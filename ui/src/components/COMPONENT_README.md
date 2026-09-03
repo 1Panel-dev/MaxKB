@@ -47,6 +47,13 @@ src/components/
 │   └── workspace-relation-tags/
 │       └── index.vue             # 标签及关联工作空间展示
 ├── global/                       # 高频、稳定的基础组件，自动注册
+│   ├── markdown-editor/
+│   │   ├── config.ts             # 本地扩展、内容过滤和语言包的全局配置
+│   │   ├── MdEditor.vue          # 支持多语言和自定义页脚的 Markdown 编辑器
+│   │   ├── MdEditorMagnify.vue   # 支持弹窗放大编辑的 Markdown 编辑器
+│   │   ├── MdPreview.vue         # 禁用代码折叠的 Markdown 预览器
+│   │   ├── sup-popover.scss      # Markdown 上标说明悬浮层样式
+│   │   └── sup-popover.ts        # Markdown 上标说明悬浮层交互
 │   ├── mk-complex-search/
 │   │   └── index.vue             # 字段选择与输入或枚举条件组合搜索框
 │   ├── mk-collapse/
@@ -146,8 +153,9 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
   由使用方手动导入。业务组件不使用 `Mk` 前缀，也不再按 Workspace 等上级领域增加额外目录。
 - 不依赖固定业务的共享组合 UI 组件放在 `components/<component-name>`，由使用方手动导入。
 - 一个公共组件默认使用一个 kebab-case 目录，入口统一为 `index.vue`；`codemirror-editor` 按语言
-  提供 `python.vue` 和 `Json.vue` 两个专用入口，`mk-logo` 按完整 Logo 与图形 Logo 提供
-  `LogoFull.vue` 和 `LogoIcon.vue` 两个专用入口。
+  提供 `python.vue` 和 `Json.vue` 两个专用入口，`markdown-editor` 提供 `MdEditor.vue`、
+  `MdEditorMagnify.vue` 和 `MdPreview.vue` 三个自动注册入口，`mk-logo` 按完整 Logo 与图形 Logo
+  提供 `LogoFull.vue` 和 `LogoIcon.vue` 两个专用入口。
 - 组件名使用 PascalCase；目录名使用 kebab-case，例如 `MkIcon` 对应
   `mk-icon/index.vue`。
 - `index.vue` 必须通过 `defineOptions({ name: 'ComponentName' })` 声明多单词组件名，避免
@@ -178,6 +186,25 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 ```
 
 ## 自动注册组件
+
+### MdEditor、MdEditorMagnify、MdPreview
+
+基于 `md-editor-v3` 的全局自动注册组件。三个组件统一使用 User Store 中的当前语言，并为繁体中文
+加载 `zh-TW` 语言包；底层组件的 Props 和事件通过 `$attrs` 透传。`MdEditor` 默认关闭 Prettier，
+并透传 `defFooters` 插槽；`MdEditorMagnify` 在无工具栏编辑器的页脚提供放大按钮，弹窗中点击确定
+才会写回内容并触发 `submitDialog`，取消或关闭弹窗会丢弃本次弹窗编辑；`MdPreview` 默认关闭代码
+折叠。Admin 和 Chat 入口统一调用
+`configureMarkdownEditor()`，将代码高亮、全屏、KaTeX、图片裁剪、Mermaid、ECharts 和 Prettier
+配置为本地实例，避免运行时加载 CDN 资源；`md-editor-v3` v6 的图标已随依赖打包，不再维护或加载
+旧版 `markdown-iconfont.js`。
+
+```vue
+<MdEditor v-model="markdownContent">
+  <template #defFooters>自定义页脚</template>
+</MdEditor>
+<MdEditorMagnify v-model="markdownContent" title="提示词" @submit-dialog="handleSubmit" />
+<MdPreview :model-value="markdownContent" />
+```
 
 ### MkCollapse
 

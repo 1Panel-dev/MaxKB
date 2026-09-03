@@ -65,11 +65,12 @@ System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。
 Login、Workflow 路由没有挂载 `AppLayout`，因此不会出现在左侧导航中：
 
 - `login`：登录及账户相关独立页面。
-- `workflow`：集中维护各业务的全屏画布路由，当前包含智能体工作流，后续知识库等画布继续在
-  `admin/workflow/index.ts` 中注册。
-- Workflow 统一使用 `/workflow/<canvas-type>/:resourceId` 结构；当前智能体工作流地址为
-  `/workflow/application/:applicationId`。智能体页面使用新标签打开该地址；路由参数
-  只保留智能体标识，页面当前不请求接口。
+- `workflow`：集中维护各业务的全屏画布路由，当前包含智能体和工具工作流，后续知识库等画布
+  继续在 `admin/workflow/index.ts` 中注册。
+- Workflow 路由保留当前 Workspace 和资源标识；智能体工作流地址为
+  `/workspace/:workspaceId/application/:applicationId/workflow`，工具工作流地址为
+  `/workspace/:workspaceId/tool/:toolId/workflow`。两个页面均可从资源操作入口进入，按住 Ctrl 或
+  Command 点击时在新标签页打开。
 
 登录页面地址为 `/login`；忘记密码使用独立页面 `/forgot-password`，两者均复用登录布局且不挂载 `AppLayout`。
 
@@ -186,7 +187,10 @@ Workspace 页面：
 /admin/workspace/:workspaceId/tools
 /admin/workspace/:workspaceId/model
 
+/admin/workspace/:workspaceId/tool/:toolId/workflow
+
 /admin/workspace/:workspaceId/application
+/admin/workspace/:workspaceId/application/:applicationId/workflow
 /admin/workspace/:workspaceId/application/:applicationId/:type/overview
 /admin/workspace/:workspaceId/application/:applicationId/:type/setting
 

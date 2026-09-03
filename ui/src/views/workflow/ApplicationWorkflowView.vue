@@ -6,19 +6,20 @@ import type { Action } from 'element-plus'
 import { Aim, Close, FullScreen } from '@element-plus/icons-vue'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
+import { RESOURCE_TYPE } from '@/api/enums'
 import type { ApplicationDetail } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
-import { defaultNodes } from '@/workflow-canvas/config/node-mapping'
-import type { ShapeItem } from '@/workflow-canvas/types'
+import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
+import { WorkflowMode, type ShapeItem } from '@/workflow-canvas/types'
 import WorkflowComponentMenu from './components/WorkflowComponentMenu.vue'
 import Conversation from '@/components/conversation/index.vue'
 
 defineOptions({ name: 'ApplicationWorkflowView' })
 
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
-  nodes: cloneDeep(defaultNodes),
+  nodes: cloneDeep(defaultApplicationNodes),
   edges: [],
 }
 
@@ -259,7 +260,12 @@ onMounted(() => {
       </div>
 
       <div class="flex shrink-0 items-center gap-3">
-        <WorkflowComponentMenu @dragstart="handleDragNode" @select="handleAddNode" />
+        <WorkflowComponentMenu
+          :current-resource="{ id: applicationId, source: RESOURCE_TYPE.APPLICATION }"
+          :workflow-mode="WorkflowMode.Application"
+          @dragstart="handleDragNode"
+          @select="handleAddNode"
+        />
         <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
         <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
         <!-- <el-button
@@ -294,7 +300,13 @@ onMounted(() => {
       </div>
     </header>
     <!-- 主画布 -->
-    <WorkflowCanvas ref="workflowRef" class="min-h-0 flex-1" />
+    <WorkflowCanvas
+      ref="workflowRef"
+      class="min-h-0 flex-1"
+      :current-resource="{ id: applicationId, source: RESOURCE_TYPE.APPLICATION }"
+      :loop-workflow-mode="WorkflowMode.ApplicationLoop"
+      :workflow-mode="WorkflowMode.Application"
+    />
 
     <!-- 调试对话：右侧悬浮面板 -->
     <transition name="debug-panel">

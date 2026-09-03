@@ -1,6 +1,6 @@
-import { del, get, getExportFile, post, put } from '../../core/request'
+import { del, get, getExportFile, post, postStream, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { ApplicationDetail, ApplicationFormPayload, Dict } from '@/api/types'
+import type { ApplicationDetail, ApplicationFormPayload, Dict, PromptGeneratePayload } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
@@ -72,6 +72,11 @@ const putApplicationPublish = (applicationId: string) => {
   return put<Record<string, never>, ApplicationDetail>(`${getPrefix()}/${applicationId}/publish`, {})
 }
 
+/** 使用指定模型流式生成或优化系统提示词。 */
+const postPromptGenerate = (applicationId: string, modelId: string, payload: PromptGeneratePayload, signal?: AbortSignal) => {
+  return postStream(`${getPrefix()}/${applicationId}/model/${modelId}/prompt_generate`, payload, { signal })
+}
+
 export default {
   getApplicationPage,
   getApplicationDetail,
@@ -85,4 +90,5 @@ export default {
   putBatchMoveApplications,
   putApplicationPublish,
   getAllApplication,
+  postPromptGenerate,
 }

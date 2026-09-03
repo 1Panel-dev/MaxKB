@@ -14,6 +14,10 @@ interface ExportRequestConfig extends AxiosRequestConfig {
   skipGlobalErrorMessage?: boolean
 }
 
+interface StreamRequestConfig {
+  signal?: AbortSignal
+}
+
 function setRequestHeaders(config: InternalAxiosRequestConfig) {
   const { auth, user } = useStore()
 
@@ -91,6 +95,16 @@ async function getResponseErrorMessage(error: unknown) {
     return responseData
   }
   return responseData?.message
+}
+
+async function getFetchErrorMessage(response: Response) {
+  const responseText = await response.text()
+  try {
+    const responseData = JSON.parse(responseText) as Partial<ApiResponse<unknown>>
+    return responseData.message || responseText
+  } catch {
+    return responseText
+  }
 }
 
 async function downloadExportResponse(response: AxiosResponse<Blob>, fileName: string, mimeType = 'application/octet-stream') {
@@ -182,10 +196,23 @@ export function get<T = unknown>(url: string, params?: Dict<unknown>, loading?: 
 }
 
 /** 发送指定方法的 Blob 请求并触发浏览器下载。 */
-export async function downloadRequest(url: string, method: string, data?: unknown, params?: Dict<unknown>, loading?: LoadingTarget): Promise<boolean> {
+export async function downloadRequest(
+  url: string,
+  method: string,
+  data?: unknown,
+  params?: Dict<unknown>,
+  loading?: LoadingTarget,
+): Promise<boolean> {
   startLoading(loading)
   try {
-    const response = await request.request<Blob>({ url, method, data, params, responseType: 'blob', skipGlobalErrorMessage: true } as ExportRequestConfig)
+    const response = await request.request<Blob>({
+      url,
+      method,
+      data,
+      params,
+      responseType: 'blob',
+      skipGlobalErrorMessage: true,
+    } as ExportRequestConfig)
 
     return downloadExportResponse(response, 'download')
   } finally {
@@ -206,7 +233,13 @@ export async function getExportFile(fileName: string, url: string, params?: Dict
 }
 
 /** 发送 POST 请求并将 Blob 响应下载为 Excel 文件。 */
-export async function postExportExcel<TData = unknown>(fileName: string, url: string, params?: Dict<unknown>, data?: TData, loading?: LoadingTarget): Promise<boolean> {
+export async function postExportExcel<TData = unknown>(
+  fileName: string,
+  url: string,
+  params?: Dict<unknown>,
+  data?: TData,
+  loading?: LoadingTarget,
+): Promise<boolean> {
   startLoading(loading)
   try {
     const response = await request.post<Blob>(url, data, { params, responseType: 'blob', skipGlobalErrorMessage: true } as ExportRequestConfig)
@@ -220,6 +253,39 @@ export async function postExportExcel<TData = unknown>(fileName: string, url: st
 /** 发送 POST 请求。 */
 export function post<TData = unknown, T = unknown>(url: string, data?: TData, params?: Dict<unknown>, loading?: LoadingTarget, timeout?: number) {
   return promise<T>(request.post<ApiResponse<T>>(url, data, { params, timeout }), loading)
+}
+
+/** 发送 POST 请求并返回可逐块读取的原始响应。 */
+export async function postStream<TData = unknown>(url: string, data?: TData, config: StreamRequestConfig = {}) {
+  const { auth, user } = useStore()
+  const headers = new Headers({ 'Content-Type': 'application/json' })
+  if (auth.token) headers.set('Authorization', `Bearer ${auth.token}`)
+  if (user.language) headers.set('Accept-Language', user.language)
+
+  const baseUrl = String(request.defaults.baseURL ?? '').replace(/\/+$/, '')
+  const response = await fetch(`${baseUrl}/${url.replace(/^\/+/, '')}`, {
+    body: JSON.stringify(data ?? {}),
+    headers,
+    method: 'POST',
+    signal: config.signal,
+  })
+
+  if (response.ok) return response
+
+  const errorMessage = (await getFetchErrorMessage(response)) || response.statusText
+  if (response.status === 401) {
+    auth.clearToken()
+    void router.push({ name: 'login' })
+  } else if (response.status === 403) {
+    MsgError(errorMessage || 'No permission to access')
+  } else if (response.status === 404) {
+    void router.replace({ name: 'not-found', params: { pathMatch: ['404'] } })
+  } else {
+    MsgError(errorMessage)
+  }
+  const error = new Error(errorMessage)
+  error.name = 'StreamRequestError'
+  throw error
 }
 
 /** 发送 PUT 请求。 */

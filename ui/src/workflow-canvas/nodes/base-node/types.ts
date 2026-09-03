@@ -35,22 +35,33 @@ export interface LongTermSetting {
   long_term_trigger_type: 'ROUND' | 'SCHEDULED'
 }
 
-export interface BaseNodeForm extends LongTermSetting {
+export interface SpeechInputSetting {
+  stt_autosend: boolean
+  stt_model_enable: boolean
+  stt_model_id: string
+  stt_model_id_type: 'custom' | 'default'
+}
+
+export interface SpeechPlaybackSetting {
+  tts_autoplay: boolean
+  tts_model_enable: boolean
+  tts_model_id: string
+  tts_model_params_setting: Record<string, unknown>
+  tts_type: 'BROWSER' | 'CUSTOM' | 'DEFAULT'
+}
+
+export interface UserInputSetting {
+  exposed_fields: string[]
+  menu_title: string
+}
+
+export interface BaseNodeForm extends LongTermSetting, SpeechInputSetting, SpeechPlaybackSetting {
   desc: string
   file_upload_enable: boolean
   file_upload_setting: FileUploadSetting
   long_term_enable: boolean
   name: string
   prologue: string
-  stt_autosend: boolean
-  stt_model_enable: boolean
-  stt_model_id: string
-  stt_model_id_type: 'custom' | 'default'
-  tts_autoplay: boolean
-  tts_model_enable: boolean
-  tts_model_id: string
-  tts_model_params_setting: Record<string, unknown>
-  tts_type: 'BROWSER' | 'CUSTOM' | 'DEFAULT'
 }
 
 export type UserInputField = FormField

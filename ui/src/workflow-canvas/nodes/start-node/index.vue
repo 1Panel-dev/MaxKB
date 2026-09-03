@@ -15,6 +15,23 @@ interface SourceField {
   variable?: string
 }
 
+type FileUploadField = 'audio' | 'document' | 'image' | 'other' | 'video'
+
+interface BaseNodeData {
+  file_upload_enable?: boolean
+  file_upload_setting?: Partial<Record<FileUploadField, boolean>>
+  long_term_enable?: boolean
+}
+
+const fileUploadFields: Array<{ label: string; value: FileUploadField }> = [
+  { label: '文档', value: 'document' },
+  { label: '图片', value: 'image' },
+  { label: '音频', value: 'audio' },
+  { label: '视频', value: 'video' },
+  { label: '其他', value: 'other' },
+]
+const fileUploadFieldValues = new Set<FileUploadField>(fileUploadFields.map(({ value }) => value))
+
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
 const nodeConfig = model.properties.config ?? (model.properties.config = {})
@@ -30,8 +47,19 @@ function formatFieldReference(fieldValue: string) {
   return `{${fieldValue}}`
 }
 
-function refreshFields() {
-  const baseNode = model.graphModel.getNodeModelById(WorkflowNodeType.Base)
+// 同步基本信息节点配置到开始节点的可用输出字段。
+function getBaseNode() {
+  return model.graphModel.getNodeModelById(WorkflowNodeType.Base)
+}
+
+function refreshStartQuestionField() {
+  const questionFields = [{ label: '用户问题', value: 'question' }]
+  nodeConfig.fields = questionFields
+  model.properties.fields = questionFields
+}
+
+function getRefreshFieldList() {
+  const baseNode = getBaseNode()
   const userFields = (cloneDeep(baseNode?.properties.user_input_field_list ?? []) as SourceField[]).map((field: SourceField) => ({
     label: typeof field.label === 'object' ? field.label.label : (field.label ?? field.name),
     value: field.field ?? field.variable,
@@ -40,12 +68,10 @@ function refreshFields() {
     label: field.name ?? field.variable,
     value: field.variable,
   }))
-  const chatInputFields = (cloneDeep(baseNode?.properties.chat_input_field_list ?? []) as SourceField[]).map((field: SourceField) => ({
-    label: field.label,
-    value: field.field,
-  }))
+  return [...userFields, ...apiFields]
+}
 
-  nodeConfig.fields = [{ label: '用户问题', value: 'question' }]
+function refreshFieldList() {
   nodeConfig.globalFields = [
     { label: '当前时间', value: 'time' },
     { label: '历史聊天记录', value: 'history_context' },
@@ -54,21 +80,55 @@ function refreshFields() {
     { label: '对话用户类型', value: 'chat_user_type' },
     { label: '对话用户组', value: 'chat_user_group' },
     { label: '对话用户', value: 'chat_user' },
-    ...userFields,
-    ...apiFields,
+    ...getRefreshFieldList(),
   ]
-  nodeConfig.chatFields = chatInputFields
+}
+
+function refreshChatFieldList() {
+  const baseNode = getBaseNode()
+  nodeConfig.chatFields = (cloneDeep(baseNode?.properties.chat_input_field_list ?? []) as SourceField[]).map((field) => ({
+    label: field.label,
+    value: field.field,
+  }))
+}
+
+function refreshFileUploadConfig() {
+  const fields = (cloneDeep(nodeConfig.fields ?? []) as WorkflowNodeField[]).filter(
+    ({ value }) => !fileUploadFieldValues.has(value as FileUploadField),
+  )
+  const baseNodeData = getBaseNode()?.properties.node_data as BaseNodeData | undefined
+  if (!baseNodeData?.file_upload_enable) {
+    nodeConfig.fields = fields
+    return
+  }
+
+  const enabledFileFields = fileUploadFields.filter(({ value }) => baseNodeData.file_upload_setting?.[value])
+  nodeConfig.fields = [...fields, ...enabledFileFields]
+}
+
+function refreshLongTermConfig() {
+  const fields = (cloneDeep(nodeConfig.fields ?? []) as WorkflowNodeField[]).filter(({ value }) => value !== 'memory')
+  const baseNodeData = getBaseNode()?.properties.node_data as BaseNodeData | undefined
+  nodeConfig.fields = baseNodeData?.long_term_enable ? [...fields, { label: '长期记忆', value: 'memory' }] : fields
 }
 
 onMounted(() => {
-  refreshFields()
-  model.graphModel.eventCenter.on('refreshFieldList', refreshFields)
-  model.graphModel.eventCenter.on('chatFieldList', refreshFields)
+  refreshStartQuestionField()
+  refreshChatFieldList()
+  refreshFieldList()
+  refreshFileUploadConfig()
+  refreshLongTermConfig()
+  model.graphModel.eventCenter.on('refreshFieldList', refreshFieldList)
+  model.graphModel.eventCenter.on('chatFieldList', refreshChatFieldList)
+  model.graphModel.eventCenter.on('refreshFileUploadConfig', refreshFileUploadConfig)
+  model.graphModel.eventCenter.on('refreshLongTermConfig', refreshLongTermConfig)
 })
 
 onBeforeUnmount(() => {
-  model.graphModel.eventCenter.off('refreshFieldList', refreshFields)
-  model.graphModel.eventCenter.off('chatFieldList', refreshFields)
+  model.graphModel.eventCenter.off('refreshFieldList', refreshFieldList)
+  model.graphModel.eventCenter.off('chatFieldList', refreshChatFieldList)
+  model.graphModel.eventCenter.off('refreshFileUploadConfig', refreshFileUploadConfig)
+  model.graphModel.eventCenter.off('refreshLongTermConfig', refreshLongTermConfig)
 })
 </script>
 

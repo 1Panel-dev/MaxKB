@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
@@ -11,6 +12,8 @@ import { MsgSuccess } from '@/utils/message'
 defineOptions({ name: 'WorkflowFormDialog' })
 
 const { auth } = useStore()
+const route = useRoute()
+const router = useRouter()
 
 const props = defineProps<{ api: typeof ToolApi; folderId: string; title: string }>()
 
@@ -47,8 +50,15 @@ function handleSubmit() {
         return refreshCurrentUser.then(() => {
           MsgSuccess(isEdit ? '保存成功' : '创建成功')
           visible.value = false
-          if (isEdit) emit('update', savedTool)
-          else emit('refresh') // TODO 跳转到工具工作流画布
+          if (isEdit) {
+            emit('update', savedTool)
+            return
+          }
+
+          return router.push({
+            name: 'workflow-tool',
+            params: { toolId: savedTool.id, workspaceId: route.params.workspaceId },
+          })
         })
       })
       .finally(() => {
@@ -101,12 +111,26 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" :title="title" @closed="handleClosed">
-    <el-form ref="formRef" v-loading="formLoading" :model="workflowForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form
+      ref="formRef"
+      v-loading="formLoading"
+      :model="workflowForm"
+      :rules="formRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
           <!-- // TODO 编辑icon 统一处理 -->
           <ToolIcon :icon="workflowForm.icon" :size="32" :type="TOOL_TYPE.WORKFLOW" />
-          <el-input v-model="workflowForm.name" maxlength="64" placeholder="请输入工作流名称" show-word-limit @blur="workflowForm.name = workflowForm.name.trim()" />
+          <el-input
+            v-model="workflowForm.name"
+            maxlength="64"
+            placeholder="请输入工作流名称"
+            show-word-limit
+            @blur="workflowForm.name = workflowForm.name.trim()"
+          />
         </div>
       </el-form-item>
       <el-form-item label="描述">

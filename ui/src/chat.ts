@@ -3,11 +3,14 @@ import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
 import App from './App.vue'
+import { configureMarkdownEditor } from '@/components/global/markdown-editor/config'
 import router from '@/router/chat'
 import { pinia } from '@/stores'
 import 'element-plus/dist/index.css'
 import '@/styles/tailwind.css'
 import '@/styles/index.scss'
+
+configureMarkdownEditor()
 
 const app = createApp(App)
 

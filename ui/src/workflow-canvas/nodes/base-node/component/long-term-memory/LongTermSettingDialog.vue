@@ -5,8 +5,8 @@ import type { FormInstance } from 'element-plus'
 import { Operation } from '@element-plus/icons-vue'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
-import ModelParamsDialog from './ModelParamsDialog.vue'
-import type { LongTermSetting } from './types'
+import ModelParamsDialog from '../../ModelParamsDialog.vue'
+import type { LongTermSetting } from '../../types'
 
 defineOptions({ name: 'BaseNodeLongTermSettingDialog' })
 
