@@ -1,9 +1,0 @@
-version: 2
-updates:
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      timezone: "Asia/Shanghai"
-      day: "friday"
-    target-branch: "v3"
