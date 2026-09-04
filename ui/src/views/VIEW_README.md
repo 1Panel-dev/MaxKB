@@ -273,3 +273,28 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 - Element Plus 登录表单通过 `formEl.validate((valid, fields) => {})` 回调处理校验结果。
 - LDAP 与本地账号登录保留清晰的条件分支，请求结果使用 `.then().catch()` 处理；未经明确要求，
   不改写为 `try/catch` 或额外抽象登录提交流程。
+
+## 工作流页面布局
+
+`workflow/components/WorkflowViewLayout.vue` 由 `ApplicationWorkflowView` 和 `ToolWorkflowView`
+共同使用，统一全屏容器、页面头部、返回按钮、标题和保存时间展示。通过 `loading`、`title`、
+`saveTime` 传入展示状态，点击返回按钮触发 `back` 事件。
+
+`actions` 插槽用于添加组件、保存、调试等页面操作，默认插槽放置画布及页面浮层；画布继续使用
+`min-h-0 flex-1` 占满头部下方空间。页面保留画布 Ref、资源与模式配置、接口调用、保存和退出确认
+逻辑，布局组件只负责展示。
+
+## 工作流默认模型设置
+
+`workflow/components/DefaultModelSetting.vue` 维护默认模型面板，按模型类型组织本地暂存配置。
+调用方通过 `show` 控制显示，通过 `v-model` 接收保存后的配置，通过 `save` 执行页面持久化，
+通过 `close` 关闭面板。只读场景传入 `readonly`。编辑与参数弹窗不直接修改父级配置；有修改时
+点击面板外会区分保存、丢弃和取消。
+
+模型查询通过必填的完整 `modelApi` 对象执行（类型使用 `typeof ModelApi`），可用 `modelQuery`
+补充资源范围需要的查询参数；调用方负责选择 API，组件不从 URL 推断资源范围。供应商列表通过
+当前公共供应商接口查询。模型选择及参数设置复用 `ModelSelect`，重排序模型隐藏参数入口。
+
+传入 `workflowRef` 后支持“应用到所有节点”：只切换节点的模型来源，保留自定义模型 ID 和参数，
+递归处理循环体，并保留基本信息节点中关闭的语音/长期记忆配置及浏览器语音播放模式。
+该操作修改画布，由页面原有保存流程持久化，不自动提交面板内暂存的默认模型设置。

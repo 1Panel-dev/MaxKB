@@ -1,100 +1,12 @@
-<template>
-  <NodeContainer :node-model="model">
-    <el-form ref="conditionNodeFormRef" :model="form_data" label-position="top" require-asterisk-position="right" label-width="auto" @submit.prevent>
-      <template v-for="(item, index) in form_data.branch" :key="item.id">
-        <div v-branch-resize="{ item, index }">
-          <el-card shadow="never" class="card-never drag-card mb-2" :class="{ 'drag-card-empty': index === form_data.branch.length - 1 }">
-            <template #header>
-              <div class="flex items-center justify-between">
-                <span>{{ item.type }}</span>
-                <div v-if="item.conditions.length > 1" class="flex items-center">
-                  <span class="text-N600">满足</span>
-                  <el-select :teleported="false" v-model="item.condition" size="small" style="width: 60px; margin: 0 8px">
-                    <el-option label="且" value="and" />
-                    <el-option label="或" value="or" />
-                  </el-select>
-                  <span class="text-N600">条件</span>
-                </div>
-              </div>
-            </template>
-
-            <div v-if="index !== form_data.branch.length - 1">
-              <template v-for="(condition, cIndex) in item.conditions" :key="cIndex">
-                <el-row :gutter="8">
-                  <el-col :span="11">
-                    <el-form-item
-                      :prop="`branch.${index}.conditions.${cIndex}.field`"
-                      :rules="{ type: 'array', required: true, message: '请选择变量', trigger: 'change' }"
-                    >
-                      <NodeCascader :ref="setCascaderRef" :node-model="model" class="w-full" placeholder="请选择变量" v-model="condition.field" />
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span="6">
-                    <el-form-item
-                      :prop="`branch.${index}.conditions.${cIndex}.compare`"
-                      :rules="{ required: true, message: '请选择比较符', trigger: 'change' }"
-                    >
-                      <el-select
-                        :teleported="false"
-                        v-model="condition.compare"
-                        placeholder="请选择比较符"
-                        clearable
-                        @change="changeCondition($event, index, cIndex)"
-                        @wheel="handleNodeWheel"
-                      >
-                        <template v-for="(item, index) in compareList" :key="index">
-                          <el-option :label="item.label" :value="item.value" />
-                        </template>
-                      </el-select>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span="6">
-                    <el-form-item
-                      v-if="!['is_null', 'is_not_null', 'is_true', 'is_not_true'].includes(condition.compare)"
-                      :prop="`branch.${index}.conditions.${cIndex}.value`"
-                      :rules="{ required: true, message: '请输入比较值', trigger: 'blur' }"
-                    >
-                      <el-input v-model="condition.value" placeholder="请输入比较值" />
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span="1">
-                    <el-button
-                      :disabled="form_data.branch.length === 2 && item.conditions.length === 1"
-                      link
-                      type="info"
-                      class="mt-2"
-                      @click="deleteCondition(index, cIndex)"
-                    >
-                      <MkIcon name="icon_delete-trash_outlined" />
-                    </el-button>
-                  </el-col>
-                </el-row>
-              </template>
-            </div>
-
-            <el-button v-if="index !== form_data.branch.length - 1" link type="primary" @click="addCondition(index)">
-              <MkIcon name="icon_add_outlined" class="mr-1" />
-              添加条件
-            </el-button>
-          </el-card>
-        </div>
-      </template>
-      <el-button link type="primary" @click="addBranch">
-        <MkIcon name="icon_add_outlined" class="mr-1" />
-        添加分支
-      </el-button>
-    </el-form>
-  </NodeContainer>
-</template>
 <script setup lang="ts">
 import { cloneDeep } from 'lodash'
-import { inject, onBeforeUnmount, onMounted, ref, type Directive, type DirectiveBinding, type Ref } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef, type Directive } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
 
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import { handleNodeWheel } from '@/workflow-canvas/core/utils'
+import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { compareList } from '@/workflow-canvas/config/constants'
 import { randomId } from '@/utils/common'
 
@@ -103,9 +15,9 @@ const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel() as BaseNodeModel & { refreshBranch: () => void }
 
 interface ConditionItem {
-  field: Array<string>
+  field: string[]
   compare: string
-  value: string
+  value: string | number
 }
 interface BranchItem {
   conditions: ConditionItem[]
@@ -119,162 +31,192 @@ interface BranchConditionListItem {
   index: number
 }
 
-const defaultForm = () => ({
-  branch: [
-    {
-      conditions: [{ field: [], compare: '', value: '' }],
-      id: randomId(),
-      type: 'IF',
-      condition: 'and',
-    },
-    {
-      conditions: [],
-      id: randomId(),
-      type: 'ELSE',
-      condition: 'and',
-    },
-  ],
-})
+// 表单初始化与条件校验。
+const valueLessComparisons = new Set(['is_null', 'is_not_null', 'is_true', 'is_not_true'])
+const createCondition = (): ConditionItem => ({ field: [], compare: '', value: '' })
 
 if (!model.properties.node_data) {
-  model.properties.node_data = defaultForm()
-}
-const form_data = model.properties.node_data as { branch: BranchItem[] }
-
-const conditionNodeFormRef = ref<FormInstance>()
-const nodeCascaderRef: Ref<Array<{ validate: () => Promise<unknown> }>> = ref([])
-
-function setCascaderRef(el: unknown) {
-  if (el && !nodeCascaderRef.value.includes(el as { validate: () => Promise<unknown> })) {
-    nodeCascaderRef.value.push(el as { validate: () => Promise<unknown> })
+  model.properties.node_data = {
+    branch: [
+      { conditions: [createCondition()], id: randomId(), type: 'IF', condition: 'and' },
+      { conditions: [], id: randomId(), type: 'ELSE', condition: 'and' },
+    ],
   }
 }
+const formData = computed(() => model.properties.node_data as { branch: BranchItem[] })
+const conditionNodeFormRef = useTemplateRef<FormInstance>('conditionNodeFormRef')
+const nodeCascaderRefs = useTemplateRef<InstanceType<typeof NodeCascader>[]>('nodeCascaderRefs')
 
-const validate = () => {
-  const vList = [conditionNodeFormRef.value?.validate(), ...nodeCascaderRef.value.map((item) => item.validate())]
-  return Promise.all(vList).catch((err) => {
-    return Promise.reject({ node: model, errMessage: err })
-  })
+function validate() {
+  return Promise.all([conditionNodeFormRef.value?.validate(), ...(nodeCascaderRefs.value ?? []).map((cascader) => cascader.validate())]).catch(
+    (error) => Promise.reject({ node: model, errMessage: error }),
+  )
 }
 
+// 分支增删保留原有锚点 ID，删除空分支时同步清理连线。
 function addBranch() {
-  const list: BranchItem[] = cloneDeep(model.properties.node_data.branch)
-  const obj: BranchItem = {
-    conditions: [{ field: [], compare: '', value: '' }],
-    type: 'ELSE IF ' + (list.length - 1),
+  const branches = cloneDeep(formData.value.branch)
+  branches.splice(branches.length - 1, 0, {
+    conditions: [createCondition()],
+    type: `ELSE IF ${branches.length - 1}`,
     id: randomId(),
     condition: 'and',
-  }
-  list.splice(list.length - 1, 0, obj)
-  refreshBranchAnchor(list, true)
-  model.properties.node_data.branch = list
+  })
+  formData.value.branch = branches
+  refreshBranchAnchors()
 }
 
-function refreshBranchAnchor(list: BranchItem[], isAdd: boolean) {
-  const branchConditionList = cloneDeep<BranchConditionListItem[]>((model.properties.branch_condition_list as BranchConditionListItem[]) ?? [])
-  const newBranchConditionList = list
-    .map((item, index) => {
-      const find = branchConditionList.find((b) => b.id === item.id)
-      if (find) {
-        return { index, height: find.height, id: item.id }
-      } else {
-        if (isAdd) {
-          return { index, height: 12, id: item.id }
-        }
+function addCondition(branch: BranchItem) {
+  branch.conditions.push(createCondition())
+}
+
+function deleteCondition(branchIndex: number, conditionIndex: number) {
+  const branches = cloneDeep(formData.value.branch)
+  const branch = branches[branchIndex]
+  if (!branch || (branches.length === 2 && branch.conditions.length === 1)) return
+
+  branch.conditions.splice(conditionIndex, 1)
+  if (branch.conditions.length === 0) {
+    branches.splice(branchIndex, 1)
+    const anchorId = `${model.id}_${branch.id}_right`
+    const edgeIds = model.outgoing.edges.filter((edge) => edge.sourceAnchorId === anchorId).map((edge) => edge.id)
+    model.graphModel.eventCenter.emit('delete_edge', edgeIds)
+    branches.forEach((remainingBranch, index) => {
+      if (remainingBranch.type === `ELSE IF ${index + 1}`) {
+        remainingBranch.type = `ELSE IF ${index}`
       }
     })
-    .filter((item) => item)
-  model.properties.branch_condition_list = newBranchConditionList
+  }
+  formData.value.branch = branches
+  refreshBranchAnchors()
+}
+
+function changeComparison(condition: ConditionItem) {
+  // 无比较值的运算仍按现有节点协议写入占位值。
+  if (valueLessComparisons.has(condition.compare)) condition.value = 1
+}
+
+// 根据卡片实际高度刷新分支锚点；通过 ID 查找当前顺序，避免删除后沿用旧索引。
+function refreshBranchAnchors(branchId?: string, height?: number) {
+  const previousBranches = (model.properties.branch_condition_list as BranchConditionListItem[] | undefined) ?? []
+  model.properties.branch_condition_list = formData.value.branch.map((branch, index) => ({
+    id: branch.id,
+    index,
+    height: branch.id === branchId && height !== undefined ? height : (previousBranches.find((previous) => previous.id === branch.id)?.height ?? 12),
+  }))
   model.refreshBranch()
 }
 
-function addCondition(index: number) {
-  const list = cloneDeep(model.properties.node_data.branch)
-  list[index].conditions.push({ field: [], compare: '', value: '' })
-  model.properties.node_data.branch = list
-}
-
-function deleteCondition(index: number, cIndex: number) {
-  const list: BranchItem[] = cloneDeep(model.properties.node_data.branch)
-  const branch = list[index]
-  if (!branch) return
-  branch.conditions.splice(cIndex, 1)
-  if (branch.conditions.length === 0) {
-    const deleteEdge = list.splice(index, 1)
-    const deleteTargetAnchorIdList = deleteEdge.map((item) => model.id + '_' + item.id + '_right')
-    model.graphModel.eventCenter.emit(
-      'delete_edge',
-      model.outgoing.edges.filter((item) => item.sourceAnchorId && deleteTargetAnchorIdList.includes(item.sourceAnchorId)).map((item) => item.id),
-    )
-    refreshBranchAnchor(list, false)
-    list.forEach((item, i) => {
-      if (item.type === 'ELSE IF ' + (i + 1)) {
-        item.type = 'ELSE IF ' + i
-      }
-    })
-  }
-  model.properties.node_data.branch = list
-}
-
-function changeCondition(val: string, index: number, cIndex: number) {
-  if (['is_null', 'is_not_null', 'is_true', 'is_not_true'].includes(val)) {
-    const list = cloneDeep(model.properties.node_data.branch)
-    list[index].conditions[cIndex].value = 1
-    model.properties.node_data.branch = list
-  }
-}
-
-const branchCardRefs = new Map<HTMLElement, ResizeObserver>()
-
-const vBranchResize: Directive = {
-  mounted(el: HTMLElement, binding: DirectiveBinding<{ item: BranchItem; index: number }>) {
-    const { item, index } = binding.value
+const branchObservers = new Map<HTMLElement, ResizeObserver>()
+const vBranchResize: Directive<HTMLElement, string> = {
+  mounted(element, { value: branchId }) {
     const observer = new ResizeObserver(() => {
-      resizeCondition(el, item, index)
+      // 折叠时保留展开高度，避免隐藏卡片把锚点高度覆盖为 0。
+      if (element.offsetHeight > 0) refreshBranchAnchors(branchId, element.offsetHeight)
     })
-    branchCardRefs.set(el, observer)
-    observer.observe(el)
+    branchObservers.set(element, observer)
+    observer.observe(element)
   },
-  unmounted(el: HTMLElement) {
-    branchCardRefs.get(el)?.disconnect()
-    branchCardRefs.delete(el)
+  unmounted(element) {
+    branchObservers.get(element)?.disconnect()
+    branchObservers.delete(element)
   },
 }
 
-function resizeCondition(container: HTMLElement, row: BranchItem, index: number) {
-  const branchConditionList = cloneDeep<BranchConditionListItem[]>((model.properties.branch_condition_list as BranchConditionListItem[]) ?? [])
-  const newBranchConditionList = branchConditionList.map((item) => {
-    if (item.id === row.id) {
-      return { ...item, height: container.offsetHeight, index }
-    }
-    return item
-  })
-  model.properties.branch_condition_list = newBranchConditionList
-  refreshBranchAnchor(model.properties.node_data.branch, true)
-}
-
+const anchorGuard = createAnchorGuard(model)
 onMounted(() => {
   model.validate = validate
-  if (!model.properties.branch_condition_list) {
-    refreshBranchAnchor(form_data.branch, true)
-  }
+  refreshBranchAnchors()
 })
-
 onBeforeUnmount(() => {
-  Array.from(branchCardRefs.values()).forEach((observer: ResizeObserver) => observer.disconnect())
-  branchCardRefs.clear()
+  branchObservers.forEach((observer) => observer.disconnect())
+  branchObservers.clear()
+  anchorGuard.reset()
 })
 </script>
-<style lang="scss" scoped>
-.drag-card {
-  :deep(.el-card__body) {
-    padding: 12px;
-  }
 
-  &.drag-card-empty {
-    :deep(.el-card__body) {
-      display: none;
-    }
-  }
-}
-</style>
+<template>
+  <NodeContainer :node-model="model">
+    <el-form ref="conditionNodeFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <div v-for="(branch, branchIndex) in formData.branch" :key="branch.id" v-branch-resize="branch.id" class="mk-gray-card mb-2">
+        <div class="flex-between min-h-6">
+          <span>{{ branch.type }}</span>
+          <div v-if="branch.conditions.length > 1" class="flex items-center gap-2 text-N600">
+            <span>符合以下</span>
+            <el-select
+              v-model="branch.condition"
+              :teleported="false"
+              size="small"
+              class="w-15!"
+              @visible-change="anchorGuard.setOverlayVisible(`${branch.id}:condition`, $event)"
+              @wheel="handleNodeWheel"
+            >
+              <el-option label="所有" value="and" />
+              <el-option label="任一" value="or" />
+            </el-select>
+            <span>条件</span>
+          </div>
+        </div>
+
+        <template v-if="branchIndex !== formData.branch.length - 1">
+          <div class="mt-2 space-y-2">
+            <div v-for="(condition, conditionIndex) in branch.conditions" :key="conditionIndex" class="flex items-start gap-2">
+              <el-form-item
+                class="mb-0! min-w-0 flex-2"
+                :prop="`branch.${branchIndex}.conditions.${conditionIndex}.field`"
+                :rules="{ type: 'array', required: true, message: '请选择变量', trigger: 'change' }"
+              >
+                <NodeCascader ref="nodeCascaderRefs" v-model="condition.field" :node-model="model" class="w-full" placeholder="请选择变量" />
+              </el-form-item>
+              <el-form-item
+                class="mb-0! min-w-0 flex-1"
+                :prop="`branch.${branchIndex}.conditions.${conditionIndex}.compare`"
+                :rules="{ required: true, message: '请选择比较符', trigger: 'change' }"
+              >
+                <el-select
+                  v-model="condition.compare"
+                  :teleported="false"
+                  placeholder="请选择比较符"
+                  clearable
+                  @change="changeComparison(condition)"
+                  @visible-change="anchorGuard.setOverlayVisible(`${branch.id}:${conditionIndex}:compare`, $event)"
+                  @wheel="handleNodeWheel"
+                >
+                  <el-option v-for="comparison in compareList" :key="comparison.value" :label="comparison.label" :value="comparison.value" />
+                </el-select>
+              </el-form-item>
+              <div class="min-w-0 flex-1">
+                <el-form-item
+                  v-if="!valueLessComparisons.has(condition.compare)"
+                  class="mb-0!"
+                  :prop="`branch.${branchIndex}.conditions.${conditionIndex}.value`"
+                  :rules="{ required: true, message: '请输入比较值', trigger: 'blur' }"
+                >
+                  <el-input v-model="condition.value" placeholder="请输入比较值" />
+                </el-form-item>
+              </div>
+              <el-button
+                :disabled="formData.branch.length === 2 && branch.conditions.length === 1"
+                link
+                type="info"
+                class="mt-2 shrink-0"
+                aria-label="删除条件"
+                @click="deleteCondition(branchIndex, conditionIndex)"
+              >
+                <MkIcon name="icon_delete-trash_outlined" />
+              </el-button>
+            </div>
+          </div>
+          <el-button class="mt-2" link type="primary" @click="addCondition(branch)">
+            <MkIcon name="icon_add_outlined" class="mr-1" />
+            添加条件
+          </el-button>
+        </template>
+      </div>
+      <el-button link type="primary" @click="addBranch">
+        <MkIcon name="icon_add_outlined" class="mr-1" />
+        添加分支
+      </el-button>
+    </el-form>
+  </NodeContainer>
+</template>

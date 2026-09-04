@@ -6,16 +6,17 @@ import SharedApi from '@/api/admin/workspace/shared'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import type { ApplicationDetail, ApplicationType, FolderItem, ToolItem, ToolType } from '@/api/types'
-import type { NodeMenuCurrentResource, NodeMenuItem, NodeMenuResourceSource } from './types'
+import type { NodeMenuItem, NodeMenuResourceSource } from './types'
 import { FOLDER_ENTRY_ID } from '@/constants'
 import { isWorkFlow } from '@/utils/application'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { applicationNode, toolLibNode, toolWorkflowLibNode } from '@/workflow-canvas/config/node-data'
+import { useRoute } from 'vue-router'
 
 defineOptions({ name: 'ResourceNodeMenu' })
 
+const route = useRoute()
 const props = defineProps<{
-  currentResource?: NodeMenuCurrentResource
   source: NodeMenuResourceSource
 }>()
 const emit = defineEmits<{
@@ -39,7 +40,6 @@ const loading = ref(false)
 const resourceItems = ref<ResourceMenuItem[]>([])
 const searchKeyword = ref('')
 const isToolMenu = computed(() => props.source === RESOURCE_TYPE.TOOL)
-const currentResourceId = computed(() => (props.currentResource?.source === props.source ? props.currentResource.id : undefined))
 
 const filteredResourceItems = computed(() => {
   const keyword = searchKeyword.value.trim().toLocaleLowerCase()
@@ -79,7 +79,7 @@ function loadTools(folder?: FolderItem) {
 
   return requestApi.getAllTool(folderQuery).then((tools) => {
     resourceItems.value = tools
-      .filter((tool) => tool.is_active && tool.id !== currentResourceId.value)
+      .filter((tool) => tool.is_active && tool.id !== route.params?.toolId)
       .map((tool) => ({
         desc: tool.desc,
         icon: tool.icon,
@@ -96,7 +96,7 @@ function loadApplications(folder?: FolderItem) {
 
   return ApplicationApi.getAllApplication({ ...folderQuery, publish_status: 'published' }).then((res) => {
     resourceItems.value = res
-      .filter((application) => application.id !== currentResourceId.value)
+      .filter((application) => application.id !== route.params?.applicationId)
       .map((application) => ({
         applicationType: application.type,
         desc: application.desc,

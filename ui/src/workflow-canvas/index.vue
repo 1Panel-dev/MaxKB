@@ -10,17 +10,14 @@ import { initDefaultShortcut } from '@/workflow-canvas/core/shortcut'
 import { disconnectAll, getTeleport } from '@/workflow-canvas/core/teleport'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import Dagre from '@/workflow-canvas/plugins/dagre'
-import modelAPI from '@/api/admin/workspace/model/model'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import { type ShapeItem } from '@/workflow-canvas/types'
-import type { NodeMenuCurrentResource } from '@/workflow-canvas/node-menu/types'
 defineOptions({ name: 'MkWorkflow' })
 
 type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void }
 
 const props = withDefaults(
   defineProps<{
-    currentResource?: NodeMenuCurrentResource
     data?: LogicFlow.GraphConfigData | null
     loopWorkflowMode?: WorkflowMode
     workflowMode?: WorkflowMode
@@ -73,13 +70,9 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   lf.value.graphModel.get_provide = (model: LogicFlow.NodeData | null, graph: GraphModel | null) => ({
     getModel: () => model,
     getGraph: () => graph,
+    apiType: 'workspace', // TODO: apiType
     workflowMode: props.workflowMode,
     loopWorkflowMode: props.loopWorkflowMode,
-    currentResource: props.currentResource,
-    apiType: 'workspace',
-    getSelectModelList: (params: { model_type: string }) => modelAPI.getModelList(params),
-    getModelParamsForm: (modelId: string) => modelAPI.getModelParamsForm(modelId),
-    startDragNode: onmousedown,
   })
   lf.value.graphModel.eventCenter.on('delete_edge', (edgeIds: string[]) => {
     edgeIds.forEach((edgeId) => lf.value?.deleteEdge(edgeId))

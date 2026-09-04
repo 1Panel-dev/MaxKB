@@ -3,13 +3,12 @@ import { ref } from 'vue'
 
 import { ClickOutside as vClickOutside } from 'element-plus'
 import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
-import type { NodeMenuCurrentResource, NodeMenuItem } from '@/workflow-canvas/node-menu/types'
+import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
 import type { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowComponentMenu' })
 
 defineProps<{
-  currentResource?: NodeMenuCurrentResource
   workflowMode: WorkflowMode
 }>()
 
@@ -47,7 +46,6 @@ const handleDragStart = (node: NodeMenuItem, event: PointerEvent) => {
         v-show="popoverVisible"
         class="absolute right-0 top-[calc(100%+8px)] z-[2000]"
         :class="{ 'pointer-events-none': dragClosing }"
-        :current-resource="currentResource"
         :workflow-mode="workflowMode"
         @dragstart="handleDragStart"
         @select="handleSelect"

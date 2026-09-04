@@ -8,12 +8,12 @@ import ToolApi from '@/api/admin/workspace/tool/tool'
 import ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
 import { RESOURCE_TYPE } from '@/api/enums'
 import type { ToolItem, ToolWorkflowDetail } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode, type ShapeItem } from '@/workflow-canvas/types'
-import WorkflowComponentMenu from './components/WorkflowComponentMenu.vue'
+import CreateNodeMenu from './components/CreateNodeMenu.vue'
+import WorkflowViewLayout from './components/WorkflowViewLayout.vue'
 
 defineOptions({ name: 'ToolWorkflowView' })
 
@@ -34,9 +34,6 @@ function handleAddNode(shapeItem: ShapeItem) {
   workflowRef.value?.addNode(shapeItem)
 }
 
-function handleDragNode(shapeItem: ShapeItem, event: PointerEvent) {
-  workflowRef.value?.onmousedown(shapeItem, event)
-}
 
 /* 工具工作流加载与保存 */
 const toolDetail = ref<ToolItem>()
@@ -138,28 +135,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <main v-loading="loading" class="flex h-screen w-screen flex-col overflow-hidden">
-    <header class="h-header flex-between shrink-0 gap-3 border-b bg-white px-6">
-      <div class="flex min-w-0 items-center gap-3">
-        <el-button text class="-ml-3" @click="handleBack">
-          <MkIcon name="icon_left_outlined" :size="18" />
-        </el-button>
-        <h4 class="max-w-[300px] truncate" :title="toolDetail?.name">
-          {{ toolDetail?.name }}
-        </h4>
-        <span v-if="saveTime" class="shrink-0 text-sm text-N600"> 保存于 {{ datetimeFormat(saveTime) }} </span>
-      </div>
-
-      <div class="flex shrink-0 items-center gap-3">
-        <WorkflowComponentMenu
-          :current-resource="{ id: toolId, source: RESOURCE_TYPE.TOOL }"
-          :workflow-mode="WorkflowMode.Tool"
-          @dragstart="handleDragNode"
-          @select="handleAddNode"
-        />
-        <el-button plain :loading="saving" :disabled="loading || saving" @click="handleSave"> 保存 </el-button>
-      </div>
-    </header>
+  <WorkflowViewLayout :loading="loading" :title="toolDetail?.name" :save-time="saveTime" @back="handleBack">
+    <template #actions>
+      <CreateNodeMenu
+        :workflow-mode="WorkflowMode.Tool"
+        @select="handleAddNode"
+      />
+      <el-button plain :loading="saving" :disabled="loading || saving" @click="handleSave"> 保存 </el-button>
+    </template>
 
     <WorkflowCanvas
       ref="workflowRef"
@@ -168,5 +151,5 @@ onMounted(() => {
       :loop-workflow-mode="WorkflowMode.ToolLoop"
       :workflow-mode="WorkflowMode.Tool"
     />
-  </main>
+  </WorkflowViewLayout>
 </template>

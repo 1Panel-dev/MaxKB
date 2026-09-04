@@ -8,12 +8,12 @@ import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
 import { RESOURCE_TYPE } from '@/api/enums'
 import type { ApplicationDetail } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode, type ShapeItem } from '@/workflow-canvas/types'
-import WorkflowComponentMenu from './components/WorkflowComponentMenu.vue'
+import CreateNodeMenu from './components/CreateNodeMenu.vue'
+import WorkflowViewLayout from './components/WorkflowViewLayout.vue'
 import Conversation from '@/components/conversation/index.vue'
 
 defineOptions({ name: 'ApplicationWorkflowView' })
@@ -33,10 +33,6 @@ const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflo
 /* 添加工作流组件 */
 function handleAddNode(shapeItem: ShapeItem) {
   workflowRef.value?.addNode(shapeItem)
-}
-
-function handleDragNode(shapeItem: ShapeItem, event: PointerEvent) {
-  workflowRef.value?.onmousedown(shapeItem, event)
 }
 
 /* 智能体工作流加载与保存 */
@@ -247,58 +243,41 @@ onMounted(() => {
 </script>
 
 <template>
-  <main v-loading="loading" class="flex h-screen w-screen flex-col overflow-hidden">
-    <header class="h-header flex-between shrink-0 gap-3 border-b bg-white px-6">
-      <div class="flex min-w-0 items-center gap-3">
-        <el-button text class="-ml-3" @click="handleBack">
-          <MkIcon name="icon_left_outlined" :size="18" />
-        </el-button>
-        <h4 class="max-w-[300px] truncate" :title="applicationDetail?.name">
-          {{ applicationDetail?.name }}
-        </h4>
-        <span v-if="saveTime" class="shrink-0 text-sm text-N600"> 保存于 {{ datetimeFormat(saveTime) }} </span>
-      </div>
+  <WorkflowViewLayout :loading="loading" :title="applicationDetail?.name" :save-time="saveTime" @back="handleBack">
+    <template #actions>
+      <CreateNodeMenu :workflow-mode="WorkflowMode.Application" @select="handleAddNode" />
+      <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
+      <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
+      <!-- <el-button
+        v-if="canPublish"
+        type="primary"
+        :loading="publishing"
+        :disabled="loading || saving || publishing"
+        @click="handlePublish"
+      >
+        发布
+      </el-button>
 
-      <div class="flex shrink-0 items-center gap-3">
-        <WorkflowComponentMenu
-          :current-resource="{ id: applicationId, source: RESOURCE_TYPE.APPLICATION }"
-          :workflow-mode="WorkflowMode.Application"
-          @dragstart="handleDragNode"
-          @select="handleAddNode"
-        />
-        <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
-        <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
-        <!-- <el-button
-          v-if="canPublish"
-          type="primary"
-          :loading="publishing"
-          :disabled="loading || saving || publishing"
-          @click="handlePublish"
-        >
-          发布
+      <MkDropdown v-if="canEdit" trigger="click">
+        <el-button text aria-label="更多工作流设置">
+          <MkIcon :icon="MoreFilled" :size="18" />
         </el-button>
-
-        <MkDropdown v-if="canEdit" trigger="click">
-          <el-button text aria-label="更多工作流设置">
-            <MkIcon :icon="MoreFilled" :size="18" />
-          </el-button>
-          <template #dropdown>
-            <MkDropdownMenu>
-              <MkDropdownItem @click.stop>
-                <span>自动保存</span>
-                <el-switch
-                  v-model="autoSaveEnabled"
-                  size="small"
-                  @click.stop
-                  @change="handleAutoSaveChange"
-                />
-              </MkDropdownItem>
-            </MkDropdownMenu>
-          </template>
-        </MkDropdown>
-    -->
-      </div>
-    </header>
+        <template #dropdown>
+          <MkDropdownMenu>
+            <MkDropdownItem @click.stop>
+              <span>自动保存</span>
+              <el-switch
+                v-model="autoSaveEnabled"
+                size="small"
+                @click.stop
+                @change="handleAutoSaveChange"
+              />
+            </MkDropdownItem>
+          </MkDropdownMenu>
+        </template>
+      </MkDropdown>
+  -->
+    </template>
     <!-- 主画布 -->
     <WorkflowCanvas
       ref="workflowRef"
@@ -322,7 +301,7 @@ onMounted(() => {
         <Conversation :defaultOpen="false" type="DEBUG" class="h-full" />
       </div>
     </transition>
-  </main>
+  </WorkflowViewLayout>
 </template>
 
 <style scoped>
