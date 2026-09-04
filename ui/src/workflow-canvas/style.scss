@@ -28,7 +28,6 @@
   }
 }
 
-
 /* anchor */
 // 连接节点按钮
 .workflow-node-anchor-wrapper {
@@ -73,12 +72,4 @@
     border: 2px solid var(--el-color-warning);
   }
 
-  .workflow-node-add-icon {
-    height: calc(var(--spacing) * 6);
-    transform-origin: center;
-    width: calc(var(--spacing) * 6);
-    color: white;
-    padding: 4px;
-    transition: opacity 0.2s ease;
-  }
 }

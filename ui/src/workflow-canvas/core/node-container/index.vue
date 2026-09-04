@@ -47,13 +47,6 @@ const showAnchor = ref(false)
 const nodeMenuDragClosing = ref(false)
 const nodeMenuRef = ref<InstanceType<typeof NodeMenu>>()
 const anchorData = ref<Model.AnchorConfig>()
-const anchorTooltipRef = ref<HTMLElement>()
-const anchorTooltipVisible = ref(false)
-// 通过虚拟触发器将 LogicFlow 锚点交给 Element Plus 定位提示。
-const setAnchorTooltip = (anchorElement?: HTMLElement) => {
-  if (anchorElement) anchorTooltipRef.value = anchorElement
-  anchorTooltipVisible.value = Boolean(anchorElement)
-}
 const dropdownMenuStyle = computed(() => {
   return { top: anchorData.value ? anchorData.value.y - model.y + model.height / 2 + 'px' : '0px' }
 })
@@ -247,7 +240,6 @@ const highlightedStepName = (contentText: string) => {
   }
 }
 onMounted(() => {
-  model.setAnchorTooltip = setAnchorTooltip
   model.openNodeMenu = (anchor: Model.AnchorConfig) => {
     showAnchor.value && anchorData.value?.id === anchor.id ? closeNodeMenu() : openNodeMenu(anchor)
   }
@@ -273,7 +265,6 @@ const stepContainerRef = ref<HTMLElement>()
 onBeforeUnmount(() => {
   closeNodeMenu()
   model.openNodeMenu = undefined
-  model.setAnchorTooltip = undefined
   disposeSelectionReaction()
   resizeObserver?.disconnect()
   resizeObserver = null
@@ -357,18 +348,6 @@ onBeforeUnmount(() => {
         </el-collapse-transition>
       </div>
     </div>
-
-    <el-tooltip
-      virtual-triggering
-      :virtual-ref="anchorTooltipRef"
-      :visible="anchorTooltipVisible && !showAnchor"
-      :teleported="false"
-      :enterable="false"
-      effect="dark"
-      placement="top"
-    >
-      <template #content>点击添加节点<br />拖拽连接节点</template>
-    </el-tooltip>
 
     <el-collapse-transition>
       <NodeMenu

@@ -1,9 +1,19 @@
-import { createApp, reactive, type Component } from 'vue'
+import { createApp, reactive, shallowReactive, type Component } from 'vue'
 import { cloneDeep } from 'lodash'
-import { h as createLogicFlowElement, HtmlNode, HtmlNodeModel, type GraphModel, type IHtmlNodeProperties, type Model } from '@logicflow/core'
+import {
+  Component as LogicFlowComponent,
+  createRef,
+  h as createLogicFlowElement,
+  HtmlNode,
+  HtmlNodeModel,
+  type GraphModel,
+  type IHtmlNodeProperties,
+  type Model,
+} from '@logicflow/core'
 import { nodeDict } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowKind, WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
 import { connect, disconnect } from './teleport'
+import NodeAnchor from './node-container/NodeAnchor.vue'
 
 type NodeViewProps = ConstructorParameters<typeof HtmlNode>[0]
 type NodeFieldGroup = Record<string, WorkflowNodeField[]>
@@ -22,6 +32,31 @@ interface WorkflowNodeProperties extends IHtmlNodeProperties {
   status?: number
   stepName?: string
   user_input_field_list?: unknown[]
+}
+
+/** 将 LogicFlow 锚点的挂载、更新和卸载同步到 Vue 组件。 */
+class WorkflowNodeAnchor extends LogicFlowComponent<InstanceType<typeof NodeAnchor>['$props']> {
+  private readonly containerRef = createRef<HTMLDivElement>()
+  private readonly anchorProps = shallowReactive({ ...this.props })
+  private readonly teleportId = `${this.props.nodeModel.graphModel.flowId}:${this.props.nodeModel.id}:anchor:${this.props.anchorData.id}`
+
+  componentDidMount() {
+    if (this.containerRef.current) {
+      connect(this.teleportId, NodeAnchor, this.containerRef.current, () => ({}), this.anchorProps)
+    }
+  }
+
+  componentDidUpdate() {
+    Object.assign(this.anchorProps, this.props)
+  }
+
+  componentWillUnmount() {
+    disconnect(this.teleportId)
+  }
+
+  render() {
+    return createLogicFlowElement('div', { ref: this.containerRef })
+  }
 }
 
 export class WorkflowNodeView extends HtmlNode {
@@ -69,38 +104,7 @@ export class WorkflowNodeView extends HtmlNode {
     return createLogicFlowElement(
       'foreignObject',
       { ...anchorData, className: 'workflow-node-anchor-wrapper', x: x - 12, y: y - 12, width: 24, height: 24 },
-      [
-        createLogicFlowElement(
-          'div',
-          {
-            'data-node-menu-node-id': nodeModel.id,
-            'data-node-menu-anchor-id': anchorData.id,
-            className: `workflow-node-anchor${type === 'right' ? ' is-right' : ''}${connected ? ' is-connected' : ''}${anchorData.id?.endsWith('_exception_right') ? ' is-abnormal' : ''}`,
-            onClick: () => {
-              if (canOpenNodeMenu) nodeModel.openNodeMenu?.(anchorData)
-            },
-            onMouseEnter: (event: MouseEvent) => {
-              if (canOpenNodeMenu && event.currentTarget instanceof HTMLElement) nodeModel.setAnchorTooltip?.(event.currentTarget)
-            },
-            onMouseLeave: () => nodeModel.setAnchorTooltip?.(),
-            onPointerDown: () => nodeModel.setAnchorTooltip?.(),
-          },
-          connected && type !== 'right'
-            ? []
-            : [
-                createLogicFlowElement(
-                  'svg',
-                  {
-                    'aria-hidden': 'true',
-                    className: 'workflow-node-add-icon',
-                    fill: 'currentColor',
-                    focusable: 'false',
-                  },
-                  [createLogicFlowElement('use', { href: '#icon_add_bold_outlined' })],
-                ),
-              ],
-        ),
-      ],
+      [createLogicFlowElement(WorkflowNodeAnchor, { key: anchorData.id, anchorData, canOpenNodeMenu, connected, nodeModel })],
     )
   }
 
@@ -134,7 +138,6 @@ export class WorkflowNodeModel extends HtmlNodeModel<WorkflowNodeProperties> {
   private upNodeFieldDict?: NodeFieldGroup
 
   openNodeMenu?: (anchorData: Model.AnchorConfig) => void
-  setAnchorTooltip?: (anchorElement?: HTMLElement) => void
   validate?: () => Promise<unknown>
 
   setAttributes() {
