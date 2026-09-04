@@ -24,7 +24,7 @@ src/workflow-canvas/
 ├── config/             # 节点数据、映射、常量及预留的本地化配置
 ├── core/               # 稳定的画布内核与所有节点共用的基础能力
 │   ├── edge/           # 普通边、循环边及边删除按钮
-│   └── node-container/ # 节点容器及其私有的条件、操作下拉组件
+│   └── node-container/ # 节点容器、锚点按钮及私有的条件、操作下拉组件
 ├── icons/              # 节点图标及图标解析工具
 ├── node-menu/          # 基础组件、工具和智能体节点菜单及其菜单配置
 ├── nodes/              # 已迁入节点的注册文件和 Vue 实现
@@ -48,6 +48,11 @@ src/workflow-canvas/
 重叠，使用 `core/utils.ts` 的 `createAnchorGuard()`，通过唯一 key 同步各浮层的
 `visible-change` 状态，并在节点组件卸载时调用 `reset()`；不要通过 Teleport 到 `body` 或增加
 `z-index` 绕过画布的缩放和 SVG 绘制顺序。
+
+锚点按钮与 `el-tooltip` 集中在 `core/node-container/NodeAnchor.vue`。`workflow-node.ts` 负责
+锚点坐标、连接状态，并将 LogicFlow 组件的挂载、Props 更新和卸载同步到现有 Vue Teleport
+容器；`teleport.connect()` 的可选第五个参数用于传入组件 Props。节点容器
+保留菜单开关与外部点击关闭逻辑，不维护锚点 tooltip 的状态或虚拟触发器。
 
 ### `config/`
 

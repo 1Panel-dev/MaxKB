@@ -12,7 +12,7 @@ const deleteEdge = () => {
 </script>
 <template>
   <div class="workflow-node-delete-icon" @mouseup.stop @click.stop @click="deleteEdge">
-    <MkIcon name="icon_close_bold_outlined" class="text-white!" />
+    <MkIcon name="icon_close_bold_outlined" class="text-white!" :size="12"/>
   </div>
 </template>
 <style lang="scss">
