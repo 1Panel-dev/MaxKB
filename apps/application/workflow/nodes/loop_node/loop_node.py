@@ -122,7 +122,7 @@ class LoopNode(INode):
 
         def on_complete(wf_manage, error):
             self._loop_node_data.append(wf_manage.context)
-            self._loop_answer_data.append(chunk_list)
+            self._loop_answer_data.append([c.to_dict() for c in chunk_list])
             self.write_context("loop_node_data", self._loop_node_data)
             self.write_context("loop_answer_data", self._loop_answer_data)
             self.write_context("index", index)
@@ -211,10 +211,10 @@ class LoopNode(INode):
             old_iteration_details = old_details.get("iteration_details", [])
 
         # 1. 先把 old_iteration_details 全部复制过来，记录断点位置
-        if old_iteration_details and position and position.id == self.node.id:
+        if old_iteration_details and position and position.get("id") == self.node.id:
             for i, value in enumerate(old_iteration_details):
                 loop_details.append(value)
-                if position.index == i:
+                if position.get("index") == i:
                     position_index = i
 
         # 2. 遍历当前新执行的迭代
@@ -222,7 +222,7 @@ class LoopNode(INode):
             iteration_result = []
 
             # 第一个新迭代且是断点：传入旧详情
-            if new_iter_index == 0 and position and position.id == self.node.id:
+            if new_iter_index == 0 and position and position.get("id") == self.node.id:
                 # 续跑迭代：先复制旧详情
                 if position_index < len(old_iteration_details):
                     for old_item in old_iteration_details[position_index]:
@@ -230,7 +230,9 @@ class LoopNode(INode):
 
             # 遍历当前迭代的节点 context
             child_position = (
-                position.children if new_iter_index == 0 and position and position.id == self.node.id else None
+                position.get("children")
+                if new_iter_index == 0 and position and position.get("id") == self.node.id
+                else None
             )
             child_position_index = 0
             for node_id, node_context in iteration_context.items():
@@ -239,13 +241,13 @@ class LoopNode(INode):
                     **node_context,
                 }
                 # 断点节点：插入到 child_position_index 位置
-                if child_position and child_position.id == node_id:
+                if child_position and child_position.get("id") == node_id:
                     iteration_result.insert(child_position_index, node_details)
                 else:
                     iteration_result.append(node_details)
 
             # 第一个新迭代且是断点：插入到 position_index，否则追加
-            if new_iter_index == 0 and position and position.id == self.node.id:
+            if new_iter_index == 0 and position and position.get("id") == self.node.id:
                 loop_details.insert(position_index, iteration_result)
             else:
                 loop_details.append(iteration_result)
