@@ -6,6 +6,8 @@ import time
 
 import django
 from django.core import management
+from django.core.management.utils import get_random_secret_key
+
 import warnings
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -110,6 +112,8 @@ def dev():
 if __name__ == "__main__":
     os.environ["HF_HOME"] = "/opt/maxkb-app/model/base"
     os.environ["TMPDIR"] = "/opt/maxkb-app/tmp"
+    if not os.environ.get('MAXKB_SECRET_KEY'):
+        os.environ['MAXKB_SECRET_KEY'] = get_random_secret_key()
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;
