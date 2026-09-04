@@ -7,6 +7,8 @@ from common.exception.app_exception import AppApiException
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase
 from django.utils import timezone
+from django.utils.datastructures import MultiValueDict
+from knowledge.api.document import DocumentBatchAddTagAPI, DocumentSplitAPI
 from knowledge.models import (
     AssetProcessStatus,
     ContentOrigin,
@@ -21,15 +23,19 @@ from knowledge.models import (
     KnowledgeType,
     LocalState,
     Paragraph,
+    ParagraphAsset,
     Problem,
     ProblemParagraphMapping,
     SearchMode,
     SourceType,
     SyncState,
-    ParagraphAsset,
 )
 from knowledge.models.knowledge_action import State as KnowledgeActionState
-from knowledge.serializers.document import DocumentSerializers, DocumentWebInstanceSerializer
+from knowledge.serializers.document import (
+    DocumentBatchAddTagSerializer,
+    DocumentSerializers,
+    DocumentWebInstanceSerializer,
+)
 from knowledge.serializers.document_strategy import DocumentSyncStrategySerializer
 from knowledge.serializers.image_document import ImagePreviewUpdateRequest
 from knowledge.serializers.knowledge import (
@@ -82,6 +88,7 @@ from knowledge.task.sync import (
     sync_replace_web_knowledge,
 )
 from knowledge.vector.pg_vector import PGVector
+from knowledge.views.document import _get_document_split_payload
 from knowledge.web_assets import internalize_web_images
 from PIL import Image
 from rest_framework.exceptions import ValidationError
@@ -527,6 +534,42 @@ class DocumentStrategyTests(SimpleTestCase):
 
 
 class WebDocumentStrategyRequestTests(SimpleTestCase):
+    def test_document_split_multipart_payload_includes_json_strategy(self):
+        request = MagicMock()
+        request.FILES.getlist.return_value = [SimpleUploadedFile("example.txt", b"content")]
+        request.data = MultiValueDict(
+            {
+                "doc_strategy": ['{"split":{"max_length":1024}}'],
+                "patterns": ["# ", "## "],
+            }
+        )
+
+        payload = _get_document_split_payload(request)
+
+        self.assertEqual(payload["doc_strategy"]["split"]["max_length"], 1024)
+        self.assertEqual(payload["patterns"], ["# ", "## "])
+
+    def test_document_split_openapi_describes_strategy_and_file_list(self):
+        schema = DocumentSplitAPI.get_request()["multipart/form-data"]
+
+        self.assertIn("doc_strategy", schema["properties"])
+        self.assertEqual(schema["properties"]["file"]["type"], "array")
+        self.assertEqual(schema["properties"]["patterns"]["type"], "array")
+
+    def test_batch_add_tag_request_exposes_resource_type(self):
+        serializer = DocumentBatchAddTagSerializer(
+            data={
+                "document_ids": ["00000000-0000-0000-0000-000000000001"],
+                "tag_ids": ["00000000-0000-0000-0000-000000000002"],
+                "resource_type": DocumentResourceType.IMAGE,
+            }
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data["resource_type"], DocumentResourceType.IMAGE)
+        self.assertIs(DocumentBatchAddTagAPI.get_request(), DocumentBatchAddTagSerializer)
+        self.assertEqual(len(DocumentBatchAddTagAPI.get_parameters()), 2)
+
     def test_web_document_request_uses_normalized_defaults(self):
         serializer = DocumentWebInstanceSerializer(
             data={

@@ -1,19 +1,19 @@
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter
-
 from common.mixins.api_mixin import APIMixin
 from common.result import DefaultResultSerializer
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
 from knowledge.serializers.common import BatchSerializer
 from knowledge.serializers.document import (
-    DocumentInstanceSerializer,
-    DocumentWebInstanceSerializer,
-    CancelInstanceSerializer,
     BatchCancelInstanceSerializer,
-    DocumentRefreshSerializer,
     BatchEditHitHandlingSerializer,
-    DocumentBatchRefreshSerializer,
+    CancelInstanceSerializer,
+    DocumentBatchAddTagSerializer,
     DocumentBatchGenerateRelatedSerializer,
+    DocumentBatchRefreshSerializer,
+    DocumentInstanceSerializer,
     DocumentMigrateSerializer,
+    DocumentRefreshSerializer,
+    DocumentWebInstanceSerializer,
 )
 from knowledge.serializers.document_strategy import DocumentSyncStrategySerializer
 from knowledge.serializers.image_document import (
@@ -40,14 +40,20 @@ class DocumentSplitAPI(APIMixin):
         return {
             "multipart/form-data": {
                 "type": "object",
+                "required": ["file"],
                 "properties": {
                     "file": {
-                        "type": "string",
-                        "format": "binary",  # Tells Swagger it's a file
+                        "type": "array",
+                        "items": {"type": "string", "format": "binary"},
                     },
                     "limit": {"type": "integer", "description": "分段长度"},
-                    "patterns": {"type": "string", "description": "分段正则列表"},
+                    "patterns": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "分段正则列表",
+                    },
                     "with_filter": {"type": "boolean", "description": "是否清除特殊字符"},
+                    "doc_strategy": {"type": "object", "description": "文档处理策略（multipart 中传 JSON）"},
                 },
             }
         }
@@ -633,6 +639,20 @@ class DocumentTagsAPI(APIMixin):
     @staticmethod
     def get_request():
         return None
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class DocumentBatchAddTagAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return DocumentBatchAPI.get_parameters()
+
+    @staticmethod
+    def get_request():
+        return DocumentBatchAddTagSerializer
 
     @staticmethod
     def get_response():

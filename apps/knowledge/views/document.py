@@ -1,23 +1,23 @@
+import json
+
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
 from common.auth.struct.aggregate_permission import ViewPermission
+from common.exception.app_exception import AppApiException
 from common.log.log import log
 from common.result import result
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
-from rest_framework.parsers import MultiPartParser
-from rest_framework.request import Request
-from rest_framework.views import APIView
-
 from knowledge.api.document import (
     BatchCancelTaskAPI,
     BatchEditHitHandlingAPI,
     BatchGenerateRelatedAPI,
     BatchRefreshAPI,
     CancelTaskAPI,
+    DocumentBatchAddTagAPI,
     DocumentBatchAPI,
     DocumentBatchCreateAPI,
     DocumentCreateAPI,
@@ -46,6 +46,29 @@ from knowledge.views.common import (
     get_document_operation_object_batch,
     get_knowledge_document_operation_object,
 )
+from rest_framework.parsers import MultiPartParser
+from rest_framework.request import Request
+from rest_framework.views import APIView
+
+
+def _get_document_split_payload(request: Request):
+    payload = {"file": request.FILES.getlist("file")}
+    request_data = request.data
+    if "patterns" in request_data and request_data.get("patterns") not in (None, ""):
+        payload["patterns"] = request_data.getlist("patterns")
+    if "limit" in request_data:
+        payload["limit"] = request_data.get("limit")
+    if "with_filter" in request_data:
+        payload["with_filter"] = request_data.get("with_filter")
+    raw_strategy = request_data.get("doc_strategy")
+    if raw_strategy not in (None, ""):
+        if isinstance(raw_strategy, str):
+            try:
+                raw_strategy = json.loads(raw_strategy)
+            except json.JSONDecodeError as exc:
+                raise AppApiException(500, _("Invalid document processing strategy")) from exc
+        payload["doc_strategy"] = raw_strategy
+    return payload
 
 
 class DocumentView(APIView):
@@ -244,25 +267,13 @@ class DocumentView(APIView):
             ),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
-            split_data = {"file": request.FILES.getlist("file")}
-            request_data = request.data
-            if (
-                "patterns" in request.data
-                and request.data.get("patterns") is not None
-                and len(request.data.get("patterns")) > 0
-            ):
-                split_data.__setitem__("patterns", request_data.getlist("patterns"))
-            if "limit" in request.data:
-                split_data.__setitem__("limit", request_data.get("limit"))
-            if "with_filter" in request.data:
-                split_data.__setitem__("with_filter", request_data.get("with_filter"))
             return result.success(
                 DocumentSerializers.Split(
                     data={
                         "workspace_id": workspace_id,
                         "knowledge_id": knowledge_id,
                     }
-                ).parse(split_data)
+                ).parse(_get_document_split_payload(request))
             )
 
     class SplitPattern(APIView):
@@ -717,9 +728,9 @@ class DocumentView(APIView):
             methods=["POST"],
             summary=_("Batch add tags to documents"),
             operation_id=_("Batch add tags to documents"),  # type: ignore
-            request=DocumentTagsAPI.get_request(),
-            parameters=DocumentTagsAPI.get_parameters(),
-            responses=DocumentTagsAPI.get_response(),
+            request=DocumentBatchAddTagAPI.get_request(),
+            parameters=DocumentBatchAddTagAPI.get_parameters(),
+            responses=DocumentBatchAddTagAPI.get_response(),
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(

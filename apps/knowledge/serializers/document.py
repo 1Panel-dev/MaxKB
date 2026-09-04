@@ -282,6 +282,16 @@ class DocumentBatchGenerateRelatedSerializer(serializers.Serializer):
     )
 
 
+class DocumentBatchAddTagSerializer(serializers.Serializer):
+    document_ids = serializers.ListField(
+        required=True, child=serializers.UUIDField(required=True), label=_("document id list")
+    )
+    tag_ids = serializers.ListField(required=True, child=serializers.UUIDField(required=True), label=_("tag id list"))
+    resource_type = serializers.ChoiceField(
+        required=False, default=DocumentResourceType.DOCUMENT, choices=DocumentResourceType.choices
+    )
+
+
 class DocumentMigrateSerializer(serializers.Serializer):
     document_id_list = serializers.ListField(required=True, label=_("document id list"))
 
@@ -1709,6 +1719,9 @@ class DocumentSerializers(serializers.Serializer):
 
         def batch_add_tag(self, instance: Dict, with_valid=True):
             if with_valid:
+                request_serializer = DocumentBatchAddTagSerializer(data=instance)
+                request_serializer.is_valid(raise_exception=True)
+                instance = request_serializer.validated_data
                 self.is_valid(raise_exception=True)
                 document_id_list = self.validate_document_ids(instance, "document_ids")
             else:
