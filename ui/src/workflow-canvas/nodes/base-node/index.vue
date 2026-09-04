@@ -55,6 +55,7 @@ const defaultForm: BaseNodeForm = {
   stt_autosend: false,
   stt_model_enable: false,
   stt_model_id: '',
+  stt_model_params_setting: {},
   stt_model_id_type: 'default',
   tts_autoplay: false,
   tts_model_enable: false,
@@ -69,6 +70,7 @@ function normalizeForm(data: Partial<BaseNodeForm>) {
   normalized.file_upload_setting = { ...cloneDeep(defaultFileUploadSetting), ...(savedData.file_upload_setting ?? {}) }
   normalized.long_term_trigger_setting = savedData.long_term_trigger_setting ?? { rounds: 10 }
   normalized.long_term_model_params_setting = savedData.long_term_model_params_setting ?? {}
+  normalized.stt_model_params_setting = savedData.stt_model_params_setting ?? {}
   normalized.tts_model_params_setting = savedData.tts_model_params_setting ?? {}
   if (!normalized.stt_model_id_type) normalized.stt_model_id_type = 'default'
   if (!normalized.long_term_model_id_type) normalized.long_term_model_id_type = 'default'
@@ -109,6 +111,7 @@ const speechInputSetting = computed<SpeechInputSetting>(() => ({
   stt_autosend: formData.value.stt_autosend,
   stt_model_enable: formData.value.stt_model_enable,
   stt_model_id: formData.value.stt_model_id,
+  stt_model_params_setting: formData.value.stt_model_params_setting,
   stt_model_id_type: formData.value.stt_model_id_type,
 }))
 const speechPlaybackSetting = computed<SpeechPlaybackSetting>(() => ({
@@ -189,11 +192,11 @@ function updateConversationVariables(fields: ChatInputField[]) {
   model.graphModel.eventCenter.emit('chatFieldList', undefined)
 }
 
-function updateSpeechInput(setting: SpeechInputSetting) {
+function updateSpeechInput(setting: Partial<SpeechInputSetting>) {
   Object.assign(formData.value, setting)
 }
 
-function updateSpeechPlayback(setting: SpeechPlaybackSetting) {
+function updateSpeechPlayback(setting: Partial<SpeechPlaybackSetting>) {
   Object.assign(formData.value, setting)
 }
 

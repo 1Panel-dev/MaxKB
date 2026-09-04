@@ -417,6 +417,8 @@
 
 /* drawer */
 .el-drawer {
+  box-shadow: -6px 0px 24px 0px rgb(var(--mk-N900-rgb) / 8%);
+
   &__header {
     position: relative;
     border-bottom: 1px solid var(--el-border-color);
@@ -776,6 +778,13 @@
         height: 16px;
       }
     }
+  }
+}
+
+.el-select-group {
+  &__title {
+    color: var(--mk-N500);
+    font-size: var(--mk-font-size-base);
   }
 }
 

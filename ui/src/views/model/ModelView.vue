@@ -92,13 +92,20 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <ModelCreateButton v-if="!isShared" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
+          <ModelCreateButton v-if="!isShared" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" :api="ModelApi" />
         </div>
       </component>
       <div v-loading="loading">
         <div v-if="ModelItems.length" class="mk-resource-card-grid">
           <template v-for="model in ModelItems" :key="model.id">
-            <ModelCard :api="ModelApi" :model="model" :provider="getModelProvider(model)" :refresh="loadModels" :shared="isShared" :disabled="isShared">
+            <ModelCard
+              :api="ModelApi"
+              :model="model"
+              :provider="getModelProvider(model)"
+              :refresh="loadModels"
+              :shared="isShared"
+              :disabled="isShared"
+            >
               <template #action-dropdown>
                 <EditModelAction label="编辑" :api="ModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
                 <ParamSettingAction v-if="model.model_type !== 'RERANKER'" label="模型参数设置" :api="ModelApi" :model="model" />

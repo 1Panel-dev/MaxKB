@@ -286,15 +286,50 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 ## 工作流默认模型设置
 
-`workflow/components/DefaultModelSetting.vue` 维护默认模型面板，按模型类型组织本地暂存配置。
-调用方通过 `show` 控制显示，通过 `v-model` 接收保存后的配置，通过 `save` 执行页面持久化，
-通过 `close` 关闭面板。只读场景传入 `readonly`。编辑与参数弹窗不直接修改父级配置；有修改时
-点击面板外会区分保存、丢弃和取消。
+`workflow/components/default-model-setting/DefaultModelSettingButton.vue` 负责顶部“默认模型设置”按钮与抽屉按需挂载，
+由 `ApplicationWorkflowView` 在 `WorkflowViewLayout` 的 `actions` 插槽中接入。同目录的
+`DefaultModelSettingDrawer.vue` 负责抽屉、模型查询、暂存表单及应用与关闭确认。入口挂载后
+通过组件 Ref 调用 `open(settings)`；抽屉内部管理显隐，打开时先重置再回填配置，关闭动画结束后
+清理状态并触发 `closed`，入口据此卸载。保存事件由入口转发。抽屉复用 `MkDrawer`，
+顶部使用 `top-header` 留出页面头栏，高度使用
+`h-layout-content`，不显示遮罩，也不阻挡头栏和左侧画布交互。表单由抽屉统一滚动，页脚固定显示
+应用到所有节点、取消和保存。
 
-模型查询通过必填的完整 `modelApi` 对象执行（类型使用 `typeof ModelApi`），可用 `modelQuery`
-补充资源范围需要的查询参数；调用方负责选择 API，组件不从 URL 推断资源范围。供应商列表通过
-当前公共供应商接口查询。模型选择及参数设置复用 `ModelSelect`，重排序模型隐藏参数入口。
+通过 `modelValue` 接收详情配置；`disabled` 控制顶部按钮。
+编辑及参数弹窗只修改抽屉副本，通过 `save(settings)` 提交副本；取消或关闭时选择不保存，
+直接丢弃副本，详情中的原配置不受影响。API 与组件共用的模型类别
+`DefaultModelType` 和单项配置 `ModelConfig` 维护在 `api/types/model.ts`；按类别组织的配置直接使用
+`Partial<Record<DefaultModelType, ModelConfig>>`，不再声明与组件名称相近的配置集合类型。
+`ApplicationWorkflowView` 用 `applicationDetail` 保存完整详情，用 `defaultModelSetting` 单独承接
+模型配置，在详情加载或保存成功后从接口的 `default_model_setting` 深拷贝回填，缺省为空对象。
+抽屉的 `save(settings)` 调用页面 `handleSaveDefaultModelSetting(settings)`，先暂存到
+`defaultModelSetting`，再复用 `handleSave()` 和 `saveApplication` 将配置与 `work_flow` 一起提交。
+页面顶部保存使用当前 `defaultModelSetting`；保存成功更新详情，失败则从详情深拷贝回滚配置，
+提示错误并继续抛出异常，阻止保存并退出、保存后调试等成功分支。
+点击保存后抽屉保持打开；`modelValue` 更新时刷新比较基准，`hasChanges` 自动重新计算。
+提交时比较基准会暂时更新，失败回滚后恢复；抽屉编辑副本不被覆盖，保存期间继续编辑的内容仍保留。
+页面将 `defaultModelSetting` 通过画布的 `defaultModelSettings` Props 传入，AI 对话节点通过节点 model
+获取当前 `LLM` 模型及参数；提交期间使用暂存配置，失败后随页面回滚，不通过 `provide` 同步抽屉草稿。
 
-传入 `workflowRef` 后支持“应用到所有节点”：只切换节点的模型来源，保留自定义模型 ID 和参数，
-递归处理循环体，并保留基本信息节点中关闭的语音/长期记忆配置及浏览器语音播放模式。
-该操作修改画布，由页面原有保存流程持久化，不自动提交面板内暂存的默认模型设置。
+模型查询通过必填的完整 `modelApi` 对象执行（类型使用 `typeof ModelApi`）；调用方负责选择 API，
+组件不从 URL 推断资源范围。每次打开或刷新只查询一次模型列表，保存在 `models` 中，由
+`getModelOptions(type)` 按 `model_type` 过滤。默认模型类型保留页面展示顺序，标签复用
+`MODEL_TYPE_LABELS`。供应商列表通过当前公共供应商接口查询。模型选择及参数设置复用
+`ModelSelect`，通过 `canEditParams` 控制参数入口，重排序模型隐藏该入口。
+默认模型抽屉开启 `canAdd`，创建成功后通过 `refresh` 重新加载模型列表。
+
+入口接收 `getGraphData` 函数并传给抽屉。“应用到所有节点”确认后，抽屉调用该函数获取最新图数据，
+克隆后切换节点的模型来源，保留自定义模型 ID 和参数，递归处理循环体，并保留基本信息节点中
+关闭的语音/长期记忆配置及浏览器语音播放模式。存在变更时触发 `applyToAll(graphData)`，入口
+转发给 `ApplicationWorkflowView`，页面只负责通过自己的画布 Ref 渲染结果，抽屉不接收画布实例。
+`disabled` 同时控制顶部入口和应用操作，确认完成后再次检查，避免保存期间修改画布。
+该操作修改画布，由页面原有保存流程持久化，不自动提交抽屉内暂存的默认模型设置。
+
+## 模型创建入口
+
+`model/create-model/ModelCreateButton.vue` 和 `CreateModelDrawer.vue` 通过必填的 `api` 接收完整
+模型 API 对象。Workspace 模型页传入 `ModelApi`，System 共享模型页传入 `SystemSharedApi`；
+创建抽屉只调用传入的 API，不再自行判断资源范围。
+`ModelCreateButton` 默认渲染主按钮，也支持通过默认作用域插槽的 `open()` 定制触发按钮，
+`ModelSelect` 的下拉页脚使用该插槽复用同一创建流程。创建成功后保留基础资料刷新，再触发
+`refresh` 通知调用方重新加载模型列表。

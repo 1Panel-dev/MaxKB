@@ -2,10 +2,12 @@
 
 import type LogicFlow from '@logicflow/core'
 import { APPLICATION_TYPE } from '@/api/enums'
+import type { DefaultModelType, ModelConfig } from './model'
 
 export type ApplicationType = (typeof APPLICATION_TYPE)[keyof typeof APPLICATION_TYPE]
 
 export interface ApplicationDetail {
+  default_model_setting?: Partial<Record<DefaultModelType, ModelConfig>>
   create_time?: string
   desc?: string | null
   folder?: string
@@ -27,6 +29,7 @@ export interface ApplicationDetail {
 }
 
 export interface ApplicationFormPayload {
+  default_model_setting?: ApplicationDetail['default_model_setting']
   name?: string
   desc?: string
   model_id?: string

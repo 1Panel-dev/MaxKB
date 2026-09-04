@@ -86,13 +86,7 @@ onMounted(() => {
 <template>
   <NodeContainer :node-model="model">
     <h6 class="mb-3">节点设置</h6>
-    <el-form
-      ref="formRef"
-      :model="formData"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent
-    >
+    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item
         :prop="formData.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
         :rules="{ required: true, message: '请选择或填写 AI 模型', trigger: 'change' }"
@@ -100,13 +94,7 @@ onMounted(() => {
         <template #label>
           <div class="flex-between gap-3 w-full">
             <span>AI 模型</span>
-            <el-select
-              v-model="formData.model_id_type"
-              :teleported="false"
-              class="w-30!"
-              size="small"
-              @change="formData.model_id_reference = []"
-            >
+            <el-select v-model="formData.model_id_type" :teleported="false" class="w-30!" size="small" @change="formData.model_id_reference = []">
               <el-option label="引用变量" value="reference" />
               <el-option label="自定义" value="custom" />
             </el-select>
@@ -122,11 +110,13 @@ onMounted(() => {
         />
         <ModelSelect
           v-else
-          placeholder="请输入 AI 模型 ID"
+          v-model="formData.model_id"
+          v-model:model-params="formData.model_params_setting"
+          can-edit-params
           :options="modelList"
           :provider-options="providerOptions"
-          v-model="formData.model_id"
-        ></ModelSelect>
+          placeholder="请选择 AI 模型"
+        />
       </el-form-item>
 
       <el-form-item>
@@ -138,19 +128,10 @@ onMounted(() => {
             </el-tooltip>
           </div>
         </template>
-        <el-input
-          v-model="formData.system"
-          :rows="4"
-          :placeholder="`系统提示词，可以引用变量，如 {{开始.question}}`"
-          type="textarea"
-        />
+        <el-input v-model="formData.system" :rows="4" :placeholder="`系统提示词，可以引用变量，如 {{开始.question}}`" type="textarea" />
       </el-form-item>
 
-      <el-form-item
-        label="用户提示词"
-        prop="prompt"
-        :rules="{ required: true, message: '请输入用户提示词', trigger: 'blur' }"
-      >
+      <el-form-item label="用户提示词" prop="prompt" :rules="{ required: true, message: '请输入用户提示词', trigger: 'blur' }">
         <template #label>
           <div class="flex items-center gap-1">
             <span>用户提示词</span>
@@ -159,24 +140,14 @@ onMounted(() => {
             </el-tooltip>
           </div>
         </template>
-        <el-input
-          v-model="formData.prompt"
-          :rows="5"
-          :placeholder="`用户提示词，可以引用变量，如 {{开始.question}}`"
-          type="textarea"
-        />
+        <el-input v-model="formData.prompt" :rows="5" :placeholder="`用户提示词，可以引用变量，如 {{开始.question}}`" type="textarea" />
       </el-form-item>
 
       <el-form-item label="历史聊天记录">
         <template #label>
           <div class="flex-between gap-3 w-full">
             <span class="whitespace-nowrap">历史聊天记录</span>
-            <el-select
-              v-model="formData.dialogue_type"
-              :teleported="false"
-              class="w-20"
-              size="small"
-            >
+            <el-select v-model="formData.dialogue_type" :teleported="false" class="w-20" size="small">
               <el-option label="节点" value="NODE" />
               <el-option label="工作流" value="WORKFLOW" />
             </el-select>

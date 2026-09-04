@@ -82,8 +82,19 @@ src/workflow-canvas/
 `index.vue`。节点注册由 `index.vue` 中的 `import.meta.glob('./nodes/**/index.ts')` 自动收集，
 不要再维护一份逐项导入列表。
 
-长期记忆模型选择使用 `ModelSelect` 的 `showModelParams` 和 `v-model:model-params`，由公共组件
-维护参数按钮、弹窗和切换模型后的默认值；语音播放的参数弹窗复用该组件目录中的 `ModelParamsDialog.vue`。
+工作流中的单模型选择统一使用 `ModelSelect` 的 `canEditParams` 和 `v-model:model-params`，
+由公共组件维护参数按钮、弹窗和切换模型后的默认值，节点不再单独创建参数弹窗或请求默认值。
+AI 对话及基本信息的语音子组件通过局部更新事件回写字段，父节点合并更新，避免模型 ID 与参数
+连续更新时被旧 Props 覆盖。语音输入使用 `stt_model_params_setting`，语音播放使用
+`tts_model_params_setting`，其他模型节点使用各自已有的参数字段。
+`ApplicationWorkflowView` 和 `ToolWorkflowView` 提供 `getModelParamsForm` 注入接口，画布中的
+Vue Teleport 节点继承页面上下文；画布核心不负责模型参数接口选择。
+智能体页面将详情加载或保存成功返回的配置通过 `defaultModelSettings` Props 传给画布。
+`WorkflowNodeModel.getDefaultModelConfig(type)` 通过画布的配置读取函数获取对应模型，不使用
+默认配置的 `provide/inject`，也不写入节点持久化数据。AI 对话节点在默认来源下读取保存后的
+`LLM` 模型 ID 和参数，使用禁用且隐藏参数按钮的 `ModelSelect` 展示；自定义来源继续编辑
+节点自身配置，引用来源使用 `NodeCascader`。默认配置只用于解析当前使用的模型，不覆盖节点
+保存的自定义配置；表单校验按当前来源检查实际模型或引用变量。
 
 节点自身的表单、状态和专属校验留在节点目录；多个节点共享且属于画布基础协议的能力才上移到
 `core`。节点应复用 `core/node-container/index.vue`，需要选择上游节点字段时复用

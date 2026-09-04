@@ -138,7 +138,7 @@ defineExpose({ open })
           v-else
           v-model="formData.long_term_model_id"
           v-model:model-params="formData.long_term_model_params_setting"
-          show-model-params
+          can-edit-params
           :options="modelOptions"
           :provider-options="providerOptions"
           placeholder="请选择 AI 模型"

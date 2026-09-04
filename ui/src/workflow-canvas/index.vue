@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { ApplicationDetail } from '@/api/types'
 import LogicFlow, { type GraphModel } from '@logicflow/core'
 import '@logicflow/core/dist/index.css'
 import { SelectionSelect } from '@logicflow/extension'
@@ -19,6 +20,7 @@ type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void 
 const props = withDefaults(
   defineProps<{
     data?: LogicFlow.GraphConfigData | null
+    defaultModelSettings?: ApplicationDetail['default_model_setting']
     loopWorkflowMode?: WorkflowMode
     workflowMode?: WorkflowMode
   }>(),
@@ -63,6 +65,8 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   })
 
   initDefaultShortcut(lf.value, lf.value.graphModel)
+  // 节点按需读取页面传入的已保存配置，保持与保存响应一致。
+  lf.value.graphModel.getDefaultModelSettings = () => props.defaultModelSettings
   lf.value.batchRegister([...Object.values(nodeModules).map(({ default: node }) => node), AppEdge])
   lf.value.setDefaultEdgeType('app-edge')
   lf.value.render(data ? data : {})

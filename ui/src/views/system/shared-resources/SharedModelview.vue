@@ -85,7 +85,7 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <ModelCreateButton :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
+          <ModelCreateButton :api="SystemSharedApi" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
         </div>
       </component>
       <div v-loading="loading">

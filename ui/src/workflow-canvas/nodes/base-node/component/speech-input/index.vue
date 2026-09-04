@@ -7,10 +7,10 @@ import type { SpeechInputSetting } from '../../types'
 defineOptions({ name: 'BaseNodeSpeechInput' })
 
 const props = defineProps<{ modelOptions: ModelItem[]; providerOptions: ModelProviderItem[]; setting: SpeechInputSetting }>()
-const emit = defineEmits<{ update: [setting: SpeechInputSetting] }>()
+const emit = defineEmits<{ update: [setting: Partial<SpeechInputSetting>] }>()
 
 function updateSetting(patch: Partial<SpeechInputSetting>) {
-  emit('update', { ...props.setting, ...patch })
+  emit('update', patch)
 }
 
 const enabled = computed({
@@ -35,6 +35,10 @@ const modelId = computed({
   get: () => props.setting.stt_model_id,
   set: (value: string) => updateSetting({ stt_model_id: value }),
 })
+const modelParams = computed({
+  get: () => props.setting.stt_model_params_setting,
+  set: (value: Record<string, unknown>) => updateSetting({ stt_model_params_setting: value }),
+})
 </script>
 
 <template>
@@ -54,7 +58,15 @@ const modelId = computed({
         <el-radio value="custom">自定义</el-radio>
       </el-radio-group>
       <el-alert v-if="modelIdType === 'default'" class="w-full" title="使用系统默认语音识别模型" type="info" :closable="false" />
-      <ModelSelect v-else v-model="modelId" :options="modelOptions" :provider-options="providerOptions" placeholder="请选择语音识别模型" />
+      <ModelSelect
+        v-else
+        v-model="modelId"
+        v-model:model-params="modelParams"
+        can-edit-params
+        :options="modelOptions"
+        :provider-options="providerOptions"
+        placeholder="请选择语音识别模型"
+      />
     </template>
   </el-form-item>
 </template>

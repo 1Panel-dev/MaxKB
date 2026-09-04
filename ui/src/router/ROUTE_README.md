@@ -67,6 +67,7 @@ Login、Workflow 路由没有挂载 `AppLayout`，因此不会出现在左侧导
 - `login`：登录及账户相关独立页面。
 - `workflow`：集中维护各业务的全屏画布路由，当前包含智能体和工具工作流，后续知识库等画布
   继续在 `admin/workflow/index.ts` 中注册。
+- Workspace 的全屏 Workflow 路由显式设置 `resourceScope: 'workspace'`，使模型创建等资源操作使用 Workspace API。
 - Workflow 路由保留当前 Workspace 和资源标识；智能体工作流地址为
   `/workspace/:workspaceId/application/:applicationId/workflow`，工具工作流地址为
   `/workspace/:workspaceId/tool/:toolId/workflow`。两个页面均可从资源操作入口进入，按住 Ctrl 或

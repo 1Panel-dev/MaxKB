@@ -73,13 +73,7 @@ onMounted(() => {
 <template>
   <NodeContainer :node-model="model">
     <h6 class="mb-3">节点设置</h6>
-    <el-form
-      ref="formRef"
-      :model="formData"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent
-    >
+    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item
         :prop="formData.stt_model_id_type === 'reference' ? 'stt_model_id_reference' : 'stt_model_id'"
         :rules="{ required: true, message: '请选择或填写语音识别模型', trigger: 'change' }"
@@ -109,25 +103,17 @@ onMounted(() => {
         />
         <ModelSelect
           v-else
-          placeholder="请输入语音识别模型 ID"
+          v-model="formData.stt_model_id"
+          v-model:model-params="formData.model_params_setting"
+          can-edit-params
           :options="modelList"
           :provider-options="providerOptions"
-          v-model="formData.stt_model_id"
-        ></ModelSelect>
+          placeholder="请选择语音识别模型"
+        />
       </el-form-item>
 
-      <el-form-item
-        prop="audio_list"
-        :rules="{ required: true, message: '请选择语音文件', trigger: 'change' }"
-        label="语音文件"
-      >
-        <NodeCascader
-          ref="contentCascaderRef"
-          v-model="formData.audio_list"
-          :node-model="model"
-          class="w-full"
-          placeholder="选择语音文件"
-        />
+      <el-form-item prop="audio_list" :rules="{ required: true, message: '请选择语音文件', trigger: 'change' }" label="语音文件">
+        <NodeCascader ref="contentCascaderRef" v-model="formData.audio_list" :node-model="model" class="w-full" placeholder="选择语音文件" />
       </el-form-item>
     </el-form>
   </NodeContainer>

@@ -3,11 +3,7 @@ import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
-import { TOOL_TYPE } from '@/api/enums'
-import ApplicationApi from '@/api/admin/workspace/application/application'
-import SharedApi from '@/api/admin/workspace/shared'
-import ToolApi from '@/api/admin/workspace/tool/tool'
-import type { ApplicationDetail, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
+import type { ModelItem, ModelProviderItem } from '@/api/types'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { isLastNode } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -17,18 +13,14 @@ import HistorySetting from './component/history-setting/index.vue'
 import ModelSetting from './component/model-setting/index.vue'
 import PromptSetting from './component/prompt-setting/index.vue'
 import ReasoningSetting from './component/reasoning-setting/index.vue'
-import ResourceSetting from './component/resource-setting/index.vue'
 import ResultSetting from './component/result-setting/index.vue'
 import VisionSetting from './component/vision-setting/index.vue'
 import type {
   AiChatNodeForm,
   AiModelSetting as AiModelSettingValue,
-  ApplicationResourceOption,
   HistorySetting as HistorySettingValue,
   PromptSetting as PromptSettingValue,
   ReasoningSetting as ReasoningSettingValue,
-  ResourceSetting as ResourceSettingValue,
-  ToolResourceOption,
   VisionSetting as VisionSettingValue,
 } from './types'
 
@@ -47,10 +39,6 @@ const visionSettingRef = useTemplateRef<InstanceType<typeof VisionSetting>>('vis
 
 const modelOptions = ref<ModelItem[]>([])
 const providerOptions = ref<ModelProviderItem[]>([])
-const toolOptions = ref<ToolResourceOption[]>([])
-const mcpOptions = ref<ToolResourceOption[]>([])
-const skillOptions = ref<ToolResourceOption[]>([])
-const applicationOptions = ref<ApplicationResourceOption[]>([])
 
 const defaultReasoningSetting: ReasoningSettingValue = {
   reasoning_content_enable: false,
@@ -117,17 +105,19 @@ function normalizeForm(data: Partial<AiChatNodeForm> & { mcp_tool_id?: string })
 if (!model.properties.node_data) model.properties.node_data = cloneDeep(defaultForm)
 normalizeForm(model.properties.node_data as Partial<AiChatNodeForm>)
 
-const formData = computed<AiChatNodeForm>({
-  get: () => model.properties.node_data as AiChatNodeForm,
-  set: (value) => (model.properties.node_data = value),
-})
+const formData = computed(() => model.properties.node_data as AiChatNodeForm)
 
-const modelSetting = computed<AiModelSettingValue>(() => ({
-  model_id: formData.value.model_id,
-  model_id_reference: formData.value.model_id_reference,
-  model_id_type: formData.value.model_id_type,
-  model_params_setting: formData.value.model_params_setting,
-}))
+// 默认来源读取保存后的 LLM 配置，节点内保留原有自定义模型和参数。
+const modelSetting = computed<AiModelSettingValue>(() => {
+  const defaultModel = model.getDefaultModelConfig('LLM')
+  const isDefaultModel = formData.value.model_id_type === 'default'
+  return {
+    model_id: isDefaultModel ? (defaultModel?.model_id ?? '') : formData.value.model_id,
+    model_id_reference: formData.value.model_id_reference,
+    model_id_type: formData.value.model_id_type,
+    model_params_setting: isDefaultModel ? (defaultModel?.model_params_setting ?? {}) : formData.value.model_params_setting,
+  }
+})
 const promptSetting = computed<PromptSettingValue>(() => ({ prompt: formData.value.prompt, system: formData.value.system }))
 const historySetting = computed<HistorySettingValue>(() => ({
   dialogue_number: formData.value.dialogue_number,
@@ -138,15 +128,7 @@ const visionSetting = computed<VisionSettingValue>(() => ({
   video_list: formData.value.video_list,
   vision: formData.value.vision,
 }))
-const resourceSetting = computed<ResourceSettingValue>(() => ({
-  application_ids: formData.value.application_ids,
-  mcp_output_enable: formData.value.mcp_output_enable,
-  mcp_servers: formData.value.mcp_servers,
-  mcp_source: formData.value.mcp_source,
-  mcp_tool_ids: formData.value.mcp_tool_ids,
-  skill_tool_ids: formData.value.skill_tool_ids,
-  tool_ids: formData.value.tool_ids,
-}))
+
 const applicationId = computed(() => {
   const value = route.params.applicationId
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '')
@@ -154,52 +136,11 @@ const applicationId = computed(() => {
 const showConversationSettings = computed(() =>
   [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
 )
-const showApplications = computed(() => apiType !== 'systemShare')
 
-function updateModelSetting(setting: AiModelSettingValue) {
-  Object.assign(formData.value, setting)
+function updateNodeData(setting: Partial<AiChatNodeForm>) {
+  model.properties.node_data = { ...formData.value, ...setting }
 }
 
-function updatePromptSetting(setting: PromptSettingValue) {
-  Object.assign(formData.value, setting)
-}
-
-function updateHistorySetting(setting: HistorySettingValue) {
-  Object.assign(formData.value, setting)
-}
-
-function updateVisionSetting(setting: VisionSettingValue) {
-  Object.assign(formData.value, setting)
-}
-
-function updateResourceSetting(setting: ResourceSettingValue) {
-  Object.assign(formData.value, setting)
-}
-
-function updateReasoningSetting(setting: ReasoningSettingValue) {
-  formData.value.model_setting = setting
-}
-
-function uniqueTools(tools: ToolItem[]) {
-  return [...new Map(tools.map((tool) => [tool.id, tool])).values()]
-}
-
-async function loadResourceOptions() {
-  const [workspaceToolsResult, sharedToolsResult, applicationsResult] = await Promise.allSettled([
-    ToolApi.getAllTool(),
-    SharedApi.getAllTool(),
-    ApplicationApi.getAllApplication(),
-  ])
-  const workspaceTools = workspaceToolsResult.status === 'fulfilled' ? workspaceToolsResult.value : []
-  const sharedTools = sharedToolsResult.status === 'fulfilled' ? sharedToolsResult.value : []
-  const applications: ApplicationDetail[] = applicationsResult.status === 'fulfilled' ? applicationsResult.value : []
-  const tools = uniqueTools([...workspaceTools, ...sharedTools]).filter(({ is_active }) => is_active)
-
-  toolOptions.value = tools.filter(({ tool_type }) => tool_type === TOOL_TYPE.CUSTOM || tool_type === TOOL_TYPE.WORKFLOW)
-  mcpOptions.value = tools.filter(({ tool_type }) => tool_type === TOOL_TYPE.MCP)
-  skillOptions.value = tools.filter(({ tool_type }) => tool_type === TOOL_TYPE.SKILL)
-  applicationOptions.value = applications.filter(({ id, is_publish }) => is_publish && id !== applicationId.value)
-}
 
 function validate() {
   return Promise.all([modelSettingRef.value?.validate(), visionSettingRef.value?.validate(), formRef.value?.validate()]).catch((error) =>
@@ -211,42 +152,36 @@ onMounted(() => {
   model.validate = validate
   store.getModelList({ model_type: 'LLM' }).then((models) => (modelOptions.value = models))
   store.getProviderList().then((providers) => (providerOptions.value = providers))
-  void loadResourceOptions()
 })
 </script>
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mb-3">节点设置</h6>
-    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <ModelSetting
-        ref="modelSettingRef"
-        :model-options="modelOptions"
-        :node-model="model"
-        :provider-options="providerOptions"
-        :setting="modelSetting"
-        @update="updateModelSetting"
-      />
+    <h6 class="mk-title-decoration mb-3">节点设置</h6>
+    <div class="mk-gray-card">
+      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+        <!-- AI模型 -->
+        <ModelSetting
+          ref="modelSettingRef"
+          :model-options="modelOptions"
+          :node-model="model"
+          :provider-options="providerOptions"
+          :setting="modelSetting"
+          @update="updateNodeData"
+        />
 
-      <PromptSetting :application-id="applicationId" :model-setting="modelSetting" :setting="promptSetting" @update="updatePromptSetting" />
+        <PromptSetting :application-id="applicationId" :model-setting="modelSetting" :setting="promptSetting" @update="updateNodeData" />
 
-      <HistorySetting v-if="showConversationSettings" :setting="historySetting" @update="updateHistorySetting" />
+        <HistorySetting v-if="showConversationSettings" :setting="historySetting" @update="updateNodeData" />
 
-      <VisionSetting ref="visionSettingRef" :node-model="model" :setting="visionSetting" @update="updateVisionSetting" />
+        <VisionSetting ref="visionSettingRef" :node-model="model" :setting="visionSetting" @update="updateNodeData" />
 
-      <ResourceSetting
-        :application-options="applicationOptions"
-        :mcp-options="mcpOptions"
-        :setting="resourceSetting"
-        :show-applications="showApplications"
-        :skill-options="skillOptions"
-        :tool-options="toolOptions"
-        @update="updateResourceSetting"
-      />
+        <!-- <ResourceSetting :setting="resourceSetting" :show-applications="showApplications" @update="updateNodeData" /> -->
 
-      <ReasoningSetting :setting="formData.model_setting" @update="updateReasoningSetting" />
+        <ReasoningSetting :setting="formData.model_setting" @update="updateNodeData" />
 
-      <ResultSetting v-if="showConversationSettings" :enabled="formData.is_result" @update:enabled="formData.is_result = $event" />
-    </el-form>
+        <ResultSetting v-if="showConversationSettings" :enabled="formData.is_result" @update:enabled="formData.is_result = $event" />
+      </el-form>
+    </div>
   </NodeContainer>
 </template>
