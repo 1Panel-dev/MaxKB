@@ -211,7 +211,7 @@ class WorkflowManage:
                 details = node.get_details(
                     index + position_index, position=position, old_details=old_details[position_index]
                 )
-                details_result.insert(position_index, details)
+                details_result[position_index] = details
             else:
                 details = node.get_details(index + position_index)
                 details_result.append(details)
