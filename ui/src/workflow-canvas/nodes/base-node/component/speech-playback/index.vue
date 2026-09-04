@@ -3,7 +3,7 @@ import { computed, useTemplateRef } from 'vue'
 import { Operation } from '@element-plus/icons-vue'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
-import ModelParamsDialog from '../../ModelParamsDialog.vue'
+import ModelParamsDialog from '@/components/business/model-select/ModelParamsDialog.vue'
 import type { SpeechPlaybackSetting } from '../../types'
 
 defineOptions({ name: 'BaseNodeSpeechPlayback' })

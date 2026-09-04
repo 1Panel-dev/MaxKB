@@ -39,17 +39,28 @@ function handleNodeDragStart(event: PointerEvent, workflowNode: WorkflowMenuNode
           <p class="mb-3 mt-3 font-semibold text-sm text-N600">{{ group.label }}</p>
           <div class="grid grid-cols-2 gap-3">
             <template v-for="workflowNode in group.list" :key="workflowNode.type">
-              <el-card
-                class="small cursor-pointer"
-                shadow="never"
-                @click="emit('select', workflowNode)"
-                @pointerdown="handleNodeDragStart($event, workflowNode)"
-              >
-                <div class="flex items-center gap-2">
-                  <component :is="iconComponent(`${workflowNode.type}-icon`)" :size="20" />
-                  <span>{{ workflowNode.label }}</span>
+              <el-popover placement="right" :width="280" :show-after="500" :persistent="false">
+                <template #reference>
+                  <el-card
+                    class="small cursor-pointer"
+                    shadow="never"
+                    @click="emit('select', workflowNode)"
+                    @pointerdown="handleNodeDragStart($event, workflowNode)"
+                  >
+                    <div class="flex items-center gap-2">
+                      <component :is="iconComponent(`${workflowNode.type}-icon`)" :size="20" />
+                      <span>{{ workflowNode.label }}</span>
+                    </div>
+                  </el-card>
+                </template>
+                <div class="p-3">
+                  <div class="flex min-w-0 items-center gap-2">
+                    <component :is="iconComponent(`${workflowNode.type}-icon`)" :size="24" />
+                    <p class="min-w-0 flex-1 break-all truncate">{{ workflowNode.label }}</p>
+                  </div>
+                  <p v-if="workflowNode.text" class="mt-2 text-sm text-N600">{{ workflowNode.text }}</p>
                 </div>
-              </el-card>
+              </el-popover>
             </template>
           </div>
         </template>

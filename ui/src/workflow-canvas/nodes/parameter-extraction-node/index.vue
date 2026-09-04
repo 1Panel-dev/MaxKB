@@ -91,29 +91,29 @@ const store = useWorkflowStore(apiType)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<ModelProviderItem>>([])
 
+// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
+if (!model.properties.node_data) {
+  model.properties.node_data = {
+    input_variable: [],
+    model_params_setting: {},
+    model_id: '',
+    model_id_type: 'custom',
+    model_id_reference: [],
+    variable_list: [],
+  }
+}
+const initialNodeData = model.properties.node_data as ParameterExtractionForm
+if (initialNodeData.model_id_type === undefined) initialNodeData.model_id_type = 'custom'
+if (!Array.isArray(initialNodeData.model_id_reference)) initialNodeData.model_id_reference = []
+if (!initialNodeData.model_params_setting) initialNodeData.model_params_setting = {}
+const shouldInit = initialNodeData.input_variable !== undefined || initialNodeData.variable_list !== undefined
+if (shouldInit) {
+  if (!Array.isArray(initialNodeData.input_variable)) initialNodeData.input_variable = []
+  if (!Array.isArray(initialNodeData.variable_list)) initialNodeData.variable_list = []
+}
+
 const formData = computed<ParameterExtractionForm>({
-  get: () => {
-    if (!model.properties.node_data) {
-      model.properties.node_data = {
-        input_variable: [],
-        model_params_setting: {},
-        model_id: '',
-        model_id_type: 'custom',
-        model_id_reference: [],
-        variable_list: [],
-      }
-    }
-    const data = model.properties.node_data as ParameterExtractionForm
-    if (data.model_id_type === undefined) data.model_id_type = 'custom'
-    if (!Array.isArray(data.model_id_reference)) data.model_id_reference = []
-    if (!data.model_params_setting) data.model_params_setting = {}
-    const shouldInit = data.input_variable !== undefined || data.variable_list !== undefined
-    if (shouldInit) {
-      if (!Array.isArray(data.input_variable)) data.input_variable = []
-      if (!Array.isArray(data.variable_list)) data.variable_list = []
-    }
-    return data
-  },
+  get: () => model.properties.node_data as ParameterExtractionForm,
   set: (value) => (model.properties.node_data = value),
 })
 

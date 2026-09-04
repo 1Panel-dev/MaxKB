@@ -293,8 +293,17 @@ onBeforeUnmount(() => {
             <el-button text @click="showNode = !showNode">
               <MkIcon name="icon_down_outlined" />
             </el-button>
-            <NodeConditionDropdown :model="model" @visible-change="anchorGuard.setOverlayVisible('condition', $event)" />
-            <NodeOperateDropdown :model="model" @visible-change="anchorGuard.setOverlayVisible('operate', $event)" />
+            <NodeConditionDropdown
+              :model="model"
+              @update:condition="model.properties.condition = $event"
+              @visible-change="anchorGuard.setOverlayVisible('condition', $event)"
+            />
+            <NodeOperateDropdown
+              :model="model"
+              @update:disabled="model.properties.disabled = $event"
+              @update:step-name="model.properties.stepName = $event"
+              @visible-change="anchorGuard.setOverlayVisible('operate', $event)"
+            />
           </div>
         </div>
 
@@ -314,7 +323,7 @@ onBeforeUnmount(() => {
 
             <!-- 输出参数 -->
             <template v-if="nodeFields.length > 0">
-              <div class="flex-between">
+              <div class="flex-between mt-2">
                 <h6 class="mk-title-decoration my-2">{{ output_title }}</h6>
                 <div v-if="exceptionNodeList.includes(String(model.type))" class="flex items-center gap-2">
                   <span>异常捕获</span>

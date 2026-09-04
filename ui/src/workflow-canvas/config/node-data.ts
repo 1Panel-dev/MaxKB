@@ -105,6 +105,16 @@ export const toolStartNode = {
 
 // 以上是默认基础节点
 
+
+
+
+export const replyNode = {
+  type: WorkflowNodeType.Reply,
+  text: '指定回复内容，引用变量会转换为字符串进行输出',
+  label: '指定回复',
+  properties: { stepName: '指定回复', config: { fields: [{ label: '内容', value: 'answer' }] } },
+}
+
 /**
  * ai对话节点配置数据
  */
@@ -238,13 +248,8 @@ export const conditionNode = {
   properties: { width: 600, stepName: '判断器', config: { fields: [{ label: '分支名称', value: 'branch_name' }] } },
 }
 
-export const replyNode = {
-  type: WorkflowNodeType.Reply,
-  text: '指定回复内容，引用变量会转换为字符串进行输出',
-  label: '指定回复',
-  height: 210,
-  properties: { stepName: '指定回复', config: { fields: [{ label: '内容', value: 'answer' }] } },
-}
+
+
 
 export const rerankerNode = {
   type: WorkflowNodeType.RerankerNode,

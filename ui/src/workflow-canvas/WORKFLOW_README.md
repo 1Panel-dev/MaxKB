@@ -49,6 +49,10 @@ src/workflow-canvas/
 `visible-change` 状态，并在节点组件卸载时调用 `reset()`；不要通过 Teleport 到 `body` 或增加
 `z-index` 绕过画布的缩放和 SVG 绘制顺序。
 
+`NodeCascader` 已在内部统一管理下拉层的锚点保护，使用方无需重复接入。
+同一节点的多个 `createAnchorGuard()` 实例共享浮层状态，最后一个浮层关闭或卸载后才恢复
+节点原本的 `hittable` 状态。
+
 锚点按钮与 `el-tooltip` 集中在 `core/node-container/NodeAnchor.vue`。`workflow-node.ts` 负责
 锚点坐标、连接状态，并将 LogicFlow 组件的挂载、Props 更新和卸载同步到现有 Vue Teleport
 容器；`teleport.connect()` 的可选第五个参数用于传入组件 Props。节点容器
@@ -79,6 +83,9 @@ src/workflow-canvas/
 `index.vue`。节点注册由 `index.vue` 中的 `import.meta.glob('./nodes/**/index.ts')` 自动收集，
 不要再维护一份逐项导入列表。
 
+长期记忆模型选择使用 `ModelSelect` 的 `showModelParams` 和 `v-model:model-params`，由公共组件
+维护参数按钮、弹窗和切换模型后的默认值；语音播放的参数弹窗复用该组件目录中的 `ModelParamsDialog.vue`。
+
 节点自身的表单、状态和专属校验留在节点目录；多个节点共享且属于画布基础协议的能力才上移到
 `core`。节点应复用 `core/node-container/index.vue`，需要选择上游节点字段时复用
 `core/NodeCascader.vue`。
@@ -90,6 +97,10 @@ src/workflow-canvas/
 固定字段写入统一使用直接赋值，例如 `model.properties.node_data = value`、
 `model.validate = validate`，不使用 Lodash `set`。写入嵌套字段前保留必要的父对象初始化；
 Vue `computed` 的 `set` 和原生 `Map.set()` 按各自 API 正常使用。
+
+默认值补齐和旧数据兼容在节点初始化阶段执行，`computed` getter 只读取数据，不修改节点属性、
+调用会修改数据的归一化方法，或通过 Lodash、类型断言绕过检查。容器私有下拉组件通过类型化的
+更新事件通知 `NodeContainer` 写回条件、禁用状态和节点名称，不直接修改 Props 中的字段。
 
 ## View 接入约定
 
@@ -133,8 +144,12 @@ Vue `computed` 的 `set` 和原生 `Map.set()` 按各自 API 正常使用。
 
 ## 当前迁移范围
 
-- 已实现并注册：基本信息、开始、AI 对话、意图识别、文本转语音、判断器、指定回复、智能体、
+- 已实现并注册：基本信息、开始、AI 对话、意图识别、文本转语音、知识库检索、判断器、指定回复、智能体、
   自定义工具和工具库工具。
+- 知识库检索节点在 `component/search-scope/` 和 `component/search-setting/` 中分别维护检索范围
+  与参数配置，节点入口统一写回数据并独立校验范围引用和问题引用。知识库选择复用
+  `KnowledgeSelectionDialog`，保留相同 Embedding 模型约束；移除关联只清理明确取消的 ID，
+  不丢弃全量关联中当前用户不可见的知识库。检索模式协议复用 `KNOWLEDGE_SEARCH_MODE`。
 - `config/node-mapping.ts` 保留节点类型映射，以及基本信息和开始节点的默认数据集合。
 - `NodeMenu` 使用 Element Plus Tabs 组织基础组件、工具和智能体；基础组件直接渲染 `node-menu/menu.ts` 返回的菜单分组，工具和智能体复用 Workspace 文件夹树加载可用资源。页面“添加组件”和节点锚点菜单均支持点击创建与拖拽到画布创建。
 - `ApplicationWorkflowView` 已接入详情加载、默认工作流、手动与自动保存、发布以及未保存退出确认。

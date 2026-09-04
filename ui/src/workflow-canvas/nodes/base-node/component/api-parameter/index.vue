@@ -2,13 +2,14 @@
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
+import type { FormField } from '@/components/mk-dynamics-form'
 import { Delete, Edit } from '@element-plus/icons-vue'
 import { MsgError } from '@/utils/message'
-import type { ApiInputField, UserInputField } from '../../types'
+import type { ApiInputField } from '../../types'
 
 defineOptions({ name: 'BaseNodeApiParameter' })
 
-const props = defineProps<{ fields: ApiInputField[]; userFields: UserInputField[] }>()
+const props = defineProps<{ fields: ApiInputField[]; userFields: FormField[] }>()
 const emit = defineEmits<{ 'update:fields': [fields: ApiInputField[]] }>()
 
 const dialogVisible = ref(false)

@@ -1,5 +1,3 @@
-import type { FormField } from '@/components/mk-dynamics-form'
-
 export interface ApiInputField {
   assignment_method: 'api_input'
   default_value: string
@@ -62,19 +60,4 @@ export interface BaseNodeForm extends LongTermSetting, SpeechInputSetting, Speec
   long_term_enable: boolean
   name: string
   prologue: string
-}
-
-export type UserInputField = FormField
-
-export const defaultFileUploadSetting: FileUploadSetting = {
-  audio: false,
-  document: true,
-  fileLimit: 50,
-  image: false,
-  local_upload: true,
-  maxFiles: 3,
-  other: false,
-  otherExtensions: ['PPT', 'DOC'],
-  url_upload: false,
-  video: false,
 }

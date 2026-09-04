@@ -59,6 +59,7 @@
     "@types/lodash": "^4.17.25",
     "@types/node": "^24.13.2",
     "@types/nprogress": "^0.2.3",
+    "@types/sortablejs": "^1.15.9",
     "@vitejs/plugin-vue": "^6.0.7",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
     "@vue/eslint-config-typescript": "^14.8.0",

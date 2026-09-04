@@ -48,34 +48,34 @@ function defaultBranch(): IntentNodeBranch[] {
   ]
 }
 
+// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
+if (!model.properties.node_data) {
+  model.properties.node_data = {
+    model_id: '',
+    model_id_type: 'custom',
+    model_id_reference: [],
+    model_params_setting: {},
+    content_list: [],
+    dialogue_type: 'WORKFLOW',
+    dialogue_number: 1,
+    branch: defaultBranch(),
+  }
+}
+const initialNodeData = model.properties.node_data as IntentNodeForm
+if (initialNodeData.model_id_type === undefined) initialNodeData.model_id_type = 'custom'
+if (!Array.isArray(initialNodeData.model_id_reference)) initialNodeData.model_id_reference = []
+if (!initialNodeData.model_params_setting) initialNodeData.model_params_setting = {}
+if (!Array.isArray(initialNodeData.content_list)) initialNodeData.content_list = []
+if (initialNodeData.dialogue_type === undefined) initialNodeData.dialogue_type = 'WORKFLOW'
+if (initialNodeData.dialogue_number === undefined || initialNodeData.dialogue_number === null) {
+  initialNodeData.dialogue_number = 1
+}
+if (!Array.isArray(initialNodeData.branch) || initialNodeData.branch.length === 0) {
+  initialNodeData.branch = defaultBranch()
+}
+
 const formData = computed<IntentNodeForm>({
-  get: () => {
-    if (!model.properties.node_data) {
-      model.properties.node_data = {
-        model_id: '',
-        model_id_type: 'custom',
-        model_id_reference: [],
-        model_params_setting: {},
-        content_list: [],
-        dialogue_type: 'WORKFLOW',
-        dialogue_number: 1,
-        branch: defaultBranch(),
-      }
-    }
-    const data = model.properties.node_data as IntentNodeForm
-    if (data.model_id_type === undefined) data.model_id_type = 'custom'
-    if (!Array.isArray(data.model_id_reference)) data.model_id_reference = []
-    if (!data.model_params_setting) data.model_params_setting = {}
-    if (!Array.isArray(data.content_list)) data.content_list = []
-    if (data.dialogue_type === undefined) data.dialogue_type = 'WORKFLOW'
-    if (data.dialogue_number === undefined || data.dialogue_number === null) {
-      data.dialogue_number = 1
-    }
-    if (!Array.isArray(data.branch) || data.branch.length === 0) {
-      data.branch = defaultBranch()
-    }
-    return data
-  },
+  get: () => model.properties.node_data as IntentNodeForm,
   set: (value) => (model.properties.node_data = value),
 })
 

@@ -3,7 +3,8 @@ import { nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { InputInstance } from 'element-plus'
 import { MsgWarning } from '@/utils/message'
-import { defaultFileUploadSetting, type FileUploadSetting } from '../../types'
+import { defaultFileUploadSetting } from '../../constant'
+import type { FileUploadSetting } from '../../types'
 
 defineOptions({ name: 'BaseNodeFileUploadSettingDialog' })
 
@@ -23,19 +24,6 @@ const fileTypes = [
 ] as const
 
 const reservedExtensions = new Set(fileTypes.flatMap(({ description }) => description.split('、')))
-
-function resetData() {
-  formData.value = cloneDeep(defaultFileUploadSetting)
-  extensionInput.value = ''
-  extensionInputVisible.value = false
-}
-
-function open(setting?: Partial<FileUploadSetting>) {
-  resetData()
-  formData.value = { ...formData.value, ...cloneDeep(setting ?? {}) }
-  formData.value.otherExtensions = [...(setting?.otherExtensions ?? defaultFileUploadSetting.otherExtensions)]
-  visible.value = true
-}
 
 function showExtensionInput() {
   extensionInputVisible.value = true
@@ -66,6 +54,17 @@ function submit() {
   }
   emit('submit', cloneDeep(formData.value))
   visible.value = false
+}
+
+function open(setting: FileUploadSetting) {
+  formData.value = cloneDeep(setting)
+  visible.value = true
+}
+
+function resetData() {
+  formData.value = cloneDeep(defaultFileUploadSetting)
+  extensionInput.value = ''
+  extensionInputVisible.value = false
 }
 
 defineExpose({ open })

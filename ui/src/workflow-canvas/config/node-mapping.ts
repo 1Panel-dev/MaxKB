@@ -92,6 +92,3 @@ export const nodeDict: Partial<Record<WorkflowNodeType, ShapeItem>> = {
 }
 export const defaultApplicationNodes = [NodeData.baseNode, NodeData.startNode]
 export const defaultToolNodes = [NodeData.toolBaseNode, NodeData.toolStartNode]
-
-/** @deprecated 使用对应工作流模式的默认节点集合。 */
-export const defaultNodes = defaultApplicationNodes

@@ -40,8 +40,12 @@ src/components/
 │   │   ├── MoveToDialog.vue
 │   │   ├── VirtualizedTree.vue
 │   │   └── types.ts
+│   ├── knowledge-selection-dialog/
+│   │   ├── index.vue             # 关联知识库选择、文件夹与共享资源查询
+│   │   └── types.ts              # 已选知识库快照类型
 │   ├── model-select/
-│   │   └── index.vue             # 按供应商分组的模型选择器
+│   │   ├── index.vue             # 按供应商分组的模型选择器与可选参数按钮
+│   │   └── ModelParamsDialog.vue # 模型参数动态表单弹窗
 │   ├── workspace-dropdown/
 │   │   └── index.vue             # 工作空间选择下拉框
 │   └── workspace-relation-tags/
@@ -1035,18 +1039,39 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 <MoveToDialog ref="moveToDialogRef" :loading="submitting" :source="RESOURCE_TYPE.TOOL" @submit="handleMoveFolder" />
 ```
 
+### KnowledgeSelectionDialog
+
+关联知识库选择弹窗，手动导入 `@/components/business/knowledge-selection-dialog/index.vue`。
+通过 `open(knowledge)` 传入已选知识库快照，确认后通过 `submit` 返回新的选择；取消不修改调用方
+数据，关闭后统一清理临时状态。`KnowledgeSelection` 类型允许仅包含 ID，以兼容缺少详情的旧数据。
+组件复用只读 `FolderTree` 和 `MkInfiniteScroll` 查询工作空间及共享知识库，支持按名称搜索，
+跨文件夹、搜索和分页保留选择，并限制新选知识库使用相同的 Embedding 模型。固定业务请求由
+该组件负责，调用方维护最终关联 ID 和快照。
+
 ### ModelSelect
 
-按供应商分组展示模型，通过 `v-model` 控制模型 ID，并在选择变化时触发 `change`。`options` 使用
-供应商标识作为键、模型数组作为值；组件根据 `modelType` 调用供应商接口补充分组名称和图标，
-模型列表仍由使用方按当前业务上下文查询。
+按供应商分组展示模型，通过 `v-model` 控制模型 ID，并在选择变化时触发 `change`。`options` 为
+`ModelItem[]`，`providerOptions` 为 `ModelProviderItem[]`，模型列表和供应商列表均由使用方查询。
+
+`showModelParams` 默认为 `false`，设为 `true` 时显示参数按钮，设为 `false` 时隐藏。
+未选择模型或传入 `disabled` 时按钮禁用；点击打开组件内的 `ModelParamsDialog`。
+通过 `v-model:model-params` 绑定参数：切换模型时加载默认值，清空模型时清空参数，弹窗确认后
+回写配置，取消不修改已保存参数。参数表单沿用上层提供的 `getModelParamsForm(modelId)` 注入方法；
+隐藏参数入口时，组件只处理模型选择，不加载或修改参数。
 
 ```vue
 <script setup lang="ts">
 import ModelSelect from '@/components/business/model-select/index.vue'
 </script>
 
-<ModelSelect v-model="selectedModelId" model-type="LLM" :options="modelOptions" placeholder="请选择模型" @change="handleModelChange" />
+<ModelSelect
+  v-model="selectedModelId"
+  v-model:model-params="modelParams"
+  show-model-params
+  :options="modelOptions"
+  :provider-options="providerOptions"
+  placeholder="请选择模型"
+/>
 ```
 
 ### WorkspaceDropdown

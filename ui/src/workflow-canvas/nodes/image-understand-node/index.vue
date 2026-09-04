@@ -35,34 +35,34 @@ const store = useWorkflowStore(apiType)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<ModelProviderItem>>([])
 
+// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
+if (!model.properties.node_data) {
+  model.properties.node_data = {
+    model_id: '',
+    model_id_type: 'custom',
+    model_id_reference: [],
+    model_setting: { reasoning_content_enable: false },
+    prompt: '{{开始.question}}',
+    system: '',
+    dialogue_type: 'WORKFLOW',
+    dialogue_number: 1,
+    image_list: [],
+  }
+}
+const initialNodeData = model.properties.node_data as ImageUnderstandNodeForm
+if (initialNodeData.model_id_type === undefined) initialNodeData.model_id_type = 'custom'
+if (!Array.isArray(initialNodeData.model_id_reference)) initialNodeData.model_id_reference = []
+if (!initialNodeData.model_setting) initialNodeData.model_setting = { reasoning_content_enable: false }
+if (initialNodeData.prompt === undefined) initialNodeData.prompt = '{{开始.question}}'
+if (initialNodeData.system === undefined) initialNodeData.system = ''
+if (initialNodeData.dialogue_type === undefined) initialNodeData.dialogue_type = 'WORKFLOW'
+if (initialNodeData.dialogue_number === undefined || initialNodeData.dialogue_number === null) {
+  initialNodeData.dialogue_number = 1
+}
+if (!Array.isArray(initialNodeData.image_list)) initialNodeData.image_list = []
+
 const formData = computed<ImageUnderstandNodeForm>({
-  get: () => {
-    if (!model.properties.node_data) {
-      model.properties.node_data = {
-        model_id: '',
-        model_id_type: 'custom',
-        model_id_reference: [],
-        model_setting: { reasoning_content_enable: false },
-        prompt: '{{开始.question}}',
-        system: '',
-        dialogue_type: 'WORKFLOW',
-        dialogue_number: 1,
-        image_list: [],
-      }
-    }
-    const data = model.properties.node_data as ImageUnderstandNodeForm
-    if (data.model_id_type === undefined) data.model_id_type = 'custom'
-    if (!Array.isArray(data.model_id_reference)) data.model_id_reference = []
-    if (!data.model_setting) data.model_setting = { reasoning_content_enable: false }
-    if (data.prompt === undefined) data.prompt = '{{开始.question}}'
-    if (data.system === undefined) data.system = ''
-    if (data.dialogue_type === undefined) data.dialogue_type = 'WORKFLOW'
-    if (data.dialogue_number === undefined || data.dialogue_number === null) {
-      data.dialogue_number = 1
-    }
-    if (!Array.isArray(data.image_list)) data.image_list = []
-    return data
-  },
+  get: () => model.properties.node_data as ImageUnderstandNodeForm,
   set: (value) => (model.properties.node_data = value),
 })
 

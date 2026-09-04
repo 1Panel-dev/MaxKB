@@ -4,18 +4,18 @@ import { cloneDeep } from 'lodash'
 import { Delete, Edit, Setting } from '@element-plus/icons-vue'
 import { MkDynamicsFormConstructor, dynamicFormTypeOptions, type FormField, type VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import { MsgError } from '@/utils/message'
-import type { ApiInputField, UserInputField, UserInputSetting } from '../../types'
+import type { ApiInputField, UserInputSetting } from '../../types'
 
 defineOptions({ name: 'BaseNodeUserInput' })
 
 const props = defineProps<{
   apiFields: ApiInputField[]
-  fields: UserInputField[]
+  fields: FormField[]
   nodeId: string
   setting: UserInputSetting
 }>()
 const emit = defineEmits<{
-  'update:fields': [fields: UserInputField[]]
+  'update:fields': [fields: FormField[]]
   'update:setting': [setting: UserInputSetting]
 }>()
 
@@ -49,13 +49,13 @@ function formatLabel(label: FormField['label'], fallback = '') {
   return typeof label === 'string' ? label : (label?.label ?? fallback)
 }
 
-function formatDefaultValue(field: UserInputField) {
+function formatDefaultValue(field: FormField) {
   if (field.input_type === 'PasswordInput' && field.default_value) return '******'
   if (Array.isArray(field.default_value)) return field.default_value.join('、')
   return String(field.default_value ?? '')
 }
 
-function openFieldDialog(field?: UserInputField, index?: number) {
+function openFieldDialog(field?: FormField, index?: number) {
   editingIndex.value = index
   currentField.value = cloneDeep(field ?? { input_type: 'TextInput', required: false, show_default_value: true })
   fieldDialogVisible.value = true
@@ -112,14 +112,13 @@ function submitSetting() {
 <template>
   <section>
     <div class="flex-between mb-3">
-      <h6>用户输入</h6>
-      <div class="flex items-center gap-1">
-        <el-button link type="primary" title="用户输入设置" @click="openSettingDialog">
+      <p>用户输入</p>
+      <div class="flex items-center">
+        <el-button text type="primary" title="用户输入设置" @click="openSettingDialog">
           <MkIcon :icon="Setting" />
         </el-button>
-        <el-button link type="primary" @click="openFieldDialog()">
+        <el-button text type="primary" @click="openFieldDialog()">
           <MkIcon name="icon_add_outlined" />
-          添加
         </el-button>
       </div>
     </div>
