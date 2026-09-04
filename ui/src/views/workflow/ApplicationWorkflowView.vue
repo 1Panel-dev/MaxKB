@@ -1,22 +1,26 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, useTemplateRef } from 'vue'
+import { nextTick, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import { Aim, Close, FullScreen } from '@element-plus/icons-vue'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
-import { RESOURCE_TYPE } from '@/api/enums'
+import ModelApi from '@/api/admin/workspace/model/model'
 import type { ApplicationDetail } from '@/api/types'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode, type ShapeItem } from '@/workflow-canvas/types'
+import DefaultModelSettingButton from './components/default-model-setting/DefaultModelSettingButton.vue'
 import CreateNodeMenu from './components/CreateNodeMenu.vue'
 import WorkflowViewLayout from './components/WorkflowViewLayout.vue'
 import Conversation from '@/components/conversation/index.vue'
 
 defineOptions({ name: 'ApplicationWorkflowView' })
+
+// 为画布节点中的 ModelSelect 提供参数表单接口。
+provide('getModelParamsForm', ModelApi.getModelParamsForm)
 
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
   nodes: cloneDeep(defaultApplicationNodes),
@@ -43,26 +47,6 @@ const saving = ref(false)
 const savedWorkflow = ref<LogicFlow.GraphData>()
 const saveTime = ref<Date | string>()
 
-/* 调试对话 */
-const debugVisible = ref(false)
-const debugExpanded = ref(false)
-
-function closeDebug() {
-  debugVisible.value = false
-  debugExpanded.value = false
-}
-
-function handleDebug() {
-  // 未保存的画布改动先落库，保证调试对话命中最新的工作流。
-  if (hasUnsavedChanges()) {
-    saveApplication(undefined, false).then(() => {
-      debugVisible.value = true
-    })
-    return
-  }
-  debugVisible.value = true
-}
-
 function getGraphData() {
   return workflowRef.value?.getGraphData()
 }
@@ -82,13 +66,19 @@ function saveApplication(graphData = getGraphData(), showMessage = false) {
   if (!graphData) return Promise.resolve<ApplicationDetail | undefined>(undefined)
 
   saving.value = true
-  return ApplicationApi.putApplication(applicationId, { work_flow: graphData })
+  return ApplicationApi.putApplication(applicationId, { work_flow: graphData, default_model_setting: cloneDeep(defaultModelSetting.value) })
     .then((application) => {
       applicationDetail.value = application
+      defaultModelSetting.value = cloneDeep(application.default_model_setting ?? {})
       saveTime.value = application.update_time || new Date()
       setSavedWorkflow(graphData)
       if (showMessage) MsgSuccess('保存成功')
       return application
+    })
+    .catch((error) => {
+      defaultModelSetting.value = cloneDeep(applicationDetail.value?.default_model_setting ?? {})
+      MsgError('保存失败')
+      throw error
     })
     .finally(() => {
       saving.value = false
@@ -96,7 +86,41 @@ function saveApplication(graphData = getGraphData(), showMessage = false) {
 }
 
 function handleSave() {
-  saveApplication(undefined, true)
+  // 保存失败已提示并回滚，页面按钮在此结束处理。
+  return saveApplication(undefined, true).catch(() => {})
+}
+
+/* 应用默认模型设置：抽屉提交后暂存，保存失败时从详情回滚。 */
+const defaultModelSetting = ref<NonNullable<ApplicationDetail['default_model_setting']>>({})
+
+function handleApplyDefaultModelToAll(graphData: LogicFlow.GraphData) {
+  workflowRef.value?.renderGraphData(graphData)
+}
+
+function handleSaveDefaultModelSetting(settings: NonNullable<ApplicationDetail['default_model_setting']>) {
+  defaultModelSetting.value = cloneDeep(settings)
+  return handleSave()
+}
+
+/* 调试对话 */
+const debugVisible = ref(false)
+const debugExpanded = ref(false)
+
+function closeDebug() {
+  debugVisible.value = false
+  debugExpanded.value = false
+}
+
+function handleDebug() {
+  // 未保存的画布改动先落库，保证调试对话命中最新的工作流。
+  if (hasUnsavedChanges()) {
+    return saveApplication(undefined, false)
+      .then(() => {
+        debugVisible.value = true
+      })
+      .catch(() => {})
+  }
+  debugVisible.value = true
 }
 
 function loadApplicationDetail() {
@@ -104,6 +128,7 @@ function loadApplicationDetail() {
   return ApplicationApi.getApplicationDetail(applicationId)
     .then((application) => {
       applicationDetail.value = application
+      defaultModelSetting.value = cloneDeep(application.default_model_setting ?? {})
       saveTime.value = application.update_time
 
       const workflow = application.work_flow?.nodes?.length ? application.work_flow : DEFAULT_WORKFLOW
@@ -246,7 +271,15 @@ onMounted(() => {
   <WorkflowViewLayout :loading="loading" :title="applicationDetail?.name" :save-time="saveTime" @back="handleBack">
     <template #actions>
       <CreateNodeMenu :workflow-mode="WorkflowMode.Application" @select="handleAddNode" />
-      <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
+      <DefaultModelSettingButton
+        :model-value="defaultModelSetting"
+        :model-api="ModelApi"
+        :get-graph-data="getGraphData"
+        :disabled="loading || saving || publishing"
+        @save="handleSaveDefaultModelSetting"
+        @apply-to-all="handleApplyDefaultModelToAll"
+      />
+      <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave()"> 保存 </el-button>
       <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
       <!-- <el-button
         v-if="canPublish"
@@ -282,7 +315,7 @@ onMounted(() => {
     <WorkflowCanvas
       ref="workflowRef"
       class="min-h-0 flex-1"
-      :current-resource="{ id: applicationId, source: RESOURCE_TYPE.APPLICATION }"
+      :default-model-settings="defaultModelSetting"
       :loop-workflow-mode="WorkflowMode.ApplicationLoop"
       :workflow-mode="WorkflowMode.Application"
     />

@@ -16,20 +16,10 @@
             </el-select>
           </div>
         </template>
-        <NodeCascader
-          ref="modelCascaderRef"
-          v-model="formData.model_id_reference"
-          :node-model="model"
-          class="w-full"
-          placeholder="请选择变量"
-        />
+        <NodeCascader ref="modelCascaderRef" v-model="formData.model_id_reference" :node-model="model" class="w-full" placeholder="请选择变量" />
       </el-form-item>
 
-      <el-form-item
-        v-else
-        prop="model_id"
-        :rules="{ required: true, message: '请选择 AI 模型', trigger: 'change' }"
-      >
+      <el-form-item v-else prop="model_id" :rules="{ required: true, message: '请选择 AI 模型', trigger: 'change' }">
         <template #label>
           <div class="flex-between gap-3 w-full">
             <span>AI 模型<span class="text-danger">*</span></span>
@@ -39,7 +29,14 @@
             </el-select>
           </div>
         </template>
-        <ModelSelect placeholder="请输入 AI 模型 ID" :options="modelList" :provider-options="providerOptions" v-model="formData.model_id" />
+        <ModelSelect
+          v-model="formData.model_id"
+          v-model:model-params="formData.model_params_setting"
+          can-edit-params
+          :options="modelList"
+          :provider-options="providerOptions"
+          placeholder="请选择 AI 模型"
+        />
       </el-form-item>
 
       <el-form-item prop="input_variable" :rules="{ required: true, message: '请选择输入变量', trigger: 'change' }">

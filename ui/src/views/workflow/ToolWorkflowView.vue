@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, useTemplateRef } from 'vue'
+import { nextTick, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import { cloneDeep } from 'lodash'
+import ModelApi from '@/api/admin/workspace/model/model'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
 import { RESOURCE_TYPE } from '@/api/enums'
@@ -16,6 +17,9 @@ import CreateNodeMenu from './components/CreateNodeMenu.vue'
 import WorkflowViewLayout from './components/WorkflowViewLayout.vue'
 
 defineOptions({ name: 'ToolWorkflowView' })
+
+// 为画布节点中的 ModelSelect 提供参数表单接口。
+provide('getModelParamsForm', ModelApi.getModelParamsForm)
 
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
   nodes: cloneDeep(defaultToolNodes),
@@ -33,7 +37,6 @@ const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflo
 function handleAddNode(shapeItem: ShapeItem) {
   workflowRef.value?.addNode(shapeItem)
 }
-
 
 /* 工具工作流加载与保存 */
 const toolDetail = ref<ToolItem>()
@@ -137,19 +140,10 @@ onMounted(() => {
 <template>
   <WorkflowViewLayout :loading="loading" :title="toolDetail?.name" :save-time="saveTime" @back="handleBack">
     <template #actions>
-      <CreateNodeMenu
-        :workflow-mode="WorkflowMode.Tool"
-        @select="handleAddNode"
-      />
+      <CreateNodeMenu :workflow-mode="WorkflowMode.Tool" @select="handleAddNode" />
       <el-button plain :loading="saving" :disabled="loading || saving" @click="handleSave"> 保存 </el-button>
     </template>
 
-    <WorkflowCanvas
-      ref="workflowRef"
-      class="min-h-0 flex-1"
-      :current-resource="{ id: toolId, source: RESOURCE_TYPE.TOOL }"
-      :loop-workflow-mode="WorkflowMode.ToolLoop"
-      :workflow-mode="WorkflowMode.Tool"
-    />
+    <WorkflowCanvas ref="workflowRef" class="min-h-0 flex-1" :loop-workflow-mode="WorkflowMode.ToolLoop" :workflow-mode="WorkflowMode.Tool" />
   </WorkflowViewLayout>
 </template>

@@ -70,6 +70,7 @@ function createApplicationNode(application: ApplicationDetail): NodeMenuItem {
 }
 
 function loadTools(folder?: FolderItem) {
+  // TODO 共享资源和资源管理需要不同的api，后续需要拆分
   const isSharedFolder = folder?.id === FOLDER_ENTRY_ID.SHARED
   const requestApi = isSharedFolder ? SharedApi : ToolApi
   const folderQuery = {
@@ -92,6 +93,7 @@ function loadTools(folder?: FolderItem) {
 }
 
 function loadApplications(folder?: FolderItem) {
+    // TODO 共享资源和资源管理需要不同的api，后续需要拆分
   const folderQuery = { folder_id: folder?.id || FOLDER_ENTRY_ID.ALL }
 
   return ApplicationApi.getAllApplication({ ...folderQuery, publish_status: 'published' }).then((res) => {

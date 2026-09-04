@@ -1053,11 +1053,22 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 按供应商分组展示模型，通过 `v-model` 控制模型 ID，并在选择变化时触发 `change`。`options` 为
 `ModelItem[]`，`providerOptions` 为 `ModelProviderItem[]`，模型列表和供应商列表均由使用方查询。
 
-`showModelParams` 默认为 `false`，设为 `true` 时显示参数按钮，设为 `false` 时隐藏。
+`canEditParams` 默认为 `false`，设为 `true` 时显示参数按钮，设为 `false` 时隐藏。
+参数按钮位于选择框右侧内部，与选择框共用外边框，并通过短竖线与下拉箭头分隔。
 未选择模型或传入 `disabled` 时按钮禁用；点击打开组件内的 `ModelParamsDialog`。
 通过 `v-model:model-params` 绑定参数：切换模型时加载默认值，清空模型时清空参数，弹窗确认后
 回写配置，取消不修改已保存参数。参数表单沿用上层提供的 `getModelParamsForm(modelId)` 注入方法；
 隐藏参数入口时，组件只处理模型选择，不加载或修改参数。
+使用方开启参数入口后应绑定对应参数字段，并移除独立的参数按钮、弹窗和默认参数请求。
+通过 Props 与事件回写设置的子组件，应分别发送模型 ID 和参数的局部更新，由父级合并，避免
+同次交互连续更新时使用旧 Props 覆盖刚选中的模型。
+
+`canAdd` 默认为 `false`，开启后在下拉列表底部显示“添加模型”，复用 `ModelCreateButton` 的
+供应商选择和模型创建流程。组件通过 `isWorkspaceResource()`、`isSystemSharedResource()` 读取
+`resourceScope`：Workspace 传入 `ModelApi`，System 共享资源传入 `SystemSharedModelApi`；
+其他范围暂不展示创建入口。创建成功后触发 `refresh`，使用方重新加载原业务范围的模型选项，
+不自动替换当前选中模型。`footer` 插槽仍可覆盖默认创建入口。
+
 
 ```vue
 <script setup lang="ts">
@@ -1067,7 +1078,7 @@ import ModelSelect from '@/components/business/model-select/index.vue'
 <ModelSelect
   v-model="selectedModelId"
   v-model:model-params="modelParams"
-  show-model-params
+  can-edit-params
   :options="modelOptions"
   :provider-options="providerOptions"
   placeholder="请选择模型"

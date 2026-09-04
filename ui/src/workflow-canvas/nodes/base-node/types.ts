@@ -37,6 +37,7 @@ export interface SpeechInputSetting {
   stt_autosend: boolean
   stt_model_enable: boolean
   stt_model_id: string
+  stt_model_params_setting: Record<string, unknown>
   stt_model_id_type: 'custom' | 'default'
 }
 

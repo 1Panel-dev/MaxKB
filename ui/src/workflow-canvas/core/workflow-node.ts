@@ -1,5 +1,6 @@
 import { createApp, reactive, shallowReactive, type Component } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { DefaultModelType, ModelConfig } from '@/api/types'
 import {
   Component as LogicFlowComponent,
   createRef,
@@ -139,6 +140,10 @@ export class WorkflowNodeModel extends HtmlNodeModel<WorkflowNodeProperties> {
 
   openNodeMenu?: (anchorData: Model.AnchorConfig) => void
   validate?: () => Promise<unknown>
+
+  getDefaultModelConfig(modelType: DefaultModelType): ModelConfig | undefined {
+    return this.graphModel.getDefaultModelSettings?.()?.[modelType]
+  }
 
   setAttributes() {
     this.width = Number(this.properties.width ?? 320)

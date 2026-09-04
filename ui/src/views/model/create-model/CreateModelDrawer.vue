@@ -1,20 +1,18 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import type { BaseModelOption, Dict, DynamicFormField, ModelPayload, ModelProviderItem, ModelTypeOption } from '@/api/types'
-import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
-import ModelApi from '@/api/admin/workspace/model/model'
+import type ModelApi from '@/api/admin/workspace/model/model'
 import ProviderApi from '@/api/admin/model-provider'
 import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import { isSystemSharedResource } from '@/utils/resource-context'
 import ModelAdvancedSettings from '@/views/model/advanced-settings-table/AdvancedSettingsTable.vue'
 
 defineOptions({ name: 'CreateModelDrawer' })
 
 const { auth } = useStore()
 
-const props = withDefaults(defineProps<{ providers?: ModelProviderItem[] }>(), { providers: () => [] })
+const props = withDefaults(defineProps<{ providers?: ModelProviderItem[]; api: typeof ModelApi }>(), { providers: () => [] })
 const emit = defineEmits<{ back: []; refresh: [] }>()
 
 const visible = ref(false)
@@ -126,7 +124,7 @@ function handleSubmit() {
   dynamicsFormRef.value?.validate().then(() => {
     loading.value = true
     const payload = { ...modelForm, model_params_form: modelParamsForm.value }
-    const request = isSystemSharedResource() ? SystemSharedModelApi.postModel(payload) : ModelApi.postModel(payload)
+    const request = props.api.postModel(payload)
 
     return request
       .then(() => {
@@ -226,7 +224,12 @@ defineExpose({ open })
                     </el-tooltip>
                   </span>
                 </template>
-                <el-input v-model="modelForm.name" maxlength="64" placeholder="请给基础模型设置一个名称" @blur="modelForm.name = modelForm.name.trim()" />
+                <el-input
+                  v-model="modelForm.name"
+                  maxlength="64"
+                  placeholder="请给基础模型设置一个名称"
+                  @blur="modelForm.name = modelForm.name.trim()"
+                />
               </el-form-item>
 
               <el-form-item class="mk-hide-asterisk" prop="model_type" :rules="{ required: true, message: '请选择模型类型', trigger: 'change' }">
@@ -254,7 +257,11 @@ defineExpose({ open })
                 </el-select>
               </el-form-item>
 
-              <el-form-item class="mk-hide-asterisk" prop="model_name" :rules="{ required: true, message: '请选择基础模型，自定义输入基础模型后回车即可', trigger: 'change' }">
+              <el-form-item
+                class="mk-hide-asterisk"
+                prop="model_name"
+                :rules="{ required: true, message: '请选择基础模型，自定义输入基础模型后回车即可', trigger: 'change' }"
+              >
                 <template #label>
                   <span class="inline-flex items-center gap-2">
                     <span class="mk-required"> 基础模型</span>
@@ -286,7 +293,12 @@ defineExpose({ open })
           </MkDynamicsForm>
 
           <!-- 高级设置 -->
-          <MkCollapse class="mt-2" v-if="modelForm.model_name && modelForm.model_type && modelForm.model_type !== 'RERANKER'" indicator-position="after" trigger-class="mb-2 w-fit">
+          <MkCollapse
+            class="mt-2"
+            v-if="modelForm.model_name && modelForm.model_type && modelForm.model_type !== 'RERANKER'"
+            indicator-position="after"
+            trigger-class="mb-2 w-fit"
+          >
             <template #label>
               <h6>高级设置</h6>
             </template>

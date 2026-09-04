@@ -75,13 +75,7 @@ onMounted(() => {
 <template>
   <NodeContainer :node-model="model">
     <h6 class="mb-3">节点设置</h6>
-    <el-form
-      ref="formRef"
-      :model="formData"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent
-    >
+    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item
         :prop="formData.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
         :rules="{ required: true, message: '请选择或填写图片生成模型', trigger: 'change' }"
@@ -89,13 +83,7 @@ onMounted(() => {
         <template #label>
           <div class="flex-between gap-3 w-full">
             <span>图片生成模型</span>
-            <el-select
-              v-model="formData.model_id_type"
-              :teleported="false"
-              class="w-30!"
-              size="small"
-              @change="formData.model_id_reference = []"
-            >
+            <el-select v-model="formData.model_id_type" :teleported="false" class="w-30!" size="small" @change="formData.model_id_reference = []">
               <el-option label="引用变量" value="reference" />
               <el-option label="自定义" value="custom" />
             </el-select>
@@ -111,18 +99,16 @@ onMounted(() => {
         />
         <ModelSelect
           v-else
-          placeholder="请输入图片生成模型 ID"
+          v-model="formData.model_id"
+          v-model:model-params="formData.model_params_setting"
+          can-edit-params
           :options="modelList"
           :provider-options="providerOptions"
-          v-model="formData.model_id"
-        ></ModelSelect>
+          placeholder="请选择图片生成模型"
+        />
       </el-form-item>
 
-      <el-form-item
-        label="提示词(正向)"
-        prop="prompt"
-        :rules="{ required: true, message: '请输入正向提示词', trigger: 'blur' }"
-      >
+      <el-form-item label="提示词(正向)" prop="prompt" :rules="{ required: true, message: '请输入正向提示词', trigger: 'blur' }">
         <template #label>
           <div class="flex items-center gap-1">
             <span>提示词(正向)</span>
@@ -131,12 +117,7 @@ onMounted(() => {
             </el-tooltip>
           </div>
         </template>
-        <el-input
-          v-model="formData.prompt"
-          :rows="5"
-          :placeholder="`正向提示词，可以引用变量，如 {{开始.question}}`"
-          type="textarea"
-        />
+        <el-input v-model="formData.prompt" :rows="5" :placeholder="`正向提示词，可以引用变量，如 {{开始.question}}`" type="textarea" />
       </el-form-item>
 
       <el-form-item label="提示词(负向)" prop="negative_prompt">
@@ -148,12 +129,7 @@ onMounted(() => {
             </el-tooltip>
           </div>
         </template>
-        <el-input
-          v-model="formData.negative_prompt"
-          :rows="4"
-          placeholder="请描述不想生成的图片内容，比如：颜色、血腥内容"
-          type="textarea"
-        />
+        <el-input v-model="formData.negative_prompt" :rows="4" placeholder="请描述不想生成的图片内容，比如：颜色、血腥内容" type="textarea" />
       </el-form-item>
     </el-form>
   </NodeContainer>

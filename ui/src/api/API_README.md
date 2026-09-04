@@ -114,6 +114,8 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 - 同一业务边界内的重复类型提取到最近共同目录的 `common.ts`；`common.ts` 不得成为无关类型
   的集合。
 - API 与 View 或 Component 使用同一业务类型时只保留一份声明，不得在两层分别定义。
+- 智能体详情及保存参数中的 `default_model_setting` 共用模型类别 `DefaultModelType` 和单项
+  配置 `ModelConfig`（`types/model.ts`），工作流页面及设置抽屉从 `@/api/types` 引用。
 - 名称相同但业务含义或字段约束不同的类型不要强行合并，应使用明确的领域名称区分。
 - 使用 `interface` 描述对象结构，使用 `type` 描述联合类型、交叉类型、工具类型结果或别名。
 - 类型名称必须体现业务含义，避免使用 `Data`、`Item`、`Info` 等脱离领域后含义不清的名称。

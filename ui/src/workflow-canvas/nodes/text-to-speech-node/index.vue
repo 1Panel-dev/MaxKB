@@ -103,11 +103,13 @@ onMounted(() => {
         />
         <ModelSelect
           v-else
-          placeholder="请输入语音合成模型 ID"
+          v-model="formData.tts_model_id"
+          v-model:model-params="formData.model_params_setting"
+          can-edit-params
           :options="modelList"
           :provider-options="providerOptions"
-          v-model="formData.tts_model_id"
-        ></ModelSelect>
+          placeholder="请选择语音合成模型"
+        />
       </el-form-item>
 
       <el-form-item prop="content_list" :rules="{ required: true, message: '请选择文本内容', trigger: 'change' }" label="文本内容">
