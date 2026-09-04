@@ -74,8 +74,7 @@ src/workflow-canvas/
 
 `node-menu` 集中维护画布节点选择菜单。`menu.ts` 定义不同画布模式下的基础组件分组；
 `BasicNodeMenu.vue` 负责基础组件搜索和列表；`ResourceNodeMenu.vue` 负责工具与智能体的文件夹、
-搜索和资源列表；`index.vue` 只负责 Tabs 和事件汇总。调用方通过 `workflowMode` 显式指定菜单模式，
-并通过 `currentResource` 传入当前资源，使资源菜单排除工作流自身。不要另建一份基础组件节点集合。
+搜索和资源列表；`index.vue` 只负责 Tabs 和事件汇总。调用方通过 `workflowMode` 显式指定菜单模式。
 
 ### `nodes/`
 
@@ -112,7 +111,7 @@ Vue `computed` 的 `set` 和原生 `Map.set()` 按各自 API 正常使用。
   画布模块不处理路由。
 - View 通过 Props 传入图数据，通过组件实例暴露的方法操作画布。接口接入后，加载、保存及错误
   处理仍由 View 或其所属业务层编排，不在节点和画布核心中直接发请求。
-- View 同时向页面添加组件菜单和 `MkWorkflow` 传入相同的 `workflowMode` 与 `currentResource`；
+- View 同时向页面添加组件菜单和 `MkWorkflow` 传入相同的 `workflowMode`；
   `MkWorkflow` 将这些上下文桥接给 LogicFlow 节点内部的锚点菜单。
 
 `MkWorkflow` 当前对外暴露的方法包括：

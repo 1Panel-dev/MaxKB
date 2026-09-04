@@ -4,12 +4,11 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import BasicNodeMenu from './BasicNodeMenu.vue'
 import ResourceNodeMenu from './ResourceNodeMenu.vue'
 import type { WorkflowMode } from '@/workflow-canvas/types'
-import type { NodeMenuCurrentResource, NodeMenuItem, NodeMenuTab } from './types'
+import type {  NodeMenuItem, NodeMenuTab } from './types'
 
 defineOptions({ name: 'NodeMenu' })
 
 defineProps<{
-  currentResource?: NodeMenuCurrentResource
   workflowMode: WorkflowMode
 }>()
 
@@ -52,7 +51,6 @@ function handleDragStart(node: NodeMenuItem, event: PointerEvent) {
         v-else
         :key="activeTab"
         :source="activeTab === 'tool' ? RESOURCE_TYPE.TOOL : RESOURCE_TYPE.APPLICATION"
-        :current-resource="currentResource"
         @dragstart="handleDragStart"
         @select="emit('select', $event)"
       />

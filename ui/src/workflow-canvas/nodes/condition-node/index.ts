@@ -64,6 +64,10 @@ class ConditionModel extends WorkflowNodeModel {
 
     return anchors
   }
+  setAttributes() {
+    super.setAttributes()
+    this.width = 600
+  }
 }
 
 export default { type: WorkflowNodeType.Condition, model: ConditionModel, view: ConditionNodeView }
