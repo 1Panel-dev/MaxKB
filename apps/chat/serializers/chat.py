@@ -233,7 +233,7 @@ class ChatSerializers(serializers.Serializer):
         return {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens}
 
     @staticmethod
-    def update_chat_record(chat_user_id, chat_record_id, workflow_context, messages):
+    def update_chat_record(chat_user_id, chat_record_id, workflow_context, messages, details):
         usage = ChatSerializers._usage_from_context(workflow_context)
         message_tokens = usage["prompt_tokens"]
         answer_tokens = usage["completion_tokens"]
@@ -243,6 +243,7 @@ class ChatSerializers(serializers.Serializer):
             messages=messages,
             message_tokens=message_tokens,
             answer_tokens=answer_tokens,
+            details=details,
         )
 
     # ---------- 执行 ----------
@@ -327,7 +328,13 @@ class ChatSerializers(serializers.Serializer):
                     FailureContent(str(uuid_utils.uuid7()), str(error), Status.SUCCESS, None, None).to_dict(),
                 )
             messages = aggregation.get_contents()
-            self.update_chat_record(chat_user_id, chat_record_id_str, wf_manage.context, messages)
+            old_details = None
+            if chat_record_id is not None:
+                chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
+                if chat_record:
+                    old_details = chat_record.details
+            details = wf_manage.get_details(position=position, old_details=old_details)
+            self.update_chat_record(chat_user_id, chat_record_id_str, wf_manage.context, messages, details)
             ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
             ChatHistory(chat_id).append(
                 ChatRecord(
