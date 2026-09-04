@@ -45,7 +45,7 @@
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 
 import ParametersFieldDialog from './ParametersFieldDialog.vue'
@@ -64,24 +64,24 @@ const nodeProps = props.nodeModel.properties as unknown as {
 const inputFieldList = computed<Array<Record<string, unknown>>>({
   get: () => {
     if (!nodeProps.node_data) {
-      set(nodeProps, 'node_data', {})
+      nodeProps.node_data = {}
     }
     if (!Array.isArray(nodeProps.node_data.variable_list)) {
-      set(nodeProps.node_data, 'variable_list', [])
+      nodeProps.node_data.variable_list = []
     }
     return nodeProps.node_data.variable_list as Array<Record<string, unknown>>
   },
   set: (value) => {
-    set(nodeProps.node_data, 'variable_list', value)
+    nodeProps.node_data.variable_list = value
   },
 })
 
 function syncConfig() {
   const fields = [{ label: '结果', value: 'result' }, ...inputFieldList.value.map((item) => ({ label: item.label, value: item.field }))]
   if (!nodeProps.config) {
-    set(nodeProps, 'config', {})
+    nodeProps.config = {}
   }
-  set(nodeProps.config, 'fields', fields)
+  nodeProps.config.fields = fields
   props.nodeModel.clearNextNodeField(false)
 }
 

@@ -2,7 +2,7 @@ import { createApp, reactive, type Component } from 'vue'
 import { cloneDeep } from 'lodash'
 import { h as createLogicFlowElement, HtmlNode, HtmlNodeModel, type GraphModel, type IHtmlNodeProperties, type Model } from '@logicflow/core'
 import { nodeDict } from '@/workflow-canvas/config/node-mapping'
-import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
+import { WorkflowKind, WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
 import { connect, disconnect } from './teleport'
 
 type NodeViewProps = ConstructorParameters<typeof HtmlNode>[0]
@@ -15,6 +15,8 @@ interface WorkflowNodeProperties extends IHtmlNodeProperties {
   api_input_field_list?: unknown[]
   chat_input_field_list?: unknown[]
   config?: WorkflowNodeConfig
+  enableException?: boolean
+  kind?: WorkflowKind
   node_data?: unknown
   showNode?: boolean
   status?: number
@@ -58,6 +60,8 @@ export class WorkflowNodeView extends HtmlNode {
   getAnchorShape(anchorData?: Model.AnchorConfig) {
     if (!anchorData) return null
     const { x, y, type } = anchorData
+    const nodeModel = this.props.model as unknown as WorkflowNodeModel
+    const canOpenNodeMenu = type === 'right' && typeof nodeModel.openNodeMenu === 'function'
     const connected = this.props.graphModel.edges.some((edge) =>
       type === 'left' ? edge.targetAnchorId === anchorData.id : edge.sourceAnchorId === anchorData.id,
     )
@@ -69,13 +73,17 @@ export class WorkflowNodeView extends HtmlNode {
         createLogicFlowElement(
           'div',
           {
-            className: `workflow-node-anchor${type === 'right' ? ' is-right' : ''}${connected ? ' is-connected' : ''}`,
+            'data-node-menu-node-id': nodeModel.id,
+            'data-node-menu-anchor-id': anchorData.id,
+            className: `workflow-node-anchor${type === 'right' ? ' is-right' : ''}${connected ? ' is-connected' : ''}${anchorData.id?.endsWith('_exception_right') ? ' is-abnormal' : ''}`,
             onClick: () => {
-              if (type === 'right') {
-                const nodeModel = this.props.model as unknown as WorkflowNodeModel
-                nodeModel.openNodeMenu?.(anchorData)
-              }
+              if (canOpenNodeMenu) nodeModel.openNodeMenu?.(anchorData)
             },
+            onMouseEnter: (event: MouseEvent) => {
+              if (canOpenNodeMenu && event.currentTarget instanceof HTMLElement) nodeModel.setAnchorTooltip?.(event.currentTarget)
+            },
+            onMouseLeave: () => nodeModel.setAnchorTooltip?.(),
+            onPointerDown: () => nodeModel.setAnchorTooltip?.(),
           },
           connected && type !== 'right'
             ? []
@@ -126,6 +134,7 @@ export class WorkflowNodeModel extends HtmlNodeModel<WorkflowNodeProperties> {
   private upNodeFieldDict?: NodeFieldGroup
 
   openNodeMenu?: (anchorData: Model.AnchorConfig) => void
+  setAnchorTooltip?: (anchorElement?: HTMLElement) => void
   validate?: () => Promise<unknown>
 
   setAttributes() {
@@ -192,13 +201,25 @@ export class WorkflowNodeModel extends HtmlNodeModel<WorkflowNodeProperties> {
   }
 
   getDefaultAnchor(): Model.AnchorConfig[] {
-    if (String(this.type) === WorkflowNodeType.Base) return []
-
+    const { id, x, y, width } = this
+    const showNode = this.properties.showNode === undefined ? true : this.properties.showNode
     const anchors: Model.AnchorConfig[] = []
-    if (String(this.type) !== WorkflowNodeType.Start) {
-      anchors.push({ x: this.x - this.width / 2, y: this.y, id: `${this.id}_left`, type: 'left', edgeAddable: false })
+
+    if ([WorkflowNodeType.Base, WorkflowNodeType.KnowledgeBase, WorkflowNodeType.ToolBaseNode].some((nodeType) => nodeType === String(this.type))) {
+      return anchors
     }
-    anchors.push({ x: this.x + this.width / 2, y: this.y, id: `${this.id}_right`, type: 'right' })
+
+    if (
+      ![WorkflowNodeType.Start, WorkflowNodeType.LoopStartNode, WorkflowNodeType.ToolStartNode].some((nodeType) => nodeType === String(this.type)) &&
+      this.properties.kind !== WorkflowKind.DataSource
+    ) {
+      anchors.push({ x: x - width / 2, y: showNode ? y : y, id: `${id}_left`, type: 'left', edgeAddable: false })
+    }
+
+    if (this.properties.enableException) {
+      anchors.push({ x: x + width / 2, y: y + this.height / 2 - 40, id: `${id}_exception_right`, type: 'right' })
+    }
+    anchors.push({ x: x + width / 2, y: showNode ? y : y, id: `${id}_right`, type: 'right' })
     return anchors
   }
 

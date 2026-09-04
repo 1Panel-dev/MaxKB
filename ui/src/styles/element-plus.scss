@@ -370,6 +370,12 @@
   .dialog-content {
     max-height: calc(100vh - 272px);
   }
+  &.is-fullscreen {
+    .dialog-content {
+      max-height: none;
+      height: calc(100vh - 154px);
+    }
+  }
   //  专属带侧边栏结构的dialog
   &.mk-aside-content-dialog {
     .el-dialog__header {

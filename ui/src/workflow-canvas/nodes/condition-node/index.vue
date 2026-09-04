@@ -87,7 +87,7 @@
   </NodeContainer>
 </template>
 <script setup lang="ts">
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { inject, onBeforeUnmount, onMounted, ref, type Directive, type DirectiveBinding, type Ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
@@ -137,7 +137,7 @@ const defaultForm = () => ({
 })
 
 if (!model.properties.node_data) {
-  set(model.properties, 'node_data', defaultForm())
+  model.properties.node_data = defaultForm()
 }
 const form_data = model.properties.node_data as { branch: BranchItem[] }
 
@@ -167,7 +167,7 @@ function addBranch() {
   }
   list.splice(list.length - 1, 0, obj)
   refreshBranchAnchor(list, true)
-  set(model.properties.node_data, 'branch', list)
+  model.properties.node_data.branch = list
 }
 
 function refreshBranchAnchor(list: BranchItem[], isAdd: boolean) {
@@ -184,14 +184,14 @@ function refreshBranchAnchor(list: BranchItem[], isAdd: boolean) {
       }
     })
     .filter((item) => item)
-  set(model.properties, 'branch_condition_list', newBranchConditionList)
+  model.properties.branch_condition_list = newBranchConditionList
   model.refreshBranch()
 }
 
 function addCondition(index: number) {
   const list = cloneDeep(model.properties.node_data.branch)
   list[index].conditions.push({ field: [], compare: '', value: '' })
-  set(model.properties.node_data, 'branch', list)
+  model.properties.node_data.branch = list
 }
 
 function deleteCondition(index: number, cIndex: number) {
@@ -213,14 +213,14 @@ function deleteCondition(index: number, cIndex: number) {
       }
     })
   }
-  set(model.properties.node_data, 'branch', list)
+  model.properties.node_data.branch = list
 }
 
 function changeCondition(val: string, index: number, cIndex: number) {
   if (['is_null', 'is_not_null', 'is_true', 'is_not_true'].includes(val)) {
     const list = cloneDeep(model.properties.node_data.branch)
     list[index].conditions[cIndex].value = 1
-    set(model.properties.node_data, 'branch', list)
+    model.properties.node_data.branch = list
   }
 }
 
@@ -249,12 +249,12 @@ function resizeCondition(container: HTMLElement, row: BranchItem, index: number)
     }
     return item
   })
-  set(model.properties, 'branch_condition_list', newBranchConditionList)
+  model.properties.branch_condition_list = newBranchConditionList
   refreshBranchAnchor(model.properties.node_data.branch, true)
 }
 
 onMounted(() => {
-  set(model, 'validate', validate)
+  model.validate = validate
   if (!model.properties.branch_condition_list) {
     refreshBranchAnchor(form_data.branch, true)
   }

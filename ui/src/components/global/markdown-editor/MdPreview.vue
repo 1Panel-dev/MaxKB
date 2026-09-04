@@ -14,7 +14,7 @@ const language = computed(() => {
 </script>
 
 <template>
-  <MdPreviewV3 :language="language" :code-foldable="false" v-bind="$attrs" />
+  <MdPreviewV3 class="mk-markdown-editor" :language="language" :code-foldable="false" v-bind="$attrs" />
 </template>
 
 <style scoped>

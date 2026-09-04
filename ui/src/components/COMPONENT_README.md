@@ -52,7 +52,7 @@ src/components/
 │   │   ├── MdEditor.vue          # 支持多语言和自定义页脚的 Markdown 编辑器
 │   │   ├── MdEditorMagnify.vue   # 支持弹窗放大编辑的 Markdown 编辑器
 │   │   ├── MdPreview.vue         # 禁用代码折叠的 Markdown 预览器
-│   │   ├── sup-popover.scss      # Markdown 上标说明悬浮层样式
+│   │   ├── md-editor.scss        # Markdown 编辑器、预览区和上标说明浮层的共享样式
 │   │   └── sup-popover.ts        # Markdown 上标说明悬浮层交互
 │   ├── mk-complex-search/
 │   │   └── index.vue             # 字段选择与输入或枚举条件组合搜索框
@@ -115,7 +115,8 @@ src/components/
 │   └── LogoIcon.vue              # 不带产品名称的图形 Logo，手动导入
 ├── codemirror-editor/
 │   ├── python.vue                # 内置 pylint 诊断和全屏编辑的 Python 编辑器
-│   └── Json.vue                  # 支持格式化、语法诊断和全屏编辑的 JSON 输入框
+│   ├── Json.vue                  # 支持格式化、语法诊断和全屏编辑的 JSON 输入框
+│   └── style.scss                # Python 与 JSON 编辑器共享的 scoped 样式
 └── mk-source-card/
 │   ├── index.vue                 # 来源资源的统一卡片结构，手动导入
 │   ├── mk-source-card-action.vue # 卡片悬浮操作容器
@@ -197,6 +198,18 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 `configureMarkdownEditor()`，将代码高亮、全屏、KaTeX、图片裁剪、Mermaid、ECharts 和 Prettier
 配置为本地实例，避免运行时加载 CDN 资源；`md-editor-v3` v6 的图标已随依赖打包，不再维护或加载
 旧版 `markdown-iconfont.js`。
+
+编辑器、预览区和上标说明浮层的共享样式统一放在组件目录的 `md-editor.scss`，由 `config.ts`
+引入。`MdEditor` 与 `MdPreview` 在底层组件根节点添加 `mk-markdown-editor`，编辑器内部样式
+仅在该范围生效；`MdEditorMagnify` 通过复用 `MdEditor` 继承样式。上标浮层由 `sup-popover.ts`
+挂载到 `body`，使用独立的 `markdown-sup-popover` 类名，不依赖编辑器祖先或 Vue scoped 属性。
+组件专属样式不放入全局 `src/styles`；第三方基础 CSS 仍由全局 Sass 入口加载。
+
+可编辑的 Markdown 输入框悬浮边框使用 `--el-input-hover-border-color`，编辑区获得焦点时
+使用 `--el-input-focus-border-color`，未提供这两个变量时分别回退到 Element Plus 的悬浮边框色
+和主题色。只读、禁用和独立预览不触发编辑边框状态。编辑器自带的滚动条统一使用
+`el-scrollbar` 的颜色变量、6px 宽度和 0.3/0.5 透明度，内容溢出时由编辑器控制显示，悬浮
+滑块时加深颜色；不再额外通过轨道透明度隐藏滚动条，保留原有滚动节点和拖动逻辑。
 
 ```vue
 <MdEditor v-model="markdownContent">
@@ -699,6 +712,11 @@ import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 ```
 
 ### PythonCodeEditor
+
+Python 与 JSON 编辑器通过 `<style lang="scss" scoped src="./style.scss">` 共享组件目录内的
+样式，使用 `mk-codemirror` 容器和 `:deep()` 限定 CodeMirror 内部节点的覆盖范围。普通编辑器
+与全屏弹窗内容分别提供该容器，默认高度为 `210px`，调用方可通过透传的 `style` 覆盖；全屏
+编辑器单独设置高度。不在全局 `app.scss` 中覆盖 `.cm-editor`。
 
 基于 CodeMirror 6 的 Python 代码编辑器，通过 `v-model` 管理代码，并在组件内部调用工具 pylint
 接口生成诊断。组件最多展示 50 条诊断，并在代码停止输入 500ms 后检查。编辑器提供内置全屏

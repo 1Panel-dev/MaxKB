@@ -102,7 +102,7 @@
 </template>
 <script setup lang="ts">
 import { ref, inject, computed, onMounted, onBeforeUnmount, nextTick, useTemplateRef } from 'vue'
-import { set, cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash'
 import Sortable from 'sortablejs'
 import type { FormInstance } from 'element-plus'
 
@@ -173,12 +173,12 @@ const visibilityFieldOptions = computed<VisibilityFieldOption[]>(() => {
 const form_data = computed<{ is_result: boolean; form_field_list: FormField[]; form_content_format: string }>({
   get: () => {
     if (!model.properties.node_data) {
-      set(model.properties, 'node_data', { is_result: true, form_content_format: '', form_field_list: [] })
+      model.properties.node_data = { is_result: true, form_content_format: '', form_field_list: [] }
     }
     return model.properties.node_data as { is_result: boolean; form_field_list: FormField[]; form_content_format: string }
   },
   set: (value) => {
-    set(model.properties, 'node_data', value)
+    model.properties.node_data = value
   },
 })
 
@@ -203,7 +203,7 @@ function initFieldSortable() {
       const [movedItem] = items.splice(evt.oldIndex, 1)
       if (!movedItem) return
       items.splice(evt.newIndex, 0, movedItem)
-      set(form_data.value, 'form_field_list', items)
+      form_data.value.form_field_list = items
       syncFieldList()
       nextTick(initFieldSortable)
     },
@@ -231,7 +231,7 @@ const openEditDialog = (row: FormField, index: number) => {
 const deleteField = (index: number) => {
   const list = cloneDeep(form_data.value.form_field_list)
   list.splice(index, 1)
-  set(form_data.value, 'form_field_list', list)
+  form_data.value.form_field_list = list
   syncFieldList()
 }
 
@@ -253,7 +253,7 @@ const submitField = async () => {
     } else {
       list.push(data as FormField)
     }
-    set(form_data.value, 'form_field_list', list)
+    form_data.value.form_field_list = list
     syncFieldList()
     dialogVisible.value = false
   } catch {
@@ -267,9 +267,9 @@ const syncFieldList = () => {
     ...form_data.value.form_field_list.map((item) => ({ value: item.field, label: getFieldLabel(item) })),
   ]
   if (!model.properties.config) {
-    set(model.properties, 'config', {})
+    model.properties.config = {}
   }
-  set(model.properties.config!, 'fields', fields)
+  model.properties.config!.fields = fields
   model.clearNextNodeField(true)
   nextTick(initFieldSortable)
 }
@@ -299,7 +299,7 @@ const validate = () => {
 }
 
 onMounted(() => {
-  set(model, 'validate', validate)
+  model.validate = validate
   nextTick(initFieldSortable)
 })
 

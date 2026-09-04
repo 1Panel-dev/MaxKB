@@ -57,7 +57,7 @@
 </template>
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef, watch } from 'vue'
-import { set } from 'lodash'
+
 import type { FormInstance } from 'element-plus'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
@@ -94,23 +94,23 @@ const providerOptions = ref<Array<ModelProviderItem>>([])
 const formData = computed<ParameterExtractionForm>({
   get: () => {
     if (!model.properties.node_data) {
-      set(model.properties, 'node_data', {
+      model.properties.node_data = {
         input_variable: [],
         model_params_setting: {},
         model_id: '',
         model_id_type: 'custom',
         model_id_reference: [],
         variable_list: [],
-      })
+      }
     }
     const data = model.properties.node_data as ParameterExtractionForm
-    if (data.model_id_type === undefined) set(data, 'model_id_type', 'custom')
-    if (!Array.isArray(data.model_id_reference)) set(data, 'model_id_reference', [])
-    if (!data.model_params_setting) set(data, 'model_params_setting', {})
+    if (data.model_id_type === undefined) data.model_id_type = 'custom'
+    if (!Array.isArray(data.model_id_reference)) data.model_id_reference = []
+    if (!data.model_params_setting) data.model_params_setting = {}
     const shouldInit = data.input_variable !== undefined || data.variable_list !== undefined
     if (shouldInit) {
-      if (!Array.isArray(data.input_variable)) set(data, 'input_variable', [])
-      if (!Array.isArray(data.variable_list)) set(data, 'variable_list', [])
+      if (!Array.isArray(data.input_variable)) data.input_variable = []
+      if (!Array.isArray(data.variable_list)) data.variable_list = []
     }
     return data
   },
@@ -146,7 +146,7 @@ function validate() {
 }
 
 onMounted(() => {
-  set(model, 'validate', validate)
+  model.validate = validate
   store.getModelList({ model_type: 'LLM' }).then((data) => {
     modelList.value = data
   })

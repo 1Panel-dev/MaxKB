@@ -68,8 +68,8 @@ function submitEditorDialog() {
 </script>
 
 <template>
-  <div class="codemirror-editor w-full relative">
-    <Codemirror v-model="code" :extensions="extensions" :tab-size="4" autofocus v-bind="$attrs" />
+  <div class="mk-codemirror w-full relative">
+    <Codemirror v-model="code" :extensions="extensions" :tab-size="4" autofocus v-bind="$attrs" :style="{ height: '210px' }" />
     <el-button class="absolute right-2 bottom-2" text type="info" @click="openEditorDialog">
       <MkIcon name="icon_magnify_outlined" />
     </el-button>
@@ -83,7 +83,9 @@ function submitEditorDialog() {
       </div>
     </template>
 
-    <Codemirror v-model="dialogCode" autofocus :extensions="extensions" style="height: calc(100vh - 160px) !important" :tab-size="4" />
+    <div class="mk-codemirror">
+      <Codemirror v-model="dialogCode" autofocus :extensions="extensions" :tab-size="4" :style="{ height: 'calc(100dvh - 160px)' }" />
+    </div>
 
     <template #footer>
       <el-button type="primary" @click="submitEditorDialog">确定</el-button>
@@ -91,4 +93,6 @@ function submitEditorDialog() {
   </MkDialog>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@use './style.scss';
+</style>

@@ -103,7 +103,7 @@
   </NodeContainer>
 </template>
 <script setup lang="ts">
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
 import { inject, onMounted, ref, type Ref } from 'vue'
@@ -134,7 +134,7 @@ const typeOptions = ['string', 'num', 'json', 'bool']
 const defaultVariable = (): VariableItem => ({ id: randomId(), fields: [], value: null, reference: [], type: 'string', source: 'custom', name: '' })
 
 if (!model.properties.node_data) {
-  set(model.properties, 'node_data', { variable_list: [defaultVariable()] })
+  model.properties.node_data = { variable_list: [defaultVariable()] }
 }
 const form_data = model.properties.node_data as { variable_list: VariableItem[] }
 
@@ -164,7 +164,7 @@ const validate = () => {
 function addVariable() {
   const list = cloneDeep(form_data.variable_list)
   list.push(defaultVariable())
-  set(model.properties.node_data, 'variable_list', list)
+  model.properties.node_data.variable_list = list
 }
 
 function changeType(index: number) {
@@ -176,7 +176,7 @@ function changeType(index: number) {
 function deleteVariable(index: number) {
   const list = cloneDeep(form_data.variable_list)
   list.splice(index, 1)
-  set(model.properties.node_data, 'variable_list', list)
+  model.properties.node_data.variable_list = list
 }
 
 function variableChange(item: VariableItem) {
@@ -189,9 +189,9 @@ function variableChange(item: VariableItem) {
 
 onMounted(() => {
   if (model.properties.node_data?.is_result === undefined && isLastNode(model)) {
-    set(model.properties.node_data, 'is_result', true)
+    model.properties.node_data.is_result = true
   }
-  set(model, 'validate', validate)
+  model.validate = validate
 })
 </script>
 <style lang="scss" scoped></style>

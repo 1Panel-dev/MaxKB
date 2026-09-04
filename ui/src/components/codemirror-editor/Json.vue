@@ -91,13 +91,13 @@ defineExpose({ format, validateRules })
 </script>
 
 <template>
-  <div class="relative w-full">
+  <div class="mk-codemirror relative w-full">
     <Codemirror
       :model-value="editorContent"
       :extensions="extensions"
       :tab-size="4"
       autofocus
-      style="height: 210px; width: 100%"
+      :style="{ height: '210px' }"
       v-bind="$attrs"
       @update:model-value="handleContentChange"
     />
@@ -110,7 +110,9 @@ defineExpose({ format, validateRules })
   </div>
 
   <MkDialog v-model="dialogVisible" :title="props.title" append-to-body fullscreen>
-    <Codemirror v-model="dialogContent" :extensions="extensions" :tab-size="4" autofocus style="height: calc(100vh - 160px)" />
+    <div class="mk-codemirror">
+      <Codemirror v-model="dialogContent" :extensions="extensions" :tab-size="4" autofocus :style="{ height: 'calc(100dvh - 160px)' }" />
+    </div>
 
     <template #footer>
       <el-button @click="closeEditorDialog">取消</el-button>
@@ -118,3 +120,7 @@ defineExpose({ format, validateRules })
     </template>
   </MkDialog>
 </template>
+
+<style lang="scss" scoped>
+@use './style.scss';
+</style>

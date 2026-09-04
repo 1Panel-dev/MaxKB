@@ -24,7 +24,7 @@ body {
   -webkit-font-smoothing: antialiased;
   background: var(--mk-N100);
   color: var(--el-text-color-primary);
-  font-family: 'PingFang SC', AlibabaPuHuiTi !important;
+  font-family: var(--mk-font-family);
   font-size: var(--mk-font-size-base);
   font-weight: 400;
   line-height: var(--mk-line-height-base);
@@ -66,6 +66,8 @@ h6 {
   font-weight: 500;
   line-height: var(--mk-line-height-base);
 }
+
+/* dot */
 
 // 状态圆点
 .mk-dot-danger {
@@ -110,101 +112,7 @@ h6 {
   }
 }
 
-// Codemirror 编辑器
-.cm-editor {
-  --el-scrollbar-bg-color: var(--el-text-color-secondary);
-  --el-scrollbar-hover-bg-color: var(--el-text-color-secondary);
-  --el-scrollbar-hover-opacity: 0.5;
-  --el-scrollbar-opacity: 0.3;
-  height: 210px;
-  border: var(--el-border);
-  border-radius: var(--el-border-radius-base);
-  overflow: hidden;
-  scrollbar-color: transparent transparent;
-  scrollbar-width: thin;
-
-  &::-webkit-scrollbar {
-    background-color: transparent;
-    height: 6px;
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-corner {
-    background-color: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: transparent;
-    border-radius: var(--el-border-radius-base);
-    transition: background-color var(--el-transition-duration);
-  }
-
-  &:hover {
-    scrollbar-color: color-mix(in srgb, var(--el-scrollbar-bg-color) calc(var(--el-scrollbar-opacity) * 100%), transparent) transparent;
-  }
-
-  &:hover::-webkit-scrollbar-thumb {
-    background-color: var(--el-scrollbar-bg-color);
-    opacity: var(--el-scrollbar-opacity);
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background-color: var(--el-scrollbar-hover-bg-color);
-    opacity: var(--el-scrollbar-hover-opacity);
-  }
-  .cm-gutters.cm-gutters-before {
-    border: none;
-  }
-  &.cm-focused {
-    outline: none !important;
-  }
-}
-
-// 资源菜单的导入按钮
-.mk-import-button {
-  width: 100%;
-  .el-upload {
-    width: 100%;
-  }
-}
-
-/*
-  标题前带竖线样式
-*/
-.mk-title-decoration {
-  position: relative;
-  padding-left: 10px;
-  &:before {
-    position: absolute;
-    left: 2px;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 2px;
-    height: 67%;
-    content: '';
-    background: var(--el-color-primary);
-  }
-}
-
-/*
-  必填文字的星号
-*/
-.mk-required {
-  &:after {
-    content: '*';
-    color: var(--el-color-danger);
-    margin-left: 4px;
-  }
-}
-/*
-  隐藏自带星号
-*/
-.mk-hide-asterisk {
-  .el-form-item__label::after {
-    display: none;
-  }
-}
-
+/* card */
 // 灰色背景卡片
 .mk-gray-card {
   background-color: var(--mk-N100) !important;
@@ -224,17 +132,7 @@ h6 {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
 }
 
-// 让一些组件内部滚动条 不会限制在padding内，滚动条贴在最右侧
-.mk-scrollbar-right {
-  &.el-scrollbar {
-    margin-right: calc(var(--spacing) * -4);
-
-    > .el-scrollbar__wrap > .el-scrollbar__view {
-      padding-right: calc(var(--spacing) * 4);
-    }
-  }
-}
-
+/* radio */
 // radio-group 垂直排列
 .vertical-radio-group {
   align-items: stretch;
@@ -258,5 +156,63 @@ h6 {
     line-height: var(--mk-line-height-base);
     min-width: 0;
     padding-left: calc(var(--spacing) * 2);
+  }
+}
+
+/* required */
+/*
+  必填文字的星号
+*/
+.mk-required {
+  &:after {
+    content: '*';
+    color: var(--el-color-danger);
+    margin-left: 4px;
+  }
+}
+/*
+  隐藏自带星号
+*/
+.mk-hide-asterisk {
+  .el-form-item__label::after {
+    display: none;
+  }
+}
+
+/* scrollbar */
+// 让一些组件内部滚动条 不会限制在padding内，滚动条贴在最右侧
+.mk-scrollbar-right {
+  &.el-scrollbar {
+    margin-right: calc(var(--spacing) * -4);
+
+    > .el-scrollbar__wrap > .el-scrollbar__view {
+      padding-right: calc(var(--spacing) * 4);
+    }
+  }
+}
+
+/* title */
+// 标题前带竖线样式
+.mk-title-decoration {
+  position: relative;
+  padding-left: 10px;
+  &:before {
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 67%;
+    content: '';
+    background: var(--el-color-primary);
+  }
+}
+
+/* upload-button */
+// 资源菜单的导入按钮
+.mk-import-button {
+  width: 100%;
+  .el-upload {
+    width: 100%;
   }
 }

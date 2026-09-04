@@ -82,6 +82,10 @@ src/workflow-canvas/
 各自的表格、表单和弹窗交互，通过 Props 和 Emits 传递数据；节点 `index.vue` 负责统一写回节点
 属性、执行节点级校验和发送画布事件，不直接堆叠各业务块的页面逻辑。
 
+固定字段写入统一使用直接赋值，例如 `model.properties.node_data = value`、
+`model.validate = validate`，不使用 Lodash `set`。写入嵌套字段前保留必要的父对象初始化；
+Vue `computed` 的 `set` 和原生 `Map.set()` 按各自 API 正常使用。
+
 ## View 接入约定
 
 - 所有画布路由页面均放在 `src/views/workflow/`，并以 `XxxWorkflowView.vue` 命名，例如

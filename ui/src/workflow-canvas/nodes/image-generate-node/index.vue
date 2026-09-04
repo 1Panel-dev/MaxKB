@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-import { set } from 'lodash'
+
 import { QuestionFilled } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
 import ModelSelect from '@/components/business/model-select/index.vue'
@@ -34,21 +34,21 @@ const providerOptions = ref<Array<ModelProviderItem>>([])
 const formData = computed<ImageGenerateNodeForm>({
   get: () => {
     if (!model.properties.node_data) {
-      set(model.properties, 'node_data', {
+      model.properties.node_data = {
         model_id: '',
         model_id_type: 'custom',
         model_id_reference: [],
         prompt: '{{开始.question}}',
         negative_prompt: '',
         model_params_setting: {},
-      })
+      }
     }
     const data = model.properties.node_data as ImageGenerateNodeForm
-    if (data.model_id_type === undefined) set(data, 'model_id_type', 'custom')
-    if (!Array.isArray(data.model_id_reference)) set(data, 'model_id_reference', [])
-    if (data.prompt === undefined) set(data, 'prompt', '{{开始.question}}')
-    if (data.negative_prompt === undefined) set(data, 'negative_prompt', '')
-    if (!data.model_params_setting) set(data, 'model_params_setting', {})
+    if (data.model_id_type === undefined) data.model_id_type = 'custom'
+    if (!Array.isArray(data.model_id_reference)) data.model_id_reference = []
+    if (data.prompt === undefined) data.prompt = '{{开始.question}}'
+    if (data.negative_prompt === undefined) data.negative_prompt = ''
+    if (!data.model_params_setting) data.model_params_setting = {}
     return data
   },
   set: (value) => (model.properties.node_data = value),
@@ -56,15 +56,13 @@ const formData = computed<ImageGenerateNodeForm>({
 
 function validate() {
   return Promise.all([
-    formData.value.model_id_type === 'reference'
-      ? modelCascaderRef.value?.validate()
-      : Promise.resolve(),
+    formData.value.model_id_type === 'reference' ? modelCascaderRef.value?.validate() : Promise.resolve(),
     formRef.value?.validate(),
   ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
-  set(model, 'validate', validate)
+  model.validate = validate
   store.getModelList({ model_type: 'TTI' }).then((data) => {
     modelList.value = data
   })

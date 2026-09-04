@@ -8,6 +8,7 @@
   cursor: pointer;
 }
 
+/* edge */
 // 连接线
 .workflow-edge-delete-wrapper {
   overflow: visible;
@@ -27,8 +28,9 @@
   }
 }
 
-// 连接节点按钮
 
+/* anchor */
+// 连接节点按钮
 .workflow-node-anchor-wrapper {
   overflow: visible;
 }
@@ -46,15 +48,18 @@
   transition: transform 0.2s ease;
   background: var(--el-color-primary);
   &.is-connected {
-    background: white;
+    background: white !important;
 
     .workflow-node-add-icon {
       opacity: 0;
     }
   }
   &.is-connected.is-right:hover {
-    background: var(--el-color-primary);
+    background: var(--el-color-primary) !important;
     transform: scale(1.17);
+    &.is-abnormal {
+      background: var(--el-color-warning) !important;
+    }
 
     .workflow-node-add-icon {
       opacity: 1;
@@ -62,6 +67,10 @@
   }
   &:not(.is-connected):hover {
     transform: scale(1.17);
+  }
+  &.is-abnormal {
+    background: var(--el-color-warning);
+    border: 2px solid var(--el-color-warning);
   }
 
   .workflow-node-add-icon {
