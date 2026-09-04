@@ -1,0 +1,53 @@
+/* CodeMirror 编辑器 */
+.mk-codemirror {
+  :deep(.cm-editor) {
+    --el-scrollbar-bg-color: var(--el-text-color-secondary);
+    --el-scrollbar-hover-bg-color: var(--el-text-color-secondary);
+    --el-scrollbar-hover-opacity: 0.5;
+    --el-scrollbar-opacity: 0.3;
+    border: var(--el-border);
+    border-radius: var(--el-border-radius-base);
+    overflow: hidden;
+    scrollbar-color: transparent transparent;
+    scrollbar-width: thin;
+  }
+
+  :deep(.cm-editor .cm-gutters.cm-gutters-before) {
+    border: none;
+  }
+
+  :deep(.cm-editor.cm-focused) {
+    outline: none !important;
+  }
+
+  :deep(.cm-editor::-webkit-scrollbar) {
+    background-color: transparent;
+    height: 6px;
+    width: 6px;
+  }
+
+  :deep(.cm-editor::-webkit-scrollbar-corner) {
+    background-color: transparent;
+  }
+
+  :deep(.cm-editor::-webkit-scrollbar-thumb) {
+    background-color: transparent;
+    border-radius: var(--el-border-radius-base);
+    transition: background-color var(--el-transition-duration);
+  }
+
+  :deep(.cm-editor:hover) {
+    scrollbar-color: color-mix(in srgb, var(--el-scrollbar-bg-color) calc(var(--el-scrollbar-opacity) * 100%), transparent) transparent;
+  }
+
+  :deep(.cm-editor:hover::-webkit-scrollbar-thumb) {
+    background-color: var(--el-scrollbar-bg-color);
+    opacity: var(--el-scrollbar-opacity);
+  }
+
+  // 滑块悬浮状态覆盖编辑器悬浮状态。
+  :deep(.cm-editor::-webkit-scrollbar-thumb:hover) {
+    background-color: var(--el-scrollbar-hover-bg-color);
+    opacity: var(--el-scrollbar-hover-opacity);
+  }
+}

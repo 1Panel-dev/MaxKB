@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
@@ -77,12 +77,13 @@ function normalizeForm(data: Partial<BaseNodeForm>) {
   return normalized
 }
 
+// 节点初始化时补齐默认值和兼容旧数据，避免读取表单时改写响应式依赖。
+if (!model.properties.node_data) model.properties.node_data = cloneDeep(defaultForm)
+normalizeForm(model.properties.node_data as Partial<BaseNodeForm>)
+
 const formData = computed<BaseNodeForm>({
-  get: () => {
-    if (!model.properties.node_data) set(model.properties, 'node_data', cloneDeep(defaultForm))
-    return normalizeForm(model.properties.node_data as Partial<BaseNodeForm>)
-  },
-  set: (value) => set(model.properties, 'node_data', value),
+  get: () => model.properties.node_data as BaseNodeForm,
+  set: (value) => (model.properties.node_data = value),
 })
 
 function handleEditorWheel(event: WheelEvent) {
@@ -272,8 +273,4 @@ onMounted(() => {
   </NodeContainer>
 </template>
 
-<style lang="scss" scoped>
-:deep(.el-form-item__label) {
-  width: 100%;
-}
-</style>
+<style lang="scss" scoped></style>

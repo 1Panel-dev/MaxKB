@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-import { set } from 'lodash'
+
 import type { FormInstance } from 'element-plus'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
@@ -33,19 +33,19 @@ const providerOptions = ref<Array<ModelProviderItem>>([])
 const formData = computed<TextToSpeechNodeForm>({
   get: () => {
     if (!model.properties.node_data) {
-      set(model.properties, 'node_data', {
+      model.properties.node_data = {
         tts_model_id: '',
         tts_model_id_type: 'custom',
         tts_model_id_reference: [],
         content_list: [],
         model_params_setting: {},
-      })
+      }
     }
     const data = model.properties.node_data as TextToSpeechNodeForm
-    if (data.tts_model_id_type === undefined) set(data, 'tts_model_id_type', 'custom')
-    if (!Array.isArray(data.tts_model_id_reference)) set(data, 'tts_model_id_reference', [])
-    if (!Array.isArray(data.content_list)) set(data, 'content_list', [])
-    if (!data.model_params_setting) set(data, 'model_params_setting', {})
+    if (data.tts_model_id_type === undefined) data.tts_model_id_type = 'custom'
+    if (!Array.isArray(data.tts_model_id_reference)) data.tts_model_id_reference = []
+    if (!Array.isArray(data.content_list)) data.content_list = []
+    if (!data.model_params_setting) data.model_params_setting = {}
     return data
   },
   set: (value) => (model.properties.node_data = value),

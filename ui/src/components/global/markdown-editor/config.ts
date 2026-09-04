@@ -14,7 +14,7 @@ import { supPopover } from './sup-popover'
 import 'cropperjs/dist/cropper.css'
 import 'highlight.js/styles/atom-one-dark.css'
 import 'katex/dist/katex.min.css'
-import './sup-popover.scss'
+import './md-editor.scss'
 
 let configured = false
 

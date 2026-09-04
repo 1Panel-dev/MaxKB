@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { QuestionFilled } from '@element-plus/icons-vue'
-import { set } from 'lodash'
+
 import type { FormInstance } from 'element-plus'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
@@ -38,7 +38,7 @@ const providerOptions = ref<Array<ModelProviderItem>>([])
 const formData = computed<ImageUnderstandNodeForm>({
   get: () => {
     if (!model.properties.node_data) {
-      set(model.properties, 'node_data', {
+      model.properties.node_data = {
         model_id: '',
         model_id_type: 'custom',
         model_id_reference: [],
@@ -48,19 +48,19 @@ const formData = computed<ImageUnderstandNodeForm>({
         dialogue_type: 'WORKFLOW',
         dialogue_number: 1,
         image_list: [],
-      })
+      }
     }
     const data = model.properties.node_data as ImageUnderstandNodeForm
-    if (data.model_id_type === undefined) set(data, 'model_id_type', 'custom')
-    if (!Array.isArray(data.model_id_reference)) set(data, 'model_id_reference', [])
-    if (!data.model_setting) set(data, 'model_setting', { reasoning_content_enable: false })
-    if (data.prompt === undefined) set(data, 'prompt', '{{开始.question}}')
-    if (data.system === undefined) set(data, 'system', '')
-    if (data.dialogue_type === undefined) set(data, 'dialogue_type', 'WORKFLOW')
+    if (data.model_id_type === undefined) data.model_id_type = 'custom'
+    if (!Array.isArray(data.model_id_reference)) data.model_id_reference = []
+    if (!data.model_setting) data.model_setting = { reasoning_content_enable: false }
+    if (data.prompt === undefined) data.prompt = '{{开始.question}}'
+    if (data.system === undefined) data.system = ''
+    if (data.dialogue_type === undefined) data.dialogue_type = 'WORKFLOW'
     if (data.dialogue_number === undefined || data.dialogue_number === null) {
-      set(data, 'dialogue_number', 1)
+      data.dialogue_number = 1
     }
-    if (!Array.isArray(data.image_list)) set(data, 'image_list', [])
+    if (!Array.isArray(data.image_list)) data.image_list = []
     return data
   },
   set: (value) => (model.properties.node_data = value),
@@ -68,16 +68,14 @@ const formData = computed<ImageUnderstandNodeForm>({
 
 function validate() {
   return Promise.all([
-    formData.value.model_id_type === 'reference'
-      ? modelCascaderRef.value?.validate()
-      : Promise.resolve(),
+    formData.value.model_id_type === 'reference' ? modelCascaderRef.value?.validate() : Promise.resolve(),
     imageCascaderRef.value?.validate(),
     formRef.value?.validate(),
   ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
-  set(model, 'validate', validate)
+  model.validate = validate
   store.getModelList({ model_type: 'IMAGE' }).then((data) => {
     modelList.value = data
   })

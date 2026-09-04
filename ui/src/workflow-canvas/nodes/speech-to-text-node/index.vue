@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-import { set } from 'lodash'
+
 import type { FormInstance } from 'element-plus'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
@@ -33,19 +33,19 @@ const providerOptions = ref<Array<ModelProviderItem>>([])
 const formData = computed<SpeechToTextNodeForm>({
   get: () => {
     if (!model.properties.node_data) {
-      set(model.properties, 'node_data', {
+      model.properties.node_data = {
         stt_model_id: '',
         stt_model_id_type: 'custom',
         stt_model_id_reference: [],
         audio_list: [],
         model_params_setting: {},
-      })
+      }
     }
     const data = model.properties.node_data as SpeechToTextNodeForm
-    if (data.stt_model_id_type === undefined) set(data, 'stt_model_id_type', 'custom')
-    if (!Array.isArray(data.stt_model_id_reference)) set(data, 'stt_model_id_reference', [])
-    if (!Array.isArray(data.audio_list)) set(data, 'audio_list', [])
-    if (!data.model_params_setting) set(data, 'model_params_setting', {})
+    if (data.stt_model_id_type === undefined) data.stt_model_id_type = 'custom'
+    if (!Array.isArray(data.stt_model_id_reference)) data.stt_model_id_reference = []
+    if (!Array.isArray(data.audio_list)) data.audio_list = []
+    if (!data.model_params_setting) data.model_params_setting = {}
     return data
   },
   set: (value) => (model.properties.node_data = value),
@@ -53,16 +53,14 @@ const formData = computed<SpeechToTextNodeForm>({
 
 function validate() {
   return Promise.all([
-    formData.value.stt_model_id_type === 'reference'
-      ? modelCascaderRef.value?.validate()
-      : Promise.resolve(),
+    formData.value.stt_model_id_type === 'reference' ? modelCascaderRef.value?.validate() : Promise.resolve(),
     contentCascaderRef.value?.validate(),
     formRef.value?.validate(),
   ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
-  set(model, 'validate', validate)
+  model.validate = validate
   store.getModelList({ model_type: 'STT' }).then((data) => {
     modelList.value = data
   })

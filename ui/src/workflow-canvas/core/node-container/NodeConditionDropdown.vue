@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { BaseNodeModel } from '@logicflow/core'
 import { computed } from 'vue'
-import { set } from 'lodash'
 
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -36,11 +35,11 @@ const condition = computed({
   get: () => {
     if (nodeProperties.value.condition) return nodeProperties.value.condition
 
-    set(props.model.properties, 'condition', 'AND')
+    props.model.properties.condition = 'AND'
     return true
   },
   set: (value: boolean | 'AND' | 'OR') => {
-    set(props.model.properties, 'condition', value)
+    props.model.properties.condition = value
   },
 })
 </script>

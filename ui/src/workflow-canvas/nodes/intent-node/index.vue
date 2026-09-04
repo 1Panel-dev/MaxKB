@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
@@ -51,7 +51,7 @@ function defaultBranch(): IntentNodeBranch[] {
 const formData = computed<IntentNodeForm>({
   get: () => {
     if (!model.properties.node_data) {
-      set(model.properties, 'node_data', {
+      model.properties.node_data = {
         model_id: '',
         model_id_type: 'custom',
         model_id_reference: [],
@@ -60,19 +60,19 @@ const formData = computed<IntentNodeForm>({
         dialogue_type: 'WORKFLOW',
         dialogue_number: 1,
         branch: defaultBranch(),
-      })
+      }
     }
     const data = model.properties.node_data as IntentNodeForm
-    if (data.model_id_type === undefined) set(data, 'model_id_type', 'custom')
-    if (!Array.isArray(data.model_id_reference)) set(data, 'model_id_reference', [])
-    if (!data.model_params_setting) set(data, 'model_params_setting', {})
-    if (!Array.isArray(data.content_list)) set(data, 'content_list', [])
-    if (data.dialogue_type === undefined) set(data, 'dialogue_type', 'WORKFLOW')
+    if (data.model_id_type === undefined) data.model_id_type = 'custom'
+    if (!Array.isArray(data.model_id_reference)) data.model_id_reference = []
+    if (!data.model_params_setting) data.model_params_setting = {}
+    if (!Array.isArray(data.content_list)) data.content_list = []
+    if (data.dialogue_type === undefined) data.dialogue_type = 'WORKFLOW'
     if (data.dialogue_number === undefined || data.dialogue_number === null) {
-      set(data, 'dialogue_number', 1)
+      data.dialogue_number = 1
     }
     if (!Array.isArray(data.branch) || data.branch.length === 0) {
-      set(data, 'branch', defaultBranch())
+      data.branch = defaultBranch()
     }
     return data
   },
@@ -88,7 +88,7 @@ function addBranch() {
   const obj: IntentNodeBranch = { id: randomId(), content: '', isOther: false }
   // 插入到最后一个（“其他”）之前
   list.splice(list.length - 1, 0, obj)
-  set(formData.value, 'branch', list)
+  formData.value.branch = list
   refreshBranch()
 }
 
@@ -98,30 +98,26 @@ function deleteBranch(id: string) {
   if (!item || item.isOther) return
 
   const deleteAnchorId = `${model.id}_${id}_right`
-  const edgeIds = model.outgoing.edges
-    .filter((edge) => edge.sourceAnchorId === deleteAnchorId)
-    .map((edge) => edge.id)
+  const edgeIds = model.outgoing.edges.filter((edge) => edge.sourceAnchorId === deleteAnchorId).map((edge) => edge.id)
   if (edgeIds.length > 0) {
     model.graphModel.eventCenter.emit('delete_edge', edgeIds)
   }
 
   const newList = list.filter((branch) => branch.id !== id)
-  set(formData.value, 'branch', newList)
+  formData.value.branch = newList
   refreshBranch()
 }
 
 function validate() {
   return Promise.all([
-    formData.value.model_id_type === 'reference'
-      ? modelCascaderRef.value?.validate()
-      : Promise.resolve(),
+    formData.value.model_id_type === 'reference' ? modelCascaderRef.value?.validate() : Promise.resolve(),
     contentCascaderRef.value?.validate(),
     formRef.value?.validate(),
   ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
-  set(model, 'validate', validate)
+  model.validate = validate
   store.getModelList({ model_type: 'LLM' }).then((data) => {
     modelList.value = data
   })

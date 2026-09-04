@@ -46,8 +46,8 @@ defineExpose({ open })
         </div>
         <el-button v-if="props.showAdd" type="primary" @click="handleAdd">应用</el-button>
       </div>
-      <!-- // TODO 换成markdown -->
-      <pre class="whitespace-pre-wrap text-sm">{{ detailContent }}</pre>
+
+      <MdPreview :modelValue="detailContent" />
     </template>
   </MkDrawer>
 </template>

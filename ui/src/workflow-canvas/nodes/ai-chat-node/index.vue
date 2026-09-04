@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import { TOOL_TYPE } from '@/api/enums'
 import ApplicationApi from '@/api/admin/workspace/application/application'
@@ -113,12 +113,13 @@ function normalizeForm(data: Partial<AiChatNodeForm> & { mcp_tool_id?: string })
   return normalized
 }
 
+// 节点初始化时补齐默认值和兼容旧数据，避免读取表单时改写响应式依赖。
+if (!model.properties.node_data) model.properties.node_data = cloneDeep(defaultForm)
+normalizeForm(model.properties.node_data as Partial<AiChatNodeForm>)
+
 const formData = computed<AiChatNodeForm>({
-  get: () => {
-    if (!model.properties.node_data) set(model.properties, 'node_data', cloneDeep(defaultForm))
-    return normalizeForm(model.properties.node_data as Partial<AiChatNodeForm>)
-  },
-  set: (value) => set(model.properties, 'node_data', value),
+  get: () => model.properties.node_data as AiChatNodeForm,
+  set: (value) => (model.properties.node_data = value),
 })
 
 const modelSetting = computed<AiModelSettingValue>(() => ({
@@ -208,7 +209,6 @@ function validate() {
 
 onMounted(() => {
   model.validate = validate
-  void formData.value
   store.getModelList({ model_type: 'LLM' }).then((models) => (modelOptions.value = models))
   store.getProviderList().then((providers) => (providerOptions.value = providers))
   void loadResourceOptions()

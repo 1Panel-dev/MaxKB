@@ -2,7 +2,6 @@
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
 import { computed, ref, useTemplateRef } from 'vue'
-import { set } from 'lodash'
 
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 import { MsgConfirm, MsgError } from '@/utils/message'
@@ -46,7 +45,7 @@ const canChangeEnabled = computed(() => {
 const nodeEnabled = computed({
   get: () => !nodeProperties.value.disabled,
   set: (value: boolean) => {
-    set(props.model.properties, 'disabled', !value)
+    props.model.properties.disabled = !value
   },
 })
 const sourceName = computed(() => {
@@ -79,7 +78,7 @@ async function saveNodeName(formInstance: FormInstance | null | undefined) {
       return
     }
 
-    set(props.model.properties, 'stepName', nodeNameForm.value.title)
+    props.model.properties.stepName = nodeNameForm.value.title
     props.model.clearNextNodeField(true)
     nodeNameDialogVisible.value = false
     formInstance.resetFields()
@@ -91,8 +90,8 @@ function copyNode() {
   const cloneNode = props.model.graphModel.cloneNode(props.model.id)
   if (!cloneNode) return
 
-  set(cloneNode, 'isSelected', true)
-  set(cloneNode, 'isHovered', true)
+  cloneNode.isSelected = true
+  cloneNode.isHovered = true
   props.model.graphModel.toFront(cloneNode.id)
 }
 

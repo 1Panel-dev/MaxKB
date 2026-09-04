@@ -301,7 +301,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       MsgError(`${nodes[0]?.properties?.stepName}节点不允许删除`)
       return
     }
-    MsgConfirm('提示', '确定删除选中的节点和连线吗？', { confirmButtonText: '确定', confirmButtonClass: 'danger' }).then(() => {
+    MsgConfirm('提示', '确定删除该节点？', { confirmButtonText: '确定', confirmButtonClass: 'danger' }).then(() => {
       if (!keyboardOptions?.enabled) return true
       if (graph.textEditElement) return true
 
@@ -328,10 +328,6 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
   keyboard.on(['cmd + v', 'ctrl + v'], () => {})
   // undo
   keyboard.on(['cmd + z', 'ctrl + z'], () => {
-    // if (!keyboardOptions?.enabled) return true
-    // if (graph.textEditElement) return true
-    // lf.undo()
-    // return false
   })
   // redo
   keyboard.on(['cmd + y', 'ctrl + y'], () => {

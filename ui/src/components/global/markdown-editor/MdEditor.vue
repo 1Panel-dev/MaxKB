@@ -18,7 +18,7 @@ const language = computed(() => {
 </script>
 
 <template>
-  <MdEditorV3 :language="language" no-prettier v-bind="$attrs">
+  <MdEditorV3 class="mk-markdown-editor" :language="language" no-prettier v-bind="$attrs">
     <template #defFooters>
       <slot name="defFooters" />
     </template>

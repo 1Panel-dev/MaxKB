@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reaction, type BaseNodeModel, type Model } from '@logicflow/core'
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
 import { copyText } from '@/utils/clipboard'
 import { WorkflowMode, WorkflowNodeType, type ShapeItem, type WorkflowNodeField } from '@/workflow-canvas/types'
@@ -45,7 +45,15 @@ const disposeSelectionReaction = reaction(
 
 const showAnchor = ref(false)
 const nodeMenuDragClosing = ref(false)
+const nodeMenuRef = ref<InstanceType<typeof NodeMenu>>()
 const anchorData = ref<Model.AnchorConfig>()
+const anchorTooltipRef = ref<HTMLElement>()
+const anchorTooltipVisible = ref(false)
+// 通过虚拟触发器将 LogicFlow 锚点交给 Element Plus 定位提示。
+const setAnchorTooltip = (anchorElement?: HTMLElement) => {
+  if (anchorElement) anchorTooltipRef.value = anchorElement
+  anchorTooltipVisible.value = Boolean(anchorElement)
+}
 const dropdownMenuStyle = computed(() => {
   return { top: anchorData.value ? anchorData.value.y - model.y + model.height / 2 + 'px' : '0px' }
 })
@@ -54,22 +62,19 @@ const nodeDisabled = computed({
     return model.properties.disabled || false
   },
   set: (v: boolean) => {
-    set(model.properties, 'disabled', v)
+    model.properties.disabled = v
   },
 })
 const anchorGuard = createAnchorGuard(model)
 
+if (model.properties.showNode === undefined) {
+  model.properties.showNode = true
+}
 const showNode = computed({
   set: (v) => {
-    set(model.properties, 'showNode', v)
+    model.properties.showNode = v
   },
-  get: () => {
-    if (model.properties.showNode !== undefined) {
-      return model.properties.showNode
-    }
-    set(model.properties, 'showNode', true)
-    return true
-  },
+  get: () => model.properties.showNode ?? true,
 })
 
 const node_status = computed(() => {
@@ -83,8 +88,8 @@ const handleNodeMousedown = (event?: MouseEvent) => {
   if (!event?.shiftKey) {
     model.graphModel.clearSelectElements()
   }
-  set(model, 'isSelected', !model.isSelected)
-  set(model, 'isHovered', !model.isSelected)
+  model.isSelected = !model.isSelected
+  model.isHovered = !model.isSelected
   model.graphModel.toFront(model.id)
 }
 const resizeStepContainer = (nodeHeight: number) => {
@@ -121,17 +126,14 @@ function dragNode(item: NodeMenuItem, event: PointerEvent) {
   nodeMenuDragClosing.value = true
   closeNodeMenu()
 }
+if (model.properties.enableException === undefined) {
+  model.properties.enableException = false
+}
 const enable_exception = computed({
   set: (v) => {
-    set(model.properties, 'enableException', v)
+    model.properties.enableException = v
   },
-  get: () => {
-    if (model.properties.enableException !== undefined) {
-      return model.properties.enableException
-    }
-    set(model.properties, 'enableException', false)
-    return false
-  },
+  get: () => model.properties.enableException ?? false,
 })
 const nodeFields = computed(() => {
   if (nodeProperties.value.config?.fields) {
@@ -173,8 +175,10 @@ const openNodeMenu = (anchorValue: Model.AnchorConfig) => {
   nodeMenuDragClosing.value = false
   showAnchor.value = true
   anchorData.value = anchorValue
+  model.graphModel.rootEl.addEventListener('pointerdown', handleNodeMenuOutsidePointerDown, true)
 }
 const closeNodeMenu = () => {
+  model.graphModel.rootEl.removeEventListener('pointerdown', handleNodeMenuOutsidePointerDown, true)
   showAnchor.value = false
   anchorData.value = undefined
 }
@@ -189,6 +193,22 @@ const selectOn = (kw: string) => {
   keyWord.value = kw
   model.setSelected(false)
   currentKeyWord.value = false
+}
+
+// 捕获阶段处理外部点击，避免节点表单和画布交互停止冒泡后菜单无法关闭。
+const handleNodeMenuOutsidePointerDown = (event: PointerEvent) => {
+  const target = event.target
+  if (!(target instanceof Element) || nodeMenuRef.value?.$el.contains(target)) return
+
+  const anchorElement = target.closest('[data-node-menu-anchor-id]')
+  if (
+    anchorElement?.getAttribute('data-node-menu-node-id') === model.id &&
+    anchorElement.getAttribute('data-node-menu-anchor-id') === anchorData.value?.id
+  ) {
+    return
+  }
+
+  closeNodeMenu()
 }
 /**
  * 定位时触发
@@ -227,12 +247,13 @@ const highlightedStepName = (contentText: string) => {
   }
 }
 onMounted(() => {
-  set(model, 'openNodeMenu', (anchor: Model.AnchorConfig) => {
-    showAnchor.value ? closeNodeMenu() : openNodeMenu(anchor)
-  })
-  set(model, 'selectOn', selectOn)
-  set(model, 'focusOn', focusOn)
-  set(model, 'clearSelectOn', clearSelectOn)
+  model.setAnchorTooltip = setAnchorTooltip
+  model.openNodeMenu = (anchor: Model.AnchorConfig) => {
+    showAnchor.value && anchorData.value?.id === anchor.id ? closeNodeMenu() : openNodeMenu(anchor)
+  }
+  model.selectOn = selectOn
+  model.focusOn = focusOn
+  model.clearSelectOn = clearSelectOn
   initResizeObserver()
 })
 let resizeObserver: ResizeObserver | null = null
@@ -250,6 +271,9 @@ const initResizeObserver = () => {
 }
 const stepContainerRef = ref<HTMLElement>()
 onBeforeUnmount(() => {
+  closeNodeMenu()
+  model.openNodeMenu = undefined
+  model.setAnchorTooltip = undefined
   disposeSelectionReaction()
   resizeObserver?.disconnect()
   resizeObserver = null
@@ -310,24 +334,21 @@ onBeforeUnmount(() => {
                 <template v-for="(item, index) in nodeFields" :key="index">
                   <div class="group flex-between">
                     <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-                    <el-tooltip effect="dark" content="复制参数" placement="top">
-                      <el-button class="group-hover-visible" link @click="copyText(item.globeLabel)">
-                        <MkIcon name="icon_copy_outlined" />
-                      </el-button>
-                    </el-tooltip>
+                    <el-button class="group-hover-visible" link @click="copyText(item.globeLabel)">
+                      <MkIcon name="icon_copy_outlined" />
+                    </el-button>
                   </div>
                 </template>
               </div>
 
-              <div v-if="enable_exception" class="mk-gray-card space-y-4">
+              <div v-if="enable_exception" class="mk-gray-card space-y-4 mt-1">
                 <template v-for="(item, index) in abnormalNodeFields" :key="index">
                   <div class="group flex-between">
                     <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-                    <el-tooltip effect="dark" content="复制参数" placement="top">
-                      <el-button class="group-hover-visible" link @click="copyText(item.globeLabel)">
-                        <MkIcon name="icon_copy_outlined" />
-                      </el-button>
-                    </el-tooltip>
+
+                    <el-button class="group-hover-visible" link @click="copyText(item.globeLabel)">
+                      <MkIcon name="icon_copy_outlined" />
+                    </el-button>
                   </div>
                 </template>
               </div>
@@ -337,9 +358,22 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
+    <el-tooltip
+      virtual-triggering
+      :virtual-ref="anchorTooltipRef"
+      :visible="anchorTooltipVisible && !showAnchor"
+      :teleported="false"
+      :enterable="false"
+      effect="dark"
+      placement="top"
+    >
+      <template #content>点击添加节点<br />拖拽连接节点</template>
+    </el-tooltip>
+
     <el-collapse-transition>
       <NodeMenu
         v-if="showAnchor"
+        ref="nodeMenuRef"
         class="absolute"
         :class="{ 'pointer-events-none': nodeMenuDragClosing }"
         :current-resource="currentResource"

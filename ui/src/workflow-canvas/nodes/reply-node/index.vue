@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 
-import { set } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
@@ -33,9 +32,10 @@ const formData = computed<ReplyNodeForm>({
 })
 
 function validate() {
-  return Promise.all([formData.value.reply_type === 'referencing' ? nodeCascaderRef.value?.validate() : Promise.resolve(), formRef.value?.validate()]).catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
+  return Promise.all([
+    formData.value.reply_type === 'referencing' ? nodeCascaderRef.value?.validate() : Promise.resolve(),
+    formRef.value?.validate(),
+  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {

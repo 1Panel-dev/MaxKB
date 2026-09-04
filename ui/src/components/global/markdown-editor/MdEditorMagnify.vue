@@ -32,7 +32,7 @@ function submitEditorDialog() {
 <template>
   <MdEditor v-model="modelValue" :preview="false" :toolbars="[]" :footers="footers" class="magnify-md-editor" v-bind="$attrs">
     <template #defFooters>
-      <el-button text @click="openEditorDialog">
+      <el-button text @click="openEditorDialog" class="mr-1 mb-1">
         <MkIcon name="icon_magnify_outlined" />
       </el-button>
     </template>
@@ -42,18 +42,9 @@ function submitEditorDialog() {
     <MdEditor v-model="dialogContent" :preview="false" :toolbars="[]" :footers="[]" class="magnify-dialog-editor" />
 
     <template #footer>
-      <el-button @click="closeEditorDialog">取消</el-button>
       <el-button type="primary" @click="submitEditorDialog">确定</el-button>
     </template>
   </MkDialog>
 </template>
 
-<style scoped>
-.magnify-md-editor :deep(.md-editor-footer) {
-  border: 0;
-}
-
-.magnify-dialog-editor {
-  height: min(60vh, 600px);
-}
-</style>
+<style scoped></style>
