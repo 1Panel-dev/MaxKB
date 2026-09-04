@@ -30,24 +30,24 @@ const store = useWorkflowStore(apiType)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<ModelProviderItem>>([])
 
+// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
+if (!model.properties.node_data) {
+  model.properties.node_data = {
+    tts_model_id: '',
+    tts_model_id_type: 'custom',
+    tts_model_id_reference: [],
+    content_list: [],
+    model_params_setting: {},
+  }
+}
+const initialNodeData = model.properties.node_data as TextToSpeechNodeForm
+if (initialNodeData.tts_model_id_type === undefined) initialNodeData.tts_model_id_type = 'custom'
+if (!Array.isArray(initialNodeData.tts_model_id_reference)) initialNodeData.tts_model_id_reference = []
+if (!Array.isArray(initialNodeData.content_list)) initialNodeData.content_list = []
+if (!initialNodeData.model_params_setting) initialNodeData.model_params_setting = {}
+
 const formData = computed<TextToSpeechNodeForm>({
-  get: () => {
-    if (!model.properties.node_data) {
-      model.properties.node_data = {
-        tts_model_id: '',
-        tts_model_id_type: 'custom',
-        tts_model_id_reference: [],
-        content_list: [],
-        model_params_setting: {},
-      }
-    }
-    const data = model.properties.node_data as TextToSpeechNodeForm
-    if (data.tts_model_id_type === undefined) data.tts_model_id_type = 'custom'
-    if (!Array.isArray(data.tts_model_id_reference)) data.tts_model_id_reference = []
-    if (!Array.isArray(data.content_list)) data.content_list = []
-    if (!data.model_params_setting) data.model_params_setting = {}
-    return data
-  },
+  get: () => model.properties.node_data as TextToSpeechNodeForm,
   set: (value) => (model.properties.node_data = value),
 })
 

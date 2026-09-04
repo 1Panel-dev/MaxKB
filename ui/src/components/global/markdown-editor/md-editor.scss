@@ -9,6 +9,7 @@
   font-weight: 400;
   line-height: 22px;
   font-family: var(--mk-font-family) !important;
+  height: 150px;
 
   .cm-content {
     color: var(--mk-N900);
@@ -16,6 +17,7 @@
     margin-block: 0 !important;
     margin-inline: 11px !important;
     padding: 5px 0 !important;
+    min-height: auto !important;
   }
   .cm-line {
     padding: 0 !important;

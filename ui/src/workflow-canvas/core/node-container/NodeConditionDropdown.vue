@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { BaseNodeModel } from '@logicflow/core'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -8,6 +8,7 @@ defineOptions({ name: 'NodeConditionDropdown' })
 
 const props = defineProps<{ model: BaseNodeModel }>()
 const emit = defineEmits<{
+  'update:condition': [condition: boolean | 'AND' | 'OR']
   'visible-change': [visible: boolean]
 }>()
 
@@ -31,15 +32,18 @@ const visible = computed(() => {
     ].includes(String(props.model.type)) && nodeProperties.value.kind !== WorkflowKind.DataSource
   )
 })
-const condition = computed({
-  get: () => {
-    if (nodeProperties.value.condition) return nodeProperties.value.condition
-
-    props.model.properties.condition = 'AND'
-    return true
+// 仅在执行条件可见且缺失时通知容器补齐，读取 computed 不写入节点。
+watch(
+  () => visible.value && !nodeProperties.value.condition,
+  (needsDefault) => {
+    if (needsDefault) emit('update:condition', 'AND')
   },
+  { immediate: true },
+)
+const condition = computed({
+  get: () => nodeProperties.value.condition || 'AND',
   set: (value: boolean | 'AND' | 'OR') => {
-    props.model.properties.condition = value
+    emit('update:condition', value)
   },
 })
 </script>

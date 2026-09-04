@@ -31,26 +31,26 @@ const store = useWorkflowStore(apiType)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<ModelProviderItem>>([])
 
+// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
+if (!model.properties.node_data) {
+  model.properties.node_data = {
+    model_id: '',
+    model_id_type: 'custom',
+    model_id_reference: [],
+    prompt: '{{开始.question}}',
+    negative_prompt: '',
+    model_params_setting: {},
+  }
+}
+const initialNodeData = model.properties.node_data as ImageGenerateNodeForm
+if (initialNodeData.model_id_type === undefined) initialNodeData.model_id_type = 'custom'
+if (!Array.isArray(initialNodeData.model_id_reference)) initialNodeData.model_id_reference = []
+if (initialNodeData.prompt === undefined) initialNodeData.prompt = '{{开始.question}}'
+if (initialNodeData.negative_prompt === undefined) initialNodeData.negative_prompt = ''
+if (!initialNodeData.model_params_setting) initialNodeData.model_params_setting = {}
+
 const formData = computed<ImageGenerateNodeForm>({
-  get: () => {
-    if (!model.properties.node_data) {
-      model.properties.node_data = {
-        model_id: '',
-        model_id_type: 'custom',
-        model_id_reference: [],
-        prompt: '{{开始.question}}',
-        negative_prompt: '',
-        model_params_setting: {},
-      }
-    }
-    const data = model.properties.node_data as ImageGenerateNodeForm
-    if (data.model_id_type === undefined) data.model_id_type = 'custom'
-    if (!Array.isArray(data.model_id_reference)) data.model_id_reference = []
-    if (data.prompt === undefined) data.prompt = '{{开始.question}}'
-    if (data.negative_prompt === undefined) data.negative_prompt = ''
-    if (!data.model_params_setting) data.model_params_setting = {}
-    return data
-  },
+  get: () => model.properties.node_data as ImageGenerateNodeForm,
   set: (value) => (model.properties.node_data = value),
 })
 

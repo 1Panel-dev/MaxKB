@@ -170,13 +170,13 @@ const visibilityFieldOptions = computed<VisibilityFieldOption[]>(() => {
   ]
 })
 
+// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
+if (!model.properties.node_data) {
+  model.properties.node_data = { is_result: true, form_content_format: '', form_field_list: [] }
+}
+
 const form_data = computed<{ is_result: boolean; form_field_list: FormField[]; form_content_format: string }>({
-  get: () => {
-    if (!model.properties.node_data) {
-      model.properties.node_data = { is_result: true, form_content_format: '', form_field_list: [] }
-    }
-    return model.properties.node_data as { is_result: boolean; form_field_list: FormField[]; form_content_format: string }
-  },
+  get: () => model.properties.node_data as { is_result: boolean; form_field_list: FormField[]; form_content_format: string },
   set: (value) => {
     model.properties.node_data = value
   },

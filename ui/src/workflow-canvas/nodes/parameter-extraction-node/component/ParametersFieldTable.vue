@@ -61,16 +61,16 @@ const nodeProps = props.nodeModel.properties as unknown as {
   node_data: Record<string, unknown>
 }
 
+// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
+if (!nodeProps.node_data) {
+  nodeProps.node_data = {}
+}
+if (!Array.isArray(nodeProps.node_data.variable_list)) {
+  nodeProps.node_data.variable_list = []
+}
+
 const inputFieldList = computed<Array<Record<string, unknown>>>({
-  get: () => {
-    if (!nodeProps.node_data) {
-      nodeProps.node_data = {}
-    }
-    if (!Array.isArray(nodeProps.node_data.variable_list)) {
-      nodeProps.node_data.variable_list = []
-    }
-    return nodeProps.node_data.variable_list as Array<Record<string, unknown>>
-  },
+  get: () => nodeProps.node_data.variable_list as Array<Record<string, unknown>>,
   set: (value) => {
     nodeProps.node_data.variable_list = value
   },

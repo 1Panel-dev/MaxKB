@@ -3,26 +3,26 @@ import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
+import type { FormField } from '@/components/mk-dynamics-form'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import ApiParameter from './component/api-parameter/index.vue'
 import ConversationVariable from './component/conversation-variable/index.vue'
-import FileUploadSetting from './component/file-upload/index.vue'
-import LongTermMemorySetting from './component/long-term-memory/index.vue'
+import FileUpload from './component/file-upload/index.vue'
+import LongTermMemory from './component/long-term-memory/index.vue'
 import SpeechInput from './component/speech-input/index.vue'
 import SpeechPlayback from './component/speech-playback/index.vue'
 import UserInput from './component/user-input/index.vue'
+import { defaultFileUploadSetting } from './constant'
 import {
-  defaultFileUploadSetting,
   type ApiInputField,
   type BaseNodeForm,
   type ChatInputField,
-  type FileUploadSetting as FileUploadSettingValue,
+  type FileUploadSetting,
   type LongTermSetting,
   type SpeechInputSetting,
   type SpeechPlaybackSetting,
-  type UserInputField,
   type UserInputSetting,
 } from './types'
 
@@ -92,7 +92,7 @@ function handleEditorWheel(event: WheelEvent) {
 }
 
 // 子模块数据映射
-const userInputFields = computed(() => (model.properties.user_input_field_list ?? []) as UserInputField[])
+const userInputFields = computed(() => (model.properties.user_input_field_list ?? []) as FormField[])
 const apiInputFields = computed(() => (model.properties.api_input_field_list ?? []) as ApiInputField[])
 const conversationVariables = computed(() => (model.properties.chat_input_field_list ?? []) as ChatInputField[])
 const userInputSetting = computed<UserInputSetting>(() =>
@@ -165,12 +165,12 @@ function updateFileUploadEnabled(enabled: boolean) {
   model.graphModel.eventCenter.emit('refreshFileUploadConfig', undefined)
 }
 
-function updateFileUploadSetting(setting: FileUploadSettingValue) {
+function updateFileUploadSetting(setting: FileUploadSetting) {
   formData.value.file_upload_setting = setting
   model.graphModel.eventCenter.emit('refreshFileUploadConfig', undefined)
 }
 
-function updateUserInputFields(fields: UserInputField[]) {
+function updateUserInputFields(fields: FormField[]) {
   model.properties.user_input_field_list = fields
   model.graphModel.eventCenter.emit('refreshFieldList', undefined)
 }
@@ -229,10 +229,11 @@ onMounted(() => {
       </el-form-item>
 
       <el-form-item label="开场白">
-        <MdEditorMagnify v-model="formData.prologue" title="开场白" style="height: 150px" @wheel="handleEditorWheel" />
+        <MdEditorMagnify v-model="formData.prologue" title="开场白" @wheel="handleEditorWheel" />
       </el-form-item>
 
-      <LongTermMemorySetting
+      <!-- 长期记忆 -->
+      <LongTermMemory
         :enabled="formData.long_term_enable"
         :model-options="llmModelOptions"
         :provider-options="providerOptions"
@@ -241,13 +242,15 @@ onMounted(() => {
         @update:setting="updateLongTermSetting"
       />
 
-      <FileUploadSetting
+      <!-- 文件上传 -->
+      <FileUpload
         :enabled="formData.file_upload_enable"
         :setting="formData.file_upload_setting"
         @update:enabled="updateFileUploadEnabled"
         @update:setting="updateFileUploadSetting"
       />
 
+      <!-- 用户输入 -->
       <UserInput
         :api-fields="apiInputFields"
         :fields="userInputFields"

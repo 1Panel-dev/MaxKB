@@ -2,10 +2,8 @@
 import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
-import { Operation } from '@element-plus/icons-vue'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
-import ModelParamsDialog from '../../ModelParamsDialog.vue'
 import type { LongTermSetting } from '../../types'
 
 defineOptions({ name: 'BaseNodeLongTermSettingDialog' })
@@ -15,7 +13,6 @@ const emit = defineEmits<{ submit: [setting: LongTermSetting] }>()
 
 const visible = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
-const modelParamsDialogRef = useTemplateRef<InstanceType<typeof ModelParamsDialog>>('modelParamsDialogRef')
 const formData = ref<LongTermSetting>({
   long_term_model_id: '',
   long_term_model_id_type: 'default',
@@ -110,22 +107,6 @@ function validateCron(_rule: unknown, value: unknown, callback: (error?: Error) 
   callback()
 }
 
-function handleModelChange(modelId: string) {
-  formData.value.long_term_model_id = modelId
-  if (!modelId) {
-    formData.value.long_term_model_params_setting = {}
-    return
-  }
-  modelParamsDialogRef.value?.resetDefault(modelId).then((settings) => {
-    formData.value.long_term_model_params_setting = settings
-  })
-}
-
-function openModelParams() {
-  if (!formData.value.long_term_model_id) return
-  modelParamsDialogRef.value?.open(formData.value.long_term_model_id, formData.value.long_term_model_params_setting)
-}
-
 function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
   if (formData.value.long_term_model_id_type === 'custom' && !formData.value.long_term_model_id) {
     callback(new Error('请选择长期记忆模型'))
@@ -153,18 +134,15 @@ defineExpose({ open })
           <el-radio value="custom">自定义</el-radio>
         </el-radio-group>
         <el-alert v-if="formData.long_term_model_id_type === 'default'" class="w-full" title="使用系统默认 AI 模型" type="info" :closable="false" />
-        <div v-else class="flex w-full gap-2">
-          <ModelSelect
-            v-model="formData.long_term_model_id"
-            :options="modelOptions"
-            :provider-options="providerOptions"
-            placeholder="请选择 AI 模型"
-            @change="handleModelChange"
-          />
-          <el-button :disabled="!formData.long_term_model_id" @click="openModelParams">
-            <MkIcon :icon="Operation" />
-          </el-button>
-        </div>
+        <ModelSelect
+          v-else
+          v-model="formData.long_term_model_id"
+          v-model:model-params="formData.long_term_model_params_setting"
+          show-model-params
+          :options="modelOptions"
+          :provider-options="providerOptions"
+          placeholder="请选择 AI 模型"
+        />
       </el-form-item>
 
       <el-form-item label="触发方式" prop="long_term_trigger_type" :rules="{ required: true, message: '请选择触发方式', trigger: 'change' }">
@@ -198,8 +176,6 @@ defineExpose({ open })
         </el-form-item>
       </template>
     </el-form>
-
-    <ModelParamsDialog ref="modelParamsDialogRef" @submit="formData.long_term_model_params_setting = $event" />
 
     <template #footer>
       <el-button @click="visible = false">取消</el-button>

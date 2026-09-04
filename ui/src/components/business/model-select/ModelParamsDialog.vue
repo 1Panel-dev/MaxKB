@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash'
 import type { DynamicFormField } from '@/api/types'
 import { MkDynamicsForm, type FormField } from '@/components/mk-dynamics-form'
 
-defineOptions({ name: 'BaseNodeModelParamsDialog' })
+defineOptions({ name: 'ModelParamsDialog' })
 
 const emit = defineEmits<{ submit: [settings: Record<string, unknown>] }>()
 

@@ -10,6 +10,8 @@ defineOptions({ name: 'NodeOperateDropdown' })
 
 const props = defineProps<{ model: BaseNodeModel }>()
 const emit = defineEmits<{
+  'update:disabled': [disabled: boolean]
+  'update:stepName': [stepName: string]
   'visible-change': [visible: boolean]
 }>()
 
@@ -45,7 +47,7 @@ const canChangeEnabled = computed(() => {
 const nodeEnabled = computed({
   get: () => !nodeProperties.value.disabled,
   set: (value: boolean) => {
-    props.model.properties.disabled = !value
+    emit('update:disabled', !value)
   },
 })
 const sourceName = computed(() => {
@@ -78,7 +80,7 @@ async function saveNodeName(formInstance: FormInstance | null | undefined) {
       return
     }
 
-    props.model.properties.stepName = nodeNameForm.value.title
+    emit('update:stepName', nodeNameForm.value.title)
     props.model.clearNextNodeField(true)
     nodeNameDialogVisible.value = false
     formInstance.resetFields()

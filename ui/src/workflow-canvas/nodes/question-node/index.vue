@@ -33,35 +33,35 @@ const store = useWorkflowStore(apiType)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<ModelProviderItem>>([])
 
+// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
+if (!model.properties.node_data) {
+  model.properties.node_data = {
+    model_id: '',
+    model_id_type: 'custom',
+    model_id_reference: [],
+    system:
+      '# 角色\n你是一位问题优化大师，擅长根据上下文精准揣测用户意图，并对用户提出的问题进行优化。\n\n' +
+      '## 技能\n### 技能 1: 优化问题\n2. 接收用户输入的问题。\n3. 依据上下文仔细分析问题含义。\n4. 输出优化后的问题。\n\n' +
+      '## 限制:\n - 仅返回优化后的问题，不进行额外解释或说明。\n - 确保优化后的问题准确反映原始问题意图，不得改变原意。',
+    prompt: '{{开始.question}}',
+    dialogue_type: 'WORKFLOW',
+    dialogue_number: 1,
+    model_params_setting: {},
+  }
+}
+const initialNodeData = model.properties.node_data as QuestionNodeForm
+if (initialNodeData.model_id_type === undefined) initialNodeData.model_id_type = 'custom'
+if (!Array.isArray(initialNodeData.model_id_reference)) initialNodeData.model_id_reference = []
+if (initialNodeData.system === undefined) initialNodeData.system = ''
+if (initialNodeData.prompt === undefined) initialNodeData.prompt = '{{开始.question}}'
+if (initialNodeData.dialogue_type === undefined) initialNodeData.dialogue_type = 'WORKFLOW'
+if (initialNodeData.dialogue_number === undefined || initialNodeData.dialogue_number === null) {
+  initialNodeData.dialogue_number = 1
+}
+if (!initialNodeData.model_params_setting) initialNodeData.model_params_setting = {}
+
 const formData = computed<QuestionNodeForm>({
-  get: () => {
-    if (!model.properties.node_data) {
-      model.properties.node_data = {
-        model_id: '',
-        model_id_type: 'custom',
-        model_id_reference: [],
-        system:
-          '# 角色\n你是一位问题优化大师，擅长根据上下文精准揣测用户意图，并对用户提出的问题进行优化。\n\n' +
-          '## 技能\n### 技能 1: 优化问题\n2. 接收用户输入的问题。\n3. 依据上下文仔细分析问题含义。\n4. 输出优化后的问题。\n\n' +
-          '## 限制:\n - 仅返回优化后的问题，不进行额外解释或说明。\n - 确保优化后的问题准确反映原始问题意图，不得改变原意。',
-        prompt: '{{开始.question}}',
-        dialogue_type: 'WORKFLOW',
-        dialogue_number: 1,
-        model_params_setting: {},
-      }
-    }
-    const data = model.properties.node_data as QuestionNodeForm
-    if (data.model_id_type === undefined) data.model_id_type = 'custom'
-    if (!Array.isArray(data.model_id_reference)) data.model_id_reference = []
-    if (data.system === undefined) data.system = ''
-    if (data.prompt === undefined) data.prompt = '{{开始.question}}'
-    if (data.dialogue_type === undefined) data.dialogue_type = 'WORKFLOW'
-    if (data.dialogue_number === undefined || data.dialogue_number === null) {
-      data.dialogue_number = 1
-    }
-    if (!data.model_params_setting) data.model_params_setting = {}
-    return data
-  },
+  get: () => model.properties.node_data as QuestionNodeForm,
   set: (value) => (model.properties.node_data = value),
 })
 
