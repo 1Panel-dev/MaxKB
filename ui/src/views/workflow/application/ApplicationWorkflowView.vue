@@ -140,56 +140,22 @@ function loadApplicationDetail() {
 }
 
 /* 发布工作流 */
-// const canPublish = computed(() => perm.application.workspace.publish(applicationId))
-// function getValidationMessage(error: unknown) {
-//   if (typeof error === 'string') return error
-//   if (error instanceof Error) return error.message
-//   if (!error || typeof error !== 'object') return '工作流校验失败'
 
-//   const validationError = error as {
-//     errMessage?: unknown
-//     node?: { properties?: { stepName?: string } }
-//   }
-//   const stepName = validationError.node?.properties?.stepName
-//   const message =
-//     typeof validationError.errMessage === 'string' ? validationError.errMessage : '工作流配置不完整'
-
-//   return stepName ? `${stepName} 节点，${message}` : message
-// }
-
-// function validateWorkflow() {
-//   const graphData = getGraphData()
-//   if (!graphData) return Promise.resolve<LogicFlow.GraphData | undefined>(undefined)
-
-//   return (workflowRef.value?.validate() ?? Promise.resolve([]))
-//     .then(() => {
-//       type ValidationGraph = ConstructorParameters<typeof WorkFlowInstance>[0]
-//       new WorkFlowInstance(graphData as unknown as ValidationGraph).is_valid()
-//       return graphData
-//     })
-//     .catch((error: unknown) => {
-//       MsgError(getValidationMessage(error))
-//       return undefined
-//     })
-// }
-
-// function handlePublish() {
-//   validateWorkflow().then((graphData) => {
-//     if (!graphData) return
-
-//     publishing.value = true
-//     return saveApplication(graphData)
-//       .then(() => ApplicationApi.putApplicationPublish(applicationId))
-//       .then((application) => {
-//         applicationDetail.value = application
-//         saveTime.value = application.update_time || saveTime.value
-//         MsgSuccess('发布成功')
-//       })
-//       .finally(() => {
-//         publishing.value = false
-//       })
-//   })
-// }
+function handlePublish() {
+  workflowRef.value?.validate().then(() => {
+    // publishing.value = true
+    // return saveApplication(graphData)
+    //   .then(() => ApplicationApi.putApplicationPublish(applicationId))
+    //   .then((application) => {
+    //     applicationDetail.value = application
+    //     saveTime.value = application.update_time || saveTime.value
+    //     MsgSuccess('发布成功')
+    //   })
+    //   .finally(() => {
+    //     publishing.value = false
+    //   })
+  })
+}
 
 /* 自动保存 */
 // const AUTO_SAVE_INTERVAL = 60_000
@@ -274,15 +240,9 @@ onMounted(() => {
       />
       <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave()"> 保存 </el-button>
       <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
-      <!-- <el-button
-        v-if="canPublish"
-        type="primary"
-        :loading="publishing"
-        :disabled="loading || saving || publishing"
-        @click="handlePublish"
-      >
-        发布
-      </el-button>
+
+      <el-button type="primary" :loading="publishing" :disabled="loading || saving || publishing" @click="handlePublish"> 发布 </el-button>
+      <!--
 
       <MkDropdown v-if="canEdit" trigger="click">
         <el-button text aria-label="更多工作流设置">

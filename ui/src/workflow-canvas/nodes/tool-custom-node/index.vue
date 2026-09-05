@@ -31,12 +31,12 @@ const formRef = useTemplateRef<FormInstance>('formRef')
 const inputFieldDialogRef = useTemplateRef<InstanceType<typeof InputFieldDialog>>('inputFieldDialogRef')
 const currentFieldIndex = ref<number>()
 
-const toolCustomNodeData = (model.properties.node_data ?? {}) as Partial<ToolCustomNodeForm>
-const shouldInitializeResult = toolCustomNodeData.is_result === undefined
-if (toolCustomNodeData.code === undefined) toolCustomNodeData.code = ''
-if (!Array.isArray(toolCustomNodeData.input_field_list)) toolCustomNodeData.input_field_list = []
-if (toolCustomNodeData.is_result === undefined) toolCustomNodeData.is_result = false
-model.properties.node_data = toolCustomNodeData as ToolCustomNodeForm
+const savedForm = model.properties.node_data as Partial<ToolCustomNodeForm> | undefined
+model.properties.node_data = {
+  code: savedForm?.code ?? '',
+  input_field_list: Array.isArray(savedForm?.input_field_list) ? savedForm.input_field_list : [],
+  is_result: savedForm ? savedForm.is_result : false,
+}
 
 const formData = computed<ToolCustomNodeForm>({
   get: () => model.properties.node_data as ToolCustomNodeForm,
@@ -73,7 +73,7 @@ function handleInputFieldRefresh(field: ToolInputField) {
 }
 
 onMounted(() => {
-  if (shouldInitializeResult) formData.value.is_result = isLastNode(model)
+  if (formData.value.is_result === undefined && isLastNode(model)) formData.value.is_result = true
   model.validate = validate
 })
 </script>

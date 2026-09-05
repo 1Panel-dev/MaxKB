@@ -21,7 +21,13 @@ const options = ref<WorkflowNodeField[]>([])
 const nodeModel = computed(() => props.nodeModel as WorkflowNodeModel)
 
 const selectedValue = computed({ get: () => props.modelValue, set: (value) => emit('update:modelValue', value) })
-const selectedNodeField = computed(() => options.value.find((field) => field.value === selectedValue.value?.[0]))
+const selectedNodeField = computed(() => {
+  const [nodeValue, fieldValue] = selectedValue.value ?? []
+  if (!nodeValue || !fieldValue) return undefined
+
+  const fieldGroup = options.value.find((field) => field.value === nodeValue)
+  return fieldGroup?.children?.some((field) => field.value === fieldValue) ? fieldGroup : undefined
+})
 
 const getOptionsValue = () => {
   if ([WorkflowMode.ApplicationLoop, WorkflowMode.KnowledgeLoop, WorkflowMode.ToolLoop].includes(workflowMode)) {

@@ -27,7 +27,7 @@ function changeEnabled(value: boolean | number | string) {
     <span class="flex items-center gap-1">
       文件上传
       <el-tooltip content="开启后，问答页面会显示上传文件的按钮。" placement="right">
-        <MkIcon name="icon_info_outlined" />
+        <MkIcon name="icon_info_outlined" class="text-N600!" />
       </el-tooltip>
     </span>
     <span class="flex items-center gap-2">
