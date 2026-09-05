@@ -147,7 +147,7 @@
 //     'workflow.nodes.textToSpeechNode.text',
 //     'workflow.nodes.textToSpeechNode.label',
 //   ],
-//   [toolNode, 'workflow.nodes.toolNode.text', 'workflow.nodes.toolNode.label'],
+//   [toolCustomNode, 'workflow.nodes.toolNode.text', 'workflow.nodes.toolNode.label'],
 //   [intentNode, 'workflow.nodes.intentNode.text', 'workflow.nodes.intentNode.label'],
 //   [loopNode, 'workflow.nodes.loopNode.text', 'workflow.nodes.loopNode.label'],
 //   [
@@ -272,7 +272,7 @@
 //   ],
 //   [speechToTextNode.properties.config.fields, ['common.result']],
 //   [textToSpeechNode.properties.config.fields, ['common.result']],
-//   [toolNode.properties.config.fields, ['common.result']],
+//   [toolCustomNode.properties.config.fields, ['common.result']],
 //   [intentNode.properties.config.fields, ['common.classify', 'common.reason']],
 //   [imageToVideoNode.properties.config.fields, ['common.fileUpload.video']],
 //   [textToVideoNode.properties.config.fields, ['common.fileUpload.video']],

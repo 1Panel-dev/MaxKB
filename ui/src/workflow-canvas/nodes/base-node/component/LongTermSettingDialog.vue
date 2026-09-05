@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
-import type { LongTermSetting } from '../../types'
+import type { LongTermSetting } from '../types'
 
 defineOptions({ name: 'BaseNodeLongTermSettingDialog' })
 

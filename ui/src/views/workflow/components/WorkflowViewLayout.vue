@@ -33,7 +33,7 @@ defineSlots<{
         <span v-if="saveTime" class="shrink-0 text-sm text-N600"> 保存于 {{ datetimeFormat(saveTime) }} </span>
       </div>
 
-      <div class="flex shrink-0 items-center gap-3">
+      <div class="flex shrink-0 items-center">
         <slot name="actions" />
       </div>
     </header>

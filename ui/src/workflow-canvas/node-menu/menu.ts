@@ -34,7 +34,7 @@ export const knowledgeMenuNodes = [
     label: '数据处理',
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
+  { label: '其他', list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ]
 export const menuNodes = [
   {
@@ -58,7 +58,7 @@ export const menuNodes = [
     label: '数据处理',
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
+  { label: '其他', list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ]
 export const applicationLoopMenuNodes = [
   {
@@ -82,7 +82,7 @@ export const applicationLoopMenuNodes = [
     label: '数据处理',
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
+  { label: '其他', list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ]
 export const knowledgeLoopMenuNodes = [
   { label: '数据源', list: [NodeData.dataSourceLocalNode, NodeData.dataSourceWebNode] },
@@ -107,7 +107,7 @@ export const knowledgeLoopMenuNodes = [
     label: '数据处理',
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
+  { label: '其他', list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ]
 export const toolLoopMenuNodes = [
   { label: '数据源', list: [NodeData.dataSourceLocalNode, NodeData.dataSourceWebNode] },
@@ -132,7 +132,7 @@ export const toolLoopMenuNodes = [
     label: '数据处理',
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
+  { label: '其他', list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ]
 const toolMenuNodes = [
   {
@@ -165,7 +165,7 @@ const toolMenuNodes = [
     label: '数据处理',
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
+  { label: '其他', list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ]
 const menuNodesByMode: Record<WorkflowMode, WorkflowMenuGroup[]> = {
   [WorkflowMode.Application]: menuNodes,

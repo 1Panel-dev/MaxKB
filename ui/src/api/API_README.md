@@ -20,6 +20,7 @@ src/api/
 │   │   ├── application/              # 智能体接口
 │   │   ├── knowledge/                # 知识库接口
 │   │   ├── model/                    # 模型接口
+│   │   ├── trigger/                   # 触发器分页查询接口
 │   │   ├── tool/                     # 工具、工具工作流及工具商店接口
 │   │   └── <resource>.ts             # 工作空间公共资源接口
 │   └── provider.ts                   # Workspace 与 System 共用的模型供应商接口

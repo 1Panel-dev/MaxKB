@@ -57,8 +57,8 @@ function deleteField(index: number) {
 <template>
   <section>
     <div class="flex-between mb-3">
-      <h6>API 参数</h6>
-      <el-button link type="primary" @click="openDialog()"><MkIcon name="icon_add_outlined" />添加</el-button>
+      <p>API 参数</p>
+      <el-button text type="primary" @click="openDialog()"><MkIcon name="icon_add_outlined" /></el-button>
     </div>
     <el-table v-if="fields.length" :data="fields" class="mb-4" table-layout="fixed">
       <el-table-column label="参数" prop="variable" min-width="120" show-overflow-tooltip />

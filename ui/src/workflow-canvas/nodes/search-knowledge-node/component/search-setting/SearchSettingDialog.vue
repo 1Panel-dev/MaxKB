@@ -94,7 +94,7 @@ defineExpose({ open })
         </el-form-item>
       </div>
       <el-form-item label="最多引用字符数" prop="max_paragraph_char_number">
-        <el-slider v-model="formData.max_paragraph_char_number" show-input :show-input-controls="false" :min="500" :max="100000" />
+        <el-slider v-model="formData.max_paragraph_char_number" show-input :min="500" :max="100000" />
       </el-form-item>
     </el-form>
     <template #footer>
