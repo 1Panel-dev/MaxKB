@@ -55,7 +55,7 @@ const download = (file: any) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .question-content {
   display: flex;
   justify-content: flex-end;

@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { ApplicationDetail } from '@/api/types'
 import LogicFlow, { type GraphModel } from '@logicflow/core'
-import '@logicflow/core/dist/index.css'
 import { SelectionSelect } from '@logicflow/extension'
-import '@logicflow/extension/lib/index.css'
 import AppEdge from '@/workflow-canvas/core/edge/index'
 import { initDefaultShortcut } from '@/workflow-canvas/core/shortcut'
 import { disconnectAll, getTeleport } from '@/workflow-canvas/core/teleport'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import Dagre from '@/workflow-canvas/plugins/dagre'
-import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
-import { type ShapeItem } from '@/workflow-canvas/types'
+import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
+import type { DefaultModelSettingPayload } from '@/api/types'
+import NodeAdd from './component/NodeAdd.vue'
+import NodeSearch from './component/NodeSearch.vue'
 defineOptions({ name: 'MkWorkflow' })
 
 type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void }
@@ -20,7 +19,7 @@ type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void 
 const props = withDefaults(
   defineProps<{
     data?: LogicFlow.GraphConfigData | null
-    defaultModelSettings?: ApplicationDetail['default_model_setting']
+    defaultModelSettings?: DefaultModelSettingPayload
     loopWorkflowMode?: WorkflowMode
     workflowMode?: WorkflowMode
   }>(),
@@ -184,7 +183,12 @@ defineExpose({ onmousedown, validate, getGraphData, addNode, clearGraphData, ren
     <TeleportContainer :flow-id="flowId" />
     <!-- // TODO: 临时注释掉，后续加 -->
     <!-- <Control class="workflow-control" v-if="lf" :lf="lf"></Control> -->
-    <!-- <NodeSearch :lf="lf" ref="nodeSearchRef"></NodeSearch> -->
+    <div class="absolute left-4 top-4 z-10">
+      <el-card shadow="always" style="--el-card-padding: 8px">
+        <NodeAdd v-if="lf" :workflow-mode="workflowMode" @dragstart="onmousedown" @select="addNode" class="mb-1" />
+        <NodeSearch v-if="lf" :logic-flow="lf" />
+      </el-card>
+    </div>
   </div>
 </template>
 

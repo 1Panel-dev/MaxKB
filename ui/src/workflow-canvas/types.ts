@@ -46,6 +46,7 @@ export enum WorkflowNodeType {
 export enum WorkflowKind {
   DataSource = 'data-source',
 }
+
 export enum WorkflowMode {
   // 应用工作流
   Application = 'application',

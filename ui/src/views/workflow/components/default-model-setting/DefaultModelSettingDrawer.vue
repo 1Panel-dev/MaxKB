@@ -5,7 +5,7 @@ import type LogicFlow from '@logicflow/core'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import type ModelApi from '@/api/admin/workspace/model/model'
 import ModelProviderApi from '@/api/admin/model-provider'
-import type { DefaultModelType, ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
+import type { DefaultModelSettingPayload, DefaultModelType, ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { MODEL_TYPE_LABELS } from '@/constants/model'
@@ -15,19 +15,19 @@ defineOptions({ name: 'DefaultModelSettingDrawer' })
 const defaultModelTypes = ['LLM', 'TTS', 'STT', 'IMAGE', 'TTI', 'TTV', 'ITV', 'RERANKER'] as const
 
 const props = defineProps<{
-  modelValue?: Partial<Record<DefaultModelType, ModelConfig>>
+  modelValue?: DefaultModelSettingPayload
   modelApi: typeof ModelApi
   getGraphData: () => LogicFlow.GraphData | undefined
   disabled?: boolean
 }>()
 const emit = defineEmits<{
-  save: [settings: Partial<Record<DefaultModelType, ModelConfig>>]
+  save: [settings: DefaultModelSettingPayload]
   applyToAll: [graphData: LogicFlow.GraphData]
   closed: []
 }>()
 
 const visible = ref(false)
-const savedSettings = ref<Partial<Record<DefaultModelType, ModelConfig>>>({})
+const savedSettings = ref<DefaultModelSettingPayload>({})
 
 // 模型资源：调用方选择当前范围的完整 API，组件不通过 URL 推断资源范围。
 const models = ref<ModelItem[]>([])
@@ -57,7 +57,7 @@ function getModelOptions(modelType: DefaultModelType) {
 }
 
 // 暂存模型设置：编辑和参数弹窗只修改副本，保存时才通知页面提交。
-function normalizeSettings(settings: Partial<Record<DefaultModelType, ModelConfig>>) {
+function normalizeSettings(settings: DefaultModelSettingPayload) {
   return Object.fromEntries(
     defaultModelTypes.map((type) => [
       type,
@@ -164,7 +164,7 @@ function handleApplyToAll() {
     })
 }
 
-function open(settings: Partial<Record<DefaultModelType, ModelConfig>> = {}) {
+function open(settings: DefaultModelSettingPayload = {}) {
   savedSettings.value = cloneDeep(settings)
   resetSettings()
   visible.value = true

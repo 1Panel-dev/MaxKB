@@ -13,7 +13,7 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .content-failure {
   display: flex;
   align-items: flex-start;

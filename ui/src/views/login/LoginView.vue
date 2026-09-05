@@ -77,7 +77,7 @@ onBeforeMount(() => {
   </LoginLayout>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .login-mode-switch {
   border-radius: 0 12px 0 0;
   height: 70px;

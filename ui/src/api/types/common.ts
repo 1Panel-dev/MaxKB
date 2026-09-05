@@ -25,3 +25,24 @@ export interface CommonUserOption {
   nick_name: string
   roles?: string[]
 }
+
+
+export interface DynamicFormField {
+  attrs?: Record<string, unknown>
+  default_value?: unknown
+  field: string
+  input_type: string
+  label: string | DynamicFormLabel
+  option_list?: Record<string, unknown>[]
+  required?: boolean
+  text_field?: string
+  value_field?: string
+  [key: string]: unknown
+}
+
+export interface DynamicFormLabel {
+  attrs?: { tooltip?: string; [key: string]: unknown }
+  input_type: string
+  label: string
+  type?: string
+}

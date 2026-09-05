@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
-
-import { ArrowDown, ArrowUp, Close, Search } from '@element-plus/icons-vue'
 import type LogicFlow from '@logicflow/core'
 import type { InputInstance } from 'element-plus'
 
@@ -67,19 +65,40 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleShortcut))
 </script>
 
 <template>
-  <div class="absolute left-5 top-5 z-10">
-    <el-button v-if="!searchVisible" circle size="large" @click="openSearch">
-      <MkIcon :icon="Search" />
-    </el-button>
-
-    <div v-else class="flex w-[360px] items-center gap-1 rounded-lg border border-N300 bg-white p-2 shadow-sm">
-      <el-input ref="searchInputRef" v-model="searchKeyword" clearable placeholder="搜索节点名称" @keyup.enter="searchNext(1)" />
-      <span class="shrink-0 text-N600">
-        {{ matchedNodes.length ? `${currentIndex + 1}/${matchedNodes.length}` : '无结果' }}
+  <el-button
+    :type="searchVisible ? 'primary' : 'default'"
+    text
+    :style="{ background: searchVisible ? 'var(--mk-primary-transparent-10)' : 'transparent' }"
+    @click="openSearch"
+  >
+    <MkIcon name="icon_search-outlined" size="18" />
+  </el-button>
+  <el-card v-if="searchVisible" shadow="always" class="workflow-search-container" style="--el-card-padding: 8px 12px">
+    <div class="flex items-center gap-1">
+      <el-input ref="searchInputRef" v-model="searchKeyword" clearable placeholder="请输入节点名称" @keyup.enter="searchNext(1)" />
+      <span class="shrink-0">
+        {{ matchedNodes.length ? `${currentIndex + 1}/${matchedNodes.length}` : searchKeyword && '无结果' }}
       </span>
-      <el-button text @click="searchNext(-1)"><MkIcon :icon="ArrowUp" /></el-button>
-      <el-button text @click="searchNext(1)"><MkIcon :icon="ArrowDown" /></el-button>
-      <el-button text @click="closeSearch"><MkIcon :icon="Close" /></el-button>
+      <el-divider direction="vertical" class="mx-2!" />
+      <el-button text @click="searchNext(-1)"><MkIcon name="icon_up_outlined" /></el-button>
+      <el-button text @click="searchNext(1)"><MkIcon name="icon_down_outlined" /></el-button>
+      <el-button text @click="closeSearch"><MkIcon name="icon_close_outlined" /></el-button>
     </div>
-  </div>
+  </el-card>
 </template>
+
+<style scoped lang="scss">
+.workflow-search-container {
+  left: 50%;
+  position: fixed;
+  top: 96px;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  width: 380px;
+
+  :deep(.el-input__wrapper) {
+    box-shadow: none;
+    padding: 0;
+  }
+}
+</style>

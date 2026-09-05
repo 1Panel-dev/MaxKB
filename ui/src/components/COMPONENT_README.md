@@ -171,6 +171,15 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 - 组件样式默认使用 `scoped`；明确的全局规则放入 `src/styles`。
 - `global` 不创建仅用于二次导出的 `components/index.ts`。
 
+### 数字输入框
+
+项目内所有设置 `controls-position="right"` 的 `el-input-number` 必须同时显式设置
+`align="left"`，统一将输入内容左对齐。页面、公共组件和工作流节点均遵循此规则。
+
+```vue
+<el-input-number v-model="value" controls-position="right" align="left" />
+```
+
 ### 浮层触发节点
 
 Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-popover`、
@@ -1068,7 +1077,6 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 `resourceScope`：Workspace 传入 `ModelApi`，System 共享资源传入 `SystemSharedModelApi`；
 其他范围暂不展示创建入口。创建成功后触发 `refresh`，使用方重新加载原业务范围的模型选项，
 不自动替换当前选中模型。`footer` 插槽仍可覆盖默认创建入口。
-
 
 ```vue
 <script setup lang="ts">

@@ -173,7 +173,7 @@ function openModelParams() {
   <ModelParamsDialog v-if="canEditParams" ref="modelParamsDialogRef" @submit="emit('update:modelParams', $event)" />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* 参数入口与选择器共用外边框，为原生下拉箭头和清空按钮预留空间。 */
 .model-select--with-params {
   :deep(.el-select__wrapper) {

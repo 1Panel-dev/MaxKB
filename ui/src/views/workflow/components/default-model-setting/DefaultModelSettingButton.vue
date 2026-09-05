@@ -2,14 +2,14 @@
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type LogicFlow from '@logicflow/core'
 import type ModelApi from '@/api/admin/workspace/model/model'
-import type { DefaultModelType, ModelConfig } from '@/api/types'
+import type { DefaultModelSettingPayload } from '@/api/types'
 import DefaultModelSettingDrawer from './DefaultModelSettingDrawer.vue'
 
 defineOptions({ name: 'DefaultModelSettingButton' })
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: Partial<Record<DefaultModelType, ModelConfig>>
+    modelValue?: DefaultModelSettingPayload
     modelApi: typeof ModelApi
     getGraphData: () => LogicFlow.GraphData | undefined
     disabled?: boolean
@@ -17,7 +17,7 @@ const props = withDefaults(
   { modelValue: () => ({}), disabled: false },
 )
 const emit = defineEmits<{
-  save: [settings: Partial<Record<DefaultModelType, ModelConfig>>]
+  save: [settings: DefaultModelSettingPayload]
   applyToAll: [graphData: LogicFlow.GraphData]
 }>()
 

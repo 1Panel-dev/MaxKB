@@ -25,7 +25,7 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .content-tool {
   background: var(--bg2, #fafafa);
   border: 1px solid var(--bd, #dcdfe6);

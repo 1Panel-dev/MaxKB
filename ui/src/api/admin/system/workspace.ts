@@ -5,13 +5,11 @@ import type { CreateWorkspaceMemberPayload, Dict, WorkspaceItem, WorkspaceMember
 const prefix = '/system/workspace'
 
 /** 首页头部工作空间列表 | 系统管理的工作空间模块 */
-// TODO 工作空间管理员接口 /workspace 未区分
 const getSystemWorkspaceList = () => {
   return get<WorkspaceItem[]>(prefix)
 }
 
 /** 获取工作空间成员列表 **/
-// TODO 工作空间管理员接口 /workspace 未区分
 
 const getWorkspaceMemberList = (workspace_id: string, page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<WorkspaceMemberItem>>(`${prefix}/${workspace_id}/user_list/${page.currentPage}/${page.pageSize}`, query)

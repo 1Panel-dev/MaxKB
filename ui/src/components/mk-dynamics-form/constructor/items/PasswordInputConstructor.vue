@@ -23,7 +23,13 @@ watch(
 const getData = () => {
   return {
     input_type: 'PasswordInput',
-    attrs: { maxlength: formValue.value.maxlength, minlength: formValue.value.minlength, 'show-word-limit': true, type: 'password', 'show-password': true },
+    attrs: {
+      maxlength: formValue.value.maxlength,
+      minlength: formValue.value.minlength,
+      'show-word-limit': true,
+      type: 'password',
+      'show-password': true,
+    },
     default_value: formValue.value.default_value,
     show_default_value: formValue.value.show_default_value,
     props_info: {
@@ -57,7 +63,12 @@ const render = (formData: DynamicFormValue) => {
   formValue.value.show_password = attrs['show-password']
 }
 const rules = computed(() => [
-  { min: formValue.value.minlength, max: formValue.value.maxlength, message: `长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`, trigger: 'blur' },
+  {
+    min: formValue.value.minlength,
+    max: formValue.value.maxlength,
+    message: `长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`,
+    trigger: 'blur',
+  },
 ])
 
 defineExpose({ getData, render })
@@ -77,7 +88,7 @@ onMounted(() => {
   <el-form-item label="文本长度" required>
     <div class="flex w-full items-start gap-2">
       <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '请输入最小长度', trigger: 'change' }]" prop="minlength">
-        <el-input-number v-model="formValue.minlength" class="w-full!" :min="1" :step="1" controls-position="right" step-strictly />
+        <el-input-number v-model="formValue.minlength" class="w-full!" :min="1" :step="1" controls-position="right" align="left" step-strictly />
       </el-form-item>
       <span class="flex-center shrink-0">-</span>
       <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '请输入最大长度', trigger: 'change' }]" prop="maxlength">
@@ -87,6 +98,7 @@ onMounted(() => {
           :min="formValue.minlength > formValue.maxlength ? formValue.minlength : 1"
           :step="1"
           controls-position="right"
+          align="left"
           step-strictly
         />
       </el-form-item>

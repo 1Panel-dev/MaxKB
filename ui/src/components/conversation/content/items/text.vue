@@ -13,7 +13,7 @@ defineProps<{
 }>()
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .content-text :deep(.md-editor) {
   background: transparent;
 }

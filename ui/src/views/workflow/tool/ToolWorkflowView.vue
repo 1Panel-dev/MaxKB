@@ -7,14 +7,12 @@ import { cloneDeep } from 'lodash'
 import ModelApi from '@/api/admin/workspace/model/model'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
-import { RESOURCE_TYPE } from '@/api/enums'
 import type { ToolItem, ToolWorkflowDetail } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
-import { WorkflowMode, type ShapeItem } from '@/workflow-canvas/types'
-import CreateNodeMenu from './components/CreateNodeMenu.vue'
-import WorkflowViewLayout from './components/WorkflowViewLayout.vue'
+import { WorkflowMode } from '@/workflow-canvas/types'
+import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 
 defineOptions({ name: 'ToolWorkflowView' })
 
@@ -32,11 +30,6 @@ const toolId = route.params.toolId as string
 const workspaceId = route.params.workspaceId as string
 
 const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflowRef')
-
-/* 添加工作流组件 */
-function handleAddNode(shapeItem: ShapeItem) {
-  workflowRef.value?.addNode(shapeItem)
-}
 
 /* 工具工作流加载与保存 */
 const toolDetail = ref<ToolItem>()
@@ -118,7 +111,7 @@ function handleBack() {
   }
 
   // 保存失败时保留当前页面，避免丢失尚未写入服务端的画布数据。
-  MsgConfirm('当前工作流尚未保存，是否保存后退出？', undefined, {
+  MsgConfirm('提示', '当前工作流尚未保存，是否保存后退出？', {
     cancelButtonText: '直接退出',
     confirmButtonText: '保存并退出',
     confirmButtonType: 'primary',
@@ -140,7 +133,6 @@ onMounted(() => {
 <template>
   <WorkflowViewLayout :loading="loading" :title="toolDetail?.name" :save-time="saveTime" @back="handleBack">
     <template #actions>
-      <CreateNodeMenu :workflow-mode="WorkflowMode.Tool" @select="handleAddNode" />
       <el-button plain :loading="saving" :disabled="loading || saving" @click="handleSave"> 保存 </el-button>
     </template>
 

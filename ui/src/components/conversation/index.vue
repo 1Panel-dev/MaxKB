@@ -100,7 +100,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .conversation-plus {
   display: flex;
   height: 100%;

@@ -115,9 +115,7 @@ export const replyNode = {
   properties: { stepName: '指定回复', config: { fields: [{ label: '内容', value: 'answer' }] } },
 }
 
-/**
- * ai对话节点配置数据
- */
+/* ai对话节点配置数据 */
 export const aiChatNode = {
   type: WorkflowNodeType.AiChat,
   text: '与 AI 大模型进行对话',
@@ -129,6 +127,22 @@ export const aiChatNode = {
         { label: 'AI 回答内容', value: 'answer' },
         { label: '思考过程', value: 'reasoning_content' },
         { label: '历史聊天记录', value: 'history_message' },
+      ],
+    },
+  },
+}
+
+/* 意图识别节点配置数据 */
+export const intentNode = {
+  type: WorkflowNodeType.IntentNode,
+  text: '将用户问题与用户预设的意图分类进行匹配',
+  label: '意图识别',
+  properties: {
+    stepName: '意图识别',
+    config: {
+      fields: [
+        { label: '分类', value: 'category' },
+        { label: '理由', value: 'reason' },
       ],
     },
   },
@@ -394,21 +408,7 @@ export const toolNode = {
   properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
-export const intentNode = {
-  type: WorkflowNodeType.IntentNode,
-  text: '将用户问题与用户预设的意图分类进行匹配',
-  label: '意图识别',
-  height: 260,
-  properties: {
-    stepName: '意图识别',
-    config: {
-      fields: [
-        { label: '分类', value: 'category' },
-        { label: '理由', value: 'reason' },
-      ],
-    },
-  },
-}
+
 
 export const loopStartNode = {
   id: WorkflowNodeType.LoopStartNode,

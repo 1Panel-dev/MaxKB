@@ -2,6 +2,7 @@
 
 import { MODEL_STATUS } from '@/api/enums'
 import type { Dict } from './common'
+import type { DynamicFormField } from './common'
 
 export type ModelStatus = (typeof MODEL_STATUS)[keyof typeof MODEL_STATUS]
 
@@ -12,6 +13,8 @@ export interface ModelConfig {
   model_id?: string
   model_params_setting?: Dict<unknown>
 }
+
+export type DefaultModelSettingPayload = Partial<Record<DefaultModelType, ModelConfig>>
 
 export interface ModelProviderItem {
   icon: string
@@ -47,26 +50,6 @@ export interface ModelPayload {
   model_type: string
   name: string
   provider: string
-}
-
-export interface DynamicFormField {
-  attrs?: Record<string, unknown>
-  default_value?: unknown
-  field: string
-  input_type: string
-  label: string | DynamicFormLabel
-  option_list?: Record<string, unknown>[]
-  required?: boolean
-  text_field?: string
-  value_field?: string
-  [key: string]: unknown
-}
-
-export interface DynamicFormLabel {
-  attrs?: { tooltip?: string; [key: string]: unknown }
-  input_type: string
-  label: string
-  type?: string
 }
 
 export interface BaseModelOption {

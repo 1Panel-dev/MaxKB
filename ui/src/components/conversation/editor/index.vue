@@ -126,7 +126,7 @@ onMounted(() => {
 defineExpose({ clear, focus })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .md-editor {
   flex: 1;
   min-width: 0;

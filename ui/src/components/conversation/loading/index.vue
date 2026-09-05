@@ -17,7 +17,7 @@ withDefaults(
 )
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .loading-dots {
   display: flex;
   align-items: center;

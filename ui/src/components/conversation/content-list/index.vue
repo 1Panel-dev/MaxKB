@@ -29,7 +29,7 @@ const contents = computed(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .content-list {
   display: flex;
   flex-direction: column;

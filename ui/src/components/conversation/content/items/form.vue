@@ -52,7 +52,7 @@ const submit = async () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .content-form {
   background: #ffffff;
   border: 1px solid var(--el-border-color-lighter, #e4e7ed);

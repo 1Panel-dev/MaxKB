@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-
 import { ClickOutside as vClickOutside } from 'element-plus'
 import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
 import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
 import type { WorkflowMode } from '@/workflow-canvas/types'
 
-defineOptions({ name: 'WorkflowComponentMenu' })
+defineOptions({ name: 'WorkflowNodeAdd' })
 
 defineProps<{
   workflowMode: WorkflowMode
@@ -17,34 +16,38 @@ const emit = defineEmits<{
   select: [node: NodeMenuItem]
 }>()
 
-const popoverVisible = ref(false)
+const menuVisible = ref(false)
 const dragClosing = ref(false)
 
-const togglePopover = () => {
+function toggleMenu() {
   dragClosing.value = false
-  popoverVisible.value = !popoverVisible.value
+  menuVisible.value = !menuVisible.value
 }
 
-const handleSelect = (node: NodeMenuItem) => {
+function handleSelect(node: NodeMenuItem) {
   emit('select', node)
-  popoverVisible.value = false
+  menuVisible.value = false
 }
 
-const handleDragStart = (node: NodeMenuItem, event: PointerEvent) => {
+function handleDragStart(node: NodeMenuItem, event: PointerEvent) {
   emit('dragstart', node, event)
   dragClosing.value = true
-  popoverVisible.value = false
+  menuVisible.value = false
 }
 </script>
 
 <template>
-  <div v-click-outside="() => (popoverVisible = false)" class="relative">
-    <el-button plain @click="togglePopover"> 添加组件 </el-button>
+  <div v-click-outside="() => (menuVisible = false)" class="relative">
+    <el-tooltip content="添加组件" placement="left">
+      <el-button text @click="toggleMenu">
+        <MkIcon name="icon_more-add_filled" :size="18" />
+      </el-button>
+    </el-tooltip>
 
     <el-collapse-transition>
       <NodeMenu
-        v-show="popoverVisible"
-        class="absolute right-0 top-[calc(100%+8px)] z-[2000]"
+        v-show="menuVisible"
+        class="absolute -top-2 left-10 z-20"
         :class="{ 'pointer-events-none': dragClosing }"
         :workflow-mode="workflowMode"
         @dragstart="handleDragStart"

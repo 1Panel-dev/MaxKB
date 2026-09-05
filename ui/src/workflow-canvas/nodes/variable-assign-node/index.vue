@@ -14,9 +14,7 @@
           <el-form-item>
             <template #label>
               <div class="flex-between">
-                <div>
-                  变量<span class="color-danger">*</span>
-                </div>
+                <div>变量<span class="color-danger">*</span></div>
                 <el-button v-if="form_data.variable_list.length > 1" text @click="deleteVariable(index)">
                   <MkIcon name="icon_delete-trash_outlined" />
                 </el-button>
@@ -55,7 +53,7 @@
               <el-input v-model="item.value" placeholder="请输入内容" clearable @wheel="handleNodeWheel"></el-input>
             </el-form-item>
             <el-form-item v-else-if="item.type === 'num'" :prop="'variable_list.' + index + '.value'" class="w-full">
-              <el-input-number v-model="item.value" controls-position="right" class="w-full" />
+              <el-input-number v-model="item.value" controls-position="right" align="left" class="w-full" />
             </el-form-item>
             <el-form-item
               v-else-if="item.type === 'json'"

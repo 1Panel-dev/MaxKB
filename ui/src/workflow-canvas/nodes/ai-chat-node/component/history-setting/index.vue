@@ -32,6 +32,7 @@ function updateSetting(changes: Partial<HistorySetting>) {
       :model-value="setting.dialogue_number"
       class="w-full!"
       controls-position="right"
+      align="left"
       :min="0"
       :step="1"
       step-strictly
