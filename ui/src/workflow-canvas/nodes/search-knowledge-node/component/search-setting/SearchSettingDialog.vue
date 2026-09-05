@@ -76,6 +76,7 @@ defineExpose({ open })
             :step="0.1"
             :value-on-clear="0"
             controls-position="right"
+            align="left"
             class="w-full!"
           />
         </el-form-item>
@@ -87,6 +88,7 @@ defineExpose({ open })
             :precision="0"
             :value-on-clear="1"
             controls-position="right"
+            align="left"
             class="w-full!"
           />
         </el-form-item>

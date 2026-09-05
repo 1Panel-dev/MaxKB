@@ -635,7 +635,7 @@ provide('sendMessage', sendMessage)
 defineExpose({ scrollToBottom })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .chat-panel {
   flex: 1;
   min-width: 0;

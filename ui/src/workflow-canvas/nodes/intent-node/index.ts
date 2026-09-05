@@ -12,7 +12,7 @@ interface IntentNodeBranch {
 
 interface IntentNodeData {
   model_id: string
-  model_id_type: 'custom' | 'reference'
+  model_id_type: 'custom' | 'default' | 'reference'
   model_id_reference: string[]
   model_params_setting: Record<string, unknown>
   content_list: string[]
@@ -38,7 +38,7 @@ function defaultBranch(): IntentNodeBranch[] {
 function defaultNodeData(): IntentNodeData {
   return {
     model_id: '',
-    model_id_type: 'custom',
+    model_id_type: 'default',
     model_id_reference: [],
     model_params_setting: {},
     content_list: [],
@@ -83,8 +83,7 @@ class IntentNodeModel extends WorkflowNodeModel {
 
     if (!showNode) {
       // 收起后所有分支锚点归并为“其他”一个右锚点，节点只显示一个右锚点。
-      const mergeTarget =
-        branchList.find((branch) => branch.isOther) ?? branchList[branchList.length - 1]
+      const mergeTarget = branchList.find((branch) => branch.isOther) ?? branchList[branchList.length - 1]
       if (mergeTarget) {
         anchors.push({
           x: x + width / 2,

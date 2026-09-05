@@ -17,9 +17,4 @@ const language = computed(() => {
   <MdPreviewV3 class="mk-markdown-editor" :language="language" :code-foldable="false" v-bind="$attrs" />
 </template>
 
-<style scoped>
-:deep(audio) {
-  width: 300px;
-  height: 43px;
-}
-</style>
+<style scoped lang="scss"></style>

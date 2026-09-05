@@ -93,5 +93,6 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(layoutTh
   --el-card-padding: 40px;
   height: 526px;
   position: relative;
+  border: none;
 }
 </style>

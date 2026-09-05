@@ -4,6 +4,7 @@
   --mk-primary-rgb: 51 112 255;
   --mk-primary-gradient-end: #7f3bf5;
   --mk-primary-gradient: linear-gradient(180deg, var(--mk-primary) 0%, var(--mk-primary-gradient-end) 100%);
+  --mk-primary-transparent-10: rgb(var(--mk-primary-rgb) / 10%);
   --mk-danger: #f54a45;
   --mk-danger-rgb: 245 74 69;
   --mk-success: #34c724;

@@ -236,8 +236,8 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `application-detail/WorkspaceApplicationDetail.vue`                    | 工作空间智能体详情上下文与资源详情布局 |
 | `application-detail/overview/OverviewView.vue`                         | 智能体概览内容                         |
 | `application-detail/setting/SimpleSettingView.vue`                     | 简易智能体设置内容                     |
-| `workflow/ApplicationWorkflowView.vue`                                 | 智能体工作流页面头部与全屏画布         |
-| `workflow/ToolWorkflowView.vue`                                        | 工具工作流页面头部与全屏画布           |
+| `workflow/application/ApplicationWorkflowView.vue`                     | 智能体工作流页面头部与全屏画布         |
+| `workflow/tool/ToolWorkflowView.vue`                                   | 工具工作流页面头部与全屏画布           |
 | `chat/ChatView.vue`                                                    | Chat 入口的对话页面                    |
 | `error/NotFoundView.vue`                                               | Admin 未匹配路由和全局 404 页面        |
 | `home/HomeView.vue`                                                    | Workspace 首页                         |
@@ -280,9 +280,9 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 共同使用，统一全屏容器、页面头部、返回按钮、标题和保存时间展示。通过 `loading`、`title`、
 `saveTime` 传入展示状态，点击返回按钮触发 `back` 事件。
 
-`actions` 插槽用于添加组件、保存、调试等页面操作，默认插槽放置画布及页面浮层；画布继续使用
+`actions` 插槽用于默认模型设置、保存、调试等页面操作，默认插槽放置画布及页面浮层；画布继续使用
 `min-h-0 flex-1` 占满头部下方空间。页面保留画布 Ref、资源与模式配置、接口调用、保存和退出确认
-逻辑，布局组件只负责展示。
+逻辑，布局组件只负责展示。添加组件入口由画布右上角的 `AddNode` 统一提供，页面不再转发节点选择事件。
 
 ## 工作流默认模型设置
 
@@ -298,8 +298,8 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 通过 `modelValue` 接收详情配置；`disabled` 控制顶部按钮。
 编辑及参数弹窗只修改抽屉副本，通过 `save(settings)` 提交副本；取消或关闭时选择不保存，
 直接丢弃副本，详情中的原配置不受影响。API 与组件共用的模型类别
-`DefaultModelType` 和单项配置 `ModelConfig` 维护在 `api/types/model.ts`；按类别组织的配置直接使用
-`Partial<Record<DefaultModelType, ModelConfig>>`，不再声明与组件名称相近的配置集合类型。
+`DefaultModelType`、单项配置 `ModelConfig` 和按类别组织的 `DefaultModelSettingPayload` 维护在
+`api/types/model.ts`，避免在组件 Props、Emits 和状态中重复展开工具类型。
 `ApplicationWorkflowView` 用 `applicationDetail` 保存完整详情，用 `defaultModelSetting` 单独承接
 模型配置，在详情加载或保存成功后从接口的 `default_model_setting` 深拷贝回填，缺省为空对象。
 抽屉的 `save(settings)` 调用页面 `handleSaveDefaultModelSetting(settings)`，先暂存到

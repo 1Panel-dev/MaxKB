@@ -1,3 +1,6 @@
+@use '@logicflow/core/dist/index.css' as logicflow-core;
+@use '@logicflow/extension/lib/index.css' as logicflow-extension;
+
 .lf-node {
   foreignObject {
     overflow: visible;
@@ -71,5 +74,4 @@
     background: var(--el-color-warning);
     border: 2px solid var(--el-color-warning);
   }
-
 }

@@ -162,7 +162,7 @@ const confirmRename = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .sidebar {
   display: flex;
   flex-direction: column;

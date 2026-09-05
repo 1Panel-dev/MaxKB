@@ -27,7 +27,7 @@ watch(() => props.content.status, (status) => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .reasoning {
   width: 100%;
   margin-bottom: 8px;

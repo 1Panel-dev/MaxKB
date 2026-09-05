@@ -163,6 +163,7 @@ onMounted(() => {
           :min="0"
           :value-on-clear="0"
           controls-position="right"
+          align="left"
           class="w-full!"
           :step="1"
           :step-strictly="true"

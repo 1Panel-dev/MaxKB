@@ -192,7 +192,7 @@ function handleAfterDrop() {
       background: var(--mk-N900-transparent-10);
     }
     &:has(.mk-tree-node.is-current) {
-      background: rgb(var(--mk-primary-rgb) / 10%);
+      background: var(--mk-primary-transparent-10);
       color: var(--el-color-primary);
       font-weight: 500;
     }

@@ -2,7 +2,7 @@
 
 import type LogicFlow from '@logicflow/core'
 import { TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
-import type { DynamicFormField } from './model'
+import type { DynamicFormField } from './common'
 
 export type ToolScope = (typeof TOOL_SCOPE)[keyof typeof TOOL_SCOPE]
 export type ToolType = (typeof TOOL_TYPE)[keyof typeof TOOL_TYPE]

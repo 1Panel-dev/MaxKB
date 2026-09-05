@@ -7,14 +7,13 @@ import { Aim, Close, FullScreen } from '@element-plus/icons-vue'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
 import ModelApi from '@/api/admin/workspace/model/model'
-import type { ApplicationDetail } from '@/api/types'
+import type { ApplicationDetail, DefaultModelSettingPayload } from '@/api/types'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
-import { WorkflowMode, type ShapeItem } from '@/workflow-canvas/types'
-import DefaultModelSettingButton from './components/default-model-setting/DefaultModelSettingButton.vue'
-import CreateNodeMenu from './components/CreateNodeMenu.vue'
-import WorkflowViewLayout from './components/WorkflowViewLayout.vue'
+import { WorkflowMode } from '@/workflow-canvas/types'
+import DefaultModelSettingButton from '../components/default-model-setting/DefaultModelSettingButton.vue'
+import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import Conversation from '@/components/conversation/index.vue'
 
 defineOptions({ name: 'ApplicationWorkflowView' })
@@ -33,11 +32,6 @@ const applicationId = route.params.applicationId as string
 const workspaceId = route.params.workspaceId as string
 
 const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflowRef')
-
-/* 添加工作流组件 */
-function handleAddNode(shapeItem: ShapeItem) {
-  workflowRef.value?.addNode(shapeItem)
-}
 
 /* 智能体工作流加载与保存 */
 const applicationDetail = ref<ApplicationDetail>()
@@ -91,13 +85,13 @@ function handleSave() {
 }
 
 /* 应用默认模型设置：抽屉提交后暂存，保存失败时从详情回滚。 */
-const defaultModelSetting = ref<NonNullable<ApplicationDetail['default_model_setting']>>({})
+const defaultModelSetting = ref<DefaultModelSettingPayload>({})
 
 function handleApplyDefaultModelToAll(graphData: LogicFlow.GraphData) {
   workflowRef.value?.renderGraphData(graphData)
 }
 
-function handleSaveDefaultModelSetting(settings: NonNullable<ApplicationDetail['default_model_setting']>) {
+function handleSaveDefaultModelSetting(settings: DefaultModelSettingPayload) {
   defaultModelSetting.value = cloneDeep(settings)
   return handleSave()
 }
@@ -244,7 +238,7 @@ function handleBack() {
   }
 
   // 保存失败时保留当前页面，避免丢失尚未写入服务端的画布数据。
-  MsgConfirm('当前工作流尚未保存，是否保存后退出？', undefined, {
+  MsgConfirm('提示', '当前工作流尚未保存，是否保存后退出？', {
     cancelButtonText: '直接退出',
     confirmButtonText: '保存并退出',
     confirmButtonType: 'primary',
@@ -270,7 +264,6 @@ onMounted(() => {
 <template>
   <WorkflowViewLayout :loading="loading" :title="applicationDetail?.name" :save-time="saveTime" @back="handleBack">
     <template #actions>
-      <CreateNodeMenu :workflow-mode="WorkflowMode.Application" @select="handleAddNode" />
       <DefaultModelSettingButton
         :model-value="defaultModelSetting"
         :model-api="ModelApi"
@@ -337,7 +330,7 @@ onMounted(() => {
   </WorkflowViewLayout>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .workflow-debug-panel {
   position: absolute;
   top: calc(var(--mk-header-height) + 12px);

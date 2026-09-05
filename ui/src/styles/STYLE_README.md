@@ -418,7 +418,7 @@ Drawer 的 `header` 插槽内时，组合 `absolute-center` 和宽度工具类�
 
 ```scss
 .selected {
-  background: rgb(var(--mk-primary-rgb) / 10%);
+  background: rgb(var(--mk-N600-rgb) / 10%);
 }
 ```
 

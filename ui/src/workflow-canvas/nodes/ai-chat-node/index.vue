@@ -4,13 +4,14 @@ import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
+import ModelSelect from '@/components/business/model-select/index.vue'
+import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { isLastNode } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import HistorySetting from './component/history-setting/index.vue'
-import ModelSetting from './component/model-setting/index.vue'
 import PromptSetting from './component/prompt-setting/index.vue'
 import ReasoningSetting from './component/reasoning-setting/index.vue'
 import ResultSetting from './component/result-setting/index.vue'
@@ -18,6 +19,7 @@ import VisionSetting from './component/vision-setting/index.vue'
 import type {
   AiChatNodeForm,
   AiModelSetting as AiModelSettingValue,
+  AiModelSource,
   HistorySetting as HistorySettingValue,
   PromptSetting as PromptSettingValue,
   ReasoningSetting as ReasoningSettingValue,
@@ -34,7 +36,7 @@ const route = useRoute()
 const store = useWorkflowStore(apiType)
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const modelSettingRef = useTemplateRef<InstanceType<typeof ModelSetting>>('modelSettingRef')
+const modelCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('modelCascaderRef')
 const visionSettingRef = useTemplateRef<InstanceType<typeof VisionSetting>>('visionSettingRef')
 
 const modelOptions = ref<ModelItem[]>([])
@@ -118,6 +120,7 @@ const modelSetting = computed<AiModelSettingValue>(() => {
     model_params_setting: isDefaultModel ? (defaultModel?.model_params_setting ?? {}) : formData.value.model_params_setting,
   }
 })
+const modelFormProp = computed(() => (formData.value.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'))
 const promptSetting = computed<PromptSettingValue>(() => ({ prompt: formData.value.prompt, system: formData.value.system }))
 const historySetting = computed<HistorySettingValue>(() => ({
   dialogue_number: formData.value.dialogue_number,
@@ -141,11 +144,25 @@ function updateNodeData(setting: Partial<AiChatNodeForm>) {
   model.properties.node_data = { ...formData.value, ...setting }
 }
 
+function changeModelSource(source: AiModelSource) {
+  updateNodeData({ model_id_reference: [], model_id_type: source })
+}
+
+function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
+  const { model_id_type, model_id, model_id_reference } = modelSetting.value
+  if (model_id_type === 'reference') {
+    callback(model_id_reference.length ? undefined : new Error('请选择引用变量'))
+    return
+  }
+  callback(model_id ? undefined : new Error(model_id_type === 'default' ? '请在默认模型设置中选择 AI 模型' : '请选择 AI 模型'))
+}
 
 function validate() {
-  return Promise.all([modelSettingRef.value?.validate(), visionSettingRef.value?.validate(), formRef.value?.validate()]).catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
+  return Promise.all([
+    formData.value.model_id_type === 'reference' ? modelCascaderRef.value?.validate() : Promise.resolve(),
+    visionSettingRef.value?.validate(),
+    formRef.value?.validate(),
+  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
@@ -161,14 +178,48 @@ onMounted(() => {
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
         <!-- AI模型 -->
-        <ModelSetting
-          ref="modelSettingRef"
-          :model-options="modelOptions"
-          :node-model="model"
-          :provider-options="providerOptions"
-          :setting="modelSetting"
-          @update="updateNodeData"
-        />
+        <el-form-item class="mk-hide-asterisk" :prop="modelFormProp" :rules="{ validator: validateModel, trigger: 'change' }">
+          <template #label>
+            <div class="flex-between">
+              <span class="mk-required">AI 模型</span>
+              <el-select :model-value="formData.model_id_type" :teleported="false" class="w-22!" size="small" @update:model-value="changeModelSource">
+                <el-option label="默认模型" value="default" />
+                <el-option label="引用变量" value="reference" />
+                <el-option label="自定义" value="custom" />
+              </el-select>
+            </div>
+          </template>
+
+          <ModelSelect
+            v-if="formData.model_id_type === 'default'"
+            :model-value="modelSetting.model_id"
+            :model-params="modelSetting.model_params_setting"
+            disabled
+            :options="modelOptions"
+            :provider-options="providerOptions"
+            placeholder="未配置默认模型"
+          />
+          <ModelSelect
+            v-else-if="formData.model_id_type === 'custom'"
+            :model-value="formData.model_id"
+            :model-params="formData.model_params_setting"
+            can-edit-params
+            :options="modelOptions"
+            :provider-options="providerOptions"
+            placeholder="请选择 AI 模型"
+            @update:model-value="updateNodeData({ model_id: $event })"
+            @update:model-params="updateNodeData({ model_params_setting: $event })"
+          />
+          <NodeCascader
+            v-else
+            ref="modelCascaderRef"
+            :model-value="formData.model_id_reference"
+            :node-model="model"
+            class="w-full"
+            placeholder="请选择变量"
+            @update:model-value="updateNodeData({ model_id_reference: $event })"
+          />
+        </el-form-item>
 
         <PromptSetting :application-id="applicationId" :model-setting="modelSetting" :setting="promptSetting" @update="updateNodeData" />
 
@@ -178,7 +229,7 @@ onMounted(() => {
 
         <!-- <ResourceSetting :setting="resourceSetting" :show-applications="showApplications" @update="updateNodeData" /> -->
 
-        <ReasoningSetting :setting="formData.model_setting" @update="updateNodeData" />
+        <ReasoningSetting :setting="formData.model_setting" @update="updateNodeData({ model_setting: $event })" />
 
         <ResultSetting v-if="showConversationSettings" :enabled="formData.is_result" @update:enabled="formData.is_result = $event" />
       </el-form>
