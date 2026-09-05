@@ -64,9 +64,10 @@ class ConditionModel extends WorkflowNodeModel {
 
     return anchors
   }
-  setAttributes() {
+  override setAttributes() {
     super.setAttributes()
     this.width = 600
+    this.properties.width = 600
   }
 }
 

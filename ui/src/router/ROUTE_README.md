@@ -46,6 +46,8 @@ Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当
 地址、登录成功和从 System 返回 Workspace 时统一进入 `/admin/workspace/default`。父路由的
 `scope` 会合并到匹配的子路由 `meta` 中。
 
+触发器列表地址为 `/admin/workspace/:workspaceId/trigger`，渲染 `views/trigger/TriggerView.vue`。
+
 每个业务模块在 `admin/workspace/modules` 中独立维护。模块的列表、创建、详情、编辑等页面应放在同一个路由文件中。
 
 ### System

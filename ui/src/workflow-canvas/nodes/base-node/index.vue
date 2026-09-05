@@ -3,28 +3,16 @@ import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
+import ModelSelect from '@/components/business/model-select/index.vue'
 import type { FormField } from '@/components/mk-dynamics-form'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import ApiParameter from './component/api-parameter/index.vue'
 import ConversationVariable from './component/conversation-variable/index.vue'
-import FileUpload from './component/file-upload/index.vue'
-import LongTermMemory from './component/long-term-memory/index.vue'
-import SpeechInput from './component/speech-input/index.vue'
-import SpeechPlayback from './component/speech-playback/index.vue'
 import UserInput from './component/user-input/index.vue'
 import { defaultFileUploadSetting } from './constant'
-import {
-  type ApiInputField,
-  type BaseNodeForm,
-  type ChatInputField,
-  type FileUploadSetting,
-  type LongTermSetting,
-  type SpeechInputSetting,
-  type SpeechPlaybackSetting,
-  type UserInputSetting,
-} from './types'
+import { type ApiInputField, type BaseNodeForm, type ChatInputField, type UserInputSetting } from './types'
 
 defineOptions({ name: 'WorkflowBaseNode' })
 
@@ -37,7 +25,6 @@ const formRef = useTemplateRef<FormInstance>('formRef')
 
 const sttModelOptions = ref<ModelItem[]>([])
 const ttsModelOptions = ref<ModelItem[]>([])
-const llmModelOptions = ref<ModelItem[]>([])
 const providerOptions = ref<ModelProviderItem[]>([])
 
 const defaultForm: BaseNodeForm = {
@@ -64,24 +51,21 @@ const defaultForm: BaseNodeForm = {
   tts_type: 'BROWSER',
 }
 
-function normalizeForm(data: Partial<BaseNodeForm>) {
-  const savedData = cloneDeep(data)
-  const normalized = Object.assign(data, cloneDeep(defaultForm), savedData) as BaseNodeForm
-  normalized.file_upload_setting = { ...cloneDeep(defaultFileUploadSetting), ...(savedData.file_upload_setting ?? {}) }
-  normalized.long_term_trigger_setting = savedData.long_term_trigger_setting ?? { rounds: 10 }
-  normalized.long_term_model_params_setting = savedData.long_term_model_params_setting ?? {}
-  normalized.stt_model_params_setting = savedData.stt_model_params_setting ?? {}
-  normalized.tts_model_params_setting = savedData.tts_model_params_setting ?? {}
-  if (!normalized.stt_model_id_type) normalized.stt_model_id_type = 'default'
-  if (!normalized.long_term_model_id_type) normalized.long_term_model_id_type = 'default'
-  if (!normalized.tts_type) normalized.tts_type = 'BROWSER'
-  if ((normalized.tts_type as string) === 'TTS') normalized.tts_type = 'CUSTOM'
-  return normalized
-}
-
 // 节点初始化时补齐默认值和兼容旧数据，避免读取表单时改写响应式依赖。
-if (!model.properties.node_data) model.properties.node_data = cloneDeep(defaultForm)
-normalizeForm(model.properties.node_data as Partial<BaseNodeForm>)
+const savedForm = cloneDeep(model.properties.node_data) as Partial<BaseNodeForm> | undefined
+const savedTtsType = savedForm?.tts_type as string | undefined
+model.properties.node_data = {
+  ...cloneDeep(defaultForm),
+  ...savedForm,
+  file_upload_setting: { ...cloneDeep(defaultFileUploadSetting), ...(savedForm?.file_upload_setting ?? {}) },
+  long_term_model_id_type: savedForm?.long_term_model_id_type || 'default',
+  long_term_model_params_setting: savedForm?.long_term_model_params_setting ?? {},
+  long_term_trigger_setting: savedForm?.long_term_trigger_setting ?? { rounds: 10 },
+  stt_model_id_type: savedForm?.stt_model_id_type || 'default',
+  stt_model_params_setting: savedForm?.stt_model_params_setting ?? {},
+  tts_model_params_setting: savedForm?.tts_model_params_setting ?? {},
+  tts_type: savedTtsType === 'TTS' ? 'CUSTOM' : savedForm?.tts_type || 'BROWSER',
+}
 
 const formData = computed<BaseNodeForm>({
   get: () => model.properties.node_data as BaseNodeForm,
@@ -100,27 +84,8 @@ const conversationVariables = computed(() => (model.properties.chat_input_field_
 const userInputSetting = computed<UserInputSetting>(() =>
   cloneDeep((model.properties.user_input_field_list_setting as UserInputSetting | undefined) ?? { exposed_fields: [], menu_title: '更多设置' }),
 )
-const longTermSetting = computed<LongTermSetting>(() => ({
-  long_term_model_id: formData.value.long_term_model_id,
-  long_term_model_id_type: formData.value.long_term_model_id_type,
-  long_term_model_params_setting: formData.value.long_term_model_params_setting,
-  long_term_trigger_setting: formData.value.long_term_trigger_setting,
-  long_term_trigger_type: formData.value.long_term_trigger_type,
-}))
-const speechInputSetting = computed<SpeechInputSetting>(() => ({
-  stt_autosend: formData.value.stt_autosend,
-  stt_model_enable: formData.value.stt_model_enable,
-  stt_model_id: formData.value.stt_model_id,
-  stt_model_params_setting: formData.value.stt_model_params_setting,
-  stt_model_id_type: formData.value.stt_model_id_type,
-}))
-const speechPlaybackSetting = computed<SpeechPlaybackSetting>(() => ({
-  tts_autoplay: formData.value.tts_autoplay,
-  tts_model_enable: formData.value.tts_model_enable,
-  tts_model_id: formData.value.tts_model_id,
-  tts_model_params_setting: formData.value.tts_model_params_setting,
-  tts_type: formData.value.tts_type,
-}))
+const defaultSttModelSetting = computed(() => model.getDefaultModelConfig('STT'))
+const defaultTtsModelSetting = computed(() => model.getDefaultModelConfig('TTS'))
 
 function validateUserFieldReferences() {
   for (const userField of userInputFields.value) {
@@ -139,8 +104,14 @@ function validate() {
   if (formData.value.tts_model_enable && formData.value.tts_type === 'CUSTOM' && !formData.value.tts_model_id) {
     return Promise.reject({ node: model, errMessage: '请选择语音播放模型' })
   }
+  if (formData.value.tts_model_enable && formData.value.tts_type === 'DEFAULT' && !defaultTtsModelSetting.value?.model_id) {
+    return Promise.reject({ node: model, errMessage: '请在默认模型设置中选择语音合成模型' })
+  }
   if (formData.value.stt_model_enable && formData.value.stt_model_id_type === 'custom' && !formData.value.stt_model_id) {
     return Promise.reject({ node: model, errMessage: '请选择语音输入模型' })
+  }
+  if (formData.value.stt_model_enable && formData.value.stt_model_id_type === 'default' && !defaultSttModelSetting.value?.model_id) {
+    return Promise.reject({ node: model, errMessage: '请在默认模型设置中选择语音识别模型' })
   }
   if (formData.value.long_term_enable && formData.value.long_term_model_id_type === 'custom' && !formData.value.long_term_model_id) {
     return Promise.reject({ node: model, errMessage: '请选择长期记忆模型' })
@@ -149,27 +120,17 @@ function validate() {
 }
 
 // 子模块数据更新
-function updateLongTermEnabled(enabled: boolean) {
-  formData.value.long_term_enable = enabled
+function changeLongTermEnabled(enabled: boolean | number | string) {
+  formData.value.long_term_enable = Boolean(enabled)
   if (enabled && !formData.value.long_term_model_id_type) formData.value.long_term_model_id_type = 'default'
   model.graphModel.eventCenter.emit('refreshLongTermConfig', undefined)
 }
 
-function updateLongTermSetting(setting: LongTermSetting) {
-  Object.assign(formData.value, setting)
-  model.graphModel.eventCenter.emit('refreshLongTermConfig', undefined)
-}
-
-function updateFileUploadEnabled(enabled: boolean) {
-  formData.value.file_upload_enable = enabled
+function changeFileUploadEnabled(enabled: boolean | number | string) {
+  formData.value.file_upload_enable = Boolean(enabled)
   if (enabled && !formData.value.file_upload_setting) {
     formData.value.file_upload_setting = cloneDeep(defaultFileUploadSetting)
   }
-  model.graphModel.eventCenter.emit('refreshFileUploadConfig', undefined)
-}
-
-function updateFileUploadSetting(setting: FileUploadSetting) {
-  formData.value.file_upload_setting = setting
   model.graphModel.eventCenter.emit('refreshFileUploadConfig', undefined)
 }
 
@@ -192,12 +153,15 @@ function updateConversationVariables(fields: ChatInputField[]) {
   model.graphModel.eventCenter.emit('chatFieldList', undefined)
 }
 
-function updateSpeechInput(setting: Partial<SpeechInputSetting>) {
-  Object.assign(formData.value, setting)
+function changeSpeechInputEnabled(enabled: boolean | number | string) {
+  if (!enabled) formData.value.stt_model_id = ''
+  if (!formData.value.stt_model_id_type) formData.value.stt_model_id_type = 'default'
 }
 
-function updateSpeechPlayback(setting: Partial<SpeechPlaybackSetting>) {
-  Object.assign(formData.value, setting)
+function changeSpeechPlaybackEnabled(enabled: boolean | number | string) {
+  if (enabled) return
+  formData.value.tts_model_id = ''
+  formData.value.tts_type = 'BROWSER'
 }
 
 onMounted(() => {
@@ -209,7 +173,6 @@ onMounted(() => {
 
   store.getModelList({ model_type: 'STT' }).then((models) => (sttModelOptions.value = models))
   store.getModelList({ model_type: 'TTS' }).then((models) => (ttsModelOptions.value = models))
-  store.getModelList({ model_type: 'LLM' }).then((models) => (llmModelOptions.value = models))
   store.getProviderList().then((providers) => (providerOptions.value = providers))
 })
 </script>
@@ -236,24 +199,42 @@ onMounted(() => {
       </el-form-item>
 
       <!-- 长期记忆 -->
-      <LongTermMemory
-        :enabled="formData.long_term_enable"
-        :model-options="llmModelOptions"
-        :provider-options="providerOptions"
-        :setting="longTermSetting"
-        @update:enabled="updateLongTermEnabled"
-        @update:setting="updateLongTermSetting"
-      />
+      <div class="mb-4 flex-between">
+        <span class="flex items-center gap-1">
+          长期记忆
+          <el-tooltip
+            content="开启后，从开启时间记录新对话并按周期生成记忆，可通过 {{开始.memory}} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。"
+            placement="right"
+          >
+            <MkIcon name="icon_info_outlined" class="text-N600!" />
+          </el-tooltip>
+        </span>
+        <span class="flex items-center gap-2">
+          <!-- // TODO 长期记忆设置 -->
+          <el-button v-if="formData.long_term_enable" text type="primary">
+            <MkIcon name="icon-setting" />
+          </el-button>
+          <el-switch :model-value="formData.long_term_enable" size="small" @change="changeLongTermEnabled" />
+        </span>
+      </div>
 
-      <!-- 文件上传 -->
-      <FileUpload
-        :enabled="formData.file_upload_enable"
-        :setting="formData.file_upload_setting"
-        @update:enabled="updateFileUploadEnabled"
-        @update:setting="updateFileUploadSetting"
-      />
+      <div class="mb-4 flex-between w-full">
+        <span class="flex items-center gap-1">
+          文件上传
+          <el-tooltip content="开启后，问答页面会显示上传文件的按钮。" placement="right">
+            <MkIcon name="icon_info_outlined" class="text-N600!" />
+          </el-tooltip>
+        </span>
+        <span class="flex items-center gap-2">
+          <!-- // TODO 文件上传设置 -->
+          <el-button v-if="formData.file_upload_enable" text type="primary">
+            <MkIcon name="icon-setting" />
+          </el-button>
+          <el-switch :model-value="formData.file_upload_enable" size="small" @change="changeFileUploadEnabled" />
+        </span>
+      </div>
 
-      <!-- 用户输入 -->
+      <!-- 用户输入 TODO 整理 -->
       <UserInput
         :api-fields="apiInputFields"
         :fields="userInputFields"
@@ -262,21 +243,81 @@ onMounted(() => {
         @update:fields="updateUserInputFields"
         @update:setting="updateUserInputSetting"
       />
-
+      <!-- 接口传参 TODO 整理 -->
       <ApiParameter :fields="apiInputFields" :user-fields="userInputFields" @update:fields="updateApiInputFields" />
 
+      <!-- 会话变量 TODO 整理 -->
       <ConversationVariable :fields="conversationVariables" @update:fields="updateConversationVariables" />
 
-      <SpeechInput :model-options="sttModelOptions" :provider-options="providerOptions" :setting="speechInputSetting" @update="updateSpeechInput" />
+      <!-- 语音输入 -->
+      <div class="flex-between mb-2">
+        <span>语音输入</span>
+        <span class="flex items-center gap-3">
+          <el-checkbox v-if="formData.stt_model_enable" v-model="formData.stt_autosend">自动发送</el-checkbox>
+          <el-switch v-model="formData.stt_model_enable" size="small" @change="changeSpeechInputEnabled" />
+        </span>
+      </div>
+      <el-form-item>
+        <template v-if="formData.stt_model_enable">
+          <el-radio-group v-model="formData.stt_model_id_type" class="mb-2">
+            <el-radio value="default">默认模型</el-radio>
+            <el-radio value="custom">自定义</el-radio>
+          </el-radio-group>
+          <ModelSelect
+            v-if="formData.stt_model_id_type === 'default'"
+            :model-value="defaultSttModelSetting?.model_id ?? ''"
+            :model-params="defaultSttModelSetting?.model_params_setting ?? {}"
+            disabled
+            :options="sttModelOptions"
+            :provider-options="providerOptions"
+            placeholder="未配置默认模型"
+          />
+          <ModelSelect
+            v-else
+            v-model="formData.stt_model_id"
+            v-model:model-params="formData.stt_model_params_setting"
+            can-edit-params
+            :options="sttModelOptions"
+            :provider-options="providerOptions"
+          />
+        </template>
+      </el-form-item>
 
-      <SpeechPlayback
-        :model-options="ttsModelOptions"
-        :provider-options="providerOptions"
-        :setting="speechPlaybackSetting"
-        @update="updateSpeechPlayback"
-      />
+      <!-- 语音播放 -->
+      <div class="flex-between mb-2">
+        <span>语音播放</span>
+        <span class="flex items-center gap-3">
+          <el-checkbox v-if="formData.tts_model_enable" v-model="formData.tts_autoplay">自动播放</el-checkbox>
+          <el-switch v-model="formData.tts_model_enable" size="small" @change="changeSpeechPlaybackEnabled" />
+        </span>
+      </div>
+
+      <el-form-item class="mb-0!">
+        <template v-if="formData.tts_model_enable">
+          <el-radio-group v-model="formData.tts_type" class="mb-2">
+            <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
+            <el-radio value="DEFAULT">默认模型</el-radio>
+            <el-radio value="CUSTOM">自定义</el-radio>
+          </el-radio-group>
+          <ModelSelect
+            v-if="formData.tts_type === 'DEFAULT'"
+            :model-value="defaultTtsModelSetting?.model_id ?? ''"
+            :model-params="defaultTtsModelSetting?.model_params_setting ?? {}"
+            disabled
+            :options="ttsModelOptions"
+            :provider-options="providerOptions"
+            placeholder="未配置默认模型"
+          />
+          <ModelSelect
+            v-else-if="formData.tts_type === 'CUSTOM'"
+            v-model="formData.tts_model_id"
+            v-model:model-params="formData.tts_model_params_setting"
+            can-edit-params
+            :options="ttsModelOptions"
+            :provider-options="providerOptions"
+          />
+        </template>
+      </el-form-item>
     </el-form>
   </NodeContainer>
 </template>
-
-<style lang="scss" scoped></style>

@@ -114,8 +114,8 @@ defineExpose({ getData, render, validate })
 <template>
   <div class="w-full space-y-4">
     <el-radio-group v-model="formData.action">
-      <el-radio value="show">满足条件时显示</el-radio>
-      <el-radio value="hide">满足条件时隐藏</el-radio>
+      <el-radio value="show">显示条件</el-radio>
+      <el-radio value="hide">隐藏条件</el-radio>
     </el-radio-group>
 
     <div class="flex align-center gap-2">
@@ -129,7 +129,7 @@ defineExpose({ getData, render, validate })
 
     <el-scrollbar>
       <div style="max-height: calc(100vh - 400px)">
-        <MkFormList v-model="conditionRows" :default-item="defaultCondition" :first-row-has-label="false">
+        <MkFormList v-model="conditionRows" :default-item="defaultCondition" :firstRowHasLabel="false">
           <template #default="{ item: condition }">
             <ConditionRow :model-value="condition" :left-options="leftOptions" />
           </template>

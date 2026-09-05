@@ -859,7 +859,7 @@ const roleSettings = defineModel<{ roleId: string; workspaceIds: string[] }[]>({
 
 `addText` 设置添加按钮文案，`showAddButton` 默认为 `true`；添加入口由业务布局单独提供时传入
 `:show-add-button="false"`。`firstRowHasLabel` 默认为 `true`：第一行删除按钮使用 `mt-8`，后续行
-使用 `mt-0.5`；并列表单项没有 label 时传入 `:first-row-has-label="false"`。删除成功后通过
+使用 `mt-0.5`；并列表单项没有 label 时传入 `:firstRowHasLabel="false"`。删除成功后通过
 `remove(item, index)` 返回被删除的行数据和原索引，业务组件可处理关联状态，不需要再次修改列表。
 
 ### MkSearchList

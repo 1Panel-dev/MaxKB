@@ -163,11 +163,13 @@ function openModelParams() {
         </slot>
       </template>
     </el-select>
-    <div v-if="canEditParams" class="absolute inset-y-px right-3 flex items-center gap-3">
+    <div v-if="canEditParams" class="absolute inset-y-px right-3 flex items-center gap-2">
       <el-divider direction="vertical" />
-      <el-button link :disabled="disabled || !modelValue" title="模型参数设置" @click.stop="openModelParams">
-        <MkIcon name="icon_preferences_outlined" />
-      </el-button>
+      <el-tooltip content="模型参数设置" placement="top" :disabled="disabled || !modelValue">
+        <el-button text class="-mr-1" :disabled="disabled || !modelValue" @click.stop="openModelParams">
+          <MkIcon name="icon_preferences_outlined" />
+        </el-button>
+      </el-tooltip>
     </div>
   </div>
   <ModelParamsDialog v-if="canEditParams" ref="modelParamsDialogRef" @submit="emit('update:modelParams', $event)" />
@@ -177,7 +179,7 @@ function openModelParams() {
 /* 参数入口与选择器共用外边框，为原生下拉箭头和清空按钮预留空间。 */
 .model-select--with-params {
   :deep(.el-select__wrapper) {
-    padding-right: calc(var(--spacing) * 14);
+    padding-right: calc(var(--spacing) * 13);
   }
 }
 </style>

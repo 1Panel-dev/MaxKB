@@ -105,13 +105,6 @@ export const toolStartNode = {
 
 // 以上是默认基础节点
 
-export const replyNode = {
-  type: WorkflowNodeType.Reply,
-  text: '指定回复内容，引用变量会转换为字符串进行输出',
-  label: '指定回复',
-  properties: { stepName: '指定回复', config: { fields: [{ label: '内容', value: 'answer' }] } },
-}
-
 /* ai对话节点配置数据 */
 export const aiChatNode = {
   type: WorkflowNodeType.AiChat,
@@ -217,129 +210,23 @@ export const questionNode = {
   properties: { stepName: '问题优化', config: { fields: [{ label: '问题优化结果', value: 'answer' }] } },
 }
 
-export const dataSourceLocalNode = {
-  type: WorkflowNodeType.DataSourceLocalNode,
-  x: 360,
-  y: 2761.3875,
-  text: '上传本地文档，输出文档列表（不解析内容，需配合 “文档内容提取” 节点解析）',
-  label: '本地文件',
-  properties: {
-    kind: WorkflowKind.DataSource,
-    height: 728.375,
-    stepName: '本地文件',
-    input_field_list: [],
-    config: { fields: [{ label: '文件列表', value: 'file_list' }] },
-    showNode: true,
-    user_input_config: {},
-    user_input_field_list: [],
-  },
+/* 指定回复 */
+export const replyNode = {
+  type: WorkflowNodeType.Reply,
+  text: '指定回复内容，引用变量会转换为字符串进行输出',
+  label: '指定回复',
+  properties: { stepName: '指定回复', config: { fields: [{ label: '内容', value: 'answer' }] } },
 }
 
-export const dataSourceWebNode = {
-  id: WorkflowNodeType.DataSourceWebNode,
-  type: WorkflowNodeType.DataSourceWebNode,
-  x: 360,
-  y: 2761.3875,
-  text: '输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表',
-  label: 'Web 站点',
-  properties: {
-    kind: WorkflowKind.DataSource,
-    height: 180,
-    stepName: 'Web 站点',
-    config: { fields: [{ label: '文档列表', value: 'document_list' }] },
-  },
-}
-
-export const knowledgeWriteNode = {
-  type: WorkflowNodeType.KnowledgeWriteNode,
-  text: '将输入的分段列表写入当前知识库，并完成向量化处理',
-  label: '知识库写入',
-  height: 100,
-  properties: { stepName: '知识库写入', config: { fields: [] } },
-}
-
-/**
- * 知识库检索配置数据
- */
-export const searchKnowledgeNode = {
-  type: WorkflowNodeType.SearchKnowledge,
-  text: '关联知识库，查找与问题相关的分段',
-  label: '知识库检索',
-  height: 355,
-  properties: {
-    stepName: '知识库检索',
-    config: {
-      fields: [
-        { label: '检索结果的分段列表', value: 'paragraph_list' },
-        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
-        { label: '检索结果', value: 'data' },
-        { label: '满足直接回答的分段内容', value: 'directly_return' },
-      ],
-    },
-  },
-}
-
-/**
- * 文档标签检索
- */
-export const searchDocumentNode = {
-  type: WorkflowNodeType.SearchDocument,
-  text: '从设定的检索范围中，根据文档标签检索出满足条件的文档',
-  label: '文档标签检索',
-  height: 355,
-  properties: {
-    width: 600,
-    stepName: '文档标签检索',
-    config: {
-      fields: [
-        { label: '知识库列表', value: 'knowledge_list' },
-        { label: '文档列表', value: 'document_list' },
-      ],
-    },
-  },
-}
-
-export const variableSplittingNode = {
-  type: WorkflowNodeType.VariableSplittingNode,
-  text: '通过配置JSON Path 表达式，对输入的 JSON 格式变量进行解析和拆分',
-  label: '变量拆分',
-  height: 345,
-  properties: { stepName: '变量拆分', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
-
-export const parameterExtractionNode = {
-  type: WorkflowNodeType.ParameterExtractionNode,
-  text: '利用 AI 模型提取结构化参数',
-  label: '参数提取',
-  height: 345,
-  properties: { width: 430, stepName: '参数提取', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
-
+/* 判断器 */
 export const conditionNode = {
   type: WorkflowNodeType.Condition,
   text: '根据不同条件执行不同的节点',
   label: '判断器',
-  height: 175,
-  properties: { width: 600, stepName: '判断器', config: { fields: [{ label: '分支名称', value: 'branch_name' }] } },
+  properties: { stepName: '判断器', config: { fields: [{ label: '分支名称', value: 'branch_name' }] } },
 }
 
-export const rerankerNode = {
-  type: WorkflowNodeType.RerankerNode,
-  text: '使用重排模型对多个知识库的检索结果进行二次召回',
-  label: '多路召回',
-  height: 252,
-  properties: {
-    stepName: '多路召回',
-    config: {
-      fields: [
-        { label: '重排结果列表', value: 'result_list' },
-        { label: '重排结果', value: 'result' },
-        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
-      ],
-    },
-  },
-}
-
+/* 表单收集 */
 export const formNode = {
   type: WorkflowNodeType.FormNode,
   text: '在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程',
@@ -359,6 +246,98 @@ ${'填写后请点击【提交】按钮进行提交。'}`,
   },
 }
 
+/* 变量聚合 */
+export const variableAggregationNode = {
+  type: WorkflowNodeType.VariableAggregationNode,
+  text: '按聚合策略聚合每组的变量',
+  label: '变量聚合',
+  height: 252,
+  properties: { stepName: '变量聚合', config: { fields: [] } },
+}
+
+/* 变量赋值 */
+export const variableAssignNode = {
+  type: WorkflowNodeType.VariableAssignNode,
+  text: '更新全局变量的值',
+  label: '变量赋值',
+  height: 252,
+  properties: { stepName: '变量赋值', config: {} },
+}
+
+/* 变量拆分 */
+export const variableSplittingNode = {
+  type: WorkflowNodeType.VariableSplittingNode,
+  text: '通过配置JSON Path 表达式，对输入的 JSON 格式变量进行解析和拆分',
+  label: '变量拆分',
+  height: 345,
+  properties: { stepName: '变量拆分', config: { fields: [{ label: '结果', value: 'result' }] } },
+}
+
+/* 参数提取 */
+export const parameterExtractionNode = {
+  type: WorkflowNodeType.ParameterExtractionNode,
+  text: '利用 AI 模型提取结构化参数',
+  label: '参数提取',
+  height: 345,
+  properties: { width: 430, stepName: '参数提取', config: { fields: [{ label: '结果', value: 'result' }] } },
+}
+
+/* 多路召回 */
+export const rerankerNode = {
+  type: WorkflowNodeType.RerankerNode,
+  text: '使用重排模型对多个知识库的检索结果进行二次召回',
+  label: '多路召回',
+  height: 252,
+  properties: {
+    stepName: '多路召回',
+    config: {
+      fields: [
+        { label: '重排结果列表', value: 'result_list' },
+        { label: '重排结果', value: 'result' },
+        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
+      ],
+    },
+  },
+}
+
+/* 知识库检索 */
+export const searchKnowledgeNode = {
+  type: WorkflowNodeType.SearchKnowledge,
+  text: '关联知识库，查找与问题相关的分段',
+  label: '知识库检索',
+  height: 355,
+  properties: {
+    stepName: '知识库检索',
+    config: {
+      fields: [
+        { label: '检索结果的分段列表', value: 'paragraph_list' },
+        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
+        { label: '检索结果', value: 'data' },
+        { label: '满足直接回答的分段内容', value: 'directly_return' },
+      ],
+    },
+  },
+}
+
+/* 文档标签检索 */
+export const searchDocumentNode = {
+  type: WorkflowNodeType.SearchDocument,
+  text: '从设定的检索范围中，根据文档标签检索出满足条件的文档',
+  label: '文档标签检索',
+  height: 355,
+  properties: {
+    width: 600,
+    stepName: '文档标签检索',
+    config: {
+      fields: [
+        { label: '知识库列表', value: 'knowledge_list' },
+        { label: '文档列表', value: 'document_list' },
+      ],
+    },
+  },
+}
+
+/* 文档内容提取 */
 export const documentExtractNode = {
   type: WorkflowNodeType.DocumentExtractNode,
   text: '解析输入文档，输出结构化文档内容',
@@ -375,30 +354,7 @@ export const documentExtractNode = {
   },
 }
 
-export const documentSplitNode = {
-  type: WorkflowNodeType.DocumentSplitNode,
-  text: '按分段策略拆分输入文档内容，输出分段文本列表',
-  label: '文档分段',
-  height: 252,
-  properties: { width: 500, stepName: '文档分段', config: { fields: [{ label: '分段列表', value: 'paragraph_list' }] } },
-}
-
-export const variableAggregationNode = {
-  type: WorkflowNodeType.VariableAggregationNode,
-  text: '按聚合策略聚合每组的变量',
-  label: '变量聚合',
-  height: 252,
-  properties: { stepName: '变量聚合', config: { fields: [] } },
-}
-
-export const variableAssignNode = {
-  type: WorkflowNodeType.VariableAssignNode,
-  text: '更新全局变量的值',
-  label: '变量赋值',
-  height: 252,
-  properties: { stepName: '变量赋值', config: {} },
-}
-
+/* MCP 调用 */
 export const mcpNode = {
   type: WorkflowNodeType.McpNode,
   text: '通过 SSE/Streamable HTTP 方式执行MCP服务中的工具',
@@ -407,14 +363,23 @@ export const mcpNode = {
   properties: { stepName: 'MCP 调用', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
-/**
- * 自定义工具配置数据
- */
-export const toolNode = {
+/* 自定义工具 */
+export const toolCustomNode = {
   type: WorkflowNodeType.ToolLibCustom,
   text: '通过执行自定义脚本，实现数据处理',
   label: '自定义工具',
   height: 260,
+  properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
+}
+
+/**
+ * 工具配置数据
+ */
+export const toolLibNode = {
+  type: WorkflowNodeType.ToolLib,
+  text: '通过执行自定义脚本，实现数据处理',
+  label: '自定义工具',
+  height: 170,
   properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
@@ -477,25 +442,12 @@ export const loopContinueNode = {
   properties: { width: 600, stepName: 'Continue', config: { fields: [] } },
 }
 
-
-
 export const loopBreakNode = {
   type: WorkflowNodeType.LoopBreakNode,
   text: '终止当前循环，跳出循环体',
   label: 'Break',
   height: 100,
   properties: { width: 600, stepName: 'Break', config: { fields: [] } },
-}
-
-/**
- * 工具配置数据
- */
-export const toolLibNode = {
-  type: WorkflowNodeType.ToolLib,
-  text: '通过执行自定义脚本，实现数据处理',
-  label: '自定义工具',
-  height: 170,
-  properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
 /**
@@ -515,4 +467,54 @@ export const applicationNode = {
   label: '智能体节点',
   height: 260,
   properties: { stepName: '智能体节点', config: { fields: [{ label: '结果', value: 'result' }] } },
+}
+
+/* 文档分段 */
+export const documentSplitNode = {
+  type: WorkflowNodeType.DocumentSplitNode,
+  text: '按分段策略拆分输入文档内容，输出分段文本列表',
+  label: '文档分段',
+  height: 252,
+  properties: { width: 500, stepName: '文档分段', config: { fields: [{ label: '分段列表', value: 'paragraph_list' }] } },
+}
+
+export const dataSourceLocalNode = {
+  type: WorkflowNodeType.DataSourceLocalNode,
+  x: 360,
+  y: 2761.3875,
+  text: '上传本地文档，输出文档列表（不解析内容，需配合 “文档内容提取” 节点解析）',
+  label: '本地文件',
+  properties: {
+    kind: WorkflowKind.DataSource,
+    height: 728.375,
+    stepName: '本地文件',
+    input_field_list: [],
+    config: { fields: [{ label: '文件列表', value: 'file_list' }] },
+    showNode: true,
+    user_input_config: {},
+    user_input_field_list: [],
+  },
+}
+
+export const dataSourceWebNode = {
+  id: WorkflowNodeType.DataSourceWebNode,
+  type: WorkflowNodeType.DataSourceWebNode,
+  x: 360,
+  y: 2761.3875,
+  text: '输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表',
+  label: 'Web 站点',
+  properties: {
+    kind: WorkflowKind.DataSource,
+    height: 180,
+    stepName: 'Web 站点',
+    config: { fields: [{ label: '文档列表', value: 'document_list' }] },
+  },
+}
+
+export const knowledgeWriteNode = {
+  type: WorkflowNodeType.KnowledgeWriteNode,
+  text: '将输入的分段列表写入当前知识库，并完成向量化处理',
+  label: '知识库写入',
+  height: 100,
+  properties: { stepName: '知识库写入', config: { fields: [] } },
 }

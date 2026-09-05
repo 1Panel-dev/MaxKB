@@ -20,7 +20,7 @@ const getData = () => {
       max: formValue.value.max,
       step: formValue.value.step,
       precision: formValue.value.precision,
-      'show-input-controls': false,
+      'show-input-controls': true,
       'show-input': formValue.value.showInput,
     },
     props_info: { rules: [{ message: `请输入 ${formValue.value.label}`, trigger: 'blur', required: formValue.value.required }] },
@@ -114,7 +114,6 @@ onBeforeMount(() => {
     <el-slider
       v-model="formValue.default_value"
       :show-input="formValue.showInput"
-      :show-input-controls="false"
       :max="formValue.max"
       :min="formValue.min"
       :step="formValue.step === 0 ? 0.1 : formValue.step"

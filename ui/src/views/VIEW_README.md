@@ -259,6 +259,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面             |
 | `system/operate-logs/OperateLogListView.vue`                           | 系统操作日志查询与清理页面             |
 | `system/shared-resources/SharedModelview.vue`                          | System 共享模型查询与模型卡片页面      |
+| `trigger/TriggerView.vue` | 工作空间触发器筛选与分页列表 |
 | `tool/ToolView.vue`                                                    | 工作空间工具目录与工具卡片页面         |
 
 ## 备注要求
