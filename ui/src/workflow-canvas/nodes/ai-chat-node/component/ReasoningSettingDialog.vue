@@ -2,7 +2,7 @@
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
-import type { ReasoningSetting } from '../../types'
+import type { ReasoningSetting } from '../types'
 
 defineOptions({ name: 'AiChatNodeReasoningSettingDialog' })
 

@@ -1,6 +1,6 @@
 <template>
-  <el-avatar class="avatar-gradient" shape="square">
-    <img src="@/assets/workflow/icon_ai_chat.svg" style="width: 75%" alt="" />
+  <el-avatar class="bg-blue!" shape="square">
+    <img src="@/assets/workflow/icon_image-generate.svg" style="width: 64%" alt="" />
   </el-avatar>
 </template>
 <script setup lang="ts"></script>

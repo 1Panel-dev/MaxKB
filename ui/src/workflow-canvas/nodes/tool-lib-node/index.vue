@@ -30,10 +30,12 @@ const model = getModel()
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 
-const toolLibNodeData = (model.properties.node_data ?? {}) as Partial<ToolLibNodeForm>
-const shouldInitializeResult = toolLibNodeData.is_result === undefined
-if (!Array.isArray(toolLibNodeData.input_field_list)) toolLibNodeData.input_field_list = []
-model.properties.node_data = toolLibNodeData as ToolLibNodeForm
+const savedForm = model.properties.node_data as Partial<ToolLibNodeForm> | undefined
+model.properties.node_data = {
+  ...savedForm,
+  input_field_list: Array.isArray(savedForm?.input_field_list) ? savedForm.input_field_list : [],
+  is_result: savedForm ? savedForm.is_result : false,
+}
 
 const formData = computed<ToolLibNodeForm>({
   get: () => model.properties.node_data as ToolLibNodeForm,
@@ -84,7 +86,7 @@ function refreshToolFields() {
 }
 
 onMounted(() => {
-  if (shouldInitializeResult) formData.value.is_result = isLastNode(model)
+  if (formData.value.is_result === undefined && isLastNode(model)) formData.value.is_result = true
   refreshToolFields()
   model.validate = validate
 })

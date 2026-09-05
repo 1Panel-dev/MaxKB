@@ -105,9 +105,6 @@ export const toolStartNode = {
 
 // 以上是默认基础节点
 
-
-
-
 export const replyNode = {
   type: WorkflowNodeType.Reply,
   text: '指定回复内容，引用变量会转换为字符串进行输出',
@@ -146,6 +143,78 @@ export const intentNode = {
       ],
     },
   },
+}
+
+/* 语音转文本节点 */
+export const speechToTextNode = {
+  type: WorkflowNodeType.SpeechToTextNode,
+  text: '将音频通过语音识别模型转换为文本',
+  label: '语音转文本',
+  properties: { stepName: '语音转文本', config: { fields: [{ label: '结果', value: 'result' }] } },
+}
+
+/* 文本转语音节点 */
+export const textToSpeechNode = {
+  type: WorkflowNodeType.TextToSpeechNode,
+  text: '将文本通过语音合成模型转换为音频',
+  label: '文本转语音',
+  properties: { stepName: '文本转语音', config: { fields: [{ label: '结果', value: 'result' }] } },
+}
+
+/* 图片生成节点 */
+export const imageGenerateNode = {
+  type: WorkflowNodeType.ImageGenerateNode,
+  text: '根据提供的文本内容生成图片',
+  label: '图片生成',
+  properties: {
+    stepName: '图片生成',
+    config: {
+      fields: [
+        { label: 'AI 回答内容', value: 'answer' },
+        { label: '图片', value: 'image' },
+      ],
+    },
+  },
+}
+
+/* 图生视频节点 */
+export const imageToVideoNode = {
+  type: WorkflowNodeType.ImageToVideoGenerateNode,
+  text: '根据提供的图片生成视频',
+  label: '图生视频',
+  properties: { stepName: '图生视频', config: { fields: [{ label: '视频', value: 'video' }] } },
+}
+
+/* 文生视频节点 */
+export const textToVideoNode = {
+  type: WorkflowNodeType.TextToVideoGenerateNode,
+  text: '根据提供的文本内容生成视频',
+  label: '文生视频',
+  properties: { stepName: '文生视频', config: { fields: [{ label: '视频', value: 'video' }] } },
+}
+
+/* 图片理解节点 */
+export const imageUnderstandNode = {
+  type: WorkflowNodeType.ImageUnderstandNode,
+  text: '识别出图片中的对象、场景等信息回答用户问题',
+  label: '图片理解',
+  properties: { stepName: '图片理解', config: { fields: [{ label: 'AI 回答内容', value: 'answer' }] } },
+}
+
+/* 视频理解节点 */
+export const videoUnderstandNode = {
+  type: WorkflowNodeType.VideoUnderstandNode,
+  text: '识别出视频中的对象、场景等信息回答用户问题',
+  label: '视频理解',
+  properties: { stepName: '视频理解', config: { fields: [{ label: 'AI 回答内容', value: 'answer' }] } },
+}
+
+/* 问题优化节点 */
+export const questionNode = {
+  type: WorkflowNodeType.Question,
+  text: '根据历史聊天记录优化完善当前问题，更利于匹配知识库分段',
+  label: '问题优化',
+  properties: { stepName: '问题优化', config: { fields: [{ label: '问题优化结果', value: 'answer' }] } },
 }
 
 export const dataSourceLocalNode = {
@@ -230,14 +299,6 @@ export const searchDocumentNode = {
   },
 }
 
-export const questionNode = {
-  type: WorkflowNodeType.Question,
-  text: '根据历史聊天记录优化完善当前问题，更利于匹配知识库分段',
-  label: '问题优化',
-  height: 345,
-  properties: { stepName: '问题优化', config: { fields: [{ label: '问题优化结果', value: 'answer' }] } },
-}
-
 export const variableSplittingNode = {
   type: WorkflowNodeType.VariableSplittingNode,
   text: '通过配置JSON Path 表达式，对输入的 JSON 格式变量进行解析和拆分',
@@ -261,9 +322,6 @@ export const conditionNode = {
   height: 175,
   properties: { width: 600, stepName: '判断器', config: { fields: [{ label: '分支名称', value: 'branch_name' }] } },
 }
-
-
-
 
 export const rerankerNode = {
   type: WorkflowNodeType.RerankerNode,
@@ -325,22 +383,6 @@ export const documentSplitNode = {
   properties: { width: 500, stepName: '文档分段', config: { fields: [{ label: '分段列表', value: 'paragraph_list' }] } },
 }
 
-export const imageUnderstandNode = {
-  type: WorkflowNodeType.ImageUnderstandNode,
-  text: '识别出图片中的对象、场景等信息回答用户问题',
-  label: '图片理解',
-  height: 252,
-  properties: { stepName: '图片理解', config: { fields: [{ label: 'AI 回答内容', value: 'answer' }] } },
-}
-
-export const videoUnderstandNode = {
-  type: WorkflowNodeType.VideoUnderstandNode,
-  text: '识别出视频中的对象、场景等信息回答用户问题',
-  label: '视频理解',
-  height: 252,
-  properties: { stepName: '视频理解', config: { fields: [{ label: 'AI 回答内容', value: 'answer' }] } },
-}
-
 export const variableAggregationNode = {
   type: WorkflowNodeType.VariableAggregationNode,
   text: '按聚合策略聚合每组的变量',
@@ -365,38 +407,6 @@ export const mcpNode = {
   properties: { stepName: 'MCP 调用', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
-export const imageGenerateNode = {
-  type: WorkflowNodeType.ImageGenerateNode,
-  text: '根据提供的文本内容生成图片',
-  label: '图片生成',
-  height: 252,
-  properties: {
-    stepName: '图片生成',
-    config: {
-      fields: [
-        { label: 'AI 回答内容', value: 'answer' },
-        { label: '图片', value: 'image' },
-      ],
-    },
-  },
-}
-
-export const speechToTextNode = {
-  type: WorkflowNodeType.SpeechToTextNode,
-  text: '将音频通过语音识别模型转换为文本',
-  label: '语音转文本',
-  height: 252,
-  properties: { stepName: '语音转文本', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
-
-export const textToSpeechNode = {
-  type: WorkflowNodeType.TextToSpeechNode,
-  text: '将文本通过语音合成模型转换为音频',
-  label: '文本转语音',
-  height: 252,
-  properties: { stepName: '文本转语音', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
-
 /**
  * 自定义工具配置数据
  */
@@ -407,8 +417,6 @@ export const toolNode = {
   height: 260,
   properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
-
-
 
 export const loopStartNode = {
   id: WorkflowNodeType.LoopStartNode,
@@ -453,14 +461,6 @@ export const loopNode = {
   },
 }
 
-export const imageToVideoNode = {
-  type: WorkflowNodeType.ImageToVideoGenerateNode,
-  text: '根据提供的图片生成视频',
-  label: '图生视频',
-  height: 252,
-  properties: { stepName: '图生视频', config: { fields: [{ label: '视频', value: 'video' }] } },
-}
-
 export const loopBodyNode = {
   type: WorkflowNodeType.LoopBodyNode,
   text: '循环体',
@@ -477,13 +477,7 @@ export const loopContinueNode = {
   properties: { width: 600, stepName: 'Continue', config: { fields: [] } },
 }
 
-export const textToVideoNode = {
-  type: WorkflowNodeType.TextToVideoGenerateNode,
-  text: '根据提供的文本内容生成视频',
-  label: '文生视频',
-  height: 252,
-  properties: { stepName: '文生视频', config: { fields: [{ label: '视频', value: 'video' }] } },
-}
+
 
 export const loopBreakNode = {
   type: WorkflowNodeType.LoopBreakNode,

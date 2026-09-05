@@ -36,7 +36,7 @@ function openSettings() {
         content="开启后，从开启时间记录新对话并按周期生成记忆，可通过 {{开始.memory}} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。"
         placement="right"
       >
-        <MkIcon name="icon_info_outlined" />
+        <MkIcon name="icon_info_outlined" class="text-N600!" />
       </el-tooltip>
     </span>
     <span class="flex items-center gap-2">

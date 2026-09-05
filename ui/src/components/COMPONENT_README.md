@@ -206,7 +206,9 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 基于 `md-editor-v3` 的全局自动注册组件。三个组件统一使用 User Store 中的当前语言，并为繁体中文
 加载 `zh-TW` 语言包；底层组件的 Props 和事件通过 `$attrs` 透传。`MdEditor` 默认关闭 Prettier，
 并透传 `defFooters` 插槽；`MdEditorMagnify` 在无工具栏编辑器的页脚提供放大按钮，弹窗中点击确定
-才会写回内容并触发 `submitDialog`，取消或关闭弹窗会丢弃本次弹窗编辑；`MdPreview` 默认关闭代码
+才会写回内容并触发 `submitDialog`，取消或关闭弹窗会丢弃本次弹窗编辑。组件位于配置了字段和规则的
+`el-form-item` 中时，会像 `el-input` 一样按 `change`、`blur` 触发规则校验；未配置字段或规则时跳过，
+传入 `:validate-event="false"` 可关闭自动校验。`MdPreview` 默认关闭代码
 折叠。Admin 和 Chat 入口统一调用
 `configureMarkdownEditor()`，将代码高亮、全屏、KaTeX、图片裁剪、Mermaid、ECharts 和 Prettier
 配置为本地实例，避免运行时加载 CDN 资源；`md-editor-v3` v6 的图标已随依赖打包，不再维护或加载

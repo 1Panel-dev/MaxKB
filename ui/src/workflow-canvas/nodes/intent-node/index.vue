@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-import { Delete } from '@element-plus/icons-vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import ModelSelect from '@/components/business/model-select/index.vue'
@@ -49,30 +48,27 @@ function defaultBranch(): IntentNodeBranch[] {
   ]
 }
 
-// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
-if (!model.properties.node_data) {
-  model.properties.node_data = {
-    model_id: '',
-    model_id_type: 'default',
-    model_id_reference: [],
-    model_params_setting: {},
-    content_list: [],
-    dialogue_type: 'WORKFLOW',
-    dialogue_number: 1,
-    branch: defaultBranch(),
-  }
+const defaultForm: IntentNodeForm = {
+  model_id: '',
+  model_id_type: 'default',
+  model_id_reference: [],
+  model_params_setting: {},
+  content_list: [],
+  dialogue_type: 'WORKFLOW',
+  dialogue_number: 1,
+  branch: defaultBranch(),
 }
-const initialNodeData = model.properties.node_data as IntentNodeForm
-if (initialNodeData.model_id_type === undefined) initialNodeData.model_id_type = 'custom'
-if (!Array.isArray(initialNodeData.model_id_reference)) initialNodeData.model_id_reference = []
-if (!initialNodeData.model_params_setting) initialNodeData.model_params_setting = {}
-if (!Array.isArray(initialNodeData.content_list)) initialNodeData.content_list = []
-if (initialNodeData.dialogue_type === undefined) initialNodeData.dialogue_type = 'WORKFLOW'
-if (initialNodeData.dialogue_number === undefined || initialNodeData.dialogue_number === null) {
-  initialNodeData.dialogue_number = 1
-}
-if (!Array.isArray(initialNodeData.branch) || initialNodeData.branch.length === 0) {
-  initialNodeData.branch = defaultBranch()
+const savedForm = model.properties.node_data as Partial<IntentNodeForm> | undefined
+model.properties.node_data = {
+  ...defaultForm,
+  ...savedForm,
+  model_id_type: savedForm ? (savedForm.model_id_type ?? 'custom') : defaultForm.model_id_type,
+  model_id_reference: Array.isArray(savedForm?.model_id_reference) ? savedForm.model_id_reference : [],
+  model_params_setting: savedForm?.model_params_setting ?? {},
+  content_list: Array.isArray(savedForm?.content_list) ? savedForm.content_list : [],
+  dialogue_type: savedForm?.dialogue_type ?? defaultForm.dialogue_type,
+  dialogue_number: savedForm?.dialogue_number ?? defaultForm.dialogue_number,
+  branch: Array.isArray(savedForm?.branch) && savedForm.branch.length ? savedForm.branch : defaultBranch(),
 }
 
 const formData = computed<IntentNodeForm>({
@@ -212,7 +208,7 @@ onMounted(() => {
         </el-form-item>
 
         <!-- 历史聊天记录 -->
-        <el-form-item label="历史聊天记录">
+        <el-form-item>
           <template #label>
             <div class="flex-between">
               <span>历史聊天记录</span>
