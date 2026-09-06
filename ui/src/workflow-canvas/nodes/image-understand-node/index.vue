@@ -39,8 +39,6 @@ interface ImageUnderstandNodeForm {
 }
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const modelCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('modelCascaderRef')
-const imageCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('imageCascaderRef')
 
 const store = useWorkflowStore(apiType)
 const modelList = ref<Array<ModelItem>>([])
@@ -121,12 +119,8 @@ function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error
   )
 }
 
-function validate() {
-  return Promise.all([
-    formData.value.model_id_type === 'reference' ? modelCascaderRef.value?.validate() : Promise.resolve(),
-    imageCascaderRef.value?.validate(),
-    formRef.value?.validate(),
-  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
+async function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
@@ -249,7 +243,6 @@ onMounted(() => {
             :value-on-clear="0"
             controls-position="right"
             align="left"
-            class="w-full!"
             :step="1"
             :step-strictly="true"
           />

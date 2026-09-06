@@ -138,7 +138,7 @@ defineExpose({ open })
         </el-form-item>
 
         <el-form-item label="Tokens 上限（单位：K）" prop="tokenLimit">
-          <el-input-number v-model="quotaSettingsForm.tokenLimit" class="w-full!" :min="1" align="left" controls-position="right" />
+          <el-input-number v-model="quotaSettingsForm.tokenLimit" :min="1" align="left" controls-position="right" />
         </el-form-item>
       </template>
     </el-form>

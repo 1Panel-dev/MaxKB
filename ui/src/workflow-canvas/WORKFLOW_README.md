@@ -50,6 +50,9 @@ src/workflow-canvas/
 `z-index` 绕过画布的缩放和 SVG 绘制顺序。
 
 `NodeCascader` 已在内部统一管理下拉层的锚点保护，使用方无需重复接入。
+下拉展开时通过 `document` 捕获阶段的 `pointerdown` 处理外部点击，排除组件内部的输入框和
+未 Teleport 的下拉面板；关闭及卸载时移除监听。不要移除节点容器的鼠标事件隔离来恢复外部关闭，
+以免操作表单时触发画布拖拽。
 同一节点的多个 `createAnchorGuard()` 实例共享浮层状态，最后一个浮层关闭或卸载后才恢复
 节点原本的 `hittable` 状态。
 

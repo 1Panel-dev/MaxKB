@@ -34,8 +34,6 @@ interface IntentNodeForm {
 type IntentModelSetting = Pick<IntentNodeForm, 'model_id' | 'model_id_reference' | 'model_id_type' | 'model_params_setting'>
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const modelCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('modelCascaderRef')
-const contentCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('contentCascaderRef')
 
 const store = useWorkflowStore(apiType)
 const modelList = ref<Array<ModelItem>>([])
@@ -135,12 +133,8 @@ function deleteBranch(id: string) {
   refreshBranch()
 }
 
-function validate() {
-  return Promise.all([
-    formData.value.model_id_type === 'reference' ? modelCascaderRef.value?.validate() : Promise.resolve(),
-    contentCascaderRef.value?.validate(),
-    formRef.value?.validate(),
-  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
+async function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
@@ -224,7 +218,6 @@ onMounted(() => {
             :value-on-clear="0"
             controls-position="right"
             align="left"
-            class="w-full!"
             :step="1"
             :step-strictly="true"
           />

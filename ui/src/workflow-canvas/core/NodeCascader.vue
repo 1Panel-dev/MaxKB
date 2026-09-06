@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import type { CascaderInstance } from 'element-plus'
 
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -18,6 +19,8 @@ const emit = defineEmits<{ 'update:modelValue': [value: string[]] }>()
 
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const options = ref<WorkflowNodeField[]>([])
+const cascaderRootRef = useTemplateRef<HTMLElement>('cascaderRootRef')
+const cascaderRef = useTemplateRef<CascaderInstance>('cascaderRef')
 const nodeModel = computed(() => props.nodeModel as WorkflowNodeModel)
 
 const selectedValue = computed({ get: () => props.modelValue, set: (value) => emit('update:modelValue', value) })
@@ -55,11 +58,23 @@ function refreshOptions(visible = true) {
   if (visible) options.value = getOptionsValue()
 }
 
-// 下拉展开期间隐藏 SVG 锚点，关闭或卸载时恢复。
+// 捕获外部点击，避免节点容器的 mousedown.stop 阻断原生关闭逻辑。
+function handleOutsidePointerDown(event: PointerEvent) {
+  const root = cascaderRootRef.value
+  if (!root || event.composedPath().includes(root)) return
+  cascaderRef.value?.togglePopperVisible(false)
+}
+
+// 下拉展开期间监听外部点击并隐藏 SVG 锚点，关闭或卸载时清理。
 const anchorGuard = createAnchorGuard(props.nodeModel)
 function handleVisibleChange(visible: boolean) {
   anchorGuard.setOverlayVisible('cascader', visible)
   refreshOptions(visible)
+  if (visible) {
+    document.addEventListener('pointerdown', handleOutsidePointerDown, true)
+  } else {
+    document.removeEventListener('pointerdown', handleOutsidePointerDown, true)
+  }
 }
 
 function validate() {
@@ -78,30 +93,36 @@ function validate() {
 onMounted(() => {
   refreshOptions()
 })
-onBeforeUnmount(anchorGuard.reset)
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', handleOutsidePointerDown, true)
+  anchorGuard.reset()
+})
 defineExpose({ validate })
 </script>
 
 <template>
-  <el-cascader
-    v-model="selectedValue"
-    v-bind="$attrs"
-    :options="options"
-    :teleported="false"
-    clearable
-    separator="/"
-    @visible-change="handleVisibleChange"
-    @wheel.stop
-    fit-input-width
-  >
-    <template v-if="selectedNodeField" #prefix>
-      <component :is="iconComponent(`${selectedNodeField.type}-icon`)" :size="20" :item="selectedNodeField" class="small" />
-    </template>
-    <template #default="{ data }">
-      <span class="flex items-center gap-1" @wheel="handleNodeWheel">
-        <component :is="iconComponent(`${data.type}-icon`)" :size="16" :item="data" class="small" />
-        <span>{{ data.label }}</span>
-      </span>
-    </template>
-  </el-cascader>
+  <div ref="cascaderRootRef" class="contents">
+    <el-cascader
+      ref="cascaderRef"
+      v-model="selectedValue"
+      v-bind="$attrs"
+      :options="options"
+      :teleported="false"
+      clearable
+      separator="/"
+      @visible-change="handleVisibleChange"
+      @wheel.stop
+      fit-input-width
+    >
+      <template v-if="selectedNodeField" #prefix>
+        <component :is="iconComponent(`${selectedNodeField.type}-icon`)" :size="20" :item="selectedNodeField" class="small" />
+      </template>
+      <template #default="{ data }">
+        <span class="flex items-center gap-1" @wheel="handleNodeWheel">
+          <component :is="iconComponent(`${data.type}-icon`)" :size="16" :item="data" class="small" />
+          <span>{{ data.label }}</span>
+        </span>
+      </template>
+    </el-cascader>
+  </div>
 </template>

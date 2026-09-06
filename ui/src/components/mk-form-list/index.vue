@@ -34,7 +34,7 @@ function removeRow(index: number) {
     </el-form-item>
   </div>
 
-  <el-button v-if="showAddButton" class="-mt-1 mb-6" link type="primary" @click="addRow">
+  <el-button v-if="showAddButton" class="-mt-1" link type="primary" @click="addRow">
     <MkIcon name="icon_add_outlined" />
     <span>{{ addText }}</span>
   </el-button>

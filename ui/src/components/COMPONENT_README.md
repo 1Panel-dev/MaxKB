@@ -768,17 +768,39 @@ const code = defineModel<string>({ required: true })
 ### JsonInput
 
 JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，内置 JSON 语法诊断、格式化和全屏
-编辑。组件暴露 `validateRules`，可直接接入 Element Plus 表单自定义校验器；无法解析的输入不会
-覆盖最后一次有效的 `v-model` 值。
+编辑。与 `MdEditorMagnify` 一样，通过 `useFormItem()` 触发外层表单项校验，不在组件内部创建
+表单项。内容变化时触发 `change`，失焦和全屏确认后触发 `blur`；`validateEvent` 默认为 `true`，
+设为 `false` 可关闭自动触发。无效输入也会触发校验，不能仅监听解析后的 `v-model`。
+
+组件暴露 `format()` 和 `validateRules()`。JSON 语法规则统一由 `validateRules` 校验编辑器原始
+文本，空白或无效 JSON 提示“请输入正确的 JSON 格式”；外层 `rules` 接入该方法后，表单提交
+也会检查语法。无法解析的输入不会覆盖最后一次有效的 `v-model` 值，不要直接对已经解析的
+`value` 再调用 `JSON.parse(value)`。必填等业务规则继续放在外层表单项。
 
 ```vue
 <script setup lang="ts">
+import { reactive, useTemplateRef } from 'vue'
 import JsonInput from '@/components/codemirror-editor/Json.vue'
 
-const config = defineModel<unknown>({ required: true })
+const form = reactive<{ config: unknown }>({ config: {} })
+const jsonInputRef = useTemplateRef<InstanceType<typeof JsonInput>>('jsonInputRef')
+
+function validateJson(rule: unknown, value: unknown, callback: (error?: Error) => void) {
+  if (!jsonInputRef.value) {
+    callback(new Error('请输入配置'))
+    return
+  }
+  jsonInputRef.value.validateRules(rule, value, callback)
+}
 </script>
 
-<JsonInput v-model="config" title="配置（JSON）" />
+<template>
+  <el-form :model="form">
+    <el-form-item prop="config" :rules="{ validator: validateJson, trigger: ['change', 'blur'] }">
+      <JsonInput ref="jsonInputRef" v-model="form.config" title="配置（JSON）" />
+    </el-form-item>
+  </el-form>
+</template>
 ```
 
 ### MkSourceCard

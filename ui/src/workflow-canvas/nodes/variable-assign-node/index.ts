@@ -8,4 +8,12 @@ class VariableAssignNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.VariableAssignNode, model: WorkflowNodeModel, view: VariableAssignNodeView }
+class VariableAssignNodeModel extends WorkflowNodeModel {
+  override setAttributes() {
+    super.setAttributes()
+    this.width = 455
+    this.properties.width = 455
+  }
+}
+
+export default { type: WorkflowNodeType.VariableAssignNode, model: VariableAssignNodeModel, view: VariableAssignNodeView }

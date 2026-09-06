@@ -134,11 +134,9 @@ function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error
 }
 
 function validate() {
-  return Promise.all([
-    formData.value.model_id_type === 'reference' ? modelCascaderRef.value?.validate() : Promise.resolve(),
-    formData.value.vision ? imageCascaderRef.value?.validate() : Promise.resolve(),
-    formRef.value?.validate(),
-  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
+  return Promise.all([formData.value.vision ? imageCascaderRef.value?.validate() : Promise.resolve(), formRef.value?.validate()]).catch((error) =>
+    Promise.reject({ node: model, errMessage: error }),
+  )
 }
 
 onMounted(() => {
@@ -257,7 +255,6 @@ onMounted(() => {
             :value-on-clear="0"
             controls-position="right"
             align="left"
-            class="w-full!"
             :step="1"
             :step-strictly="true"
           />

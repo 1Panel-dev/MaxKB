@@ -71,10 +71,6 @@ function addBranch() {
   refreshBranchAnchors()
 }
 
-function addCondition(branch: BranchItem) {
-  branch.conditions.push(createCondition())
-}
-
 function changeComparison(condition: ConditionItem) {
   // 无比较值的运算仍按现有节点协议写入占位值。
   if (valueLessComparisons.has(condition.compare)) condition.value = 1
@@ -145,17 +141,17 @@ onBeforeUnmount(() => {
 
           <template v-if="branchIndex !== formData.branch.length - 1">
             <div class="mt-2">
-              <MkFormList v-model="branch.conditions" :default-item="createCondition()" :firstRowHasLabel="false" addText="添加条件">
+              <MkFormList v-model="branch.conditions" :default-item="createCondition()" :first-row-has-label="false" add-text="添加条件">
                 <template #default="{ item: condition, index: conditionIndex }">
                   <el-form-item
-                    class="min-w-0 flex-2"
+                    class="small min-w-0 flex-2"
                     :prop="`branch.${branchIndex}.conditions.${conditionIndex}.field`"
                     :rules="{ type: 'array', required: true, message: '请选择变量', trigger: 'change' }"
                   >
                     <NodeCascader ref="nodeCascaderRefs" v-model="condition.field" :node-model="model" class="w-full" placeholder="请选择变量" />
                   </el-form-item>
                   <el-form-item
-                    class="min-w-0 flex-1"
+                    class="small min-w-0 flex-1"
                     :prop="`branch.${branchIndex}.conditions.${conditionIndex}.compare`"
                     :rules="{ required: true, message: '请选择比较符', trigger: 'change' }"
                   >
@@ -176,6 +172,7 @@ onBeforeUnmount(() => {
                       v-if="!valueLessComparisons.has(condition.compare)"
                       :prop="`branch.${branchIndex}.conditions.${conditionIndex}.value`"
                       :rules="{ required: true, message: '请输入比较值', trigger: 'blur' }"
+                      class="small"
                     >
                       <el-input v-model="condition.value" placeholder="请输入比较值" />
                     </el-form-item>

@@ -138,7 +138,7 @@ onMounted(() => {
       </el-button>
     </div>
 
-    <div class="w-full mk-gray-card py-3!">
+    <div class="w-full mk-gray-card">
       <MkFormList v-model="formValue.option_list" :default-item="{ label: '', value: '' }" :show-add-button="false" @remove="handleOptionRemove">
         <template #default="{ index, item: option }">
           <el-form-item

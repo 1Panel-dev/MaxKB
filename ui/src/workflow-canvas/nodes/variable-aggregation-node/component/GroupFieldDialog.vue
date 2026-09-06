@@ -16,10 +16,8 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <span class="dialog-footer">
-        <el-button @click.prevent="close">取消</el-button>
-        <el-button type="primary" @click="submit(fieldFormRef)">保存</el-button>
-      </span>
+      <el-button @click.prevent="close">取消</el-button>
+      <el-button type="primary" @click="submit(fieldFormRef)">保存</el-button>
     </template>
   </MkDialog>
 </template>
@@ -74,4 +72,3 @@ const submit = async (formEl: FormInstance | null) => {
 
 defineExpose({ open, close })
 </script>
-<style lang="scss" scoped></style>

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="Multiple extends boolean = false">
 import { computed, ref, useTemplateRef } from 'vue'
 import type { SelectInstance } from 'element-plus'
 import { MODEL_STATUS } from '@/api/enums'
@@ -18,18 +18,20 @@ interface ModelOptionGroup {
   provider: string
 }
 
+type ModelSelectValue = Multiple extends true ? string[] : string
+
 const props = withDefaults(
   defineProps<{
-    modelValue: string
+    modelValue: ModelSelectValue
     options: ModelItem[]
     providerOptions: ModelProviderItem[]
     canEditParams?: boolean
     canAdd?: boolean
     modelParams?: Record<string, unknown>
     disabled?: boolean
+    multiple?: Multiple
   }>(),
   {
-    modelValue: '',
     options: () => [],
     providerOptions: () => [],
     canEditParams: false,
@@ -40,9 +42,9 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  change: [modelId: string]
+  change: [modelValue: ModelSelectValue]
   refresh: []
-  'update:modelValue': [modelId: string]
+  'update:modelValue': [modelValue: ModelSelectValue]
   'update:modelParams': [settings: Record<string, unknown>]
 }>()
 
@@ -60,23 +62,25 @@ const modelOptionGroups = computed<ModelOptionGroup[]>(() => {
   })
 })
 
-const selectedProviderIcon = computed(
-  () => modelOptionGroups.value.find(({ models }) => models.some(({ id }) => id === selectedModelId.value))?.icon ?? '',
-)
 const _options = computed(() => {
   return groupBy(props.options, 'provider')
 })
 
 const loading = ref(false)
+const canEditModelParams = computed(() => props.canEditParams && !props.multiple)
 
-const selectedModelId = computed({
+const selectedModelValue = computed<ModelSelectValue>({
   get: () => props.modelValue,
-  set: (modelId) => {
-    emit('update:modelValue', modelId)
-    emit('change', modelId)
-    resetModelParams(modelId)
+  set: (modelValue) => {
+    emit('update:modelValue', modelValue)
+    emit('change', modelValue)
+    if (typeof modelValue === 'string') resetModelParams(modelValue)
   },
 })
+
+function getProviderIcon(modelId: unknown) {
+  return modelOptionGroups.value.find(({ models }) => models.some(({ id }) => id === modelId))?.icon ?? ''
+}
 
 // 创建模型：根据当前资源范围传入完整 API，创建后由调用方刷新选项。
 const selectRef = useTemplateRef<SelectInstance>('selectRef')
@@ -97,26 +101,26 @@ function handleOpenCreateModel(open: () => void) {
 const modelParamsDialogRef = useTemplateRef<InstanceType<typeof ModelParamsDialog>>('modelParamsDialogRef')
 
 function resetModelParams(modelId: string) {
-  if (!props.canEditParams) return
+  if (!canEditModelParams.value) return
   emit('update:modelParams', {})
   if (!modelId) return
   modelParamsDialogRef.value?.resetDefault(modelId).then((settings) => {
-    if (props.modelValue !== modelId || !props.canEditParams) return
+    if (props.modelValue !== modelId || !canEditModelParams.value) return
     emit('update:modelParams', settings)
   })
 }
 
 function openModelParams() {
-  if (!props.modelValue || props.disabled) return
+  if (typeof props.modelValue !== 'string' || !props.modelValue || props.disabled) return
   modelParamsDialogRef.value?.open(props.modelValue, props.modelParams)
 }
 </script>
 
 <template>
-  <div class="relative w-full" :class="{ 'model-select--with-params': canEditParams }">
+  <div class="relative w-full" :class="{ 'model-select--with-params': canEditModelParams }">
     <el-select
       ref="selectRef"
-      v-model="selectedModelId"
+      v-model="selectedModelValue"
       placeholder="请选择模型"
       v-bind="$attrs"
       class="w-full"
@@ -124,6 +128,7 @@ function openModelParams() {
       clearable
       filterable
       :loading="loading"
+      :multiple="multiple"
       :teleported="false"
     >
       <el-option-group v-for="group in modelOptionGroups" :key="group.provider" :label="group.name">
@@ -143,9 +148,9 @@ function openModelParams() {
         </el-option>
       </el-option-group>
 
-      <template #label="{ label }">
-        <div class="flex items-center gap-2">
-          <span class="h-5 w-5 shrink-0" v-html="selectedProviderIcon" />
+      <template #label="{ label, value }">
+        <div class="flex items-center" :class="multiple ? 'gap-1' : 'gap-2'">
+          <span v-if="getProviderIcon(value)" class="shrink-0" :class="multiple ? 'h-4 w-4' : 'h-5 w-5'" v-html="getProviderIcon(value)" />
           <span class="truncate" :title="label">{{ label }}</span>
         </div>
       </template>
@@ -163,7 +168,7 @@ function openModelParams() {
         </slot>
       </template>
     </el-select>
-    <div v-if="canEditParams" class="absolute inset-y-px right-3 flex items-center gap-2">
+    <div v-if="canEditModelParams" class="absolute inset-y-px right-3 flex items-center gap-2">
       <el-divider direction="vertical" />
       <el-tooltip content="模型参数设置" placement="top" :disabled="disabled || !modelValue">
         <el-button text class="-mr-1" :disabled="disabled || !modelValue" @click.stop="openModelParams">
@@ -172,7 +177,7 @@ function openModelParams() {
       </el-tooltip>
     </div>
   </div>
-  <ModelParamsDialog v-if="canEditParams" ref="modelParamsDialogRef" @submit="emit('update:modelParams', $event)" />
+  <ModelParamsDialog v-if="canEditModelParams" ref="modelParamsDialogRef" @submit="emit('update:modelParams', $event)" />
 </template>
 
 <style scoped lang="scss">

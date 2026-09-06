@@ -143,7 +143,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form v-loading="loading" ref="authFormRef" class="max-w-200" :model="form" :rules="rules" label-position="top" require-asterisk-position="right">
+  <el-form
+    v-loading="loading"
+    ref="authFormRef"
+    class="max-w-200"
+    :model="form"
+    :rules="rules"
+    label-position="top"
+    require-asterisk-position="right"
+  >
     <el-form-item label="登录方式" prop="login_methods">
       <el-checkbox-group v-model="form.login_methods" @change="handleLoginMethodsChange" class="flex-wrap">
         <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption" :value="loginMethodOption" class="w-40">
@@ -154,7 +162,12 @@ onMounted(() => {
 
     <el-form-item label="默认登录方式" prop="default_value">
       <el-select v-model="form.default_value">
-        <el-option v-for="loginMethodOption in defaultLoginMethodOptions" :key="loginMethodOption.value" :value="loginMethodOption.value" :label="loginMethodOption.label" />
+        <el-option
+          v-for="loginMethodOption in defaultLoginMethodOptions"
+          :key="loginMethodOption.value"
+          :value="loginMethodOption.value"
+          :label="loginMethodOption.label"
+        />
       </el-select>
     </el-form-item>
 
@@ -162,16 +175,39 @@ onMounted(() => {
       <div class="w-full mk-gray-card p-4!">
         <div class="flex items-center gap-2">
           <span>登录失败</span>
-          <el-input-number v-model="form.max_attempts" :max="10" :min="-1" :step="1" :value-on-clear="-1" @change="form.max_attempts = normalizeNonZeroNumber($event)" />
-          <span>登录失败</span>
+          <el-input-number
+            v-model="form.max_attempts"
+            class="w-40!"
+            :max="10"
+            :min="-1"
+            :step="1"
+            :value-on-clear="-1"
+            @change="form.max_attempts = normalizeNonZeroNumber($event)"
+          />
+          <span>次显示验证码</span>
           <span class="text-N500">(值为-1时，不显示验证码)</span>
         </div>
         <div class="flex items-center gap-2 mt-4">
           <span>登录失败</span>
-          <el-input-number v-model="form.failed_attempts" :max="10" :min="-1" :step="1" :value-on-clear="-1" @change="form.max_attempts = normalizeNonZeroNumber($event)" />
+          <el-input-number
+            v-model="form.failed_attempts"
+            class="w-40!"
+            :max="10"
+            :min="-1"
+            :step="1"
+            :value-on-clear="-1"
+            @change="form.max_attempts = normalizeNonZeroNumber($event)"
+          />
           <span>次，</span>
           <span>锁定账号</span>
-          <el-input-number v-model="form.lock_time" :min="1" :step="1" :value-on-clear="1" @change="form.max_attempts = normalizeNonZeroNumber($event)" />
+          <el-input-number
+            class="w-40!"
+            v-model="form.lock_time"
+            :min="1"
+            :step="1"
+            :value-on-clear="1"
+            @change="form.max_attempts = normalizeNonZeroNumber($event)"
+          />
           <span>分钟</span>
         </div>
       </div>
@@ -179,12 +215,26 @@ onMounted(() => {
     <p class="mb-2">第三方用户默认角色分配</p>
     <div class="w-full mk-gray-card p-4!">
       <el-form-item label="角色" prop="role_id">
-        <el-select v-model="form.role_id" :loading="roleSettingOptionsLoading" filterable clearable placeholder="请选择角色" @change="handleRoleChange">
+        <el-select
+          v-model="form.role_id"
+          :loading="roleSettingOptionsLoading"
+          filterable
+          clearable
+          placeholder="请选择角色"
+          @change="handleRoleChange"
+        >
           <el-option v-for="role in roleOptions" :key="role.id" :label="role.name" :value="role.id" />
         </el-select>
       </el-form-item>
       <el-form-item label="工作空间" prop="workspace_id" v-if="auth.isEE && showWorkspaceSelector">
-        <el-select v-model="form.workspace_id" :loading="roleSettingOptionsLoading" filterable clearable placeholder="请选择工作空间" @change="handleWorkspaceChange">
+        <el-select
+          v-model="form.workspace_id"
+          :loading="roleSettingOptionsLoading"
+          filterable
+          clearable
+          placeholder="请选择工作空间"
+          @change="handleWorkspaceChange"
+        >
           <el-option v-for="workspace in workspaceOptions" :key="workspace.id" :label="workspace.name" :value="workspace.id" />
         </el-select>
       </el-form-item>
