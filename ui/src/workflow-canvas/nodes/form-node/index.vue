@@ -41,7 +41,14 @@
             </div>
           </template>
 
-          <el-table ref="tableRef" v-if="form_data.form_field_list.length > 0" :data="form_data.form_field_list" row-key="field" class="border">
+          <MkTable
+            v-if="form_data.form_field_list.length > 0"
+            v-model:data="sortableFields"
+            sortable
+            row-key="field"
+            :max-height="undefined"
+            class="border"
+          >
             <el-table-column prop="field" :label="'参数'" width="100" show-overflow-tooltip>
               <template #default="{ row }">
                 <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
@@ -79,7 +86,7 @@
                 </el-button>
               </template>
             </el-table-column>
-          </el-table>
+          </MkTable>
         </el-form-item>
       </el-form>
     </el-card>
@@ -101,9 +108,8 @@
   </NodeContainer>
 </template>
 <script setup lang="ts">
-import { ref, inject, computed, onMounted, onBeforeUnmount, nextTick, useTemplateRef } from 'vue'
+import { ref, inject, computed, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import Sortable from 'sortablejs'
 import type { FormInstance } from 'element-plus'
 
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
@@ -184,35 +190,14 @@ const form_data = computed<{ is_result: boolean; form_field_list: FormField[]; f
 
 const formNodeFormRef = useTemplateRef<FormInstance>('formNodeFormRef')
 const constructorRef = useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('constructorRef')
-const tableRef = useTemplateRef<{ $el: HTMLElement }>('tableRef')
-
-// 表单字段拖拽排序（对应 v2 的 tableRef + Sortable）
-let sortableInstance: Sortable | undefined
-function initFieldSortable() {
-  destroyFieldSortable()
-  const tableEl = tableRef.value?.$el as HTMLElement | undefined
-  const tbody = tableEl?.querySelector('.el-table__body-wrapper tbody') as HTMLElement | undefined
-  if (!tbody) return
-  sortableInstance = Sortable.create(tbody, {
-    animation: 150,
-    ghostClass: 'ghost-row',
-    onEnd: (evt: { oldIndex?: number; newIndex?: number }) => {
-      if (evt.oldIndex === undefined || evt.newIndex === undefined) return
-      if (evt.oldIndex === evt.newIndex) return
-      const items = cloneDeep(form_data.value.form_field_list)
-      const [movedItem] = items.splice(evt.oldIndex, 1)
-      if (!movedItem) return
-      items.splice(evt.newIndex, 0, movedItem)
-      form_data.value.form_field_list = items
-      syncFieldList()
-      nextTick(initFieldSortable)
-    },
-  })
-}
-function destroyFieldSortable() {
-  sortableInstance?.destroy()
-  sortableInstance = undefined
-}
+// 排序后的工作流字段独立写回，并同步下游可引用字段。
+const sortableFields = computed({
+  get: () => form_data.value.form_field_list,
+  set: (fields: FormField[]) => {
+    form_data.value.form_field_list = cloneDeep(fields)
+    syncFieldList()
+  },
+})
 
 const openAddDialog = () => {
   isEdit.value = false
@@ -271,7 +256,6 @@ const syncFieldList = () => {
   }
   model.properties.config!.fields = fields
   model.clearNextNodeField(true)
-  nextTick(initFieldSortable)
 }
 
 const validate = () => {
@@ -300,10 +284,5 @@ const validate = () => {
 
 onMounted(() => {
   model.validate = validate
-  nextTick(initFieldSortable)
-})
-
-onBeforeUnmount(() => {
-  destroyFieldSortable()
 })
 </script>

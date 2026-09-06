@@ -90,7 +90,6 @@ onMounted(() => {
           ref="questionReferenceRef"
           v-model="formData.question_reference_address"
           :node-model="model"
-          class="w-full"
           placeholder="请选择检索问题"
         />
       </el-form-item>

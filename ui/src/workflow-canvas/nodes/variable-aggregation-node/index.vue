@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, type Ref, useTemplateRef } from 'vue'
-import Sortable from 'sortablejs'
 
+import MkFormList from '@/components/mk-form-list/index.vue'
 import GroupFieldDialog from './component/GroupFieldDialog.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
@@ -29,77 +29,40 @@ interface GroupItem {
   variable_list: VariableItem[]
 }
 
-const defaultForm = () =>
-  ({
-    strategy: 'first_non_null',
-    group_list: [
-      {
-        id: randomId(),
-        label: 'Group1',
-        field: 'Group1',
-        variable_list: [{ v_id: randomId(), variable: [] }],
-      },
-    ],
-  }) as { strategy: string; group_list: GroupItem[] }
+interface VariableAggregationNodeForm {
+  strategy: string
+  group_list: GroupItem[]
+  is_result?: boolean
+}
+
+const defaultForm: VariableAggregationNodeForm = {
+  strategy: 'first_non_null',
+  group_list: [
+    {
+      id: randomId(),
+      label: 'Group1',
+      field: 'Group1',
+      variable_list: [{ v_id: randomId(), variable: [] }],
+    },
+  ],
+}
 
 // 初始化时兼容旧聚合策略，表单读取不修改节点数据。
-const savedForm = model.properties.node_data as { is_result?: boolean; strategy: string; group_list: GroupItem[] } | undefined
-const initialForm = savedForm ?? defaultForm()
+const savedForm = model.properties.node_data as Partial<VariableAggregationNodeForm> | undefined
 model.properties.node_data = {
-  ...initialForm,
-  strategy: initialForm.strategy === 'variable_to_json' ? 'variable_to_array' : initialForm.strategy,
+  ...defaultForm,
+  ...savedForm,
+  strategy: savedForm?.strategy === 'variable_to_json' ? 'variable_to_array' : (savedForm?.strategy ?? defaultForm.strategy),
+  group_list: Array.isArray(savedForm?.group_list) ? savedForm.group_list : defaultForm.group_list,
 }
-const formData = computed<{ is_result?: boolean; strategy: string; group_list: GroupItem[] }>({
-  get: () => model.properties.node_data as { is_result?: boolean; strategy: string; group_list: GroupItem[] },
+const formData = computed<VariableAggregationNodeForm>({
+  get: () => model.properties.node_data as VariableAggregationNodeForm,
   set: (value) => (model.properties.node_data = value),
 })
 
 const variableAggregationFormRef = useTemplateRef<FormInstance>('variableAggregationFormRef')
 const groupFieldDialogRef = useTemplateRef<InstanceType<typeof GroupFieldDialog>>('groupFieldDialogRef')
-const nodeCascaderRef: Ref<Array<{ validate: () => Promise<unknown> }>> = ref([])
-const sortableInstances = new Map<number, Sortable>()
-
-function setCascaderRef(el: unknown) {
-  if (el && !nodeCascaderRef.value.includes(el as { validate: () => Promise<unknown> })) {
-    nodeCascaderRef.value.push(el as { validate: () => Promise<unknown> })
-  }
-}
-
-function initSortable(gIndex: number) {
-  destroySortable(gIndex)
-  const nodeRoot = document.querySelector(`[data-node-id="${model.id}"]`)
-  const el = nodeRoot?.querySelector(`[data-group-index="${gIndex}"]`) as HTMLElement | undefined
-  if (!el) {
-    // 节点内容 Teleport 到 foreignObject 是异步的,未挂载时重试
-    nextTick(() => initSortable(gIndex))
-    return
-  }
-  sortableInstances.set(
-    gIndex,
-    Sortable.create(el, {
-      animation: 150,
-      ghostClass: 'ghost',
-      handle: '.handle',
-      onEnd: (evt: { oldIndex?: number; newIndex?: number }) => {
-        if (evt.oldIndex === undefined || evt.newIndex === undefined) return
-        if (evt.oldIndex === evt.newIndex) return
-        const group = formData.value.group_list[gIndex]
-        if (!group) return
-        const list = cloneDeep(group.variable_list)
-        const [moved] = list.splice(evt.oldIndex, 1)
-        if (!moved) return
-        list.splice(evt.newIndex, 0, moved)
-        group.variable_list = list
-        nextTick(() => initSortable(gIndex))
-      },
-    }),
-  )
-}
-
-function destroySortable(gIndex: number) {
-  sortableInstances.get(gIndex)?.destroy()
-  sortableInstances.delete(gIndex)
-}
+const defaultVariable = (): VariableItem => ({ v_id: randomId(), variable: [] })
 
 function onStrategyChange() {
   if (formData.value.strategy !== 'variable_to_dict') {
@@ -120,7 +83,8 @@ function syncFieldList() {
   model.clearNextNodeField(true)
 }
 
-function refreshFieldList(data: { field: string; label: string }, index?: number) {
+/* 添加编辑组 */
+function handleGroupSubmit(data: { field: string; label: string }, index?: number) {
   for (let i = 0; i < formData.value.group_list.length; i++) {
     const group = formData.value.group_list[i]
     if (group && group.field === data.field && i !== index) {
@@ -150,7 +114,6 @@ function addGroup(data: { field: string; label: string }) {
   const list = cloneDeep(formData.value.group_list)
   list.push({ id: randomId(), field: data.field, label: data.label, variable_list: [{ v_id: randomId(), variable: [] }] })
   formData.value.group_list = list
-  nextTick(() => initSortable(list.length - 1))
   syncFieldList()
 }
 
@@ -158,26 +121,7 @@ function deleteGroup(gIndex: number) {
   const list = cloneDeep(formData.value.group_list)
   list.splice(gIndex, 1)
   formData.value.group_list = list
-  destroySortable(gIndex)
   syncFieldList()
-}
-
-function addVariable(gIndex: number) {
-  const list = cloneDeep(formData.value.group_list)
-  const target = list[gIndex]
-  if (!target) return
-  target.variable_list.push({ v_id: randomId(), variable: [] })
-  formData.value.group_list = list
-  nextTick(() => initSortable(gIndex))
-}
-
-function deleteVariable(gIndex: number, vIndex: number) {
-  const list = cloneDeep(formData.value.group_list)
-  const target = list[gIndex]
-  if (!target) return
-  target.variable_list.splice(vIndex, 1)
-  formData.value.group_list = list
-  nextTick(() => initSortable(gIndex))
 }
 
 function openAddOrEditDialog(group?: GroupItem, index?: number) {
@@ -185,11 +129,9 @@ function openAddOrEditDialog(group?: GroupItem, index?: number) {
   groupFieldDialogRef.value?.open(data, index)
 }
 
-const validate = () => {
-  const vList = [variableAggregationFormRef.value?.validate(), ...nodeCascaderRef.value.map((item) => item.validate())]
-  return Promise.all(vList).catch((err) => Promise.reject({ node: model, errMessage: err }))
+async function validate() {
+  return variableAggregationFormRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
-
 const anchorGuard = createAnchorGuard(model)
 
 onMounted(() => {
@@ -197,115 +139,71 @@ onMounted(() => {
     formData.value.is_result = true
   }
   model.validate = validate
-  nextTick(() => {
-    formData.value.group_list.forEach((_, index) => initSortable(index))
-  })
   syncFieldList()
 })
 
 onBeforeUnmount(() => {
   anchorGuard.reset()
-  Array.from(sortableInstances.keys()).forEach(destroySortable)
 })
 </script>
 
 <template>
   <NodeContainer :node-model="model">
-    <el-form
-      ref="variableAggregationFormRef"
-      :model="formData"
-      label-position="top"
-      require-asterisk-position="right"
-      label-width="auto"
-      hide-required-asterisk
-      @submit.prevent
-    >
-      <el-form-item :rules="{ required: true, trigger: 'change' }">
-        <template #label>
-          <div class="flex-between">
-            <div>
-              <span>聚合策略<span class="ml-1 text-danger">*</span></span>
+    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <div class="mk-gray-card">
+      <el-form ref="variableAggregationFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+        <!-- 聚合策略 -->
+        <el-form-item label="聚合策略" :rules="{ required: true, message: '请选择聚合策略', trigger: 'change' }">
+          <el-select v-model="formData.strategy" :teleported="false" @change="onStrategyChange" @wheel="handleNodeWheel">
+            <el-option label="返回每组的第一个非空值" value="first_non_null" />
+            <el-option label="返回每组变量的数组（Array）" value="variable_to_array" />
+            <el-option label="返回每组变量的字典（Dict）" value="variable_to_dict" />
+          </el-select>
+        </el-form-item>
+        <template v-for="(group, gIndex) in formData.group_list" :key="group.id">
+          <div class="mk-gray-card bg-white! mb-2">
+            <div class="flex-between mb-2 gap-2">
+              <span class="min-w-0 truncate" :title="group.label">{{ group.label }}</span>
+              <div class="flex shrink-0 items-center gap-1">
+                <!-- 编辑组 -->
+                <el-button text @click="openAddOrEditDialog(group, gIndex)">
+                  <MkIcon name="icon_edit_outlined" />
+                </el-button>
+                <!-- 删除组 -->
+                <el-button text @click="deleteGroup(gIndex)" :disabled="formData.group_list.length <= 1">
+                  <MkIcon name="icon_delete-trash_outlined" />
+                </el-button>
+              </div>
             </div>
-          </div>
-        </template>
-        <el-select
-          v-model="formData.strategy"
-          :teleported="false"
-          @change="onStrategyChange"
-          @visible-change="anchorGuard.setOverlayVisible('strategy', $event)"
-          @wheel="handleNodeWheel"
-        >
-          <el-option label="返回每组的第一个非空值" value="first_non_null" />
-          <el-option label="返回每组变量的数组（Array）" value="variable_to_array" />
-          <el-option label="返回每组变量的字典（Dict）" value="variable_to_dict" />
-        </el-select>
-      </el-form-item>
 
-      <div v-for="(group, gIndex) in formData.group_list" :key="group.id" class="mk-gray-card mb-2">
-        <div class="flex-between mb-2 gap-2">
-          <span class="min-w-0 truncate" :title="group.label">{{ group.label }}</span>
-          <div class="flex shrink-0 items-center gap-1">
-            <el-button @click="openAddOrEditDialog(group, gIndex)" text class="h-6! w-6! p-0!" aria-label="编辑分组">
-              <MkIcon name="icon_edit_outlined" />
-            </el-button>
-            <el-button
-              @click="deleteGroup(gIndex)"
-              text
-              class="ml-0! h-6! w-6! p-0!"
-              aria-label="删除分组"
-              :disabled="formData.group_list.length <= 1"
-            >
-              <MkIcon name="icon_delete-trash_outlined" />
-            </el-button>
-          </div>
-        </div>
-
-        <div :data-group-index="gIndex">
-          <div v-for="(item, vIndex) in group.variable_list" :key="item.v_id" class="mb-2">
-            <div class="handle flex cursor-move items-center gap-2">
-              <span class="flex h-8 shrink-0 items-center text-N600">
-                <MkIcon name="icon_move2_outlined" />
-              </span>
-              <div class="min-w-0 flex-1">
+            <MkFormList v-model="group.variable_list" :default-item="defaultVariable" :first-row-has-label="false" sortable item-key="v_id">
+              <template #default="{ item, index: vIndex }">
                 <el-form-item
+                  v-if="formData.strategy === 'variable_to_dict'"
+                  class="small w-25 shrink-0"
+                  :prop="`group_list.${gIndex}.variable_list.${vIndex}.key`"
+                  :rules="{ required: true, message: '请输入键名', trigger: 'blur' }"
+                >
+                  <el-input v-model="item.key" placeholder="请输入键名" maxlength="256" />
+                </el-form-item>
+                <el-form-item
+                  class="small min-w-0 flex-1"
                   :prop="`group_list.${gIndex}.variable_list.${vIndex}.variable`"
                   :rules="{ type: 'array', required: true, message: '请选择变量', trigger: 'change' }"
-                  class="mb-0! w-full"
                 >
-                  <el-input
-                    v-if="formData.strategy === 'variable_to_dict'"
-                    v-model="item.key"
-                    placeholder="变量键"
-                    class="mr-2 w-25! shrink-0"
-                    maxlength="256"
-                  />
-                  <NodeCascader :ref="setCascaderRef" :node-model="model" class="min-w-0 flex-1" placeholder="请选择变量" v-model="item.variable" />
+                  <NodeCascader v-model="item.variable" :node-model="model" placeholder="请选择变量" />
                 </el-form-item>
-              </div>
-              <el-button
-                text
-                class="h-6! w-6! shrink-0 p-0!"
-                aria-label="删除变量"
-                :disabled="group.variable_list.length <= 1"
-                @click="deleteVariable(gIndex, vIndex)"
-              >
-                <MkIcon name="icon_delete-trash_outlined" />
-              </el-button>
-            </div>
+              </template>
+            </MkFormList>
           </div>
-        </div>
+        </template>
 
-        <el-button @click="addVariable(gIndex)" type="primary" link>
+        <el-button @click="openAddOrEditDialog()" type="primary" link>
           <MkIcon name="icon_add_outlined" class="mr-1" />
-          添加
+          添加分组
         </el-button>
-      </div>
-
-      <el-button @click="openAddOrEditDialog()" type="primary" link>
-        <MkIcon name="icon_add_outlined" class="mr-1" />
-        添加分组
-      </el-button>
-    </el-form>
-    <GroupFieldDialog ref="groupFieldDialogRef" @refresh="refreshFieldList" />
+      </el-form>
+    </div>
+    <GroupFieldDialog ref="groupFieldDialogRef" @submit="handleGroupSubmit" />
   </NodeContainer>
 </template>

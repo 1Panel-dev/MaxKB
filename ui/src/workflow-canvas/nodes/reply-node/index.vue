@@ -72,7 +72,6 @@ onMounted(() => {
             ref="nodeCascaderRef"
             v-model="formData.fields"
             :node-model="model"
-            class="w-full"
             placeholder="请选择变量"
           />
 

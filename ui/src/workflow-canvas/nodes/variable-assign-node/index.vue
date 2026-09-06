@@ -1,14 +1,13 @@
 <script setup lang="ts">
+import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
-import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
-
-import JsonInput from '@/components/codemirror-editor/Json.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'
+import JsonInput from '@/components/codemirror-editor/Json.vue'
 import { randomId } from '@/utils/common'
 
 defineOptions({ name: 'WorkflowVariableAssignNode' })
@@ -25,35 +24,50 @@ interface VariableItem {
   value: unknown
 }
 
+interface VariableAssignNodeForm {
+  variable_list: VariableItem[]
+  is_result?: boolean
+}
+
 // 变量配置与表单校验。
 const typeOptions = ['string', 'num', 'json', 'bool']
 
-const defaultVariable = (): VariableItem => ({ id: randomId(), fields: [], value: null, reference: [], type: 'string', source: 'custom', name: '' })
+const createVariable = (): VariableItem => ({ id: randomId(), fields: [], value: null, reference: [], type: 'string', source: 'custom', name: '' })
 
-if (!model.properties.node_data) {
-  model.properties.node_data = { variable_list: [defaultVariable()] }
+const defaultForm: VariableAssignNodeForm = {
+  variable_list: [createVariable()],
 }
-const formData = model.properties.node_data as { variable_list: VariableItem[] }
+const savedForm = model.properties.node_data as Partial<VariableAssignNodeForm> | undefined
+model.properties.node_data = {
+  ...defaultForm,
+  ...savedForm,
+  variable_list: Array.isArray(savedForm?.variable_list) ? savedForm.variable_list : defaultForm.variable_list,
+}
+
+const formData = computed<VariableAssignNodeForm>({
+  get: () => model.properties.node_data as VariableAssignNodeForm,
+  set: (value) => (model.properties.node_data = value),
+})
 
 const variableAssignNodeFormRef = ref<FormInstance>()
 
 // 变量增删与赋值类型切换。
 function addVariable() {
-  const variables = cloneDeep(formData.variable_list)
-  variables.push(defaultVariable())
-  model.properties.node_data.variable_list = variables
+  const variables = cloneDeep(formData.value.variable_list)
+  variables.push(createVariable())
+  formData.value.variable_list = variables
 }
 
 function changeType(index: number) {
-  const item = formData.variable_list[index]
+  const item = formData.value.variable_list[index]
   if (!item) return
   item.value = item.type === 'bool' ? true : null
 }
 
 function deleteVariable(index: number) {
-  const variables = cloneDeep(formData.variable_list)
+  const variables = cloneDeep(formData.value.variable_list)
   variables.splice(index, 1)
-  model.properties.node_data.variable_list = variables
+  formData.value.variable_list = variables
 }
 
 function variableChange(item: VariableItem) {
@@ -72,8 +86,8 @@ const anchorGuard = createAnchorGuard(model)
 onBeforeUnmount(() => anchorGuard.reset())
 
 onMounted(() => {
-  if (model.properties.node_data?.is_result === undefined && isLastNode(model)) {
-    model.properties.node_data.is_result = true
+  if (formData.value.is_result === undefined && isLastNode(model)) {
+    formData.value.is_result = true
   }
   model.validate = validate
 })
@@ -93,7 +107,6 @@ onMounted(() => {
             >
               <NodeCascader
                 :node-model="model"
-                class="w-full"
                 placeholder="请选择变量"
                 v-model="item.fields"
                 :global="true"
@@ -178,7 +191,7 @@ onMounted(() => {
               :prop="'variable_list.' + index + '.reference'"
               :rules="{ required: true, message: '请选择变量', trigger: 'change' }"
             >
-              <NodeCascader v-model="item.reference" :node-model="model" class="w-full" placeholder="请选择变量" />
+              <NodeCascader v-model="item.reference" :node-model="model" placeholder="请选择变量" />
             </el-form-item>
           </div>
           <!-- 删除变量 -->

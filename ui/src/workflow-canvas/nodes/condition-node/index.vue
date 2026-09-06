@@ -148,7 +148,7 @@ onBeforeUnmount(() => {
                     :prop="`branch.${branchIndex}.conditions.${conditionIndex}.field`"
                     :rules="{ type: 'array', required: true, message: '请选择变量', trigger: 'change' }"
                   >
-                    <NodeCascader ref="nodeCascaderRefs" v-model="condition.field" :node-model="model" class="w-full" placeholder="请选择变量" />
+                    <NodeCascader ref="nodeCascaderRefs" v-model="condition.field" :node-model="model" placeholder="请选择变量" />
                   </el-form-item>
                   <el-form-item
                     class="small min-w-0 flex-1"

@@ -129,7 +129,7 @@ onMounted(() => {
               </el-select>
             </div>
           </template>
-          <NodeCascader ref="modelCascaderRef" v-model="formData.model_id_reference" :node-model="model" class="w-full" placeholder="请选择变量" />
+          <NodeCascader ref="modelCascaderRef" v-model="formData.model_id_reference" :node-model="model" placeholder="请选择变量" />
         </el-form-item>
 
         <el-form-item v-else prop="model_id" :rules="{ required: true, message: '请选择 AI 模型', trigger: 'change' }">
@@ -168,7 +168,6 @@ onMounted(() => {
             ref="inputVariableCascaderRef"
             v-model="formData.input_variable"
             :node-model="model"
-            class="w-full"
             placeholder="请选择变量"
           />
         </el-form-item>

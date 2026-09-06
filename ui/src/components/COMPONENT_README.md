@@ -621,6 +621,23 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 传入 `size="small"` 时，组件会为内部 `el-table` 添加 `small` class；组件仅提供该样式钩子，
 不内置对应样式。
 
+行拖拽排序通过 `sortable` 按需开启，开启后可从整行任意位置开始拖动，不添加独立的排序图标列。
+使用 `v-model:data` 接收新顺序；也可使用 `:data` 和 `@update:data` 自行写回。
+`row-key` 支持字段路径或函数，默认为 `id`，排序要求每行键值唯一且
+为字符串或数字。
+
+```vue
+<MkTable v-model:data="fieldRows" sortable row-key="field" @sort-change="saveFieldOrder">
+  <el-table-column prop="label" label="字段名称" />
+</MkTable>
+```
+
+`sort-change` 在实际顺序变化后返回 `{ oldIndex, newIndex, data }`，不要在回调里再次移动数组。
+分页场景只调整当前传入页的数据，索引从 `0` 开始；跨页位置、接口保存和失败回滚由业务负责。
+有活动列排序、表头筛选、展开行或树形数据时暂停拖拽，避免显示行与数据索引不一致。
+虚拟表格、跨页和跨列表拖拽不属于该接口。排序工具不会深拷贝普通表格的行对象；工作流使用方应在
+数据写回边界自行 `cloneDeep`，保持 LogicFlow 的可观察树约束。
+
 表头需要多选筛选时使用 `MkTableFilter`。`label` 设置表头文案，`options` 接收
 `OptionItem<string>[]`，`v-model` 绑定已选值；初始不选择任何选项，确认或重置后通过 `change`
 返回筛选值。过长的选项文案会显示省略号，悬停时可查看完整文案。
@@ -872,7 +889,7 @@ import MkSourceCard from '@/components/mk-source-card/index.vue'
 
 ### MkFormList
 
-用于多个业务字段组成的动态表单行，只负责重复行布局、添加和删除，不管理业务字段、校验规则或
+用于多个业务字段组成的动态表单行，负责重复行布局、添加、删除和可选排序，不管理业务字段、校验规则或
 选项请求。通过 `v-model` 传入行数据，`defaultItem` 创建新行，列表始终至少保留一行。默认插槽
 提供 `item`、`index`，业务组件在插槽中继续声明
 `el-form-item`、字段路径和校验规则。
@@ -901,6 +918,24 @@ const roleSettings = defineModel<{ roleId: string; workspaceIds: string[] }[]>({
 `:show-add-button="false"`。`firstRowHasLabel` 默认为 `true`：第一行删除按钮使用 `mt-8`，后续行
 使用 `mt-0.5`；并列表单项没有 label 时传入 `:firstRowHasLabel="false"`。删除成功后通过
 `remove(item, index)` 返回被删除的行数据和原索引，业务组件可处理关联状态，不需要再次修改列表。
+增删时使用 Lodash `cloneDeep` 回写独立的行数据，新增行也独立克隆 `defaultItem`，避免共享嵌套
+引用及重复挂载 LogicFlow 的 MobX 可观察对象。调用方应使用业务 ID 识别行，不依赖对象引用保持不变。
+
+表单行排序通过 `sortable` 开启，同时必须提供稳定且唯一的 `item-key`（字段名或取键函数）。
+组件自带拖拽手柄，添加按钮位于排序容器之外，不需要业务再包拖拽指令或放置手柄。
+不足两行或键值无效时禁用拖拽。排序与增删一样深拷贝写回，
+`sort-change` 返回 `{ oldIndex, newIndex, data }`。校验规则和字段路径继续由默认插槽提供。
+
+新行包含业务 ID 时，`default-item` 应传工厂函数，在每次点击添加时生成新 ID；普通无 ID 数据
+仍可传默认对象。
+
+```vue
+<MkFormList v-model="group.variable_list" :default-item="createVariable" :first-row-has-label="false" sortable item-key="v_id">
+  <template #default="{ item, index }">
+    <!-- 业务字段与 el-form-item -->
+  </template>
+</MkFormList>
+```
 
 ### MkSearchList
 
