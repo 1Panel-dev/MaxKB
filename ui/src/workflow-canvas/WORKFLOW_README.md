@@ -100,7 +100,7 @@ Vue Teleport 节点继承页面上下文；画布核心不负责模型参数接�
 智能体页面将详情加载或保存成功返回的配置通过 `defaultModelSettings` Props 传给画布。
 `WorkflowNodeModel.getDefaultModelConfig(type)` 通过画布的配置读取函数获取对应模型，不使用
 默认配置的 `provide/inject`，也不写入节点持久化数据。AI 对话、意图识别、问题优化、语音、
-图片和视频相关节点在默认来源下读取保存后的对应模型 ID 和参数，使用禁用且隐藏参数按钮的
+图片、视频及参数提取相关节点在默认来源下读取保存后的对应模型 ID 和参数，使用禁用且隐藏参数按钮的
 `ModelSelect` 展示；自定义来源继续编辑节点自身配置，引用来源使用 `NodeCascader`。默认配置
 只用于解析当前使用的模型，不覆盖节点保存的自定义配置；各节点在本地维护模型设置，并按当前
 来源检查实际模型或引用变量。
@@ -112,6 +112,21 @@ Vue Teleport 节点继承页面上下文；画布核心不负责模型参数接�
 复杂节点中的普通表单区块直接放在节点 `index.vue`，避免为简单字段读写增加 Props、Emits 和
 中间 computed。独立弹窗、资源选择等具有完整交互边界的能力放在节点目录的 `component/` 下；
 节点入口负责统一写回节点属性和执行节点级校验。
+
+变量拆分节点的 `VariableFieldTable` 通过 `v-model` 接收 `VariableField[]`，只负责列表增删改、
+重名检查和编辑弹窗，不接收节点模型或读写 `node_data`。节点入口在列表写回时同步输出字段并
+清理下游失效引用；字段类型由该组件目录的 `types.ts` 统一定义。
+`VariableFieldDialog` 与 `GroupFieldDialog` 使用 `submit(data, index?)` 提交，表格通过重名检查并
+写回列表后调用 `close()`；关闭动画结束时通过 `closed` 重置表单，添加与编辑共用同一提交流程。
+
+参数提取节点的默认模型读取 `LLM` 配置，新节点默认选择“默认模型”，旧节点缺少来源字段时
+保留“自定义”语义。默认模型仅用于展示与校验，不覆盖节点保存的自定义模型和参数。
+
+参数提取节点遵循相同边界：`component/parameters-field` 内的 `ParametersFieldTable` 通过
+`v-model` 编辑 `ParameterField[]`，弹窗只通过 `submit(data, index?)` 提交，节点入口同步输出
+字段和下游引用。模型引用与输入变量的有效性校验接入节点表单规则，调用 `NodeCascader.validate()`
+保留失效引用检查；节点级 `validate()` 统一调用表单校验。所有非登录表单仅使用 `@submit.prevent`，
+保存或添加由按钮触发。
 
 AI 对话节点的提示词、历史记录、视觉理解和输出思考表单直接在节点入口维护，统一使用全局
 `MdEditorMagnify` 和节点表单样式；AI 提示词生成与思考过程配置仍使用独立弹窗。
