@@ -77,33 +77,27 @@ onBeforeMount(() => {
   <el-form-item label="是否带输入框" required prop="showInput" @click.prevent>
     <el-switch v-model="formValue.showInput" />
   </el-form-item>
-  <!-- // TODO 待调整 -->
-  <el-form-item label="取值范围" required>
-    <el-col :span="11" style="padding-left: 0">
-      <el-form-item :rules="[{ required: true, message: '最小值必填', trigger: 'change' }]" prop="min">
-        <el-input-number style="width: 100%" v-model="formValue.min" controls-position="right" align="left"
-      /></el-form-item>
-    </el-col>
-    <el-col :span="2" class="text-center">
-      <span class="text-gray-500">-</span>
-    </el-col>
-    <el-col :span="11">
-      <el-form-item :rules="[{ required: true, message: '最大值必填', trigger: 'change' }]" prop="max"
-        ><el-input-number
-          prop="max"
-          style="width: 100%"
-          v-model="formValue.max"
-          :min="formValue.min > formValue.max ? formValue.min : undefined"
-          controls-position="right"
-          align="left"
-      /></el-form-item>
-    </el-col>
-  </el-form-item>
-  <el-col :span="11" style="padding-left: 0">
-    <el-form-item label="步长值" required prop="step" :rules="stepRules">
-      <el-input-number style="width: 100%" v-model="formValue.step" :min="0" controls-position="right" align="left" />
+  <!-- 取值范围 -->
+  <div class="mk-required mb-2">取值范围</div>
+  <div class="flex w-full items-start gap-2">
+    <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '最小值必填', trigger: 'change' }]" prop="min">
+      <el-input-number v-model="formValue.min" class="w-full!" controls-position="right" align="left" />
     </el-form-item>
-  </el-col>
+    <span class="flex-center shrink-0 h-8">-</span>
+    <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '最大值必填', trigger: 'change' }]" prop="max">
+      <el-input-number
+        v-model="formValue.max"
+        class="w-full!"
+        :min="formValue.min > formValue.max ? formValue.min : undefined"
+        controls-position="right"
+        align="left"
+      />
+    </el-form-item>
+  </div>
+
+  <el-form-item label="步长值" required prop="step" :rules="stepRules">
+    <el-input-number class="w-full!" v-model="formValue.step" :min="0" controls-position="right" align="left" />
+  </el-form-item>
 
   <el-form-item
     label="默认值"
@@ -111,7 +105,7 @@ onBeforeMount(() => {
     prop="default_value"
     :rules="formValue.required ? [{ required: true, message: '为必填属性' }] : []"
   >
-    <el-slider
+    <MkSlider
       v-model="formValue.default_value"
       :show-input="formValue.showInput"
       :max="formValue.max"

@@ -91,6 +91,8 @@ src/components/
 │   │   └── index.vue             # 带默认搜索图标的输入框
 │   ├── mk-status-label/
 │   │   └── index.vue             # 布尔状态图标和文案
+│   ├── mk-slider/
+│   │   └── index.vue             # 滑块与右置控制按钮的数值输入框
 │   ├── mk-table/
 │   │   ├── index.vue             # 表格、分页、列宽拖拽和批量操作
 │   │   ├── mk-table-filter.vue   # 表头多选筛选器
@@ -563,6 +565,22 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 <MkSearchInput v-model="searchKeyword" placeholder="搜索工作空间" />
 ```
 
+### MkSlider
+
+全局滑块组件，组合 `el-slider` 和 `el-input-number`，默认显示数值输入框，控制按钮固定在
+右侧，输入内容左对齐。输入框的 `controls` 固定为 `true`，始终显示加减按钮；
+`show-input-controls` 不作为组件配置使用，调用方无需传入，传入也不会改变按钮显隐。
+其余 Element Plus Slider Props 和 `update:modelValue`、`input`、`change` 事件保持可用；
+`class`、`style` 作用于外层布局。通过 `:show-input="false"` 隐藏输入框。
+`range` 或 `step="mark"` 模式不显示
+单值输入框；垂直模式下输入框位于滑块下方。输入框与滑块共用范围、步长、禁用状态，
+输入框清空并提交后回退到最小值，表单变更校验由滑块统一触发。
+
+```vue
+<MkSlider v-model="temperature" :min="0" :max="1" :step="0.1" />
+<MkSlider v-model="score" :show-input="false" />
+```
+
 ### MkStatusLabel
 
 用于展示布尔状态。`active` 控制启用或禁用，默认文案为“已启用”和“已禁用”；通过
@@ -1007,6 +1025,20 @@ const formValue = ref<Dict<DynamicFormValue>>({})
 
 字段配置中的动态校验器和表格行表达式属于受信任的服务端协议，只允许加载可信配置；普通业务
 输入不得作为脚本传入。
+
+单选、多选和卡片单选配置器的自定义选项中，标签和选项值的必填校验跟随字段的“是否必填”；每行通过
+`option_list.<index>.label`、`option_list.<index>.value` 参与配置表单校验。编辑中的不完整行
+保留在表单内，仅两项都填写且非纯空白的选项进入默认值选择区和 `getData()` 返回的 `option_list`。
+初始化、空配置回填和切回自定义赋值时保留一行空白选项。卡片单选仅在存在完整选项时显示默认值卡片区。
+引用变量模式继续保留变量路径，不应用自定义选项过滤。
+
+动态表单的 Model 字段使用 `ModelSelect`，将 `attrs.provider_list` 中的模型快照映射为
+扁平 `ModelItem[]`，由选择器统一分组和展示供应商。旧快照未保存状态时保留可选行为，已保存的
+状态按 `ModelSelect` 的可用性规则处理。切换模型一次性回写 `model_id` 和深拷贝后的
+`model_params_setting`；清空时回写空 ID 和空参数，避免修改原配置中的参数对象。
+
+Model 配置器的默认模型也使用 `ModelSelect`，仅展示已选的可选模型，不开启参数设置入口。
+选择时将模型 ID 转换为包含已配置参数的 `default_value` 对象，清空时重置为空对象。
 
 ## 跨页面业务组件
 

@@ -792,6 +792,22 @@
   }
 }
 
+/* slider */
+.el-slider {
+  --el-slider-button-wrapper-size: 16px;
+  --el-slider-button-size: 16px;
+  --el-slider-button-wrapper-offset: -9px;
+  --el-slider-runway-bg-color: rgb(var(--mk-N900-rgb) / 16%);
+  --el-slider-height: 4px;
+  &__button {
+    border: solid 1px var(--mk-N400);
+    box-shadow: var(--el-box-shadow-lighter);
+    &:hover {
+      border: 2px solid var(--el-color-primary);
+    }
+  }
+}
+
 /* steps */
 .el-steps {
   align-items: center;

@@ -74,11 +74,11 @@ defineExpose({ open })
   <MkDialog v-model="visible" title="文件上传设置" width="800" @closed="resetData">
     <el-form :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="单次最多上传文件数">
-        <el-slider v-model="formData.maxFiles" :max="100" :min="1" show-input />
+        <MkSlider v-model="formData.maxFiles" :max="100" :min="1" show-input />
       </el-form-item>
 
       <el-form-item label="单个文件大小限制（MB）">
-        <el-slider v-model="formData.fileLimit" :max="1000" :min="1" show-input />
+        <MkSlider v-model="formData.fileLimit" :max="1000" :min="1" show-input />
       </el-form-item>
 
       <el-form-item label="允许上传的文件类型">
