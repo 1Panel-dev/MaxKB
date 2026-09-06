@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { referenceOptionsHelp } from '../../constant'
 import { computed, onMounted, inject } from 'vue'
 import MultiRow from '@/components/mk-dynamics-form/items/MultiRow.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
@@ -86,27 +87,15 @@ onMounted(() => {
 
 <template>
   <el-form-item v-if="getModel" label="赋值方式">
-    <!-- // TODO 赋值方式待调整 -->
     <el-radio-group @change="formValue.option_list = []" v-model="formValue.assignment_method">
       <el-radio :value="item.value" v-for="(item, index) in assignmentMethodOptions" :key="index">
-        <span class="flex align-center">
+        <span class="flex items-center gap-1">
           {{ item.label }}
-
           <el-tooltip placement="right" v-if="item.value === 'ref_variables'">
             <template #content>
-              变量的值必须符合:<br />
-              [<br />
-              {<br />
-              "label": "xx",<br />
-              "value": "xx",<br />
-              "default": false<br />
-              }<br />
-              ]<br />
-              label: 标签 必填<br />
-              value: 值 必填<br />
-              default: 是否为默认值
+              <div class="whitespace-pre-wrap">{{ referenceOptionsHelp }}</div>
             </template>
-            <MkIcon name="icon_info_outlined"></MkIcon>
+            <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
           </el-tooltip>
         </span>
       </el-radio>

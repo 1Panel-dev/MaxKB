@@ -59,7 +59,14 @@ async function submitEditorDialog() {
   </MdEditor>
 
   <MkDialog v-model="dialogVisible" :title="title" align-center>
-    <MdEditor v-model="dialogContent" :preview="false" :toolbars="[]" :footers="[]" class="magnify-dialog-editor" />
+    <MdEditor
+      v-model="dialogContent"
+      :preview="false"
+      :toolbars="[]"
+      :footers="[]"
+      style="height: calc(100vh - 350px)"
+      class="magnify-dialog-editor"
+    />
 
     <template #footer>
       <el-button type="primary" @click="submitEditorDialog">确定</el-button>

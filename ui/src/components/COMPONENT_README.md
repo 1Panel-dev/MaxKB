@@ -1084,6 +1084,11 @@ const formValue = ref<Dict<DynamicFormValue>>({})
 `enableVisibility` 和 `leftOptions`，其中 `leftOptions` 使用 `VisibilityFieldOption[]`；公开
 `validate()`、`getData()` 与 `render()`。
 
+启用显隐设置时，配置器将 Tabs 导航与内容分开，只继承容器的最大高度，内容较少时自然撑开。
+`el-scrollbar` 及其内部滚动容器使用可收缩的 Flex 布局，并覆盖默认的百分比高度；达到最大高度后
+仅内容区滚动，Tabs 保持固定。普通 `MkDialog` 已提供内容最大高度，调用方不需要设置固定高度。
+两个表单通过 `v-show` 切换并保持挂载，确保未选中的页签也能回填、取值和校验。
+
 字段配置中的动态校验器和表格行表达式属于受信任的服务端协议，只允许加载可信配置；普通业务
 输入不得作为脚本传入。
 

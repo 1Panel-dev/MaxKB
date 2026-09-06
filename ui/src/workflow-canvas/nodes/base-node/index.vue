@@ -250,41 +250,39 @@ onMounted(() => {
       <ConversationVariable :fields="conversationVariables" @update:fields="updateConversationVariables" />
 
       <!-- 语音输入 -->
-      <div class="flex-between mb-2">
+      <div class="flex-between">
         <span>语音输入</span>
         <span class="flex items-center gap-3">
           <el-checkbox v-if="formData.stt_model_enable" v-model="formData.stt_autosend">自动发送</el-checkbox>
           <el-switch v-model="formData.stt_model_enable" size="small" @change="changeSpeechInputEnabled" />
         </span>
       </div>
-      <el-form-item>
-        <template v-if="formData.stt_model_enable">
-          <el-radio-group v-model="formData.stt_model_id_type" class="mb-2">
-            <el-radio value="default">默认模型</el-radio>
-            <el-radio value="custom">自定义</el-radio>
-          </el-radio-group>
-          <ModelSelect
-            v-if="formData.stt_model_id_type === 'default'"
-            :model-value="defaultSttModelSetting?.model_id ?? ''"
-            :model-params="defaultSttModelSetting?.model_params_setting ?? {}"
-            disabled
-            :options="sttModelOptions"
-            :provider-options="providerOptions"
-            placeholder="未配置默认模型"
-          />
-          <ModelSelect
-            v-else
-            v-model="formData.stt_model_id"
-            v-model:model-params="formData.stt_model_params_setting"
-            can-edit-params
-            :options="sttModelOptions"
-            :provider-options="providerOptions"
-          />
-        </template>
+      <el-form-item class="mt-2" v-if="formData.stt_model_enable">
+        <el-radio-group v-model="formData.stt_model_id_type" class="mb-2">
+          <el-radio value="default">默认模型</el-radio>
+          <el-radio value="custom">自定义</el-radio>
+        </el-radio-group>
+        <ModelSelect
+          v-if="formData.stt_model_id_type === 'default'"
+          :model-value="defaultSttModelSetting?.model_id ?? ''"
+          :model-params="defaultSttModelSetting?.model_params_setting ?? {}"
+          disabled
+          :options="sttModelOptions"
+          :provider-options="providerOptions"
+          placeholder="未配置默认模型"
+        />
+        <ModelSelect
+          v-else
+          v-model="formData.stt_model_id"
+          v-model:model-params="formData.stt_model_params_setting"
+          can-edit-params
+          :options="sttModelOptions"
+          :provider-options="providerOptions"
+        />
       </el-form-item>
 
       <!-- 语音播放 -->
-      <div class="flex-between mb-2">
+      <div class="flex-between mt-4">
         <span>语音播放</span>
         <span class="flex items-center gap-3">
           <el-checkbox v-if="formData.tts_model_enable" v-model="formData.tts_autoplay">自动播放</el-checkbox>
@@ -292,31 +290,29 @@ onMounted(() => {
         </span>
       </div>
 
-      <el-form-item class="mb-0!">
-        <template v-if="formData.tts_model_enable">
-          <el-radio-group v-model="formData.tts_type" class="mb-2">
-            <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
-            <el-radio value="DEFAULT">默认模型</el-radio>
-            <el-radio value="CUSTOM">自定义</el-radio>
-          </el-radio-group>
-          <ModelSelect
-            v-if="formData.tts_type === 'DEFAULT'"
-            :model-value="defaultTtsModelSetting?.model_id ?? ''"
-            :model-params="defaultTtsModelSetting?.model_params_setting ?? {}"
-            disabled
-            :options="ttsModelOptions"
-            :provider-options="providerOptions"
-            placeholder="未配置默认模型"
-          />
-          <ModelSelect
-            v-else-if="formData.tts_type === 'CUSTOM'"
-            v-model="formData.tts_model_id"
-            v-model:model-params="formData.tts_model_params_setting"
-            can-edit-params
-            :options="ttsModelOptions"
-            :provider-options="providerOptions"
-          />
-        </template>
+      <el-form-item class="mt-2" v-if="formData.tts_model_enable">
+        <el-radio-group v-model="formData.tts_type" class="mb-2">
+          <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
+          <el-radio value="DEFAULT">默认模型</el-radio>
+          <el-radio value="CUSTOM">自定义</el-radio>
+        </el-radio-group>
+        <ModelSelect
+          v-if="formData.tts_type === 'DEFAULT'"
+          :model-value="defaultTtsModelSetting?.model_id ?? ''"
+          :model-params="defaultTtsModelSetting?.model_params_setting ?? {}"
+          disabled
+          :options="ttsModelOptions"
+          :provider-options="providerOptions"
+          placeholder="未配置默认模型"
+        />
+        <ModelSelect
+          v-else-if="formData.tts_type === 'CUSTOM'"
+          v-model="formData.tts_model_id"
+          v-model:model-params="formData.tts_model_params_setting"
+          can-edit-params
+          :options="ttsModelOptions"
+          :provider-options="providerOptions"
+        />
       </el-form-item>
     </el-form>
   </NodeContainer>

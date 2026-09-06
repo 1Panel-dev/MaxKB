@@ -231,9 +231,7 @@ export const formNode = {
   type: WorkflowNodeType.FormNode,
   text: '在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程',
   label: '表单收集',
-  height: 252,
   properties: {
-    width: 600,
     stepName: '表单收集',
     node_data: {
       is_result: true,
@@ -251,7 +249,7 @@ export const variableAssignNode = {
   type: WorkflowNodeType.VariableAssignNode,
   text: '更新全局变量的值',
   label: '变量赋值',
-  properties: { stepName: '变量赋值', width: 455, config: {} },
+  properties: { stepName: '变量赋值', config: {} },
 }
 
 /* 变量聚合 */
@@ -267,7 +265,7 @@ export const variableSplittingNode = {
   type: WorkflowNodeType.VariableSplittingNode,
   text: '通过配置JSON Path 表达式，对输入的 JSON 格式变量进行解析和拆分',
   label: '变量拆分',
-  properties: { stepName: '变量拆分', width: 455, config: { fields: [{ label: '结果', value: 'result' }] } },
+  properties: { stepName: '变量拆分', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
 /* 参数提取 */
@@ -275,7 +273,7 @@ export const parameterExtractionNode = {
   type: WorkflowNodeType.ParameterExtractionNode,
   text: '利用 AI 模型提取结构化参数',
   label: '参数提取',
-  properties: { stepName: '参数提取', width: 455, config: { fields: [{ label: '结果', value: 'result' }] } },
+  properties: { stepName: '参数提取', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
 /* 多路召回 */

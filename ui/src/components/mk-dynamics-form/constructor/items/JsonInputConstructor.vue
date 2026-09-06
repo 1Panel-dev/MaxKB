@@ -89,21 +89,25 @@ onMounted(() => {
 
 <template>
   <el-form-item v-if="getModel" label="赋值方式">
-    <!-- // TODO 赋值方式待调整 -->
     <el-radio-group v-model="formValue.default_value_assignment_method">
       <el-radio :value="item.value" v-for="(item, index) in assignmentMethodOptions" :key="index">
-        <span class="flex align-center">
+        <span class="flex items-center gap-1">
           {{ item.label }}
 
           <el-tooltip placement="right" v-if="item.value === 'ref_variables'">
             <template #content> 变量的值必须符合: JSON 格式 </template>
-            <MkIcon name="icon_info_outlined"></MkIcon>
+            <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
           </el-tooltip>
         </span>
       </el-radio>
     </el-radio-group>
   </el-form-item>
-  <el-form-item v-if="formValue.default_value_assignment_method === 'ref_variables'" :required="true" prop="default_value" :rules="[referenceVariableRule]">
+  <el-form-item
+    v-if="formValue.default_value_assignment_method === 'ref_variables'"
+    :required="true"
+    prop="default_value"
+    :rules="[referenceVariableRule]"
+  >
     <NodeCascader ref="nodeCascaderRef" :nodeModel="model" placeholder="请选择变量" v-model="formValue.option_list" />
   </el-form-item>
 

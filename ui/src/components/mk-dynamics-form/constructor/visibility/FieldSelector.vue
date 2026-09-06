@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { VisibilityFieldOption } from '../../type'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
+import { iconComponent } from '@/workflow-canvas/icons/utils'
 const props = defineProps<{ modelValue: string[]; leftOptions?: VisibilityFieldOption[] }>()
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -15,6 +16,14 @@ const data = computed({
   },
 })
 const options = computed<VisibilityFieldOption[]>(() => props.leftOptions ?? [])
+
+const selectedNodeField = computed(() => {
+  const [nodeValue, fieldValue] = data.value ?? []
+  if (!nodeValue || !fieldValue) return undefined
+
+  const fieldGroup = options.value.find((field) => field.value === nodeValue)
+  return fieldGroup?.children?.some((field) => field.value === fieldValue) ? fieldGroup : undefined
+})
 
 const validate = () => {
   if (!data.value || data.value.length === 0) {
@@ -40,12 +49,15 @@ defineExpose({ validate })
 </script>
 
 <template>
-  <el-cascader @wheel="handleNodeWheel" :teleported="true" :options="options" v-bind="$attrs" v-model="data" separator=" > " clearable>
+  <el-cascader class="w-full" @wheel="handleNodeWheel" :teleported="true" :options="options" v-bind="$attrs" v-model="data" separator=" > " clearable>
+    <template v-if="selectedNodeField" #prefix>
+      <component :is="iconComponent(`${selectedNodeField.type}-icon`)" :size="20" :item="selectedNodeField" class="small" />
+    </template>
     <template #default="{ data }">
-      <span class="flex align-center" @wheel="handleNodeWheel">
-        <!-- // TODO 不确定icon -->
-        <component v-if="data.icon" :is="data.icon" class="mr-8" :size="18" :item="data" />{{ data.label }}</span
-      >
+      <span class="flex items-center gap-1" @wheel="handleNodeWheel">
+        <component :is="iconComponent(`${data.type}-icon`)" :size="16" :item="data" class="small" />
+        <span>{{ data.label }}</span>
+      </span>
     </template>
   </el-cascader>
 </template>
