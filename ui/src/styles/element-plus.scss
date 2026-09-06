@@ -983,6 +983,10 @@
       padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
     }
   }
+  //  需要仅增加table最外层border的样式
+  &.border {
+    border-right: 1px solid var(--el-table-border-color);
+  }
 
   [class*='el-table__row--level'] .el-table__expand-icon {
     align-items: center;
