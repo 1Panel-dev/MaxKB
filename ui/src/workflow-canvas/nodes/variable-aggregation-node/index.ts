@@ -10,8 +10,9 @@ class VariableAggregationNodeView extends WorkflowNodeView {
 
 class VariableAggregationNodeModel extends WorkflowNodeModel {
   setAttributes() {
-    this.width = Number(this.properties.width ?? 450)
-    this.height = Number(this.properties.height ?? 300)
+    super.setAttributes()
+    this.width = 455
+    this.properties.width = 455
     this.text.editable = false
   }
 }

@@ -19,3 +19,16 @@ export const dynamicFormTypeOptions = [
 
 export type DynamicFormInputType = (typeof dynamicFormTypeOptions)[number]['value']
 export type DynamicFormTypeOption = (typeof dynamicFormTypeOptions)[number]
+
+// 引用变量为选择类字段提供选项时的格式说明。
+export const referenceOptionsHelp = `变量的值必须符合:
+[
+  {
+    "label": "xx",
+    "value": "xx",
+    "default": false
+  }
+]
+label: 标签 必填
+value: 值 必填
+default: 是否为默认值`

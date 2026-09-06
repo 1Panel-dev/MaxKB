@@ -167,8 +167,6 @@ const validateForm = async () => {
       v-model="currentField"
       :enable-visibility="true"
       :left-options="visibilityFieldOptions"
-      label-position="top"
-      require-asterisk-position="right"
     />
     <template #footer>
       <el-button @click="dialogVisible = false">取消</el-button>

@@ -1,288 +1,129 @@
-<template>
-  <NodeContainer :node-model="model">
-    <h6 class="mb-3">节点设置</h6>
-    <el-card shadow="never" class="card-never">
-      <el-form
-        ref="formNodeFormRef"
-        :model="form_data"
-        label-position="top"
-        require-asterisk-position="right"
-        label-width="auto"
-        hide-required-asterisk
-        @submit.prevent
-      >
-        <el-form-item prop="form_content_format" :rules="{ required: true, message: '请填写表单内容', trigger: 'blur' }">
-          <template #label>
-            <div class="flex items-center">
-              <span class="text-N900">表单内容<span class="text-danger">*</span></span>
-              <el-tooltip effect="dark" placement="right">
-                <template #content>表单内容中可使用 { form } 占位符来动态插入表单</template>
-                <MkIcon name="icon_info_outlined" class="ml-1 cursor-pointer align-middle" />
-              </el-tooltip>
-            </div>
-          </template>
-          <el-input
-            v-model="form_data.form_content_format"
-            :rows="5"
-            type="textarea"
-            placeholder="请输入表单内容，如：你好，请先填写下面表单内容：
-{{form}}"
-          />
-        </el-form-item>
-
-        <el-form-item @click.prevent>
-          <template #label>
-            <div class="flex w-full items-center justify-between gap-3">
-              <h6 class="font-medium">表单设置</h6>
-              <el-button link type="primary" @click="openAddDialog">
-                <MkIcon name="icon_add_outlined" class="mr-1" />
-                添加
-              </el-button>
-            </div>
-          </template>
-
-          <MkTable
-            v-if="form_data.form_field_list.length > 0"
-            v-model:data="sortableFields"
-            sortable
-            row-key="field"
-            :max-height="undefined"
-            class="border"
-          >
-            <el-table-column prop="field" :label="'参数'" width="100" show-overflow-tooltip>
-              <template #default="{ row }">
-                <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column :label="'显示名称'">
-              <template #default="{ row }">
-                <span :title="getFieldLabel(row)" class="ellipsis-1">{{ getFieldLabel(row) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column :label="'组件类型'" width="100">
-              <template #default="{ row }">
-                <el-tag size="small" type="info" class="info-tag">{{ getTypeLabel(row.input_type) }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column :label="'默认值'">
-              <template #default="{ row }">
-                <span :title="getDefaultValue(row)" class="ellipsis-1">{{ getDefaultValue(row) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column :label="'必填'" width="55">
-              <template #default="{ row }">
-                <div @click.stop>
-                  <el-switch size="small" :model-value="Boolean(row.required)" />
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column :label="'操作'" width="90">
-              <template #default="{ row, $index }">
-                <el-button link type="primary" @click="openEditDialog(row, $index)">
-                  <MkIcon name="icon_edit_outlined" />
-                </el-button>
-                <el-button link type="info" @click="deleteField($index)">
-                  <MkIcon name="icon_delete-trash_outlined" />
-                </el-button>
-              </template>
-            </el-table-column>
-          </MkTable>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
-    <MkDialog v-model="dialogVisible" :title="isEdit ? '编辑字段' : '添加字段'" width="600px" append-to-body destroy-on-close>
-      <MkDynamicsFormConstructor
-        ref="constructorRef"
-        v-model="currentField"
-        :enable-visibility="true"
-        :left-options="visibilityFieldOptions"
-        label-position="top"
-        require-asterisk-position="right"
-      />
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitField">确定</el-button>
-      </template>
-    </MkDialog>
-  </NodeContainer>
-</template>
 <script setup lang="ts">
-import { ref, inject, computed, onMounted, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
-
+import type { FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import { MkDynamicsFormConstructor, dynamicFormTypeOptions, type FormField, type VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import type { BaseNodeModel } from '@logicflow/core'
-import { MsgError } from '@/utils/message'
+import { handleNodeWheel } from '@/workflow-canvas/core/utils'
+import FormSettingTable from './component/form-setting/FormSettingTable.vue'
 
 defineOptions({ name: 'WorkflowFormNode' })
-const getModel = inject('getModel') as () => BaseNodeModel
-const model = getModel() as WorkflowNodeModel
 
-const dialogVisible = ref(false)
-const isEdit = ref(false)
-const editIndex = ref(-1)
-const currentField = ref<Partial<FormField>>({})
+const getModel = inject<() => WorkflowNodeModel>('getModel')!
+const model = getModel()
 
-const getFieldLabel = (row: FormField) => {
-  if (typeof row.label !== 'string') {
-    return row.label?.label || ''
-  }
-  return row.label || ''
+interface FormNodeForm {
+  is_result: boolean
+  form_field_list: FormField[]
+  form_content_format: string
 }
-
-const getTypeLabel = (inputType: string) => {
-  const item = dynamicFormTypeOptions.find((i) => i.value === inputType)
-  return item ? item.label : inputType
-}
-
-const getDefaultValue = (row: FormField) => {
-  if (row.default_value === undefined || row.default_value === null) return ''
-  if (Array.isArray(row.default_value)) {
-    if (!row.option_list) return String(row.default_value)
-    return row.option_list
-      .filter((v) => (row.default_value as Array<unknown>).includes(v.value))
-      .map((v) => v.label)
-      .join(',')
-  }
-  return String(row.default_value)
-}
-
-const visibilityFieldOptions = computed<VisibilityFieldOption[]>(() => {
-  const selfChildren = form_data.value.form_field_list
-    .filter((_, index) => (editIndex.value < 0 ? true : index < editIndex.value))
-    .map((field) => ({
-      label: getFieldLabel(field),
-      value: field.field,
-      input_type: field.input_type,
-      option_list: field.option_list,
-      attrs: field.attrs,
-    }))
-  return [
-    ...model.getUpNodeFieldList(false, true).filter((field) => Boolean(field.children?.length)),
-    ...(selfChildren.length
-      ? [
-          {
-            label: String(model.properties.stepName || '表单收集'),
-            value: 'self-form',
-            self: true,
-            children: selfChildren,
-          },
-        ]
-      : []),
-  ]
-})
-
-// 节点初始化时补齐默认值和兼容旧数据，computed 只读取表单。
-if (!model.properties.node_data) {
-  model.properties.node_data = { is_result: true, form_content_format: '', form_field_list: [] }
-}
-
-const form_data = computed<{ is_result: boolean; form_field_list: FormField[]; form_content_format: string }>({
-  get: () => model.properties.node_data as { is_result: boolean; form_field_list: FormField[]; form_content_format: string },
-  set: (value) => {
-    model.properties.node_data = value
-  },
-})
 
 const formNodeFormRef = useTemplateRef<FormInstance>('formNodeFormRef')
-const constructorRef = useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('constructorRef')
-// 排序后的工作流字段独立写回，并同步下游可引用字段。
-const sortableFields = computed({
-  get: () => form_data.value.form_field_list,
+
+// 初始化时一次性补齐旧节点缺失的表单配置。
+const defaultForm: FormNodeForm = { is_result: true, form_content_format: '', form_field_list: [] }
+const savedForm = model.properties.node_data as Partial<FormNodeForm> | undefined
+// 当前表单引用统一使用真实节点 ID，兼容旧占位标识与 v2 未保存 self 的条件。
+const savedFields = cloneDeep(Array.isArray(savedForm?.form_field_list) ? savedForm.form_field_list : defaultForm.form_field_list)
+for (const field of savedFields) {
+  for (const condition of field.visibility_rules?.conditions ?? []) {
+    if (condition.field?.length === 2 && (condition.self || condition.field[0] === 'self-form' || condition.field[0] === model.id)) {
+      condition.field[0] = model.id
+      condition.self = true
+    }
+  }
+}
+model.properties.node_data = {
+  ...defaultForm,
+  ...savedForm,
+  is_result: savedForm?.is_result ?? defaultForm.is_result,
+  form_content_format: savedForm?.form_content_format ?? defaultForm.form_content_format,
+  form_field_list: savedFields,
+}
+
+const formData = computed<FormNodeForm>({
+  get: () => model.properties.node_data as FormNodeForm,
+  set: (value) => (model.properties.node_data = value),
+})
+
+// 字段表格只编辑列表，节点统一写回并同步下游引用。
+const formFields = computed({
+  get: () => formData.value.form_field_list,
   set: (fields: FormField[]) => {
-    form_data.value.form_field_list = cloneDeep(fields)
-    syncFieldList()
+    formData.value.form_field_list = cloneDeep(fields)
+    model.properties.config ??= {}
+    model.properties.config.fields = [
+      { label: '表单全部内容', value: 'form_data' },
+      ...formFields.value.map((field) => ({
+        label: typeof field.label === 'string' ? field.label : (field.label?.label ?? ''),
+        value: field.field,
+      })),
+    ]
+    model.clearNextNodeField(true)
   },
 })
 
-const openAddDialog = () => {
-  isEdit.value = false
-  editIndex.value = -1
-  currentField.value = {}
-  dialogVisible.value = true
-}
+const upstreamFieldOptions = computed<VisibilityFieldOption[]>(() =>
+  model.getUpNodeFieldList(false, true).filter((field) => Boolean(field.children?.length)),
+)
 
-const openEditDialog = (row: FormField, index: number) => {
-  isEdit.value = true
-  editIndex.value = index
-  currentField.value = { ...cloneDeep(row) }
-  dialogVisible.value = true
-}
-
-const deleteField = (index: number) => {
-  const list = cloneDeep(form_data.value.form_field_list)
-  list.splice(index, 1)
-  form_data.value.form_field_list = list
-  syncFieldList()
-}
-
-const submitField = async () => {
-  try {
-    await constructorRef.value?.validate()
-    const data = constructorRef.value?.getData()
-    if (!data) return
-
-    const isDuplicate = form_data.value.form_field_list.some((item, index) => item.field === data.field && index !== editIndex.value)
-    if (isDuplicate) {
-      MsgError(`参数 "${data.field}" 已存在`)
-      return
-    }
-
-    const list = cloneDeep(form_data.value.form_field_list)
-    if (isEdit.value && editIndex.value >= 0) {
-      list.splice(editIndex.value, 1, data as FormField)
-    } else {
-      list.push(data as FormField)
-    }
-    form_data.value.form_field_list = list
-    syncFieldList()
-    dialogVisible.value = false
-  } catch {
-    //
-  }
-}
-
-const syncFieldList = () => {
-  const fields = [
-    { label: '表单全部内容', value: 'form_data' },
-    ...form_data.value.form_field_list.map((item) => ({ value: item.field, label: getFieldLabel(item) })),
-  ]
-  if (!model.properties.config) {
-    model.properties.config = {}
-  }
-  model.properties.config!.fields = fields
-  model.clearNextNodeField(true)
-}
-
-const validate = () => {
-  const vList: Array<Promise<unknown>> = []
+// 节点校验保留表单内容与显隐条件中的失效引用检查。
+function validate() {
+  const validationResults: Array<Promise<unknown>> = []
   const formResult = formNodeFormRef.value?.validate()
-  if (formResult) vList.push(formResult)
+  if (formResult) validationResults.push(formResult)
 
   const upstreamNodeFields = model.getUpNodeFieldList(true, true)
-  for (const field of form_data.value.form_field_list) {
-    for (const cond of field.visibility_rules?.conditions || []) {
-      if (!cond.field || cond.field.length < 2 || !cond.field[0] || !cond.field[1]) continue
-      if (cond.self) {
-        if (!form_data.value.form_field_list.some((f) => f.field === cond.field[1])) {
-          vList.push(Promise.reject('引用变量不存在'))
+  for (const field of formData.value.form_field_list) {
+    for (const condition of field.visibility_rules?.conditions || []) {
+      if (!condition.field || condition.field.length < 2 || !condition.field[0] || !condition.field[1]) continue
+      if (condition.self) {
+        if (!formData.value.form_field_list.some((formField) => formField.field === condition.field[1])) {
+          validationResults.push(Promise.reject('引用变量不存在'))
         }
       } else {
-        const nodeEntry = upstreamNodeFields.find((n) => n.value === cond.field[0])
-        if (!nodeEntry || !nodeEntry.children?.some((c) => c.value === cond.field[1])) {
-          vList.push(Promise.reject('引用变量不存在'))
+        const nodeEntry = upstreamNodeFields.find((node) => node.value === condition.field[0])
+        if (!nodeEntry || !nodeEntry.children?.some((nodeField) => nodeField.value === condition.field[1])) {
+          validationResults.push(Promise.reject('引用变量不存在'))
         }
       }
     }
   }
-  return Promise.all(vList).catch((error) => Promise.reject({ node: model, errMessage: error }))
+  return Promise.all(validationResults).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
   model.validate = validate
 })
 </script>
+
+<template>
+  <NodeContainer :node-model="model">
+    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <div class="mk-gray-card">
+      <el-form ref="formNodeFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+        <el-form-item prop="form_content_format" class="mk-hide-asterisk" :rules="{ required: true, message: '请填写表单输出内容', trigger: 'blur' }">
+          <template #label>
+            <div class="flex items-center gap-1">
+              <span class="mk-required">表单输出内容</span>
+              <el-tooltip placement="right" content="设置执行该节点输出的内容，{ form } 为表单的占位符">
+                <MkIcon name="icon_info_outlined" class="text-N600!" />
+              </el-tooltip>
+            </div>
+          </template>
+          <MdEditorMagnify v-model="formData.form_content_format" title="表单输出内容" @wheel="handleNodeWheel" />
+        </el-form-item>
+        <!-- 表单配置 -->
+        <el-form-item>
+          <FormSettingTable
+            v-model="formFields"
+            :upstream-field-options="upstreamFieldOptions"
+            :node-id="model.id"
+            :node-name="String(model.properties.stepName || '表单收集')"
+          />
+        </el-form-item>
+      </el-form>
+    </div>
+  </NodeContainer>
+</template>

@@ -8,4 +8,12 @@ class FormNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.FormNode, model: WorkflowNodeModel, view: FormNodeView }
+class FormNodeModel extends WorkflowNodeModel {
+  override setAttributes() {
+    super.setAttributes()
+    this.width = 680
+    this.properties.width = 680
+  }
+}
+
+export default { type: WorkflowNodeType.FormNode, model: FormNodeModel, view: FormNodeView }

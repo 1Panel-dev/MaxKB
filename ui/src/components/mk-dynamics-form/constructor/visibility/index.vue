@@ -112,29 +112,25 @@ defineExpose({ getData, render, validate })
 </script>
 
 <template>
-  <div class="w-full space-y-4">
+  <div class="w-full">
     <el-radio-group v-model="formData.action">
       <el-radio value="show">显示条件</el-radio>
       <el-radio value="hide">隐藏条件</el-radio>
     </el-radio-group>
 
-    <div class="flex align-center gap-2">
-      <span class="lighter">满足</span>
+    <div class="flex align-center gap-2 my-2">
+      <span>符合以下</span>
       <el-select v-model="formData.condition" size="small" class="w-20!">
-        <el-option label="且" value="and" />
-        <el-option label="或" value="or" />
+        <el-option label="所有" value="and" />
+        <el-option label="任意" value="or" />
       </el-select>
-      <span class="lighter">条件</span>
+      <span>条件</span>
     </div>
 
-    <el-scrollbar>
-      <div style="max-height: calc(100vh - 400px)">
-        <MkFormList v-model="conditionRows" :default-item="defaultCondition" :firstRowHasLabel="false">
-          <template #default="{ item: condition }">
-            <ConditionRow :model-value="condition" :left-options="leftOptions" />
-          </template>
-        </MkFormList>
-      </div>
-    </el-scrollbar>
+    <MkFormList v-model="conditionRows" :default-item="defaultCondition" :firstRowHasLabel="false">
+      <template #default="{ item: condition }">
+        <ConditionRow :model-value="condition" :left-options="leftOptions" />
+      </template>
+    </MkFormList>
   </div>
 </template>
