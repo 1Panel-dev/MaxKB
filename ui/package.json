@@ -47,10 +47,10 @@
     "pinia": "^3.0.4",
     "prettier": "3.8.4",
     "screenfull": "^6.0.2",
-    "sortablejs": "^1.15.7",
     "vue": "^3.5.38",
     "vue-codemirror": "^6.1.1",
     "vue-demi": "^0.14.10",
+    "vue-draggable-plus": "^0.6.1",
     "vue-router": "^5.1.0"
   },
   "devDependencies": {
@@ -59,7 +59,6 @@
     "@types/lodash": "^4.17.25",
     "@types/node": "^24.13.2",
     "@types/nprogress": "^0.2.3",
-    "@types/sortablejs": "^1.15.9",
     "@vitejs/plugin-vue": "^6.0.7",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
     "@vue/eslint-config-typescript": "^14.8.0",

@@ -16,6 +16,7 @@ src/utils/
 ├── resource-context.ts   # 当前路由的资源范围和工作空间上下文判断
 ├── time.ts               # 跨页面复用的日期时间计算与格式化函数
 ├── use-responsive.ts     # 需要同步组件状态时使用的响应式屏幕判断
+├── use-sortable.ts       # 列表排序、动态容器绑定和可选的独立数据写回
 └── vnode.ts              # Vue 插槽 VNode 的可渲染内容判断
 ```
 
@@ -30,6 +31,48 @@ src/utils/
 - 不要为了统一导出而新增只做二次转发的 `index.ts`，使用方从具体文件直接导入。
 - 依赖 Vue 响应式状态或生命周期的通用组合式函数可以使用 `use-*.ts` 命名。
 - 仅改变样式的响应式需求优先使用 Tailwind；只有需要改变组件状态时才使用响应式工具函数。
+
+## 拖拽排序
+
+同一列表内的拖拽排序统一使用 `use-sortable.ts` 的 `useSortable`，底层为 VueDraggablePlus；
+不要在业务代码中直接初始化 SortableJS 或重复实现 DOM 还原和数组移动。目录树继续使用
+`@he-tree/vue` 的树形拖拽协议。
+
+```ts
+import { ref } from 'vue'
+import { useSortable } from '@/utils/use-sortable'
+
+const rowContainer = ref<HTMLElement>()
+const taskRows = ref([
+  { id: 'a', name: '任务 A' },
+  { id: 'b', name: '任务 B' },
+])
+const sortDisabled = ref(false)
+
+useSortable(rowContainer, taskRows, () => ({
+  handle: '.task-drag-handle',
+  draggable: '> .task-row',
+  disabled: sortDisabled.value,
+  onReorder: ({ oldIndex, newIndex, data }) => {
+    // data 已经完成排序，可在这里保存新顺序，不要再次 splice。
+  },
+}))
+```
+
+容器的直属可拖动元素应与数组逐项对应，Vue 渲染使用稳定业务 ID 作为 `key`；添加按钮等
+操作元素放在行容器之外。容器参数支持模板 Ref 或返回 HTMLElement 的 getter，适配 `v-if`
+和表格内部 `tbody`；组件更新时检查是否需要重新绑定，卸载时自动销毁。外部代码重建内部 DOM
+时可调用返回的 `refresh()`，也提供 `pause()`、`resume()`；响应式禁用优先通过 `disabled` 配置。
+配置可传对象、Ref 或 getter，默认动画 `150ms`，拖拽占位使用 `opacity-40`。
+
+普通 Vue 数组排序保留行对象引用；LogicFlow/MobX 可观察树的数据需要开启
+`cloneOnUpdate: true`，或在业务 computed setter 中使用 Lodash `cloneDeep` 后写回。
+库的 `clone` 选项不等同于普通排序写回时深拷贝整个数组。`onReorder` 只在实际顺序变化时触发，
+返回 `{ oldIndex, newIndex, data }`，索引基于当前列表，从 `0` 开始。
+
+MkTable、MkFormList 的排序优先使用其公开属性；普通列表再直接接入该工具。本工具只处理
+同一列表排序，不开放跨列表 `group` 和绕过默认同步的 `customUpdate`；特殊业务置换规则应另行
+评估，不直接套用普通移动语义。
 
 ## 资源上下文
 

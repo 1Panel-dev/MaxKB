@@ -113,6 +113,7 @@ defineExpose({ validate })
       @visible-change="handleVisibleChange"
       @wheel.stop
       fit-input-width
+      class="w-full"
     >
       <template v-if="selectedNodeField" #prefix>
         <component :is="iconComponent(`${selectedNodeField.type}-icon`)" :size="20" :item="selectedNodeField" class="small" />

@@ -149,7 +149,7 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-3">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">节点设置</h6>
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
         <!-- AI模型 -->
@@ -190,7 +190,6 @@ onMounted(() => {
             ref="modelCascaderRef"
             :model-value="formData.model_id_reference"
             :node-model="model"
-            class="w-full"
             placeholder="请选择变量"
             @update:model-value="updateNodeData({ model_id_reference: $event })"
           />
@@ -279,7 +278,7 @@ onMounted(() => {
                 </el-tooltip>
               </span>
             </template>
-            <NodeCascader ref="imageCascaderRef" v-model="formData.image_list" :node-model="model" class="w-full" placeholder="请选择" />
+            <NodeCascader ref="imageCascaderRef" v-model="formData.image_list" :node-model="model" placeholder="请选择" />
           </el-form-item>
 
           <el-form-item>
@@ -295,7 +294,7 @@ onMounted(() => {
                 </el-tooltip>
               </span>
             </template>
-            <NodeCascader v-model="formData.video_list" :node-model="model" class="w-full" placeholder="请选择" />
+            <NodeCascader v-model="formData.video_list" :node-model="model" placeholder="请选择" />
           </el-form-item>
         </template>
 

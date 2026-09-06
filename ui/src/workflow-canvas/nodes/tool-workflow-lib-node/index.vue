@@ -188,7 +188,6 @@ onMounted(() => {
               v-if="field.source === 'reference'"
               v-model="field.value"
               :node-model="model"
-              class="w-full"
               placeholder="请选择参数"
             />
             <template v-else>

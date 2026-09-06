@@ -150,7 +150,7 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-3">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">节点设置</h6>
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
         <el-form-item class="mk-hide-asterisk" :prop="modelFormProp" :rules="{ validator: validateModel, trigger: 'change' }">
@@ -190,7 +190,6 @@ onMounted(() => {
             ref="modelCascaderRef"
             :model-value="formData.model_id_reference"
             :node-model="model"
-            class="w-full"
             placeholder="请选择变量"
             @update:model-value="updateModelSetting({ model_id_reference: $event })"
           />
@@ -198,7 +197,7 @@ onMounted(() => {
 
         <!-- 输入 -->
         <el-form-item prop="content_list" :rules="{ required: true, message: '请选择', trigger: 'change' }" label="输入">
-          <NodeCascader ref="contentCascaderRef" v-model="formData.content_list" :node-model="model" class="w-full" placeholder="请选择" />
+          <NodeCascader ref="contentCascaderRef" v-model="formData.content_list" :node-model="model" placeholder="请选择" />
         </el-form-item>
 
         <!-- 历史聊天记录 -->

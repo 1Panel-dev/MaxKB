@@ -125,7 +125,7 @@ onMounted(() => {
               </div>
             </template>
 
-            <NodeCascader v-if="field.source === 'reference'" v-model="field.value" :node-model="model" class="w-full" placeholder="请选择参数" />
+            <NodeCascader v-if="field.source === 'reference'" v-model="field.value" :node-model="model" placeholder="请选择参数" />
             <el-input v-else v-model="field.value" placeholder="请输入参数" />
           </el-form-item>
         </template>

@@ -104,7 +104,7 @@ onMounted(() => {
     </el-radio-group>
   </el-form-item>
   <el-form-item v-if="formValue.default_value_assignment_method === 'ref_variables'" :required="true" prop="default_value" :rules="[referenceVariableRule]">
-    <NodeCascader ref="nodeCascaderRef" :nodeModel="model" class="w-full" placeholder="请选择变量" v-model="formValue.option_list" />
+    <NodeCascader ref="nodeCascaderRef" :nodeModel="model" placeholder="请选择变量" v-model="formValue.option_list" />
   </el-form-item>
 
   <el-form-item

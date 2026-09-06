@@ -6,7 +6,7 @@ import { iconComponent } from '@/workflow-canvas/icons/utils'
 import { copyText } from '@/utils/clipboard'
 import { WorkflowMode, WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
 import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
-import type {  NodeMenuItem } from '@/workflow-canvas/node-menu/types'
+import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
 import NodeConditionDropdown from './NodeConditionDropdown.vue'
 import NodeOperateDropdown from './NodeOperateDropdown.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
@@ -282,7 +282,7 @@ onBeforeUnmount(() => {
             ></h4>
           </div>
 
-          <div class="flex items-center gap-1" @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
+          <div class="flex items-center gap-1" @pointerdown.stop @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode">
               <MkIcon name="icon_down_outlined" />
             </el-button>
@@ -311,7 +311,7 @@ onBeforeUnmount(() => {
         />
 
         <el-collapse-transition>
-          <div v-show="showNode" class="mt-4" @pointermove.stop @pointerenter.stop @mousedown.stop @keydown.stop @click.stop>
+          <div v-show="showNode" class="mt-4" @pointerdown.stop @pointermove.stop @pointerenter.stop @mousedown.stop @keydown.stop @click.stop>
             <slot />
 
             <!-- 输出参数 -->
@@ -358,6 +358,7 @@ onBeforeUnmount(() => {
         class="absolute"
         :class="{ 'pointer-events-none': nodeMenuDragClosing }"
         :workflow-mode="workflowMode"
+        @pointerdown.stop
         @mousemove.stop
         @mousedown.stop
         @click.stop

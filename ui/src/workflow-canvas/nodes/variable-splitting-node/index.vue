@@ -61,7 +61,7 @@ onMounted(() => {
               <div>输入变量<span class="ml-1 text-danger">*</span></div>
             </div>
           </template>
-          <NodeCascader ref="nodeCascaderRef" :node-model="model" class="w-full" placeholder="请选择变量" v-model="formData.input_variable" />
+          <NodeCascader ref="nodeCascaderRef" :node-model="model" placeholder="请选择变量" v-model="formData.input_variable" />
         </el-form-item>
 
         <el-form-item prop="variable_list" :rules="{ message: '请添加拆分变量', trigger: 'blur', required: true }">

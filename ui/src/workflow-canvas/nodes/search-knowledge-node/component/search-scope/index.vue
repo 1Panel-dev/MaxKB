@@ -121,7 +121,6 @@ defineExpose({ validate })
         ref="referenceRef"
         :model-value="scopeReference"
         :node-model="nodeModel"
-        class="w-full"
         placeholder="请选择引用变量"
         @update:model-value="emit('update:scopeReference', $event)"
         @visible-change="anchorGuard.setOverlayVisible('reference', $event)"

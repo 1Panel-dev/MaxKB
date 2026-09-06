@@ -53,6 +53,10 @@ src/workflow-canvas/
 下拉展开时通过 `document` 捕获阶段的 `pointerdown` 处理外部点击，排除组件内部的输入框和
 未 Teleport 的下拉面板；关闭及卸载时移除监听。不要移除节点容器的鼠标事件隔离来恢复外部关闭，
 以免操作表单时触发画布拖拽。
+节点内容区、标题操作区和节点菜单在冒泡阶段拦截 `pointerdown`，避免表单或列表排序同时启动
+LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Pointer Events。不要在捕获阶段
+拦截，以免阻断内部排序手柄；也不要拦截 `pointerup`，保留已启动拖拽的结束事件。节点标题区域
+继续允许正常拖动节点。
 同一节点的多个 `createAnchorGuard()` 实例共享浮层状态，最后一个浮层关闭或卸载后才恢复
 节点原本的 `hittable` 状态。
 
@@ -126,6 +130,18 @@ Vue `computed` 的 `set` 和原生 `Map.set()` 按各自 API 正常使用。
 支持直接输出给用户的节点使用 `is_result` 保存“返回内容”开关；该设置只在应用、应用循环、
 工具和工具循环模式展示。新节点和旧节点缺失字段时的处理沿用 v2 对应节点行为；AI 对话和
 问题优化节点会在旧数据缺少该字段且节点位于流程末尾时启用返回内容。
+
+### 节点列表排序
+
+普通节点列表、表单行和字段表格统一复用 VueDraggablePlus 支撑的共享排序能力：表单行使用
+`MkFormList` 的 `sortable` 与稳定 `item-key`，字段表格使用 `MkTable` 的 `sortable` 与
+`v-model:data`，其他列表使用 `@/utils/use-sortable`。不要在节点中直接创建 SortableJS 实例、
+手动恢复排序 DOM，或在库已更新数组后再次移动数据。
+
+MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行对象引用，因此工作流节点
+在 computed setter 中深拷贝新数组后写回 `model.properties.node_data`，并执行原有字段同步。
+带 ID 的新行使用 `default-item` 工厂函数，每次添加生成独立 ID。条件分支等保留锚点 ID、
+固定末尾分支的特殊规则不能直接替换成普通列表移动。
 
 ## View 接入约定
 

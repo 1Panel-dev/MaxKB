@@ -169,25 +169,24 @@ onMounted(() => {
             ref="questionCascaderRef"
             v-model="formData.question_reference_address"
             :node-model="model"
-            class="w-full"
             placeholder="请选择用户问题"
           />
         </el-form-item>
 
         <el-form-item v-if="formData.document_list !== undefined" label="选择文档" prop="document_list">
-          <NodeCascader v-model="formData.document_list" :node-model="model" class="w-full" placeholder="请选择文档" />
+          <NodeCascader v-model="formData.document_list" :node-model="model" placeholder="请选择文档" />
         </el-form-item>
 
         <el-form-item v-if="formData.image_list !== undefined" label="选择图片" prop="image_list">
-          <NodeCascader v-model="formData.image_list" :node-model="model" class="w-full" placeholder="请选择图片" />
+          <NodeCascader v-model="formData.image_list" :node-model="model" placeholder="请选择图片" />
         </el-form-item>
 
         <el-form-item v-if="formData.audio_list !== undefined" label="选择音频" prop="audio_list">
-          <NodeCascader v-model="formData.audio_list" :node-model="model" class="w-full" placeholder="请选择音频" />
+          <NodeCascader v-model="formData.audio_list" :node-model="model" placeholder="请选择音频" />
         </el-form-item>
 
         <el-form-item v-if="formData.video_list !== undefined" label="选择视频" prop="video_list">
-          <NodeCascader v-model="formData.video_list" :node-model="model" class="w-full" placeholder="请选择视频" />
+          <NodeCascader v-model="formData.video_list" :node-model="model" placeholder="请选择视频" />
         </el-form-item>
 
         <el-form-item
@@ -197,7 +196,7 @@ onMounted(() => {
           :prop="`api_input_field_list.${index}.value`"
           :rules="{ required: field.is_required, message: `请选择${formatFieldLabel(field.variable)}`, trigger: 'change' }"
         >
-          <NodeCascader v-model="field.value" :node-model="model" class="w-full" placeholder="请选择参数" />
+          <NodeCascader v-model="field.value" :node-model="model" placeholder="请选择参数" />
         </el-form-item>
 
         <el-form-item
@@ -207,7 +206,7 @@ onMounted(() => {
           :prop="`user_input_field_list.${index}.value`"
           :rules="{ required: field.required, message: `请选择${formatFieldLabel(field.label)}`, trigger: 'change' }"
         >
-          <NodeCascader v-model="field.value" :node-model="model" class="w-full" placeholder="请选择参数" />
+          <NodeCascader v-model="field.value" :node-model="model" placeholder="请选择参数" />
         </el-form-item>
 
         <el-form-item label="返回内容" @click.prevent>
