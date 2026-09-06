@@ -7,10 +7,11 @@ import ModelSelect from '@/components/business/model-select/index.vue'
 import type { FormField } from '@/components/mk-dynamics-form'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
-import ApiParameter from './component/api-parameter/index.vue'
-import ConversationVariable from './component/conversation-variable/index.vue'
-import UserInput from './component/user-input/index.vue'
+import ApiParameterTable from './component/api-parameter/ApiParameterTable.vue'
+import ConversationVariableTable from './component/conversation-variable/ConversationVariableTable.vue'
+import UserInputTable from './component/user-input/UserInputTable.vue'
 import { defaultFileUploadSetting } from './constant'
 import { type ApiInputField, type BaseNodeForm, type ChatInputField, type UserInputSetting } from './types'
 
@@ -23,10 +24,7 @@ const store = useWorkflowStore(apiType)
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 
-const sttModelOptions = ref<ModelItem[]>([])
-const ttsModelOptions = ref<ModelItem[]>([])
-const providerOptions = ref<ModelProviderItem[]>([])
-
+// 基本信息与节点数据初始化
 const defaultForm: BaseNodeForm = {
   desc: '',
   file_upload_enable: false,
@@ -72,20 +70,37 @@ const formData = computed<BaseNodeForm>({
   set: (value) => (model.properties.node_data = value),
 })
 
-function handleEditorWheel(event: WheelEvent) {
-  if (event.ctrlKey) event.preventDefault()
-  else event.stopPropagation()
+// 长期记忆
+function changeLongTermEnabled(enabled: boolean | number | string) {
+  formData.value.long_term_enable = Boolean(enabled)
+  if (enabled && !formData.value.long_term_model_id_type) formData.value.long_term_model_id_type = 'default'
+  model.graphModel.eventCenter.emit('refreshLongTermConfig', undefined)
 }
 
-// 子模块数据映射
-const userInputFields = computed(() => (model.properties.user_input_field_list ?? []) as FormField[])
-const apiInputFields = computed(() => (model.properties.api_input_field_list ?? []) as ApiInputField[])
-const conversationVariables = computed(() => (model.properties.chat_input_field_list ?? []) as ChatInputField[])
-const userInputSetting = computed<UserInputSetting>(() =>
-  cloneDeep((model.properties.user_input_field_list_setting as UserInputSetting | undefined) ?? { exposed_fields: [], menu_title: '更多设置' }),
-)
-const defaultSttModelSetting = computed(() => model.getDefaultModelConfig('STT'))
-const defaultTtsModelSetting = computed(() => model.getDefaultModelConfig('TTS'))
+// 文件上传
+function changeFileUploadEnabled(enabled: boolean | number | string) {
+  formData.value.file_upload_enable = Boolean(enabled)
+  if (enabled && !formData.value.file_upload_setting) {
+    formData.value.file_upload_setting = cloneDeep(defaultFileUploadSetting)
+  }
+  model.graphModel.eventCenter.emit('refreshFileUploadConfig', undefined)
+}
+
+// 用户输入：字段、展示设置与显隐引用校验
+const userInputFields = computed({
+  get: () => (model.properties.user_input_field_list ?? []) as FormField[],
+  set: (fields) => {
+    model.properties.user_input_field_list = cloneDeep(fields)
+    model.graphModel.eventCenter.emit('refreshFieldList', undefined)
+  },
+})
+const userInputSetting = computed<UserInputSetting>({
+  get: () =>
+    cloneDeep((model.properties.user_input_field_list_setting as UserInputSetting | undefined) ?? { exposed_fields: [], menu_title: '用户输入' }),
+  set: (setting) => {
+    model.properties.user_input_field_list_setting = cloneDeep(setting)
+  },
+})
 
 function validateUserFieldReferences() {
   for (const userField of userInputFields.value) {
@@ -93,14 +108,56 @@ function validateUserFieldReferences() {
       if (!condition.field?.[0] || !condition.field?.[1]) continue
       const isCurrentForm = condition.field[0] === model.id || (model.id === 'base-node' && condition.field[0] === 'global')
       if (isCurrentForm && !userInputFields.value.some(({ field }) => field === condition.field[1])) {
-        return Promise.reject('用户输入参数引用了已删除的变量')
+        return Promise.reject('引用变量不存在')
       }
     }
   }
   return Promise.resolve()
 }
 
+// 接口传参
+const apiInputFields = computed({
+  get: () => (model.properties.api_input_field_list ?? []) as ApiInputField[],
+  set: (fields) => {
+    model.properties.api_input_field_list = cloneDeep(fields)
+    model.graphModel.eventCenter.emit('refreshFieldList', undefined)
+  },
+})
+
+// 会话变量
+const conversationVariables = computed({
+  get: () => (model.properties.chat_input_field_list ?? []) as ChatInputField[],
+  set: (fields) => {
+    model.properties.chat_input_field_list = cloneDeep(fields)
+    model.graphModel.eventCenter.emit('chatFieldList', undefined)
+  },
+})
+
+// 语音输入
+const sttModelOptions = ref<ModelItem[]>([])
+const defaultSttModelSetting = computed(() => model.getDefaultModelConfig('STT'))
+
+function changeSpeechInputEnabled(enabled: boolean | number | string) {
+  if (!enabled) formData.value.stt_model_id = ''
+  if (!formData.value.stt_model_id_type) formData.value.stt_model_id_type = 'default'
+}
+
+// 语音播放
+const ttsModelOptions = ref<ModelItem[]>([])
+const defaultTtsModelSetting = computed(() => model.getDefaultModelConfig('TTS'))
+
+function changeSpeechPlaybackEnabled(enabled: boolean | number | string) {
+  if (enabled) return
+  formData.value.tts_model_id = ''
+  formData.value.tts_type = 'BROWSER'
+}
+
+// 语音模型共用的供应商选项
+const providerOptions = ref<ModelProviderItem[]>([])
+
+// 节点统一校验
 function validate() {
+  // TODO v2没有标记必填 但是需要校验 需要核对一下
   if (formData.value.tts_model_enable && formData.value.tts_type === 'CUSTOM' && !formData.value.tts_model_id) {
     return Promise.reject({ node: model, errMessage: '请选择语音播放模型' })
   }
@@ -117,51 +174,6 @@ function validate() {
     return Promise.reject({ node: model, errMessage: '请选择长期记忆模型' })
   }
   return Promise.all([validateUserFieldReferences(), formRef.value?.validate()]).catch((error) => Promise.reject({ node: model, errMessage: error }))
-}
-
-// 子模块数据更新
-function changeLongTermEnabled(enabled: boolean | number | string) {
-  formData.value.long_term_enable = Boolean(enabled)
-  if (enabled && !formData.value.long_term_model_id_type) formData.value.long_term_model_id_type = 'default'
-  model.graphModel.eventCenter.emit('refreshLongTermConfig', undefined)
-}
-
-function changeFileUploadEnabled(enabled: boolean | number | string) {
-  formData.value.file_upload_enable = Boolean(enabled)
-  if (enabled && !formData.value.file_upload_setting) {
-    formData.value.file_upload_setting = cloneDeep(defaultFileUploadSetting)
-  }
-  model.graphModel.eventCenter.emit('refreshFileUploadConfig', undefined)
-}
-
-function updateUserInputFields(fields: FormField[]) {
-  model.properties.user_input_field_list = fields
-  model.graphModel.eventCenter.emit('refreshFieldList', undefined)
-}
-
-function updateUserInputSetting(setting: UserInputSetting) {
-  model.properties.user_input_field_list_setting = setting
-}
-
-function updateApiInputFields(fields: ApiInputField[]) {
-  model.properties.api_input_field_list = fields
-  model.graphModel.eventCenter.emit('refreshFieldList', undefined)
-}
-
-function updateConversationVariables(fields: ChatInputField[]) {
-  model.properties.chat_input_field_list = fields
-  model.graphModel.eventCenter.emit('chatFieldList', undefined)
-}
-
-function changeSpeechInputEnabled(enabled: boolean | number | string) {
-  if (!enabled) formData.value.stt_model_id = ''
-  if (!formData.value.stt_model_id_type) formData.value.stt_model_id_type = 'default'
-}
-
-function changeSpeechPlaybackEnabled(enabled: boolean | number | string) {
-  if (enabled) return
-  formData.value.tts_model_id = ''
-  formData.value.tts_type = 'BROWSER'
 }
 
 onMounted(() => {
@@ -195,7 +207,7 @@ onMounted(() => {
       </el-form-item>
 
       <el-form-item label="开场白">
-        <MdEditorMagnify v-model="formData.prologue" title="开场白" @wheel="handleEditorWheel" />
+        <MdEditorMagnify v-model="formData.prologue" title="开场白" @wheel="handleNodeWheel" />
       </el-form-item>
 
       <!-- 长期记忆 -->
@@ -234,20 +246,18 @@ onMounted(() => {
         </span>
       </div>
 
-      <!-- 用户输入 TODO 整理 -->
-      <UserInput
-        :api-fields="apiInputFields"
-        :fields="userInputFields"
-        :node-id="model.id"
-        :setting="userInputSetting"
-        @update:fields="updateUserInputFields"
-        @update:setting="updateUserInputSetting"
-      />
-      <!-- 接口传参 TODO 整理 -->
-      <ApiParameter :fields="apiInputFields" :user-fields="userInputFields" @update:fields="updateApiInputFields" />
-
-      <!-- 会话变量 TODO 整理 -->
-      <ConversationVariable :fields="conversationVariables" @update:fields="updateConversationVariables" />
+      <!-- 用户输入 -->
+      <el-form-item>
+        <UserInputTable v-model="userInputFields" v-model:setting="userInputSetting" :api-fields="apiInputFields" :node-id="model.id" />
+      </el-form-item>
+      <!-- 接口传参 -->
+      <el-form-item>
+        <ApiParameterTable v-model="apiInputFields" :user-fields="userInputFields" />
+      </el-form-item>
+      <!-- 会话变量 -->
+      <el-form-item>
+        <ConversationVariableTable v-model="conversationVariables" />
+      </el-form-item>
 
       <!-- 语音输入 -->
       <div class="flex-between">

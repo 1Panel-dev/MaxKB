@@ -85,7 +85,7 @@ function validate() {
   const fieldGroup = getOptionsValue().find(({ value }) => value === nodeId)
   if (!fieldGroup?.children?.some(({ value }) => value === fieldValue)) {
     selectedValue.value = []
-    return Promise.reject('不存在的引用变量')
+    return Promise.reject('引用变量不存在')
   }
   return Promise.resolve()
 }
