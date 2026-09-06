@@ -1,21 +1,9 @@
 <script setup lang="ts">
 import type { DynamicFormValue } from '../../type'
 import { computed, inject, ref } from 'vue'
-import { groupBy } from 'lodash'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import { providerList as providerOptions } from '../../items/model/provider-data'
-import { relatedObject } from '@/utils/common'
-const modelTypeList = [
-  { text: 'LLM', value: 'LLM' },
-  { text: 'EMBEDDING', value: 'EMBEDDING' },
-  { text: 'RERANKER', value: 'RERANKER' },
-  { text: 'STT', value: 'STT' },
-  { text: 'TTS', value: 'TTS' },
-  { text: 'IMAGE', value: 'IMAGE' },
-  { text: 'TTI', value: 'TTI' },
-  { text: 'ITV', value: 'ITV' },
-  { text: 'TTV', value: 'TTV' },
-]
+import { MODEL_TYPE_LABELS } from '@/constants/model'
 const getSelectModelList = inject<(params: { model_type: string }) => Promise<DynamicFormValue>>('getSelectModelList')
 const getModelParamsForm = inject<(modelId: string) => Promise<DynamicFormValue>>('getModelParamsForm')
 
@@ -58,8 +46,7 @@ const selectedIds = computed({
 
 const selectedModelsOptions = computed(() => {
   const ids = (formValue.value.provider_list || []).map((p: DynamicFormValue) => p.model_id)
-  const filtered = rawModelOptions.value.filter((m: DynamicFormValue) => ids.includes(m.id))
-  return groupBy(filtered, 'provider')
+  return rawModelOptions.value.filter((model: DynamicFormValue) => ids.includes(model.id))
 })
 
 function fetchDefaultParams(modelId: string) {
@@ -84,7 +71,6 @@ function fetchDefaultParams(modelId: string) {
   })
 }
 const rawModelOptions = ref<DynamicFormValue[]>([])
-const groupedModelOptions = ref<Record<string, any[]>>({})
 
 const fetchModelByType = (type: string) => {
   if (!type || !getSelectModelList) return
@@ -101,7 +87,6 @@ const handleModelTypeChange = (val: string) => {
     fetchModelByType(val)
   } else {
     rawModelOptions.value = []
-    groupedModelOptions.value = {}
   }
 }
 
@@ -120,6 +105,13 @@ const getProviderItem = (modelId: string) => {
   return { model_id: modelId, model_params_setting: {} }
 }
 
+const defaultModelId = computed({
+  get: () => formValue.value.default_value?.model_id ?? '',
+  set: (modelId: string) => {
+    formValue.value.default_value = modelId ? getProviderItem(modelId) : {}
+  },
+})
+
 const getData = () => {
   const providerList = (formValue.value.provider_list || []).map((p: DynamicFormValue) => {
     const modelInfo = getModelInfo(p.model_id)
@@ -131,7 +123,12 @@ const getData = () => {
       model_form_field: p.model_form_field || [],
     }
   })
-  return { input_type: 'Model', model_type: formValue.value.model_type, default_value: formValue.value.default_value, attrs: { provider_list: providerList } }
+  return {
+    input_type: 'Model',
+    model_type: formValue.value.model_type,
+    default_value: formValue.value.default_value,
+    attrs: { provider_list: providerList },
+  }
 }
 
 const render = (formData: DynamicFormValue) => {
@@ -150,15 +147,21 @@ defineExpose({ getData, render })
 <template>
   <el-form-item label="模型类型" required prop="model_type" :rules="[{ required: true, message: '请选择模型类型' }]">
     <el-select v-model="formValue.model_type" placeholder="请选择模型类型" @change="handleModelTypeChange">
-      <el-option v-for="item in modelTypeList" :key="item.value" :label="item.text" :value="item.value" />
+      <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
     </el-select>
   </el-form-item>
 
   <el-form-item label="可选模型" required prop="provider_list" :rules="[{ required: true, message: '请选择模型', type: 'array' }]">
-    <div class="flex-between w-full">
-      <ModelSelect multiple v-model="selectedIds" placeholder="请选择模型" :options="rawModelOptions" :provider-options="providerOptions" :model-type="formValue.model_type">
-      </ModelSelect>
-    </div>
+    <!-- // TODO  -->
+    <ModelSelect
+      multiple
+      v-model="selectedIds"
+      placeholder="请选择模型"
+      :options="rawModelOptions"
+      :provider-options="providerOptions"
+      :model-type="formValue.model_type"
+    >
+    </ModelSelect>
   </el-form-item>
   <el-form-item
     label="默认模型"
@@ -167,29 +170,7 @@ defineExpose({ getData, render })
     :rules="formValue.required ? [{ required: true, message: '请选择模型' }] : []"
     v-if="formValue.provider_list && formValue.provider_list.length > 0"
   >
-    <div class="flex-between w-full">
-      <el-select v-model="formValue.default_value" value-key="model_id" placeholder="请选择模型">
-        <el-option-group
-          v-for="(modelList, providerName) in selectedModelsOptions"
-          :key="providerName"
-          :label="relatedObject(providerOptions, String(providerName), 'provider')?.name"
-        >
-          <el-option v-for="item in modelList" :key="item.id" :label="item.name" :value="getProviderItem(item.id)">
-            <el-space :size="8">
-              <span :innerHTML="String(relatedObject(providerOptions, String(providerName), 'provider')?.icon ?? '')" class="select-model-icon" style="margin-top: -7px"></span>
-              <span>{{ item.name }}</span>
-            </el-space>
-          </el-option>
-        </el-option-group>
-        <template #label="{ label, value }">
-          <el-space :size="8" v-if="value?.model_id">
-            <span class="select-model-icon" :innerHTML="String(relatedObject(providerOptions, getModelInfo(value.model_id)?.provider, 'provider')?.icon ?? '')"> </span>
-            <span>
-              <span>{{ label }}</span>
-            </span>
-          </el-space>
-        </template>
-      </el-select>
-    </div>
+    <!-- // TODO  -->
+    <ModelSelect v-model="defaultModelId" placeholder="请选择模型" :options="selectedModelsOptions" :provider-options="providerOptions" />
   </el-form-item>
 </template>

@@ -75,25 +75,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form-item label="文本长度" required>
-    <div class="flex w-full items-start gap-2">
-      <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '请输入最小长度', trigger: 'change' }]" prop="minlength">
-        <el-input-number v-model="formValue.minlength" class="w-full!" :min="1" :step="1" controls-position="right" align="left" step-strictly />
-      </el-form-item>
-      <span class="flex-center shrink-0">-</span>
-      <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '请输入最大长度', trigger: 'change' }]" prop="maxlength">
-        <el-input-number
-          v-model="formValue.maxlength"
-          class="w-full!"
-          :min="formValue.minlength > formValue.maxlength ? formValue.minlength : 1"
-          :step="1"
-          controls-position="right"
-          align="left"
-          step-strictly
-        />
-      </el-form-item>
-    </div>
-  </el-form-item>
+  <div class="mk-required mb-2">文本长度</div>
+  <div class="flex w-full items-start gap-2">
+    <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '请输入最小长度', trigger: 'change' }]" prop="minlength">
+      <el-input-number v-model="formValue.minlength" class="w-full!" :min="1" :step="1" controls-position="right" align="left" step-strictly />
+    </el-form-item>
+    <span class="flex-center shrink-0 h-8">-</span>
+    <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '请输入最大长度', trigger: 'change' }]" prop="maxlength">
+      <el-input-number
+        v-model="formValue.maxlength"
+        class="w-full!"
+        :min="formValue.minlength > formValue.maxlength ? formValue.minlength : 1"
+        :step="1"
+        controls-position="right"
+        align="left"
+        step-strictly
+      />
+    </el-form-item>
+  </div>
 
   <el-form-item
     class="mk-hide-asterisk"

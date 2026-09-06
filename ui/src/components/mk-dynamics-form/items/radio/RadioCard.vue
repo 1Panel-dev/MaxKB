@@ -54,7 +54,7 @@ const options = computed(() => {
     <div
       v-for="(item, index) in options"
       :key="item[valueField] ?? index"
-      class="cursor-pointer break-all rounded-md border px-4 py-[3px] text-center"
+      class="cursor-pointer break-all rounded-md border px-4 py-2 text-center"
       :class="[inputDisabled ? 'cursor-not-allowed! bg-N100! text-N600!' : '', isOptionActive(item[valueField]) ? 'border-primary! text-primary!' : '']"
       @click="selectOption(item[valueField])"
     >

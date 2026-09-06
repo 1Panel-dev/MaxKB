@@ -1,80 +1,63 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
-import { groupBy, flatMap } from 'lodash'
-import { relatedObject } from '@/utils/common'
+import { cloneDeep } from 'lodash'
+import { MODEL_STATUS } from '@/api/enums'
+import type { Dict, ModelConfig, ModelItem } from '@/api/types'
 import type { FormField } from '../../type'
 import { providerList } from './provider-data'
+import ModelSelect from '@/components/business/model-select/index.vue'
 
-defineOptions({ name: 'DynamicFormModel' })
+defineOptions({ name: 'DynamicFormModel', inheritAttrs: false })
 
-const props = withDefaults(defineProps<{ modelValue?: { model_id: string; model_params_setting: Record<string, DynamicFormValue> } | null; formField: FormField }>(), {
+interface ConfiguredModelOption {
+  model_id: string
+  model_name: string
+  provider: string
+  model_params_setting?: Dict<unknown>
+  status?: ModelItem['status']
+  source?: ModelItem['source']
+}
+
+const props = withDefaults(defineProps<{ modelValue?: ModelConfig | null; formField: FormField }>(), {
   modelValue: null,
 })
 
-const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits<{
+  'update:modelValue': [value: ModelConfig]
+  change: [field: FormField]
+}>()
 
-const modelValueProxy = computed({
-  get: () => props.modelValue,
-  set: (value) => {
-    emit('update:modelValue', value)
-    emit('change', props.formField)
-  },
-})
+// 将动态表单保存的模型快照转换为 ModelSelect 的扁平选项。
+const configuredModels = computed<ConfiguredModelOption[]>(() => props.formField.attrs?.provider_list ?? [])
+const modelOptions = computed<ModelItem[]>(() =>
+  configuredModels.value.map((model) => ({
+    id: model.model_id,
+    name: model.model_name,
+    model_name: model.model_name,
+    model_type: props.formField.model_type ?? '',
+    provider: model.provider,
+    status: model.status ?? MODEL_STATUS.SUCCESS,
+    source: model.source,
+  })),
+)
 
-const groupedOptions = computed(() => {
-  const list = (props.formField.attrs?.provider_list as DynamicFormValue[]) || []
-  return groupBy(list, 'provider')
-})
-
-const getModelProvider = computed(() => {
-  return (id: string) => {
-    const item = flatMap(groupedOptions.value)?.find((item: DynamicFormValue) => item.model_id === id)
-    return (item as DynamicFormValue)?.provider || ''
-  }
-})
-
-const handleModelChange = (selectedId: string) => {
-  const list = (props.formField.attrs?.provider_list as DynamicFormValue[]) || []
-  const selectedItem = list.find((p) => p.model_id === selectedId)
-  modelValueProxy.value = { model_id: selectedId, model_params_setting: selectedItem?.model_params_setting || {} }
+function handleModelChange(modelId: string) {
+  const selectedModel = configuredModels.value.find((model) => model.model_id === modelId)
+  emit('update:modelValue', {
+    model_id: modelId,
+    model_params_setting: cloneDeep(selectedModel?.model_params_setting ?? {}),
+  })
+  emit('change', props.formField)
 }
 </script>
 
 <template>
-  <div class="complex-select flex align-center w-full">
-    <el-select class="complex-select__left" :model-value="modelValueProxy?.model_id" @change="handleModelChange" v-bind="$attrs" popper-class="select-model">
-      <el-option-group v-for="(modelList, providerName) in groupedOptions" :key="providerName" :label="relatedObject(providerList, String(providerName), 'provider')?.name">
-        <el-option v-for="item in modelList" :key="item.model_id" :label="item.model_name" :value="item.model_id">
-          <el-space :size="8">
-            <span :innerHTML="String(relatedObject(providerList, String(providerName), 'provider')?.icon ?? '')" class="select-model-icon" style="margin-top: -7px"> </span>
-            <span>{{ item.model_name }}</span>
-          </el-space>
-        </el-option>
-      </el-option-group>
-      <template #label="{ label, value }">
-        <el-space :size="8" v-if="value">
-          <span class="select-model-icon" :innerHTML="String(relatedObject(providerList, getModelProvider(value), 'provider')?.icon ?? '')"> </span>
-          <span>
-            <span>{{ label }}</span>
-          </span>
-        </el-space>
-      </template>
-    </el-select>
-  </div>
+  <!-- // TODO  -->
+  <ModelSelect
+    v-bind="$attrs"
+    :model-value="props.modelValue?.model_id ?? ''"
+    :options="modelOptions"
+    :provider-options="providerList"
+    @update:model-value="handleModelChange"
+  />
 </template>
-<style lang="scss" scoped>
-// AI模型选择：添加模型hover样式
-.select-model {
-  .el-select-dropdown__footer {
-    &:hover {
-      background-color: var(--el-fill-color-light);
-    }
-  }
-
-  .check-icon {
-    position: absolute;
-    right: 10px;
-  }
-}
-</style>
