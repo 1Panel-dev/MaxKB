@@ -128,6 +128,12 @@ Vue Teleport 节点继承页面上下文；画布核心不负责模型参数接�
 保留失效引用检查；节点级 `validate()` 统一调用表单校验。所有非登录表单仅使用 `@submit.prevent`，
 保存或添加由按钮触发。
 
+基本信息节点的用户输入、接口传参和会话变量分别由 `UserInputTable`、`ApiParameterTable`、
+`ConversationVariableTable` 通过 `v-model` 编辑，使用小尺寸 `MkTable` 支持排序。字段弹窗只负责
+收集和校验单个字段，通过 `submit(data, index?)` 提交；表格完成重名检查和写回后调用 `close()`。
+节点入口深拷贝写回列表并发送原有字段刷新事件，保留显隐条件引用校验。用户输入与接口传参继续
+交叉检查参数重名；`UserInputSettingDialog` 独立维护直接展示参数设置，删除字段时由表格清理对应设置。
+
 表单收集节点的 `component/form-setting/FormSettingTable` 通过 `v-model` 编辑动态表单的
 `FormField[]`，负责增删改、排序和重名检查；`FormFieldDialog` 复用 `MkDynamicsFormConstructor`，
 通过 `submit(data, index?)` 提交，由表格写回后调用 `close()`，关闭动画结束时重置编辑状态。

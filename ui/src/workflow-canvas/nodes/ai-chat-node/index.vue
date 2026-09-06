@@ -134,6 +134,7 @@ function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error
 }
 
 function validate() {
+  // TODO 图片选择需要必填？为什么没有必填标记？
   return Promise.all([formData.value.vision ? imageCascaderRef.value?.validate() : Promise.resolve(), formRef.value?.validate()]).catch((error) =>
     Promise.reject({ node: model, errMessage: error }),
   )
