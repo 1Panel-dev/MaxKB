@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
+import { useFormItem } from 'element-plus'
 import { DocumentChecked } from '@element-plus/icons-vue'
 import { json, jsonParseLinter } from '@codemirror/lang-json'
 import { linter } from '@codemirror/lint'
@@ -8,9 +9,16 @@ import { Codemirror } from 'vue-codemirror'
 defineOptions({ name: 'JsonInput', inheritAttrs: false })
 
 const modelValue = defineModel<unknown>({ required: true })
-const props = withDefaults(defineProps<{ title?: string }>(), { title: 'JSON' })
+const props = withDefaults(defineProps<{ title?: string; validateEvent?: boolean }>(), { title: 'JSON', validateEvent: true })
 
 const emit = defineEmits<{ submitDialog: [value: unknown] }>()
+
+const { formItem } = useFormItem()
+// 与 MdEditorMagnify 一致，由外层 FormItem 管理规则和错误提示。
+function validateFormItem(trigger: 'change' | 'blur') {
+  if (!props.validateEvent || !formItem?.propString) return
+  formItem.validate(trigger).catch(() => {})
+}
 
 const extensions = [json(), linter(jsonParseLinter())]
 
@@ -44,6 +52,7 @@ function handleContentChange(content: string) {
   } catch {
     // 保留无法解析的编辑内容，交由 CodeMirror 和表单校验提示。
   }
+  void nextTick(() => validateFormItem('change'))
 }
 
 function format() {
@@ -67,12 +76,14 @@ function closeEditorDialog() {
   dialogVisible.value = false
 }
 
-function submitEditorDialog() {
+async function submitEditorDialog() {
   try {
     const value = parseJson(dialogContent.value)
     handleContentChange(dialogContent.value)
     emit('submitDialog', value)
     closeEditorDialog()
+    await nextTick()
+    validateFormItem('blur')
   } catch {
     // JSON 不合法时保留弹窗和编辑内容，等待用户修正。
   }
@@ -80,7 +91,7 @@ function submitEditorDialog() {
 
 function validateRules(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
   try {
-    parseJson(editorContent.value)
+    JSON.parse(editorContent.value)
     callback()
   } catch {
     callback(new Error('请输入正确的 JSON 格式'))
@@ -100,6 +111,7 @@ defineExpose({ format, validateRules })
       :style="{ height: '210px' }"
       v-bind="$attrs"
       @update:model-value="handleContentChange"
+      @blur="validateFormItem('blur')"
     />
     <el-button class="absolute right-2 top-2" text type="info" @click="format">
       <MkIcon :icon="DocumentChecked" />

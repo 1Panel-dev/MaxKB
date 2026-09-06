@@ -15,7 +15,7 @@
         <el-input v-model="form.label" :maxlength="64" placeholder="请输入显示名称" show-word-limit />
       </el-form-item>
       <el-form-item label="参数类型" prop="parameter_type" :rules="rules.parameter_type">
-        <el-select :teleported="false" v-model="form.parameter_type" placeholder="请选择参数类型" style="width: 100%">
+        <el-select :teleported="false" v-model="form.parameter_type" placeholder="请选择参数类型" class="w-full">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
@@ -24,10 +24,8 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="close">取消</el-button>
-        <el-button type="primary" @click="submit(fieldFormRef)"> 保存 </el-button>
-      </span>
+      <el-button @click="close">取消</el-button>
+      <el-button type="primary" @click="submit(fieldFormRef)"> 保存 </el-button>
     </template>
   </MkDialog>
 </template>

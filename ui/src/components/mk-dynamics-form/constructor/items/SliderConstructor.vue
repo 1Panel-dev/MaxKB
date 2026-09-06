@@ -81,13 +81,12 @@ onBeforeMount(() => {
   <div class="mk-required mb-2">取值范围</div>
   <div class="flex w-full items-start gap-2">
     <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '最小值必填', trigger: 'change' }]" prop="min">
-      <el-input-number v-model="formValue.min" class="w-full!" controls-position="right" align="left" />
+      <el-input-number v-model="formValue.min"  controls-position="right" align="left" />
     </el-form-item>
     <span class="flex-center shrink-0 h-8">-</span>
     <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '最大值必填', trigger: 'change' }]" prop="max">
       <el-input-number
         v-model="formValue.max"
-        class="w-full!"
         :min="formValue.min > formValue.max ? formValue.min : undefined"
         controls-position="right"
         align="left"
@@ -96,7 +95,7 @@ onBeforeMount(() => {
   </div>
 
   <el-form-item label="步长值" required prop="step" :rules="stepRules">
-    <el-input-number class="w-full!" v-model="formValue.step" :min="0" controls-position="right" align="left" />
+    <el-input-number v-model="formValue.step" :min="0" controls-position="right" align="left" />
   </el-form-item>
 
   <el-form-item

@@ -56,7 +56,7 @@ class ConditionModel extends WorkflowNodeModel {
       const h = getUpIndexHeight(branchList, index)
       anchors.push({
         x: x + width / 2,
-        y: showNode ? y - currentHeight / 2 + 75 + h + element.height / 2 : y,
+        y: showNode ? y - currentHeight / 2 + 60 + h + element.height / 2 : y,
         id: `${id}_${element.id}_right`,
         type: 'right',
       })

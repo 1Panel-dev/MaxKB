@@ -246,22 +246,20 @@ ${'填写后请点击【提交】按钮进行提交。'}`,
   },
 }
 
-/* 变量聚合 */
-export const variableAggregationNode = {
-  type: WorkflowNodeType.VariableAggregationNode,
-  text: '按聚合策略聚合每组的变量',
-  label: '变量聚合',
-  height: 252,
-  properties: { stepName: '变量聚合', config: { fields: [] } },
-}
-
 /* 变量赋值 */
 export const variableAssignNode = {
   type: WorkflowNodeType.VariableAssignNode,
   text: '更新全局变量的值',
   label: '变量赋值',
-  height: 252,
-  properties: { stepName: '变量赋值', config: {} },
+  properties: { stepName: '变量赋值', width: 455, config: {} },
+}
+
+/* 变量聚合 */
+export const variableAggregationNode = {
+  type: WorkflowNodeType.VariableAggregationNode,
+  text: '按聚合策略聚合每组的变量',
+  label: '变量聚合',
+  properties: { stepName: '变量聚合', config: { fields: [] } },
 }
 
 /* 变量拆分 */
@@ -269,8 +267,7 @@ export const variableSplittingNode = {
   type: WorkflowNodeType.VariableSplittingNode,
   text: '通过配置JSON Path 表达式，对输入的 JSON 格式变量进行解析和拆分',
   label: '变量拆分',
-  height: 345,
-  properties: { stepName: '变量拆分', config: { fields: [{ label: '结果', value: 'result' }] } },
+  properties: { stepName: '变量拆分', width: 455, config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
 /* 参数提取 */
@@ -278,8 +275,7 @@ export const parameterExtractionNode = {
   type: WorkflowNodeType.ParameterExtractionNode,
   text: '利用 AI 模型提取结构化参数',
   label: '参数提取',
-  height: 345,
-  properties: { width: 430, stepName: '参数提取', config: { fields: [{ label: '结果', value: 'result' }] } },
+  properties: { stepName: '参数提取', width: 455, config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
 /* 多路召回 */

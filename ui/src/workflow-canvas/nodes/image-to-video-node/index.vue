@@ -32,8 +32,6 @@ interface ImageToVideoNodeForm {
 }
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const modelCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('modelCascaderRef')
-const firstFrameCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('firstFrameCascaderRef')
 
 const store = useWorkflowStore(apiType)
 const modelList = ref<Array<ModelItem>>([])
@@ -106,12 +104,8 @@ function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error
   )
 }
 
-function validate() {
-  return Promise.all([
-    formData.value.model_id_type === 'reference' ? modelCascaderRef.value?.validate() : Promise.resolve(),
-    firstFrameCascaderRef.value?.validate(),
-    formRef.value?.validate(),
-  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
+async function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
@@ -217,13 +211,7 @@ onMounted(() => {
               </el-tooltip>
             </span>
           </template>
-          <NodeCascader
-            ref="firstFrameCascaderRef"
-            v-model="formData.first_frame_url"
-            :node-model="model"
-            class="w-full"
-            placeholder="请选择首帧图片"
-          />
+          <NodeCascader v-model="formData.first_frame_url" :node-model="model" class="w-full" placeholder="请选择首帧图片" />
         </el-form-item>
 
         <!-- 尾帧图片 -->

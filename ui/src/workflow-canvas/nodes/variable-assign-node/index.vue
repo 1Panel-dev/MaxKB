@@ -1,115 +1,13 @@
-<template>
-  <NodeContainer :node-model="model">
-    <el-form
-      ref="variableAssignNodeFormRef"
-      :model="form_data"
-      label-position="top"
-      require-asterisk-position="right"
-      label-width="auto"
-      hide-required-asterisk
-      @submit.prevent
-    >
-      <template v-for="(item, index) in form_data.variable_list" :key="item.id">
-        <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
-          <el-form-item>
-            <template #label>
-              <div class="flex-between">
-                <div>变量<span class="color-danger">*</span></div>
-                <el-button v-if="form_data.variable_list.length > 1" text @click="deleteVariable(index)">
-                  <MkIcon name="icon_delete-trash_outlined" />
-                </el-button>
-              </div>
-            </template>
-            <NodeCascader
-              :ref="setCascaderRef"
-              :node-model="model"
-              class="w-full"
-              placeholder="请选择变量"
-              v-model="item.fields"
-              :global="true"
-              @change="variableChange(item)"
-            />
-          </el-form-item>
-          <div class="flex-between mb-8">
-            <span class="lighter">赋值<span class="color-danger">*</span></span>
-            <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px">
-              <el-option label="引用变量" value="referencing" />
-              <el-option label="自定义" value="custom" />
-              <el-option label="null" value="null" />
-            </el-select>
-          </div>
-
-          <div v-if="item.source === 'custom'" class="flex w-full">
-            <el-select v-model="item.type" style="max-width: 85px" class="mr-8" @change="changeType(index)">
-              <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
-            </el-select>
-
-            <el-form-item
-              v-if="item.type === 'string'"
-              :prop="'variable_list.' + index + '.value'"
-              :rules="{ message: '请输入内容', trigger: 'blur', required: true }"
-              class="w-full"
-            >
-              <el-input v-model="item.value" placeholder="请输入内容" clearable @wheel="handleNodeWheel"></el-input>
-            </el-form-item>
-            <el-form-item v-else-if="item.type === 'num'" :prop="'variable_list.' + index + '.value'" class="w-full">
-              <el-input-number v-model="item.value" controls-position="right" align="left" class="w-full" />
-            </el-form-item>
-            <el-form-item
-              v-else-if="item.type === 'json'"
-              :prop="'variable_list.' + index + '.value'"
-              :rules="[
-                { message: '请输入内容', trigger: 'blur', required: true },
-                {
-                  validator: (rule: any, value: any, callback: any) => {
-                    try {
-                      JSON.parse(value)
-                      callback()
-                    } catch (e) {
-                      callback(new Error('Invalid JSON format'))
-                    }
-                  },
-                  trigger: 'blur',
-                },
-              ]"
-              class="w-full"
-            >
-              <JsonInput v-model="item.value" title="JSON" class="w-full" />
-            </el-form-item>
-            <el-form-item
-              v-else-if="item.type === 'bool'"
-              :prop="'variable_list.' + index + '.value'"
-              :rules="{ message: '请输入内容', trigger: 'blur', required: true }"
-            >
-              <el-select v-model="item.value" style="width: 155px" :teleported="false">
-                <el-option label="true" :value="true" />
-                <el-option label="false" :value="false" />
-              </el-select>
-            </el-form-item>
-          </div>
-          <el-form-item v-else-if="item.source === 'referencing'">
-            <NodeCascader :ref="setCascaderRef2" :node-model="model" class="w-full" placeholder="请选择变量" v-model="item.reference" />
-          </el-form-item>
-        </el-card>
-      </template>
-
-      <el-button link type="primary" @click="addVariable">
-        <MkIcon name="icon_add_outlined" class="mr-1" />
-        添加变量
-      </el-button>
-    </el-form>
-  </NodeContainer>
-</template>
 <script setup lang="ts">
 import { cloneDeep } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
-import { inject, onMounted, ref, type Ref } from 'vue'
+import { inject, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import JsonInput from '@/components/codemirror-editor/Json.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
+import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import { randomId } from '@/utils/common'
 
@@ -127,6 +25,7 @@ interface VariableItem {
   value: unknown
 }
 
+// 变量配置与表单校验。
 const typeOptions = ['string', 'num', 'json', 'bool']
 
 const defaultVariable = (): VariableItem => ({ id: randomId(), fields: [], value: null, reference: [], type: 'string', source: 'custom', name: '' })
@@ -134,47 +33,27 @@ const defaultVariable = (): VariableItem => ({ id: randomId(), fields: [], value
 if (!model.properties.node_data) {
   model.properties.node_data = { variable_list: [defaultVariable()] }
 }
-const form_data = model.properties.node_data as { variable_list: VariableItem[] }
+const formData = model.properties.node_data as { variable_list: VariableItem[] }
 
 const variableAssignNodeFormRef = ref<FormInstance>()
-const nodeCascaderRef: Ref<Array<{ validate: () => Promise<unknown> }>> = ref([])
-const nodeCascaderRef2: Ref<Array<{ validate: () => Promise<unknown> }>> = ref([])
 
-function setCascaderRef(el: unknown) {
-  if (el && !nodeCascaderRef.value.includes(el as { validate: () => Promise<unknown> })) {
-    nodeCascaderRef.value.push(el as { validate: () => Promise<unknown> })
-  }
-}
-function setCascaderRef2(el: unknown) {
-  if (el && !nodeCascaderRef2.value.includes(el as { validate: () => Promise<unknown> })) {
-    nodeCascaderRef2.value.push(el as { validate: () => Promise<unknown> })
-  }
-}
-
-const validate = () => {
-  const ps = [variableAssignNodeFormRef.value?.validate(), ...nodeCascaderRef.value.map((item) => item.validate())]
-  if (nodeCascaderRef2.value.length) {
-    ps.push(...nodeCascaderRef2.value.map((item) => item.validate()))
-  }
-  return Promise.all(ps).catch((err: unknown) => Promise.reject({ node: model, errMessage: err }))
-}
-
+// 变量增删与赋值类型切换。
 function addVariable() {
-  const list = cloneDeep(form_data.variable_list)
-  list.push(defaultVariable())
-  model.properties.node_data.variable_list = list
+  const variables = cloneDeep(formData.variable_list)
+  variables.push(defaultVariable())
+  model.properties.node_data.variable_list = variables
 }
 
 function changeType(index: number) {
-  const item = form_data.variable_list[index]
+  const item = formData.variable_list[index]
   if (!item) return
   item.value = item.type === 'bool' ? true : null
 }
 
 function deleteVariable(index: number) {
-  const list = cloneDeep(form_data.variable_list)
-  list.splice(index, 1)
-  model.properties.node_data.variable_list = list
+  const variables = cloneDeep(formData.variable_list)
+  variables.splice(index, 1)
+  model.properties.node_data.variable_list = variables
 }
 
 function variableChange(item: VariableItem) {
@@ -185,6 +64,13 @@ function variableChange(item: VariableItem) {
   if (child) item.name = child.label
 }
 
+async function validate() {
+  return variableAssignNodeFormRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
+}
+
+const anchorGuard = createAnchorGuard(model)
+onBeforeUnmount(() => anchorGuard.reset())
+
 onMounted(() => {
   if (model.properties.node_data?.is_result === undefined && isLastNode(model)) {
     model.properties.node_data.is_result = true
@@ -192,4 +78,126 @@ onMounted(() => {
   model.validate = validate
 })
 </script>
-<style lang="scss" scoped></style>
+
+<template>
+  <NodeContainer :node-model="model">
+    <el-form ref="variableAssignNodeFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <template v-for="(item, index) in formData.variable_list" :key="item.id">
+        <div class="mb-2 flex items-center gap-1">
+          <div class="mk-gray-card flex-1">
+            <!-- 变量 -->
+            <el-form-item
+              label="变量"
+              :prop="'variable_list.' + index + '.fields'"
+              :rules="{ required: true, message: '请选择变量', trigger: 'change' }"
+            >
+              <NodeCascader
+                :node-model="model"
+                class="w-full"
+                placeholder="请选择变量"
+                v-model="item.fields"
+                :global="true"
+                @change="variableChange(item)"
+              />
+            </el-form-item>
+            <!-- 赋值 -->
+            <div class="flex-between">
+              <span :class="item.source !== 'null' ? 'mk-required' : ''">赋值</span>
+              <el-select
+                :teleported="false"
+                v-model="item.source"
+                size="small"
+                class="w-21!"
+                @visible-change="anchorGuard.setOverlayVisible(`${item.id}:source`, $event)"
+                @wheel="handleNodeWheel"
+              >
+                <el-option label="引用变量" value="referencing" />
+                <el-option label="自定义" value="custom" />
+                <el-option label="null" value="null" />
+              </el-select>
+            </div>
+
+            <div v-if="item.source === 'custom'">
+              <el-radio-group v-model="item.type" @change="changeType(index)" class="mb-1">
+                <template v-for="variableType in typeOptions" :key="variableType">
+                  <el-radio :value="variableType">{{ variableType }}</el-radio>
+                </template>
+              </el-radio-group>
+              <!-- string -->
+              <el-form-item
+                v-if="item.type === 'string'"
+                :prop="'variable_list.' + index + '.value'"
+                :rules="{ message: '请输入', trigger: 'blur', required: true }"
+              >
+                <el-input v-model="item.value" placeholder="请输入内容" clearable @wheel="handleNodeWheel"></el-input>
+              </el-form-item>
+              <!-- num -->
+              <el-form-item
+                v-else-if="item.type === 'num'"
+                :prop="'variable_list.' + index + '.value'"
+                :rules="{ message: '请输入', trigger: ['blur', 'change'], required: true }"
+              >
+                <el-input-number v-model="item.value" controls-position="right" align="left" />
+              </el-form-item>
+              <!-- json -->
+              <el-form-item
+                v-else-if="item.type === 'json'"
+                :prop="'variable_list.' + index + '.value'"
+                :rules="[
+                  { message: '请输入', trigger: 'blur', required: true },
+                  {
+                    validator: (rule: any, value: any, callback: any) => {
+                      try {
+                        JSON.parse(value)
+                        callback()
+                      } catch (e) {
+                        callback(new Error('Invalid JSON format'))
+                      }
+                    },
+                    trigger: 'blur',
+                  },
+                ]"
+                class="small min-w-0 flex-1"
+              >
+                <JsonInput v-model="item.value" title="JSON" class="w-full" />
+              </el-form-item>
+              <!-- bool -->
+              <el-form-item
+                v-else-if="item.type === 'bool'"
+                :prop="'variable_list.' + index + '.value'"
+                :rules="{ message: '请输入', trigger: 'change', required: true }"
+              >
+                <el-select v-model="item.value" class="w-full" :teleported="false" @wheel="handleNodeWheel">
+                  <el-option label="true" :value="true" />
+                  <el-option label="false" :value="false" />
+                </el-select>
+              </el-form-item>
+            </div>
+            <el-form-item
+              v-else-if="item.source === 'referencing'"
+              :prop="'variable_list.' + index + '.reference'"
+              :rules="{ required: true, message: '请选择变量', trigger: 'change' }"
+            >
+              <NodeCascader v-model="item.reference" :node-model="model" class="w-full" placeholder="请选择变量" />
+            </el-form-item>
+          </div>
+          <!-- 删除变量 -->
+          <el-button
+            v-if="formData.variable_list.length > 1"
+            text
+            class="h-6! w-6! shrink-0 p-0!"
+            aria-label="删除变量"
+            @click="deleteVariable(index)"
+          >
+            <MkIcon name="icon_delete-trash_outlined" />
+          </el-button>
+        </div>
+      </template>
+
+      <el-button link type="primary" @click="addVariable">
+        <MkIcon name="icon_add_outlined" />
+        <span>添加</span>
+      </el-button>
+    </el-form>
+  </NodeContainer>
+</template>

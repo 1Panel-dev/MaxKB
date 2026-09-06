@@ -1,64 +1,11 @@
-<template>
-  <NodeContainer :node-model="model">
-    <h6 class="mb-3">节点设置</h6>
-    <el-form ref="formRef" :model="formData" label-position="top" hide-required-asterisk @submit.prevent>
-      <el-form-item
-        v-if="formData.model_id_type === 'reference'"
-        prop="model_id_reference"
-        :rules="{ required: true, message: '请选择 AI 模型', trigger: 'change' }"
-      >
-        <template #label>
-          <div class="flex-between gap-3 w-full">
-            <span>AI 模型<span class="text-danger">*</span></span>
-            <el-select v-model="formData.model_id_type" :teleported="false" class="w-30!" size="small" @change="formData.model_id_reference = []">
-              <el-option label="引用变量" value="reference" />
-              <el-option label="自定义" value="custom" />
-            </el-select>
-          </div>
-        </template>
-        <NodeCascader ref="modelCascaderRef" v-model="formData.model_id_reference" :node-model="model" class="w-full" placeholder="请选择变量" />
-      </el-form-item>
-
-      <el-form-item v-else prop="model_id" :rules="{ required: true, message: '请选择 AI 模型', trigger: 'change' }">
-        <template #label>
-          <div class="flex-between gap-3 w-full">
-            <span>AI 模型<span class="text-danger">*</span></span>
-            <el-select v-model="formData.model_id_type" :teleported="false" class="w-30!" size="small" @change="formData.model_id_reference = []">
-              <el-option label="引用变量" value="reference" />
-              <el-option label="自定义" value="custom" />
-            </el-select>
-          </div>
-        </template>
-        <ModelSelect
-          v-model="formData.model_id"
-          v-model:model-params="formData.model_params_setting"
-          can-edit-params
-          :options="modelList"
-          :provider-options="providerOptions"
-          placeholder="请选择 AI 模型"
-        />
-      </el-form-item>
-
-      <el-form-item prop="input_variable" :rules="{ required: true, message: '请选择输入变量', trigger: 'change' }">
-        <template #label>
-          <span>输入变量<span class="text-danger">*</span></span>
-        </template>
-        <NodeCascader ref="inputVariableCascaderRef" v-model="formData.input_variable" :node-model="model" class="w-full" placeholder="请选择变量" />
-      </el-form-item>
-
-      <el-form-item prop="variable_list" :rules="{ required: true, message: '请添加提取参数', trigger: 'blur' }">
-        <ParametersFieldTable ref="paramsFieldTableRef" :node-model="model" />
-      </el-form-item>
-    </el-form>
-  </NodeContainer>
-</template>
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import type { FormInstance } from 'element-plus'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
+import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
@@ -142,6 +89,9 @@ function validate() {
   return Promise.all(list).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
+const anchorGuard = createAnchorGuard(model)
+onBeforeUnmount(() => anchorGuard.reset())
+
 onMounted(() => {
   model.validate = validate
   store.getModelList({ model_type: 'LLM' }).then((data) => {
@@ -152,8 +102,81 @@ onMounted(() => {
   })
 })
 </script>
-<style lang="scss" scoped>
-:deep(.el-form-item) {
-  margin-bottom: 16px;
-}
-</style>
+
+<template>
+  <NodeContainer :node-model="model">
+    <div class="mk-gray-card">
+      <el-form ref="formRef" :model="formData" label-position="top" hide-required-asterisk @submit.prevent>
+        <el-form-item
+          v-if="formData.model_id_type === 'reference'"
+          prop="model_id_reference"
+          :rules="{ required: true, message: '请选择 AI 模型', trigger: 'change' }"
+        >
+          <template #label>
+            <div class="flex-between gap-3">
+              <span>AI 模型<span class="ml-1 text-danger">*</span></span>
+              <el-select
+                v-model="formData.model_id_type"
+                :teleported="false"
+                class="w-21!"
+                size="small"
+                @change="formData.model_id_reference = []"
+                @visible-change="anchorGuard.setOverlayVisible('model-source', $event)"
+                @wheel="handleNodeWheel"
+              >
+                <el-option label="引用变量" value="reference" />
+                <el-option label="自定义" value="custom" />
+              </el-select>
+            </div>
+          </template>
+          <NodeCascader ref="modelCascaderRef" v-model="formData.model_id_reference" :node-model="model" class="w-full" placeholder="请选择变量" />
+        </el-form-item>
+
+        <el-form-item v-else prop="model_id" :rules="{ required: true, message: '请选择 AI 模型', trigger: 'change' }">
+          <template #label>
+            <div class="flex-between gap-3">
+              <span>AI 模型<span class="ml-1 text-danger">*</span></span>
+              <el-select
+                v-model="formData.model_id_type"
+                :teleported="false"
+                class="w-21!"
+                size="small"
+                @change="formData.model_id_reference = []"
+                @visible-change="anchorGuard.setOverlayVisible('model-source', $event)"
+                @wheel="handleNodeWheel"
+              >
+                <el-option label="引用变量" value="reference" />
+                <el-option label="自定义" value="custom" />
+              </el-select>
+            </div>
+          </template>
+          <ModelSelect
+            v-model="formData.model_id"
+            v-model:model-params="formData.model_params_setting"
+            can-edit-params
+            :options="modelList"
+            :provider-options="providerOptions"
+            placeholder="请选择 AI 模型"
+          />
+        </el-form-item>
+
+        <el-form-item prop="input_variable" :rules="{ required: true, message: '请选择输入变量', trigger: 'change' }">
+          <template #label>
+            <span>输入变量<span class="ml-1 text-danger">*</span></span>
+          </template>
+          <NodeCascader
+            ref="inputVariableCascaderRef"
+            v-model="formData.input_variable"
+            :node-model="model"
+            class="w-full"
+            placeholder="请选择变量"
+          />
+        </el-form-item>
+
+        <el-form-item prop="variable_list" :rules="{ required: true, message: '请添加提取参数', trigger: 'blur' }">
+          <ParametersFieldTable ref="paramsFieldTableRef" :node-model="model" />
+        </el-form-item>
+      </el-form>
+    </div>
+  </NodeContainer>
+</template>

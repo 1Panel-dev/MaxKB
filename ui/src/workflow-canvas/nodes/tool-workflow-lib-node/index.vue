@@ -200,7 +200,6 @@ onMounted(() => {
               <el-input-number
                 v-if="['int', 'float'].includes(field.type)"
                 v-model="field.value"
-                class="w-full"
               />
               <el-switch
                 v-if="['boolean'].includes(field.type)"

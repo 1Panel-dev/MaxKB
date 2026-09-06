@@ -8,4 +8,12 @@ class VariableSplittingNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.VariableSplittingNode, model: WorkflowNodeModel, view: VariableSplittingNodeView }
+class VariableSplittingNodeModel extends WorkflowNodeModel {
+  override setAttributes() {
+    super.setAttributes()
+    this.width = 455
+    this.properties.width = 455
+  }
+}
+
+export default { type: WorkflowNodeType.VariableSplittingNode, model: VariableSplittingNodeModel, view: VariableSplittingNodeView }

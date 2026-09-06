@@ -18,7 +18,6 @@ interface ReplyNodeForm {
 }
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const nodeCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('nodeCascaderRef')
 
 const defaultForm: ReplyNodeForm = {
   content: '',
@@ -41,11 +40,8 @@ const formData = computed<ReplyNodeForm>({
   set: (value) => (model.properties.node_data = value),
 })
 
-function validate() {
-  return Promise.all([
-    formData.value.reply_type === 'referencing' ? nodeCascaderRef.value?.validate() : Promise.resolve(),
-    formRef.value?.validate(),
-  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
+async function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {

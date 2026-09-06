@@ -7,43 +7,38 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <el-form ref="fieldFormRef" label-position="top" require-asterisk-position="right" hide-required-asterisk :rules="rules" :model="form">
-      <el-form-item prop="field">
-        <template #label>
-          <div class="flex items-center">
-            <span class="mr-4">变量<span class="text-danger">*</span></span>
-          </div>
-        </template>
+    <el-form ref="fieldFormRef" label-position="top" require-asterisk-position="right" :rules="rules" :model="form">
+      <el-form-item label="变量" prop="field">
         <el-input v-model="form.field" :maxlength="64" placeholder="请输入变量" show-word-limit />
       </el-form-item>
-      <el-form-item prop="label">
-        <template #label>
-          <div class="flex items-center">
-            <span class="mr-4">显示名称<span class="text-danger">*</span></span>
-          </div>
-        </template>
+      <el-form-item label="显示名称" prop="label">
         <el-input v-model="form.label" :maxlength="64" show-word-limit placeholder="请输入显示名称" />
       </el-form-item>
-      <el-form-item prop="expression">
+      <el-form-item label="表达式" prop="expression">
         <template #label>
-          <div class="flex items-center">
-            <span class="mr-4">表达式<span class="text-danger">*</span></span>
+          <span class="inline-flex items-center gap-1">
+            表达式
             <el-tooltip effect="dark" placement="right">
               <template #content>
-                <span v-html="expressionTip"></span>
+                请使用 JSON Path 表达式拆分变量，例如：$.store.book
+                <a
+                  href="https://pypi.org/project/jsonpath-ng/1.8.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-primary hover:text-primary/80"
+                  >点击查看详情 ➜ pypi.org</a
+                >
               </template>
-              <MkIcon name="icon_info_outlined" class="cursor-pointer align-middle" />
+              <MkIcon name="icon_info_outlined" class="text-N600!" />
             </el-tooltip>
-          </div>
+          </span>
         </template>
         <el-input v-model="form.expression" :maxlength="64" show-word-limit placeholder="请输入表达式" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <span class="dialog-footer">
-        <el-button @click.prevent="close">取消</el-button>
-        <el-button type="primary" @click="submit(fieldFormRef)">保存</el-button>
-      </span>
+      <el-button @click.prevent="close">取消</el-button>
+      <el-button type="primary" @click="submit(fieldFormRef)">保存</el-button>
     </template>
   </MkDialog>
 </template>
@@ -55,10 +50,6 @@ import { cloneDeep } from 'lodash'
 defineOptions({ name: 'VariableSplittingFieldDialog' })
 
 const emit = defineEmits<{ refresh: [data: { field: string; label: string; expression: string }, index?: number] }>()
-
-const expressionTip =
-  '请使用 JSON Path 表达式拆分变量，例如：$.store.book ' +
-  '<a href="https://pypi.org/project/jsonpath-ng/1.8.0/" target="_blank" rel="noopener noreferrer" class="expression_tip">点击查看详情 ➜ pypi.org</a>'
 
 const fieldFormRef = useTemplateRef<FormInstance>('fieldFormRef')
 const isEdit = ref(false)
@@ -103,12 +94,3 @@ const submit = async (formEl: FormInstance | null) => {
 
 defineExpose({ open, close })
 </script>
-<style lang="scss">
-.expression_tip {
-  color: var(--el-color-primary-light-5);
-
-  &:hover {
-    color: var(--el-color-primary-light-3);
-  }
-}
-</style>

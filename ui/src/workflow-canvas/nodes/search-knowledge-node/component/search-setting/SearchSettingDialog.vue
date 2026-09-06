@@ -77,7 +77,7 @@ defineExpose({ open })
             :value-on-clear="0"
             controls-position="right"
             align="left"
-            class="w-full!"
+
           />
         </el-form-item>
         <el-form-item label="引用分段数 TOP" prop="top_n">
@@ -89,7 +89,6 @@ defineExpose({ open })
             :value-on-clear="1"
             controls-position="right"
             align="left"
-            class="w-full!"
           />
         </el-form-item>
       </div>

@@ -1,44 +1,44 @@
 <template>
   <div class="w-full">
-    <div class="flex w-full items-center justify-between">
-      <h6 class="font-medium">
+    <div class="flex-between mb-2">
+      <span>
         提取参数
-        <span class="text-danger">*</span>
-      </h6>
+        <span class="ml-1 text-danger">*</span>
+      </span>
       <el-button link type="primary" @click="openAddDialog()">
         <MkIcon name="icon_add_outlined" class="mr-1" />
         添加
       </el-button>
     </div>
 
-    <el-table v-if="inputFieldList.length > 0" :data="inputFieldList" row-key="field" class="border">
+    <MkTable size="small" v-if="inputFieldList.length > 0" :data="inputFieldList" row-key="field">
       <el-table-column prop="field" label="参数" width="100" show-overflow-tooltip>
         <template #default="{ row }">
-          <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
+          <span :title="row.field" class="block truncate">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="显示名称">
+      <el-table-column prop="label" label="显示名称" min-width="90">
         <template #default="{ row }">
-          <span :title="row.label" class="ellipsis-1">{{ row.label }}</span>
+          <span :title="row.label" class="block truncate">{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="参数类型">
+      <el-table-column label="参数类型" width="90">
         <template #default="{ row }">
-          <el-tag size="small" type="info" class="info-tag">{{ row.parameter_type }}</el-tag>
+          <el-tag size="small" type="info">{{ row.parameter_type }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="90">
+      <el-table-column label="操作" width="72">
         <template #default="{ row, $index }">
-          <el-button link type="primary" @click="openAddDialog(row, $index)">
+          <el-button text class="h-6! w-6! p-0!" aria-label="编辑" @click="openAddDialog(row, $index)">
             <MkIcon name="icon_edit_outlined" />
           </el-button>
-          <el-button link type="info" @click="deleteField($index)">
+          <el-button text class="ml-0! h-6! w-6! p-0!" aria-label="删除" @click="deleteField($index)">
             <MkIcon name="icon_delete-trash_outlined" />
           </el-button>
         </template>
       </el-table-column>
-    </el-table>
-    <el-empty v-else description="暂无参数，请点击添加" :image-size="60" />
+    </MkTable>
+    <MkEmpty v-else description="暂无参数，请点击添加" :image-size="60" />
 
     <ParametersFieldDialog ref="ParamsFieldDialogRef" @refresh="refreshFieldList" />
   </div>
