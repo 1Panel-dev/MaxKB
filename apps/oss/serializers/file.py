@@ -1,7 +1,6 @@
 # coding=utf-8
 import re
 import urllib
-from urllib.parse import urlparse
 
 import uuid_utils.compat as uuid
 from application.models import Application, ApplicationAccessToken, ChatShareLink
@@ -10,7 +9,6 @@ from common.auth.handle.impl.user_token import get_auth
 from common.constants.authentication_type import AuthenticationType
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed, NotFound404
-from common.utils.common import common_convert_value
 from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.utils.translation import gettext
@@ -162,7 +160,7 @@ _PUBLIC_SOURCE_TYPES = (
 
 
 def _deny():
-    raise AppUnauthorizedFailed(403, gettext('No permission to access'))
+    raise AppUnauthorizedFailed(403, gettext("No permission to access"))
 
 
 def auth(file, mk_file_auth):
@@ -172,14 +170,11 @@ def auth(file, mk_file_auth):
     if file.source_type in _PUBLIC_SOURCE_TYPES:
         return
     # PublicFileAccess 中记录的文件允许公开访问
-    if QuerySet(PublicFileAccess).filter(source_type='FILE', source_id=str(file.id)).exists():
+    if QuerySet(PublicFileAccess).filter(source_type="FILE", source_id=str(file.id)).exists():
         return
-    if file.source_type == FileSourceType.APPLICATION:
-        application = QuerySet(Application).filter(id=file.source_id).first()
-        if application is None:
-            _deny()
-        if file.meta.get('chat_id') is None:
-            return
+    if file.source_type == FileSourceType.APPLICATION_SETTINGS:
+        return
+
     # 非公共文件,直接拒绝
     if mk_file_auth is None:
         _deny()
@@ -203,7 +198,7 @@ def _auth_chat(file, token, user_type):
         else:
             return
     if file.source_type == FileSourceType.CHAT:
-        if file.meta.get('user_id') == user_id:
+        if file.meta.get("user_id") == user_id:
             return
         # 非本人:存在分享链接才允许
         if not QuerySet(ChatShareLink).filter(chat_id=file.source_id).exists():
@@ -215,10 +210,7 @@ def _auth_chat(file, token, user_type):
 
     # DOCUMENT / KNOWLEDGE
     if file.source_type == FileSourceType.DOCUMENT:
-        knowledge_id = (QuerySet(Document)
-                        .filter(id=file.source_id)
-                        .values_list('knowledge_id', flat=True)
-                        .first())
+        knowledge_id = QuerySet(Document).filter(id=file.source_id).values_list("knowledge_id", flat=True).first()
         if knowledge_id is None:
             _deny()
     elif file.source_type == FileSourceType.KNOWLEDGE:
@@ -231,7 +223,7 @@ def _auth_chat(file, token, user_type):
         _check_knowledge_mapped_to_application(token.application_id, knowledge_id)
         return
 
-    get_authorized = DatabaseModelManage.get_model('get_knowledge_list_of_authorized')
+    get_authorized = DatabaseModelManage.get_model("get_knowledge_list_of_authorized")
     if knowledge_id not in get_authorized(user_id, [knowledge_id]):
         _deny()
 
@@ -241,20 +233,23 @@ def _check_anonymous_login(chat_id):
         application__chat__id=chat_id,
         application__chat__is_deleted=False,
     ).first()
-    if (access_token and access_token.authentication
-            and access_token.authentication_value.get('type') == 'login'):
+    if access_token and access_token.authentication and access_token.authentication_value.get("type") == "login":
         _deny()
 
 
 def _check_knowledge_mapped_to_application(application_id, knowledge_id):
     if application_id is None or knowledge_id is None:
         _deny()
-    exists = QuerySet(ResourceMapping).filter(
-        source_type=ResourceType.APPLICATION,
-        source_id=str(application_id),
-        target_type=ResourceType.KNOWLEDGE,
-        target_id=str(knowledge_id),
-    ).exists()
+    exists = (
+        QuerySet(ResourceMapping)
+        .filter(
+            source_type=ResourceType.APPLICATION,
+            source_id=str(application_id),
+            target_type=ResourceType.KNOWLEDGE,
+            target_id=str(knowledge_id),
+        )
+        .exists()
+    )
     if not exists:
         _deny()
 
@@ -270,7 +265,8 @@ def _auth_system(file, user_id):
         if application is None:
             _deny()
         _check_workspace_resource_permission(
-            user_auth, user_id,
+            user_auth,
+            user_id,
             workspace_id=application.workspace_id,
             target_id=application.id,
             auth_target_type="APPLICATION",
@@ -281,7 +277,8 @@ def _auth_system(file, user_id):
         if application is None:
             _deny()
         _check_workspace_resource_permission(
-            user_auth, user_id,
+            user_auth,
+            user_id,
             workspace_id=application.workspace_id,
             target_id=application.id,
             auth_target_type="APPLICATION",
@@ -289,17 +286,15 @@ def _auth_system(file, user_id):
         )
     elif file.source_type in (FileSourceType.DOCUMENT, FileSourceType.KNOWLEDGE):
         if file.source_type == FileSourceType.DOCUMENT:
-            knowledge_id = (QuerySet(Document)
-                            .filter(id=file.source_id)
-                            .values_list('knowledge_id', flat=True)
-                            .first())
+            knowledge_id = QuerySet(Document).filter(id=file.source_id).values_list("knowledge_id", flat=True).first()
         else:
             knowledge_id = file.source_id
         knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first() if knowledge_id else None
         if knowledge is None:
             _deny()
         _check_workspace_resource_permission(
-            user_auth, user_id,
+            user_auth,
+            user_id,
             workspace_id=knowledge.workspace_id,
             target_id=knowledge.id,
             auth_target_type="KNOWLEDGE",
@@ -309,23 +304,28 @@ def _auth_system(file, user_id):
         _deny()
 
 
-def _check_workspace_resource_permission(user_auth, user_id, *, workspace_id,
-                                         target_id, auth_target_type, read_permission):
+def _check_workspace_resource_permission(
+    user_auth, user_id, *, workspace_id, target_id, auth_target_type, read_permission
+):
     if is_workspace_manage(user_auth, workspace_id):
         return
-    if (is_extends_workspace_manage(user_auth, workspace_id)
-            and has_extends_workspace_manage_permission(user_auth, read_permission, workspace_id)):
+    if is_extends_workspace_manage(user_auth, workspace_id) and has_extends_workspace_manage_permission(
+        user_auth, read_permission, workspace_id
+    ):
         return
 
-    permission_list = (["VIEW", "MANAGE", "ROLE"]
-                       if hasPermission(user_auth, read_permission)
-                       else ["VIEW", "MANAGE"])
-    if not QuerySet(WorkspaceUserResourcePermission).filter(
+    permission_list = ["VIEW", "MANAGE", "ROLE"] if hasPermission(user_auth, read_permission) else ["VIEW", "MANAGE"]
+    if (
+        not QuerySet(WorkspaceUserResourcePermission)
+        .filter(
             target=target_id,
             workspace_id=workspace_id,
             user_id=user_id,
             auth_target_type=auth_target_type,
-            permission_list__overlap=permission_list).exists():
+            permission_list__overlap=permission_list,
+        )
+        .exists()
+    ):
         _deny()
 
 
@@ -351,7 +351,7 @@ class FileSerializer(serializers.Serializer):
             meta = {"debug": True}
         if user_id:
             meta["user_id"] = user_id
-        file_id = meta.get('file_id', uuid.uuid7())
+        file_id = meta.get("file_id", uuid.uuid7())
         file = File(
             id=file_id,
             file_name=self.data.get("file").name,
@@ -410,7 +410,7 @@ class FileSerializer(serializers.Serializer):
                 length = end - start + 1
 
                 # 创建部分响应
-                response = HttpResponse(file_bytes[start: start + length], status=206, content_type=content_type)
+                response = HttpResponse(file_bytes[start : start + length], status=206, content_type=content_type)
 
                 # 设置部分内容响应头
                 response["Content-Range"] = f"bytes {start}-{end}/{file_size}"
@@ -432,14 +432,15 @@ class FileSerializer(serializers.Serializer):
 def get_url_content(url, application_id: str):
     application = Application.objects.filter(id=application_id).first()
     if application is None:
-        raise AppApiException(500, _('Application does not exist'))
+        raise AppApiException(500, _("Application does not exist"))
     if not application.file_upload_enable:
-        raise AppApiException(500, _('File upload is not enabled'))
+        raise AppApiException(500, _("File upload is not enabled"))
     file_limit = 50 * 1024 * 1024
-    if application.file_upload_setting and application.file_upload_setting.get('fileLimit'):
-        file_limit = application.file_upload_setting.get('fileLimit') * 1024 * 1024
+    if application.file_upload_setting and application.file_upload_setting.get("fileLimit"):
+        file_limit = application.file_upload_setting.get("fileLimit") * 1024 * 1024
     try:
         from common.utils.tool_code import ToolExecutor
+
         response = ToolExecutor().exec_code(
             """
     def get_url_content(url):
@@ -459,15 +460,15 @@ def get_url_content(url, application_id: str):
             "content": content,
         }
     """,
-            {"url": url}
+            {"url": url},
         )
     except Exception as e:
         raise AppApiException(500, str(e))
-    if int(response.get('Content-Length')) > file_limit:
-        raise AppApiException(500, _('File size exceeds limit'))
+    if int(response.get("Content-Length")) > file_limit:
+        raise AppApiException(500, _("File size exceeds limit"))
     return {
-        'status_code': response.get('status_code'),
-        'Content-Type': response.get('Content-Type'),
-        'Content-Length': response.get('Content-Length'),
-        'content': response.get('content'),
+        "status_code": response.get("status_code"),
+        "Content-Type": response.get("Content-Type"),
+        "Content-Length": response.get("Content-Length"),
+        "content": response.get("content"),
     }
