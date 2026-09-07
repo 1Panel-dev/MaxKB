@@ -28,7 +28,6 @@ from models_provider.impl.zhipu_model_provider.zhipu_model_provider import ZhiPu
 
 
 class ModelProvideConstants(Enum):
-    model_aimlapi_provider = AIMLAPIModelProvider()
     model_azure_provider = AzureModelProvider()
     model_wenxin_provider = WenxinModelProvider()
     model_ollama_provider = OllamaModelProvider()
@@ -50,3 +49,4 @@ class ModelProvideConstants(Enum):
     model_siliconCloud_provider = SiliconCloudModelProvider()
     model_regolo_provider = RegoloModelProvider()
     model_minimax_provider = MiniMaxModelProvider()
+    model_aimlapi_provider = AIMLAPIModelProvider()
