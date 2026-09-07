@@ -529,6 +529,8 @@ class FileSourceType(models.TextChoices):
     TEMPORARY_120_MINUTE = "TEMPORARY_120_MINUTE"
     # 临时1天 数据1天后被清理 source_id为TEMPORARY_1_DAY
     TEMPORARY_1_DAY = "TEMPORARY_1_DAY"
+    # 应用的icon 背景图等 用户的icon
+    APPLICATION_SETTINGS = "APPLICATION_SETTINGS"
 
 
 class VectorField(models.Field):
