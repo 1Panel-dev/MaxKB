@@ -24,7 +24,6 @@ const model = getModel()
 const store = useWorkflowStore(apiType)
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const modelCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('modelCascaderRef')
 const imageCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('imageCascaderRef')
 const promptGenerateDialogRef = useTemplateRef<InstanceType<typeof PromptGenerateDialog>>('promptGenerateDialogRef')
 const reasoningSettingDialogRef = useTemplateRef<InstanceType<typeof ReasoningSettingDialog>>('reasoningSettingDialogRef')

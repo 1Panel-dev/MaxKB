@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
-import { QuestionFilled } from '@element-plus/icons-vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import ApplicationApi from '@/api/admin/workspace/application/application'
@@ -8,7 +7,7 @@ import { APPLICATION_TYPE } from '@/api/enums'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
+import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowApplicationNode' })
 
@@ -55,35 +54,45 @@ interface ReferencedApplicationProperties {
 
 const uploadFields: UploadField[] = ['document', 'image', 'audio', 'video']
 const getModel = inject('getModel') as () => WorkflowNodeModel
+const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const model = getModel()
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const questionCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('questionCascaderRef')
 
-const applicationNodeData = (model.properties.node_data ?? {}) as Partial<ApplicationNodeForm>
-if (!Array.isArray(applicationNodeData.question_reference_address)) {
-  applicationNodeData.question_reference_address = [WorkflowNodeType.Start, 'question']
+// 一次性补齐旧节点表单，保留已保存的参数和文件引用。
+const defaultForm: ApplicationNodeForm = {
+  api_input_field_list: [],
+  user_input_field_list: [],
+  question_reference_address: [WorkflowNodeType.Start, 'question'],
+  is_result: false,
 }
-if (!Array.isArray(applicationNodeData.api_input_field_list)) applicationNodeData.api_input_field_list = []
-if (!Array.isArray(applicationNodeData.user_input_field_list)) applicationNodeData.user_input_field_list = []
-if (applicationNodeData.is_result === undefined) applicationNodeData.is_result = false
-model.properties.node_data = applicationNodeData as ApplicationNodeForm
+const savedForm = model.properties.node_data as Partial<ApplicationNodeForm> | undefined
+model.properties.node_data = {
+  ...defaultForm,
+  ...savedForm,
+  api_input_field_list: Array.isArray(savedForm?.api_input_field_list) ? savedForm.api_input_field_list : defaultForm.api_input_field_list,
+  user_input_field_list: Array.isArray(savedForm?.user_input_field_list) ? savedForm.user_input_field_list : defaultForm.user_input_field_list,
+  question_reference_address: Array.isArray(savedForm?.question_reference_address)
+    ? savedForm.question_reference_address
+    : defaultForm.question_reference_address,
+  is_result: savedForm?.is_result ?? defaultForm.is_result,
+}
 
 const formData = computed<ApplicationNodeForm>({
   get: () => model.properties.node_data as ApplicationNodeForm,
   set: (value) => (model.properties.node_data = value),
 })
 
+const showReturnContent = computed(() =>
+  [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
+)
+
 function formatFieldLabel(label: FieldLabel) {
   return typeof label === 'object' && label !== null ? (label.label ?? '') : label
 }
 
-function validate() {
-  return Promise.all([questionCascaderRef.value?.validate(), formRef.value?.validate()]).catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
-}
 
+// 根据关联智能体配置同步输入字段，按字段标识保留已选变量。
 function syncUploadField(field: UploadField, enabled: boolean) {
   const listKey: UploadListKey = `${field}_list`
   if (enabled) {
@@ -152,6 +161,13 @@ function refreshApplicationFields() {
     })
 }
 
+async function validate() {
+  return formRef.value?.validate().catch((error) =>
+    Promise.reject({ node: model, errMessage: error }),
+  )
+}
+
+
 onMounted(() => {
   refreshApplicationFields()
   model.validate = validate
@@ -160,17 +176,12 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mb-3">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">节点设置</h6>
 
-    <el-card shadow="never" class="card-never">
+    <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
         <el-form-item label="用户问题" prop="question_reference_address" :rules="{ message: '请选择用户问题', trigger: 'change', required: true }">
-          <NodeCascader
-            ref="questionCascaderRef"
-            v-model="formData.question_reference_address"
-            :node-model="model"
-            placeholder="请选择用户问题"
-          />
+          <NodeCascader ref="questionCascaderRef" v-model="formData.question_reference_address" :node-model="model" placeholder="请选择用户问题" />
         </el-form-item>
 
         <el-form-item v-if="formData.document_list !== undefined" label="选择文档" prop="document_list">
@@ -209,18 +220,17 @@ onMounted(() => {
           <NodeCascader v-model="field.value" :node-model="model" placeholder="请选择参数" />
         </el-form-item>
 
-        <el-form-item label="返回内容" @click.prevent>
-          <template #label>
-            <div class="flex items-center gap-1">
-              <span>返回内容</span>
-              <el-tooltip content="开启后，该节点的输出会作为工作流的最终回复内容" effect="dark" placement="right">
-                <MkIcon :icon="QuestionFilled" class="cursor-help text-N600" />
-              </el-tooltip>
-            </div>
-          </template>
+        <!-- 返回内容 -->
+        <div v-if="showReturnContent" class="flex-between w-full">
+          <span class="flex items-center gap-1">
+            返回内容
+            <el-tooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+              <MkIcon name="icon_info_outlined" class="text-N600!" />
+            </el-tooltip>
+          </span>
           <el-switch v-model="formData.is_result" size="small" />
-        </el-form-item>
+        </div>
       </el-form>
-    </el-card>
+    </div>
   </NodeContainer>
 </template>

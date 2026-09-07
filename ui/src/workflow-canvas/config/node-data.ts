@@ -377,6 +377,27 @@ export const toolLibNode = {
   properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
+/**
+ * 工作流工具配置数据
+ */
+export const toolWorkflowLibNode = {
+  type: WorkflowNodeType.ToolWorkflowLib,
+  text: '工作流工具',
+  label: '工作流工具',
+  height: 170,
+  properties: { stepName: '工作流工具', config: { fields: [] } },
+}
+
+
+/* 智能体节点 */
+export const applicationNode = {
+  type: WorkflowNodeType.Application,
+  text: '智能体节点',
+  label: '智能体节点',
+  properties: { stepName: '智能体节点', config: { fields: [{ label: '结果', value: 'result' }] } },
+}
+
+
 export const loopStartNode = {
   id: WorkflowNodeType.LoopStartNode,
   type: WorkflowNodeType.LoopStartNode,
@@ -442,25 +463,6 @@ export const loopBreakNode = {
   label: 'Break',
   height: 100,
   properties: { width: 600, stepName: 'Break', config: { fields: [] } },
-}
-
-/**
- * 工作流工具配置数据
- */
-export const toolWorkflowLibNode = {
-  type: WorkflowNodeType.ToolWorkflowLib,
-  text: '工作流工具',
-  label: '工作流工具',
-  height: 170,
-  properties: { stepName: '工作流工具', config: { fields: [] } },
-}
-
-export const applicationNode = {
-  type: WorkflowNodeType.Application,
-  text: '智能体节点',
-  label: '智能体节点',
-  height: 260,
-  properties: { stepName: '智能体节点', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
 /* 文档分段 */

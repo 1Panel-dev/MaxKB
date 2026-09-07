@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
-import { QuestionFilled } from '@element-plus/icons-vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ToolInputField } from '@/api/types'
@@ -30,11 +29,17 @@ const model = getModel()
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 
+// 新节点默认不返回内容，旧节点缺少开关时继续按末尾节点兼容。
+const defaultForm: ToolLibNodeForm = {
+  input_field_list: [],
+  is_result: false,
+}
 const savedForm = model.properties.node_data as Partial<ToolLibNodeForm> | undefined
 model.properties.node_data = {
+  ...defaultForm,
   ...savedForm,
-  input_field_list: Array.isArray(savedForm?.input_field_list) ? savedForm.input_field_list : [],
-  is_result: savedForm ? savedForm.is_result : false,
+  input_field_list: Array.isArray(savedForm?.input_field_list) ? savedForm.input_field_list : defaultForm.input_field_list,
+  is_result: savedForm ? savedForm.is_result : defaultForm.is_result,
 }
 
 const formData = computed<ToolLibNodeForm>({
@@ -50,6 +55,7 @@ function validate() {
   return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error })) ?? Promise.resolve()
 }
 
+// 工具参数按名称和来源合并，保留已有引用或自定义值。
 function createInputField(field: ToolInputField, previousFields: ToolNodeInputField[]): ToolNodeInputField {
   const previousField = previousFields.find((item) => item.name === field.name && item.source === field.source)
   if (field.source === 'reference') {
@@ -94,11 +100,11 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mb-3">节点设置</h6>
-    <h6 class="mb-2">输入参数</h6>
+    <h6 class="mk-title-decoration mb-2">节点设置</h6>
 
-    <el-form ref="formRef" :model="formData" label-position="top" hide-required-asterisk @submit.prevent>
-      <el-card shadow="never" class="card-never mb-4" style="--el-card-padding: 12px">
+    <div class="mk-gray-card">
+      <el-form ref="formRef" :model="formData" label-position="top" hide-required-asterisk @submit.prevent>
+        <h6 class="mb-2">输入参数</h6>
         <template v-if="formData.input_field_list.length">
           <el-form-item
             v-for="(field, index) in formData.input_field_list"
@@ -112,11 +118,10 @@ onMounted(() => {
           >
             <template #label>
               <div class="flex w-full items-center gap-1">
-                <span class="max-w-40 truncate" :title="field.name">{{ field.name }}</span>
+                <span class="max-w-40 truncate" :class="{ 'mk-required': field.is_required }" :title="field.name">{{ field.name }}</span>
                 <el-tooltip v-if="field.desc" :content="field.desc" effect="dark" placement="right">
-                  <MkIcon :icon="QuestionFilled" class="cursor-help text-N600" />
+                  <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </el-tooltip>
-                <span v-if="field.is_required" class="text-danger">*</span>
                 <el-tag size="small" type="info">{{ field.type }}</el-tag>
               </div>
             </template>
@@ -125,20 +130,19 @@ onMounted(() => {
             <el-input v-else v-model="field.value" placeholder="请输入参数" />
           </el-form-item>
         </template>
-        <MkEmpty v-else :image-size="60" />
-      </el-card>
+        <MkEmpty v-else :image-size="60" class="mb-4" />
 
-      <el-form-item v-if="showReturnContent" label="返回内容" @click.prevent>
-        <template #label>
-          <div class="flex items-center gap-1">
-            <span>返回内容</span>
-            <el-tooltip content="开启后，该节点的输出会作为工作流的最终回复内容" effect="dark" placement="right">
-              <MkIcon :icon="QuestionFilled" class="cursor-help text-N600" />
+        <!-- 返回内容 -->
+        <div v-if="showReturnContent" class="flex-between w-full">
+          <span class="flex items-center gap-1">
+            返回内容
+            <el-tooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+              <MkIcon name="icon_info_outlined" class="text-N600!" />
             </el-tooltip>
-          </div>
-        </template>
-        <el-switch v-model="formData.is_result" size="small" />
-      </el-form-item>
-    </el-form>
+          </span>
+          <el-switch v-model="formData.is_result" size="small" />
+        </div>
+      </el-form>
+    </div>
   </NodeContainer>
 </template>
