@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, ref, useTemplateRef, provide } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
@@ -19,8 +19,13 @@ defineOptions({ name: 'WorkflowBaseNode' })
 
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const apiType = (inject('apiType') as string) || 'workspace'
+
 const model = getModel()
 const store = useWorkflowStore(apiType)
+
+// 为画布节点中的 ModelSelect 提供参数表单接口。
+provide('getModelParamsForm', store.force.getModelParamsForm)
+provide('getSelectModelList', store.force.getModelList)
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 

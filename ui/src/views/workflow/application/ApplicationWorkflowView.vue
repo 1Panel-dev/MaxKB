@@ -15,11 +15,10 @@ import { WorkflowMode } from '@/workflow-canvas/types'
 import DefaultModelSettingButton from '../components/default-model-setting/DefaultModelSettingButton.vue'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import Conversation from '@/components/conversation/index.vue'
+import { getResourceScope } from '@/utils/resource-context.ts'
 
 defineOptions({ name: 'ApplicationWorkflowView' })
-
-// 为画布节点中的 ModelSelect 提供参数表单接口。
-provide('getModelParamsForm', ModelApi.getModelParamsForm)
+provide('resourceScope', getResourceScope())
 
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
   nodes: cloneDeep(defaultApplicationNodes),
