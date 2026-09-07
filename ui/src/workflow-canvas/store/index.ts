@@ -1,14 +1,33 @@
-import type { Dict, DynamicFormField, ModelItem, ModelProviderItem } from '@/api/types'
+import type { Dict, DynamicFormField, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
+
+export interface McpTool {
+  args_schema: Record<string, unknown>
+  description: string
+  name: string
+  server: string
+}
 
 // 底层 api/*/index.ts 提供的原始接口实现,不含缓存层能力。
 type ApiModule = {
   getModelList: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
   getModelParamsForm: (modelId: string) => Promise<DynamicFormField[]>
+  getMcpTools?: (resourceType: string, resourceId: string, mcpServers: string) => Promise<McpTool[]>
+  getAllToolList?: (query?: Dict<unknown>) => Promise<ToolItem[]>
+  getToolById?: (toolId: string) => Promise<ToolItem>
 }
 
 // useWorkflowStore 返回的包装接口:默认走缓存,通过 store.force.xxx() 强制刷新。
-type WorkflowStore = ApiModule & { force: ApiModule }
+export type WorkflowStoreApi = {
+  getModelList: (query?: Dict<unknown>) => Promise<ModelItem[]>
+  getProviderList: () => Promise<ModelProviderItem[]>
+  getModelParamsForm: (modelId: string) => Promise<DynamicFormField[]>
+  getMcpTools: (resourceType: string, resourceId: string, mcpServers: string) => Promise<McpTool[]>
+  getAllToolList: (query?: Dict<unknown>) => Promise<ToolItem[]>
+  getToolById: (toolId: string) => Promise<ToolItem>
+}
+
+type WorkflowStore = WorkflowStoreApi & { force: WorkflowStoreApi }
 
 const apiModules = import.meta.glob<{ default: ApiModule }>('./api/*/index.ts', { eager: true })
 
@@ -51,7 +70,7 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
   }
 
   // 生成一组接口方法;force 为 true 时对应的调用会跳过缓存强制刷新。
-  function build(force: boolean): ApiModule {
+  function build(force: boolean): WorkflowStoreApi {
     return {
       getModelList(query?: Dict<unknown>): Promise<ModelItem[]> {
         return withCache(`model:${JSON.stringify(query ?? {})}`, () => resolvedApi.getModelList(query), force)
@@ -61,6 +80,18 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
       },
       getModelParamsForm(modelId: string): Promise<DynamicFormField[]> {
         return withCache(`modelParamsForm:${modelId}`, () => resolvedApi.getModelParamsForm(modelId), force)
+      },
+      getMcpTools(resourceType: string, resourceId: string, mcpServers: string): Promise<McpTool[]> {
+        if (!resolvedApi.getMcpTools) return Promise.resolve([])
+        return withCache(`mcp-tools:${resourceType}:${resourceId}:${mcpServers}`, () => resolvedApi.getMcpTools!(resourceType, resourceId, mcpServers), force)
+      },
+      getAllToolList(query?: Dict<unknown>): Promise<ToolItem[]> {
+        if (!resolvedApi.getAllToolList) return Promise.resolve([])
+        return withCache(`tool-list:${JSON.stringify(query ?? {})}`, () => resolvedApi.getAllToolList!(query), force)
+      },
+      getToolById(toolId: string): Promise<ToolItem> {
+        if (!resolvedApi.getToolById) return Promise.resolve({} as ToolItem)
+        return withCache(`tool:${toolId}`, () => resolvedApi.getToolById!(toolId), force)
       },
     }
   }
