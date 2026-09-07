@@ -26,6 +26,7 @@ interface QuestionNodeForm {
   dialogue_number: number
   is_result: boolean
   model_params_setting: Record<string, unknown>
+  dialogue_type: 'NODE' | 'WORKFLOW'
 }
 
 const formRef = useTemplateRef<FormInstance>('formRef')
@@ -46,6 +47,7 @@ const defaultForm: QuestionNodeForm = {
   dialogue_number: 1,
   is_result: false,
   model_params_setting: {},
+  dialogue_type: 'NODE',
 }
 const savedForm = model.properties.node_data as Partial<QuestionNodeForm> | undefined
 model.properties.node_data = {
@@ -57,6 +59,7 @@ model.properties.node_data = {
   system: savedForm?.system ?? defaultForm.system,
   prompt: savedForm?.prompt ?? defaultForm.prompt,
   dialogue_number: savedForm?.dialogue_number ?? defaultForm.dialogue_number,
+  dialogue_type: savedForm?.dialogue_type ?? defaultForm.dialogue_type,
   is_result: savedForm ? savedForm.is_result : defaultForm.is_result,
 }
 
@@ -198,7 +201,16 @@ onMounted(() => {
         </el-form-item>
 
         <!-- 历史聊天记录 -->
-        <el-form-item label="历史聊天记录">
+        <el-form-item>
+          <template #label>
+            <div class="flex-between">
+              <span>历史聊天记录</span>
+              <el-select v-model="formData.dialogue_type" :teleported="false" class="w-18!" size="small">
+                <el-option label="节点" value="NODE" />
+                <el-option label="工作流" value="WORKFLOW" />
+              </el-select>
+            </div>
+          </template>
           <el-input-number
             v-model="formData.dialogue_number"
             :min="0"

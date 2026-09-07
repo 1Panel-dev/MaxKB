@@ -157,22 +157,6 @@ const providerOptions = ref<ModelProviderItem[]>([])
 
 // 节点统一校验
 function validate() {
-  // TODO v2没有标记必填 但是需要校验 需要核对一下
-  if (formData.value.tts_model_enable && formData.value.tts_type === 'CUSTOM' && !formData.value.tts_model_id) {
-    return Promise.reject({ node: model, errMessage: '请选择语音播放模型' })
-  }
-  if (formData.value.tts_model_enable && formData.value.tts_type === 'DEFAULT' && !defaultTtsModelSetting.value?.model_id) {
-    return Promise.reject({ node: model, errMessage: '请在默认模型设置中选择语音合成模型' })
-  }
-  if (formData.value.stt_model_enable && formData.value.stt_model_id_type === 'custom' && !formData.value.stt_model_id) {
-    return Promise.reject({ node: model, errMessage: '请选择语音输入模型' })
-  }
-  if (formData.value.stt_model_enable && formData.value.stt_model_id_type === 'default' && !defaultSttModelSetting.value?.model_id) {
-    return Promise.reject({ node: model, errMessage: '请在默认模型设置中选择语音识别模型' })
-  }
-  if (formData.value.long_term_enable && formData.value.long_term_model_id_type === 'custom' && !formData.value.long_term_model_id) {
-    return Promise.reject({ node: model, errMessage: '请选择长期记忆模型' })
-  }
   return Promise.all([validateUserFieldReferences(), formRef.value?.validate()]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
@@ -211,40 +195,58 @@ onMounted(() => {
       </el-form-item>
 
       <!-- 长期记忆 -->
-      <div class="mb-4 flex-between">
-        <span class="flex items-center gap-1">
-          长期记忆
-          <el-tooltip
-            content="开启后，从开启时间记录新对话并按周期生成记忆，可通过 {{开始.memory}} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。"
-            placement="right"
-          >
-            <MkIcon name="icon_info_outlined" class="text-N600!" />
-          </el-tooltip>
-        </span>
-        <span class="flex items-center gap-2">
-          <!-- // TODO 长期记忆设置 -->
-          <el-button v-if="formData.long_term_enable" text type="primary">
-            <MkIcon name="icon-setting" />
-          </el-button>
-          <el-switch :model-value="formData.long_term_enable" size="small" @change="changeLongTermEnabled" />
-        </span>
-      </div>
+      <el-form-item
+        class="mb-2!"
+        prop="long_term_model_id"
+        :rules="{
+          required: formData.long_term_enable && formData.long_term_model_id_type === 'custom',
+          message: '请选择长期记忆模型',
+          trigger: 'change',
+        }"
+      >
+        <template #label>
+          <div class="flex-between">
+            <span class="flex items-center gap-1">
+              <span :class="formData.long_term_enable ? 'mk-required' : ''">长期记忆</span>
 
-      <div class="mb-4 flex-between w-full">
-        <span class="flex items-center gap-1">
-          文件上传
-          <el-tooltip content="开启后，问答页面会显示上传文件的按钮。" placement="right">
-            <MkIcon name="icon_info_outlined" class="text-N600!" />
-          </el-tooltip>
-        </span>
-        <span class="flex items-center gap-2">
-          <!-- // TODO 文件上传设置 -->
-          <el-button v-if="formData.file_upload_enable" text type="primary">
-            <MkIcon name="icon-setting" />
-          </el-button>
-          <el-switch :model-value="formData.file_upload_enable" size="small" @change="changeFileUploadEnabled" />
-        </span>
-      </div>
+              <el-tooltip
+                content="开启后，从开启时间记录新对话并按周期生成记忆，可通过 {{开始.memory}} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。"
+                placement="right"
+              >
+                <MkIcon name="icon_info_outlined" class="text-N600!" />
+              </el-tooltip>
+            </span>
+            <span class="flex items-center gap-2">
+              <!-- // TODO 长期记忆设置 -->
+              <el-button v-if="formData.long_term_enable" text type="primary">
+                <MkIcon name="icon-setting" />
+              </el-button>
+              <el-switch :model-value="formData.long_term_enable" size="small" @change="changeLongTermEnabled" />
+            </span>
+          </div>
+        </template>
+      </el-form-item>
+
+      <!-- 文件上传 -->
+      <el-form-item class="mb-2!">
+        <template #label>
+          <div class="flex-between w-full">
+            <span class="flex items-center gap-1">
+              文件上传
+              <el-tooltip content="开启后，问答页面会显示上传文件的按钮。" placement="right">
+                <MkIcon name="icon_info_outlined" class="text-N600!" />
+              </el-tooltip>
+            </span>
+            <span class="flex items-center gap-2">
+              <!-- // TODO 文件上传设置 -->
+              <el-button v-if="formData.file_upload_enable" text type="primary">
+                <MkIcon name="icon-setting" />
+              </el-button>
+              <el-switch :model-value="formData.file_upload_enable" size="small" @change="changeFileUploadEnabled" />
+            </span>
+          </div>
+        </template>
+      </el-form-item>
 
       <!-- 用户输入 -->
       <el-form-item>
@@ -261,13 +263,31 @@ onMounted(() => {
 
       <!-- 语音输入 -->
       <div class="flex-between">
-        <span>语音输入</span>
+        <span :class="formData.stt_model_enable ? 'mk-required' : ''">语音输入</span>
         <span class="flex items-center gap-3">
           <el-checkbox v-if="formData.stt_model_enable" v-model="formData.stt_autosend">自动发送</el-checkbox>
           <el-switch v-model="formData.stt_model_enable" size="small" @change="changeSpeechInputEnabled" />
         </span>
       </div>
-      <el-form-item class="mt-2" v-if="formData.stt_model_enable">
+      <el-form-item
+        v-if="formData.stt_model_enable"
+        class="mt-2"
+        prop="stt_model_id"
+        :rules="{
+          trigger: 'change',
+          validator: (_rule: unknown, _value: unknown, callback: (error?: Error) => void) => {
+            if (formData.stt_model_id_type === 'custom' && !formData.stt_model_id) {
+              callback(new Error('请选择语音输入模型'))
+              return
+            }
+            if (formData.stt_model_id_type === 'default' && !defaultSttModelSetting?.model_id) {
+              callback(new Error('请在默认模型设置中选择语音识别模型'))
+              return
+            }
+            callback()
+          },
+        }"
+      >
         <el-radio-group v-model="formData.stt_model_id_type" class="mb-2">
           <el-radio value="default">默认模型</el-radio>
           <el-radio value="custom">自定义</el-radio>
@@ -293,14 +313,32 @@ onMounted(() => {
 
       <!-- 语音播放 -->
       <div class="flex-between mt-4">
-        <span>语音播放</span>
+        <span :class="formData.tts_model_enable && formData.tts_type !== 'BROWSER' ? 'mk-required' : ''">语音播放</span>
         <span class="flex items-center gap-3">
           <el-checkbox v-if="formData.tts_model_enable" v-model="formData.tts_autoplay">自动播放</el-checkbox>
           <el-switch v-model="formData.tts_model_enable" size="small" @change="changeSpeechPlaybackEnabled" />
         </span>
       </div>
 
-      <el-form-item class="mt-2" v-if="formData.tts_model_enable">
+      <el-form-item
+        v-if="formData.tts_model_enable"
+        class="mt-2"
+        prop="tts_model_id"
+        :rules="{
+          trigger: 'change',
+          validator: (_rule: unknown, _value: unknown, callback: (error?: Error) => void) => {
+            if (formData.tts_type === 'CUSTOM' && !formData.tts_model_id) {
+              callback(new Error('请选择语音播放模型'))
+              return
+            }
+            if (formData.tts_type === 'DEFAULT' && !defaultTtsModelSetting?.model_id) {
+              callback(new Error('请在默认模型设置中选择语音合成模型'))
+              return
+            }
+            callback()
+          },
+        }"
+      >
         <el-radio-group v-model="formData.tts_type" class="mb-2">
           <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
           <el-radio value="DEFAULT">默认模型</el-radio>

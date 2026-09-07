@@ -24,7 +24,6 @@ const model = getModel()
 const store = useWorkflowStore(apiType)
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const imageCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('imageCascaderRef')
 const promptGenerateDialogRef = useTemplateRef<InstanceType<typeof PromptGenerateDialog>>('promptGenerateDialogRef')
 const reasoningSettingDialogRef = useTemplateRef<InstanceType<typeof ReasoningSettingDialog>>('reasoningSettingDialogRef')
 
@@ -132,11 +131,8 @@ function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error
   callback(model_id ? undefined : new Error(model_id_type === 'default' ? '请在默认模型设置中选择 AI 模型' : '请选择 AI 模型'))
 }
 
-function validate() {
-  // TODO 图片选择需要必填？为什么没有必填标记？
-  return Promise.all([formData.value.vision ? imageCascaderRef.value?.validate() : Promise.resolve(), formRef.value?.validate()]).catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
+async function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
