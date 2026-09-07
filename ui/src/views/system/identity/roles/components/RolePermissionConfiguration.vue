@@ -6,6 +6,8 @@ import { MsgSuccess } from '@/utils/message'
 
 interface PermissionTableRow {
   id: string
+  categoryId: string
+  category: string
   moduleId: string
   module: string
   name: string
@@ -30,15 +32,35 @@ function loadPermissions() {
 }
 
 function transformPermissions(modules: RolePermissionModule[]) {
-  return modules.flatMap((module) =>
-    module.children.map((feature) => ({ id: `${module.id}:${feature.id}`, moduleId: module.id, module: module.name, name: feature.name, permissions: feature.permission })),
+  // 后端返回 分类(category) → 分组(group) → 叶子(feature) → 权限 的结构，
+  // 分类 → “分类”列，分组 → “模块名称”列，叶子 → “操作对象”列，向下展平为表格行
+  return modules.flatMap((category) =>
+    category.children.flatMap((group) =>
+      group.children.map((feature) => ({
+        id: `${category.id}:${group.id}:${feature.id}`,
+        categoryId: category.id,
+        category: category.name,
+        moduleId: `${category.id}:${group.id}`,
+        module: group.name,
+        name: feature.name,
+        permissions: feature.permission,
+      })),
+    ),
   )
 }
 
 function permissionTableSpan({ row, rowIndex, columnIndex }: { row: PermissionTableRow; rowIndex: number; columnIndex: number }) {
-  if (columnIndex !== 0) return [1, 1]
-  const firstRowIndex = permissionData.value.findIndex(({ moduleId }) => moduleId === row.moduleId)
-  return rowIndex === firstRowIndex ? [permissionData.value.filter(({ moduleId }) => moduleId === row.moduleId).length, 1] : [0, 0]
+  if (columnIndex === 0) {
+    // “分类”列按分类纵向合并
+    const firstRowIndex = permissionData.value.findIndex(({ categoryId }) => categoryId === row.categoryId)
+    return rowIndex === firstRowIndex ? [permissionData.value.filter(({ categoryId }) => categoryId === row.categoryId).length, 1] : [0, 0]
+  }
+  if (columnIndex === 1) {
+    // “模块名称”列按分组纵向合并
+    const firstRowIndex = permissionData.value.findIndex(({ moduleId }) => moduleId === row.moduleId)
+    return rowIndex === firstRowIndex ? [permissionData.value.filter(({ moduleId }) => moduleId === row.moduleId).length, 1] : [0, 0]
+  }
+  return [1, 1]
 }
 
 /* 单项权限与查看权限联动 */
@@ -96,6 +118,7 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
       :data="permissionData"
       v-loading="loading"
     >
+      <el-table-column prop="category" label="分类" width="120" />
       <el-table-column prop="module" label="模块名称" width="150" />
       <el-table-column prop="name" label="操作对象" width="150" />
       <el-table-column label="权限">

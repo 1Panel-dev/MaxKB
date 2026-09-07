@@ -20,14 +20,20 @@ export interface RolePermission {
 export interface RolePermissionFeature {
   id: string
   name: string
-  enable: boolean
+  enable?: boolean
   permission: RolePermission[]
+}
+
+export interface RolePermissionModuleGroup {
+  id: string
+  name: string
+  children: RolePermissionFeature[]
 }
 
 export interface RolePermissionModule {
   id: string
   name: string
-  children: RolePermissionFeature[]
+  children: RolePermissionModuleGroup[]
 }
 
 export interface RolePayload {

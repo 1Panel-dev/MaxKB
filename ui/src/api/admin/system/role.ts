@@ -1,12 +1,18 @@
 import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
-import type { CreateRoleMembersRequest, Dict, RoleItem, RoleMember, RolePermissionModule, RolePayload, SaveRolePermissionRequest } from '@/api/types'
+import type { CreateRoleMembersRequest, Dict, RoleItem, RoleMember, RolePermissionModule, RolePayload, RoleType, SaveRolePermissionRequest } from '@/api/types'
 
 const prefix = '/system/role'
 
 /** 获取内置角色与自定义角色列表。 */
 const getRoleList = () => {
-  return get<{ internal_role: RoleItem[]; custom_role: RoleItem[] }>(prefix)
+  return get<{ internal_role: RoleItem[]; custom_role: RoleItem[] } | Array<{ role_type: RoleType; role_list: RoleItem[] }>>(prefix).then((data) => {
+    if (Array.isArray(data)) {
+      // 后端按角色类型分组返回 { role_type, role_list }，展平为扁平角色数组
+      return data.flatMap((group) => group.role_list ?? [])
+    }
+    return [...(data.internal_role ?? []), ...(data.custom_role ?? [])]
+  })
 }
 
 /** 创建或重命名自定义角色。 */

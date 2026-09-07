@@ -51,7 +51,9 @@ class PermissionMeta:
     category: Optional[Category] = None
     resource_permission_group_list: Optional[list] = None
     scope: list[PermissionScopeConstants] = field(default_factory=list)
-    is_ee: bool = False
+    is_ee: bool = True
+    # 角色 -> 分类 覆盖表；未列出的角色默认归入 OTHER
+    role_category_map: Optional[dict] = None
 
 
 @dataclass(frozen=True)
