@@ -25,3 +25,7 @@ export const isSystemResource = () => {
 export const isSystemSharedResource = () => {
   return router.currentRoute.value.meta.resourceScope === 'system-shared'
 }
+
+export const getResourceScope = () => {
+  return router.currentRoute.value.meta.resourceScope
+}

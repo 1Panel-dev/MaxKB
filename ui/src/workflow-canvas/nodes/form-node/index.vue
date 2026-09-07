@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, useTemplateRef, provide } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
@@ -7,12 +7,15 @@ import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import FormSettingTable from './component/form-setting/FormSettingTable.vue'
-
+import { useWorkflowStore } from '@/workflow-canvas/store'
 defineOptions({ name: 'WorkflowFormNode' })
-
+const apiType = (inject('apiType') as string) || 'workspace'
+const store = useWorkflowStore(apiType)
 const getModel = inject<() => WorkflowNodeModel>('getModel')!
 const model = getModel()
-
+// 为画布节点中的 ModelSelect 提供参数表单接口。
+provide('getModelParamsForm', store.force.getModelParamsForm)
+provide('getSelectModelList', store.force.getModelList)
 interface FormNodeForm {
   is_result: boolean
   form_field_list: FormField[]
