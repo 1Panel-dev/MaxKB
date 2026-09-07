@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash'
 import LogicFlow, { type GraphModel } from '@logicflow/core'
 import { SelectionSelect } from '@logicflow/extension'
 import AppEdge from '@/workflow-canvas/core/edge/index'
+import LoopEdge from '@/workflow-canvas/core/edge/loop-edge'
 import { initDefaultShortcut } from '@/workflow-canvas/core/shortcut'
 import { disconnectAll, getTeleport } from '@/workflow-canvas/core/teleport'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -66,7 +67,7 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   initDefaultShortcut(lf.value, lf.value.graphModel)
   // 节点按需读取页面传入的已保存配置，保持与保存响应一致。
   lf.value.graphModel.getDefaultModelSettings = () => props.defaultModelSettings
-  lf.value.batchRegister([...Object.values(nodeModules).map(({ default: node }) => node), AppEdge])
+  lf.value.batchRegister([...Object.values(nodeModules).map(({ default: node }) => node), AppEdge, LoopEdge])
   lf.value.setDefaultEdgeType('app-edge')
   lf.value.render(data ? data : {})
 

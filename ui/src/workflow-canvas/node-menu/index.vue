@@ -35,7 +35,7 @@ function handleDragStart(node: NodeMenuItem, event: PointerEvent) {
     <el-tabs v-model="activeTab" class="small p-4 pb-0">
       <el-tab-pane label="基础组件" name="basic" />
       <el-tab-pane label="工具" name="tool" />
-      <el-tab-pane label="智能体" name="application" v-if="workflowMode === 'application'" />
+      <el-tab-pane label="智能体" name="application" v-if="workflowMode === 'application' || workflowMode === 'application-loop'" />
     </el-tabs>
 
     <KeepAlive>
