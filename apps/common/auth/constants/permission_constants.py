@@ -75,7 +75,7 @@ class PermissionConstants(Enum):
     HOMEPAGE_READ = (
         Permission(group=Group.HOMEPAGE, sub_group=Group.HOMEPAGE, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE],
         ),
@@ -84,7 +84,7 @@ class PermissionConstants(Enum):
     HOMEPAGE_EXPORT = (
         Permission(group=Group.HOMEPAGE, sub_group=Group.HOMEPAGE, operate=Operate.EXPORT, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE],
         ),
