@@ -26,6 +26,7 @@ export const isSystemSharedResource = () => {
   return router.currentRoute.value.meta.resourceScope === 'system-shared'
 }
 
+/** 获取当前是哪个资源范围 */
 export const getResourceScope = () => {
   return router.currentRoute.value.meta.resourceScope
 }

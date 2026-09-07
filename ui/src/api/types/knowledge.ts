@@ -25,3 +25,9 @@ export interface KnowledgeItem {
   user_id?: string | null
   workspace_id: string
 }
+
+/** 按标签名称分组的知识库标签。 */
+export interface KnowledgeTagGroup {
+  key: string
+  values: { id: string; value: string; create_time: string; update_time: string }[]
+}

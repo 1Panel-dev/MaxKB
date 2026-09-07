@@ -40,10 +40,9 @@ src/components/
 │   │   ├── MoveToDialog.vue
 │   │   ├── VirtualizedTree.vue
 │   │   └── types.ts
-│   ├── knowledge-selection-dialog/
-│   │   ├── index.vue             # 关联知识库选择、文件夹与共享资源查询
-│   │   └── types.ts              # 已选知识库快照类型
-│   ├── model-select/
+│   ├── select-knowledge-dialog/
+│   │   └── index.vue             # 关联知识库选择、文件夹与共享资源查询
+│   ├── select-model/
 │   │   ├── index.vue             # 按供应商分组的模型选择器与可选参数按钮
 │   │   └── ModelParamsDialog.vue # 模型参数动态表单弹窗
 │   ├── workspace-dropdown/
@@ -145,7 +144,7 @@ import JsonInput from '@/components/codemirror-editor/Json.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
-import ModelSelect from '@/components/business/model-select/index.vue'
+import SelectModel from '@/components/business/select-model/index.vue'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 ```
@@ -281,6 +280,10 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 `subtitle`、默认和 `footer` 插槽保持可用。`subtitle` 位于标题下方的 Header 区域，并统一使用
 `mt-2 text-N600` 样式；仅使用 `subtitle` 时，组件仍会按照 Element Plus 原生的标题 ID 和样式类
 渲染 `title`。内容区域超出最大高度后显示滚动条。
+
+Dialog 外壳仅在首次打开时挂载；默认在关闭动画结束、触发 `closed` 后整体卸载，
+避免未打开的弹窗生成隐藏 DOM。设置 `destroy-on-close="false"` 时，首次打开后保留实例和内容。
+业务侧无需额外使用 `v-if="visible"`，以免跳过关闭动画及 `closed` 清理。
 
 ```vue
 <MkDialog v-model="visible" title="创建工作空间" width="600">
@@ -513,6 +516,10 @@ Prop，未传入时读取当前路由的 `meta.title`；显式传入 `title=""` 
 
 智能体、知识库和工具的资源图标分别使用自动注册的 `ApplicationIcon`、`KnowledgeIcon` 和
 `ToolIcon`。`ApplicationIcon` 在未传入 `icon` 时会回退到系统默认图标。
+
+`KnowledgeIcon` 的 `type` 接收接口数字类型 `KnowledgeType`，内部通过
+`constants/knowledge.ts` 的 `KNOWLEDGE_TYPE_MAP` 转换为字符串后选择图标。自定义 `icon`
+优先；`BASE`、`YUQUE` 以及未提供或未知类型时沿用默认知识库图标。
 
 ```vue
 <ApplicationIcon :icon="application.icon" :size="24" />
@@ -826,6 +833,9 @@ function validateJson(rule: unknown, value: unknown, callback: (error?: Error) =
 
 ### MkSourceCard
 
+`disabled` 默认为 `false`；传入 `true` 时不添加 `cursor-pointer`，并将卡片 `shadow` 从
+`hover` 改为 `always`。该属性仅控制卡片样式，不拦截点击或选择事件。
+
 用于模型、工具等带来源信息的等高资源卡片。`title` 提供默认标题，`nick_name` 和 `create_time`
 提供固定样式的创建信息；`subtitle` 插槽也始终应用 `text-sm text-N600`。默认插槽放置资源详情，
 `footer` 插槽作为左侧常驻内容并始终贴在卡片底部；无论是否传入内容，底部都会保留固定位置。
@@ -1098,12 +1108,12 @@ const formValue = ref<Dict<DynamicFormValue>>({})
 初始化、空配置回填和切回自定义赋值时保留一行空白选项。卡片单选仅在存在完整选项时显示默认值卡片区。
 引用变量模式继续保留变量路径，不应用自定义选项过滤。
 
-动态表单的 Model 字段使用 `ModelSelect`，将 `attrs.provider_list` 中的模型快照映射为
+动态表单的 Model 字段使用 `SelectModel`，将 `attrs.provider_list` 中的模型快照映射为
 扁平 `ModelItem[]`，由选择器统一分组和展示供应商。旧快照未保存状态时保留可选行为，已保存的
-状态按 `ModelSelect` 的可用性规则处理。切换模型一次性回写 `model_id` 和深拷贝后的
+状态按 `SelectModel` 的可用性规则处理。切换模型一次性回写 `model_id` 和深拷贝后的
 `model_params_setting`；清空时回写空 ID 和空参数，避免修改原配置中的参数对象。
 
-Model 配置器的默认模型也使用 `ModelSelect`，仅展示已选的可选模型，不开启参数设置入口。
+Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选模型，不开启参数设置入口。
 选择时将模型 ID 转换为包含已配置参数的 `default_value` 对象，清空时重置为空对象。
 
 ## 跨页面业务组件
@@ -1148,16 +1158,22 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 <MoveToDialog ref="moveToDialogRef" :loading="submitting" :source="RESOURCE_TYPE.TOOL" @submit="handleMoveFolder" />
 ```
 
-### KnowledgeSelectionDialog
+### SelectKnowledgeDialog
 
-关联知识库选择弹窗，手动导入 `@/components/business/knowledge-selection-dialog/index.vue`。
+关联知识库选择弹窗，手动导入 `@/components/business/select-knowledge-dialog/index.vue`。
 通过 `open(knowledge)` 传入已选知识库快照，确认后通过 `submit` 返回新的选择；取消不修改调用方
-数据，关闭后统一清理临时状态。`KnowledgeSelection` 类型允许仅包含 ID，以兼容缺少详情的旧数据。
-组件复用只读 `FolderTree` 和 `MkInfiniteScroll` 查询工作空间及共享知识库，支持按名称搜索，
-跨文件夹、搜索和分页保留选择，并限制新选知识库使用相同的 Embedding 模型。固定业务请求由
+数据，关闭后统一清理临时状态。选择数据直接基于 `KnowledgeItem` 声明为
+`(Partial<KnowledgeItem> & { id: string })[]`，保留必需的 ID 并兼容缺少详情的旧数据，
+不再维护弹窗专用类型文件。
+组件采用 `MkViewLayout` 左右布局，搜索栏位于内容区右上角，刷新位于弹窗标题栏。
+选项使用紧凑三列布局（窄屏减少列数），左侧图标与省略名称、右侧复选框。点击卡片或复选框
+切换选择，选中后仅展示相同 Embedding 模型的选项，清空后恢复；悬停展示知识库详情。
+复用只读 `FolderTree`，通过工作空间及共享 API 的 `getAllKnowledge` 一次加载当前查询的全部
+知识库，不使用滚动分页。支持按名称搜索，跨文件夹和搜索保留选择，并限制新选知识库使用
+相同的 Embedding 模型。固定业务请求由
 该组件负责，调用方维护最终关联 ID 和快照。
 
-### ModelSelect
+### SelectModel
 
 按供应商分组展示模型，通过 `v-model` 控制模型 ID，并在选择变化时触发 `change`。`options` 为
 `ModelItem[]`，`providerOptions` 为 `ModelProviderItem[]`，模型列表和供应商列表均由使用方查询。
@@ -1180,10 +1196,10 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 
 ```vue
 <script setup lang="ts">
-import ModelSelect from '@/components/business/model-select/index.vue'
+import SelectModel from '@/components/business/select-model/index.vue'
 </script>
 
-<ModelSelect
+<SelectModel
   v-model="selectedModelId"
   v-model:model-params="modelParams"
   can-edit-params

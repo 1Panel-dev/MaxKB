@@ -65,6 +65,10 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 容器；`teleport.connect()` 的可选第五个参数用于传入组件 Props。节点容器
 保留菜单开关与外部点击关闭逻辑，不维护锚点 tooltip 的状态或虚拟触发器。
 
+画布中的所有弹窗（包括节点重命名、字段编辑和参数设置）统一使用 `MkDialog`，
+由公共组件负责打开时挂载、关闭动画结束后卸载，避免每个节点提前生成隐藏 Dialog DOM。
+保留业务弹窗的 `open()`、`close()` 和 `closed` 清理流程，不在调用处直接用可见状态卸载弹窗。
+
 ### `config/`
 
 `config` 是随业务持续维护的配置层，增加、删除或调整节点时通常会更新：
@@ -90,7 +94,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 `index.vue`。节点注册由 `index.vue` 中的 `import.meta.glob('./nodes/**/index.ts')` 自动收集，
 不要再维护一份逐项导入列表。
 
-工作流中的单模型选择统一使用 `ModelSelect` 的 `canEditParams` 和 `v-model:model-params`，
+工作流中的单模型选择统一使用 `SelectModel` 的 `canEditParams` 和 `v-model:model-params`，
 由公共组件维护参数按钮、弹窗和切换模型后的默认值，节点不再单独创建参数弹窗或请求默认值。
 AI 对话及基本信息的语音子组件通过局部更新事件回写字段，父节点合并更新，避免模型 ID 与参数
 连续更新时被旧 Props 覆盖。语音输入使用 `stt_model_params_setting`，语音播放使用
@@ -101,9 +105,28 @@ Vue Teleport 节点继承页面上下文；画布核心不负责模型参数接�
 `WorkflowNodeModel.getDefaultModelConfig(type)` 通过画布的配置读取函数获取对应模型，不使用
 默认配置的 `provide/inject`，也不写入节点持久化数据。AI 对话、意图识别、问题优化、语音、
 图片、视频及参数提取相关节点在默认来源下读取保存后的对应模型 ID 和参数，使用禁用且隐藏参数按钮的
-`ModelSelect` 展示；自定义来源继续编辑节点自身配置，引用来源使用 `NodeCascader`。默认配置
-只用于解析当前使用的模型，不覆盖节点保存的自定义配置；各节点在本地维护模型设置，并按当前
-来源检查实际模型或引用变量。
+`SelectModel` 展示；自定义来源继续编辑节点自身配置，引用来源使用 `NodeCascader`。默认配置
+只用于解析当前使用的模型，不覆盖节点保存的自定义配置。
+
+AI 对话、意图识别、问题优化、参数提取、图片理解、视频理解、图片生成、文生视频、图生视频、
+语音转文本和文本转语音这 11 个节点统一使用 `component/node-model-select/index.vue` 的
+`NodeModelSelect`。组件接收 `nodeModel`、只读 `formData`、`modelType`、`label`、`options` 和
+`providerOptions`；默认字段为 `model_id_type`、`model_id`、`model_id_reference` 与
+`model_params_setting`，语音节点通过类型化的 `fields` 映射 STT/TTS 字段。组件通过 `update`
+提交实际字段的局部更新，节点合并最新数据后写回；初始化、旧数据兼容和选项查询仍由节点负责。
+组件内部的 `el-form-item` 注册到节点外层表单，节点只需调用原有 `formRef.validate()`。
+默认来源检查保存后的默认模型，自定义来源检查模型 ID，引用来源检查必填并调用
+`NodeCascader.validate()` 检查引用有效性。切换来源清空引用与旧校验，保留自定义模型和参数。
+来源及模型下拉由组件统一维护锚点保护；参数按钮与默认参数加载继续复用 `SelectModel`。
+多路召回、基本信息中的语音设置和长期记忆保持各自实现，不接入该组件。
+
+知识库检索的范围区块使用 `component/node-search-scope/index.vue` 的 `NodeSearchScope`。
+组件通过 `formData` 接收 `NodeSearchScopeData`、通过 `selectedKnowledge` 接收包含 ID 回退的
+知识库快照，`nodeModel` 仅用于变量选择和浮层锚点保护。`update` 提交范围字段的局部变更，
+`update:knowledge` 提交选择或移除后的知识库列表；节点保留快照、关联 ID 和不可见关联的清理逻辑。
+组件复用 `SelectKnowledgeDialog`，保留相同 Embedding 模型约束。切换范围保留配置，切换知识库/
+文档列表清空引用；引用的必填与有效性校验通过组件内的表单项加入节点外层表单，自定义范围不校验
+隐藏引用，也不新增知识库必填限制。文档标签检索后续可以复用该组件，标签加载与过滤仍归节点。
 
 节点自身的表单、状态和专属校验留在节点目录；多个节点共享且属于画布基础协议的能力才上移到
 `core`。节点应复用 `core/node-container/index.vue`，需要选择上游节点字段时复用
@@ -142,10 +165,24 @@ Vue Teleport 节点继承页面上下文；画布核心不负责模型参数接�
 当前表单的显隐引用使用真实节点 ID，与 v2 的引用路径一致；保留 `self` 标记供动态表单从本地值取数。
 节点初始化时将旧 `self-form` 引用转换为当前节点 ID，并为 v2 的当前节点引用补齐 `self`，不改动上游引用。
 
+AI 对话节点的 `component/resource-setting` 仅渲染技能卡片内的 MCP、工具、Skills 和智能体分组，
+各分组直接在入口使用 `MkCollapse`，不再拆分普通列表子组件，仅选择弹窗独立封装。
+标题、输出执行过程开关与 `mk-white-card` 由节点入口维护。组件通过 `setting`
+读取资源配置、通过 `update` 提交局部变更；资源选项由 Props 传入，未接入数据源时默认为空数组，
+已关联但缺少详情的资源保留 ID 回退展示。
+
 AI 对话节点的提示词、历史记录、视觉理解和输出思考表单直接在节点入口维护，统一使用全局
 `MdEditorMagnify` 和节点表单样式；AI 提示词生成与思考过程配置仍使用独立弹窗。
 问题优化、图片理解和视频理解节点的系统提示词与用户提示词，以及图片、文生视频和图生视频
 节点的正向与负向提示词同样使用 `MdEditorMagnify`，必填字段由所在节点表单统一校验。
+
+文档内容提取、多路召回和文档标签检索节点使用统一的节点标题、`mk-gray-card`、表单必填标记与
+`MkIcon`。多路召回的独立参数弹窗位于节点 `component/`，复用 `MkDialog` 和 `MkSlider`；
+重排内容与标签条件允许删除到空列表，保留原有列表语义。文档标签检索复用
+`SelectKnowledgeDialog`，保留知识库快照及缺少详情的关联 ID。
+`ApplicationWorkflowView` 和 `ToolWorkflowView` 提供 `getKnowledgeTags` 与 `getRerankerModels`
+注入接口，分别用于文档标签选项与重排模型查询；新增模型后直接重新查询，不读取已有模型列表缓存。
+标签请求只回写当前关联知识库的结果，过期或节点卸载后的响应不再修改节点。
 
 固定字段写入统一使用直接赋值，例如 `model.properties.node_data = value`、
 `model.validate = validate`，不使用 Lodash `set`。写入嵌套字段前保留必要的父对象初始化；
@@ -216,10 +253,11 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 
 - 已实现并注册：基本信息、开始、AI 对话、意图识别、问题优化、语音转文本、文本转语音、图片生成、
   图片理解、文生视频、图生视频、视频理解、知识库检索、判断器、指定回复、智能体、自定义工具和
-  工具库工具。
-- 知识库检索节点在 `component/search-scope/` 和 `component/search-setting/` 中分别维护检索范围
-  与参数配置，节点入口统一写回数据并独立校验范围引用和问题引用。知识库选择复用
-  `KnowledgeSelectionDialog`，保留相同 Embedding 模型约束；移除关联只清理明确取消的 ID，
+  工具库工具、文档内容提取、多路召回和文档标签检索。
+- 知识库检索节点在入口维护检索范围、参数摘要和问题表单，参数设置按钮与弹窗统一封装在
+  `component/SearchSetting.vue`，通过 `v-model` 接收检索参数，仅在校验通过并保存后深拷贝回写；
+  节点入口统一维护关联数据，范围引用加入节点表单校验，问题引用保留独立有效性检查。知识库选择复用
+  `SelectKnowledgeDialog`，保留相同 Embedding 模型约束；移除关联只清理明确取消的 ID，
   不丢弃全量关联中当前用户不可见的知识库。检索模式协议复用 `KNOWLEDGE_SEARCH_MODE`。
 - `config/node-mapping.ts` 保留节点类型映射，以及基本信息和开始节点的默认数据集合。
 - `NodeMenu` 使用 Element Plus Tabs 组织基础组件、工具和智能体；基础组件直接渲染 `node-menu/menu.ts` 返回的菜单分组，工具和智能体复用 Workspace 文件夹树加载可用资源。画布右上角的 `AddNode` 和节点锚点菜单均支持点击创建与拖拽到画布创建。

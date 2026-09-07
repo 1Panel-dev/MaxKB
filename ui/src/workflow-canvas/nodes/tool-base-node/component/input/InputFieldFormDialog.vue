@@ -73,7 +73,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <el-dialog
+  <MkDialog
     :title="isEdit ? '编辑参数' : '添加参数'"
     v-model="dialogVisible"
     :close-on-click-modal="false"
@@ -81,39 +81,15 @@ defineExpose({ open, close })
     :destroy-on-close="true"
     append-to-body
   >
-    <el-form
-      label-position="top"
-      ref="fieldFormRef"
-      :rules="rules"
-      :model="form"
-      require-asterisk-position="right"
-    >
+    <el-form label-position="top" ref="fieldFormRef" :rules="rules" :model="form" require-asterisk-position="right">
       <el-form-item label="参数名" prop="field">
-        <el-input
-          v-model="form.field"
-          placeholder="请输入参数名"
-          maxlength="64"
-          show-word-limit
-          @blur="form.field = form.field.trim()"
-        />
+        <el-input v-model="form.field" placeholder="请输入参数名" maxlength="64" show-word-limit @blur="form.field = form.field.trim()" />
       </el-form-item>
       <el-form-item label="显示名" prop="label">
-        <el-input
-          v-model="form.label"
-          placeholder="请输入显示名"
-          :maxlength="128"
-          show-word-limit
-          @blur="form.label = form.label?.trim()"
-        />
+        <el-input v-model="form.label" placeholder="请输入显示名" :maxlength="128" show-word-limit @blur="form.label = form.label?.trim()" />
       </el-form-item>
       <el-form-item label="描述">
-        <el-input
-          v-model="form.desc"
-          placeholder="请输入描述"
-          :maxlength="128"
-          show-word-limit
-          @blur="form.desc = form.desc?.trim()"
-        />
+        <el-input v-model="form.desc" placeholder="请输入描述" :maxlength="128" show-word-limit @blur="form.desc = form.desc?.trim()" />
       </el-form-item>
       <el-form-item label="数据类型">
         <el-select v-model="form.type">
@@ -133,5 +109,5 @@ defineExpose({ open, close })
         </el-button>
       </span>
     </template>
-  </el-dialog>
+  </MkDialog>
 </template>

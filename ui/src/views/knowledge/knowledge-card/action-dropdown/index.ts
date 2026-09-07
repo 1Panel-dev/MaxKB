@@ -1,0 +1,3 @@
+/** 知识库卡片菜单操作。 */
+export { default as MoveKnowledgeAction } from './MoveKnowledgeAction.vue'
+export { default as DeleteKnowledgeAction } from './DeleteKnowledgeAction.vue'

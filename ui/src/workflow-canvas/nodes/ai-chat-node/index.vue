@@ -3,7 +3,7 @@ import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
-import ModelSelect from '@/components/business/model-select/index.vue'
+import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
@@ -12,7 +12,8 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import PromptGenerateDialog from './component/PromptGenerateDialog.vue'
 import ReasoningSettingDialog from './component/ReasoningSettingDialog.vue'
-import type { AiChatNodeForm, AiModelSetting, AiModelSource, ReasoningSetting } from './types'
+import ResourceSetting from './component/resource-setting/index.vue'
+import type { AiChatNodeForm, ReasoningSetting } from './types'
 import { fileTooltip } from '@/workflow-canvas/config/constants'
 
 defineOptions({ name: 'WorkflowAiChatNode' })
@@ -98,37 +99,11 @@ model.properties.node_data = normalizedForm
 
 const formData = computed(() => model.properties.node_data as AiChatNodeForm)
 
-// 默认来源读取保存后的 LLM 配置，节点内保留原有自定义模型和参数。
-const modelSetting = computed<AiModelSetting>(() => {
-  const defaultModel = model.getDefaultModelConfig('LLM')
-  const isDefaultModel = formData.value.model_id_type === 'default'
-  return {
-    model_id: isDefaultModel ? (defaultModel?.model_id ?? '') : formData.value.model_id,
-    model_id_reference: formData.value.model_id_reference,
-    model_id_type: formData.value.model_id_type,
-    model_params_setting: isDefaultModel ? (defaultModel?.model_params_setting ?? {}) : formData.value.model_params_setting,
-  }
-})
-const modelFormProp = computed(() => (formData.value.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'))
-
 const showSettings = computed(() =>
   [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
 )
 function updateNodeData(setting: Partial<AiChatNodeForm>) {
   model.properties.node_data = { ...formData.value, ...setting }
-}
-
-function changeModelSource(source: AiModelSource) {
-  updateNodeData({ model_id_reference: [], model_id_type: source })
-}
-
-function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
-  const { model_id_type, model_id, model_id_reference } = modelSetting.value
-  if (model_id_type === 'reference') {
-    callback(model_id_reference.length ? undefined : new Error('请选择引用变量'))
-    return
-  }
-  callback(model_id ? undefined : new Error(model_id_type === 'default' ? '请在默认模型设置中选择 AI 模型' : '请选择 AI 模型'))
 }
 
 async function validate() {
@@ -149,47 +124,15 @@ onMounted(() => {
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
         <!-- AI模型 -->
-        <el-form-item class="mk-hide-asterisk" :prop="modelFormProp" :rules="{ validator: validateModel, trigger: 'change' }">
-          <template #label>
-            <div class="flex-between">
-              <span class="mk-required">AI 模型</span>
-              <el-select :model-value="formData.model_id_type" :teleported="false" class="w-22!" size="small" @update:model-value="changeModelSource">
-                <el-option label="默认模型" value="default" />
-                <el-option label="引用变量" value="reference" />
-                <el-option label="自定义" value="custom" />
-              </el-select>
-            </div>
-          </template>
-
-          <ModelSelect
-            v-if="formData.model_id_type === 'default'"
-            :model-value="modelSetting.model_id"
-            :model-params="modelSetting.model_params_setting"
-            disabled
-            :options="modelOptions"
-            :provider-options="providerOptions"
-            placeholder="未配置默认模型"
-          />
-          <ModelSelect
-            v-else-if="formData.model_id_type === 'custom'"
-            :model-value="formData.model_id"
-            :model-params="formData.model_params_setting"
-            can-edit-params
-            :options="modelOptions"
-            :provider-options="providerOptions"
-            placeholder="请选择 AI 模型"
-            @update:model-value="updateNodeData({ model_id: $event })"
-            @update:model-params="updateNodeData({ model_params_setting: $event })"
-          />
-          <NodeCascader
-            v-else
-            ref="modelCascaderRef"
-            :model-value="formData.model_id_reference"
-            :node-model="model"
-            placeholder="请选择变量"
-            @update:model-value="updateNodeData({ model_id_reference: $event })"
-          />
-        </el-form-item>
+        <NodeModelSelect
+          :node-model="model"
+          :form-data="formData"
+          model-type="LLM"
+          label="AI 模型"
+          :options="modelOptions"
+          :provider-options="providerOptions"
+          @update="updateNodeData"
+        />
 
         <!-- 系统提示词 -->
         <el-form-item>
@@ -267,7 +210,6 @@ onMounted(() => {
                 <span>选择图片</span>
                 <el-tooltip placement="right">
                   <template #content>
-                    <!-- // TODO: ? -->
                     <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>
                   </template>
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
@@ -283,7 +225,6 @@ onMounted(() => {
                 选择视频
                 <el-tooltip placement="right">
                   <template #content>
-                    <!-- // TODO: ? -->
                     <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>
                   </template>
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
@@ -294,7 +235,15 @@ onMounted(() => {
           </el-form-item>
         </template>
 
-        <!-- TODO 技能 待处理 -->
+        <!-- 技能 -->
+
+        <div class="flex-between w-full gap-3 mb-2">
+          <span>技能</span>
+          <el-checkbox :model-value="formData.mcp_output_enable">输出执行过程</el-checkbox>
+        </div>
+        <div class="mk-white-card w-full">
+          <ResourceSetting :setting="formData" @update="updateNodeData" />
+        </div>
 
         <!-- 输出思考 -->
         <div class="flex-between mb-4">

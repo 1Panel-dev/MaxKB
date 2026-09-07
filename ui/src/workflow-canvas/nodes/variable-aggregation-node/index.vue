@@ -161,7 +161,7 @@ onBeforeUnmount(() => {
           </el-select>
         </el-form-item>
         <template v-for="(group, gIndex) in formData.group_list" :key="group.id">
-          <div class="mk-gray-card bg-white! mb-2">
+          <div class="mk-white-card mb-2">
             <div class="flex-between mb-2 gap-2">
               <span class="min-w-0 truncate" :title="group.label">{{ group.label }}</span>
               <div class="flex shrink-0 items-center gap-1">

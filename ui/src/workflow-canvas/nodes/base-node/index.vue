@@ -3,7 +3,7 @@ import { computed, inject, onMounted, ref, useTemplateRef, provide } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
-import ModelSelect from '@/components/business/model-select/index.vue'
+import SelectModel from '@/components/business/select-model/index.vue'
 import type { FormField } from '@/components/mk-dynamics-form'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -297,7 +297,7 @@ onMounted(() => {
           <el-radio value="default">默认模型</el-radio>
           <el-radio value="custom">自定义</el-radio>
         </el-radio-group>
-        <ModelSelect
+        <SelectModel
           v-if="formData.stt_model_id_type === 'default'"
           :model-value="defaultSttModelSetting?.model_id ?? ''"
           :model-params="defaultSttModelSetting?.model_params_setting ?? {}"
@@ -306,7 +306,7 @@ onMounted(() => {
           :provider-options="providerOptions"
           placeholder="未配置默认模型"
         />
-        <ModelSelect
+        <SelectModel
           v-else
           v-model="formData.stt_model_id"
           v-model:model-params="formData.stt_model_params_setting"
@@ -349,7 +349,7 @@ onMounted(() => {
           <el-radio value="DEFAULT">默认模型</el-radio>
           <el-radio value="CUSTOM">自定义</el-radio>
         </el-radio-group>
-        <ModelSelect
+        <SelectModel
           v-if="formData.tts_type === 'DEFAULT'"
           :model-value="defaultTtsModelSetting?.model_id ?? ''"
           :model-params="defaultTtsModelSetting?.model_params_setting ?? {}"
@@ -358,7 +358,7 @@ onMounted(() => {
           :provider-options="providerOptions"
           placeholder="未配置默认模型"
         />
-        <ModelSelect
+        <SelectModel
           v-else-if="formData.tts_type === 'CUSTOM'"
           v-model="formData.tts_model_id"
           v-model:model-params="formData.tts_model_params_setting"

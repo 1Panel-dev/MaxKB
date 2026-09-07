@@ -117,6 +117,27 @@ query，不写入新的文件夹 ID，进入详情时也不携带该 query。`Wo
 局部替换，接口只返回布尔值或部分数据时调用 `refreshApplicationDetail()` 重新获取详情。切换二级
 菜单不会重新挂载详情容器，也不会自动重复请求详情。
 
+知识库列表按相同方式维护卡片、菜单 Action 和批量流程：
+
+```text
+src/views/knowledge/
+├── KnowledgeView.vue
+├── knowledge-card/
+│   ├── KnowledgeCard.vue
+│   └── action-dropdown/
+│       ├── index.ts
+│       ├── MoveKnowledgeAction.vue
+│       └── DeleteKnowledgeAction.vue
+└── template.ts
+```
+
+`KnowledgeCard` 只负责展示、选择状态和 `action-dropdown` 插槽；页面传入完整 Knowledge API，
+组合单项转移、删除 Action，并管理批量选择、全选、批量转移与批量删除。共享知识库不展示这些操作。
+切换文件夹退出批量模式，搜索或刷新列表清空选择。转移复用公共 `MoveToDialog`：单项飞书知识库
+调用 `putLarkKnowledge`，其他类型调用 `putKnowledge`，只提交 `folder_id`；成功后通过 `move`
+更新卡片所属目录，在具体目录转出时通过 `delete` 移除卡片，在全部目录或转入当前目录时保留。
+批量转移与删除使用对应批量接口，成功后退出选择模式并刷新列表。
+
 当前工具页面按工具类型组织维护表单，共用的参数和代码设置保留在
 `tool-form/component/` 中：
 
@@ -316,7 +337,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 组件不从 URL 推断资源范围。每次打开或刷新只查询一次模型列表，保存在 `models` 中，由
 `getModelOptions(type)` 按 `model_type` 过滤。默认模型类型保留页面展示顺序，标签复用
 `MODEL_TYPE_LABELS`。供应商列表通过当前公共供应商接口查询。模型选择及参数设置复用
-`ModelSelect`，通过 `canEditParams` 控制参数入口，重排序模型隐藏该入口。
+`SelectModel`，通过 `canEditParams` 控制参数入口，重排序模型隐藏该入口。
 默认模型抽屉开启 `canAdd`，创建成功后通过 `refresh` 重新加载模型列表。
 
 入口接收 `getGraphData` 函数并传给抽屉。“应用到所有节点”确认后，抽屉调用该函数获取最新图数据，
@@ -332,5 +353,5 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 模型 API 对象。Workspace 模型页传入 `ModelApi`，System 共享模型页传入 `SystemSharedApi`；
 创建抽屉只调用传入的 API，不再自行判断资源范围。
 `ModelCreateButton` 默认渲染主按钮，也支持通过默认作用域插槽的 `open()` 定制触发按钮，
-`ModelSelect` 的下拉页脚使用该插槽复用同一创建流程。创建成功后保留基础资料刷新，再触发
+`SelectModel` 的下拉页脚使用该插槽复用同一创建流程。创建成功后保留基础资料刷新，再触发
 `refresh` 通知调用方重新加载模型列表。

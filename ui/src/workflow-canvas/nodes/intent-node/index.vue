@@ -2,7 +2,7 @@
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
-import ModelSelect from '@/components/business/model-select/index.vue'
+import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -74,35 +74,8 @@ const formData = computed<IntentNodeForm>({
   set: (value) => (model.properties.node_data = value),
 })
 
-// 默认来源读取应用配置，同时保留节点原来的自定义模型和参数。
-const modelSetting = computed<IntentModelSetting>(() => {
-  const defaultModel = model.getDefaultModelConfig('LLM')
-  const isDefaultModel = formData.value.model_id_type === 'default'
-  return {
-    model_id: isDefaultModel ? (defaultModel?.model_id ?? '') : formData.value.model_id,
-    model_id_reference: formData.value.model_id_reference,
-    model_id_type: formData.value.model_id_type,
-    model_params_setting: isDefaultModel ? (defaultModel?.model_params_setting ?? {}) : formData.value.model_params_setting,
-  }
-})
-
-const modelFormProp = computed(() => (formData.value.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'))
-
 function updateModelSetting(setting: Partial<IntentModelSetting>) {
   model.properties.node_data = { ...formData.value, ...setting }
-}
-
-function changeModelSource(source: IntentNodeForm['model_id_type']) {
-  updateModelSetting({ model_id_reference: [], model_id_type: source })
-}
-
-function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
-  const { model_id_type, model_id, model_id_reference } = modelSetting.value
-  if (model_id_type === 'reference') {
-    callback(model_id_reference.length ? undefined : new Error('请选择引用变量'))
-    return
-  }
-  callback(model_id ? undefined : new Error(model_id_type === 'default' ? '请在默认模型设置中选择 AI 模型' : '请选择 AI 模型'))
 }
 
 function refreshBranch() {
@@ -153,47 +126,15 @@ onMounted(() => {
     <h6 class="mk-title-decoration mb-2">节点设置</h6>
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item class="mk-hide-asterisk" :prop="modelFormProp" :rules="{ validator: validateModel, trigger: 'change' }">
-          <template #label>
-            <div class="flex-between">
-              <span class="mk-required">AI 模型</span>
-              <el-select :model-value="formData.model_id_type" :teleported="false" class="w-22!" size="small" @update:model-value="changeModelSource">
-                <el-option label="默认模型" value="default" />
-                <el-option label="引用变量" value="reference" />
-                <el-option label="自定义" value="custom" />
-              </el-select>
-            </div>
-          </template>
-
-          <ModelSelect
-            v-if="formData.model_id_type === 'default'"
-            :model-value="modelSetting.model_id"
-            :model-params="modelSetting.model_params_setting"
-            disabled
-            :options="modelList"
-            :provider-options="providerOptions"
-            placeholder="未配置默认模型"
-          />
-          <ModelSelect
-            v-else-if="formData.model_id_type === 'custom'"
-            :model-value="formData.model_id"
-            :model-params="formData.model_params_setting"
-            can-edit-params
-            :options="modelList"
-            :provider-options="providerOptions"
-            placeholder="请选择 AI 模型"
-            @update:model-value="updateModelSetting({ model_id: $event })"
-            @update:model-params="updateModelSetting({ model_params_setting: $event })"
-          />
-          <NodeCascader
-            v-else
-            ref="modelCascaderRef"
-            :model-value="formData.model_id_reference"
-            :node-model="model"
-            placeholder="请选择变量"
-            @update:model-value="updateModelSetting({ model_id_reference: $event })"
-          />
-        </el-form-item>
+        <NodeModelSelect
+          :node-model="model"
+          :form-data="formData"
+          model-type="LLM"
+          label="AI 模型"
+          :options="modelList"
+          :provider-options="providerOptions"
+          @update="updateModelSetting"
+        />
 
         <!-- 输入 -->
         <el-form-item prop="content_list" :rules="{ required: true, message: '请选择', trigger: 'change' }" label="输入">

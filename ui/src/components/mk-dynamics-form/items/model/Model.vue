@@ -5,7 +5,7 @@ import { MODEL_STATUS } from '@/api/enums'
 import type { Dict, ModelConfig, ModelItem } from '@/api/types'
 import type { FormField } from '../../type'
 import { providerList } from './provider-data'
-import ModelSelect from '@/components/business/model-select/index.vue'
+import SelectModel from '@/components/business/select-model/index.vue'
 
 defineOptions({ name: 'DynamicFormModel', inheritAttrs: false })
 
@@ -27,7 +27,7 @@ const emit = defineEmits<{
   change: [field: FormField]
 }>()
 
-// 将动态表单保存的模型快照转换为 ModelSelect 的扁平选项。
+// 将动态表单保存的模型快照转换为 SelectModel 的扁平选项。
 const configuredModels = computed<ConfiguredModelOption[]>(() => props.formField.attrs?.provider_list ?? [])
 const modelOptions = computed<ModelItem[]>(() =>
   configuredModels.value.map((model) => ({
@@ -53,7 +53,7 @@ function handleModelChange(modelId: string) {
 
 <template>
   <!-- // TODO  -->
-  <ModelSelect
+  <SelectModel
     v-bind="$attrs"
     :model-value="props.modelValue?.model_id ?? ''"
     :options="modelOptions"

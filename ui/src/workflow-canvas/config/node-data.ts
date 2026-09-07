@@ -276,30 +276,12 @@ export const parameterExtractionNode = {
   properties: { stepName: '参数提取', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
-/* 多路召回 */
-export const rerankerNode = {
-  type: WorkflowNodeType.RerankerNode,
-  text: '使用重排模型对多个知识库的检索结果进行二次召回',
-  label: '多路召回',
-  height: 252,
-  properties: {
-    stepName: '多路召回',
-    config: {
-      fields: [
-        { label: '重排结果列表', value: 'result_list' },
-        { label: '重排结果', value: 'result' },
-        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
-      ],
-    },
-  },
-}
 
 /* 知识库检索 */
 export const searchKnowledgeNode = {
   type: WorkflowNodeType.SearchKnowledge,
   text: '关联知识库，查找与问题相关的分段',
   label: '知识库检索',
-  height: 355,
   properties: {
     stepName: '知识库检索',
     config: {
@@ -348,6 +330,25 @@ export const documentExtractNode = {
   },
 }
 
+/* 多路召回 */
+export const rerankerNode = {
+  type: WorkflowNodeType.RerankerNode,
+  text: '使用重排模型对多个知识库的检索结果进行二次召回',
+  label: '多路召回',
+  height: 252,
+  properties: {
+    stepName: '多路召回',
+    config: {
+      fields: [
+        { label: '重排结果列表', value: 'result_list' },
+        { label: '重排结果', value: 'result' },
+        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
+      ],
+    },
+  },
+}
+
+
 /* MCP 调用 */
 export const mcpNode = {
   type: WorkflowNodeType.McpNode,
@@ -365,6 +366,16 @@ export const toolCustomNode = {
   height: 260,
   properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
+
+
+/* 智能体节点 */
+export const applicationNode = {
+  type: WorkflowNodeType.Application,
+  text: '智能体节点',
+  label: '智能体节点',
+  properties: { stepName: '智能体节点', config: { fields: [{ label: '结果', value: 'result' }] } },
+}
+
 
 /**
  * 工具配置数据
@@ -389,13 +400,6 @@ export const toolWorkflowLibNode = {
 }
 
 
-/* 智能体节点 */
-export const applicationNode = {
-  type: WorkflowNodeType.Application,
-  text: '智能体节点',
-  label: '智能体节点',
-  properties: { stepName: '智能体节点', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
 
 
 export const loopStartNode = {

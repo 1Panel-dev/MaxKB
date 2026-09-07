@@ -79,6 +79,23 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 额外维护逐方法接口，例如 `ModelActionApi`，也不要使用不断扩展的 `Pick<typeof XxxApi, ...>`。
 仅展示数据的组件不接收 API。
 
+### 知识库维护
+
+`workspace/knowledge/knowledge.ts` 与 `workspace/shared.ts` 的 `getAllKnowledge(query)`
+分别查询工作空间及共享知识库的非分页列表，返回 `KnowledgeItem[]`，用于关联知识库选择等
+需要全量选项的场景。原有 `getKnowledgePage` 继续用于分页列表。
+
+`workspace/knowledge/knowledge.ts` 的 `putKnowledge` 更新普通知识库，`putLarkKnowledge`
+更新飞书知识库；单项转移提交 `folder_id`。`putBatchMoveKnowledge` 将知识库 ID 数组和目标目录
+组装为 `{ id_list, folder_id }`，`putBatchDeleteKnowledge` 将 ID 数组组装为 `{ id_list }`，
+分别使用 PUT 请求 `batch_move` 和 `batch_delete`。页面和 Action 负责类型判断及 loading。
+
+### 知识库文档标签
+
+`workspace/knowledge/knowledge.ts` 的 `getKnowledgeTags(knowledgeIds)` 查询所选知识库的全部文档
+标签，返回按标签名称分组的 `KnowledgeTagGroup[]`。工作流页面将查询方法提供给文档标签检索
+节点，节点负责本地搜索和最多 100 项的展示。
+
 ## 枚举与类型组织
 
 API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文档统一维护。

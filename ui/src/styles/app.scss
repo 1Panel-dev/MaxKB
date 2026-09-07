@@ -119,6 +119,12 @@ h6 {
   border-radius: 6px;
   padding: calc(var(--spacing) * 3);
 }
+// 白色背景卡片
+.mk-white-card {
+  background-color: white !important;
+  border-radius: 6px;
+  padding: calc(var(--spacing) * 3);
+}
 
 // 资源的card grid布局
 .mk-resource-card-grid {
@@ -133,6 +139,26 @@ h6 {
 }
 
 /* radio */
+// 卡片内单选：文字在左，选择框在右并垂直居中。
+.mk-card-radio.el-radio {
+  flex-direction: row-reverse;
+  height: auto;
+  margin-right: 0;
+  width: 100%;
+
+  .el-radio__input {
+    flex-shrink: 0;
+  }
+
+  .el-radio__label {
+    flex: 1;
+    min-width: 0;
+    padding-left: 0;
+    padding-right: calc(var(--spacing) * 3);
+    white-space: normal;
+  }
+}
+
 // radio-group 垂直排列
 .vertical-radio-group {
   align-items: stretch;

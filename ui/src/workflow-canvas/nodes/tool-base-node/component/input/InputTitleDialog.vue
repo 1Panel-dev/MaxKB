@@ -12,9 +12,7 @@ const form = ref<any>({
 })
 
 const rules = reactive({
-  title: [
-    { required: true, message: '请输入标题', trigger: 'blur' },
-  ],
+  title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -43,7 +41,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <el-dialog
+  <MkDialog
     title="设置"
     v-model="dialogVisible"
     :close-on-click-modal="false"
@@ -52,30 +50,16 @@ defineExpose({ open, close })
     :before-close="close"
     append-to-body
   >
-    <el-form
-      label-position="top"
-      ref="fieldFormRef"
-      :rules="rules"
-      :model="form"
-      require-asterisk-position="right"
-      @submit.prevent
-    >
+    <el-form label-position="top" ref="fieldFormRef" :rules="rules" :model="form" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="标题" prop="title">
-        <el-input
-          v-model="form.title"
-          maxlength="64"
-          show-word-limit
-          @blur="form.title = form.title.trim()"
-        />
+        <el-input v-model="form.title" maxlength="64" show-word-limit @blur="form.title = form.title.trim()" />
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submit(fieldFormRef)" :loading="loading">
-          保存
-        </el-button>
+        <el-button type="primary" @click="submit(fieldFormRef)" :loading="loading"> 保存 </el-button>
       </span>
     </template>
-  </el-dialog>
+  </MkDialog>
 </template>

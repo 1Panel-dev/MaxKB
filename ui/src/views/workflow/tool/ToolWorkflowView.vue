@@ -16,7 +16,7 @@ import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 
 defineOptions({ name: 'ToolWorkflowView' })
 
-// 为画布节点中的 ModelSelect 提供参数表单接口。
+// 为画布节点中的 SelectModel 提供参数表单接口。
 provide('getModelParamsForm', ModelApi.getModelParamsForm)
 
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {

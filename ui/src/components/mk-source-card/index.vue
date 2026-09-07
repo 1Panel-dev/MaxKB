@@ -32,11 +32,12 @@ const props = withDefaults(
   defineProps<{
     create_time?: string //创建日期
     nick_name?: string // 创建者
+    disabled?: boolean
     selectable?: boolean
     selected?: boolean
     title: string
   }>(),
-  { selectable: false, selected: false },
+  { disabled: false, selectable: false, selected: false },
 )
 
 const emit = defineEmits<{ selected: [selected: boolean] }>()
@@ -63,10 +64,10 @@ function handleSelectedChange(selected: boolean | string | number) {
 
 <template>
   <el-card
-    :class="{ 'cursor-pointer': props.selectable, active: props.selectable && props.selected }"
+    :class="{ 'cursor-pointer': props.selectable && !props.disabled, active: props.selectable && props.selected }"
     :role="props.selectable ? 'checkbox' : undefined"
     :tabindex="props.selectable ? 0 : undefined"
-    shadow="hover"
+    :shadow="props.disabled ? 'always' : 'hover'"
     class="mk-source-card group relative"
     body-class="flex h-full flex-col"
     @click="handleSelect"
