@@ -110,7 +110,7 @@ def get_permissions(
                     for role_id in role_ids:
                         for m in role_permission_mapping_dict.get(str(role_id)) or []:
                             p = PERMISSION_STR_MAP.get(m.permission_id)
-                            if p is not None and PermissionScopeConstants.WORKSPACE in p.meta.scope:
+                            if PermissionScopeConstants.WORKSPACE in p.meta.scope:
                                 permissions.append(p)
 
                     for group, ps in group_by(permissions, lambda p: p.meta.group).items():

@@ -42,7 +42,8 @@ class Permission:
     def __str__(self):
         sub = f"_{self.sub_group}" if self.sub_group != self.group else ""
         flag = f"_{self.flag}" if self.flag else ""
-        return f"{self.group}{sub}_{self.operate}{flag}"
+        operate = f":{self.operate}" if self.operate else ""
+        return f"{self.group}{sub}{operate}{flag}"
 
 
 @dataclass
