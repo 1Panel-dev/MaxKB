@@ -96,6 +96,7 @@ def get_permissions(
                             if _resource_permission in ["VIEW", "MANAGE"]
                         ]
                     )
+                    all_permissions = [_permission for _permission in all_permissions if _permission is not None]
                     for group, permissions in group_by(
                         all_permissions, lambda _permission: _permission.value.group
                     ).items():
@@ -109,7 +110,7 @@ def get_permissions(
                     for role_id in role_ids:
                         for m in role_permission_mapping_dict.get(str(role_id)) or []:
                             p = PERMISSION_STR_MAP.get(m.permission_id)
-                            if PermissionScopeConstants.WORKSPACE in p.meta.scope:
+                            if p is not None and PermissionScopeConstants.WORKSPACE in p.meta.scope:
                                 permissions.append(p)
 
                     for group, ps in group_by(permissions, lambda p: p.meta.group).items():
@@ -128,7 +129,7 @@ def get_permissions(
                 permissions = [
                     _permission
                     for _permission in permissions
-                    if PermissionScopeConstants.WORKSPACE in _permission.meta.scope
+                    if _permission is not None and PermissionScopeConstants.WORKSPACE in _permission.meta.scope
                 ]
                 for group, ps in group_by(permissions, lambda p: p.meta.group).items():
                     k = f"{group}:w:{_.workspace_id}"
@@ -142,7 +143,7 @@ def get_permissions(
             system_permissions = [
                 _permission
                 for _permission in system_permissions
-                if PermissionScopeConstants.SYSTEM in _permission.meta.scope
+                if _permission is not None and PermissionScopeConstants.SYSTEM in _permission.meta.scope
             ]
             for group, permissions in group_by(system_permissions, lambda _permission: _permission.meta.group).items():
                 permission_map[f"{group}"] = reduce(
