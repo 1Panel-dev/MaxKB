@@ -52,11 +52,6 @@ const formData = computed(() => model.properties.node_data as { branch: BranchIt
 const conditionNodeFormRef = useTemplateRef<FormInstance>('conditionNodeFormRef')
 const nodeCascaderRefs = useTemplateRef<InstanceType<typeof NodeCascader>[]>('nodeCascaderRefs')
 
-function validate() {
-  return Promise.all([conditionNodeFormRef.value?.validate(), ...(nodeCascaderRefs.value ?? []).map((cascader) => cascader.validate())]).catch(
-    (error) => Promise.reject({ node: model, errMessage: error }),
-  )
-}
 
 // 新分支插入 ELSE 之前，并保留稳定的锚点 ID。
 function addBranch() {
@@ -102,6 +97,14 @@ const vBranchResize: Directive<HTMLElement, string> = {
     branchObservers.delete(element)
   },
 }
+
+
+async function validate() {
+  return conditionNodeFormRef.value?.validate().catch(
+    (error) => Promise.reject({ node: model, errMessage: error }),
+  )
+}
+
 
 const anchorGuard = createAnchorGuard(model)
 onMounted(() => {
@@ -153,12 +156,12 @@ onBeforeUnmount(() => {
                   <el-form-item
                     class="small min-w-0 flex-1"
                     :prop="`branch.${branchIndex}.conditions.${conditionIndex}.compare`"
-                    :rules="{ required: true, message: '请选择比较符', trigger: 'change' }"
+                    :rules="{ required: true, message: '请选择', trigger: 'change' }"
                   >
                     <el-select
                       v-model="condition.compare"
                       :teleported="false"
-                      placeholder="请选择比较符"
+                      placeholder="请选择"
                       clearable
                       @change="changeComparison(condition)"
                       @visible-change="anchorGuard.setOverlayVisible(`${branch.id}:${conditionIndex}:compare`, $event)"

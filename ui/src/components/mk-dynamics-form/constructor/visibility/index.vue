@@ -43,7 +43,7 @@ function validate(): Promise<void> {
       hasError = true
     }
     if (!cond.compare) {
-      cond._compareError = '请选择比较方式'
+      cond._compareError = '请选择'
       hasError = true
     }
     const isEmpty = Array.isArray(cond.value) ? cond.value.length === 0 : !cond.value && cond.value !== 0
