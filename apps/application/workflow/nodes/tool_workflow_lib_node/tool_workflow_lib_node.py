@@ -81,7 +81,7 @@ class ToolWorkflowLibNode(INode):
         tool_lib_id = node_params.get("tool_lib_id")
         input_field_list = node_params.get("input_field_list", [])
         workspace_id = workflow_params.get("workspace_id")
-
+        position = workflow_params.get("position")
         tool_workflow_version = (
             QuerySet(ToolWorkflowVersion).filter(tool_id=tool_lib_id).order_by("-create_time")[0:1].first()
         )
@@ -101,6 +101,9 @@ class ToolWorkflowLibNode(INode):
             "tool_id": str(tool_lib_id),
             "stream": True,
             "workspace_id": workspace_id,
+            "position": position.get("children") if position else None,
+            "chunk_id": workflow_params.get("chunk_id"),
+            "form_data": workflow_params.get("form_data"),
             **parameters,
         }
 
@@ -138,6 +141,15 @@ class ToolWorkflowLibNode(INode):
         call_back = CallBack(on_next, on_complete)
 
         def get_start_node_fn(wf, wm):
+            # 如果有 position，根据 position 确定开始节点
+            _position = wm.get_parameters().get("position")
+            if _position and _position.get("id"):
+                _node_id = _position.get("id")
+                node = wf.get_node(_node_id)
+                if node:
+                    node_class = get_node_class(node.type, WorkflowType.TOOL)
+                    return node_class(node, wm, lambda n: n.properties.get("node_data", {}))
+            # 默认返回工具工作流开始节点
             start_node = wf.get_node("tool-start-node")
             node_class = get_node_class("tool-start-node", WorkflowType.TOOL)
             return node_class(start_node, wm, lambda n: n.properties.get("node_data", {}))
@@ -171,8 +183,28 @@ class ToolWorkflowLibNode(INode):
                 "output": self.data.get("output"),
                 "message_tokens": self.data.get("message_tokens"),
                 "answer_tokens": self.data.get("answer_tokens"),
-                "details": self.data.get("details"),
                 "enableException": self.node.properties.get("enableException"),
             }
         )
+
+        # 子工作流节点详情。工具工作流只运行一遍，children 是扁平的一层节点列表；
+        # 循环节点因每个迭代多一层，children 结构为 [[节点...], [节点...]]。
+        node_details = []
+        position_index = 0
+        if old_details and position:
+            # 用旧详情作为底，定位续跑点（子工作流表单节点）
+            old_node_list = old_details.get("children") or []
+            node_details = list(old_node_list)
+            for node_index, value in enumerate(node_details):
+                if position.get("children", {}).get("id") == value.get("node_id"):
+                    position_index = node_index
+
+        for index, item in enumerate(self.data.get("details") or []):
+            if position is not None and node_details and index == 0:
+                # 续跑点：子工作流从表单节点恢复，当前运行的首个节点覆盖旧详情中的同一点
+                node_details[position_index] = item
+            else:
+                node_details.append(item)
+
+        details["children"] = node_details
         return details
