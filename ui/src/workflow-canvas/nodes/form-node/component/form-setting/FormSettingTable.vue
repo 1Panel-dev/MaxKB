@@ -63,7 +63,7 @@ function saveField(data: FormField, index?: number) {
       </el-button>
     </div>
 
-    <MkTable v-model:data="formFields" sortable size="small" row-key="field" :max-height="undefined" class="border">
+    <MkTable class="border" v-if="formFields.length" v-model:data="formFields" sortable size="small" row-key="field" :max-height="undefined">
       <el-table-column prop="field" label="参数">
         <template #default="{ row }">
           <span :title="row.field" class="block truncate">{{ row.field }}</span>

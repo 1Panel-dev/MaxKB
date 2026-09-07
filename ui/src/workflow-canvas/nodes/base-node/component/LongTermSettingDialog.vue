@@ -2,7 +2,7 @@
 import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
-import ModelSelect from '@/components/business/model-select/index.vue'
+import SelectModel from '@/components/business/select-model/index.vue'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { LongTermSetting } from '../types'
 
@@ -134,7 +134,7 @@ defineExpose({ open })
           <el-radio value="custom">自定义</el-radio>
         </el-radio-group>
         <el-alert v-if="formData.long_term_model_id_type === 'default'" class="w-full" title="使用系统默认 AI 模型" type="info" :closable="false" />
-        <ModelSelect
+        <SelectModel
           v-else
           v-model="formData.long_term_model_id"
           v-model:model-params="formData.long_term_model_params_setting"

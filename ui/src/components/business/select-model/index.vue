@@ -9,7 +9,7 @@ import ModelCreateButton from '@/views/model/create-model/ModelCreateButton.vue'
 import ModelApi from '@/api/admin/workspace/model/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import { isWorkspaceResource, isSystemSharedResource } from '@/utils/resource-context'
-defineOptions({ name: 'ModelSelect', inheritAttrs: false })
+defineOptions({ name: 'SelectModel', inheritAttrs: false })
 
 interface ModelOptionGroup {
   icon: string
@@ -18,11 +18,11 @@ interface ModelOptionGroup {
   provider: string
 }
 
-type ModelSelectValue = Multiple extends true ? string[] : string
+type SelectModelValue = Multiple extends true ? string[] : string
 
 const props = withDefaults(
   defineProps<{
-    modelValue: ModelSelectValue
+    modelValue: SelectModelValue
     options: ModelItem[]
     providerOptions: ModelProviderItem[]
     canEditParams?: boolean
@@ -42,9 +42,9 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  change: [modelValue: ModelSelectValue]
+  change: [modelValue: SelectModelValue]
   refresh: []
-  'update:modelValue': [modelValue: ModelSelectValue]
+  'update:modelValue': [modelValue: SelectModelValue]
   'update:modelParams': [settings: Record<string, unknown>]
 }>()
 
@@ -69,7 +69,7 @@ const _options = computed(() => {
 const loading = ref(false)
 const canEditModelParams = computed(() => props.canEditParams && !props.multiple)
 
-const selectedModelValue = computed<ModelSelectValue>({
+const selectedModelValue = computed<SelectModelValue>({
   get: () => props.modelValue,
   set: (modelValue) => {
     emit('update:modelValue', modelValue)
@@ -117,7 +117,7 @@ function openModelParams() {
 </script>
 
 <template>
-  <div class="relative w-full" :class="{ 'model-select--with-params': canEditModelParams }">
+  <div class="relative w-full" :class="{ 'select-model--with-params': canEditModelParams }">
     <el-select
       ref="selectRef"
       v-model="selectedModelValue"
@@ -182,7 +182,7 @@ function openModelParams() {
 
 <style scoped lang="scss">
 /* 参数入口与选择器共用外边框，为原生下拉箭头和清空按钮预留空间。 */
-.model-select--with-params {
+.select-model--with-params {
   :deep(.el-select__wrapper) {
     padding-right: calc(var(--spacing) * 13);
   }

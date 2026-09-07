@@ -19,3 +19,14 @@ src/constants/
 统一从 `@/api/enums` 导入。`constants` 只维护标签、颜色、选项等前端映射；映射的键应引用
 API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一数据源，`constants/auth.ts`
 只维护它们的展示文案。
+
+知识库类型的接口值保持为 `KNOWLEDGE_TYPE` 中的数字。`constants/knowledge.ts` 提供
+`KNOWLEDGE_TYPE_MAP`，将数字转换为 `BASE`、`WEB`、`LARK`、`YUQUE`、`WORKFLOW` 字符串，
+供前端判断；`KNOWLEDGE_TYPE_LABELS` 按这些字符串提供展示文案。提交接口时仍使用数字枚举值。
+字符串标识统一由 `KNOWLEDGE_TYPE_KEY` 维护，映射、文案和业务判断均引用该常量，避免重复写裸字符串。
+
+```ts
+const knowledgeType = KNOWLEDGE_TYPE_MAP[knowledge.type]
+const isWebKnowledge = knowledgeType === KNOWLEDGE_TYPE_KEY.WEB
+const knowledgeTypeLabel = KNOWLEDGE_TYPE_LABELS[knowledgeType]
+```

@@ -45,7 +45,7 @@ function saveField(data: VariableField, index?: number) {
       </el-button>
     </div>
 
-    <MkTable size="small" class="border" :data="variableList" row-key="field">
+    <MkTable v-if="variableList.length" size="small" class="border" :data="variableList" row-key="field">
       <el-table-column prop="field" label="变量">
         <template #default="{ row }">
           <span :title="row.field" class="block truncate">{{ row.field }}</span>

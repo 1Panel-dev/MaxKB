@@ -1,28 +1,30 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
-import { CaretRight, Close, Plus, QuestionFilled } from '@element-plus/icons-vue'
-import type { ApplicationResourceOption, McpSetting, ResourceSetting, ToolResourceOption } from '../../types'
+import { computed, useTemplateRef } from 'vue'
+import type { ApplicationResourceOption, ResourceSetting, ToolResourceOption } from '../../types'
 import McpSettingDialog from './McpSettingDialog.vue'
-import ResourceGroup from './ResourceGroup.vue'
-import ResourceSelectionDialog from './ResourceSelectionDialog.vue'
 
 defineOptions({ name: 'AiChatNodeResourceSetting' })
 
-const props = defineProps<{
-  applicationOptions: ApplicationResourceOption[]
-  mcpOptions: ToolResourceOption[]
-  setting: ResourceSetting
-  showApplications: boolean
-  skillOptions: ToolResourceOption[]
-  toolOptions: ToolResourceOption[]
-}>()
-const emit = defineEmits<{ update: [setting: ResourceSetting] }>()
+const props = withDefaults(
+  defineProps<{
+    applicationOptions?: ApplicationResourceOption[]
+    mcpOptions?: ToolResourceOption[]
+    setting: ResourceSetting
+    showApplications?: boolean
+    skillOptions?: ToolResourceOption[]
+    toolOptions?: ToolResourceOption[]
+  }>(),
+  {
+    applicationOptions: () => [],
+    mcpOptions: () => [],
+    showApplications: true,
+    skillOptions: () => [],
+    toolOptions: () => [],
+  },
+)
+const emit = defineEmits<{ update: [setting: Partial<ResourceSetting>] }>()
 
-const mcpExpanded = ref(true)
 const mcpDialogRef = useTemplateRef<InstanceType<typeof McpSettingDialog>>('mcpDialogRef')
-const toolDialogRef = useTemplateRef<InstanceType<typeof ResourceSelectionDialog>>('toolDialogRef')
-const skillDialogRef = useTemplateRef<InstanceType<typeof ResourceSelectionDialog>>('skillDialogRef')
-const applicationDialogRef = useTemplateRef<InstanceType<typeof ResourceSelectionDialog>>('applicationDialogRef')
 
 const selectedMcpTools = computed(() =>
   props.setting.mcp_tool_ids.map(
@@ -31,100 +33,139 @@ const selectedMcpTools = computed(() =>
 )
 const mcpCount = computed(() => props.setting.mcp_tool_ids.length + Number(Boolean(props.setting.mcp_servers)))
 
-function updateSetting(changes: Partial<ResourceSetting>) {
-  emit('update', { ...props.setting, ...changes })
-}
+const selectedTools = computed(() =>
+  props.setting.tool_ids.map(
+    (id) => props.toolOptions.find((option) => option.id === id) ?? { id, name: `已选资源（${id}）`, icon: undefined, tool_type: undefined },
+  ),
+)
+const selectedSkills = computed(() =>
+  props.setting.skill_tool_ids.map(
+    (id) => props.skillOptions.find((option) => option.id === id) ?? { id, name: `已选资源（${id}）`, icon: undefined, tool_type: undefined },
+  ),
+)
+const selectedApplications = computed<ApplicationResourceOption[]>(() =>
+  props.setting.application_ids.map((id) => props.applicationOptions.find((option) => option.id === id) ?? { id, name: `已选资源（${id}）` }),
+)
 
-function submitMcp(setting: McpSetting) {
-  updateSetting(setting)
-  mcpExpanded.value = true
+function updateSetting(changes: Partial<ResourceSetting>) {
+  emit('update', changes)
 }
 
 function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' | 'tool_ids', id: string) {
   updateSetting({ [field]: props.setting[field].filter((resourceId) => resourceId !== id) })
 }
-
-function changeMcpOutput(value: boolean | number | string) {
-  updateSetting({ mcp_output_enable: Boolean(value) })
-}
 </script>
 
 <template>
-  <el-form-item>
-    <template #label>
-      <div class="flex-between w-full gap-3">
-        <span class="flex items-center gap-1">
-          工具与智能体
-          <el-tooltip content="允许模型在对话过程中调用 MCP、工具、Skills 和其他智能体" placement="right">
-            <MkIcon :icon="QuestionFilled" class="cursor-help text-N600" />
-          </el-tooltip>
-        </span>
-        <el-checkbox :model-value="setting.mcp_output_enable" @change="changeMcpOutput">输出 MCP 过程</el-checkbox>
-      </div>
-    </template>
-
-    <el-card class="w-full" shadow="never">
-      <div>
-        <div class="flex-between cursor-pointer py-2" @click="mcpExpanded = !mcpExpanded">
-          <span class="flex items-center gap-1 text-N600">
-            <MkIcon :icon="CaretRight" class="transition-transform" :class="{ 'rotate-90': mcpExpanded }" />
-            MCP<span v-if="mcpCount">（{{ mcpCount }}）</span>
-          </span>
-          <el-button link title="添加 MCP" type="primary" @click.stop="mcpDialogRef?.open(setting)"><MkIcon :icon="Plus" /></el-button>
+  <div class="space-y-1">
+    <!-- MCP -->
+    <MkCollapse trigger-class="py-0!">
+      <template #label>
+        <div class="flex-between min-w-0 flex-1">
+          <span
+            >MCP<span v-if="mcpCount">（{{ mcpCount }}）</span></span
+          >
+          <el-button text title="添加 MCP" type="primary" @click.stop="mcpDialogRef?.open(setting)"><MkIcon name="icon_add_outlined" /></el-button>
         </div>
+      </template>
 
-        <div v-if="mcpExpanded && mcpCount" class="mb-2 flex flex-col gap-1">
-          <div v-for="resource in selectedMcpTools" :key="resource.id" class="flex-between rounded-md border border-N200 bg-white px-2 py-1.5">
+      <div v-if="mcpCount" class="mb-2 flex flex-col gap-1">
+        <el-card v-for="resource in selectedMcpTools" :key="resource.id" class="small" shadow="never">
+          <div class="flex-between">
             <span class="flex min-w-0 items-center gap-2">
-              <ToolIcon :icon="resource.icon" :size="20" :type="resource.tool_type" />
+              <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
               <span class="truncate" :title="resource.name">{{ resource.name }}</span>
             </span>
-            <el-button text title="移除" @click="removeId('mcp_tool_ids', resource.id)"><MkIcon :icon="Close" /></el-button>
+            <el-button text title="移除 MCP" @click="removeId('mcp_tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
           </div>
-          <div v-if="setting.mcp_servers" class="flex-between rounded-md border border-N200 bg-white px-2 py-1.5">
+        </el-card>
+        <el-card v-if="setting.mcp_servers" class="small" shadow="never">
+          <div class="flex-between">
             <span class="flex min-w-0 items-center gap-2">
-              <ToolIcon :size="20" type="MCP" />
+              <ToolIcon :size="20" class="shrink-0 small" type="MCP" />
               <span>自定义 MCP 服务</span>
             </span>
-            <el-button text title="移除" @click="updateSetting({ mcp_servers: '' })"><MkIcon :icon="Close" /></el-button>
+            <el-button text title="移除自定义 MCP 服务" @click="updateSetting({ mcp_servers: '' })"><MkIcon name="icon_close_outlined" /></el-button>
           </div>
-        </div>
+        </el-card>
       </div>
+    </MkCollapse>
+    <!-- 工具 -->
+    <MkCollapse trigger-class="py-1!">
+      <template #label>
+        <div class="flex-between min-w-0 flex-1">
+          <span
+            >工具<span v-if="selectedTools.length">（{{ selectedTools.length }}）</span></span
+          >
+          <el-button link type="primary" title="添加工具" @click.stop="toolDialogRef?.open(setting.tool_ids)">
+            <MkIcon name="icon_add_outlined" />
+          </el-button>
+        </div>
+      </template>
 
-      <ResourceGroup
-        :ids="setting.tool_ids"
-        label="工具"
-        :options="toolOptions"
-        @add="toolDialogRef?.open(setting.tool_ids)"
-        @remove="removeId('tool_ids', $event)"
-      />
-      <ResourceGroup
-        :ids="setting.skill_tool_ids"
-        label="Skills"
-        :options="skillOptions"
-        @add="skillDialogRef?.open(setting.skill_tool_ids)"
-        @remove="removeId('skill_tool_ids', $event)"
-      />
-      <ResourceGroup
-        v-if="showApplications"
-        application
-        :ids="setting.application_ids"
-        label="智能体"
-        :options="applicationOptions"
-        @add="applicationDialogRef?.open(setting.application_ids)"
-        @remove="removeId('application_ids', $event)"
-      />
-    </el-card>
-  </el-form-item>
+      <div v-if="selectedTools.length" class="mb-2 flex flex-col gap-1">
+        <el-card v-for="resource in selectedTools" :key="resource.id" class="small" shadow="never">
+          <div class="flex-between">
+            <span class="flex min-w-0 items-center gap-2">
+              <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
+              <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+            </span>
+            <el-button text title="移除工具" @click="removeId('tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
+          </div>
+        </el-card>
+      </div>
+    </MkCollapse>
+    <!-- Skills -->
+    <MkCollapse trigger-class="py-1!">
+      <template #label>
+        <div class="flex-between min-w-0 flex-1">
+          <span
+            >Skills<span v-if="selectedSkills.length">（{{ selectedSkills.length }}）</span></span
+          >
+          <el-button link type="primary" title="添加Skills" @click.stop="skillDialogRef?.open(setting.skill_tool_ids)">
+            <MkIcon name="icon_add_outlined" />
+          </el-button>
+        </div>
+      </template>
 
-  <McpSettingDialog ref="mcpDialogRef" :options="mcpOptions" @submit="submitMcp" />
-  <ResourceSelectionDialog ref="toolDialogRef" title="选择工具" :options="toolOptions" @submit="updateSetting({ tool_ids: $event })" />
-  <ResourceSelectionDialog ref="skillDialogRef" title="选择 Skills" :options="skillOptions" @submit="updateSetting({ skill_tool_ids: $event })" />
-  <ResourceSelectionDialog
-    ref="applicationDialogRef"
-    application
-    title="选择智能体"
-    :options="applicationOptions"
-    @submit="updateSetting({ application_ids: $event })"
-  />
+      <div v-if="selectedSkills.length" class="mb-2 flex flex-col gap-1">
+        <el-card v-for="resource in selectedSkills" :key="resource.id" class="small" shadow="never">
+          <div class="flex-between">
+            <span class="flex min-w-0 items-center gap-2">
+              <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
+              <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+            </span>
+            <el-button text title="移除Skills" @click="removeId('skill_tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
+          </div>
+        </el-card>
+      </div>
+    </MkCollapse>
+    <!-- 智能体 -->
+    <MkCollapse v-if="showApplications" trigger-class="py-1!">
+      <template #label>
+        <div class="flex-between min-w-0 flex-1">
+          <span
+            >智能体<span v-if="selectedApplications.length">（{{ selectedApplications.length }}）</span></span
+          >
+          <el-button link type="primary" title="添加智能体" @click.stop="applicationDialogRef?.open(setting.application_ids)">
+            <MkIcon name="icon_add_outlined" />
+          </el-button>
+        </div>
+      </template>
+
+      <div v-if="selectedApplications.length" class="mb-2 flex flex-col gap-1">
+        <el-card v-for="resource in selectedApplications" :key="resource.id" class="small" shadow="never">
+          <div class="flex-between">
+            <span class="flex min-w-0 items-center gap-2">
+              <ApplicationIcon :icon="resource.icon" :size="20" class="shrink-0 small" />
+              <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+            </span>
+            <el-button text title="移除智能体" @click="removeId('application_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
+          </div>
+        </el-card>
+      </div>
+    </MkCollapse>
+  </div>
+
+  <!-- <McpSettingDialog ref="mcpDialogRef" :options="mcpOptions" @submit="updateSetting" /> -->
 </template>

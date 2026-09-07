@@ -6,7 +6,7 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import type ModelApi from '@/api/admin/workspace/model/model'
 import ModelProviderApi from '@/api/admin/model-provider'
 import type { DefaultModelSettingPayload, DefaultModelType, ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
-import ModelSelect from '@/components/business/model-select/index.vue'
+import SelectModel from '@/components/business/select-model/index.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { MODEL_TYPE_LABELS } from '@/constants/model'
 
@@ -230,7 +230,7 @@ defineExpose({ open })
 
     <el-form v-loading="loading" label-position="top" @submit.prevent>
       <el-form-item v-for="modelType in defaultModelTypes" :key="modelType" :label="MODEL_TYPE_LABELS[modelType]">
-        <ModelSelect
+        <SelectModel
           v-model="modelSettings[modelType].model_id"
           v-model:model-params="modelSettings[modelType].model_params_setting"
           :options="getModelOptions(modelType)"

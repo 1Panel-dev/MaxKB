@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DynamicFormValue } from '../../type'
 import { computed, inject, ref } from 'vue'
-import ModelSelect from '@/components/business/model-select/index.vue'
+import SelectModel from '@/components/business/select-model/index.vue'
 import { providerList as providerOptions } from '../../items/model/provider-data'
 import { MODEL_TYPE_LABELS } from '@/constants/model'
 const getSelectModelList = inject<(params: { model_type: string }) => Promise<DynamicFormValue>>('getSelectModelList')
@@ -153,7 +153,7 @@ defineExpose({ getData, render })
 
   <el-form-item label="可选模型" required prop="provider_list" :rules="[{ required: true, message: '请选择模型', type: 'array' }]">
     <!-- // TODO  -->
-    <ModelSelect
+    <SelectModel
       multiple
       v-model="selectedIds"
       placeholder="请选择模型"
@@ -161,7 +161,7 @@ defineExpose({ getData, render })
       :provider-options="providerOptions"
       :model-type="formValue.model_type"
     >
-    </ModelSelect>
+    </SelectModel>
   </el-form-item>
   <el-form-item
     label="默认模型"
@@ -171,6 +171,6 @@ defineExpose({ getData, render })
     v-if="formValue.provider_list && formValue.provider_list.length > 0"
   >
     <!-- // TODO  -->
-    <ModelSelect v-model="defaultModelId" placeholder="请选择模型" :options="selectedModelsOptions" :provider-options="providerOptions" />
+    <SelectModel v-model="defaultModelId" placeholder="请选择模型" :options="selectedModelsOptions" :provider-options="providerOptions" />
   </el-form-item>
 </template>

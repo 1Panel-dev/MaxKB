@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 
 import type { FormInstance } from 'element-plus'
-import ModelSelect from '@/components/business/model-select/index.vue'
+import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
@@ -69,42 +68,13 @@ const parameterList = computed({
   },
 })
 
-const modelSetting = computed(() => {
-  const defaultModel = model.getDefaultModelConfig('LLM')
-  const isDefaultModel = formData.value.model_id_type === 'default'
-  return {
-    model_id: isDefaultModel ? (defaultModel?.model_id ?? '') : formData.value.model_id,
-    model_params_setting: isDefaultModel ? (defaultModel?.model_params_setting ?? {}) : formData.value.model_params_setting,
-  }
-})
-const modelFormProp = computed(() => (formData.value.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'))
 function updateNodeData(setting: Partial<ParameterExtractionForm>) {
   model.properties.node_data = { ...formData.value, ...setting }
-}
-
-function changeModelSource(source: ParameterExtractionForm['model_id_type']) {
-  updateNodeData({ model_id_reference: [], model_id_type: source })
-  parameterExtractionFormRef.value?.clearValidate(['model_id', 'model_id_reference'])
-}
-
-function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
-  if (formData.value.model_id_type === 'reference') {
-    callback(formData.value.model_id_reference.length ? undefined : new Error('请选择引用变量'))
-    return
-  }
-  callback(
-    modelSetting.value.model_id
-      ? undefined
-      : new Error(formData.value.model_id_type === 'default' ? '请在默认模型设置中选择 AI 模型' : '请选择 AI 模型'),
-  )
 }
 
 async function validate() {
   return parameterExtractionFormRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
-
-const anchorGuard = createAnchorGuard(model)
-onBeforeUnmount(() => anchorGuard.reset())
 
 onMounted(() => {
   model.validate = validate
@@ -122,53 +92,15 @@ onMounted(() => {
     <h6 class="mk-title-decoration mb-2">节点设置</h6>
     <div class="mk-gray-card">
       <el-form ref="parameterExtractionFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item :prop="modelFormProp" class="mk-hide-asterisk" :rules="{ validator: validateModel, trigger: 'change' }">
-          <template #label>
-            <div class="flex-between gap-3">
-              <span class="mk-required">AI 模型</span>
-              <el-select
-                :model-value="formData.model_id_type"
-                :teleported="false"
-                class="w-22!"
-                size="small"
-                @update:model-value="changeModelSource"
-                @visible-change="anchorGuard.setOverlayVisible('model-source', $event)"
-                @wheel="handleNodeWheel"
-              >
-                <el-option label="默认模型" value="default" />
-                <el-option label="引用变量" value="reference" />
-                <el-option label="自定义" value="custom" />
-              </el-select>
-            </div>
-          </template>
-          <NodeCascader
-            v-if="formData.model_id_type === 'reference'"
-            ref="modelCascaderRef"
-            v-model="formData.model_id_reference"
-            :node-model="model"
-            placeholder="请选择变量"
-          />
-          <ModelSelect
-            v-else-if="formData.model_id_type === 'default'"
-            :model-value="modelSetting.model_id"
-            :model-params="modelSetting.model_params_setting"
-            disabled
-            :options="modelList"
-            :provider-options="providerOptions"
-            placeholder="未配置默认模型"
-          />
-          <ModelSelect
-            v-else
-            :model-value="formData.model_id"
-            :model-params="formData.model_params_setting"
-            can-edit-params
-            :options="modelList"
-            :provider-options="providerOptions"
-            placeholder="请选择 AI 模型"
-            @update:model-value="updateNodeData({ model_id: $event })"
-            @update:model-params="updateNodeData({ model_params_setting: $event })"
-          />
-        </el-form-item>
+        <NodeModelSelect
+          :node-model="model"
+          :form-data="formData"
+          model-type="LLM"
+          label="AI 模型"
+          :options="modelList"
+          :provider-options="providerOptions"
+          @update="updateNodeData"
+        />
 
         <!-- 输入变量 -->
         <el-form-item label="输入变量" prop="input_variable" :rules="{ message: '请选择输入变量', trigger: 'change', required: true }">

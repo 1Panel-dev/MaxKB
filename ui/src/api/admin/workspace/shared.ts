@@ -27,4 +27,9 @@ const getKnowledgePage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<KnowledgeItem>>(`${getPrefix()}/knowledge/${page.currentPage}/${page.pageSize}`, query)
 }
 
-export default { getKnowledgePage, getModelList, getToolPage, getAllTool }
+/** 获取工作空间共享的不分页知识库列表。 */
+const getAllKnowledge = (query?: Dict<unknown>) => {
+  return get<KnowledgeItem[]>(`${getPrefix()}/knowledge`, query)
+}
+
+export default { getAllKnowledge, getKnowledgePage, getModelList, getToolPage, getAllTool }

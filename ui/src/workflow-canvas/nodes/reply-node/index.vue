@@ -55,11 +55,20 @@ onMounted(() => {
 <template>
   <NodeContainer :node-model="model">
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" @submit.prevent>
-        <el-form-item label="回复内容">
+      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+        <el-form-item
+          label="回复内容"
+          class="mk-hide-asterisk"
+          :prop="formData.reply_type === 'referencing' ? 'fields' : 'content'"
+          :rules="{
+            required: true,
+            message: formData.reply_type === 'referencing' ? '请选择变量' : '请输入回复内容',
+            trigger: 'change',
+          }"
+        >
           <template #label>
             <div class="flex-between">
-              <span>回复内容</span>
+              <span class="mk-required">回复内容</span>
               <el-select v-model="formData.reply_type" :teleported="false" class="w-21!" size="small">
                 <el-option label="引用变量" value="referencing" />
                 <el-option label="自定义" value="content" />

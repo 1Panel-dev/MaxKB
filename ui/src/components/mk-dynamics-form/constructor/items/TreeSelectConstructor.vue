@@ -110,7 +110,9 @@ function closeAddDialog() {
 }
 
 function submitAdd() {
-  const validList = addDialog.formList.map((item) => ({ label: item.label.trim(), value: item.value.trim() })).filter((item) => item.label && item.value)
+  const validList = addDialog.formList
+    .map((item) => ({ label: item.label.trim(), value: item.value.trim() }))
+    .filter((item) => item.label && item.value)
 
   if (!validList.length) {
     ElMessage.warning('请至少填写一条完整数据')
@@ -260,17 +262,30 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
     </el-card>
   </el-form-item>
 
-  <el-form-item class="mk-hide-asterisk" :required="formValue.required" prop="default_value" :rules="formValue.required ? [{ required: true, message: '请输入默认值' }] : []">
+  <el-form-item
+    class="mk-hide-asterisk"
+    :required="formValue.required"
+    prop="default_value"
+    :rules="formValue.required ? [{ required: true, message: '请输入默认值' }] : []"
+  >
     <template #label>
       <div class="flex-between">
         <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
         <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
       </div>
     </template>
-    <el-tree-select v-model="formValue.default_value" :data="formValue.treeData" :multiple="formValue.multiple" :render-after-expand="false" style="width: 100%" />
+    <el-tree-select
+      v-model="formValue.default_value"
+      :data="formValue.treeData"
+      :multiple="formValue.multiple"
+      :render-after-expand="false"
+      style="width: 100%"
+    />
   </el-form-item>
   <!-- 添加弹窗 -->
-  <el-dialog
+  <MkDialog
+    :close-on-click-modal="true"
+    :close-on-press-escape="true"
     v-model="addDialog.visible"
     :title="addDialog.mode === 'root' ? '添加一级选项' : '添加子选项'"
     width="520px"
@@ -301,7 +316,12 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
             </el-form-item>
           </el-col>
           <el-col :span="1">
-            <el-button :disabled="addDialog.formList.length === 1" link @click="removeAddRow(index)" :style="{ marginTop: index === 0 ? '35px' : '12px' }">
+            <el-button
+              :disabled="addDialog.formList.length === 1"
+              link
+              @click="removeAddRow(index)"
+              :style="{ marginTop: index === 0 ? '35px' : '12px' }"
+            >
               <MkIcon name="icon_delete-trash_outlined"></MkIcon>
             </el-button>
           </el-col>
@@ -316,10 +336,20 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
       <el-button @click="closeAddDialog">取消</el-button>
       <el-button type="primary" @click="submitAdd">添加</el-button>
     </template>
-  </el-dialog>
+  </MkDialog>
 
   <!-- 编辑弹窗 -->
-  <el-dialog v-model="editDialog.visible" title="编辑" width="520px" destroy-on-close label-position="top" require-asterisk-position="right" @submit.prevent>
+  <MkDialog
+    :close-on-click-modal="true"
+    :close-on-press-escape="true"
+    v-model="editDialog.visible"
+    title="编辑"
+    width="520px"
+    destroy-on-close
+    label-position="top"
+    require-asterisk-position="right"
+    @submit.prevent
+  >
     <el-row :gutter="8">
       <el-col :span="12">
         <el-form-item>
@@ -345,7 +375,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
       <el-button @click="closeEditDialog">取消</el-button>
       <el-button type="primary" @click="submitEdit">保存</el-button>
     </template>
-  </el-dialog>
+  </MkDialog>
 </template>
 <style lang="scss" scoped>
 .tag-list-max-list {

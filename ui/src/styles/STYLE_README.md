@@ -167,6 +167,19 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 
 ## 常用交互工具类
 
+卡片内需要文字居左、单选圆点居右并垂直居中时，在 `el-radio` 上添加 `mk-card-radio`。
+该类由 `app.scss` 统一设置整行宽度、自适应高度、文字换行和左右间距；卡片边框与选中状态
+仍由外层卡片控制。
+
+```vue
+<el-card>
+  <el-radio :value="option.value" class="mk-card-radio">
+    <h6>{{ option.label }}</h6>
+    <span class="mt-1 block text-sm text-N600">{{ option.description }}</span>
+  </el-radio>
+</el-card>
+```
+
 `group-hover-visible` 用于列表项、卡片等父级带有 `group` 的悬浮操作区。操作区默认透明且不响应
 鼠标事件；距离操作区最近的 `group` 悬浮或内部获得焦点时显示并恢复交互，外层 `group` 不会越过
 内层 `group` 触发操作区。该工具类只负责显隐，布局继续由使用方组合。
