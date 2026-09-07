@@ -214,7 +214,8 @@ class WorkspaceUserMemberView(APIView):
         RoleConstants.EXTENDS_USER,
     )
     def get(self, request: Request, workspace_id):
-        return result.success(UserManageSerializer().get_user_members(workspace_id))
+        nick_name = request.query_params.get("nick_name", None)
+        return result.success(UserManageSerializer().get_user_members(workspace_id, nick_name))
 
 
 class UserManage(APIView):
