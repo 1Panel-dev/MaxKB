@@ -1477,7 +1477,11 @@ class ToolSerializer(serializers.Serializer):
                     Cache_Version.TOOL_WORKFLOW_EXECUTE.get_key(key=self.data.get("id")),
                     version=Cache_Version.TOOL_WORKFLOW_EXECUTE.get_version(),
                 )
-                if tool_record:
+                if (
+                    tool_record
+                    and str(tool_record.get("tool_id")) == str(self.data.get("tool_id"))
+                    and tool_record.get("workspace_id") == self.data.get("workspace_id")
+                ):
                     return tool_record
                 tool_record = (
                     QuerySet(ToolRecord)
