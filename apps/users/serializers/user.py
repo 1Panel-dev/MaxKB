@@ -700,10 +700,11 @@ class UserManageSerializer(serializers.Serializer):
 
         return list(users)
 
-    def get_user_members(self, workspace_id):
+    def get_user_members(self, workspace_id, nick_name=None):
         """
         获取工作空间成员列表
         :param workspace_id: 工作空间ID
+        :param nick_name: 昵称模糊查询
         :return: 成员列表
         """
         role_model = DatabaseModelManage.get_model("role_model")
@@ -713,6 +714,8 @@ class UserManageSerializer(serializers.Serializer):
             user_role_relations = user_role_relation_model.objects.filter(
                 workspace_id=workspace_id, role__type="USER"
             ).select_related("role", "user")
+            if nick_name:
+                user_role_relations = user_role_relations.filter(user__nick_name__contains=nick_name)
             user_dict = {}
             for relation in user_role_relations:
                 user_id = relation.user.id
@@ -726,9 +729,13 @@ class UserManageSerializer(serializers.Serializer):
                     user_dict[user_id]["roles"].append(relation.role.role_name)
 
             # 将字典值转换为列表形式
-            return list(user_dict.values())
+            return list(user_dict.values())[:200]
         user_list = User.objects.exclude(role=RoleConstants.ADMIN.name)
-        return [{"id": user.id, "nick_name": user.nick_name, "roles": [RoleConstants.USER.name]} for user in user_list]
+        if nick_name:
+            user_list = user_list.filter(nick_name__contains=nick_name)
+        return [
+            {"id": user.id, "nick_name": user.nick_name, "roles": [RoleConstants.USER.name]} for user in user_list[:200]
+        ]
 
     class BatchDelete(serializers.Serializer):
         ids = serializers.ListField(required=True, label=_("User IDs"))

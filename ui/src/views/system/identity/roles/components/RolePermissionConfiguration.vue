@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import RoleApi from '@/api/admin/system/role'
-import type { RoleItem, RolePermission, RolePermissionModule } from '@/api/types'
+import type { RoleItem, RolePermission, RolePermissionModule, RolePermissionModuleGroup } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 interface PermissionTableRow {
@@ -19,6 +19,7 @@ const props = defineProps<{ currentRole: RoleItem }>()
 /* 权限数据加载与表格展示 */
 const loading = ref(false)
 const permissionData = ref<PermissionTableRow[]>([])
+const showCategory = ref(true)
 const disabled = computed(() => props.currentRole.internal)
 const permissionTableKey = computed(() => `${props.currentRole.id}:${disabled.value ? 'readonly' : 'editable'}`)
 
@@ -32,8 +33,29 @@ function loadPermissions() {
 }
 
 function transformPermissions(modules: RolePermissionModule[]) {
-  // 后端返回 分类(category) → 分组(group) → 叶子(feature) → 权限 的结构，
-  // 分类 → “分类”列，分组 → “模块名称”列，叶子 → “操作对象”列，向下展平为表格行
+  // 后端对普通用户角色(USER)不再返回“分类”层，直接返回 分组 → 叶子 → 权限。
+  // 分类层的子节点是分组(Group，含 children)，扁平结构的子节点是叶子(Feature，含 permission)。
+  const firstChild = modules[0]?.children?.[0]
+  const categorized = Boolean(firstChild && Array.isArray(firstChild.children))
+  showCategory.value = categorized
+
+  if (!categorized) {
+    // 无“分类”层：分组 → “模块名称”列，叶子 → “操作对象”列
+    const flatModules = modules as unknown as RolePermissionModuleGroup[]
+    return flatModules.flatMap((group) =>
+      group.children.map((feature) => ({
+        id: `${group.id}:${feature.id}`,
+        categoryId: group.id,
+        category: group.name,
+        moduleId: group.id,
+        module: group.name,
+        name: feature.name,
+        permissions: feature.permission,
+      })),
+    )
+  }
+
+  // 含“分类”层：分类 → “分类”列，分组 → “模块名称”列，叶子 → “操作对象”列
   return modules.flatMap((category) =>
     category.children.flatMap((group) =>
       group.children.map((feature) => ({
@@ -50,12 +72,14 @@ function transformPermissions(modules: RolePermissionModule[]) {
 }
 
 function permissionTableSpan({ row, rowIndex, columnIndex }: { row: PermissionTableRow; rowIndex: number; columnIndex: number }) {
-  if (columnIndex === 0) {
+  // “分类”列存在时，列0为“分类”、列1为“模块名称”；“分类”列隐藏时，列0即为“模块名称”
+  const moduleColumnIndex = showCategory.value ? 1 : 0
+  if (showCategory.value && columnIndex === 0) {
     // “分类”列按分类纵向合并
     const firstRowIndex = permissionData.value.findIndex(({ categoryId }) => categoryId === row.categoryId)
     return rowIndex === firstRowIndex ? [permissionData.value.filter(({ categoryId }) => categoryId === row.categoryId).length, 1] : [0, 0]
   }
-  if (columnIndex === 1) {
+  if (columnIndex === moduleColumnIndex) {
     // “模块名称”列按分组纵向合并
     const firstRowIndex = permissionData.value.findIndex(({ moduleId }) => moduleId === row.moduleId)
     return rowIndex === firstRowIndex ? [permissionData.value.filter(({ moduleId }) => moduleId === row.moduleId).length, 1] : [0, 0]
@@ -77,7 +101,10 @@ function handlePermissionChange(value: boolean, permission: RolePermission, row:
 /* 行选择与全表选择 */
 function getPermissionState(permissions: RolePermission[]) {
   const checkedCount = permissions.filter(({ enable }) => enable).length
-  return { checked: permissions.length > 0 && checkedCount === permissions.length, indeterminate: checkedCount > 0 && checkedCount < permissions.length }
+  return {
+    checked: permissions.length > 0 && checkedCount === permissions.length,
+    indeterminate: checkedCount > 0 && checkedCount < permissions.length,
+  }
 }
 
 function handleRowChange(value: boolean, row: PermissionTableRow) {
@@ -118,23 +145,32 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
       :data="permissionData"
       v-loading="loading"
     >
-      <el-table-column prop="category" label="分类" width="120" />
+      <el-table-column v-if="showCategory" prop="category" label="分类" width="120" />
       <el-table-column prop="module" label="模块名称" width="150" />
       <el-table-column prop="name" label="操作对象" width="150" />
       <el-table-column label="权限">
         <template #default="{ row }">
           <div class="flex-wrap">
             <template v-for="permission in row.permissions" :key="permission.id">
-              <el-checkbox v-model="permission.enable" :disabled="disabled" class="w-30" @change="(value: boolean) => handlePermissionChange(value, permission, row)">{{
-                permission.name
-              }}</el-checkbox>
+              <el-checkbox
+                v-model="permission.enable"
+                :disabled="disabled"
+                class="w-30"
+                @change="(value: boolean) => handlePermissionChange(value, permission, row)"
+                >{{ permission.name }}</el-checkbox
+              >
             </template>
           </div>
         </template>
       </el-table-column>
       <el-table-column class-name="permission-checkbox-column" label-class-name="permission-checkbox-column" :width="60">
         <template #header>
-          <el-checkbox :model-value="allPermissionState.checked" :indeterminate="allPermissionState.indeterminate" :disabled="disabled" @change="handleCheckAll" />
+          <el-checkbox
+            :model-value="allPermissionState.checked"
+            :indeterminate="allPermissionState.indeterminate"
+            :disabled="disabled"
+            @change="handleCheckAll"
+          />
         </template>
 
         <template #default="{ row }">
