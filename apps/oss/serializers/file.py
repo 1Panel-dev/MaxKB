@@ -174,12 +174,9 @@ def auth(file, mk_file_auth):
     # PublicFileAccess 中记录的文件允许公开访问
     if QuerySet(PublicFileAccess).filter(source_type='FILE', source_id=str(file.id)).exists():
         return
-    if file.source_type == FileSourceType.APPLICATION:
-        application = QuerySet(Application).filter(id=file.source_id).first()
-        if application is None:
-            _deny()
-        if file.meta.get('chat_id') is None:
-            return
+    if file.source_type == FileSourceType.APPLICATION_SETTINGS:
+        return
+            
     # 非公共文件,直接拒绝
     if mk_file_auth is None:
         _deny()
