@@ -121,6 +121,8 @@ class LoopNode(INode):
             self.write(content)
 
         def on_complete(wf_manage, error):
+            loop_details_list = self.data.setdefault("loop_details_list", [])
+            loop_details_list.append(wf_manage.get_details())
             self._loop_node_data.append(wf_manage.context)
             self._loop_answer_data.append([c.to_dict() for c in chunk_list])
             self.write_context("loop_node_data", self._loop_node_data)
@@ -200,57 +202,32 @@ class LoopNode(INode):
                 "answer": self.get_context("answer"),
             }
         )
-
-        loop_node_data = self.get_context("loop_node_data") or []
         loop_details = []
         position_index = 0
+        loop_position_index = 0
+        if old_details and position:
+            for index, item in enumerate(old_details.get("iteration_details") or []):
+                loop_position_index = index
+                loop_details.append(item)
+            current_details = loop_details[loop_position_index]
+            for index, value in enumerate(current_details):
+                if position.get("children").get("id") == value.get("node_id"):
+                    position_index = index
 
-        # 从 old_details 获取之前的迭代详情
-        old_iteration_details = []
-        if old_details and isinstance(old_details, dict):
-            old_iteration_details = old_details.get("iteration_details", [])
-
-        # 1. 先把 old_iteration_details 全部复制过来，记录断点位置
-        if old_iteration_details and position and position.get("id") == self.node.id:
-            for i, value in enumerate(old_iteration_details):
-                loop_details.append(value)
-                if position.get("index") == i:
-                    position_index = i
-
-        # 2. 遍历当前新执行的迭代
-        for new_iter_index, iteration_context in enumerate(loop_node_data):
-            iteration_result = []
-
-            # 第一个新迭代且是断点：传入旧详情
-            if new_iter_index == 0 and position and position.get("id") == self.node.id:
-                # 续跑迭代：先复制旧详情
-                if position_index < len(old_iteration_details):
-                    for old_item in old_iteration_details[position_index]:
-                        iteration_result.append(old_item)
-
-            # 遍历当前迭代的节点 context
-            child_position = (
-                position.get("children")
-                if new_iter_index == 0 and position and position.get("id") == self.node.id
-                else None
-            )
-            child_position_index = 0
-            for node_id, node_context in iteration_context.items():
-                node_details = {
-                    "node_id": node_id,
-                    **node_context,
-                }
-                # 断点节点：插入到 child_position_index 位置
-                if child_position and child_position.get("id") == node_id:
-                    iteration_result.insert(child_position_index, node_details)
-                else:
-                    iteration_result.append(node_details)
-
-            # 第一个新迭代且是断点：插入到 position_index，否则追加
-            if new_iter_index == 0 and position and position.get("id") == self.node.id:
-                loop_details.insert(position_index, iteration_result)
+        for index, _loop_details in enumerate(self.data.get("loop_details_list")):
+            if position and index == 0:
+                for inner_index, item in enumerate(_loop_details):
+                    if position is not None and inner_index == 0 and index == 0:
+                        loop_details[loop_position_index][position_index] = item
+                    else:
+                        _child = []
+                        if len(loop_details) > loop_position_index:
+                            _child = loop_details[loop_position_index]
+                        else:
+                            loop_details.insert(loop_position_index, _child)
+                        _child.append(item)
             else:
-                loop_details.append(iteration_result)
+                loop_details.append(_loop_details)
 
-        details["iteration_details"] = loop_details
+        details["children"] = loop_details
         return details
