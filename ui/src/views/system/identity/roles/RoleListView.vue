@@ -30,10 +30,10 @@ const roleGroups = computed(() => {
 function loadRoles(selectedRoleId?: string) {
   loadingRoles.value = true
   return RoleApi.getRoleList()
-    .then(({ internal_role, custom_role }) => {
-      AllRoles.value = [...internal_role, ...custom_role]
+    .then((roles) => {
+      AllRoles.value = roles
       currentRole.value =
-        AllRoles.value.find(({ id }) => id === selectedRoleId) ?? AllRoles.value.find(({ id }) => id === currentRole.value?.id) ?? internal_role[0]
+        AllRoles.value.find(({ id }) => id === selectedRoleId) ?? AllRoles.value.find(({ id }) => id === currentRole.value?.id) ?? AllRoles.value[0]
     })
     .finally(() => {
       loadingRoles.value = false
