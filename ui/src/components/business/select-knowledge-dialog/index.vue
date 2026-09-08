@@ -7,6 +7,7 @@ import type { FolderItem, KnowledgeItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
 import FolderTree from '@/components/business/folder-tree/index.vue'
+import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 import KnowledgeCard from '@/views/knowledge/knowledge-card/KnowledgeCard.vue'
 
 defineOptions({ name: 'SelectKnowledgeDialog' })
@@ -137,26 +138,16 @@ defineExpose({ open })
             <template v-for="knowledge in filteredKnowledge" :key="knowledge.id">
               <el-popover placement="bottom-start" :width="360" :show-after="500" :persistent="false" popper-class="border-none! rounded-xl!">
                 <template #reference>
-                  <el-card
-                    shadow="hover"
-                    class="min-w-0 cursor-pointer"
-                    :class="{ 'border-primary!': selectedKnowledgeIds.includes(knowledge.id) }"
-                    @click="toggleKnowledge(knowledge)"
+                  <MkCardCheckbox
+                    :model-value="selectedKnowledgeIds.includes(knowledge.id)"
+                    :label="knowledge.name"
+                    @update:model-value="toggleKnowledge(knowledge)"
                   >
-                    <div class="flex-between gap-3">
-                      <div class="flex min-w-0 flex-1 items-center gap-2">
-                        <KnowledgeIcon :type="knowledge.type" class="shrink-0" />
-                        <span class="min-w-0 flex-1 truncate" :title="knowledge.name">{{ knowledge.name }}</span>
-                      </div>
-                      <el-checkbox
-                        :model-value="selectedKnowledgeIds.includes(knowledge.id)"
-                        :aria-label="knowledge.name"
-                        class="shrink-0"
-                        @click.stop
-                        @change="toggleKnowledge(knowledge)"
-                      />
+                    <div class="flex min-w-0 flex-1 items-center gap-2">
+                      <KnowledgeIcon :type="knowledge.type" class="shrink-0" />
+                      <span class="min-w-0 flex-1 truncate" :title="knowledge.name">{{ knowledge.name }}</span>
                     </div>
-                  </el-card>
+                  </MkCardCheckbox>
                 </template>
                 <template #default>
                   <KnowledgeCard :knowledge="knowledge" disabled> </KnowledgeCard>

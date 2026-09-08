@@ -7,6 +7,7 @@ import type { FolderItem, ToolItem, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
 import FolderTree from '@/components/business/folder-tree/index.vue'
+import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 
 defineOptions({ name: 'SelectToolDialog' })
@@ -132,26 +133,12 @@ defineExpose({ open })
             <template v-for="tool in toolOptions" :key="tool.id">
               <el-popover placement="bottom-start" :width="360" :show-after="500" :persistent="false" popper-class="border-none! rounded-xl!">
                 <template #reference>
-                  <el-card
-                    shadow="hover"
-                    class="min-w-0 cursor-pointer"
-                    :class="{ 'border-primary!': selectedToolIds.includes(tool.id) }"
-                    @click="toggleTool(tool)"
-                  >
-                    <div class="flex-between gap-3">
-                      <div class="flex min-w-0 flex-1 items-center gap-2">
-                        <ToolIcon :icon="tool.icon" :type="tool.tool_type" class="shrink-0" />
-                        <span class="min-w-0 flex-1 truncate" :title="tool.name">{{ tool.name }}</span>
-                      </div>
-                      <el-checkbox
-                        :model-value="selectedToolIds.includes(tool.id)"
-                        :aria-label="tool.name"
-                        class="shrink-0"
-                        @click.stop
-                        @change="toggleTool(tool)"
-                      />
+                  <MkCardCheckbox :model-value="selectedToolIds.includes(tool.id)" :label="tool.name" @update:model-value="toggleTool(tool)">
+                    <div class="flex min-w-0 flex-1 items-center gap-2">
+                      <ToolIcon :icon="tool.icon" :type="tool.tool_type" class="shrink-0" />
+                      <span class="min-w-0 flex-1 truncate" :title="tool.name">{{ tool.name }}</span>
                     </div>
-                  </el-card>
+                  </MkCardCheckbox>
                 </template>
                 <template #default>
                   <MkSourceCard :title="tool.name" :nick_name="tool.nick_name || '-'" :create_time="tool.create_time">

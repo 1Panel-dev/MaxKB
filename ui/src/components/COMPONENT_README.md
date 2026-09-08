@@ -102,6 +102,8 @@ src/components/
 │   │   └── mk-table-more-dropdown.vue # 表格操作列 More 下拉菜单
 │   └── mk-tag-group/
 │       └── index.vue             # 标签折叠和剩余标签浮层
+├── mk-card-checkbox/
+│   └── index.vue                 # 卡片式布尔选择，手动导入
 ├── mk-date-range/
 │   ├── index.vue                 # 日期预设与自定义日期区间组合筛选器，手动导入
 │   └── types.ts                  # 日期筛选结果类型
@@ -709,6 +711,29 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 ```
 
 ## 手动导入组件
+
+### MkCardCheckbox
+
+卡片式复选组件，手动导入 `@/components/mk-card-checkbox/index.vue`，不参与全局注册。
+通过布尔 `v-model` 管理选中状态，`label` 必填并作为复选框的无障碍名称；`disabled` 禁止切换。
+默认插槽放置图标、标题、描述等内容。卡片统一维护悬停阴影、选中边框及右侧复选框，
+点击卡片或复选框均更新一次 `v-model` 并触发 `change(checked)`；复选框保留原生键盘操作。
+插槽中的输入框、按钮等独立交互区域使用 `@click.stop`，避免操作时切换卡片。
+其余卡片属性和样式通过 `$attrs` 透传到 `el-card`。
+知识库、工具（含 Skills）、智能体选择弹窗，以及动态表单配置器的添加知识库列表统一使用
+该组件。集合选择通过 `:model-value` 与 `@update:model-value` 接入原有业务选择逻辑，
+保留筛选、跨目录选择和已选快照；不要同时监听 `change` 重复更新同一集合。
+
+```vue
+<script setup lang="ts">
+import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
+</script>
+
+<MkCardCheckbox v-model="formData.document" label="文档">
+  <h6>文档</h6>
+  <p class="text-sm text-N600">TXT、PDF、DOCX</p>
+</MkCardCheckbox>
+```
 
 ### LogoFull、LogoIcon
 

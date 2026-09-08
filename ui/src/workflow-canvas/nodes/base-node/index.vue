@@ -11,10 +11,10 @@ import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import ApiParameterTable from './component/api-parameter/ApiParameterTable.vue'
 import ConversationVariableTable from './component/conversation-variable/ConversationVariableTable.vue'
-import FileUploadSettingDialog from './component/FileUploadSettingDialog.vue'
+import FileUploadSetting from './component/FileUploadSetting.vue'
 import UserInputTable from './component/user-input/UserInputTable.vue'
 import { defaultFileUploadSetting } from './constant'
-import { type ApiInputField, type BaseNodeForm, type ChatInputField, type FileUploadSetting, type UserInputSetting } from './types'
+import { type ApiInputField, type BaseNodeForm, type ChatInputField, type FileUploadSettingData, type UserInputSetting } from './types'
 
 defineOptions({ name: 'WorkflowBaseNode' })
 
@@ -84,7 +84,7 @@ function changeLongTermEnabled(enabled: boolean | number | string) {
 }
 
 // 文件上传
-const fileUploadSetting = computed<FileUploadSetting>({
+const fileUploadSetting = computed<FileUploadSettingData>({
   get: () => formData.value.file_upload_setting,
   set: (setting) => {
     formData.value.file_upload_setting = cloneDeep(setting)
@@ -252,7 +252,7 @@ onMounted(() => {
               </el-tooltip>
             </span>
             <span class="flex items-center gap-2">
-              <FileUploadSettingDialog v-if="formData.file_upload_enable" v-model="fileUploadSetting" />
+              <FileUploadSetting v-if="formData.file_upload_enable" v-model="fileUploadSetting" />
               <el-switch :model-value="formData.file_upload_enable" size="small" @change="changeFileUploadEnabled" />
             </span>
           </div>

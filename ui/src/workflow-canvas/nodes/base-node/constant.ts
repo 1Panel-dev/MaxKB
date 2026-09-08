@@ -1,6 +1,6 @@
-import type { FileUploadSetting } from './types'
+import type { FileUploadSettingData } from './types'
 
-export const defaultFileUploadSetting: FileUploadSetting = {
+export const defaultFileUploadSetting: FileUploadSettingData = {
   audio: false,
   document: true,
   fileLimit: 50,

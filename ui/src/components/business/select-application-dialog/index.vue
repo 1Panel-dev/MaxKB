@@ -6,6 +6,7 @@ import type { FolderItem, ApplicationDetail } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES } from '@/constants/folder'
 import FolderTree from '@/components/business/folder-tree/index.vue'
+import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 
 defineOptions({ name: 'SelectApplicationDialog' })
@@ -130,26 +131,16 @@ defineExpose({ open })
             <template v-for="application in applicationOptions" :key="application.id">
               <el-popover placement="bottom-start" :width="360" :show-after="500" :persistent="false" popper-class="border-none! rounded-xl!">
                 <template #reference>
-                  <el-card
-                    shadow="hover"
-                    class="min-w-0 cursor-pointer"
-                    :class="{ 'border-primary!': selectedApplicationIds.includes(application.id) }"
-                    @click="toggleApplication(application)"
+                  <MkCardCheckbox
+                    :model-value="selectedApplicationIds.includes(application.id)"
+                    :label="application.name"
+                    @update:model-value="toggleApplication(application)"
                   >
-                    <div class="flex-between gap-3">
-                      <div class="flex min-w-0 flex-1 items-center gap-2">
-                        <ApplicationIcon :icon="application.icon" class="shrink-0" />
-                        <span class="min-w-0 flex-1 truncate" :title="application.name">{{ application.name }}</span>
-                      </div>
-                      <el-checkbox
-                        :model-value="selectedApplicationIds.includes(application.id)"
-                        :aria-label="application.name"
-                        class="shrink-0"
-                        @click.stop
-                        @change="toggleApplication(application)"
-                      />
+                    <div class="flex min-w-0 flex-1 items-center gap-2">
+                      <ApplicationIcon :icon="application.icon" class="shrink-0" />
+                      <span class="min-w-0 flex-1 truncate" :title="application.name">{{ application.name }}</span>
                     </div>
-                  </el-card>
+                  </MkCardCheckbox>
                 </template>
                 <template #default>
                   <MkSourceCard :title="application.name" :nick_name="application.nick_name || '-'" :create_time="application.create_time">
