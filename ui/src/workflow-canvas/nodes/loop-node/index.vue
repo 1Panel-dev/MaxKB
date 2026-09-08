@@ -1,27 +1,3 @@
-<template>
-  <NodeContainer :node-model="model">
-    <h6 class="mb-3">节点设置</h6>
-    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item
-        label="循环类型"
-        prop="loop_type"
-        :rules="{ required: true, message: '请选择循环类型', trigger: 'change' }"
-      >
-        <el-select v-model="formData.loop_type" :teleported="false" class="w-full" size="small">
-          <el-option label="数组循环" value="ARRAY" />
-          <el-option label="次数循环" value="NUMBER" />
-          <el-option label="无限循环" value="LOOP" />
-        </el-select>
-      </el-form-item>
-      <el-form-item v-if="formData.loop_type === 'ARRAY'" label="循环数组" prop="array">
-        <NodeCascader ref="nodeCascaderRef" v-model="formData.array" :node-model="model" class="w-full" placeholder="请选择循环数组变量" />
-      </el-form-item>
-      <el-form-item v-else-if="formData.loop_type === 'NUMBER'" label="循环次数" prop="number">
-        <el-input-number v-model="formData.number" :min="1" />
-      </el-form-item>
-    </el-form>
-  </NodeContainer>
-</template>
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef, watch } from 'vue'
 import { cloneDeep, set, throttle } from 'lodash'
@@ -136,3 +112,25 @@ onMounted(() => {
   if (showNode.value && !model.virtual) mountLoopBodyNode()
 })
 </script>
+
+<template>
+  <NodeContainer :node-model="model">
+    <div class="mk-gray-card">
+      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+        <el-form-item label="循环类型" prop="loop_type" :rules="{ required: true, message: '请选择循环类型', trigger: 'change' }">
+          <el-select v-model="formData.loop_type" :teleported="false" class="w-full">
+            <el-option label="数组循环" value="ARRAY" />
+            <el-option label="次数循环" value="NUMBER" />
+            <el-option label="无限循环" value="LOOP" />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="formData.loop_type === 'ARRAY'" label="循环数组" prop="array">
+          <NodeCascader ref="nodeCascaderRef" v-model="formData.array" :node-model="model" placeholder="请选择变量" />
+        </el-form-item>
+        <el-form-item v-else-if="formData.loop_type === 'NUMBER'" label="循环次数" prop="number">
+          <el-input-number v-model="formData.number" :min="1" :step="1" controls-position="right" align="left" />
+        </el-form-item>
+      </el-form>
+    </div>
+  </NodeContainer>
+</template>
