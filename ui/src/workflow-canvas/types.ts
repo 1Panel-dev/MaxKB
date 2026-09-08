@@ -12,7 +12,7 @@ export enum WorkflowNodeType {
   Reply = 'reply-node',
   ToolLib = 'tool-lib-node',
   ToolWorkflowLib = 'tool-workflow-lib-node',
-  ToolLibCustom = 'tool-custom-node',
+  ToolLibCustom = 'tool-node',
   RerankerNode = 'reranker-node',
   Application = 'application-node',
   DocumentExtractNode = 'document-extract-node',

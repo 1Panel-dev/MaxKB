@@ -116,7 +116,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
         </div>
       </template>
 
-      <div v-if="mcpCount" class="mb-2 flex flex-col gap-1">
+      <div v-if="mcpCount" class="mt-2 mb-2 flex flex-col gap-1">
         <el-card v-for="resource in selectedMcpTools" :key="resource.id" class="small" shadow="never">
           <div class="flex-between">
             <span class="flex min-w-0 items-center gap-2">
