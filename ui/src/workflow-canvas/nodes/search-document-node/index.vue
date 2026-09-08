@@ -72,8 +72,8 @@ watch(
     allKnowledgeTags.value = []
     formData.value.knowledge_tags = []
     if (!knowledgeIds.length) return
-    store.force
-      .getAllTags(knowledgeIds)
+    store
+      .getKnowledgeTags(knowledgeIds)
       .then((tags) => {
         if (version !== tagRequestVersion) return
         allKnowledgeTags.value = tags

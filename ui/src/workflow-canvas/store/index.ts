@@ -16,6 +16,7 @@ type ApiModule = {
   getMcpTools?: (resourceType: string, resourceId: string, mcpServers: string) => Promise<McpTool[]>
   getToolListWithShared?: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById?: (toolId: string) => Promise<ToolItem>
+  getKnowledgeTags?: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
 }
 
 // useWorkflowStore 返回的包装接口:默认走缓存,通过 store.force.xxx() 强制刷新。
@@ -27,6 +28,7 @@ export type WorkflowStoreApi = {
   getMcpTools: (resourceType: string, resourceId: string, mcpServers: string) => Promise<McpTool[]>
   getToolListWithShared: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById: (toolId: string) => Promise<ToolItem>
+  getKnowledgeTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
 }
 
 type WorkflowStore = WorkflowStoreApi & { force: WorkflowStoreApi }
@@ -102,6 +104,10 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
       getToolById(toolId: string): Promise<ToolItem> {
         if (!resolvedApi.getToolById) return Promise.resolve({} as ToolItem)
         return withCache(`tool:${toolId}`, () => resolvedApi.getToolById!(toolId), force)
+      },
+      getKnowledgeTags(knowledgeIds: string[]): Promise<KnowledgeTagGroup[]> {
+        if (!resolvedApi.getKnowledgeTags) return Promise.resolve([])
+        return withCache(`knowledge-tags:${JSON.stringify(knowledgeIds)}`, () => resolvedApi.getKnowledgeTags!(knowledgeIds), force)
       },
     }
   }
