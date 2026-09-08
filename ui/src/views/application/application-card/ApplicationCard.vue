@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ApplicationDetail } from '@/api/types'
-import MkSourceCard from '@/components/mk-source-card/index.vue'
 import { isWorkFlow } from '@/utils/application'
 import { dateFormat } from '@/utils/time'
 

@@ -171,11 +171,14 @@ watch(
       <el-table-column type="selection" width="40" reserve-selection />
       <el-table-column class-name="resource-name-column" label="名称" min-width="260" prop="name">
         <template #default="{ row }: { row: ResourcePermissionItem }">
-          <div class="flex min-w-0 items-center gap-2">
+          <div class="flex min-w-0 flex-1 items-center gap-2">
             <MkIcon v-if="row.resource_type === 'folder'" name="icon_file-folder_colorful" :size="18" />
             <span v-else-if="resourceType === RESOURCE_TYPE.MODEL" class="block h-5 w-5 shrink-0" :innerHTML="getModelProviderIcon(row)" />
+
             <ToolIcon v-else-if="resourceType === RESOURCE_TYPE.TOOL" :icon="row.icon ?? undefined" :size="20" :type="row.tool_type ?? undefined" />
             <ApplicationIcon v-else-if="resourceType === RESOURCE_TYPE.APPLICATION" :icon="row?.icon ?? undefined" :size="20" />
+            <KnowledgeIcon v-else-if="resourceType === RESOURCE_TYPE.KNOWLEDGE" :type="row.icon ?? undefined" :size="20" />
+
             <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
           </div>
         </template>
@@ -199,5 +202,11 @@ watch(
 :deep(.resource-name-column .cell) {
   align-items: center;
   display: flex;
+
+  .el-table__expand-icon,
+  .el-table__indent,
+  .el-table__placeholder {
+    flex-shrink: 0;
+  }
 }
 </style>

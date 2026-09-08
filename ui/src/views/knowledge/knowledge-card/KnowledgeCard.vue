@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { KnowledgeItem } from '@/api/types'
-import MkSourceCard from '@/components/mk-source-card/index.vue'
 import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'KnowledgeCard' })

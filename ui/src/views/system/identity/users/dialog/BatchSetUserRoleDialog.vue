@@ -7,7 +7,6 @@ import { ROLE_TYPE } from '@/api/enums'
 import type { ListItem, BatchSetUserWorkspaceRolesRequest, SystemUserRoleAssignment } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import MkFormList from '@/components/mk-form-list/index.vue'
 
 defineOptions({ name: 'BatchSetUserRoleDialog' })
 

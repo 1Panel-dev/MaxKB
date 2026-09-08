@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import type { ToolStoreItem } from '@/api/types'
-import MkSourceCard from '@/components/mk-source-card/index.vue'
 import { resetUrl } from '@/utils/icon'
 import { numberFormat } from '@/utils/number'
 import StoreToolFormDialog from '../../tool-form/StoreToolFormDialog.vue'

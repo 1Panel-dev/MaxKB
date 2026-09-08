@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { randomId } from '@/utils/common'
-import MkFormList from '@/components/mk-form-list/index.vue'
 import type { VisibilityConditionState, VisibilityFieldOption, VisibilityRules } from '../../type'
 import { inferFieldType, getAllowedOps, getFieldConfig } from './utils'
 import { compareList } from '@/workflow-canvas/config/constants'

@@ -75,8 +75,12 @@ src/components/
 │   │   └── index.vue             # 统一抽屉关闭行为和内容滚动布局
 │   ├── mk-empty/
 │   │   └── index.vue             # 普通无数据与搜索无匹配的统一空状态
-│   ├── mk-filterable-dropdown/
-│   │   └── index.vue             # 带搜索过滤和滚动列表的下拉选择
+│   ├── mk-form-list/
+│   │   └── index.vue             # 可动态增删与排序的表单行列表，自动注册
+│   ├── mk-source-card/
+│   │   ├── index.vue             # 来源资源的统一卡片结构
+│   │   ├── mk-source-card-action.vue # 内部卡片悬浮操作容器
+│   │   └── mk-source-card-action-dropdown.vue # 内部 More 下拉菜单
 │   ├── mk-icon/
 │   │   ├── ApplicationIcon.vue   # 智能体头像与默认图标
 │   │   ├── KnowledgeIcon.vue     # 知识库类型与自定义图标
@@ -102,6 +106,8 @@ src/components/
 │   │   └── mk-table-more-dropdown.vue # 表格操作列 More 下拉菜单
 │   └── mk-tag-group/
 │       └── index.vue             # 标签折叠和剩余标签浮层
+├── mk-filterable-dropdown/
+│   └── index.vue                 # 带搜索过滤和滚动列表的下拉选择，手动导入
 ├── mk-card-checkbox/
 │   └── index.vue                 # 卡片式布尔选择，手动导入
 ├── mk-date-range/
@@ -119,27 +125,24 @@ src/components/
 │   └── constructor/              # 字段配置器、变量选择器及配置项实现
 ├── mk-search-list/
 │   └── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
-├── mk-form-list/
-│   └── index.vue                 # 可动态增删的表单行列表，手动导入
+├── mk-tags-edit/
+│   └── index.vue                 # 扩展名标签增删与重复检查，手动导入
 ├── mk-logo/
 │   ├── LogoFull.vue              # 带产品名称的完整 Logo，手动导入
 │   └── LogoIcon.vue              # 不带产品名称的图形 Logo，手动导入
-├── codemirror-editor/
-│   ├── python.vue                # 内置 pylint 诊断和全屏编辑的 Python 编辑器
-│   ├── Json.vue                  # 支持格式化、语法诊断和全屏编辑的 JSON 输入框
-│   └── style.scss                # Python 与 JSON 编辑器共享的 scoped 样式
-└── mk-source-card/
-│   ├── index.vue                 # 来源资源的统一卡片结构，手动导入
-│   ├── mk-source-card-action.vue # 卡片悬浮操作容器
-│   └── mk-source-card-action-dropdown.vue # 卡片 More 下拉菜单
+└── codemirror-editor/
+    ├── python.vue                # 内置 pylint 诊断和全屏编辑的 Python 编辑器
+    ├── Json.vue                  # 支持格式化、语法诊断和全屏编辑的 JSON 输入框
+    └── style.scss                # Python 与 JSON 编辑器共享的 scoped 样式
 ```
 
-Vite 的 `unplugin-vue-components` 只扫描 `src/components/global`。该目录中的组件可以直接在
-Vue 模板中使用，不需要手动导入。其他共享组件必须从具体文件路径导入：
+Vite 的 `unplugin-vue-components` 只扫描 `src/components/global`。未被排除扫描的组件可以直接在
+Vue 模板中使用，不需要手动导入；`MkFormList`、`MkSourceCard` 均通过此方式使用。`MkSourceCard` 的两个内部操作组件通过 `globsExclude`
+排除扫描，仅由卡片显式导入并通过插槽提供。其他共享组件必须从具体文件路径导入：
 
 ```ts
+import MkFilterableDropdown from '@/components/mk-filterable-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
-import MkFormList from '@/components/mk-form-list/index.vue'
 import MkDateRange from '@/components/mk-date-range/index.vue'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
@@ -147,7 +150,6 @@ import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
 import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
 import JsonInput from '@/components/codemirror-editor/Json.vue'
-import MkSourceCard from '@/components/mk-source-card/index.vue'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import SelectModel from '@/components/business/select-model/index.vue'
@@ -156,14 +158,16 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 ```
 
 自动注册只适用于 Vue 模板。脚本中的类型、常量和 Element Plus 图标仍需显式导入。自动生成
-的声明位于 `src/components.d.ts`，不要手动修改；通过开发服务、类型检查或生产构建刷新。
+的声明位于 `src/components.d.ts`，不要手动修改；通过 Vite 开发服务或生产构建刷新，
+再运行类型检查验证。
 
 ## 组件约定
 
 - 高频、稳定、跨多数页面使用的基础组件放入 `global`。
 - 跨页面复用且依赖业务类型、固定业务接口或领域交互的组件放入 `business/<component-name>`，
   由使用方手动导入。业务组件不使用 `Mk` 前缀，也不再按 Workspace 等上级领域增加额外目录。
-- 不依赖固定业务的共享组合 UI 组件放在 `components/<component-name>`，由使用方手动导入。
+- 不依赖固定业务且尚未纳入全局基础组件的共享组合 UI 放在 `components/<component-name>`，
+  由使用方手动导入，例如 `MkFilterableDropdown`。
 - 一个公共组件默认使用一个 kebab-case 目录，入口统一为 `index.vue`；`codemirror-editor` 按语言
   提供 `python.vue` 和 `Json.vue` 两个专用入口，`markdown-editor` 提供 `MdEditor.vue`、
   `MdEditorMagnify.vue` 和 `MdPreview.vue` 三个自动注册入口，`mk-logo` 按完整 Logo 与图形 Logo
@@ -397,25 +401,6 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 </MkDropdownItem>
 ```
 
-### MkFilterableDropdown
-
-带搜索过滤和滚动列表的下拉选择。组件不限制选项字段，默认使用 `label` 作为展示和搜索字段、
-`value` 作为唯一值；数据结构不同时通过 `props.label` 和 `props.value` 映射，使用方式与
-`MkSearchList` 一致。原始选项类型会贯穿 `options`、作用域插槽和 `select` 事件。
-`emptyText` 默认为“暂无匹配结果”。默认插槽接收 `selectedOption` 和 `text`，`option` 插槽接收
-当前原始选项；选择后先更新 `v-model`，再通过 `select` 返回未经转换的原始选项。
-
-```vue
-<MkFilterableDropdown v-model="selectedWorkspaceId" :options="workspaces" :props="{ label: 'name', value: 'id' }" @select="handleWorkspaceSelect">
-  <template #default="{ text }">
-    <el-button text>{{ text }}</el-button>
-  </template>
-  <template #option="{ option }">
-    <span class="truncate" :title="option.name">{{ option.name }}</span>
-  </template>
-</MkFilterableDropdown>
-```
-
 ### MkViewLayout
 
 路由页面及全高浮层的通用内容结构，统一提供满高弹性布局及可选左侧栏。标题优先使用 `title`
@@ -523,9 +508,10 @@ Prop，未传入时读取当前路由的 `meta.title`；显式传入 `title=""` 
 智能体、知识库和工具的资源图标分别使用自动注册的 `ApplicationIcon`、`KnowledgeIcon` 和
 `ToolIcon`。`ApplicationIcon` 在未传入 `icon` 时会回退到系统默认图标。
 
-`KnowledgeIcon` 的 `type` 接收接口数字类型 `KnowledgeType`，内部通过
-`constants/knowledge.ts` 的 `KNOWLEDGE_TYPE_MAP` 转换为字符串后选择图标。自定义 `icon`
-优先；`BASE`、`YUQUE` 以及未提供或未知类型时沿用默认知识库图标。
+`KnowledgeIcon` 的 `type` 接收接口数字类型 `KnowledgeType`，也兼容资源授权接口返回的字符串类型值。
+组件内部匹配 `KNOWLEDGE_TYPE` 枚举，再通过 `constants/knowledge.ts` 的
+`KNOWLEDGE_TYPE_MAP` 选择图标，调用方无需转换。`BASE`、`YUQUE` 以及未提供或未知类型时
+沿用默认知识库图标。
 
 ```vue
 <ApplicationIcon :icon="application.icon" :size="24" />
@@ -710,7 +696,163 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 <MkTagGroup :tags="roleNames" popover-disabled />
 ```
 
+### MkSourceCard
+
+位于 `global/mk-source-card/`，模板中直接使用，无需手动导入。内部 `Action` 和
+`ActionDropdown` 仅通过 `footer` 插槽提供，调用方不直接导入或使用其内部组件名。
+
+`disabled` 默认为 `false`；传入 `true` 时不添加 `cursor-pointer`，并将卡片 `shadow` 从
+`hover` 改为 `always`。该属性仅控制卡片样式，不拦截点击或选择事件。
+
+用于模型、工具等带来源信息的等高资源卡片。`title` 提供默认标题，`nick_name` 和 `create_time`
+提供固定样式的创建信息；`subtitle` 插槽也始终应用 `text-sm text-N600`。默认插槽放置资源详情，
+`footer` 插槽作为左侧常驻内容并始终贴在卡片底部；无论是否传入内容，底部都会保留固定位置。
+`footer` 作用域提供 `Action` 和 `ActionDropdown`。左侧常驻内容与 `Action` 写在同一个插槽内；
+`Action` 是卡片悬浮或内部获得焦点时显示的右侧操作容器，可以只放开关或按钮。
+需要 More 菜单时，再将 `ActionDropdown` 放入 `Action`，组件会统一渲染 `MkDropdownMenu`，默认
+插槽中直接放置 `MkDropdownItem`；插槽为空，或其中的条件菜单项均未渲染时，不显示 More 触发器。
+`ActionDropdown` 固定开启 `persistent`，避免菜单关闭后销毁由菜单项管理的 Drawer 或 Dialog；
+浮层本身应在打开时按需挂载，并在 `closed` 后卸载，避免每张卡片都长期保留隐藏的浮层节点。
+传入 `selectable` 后，卡片进入选择模式：复选框固定在右上角，`tag` 插槽仍正常渲染并为复选框
+预留位置；点击卡片或复选框会通过 `selected` 事件返回新的选择状态，页面通过 `selected` Prop
+传回当前状态，选中卡片统一显示主题色边框和浅色背景。业务内容需要在选择模式下由复选框替代时，
+由业务卡片根据 `selectable` 控制该内容是否渲染；例如工具卡片选择时隐藏“更新版本”入口。
+选择模式下，`MkSourceCard` 提供的 `Action` 不渲染任何内容，业务卡片不需要重复判断
+`selectable`；选择集合、全选、批量接口和页面底部操作栏仍由使用页面管理。
+需要自定义头部时可
+通过 `icon`、`title`、`subtitle` 和 `tag` 插槽覆盖对应区域；`title` 插槽提供 `{ title }`，
+便于在保留标题文案的同时追加状态图标等内容。
+
+```vue
+<MkSourceCard title="大语言模型" nick_name="管理员" create_time="2026-08-17">
+  <template #icon><ProviderIcon /></template>
+  <template #title="{ title }">
+    <h6 class="min-w-0 truncate" :title="title">{{ title }}</h6>
+    <MkIcon name="icon_warning_filled" />
+  </template>
+  <ul>资源详情</ul>
+  <template #footer="{ Action, ActionDropdown }">
+    <span>左侧常驻内容</span>
+    <component :is="Action">
+      <el-switch size="small" />
+      <component :is="ActionDropdown">
+        <MkDropdownItem>编辑</MkDropdownItem>
+        <MkDropdownItem>删除</MkDropdownItem>
+      </component>
+    </component>
+  </template>
+</MkSourceCard>
+```
+
+批量选择模式由页面显式控制：
+
+```vue
+<MkSourceCard :selectable="batchSelectionMode" :selected="selected" title="工作流工具" @selected="selected = $event">
+  <p>工具描述</p>
+</MkSourceCard>
+```
+
+只需要悬浮显示开关时，可以不使用 `ActionDropdown`：
+
+```vue
+<MkSourceCard title="大语言模型" nick_name="管理员" create_time="2026-08-17">
+  <template #footer="{ Action }">
+    <span>左侧常驻内容</span>
+    <component :is="Action">
+      <el-switch size="small" />
+    </component>
+  </template>
+</MkSourceCard>
+```
+
+### MkFormList
+
+位于 `global/mk-form-list/`，模板中直接使用，无需手动导入。
+
+用于多个业务字段组成的动态表单行，负责重复行布局、添加、删除和可选排序，不管理业务字段、校验规则或
+选项请求。通过 `v-model` 传入行数据，`defaultItem` 创建新行，`minRows` 默认值为 `1`，控制删除时保留的最小行数；
+允许删除到空列表时传入 `:min-rows="0"`。组件不会自动补齐初始行。默认插槽
+提供 `item`、`index`，业务组件在插槽中继续声明
+`el-form-item`、字段路径和校验规则。
+
+```vue
+<script setup lang="ts">
+const roleSettings = defineModel<{ roleId: string; workspaceIds: string[] }[]>({ required: true })
+</script>
+
+<MkFormList v-model="roleSettings" add-text="添加角色" :default-item="{ roleId: '', workspaceIds: [] }">
+  <template #default="{ index, item }">
+    <el-form-item
+      class="flex-1"
+      :label="index===0 ? '角色' : ''"
+      :prop="`roleSettings.${index}.roleId`"
+    >
+      <el-select v-model="item.roleId" />
+    </el-form-item>
+  </template>
+</MkFormList>
+```
+
+`addText` 设置添加按钮文案，`showAddButton` 默认为 `true`；添加入口由业务布局单独提供时传入
+`:show-add-button="false"`。`firstRowHasLabel` 默认为 `true`：第一行删除按钮使用 `mt-8`，后续行
+使用 `mt-0.5`；并列表单项没有 label 时传入 `:firstRowHasLabel="false"`。删除成功后通过
+`remove(item, index)` 返回被删除的行数据和原索引，业务组件可处理关联状态，不需要再次修改列表。
+增删时使用 Lodash `cloneDeep` 回写独立的行数据，新增行也独立克隆 `defaultItem`，避免共享嵌套
+引用及重复挂载 LogicFlow 的 MobX 可观察对象。调用方应使用业务 ID 识别行，不依赖对象引用保持不变。
+
+表单行排序通过 `sortable` 开启，同时必须提供稳定且唯一的 `item-key`（字段名或取键函数）。
+组件自带拖拽手柄，添加按钮位于排序容器之外，不需要业务再包拖拽指令或放置手柄。
+不足两行或键值无效时禁用拖拽。排序与增删一样深拷贝写回，
+`sort-change` 返回 `{ oldIndex, newIndex, data }`。校验规则和字段路径继续由默认插槽提供。
+
+新行包含业务 ID 时，`default-item` 应传工厂函数，在每次点击添加时生成新 ID；普通无 ID 数据
+仍可传默认对象。
+
+```vue
+<MkFormList v-model="group.variable_list" :default-item="createVariable" :first-row-has-label="false" sortable item-key="v_id">
+  <template #default="{ item, index }">
+    <!-- 业务字段与 el-form-item -->
+  </template>
+</MkFormList>
+```
+
 ## 手动导入组件
+
+### MkFilterableDropdown
+
+位于 `components/mk-filterable-dropdown/`，使用时必须手动导入。
+
+带搜索过滤和滚动列表的下拉选择。组件不限制选项字段，默认使用 `label` 作为展示和搜索字段、
+`value` 作为唯一值；数据结构不同时通过 `props.label` 和 `props.value` 映射，使用方式与
+`MkSearchList` 一致。原始选项类型会贯穿 `options`、作用域插槽和 `select` 事件。
+`emptyText` 默认为“暂无匹配结果”。默认插槽接收 `selectedOption` 和 `text`，`option` 插槽接收
+当前原始选项；选择后先更新 `v-model`，再通过 `select` 返回未经转换的原始选项。
+
+```vue
+<script setup lang="ts">
+import MkFilterableDropdown from '@/components/mk-filterable-dropdown/index.vue'
+</script>
+
+<MkFilterableDropdown v-model="selectedWorkspaceId" :options="workspaces" :props="{ label: 'name', value: 'id' }" @select="handleWorkspaceSelect">
+  <template #default="{ text }">
+    <el-button text>{{ text }}</el-button>
+  </template>
+  <template #option="{ option }">
+    <span class="truncate" :title="option.name">{{ option.name }}</span>
+  </template>
+</MkFilterableDropdown>
+```
+
+### MkTagsEdit
+
+手动导入 `@/components/mk-tags-edit/index.vue`，通过必填的 `string[]` 类型 `v-model`
+编辑扩展名。可选 `reservedExtensions` 接收已有的大写扩展名数组，默认为空；组件检查保留值与
+当前列表的重复项，并提示“该扩展名已存在”。输入失焦或按回车时去除首尾空格、一个前导点并转为
+大写，空值不添加。组件内部维护输入框显隐与自动聚焦，根节点阻止点击冒泡；外部间距通过 `class` 设置。
+
+```vue
+<MkTagsEdit v-model="formData.otherExtensions" :reserved-extensions="reservedExtensions" class="mt-2" />
+```
 
 ### MkCardCheckbox
 
@@ -858,127 +1000,6 @@ function validateJson(rule: unknown, value: unknown, callback: (error?: Error) =
     </el-form-item>
   </el-form>
 </template>
-```
-
-### MkSourceCard
-
-`disabled` 默认为 `false`；传入 `true` 时不添加 `cursor-pointer`，并将卡片 `shadow` 从
-`hover` 改为 `always`。该属性仅控制卡片样式，不拦截点击或选择事件。
-
-用于模型、工具等带来源信息的等高资源卡片。`title` 提供默认标题，`nick_name` 和 `create_time`
-提供固定样式的创建信息；`subtitle` 插槽也始终应用 `text-sm text-N600`。默认插槽放置资源详情，
-`footer` 插槽作为左侧常驻内容并始终贴在卡片底部；无论是否传入内容，底部都会保留固定位置。
-`footer` 作用域提供 `Action` 和 `ActionDropdown`。左侧常驻内容与 `Action` 写在同一个插槽内；
-`Action` 是卡片悬浮或内部获得焦点时显示的右侧操作容器，可以只放开关或按钮。
-需要 More 菜单时，再将 `ActionDropdown` 放入 `Action`，组件会统一渲染 `MkDropdownMenu`，默认
-插槽中直接放置 `MkDropdownItem`；插槽为空，或其中的条件菜单项均未渲染时，不显示 More 触发器。
-`ActionDropdown` 固定开启 `persistent`，避免菜单关闭后销毁由菜单项管理的 Drawer 或 Dialog；
-浮层本身应在打开时按需挂载，并在 `closed` 后卸载，避免每张卡片都长期保留隐藏的浮层节点。
-传入 `selectable` 后，卡片进入选择模式：复选框固定在右上角，`tag` 插槽仍正常渲染并为复选框
-预留位置；点击卡片或复选框会通过 `selected` 事件返回新的选择状态，页面通过 `selected` Prop
-传回当前状态，选中卡片统一显示主题色边框和浅色背景。业务内容需要在选择模式下由复选框替代时，
-由业务卡片根据 `selectable` 控制该内容是否渲染；例如工具卡片选择时隐藏“更新版本”入口。
-选择模式下，`MkSourceCard` 提供的 `Action` 不渲染任何内容，业务卡片不需要重复判断
-`selectable`；选择集合、全选、批量接口和页面底部操作栏仍由使用页面管理。
-需要自定义头部时可
-通过 `icon`、`title`、`subtitle` 和 `tag` 插槽覆盖对应区域；`title` 插槽提供 `{ title }`，
-便于在保留标题文案的同时追加状态图标等内容。
-
-```vue
-<script setup lang="ts">
-import MkSourceCard from '@/components/mk-source-card/index.vue'
-</script>
-
-<MkSourceCard title="大语言模型" nick_name="管理员" create_time="2026-08-17">
-  <template #icon><ProviderIcon /></template>
-  <template #title="{ title }">
-    <h6 class="min-w-0 truncate" :title="title">{{ title }}</h6>
-    <MkIcon name="icon_warning_filled" />
-  </template>
-  <ul>资源详情</ul>
-  <template #footer="{ Action, ActionDropdown }">
-    <span>左侧常驻内容</span>
-    <component :is="Action">
-      <el-switch size="small" />
-      <component :is="ActionDropdown">
-        <MkDropdownItem>编辑</MkDropdownItem>
-        <MkDropdownItem>删除</MkDropdownItem>
-      </component>
-    </component>
-  </template>
-</MkSourceCard>
-```
-
-批量选择模式由页面显式控制：
-
-```vue
-<MkSourceCard :selectable="batchSelectionMode" :selected="selected" title="工作流工具" @selected="selected = $event">
-  <p>工具描述</p>
-</MkSourceCard>
-```
-
-只需要悬浮显示开关时，可以不使用 `ActionDropdown`：
-
-```vue
-<MkSourceCard title="大语言模型" nick_name="管理员" create_time="2026-08-17">
-  <template #footer="{ Action }">
-    <span>左侧常驻内容</span>
-    <component :is="Action">
-      <el-switch size="small" />
-    </component>
-  </template>
-</MkSourceCard>
-```
-
-### MkFormList
-
-用于多个业务字段组成的动态表单行，负责重复行布局、添加、删除和可选排序，不管理业务字段、校验规则或
-选项请求。通过 `v-model` 传入行数据，`defaultItem` 创建新行，`minRows` 默认值为 `1`，控制删除时保留的最小行数；
-允许删除到空列表时传入 `:min-rows="0"`。组件不会自动补齐初始行。默认插槽
-提供 `item`、`index`，业务组件在插槽中继续声明
-`el-form-item`、字段路径和校验规则。
-
-```vue
-<script setup lang="ts">
-import MkFormList from '@/components/mk-form-list/index.vue'
-
-const roleSettings = defineModel<{ roleId: string; workspaceIds: string[] }[]>({ required: true })
-</script>
-
-<MkFormList v-model="roleSettings" add-text="添加角色" :default-item="{ roleId: '', workspaceIds: [] }">
-  <template #default="{ index, item }">
-    <el-form-item
-      class="flex-1"
-      :label="index===0 ? '角色' : ''"
-      :prop="`roleSettings.${index}.roleId`"
-    >
-      <el-select v-model="item.roleId" />
-    </el-form-item>
-  </template>
-</MkFormList>
-```
-
-`addText` 设置添加按钮文案，`showAddButton` 默认为 `true`；添加入口由业务布局单独提供时传入
-`:show-add-button="false"`。`firstRowHasLabel` 默认为 `true`：第一行删除按钮使用 `mt-8`，后续行
-使用 `mt-0.5`；并列表单项没有 label 时传入 `:firstRowHasLabel="false"`。删除成功后通过
-`remove(item, index)` 返回被删除的行数据和原索引，业务组件可处理关联状态，不需要再次修改列表。
-增删时使用 Lodash `cloneDeep` 回写独立的行数据，新增行也独立克隆 `defaultItem`，避免共享嵌套
-引用及重复挂载 LogicFlow 的 MobX 可观察对象。调用方应使用业务 ID 识别行，不依赖对象引用保持不变。
-
-表单行排序通过 `sortable` 开启，同时必须提供稳定且唯一的 `item-key`（字段名或取键函数）。
-组件自带拖拽手柄，添加按钮位于排序容器之外，不需要业务再包拖拽指令或放置手柄。
-不足两行或键值无效时禁用拖拽。排序与增删一样深拷贝写回，
-`sort-change` 返回 `{ oldIndex, newIndex, data }`。校验规则和字段路径继续由默认插槽提供。
-
-新行包含业务 ID 时，`default-item` 应传工厂函数，在每次点击添加时生成新 ID；普通无 ID 数据
-仍可传默认对象。
-
-```vue
-<MkFormList v-model="group.variable_list" :default-item="createVariable" :first-row-has-label="false" sortable item-key="v_id">
-  <template #default="{ item, index }">
-    <!-- 业务字段与 el-form-item -->
-  </template>
-</MkFormList>
 ```
 
 ### MkSearchList
@@ -1255,7 +1276,7 @@ import SelectModel from '@/components/business/select-model/index.vue'
 
 统一工作空间下拉框的图标和触发器布局。通过 `options` 传入工作空间选项，通过 `v-model`
 控制选中值，选择后通过 `select` 返回完整选项。组件不读取 Store，也不执行导航；路由切换和
-数据刷新由使用方处理。
+数据刷新由使用方处理。内部显式导入非全局的 `MkFilterableDropdown`，复用搜索与选项渲染能力。
 
 ```vue
 <script setup lang="ts">

@@ -6,7 +6,6 @@ import CommonSystemApi from '@/api/admin/system/common'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import type { CreateWorkspaceMemberPayload, ListItem, SystemUserOption, WorkspaceItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
-import MkFormList from '@/components/mk-form-list/index.vue'
 
 defineOptions({ name: 'AddWorkspaceMemberDrawer' })
 

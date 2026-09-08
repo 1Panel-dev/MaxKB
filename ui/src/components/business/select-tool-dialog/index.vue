@@ -8,7 +8,6 @@ import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
-import MkSourceCard from '@/components/mk-source-card/index.vue'
 
 defineOptions({ name: 'SelectToolDialog' })
 
