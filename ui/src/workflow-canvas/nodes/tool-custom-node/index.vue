@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-import { QuestionFilled } from '@element-plus/icons-vue'
+import { computed, inject, onMounted, useTemplateRef } from 'vue'
+import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ToolInputField } from '@/api/types'
 import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
@@ -9,7 +9,7 @@ import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import InputFieldDialog from './InputFieldDialog.vue'
+import FieldSetting from './component/FieldSetting.vue'
 
 defineOptions({ name: 'WorkflowToolCustomNode' })
 
@@ -20,7 +20,7 @@ type ToolNodeInputField =
 interface ToolCustomNodeForm {
   code: string
   input_field_list: ToolNodeInputField[]
-  is_result: boolean
+  is_result?: boolean
 }
 
 const getModel = inject('getModel') as () => WorkflowNodeModel
@@ -29,13 +29,16 @@ const model = getModel()
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 const inputFieldDialogRef = useTemplateRef<InstanceType<typeof InputFieldDialog>>('inputFieldDialogRef')
-const currentFieldIndex = ref<number>()
 
+// 初始化节点配置，保留旧节点缺少返回内容开关时的兼容逻辑。
+const defaultForm: ToolCustomNodeForm = { code: '', input_field_list: [], is_result: false }
 const savedForm = model.properties.node_data as Partial<ToolCustomNodeForm> | undefined
 model.properties.node_data = {
-  code: savedForm?.code ?? '',
-  input_field_list: Array.isArray(savedForm?.input_field_list) ? savedForm.input_field_list : [],
-  is_result: savedForm ? savedForm.is_result : false,
+  ...defaultForm,
+  ...savedForm,
+  code: savedForm?.code ?? defaultForm.code,
+  input_field_list: Array.isArray(savedForm?.input_field_list) ? savedForm.input_field_list : defaultForm.input_field_list,
+  is_result: savedForm ? savedForm.is_result : defaultForm.is_result,
 }
 
 const formData = computed<ToolCustomNodeForm>({
@@ -47,29 +50,33 @@ const showReturnContent = computed(() =>
   [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
 )
 
-function validate() {
-  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error })) ?? Promise.resolve()
-}
-
+// 参数配置由弹窗提交，节点入口统一写回；编辑后沿用原有的值重置行为。
 function handleOpenInputField(field?: ToolNodeInputField, index?: number) {
-  currentFieldIndex.value = index
-  inputFieldDialogRef.value?.open(field)
+  inputFieldDialogRef.value?.open(field, index)
 }
 
 function handleDeleteInputField(index: number) {
-  formData.value.input_field_list.splice(index, 1)
+  const inputFields = cloneDeep(formData.value.input_field_list)
+  inputFields.splice(index, 1)
+  formData.value = { ...formData.value, input_field_list: inputFields }
 }
 
-function handleInputFieldRefresh(field: ToolInputField) {
+function handleInputFieldSubmit(field: ToolInputField, index?: number) {
   const inputField: ToolNodeInputField =
     field.source === 'reference' ? { ...field, source: 'reference', value: [] } : { ...field, source: 'custom', value: '' }
+  const inputFields = cloneDeep(formData.value.input_field_list)
 
-  if (currentFieldIndex.value === undefined) {
-    formData.value.input_field_list.push(inputField)
+  if (index === undefined) {
+    inputFields.push(inputField)
   } else {
-    formData.value.input_field_list.splice(currentFieldIndex.value, 1, inputField)
+    inputFields.splice(index, 1, inputField)
   }
-  currentFieldIndex.value = undefined
+  formData.value = { ...formData.value, input_field_list: inputFields }
+  inputFieldDialogRef.value?.close()
+}
+
+function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error })) ?? Promise.resolve()
 }
 
 onMounted(() => {
@@ -80,74 +87,71 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mb-3">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">节点设置</h6>
 
     <el-form ref="formRef" :model="formData" label-position="top" hide-required-asterisk @submit.prevent>
-      <div class="mb-2 flex-between">
-        <h6>输入参数</h6>
-        <el-button link type="primary" @click="handleOpenInputField()">
-          <MkIcon name="icon_add_outlined" class="mr-1" />
-          添加
-        </el-button>
-      </div>
+      <div class="mk-gray-card">
+        <!-- 输入参数 -->
+        <div class="flex-between mb-2">
+          <p>输入参数</p>
+          <FieldSetting ref="inputFieldDialogRef" @submit="handleInputFieldSubmit" />
+        </div>
 
-      <el-card shadow="never" class="card-never mb-4" style="--el-card-padding: 12px">
         <template v-if="formData.input_field_list.length">
-          <el-form-item
-            v-for="(field, index) in formData.input_field_list"
-            :key="`${field.name}-${index}`"
-            :prop="`input_field_list.${index}.value`"
-            :rules="{
-              required: field.is_required,
-              message: field.source === 'reference' ? '请选择参数' : '请输入参数',
-              trigger: field.source === 'reference' ? 'change' : 'blur',
-            }"
-          >
-            <template #label>
-              <div class="flex w-full items-center justify-between gap-2">
-                <div class="flex min-w-0 items-center gap-1">
-                  <span class="max-w-32 truncate" :title="field.name">{{ field.name }}</span>
-                  <el-tooltip v-if="field.desc" :content="field.desc" effect="dark" placement="right">
-                    <MkIcon :icon="QuestionFilled" class="cursor-help text-N600" />
-                  </el-tooltip>
-                  <span v-if="field.is_required" class="text-danger">*</span>
-                  <el-tag size="small" type="info">{{ field.type }}</el-tag>
+          <div class="mk-white-card">
+            <el-form-item
+              v-for="(field, index) in formData.input_field_list"
+              :key="`${field.name}-${index}`"
+              :prop="`input_field_list.${index}.value`"
+              :rules="{
+                required: field.is_required,
+                message: field.source === 'reference' ? '请选择参数' : '请输入参数',
+                trigger: field.source === 'reference' ? 'change' : 'blur',
+              }"
+            >
+              <template #label>
+                <div class="flex w-full items-center justify-between gap-2">
+                  <div class="flex min-w-0 items-center gap-1">
+                    <span class="max-w-32 truncate" :class="{ 'mk-required': field.is_required }" :title="field.name">{{ field.name }}</span>
+                    <el-tooltip v-if="field.desc" :content="field.desc" effect="dark" placement="right">
+                      <MkIcon name="icon_info_outlined" class="text-N600!" />
+                    </el-tooltip>
+                    <el-tag size="small" type="info">{{ field.type }}</el-tag>
+                  </div>
+
+                  <div class="flex shrink-0 items-center">
+                    <el-button text type="primary" @click.stop="handleOpenInputField(field, index)">
+                      <MkIcon name="icon_edit_outlined" />
+                    </el-button>
+                    <el-button text type="primary" @click="handleDeleteInputField(index)">
+                      <MkIcon name="icon_delete-trash_outlined" />
+                    </el-button>
+                  </div>
                 </div>
+              </template>
 
-                <div class="flex shrink-0 items-center">
-                  <el-button text type="primary" @click.stop="handleOpenInputField(field, index)">
-                    <MkIcon name="icon_edit_outlined" />
-                  </el-button>
-                  <el-button text type="primary" @click="handleDeleteInputField(index)">
-                    <MkIcon name="icon_delete-trash_outlined" />
-                  </el-button>
-                </div>
-              </div>
-            </template>
-
-            <NodeCascader v-if="field.source === 'reference'" v-model="field.value" :node-model="model" placeholder="请选择参数" />
-            <el-input v-else v-model="field.value" placeholder="请输入参数" />
-          </el-form-item>
-        </template>
-        <MkEmpty v-else :image-size="60" />
-      </el-card>
-
-      <h6 class="mb-2">Python 代码</h6>
-      <PythonCodeEditor v-model="formData.code" class="h-32" title="Python 代码" @wheel="handleNodeWheel" />
-
-      <el-form-item v-if="showReturnContent" label="返回内容" class="mt-4" @click.prevent>
-        <template #label>
-          <div class="flex items-center gap-1">
-            <span>返回内容</span>
-            <el-tooltip content="开启后，该节点的输出会作为工作流的最终回复内容" effect="dark" placement="right">
-              <MkIcon :icon="QuestionFilled" class="cursor-help text-N600" />
-            </el-tooltip>
+              <NodeCascader v-if="field.source === 'reference'" v-model="field.value" :node-model="model" placeholder="请选择参数" />
+              <el-input v-else v-model="field.value" placeholder="请输入参数" />
+            </el-form-item>
           </div>
         </template>
-        <el-switch v-model="formData.is_result" size="small" />
-      </el-form-item>
+        <!-- 输入参数 -->
+        <el-form-item label="工具内容（Python）" class="mt-4">
+          <PythonCodeEditor v-model="formData.code" title="工具内容（Python）" @wheel="handleNodeWheel" />
+        </el-form-item>
+        <!-- 返回内容 -->
+        <div class="flex-between w-full" v-if="showReturnContent">
+          <span class="flex items-center gap-1">
+            返回内容
+            <el-tooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+              <MkIcon name="icon_info_outlined" class="text-N600!" />
+            </el-tooltip>
+          </span>
+          <span>
+            <el-switch v-model="formData.is_result" size="small" />
+          </span>
+        </div>
+      </div>
     </el-form>
-
-    <InputFieldDialog ref="inputFieldDialogRef" @refresh="handleInputFieldRefresh" />
   </NodeContainer>
 </template>

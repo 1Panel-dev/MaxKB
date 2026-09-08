@@ -350,7 +350,6 @@ export const mcpNode = {
   type: WorkflowNodeType.McpNode,
   text: '通过 SSE/Streamable HTTP 方式执行MCP服务中的工具',
   label: 'MCP 调用',
-  height: 252,
   properties: { stepName: 'MCP 调用', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
@@ -359,7 +358,6 @@ export const toolCustomNode = {
   type: WorkflowNodeType.ToolLibCustom,
   text: '通过执行自定义脚本，实现数据处理',
   label: '自定义工具',
-  height: 260,
   properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
