@@ -40,6 +40,9 @@ export interface McpSetting {
 }
 
 export interface ResourceSetting extends McpSetting {
+  application_list?: (Partial<ApplicationDetail> & { id: string })[]
+  tool_list?: (Partial<ToolItem> & { id: string })[]
+  skill_tool_list?: (Partial<ToolItem> & { id: string })[]
   application_ids: string[]
   mcp_output_enable: boolean
   skill_tool_ids: string[]

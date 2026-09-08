@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
-import SelectModel from '@/components/business/select-model/index.vue'
+import MkFormList from '@/components/mk-form-list/index.vue'
+import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
+import type { NodeModelData } from '@/workflow-canvas/component/node-model-select/types'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
-import ParamSettingDialog from './component/ParamSettingDialog.vue'
+import SearchSetting from './component/SearchSetting.vue'
 import type { RerankerSetting } from './types'
 
 defineOptions({ name: 'WorkflowRerankerNode' })
@@ -18,9 +19,6 @@ const apiType = inject<string>('apiType', 'workspace')
 const model = getModel()
 const store = useWorkflowStore(apiType)
 const formRef = useTemplateRef<FormInstance>('formRef')
-const questionCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('questionCascaderRef')
-const modelCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('modelCascaderRef')
-const paramSettingDialogRef = useTemplateRef<InstanceType<typeof ParamSettingDialog>>('paramSettingDialogRef')
 
 interface RerankerForm {
   reranker_reference_list: string[][]
@@ -57,12 +55,9 @@ model.properties.node_data = {
 }
 const formData = computed(() => model.properties.node_data as RerankerForm)
 
-// 重排内容允许删除到空列表，交由必填规则提示。
+// 标题栏添加重排内容，深拷贝回写以保持节点历史记录的数据独立。
 function addReference() {
   formData.value.reranker_reference_list = [...cloneDeep(formData.value.reranker_reference_list), []]
-}
-function removeReference(index: number) {
-  formData.value.reranker_reference_list = cloneDeep(formData.value.reranker_reference_list.filter((_, referenceIndex) => referenceIndex !== index))
 }
 
 // 模型来源与重排参数
@@ -74,24 +69,17 @@ function refreshModels() {
     modelOptions.value = models
   })
 }
-const defaultModelSetting = computed(() => model.getDefaultModelConfig('RERANKER'))
-function changeModelSource() {
-  formData.value.reranker_model_id_reference = []
-  formRef.value?.clearValidate(['reranker_model_id', 'reranker_model_id_reference'])
+function updateModel(patch: Partial<NodeModelData>) {
+  model.properties.node_data = { ...formData.value, ...patch }
 }
-function openParamSetting() {
-  paramSettingDialogRef.value?.open(formData.value.reranker_setting)
+const settingRows = computed(() => [
+  { label: 'Score 高于', value: formData.value.reranker_setting.similarity.toFixed(3) },
+  { label: '引用分段数 TOP', value: formData.value.reranker_setting.top_n },
+  { label: '最大引用字符数', value: formData.value.reranker_setting.max_paragraph_char_number },
+])
+async function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
-function updateParamSetting(setting: RerankerSetting) {
-  formData.value.reranker_setting = cloneDeep(setting)
-}
-function validate() {
-  return Promise.all([questionCascaderRef.value?.validate(), modelCascaderRef.value?.validate(), formRef.value?.validate()]).catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
-}
-const anchorGuard = createAnchorGuard(model)
-onBeforeUnmount(() => anchorGuard.reset())
 onMounted(() => {
   model.validate = validate
   refreshModels()
@@ -106,6 +94,7 @@ onMounted(() => {
     <h6 class="mk-title-decoration mb-2">节点设置</h6>
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+        <!-- 重排内容 -->
         <el-form-item
           class="mk-hide-asterisk"
           prop="reranker_reference_list"
@@ -114,11 +103,13 @@ onMounted(() => {
           <template #label>
             <div class="flex-between">
               <span class="mk-required">重排内容</span>
-              <el-button link type="primary" title="添加重排内容" @click="addReference"><MkIcon name="icon_add_outlined" /></el-button>
+              <el-button text type="primary" title="添加重排内容" aria-label="添加重排内容" @click="addReference">
+                <MkIcon name="icon_add_outlined" />
+              </el-button>
             </div>
           </template>
-          <div class="flex w-full flex-col gap-2">
-            <div v-for="(_, index) in formData.reranker_reference_list" :key="index" class="flex items-start gap-2">
+          <MkFormList v-model="formData.reranker_reference_list" :default-item="[]" :first-row-has-label="false" :show-add-button="false">
+            <template #default="{ index }">
               <el-form-item
                 class="min-w-0 flex-1"
                 :prop="`reranker_reference_list.${index}`"
@@ -126,90 +117,49 @@ onMounted(() => {
               >
                 <NodeCascader v-model="formData.reranker_reference_list[index]!" :node-model="model" placeholder="请选择重排内容" />
               </el-form-item>
-              <el-button text title="删除重排内容" @click="removeReference(index)"
-                ><MkIcon name="icon_delete-trash_outlined" class="text-N600"
-              /></el-button>
-            </div>
-          </div>
+            </template>
+          </MkFormList>
         </el-form-item>
+        <!-- 检索参数 -->
         <el-form-item>
           <template #label>
             <div class="flex-between">
               <span>检索参数</span>
-              <el-button text type="primary" title="参数设置" @click="openParamSetting"><MkIcon name="icon-setting" /></el-button>
+              <SearchSetting v-model="formData.reranker_setting" />
             </div>
           </template>
-          <div class="grid w-full grid-cols-2 gap-y-1">
-            <span class="text-N600">Score 高于</span><span>{{ formData.reranker_setting.similarity.toFixed(3) }}</span>
-            <span class="text-N600">引用分段数 TOP</span><span>{{ formData.reranker_setting.top_n }}</span>
-            <span class="text-N600">最大引用字符数</span><span>{{ formData.reranker_setting.max_paragraph_char_number }}</span>
+          <div class="mk-white-card w-full">
+            <ul class="space-y-2">
+              <li v-for="row in settingRows" :key="row.label" class="flex gap-4">
+                <span class="w-28 shrink-0 text-N600">{{ row.label }}</span>
+                <span class="min-w-0 flex-1 truncate" :title="String(row.value)">{{ row.value }}</span>
+              </li>
+            </ul>
           </div>
         </el-form-item>
+        <!-- 检索问题 -->
         <el-form-item label="检索问题" prop="question_reference_address" :rules="{ required: true, message: '请选择检索问题', trigger: 'change' }">
           <NodeCascader ref="questionCascaderRef" v-model="formData.question_reference_address" :node-model="model" placeholder="请选择检索问题" />
         </el-form-item>
-        <el-form-item
-          class="mk-hide-asterisk"
-          :prop="formData.reranker_model_id_type === 'reference' ? 'reranker_model_id_reference' : 'reranker_model_id'"
-          :rules="{
-            required: formData.reranker_model_id_type !== 'default',
-            message: formData.reranker_model_id_type === 'reference' ? '请选择引用变量' : '请选择重排模型',
-            trigger: 'change',
-          }"
-        >
-          <template #label>
-            <div class="flex-between">
-              <span class="mk-required">重排模型</span>
-              <el-select
-                v-model="formData.reranker_model_id_type"
-                :teleported="false"
-                class="w-22!"
-                size="small"
-                @change="changeModelSource"
-                @visible-change="anchorGuard.setOverlayVisible('model-source', $event)"
-                @wheel="handleNodeWheel"
-              >
-                <el-option label="默认模型" value="default" /><el-option label="引用变量" value="reference" /><el-option
-                  label="自定义"
-                  value="custom"
-                />
-              </el-select>
-            </div>
-          </template>
-          <SelectModel
-            v-if="formData.reranker_model_id_type === 'custom'"
-            v-model="formData.reranker_model_id"
-            :options="modelOptions"
-            :provider-options="providerOptions"
-            can-add
-            :teleported="false"
-            @visible-change="anchorGuard.setOverlayVisible('model', $event)"
-            @wheel="handleNodeWheel"
-            placeholder="请选择重排模型"
-            @refresh="refreshModels"
-          />
-          <SelectModel
-            v-else-if="formData.reranker_model_id_type === 'default'"
-            :model-value="defaultModelSetting?.model_id ?? ''"
-            :options="modelOptions"
-            :provider-options="providerOptions"
-            disabled
-            placeholder="未配置默认模型"
-          />
-          <NodeCascader
-            v-else
-            ref="modelCascaderRef"
-            v-model="formData.reranker_model_id_reference"
-            :node-model="model"
-            placeholder="请选择引用变量"
-          />
-        </el-form-item>
+        <!-- 重排模型 -->
+        <NodeModelSelect
+          :node-model="model"
+          :form-data="formData"
+          :fields="{ source: 'reranker_model_id_type', id: 'reranker_model_id', reference: 'reranker_model_id_reference' }"
+          model-type="RERANKER"
+          label="重排模型"
+          :options="modelOptions"
+          :provider-options="providerOptions"
+          :can-edit-params="false"
+          can-add
+          @update="updateModel"
+          @refresh="refreshModels"
+        />
         <div class="flex-between">
           <span>结果显示在知识来源中</span>
           <el-switch v-model="formData.show_knowledge" size="small" />
         </div>
       </el-form>
     </div>
-    <ParamSettingDialog ref="paramSettingDialogRef" @submit="updateParamSetting" />
   </NodeContainer>
 </template>

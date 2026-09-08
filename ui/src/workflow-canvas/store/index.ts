@@ -13,7 +13,7 @@ type ApiModule = {
   getProviderList: () => Promise<ModelProviderItem[]>
   getModelParamsForm: (modelId: string) => Promise<DynamicFormField[]>
   getMcpTools?: (resourceType: string, resourceId: string, mcpServers: string) => Promise<McpTool[]>
-  getAllToolList?: (query?: Dict<unknown>) => Promise<ToolItem[]>
+  getToolListWithShared?: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById?: (toolId: string) => Promise<ToolItem>
 }
 
@@ -23,7 +23,7 @@ export type WorkflowStoreApi = {
   getProviderList: () => Promise<ModelProviderItem[]>
   getModelParamsForm: (modelId: string) => Promise<DynamicFormField[]>
   getMcpTools: (resourceType: string, resourceId: string, mcpServers: string) => Promise<McpTool[]>
-  getAllToolList: (query?: Dict<unknown>) => Promise<ToolItem[]>
+  getToolListWithShared: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById: (toolId: string) => Promise<ToolItem>
 }
 
@@ -85,9 +85,9 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
         if (!resolvedApi.getMcpTools) return Promise.resolve([])
         return withCache(`mcp-tools:${resourceType}:${resourceId}:${mcpServers}`, () => resolvedApi.getMcpTools!(resourceType, resourceId, mcpServers), force)
       },
-      getAllToolList(query?: Dict<unknown>): Promise<ToolItem[]> {
-        if (!resolvedApi.getAllToolList) return Promise.resolve([])
-        return withCache(`tool-list:${JSON.stringify(query ?? {})}`, () => resolvedApi.getAllToolList!(query), force)
+      getToolListWithShared(query?: Dict<unknown>): Promise<ToolItem[]> {
+        if (!resolvedApi.getToolListWithShared) return Promise.resolve([])
+        return withCache(`tool-list:${JSON.stringify(query ?? {})}`, () => resolvedApi.getToolListWithShared!(query), force)
       },
       getToolById(toolId: string): Promise<ToolItem> {
         if (!resolvedApi.getToolById) return Promise.resolve({} as ToolItem)

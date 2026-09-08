@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { computed, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { useRoute } from 'vue-router'
+import { cloneDeep } from 'lodash'
+import { TOOL_TYPE } from '@/api/enums'
+import type { ApplicationDetail, ToolItem } from '@/api/types'
+import SelectApplicationDialog from '@/components/business/select-application-dialog/index.vue'
+import SelectToolDialog from '@/components/business/select-tool-dialog/index.vue'
 import type { ApplicationResourceOption, ResourceSetting, ToolResourceOption } from '../../types'
 import McpSettingDialog from './McpSettingDialog.vue'
 
@@ -26,25 +32,63 @@ const emit = defineEmits<{ update: [setting: Partial<ResourceSetting>] }>()
 
 const mcpDialogRef = useTemplateRef<InstanceType<typeof McpSettingDialog>>('mcpDialogRef')
 
+const route = useRoute()
+const toolDialogRef = useTemplateRef<InstanceType<typeof SelectToolDialog>>('toolDialogRef')
+const selectingSkills = ref(false)
+const applicationDialogRef = useTemplateRef<InstanceType<typeof SelectApplicationDialog>>('applicationDialogRef')
+const excludedToolIds = computed(() => (typeof route.params.toolId === 'string' ? [route.params.toolId] : []))
+const excludedApplicationIds = computed(() => (typeof route.params.applicationId === 'string' ? [route.params.applicationId] : []))
+
+// 等待标题和类型 Props 更新后再打开，确保查询使用本次选择的资源类型。
+function openToolDialog(skills: boolean) {
+  selectingSkills.value = skills
+  nextTick(() => toolDialogRef.value?.open(skills ? selectedSkills.value : selectedTools.value))
+}
+
+function submitToolDialog(tools: (Partial<ToolItem> & { id: string })[]) {
+  if (selectingSkills.value) submitSkills(tools)
+  else submitTools(tools)
+}
+
+// 同时写回执行所需 ID 和回显快照，关闭后再次打开仍保留选择。
+function submitTools(tools: (Partial<ToolItem> & { id: string })[]) {
+  updateSetting({ tool_ids: tools.map(({ id }) => id), tool_list: cloneDeep(tools) })
+}
+function submitSkills(tools: (Partial<ToolItem> & { id: string })[]) {
+  updateSetting({ skill_tool_ids: tools.map(({ id }) => id), skill_tool_list: cloneDeep(tools) })
+}
+function submitApplications(applications: (Partial<ApplicationDetail> & { id: string })[]) {
+  updateSetting({ application_ids: applications.map(({ id }) => id), application_list: cloneDeep(applications) })
+}
+
+const loadedMcpOptions = ref<ToolItem[]>([])
 const selectedMcpTools = computed(() =>
   props.setting.mcp_tool_ids.map(
-    (id) => props.mcpOptions.find((option) => option.id === id) ?? { id, name: `已选 MCP（${id}）`, tool_type: 'MCP' as const },
+    (id) =>
+      loadedMcpOptions.value.find((option) => option.id === id) ??
+      props.mcpOptions.find((option) => option.id === id) ?? { id, name: `已选 MCP（${id}）`, tool_type: 'MCP' as const },
   ),
 )
 const mcpCount = computed(() => props.setting.mcp_tool_ids.length + Number(Boolean(props.setting.mcp_servers)))
 
 const selectedTools = computed(() =>
-  props.setting.tool_ids.map(
-    (id) => props.toolOptions.find((option) => option.id === id) ?? { id, name: `已选资源（${id}）`, icon: undefined, tool_type: undefined },
-  ),
+  props.setting.tool_ids.map((id) => {
+    const tool = props.toolOptions.find((option) => option.id === id) ?? props.setting.tool_list?.find((option) => option.id === id)
+    return { ...tool, id, icon: tool?.icon, tool_type: tool?.tool_type, name: tool?.name || `已选资源（${id}）` }
+  }),
 )
 const selectedSkills = computed(() =>
-  props.setting.skill_tool_ids.map(
-    (id) => props.skillOptions.find((option) => option.id === id) ?? { id, name: `已选资源（${id}）`, icon: undefined, tool_type: undefined },
-  ),
+  props.setting.skill_tool_ids.map((id) => {
+    const tool = props.skillOptions.find((option) => option.id === id) ?? props.setting.skill_tool_list?.find((option) => option.id === id)
+    return { ...tool, id, icon: tool?.icon, tool_type: tool?.tool_type, name: tool?.name || `已选资源（${id}）` }
+  }),
 )
-const selectedApplications = computed<ApplicationResourceOption[]>(() =>
-  props.setting.application_ids.map((id) => props.applicationOptions.find((option) => option.id === id) ?? { id, name: `已选资源（${id}）` }),
+const selectedApplications = computed(() =>
+  props.setting.application_ids.map((id) => {
+    const application =
+      props.applicationOptions.find((option) => option.id === id) ?? props.setting.application_list?.find((option) => option.id === id)
+    return { ...application, id, icon: application?.icon, name: application?.name || `已选资源（${id}）` }
+  }),
 )
 
 function updateSetting(changes: Partial<ResourceSetting>) {
@@ -52,6 +96,9 @@ function updateSetting(changes: Partial<ResourceSetting>) {
 }
 
 function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' | 'tool_ids', id: string) {
+  if (field === 'tool_ids') return submitTools(selectedTools.value.filter((resource) => resource.id !== id))
+  if (field === 'skill_tool_ids') return submitSkills(selectedSkills.value.filter((resource) => resource.id !== id))
+  if (field === 'application_ids') return submitApplications(selectedApplications.value.filter((resource) => resource.id !== id))
   updateSetting({ [field]: props.setting[field].filter((resourceId) => resourceId !== id) })
 }
 </script>
@@ -97,7 +144,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
           <span
             >工具<span v-if="selectedTools.length">（{{ selectedTools.length }}）</span></span
           >
-          <el-button link type="primary" title="添加工具" @click.stop="toolDialogRef?.open(setting.tool_ids)">
+          <el-button text type="primary" title="添加工具" @click.stop="openToolDialog(false)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
         </div>
@@ -122,7 +169,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
           <span
             >Skills<span v-if="selectedSkills.length">（{{ selectedSkills.length }}）</span></span
           >
-          <el-button link type="primary" title="添加Skills" @click.stop="skillDialogRef?.open(setting.skill_tool_ids)">
+          <el-button text type="primary" title="添加Skills" @click.stop="openToolDialog(true)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
         </div>
@@ -147,7 +194,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
           <span
             >智能体<span v-if="selectedApplications.length">（{{ selectedApplications.length }}）</span></span
           >
-          <el-button link type="primary" title="添加智能体" @click.stop="applicationDialogRef?.open(setting.application_ids)">
+          <el-button text type="primary" title="添加智能体" @click.stop="applicationDialogRef?.open(selectedApplications)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
         </div>
@@ -167,5 +214,13 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
     </MkCollapse>
   </div>
 
-  <!-- <McpSettingDialog ref="mcpDialogRef" :options="mcpOptions" @submit="updateSetting" /> -->
+  <SelectToolDialog
+    ref="toolDialogRef"
+    :title="selectingSkills ? 'Skills' : '工具'"
+    :tool-types="selectingSkills ? [TOOL_TYPE.SKILL] : undefined"
+    :excluded-ids="excludedToolIds"
+    @submit="submitToolDialog"
+  />
+  <SelectApplicationDialog v-if="showApplications" ref="applicationDialogRef" :excluded-ids="excludedApplicationIds" @submit="submitApplications" />
+  <McpSettingDialog ref="mcpDialogRef" @loaded="loadedMcpOptions = $event" @submit="updateSetting" />
 </template>

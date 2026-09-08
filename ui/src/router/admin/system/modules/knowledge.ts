@@ -5,13 +5,13 @@ export const systemKnowledgeRoutes: RouteRecordRaw[] = [
   {
     path: 'knowledge/:knowledgeId',
     name: 'system-knowledge-detail',
-    component: () => import('@/views/knowledge/KnowledgeDetailView.vue'),
+    component: () => import('@/views/knowledge-detail/KnowledgeDetailView.vue'),
     meta: { title: '知识库详情', hidden: true },
   },
   {
     path: 'knowledge/:knowledgeId/document/:documentId',
     name: 'system-knowledge-document-detail',
-    component: () => import('@/views/knowledge/DocumentDetailView.vue'),
+    component: () => import('@/views/knowledge-detail/DocumentDetailView.vue'),
     meta: { title: '文档详情', hidden: true },
   },
 ]

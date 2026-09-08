@@ -79,6 +79,13 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 额外维护逐方法接口，例如 `ModelActionApi`，也不要使用不断扩展的 `Pick<typeof XxxApi, ...>`。
 仅展示数据的组件不接收 API。
 
+### 工具列表查询
+
+`workspace/tool/tool.ts` 的 `getAllTool(query)` 查询支持 `folder_id` 筛选的工作空间工具
+非分页列表，用于文件夹菜单和工具选择弹窗。`getToolListWithShared(query)` 请求 `tool/tool_list`，
+将响应的 `tools` 与 `shared_tools` 合并为 `ToolItem[]`，用于包含已授权共享工具的选项查询；
+按工具类型筛选时使用 `tool_type`。`workspace/shared.ts` 的 `getAllTool(query)` 仅查询共享工具。
+
 ### 知识库维护
 
 `workspace/knowledge/knowledge.ts` 与 `workspace/shared.ts` 的 `getAllKnowledge(query)`

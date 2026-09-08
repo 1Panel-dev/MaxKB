@@ -88,6 +88,11 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 搜索和资源列表；`index.vue` 只负责 Tabs 和事件汇总。`component/AddNode.vue` 负责画布右上角的
 悬浮入口、菜单显隐，以及点击添加和拖拽添加事件；画布入口传入 `workflowMode` 并完成节点创建。
 
+工作流 Store 的 `getToolListWithShared` 用于包含已授权共享工具的选项查询，MCP 节点使用
+`tool_type: 'MCP'` 筛选；AI 对话的 `McpSettingDialog` 每次打开通过
+`store.force.getToolListWithShared` 刷新同类选项，关闭或重新打开后忽略旧响应，通过 `loaded`
+将工具详情提供给资源区回显；取消不修改已选配置。文件夹菜单继续使用 `getAllTool`，不复用这一路查询。
+
 ### `nodes/`
 
 每个已实现节点使用一个目录，目录中包含 LogicFlow 注册文件 `index.ts` 和节点视图
@@ -109,7 +114,7 @@ Vue Teleport 节点继承页面上下文；画布核心不负责模型参数接�
 只用于解析当前使用的模型，不覆盖节点保存的自定义配置。
 
 AI 对话、意图识别、问题优化、参数提取、图片理解、视频理解、图片生成、文生视频、图生视频、
-语音转文本和文本转语音这 11 个节点统一使用 `component/node-model-select/index.vue` 的
+语音转文本、文本转语音和多路召回这 12 个节点统一使用 `component/node-model-select/index.vue` 的
 `NodeModelSelect`。组件接收 `nodeModel`、只读 `formData`、`modelType`、`label`、`options` 和
 `providerOptions`；默认字段为 `model_id_type`、`model_id`、`model_id_reference` 与
 `model_params_setting`，语音节点通过类型化的 `fields` 映射 STT/TTS 字段。组件通过 `update`
@@ -118,15 +123,19 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 默认来源检查保存后的默认模型，自定义来源检查模型 ID，引用来源检查必填并调用
 `NodeCascader.validate()` 检查引用有效性。切换来源清空引用与旧校验，保留自定义模型和参数。
 来源及模型下拉由组件统一维护锚点保护；参数按钮与默认参数加载继续复用 `SelectModel`。
-多路召回、基本信息中的语音设置和长期记忆保持各自实现，不接入该组件。
+多路召回通过 `fields` 映射 `reranker_model_id*`，不提供参数字段，并设置 `canEditParams` 为
+`false`，仅保留独立的检索参数弹窗；模型校验统一遵循上述规则，包括默认模型必填。
+`canEditParams` 默认为 `true`，仅配置参数字段时启用；`canAdd` 默认为 `false`，多路召回开启后
+通过 `refresh` 重新查询重排模型，保留添加模型能力。
+基本信息中的语音设置和长期记忆保持各自实现，不接入该组件。
 
-知识库检索的范围区块使用 `component/node-search-scope/index.vue` 的 `NodeSearchScope`。
+知识库检索与文档标签检索的范围区块使用 `component/node-search-scope/index.vue` 的 `NodeSearchScope`。
 组件通过 `formData` 接收 `NodeSearchScopeData`、通过 `selectedKnowledge` 接收包含 ID 回退的
 知识库快照，`nodeModel` 仅用于变量选择和浮层锚点保护。`update` 提交范围字段的局部变更，
 `update:knowledge` 提交选择或移除后的知识库列表；节点保留快照、关联 ID 和不可见关联的清理逻辑。
 组件复用 `SelectKnowledgeDialog`，保留相同 Embedding 模型约束。切换范围保留配置，切换知识库/
 文档列表清空引用；引用的必填与有效性校验通过组件内的表单项加入节点外层表单，自定义范围不校验
-隐藏引用，也不新增知识库必填限制。文档标签检索后续可以复用该组件，标签加载与过滤仍归节点。
+隐藏引用，也不新增知识库必填限制。文档标签的加载与过滤仍归文档标签检索节点。
 
 节点自身的表单、状态和专属校验留在节点目录；多个节点共享且属于画布基础协议的能力才上移到
 `core`。节点应复用 `core/node-container/index.vue`，需要选择上游节点字段时复用
@@ -167,6 +176,10 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 
 AI 对话节点的 `component/resource-setting` 仅渲染技能卡片内的 MCP、工具、Skills 和智能体分组，
 各分组直接在入口使用 `MkCollapse`，不再拆分普通列表子组件，仅选择弹窗独立封装。
+工具和 Skills 的添加入口复用 `SelectToolDialog`，智能体入口使用 `SelectApplicationDialog`；
+Skills 仅查询 SKILL 类型，选择器排除当前路由对应的智能体或工具。确认后同时更新执行用的
+ID 数组及 `tool_list`、`skill_tool_list`、`application_list` 回显快照；移除时同步清理快照，
+取消不更新节点，旧数据缺少快照时继续显示 ID。
 标题、输出执行过程开关与 `mk-white-card` 由节点入口维护。组件通过 `setting`
 读取资源配置、通过 `update` 提交局部变更；资源选项由 Props 传入，未接入数据源时默认为空数组，
 已关联但缺少详情的资源保留 ID 回退展示。
@@ -177,9 +190,12 @@ AI 对话节点的提示词、历史记录、视觉理解和输出思考表单�
 节点的正向与负向提示词同样使用 `MdEditorMagnify`，必填字段由所在节点表单统一校验。
 
 文档内容提取、多路召回和文档标签检索节点使用统一的节点标题、`mk-gray-card`、表单必填标记与
-`MkIcon`。多路召回的独立参数弹窗位于节点 `component/`，复用 `MkDialog` 和 `MkSlider`；
-重排内容与标签条件允许删除到空列表，保留原有列表语义。文档标签检索复用
-`SelectKnowledgeDialog`，保留知识库快照及缺少详情的关联 ID。
+`MkIcon`。多路召回的参数设置按钮与弹窗封装在节点 `component/SearchSetting.vue`，通过
+`v-model` 接收检索参数，保存时深拷贝回写，取消不修改节点；弹窗复用 `MkDialog` 和 `MkSlider`。
+重排内容使用 `MkFormList` 并隐藏内置添加按钮，由标题栏按钮深拷贝新增空引用，保留至少一行；
+标签条件使用 `MkFormList`，设置 `minRows` 为 `0`，保留允许删除到空列表的语义。文档标签检索通过
+`NodeSearchScope` 复用知识库选择，保留知识库快照及缺少详情的关联 ID；标签条件使用
+`MkFormList` 并设置 `minRows` 为 `0`，节点模型统一将新建及已有节点宽度设为 `455`。
 `ApplicationWorkflowView` 和 `ToolWorkflowView` 提供 `getKnowledgeTags` 与 `getRerankerModels`
 注入接口，分别用于文档标签选项与重排模型查询；新增模型后直接重新查询，不读取已有模型列表缓存。
 标签请求只回写当前关联知识库的结果，过期或节点卸载后的响应不再修改节点。
