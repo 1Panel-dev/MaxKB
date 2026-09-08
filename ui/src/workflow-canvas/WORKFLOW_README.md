@@ -22,6 +22,7 @@
 src/workflow-canvas/
 ├── component/          # 画布内可复用的控制和搜索组件
 ├── config/             # 节点数据、映射、常量及预留的本地化配置
+├── details/            # 执行详情：顶层分发入口与公共卡壳，节点内容由 nodes/*/details/ 提供
 ├── core/               # 稳定的画布内核与所有节点共用的基础能力
 │   ├── edge/           # 普通边、循环边及边删除按钮
 │   └── node-container/ # 节点容器、锚点按钮及私有的条件、操作下拉组件
@@ -234,6 +235,40 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 卡片悬停时显示排序手柄；ELSE 独立渲染并固定末尾。排序后按位置更新分支名称，保留分支 ID，
 并同步刷新锚点顺序与连线。
 
+### 执行详情（`details/`）
+
+节点执行详情按三层组织，与画布节点注册同源，通过节点类型分发渲染：
+
+- `details/index.vue`（`ExecutionDetailContent`）是顶层分发层：接收 `detail` 数组和 `workflowMode`，
+  按 `index` 升序，逐项按节点类型渲染对应节点的详情组件。类型到详情组件的映射来自
+  `import.meta.glob('../nodes/*/index.ts')` 收集的默认导出中的 `details` 字段，与画布节点注册同一份
+  清单，不按目录名推断，也不再单独维护映射表。
+- `details/DetailContainer.vue` 是纯布局卡壳（架子），不认识任何具体节点类型：提供 `#header` 具名
+  插槽（透出折叠 `show`）、折叠体默认插槽承载节点内容，以及 `showContentOnError` 决定失败时是否仍
+  展示内容（默认失败只显示错误日志块）。
+- `details/BaseHeader.vue` 是公共头部：折叠箭头、节点图标、名称、耗时和状态图标；是否显示 tokens 由
+  节点通过 `show-tokens` 布尔控制，tokens 数值由 `BaseHeader` 从 `data` 自行计算，容器不参与该判断。
+- 详情载荷类型 `ExecutionNodeDetail` 在 `details/types.ts`，以开放索引签名承载各节点动态字段，仅显式
+  声明外层卡片通用字段；分发和模式统一使用 `WorkflowMode` 枚举，不自造字符串联合类型。
+
+每个节点的详情入口统一为 `nodes/<node-type>/details/index.vue`，并在该节点 `index.ts` 的默认导出中通过
+`details` 字段注册（LogicFlow 注册忽略该额外字段）：
+
+- 内容不随工作流模式变化的节点（如循环），`details/index.vue` 直接就是详情内容。
+- 内容随模式不同的节点（如 AI 对话），`details/index.vue` 按 `workflowMode` 用映射分发到同目录下的
+  `application.vue`、`knowledge.vue` 等模式文件，其它模式兜底到应用视图；各模式文件各自完整、自包含，
+  共用部分不强行抽取。
+
+详情内的灰底标题块直接使用内联 Tailwind（`overflow-hidden rounded-md bg-N100` + `h5.px-3.py-2` +
+`border-t border-dashed px-3 py-2 text-N900`），不引入独立的区块组件。只读 Markdown 回答复用全局
+`MdPreview`，并在节点内通过 `:deep()` 覆盖其固定高度与背景以融入灰底。
+
+循环节点的详情是唯一的递归点：它维护循环设置与轮次选择，选中某轮后把该轮的子节点数组交回顶层
+`ExecutionDetailContent` 渲染（排序与类型分发由顶层负责），并对外层卡壳传 `show-content-on-error`
+以便整体失败时仍能展开已执行的子节点。递归由数据驱动、逐层向下收敛（一个循环的轮次数据不含它
+自身），执行详情是有限树因而必然终止；`details/index.vue` 与节点详情之间的循环 import 仅在渲染期
+使用、不在模块求值期调用，属正常的组件递归引用。
+
 ## View 接入约定
 
 - 所有画布路由页面均放在 `src/views/workflow/`，并以 `XxxWorkflowView.vue` 命名，例如
@@ -269,7 +304,9 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 3. 在 `config/node-mapping.ts` 中维护节点映射；需要作为初始节点时再加入默认节点集合。
 4. 在 `node-menu/menu.ts` 中加入适用画布模式的菜单分组。
 5. 在 `nodes/<node-type>/` 中实现注册文件和节点视图，并按需增加 `icons/` 图标。
-6. 确认节点能被自动注册、从菜单添加、正确连线、校验并导出图数据。
+6. 如需执行详情，在 `nodes/<node-type>/details/index.vue` 中实现，并在 `index.ts` 默认导出中通过
+   `details` 字段注册；内容随模式变化时在该目录下按 `workflowMode` 分发到模式文件。
+7. 确认节点能被自动注册、从菜单添加、正确连线、校验并导出图数据。
 
 节点协议值统一使用 `WorkflowNodeType` 等枚举或画布常量，不在判断和映射中重复书写
 `ai-chat-node`、`tool-custom-node` 等字符串字面量。

@@ -14,6 +14,8 @@ const router = createRouter({
   history: createWebHistory(ADMIN_BASE_PATH),
   routes: [
     { path: '/', redirect: { name: 'workspace-home', params: { workspaceId: 'default' } } },
+    // TODO(demo): 执行详情样式预览，验收后删除
+    { path: '/details-demo', name: 'details-demo', component: () => import('@/views/details-demo/index.vue'), meta: { title: '执行详情 Demo' } },
     ...loginRoutes,
     ...workflowRoutes,
     workspaceRoutes,
@@ -24,7 +26,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
   if (to.path !== from.path) NProgress.start()
-  const notAuthRouteNameList = ['login', 'forgot-password', 'not-found']
+  const notAuthRouteNameList = ['login', 'forgot-password', 'not-found', 'details-demo']
   const { auth, user } = useStore()
 
   if (!notAuthRouteNameList.includes(to.name ? to.name.toString() : '')) {

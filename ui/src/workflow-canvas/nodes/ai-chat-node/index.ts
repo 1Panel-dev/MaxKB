@@ -1,4 +1,5 @@
 import AiChatNode from './index.vue'
+import AiChatNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -8,4 +9,4 @@ class AiChatNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.AiChat, model: WorkflowNodeModel, view: AiChatNodeView }
+export default { type: WorkflowNodeType.AiChat, model: WorkflowNodeModel, view: AiChatNodeView, details: AiChatNodeDetail }

@@ -1,4 +1,5 @@
 import LoopNodeVue from './index.vue'
+import LoopNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import type { Model } from '@logicflow/core'
@@ -25,4 +26,5 @@ export default {
   type: WorkflowNodeType.LoopNode,
   model: LoopNodeModel,
   view: LoopNodeView,
+  details: LoopNodeDetail,
 }
