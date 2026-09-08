@@ -266,11 +266,7 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <div class="workflow-node-container relative overflow-visible" @mousedown="handleNodeMousedown">
-    <div
-      ref="stepContainerRef"
-      class="step-container shadow-sm overflow-visible rounded-xl border-2 border-white bg-white p-4"
-      :class="{ isSelected: nodeSelected, error: node_status !== 200 }"
-    >
+    <div ref="stepContainerRef" class="step-container p-4" :class="{ isSelected: nodeSelected, error: node_status !== 200 }">
       <div>
         <div class="flex-between">
           <div class="flex min-w-0 flex-1 items-center" @dragstart.prevent @drag.prevent @dragover.prevent @dragend.prevent>
@@ -284,7 +280,7 @@ onBeforeUnmount(() => {
 
           <div class="flex shrink-0 items-center gap-1" @pointerdown.stop @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode">
-              <MkIcon name="icon_down_outlined" />
+              <MkIcon name="icon_down_outlined" :size="20"/>
             </el-button>
             <NodeConditionDropdown
               :model="model"
@@ -370,22 +366,4 @@ onBeforeUnmount(() => {
     </el-collapse-transition>
   </div>
 </template>
-<style lang="scss" scoped>
-.workflow-node-container {
-  .step-container {
-    box-sizing: border-box;
-    &:hover {
-      box-shadow: 0px 6px 24px 0px rgb(var(--mk-N900-rgb) / 8%);
-    }
-
-    &.isSelected {
-      border-color: var(--mk-primary);
-    }
-
-    &.error {
-      border-color: var(--mk-danger);
-      border-width: 1px;
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

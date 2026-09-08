@@ -1,30 +1,5 @@
-<template>
-  <div class="workflow-loop-body relative overflow-visible p-4">
-    <div class="step-container" :class="{ isSelected: nodeSelected, error: nodeStatus !== 200 }">
-      <div class="flex-between">
-        <div class="flex min-w-0 items-center gap-2">
-          <component :is="iconComponent(`${model.type}-icon`)" class="mr-1" :size="24" :item="model.properties.node_data" />
-          <h4 class="truncate break-all" :title="String(model.properties.stepName ?? '')">{{ model.properties.stepName }}</h4>
-        </div>
-        <div class="flex items-center gap-1" @mousedown.stop @keydown.stop @click.stop>
-          <el-button text @click="layout">
-            <MkIcon name="icon_magnify_outlined" />
-          </el-button>
-          <el-button text @click="showNode = !showNode">
-            <MkIcon name="icon_down_outlined" />
-          </el-button>
-        </div>
-      </div>
-      <el-collapse-transition>
-        <div v-show="showNode" class="mt-2">
-          <div :style="`height:${canvasHeight}px`"><slot /></div>
-        </div>
-      </el-collapse-transition>
-    </div>
-  </div>
-</template>
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { set } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
@@ -34,7 +9,10 @@ const props = defineProps<{ nodeModel: BaseNodeModel }>()
 const model = computed(() => props.nodeModel)
 
 const nodeSelected = ref(model.value.isSelected)
-watch(() => model.value.isSelected, (value) => (nodeSelected.value = value))
+watch(
+  () => model.value.isSelected,
+  (value) => (nodeSelected.value = value),
+)
 
 const nodeStatus = computed(() => (model.value.properties.status as number | undefined) ?? 200)
 
@@ -47,30 +25,77 @@ const showNode = computed({
   set: (v) => set(model.value.properties, 'showNode', v),
 })
 
+// 循环体放大：按主画布视口和缩放计算尺寸，退出时恢复原尺寸。
 const canvasHeight = ref(1000)
+const stepContainerRef = ref<HTMLDivElement>()
+const enlarge = ref(false)
+let originalSize: { width: number; canvasHeight: number } | undefined
 
-function layout() {
-  model.value.loopLayout?.()
-}
-</script>
-<style lang="scss" scoped>
-.workflow-loop-body {
-  .step-container {
-    box-sizing: border-box;
-    border-radius: 8px;
-    border: 2px solid #fff;
-    background: #fff;
-    box-shadow: 0 2px 4px 0 rgb(var(--el-text-color-primary-rgb) / 12%);
-    &:hover {
-      box-shadow: 0 6px 24px 0 rgb(var(--el-text-color-primary-rgb) / 8%);
-    }
-    &.isSelected {
-      border-color: var(--mk-primary);
-    }
-    &.error {
-      border-color: var(--mk-danger);
-      border-width: 1px;
-    }
+async function enlargeHandle() {
+  const nodeModel = model.value
+  const { graphModel } = nodeModel
+  const { transformModel } = graphModel
+  const stepContainer = stepContainerRef.value
+  if (!stepContainer) return
+
+  // 标题、边框和内边距由实际 DOM 测量，避免与容器样式重复维护。
+  const chromeHeight = stepContainer.offsetHeight - (showNode.value ? canvasHeight.value : 0)
+
+  if (enlarge.value && originalSize) {
+    nodeModel.width = originalSize.width
+    canvasHeight.value = originalSize.canvasHeight
+    originalSize = undefined
+    enlarge.value = false
+  } else {
+    const { width, height } = graphModel
+    if (width <= 0 || height <= 0) return
+
+    originalSize = { width: nodeModel.width, canvasHeight: canvasHeight.value }
+    const viewportPadding = 16
+    nodeModel.width = Math.max(1, (width - viewportPadding * 2) / transformModel.SCALE_X)
+    canvasHeight.value = Math.max(1, (height - viewportPadding * 2) / transformModel.SCALE_Y - chromeHeight)
+    showNode.value = true
+    enlarge.value = true
+  }
+
+  nodeModel.properties.width = nodeModel.width
+  await nextTick()
+  nodeModel.setHeight(chromeHeight + (showNode.value ? canvasHeight.value : 0))
+  if (enlarge.value) {
+    transformModel.focusOn(nodeModel.x, nodeModel.y, graphModel.width, graphModel.height)
   }
 }
-</style>
+
+function zoom() {
+  if (enlarge.value) return enlargeHandle()
+}
+
+defineExpose({ zoom })
+</script>
+
+<template>
+  <div class="workflow-node-container relative overflow-visible">
+    <div ref="stepContainerRef" class="step-container p-4" :class="{ isSelected: nodeSelected, error: nodeStatus !== 200 }">
+      <div class="flex-between">
+        <div class="flex min-w-0 items-center gap-2">
+          <component :is="iconComponent(`${model.type}-icon`)" class="mr-1" :size="24" :item="model.properties.node_data" />
+          <h4 class="truncate break-all" :title="String(model.properties.stepName ?? '')">{{ model.properties.stepName }}</h4>
+        </div>
+        <div class="flex items-center gap-1" @pointerdown.stop @mousedown.stop @keydown.stop @click.stop>
+          <el-button text :title="enlarge ? '还原' : '放大'" @click="enlargeHandle">
+            <MkIcon name="icon_magnify_outlined" :size="20" />
+          </el-button>
+          <el-button text @click="showNode = !showNode">
+            <MkIcon name="icon_down_outlined" :size="20" />
+          </el-button>
+        </div>
+      </div>
+      <el-collapse-transition>
+        <div v-show="showNode" class="mt-4">
+          <div :style="`height:${canvasHeight}px`"><slot /></div>
+        </div>
+      </el-collapse-transition>
+    </div>
+  </div>
+</template>
+<style lang="scss" scoped></style>
