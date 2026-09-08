@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { KnowledgeType } from '@/api/types'
 import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 
 defineOptions({ name: 'KnowledgeIcon' })
 
-const props = withDefaults(defineProps<{ size?: number | string; type?: KnowledgeType }>(), { size: 24 })
-const knowledgeType = computed(() => (props.type === undefined ? undefined : KNOWLEDGE_TYPE_MAP[props.type]))
+const props = withDefaults(defineProps<{ size?: number | string; type?: KnowledgeType | string }>(), { size: 24 })
+const knowledgeType = computed(() => {
+  const type = Object.values(KNOWLEDGE_TYPE).find((type) => String(type) === String(props.type))
+  return type === undefined ? undefined : KNOWLEDGE_TYPE_MAP[type]
+})
 </script>
 <template>
   <el-avatar v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB" class="bg-purple!" shape="square" :size="size">

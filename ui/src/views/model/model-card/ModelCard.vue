@@ -5,7 +5,6 @@ import type ModelApi from '@/api/admin/workspace/model/model'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
 import { MODEL_TYPE_LABELS } from '@/constants'
-import MkSourceCard from '@/components/mk-source-card/index.vue'
 import ModelDownloadStatus from './ModelDownloadStatus.vue'
 
 defineOptions({ name: 'ModelCard' })

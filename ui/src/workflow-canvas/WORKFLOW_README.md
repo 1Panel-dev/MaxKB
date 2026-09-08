@@ -177,8 +177,10 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 通过 `v-model` 接收 `FileUploadSettingData`。节点入口根据上传开关挂载组件，并在配置写回后发送
 `refreshFileUploadConfig` 刷新开始节点文件变量；弹窗打开时重置并深拷贝草稿，确认时保留上传方式
 的表单必填校验，取消不修改节点，关闭动画结束后统一清理草稿与校验状态。
-文件类型与其他文件选择复用手动导入的 `MkCardCheckbox`；扩展名编辑区域阻止点击冒泡，
-避免添加或删除扩展名时切换文件类型。
+文件类型与其他文件选择复用手动导入的 `MkCardCheckbox`；扩展名编辑复用非全局组件
+`MkTagsEdit`，通过 `v-model` 编辑草稿的 `otherExtensions`，文件类型中已有的扩展名通过
+`reservedExtensions` 传入用于重复检查。组件内部阻止点击冒泡，避免增删扩展名时切换文件类型；
+输入临时状态随弹窗内容卸载而清理。
 
 表单收集节点的 `component/form-setting/FormSettingTable` 通过 `v-model` 编辑动态表单的
 `FormField[]`，负责增删改、排序和重名检查；`FormFieldDialog` 复用 `MkDynamicsFormConstructor`，
@@ -240,6 +242,9 @@ Break 和 Continue 节点在各自入口维护 `condition`、`condition_list` �
 比较符和逻辑下拉保持 `teleported="false"`，通过 `createAnchorGuard()` 保护锚点。
 
 ### 节点列表排序
+
+`MkFormList` 和 `MkTable` 均为全局自动注册组件，节点模板直接使用，无需手动导入；
+组件 API 与注册规则以 `../components/COMPONENT_README.md` 为准。
 
 普通节点列表、表单行和字段表格统一复用 VueDraggablePlus 支撑的共享排序能力：表单行使用
 `MkFormList` 的 `sortable` 与稳定 `item-key`，字段表格使用 `MkTable` 的 `sortable` 与

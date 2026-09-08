@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem, ToolStoreResponse } from '@/api/types'
-import MkSourceCard from '@/components/mk-source-card/index.vue'
 import ToolStatusSwitch from './ToolStatusSwitch.vue'
 import UpdateVersionButton from './UpdateVersionButton.vue'
 

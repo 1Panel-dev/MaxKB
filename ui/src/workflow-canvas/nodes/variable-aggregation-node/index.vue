@@ -4,7 +4,6 @@ import { cloneDeep } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
 
-import MkFormList from '@/components/mk-form-list/index.vue'
 import GroupFieldDialog from './component/GroupFieldDialog.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'

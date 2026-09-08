@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { nextTick, ref, useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance, FormRules, InputInstance } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus'
 import documentIcon from '@/assets/file-type/file-document-icon.svg'
 import imageIcon from '@/assets/file-type/file-image-icon.svg'
 import audioIcon from '@/assets/file-type/file-audio-icon.svg'
 import videoIcon from '@/assets/file-type/file-video-icon.svg'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
-import { MsgWarning } from '@/utils/message'
+import MkTagsEdit from '@/components/mk-tags-edit/index.vue'
 import { defaultFileUploadSetting } from '../constant'
 import type { FileUploadSettingData } from '../types'
 
@@ -17,9 +17,6 @@ const setting = defineModel<FileUploadSettingData>({ required: true })
 
 // 文件上传设置：打开时创建草稿，确认后回写配置。
 const visible = ref(false)
-const extensionInputVisible = ref(false)
-const extensionInput = ref('')
-const inputRef = useTemplateRef<InputInstance>('inputRef')
 const formRef = useTemplateRef<FormInstance>('formRef')
 const formData = ref<FileUploadSettingData>(cloneDeep(defaultFileUploadSetting))
 const rules: FormRules<FileUploadSettingData> = {
@@ -41,29 +38,7 @@ const fileTypes = [
   { field: 'video', label: '视频', icon: videoIcon, description: 'MP4、AVI、MKV、MOV、FLV、WMV' },
 ] as const
 
-const reservedExtensions = new Set(fileTypes.flatMap(({ description }) => description.split('、')))
-
-function showExtensionInput() {
-  extensionInputVisible.value = true
-  nextTick(() => inputRef.value?.focus())
-}
-
-function confirmExtension() {
-  const extension = extensionInput.value.trim().replace(/^\./, '').toUpperCase()
-  if (extension) {
-    if (reservedExtensions.has(extension) || formData.value.otherExtensions.includes(extension)) {
-      MsgWarning('该扩展名已存在')
-    } else {
-      formData.value.otherExtensions.push(extension)
-    }
-  }
-  extensionInput.value = ''
-  extensionInputVisible.value = false
-}
-
-function removeExtension(extension: string) {
-  formData.value.otherExtensions = formData.value.otherExtensions.filter((item) => item !== extension)
-}
+const reservedExtensions = fileTypes.flatMap(({ description }) => description.split('、'))
 
 function submit() {
   formRef.value?.validate((valid) => {
@@ -81,8 +56,6 @@ function open() {
 
 function resetData() {
   formData.value = cloneDeep(defaultFileUploadSetting)
-  extensionInput.value = ''
-  extensionInputVisible.value = false
   formRef.value?.clearValidate()
 }
 </script>
@@ -126,31 +99,7 @@ function resetData() {
               <img class="shrink-0 w-6" src="@/assets/file-type/unknown-icon.svg" />
               <div class="min-w-0 flex-1">
                 <h6>其他文件</h6>
-                <div class="mt-2 flex flex-wrap gap-2" @click.stop>
-                  <el-tag
-                    v-for="extension in formData.otherExtensions"
-                    :key="extension"
-                    closable
-                    effect="plain"
-                    type="info"
-                    @close="removeExtension(extension)"
-                  >
-                    {{ extension }}
-                  </el-tag>
-                  <el-input
-                    v-if="extensionInputVisible"
-                    ref="inputRef"
-                    v-model="extensionInput"
-                    class="w-24!"
-                    size="small"
-                    @blur="confirmExtension"
-                    @keyup.enter="confirmExtension"
-                  />
-                  <el-button v-else size="small" @click="showExtensionInput">
-                    <MkIcon name="icon_add_outlined" />
-                    添加扩展名
-                  </el-button>
-                </div>
+                <MkTagsEdit v-model="formData.otherExtensions" :reserved-extensions="reservedExtensions" class="mt-2" />
               </div>
             </div>
           </MkCardCheckbox>

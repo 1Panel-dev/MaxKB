@@ -2,7 +2,6 @@
 import { referenceOptionsHelp } from '../../constant'
 import { computed, onMounted, inject } from 'vue'
 import MultiRow from '@/components/mk-dynamics-form/items/MultiRow.vue'
-import MkFormList from '@/components/mk-form-list/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import type { DynamicFormConstructorOption, DynamicFormValidatorCallback, DynamicFormValue, FormField } from '../../type'
 const getModel = inject<() => DynamicFormValue>('getModel')

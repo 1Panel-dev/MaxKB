@@ -3,7 +3,6 @@ import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vu
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
-import MkFormList from '@/components/mk-form-list/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { compareList } from '@/workflow-canvas/config/constants'

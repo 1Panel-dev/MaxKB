@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CaretBottom } from '@element-plus/icons-vue'
 import type { WorkspaceItem } from '@/api/types'
+import MkFilterableDropdown from '@/components/mk-filterable-dropdown/index.vue'
 
 defineOptions({ name: 'WorkspaceDropdown' })
 
