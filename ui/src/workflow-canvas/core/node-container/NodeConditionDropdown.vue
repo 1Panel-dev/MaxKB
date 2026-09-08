@@ -51,7 +51,7 @@ const condition = computed({
 <template>
   <MkDropdown v-if="visible" :teleported="false" trigger="click" placement="bottom" @visible-change="emit('visible-change', $event)">
     <el-button text>
-      <MkIcon :name="condition === 'OR' ? 'icon_any_outlined' : 'icon_all_outlined'" />
+      <MkIcon :name="condition === 'OR' ? 'icon_any_outlined' : 'icon_all_outlined'" :size="20" />
     </el-button>
     <template #dropdown>
       <div class="w-84 px-4 py-3">

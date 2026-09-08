@@ -1,19 +1,3 @@
-<template>
-  <LoopBodyContainer :node-model="model">
-    <div
-      ref="containerRef"
-      class="h-full w-full"
-      @wheel.stop
-      @mousedown.stop
-      @click.stop
-      @dblclick.stop
-      @contextmenu.stop
-      @pointerdown.stop
-      @keydown.stop
-      @keyup.stop
-    />
-  </LoopBodyContainer>
-</template>
 <script setup lang="ts">
 import { inject, onMounted, onUnmounted, shallowRef, useTemplateRef } from 'vue'
 import { cloneDeep, set } from 'lodash'
@@ -188,3 +172,20 @@ onUnmounted(() => {
   lf.value = null
 })
 </script>
+
+<template>
+  <LoopBodyContainer :node-model="model" ref="LoopBodyContainerRef">
+    <div
+      ref="containerRef"
+      class="h-full w-full"
+      @wheel.stop
+      @mousedown.stop
+      @click.stop
+      @dblclick.stop
+      @contextmenu.stop
+      @pointerdown.stop
+      @keydown.stop
+      @keyup.stop
+    />
+  </LoopBodyContainer>
+</template>
