@@ -103,7 +103,7 @@ function mountLoopBodyNode() {
     edges: [],
   }
   let x = model.x
-  let y = model.y + 350
+  let y = model.y + 850
   if (nodeData?.loop_body) workflow = nodeData.loop_body
   if (nodeData?.loop) {
     x = nodeData.loop.x
