@@ -96,7 +96,7 @@ onMounted(() => {
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
         <!-- 重排内容 -->
         <el-form-item
-          class="mk-hide-asterisk"
+          class="mk-hide-asterisk mb-0!"
           prop="reranker_reference_list"
           :rules="{ type: 'array', required: true, message: '请选择重排内容', trigger: 'change' }"
         >
@@ -108,10 +108,11 @@ onMounted(() => {
               </el-button>
             </div>
           </template>
+
           <MkFormList v-model="formData.reranker_reference_list" :default-item="[]" :first-row-has-label="false" :show-add-button="false">
             <template #default="{ index }">
               <el-form-item
-                class="min-w-0 flex-1"
+                class="mb-2! min-w-0 flex-1"
                 :prop="`reranker_reference_list.${index}`"
                 :rules="{ type: 'array', required: true, message: '请选择重排内容', trigger: 'change' }"
               >

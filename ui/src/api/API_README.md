@@ -97,12 +97,6 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 组装为 `{ id_list, folder_id }`，`putBatchDeleteKnowledge` 将 ID 数组组装为 `{ id_list }`，
 分别使用 PUT 请求 `batch_move` 和 `batch_delete`。页面和 Action 负责类型判断及 loading。
 
-### 知识库文档标签
-
-`workspace/knowledge/knowledge.ts` 的 `getKnowledgeTags(knowledgeIds)` 查询所选知识库的全部文档
-标签，返回按标签名称分组的 `KnowledgeTagGroup[]`。工作流页面将查询方法提供给文档标签检索
-节点，节点负责本地搜索和最多 100 项的展示。
-
 ## 枚举与类型组织
 
 API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文档统一维护。

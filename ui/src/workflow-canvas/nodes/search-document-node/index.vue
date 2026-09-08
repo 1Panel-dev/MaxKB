@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { useWorkflowStore } from '@/workflow-canvas/store'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { KnowledgeItem, KnowledgeTagGroup } from '@/api/types'
@@ -16,7 +17,8 @@ import type { SearchDocumentForm } from './types'
 
 defineOptions({ name: 'WorkflowSearchDocumentNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
-const getKnowledgeTags = inject('getKnowledgeTags') as (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
+const apiType = (inject('apiType') as string) || 'workspace'
+const store = useWorkflowStore(apiType)
 const model = getModel()
 const formRef = useTemplateRef<FormInstance>('formRef')
 const questionCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('questionCascaderRef')
@@ -70,7 +72,8 @@ watch(
     allKnowledgeTags.value = []
     formData.value.knowledge_tags = []
     if (!knowledgeIds.length) return
-    getKnowledgeTags(knowledgeIds)
+    store.force
+      .getAllTags(knowledgeIds)
       .then((tags) => {
         if (version !== tagRequestVersion) return
         allKnowledgeTags.value = tags
@@ -142,7 +145,7 @@ onMounted(() => {
           <NodeCascader ref="questionCascaderRef" v-model="formData.question_reference" :node-model="model" placeholder="请选择检索问题" />
         </el-form-item>
         <template v-else>
-          <div class="mb-2 flex items-center gap-2 text-sm text-N600">
+          <div class="-mt-2 mb-2 flex items-center gap-2 text-sm text-N600">
             满足以下
             <el-select
               v-model="formData.search_condition_type"
@@ -164,7 +167,7 @@ onMounted(() => {
             add-text="添加条件"
           >
             <template #default="{ item: condition, index }">
-              <el-form-item class="min-w-0 flex-1">
+              <el-form-item class="small min-w-0 flex-1">
                 <el-select
                   v-model="condition.key"
                   filterable
@@ -178,7 +181,7 @@ onMounted(() => {
                   <el-option v-for="tag in formData.knowledge_tags" :key="tag.key" :label="tag.key" :value="tag.key" />
                 </el-select>
               </el-form-item>
-              <el-form-item class="w-24 shrink-0">
+              <el-form-item class="small w-24 shrink-0">
                 <el-select
                   v-model="condition.compare"
                   :teleported="false"
@@ -188,7 +191,7 @@ onMounted(() => {
                   <el-option v-for="option in compareOptions" :key="option.value" :value="option.value" :label="option.label" />
                 </el-select>
               </el-form-item>
-              <el-form-item class="min-w-0 flex-1">
+              <el-form-item class="small min-w-0 flex-1">
                 <el-input v-model="condition.value" placeholder="值或变量" />
               </el-form-item>
             </template>
