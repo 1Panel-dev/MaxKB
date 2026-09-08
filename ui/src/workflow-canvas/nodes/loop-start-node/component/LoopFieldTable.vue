@@ -38,17 +38,13 @@ import { cloneDeep, set } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import LoopFieldDialog from './LoopFieldDialog.vue'
 import { MsgError } from '@/utils/message'
+import { isLoopBuiltinField } from '../constant'
 
 defineOptions({ name: 'LoopFieldTable' })
 const props = defineProps<{ nodeModel: BaseNodeModel }>()
 
 type WorkflowGraphModel = BaseNodeModel['graphModel'] & { refresh_loop_fields?: (fields: Array<{ label: string; value: string }>) => void }
 type LoopInputField = { field: string; label: string }
-
-const DEFAULT_FIELDS: LoopInputField[] = [
-  { field: 'index', label: '下标' },
-  { field: 'item', label: '循环元素' },
-]
 
 const fieldDialogRef = ref<InstanceType<typeof LoopFieldDialog>>()
 const loopInputFieldList = ref<LoopInputField[]>([])
@@ -85,11 +81,10 @@ function sync() {
 
 onMounted(() => {
   const properties = props.nodeModel.properties as { loop_input_field_list?: LoopInputField[] }
-  if (Array.isArray(properties.loop_input_field_list)) {
-    loopInputFieldList.value = cloneDeep(properties.loop_input_field_list)
-  } else {
-    loopInputFieldList.value = cloneDeep(DEFAULT_FIELDS)
-  }
+  // 内置参数（index/item）由循环引擎提供，作为只读输出参数展示，不进入用户可配置的循环变量列表
+  loopInputFieldList.value = (Array.isArray(properties.loop_input_field_list) ? cloneDeep(properties.loop_input_field_list) : []).filter(
+    (item) => !isLoopBuiltinField(item.field),
+  )
   sync()
 })
 </script>
