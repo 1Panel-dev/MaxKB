@@ -8,7 +8,7 @@ class LoopBodyModel extends WorkflowNodeModel {
   loopLayout?: () => void
 
   getDefaultAnchor(): Model.AnchorConfig[] {
-    return [{ x: this.x, y: this.y - this.height / 2 + 10, id: `${this.id}_children`, type: 'children', edgeAddable: false }]
+    return [{ x: this.x, y: this.y - this.height / 2, id: `${this.id}_children`, type: 'children', edgeAddable: false }]
   }
 
   refreshBranch() {

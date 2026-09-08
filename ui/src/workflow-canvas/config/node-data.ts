@@ -276,7 +276,6 @@ export const parameterExtractionNode = {
   properties: { stepName: '参数提取', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
-
 /* 知识库检索 */
 export const searchKnowledgeNode = {
   type: WorkflowNodeType.SearchKnowledge,
@@ -344,7 +343,6 @@ export const rerankerNode = {
   },
 }
 
-
 /* MCP 调用 */
 export const mcpNode = {
   type: WorkflowNodeType.McpNode,
@@ -361,7 +359,6 @@ export const toolCustomNode = {
   properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
-
 /* 智能体节点 */
 export const applicationNode = {
   type: WorkflowNodeType.Application,
@@ -370,39 +367,47 @@ export const applicationNode = {
   properties: { stepName: '智能体节点', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
-
 /**
  * 工具配置数据
  */
 export const toolLibNode = {
   type: WorkflowNodeType.ToolLib,
-  text: '通过执行自定义脚本，实现数据处理',
-  label: '自定义工具',
-  height: 170,
-  properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
+  text: '工具节点',
+  label: '工具节点',
+  properties: { stepName: '工具节点', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
-/**
- * 工作流工具配置数据
- */
-export const toolWorkflowLibNode = {
-  type: WorkflowNodeType.ToolWorkflowLib,
-  text: '工作流工具',
-  label: '工作流工具',
-  height: 170,
-  properties: { stepName: '工作流工具', config: { fields: [] } },
+/* 循环节点 */
+
+export const loopNode = {
+  type: WorkflowNodeType.LoopNode,
+  visible: false,
+  text: '通过设置循环次数和逻辑，重复执行一系列任务',
+  label: '循环节点',
+  properties: {
+    stepName: '循环节点',
+    workflow: {
+      edges: [],
+      nodes: [
+        {
+          x: 480,
+          y: 200,
+          id: 'loop-start-node',
+          type: 'loop-start-node',
+          properties: { config: { fields: [], globalFields: [] }, fields: [], showNode: true, stepName: '开始', globalFields: [] },
+        },
+      ],
+    },
+    config: { fields: [] },
+  },
 }
-
-
-
 
 export const loopStartNode = {
   id: WorkflowNodeType.LoopStartNode,
   type: WorkflowNodeType.LoopStartNode,
   x: 480,
-  y: 3340,
+  y: 200,
   properties: {
-    height: 364,
     stepName: '循环开始',
     config: {
       fields: [
@@ -415,35 +420,12 @@ export const loopStartNode = {
   },
 }
 
-export const loopNode = {
-  type: WorkflowNodeType.LoopNode,
-  visible: false,
-  text: '通过设置循环次数和逻辑，重复执行一系列任务',
-  label: '循环节点',
-  height: 252,
-  properties: {
-    stepName: '循环节点',
-    workflow: {
-      edges: [],
-      nodes: [
-        {
-          x: 480,
-          y: 3340,
-          id: 'loop-start-node',
-          type: 'loop-start-node',
-          properties: { config: { fields: [], globalFields: [] }, fields: [], height: 361.333, showNode: true, stepName: '开始', globalFields: [] },
-        },
-      ],
-    },
-    config: { fields: [] },
-  },
-}
-
 export const loopBodyNode = {
   type: WorkflowNodeType.LoopBodyNode,
   text: '循环体',
   label: '循环体',
   height: 1080,
+
   properties: { width: 1920, stepName: '循环体', config: { fields: [] } },
 }
 
@@ -451,7 +433,6 @@ export const loopContinueNode = {
   type: WorkflowNodeType.LoopContinueNode,
   text: '用于终止当前循环，执行下次循环',
   label: 'Continue',
-  height: 100,
   properties: { width: 600, stepName: 'Continue', config: { fields: [] } },
 }
 
@@ -459,8 +440,17 @@ export const loopBreakNode = {
   type: WorkflowNodeType.LoopBreakNode,
   text: '终止当前循环，跳出循环体',
   label: 'Break',
-  height: 100,
   properties: { width: 600, stepName: 'Break', config: { fields: [] } },
+}
+
+/**
+ * 工作流工具配置数据
+ */
+export const toolWorkflowLibNode = {
+  type: WorkflowNodeType.ToolWorkflowLib,
+  text: '工作流工具',
+  label: '工作流工具',
+  properties: { stepName: '工作流工具', config: { fields: [] } },
 }
 
 /* 文档分段 */

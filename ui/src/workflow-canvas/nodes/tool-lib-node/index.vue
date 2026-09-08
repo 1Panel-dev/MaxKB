@@ -104,36 +104,38 @@ onMounted(() => {
 
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" hide-required-asterisk @submit.prevent>
+        <!-- 输入参数 -->
         <h6 class="mb-2">输入参数</h6>
         <template v-if="formData.input_field_list.length">
-          <el-form-item
-            v-for="(field, index) in formData.input_field_list"
-            :key="`${field.name}-${index}`"
-            :prop="`input_field_list.${index}.value`"
-            :rules="{
-              required: field.is_required,
-              message: field.source === 'reference' ? '请选择参数' : '请输入参数',
-              trigger: field.source === 'reference' ? 'change' : 'blur',
-            }"
-          >
-            <template #label>
-              <div class="flex w-full items-center gap-1">
-                <span class="max-w-40 truncate" :class="{ 'mk-required': field.is_required }" :title="field.name">{{ field.name }}</span>
-                <el-tooltip v-if="field.desc" :content="field.desc" effect="dark" placement="right">
-                  <MkIcon name="icon_info_outlined" class="text-N600!" />
-                </el-tooltip>
-                <el-tag size="small" type="info">{{ field.type }}</el-tag>
-              </div>
-            </template>
+          <div class="mk-white-card">
+            <el-form-item
+              v-for="(field, index) in formData.input_field_list"
+              :key="`${field.name}-${index}`"
+              :prop="`input_field_list.${index}.value`"
+              :rules="{
+                required: field.is_required,
+                message: field.source === 'reference' ? '请选择参数' : '请输入参数',
+                trigger: field.source === 'reference' ? 'change' : 'blur',
+              }"
+            >
+              <template #label>
+                <div class="flex w-full items-center gap-1">
+                  <span class="max-w-40 truncate" :class="{ 'mk-required': field.is_required }" :title="field.name">{{ field.name }}</span>
+                  <el-tooltip v-if="field.desc" :content="field.desc" effect="dark" placement="right">
+                    <MkIcon name="icon_info_outlined" class="text-N600!" />
+                  </el-tooltip>
+                  <el-tag size="small" type="info">{{ field.type }}</el-tag>
+                </div>
+              </template>
 
-            <NodeCascader v-if="field.source === 'reference'" v-model="field.value" :node-model="model" placeholder="请选择参数" />
-            <el-input v-else v-model="field.value" placeholder="请输入参数" />
-          </el-form-item>
+              <NodeCascader v-if="field.source === 'reference'" v-model="field.value" :node-model="model" placeholder="请选择参数" />
+              <el-input v-else v-model="field.value" placeholder="请输入参数" />
+            </el-form-item>
+          </div>
         </template>
-        <MkEmpty v-else :image-size="60" class="mb-4" />
 
         <!-- 返回内容 -->
-        <div v-if="showReturnContent" class="flex-between w-full">
+        <div v-if="showReturnContent" class="flex-between w-full mt-4">
           <span class="flex items-center gap-1">
             返回内容
             <el-tooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">

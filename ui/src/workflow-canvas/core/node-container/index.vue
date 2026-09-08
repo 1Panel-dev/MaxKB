@@ -273,16 +273,16 @@ onBeforeUnmount(() => {
     >
       <div>
         <div class="flex-between">
-          <div class="flex items-center" @dragstart.prevent @drag.prevent @dragover.prevent @dragend.prevent>
-            <component :is="iconComponent(`${model.type}-icon`)" class="mr-2" :size="24" :item="model?.properties.node_data" />
+          <div class="flex min-w-0 flex-1 items-center" @dragstart.prevent @drag.prevent @dragover.prevent @dragend.prevent>
+            <component :is="iconComponent(`${model.type}-icon`)" class="mr-2 shrink-0" :size="24" :item="model?.properties.node_data" />
             <h4
-              class="truncate break-all"
+              class="truncate"
               :title="String(model.properties.stepName ?? '')"
               v-html="highlightedStepName(String(model.properties.stepName ?? ''))"
             ></h4>
           </div>
 
-          <div class="flex items-center gap-1" @pointerdown.stop @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
+          <div class="flex shrink-0 items-center gap-1" @pointerdown.stop @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode">
               <MkIcon name="icon_down_outlined" />
             </el-button>

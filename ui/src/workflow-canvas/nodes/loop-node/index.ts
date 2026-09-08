@@ -7,7 +7,7 @@ import type { Model } from '@logicflow/core'
 class LoopNodeModel extends WorkflowNodeModel {
   getDefaultAnchor(): Model.AnchorConfig[] {
     const anchors = super.getDefaultAnchor()
-    anchors.push({ x: this.x, y: this.y + this.height / 2 - 25, id: `${this.id}_children`, type: 'children', edgeAddable: false })
+    anchors.push({ x: this.x, y: this.y + this.height / 2, id: `${this.id}_children`, type: 'children', edgeAddable: false })
     return anchors
   }
 
