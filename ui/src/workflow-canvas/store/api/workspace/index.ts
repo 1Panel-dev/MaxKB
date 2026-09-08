@@ -19,6 +19,6 @@ export default {
   getProviderList: providerAPI.getProviderList,
   getModelParamsForm: modelAPI.getModelParamsForm,
   getMcpTools,
-  getAllToolList: toolAPI.getAllTool,
+  getToolListWithShared: toolAPI.getToolListWithShared,
   getToolById: toolAPI.getToolDetail,
 }

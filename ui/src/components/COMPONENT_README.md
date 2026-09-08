@@ -40,6 +40,10 @@ src/components/
 │   │   ├── MoveToDialog.vue
 │   │   ├── VirtualizedTree.vue
 │   │   └── types.ts
+│   ├── select-application-dialog/
+│   │   └── index.vue             # 已发布智能体选择
+│   ├── select-tool-dialog/
+│   │   └── index.vue             # 工具与 Skills 按类型选择
 │   ├── select-knowledge-dialog/
 │   │   └── index.vue             # 关联知识库选择、文件夹与共享资源查询
 │   ├── select-model/
@@ -904,7 +908,8 @@ import MkSourceCard from '@/components/mk-source-card/index.vue'
 ### MkFormList
 
 用于多个业务字段组成的动态表单行，负责重复行布局、添加、删除和可选排序，不管理业务字段、校验规则或
-选项请求。通过 `v-model` 传入行数据，`defaultItem` 创建新行，列表始终至少保留一行。默认插槽
+选项请求。通过 `v-model` 传入行数据，`defaultItem` 创建新行，`minRows` 默认值为 `1`，控制删除时保留的最小行数；
+允许删除到空列表时传入 `:min-rows="0"`。组件不会自动补齐初始行。默认插槽
 提供 `item`、`index`，业务组件在插槽中继续声明
 `el-form-item`、字段路径和校验规则。
 
@@ -1172,6 +1177,18 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 知识库，不使用滚动分页。支持按名称搜索，跨文件夹和搜索保留选择，并限制新选知识库使用
 相同的 Embedding 模型。固定业务请求由
 该组件负责，调用方维护最终关联 ID 和快照。
+
+### SelectApplicationDialog、SelectToolDialog
+
+手动导入 `business/select-application-dialog/index.vue` 和 `business/select-tool-dialog/index.vue`。
+两者沿用知识库选择弹窗的目录、名称搜索、三列卡片、悬停详情、跨目录选择和清空交互；
+`open()` 接收已选资源对象数组，`submit` 返回深拷贝后的资源对象数组，兼容只有 ID 的旧数据。
+每次打开先重置临时状态；取消不提交，过期请求不写回。
+
+智能体通过 `getAllApplication` 全量查询已发布资源，不展示共享目录。工具通过工作空间或共享
+`getAllTool` 全量查询，仅展示启用资源；`toolTypes` 默认包含自定义、工作流和内置工具，
+Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两者支持 `excludedIds`，
+供调用方排除当前智能体或工具，避免直接自引用。弹窗不使用滚动分页。
 
 ### SelectModel
 

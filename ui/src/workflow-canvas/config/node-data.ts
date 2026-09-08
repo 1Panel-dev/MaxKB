@@ -300,9 +300,7 @@ export const searchDocumentNode = {
   type: WorkflowNodeType.SearchDocument,
   text: '从设定的检索范围中，根据文档标签检索出满足条件的文档',
   label: '文档标签检索',
-  height: 355,
   properties: {
-    width: 600,
     stepName: '文档标签检索',
     config: {
       fields: [
@@ -318,7 +316,6 @@ export const documentExtractNode = {
   type: WorkflowNodeType.DocumentExtractNode,
   text: '解析输入文档，输出结构化文档内容',
   label: '文档内容提取',
-  height: 252,
   properties: {
     stepName: '文档内容提取',
     config: {
@@ -335,7 +332,6 @@ export const rerankerNode = {
   type: WorkflowNodeType.RerankerNode,
   text: '使用重排模型对多个知识库的检索结果进行二次召回',
   label: '多路召回',
-  height: 252,
   properties: {
     stepName: '多路召回',
     config: {

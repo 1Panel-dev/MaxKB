@@ -94,6 +94,7 @@
   </NodeContainer>
 </template>
 <script setup lang="ts">
+import { TOOL_TYPE } from '@/api/enums'
 import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import { set } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
@@ -385,7 +386,7 @@ const validate = () => {
 }
 
 async function getMcpToolSelectOptions() {
-  const tools = await store.getAllToolList({ folder_id: 'default', tool_type_list: ['MCP'] })
+  const tools = await store.getToolListWithShared({ tool_type: TOOL_TYPE.MCP })
   mcpToolSelectOptions.value = tools.filter((item) => item.is_active)
 }
 

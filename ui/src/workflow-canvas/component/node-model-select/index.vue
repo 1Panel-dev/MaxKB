@@ -15,16 +15,20 @@ const props = withDefaults(
     nodeModel: WorkflowNodeModel
     formData: NodeModelData
     fields?: NodeModelFields
+    canEditParams?: boolean
+    canAdd?: boolean
     modelType: DefaultModelType
     label: string
     options: ModelItem[]
     providerOptions: ModelProviderItem[]
   }>(),
   {
+    canEditParams: true,
+    canAdd: false,
     fields: () => ({ source: 'model_id_type', id: 'model_id', reference: 'model_id_reference', params: 'model_params_setting' }),
   },
 )
-const emit = defineEmits<{ update: [patch: Partial<NodeModelData>] }>()
+const emit = defineEmits<{ update: [patch: Partial<NodeModelData>]; refresh: [] }>()
 const formItemRef = useTemplateRef<FormItemInstance>('formItemRef')
 const modelCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('modelCascaderRef')
 
@@ -38,6 +42,10 @@ const formProp = computed(() => (source.value === 'reference' ? props.fields.ref
 function changeSource(value: NodeModelSource) {
   emit('update', { [props.fields.source]: value, [props.fields.reference]: [] })
   nextTick(() => formItemRef.value?.clearValidate())
+}
+
+function updateModelParams(params: Record<string, unknown>) {
+  if (props.canEditParams && props.fields.params) emit('update', { [props.fields.params]: params })
 }
 
 // 注册到节点的外层表单，引用有效性失败也由同一个表单项展示。
@@ -96,13 +104,15 @@ onBeforeUnmount(() => anchorGuard.reset())
     <SelectModel
       v-else-if="source === 'custom'"
       :model-value="modelId"
-      :model-params="formData[fields.params]"
+      :model-params="fields.params ? formData[fields.params] : undefined"
       :options="options"
       :provider-options="providerOptions"
-      can-edit-params
+      :can-edit-params="canEditParams && !!fields.params"
+      :can-add="canAdd"
       :placeholder="`请选择${label}`"
       @update:model-value="emit('update', { [fields.id]: $event })"
-      @update:model-params="emit('update', { [fields.params]: $event })"
+      @update:model-params="updateModelParams"
+      @refresh="emit('refresh')"
       @visible-change="anchorGuard.setOverlayVisible('model', $event)"
       @wheel="handleNodeWheel"
     />

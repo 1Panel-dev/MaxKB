@@ -10,6 +10,7 @@ const props = withDefaults(
     addText?: string
     defaultItem: T | (() => T)
     firstRowHasLabel?: boolean
+    minRows?: number
     showAddButton?: boolean
     sortable?: boolean
     itemKey?: keyof T | ((item: T) => string | number)
@@ -17,6 +18,7 @@ const props = withDefaults(
   {
     addText: '添加',
     firstRowHasLabel: true,
+    minRows: 1,
     showAddButton: true,
     sortable: false,
   },
@@ -60,7 +62,7 @@ function addRow() {
 }
 
 function removeRow(index: number) {
-  if (formRows.value.length === 1) return
+  if (formRows.value.length <= props.minRows) return
   const removedItem = formRows.value[index] as T
   formRows.value = cloneDeep(formRows.value.filter((_, rowIndex) => rowIndex !== index))
   emit('remove', removedItem, index)
@@ -82,7 +84,7 @@ function removeRow(index: number) {
       </el-button>
       <slot :index="index" :item="item" />
       <el-form-item class="shrink-0" :class="firstRowHasLabel ? (index === 0 ? 'mt-8' : 'mt-0.5') : 'mt-1'">
-        <el-button :disabled="formRows.length === 1" text @click="removeRow(index)">
+        <el-button :disabled="formRows.length <= minRows" text @click="removeRow(index)">
           <MkIcon name="icon_delete-trash_outlined" class="text-N600" />
         </el-button>
       </el-form-item>

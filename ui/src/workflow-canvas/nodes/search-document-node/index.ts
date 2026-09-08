@@ -8,4 +8,12 @@ class SearchDocumentNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.SearchDocument, model: WorkflowNodeModel, view: SearchDocumentNodeView }
+class SearchDocumentNodeModel extends WorkflowNodeModel {
+  override setAttributes() {
+    super.setAttributes()
+    this.width = 455
+    this.properties.width = 455
+  }
+}
+
+export default { type: WorkflowNodeType.SearchDocument, model: SearchDocumentNodeModel, view: SearchDocumentNodeView }

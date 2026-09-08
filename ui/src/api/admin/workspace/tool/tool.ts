@@ -8,9 +8,17 @@ const getPrefix = () => {
   return `/workspace/${workspaceId}/tool`
 }
 
-/** 获取不分页的全部工具列表。 */
+/** 获取支持 folder_id 筛选的工作空间工具非分页列表。 */
 const getAllTool = (query?: Dict<unknown>) => {
   return get<{ tools: ToolItem[] }>(`${getPrefix()}`, query).then(({ tools }) => tools)
+}
+
+/** 获取包含已授权共享工具的非分页列表。 */
+const getToolListWithShared = (query?: Dict<unknown>) => {
+  return get<{ tools: ToolItem[]; shared_tools: ToolItem[] }>(`${getPrefix()}/tool_list`, query).then(({ tools, shared_tools }) => [
+    ...tools,
+    ...shared_tools,
+  ])
 }
 
 /** 获取工具分页列表。 */
@@ -110,4 +118,5 @@ export default {
   putBatchMoveTools,
   putTool,
   getAllTool,
+  getToolListWithShared,
 }
