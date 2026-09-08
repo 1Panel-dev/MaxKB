@@ -51,10 +51,6 @@ const showReturnContent = computed(() =>
   [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
 )
 
-function validate() {
-  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error })) ?? Promise.resolve()
-}
-
 // 工具参数按名称和来源合并，保留已有引用或自定义值。
 function createInputField(field: ToolInputField, previousFields: ToolNodeInputField[]): ToolNodeInputField {
   const previousField = previousFields.find((item) => item.name === field.name && item.source === field.source)
@@ -91,6 +87,9 @@ function refreshToolFields() {
     })
 }
 
+function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error })) ?? Promise.resolve()
+}
 onMounted(() => {
   if (formData.value.is_result === undefined && isLastNode(model)) formData.value.is_result = true
   refreshToolFields()

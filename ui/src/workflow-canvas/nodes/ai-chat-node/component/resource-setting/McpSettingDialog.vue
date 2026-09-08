@@ -114,7 +114,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
       <el-button type="primary" @click="submit">确定</el-button>
     </template>
   </MkDialog>

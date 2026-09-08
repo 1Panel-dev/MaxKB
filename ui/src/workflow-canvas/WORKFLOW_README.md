@@ -20,7 +20,7 @@
 
 ```text
 src/workflow-canvas/
-├── component/          # 画布内可复用的控制和搜索组件
+├── component/          # 画布内可复用的控制、搜索和节点设置组件
 ├── config/             # 节点数据、映射、常量及预留的本地化配置
 ├── details/            # 执行详情：顶层分发入口与公共卡壳，节点内容由 nodes/*/details/ 提供
 ├── core/               # 稳定的画布内核与所有节点共用的基础能力
@@ -30,6 +30,7 @@ src/workflow-canvas/
 ├── node-menu/          # 基础组件、工具和智能体节点菜单及其菜单配置
 ├── nodes/              # 已迁入节点的注册文件和 Vue 实现
 ├── plugins/            # 仅供画布使用的 LogicFlow 插件
+├── store/              # 按资源范围适配查询接口，提供缓存及在途请求去重
 ├── index.vue           # 画布入口组件 WorkflowCanvas
 ├── style.scss          # 画布内 LogicFlow 全局样式覆盖
 ├── types.ts            # 画布协议类型和枚举
@@ -172,6 +173,11 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 节点入口深拷贝写回列表并发送原有字段刷新事件，保留显隐条件引用校验。用户输入与接口传参继续
 交叉检查参数重名；`UserInputSettingDialog` 独立维护直接展示参数设置，删除字段时由表格清理对应设置。
 
+基本信息节点的 `component/FileUploadSettingDialog.vue` 同时封装文件上传设置按钮与弹窗，
+通过 `v-model` 接收 `FileUploadSetting`。节点入口根据上传开关挂载组件，并在配置写回后发送
+`refreshFileUploadConfig` 刷新开始节点文件变量；弹窗打开时重置并深拷贝草稿，确认时保留上传方式
+校验，取消不修改节点，关闭动画结束后统一清理草稿。
+
 表单收集节点的 `component/form-setting/FormSettingTable` 通过 `v-model` 编辑动态表单的
 `FormField[]`，负责增删改、排序和重名检查；`FormFieldDialog` 复用 `MkDynamicsFormConstructor`，
 通过 `submit(data, index?)` 提交，由表格写回后调用 `close()`，关闭动画结束时重置编辑状态。
@@ -191,7 +197,11 @@ ID 数组及 `tool_list`、`skill_tool_list`、`application_list` 回显快照�
 已关联但缺少详情的资源保留 ID 回退展示。
 
 AI 对话节点的提示词、历史记录、视觉理解和输出思考表单直接在节点入口维护，统一使用全局
-`MdEditorMagnify` 和节点表单样式；AI 提示词生成与思考过程配置仍使用独立弹窗。
+`MdEditorMagnify` 和节点表单样式；AI 提示词生成使用独立弹窗。AI 对话、图片理解和视频理解节点的
+输出思考设置统一复用 `component/ThinkingSetting.vue`，后续同类入口也应引用该组件。组件通过
+`v-model` 接收 `types.ts` 中的共享配置类型 `ReasoningSettingData`；节点入口维护输出思考开关，
+并根据开关用 `v-if` 挂载设置组件。弹窗打开时重置并深拷贝草稿，仅在校验通过并保存后回写，
+取消不修改节点，关闭动画结束后重置草稿及校验状态。当前开始、结束标签未配置必填规则。
 问题优化、图片理解和视频理解节点的系统提示词与用户提示词，以及图片、文生视频和图生视频
 节点的正向与负向提示词同样使用 `MdEditorMagnify`，必填字段由所在节点表单统一校验。
 
@@ -279,16 +289,16 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 
 - 所有画布路由页面均放在 `src/views/workflow/`，并以 `XxxWorkflowView.vue` 命名，例如
   `ApplicationWorkflowView.vue`。未来的智能体画布、知识库画布等都遵守此规则。
-- View 在 `MkWorkflow` 外部组织页面头部的保存、发布、调试等页面级操作；添加组件属于画布操作，
-  由 `MkWorkflow` 内的 `AddNode` 统一提供。
+- View 在 `WorkflowCanvas` 外部组织页面头部的保存、发布、调试等页面级操作；添加组件属于画布操作，
+  由 `WorkflowCanvas` 内的 `AddNode` 统一提供。
 - 画布页面需要独立全屏展示时，由 `src/router/admin/workflow/` 配置不挂载业务 Layout 的路由；
   画布模块不处理路由。
 - View 通过 Props 传入图数据，通过组件实例暴露的方法操作画布。接口接入后，加载、保存及错误
   处理仍由 View 或其所属业务层编排，不在节点和画布核心中直接发请求。
-- View 向 `MkWorkflow` 传入 `workflowMode`；`MkWorkflow` 将它用于右上角添加组件菜单，并桥接给
+- View 向 `WorkflowCanvas` 传入 `workflowMode`；`WorkflowCanvas` 将它用于右上角添加组件菜单，并桥接给
   LogicFlow 节点内部的锚点菜单。
 
-`MkWorkflow` 当前对外暴露的方法包括：
+`WorkflowCanvas` 当前对外暴露的方法包括：
 
 | 方法              | 用途                        |
 | ----------------- | --------------------------- |
@@ -321,7 +331,8 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 
 - 已实现并注册：基本信息、开始、AI 对话、意图识别、问题优化、语音转文本、文本转语音、图片生成、
   图片理解、文生视频、图生视频、视频理解、知识库检索、判断器、指定回复、智能体、自定义工具和
-  工具库工具、文档内容提取、多路召回和文档标签检索。
+  工具库工具、工具工作流、MCP、文档内容提取、多路召回和文档标签检索，以及参数提取、表单收集、
+  变量赋值、变量聚合、变量拆分、循环、循环体、循环开始、Break、Continue、工具基本信息和工具开始节点。
 - 知识库检索节点在入口维护检索范围、参数摘要和问题表单，参数设置按钮与弹窗统一封装在
   `component/SearchSetting.vue`，通过 `v-model` 接收检索参数，仅在校验通过并保存后深拷贝回写；
   节点入口统一维护关联数据，范围引用加入节点表单校验，问题引用保留独立有效性检查。知识库选择复用
@@ -339,9 +350,12 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 
 ```bash
 npm run type-check
-npm run lint
+npx eslint <本次修改的Vue或TypeScript文件>
 git diff --check
 ```
+
+当前 `npm run lint` 尚未配置对应的 `lint:*` 子脚本，不能替代实际 ESLint 检查。
+仅修改 Markdown 文档时，检查修改文件的 Prettier 格式、路径引用及 `git diff --check` 即可。
 
 若当前迁移中的预留文件仍存在已知类型错误，应在交付说明中明确区分，不要通过改变现有画布业务
 逻辑来绕过。

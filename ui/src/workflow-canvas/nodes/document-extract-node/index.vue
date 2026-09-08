@@ -11,7 +11,6 @@ defineOptions({ name: 'WorkflowDocumentExtractNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const model = getModel()
 const formRef = useTemplateRef<FormInstance>('formRef')
-const documentCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('documentCascaderRef')
 
 interface DocumentExtractForm {
   document_list: string[]
@@ -26,8 +25,8 @@ model.properties.node_data = {
 }
 const formData = computed(() => model.properties.node_data as DocumentExtractForm)
 
-function validate() {
-  return Promise.all([documentCascaderRef.value?.validate(), formRef.value?.validate()]).catch((error) =>
+async function validate() {
+  return formRef.value?.validate().catch((error) =>
     Promise.reject({ node: model, errMessage: error }),
   )
 }

@@ -17,7 +17,6 @@ defineOptions({ name: 'WorkflowSearchKnowledgeNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const model = getModel()
 const formRef = useTemplateRef<FormInstance>('formRef')
-const questionReferenceRef = useTemplateRef<InstanceType<typeof NodeCascader>>('questionReferenceRef')
 
 // 初始化时补齐旧工作流缺失的字段，读取表单时不再改写节点数据。
 const defaultForm: SearchKnowledgeNodeForm = {
@@ -80,10 +79,8 @@ const settingRows = computed(() => [
 ])
 
 // 检索范围由组件加入表单校验，检索问题保留原有引用有效性检查。
-function validate() {
-  return Promise.all([questionReferenceRef.value?.validate(), formRef.value?.validate()]).catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
+async function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {

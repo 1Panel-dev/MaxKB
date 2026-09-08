@@ -294,7 +294,7 @@ Dialog 外壳仅在首次打开时挂载；默认在关闭动画结束、触发 
   <template #subtitle>创建后可继续添加工作空间成员。</template>
   <el-form>...</el-form>
   <template #footer>
-    <el-button @click="visible = false">取消</el-button>
+    <el-button plain @click="visible = false">取消</el-button>
     <el-button type="primary">创建</el-button>
   </template>
 </MkDialog>
@@ -313,7 +313,7 @@ Escape 关闭；这些默认行为可以通过同名 Props 覆盖。Element Plus
 <MkDrawer v-model="visible" title="创建用户" size="600">
   <el-form>...</el-form>
   <template #footer>
-    <el-button @click="visible = false">取消</el-button>
+    <el-button plain @click="visible = false">取消</el-button>
     <el-button type="primary">创建</el-button>
   </template>
 </MkDrawer>
