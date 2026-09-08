@@ -221,6 +221,12 @@ Vue `computed` 的 `set` 和原生 `Map.set()` 按各自 API 正常使用。
 工具和工具循环模式展示。新节点和旧节点缺失字段时的处理沿用 v2 对应节点行为；AI 对话和
 问题优化节点会在旧数据缺少该字段且节点位于流程末尾时启用返回内容。
 
+Break 和 Continue 节点在各自入口维护 `condition`、`condition_list` 条件表单，复用 `MkFormList`
+完成增删，显式设置 `minRows` 为 `0`，保留 v2 的默认空列表及允许删除最后一项的行为。
+多条条件时显示“所有／任一”；比较符复用 `config/constants.ts` 的 `compareList`，为空、不为空、
+为真、不为真时隐藏比较值并跳过其必填校验，不改写已保存的比较值。节点级校验统一调用外层表单，
+比较符和逻辑下拉保持 `teleported="false"`，通过 `createAnchorGuard()` 保护锚点。
+
 ### 节点列表排序
 
 普通节点列表、表单行和字段表格统一复用 VueDraggablePlus 支撑的共享排序能力：表单行使用

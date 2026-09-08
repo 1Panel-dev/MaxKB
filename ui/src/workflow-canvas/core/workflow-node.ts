@@ -98,8 +98,10 @@ export class WorkflowNodeView extends HtmlNode {
     const { x, y, type } = anchorData
     const nodeModel = this.props.model as unknown as WorkflowNodeModel
     const canOpenNodeMenu = type === 'right' && typeof nodeModel.openNodeMenu === 'function'
-    const connected = this.props.graphModel.edges.some((edge) =>
-      type === 'left' ? edge.targetAnchorId === anchorData.id : edge.sourceAnchorId === anchorData.id,
+    const connected = this.props.graphModel.edges.some(
+      (edge) =>
+        (edge.sourceNodeId === nodeModel.id && edge.sourceAnchorId === anchorData.id) ||
+        (edge.targetNodeId === nodeModel.id && edge.targetAnchorId === anchorData.id),
     )
 
     return createLogicFlowElement(
