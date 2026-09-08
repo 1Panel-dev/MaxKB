@@ -1,134 +1,6 @@
-<template>
-  <NodeContainer :node-model="model">
-    <h6 class="mb-3">节点设置</h6>
-    <div class="border-r-6 layout-bg lighter mb-8 p-8-12">
-      <el-form
-        ref="mcpNodeFormRef"
-        :model="form_data"
-        label-position="top"
-        require-asterisk-position="right"
-        label-width="auto"
-        hide-required-asterisk
-        @submit.prevent
-      >
-        <el-form-item label="MCP Server Config">
-          <template #label>
-            <div class="flex-between">
-              <div>MCP Server Config<span class="text-danger">*</span></div>
-              <el-select :teleported="false" v-model="form_data.mcp_source" size="small" style="width: 85px">
-                <el-option label="引用变量" value="referencing" />
-                <el-option label="自定义" value="custom" />
-              </el-select>
-            </div>
-          </template>
-          <MdEditorMagnify
-            v-if="form_data.mcp_source === 'custom'"
-            title="MCP Server Config"
-            v-model="form_data.mcp_servers"
-            style="height: 150px"
-            :placeholder="mcpServerJson"
-            @wheel="handleNodeWheel"
-          />
-          <el-select v-else :teleported="false" v-model="form_data.mcp_tool_id" filterable @change="mcpToolSelectChange" @wheel="handleNodeWheel">
-            <el-option v-for="mcpTool in mcpToolSelectOptions" :key="mcpTool.id" :label="mcpTool.name" :value="mcpTool.id">
-              <div class="flex items-center">
-                <ToolIcon v-if="!mcpTool.icon" :size="20" :type="mcpTool.tool_type" class="mr-2" />
-                <el-avatar v-else shape="square" :size="20" class="mr-2" style="background: none">
-                  <img :src="mcpTool.icon" alt="" />
-                </el-avatar>
-                <span>{{ mcpTool.name }}</span>
-                <el-tag v-if="mcpTool.scope === 'SHARED'" size="small" type="info" class="info-tag ml-2">共享</el-tag>
-              </div>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <template #label>
-            <div class="flex-between">
-              <span>工具</span>
-              <el-button type="primary" link @click="getTools">
-                <MkIcon name="icon_add_outlined" class="mr-1" />
-                获取工具
-              </el-button>
-            </div>
-          </template>
-          <el-select v-model="form_data.mcp_tool" filterable :teleported="false" @change="changeTool" @wheel="handleNodeWheel">
-            <el-option v-for="item in form_data.mcp_tools" :key="item.name" :label="item.name" :value="item.name" class="flex items-center">
-              <el-tooltip effect="dark" :content="item.description" placement="top-start" popper-class="max-w-350">
-                <MkIcon name="icon_warning_filled" />
-              </el-tooltip>
-              <span class="ml-4">{{ item.name }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </div>
-    <h6 class="mb-3">工具参数</h6>
-    <div v-if="form_data.mcp_tool" class="border-r-6 layout-bg lighter p-8-12">
-      <el-form
-        ref="dynamicsFormRef"
-        label-position="top"
-        v-loading="loading"
-        require-asterisk-position="right"
-        :hide-required-asterisk="true"
-        @submit.prevent
-      >
-        <el-form-item v-for="item in form_data.tool_form_field" :key="item.field" :required="item.required">
-          <template #label>
-            <div class="flex-between">
-              <div>
-                <TooltipLabel v-if="item.label.attrs?.tooltip" :label="item.label" :required="item.required" />
-                <span v-else>{{ item.label.label }}</span>
-                <span v-if="item.required" class="text-danger">*</span>
-              </div>
-              <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px" @change="setParamValue(item, '')">
-                <el-option label="引用变量" value="referencing" />
-                <el-option label="自定义" value="custom" />
-              </el-select>
-            </div>
-          </template>
-          <el-input
-            v-if="item.source === 'custom' && item.input_type === 'TextInput'"
-            :model-value="paramsOf()[item.label.label]"
-            @update:model-value="setParamValue(item, $event)"
-          />
-          <el-input-number
-            v-else-if="item.source === 'custom' && item.input_type === 'NumberInput'"
-            :model-value="paramsOf()[item.label.label]"
-            @update:model-value="setParamValue(item, $event)"
-          />
-          <el-switch
-            v-else-if="item.source === 'custom' && item.input_type === 'SwitchInput'"
-            :model-value="paramsOf()[item.label.label]"
-            @update:model-value="setParamValue(item, $event)"
-          />
-          <el-input
-            v-else-if="item.source === 'custom' && item.input_type === 'JsonInput'"
-            :model-value="paramsOf()[item.label.label]"
-            @update:model-value="setParamValue(item, $event)"
-            type="textarea"
-          />
-          <NodeCascader
-            v-if="item.source === 'referencing'"
-            :ref="setCascaderRef"
-            :node-model="model"
-            class="w-full"
-            placeholder="请选择变量"
-            :model-value="paramsOf()[item.label.label] as string[]"
-            @update:model-value="setParamValue(item, $event)"
-          />
-        </el-form-item>
-      </el-form>
-    </div>
-    <div v-else class="border-r-6 layout-bg lighter p-8-12">
-      <el-text type="info">暂无数据</el-text>
-    </div>
-    <McpServerInputDialog ref="mcpServerInputDialogRef" @refresh="handleMcpVariables" />
-  </NodeContainer>
-</template>
 <script setup lang="ts">
 import { TOOL_TYPE } from '@/api/enums'
-import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
+import { computed, inject, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { set } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
@@ -234,14 +106,12 @@ const form_data = computed<McpNodeData>({
 const mcpNodeFormRef = useTemplateRef<FormInstance>('mcpNodeFormRef')
 const dynamicsFormRef = useTemplateRef<FormInstance>('dynamicsFormRef')
 const mcpServerInputDialogRef = useTemplateRef<InstanceType<typeof McpServerInputDialog>>('mcpServerInputDialogRef')
-const nodeCascaderRef: Ref<Array<{ validate: () => Promise<unknown> }>> = ref([])
 const loading = ref(false)
 const mcpToolSelectOptions = ref<ToolItem[]>([])
+const mcpConfigProp = computed(() => (form_data.value.mcp_source === 'custom' ? 'mcp_servers' : 'mcp_tool_id'))
 
-function setCascaderRef(el: unknown) {
-  if (el && !nodeCascaderRef.value.includes(el as { validate: () => Promise<unknown> })) {
-    nodeCascaderRef.value.push(el as { validate: () => Promise<unknown> })
-  }
+function changeMcpSource() {
+  nextTick(() => mcpNodeFormRef.value?.clearValidate(['mcp_servers', 'mcp_tool_id']))
 }
 
 function paramsOf(): Record<string, unknown> {
@@ -250,6 +120,12 @@ function paramsOf(): Record<string, unknown> {
     return (params[form_data.value.params_nested] as Record<string, unknown>) ?? {}
   }
   return params
+}
+
+// 引用参数只向级联选择器传入字符串路径，未填写或旧的非路径值按空选项展示。
+function getParamReference(item: ToolFormFieldItem): string[] {
+  const value = paramsOf()[item.label.label]
+  return Array.isArray(value) && value.every((segment): segment is string => typeof segment === 'string') ? value : []
 }
 
 function setParamValue(item: ToolFormFieldItem, value: unknown) {
@@ -269,20 +145,14 @@ async function mcpToolSelectChange() {
   form_data.value.mcp_servers = tool?.code ?? ''
 }
 
-function getTools() {
-  if (form_data.value.mcp_source === 'referencing' && !form_data.value.mcp_tool_id) {
-    MsgError('请先选择引用的 MCP 工具')
-    return
-  }
+async function getTools() {
+  const valid = await mcpNodeFormRef.value?.validateField(mcpConfigProp.value).catch(() => false)
+  if (!valid) return
   if (form_data.value.mcp_source === 'referencing' && form_data.value.mcp_tool_id) {
     if (!mcpToolSelectOptions.value.find((item) => item.id === form_data.value.mcp_tool_id)) {
       MsgError('请先选择引用的 MCP 工具')
       return
     }
-  }
-  if (form_data.value.mcp_source === 'custom' && !form_data.value.mcp_servers) {
-    MsgError('请先配置 MCP Server')
-    return
   }
   try {
     JSON.parse(form_data.value.mcp_servers)
@@ -406,16 +276,15 @@ const validate = () => {
     for (const item of requiredFields) {
       const value = paramsOf()[item.label.label]
       if (value === undefined || value === null || value === '') {
-        vList.push(Promise.reject(`${item.label.label} 为必填项`))
+        vList.push(Promise.reject(`请输入 ${item.label.label}`))
       }
     }
   }
   if (dynamicsFormRef.value || mcpNodeFormRef.value) {
-    if (!form_data.value.mcp_servers) vList.push(Promise.reject('请先配置 MCP Server'))
     if (!form_data.value.mcp_tool) vList.push(Promise.reject('请选择 MCP 工具'))
   }
-  const cascaderResults = nodeCascaderRef.value.map((item) => item.validate())
-  return Promise.all([...vList, ...cascaderResults]).catch((error) => Promise.reject({ node: model, errMessage: error }))
+  if (mcpNodeFormRef.value) vList.push(mcpNodeFormRef.value.validate())
+  return Promise.all([...vList]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 async function getMcpToolSelectOptions() {
@@ -431,12 +300,145 @@ onMounted(() => {
   getMcpToolSelectOptions()
 })
 </script>
-<style lang="scss" scoped>
-:deep(.app-warning-icon) {
-  color: var(--el-color-primary-light-5);
+<template>
+  <NodeContainer :node-model="model">
+    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <div class="mk-gray-card">
+      <el-form ref="mcpNodeFormRef" :model="form_data" label-position="top" require-asterisk-position="right" @submit.prevent>
+        <!-- MCP Server Config -->
+        <el-form-item
+          label="MCP Server Config"
+          :prop="mcpConfigProp"
+          class="mk-hide-asterisk"
+          :rules="[
+            {
+              required: true,
+              message: form_data.mcp_source === 'custom' ? '请先配置 MCP Server' : '请先选择引用的 MCP 工具',
+              trigger: ['change', 'blur'],
+            },
+          ]"
+        >
+          <template #label>
+            <div class="flex-between">
+              <span class="mk-required">MCP Server Config</span>
+              <el-select
+                :teleported="false"
+                v-model="form_data.mcp_source"
+                :validate-event="false"
+                size="small"
+                class="w-23!"
+                @change="changeMcpSource"
+              >
+                <el-option label="引用 MCP" value="referencing" />
+                <el-option label="自定义" value="custom" />
+              </el-select>
+            </div>
+          </template>
+          <MdEditorMagnify
+            v-if="form_data.mcp_source === 'custom'"
+            title="MCP Server Config"
+            v-model="form_data.mcp_servers"
+            :placeholder="mcpServerJson"
+            @wheel="handleNodeWheel"
+          />
+          <el-select v-else :teleported="false" v-model="form_data.mcp_tool_id" filterable @change="mcpToolSelectChange" @wheel="handleNodeWheel">
+            <template v-for="mcpTool in mcpToolSelectOptions" :key="mcpTool.id">
+              <el-option :label="mcpTool.name" :value="mcpTool.id">
+                <div class="flex items-center gap-2">
+                  <ToolIcon :size="20" :icon="mcpTool.icon" :type="mcpTool.tool_type" />
+                  <span>{{ mcpTool.name }}</span>
+                  <el-tag v-if="mcpTool.scope === 'SHARED'" size="small" type="info">共享</el-tag>
+                </div>
+              </el-option>
+            </template>
+          </el-select>
+        </el-form-item>
 
-  &:hover {
-    color: var(--el-color-primary-light-3);
-  }
-}
-</style>
+        <!-- 工具 -->
+        <el-form-item>
+          <template #label>
+            <div class="flex-between">
+              <span>工具</span>
+              <el-button type="primary" text @click="getTools">
+                <MkIcon name="icon_refresh_outlined" />
+              </el-button>
+            </div>
+          </template>
+          <el-select v-model="form_data.mcp_tool" filterable :teleported="false" @change="changeTool" @wheel="handleNodeWheel">
+            <el-option v-for="item in form_data.mcp_tools" :key="item.name" :label="item.name" :value="item.name">
+              <div class="flex items-center gap-1">
+                <el-tooltip :content="item.description" placement="top-start">
+                  <MkIcon name="icon_info_outlined" class="text-N600!" />
+                </el-tooltip>
+                <span>{{ item.name }}</span>
+              </div>
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+    </div>
+    <!-- 工具参数 -->
+    <h6 class="mk-title-decoration mb-2 mt-2">工具参数</h6>
+    <div class="mk-gray-card">
+      <el-form
+        v-if="form_data.mcp_tool"
+        ref="dynamicsFormRef"
+        label-position="top"
+        v-loading="loading"
+        require-asterisk-position="right"
+        :hide-required-asterisk="true"
+        @submit.prevent
+      >
+        <el-form-item class="mk-hide-asterisk" v-for="item in form_data.tool_form_field" :key="item.field" :required="item.required">
+          <template #label>
+            <div class="flex-between">
+              <TooltipLabel v-if="item.label.attrs?.tooltip" :label="item.label" :required="item.required" />
+              <span v-else :class="item.required ? 'mk-required' : ''">{{ item.label.label }}</span>
+
+              <el-select :teleported="false" v-model="item.source" size="small" class="w-21!" @change="setParamValue(item, '')">
+                <el-option label="引用变量" value="referencing" />
+                <el-option label="自定义" value="custom" />
+              </el-select>
+            </div>
+          </template>
+          <el-input
+            v-if="item.source === 'custom' && item.input_type === 'TextInput'"
+            :model-value="paramsOf()[item.label.label]"
+            @update:model-value="setParamValue(item, $event)"
+            placeholder="请输入"
+          />
+          <el-input-number
+            v-else-if="item.source === 'custom' && item.input_type === 'NumberInput'"
+            :model-value="paramsOf()[item.label.label]"
+            @update:model-value="setParamValue(item, $event)"
+            placeholder="请输入"
+          />
+          <el-switch
+            v-else-if="item.source === 'custom' && item.input_type === 'SwitchInput'"
+            :model-value="paramsOf()[item.label.label]"
+            @update:model-value="setParamValue(item, $event)"
+            placeholder="请输入"
+          />
+          <el-input
+            v-else-if="item.source === 'custom' && item.input_type === 'JsonInput'"
+            :model-value="paramsOf()[item.label.label]"
+            @update:model-value="setParamValue(item, $event)"
+            type="textarea"
+            placeholder="请输入"
+          />
+          <NodeCascader
+            v-if="item.source === 'referencing'"
+            :node-model="model"
+            class="w-full"
+            placeholder="请选择变量"
+            :model-value="getParamReference(item)"
+            @update:model-value="setParamValue(item, $event)"
+          />
+        </el-form-item>
+      </el-form>
+      <el-text v-else type="info">暂无数据</el-text>
+    </div>
+    <McpServerInputDialog ref="mcpServerInputDialogRef" @refresh="handleMcpVariables" />
+  </NodeContainer>
+</template>
+<style lang="scss" scoped></style>

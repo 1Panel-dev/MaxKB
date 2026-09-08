@@ -1,13 +1,6 @@
 <template>
-  <MkDialog
-    v-model="dialogVisible"
-    title="设置变量"
-    width="600"
-    append-to-body
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-  >
-    <el-form ref="formRef" label-position="top" :model="form" require-asterisk-position="right">
+  <MkDialog v-model="dialogVisible" title="设置变量">
+    <el-form ref="formRef" label-position="top" :model="form" require-asterisk-position="right" @submit.prevent>
       <el-form-item
         v-for="item in inputFieldList"
         :key="item"
