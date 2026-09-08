@@ -3,6 +3,7 @@ import type { DynamicFormValue } from '../../type'
 import { computed, reactive, ref } from 'vue'
 import { CaretBottom } from '@element-plus/icons-vue'
 import Knowledge from '../../items/knowledge/Knowledge.vue'
+import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 import type { FormField } from '../../type'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
@@ -47,6 +48,10 @@ const knowledgeLoading = ref(false)
 const knowledgeSearch = ref('')
 const knowledgeList = ref<KnowledgeItem[]>([])
 const selectedKnowledgeIds = ref<Array<string>>([])
+
+function changeKnowledgeSelection(knowledgeId: string, checked: boolean) {
+  selectedKnowledgeIds.value = checked ? [...selectedKnowledgeIds.value, knowledgeId] : selectedKnowledgeIds.value.filter((id) => id !== knowledgeId)
+}
 
 const filteredKnowledgeList = computed(() => {
   const keyword = knowledgeSearch.value.trim().toLocaleLowerCase()
@@ -149,14 +154,20 @@ function removeKnowledge(id: string) {
       </template>
     </el-input>
     <div v-loading="knowledgeLoading" class="max-h-[360px] overflow-auto">
-      <el-checkbox-group v-model="selectedKnowledgeIds">
-        <el-checkbox :value="item.id" class="-mr-2 w-full mb-2 rounded-md border border-N300 p-2" v-for="item in filteredKnowledgeList" :key="item.id">
-          <span class="flex items-center gap-2">
-            <KnowledgeIcon :type="item.type" :size="20" style="--el-avatar-border-radius: 6px" />
-            <span class="truncate">{{ item.name }}</span>
-          </span>
-        </el-checkbox>
-      </el-checkbox-group>
+      <div class="space-y-2">
+        <MkCardCheckbox
+          v-for="knowledge in filteredKnowledgeList"
+          :key="knowledge.id"
+          :model-value="selectedKnowledgeIds.includes(knowledge.id)"
+          :label="knowledge.name"
+          @update:model-value="changeKnowledgeSelection(knowledge.id, $event)"
+        >
+          <div class="flex min-w-0 items-center gap-2">
+            <KnowledgeIcon :type="knowledge.type" :size="20" class="shrink-0" style="--el-avatar-border-radius: 6px" />
+            <span class="min-w-0 flex-1 truncate" :title="knowledge.name">{{ knowledge.name }}</span>
+          </div>
+        </MkCardCheckbox>
+      </div>
       <el-empty v-if="!knowledgeLoading && filteredKnowledgeList.length === 0" description="暂无知识库" :image-size="60" />
     </div>
     <template #footer>

@@ -173,10 +173,12 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 节点入口深拷贝写回列表并发送原有字段刷新事件，保留显隐条件引用校验。用户输入与接口传参继续
 交叉检查参数重名；`UserInputSettingDialog` 独立维护直接展示参数设置，删除字段时由表格清理对应设置。
 
-基本信息节点的 `component/FileUploadSettingDialog.vue` 同时封装文件上传设置按钮与弹窗，
-通过 `v-model` 接收 `FileUploadSetting`。节点入口根据上传开关挂载组件，并在配置写回后发送
+基本信息节点的 `component/FileUploadSetting.vue` 同时封装文件上传设置按钮与弹窗，
+通过 `v-model` 接收 `FileUploadSettingData`。节点入口根据上传开关挂载组件，并在配置写回后发送
 `refreshFileUploadConfig` 刷新开始节点文件变量；弹窗打开时重置并深拷贝草稿，确认时保留上传方式
-校验，取消不修改节点，关闭动画结束后统一清理草稿。
+的表单必填校验，取消不修改节点，关闭动画结束后统一清理草稿与校验状态。
+文件类型与其他文件选择复用手动导入的 `MkCardCheckbox`；扩展名编辑区域阻止点击冒泡，
+避免添加或删除扩展名时切换文件类型。
 
 表单收集节点的 `component/form-setting/FormSettingTable` 通过 `v-model` 编辑动态表单的
 `FormField[]`，负责增删改、排序和重名检查；`FormFieldDialog` 复用 `MkDynamicsFormConstructor`，

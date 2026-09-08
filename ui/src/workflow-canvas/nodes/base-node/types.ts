@@ -12,7 +12,7 @@ export interface ChatInputField {
   label: string
 }
 
-export interface FileUploadSetting {
+export interface FileUploadSettingData {
   audio: boolean
   document: boolean
   fileLimit: number
@@ -57,7 +57,7 @@ export interface UserInputSetting {
 export interface BaseNodeForm extends LongTermSetting, SpeechInputSetting, SpeechPlaybackSetting {
   desc: string
   file_upload_enable: boolean
-  file_upload_setting: FileUploadSetting
+  file_upload_setting: FileUploadSettingData
   long_term_enable: boolean
   name: string
   prologue: string
