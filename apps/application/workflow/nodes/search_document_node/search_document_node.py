@@ -5,8 +5,6 @@
 @desc:
 """
 
-from typing import List
-
 import jieba
 from django.db.models import Q
 from django.db.models import QuerySet
@@ -44,6 +42,32 @@ class SearchDocumentNodeSerializer(serializers.Serializer):
         required=False, choices=["AND", "OR"], label=_("search condition type"), default="AND"
     )
     search_condition_list = serializers.ListField(required=False, label=_("search condition list"), default=list)
+
+
+def _to_jsonable(value):
+    """将 ORM values() 行中的非 JSON 可序列化类型转为可序列化值。"""
+    import datetime
+    import decimal
+    import uuid
+
+    if isinstance(value, (datetime.datetime, datetime.date)):
+        return value.strftime("%Y-%m-%d %H:%M:%S")
+    if isinstance(value, decimal.Decimal):
+        return float(value)
+    if isinstance(value, uuid.UUID):
+        return str(value)
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="ignore")
+    if isinstance(value, dict):
+        return {k: _to_jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_to_jsonable(v) for v in value]
+    return value
+
+
+def _serialize_items(rows):
+    """把 ORM values() 列表转成干净的可 JSON 序列化列表。"""
+    return [_to_jsonable(row) for row in rows]
 
 
 def _handle_auto_tags(workflow_manage, document_id_list, question_reference):
@@ -220,9 +244,9 @@ class SearchDocumentNode(INode):
         knowledge_items = list(QuerySet(Knowledge).filter(id__in=final_knowledge_ids).values())
 
         self.write_context("document_list", final_document_ids)
-        self.write_context("document_items", document_items)
+        self.write_context("document_items", _serialize_items(document_items))
         self.write_context("knowledge_list", final_knowledge_ids)
-        self.write_context("knowledge_items", knowledge_items)
+        self.write_context("knowledge_items", _serialize_items(knowledge_items))
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
