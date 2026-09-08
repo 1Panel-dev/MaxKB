@@ -1,7 +1,11 @@
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mb-3">节点设置</h6>
-    <LoopFieldTable :node-model="model" />
+    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <div class="mk-gray-card">
+      <el-form-item>
+        <LoopFieldTable :node-model="model" />
+      </el-form-item>
+    </div>
     <template v-if="loopInputFields.length">
       <h6 class="mk-title-decoration mb-2 mt-4">循环变量</h6>
       <div class="mk-gray-card space-y-4">
