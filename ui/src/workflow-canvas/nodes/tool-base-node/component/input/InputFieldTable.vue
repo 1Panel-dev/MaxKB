@@ -36,13 +36,13 @@ function refreshFieldList(data: any) {
         .filter((item, index) => index != currentIndex.value)
         .some((field) => field.field == data.field)
     ) {
-      MsgError('参数名已存在：' + data.field)
+      MsgError('参数已存在：' + data.field)
       return
     }
     inputFieldList.value?.splice(currentIndex.value, 1, data)
   } else {
     if (inputFieldList.value.some((field) => field.field == data.field)) {
-      MsgError('参数名已存在：' + data.field)
+      MsgError('参数已存在：' + data.field)
       return
     }
     inputFieldList.value?.push(data)
@@ -89,14 +89,14 @@ onMounted(() => {
   </div>
 
   <el-table :data="inputFieldList" class="mb-4">
-    <el-table-column prop="field" label="参数名">
+    <el-table-column prop="field" label="参数">
       <template #default="{ row }">
         <span class="ellipsis-1" :title="row.field">
           {{ row.field }}
         </span>
       </template>
     </el-table-column>
-    <el-table-column prop="label" label="显示名">
+    <el-table-column prop="label" label="显示名称">
       <template #default="{ row }">
         <span class="ellipsis-1" :title="row.label">
           {{ row.label }}

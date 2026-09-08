@@ -20,7 +20,7 @@ const rules = reactive({
   field: [
     {
       required: true,
-      message: '请输入参数名',
+      message: '请输入参数',
       trigger: 'blur',
     },
   ],
@@ -82,11 +82,11 @@ defineExpose({ open, close })
     append-to-body
   >
     <el-form label-position="top" ref="fieldFormRef" :rules="rules" :model="form" require-asterisk-position="right">
-      <el-form-item label="参数名" prop="field">
-        <el-input v-model="form.field" placeholder="请输入参数名" maxlength="64" show-word-limit @blur="form.field = form.field.trim()" />
+      <el-form-item label="参数" prop="field">
+        <el-input v-model="form.field" placeholder="请输入参数" :maxlength="64" show-word-limit @blur="form.field = form.field.trim()" />
       </el-form-item>
-      <el-form-item label="显示名" prop="label">
-        <el-input v-model="form.label" placeholder="请输入显示名" :maxlength="128" show-word-limit @blur="form.label = form.label?.trim()" />
+      <el-form-item label="显示名称" prop="label">
+        <el-input v-model="form.label" placeholder="请输入显示名称" :maxlength="128" show-word-limit @blur="form.label = form.label?.trim()" />
       </el-form-item>
       <el-form-item label="描述">
         <el-input v-model="form.desc" placeholder="请输入描述" :maxlength="128" show-word-limit @blur="form.desc = form.desc?.trim()" />

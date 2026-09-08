@@ -1,35 +1,36 @@
 <template>
-  <div>
-    <div class="flex-between mb-2">
-      <h6 class="mk-title-decoration">循环变量</h6>
-      <el-button text type="primary" @click="openAddDialog()">
-        <template #icon><MkIcon name="icon_add_outlined" /></template>
-        添加
-      </el-button>
+  <div class="w-full">
+    <div class="flex-between">
+      <span>循环变量</span>
+      <div class="flex items-center">
+        <el-button text type="primary" @click="openAddDialog()">
+          <MkIcon name="icon_add_outlined" />
+        </el-button>
+      </div>
     </div>
-    <el-table v-if="loopInputFieldList.length > 0" :data="loopInputFieldList" row-key="field" border>
-      <el-table-column prop="field" label="变量名">
+    <MkTable class="mt-2 border" size="small" v-if="loopInputFieldList.length > 0" :data="loopInputFieldList" row-key="field">
+      <el-table-column prop="field" label="参数">
         <template #default="{ row }">
           <span :title="row.field" class="truncate">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="标签">
+      <el-table-column prop="label" label="显示名称">
         <template #default="{ row }">
           <span :title="row.label" class="truncate">{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="left" width="90">
+      <el-table-column label="操作" align="left" width="80">
         <template #default="{ row, $index }">
           <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
             <template #icon><MkIcon name="icon_edit_outlined" /></template>
           </el-button>
           <el-button type="primary" text @click="deleteField($index)">
-            <template #icon><MkIcon name="icon_delete" /></template>
+            <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
           </el-button>
         </template>
       </el-table-column>
-    </el-table>
-    <LoopFieldDialog ref="fieldDialogRef" @refresh="refreshFieldList" />
+    </MkTable>
+    <LoopFieldDialog ref="fieldDialogRef" @submit="submitField" />
   </div>
 </template>
 <script setup lang="ts">
@@ -58,7 +59,7 @@ function deleteField(index: number) {
   sync()
 }
 
-function refreshFieldList(data: LoopInputField, index?: number) {
+function submitField(data: LoopInputField, index?: number) {
   if (loopInputFieldList.value.some((item, i) => index !== i && item.field === data.field)) {
     MsgError(`循环变量已存在：${data.field}`)
     return
@@ -69,6 +70,7 @@ function refreshFieldList(data: LoopInputField, index?: number) {
     loopInputFieldList.value.splice(index, 1, data)
   }
   sync()
+  fieldDialogRef.value?.close()
 }
 
 function sync() {
