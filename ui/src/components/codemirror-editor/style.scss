@@ -50,4 +50,7 @@
     background-color: var(--el-scrollbar-hover-bg-color);
     opacity: var(--el-scrollbar-hover-opacity);
   }
+  :deep(.cm-content) {
+    background: white;
+  }
 }

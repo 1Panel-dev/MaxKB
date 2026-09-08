@@ -145,6 +145,11 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 中间 computed。独立弹窗、资源选择等具有完整交互边界的能力放在节点目录的 `component/` 下；
 节点入口负责统一写回节点属性和执行节点级校验。
 
+自定义工具节点的参数列表、Python 代码与返回内容由节点入口维护，参数弹窗放在
+`tool-custom-node/component/InputFieldDialog.vue`，同时封装标题栏的添加按钮，编辑入口调用其 `open(data, index)`。
+组件通过 `submit(data, index?)` 提交，节点写回后
+调用 `close()`。新增与编辑参数继续按来源重置参数值，保留旧节点在流程末尾时的返回内容兼容逻辑。
+
 变量拆分节点的 `VariableFieldTable` 通过 `v-model` 接收 `VariableField[]`，只负责列表增删改、
 重名检查和编辑弹窗，不接收节点模型或读写 `node_data`。节点入口在列表写回时同步输出字段并
 清理下游失效引用；字段类型由该组件目录的 `types.ts` 统一定义。
