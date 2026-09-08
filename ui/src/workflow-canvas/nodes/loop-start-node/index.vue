@@ -25,6 +25,7 @@ import type { BaseNodeModel } from '@logicflow/core'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import LoopFieldTable from './component/LoopFieldTable.vue'
 import { copyText } from '@/utils/clipboard'
+import { isLoopBuiltinField } from './constant'
 
 defineOptions({ name: 'WorkflowLoopStartNode' })
 const getModel = inject('getModel') as () => BaseNodeModel
@@ -40,6 +41,6 @@ const loopInputFields = computed(() => {
   const list = (model.properties as { loop_input_field_list?: LoopInputField[] }).loop_input_field_list ?? []
   return list
     .map((item) => ({ label: item.label ?? item.field ?? '', value: item.field ?? item.variable ?? '' }))
-    .filter((field) => Boolean(field.value))
+    .filter((field) => Boolean(field.value) && !isLoopBuiltinField(field.value))
 })
 </script>

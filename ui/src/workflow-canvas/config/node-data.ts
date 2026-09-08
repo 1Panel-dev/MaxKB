@@ -394,7 +394,20 @@ export const loopNode = {
           y: 200,
           id: 'loop-start-node',
           type: 'loop-start-node',
-          properties: { config: { fields: [], globalFields: [] }, fields: [], showNode: true, stepName: '开始', globalFields: [] },
+          properties: {
+            config: {
+              // 循环引擎内置的输出参数（index/item），只读展示，用户不可增删改
+              fields: [
+                { label: '下标', value: 'index' },
+                { label: '循环元素', value: 'item' },
+              ],
+              globalFields: [],
+            },
+            fields: [],
+            showNode: true,
+            stepName: '开始',
+            globalFields: [],
+          },
         },
       ],
     },
@@ -410,6 +423,7 @@ export const loopStartNode = {
   properties: {
     stepName: '循环开始',
     config: {
+      // 循环引擎内置的输出参数（index/item），只读展示，用户不可增删改
       fields: [
         { label: '下标', value: 'index' },
         { label: '循环元素', value: 'item' },

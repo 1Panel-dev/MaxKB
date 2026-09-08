@@ -28,6 +28,7 @@
 import { reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
+import { isLoopBuiltinField } from '../constant'
 
 defineOptions({ name: 'LoopFieldDialog' })
 const emit = defineEmits<{ refresh: [data: { field: string; label: string }, index?: number] }>()
@@ -42,6 +43,16 @@ const rules = reactive({
   field: [
     { required: true, message: '请输入变量名', trigger: 'blur' },
     { pattern: /^[a-zA-Z0-9_]+$/, message: '变量名只能包含英文字母、数字、下划线', trigger: 'blur' },
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+        if (isLoopBuiltinField(value)) {
+          callback(new Error('此变量名为循环引擎内置，不可使用'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
   ],
 })
 
