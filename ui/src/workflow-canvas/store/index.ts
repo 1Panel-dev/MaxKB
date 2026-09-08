@@ -1,4 +1,4 @@
-import type { Dict, DynamicFormField, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
+import type { Dict, DynamicFormField, KnowledgeTagGroup, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
 
 export interface McpTool {
   args_schema: Record<string, unknown>
@@ -9,6 +9,7 @@ export interface McpTool {
 
 // 底层 api/*/index.ts 提供的原始接口实现,不含缓存层能力。
 type ApiModule = {
+  getAllTags?: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
   getModelList: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
   getModelParamsForm: (modelId: string) => Promise<DynamicFormField[]>
@@ -19,6 +20,7 @@ type ApiModule = {
 
 // useWorkflowStore 返回的包装接口:默认走缓存,通过 store.force.xxx() 强制刷新。
 export type WorkflowStoreApi = {
+  getAllTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
   getModelList: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
   getModelParamsForm: (modelId: string) => Promise<DynamicFormField[]>
@@ -72,6 +74,10 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
   // 生成一组接口方法;force 为 true 时对应的调用会跳过缓存强制刷新。
   function build(force: boolean): WorkflowStoreApi {
     return {
+      getAllTags(knowledgeIds: string[]): Promise<KnowledgeTagGroup[]> {
+        if (!resolvedApi.getAllTags) return Promise.resolve([])
+        return withCache(`knowledge-tags:${JSON.stringify(knowledgeIds)}`, () => resolvedApi.getAllTags!(knowledgeIds), force)
+      },
       getModelList(query?: Dict<unknown>): Promise<ModelItem[]> {
         return withCache(`model:${JSON.stringify(query ?? {})}`, () => resolvedApi.getModelList(query), force)
       },
@@ -83,7 +89,11 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
       },
       getMcpTools(resourceType: string, resourceId: string, mcpServers: string): Promise<McpTool[]> {
         if (!resolvedApi.getMcpTools) return Promise.resolve([])
-        return withCache(`mcp-tools:${resourceType}:${resourceId}:${mcpServers}`, () => resolvedApi.getMcpTools!(resourceType, resourceId, mcpServers), force)
+        return withCache(
+          `mcp-tools:${resourceType}:${resourceId}:${mcpServers}`,
+          () => resolvedApi.getMcpTools!(resourceType, resourceId, mcpServers),
+          force,
+        )
       },
       getToolListWithShared(query?: Dict<unknown>): Promise<ToolItem[]> {
         if (!resolvedApi.getToolListWithShared) return Promise.resolve([])

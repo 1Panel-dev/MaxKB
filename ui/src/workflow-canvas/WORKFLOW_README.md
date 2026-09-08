@@ -196,8 +196,10 @@ AI 对话节点的提示词、历史记录、视觉理解和输出思考表单�
 标签条件使用 `MkFormList`，设置 `minRows` 为 `0`，保留允许删除到空列表的语义。文档标签检索通过
 `NodeSearchScope` 复用知识库选择，保留知识库快照及缺少详情的关联 ID；标签条件使用
 `MkFormList` 并设置 `minRows` 为 `0`，节点模型统一将新建及已有节点宽度设为 `455`。
-`ApplicationWorkflowView` 和 `ToolWorkflowView` 提供 `getKnowledgeTags` 与 `getRerankerModels`
-注入接口，分别用于文档标签选项与重排模型查询；新增模型后直接重新查询，不读取已有模型列表缓存。
+`store/api/workspace/index.ts` 独立维护 `getAllTags(knowledgeIds)`，使用 `knowledge_ids[]` 查询
+所选知识库的全部文档标签，返回 `KnowledgeTagGroup[]`。文档标签选项通过工作流 Store 的 `force.getAllTags(knowledgeIds)` 查询，刷新时跳过已有标签缓存。
+`ApplicationWorkflowView` 和 `ToolWorkflowView` 提供重排模型查询注入接口；新增模型后直接重新查询，
+不读取已有模型列表缓存。
 标签请求只回写当前关联知识库的结果，过期或节点卸载后的响应不再修改节点。
 
 固定字段写入统一使用直接赋值，例如 `model.properties.node_data = value`、
@@ -223,7 +225,9 @@ Vue `computed` 的 `set` 和原生 `Map.set()` 按各自 API 正常使用。
 MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行对象引用，因此工作流节点
 在 computed setter 中深拷贝新数组后写回 `model.properties.node_data`，并执行原有字段同步。
 带 ID 的新行使用 `default-item` 工厂函数，每次添加生成独立 ID。条件分支等保留锚点 ID、
-固定末尾分支的特殊规则不能直接替换成普通列表移动。
+固定末尾分支的特殊规则不能直接替换成普通列表移动。判断器仅将 IF / ELSE IF 分支放入排序容器，
+卡片悬停时显示排序手柄；ELSE 独立渲染并固定末尾。排序后按位置更新分支名称，保留分支 ID，
+并同步刷新锚点顺序与连线。
 
 ## View 接入约定
 

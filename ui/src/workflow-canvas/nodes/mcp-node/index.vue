@@ -2,7 +2,15 @@
   <NodeContainer :node-model="model">
     <h6 class="mb-3">节点设置</h6>
     <div class="border-r-6 layout-bg lighter mb-8 p-8-12">
-      <el-form ref="mcpNodeFormRef" :model="form_data" label-position="top" require-asterisk-position="right" label-width="auto" hide-required-asterisk @submit.prevent>
+      <el-form
+        ref="mcpNodeFormRef"
+        :model="form_data"
+        label-position="top"
+        require-asterisk-position="right"
+        label-width="auto"
+        hide-required-asterisk
+        @submit.prevent
+      >
         <el-form-item label="MCP Server Config">
           <template #label>
             <div class="flex-between">
@@ -21,14 +29,7 @@
             :placeholder="mcpServerJson"
             @wheel="handleNodeWheel"
           />
-          <el-select
-            v-else
-            :teleported="false"
-            v-model="form_data.mcp_tool_id"
-            filterable
-            @change="mcpToolSelectChange"
-            @wheel="handleNodeWheel"
-          >
+          <el-select v-else :teleported="false" v-model="form_data.mcp_tool_id" filterable @change="mcpToolSelectChange" @wheel="handleNodeWheel">
             <el-option v-for="mcpTool in mcpToolSelectOptions" :key="mcpTool.id" :label="mcpTool.name" :value="mcpTool.id">
               <div class="flex items-center">
                 <ToolIcon v-if="!mcpTool.icon" :size="20" :type="mcpTool.tool_type" class="mr-2" />
@@ -54,7 +55,7 @@
           <el-select v-model="form_data.mcp_tool" filterable :teleported="false" @change="changeTool" @wheel="handleNodeWheel">
             <el-option v-for="item in form_data.mcp_tools" :key="item.name" :label="item.name" :value="item.name" class="flex items-center">
               <el-tooltip effect="dark" :content="item.description" placement="top-start" popper-class="max-w-350">
-                <MkIcon name="icon_warning_filled" class="app-warning-icon" />
+                <MkIcon name="icon_warning_filled" />
               </el-tooltip>
               <span class="ml-4">{{ item.name }}</span>
             </el-option>
@@ -64,7 +65,14 @@
     </div>
     <h6 class="mb-3">工具参数</h6>
     <div v-if="form_data.mcp_tool" class="border-r-6 layout-bg lighter p-8-12">
-      <el-form ref="dynamicsFormRef" label-position="top" v-loading="loading" require-asterisk-position="right" :hide-required-asterisk="true" @submit.prevent>
+      <el-form
+        ref="dynamicsFormRef"
+        label-position="top"
+        v-loading="loading"
+        require-asterisk-position="right"
+        :hide-required-asterisk="true"
+        @submit.prevent
+      >
         <el-form-item v-for="item in form_data.tool_form_field" :key="item.field" :required="item.required">
           <template #label>
             <div class="flex-between">
@@ -79,11 +87,36 @@
               </el-select>
             </div>
           </template>
-          <el-input v-if="item.source === 'custom' && item.input_type === 'TextInput'" :model-value="paramsOf()[item.label.label]" @update:model-value="setParamValue(item, $event)" />
-          <el-input-number v-else-if="item.source === 'custom' && item.input_type === 'NumberInput'" :model-value="paramsOf()[item.label.label]" @update:model-value="setParamValue(item, $event)" />
-          <el-switch v-else-if="item.source === 'custom' && item.input_type === 'SwitchInput'" :model-value="paramsOf()[item.label.label]" @update:model-value="setParamValue(item, $event)" />
-          <el-input v-else-if="item.source === 'custom' && item.input_type === 'JsonInput'" :model-value="paramsOf()[item.label.label]" @update:model-value="setParamValue(item, $event)" type="textarea" />
-          <NodeCascader v-if="item.source === 'referencing'" :ref="setCascaderRef" :node-model="model" class="w-full" placeholder="请选择变量" :model-value="paramsOf()[item.label.label] as string[]" @update:model-value="setParamValue(item, $event)" />
+          <el-input
+            v-if="item.source === 'custom' && item.input_type === 'TextInput'"
+            :model-value="paramsOf()[item.label.label]"
+            @update:model-value="setParamValue(item, $event)"
+          />
+          <el-input-number
+            v-else-if="item.source === 'custom' && item.input_type === 'NumberInput'"
+            :model-value="paramsOf()[item.label.label]"
+            @update:model-value="setParamValue(item, $event)"
+          />
+          <el-switch
+            v-else-if="item.source === 'custom' && item.input_type === 'SwitchInput'"
+            :model-value="paramsOf()[item.label.label]"
+            @update:model-value="setParamValue(item, $event)"
+          />
+          <el-input
+            v-else-if="item.source === 'custom' && item.input_type === 'JsonInput'"
+            :model-value="paramsOf()[item.label.label]"
+            @update:model-value="setParamValue(item, $event)"
+            type="textarea"
+          />
+          <NodeCascader
+            v-if="item.source === 'referencing'"
+            :ref="setCascaderRef"
+            :node-model="model"
+            class="w-full"
+            placeholder="请选择变量"
+            :model-value="paramsOf()[item.label.label] as string[]"
+            @update:model-value="setParamValue(item, $event)"
+          />
         </el-form-item>
       </el-form>
     </div>

@@ -45,7 +45,6 @@ function submit() {
           </template>
           <el-input-number
             v-model="formData.similarity"
-            class="w-full!"
             :min="0"
             :max="formData.search_mode === 'blend' ? 2 : 1"
             :precision="3"
@@ -57,7 +56,6 @@ function submit() {
         </el-form-item>
         <el-form-item label="引用分段数 TOP">
           <el-input-number
-            class="w-full!"
             v-model="formData.top_n"
             :min="1"
             :max="10000"
