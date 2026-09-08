@@ -23,7 +23,6 @@ interface LoopNodeData {
 }
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const nodeCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('nodeCascaderRef')
 
 const DEFAULT_FORM: LoopNodeData = { loop_type: 'ARRAY', array: [], number: 1 }
 
@@ -53,12 +52,6 @@ const showNode = computed({
 watch(showNode, (value) => {
   value ? throttle(mountLoopBodyNode, 1000)() : throttle(destroyLoopBodyNode, 1000)()
 })
-
-function validate() {
-  return Promise.all([nodeCascaderRef.value?.validate(), formRef.value?.validate()]).catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
-}
 
 function destroyLoopBodyNode() {
   const outgoing = model.graphModel.getNodeOutgoingNode(model.id)
@@ -107,8 +100,12 @@ function mountLoopBodyNode() {
   } as unknown as Parameters<typeof model.graphModel.addEdge>[0])
 }
 
+function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
+}
+
 onMounted(() => {
-  set(model, 'validate', validate)
+  model.validate = validate
   if (showNode.value && !model.virtual) mountLoopBodyNode()
 })
 </script>

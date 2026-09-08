@@ -8,8 +8,9 @@ import type { FileUploadSetting } from '../types'
 
 defineOptions({ name: 'BaseNodeFileUploadSettingDialog' })
 
-const emit = defineEmits<{ submit: [setting: FileUploadSetting] }>()
+const setting = defineModel<FileUploadSetting>({ required: true })
 
+// 文件上传设置：打开时创建草稿，确认后回写配置。
 const visible = ref(false)
 const extensionInputVisible = ref(false)
 const extensionInput = ref('')
@@ -52,12 +53,13 @@ function submit() {
     MsgWarning('请至少选择一种上传方式')
     return
   }
-  emit('submit', cloneDeep(formData.value))
+  setting.value = cloneDeep(formData.value)
   visible.value = false
 }
 
-function open(setting: FileUploadSetting) {
-  formData.value = cloneDeep(setting)
+function open() {
+  resetData()
+  formData.value = cloneDeep(setting.value)
   visible.value = true
 }
 
@@ -66,11 +68,12 @@ function resetData() {
   extensionInput.value = ''
   extensionInputVisible.value = false
 }
-
-defineExpose({ open })
 </script>
 
 <template>
+  <el-button text type="primary" @click="open">
+    <MkIcon name="icon-setting" />
+  </el-button>
   <MkDialog v-model="visible" title="文件上传设置" width="800" @closed="resetData">
     <el-form :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="单次最多上传文件数">
@@ -141,7 +144,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
       <el-button type="primary" @click="submit">确定</el-button>
     </template>
   </MkDialog>

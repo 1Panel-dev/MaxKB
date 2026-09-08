@@ -4,13 +4,14 @@ import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
+import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
 import { fileTooltip } from '@/workflow-canvas/config/constants'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
-import { WorkflowMode } from '@/workflow-canvas/types'
+import { WorkflowMode, type ReasoningSettingData } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowVideoUnderstandNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
@@ -18,18 +19,12 @@ const apiType = (inject('apiType') as string) || 'workspace'
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const model = getModel()
 
-interface ReasoningSetting {
-  reasoning_content_enable: boolean
-  reasoning_content_end: string
-  reasoning_content_start: string
-}
-
 interface VideoUnderstandNodeForm {
   model_id: string
   model_params_setting: Record<string, unknown>
   model_id_type: 'custom' | 'default' | 'reference'
   model_id_reference: string[]
-  model_setting: ReasoningSetting
+  model_setting: ReasoningSettingData
   prompt: string
   system: string
   dialogue_type: 'NODE' | 'WORKFLOW'
@@ -210,10 +205,7 @@ onMounted(() => {
         <div class="flex-between mb-4">
           <span>输出思考</span>
           <div class="flex items-center gap-2">
-            <!-- // TODO: 输出思考 统一处理 -->
-            <el-button type="primary" text v-if="formData.model_setting.reasoning_content_enable">
-              <MkIcon name="icon-setting" />
-            </el-button>
+            <ThinkingSetting v-model="formData.model_setting" v-if="formData.model_setting.reasoning_content_enable" />
             <el-switch v-model="formData.model_setting.reasoning_content_enable" size="small" />
           </div>
         </div>

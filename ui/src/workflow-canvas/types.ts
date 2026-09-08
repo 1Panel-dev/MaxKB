@@ -62,6 +62,13 @@ export enum WorkflowMode {
   KnowledgeLoop = 'knowledge-loop',
 }
 
+/** 输出思考配置，由支持思考标签的节点共享。 */
+export interface ReasoningSettingData {
+  reasoning_content_enable: boolean
+  reasoning_content_end: string
+  reasoning_content_start: string
+}
+
 export interface WorkflowNodeField {
   children?: WorkflowNodeField[]
   label: string

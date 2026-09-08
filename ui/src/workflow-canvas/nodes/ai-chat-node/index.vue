@@ -11,9 +11,10 @@ import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import PromptGenerateDialog from './component/PromptGenerateDialog.vue'
-import ReasoningSettingDialog from './component/ReasoningSettingDialog.vue'
+import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
 import ResourceSetting from './component/resource-setting/index.vue'
-import type { AiChatNodeForm, ReasoningSetting } from './types'
+import type { AiChatNodeForm } from './types'
+import type { ReasoningSettingData } from '@/workflow-canvas/types'
 import { fileTooltip } from '@/workflow-canvas/config/constants'
 
 defineOptions({ name: 'WorkflowAiChatNode' })
@@ -26,12 +27,11 @@ const store = useWorkflowStore(apiType)
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 const promptGenerateDialogRef = useTemplateRef<InstanceType<typeof PromptGenerateDialog>>('promptGenerateDialogRef')
-const reasoningSettingDialogRef = useTemplateRef<InstanceType<typeof ReasoningSettingDialog>>('reasoningSettingDialogRef')
 
 const modelOptions = ref<ModelItem[]>([])
 const providerOptions = ref<ModelProviderItem[]>([])
 
-const defaultReasoningSetting: ReasoningSetting = {
+const defaultThinkingSetting: ReasoningSettingData = {
   reasoning_content_enable: false,
   reasoning_content_end: '</think>',
   reasoning_content_start: '<think>',
@@ -51,7 +51,7 @@ const defaultForm: AiChatNodeForm = {
   model_id_reference: [],
   model_id_type: 'default',
   model_params_setting: {},
-  model_setting: cloneDeep(defaultReasoningSetting),
+  model_setting: cloneDeep(defaultThinkingSetting),
   prompt: '{{开始.question}}',
   skill_tool_ids: [],
   system: '',
@@ -83,9 +83,9 @@ const normalizedForm = {
   model_id_type: savedForm ? (savedForm.model_id_type ?? 'custom') : defaultForm.model_id_type,
   model_params_setting: savedForm?.model_params_setting ?? {},
   model_setting: {
-    reasoning_content_enable: savedForm?.model_setting?.reasoning_content_enable ?? defaultReasoningSetting.reasoning_content_enable,
-    reasoning_content_end: savedForm?.model_setting?.reasoning_content_end ?? defaultReasoningSetting.reasoning_content_end,
-    reasoning_content_start: savedForm?.model_setting?.reasoning_content_start ?? defaultReasoningSetting.reasoning_content_start,
+    reasoning_content_enable: savedForm?.model_setting?.reasoning_content_enable ?? defaultThinkingSetting.reasoning_content_enable,
+    reasoning_content_end: savedForm?.model_setting?.reasoning_content_end ?? defaultThinkingSetting.reasoning_content_end,
+    reasoning_content_start: savedForm?.model_setting?.reasoning_content_start ?? defaultThinkingSetting.reasoning_content_start,
   },
   prompt: savedForm?.prompt ?? defaultForm.prompt,
   skill_tool_ids: Array.isArray(savedForm?.skill_tool_ids) ? savedForm.skill_tool_ids : [],
@@ -246,13 +246,10 @@ onMounted(() => {
         </div>
 
         <!-- 输出思考 -->
-        <div class="flex-between mb-4">
+        <div class="flex-between mb-4 mt-4">
           <span> 输出思考 </span>
           <div class="flex items-center gap-2">
-            <!-- // TODO 思考 -->
-            <el-button v-if="formData.model_setting.reasoning_content_enable" text type="primary">
-              <MkIcon name="icon-setting" />
-            </el-button>
+            <ThinkingSetting v-model="formData.model_setting" v-if="formData.model_setting.reasoning_content_enable" />
             <el-switch v-model="formData.model_setting.reasoning_content_enable" size="small" />
           </div>
         </div>
@@ -273,6 +270,5 @@ onMounted(() => {
     </div>
 
     <PromptGenerateDialog ref="promptGenerateDialogRef" @replace="formData.system = $event" />
-    <ReasoningSettingDialog ref="reasoningSettingDialogRef" @submit="formData.model_setting = $event" />
   </NodeContainer>
 </template>

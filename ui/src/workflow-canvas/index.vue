@@ -13,7 +13,7 @@ import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canva
 import type { DefaultModelSettingPayload } from '@/api/types'
 import NodeAdd from './component/NodeAdd.vue'
 import NodeSearch from './component/NodeSearch.vue'
-defineOptions({ name: 'MkWorkflow' })
+defineOptions({ name: 'WorkflowCanvas' })
 
 type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void }
 const apiType = inject('resourceScope', 'workspace')

@@ -1,4 +1,5 @@
 import type { ApplicationDetail, ToolItem } from '@/api/types'
+import type { ReasoningSettingData } from '@/workflow-canvas/types'
 
 export type AiModelSource = 'custom' | 'default' | 'reference'
 export type DialogueSource = 'NODE' | 'WORKFLOW'
@@ -27,12 +28,6 @@ export interface VisionSetting {
   vision: boolean
 }
 
-export interface ReasoningSetting {
-  reasoning_content_enable: boolean
-  reasoning_content_end: string
-  reasoning_content_start: string
-}
-
 export interface McpSetting {
   mcp_servers: string
   mcp_source: McpSource
@@ -51,7 +46,7 @@ export interface ResourceSetting extends McpSetting {
 
 export interface AiChatNodeForm extends AiModelSetting, HistorySetting, PromptSetting, ResourceSetting, VisionSetting {
   is_result: boolean
-  model_setting: ReasoningSetting
+  model_setting: ReasoningSettingData
 }
 
 export type ToolResourceOption = Pick<ToolItem, 'desc' | 'icon' | 'id' | 'name' | 'source' | 'tool_type'>

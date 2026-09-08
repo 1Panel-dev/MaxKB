@@ -92,10 +92,8 @@ function filterTags(keyword: string) {
 }
 
 // 范围引用由公共组件加入表单校验，自动检索保留问题引用有效性检查。
-function validate() {
-  return Promise.all([questionCascaderRef.value?.validate(), formRef.value?.validate()]).catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
+async function validate() {
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 const anchorGuard = createAnchorGuard(model)
 onBeforeUnmount(() => {

@@ -256,36 +256,20 @@ export function post<TData = unknown, T = unknown>(url: string, data?: TData, pa
 }
 
 /** 发送 POST 请求并返回可逐块读取的原始响应。 */
-export async function postStream<TData = unknown>(url: string, data?: TData, config: StreamRequestConfig = {}) {
+export function postStream(base: string, path: string, data?: unknown) {
   const { auth, user } = useStore()
-  const headers = new Headers({ 'Content-Type': 'application/json' })
-  if (auth.token) headers.set('Authorization', `Bearer ${auth.token}`)
-  if (user.language) headers.set('Accept-Language', user.language)
-
-  const baseUrl = String(request.defaults.baseURL ?? '').replace(/\/+$/, '')
-  const response = await fetch(`${baseUrl}/${url.replace(/^\/+/, '')}`, {
-    body: JSON.stringify(data ?? {}),
-    headers,
-    method: 'POST',
-    signal: config.signal,
-  })
-
-  if (response.ok) return response
-
-  const errorMessage = (await getFetchErrorMessage(response)) || response.statusText
-  if (response.status === 401) {
-    auth.clearToken()
-    void router.push({ name: 'login' })
-  } else if (response.status === 403) {
-    MsgError(errorMessage || 'No permission to access')
-  } else if (response.status === 404) {
-    void router.replace({ name: 'not-found', params: { pathMatch: ['404'] } })
-  } else {
-    MsgError(errorMessage)
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (auth.token) {
+    headers['Authorization'] = `Bearer ${auth.token}`
   }
-  const error = new Error(errorMessage)
-  error.name = 'StreamRequestError'
-  throw error
+  if (user.language) {
+    headers['Accept-Language'] = user.language
+  }
+  return fetch(`${base}${path.startsWith('/') ? path : `/${path}`}`, {
+    method: 'POST',
+    headers,
+    body: data === undefined ? undefined : JSON.stringify(data),
+  })
 }
 
 /** 发送 PUT 请求。 */

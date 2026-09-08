@@ -162,7 +162,7 @@ defineExpose({ open })
     </div>
 
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
       <el-button :disabled="!latestAnswer || loading" type="primary" @click="replacePrompt">替换系统提示词</el-button>
     </template>
   </MkDialog>

@@ -68,17 +68,20 @@ ui/
 │   ├── constants/             # Cross-feature constants grouped by domain
 │   │   └── CONSTANT_README.md # Shared constant placement and naming rules
 │   ├── layout/                # Shared application shells, headers, sidebars, types, and helpers
-│   ├── locales/               # Reserved for internationalization messages and locale setup
+│   ├── permission/            # Permission policies, business permission methods, and Admin $perm plugin
 │   ├── workflow-canvas/       # LogicFlow canvas and workflow domain components
 │   │   ├── component/         # Reusable workflow canvas UI
 │   │   ├── config/            # Maintainable node data, menus, mappings, and constants
 │   │   ├── core/              # Stable canvas behavior and shared node infrastructure
+│   │   ├── details/           # Node execution detail dispatch and shared presentation
 │   │   ├── icons/             # Workflow node icons
+│   │   ├── node-menu/         # Basic, tool, and application node selection menus
 │   │   ├── nodes/             # Workflow node definitions and components
 │   │   ├── plugins/           # Canvas-local plugins
+│   │   ├── store/             # Resource API adapters, query caching, and request deduplication
 │   │   ├── WORKFLOW_README.md # Canvas boundaries and maintenance rules
 │   │   ├── types.ts           # Workflow canvas protocol types
-│   │   └── index.vue          # MkWorkflow canvas entry
+│   │   └── index.vue          # WorkflowCanvas canvas entry
 │   ├── router/                # Vue Router routes and router instance
 │   │   └── ROUTE_README.md    # Routing conventions and rules
 │   ├── stores/                # Shared Pinia instance and state stores
@@ -95,16 +98,27 @@ ui/
 │   ├── views/                 # Route-level page components grouped by feature
 │   │   ├── VIEW_README.md     # Page responsibilities and feature-local code rules
 │   │   ├── home/             # Workspace home page
+│   │   ├── application/      # Application list and creation
+│   │   ├── application-detail/ # Application overview and settings
+│   │   ├── knowledge/        # Knowledge base list and cards
+│   │   ├── knowledge-detail/ # Knowledge base and document details
+│   │   ├── model/            # Model list, creation, and settings
+│   │   ├── tool/             # Tool list, forms, and tool store
+│   │   ├── trigger/          # Workspace trigger list
 │   │   ├── system/           # System-management pages
-│   │   ├── login/            # Reserved for admin login pages
-│   │   ├── chat/             # Chat-side pages, including user login
+│   │   ├── login/            # Admin login, account recovery, and login modes
+│   │   ├── chat/             # Chat entry placeholder page
+│   │   ├── error/            # Not-found page
+│   │   ├── details-demo/     # Temporary execution-detail preview page
 │   │   └── workflow/         # Full-screen workflow route pages
 ├── vite.config.ts            # Vite entries, plugins, aliases, proxy, and build output
 ├── tsconfig*.json            # TypeScript configuration
 └── package.json              # Dependencies and npm scripts
 ```
 
-Directories marked as reserved may be empty while their feature is being introduced. Add files to the matching feature directory instead of creating parallel top-level structures.
+Internationalization is not yet integrated; `src/locales/` has not been created. Chat currently has a
+placeholder route page and a reserved independent API directory. Add files to the matching feature
+directory instead of creating parallel top-level structures.
 
 Structural responsibilities:
 
@@ -113,7 +127,7 @@ Structural responsibilities:
 - Put reusable application chrome in `layout/`, not in individual route views.
 - Keep LogicFlow initialization, node registration, and canvas behavior inside `workflow-canvas/`.
   Every page rendering this canvas belongs in `views/workflow/`; those Views own the page header,
-  route and page-level actions around `MkWorkflow`.
+  route and page-level actions around `WorkflowCanvas`.
 - Put server communication in `api/`, isolate Admin and Chat request systems, and group business APIs
   by domain and resource according to `src/api/API_README.md`.
 - Put backend fixed-value enums in `api/enums/` and import them through `@/api/enums`; keep
@@ -149,7 +163,8 @@ Important variables:
 - `VITE_APP_PORT`: local dev server port
 - `VITE_APP_TITLE`: HTML title
 - `VITE_ENTRY`: HTML entry file
-- `VITE_API_TARGET`: optional backend proxy target, defaults to `http://127.0.0.1:8080`
+- `VITE_API_TARGET`: optional backend proxy target; currently defaults to `http://47.120.55.164:38080`
+  through `defaultBackendTarget` in `vite.config.ts`. Override it locally for a different backend.
 
 Build output mirrors the v2 layout:
 
@@ -169,9 +184,13 @@ npm run chat         # chat dev server
 npm run build        # default admin build with type-check
 npm run build-chat   # chat build with type-check
 npm run type-check
-npm run lint
 npm run format
 ```
+
+Node.js must satisfy `^22.18.0 || >=24.12.0` as declared in `package.json`.
+Admin and Chat use ports 3000 and 3001 respectively, with `strictPort` enabled.
+`npm run lint` currently delegates to `lint:*`, but no matching scripts are defined. Use
+`npx eslint <changed-files>` for targeted linting until those scripts are configured.
 
 ## Vite Configuration
 
