@@ -29,7 +29,12 @@ const loading = ref(false)
 const submitting = ref(false)
 const pendingUserIds = ref<string[]>([])
 
-const quotaSettingsForm = reactive<QuotaSettingsForm>({ periodType: PERIOD_TYPE.MONTH, periodValue: 1, quotaType: QUOTA_TYPE.UNLIMITED, tokenLimit: 10_000_000 })
+const quotaSettingsForm = reactive<QuotaSettingsForm>({
+  periodType: PERIOD_TYPE.MONTH,
+  periodValue: 1,
+  quotaType: QUOTA_TYPE.UNLIMITED,
+  tokenLimit: 10_000_000,
+})
 const quotaSettingsRules: FormRules<QuotaSettingsForm> = {
   periodValue: [{ required: true, message: '请输入周期', trigger: 'change' }],
   tokenLimit: [{ required: true, message: '请输入 Tokens 上限', trigger: 'change' }],
@@ -39,7 +44,12 @@ function buildPayload(): ChatUserQuotaPayload {
   if (quotaSettingsForm.quotaType === QUOTA_TYPE.UNLIMITED) {
     return { quota_type: QUOTA_TYPE.UNLIMITED, period_type: null, period_value: null, token_limit: null }
   }
-  return { quota_type: QUOTA_TYPE.PERIODIC, period_type: quotaSettingsForm.periodType, period_value: quotaSettingsForm.periodValue, token_limit: quotaSettingsForm.tokenLimit }
+  return {
+    quota_type: QUOTA_TYPE.PERIODIC,
+    period_type: quotaSettingsForm.periodType,
+    period_value: quotaSettingsForm.periodValue,
+    token_limit: quotaSettingsForm.tokenLimit,
+  }
 }
 
 function submitQuotaSettings() {

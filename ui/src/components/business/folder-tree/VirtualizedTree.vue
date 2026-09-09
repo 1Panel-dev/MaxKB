@@ -25,13 +25,16 @@ interface DropTargetInfo {
   siblings?: FolderStat[]
 }
 
-const props = withDefaults(defineProps<{ canEdit?: boolean; currentNodeKey?: string; data?: FolderTreeNode[]; draggable?: boolean; filterText?: string }>(), {
-  canEdit: true,
-  currentNodeKey: '',
-  data: () => [],
-  draggable: false,
-  filterText: '',
-})
+const props = withDefaults(
+  defineProps<{ canEdit?: boolean; currentNodeKey?: string; data?: FolderTreeNode[]; draggable?: boolean; filterText?: string }>(),
+  {
+    canEdit: true,
+    currentNodeKey: '',
+    data: () => [],
+    draggable: false,
+    filterText: '',
+  },
+)
 
 const emit = defineEmits<{
   create: [folder: FolderItem]
@@ -153,8 +156,8 @@ function handleAfterDrop() {
   --el-scrollbar-hover-opacity: 0.5;
   --el-scrollbar-hover-bg-color: var(--el-text-color-secondary);
   scrollbar-color: transparent transparent;
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
-
 
   &::-webkit-scrollbar {
     background-color: transparent;

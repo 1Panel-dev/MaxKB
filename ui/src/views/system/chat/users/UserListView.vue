@@ -8,23 +8,16 @@ import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { formatTokenNumber } from '@/utils/number'
 import UserFromDrawer from './UserFromDrawer.vue'
-import ImportUsersDialog from './dialog/ImportUsersDialog.vue'
-import UserPwdDialog from './dialog/UserPwdDialog.vue'
-import BatchSetUserGroupDialog from './dialog/BatchSetUserGroupDialog.vue'
-import QuotaSettingsDialog from './dialog/QuotaSettingsDialog.vue'
+import ImportUsersButton from './import-users/ImportUsersButton.vue'
+import UserPwdButton from './user-password/UserPwdButton.vue'
+import BatchSetUserGroupButton from './batch-set-user-group/BatchSetUserGroupButton.vue'
+import QuotaSettingsButton from './quota-settings/QuotaSettingsButton.vue'
 
 /* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
 
 function handleOpenUserFormDrawer(chatUser?: ChatUser) {
   userFormDrawerRef.value?.open(chatUser)
-}
-
-/* 导入用户 */
-const importUsersDialogRef = ref<InstanceType<typeof ImportUsersDialog>>()
-
-function handleOpenImportUsersDialog() {
-  importUsersDialogRef.value?.open()
 }
 
 /* 列表查询相关 */
@@ -80,20 +73,6 @@ function loadChatUsers(resetQuery = false) {
     })
 }
 
-/* 密码修改dialog */
-const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
-
-function handleOpenUserPwdDialog(chatUser: ChatUser) {
-  userPwdDialogRef.value?.open(chatUser)
-}
-
-/* 配额设置dialog */
-const quotaSettingsDialogRef = ref<InstanceType<typeof QuotaSettingsDialog>>()
-
-function handleOpenQuotaSettingsDialog(chatUser: ChatUser) {
-  quotaSettingsDialogRef.value?.open(chatUser.id)
-}
-
 /* 修改用户状态 */
 function handleChangeStatus(user: ChatUser) {
   const nextActive = !user.is_active
@@ -147,17 +126,6 @@ function handleBatchDelete() {
     })
 }
 
-/* 批量设置用户组 */
-const batchSetUserGroupDialogRef = ref<InstanceType<typeof BatchSetUserGroupDialog>>()
-
-function openBatchSetUserGroupDialog() {
-  batchSetUserGroupDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
-}
-
-function openBatchQuotaSettingsDialog() {
-  quotaSettingsDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
-}
-
 onMounted(() => loadChatUsers())
 </script>
 
@@ -168,10 +136,9 @@ onMounted(() => loadChatUsers())
         <h4>{{ title }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button plain class="ml-3" @click="handleOpenImportUsersDialog">
-            <MkIcon name="icon_import_outlined" />
-            <span>导入用户</span>
-          </el-button>
+          <!-- 导入用户 -->
+          <ImportUsersButton @refresh="loadChatUsers(true)" />
+          <!-- 创建用户 -->
           <el-button type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
             <span>创建用户</span>
@@ -245,24 +212,19 @@ onMounted(() => loadChatUsers())
               </span>
               <el-divider direction="vertical" />
               <div class="flex">
+                <!-- 编辑 -->
                 <el-tooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <mk-icon name="icon_edit_outlined"></mk-icon>
                   </el-button>
                 </el-tooltip>
-                <el-tooltip content="修改用户密码" placement="top">
-                  <el-button type="primary" text @click.stop="handleOpenUserPwdDialog(row)">
-                    <mk-icon name="icon-key_outlined"></mk-icon>
-                  </el-button>
-                </el-tooltip>
+                <!-- 修改用户密码 -->
+                <UserPwdButton :user="row" @refresh="loadChatUsers(false)" />
                 <!-- 更多 -->
-                <MkTableMoreDropdown class="ml-1">
-                  <MkDropdownItem @click="handleOpenQuotaSettingsDialog(row)">
-                    <template #icon>
-                      <MkIcon name="icon_edit_outlined" />
-                    </template>
-                    <span>配额设置</span>
-                  </MkDropdownItem>
+                <MkTableMoreDropdown class="ml-1" persistent>
+                  <!-- 配额设置 -->
+                  <QuotaSettingsButton :user-ids="row.id" dropdown @refresh="loadChatUsers()" />
+                  <!-- 删除 -->
                   <MkDropdownItem divided @click="deleteUser(row)">
                     <template #icon>
                       <MkIcon name="icon_delete-trash_outlined" />
@@ -276,16 +238,15 @@ onMounted(() => loadChatUsers())
         </el-table-column>
 
         <template #footer-batch-actions>
-          <el-button type="primary" plain @click="openBatchSetUserGroupDialog"> 设置用户组 </el-button>
-          <el-button type="primary" plain @click="openBatchQuotaSettingsDialog"> 配额设置 </el-button>
+          <!-- 批量设置用户组 -->
+          <BatchSetUserGroupButton :user-ids="batchSelectedUsers.map(({ id }) => id)" @refresh="loadChatUsers(false)" />
+          <!-- 批量配额设置-->
+          <QuotaSettingsButton :user-ids="batchSelectedUsers.map(({ id }) => id)" @refresh="loadChatUsers()" />
+          <!-- 批量删除-->
           <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
       </MkTable>
     </template>
   </MkViewLayout>
   <UserFromDrawer ref="userFormDrawerRef" @refresh="loadChatUsers" />
-  <ImportUsersDialog ref="importUsersDialogRef" @refresh="loadChatUsers(true)" />
-  <UserPwdDialog ref="userPwdDialogRef" @refresh="loadChatUsers(false)" />
-  <BatchSetUserGroupDialog ref="batchSetUserGroupDialogRef" @refresh="loadChatUsers(false)" />
-  <QuotaSettingsDialog ref="quotaSettingsDialogRef" @refresh="loadChatUsers" />
 </template>

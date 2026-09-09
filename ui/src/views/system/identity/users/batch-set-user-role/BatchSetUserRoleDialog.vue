@@ -72,7 +72,8 @@ function submitBatchSetUserRoles() {
           is_append: batchRoleForm.is_append,
           role_setting: batchRoleForm.role_setting.map((assignment) => ({
             ...assignment,
-            workspace_ids: roleOptions.value.find(({ id }) => id === assignment.role_id)?.type === ROLE_TYPE.ADMIN ? ['None'] : assignment.workspace_ids,
+            workspace_ids:
+              roleOptions.value.find(({ id }) => id === assignment.role_id)?.type === ROLE_TYPE.ADMIN ? ['None'] : assignment.workspace_ids,
           })),
         })
       : UserManageApi.postBatchSetUserRoles({
@@ -113,7 +114,13 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="设置角色" align-center @closed="resetData">
-    <el-form ref="batchRoleFormRef" :model="batchRoleForm" label-position="top" require-asterisk-position="right" @submit.prevent="submitBatchSetUserRoles">
+    <el-form
+      ref="batchRoleFormRef"
+      :model="batchRoleForm"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent="submitBatchSetUserRoles"
+    >
       <el-form-item label="设置方式">
         <el-radio-group v-model="batchRoleForm.is_append">
           <el-radio :value="true">追加</el-radio>
@@ -121,7 +128,12 @@ defineExpose({ open })
         </el-radio-group>
       </el-form-item>
 
-      <MkFormList v-if="auth.isEE || auth.isPE" v-model="batchRoleForm.role_setting" add-text="添加角色" :default-item="{ role_id: '', workspace_ids: [] }">
+      <MkFormList
+        v-if="auth.isEE || auth.isPE"
+        v-model="batchRoleForm.role_setting"
+        add-text="添加角色"
+        :default-item="{ role_id: '', workspace_ids: [] }"
+      >
         <template #default="{ index, item: roleAssignment }">
           <el-form-item
             class="flex-1"
@@ -138,7 +150,13 @@ defineExpose({ open })
               fit-input-width
               @change="handleRoleChange(roleAssignment, index)"
             >
-              <el-option v-for="roleOption in roleOptions" :key="roleOption.id" :label="roleOption.name" :title="roleOption.name" :value="roleOption.id" />
+              <el-option
+                v-for="roleOption in roleOptions"
+                :key="roleOption.id"
+                :label="roleOption.name"
+                :title="roleOption.name"
+                :value="roleOption.id"
+              />
             </el-select>
           </el-form-item>
 

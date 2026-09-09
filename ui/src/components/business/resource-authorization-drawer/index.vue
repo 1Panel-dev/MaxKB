@@ -52,7 +52,6 @@ const searchFields = computed(() => [
 
 /* 查询与跨页选择 */
 const drawerVisible = ref(false)
-const workspaceId = ref('')
 const targetId = ref('')
 const folderData = ref<FolderItem>()
 const loading = ref(false)
@@ -62,17 +61,13 @@ const selectedUsers = ref<ResourceUserPermission[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchQuery = ref<Dict<unknown>>()
 const tableRef = useTemplateRef('tableRef')
-let requestId = 0
-let sessionId = 0
 
 function loadPermissions() {
   if (!targetId.value) return Promise.resolve()
-  const currentRequestId = ++requestId
   loading.value = true
   return props.api
-    .getResourceAuthorization(workspaceId.value, targetId.value, authorizationType.value, paginationConfig.value, searchQuery.value)
+    .getResourceAuthorization(targetId.value, authorizationType.value, paginationConfig.value, searchQuery.value)
     .then(({ records, total }) => {
-      if (currentRequestId !== requestId) return
       permissionUsers.value = records.map((user) => ({
         ...user,
         permission: props.isRootFolder && user.permission === RESOURCE_PERMISSION.NOT_AUTH ? RESOURCE_PERMISSION.VIEW : user.permission,
@@ -80,7 +75,7 @@ function loadPermissions() {
       paginationConfig.value.total = total
     })
     .finally(() => {
-      if (currentRequestId === requestId) loading.value = false
+      loading.value = false
     })
 }
 
@@ -100,17 +95,17 @@ function handleSelectionChange(selection: unknown[]) {
   selectedUsers.value = selection as ResourceUserPermission[]
 }
 
-/* 子资源范围：使用目标工作空间鉴权，不依赖路由路径推断。 */
+/* 子资源范围：直接使用路由中的工作空间鉴权。 */
 const managedFolderIds = computed(() => {
   const permissions = folderPermissions.value
   if (!folderData.value || !permissions) return []
   const canManageAll = hasPermission(
-    [RoleConstants.ADMIN, new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId.value), permissions.auth.getWorkspaceManageFlagPermission()],
+    [RoleConstants.ADMIN, new Role(RoleConstants.WORKSPACE_MANAGE.name, getWorkspaceId()), permissions.auth.getWorkspaceManageFlagPermission()],
     undefined,
-    { workspaceId: workspaceId.value },
+    { workspaceId: getWorkspaceId() },
   )
   function collectFolders(folder: FolderItem): string[] {
-    const canManage = canManageAll || hasPermission(buildBaseResourcePermission(permissions!.edit, folder.id, workspaceId.value))
+    const canManage = canManageAll || hasPermission(buildBaseResourcePermission(permissions!.edit, folder.id, getWorkspaceId()))
     return [...(canManage ? [folder.id] : []), ...(folder.children ?? []).flatMap(collectFolders)]
   }
   return collectFolders(folderData.value)
@@ -139,7 +134,6 @@ function handlePermissionChange(value: string | number | boolean | undefined, us
 
 function submitPermissions(permission: ResourcePermission, includeChildren: boolean) {
   if (submitting.value || !pendingUserIds.value.length || (includeChildren && !managedFolderIds.value.length)) return
-  const currentSessionId = sessionId
   const permissions: ResourceUserPermissionPayload[] = pendingUserIds.value.map((userId) => ({
     user_id: userId,
     permission,
@@ -148,9 +142,8 @@ function submitPermissions(permission: ResourcePermission, includeChildren: bool
   }))
   submitting.value = true
   return props.api
-    .putResourceAuthorization(workspaceId.value, targetId.value, authorizationType.value, permissions)
+    .putResourceAuthorization(targetId.value, authorizationType.value, permissions)
     .then(() => {
-      if (currentSessionId !== sessionId) return
       MsgSuccess('提交成功')
       configDialogRef.value?.close()
       pendingUserIds.value = []
@@ -159,16 +152,19 @@ function submitPermissions(permission: ResourcePermission, includeChildren: bool
       return loadPermissions()
     })
     .finally(() => {
-      if (currentSessionId === sessionId) submitting.value = false
+      submitting.value = false
     })
 }
 
-/* 抽屉生命周期 */
+function open(id: string, folder?: FolderItem) {
+  targetId.value = id
+  folderData.value = folder ? cloneDeep(folder) : undefined
+  drawerVisible.value = true
+  loadPermissions()
+}
+
 function resetData() {
-  sessionId += 1
-  requestId += 1
   targetId.value = ''
-  workspaceId.value = ''
   folderData.value = undefined
   permissionUsers.value = []
   searchQuery.value = undefined
@@ -179,20 +175,11 @@ function resetData() {
   clearSelection()
 }
 
-function open(id: string, folder?: FolderItem, resourceWorkspaceId?: string) {
-  resetData()
-  targetId.value = id
-  workspaceId.value = resourceWorkspaceId ?? folder?.workspace_id ?? getWorkspaceId() ?? 'default'
-  folderData.value = folder ? cloneDeep(folder) : undefined
-  drawerVisible.value = true
-  loadPermissions()
-}
-
 defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="drawerVisible" title="资源授权" size="850" :show-close="!submitting" @closed="resetData">
+  <MkDrawer v-model="drawerVisible" title="资源授权" :size="920" :show-close="!submitting" @closed="resetData">
     <div class="flex-between mb-4 gap-4">
       <el-button type="primary" :disabled="!selectedUsers.length || loading || submitting" @click="handleOpenBatchConfig">配置权限</el-button>
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />

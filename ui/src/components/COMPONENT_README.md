@@ -1186,6 +1186,10 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 新 ID 写入路由，但会清除已有的 `folderId`，避免刷新页面后恢复到旧文件夹。隐藏“全部”入口的
 移动目录树继续以调用方传入的 `v-model` 为准。
 
+可编辑文件夹的菜单提供“资源授权”，根据对应资源模块的 `folderAuth(folder.id)` 控制入口。
+点击后复用 `ResourceAuthorizationDrawer`，传入 Workspace 资源授权 API、当前 `source` 和
+原始完整文件夹子树；搜索过滤不缩减子资源授权范围。只读选择场景不挂载授权抽屉。
+
 ```vue
 <script setup lang="ts">
 import { RESOURCE_TYPE } from '@/api/enums'
@@ -1320,12 +1324,12 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 手动导入 `business/resource-authorization-drawer/index.vue`。调用方传入完整 `api`
 （`typeof ResourceAuthorizationApi`）和 `type`（`ResourceAuthorizationTargetType`），不由抽屉
 根据路由路径选择接口。当前后端的资源用户授权统一使用
-`api/admin/workspace/resource-authorization.ts`。通过 `open(id, folder?, workspaceId?)` 打开；
-System 场景显式传入资源所属工作空间，Workspace 场景可读取当前工作空间。
+`api/admin/workspace/resource-authorization.ts`。通过 `open(id, folder?)` 打开；
+接口请求与文件夹鉴权均直接通过 `getWorkspaceId()` 读取路由中的工作空间，无需额外传入或保存。
 `isFolder`、`isRootFolder` 标记文件夹及根目录，传入文件夹类型也可识别文件夹。
 
 支持姓名、用户名、权限及商业版本角色搜索，跨页选择和单人、批量授权；搜索后清空选择。
 根目录隐藏“不授权”，返回的“不授权”按“查看”展示。包含子资源时必须传入完整文件夹子树，
-抽屉根据目标工作空间筛选有管理权限的文件夹 ID；没有可管理文件夹时禁用该范围。
+抽屉根据当前路由工作空间筛选有管理权限的文件夹 ID；没有可管理文件夹时禁用该范围。
 `PermissionConfigDialog` 只收集权限和范围，保存成功才关闭并刷新，失败保留配置。
-保存成功触发 `refresh`，打开和关闭后统一重置临时数据，过期查询不写回。
+保存成功触发 `refresh`，关闭后统一重置临时数据。

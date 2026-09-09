@@ -9,9 +9,9 @@ import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 import UserFromDrawer from './UserFromDrawer.vue'
-import ImportUsersDialog from './dialog/ImportUsersDialog.vue'
-import UserPwdDialog from './dialog/UserPwdDialog.vue'
-import BatchSetUserRoleDialog from './dialog/BatchSetUserRoleDialog.vue'
+import ImportUsersButton from './import-users/ImportUsersButton.vue'
+import UserPwdButton from './user-password/UserPwdButton.vue'
+import BatchSetUserRoleButton from './batch-set-user-role/BatchSetUserRoleButton.vue'
 
 const { auth, user } = useStore()
 
@@ -20,13 +20,6 @@ const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
 
 function handleOpenUserFormDrawer(systemUser?: SystemUser) {
   userFormDrawerRef.value?.open(systemUser)
-}
-
-/* 导入用户 */
-const importUsersDialogRef = ref<InstanceType<typeof ImportUsersDialog>>()
-
-function handleOpenImportUsersDialog() {
-  importUsersDialogRef.value?.open()
 }
 
 /* 列表查询相关 */
@@ -69,13 +62,6 @@ function loadSystemUsers(resetQuery = false) {
     .finally(() => {
       systemUsersLoading.value = false
     })
-}
-
-/* 密码修改dialog */
-const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
-
-function handleOpenUserPwdDialog(systemUser: SystemUser) {
-  userPwdDialogRef.value?.open(systemUser)
 }
 
 /* 修改用户状态 */
@@ -130,12 +116,6 @@ function handleBatchDelete() {
     })
 }
 
-/* 批量设置角色 */
-const batchSetUserRoleDialogRef = ref<InstanceType<typeof BatchSetUserRoleDialog>>()
-function openBatchSetUserRoleDialog() {
-  batchSetUserRoleDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
-}
-
 onMounted(() => loadSystemUsers())
 </script>
 
@@ -146,10 +126,9 @@ onMounted(() => loadSystemUsers())
         <h4>{{ title }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button plain class="ml-3" @click="handleOpenImportUsersDialog">
-            <MkIcon name="icon_import_outlined" />
-            <span>导入用户</span>
-          </el-button>
+          <!-- 导入用户 -->
+          <ImportUsersButton @refresh="loadSystemUsers()" />
+          <!-- 创建用户 -->
           <el-button type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
             <span>创建用户</span>
@@ -232,16 +211,15 @@ onMounted(() => loadSystemUsers())
               </span>
               <el-divider direction="vertical" />
               <div class="flex">
+                <!-- 编辑 -->
                 <el-tooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <mk-icon name="icon_edit_outlined"></mk-icon>
                   </el-button>
                 </el-tooltip>
-                <el-tooltip content="修改用户密码" placement="top">
-                  <el-button type="primary" text @click.stop="handleOpenUserPwdDialog(row)">
-                    <mk-icon name="icon-key_outlined"></mk-icon>
-                  </el-button>
-                </el-tooltip>
+                <!-- 修改用户密码 -->
+                <UserPwdButton :user="row" @refresh="loadSystemUsers(false)" />
+                <!-- 删除 -->
                 <el-tooltip content="删除" placement="top">
                   <el-button type="primary" text @click.stop="deleteUser(row)">
                     <mk-icon name="icon_delete-trash_outlined"></mk-icon>
@@ -253,16 +231,19 @@ onMounted(() => loadSystemUsers())
         </el-table-column>
 
         <template #footer-batch-actions>
-          <el-button v-if="auth.isEE || auth.isPE" type="primary" plain @click="openBatchSetUserRoleDialog"> 设置角色 </el-button>
+          <!-- 批量设置角色 -->
+          <BatchSetUserRoleButton
+            v-if="auth.isEE || auth.isPE"
+            :user-ids="batchSelectedUsers.map(({ id }) => id)"
+            @refresh="loadSystemUsers(false)"
+          />
+          <!-- 批量删除 -->
           <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
       </MkTable>
     </template>
   </MkViewLayout>
   <UserFromDrawer ref="userFormDrawerRef" @refresh="loadSystemUsers" />
-  <ImportUsersDialog ref="importUsersDialogRef" @refresh="loadSystemUsers" />
-  <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers(false)" />
-  <BatchSetUserRoleDialog ref="batchSetUserRoleDialogRef" @refresh="loadSystemUsers(false)" />
 </template>
 
 <style scoped lang="scss"></style>

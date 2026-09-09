@@ -175,6 +175,7 @@ onMounted(() => loadWorkspaceOptions())
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
+        <!-- 创建工作空间 -->
         <el-tooltip content="创建工作空间" placement="top">
           <el-button text type="primary" class="-mr-1" @click="handleOpenWorkspaceDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
@@ -183,12 +184,14 @@ onMounted(() => loadWorkspaceOptions())
       </component>
       <MkSearchList :data="workspacesList" :default-active="currentWorkspace?.id" @click="handleWorkspaceSelect">
         <template #action-dropdown="{ row: workspace }">
+          <!-- 重命名工作空间 -->
           <MkDropdownItem @click="handleOpenWorkspaceDialog(workspace)">
             <template #icon>
               <MkIcon name="icon_rename_outlined" />
             </template>
             <span>重命名</span>
           </MkDropdownItem>
+          <!-- 删除工作空间 -->
           <MkDropdownItem divided @click="handleWorkspaceDelete(workspace)">
             <template #icon>
               <MkIcon name="icon_delete-trash_outlined" />
@@ -243,6 +246,7 @@ onMounted(() => loadWorkspaceOptions())
           <el-table-column prop="role_name" label="角色" class-name="border-l!" />
           <el-table-column label="操作" width="70" fixed="right">
             <template #default="{ row }">
+              <!-- 移除成员 -->
               <el-tooltip content="移除" placement="top">
                 <el-button type="primary" text @click="handleRemoveMember(row)">
                   <MkIcon name="icon_assigned_outlined" />
@@ -252,6 +256,7 @@ onMounted(() => loadWorkspaceOptions())
           </el-table-column>
 
           <template #footer-batch-actions>
+            <!-- 批量移除成员 -->
             <el-button type="danger" plain @click="handleBatchDelete">移除</el-button>
           </template>
         </MkTable>

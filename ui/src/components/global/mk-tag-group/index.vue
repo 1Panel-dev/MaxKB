@@ -39,7 +39,14 @@ withDefaults(
 </template>
 
 <style scoped lang="scss">
+:global(.el-popper.el-popover.mk-tag-group__popper[data-popper-placement]) {
+  translate: 0 -2px;
+}
+
 :global(.el-popper.el-popover.mk-tag-group__popper .el-popper__arrow) {
   display: block;
+  &[data-popper-placement] {
+    translate: none;
+  }
 }
 </style>

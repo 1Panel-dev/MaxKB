@@ -5,7 +5,7 @@ import WorkspaceApi from '@/api/admin/system/workspace'
 import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { Dict, OperateLog, OptionItem } from '@/api/types'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
-import CleanStrategyDialog from './dialog/CleanStrategyDialog.vue'
+import CleanStrategyButton from './clean-strategy/CleanStrategyButton.vue'
 import OperateLogDetailDialog from './dialog/OperateLogDetailDialog.vue'
 import { beforeDay, datetimeFormat } from '@/utils/time'
 import { useStore } from '@/stores'
@@ -109,13 +109,6 @@ const detailDialogRef = useTemplateRef<InstanceType<typeof OperateLogDetailDialo
 function handleOpenDetail(log: OperateLog) {
   detailDialogRef.value?.open(log)
 }
-/* 清除策略 */
-const cleanStrategyDialogRef = useTemplateRef<InstanceType<typeof CleanStrategyDialog>>('cleanStrategyDialogRef')
-
-function handleOpenCleanStrategy() {
-  cleanStrategyDialogRef.value?.open()
-}
-
 /* 导出 */
 function handleExport() {
   loading.value = true
@@ -139,14 +132,13 @@ onMounted(() => {
         <div class="flex items-center">
           <MkDateRange class="mr-3" @change="handleDateFilterChange" />
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" class="mr-3" />
+          <!-- 清除策略 导出-->
           <el-button plain @click="handleExport">
             <MkIcon name="icon_export_outlined" />
             <span>导出</span>
           </el-button>
-          <el-button plain @click="handleOpenCleanStrategy">
-            <MkIcon name="icon_clear_outlined" />
-            <span>清除策略</span>
-          </el-button>
+          <!-- 清除策略 -->
+          <CleanStrategyButton />
         </div>
       </component>
 
@@ -201,6 +193,5 @@ onMounted(() => {
       </MkTable>
     </template>
   </MkViewLayout>
-  <CleanStrategyDialog ref="cleanStrategyDialogRef" />
   <OperateLogDetailDialog ref="detailDialogRef" />
 </template>

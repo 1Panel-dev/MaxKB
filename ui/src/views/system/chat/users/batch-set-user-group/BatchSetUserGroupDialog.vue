@@ -16,7 +16,9 @@ const submitting = ref(false)
 const userGroupOptionsLoading = ref(false)
 const userGroupOptions = ref<ListItem[]>([])
 const batchGroupForm = reactive<BatchSetChatUserGroupsRequest>({ ids: [], is_append: true, user_group_ids: [] })
-const batchGroupFormRules: FormRules<BatchSetChatUserGroupsRequest> = { user_group_ids: [{ required: true, type: 'array', min: 1, message: '请选择用户组', trigger: 'change' }] }
+const batchGroupFormRules: FormRules<BatchSetChatUserGroupsRequest> = {
+  user_group_ids: [{ required: true, type: 'array', min: 1, message: '请选择用户组', trigger: 'change' }],
+}
 
 /* 用户组选项 */
 function loadUserGroupOptions() {

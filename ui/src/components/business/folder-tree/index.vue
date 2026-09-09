@@ -2,12 +2,14 @@
 import { computed, defineAsyncComponent, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FolderApi from '@/api/admin/workspace/folder'
+import ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
 import type { FolderSource, FolderItem } from '@/api/types'
 import { FOLDER_SORT, type FolderSort } from './types'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import VirtualizedTree from './VirtualizedTree.vue'
 import FolderFormDialog from './FolderFormDialog.vue'
+import ResourceAuthorizationDrawer from '@/components/business/resource-authorization-drawer/index.vue'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/resource-context'
 
@@ -214,6 +216,13 @@ function handleOpenEditFolder(folder: FolderItem) {
   folderFormDialogRef.value?.open(folder.id, folder)
 }
 
+/* 文件夹资源授权 */
+const resourceAuthorizationDrawerRef = useTemplateRef<InstanceType<typeof ResourceAuthorizationDrawer>>('resourceAuthorizationDrawerRef')
+
+function handleOpenResourceAuthorization(folder: FolderItem) {
+  resourceAuthorizationDrawerRef.value?.open(folder.id, folder)
+}
+
 // 创建后选中新文件夹；编辑当前文件夹时同步最新信息。
 function handleFolderRefresh(folder: FolderItem, isEdit: boolean) {
   return loadFolders().then(() => {
@@ -410,6 +419,10 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
             <template #icon><MkIcon name="icon_move2_outlined" /></template>
             <span>移动到</span>
           </MkDropdownItem>
+          <MkDropdownItem @click="handleOpenResourceAuthorization(row)">
+            <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
+            <span>资源授权</span>
+          </MkDropdownItem>
           <MkDropdownItem divided @click="handleDeleteFolder(row)">
             <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
             <span>删除</span>
@@ -420,5 +433,6 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
 
     <FolderFormDialog ref="folderFormDialogRef" :title="formTitle" :source="props.source" @refresh="handleFolderRefresh" />
     <MoveToDialog v-if="canEdit" ref="moveToDialogRef" :loading="moveSubmitting" :source="props.source" @submit="handleMoveFolder" />
+    <ResourceAuthorizationDrawer v-if="canEdit" ref="resourceAuthorizationDrawerRef" :api="ResourceAuthorizationApi" :type="source" is-folder />
   </div>
 </template>

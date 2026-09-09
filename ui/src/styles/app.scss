@@ -67,8 +67,6 @@ h6 {
   line-height: var(--mk-line-height-base);
 }
 
-
-
 /* dot */
 // 状态圆点
 .mk-dot-danger {
@@ -165,28 +163,21 @@ h6 {
   align-items: stretch;
   display: flex;
   flex-direction: column;
-  gap: calc(var(--spacing) * 3);
+  gap: calc(var(--spacing) * 2);
   width: 100%;
 
-  :deep(.el-radio) {
+  .el-radio {
     align-items: flex-start;
     height: auto;
     margin-right: 0;
     white-space: normal;
   }
 
-  :deep(.el-radio__input) {
+  .el-radio__input {
+    flex-shrink: 0;
     margin-top: 3px;
   }
-
-  :deep(.el-radio__label) {
-    line-height: var(--mk-line-height-base);
-    min-width: 0;
-    padding-left: calc(var(--spacing) * 2);
-  }
 }
-
-
 
 /* link */
 .mk-link {
