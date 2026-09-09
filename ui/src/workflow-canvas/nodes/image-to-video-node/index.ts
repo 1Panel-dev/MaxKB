@@ -1,4 +1,5 @@
 import ImageToVideoNodeVue from './index.vue'
+import ImageToVideoNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -12,4 +13,5 @@ export default {
   type: WorkflowNodeType.ImageToVideoGenerateNode,
   model: WorkflowNodeModel,
   view: ImageToVideoNodeView,
+  details: ImageToVideoNodeDetail,
 }

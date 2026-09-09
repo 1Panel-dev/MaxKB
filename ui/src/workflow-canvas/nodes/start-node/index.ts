@@ -1,4 +1,5 @@
 import StartNode from './index.vue'
+import StartNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -8,4 +9,4 @@ class StartNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.Start, model: WorkflowNodeModel, view: StartNodeView }
+export default { type: WorkflowNodeType.Start, model: WorkflowNodeModel, view: StartNodeView, details: StartNodeDetail }

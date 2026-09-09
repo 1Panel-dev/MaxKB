@@ -1,4 +1,5 @@
 import RerankerNode from './index.vue'
+import RerankerNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -8,4 +9,4 @@ class RerankerNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.RerankerNode, model: WorkflowNodeModel, view: RerankerNodeView }
+export default { type: WorkflowNodeType.RerankerNode, model: WorkflowNodeModel, view: RerankerNodeView, details: RerankerNodeDetail }

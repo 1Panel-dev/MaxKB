@@ -1,4 +1,5 @@
 import QuestionNodeVue from './index.vue'
+import QuestionNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -12,4 +13,5 @@ export default {
   type: WorkflowNodeType.Question,
   model: WorkflowNodeModel,
   view: QuestionNodeView,
+  details: QuestionNodeDetail,
 }

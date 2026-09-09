@@ -1,4 +1,5 @@
 import ToolWorkflowLibNode from './index.vue'
+import ToolWorkflowLibNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -8,4 +9,4 @@ class ToolWorkflowLibNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.ToolWorkflowLib, model: WorkflowNodeModel, view: ToolWorkflowLibNodeView }
+export default { type: WorkflowNodeType.ToolWorkflowLib, model: WorkflowNodeModel, view: ToolWorkflowLibNodeView, details: ToolWorkflowLibNodeDetail }
