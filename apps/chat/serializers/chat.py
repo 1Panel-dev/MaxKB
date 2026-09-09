@@ -329,19 +329,25 @@ class ChatSerializers(serializers.Serializer):
                 )
             messages = aggregation.get_contents()
             old_details = None
+            chat_record = None
             if chat_record_id is not None:
                 chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
                 if chat_record:
                     old_details = chat_record.details
+                    if position and chat_record.messages:
+                        messages = [*chat_record.messages, *messages]
             details = wf_manage.get_details(position=position, old_details=old_details)
             self.update_chat_record(chat_user_id, chat_record_id_str, wf_manage.context, messages, details)
             ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
+            # 表单续跑时 message_dict.content 为空;保留原记录里的用户问题,避免 WORKFLOW 历史丢问题
+            question = chat_record.question if (chat_record and chat_record.question) else message_dict
             ChatHistory(chat_id).append(
                 ChatRecord(
                     id=chat_record_id_str,
                     chat_id=chat_id,
-                    question=message_dict,
+                    question=question,
                     messages=messages,
+                    details=details,
                     create_time=timezone.now(),
                 )
             )
