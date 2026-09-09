@@ -3,6 +3,7 @@ import type { Dict, ResourceAuthorizationType, ResourcePermissionItem, ResourceP
 
 /** 系统管理资源授权 */
 const prefix = (workspaceId: string) => `/workspace/${workspaceId}/user_resource_permission`
+const groupPrefix = (workspaceId: string) => `/workspace/${workspaceId}/user_group_resource_permission`
 /** 获取指定空间、指定用户、指定资源类型的权限列表。 */
 const getUserResourcePermissions = (workspaceId: string, userId: string, resource: ResourceAuthorizationType, query?: Dict<unknown>) => {
   return get<ResourcePermissionItem[]>(`${prefix(workspaceId)}/user/${userId}/resource/${resource}`, query)
@@ -16,12 +17,15 @@ const putUserResourcePermissions = (workspaceId: string, userId: string, resourc
 
 /** 获取指定空间、指定用户组、指定资源类型的权限列表。 */
 const getUserGroupResourcePermissions = (workspaceId: string, userId: string, resource: ResourceAuthorizationType, query?: Dict<unknown>) => {
-  return get<ResourcePermissionItem[]>(`${prefix(workspaceId)}/user-group/${userId}/resource/${resource}`, query)
+  return get<ResourcePermissionItem[]>(`${groupPrefix(workspaceId)}/user_group/${userId}/resource/${resource}`, query)
 }
 
 /** 更新指定空间、指定用户组、指定资源类型的权限列表。 */
 const putUserGroupResourcePermissions = (workspaceId: string, userId: string, resource: ResourceAuthorizationType, permissions: ResourcePermissionPayload[]) => {
-  return put<ResourcePermissionPayload[], ResourcePermissionPayload[]>(`${prefix(workspaceId)}/user-group/${userId}/resource/${resource}`, permissions)
+  return put<ResourcePermissionPayload[], ResourcePermissionPayload[]>(
+    `${groupPrefix(workspaceId)}/user_group/${userId}/resource/${resource}`,
+    permissions,
+  )
 }
 
 
