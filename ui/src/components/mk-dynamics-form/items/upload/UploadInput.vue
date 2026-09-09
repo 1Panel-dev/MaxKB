@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DynamicFormValue } from '../../type'
 import { computed, inject, ref, useAttrs } from 'vue'
-import { ElMessage } from 'element-plus'
+import { MsgWarning } from '@/utils/message'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { downloadByURL, getAttrsArray, getFileUrl } from '@/utils/common'
 import { getFileExtension, getFileIconUrl } from '@/utils/icon'
@@ -45,7 +45,9 @@ const images = computed(() => filesWithUrl.value.filter(ofType(imageExtensions))
 const audioFiles = computed(() => filesWithUrl.value.filter(ofType(audioExtensions)))
 const videoFiles = computed(() => filesWithUrl.value.filter(ofType(videoExtensions)))
 // 非图片/音频/视频的（文档、压缩包等）统一走下载卡片
-const downloadFiles = computed(() => filesWithUrl.value.filter((f: DynamicFormValue) => !ofType([...imageExtensions, ...audioExtensions, ...videoExtensions])(f)))
+const downloadFiles = computed(() =>
+  filesWithUrl.value.filter((f: DynamicFormValue) => !ofType([...imageExtensions, ...audioExtensions, ...videoExtensions])(f)),
+)
 
 function downloadFile(item: DynamicFormValue) {
   downloadByURL(item.url, item.name)
@@ -56,18 +58,18 @@ const loading = ref<boolean>(false)
 const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) => {
   fileList.splice(fileList.indexOf(file), 1)
   if (fileArray.value.find((f: DynamicFormValue) => f.name === file.name)) {
-    ElMessage.warning('文件名重复')
+    MsgWarning('文件名重复')
 
     return
   }
   const maxFileSize = (props.formField as DynamicFormValue).max_file_size
   if (file.size / 1024 / 1024 > maxFileSize) {
-    ElMessage.warning('文件大小不能超过 ' + maxFileSize + 'MB')
+    MsgWarning('文件大小不能超过 ' + maxFileSize + 'MB')
     return
   }
 
   if (fileList.length > attrs.limit) {
-    ElMessage.warning('最多只能上传 ' + attrs.limit + ' 个文件')
+    MsgWarning('最多只能上传 ' + attrs.limit + ' 个文件')
     return
   }
   upload(file.raw, loading).then((ok: DynamicFormValue) => {

@@ -397,6 +397,9 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 所有 `el-button` 的 `:active` 和 `.is-active` 视觉统一复用各自的 hover 样式，不额外加深背景、
 边框或文字颜色；普通、plain、text、link、circle 及各语义类型按钮均遵循该规则。
 
+Tree 的 `.el-tree-node__content` 统一保留 4px 底部间距，使同级节点及展开后的父子节点行
+保持一致间距；规则维护在 `element-plus.scss` 的 tree 分组。
+
 按钮式多选使用 `el-checkbox-group` 和 `el-checkbox-button`，外观与按钮式单选一致：
 组容器提供圆角边框、4px 内边距和间距，选中项使用主题色文字与浅色背景，不显示相邻按钮连接阴影。
 规则统一维护在 `element-plus.scss` 的 checkbox 分组；仅包含 `el-checkbox-button` 的组容器

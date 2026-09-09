@@ -2,7 +2,7 @@
 import type { DynamicFormValue } from '../../type'
 import { computed, onMounted, reactive } from 'vue'
 
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { MsgConfirm, MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -93,15 +93,6 @@ function openAddChildDialog(node: TreeNode) {
   addDialog.formList = [createEmptyRow()]
 }
 
-function appendAddRow() {
-  addDialog.formList.push(createEmptyRow())
-}
-
-function removeAddRow(index: number) {
-  if (addDialog.formList.length === 1) return
-  addDialog.formList.splice(index, 1)
-}
-
 function closeAddDialog() {
   addDialog.visible = false
   addDialog.mode = 'root'
@@ -115,7 +106,7 @@ function submitAdd() {
     .filter((item) => item.label && item.value)
 
   if (!validList.length) {
-    ElMessage.warning('请至少填写一条完整数据')
+    MsgWarning('请至少填写一条完整数据')
     return
   }
 
@@ -126,7 +117,7 @@ function submitAdd() {
   } else {
     const parent = addDialog.parentNode
     if (!parent) {
-      ElMessage.error('未找到父节点')
+      MsgError('未找到父节点')
       return
     }
 
@@ -136,7 +127,7 @@ function submitAdd() {
     parent.children.push(...newNodes)
   }
 
-  ElMessage.success('保存成功')
+  MsgSuccess('保存成功')
   closeAddDialog()
 }
 
@@ -161,32 +152,32 @@ function submitEdit() {
   const value = editDialog.form.value.trim()
 
   if (!label || !value) {
-    ElMessage.warning('标签和选项值不能为空')
+    MsgWarning('标签和选项值不能为空')
     return
   }
 
   if (!editDialog.targetNode) {
-    ElMessage.error('未找到父节点')
+    MsgError('未找到父节点')
     return
   }
 
   editDialog.targetNode.label = label
   editDialog.targetNode.value = value
 
-  ElMessage.success('保存成功')
+  MsgSuccess('保存成功')
   closeEditDialog()
 }
 
 /* -------------------- 删除 -------------------- */
 
 function handleDelete(node: TreeNode) {
-  ElMessageBox.confirm(`确定删除「${node.label}」吗？`, '提示', { type: 'warning' })
+  MsgConfirm('提示', `确定删除「${node.label}」吗？`, { type: 'warning' })
     .then(() => {
       const removed = removeNodeById(formValue.value.treeData, node.id)
       if (removed) {
-        ElMessage.success('删除成功')
+        MsgSuccess('删除成功')
       } else {
-        ElMessage.error('删除失败')
+        MsgError('删除失败')
       }
     })
     .catch(() => {})
@@ -216,45 +207,34 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
 </script>
 
 <template>
-  <el-form-item prop="treeData" :rules="[{ message: '选项必填', blur: 'change', type: 'array', min: 1 }]">
+  <el-form-item prop="treeData" class="mk-hide-asterisk" :rules="[{ required: true, message: '请添加选项', blur: 'change', type: 'array', min: 1 }]">
     <template #label>
       <div class="flex-between">
-        <span>
-          选项
-          <span class="color-danger">*</span>
-        </span>
-        <div class="flex">
-          <el-checkbox v-model="formValue.multiple" label="允许多选" size="large" class="pr-8" />
+        <span class="mk-required">选项</span>
+        <div class="flex gap-3">
+          <el-checkbox v-model="formValue.multiple" label="允许多选" />
           <el-button link type="primary" @click="openAddRootDialog">
-            <MkIcon name="icon_add_outlined" class="mr-4"></MkIcon>
+            <MkIcon name="icon_add_outlined"></MkIcon>
           </el-button>
         </div>
       </div>
     </template>
-    <el-card shadow="never" class="border-r-6 w-full" style="--el-card-padding: 8px">
+    <el-card shadow="never" class="w-full" style="--el-card-padding: 12px">
       <el-tree :data="formValue.treeData" node-key="id" default-expand-all :expand-on-click-node="false" :props="treeProps" class="option-tree">
         <template #default="{ data, node }">
-          <div class="flex-between w-full">
-            <div class="ellipsis" :title="`${data.label}-${data.value}`" style="max-width: 350px">
-              <span>{{ data.label }}-{{ data.value }}</span>
-            </div>
+          <div class="flex-between min-w-0 flex-1 gap-2">
+            <div class="min-w-0 flex-1 truncate" :title="`${data.label}-${data.value}`">{{ data.label }}-{{ data.value }}</div>
+            <div class="flex shrink-0 items-center">
+              <el-button text @click.stop="openEditDialog(data)">
+                <MkIcon name="icon_edit_outlined"></MkIcon>
+              </el-button>
+              <el-button text @click.stop="openAddChildDialog(data)" v-if="node.level < 5">
+                <MkIcon name="icon_add_outlined"></MkIcon>
+              </el-button>
 
-            <div>
-              <span class="mr-4" v-if="node.level < 5">
-                <el-button link @click.stop="openAddChildDialog(data)">
-                  <MkIcon name="icon_add_outlined" class="color-secondary"></MkIcon>
-                </el-button>
-              </span>
-              <span class="mr-4">
-                <el-button link @click.stop="openEditDialog(data)">
-                  <MkIcon name="icon_edit_outlined" class="color-secondary"></MkIcon>
-                </el-button>
-              </span>
-              <span>
-                <el-button link @click.stop="handleDelete(data)">
-                  <MkIcon name="icon_delete-trash_outlined" class="color-secondary"></MkIcon>
-                </el-button>
-              </span>
+              <el-button text @click.stop="handleDelete(data)">
+                <MkIcon name="icon_delete-trash_outlined"></MkIcon>
+              </el-button>
             </div>
           </div>
         </template>
@@ -283,94 +263,40 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
     />
   </el-form-item>
   <!-- 添加弹窗 -->
-  <MkDialog
-    v-model="addDialog.visible"
-    :title="addDialog.mode === 'root' ? '添加一级选项' : '添加子选项'"
-    label-position="top"
-    require-asterisk-position="right"
-    @submit.prevent
-  >
-    <el-scrollbar>
-      <el-row :gutter="8" style="margin-right: 10px" class="tag-list-max-list">
-        <template v-for="(item, index) in addDialog.formList" :key="index">
-          <el-col :span="12">
-            <el-form-item>
-              <template #label>
-                {{ index === 0 ? '标签' : '' }}
-                <span class="color-danger" v-if="index === 0"> *</span>
-              </template>
-              <el-input v-model.trim="item.label" class="w-full" placeholder="请输入选项标签" maxlength="50"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item class="w-full">
-              <template #label>
-                {{ index === 0 ? '选项值' : '' }}
-                <span class="color-danger" v-if="index === 0">*</span>
-              </template>
-              <el-input v-model.trim="item.value" placeholder="请输入选项值" maxlength="100"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="1">
-            <el-button
-              :disabled="addDialog.formList.length === 1"
-              link
-              @click="removeAddRow(index)"
-              :style="{ marginTop: index === 0 ? '35px' : '12px' }"
-            >
-              <MkIcon name="icon_delete-trash_outlined"></MkIcon>
-            </el-button>
-          </el-col>
+  <MkDialog v-model="addDialog.visible" :title="addDialog.mode === 'root' ? '添加一级选项' : '添加子选项'">
+    <el-form :model="addDialog" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <MkFormList v-model="addDialog.formList" :default-item="createEmptyRow" item-key="key">
+        <template #default="{ index, item: option }">
+          <el-form-item :label="index === 0 ? '标签' : ''" :required="index === 0" class="min-w-0 flex-1 small">
+            <el-input v-model.trim="option.label" placeholder="请输入选项标签" maxlength="50" />
+          </el-form-item>
+          <el-form-item :label="index === 0 ? '选项值' : ''" :required="index === 0" class="min-w-0 flex-1 small">
+            <el-input v-model.trim="option.value" placeholder="请输入选项值" maxlength="100" />
+          </el-form-item>
         </template>
-      </el-row>
-    </el-scrollbar>
-    <el-button link type="primary" @click="appendAddRow">
-      <MkIcon name="icon_add_outlined" class="mr-4" />
-      添加
-    </el-button>
+      </MkFormList>
+    </el-form>
     <template #footer>
-      <el-button @click="closeAddDialog">取消</el-button>
+      <el-button plain @click="closeAddDialog">取消</el-button>
       <el-button type="primary" @click="submitAdd">添加</el-button>
     </template>
   </MkDialog>
 
   <!-- 编辑弹窗 -->
-  <MkDialog
-    :close-on-click-modal="true"
-    :close-on-press-escape="true"
-    v-model="editDialog.visible"
-    title="编辑"
-    width="520px"
-    destroy-on-close
-    label-position="top"
-    require-asterisk-position="right"
-    @submit.prevent
-  >
-    <el-row :gutter="8">
-      <el-col :span="12">
-        <el-form-item>
-          <template #label>
-            标签
-            <span class="color-danger"> *</span>
-          </template>
+  <MkDialog :close-on-click-modal="true" :close-on-press-escape="true" v-model="editDialog.visible" title="编辑">
+    <el-form :model="editDialog.form" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <div class="flex gap-2">
+        <el-form-item label="标签" required class="min-w-0 flex-1 small">
           <el-input v-model.trim="editDialog.form.label" placeholder="请输入选项标签" maxlength="50" />
         </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item class="w-full">
-          <template #label>
-            选项值
-            <span class="color-danger">*</span>
-          </template>
+        <el-form-item label="选项值" required class="min-w-0 flex-1 small">
           <el-input v-model.trim="editDialog.form.value" placeholder="请输入选项值" maxlength="100" />
         </el-form-item>
-      </el-col>
-    </el-row>
-
+      </div>
+    </el-form>
     <template #footer>
-      <el-button @click="closeEditDialog">取消</el-button>
+      <el-button plain @click="closeEditDialog">取消</el-button>
       <el-button type="primary" @click="submitEdit">保存</el-button>
     </template>
   </MkDialog>
 </template>
-<style lang="scss" scoped></style>
