@@ -184,3 +184,17 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 `ResourceAuthorizationTargetType` 包含资源类型和三个 `_FOLDER` 类型，文件夹类型用于后端
 鉴权。包含子资源时传 `include_children: true` 及经过管理权限筛选的 `folder_ids`，
 普通资源或仅当前文件夹不传子文件夹 ID。loading、刷新及成功提示由抽屉负责。
+
+用户组视角使用同文件的 `getResourceUserGroupAuthorization` 和
+`putResourceUserGroupAuthorization`，请求路径为
+`resource_user_group_permission/resource/<target>/resource/<resource>`。分页返回
+`ResponsePage<ResourceUserGroupPermission>`（`id`、`name`、`count`、`permission`），
+名称查询参数为 `name`，提交 `ResourceUserGroupPermissionPayload[]`，对象 ID 字段为
+`user_group_id`；文件夹生效范围参数与用户授权一致。
+
+System 资源管理的用户授权维护在 `admin/system/resource-management/resource-authorization.ts`，
+使用 `/system/workspace/<workspaceId>/resource_management/resource/<target>/resource/<resource>`。
+查询与保存签名、分页类型、响应类型及提交类型与 Workspace 用户授权保持一致；工作空间 ID
+由接口内部读取，loading 由组件管理。`ResourceAuthorizationDrawer` 内部通过
+`isSystemResource()` 选择完整的用户授权 API 对象，作为该抽屉的范围选择例外；用户组仍使用
+现有 Workspace 接口，不推测 System 用户组路径。

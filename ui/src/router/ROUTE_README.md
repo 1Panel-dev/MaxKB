@@ -180,7 +180,9 @@ Vue Router 的 meta 合并自动继承。
 判断。非资源页面不配置 `resourceScope`。
 
 `resourceScope` 负责表达当前路由语义，页面据此决定展示和选用哪个业务 API；卡片、Action、
-Drawer、Dialog 不根据 path、路由名称或 Scope 自行维护 API 映射。
+Drawer、Dialog 通常不根据 path、路由名称或 Scope 自行维护 API 映射。
+资源授权抽屉 `ResourceAuthorizationDrawer` 例外：由抽屉入口通过 `isSystemResource()`
+选择 System 资源管理或 Workspace 用户授权接口，再传给标签子组件。
 
 ## 业务路由层级
 

@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import type { Dict, OptionItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 
+defineOptions({ name: 'UserGroupMembersDrawer' })
+
 /* 成员查询与分页 */
 const drawerVisible = ref(false)
 const currentGroup = ref<SystemUserGroup>()
@@ -38,6 +40,7 @@ function handleMemberSearch(query?: Dict<unknown>) {
 }
 
 function open(userGroup: SystemUserGroup) {
+  resetData()
   currentGroup.value = { ...userGroup }
   drawerVisible.value = true
   loadUserGroupMembers()

@@ -263,8 +263,8 @@ src/views/system/identity/users/
 `CleanStrategyButton.vue` 管理打开动作和弹窗 Ref，`CleanStrategyDialog.vue` 负责策略查询与保存，
 `OperateLogListView.vue` 只组合入口组件。
 
-资源授权页面的 `UserGroupAuthorizationList` 通过人数链接打开同目录的
-`UserGroupMembersDrawer.vue`，按用户组所属工作空间查询成员，提供用户名、姓名搜索和分页，
+资源授权页面的 `UserGroupAuthorizationList` 通过人数链接打开共享业务组件
+`components/business/resource-authorization-drawer/user-group/UserGroupMembersDrawer.vue`，按用户组所属工作空间查询成员，提供用户名、姓名搜索和分页，
 并使用 `MkTagGroup` 折叠展示角色；点击人数不切换当前授权对象。
 
 ## 文件命名
@@ -385,3 +385,11 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 `ModelCreateButton` 默认渲染主按钮，也支持通过默认作用域插槽的 `open()` 定制触发按钮，
 `SelectModel` 的下拉页脚使用该插槽复用同一创建流程。创建成功后保留基础资料刷新，再触发
 `refresh` 通知调用方重新加载模型列表。
+
+## 资源授权 Action
+
+四类资源卡片的 `action-dropdown/` 分别提供 `AuthorizeModelAction`、`AuthorizeToolAction`、
+`AuthorizeKnowledgeAction` 和 `AuthorizeApplicationAction`，由列表页面组合，显式传入 `label`
+和当前资源，保存成功后通过 `refresh` 刷新列表。Action 使用对应资源的 Workspace 或 System
+`auth` 权限判断，共享资源不展示入口。点击后按需挂载公共 `ResourceAuthorizationDrawer`，
+传入资源类型并调用 `open(id)`；在 `closed` 后卸载，不再复制授权表格或请求逻辑。

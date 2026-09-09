@@ -25,6 +25,21 @@ export interface ResourceUserPermissionPayload {
   folder_ids?: string[]
 }
 
+/** 指定资源下的用户组及其权限。 */
+export interface ResourceUserGroupPermission {
+  id: string
+  name: string
+  count: number
+  permission: ResourcePermission
+}
+
+export interface ResourceUserGroupPermissionPayload {
+  user_group_id: string
+  permission: ResourcePermission
+  include_children?: boolean
+  folder_ids?: string[]
+}
+
 export interface ResourcePermissionItem {
   auth_target_type: ResourceAuthorizationType
   children?: ResourcePermissionItem[]

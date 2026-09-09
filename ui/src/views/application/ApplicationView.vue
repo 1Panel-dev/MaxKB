@@ -10,7 +10,13 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ApplicationCard from './application-card/ApplicationCard.vue'
-import { DeleteApplicationAction, ExportApplicationAction, MoveApplicationAction, SettingApplicationAction } from './application-card/action-dropdown'
+import {
+  AuthorizeApplicationAction,
+  DeleteApplicationAction,
+  ExportApplicationAction,
+  MoveApplicationAction,
+  SettingApplicationAction,
+} from './application-card/action-dropdown'
 import CreateApplicationDropdown from './create-application/CreateApplicationDropdown.vue'
 
 const route = useRoute()
@@ -229,6 +235,8 @@ function handleBatchDelete() {
                     :api="ApplicationApi"
                     :application="application"
                   />
+                  <!-- 资源授权 -->
+                  <AuthorizeApplicationAction label="资源授权" :application="application" @refresh="refreshApplications" />
                   <DeleteApplicationAction
                     v-model:loading="applicationOperationLoading"
                     label="删除"

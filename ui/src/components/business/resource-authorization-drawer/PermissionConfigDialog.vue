@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { OptionItem, ResourcePermission } from '@/api/types'
+import type { ResourcePermission } from '@/api/types'
+
+import type { ResourcePermissionOption } from './types'
 
 const props = defineProps<{
-  options: (OptionItem<ResourcePermission> & { description: string })[]
+  options: ResourcePermissionOption[]
   isFolder: boolean
   canIncludeChildren: boolean
   loading: boolean
