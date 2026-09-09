@@ -1,19 +1,23 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： message_queue.py
-    @date：2026/7/27  10:10
-    @desc: 消息队列管理，用于流式响应的消息存储和消费
-    支持多消费者、断线重连、消息持久化
+@project: MaxKB
+@Author：虎虎虎
+@file： message_queue.py
+@date：2026/7/27  10:10
+@desc: 消息队列管理，用于流式响应的消息存储和消费
+支持多消费者、断线重连、消息持久化
 """
+
 import bisect
 import fnmatch
 import json
+import os
 import socket
 import threading
 import time
 from abc import ABC, abstractmethod
+from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 from enum import Enum
 from typing import Any, Callable, List, Optional, Tuple
 
@@ -35,6 +39,7 @@ def _benign_timeouts() -> tuple:
     candidates = [TimeoutError, socket.timeout]
     try:
         from redis.exceptions import TimeoutError as RedisTimeoutError
+
         candidates.append(RedisTimeoutError)
     except ImportError:
         pass
@@ -103,13 +108,13 @@ class IMessageQueue(ABC):
 
     @abstractmethod
     def consume(
-            self,
-            queue_id: str,
-            start_id: str = "0",
-            on_message: Optional[Callable[[str, str], None]] = None,
-            on_done: Optional[Callable[[], None]] = None,
-            timeout: float = 300,
-            should_stop: Optional[Callable[[], bool]] = None,
+        self,
+        queue_id: str,
+        start_id: str = "0",
+        on_message: Optional[Callable[[str, str], None]] = None,
+        on_done: Optional[Callable[[], None]] = None,
+        timeout: float = 300,
+        should_stop: Optional[Callable[[], bool]] = None,
     ) -> None:
         """
         消费消息，阻塞直到队列结束 / 超时 / 被取消。
@@ -236,13 +241,13 @@ class InMemoryMessageQueue(IMessageQueue):
             return self._done_flags.get(queue_id, False)
 
     def consume(
-            self,
-            queue_id: str,
-            start_id: str = "0",
-            on_message: Optional[Callable[[str, str], None]] = None,
-            on_done: Optional[Callable[[], None]] = None,
-            timeout: float = 300,
-            should_stop: Optional[Callable[[], bool]] = None,
+        self,
+        queue_id: str,
+        start_id: str = "0",
+        on_message: Optional[Callable[[str, str], None]] = None,
+        on_done: Optional[Callable[[], None]] = None,
+        timeout: float = 300,
+        should_stop: Optional[Callable[[], bool]] = None,
     ) -> None:
         deadline = time.monotonic() + timeout
         cursor = parse_stream_id(start_id)
@@ -316,6 +321,7 @@ class RedisStreamMessageQueue(IMessageQueue):
         """
         try:
             from django_redis import get_redis_connection
+
             return get_redis_connection(self._alias)
         except ImportError:
             pass
@@ -323,6 +329,7 @@ class RedisStreamMessageQueue(IMessageQueue):
             maxkb_logger.warning(f"get_redis_connection({self._alias}) failed: {e}")
 
         from django.core.cache import cache
+
         client = getattr(cache, "client", None)
         if client is not None and hasattr(client, "get_client"):
             return client.get_client(write=True)
@@ -358,9 +365,7 @@ class RedisStreamMessageQueue(IMessageQueue):
                 safe = int(float(socket_timeout) * 1000 * BLOCK_SAFETY_RATIO)
                 limit = max(100, min(limit, safe))
                 if limit < self._block_timeout:
-                    maxkb_logger.info(
-                        f"MessageQueue: socket_timeout={socket_timeout}s，XREAD block 收敛到 {limit}ms"
-                    )
+                    maxkb_logger.info(f"MessageQueue: socket_timeout={socket_timeout}s，XREAD block 收敛到 {limit}ms")
         except Exception as e:
             maxkb_logger.warning(f"MessageQueue: 无法读取 socket_timeout，沿用默认 block: {e}")
 
@@ -439,13 +444,13 @@ class RedisStreamMessageQueue(IMessageQueue):
             raise MessageQueueError(f"is_done({queue_id}) failed: {e}") from e
 
     def consume(
-            self,
-            queue_id: str,
-            start_id: str = "0",
-            on_message: Optional[Callable[[str, str], None]] = None,
-            on_done: Optional[Callable[[], None]] = None,
-            timeout: float = 300,
-            should_stop: Optional[Callable[[], bool]] = None,
+        self,
+        queue_id: str,
+        start_id: str = "0",
+        on_message: Optional[Callable[[str, str], None]] = None,
+        on_done: Optional[Callable[[], None]] = None,
+        timeout: float = 300,
+        should_stop: Optional[Callable[[], bool]] = None,
     ) -> None:
         key = self._key(queue_id)
         deadline = time.monotonic() + timeout
@@ -553,8 +558,8 @@ class RedisStreamMessageQueue(IMessageQueue):
             redis = self._get_redis()
             count = 0
             for full_pattern, counted in (
-                    (f"{self._namespace}:{pattern}", True),
-                    (f"{self._namespace}:{pattern}:done", False),
+                (f"{self._namespace}:{pattern}", True),
+                (f"{self._namespace}:{pattern}:done", False),
             ):
                 cursor = 0
                 while True:
@@ -571,6 +576,118 @@ class RedisStreamMessageQueue(IMessageQueue):
             return 0
 
 
+class _ProducerLane:
+    """单个 queue_id 的写入通道：一个 FIFO 缓冲 + 是否已有 flush 任务在跑的标记。"""
+
+    __slots__ = ("buffer", "active")
+
+    def __init__(self):
+        self.buffer: deque = deque()
+        self.active = False
+
+
+class AsyncMessageQueue(IMessageQueue):
+    """
+    给后端队列套一层"异步写入 + 单会话保序"的生产侧包装。
+
+    流式场景每 token 都要 produce 一次，若同步写后端（Redis）会让调用线程逐 token 等一次网络 RTT，
+    进而拖慢整个工作流。这里把 produce / produce_done 交给共享线程池执行，调用方只做一次进程内入队后立即返回：
+      - 每个 queue_id 同一时刻至多一个 flush 任务在跑，消息按 deque FIFO 顺序写出，
+        断线重连用的 Stream ID 顺序不受影响；
+      - produce_done 走同一条通道，保证在全部消息写完之后才落 done 标记；
+      - 会话写空后回收该 queue_id 的通道，避免长期占用内存；
+      - 读操作（exists / consume / get_messages / is_done 等）直接委托后端，语义不变。
+    后端写入异常只记日志、不抛回业务线程（业务线程此时早已返回）。
+    """
+
+    _DONE = object()
+
+    def __init__(self, backend: IMessageQueue, max_workers: int = None):
+        self._backend = backend
+        self._lanes: dict[str, _ProducerLane] = {}
+        self._lock = threading.Lock()
+        self._pool = ThreadPoolExecutor(
+            max_workers=max_workers or int(os.getenv("MAXKB_MQ_PRODUCE_WORKERS", "8")),
+            thread_name_prefix="mq-produce",
+        )
+
+    # ---------- 生产侧：异步 + 保序 ----------
+
+    def produce(self, queue_id: str, message: Any, ttl: int = None) -> None:
+        self._enqueue(queue_id, (message, ttl))
+
+    def produce_done(self, queue_id: str, ttl: int = None) -> None:
+        self._enqueue(queue_id, (self._DONE, ttl))
+
+    def _enqueue(self, queue_id: str, item: Tuple[Any, Optional[int]]) -> None:
+        with self._lock:
+            lane = self._lanes.get(queue_id)
+            if lane is None:
+                lane = _ProducerLane()
+                self._lanes[queue_id] = lane
+            lane.buffer.append(item)
+            if lane.active:
+                return
+            lane.active = True
+        self._pool.submit(self._flush, queue_id)
+
+    def _flush(self, queue_id: str) -> None:
+        while True:
+            with self._lock:
+                lane = self._lanes.get(queue_id)
+                if lane is None:
+                    return
+                if not lane.buffer:
+                    # 写空即回收：新消息到来时 _enqueue 会重建通道并重新提交任务
+                    self._lanes.pop(queue_id, None)
+                    return
+                message, ttl = lane.buffer.popleft()
+            try:
+                if message is self._DONE:
+                    self._backend.produce_done(queue_id, ttl=ttl)
+                else:
+                    self._backend.produce(queue_id, message, ttl=ttl)
+            except Exception as e:
+                maxkb_logger.error(f"AsyncMessageQueue flush error [{queue_id}]: {e}")
+
+    def _drop_lane(self, queue_id: str) -> None:
+        with self._lock:
+            self._lanes.pop(queue_id, None)
+
+    # ---------- 读操作 / 清理：委托后端 ----------
+
+    def exists(self, queue_id: str) -> bool:
+        return self._backend.exists(queue_id)
+
+    def is_done(self, queue_id: str) -> bool:
+        return self._backend.is_done(queue_id)
+
+    def consume(
+        self,
+        queue_id: str,
+        start_id: str = "0",
+        on_message: Optional[Callable[[str, str], None]] = None,
+        on_done: Optional[Callable[[], None]] = None,
+        timeout: float = 300,
+        should_stop: Optional[Callable[[], bool]] = None,
+    ) -> None:
+        return self._backend.consume(queue_id, start_id, on_message, on_done, timeout, should_stop)
+
+    def get_messages(self, queue_id: str, start_id: str = "0", count: int = 100) -> list:
+        return self._backend.get_messages(queue_id, start_id, count)
+
+    def delete(self, queue_id: str) -> None:
+        # 先丢掉尚未 flush 的缓冲，避免删除后又把残留写回后端
+        self._drop_lane(queue_id)
+        self._backend.delete(queue_id)
+
+    def clear_by_pattern(self, pattern: str) -> int:
+        with self._lock:
+            for queue_id in [q for q in self._lanes if fnmatch.fnmatch(q, pattern)]:
+                self._lanes.pop(queue_id, None)
+        return self._backend.clear_by_pattern(pattern)
+
+
 def create_message_queue(namespace: str = "mq", use_redis: bool = True) -> IMessageQueue:
     """
     创建消息队列实例
@@ -583,9 +700,7 @@ def create_message_queue(namespace: str = "mq", use_redis: bool = True) -> IMess
             queue.ping()
             return queue
         except Exception as e:
-            maxkb_logger.warning(
-                f"Redis 不可用，降级为 InMemoryMessageQueue（多 worker 部署下跨进程消费将失效）: {e}"
-            )
+            maxkb_logger.warning(f"Redis 不可用，降级为 InMemoryMessageQueue（多 worker 部署下跨进程消费将失效）: {e}")
     return InMemoryMessageQueue()
 
 
@@ -598,9 +713,12 @@ def get_message_queue(namespace: str = "chat") -> IMessageQueue:
         instance = _instances.get(namespace)  # 双检
         if instance is None:
             from django.conf import settings
-            instance = create_message_queue(
+
+            backend = create_message_queue(
                 namespace=namespace,
                 use_redis=getattr(settings, "MESSAGE_QUEUE_USE_REDIS", True),
             )
+            # 套异步写入层：produce/produce_done 不再阻塞业务线程（逐 token 的 Redis RTT 拖慢工作流）
+            instance = AsyncMessageQueue(backend)
             _instances[namespace] = instance
         return instance
