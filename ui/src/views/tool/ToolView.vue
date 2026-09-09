@@ -13,6 +13,7 @@ import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolCard from './tool-card/ToolCard.vue'
 import {
+  AuthorizeToolAction,
   CopyToolAction,
   DeleteToolAction,
   EditToolAction,
@@ -250,7 +251,6 @@ onMounted(() => {
                     :tool="tool"
                   />
 
-                  <!-- // TODO: 资源授权-统一处理-->
                   <!-- // TODO: 触发器 (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW')-->
                   <!-- // TODO: 查看关联资源-->
                   <!-- // TODO: 查看执行记录    (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW')-->
@@ -265,6 +265,8 @@ onMounted(() => {
                     @delete="handleDeleteTool"
                   />
                   <ExportToolAction v-if="!tool.template_id" v-model:loading="toolOperationLoading" label="导出" :api="ToolApi" :tool="tool" />
+                  <!-- 资源授权 -->
+                  <AuthorizeToolAction label="资源授权" :tool="tool" @refresh="refreshTool" />
                   <DeleteToolAction v-model:loading="toolOperationLoading" label="删除" :api="ToolApi" :tool="tool" @delete="handleDeleteTool" />
                 </template>
               </ToolCard>

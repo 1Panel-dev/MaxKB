@@ -10,7 +10,7 @@ import ProviderApi from '@/api/admin/model-provider.ts'
 import ModelCard from './model-card/ModelCard.vue'
 import ModelCreateButton from './create-model/ModelCreateButton.vue'
 import ModelProvider from './components/ModelProvider.vue'
-import { DeleteModelAction, EditModelAction, ParamSettingAction } from './model-card/action-dropdown'
+import { AuthorizeModelAction, DeleteModelAction, EditModelAction, ParamSettingAction } from './model-card/action-dropdown'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 
@@ -107,11 +107,14 @@ onMounted(() => {
               :disabled="isShared"
             >
               <template #action-dropdown>
+                <!-- 编辑 -->
                 <EditModelAction label="编辑" :api="ModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
+                <!-- 模型参数设置 -->
                 <ParamSettingAction v-if="model.model_type !== 'RERANKER'" label="模型参数设置" :api="ModelApi" :model="model" />
-                <!-- // TODO: 资源授权-统一处理-->
+                <!-- 资源授权 -->
+                <AuthorizeModelAction label="资源授权" :model="model" @refresh="loadModels" />
                 <!-- // TODO: 查看关联资源-->
-
+                <!-- 删除 -->
                 <DeleteModelAction label="删除" :api="ModelApi" :model="model" @refresh="loadModels" />
               </template>
             </ModelCard>

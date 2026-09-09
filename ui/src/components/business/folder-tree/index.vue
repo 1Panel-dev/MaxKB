@@ -2,7 +2,6 @@
 import { computed, defineAsyncComponent, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FolderApi from '@/api/admin/workspace/folder'
-import ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
 import type { FolderSource, FolderItem } from '@/api/types'
 import { FOLDER_SORT, type FolderSort } from './types'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
@@ -433,6 +432,6 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
 
     <FolderFormDialog ref="folderFormDialogRef" :title="formTitle" :source="props.source" @refresh="handleFolderRefresh" />
     <MoveToDialog v-if="canEdit" ref="moveToDialogRef" :loading="moveSubmitting" :source="props.source" @submit="handleMoveFolder" />
-    <ResourceAuthorizationDrawer v-if="canEdit" ref="resourceAuthorizationDrawerRef" :api="ResourceAuthorizationApi" :type="source" is-folder />
+    <ResourceAuthorizationDrawer v-if="canEdit" ref="resourceAuthorizationDrawerRef" :type="source" is-folder />
   </div>
 </template>

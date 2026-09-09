@@ -51,8 +51,13 @@ src/components/
 │   │   └── ModelParamsDialog.vue # 模型参数动态表单弹窗
 │   ├── workspace-dropdown/
 │   │   └── index.vue             # 工作空间选择下拉框
-│   ├── resource-authorization-drawer/ # 资源用户授权抽屉与权限配置弹窗
+│   ├── resource-authorization-drawer/ # 资源用户组、用户授权抽屉与权限配置弹窗
 │   │   ├── index.vue
+│   │   ├── UserAuthorization.vue      # 按用户查询与授权
+│   │   ├── types.ts                 # 内部公共 Props 与权限选项类型
+│   │   ├── user-group/
+│   │   │   ├── UserGroupAuthorization.vue # 按用户组查询与授权
+│   │   │   └── UserGroupMembersDrawer.vue # 用户组成员查询抽屉
 │   │   └── PermissionConfigDialog.vue
 │   └── workspace-relation-tags/
 │       └── index.vue             # 标签及关联工作空间展示
@@ -1321,15 +1326,34 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 
 ### ResourceAuthorizationDrawer
 
-手动导入 `business/resource-authorization-drawer/index.vue`。调用方传入完整 `api`
-（`typeof ResourceAuthorizationApi`）和 `type`（`ResourceAuthorizationTargetType`），不由抽屉
-根据路由路径选择接口。当前后端的资源用户授权统一使用
-`api/admin/workspace/resource-authorization.ts`。通过 `open(id, folder?)` 打开；
-接口请求与文件夹鉴权均直接通过 `getWorkspaceId()` 读取路由中的工作空间，无需额外传入或保存。
+手动导入 `business/resource-authorization-drawer/index.vue`，调用方传入
+`type`（`ResourceAuthorizationTargetType`），通过 `open(id, folder?)` 打开，不再传入 API。
+抽屉内部使用 `isSystemResource()` 判断：用户授权在 System 资源管理中选择
+`api/admin/system/resource-management/resource-authorization.ts`，其他范围选择 Workspace 授权接口。
+用户组授权继续使用 Workspace 的 `resource_user_group_permission` 接口，尚无独立 System 接口。
+两个标签子组件只调用入口传入的完整 API 对象，不自行判断资源范围。
+接口请求与文件夹鉴权均通过 `getWorkspaceId()` 读取路由中的工作空间。
 `isFolder`、`isRootFolder` 标记文件夹及根目录，传入文件夹类型也可识别文件夹。
 
-支持姓名、用户名、权限及商业版本角色搜索，跨页选择和单人、批量授权；搜索后清空选择。
+入口 `index.vue` 只管理抽屉、标签切换和公共资源权限上下文；`UserGroupAuthorization.vue`
+与 `UserAuthorization.vue` 分别管理各自的查询、分页、选择、单项及批量保存，复用
+`PermissionConfigDialog`。仅挂载当前标签组件，切换后重新查询并重置临时状态；子组件通过
+`v-model:submitting` 同步保存状态，通过 `refresh` 通知入口转发刷新。
+默认打开“按用户组”，展示用户组名称、成员数和操作权限，支持名称搜索；成员数链接打开共享
+`UserGroupMembersDrawer`。原用户授权放在“按用户”，保留姓名、用户名、权限及商业版本角色搜索。
+两个标签均支持跨页选择、单项和批量授权；切换标签重置搜索、分页及选择，保存期间禁止切换。
+查询仅应用最新响应，避免快速切换标签后串用用户与用户组数据；搜索后清空选择。
 根目录隐藏“不授权”，返回的“不授权”按“查看”展示。包含子资源时必须传入完整文件夹子树，
 抽屉根据当前路由工作空间筛选有管理权限的文件夹 ID；没有可管理文件夹时禁用该范围。
 `PermissionConfigDialog` 只收集权限和范围，保存成功才关闭并刷新，失败保留配置。
-保存成功触发 `refresh`，关闭后统一重置临时数据。
+保存成功触发 `refresh`，关闭动画结束后重置临时数据并触发 `closed`，供资源 Action 卸载按需挂载的抽屉。
+
+### UserGroupMembersDrawer
+
+手动导入 `business/resource-authorization-drawer/user-group/UserGroupMembersDrawer.vue`，通过 `open(userGroup)` 传入
+`SystemUserGroup`，按其 `workspace_id` 查询成员。支持用户名、姓名搜索和分页，角色使用
+`MkTagGroup` 展示；供系统资源授权页面和资源授权抽屉共同复用。
+
+资源授权抽屉内部公共展示 Props 放在同目录 `types.ts`，权限选项类型从
+`RESOURCE_PERMISSION_OPTIONS` 派生；用户和用户组 API Props 分别保留完整 API 对象类型，
+用户组组件只接收具备用户组方法的 Workspace API。

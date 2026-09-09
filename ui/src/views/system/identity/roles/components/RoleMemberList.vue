@@ -109,6 +109,7 @@ watch(
       :max-table-height="290"
       rowKey="user_relation_id"
       @selection-change="handleBatchSelectionChange"
+      rowKey="user_relation_id"
     >
       <el-table-column type="selection" width="40" />
       <el-table-column prop="nick_name" label="姓名" min-width="180" show-overflow-tooltip />

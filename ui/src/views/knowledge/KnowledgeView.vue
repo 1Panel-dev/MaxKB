@@ -9,7 +9,7 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
-import { DeleteKnowledgeAction, MoveKnowledgeAction } from './knowledge-card/action-dropdown'
+import { AuthorizeKnowledgeAction, DeleteKnowledgeAction, MoveKnowledgeAction } from './knowledge-card/action-dropdown'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
@@ -217,6 +217,8 @@ function handleBatchDelete() {
                     @delete="handleDeleteKnowledge"
                     @move="handleMoveKnowledge"
                   />
+                  <!-- 资源授权 -->
+                  <AuthorizeKnowledgeAction label="资源授权" :knowledge="knowledge" @refresh="refreshKnowledge" />
                   <DeleteKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
                     label="删除"

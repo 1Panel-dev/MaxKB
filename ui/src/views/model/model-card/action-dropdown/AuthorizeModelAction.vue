@@ -1,0 +1,37 @@
+<script setup lang="ts">
+import { nextTick, ref, useTemplateRef } from 'vue'
+import type { ModelItem } from '@/api/types'
+import { RESOURCE_TYPE } from '@/api/enums'
+import ResourceAuthorizationDrawer from '@/components/business/resource-authorization-drawer/index.vue'
+
+defineOptions({ name: 'AuthorizeModelAction' })
+const props = defineProps<{ model: ModelItem; label: string }>()
+const emit = defineEmits<{ refresh: [] }>()
+
+const drawerMounted = ref(false)
+const authorizationDrawerRef = useTemplateRef<InstanceType<typeof ResourceAuthorizationDrawer>>('authorizationDrawerRef')
+
+function handleOpenAuthorization() {
+  drawerMounted.value = true
+  return nextTick(() => authorizationDrawerRef.value?.open(props.model.id))
+}
+
+function handleDrawerClosed() {
+  drawerMounted.value = false
+}
+</script>
+
+<template>
+  <!-- 资源授权 -->
+  <MkDropdownItem @click="handleOpenAuthorization">
+    <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
+    <span>{{ label }}</span>
+  </MkDropdownItem>
+  <ResourceAuthorizationDrawer
+    v-if="drawerMounted"
+    ref="authorizationDrawerRef"
+    :type="RESOURCE_TYPE.MODEL"
+    @closed="handleDrawerClosed"
+    @refresh="emit('refresh')"
+  />
+</template>
