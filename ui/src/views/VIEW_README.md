@@ -240,6 +240,10 @@ src/views/system/identity/users/
     └── UserPwdDialog.vue          # 修改用户密码弹窗
 ```
 
+资源授权页面的 `UserGroupAuthorizationList` 通过人数链接打开同目录的
+`UserGroupMembersDrawer.vue`，按用户组所属工作空间查询成员，提供用户名、姓名搜索和分页，
+并使用 `MkTagGroup` 折叠展示角色；点击人数不切换当前授权对象。
+
 ## 文件命名
 
 | 文件职责     | 命名格式                            | 示例                                |

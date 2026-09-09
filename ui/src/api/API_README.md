@@ -173,3 +173,13 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 - 流式 POST 请求使用 `postStream` 返回原始 `Response`，由业务组件按具体协议解析数据块；
   鉴权、语言请求头和错误状态仍由请求基础设施统一处理。
 - 上传、下载和其他特殊请求在真实需求出现时独立设计，不提前塞入普通 JSON 请求客户端。
+
+### 资源用户授权
+
+`admin/workspace/resource-authorization.ts` 按指定资源查询和更新用户权限，使用
+`resource_user_permission/resource/<target>/resource/<resource>`；与 System 用户视角的
+`user_resource_permission` 区分。分页使用 `ParamsPage`，直接返回
+`ResponsePage<ResourceUserPermission>`；提交 `ResourceUserPermissionPayload[]`。
+`ResourceAuthorizationTargetType` 包含资源类型和三个 `_FOLDER` 类型，文件夹类型用于后端
+鉴权。包含子资源时传 `include_children: true` 及经过管理权限筛选的 `folder_ids`，
+普通资源或仅当前文件夹不传子文件夹 ID。loading、刷新及成功提示由抽屉负责。

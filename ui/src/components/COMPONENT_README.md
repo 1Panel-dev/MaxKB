@@ -51,6 +51,9 @@ src/components/
 │   │   └── ModelParamsDialog.vue # 模型参数动态表单弹窗
 │   ├── workspace-dropdown/
 │   │   └── index.vue             # 工作空间选择下拉框
+│   ├── resource-authorization-drawer/ # 资源用户授权抽屉与权限配置弹窗
+│   │   ├── index.vue
+│   │   └── PermissionConfigDialog.vue
 │   └── workspace-relation-tags/
 │       └── index.vue             # 标签及关联工作空间展示
 ├── global/                       # 高频、稳定的基础组件，自动注册
@@ -1311,3 +1314,18 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 5. 更新本文档中的目录树和组件说明。
 6. 通过正常开发或构建流程刷新自动生成的组件声明。
 7. 运行 ESLint、类型检查以及受影响入口的生产构建。
+
+### ResourceAuthorizationDrawer
+
+手动导入 `business/resource-authorization-drawer/index.vue`。调用方传入完整 `api`
+（`typeof ResourceAuthorizationApi`）和 `type`（`ResourceAuthorizationTargetType`），不由抽屉
+根据路由路径选择接口。当前后端的资源用户授权统一使用
+`api/admin/workspace/resource-authorization.ts`。通过 `open(id, folder?, workspaceId?)` 打开；
+System 场景显式传入资源所属工作空间，Workspace 场景可读取当前工作空间。
+`isFolder`、`isRootFolder` 标记文件夹及根目录，传入文件夹类型也可识别文件夹。
+
+支持姓名、用户名、权限及商业版本角色搜索，跨页选择和单人、批量授权；搜索后清空选择。
+根目录隐藏“不授权”，返回的“不授权”按“查看”展示。包含子资源时必须传入完整文件夹子树，
+抽屉根据目标工作空间筛选有管理权限的文件夹 ID；没有可管理文件夹时禁用该范围。
+`PermissionConfigDialog` 只收集权限和范围，保存成功才关闭并刷新，失败保留配置。
+保存成功触发 `refresh`，打开和关闭后统一重置临时数据，过期查询不写回。

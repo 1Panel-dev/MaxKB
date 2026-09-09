@@ -30,3 +30,6 @@ const knowledgeType = KNOWLEDGE_TYPE_MAP[knowledge.type]
 const isWebKnowledge = knowledgeType === KNOWLEDGE_TYPE_KEY.WEB
 const knowledgeTypeLabel = KNOWLEDGE_TYPE_LABELS[knowledgeType]
 ```
+
+`resource-authorization.ts` 的 `RESOURCE_PERMISSION_OPTIONS` 统一维护权限标签和说明；
+资源授权页面与资源用户授权抽屉按版本和根目录约束筛选选项。

@@ -13,4 +13,16 @@ const putUserResourcePermissions = (workspaceId: string, userId: string, resourc
   return put<ResourcePermissionPayload[], ResourcePermissionPayload[]>(`${prefix(workspaceId)}/user/${userId}/resource/${resource}`, permissions)
 }
 
-export default { getUserResourcePermissions, putUserResourcePermissions }
+
+/** 获取指定空间、指定用户组、指定资源类型的权限列表。 */
+const getUserGroupResourcePermissions = (workspaceId: string, userId: string, resource: ResourceAuthorizationType, query?: Dict<unknown>) => {
+  return get<ResourcePermissionItem[]>(`${prefix(workspaceId)}/user-group/${userId}/resource/${resource}`, query)
+}
+
+/** 更新指定空间、指定用户组、指定资源类型的权限列表。 */
+const putUserGroupResourcePermissions = (workspaceId: string, userId: string, resource: ResourceAuthorizationType, permissions: ResourcePermissionPayload[]) => {
+  return put<ResourcePermissionPayload[], ResourcePermissionPayload[]>(`${prefix(workspaceId)}/user-group/${userId}/resource/${resource}`, permissions)
+}
+
+
+export default { getUserResourcePermissions, putUserResourcePermissions, getUserGroupResourcePermissions, putUserGroupResourcePermissions }

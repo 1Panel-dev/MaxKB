@@ -67,8 +67,9 @@ h6 {
   line-height: var(--mk-line-height-base);
 }
 
-/* dot */
 
+
+/* dot */
 // 状态圆点
 .mk-dot-danger {
   border-radius: 50%;
@@ -182,6 +183,18 @@ h6 {
     line-height: var(--mk-line-height-base);
     min-width: 0;
     padding-left: calc(var(--spacing) * 2);
+  }
+}
+
+
+
+/* link */
+.mk-link {
+  color: var(--mk-primary);
+  cursor: pointer;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
   }
 }
 
