@@ -1,178 +1,123 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
-import { computed, reactive, ref } from 'vue'
-import { CaretBottom } from '@element-plus/icons-vue'
-import Knowledge from '../../items/knowledge/Knowledge.vue'
-import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
-import type { FormField } from '../../type'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import { computed, nextTick, useTemplateRef } from 'vue'
+import type { FormItemInstance } from 'element-plus'
 import type { KnowledgeItem } from '@/api/types'
-import { FOLDER_ENTRY_ID } from '@/constants'
+import SelectKnowledgeDialog from '@/components/business/select-knowledge-dialog/index.vue'
+import Knowledge from '../../items/knowledge/Knowledge.vue'
+import type { FormField } from '../../type'
 
-const props = defineProps<{ modelValue: DynamicFormValue }>()
-
-const emit = defineEmits(['update:modelValue'])
-
-const collapseData = reactive({ optional_knowledge: true })
-const formValue = computed({
-  set: (item: DynamicFormValue) => {
-    emit('update:modelValue', item)
-  },
-  get: () => {
-    return props.modelValue || { knowledge_list: [], default_value: [] }
-  },
-})
-
-const formField = computed<FormField>(() => {
-  return { attrs: { knowledge_list: formValue.value.knowledge_list } } as DynamicFormValue
-})
-
-const getData = () => {
-  const knowledgeItemList = (formValue.value.knowledge_list || []).map((k: DynamicFormValue) => {
-    return { id: k.id, name: k.name, type: k.type, embedding_model_id: k.embedding_model_id }
-  })
-
-  return { input_type: 'Knowledge', default_value: formValue.value.default_value || [], attrs: { knowledge_list: knowledgeItemList } }
+type KnowledgeOption = Pick<KnowledgeItem, 'id'> & Partial<Pick<KnowledgeItem, 'name' | 'type' | 'embedding_model_id'>>
+interface KnowledgeConstructorValue {
+  field?: string
+  required?: boolean
+  knowledge_list?: KnowledgeOption[]
+  default_value?: string[]
 }
 
-const render = (formData: DynamicFormValue) => {
+const props = defineProps<{ modelValue: KnowledgeConstructorValue }>()
+const emit = defineEmits<{ 'update:modelValue': [value: KnowledgeConstructorValue] }>()
+
+// 配置回填与序列化：保留知识库快照及默认 ID 的字段协议。
+const formValue = computed({
+  get: () => props.modelValue || { knowledge_list: [], default_value: [] },
+  set: (value: KnowledgeConstructorValue) => emit('update:modelValue', value),
+})
+const availableKnowledge = computed(() => formValue.value.knowledge_list || [])
+const formField = computed<FormField>(() => ({
+  field: formValue.value.field || '',
+  input_type: 'Knowledge',
+  attrs: { knowledge_list: availableKnowledge.value },
+}))
+
+function getData(): Partial<FormField> {
+  return {
+    input_type: 'Knowledge',
+    default_value: formValue.value.default_value || [],
+    attrs: {
+      knowledge_list: availableKnowledge.value.map(({ id, name, type, embedding_model_id }) => ({ id, name, type, embedding_model_id })),
+    },
+  }
+}
+
+function render(formData: FormField) {
   formValue.value.default_value = formData.default_value || []
   formValue.value.knowledge_list = formData.attrs?.knowledge_list || []
 }
 
 defineExpose({ getData, render })
 
-// ── 添加知识库 ─────────────────────────────────────────
-const knowledgeDialogVisible = ref(false)
-const knowledgeLoading = ref(false)
-const knowledgeSearch = ref('')
-const knowledgeList = ref<KnowledgeItem[]>([])
-const selectedKnowledgeIds = ref<Array<string>>([])
-
-function changeKnowledgeSelection(knowledgeId: string, checked: boolean) {
-  selectedKnowledgeIds.value = checked ? [...selectedKnowledgeIds.value, knowledgeId] : selectedKnowledgeIds.value.filter((id) => id !== knowledgeId)
-}
-
-const filteredKnowledgeList = computed(() => {
-  const keyword = knowledgeSearch.value.trim().toLocaleLowerCase()
-  if (!keyword) return knowledgeList.value
-  return knowledgeList.value.filter((item) => item.name.toLocaleLowerCase().includes(keyword))
-})
-
-const openAddKnowledgeDialog = async () => {
-  knowledgeDialogVisible.value = true
-  selectedKnowledgeIds.value = (formValue.value.knowledge_list || []).map((k: DynamicFormValue) => k.id)
-  knowledgeLoading.value = true
-  try {
-    const res = await KnowledgeApi.getKnowledgePage({ currentPage: 1, pageSize: 100 }, { folder_id: FOLDER_ENTRY_ID.ALL })
-    knowledgeList.value = res.records || []
-  } finally {
-    knowledgeLoading.value = false
-  }
-}
-
-const handleKnowledgeSelect = () => {
-  const selectIds = new Set(selectedKnowledgeIds.value)
-  const currentList = (formValue.value.knowledge_list || []).filter((k: DynamicFormValue) => selectIds.has(k.id))
-  knowledgeList.value.forEach((item) => {
-    if (selectIds.has(item.id) && !currentList.some((k: DynamicFormValue) => k.id === item.id)) {
-      currentList.push({ id: item.id, name: item.name, type: item.type, embedding_model_id: item.embedding_model_id })
-    }
+// 自定义选择列表不会自动触发表单校验，用户修改后等待字段更新再校验。
+const knowledgeFormItemRef = useTemplateRef<FormItemInstance>('knowledgeFormItemRef')
+function validateKnowledgeSelection() {
+  void nextTick(() => {
+    void knowledgeFormItemRef.value?.validate('change').catch(() => {
+      // 校验失败由表单项展示，避免产生未处理的 Promise 拒绝。
+    })
   })
-  formValue.value.knowledge_list = currentList
-  if (formValue.value.default_value) {
-    formValue.value.default_value = formValue.value.default_value.filter((id: string) => selectIds.has(id))
-  }
-  knowledgeDialogVisible.value = false
 }
 
-function removeKnowledge(id: string) {
-  formValue.value.knowledge_list = formValue.value.knowledge_list.filter((k: DynamicFormValue) => k.id !== id)
-  if (formValue.value.default_value) {
-    formValue.value.default_value = formValue.value.default_value.filter((k_id: string) => k_id !== id)
-  }
+// 添加知识库：由公共弹窗管理查询和临时选择，确认后同步可选项及默认值。
+const knowledgeDialogRef = useTemplateRef<InstanceType<typeof SelectKnowledgeDialog>>('knowledgeDialogRef')
+
+function openAddKnowledgeDialog() {
+  knowledgeDialogRef.value?.open(availableKnowledge.value)
+}
+
+function handleKnowledgeSelect(knowledge: (Partial<KnowledgeItem> & { id: string })[]) {
+  const selectedIds = new Set(knowledge.map(({ id }) => id))
+  formValue.value.knowledge_list = knowledge.map(({ id, name, type, embedding_model_id }) => ({ id, name, type, embedding_model_id }))
+  formValue.value.default_value = (formValue.value.default_value || []).filter((id) => selectedIds.has(id))
+  validateKnowledgeSelection()
+}
+
+// 移除可选知识库时同步清理默认值，保留其他关联。
+function removeKnowledge(knowledgeId: string) {
+  formValue.value.knowledge_list = availableKnowledge.value.filter(({ id }) => id !== knowledgeId)
+  formValue.value.default_value = (formValue.value.default_value || []).filter((id) => id !== knowledgeId)
+  validateKnowledgeSelection()
 }
 </script>
 
 <template>
-  <el-form-item prop="knowledge_list" :rules="[{ message: '请选择可选知识库', type: 'array', min: 1 }]">
-    <template #label>
-      <div class="flex-between mb-2 cursor" @click="collapseData.optional_knowledge = !collapseData.optional_knowledge">
-        <div class="flex align-center">
-          <MkIcon
-            :icon="CaretBottom"
-            :size="14"
-            class="mr-1 text-N600! transition-transform"
-            :class="{ '-rotate-90': !collapseData.optional_knowledge }"
-          />
-          <span class="lighter"
-            >可选知识库
-            <span class="text-danger">*</span>
-          </span>
-          <span class="ml-1" v-if="formValue.knowledge_list?.length">({{ formValue.knowledge_list.length }})</span>
-        </div>
-        <el-button type="primary" link @click.stop="openAddKnowledgeDialog">
-          <MkIcon name="icon_add_outlined" class="mr-1" />
-          添加
-        </el-button>
-      </div>
-    </template>
-    <div class="w-full" v-if="collapseData.optional_knowledge">
-      <div v-if="formValue.knowledge_list?.length > 0">
-        <template v-for="(item, index) in formValue.knowledge_list" :key="index">
-          <div class="flex-between border border-r-6 white-bg mb-8" style="padding: 3px 12px">
-            <div class="flex align-center" style="width: 80%">
-              <KnowledgeIcon :type="item.type" class="mr-8" :size="20" style="--el-avatar-border-radius: 6px" />
-
-              <span class="ellipsis cursor" :title="item.name"> {{ item.name }}</span>
-            </div>
-            <el-button text @click="removeKnowledge(item.id)">
-              <el-icon><Close /></el-icon>
-            </el-button>
+  <el-form-item ref="knowledgeFormItemRef" prop="knowledge_list" :rules="[{ required: true, message: '请选择可选知识库', type: 'array', min: 1 }]">
+    <MkCollapse class="w-full" trigger-class="pt-0 pb-2">
+      <template #label>
+        <div class="flex-between w-full">
+          <div class="flex items-center">
+            <span class="mk-required">可选知识库</span>
+            <span v-if="availableKnowledge.length">({{ availableKnowledge.length }})</span>
           </div>
+
+          <el-button type="primary" text @click.stop="openAddKnowledgeDialog">
+            <MkIcon name="icon_add_outlined" />
+          </el-button>
+        </div>
+      </template>
+      <div v-if="availableKnowledge.length" class="space-y-2">
+        <template v-for="knowledge in availableKnowledge" :key="knowledge.id">
+          <el-card class="small" shadow="never">
+            <div class="flex-between">
+              <span class="flex min-w-0 items-center gap-2">
+                <KnowledgeIcon :type="knowledge.type" :size="20" class="shrink-0" />
+                <span class="min-w-0 flex-1 truncate" :title="knowledge.name">{{ knowledge.name }}</span>
+              </span>
+              <el-button text @click="removeKnowledge(knowledge.id)"><MkIcon name="icon_close_outlined" /></el-button>
+            </div>
+          </el-card>
         </template>
       </div>
-      <el-text type="info" v-else> 请选择可选知识库 </el-text>
-    </div>
+      <el-text v-else type="info">请选择可选知识库</el-text>
+    </MkCollapse>
   </el-form-item>
   <el-form-item
+    v-if="availableKnowledge.length"
     label="默认知识库"
     prop="default_value"
     :required="formValue.required"
     :rules="formValue.required ? [{ message: '请选择知识库', type: 'array', min: 1 }] : []"
-    v-if="formValue.knowledge_list && formValue.knowledge_list.length > 0"
   >
-    <div class="w-full" v-if="formValue.knowledge_list?.length > 0">
-      <Knowledge v-model="formValue.default_value" :form-field="formField" />
-    </div>
+    <Knowledge v-model="formValue.default_value" :form-field="formField" />
   </el-form-item>
 
-  <MkDialog v-model="knowledgeDialogVisible" title="添加知识库" width="600px" append-to-body>
-    <el-input v-model="knowledgeSearch" placeholder="按名称搜索" clearable class="mb-3">
-      <template #prefix>
-        <MkIcon name="icon_magnify_outlined" />
-      </template>
-    </el-input>
-    <div v-loading="knowledgeLoading" class="max-h-[360px] overflow-auto">
-      <div class="space-y-2">
-        <MkCardCheckbox
-          v-for="knowledge in filteredKnowledgeList"
-          :key="knowledge.id"
-          :model-value="selectedKnowledgeIds.includes(knowledge.id)"
-          :label="knowledge.name"
-          @update:model-value="changeKnowledgeSelection(knowledge.id, $event)"
-        >
-          <div class="flex min-w-0 items-center gap-2">
-            <KnowledgeIcon :type="knowledge.type" :size="20" class="shrink-0" style="--el-avatar-border-radius: 6px" />
-            <span class="min-w-0 flex-1 truncate" :title="knowledge.name">{{ knowledge.name }}</span>
-          </div>
-        </MkCardCheckbox>
-      </div>
-      <el-empty v-if="!knowledgeLoading && filteredKnowledgeList.length === 0" description="暂无知识库" :image-size="60" />
-    </div>
-    <template #footer>
-      <el-button @click="knowledgeDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="handleKnowledgeSelect">确定</el-button>
-    </template>
-  </MkDialog>
+  <SelectKnowledgeDialog ref="knowledgeDialogRef" @submit="handleKnowledgeSelect" />
 </template>

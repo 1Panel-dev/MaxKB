@@ -5,56 +5,74 @@ import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'MkTagsEdit' })
 
-const extensions = defineModel<string[]>({ required: true })
-const props = withDefaults(defineProps<{ reservedExtensions?: readonly string[] }>(), {
-  reservedExtensions: () => [],
+const tags = defineModel<string[]>({ required: true })
+const props = withDefaults(defineProps<{ reservedTags?: readonly string[]; normalizeTag?: (tag: string) => string }>(), {
+  reservedTags: () => [],
 })
 
-// 扩展名编辑：自动聚焦，确认时归一化并检查重复值。
-const extensionInputVisible = ref(false)
-const extensionInput = ref('')
+// 标签编辑：自动聚焦，确认时清理输入并检查重复值。
+const tagInputVisible = ref(false)
+const tagInput = ref('')
 const inputRef = useTemplateRef<InputInstance>('inputRef')
 
-function showExtensionInput() {
-  extensionInputVisible.value = true
+function showTagInput() {
+  tagInputVisible.value = true
   nextTick(() => inputRef.value?.focus())
 }
 
-function confirmExtension() {
-  const extension = extensionInput.value.trim().replace(/^\./, '').toUpperCase()
-  if (extension) {
-    if (props.reservedExtensions.includes(extension) || extensions.value.includes(extension)) {
-      MsgWarning('该扩展名已存在')
+function confirmTag() {
+  const input = tagInput.value.trim()
+  const tag = props.normalizeTag ? props.normalizeTag(input) : input
+  if (tag) {
+    if (props.reservedTags.includes(tag) || tags.value.includes(tag)) {
+      MsgWarning('文件后缀已存在')
     } else {
-      extensions.value = [...extensions.value, extension]
+      tags.value = [...tags.value, tag]
     }
   }
-  extensionInput.value = ''
-  extensionInputVisible.value = false
+  tagInput.value = ''
+  tagInputVisible.value = false
 }
 
-function removeExtension(extension: string) {
-  extensions.value = extensions.value.filter((currentExtension) => currentExtension !== extension)
+function removeTag(tag: string) {
+  tags.value = tags.value.filter((currentTag) => currentTag !== tag)
 }
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-2" @click.stop>
-    <el-tag v-for="extension in extensions" :key="extension" closable effect="plain" type="info" @close="removeExtension(extension)">
-      {{ extension }}
-    </el-tag>
+  <div class="mk-tags-edit flex flex-wrap gap-2" @click.stop>
+    <template v-for="tag in tags" :key="tag">
+      <el-tag closable effect="plain" type="info" :disable-transitions="true" @close="removeTag(tag)">
+        {{ tag }}
+      </el-tag>
+    </template>
+
     <el-input
-      v-if="extensionInputVisible"
+      v-if="tagInputVisible"
       ref="inputRef"
-      v-model="extensionInput"
-      class="w-24!"
+      v-model="tagInput"
+      class="w-26!"
       size="small"
-      @blur="confirmExtension"
-      @keyup.enter="confirmExtension"
+      placeholder="添加后缀名"
+      @blur="confirmTag"
+      @keyup.enter="confirmTag"
     />
-    <el-button v-else size="small" @click="showExtensionInput">
-      <MkIcon name="icon_add_outlined" />
-      添加扩展名
+    <el-button class="add-tag-button" plain v-else size="small" @click="showTagInput">
+      <MkIcon name="icon_add_outlined" size="14" />
+      <span>添加后缀名</span>
     </el-button>
   </div>
 </template>
+<style lang="scss" scoped>
+.mk-tags-edit {
+  .add-tag-button {
+    padding: 0 8px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 14px;
+    border: 1px dashed var(--el-border-color);
+    border-radius: var(--el-border-radius-small);
+    color: var(--mk-N500);
+  }
+}
+</style>

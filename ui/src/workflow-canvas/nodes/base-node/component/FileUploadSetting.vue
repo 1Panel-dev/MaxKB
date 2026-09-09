@@ -40,6 +40,10 @@ const fileTypes = [
 
 const reservedExtensions = fileTypes.flatMap(({ description }) => description.split('、'))
 
+function normalizeExtension(extension: string) {
+  return extension.replace(/^\./, '').toUpperCase()
+}
+
 function submit() {
   formRef.value?.validate((valid) => {
     if (!valid) return
@@ -98,8 +102,13 @@ function resetData() {
             <div class="flex min-w-0 items-center gap-3">
               <img class="shrink-0 w-6" src="@/assets/file-type/unknown-icon.svg" />
               <div class="min-w-0 flex-1">
-                <h6>其他文件</h6>
-                <MkTagsEdit v-model="formData.otherExtensions" :reserved-extensions="reservedExtensions" class="mt-2" />
+                <h6 class="mb-2">其他文件</h6>
+                <MkTagsEdit
+                  v-model="formData.otherExtensions"
+                  :reserved-tags="reservedExtensions"
+                  :normalize-tag="normalizeExtension"
+                  add-text="添加后缀名"
+                />
               </div>
             </div>
           </MkCardCheckbox>

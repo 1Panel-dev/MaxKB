@@ -145,14 +145,13 @@ defineExpose({ getData, render })
 </script>
 
 <template>
-  <el-form-item label="模型类型" required prop="model_type" :rules="[{ required: true, message: '请选择模型类型' }]">
+  <el-form-item label="模型类型" prop="model_type" :rules="[{ required: true, message: '请选择模型类型' }]">
     <el-select v-model="formValue.model_type" placeholder="请选择模型类型" @change="handleModelTypeChange">
       <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
     </el-select>
   </el-form-item>
 
-  <el-form-item label="可选模型" required prop="provider_list" :rules="[{ required: true, message: '请选择模型', type: 'array' }]">
-    <!-- // TODO  -->
+  <el-form-item label="可选模型" prop="provider_list" :rules="[{ required: true, message: '请选择模型', type: 'array' }]">
     <SelectModel
       multiple
       v-model="selectedIds"
@@ -170,7 +169,6 @@ defineExpose({ getData, render })
     :rules="formValue.required ? [{ required: true, message: '请选择模型' }] : []"
     v-if="formValue.provider_list && formValue.provider_list.length > 0"
   >
-    <!-- // TODO  -->
     <SelectModel v-model="defaultModelId" placeholder="请选择模型" :options="selectedModelsOptions" :provider-options="providerOptions" />
   </el-form-item>
 </template>

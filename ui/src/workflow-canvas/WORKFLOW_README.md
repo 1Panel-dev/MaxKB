@@ -179,7 +179,8 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 的表单必填校验，取消不修改节点，关闭动画结束后统一清理草稿与校验状态。
 文件类型与其他文件选择复用手动导入的 `MkCardCheckbox`；扩展名编辑复用非全局组件
 `MkTagsEdit`，通过 `v-model` 编辑草稿的 `otherExtensions`，文件类型中已有的扩展名通过
-`reservedExtensions` 传入用于重复检查。组件内部阻止点击冒泡，避免增删扩展名时切换文件类型；
+`reservedTags` 传入用于重复检查。文件上传设置通过 `normalizeTag` 传入去除一个前导点并转为
+大写的扩展名规则，通过 `addText` 设置“添加后缀名”。组件内部阻止点击冒泡，避免增删扩展名时切换文件类型；
 输入临时状态随弹窗内容卸载而清理。
 
 表单收集节点的 `component/form-setting/FormSettingTable` 通过 `v-model` 编辑动态表单的
