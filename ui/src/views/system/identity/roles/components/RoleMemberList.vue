@@ -107,7 +107,6 @@ watch(
       @current-change="loadMembers()"
       @size-change="loadMembers()"
       :max-table-height="290"
-      rowKey="user_relation_id"
       @selection-change="handleBatchSelectionChange"
       rowKey="user_relation_id"
     >
