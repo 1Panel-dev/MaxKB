@@ -10,12 +10,11 @@
 import uuid_utils.compat as uuid
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.utils.translation import gettext as _
-from langchain_core.messages import HumanMessage, AIMessage
 
 from application.models import Application
 from common.encoder.encoder import SystemEncoder
 from common.mixins.app_model_mixin import AppModelMixin
+from common.utils.messages_util import to_ai_message_list, to_human_message_list
 from users.models import User
 
 
@@ -130,35 +129,10 @@ class ChatRecord(AppModelMixin):
     workflow_context = models.JSONField(verbose_name="工作流上下文", default=dict, null=True, blank=True)
 
     def get_human_message(self):
-        # 用户消息取自 question（{content, image_list, ...}），历史上下文用文本部分
-        question = self.question if isinstance(self.question, dict) else {"content": self.question or ""}
-        return [HumanMessage(content=question.get("content", "") or "")]
+        return to_human_message_list(self.question)
 
     def get_ai_message(self):
-        # 答案取自 messages 中的 TEXT / TOOL 内容块（REASONING/FORM/FAILURE 不进历史），按顺序保留交错。
-        # 注意：type 用字面量，避免 models 反向依赖 application.workflow.ContentType
-        ai_message_list = []
-        for m in self.messages or []:
-            if not isinstance(m, dict):
-                continue
-            m_type = m.get("type")
-            if m_type == "TEXT":
-                if m.get("content"):
-                    ai_message_list.append(AIMessage(content=m.get("content")))
-            elif m_type == "TOOL":
-                # 工具调用：名称 + 入参 + 结果 拼成一段
-                tool_parts = [str(p) for p in (m.get("content"), m.get("arguments"), m.get("result")) if p]
-                if tool_parts:
-                    ai_message_list.append(AIMessage(content="\n".join(tool_parts)))
-        if len(ai_message_list) == 0:
-            ai_message_list = [
-                AIMessage(
-                    content=_(
-                        "Sorry, no relevant content was found. Please re-describe your problem or provide more information. "
-                    )
-                )
-            ]
-        return ai_message_list
+        return to_ai_message_list(self.messages)
 
     def get_node_details_runtime_node_id(self, runtime_node_id):
         return self.details.get(runtime_node_id, None)
