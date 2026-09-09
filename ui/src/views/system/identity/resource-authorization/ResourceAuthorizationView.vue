@@ -89,7 +89,7 @@ function loadResourcePermissions() {
   loadingPermissions.value = true
   const permissionRequest =
     targetType.value === 'user-group'
-      ? ResourceAuthorizationApi.getUserResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value)
+      ? ResourceAuthorizationApi.getUserGroupResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value)
       : ResourceAuthorizationApi.getUserResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value)
 
   return permissionRequest
@@ -136,7 +136,7 @@ function handlePermissionsSubmit(permissions: ResourcePermissionPayload[]) {
   loadingPermissions.value = true
   const permissionRequest =
     targetType.value === 'user-group'
-      ? ResourceAuthorizationApi.putUserResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value, permissions)
+      ? ResourceAuthorizationApi.putUserGroupResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value, permissions)
       : ResourceAuthorizationApi.putUserResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value, permissions)
 
   permissionRequest

@@ -7,6 +7,7 @@ export interface SystemUserGroup {
 
 export interface SystemUserGroupMember {
   id: string
+  roles: string[]
   username: string
   email: string
   phone: string

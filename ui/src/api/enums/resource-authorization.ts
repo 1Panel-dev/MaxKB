@@ -1,5 +1,13 @@
 /** 后端资源授权的资源类型。 */
 export const RESOURCE_TYPE = { APPLICATION: 'APPLICATION', KNOWLEDGE: 'KNOWLEDGE', MODEL: 'MODEL', TOOL: 'TOOL' } as const
 
+/** 用户授权接口额外区分文件夹目标，以匹配后端鉴权入口。 */
+export const RESOURCE_AUTHORIZATION_TARGET_TYPE = {
+  ...RESOURCE_TYPE,
+  APPLICATION_FOLDER: 'APPLICATION_FOLDER',
+  KNOWLEDGE_FOLDER: 'KNOWLEDGE_FOLDER',
+  TOOL_FOLDER: 'TOOL_FOLDER',
+} as const
+
 /** 后端资源授权的权限值。 */
 export const RESOURCE_PERMISSION = { MANAGE: 'MANAGE', NOT_AUTH: 'NOT_AUTH', ROLE: 'ROLE', VIEW: 'VIEW' } as const
