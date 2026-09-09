@@ -152,7 +152,6 @@ onMounted(() => {
   </div>
   <el-form-item
     class="mk-hide-asterisk"
-    v-if="formValue.assignment_method === 'custom' && completeOptions.length > 0"
     :required="formValue.required"
     prop="default_value"
     :rules="formValue.required ? [{ required: true, message: '请输入默认值' }] : []"

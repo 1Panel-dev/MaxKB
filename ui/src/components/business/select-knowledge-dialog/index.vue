@@ -102,11 +102,11 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" title="关联知识库" width="1200" @closed="resetData">
+  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" width="1200" @closed="resetData">
     <template #header="{ titleId }">
       <div class="flex-between pr-8">
         <div class="flex items-center gap-2">
-          <h4 :id="titleId">关联知识库</h4>
+          <h4 :id="titleId">知识库</h4>
           <span class="text-N600!">所选知识库必须使用相同的 Embedding 模型</span>
         </div>
 

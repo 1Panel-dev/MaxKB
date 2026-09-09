@@ -134,7 +134,7 @@ src/components/
 ├── mk-search-list/
 │   └── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
 ├── mk-tags-edit/
-│   └── index.vue                 # 扩展名标签增删与重复检查，手动导入
+│   └── index.vue                 # 标签增删与重复检查，手动导入
 ├── mk-logo/
 │   ├── LogoFull.vue              # 带产品名称的完整 Logo，手动导入
 │   └── LogoIcon.vue              # 不带产品名称的图形 Logo，手动导入
@@ -854,12 +854,13 @@ import MkFilterableDropdown from '@/components/mk-filterable-dropdown/index.vue'
 ### MkTagsEdit
 
 手动导入 `@/components/mk-tags-edit/index.vue`，通过必填的 `string[]` 类型 `v-model`
-编辑扩展名。可选 `reservedExtensions` 接收已有的大写扩展名数组，默认为空；组件检查保留值与
-当前列表的重复项，并提示“该扩展名已存在”。输入失焦或按回车时去除首尾空格、一个前导点并转为
-大写，空值不添加。组件内部维护输入框显隐与自动聚焦，根节点阻止点击冒泡；外部间距通过 `class` 设置。
+编辑标签。可选 `reservedTags` 接收保留标签数组，默认为空；组件检查保留值与当前列表的
+重复项，并提示“该标签已存在”。输入失焦或按回车时去除首尾空格，空值不添加；默认保留大小写
+和前导点。业务需要格式化时通过 `normalizeTag(tag)` 传入转换函数，在重复检查前执行。
+`addText` 默认为“添加标签”。组件内部维护输入框显隐与自动聚焦，根节点阻止点击冒泡；外部间距通过 `class` 设置。
 
 ```vue
-<MkTagsEdit v-model="formData.otherExtensions" :reserved-extensions="reservedExtensions" class="mt-2" />
+<MkTagsEdit v-model="formData.tags" :reserved-tags="reservedTags" class="mt-2" />
 ```
 
 ### MkCardCheckbox
@@ -1161,16 +1162,27 @@ const formValue = ref<Dict<DynamicFormValue>>({})
 字段配置中的动态校验器和表格行表达式属于受信任的服务端协议，只允许加载可信配置；普通业务
 输入不得作为脚本传入。
 
-单选、多选和卡片单选配置器的自定义选项中，标签和选项值的必填校验跟随字段的“是否必填”；每行通过
+单选、多选、MultiRow、RadioRow 和卡片单选配置器的自定义选项中，标签和选项值的必填校验跟随字段的“是否必填”；每行通过
 `option_list.<index>.label`、`option_list.<index>.value` 参与配置表单校验。编辑中的不完整行
 保留在表单内，仅两项都填写且非纯空白的选项进入默认值选择区和 `getData()` 返回的 `option_list`。
 初始化、空配置回填和切回自定义赋值时保留一行空白选项。卡片单选仅在存在完整选项时显示默认值卡片区。
 引用变量模式继续保留变量路径，不应用自定义选项过滤。
+MultiRow 配置器的默认值复用 MultiRow 字段组件，通过 `el-checkbox-group` 和
+`el-checkbox-button` 以圆角边框内的横向按钮展示多选项，复用原生禁用、键盘操作和表单校验，
+选中项使用主题色文字和浅色背景；支持再次点击取消选择，不使用 Select。仅完整选项参与展示，
+无完整选项时显示填写提示；配置器与运行时共用样式，字段输出仍为 `MultiRow`。
+RadioRow 配置器沿用同样的选项编辑和完整性过滤，默认值复用 RadioRow 字段组件，
+通过 `el-radio-group` 和 `el-radio-button` 展示横向单选，沿用全局按钮式单选样式及原生校验、
+禁用和键盘交互；字段输出仍为 `RadioRow`。
 
 动态表单的 Model 字段使用 `SelectModel`，将 `attrs.provider_list` 中的模型快照映射为
 扁平 `ModelItem[]`，由选择器统一分组和展示供应商。旧快照未保存状态时保留可选行为，已保存的
 状态按 `SelectModel` 的可用性规则处理。切换模型一次性回写 `model_id` 和深拷贝后的
 `model_params_setting`；清空时回写空 ID 和空参数，避免修改原配置中的参数对象。
+
+Knowledge 配置器复用 `SelectKnowledgeDialog` 选择可选知识库，沿用文件夹、共享资源查询及
+相同 Embedding 模型约束。打开时传入已选快照，确认后回写可选知识库并清理已取消 ID 对应的
+默认值；取消不修改配置。
 
 Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选模型，不开启参数设置入口。
 选择时将模型 ID 转换为包含已配置参数的 `default_value` 对象，清空时重置为空对象。

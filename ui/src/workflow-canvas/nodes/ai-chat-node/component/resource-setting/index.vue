@@ -112,27 +112,30 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
           <span
             >MCP<span v-if="mcpCount">（{{ mcpCount }}）</span></span
           >
-          <el-button text title="添加 MCP" type="primary" @click.stop="mcpDialogRef?.open(setting)"><MkIcon name="icon_add_outlined" /></el-button>
+          <el-button text type="primary" @click.stop="mcpDialogRef?.open(setting)"><MkIcon name="icon_add_outlined" /></el-button>
         </div>
       </template>
 
       <div v-if="mcpCount" class="mt-2 mb-2 flex flex-col gap-1">
-        <el-card v-for="resource in selectedMcpTools" :key="resource.id" class="small" shadow="never">
-          <div class="flex-between">
-            <span class="flex min-w-0 items-center gap-2">
-              <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
-              <span class="truncate" :title="resource.name">{{ resource.name }}</span>
-            </span>
-            <el-button text title="移除 MCP" @click="removeId('mcp_tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
-          </div>
-        </el-card>
+        <template v-for="resource in selectedMcpTools" :key="resource.id">
+          <el-card class="small" shadow="never">
+            <div class="flex-between">
+              <span class="flex min-w-0 items-center gap-2">
+                <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
+                <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+              </span>
+              <el-button text @click="removeId('mcp_tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
+            </div>
+          </el-card>
+        </template>
+
         <el-card v-if="setting.mcp_servers" class="small" shadow="never">
           <div class="flex-between">
             <span class="flex min-w-0 items-center gap-2">
               <ToolIcon :size="20" class="shrink-0 small" type="MCP" />
               <span>自定义 MCP 服务</span>
             </span>
-            <el-button text title="移除自定义 MCP 服务" @click="updateSetting({ mcp_servers: '' })"><MkIcon name="icon_close_outlined" /></el-button>
+            <el-button text @click="updateSetting({ mcp_servers: '' })"><MkIcon name="icon_close_outlined" /></el-button>
           </div>
         </el-card>
       </div>
@@ -142,8 +145,8 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       <template #label>
         <div class="flex-between min-w-0 flex-1">
           <span
-            >工具<span v-if="selectedTools.length">（{{ selectedTools.length }}）</span></span
-          >
+            >工具<span v-if="selectedTools.length">（{{ selectedTools.length }}）</span>
+          </span>
           <el-button text type="primary" title="添加工具" @click.stop="openToolDialog(false)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
@@ -151,15 +154,17 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       </template>
 
       <div v-if="selectedTools.length" class="mb-2 flex flex-col gap-1">
-        <el-card v-for="resource in selectedTools" :key="resource.id" class="small" shadow="never">
-          <div class="flex-between">
-            <span class="flex min-w-0 items-center gap-2">
-              <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
-              <span class="truncate" :title="resource.name">{{ resource.name }}</span>
-            </span>
-            <el-button text title="移除工具" @click="removeId('tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
-          </div>
-        </el-card>
+        <template v-for="resource in selectedTools" :key="resource.id">
+          <el-card class="small" shadow="never">
+            <div class="flex-between">
+              <span class="flex min-w-0 items-center gap-2">
+                <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
+                <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+              </span>
+              <el-button text @click="removeId('tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
+            </div>
+          </el-card>
+        </template>
       </div>
     </MkCollapse>
     <!-- Skills -->
@@ -176,15 +181,17 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       </template>
 
       <div v-if="selectedSkills.length" class="mb-2 flex flex-col gap-1">
-        <el-card v-for="resource in selectedSkills" :key="resource.id" class="small" shadow="never">
-          <div class="flex-between">
-            <span class="flex min-w-0 items-center gap-2">
-              <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
-              <span class="truncate" :title="resource.name">{{ resource.name }}</span>
-            </span>
-            <el-button text title="移除Skills" @click="removeId('skill_tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
-          </div>
-        </el-card>
+        <template v-for="resource in selectedSkills" :key="resource.id">
+          <el-card class="small" shadow="never">
+            <div class="flex-between">
+              <span class="flex min-w-0 items-center gap-2">
+                <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
+                <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+              </span>
+              <el-button text @click="removeId('skill_tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
+            </div>
+          </el-card>
+        </template>
       </div>
     </MkCollapse>
     <!-- 智能体 -->
@@ -194,22 +201,24 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
           <span
             >智能体<span v-if="selectedApplications.length">（{{ selectedApplications.length }}）</span></span
           >
-          <el-button text type="primary" title="添加智能体" @click.stop="applicationDialogRef?.open(selectedApplications)">
+          <el-button text type="primary" @click.stop="applicationDialogRef?.open(selectedApplications)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
         </div>
       </template>
 
       <div v-if="selectedApplications.length" class="mb-2 flex flex-col gap-1">
-        <el-card v-for="resource in selectedApplications" :key="resource.id" class="small" shadow="never">
-          <div class="flex-between">
-            <span class="flex min-w-0 items-center gap-2">
-              <ApplicationIcon :icon="resource.icon" :size="20" class="shrink-0 small" />
-              <span class="truncate" :title="resource.name">{{ resource.name }}</span>
-            </span>
-            <el-button text title="移除智能体" @click="removeId('application_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
-          </div>
-        </el-card>
+        <template v-for="resource in selectedApplications" :key="resource.id">
+          <el-card class="small" shadow="never">
+            <div class="flex-between">
+              <span class="flex min-w-0 items-center gap-2">
+                <ApplicationIcon :icon="resource.icon" :size="20" class="shrink-0 small" />
+                <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+              </span>
+              <el-button text @click="removeId('application_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
+            </div>
+          </el-card>
+        </template>
       </div>
     </MkCollapse>
   </div>

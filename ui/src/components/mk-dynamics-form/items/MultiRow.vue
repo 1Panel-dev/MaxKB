@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { DynamicFormValue } from '../type'
-import { computed, inject } from 'vue'
+import { computed } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
-import { useFormDisabled, formItemContextKey } from 'element-plus'
-const inputDisabled = useFormDisabled()
+import type { CheckboxValueType } from 'element-plus'
 const props = defineProps<{
   formValue?: DynamicFormValue
   formfieldList?: FormField[]
@@ -14,29 +13,15 @@ const props = defineProps<{
   // 选中的值
   modelValue?: DynamicFormValue
 }>()
-const elFormItem = inject(formItemContextKey, void 0)
-const selected = (activeValue: string | number) => {
-  if (_value.value.includes(activeValue)) {
-    emit(
-      'update:modelValue',
-      props.modelValue.filter((i: DynamicFormValue) => i !== activeValue),
-    )
-  } else {
-    emit('update:modelValue', reset(activeValue))
-  }
-  if (elFormItem?.validate) {
-    elFormItem.validate('change')
-  }
-}
-const reset = (activeValue: string | number) => {
-  const _result = props.modelValue ? [...props.modelValue, activeValue] : [activeValue]
-  return _result.filter((r) => optionValues.value.includes(r))
-}
+const emit = defineEmits<{ 'update:modelValue': [value: CheckboxValueType[]] }>()
 
-const _value = computed(() => {
-  return props.modelValue ? props.modelValue : []
+// 兼容旧配置的空字符串；新增选择时沿用原有逻辑，清理已不在选项中的值。
+const selectedValues = computed<CheckboxValueType[]>({
+  get: () => (Array.isArray(props.modelValue) ? props.modelValue : []),
+  set: (values) => {
+    emit('update:modelValue', values.length > selectedValues.value.length ? values.filter((value) => optionValues.value.includes(value)) : values)
+  },
 })
-const emit = defineEmits(['update:modelValue'])
 
 const textField = computed(() => {
   return props.formField.text_field ? props.formField.text_field : 'key'
@@ -54,59 +39,9 @@ const options = computed(() => {
 </script>
 
 <template>
-  <!-- // TODO 重新设计 -->
-  <div class="multi_row">
-    <div
-      v-for="item in options"
-      :key="item.value"
-      class="item"
-      :class="[inputDisabled ? 'is-disabled' : '', _value.includes(item[valueField]) ? 'active' : '']"
-      @click="selected(item[valueField])"
-    >
-      {{ item[textField] }}
-    </div>
-  </div>
+  <el-checkbox-group v-model="selectedValues">
+    <el-checkbox-button v-for="option in options" :key="option[valueField]" :value="option[valueField]">
+      {{ option[textField] }}
+    </el-checkbox-button>
+  </el-checkbox-group>
 </template>
-<style lang="scss" scoped>
-.multi_row {
-  // height: 32px;
-  display: inline-flex;
-  border: 1px solid #bbbfc4;
-  border-radius: 4px;
-  font-weight: 400;
-  font-size: 14px;
-  color: var(--el-text-color-primary);
-  padding: 3px 4px;
-  box-sizing: border-box;
-  white-space: nowrap;
-  .is-disabled {
-    border: 1px solid var(--el-card-border-color);
-    background-color: var(--el-fill-color-light);
-    color: var(--el-text-color-placeholder);
-    cursor: not-allowed;
-    &:hover {
-      cursor: not-allowed;
-    }
-  }
-  .active {
-    border-radius: 4px;
-    background: var(--el-color-primary-light-9);
-    color: var(--el-color-primary);
-  }
-  .item {
-    cursor: pointer;
-    margin: 0px 2px;
-    padding: 2px 8px;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    &:last-child {
-      margin: 0 4px 0 2px;
-    }
-    &:first-child {
-      margin: 0 2px 0 4px;
-    }
-  }
-}
-</style>

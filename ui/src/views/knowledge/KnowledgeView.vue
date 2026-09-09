@@ -208,6 +208,11 @@ function handleBatchDelete() {
                 @selected="handleKnowledgeSelect(knowledge.id, $event)"
               >
                 <template v-if="!isShared" #action-dropdown>
+                  <!-- 资源授权 -->
+                  <AuthorizeKnowledgeAction label="资源授权" :knowledge="knowledge" @refresh="refreshKnowledge" />
+
+                  <!-- TODO 关联资源 -->
+                  <!-- 转移到 -->
                   <MoveKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
                     label="转移到"
@@ -217,8 +222,7 @@ function handleBatchDelete() {
                     @delete="handleDeleteKnowledge"
                     @move="handleMoveKnowledge"
                   />
-                  <!-- 资源授权 -->
-                  <AuthorizeKnowledgeAction label="资源授权" :knowledge="knowledge" @refresh="refreshKnowledge" />
+                  <!-- 删除 -->
                   <DeleteKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
                     label="删除"

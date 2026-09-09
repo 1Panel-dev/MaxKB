@@ -250,6 +250,8 @@ onMounted(() => {
                     :api="ToolApi"
                     :tool="tool"
                   />
+                  <!-- 资源授权 -->
+                  <AuthorizeToolAction label="资源授权" :tool="tool" @refresh="refreshTool" />
 
                   <!-- // TODO: 触发器 (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW')-->
                   <!-- // TODO: 查看关联资源-->
@@ -265,8 +267,6 @@ onMounted(() => {
                     @delete="handleDeleteTool"
                   />
                   <ExportToolAction v-if="!tool.template_id" v-model:loading="toolOperationLoading" label="导出" :api="ToolApi" :tool="tool" />
-                  <!-- 资源授权 -->
-                  <AuthorizeToolAction label="资源授权" :tool="tool" @refresh="refreshTool" />
                   <DeleteToolAction v-model:loading="toolOperationLoading" label="删除" :api="ToolApi" :tool="tool" @delete="handleDeleteTool" />
                 </template>
               </ToolCard>

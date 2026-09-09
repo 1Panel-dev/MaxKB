@@ -220,7 +220,12 @@ function handleBatchDelete() {
                 @selected="handleApplicationSelect(application.id, $event)"
               >
                 <template #action-dropdown>
+                  <!-- 设置 -->
                   <SettingApplicationAction label="设置" :application="application" />
+                  <!-- 资源授权 -->
+                  <AuthorizeApplicationAction label="资源授权" :application="application" @refresh="refreshApplications" />
+                  <!-- TODO 关联资源 -->
+                  <!-- 移动到 -->
                   <MoveApplicationAction
                     v-model:loading="applicationOperationLoading"
                     label="移动到"
@@ -229,14 +234,14 @@ function handleBatchDelete() {
                     :current-folder-id="currentFolder.id"
                     @delete="handleDeleteApplication"
                   />
+                  <!-- 导出 -->
                   <ExportApplicationAction
                     v-model:loading="applicationOperationLoading"
                     label="导出"
                     :api="ApplicationApi"
                     :application="application"
                   />
-                  <!-- 资源授权 -->
-                  <AuthorizeApplicationAction label="资源授权" :application="application" @refresh="refreshApplications" />
+                  <!-- 删除 -->
                   <DeleteApplicationAction
                     v-model:loading="applicationOperationLoading"
                     label="删除"

@@ -284,12 +284,8 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
   </el-form-item>
   <!-- 添加弹窗 -->
   <MkDialog
-    :close-on-click-modal="true"
-    :close-on-press-escape="true"
     v-model="addDialog.visible"
     :title="addDialog.mode === 'root' ? '添加一级选项' : '添加子选项'"
-    width="520px"
-    destroy-on-close
     label-position="top"
     require-asterisk-position="right"
     @submit.prevent
@@ -377,8 +373,4 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
     </template>
   </MkDialog>
 </template>
-<style lang="scss" scoped>
-.tag-list-max-list {
-  max-height: calc(100vh - 260px);
-}
-</style>
+<style lang="scss" scoped></style>

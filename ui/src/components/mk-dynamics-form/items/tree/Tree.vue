@@ -40,7 +40,12 @@ const options = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 const propsData = computed(() => {
-  return { label: textField, children: childrenField, isLeaf: (data: DynamicFormValue) => data.leaf, disabled: (data: DynamicFormValue) => data.disabled }
+  return {
+    label: textField,
+    children: childrenField,
+    isLeaf: (data: DynamicFormValue) => data.leaf,
+    disabled: (data: DynamicFormValue) => data.disabled,
+  }
 })
 
 const attrs = useAttrs() as DynamicFormValue
@@ -54,10 +59,13 @@ function renderTemplate(template: string, data: DynamicFormValue) {
 
 const loadNode: LoadFunction = (node, resolve) => {
   requestCall(request, {
-    url: renderTemplate('/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' + attrs.fetch_list_function, {
-      ...props.otherParams,
-      ...(getExtra ? getExtra() : {}),
-    }),
+    url: renderTemplate(
+      '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' + attrs.fetch_list_function,
+      {
+        ...props.otherParams,
+        ...(getExtra ? getExtra() : {}),
+      },
+    ),
     body: { current_node: node.level === 0 ? undefined : node.data },
     then: (res: DynamicFormValue) => {
       resolve(res.data)
@@ -70,7 +78,9 @@ const loadNode: LoadFunction = (node, resolve) => {
     loading: loading,
   })
 }
-const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField; otherParams: DynamicFormValue }>(), { modelValue: () => [] })
+const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField; otherParams: DynamicFormValue }>(), {
+  modelValue: () => [],
+})
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
@@ -133,8 +143,8 @@ const loading = ref<boolean>(false)
               <span class="ml-4">{{ node.label }}</span>
             </div>
           </template>
-        </el-tree></el-scrollbar
-      >
+        </el-tree>
+      </el-scrollbar>
     </div>
   </div>
 </template>

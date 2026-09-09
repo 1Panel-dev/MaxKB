@@ -397,6 +397,11 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 所有 `el-button` 的 `:active` 和 `.is-active` 视觉统一复用各自的 hover 样式，不额外加深背景、
 边框或文字颜色；普通、plain、text、link、circle 及各语义类型按钮均遵循该规则。
 
+按钮式多选使用 `el-checkbox-group` 和 `el-checkbox-button`，外观与按钮式单选一致：
+组容器提供圆角边框、4px 内边距和间距，选中项使用主题色文字与浅色背景，不显示相邻按钮连接阴影。
+规则统一维护在 `element-plus.scss` 的 checkbox 分组；仅包含 `el-checkbox-button` 的组容器
+应用该布局，普通复选框组不受影响。保留禁用状态和键盘焦点提示。
+
 Element Plus 所需的 `light-3` 至 `light-9` 和 `dark-2` 色阶使用 `color-mix()` 根据主题色生成。业务代码通常不需要直接修改 `--el-color-primary-*`。
 
 项目内所有 Select 下拉弹层统一隐藏 Popper 箭头，并将 Element Plus 默认的 `12px` 偏移回收
