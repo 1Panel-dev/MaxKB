@@ -1172,6 +1172,25 @@
   }
 }
 
+/* tree */
+.el-tree {
+  --el-tree-node-content-height: 32px;
+  --el-tree-node-hover-bg-color: var(--mk-N900-transparent-10);
+  --el-tree-text-color: var(--el-text-color-primary);
+  --el-tree-expand-icon-color: var(--mk-N600);
+  .el-tree-node__content {
+    border-radius: var(--el-border-radius-base);
+    margin-bottom: var(--spacing);
+    padding-right: calc(var(--spacing) * 2);
+  }
+  .el-tree-node__expand-icon {
+    font-size: 14px;
+  }
+  .el-tree__empty-block {
+    min-height: 22px;
+  }
+}
+
 /* upload */
 .el-upload {
   --el-upload-dragger-padding-horizontal: 40px;
