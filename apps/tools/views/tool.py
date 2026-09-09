@@ -226,11 +226,11 @@ class ToolView(APIView):
             methods=["PUT"],
             description=_("Batch delete tools"),
             summary=_("Batch delete tools"),
-            operation_id=_("Batch delete tools"),
+            operation_id=_("Batch delete tools"),  # type: ignore
             parameters=ToolBatchOperateAPI.get_parameters(),
             request=ToolBatchOperateAPI.get_request(),
             responses=result.DefaultResultSerializer,
-            tags=[_("Tool")],
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_BATCH_DELETE.get_workspace_permission(),
@@ -275,11 +275,11 @@ class ToolView(APIView):
             methods=["PUT"],
             description=_("Batch move tools"),
             summary=_("Batch move tools"),
-            operation_id=_("Batch move tools"),
+            operation_id=_("Batch move tools"),  # type: ignore
             parameters=ToolBatchOperateAPI.get_parameters(),
             request=ToolBatchOperateAPI.get_move_request(),
             responses=result.DefaultResultSerializer,
-            tags=[_("Tool")],
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_BATCH_MOVE.get_workspace_permission(),

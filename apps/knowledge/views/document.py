@@ -1356,7 +1356,7 @@ class TableTemplate(APIView):
         operation_id=_("Get form template"),  # type: ignore
         parameters=TemplateExportAPI.get_parameters(),
         responses=TemplateExportAPI.get_response(),
-        tags=[_("Knowledge Base/Documentation")],
+        tags=[_("Knowledge Base/Documentation")],  # type: ignore
     )  # type: ignore
     def get(self, request: Request):
         return DocumentSerializers.Export(data={"type": request.query_params.get("type")}).table_export(with_valid=True)

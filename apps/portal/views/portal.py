@@ -36,9 +36,9 @@ class PortalView(APIView):
         methods=["GET"],
         description=_("Get portal configuration"),
         summary=_("Get portal configuration"),
-        operation_id=_("Get portal configuration"),
+        operation_id=_("Get portal configuration"),  # type: ignore
         responses=PortalAPI.Get.get_response(),
-        tags=[_("Portal")],
+        tags=[_("Portal")],  # type: ignore
     )
     @has_permissions(PermissionConstants.PORTAL_EDIT, RoleConstants.ADMIN)
     def get(self, request: Request):
@@ -48,10 +48,10 @@ class PortalView(APIView):
         methods=["PUT"],
         description=_("Save portal configuration"),
         summary=_("Save portal configuration"),
-        operation_id=_("Save portal configuration"),
+        operation_id=_("Save portal configuration"),  # type: ignore
         request=PortalAPI.Save.get_request(),
         responses=PortalAPI.Save.get_response(),
-        tags=[_("Portal")],
+        tags=[_("Portal")],  # type: ignore
     )
     @log(menu="Portal", operate="Save portal configuration")
     @has_permissions(PermissionConstants.PORTAL_EDIT, RoleConstants.ADMIN)
@@ -64,8 +64,8 @@ class PortalLoginView(APIView):
         methods=["POST"],
         description=_("Portal login"),
         summary=_("Portal login"),
-        operation_id=_("Portal login"),
-        tags=[_("Portal")],
+        operation_id=_("Portal login"),  # type: ignore
+        tags=[_("Portal")],  # type: ignore
         request=PortalAPI.Login.get_request(),
         responses=PortalAPI.Login.get_response(),
     )
@@ -91,8 +91,8 @@ class PortalInfoView(APIView):
         methods=["GET"],
         description=_("Get portal login info"),
         summary=_("Get portal login info"),
-        operation_id=_("Get portal login info"),
-        tags=[_("Portal")],
+        operation_id=_("Get portal login info"),  # type: ignore
+        tags=[_("Portal")],  # type: ignore
     )
     def get(self, request: Request):
         return result.success(PortalLoginSerializer.get_login_profile())
@@ -103,8 +103,8 @@ class PortalLogoutView(APIView):
         methods=["POST"],
         summary=_("Portal logout"),
         description=_("Portal logout"),
-        operation_id=_("Portal logout"),
-        tags=[_("Portal")],
+        operation_id=_("Portal logout"),  # type: ignore
+        tags=[_("Portal")],  # type: ignore
         responses=PortalAPI.Logout.get_response(),
     )
     @log(menu="Portal", operate="Log out")

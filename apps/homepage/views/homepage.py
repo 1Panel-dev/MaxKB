@@ -48,7 +48,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_chat_count_aggregation",
             parameters=TokensAggregationAPI.get_parameters(),
             responses=TokensAggregationAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
@@ -77,7 +77,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_tokens_aggregation",
             parameters=TokensAggregationAPI.get_parameters(),
             responses=TokensAggregationAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
@@ -106,7 +106,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_application_tokens_ranking_export",
             parameters=RankingBaseExportAPI.get_parameters(),
             responses=RankingBaseExportAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_EXPORT.get_workspace_permission(),
@@ -134,7 +134,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_application_tokens_ranking",
             parameters=ApplicationTokensRankingAPI.get_parameters(),
             responses=ApplicationTokensRankingAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
@@ -164,7 +164,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_application_question_ranking_export",
             parameters=RankingBaseExportAPI.get_parameters(),
             responses=RankingBaseExportAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_EXPORT.get_workspace_permission(),
@@ -192,7 +192,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_application_question_ranking",
             parameters=ApplicationQuestionRankingAPI.get_parameters(),
             responses=ApplicationQuestionRankingAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
@@ -222,7 +222,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_user_tokens_ranking_export",
             parameters=RankingBaseExportAPI.get_parameters(),
             responses=RankingBaseExportAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_EXPORT.get_workspace_permission(),
@@ -250,7 +250,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_user_tokens_ranking",
             parameters=UserTokensRankingAPI.get_parameters(),
             responses=UserTokensRankingAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
@@ -310,7 +310,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_application_aggregation",
             parameters=ApplicationAggregationAPI.get_parameters(),
             responses=ApplicationAggregationAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
@@ -334,7 +334,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_knowledge_aggregation",
             parameters=KnowledgeAggregationAPI.get_parameters(),
             responses=KnowledgeAggregationAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
@@ -358,7 +358,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_tool_aggregation",
             parameters=ToolAggregationAPI.get_parameters(),
             responses=ToolAggregationAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
@@ -382,7 +382,7 @@ class HomePageAPI(APIView):
             operation_id="homepage_model_aggregation",
             parameters=ModelAggregationAPI.get_parameters(),
             responses=ModelAggregationAPI.get_response(),
-            tags=[_("Home page")],
+            tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
@@ -410,7 +410,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_application_aggregation",
             parameters=system_parameters(ApplicationAggregationAPI),
             responses=ApplicationAggregationAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -437,7 +437,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_knowledge_aggregation",
             parameters=system_parameters(KnowledgeAggregationAPI),
             responses=KnowledgeAggregationAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -464,7 +464,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_tool_aggregation",
             parameters=system_parameters(ToolAggregationAPI),
             responses=ToolAggregationAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -491,7 +491,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_model_aggregation",
             parameters=system_parameters(ModelAggregationAPI),
             responses=ModelAggregationAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -518,7 +518,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_tokens_aggregation",
             parameters=system_parameters(TokensAggregationAPI),
             responses=TokensAggregationAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -550,7 +550,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_chat_record_aggregation",
             parameters=system_parameters(TokensAggregationAPI),
             responses=TokensAggregationAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -582,7 +582,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_application_tokens_ranking",
             parameters=system_parameters(ApplicationTokensRankingAPI),
             responses=ApplicationTokensRankingAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -615,7 +615,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_application_question_ranking",
             parameters=system_parameters(ApplicationQuestionRankingAPI),
             responses=ApplicationQuestionRankingAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -648,7 +648,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_user_tokens_ranking",
             parameters=system_parameters(UserTokensRankingAPI),
             responses=UserTokensRankingAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -681,7 +681,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_user_tokens_ranking_export",
             parameters=system_parameters(RankingBaseExportAPI),
             responses=RankingBaseExportAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -712,7 +712,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_application_question_ranking_export",
             parameters=system_parameters(RankingBaseExportAPI),
             responses=RankingBaseExportAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -743,7 +743,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_application_tokens_ranking_export",
             parameters=system_parameters(RankingBaseExportAPI),
             responses=RankingBaseExportAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,
@@ -774,7 +774,7 @@ class SystemHomePageAPI(APIView):
             operation_id="system_homepage_application_monitoring",
             parameters=system_parameters(ApplicationMonitoringAPI),
             responses=ApplicationMonitoringAPI.get_response(),
-            tags=[_("System home page")],
+            tags=[_("System home page")],  # type: ignore
         )
         @has_permissions(
             RoleConstants.ADMIN,

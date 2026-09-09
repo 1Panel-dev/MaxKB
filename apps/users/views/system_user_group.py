@@ -47,7 +47,7 @@ class SystemUserGroupView(APIView):
         methods=["POST"],
         summary=_("Create or update System User Group"),
         description=_("Create or update System User Group"),
-        operation_id=_("Create or update System User Group"),
+        operation_id=_("Create or update System User Group"),  # type: ignore
         request=CreateUserGroupApi.get_request(),
         responses=CreateUserGroupApi.get_response(),
         tags=["IAM/System User Group"],
@@ -74,7 +74,7 @@ class SystemUserGroupView(APIView):
         methods=["GET"],
         summary=_("Get System User Group list by workspace id"),
         description=_("Get System User Group list by workspace id"),
-        operation_id=_("Get System User Group list by workspace id"),
+        operation_id=_("Get System User Group list by workspace id"),  # type: ignore
         request=UserGroupListApi.get_parameters(),
         responses=UserGroupListApi.get_response(),
         tags=["IAM/System User Group"],
@@ -92,7 +92,7 @@ class SystemUserGroupView(APIView):
             methods=["DELETE"],
             summary=_("Delete System User Group"),
             description=_("Delete System User Group"),
-            operation_id=_("Delete System User Group"),
+            operation_id=_("Delete System User Group"),  # type: ignore
             parameters=DeleteUserGroupApi.get_parameters(),
             responses=DefaultModelResponse.get_response(),
             tags=["IAM/System User Group"],
@@ -116,7 +116,7 @@ class SystemUserGroupView(APIView):
             methods=["POST"],
             summary=_("Add members to System User Group"),
             description=_("Add members to System User Group"),
-            operation_id=_("Add members to System User Group"),
+            operation_id=_("Add members to System User Group"),  # type: ignore
             parameters=AddMemberApi.get_parameters(),
             request=AddMemberApi.get_request(),
             responses=DefaultModelResponse.get_response(),
@@ -142,7 +142,7 @@ class SystemUserGroupView(APIView):
             methods=["DELETE"],
             summary=_("Remove members from System User Group"),
             description=_("Remove members from System User Group"),
-            operation_id=_("Remove members from System User Group"),
+            operation_id=_("Remove members from System User Group"),  # type: ignore
             parameters=RemoveMemberApi.get_parameters(),
             request=RemoveMemberApi.get_request(),
             responses=DefaultModelResponse.get_response(),

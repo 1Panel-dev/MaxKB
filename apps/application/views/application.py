@@ -318,11 +318,11 @@ class ApplicationAPI(APIView):
             methods=['PUT'],
             description=_("Batch delete applications"),
             summary=_("Batch delete applications"),
-            operation_id=_("Batch delete applications"),
+            operation_id=_("Batch delete applications"),  # type: ignore
             parameters=ApplicationBatchOperateAPI.get_parameters(),
             request=ApplicationBatchOperateAPI.get_request(),
             responses=result.DefaultResultSerializer,
-            tags=[_('Application')]
+            tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_BATCH_DELETE.get_workspace_permission(),
                          RoleConstants.USER.get_workspace_role(),
@@ -356,11 +356,11 @@ class ApplicationAPI(APIView):
             methods=['PUT'],
             description=_("Batch move applications"),
             summary=_("Batch move applications"),
-            operation_id=_("Batch move applications"),
+            operation_id=_("Batch move applications"),  # type: ignore
             parameters=ApplicationBatchOperateAPI.get_parameters(),
             request=ApplicationBatchOperateAPI.get_move_request(),
             responses=result.DefaultResultSerializer,
-            tags=[_('Application')]
+            tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_BATCH_MOVE.get_workspace_permission(),
                          RoleConstants.USER.get_workspace_role(),
@@ -395,11 +395,11 @@ class ApplicationAPI(APIView):
             methods=['PUT'],
             description=_("Batch update application chat log clear policy"),
             summary=_("Batch update application chat log clear policy"),
-            operation_id=_("Batch update application chat log clear policy"),
+            operation_id=_("Batch update application chat log clear policy"),  # type: ignore
             parameters=ApplicationBatchOperateAPI.get_parameters(),
             request=ApplicationBatchOperateAPI.get_clean_time_request(),
             responses=result.DefaultResultSerializer,
-            tags=[_('Application')]
+            tags=[_('Application')]  # type: ignore
         )
         @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_permission(),
                          RoleConstants.USER.get_workspace_role(),

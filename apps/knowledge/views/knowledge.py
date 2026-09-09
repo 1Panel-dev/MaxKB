@@ -184,11 +184,11 @@ class KnowledgeView(APIView):
             methods=["PUT"],
             description=_("Batch delete knowledge"),
             summary=_("Batch delete knowledge"),
-            operation_id=_("Batch delete knowledge"),
+            operation_id=_("Batch delete knowledge"),  # type: ignore
             parameters=KnowledgeBatchOperateAPI.get_parameters(),
             request=KnowledgeBatchOperateAPI.get_request(),
             responses=result.DefaultResultSerializer,
-            tags=[_("Knowledge Base")],
+            tags=[_("Knowledge Base")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_BATCH_DELETE.get_workspace_permission(),
@@ -233,11 +233,11 @@ class KnowledgeView(APIView):
             methods=["PUT"],
             description=_("Batch move knowledge"),
             summary=_("Batch move knowledge"),
-            operation_id=_("Batch move knowledge"),
+            operation_id=_("Batch move knowledge"),  # type: ignore
             parameters=KnowledgeBatchOperateAPI.get_parameters(),
             request=KnowledgeBatchOperateAPI.get_move_request(),
             responses=result.DefaultResultSerializer,
-            tags=[_("Knowledge Base")],
+            tags=[_("Knowledge Base")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_BATCH_MOVE.get_workspace_permission(),
@@ -641,11 +641,11 @@ class KnowledgeView(APIView):
             methods=["POST"],
             description=_("Import knowledge bundle"),
             summary=_("Import knowledge bundle"),
-            operation_id=_("Import knowledge bundle"),
+            operation_id=_("Import knowledge bundle"),  # type: ignore
             parameters=KnowledgeImportAPI.get_parameters(),
             request=KnowledgeImportAPI.get_request(),
             responses=KnowledgeImportAPI.get_response(),
-            tags=[_("Knowledge Base")],
+            tags=[_("Knowledge Base")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission(),

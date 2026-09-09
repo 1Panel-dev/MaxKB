@@ -30,10 +30,10 @@ class PortalApplicationView(APIView):
         methods=["GET"],
         description=_("Get published application list by page"),
         summary=_("Get published application list by page"),
-        operation_id=_("Get published application list by page"),
+        operation_id=_("Get published application list by page"),  # type: ignore
         parameters=PortalAPI.Application.get_parameters(),
         responses=PortalAPI.Application.get_response(),
-        tags=[_("V3 Chat")],
+        tags=[_("V3 Chat")],  # type: ignore
     )
     def get(self, request: Request, current_page: int, page_size: int):
         return result.success(
@@ -50,10 +50,10 @@ class PortalHistoricalConversationView(APIView):
         methods=["GET"],
         description=_("Get portal historical conversation by page"),
         summary=_("Get portal historical conversation by page"),
-        operation_id=_("Get portal historical conversation by page"),
+        operation_id=_("Get portal historical conversation by page"),  # type: ignore
         parameters=PortalAPI.Conversation.get_parameters(),
         responses=PortalAPI.Conversation.get_response(),
-        tags=[_("V3 Chat")],
+        tags=[_("V3 Chat")],  # type: ignore
     )
     def get(self, request: Request, current_page: int, page_size: int):
         return result.success(

@@ -20,7 +20,7 @@ class ChatUserApiKeyView(APIView):
         summary=_("Create ChatUserAPIKey"),
         operation_id="V3 Create ChatUserAPIKey",
         responses=None,
-        tags=[_("V3 Chat User API Key")],
+        tags=[_("V3 Chat User API Key")],  # type: ignore
     )
     @log(menu="Chat User API Key", operate="Add chat user API key")
     def post(self, request: Request):
@@ -39,7 +39,7 @@ class ChatUserApiKeyView(APIView):
                                  description=_('order by'), required=False),
             ],
             responses=None,
-            tags=[_("V3 Chat User API Key")],
+            tags=[_("V3 Chat User API Key")],  # type: ignore
         )
         def get(self, request: Request, current_page, page_size):
             return result.success(
@@ -58,7 +58,7 @@ class ChatUserApiKeyView(APIView):
             operation_id="V3 Delete ChatUserAPIKey",
             responses=None,
             parameters=None,
-            tags=[_("V3 Chat User API Key")],
+            tags=[_("V3 Chat User API Key")],  # type: ignore
         )
         @log(menu="Chat User API Key", operate="Delete chat user API key")
         def delete(self, request: Request, api_key_id: str):
