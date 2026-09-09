@@ -40,6 +40,7 @@ class ChatHistory:
             "chat_id": str(r.chat_id),
             "question": r.question,
             "messages": r.messages,
+            "details": r.details,
             "create_time": r.create_time,
         }
 
@@ -50,6 +51,7 @@ class ChatHistory:
             chat_id=d.get("chat_id"),
             question=d.get("question"),
             messages=d.get("messages"),
+            details=d.get("details"),
             create_time=d.get("create_time"),
         )
 

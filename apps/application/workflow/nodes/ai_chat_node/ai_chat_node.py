@@ -18,11 +18,12 @@ from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from rest_framework import serializers
 
+from application.workflow.message.aggregator import AggregationManager
 from application.flow.tools import get_tools, mcp_response_generator
 from application.models import Application, ApplicationAccessToken, ApplicationApiKey
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo, Position
+from application.workflow.message.struct.content import NodeInfo, Position, Content
 from application.workflow.message.struct.reasoning_content import ReasoningContent
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.tool_content import ToolContent
@@ -30,6 +31,7 @@ from application.workflow.status import Status
 from application.workflow.tools import Reasoning
 from common.exception.app_exception import AppApiException
 from common.utils.common import guess_image_format
+from common.utils.messages_util import to_ai_message_list, to_human_message_list
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
@@ -96,7 +98,8 @@ def _get_node_message(chat_record, runtime_node_id):
     node_details = chat_record.get_node_details_runtime_node_id(runtime_node_id)
     if node_details is None:
         return []
-    return [HumanMessage(node_details.get("question")), AIMessage(node_details.get("answer"))]
+    return [*to_human_message_list(node_details.get("question")), *to_ai_message_list(node_details.get("messages"))]
+    return [HumanMessage(node_details.get("question")), AIMessage(node_details.get("messages"))]
 
 
 def _get_workflow_message(chat_record):
@@ -193,6 +196,12 @@ class AIChatNode(INode):
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "ai-chat-node"
 
+    def write(self, message: Content):
+        super().write(message)
+        if not self.data.get("messages"):
+            self.data["messages"] = []
+        self.data["messages"].append(message)
+
     def execute(self):
         workflow_params = self.get_workflow_parameters()
         node_params = self.get_parameters()
@@ -254,7 +263,7 @@ class AIChatNode(INode):
                 "reasoning_content_end": "</think>",
                 "reasoning_content_start": "<think>",
             }
-        self.write_context("model_setting", model_setting)
+        self.data["model_setting"] = model_setting
 
         chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id, **(model_params_setting or {}))
 
@@ -263,12 +272,12 @@ class AIChatNode(INode):
             "history_message",
             [{"content": message.content, "role": message.type} for message in (history_message or [])],
         )
-
-        question = self._generate_prompt_question(prompt, chat_model, vision, image_list, video_list)
-        self.write_context("question", question.content)
+        question_str = self.workflow_manage.generate_prompt(prompt)
+        question = self._generate_prompt_question(question_str, chat_model, vision, image_list, video_list)
+        self.data["question"] = {"content": question_str, "image_list": image_list, "video_list": video_list}
 
         system = self.workflow_manage.generate_prompt(system)
-        self.write_context("system", system)
+        self.data["system"] = system
 
         message_list = [*history_message, question]
 
@@ -321,7 +330,7 @@ class AIChatNode(INode):
                     r, chat_model, message_list_with_system, question.content, is_result, text_content_id
                 )
 
-    def _generate_prompt_question(self, prompt, model, vision, image_list, video_list):
+    def _generate_prompt_question(self, question_str, model, vision, image_list, video_list):
         images = []
         videos = []
         if vision:
@@ -334,9 +343,7 @@ class AIChatNode(INode):
             if video_list:
                 video = self.workflow_manage.get_reference_field(video_list[0], video_list[1:])
                 videos = _process_videos(video, model)
-        return HumanMessage(
-            content=[*videos, *images, {"type": "text", "text": self.workflow_manage.generate_prompt(prompt)}]
-        )
+        return HumanMessage(content=[*videos, *images, {"type": "text", "text": question_str}])
 
     def _stream_response(self, response, chat_model, message_list, question, reasoning_content_id, text_content_id):
         node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
@@ -436,11 +443,10 @@ class AIChatNode(INode):
     def _write_final_context(self, chat_model, message_list, question, answer, reasoning_content):
         message_tokens = chat_model.get_num_tokens_from_messages(message_list)
         answer_tokens = chat_model.get_num_tokens(answer)
-        self.write_context("message_tokens", message_tokens)
-        self.write_context("answer_tokens", answer_tokens)
+        self.data["message_tokens"] = message_tokens
+        self.data["answer_tokens"] = answer_tokens
         self.write_context("answer", answer)
-        self.write_context("question", question)
-        self.write_context("reasoning_content", reasoning_content)
+        self.data["reasoning_content"] = reasoning_content
 
     def _handle_mcp(
         self,
@@ -498,7 +504,6 @@ class AIChatNode(INode):
 
         tools = get_tools(source_type, chat_id, tool_ids, workspace_id)
         if tool_ids and len(tool_ids) > 0:
-            self.write_context("tool_ids", tool_ids)
             custom_tools_map = {
                 str(t.id): t for t in QuerySet(Tool).filter(id__in=tool_ids, tool_type=ToolType.CUSTOM, is_active=True)
             }
@@ -516,7 +521,6 @@ class AIChatNode(INode):
                 mcp_servers_config[str(tool.id)] = tool_config
 
         if application_ids and len(application_ids) > 0:
-            self.write_context("application_ids", application_ids)
             apps_map = {str(a.id): a for a in QuerySet(Application).filter(id__in=application_ids, is_publish=True)}
             app_keys_map = {
                 str(ak.application_id): ak
@@ -550,7 +554,6 @@ class AIChatNode(INode):
                 mcp_servers_config[app.name] = app_config
 
         if skill_tool_ids and len(skill_tool_ids) > 0:
-            self.write_context("skill_tool_ids", skill_tool_ids)
             skill_file_items = []
             skill_tools_map = {str(t.id): t for t in QuerySet(Tool).filter(id__in=skill_tool_ids, is_active=True)}
             for tool_id in skill_tool_ids:
@@ -632,14 +635,19 @@ class AIChatNode(INode):
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
+        aggregation = AggregationManager()
+        for m in self.data.get("messages"):
+            aggregation.aggregate(m)
+        messages = aggregation.get_contents()
         details.update(
             {
-                "question": self.get_context("question"),
+                "question": self.data.get("question"),
                 "answer": self.get_context("answer"),
                 "reasoning_content": self.get_context("reasoning_content"),
                 "message_tokens": self.get_context("message_tokens"),
                 "answer_tokens": self.get_context("answer_tokens"),
                 "history_message": self.get_context("history_message"),
+                "messages": messages,
             }
         )
         return details

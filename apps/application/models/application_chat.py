@@ -135,7 +135,10 @@ class ChatRecord(AppModelMixin):
         return to_ai_message_list(self.messages)
 
     def get_node_details_runtime_node_id(self, runtime_node_id):
-        return self.details.get(runtime_node_id, None)
+        for node_details in self.details:
+            if node_details.get("node_id") == runtime_node_id:
+                return node_details
+        return None
 
     class Meta:
         db_table = "application_chat_record"
