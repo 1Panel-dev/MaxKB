@@ -156,7 +156,8 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
     @staticmethod
     def get_loop_workflow_node(details):
         result = []
-        for item in details.values():
+
+        for item in details.values() if isinstance(details, dict) else details:
             if item.get("type") == "loop-node":
                 for loop_item in item.get("loop_node_data") or []:
                     for inner_item in loop_item.values():
@@ -174,7 +175,7 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
             paragraph_list = chat_record.details.get("search_step").get("paragraph_list")
 
         for item in [
-            *chat_record.details.values(),
+            *(chat_record.details.values() if isinstance(chat_record.details, dict) else chat_record.details),
             *ApplicationChatRecordQuerySerializers.get_loop_workflow_node(chat_record.details),
         ]:
             if item.get("type") == "search-knowledge-node" and item.get("show_knowledge", False):
@@ -218,13 +219,21 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
             "knowledge_list": knowledge_list,
             "paragraph_list": paragraph_list,
         }
-        show_exec_dict = {
-            "execution_details": [
-                chat_record.details[key]
-                for key in chat_record.details
-                if (True if show_exec else chat_record.details[key].get("type") == "start-node")
-            ]
-        }
+        if isinstance(chat_record.details, dict):
+            show_exec_dict = {
+                "execution_details": [
+                    chat_record.details[key]
+                    for key in chat_record.details
+                    if (True if show_exec else chat_record.details[key].get("type") == "start-node")
+                ]
+            }
+        else:
+            show_exec_dict = {
+                "execution_details": [
+                    item for item in chat_record.details if (True if show_exec else item.get("type") == "start-node")
+                ]
+            }
+
         return {
             **ChatRecordSerializerModel(chat_record).data,
             "padding_problem_text": chat_record.details.get("problem_padding").get("padding_problem_text")
