@@ -50,4 +50,9 @@ const deleteRoleMember = (roleId: string, userRelationId: string) => {
   return del<boolean>(`${prefix}/${roleId}/remove_member/${userRelationId}`)
 }
 
-export default { deleteRole, deleteRoleMember, getRoleList, getRoleMemberList, getRolePermissionList, postRole, postRoleMembers, postRolePermissions }
+/** 从指定角色批量移除成员。 */
+const deleteRoleMembers = (roleId: string, userRelationIds: string[]) => {
+  return del<{ member_ids: string[] }, boolean>(`${prefix}/${roleId}/remove_member/batch`, undefined, { member_ids: userRelationIds })
+}
+
+export default { deleteRole, deleteRoleMember, deleteRoleMembers, getRoleList, getRoleMemberList, getRolePermissionList, postRole, postRoleMembers, postRolePermissions }
