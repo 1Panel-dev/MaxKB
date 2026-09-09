@@ -66,7 +66,12 @@ const batchSelectedMembers = ref<RoleMember[]>([])
 function handleBatchDelete() {
   MsgConfirm(`是否删除选中的 ${batchSelectedMembers.value.length} 个成员？`, '')
     .then(() => {
-      // TODO: 批量删除
+      loading.value = true
+      const memberIds = batchSelectedMembers.value.map((member) => member.user_relation_id)
+      return RoleApi.deleteRoleMembers(props.currentRole.id, memberIds).then(() => {
+        MsgSuccess('批量移除成功')
+        return loadMembers()
+      })
     })
     .catch(() => {})
     .finally(() => {
@@ -102,6 +107,7 @@ watch(
       @current-change="loadMembers()"
       @size-change="loadMembers()"
       :max-table-height="290"
+      rowKey="user_relation_id"
       @selection-change="handleBatchSelectionChange"
     >
       <el-table-column type="selection" width="40" />
