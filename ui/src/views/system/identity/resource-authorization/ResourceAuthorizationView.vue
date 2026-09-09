@@ -12,7 +12,7 @@ import { MsgSuccess } from '@/utils/message'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import PermissionTable from './components/PermissionTable.vue'
 import UserAuthorizationList from './components/UserAuthorizationList.vue'
-import UserGroupAuthorizationList from './components/UserGroupAuthorizationList.vue'
+import UserGroupAuthorizationList from './components/user-group/UserGroupAuthorizationList.vue'
 import { RESOURCE_AUTHORIZATION_LABELS } from './constants'
 
 const { auth } = useStore()

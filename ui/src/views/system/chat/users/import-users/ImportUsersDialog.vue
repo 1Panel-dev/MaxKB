@@ -43,7 +43,10 @@ function loadSyncTypes() {
   return ChatUserApi.getChatUserSyncTypes()
     .then((syncTypes) => {
       syncTypeOptions.value = [
-        ...syncTypes.map((syncType) => ({ label: syncType === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[syncType as LoginMethod], value: syncType })),
+        ...syncTypes.map((syncType) => ({
+          label: syncType === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[syncType as LoginMethod],
+          value: syncType,
+        })),
         { label: '本地文件', value: LOCAL_FILE_SOURCE },
       ]
       importUsersForm.syncType = syncTypeOptions.value[0]?.value ?? ''
@@ -106,7 +109,11 @@ function submitImportUsers() {
 
     const syncFile = isLocalFileSource.value ? ((importUsersForm.files[0]?.raw ?? undefined) as File | undefined) : undefined
     importing.value = true
-    return ChatUserApi.postSyncChatUsers(isLocalFileSource.value ? 'file' : importUsersForm.syncType, importUsersForm.userGroupId || undefined, syncFile)
+    return ChatUserApi.postSyncChatUsers(
+      isLocalFileSource.value ? 'file' : importUsersForm.syncType,
+      importUsersForm.userGroupId || undefined,
+      syncFile,
+    )
       .then((result) => {
         const conflictMessage = formatConflictMessage(result.conflict_users ?? [])
         MsgSuccess(`成功导入 ${result.success_count} 个用户${conflictMessage ? `，${conflictMessage}` : ''}`)
@@ -153,7 +160,12 @@ defineExpose({ open })
     >
       <el-form-item label="用户来源" prop="syncType">
         <el-select v-model="importUsersForm.syncType" class="w-full" :loading="syncTypesLoading" placeholder="请选择用户来源">
-          <el-option v-for="syncTypeOption in syncTypeOptions" :key="syncTypeOption.value" :label="syncTypeOption.label" :value="syncTypeOption.value" />
+          <el-option
+            v-for="syncTypeOption in syncTypeOptions"
+            :key="syncTypeOption.value"
+            :label="syncTypeOption.label"
+            :value="syncTypeOption.value"
+          />
         </el-select>
       </el-form-item>
 
@@ -175,7 +187,15 @@ defineExpose({ open })
       </el-form-item>
 
       <el-form-item label="用户组">
-        <el-select v-model="importUsersForm.userGroupId" class="w-full" :loading="userGroupOptionsLoading" clearable filterable placeholder="请选择用户组" fit-input-width>
+        <el-select
+          v-model="importUsersForm.userGroupId"
+          class="w-full"
+          :loading="userGroupOptionsLoading"
+          clearable
+          filterable
+          placeholder="请选择用户组"
+          fit-input-width
+        >
           <el-option v-for="userGroup in userGroupOptions" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
         </el-select>
       </el-form-item>

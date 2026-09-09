@@ -180,6 +180,7 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 `resource_user_permission/resource/<target>/resource/<resource>`；与 System 用户视角的
 `user_resource_permission` 区分。分页使用 `ParamsPage`，直接返回
 `ResponsePage<ResourceUserPermission>`；提交 `ResourceUserPermissionPayload[]`。
+查询和更新接口内部调用 `getWorkspaceId()` 获取路由工作空间，调用方不传工作空间 ID。
 `ResourceAuthorizationTargetType` 包含资源类型和三个 `_FOLDER` 类型，文件夹类型用于后端
 鉴权。包含子资源时传 `include_children: true` 及经过管理权限筛选的 `folder_ids`，
 普通资源或仅当前文件夹不传子文件夹 ID。loading、刷新及成功提示由抽屉负责。

@@ -78,12 +78,33 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="修改用户密码" @closed="resetData">
-    <el-form ref="userPasswordFormRef" :model="userPasswordForm" :rules="userPasswordRules" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form
+      ref="userPasswordFormRef"
+      :model="userPasswordForm"
+      :rules="userPasswordRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <el-form-item label="新密码" prop="password">
-        <el-input v-model="userPasswordForm.password" autocomplete="new-password" maxlength="20" placeholder="请输入新密码" show-password type="password" />
+        <el-input
+          v-model="userPasswordForm.password"
+          autocomplete="new-password"
+          maxlength="20"
+          placeholder="请输入新密码"
+          show-password
+          type="password"
+        />
       </el-form-item>
       <el-form-item label="确认密码" prop="re_password">
-        <el-input v-model="userPasswordForm.re_password" autocomplete="new-password" maxlength="20" placeholder="请再次输入新密码" show-password type="password" />
+        <el-input
+          v-model="userPasswordForm.re_password"
+          autocomplete="new-password"
+          maxlength="20"
+          placeholder="请再次输入新密码"
+          show-password
+          type="password"
+        />
       </el-form-item>
     </el-form>
 

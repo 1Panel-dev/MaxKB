@@ -289,13 +289,23 @@ defineExpose({ open })
 
       <el-form-item v-if="showWorkspace" label="工作空间" prop="workspaceId">
         <el-select v-model="importUsersForm.workspaceId" :loading="workspaceLoading" placeholder="请选择工作空间">
-          <el-option v-for="workspaceOption in workspaceOptions" :key="workspaceOption.id" :label="workspaceOption.name" :value="workspaceOption.id" />
+          <el-option
+            v-for="workspaceOption in workspaceOptions"
+            :key="workspaceOption.id"
+            :label="workspaceOption.name"
+            :value="workspaceOption.id"
+          />
         </el-select>
       </el-form-item>
 
       <el-form-item v-if="showUserGroups" label="用户组" prop="userGroupIds">
         <el-select v-model="importUsersForm.userGroupIds" :loading="userGroupLoading" multiple placeholder="请选择用户组">
-          <el-option v-for="userGroupOption in userGroupOptions" :key="userGroupOption.id" :label="userGroupOption.name" :value="userGroupOption.id" />
+          <el-option
+            v-for="userGroupOption in userGroupOptions"
+            :key="userGroupOption.id"
+            :label="userGroupOption.name"
+            :value="userGroupOption.id"
+          />
         </el-select>
       </el-form-item>
     </el-form>

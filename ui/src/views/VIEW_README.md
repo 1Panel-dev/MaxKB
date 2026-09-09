@@ -34,6 +34,11 @@
 - 页面脚本中的状态、计算属性和处理方法按照同一业务流程集中放置，并使用简短的业务备注划分
   列表查询、批量操作等流程。流程较长的函数应在确认、请求、刷新等关键阶段添加说明，重点解释
   Promise 返回、执行顺序和业务约束，不为含义明确的单行代码逐句添加注释。
+- 同类业务页面的模板必须在各操作入口前添加简短的中文 HTML 备注，覆盖顶部操作、行操作、
+  更多菜单项和批量操作，例如 `<!-- 导入用户 -->`、`<!-- 创建用户 -->`、`<!-- 编辑 -->`、
+  `<!-- 修改用户密码 -->`、`<!-- 更多 -->`、`<!-- 删除 -->`、`<!-- 批量设置角色 -->`。
+  备注紧邻对应按钮、菜单项或封装后的入口组件；批量操作明确标注“批量”，名称按实际业务职责
+  填写。今后新增或调整同类页面时统一补齐，不因操作已封装为组件或按钮已有文案而省略。
 - 页面模板的事件绑定不直接调用 Dialog、Drawer 等组件实例暴露的 `open()` 方法。应在对应业务
   流程的方法区域定义语义明确的 `handleOpenXxx` 处理函数，由处理函数调用组件实例的 `open()`，
   模板只绑定该处理函数；创建和编辑共用同一浮层时，可通过处理函数的可选参数区分操作场景。
@@ -227,18 +232,36 @@ src/views/system/shared-resources/
         └── SharedModelInfoDrawer.vue
 ```
 
-当前 System 用户页面示例：
+System 用户页面按业务流程归拢操作入口和专属 Dialog。入口组件管理弹窗 Ref、打开动作并转发
+`refresh`；列表页负责查询、批量选择和刷新策略，创建与编辑共用的 `UserFromDrawer` 仍由页面管理。
 
 ```text
 src/views/system/identity/users/
-├── UserListView.vue               # 用户列表路由页面
-├── UserFromDrawer.vue             # 用户表单抽屉
+├── UserListView.vue
+├── UserFromDrawer.vue
 ├── components/
-│   └── UserGroupSetting.vue       # 用户组与工作空间异步联动设置
-└── dialog/
-    ├── BatchSetUserRoleDialog.vue # 批量设置用户角色弹窗
-    └── UserPwdDialog.vue          # 修改用户密码弹窗
+│   └── UserGroupSetting.vue
+├── import-users/
+│   ├── ImportUsersButton.vue
+│   └── ImportUsersDialog.vue
+├── user-password/
+│   ├── UserPwdButton.vue
+│   └── UserPwdDialog.vue
+└── batch-set-user-role/
+    ├── BatchSetUserRoleButton.vue
+    └── BatchSetUserRoleDialog.vue
 ```
+
+`system/chat/users/` 同样使用 `import-users/`、`user-password/`，批量用户组设置放在
+`batch-set-user-group/`（`BatchSetUserGroupButton.vue` 与 `BatchSetUserGroupDialog.vue`）；
+单人和批量配额设置统一放在 `quota-settings/`（`QuotaSettingsButton.vue` 与
+`QuotaSettingsDialog.vue`）。配额入口通过 `dropdown` 区分行菜单与批量按钮，传入单个用户 ID
+或选中用户 ID 数组。行操作菜单开启 `persistent`，避免菜单关闭时卸载其内部的配额弹窗。
+两套用户页面保留各自业务 API 和导入成功后的查询刷新方式。
+
+操作日志页面的清除策略入口与弹窗统一放在 `system/operate-logs/clean-strategy/`：
+`CleanStrategyButton.vue` 管理打开动作和弹窗 Ref，`CleanStrategyDialog.vue` 负责策略查询与保存，
+`OperateLogListView.vue` 只组合入口组件。
 
 资源授权页面的 `UserGroupAuthorizationList` 通过人数链接打开同目录的
 `UserGroupMembersDrawer.vue`，按用户组所属工作空间查询成员，提供用户名、姓名搜索和分页，
