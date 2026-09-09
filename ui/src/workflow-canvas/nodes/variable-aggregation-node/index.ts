@@ -1,4 +1,5 @@
 import VariableAggregationNodeVue from './index.vue'
+import VariableAggregationNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -17,4 +18,4 @@ class VariableAggregationNodeModel extends WorkflowNodeModel {
   }
 }
 
-export default { type: WorkflowNodeType.VariableAggregationNode, model: VariableAggregationNodeModel, view: VariableAggregationNodeView }
+export default { type: WorkflowNodeType.VariableAggregationNode, model: VariableAggregationNodeModel, view: VariableAggregationNodeView, details: VariableAggregationNodeDetail }

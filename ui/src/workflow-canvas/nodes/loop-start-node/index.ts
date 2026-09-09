@@ -1,4 +1,5 @@
 import LoopStartNodeVue from './index.vue'
+import LoopStartNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
 import { isLoopBuiltinField, LOOP_BUILTIN_FIELDS } from './constant'
@@ -42,4 +43,5 @@ export default {
   type: WorkflowNodeType.LoopStartNode,
   model: LoopStartNodeModel,
   view: LoopStartNodeView,
+  details: LoopStartNodeDetail,
 }

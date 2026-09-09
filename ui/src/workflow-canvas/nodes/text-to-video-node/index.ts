@@ -1,4 +1,5 @@
 import TextToVideoNodeVue from './index.vue'
+import TextToVideoNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -12,4 +13,5 @@ export default {
   type: WorkflowNodeType.TextToVideoGenerateNode,
   model: WorkflowNodeModel,
   view: TextToVideoNodeView,
+  details: TextToVideoNodeDetail,
 }

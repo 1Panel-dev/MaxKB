@@ -1,4 +1,5 @@
 import ParameterExtractionNodeVue from './index.vue'
+import ParameterExtractionNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -16,4 +17,4 @@ class ParameterExtractionNodeModel extends WorkflowNodeModel {
   }
 }
 
-export default { type: WorkflowNodeType.ParameterExtractionNode, model: ParameterExtractionNodeModel, view: ParameterExtractionNodeView }
+export default { type: WorkflowNodeType.ParameterExtractionNode, model: ParameterExtractionNodeModel, view: ParameterExtractionNodeView, details: ParameterExtractionNodeDetail }

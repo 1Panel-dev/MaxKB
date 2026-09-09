@@ -1,4 +1,5 @@
 import ImageGenerateNodeVue from './index.vue'
+import ImageGenerateNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -12,4 +13,5 @@ export default {
   type: WorkflowNodeType.ImageGenerateNode,
   model: WorkflowNodeModel,
   view: ImageGenerateNodeView,
+  details: ImageGenerateNodeDetail,
 }

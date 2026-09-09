@@ -1,4 +1,5 @@
 import ToolStartNode from './index.vue'
+import ToolStartNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types.ts'
 import type { Model } from '@logicflow/core'
@@ -41,4 +42,4 @@ class ToolStartNodeModel extends WorkflowNodeModel {
   }
 }
 
-export default { type: WorkflowNodeType.ToolStartNode, model: ToolStartNodeModel, view: ToolStartNodeView }
+export default { type: WorkflowNodeType.ToolStartNode, model: ToolStartNodeModel, view: ToolStartNodeView, details: ToolStartNodeDetail }

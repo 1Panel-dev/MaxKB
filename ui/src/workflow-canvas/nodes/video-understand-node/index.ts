@@ -1,4 +1,5 @@
 import VideoUnderstandNodeVue from './index.vue'
+import VideoUnderstandNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -12,4 +13,5 @@ export default {
   type: WorkflowNodeType.VideoUnderstandNode,
   model: WorkflowNodeModel,
   view: VideoUnderstandNodeView,
+  details: VideoUnderstandNodeDetail,
 }

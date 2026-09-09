@@ -1,4 +1,5 @@
 import SearchDocumentNode from './index.vue'
+import SearchDocumentNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -16,4 +17,4 @@ class SearchDocumentNodeModel extends WorkflowNodeModel {
   }
 }
 
-export default { type: WorkflowNodeType.SearchDocument, model: SearchDocumentNodeModel, view: SearchDocumentNodeView }
+export default { type: WorkflowNodeType.SearchDocument, model: SearchDocumentNodeModel, view: SearchDocumentNodeView, details: SearchDocumentNodeDetail }

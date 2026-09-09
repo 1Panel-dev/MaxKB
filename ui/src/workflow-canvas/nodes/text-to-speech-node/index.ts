@@ -1,4 +1,5 @@
 import TextToSpeechNodeVue from './index.vue'
+import TextToSpeechNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -12,4 +13,5 @@ export default {
   type: WorkflowNodeType.TextToSpeechNode,
   model: WorkflowNodeModel,
   view: TextToSpeechNodeView,
+  details: TextToSpeechNodeDetail,
 }
