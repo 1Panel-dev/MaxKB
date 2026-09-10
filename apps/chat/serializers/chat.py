@@ -36,7 +36,7 @@ from application.models import (
 )
 from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.application_chat import ChatCountSerializer
-from application.serializers.common import resolve_chat_user, resolve_chat_user_group
+from application.serializers.common import load_debug_workflow_context, resolve_chat_user, resolve_chat_user_group
 from chat.serializers.chat_history import ChatHistory
 from application.workflow.common import WorkflowType, new_instance
 from application.workflow.message.aggregator import AggregationManager
@@ -356,7 +356,7 @@ class ChatSerializers(serializers.Serializer):
         # Form 提交（有 position 和 chat_record_id）：从历史 context 恢复
         if position and chat_record_id:
             work_flow_manage = WorkflowManage.from_context(
-                chat_record_id=chat_record_id,
+                get_context=lambda: load_debug_workflow_context(chat_record_id),
                 workflow=workflow,
                 parameters=parameters,
                 workflow_type=WorkflowType.APPLICATION,
