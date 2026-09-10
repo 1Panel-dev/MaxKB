@@ -133,6 +133,7 @@ class LoopNode(INode):
 
             if error:
                 self.write_context("error_message", str(error))
+                self.complete(Status.FAIL, error=error)
                 return
 
             self._run_next()
