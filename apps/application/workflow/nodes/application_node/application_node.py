@@ -166,6 +166,7 @@ class ApplicationNode(INode):
                 "document_list": app_document_list,
                 "audio_list": app_audio_list,
                 "video_list": app_video_list,
+                "default_model_setting": sub_application.default_model_setting or {},
             }
         )
 
