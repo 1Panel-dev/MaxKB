@@ -43,11 +43,9 @@ from chat.serializers.chat_authentication import (
 )
 from common.auth import ChatTokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.common import FileToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
-from common.auth.common import ChatAuthentication
 from common.exception.app_exception import AppAuthenticationFailed, AppApiException
 from common.log.log import _get_ip_address, log
 from common.result import result
@@ -443,7 +441,7 @@ class BaseAuthView(APIView):
         token = ChatUserAccessTokenSerializer.create_token_and_cache(access_token, user, request)
         version, get_key = Cache_Version.CHAT_USER_TOKEN.value
         cache.set(get_key(token), user, timeout=60 * 60 * 2, version=version)
-        return token, FileToken(str(user.id), AuthenticationType.CHAT_USER.value).to_token()
+        return token
 
     @classmethod
     def generate(self, request, f_token: str, response: HttpResponse, path: str = "/chat"):
@@ -474,9 +472,9 @@ class LocalLoginView(BaseAuthView):
     def post(self, request: Request, access_token: str = None):
         user = ChatUserAccessTokenSerializer.local_login(request.data, access_token)
         user.source = "LOCAL"
-        token, f_token = self.create_token_and_cache(access_token, user, request)
+        token = self.create_token_and_cache(access_token, user, request)
         response = result.success({"token": token})
-        return self.generate(request, f_token, response, path=f"/chat/{access_token}/")
+        return self.generate(request, token, response, path=f"/chat/{access_token}/")
 
 
 class Logout(APIView):

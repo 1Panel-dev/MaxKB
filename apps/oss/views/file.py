@@ -7,7 +7,6 @@ from rest_framework.views import APIView, Request
 
 from common.auth import TokenAuth, AllTokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.common import ChatAuthentication
 from common.auth.constants.role_constants import RoleConstants
 from common.exception.app_exception import AppUnauthorizedFailed
 from common.log.log import log
@@ -68,7 +67,7 @@ class FileView(APIView):
                     "source_id": source_id,
                     "source_type": source_type,
                 }
-            ).upload(user_id=(str(request.user.id) if request.user else request.auth.chat_user_id))
+            ).upload(user_id=str(request.user.id))
         )
 
     class Operate(APIView):
@@ -108,11 +107,7 @@ class GetUrlView(APIView):
         tags=[_("Chat")],  # type: ignore
     )
     def get(self, request: Request, application_id: str):
-        if (
-            isinstance(request.auth, ChatAuthentication)
-            and request.auth.application_id
-            and str(request.auth.application_id) != application_id
-        ):
+        if "application_id" in request.user.kwargs and str(request.user.kwargs.get("application_id")) != application_id:
             return result.error(_("No permission"))
         url = request.query_params.get("url")
         result_data = get_url_content(url, application_id)

@@ -38,7 +38,7 @@ from chat.serializers.chat_authentication import (
 )
 from common.auth import ChatTokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.common import FileToken, ChatToken
+from common.auth.common import ChatToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.constants.operate_constants import Operate
 from common.constants.authentication_type import AuthenticationType
@@ -140,7 +140,7 @@ class AnonymousAuthentication(APIView):
     def post(self, request: Request):
         serializer = AnonymousAuthenticationSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
-        token, f_token = serializer.auth(request)
+        token = serializer.auth(request)
         response = result.success(
             token,
             headers={
@@ -156,7 +156,7 @@ class AnonymousAuthentication(APIView):
         cookie_path = f"{CONFIG.get_chat_path()}/{application_id}" if application_id else CONFIG.get_chat_path()
         response.set_cookie(
             key="mk_file_auth",
-            value=f_token,
+            value=token,
             max_age=7 * 24 * 3600,
             path=cookie_path,
             secure=is_https,
@@ -450,7 +450,7 @@ class BaseAuthView(APIView):
         ).to_token()
         version, get_key = Cache_Version.CHAT_USER_TOKEN.value
         cache.set(get_key(token), user, timeout=60 * 60 * 2, version=version)
-        return token, FileToken(str(user.id), AuthenticationType.CHAT_USER.value).to_token()
+        return token
 
     @classmethod
     def generate(self, request, f_token: str, response: HttpResponse, path: str = "/chat"):
@@ -482,9 +482,9 @@ class LocalLoginView(BaseAuthView):
         user = ChatUserAccessTokenV3Serializer.local_login(request.data)
         user.source = "LOCAL"
         access_token = request.query_params.get("accessToken")
-        token, f_token = self.create_token_and_cache(user, access_token, Operate.LOCAL)
+        token = self.create_token_and_cache(user, access_token, Operate.LOCAL)
         response = result.success({"token": token})
-        return self.generate(request, f_token, response, path=f"/chat/{access_token + '/' if access_token else ''}")
+        return self.generate(request, token, response, path=f"/chat/{access_token + '/' if access_token else ''}")
 
 
 class Logout(APIView):
