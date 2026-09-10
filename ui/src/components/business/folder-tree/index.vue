@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, defineAsyncComponent, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FolderApi from '@/api/admin/workspace/folder'
 import type { FolderSource, FolderItem } from '@/api/types'
@@ -216,10 +216,12 @@ function handleOpenEditFolder(folder: FolderItem) {
 }
 
 /* 文件夹资源授权 */
+const authorizationWorkspaceId = ref<string>()
 const resourceAuthorizationDrawerRef = useTemplateRef<InstanceType<typeof ResourceAuthorizationDrawer>>('resourceAuthorizationDrawerRef')
 
 function handleOpenResourceAuthorization(folder: FolderItem) {
-  resourceAuthorizationDrawerRef.value?.open(folder.id, folder)
+  authorizationWorkspaceId.value = folder.workspace_id
+  return nextTick(() => resourceAuthorizationDrawerRef.value?.open(folder.id, folder))
 }
 
 // 创建后选中新文件夹；编辑当前文件夹时同步最新信息。
@@ -432,6 +434,12 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
 
     <FolderFormDialog ref="folderFormDialogRef" :title="formTitle" :source="props.source" @refresh="handleFolderRefresh" />
     <MoveToDialog v-if="canEdit" ref="moveToDialogRef" :loading="moveSubmitting" :source="props.source" @submit="handleMoveFolder" />
-    <ResourceAuthorizationDrawer v-if="canEdit" ref="resourceAuthorizationDrawerRef" :type="source" is-folder />
+    <ResourceAuthorizationDrawer
+      v-if="canEdit"
+      ref="resourceAuthorizationDrawerRef"
+      :type="source"
+      :workspace-id="authorizationWorkspaceId"
+      is-folder
+    />
   </div>
 </template>

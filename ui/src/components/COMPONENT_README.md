@@ -51,8 +51,10 @@ src/components/
 │   │   └── ModelParamsDialog.vue # 模型参数动态表单弹窗
 │   ├── workspace-dropdown/
 │   │   └── index.vue             # 工作空间选择下拉框
-│   ├── related-resources-drawer/  # 关联资源查看抽屉（待完成 v3 接入）
-│   │   └── index.vue
+│   ├── related-resources-drawer/  # 关联资源查看抽屉
+│   │   ├── index.vue
+│   │   ├── ResourceIcon.vue      # 两个关系方向共用的资源图标
+│   │   └── types.ts              # 抽屉目标与规范化表格行类型
 │   ├── resource-authorization-drawer/ # 资源用户组、用户授权抽屉与权限配置弹窗
 │   │   ├── index.vue
 │   │   ├── UserAuthorization.vue      # 按用户查询与授权
@@ -94,6 +96,7 @@ src/components/
 │   ├── mk-icon/
 │   │   ├── ApplicationIcon.vue   # 智能体头像与默认图标
 │   │   ├── KnowledgeIcon.vue     # 知识库类型与自定义图标
+│   │   ├── TriggerIcon.vue       # 触发器类型图标
 │   │   ├── ToolIcon.vue          # 工具类型与自定义图标
 │   │   └── index.vue             # SVG Symbol 与 Element Plus 图标统一入口
 │   ├── mk-infinite-scroll/
@@ -1208,7 +1211,7 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 移动目录树继续以调用方传入的 `v-model` 为准。
 
 可编辑文件夹的菜单提供“资源授权”，根据对应资源模块的 `folderAuth(folder.id)` 控制入口。
-点击后复用 `ResourceAuthorizationDrawer`，传入 Workspace 资源授权 API、当前 `source` 和
+点击后复用 `ResourceAuthorizationDrawer`，传入当前 `source`，通过 `workspaceId` Prop 传入文件夹的 `workspace_id`，调用 `open(folder.id, folder)` 传入
 原始完整文件夹子树；搜索过滤不缩减子资源授权范围。只读选择场景不挂载授权抽屉。
 
 ```vue
@@ -1347,20 +1350,24 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 抽屉内部使用 `isSystemResource()` 判断：用户授权在 System 资源管理中选择
 `api/admin/system/resource-management/resource-authorization.ts`，其他范围选择 Workspace 授权接口。
 用户组授权继续使用 Workspace 的 `resource_user_group_permission` 接口，尚无独立 System 接口。
-两个标签子组件只调用入口传入的完整 API 对象，不自行判断资源范围。
-接口请求与文件夹鉴权均通过 `getWorkspaceId()` 读取路由中的工作空间。
+用户授权子组件接收入口选择的完整 `api` 对象和 `workspaceId`，统一显式传参；
+用户组子组件接收完整 Workspace API 对象及工作空间 ID。
+Workspace 与 System 授权均通过 `workspaceId` Prop 传入资源或文件夹接口数据的 `workspace_id`，
+不从 `open` 参数或路由读取工作空间。
+用户、用户组查询与保存、用户组成员查询及子文件夹鉴权均使用该工作空间；缺少时不发送授权请求。
 `isFolder`、`isRootFolder` 标记文件夹及根目录，传入文件夹类型也可识别文件夹。
 
-入口 `index.vue` 只管理抽屉、标签切换和公共资源权限上下文；`UserGroupAuthorization.vue`
-与 `UserAuthorization.vue` 分别管理各自的查询、分页、选择、单项及批量保存，复用
-`PermissionConfigDialog`。仅挂载当前标签组件，切换后重新查询并重置临时状态；子组件通过
-`v-model:submitting` 同步保存状态，通过 `refresh` 通知入口转发刷新。
+入口 `index.vue` 管理抽屉、标签切换、公共权限上下文及唯一的 `PermissionConfigDialog`，
+统一处理单项与批量提交、成功提示、关闭配置弹窗和列表刷新。`UserGroupAuthorization.vue`
+与 `UserAuthorization.vue` 负责查询、分页和选择，通过 `configure` 事件传出对象 ID 与可选权限，
+通过 `submitting` Prop 接收保存状态，并暴露 `refresh()` 供保存成功后清空选择、重新查询。
+仅挂载当前标签组件，切换后重新查询并重置临时状态。
 默认打开“按用户组”，展示用户组名称、成员数和操作权限，支持名称搜索；成员数链接打开共享
 `UserGroupMembersDrawer`。原用户授权放在“按用户”，保留姓名、用户名、权限及商业版本角色搜索。
 两个标签均支持跨页选择、单项和批量授权；切换标签重置搜索、分页及选择，保存期间禁止切换。
 查询仅应用最新响应，避免快速切换标签后串用用户与用户组数据；搜索后清空选择。
 根目录隐藏“不授权”，返回的“不授权”按“查看”展示。包含子资源时必须传入完整文件夹子树，
-抽屉根据当前路由工作空间筛选有管理权限的文件夹 ID；没有可管理文件夹时禁用该范围。
+抽屉根据文件夹所属工作空间筛选有管理权限的文件夹 ID；没有可管理文件夹时禁用该范围。
 `PermissionConfigDialog` 只收集权限和范围，保存成功才关闭并刷新，失败保留配置。
 保存成功触发 `refresh`，关闭动画结束后重置临时数据并触发 `closed`，供资源 Action 卸载按需挂载的抽屉。
 
@@ -1370,13 +1377,26 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 `SystemUserGroup`，按其 `workspace_id` 查询成员。支持用户名、姓名搜索和分页，角色使用
 `MkTagGroup` 展示；供系统资源授权页面和资源授权抽屉共同复用。
 
-资源授权抽屉内部公共展示 Props 放在同目录 `types.ts`，权限选项类型从
-`RESOURCE_PERMISSION_OPTIONS` 派生；用户和用户组 API Props 分别保留完整 API 对象类型，
-用户组组件只接收具备用户组方法的 Workspace API。
+资源授权列表只通过 `permissionOptions` 接收可选权限，不再使用 `config` 包装；根目录未提供
+“不授权”选项时，接口返回的“不授权”按“查看”展示。用户权限搜索选项在用户组件内按版本生成，
+保留“不授权”搜索项。文件夹生效范围和可管理文件夹 ID 保留在入口，用于统一提交。
+权限选项类型从 `RESOURCE_PERMISSION_OPTIONS` 派生，保留在同目录 `types.ts`；
+用户授权与用户组 API Props 均保留完整 API 对象类型，用户组组件只接收具备用户组方法的 Workspace API。
 
 ### RelatedResourcesDrawer
 
 关联资源查看抽屉，路径为 `business/related-resources-drawer/index.vue`，组件名为
 `RelatedResourcesDrawer`。标题为“关联资源”，操作入口文案统一为“查看关联资源”；
 两个方向分别显示“依赖的资源”和“引用此资源的资源”。
-当前保留旧版实现，尚未完成 v3 请求、国际化依赖适配及页面接入。
+通过 `open(resourceType, resource)` 传入资源类型和包含 `workspace_id` 的快照；查询接口使用该资源所属工作空间。
+`close()` 关闭，关闭动画结束后
+清理搜索、分页和筛选并触发 `closed`。模型和非工作流工具默认展示“引用此资源的资源”。
+复用 `MkDrawer`、`MkComplexSearch`、`MkTable`；两种关系共用表格和分页查询，切换方向
+重置搜索和页码，过期响应不写回当前列表。
+
+调用页面传入完整的 `api: typeof RelatedResourcesApi`，按所属资源范围选择真实 API；
+抽屉不拼接 System URL。`showWorkspace` 由页面按范围及版本决定；企业版开启后查询
+工作空间选项，使用 `MkTableFilter` 提供多选、全选、确认和重置，提交 `workspace_ids`。
+资源名称仅作为文本展示，暂不提供目标资源跳转或相关回调；表格内部按关系方向统一资源 ID 和类型。
+`ResourceIcon.vue` 仅负责展示，供应商由抽屉查询后传入；模型供应商标识来自关系记录的 `icon`。
+工作空间模型列表已通过 `RelatedResourcesModelAction` 接入；其他资源页面入口尚未接入。

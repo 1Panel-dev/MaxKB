@@ -256,13 +256,13 @@ onMounted(() => {
             </span>
             <span class="flex items-center gap-2">
               <!-- 长期记忆设置 -->
-              <!-- <LongTermSetting
+              <LongTermSetting
                 v-if="formData.long_term_enable"
                 v-model="longTermSetting"
                 :model-options="longTermModelOptions"
                 :default-model-setting="defaultLongTermModelSetting"
                 :provider-options="providerOptions"
-              /> -->
+              />
               <el-switch :model-value="formData.long_term_enable" size="small" @change="changeLongTermEnabled" />
             </span>
           </div>

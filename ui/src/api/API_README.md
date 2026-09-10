@@ -21,7 +21,7 @@ src/api/
 │   │   ├── application/              # 智能体接口
 │   │   ├── knowledge/                # 知识库接口
 │   │   ├── model/                    # 模型接口
-│   │   ├── trigger/                   # 触发器分页查询接口
+│   │   ├── trigger/                   # 触发器查询及维护接口
 │   │   ├── tool/                     # 工具、工具工作流及工具商店接口
 │   │   └── <resource>.ts             # 工作空间公共资源接口
 │   └── provider.ts                   # Workspace 与 System 共用的模型供应商接口
@@ -186,7 +186,8 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 `resource_user_permission/resource/<target>/resource/<resource>`；与 System 用户视角的
 `user_resource_permission` 区分。分页使用 `ParamsPage`，直接返回
 `ResponsePage<ResourceUserPermission>`；提交 `ResourceUserPermissionPayload[]`。
-查询和更新接口内部调用 `getWorkspaceId()` 获取路由工作空间，调用方不传工作空间 ID。
+用户及用户组的查询和更新接口均以必填的 `workspaceId` 为首个参数，由调用方从资源或文件夹
+接口数据的 `workspace_id` 传入，不读取或回退到路由工作空间。
 `ResourceAuthorizationTargetType` 包含资源类型和三个 `_FOLDER` 类型，文件夹类型用于后端
 鉴权。包含子资源时传 `include_children: true` 及经过管理权限筛选的 `folder_ids`，
 普通资源或仅当前文件夹不传子文件夹 ID。loading、刷新及成功提示由抽屉负责。
@@ -200,9 +201,10 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 
 System 资源管理的用户授权维护在 `admin/system/resource-management/resource-authorization.ts`，
 使用 `/system/workspace/<workspaceId>/resource_management/resource/<target>/resource/<resource>`。
-查询与保存签名、分页类型、响应类型及提交类型与 Workspace 用户授权保持一致；工作空间 ID
-由接口内部读取，loading 由组件管理。`ResourceAuthorizationDrawer` 内部通过
-`isSystemResource()` 选择完整的用户授权 API 对象，作为该抽屉的范围选择例外；用户组仍使用
+查询与保存方法以必填的 `workspaceId` 为首个参数，由调用方从资源数据的 `workspace_id` 传入，
+不得读取或回退到路由工作空间。其余参数、分页类型、响应类型及提交类型与 Workspace 用户授权一致。
+loading 由组件管理。`ResourceAuthorizationDrawer` 内部通过 `isSystemResource()` 选择完整的用户授权
+API 对象和工作空间上下文，作为该抽屉的范围选择例外；用户组仍使用
 现有 Workspace 接口，不推测 System 用户组路径。
 
 ### 关联资源
@@ -210,5 +212,16 @@ System 资源管理的用户授权维护在 `admin/system/resource-management/re
 `admin/workspace/related-resources.ts` 维护关联资源查询：
 `getResourceDependencies` 查询当前资源依赖的资源，对应后端 `mapping_resource`；
 `getResourceDependents` 查询引用当前资源的资源，对应后端 `resource_mapping`。
-前端按关联资源语义命名，后端接口路径保持不变。该文件当前保留旧版请求签名，
-尚未完成 v3 请求适配及页面接入。
+前端按关联资源语义命名，后端接口路径保持不变。方法接收工作空间 ID、资源类型、资源 ID、`ParamsPage`
+和查询参数；工作空间 ID 由目标资源数据的 `workspace_id` 显式传入，不读取路由。返回 `ResponsePage<RelatedResource>`，
+不传 loading，不重复解包响应。`RelatedResource` 通过 `@/api/types` 导出，保留
+`source_*`、`target_*` 字段。依赖查询按 `target_type` 筛选，被依赖查询按 `source_type`
+筛选，类型数组沿用请求层的数组序列化。页面负责按资源范围传入完整 API，未推测 System 接口。
+
+### 触发器维护
+
+`workspace/trigger/trigger.ts` 维护分页、详情、新建、编辑、删除及批量接口。
+`putBatchActivateTrigger(ids, isActive)` 提交 `{ id_list, is_active }` 到 `batch_activate`；
+`putBatchDeleteTrigger(ids)` 提交 `{ id_list }` 到 `batch_delete`。单项启停通过 `putTrigger`
+仅提交 `is_active`。`Trigger` 为分页摘要，`TriggerDetail` 为含任务参数的完整详情；
+`TriggerPayload` 用于新建和编辑，ID 在新建前生成以展示事件回调 URL。

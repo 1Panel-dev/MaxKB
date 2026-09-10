@@ -7,10 +7,17 @@ import ModelApi from '@/api/admin/workspace/model/model'
 import CommonSystemApi from '@/api/admin/system/common'
 import SharedApi from '@/api/admin/workspace/shared.ts'
 import ProviderApi from '@/api/admin/model-provider.ts'
+import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import ModelCard from './model-card/ModelCard.vue'
 import ModelCreateButton from './create-model/ModelCreateButton.vue'
 import ModelProvider from './components/ModelProvider.vue'
-import { AuthorizeModelAction, DeleteModelAction, EditModelAction, ParamSettingAction } from './model-card/action-dropdown'
+import {
+  AuthorizeModelAction,
+  DeleteModelAction,
+  EditModelAction,
+  ParamSettingAction,
+  RelatedResourcesModelAction,
+} from './model-card/action-dropdown'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 
@@ -112,8 +119,9 @@ onMounted(() => {
                 <!-- 模型参数设置 -->
                 <ParamSettingAction v-if="model.model_type !== 'RERANKER'" label="模型参数设置" :api="ModelApi" :model="model" />
                 <!-- 资源授权 -->
-                <AuthorizeModelAction label="资源授权" :model="model" @refresh="loadModels" />
-                <!-- // TODO: 查看关联资源-->
+                <AuthorizeModelAction label="资源授权" :model="model" />
+                <!-- 查看关联资源 -->
+                <RelatedResourcesModelAction label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
                 <!-- 删除 -->
                 <DeleteModelAction label="删除" :api="ModelApi" :model="model" @refresh="loadModels" />
               </template>
