@@ -9,9 +9,9 @@ import { useStore } from '@/stores'
 import type { ApiResponse, LoadingTarget } from './types'
 import type { Dict } from '@/api/types'
 import { MsgError } from '@/utils/message'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes
-const CHAT_BASE_PATH = window.MaxKB?.chatPrefix || import.meta.env.VITE_BASE_PATH || '/chat/'
 
 function setRequestHeaders(config: InternalAxiosRequestConfig) {
   const { auth, user } = useStore()
@@ -64,7 +64,7 @@ async function getResponseErrorMessage(error: unknown) {
 }
 
 export const request = axios.create({
-  baseURL: `${CHAT_BASE_PATH.replace(/\/+$/, '')}/api`,
+  baseURL: CHAT_API_BASE_PATH,
   timeout: DEFAULT_TIMEOUT,
   withCredentials: false,
 })
