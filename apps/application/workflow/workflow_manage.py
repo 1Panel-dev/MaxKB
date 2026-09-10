@@ -246,27 +246,16 @@ class WorkflowManage:
         return obj
 
     @classmethod
-    def from_context(cls, chat_record_id, workflow, parameters, workflow_type, call_back, get_start_node):
-        """从历史 context 恢复 WorkflowManage"""
-        from application.models import ChatRecord
-        from django.core.cache import cache
-        from common.constants.cache_version import Cache_Version
-
+    def from_context(cls, get_context, workflow, parameters, workflow_type, call_back, get_start_node):
+        """
+        恢复 WorkflowManage:调用 get_context() 拿到历史 context 并用它重建实例。
+        context 从何而来(DB、缓存或其它)由调用方通过 get_context 决定,引擎不关心其业务来源;
+        get_context 返回空或抛异常则返回 None,调用方可据此回退为全新执行。
+        """
         try:
-            context_data = None
-
-            # 先从 Redis 查（调试模式）
-            cache_key = Cache_Version.DEBUG_WORKFLOW_CONTEXT.get_key(chat_record_id=str(chat_record_id))
-            context_data = cache.get(cache_key)
-
-            # Redis 没有，从数据库查
-            if not context_data:
-                chat_record = ChatRecord.objects.filter(id=chat_record_id).first()
-                if not chat_record or not chat_record.workflow_context:
-                    return None
-                context_data = chat_record.workflow_context
-
-            # 创建 WorkflowManage 实例
+            context = get_context()
+            if not context:
+                return None
             instance = cls(
                 workflow=workflow,
                 parameters=parameters,
@@ -274,12 +263,10 @@ class WorkflowManage:
                 call_back=call_back,
                 get_start_node=get_start_node,
             )
-
             # 恢复全局 context
-            instance.context = context_data
-
+            instance.context = context
             return instance
-        except Exception as e:
+        except Exception:
             import traceback
 
             traceback.print_exc()

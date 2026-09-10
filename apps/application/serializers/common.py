@@ -121,6 +121,28 @@ class ToolExecute:
             )
 
 
+def load_debug_workflow_context(chat_record_id):
+    """
+    按记录 id 解析历史工作流 context:优先 Redis 调试缓存 DEBUG_WORKFLOW_CONTEXT,其次 DB ChatRecord.workflow_context。
+    属业务层逻辑(依赖 ChatRecord),供基于 ChatRecord 的续跑场景(应用对话、子应用节点)复用,
+    作为 WorkflowManage.from_context 的 get_context 回调传入;引擎本身不关心 context 来源。
+    """
+    try:
+        cache_key = Cache_Version.DEBUG_WORKFLOW_CONTEXT.get_key(chat_record_id=str(chat_record_id))
+        context_data = cache.get(cache_key)
+        if not context_data:
+            chat_record = ChatRecord.objects.filter(id=chat_record_id).first()
+            if not chat_record or not chat_record.workflow_context:
+                return None
+            context_data = chat_record.workflow_context
+        return context_data
+    except Exception:
+        import traceback
+
+        traceback.print_exc()
+        return None
+
+
 def resolve_chat_user(chat_user_id, chat_user_type, asker=None):
     """
     根据对话用户 id / 类型解析出对话用户信息。

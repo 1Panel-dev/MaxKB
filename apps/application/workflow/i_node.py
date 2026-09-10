@@ -8,6 +8,7 @@
 """
 
 import time
+import traceback
 from enum import Enum
 from typing import Optional, Type, Callable
 
@@ -99,6 +100,7 @@ class INode:
         except CancelledException:
             self.complete(Status.CANCELLED)
         except Exception as e:
+            traceback.print_exc()
             self.complete(Status.FAIL, error=e)
 
     def _run(self):

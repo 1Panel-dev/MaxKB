@@ -14,11 +14,8 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType, new_instance
 from application.workflow.i_node import INode, Signal
-
-from application.workflow.message.struct.content import NodeInfo, Position
-from application.workflow.message.struct.text_content import TextContent
+from application.workflow.message.struct.content import Position
 from application.workflow.status import Status
-
 from common.exception.app_exception import AppApiException
 
 MAX_LOOP_COUNT = 500
@@ -61,6 +58,8 @@ class LoopNode(INode):
     serializer_class = LoopNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "loop-node"
+    _workflow_params = None
+    _iterator = None
 
     def _run(self):
         self.execute()
@@ -81,7 +80,7 @@ class LoopNode(INode):
         if loop_type == "ARRAY" and isinstance(array, list) and len(array) >= 2:
             array = self.workflow_manage.get_reference_field(array[0], array[1:])
 
-        self.write_context("params", {"loop_type": loop_type, "array": array, "number": number})
+        self.data["params"] = {"loop_type": loop_type, "array": array, "number": number}
 
         # 根据 start_index 构建迭代器
         if loop_type == "ARRAY":
@@ -90,12 +89,8 @@ class LoopNode(INode):
             iterator = _generate_while_loop(number or MAX_LOOP_COUNT, start_index=start_index)
         else:
             iterator = _generate_loop_number(number, start_index=start_index)
-
-        self._loop_node_data = self.get_context("loop_node_data") or []
-        self._loop_answer_data = self.get_context("loop_answer_data") or []
-        self._answer_text = self.get_context("answer") or ""
         self._workflow_params = workflow_params
-        self._loop_body = loop_body
+        self.data["loop_body"] = loop_body
         self._iterator = iterator
 
         self._run_next()
@@ -104,35 +99,31 @@ class LoopNode(INode):
         try:
             item, index = next(self._iterator)
         except StopIteration:
-            self.write_context("answer", self._answer_text)
-            self.write_context("run_time", time.time() - self.data.get("start_time", time.time()))
+            self.data["run_time"] = time.time() - self.data.get("start_time", time.time())
             self.complete(Status.SUCCESS)
             return
-        loop_context = {"index": index, "item": item}
-        workflow = new_instance(self._loop_body, self.get_workflow_type())
+        workflow = new_instance(self.data["loop_body"], self.get_workflow_type())
 
         chunk_list = []
 
         def on_next(wf_manage, content):
             chunk_list.append(content)
-            if hasattr(content, "content"):
-                self._answer_text += content.content
             content.position = Position(self.get_node_id(), index, content.position)
             self.write(content)
 
         def on_complete(wf_manage, error):
             loop_details_list = self.data.setdefault("loop_details_list", [])
             loop_details_list.append(wf_manage.get_details())
-            self._loop_node_data.append(wf_manage.context)
-            self._loop_answer_data.append([c.to_dict() for c in chunk_list])
-            self.write_context("loop_node_data", self._loop_node_data)
-            self.write_context("loop_answer_data", self._loop_answer_data)
             self.write_context("index", index)
             self.write_context("item", item)
+            last_context = self.workflow_manage.get_context(self.node.id, "last_context")
+            if last_context:
+                self.write_context("last_context", {**last_context, **wf_manage.context})
+            else:
+                self.write_context("last_context", wf_manage.context)
 
             if wf_manage.signal == Signal.BREAK or wf_manage.signal == Signal.FORM:
-                self.write_context("answer", self._answer_text)
-                self.write_context("run_time", time.time() - self.data.get("start_time", time.time()))
+                self.data["run_time"] = time.time() - self.data.get("start_time", time.time())
                 self.complete(Status.SUCCESS)
                 return
 
@@ -173,40 +164,41 @@ class LoopNode(INode):
             start_node = wf.get_node("loop-start-node")
             return loop_start_class(start_node, wf_manage, lambda n: n.properties.get("node_data", {}))
 
+        def get_context():
+            last_context = self.workflow_manage.get_context(self.node.id, "last_context") or {}
+            if last_context:
+                return last_context
+            return {}
+
         # 构建子工作流参数，第一次迭代传入 child_position
         loop_workflow_params = dict(self._workflow_params)
         if child_position:
             loop_workflow_params["position"] = child_position
         else:
             loop_workflow_params.pop("position", None)
-
-        loop_manage = LoopWorkFlowManage(
+        loop_workflow_params["index"] = index
+        loop_workflow_params["item"] = item
+        loop_manage = LoopWorkFlowManage.from_context(
             workflow=workflow,
             parameters=loop_workflow_params,
             workflow_type=self.get_workflow_type(),
             call_back=call_back,
             get_start_node=get_start_node_fn,
             parent_workflow_manage=self.workflow_manage,
-            loop_context=loop_context,
+            get_context=get_context,
         )
-        loop_manage.start_node.workflow_manage = loop_manage
         loop_manage.run()
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
-            {
-                "params": self.get_context("params"),
-                "index": self.get_context("index"),
-                "item": self.get_context("item"),
-                "answer": self.get_context("answer"),
-            }
+            {"params": self.data.get("params"), "index": self.get_context("index"), "item": self.get_context("item")}
         )
         loop_details = []
         position_index = 0
         loop_position_index = 0
         if old_details and position:
-            for index, item in enumerate(old_details.get("iteration_details") or []):
+            for index, item in enumerate(old_details.get("children") or []):
                 loop_position_index = index
                 loop_details.append(item)
             current_details = loop_details[loop_position_index]

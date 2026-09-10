@@ -23,12 +23,18 @@ class LoopStartNode(INode):
     type = "loop-start-node"
 
     def execute(self):
-        loop_context = getattr(self.workflow_manage, "loop_context", {})
-        index = loop_context.get("index", 0)
-        item = loop_context.get("item", None)
-
-        self.write_context("index", index)
-        self.write_context("item", item)
+        loop = self.workflow_manage.context.get("loop")
+        if loop is None:
+            self.write_context("loop", {})
+        parameters = self.workflow_manage.get_parameters()
+        if parameters is not None:
+            index = parameters.get("index", 0)
+            item = parameters.get("item", 0)
+            self.write_context("index", index)
+            self.write_context("item", item)
+        else:
+            self.write_context("index", 0)
+            self.write_context("item", 0)
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)

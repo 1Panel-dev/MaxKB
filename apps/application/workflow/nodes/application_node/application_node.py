@@ -213,8 +213,10 @@ class ApplicationNode(INode):
 
         # 表单提交：从历史 context 恢复子应用；否则全新运行
         if is_submit:
+            from application.serializers.common import load_debug_workflow_context
+
             sub_manage = WorkflowManage.from_context(
-                chat_record_id=sub_chat_record_id,
+                get_context=lambda: load_debug_workflow_context(sub_chat_record_id),
                 workflow=sub_workflow,
                 parameters=sub_parameters,
                 workflow_type=WorkflowType.APPLICATION,
