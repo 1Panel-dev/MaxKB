@@ -107,7 +107,7 @@ const renderGraphData = (data?: LogicFlow.GraphConfigData) => {
   })
   const lfInstance = lf.value
   lfInstance.setTheme({ bezier: { stroke: '#afafaf', strokeWidth: 1 } })
-
+  lf.value.graphModel.getDefaultModelSettings = () => model.graphModel.getDefaultModelSettings()
   // 嵌套画布位于主画布 foreignObject 内，会随主画布缩放/平移而放大。
   // 覆写 HtmlPointToCanvasPoint，把主画布的 scale/translate 乘进去，使鼠标坐标、节点拖动距离、连线位置与真实位置一致。
   const nestedTransform = lfInstance.graphModel.transformModel
