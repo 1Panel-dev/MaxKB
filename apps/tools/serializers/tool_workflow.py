@@ -13,24 +13,29 @@ import os
 
 # coding=utf-8
 import pickle
+import queue
 import tempfile
+import time
 import zipfile
 from functools import reduce
 from typing import Dict, List
 
 import requests
 import uuid_utils.compat as uuid
-from application.flow.common import Workflow, WorkflowMode
-from application.flow.i_step_node import ToolWorkflowPostHandler
-from application.flow.tool_workflow_manage import ToolWorkflowManage
-from application.models import ChatRecord
+from application.flow.tools import to_stream_response_simple
+from application.workflow.common import WorkflowType, new_instance
+from application.workflow.message.aggregator import AggregationManager
+from application.workflow.nodes import get_node_class
+from application.workflow.status import Status
+from application.workflow.workflow_manage import CallBack, WorkflowManage
 from application.serializers.application import (
     McpServersSerializer,
     get_mcp_tools,
     validate_bound_tool_permissions,
 )
-from application.serializers.common import ToolExecute
+from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
+from common.handle.impl.response.system_to_response import SystemToResponse
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.result import result
@@ -38,12 +43,14 @@ from common.utils.common import bytes_to_uploaded_file, generate_uuid, restricte
 from common.utils.logger import maxkb_logger
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Q, QuerySet
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeWorkflow
+from knowledge.models.knowledge_action import State
 from knowledge.serializers.knowledge import KnowledgeModelSerializer, KnowledgeSerializer
 from maxkb.const import CONFIG
 from rest_framework import serializers, status
@@ -164,42 +171,175 @@ class ToolWorkflowSerializer(serializers.Serializer):
             tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
             workspace_id = tool_workflow.workspace_id
             tool_record_id = instance.get("chat_record_id") or str(uuid.uuid7())
-            took_execute = ToolExecute(self.data.get("tool_id"), tool_record_id, workspace_id, None, None, True)
-            record = took_execute.get_record()
+            # 表单节点等断点续跑:position 指向要从其恢复执行的节点,机制与 chat 一致
+            position = instance.get("position")
             # 运行身份取自认证上下文(DB 工作空间 + 登录用户),请求体不得覆盖,
-            # 防止低权限用户伪造 workspace_id/user_id 绕过工具引用授权
-            identity_keys = {"workspace_id", "user_id", "chat_user_id", "chat_user_type"}
-            run_params = {
-                "chat_record_id": tool_record_id,
+            # 防止低权限用户伪造 workspace_id/user_id 绕过工具引用授权;
+            # chat_record_id 仅用于沿用同一条执行记录,工具工作流本身不作为运行参数
+            identity_keys = {"workspace_id", "user_id", "chat_user_id", "chat_user_type", "chat_record_id"}
+            # 对齐旧引擎 get_body():输入字段值 + 执行身份,不含对话语义字段(question/chat_record_id)
+            parameters = {
                 "tool_id": self.data.get("tool_id"),
                 "stream": True,
+                "debug": True,
                 "workspace_id": workspace_id,
                 "user_id": self.data.get("user_id"),
                 **{k: v for k, v in instance.items() if k not in identity_keys},
             }
-            work_flow_manage = ToolWorkflowManage(
-                Workflow.new_instance(tool_workflow.work_flow, WorkflowMode.TOOL),
-                run_params,
-                ToolWorkflowPostHandler(took_execute, self.data.get("tool_id")),
-                is_the_task_interrupted=lambda: False,
-                child_node=instance.get("child_node"),
-                start_node_id=instance.get("runtime_node_id"),
-                start_node_data=instance.get("node_data"),
-                chat_record=self.to_chat_record(record),
-            )
 
-            r = work_flow_manage.run()
-            return r
+            workflow = new_instance(tool_workflow.work_flow, WorkflowType.TOOL)
+            aggregation = AggregationManager()
+            result_queue = queue.Queue()
+            base_to_response = SystemToResponse()
+            start_time = time.time()
+
+            def on_next(wf_manage, content):
+                aggregation.aggregate(content)
+                result_queue.put(("chunk", content.to_dict()))
+
+            def on_complete(wf_manage, error):
+                try:
+                    self.save_tool_record(
+                        tool_record_id,
+                        self.data.get("tool_id"),
+                        workspace_id,
+                        wf_manage,
+                        aggregation,
+                        parameters,
+                        start_time,
+                        error,
+                        position,
+                    )
+                finally:
+                    result_queue.put(("error", error) if error else ("done", None))
+
+            call_back = CallBack(on_next, on_complete)
+
+            def get_node_parameters(node):
+                return node.properties.get("node_data", {})
+
+            def get_start_node_fn(wf, wm):
+                # 有 position:从指定节点续跑(表单节点等),与 chat 的 position 机制一致
+                if position and position.get("id"):
+                    node = wf.get_node(position.get("id"))
+                    if node:
+                        node_class = get_node_class(node.type, WorkflowType.TOOL)
+                        return node_class(node, wm, get_node_parameters)
+                # 默认从工具起始节点开始
+                start_node = wf.get_node("tool-start-node")
+                if start_node is None:
+                    raise AppApiException(500, gettext("The start node does not exist"))
+                node_class = get_node_class(start_node.type, WorkflowType.TOOL)
+                return node_class(start_node, wm, get_node_parameters)
+
+            # 有 position 且有记录 id:从历史 context 恢复(position 机制与 chat 一致);恢复失败回退为全新执行。
+            # 工具无 ChatRecord,context 来源是 debug 专用缓存——通过 get_context 回调提供,from_context 只负责重建
+            if position and instance.get("chat_record_id"):
+
+                def get_tool_context():
+                    return cache.get(Cache_Version.DEBUG_WORKFLOW_CONTEXT.get_key(chat_record_id=str(tool_record_id)))
+
+                work_flow_manage = WorkflowManage.from_context(
+                    get_context=get_tool_context,
+                    workflow=workflow,
+                    parameters=parameters,
+                    workflow_type=WorkflowType.TOOL,
+                    call_back=call_back,
+                    get_start_node=get_start_node_fn,
+                )
+                if work_flow_manage is None:
+                    work_flow_manage = WorkflowManage(
+                        workflow, parameters, WorkflowType.TOOL, call_back, get_start_node_fn
+                    )
+            else:
+                work_flow_manage = WorkflowManage(workflow, parameters, WorkflowType.TOOL, call_back, get_start_node_fn)
+            work_flow_manage.start_node.workflow_manage = work_flow_manage
+
+            def generate():
+                work_flow_manage.run()
+                while True:
+                    msg_type, data = result_queue.get()
+                    if msg_type == "done":
+                        yield "data: [DONE]\n\n"
+                        break
+                    if msg_type == "error":
+                        error_block = {"id": str(uuid.uuid7()), "type": "FAILURE", "content": str(data)}
+                        frame = base_to_response.to_stream(tool_record_id, tool_record_id, error_block)
+                        if frame is not None:
+                            yield "data: " + frame + "\n\n"
+                        yield "data: [DONE]\n\n"
+                        break
+                    if msg_type == "chunk":
+                        frame = base_to_response.to_stream(tool_record_id, tool_record_id, data)
+                        if frame is not None:
+                            yield "data: " + frame + "\n\n"
+
+            return to_stream_response_simple(generate())
 
         @staticmethod
-        def to_chat_record(record):
-            if record is None:
-                return None
-            return ChatRecord(
-                answer_text_list=record.meta.get("answer_text_list"),
-                details=record.meta.get("details"),
-                answer_text="",
+        def save_tool_record(
+            tool_record_id, tool_id, workspace_id, wf_manage, aggregation, parameters, start_time, error, position=None
+        ):
+            """
+            工具调试执行结束后写执行记录缓存(替代旧引擎 ToolWorkflowPostHandler)。
+            debug 只写 30 分钟 Redis 缓存、不落库,前端据此拉取 meta.output/details 展示;
+            缓存 shape 与 tool 记录查询端点(ToolSerializer...one)读取的字段保持一致。
+            同时把运行 context 写入 DEBUG_WORKFLOW_CONTEXT,供下次 position 续跑时 from_context 恢复。
+            """
+            workflow = wf_manage.workflow
+            base_node = workflow.get_node("tool-base-node")
+            input_field_list = base_node.properties.get("user_input_field_list", []) if base_node else []
+            output_field_list = base_node.properties.get("user_output_field_list", []) if base_node else []
+            input_data = {f.get("field"): parameters.get(f.get("field")) for f in input_field_list}
+            # 新引擎工具输出收口于全局 output 上下文(tool-start-node 初始化、变量赋值节点写入)
+            output = wf_manage.context.get("output", {})
+            # 续跑(有 position):合并上一次的节点详情,与 chat 的 get_details 用法一致
+            old_details = None
+            if position:
+                prev_record = cache.get(
+                    Cache_Version.TOOL_WORKFLOW_EXECUTE.get_key(key=tool_record_id),
+                    version=Cache_Version.TOOL_WORKFLOW_EXECUTE.get_version(),
+                )
+                if prev_record:
+                    old_details = (prev_record.get("meta") or {}).get("details")
+            details = wf_manage.get_details(position=position, old_details=old_details)
+            tool_record = {
+                "id": tool_record_id,
+                "tool_id": tool_id,
+                "workspace_id": workspace_id,
+                "source_type": None,
+                "source_id": None,
+                "state": ToolWorkflowSerializer.Operate.compute_tool_state(details, error),
+                "run_time": time.time() - start_time,
+                "meta": {
+                    "input_field_list": input_field_list,
+                    "output_field_list": output_field_list,
+                    "input": input_data,
+                    "output": output,
+                    "details": details,
+                    "answer_text_list": aggregation.get_contents(),
+                },
+            }
+            cache.set(
+                Cache_Version.TOOL_WORKFLOW_EXECUTE.get_key(key=tool_record_id),
+                tool_record,
+                version=Cache_Version.TOOL_WORKFLOW_EXECUTE.get_version(),
+                timeout=60 * 30,
             )
+            # 持久化运行 context,供 position 续跑时恢复(工具无 ChatRecord,故写 debug 专用缓存)。
+            # 读写都用 cache.get/set(key) 不带 version,两侧须一致,否则 Django version 命名空间对不上会命中不到。
+            cache.set(
+                Cache_Version.DEBUG_WORKFLOW_CONTEXT.get_key(chat_record_id=str(tool_record_id)),
+                wf_manage.context,
+                timeout=60 * 30,
+            )
+
+        @staticmethod
+        def compute_tool_state(details, error):
+            if error:
+                return State.FAILURE
+            has_fail = any((d or {}).get("status") == Status.FAIL.value for d in (details or []))
+            return State.FAILURE if has_fail else State.SUCCESS
 
         def publish(self, with_valid=True):
             if with_valid:
