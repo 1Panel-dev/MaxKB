@@ -3,7 +3,7 @@ import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vu
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { compareList } from '@/workflow-canvas/config/constants'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'

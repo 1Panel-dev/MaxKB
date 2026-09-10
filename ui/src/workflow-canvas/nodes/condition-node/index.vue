@@ -4,7 +4,7 @@ import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef, type Dire
 import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
 
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { compareList } from '@/workflow-canvas/config/constants'
@@ -159,7 +159,8 @@ onBeforeUnmount(() => {
           <div v-branch-resize="branch.id" class="mk-gray-card group/branch min-w-0 flex-1">
             <div class="condition-branch-handle flex-between min-h-6">
               <div class="flex items-center">
-                <el-button v-if="sortableBranches.length > 1" link class="hidden! group-hover/branch:inline-flex!" aria-label="拖拽排序分支">
+                <!-- 拖拽排序分支 -->
+                <el-button v-if="sortableBranches.length > 1" link class="hidden! group-hover/branch:inline-flex!">
                   <MkIcon name="icon_drag_outlined" />
                 </el-button>
                 <span>{{ branch.type }}</span>
@@ -222,9 +223,9 @@ onBeforeUnmount(() => {
               </MkFormList>
             </div>
           </div>
-          <!-- 删除分支 -->
           <div v-if="formData.branch.length > 2" class="h-6 w-6 shrink-0">
-            <el-button text class="h-6! w-6! p-0!" aria-label="删除分支" @click="deleteBranch(branchIndex)">
+            <!-- 删除分支 -->
+            <el-button text class="h-6! w-6! p-0!" @click="deleteBranch(branchIndex)">
               <MkIcon name="icon_delete-trash_outlined" />
             </el-button>
           </div>

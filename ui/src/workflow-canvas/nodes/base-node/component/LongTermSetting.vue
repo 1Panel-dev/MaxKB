@@ -3,14 +3,15 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import SelectModel from '@/components/business/select-model/index.vue'
-import type { ModelItem, ModelProviderItem } from '@/api/types'
+import type { ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
 import type { LongTermSetting } from '../types'
 
-defineOptions({ name: 'BaseNodeLongTermSettingDialog' })
+defineOptions({ name: 'BaseNodeLongTermSetting' })
 
-defineProps<{ modelOptions: ModelItem[]; providerOptions: ModelProviderItem[] }>()
-const emit = defineEmits<{ submit: [setting: LongTermSetting] }>()
+const props = defineProps<{ modelOptions: ModelItem[]; providerOptions: ModelProviderItem[]; defaultModelSetting?: ModelConfig }>()
+const setting = defineModel<LongTermSetting>({ required: true })
 
+// 长期记忆设置：打开时创建草稿，保存后回写配置。
 const visible = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 const formData = ref<LongTermSetting>({
@@ -79,8 +80,9 @@ const scheduleValue = computed<Array<number | string>>({
   },
 })
 
-function open(setting: LongTermSetting) {
-  formData.value = cloneDeep(setting)
+function open() {
+  formRef.value?.clearValidate()
+  formData.value = cloneDeep(setting.value)
   if (!formData.value.long_term_trigger_setting || !Object.keys(formData.value.long_term_trigger_setting).length) {
     formData.value.long_term_trigger_setting = { rounds: 10 }
   }
@@ -109,31 +111,46 @@ function validateCron(_rule: unknown, value: unknown, callback: (error?: Error) 
 
 function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
   if (formData.value.long_term_model_id_type === 'custom' && !formData.value.long_term_model_id) {
-    callback(new Error('请选择长期记忆模型'))
+    callback(new Error('请选择 AI 模型'))
+    return
+  }
+  if (formData.value.long_term_model_id_type === 'default' && !props.defaultModelSetting?.model_id) {
+    callback(new Error('请配置默认模型'))
     return
   }
   callback()
 }
 
 function submit() {
-  formRef.value?.validate().then(() => {
-    emit('submit', cloneDeep(formData.value))
+  formRef.value?.validate((valid) => {
+    if (!valid) return
+    setting.value = cloneDeep(formData.value)
     visible.value = false
   })
 }
-
-defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="长期记忆设置" width="600">
+  <!-- 打开长期记忆设置 -->
+  <el-button text type="primary" @click="open">
+    <MkIcon name="icon-setting" />
+  </el-button>
+  <MkDialog v-model="visible" title="长期记忆设置">
     <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="长期记忆模型" prop="long_term_model_id" :rules="{ validator: validateModel, trigger: 'change' }">
+      <el-form-item label="AI 模型" prop="long_term_model_id" :rules="{ required: true, validator: validateModel, trigger: 'change' }">
         <el-radio-group v-model="formData.long_term_model_id_type" class="mb-2">
           <el-radio value="default">默认模型</el-radio>
           <el-radio value="custom">自定义</el-radio>
         </el-radio-group>
-        <el-alert v-if="formData.long_term_model_id_type === 'default'" class="w-full" title="使用系统默认 AI 模型" type="info" :closable="false" />
+        <SelectModel
+          v-if="formData.long_term_model_id_type === 'default'"
+          :model-value="defaultModelSetting?.model_id ?? ''"
+          :model-params="defaultModelSetting?.model_params_setting ?? {}"
+          disabled
+          :options="modelOptions"
+          :provider-options="providerOptions"
+          placeholder="未配置默认模型"
+        />
         <SelectModel
           v-else
           v-model="formData.long_term_model_id"
@@ -178,7 +195,9 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
+      <!-- 取消长期记忆设置 -->
       <el-button plain @click="visible = false">取消</el-button>
+      <!-- 保存长期记忆设置 -->
       <el-button type="primary" @click="submit">保存</el-button>
     </template>
   </MkDialog>

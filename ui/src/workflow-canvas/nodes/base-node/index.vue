@@ -12,9 +12,17 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import ApiParameterTable from './component/api-parameter/ApiParameterTable.vue'
 import ConversationVariableTable from './component/conversation-variable/ConversationVariableTable.vue'
 import FileUploadSetting from './component/FileUploadSetting.vue'
+import LongTermSetting from './component/LongTermSetting.vue'
 import UserInputTable from './component/user-input/UserInputTable.vue'
 import { defaultFileUploadSetting } from './constant'
-import { type ApiInputField, type BaseNodeForm, type ChatInputField, type FileUploadSettingData, type UserInputSetting } from './types'
+import {
+  type ApiInputField,
+  type BaseNodeForm,
+  type ChatInputField,
+  type FileUploadSettingData,
+  type LongTermSetting as LongTermSettingData,
+  type UserInputSetting,
+} from './types'
 
 defineOptions({ name: 'WorkflowBaseNode' })
 
@@ -77,6 +85,21 @@ const formData = computed<BaseNodeForm>({
 })
 
 // 长期记忆
+const longTermModelOptions = ref<ModelItem[]>([])
+const defaultLongTermModelSetting = computed(() => model.getDefaultModelConfig('LLM'))
+const longTermSetting = computed<LongTermSettingData>({
+  get: () => ({
+    long_term_model_id: formData.value.long_term_model_id,
+    long_term_model_id_type: formData.value.long_term_model_id_type,
+    long_term_model_params_setting: formData.value.long_term_model_params_setting,
+    long_term_trigger_setting: formData.value.long_term_trigger_setting,
+    long_term_trigger_type: formData.value.long_term_trigger_type,
+  }),
+  set: (setting) => {
+    Object.assign(formData.value, cloneDeep(setting))
+  },
+})
+
 function changeLongTermEnabled(enabled: boolean | number | string) {
   formData.value.long_term_enable = Boolean(enabled)
   if (enabled && !formData.value.long_term_model_id_type) formData.value.long_term_model_id_type = 'default'
@@ -182,6 +205,7 @@ onMounted(() => {
   if (!model.properties.user_input_config) model.properties.user_input_config = { title: '用户输入' }
 
   store.getModelList({ model_type: 'STT' }).then((models) => (sttModelOptions.value = models))
+  store.getModelList({ model_type: 'LLM' }).then((models) => (longTermModelOptions.value = models))
   store.getModelList({ model_type: 'TTS' }).then((models) => (ttsModelOptions.value = models))
   store.getProviderList().then((providers) => (providerOptions.value = providers))
 })
@@ -231,10 +255,14 @@ onMounted(() => {
               </el-tooltip>
             </span>
             <span class="flex items-center gap-2">
-              <!-- // TODO 长期记忆设置 -->
-              <el-button v-if="formData.long_term_enable" text type="primary">
-                <MkIcon name="icon-setting" />
-              </el-button>
+              <!-- 长期记忆设置 -->
+              <!-- <LongTermSetting
+                v-if="formData.long_term_enable"
+                v-model="longTermSetting"
+                :model-options="longTermModelOptions"
+                :default-model-setting="defaultLongTermModelSetting"
+                :provider-options="providerOptions"
+              /> -->
               <el-switch :model-value="formData.long_term_enable" size="small" @change="changeLongTermEnabled" />
             </span>
           </div>

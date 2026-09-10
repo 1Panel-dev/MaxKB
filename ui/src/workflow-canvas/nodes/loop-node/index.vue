@@ -4,7 +4,7 @@ import { cloneDeep, set, throttle } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { loopBodyNode, loopStartNode } from '@/workflow-canvas/config/node-data'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 

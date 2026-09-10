@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, inject } from 'vue'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import JsonInput from '@/components/mk-dynamics-form/items/JsonInput.vue'
 import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
 const props = defineProps<{ modelValue: DynamicFormValue }>()

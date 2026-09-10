@@ -204,3 +204,11 @@ System 资源管理的用户授权维护在 `admin/system/resource-management/re
 由接口内部读取，loading 由组件管理。`ResourceAuthorizationDrawer` 内部通过
 `isSystemResource()` 选择完整的用户授权 API 对象，作为该抽屉的范围选择例外；用户组仍使用
 现有 Workspace 接口，不推测 System 用户组路径。
+
+### 关联资源
+
+`admin/workspace/related-resources.ts` 维护关联资源查询：
+`getResourceDependencies` 查询当前资源依赖的资源，对应后端 `mapping_resource`；
+`getResourceDependents` 查询引用当前资源的资源，对应后端 `resource_mapping`。
+前端按关联资源语义命名，后端接口路径保持不变。该文件当前保留旧版请求签名，
+尚未完成 v3 请求适配及页面接入。

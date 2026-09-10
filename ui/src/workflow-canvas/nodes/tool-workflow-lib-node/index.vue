@@ -4,7 +4,7 @@ import { cloneDeep, set } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowMode } from '@/workflow-canvas/types'
 

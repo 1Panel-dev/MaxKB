@@ -56,7 +56,15 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
     container,
   })
 
-  lf.value.setTheme({ bezier: { stroke: '#afafaf', strokeWidth: 1 } })
+  lf.value.setTheme({
+    bezier: { stroke: '#afafaf', strokeWidth: 1 },
+    edgeOutline: {
+      stroke: 'var(--mk-N350)',
+      strokeWidth: 1.5,
+      strokeDasharray: '4,4', // 虚线长度和间隔
+      hover: { stroke: 'var(--mk-primary)' },
+    },
+  })
   lf.value.on('graph:rendered', () => {
     flowId.value = lf.value?.graphModel.flowId ?? ''
   })

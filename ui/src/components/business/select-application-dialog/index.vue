@@ -101,7 +101,8 @@ defineExpose({ open })
           <h4 :id="titleId">智能体</h4>
         </div>
 
-        <el-button text class="h-7! w-7! min-w-0! p-1!" title="刷新" aria-label="刷新智能体" @click="refreshResources">
+        <!-- 刷新智能体 -->
+        <el-button text class="h-7! w-7! min-w-0! p-1!" title="刷新" @click="refreshResources">
           <MkIcon name="icon_refresh_outlined" :size="20" />
         </el-button>
       </div>

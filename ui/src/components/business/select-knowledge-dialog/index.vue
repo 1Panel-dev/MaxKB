@@ -110,7 +110,8 @@ defineExpose({ open })
           <span class="text-N600!">所选知识库必须使用相同的 Embedding 模型</span>
         </div>
 
-        <el-button text class="h-7! w-7! min-w-0! p-1!" title="刷新" aria-label="刷新知识库" @click="refreshResources">
+        <!-- 刷新知识库 -->
+        <el-button text class="h-7! w-7! min-w-0! p-1!" title="刷新" @click="refreshResources">
           <MkIcon name="icon_refresh_outlined" :size="20" />
         </el-button>
       </div>

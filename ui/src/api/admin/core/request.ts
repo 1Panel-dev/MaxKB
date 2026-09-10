@@ -14,10 +14,6 @@ interface ExportRequestConfig extends AxiosRequestConfig {
   skipGlobalErrorMessage?: boolean
 }
 
-interface StreamRequestConfig {
-  signal?: AbortSignal
-}
-
 function setRequestHeaders(config: InternalAxiosRequestConfig) {
   const { auth, user } = useStore()
 
@@ -256,7 +252,7 @@ export async function downloadRequest(
 }
 
 /** 发送 POST 请求并返回可逐块读取的原始响应。 */
-export function postStream(base: string, path: string, data?: unknown, config?: StreamRequestConfig): Promise<Response> {
+export function postStream(base: string, path: string, data?: unknown): Promise<Response> {
   const { auth, user } = useStore()
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (auth.token) {
@@ -269,7 +265,6 @@ export function postStream(base: string, path: string, data?: unknown, config?: 
     method: 'POST',
     headers,
     body: data === undefined ? undefined : JSON.stringify(data),
-    signal: config?.signal,
   })
 }
 

@@ -7,7 +7,7 @@ import type { KnowledgeItem, KnowledgeTagGroup } from '@/api/types'
 import NodeSearchScope from '@/workflow-canvas/component/node-search-scope/index.vue'
 import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 

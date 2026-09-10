@@ -72,13 +72,13 @@ function removeRow(index: number) {
 <template>
   <div ref="rowsRef" class="w-full">
     <div v-for="(item, index) in formRows" :key="getRowKey(item, index)" class="mk-form-list__row flex w-full gap-2">
+      <!-- 拖拽排序 -->
       <el-button
         v-if="sortable"
         link
         class="mk-form-list__handle shrink-0 text-N600 -mr-2 h-8!"
         :class="{ 'mt-8': firstRowHasLabel && index === 0 }"
         :disabled="sortDisabled"
-        aria-label="拖拽排序"
       >
         <MkIcon name="icon_drag_outlined" />
       </el-button>

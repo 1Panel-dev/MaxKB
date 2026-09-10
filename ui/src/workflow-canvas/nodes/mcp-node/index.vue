@@ -7,7 +7,7 @@ import type { FormInstance } from 'element-plus'
 import { useRoute } from 'vue-router'
 
 import McpServerInputDialog from './component/McpServerInputDialog.vue'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
