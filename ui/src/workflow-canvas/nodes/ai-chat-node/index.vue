@@ -4,13 +4,13 @@ import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import PromptGenerateDialog from './component/PromptGenerateDialog.vue'
+import PromptGenerate from './component/PromptGenerate.vue'
 import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
 import ResourceSetting from './component/resource-setting/index.vue'
 import type { AiChatNodeForm } from './types'
@@ -26,7 +26,6 @@ const model = getModel()
 const store = useWorkflowStore(apiType)
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const promptGenerateDialogRef = useTemplateRef<InstanceType<typeof PromptGenerateDialog>>('promptGenerateDialogRef')
 
 const modelOptions = ref<ModelItem[]>([])
 const providerOptions = ref<ModelProviderItem[]>([])
@@ -145,9 +144,12 @@ onMounted(() => {
                 </el-tooltip>
               </div>
               <!-- // TODO 生成 -->
-              <el-button class="-mr-1" text type="primary" :disabled="formData.model_id_type === 'reference' || !formData.model_id">
-                <MkIcon name="icon_star" />
-              </el-button>
+              <!-- <PromptGenerate
+                :model-id="formData.model_id"
+                :provider-options="providerOptions"
+                :disabled="formData.model_id_type === 'reference' || !formData.model_id"
+                @replace="formData.system = $event"
+              /> -->
             </div>
           </template>
           <MdEditorMagnify
@@ -268,7 +270,5 @@ onMounted(() => {
         </div>
       </el-form>
     </div>
-
-    <PromptGenerateDialog ref="promptGenerateDialogRef" @replace="formData.system = $event" />
   </NodeContainer>
 </template>

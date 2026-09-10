@@ -2,7 +2,7 @@
 import { referenceOptionsHelp } from '../../constant'
 import { computed, onMounted, inject } from 'vue'
 import RadioRow from '../../items/radio/RadioRow.vue'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import type { DynamicFormConstructorOption, DynamicFormValidatorCallback, DynamicFormValue, FormField } from '../../type'
 const getModel = inject<() => DynamicFormValue>('getModel')
 

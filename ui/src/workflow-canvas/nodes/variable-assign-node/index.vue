@@ -3,7 +3,7 @@ import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'
@@ -105,13 +105,7 @@ onMounted(() => {
               :prop="'variable_list.' + index + '.fields'"
               :rules="{ required: true, message: '请选择变量', trigger: 'change' }"
             >
-              <NodeCascader
-                :node-model="model"
-                placeholder="请选择变量"
-                v-model="item.fields"
-                :global="true"
-                @change="variableChange(item)"
-              />
+              <NodeCascader :node-model="model" placeholder="请选择变量" v-model="item.fields" :global="true" @change="variableChange(item)" />
             </el-form-item>
             <!-- 赋值 -->
             <div class="flex-between">
@@ -195,13 +189,7 @@ onMounted(() => {
             </el-form-item>
           </div>
           <!-- 删除变量 -->
-          <el-button
-            v-if="formData.variable_list.length > 1"
-            text
-            class="h-6! w-6! shrink-0 p-0!"
-            aria-label="删除变量"
-            @click="deleteVariable(index)"
-          >
+          <el-button v-if="formData.variable_list.length > 1" text class="h-6! w-6! shrink-0 p-0!" @click="deleteVariable(index)">
             <MkIcon name="icon_delete-trash_outlined" />
           </el-button>
         </div>

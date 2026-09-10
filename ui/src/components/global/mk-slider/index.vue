@@ -44,7 +44,6 @@ function changeInputValue(value: number | undefined) {
       :disabled="props.disabled"
       :size="props.inputSize || props.size"
       :controls="true"
-      :aria-label="props.ariaLabel"
       :validate-event="false"
       value-on-clear="min"
       controls-position="right"

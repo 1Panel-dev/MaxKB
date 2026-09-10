@@ -58,8 +58,10 @@ function deleteField(index: number) {
       </el-table-column>
       <el-table-column label="操作" width="80">
         <template #default="{ row, $index }">
-          <el-button text type="primary" aria-label="编辑" @click="openDialog(row, $index)"><MkIcon name="icon_edit_outlined" /></el-button>
-          <el-button text type="primary" aria-label="删除" @click="deleteField($index)"><MkIcon name="icon_delete-trash_outlined" /></el-button>
+          <!-- 编辑 -->
+          <el-button text type="primary" @click="openDialog(row, $index)"><MkIcon name="icon_edit_outlined" /></el-button>
+          <!-- 删除 -->
+          <el-button text type="primary" @click="deleteField($index)"><MkIcon name="icon_delete-trash_outlined" /></el-button>
         </template>
       </el-table-column>
     </MkTable>

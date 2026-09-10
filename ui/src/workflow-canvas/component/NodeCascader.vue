@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import { useFormItem } from 'element-plus'
 import type { CascaderInstance } from 'element-plus'
 
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
@@ -13,9 +14,13 @@ defineOptions({ name: 'WorkflowNodeCascader', inheritAttrs: false })
 
 type WorkflowGraphModel = WorkflowNodeModel['graphModel'] & { getUpNodeFieldList?: (containSelf: boolean, useCache: boolean) => WorkflowNodeField[] }
 
-const props = withDefaults(defineProps<{ global?: boolean; modelValue: string[]; nodeModel: BaseNodeModel }>(), { global: false })
+const props = withDefaults(defineProps<{ global?: boolean; modelValue: string[]; nodeModel: BaseNodeModel; validateEvent?: boolean }>(), {
+  global: false,
+  validateEvent: true,
+})
 
 const emit = defineEmits<{ 'update:modelValue': [value: string[]] }>()
+const { formItem } = useFormItem()
 
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const options = ref<WorkflowNodeField[]>([])
@@ -23,7 +28,17 @@ const cascaderRootRef = useTemplateRef<HTMLElement>('cascaderRootRef')
 const cascaderRef = useTemplateRef<CascaderInstance>('cascaderRef')
 const nodeModel = computed(() => props.nodeModel as WorkflowNodeModel)
 
-const selectedValue = computed({ get: () => props.modelValue, set: (value) => emit('update:modelValue', value) })
+const selectedValue = computed({
+  get: () => props.modelValue ?? [],
+  set: (value: string[] | null | undefined) => emit('update:modelValue', value ?? []),
+})
+
+// 节点可能整体替换表单数据，等待新值传回表单与引用校验器后再校验。
+async function validateFormItem(trigger: 'change' | 'blur') {
+  if (!props.validateEvent || !formItem) return
+  await nextTick()
+  await formItem.validate(trigger).catch(() => undefined)
+}
 const selectedNodeField = computed(() => {
   const [nodeValue, fieldValue] = selectedValue.value ?? []
   if (!nodeValue || !fieldValue) return undefined
@@ -106,11 +121,14 @@ defineExpose({ validate })
       ref="cascaderRef"
       v-model="selectedValue"
       v-bind="$attrs"
+      :validate-event="false"
       :options="options"
       :teleported="false"
       clearable
       separator="/"
       @visible-change="handleVisibleChange"
+      @change="validateFormItem('change')"
+      @blur="validateFormItem('blur')"
       @wheel.stop
       fit-input-width
       class="w-full"

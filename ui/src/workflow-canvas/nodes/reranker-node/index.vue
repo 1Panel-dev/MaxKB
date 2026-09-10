@@ -6,7 +6,7 @@ import type { ModelItem, ModelProviderItem } from '@/api/types'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
 import type { NodeModelData } from '@/workflow-canvas/component/node-model-select/types'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import SearchSetting from './component/SearchSetting.vue'
@@ -102,7 +102,8 @@ onMounted(() => {
           <template #label>
             <div class="flex-between">
               <span class="mk-required">重排内容</span>
-              <el-button text type="primary" title="添加重排内容" aria-label="添加重排内容" @click="addReference">
+              <!-- 添加重排内容 -->
+              <el-button text type="primary" title="添加重排内容" @click="addReference">
                 <MkIcon name="icon_add_outlined" />
               </el-button>
             </div>

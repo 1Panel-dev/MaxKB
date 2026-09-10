@@ -61,12 +61,12 @@ onBeforeMount(() => {
 
 <template>
   <LoginLayout v-if="!isLoading">
+    <!-- 切换扫码登录或账号登录 -->
     <el-button
       v-if="showLoginModeSwitch"
       type="primary"
       text
       class="login-mode-switch"
-      :aria-label="loginMode === 'account' ? '切换扫码登录' : '切换账号登录'"
       @click="loginMode = loginMode === 'account' ? 'qr-code' : 'account'"
     >
       <MkIcon :name="loginMode === 'account' ? 'icon_qr_outlined' : 'icon_pc_outlined'" :size="48" />

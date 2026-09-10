@@ -2,7 +2,7 @@
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 
 import type { FormInstance } from 'element-plus'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { BaseNodeModel } from '@logicflow/core'

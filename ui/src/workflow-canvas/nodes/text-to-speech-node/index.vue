@@ -3,7 +3,7 @@ import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 
 import type { FormInstance } from 'element-plus'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
-import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'

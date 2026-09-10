@@ -15,48 +15,19 @@ export const applicationTemplate = {
           config: {},
           height: 725,
           showNode: true,
-          stepName: '\u57fa\u672c\u4fe1\u606f',
-          condition: 'AND',
+          stepName: '基本信息',
           node_data: {
-            desc: '',
-            name: 'dan-template',
-            prologue:
-              '\u60a8\u597d\uff0c\u6211\u662f XXX \u5c0f\u52a9\u624b\uff0c\u60a8\u53ef\u4ee5\u5411\u6211\u63d0\u51fa XXX \u4f7f\u7528\u95ee\u9898\u3002\n- XXX \u4e3b\u8981\u529f\u80fd\u6709\u4ec0\u4e48\uff1f\n- XXX \u5982\u4f55\u6536\u8d39\uff1f\n- \u9700\u8981\u8f6c\u4eba\u5de5\u670d\u52a1',
+            desc: '基于用户问题，检索知识库相关内容作为AI模型的参考内容',
+            name: '知识库问答助手',
+            prologue: '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务',
             tts_type: 'BROWSER',
-            stt_autosend: false,
-            stt_model_id: '',
-            tts_autoplay: false,
-            tts_model_id: '',
-            long_term_enable: false,
-            stt_model_enable: false,
-            tts_model_enable: false,
             stt_model_id_type: 'default',
-            file_upload_enable: false,
-            long_term_model_id: '',
-            file_upload_setting: {
-              audio: false,
-              image: false,
-              other: false,
-              video: false,
-              document: true,
-              maxFiles: 3,
-              fileLimit: 50,
-              url_upload: false,
-              local_upload: true,
-              otherExtensions: ['PPT', 'DOC'],
-            },
-            long_term_trigger_type: 'ROUND',
             long_term_model_id_type: 'default',
-            tts_model_params_setting: {},
-            long_term_trigger_setting: {
-              rounds: 10,
-            },
-            long_term_model_params_setting: {},
           },
           enableException: false,
           input_field_list: [],
           user_input_config: {
-            title: '\u7528\u6237\u8f93\u5165',
+            title: '用户输入',
           },
           api_input_field_list: [],
           chat_input_field_list: [],
@@ -69,56 +40,60 @@ export const applicationTemplate = {
         id: 'start-node',
         type: 'start-node',
         properties: {
-          width: 320,
           config: {
             fields: [
               {
-                label: '\u7528\u6237\u95ee\u9898',
+                label: '用户问题',
                 value: 'question',
               },
             ],
-            chatFields: [],
             globalFields: [
               {
-                label: '\u5f53\u524d\u65f6\u95f4',
+                label: '当前时间',
                 value: 'time',
               },
               {
-                label: '\u5386\u53f2\u804a\u5929\u8bb0\u5f55',
+                label: '历史聊天记录',
                 value: 'history_context',
               },
               {
-                label: '\u5bf9\u8bdd ID',
+                label: '对话 ID',
                 value: 'chat_id',
               },
               {
-                label: '\u5bf9\u8bdd\u7528\u6237 ID',
+                label: '对话用户 ID',
                 value: 'chat_user_id',
               },
               {
-                label: '\u5bf9\u8bdd\u7528\u6237\u7c7b\u578b',
+                label: '对话用户类型',
                 value: 'chat_user_type',
               },
               {
-                label: '\u5bf9\u8bdd\u7528\u6237\u7ec4',
+                label: '对话用户组',
                 value: 'chat_user_group',
               },
               {
-                label: '\u5bf9\u8bdd\u7528\u6237',
+                label: '对话用户',
                 value: 'chat_user',
               },
             ],
+            chatFields: [],
           },
           fields: [
             {
-              label: '\u7528\u6237\u95ee\u9898',
+              label: '用户问题',
               value: 'question',
             },
           ],
-          height: 456,
+          height: 556,
           showNode: true,
-          stepName: '\u5f00\u59cb',
-          condition: 'AND',
+          stepName: '开始',
+          globalFields: [
+            {
+              label: '当前时间',
+              value: 'time',
+            },
+          ],
           enableException: false,
         },
       },
@@ -128,30 +103,29 @@ export const applicationTemplate = {
         id: 'fd0324fc-f5e4-4fa6-a2d9-cb251b467605',
         type: 'search-knowledge-node',
         properties: {
-          width: 320,
           config: {
             fields: [
               {
-                label: '\u68c0\u7d22\u7ed3\u679c\u7684\u5206\u6bb5\u5217\u8868',
+                label: '检索结果的分段列表',
                 value: 'paragraph_list',
               },
               {
-                label: '\u6ee1\u8db3\u76f4\u63a5\u56de\u7b54\u7684\u5206\u6bb5\u5217\u8868',
+                label: '满足直接回答的分段列表',
                 value: 'is_hit_handling_method_list',
               },
               {
-                label: '\u68c0\u7d22\u7ed3\u679c',
+                label: '检索结果',
                 value: 'data',
               },
               {
-                label: '\u6ee1\u8db3\u76f4\u63a5\u56de\u7b54\u7684\u5206\u6bb5\u5185\u5bb9',
+                label: '满足直接回答的分段内容',
                 value: 'directly_return',
               },
             ],
           },
-          height: 698,
+          height: 806.383,
           showNode: true,
-          stepName: '\u77e5\u8bc6\u5e93\u68c0\u7d22',
+          stepName: '知识库检索',
           condition: 'AND',
           node_data: {
             knowledge_list: [],
@@ -166,7 +140,6 @@ export const applicationTemplate = {
             search_scope_type: 'custom',
             search_scope_source: 'knowledge',
             all_knowledge_id_list: [],
-            search_scope_reference: [],
             question_reference_address: ['start-node', 'question'],
             no_permission_knowledge_id_list: [],
           },
@@ -179,18 +152,18 @@ export const applicationTemplate = {
         id: '420a6e4f-44ff-4847-bb81-0923630846b5',
         type: 'condition-node',
         properties: {
-          width: 320,
+          width: 600,
           config: {
             fields: [
               {
-                label: '\u5206\u652f\u540d\u79f0',
+                label: '分支名称',
                 value: 'branch_name',
               },
             ],
           },
-          height: 569,
+          height: 552.148,
           showNode: true,
-          stepName: '\u5224\u65ad\u5668',
+          stepName: '判断器',
           condition: 'AND',
           node_data: {
             branch: [
@@ -229,19 +202,19 @@ export const applicationTemplate = {
           enableException: false,
           branch_condition_list: [
             {
-              id: '7887',
               index: 0,
-              height: 139,
+              height: 121.383,
+              id: '7887',
             },
             {
-              id: '6847',
               index: 1,
-              height: 139,
+              height: 121.383,
+              id: '6847',
             },
             {
-              id: '2794',
               index: 2,
-              height: 85,
+              height: 44,
+              id: '2794',
             },
           ],
         },
@@ -252,22 +225,21 @@ export const applicationTemplate = {
         id: '36a440a9-5b00-4d82-b13a-8e7819112918',
         type: 'reply-node',
         properties: {
-          width: 320,
           config: {
             fields: [
               {
-                label: '\u5185\u5bb9',
+                label: '内容',
                 value: 'answer',
               },
             ],
           },
-          height: 279.375,
+          height: 394,
           showNode: true,
-          stepName: '\u6307\u5b9a\u56de\u590d',
+          stepName: '指定回复',
           condition: 'AND',
           node_data: {
             fields: ['fd0324fc-f5e4-4fa6-a2d9-cb251b467605', 'directly_return'],
-            content: '12323232',
+            content: '',
             is_result: true,
             reply_type: 'referencing',
           },
@@ -280,50 +252,43 @@ export const applicationTemplate = {
         id: 'f7c3b4a2-cb80-4e47-b050-7fef0315daaf',
         type: 'ai-chat-node',
         properties: {
-          width: 320,
           config: {
             fields: [
               {
-                label: 'AI \u56de\u7b54\u5185\u5bb9',
+                label: 'AI 回答内容',
                 value: 'answer',
               },
               {
-                label: '\u601d\u8003\u8fc7\u7a0b',
+                label: '思考过程',
                 value: 'reasoning_content',
+              },
+              {
+                label: '历史聊天记录',
+                value: 'history_message',
               },
             ],
           },
-          height: 1134,
+          height: 1174.38,
           showNode: true,
-          stepName: 'AI \u5bf9\u8bdd',
+          stepName: 'AI 对话',
           condition: 'AND',
           node_data: {
-            prompt: '\u5df2\u77e5\u4fe1\u606f\uff1a\n{{\u77e5\u8bc6\u5e93\u68c0\u7d22.data}}\n\u95ee\u9898\uff1a\n{{\u5f00\u59cb.question}}',
+            prompt: '已知信息：\n{{知识库检索.data}}\n问题：\n{{开始.question}}',
             system: '',
-            vision: false,
             model_id: '',
-            tool_ids: [],
             is_result: true,
-            image_list: [],
             max_tokens: null,
-            mcp_source: 'referencing',
-            video_list: [],
-            mcp_servers: '',
             temperature: null,
-            mcp_tool_ids: [],
             dialogue_type: 'WORKFLOW',
-            model_id_type: 'custom',
+            model_id_type: 'default',
             model_setting: {
               reasoning_content_end: '</think>',
               reasoning_content_start: '<think>',
               reasoning_content_enable: false,
             },
-            skill_tool_ids: [],
-            application_ids: [],
             dialogue_number: 1,
             mcp_output_enable: true,
             model_id_reference: [],
-            model_params_setting: {},
           },
           enableException: false,
         },
@@ -334,23 +299,21 @@ export const applicationTemplate = {
         id: '04dd6c1e-95f9-4757-bb3e-134d503fce54',
         type: 'reply-node',
         properties: {
-          width: 320,
           config: {
             fields: [
               {
-                label: '\u5185\u5bb9',
+                label: '内容',
                 value: 'answer',
               },
             ],
           },
-          height: 397.375,
+          height: 512,
           showNode: true,
-          stepName: '\u6307\u5b9a\u56de\u590d1',
+          stepName: '指定回复1',
           condition: 'AND',
           node_data: {
             fields: [],
-            content:
-              '\u62b1\u6b49\uff0c\u6ca1\u6709\u5728\u77e5\u8bc6\u5e93\u67e5\u8be2\u5230\u76f8\u5173\u5185\u5bb9\uff0c\u8bf7\u63d0\u4f9b\u66f4\u8be6\u7ec6\u7684\u4fe1\u606f\u3002',
+            content: '抱歉，没有在知识库查询到相关内容，请提供更详细的信息。',
             is_result: true,
             reply_type: 'content',
           },

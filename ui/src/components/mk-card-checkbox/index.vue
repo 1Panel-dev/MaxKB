@@ -26,7 +26,7 @@ function toggle() {
       <div class="min-w-0 flex-1">
         <slot />
       </div>
-      <el-checkbox :model-value="checked" :disabled="props.disabled" :aria-label="props.label" class="shrink-0" @click.stop @change="toggle" />
+      <el-checkbox :model-value="checked" :disabled="props.disabled" class="shrink-0" @click.stop @change="toggle" />
     </div>
   </el-card>
 </template>

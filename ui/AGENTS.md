@@ -208,6 +208,8 @@ Keep these behaviors:
 ## Frontend Implementation Notes
 
 - Prefer existing project structure and naming.
+- Do not write `aria-label` attributes in project source. Add concise Chinese HTML comments before
+  buttons to describe their purpose, following `src/components/COMPONENT_README.md`.
 - Before changing existing behavior, trace the affected flow and dependent requirements, including
   why the current implementation exists. If the requested change is likely to remove a requirement
   or introduce a regression, pause before editing, explain the risk, recommend a safer approach,

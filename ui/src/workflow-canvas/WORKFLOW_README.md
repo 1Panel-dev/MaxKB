@@ -39,7 +39,7 @@ src/workflow-canvas/
 
 ### `core/`
 
-`core` 是配置完成后应保持稳定的基础层。`node-container/index.vue` 和 `NodeCascader.vue` 是节点的
+`core` 是配置完成后应保持稳定的基础层。`node-container/index.vue` 提供节点的
 通用结构与交互能力，属于核心代码；连线、快捷键、公共校验、Teleport 和节点公共工具也放在
 这里。`node-container/` 内的条件和操作下拉组件是节点容器的私有实现，不作为画布可复用组件
 单独引用；`edge/` 集中维护边的 LogicFlow 注册配置、模型、视图和删除按钮，普通边由画布入口
@@ -51,7 +51,9 @@ src/workflow-canvas/
 `visible-change` 状态，并在节点组件卸载时调用 `reset()`；不要通过 Teleport 到 `body` 或增加
 `z-index` 绕过画布的缩放和 SVG 绘制顺序。
 
-`NodeCascader` 已在内部统一管理下拉层的锚点保护，使用方无需重复接入。
+`component/NodeCascader.vue` 提供上游变量选择，已在内部统一管理下拉层的锚点保护，使用方无需重复接入。
+组件在选值回写及 Vue 更新完成后触发表单校验，清空统一回写空数组；`validateEvent` 默认为
+`true`，设为 `false` 可关闭自动校验。
 下拉展开时通过 `document` 捕获阶段的 `pointerdown` 处理外部点击，排除组件内部的输入框和
 未 Teleport 的下拉面板；关闭及卸载时移除监听。不要移除节点容器的鼠标事件隔离来恢复外部关闭，
 以免操作表单时触发画布拖拽。
@@ -141,7 +143,7 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 
 节点自身的表单、状态和专属校验留在节点目录；多个节点共享且属于画布基础协议的能力才上移到
 `core`。节点应复用 `core/node-container/index.vue`，需要选择上游节点字段时复用
-`core/NodeCascader.vue`。
+`component/NodeCascader.vue`。
 
 复杂节点中的普通表单区块直接放在节点 `index.vue`，避免为简单字段读写增加 Props、Emits 和
 中间 computed。独立弹窗、资源选择等具有完整交互边界的能力放在节点目录的 `component/` 下；
@@ -173,6 +175,12 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 节点入口深拷贝写回列表并发送原有字段刷新事件，保留显隐条件引用校验。用户输入与接口传参继续
 交叉检查参数重名；`UserInputSettingDialog` 独立维护直接展示参数设置，删除字段时由表格清理对应设置。
 
+基本信息节点的 `component/LongTermSetting.vue` 同时封装长期记忆设置按钮与弹窗，
+通过 `v-model` 接收 `LongTermSetting`，模型与供应商选项由节点入口传入。节点入口根据长期记忆
+开关挂载组件；打开时深拷贝配置为草稿，校验通过并保存后仅合并长期记忆配置，取消不修改节点。
+默认来源通过 `defaultModelSetting` 接收保存后的 `LLM` 配置，使用禁用的 `SelectModel` 展示，
+未配置默认模型时阻止弹窗保存；自定义来源保留节点自己的模型与参数。
+
 基本信息节点的 `component/FileUploadSetting.vue` 同时封装文件上传设置按钮与弹窗，
 通过 `v-model` 接收 `FileUploadSettingData`。节点入口根据上传开关挂载组件，并在配置写回后发送
 `refreshFileUploadConfig` 刷新开始节点文件变量；弹窗打开时重置并深拷贝草稿，确认时保留上传方式
@@ -202,7 +210,12 @@ ID 数组及 `tool_list`、`skill_tool_list`、`application_list` 回显快照�
 已关联但缺少详情的资源保留 ID 回退展示。
 
 AI 对话节点的提示词、历史记录、视觉理解和输出思考表单直接在节点入口维护，统一使用全局
-`MdEditorMagnify` 和节点表单样式；AI 提示词生成使用独立弹窗。AI 对话、图片理解和视频理解节点的
+`MdEditorMagnify` 和节点表单样式；`component/PromptGenerate.vue` 同时封装生成按钮与弹窗，
+接收 `modelId`、`disabled`、`modelOptions` 和 `providerOptions`，内部读取当前路由的智能体 ID。
+弹窗顶部复用 `SelectModel`，仅修改本次生成使用的模型；主体展示最新结果与主题输入框，支持停止和重新生成。
+重新生成复用上次请求消息，关闭时终止请求并在关闭动画结束后清理会话；点击替换后通过 `replace` 交由节点回写系统提示词。
+生成接口沿用智能体已保存的参数，弹窗不提供独立模型参数设置。
+AI 对话、图片理解和视频理解节点的
 输出思考设置统一复用 `component/ThinkingSetting.vue`，后续同类入口也应引用该组件。组件通过
 `v-model` 接收 `types.ts` 中的共享配置类型 `ReasoningSettingData`；节点入口维护输出思考开关，
 并根据开关用 `v-if` 挂载设置组件。弹窗打开时重置并深拷贝草稿，仅在校验通过并保存后回写，

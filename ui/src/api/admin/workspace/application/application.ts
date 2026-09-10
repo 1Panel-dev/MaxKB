@@ -74,8 +74,8 @@ const putApplicationPublish = (applicationId: string) => {
 }
 
 /** 使用指定模型流式生成或优化系统提示词。 */
-const postPromptGenerate = (applicationId: string, modelId: string, payload: PromptGeneratePayload, signal?: AbortSignal) => {
-  return postStream(ADMIN_API_BASE_PATH, `${getPrefix()}/${applicationId}/model/${modelId}/prompt_generate`, payload, { signal })
+const postPromptGenerate = (applicationId: string, modelId: string, payload: PromptGeneratePayload) => {
+  return postStream(ADMIN_API_BASE_PATH, `${getPrefix()}/${applicationId}/model/${modelId}/prompt_generate`, payload)
 }
 
 export default {

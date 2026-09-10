@@ -51,6 +51,8 @@ src/components/
 │   │   └── ModelParamsDialog.vue # 模型参数动态表单弹窗
 │   ├── workspace-dropdown/
 │   │   └── index.vue             # 工作空间选择下拉框
+│   ├── related-resources-drawer/  # 关联资源查看抽屉（待完成 v3 接入）
+│   │   └── index.vue
 │   ├── resource-authorization-drawer/ # 资源用户组、用户授权抽屉与权限配置弹窗
 │   │   ├── index.vue
 │   │   ├── UserAuthorization.vue      # 按用户查询与授权
@@ -171,6 +173,8 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 
 ## 组件约定
 
+- 项目源码不编写 `aria-label` 属性。按钮前添加简短中文 HTML 备注说明实际用途，
+  例如 `<!-- 删除文件 -->`；已有用途备注时不重复添加。此规则适用于公共组件、页面和工作流节点。
 - 高频、稳定、跨多数页面使用的基础组件放入 `global`。
 - 跨页面复用且依赖业务类型、固定业务接口或领域交互的组件放入 `business/<component-name>`，
   由使用方手动导入。业务组件不使用 `Mk` 前缀，也不再按 Workspace 等上级领域增加额外目录。
@@ -1369,3 +1373,10 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 资源授权抽屉内部公共展示 Props 放在同目录 `types.ts`，权限选项类型从
 `RESOURCE_PERMISSION_OPTIONS` 派生；用户和用户组 API Props 分别保留完整 API 对象类型，
 用户组组件只接收具备用户组方法的 Workspace API。
+
+### RelatedResourcesDrawer
+
+关联资源查看抽屉，路径为 `business/related-resources-drawer/index.vue`，组件名为
+`RelatedResourcesDrawer`。标题为“关联资源”，操作入口文案统一为“查看关联资源”；
+两个方向分别显示“依赖的资源”和“引用此资源的资源”。
+当前保留旧版实现，尚未完成 v3 请求、国际化依赖适配及页面接入。

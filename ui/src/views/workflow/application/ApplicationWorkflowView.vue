@@ -241,10 +241,10 @@ onMounted(() => {
       <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
 
       <el-button type="primary" :loading="publishing" :disabled="loading || saving || publishing" @click="handlePublish"> 发布 </el-button>
-      <!--
+      <!-- 更多工作流设置（预留）
 
       <MkDropdown v-if="canEdit" trigger="click">
-        <el-button text aria-label="更多工作流设置">
+        <el-button text>
           <MkIcon :icon="MoreFilled" :size="18" />
         </el-button>
         <template #dropdown>
@@ -276,10 +276,12 @@ onMounted(() => {
     <transition name="debug-panel">
       <div v-if="debugVisible" class="workflow-debug-panel" :class="{ expanded: debugExpanded }">
         <div class="debug-panel-actions">
-          <button type="button" class="debug-panel-btn" :aria-label="debugExpanded ? '还原' : '放大'" @click="debugExpanded = !debugExpanded">
+          <!-- 放大或还原调试面板 -->
+          <button type="button" class="debug-panel-btn" @click="debugExpanded = !debugExpanded">
             <MkIcon :icon="debugExpanded ? Aim : FullScreen" :size="16" />
           </button>
-          <button type="button" class="debug-panel-btn" aria-label="关闭调试" @click="closeDebug">
+          <!-- 关闭调试 -->
+          <button type="button" class="debug-panel-btn" @click="closeDebug">
             <MkIcon :icon="Close" :size="16" />
           </button>
         </div>
