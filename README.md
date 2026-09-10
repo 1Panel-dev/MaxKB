@@ -34,6 +34,42 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
 
 中国用户如遇到 Docker 镜像 Pull 失败问题，请参照该 [离线安装文档](https://maxkb.cn/docs/v2/installation/offline_installtion/) 进行安装。
 
+## Web search with MCP
+
+To give an agent access to public web search and page extraction, connect
+[Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp)
+through MaxKB's existing MCP tools. No Parallel account or API key is required;
+free access is rate limited. The MaxKB server needs outbound HTTPS access to
+`search.parallel.ai`.
+
+1. Open **Tool**, choose **Create MCP**, and name it `Parallel Search`.
+2. Paste this object into **MCP Server Config**. Use `streamable_http`, not `sse`,
+   and do not add an outer `mcpServers` object or authentication headers.
+
+   ```json
+   {
+     "parallel-search": {
+       "url": "https://search.parallel.ai/mcp",
+       "transport": "streamable_http",
+       "headers": {"User-Agent": "MaxKB"}
+     }
+   }
+   ```
+
+3. Click **Test Connection**, then **Create**, and enable the tool.
+4. In the agent's settings, add an MCP connection under **Capabilities**,
+   choose **Reference MCP**, and select `Parallel Search`. Save the settings.
+   The agent can then use `web_search` and `web_fetch`, for example to find
+   current public documentation and read the source pages.
+
+The `User-Agent` identifies MaxKB so Parallel can measure aggregate free MCP
+usage. Keep it project-wide; do not add user or installation identifiers.
+
+Once selected, the agent may call these tools during a conversation. Queries,
+requested URLs, and any supplied objectives or context are sent to Parallel.
+Only include information you intend to send to that service. To stop using it
+in an agent, remove the connection from that agent's MCP settings and save.
+
 ## Screenshots
 
 <table style="border-collapse: collapse; border: 1px solid black;">
