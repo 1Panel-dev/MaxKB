@@ -104,6 +104,7 @@ class ToolWorkflowLibNode(INode):
             "position": position.get("children") if position else None,
             "chunk_id": workflow_params.get("chunk_id"),
             "form_data": workflow_params.get("form_data"),
+            "default_model_setting": tool_workflow_version.default_model_setting or {},
             **parameters,
         }
 

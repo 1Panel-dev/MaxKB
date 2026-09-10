@@ -170,6 +170,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
             workspace_id = tool_workflow.workspace_id
+            default_model_setting = tool_workflow.default_model_setting
             tool_record_id = instance.get("chat_record_id") or str(uuid.uuid7())
             # 表单节点等断点续跑:position 指向要从其恢复执行的节点,机制与 chat 一致
             position = instance.get("position")
@@ -184,6 +185,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 "debug": True,
                 "workspace_id": workspace_id,
                 "user_id": self.data.get("user_id"),
+                "default_model_setting": default_model_setting,
                 **{k: v for k, v in instance.items() if k not in identity_keys},
             }
 
@@ -356,6 +358,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 publish_user_id=user_id,
                 publish_user_name=user.username,
                 workspace_id=workspace_id,
+                default_model_setting=tool_workflow.default_model_setting,
             )
             work_flow_version.save()
             QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).update(
@@ -444,11 +447,13 @@ class ToolWorkflowSerializer(serializers.Serializer):
                         "tool_id": self.data.get("tool_id"),
                         "workspace_id": workflow_id,
                         "work_flow": instance.get("work_flow", {}),
+                        "default_model_setting": instance.get("default_model_setting", {}),
                     },
                     defaults={
                         "tool_id": self.data.get("tool_id"),
                         "workspace_id": workflow_id,
                         "work_flow": instance.get("work_flow"),
+                        "default_model_setting": instance.get("default_model_setting", {}),
                     },
                 )
                 # 当前用户可修改关联的知识库列表
