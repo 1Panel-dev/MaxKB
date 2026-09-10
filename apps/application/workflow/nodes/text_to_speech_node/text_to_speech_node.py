@@ -84,6 +84,12 @@ class TextToSpeechNode(INode):
                 tts_model_id = reference_data.get("tts_model_id", reference_data.get("model_id", tts_model_id))
                 model_params_setting = reference_data.get("model_params_setting")
 
+        if tts_model_id_type == "default":
+            default_model_setting = workflow_params.get("default_model_setting").get("TTS") or {}
+            if default_model_setting and isinstance(default_model_setting, dict):
+                tts_model_id = default_model_setting.get("model_id", tts_model_id)
+                model_params_setting = default_model_setting.get("model_params_setting")
+
         if not tts_model_id:
             raise Exception(_("Model is not allowed to be empty"))
 

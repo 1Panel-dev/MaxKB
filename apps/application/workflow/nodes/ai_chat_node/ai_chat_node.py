@@ -251,6 +251,12 @@ class AIChatNode(INode):
                 model_id = reference_data.get("model_id", model_id)
                 model_params_setting = reference_data.get("model_params_setting")
 
+        if model_id_type == "default":
+            default_model_setting = workflow_params.get("default_model_setting").get("LLM") or {}
+            if default_model_setting and isinstance(default_model_setting, dict):
+                model_id = default_model_setting.get("model_id", model_id)
+                model_params_setting = default_model_setting.get("model_params_setting")
+
         if not model_id:
             raise Exception(_("Model is not allowed to be empty"))
 
