@@ -21,7 +21,6 @@ from application.models import Application
 from common.constants.cache_version import Cache_Version
 from common.auth.constants.role_constants import RoleConstants
 from common.constants.resource_permission_constants import ResourceAuthType, ResourcePermissionConstants
-from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, native_page_search, get_dynamics_model
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException
@@ -373,7 +372,7 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
         permission = instance.get("permission")
         query_p_list = [None if p == "NOT_AUTH" else p for p in permission]
 
-        workspace_user_resource_permission_query_set = QuerySet(WorkspaceUserGroupResourcePermission).filter(
+        workspace_user_group_resource_permission_query_set = QuerySet(WorkspaceUserGroupResourcePermission).filter(
             workspace_id=self.data.get("workspace_id"),
             auth_target_type=self.data.get("auth_target_type"),
             target=self.data.get("target"),
@@ -389,7 +388,7 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
                 else:
                     user_query_set = user_query_set.filter(permission__in=query_p_list)
         return {
-            "workspace_user_resource_permission_query_set": workspace_user_resource_permission_query_set,
+            "workspace_user_group_resource_permission_query_set": workspace_user_group_resource_permission_query_set,
             "user_query_set": user_query_set,
         }
 
