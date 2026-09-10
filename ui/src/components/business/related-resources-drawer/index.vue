@@ -136,10 +136,10 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="关联资源" size="60%" @closed="handleClosed">
+  <MkDrawer v-model="visible" title="查看关联资源" size="60%" @closed="handleClosed">
     <template v-if="targetResource">
-      <div class="flex items-center gap-2 mb-4">
-        <span>{{ resourceLabels[resourceType] }}</span>
+      <div class="flex items-center mb-4">
+        <span class="mr-4 mk-N600!">{{ resourceLabels[resourceType] }}</span>
 
         <ResourceIcon
           :resource-type="resourceType"
@@ -148,8 +148,10 @@ defineExpose({ open, close })
           :provider="targetResource.provider"
           :providers="providers"
         />
-        <span>{{ targetResource.name }}</span>
+        <span class="ml-2">{{ targetResource.name }}</span>
       </div>
+
+      <h4 class="mk-title-decoration mb-4">关联资源</h4>
 
       <div class="flex-between gap-3">
         <el-radio-group v-model="relationDirection" @change="changeDirection">
