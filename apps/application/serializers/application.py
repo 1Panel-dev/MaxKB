@@ -426,6 +426,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
                 file_upload_enable=application.get("file_upload_enable", False),
                 file_upload_setting=application.get("file_upload_setting", {}),
                 work_flow=default_workflow,
+                default_model_setting=application.get("default_model_setting", {}),
             )
 
     class SimplateRequest(serializers.Serializer):
@@ -714,6 +715,9 @@ class ApplicationEditSerializer(serializers.Serializer):
     )
     # 数据集相关设置
     knowledge_setting = KnowledgeSettingSerializer(required=False, allow_null=True, label=_("Dataset settings"))
+
+    default_model_setting = serializers.DictField(required=False, label=_("Default model setting"))
+
     # 模型相关设置
     model_setting = ModelSettingSerializer(required=False, allow_null=True, label=_("Model setup"))
     # 问题补全
@@ -1245,6 +1249,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             "skill_tool_ids": "skill_tool_ids",
             "mcp_output_enable": "mcp_output_enable",
             "type": "type",
+            "default_model_setting": "default_model_setting",
         }
 
         for version_field, app_field in update_field_dict.items():
@@ -1470,6 +1475,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             "clean_time",
             "file_clean_time",
             "folder_id",
+            "default_model_setting",
         ]
         for update_key in update_keys:
             if update_key in instance and instance.get(update_key) is not None:
