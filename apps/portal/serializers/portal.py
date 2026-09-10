@@ -14,7 +14,6 @@ from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.auth.common import FileToken
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
@@ -189,7 +188,6 @@ class PortalLoginSerializer(serializers.Serializer):
         version, get_key = Cache_Version.TOKEN.value
         timeout = CONFIG.get_session_timeout()
         cache.set(get_key(token), user, timeout=timeout, version=version)
-        f_token = FileToken(str(user.id), "PORTAL_USER").to_token()
         record_log(
             menu="Portal",
             operate="Log in",
@@ -199,7 +197,7 @@ class PortalLoginSerializer(serializers.Serializer):
             operation_object={"name": user.username},
             workspace_id="default",
         )
-        return {"token": token}, f_token
+        return {"token": token}
 
     @staticmethod
     def get_login_profile():

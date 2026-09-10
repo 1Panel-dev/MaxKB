@@ -70,12 +70,12 @@ class PortalLoginView(APIView):
         responses=PortalAPI.Login.get_response(),
     )
     def post(self, request: Request):
-        token_data, f_token = PortalLoginSerializer.login(request.data)
+        token_data = PortalLoginSerializer.login(request.data)
         response = result.success(token_data)
         secure = request.is_secure()
         response.set_cookie(
             "mk_file_auth",
-            value=f_token,
+            value=token_data.get("token"),
             max_age=7 * 24 * 3600,
             path="/portal/",
             domain=None,

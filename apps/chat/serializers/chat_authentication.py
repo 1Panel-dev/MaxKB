@@ -15,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import ApplicationAccessToken, Application, ApplicationVersion
-from common.auth.common import FileToken, ChatToken
+from common.auth.common import ChatToken
 from common.auth.constants.operate_constants import Operate
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
@@ -48,14 +48,10 @@ class AnonymousAuthenticationSerializer(serializers.Serializer):
             if application_access_token is None or not application_access_token.is_active:
                 raise AppApiException(500, _("Invalid application_id"))
             application_id = str(application_id)
-            return (
-                ChatToken(chat_user_id, _type, str(Operate.ANNOTATION_AUTH), application_id=application_id).to_token(),
-                FileToken(chat_user_id, _type, application_id=application_id).to_token(),
-            )
-        return (
-            ChatToken(chat_user_id, _type, str(Operate.ANNOTATION_AUTH)).to_token(),
-            FileToken(chat_user_id, _type).to_token(),
-        )
+            return ChatToken(
+                chat_user_id, _type, str(Operate.ANNOTATION_AUTH), application_id=application_id
+            ).to_token()
+        return (ChatToken(chat_user_id, _type, str(Operate.ANNOTATION_AUTH)).to_token(),)
 
 
 class AnonymousAuthenticationV2Serializer(serializers.Serializer):

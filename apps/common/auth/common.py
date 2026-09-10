@@ -7,138 +7,57 @@
 @desc:
 """
 
-import hashlib
-import json
-import threading
+from django.core import signing
 
-from django.core import signing, cache
-
-from application.models import ChatUserType
 from common.constants.authentication_type import AuthenticationType
-from common.constants.cache_version import Cache_Version
-from common.utils.rsa_util import encrypt, decrypt
-
-authentication_cache = cache.cache
-lock = threading.Lock()
+from common.exception.app_exception import AppAuthenticationFailed
 
 
-def _decrypt(authentication: str):
-    cache_key = hashlib.sha256(authentication.encode()).hexdigest()
-    result = authentication_cache.get(key=cache_key, version=Cache_Version.CHAT.value)
-    if result is None:
-        with lock:
-            result = authentication_cache.get(cache_key, version=Cache_Version.CHAT.value)
-            if result is None:
-                result = decrypt(authentication)
-                authentication_cache.set(cache_key, result, version=Cache_Version.CHAT.value, timeout=60 * 60 * 2)
-
-    return result
-
-
-class ChatAuthentication:
-    def __init__(self, auth_type: str | None, **kwargs):
-        self.auth_type = auth_type
-        for k, v in kwargs.items():
-            self.__setattr__(k, v)
-
-    def to_dict(self):
-        return self.__dict__
-
-    def to_string(self):
-        value = json.dumps(self.to_dict())
-        authentication = encrypt(value)
-        cache_key = hashlib.sha256(authentication.encode()).hexdigest()
-        authentication_cache.set(cache_key, value, version=Cache_Version.CHAT.get_version(), timeout=60 * 60 * 2)
-        return authentication
-
-    @staticmethod
-    def new_instance(authentication: str):
-        auth = json.loads(_decrypt(authentication))
-        return ChatAuthentication(**auth)
-
-
-class FileToken:
-    def __init__(self, user_id, _type, application_id: str = None):
-        self.user_id = user_id
+class SystemToken:
+    def __init__(self, user_id, _type: AuthenticationType, **kwargs):
+        self.id = user_id
         self.type = _type
-        self.application_id = application_id
+        self.kwargs = kwargs
 
     def to_dict(self):
-        return (
-            {"user_id": self.user_id, "type": str(self.type), "application_id": self.application_id}
-            if self.application_id
-            else {"user_id": self.user_id, "type": str(self.type)}
-        )
+        if self.kwargs:
+            return {"user_id": self.id, "type": str(self.type.value), "kwargs": self.kwargs}
+        return {"id": str(self.id), "type": str(self.type.value)}
 
     def to_token(self):
         return signing.dumps(self.to_dict())
-
-    @staticmethod
-    def new_instance(token):
-        token_dict = signing.loads(token)
-        return FileToken(token_dict.get("user_id"), token_dict.get("type"), token_dict.get("application_id"))
-
-
-class ChatUserToken:
-    def __init__(
-        self,
-        application_id,
-        user_id,
-        access_token,
-        _type,
-        chat_user_type,
-        chat_user_id,
-        authentication: ChatAuthentication,
-    ):
-        self.application_id = application_id
-        self.user_id = user_id
-        self.access_token = access_token
-        self.type = _type
-        self.chat_user_type = chat_user_type
-        self.chat_user_id = chat_user_id
-        self.authentication = authentication
-
-    def to_dict(self):
-        return {
-            "application_id": str(self.application_id),
-            "user_id": str(self.user_id),
-            "access_token": self.access_token,
-            "type": str(self.type.value),
-            "chat_user_type": str(self.chat_user_type),
-            "chat_user_id": str(self.chat_user_id),
-            "authentication": self.authentication.to_string(),
-        }
-
-    def to_token(self):
-        return signing.dumps(self.to_dict())
-
-    @staticmethod
-    def new_instance(token_dict):
-        return ChatUserToken(
-            token_dict.get("application_id"),
-            token_dict.get("user_id"),
-            token_dict.get("access_token"),
-            token_dict.get("type"),
-            token_dict.get("chat_user_type"),
-            token_dict.get("chat_user_id"),
-            ChatAuthentication.new_instance(token_dict.get("authentication")),
-        )
 
 
 class ChatToken:
     def __init__(self, user_id, _type: AuthenticationType, login_type: str, **kwargs):
-        self.user_id = user_id
+        self.id = user_id
         self.type = _type
         self.login_type = login_type
         self.kwargs = kwargs
 
     def to_dict(self):
+        if self.kwargs:
+            return {
+                "id": str(self.id),
+                "type": str(self.type.value),
+                "login_type": str(self.login_type),
+                "kwargs": self.kwargs,
+            }
         return {
-            "user_id": str(self.user_id),
+            "id": str(self.id),
             "type": str(self.type.value),
             "login_type": str(self.login_type),
-            "kwargs": self.kwargs,
         }
 
     def to_token(self):
         return signing.dumps(self.to_dict())
+
+
+def parse_token(token):
+    details = signing.loads(token)
+    _type = details.get("type")
+    if _type:
+        if _type == AuthenticationType.SYSTEM_USER.value:
+            return SystemToken(details.get("id"), details.get("type"), **details.get("kwargs", {}))
+        return ChatToken(details.get("id"), details.get("type"), details.get("login_type"), **details.get("kwargs", {}))
+    raise AppAuthenticationFailed(1001, "")

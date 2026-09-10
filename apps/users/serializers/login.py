@@ -12,7 +12,7 @@ import json
 
 from application.models import ApplicationAccessToken
 from captcha.image import ImageCaptcha
-from common.auth.common import FileToken
+from common.auth.common import SystemToken
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -117,14 +117,7 @@ class LoginSerializer(serializers.Serializer):
     @staticmethod
     def _issue_token(user: User) -> str:
         """签发登录 token 并写入缓存"""
-        token = signing.dumps(
-            {
-                "username": user.username,
-                "id": str(user.id),
-                "email": user.email,
-                "type": AuthenticationType.SYSTEM_USER.value,
-            }
-        )
+        token = SystemToken(str(user.id), AuthenticationType.SYSTEM_USER).to_token()
         version, get_key = Cache_Version.TOKEN.value
         cache.set(get_key(token), user, timeout=CONFIG.get_session_timeout(), version=version)
         return token
@@ -174,7 +167,7 @@ class LoginSerializer(serializers.Serializer):
         cache.delete(system_get_key(f"system_{username}_lock"), version=system_version)
         token = LoginSerializer._issue_token(user)
 
-        return {"token": token}, FileToken(str(user.id), AuthenticationType.SYSTEM_USER.value).to_token()
+        return {"token": token}
 
     @staticmethod
     def _is_account_locked(username: str, failed_attempts: int) -> bool:

@@ -3,13 +3,18 @@ import re
 import urllib
 
 import uuid_utils.compat as uuid
+from django.db.models.functions import Cast
+
 from application.models import Application, ApplicationAccessToken, ChatShareLink
-from common.auth.common import FileToken
+from common.auth.common import parse_token
+from common.auth.constants.chat_permission_constants import ChatPermissionConstants
+from common.auth.constants.operate_constants import Operate
 from common.auth.handle.impl.user_token import get_auth
+from common.auth.handle.impl.chat_user_token import get_auth as get_chat_auth
 from common.constants.authentication_type import AuthenticationType
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed, NotFound404
-from django.db.models import QuerySet
+from django.db.models import QuerySet, CharField
 from django.http import HttpResponse
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -178,25 +183,37 @@ def auth(file, mk_file_auth):
     # 非公共文件,直接拒绝
     if mk_file_auth is None:
         _deny()
-    token = FileToken.new_instance(mk_file_auth)
+    token = parse_token(mk_file_auth)
     user_type = AuthenticationType(token.type)
 
-    if user_type in (AuthenticationType.CHAT_USER, AuthenticationType.CHAT_ANONYMOUS_USER):
-        _auth_chat(file, token, user_type)
+    if user_type == AuthenticationType.CHAT_USER:
+        _auth_chat(file, token)
     elif user_type == AuthenticationType.SYSTEM_USER:
-        _auth_system(file, token.user_id)
+        _auth_system(file, token.id)
     else:
         # 默认拒绝,避免枚举扩展后静默放行
         _deny()
 
 
-def _auth_chat(file, token, user_type):
-    user_id = token.user_id
+def _auth_chat(file, token):
+    user_id = token.id
+    application_id = token.kwargs.get("application_id")
     if file.source_type == FileSourceType.APPLICATION:
-        if not token.application_id == file.source_id:
-            _deny()
+        if application_id:
+            if not token.application_id == file.source_id:
+                _deny()
         else:
-            return
+            user_auth = get_chat_auth(token.login_type, token.id, application_id)
+            if not any(
+                [
+                    hasPermission(
+                        user_auth,
+                        _permission._build_workspace_permission("application_id")({"application_id": file.source_id}),
+                    )
+                    for _permission in ChatPermissionConstants
+                ]
+            ):
+                _deny()
     if file.source_type == FileSourceType.CHAT:
         if file.meta.get("user_id") == user_id:
             return
@@ -204,7 +221,7 @@ def _auth_chat(file, token, user_type):
         if not QuerySet(ChatShareLink).filter(chat_id=file.source_id).exists():
             _deny()
         # 匿名用户还需满足应用的登录要求
-        if user_type == AuthenticationType.CHAT_ANONYMOUS_USER:
+        if token.login_type.upper() == str(Operate.ANNOTATION_AUTH):
             _check_anonymous_login(file.source_id)
         return
 
@@ -218,9 +235,9 @@ def _auth_chat(file, token, user_type):
     else:
         _deny()
         return
-
-    if user_type == AuthenticationType.CHAT_ANONYMOUS_USER:
-        _check_knowledge_mapped_to_application(token.application_id, knowledge_id)
+    ## 如果是匿名的就要看可访问的应用是否
+    if token.login_type.upper() == str(Operate.ANNOTATION_AUTH):
+        _check_knowledge_mapped_to_application(knowledge_id)
         return
 
     get_authorized = DatabaseModelManage.get_model("get_knowledge_list_of_authorized")
@@ -237,14 +254,16 @@ def _check_anonymous_login(chat_id):
         _deny()
 
 
-def _check_knowledge_mapped_to_application(application_id, knowledge_id):
-    if application_id is None or knowledge_id is None:
+def _check_knowledge_mapped_to_application(knowledge_id):
+    if knowledge_id is None:
         _deny()
     exists = (
         QuerySet(ResourceMapping)
         .filter(
             source_type=ResourceType.APPLICATION,
-            source_id=str(application_id),
+            source_id__in=QuerySet(ApplicationAccessToken)
+            .filter(is_active=True, authentication=False)
+            .values_list(Cast("application_id", output_field=CharField()), flat=True),
             target_type=ResourceType.KNOWLEDGE,
             target_id=str(knowledge_id),
         )
