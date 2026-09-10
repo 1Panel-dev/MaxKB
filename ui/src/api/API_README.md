@@ -5,6 +5,7 @@ Admin API；Chat 目录作为独立体系预留。
 
 ```text
 src/api/
+├── constants.ts                     # Admin 与 Chat 的 API base 路径常量
 ├── admin/
 │   ├── auth/                         # Admin 登录认证与当前用户接口
 │   │   └── types.ts                  # 认证 API 与认证 Store 共用类型
@@ -154,8 +155,12 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 
 ## 请求约定
 
-- Admin 业务接口只声明相对资源路径，`/admin/api` 等部署前缀由 `core/request.ts` 统一处理。
-- Admin Router 与请求客户端直接读取 `window.MaxKB` 运行时路径配置；`Window` 和
+- `constants.ts` 统一导出 `ADMIN_API_BASE_PATH` 和 `CHAT_API_BASE_PATH`，分别优先读取
+  `window.MaxKB.prefix` 和 `window.MaxKB.chatPrefix`，再回退到 `VITE_BASE_PATH` 和各自默认路径；
+  去掉末尾斜杠后追加 `/api`。Admin、Chat 请求客户端和会话流式请求复用这些常量。
+- Admin 普通业务接口只声明相对资源路径，由 `core/request.ts` 的 Axios baseURL 处理部署前缀；
+  流式接口显式传入对应的 API base 常量。
+- Admin Router 直接读取 `window.MaxKB` 运行时路径配置，请求客户端通过上述常量读取；`Window` 和
   `MaxKBRuntimeConfig` 的全局类型统一声明在根目录 `env.d.ts`。
 - Admin 普通 JSON 请求使用 Axios；`request.ts` 导出 Axios 实例以及 `promise`、`get`、
   `post`、`put`、`del`、流式响应 `postStream` 和 Blob 文件 `downloadRequest` 请求封装。
@@ -171,6 +176,7 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
   登录页。
 - loading 不作为 API 函数参数，由调用接口的页面或 Store 管理。
 - 流式 POST 请求使用 `postStream` 返回原始 `Response`，由业务组件按具体协议解析数据块；
+  参数顺序为 `postStream(base, path, data?, config?)`，`config.signal` 用于取消请求。
   鉴权、语言请求头和错误状态仍由请求基础设施统一处理。
 - 上传、下载和其他特殊请求在真实需求出现时独立设计，不提前塞入普通 JSON 请求客户端。
 

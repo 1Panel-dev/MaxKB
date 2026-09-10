@@ -21,13 +21,7 @@ import {
 } from '@/api/chat/core/request'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/resource-context'
-
-const trimTrailingSlash = (value: string) => value.replace(/\/+$/, '')
-const adminApiBase =
-  trimTrailingSlash(window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/') + '/api'
-
-const chatApiBase =
-  trimTrailingSlash(window.MaxKB?.chatPrefix || import.meta.env.VITE_BASE_PATH || '/chat/') + '/api'
+import { ADMIN_API_BASE_PATH as adminApiBase, CHAT_API_BASE_PATH as chatApiBase } from '@/api/constants'
 
 /** 发送流式 POST 请求，返回原始 `Response` 供 SSE 读取。 */
 function postStream(base: string, path: string, data?: unknown) {

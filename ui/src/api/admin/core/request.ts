@@ -6,9 +6,9 @@ import { useStore } from '@/stores'
 import type { ApiResponse, LoadingTarget } from './types'
 import type { Dict } from '@/api/types'
 import { MsgError } from '@/utils/message'
+import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes
-const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'
 
 interface ExportRequestConfig extends AxiosRequestConfig {
   skipGlobalErrorMessage?: boolean
@@ -128,7 +128,7 @@ async function downloadExportResponse(response: AxiosResponse<Blob>, fileName: s
   return true
 }
 
-export const request = axios.create({ baseURL: `${ADMIN_BASE_PATH.replace(/\/+$/, '')}/api`, timeout: DEFAULT_TIMEOUT, withCredentials: false })
+export const request = axios.create({ baseURL: ADMIN_API_BASE_PATH, timeout: DEFAULT_TIMEOUT, withCredentials: false })
 
 request.interceptors.request.use(setRequestHeaders)
 
@@ -195,29 +195,9 @@ export function get<T = unknown>(url: string, params?: Dict<unknown>, loading?: 
   return promise<T>(request.get<ApiResponse<T>>(url, { params, timeout }), loading)
 }
 
-/** 发送指定方法的 Blob 请求并触发浏览器下载。 */
-export async function downloadRequest(
-  url: string,
-  method: string,
-  data?: unknown,
-  params?: Dict<unknown>,
-  loading?: LoadingTarget,
-): Promise<boolean> {
-  startLoading(loading)
-  try {
-    const response = await request.request<Blob>({
-      url,
-      method,
-      data,
-      params,
-      responseType: 'blob',
-      skipGlobalErrorMessage: true,
-    } as ExportRequestConfig)
-
-    return downloadExportResponse(response, 'download')
-  } finally {
-    finishLoading(loading)
-  }
+/** 发送 POST 请求。 */
+export function post<TData = unknown, T = unknown>(url: string, data?: TData, params?: Dict<unknown>, loading?: LoadingTarget, timeout?: number) {
+  return promise<T>(request.post<ApiResponse<T>>(url, data, { params, timeout }), loading)
 }
 
 /** 发送 GET 请求并将 Blob 响应下载为文件。 */
@@ -250,13 +230,33 @@ export async function postExportExcel<TData = unknown>(
   }
 }
 
-/** 发送 POST 请求。 */
-export function post<TData = unknown, T = unknown>(url: string, data?: TData, params?: Dict<unknown>, loading?: LoadingTarget, timeout?: number) {
-  return promise<T>(request.post<ApiResponse<T>>(url, data, { params, timeout }), loading)
+/** 发送指定方法的 Blob 请求并触发浏览器下载。 */
+export async function downloadRequest(
+  url: string,
+  method: string,
+  data?: unknown,
+  params?: Dict<unknown>,
+  loading?: LoadingTarget,
+): Promise<boolean> {
+  startLoading(loading)
+  try {
+    const response = await request.request<Blob>({
+      url,
+      method,
+      data,
+      params,
+      responseType: 'blob',
+      skipGlobalErrorMessage: true,
+    } as ExportRequestConfig)
+
+    return downloadExportResponse(response, 'download')
+  } finally {
+    finishLoading(loading)
+  }
 }
 
 /** 发送 POST 请求并返回可逐块读取的原始响应。 */
-export function postStream(base: string, path: string, data?: unknown) {
+export function postStream(base: string, path: string, data?: unknown, config?: StreamRequestConfig): Promise<Response> {
   const { auth, user } = useStore()
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (auth.token) {
@@ -269,6 +269,7 @@ export function postStream(base: string, path: string, data?: unknown) {
     method: 'POST',
     headers,
     body: data === undefined ? undefined : JSON.stringify(data),
+    signal: config?.signal,
   })
 }
 
