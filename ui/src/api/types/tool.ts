@@ -3,6 +3,7 @@
 import type LogicFlow from '@logicflow/core'
 import { TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
 import type { DynamicFormField } from './common'
+import type { DefaultModelSettingPayload } from '@/api/types/model.ts'
 
 export type ToolScope = (typeof TOOL_SCOPE)[keyof typeof TOOL_SCOPE]
 export type ToolType = (typeof TOOL_TYPE)[keyof typeof TOOL_TYPE]
@@ -71,6 +72,7 @@ export interface ToolItem {
 }
 
 export interface ToolWorkflowDetail {
+  default_model_setting?: DefaultModelSettingPayload
   create_time?: string
   id: string
   is_publish: boolean

@@ -7,12 +7,13 @@ import { cloneDeep } from 'lodash'
 import ModelApi from '@/api/admin/workspace/model/model'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
-import type { ToolItem, ToolWorkflowDetail } from '@/api/types'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import type { DefaultModelSettingPayload, ToolItem, ToolWorkflowDetail } from '@/api/types'
+import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
+import DefaultModelSettingButton from '@/views/workflow/components/default-model-setting/DefaultModelSettingButton.vue'
 
 defineOptions({ name: 'ToolWorkflowView' })
 
@@ -35,6 +36,7 @@ const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflo
 const toolDetail = ref<ToolItem>()
 const loading = ref(false)
 const saving = ref(false)
+const publishing = ref(false)
 const savedWorkflow = ref<LogicFlow.GraphData>()
 const saveTime = ref<Date | string>()
 
@@ -57,8 +59,9 @@ function saveToolWorkflow(graphData = getGraphData(), showMessage = false) {
   if (!graphData) return Promise.resolve<ToolWorkflowDetail | undefined>(undefined)
 
   saving.value = true
-  return ToolWorkflowApi.putToolWorkflow(toolId, { work_flow: graphData })
+  return ToolWorkflowApi.putToolWorkflow(toolId, { work_flow: graphData, default_model_setting: cloneDeep(defaultModelSetting.value) })
     .then((toolWorkflow) => {
+      defaultModelSetting.value = cloneDeep(toolWorkflow.default_model_setting ?? {})
       saveTime.value = toolWorkflow.update_time || new Date()
       setSavedWorkflow(graphData)
       if (showMessage) MsgSuccess('保存成功')
@@ -69,8 +72,35 @@ function saveToolWorkflow(graphData = getGraphData(), showMessage = false) {
     })
 }
 
+/* 应用默认模型设置：抽屉提交后暂存，保存失败时从详情回滚。 */
+const defaultModelSetting = ref<DefaultModelSettingPayload>({})
+
+function handleApplyDefaultModelToAll(graphData: LogicFlow.GraphData) {
+  workflowRef.value?.renderGraphData(graphData)
+}
+
+function handleSaveDefaultModelSetting(settings: DefaultModelSettingPayload) {
+  defaultModelSetting.value = cloneDeep(settings)
+  return handleSave()
+}
+
 function handleSave() {
   saveToolWorkflow(undefined, true)
+}
+
+function handlePublish() {
+  if (!workflowRef.value) return
+
+  publishing.value = true
+  workflowRef.value
+    .validate()
+    .then(() => saveToolWorkflow()) // 先保存未落库的画布改动
+    .then(() => ToolWorkflowApi.putToolWorkflowPublish(toolId))
+    .then(() => MsgSuccess('发布成功'))
+    .catch(() => MsgError('发布失败'))
+    .finally(() => {
+      publishing.value = false
+    })
 }
 
 function loadToolWorkflow() {
@@ -78,6 +108,7 @@ function loadToolWorkflow() {
   return Promise.all([ToolApi.getToolDetail(toolId), ToolWorkflowApi.getToolWorkflow(toolId)])
     .then(([tool, toolWorkflow]) => {
       toolDetail.value = tool
+      defaultModelSetting.value = cloneDeep(toolWorkflow.default_model_setting ?? {})
       saveTime.value = toolWorkflow.update_time
 
       const workflow = toolWorkflow.work_flow?.nodes?.length ? toolWorkflow.work_flow : DEFAULT_WORKFLOW
@@ -133,9 +164,19 @@ onMounted(() => {
 <template>
   <WorkflowViewLayout :loading="loading" :title="toolDetail?.name" :save-time="saveTime" @back="handleBack">
     <template #actions>
+      <DefaultModelSettingButton
+        :model-value="defaultModelSetting"
+        :model-api="ModelApi"
+        :get-graph-data="getGraphData"
+        :disabled="loading || saving || publishing"
+        @save="handleSaveDefaultModelSetting"
+        @apply-to-all="handleApplyDefaultModelToAll"
+      />
+
+      <el-button type="primary" :loading="publishing" :disabled="loading || saving || publishing" @click="handlePublish"> 发布 </el-button>
       <el-button plain :loading="saving" :disabled="loading || saving" @click="handleSave"> 保存 </el-button>
     </template>
 
-    <WorkflowCanvas ref="workflowRef" class="min-h-0 flex-1" :loop-workflow-mode="WorkflowMode.ToolLoop" :workflow-mode="WorkflowMode.Tool" />
+    <WorkflowCanvas ref="workflowRef" class="min-h-0 flex-1" :default-model-settings="defaultModelSetting" :loop-workflow-mode="WorkflowMode.ToolLoop" :workflow-mode="WorkflowMode.Tool" />
   </WorkflowViewLayout>
 </template>
