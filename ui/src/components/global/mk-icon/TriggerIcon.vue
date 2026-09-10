@@ -7,10 +7,11 @@ withDefaults(defineProps<{ size?: number | string; type?: TriggerType | string }
 </script>
 
 <template>
-  <el-avatar v-if="type == 'EVENT'" class="bg-warning!" shape="square" :size="size">
-    <img src="@/assets/trigger/icon_event.svg" style="width: 58%" alt="" />
-  </el-avatar>
-  <el-avatar v-else shape="square" :size="size">
+  <el-avatar v-if="type == 'SCHEDULED'" shape="square" :size="size">
     <img src="@/assets/trigger/icon_scheduled.svg" style="width: 58%" alt="" />
+  </el-avatar>
+
+  <el-avatar v-else class="bg-warning!" shape="square" :size="size">
+    <img src="@/assets/trigger/icon_event.svg" style="width: 58%" alt="" />
   </el-avatar>
 </template>
