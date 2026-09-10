@@ -310,7 +310,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面             |
 | `system/operate-logs/OperateLogListView.vue`                           | 系统操作日志查询与清理页面             |
 | `system/shared-resources/SharedModelview.vue`                          | System 共享模型查询与模型卡片页面      |
-| `trigger/TriggerView.vue` | 工作空间触发器筛选与分页列表 |
+| `trigger/TriggerView.vue` | 工作空间触发器查询、新建、编辑及单项和批量启停、删除 |
 | `tool/ToolView.vue`                                                    | 工作空间工具目录与工具卡片页面         |
 
 ## 备注要求
@@ -392,4 +392,26 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 `AuthorizeKnowledgeAction` 和 `AuthorizeApplicationAction`，由列表页面组合，显式传入 `label`
 和当前资源，保存成功后通过 `refresh` 刷新列表。Action 使用对应资源的 Workspace 或 System
 `auth` 权限判断，共享资源不展示入口。点击后按需挂载公共 `ResourceAuthorizationDrawer`，
-传入资源类型并调用 `open(id)`；在 `closed` 后卸载，不再复制授权表格或请求逻辑。
+传入资源类型及 `workspaceId` Prop（来自资源数据的 `workspace_id`），调用 `open(resource.id)`；
+Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作空间。
+在 `closed` 后卸载，不再复制授权表格或请求逻辑。
+
+## 触发器维护
+
+`trigger/TriggerView.vue` 负责列表查询、跨页选择、单项启停/删除及批量操作，通过
+`$perm.trigger` 控制工作空间级操作权限。删除最后一页数据后自动回退到有效页码；
+状态更新以接口成功为准，操作失败时保留原状态或选择。
+`trigger/TriggerFormDrawer.vue` 共用新建和编辑流程，编辑时查询详情并保留任务 ID、参数、
+启用状态及 meta。定时支持每日、每周、每月、间隔和五段 Cron；事件支持 URL、Token 和请求参数。
+任务选择复用 `SelectApplicationDialog` 与 `SelectToolDialog`，工具限定自定义和工作流类型。
+`trigger/components/TaskParameters.vue` 展示任务输入及事件参数引用，
+`trigger/task-parameters.ts` 从资源输入定义生成字段，只补全缺失值，不覆盖已有配置。
+保存时校验所有任务，包括折叠的任务；接口失败保持抽屉打开。
+
+## 模型关联资源 Action
+
+`model/model-card/action-dropdown/RelatedResourcesModelAction.vue` 在工作空间模型卡片的更多菜单中
+提供“查看关联资源”，由 `ModelView` 按 `model.workspace.relateMap(model.id)` 控制入口权限，
+共享模型不展示。页面传入完整 `RelatedResourcesApi`；Action 点击后
+按需挂载 `RelatedResourcesDrawer`，以模型类型打开，在 `closed` 后卸载。
+默认展示引用该模型的资源，资源名称仅展示文本，暂不支持打开目标资源。

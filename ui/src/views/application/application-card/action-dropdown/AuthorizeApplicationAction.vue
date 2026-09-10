@@ -6,7 +6,6 @@ import ResourceAuthorizationDrawer from '@/components/business/resource-authoriz
 
 defineOptions({ name: 'AuthorizeApplicationAction' })
 const props = defineProps<{ application: ApplicationDetail; label: string }>()
-const emit = defineEmits<{ refresh: [] }>()
 
 const drawerMounted = ref(false)
 const authorizationDrawerRef = useTemplateRef<InstanceType<typeof ResourceAuthorizationDrawer>>('authorizationDrawerRef')
@@ -31,7 +30,7 @@ function handleDrawerClosed() {
     v-if="drawerMounted"
     ref="authorizationDrawerRef"
     :type="RESOURCE_TYPE.APPLICATION"
+    :workspace-id="application.workspace_id"
     @closed="handleDrawerClosed"
-    @refresh="emit('refresh')"
   />
 </template>

@@ -45,6 +45,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ToolIcon: typeof import('./components/global/mk-icon/ToolIcon.vue')['default']
+    TriggerIcon: typeof import('./components/global/mk-icon/TriggerIcon.vue')['default']
   }
 }
 
@@ -83,4 +84,5 @@ declare global {
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
   const ToolIcon: typeof import('./components/global/mk-icon/ToolIcon.vue')['default']
+  const TriggerIcon: typeof import('./components/global/mk-icon/TriggerIcon.vue')['default']
 }

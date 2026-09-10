@@ -1,31 +1,34 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { RESOURCE_PERMISSION } from '@/api/enums'
+import { RESOURCE_PERMISSION_OPTIONS } from '@/constants/resource-authorization'
+import type { Dict, ResourceAuthorizationTargetType, ResourcePermission, ResourceUserPermission } from '@/api/types'
+import MkTable from '@/components/global/mk-table/index.vue'
+import { useStore } from '@/stores'
 import type ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
 import type SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
-import { RESOURCE_PERMISSION } from '@/api/enums'
-import type { Dict, ResourcePermission, ResourceUserPermission } from '@/api/types'
-import { MsgSuccess } from '@/utils/message'
-import MkTable from '@/components/global/mk-table/index.vue'
-import PermissionConfigDialog from './PermissionConfigDialog.vue'
-import { useStore } from '@/stores'
+import type { ResourcePermissionOption } from './types'
 
-import type { ResourceAuthorizationContentProps, ResourcePermissionOption } from './types'
-
-interface Props extends ResourceAuthorizationContentProps {
+const props = defineProps<{
   api: typeof ResourceAuthorizationApi | typeof SystemResourceAuthorizationApi
+  workspaceId: string
+  targetId: string
+  type: ResourceAuthorizationTargetType
+  submitting: boolean
   permissionOptions: ResourcePermissionOption[]
-}
+}>()
+const emit = defineEmits<{ configure: [subjectIds: string[], permission?: ResourcePermission] }>()
 
-const props = defineProps<Props>()
-const emit = defineEmits<{ refresh: [] }>()
-const submitting = defineModel<boolean>('submitting', { required: true })
+/* 根目录不提供“不授权”，按“查看”展示接口返回的该权限。 */
+const canSelectNotAuth = computed(() => props.permissionOptions.some(({ value }) => value === RESOURCE_PERMISSION.NOT_AUTH))
 
 /* 查询与跨页选择 */
 const { auth } = useStore()
+const searchPermissionOptions = computed(() => RESOURCE_PERMISSION_OPTIONS.filter(({ value }) => !auth.isCE || value !== RESOURCE_PERMISSION.ROLE))
 const searchFields = computed(() => [
   { label: '姓名', value: 'nick_name' },
   { label: '用户名', value: 'username' },
-  { label: '权限', value: 'permission', multiple: true, options: props.permissionOptions },
+  { label: '权限', value: 'permission', multiple: true, options: searchPermissionOptions.value },
   ...(auth.isEE || auth.isPE ? [{ label: '角色', value: 'role' }] : []),
 ])
 const loading = ref(false)
@@ -39,11 +42,11 @@ function loadPermissions() {
   if (!props.targetId) return Promise.resolve()
   loading.value = true
   return props.api
-    .getResourceAuthorization(props.targetId, props.type, paginationConfig.value, searchQuery.value)
+    .getResourceAuthorization(props.workspaceId, props.targetId, props.type, paginationConfig.value, searchQuery.value)
     .then(({ records, total }) => {
       permissionUsers.value = records.map((subject) => ({
         ...subject,
-        permission: props.isRootFolder && subject.permission === RESOURCE_PERMISSION.NOT_AUTH ? RESOURCE_PERMISSION.VIEW : subject.permission,
+        permission: !canSelectNotAuth.value && subject.permission === RESOURCE_PERMISSION.NOT_AUTH ? RESOURCE_PERMISSION.VIEW : subject.permission,
       }))
       paginationConfig.value.total = total
     })
@@ -68,53 +71,27 @@ function handleSelectionChange(selection: unknown[]) {
   selectedUsers.value = selection as ResourceUserPermission[]
 }
 
-/* 单项与批量保存：确认前不修改行数据，失败时保留待提交配置。 */
-const configDialogRef = useTemplateRef<InstanceType<typeof PermissionConfigDialog>>('configDialogRef')
-const pendingUserIds = ref<string[]>([])
-
+/* 将单项与批量权限配置交给抽屉统一处理。 */
 function handleOpenBatchConfig() {
-  if (!selectedUsers.value.length || submitting.value) return
-  pendingUserIds.value = selectedUsers.value.map(({ id }) => id)
-  configDialogRef.value?.open()
+  if (!selectedUsers.value.length || props.submitting) return
+  emit(
+    'configure',
+    selectedUsers.value.map(({ id }) => id),
+  )
 }
 
 function handlePermissionChange(value: string | number | boolean | undefined, subject: ResourceUserPermission) {
-  const permission = props.editablePermissionOptions.find((option) => option.value === value)?.value
-  if (!permission || permission === subject.permission || submitting.value) return
-  pendingUserIds.value = [subject.id]
-  if (props.isFolder) {
-    configDialogRef.value?.open(permission)
-  } else {
-    submitPermissions(permission, false)
-  }
+  const permission = props.permissionOptions.find((option) => option.value === value)?.value
+  if (!permission || permission === subject.permission || props.submitting) return
+  emit('configure', [subject.id], permission)
 }
 
-function submitPermissions(permission: ResourcePermission, includeChildren: boolean) {
-  if (submitting.value || !pendingUserIds.value.length || (includeChildren && !props.managedFolderIds.length)) return
-  const permissionScope = {
-    permission,
-    include_children: includeChildren,
-    ...(includeChildren ? { folder_ids: [...props.managedFolderIds] } : {}),
-  }
-  submitting.value = true
-  return props.api
-    .putResourceAuthorization(
-      props.targetId,
-      props.type,
-      pendingUserIds.value.map((id) => ({ user_id: id, ...permissionScope })),
-    )
-    .then(() => {
-      MsgSuccess('提交成功')
-      configDialogRef.value?.close()
-      pendingUserIds.value = []
-      clearSelection()
-      emit('refresh')
-      return loadPermissions()
-    })
-    .finally(() => {
-      submitting.value = false
-    })
+function refresh() {
+  clearSelection()
+  return loadPermissions()
 }
+
+defineExpose({ refresh })
 
 /* 挂载当前标签时查询权限。 */
 onMounted(() => loadPermissions())
@@ -123,6 +100,7 @@ onMounted(() => loadPermissions())
 <template>
   <div>
     <div class="flex-between mb-4 gap-4">
+      <!-- 批量配置权限 -->
       <el-button type="primary" :disabled="!selectedUsers.length || loading || submitting" @click="handleOpenBatchConfig">配置权限</el-button>
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />
     </div>
@@ -148,20 +126,10 @@ onMounted(() => loadPermissions())
       <el-table-column label="权限" min-width="340">
         <template #default="{ row }">
           <el-radio-group :model-value="row.permission" :disabled="submitting" @change="handlePermissionChange($event, row)">
-            <el-radio v-for="option in editablePermissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{
-              option.label
-            }}</el-radio>
+            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ option.label }}</el-radio>
           </el-radio-group>
         </template>
       </el-table-column>
     </MkTable>
-    <PermissionConfigDialog
-      ref="configDialogRef"
-      :options="editablePermissionOptions"
-      :is-folder="isFolder"
-      :can-include-children="managedFolderIds.length > 0"
-      :loading="submitting"
-      @submit="submitPermissions"
-    />
   </div>
 </template>

@@ -209,7 +209,7 @@ function handleBatchDelete() {
               >
                 <template v-if="!isShared" #action-dropdown>
                   <!-- 资源授权 -->
-                  <AuthorizeKnowledgeAction label="资源授权" :knowledge="knowledge" @refresh="refreshKnowledge" />
+                  <AuthorizeKnowledgeAction label="资源授权" :knowledge="knowledge" />
 
                   <!-- TODO 关联资源 -->
                   <!-- 转移到 -->

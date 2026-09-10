@@ -251,7 +251,7 @@ onMounted(() => {
                     :tool="tool"
                   />
                   <!-- 资源授权 -->
-                  <AuthorizeToolAction label="资源授权" :tool="tool" @refresh="refreshTool" />
+                  <AuthorizeToolAction label="资源授权" :tool="tool" />
 
                   <!-- // TODO: 触发器 (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW')-->
                   <!-- // TODO: 查看关联资源-->

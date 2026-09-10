@@ -220,11 +220,16 @@ function handleBatchDelete() {
                 @selected="handleApplicationSelect(application.id, $event)"
               >
                 <template #action-dropdown>
+                  <!-- TODO 同步 -->
+                  <!-- TODO 向量化 -->
+                  <!-- TODO 生成问题 -->
                   <!-- 设置 -->
                   <SettingApplicationAction label="设置" :application="application" />
+                  <!-- TODO 触发器 -->
                   <!-- 资源授权 -->
-                  <AuthorizeApplicationAction label="资源授权" :application="application" @refresh="refreshApplications" />
+                  <AuthorizeApplicationAction label="资源授权" :application="application" />
                   <!-- TODO 关联资源 -->
+                  <!-- TODO 复制 -->
                   <!-- 移动到 -->
                   <MoveApplicationAction
                     v-model:loading="applicationOperationLoading"
