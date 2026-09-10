@@ -50,6 +50,39 @@ docker run -d --name=maxkb --restart=always -p 8080:8080 -v C:/maxkb:/opt/maxkb 
 
 <image height="150px" width="150px" src="https://github.com/1Panel-dev/MaxKB/assets/52996290/a083d214-02be-4178-a1db-4f428124153a"/>
 
+## 通过 MCP 搜索网页
+
+可以通过 MaxKB 现有的 MCP 工具接入
+[Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp)，
+为智能体提供公开网页搜索和页面内容提取。无需 Parallel 账号或 API 密钥，
+免费访问有速率限制。MaxKB 服务器需要能够通过 HTTPS 访问 `search.parallel.ai`。
+
+1. 打开**工具**，选择**创建 MCP**，名称填写 `Parallel Search`。
+2. 将以下对象粘贴到 **MCP Server Config** 配置框。使用 `streamable_http`，
+   不要使用 `sse`，也不要添加外层 `mcpServers` 对象或身份验证请求头。
+
+   ```json
+   {
+     "parallel-search": {
+       "url": "https://search.parallel.ai/mcp",
+       "transport": "streamable_http",
+       "headers": {"User-Agent": "MaxKB"}
+     }
+   }
+   ```
+
+3. 点击**测试连接**，然后**创建**，并启用该工具。
+4. 在智能体设置的**技能**区域添加 MCP 连接，选择**引用MCP**，
+   选中 `Parallel Search` 并保存。智能体即可使用 `web_search` 和 `web_fetch`，
+   例如查找最新的公开文档并读取来源页面。
+
+`User-Agent` 标识 MaxKB，以便 Parallel 统计项目级的免费 MCP 使用量。
+请保持该标识一致，不要添加用户或安装实例标识。
+
+选中后，智能体可能在对话中自行调用这些工具。查询词、请求的 URL 以及提供的
+目标或上下文会发送给 Parallel，请只提供你愿意发送给该服务的信息。
+如需在某个智能体中停用，请从该智能体的 MCP 设置中移除连接并保存。
+
 ## UI 展示
 
 <table style="border-collapse: collapse; border: 1px solid black;">
