@@ -268,6 +268,7 @@ class ChatSerializers(serializers.Serializer):
         position = instance.get("position")
         chunk_id = instance.get("chunk_id")
         debug = self.data.get("debug", False)
+        default_model_setting = application.default_model_setting or {}
 
         # 对话用户信息（asker 取自 form_data）
         chat_user = resolve_chat_user(chat_user_id, chat_user_type, asker=form_data.get("asker"))
@@ -307,6 +308,7 @@ class ChatSerializers(serializers.Serializer):
             "audio_list": audio_list or [],
             "video_list": video_list or [],
             "other_list": other_list or [],
+            "default_model_setting": default_model_setting,
         }
 
         result_queue = queue.Queue()
