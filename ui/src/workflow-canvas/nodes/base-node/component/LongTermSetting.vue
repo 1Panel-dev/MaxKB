@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
+import type { CascaderOption, FormInstance } from 'element-plus'
 import SelectModel from '@/components/business/select-model/index.vue'
 import type { ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
 import type { LongTermSetting } from '../types'
@@ -22,21 +22,35 @@ const formData = ref<LongTermSetting>({
   long_term_trigger_type: 'ROUND',
 })
 
-const times = Array.from({ length: 24 }, (_, hour) => {
-  const value = `${String(hour).padStart(2, '0')}:00`
-  return { label: value, value }
+// 触发方式卡片与周期选项。
+const triggerRounds = computed<number | undefined>({
+  get: () => {
+    const rounds = formData.value.long_term_trigger_setting.rounds
+    return typeof rounds === 'number' ? rounds : undefined
+  },
+  set: (rounds) => {
+    formData.value.long_term_trigger_setting.rounds = rounds
+  },
 })
-const scheduleOptions = [
-  { label: '每天', value: 'daily', children: times },
+const triggerOptions = [
+  { value: 'ROUND', label: '按轮次触发', description: '累计到 N 轮后，自动提炼 N 轮对话，生成记忆' },
+  { value: 'SCHEDULED', label: '定时触发', description: '到设定时间后，自动提炼周期内所有对话，生成记忆' },
+] as const
+const scheduleTimes = Array.from({ length: 24 }, (_, hour) => {
+  const time = `${String(hour).padStart(2, '0')}:00`
+  return { label: time, value: time }
+})
+const scheduleOptions: CascaderOption[] = [
+  { label: '每日', value: 'daily', children: scheduleTimes },
   {
     label: '每周',
     value: 'weekly',
-    children: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'].map((label, index) => ({ label, value: index + 1, children: times })),
+    children: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'].map((label, index) => ({ label, value: index + 1, children: scheduleTimes })),
   },
   {
     label: '每月',
     value: 'monthly',
-    children: Array.from({ length: 31 }, (_, index) => ({ label: `${index + 1} 日`, value: String(index + 1), children: times })),
+    children: Array.from({ length: 31 }, (_, index) => ({ label: `${index + 1} 日`, value: String(index + 1), children: scheduleTimes })),
   },
   {
     label: '按间隔',
@@ -53,22 +67,32 @@ const scheduleMode = computed<'cron' | 'preset'>({
   set: (mode) => {
     formData.value.long_term_trigger_setting =
       mode === 'cron' ? { schedule_type: 'cron', cron_expression: '' } : { schedule_type: 'daily', time: ['00:00'] }
+    validateTriggerSetting()
   },
 })
 
 const scheduleValue = computed<Array<number | string>>({
   get: () => {
     const setting = formData.value.long_term_trigger_setting
-    if (setting.schedule_type === 'interval') return ['interval', String(setting.interval_unit ?? 'hours'), Number(setting.interval_value ?? 1)]
-    if (setting.schedule_type === 'weekly') {
-      return ['weekly', Number((setting.days as unknown[] | undefined)?.[0] ?? 1), String((setting.time as unknown[] | undefined)?.[0] ?? '00:00')]
+    if (setting.schedule_type === 'interval') {
+      return typeof setting.interval_unit === 'string' && typeof setting.interval_value === 'number'
+        ? ['interval', setting.interval_unit, setting.interval_value]
+        : []
     }
-    if (setting.schedule_type === 'monthly') {
-      return ['monthly', String((setting.days as unknown[] | undefined)?.[0] ?? '1'), String((setting.time as unknown[] | undefined)?.[0] ?? '00:00')]
-    }
-    return ['daily', String((setting.time as unknown[] | undefined)?.[0] ?? '00:00')]
+    const time = Array.isArray(setting.time) ? setting.time[0] : undefined
+    if (typeof time !== 'string') return []
+    if (setting.schedule_type === 'daily') return ['daily', time]
+    const day = Array.isArray(setting.days) ? setting.days[0] : undefined
+    if (day === undefined) return []
+    if (setting.schedule_type === 'weekly') return ['weekly', Number(day), time]
+    if (setting.schedule_type === 'monthly') return ['monthly', String(day), time]
+    return []
   },
   set: (value) => {
+    if (!value?.length) {
+      formData.value.long_term_trigger_setting = {}
+      return
+    }
     const scheduleType = value[0]
     if (scheduleType === 'interval') {
       formData.value.long_term_trigger_setting = { schedule_type: 'interval', interval_unit: value[1], interval_value: value[2] }
@@ -80,6 +104,31 @@ const scheduleValue = computed<Array<number | string>>({
   },
 })
 
+// 等待当前配置表单挂载后，只校验当前触发方式，清理已隐藏字段的提示。
+async function validateTriggerSetting() {
+  await nextTick()
+  const triggerFields = ['long_term_trigger_setting.rounds', 'long_term_trigger_setting', 'long_term_trigger_setting.cron_expression']
+  formRef.value?.clearValidate(triggerFields)
+  const activeField =
+    formData.value.long_term_trigger_type === 'ROUND' ? triggerFields[0]! : scheduleMode.value === 'cron' ? triggerFields[2]! : triggerFields[1]!
+  formRef.value?.validateField(activeField, () => {})
+}
+
+function validateRounds(_rule: unknown, value: unknown, callback: (error?: Error) => void) {
+  callback(typeof value === 'number' && Number.isInteger(value) && value >= 5 && value <= 100 ? undefined : new Error('请输入 5–100 之间的整数轮次'))
+}
+
+function validateSchedule(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
+  let options = scheduleOptions
+  let selectedOption: CascaderOption | undefined
+  for (const value of scheduleValue.value) {
+    selectedOption = options.find((option) => option.value === value)
+    if (!selectedOption) break
+    options = selectedOption.children ?? []
+  }
+  callback(selectedOption && !selectedOption.children?.length ? undefined : new Error('请选择触发周期'))
+}
+
 function open() {
   formRef.value?.clearValidate()
   formData.value = cloneDeep(setting.value)
@@ -90,12 +139,18 @@ function open() {
 }
 
 function changeTriggerType(triggerType: 'ROUND' | 'SCHEDULED') {
+  if (formData.value.long_term_trigger_type === triggerType) {
+    validateTriggerSetting()
+    return
+  }
+  formData.value.long_term_trigger_type = triggerType
   if (triggerType === 'ROUND' && !formData.value.long_term_trigger_setting.rounds) {
     formData.value.long_term_trigger_setting = { rounds: 10 }
   }
   if (triggerType === 'SCHEDULED' && !formData.value.long_term_trigger_setting.schedule_type) {
     formData.value.long_term_trigger_setting = { schedule_type: 'daily', time: ['00:00'] }
   }
+  validateTriggerSetting()
 }
 
 function validateCron(_rule: unknown, value: unknown, callback: (error?: Error) => void) {
@@ -103,7 +158,7 @@ function validateCron(_rule: unknown, value: unknown, callback: (error?: Error) 
     .trim()
     .split(/\s+/)
   if (fields.length !== 5 || fields.some((field) => !field)) {
-    callback(new Error('请输入有效的五段 Cron 表达式'))
+    callback(new Error('请输入有效的Cron 表达式'))
     return
   }
   callback()
@@ -135,7 +190,7 @@ function submit() {
   <el-button text type="primary" @click="open">
     <MkIcon name="icon-setting" />
   </el-button>
-  <MkDialog v-model="visible" title="长期记忆设置">
+  <MkDialog v-model="visible" title="长期记忆设置" align-center>
     <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="AI 模型" prop="long_term_model_id" :rules="{ required: true, validator: validateModel, trigger: 'change' }">
         <el-radio-group v-model="formData.long_term_model_id_type" class="mb-2">
@@ -163,35 +218,80 @@ function submit() {
       </el-form-item>
 
       <el-form-item label="触发方式" prop="long_term_trigger_type" :rules="{ required: true, message: '请选择触发方式', trigger: 'change' }">
-        <el-radio-group v-model="formData.long_term_trigger_type" @change="changeTriggerType">
-          <el-radio-button value="ROUND">按对话轮次</el-radio-button>
-          <el-radio-button value="SCHEDULED">定时执行</el-radio-button>
-        </el-radio-group>
+        <div class="w-full space-y-2">
+          <template v-for="trigger in triggerOptions" :key="trigger.value">
+            <MkSourceCard
+              :title="trigger.label"
+              class="min-h-0!"
+              :class="{ 'border-primary!': formData.long_term_trigger_type === trigger.value }"
+              :aria-checked="formData.long_term_trigger_type === trigger.value"
+              @click="changeTriggerType(trigger.value)"
+            >
+              <template #icon>
+                <TriggerIcon :type="trigger.value" />
+              </template>
+              <template #subtitle>{{ trigger.description }}</template>
+              <template v-if="formData.long_term_trigger_type === trigger.value" #default>
+                <div class="mk-gray-card rounded-xl! p-4! text-N900" @click.stop @keydown.stop>
+                  <!-- 定时 -->
+                  <template v-if="trigger.value === 'SCHEDULED'">
+                    <div class="flex-between mb-2">
+                      <span class="mk-required">{{ scheduleMode === 'preset' ? '触发周期' : 'Cron 表达式' }}</span>
+                      <!-- 切换周期设置与 Cron 表达式 -->
+                      <el-tooltip :content="scheduleMode === 'preset' ? '切换为 Cron 表达式' : '切换为周期设置'" placement="top">
+                        <el-button text type="primary" @click="scheduleMode = scheduleMode === 'preset' ? 'cron' : 'preset'">
+                          <MkIcon name="icon_swich" />
+                        </el-button>
+                      </el-tooltip>
+                    </div>
+                    <el-form-item
+                      v-if="scheduleMode === 'preset'"
+                      prop="long_term_trigger_setting"
+                      :rules="{ required: true, validator: validateSchedule, trigger: 'change' }"
+                      class="mb-0!"
+                    >
+                      <el-cascader
+                        v-model="scheduleValue"
+                        :options="scheduleOptions"
+                        :teleported="false"
+                        class="w-full"
+                        clearable
+                        placeholder="请选择触发周期"
+                      />
+                    </el-form-item>
+                    <el-form-item
+                      v-else
+                      prop="long_term_trigger_setting.cron_expression"
+                      :rules="{ required: true, validator: validateCron, trigger: ['blur', 'change'] }"
+                      class="mb-0!"
+                    >
+                      <el-input v-model="formData.long_term_trigger_setting.cron_expression" placeholder="请输入Cron表达式（如：0 0 1 * *）" />
+                    </el-form-item>
+                  </template>
+                  <!-- 按轮次 -->
+                  <el-form-item
+                    v-else
+                    label="触发间隔"
+                    prop="long_term_trigger_setting.rounds"
+                    :rules="{ required: true, validator: validateRounds, trigger: ['blur', 'change'] }"
+                    class="mb-0!"
+                  >
+                    <el-input-number
+                      v-model="triggerRounds"
+                      :value-on-clear="5"
+                      :max="100"
+                      :min="5"
+                      :step="1"
+                      controls-position="right"
+                      align="left"
+                    />
+                  </el-form-item>
+                </div>
+              </template>
+            </MkSourceCard>
+          </template>
+        </div>
       </el-form-item>
-
-      <el-form-item v-if="formData.long_term_trigger_type === 'ROUND'" label="触发间隔（轮）">
-        <el-input-number v-model="formData.long_term_trigger_setting.rounds" :max="100" :min="5" />
-      </el-form-item>
-
-      <template v-else>
-        <el-form-item label="定时方式">
-          <el-radio-group v-model="scheduleMode">
-            <el-radio value="preset">周期设置</el-radio>
-            <el-radio value="cron">Cron 表达式</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item v-if="scheduleMode === 'preset'" label="执行周期">
-          <el-cascader v-model="scheduleValue" :options="scheduleOptions" :teleported="false" class="w-full" />
-        </el-form-item>
-        <el-form-item
-          v-else
-          label="Cron 表达式"
-          prop="long_term_trigger_setting.cron_expression"
-          :rules="{ validator: validateCron, trigger: 'blur' }"
-        >
-          <el-input v-model="formData.long_term_trigger_setting.cron_expression" placeholder="例如：0 2 * * *" />
-        </el-form-item>
-      </template>
     </el-form>
 
     <template #footer>
@@ -202,3 +302,5 @@ function submit() {
     </template>
   </MkDialog>
 </template>
+
+<style lang="scss" scoped></style>

@@ -101,7 +101,7 @@ function handleSelectedChange(selected: boolean | string | number) {
 
       <slot name="tag" />
     </header>
-    <div class="my-4 h-full text-N600">
+    <div class="my-4 h-full text-N600" v-if="slots.default">
       <slot />
     </div>
 

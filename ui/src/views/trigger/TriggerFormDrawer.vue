@@ -21,7 +21,6 @@ import SelectToolDialog from '@/components/business/select-tool-dialog/index.vue
 import TaskParameters from './components/TaskParameters.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import { perm } from '@/permission'
 
 const emit = defineEmits<{ refresh: [] }>()
 /* 抽屉生命周期与详情 */
@@ -67,7 +66,6 @@ function createDefaultForm(): TriggerPayload {
 }
 const form = ref<TriggerPayload>(createDefaultForm())
 const eventUrl = computed(() => `${window.location.origin}${ADMIN_API_BASE_PATH}/trigger/v1/webhook/${form.value.id}`)
-const canSave = computed(() => (editingId.value ? perm.trigger.edit() : perm.trigger.create()))
 const taskKey = (task: Pick<TriggerTaskPayload, 'source_type' | 'source_id'>) => `${task.source_type}:${task.source_id}`
 
 function resetData() {
