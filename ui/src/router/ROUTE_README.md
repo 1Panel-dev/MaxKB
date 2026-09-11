@@ -67,13 +67,14 @@ System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。
 Login、Workflow 路由没有挂载 `AppLayout`，因此不会出现在左侧导航中：
 
 - `login`：登录及账户相关独立页面。
-- `workflow`：集中维护各业务的全屏画布路由，当前包含智能体和工具工作流，后续知识库等画布
+- `workflow`：集中维护各业务的全屏画布路由，当前包含智能体、工具和知识库工作流，后续其他画布
   继续在 `admin/workflow/index.ts` 中注册。
 - Workspace 的全屏 Workflow 路由显式设置 `resourceScope: 'workspace'`，使模型创建等资源操作使用 Workspace API。
 - Workflow 路由保留当前 Workspace 和资源标识；智能体工作流地址为
   `/workspace/:workspaceId/application/:applicationId/workflow`，工具工作流地址为
   `/workspace/:workspaceId/tool/:toolId/workflow`。两个页面均可从资源操作入口进入，按住 Ctrl 或
-  Command 点击时在新标签页打开。
+  Command 点击时在新标签页打开。知识库工作流路由名为 `workflow-knowledge`，地址为
+  `/workspace/:workspaceId/knowledge/:knowledgeId/workflow`。
 
 登录页面地址为 `/login`；忘记密码使用独立页面 `/forgot-password`，两者均复用登录布局且不挂载 `AppLayout`。
 
@@ -200,7 +201,10 @@ Workspace 页面：
 /admin/workspace/:workspaceId/application/:applicationId/:type/setting
 
 /admin/workspace/:workspaceId/knowledge
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/workflow
 /admin/workspace/:workspaceId/knowledge/:knowledgeId
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/document
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/workflow-entry
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/document/:documentId
 ```
 
@@ -309,3 +313,8 @@ System 共享资源页面：
 - Login、Workflow 等全屏页面不要挂载 `AppLayout`。
 - Admin 与 Chat 路由不要相互引用。
 - 每次新增、删除、移动或修改路由时，必须同步更新本文件。
+
+工作空间知识库卡片进入 `workspace-knowledge-detail`，默认重定向到“文档”子路由。
+详情容器复用 `ResourceDetailLayout`，二级目录包含“文档”和“工作流”；`workflow-entry`
+仅作为目录跳转入口，重定向到独立的 `workflow-knowledge` 全屏画布。画布返回知识库详情。
+文档详情继续保留原地址，并通过 `detailActiveMenu` 高亮“文档”。

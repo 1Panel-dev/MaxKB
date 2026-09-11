@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import { RESOURCE_TYPE } from '@/api/enums'
 import BasicNodeMenu from './BasicNodeMenu.vue'
 import ResourceNodeMenu from './ResourceNodeMenu.vue'
-import type { WorkflowMode } from '@/workflow-canvas/types'
-import type {  NodeMenuItem, NodeMenuTab } from './types'
+import { WorkflowMode } from '@/workflow-canvas/types'
+import type { NodeMenuItem, NodeMenuTab } from './types'
 
 defineOptions({ name: 'NodeMenu' })
 
@@ -34,8 +34,13 @@ function handleDragStart(node: NodeMenuItem, event: PointerEvent) {
   >
     <el-tabs v-model="activeTab" class="small p-4 pb-0">
       <el-tab-pane label="基础组件" name="basic" />
+      <el-tab-pane label="数据源" name="data-source" v-if="workflowMode === WorkflowMode.Knowledge || workflowMode === WorkflowMode.KnowledgeLoop" />
       <el-tab-pane label="工具" name="tool" />
-      <el-tab-pane label="智能体" name="application" v-if="workflowMode === 'application' || workflowMode === 'application-loop'" />
+      <el-tab-pane
+        label="智能体"
+        name="application"
+        v-if="workflowMode === WorkflowMode.Application || workflowMode === WorkflowMode.ApplicationLoop"
+      />
     </el-tabs>
 
     <KeepAlive>
@@ -50,7 +55,8 @@ function handleDragStart(node: NodeMenuItem, event: PointerEvent) {
       <ResourceNodeMenu
         v-else
         :key="activeTab"
-        :source="activeTab === 'tool' ? RESOURCE_TYPE.TOOL : RESOURCE_TYPE.APPLICATION"
+        :source="activeTab === 'application' ? RESOURCE_TYPE.APPLICATION : RESOURCE_TYPE.TOOL"
+        :data-source="activeTab === 'data-source'"
         @dragstart="handleDragStart"
         @select="emit('select', $event)"
       />

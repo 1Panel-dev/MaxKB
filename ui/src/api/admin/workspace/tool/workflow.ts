@@ -1,9 +1,10 @@
 import type LogicFlow from '@logicflow/core'
 import { get, put } from '../../core/request'
-import type { ToolWorkflowDetail } from '@/api/types'
+import type { DefaultModelSettingPayload, ToolWorkflowDetail } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 interface ToolWorkflowPayload {
+  default_model_setting?: DefaultModelSettingPayload
   work_flow: LogicFlow.GraphConfigData
 }
 

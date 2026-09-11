@@ -1,6 +1,6 @@
 import { del, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { Dict, KnowledgeItem } from '@/api/types'
+import type { Dict, KnowledgeDetail, KnowledgeItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
@@ -15,6 +15,11 @@ const getAllKnowledge = (query?: Dict<unknown>) => {
 /** 获取工作空间知识库分页列表。 */
 const getKnowledgePage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<KnowledgeItem>>(`${getPrefix()}/${page.currentPage}/${page.pageSize}`, query)
+}
+
+/** 获取工作空间知识库详情。 */
+const getKnowledgeDetail = (knowledgeId: string) => {
+  return get<KnowledgeDetail>(`${getPrefix()}/${knowledgeId}`)
 }
 
 /** 删除工作空间知识库。 */
@@ -50,6 +55,7 @@ const importKnowledgeBundle = (payload: FormData) => {
 export default {
   deleteKnowledge,
   getAllKnowledge,
+  getKnowledgeDetail,
   getKnowledgePage,
   putKnowledge,
   putLarkKnowledge,

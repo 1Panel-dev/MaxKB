@@ -288,6 +288,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `application-detail/overview/OverviewView.vue`                         | 智能体概览内容                         |
 | `application-detail/setting/SimpleSettingView.vue`                     | 简易智能体设置内容                     |
 | `workflow/application/ApplicationWorkflowView.vue`                     | 智能体工作流页面头部与全屏画布         |
+| `workflow/knowledge/KnowledgeWorkflowView.vue` | 知识库工作流加载、保存、发布与全屏画布 |
 | `workflow/tool/ToolWorkflowView.vue`                                   | 工具工作流页面头部与全屏画布           |
 | `chat/ChatView.vue`                                                    | Chat 入口的对话页面                    |
 | `error/NotFoundView.vue`                                               | Admin 未匹配路由和全局 404 页面        |
@@ -328,7 +329,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 ## 工作流页面布局
 
-`workflow/components/WorkflowViewLayout.vue` 由 `ApplicationWorkflowView` 和 `ToolWorkflowView`
+`workflow/components/WorkflowViewLayout.vue` 由 `ApplicationWorkflowView`、`ToolWorkflowView` 和 `KnowledgeWorkflowView`
 共同使用，统一全屏容器、页面头部、返回按钮、标题和保存时间展示。通过 `loading`、`title`、
 `saveTime` 传入展示状态，点击返回按钮触发 `back` 事件。
 
@@ -415,3 +416,15 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 共享模型不展示。页面传入完整 `RelatedResourcesApi`；Action 点击后
 按需挂载 `RelatedResourcesDrawer`，以模型类型打开，在 `closed` 后卸载。
 默认展示引用该模型的资源，资源名称仅展示文本，暂不支持打开目标资源。
+
+知识库工作流页面使用 `WorkflowMode.Knowledge` 和 `WorkflowMode.KnowledgeLoop`，空画布使用本地文件数据源节点。
+页面只通过 `getKnowledgeDetail` 返回的 `work_flow` 加载画布数据，发布前先校验并保存；返回知识库详情时检查未保存改动。
+
+`KnowledgeCard` 在非批量选择模式下通过 `click` 通知列表进入知识库详情。
+`knowledge-detail/WorkspaceKnowledgeDetailView.vue` 查询并展示知识库名称，复用
+`ResourceDetailLayout` 生成“文档”和“工作流”目录，返回列表时恢复所属文件夹。
+`knowledge-detail/document/DocumentListView.vue` 为文档列表子页面，目前保留占位内容；
+文档详情作为同一容器的子路由。System 详情仍使用原有独立占位页面。
+
+`KnowledgeWorkflowView` 复用 `DefaultModelSettingButton`，从知识库详情读取默认模型配置，
+随工作流保存提交并将配置传入画布；支持应用到所有节点，保存失败回滚至已保存配置。

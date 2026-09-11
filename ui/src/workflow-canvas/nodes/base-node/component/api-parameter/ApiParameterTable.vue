@@ -50,9 +50,21 @@ function deleteField(index: number) {
       row-key="variable"
       :max-height="undefined"
     >
-      <el-table-column label="参数" prop="variable" min-width="120" show-overflow-tooltip />
-      <el-table-column label="描述" prop="desc" min-width="120" show-overflow-tooltip />
-      <el-table-column label="默认值" prop="default_value" min-width="100" show-overflow-tooltip />
+      <el-table-column label="参数" prop="variable" min-width="120">
+        <template #default="{ row }">
+          <span class="block truncate" :title="row.variable">{{ row.variable }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="描述" prop="desc" min-width="120">
+        <template #default="{ row }">
+          <span class="block truncate" :title="row.desc">{{ row.desc }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="默认值" prop="default_value" min-width="100">
+        <template #default="{ row }">
+          <span class="block truncate" :title="row.default_value">{{ row.default_value }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="必填" width="55">
         <template #default="{ row }"><el-switch :model-value="Boolean(row.is_required)" disabled size="small" /></template>
       </el-table-column>

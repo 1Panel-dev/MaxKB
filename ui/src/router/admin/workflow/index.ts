@@ -14,4 +14,10 @@ export const workflowRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/workflow/tool/ToolWorkflowView.vue'),
     meta: { title: '工具工作流', resourceScope: 'workspace' },
   },
+  {
+    path: '/workspace/:workspaceId/knowledge/:knowledgeId/workflow',
+    name: 'workflow-knowledge',
+    component: () => import('@/views/workflow/knowledge/KnowledgeWorkflowView.vue'),
+    meta: { title: '知识库工作流', resourceScope: 'workspace' },
+  },
 ]

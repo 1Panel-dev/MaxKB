@@ -12,12 +12,14 @@ import { isWorkFlow } from '@/utils/application'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { applicationNode, toolLibNode, toolWorkflowLibNode } from '@/workflow-canvas/config/node-data'
 import { useRoute } from 'vue-router'
+import { WorkflowKind } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'ResourceNodeMenu' })
 
 const route = useRoute()
 const props = defineProps<{
   source: NodeMenuResourceSource
+  dataSource?: boolean
 }>()
 const emit = defineEmits<{
   dragstart: [node: NodeMenuItem, event: PointerEvent]
@@ -54,6 +56,7 @@ function createToolNode(tool: ToolItem): NodeMenuItem {
   node.properties = {
     ...node.properties,
     stepName: tool.name,
+    ...(tool.tool_type === TOOL_TYPE.DATA_SOURCE ? { kind: WorkflowKind.DataSource, condition: 'OR' } : {}),
     node_data: { ...cloneDeep(tool), input_field_list: inputFields, tool_lib_id: tool.id },
   }
   return node
@@ -74,13 +77,18 @@ function loadTools(folder?: FolderItem) {
   const isSharedFolder = folder?.id === FOLDER_ENTRY_ID.SHARED
   const requestApi = isSharedFolder ? SharedApi : ToolApi
   const folderQuery = {
-    tool_type_list: SUPPORTED_TOOL_TYPES,
+    ...(props.dataSource ? { tool_type: TOOL_TYPE.DATA_SOURCE } : { tool_type_list: SUPPORTED_TOOL_TYPES }),
     ...(!isSharedFolder ? { folder_id: folder?.id || FOLDER_ENTRY_ID.ALL } : {}),
   }
 
   return requestApi.getAllTool(folderQuery).then((tools) => {
     resourceItems.value = tools
-      .filter((tool) => tool.is_active && tool.id !== route.params?.toolId)
+      .filter(
+        (tool) =>
+          tool.is_active &&
+          tool.id !== route.params?.toolId &&
+          (props.dataSource ? tool.tool_type === TOOL_TYPE.DATA_SOURCE : SUPPORTED_TOOL_TYPES.includes(tool.tool_type)),
+      )
       .map((tool) => ({
         desc: tool.desc,
         icon: tool.icon,
@@ -93,7 +101,7 @@ function loadTools(folder?: FolderItem) {
 }
 
 function loadApplications(folder?: FolderItem) {
-    // TODO 共享资源和资源管理需要不同的api，后续需要拆分
+  // TODO 共享资源和资源管理需要不同的api，后续需要拆分
   const folderQuery = { folder_id: folder?.id || FOLDER_ENTRY_ID.ALL }
 
   return ApplicationApi.getAllApplication({ ...folderQuery, publish_status: 'published' }).then((res) => {
@@ -160,7 +168,7 @@ onMounted(() => {
                 <div class="flex min-w-0 items-center gap-2">
                   <ToolIcon v-if="isToolMenu" :icon="resource.icon" :size="24" :type="resource.toolType" />
                   <ApplicationIcon v-else :icon="resource.icon" :size="24" />
-                  <p class="min-w-0 flex-1 break-all truncate">{{ resource.name }}</p>
+                  <p class="min-w-0 flex-1 break-all truncate" :title="resource.name">{{ resource.name }}</p>
                   <el-tag v-if="resource.applicationType" size="small" :type="isWorkFlow(resource.applicationType) ? 'warning' : 'primary'">
                     {{ isWorkFlow(resource.applicationType) ? '高级' : '简易' }}
                   </el-tag>

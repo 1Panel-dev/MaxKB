@@ -46,8 +46,16 @@ function saveTitle(data: ToolFieldConfig) {
       </div>
     </div>
     <MkTable v-if="fields.length" v-model:data="fields" size="small" row-key="field" class="mt-2 border" :max-height="undefined">
-      <el-table-column prop="field" label="参数" min-width="100" show-overflow-tooltip />
-      <el-table-column prop="label" label="显示名称" min-width="100" show-overflow-tooltip />
+      <el-table-column prop="field" label="参数" min-width="100">
+        <template #default="{ row }">
+          <span class="block truncate" :title="row.field">{{ row.field }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="label" label="显示名称" min-width="100">
+        <template #default="{ row }">
+          <span class="block truncate" :title="row.label">{{ row.label }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="80">
         <template #default="{ row, $index }">
           <!-- 编辑参数 -->

@@ -229,6 +229,7 @@ onMounted(() => {
 <template>
   <WorkflowViewLayout :loading="loading" :title="applicationDetail?.name" :save-time="saveTime" @back="handleBack">
     <template #actions>
+      <!-- 默认模型设置 -->
       <DefaultModelSettingButton
         :model-value="defaultModelSetting"
         :model-api="ModelApi"
@@ -237,9 +238,11 @@ onMounted(() => {
         @save="handleSaveDefaultModelSetting"
         @apply-to-all="handleApplyDefaultModelToAll"
       />
+      <!-- 保存 -->
       <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave()"> 保存 </el-button>
+      <!-- 调试 -->
       <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
-
+      <!-- 发布 -->
       <el-button type="primary" :loading="publishing" :disabled="loading || saving || publishing" @click="handlePublish"> 发布 </el-button>
       <!-- 更多工作流设置（预留）
 
