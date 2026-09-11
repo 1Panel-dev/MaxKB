@@ -427,26 +427,6 @@ class SendEmail(APIView):
             return result.success(serializer_obj.send())
 
 
-class CheckCode(APIView):
-    @extend_schema(
-        methods=["POST"],
-        summary=_("Check whether the verification code is correct"),
-        description=_("Check whether the verification code is correct"),
-        operation_id=_("Check whether the verification code is correct"),  # type: ignore
-        tags=[_("User Management")],  # type: ignore
-        request=CheckCodeAPI.get_request(),
-        responses=CheckCodeAPI.get_response(),
-    )
-    @log(
-        menu="User management",
-        operate="Check whether the verification code is correct",
-        get_operation_object=lambda r, k: {"name": r.data.get("email", None)},
-        get_user=lambda r: {"user_name": None, "email": r.data.get("email", None)},
-    )
-    def post(self, request: Request):
-        return result.success(CheckCodeSerializer(data=request.data).is_valid(raise_exception=True))
-
-
 class SendEmailToCurrentUserView(APIView):
     authentication_classes = [TokenAuth]
 

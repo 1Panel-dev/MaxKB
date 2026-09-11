@@ -13,7 +13,6 @@ urlpatterns = [
     path('user/logout', views.Logout.as_view(), name='logout'),
     path('user/language', views.SwitchUserLanguageView.as_view(), name='language'),
     path("user/send_email", views.SendEmail.as_view(), name='send_email'),
-    path("user/check_code", views.CheckCode.as_view(), name='check_code'),
     path("user/re_password", views.RePasswordView.as_view(), name='re_password'),
     path("user/current/send_email", views.SendEmailToCurrentUserView.as_view(), name="send_email_current"),
     path("user/current/reset_password", views.ResetCurrentUserPasswordView.as_view(), name="reset_password_current"),
@@ -33,4 +32,3 @@ urlpatterns = [
     path('system/workspace/<str:workspace_id>/user_group/<str:user_group_id>/remove_member', views.SystemUserGroupView.RemoveMember.as_view()),
     path('system/workspace/<str:workspace_id>/user_group/<str:user_group_id>/user_list/<int:current_page>/<int:page_size>', views.SystemUserGroupView.UserList.as_view()),
 ]
-
