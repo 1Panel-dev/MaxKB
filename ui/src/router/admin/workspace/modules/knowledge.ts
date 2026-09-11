@@ -32,12 +32,12 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             redirect: (to) => ({ name: 'workflow-knowledge', params: { workspaceId: to.params.workspaceId, knowledgeId: to.params.knowledgeId } }),
             meta: { title: '工作流', order: 20 },
           },
-          {
-            path: 'document/:documentId',
-            name: 'workspace-knowledge-document-detail',
-            component: () => import('@/views/knowledge-detail/DocumentDetailView.vue'),
-            meta: { title: '文档详情', hidden: true, detailActiveMenu: 'workspace-knowledge-document-list' },
-          },
+          // {
+          //   path: 'document/:documentId',
+          //   name: 'workspace-knowledge-document-detail',
+          //   component: () => import('@/views/knowledge-detail/DocumentDetailView.vue'),
+          //   meta: { title: '文档详情', hidden: true, detailActiveMenu: 'workspace-knowledge-document-list' },
+          // },
         ],
       },
     ],
