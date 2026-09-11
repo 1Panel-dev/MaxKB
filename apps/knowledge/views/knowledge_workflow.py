@@ -131,7 +131,7 @@ class KnowledgeWorkflowActionView(APIView):
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(
             KnowledgeWorkflowActionSerializer(data={"workspace_id": workspace_id, "knowledge_id": knowledge_id}).action(
-                request.data, request.user, True
+                request.data, request.user.profile, True
             )
         )
 

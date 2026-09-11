@@ -1047,9 +1047,9 @@ class KnowledgeScheduleTests(SimpleTestCase):
 
 
 class WorkflowKnowledgeScheduleTests(SimpleTestCase):
-    @patch("application.flow.i_step_node.merge_workflow_incremental_snapshot")
+    @patch("knowledge.serializers.knowledge_workflow.merge_workflow_incremental_snapshot")
     @patch("application.flow.i_step_node.get_workflow_state", return_value=KnowledgeActionState.SUCCESS)
-    @patch("application.flow.i_step_node.QuerySet")
+    @patch("knowledge.serializers.knowledge_workflow.QuerySet")
     def test_incremental_workflow_uses_stable_snapshot_merge(
         self, query_set, _get_workflow_state, merge_workflow_snapshot
     ):
@@ -1128,12 +1128,13 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
             str(sync_log.id),
         )
 
-    @patch("knowledge.serializers.knowledge_workflow.Workflow.new_instance")
-    @patch("knowledge.serializers.knowledge_workflow.KnowledgeWorkflowManage")
+    @patch("knowledge.serializers.knowledge_workflow.WorkflowRunRegistry")
+    @patch("knowledge.serializers.knowledge_workflow.new_instance")
+    @patch("knowledge.serializers.knowledge_workflow.WorkflowManage")
     @patch("knowledge.serializers.knowledge_workflow.KnowledgeAction.save")
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
     def test_manual_action_saves_input_for_later_scheduled_runs(
-        self, query_set, _save_action, workflow_manage, _new_workflow
+        self, query_set, _save_action, workflow_manage, _new_instance, _registry
     ):
         workflow = MagicMock(work_flow={})
         knowledge = MagicMock(

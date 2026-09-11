@@ -493,7 +493,7 @@ class ToolSerializer(serializers.Serializer):
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
                     if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
-                       raise AppApiException(500, _("Illegal download callback url"))
+                        raise AppApiException(500, _("Illegal download callback url"))
                     requests.get(download_callback_url, timeout=5, allow_redirects=False)
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
@@ -584,7 +584,7 @@ class ToolSerializer(serializers.Serializer):
                 ]
             }
             # 合并初始化参数（默认值 → 已保存的启动参数 → 运行时入参）
-            init_params_default_value = {i["field"]: i.get('default_value') for i in init_field_list}
+            init_params_default_value = {i["field"]: i.get("default_value") for i in init_field_list}
             # 合并初始化参数
             if init_params is not None:
                 all_params = init_params_default_value | init_params | params
@@ -649,9 +649,7 @@ class ToolSerializer(serializers.Serializer):
                 if instance.get("tool_type") == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get("code", ""))
 
-            if not QuerySet(Tool).filter(
-                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
-            ).exists():
+            if not QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).exists():
                 raise serializers.ValidationError(_("Tool not found"))
 
             edit_field_list = [
@@ -671,11 +669,9 @@ class ToolSerializer(serializers.Serializer):
                 if (field in instance and instance.get(field) is not None)
             }
 
-            tool = QuerySet(Tool).filter(
-                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
-            ).first()
+            tool = QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).first()
             if "init_params" in edit_dict:
-                if edit_dict["init_field_list"] is not None:
+                if edit_dict.get("init_field_list") is not None:
                     rm_key = []
                     for key in edit_dict["init_params"]:
                         if key not in [field["field"] for field in edit_dict["init_field_list"]]:
@@ -690,9 +686,9 @@ class ToolSerializer(serializers.Serializer):
                 edit_dict["init_params"] = rsa_long_encrypt(json.dumps(edit_dict["init_params"]))
 
             edit_dict["update_time"] = timezone.now()
-            QuerySet(Tool).filter(
-                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
-            ).update(**edit_dict)
+            QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).update(
+                **edit_dict
+            )
             if "is_active" in instance:
                 QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get("id")).update(
                     is_active=instance.get("is_active")
@@ -714,9 +710,7 @@ class ToolSerializer(serializers.Serializer):
             from trigger.serializers.trigger import TriggerModelSerializer
 
             self.is_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(
-                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
-            ).first()
+            tool = QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).first()
             if tool is None:
                 raise serializers.ValidationError(_("Tool not found"))
             if tool.template_id is None and tool.icon != "":
@@ -724,9 +718,7 @@ class ToolSerializer(serializers.Serializer):
             if tool.tool_type == ToolType.SKILL:
                 QuerySet(File).filter(id=tool.code).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=tool.id).delete()
-            QuerySet(Tool).filter(
-                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
-            ).delete()
+            QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).delete()
             ResourceMapping.objects.filter(Q(target_id=self.data.get("id")) | Q(source_id=self.data.get("id"))).delete()
             QuerySet(ToolRecord).filter(tool_id=self.data.get("id")).delete()
             trigger_ids = list(
@@ -735,9 +727,7 @@ class ToolSerializer(serializers.Serializer):
                 .values("trigger_id")
                 .distinct()
             )
-            QuerySet(TriggerTask).filter(
-                source_type="TOOL", source_id=self.data.get("id")
-            ).delete()
+            QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get("id")).delete()
             for trigger_id in trigger_ids:
                 trigger = Trigger.objects.filter(id=trigger_id["trigger_id"]).first()
                 if trigger and trigger.is_active:
@@ -889,9 +879,9 @@ class ToolSerializer(serializers.Serializer):
                     {
                         "type": "error"
                         if (
-                                item.get("code") == "E999"
-                                or str(item.get("code") or "").startswith("E9")
-                                or item.get("code") in ["F821", "F822", "F823"]
+                            item.get("code") == "E999"
+                            or str(item.get("code") or "").startswith("E9")
+                            or item.get("code") in ["F821", "F822", "F823"]
                         )
                         else "warning",
                         "module": "",
@@ -1017,7 +1007,7 @@ class ToolSerializer(serializers.Serializer):
                     {**tool, "id": update_tool_map.get(tool.get("id"))}
                     for tool in tool_list
                     if not exits_tool_id_list.__contains__(tool.get("id"))
-                       and not exits_tool_id_list.__contains__(
+                    and not exits_tool_id_list.__contains__(
                         new_uuid.generate_uuid(tool.get("id"))
                         if new_child_policy == 2
                         else generate_uuid((tool.get("id") + workspace_id or ""))
@@ -1229,9 +1219,7 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 AddInternalToolRequest(data=instance).is_valid(raise_exception=True)
 
-            internal_tool = QuerySet(Tool).filter(
-                id=self.data.get("tool_id"), scope=ToolScope.INTERNAL
-            ).first()
+            internal_tool = QuerySet(Tool).filter(id=self.data.get("tool_id"), scope=ToolScope.INTERNAL).first()
             if internal_tool is None:
                 raise AppApiException(500, _("Tool does not exist"))
 
@@ -1403,9 +1391,9 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             if not validate_trusted_url(self.data.get("download_url"), ALLOWED_DOWNLOAD_HOSTS):
                 raise AppApiException(500, _("Illegal download url"))
-            tool = QuerySet(Tool).filter(
-                id=self.data.get("tool_id"), workspace_id=self.data.get("workspace_id")
-            ).first()
+            tool = (
+                QuerySet(Tool).filter(id=self.data.get("tool_id"), workspace_id=self.data.get("workspace_id")).first()
+            )
             if tool is None:
                 raise AppApiException(500, _("Tool does not exist"))
             # 查找匹配的版本名称
@@ -1637,15 +1625,15 @@ class ToolSerializer(serializers.Serializer):
                 )
                 try:
                     for r in model.stream(
-                            [
-                                # SystemMessage(content=SYSTEM_ROLE),
-                                *[
-                                    HumanMessage(content=m.get("content"))
-                                    if m.get("role") == "user"
-                                    else AIMessage(content=m.get("content"))
-                                    for m in messages
-                                ]
+                        [
+                            # SystemMessage(content=SYSTEM_ROLE),
+                            *[
+                                HumanMessage(content=m.get("content"))
+                                if m.get("role") == "user"
+                                else AIMessage(content=m.get("content"))
+                                for m in messages
                             ]
+                        ]
                     ):
                         yield "data: " + json.dumps({"content": r.content}) + "\n\n"
                 except Exception as e:
@@ -1809,8 +1797,9 @@ class ToolTreeSerializer(serializers.Serializer):
         def page_tool_with_folders(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
 
-            workspace_manage = is_workspace_manage_permission_read(self.data.get("user_id"),
-                                                                   self.data.get("workspace_id"), 'TOOL:READ')
+            workspace_manage = is_workspace_manage_permission_read(
+                self.data.get("user_id"), self.data.get("workspace_id"), "TOOL:READ"
+            )
             is_x_pack_ee = self.is_x_pack_ee()
             result = native_page_search(
                 current_page,
@@ -1838,8 +1827,9 @@ class ToolTreeSerializer(serializers.Serializer):
         def get_tools(self):
             self.is_valid(raise_exception=True)
 
-            workspace_manage = is_workspace_manage_permission_read(self.data.get("user_id"),
-                                                                   self.data.get("workspace_id"), 'TOOL:READ')
+            workspace_manage = is_workspace_manage_permission_read(
+                self.data.get("user_id"), self.data.get("workspace_id"), "TOOL:READ"
+            )
             is_x_pack_ee = self.is_x_pack_ee()
             results = native_search(
                 self.get_query_set(workspace_manage, is_x_pack_ee),

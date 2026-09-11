@@ -14,6 +14,7 @@ import { defaultKnowledgeNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import DefaultModelSettingButton from '../components/default-model-setting/DefaultModelSettingButton.vue'
+import DebugDrawer from './debug/DebugDrawer.vue'
 
 defineOptions({ name: 'KnowledgeWorkflowView' })
 
@@ -92,6 +93,24 @@ function saveKnowledgeWorkflow(graphData = getGraphData(), showMessage = false) 
 
 function handleSave() {
   return saveKnowledgeWorkflow(undefined, true).catch(() => {})
+}
+
+/* 调试：先落库未保存的画布改动，保证调试命中最新工作流 */
+const debugDrawerRef = useTemplateRef<InstanceType<typeof DebugDrawer>>('debugDrawerRef')
+
+function openDebug() {
+  const graphData = getGraphData()
+  if (graphData) debugDrawerRef.value?.open(graphData)
+}
+
+function handleDebug() {
+  if (hasUnsavedChanges()) {
+    saveKnowledgeWorkflow(undefined, false)
+      .then(() => openDebug())
+      .catch(() => {})
+    return
+  }
+  openDebug()
 }
 
 function handlePublish() {
@@ -180,6 +199,8 @@ onMounted(() => {
       />
       <!-- 保存 -->
       <el-button plain :loading="saving" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
+      <!-- 调试 -->
+      <el-button type="primary" plain :disabled="loading || saving || publishing" @click="handleDebug"> 调试 </el-button>
       <!-- 发布 -->
       <el-button type="primary" :loading="publishing" :disabled="loading || saving || publishing" @click="handlePublish"> 发布 </el-button>
     </template>
@@ -191,5 +212,8 @@ onMounted(() => {
       :loop-workflow-mode="WorkflowMode.KnowledgeLoop"
       :workflow-mode="WorkflowMode.Knowledge"
     />
+
+    <!-- 调试抽屉 -->
+    <DebugDrawer ref="debugDrawerRef" :knowledge-id="knowledgeId" />
   </WorkflowViewLayout>
 </template>

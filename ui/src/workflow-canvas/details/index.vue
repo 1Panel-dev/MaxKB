@@ -35,9 +35,28 @@ function nodeDetailComponent(type?: WorkflowNodeType): Component | null {
   return type ? (nodeDetailComponentMap.get(type) ?? null) : null
 }
 
-// 按 index 升序展示各节点执行详情。
-const sortedDetail = computed(() =>
-  [...props.detail].sort((a, b) => ((a?.index as number) || 0) - ((b?.index as number) || 0)),
+// 新引擎节点详情的 status 为枚举字符串，而 v3 详情契约（types/DetailContainer/BaseHeader）统一使用
+// v2 的数字状态码（200 成功 / 202 运行中 / 其余失败）。在详情进入 v3 渲染体系的唯一入口做一次适配，
+// 已是数字（如历史数据或预览 mock）则原样透传。嵌套子节点会在递归渲染时经本入口再次适配。
+const STATUS_CODE_MAP: Record<string, number> = {
+  SUCCESS: 200,
+  RUNNING: 202,
+  BEFORE_RUNNING: 202,
+  CANCELLED: 201,
+  FAIL: 500,
+}
+
+function coerceStatus(status: unknown): number | undefined {
+  if (typeof status === 'number') return status
+  if (typeof status === 'string') return STATUS_CODE_MAP[status] ?? 500
+  return status as undefined
+}
+
+// 按 index 升序展示各节点执行详情，并把枚举状态适配为数字状态码。
+const sortedDetail = computed<ExecutionNodeDetail[]>(() =>
+  [...props.detail]
+    .sort((a, b) => ((a?.index as number) || 0) - ((b?.index as number) || 0))
+    .map((item) => ({ ...item, status: coerceStatus(item.status) })),
 )
 </script>
 

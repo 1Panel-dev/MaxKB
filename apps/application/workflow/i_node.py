@@ -15,7 +15,8 @@ from typing import Optional, Type, Callable
 from rest_framework import serializers
 
 from application.workflow.common import Node
-from application.workflow.message.struct.content import Content
+from application.workflow.message.struct.content import Content, NodeInfo, Position
+from application.workflow.message.struct.progress_content import ProgressContent
 from application.workflow.status import Status
 from common.utils.logger import maxkb_logger
 
@@ -108,6 +109,14 @@ class INode:
         执行节点
         @return:
         """
+        self.write(
+            ProgressContent(
+                self.node.id,
+                Status.BEFORE_RUNNING,
+                NodeInfo(self.get_node_id(), self.get_node_name(), Status.BEFORE_RUNNING),
+                Position(self.get_node_id()),
+            )
+        )
         self.execute()
         self.complete(Status.SUCCESS)
 

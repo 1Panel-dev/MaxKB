@@ -3,13 +3,13 @@ import asyncio
 import base64
 import json
 import pickle
+import time
 from copy import deepcopy
 from functools import reduce
 from typing import Dict, List
 
 import requests
 import uuid_utils.compat as uuid
-from django.core.cache import cache
 from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpResponse
@@ -17,13 +17,14 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 
-from application.flow.common import Workflow, WorkflowMode
-from application.flow.i_step_node import KnowledgeWorkflowPostHandler
-from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
-from application.flow.step_node import get_node
-from application.flow.tools import get_tool_id_list, save_workflow_mapping
+from application.workflow.common import WorkflowType, new_instance
+from application.workflow.i_node import Signal
+from application.workflow.nodes import get_node_class
+from application.workflow.resource import get_tool_id_list, save_workflow_mapping
+from application.workflow.status import Status
+from application.workflow.workflow_manage import CallBack, WorkflowManage
+from application.workflow.workflow_run_registry import WorkflowRunRegistry
 from application.mcp_tools import get_mcp_tools
-from common.constants.cache_version import Cache_Version
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
@@ -42,11 +43,17 @@ from knowledge.models import (
     KnowledgeWorkflowVersion,
     File,
     FileSourceType,
+    Document,
+    DocumentResourceType,
+    KnowledgeSyncLog,
+    KnowledgeSyncStatus,
+    KnowledgeSyncType,
 )
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.common import update_resource_mapping_by_knowledge
 from knowledge.serializers.knowledge_model import KnowledgeModelSerializer
 from knowledge.services.document_cleanup import delete_document_data
+from knowledge.services.workflow_sync import merge_workflow_incremental_snapshot
 from system_manage.models import AuthTargetType
 from system_manage.models.resource_mapping import ResourceType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
@@ -79,6 +86,56 @@ def hand_node(node, update_tool_map):
     if node.get("type") == "tool-workflow-lib-node":
         tool_lib_id = node.get("properties", {}).get("node_data", {}).get("tool_lib_id") or ""
         node.get("properties", {}).get("node_data", {})["tool_lib_id"] = update_tool_map.get(tool_lib_id, tool_lib_id)
+
+
+def finalize_knowledge_action(knowledge_action_id, state, run_time, sync_log_id=None, document_cleanup=None):
+    """
+    知识库工作流执行结束后的收尾:更新 KnowledgeAction 的最终状态/耗时,并在同步场景下收尾 KnowledgeSyncLog。
+    与具体执行引擎解耦——state/run_time 由调用方按各自引擎算好传入。
+    """
+    QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(state=state, run_time=run_time)
+    if sync_log_id is not None:
+        sync_log = QuerySet(KnowledgeSyncLog).filter(id=sync_log_id).first()
+        if sync_log is not None:
+            if (
+                state == State.SUCCESS
+                and sync_log.sync_type == KnowledgeSyncType.INCREMENTAL
+                and document_cleanup is not None
+            ):
+                stats = merge_workflow_incremental_snapshot(sync_log)
+            else:
+                stats = {
+                    "total_count": QuerySet(Document)
+                    .filter(
+                        knowledge_id=sync_log.knowledge_id,
+                        resource_type=DocumentResourceType.DOCUMENT,
+                    )
+                    .count(),
+                    "synced_count": QuerySet(Document)
+                    .filter(
+                        knowledge_id=sync_log.knowledge_id,
+                        type=KnowledgeType.WORKFLOW,
+                        resource_type=DocumentResourceType.DOCUMENT,
+                        create_time__gte=sync_log.create_time,
+                    )
+                    .count(),
+                    "skipped_count": 0,
+                    "deleted_count": sync_log.deleted_count,
+                    "failed_count": 0 if state == State.SUCCESS else 1,
+                }
+            is_success = state == State.SUCCESS
+            QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(
+                status=KnowledgeSyncStatus.SUCCESS
+                if is_success and not stats["failed_count"]
+                else KnowledgeSyncStatus.FAILURE,
+                total_count=stats["total_count"],
+                synced_count=stats["synced_count"],
+                skipped_count=stats["skipped_count"],
+                deleted_count=stats["deleted_count"],
+                failed_count=stats["failed_count"],
+                duration_ms=max(0, round(run_time * 1000)),
+                message=f"Workflow action {knowledge_action_id}: {state}",
+            )
 
 
 class KnowledgeWorkflowModelSerializer(serializers.ModelSerializer):
@@ -199,26 +256,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 "workspace_id": knowledge.workspace_id,
             },
         }
-        work_flow_manage = KnowledgeWorkflowManage(
-            Workflow.new_instance(knowledge_workflow.work_flow, WorkflowMode.KNOWLEDGE),
-            {
-                "knowledge_id": self.data.get("knowledge_id"),
-                "knowledge_action_id": knowledge_action_id,
-                "stream": True,
-                "workspace_id": self.data.get("workspace_id"),
-                "user_id": str(user.id),
-                **instance,
-            },
-            KnowledgeWorkflowPostHandler(None, knowledge_action_id, sync_log_id, delete_document_data),
-            is_the_task_interrupted=lambda: (
-                cache.get(
-                    Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_key(action_id=knowledge_action_id),
-                    version=Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_version(),
-                )
-                or False
-            ),
-        )
-        work_flow_manage.run()
+        self._launch_knowledge_workflow(instance, user, knowledge_action_id, knowledge_workflow.work_flow, sync_log_id)
         # 需要把文件改成永久文件
         data_source = instance.get("data_source") or {}
         file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
@@ -238,6 +276,66 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             "details": {},
             "meta": meta,
         }
+
+    def _launch_knowledge_workflow(self, instance: Dict, user, knowledge_action_id, work_flow, sync_log_id=None):
+        """
+        在新引擎上异步启动知识库工作流(action/upload_document 共用):
+        动态解析数据源起点 -> 注册到运行注册表(供停止)-> run() 每节点起线程立即返回,
+        最终状态由 on_complete 通过 finalize_knowledge_action 落库。
+        """
+        parameters = {
+            "knowledge_id": self.data.get("knowledge_id"),
+            "knowledge_action_id": knowledge_action_id,
+            "stream": True,
+            "workspace_id": self.data.get("workspace_id"),
+            "user_id": str(user.id),
+            **instance,
+        }
+        workflow = new_instance(work_flow, WorkflowType.KNOWLEDGE)
+        start_time = time.time()
+
+        def get_node_parameters(node):
+            return node.properties.get("node_data", {})
+
+        def get_start_node_fn(wf, wm):
+            # 知识库起点是数据源节点,由 data_source.node_id 指定(动态,非固定 start-node)
+            node_id = (instance.get("data_source") or {}).get("node_id")
+            node = wf.get_node(node_id) if node_id else None
+            if node is None:
+                raise AppApiException(500, _("The start node does not exist"))
+            return get_node_class(node.type, WorkflowType.KNOWLEDGE)(node, wm, get_node_parameters)
+
+        def on_next(wf_manage, content):
+            # 实时刷新节点详情,供前端轮询 KnowledgeAction 展示进度
+            QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(details=wf_manage.get_details())
+
+        def on_complete(wf_manage, error):
+            WorkflowRunRegistry.unregister(str(knowledge_action_id))
+            details = wf_manage.get_details()
+            cancelled = wf_manage.signal == Signal.CANCELLED
+            state = self.compute_knowledge_state(details, error, cancelled)
+            run_time = time.time() - start_time
+            QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(details=details)
+            finalize_knowledge_action(knowledge_action_id, state, run_time, sync_log_id, delete_document_data)
+
+        call_back = CallBack(on_next, on_complete)
+        work_flow_manage = WorkflowManage(workflow, parameters, WorkflowType.KNOWLEDGE, call_back, get_start_node_fn)
+        WorkflowRunRegistry.register(str(knowledge_action_id), None, work_flow_manage)
+        work_flow_manage.run()
+        return work_flow_manage
+
+    @staticmethod
+    def compute_knowledge_state(details, error, cancelled):
+        if cancelled:
+            return State.REVOKED
+        details = details or []
+        has_fail = any(d.get("status") == Status.FAIL.value and not d.get("enableException") for d in details)
+        if error or has_fail:
+            return State.FAILURE
+        write_exist = any(d.get("type") == "knowledge-write-node" for d in details)
+        if not write_exist:
+            return State.FAILURE
+        return State.SUCCESS
 
     def upload_document(self, instance: Dict, user, with_valid=True):
         if with_valid:
@@ -266,26 +364,8 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 "workspace_id": knowledge.workspace_id,
             },
         }
-        work_flow_manage = KnowledgeWorkflowManage(
-            Workflow.new_instance(knowledge_workflow_version.work_flow, WorkflowMode.KNOWLEDGE),
-            {
-                "knowledge_id": self.data.get("knowledge_id"),
-                "knowledge_action_id": knowledge_action_id,
-                "stream": True,
-                "workspace_id": self.data.get("workspace_id"),
-                "user_id": str(user.id),
-                **instance,
-            },
-            KnowledgeWorkflowPostHandler(None, knowledge_action_id),
-            is_the_task_interrupted=lambda: (
-                cache.get(
-                    Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_key(action_id=knowledge_action_id),
-                    version=Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_version(),
-                )
-                or False
-            ),
-        )
-        work_flow_manage.run()
+        # 线上上传走已发布版本的 work_flow,执行链路与 action 一致(新引擎异步执行)
+        self._launch_knowledge_workflow(instance, user, knowledge_action_id, knowledge_workflow_version.work_flow)
         return {
             "id": knowledge_action_id,
             "knowledge_id": self.data.get("knowledge_id"),
@@ -335,11 +415,8 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             if is_valid:
                 self.is_valid(raise_exception=True)
             knowledge_action_id = self.data.get("id")
-            cache.set(
-                Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_key(action_id=knowledge_action_id),
-                True,
-                version=Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_version(),
-            )
+            # action / upload_document 均在新引擎执行,统一向运行注册表发送停止信号
+            WorkflowRunRegistry.cancel_by_record_id(str(knowledge_action_id))
             QuerySet(KnowledgeAction).filter(
                 id=knowledge_action_id,
                 knowledge_id=self.data.get("knowledge_id"),
@@ -358,8 +435,9 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
         def action(self):
             self.is_valid(raise_exception=True)
             if self.data.get("type") == "local":
-                node = get_node(self.data.get("id"), WorkflowMode.KNOWLEDGE)
-                return node.__getattribute__(node, self.data.get("function_name"))(**self.data.get("params"))
+                # self.data["id"] 为数据源节点类型,取新引擎该节点类上的同名静态方法(如 get_form_list)
+                node_class = get_node_class(self.data.get("id"), WorkflowType.KNOWLEDGE)
+                return getattr(node_class, self.data.get("function_name"))(**self.data.get("params"))
             elif self.data.get("type") == "tool":
                 tool = QuerySet(Tool).filter(id=self.data.get("id")).first()
                 init_params = json.loads(rsa_long_decrypt(tool.init_params))
