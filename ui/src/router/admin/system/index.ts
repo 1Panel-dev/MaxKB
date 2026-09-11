@@ -68,7 +68,7 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'resource',
       name: 'system-resource',
       redirect: { name: 'system-resource-applications' },
-      meta: { title: '资源管理', icon: 'icon-setting', order: 20, resourceScope: 'system-resource' },
+      meta: { title: '资源管理', icon: 'icon_setting', order: 20, resourceScope: 'system-resource' },
       children: [
         { path: 'applications', name: 'system-resource-applications', component: () => import('@/views/system/SystemView.vue'), meta: { title: '智能体', order: 10 } },
         { path: 'knowledge', name: 'system-resource-knowledge', component: () => import('@/views/system/SystemView.vue'), meta: { title: '知识库', order: 20 } },
@@ -82,7 +82,7 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'share',
       name: 'system-share',
       redirect: { name: 'system-shared-knowledge' },
-      meta: { title: '共享资源', icon: 'icon-setting', order: 30, resourceScope: 'system-shared' },
+      meta: { title: '共享资源', icon: 'icon_setting', order: 30, resourceScope: 'system-shared' },
       children: [
         { path: 'knowledge', name: 'system-shared-knowledge', component: () => import('@/views/system/SystemView.vue'), meta: { title: '知识库', order: 10 } },
         { path: 'models', name: 'system-shared-models', component: () => import('@/views/system/shared-resources/SharedModelview.vue'), meta: { title: '模型', order: 20 } },
@@ -110,7 +110,7 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'settings',
       name: 'system-settings',
       redirect: { name: 'system-login-authentication' },
-      meta: { title: '系统设置', icon: 'icon-setting', order: 50 },
+      meta: { title: '系统设置', icon: 'icon_setting', order: 50 },
       children: [
         {
           path: 'authentication',

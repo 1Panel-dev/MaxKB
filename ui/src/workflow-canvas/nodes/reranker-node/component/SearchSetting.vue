@@ -31,7 +31,7 @@ function submit() {
 
 <template>
   <el-button text type="primary" title="参数设置" @click="open">
-    <MkIcon name="icon-setting" :size="20" />
+    <MkIcon name="icon_setting" :size="20" />
   </el-button>
   <MkDialog v-model="visible" align-center title="参数设置" width="550" @closed="resetData">
     <el-form ref="formRef" :model="formData" label-position="top" @submit.prevent>

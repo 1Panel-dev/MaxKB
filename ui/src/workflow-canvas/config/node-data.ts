@@ -89,7 +89,7 @@ export const toolBaseNode = {
 export const toolStartNode = {
   id: WorkflowNodeType.ToolStartNode,
   type: WorkflowNodeType.ToolStartNode,
-  x: 946,
+  x: 846,
   y: 2600,
   text: '',
   properties: {
@@ -377,6 +377,16 @@ export const toolLibNode = {
   properties: { stepName: '工具节点', config: { fields: [{ label: '结果', value: 'result' }] } },
 }
 
+/**
+ * 工作流工具配置数据
+ */
+export const toolWorkflowLibNode = {
+  type: WorkflowNodeType.ToolWorkflowLib,
+  text: '工作流工具',
+  label: '工作流工具',
+  properties: { stepName: '工作流工具', config: { fields: [] } },
+}
+
 /* 循环节点 */
 
 export const loopNode = {
@@ -457,23 +467,12 @@ export const loopBreakNode = {
   properties: { width: 600, stepName: 'Break', config: { fields: [] } },
 }
 
-/**
- * 工作流工具配置数据
- */
-export const toolWorkflowLibNode = {
-  type: WorkflowNodeType.ToolWorkflowLib,
-  text: '工作流工具',
-  label: '工作流工具',
-  properties: { stepName: '工作流工具', config: { fields: [] } },
-}
-
 /* 文档分段 */
 export const documentSplitNode = {
   type: WorkflowNodeType.DocumentSplitNode,
   text: '按分段策略拆分输入文档内容，输出分段文本列表',
   label: '文档分段',
-  height: 252,
-  properties: { width: 500, stepName: '文档分段', config: { fields: [{ label: '分段列表', value: 'paragraph_list' }] } },
+  properties: { stepName: '文档分段', config: { fields: [{ label: '分段列表', value: 'paragraph_list' }] } },
 }
 
 export const dataSourceLocalNode = {

@@ -244,7 +244,7 @@ System 共享资源页面：
   component: () => import('@/views/system/SystemView.vue'),
   meta: {
     title: '系统设置',
-    icon: 'icon_setting_outlined',
+    icon: 'icon_setting',
     order: 60,
   },
 }

@@ -62,7 +62,7 @@ function removeExposedField(field: string) {
       <span>用户输入</span>
       <div class="flex items-center">
         <el-button text type="primary" title="用户输入设置" @click="settingDialogRef?.open(setting)">
-          <MkIcon name="icon-setting" />
+          <MkIcon name="icon_setting" />
         </el-button>
         <el-button text type="primary" @click="openFieldDialog()">
           <MkIcon name="icon_add_outlined" />

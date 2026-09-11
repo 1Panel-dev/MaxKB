@@ -188,7 +188,7 @@ function submit() {
 <template>
   <!-- 打开长期记忆设置 -->
   <el-button text type="primary" @click="open">
-    <MkIcon name="icon-setting" />
+    <MkIcon name="icon_setting" />
   </el-button>
   <MkDialog v-model="visible" title="长期记忆设置" align-center>
     <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>

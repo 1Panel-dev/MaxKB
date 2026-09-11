@@ -1,110 +1,63 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { cloneDeep, set } from 'lodash'
+import { useTemplateRef } from 'vue'
+import { cloneDeep } from 'lodash'
 import { MsgError } from '@/utils/message'
+import type { ToolOutputField, ToolFieldConfig } from '../../types'
 import OutputFieldFormDialog from './OutputFieldFormDialog.vue'
-import OutputTitleDialog from './OutputTitleDialog.vue'
+import TitleSettingDialog from './TitleSettingDialog.vue'
 
-const props = defineProps<{ nodeModel: any }>()
-const outputFieldFormDialogRef = ref<InstanceType<typeof OutputFieldFormDialog>>()
-const outputTitleDialogRef = ref<InstanceType<typeof OutputTitleDialog>>()
-const outputFieldList = ref<any[]>([])
-const outputFieldConfig = ref({ title: '输出参数' })
+const fields = defineModel<ToolOutputField[]>({ required: true })
+const config = defineModel<ToolFieldConfig>('config', { required: true })
+const fieldDialogRef = useTemplateRef<InstanceType<typeof OutputFieldFormDialog>>('fieldDialogRef')
+const titleDialogRef = useTemplateRef<InstanceType<typeof TitleSettingDialog>>('titleDialogRef')
 
-function openAddDialog(data?: any, index?: any) {
-  if (index !== undefined) {
-    currentIndex.value = index
+// 表格只维护列表和重名检查，节点入口统一同步变量。
+function saveField(data: ToolOutputField, index?: number) {
+  if (fields.value.some((field, fieldIndex) => field.field === data.field && fieldIndex !== index)) {
+    MsgError(`参数已存在：${data.field}`)
+    return
   }
-  outputFieldFormDialogRef.value?.open(data)
+  const nextFields = cloneDeep(fields.value)
+  if (index === undefined) nextFields.push(cloneDeep(data))
+  else nextFields.splice(index, 1, cloneDeep(data))
+  fields.value = nextFields
+  fieldDialogRef.value?.close()
 }
 
-function openChangeTitleDialog() {
-  outputTitleDialogRef.value?.open(outputFieldConfig.value)
+function deleteField(index: number) {
+  fields.value = cloneDeep(fields.value.filter((_, fieldIndex) => fieldIndex !== index))
 }
 
-function deleteField(index: any) {
-  outputFieldList.value = outputFieldList.value.filter((item, i) => i !== index)
-  set(props.nodeModel.properties, 'user_output_field_list', outputFieldList.value)
+function saveTitle(data: ToolFieldConfig) {
+  config.value = cloneDeep(data)
+  titleDialogRef.value?.close()
 }
-
-const currentIndex = ref<number | null>(null)
-function refreshFieldList(data: any) {
-  if (currentIndex.value !== null) {
-    if (
-      outputFieldList.value
-        .filter((item, index) => index != currentIndex.value)
-        .some((field) => field.field == data.field)
-    ) {
-      MsgError('参数已存在：' + data.field)
-      return
-    }
-    outputFieldList.value?.splice(currentIndex.value, 1, data)
-  } else {
-    if (outputFieldList.value.some((field) => field.field == data.field)) {
-      MsgError('参数已存在：' + data.field)
-      return
-    }
-    outputFieldList.value?.push(data)
-  }
-  set(props.nodeModel.properties, 'user_output_field_list', cloneDeep(outputFieldList.value))
-  outputFieldFormDialogRef.value?.close()
-  props.nodeModel.graphModel.getNodeModelById('tool-start-node')?.clearNextNodeField(true)
-  currentIndex.value = null
-}
-
-function refreshFieldTitle(data: any) {
-  outputFieldConfig.value = data
-  outputTitleDialogRef.value?.close()
-}
-
-onMounted(() => {
-  if (props.nodeModel.properties.user_output_config) {
-    outputFieldConfig.value = cloneDeep(props.nodeModel.properties.user_output_config)
-  }
-  if (props.nodeModel.properties.user_output_field_list) {
-    outputFieldList.value = cloneDeep(props.nodeModel.properties.user_output_field_list)
-  }
-})
 </script>
 
 <template>
-  <div class="flex-between mb-4">
-    <h6 class="break-all ellipsis lighter" style="max-width: 80%" :title="outputFieldConfig.title">
-      {{ outputFieldConfig.title }}
-    </h6>
-    <div>
-      <el-button type="primary" link @click="openChangeTitleDialog">
-        <MkIcon name="icon_setting_outlined" />
-      </el-button>
-      <span class="ml-4">
-        <el-button link type="primary" @click="openAddDialog()">
-          <MkIcon name="icon_add_outlined" class="mr-4" />
-          添加
-        </el-button>
-      </span>
+  <div class="w-full">
+    <div class="flex-between gap-2">
+      <span class="min-w-0 truncate" :title="config.title">{{ config.title }}</span>
+      <div class="flex shrink-0 items-center">
+        <!-- 设置标题 -->
+        <el-button text type="primary" @click="titleDialogRef?.open(config)"><MkIcon name="icon_setting" /></el-button>
+        <!-- 添加参数 -->
+        <el-button text type="primary" @click="fieldDialogRef?.open()"><MkIcon name="icon_add_outlined" /></el-button>
+      </div>
     </div>
+    <MkTable v-if="fields.length" v-model:data="fields" size="small" row-key="field" class="mt-2 border" :max-height="undefined">
+      <el-table-column prop="field" label="参数" min-width="100" show-overflow-tooltip />
+      <el-table-column prop="label" label="显示名称" min-width="100" show-overflow-tooltip />
+      <el-table-column label="操作" width="80">
+        <template #default="{ row, $index }">
+          <!-- 编辑参数 -->
+          <el-button text type="primary" @click="fieldDialogRef?.open(row, $index)"><MkIcon name="icon_edit_outlined" /></el-button>
+          <!-- 删除参数 -->
+          <el-button text type="primary" @click="deleteField($index)"><MkIcon name="icon_delete-trash_outlined" /></el-button>
+        </template>
+      </el-table-column>
+    </MkTable>
   </div>
-
-  <el-table :data="outputFieldList" class="mb-4">
-    <el-table-column prop="field" label="参数" />
-    <el-table-column prop="label" label="显示名称" />
-    <el-table-column label="操作" align="left" width="90">
-      <template #default="{ row, $index }">
-        <span class="mr-4">
-          <el-tooltip effect="dark" content="编辑" placement="top">
-            <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
-              <MkIcon name="icon_edit_outlined" />
-            </el-button>
-          </el-tooltip>
-        </span>
-        <el-tooltip effect="dark" content="删除" placement="top">
-          <el-button type="primary" text @click="deleteField($index)">
-            <MkIcon name="icon_delete_outlined" />
-          </el-button>
-        </el-tooltip>
-      </template>
-    </el-table-column>
-  </el-table>
-  <OutputFieldFormDialog ref="outputFieldFormDialogRef" @refresh="refreshFieldList" />
-  <OutputTitleDialog ref="outputTitleDialogRef" @refresh="refreshFieldTitle" />
+  <OutputFieldFormDialog ref="fieldDialogRef" @submit="saveField" />
+  <TitleSettingDialog ref="titleDialogRef" @submit="saveTitle" />
 </template>

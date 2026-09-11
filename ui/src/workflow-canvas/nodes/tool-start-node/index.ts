@@ -1,7 +1,8 @@
 import ToolStartNode from './index.vue'
 import ToolStartNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
-import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types.ts'
+import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
+import type { ToolOutputField } from '../tool-base-node/types'
 import type { Model } from '@logicflow/core'
 
 class ToolStartNodeView extends WorkflowNodeView {
@@ -21,9 +22,10 @@ class ToolStartNodeModel extends WorkflowNodeModel {
     })
 
     const toolBaseNode = this.graphModel.getNodeModelById(WorkflowNodeType.ToolBaseNode)
-    const output = (toolBaseNode?.properties?.user_output_field_list as any[])?.map((i: any) => {
-      return { label: i.label || i.name, value: i.field }
-    })
+    const output = ((toolBaseNode?.properties.user_output_field_list ?? []) as ToolOutputField[]).map((field) => ({
+      label: field.label || field.name || field.field,
+      value: field.field,
+    }))
 
     result.push({
       value: 'output',
