@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import JSEncrypt from 'jsencrypt'
 import type { FormInstance, FormRules } from 'element-plus'
+import ForgotPasswordApi from '@/api/admin/auth/forgot-password'
+import { useStore } from '@/stores'
+import { MsgSuccess } from '@/utils/message'
 import LoginLayout from './components/LoginLayout.vue'
 
 interface ForgotPasswordForm {
@@ -11,12 +15,20 @@ interface ForgotPasswordForm {
   verificationCode: string
 }
 
+const RESEND_WAIT_SECONDS = 60
+
 defineOptions({ name: 'ForgotPasswordView' })
 
 const router = useRouter()
+const { auth } = useStore()
 
 const forgotPasswordFormRef = ref<FormInstance>()
 const forgotPasswordForm = reactive<ForgotPasswordForm>({ confirmPassword: '', email: '', password: '', verificationCode: '' })
+
+const isSubmitting = ref(false)
+const isSendingCode = ref(false)
+const countdown = ref(0)
+let countdownTimer: number | undefined
 
 const validateConfirmPassword = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
   if (!value) {
@@ -41,14 +53,63 @@ const forgotPasswordRules = reactive<FormRules<ForgotPasswordForm>>({
   verificationCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
 })
 
+const startCountdown = () => {
+  countdown.value = RESEND_WAIT_SECONDS
+  countdownTimer = window.setInterval(() => {
+    countdown.value -= 1
+    if (countdown.value <= 0 && countdownTimer) {
+      window.clearInterval(countdownTimer)
+      countdownTimer = undefined
+    }
+  }, 1000)
+}
+
+const handleSendCode = async () => {
+  if (isSendingCode.value || countdown.value > 0 || !forgotPasswordFormRef.value) return
+
+  await forgotPasswordFormRef.value.validateField('email', async (valid) => {
+    if (!valid) return
+    isSendingCode.value = true
+    try {
+      await ForgotPasswordApi.postSendVerificationCode(forgotPasswordForm.email)
+      MsgSuccess('验证码已发送，请查收邮件')
+      startCountdown()
+    } finally {
+      isSendingCode.value = false
+    }
+  })
+}
+
 const handleResetPassword = async () => {
   if (!forgotPasswordFormRef.value) return
 
-  await forgotPasswordFormRef.value.validate((valid) => {
+  await forgotPasswordFormRef.value.validate(async (valid) => {
     if (!valid) return
-    // TODO: 接入忘记密码接口。
+    isSubmitting.value = true
+    try {
+      if (!auth.baseProfile) {
+        await auth.loadBaseProfile()
+      }
+      const encryptor = new JSEncrypt()
+      encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
+      const { confirmPassword: re_password, email, password, verificationCode: code } = forgotPasswordForm
+      const encryptedData = encryptor.encrypt(JSON.stringify({ password, re_password }))
+      if (!encryptedData) {
+        return
+      }
+
+      await ForgotPasswordApi.postResetPassword({ code, email, password: encryptedData, re_password: encryptedData, encrypted: true })
+      MsgSuccess('密码修改成功，请使用新密码登录')
+      router.push({ name: 'login' })
+    } finally {
+      isSubmitting.value = false
+    }
   })
 }
+
+onMounted(() => {
+  void auth.loadBaseProfile()
+})
 </script>
 
 <template>
@@ -68,7 +129,9 @@ const handleResetPassword = async () => {
       <el-form-item prop="verificationCode">
         <div class="flex w-full gap-3">
           <el-input v-model="forgotPasswordForm.verificationCode" placeholder="请输入验证码" />
-          <el-button plain class="w-35 shrink-0">获取验证码</el-button>
+          <el-button plain class="w-35 shrink-0" :disabled="countdown > 0" :loading="isSendingCode" @click="handleSendCode">
+            {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+          </el-button>
         </div>
       </el-form-item>
 
@@ -80,7 +143,7 @@ const handleResetPassword = async () => {
         <el-input v-model="forgotPasswordForm.confirmPassword" autocomplete="new-password" maxlength="30" placeholder="请输入确认密码" show-password type="password" />
       </el-form-item>
 
-      <el-button native-type="submit" type="primary" class="w-full">修改密码</el-button>
+      <el-button native-type="submit" type="primary" class="w-full" :loading="isSubmitting">修改密码</el-button>
     </el-form>
   </LoginLayout>
 </template>

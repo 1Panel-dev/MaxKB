@@ -25,3 +25,18 @@ export interface UpdatePasswordForm {
   password: string
   re_password: string
 }
+
+/** 忘记密码页面发送邮箱验证码的请求。 */
+export interface SendEmailRequest {
+  email: string
+  type: string
+}
+
+/** 忘记密码页面校验验证码并重置密码的请求。 */
+export interface ResetPasswordRequest {
+  email: string
+  code: string
+  password: string
+  re_password: string
+  encrypted?: boolean
+}
