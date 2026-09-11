@@ -78,7 +78,8 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 `config` 是随业务持续维护的配置层，增加、删除或调整节点时通常会更新：
 
 - `node-data.ts`：节点的静态定义和默认属性，只存放数据。
-- `node-mapping.ts`：节点类型到配置数据的映射、模式匹配和默认节点集合。
+- `node-mapping.ts`：节点类型到配置数据的映射、模式匹配和默认节点集合。知识库的
+  `defaultKnowledgeNodes` 使用本地文件数据源作为空工作流的初始节点。
 - `constants.ts`：仅供工作流画布使用的稳定常量。
 - `locale.ts`：预留的节点文案本地化配置；国际化接入前不参与当前逻辑。
 
@@ -88,7 +89,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 ### `node-menu/`
 
 `node-menu` 集中维护画布节点选择菜单。`menu.ts` 定义不同画布模式下的基础组件分组；
-`BasicNodeMenu.vue` 负责基础组件搜索和列表；`ResourceNodeMenu.vue` 负责工具与智能体的文件夹、
+`BasicNodeMenu.vue` 负责基础组件搜索和列表；`ResourceNodeMenu.vue` 负责工具、数据源与智能体的文件夹、
 搜索和资源列表；`index.vue` 只负责 Tabs 和事件汇总。`component/AddNode.vue` 负责画布右上角的
 悬浮入口、菜单显隐，以及点击添加和拖拽添加事件；画布入口传入 `workflowMode` 并完成节点创建。
 
@@ -96,6 +97,28 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 `tool_type: 'MCP'` 筛选；AI 对话的 `McpSettingDialog` 每次打开通过
 `store.force.getToolListWithShared` 刷新同类选项，关闭或重新打开后忽略旧响应，通过 `loaded`
 将工具详情提供给资源区回显；取消不修改已选配置。文件夹菜单继续使用 `getAllTool`，不复用这一路查询。
+
+知识库及知识库循环模式的“数据源”页签复用工具资源菜单和工具文件夹，通过 `dataSource`
+区分查询：数据源传 `tool_type: TOOL_TYPE.DATA_SOURCE`，普通工具传
+`tool_type_list: [TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW]`。当前工作空间使用 `ToolApi.getAllTool`，
+共享目录使用 `SharedApi.getAllTool`；菜单只展示启用且类型匹配的资源。
+数据源点击和拖拽共用节点构造，使用 `tool-lib-node`，写入 `kind: WorkflowKind.DataSource`、
+`condition: 'OR'`、`tool_lib_id` 与输入参数初始值；引用参数初始化为空数组，其余为空字符串。
+各资源页签通过独立的 KeepAlive key 保留目录和搜索状态，数据源不会进入智能体查询分支。
+
+### 表格文本省略
+
+`workflow-canvas/` 内所有表格及列禁止使用 `show-overflow-tooltip`（包括 `showOverflowTooltip` 写法）。
+需要省略的文本通过列的默认插槽渲染，统一使用 `span.block.truncate` 并绑定原生 `title`；
+标题与展示内容使用同一字段或格式化结果，参考 `base-node/component/user-input/UserInputTable.vue`。
+
+```vue
+<el-table-column prop="field" label="参数">
+  <template #default="{ row }">
+    <span class="block truncate" :title="row.field">{{ row.field }}</span>
+  </template>
+</el-table-column>
+```
 
 ### `nodes/`
 
@@ -187,6 +210,21 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 标题弹窗通过 `submit(config)` 提交。节点入口统一深拷贝写回 `properties` 顶层的原有字段与标题协议，
 增删、编辑及排序后刷新工具开始节点的全局变量并清空下游字段缓存。工具开始节点保留
 `global` 输入与 `output` 输出分组、旧字段的 `name` 回退和全局变量引用复制。
+
+本地文件与 Web 数据源节点使用统一节点模型和容器，输出分别保留 `file_list` 与 `document_list`。
+本地文件节点在初始化时补齐文件格式、数量和大小限制，保留自定义格式；表单校验必选格式和
+1–1000 范围的整数限制。格式选择器不 Teleport，并接入锚点保护。Web 节点没有可编辑配置，
+不再保留未使用的文档引用表单，也不改写已有 `node_data`。
+
+知识库写入节点使用统一 `WorkflowNodeModel`、`NodeContainer` 和 `NodeCascader`，保留
+`node_data.document_list` 引用协议；必填和引用有效性校验统一由表单执行。初始化补齐引用数组，
+仅在旧配置未声明 `is_result` 且节点位于流程末端时设为 `true`，不覆盖已保存的输出设置。
+
+知识库基本信息节点同样由节点入口管理 `properties.user_input_field_list`、`user_input_config`，
+`UserInputFieldTable` 通过 `v-model` / `v-model:config` 编辑文档设置和标题，使用 `MkTable` 排序。
+字段弹窗复用 `MkDynamicsFormConstructor`，保留原有七种输入类型及旧 input/select/date 字段兼容，
+标题和字段弹窗统一使用 `MkDialog`。增删、编辑及排序后同步 `config.globalFields` 并失效下游缓存，
+输出固定保留 `global.knowledge`，复制引用使用 `copyText`；输出计算不再修改节点数据。
 
 基本信息节点的 `component/LongTermSetting.vue` 同时封装长期记忆设置按钮与弹窗，
 通过 `v-model` 接收 `LongTermSetting`，模型与供应商选项由节点入口传入。节点入口根据长期记忆
@@ -334,7 +372,7 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 ## View 接入约定
 
 - 所有画布路由页面均放在 `src/views/workflow/`，并以 `XxxWorkflowView.vue` 命名，例如
-  `ApplicationWorkflowView.vue`。未来的智能体画布、知识库画布等都遵守此规则。
+  `ApplicationWorkflowView.vue`、`KnowledgeWorkflowView.vue`。
 - View 在 `WorkflowCanvas` 外部组织页面头部的保存、发布、调试等页面级操作；添加组件属于画布操作，
   由 `WorkflowCanvas` 内的 `AddNode` 统一提供。
 - 画布页面需要独立全屏展示时，由 `src/router/admin/workflow/` 配置不挂载业务 Layout 的路由；

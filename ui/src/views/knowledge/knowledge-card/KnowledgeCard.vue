@@ -4,10 +4,14 @@ import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'KnowledgeCard' })
 
-defineProps<{ knowledge: KnowledgeItem; shared?: boolean; selectable?: boolean; selected?: boolean }>()
+const props = defineProps<{ knowledge: KnowledgeItem; shared?: boolean; selectable?: boolean; selected?: boolean }>()
 
-const emit = defineEmits<{ selected: [selected: boolean] }>()
+const emit = defineEmits<{ click: []; selected: [selected: boolean] }>()
 defineSlots<{ 'action-dropdown'?: () => unknown }>()
+
+function handleOpen() {
+  if (!props.selectable) emit('click')
+}
 </script>
 
 <template>
@@ -17,6 +21,8 @@ defineSlots<{ 'action-dropdown'?: () => unknown }>()
     :title="knowledge.name"
     :selectable="selectable"
     :selected="selected"
+    :class="{ 'cursor-pointer': !selectable }"
+    @click="handleOpen"
     @selected="emit('selected', $event)"
   >
     <template #icon>

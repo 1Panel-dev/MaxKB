@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
@@ -12,6 +13,17 @@ import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
 import { AuthorizeKnowledgeAction, DeleteKnowledgeAction, MoveKnowledgeAction } from './knowledge-card/action-dropdown'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+
+/* 知识库详情入口 */
+const route = useRoute()
+const router = useRouter()
+
+function handleOpenKnowledge(knowledge: KnowledgeItem) {
+  void router.push({
+    name: 'workspace-knowledge-detail',
+    params: { workspaceId: route.params.workspaceId, knowledgeId: knowledge.id },
+  })
+}
 
 /* 当前文件夹 */
 const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.KNOWLEDGE].all })
@@ -205,6 +217,7 @@ function handleBatchDelete() {
                 :shared="isShared"
                 :selectable="batchSelectionMode"
                 :selected="selectedKnowledgeIds.includes(knowledge.id)"
+                @click="handleOpenKnowledge(knowledge)"
                 @selected="handleKnowledgeSelect(knowledge.id, $event)"
               >
                 <template v-if="!isShared" #action-dropdown>

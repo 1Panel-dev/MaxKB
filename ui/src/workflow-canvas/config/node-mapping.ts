@@ -92,3 +92,5 @@ export const nodeDict: Partial<Record<WorkflowNodeType, ShapeItem>> = {
 }
 export const defaultApplicationNodes = [NodeData.baseNode, NodeData.startNode]
 export const defaultToolNodes = [NodeData.toolBaseNode, NodeData.toolStartNode]
+
+export const defaultKnowledgeNodes = [NodeData.dataSourceLocalNode]

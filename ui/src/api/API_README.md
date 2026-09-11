@@ -56,6 +56,7 @@ src/api/
   入口，也不创建汇总所有业务接口的 `api.ts`。
 - 工具基础信息和工具工作流使用后端不同资源接口：`workspace/tool/tool.ts` 维护工具增删改查，
   `workspace/tool/workflow.ts` 维护工具工作流的加载、保存和发布。
+  工具工作流保存请求的 `default_model_setting` 与详情响应统一复用 `DefaultModelSettingPayload`。
 - 每个业务接口函数必须添加简短的 JSDoc，说明接口的业务作用；注释应描述“获取什么”“保存什么”
   或“对哪个资源执行什么操作”，不重复参数类型、请求方法等代码已经清楚表达的信息。
 - 每个业务接口使用 `const` 声明的箭头函数，不单独具名导出；在文件末尾通过
@@ -225,3 +226,11 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 `putBatchDeleteTrigger(ids)` 提交 `{ id_list }` 到 `batch_delete`。单项启停通过 `putTrigger`
 仅提交 `is_active`。`Trigger` 为分页摘要，`TriggerDetail` 为含任务参数的完整详情；
 `TriggerPayload` 用于新建和编辑，ID 在新建前生成以展示事件回调 URL。
+
+### 知识库工作流
+
+`workspace/knowledge/knowledge.ts` 的 `getKnowledgeDetail` 返回 `KnowledgeDetail`，包含知识库
+名称、所属目录，以及工作流类型的 `work_flow` 和发布状态；进入画布只调用此详情接口加载。
+`workspace/knowledge/workflow.ts` 维护保存和发布，保存提交 `work_flow`，响应使用
+`KnowledgeWorkflowDetail`。前端详情与保存协议的 `default_model_setting` 复用
+`DefaultModelSettingPayload`；服务端需支持该字段的持久化与回传（当前仓库知识库后端尚未实现）。
