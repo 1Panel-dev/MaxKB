@@ -575,7 +575,7 @@ class ChatInfo:
 
 
 def update_resource_mapping_by_application(application_id: str, other_resource_mapping=None):
-    from application.flow.tools import (
+    from system_manage.services.resource_mapping import (
         application_instance_field_call_dict,
         get_instance_resource,
         save_workflow_mapping,

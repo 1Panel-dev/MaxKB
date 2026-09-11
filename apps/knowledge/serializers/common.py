@@ -17,7 +17,11 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.flow.tools import save_workflow_mapping, get_instance_resource, knowledge_instance_field_call_dict
+from system_manage.services.resource_mapping import (
+    save_workflow_mapping,
+    get_instance_resource,
+    knowledge_instance_field_call_dict,
+)
 from common.config.embedding_config import ModelManage
 from common.db.search import native_search
 from common.db.sql_execute import sql_execute, update_execute

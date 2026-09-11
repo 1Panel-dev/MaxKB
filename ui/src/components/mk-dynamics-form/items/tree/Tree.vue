@@ -68,8 +68,8 @@ const loadNode: LoadFunction = (node, resolve) => {
     ),
     body: { current_node: node.level === 0 ? undefined : node.data },
     then: (res: DynamicFormValue) => {
-      resolve(res.data)
-      res.data.forEach((childNode: DynamicFormValue) => {
+      resolve(res)
+      res.forEach((childNode: DynamicFormValue) => {
         if (childNode.is_exist) {
           treeRef.value?.setChecked(childNode.token, true, false)
         }

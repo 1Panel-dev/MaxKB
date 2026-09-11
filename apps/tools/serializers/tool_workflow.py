@@ -622,7 +622,7 @@ class StoreToolWorkflow(serializers.Serializer):
 
 
 def update_resource_mapping_by_tool(tool_id: str, other_resource_mapping=None):
-    from application.flow.tools import get_instance_resource, save_workflow_mapping
+    from system_manage.services.resource_mapping import get_instance_resource, save_workflow_mapping
     from system_manage.models.resource_mapping import ResourceType
 
     if other_resource_mapping is None:

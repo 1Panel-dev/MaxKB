@@ -1128,12 +1128,13 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
             str(sync_log.id),
         )
 
-    @patch("knowledge.serializers.knowledge_workflow.Workflow.new_instance")
-    @patch("knowledge.serializers.knowledge_workflow.KnowledgeWorkflowManage")
+    @patch("knowledge.serializers.knowledge_workflow.WorkflowRunRegistry")
+    @patch("knowledge.serializers.knowledge_workflow.new_instance")
+    @patch("knowledge.serializers.knowledge_workflow.WorkflowManage")
     @patch("knowledge.serializers.knowledge_workflow.KnowledgeAction.save")
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
     def test_manual_action_saves_input_for_later_scheduled_runs(
-        self, query_set, _save_action, workflow_manage, _new_workflow
+        self, query_set, _save_action, workflow_manage, _new_instance, _registry
     ):
         workflow = MagicMock(work_flow={})
         knowledge = MagicMock(

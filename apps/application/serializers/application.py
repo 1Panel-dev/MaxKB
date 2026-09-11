@@ -1170,7 +1170,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 self.is_valid()
             application_id = self.data.get("application_id")
             application = QuerySet(Application).filter(id=application_id).first()
-            from application.flow.tools import get_tool_id_list
+            from system_manage.services.resource_mapping import get_tool_id_list
 
             tool_id_list = get_tool_id_list(application.work_flow, True)
             if len(tool_id_list) > 0:

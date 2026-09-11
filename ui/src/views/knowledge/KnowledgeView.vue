@@ -11,6 +11,7 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
+import CreateWorkflowKnowledgeDialog from './create-knowledge/CreateWorkflowKnowledgeDialog.vue'
 import {
   AuthorizeKnowledgeAction,
   DeleteKnowledgeAction,
@@ -47,6 +48,13 @@ function handleFolderSelect(folder: FolderItem) {
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
 function handleCreateFolder() {
   folderTreeRef.value?.openCreate()
+}
+
+/* 创建知识库 */
+const createFolderId = computed(() => currentFolder.value.id || FOLDER_ENTRY_ID.ALL)
+const createWorkflowKnowledgeDialogRef = useTemplateRef<InstanceType<typeof CreateWorkflowKnowledgeDialog>>('createWorkflowKnowledgeDialogRef')
+function handleCreateWorkflowKnowledge() {
+  createWorkflowKnowledgeDialogRef.value?.open()
 }
 
 /* 知识库查询 */
@@ -201,7 +209,7 @@ function handleBatchDelete() {
                 <MkDropdownMenu class="w-52!">
                   <MkDropdownItem>通用知识库</MkDropdownItem>
                   <MkDropdownItem>Web 站点知识库</MkDropdownItem>
-                  <MkDropdownItem>工作流知识库</MkDropdownItem>
+                  <MkDropdownItem @click="handleCreateWorkflowKnowledge">工作流知识库</MkDropdownItem>
                   <MkDropdownItem divided>导入创建</MkDropdownItem>
                 </MkDropdownMenu>
               </template>
@@ -279,4 +287,6 @@ function handleBatchDelete() {
   </MkViewLayout>
 
   <MoveToDialog ref="batchMoveToDialogRef" :loading="knowledgeOperationLoading" :source="RESOURCE_TYPE.KNOWLEDGE" @submit="handleBatchMove" />
+
+  <CreateWorkflowKnowledgeDialog ref="createWorkflowKnowledgeDialogRef" :folder-id="createFolderId" />
 </template>
