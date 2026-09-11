@@ -1,8 +1,8 @@
 import type LogicFlow from '@logicflow/core'
-import { defaultNodes } from '@/workflow-canvas/config/node-mapping'
+import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
 
 export const applicationTemplate = {
-  blank: { edges: [], nodes: defaultNodes },
+  blank: { edges: [], nodes: defaultApplicationNodes },
   assistant: {
     nodes: [
       {

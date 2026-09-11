@@ -97,7 +97,7 @@ from knowledge.serializers.knowledge_workflow import (
 from knowledge.task.embedding import delete_embedding_by_knowledge, embedding_by_knowledge
 from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_replace_web_knowledge, sync_web_knowledge
-from application.flow.tools import get_tool_id_list
+from system_manage.services.resource_mapping import get_tool_id_list
 from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
 
 
