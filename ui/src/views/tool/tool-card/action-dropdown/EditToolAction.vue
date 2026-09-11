@@ -27,7 +27,7 @@ const skillToolFormDrawerRef = useTemplateRef<InstanceType<typeof SkillToolFormD
 const workflowFormDialogRef = useTemplateRef<InstanceType<typeof WorkflowFormDialog>>('workflowFormDialogRef')
 
 function handleOpenToolForm() {
-  // 模板转换而来的工具只允许修改名称。
+  // TODO 模板转换而来的工具只允许修改名称。
   if (props.tool.template_id) {
     formMounted.value = true
     void nextTick(() =>
@@ -39,7 +39,7 @@ function handleOpenToolForm() {
     return
   }
 
-  // 有版本号的展示readme，是商店更新过来的
+  // TODO 有版本号的展示readme，是商店更新过来的
   if (props.tool.version) {
     formMounted.value = true
     void nextTick(() => {

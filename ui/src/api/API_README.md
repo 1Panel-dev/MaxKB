@@ -69,6 +69,12 @@ src/api/
   `import WorkspaceApi from '@/api/admin/system/workspace'`；System 登录设置使用
   `import AuthSettingApi from '@/api/admin/system/settings/auth-setting'`。
 
+### 当前账号密码
+
+`admin/auth/current-user.ts` 的 `postCurrentUserPassword` 向 `/user/current/reset_password`
+提交 RSA 加密的 `{ encryptedData }`。头像菜单的 `layout/avatar-dropdown/ChangePasswordDialog.vue`
+负责新密码与确认密码校验、加密和提交，成功后清除本地登录凭据并跳转登录页。
+
 ### 四类特殊资源 API
 
 `application`、`knowledge`、`model`、`tool` 是需要同时考虑 Workspace、System 资源管理和

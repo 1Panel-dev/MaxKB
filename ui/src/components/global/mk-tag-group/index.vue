@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { TagProps } from 'element-plus'
+
 defineOptions({ name: 'MkTagGroup' })
 
 withDefaults(
@@ -7,14 +9,18 @@ withDefaults(
     popoverDisabled?: boolean
     /** 标签文字 */
     tags?: string[]
+    /** 标签尺寸 */
+    size?: TagProps['size']
+    /** 首个标签的类型 */
+    type?: TagProps['type']
   }>(),
-  { popoverDisabled: false, tags: () => [] },
+  { popoverDisabled: false, tags: () => [], type: 'info' },
 )
 </script>
 
 <template>
   <span class="inline-flex items-center gap-1">
-    <el-tag type="info" :title="tags?.[0]">
+    <el-tag :type="type" :size="size" :title="tags?.[0]" :disable-transitions="true">
       {{ tags?.[0] }}
     </el-tag>
 
@@ -24,13 +30,14 @@ withDefaults(
       popper-class="mk-tag-group__popper"
       trigger="hover"
       :popper-style="{ maxWidth: '250px', width: 'auto' }"
+      :show-after="200"
       v-if="tags?.length > 1"
     >
       <template #reference>
-        <el-tag type="info" class="cursor-pointer">+{{ tags.length - 1 }}</el-tag>
+        <el-tag type="info" :size="size" class="cursor-pointer" :disable-transitions="true">+{{ tags.length - 1 }}</el-tag>
       </template>
       <div class="flex-wrap gap-2 px-4 py-3">
-        <el-tag v-for="tag in tags.slice(1)" :key="tag" type="info" :title="tag">
+        <el-tag v-for="tag in tags.slice(1)" :key="tag" type="info" :size="size" :title="tag" :disable-transitions="true">
           {{ tag }}
         </el-tag>
       </div>

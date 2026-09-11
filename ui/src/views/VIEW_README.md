@@ -400,8 +400,6 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 ## 触发器维护
 
 `trigger/TriggerView.vue` 负责列表查询、跨页选择、单项启停/删除及批量操作，通过
-`$perm.trigger` 控制工作空间级操作权限。删除最后一页数据后自动回退到有效页码；
-状态更新以接口成功为准，操作失败时保留原状态或选择。
 `trigger/TriggerFormDrawer.vue` 共用新建和编辑流程，编辑时查询详情并保留任务 ID、参数、
 启用状态及 meta。定时支持每日、每周、每月、间隔和五段 Cron；事件支持 URL、Token 和请求参数。
 任务选择复用 `SelectApplicationDialog` 与 `SelectToolDialog`，工具限定自定义和工作流类型。
@@ -409,13 +407,17 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 `trigger/task-parameters.ts` 从资源输入定义生成字段，只补全缺失值，不覆盖已有配置。
 保存时校验所有任务，包括折叠的任务；接口失败保持抽屉打开。
 
-## 模型关联资源 Action
+## 查看关联资源 Action
 
-`model/model-card/action-dropdown/RelatedResourcesModelAction.vue` 在工作空间模型卡片的更多菜单中
-提供“查看关联资源”，由 `ModelView` 按 `model.workspace.relateMap(model.id)` 控制入口权限，
-共享模型不展示。页面传入完整 `RelatedResourcesApi`；Action 点击后
-按需挂载 `RelatedResourcesDrawer`，以模型类型打开，在 `closed` 后卸载。
-默认展示引用该模型的资源，资源名称仅展示文本，暂不支持打开目标资源。
+模型、知识库、应用、工具卡片的 `action-dropdown/` 分别提供
+`RelatedResourcesModelAction`、`RelatedResourcesKnowledgeAction`、
+`RelatedResourcesApplicationAction`、`RelatedResourcesToolAction`，在更多菜单展示“查看关联资源”。
+列表页面按对应资源的 `workspace.relateMap(resource.id)` 控制入口权限，共享知识库、工具和模型不展示。
+页面传入完整 `RelatedResourcesApi` 和当前资源。Action 点击后按需挂载
+`RelatedResourcesDrawer`，传入对应 `RESOURCE_TYPE` 和包含 `workspace_id` 的资源快照；
+工作空间 ID 来自资源数据，缺失时提示并停止打开，关闭后卸载抽屉。
+模型及非工作流工具默认展示“引用此资源的资源”，其他资源默认展示“依赖的资源”。
+资源名称仅展示文本，暂不支持打开目标资源。
 
 知识库工作流页面使用 `WorkflowMode.Knowledge` 和 `WorkflowMode.KnowledgeLoop`，空画布使用本地文件数据源节点。
 页面只通过 `getKnowledgeDetail` 返回的 `work_flow` 加载画布数据，发布前先校验并保存；返回知识库详情时检查未保存改动。

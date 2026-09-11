@@ -68,12 +68,12 @@ function handleItemClick(option: TOption) {
     <slot :selected-option="selectedOption" :text="selectedText" />
 
     <template #dropdown>
-      <div class="w-70 overflow-hidden rounded-md">
+      <div class="min-w-70 max-w-80 overflow-hidden rounded-md">
         <div class="p-2 pb-1" @click.stop @keydown.stop>
           <MkSearchInput v-model="searchKeyword" />
         </div>
 
-        <el-scrollbar max-height="200px">
+        <el-scrollbar max-height="220px">
           <div class="px-1">
             <MkDropdownMenu>
               <MkDropdownItem

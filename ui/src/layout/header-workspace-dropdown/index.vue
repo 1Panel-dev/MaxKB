@@ -32,5 +32,5 @@ function handleWorkspaceSelect(workspace: WorkspaceItem) {
 </script>
 
 <template>
-  <WorkspaceDropdown v-model="selectedWorkspace" :options="workspaceOptions" @select="handleWorkspaceSelect" />
+  <WorkspaceDropdown v-model="selectedWorkspace" :options="workspaceOptions" @select="handleWorkspaceSelect" showRoleTags />
 </template>

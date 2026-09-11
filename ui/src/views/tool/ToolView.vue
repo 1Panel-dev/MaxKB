@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import { onMounted, computed, ref, useTemplateRef } from 'vue'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
@@ -14,6 +15,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolCard from './tool-card/ToolCard.vue'
 import {
   AuthorizeToolAction,
+  RelatedResourcesToolAction,
   CopyToolAction,
   DeleteToolAction,
   EditToolAction,
@@ -254,10 +256,13 @@ onMounted(() => {
                   <AuthorizeToolAction label="资源授权" :tool="tool" />
 
                   <!-- // TODO: 触发器 (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW')-->
-                  <!-- // TODO: 查看关联资源-->
-                  <!-- // TODO: 查看执行记录    (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW')-->
-                  <CopyToolAction v-model:loading="toolOperationLoading" label="复制" :api="ToolApi" :tool="tool" @refresh="refreshTool" />
+                  <!-- 查看关联资源 -->
+                  <RelatedResourcesToolAction label="查看关联资源" :api="RelatedResourcesApi" :tool="tool" />
 
+                  <!-- // TODO: 查看执行记录    (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW')-->
+                  <!-- 复制 -->
+                  <CopyToolAction v-model:loading="toolOperationLoading" label="复制" :api="ToolApi" :tool="tool" @refresh="refreshTool" />
+                  <!-- 移动到 -->
                   <MoveToolAction
                     v-model:loading="toolOperationLoading"
                     label="移动到"
@@ -266,6 +271,8 @@ onMounted(() => {
                     :tool="tool"
                     @delete="handleDeleteTool"
                   />
+                  <!-- 导出 -->
+                  <!-- 删除 -->
                   <ExportToolAction v-if="!tool.template_id" v-model:loading="toolOperationLoading" label="导出" :api="ToolApi" :tool="tool" />
                   <DeleteToolAction v-model:loading="toolOperationLoading" label="删除" :api="ToolApi" :tool="tool" @delete="handleDeleteTool" />
                 </template>

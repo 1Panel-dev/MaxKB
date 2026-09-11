@@ -23,4 +23,6 @@ const getCaptcha = (username?: string) => {
   return get<CaptchaResponse>('/user/captcha', { username })
 }
 
+
+
 export default { getCaptcha, postLdapLogin, postLogin, postLogout }
