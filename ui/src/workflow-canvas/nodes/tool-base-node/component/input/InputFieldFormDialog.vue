@@ -1,71 +1,46 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import type { FormInstance } from 'element-plus'
+import { ref, useTemplateRef } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
+import type { ToolInputField } from '../../types'
 
 const typeOptions = ['string', 'int', 'dict', 'array', 'float', 'boolean']
-const emit = defineEmits(['refresh'])
-const fieldFormRef = ref<FormInstance>()
-const loading = ref<boolean>(false)
-const isEdit = ref(false)
-const form = ref<any>({
-  field: '',
-  type: typeOptions[0],
-  label: '',
-  desc: '',
-  is_required: true,
-})
+const emit = defineEmits<{ submit: [data: ToolInputField, index?: number] }>()
+const formRef = useTemplateRef<FormInstance>('formRef')
+const dialogVisible = ref(false)
+const editingIndex = ref<number>()
+const form = ref<ToolInputField>(createField())
+const rules: FormRules<ToolInputField> = {
+  field: [{ required: true, message: '请输入参数', trigger: 'blur' }],
+  label: [{ required: true, message: '请输入显示名', trigger: 'blur' }],
+}
 
-const rules = reactive({
-  field: [
-    {
-      required: true,
-      message: '请输入参数',
-      trigger: 'blur',
-    },
-  ],
-  label: [
-    {
-      required: true,
-      message: '请输入显示名',
-      trigger: 'blur',
-    },
-  ],
-})
+function createField(): ToolInputField {
+  return { field: '', type: 'string', label: '', desc: '', is_required: true }
+}
 
-const dialogVisible = ref<boolean>(false)
+// 打开和关闭统一重置草稿，取消编辑不会影响下一次添加。
+function resetData() {
+  form.value = createField()
+  editingIndex.value = undefined
+  formRef.value?.clearValidate()
+}
 
-watch(dialogVisible, (bool) => {
-  if (!bool) {
-    form.value = {
-      field: '',
-      type: typeOptions[0],
-      label: '',
-      desc: '',
-      is_required: true,
-    }
-    isEdit.value = false
-  }
-})
-
-const open = (row: any) => {
-  if (row) {
-    form.value = cloneDeep(row)
-    isEdit.value = true
-  }
+function open(field?: ToolInputField, index?: number) {
+  resetData()
+  if (field) form.value = cloneDeep(field)
+  editingIndex.value = index
   dialogVisible.value = true
 }
 
-const submit = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await formEl.validate((valid) => {
-    if (valid) {
-      emit('refresh', form.value)
-    }
-  })
+function submitField() {
+  formRef.value
+    ?.validate()
+    .then(() => emit('submit', cloneDeep(form.value), editingIndex.value))
+    .catch(() => {})
 }
 
-const close = () => {
+function close() {
   dialogVisible.value = false
 }
 
@@ -73,15 +48,8 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog
-    :title="isEdit ? '编辑参数' : '添加参数'"
-    v-model="dialogVisible"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :destroy-on-close="true"
-    append-to-body
-  >
-    <el-form label-position="top" ref="fieldFormRef" :rules="rules" :model="form" require-asterisk-position="right">
+  <MkDialog v-model="dialogVisible" :title="editingIndex === undefined ? '添加参数' : '编辑参数'" align-center @closed="resetData">
+    <el-form label-position="top" ref="formRef" :rules="rules" :model="form" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="参数" prop="field">
         <el-input v-model="form.field" placeholder="请输入参数" :maxlength="64" show-word-limit @blur="form.field = form.field.trim()" />
       </el-form-item>
@@ -93,19 +61,21 @@ defineExpose({ open, close })
       </el-form-item>
       <el-form-item label="数据类型">
         <el-select v-model="form.type">
-          <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
+          <el-option v-for="fieldType in typeOptions" :key="fieldType" :label="fieldType" :value="fieldType" />
         </el-select>
       </el-form-item>
 
-      <el-form-item label="必填" @click.prevent>
+      <el-form-item label="必填">
         <el-switch size="small" v-model="form.is_required" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submit(fieldFormRef)" :loading="loading">
-          {{ isEdit ? '保存' : '添加' }}
+      <span>
+        <!-- 取消编辑 -->
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <!-- 提交参数 -->
+        <el-button type="primary" @click="submitField">
+          {{ editingIndex === undefined ? '添加' : '保存' }}
         </el-button>
       </span>
     </template>

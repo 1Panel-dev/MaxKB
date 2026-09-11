@@ -29,7 +29,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
             path: 'setting',
             name: 'workspace-application-simple-setting',
             component: () => import('@/views/application-detail/setting/SimpleSettingView.vue'),
-            meta: { title: '设置', icon: 'icon-setting', activeIcon: 'icon_setting_filled', order: 20 },
+            meta: { title: '设置', icon: 'icon_setting', activeIcon: 'icon_setting_filled', order: 20 },
           },
         ],
       },

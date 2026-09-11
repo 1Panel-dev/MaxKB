@@ -43,7 +43,7 @@ function resetData() {
 
 <template>
   <el-button text type="primary" @click="open">
-    <MkIcon name="icon-setting" />
+    <MkIcon name="icon_setting" />
   </el-button>
   <MkDialog v-model="visible" title="设置" @closed="resetData">
     <template #subtitle> 请根据模型返回的思考标签设置，标签中间的内容将会认定为思考过程</template>

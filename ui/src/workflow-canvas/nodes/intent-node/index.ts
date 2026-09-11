@@ -23,7 +23,7 @@ interface IntentNodeData {
 }
 
 /** 节点顶部到第一个分类行锚点的纵向偏移（近似）。 */
-const BRANCH_ANCHOR_TOP_OFFSET = 400
+const BRANCH_ANCHOR_TOP_OFFSET = 390
 /** 相邻分类行锚点的纵向间距（近似行高）。 */
 const BRANCH_ANCHOR_GAP = 40
 
@@ -88,7 +88,7 @@ class IntentNodeModel extends WorkflowNodeModel {
       if (mergeTarget) {
         anchors.push({
           x: x + width / 2,
-          y,
+          y: y,
           id: `${id}_${mergeTarget.id}_right`,
           type: 'right',
         })

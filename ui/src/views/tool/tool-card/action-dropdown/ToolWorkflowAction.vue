@@ -27,7 +27,7 @@ function handleOpenWorkflow(event: MouseEvent) {
 
 <template>
   <MkDropdownItem @click="handleOpenWorkflow">
-    <template #icon><MkIcon name="icon-setting" /></template>
+    <template #icon><MkIcon name="icon_setting" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>
 </template>
