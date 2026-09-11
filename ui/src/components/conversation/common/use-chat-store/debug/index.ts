@@ -6,6 +6,7 @@ import { useMessagePagination } from '../shared/use-message-pagination'
 import { useConversationCrud } from '../shared/use-conversation-crud'
 import { aggregators, Scroll } from '../../../index'
 import type { ChatMessage } from '../../types'
+import { v4 as uuidv4 } from 'uuid'
 
 // ── 共享状态（单例） ─────────────────────────────────────
 const appInfo = ref<{ name: string; icon: string } | null>(null)
@@ -95,7 +96,7 @@ export function useDebugStore() {
   // 不请求后端 open，不往左侧列表 push（直到首次发消息才入列表，见 chat-panel send）。
   const getChatId = (): string => {
     if (currentChatId.value) return currentChatId.value
-    currentChatId.value = crypto.randomUUID()
+    currentChatId.value = uuidv4()
     return currentChatId.value
   }
 

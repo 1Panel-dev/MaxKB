@@ -10,6 +10,7 @@ import { useStore } from '@/stores'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { LoginConfig, LoginMethod } from '@/api/types'
 import { MsgConfirm } from '@/utils/message'
+import { v4 as uuidv4 } from 'uuid'
 
 interface AccountLoginForm {
   captcha: string
@@ -142,7 +143,7 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
     }
     if (authType === LOGIN_METHOD.OAUTH2) {
       if (!config.authEndpoint || !config.clientId) return ''
-      let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${crypto.randomUUID()}`
+      let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${uuidv4()}`
       if (config.scope) url += `&scope=${config.scope}`
       return url
     }
