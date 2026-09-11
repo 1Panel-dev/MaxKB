@@ -453,11 +453,11 @@ class BaseAuthView(APIView):
         return token
 
     @classmethod
-    def generate(self, request, f_token: str, response: HttpResponse, path: str = "/chat"):
+    def generate(self, request, token: str, response: HttpResponse, path: str = "/chat"):
         secure = request.is_secure()
         response.set_cookie(
             "mk_file_auth",
-            value=f_token,
+            value=token,
             max_age=7 * 24 * 3600,
             path=path,
             domain=None,
