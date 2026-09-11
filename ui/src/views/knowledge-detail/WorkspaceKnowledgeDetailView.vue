@@ -13,18 +13,16 @@ const router = useRouter()
 const knowledge = ref<KnowledgeItem>()
 const loading = ref(false)
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
-let detailRequestId = 0
 
 function loadKnowledgeDetail() {
-  const requestId = ++detailRequestId
   knowledge.value = undefined
   loading.value = true
   return KnowledgeApi.getKnowledgeDetail(knowledgeId.value)
     .then((detail) => {
-      if (requestId === detailRequestId) knowledge.value = detail
+      knowledge.value = detail
     })
     .finally(() => {
-      if (requestId === detailRequestId) loading.value = false
+      loading.value = false
     })
 }
 

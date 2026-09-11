@@ -22,7 +22,6 @@ const knowledgeOptions = ref<KnowledgeItem[]>([])
 const selectedKnowledge = ref<(Partial<KnowledgeItem> & { id: string })[]>([])
 const knowledgeLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('knowledgeLayoutRef')
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
-let dialogVersion = 0
 
 // 与 v2 一致，以首个已选知识库的 Embedding 模型筛选可选资源。
 const selectedKnowledgeIds = computed(() => selectedKnowledge.value.map(({ id }) => id))
@@ -39,9 +38,8 @@ function toggleKnowledge(knowledge: KnowledgeItem) {
     : [...selectedKnowledge.value, cloneDeep(knowledge)]
 }
 
-// 每次查询一次加载全部结果，忽略切换目录或关闭弹窗前发出的旧请求。
+// 每次查询一次加载全部结果。
 function refreshKnowledge() {
-  const version = ++dialogVersion
   loading.value = true
   knowledgeOptions.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
@@ -53,17 +51,16 @@ function refreshKnowledge() {
       ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
     })
     .then((knowledge) => {
-      if (version !== dialogVersion) return
       knowledgeOptions.value = knowledge
       // 仅补全已选快照，不因查询结果缺少某个 ID 而删除关联。
       const knowledgeById = new Map(knowledge.map((knowledge) => [knowledge.id, knowledge]))
       selectedKnowledge.value = selectedKnowledge.value.map((knowledge) => knowledgeById.get(knowledge.id) ?? knowledge)
       return nextTick(() => {
-        if (version === dialogVersion) knowledgeLayoutRef.value?.setScrollTop(0)
+        knowledgeLayoutRef.value?.setScrollTop(0)
       })
     })
     .finally(() => {
-      if (version === dialogVersion) loading.value = false
+      loading.value = false
     })
 }
 
@@ -89,7 +86,6 @@ function submit() {
   visible.value = false
 }
 function resetData() {
-  dialogVersion++
   loading.value = false
   searchKeyword.value = ''
   appliedSearchKeyword.value = ''

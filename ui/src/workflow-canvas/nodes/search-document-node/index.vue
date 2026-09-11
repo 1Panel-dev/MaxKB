@@ -61,25 +61,21 @@ function updateSearchScope(patch: Partial<NodeSearchScopeData>) {
   model.properties.node_data = { ...formData.value, ...patch }
 }
 
-// 标签选项随关联知识库刷新；请求过期或节点卸载后不再回写。
+// 标签选项随关联知识库刷新。
 const allKnowledgeTags = ref<KnowledgeTagGroup[]>([])
-let tagRequestVersion = 0
 watch(
   () => formData.value.knowledge_id_list,
   (knowledgeIds) => {
-    const version = ++tagRequestVersion
     allKnowledgeTags.value = []
     formData.value.knowledge_tags = []
     if (!knowledgeIds.length) return
     store
       .getKnowledgeTags(knowledgeIds)
       .then((tags) => {
-        if (version !== tagRequestVersion) return
         allKnowledgeTags.value = tags
         formData.value.knowledge_tags = tags.slice(0, 100)
       })
       .catch(() => {
-        if (version !== tagRequestVersion) return
         allKnowledgeTags.value = []
         formData.value.knowledge_tags = []
       })
@@ -96,7 +92,6 @@ async function validate() {
 }
 const anchorGuard = createAnchorGuard(model)
 onBeforeUnmount(() => {
-  tagRequestVersion++
   anchorGuard.reset()
 })
 onMounted(() => {

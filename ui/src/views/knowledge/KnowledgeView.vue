@@ -185,32 +185,28 @@ function handleBatchDelete() {
         <h4 class="min-w-0 truncate" :title="currentFolder.name">{{ currentFolder.name }}</h4>
         <div class="flex items-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-
-          <el-button
-            v-if="!isShared && (knowledgeData.length || batchSelectionMode)"
-            :type="batchSelectionMode ? 'primary' : undefined"
-            :disabled="knowledgeOperationLoading"
-            plain
-            @click="toggleBatchSelection"
-          >
-            <MkIcon name="icon_Batch_outlined" />
-            <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
-          </el-button>
-
-          <MkDropdown v-if="!isShared && !batchSelectionMode" trigger="click" placement="bottom-end">
-            <el-button type="primary">
-              <span class="mr-1">创建</span>
-              <MkIcon name="icon_down_outlined" :size="14" />
+          <template v-if="!isShared">
+            <!-- 批量选择 -->
+            <el-button :type="batchSelectionMode ? 'primary' : undefined" :disabled="!knowledgeData.length" plain @click="toggleBatchSelection">
+              <MkIcon name="icon_Batch_outlined" />
+              <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
             </el-button>
-            <template #dropdown>
-              <MkDropdownMenu class="w-52!">
-                <MkDropdownItem>通用知识库</MkDropdownItem>
-                <MkDropdownItem>Web 站点知识库</MkDropdownItem>
-                <MkDropdownItem>工作流知识库</MkDropdownItem>
-                <MkDropdownItem divided>导入创建</MkDropdownItem>
-              </MkDropdownMenu>
-            </template>
-          </MkDropdown>
+            <!-- 创建 -->
+            <MkDropdown v-if="!batchSelectionMode" trigger="click" placement="bottom-end">
+              <el-button type="primary">
+                <span class="mr-1">创建</span>
+                <MkIcon name="icon_down_outlined" :size="14" />
+              </el-button>
+              <template #dropdown>
+                <MkDropdownMenu class="w-52!">
+                  <MkDropdownItem>通用知识库</MkDropdownItem>
+                  <MkDropdownItem>Web 站点知识库</MkDropdownItem>
+                  <MkDropdownItem>工作流知识库</MkDropdownItem>
+                  <MkDropdownItem divided>导入创建</MkDropdownItem>
+                </MkDropdownMenu>
+              </template>
+            </MkDropdown>
+          </template>
         </div>
       </component>
 

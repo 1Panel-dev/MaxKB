@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, onBeforeUnmount, ref, useTemplateRef } from 'vue'
+import { inject, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import { TOOL_TYPE } from '@/api/enums'
@@ -25,35 +25,25 @@ const visible = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 const formData = ref<McpSetting>({ mcp_servers: '', mcp_source: 'referencing', mcp_tool_ids: [] })
 
-// 每次打开刷新包含共享资源的 MCP 工具，关闭或重新打开后忽略旧响应。
+// 每次打开刷新包含共享资源的 MCP 工具。
 const mcpOptions = ref<ToolItem[]>([])
 const loading = ref(false)
-let requestVersion = 0
-function resetData() {
-  requestVersion++
-  loading.value = false
-  mcpOptions.value = []
-  formData.value = { mcp_servers: '', mcp_source: 'referencing', mcp_tool_ids: [] }
-  formRef.value?.clearValidate()
-}
-onBeforeUnmount(() => requestVersion++)
 
 function open(setting: McpSetting) {
-  resetData()
   formData.value = cloneDeep(setting)
   if (formData.value.mcp_servers) formData.value.mcp_source = 'custom'
   visible.value = true
-  const version = ++requestVersion
+
   loading.value = true
   return store.force
     .getToolListWithShared({ tool_type: TOOL_TYPE.MCP })
     .then((tools) => {
-      if (version !== requestVersion || !visible.value) return
+      if (!visible.value) return
       mcpOptions.value = tools
       emit('loaded', tools)
     })
     .finally(() => {
-      if (version === requestVersion) loading.value = false
+      loading.value = false
     })
 }
 
@@ -76,6 +66,13 @@ function submit() {
     emit('submit', cloneDeep(formData.value))
     visible.value = false
   })
+}
+
+function resetData() {
+  loading.value = false
+  mcpOptions.value = []
+  formData.value = { mcp_servers: '', mcp_source: 'referencing', mcp_tool_ids: [] }
+  formRef.value?.clearValidate()
 }
 
 defineExpose({ open })

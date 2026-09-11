@@ -33,3 +33,6 @@ const knowledgeTypeLabel = KNOWLEDGE_TYPE_LABELS[knowledgeType]
 
 `resource-authorization.ts` 的 `RESOURCE_PERMISSION_OPTIONS` 统一维护权限标签和说明；
 资源授权页面与资源用户授权抽屉按版本和根目录约束筛选选项。
+
+`trigger.ts` 的 `TRIGGER_SCHEDULE_OPTIONS` 统一提供触发器与长期记忆的周期级联选项，
+包含周期文案、执行时间和间隔数值；使用方只读，配置回填与校验仍由各自组件维护。

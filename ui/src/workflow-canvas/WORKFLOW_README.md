@@ -93,7 +93,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 工作流 Store 的 `getToolListWithShared` 用于包含已授权共享工具的选项查询，MCP 节点使用
 `tool_type: 'MCP'` 筛选；AI 对话的 `McpSettingDialog` 每次打开通过
-`store.force.getToolListWithShared` 刷新同类选项，关闭或重新打开后忽略旧响应，通过 `loaded`
+`store.force.getToolListWithShared` 刷新同类选项，通过 `loaded`
 将工具详情提供给资源区回显；取消不修改已选配置。文件夹菜单继续使用 `getAllTool`，不复用这一路查询。
 
 知识库及知识库循环模式的“数据源”页签复用工具资源菜单和工具文件夹，通过 `dataSource`
@@ -339,7 +339,7 @@ AI 对话、图片理解和视频理解统一复用 `component/ThinkingSetting.v
 多路召回优先使用 `getRerankerModels` 注入，当前页面未提供时回退到
 `store.getModelList({ model_type: 'RERANKER' })`。添加模型后触发 `refreshModels()`，
 该回退仍读取缓存，不能视为强制刷新。
-标签请求只回写当前关联知识库的结果，过期或节点卸载后的响应不再修改节点。
+关联知识库变化时重新查询标签，并更新节点的标签选项。
 
 文档分段节点使用 `WorkflowNodeModel` / `WorkflowNodeView` 注册，在入口维护智能、高级和问答对
 三种策略。保留 `referencing` 来源协议、子分块长度默认 256、分段长度默认 4096，以及高级策略和

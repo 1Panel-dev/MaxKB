@@ -13,6 +13,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ApplicationCard from './application-card/ApplicationCard.vue'
 import {
   AuthorizeApplicationAction,
+  CopyApplicationAction,
   RelatedResourcesApplicationAction,
   DeleteApplicationAction,
   ExportApplicationAction,
@@ -201,7 +202,7 @@ function handleBatchDelete() {
         <h4 class="min-w-0 truncate" :title="currentFolder.name">{{ currentFolder.name }}</h4>
         <div class="flex items-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button v-if="applicationData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
+          <el-button :disabled="!applicationData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
             <MkIcon name="icon_Batch_outlined" />
             <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
           </el-button>
@@ -229,7 +230,16 @@ function handleBatchDelete() {
                   <AuthorizeApplicationAction label="资源授权" :application="application" />
                   <!-- 查看关联资源 -->
                   <RelatedResourcesApplicationAction label="查看关联资源" :api="RelatedResourcesApi" :application="application" />
-                  <!-- TODO 复制 -->
+                  <!-- 复制 -->
+                  <CopyApplicationAction
+                    v-if="$perm.application.workspace.copy(application.id)"
+                    v-model:loading="applicationOperationLoading"
+                    label="复制"
+                    :api="ApplicationApi"
+                    :application="application"
+                    :folder-id="currentFolder.id"
+                    @refresh="refreshApplications"
+                  />
                   <!-- 移动到 -->
                   <MoveApplicationAction
                     v-model:loading="applicationOperationLoading"

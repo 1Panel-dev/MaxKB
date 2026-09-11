@@ -46,6 +46,12 @@ src/api/
 - 页面或 Store 负责 loading、成功提示、特殊业务错误以及请求成功后的状态变更。
 - Chat 的 base URL、鉴权和错误处理独立实现，不复用 Admin 请求客户端。
 
+## 请求版本控制
+
+除 `components/global/mk-infinite-scroll/index.vue` 的滚动加载外，未经用户明确要求，
+不添加 `requestVersion`、请求序号、递增 ID、代次标记等用于忽略旧响应的请求版本控制，
+也不通过改名或封装工具引入同类逻辑。普通请求直接维护数据、loading 和错误处理。
+
 ## 业务接口组织
 
 - 业务 API 先按 Admin 入口下的 `auth`、`workspace`、`system` 等一级业务域归类。Workspace 和
@@ -240,3 +246,9 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 `workspace/knowledge/workflow.ts` 维护保存和发布，保存提交 `work_flow`，响应使用
 `KnowledgeWorkflowDetail`。前端详情与保存协议的 `default_model_setting` 复用
 `DefaultModelSettingPayload`；服务端需支持该字段的持久化与回传（当前仓库知识库后端尚未实现）。
+
+### 智能体复制
+
+`ApplicationDetail` 复用 `ApplicationFormPayload` 中的配置字段，并保留详情接口的 `model`
+和可空描述。复制通过 `getApplicationDetail` 获取完整配置，将 `model` 映射为 `model_id`，
+再调用 `postApplication` 创建副本；不使用卡片列表摘要作为复制数据。

@@ -128,6 +128,7 @@ Structural responsibilities:
 - Keep LogicFlow initialization, node registration, and canvas behavior inside `workflow-canvas/`.
   Every page rendering this canvas belongs in `views/workflow/`; those Views own the page header,
   route and page-level actions around `WorkflowCanvas`.
+- Request version guards are reserved for `MkInfiniteScroll`; add them elsewhere only when explicitly requested. See `src/api/API_README.md`.
 - Put server communication in `api/`, isolate Admin and Chat request systems, and group business APIs
   by domain and resource according to `src/api/API_README.md`.
 - Put backend fixed-value enums in `api/enums/` and import them through `@/api/enums`; keep

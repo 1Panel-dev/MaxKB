@@ -70,6 +70,9 @@ Admin、Chat 入口调用 `configureMarkdownEditor()` 配置本地高亮、KaTeX
 
 ### MkCollapse
 
+`v-model:expanded` 可控制展开状态；未绑定时沿用 `defaultExpanded` 的内部状态。
+`destroyOnCollapse` 默认 `true`，设为 `false` 时折叠只隐藏内容，适用于需要保留参数表单及校验的场景。
+
 标题折叠区，`title` 或 `label` 插槽提供标题，默认插槽提供内容。
 `defaultExpanded` 默认 `true`，仅设置初始状态；点击标题内部切换，当前不提供展开状态事件。
 `indicatorPosition` 默认 `before`，可设为 `after`；`triggerClass`、`triggerStyle` 调整触发区。
@@ -253,6 +256,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `icon`、`title`（透出 `{ title }`）、`subtitle`、`tag` 插槽可覆盖头部，默认插槽放详情。
 `footer` 提供常驻内容及 `Action`、`ActionDropdown`：前者是悬浮/焦点操作容器，后者包裹 More 菜单，
 内部直接放 `MkDropdownItem`，空菜单隐藏入口。仅需要开关或按钮时使用 `Action` 即可。
+无有效 `footer` 内容时不渲染底栏，默认内容区不额外保留底部间距；有底栏时保留 16px 分隔。
 `ActionDropdown` 固定 `persistent`，其管理的业务浮层应打开时挂载、`closed` 后卸载。
 
 `selectable` 开启卡片选择，`selected` Prop 控制选中，`selected` 事件返回新状态。
@@ -498,7 +502,7 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 手动导入 `business/select-application-dialog/index.vue` 和 `business/select-tool-dialog/index.vue`。
 两者沿用知识库选择弹窗的目录、名称搜索、三列卡片、悬停详情、跨目录选择和清空交互；
 `open()` 接收已选资源对象数组，`submit` 返回深拷贝后的资源对象数组，兼容只有 ID 的旧数据。
-每次打开先重置临时状态；取消不提交，过期请求不写回。
+每次打开先重置临时状态；取消不提交。
 
 智能体通过 `getAllApplication` 全量查询已发布资源，不展示共享目录。工具通过工作空间或共享
 `getAllTool` 全量查询，仅展示启用资源；`toolTypes` 默认包含自定义、工作流和内置工具，

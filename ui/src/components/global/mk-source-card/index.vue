@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { h, type FunctionalComponent } from 'vue'
+import { computed, h, type FunctionalComponent } from 'vue'
 import { dateFormat } from '@/utils/time'
+import { hasRenderableSlotContent } from '@/utils/vnode'
 import MkSourceCardAction from './mk-source-card-action.vue'
 import MkSourceCardActionDropdown from './mk-source-card-action-dropdown.vue'
 
@@ -52,6 +53,7 @@ const slots = defineSlots<{
 }>()
 
 const SourceCardAction: FunctionalComponent = (_, { slots }) => (props.selectable ? null : h(MkSourceCardAction, null, slots))
+const hasFooter = computed(() => hasRenderableSlotContent(slots.footer?.({ Action: SourceCardAction, ActionDropdown: MkSourceCardActionDropdown })))
 
 function handleSelect() {
   if (props.selectable) emit('selected', !props.selected)
@@ -101,11 +103,11 @@ function handleSelectedChange(selected: boolean | string | number) {
 
       <slot name="tag" />
     </header>
-    <div class="my-4 h-full text-N600" v-if="slots.default">
+    <div class="mt-4 h-full text-N600" :class="{ 'mb-4': hasFooter }" v-if="slots.default">
       <slot />
     </div>
 
-    <footer class="flex items-center gap-2">
+    <footer v-if="hasFooter" class="flex items-center gap-2">
       <slot name="footer" :Action="SourceCardAction" :ActionDropdown="MkSourceCardActionDropdown" />
     </footer>
   </el-card>

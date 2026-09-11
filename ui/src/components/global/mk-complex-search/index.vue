@@ -16,19 +16,17 @@ const emit = defineEmits<{ change: [value: Record<string, SearchValue | SearchVa
 
 // 异步搜索
 const remoteLoading = ref(false)
-let remoteRequestId = 0
 function handleRemoteSearch(query: string) {
   const request = activeField.value?.remoteMethod?.(query)
   if (!(request instanceof Promise)) return
 
-  const requestId = ++remoteRequestId
   remoteLoading.value = true
   request.then(
     () => {
-      if (requestId === remoteRequestId) remoteLoading.value = false
+      remoteLoading.value = false
     },
     () => {
-      if (requestId === remoteRequestId) remoteLoading.value = false
+      remoteLoading.value = false
     },
   )
 }
@@ -40,7 +38,7 @@ const activeField = computed(() => props.fields.find(({ value }) => value === se
 
 function handleFieldChange() {
   const shouldClearSearch = Array.isArray(searchValue.value) ? searchValue.value.length > 0 : searchValue.value !== ''
-  remoteRequestId += 1
+
   remoteLoading.value = false
   searchValue.value = activeField.value?.multiple ? [] : ''
   if (shouldClearSearch) emit('change', undefined)
@@ -79,10 +77,24 @@ function handleChange() {
       @change="handleChange"
       :persistent="false"
     >
-      <el-option v-for="(option, index) in activeField.options ?? []" :key="index" :disabled="option.disabled" :label="option.label" :value="option.value" />
+      <el-option
+        v-for="(option, index) in activeField.options ?? []"
+        :key="index"
+        :disabled="option.disabled"
+        :label="option.label"
+        :value="option.value"
+      />
     </el-select>
 
-    <el-input v-else :key="activeField?.value" v-model="searchValue" class="mk-complex-search__value w-50!" clearable placeholder="请输入" @change="handleChange" />
+    <el-input
+      v-else
+      :key="activeField?.value"
+      v-model="searchValue"
+      class="mk-complex-search__value w-50!"
+      clearable
+      placeholder="请输入"
+      @change="handleChange"
+    />
   </div>
 </template>
 

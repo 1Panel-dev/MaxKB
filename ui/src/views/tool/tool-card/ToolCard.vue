@@ -6,7 +6,15 @@ import UpdateVersionButton from './UpdateVersionButton.vue'
 
 defineOptions({ name: 'ToolCard' })
 
-defineProps<{ api: typeof ToolApi; disabled?: boolean; selectable?: boolean; selected?: boolean; shared: boolean; storeTools: ToolStoreResponse['apps']; tool: ToolItem }>()
+defineProps<{
+  api: typeof ToolApi
+  disabled?: boolean
+  selectable?: boolean
+  selected?: boolean
+  shared: boolean
+  storeTools: ToolStoreResponse['apps']
+  tool: ToolItem
+}>()
 
 const loading = defineModel<boolean>('loading', { default: false })
 
@@ -36,7 +44,13 @@ defineSlots<{ actions?: () => unknown; 'action-dropdown'?: () => unknown }>()
 
     <template #tag>
       <el-tag v-if="shared" size="small" type="info">共享</el-tag>
-      <UpdateVersionButton v-else-if="!selectable" v-model:loading="loading" :store-tools="storeTools" :tool="tool" @update="emit('update', $event)" />
+      <UpdateVersionButton
+        v-else-if="!selectable"
+        v-model:loading="loading"
+        :store-tools="storeTools"
+        :tool="tool"
+        @update="emit('update', $event)"
+      />
     </template>
 
     <p class="line-clamp-2" :title="tool.desc ?? undefined">
@@ -46,6 +60,7 @@ defineSlots<{ actions?: () => unknown; 'action-dropdown'?: () => unknown }>()
     <template #footer="{ Action, ActionDropdown }">
       <MkStatusLabel :active="tool.is_active" />
       <component :is="Action" v-if="!disabled">
+        <!-- 修改工具状态 -->
         <ToolStatusSwitch v-model:loading="loading" :api="api" :tool="tool" @update="emit('update', $event)" />
         <component :is="ActionDropdown">
           <slot name="action-dropdown" />

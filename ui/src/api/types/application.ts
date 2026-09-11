@@ -6,7 +6,9 @@ import type { DefaultModelSettingPayload } from './model'
 
 export type ApplicationType = (typeof APPLICATION_TYPE)[keyof typeof APPLICATION_TYPE]
 
-export interface ApplicationDetail {
+export interface ApplicationDetail extends Omit<ApplicationFormPayload, 'desc'> {
+  /** 详情接口返回的主模型 ID。 */
+  model?: string | null
   default_model_setting?: DefaultModelSettingPayload
   create_time?: string
   desc?: string | null

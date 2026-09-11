@@ -27,7 +27,6 @@ const toolOptions = ref<ToolItem[]>([])
 const selectedTool = ref<(Partial<ToolItem> & { id: string })[]>([])
 const toolLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('toolLayoutRef')
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
-let dialogVersion = 0
 
 const selectedToolIds = computed(() => selectedTool.value.map(({ id }) => id))
 
@@ -37,9 +36,8 @@ function toggleTool(tool: ToolItem) {
     : [...selectedTool.value, cloneDeep(tool)]
 }
 
-// 每次查询一次加载全部结果，忽略切换目录或关闭弹窗前发出的旧请求。
+// 每次查询一次加载全部结果。
 function refreshTool() {
-  const version = ++dialogVersion
   loading.value = true
   toolOptions.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
@@ -52,7 +50,6 @@ function refreshTool() {
       ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
     })
     .then((tool) => {
-      if (version !== dialogVersion) return
       toolOptions.value = tool.filter(
         (resource) => resource.is_active && props.toolTypes.includes(resource.tool_type) && !props.excludedIds.includes(resource.id),
       )
@@ -60,11 +57,11 @@ function refreshTool() {
       const toolById = new Map(tool.map((tool) => [tool.id, tool]))
       selectedTool.value = selectedTool.value.map((tool) => toolById.get(tool.id) ?? tool)
       return nextTick(() => {
-        if (version === dialogVersion) toolLayoutRef.value?.setScrollTop(0)
+        toolLayoutRef.value?.setScrollTop(0)
       })
     })
     .finally(() => {
-      if (version === dialogVersion) loading.value = false
+      loading.value = false
     })
 }
 
@@ -91,7 +88,6 @@ function submit() {
   visible.value = false
 }
 function resetData() {
-  dialogVersion++
   loading.value = false
   searchKeyword.value = ''
   appliedSearchKeyword.value = ''

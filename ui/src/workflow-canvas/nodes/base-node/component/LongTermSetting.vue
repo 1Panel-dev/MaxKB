@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { TRIGGER_SCHEDULE_OPTIONS } from '@/constants/trigger'
 import type { CascaderOption, FormInstance } from 'element-plus'
 import SelectModel from '@/components/business/select-model/index.vue'
 import type { ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
@@ -36,32 +37,6 @@ const triggerOptions = [
   { value: 'ROUND', label: '按轮次触发', description: '累计到 N 轮后，自动提炼 N 轮对话，生成记忆' },
   { value: 'SCHEDULED', label: '定时触发', description: '到设定时间后，自动提炼周期内所有对话，生成记忆' },
 ] as const
-const scheduleTimes = Array.from({ length: 24 }, (_, hour) => {
-  const time = `${String(hour).padStart(2, '0')}:00`
-  return { label: time, value: time }
-})
-const scheduleOptions: CascaderOption[] = [
-  { label: '每日', value: 'daily', children: scheduleTimes },
-  {
-    label: '每周',
-    value: 'weekly',
-    children: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'].map((label, index) => ({ label, value: index + 1, children: scheduleTimes })),
-  },
-  {
-    label: '每月',
-    value: 'monthly',
-    children: Array.from({ length: 31 }, (_, index) => ({ label: `${index + 1} 日`, value: String(index + 1), children: scheduleTimes })),
-  },
-  {
-    label: '按间隔',
-    value: 'interval',
-    children: [
-      { label: '小时', value: 'hours', children: Array.from({ length: 24 }, (_, index) => ({ label: `${index + 1} 小时`, value: index + 1 })) },
-      { label: '分钟', value: 'minutes', children: Array.from({ length: 60 }, (_, index) => ({ label: `${index + 1} 分钟`, value: index + 1 })) },
-    ],
-  },
-]
-
 const scheduleMode = computed<'cron' | 'preset'>({
   get: () => (formData.value.long_term_trigger_setting.schedule_type === 'cron' ? 'cron' : 'preset'),
   set: (mode) => {
@@ -119,7 +94,7 @@ function validateRounds(_rule: unknown, value: unknown, callback: (error?: Error
 }
 
 function validateSchedule(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
-  let options = scheduleOptions
+  let options = TRIGGER_SCHEDULE_OPTIONS
   let selectedOption: CascaderOption | undefined
   for (const value of scheduleValue.value) {
     selectedOption = options.find((option) => option.value === value)
@@ -252,7 +227,7 @@ function submit() {
                     >
                       <el-cascader
                         v-model="scheduleValue"
-                        :options="scheduleOptions"
+                        :options="TRIGGER_SCHEDULE_OPTIONS"
                         :teleported="false"
                         class="w-full"
                         clearable
