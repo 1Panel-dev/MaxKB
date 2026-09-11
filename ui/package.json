@@ -47,6 +47,7 @@
     "pinia": "^3.0.4",
     "prettier": "3.8.4",
     "screenfull": "^6.0.2",
+    "uuid": "^14.0.2",
     "vue": "^3.5.38",
     "vue-codemirror": "^6.1.1",
     "vue-demi": "^0.14.10",
