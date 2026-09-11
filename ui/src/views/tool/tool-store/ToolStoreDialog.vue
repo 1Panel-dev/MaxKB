@@ -28,7 +28,6 @@ const searchKeyword = ref('')
 const storeTools = ref<ToolStoreItem[]>([])
 const storeTags = ref<ToolStoreTag[]>([])
 const hasSearchKeyword = computed(() => Boolean(appliedSearchKeyword.value))
-let storeToolsLoadSequence = 0
 
 const categoryTitles = computed(() => {
   return storeTags.value.reduce<Record<string, string>>((titles, tag) => ({ ...titles, [tag.key]: tag.name }), { ...DEFAULT_CATEGORY_TITLES })
@@ -59,11 +58,19 @@ function getStoreToolType(label?: string | null): ToolType {
 }
 
 function normalizeInternalTool(tool: ToolItem): ToolStoreItem {
-  return { desc: tool.desc, icon: tool.icon, id: tool.id, label: tool.label, name: tool.name, source: 'internal', tool_type: TOOL_TYPE.INTERNAL, version: tool.version }
+  return {
+    desc: tool.desc,
+    icon: tool.icon,
+    id: tool.id,
+    label: tool.label,
+    name: tool.name,
+    source: 'internal',
+    tool_type: TOOL_TYPE.INTERNAL,
+    version: tool.version,
+  }
 }
 
 function loadStoreTools() {
-  const currentLoadSequence = ++storeToolsLoadSequence
   loading.value = true
   storeTools.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
@@ -71,8 +78,6 @@ function loadStoreTools() {
 
   Promise.all([ToolStoreApi.getInternalToolList(query), ToolStoreApi.getStoreToolList(query)])
     .then(([internalTools, storeResponse]) => {
-      if (currentLoadSequence !== storeToolsLoadSequence) return
-
       const appStoreTools: ToolStoreItem[] = storeResponse.apps.map((tool) => ({
         ...tool,
         desc: tool.description ?? tool.desc,
@@ -88,7 +93,7 @@ function loadStoreTools() {
       })
     })
     .finally(() => {
-      if (currentLoadSequence === storeToolsLoadSequence) loading.value = false
+      loading.value = false
     })
 }
 
@@ -105,7 +110,9 @@ function open(targetFolderId: string) {
 
 /* 锚点 */
 const contentScrollContainer = shallowRef<HTMLElement>()
-const storeLayoutRef = useTemplateRef<{ getScrollContainer: () => HTMLElement | undefined; setScrollTop: (scrollTop: number) => void }>('storeLayoutRef')
+const storeLayoutRef = useTemplateRef<{ getScrollContainer: () => HTMLElement | undefined; setScrollTop: (scrollTop: number) => void }>(
+  'storeLayoutRef',
+)
 
 function handleCategoryAnchorChange(href: string) {
   activeCategoryId.value = href.slice(TOOL_STORE_CATEGORY_ANCHOR_PREFIX.length)
@@ -121,7 +128,6 @@ function handleAddSuccess() {
 }
 
 function handleClosed() {
-  storeToolsLoadSequence++
   loading.value = false
 }
 
@@ -168,7 +174,12 @@ defineExpose({ open })
 
           <div class="mk-resource-card-grid-sm">
             <template v-for="tool in storeTools" :key="`${tool.source}-${tool.id}`">
-              <ToolStoreCard :category-title="categoryTitles[tool.label || 'other'] ?? tool.label ?? '其他'" :folder-id="folderId" :tool="tool" @refresh="handleAddSuccess" />
+              <ToolStoreCard
+                :category-title="categoryTitles[tool.label || 'other'] ?? tool.label ?? '其他'"
+                :folder-id="folderId"
+                :tool="tool"
+                @refresh="handleAddSuccess"
+              />
             </template>
           </div>
           <MkEmpty v-if="!storeTools.length" type="search" />

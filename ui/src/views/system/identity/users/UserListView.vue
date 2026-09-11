@@ -207,9 +207,11 @@ onMounted(() => loadSystemUsers())
                   :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id"
                   :before-change="() => handleChangeStatus(row)"
                   size="small"
+                  class="mr-3"
                 />
+                <el-divider direction="vertical" />
               </span>
-              <el-divider direction="vertical" />
+
               <div class="flex">
                 <!-- 编辑 -->
                 <el-tooltip content="编辑" placement="top">

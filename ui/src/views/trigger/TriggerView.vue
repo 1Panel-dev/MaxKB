@@ -1,95 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import TriggerApi from '@/api/admin/workspace/trigger/trigger'
+import CommonApi from '@/api/admin/workspace/common'
 import { TRIGGER_TYPE } from '@/api/enums'
 import type { Dict, OptionItem, Trigger, TriggerType } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import TriggerFormDrawer from './TriggerFormDrawer.vue'
-
-const triggerDrawerRef = ref<InstanceType<typeof TriggerFormDrawer>>()
-const tableRef = ref<{ clearSelection: () => void }>()
-const selectedTriggers = ref<Trigger[]>([])
-const operating = ref(false)
-const switchingIds = ref<string[]>([])
-
-/* 新建、编辑及删除 */
-function handleOpenTriggerDrawer(trigger?: Trigger) {
-  triggerDrawerRef.value?.open(trigger?.id)
-}
-
-function handleDeleteTrigger(trigger: Trigger) {
-  if (operating.value) return
-  return MsgConfirm(`确定删除触发器“${trigger.name}”吗？`, '删除后将停止触发任务，并删除相关执行记录。')
-    .then(() => {
-      operating.value = true
-      return TriggerApi.deleteTrigger(trigger.id)
-        .then(() => {
-          MsgSuccess('删除成功')
-          tableRef.value?.clearSelection()
-          return loadTriggers()
-        })
-        .finally(() => {
-          operating.value = false
-        })
-    })
-    .catch(() => {})
-}
-
-/* 启用状态在请求成功后更新，失败时保留原状态 */
-function handleChangeState(trigger: Trigger) {
-  if (switchingIds.value.includes(trigger.id)) return
-  const isActive = !trigger.is_active
-  switchingIds.value.push(trigger.id)
-  return TriggerApi.putTrigger(trigger.id, { is_active: isActive })
-    .then((detail) => {
-      trigger.is_active = detail.is_active ?? isActive
-      MsgSuccess(isActive ? '启用成功' : '禁用成功')
-      return loadTriggers()
-    })
-    .finally(() => {
-      switchingIds.value = switchingIds.value.filter((id) => id !== trigger.id)
-    })
-}
-
-/* 跨页批量操作 */
-function handleSelectionChange(selection: unknown[]) {
-  selectedTriggers.value = selection as Trigger[]
-}
-
-function handleBatchActivate(isActive: boolean) {
-  if (!selectedTriggers.value.length || operating.value) return
-  operating.value = true
-  const triggerIds = selectedTriggers.value.map(({ id }) => id)
-  return TriggerApi.putBatchActivateTrigger(triggerIds, isActive)
-    .then(() => {
-      MsgSuccess(isActive ? '批量启用成功' : '批量禁用成功')
-      tableRef.value?.clearSelection()
-      return loadTriggers()
-    })
-    .finally(() => {
-      operating.value = false
-    })
-}
-
-function handleBatchDelete() {
-  if (!selectedTriggers.value.length || operating.value) return
-  const triggerIds = selectedTriggers.value.map(({ id }) => id)
-  return MsgConfirm(`确定删除选中的 ${triggerIds.length} 个触发器吗？`, '删除后将停止触发任务，并删除相关执行记录。')
-    .then(() => {
-      operating.value = true
-      return TriggerApi.putBatchDeleteTrigger(triggerIds)
-        .then(() => {
-          MsgSuccess('批量删除成功')
-          tableRef.value?.clearSelection()
-          return loadTriggers()
-        })
-        .finally(() => {
-          operating.value = false
-        })
-    })
-    .catch(() => {})
-}
+import TriggerFormDrawer from './trigger-form/TriggerFormDrawer.vue'
+import TriggerTaskPopover from './components/TriggerTaskPopover.vue'
 
 /* 触发器筛选与分页查询 */
 const loading = ref(false)
@@ -100,7 +18,8 @@ const triggerTypeLabels: Record<TriggerType, string> = {
   [TRIGGER_TYPE.SCHEDULED]: '定时触发',
   [TRIGGER_TYPE.EVENT]: '事件触发',
 }
-const searchFields: OptionItem<string>[] = [
+const creatorOptions = ref<OptionItem<string>[]>([])
+const searchFields = computed(() => [
   { label: '名称', value: 'name' },
   {
     label: '类型',
@@ -116,25 +35,24 @@ const searchFields: OptionItem<string>[] = [
       { label: '已禁用', value: 'false' },
     ],
   },
-]
+  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+])
 
-let queryVersion = 0
+function loadCreatorOptions(keyword: string) {
+  return CommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
+    creatorOptions.value = users.map(({ id, nick_name }) => ({ label: nick_name, value: id }))
+  })
+}
+
 function loadTriggers(): Promise<void> {
-  const version = ++queryVersion
   loading.value = true
   return TriggerApi.getTriggerPage(paginationConfig.value, triggerQuery.value)
     .then((page) => {
-      if (version !== queryVersion) return
-      const lastPage = Math.max(1, Math.ceil(page.total / paginationConfig.value.pageSize))
-      if (paginationConfig.value.currentPage > lastPage) {
-        paginationConfig.value.currentPage = lastPage
-        return loadTriggers()
-      }
       triggerData.value = page.records
       paginationConfig.value.total = page.total
     })
     .finally(() => {
-      if (version === queryVersion) loading.value = false
+      loading.value = false
     })
 }
 
@@ -145,18 +63,96 @@ function handleSearchChange(query?: Dict<unknown>) {
   loadTriggers()
 }
 
-onMounted(loadTriggers)
+/* 新建、编辑 */
+const triggerDrawerRef = ref<InstanceType<typeof TriggerFormDrawer>>()
+const tableRef = ref<{ clearSelection: () => void }>()
+const selectedTriggers = ref<Trigger[]>([])
+
+function handleOpenTriggerDrawer(trigger?: Trigger) {
+  triggerDrawerRef.value?.open(trigger?.id)
+}
+
+function handleDeleteTrigger(trigger: Trigger) {
+  return MsgConfirm(`确定删除触发器“${trigger.name}”吗？`, '删除后将停止触发任务，并删除相关执行记录。')
+    .then(() => {
+      loading.value = true
+      return TriggerApi.deleteTrigger(trigger.id)
+        .then(() => {
+          MsgSuccess('删除成功')
+          tableRef.value?.clearSelection()
+          return loadTriggers()
+        })
+        .finally(() => {
+          loading.value = false
+        })
+    })
+    .catch(() => {})
+}
+
+/* 启用状态在请求成功后更新，失败时保留原状态 */
+
+function handleChangeStatus(trigger: Trigger) {
+  const nextActive = !trigger.is_active
+
+  return TriggerApi.putTrigger(trigger.id, { is_active: nextActive })
+    .then(() => {
+      MsgSuccess(nextActive ? '启用成功' : '禁用成功')
+      return true
+    })
+    .catch(() => false)
+}
+
+/* 批量操作 */
+function handleSelectionChange(selection: unknown[]) {
+  selectedTriggers.value = selection as Trigger[]
+}
+function handleBatchActivate(isActive: boolean) {
+  loading.value = true
+  const triggerIds = selectedTriggers.value.map(({ id }) => id)
+  return TriggerApi.putBatchActivateTrigger(triggerIds, isActive)
+    .then(() => {
+      MsgSuccess(isActive ? '批量启用成功' : '批量禁用成功')
+      tableRef.value?.clearSelection()
+      return loadTriggers()
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+function handleBatchDelete() {
+  const triggerIds = selectedTriggers.value.map(({ id }) => id)
+  return MsgConfirm(`是否删除选中的 ${triggerIds.length} 个触发器？`)
+    .then(() => {
+      loading.value = true
+      return TriggerApi.putBatchDeleteTrigger(triggerIds)
+        .then(() => {
+          MsgSuccess('批量删除成功')
+          tableRef.value?.clearSelection()
+          return loadTriggers()
+        })
+        .finally(() => {
+          loading.value = false
+        })
+    })
+    .catch(() => {})
+}
+
+onMounted(() => loadTriggers())
 </script>
 
 <template>
-  <MkViewLayout :loading="loading || operating">
+  <MkViewLayout :loading="loading">
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
         <div class="flex items-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 新建触发器 -->
-          <el-button type="primary" @click="handleOpenTriggerDrawer()">新建触发器</el-button>
+          <el-button type="primary" @click="handleOpenTriggerDrawer()">
+            <MkIcon name="icon_add_outlined" />
+            <span>创建</span>
+          </el-button>
         </div>
       </component>
       <MkTable
@@ -170,7 +166,7 @@ onMounted(loadTriggers)
         @size-change="loadTriggers"
         resizable
       >
-        <el-table-column v-if="canBatchOperate" type="selection" width="48" reserve-selection />
+        <el-table-column type="selection" width="48" reserve-selection />
         <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
           <template #default="{ row }"
             ><div class="flex items-center gap-2">
@@ -188,46 +184,47 @@ onMounted(loadTriggers)
         <el-table-column prop="next_run_time" label="下次执行时间" width="180">
           <template #default="{ row }">{{ datetimeFormat(row.next_run_time) || '-' }}</template>
         </el-table-column>
-        <el-table-column label="任务" min-width="180" show-overflow-tooltip>
-          <template #default="{ row }">{{
-            row.trigger_task
-              .map((task: Trigger['trigger_task'][number]) => task.name)
-              .filter(Boolean)
-              .join('、') || '-'
-          }}</template>
+        <el-table-column label="任务" min-width="180">
+          <template #default="{ row }"><TriggerTaskPopover :tasks="row.trigger_task" /></template>
         </el-table-column>
         <el-table-column prop="create_user" label="创建者" width="130" show-overflow-tooltip />
         <el-table-column prop="create_time" label="创建时间" width="180">
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <div class="flex items-center gap-2">
-              <el-switch
-                :model-value="row.is_active"
-                :loading="switchingIds.includes(row.id)"
-                :disabled="operating"
-                size="small"
-                @change="handleChangeState(row)"
-              />
-              <!-- 编辑当前触发器 -->
-              <el-button text type="primary" :disabled="switchingIds.includes(row.id) || operating" @click="handleOpenTriggerDrawer(row)"
-                >编辑</el-button
-              >
-              <!-- 删除当前触发器 -->
-              <el-button text type="danger" :disabled="switchingIds.includes(row.id) || operating" @click="handleDeleteTrigger(row)">删除</el-button>
+            <div class="flex items-center gap-3">
+              <!-- 修改触发器状态 -->
+              <span @click.stop>
+                <el-switch v-model="row.is_active" :before-change="() => handleChangeStatus(row)" size="small" class="mr-3" />
+                <el-divider direction="vertical" />
+              </span>
+
+              <div class="flex">
+                <!-- 编辑当前触发器 -->
+                <el-tooltip content="编辑" placement="top">
+                  <el-button type="primary" text @click.stop="handleOpenTriggerDrawer(row)">
+                    <mk-icon name="icon_edit_outlined"></mk-icon>
+                  </el-button>
+                </el-tooltip>
+                <!-- 删除当前触发器 -->
+
+                <el-tooltip content="删除" placement="top">
+                  <el-button type="primary" text @click.stop="handleDeleteTrigger(row)">
+                    <mk-icon name="icon_delete-trash_outlined"></mk-icon>
+                  </el-button>
+                </el-tooltip>
+              </div>
             </div>
           </template>
         </el-table-column>
         <template #footer-batch-actions>
           <!-- 批量启用所选触发器 -->
-          <el-button :disabled="operating || !selectedTriggers.length || !!switchingIds.length" @click="handleBatchActivate(true)">启用</el-button>
+          <el-button type="primary" plain @click="handleBatchActivate(true)">启用</el-button>
           <!-- 批量禁用所选触发器 -->
-          <el-button :disabled="operating || !selectedTriggers.length || !!switchingIds.length" @click="handleBatchActivate(false)">禁用</el-button>
+          <el-button type="primary" plain @click="handleBatchActivate(false)">禁用</el-button>
           <!-- 批量删除所选触发器 -->
-          <el-button type="danger" plain :disabled="operating || !selectedTriggers.length || !!switchingIds.length" @click="handleBatchDelete"
-            >删除</el-button
-          >
+          <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
       </MkTable>
     </template>

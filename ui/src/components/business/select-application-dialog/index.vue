@@ -22,7 +22,6 @@ const applicationOptions = ref<ApplicationDetail[]>([])
 const selectedApplication = ref<(Partial<ApplicationDetail> & { id: string })[]>([])
 const applicationLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('applicationLayoutRef')
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
-let dialogVersion = 0
 
 const selectedApplicationIds = computed(() => selectedApplication.value.map(({ id }) => id))
 
@@ -32,9 +31,8 @@ function toggleApplication(application: ApplicationDetail) {
     : [...selectedApplication.value, cloneDeep(application)]
 }
 
-// 每次查询一次加载全部结果，忽略切换目录或关闭弹窗前发出的旧请求。
+// 每次查询一次加载全部结果。
 function refreshApplication() {
-  const version = ++dialogVersion
   loading.value = true
   applicationOptions.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
@@ -44,17 +42,16 @@ function refreshApplication() {
     ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
   })
     .then((application) => {
-      if (version !== dialogVersion) return
       applicationOptions.value = application.filter((resource) => resource.is_publish && !props.excludedIds.includes(resource.id))
       // 仅补全已选快照，不因查询结果缺少某个 ID 而删除关联。
       const applicationById = new Map(application.map((application) => [application.id, application]))
       selectedApplication.value = selectedApplication.value.map((application) => applicationById.get(application.id) ?? application)
       return nextTick(() => {
-        if (version === dialogVersion) applicationLayoutRef.value?.setScrollTop(0)
+        applicationLayoutRef.value?.setScrollTop(0)
       })
     })
     .finally(() => {
-      if (version === dialogVersion) loading.value = false
+      loading.value = false
     })
 }
 
@@ -81,7 +78,6 @@ function submit() {
   visible.value = false
 }
 function resetData() {
-  dialogVersion++
   loading.value = false
   searchKeyword.value = ''
   appliedSearchKeyword.value = ''

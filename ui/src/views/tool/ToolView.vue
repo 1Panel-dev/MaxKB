@@ -204,15 +204,18 @@ onMounted(() => {
         <div class="flex items-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <template v-if="!isShared">
+            <!-- 批量选择 -->
             <span>
-              <el-button v-if="toolsData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
+              <el-button :disabled="!toolsData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
                 <MkIcon name="icon_Batch_outlined" />
                 <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
               </el-button>
             </span>
 
             <template v-if="!batchSelectionMode">
+              <!-- 工具商店 -->
               <OpenToolStoreButton :folder-id="currentFolder.id" @refresh="refreshTool" />
+              <!-- 创建 -->
               <CreateToolDropdown :folder-id="currentFolder.id" @refresh="refreshTool" />
             </template>
           </template>
@@ -272,8 +275,8 @@ onMounted(() => {
                     @delete="handleDeleteTool"
                   />
                   <!-- 导出 -->
-                  <!-- 删除 -->
                   <ExportToolAction v-if="!tool.template_id" v-model:loading="toolOperationLoading" label="导出" :api="ToolApi" :tool="tool" />
+                  <!-- 删除 -->
                   <DeleteToolAction v-model:loading="toolOperationLoading" label="删除" :api="ToolApi" :tool="tool" @delete="handleDeleteTool" />
                 </template>
               </ToolCard>

@@ -3,7 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import type { FormInstance, FormItemRule } from 'element-plus'
 import { TRIGGER_PARAMETER_SOURCE, TRIGGER_TYPE } from '@/api/enums'
 import type { ApplicationDetail, ToolItem, TriggerBodyField, TriggerParameters, TriggerTaskSource, TriggerType } from '@/api/types'
-import { type TaskParameterField, getTaskParameterFields, getTaskParameter, initializeTaskParameters } from '../task-parameters'
+import { type TaskParameterField, getTaskParameterFields, getTaskParameter, initializeTaskParameters } from './task-parameters'
 
 const props = defineProps<{
   disabled?: boolean
@@ -82,6 +82,5 @@ defineExpose({ validate })
         <el-input v-else v-model="getTaskParameter(parameters, field).value" :placeholder="`请输入${field.label}`" />
       </div>
     </el-form-item>
-    <p v-if="!fields.length" class="text-N600">无需配置参数</p>
   </el-form>
 </template>
