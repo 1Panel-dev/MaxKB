@@ -3,6 +3,8 @@ export interface WorkspaceItem {
   name: string
   id?: string
   user_count?: number
+  /** 当前用户在工作空间中的角色名称；普通工作空间列表可能不返回。 */
+  role_name?: string[]
 }
 
 export interface CreateWorkspaceMemberPayload {

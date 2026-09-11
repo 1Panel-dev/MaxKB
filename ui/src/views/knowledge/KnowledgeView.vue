@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CommonApi from '@/api/admin/workspace/common'
@@ -10,7 +11,12 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
-import { AuthorizeKnowledgeAction, DeleteKnowledgeAction, MoveKnowledgeAction } from './knowledge-card/action-dropdown'
+import {
+  AuthorizeKnowledgeAction,
+  DeleteKnowledgeAction,
+  MoveKnowledgeAction,
+  RelatedResourcesKnowledgeAction,
+} from './knowledge-card/action-dropdown'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
@@ -221,10 +227,15 @@ function handleBatchDelete() {
                 @selected="handleKnowledgeSelect(knowledge.id, $event)"
               >
                 <template v-if="!isShared" #action-dropdown>
+                  <!-- TODO 同步 -->
+                  <!-- TODO 向量化 -->
+                  <!-- TODO 生成问题 -->
+                  <!-- TODO 设置 -->
                   <!-- 资源授权 -->
                   <AuthorizeKnowledgeAction label="资源授权" :knowledge="knowledge" />
 
-                  <!-- TODO 关联资源 -->
+                  <!-- 查看关联资源 -->
+                  <RelatedResourcesKnowledgeAction label="查看关联资源" :api="RelatedResourcesApi" :knowledge="knowledge" />
                   <!-- 转移到 -->
                   <MoveKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
@@ -235,6 +246,8 @@ function handleBatchDelete() {
                     @delete="handleDeleteKnowledge"
                     @move="handleMoveKnowledge"
                   />
+
+                  <!--TODO 导出-->
                   <!-- 删除 -->
                   <DeleteKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"

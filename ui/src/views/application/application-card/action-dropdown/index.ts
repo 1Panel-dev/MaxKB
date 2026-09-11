@@ -3,3 +3,4 @@ export { default as ExportApplicationAction } from './ExportApplicationAction.vu
 export { default as MoveApplicationAction } from './MoveApplicationAction.vue'
 export { default as SettingApplicationAction } from './SettingApplicationAction.vue'
 export { default as AuthorizeApplicationAction } from './AuthorizeApplicationAction.vue'
+export { default as RelatedResourcesApplicationAction } from './RelatedResourcesApplicationAction.vue'

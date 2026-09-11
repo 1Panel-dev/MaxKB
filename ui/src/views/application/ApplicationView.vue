@@ -3,6 +3,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CommonApi from '@/api/admin/workspace/common'
 import ApplicationApi from '@/api/admin/workspace/application/application'
+import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import type { ApplicationDetail, Dict, FolderItem, OptionItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
@@ -12,6 +13,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ApplicationCard from './application-card/ApplicationCard.vue'
 import {
   AuthorizeApplicationAction,
+  RelatedResourcesApplicationAction,
   DeleteApplicationAction,
   ExportApplicationAction,
   MoveApplicationAction,
@@ -220,15 +222,13 @@ function handleBatchDelete() {
                 @selected="handleApplicationSelect(application.id, $event)"
               >
                 <template #action-dropdown>
-                  <!-- TODO 同步 -->
-                  <!-- TODO 向量化 -->
-                  <!-- TODO 生成问题 -->
                   <!-- 设置 -->
                   <SettingApplicationAction label="设置" :application="application" />
                   <!-- TODO 触发器 -->
                   <!-- 资源授权 -->
                   <AuthorizeApplicationAction label="资源授权" :application="application" />
-                  <!-- TODO 关联资源 -->
+                  <!-- 查看关联资源 -->
+                  <RelatedResourcesApplicationAction label="查看关联资源" :api="RelatedResourcesApi" :application="application" />
                   <!-- TODO 复制 -->
                   <!-- 移动到 -->
                   <MoveApplicationAction

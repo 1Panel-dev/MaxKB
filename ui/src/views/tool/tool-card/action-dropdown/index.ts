@@ -7,3 +7,4 @@ export { default as McpConfigAction } from './mcp-config-action/McpConfigAction.
 export { default as MoveToolAction } from './MoveToolAction.vue'
 export { default as ToolWorkflowAction } from './ToolWorkflowAction.vue'
 export { default as AuthorizeToolAction } from './AuthorizeToolAction.vue'
+export { default as RelatedResourcesToolAction } from './RelatedResourcesToolAction.vue'
