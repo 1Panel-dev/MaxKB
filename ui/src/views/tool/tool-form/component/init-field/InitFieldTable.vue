@@ -40,9 +40,8 @@ function getTypeLabel(inputType: string) {
   <section>
     <div class="mb-4 flex-between">
       <h4 class="mk-title-decoration">启动参数</h4>
-      <el-button link type="primary" @click="handleOpenInitField()">
+      <el-button text type="primary" @click="handleOpenInitField()">
         <MkIcon name="icon_add_outlined" />
-        <span>添加</span>
       </el-button>
     </div>
     <MkTable :data="initFields" size="small">

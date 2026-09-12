@@ -35,9 +35,8 @@ function handleDeleteInputField(index: number) {
         <h4 class="mk-title-decoration">输入参数</h4>
         <span class="text-N600">使用工具时显示</span>
       </div>
-      <el-button link type="primary" @click="handleOpenInputField()">
+      <el-button text type="primary" @click="handleOpenInputField()">
         <MkIcon name="icon_add_outlined" />
-        <span>添加</span>
       </el-button>
     </div>
     <MkTable :data="inputFields" size="small">

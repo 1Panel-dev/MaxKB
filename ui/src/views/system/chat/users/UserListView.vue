@@ -215,7 +215,7 @@ onMounted(() => loadChatUsers())
                 <!-- 编辑 -->
                 <el-tooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
-                    <mk-icon name="icon_edit_outlined"></mk-icon>
+                    <MkIcon name="icon_edit_outlined" />
                   </el-button>
                 </el-tooltip>
                 <!-- 修改用户密码 -->

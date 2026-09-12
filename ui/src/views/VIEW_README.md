@@ -405,13 +405,16 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 任务选择复用 `SelectApplicationDialog` 与 `SelectToolDialog`，工具限定自定义和工作流类型。
 `trigger/trigger-form/request-parameters/RequestParameters.vue` 用 `MkFormList` 展示和删除事件请求参数，
 同目录 `RequestParameterDialog.vue` 负责新增、编辑及参数名必填与重名校验；确认后回写，取消保留原值。
-`trigger/trigger-form/task-execution/TaskParameters.vue` 展示任务输入及事件参数引用，
-`trigger/trigger-form/task-execution/task-parameters.ts` 从资源输入定义生成字段，只补全缺失值，不覆盖已有配置。
+`trigger/trigger-form/task-execution/parameters/` 内 `ApplicationParameter.vue` 与 `ToolParameter.vue`
+分别生成智能体和工具字段，共用 `ParameterForm.vue` 的输入、事件引用、初始化和校验；
+`types.ts` 仅维护跨组件使用的字段描述类型，不再单独拆分每个组件专用的参数工具文件。
+初始化只补全缺失值，不覆盖已有自定义配置；切回定时或移除全部事件参数时，引用参数恢复自定义默认值。
+智能体包含 Question、启用的文件类型、用户输入和接口参数；工具包含普通输入和工作流用户输入。
 抽屉采用类型卡片选择，选中卡片内显示配置，触发周期与 Cron 通过切换按钮切换；新建时需选择周期。
-`trigger/trigger-form/task-execution/TriggerTaskGroups.vue` 维护任务分组、展开收起、移除及参数表单，
+`trigger/trigger-form/task-execution/TaskExecution.vue` 维护任务分组、展开收起、移除及参数表单，
 组件内管理智能体与工具选择弹窗、资源详情加载和任务参数保留，通过 `v-model` 回写任务、
 `v-model:loading` 同步加载状态、`change` 通知清理校验，并提供 `validate`、`expandAll`、`reset`。
-任务 UI 沿用 AI Chat 技能区的 `MkCollapse` 分组和紧凑资源卡片，参数区折叠后保留挂载以支持完整校验。
+任务 UI 沿用 AI Chat 技能区的 `MkCollapse` 分组和紧凑资源卡片，保存前先展开全部任务，待参数表单挂载后统一校验。
 抽屉负责触发器详情查询与保存，将详情资源快照通过 `initialResources` 传入任务组件；
 任务组件新增资源后展开任务，抽屉保存时调用分组组件校验全部参数。
 保存时校验所有任务，包括折叠的任务；接口失败保持抽屉打开。

@@ -29,7 +29,9 @@ function saveField(field: TriggerBodyField, index?: number) {
     <div class="flex-between mt-4 mb-2">
       <h6>请求参数</h6>
       <!-- 添加请求参数 -->
-      <el-button link type="primary" @click="dialogRef?.open()">添加参数</el-button>
+      <el-button text type="primary" @click="dialogRef?.open()">
+        <MkIcon name="icon_add_outlined" />
+      </el-button>
     </div>
     <MkFormList v-model="fields" :default-item="defaultField" :min-rows="0" :first-row-has-label="false" :show-add-button="false">
       <template #default="{ item, index }">

@@ -7,13 +7,12 @@ defineOptions({ name: 'MkCollapse' })
 const props = withDefaults(
   defineProps<{
     defaultExpanded?: boolean
-    destroyOnCollapse?: boolean
     indicatorPosition?: 'after' | 'before'
     title?: string
     triggerClass?: HTMLAttributes['class']
     triggerStyle?: HTMLAttributes['style']
   }>(),
-  { defaultExpanded: true, destroyOnCollapse: true, indicatorPosition: 'before' },
+  { defaultExpanded: true, indicatorPosition: 'before' },
 )
 
 defineSlots<{ default?: () => unknown; label?: () => unknown }>()
@@ -54,7 +53,7 @@ const expanded = computed({
       </div>
     </div>
     <el-collapse-transition>
-      <div v-if="!destroyOnCollapse || expanded" v-show="expanded">
+      <div v-show="expanded">
         <slot />
       </div>
     </el-collapse-transition>
