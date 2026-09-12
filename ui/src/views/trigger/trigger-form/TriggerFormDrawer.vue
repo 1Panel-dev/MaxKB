@@ -7,7 +7,7 @@ import TriggerApi from '@/api/admin/workspace/trigger/trigger'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 import { RESOURCE_TYPE, TRIGGER_TYPE, TRIGGER_SCHEDULE_TYPE as SCHEDULE, TRIGGER_INTERVAL_UNIT as INTERVAL } from '@/api/enums'
 import type { ApplicationDetail, ToolItem, TriggerPayload, TriggerSetting } from '@/api/types'
-import TriggerTaskGroups from './task-execution/TriggerTaskGroups.vue'
+import TaskExecution from './task-execution/TaskExecution.vue'
 import RequestParameters from './request-parameters/RequestParameters.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
@@ -21,7 +21,7 @@ const detailFailed = ref(false)
 const editingId = ref<string>()
 const formRef = ref<FormInstance>()
 const presetScheduleType = ref<TriggerSetting['schedule_type']>()
-const taskGroupsRef = ref<InstanceType<typeof TriggerTaskGroups>>()
+const taskExecutionRef = ref<InstanceType<typeof TaskExecution>>()
 const resources = ref<Record<string, Partial<ApplicationDetail & ToolItem>>>({})
 
 // HTTP 部署中 randomUUID 可能不可用，使用浏览器安全随机数生成 UUID。
@@ -184,10 +184,9 @@ function handleSave() {
   form.value.name = form.value.name.trim()
   saving.value = true
   return nextTick()
-    .then(() => Promise.all([formRef.value?.validate().catch(() => false), taskGroupsRef.value?.validate()]))
+    .then(() => Promise.all([formRef.value?.validate().catch(() => false), taskExecutionRef.value?.validate()]))
     .then((validations) => {
       if (validations.some((valid) => !valid)) {
-        taskGroupsRef.value?.expandAll()
         return
       }
       const payload = cloneDeep(form.value)
@@ -226,7 +225,7 @@ function resetData() {
   saving.value = false
   detailFailed.value = false
   resources.value = {}
-  taskGroupsRef.value?.reset()
+  taskExecutionRef.value?.reset()
   presetScheduleType.value = undefined
   formRef.value?.clearValidate()
 }
@@ -293,7 +292,7 @@ defineExpose({ open })
                       <el-input v-model="eventUrl" readonly>
                         <template #suffix>
                           <el-button text @click="copyText(eventUrl)" class="-mr-1">
-                            <mk-icon name="icon_copy_outlined" class="text-N600"></mk-icon>
+                            <MkIcon name="icon_copy_outlined" class="text-N600" />
                           </el-button>
                         </template>
                       </el-input>
@@ -303,16 +302,16 @@ defineExpose({ open })
                       <el-input v-model="form.trigger_setting.token" readonly>
                         <template #suffix>
                           <el-button text @click="copyText(form.trigger_setting.token)">
-                            <mk-icon name="icon_copy_outlined" class="text-N600"></mk-icon>
+                            <MkIcon name="icon_copy_outlined" class="text-N600" />
                           </el-button>
                           <!-- 刷新Token -->
                           <el-button text @click="handleRefreshToken" class="-mr-1">
-                            <mk-icon name="icon_refresh_outlined" class="text-N600"></mk-icon>
+                            <MkIcon name="icon_refresh_outlined" class="text-N600" />
                           </el-button>
                         </template>
                       </el-input>
                       <!-- 请求参数 -->
-                      <RequestParameters v-model="form.trigger_setting.body" />
+                      <!-- <RequestParameters v-model="form.trigger_setting.body" /> -->
                     </template>
                   </div>
                 </el-form-item>
@@ -323,12 +322,11 @@ defineExpose({ open })
         <!-- 任务执行 -->
         <el-form-item label="任务执行" prop="trigger_task">
           <div class="mk-gray-card w-full p-4! rounded-xl!">
-            <TriggerTaskGroups
-              ref="taskGroupsRef"
+            <TaskExecution
+              ref="taskExecutionRef"
               v-model="form.trigger_task"
               :initial-resources="resources"
               v-model:loading="loading"
-              :active="visible"
               :trigger-type="form.trigger_type"
               :body="form.trigger_setting.body ?? []"
               :disabled="saving || loading"

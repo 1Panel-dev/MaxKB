@@ -209,6 +209,8 @@ Keep these behaviors:
 ## Frontend Implementation Notes
 
 - Prefer existing project structure and naming.
+- Do not modify shared components under `src/components/` without an explicit user instruction to
+  change those components. Follow the modification boundary in `src/components/COMPONENT_README.md`.
 - Do not write `aria-label` attributes in project source. Add concise Chinese HTML comments before
   buttons to describe their purpose, following `src/components/COMPONENT_README.md`.
 - Before changing existing behavior, trace the affected flow and dependent requirements, including

@@ -216,7 +216,7 @@ onMounted(() => loadSystemUsers())
                 <!-- 编辑 -->
                 <el-tooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
-                    <mk-icon name="icon_edit_outlined"></mk-icon>
+                    <MkIcon name="icon_edit_outlined" />
                   </el-button>
                 </el-tooltip>
                 <!-- 修改用户密码 -->
@@ -224,7 +224,7 @@ onMounted(() => loadSystemUsers())
                 <!-- 删除 -->
                 <el-tooltip content="删除" placement="top">
                   <el-button type="primary" text @click.stop="deleteUser(row)">
-                    <mk-icon name="icon_delete-trash_outlined"></mk-icon>
+                    <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
                 </el-tooltip>
               </div>

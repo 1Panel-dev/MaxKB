@@ -6,6 +6,15 @@
 
 ## 选型与目录
 
+### 公共组件修改边界
+
+没有用户明确要求修改公共组件的指令，不允许修改 `src/components/` 下公共组件的内容，
+包括 `global/`、`business/` 及其他共享组件目录中的模板、逻辑、样式和接口。
+“参考某组件”“使用某组件”或修改业务页面，不视为授权修改该公共组件。
+实现前先使用已有 Props、事件和插槽，在所属 View 或功能目录中完成组合与适配。
+确实需要修改公共组件时，先说明具体组件、必要性及影响范围，取得明确指令后再修改。
+此约束纳入实现前检查和提交前 diff 检查；已有其他工作留下的公共组件改动不擅自覆盖或回退。
+
 依次检查全局 Mk 组件、业务组件、手动导入的共享 UI，最后使用 Element Plus；已有同类封装时
 直接复用，例如 `MkDialog`、`MkDrawer`、`MkDropdown`、`MkIcon`、`MkTable`。先用现有 Props、
 事件、插槽和样式适配，无法满足必要行为时再新增组件；无明确需求不引入新 UI 库。
@@ -71,7 +80,6 @@ Admin、Chat 入口调用 `configureMarkdownEditor()` 配置本地高亮、KaTeX
 ### MkCollapse
 
 `v-model:expanded` 可控制展开状态；未绑定时沿用 `defaultExpanded` 的内部状态。
-`destroyOnCollapse` 默认 `true`，设为 `false` 时折叠只隐藏内容，适用于需要保留参数表单及校验的场景。
 
 标题折叠区，`title` 或 `label` 插槽提供标题，默认插槽提供内容。
 `defaultExpanded` 默认 `true`，仅设置初始状态；点击标题内部切换，当前不提供展开状态事件。

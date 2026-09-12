@@ -204,14 +204,14 @@ onMounted(() => loadTriggers())
                 <!-- 编辑当前触发器 -->
                 <el-tooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenTriggerDrawer(row)">
-                    <mk-icon name="icon_edit_outlined"></mk-icon>
+                    <MkIcon name="icon_edit_outlined" />
                   </el-button>
                 </el-tooltip>
                 <!-- 删除当前触发器 -->
 
                 <el-tooltip content="删除" placement="top">
                   <el-button type="primary" text @click.stop="handleDeleteTrigger(row)">
-                    <mk-icon name="icon_delete-trash_outlined"></mk-icon>
+                    <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
                 </el-tooltip>
               </div>
