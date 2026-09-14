@@ -19,7 +19,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from rest_framework import serializers
 
 from application.workflow.message.aggregator import AggregationManager
-from application.flow.tools import get_tools, mcp_response_generator
+from application.workflow.nodes.ai_chat_node.agent import get_workflow_tools, mcp_response_generator
 from application.models import Application, ApplicationAccessToken, ApplicationApiKey
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
@@ -508,7 +508,7 @@ class AIChatNode(INode):
             source_id = self.get_workflow_parameters().get("application_id")
             source_type = "APPLICATION"
 
-        tools = get_tools(source_type, chat_id, tool_ids, workspace_id)
+        tools = get_workflow_tools(source_type, chat_id, tool_ids, workspace_id)
         if tool_ids and len(tool_ids) > 0:
             custom_tools_map = {
                 str(t.id): t for t in QuerySet(Tool).filter(id__in=tool_ids, tool_type=ToolType.CUSTOM, is_active=True)
