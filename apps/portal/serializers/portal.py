@@ -147,25 +147,30 @@ class PortalLoginSerializer(serializers.Serializer):
             raise AppApiException(500, _("Portal local login is not enabled"))
 
         max_attempts = auth_config.get("max_attempts", 1)
-        failed_attempts = auth_config.get("failed_attempts", 5)
-        lock_time = auth_config.get("lock_time", 10)
 
-        license_validator = DatabaseModelManage.get_model("license_is_valid")
-        is_license_valid = bool(license_validator()) if license_validator else False
+        license_validator = DatabaseModelManage.get_model("license_is_valid") or (lambda: False)
+        is_license_valid = license_validator() if license_validator() is not None else False
+
+        if is_license_valid:
+            failed_attempts = auth_config.get("failed_attempts", 5)
+            lock_time = auth_config.get("lock_time", 10)
+        else:
+            failed_attempts = 5
+            lock_time = 10
 
         cache_key = system_get_key(f"portal_{username}")
-        if is_license_valid:
-            if PortalLoginSerializer._is_account_locked(username, failed_attempts):
-                raise AppApiException(
-                    1005, _("This account has been locked for %s minutes, please try again later") % lock_time
-                )
+
+        if PortalLoginSerializer._is_account_locked(username, failed_attempts):
+            raise AppApiException(
+                1005, _("This account has been locked for %s minutes, please try again later") % lock_time
+            )
         if PortalLoginSerializer._need_captcha(username, max_attempts):
-            PortalLoginSerializer._validate_captcha(username, captcha)
+            PortalLoginSerializer._validate_captcha(username, captcha, failed_attempts, lock_time)
 
         user = ChatUser.objects.filter(username=username).first()
 
         if not user or not password_verify(password, user.password):
-            PortalLoginSerializer._handle_failed_login(username, is_license_valid, failed_attempts, lock_time)
+            PortalLoginSerializer._handle_failed_login(username, failed_attempts, lock_time)
             raise AppApiException(500, _("The username or password is incorrect"))
 
         if needs_password_upgrade(user.password):
@@ -234,17 +239,21 @@ class PortalLoginSerializer(serializers.Serializer):
         return True
 
     @staticmethod
-    def _validate_captcha(username: str, captcha: str) -> None:
+    def _validate_captcha(username: str, captcha: str, failed_attempts: int = 5, lock_time: int = 10) -> None:
         if not captcha:
             raise AppApiException(1005, _("Captcha is required"))
-        captcha_cache = cache.get(
-            Cache_Version.CAPTCHA.get_key(captcha=f"portal_{username}"), version=Cache_Version.CAPTCHA.get_version()
-        )
+        captcha_key = Cache_Version.CAPTCHA.get_key(captcha=f"portal_{username}")
+        captcha_cache = cache.get(captcha_key, version=Cache_Version.CAPTCHA.get_version())
         if captcha_cache is None or captcha.lower() != captcha_cache:
+            # 校验失败与口令失败共用同一失败计数与锁定机制，防止"识别-试错"循环绕过验证码
+            PortalLoginSerializer._record_login_failure(username, failed_attempts, lock_time)
             raise AppApiException(1005, _("Captcha code error or expiration"))
+        # 校验通过即销毁，保证验证码一次性使用
+        cache.delete(captcha_key, version=Cache_Version.CAPTCHA.get_version())
 
     @staticmethod
-    def _handle_failed_login(username: str, is_license_valid: bool, failed_attempts: int, lock_time: int) -> None:
+    def _record_login_failure(username: str, failed_attempts: int, lock_time: int) -> int:
+        """记录一次认证失败（口令或验证码），累计计数并在达到阈值时创建锁键；不抛异常。"""
         try:
             _record_login_fail(username)
         except Exception:
@@ -254,7 +263,18 @@ class PortalLoginSerializer(serializers.Serializer):
             lock_fail_count = _record_login_fail_lock(username, lock_time)
         except Exception:
             pass
-        if not is_license_valid or failed_attempts <= 0:
+        if failed_attempts > 0 and lock_fail_count >= failed_attempts:
+            try:
+                cache.add(system_get_key(f"portal_{username}_lock"), 1, timeout=lock_time * 60, version=system_version)
+            except Exception:
+                pass
+        return lock_fail_count
+
+    @staticmethod
+    def _handle_failed_login(username: str, failed_attempts: int, lock_time: int) -> None:
+        lock_fail_count = PortalLoginSerializer._record_login_failure(username, failed_attempts, lock_time)
+        # 仅由失败次数配置控制（CE/PE 同样生效）；计数在此之前已记录
+        if failed_attempts <= 0:
             return
         if lock_fail_count < failed_attempts:
             remain_attempts = failed_attempts - lock_fail_count
@@ -263,10 +283,6 @@ class PortalLoginSerializer(serializers.Serializer):
                 _("Login failed %s times, account will be locked, you have %s more chances !")
                 % (failed_attempts, remain_attempts),
             )
-        try:
-            cache.add(system_get_key(f"portal_{username}_lock"), 1, timeout=lock_time * 60, version=system_version)
-        except Exception:
-            pass
         raise AppApiException(
             1005, _("This account has been locked for %s minutes, please try again later") % lock_time
         )

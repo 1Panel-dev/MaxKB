@@ -52,14 +52,7 @@ class ChatUserAccessTokenV3Serializer(serializers.Serializer):
             need_captcha = fail_count >= max_attempts
 
         if need_captcha:
-            if not captcha:
-                raise AppApiException(1005, _("Captcha is required"))
-
-            captcha_cache = cache.get(
-                Cache_Version.CAPTCHA.get_key(captcha=f"chat_{username}"), version=Cache_Version.CAPTCHA.get_version()
-            )
-            if captcha_cache is None or captcha.lower() != captcha_cache:
-                raise AppApiException(1005, _("Captcha code error or expiration"))
+            ChatUserAccessTokenV3Serializer._validate_captcha(username, captcha)
 
         user = ChatUser.objects.filter(username=username).first()
 
@@ -75,14 +68,29 @@ class ChatUserAccessTokenV3Serializer(serializers.Serializer):
         cache.delete(system_get_key(f"chat_{username}"), version=system_version)
         return user
 
+    @staticmethod
+    def _validate_captcha(username: str, captcha: str) -> None:
+        """验证验证码（一次性消费）"""
+        if not captcha:
+            raise AppApiException(1005, _("Captcha is required"))
+
+        captcha_key = Cache_Version.CAPTCHA.get_key(captcha=f"chat_{username}")
+        captcha_cache = cache.get(captcha_key, version=Cache_Version.CAPTCHA.get_version())
+
+        if captcha_cache is None or captcha.lower() != captcha_cache:
+            record_login_fail(username)
+            raise AppApiException(1005, _("Captcha code error or expiration"))
+
+        # 校验通过即销毁，保证验证码一次性使用
+        cache.delete(captcha_key, version=Cache_Version.CAPTCHA.get_version())
+
 
 def record_login_fail(username: str, expire: int = 600):
-    """记录登录失败次数"""
+    """记录登录失败次数（原子递增）"""
     if not username:
         return
     fail_key = system_get_key(f"chat_{username}")
-    fail_count = cache.get(fail_key, version=system_version)
-    if fail_count is None:
-        cache.set(fail_key, 1, timeout=expire, version=system_version)
-    else:
+    try:
         cache.incr(fail_key, 1, version=system_version)
+    except ValueError:
+        cache.set(fail_key, 1, timeout=expire, version=system_version)

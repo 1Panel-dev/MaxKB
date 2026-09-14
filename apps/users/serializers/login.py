@@ -137,26 +137,29 @@ class LoginSerializer(serializers.Serializer):
         # 获取认证配置
         auth_setting = LoginSerializer.get_auth_setting()
         max_attempts = auth_setting.get("max_attempts", 1)
-        failed_attempts = auth_setting.get("failed_attempts", 5)
-        lock_time = auth_setting.get("lock_time", 10)
 
-        # 检查许可证有效性
-        license_validator = DatabaseModelManage.get_model("license_is_valid")
-        is_license_valid = bool(license_validator()) if license_validator else False
+        license_validator = DatabaseModelManage.get_model("license_is_valid") or (lambda: False)
+        is_license_valid = license_validator() if license_validator() is not None else False
 
-        if is_license_valid and LoginSerializer._is_account_locked(username, failed_attempts):
-            # 检查账户是否被锁定
+        if is_license_valid:
+            failed_attempts = auth_setting.get("failed_attempts", 5)
+            lock_time = auth_setting.get("lock_time", 10)
+        else:
+            failed_attempts = 5
+            lock_time = 10
+
+        if LoginSerializer._is_account_locked(username, failed_attempts):
             raise AppApiException(
                 1005, _("This account has been locked for %s minutes, please try again later") % lock_time
             )
         if LoginSerializer._need_captcha(username, max_attempts):
             # 验证验证码
-            LoginSerializer._validate_captcha(username, captcha)
+            LoginSerializer._validate_captcha(username, captcha, failed_attempts, lock_time)
 
         # 验证用户凭据：先按用户名查找，再用 password_verify 验证密码
         user = LoginSerializer._authenticate(username, password)
         if user is None:
-            LoginSerializer._handle_failed_login(username, is_license_valid, failed_attempts, lock_time)
+            LoginSerializer._handle_failed_login(username, failed_attempts, lock_time)
             raise AppApiException(500, _("The username or password is incorrect"))
 
         if not user.is_active:
@@ -192,27 +195,36 @@ class LoginSerializer(serializers.Serializer):
         return True
 
     @staticmethod
-    def _validate_captcha(username: str, captcha: str) -> None:
-        """验证验证码"""
+    def _validate_captcha(username: str, captcha: str, failed_attempts: int = 5, lock_time: int = 10) -> None:
+        """验证验证码（一次性消费）"""
         if not captcha:
             raise AppApiException(1005, _("Captcha is required"))
 
-        captcha_cache = cache.get(
-            Cache_Version.CAPTCHA.get_key(captcha=f"system_{username}"), version=Cache_Version.CAPTCHA.get_version()
-        )
+        captcha_key = Cache_Version.CAPTCHA.get_key(captcha=f"system_{username}")
+        captcha_cache = cache.get(captcha_key, version=Cache_Version.CAPTCHA.get_version())
 
         if captcha_cache is None or captcha.lower() != captcha_cache:
+            # 校验失败与口令失败共用同一失败计数与锁定机制，防止"识别-试错"循环绕过验证码
+            LoginSerializer._record_login_failure(username, failed_attempts, lock_time)
+            if LoginSerializer._is_account_locked(username, failed_attempts):
+                raise AppApiException(
+                    1005, _("This account has been locked for %s minutes, please try again later") % lock_time
+                )
             raise AppApiException(1005, _("Captcha code error or expiration"))
 
+        # 校验通过即销毁，保证验证码一次性使用
+        cache.delete(captcha_key, version=Cache_Version.CAPTCHA.get_version())
+
     @staticmethod
-    def _handle_failed_login(username: str, is_license_valid: bool, failed_attempts: int, lock_time: int) -> None:
-        """处理登录失败
+    def _record_login_failure(username: str, failed_attempts: int, lock_time: int) -> int:
+        """记录一次认证失败（口令或验证码），累计失败/锁定计数，达到阈值时创建锁键。
 
         修复要点：
         - 使用 record_login_fail / record_login_fail_lock 两个原子 incr 来记录失败；
         - 不再依赖精确等于 0 的比较来触发锁，而是基于原子计数 >= 阈值来决定进入锁定分支；
         - 使用 cache.add 原子创建锁键，cache.add 保证只有第一个成功创建者可写入该键；
           其他并发到达的请求若发现计数已到达阈值也应当返回"已锁定"响应，避免出现绕过。
+        - 不抛异常，返回当前锁定计数，供口令校验与验证码校验共用。
         """
         # 记录普通失败计数（供验证码触发使用）
         try:
@@ -227,8 +239,29 @@ class LoginSerializer(serializers.Serializer):
         except Exception:
             maxkb_logger.exception("Failed to record lock fail count for user %s", username)
 
-        # 如果不是企业版或禁用锁定功能，直接返回（但计数已经记录）
-        if not is_license_valid or failed_attempts <= 0:
+        # 当计数达到或超过阈值时，尝试原子创建锁键；无论 cache.add 返回 True/False 都视为已锁定，
+        # 因为若为 False 说明其他并发请求已将账户标记为锁定，行为应一致。
+        if failed_attempts > 0 and lock_fail_count >= failed_attempts:
+            try:
+                locked = cache.add(
+                    system_get_key(f"system_{username}_lock"), 1, timeout=lock_time * 60, version=system_version
+                )
+                if locked:
+                    maxkb_logger.info("Account %s locked by setting cache key", username)
+                else:
+                    maxkb_logger.info("Account %s lock key already present (another request set it)", username)
+            except Exception:
+                maxkb_logger.exception("Failed to set lock key for user %s", username)
+
+        return lock_fail_count
+
+    @staticmethod
+    def _handle_failed_login(username: str, failed_attempts: int, lock_time: int) -> None:
+        """处理口令校验失败：记录失败计数并抛出对应提示"""
+        lock_fail_count = LoginSerializer._record_login_failure(username, failed_attempts, lock_time)
+
+        # 仅由失败次数配置控制（CE/PE 同样生效）；计数在此之前已记录
+        if failed_attempts <= 0:
             return
 
         # 当计数小于阈值，告知剩余尝试次数
@@ -239,19 +272,6 @@ class LoginSerializer(serializers.Serializer):
                 _("Login failed %s times, account will be locked, you have %s more chances !")
                 % (failed_attempts, remain_attempts),
             )
-
-        # 当计数达到或超过阈值时，尝试原子创建锁键；无论 cache.add 返回 True/False，都返回已锁定响应，
-        # 因为若为 False 说明其他并发请求已将账户标记为锁定，行为应一致。
-        try:
-            locked = cache.add(
-                system_get_key(f"system_{username}_lock"), 1, timeout=lock_time * 60, version=system_version
-            )
-            if locked:
-                maxkb_logger.info("Account %s locked by setting cache key", username)
-            else:
-                maxkb_logger.info("Account %s lock key already present (another request set it)", username)
-        except Exception:
-            maxkb_logger.exception("Failed to set lock key for user %s", username)
 
         raise AppApiException(
             1005, _("This account has been locked for %s minutes, please try again later") % lock_time
