@@ -21,6 +21,7 @@ from django.utils.translation import gettext_lazy as _
 from maxkb.const import BASE_DIR, CONFIG, PROJECT_DIR
 
 from common.utils.logger import maxkb_logger
+from common.utils.mcp_client import InternalMCPConfig, validate_mcp_servers
 
 _enable_sandbox = bool(int(CONFIG.get("SANDBOX", 1)))
 _run_user = "sandbox" if _enable_sandbox else getpass.getuser()
@@ -76,10 +77,11 @@ class ToolExecutor:
         allow_dl_open = CONFIG.get("SANDBOX_PYTHON_ALLOW_DL_OPEN", "0")
         allow_subprocess = CONFIG.get("SANDBOX_PYTHON_ALLOW_SUBPROCESS", "0")
         allow_syscall = CONFIG.get("SANDBOX_PYTHON_ALLOW_SYSCALL", "0")
-        import _ctypes;
+        import _ctypes
+
         ctypes_so_mode = os.stat(_ctypes.__file__).st_mode
         # 如果不允许打开动态链接库，则去掉sandbox用户对ctypes动态链接库文件的读权限
-        os.chmod(_ctypes.__file__,  ctypes_so_mode & ~0o040 if allow_dl_open == "0" else ctypes_so_mode | 0o040)
+        os.chmod(_ctypes.__file__, ctypes_so_mode & ~0o040 if allow_dl_open == "0" else ctypes_so_mode | 0o040)
         if banned_hosts:
             hostname = socket.gethostname()
             local_ip = socket.gethostbyname(hostname)
@@ -340,7 +342,7 @@ exec({dedent(code)!a})
             },
             "transport": "stdio",
         }
-        return tool_config
+        return InternalMCPConfig(tool_config)
 
     def get_app_mcp_config(self, api_key, chat_files=None, form_data=None):
         headers = {
@@ -359,7 +361,7 @@ exec({dedent(code)!a})
             "transport": "streamable_http",
             "headers": headers,
         }
-        return app_config
+        return InternalMCPConfig(app_config)
 
     @staticmethod
     def encode_chat_files(chat_files, max_size=6000):
@@ -416,10 +418,7 @@ exec({dedent(code)!a})
             raise Exception(_("Process execution timed out after {} seconds.").format(_process_limit_timeout_seconds))
 
     def validate_mcp_transport(self, code_str):
-        servers = json.loads(code_str)
-        for server, config in servers.items():
-            if config.get("transport") not in ["sse", "streamable_http"]:
-                raise Exception(_("Only support transport=sse or transport=streamable_http"))
+        validate_mcp_servers(json.loads(code_str))
 
 
 @contextmanager

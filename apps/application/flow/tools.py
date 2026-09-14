@@ -45,7 +45,7 @@ from knowledge.models.knowledge_action import State
 from langchain_core.messages import AIMessageChunk, BaseMessage, BaseMessageChunk, ToolMessage
 from langchain_core.tools import StructuredTool
 from langchain_core.utils._merge import merge_lists as _original_merge_lists
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from common.utils.mcp_client import create_mcp_client
 from langgraph.checkpoint.memory import MemorySaver
 from maxkb.const import CONFIG
 from pydantic import Field, create_model
@@ -396,7 +396,7 @@ def _extract_tool_id(raw_id):
 
 async def _initialize_skills(mcp_servers, temp_dir):
     skills_dir = os.path.join(temp_dir, "skills")
-    mcp_config = json.loads(mcp_servers)
+    mcp_config = dict(mcp_servers)  # Preserve server-generated InternalMCPConfig objects.
     if "skills" in mcp_config:
         skill_file_items = mcp_config.pop("skills")
         for skill_file in skill_file_items:
@@ -435,7 +435,7 @@ async def _initialize_skills(mcp_servers, temp_dir):
 
         os.system("chmod -R g+rx " + temp_dir)  # 确保技能目录可访问
 
-    client = MultiServerMCPClient(mcp_config)
+    client = create_mcp_client(mcp_config)
 
     return client
 

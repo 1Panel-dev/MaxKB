@@ -51,7 +51,7 @@ from django.utils.translation import gettext_lazy as _
 from knowledge.models import File, FileSourceType, Knowledge, KnowledgeScope
 from knowledge.serializers.common import BatchMoveSerializer, BatchSerializer
 from knowledge.serializers.knowledge import KnowledgeModelSerializer, KnowledgeSerializer
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from common.utils.mcp_client import create_mcp_client
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
 from models_provider.models import Model
@@ -1095,7 +1095,7 @@ class PlayDemoTextRequest(serializers.Serializer):
 
 
 async def get_mcp_tools(servers):
-    client = MultiServerMCPClient(servers)
+    client = create_mcp_client(servers)
     return await client.get_tools()
 
 
@@ -1122,9 +1122,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             McpServersSerializer(data=instance).is_valid(raise_exception=True)
         servers = json.loads(instance.get("mcp_servers"))
-        for server, config in servers.items():
-            if config.get("transport") not in ["sse", "streamable_http"]:
-                raise AppApiException(500, _("Only support transport=sse or transport=streamable_http"))
+        ToolExecutor().validate_mcp_transport(json.dumps(servers))
         tools = []
         for server in servers:
             tools += [
