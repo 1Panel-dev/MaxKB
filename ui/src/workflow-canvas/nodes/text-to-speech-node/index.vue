@@ -68,7 +68,7 @@ async function validate() {
 }
 onMounted(() => {
   model.validate = validate
-  store.getModelList({ model_type: 'TTS' }).then((data) => {
+  store.getModelListWithShared({ model_type: 'TTS' }).then((data) => {
     modelList.value = data
   })
   store.getProviderList().then((data) => {

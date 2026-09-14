@@ -136,6 +136,14 @@ src/views/knowledge/
 │       ├── index.ts
 │       ├── MoveKnowledgeAction.vue
 │       └── DeleteKnowledgeAction.vue
+├── create-knowledge/
+│   ├── CreateKnowledgeDropdown.vue       # 知识库创建菜单与弹窗入口
+│   ├── CreateBaseKnowledgeDialog.vue     # 通用知识库创建
+│   ├── CreateWebKnowledgeDialog.vue      # Web 站点配置与创建
+│   ├── CreateLarkKnowledgeDialog.vue     # 飞书应用配置与创建
+│   ├── CreateWorkflowKnowledgeDialog.vue # 工作流知识库创建
+│   └── components/
+│       └── KnowledgeBaseForm.vue         # 名称、描述与 Embedding 模型表单
 └── template.ts
 ```
 
@@ -145,6 +153,17 @@ src/views/knowledge/
 调用 `putLarkKnowledge`，其他类型调用 `putKnowledge`，只提交 `folder_id`；成功后通过 `move`
 更新卡片所属目录，在具体目录转出时通过 `delete` 移除卡片，在全部目录或转入当前目录时保留。
 批量转移与删除使用对应批量接口，成功后退出选择模式并刷新列表。
+
+`CreateKnowledgeDropdown` 内聚四类创建弹窗 Ref 和打开动作，列表页传入目标 `folderId`，通过
+`refresh` 刷新列表。入口支持 `trigger` 插槽替换默认创建按钮，下拉使用 `persistent`。
+各弹窗接收 `folderId`，通过 `open()` 打开；工作流额外接受可选的商店模板。共用的
+`KnowledgeBaseForm` 负责名称、描述、Embedding 模型必填校验以及工作空间和共享模型查询，
+通过 `ModelApi.getModelListWithShared({ model_type: 'EMBEDDING' })` 一次加载模型选项，
+复用 `SelectModel`，允许创建模型后刷新选项。Web、飞书的特有字段留在对应弹窗中。
+创建前校验表单，提交期间禁止重复提交和关闭；成功后刷新用户基础资料并通知列表刷新，
+普通类型进入文档列表，工作流进入画布。每次打开及关闭动画结束后清理表单，工作流模板使用
+`cloneDeep` 隔离；创建流程使用 Workspace API，不通过路由字符串推测 System 范围。
+飞书创建沿用扩展接口 `/lark/save`，部署环境需要提供该接口；导入目前仅展示菜单入口。
 
 当前工具页面按工具类型组织维护表单，共用的参数和代码设置保留在
 `tool-form/component/` 中：

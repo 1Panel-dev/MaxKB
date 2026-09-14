@@ -15,7 +15,7 @@ const getModel = inject<() => WorkflowNodeModel>('getModel')!
 const model = getModel()
 // 为画布节点中的 ModelSelect 提供参数表单接口。
 provide('getModelParamsForm', store.force.getModelParamsForm)
-provide('getSelectModelList', store.force.getModelList)
+provide('getSelectModelList', store.force.getModelListWithShared)
 interface FormNodeForm {
   is_result: boolean
   form_field_list: FormField[]

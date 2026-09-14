@@ -112,7 +112,7 @@ async function validate() {
 
 onMounted(() => {
   model.validate = validate
-  store.getModelList({ model_type: 'LLM' }).then((data) => {
+  store.getModelListWithShared({ model_type: 'LLM' }).then((data) => {
     modelList.value = data
   })
   store.getProviderList().then((data) => {

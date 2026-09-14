@@ -62,7 +62,7 @@ function addReference() {
 // 模型来源与重排参数
 const modelOptions = ref<ModelItem[]>([])
 const providerOptions = ref<ModelProviderItem[]>([])
-const getRerankerModels = inject<() => Promise<ModelItem[]>>('getRerankerModels', () => store.getModelList({ model_type: 'RERANKER' }))
+const getRerankerModels = inject<() => Promise<ModelItem[]>>('getRerankerModels', () => store.getModelListWithShared({ model_type: 'RERANKER' }))
 function refreshModels() {
   return getRerankerModels().then((models) => {
     modelOptions.value = models

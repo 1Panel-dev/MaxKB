@@ -85,7 +85,7 @@ async function validate() {
 
 onMounted(() => {
   model.validate = validate
-  store.getModelList({ model_type: 'ITV' }).then((data) => {
+  store.getModelListWithShared({ model_type: 'ITV' }).then((data) => {
     modelList.value = data
   })
   store.getProviderList().then((data) => {

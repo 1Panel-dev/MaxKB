@@ -1,6 +1,6 @@
 import { del, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { Dict, KnowledgeDetail, KnowledgeItem } from '@/api/types'
+import type { Dict, KnowledgeDetail, KnowledgeItem, KnowledgeCreatePayload, WebKnowledgeCreatePayload, LarkKnowledgeCreatePayload } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
@@ -20,6 +20,21 @@ const getKnowledgePage = (page: ParamsPage, query?: Dict<unknown>) => {
 /** 获取工作空间知识库详情。 */
 const getKnowledgeDetail = (knowledgeId: string) => {
   return get<KnowledgeDetail>(`${getPrefix()}/${knowledgeId}`)
+}
+
+/** 创建通用知识库。 */
+const postKnowledge = (payload: KnowledgeCreatePayload) => {
+  return post<KnowledgeCreatePayload, KnowledgeItem>(`${getPrefix()}/base`, payload)
+}
+
+/** 创建 Web 知识库。 */
+const postWebKnowledge = (payload: WebKnowledgeCreatePayload) => {
+  return post<WebKnowledgeCreatePayload, KnowledgeItem>(`${getPrefix()}/web`, payload)
+}
+
+/** 创建飞书知识库，沿用飞书扩展接口。 */
+const postLarkKnowledge = (payload: LarkKnowledgeCreatePayload) => {
+  return post<LarkKnowledgeCreatePayload, KnowledgeItem>(`${getPrefix()}/lark/save`, payload)
 }
 
 /** 删除工作空间知识库。 */
@@ -53,6 +68,9 @@ const importKnowledgeBundle = (payload: FormData) => {
 }
 
 export default {
+  postKnowledge,
+  postWebKnowledge,
+  postLarkKnowledge,
   deleteKnowledge,
   getAllKnowledge,
   getKnowledgeDetail,

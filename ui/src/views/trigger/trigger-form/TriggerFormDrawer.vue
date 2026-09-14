@@ -310,7 +310,7 @@ defineExpose({ open })
                           </el-button>
                         </template>
                       </el-input>
-                      <!-- 请求参数 -->
+                      <!-- TODO 请求参数 -->
                       <!-- <RequestParameters v-model="form.trigger_setting.body" /> -->
                     </template>
                   </div>

@@ -5,7 +5,8 @@ import type {
   DefaultModelSettingPayload,
   Dict,
   KnowledgeItem,
-  KnowledgeType,
+  KnowledgeCreatePayload,
+  KnowledgeWorkflowTemplate,
   KnowledgeWorkflowAction,
   KnowledgeWorkflowDebugPayload,
   KnowledgeWorkflowDetail,
@@ -17,12 +18,9 @@ interface KnowledgeWorkflowPayload {
   work_flow: LogicFlow.GraphConfigData
 }
 
-interface CreateKnowledgeWorkflowPayload {
-  name: string
-  desc?: string
-  folder_id: string
-  type: KnowledgeType
+interface CreateKnowledgeWorkflowPayload extends KnowledgeCreatePayload {
   work_flow: LogicFlow.GraphConfigData
+  work_flow_template?: KnowledgeWorkflowTemplate
 }
 
 const getPrefix = () => {

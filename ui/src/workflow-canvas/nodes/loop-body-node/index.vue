@@ -11,6 +11,7 @@ import LoopEdge from '@/workflow-canvas/core/edge/loop-edge'
 import { initDefaultShortcut } from '@/workflow-canvas/core/shortcut'
 import { disconnectByFlow } from '@/workflow-canvas/core/teleport'
 import { KnowledgeWorkFlowInstance, WorkFlowInstance } from '@/workflow-canvas/core/validate'
+import type { ModelItem } from '@/api/types'
 import { WorkflowMode, type ShapeItem } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowLoopBodyNode' })
@@ -20,7 +21,7 @@ const model = getModel()
 const parentLoopWorkflowMode = inject<WorkflowMode>('loopWorkflowMode') || WorkflowMode.ApplicationLoop
 const apiType = (inject('apiType') as string) || 'workspace'
 const currentResource = inject<unknown>('currentResource')
-const selectModelList = inject<(params: { model_type: string }) => unknown>('getSelectModelList')
+const getSelectModelList = inject<(params: { model_type: string }) => Promise<ModelItem[]>>('getSelectModelList')
 const modelParamsForm = inject<(modelId: string) => unknown>('getModelParamsForm')
 
 const containerRef = useTemplateRef<HTMLDivElement>('containerRef')
@@ -133,7 +134,7 @@ const renderGraphData = (data?: LogicFlow.GraphConfigData) => {
     loopWorkflowMode: parentLoopWorkflowMode,
     currentResource,
     apiType,
-    getSelectModelList: selectModelList,
+    getSelectModelList,
     getModelParamsForm: modelParamsForm,
     startDragNode: nestedStartDrag,
   })

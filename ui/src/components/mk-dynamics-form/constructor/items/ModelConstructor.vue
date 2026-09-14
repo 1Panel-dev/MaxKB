@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import type { ModelItem } from '@/api/types'
 import type { DynamicFormValue } from '../../type'
 import { computed, inject, ref } from 'vue'
 import SelectModel from '@/components/business/select-model/index.vue'
 import { providerList as providerOptions } from '../../items/model/provider-data'
 import { MODEL_TYPE_LABELS } from '@/constants/model'
-const getSelectModelList = inject<(params: { model_type: string }) => Promise<DynamicFormValue>>('getSelectModelList')
+const getSelectModelList = inject<(params: { model_type: string }) => Promise<ModelItem[]>>('getSelectModelList')
 const getModelParamsForm = inject<(modelId: string) => Promise<DynamicFormValue>>('getModelParamsForm')
 
 const props = defineProps<{ modelValue: DynamicFormValue }>()
@@ -70,12 +71,12 @@ function fetchDefaultParams(modelId: string) {
     }
   })
 }
-const rawModelOptions = ref<DynamicFormValue[]>([])
+const rawModelOptions = ref<ModelItem[]>([])
 
 const fetchModelByType = (type: string) => {
   if (!type || !getSelectModelList) return
-  getSelectModelList({ model_type: type }).then((res: DynamicFormValue) => {
-    rawModelOptions.value = res
+  getSelectModelList({ model_type: type }).then((models) => {
+    rawModelOptions.value = models
   })
 }
 

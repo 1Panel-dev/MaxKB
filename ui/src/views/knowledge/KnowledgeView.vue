@@ -11,7 +11,7 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
-import CreateWorkflowKnowledgeDialog from './create-knowledge/CreateWorkflowKnowledgeDialog.vue'
+import CreateKnowledgeDropdown from './create-knowledge/CreateKnowledgeDropdown.vue'
 import {
   AuthorizeKnowledgeAction,
   DeleteKnowledgeAction,
@@ -52,10 +52,6 @@ function handleCreateFolder() {
 
 /* 创建知识库 */
 const createFolderId = computed(() => currentFolder.value.id || FOLDER_ENTRY_ID.ALL)
-const createWorkflowKnowledgeDialogRef = useTemplateRef<InstanceType<typeof CreateWorkflowKnowledgeDialog>>('createWorkflowKnowledgeDialogRef')
-function handleCreateWorkflowKnowledge() {
-  createWorkflowKnowledgeDialogRef.value?.open()
-}
 
 /* 知识库查询 */
 const knowledgeData = ref<KnowledgeItem[]>([])
@@ -200,20 +196,7 @@ function handleBatchDelete() {
               <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
             </el-button>
             <!-- 创建 -->
-            <MkDropdown v-if="!batchSelectionMode" trigger="click" placement="bottom-end">
-              <el-button type="primary">
-                <span class="mr-1">创建</span>
-                <MkIcon name="icon_down_outlined" :size="14" />
-              </el-button>
-              <template #dropdown>
-                <MkDropdownMenu class="w-52!">
-                  <MkDropdownItem>通用知识库</MkDropdownItem>
-                  <MkDropdownItem>Web 站点知识库</MkDropdownItem>
-                  <MkDropdownItem @click="handleCreateWorkflowKnowledge">工作流知识库</MkDropdownItem>
-                  <MkDropdownItem divided>导入创建</MkDropdownItem>
-                </MkDropdownMenu>
-              </template>
-            </MkDropdown>
+            <CreateKnowledgeDropdown v-if="!batchSelectionMode" :folder-id="createFolderId" @refresh="refreshKnowledge" />
           </template>
         </div>
       </component>
@@ -287,6 +270,4 @@ function handleBatchDelete() {
   </MkViewLayout>
 
   <MoveToDialog ref="batchMoveToDialogRef" :loading="knowledgeOperationLoading" :source="RESOURCE_TYPE.KNOWLEDGE" @submit="handleBatchMove" />
-
-  <CreateWorkflowKnowledgeDialog ref="createWorkflowKnowledgeDialogRef" :folder-id="createFolderId" />
 </template>

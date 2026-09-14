@@ -2,12 +2,19 @@
 import { ref, computed, provide } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { Dict } from '@/api/types'
-import { dynamicFormTypeOptions, MkDynamicsForm, MkDynamicsFormConstructor, type DynamicFormValue, type FormField, type VisibilityFieldOption } from '@/components/mk-dynamics-form'
-import modelAPI from '@/api/admin/workspace/model/model'
+import {
+  dynamicFormTypeOptions,
+  MkDynamicsForm,
+  MkDynamicsFormConstructor,
+  type DynamicFormValue,
+  type FormField,
+  type VisibilityFieldOption,
+} from '@/components/mk-dynamics-form'
+import ModelApi from '@/api/admin/workspace/model/model'
 
 defineOptions({ name: 'MkDynamicsFormDemo' })
-provide('getSelectModelList', modelAPI.getModelList)
-provide('getModelParamsForm', modelAPI.getModelParamsForm)
+provide('getSelectModelList', ModelApi.getModelListWithShared)
+provide('getModelParamsForm', ModelApi.getModelParamsForm)
 const constructorRef = ref<InstanceType<typeof MkDynamicsFormConstructor>>()
 const dynamicsFormRef = ref<InstanceType<typeof MkDynamicsForm>>()
 
@@ -26,7 +33,13 @@ const visibilityFieldOptions = computed<VisibilityFieldOption[]>(() => [
     self: true,
     children: formFieldList.value
       .filter((_, index) => index !== editIndex.value) // 排除正在编辑的字段，避免自引用
-      .map((item) => ({ label: getFieldLabel(item), value: item.field, input_type: item.input_type, option_list: item.option_list, attrs: item.attrs })),
+      .map((item) => ({
+        label: getFieldLabel(item),
+        value: item.field,
+        input_type: item.input_type,
+        option_list: item.option_list,
+        attrs: item.attrs,
+      })),
   },
 ])
 
@@ -162,12 +175,7 @@ const validateForm = async () => {
 
   <!-- 添加/编辑字段弹窗 -->
   <MkDialog v-model="dialogVisible" :title="isEdit ? '编辑字段' : '添加字段'" width="600px" append-to-body destroy-on-close>
-    <MkDynamicsFormConstructor
-      ref="constructorRef"
-      v-model="currentField"
-      :enable-visibility="true"
-      :left-options="visibilityFieldOptions"
-    />
+    <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" :enable-visibility="true" :left-options="visibilityFieldOptions" />
     <template #footer>
       <el-button @click="dialogVisible = false">取消</el-button>
       <el-button type="primary" @click="submitField">确定</el-button>

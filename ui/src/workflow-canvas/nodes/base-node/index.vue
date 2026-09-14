@@ -34,7 +34,7 @@ const store = useWorkflowStore(apiType)
 
 // 为画布节点中的 ModelSelect 提供参数表单接口。
 provide('getModelParamsForm', store.force.getModelParamsForm)
-provide('getSelectModelList', store.force.getModelList)
+provide('getSelectModelList', store.force.getModelListWithShared)
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 
@@ -204,9 +204,9 @@ onMounted(() => {
   if (!Array.isArray(model.properties.chat_input_field_list)) model.properties.chat_input_field_list = []
   if (!model.properties.user_input_config) model.properties.user_input_config = { title: '用户输入' }
 
-  store.getModelList({ model_type: 'STT' }).then((models) => (sttModelOptions.value = models))
-  store.getModelList({ model_type: 'LLM' }).then((models) => (longTermModelOptions.value = models))
-  store.getModelList({ model_type: 'TTS' }).then((models) => (ttsModelOptions.value = models))
+  store.getModelListWithShared({ model_type: 'STT' }).then((models) => (sttModelOptions.value = models))
+  store.getModelListWithShared({ model_type: 'LLM' }).then((models) => (longTermModelOptions.value = models))
+  store.getModelListWithShared({ model_type: 'TTS' }).then((models) => (ttsModelOptions.value = models))
   store.getProviderList().then((providers) => (providerOptions.value = providers))
 })
 </script>

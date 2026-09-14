@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue'
 import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { BaseModelOption, Dict, ModelItem, ModelPayload, ModelProviderItem } from '@/api/types'
 import ProviderApi from '@/api/admin/model-provider'
 import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
@@ -9,7 +10,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'EditModelDrawer' })
 
-const props = defineProps<{ api: typeof ModelApi }>()
+const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi }>()
 
 const emit = defineEmits<{ closed: []; refresh: [] }>()
 
@@ -56,7 +57,10 @@ function open(provider: ModelProviderItem, model: ModelItem) {
       modelForm.name = detail.name
       modelForm.provider = detail.provider
 
-      return Promise.all([ProviderApi.getBaseModelList(detail.provider, detail.model_type), ProviderApi.getModelCreateForm(detail.provider, detail.model_type, detail.model_name)])
+      return Promise.all([
+        ProviderApi.getBaseModelList(detail.provider, detail.model_type),
+        ProviderApi.getModelCreateForm(detail.provider, detail.model_type, detail.model_name),
+      ])
     })
     .then(([baseModels, fields]) => {
       baseModelOptions.value = baseModels

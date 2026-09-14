@@ -82,7 +82,7 @@ async function validate() {
 onMounted(() => {
   if (formData.value.is_result === undefined && isLastNode(model)) formData.value.is_result = true
   model.validate = validate
-  store.getModelList({ model_type: 'LLM' }).then((data) => {
+  store.getModelListWithShared({ model_type: 'LLM' }).then((data) => {
     modelList.value = data
   })
   store.getProviderList().then((data) => {
