@@ -104,10 +104,21 @@ const FORM = (prev: any, chunk: any) => {
   }
 }
 
+const PROGRESS = (prev: any = {}, chunk: any) => {
+  return {
+    type: 'PROGRESS',
+    id: chunk.id ?? prev.id,
+     status: chunk.status ?? prev.status,
+    workflowRunId: chunk.workflowRunId ?? prev.workflowRunId,
+    extra: chunk.extra ?? prev.extra
+  }
+}
+
 export const aggregators: Record<string, (prev: any, chunk: any) => any> = {
   TEXT,
   REASONING,
   FAILURE,
   TOOL,
-  FORM
+  FORM,
+  PROGRESS
 }
