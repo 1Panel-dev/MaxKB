@@ -7,7 +7,9 @@
 """
 from typing import Dict, Type, Optional
 
+from application.workflow.message.aggregator.impl import ProgressAggregator
 from application.workflow.message.struct.content import Content
+from application.workflow.message.struct.progress_content import ProgressContent
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.reasoning_content import ReasoningContent
 from application.workflow.message.struct.tool_content import ToolContent
@@ -26,6 +28,7 @@ class AggregatorFactory:
         TextContent: TextAggregator(),
         ReasoningContent: ReasoningAggregator(),
         ToolContent: ToolAggregator(),
+        ProgressContent: ProgressAggregator()
     }
 
     @classmethod

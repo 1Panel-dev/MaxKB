@@ -17,3 +17,4 @@ class ContentType(Enum):
     CONTINUE = "CONTINUE"
     BREAK = "BREAK"
     FORM = "FORM"
+    PROGRESS="PROGRESS"
