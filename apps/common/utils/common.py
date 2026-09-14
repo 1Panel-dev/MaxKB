@@ -13,8 +13,8 @@ import io
 import json
 import mimetypes
 import pickle
-import random
 import re
+import secrets
 import shutil
 import uuid
 from functools import reduce
@@ -117,7 +117,7 @@ SAFE_CHAR_SET = (
 def get_random_chars(number=4):
     if number <= 0:
         return ""
-    return "".join(random.choices(SAFE_CHAR_SET, k=number))
+    return "".join(secrets.choice(SAFE_CHAR_SET) for _ in range(number))
 
 
 def encryption(message: str):
