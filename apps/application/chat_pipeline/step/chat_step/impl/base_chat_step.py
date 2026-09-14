@@ -445,7 +445,7 @@ class BaseChatStep(IChatStep):
                 chat_model,
                 system_prompt,
                 message_list,
-                json.dumps(mcp_servers_config),
+                mcp_servers_config,
                 mcp_output_enable,
                 tool_init_params,
                 source_id,
