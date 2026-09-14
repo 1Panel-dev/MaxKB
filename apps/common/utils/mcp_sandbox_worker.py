@@ -3,6 +3,7 @@
 import ctypes
 from contextlib import contextmanager
 import errno
+import importlib.machinery
 import importlib.util
 import ipaddress
 import json
@@ -162,8 +163,10 @@ def main():
     # Neither module imports Django nor reads the application configuration.
     modules = {}
     for name in ("mcp_network", "mcp_sandbox_proxy"):
-        path = Path(__file__).with_name(name + ".py")
-        spec = importlib.util.spec_from_file_location(name, path)
+        # Use the source or sourceless loader selected for the installed layout.
+        spec = importlib.machinery.PathFinder.find_spec(name, [str(Path(__file__).parent)])
+        if spec is None or spec.loader is None:
+            raise RuntimeError("MCP sandbox dependency is missing")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         modules[name] = module
