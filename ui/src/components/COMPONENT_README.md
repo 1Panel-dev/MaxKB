@@ -312,6 +312,37 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 ## 手动导入的共享 UI
 
+### MkEditAvatar（修改头像）
+
+手动导入 `@/components/mk-edit-avatar/index.vue`，不参与全局注册。`defaultIcon` 必填，接收默认
+图标图片 URL；字符串 `v-model` 为当前自定义头像 URL，空字符串表示使用默认图标。
+`size` 默认为 `32`（px），`editable` 默认为 `true`，设为 `false` 时仅展示头像。
+
+默认插槽替换触发区的头像内容，透出 `{ icon, size }`；`icon` 为当前 `v-model` 值，空值可由
+`ToolIcon` 等资源组件自行回退。未提供插槽时展示当前头像或 `defaultIcon` 图片。
+触发按钮及悬停、聚焦、点击行为由 `MkEditAvatar` 统一维护，插槽内只放展示内容，不嵌套按钮。
+`ToolFormDrawer` 通过此插槽渲染 `ToolIcon`，并将头像绑定到 `toolForm.icon`。
+
+悬停、聚焦或点击头像打开 Logo 设置，打开后保持显示以便选择本地文件；取消、点击外部或 Escape
+关闭并丢弃草稿，确定后才更新 `v-model` 并触发 `change(icon, file)`。
+自定义图片支持 JPG、PNG、GIF，大小不超过 10MB；确认时 `icon` 为本地 Data URL，`file`
+为所选 `File`，未重新选文件或使用默认 Logo 时为 `null`。组件不请求上传接口；调用方负责上传
+和持久化，并可将返回的图片 URL 写回 `v-model`。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
+import defaultIcon from '@/assets/mk_icon_upload.svg'
+
+const avatar = ref('')
+</script>
+
+<template>
+  <MkEditAvatar v-model="avatar" :default-icon="defaultIcon" />
+</template>
+```
+
 ### MkFilterableDropdown
 
 带搜索过滤和滚动列表的下拉选择。组件不限制选项字段，默认使用 `label` 作为展示和搜索字段、

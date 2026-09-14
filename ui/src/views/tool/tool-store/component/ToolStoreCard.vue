@@ -3,7 +3,7 @@ import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import type { ToolStoreItem } from '@/api/types'
 import { resetUrl } from '@/utils/icon'
 import { numberFormat } from '@/utils/number'
-import StoreToolFormDialog from '../../tool-form/StoreToolFormDialog.vue'
+import StoreToolFormDialog from '../StoreToolFormDialog.vue'
 import ToolStoreDetailDrawer from '../ToolStoreDetailDrawer.vue'
 
 defineOptions({ name: 'ToolStoreCard' })

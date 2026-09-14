@@ -143,13 +143,27 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="visible" :before-close="handleBeforeClose" :title="title" size="60%" @closed="handleClosed">
-    <el-form ref="formRef" v-loading="formLoading" :model="toolForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form
+      ref="formRef"
+      v-loading="formLoading"
+      :model="toolForm"
+      :rules="formRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
-          <!-- // TODO 头像 统一修改组件-->
-          <ToolIcon :size="32" />
-          <el-input v-model="toolForm.name" maxlength="64" placeholder="请输入工具名称" show-word-limit @blur="toolForm.name = toolForm.name.trim()" />
+          <!-- TODO 统一修改修改工具头像 -->
+          <ToolIcon :icon="toolForm.icon" />
+          <el-input
+            v-model="toolForm.name"
+            maxlength="64"
+            placeholder="请输入工具名称"
+            show-word-limit
+            @blur="toolForm.name = toolForm.name.trim()"
+          />
         </div>
       </el-form-item>
       <el-form-item label="描述">
