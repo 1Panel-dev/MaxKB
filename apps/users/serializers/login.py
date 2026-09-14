@@ -126,11 +126,9 @@ class LoginSerializer(serializers.Serializer):
         auth_setting = LoginSerializer.get_auth_setting()
         max_attempts = auth_setting.get("max_attempts", 1)
 
-        # 许可证有效性：CE 无 license_is_valid 模型，使用默认值 False；PE/EE 使用自定义值
         license_validator = DatabaseModelManage.get_model("license_is_valid") or (lambda: False)
         is_license_valid = license_validator() if license_validator() is not None else False
 
-        # CE 使用默认锁定策略；PE/EE 允许使用自定义值
         if is_license_valid:
             failed_attempts = auth_setting.get("failed_attempts", 5)
             lock_time = auth_setting.get("lock_time", 10)
