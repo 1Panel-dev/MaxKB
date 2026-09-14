@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
-import type { ToolItem, ToolStoreItem, ToolStoreResponse } from '@/api/types'
+import type { ToolItem, ToolStoreResponse } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vue'
 import DataSourceFormDrawer from '@/views/tool/tool-form/DataSourceFormDrawer.vue'
 import McpFormDrawer from '@/views/tool/tool-form/McpFormDrawer.vue'
 import SkillToolFormDrawer from '@/views/tool/tool-form/SkillToolFormDrawer.vue'
-import StoreToolFormDialog from '@/views/tool/tool-form/StoreToolFormDialog.vue'
 import WorkflowFormDialog from '@/views/tool/tool-form/WorkflowFormDialog.vue'
-import ToolStoreDetailDrawer from '@/views/tool/tool-store/ToolStoreDetailDrawer.vue'
 
 defineOptions({ name: 'EditToolAction' })
 
@@ -18,8 +16,6 @@ const props = defineProps<{ api: typeof ToolApi; label: string; storeTools: Tool
 const emit = defineEmits<{ update: [tool: ToolItem] }>()
 
 const formMounted = ref(false)
-const storeToolFormDialogRef = useTemplateRef<InstanceType<typeof StoreToolFormDialog>>('storeToolFormDialogRef')
-const toolStoreDetailDrawerRef = useTemplateRef<InstanceType<typeof ToolStoreDetailDrawer>>('toolStoreDetailDrawerRef')
 const toolFormDrawerRef = useTemplateRef<InstanceType<typeof ToolFormDrawer>>('toolFormDrawerRef')
 const dataSourceFormDrawerRef = useTemplateRef<InstanceType<typeof DataSourceFormDrawer>>('dataSourceFormDrawerRef')
 const mcpFormDrawerRef = useTemplateRef<InstanceType<typeof McpFormDrawer>>('mcpFormDrawerRef')
@@ -27,38 +23,6 @@ const skillToolFormDrawerRef = useTemplateRef<InstanceType<typeof SkillToolFormD
 const workflowFormDialogRef = useTemplateRef<InstanceType<typeof WorkflowFormDialog>>('workflowFormDialogRef')
 
 function handleOpenToolForm() {
-  // TODO 模板转换而来的工具只允许修改名称。
-  if (props.tool.template_id) {
-    formMounted.value = true
-    void nextTick(() =>
-      storeToolFormDialogRef.value?.open(
-        { desc: props.tool.desc, icon: props.tool.icon, id: props.tool.id, name: props.tool.name, source: 'store', tool_type: props.tool.tool_type, version: props.tool.version },
-        true,
-      ),
-    )
-    return
-  }
-
-  // TODO 有版本号的展示readme，是商店更新过来的
-  if (props.tool.version) {
-    formMounted.value = true
-    void nextTick(() => {
-      const storeTool = props.storeTools.find((item) => item.id === props.tool.template_id)
-      const toolDetail: ToolStoreItem = {
-        ...storeTool,
-        desc: props.tool.desc,
-        icon: props.tool.icon,
-        id: props.tool.id,
-        name: props.tool.name,
-        source: 'store',
-        tool_type: props.tool.tool_type,
-        version: props.tool.version,
-      }
-      toolStoreDetailDrawerRef.value?.open(toolDetail, storeTool?.readMe)
-    })
-    return
-  }
-
   formMounted.value = true
   return nextTick(() => {
     if (props.tool.tool_type === TOOL_TYPE.DATA_SOURCE) {
@@ -87,19 +51,8 @@ function handleFormClosed() {
   </MkDropdownItem>
 
   <template v-if="formMounted">
-    <StoreToolFormDialog v-if="tool.template_id" ref="storeToolFormDialogRef" @closed="handleFormClosed" @update="emit('update', $event)" />
-    <ToolStoreDetailDrawer v-else-if="tool.version" ref="toolStoreDetailDrawerRef" :show-add="false" @closed="handleFormClosed" />
-    <ToolFormDrawer
-      v-else-if="tool.tool_type === TOOL_TYPE.CUSTOM"
-      ref="toolFormDrawerRef"
-      title="编辑工具"
-      :api="api"
-      :folder-id="tool.folder_id ?? ''"
-      @closed="handleFormClosed"
-      @update="emit('update', $event)"
-    />
     <DataSourceFormDrawer
-      v-else-if="tool.tool_type === TOOL_TYPE.DATA_SOURCE"
+      v-if="tool.tool_type === TOOL_TYPE.DATA_SOURCE"
       ref="dataSourceFormDrawerRef"
       title="编辑数据源"
       :api="api"
@@ -129,6 +82,15 @@ function handleFormClosed() {
       v-else-if="tool.tool_type === TOOL_TYPE.WORKFLOW"
       ref="workflowFormDialogRef"
       title="编辑工作流"
+      :api="api"
+      :folder-id="tool.folder_id ?? ''"
+      @closed="handleFormClosed"
+      @update="emit('update', $event)"
+    />
+    <ToolFormDrawer
+      v-else
+      ref="toolFormDrawerRef"
+      title="编辑工具"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
