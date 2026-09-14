@@ -29,6 +29,7 @@ const props = withDefaults(
     canAdd?: boolean
     modelParams?: Record<string, unknown>
     disabled?: boolean
+    teleported?: boolean
     multiple?: Multiple
   }>(),
   {
@@ -38,6 +39,7 @@ const props = withDefaults(
     canAdd: false,
     modelParams: () => ({}),
     disabled: false,
+    teleported: false,
   },
 )
 
@@ -129,7 +131,7 @@ function openModelParams() {
       filterable
       :loading="loading"
       :multiple="multiple"
-      :teleported="false"
+      :teleported="teleported"
     >
       <el-option-group v-for="group in modelOptionGroups" :key="group.provider" :label="group.name">
         <el-option

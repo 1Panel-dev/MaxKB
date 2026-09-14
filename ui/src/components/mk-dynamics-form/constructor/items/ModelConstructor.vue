@@ -154,6 +154,7 @@ defineExpose({ getData, render })
 
   <el-form-item label="可选模型" prop="provider_list" :rules="[{ required: true, message: '请选择模型', type: 'array' }]">
     <SelectModel
+      teleported
       multiple
       v-model="selectedIds"
       placeholder="请选择模型"
@@ -170,6 +171,6 @@ defineExpose({ getData, render })
     :rules="formValue.required ? [{ required: true, message: '请选择模型' }] : []"
     v-if="formValue.provider_list && formValue.provider_list.length > 0"
   >
-    <SelectModel v-model="defaultModelId" placeholder="请选择模型" :options="selectedModelsOptions" :provider-options="providerOptions" />
+    <SelectModel v-model="defaultModelId" placeholder="请选择模型" :options="selectedModelsOptions" :provider-options="providerOptions" teleported />
   </el-form-item>
 </template>

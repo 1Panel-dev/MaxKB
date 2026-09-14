@@ -163,7 +163,7 @@ onBeforeUnmount(() => abortController?.abort())
       <div class="flex items-center justify-between gap-4 pr-10">
         <span :id="titleId" :class="titleClass" class="shrink-0">生成提示词</span>
         <div class="min-w-0 w-70">
-          <SelectModel v-model="activeModelId" :options="modelOptions" :provider-options="providerOptions" :disabled="loading" />
+          <SelectModel v-model="activeModelId" :options="modelOptions" :provider-options="providerOptions" :disabled="loading" teleported />
         </div>
         <el-divider direction="vertical" />
       </div>

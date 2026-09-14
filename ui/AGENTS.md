@@ -208,6 +208,9 @@ Keep these behaviors:
 
 ## Frontend Implementation Notes
 
+- Newly implemented frontend features must not add permission checks or permission-based visibility
+  or disabled states until the user explicitly requests them. Preserve existing permission logic
+  outside the requested scope; page-specific guidance is maintained in `src/views/VIEW_README.md`.
 - Prefer existing project structure and naming.
 - Do not modify shared components under `src/components/` without an explicit user instruction to
   change those components. Follow the modification boundary in `src/components/COMPONENT_README.md`.

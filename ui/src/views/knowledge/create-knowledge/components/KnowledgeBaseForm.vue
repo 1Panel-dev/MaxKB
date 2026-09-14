@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import { MODEL_STATUS } from '@/api/enums'
 import type { KnowledgeCreatePayload, ModelItem, ModelProviderItem } from '@/api/types'
 import ModelApi from '@/api/admin/workspace/model/model'
 import ModelProviderApi from '@/api/admin/model-provider'
@@ -25,7 +26,11 @@ function validate() {
 }
 
 function reset() {
-  Object.assign(form, { name: '', desc: '', embedding_model_id: '' })
+  Object.assign(form, {
+    name: '',
+    desc: '',
+    embedding_model_id: modelOptions.value.find((model) => model.status === MODEL_STATUS.SUCCESS)?.id ?? '',
+  })
   formRef.value?.clearValidate()
 }
 
@@ -40,13 +45,17 @@ function loadModelOptions() {
     .then(([models, providers]) => {
       modelOptions.value = models
       providerOptions.value = providers
+      // 新建时默认选择首个可用模型，刷新选项时保留已有选择和详情回填值。
+      if (!form.embedding_model_id) {
+        form.embedding_model_id = models.find((model) => model.status === MODEL_STATUS.SUCCESS)?.id ?? ''
+      }
     })
     .finally(() => {
       loading.value = false
     })
 }
 
-onMounted(()=>loadModelOptions())
+onMounted(() => loadModelOptions())
 defineExpose({ form, validate, reset })
 </script>
 
@@ -68,6 +77,7 @@ defineExpose({ form, validate, reset })
     </el-form-item>
     <el-form-item v-loading="loading" label="向量模型" prop="embedding_model_id">
       <SelectModel
+        teleported
         v-model="form.embedding_model_id"
         :options="modelOptions"
         :provider-options="providerOptions"

@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
+import type { UploadFile, UploadInstance } from 'element-plus'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
+import { useStore } from '@/stores'
+import { MsgSuccess } from '@/utils/message'
 import CreateBaseKnowledgeDialog from './BaseKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from './WebKnowledgeDialog.vue'
 import CreateLarkKnowledgeDialog from './LarkKnowledgeDialog.vue'
@@ -8,7 +12,8 @@ import CreateWorkflowKnowledgeDialog from './WorkflowKnowledgeDialog.vue'
 
 defineOptions({ name: 'CreateKnowledgeDropdown' })
 
-defineProps<{ folderId: string }>()
+const props = defineProps<{ folderId: string }>()
+const { auth } = useStore()
 
 defineSlots<{
   /** 创建菜单触发器，只能渲染一个有效根节点 */
@@ -38,6 +43,27 @@ function handleCreateLarkKnowledge() {
 
 function handleCreateWorkflowKnowledge() {
   createWorkflowKnowledgeDialogRef.value?.open()
+}
+
+/* 导入创建 */
+const importUploadRef = ref<UploadInstance>()
+const importing = ref(false)
+
+function handleImportCreate(file: UploadFile) {
+  if (!file.raw || importing.value) return
+  importing.value = true
+  return KnowledgeApi.postKnowledgeImport(file.raw, props.folderId)
+    .then(() => {
+      // 先刷新新资源权限，再通知列表加载导入的知识库。
+      return auth.loadAuthBaseProfile().then(() => {
+        MsgSuccess('导入成功')
+        emit('refresh')
+      })
+    })
+    .finally(() => {
+      importing.value = false
+      importUploadRef.value?.clearFiles()
+    })
 }
 </script>
 
@@ -85,12 +111,22 @@ function handleCreateWorkflowKnowledge() {
           </div>
         </MkDropdownItem>
         <!-- 导入创建 -->
-        <MkDropdownItem class="py-2!">
-          <template #icon>
-            <img class="size-6" src="@/assets/mk_icon_import.svg" alt="" />
-          </template>
-          <span>导入创建</span>
-        </MkDropdownItem>
+        <el-upload
+          ref="importUploadRef"
+          action="#"
+          :auto-upload="false"
+          class="mk-import-button"
+          :limit="1"
+          :on-change="handleImportCreate"
+          :show-file-list="false"
+        >
+          <MkDropdownItem class="w-full py-2!">
+            <template #icon>
+              <img class="size-6" src="@/assets/mk_icon_import.svg" alt="" />
+            </template>
+            <span>导入创建</span>
+          </MkDropdownItem>
+        </el-upload>
       </MkDropdownMenu>
     </template>
   </MkDropdown>

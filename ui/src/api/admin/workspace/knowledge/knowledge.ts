@@ -1,4 +1,4 @@
-import { del, get, post, put } from '../../core/request'
+import { del, get, getExportFile, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { Dict, KnowledgeDetail, KnowledgeItem, KnowledgeCreatePayload, WebKnowledgeCreatePayload, LarkKnowledgeCreatePayload } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
@@ -52,6 +52,11 @@ const putLarkKnowledge = (knowledgeId: string, payload: Partial<KnowledgeItem>) 
   return put<Partial<KnowledgeItem>, KnowledgeItem>(`${getPrefix()}/lark/${knowledgeId}`, payload)
 }
 
+/** 对知识库中的文档重新向量化。 */
+const putReEmbeddingKnowledge = (knowledgeId: string) => {
+  return put<undefined, boolean>(`${getPrefix()}/${knowledgeId}/embedding`)
+}
+
 /** 批量删除工作空间知识库。 */
 const putBatchDeleteKnowledge = (knowledgeIds: string[]) => {
   return put<{ id_list: string[] }, boolean>(`${getPrefix()}/batch_delete`, { id_list: knowledgeIds })
@@ -62,12 +67,33 @@ const putBatchMoveKnowledge = (knowledgeIds: string[], folderId: string) => {
   return put<{ id_list: string[]; folder_id: string }, boolean>(`${getPrefix()}/batch_move`, { id_list: knowledgeIds, folder_id: folderId })
 }
 
-/** 导入知识库文件。 */
-const importKnowledgeBundle = (payload: FormData) => {
-  return post<FormData, unknown>(`${getPrefix()}/import_knowledge`, payload)
+/** 将知识库文档导出为 Excel。 */
+const exportKnowledgeExcel = (knowledgeId: string, knowledgeName: string) => {
+  return getExportFile(`${knowledgeName}.xlsx`, `${getPrefix()}/${knowledgeId}/export`)
+}
+
+/** 将知识库文档及图片导出为 ZIP。 */
+const exportKnowledgeZip = (knowledgeId: string, knowledgeName: string) => {
+  return getExportFile(`${knowledgeName}.zip`, `${getPrefix()}/${knowledgeId}/export_zip`)
+}
+
+/** 导出可用于导入创建的知识库压缩包。 */
+const exportKnowledge = (knowledgeId: string, knowledgeName: string) => {
+  return getExportFile(`${knowledgeName}.zip`, `${getPrefix()}/${knowledgeId}/export_knowledge`)
+}
+
+/** 导入知识库文件并在指定文件夹创建知识库。 */
+const postKnowledgeImport = (file: File, folderId: string) => {
+  const payload = new FormData()
+  payload.append('file', file)
+  payload.append('folder_id', folderId)
+  return post<FormData, { knowledge_id: string; type: KnowledgeItem['type'] }>(`${getPrefix()}/import_knowledge`, payload)
 }
 
 export default {
+  exportKnowledgeExcel,
+  exportKnowledgeZip,
+  exportKnowledge,
   postKnowledge,
   postWebKnowledge,
   postLarkKnowledge,
@@ -77,7 +103,8 @@ export default {
   getKnowledgePage,
   putKnowledge,
   putLarkKnowledge,
+  putReEmbeddingKnowledge,
   putBatchDeleteKnowledge,
   putBatchMoveKnowledge,
-  importKnowledgeBundle,
+  postKnowledgeImport,
 }

@@ -93,15 +93,6 @@ async function getResponseErrorMessage(error: unknown) {
   return responseData?.message
 }
 
-async function getFetchErrorMessage(response: Response) {
-  const responseText = await response.text()
-  try {
-    const responseData = JSON.parse(responseText) as Partial<ApiResponse<unknown>>
-    return responseData.message || responseText
-  } catch {
-    return responseText
-  }
-}
 
 async function downloadExportResponse(response: AxiosResponse<Blob>, fileName: string, mimeType = 'application/octet-stream') {
   if (response.data.type.includes('application/json')) {

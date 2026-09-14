@@ -5,6 +5,8 @@
 
 ## 放置规则
 
+- 当前新增功能暂不接入前端权限判断，包括按权限隐藏入口、禁用控件或拦截操作，等待用户明确
+  指令后再增加。已有功能的权限逻辑不随新功能开发移除；导入或创建后的用户资料刷新继续保留。
 - `views/<feature>/` 是页面功能边界。每个独立功能页面使用自己的目录，路由页面和该页面专用
   代码放在同一目录或其子目录中，不要把多个无关页面平铺在上级目录。
 - 路由级 Vue 组件统一使用 `PascalCase` 并以 `View.vue` 结尾，例如
@@ -134,6 +136,8 @@ src/views/knowledge/
 │   ├── KnowledgeCard.vue
 │   └── action-dropdown/
 │       ├── index.ts
+│       ├── SettingKnowledgeAction.vue   # 跳转知识库设置
+│       ├── ExportKnowledgeAction.vue    # Excel、文档 ZIP 与知识库包导出
 │       ├── MoveKnowledgeAction.vue
 │       └── DeleteKnowledgeAction.vue
 ├── create-knowledge/
@@ -149,6 +153,11 @@ src/views/knowledge/
 
 `KnowledgeCard` 只负责展示、选择状态和 `action-dropdown` 插槽；页面传入完整 Knowledge API，
 组合单项转移、删除 Action，并管理批量选择、全选、批量转移与批量删除。共享知识库不展示这些操作。
+`SettingKnowledgeAction` 暂不增加权限判断，点击后携带当前
+`workspaceId` 和知识库 ID 跳转 `workspace-knowledge-setting`；阻止事件冒泡，避免同时触发卡片详情跳转。
+`ExportKnowledgeAction` 接收完整 Knowledge API，暂不增加权限判断；悬停“导出”展开右侧
+子菜单，分别导出文档 Excel、文档 ZIP 和可再次导入的知识库包。
+导出复用页面操作 loading，防止重复请求，结束或失败后恢复；共享知识库不展示该入口。
 切换文件夹退出批量模式，搜索或刷新列表清空选择。转移复用公共 `MoveToDialog`：单项飞书知识库
 调用 `putLarkKnowledge`，其他类型调用 `putKnowledge`，只提交 `folder_id`；成功后通过 `move`
 更新卡片所属目录，在具体目录转出时通过 `delete` 移除卡片，在全部目录或转入当前目录时保留。
@@ -160,10 +169,15 @@ src/views/knowledge/
 `KnowledgeBaseForm` 负责名称、描述、Embedding 模型必填校验以及工作空间和共享模型查询，
 通过 `ModelApi.getModelListWithShared({ model_type: 'EMBEDDING' })` 一次加载模型选项，
 复用 `SelectModel`，允许创建模型后刷新选项。Web、飞书的特有字段留在对应弹窗中。
+模型加载后仅在未选择时默认选中首个可用模型；重置表单时恢复该默认值，无可用模型时保持为空。
+刷新选项不覆盖用户选择或设置页回填的模型。
 创建前校验表单，提交期间禁止重复提交和关闭；成功后刷新用户基础资料并通知列表刷新，
 普通类型进入文档列表，工作流进入画布。每次打开及关闭动画结束后清理表单，工作流模板使用
 `cloneDeep` 隔离；创建流程使用 Workspace API，不通过路由字符串推测 System 范围。
-飞书创建沿用扩展接口 `/lark/save`，部署环境需要提供该接口；导入目前仅展示菜单入口。
+飞书创建沿用扩展接口 `/lark/save`，部署环境需要提供该接口。
+“导入创建”沿用智能体和工具的菜单文件选择交互，调用 `postKnowledgeImport` 上传文件及当前
+`folderId`，导入成功后先刷新用户基础资料，再通知知识库列表刷新。上传期间禁止重复导入，
+请求结束后清理文件列表，允许重新选择同一文件；文件内容由后端校验。
 
 当前工具页面按工具类型组织维护表单，共用的参数和代码设置保留在
 `tool-form/component/` 中：
@@ -313,6 +327,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `error/NotFoundView.vue`                                               | Admin 未匹配路由和全局 404 页面        |
 | `home/HomeView.vue`                                                    | Workspace 首页                         |
 | `knowledge/KnowledgeView.vue`                                          | 工作空间知识库目录与知识库卡片页面     |
+| `knowledge-detail/setting/KnowledgeSettingView.vue` | 知识库基本信息、来源配置与上传限制设置 |
 | `knowledge/KnowledgeDetailView.vue`                                    | 知识库详情页面                         |
 | `knowledge/DocumentDetailView.vue`                                     | 知识库文档详情页面                     |
 | `login/LoginView.vue`                                                  | Admin 登录页面                         |
@@ -458,7 +473,12 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 
 `KnowledgeCard` 在非批量选择模式下通过 `click` 通知列表进入知识库详情。
 `knowledge-detail/WorkspaceKnowledgeDetailView.vue` 查询并展示知识库名称，复用
-`ResourceDetailLayout` 生成“文档”和“工作流”目录，返回列表时恢复所属文件夹。
+`ResourceDetailLayout` 生成“文档”、“工作流”和“设置”目录，返回列表时恢复所属文件夹。
+容器通过 `knowledge-detail/context.ts` 提供只读详情与替换能力；设置页复用已加载详情，保存成功后
+更新容器数据，同步名称等展示。基本信息复用创建流程的 `KnowledgeBaseForm`，类型配置和校验留在
+设置页中。当前设置页仅接入 Workspace 路由和 API，暂不增加前端权限判断。
+更换向量模型需确认，先保存再重新向量化，整条流程禁止重复提交；向量化失败时保留原模型比较基准，
+允许再次保存重试。Web、飞书设置保留未编辑的 `meta` 字段，上传限制使用详情顶层值。
 `knowledge-detail/document/DocumentListView.vue` 为文档列表子页面，目前保留占位内容；
 文档详情作为同一容器的子路由。System 详情仍使用原有独立占位页面。
 
