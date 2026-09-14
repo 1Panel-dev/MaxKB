@@ -95,7 +95,7 @@ class QianfanModelProvider(IModelProvider):
             name=_("Thousand sails large model"),
             icon=get_file_content(
                 os.path.join(
-                    PROJECT_DIR, "apps", "models_provider", "impl", "qianfan_model_provider", "icon", "azure_icon_svg"
+                    PROJECT_DIR, "apps", "models_provider", "impl", "qianfan_model_provider", "icon", "qianfan_icon_svg"
                 )
             ),
         )
