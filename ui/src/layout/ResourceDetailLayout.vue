@@ -34,7 +34,7 @@ function navigateToDetailMenu(detailMenuItem: LayoutMenuItem) {
   <MkViewLayout :loading="props.loading" title="">
     <template #aside="{ Header }">
       <component :is="Header">
-        <div class="flex min-w-0 items-center gap-1">
+        <div class="flex min-w-0 items-center gap-2">
           <el-button class="-ml-1" text @click="navigateBack">
             <MkIcon name="icon_arrow-left_outlined" :size="20" />
           </el-button>

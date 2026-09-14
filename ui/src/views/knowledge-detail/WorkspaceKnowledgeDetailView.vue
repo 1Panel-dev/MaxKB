@@ -1,18 +1,28 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, provide, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import type { KnowledgeItem } from '@/api/types'
+import type { KnowledgeDetail } from '@/api/types'
 import ResourceDetailLayout from '@/layout/ResourceDetailLayout.vue'
+import { knowledgeDetailContextKey } from './context'
 
 defineOptions({ name: 'WorkspaceKnowledgeDetailView' })
 
 /* 知识库详情与目录 */
 const route = useRoute()
 const router = useRouter()
-const knowledge = ref<KnowledgeItem>()
+const knowledge = ref<KnowledgeDetail>()
 const loading = ref(false)
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
+
+function replaceKnowledgeDetail(detail: KnowledgeDetail) {
+  knowledge.value = detail
+}
+
+provide(knowledgeDetailContextKey, {
+  knowledge: computed(() => knowledge.value),
+  replaceKnowledgeDetail,
+})
 
 function loadKnowledgeDetail() {
   knowledge.value = undefined

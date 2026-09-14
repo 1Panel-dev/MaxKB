@@ -79,12 +79,15 @@ Admin、Chat 入口调用 `configureMarkdownEditor()` 配置本地高亮、KaTeX
 
 ### MkCollapse
 
+`trigger` 默认 `header`，点击标题区域切换；设置为 `indicator` 时，仅点击箭头按钮切换，
+标题文字和空白区域不触发。箭头按钮支持键盘操作。
+
 `v-model:expanded` 可控制展开状态；未绑定时沿用 `defaultExpanded` 的内部状态。
 
 标题折叠区，`title` 或 `label` 插槽提供标题，默认插槽提供内容。
-`defaultExpanded` 默认 `true`，仅设置初始状态；点击标题内部切换，当前不提供展开状态事件。
+`defaultExpanded` 默认 `true`，仅设置初始状态；展开状态通过 `v-model:expanded` 同步。
 `indicatorPosition` 默认 `before`，可设为 `after`；`triggerClass`、`triggerStyle` 调整触发区。
-内容使用 `v-if`，收起会卸载内部组件。
+内容使用 `v-show`，收起时保留内部组件及表单状态。
 
 ### MkEmpty
 
@@ -522,6 +525,10 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 供调用方排除当前智能体或工具，避免直接自引用。弹窗不使用滚动分页。
 
 ### SelectModel
+
+`teleported` 默认为 `false`，画布节点内保留此默认值，使下拉浮层跟随画布。
+画布外的表单、Dialog 和 Drawer 显式传入 `teleported`（即 `true`），将下拉浮层挂载到 body，
+避免被滚动容器裁剪。动态表单 Model 字段可通过透传属性配置该值。
 
 按供应商分组展示模型，单选 `v-model` 为字符串，`multiple` 模式为字符串数组，变化时触发 `change`。`options` 为
 `ModelItem[]`，`providerOptions` 为 `ModelProviderItem[]`，模型列表和供应商列表均由使用方查询。

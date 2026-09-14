@@ -24,13 +24,20 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             path: 'document',
             name: 'workspace-knowledge-document-list',
             component: () => import('@/views/knowledge-detail/document/DocumentListView.vue'),
-            meta: { title: '文档', order: 10 },
+            meta: { title: '文档', icon: 'icon-draft_outlined', activeIcon: 'icon-draft_outlined', order: 10 },
           },
+
           {
             path: 'workflow-entry',
             name: 'workspace-knowledge-workflow',
             redirect: (to) => ({ name: 'workflow-knowledge', params: { workspaceId: to.params.workspaceId, knowledgeId: to.params.knowledgeId } }),
-            meta: { title: '工作流', order: 20 },
+            meta: { title: '工作流', icon: 'icon_ticket-flow_outlined', activeIcon: 'icon_ticket-flow_outlined', order: 20 },
+          },
+          {
+            path: 'setting',
+            name: 'workspace-knowledge-setting',
+            component: () => import('@/views/knowledge-detail/setting/KnowledgeSettingView.vue'),
+            meta: { title: '设置', icon: 'icon_setting', activeIcon: 'icon_setting_filled', order: 30 },
           },
           // {
           //   path: 'document/:documentId',

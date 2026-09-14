@@ -112,6 +112,14 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 
 ### 知识库维护
 
+`exportKnowledgeExcel`、`exportKnowledgeZip`、`exportKnowledge` 分别通过 GET 请求知识库
+`/<knowledgeId>/export`、`export_zip`、`export_knowledge`，复用 `getExportFile` 下载。
+三种结果分别为文档 Excel、包含图片的文档 ZIP 和可导入创建的知识库 ZIP；优先使用服务端文件名。
+
+`postKnowledgeImport(file, folderId)` 将文件与 `folder_id` 组装为 FormData，POST 到
+`/workspace/<workspaceId>/knowledge/import_knowledge`，响应为 `{ knowledge_id, type }`。
+后端校验知识库导出包并创建资源；导入成功后的用户权限和列表刷新由调用页面负责。
+
 `workspace/knowledge/knowledge.ts` 与 `workspace/shared.ts` 的 `getAllKnowledge(query)`
 分别查询工作空间及共享知识库的非分页列表，返回 `KnowledgeItem[]`，用于关联知识库选择等
 需要全量选项的场景。原有 `getKnowledgePage` 继续用于分页列表。
@@ -120,6 +128,10 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 更新飞书知识库；单项转移提交 `folder_id`。`putBatchMoveKnowledge` 将知识库 ID 数组和目标目录
 组装为 `{ id_list, folder_id }`，`putBatchDeleteKnowledge` 将 ID 数组组装为 `{ id_list }`，
 分别使用 PUT 请求 `batch_move` 和 `batch_delete`。页面和 Action 负责类型判断及 loading。
+
+`putReEmbeddingKnowledge` 使用 PUT 请求 `/<knowledgeId>/embedding` 重新向量化。
+设置页更换向量模型时先确认、保存，再调用该接口；Web、飞书配置通过 `meta` 提交，保留未编辑的
+已有配置，文件数量与大小限制仍作为知识库顶层字段提交。
 
 知识库创建通过 `postKnowledge`、`postWebKnowledge` 分别提交到 `/base`、`/web`；
 `postLarkKnowledge` 沿用飞书扩展接口 `/lark/save`，当前开源后端未包含该实现。

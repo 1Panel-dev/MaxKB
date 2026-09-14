@@ -15,8 +15,10 @@ import CreateKnowledgeDropdown from './create-knowledge/CreateKnowledgeDropdown.
 import {
   AuthorizeKnowledgeAction,
   DeleteKnowledgeAction,
+  ExportKnowledgeAction,
   MoveKnowledgeAction,
   RelatedResourcesKnowledgeAction,
+  SettingKnowledgeAction,
 } from './knowledge-card/action-dropdown'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -217,7 +219,8 @@ function handleBatchDelete() {
                   <!-- TODO 同步 -->
                   <!-- TODO 向量化 -->
                   <!-- TODO 生成问题 -->
-                  <!-- TODO 设置 -->
+                  <!-- 设置 -->
+                  <SettingKnowledgeAction label="设置" :knowledge="knowledge" />
                   <!-- 资源授权 -->
                   <AuthorizeKnowledgeAction label="资源授权" :knowledge="knowledge" />
 
@@ -234,7 +237,13 @@ function handleBatchDelete() {
                     @move="handleMoveKnowledge"
                   />
 
-                  <!--TODO 导出-->
+                  <!-- 导出 -->
+                  <ExportKnowledgeAction
+                    v-model:loading="knowledgeOperationLoading"
+                    label="导出"
+                    :api="KnowledgeApi"
+                    :knowledge="knowledge"
+                  />
                   <!-- 删除 -->
                   <DeleteKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"

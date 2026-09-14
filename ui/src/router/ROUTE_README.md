@@ -204,6 +204,7 @@ Workspace 页面：
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/workflow
 /admin/workspace/:workspaceId/knowledge/:knowledgeId
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/document
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/setting
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/workflow-entry
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/document/:documentId
 ```
@@ -315,6 +316,7 @@ System 共享资源页面：
 - 每次新增、删除、移动或修改路由时，必须同步更新本文件。
 
 工作空间知识库卡片进入 `workspace-knowledge-detail`，默认重定向到“文档”子路由。
-详情容器复用 `ResourceDetailLayout`，二级目录包含“文档”和“工作流”；`workflow-entry`
+详情容器复用 `ResourceDetailLayout`，二级目录包含“文档”、“工作流”和“设置”；`setting`
+渲染 `knowledge-detail/setting/KnowledgeSettingView.vue`，使用容器提供的知识库详情。`workflow-entry`
 仅作为目录跳转入口，重定向到独立的 `workflow-knowledge` 全屏画布。画布返回知识库详情。
 文档详情继续保留原地址，并通过 `detailActiveMenu` 高亮“文档”。

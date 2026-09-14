@@ -231,6 +231,7 @@ defineExpose({ open })
     <el-form v-loading="loading" label-position="top" @submit.prevent>
       <el-form-item v-for="modelType in defaultModelTypes" :key="modelType" :label="MODEL_TYPE_LABELS[modelType]">
         <SelectModel
+          teleported
           v-model="modelSettings[modelType].model_id"
           v-model:model-params="modelSettings[modelType].model_params_setting"
           :options="getModelOptions(modelType)"
