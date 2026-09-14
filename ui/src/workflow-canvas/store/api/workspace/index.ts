@@ -20,7 +20,7 @@ const getAllTags = (knowledgeIds: string[]) => {
 }
 
 export default {
-  getModelList: modelAPI.getModelList,
+  getModelListWithShared: modelAPI.getModelListWithShared,
   getProviderList: providerAPI.getProviderList,
   getModelParamsForm: modelAPI.getModelParamsForm,
   getMcpTools,

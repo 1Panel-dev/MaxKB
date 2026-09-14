@@ -43,7 +43,7 @@ function loadModelOptions() {
   const providerRequest = ModelProviderApi.getProviderList().then((providers) => {
     providerOptions.value = providers
   })
-  const modelRequest = props.modelApi.getModelList().then((modelList) => {
+  const modelRequest = props.modelApi.getModelListWithShared().then((modelList) => {
     models.value = modelList
   })
   // 模型列表只查询一次，各类型选择器从完整列表中过滤选项。

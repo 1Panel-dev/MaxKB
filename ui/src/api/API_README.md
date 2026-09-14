@@ -91,7 +91,17 @@ System 接口地址。
 页面根据路由 `resourceScope` 选择当前范围的完整业务 API 对象，并将其传给需要请求的 Card
 Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 API 对象；不要为每组 Action
 额外维护逐方法接口，例如 `ModelActionApi`，也不要使用不断扩展的 `Pick<typeof XxxApi, ...>`。
+完整 API 对象的方法集合不同时，共用组件使用完整对象类型的联合，例如
+`typeof ModelApi | typeof SystemSharedModelApi`，不为凑齐类型添加其他范围不存在的接口。
 仅展示数据的组件不接收 API。
+
+### 模型选项查询
+
+`workspace/model/model.ts` 的 `getModelListWithShared(query)` 请求
+`/workspace/<workspaceId>/model_list`，支持 `name`、`model_type`、`model_name` 筛选。
+将 `shared_model` 与 `model` 按共享在前的顺序合并为 `ModelItem[]`，分别标记
+`source: 'shared'` 与 `source: 'workspace'`。`SelectModel` 的接口选项统一通过此方法查询，
+工作流通过 Store 同名方法使用缓存或强制刷新。模型管理列表继续使用 `getModelList`。
 
 ### 工具列表查询
 
@@ -110,6 +120,12 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 更新飞书知识库；单项转移提交 `folder_id`。`putBatchMoveKnowledge` 将知识库 ID 数组和目标目录
 组装为 `{ id_list, folder_id }`，`putBatchDeleteKnowledge` 将 ID 数组组装为 `{ id_list }`，
 分别使用 PUT 请求 `batch_move` 和 `batch_delete`。页面和 Action 负责类型判断及 loading。
+
+知识库创建通过 `postKnowledge`、`postWebKnowledge` 分别提交到 `/base`、`/web`；
+`postLarkKnowledge` 沿用飞书扩展接口 `/lark/save`，当前开源后端未包含该实现。
+基础创建字段由 `KnowledgeCreatePayload` 统一维护，Web、飞书请求扩展对应类型；工作流创建
+复用基础字段并附加 `work_flow` 及可选的 `KnowledgeWorkflowTemplate` 商店模板。
+成功后的用户资料刷新、列表刷新和路由跳转由创建弹窗负责。
 
 ## 枚举与类型组织
 

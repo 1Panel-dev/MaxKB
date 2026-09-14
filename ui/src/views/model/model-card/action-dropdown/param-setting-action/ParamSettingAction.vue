@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { ModelItem } from '@/api/types'
 import ParamSettingDrawer from './ParamSettingDrawer.vue'
 
 defineOptions({ name: 'ParamSettingAction' })
 
-const props = defineProps<{ api: typeof ModelApi; label: string; model: ModelItem }>()
+const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi; label: string; model: ModelItem }>()
 
 const drawerMounted = ref(false)
 const paramSettingDrawerRef = useTemplateRef<InstanceType<typeof ParamSettingDrawer>>('paramSettingDrawerRef')

@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 
 import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
 import { MODEL_TYPE_LABELS } from '@/constants'
@@ -10,7 +11,7 @@ import ModelDownloadStatus from './ModelDownloadStatus.vue'
 defineOptions({ name: 'ModelCard' })
 
 const props = defineProps<{
-  api: typeof ModelApi
+  api: typeof ModelApi | typeof SystemSharedModelApi
   disabled?: boolean
   model: ModelItem
   provider: ModelProviderItem

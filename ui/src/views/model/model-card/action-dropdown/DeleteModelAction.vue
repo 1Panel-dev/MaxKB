@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { ModelItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DeleteModelAction' })
 
-const props = defineProps<{ api: typeof ModelApi; label: string; model: ModelItem }>()
+const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi; label: string; model: ModelItem }>()
 
 const emit = defineEmits<{ refresh: [] }>()
 

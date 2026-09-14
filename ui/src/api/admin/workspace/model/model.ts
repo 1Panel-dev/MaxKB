@@ -12,6 +12,16 @@ const getModelList = (query?: Dict<unknown>) => {
   return get<ModelItem[]>(getPrefix(), query)
 }
 
+/** 获取包含已授权共享模型的下拉选项。 */
+const getModelListWithShared = (query?: Dict<unknown>): Promise<ModelItem[]> => {
+  return get<{ shared_model: ModelItem[]; model: ModelItem[] }>(`/workspace/${getWorkspaceId()}/model_list`, query).then(
+    ({ shared_model, model }) => [
+      ...shared_model.map((model): ModelItem => ({ ...model, source: 'shared' })),
+      ...model.map((model): ModelItem => ({ ...model, source: 'workspace' })),
+    ],
+  )
+}
+
 /** 创建工作空间模型。 */
 const postModel = (payload: ModelPayload) => {
   return post<ModelPayload, ModelItem>(getPrefix(), payload)
@@ -52,4 +62,15 @@ const putPauseModelDownload = (modelId: string) => {
   return put<undefined, boolean>(`${getPrefix()}/${modelId}/pause_download`)
 }
 
-export default { deleteModel, getModelDetail, getModelList, getModelMeta, getModelParamsForm, postModel, putModel, putModelParamsForm, putPauseModelDownload }
+export default {
+  deleteModel,
+  getModelDetail,
+  getModelList,
+  getModelListWithShared,
+  getModelMeta,
+  getModelParamsForm,
+  postModel,
+  putModel,
+  putModelParamsForm,
+  putPauseModelDownload,
+}

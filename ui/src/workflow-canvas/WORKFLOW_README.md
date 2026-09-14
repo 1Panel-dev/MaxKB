@@ -129,6 +129,9 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 `useWorkflowStore(apiType)` 是画布查询适配器，不是 Pinia Store。它自动收集 `store/api/*/index.ts`，
 按范围、方法与查询参数缓存结果并复用在途请求；`store.force.xxx()` 跳过已完成缓存，仍复用同键在途请求。
+模型选项统一调用 `store.getModelListWithShared(query)`，由 API 合并工作空间和已授权共享模型；
+强制刷新使用 `store.force.getModelListWithShared(query)`。动态表单配置器通过
+`getSelectModelList` 注入使用该能力，循环体转发同名注入。
 主画布从 `resourceScope` 注入读取范围（默认 `workspace`），通过节点上下文传递为 `apiType`。
 
 当前 `workspace` 适配模型、供应商、模型参数、MCP 工具、共享工具选项、工具详情和标签查询；
@@ -337,7 +340,7 @@ AI 对话、图片理解和视频理解统一复用 `component/ThinkingSetting.v
 `store/api/workspace/index.ts` 独立维护 `getAllTags(knowledgeIds)`，使用 `knowledge_ids[]` 查询
 所选知识库的全部文档标签，返回 `KnowledgeTagGroup[]`。文档标签选项通过工作流 Store 的 `force.getAllTags(knowledgeIds)` 查询，刷新时跳过已有标签缓存。
 多路召回优先使用 `getRerankerModels` 注入，当前页面未提供时回退到
-`store.getModelList({ model_type: 'RERANKER' })`。添加模型后触发 `refreshModels()`，
+`store.getModelListWithShared({ model_type: 'RERANKER' })`。添加模型后触发 `refreshModels()`，
 该回退仍读取缓存，不能视为强制刷新。
 关联知识库变化时重新查询标签，并更新节点的标签选项。
 

@@ -2,6 +2,7 @@
 import { computed, reactive, ref } from 'vue'
 import type { BaseModelOption, Dict, DynamicFormField, ModelPayload, ModelProviderItem, ModelTypeOption } from '@/api/types'
 import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import ProviderApi from '@/api/admin/model-provider'
 import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
 import { useStore } from '@/stores'
@@ -12,7 +13,9 @@ defineOptions({ name: 'CreateModelDrawer' })
 
 const { auth } = useStore()
 
-const props = withDefaults(defineProps<{ providers?: ModelProviderItem[]; api: typeof ModelApi }>(), { providers: () => [] })
+const props = withDefaults(defineProps<{ providers?: ModelProviderItem[]; api: typeof ModelApi | typeof SystemSharedModelApi }>(), {
+  providers: () => [],
+})
 const emit = defineEmits<{ back: []; refresh: [] }>()
 
 const visible = ref(false)

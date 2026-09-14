@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { ModelItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
 
 defineOptions({ name: 'ModelDownloadStatus' })
 
-const props = defineProps<{ api: typeof ModelApi; model: ModelItem; refresh: () => Promise<void> }>()
+const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi; model: ModelItem; refresh: () => Promise<void> }>()
 
 const cancelLoading = ref(false)
 let downloadTimer: ReturnType<typeof setInterval> | undefined

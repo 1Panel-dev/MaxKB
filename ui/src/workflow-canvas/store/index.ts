@@ -10,7 +10,7 @@ export interface McpTool {
 // 底层 api/*/index.ts 提供的原始接口实现,不含缓存层能力。
 type ApiModule = {
   getAllTags?: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
-  getModelList: (query?: Dict<unknown>) => Promise<ModelItem[]>
+  getModelListWithShared: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
   getModelParamsForm: (modelId: string) => Promise<DynamicFormField[]>
   getMcpTools?: (resourceType: string, resourceId: string, mcpServers: string) => Promise<McpTool[]>
@@ -22,7 +22,7 @@ type ApiModule = {
 // useWorkflowStore 返回的包装接口:默认走缓存,通过 store.force.xxx() 强制刷新。
 export type WorkflowStoreApi = {
   getAllTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
-  getModelList: (query?: Dict<unknown>) => Promise<ModelItem[]>
+  getModelListWithShared: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
   getModelParamsForm: (modelId: string) => Promise<DynamicFormField[]>
   getMcpTools: (resourceType: string, resourceId: string, mcpServers: string) => Promise<McpTool[]>
@@ -80,8 +80,8 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
         if (!resolvedApi.getAllTags) return Promise.resolve([])
         return withCache(`knowledge-tags:${JSON.stringify(knowledgeIds)}`, () => resolvedApi.getAllTags!(knowledgeIds), force)
       },
-      getModelList(query?: Dict<unknown>): Promise<ModelItem[]> {
-        return withCache(`model:${JSON.stringify(query ?? {})}`, () => resolvedApi.getModelList(query), force)
+      getModelListWithShared(query?: Dict<unknown>): Promise<ModelItem[]> {
+        return withCache(`model:${JSON.stringify(query ?? {})}`, () => resolvedApi.getModelListWithShared(query), force)
       },
       getProviderList(): Promise<ModelProviderItem[]> {
         return withCache('provider', () => resolvedApi.getProviderList(), force)

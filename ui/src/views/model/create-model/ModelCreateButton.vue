@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { ModelProviderItem } from '@/api/types'
 import CreateModelDrawer from './CreateModelDrawer.vue'
 import SelectProviderDrawer from './SelectProviderDrawer.vue'
 
 defineOptions({ name: 'ModelCreate' })
 
-const props = defineProps<{ currentProvider: ModelProviderItem; providers: ModelProviderItem[]; api: typeof ModelApi }>()
+const props = defineProps<{
+  currentProvider: ModelProviderItem
+  providers: ModelProviderItem[]
+  api: typeof ModelApi | typeof SystemSharedModelApi
+}>()
 
 const emit = defineEmits<{ refresh: [] }>()
 defineSlots<{ default(props: { open: () => void }): unknown }>()

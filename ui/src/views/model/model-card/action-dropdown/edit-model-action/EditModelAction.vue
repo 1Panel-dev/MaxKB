@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import EditModelDrawer from './EditModelDrawer.vue'
 
 defineOptions({ name: 'EditModelAction' })
 
-const props = defineProps<{ api: typeof ModelApi; label: string; model: ModelItem; provider: ModelProviderItem }>()
+const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi; label: string; model: ModelItem; provider: ModelProviderItem }>()
 
 const emit = defineEmits<{ refresh: [] }>()
 

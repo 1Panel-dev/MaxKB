@@ -458,6 +458,10 @@ Knowledge 配置器复用 `SelectKnowledgeDialog` 选择可选知识库，沿用
 相同 Embedding 模型约束。打开时传入已选快照，确认后回写可选知识库并清理已取消 ID 对应的
 默认值；取消不修改配置。
 
+Model 配置器通过 `getSelectModelList(query)` 注入加载可选模型，返回 `Promise<ModelItem[]>`。
+上层提供 `ModelApi.getModelListWithShared` 或工作流的 `store.force.getModelListWithShared`；
+循环体转发同名注入。该名称用于数据加载能力，与业务 API 方法名区分。
+
 Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选模型，不开启参数设置入口。
 选择时将模型 ID 转换为包含已配置参数的 `default_value` 对象，清空时重置为空对象。
 
@@ -521,6 +525,8 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 
 按供应商分组展示模型，单选 `v-model` 为字符串，`multiple` 模式为字符串数组，变化时触发 `change`。`options` 为
 `ModelItem[]`，`providerOptions` 为 `ModelProviderItem[]`，模型列表和供应商列表均由使用方查询。
+需要接口加载的模型选项统一使用 `getModelListWithShared`，共享标签读取 `source: 'shared'`。
+动态表单运行时的配置快照及默认模型的已选子集继续由上层提供，不额外查询全量模型。
 
 只有 `status === MODEL_STATUS.SUCCESS` 的选项可选，同供应商内可用模型排在前面。
 `canEditParams` 默认 `false`，开启且为单选时显示参数按钮；多选不加载或修改参数。

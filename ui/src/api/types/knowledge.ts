@@ -72,3 +72,31 @@ export interface KnowledgeWorkflowDetail {
   create_time?: string
   update_time?: string
 }
+
+/** 创建知识库共用的基本信息。 */
+export interface KnowledgeCreatePayload {
+  name: string
+  desc: string
+  embedding_model_id: string
+  folder_id: string
+  type: KnowledgeType
+}
+
+/** 创建 Web 知识库的站点配置。 */
+export interface WebKnowledgeCreatePayload extends KnowledgeCreatePayload {
+  source_url: string
+  selector: string
+}
+
+/** 创建飞书知识库的应用配置。 */
+export interface LarkKnowledgeCreatePayload extends KnowledgeCreatePayload {
+  app_id: string
+  app_secret: string
+  folder_token: string
+}
+
+/** 知识库工作流商店模板。 */
+export interface KnowledgeWorkflowTemplate {
+  downloadUrl: string
+  downloadCallbackUrl?: string
+}
