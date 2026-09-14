@@ -73,13 +73,14 @@ onMounted(() => loadSetting())
     <el-form-item label="State"><el-input v-model="form.config.state" placeholder="请输入" /></el-form-item>
     <el-form-item label="客户端 ID" prop="config.clientId"><el-input v-model="form.config.clientId" placeholder="请输入客户端 ID" /></el-form-item>
     <el-form-item label="客户端密钥" prop="config.clientSecret"
-      ><el-input v-model="form.config.clientSecret" type="password" show-password placeholder="请输入客户端密钥"
+      ><el-input v-model="form.config.clientSecret" type="password" autocomplete="new-password" show-password placeholder="请输入客户端密钥"
     /></el-form-item>
     <el-form-item label="字段映射" prop="config.fieldMapping"><el-input v-model="form.config.fieldMapping" placeholder="请输入字段映射" /></el-form-item>
     <el-form-item label="回调地址" prop="config.redirectUrl"><el-input v-model="form.config.redirectUrl" placeholder="请输入回调地址" /></el-form-item>
     <el-form-item
       ><div class="flex flex-col"><span>启用 OIDC 认证</span><el-switch v-model="form.is_active" class="self-start" /></div
     ></el-form-item>
+    <!-- 保存 -->
     <el-button type="primary" @click="submit">保存</el-button>
   </el-form>
 </template>

@@ -61,7 +61,7 @@ function handleCreateWorkflowKnowledge() {
           </div>
         </MkDropdownItem>
         <!-- 创建 Web 知识库 -->
-        <MkDropdownItem class="py-2!" @click="handleCreateWebKnowledge">
+        <MkDropdownItem class="py-2!">
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.WEB" /></template>
           <div class="min-w-0">
             <p>Web 知识库</p>

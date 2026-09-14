@@ -17,7 +17,7 @@ const form = reactive<KnowledgeBaseDraft>({ name: '', desc: '', embedding_model_
 const rules: FormRules<KnowledgeBaseDraft> = {
   name: [{ required: true, whitespace: true, message: '请输入知识库名称', trigger: 'blur' }],
   desc: [{ required: true, whitespace: true, message: '请输入知识库描述', trigger: 'blur' }],
-  embedding_model_id: [{ required: true, message: '请选择 Embedding 模型', trigger: 'change' }],
+  embedding_model_id: [{ required: true, message: '请选择向量模型', trigger: 'change' }],
 }
 
 function validate() {

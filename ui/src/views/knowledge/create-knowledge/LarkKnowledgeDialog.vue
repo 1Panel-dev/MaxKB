@@ -77,9 +77,10 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建飞书知识库" width="720" align-center :show-close="!loading" @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="创建飞书知识库" align-center :show-close="!loading" @closed="resetData">
     <KnowledgeBaseForm ref="baseFormRef" :disabled="loading" />
     <el-form
+    class="mt-4"
       ref="knowledgeFormRef"
       :model="knowledgeForm"
       :rules="knowledgeFormRules"
@@ -92,7 +93,7 @@ defineExpose({ open })
         <el-input v-model="knowledgeForm.app_id" placeholder="请输入 App ID" @blur="knowledgeForm.app_id = knowledgeForm.app_id.trim()" />
       </el-form-item>
       <el-form-item label="App Secret" prop="app_secret">
-        <el-input v-model="knowledgeForm.app_secret" placeholder="请输入 App Secret" type="password" show-password />
+        <el-input v-model="knowledgeForm.app_secret" placeholder="请输入 App Secret" type="password" autocomplete="new-password" show-password />
       </el-form-item>
       <el-form-item label="Folder Token" prop="folder_token">
         <el-input
