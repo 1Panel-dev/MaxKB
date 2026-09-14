@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： content_type.py
-    @date：2026/6/30 15:57
-    @desc:
+@project: MaxKB
+@Author：虎虎虎
+@file： content_type.py
+@date：2026/6/30 15:57
+@desc:
 """
+
 from enum import Enum
 
 
@@ -17,3 +18,4 @@ class ContentType(Enum):
     CONTINUE = "CONTINUE"
     BREAK = "BREAK"
     FORM = "FORM"
+    PROGRESS = "PROGRESS"

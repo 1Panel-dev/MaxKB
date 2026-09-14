@@ -14,7 +14,7 @@ from application.workflow.status import Status
 
 class ProgressContent(Content):
     def __init__(self, _id, status: Status, node_info: NodeInfo, position: Position, **kwargs):
-        super().__init__(_id, status, ContentType.REASONING, node_info, position, **kwargs)
+        super().__init__(_id, status, ContentType.PROGRESS, node_info, position, **kwargs)
 
     def to_dict(self):
         result = super().to_dict()
