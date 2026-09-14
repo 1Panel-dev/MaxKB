@@ -125,29 +125,34 @@ class LoginSerializer(serializers.Serializer):
         # 获取认证配置
         auth_setting = LoginSerializer.get_auth_setting()
         max_attempts = auth_setting.get("max_attempts", 1)
-        failed_attempts = auth_setting.get("failed_attempts", 5)
-        lock_time = auth_setting.get("lock_time", 10)
 
-        # 检查许可证有效性
+        # 许可证有效性：CE 无 license_is_valid 模型，使用默认值 False；PE/EE 使用自定义值
         license_validator = DatabaseModelManage.get_model("license_is_valid") or (lambda: False)
         is_license_valid = license_validator() if license_validator() is not None else False
 
+        # CE 使用默认锁定策略；PE/EE 允许使用自定义值
         if is_license_valid:
-            # 检查账户是否被锁定
-            if LoginSerializer._is_account_locked(username, failed_attempts):
-                raise AppApiException(
-                    1005, _("This account has been locked for %s minutes, please try again later") % lock_time
-                )
+            failed_attempts = auth_setting.get("failed_attempts", 5)
+            lock_time = auth_setting.get("lock_time", 10)
+        else:
+            failed_attempts = 5
+            lock_time = 10
 
-            # 验证验证码
+        # 检查账户是否被锁定（对 CE / EE 均生效）
+        if LoginSerializer._is_account_locked(username, failed_attempts):
+            raise AppApiException(
+                1005, _("This account has been locked for %s minutes, please try again later") % lock_time
+            )
+
+        # 验证验证码
         if LoginSerializer._need_captcha(username, max_attempts):
-            LoginSerializer._validate_captcha(username, captcha)
+            LoginSerializer._validate_captcha(username, captcha, failed_attempts, lock_time)
 
         # 验证用户凭据：先按用户名查找，再用 password_verify 验证密码
         user = User.objects.filter(username=username).first()
 
         if not user or not password_verify(password, user.password):
-            LoginSerializer._handle_failed_login(username, is_license_valid, failed_attempts, lock_time)
+            LoginSerializer._handle_failed_login(username, failed_attempts, lock_time)
             raise AppApiException(500, _("The username or password is incorrect"))
 
         # Transparently upgrade legacy MD5 hash to PBKDF2
@@ -195,20 +200,25 @@ class LoginSerializer(serializers.Serializer):
         return True
 
     @staticmethod
-    def _validate_captcha(username: str, captcha: str) -> None:
-        """验证验证码"""
+    def _validate_captcha(username: str, captcha: str, failed_attempts: int = 5, lock_time: int = 10) -> None:
+        """验证验证码（一次性消费）"""
         if not captcha:
             raise AppApiException(1005, _("Captcha is required"))
 
-        captcha_cache = cache.get(
-            Cache_Version.CAPTCHA.get_key(captcha=f"system_{username}"), version=Cache_Version.CAPTCHA.get_version()
-        )
+        captcha_key = Cache_Version.CAPTCHA.get_key(captcha=f"system_{username}")
+        captcha_cache = cache.get(captcha_key, version=Cache_Version.CAPTCHA.get_version())
 
         if captcha_cache is None or captcha.lower() != captcha_cache:
+            # 校验失败同样按一次登录失败处理：统一走 _handle_failed_login，
+            # 既递增失败计数/锁定计数，也会在达到阈值时触发账户锁定
+            LoginSerializer._handle_failed_login(username, failed_attempts, lock_time)
             raise AppApiException(1005, _("Captcha code error or expiration"))
 
+        # 校验通过即销毁，保证验证码一次性使用
+        cache.delete(captcha_key, version=Cache_Version.CAPTCHA.get_version())
+
     @staticmethod
-    def _handle_failed_login(username: str, is_license_valid: bool, failed_attempts: int, lock_time: int) -> None:
+    def _handle_failed_login(username: str, failed_attempts: int, lock_time: int) -> None:
         """处理登录失败
 
         修复要点：
@@ -230,8 +240,8 @@ class LoginSerializer(serializers.Serializer):
         except Exception:
             maxkb_logger.exception("Failed to record lock fail count for user %s", username)
 
-        # 如果不是企业版或禁用锁定功能，直接返回（但计数已经记录）
-        if not is_license_valid or failed_attempts <= 0:
+        # 禁用锁定（failed_attempts <= 0 或 -1）时仅累计计数，不触发锁定
+        if failed_attempts <= 0:
             return
 
         # 当计数小于阈值，告知剩余尝试次数
