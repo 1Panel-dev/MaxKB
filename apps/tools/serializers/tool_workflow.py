@@ -410,9 +410,7 @@ class ToolWorkflowMcpSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             McpServersSerializer(data=instance).is_valid(raise_exception=True)
         servers = json.loads(instance.get("mcp_servers"))
-        for server, config in servers.items():
-            if config.get("transport") not in ["sse", "streamable_http"]:
-                raise AppApiException(500, _("Only support transport=sse or transport=streamable_http"))
+        ToolExecutor().validate_mcp_transport(json.dumps(servers))
         tools = []
         for server in servers:
             tools += [

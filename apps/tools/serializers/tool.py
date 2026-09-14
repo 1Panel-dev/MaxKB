@@ -36,7 +36,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from knowledge.models import File, FileSourceType, Knowledge
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from common.utils.mcp_client import create_mcp_client
 from maxkb.const import CONFIG, PROJECT_DIR
 from models_provider.models import Model
 from rest_framework import serializers, status
@@ -158,13 +158,13 @@ def encryption(message: str):
 
 def validate_mcp_config(servers: Dict):
     async def validate():
-        client = MultiServerMCPClient(servers)
+        client = create_mcp_client(servers)
         await client.get_tools()
 
     try:
         asyncio.run(validate())
     except Exception as e:
-        maxkb_logger.error(f"validate mcp config error: {e}, servers: {servers}")
+        maxkb_logger.error(f"validate mcp config error: {e}")
         raise serializers.ValidationError(_("MCP configuration is invalid"))
 
 
