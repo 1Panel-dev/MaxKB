@@ -71,7 +71,13 @@ onMounted(() => loadEmailSetting())
         <el-input v-model="emailSetting.from_email" type="email" placeholder="请输入发件人邮箱" />
       </el-form-item>
       <el-form-item label="密码" prop="email_host_password">
-        <el-input v-model="emailSetting.email_host_password" type="password" show-password placeholder="请输入发件人密码" />
+        <el-input
+          v-model="emailSetting.email_host_password"
+          type="password"
+          autocomplete="new-password"
+          show-password
+          placeholder="请输入发件人密码"
+        />
       </el-form-item>
       <el-form-item>
         <div class="flex flex-col">
@@ -86,7 +92,9 @@ onMounted(() => loadEmailSetting())
         </div>
       </el-form-item>
 
+      <!-- 保存 -->
       <el-button type="primary" @click="submitEmailSetting('save')">保存</el-button>
+      <!-- 测试连接 -->
       <el-button plain @click="submitEmailSetting('test')">测试连接</el-button>
     </el-form>
   </MkViewLayout>

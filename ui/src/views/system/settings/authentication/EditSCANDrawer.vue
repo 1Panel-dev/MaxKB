@@ -61,13 +61,22 @@ defineExpose({ open })
   <MkDrawer v-model="visible" :title="`${LOGIN_METHOD_LABELS[form.key]}设置`" @closed="resetData">
     <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-position="top" require-asterisk-position="right">
       <el-form-item v-for="(_, key) in form.config" :key="key" :label="SCAN_FIELD_LABELS[key] ?? key" :prop="`config.${key}`">
-        <el-input v-model="form.config[key]" :show-password="key === 'app_secret'" :type="key === 'app_secret' ? 'password' : 'text'" placeholder="请输入" />
+        <el-input
+          v-model="form.config[key]"
+          :autocomplete="key === 'app_secret' ? 'new-password' : 'off'"
+          :show-password="key === 'app_secret'"
+          :type="key === 'app_secret' ? 'password' : 'text'"
+          placeholder="请输入"
+        />
       </el-form-item>
     </el-form>
 
     <template #footer>
+      <!-- 取消 -->
       <el-button plain @click="visible = false">取消</el-button>
+      <!-- 校验 -->
       <el-button plain @click="handleValidatePlatform">校验</el-button>
+      <!-- 保存 -->
       <el-button type="primary" @click="submit">保存</el-button>
     </template>
   </MkDrawer>

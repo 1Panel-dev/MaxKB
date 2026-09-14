@@ -50,7 +50,7 @@ onMounted(() => loadSetting())
     <el-form-item label="LDAP 地址" prop="config.ldap_server"><el-input v-model="form.config.ldap_server" placeholder="请输入LDAP 地址" /></el-form-item>
     <el-form-item label="绑定 DN" prop="config.base_dn"><el-input v-model="form.config.base_dn" placeholder="请输入绑定 DN" /></el-form-item>
     <el-form-item label="密码" prop="config.password">
-      <el-input v-model="form.config.password" type="password" show-password placeholder="请输入密码" />
+      <el-input v-model="form.config.password" type="password" autocomplete="new-password" show-password placeholder="请输入密码" />
     </el-form-item>
     <el-form-item label="用户 OU" prop="config.ou">
       <el-input v-model="form.config.ou" placeholder="请输入用户 OU" />
@@ -66,7 +66,9 @@ onMounted(() => loadSetting())
       </div>
     </el-form-item>
     <div>
+      <!-- 保存 -->
       <el-button type="primary" @click="submit('save')">保存</el-button>
+      <!-- 测试连接 -->
       <el-button plain @click="submit('test')">测试连接</el-button>
     </div>
   </el-form>
