@@ -109,3 +109,28 @@ class TextToVideoModelCredential(BaseForm, BaseModelCredential):
         :return: Parameter setting form.
         """
         return MiniMaxModelParams()
+
+
+class MiniMaxH3ModelParams(BaseForm):
+    """Required parameters for MiniMax H3 text-to-video generation."""
+
+    resolution = SingleSelect(
+        _('Resolution'), text_field='label', value_field='value',
+        option_list=[{'label': '2K', 'value': '2K'}],
+        required=True, default_value='2K',
+    )
+    duration = SliderField(
+        _('Duration (seconds)'), _min=4, _max=15, _step=1, precision=0,
+        required=True, default_value=4,
+    )
+
+
+class MiniMaxH3TextToVideoModelCredential(TextToVideoModelCredential):
+    """Use the MiniMax v2 endpoint and required H3 generation parameters."""
+
+    api_base = forms.TextInputField('API URL', required=True,
+                                    default_value='https://api.minimaxi.com/v2')
+    api_key = PasswordInputField('API Key', required=True)
+
+    def get_model_params_setting_form(self, model_name: str):
+        return MiniMaxH3ModelParams()
