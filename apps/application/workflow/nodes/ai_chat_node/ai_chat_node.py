@@ -11,34 +11,46 @@ import base64
 import json
 import re
 from functools import reduce
+from typing import Callable, Optional
 
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage, AIMessageChunk
 from rest_framework import serializers
 
-from application.workflow.message.aggregator import AggregationManager
-from application.workflow.nodes.ai_chat_node.agent import get_workflow_tools, mcp_response_generator
-from application.models import Application, ApplicationAccessToken, ApplicationApiKey
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
+from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.content import NodeInfo, Position, Content
 from application.workflow.message.struct.reasoning_content import ReasoningContent
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.tool_content import ToolContent
+from application.workflow.nodes.ai_chat_node.agent import create_agent, ToolCallStreamManagement, _get_tool_call_id
+from application.workflow.nodes.ai_chat_node.tools import (
+    get_application_tools,
+    get_mcp_servers,
+    get_tool_tools,
+)
 from application.workflow.status import Status
 from application.workflow.tools import Reasoning
-from common.exception.app_exception import AppApiException
 from common.utils.common import guess_image_format
 from common.utils.messages_util import to_ai_message_list, to_human_message_list
-from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import File
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
-from tools.models import Tool, ToolType
+
+
+class AgentCallBack:
+    def __init__(
+        self,
+        on_next: Callable[[any], None],
+        on_complete: Callable[[Optional[Exception]], None],
+    ):
+        self.on_next = on_next
+        self.on_complete = on_complete
 
 
 class ChatNodeSerializer(serializers.Serializer):
@@ -313,13 +325,10 @@ class AIChatNode(INode):
             chat_model,
             SystemMessage(system),
             message_list,
-            history_message,
             question,
             chat_id,
             workspace_id,
             workflow_type,
-            reasoning_content_id,
-            text_content_id,
             is_result,
         )
         if not mcp_handled:
@@ -467,37 +476,14 @@ class AIChatNode(INode):
         chat_model,
         system_prompt,
         message_list,
-        history_message,
         question,
         chat_id,
         workspace_id,
         workflow_type,
-        reasoning_content_id,
         text_content_id,
         is_result=False,
     ):
-        mcp_servers_config = {}
-
-        if mcp_source is None:
-            mcp_source = "custom"
-        if not mcp_tool_ids:
-            mcp_tool_ids = []
-        if mcp_tool_id:
-            mcp_tool_ids = list(set(mcp_tool_ids + [mcp_tool_id]))
-
-        if mcp_source == "custom" and mcp_servers:
-            mcp_servers_config = json.loads(mcp_servers)
-            mcp_servers_config = self._handle_variables(mcp_servers_config)
-        elif mcp_tool_ids:
-            mcp_tools = QuerySet(Tool).filter(id__in=mcp_tool_ids).values()
-            for mcp_tool in mcp_tools:
-                if mcp_tool and mcp_tool["is_active"]:
-                    mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool["code"])}
-                    mcp_servers_config = self._handle_variables(mcp_servers_config)
-
-        ToolExecutor().validate_mcp_transport(json.dumps(mcp_servers_config))
-
-        tool_init_params = {}
+        # 工具记录来源（source_type / source_id）
         if workflow_type == WorkflowType.KNOWLEDGE:
             source_id = self.get_workflow_parameters().get("knowledge_id")
             source_type = "KNOWLEDGE"
@@ -508,118 +494,129 @@ class AIChatNode(INode):
             source_id = self.get_workflow_parameters().get("application_id")
             source_type = "APPLICATION"
 
-        tools = get_workflow_tools(source_type, chat_id, tool_ids, workspace_id)
-        if tool_ids and len(tool_ids) > 0:
-            custom_tools_map = {
-                str(t.id): t for t in QuerySet(Tool).filter(id__in=tool_ids, tool_type=ToolType.CUSTOM, is_active=True)
-            }
-            for tool_id in tool_ids:
-                tool = custom_tools_map.get(str(tool_id))
-                if tool is None:
-                    continue
-                executor = ToolExecutor()
-                init_params_default_value = {i["field"]: i.get("default_value") for i in tool.init_field_list}
-                if tool.init_params is not None:
-                    tool_init_params = init_params_default_value | json.loads(rsa_long_decrypt(tool.init_params))
-                else:
-                    tool_init_params = init_params_default_value
-                tool_config = executor.get_tool_mcp_config(tool, tool_init_params)
-                mcp_servers_config[str(tool.id)] = tool_config
+        # 工具(workflow/custom) + 智能体(子应用) → LangChain tools；
+        # MCP(自定义/库内) → mcp_servers 配置；技能 → 交给引擎侧 init_skills 初始化
+        tools = get_tool_tools(source_type, source_id, tool_ids, workspace_id) + get_application_tools(
+            source_type, source_id, application_ids, workspace_id, self.get_workflow_parameters()
+        )
+        mcp_servers_config = get_mcp_servers(mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, self._handle_variables)
+        ToolExecutor().validate_mcp_transport(json.dumps(mcp_servers_config))
 
-        if application_ids and len(application_ids) > 0:
-            apps_map = {str(a.id): a for a in QuerySet(Application).filter(id__in=application_ids, is_publish=True)}
-            app_keys_map = {
-                str(ak.application_id): ak
-                for ak in QuerySet(ApplicationApiKey).filter(application_id__in=application_ids, is_active=True)
-            }
-            app_access_tokens_map = {
-                str(at.application_id): at
-                for at in QuerySet(ApplicationAccessToken).filter(application_id__in=application_ids)
-            }
-            for application_id in application_ids:
-                app = apps_map.get(str(application_id))
-                if app is None:
-                    continue
-                app_key = app_keys_map.get(str(application_id))
-                if app_key is not None:
-                    api_key = app_key.secret_key
-                    application_access_token = app_access_tokens_map.get(str(app_key.application_id))
-                    if application_access_token is not None and application_access_token.authentication:
-                        raise AppApiException(
-                            500,
-                            _("Agent 【{name}】 access token authentication is not supported for agent tool").format(
-                                name=app.name
-                            ),
-                        )
-                else:
-                    raise AppApiException(
-                        500, _("Agent Key is required for agent tool 【{name}】").format(name=app.name)
-                    )
-                executor = ToolExecutor()
-                app_config = executor.get_app_mcp_config(api_key)
-                mcp_servers_config[app.name] = app_config
-
-        if skill_tool_ids and len(skill_tool_ids) > 0:
-            skill_file_items = []
-            skill_tools_map = {str(t.id): t for t in QuerySet(Tool).filter(id__in=skill_tool_ids, is_active=True)}
-            for tool_id in skill_tool_ids:
-                tool = skill_tools_map.get(str(tool_id))
-                if tool is None:
-                    continue
-                init_params_default_value = {i["field"]: i.get("default_value") for i in tool.init_field_list}
-                if tool.init_params is not None:
-                    params = init_params_default_value | json.loads(rsa_long_decrypt(tool.init_params))
-                else:
-                    params = init_params_default_value
-                skill_file_items.append({"tool_id": str(tool.id), "file_id": tool.code, "params": params})
-            mcp_servers_config["skills"] = skill_file_items
-
-        if len(mcp_servers_config) > 0 or len(tools) > 0:
+        if tools or mcp_servers_config or skill_tool_ids:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
-            tool_content_id = str(uuid.uuid7())
-            r = mcp_response_generator(
+            # 使用可变状态在回调间共享（answer 累积、当前文本 content id、工具 content id 映射）
+            state = {"answer": "", "text_id": text_content_id, "tool_id_map": {}}
+            tool_stream = ToolCallStreamManagement()
+            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
+
+            def on_next(chunk):
+                self._check_cancelled()
+                if mcp_output_enable and isinstance(chunk, AIMessageChunk):
+                    if chunk.tool_call_chunks:
+                        for tc in chunk.tool_call_chunks:
+                            tool_id = tool_stream.get_tool_id(tc.get("index"), tc.get("id"))
+                            if not tool_id:
+                                continue
+                            tool_stream.add_tool_id(tool_id)
+                            if tc.get("name") or tc.get("args"):
+                                tool_stream.set_tool_id_name(tool_id, tc.get("name"))
+                                self.write(
+                                    ToolContent(
+                                        tool_stream.get_tool_uuid(tool_id),
+                                        tc.get("name"),
+                                        tc.get("args"),
+                                        "",
+                                        Status.RUNNING,
+                                        node_info,
+                                        Position(self.get_node_id()),
+                                    )
+                                )
+                    else:
+                        for index, raw_id, name, args in tool_stream.get_fallback_tool_calls(chunk):
+                            tool_id = tool_stream.get_tool_id(index, raw_id)
+                            if not tool_id or not tool_stream.add_tool_id(tool_id):
+                                continue
+                            self.write(
+                                ToolContent(
+                                    tool_stream.get_tool_uuid(tool_id),
+                                    name,
+                                    args,
+                                    "",
+                                    Status.RUNNING,
+                                    node_info,
+                                    Position(self.get_node_id()),
+                                )
+                            )
+
+                if mcp_output_enable and isinstance(chunk, ToolMessage):
+                    tool_id = _get_tool_call_id(chunk.tool_call_id) or chunk.tool_call_id
+                    chunk.name = tool_stream.get_tool_name(tool_id, chunk.name)
+                    try:
+                        if isinstance(chunk.content, str):
+                            tool_result = json.loads(chunk.content)
+                        elif isinstance(chunk.content, dict):
+                            tool_result = chunk.content
+                        elif isinstance(chunk.content, list):
+                            tool_result = chunk.content[0] if len(chunk.content) > 0 else {}
+                        else:
+                            tool_result = {}
+                        text = tool_result.get("text") if "text" in tool_result else None
+                        text_result = json.loads(text) if text else tool_result
+                        tool_result = (
+                            text_result if isinstance(text_result, str) else json.dumps(text_result, ensure_ascii=False)
+                        )
+                    except Exception:
+                        tool_result = chunk.content
+                    result = (
+                        tool_result if isinstance(tool_result, str) else json.dumps(tool_result, ensure_ascii=False)
+                    )
+                    self.write(
+                        ToolContent(
+                            tool_stream.get_tool_uuid(tool_id),
+                            "",
+                            "",
+                            result,
+                            Status.SUCCESS,
+                            NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS),
+                            Position(self.get_node_id()),
+                        )
+                    )
+                else:
+                    if is_result and chunk.content:
+                        self.write(
+                            TextContent(
+                                tool_stream.get_tool_uuid(chunk.id),
+                                chunk.content,
+                                Status.RUNNING,
+                                node_info,
+                                Position(self.get_node_id()),
+                            )
+                        )
+
+            def on_complete(error):
+                if error:
+                    raise error
+                self._write_final_context(chat_model, message_list, question.content, state["answer"], "")
+                self.write(
+                    TextContent(
+                        tool_stream.get_tool_uuid("text"),
+                        "",
+                        Status.SUCCESS,
+                        NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS),
+                        Position(self.get_node_id()),
+                    )
+                )
+
+            create_agent(
                 chat_model,
                 system_prompt,
                 message_list,
                 json.dumps(mcp_servers_config),
-                mcp_output_enable,
-                tool_init_params,
-                source_id,
-                source_type,
+                AgentCallBack(on_next, on_complete),
                 chat_id,
+                skill_tool_ids,
                 tools,
             )
-            answer = ""
-            tool_calls_map = {}
-            for chunk in r:
-                self._check_cancelled()
-                if isinstance(chunk, ToolMessage):
-                    tool_call = tool_calls_map.get(chunk.tool_call_id, {})
-                    self.write(
-                        ToolContent(
-                            tool_content_id,
-                            tool_call.get("name", getattr(chunk, "name", "")),
-                            json.dumps(tool_call.get("args", {}), ensure_ascii=False),
-                            chunk.content,
-                            Status.RUNNING,
-                            node_info,
-                            Position(self.get_node_id()),
-                        )
-                    )
-                    continue
-
-                if hasattr(chunk, "tool_calls") and chunk.tool_calls:
-                    for tool_call in chunk.tool_calls:
-                        tool_calls_map[tool_call.get("id", "")] = tool_call
-
-                answer += chunk.content if hasattr(chunk, "content") else str(chunk)
-                if chunk.content:
-                    self.write(
-                        TextContent(
-                            text_content_id, chunk.content, Status.RUNNING, node_info, Position(self.get_node_id())
-                        )
-                    )
-            self._write_final_context(chat_model, message_list, question.content, answer, "")
             return True
 
         return False
