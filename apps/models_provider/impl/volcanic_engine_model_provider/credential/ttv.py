@@ -15,11 +15,11 @@ class VolcanicEngineTTVModelGeneralParams(BaseForm):
     resolution = SingleSelect(
         TooltipLabel(_("Resolution"), _("Resolution")),
         required=True,
-        default_value="480P",
+        default_value="480p",
         option_list=[
-            {"value": "480P", "label": "480P"},
-            {"value": "720P", "label": "720P"},
-            {"value": "1080P", "label": "1080P"},
+            {"value": "480p", "label": "480p"},
+            {"value": "720p", "label": "720p"},
+            {"value": "1080p", "label": "1080p"},
         ],
         text_field="label",
         value_field="value",

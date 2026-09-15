@@ -15,38 +15,74 @@ class VolcanicEngineTTSModelGeneralParams(BaseForm):
         TooltipLabel(_("timbre"), _("Chinese sounds can support mixed scenes of Chinese and English")),
         required=True,
         default_value="zh_female_cancan_mars_bigtts",
-        text_field="value",
+        text_field="label",
         value_field="value",
         option_list=[
-            {"text": "灿灿/Shiny", "value": "zh_female_cancan_mars_bigtts"},
-            {"text": "清新女声", "value": "zh_female_qingxinnvsheng_mars_bigtts"},
-            {"text": "爽快思思/Skye", "value": "zh_female_shuangkuaisisi_moon_bigtts"},
-            {"text": "湾区大叔", "value": "zh_female_wanqudashu_moon_bigtts"},
-            {"text": "呆萌川妹", "value": "zh_female_daimengchuanmei_moon_bigtts"},
-            {"text": "广州德哥", "value": "zh_male_guozhoudege_moon_bigtts"},
-            {"text": "北京小爷", "value": "zh_male_beijingxiaoye_moon_bigtts"},
-            {"text": "少年梓辛/Brayan", "value": "zh_male_shaonianzixin_moon_bigtts"},
-            {"text": "魅力女友", "value": "zh_female_meilinvyou_moon_bigtts"},
+            {"label": "灿灿/Shiny", "value": "zh_female_cancan_mars_bigtts"},
+            {"label": "清新女声", "value": "zh_female_qingxinnvsheng_mars_bigtts"},
+            {"label": "爽快思思/Skye", "value": "zh_female_shuangkuaisisi_moon_bigtts"},
+            {"label": "湾区大叔", "value": "zh_female_wanqudashu_moon_bigtts"},
+            {"label": "呆萌川妹", "value": "zh_female_daimengchuanmei_moon_bigtts"},
+            {"label": "广州德哥", "value": "zh_male_guozhoudege_moon_bigtts"},
+            {"label": "北京小爷", "value": "zh_male_beijingxiaoye_moon_bigtts"},
+            {"label": "少年梓辛/Brayan", "value": "zh_male_shaonianzixin_moon_bigtts"},
+            {"label": "魅力女友", "value": "zh_female_meilinvyou_moon_bigtts"},
         ],
     )
-    speed_ratio = forms.SliderField(
-        TooltipLabel(_("speaking speed"), _("[0.2,3], the default is 1, usually one decimal place is enough")),
+    format = forms.SingleSelect(
+        TooltipLabel(_("audio format"), _("The streaming scenario recommends pcm")),
         required=True,
-        default_value=1,
-        _min=0.2,
-        _max=3,
-        _step=0.1,
-        precision=1,
+        default_value="mp3",
+        text_field="label",
+        value_field="value",
+        option_list=[
+            {"label": "mp3", "value": "mp3"},
+            {"label": "pcm", "value": "pcm"},
+            {"label": "ogg_opus", "value": "ogg_opus"},
+            {"label": "wav", "value": "wav"},
+        ],
+    )
+    sample_rate = forms.SingleSelect(
+        TooltipLabel(_("sample rate"), _("ogg_opus only supports 48000")),
+        required=True,
+        default_value=24000,
+        text_field="label",
+        value_field="value",
+        option_list=[
+            {"label": "8000", "value": 8000},
+            {"label": "16000", "value": 16000},
+            {"label": "22050", "value": 22050},
+            {"label": "24000", "value": 24000},
+            {"label": "32000", "value": 32000},
+            {"label": "44100", "value": 44100},
+            {"label": "48000", "value": 48000},
+        ],
+    )
+    speech_rate = forms.SliderField(
+        TooltipLabel(_("speaking speed"), _("[-50,100], 100 means 2x speed, -50 means 0.5x speed")),
+        required=True,
+        default_value=0,
+        _min=-50,
+        _max=100,
+        _step=1,
+        precision=0,
+    )
+    loudness_rate = forms.SliderField(
+        TooltipLabel(_("volume"), _("[-50,100], 100 means 2x volume, -50 means 0.5x volume")),
+        required=True,
+        default_value=0,
+        _min=-50,
+        _max=100,
+        _step=1,
+        precision=0,
     )
 
 
 class VolcanicEngineTTSModelCredential(BaseForm, BaseModelCredential):
-    volcanic_api_url = forms.TextInputField(
-        "API URL", required=True, default_value="wss://openspeech.bytedance.com/api/v1/tts/ws_binary"
+    api_url = forms.TextInputField(
+        "API URL", required=True, default_value="https://openspeech.bytedance.com/api/v3/tts/unidirectional"
     )
-    volcanic_app_id = forms.TextInputField("App ID", required=True)
-    volcanic_token = forms.PasswordInputField("Access Token", required=True)
-    volcanic_cluster = forms.TextInputField("Cluster ID", required=True)
+    api_key = forms.PasswordInputField("API Key", required=True)
 
     def is_valid(
         self,
@@ -64,7 +100,7 @@ class VolcanicEngineTTSModelCredential(BaseForm, BaseModelCredential):
                 gettext("{model_type} Model type is not supported").format(model_type=model_type),
             )
 
-        for key in ["volcanic_api_url", "volcanic_app_id", "volcanic_token", "volcanic_cluster"]:
+        for key in ["api_url", "api_key"]:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, gettext("{key}  is required").format(key=key))
@@ -89,7 +125,7 @@ class VolcanicEngineTTSModelCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, "volcanic_token": super().encryption(model.get("volcanic_token", ""))}
+        return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
     def get_model_params_setting_form(self, model_name):
         return VolcanicEngineTTSModelGeneralParams()

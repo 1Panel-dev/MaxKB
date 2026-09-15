@@ -70,13 +70,30 @@ model_info_list = [
     ModelInfo(
         "bigmodel", "", ModelTypeConst.STT, volcanic_engine_big_stt_model_credential, VolcanicEngineBigModelSpeechToText
     ),
-    ModelInfo("tts", "", ModelTypeConst.TTS, volcanic_engine_tts_model_credential, VolcanicEngineTextToSpeech),
     ModelInfo(
         "doubao-seedream-3-0-t2i-250415",
         _(""),
         ModelTypeConst.TTI,
         volcanic_engine_tti_model_credential,
         VolcanicEngineTextToImage,
+    ),
+]
+
+# TTS 的模型ID 即接口的 resource id
+model_info_tts_list = [
+    ModelInfo(
+        "seed-tts-2.0",
+        _(""),
+        ModelTypeConst.TTS,
+        volcanic_engine_tts_model_credential,
+        VolcanicEngineTextToSpeech,
+    ),
+    ModelInfo(
+        "seed-icl-2.0",
+        _(""),
+        ModelTypeConst.TTS,
+        volcanic_engine_tts_model_credential,
+        VolcanicEngineTextToSpeech,
     ),
 ]
 
@@ -113,7 +130,8 @@ model_info_manage = (
     .append_default_model_info(model_info_list[2])
     .append_default_model_info(model_info_list[3])
     .append_default_model_info(model_info_list[4])
-    .append_default_model_info(model_info_list[5])
+    .append_model_info_list(model_info_tts_list)
+    .append_default_model_info(model_info_tts_list[0])
     .append_model_info_list(model_info_embedding_list)
     .append_default_model_info(model_info_embedding_list[0])
     .append_model_info_list(model_info_ttv_list)
