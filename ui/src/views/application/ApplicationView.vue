@@ -20,7 +20,8 @@ import {
   MoveApplicationAction,
   SettingApplicationAction,
 } from './application-card/action-dropdown'
-import CreateApplicationDropdown from './create-application/CreateApplicationDropdown.vue'
+import ButtonCreateApplication from './components/ButtonCreateApplication.vue'
+import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -202,12 +203,20 @@ function handleBatchDelete() {
         <h4 class="min-w-0 truncate" :title="currentFolder.name">{{ currentFolder.name }}</h4>
         <div class="flex items-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button :disabled="!applicationData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
-            <MkIcon name="icon_Batch_outlined" />
-            <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
-          </el-button>
+          <!-- 批量选择 -->
+          <span>
+            <el-button :disabled="!applicationData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
+              <MkIcon name="icon_Batch_outlined" />
+              <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
+            </el-button>
+          </span>
 
-          <CreateApplicationDropdown v-if="!batchSelectionMode" :folder-id="currentFolder.id" @refresh="refreshApplications" />
+          <template v-if="!batchSelectionMode">
+            <!-- 模板中心 -->
+            <ButtonTemplateStore :folder-id="currentFolder.id" />
+            <!-- 创建智能体 -->
+            <ButtonCreateApplication :folder-id="currentFolder.id" @refresh="refreshApplications" />
+          </template>
         </div>
       </component>
 

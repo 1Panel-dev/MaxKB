@@ -3,14 +3,13 @@ import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import type { ToolStoreItem } from '@/api/types'
 import { resetUrl } from '@/utils/icon'
 import { numberFormat } from '@/utils/number'
-import StoreToolFormDialog from '../StoreToolFormDialog.vue'
 import ToolStoreDetailDrawer from '../ToolStoreDetailDrawer.vue'
 
 defineOptions({ name: 'ToolStoreCard' })
 
-const props = defineProps<{ categoryTitle: string; folderId: string; tool: ToolStoreItem }>()
+const props = defineProps<{ categoryTitle: string; tool: ToolStoreItem }>()
 
-const emit = defineEmits<{ refresh: [] }>()
+const emit = defineEmits<{ apply: [tool: ToolStoreItem] }>()
 
 const toolTypeLabel = computed(() => (props.tool.label === 'data_source' ? '数据源' : '工具'))
 
@@ -36,13 +35,9 @@ function handleOpenDetail() {
     .catch(() => openDetailDrawer())
 }
 
-/* 添加商店工具 */
-const storeToolFormDialogMounted = ref(false)
-const storeToolFormDialogRef = useTemplateRef<InstanceType<typeof StoreToolFormDialog>>('storeToolFormDialogRef')
-
-function handleOpenAdd(tool = props.tool) {
-  storeToolFormDialogMounted.value = true
-  nextTick(() => storeToolFormDialogRef.value?.open(tool))
+/* 应用工具交由商店弹窗统一处理。 */
+function handleApply(tool = props.tool) {
+  emit('apply', tool)
 }
 </script>
 
@@ -70,19 +65,14 @@ function handleOpenAdd(tool = props.tool) {
 
       <component :is="Action" class="flex-1!">
         <div class="flex min-w-0 flex-1" @click.stop>
+          <!-- 查看工具详情 -->
           <el-button class="flex-1!" plain @click="handleOpenDetail">详情</el-button>
-          <el-button class="flex-1!" type="primary" @click="handleOpenAdd()"> 应用 </el-button>
+          <!-- 应用工具 -->
+          <el-button class="flex-1!" type="primary" @click="handleApply()"> 应用 </el-button>
         </div>
       </component>
     </template>
   </MkSourceCard>
 
-  <ToolStoreDetailDrawer v-if="detailDrawerMounted" ref="detailDrawerRef" @add="handleOpenAdd" @closed="detailDrawerMounted = false" />
-  <StoreToolFormDialog
-    v-if="storeToolFormDialogMounted"
-    ref="storeToolFormDialogRef"
-    @closed="storeToolFormDialogMounted = false"
-    @refresh="emit('refresh')"
-    :folderId="folderId"
-  />
+  <ToolStoreDetailDrawer v-if="detailDrawerMounted" ref="detailDrawerRef" @add="handleApply" @closed="detailDrawerMounted = false" />
 </template>

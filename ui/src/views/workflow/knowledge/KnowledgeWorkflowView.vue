@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import { cloneDeep } from 'lodash'
+import { KNOWLEDGE_TYPE } from '@/api/enums'
 import ModelApi from '@/api/admin/workspace/model/model'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
@@ -13,7 +14,7 @@ import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultKnowledgeNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
-import DefaultModelSettingButton from '../components/default-model-setting/DefaultModelSettingButton.vue'
+import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
 import DebugDrawer from './debug/DebugDrawer.vue'
 
 defineOptions({ name: 'KnowledgeWorkflowView' })
@@ -187,9 +188,12 @@ onMounted(() => {
 
 <template>
   <WorkflowViewLayout :loading="loading" :title="knowledgeDetail?.name" :save-time="saveTime" @back="handleBack">
+    <template #icon>
+      <KnowledgeIcon :type="knowledgeDetail?.type ?? KNOWLEDGE_TYPE.WORKFLOW" :size="32" class="shrink-0" />
+    </template>
     <template #actions>
       <!-- 默认模型设置 -->
-      <DefaultModelSettingButton
+      <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"
         :model-api="ModelApi"
         :get-graph-data="getGraphData"

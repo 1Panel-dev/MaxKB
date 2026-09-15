@@ -5,7 +5,7 @@ import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import { APPLICATION_TYPE } from '@/api/enums'
-import type { ApplicationFormPayload } from '@/api/types'
+import type { ApplicationFormPayload, ApplicationStoreTemplate } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import { applicationTemplate } from './template'
@@ -24,6 +24,8 @@ const route = useRoute()
 const router = useRouter()
 
 const props = defineProps<{ folderId: string }>()
+const emit = defineEmits<{ refresh: []; closed: [] }>()
+const storeTemplate = ref<ApplicationStoreTemplate>()
 
 const dialogVisible = ref(false)
 const loading = ref(false)
@@ -31,7 +33,7 @@ const selectedTemplate = ref<ApplicationTemplateType>('blank')
 const applicationFormRef = ref<FormInstance>()
 const applicationForm = reactive<AdvancedApplicationDraft>({ desc: '', name: '' })
 const applicationFormRules: FormRules<typeof applicationForm> = {
-  name: [{ required: true, message: '请输入智能体名称', trigger: 'blur' }],
+  name: [{ required: true, whitespace: true, message: '请输入智能体名称', trigger: 'blur' }],
 }
 const createDisabled = computed(() => !applicationForm.name.trim())
 
@@ -40,19 +42,24 @@ function handleTemplateSelect(template: ApplicationTemplateType) {
 }
 
 function submit() {
+  if (loading.value) return
   applicationFormRef.value?.validate((valid) => {
-    if (!valid) return
+    if (!valid || loading.value) return
 
-    const workflow = cloneDeep(applicationTemplate[selectedTemplate.value])
-    const baseNode = workflow.nodes?.find(({ id }) => id === 'base-node')
-    const prologue = (baseNode?.properties as { node_data?: { prologue?: string } } | undefined)?.node_data?.prologue
     const payload: ApplicationFormPayload = {
       desc: applicationForm.desc.trim(),
       folder_id: props.folderId,
       name: applicationForm.name.trim(),
-      prologue,
       type: APPLICATION_TYPE.WORK_FLOW,
-      work_flow: workflow,
+    }
+
+    if (storeTemplate.value) {
+      payload.work_flow_template = cloneDeep(storeTemplate.value)
+    } else {
+      const workflow = cloneDeep(applicationTemplate[selectedTemplate.value])
+      const baseNode = workflow.nodes?.find(({ id }) => id === 'base-node')
+      payload.prologue = (baseNode?.properties as { node_data?: { prologue?: string } } | undefined)?.node_data?.prologue
+      payload.work_flow = workflow
     }
 
     loading.value = true
@@ -73,13 +80,28 @@ function submit() {
   })
 }
 
-function open() {
+function open(template?: ApplicationStoreTemplate) {
+  resetData()
+  if (template) {
+    storeTemplate.value = cloneDeep(template)
+    Object.assign(applicationForm, { name: template.name, desc: template.desc || '' })
+  }
   dialogVisible.value = true
+}
+
+function handleBeforeClose(done: () => void) {
+  if (!loading.value) done()
+}
+
+function handleClosed() {
+  resetData()
+  emit('closed')
 }
 
 function resetData() {
   Object.assign(applicationForm, { desc: '', name: '' })
   selectedTemplate.value = 'blank'
+  storeTemplate.value = undefined
   loading.value = false
   applicationFormRef.value?.clearValidate()
 }
@@ -88,14 +110,22 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建高级智能体" align-center @closed="resetData">
+  <MkDialog
+    v-model="dialogVisible"
+    title="创建高级智能体"
+    align-center
+    :before-close="handleBeforeClose"
+    :show-close="!loading"
+    @closed="handleClosed"
+  >
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"
       :rules="applicationFormRules"
+      :disabled="loading"
       label-position="top"
       require-asterisk-position="right"
-      @submit.prevent="submit"
+      @submit.prevent
     >
       <el-form-item label="名称" prop="name">
         <el-input
@@ -119,7 +149,7 @@ defineExpose({ open })
         />
       </el-form-item>
 
-      <el-form-item label="模板">
+      <el-form-item v-if="!storeTemplate" label="模板">
         <div class="grid w-full grid-cols-2 gap-4">
           <el-card
             :class="selectedTemplate === 'blank' ? 'border-primary! bg-primary/10!' : ''"
@@ -148,7 +178,9 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
+      <!-- 取消创建 -->
       <el-button plain :disabled="loading" @click="dialogVisible = false">取消</el-button>
+      <!-- 创建高级智能体 -->
       <el-button type="primary" :disabled="createDisabled" :loading="loading" @click="submit">创建</el-button>
     </template>
   </MkDialog>

@@ -1,21 +1,24 @@
 <script setup lang="ts">
-import { nextTick, onMounted, provide, ref, useTemplateRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
+import { useRoute } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
-import { Aim, Close, FullScreen } from '@element-plus/icons-vue'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
+import WorkflowVersionApi from '@/api/admin/workspace/application/workflow-version'
 import ModelApi from '@/api/admin/workspace/model/model'
-import type { ApplicationDetail, DefaultModelSettingPayload } from '@/api/types'
+import type { ApplicationDetail, ApplicationStoreTemplate, DefaultModelSettingPayload, WorkflowVersion } from '@/api/types'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import DefaultModelSettingButton from '../components/default-model-setting/DefaultModelSettingButton.vue'
+import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
-import Conversation from '@/components/conversation/index.vue'
+import ButtonPublishHistory from '../components/publish-history/ButtonPublishHistory.vue'
+import TemplateStoreDialog from '@/views/application/template-store/TemplateStoreDialog.vue'
+import DebugPanel from './debug/DebugPanel.vue'
 import { getResourceScope } from '@/utils/resource-context.ts'
+import { goBack } from './navigation'
 
 defineOptions({ name: 'ApplicationWorkflowView' })
 provide('resourceScope', getResourceScope())
@@ -26,9 +29,7 @@ const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
 }
 
 const route = useRoute()
-const router = useRouter()
 const applicationId = route.params.applicationId as string
-const workspaceId = route.params.workspaceId as string
 
 const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflowRef')
 
@@ -56,15 +57,17 @@ function hasUnsavedChanges() {
 }
 
 function saveApplication(graphData = getGraphData(), showMessage = false) {
-  if (!graphData) return Promise.resolve<ApplicationDetail | undefined>(undefined)
+  if (!graphData || previewVersion.value) return Promise.resolve<ApplicationDetail | undefined>(undefined)
 
+  // 固定本次提交快照，保留请求期间继续编辑产生的未保存状态。
+  const workflowSnapshot = cloneDeep(graphData)
   saving.value = true
-  return ApplicationApi.putApplication(applicationId, { work_flow: graphData, default_model_setting: cloneDeep(defaultModelSetting.value) })
+  return ApplicationApi.putApplication(applicationId, { work_flow: workflowSnapshot, default_model_setting: cloneDeep(defaultModelSetting.value) })
     .then((application) => {
       applicationDetail.value = application
       defaultModelSetting.value = cloneDeep(application.default_model_setting ?? {})
       saveTime.value = application.update_time || new Date()
-      setSavedWorkflow(graphData)
+      setSavedWorkflow(workflowSnapshot)
       if (showMessage) MsgSuccess('保存成功')
       return application
     })
@@ -79,8 +82,126 @@ function saveApplication(graphData = getGraphData(), showMessage = false) {
 }
 
 function handleSave() {
-  // 保存失败已提示并回滚，页面按钮在此结束处理。
-  return saveApplication(undefined, true).catch(() => {})
+  return saveApplication(undefined, true)
+}
+
+/* 自动保存：一分钟周期，按资源类型和智能体独立记录开关。 */
+const AUTO_SAVE_INTERVAL = 60_000
+const autoSaveStorageKey = `workflowAutoSave:application:${applicationId}`
+const autoSaveEnabled = ref(localStorage.getItem(autoSaveStorageKey) === 'true')
+let autoSaveTimer: ReturnType<typeof setInterval> | undefined
+const confirmingExit = ref(false)
+
+function stopAutoSave() {
+  if (autoSaveTimer !== undefined) clearInterval(autoSaveTimer)
+  autoSaveTimer = undefined
+}
+
+function startAutoSave() {
+  stopAutoSave()
+  autoSaveTimer = setInterval(() => {
+    if (loading.value || saving.value || publishing.value || confirmingExit.value || historyVisible.value || !hasUnsavedChanges()) return
+    saveApplication()
+  }, AUTO_SAVE_INTERVAL)
+}
+
+function handleAutoSaveChange() {
+  if (autoSaveEnabled.value) {
+    startAutoSave()
+    localStorage.setItem(autoSaveStorageKey, 'true')
+  } else {
+    stopAutoSave()
+    localStorage.removeItem(autoSaveStorageKey)
+  }
+}
+
+/* 调试入口 */
+const debugPanelRef = useTemplateRef<InstanceType<typeof DebugPanel>>('debugPanelRef')
+
+function handleDebug() {
+  if (loading.value || saving.value) return
+  if (!hasUnsavedChanges()) {
+    debugPanelRef.value?.open()
+    return
+  }
+  // 调试前先保存，失败时保留面板原有状态。
+  return saveApplication()
+    .then(() => {
+      debugPanelRef.value?.open()
+    })
+    .catch(() => {
+      /* 保存失败已由保存流程提示。 */
+    })
+}
+
+function closeDebug() {
+  debugPanelRef.value?.close()
+}
+
+/* 发布历史：预览保留原草稿，恢复后交由页面保存流程持久化。 */
+const historyVisible = ref(false)
+const previewVersion = ref<WorkflowVersion>()
+let workflowBeforePreview: LogicFlow.GraphData | undefined
+
+function handlePreviewVersion(version: WorkflowVersion) {
+  if (loading.value || saving.value || publishing.value) return
+  if (!previewVersion.value) workflowBeforePreview = cloneDeep(getGraphData())
+  previewVersion.value = version
+  workflowRef.value?.render(cloneDeep(version.work_flow))
+  nextTick(() => workflowRef.value?.fitView())
+}
+
+function handleCloseHistory() {
+  if (workflowBeforePreview) workflowRef.value?.render(cloneDeep(workflowBeforePreview))
+  workflowBeforePreview = undefined
+  previewVersion.value = undefined
+  historyVisible.value = false
+}
+
+function handleRestoreVersion(version = previewVersion.value) {
+  if (!version || loading.value || saving.value || publishing.value) return
+  workflowRef.value?.render(cloneDeep(version.work_flow))
+  workflowBeforePreview = undefined
+  previewVersion.value = undefined
+  historyVisible.value = false
+  nextTick(() => workflowRef.value?.fitView())
+}
+
+function handleUpdateVersion(version: WorkflowVersion) {
+  if (previewVersion.value?.id === version.id) previewVersion.value = version
+}
+
+/* 模板中心 */
+const templateStoreDialogRef = useTemplateRef<InstanceType<typeof TemplateStoreDialog>>('templateStoreDialogRef')
+
+function handleOpenTemplateStore() {
+  if (loading.value || saving.value || publishing.value) return
+  closeDebug()
+  templateStoreDialogRef.value?.open()
+}
+
+function handleUseTemplate(template: ApplicationStoreTemplate) {
+  if (loading.value || saving.value || publishing.value) return
+  saving.value = true
+  return MsgConfirm('提示', `使用 ${template.name} 将覆盖当前工作流？`, {
+    confirmButtonText: '确认',
+    confirmButtonType: 'primary',
+  })
+    .then(() => {
+      return ApplicationApi.putApplication(applicationId, { work_flow_template: cloneDeep(template) }).then(() => {
+        // 重新加载服务端模板，更新画布和已保存基准。
+        return loadApplicationDetail().then(() => {
+          templateStoreDialogRef.value?.close()
+          MsgSuccess('应用成功')
+        })
+      })
+    })
+    .catch(() => {
+      // 取消或请求失败时保留模板中心，接口错误由请求层提示。
+    })
+    .finally(() => {
+      saving.value = false
+    })
 }
 
 /* 应用默认模型设置：抽屉提交后暂存，保存失败时从详情回滚。 */
@@ -95,27 +216,55 @@ function handleSaveDefaultModelSetting(settings: DefaultModelSettingPayload) {
   return handleSave()
 }
 
-/* 调试对话 */
-const debugVisible = ref(false)
-const debugExpanded = ref(false)
-
-function closeDebug() {
-  debugVisible.value = false
-  debugExpanded.value = false
+/* 发布工作流 */
+function handlePublish() {
+  workflowRef.value?.validate().then(() => {
+    // publishing.value = true
+    // return saveApplication(undefined, false)
+    //   .then(() => ApplicationApi.putApplicationPublish(applicationId))
+    //   .then((application) => {
+    //     applicationDetail.value = application
+    //     saveTime.value = application.update_time || saveTime.value
+    //     MsgSuccess('发布成功')
+    //   })
+    //   .finally(() => {
+    //     publishing.value = false
+    //   })
+  })
 }
 
-function handleDebug() {
-  // 未保存的画布改动先落库，保证调试对话命中最新的工作流。
-  if (hasUnsavedChanges()) {
-    return saveApplication(undefined, false)
-      .then(() => {
-        debugVisible.value = true
-      })
-      .catch(() => {})
+/* 退出工作流 */
+function handleBack() {
+  if (loading.value || saving.value || confirmingExit.value) return
+  if (historyVisible.value) {
+    handleCloseHistory()
+    return
   }
-  debugVisible.value = true
+  if (!hasUnsavedChanges()) {
+    goBack(applicationId)
+    return
+  }
+
+  // 保存失败时保留当前页面，避免丢失尚未写入服务端的画布数据。
+  confirmingExit.value = true
+  MsgConfirm('提示', '当前工作流尚未保存，是否保存后退出？', {
+    cancelButtonText: '直接退出',
+    confirmButtonText: '保存并退出',
+    confirmButtonType: 'primary',
+    distinguishCancelAndClose: true,
+  })
+    .then(() => {
+      return saveApplication(undefined, true).then(() => goBack(applicationId))
+    })
+    .catch((action: Action) => {
+      if (action === 'cancel') goBack(applicationId)
+    })
+    .finally(() => {
+      confirmingExit.value = false
+    })
 }
 
+// 加载详情
 function loadApplicationDetail() {
   loading.value = true
   return ApplicationApi.getApplicationDetail(applicationId)
@@ -138,238 +287,110 @@ function loadApplicationDetail() {
     })
 }
 
-/* 发布工作流 */
-
-function handlePublish() {
-  workflowRef.value?.validate().then(() => {
-    // publishing.value = true
-    // return saveApplication(graphData)
-    //   .then(() => ApplicationApi.putApplicationPublish(applicationId))
-    //   .then((application) => {
-    //     applicationDetail.value = application
-    //     saveTime.value = application.update_time || saveTime.value
-    //     MsgSuccess('发布成功')
-    //   })
-    //   .finally(() => {
-    //     publishing.value = false
-    //   })
-  })
-}
-
-/* 自动保存 */
-// const AUTO_SAVE_INTERVAL = 60_000
-// const AUTO_SAVE_STORAGE_KEY = 'workflowAutoSave'
-// const autoSaveEnabled = ref(localStorage.getItem(AUTO_SAVE_STORAGE_KEY) === 'true')
-// let autoSaveTimer: ReturnType<typeof setInterval> | undefined
-
-// function stopAutoSave() {
-//   if (autoSaveTimer) clearInterval(autoSaveTimer)
-//   autoSaveTimer = undefined
-// }
-
-// function startAutoSave() {
-//   stopAutoSave()
-//   if (!canEdit.value) return
-
-//   autoSaveTimer = setInterval(() => {
-//     if (
-//       canEdit.value &&
-//       !loading.value &&
-//       !saving.value &&
-//       !publishing.value &&
-//       hasUnsavedChanges()
-//     ) {
-//       saveApplication()
-//     }
-//   }, AUTO_SAVE_INTERVAL)
-// }
-
-// function handleAutoSaveChange(value: string | number | boolean) {
-//   autoSaveEnabled.value = Boolean(value)
-//   localStorage.setItem(AUTO_SAVE_STORAGE_KEY, String(autoSaveEnabled.value))
-//   if (autoSaveEnabled.value) startAutoSave()
-//   else stopAutoSave()
-// }
-
-/* 退出工作流 */
-function goBack() {
-  router.push({ name: 'workspace-application-list', params: { workspaceId } })
-}
-
-function handleBack() {
-  if (!hasUnsavedChanges()) {
-    goBack()
-    return
-  }
-
-  // 保存失败时保留当前页面，避免丢失尚未写入服务端的画布数据。
-  MsgConfirm('提示', '当前工作流尚未保存，是否保存后退出？', {
-    cancelButtonText: '直接退出',
-    confirmButtonText: '保存并退出',
-    confirmButtonType: 'primary',
-    distinguishCancelAndClose: true,
-  })
-    .then(() => {
-      return saveApplication(undefined, true).then(() => goBack())
-    })
-    .catch((action: Action) => {
-      if (action === 'cancel') goBack()
-    })
-}
-
 onMounted(() => {
-  loadApplicationDetail().then(() => {
-    // if (autoSaveEnabled.value && canEdit.value) startAutoSave()
-  })
+  if (autoSaveEnabled.value) startAutoSave()
+  loadApplicationDetail()
 })
 
-// onBeforeUnmount(() => stopAutoSave())
+onBeforeUnmount(() => stopAutoSave())
 </script>
 
 <template>
-  <WorkflowViewLayout :loading="loading" :title="applicationDetail?.name" :save-time="saveTime" @back="handleBack">
+  <WorkflowViewLayout
+    :loading="loading"
+    :title="applicationDetail?.name"
+    :save-time="saveTime"
+    :history-visible="historyVisible"
+    :can-restore-version="!!previewVersion && !loading && !saving && !publishing"
+    @back="handleBack"
+    @restore-version="handleRestoreVersion()"
+  >
+    <template #icon>
+      <ApplicationIcon :icon="applicationDetail?.icon" :size="32" class="shrink-0" />
+    </template>
     <template #actions>
+      <!-- 模板中心 -->
+      <el-button plain :disabled="loading || saving || publishing" @click="handleOpenTemplateStore">
+        <MkIcon name="icon_template_outlined" />
+        <span>模板中心</span>
+      </el-button>
+
       <!-- 默认模型设置 -->
-      <DefaultModelSettingButton
+      <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"
         :model-api="ModelApi"
         :get-graph-data="getGraphData"
         :disabled="loading || saving || publishing"
+        @open="closeDebug"
         @save="handleSaveDefaultModelSetting"
         @apply-to-all="handleApplyDefaultModelToAll"
       />
-      <!-- 保存 -->
-      <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave()"> 保存 </el-button>
-      <!-- 调试 -->
-      <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
-      <!-- 发布 -->
-      <el-button type="primary" :loading="publishing" :disabled="loading || saving || publishing" @click="handlePublish"> 发布 </el-button>
-      <!-- 更多工作流设置（预留）
 
-      <MkDropdown v-if="canEdit" trigger="click">
-        <el-button text>
-          <MkIcon :icon="MoreFilled" :size="18" />
+      <!-- 调试 -->
+      <el-button plain :disabled="loading || saving" @click="handleDebug">
+        <MkIcon name="icon_play_outlined" />
+        <span>调试</span>
+      </el-button>
+
+      <!-- 保存 -->
+      <el-button plain :disabled="loading || saving || publishing" @click="handleSave()">
+        <MkIcon name="icon_save_outlined" />
+        <span> 保存 </span>
+      </el-button>
+
+      <!-- 发布 -->
+      <el-button type="primary" :disabled="loading || saving || publishing" @click="handlePublish"> 发布 </el-button>
+      <!-- 更多操作 -->
+      <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
+        <el-button text class="h-7! w-7! px-0!">
+          <MkIcon name="icon_more_outlined" class="rotate-90" :size="20" />
         </el-button>
         <template #dropdown>
-          <MkDropdownMenu>
+          <MkDropdownMenu class="w-37">
+            <!-- 去对话 -->
+            <MkDropdownItem>
+              <template #icon><MkIcon name="icon_new-chat_outlined" /></template>
+              <span>去对话</span>
+            </MkDropdownItem>
+            <!-- 发布历史 -->
+            <ButtonPublishHistory
+              v-model:visible="historyVisible"
+              :resource-id="applicationId"
+              :api="WorkflowVersionApi"
+              :selected-id="previewVersion?.id"
+              :disabled="loading || saving || publishing"
+              @open="closeDebug"
+              @preview="handlePreviewVersion"
+              @restore="handleRestoreVersion"
+              @update="handleUpdateVersion"
+              @close="handleCloseHistory"
+            />
+            <!-- 自动保存 -->
             <MkDropdownItem @click.stop>
+              <template #icon><MkIcon name="icon_save_outlined" /></template>
               <span>自动保存</span>
-              <el-switch
-                v-model="autoSaveEnabled"
-                size="small"
-                @click.stop
-                @change="handleAutoSaveChange"
-              />
+              <el-switch v-model="autoSaveEnabled" class="ml-auto" size="small" @click.stop @change="handleAutoSaveChange" />
             </MkDropdownItem>
           </MkDropdownMenu>
         </template>
       </MkDropdown>
-  -->
     </template>
     <!-- 主画布 -->
-    <WorkflowCanvas
-      ref="workflowRef"
-      class="min-h-0 flex-1"
-      :default-model-settings="defaultModelSetting"
-      :loop-workflow-mode="WorkflowMode.ApplicationLoop"
-      :workflow-mode="WorkflowMode.Application"
-    />
-
-    <!-- 调试对话：右侧悬浮面板 -->
-    <transition name="debug-panel">
-      <div v-if="debugVisible" class="workflow-debug-panel" :class="{ expanded: debugExpanded }">
-        <div class="debug-panel-actions">
-          <!-- 放大或还原调试面板 -->
-          <button type="button" class="debug-panel-btn" @click="debugExpanded = !debugExpanded">
-            <MkIcon :icon="debugExpanded ? Aim : FullScreen" :size="16" />
-          </button>
-          <!-- 关闭调试 -->
-          <button type="button" class="debug-panel-btn" @click="closeDebug">
-            <MkIcon :icon="Close" :size="16" />
-          </button>
-        </div>
-        <Conversation :defaultOpen="false" type="DEBUG" class="h-full" />
+    <div class="relative flex min-h-0 flex-1">
+      <div class="relative min-w-0 flex-1" :inert="!!previewVersion">
+        <WorkflowCanvas
+          ref="workflowRef"
+          class="h-full"
+          :default-model-settings="defaultModelSetting"
+          :loop-workflow-mode="WorkflowMode.ApplicationLoop"
+          :workflow-mode="WorkflowMode.Application"
+        />
       </div>
-    </transition>
+    </div>
+
+    <!-- 调试框 -->
+    <DebugPanel ref="debugPanelRef" />
+    <!-- 模版中心 -->
+    <TemplateStoreDialog ref="templateStoreDialogRef" source="work_flow" :applying="saving" @use="handleUseTemplate" />
   </WorkflowViewLayout>
 </template>
-
-<style scoped lang="scss">
-.workflow-debug-panel {
-  position: absolute;
-  top: calc(var(--mk-header-height) + 12px);
-  right: 12px;
-  bottom: 12px;
-  width: 460px;
-  max-width: calc(100vw - 24px);
-  z-index: 20;
-  background: var(--mk-N0, #fff);
-  border: 1px solid var(--mk-N200, #dcdfe6);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
-  transition:
-    width 0.25s ease,
-    top 0.25s ease,
-    right 0.25s ease,
-    bottom 0.25s ease,
-    border-radius 0.25s ease;
-}
-
-/* 放大：宽度占视口 50%，高度 100% */
-.workflow-debug-panel.expanded {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 50vw;
-  max-width: 100vw;
-  border-radius: 0;
-}
-
-/* 面板内的对话框自带移动端样式：小屏下会把输入框 fixed 到整个视口。
-   这里把它约束回面板内部，避免输入框脱离面板铺满视口。 */
-.workflow-debug-panel :deep(.panel-input) {
-  position: relative !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-}
-
-.debug-panel-actions {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.debug-panel-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--mk-N600, #606266);
-  cursor: pointer;
-}
-.debug-panel-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.debug-panel-enter-active,
-.debug-panel-leave-active {
-  transition:
-    transform 0.25s ease,
-    opacity 0.25s ease;
-}
-.debug-panel-enter-from,
-.debug-panel-leave-to {
-  transform: translateX(16px);
-  opacity: 0;
-}
-</style>

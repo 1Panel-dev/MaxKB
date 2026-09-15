@@ -11,6 +11,8 @@
   代码放在同一目录或其子目录中，不要把多个无关页面平铺在上级目录。
 - 路由级 Vue 组件统一使用 `PascalCase` 并以 `View.vue` 结尾，例如
   `UserListView.vue`。
+- 页面按钮组件遵循 [COMPONENT_README.md](../components/COMPONENT_README.md) 的 `Button` 前缀命名规则，
+  文件名、导入名和模板引用保持一致。
 - 页面拆分出的普通子组件统一放在当前功能目录的 `components/` 中，不与路由页面或 Drawer
   混放。属于同一业务流程的入口、Dialog 和配套组件可以使用职责明确的业务目录集中维护，例如
   `create-application/`；Dialog 文件使用 `PascalCase` 并以 `Dialog.vue` 结尾。
@@ -127,6 +129,31 @@ query，不写入新的文件夹 ID，进入详情时也不携带该 query。`Wo
 局部替换，接口只返回布尔值或部分数据时调用 `refreshApplicationDetail()` 重新获取详情。切换二级
 菜单不会重新挂载详情容器，也不会自动重复请求详情。
 
+智能体模板中心参照工具商店按列表、卡片、详情和创建流程组织：
+
+```text
+src/views/application/template-store/
+├── TemplateStoreDialog.vue        # 模板列表、搜索与工作流覆盖确认
+├── TemplateStoreDetailDrawer.vue  # 模板详情与使用入口
+└── components/
+    └── TemplateCard.vue           # 模板卡片及详情抽屉的按需挂载
+```
+
+模板中心直接平铺全部模板，支持名称搜索，不展示分类导航、分类锚点或卡片分类文字。
+`TemplateStoreDialog.open(folderId)` 接收创建目标目录，默认用于模板创建；
+工作流模式传入 `source="work_flow"`，选择模板后发出 `use(template)`，由工作流页面处理确认和请求。
+弹窗不接收智能体 ID 或 API；页面通过 `applying` 传入忙碌状态，成功后调用 `close()`，失败保留弹窗。
+卡片负责打开详情抽屉，卡片和详情的使用操作统一通过 `use(template)` 交给 `TemplateStoreDialog`。
+模板中心按 `source` 选择创建智能体或覆盖工作流，统一管理一份 `AdvancedCreateDialog`，
+传入目标 `folderId`，创建成功后关闭模板中心并通知刷新；配套浮层在 `closed` 后卸载。
+`create-application/AdvancedCreateDialog.open(template?)` 同时承接普通高级创建与商店模板创建。
+传入模板时回填名称、描述，隐藏内置模板选择并提交 `work_flow_template`；无参数时保留空白和知识库问答助手选择，
+提交 `work_flow` 及开场白。创建成功刷新用户基础资料、发出 `refresh` 并进入智能体工作流，
+提交期间禁止重复提交与关闭，关闭后清理草稿并发出 `closed`。
+`ApplicationView` 在批量选择按钮之后、创建入口之前组合
+`components/ButtonTemplateStore.vue`，位置及样式与工具商店入口一致，批量选择模式下隐藏。
+入口传入当前文件夹 ID，转发创建成功的 `refresh` 事件刷新智能体列表。
+
 知识库列表按相同方式维护卡片、菜单 Action 和批量流程：
 
 ```text
@@ -187,12 +214,11 @@ src/views/tool/
 ├── ToolView.vue
 ├── components/
 │   ├── CreateToolDropdown.vue     # 工具创建入口
-│   └── OpenToolStoreButton.vue    # 工具商店入口
+│   └── ButtonToolStore.vue    # 工具商店入口
 ├── tool-form/                     # 各类型工具创建、编辑表单
 │   ├── DataSourceFormDrawer.vue
 │   ├── McpFormDrawer.vue
 │   ├── SkillToolFormDrawer.vue
-│   ├── StoreToolFormDialog.vue
 │   ├── WorkflowFormDialog.vue
 │   ├── component/                 # 工具表单共用片段
 │   │   ├── init-field/
@@ -203,7 +229,7 @@ src/views/tool/
 │   ├── ToolCard.vue               # 工具卡片展示与操作插槽
 │   ├── InitParamDialog.vue        # 配置工具启动参数
 │   ├── ToolStatusSwitch.vue       # 工具启停及启动参数配置入口
-│   ├── UpdateVersionButton.vue    # 根据页面传入的商店数据检测并更新工具版本
+│   ├── ButtonUpdateVersion.vue    # 根据页面传入的商店数据检测并更新工具版本
 │   └── action-dropdown/           # 工作空间工具菜单 Action
 │       ├── index.ts
 │       ├── CopyToolAction.vue
@@ -219,6 +245,7 @@ src/views/tool/
 └── tool-store/                    # 工具商店列表、详情与添加流程
     ├── component/
     │   └── ToolStoreCard.vue      # 商店工具卡片及详情、添加入口
+    ├── StoreToolFormDialog.vue    # 商店工具应用表单及提交
     ├── ToolStoreDetailDrawer.vue  # 商店工具详情
     └── ToolStoreDialog.vue        # 商店分类、查询及添加成功后的列表刷新
 ```
@@ -240,13 +267,13 @@ src/views/tool/
 使用卡片传入的 Tool API 更新，并通过 `update` 事件通知页面替换列表数据。工具批量选择状态、
 批量移动和批量删除流程由 `ToolView` 管理；`MoveToolAction` 复用公共 `MoveToDialog` 完成单个工具移动，
 在具体目录中通过 `delete` 通知页面局部移除卡片，在“全部工具”中保留卡片。`ToolCard` 只把选择模式与选中状态传给 `MkSourceCard`。
-工具商店列表由 `ToolView` 统一加载并经 `ToolCard` 传给 `UpdateVersionButton`，卡片和更新按钮
-不重复请求商店列表。`ToolStoreCard` 负责详情和添加入口，并在操作触发时按需挂载
-`ToolStoreDetailDrawer` 与 `StoreToolFormDialog`；`StoreToolFormDialog` 直接根据打开时的新增或编辑
-上下文完成请求并管理提交状态。新增时由打开方提供目标 `folderId`，
-成功后只发出无数据的 `refresh` 事件；编辑成功后通过 `update` 返回接口响应的完整工具数据。
-`ToolStoreCard` 只负责打开表单并转发刷新通知，`ToolStoreDialog` 据此关闭商店并刷新列表，外层不再
-传递工具和名称等提交数据。
+工具商店列表由 `ToolView` 统一加载并经 `ToolCard` 传给 `ButtonUpdateVersion`，卡片和更新按钮
+不重复请求商店列表。`ToolStoreCard` 负责卡片展示与详情抽屉的按需挂载；卡片和详情中的
+“应用”操作统一通过 `apply(tool)` 交给 `ToolStoreDialog`。
+`ToolStoreDialog` 管理一份 `tool-store/StoreToolFormDialog.vue`，应用时按需挂载并传入目标
+`folderId`，关闭动画结束后卸载；应用成功后关闭商店并发出 `refresh` 通知页面刷新。
+`StoreToolFormDialog` 保留表单校验、各工具类型的提交请求及提交状态管理，根据打开时的新增或编辑
+上下文完成请求。新增成功发出无数据的 `refresh` 事件；编辑成功通过 `update` 返回接口响应的完整工具数据。
 
 System 共享资源页面统一放在 `views/system/shared-resources/`。页面负责 System 范围的资源查询、
 筛选和页面动作；资源卡片、供应商列表等可复用展示能力继续使用对应 Workspace 功能目录中的
@@ -275,25 +302,25 @@ src/views/system/identity/users/
 ├── components/
 │   └── UserGroupSetting.vue
 ├── import-users/
-│   ├── ImportUsersButton.vue
+│   ├── ButtonImportUsers.vue
 │   └── ImportUsersDialog.vue
 ├── user-password/
-│   ├── UserPwdButton.vue
+│   ├── ButtonChangeUserPassword.vue
 │   └── UserPwdDialog.vue
 └── batch-set-user-role/
-    ├── BatchSetUserRoleButton.vue
+    ├── ButtonBatchSetUserRole.vue
     └── BatchSetUserRoleDialog.vue
 ```
 
 `system/chat/users/` 同样使用 `import-users/`、`user-password/`，批量用户组设置放在
-`batch-set-user-group/`（`BatchSetUserGroupButton.vue` 与 `BatchSetUserGroupDialog.vue`）；
-单人和批量配额设置统一放在 `quota-settings/`（`QuotaSettingsButton.vue` 与
+`batch-set-user-group/`（`ButtonBatchSetUserGroup.vue` 与 `BatchSetUserGroupDialog.vue`）；
+单人和批量配额设置统一放在 `quota-settings/`（`ButtonQuotaSettings.vue` 与
 `QuotaSettingsDialog.vue`）。配额入口通过 `dropdown` 区分行菜单与批量按钮，传入单个用户 ID
 或选中用户 ID 数组。行操作菜单开启 `persistent`，避免菜单关闭时卸载其内部的配额弹窗。
 两套用户页面保留各自业务 API 和导入成功后的查询刷新方式。
 
 操作日志页面的清除策略入口与弹窗统一放在 `system/operate-logs/clean-strategy/`：
-`CleanStrategyButton.vue` 管理打开动作和弹窗 Ref，`CleanStrategyDialog.vue` 负责策略查询与保存，
+`ButtonCleanStrategy.vue` 管理打开动作和弹窗 Ref，`CleanStrategyDialog.vue` 负责策略查询与保存，
 `OperateLogListView.vue` 只组合入口组件。
 
 资源授权页面的 `UserGroupAuthorizationList` 通过人数链接打开共享业务组件
@@ -366,14 +393,55 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 `workflow/components/WorkflowViewLayout.vue` 由 `ApplicationWorkflowView`、`ToolWorkflowView` 和 `KnowledgeWorkflowView`
 共同使用，统一全屏容器、页面头部、返回按钮、标题和保存时间展示。通过 `loading`、`title`、
 `saveTime` 传入展示状态，点击返回按钮触发 `back` 事件。
+标题前的 `icon` 插槽由各页面分别传入 `ApplicationIcon`、`ToolIcon`、`KnowledgeIcon`，
+统一使用 32px 头像，并根据资源详情展示自定义图标或对应类型图标。
 
 `actions` 插槽用于默认模型设置、保存、调试等页面操作，默认插槽放置画布及页面浮层；画布继续使用
 `min-h-0 flex-1` 占满头部下方空间。页面保留画布 Ref、资源与模式配置、接口调用、保存和退出确认
 逻辑，布局组件只负责展示。添加组件入口由画布右上角的 `AddNode` 统一提供，页面不再转发节点选择事件。
 
+## 智能体工作流自动保存
+
+`ApplicationWorkflowView` 使用 `workflowAutoSave:application:<applicationId>` 浏览器存储开关，
+按资源类型和智能体独立记录，不读取旧的全局 `workflowAutoSave` 开关。默认关闭，开启后每
+60 秒检查并保存未保存的画布改动。加载、保存、发布和退出确认期间跳过，关闭开关或卸载页面时
+清理定时器；仅开启时写入存储，关闭开关时删除当前智能体的存储项。自动保存复用页面保存流程，不弹成功提示；成功更新保存时间和本次提交的图快照，
+失败保留未保存状态供后续周期重试。请求期间继续编辑的内容不会被标记为已保存。
+
+## 工作流发布历史
+
+`workflow/components/publish-history/ButtonPublishHistory.vue` 封装发布历史菜单入口与面板挂载，
+通过 `v-model:visible` 与页面共享显隐状态，接收 `resourceId`、完整版本 `api`、`selectedId` 和
+`disabled`，转发 `preview`、`restore`、`update`、`close`，打开时发出 `open`。
+面板通过 Teleport 展示在页面右侧、头部下方，页面无需再单独引用 `PublishHistory`。
+所在的 `MkDropdown` 必须设置 `persistent`，避免菜单收起后销毁面板入口。
+
+`workflow/components/publish-history/PublishHistory.vue` 为工作流页面共用的发布历史面板，
+接收 `resourceId`、完整版本 `api`、`selectedId` 和 `disabled`。挂载时查询列表，保留服务端
+发布时间倒序，首项标记“最近发布”；显示标题、发布人和创建时间。面板绝对定位在父级右侧，
+调用方提供相对定位容器。通过 `preview(version)`、`restore(version)`、`update(version)` 和
+`close` 将画布与页面动作交给 View，不读取路由或操作画布。
+
+同目录 `EditPublishVersionDialog.vue` 使用 `open(version)` 回填副本：标题必填、最多 64 字，
+更新说明可选、最多 1000 字；确认按钮沿设计显示“发布”，调用版本编辑接口，不创建新发布。
+成功后更新列表及预览标题，失败保留弹窗与草稿，提交期间禁止重复提交和关闭。
+`UpdateDescriptionDialog.vue` 通过 `open(content)` 展示纯文本更新说明，保留换行，无内容时显示
+“暂无更新说明”；两者复用 `MkDialog` 的延迟挂载与关闭销毁能力。
+
+`ApplicationWorkflowView` 已接入更多菜单中的发布历史。打开时关闭调试，面板打开期间跳过
+自动保存；首次预览保留当前画布草稿，切换版本不覆盖草稿，关闭预览恢复原草稿。
+面板打开后头部保留智能体图标、名称与保存时间，操作区仅显示“恢复此版本”；未选择版本时禁用，
+选择版本后启用。通过历史面板关闭按钮或头部返回按钮退出历史模式，并恢复常规头部操作。
+这部分展示判断统一由 `WorkflowViewLayout` 的 `historyVisible`、`canRestoreVersion` Props 控制，
+点击恢复发出 `restoreVersion`，页面负责具体画布恢复。常规 `actions` 插槽使用 `v-show` 保留实例，
+避免历史模式下销毁菜单内的 `ButtonPublishHistory`。其他工作流不传这些 Props 时保持原头部展示。
+恢复版本只将历史图数据放回编辑态，不立即保存或发布，后续沿用手动与自动保存流程。
+服务端当前版本接口只返回工作流图，不返回历史默认模型设置，页面保留当前默认模型配置。
+更新说明使用 `description` 字段，服务端支持要求见 `../api/API_README.md`。
+
 ## 工作流默认模型设置
 
-`workflow/components/default-model-setting/DefaultModelSettingButton.vue` 负责顶部“默认模型设置”按钮与抽屉按需挂载，
+`workflow/components/default-model-setting/ButtonDefaultModelSetting.vue` 负责顶部“默认模型设置”按钮与抽屉按需挂载，
 由 `ApplicationWorkflowView` 在 `WorkflowViewLayout` 的 `actions` 插槽中接入。同目录的
 `DefaultModelSettingDrawer.vue` 负责抽屉、模型查询、暂存表单及应用与关闭确认。入口挂载后
 通过组件 Ref 调用 `open(settings)`；抽屉内部管理显隐，打开时先重置再回填配置，关闭动画结束后
@@ -414,10 +482,10 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 ## 模型创建入口
 
-`model/create-model/ModelCreateButton.vue` 和 `CreateModelDrawer.vue` 通过必填的 `api` 接收完整
+`model/create-model/ButtonAddModel.vue` 和 `CreateModelDrawer.vue` 通过必填的 `api` 接收完整
 模型 API 对象。Workspace 模型页传入 `ModelApi`，System 共享模型页传入 `SystemSharedApi`；
 创建抽屉只调用传入的 API，不再自行判断资源范围。
-`ModelCreateButton` 默认渲染主按钮，也支持通过默认作用域插槽的 `open()` 定制触发按钮，
+`ButtonAddModel` 默认渲染主按钮，也支持通过默认作用域插槽的 `open()` 定制触发按钮，
 `SelectModel` 的下拉页脚使用该插槽复用同一创建流程。创建成功后保留基础资料刷新，再触发
 `refresh` 通知调用方重新加载模型列表。
 
@@ -482,7 +550,7 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 `knowledge-detail/document/DocumentListView.vue` 为文档列表子页面，目前保留占位内容；
 文档详情作为同一容器的子路由。System 详情仍使用原有独立占位页面。
 
-`KnowledgeWorkflowView` 复用 `DefaultModelSettingButton`，从知识库详情读取默认模型配置，
+`KnowledgeWorkflowView` 复用 `ButtonDefaultModelSetting`，从知识库详情读取默认模型配置，
 随工作流保存提交并将配置传入画布；支持应用到所有节点，保存失败回滚至已保存配置。
 
 ## 智能体复制 Action
@@ -492,3 +560,27 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 源应用及当前文件夹 ID。点击后查询完整详情，深拷贝配置并移除原 ID 等资源元数据，名称默认追加
 “副本”，确认后创建到打开时的当前文件夹。复制成功刷新列表及用户权限，简易应用进入设置页，
 工作流应用进入画布；请求失败保留表单。弹窗按需挂载，在 `closed` 后卸载。
+
+`workflow/application/ApplicationWorkflowView.vue` 直接维护头部的模板中心按钮和弹窗 Ref，
+入口位于默认模型设置之前，监听弹窗的 `use(template)` 事件。
+按钮复用 `application/template-store/TemplateStoreDialog.vue`，以 `source="work_flow"` 打开；
+加载、保存或发布期间禁止打开。页面确认覆盖后提交 `work_flow_template`，重新加载详情、画布和
+已保存基准；完成后关闭模板中心并提示成功。取消或失败保留模板中心。
+
+## 智能体工作流调试
+
+`workflow/application/debug/DebugPanel.vue` 封装调试对话、面板显隐、放大/还原及局部样式，
+通过 `open()`、`close()` 控制，关闭时重置放大状态。对话内容只在面板打开时挂载，保留关闭动画。
+`ApplicationWorkflowView` 直接渲染调试按钮和 `<DebugPanel ref="debugPanelRef" />`，
+通过 `handleDebug` 在存在未保存改动时先保存，成功后调用面板的 `open()`。
+打开模板中心或默认模型设置时，页面调用 `close()` 关闭调试。
+
+## 智能体工作流返回导航
+
+`workflow/application/navigation.ts` 的 `goBack(applicationId)` 读取当前资源范围的智能体详情父路由，
+按子路由 `meta.order` 选择首个有名称、标题、未隐藏且通过 `meta.canAccess(params)` 的页面。
+返回逻辑不固定概览、访问、访客或日志路径；新增、重命名和排序子页面只需维护路由配置。
+未配置 `canAccess` 的详情页默认可访问；有权限或类型限制的页面必须显式配置。
+当前概览使用 v3 `overviewRead` 权限；简易设置只允许 SIMPLE 类型及编辑权限，不作为工作流返回目标。
+无可访问详情时回退对应列表。System 暂无详情父路由，当前回退 System 资源管理智能体列表。
+`ApplicationWorkflowView` 保留未保存确认以及保存后退出流程，导航统一调用该工具函数。

@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import { cloneDeep } from 'lodash'
+import { TOOL_TYPE } from '@/api/enums'
 import ModelApi from '@/api/admin/workspace/model/model'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
@@ -13,7 +14,7 @@ import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
-import DefaultModelSettingButton from '@/views/workflow/components/default-model-setting/DefaultModelSettingButton.vue'
+import ButtonDefaultModelSetting from '@/views/workflow/components/default-model-setting/ButtonDefaultModelSetting.vue'
 
 defineOptions({ name: 'ToolWorkflowView' })
 
@@ -163,9 +164,12 @@ onMounted(() => {
 
 <template>
   <WorkflowViewLayout :loading="loading" :title="toolDetail?.name" :save-time="saveTime" @back="handleBack">
+    <template #icon>
+      <ToolIcon :icon="toolDetail?.icon" :type="toolDetail?.tool_type ?? TOOL_TYPE.WORKFLOW" :size="32" class="shrink-0" />
+    </template>
     <template #actions>
       <!-- 默认模型设置 -->
-      <DefaultModelSettingButton
+      <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"
         :model-api="ModelApi"
         :get-graph-data="getGraphData"

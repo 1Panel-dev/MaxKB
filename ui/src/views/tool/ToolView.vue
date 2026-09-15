@@ -5,7 +5,7 @@ import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import SharedApi from '@/api/admin/workspace/shared'
-import ToolStoreApi from '@/api/admin/tool-store.ts'
+import StoreApi from '@/api/admin/store.ts'
 import type { Dict, FolderItem, OptionItem, ToolItem, ToolStoreResponse, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS, FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
@@ -25,8 +25,8 @@ import {
   MoveToolAction,
   ToolWorkflowAction,
 } from './tool-card/action-dropdown'
-import CreateToolDropdown from './components/CreateToolDropdown.vue'
-import OpenToolStoreButton from './components/OpenToolStoreButton.vue'
+import ButtonCreateTool from './components/ButtonCreateTool.vue'
+import ButtonToolStore from './components/ButtonToolStore.vue'
 
 /* 当前文件夹 */
 
@@ -80,7 +80,7 @@ function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
 const storeTools = ref<ToolStoreResponse['apps']>([])
 
 function loadStoreTools() {
-  ToolStoreApi.getStoreToolList({ name: '' }).then((res) => {
+  StoreApi.getStoreToolList({ name: '' }).then((res) => {
     storeTools.value = res.apps
   })
 }
@@ -214,9 +214,9 @@ onMounted(() => {
 
             <template v-if="!batchSelectionMode">
               <!-- 工具商店 -->
-              <OpenToolStoreButton :folder-id="currentFolder.id" @refresh="refreshTool" />
+              <ButtonToolStore :folder-id="currentFolder.id" @refresh="refreshTool" />
               <!-- 创建 -->
-              <CreateToolDropdown :folder-id="currentFolder.id" @refresh="refreshTool" />
+              <ButtonCreateTool :folder-id="currentFolder.id" @refresh="refreshTool" />
             </template>
           </template>
         </div>
@@ -239,7 +239,7 @@ onMounted(() => {
               >
                 <template #action-dropdown>
                   <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" :tool="tool" />
-                  <EditToolAction label="编辑" :api="ToolApi" :store-tools="storeTools" :tool="tool" @update="handleToolUpdate" />
+                  <EditToolAction label="编辑" :api="ToolApi" :tool="tool" @update="handleToolUpdate" />
                   <InitParamAction
                     v-if="(tool.init_field_list?.length ?? 0) > 0"
                     v-model:loading="toolOperationLoading"

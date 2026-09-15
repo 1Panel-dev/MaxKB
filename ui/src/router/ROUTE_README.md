@@ -320,3 +320,13 @@ System 共享资源页面：
 渲染 `knowledge-detail/setting/KnowledgeSettingView.vue`，使用容器提供的知识库详情。`workflow-entry`
 仅作为目录跳转入口，重定向到独立的 `workflow-knowledge` 全屏画布。画布返回知识库详情。
 文档详情继续保留原地址，并通过 `detailActiveMenu` 高亮“文档”。
+
+智能体工作流返回通过 `views/workflow/application/navigation.ts` 动态读取详情父路由的 `children`。
+Workspace 父路由为 `workspace-application-detail-layout`；System 详情实现时使用
+`system-application-detail-layout`。按照菜单的 `meta.order` 顺序选择首个具备名称、标题、未隐藏
+且 `meta.canAccess(params)` 返回 true 的子路由；未配置该方法时默认可访问。
+`canAccess` 接收目标路由参数，维护本页权限和类型约束；当前只用于详情返回导航，不代替路由守卫或后端鉴权。
+概览配置 v3 的 `overviewRead` 权限，简易设置要求 SIMPLE 类型及编辑权限。
+新增或调整详情页时在路由中维护这些条件，不在工作流返回函数中新增页面名称分支。
+无可访问子页面或详情父路由尚未实现时，分别返回 `workspace-application-list` 或
+`system-resource-applications`。

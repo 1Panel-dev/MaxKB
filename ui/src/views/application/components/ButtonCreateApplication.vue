@@ -4,8 +4,8 @@ import type { UploadFile, UploadInstance } from 'element-plus'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import AdvancedCreateDialog from './AdvancedCreateDialog.vue'
-import SimpleCreateDialog from './SimpleCreateDialog.vue'
+import AdvancedCreateDialog from '@/views/application/create-application/AdvancedCreateDialog.vue'
+import SimpleCreateDialog from '@/views/application/create-application/SimpleCreateDialog.vue'
 
 defineOptions({ name: 'CreateApplicationDropdown' })
 

@@ -1,6 +1,6 @@
 import { BezierEdge, BezierEdgeModel, h } from '@logicflow/core'
 import { connect, disconnect } from '../teleport'
-import DeleteEdgeButton from './DeleteEdgeButton.vue'
+import ButtonDeleteEdge from './ButtonDeleteEdge.vue'
 
 const DEFAULT_WIDTH = 24
 const DEFAULT_HEIGHT = 24
@@ -15,7 +15,7 @@ class AppEdgeView extends BezierEdge {
     this.unmountVueComponent()
     this.root = root
     if (root) {
-      connect(this.targetId(), DeleteEdgeButton, root, () => {
+      connect(this.targetId(), ButtonDeleteEdge, root, () => {
         return { getModel: () => this.props.model }
       })
     }
