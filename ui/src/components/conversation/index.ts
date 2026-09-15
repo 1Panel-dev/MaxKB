@@ -79,8 +79,8 @@ const TOOL = (prev: any, chunk: any) => {
   return {
     type: 'TOOL',
     id: chunk.id ?? prev.id,
-    toolName: chunk.toolName,
-    functionArguments: (prev.functionArguments || '') + (chunk.functionArguments || ''),
+    name: chunk.name,
+    arguments: (prev.arguments || '') + (chunk.arguments || ''),
     content: (prev.content || '') + (chunk.content || ''),
     status: chunk.status ?? prev.status,
     workflowRunId: chunk.workflowRunId ?? prev.workflowRunId,

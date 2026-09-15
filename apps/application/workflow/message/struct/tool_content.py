@@ -1,27 +1,37 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： tool_content.py
-    @date：2026/6/30 16:17
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： tool_content.py
+@date：2026/6/30 16:17
+@desc:
 """
+
 from application.workflow.content_type import ContentType
 from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.status import Status
 
 
 class ToolContent(Content):
-    def __init__(self, _id, tool_name: str, arguments: str, result: str, status: Status, node_info: NodeInfo,
-                 position: Position, **kwargs):
-        self.content = tool_name
+    def __init__(
+        self,
+        _id,
+        tool_name: str,
+        arguments: str,
+        result: str,
+        status: Status,
+        node_info: NodeInfo,
+        position: Position,
+        **kwargs,
+    ):
+        self.name = tool_name
         self.arguments = arguments
-        self.result = result
+        self.content = result
         super().__init__(_id, status, ContentType.TOOL, node_info, position, **kwargs)
 
     def to_dict(self):
         result = super().to_dict()
-        result['content'] = self.content
-        result['arguments'] = self.arguments
-        result['result'] = self.result
+        result["content"] = self.content
+        result["arguments"] = self.arguments
+        result["name"] = self.name
         return result
