@@ -1,11 +1,10 @@
 """MCP egress policy shared by validation, discovery and tool execution."""
 
-import ipaddress
 from functools import partial
 
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
-from common.utils.mcp_network import check_addresses, http_client_factory, parse_url
+from common.utils.mcp_network import http_client_factory, parse_url
 
 
 class InternalMCPConfig(dict):
@@ -16,38 +15,21 @@ class InternalMCPConfig(dict):
     """
 
 
-def allowed_networks():
-    from maxkb.const import CONFIG
-
-    return tuple(
-        ipaddress.ip_network(value.strip())
-        for value in CONFIG.get("MCP_ALLOWED_NETWORKS", "").split(",")
-        if value.strip()
-    )
-
-
 def validate_mcp_servers(servers):
     if not isinstance(servers, dict):
         raise ValueError("MCP servers must be an object")
-    networks = allowed_networks()
     for config in servers.values():
         if not isinstance(config, dict) or config.get("transport") not in ("sse", "streamable_http"):
             raise ValueError("Only support transport=sse or transport=streamable_http")
-        url = parse_url(config.get("url"))
-        # Do not resolve user hostnames in the web process. The worker checks
-        # every DNS result at connection time, including nonstandard IP notation.
-        try:
-            address = ipaddress.ip_address(url.host)
-        except ValueError:
-            continue
-        check_addresses([str(address)], networks)
+        # Do not resolve or connect in the web process. sandbox.so enforces
+        # hostname and address restrictions when the worker opens a connection.
+        parse_url(config.get("url"))
 
 
 def create_mcp_client(servers):
     if not isinstance(servers, dict):
         raise ValueError("MCP servers must be an object")
     connections = {}
-    networks = allowed_networks()
     for name, config in servers.items():
         if not isinstance(config, dict):
             raise ValueError("MCP server configuration must be an object")
@@ -62,11 +44,10 @@ def create_mcp_client(servers):
             connection = dict(config)
             connection["httpx_client_factory"] = partial(
                 http_client_factory, url=str(url), internal=True,
-                networks=(ipaddress.ip_network("127.0.0.1/32"),),
             )
         else:
             from common.utils.mcp_sandbox import sandbox_connection
 
-            connection = sandbox_connection(config, networks)
+            connection = sandbox_connection(config)
         connections[name] = connection
     return MultiServerMCPClient(connections)
