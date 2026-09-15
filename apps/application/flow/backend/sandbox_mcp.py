@@ -1,18 +1,20 @@
-"""MCP backend using isolated workers for user-configured remote servers."""
+"""MCP backend honoring the application's sandbox switch."""
 
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from mcp.types import CallToolResult
 
-from common.mcp.config import InternalMCPConfig, validate_mcp_servers
+from common.mcp.config import InternalMCPConfig, remote_connection, validate_mcp_servers
 from common.mcp.sandbox import sandbox_connection
+from maxkb.const import CONFIG
 
 
 class SandboxMCPBackend(MultiServerMCPClient):
-    """Provide MCP tools and sessions backed by sandboxed stdio connections.
+    """Provide MCP tools and sessions using the configured sandbox mode.
 
-    Inherited get_tools() creates tools whose later invocations also open sandbox
-    workers. This backend supplies the agent's tools; SandboxShellBackend remains
-    the agent backend for skill files and shell commands.
+    With SANDBOX enabled, inherited get_tools() creates tools whose later
+    invocations also open sandbox workers. When explicitly disabled, use remote
+    SDK connections directly for local development. This backend supplies the
+    agent's tools; SandboxShellBackend handles skill files and shell commands.
     """
 
     def __init__(self, servers: dict):
@@ -31,7 +33,12 @@ class SandboxMCPBackend(MultiServerMCPClient):
                 connections[name] = dict(config)
                 continue
             validate_mcp_servers({name: config})
-            connections[name] = dict(config) if internal else sandbox_connection(config)
+            if internal:
+                connections[name] = dict(config)
+            elif bool(int(CONFIG.get("SANDBOX", 1))):
+                connections[name] = sandbox_connection(config)
+            else:
+                connections[name] = remote_connection(config)
         return connections
 
     async def call_tool(self, server_name: str, tool_name: str, arguments: dict | None = None) -> CallToolResult:
