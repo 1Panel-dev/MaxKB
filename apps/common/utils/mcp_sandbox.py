@@ -35,12 +35,12 @@ def sandbox_settings():
     }
 
 
-def sandbox_connection(config, networks):
+def sandbox_connection(config):
     settings = sandbox_settings()
     # Only transport data goes to the remote client. In particular, ignore user
     # command/env/factory/session_kwargs fields and never deserialize Python code.
     remote = {key: value for key, value in config.items() if key in REMOTE_FIELDS}
-    bootstrap = {"connection": remote, "networks": [str(network) for network in networks]}
+    bootstrap = {"connection": remote}
     # Check serializability before launching, and detach from mutable input.
     bootstrap = json.loads(json.dumps(bootstrap, allow_nan=False))
     return {

@@ -1,11 +1,8 @@
-"""HTTP destination checks usable without Django inside an MCP worker."""
+"""HTTP request safeguards; address access is enforced by sandbox.so."""
 
-import ipaddress
 import socket
 import ssl
 
-import anyio
-import httpcore
 import httpx
 
 
@@ -68,74 +65,29 @@ def parse_url(value):
         raise ValueError("Invalid MCP server URL") from exc
 
 
-def check_addresses(addresses, networks):
-    if not addresses:
-        raise MCPNetworkPolicyError("MCP server hostname has no addresses")
-    for address in addresses:
-        ip = ipaddress.ip_address(address)
-        if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped:
-            ip = ip.ipv4_mapped
-        # Do not let IPv6 transition mechanisms tunnel to restricted IPv4 hosts.
-        transition = isinstance(ip, ipaddress.IPv6Address) and (
-            ip.sixtofour is not None
-            or ip.teredo is not None
-            or ip in ipaddress.ip_network("64:ff9b::/96")
-            or ip in ipaddress.ip_network("64:ff9b:1::/48")
-        )
-        public = ip.is_global and not ip.is_multicast and not transition
-        if not public and not any(ip in network for network in networks):
-            raise MCPNetworkPolicyError("MCP server address is not allowed by the network policy")
-
-
-class MCPNetworkBackend(httpcore.AnyIOBackend):
-    def __init__(self, networks):
-        self.networks = networks
-
-    async def connect_tcp(self, host, port, timeout=None, local_address=None, socket_options=None):
-        try:
-            with anyio.fail_after(timeout):
-                # Resolve again at connection time, validate EVERY result, then
-                # connect to the numeric address. HTTP Host and TLS SNI remain
-                # the original hostname in httpcore, including certificate checks.
-                results = await anyio.getaddrinfo(host, port, type=socket.SOCK_STREAM)
-                addresses = list(dict.fromkeys(item[4][0] for item in results))
-                check_addresses(addresses, self.networks)
-                for index, address in enumerate(addresses):
-                    try:
-                        return await super().connect_tcp(address, port, timeout, local_address, socket_options)
-                    except (httpcore.ConnectError, httpcore.ConnectTimeout):
-                        if index == len(addresses) - 1:
-                            raise
-        except TimeoutError as exc:
-            raise httpcore.ConnectTimeout() from exc
-        except OSError as exc:
-            raise httpcore.ConnectError(str(exc)) from exc
-
-
 class MCPTransport(httpx.AsyncHTTPTransport):
-    def __init__(self, url, networks, internal=False):
+    def __init__(self, url, internal=False):
         super().__init__(trust_env=False)
         self.url = parse_url(url)
         self.internal = internal
-        # HTTPX 0.28 has no public network_backend argument. Keep its standard
-        # response/error handling and replace only the pool's connection backend.
-        self._pool._network_backend = MCPNetworkBackend(networks)
+        # Keep the standard resolver/socket backend so sandbox.so checks both
+        # the requested hostname and the actual address passed to connect().
 
     async def handle_async_request(self, request):
         target = parse_url(str(request.url))
         if (target.scheme, target.host, target.port) != (self.url.scheme, self.url.host, self.url.port):
-            raise ValueError("MCP requests must stay on the configured origin")
+            raise MCPNetworkPolicyError("MCP requests must stay on the configured origin")
         if self.internal and target != self.url:
-            raise ValueError("Internal MCP requests must use the generated endpoint")
+            raise MCPNetworkPolicyError("Internal MCP requests must use the generated endpoint")
         return await super().handle_async_request(request)
 
 
-def http_client_factory(headers=None, timeout=None, auth=None, *, url, networks, internal=False):
+def http_client_factory(headers=None, timeout=None, auth=None, *, url, internal=False):
     return httpx.AsyncClient(
         headers=headers,
         timeout=timeout if timeout is not None else httpx.Timeout(30, read=300),
         auth=auth,
         follow_redirects=False,
         trust_env=False,
-        transport=MCPTransport(url, networks, internal),
+        transport=MCPTransport(url, internal),
     )

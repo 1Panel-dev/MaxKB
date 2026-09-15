@@ -47,7 +47,6 @@ class Config(dict):
         "REDIS_MAX_CONNECTIONS": 100,
         # 外置语言包路径
         "EXTERNAL_LOCALE_PATH": "/opt/maxkb/local/locales",
-        "MCP_ALLOWED_NETWORKS": "",
         "FILE_AUTH": "1",
         # S3 配置
         "S3_ACCESS_KEY": "seaweedfsadmin",

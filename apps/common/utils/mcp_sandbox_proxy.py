@@ -2,7 +2,6 @@
 
 from contextlib import asynccontextmanager
 from functools import partial
-import ipaddress
 import logging
 import os
 import sys
@@ -80,11 +79,7 @@ async def remote_transport(bootstrap, http_factory):
     config = bootstrap["connection"]
     if config.get("transport") not in ("sse", "streamable_http"):
         raise ValueError("Unsupported external MCP transport")
-    factory = partial(
-        http_factory,
-        url=config["url"],
-        networks=tuple(ipaddress.ip_network(value) for value in bootstrap["networks"]),
-    )
+    factory = partial(http_factory, url=config["url"])
     timeout = config.get("timeout", 5 if config["transport"] == "sse" else 30)
     read_timeout = config.get("sse_read_timeout", 300)
     if config["transport"] == "sse":
