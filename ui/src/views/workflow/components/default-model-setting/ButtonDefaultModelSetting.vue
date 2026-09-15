@@ -5,7 +5,7 @@ import type ModelApi from '@/api/admin/workspace/model/model'
 import type { DefaultModelSettingPayload } from '@/api/types'
 import DefaultModelSettingDrawer from './DefaultModelSettingDrawer.vue'
 
-defineOptions({ name: 'DefaultModelSettingButton' })
+defineOptions({ name: 'ButtonDefaultModelSetting' })
 
 const props = withDefaults(
   defineProps<{
@@ -17,6 +17,7 @@ const props = withDefaults(
   { modelValue: () => ({}), disabled: false },
 )
 const emit = defineEmits<{
+  open: []
   save: [settings: DefaultModelSettingPayload]
   applyToAll: [graphData: LogicFlow.GraphData]
 }>()
@@ -26,6 +27,7 @@ const drawerRef = useTemplateRef<InstanceType<typeof DefaultModelSettingDrawer>>
 
 function handleOpen() {
   if (props.disabled || drawerMounted.value) return
+  emit('open')
   drawerMounted.value = true
   void nextTick(() => drawerRef.value?.open(props.modelValue))
 }

@@ -6,7 +6,7 @@ import SystemSharedApi from '@/api/admin/system/shared-resources/model'
 import CommonSystemApi from '@/api/admin/system/common'
 import ProviderApi from '@/api/admin/model-provider'
 import ModelCard from '@/views/model/model-card/ModelCard.vue'
-import ModelCreateButton from '@/views/model/create-model/ModelCreateButton.vue'
+import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
 import ModelProvider from '@/views/model/components/ModelProvider.vue'
 import { DeleteModelAction, EditModelAction, ParamSettingAction } from '@/views/model/model-card/action-dropdown'
 
@@ -85,7 +85,7 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <ModelCreateButton :api="SystemSharedApi" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
+          <ButtonAddModel :api="SystemSharedApi" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
         </div>
       </component>
       <div v-loading="loading">

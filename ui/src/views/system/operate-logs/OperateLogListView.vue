@@ -5,7 +5,7 @@ import WorkspaceApi from '@/api/admin/system/workspace'
 import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { Dict, OperateLog, OptionItem } from '@/api/types'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
-import CleanStrategyButton from './clean-strategy/CleanStrategyButton.vue'
+import ButtonCleanStrategy from './clean-strategy/ButtonCleanStrategy.vue'
 import OperateLogDetailDialog from './dialog/OperateLogDetailDialog.vue'
 import { beforeDay, datetimeFormat } from '@/utils/time'
 import { useStore } from '@/stores'
@@ -138,7 +138,7 @@ onMounted(() => {
             <span>导出</span>
           </el-button>
           <!-- 清除策略 -->
-          <CleanStrategyButton />
+          <ButtonCleanStrategy />
         </div>
       </component>
 

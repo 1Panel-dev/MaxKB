@@ -5,7 +5,7 @@ import { MODEL_STATUS } from '@/api/enums'
 import type { ModelProviderItem, ModelItem } from '@/api/types'
 import { groupBy } from 'lodash'
 import ModelParamsDialog from './ModelParamsDialog.vue'
-import ModelCreateButton from '@/views/model/create-model/ModelCreateButton.vue'
+import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
 import ModelApi from '@/api/admin/workspace/model/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import { isWorkspaceResource, isSystemSharedResource } from '@/utils/resource-context'
@@ -159,14 +159,14 @@ function openModelParams() {
 
       <template v-if="canAdd && createModelApi" #footer>
         <slot name="footer">
-          <ModelCreateButton :api="createModelApi" :current-provider="allModelProvider" :providers="providerOptions" @refresh="emit('refresh')">
+          <ButtonAddModel :api="createModelApi" :current-provider="allModelProvider" :providers="providerOptions" @refresh="emit('refresh')">
             <template #default="{ open }">
               <el-button type="primary" link :disabled="disabled" @click.stop="handleOpenCreateModel(open)">
                 <MkIcon name="icon_add_outlined" />
                 <span>添加模型</span>
               </el-button>
             </template>
-          </ModelCreateButton>
+          </ButtonAddModel>
         </slot>
       </template>
     </el-select>

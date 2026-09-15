@@ -43,6 +43,11 @@ import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynam
 
 ## 通用规则
 
+- 按钮组件统一使用 `Button` 前缀：操作按钮按 `Button + 动作 + 对象` 命名，例如
+  `ButtonAddModel`、`ButtonImportUsers`；功能入口按 `Button + 功能名称` 命名，例如
+  `ButtonToolStore`、`ButtonDefaultModelSetting`，不添加表示打开弹窗的 `Open`。
+  此规则适用于公共、页面和画布按钮组件；文件名、导入名、模板标签及已有的
+  `defineOptions.name` 保持一致，打开方法仍可命名为 `handleOpenXxx`。
 - 目录使用 kebab-case，默认入口为 `index.vue`，通过 `defineOptions` 声明 PascalCase 多单词组件名。
   Markdown 编辑器、CodeMirror 和 Logo 按下文的专用入口使用。
 - Props、Emits、Slots 保持类型化。类型归属遵循 [API_README.md](../api/API_README.md)，
@@ -576,7 +581,7 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 通过 Props 与事件回写设置的子组件，应分别发送模型 ID 和参数的局部更新，由父级合并，避免
 同次交互连续更新时使用旧 Props 覆盖刚选中的模型。
 
-`canAdd` 默认为 `false`，开启后在下拉列表底部显示“添加模型”，复用 `ModelCreateButton` 的
+`canAdd` 默认为 `false`，开启后在下拉列表底部显示“添加模型”，复用 `ButtonAddModel` 的
 供应商选择和模型创建流程。组件通过 `isWorkspaceResource()`、`isSystemSharedResource()` 读取
 `resourceScope`：Workspace 传入 `ModelApi`，System 共享资源传入 `SystemSharedModelApi`；
 其他范围暂不展示创建入口。创建成功后触发 `refresh`，使用方重新加载原业务范围的模型选项，

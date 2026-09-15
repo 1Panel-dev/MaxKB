@@ -9,7 +9,7 @@ import SharedApi from '@/api/admin/workspace/shared.ts'
 import ProviderApi from '@/api/admin/model-provider.ts'
 import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import ModelCard from './model-card/ModelCard.vue'
-import ModelCreateButton from './create-model/ModelCreateButton.vue'
+import ButtonAddModel from './create-model/ButtonAddModel.vue'
 import ModelProvider from './components/ModelProvider.vue'
 import {
   AuthorizeModelAction,
@@ -99,7 +99,7 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <ModelCreateButton v-if="!isShared" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" :api="ModelApi" />
+          <ButtonAddModel v-if="!isShared" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" :api="ModelApi" />
         </div>
       </component>
       <div v-loading="loading">

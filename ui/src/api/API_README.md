@@ -95,6 +95,25 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 `typeof ModelApi | typeof SystemSharedModelApi`，不为凑齐类型添加其他范围不存在的接口。
 仅展示数据的组件不接收 API。
 
+### 工作流发布历史
+
+`workspace/application/workflow-version.ts` 维护智能体 `application_version` 资源：
+`getWorkflowVersions(applicationId)` 返回按创建时间倒序的完整 `WorkflowVersion[]`；
+`putWorkflowVersion(applicationId, versionId, payload)` 编辑标题与更新说明，返回更新后的版本。
+共用类型 `WorkflowVersion` 和 `WorkflowVersionPayload` 位于 `types/workflow-version.ts`，
+通过 `@/api/types` 导出。页面传入完整 API 对象，发布历史面板不推测其他工作流的接口地址。
+
+v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明上限 1000。
+当前仓库后端的版本编辑序列化器只处理 `name`，列表和详情也未返回 `description`；
+更新说明的持久化与回显需要后端补齐，前端不将智能体自身的 `desc` 当作版本更新说明。
+
+### 智能体模板中心
+
+`admin/tool-store.ts` 的 `getStoreApplicationList(query)` 查询智能体模板，直接返回
+`ApplicationStoreResponse`，不再返回 `unknown`。模板元数据使用 `ApplicationStoreTemplate`，
+与响应类型一起维护在 `api/types/application.ts`，经 `@/api/types` 导入。
+创建或覆盖工作流时通过已有智能体 API 提交 `work_flow_template`，成功后的刷新与导航由 View 负责。
+
 ### 模型选项查询
 
 `workspace/model/model.ts` 的 `getModelListWithShared(query)` 请求

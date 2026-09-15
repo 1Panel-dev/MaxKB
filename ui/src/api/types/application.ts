@@ -84,3 +84,23 @@ export interface PromptGeneratePayload {
   messages: PromptGenerateMessage[]
   prompt: string
 }
+
+/** 智能体模板中心的模板及下载元数据。 */
+export interface ApplicationStoreTemplate {
+  id: string
+  name: string
+  desc?: string | null
+  description?: string | null
+  icon?: string
+  label?: string | null
+  downloads?: number
+  readMe?: string
+  downloadUrl?: string
+  downloadCallbackUrl?: string
+  [key: string]: unknown
+}
+
+export interface ApplicationStoreResponse {
+  additionalProperties: { tags: { key: string; name: string }[] }
+  apps: ApplicationStoreTemplate[]
+}

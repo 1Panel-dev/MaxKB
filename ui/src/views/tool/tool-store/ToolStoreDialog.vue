@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, shallowRef, useTemplateRef } from 'vue'
-import ToolStoreApi from '@/api/admin/tool-store'
+import StoreApi from '@/api/admin/store.ts'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem, ToolStoreItem, ToolStoreTag, ToolType } from '@/api/types'
 import ToolStoreCard from './component/ToolStoreCard.vue'
+import ApplyStoreToolDialog from './ApplyStoreToolDialog.vue'
 
 defineOptions({ name: 'ToolStoreDialog' })
 
@@ -76,7 +77,7 @@ function loadStoreTools() {
   appliedSearchKeyword.value = searchKeyword.value.trim()
   const query = appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : undefined
 
-  Promise.all([ToolStoreApi.getInternalToolList(query), ToolStoreApi.getStoreToolList(query)])
+  Promise.all([StoreApi.getInternalToolList(query), StoreApi.getStoreToolList(query)])
     .then(([internalTools, storeResponse]) => {
       const appStoreTools: ToolStoreItem[] = storeResponse.apps.map((tool) => ({
         ...tool,
@@ -122,6 +123,16 @@ function handleCategoryAnchorClick(event: MouseEvent) {
   event.preventDefault()
 }
 
+/* 应用工具：统一挂载表单，成功后关闭商店并通知列表刷新。 */
+const storeToolFormDialogMounted = ref(false)
+const storeToolFormDialogRef = useTemplateRef<InstanceType<typeof ApplyStoreToolDialog>>('storeToolFormDialogRef')
+
+function handleApplyTool(tool: ToolStoreItem) {
+  if (storeToolFormDialogMounted.value) return
+  storeToolFormDialogMounted.value = true
+  nextTick(() => storeToolFormDialogRef.value?.open(tool))
+}
+
 function handleAddSuccess() {
   visible.value = false
   emit('refresh')
@@ -139,7 +150,7 @@ defineExpose({ open })
     <template #header="{ titleId }">
       <div class="relative flex items-center">
         <h4 :id="titleId">工具商店</h4>
-        <MkSearchInput v-model="searchKeyword" class="absolute left-1/2 w-80! -translate-x-1/2" placeholder="搜索" @change="loadStoreTools" />
+        <MkSearchInput v-model="searchKeyword" class="absolute left-1/2 w-80! -translate-x-3/4" placeholder="搜索" @change="loadStoreTools" />
       </div>
     </template>
 
@@ -174,12 +185,7 @@ defineExpose({ open })
 
           <div class="mk-resource-card-grid-sm">
             <template v-for="tool in storeTools" :key="`${tool.source}-${tool.id}`">
-              <ToolStoreCard
-                :category-title="categoryTitles[tool.label || 'other'] ?? tool.label ?? '其他'"
-                :folder-id="folderId"
-                :tool="tool"
-                @refresh="handleAddSuccess"
-              />
+              <ToolStoreCard :category-title="categoryTitles[tool.label || 'other'] ?? tool.label ?? '其他'" :tool="tool" @apply="handleApplyTool" />
             </template>
           </div>
           <MkEmpty v-if="!storeTools.length" type="search" />
@@ -190,7 +196,7 @@ defineExpose({ open })
             <h4 class="mb-4">{{ category.title }}</h4>
             <div class="mk-resource-card-grid-sm">
               <template v-for="tool in category.tools" :key="`${tool.source}-${tool.id}`">
-                <ToolStoreCard :category-title="category.title" :folder-id="folderId" :tool="tool" @refresh="handleAddSuccess" />
+                <ToolStoreCard :category-title="category.title" :tool="tool" @apply="handleApplyTool" />
               </template>
             </div>
           </section>
@@ -199,6 +205,13 @@ defineExpose({ open })
       </div>
     </MkViewLayout>
   </MkDialog>
+  <ApplyStoreToolDialog
+    v-if="storeToolFormDialogMounted"
+    ref="storeToolFormDialogRef"
+    :folder-id="folderId"
+    @closed="storeToolFormDialogMounted = false"
+    @refresh="handleAddSuccess"
+  />
 </template>
 
 <style scoped lang="scss"></style>

@@ -9,9 +9,9 @@ import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 import UserFromDrawer from './UserFromDrawer.vue'
-import ImportUsersButton from './import-users/ImportUsersButton.vue'
-import UserPwdButton from './user-password/UserPwdButton.vue'
-import BatchSetUserRoleButton from './batch-set-user-role/BatchSetUserRoleButton.vue'
+import ButtonImportUsers from './import-users/ButtonImportUsers.vue'
+import ButtonChangeUserPassword from './user-password/ButtonChangeUserPassword.vue'
+import ButtonBatchSetUserRole from './batch-set-user-role/ButtonBatchSetUserRole.vue'
 
 const { auth, user } = useStore()
 
@@ -127,7 +127,7 @@ onMounted(() => loadSystemUsers())
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 导入用户 -->
-          <ImportUsersButton @refresh="loadSystemUsers()" />
+          <ButtonImportUsers @refresh="loadSystemUsers()" />
           <!-- 创建用户 -->
           <el-button type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
@@ -220,7 +220,7 @@ onMounted(() => loadSystemUsers())
                   </el-button>
                 </el-tooltip>
                 <!-- 修改用户密码 -->
-                <UserPwdButton :user="row" @refresh="loadSystemUsers(false)" />
+                <ButtonChangeUserPassword :user="row" @refresh="loadSystemUsers(false)" />
                 <!-- 删除 -->
                 <el-tooltip content="删除" placement="top">
                   <el-button type="primary" text @click.stop="deleteUser(row)">
@@ -234,7 +234,7 @@ onMounted(() => loadSystemUsers())
 
         <template #footer-batch-actions>
           <!-- 批量设置角色 -->
-          <BatchSetUserRoleButton
+          <ButtonBatchSetUserRole
             v-if="auth.isEE || auth.isPE"
             :user-ids="batchSelectedUsers.map(({ id }) => id)"
             @refresh="loadSystemUsers(false)"

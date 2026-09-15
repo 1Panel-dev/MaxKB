@@ -6,7 +6,7 @@ import type { ModelProviderItem } from '@/api/types'
 import CreateModelDrawer from './CreateModelDrawer.vue'
 import SelectProviderDrawer from './SelectProviderDrawer.vue'
 
-defineOptions({ name: 'ModelCreate' })
+defineOptions({ name: 'ButtonAddModel' })
 
 const props = defineProps<{
   currentProvider: ModelProviderItem

@@ -2,7 +2,7 @@
 import type { BaseEdgeModel } from '@logicflow/core'
 import { inject } from 'vue'
 
-defineOptions({ name: 'DeleteEdgeButton' })
+defineOptions({ name: 'ButtonDeleteEdge' })
 
 const getModel = inject('getModel') as () => BaseEdgeModel
 const model = getModel()
@@ -12,7 +12,7 @@ const deleteEdge = () => {
 </script>
 <template>
   <div class="workflow-node-delete-icon" @mouseup.stop @click.stop @click="deleteEdge">
-    <MkIcon name="icon_close_bold_outlined" class="text-white!" :size="12"/>
+    <MkIcon name="icon_close_bold_outlined" class="text-white!" :size="12" />
   </div>
 </template>
 <style lang="scss">

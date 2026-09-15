@@ -2,7 +2,7 @@
 import { useTemplateRef } from 'vue'
 import ToolStoreDialog from '../tool-store/ToolStoreDialog.vue'
 
-defineOptions({ name: 'ToolStoreOpenButton' })
+defineOptions({ name: 'ButtonToolStore' })
 
 const props = defineProps<{ folderId: string }>()
 

@@ -2,7 +2,7 @@
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem, ToolStoreResponse } from '@/api/types'
 import ToolStatusSwitch from './ToolStatusSwitch.vue'
-import UpdateVersionButton from './UpdateVersionButton.vue'
+import ButtonUpdateVersion from './ButtonUpdateVersion.vue'
 
 defineOptions({ name: 'ToolCard' })
 
@@ -44,7 +44,7 @@ defineSlots<{ actions?: () => unknown; 'action-dropdown'?: () => unknown }>()
 
     <template #tag>
       <el-tag v-if="shared" size="small" type="info">共享</el-tag>
-      <UpdateVersionButton
+      <ButtonUpdateVersion
         v-else-if="!selectable"
         v-model:loading="loading"
         :store-tools="storeTools"

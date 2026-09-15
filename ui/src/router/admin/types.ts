@@ -1,5 +1,6 @@
 /** Admin Router 的业务范围和路由元信息声明。 */
 
+import type { RouteParamsGeneric } from 'vue-router'
 import type { ResourceAuthorizationType } from '@/api/types'
 
 export type RouteScope = 'workspace' | 'system'
@@ -22,6 +23,8 @@ declare module 'vue-router' {
     hidden?: boolean
     /** 系统资源授权页面当前管理的资源类型。 */
     resource?: ResourceAuthorizationType
+    /** 详情返回导航的可访问性判断，由业务路由配置。 */
+    canAccess?: (params: RouteParamsGeneric) => boolean
     title?: string
   }
 }
