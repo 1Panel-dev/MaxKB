@@ -45,12 +45,12 @@ from knowledge.models.knowledge_action import State
 from langchain_core.messages import AIMessageChunk, BaseMessage, BaseMessageChunk, ToolMessage
 from langchain_core.tools import StructuredTool
 from langchain_core.utils._merge import merge_lists as _original_merge_lists
-from common.utils.mcp_client import create_mcp_client
 from langgraph.checkpoint.memory import MemorySaver
 from maxkb.const import CONFIG
 from pydantic import Field, create_model
 from tools.models import Tool, ToolRecord, ToolType, ToolWorkflowVersion
 
+from application.flow.backend.sandbox_mcp import SandboxMCPBackend
 from application.flow.backend.sandbox_shell import SandboxShellBackend
 from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import ToolWorkflowPostHandler, WorkFlowPostHandler
@@ -394,7 +394,7 @@ def _extract_tool_id(raw_id):
     return tool_id or raw_id
 
 
-async def _initialize_skills(mcp_servers, temp_dir):
+async def _initialize_skills(mcp_servers, temp_dir) -> SandboxMCPBackend:
     skills_dir = os.path.join(temp_dir, "skills")
     mcp_config = dict(mcp_servers)  # Preserve server-generated InternalMCPConfig objects.
     if "skills" in mcp_config:
@@ -435,9 +435,7 @@ async def _initialize_skills(mcp_servers, temp_dir):
 
         os.system("chmod -R g+rx " + temp_dir)  # 确保技能目录可访问
 
-    client = create_mcp_client(mcp_config)
-
-    return client
+    return SandboxMCPBackend(mcp_config)
 
 
 async def _yield_mcp_response(
@@ -455,8 +453,8 @@ async def _yield_mcp_response(
 ):
     try:
         checkpointer = MemorySaver()
-        client = await _initialize_skills(mcp_servers, temp_dir)
-        tools = await client.get_tools()
+        mcp_backend = await _initialize_skills(mcp_servers, temp_dir)
+        tools = await mcp_backend.get_tools()
         for tool in tools:
             tool.handle_tool_error = True
         if extra_tools:

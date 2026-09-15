@@ -1,9 +1,10 @@
 """Forward MCP messages without converting tools, results or notifications."""
 
 from contextlib import asynccontextmanager
-from functools import partial
 import logging
 import os
+import socket
+import ssl
 import sys
 
 import anyio
@@ -11,7 +12,38 @@ import httpx
 from mcp.client.sse import sse_client
 from mcp.client.streamable_http import streamable_http_client
 from mcp.server.stdio import stdio_server
+from mcp.shared._httpx_utils import create_mcp_http_client
 from mcp.types import JSONRPCRequest
+
+
+def sandbox_failure_message(error):
+    # SDK exception groups and chained HTTP errors can embed credentials. Only
+    # report numeric HTTP statuses or fixed descriptions, never exception text.
+    errors, pending, seen = [], [error], set()
+    while pending:
+        current = pending.pop()
+        if id(current) in seen:
+            continue
+        seen.add(id(current))
+        errors.append(current)
+        if isinstance(current, BaseExceptionGroup):
+            pending.extend(current.exceptions)
+        if current.__cause__ is not None:
+            pending.append(current.__cause__)
+    for current in errors:
+        if isinstance(current, httpx.HTTPStatusError):
+            return f"MCP endpoint returned HTTP {current.response.status_code}; check endpoint and credentials"
+    for exception_type, message in (
+        (ssl.SSLCertVerificationError, "MCP TLS certificate verification failed"),
+        (socket.gaierror, "MCP hostname resolution failed; check container DNS"),
+        (PermissionError, "MCP access denied; check sandbox file and network policy"),
+        ((httpx.TimeoutException, TimeoutError), "MCP connection timed out"),
+        (httpx.TooManyRedirects, "MCP endpoint returned too many redirects"),
+        (httpx.ConnectError, "MCP connection failed; check container connectivity and sandbox network policy"),
+    ):
+        if any(isinstance(current, exception_type) for current in errors):
+            return message
+    return "MCP session failed; check endpoint, sandbox setup and network policy"
 
 
 class PipeInput:
@@ -75,11 +107,10 @@ def extract_bootstrap(message):
 
 
 @asynccontextmanager
-async def remote_transport(bootstrap, http_factory):
+async def remote_transport(bootstrap):
     config = bootstrap["connection"]
     if config.get("transport") not in ("sse", "streamable_http"):
         raise ValueError("Unsupported external MCP transport")
-    factory = partial(http_factory, url=config["url"])
     timeout = config.get("timeout", 5 if config["transport"] == "sse" else 30)
     read_timeout = config.get("sse_read_timeout", 300)
     if config["transport"] == "sse":
@@ -88,11 +119,13 @@ async def remote_transport(bootstrap, http_factory):
             headers=config.get("headers"),
             timeout=timeout,
             sse_read_timeout=read_timeout,
-            httpx_client_factory=factory,
         ) as streams:
             yield streams
     else:
-        async with factory(headers=config.get("headers"), timeout=httpx.Timeout(timeout, read=read_timeout)) as client:
+        async with create_mcp_http_client(
+            headers=config.get("headers"),
+            timeout=httpx.Timeout(timeout, read=read_timeout),
+        ) as client:
             async with streamable_http_client(
                 config["url"],
                 http_client=client,
@@ -111,19 +144,19 @@ async def forward(source, destination, cancel_scope):
         cancel_scope.cancel()
 
 
-async def proxy(http_factory):
+async def proxy():
     async with stdio_server(stdin=PipeInput(), stdout=PipeOutput()) as (local_read, local_write):
         with anyio.fail_after(30):
             first = await local_read.receive()
             bootstrap = extract_bootstrap(first)
-        async with remote_transport(bootstrap, http_factory) as (remote_read, remote_write):
+        async with remote_transport(bootstrap) as (remote_read, remote_write):
             async with anyio.create_task_group() as tasks:
                 tasks.start_soon(forward, remote_read, local_write, tasks.cancel_scope)
                 await remote_write.send(first)
                 tasks.start_soon(forward, local_read, remote_write, tasks.cancel_scope)
 
 
-def run(http_factory):
+def run():
     # Remote SDK exceptions may contain authorization headers or URL parameters.
     logging.disable(logging.CRITICAL)
-    anyio.run(proxy, http_factory)
+    anyio.run(proxy)

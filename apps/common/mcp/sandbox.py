@@ -4,9 +4,12 @@ import json
 import pwd
 import sys
 from datetime import timedelta
+from importlib.machinery import PathFinder
 from pathlib import Path
 
 from mcp.types import Implementation
+
+from maxkb.const import CONFIG
 
 
 BOOTSTRAP_KEY = "maxkbSandbox"
@@ -14,8 +17,6 @@ REMOTE_FIELDS = {"transport", "url", "headers", "timeout", "sse_read_timeout", "
 
 
 def sandbox_settings():
-    from maxkb.const import CONFIG
-
     if not sys.platform.startswith("linux") or not bool(int(CONFIG.get("SANDBOX", 1))):
         raise ValueError("External MCP requires an enabled Linux sandbox")
     account = pwd.getpwnam("sandbox")
@@ -37,6 +38,11 @@ def sandbox_settings():
 
 def sandbox_connection(config):
     settings = sandbox_settings()
+    # Release builds replace source files with adjacent, sourceless .pyc files.
+    # Search only our installed directory, never a user-controlled module path.
+    worker = PathFinder.find_spec("sandbox_worker", [str(Path(__file__).parent)])
+    if worker is None or worker.origin is None or Path(worker.origin).suffix not in (".py", ".pyc"):
+        raise RuntimeError("MCP sandbox worker is missing or has an unsupported format")
     # Only transport data goes to the remote client. In particular, ignore user
     # command/env/factory/session_kwargs fields and never deserialize Python code.
     remote = {key: value for key, value in config.items() if key in REMOTE_FIELDS}
@@ -46,7 +52,7 @@ def sandbox_connection(config):
     return {
         "transport": "stdio",
         "command": sys.executable,
-        "args": ["-I", str(Path(__file__).with_name("mcp_sandbox_worker.py"))],
+        "args": ["-I", worker.origin],
         "cwd": settings["cwd"],
         "env": {
             "LD_PRELOAD": settings["library"],

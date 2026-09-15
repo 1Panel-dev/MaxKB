@@ -3,6 +3,7 @@
 import ctypes
 from contextlib import contextmanager
 import errno
+import importlib.machinery
 import importlib.util
 import ipaddress
 import json
@@ -17,7 +18,7 @@ import sys
 
 
 class MCPWorkerFailure(Exception):
-    """A failure whose message was sanitized by the fixed network module."""
+    """A failure whose message was sanitized by the protocol proxy."""
 
 
 class DlInfo(ctypes.Structure):
@@ -168,24 +169,23 @@ def enter_sandbox(settings):
 
 def main():
     settings = json.loads(os.environ.pop("MAXKB_MCP_WORKER_SETTINGS"))
-    # Load only fixed, installed modules before dropping access to the app tree.
-    # Neither module imports Django nor reads the application configuration.
-    modules = {}
-    for name in ("mcp_network", "mcp_sandbox_proxy"):
-        path = Path(__file__).with_name(name + ".py")
-        spec = importlib.util.spec_from_file_location(name, path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        modules[name] = module
+    # Load the fixed proxy before dropping access to the app tree. It does not
+    # import Django or read application configuration. The loader supports both
+    # source and sourceless release layouts, only from our installed directory.
+    spec = importlib.machinery.PathFinder.find_spec("sandbox_proxy", [str(Path(__file__).parent)])
+    if spec is None or spec.loader is None:
+        raise RuntimeError("MCP sandbox dependency is missing")
+    proxy = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(proxy)
     # Remove the application directory while retaining approved package paths.
     app_path = str(Path(__file__).resolve().parents[2])
     sys.path = [p for p in sys.path if p != app_path]
     sys.path.extend(p for p in settings["python_paths"] if p and p not in sys.path)
     enter_sandbox(settings)
     try:
-        modules["mcp_sandbox_proxy"].run(modules["mcp_network"].http_client_factory)
+        proxy.run()
     except Exception as exc:
-        raise MCPWorkerFailure(modules["mcp_network"].sandbox_failure_message(exc)) from None
+        raise MCPWorkerFailure(proxy.sandbox_failure_message(exc)) from None
 
 
 if __name__ == "__main__":
