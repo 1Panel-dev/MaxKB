@@ -20,8 +20,8 @@ import uuid_utils.compat as uuid
 from django.utils.translation import gettext_lazy as _
 from maxkb.const import BASE_DIR, CONFIG, PROJECT_DIR
 
+from common.mcp.config import InternalMCPConfig, validate_mcp_servers
 from common.utils.logger import maxkb_logger
-from common.utils.mcp_client import InternalMCPConfig, validate_mcp_servers
 
 _enable_sandbox = bool(int(CONFIG.get("SANDBOX", 1)))
 _run_user = "sandbox" if _enable_sandbox else getpass.getuser()

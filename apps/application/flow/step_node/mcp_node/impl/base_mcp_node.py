@@ -4,7 +4,7 @@ import json
 from typing import List
 
 from django.db.models import QuerySet
-from common.utils.mcp_client import create_mcp_client
+from application.flow.backend.sandbox_mcp import SandboxMCPBackend
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.mcp_node.i_mcp_node import IMcpNode
@@ -45,12 +45,8 @@ class BaseMcpNode(IMcpNode):
         params = json.loads(json.dumps(tool_params))
         params = self.handle_variables(params)
 
-        async def call_tool(t, a):
-            client = create_mcp_client(servers)
-            async with client.session(mcp_server) as s:
-                return await s.call_tool(t, a)
-
-        res = asyncio.run(call_tool(mcp_tool, params))
+        backend = SandboxMCPBackend(servers)
+        res = asyncio.run(backend.call_tool(mcp_server, mcp_tool, params))
         return NodeResult(
             {'result': [content.text for content in res.content], 'tool_params': params, 'mcp_tool': mcp_tool}, {})
 

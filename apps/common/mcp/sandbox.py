@@ -9,14 +9,14 @@ from pathlib import Path
 
 from mcp.types import Implementation
 
+from maxkb.const import CONFIG
+
 
 BOOTSTRAP_KEY = "maxkbSandbox"
 REMOTE_FIELDS = {"transport", "url", "headers", "timeout", "sse_read_timeout", "terminate_on_close"}
 
 
 def sandbox_settings():
-    from maxkb.const import CONFIG
-
     if not sys.platform.startswith("linux") or not bool(int(CONFIG.get("SANDBOX", 1))):
         raise ValueError("External MCP requires an enabled Linux sandbox")
     account = pwd.getpwnam("sandbox")
@@ -40,7 +40,7 @@ def sandbox_connection(config):
     settings = sandbox_settings()
     # Release builds replace source files with adjacent, sourceless .pyc files.
     # Search only our installed directory, never a user-controlled module path.
-    worker = PathFinder.find_spec("mcp_sandbox_worker", [str(Path(__file__).parent)])
+    worker = PathFinder.find_spec("sandbox_worker", [str(Path(__file__).parent)])
     if worker is None or worker.origin is None or Path(worker.origin).suffix not in (".py", ".pyc"):
         raise RuntimeError("MCP sandbox worker is missing or has an unsupported format")
     # Only transport data goes to the remote client. In particular, ignore user

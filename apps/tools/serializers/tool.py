@@ -36,7 +36,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from knowledge.models import File, FileSourceType, Knowledge
 from langchain_core.messages import AIMessage, HumanMessage
-from common.utils.mcp_client import create_mcp_client
+from application.flow.backend.sandbox_mcp import SandboxMCPBackend
 from maxkb.const import CONFIG, PROJECT_DIR
 from models_provider.models import Model
 from rest_framework import serializers, status
@@ -158,8 +158,8 @@ def encryption(message: str):
 
 def validate_mcp_config(servers: Dict):
     async def validate():
-        client = create_mcp_client(servers)
-        await client.get_tools()
+        backend = SandboxMCPBackend(servers)
+        await backend.get_tools()
 
     try:
         asyncio.run(validate())
