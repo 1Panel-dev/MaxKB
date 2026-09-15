@@ -41,7 +41,7 @@ class VolcanicEngineTextToImage(MaxKBBaseModel, BaseTextToImage):
         return VolcanicEngineTextToImage(
             model_version=model_name,
             api_key=model_credential.get("api_key"),
-            api_base=model_credential.get("volcanic_api_url") or "https://ark-api.volcengine.com",
+            api_base=model_credential.get("volcanic_api_url") or "https://ark.cn-beijing.volces.com/api/v3",
             **optional_params,
         )
 
