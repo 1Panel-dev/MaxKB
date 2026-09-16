@@ -3,7 +3,7 @@
 import axios, { AxiosHeaders, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import router from '@/router/admin'
 import { useStore } from '@/stores'
-import type { ApiResponse, LoadingTarget } from './types'
+import type { ApiResponse } from './types'
 import type { Dict } from '@/api/types'
 import { MsgError } from '@/utils/message'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
@@ -28,28 +28,6 @@ function setRequestHeaders(config: InternalAxiosRequestConfig) {
   }
 
   return config
-}
-
-function startLoading(loading?: LoadingTarget) {
-  if (!loading) {
-    return
-  }
-  if ('start' in loading) {
-    loading.start()
-    return
-  }
-  loading.value = true
-}
-
-function finishLoading(loading?: LoadingTarget) {
-  if (!loading) {
-    return
-  }
-  if ('done' in loading) {
-    loading.done()
-    return
-  }
-  loading.value = false
 }
 
 function extractFilename(contentDisposition?: string) {
@@ -92,7 +70,6 @@ async function getResponseErrorMessage(error: unknown) {
   }
   return responseData?.message
 }
-
 
 async function downloadExportResponse(response: AxiosResponse<Blob>, fileName: string, mimeType = 'application/octet-stream') {
   if (response.data.type.includes('application/json')) {
@@ -165,81 +142,49 @@ request.interceptors.response.use(
 )
 
 /**
- * 统一解包标准 API 响应，并同步可选的 loading 状态。
+ * 统一解包标准 API 响应。
  */
-export async function promise<T>(requestPromise: Promise<AxiosResponse<ApiResponse<T>>>, loading?: LoadingTarget) {
-  startLoading(loading)
-  try {
-    const response = await requestPromise
-    return response.data.data
-  } finally {
-    finishLoading(loading)
-  }
+export async function promise<T>(requestPromise: Promise<AxiosResponse<ApiResponse<T>>>) {
+  const response = await requestPromise
+  return response.data.data
 }
 
 /** 发送 GET 请求。 */
-export function get<T = unknown>(url: string, params?: Dict<unknown>, loading?: LoadingTarget, timeout?: number) {
-  return promise<T>(request.get<ApiResponse<T>>(url, { params, timeout }), loading)
+export function get<T = unknown>(url: string, params?: Dict<unknown>, timeout?: number) {
+  return promise<T>(request.get<ApiResponse<T>>(url, { params, timeout }))
 }
 
 /** 发送 POST 请求。 */
-export function post<TData = unknown, T = unknown>(url: string, data?: TData, params?: Dict<unknown>, loading?: LoadingTarget, timeout?: number) {
-  return promise<T>(request.post<ApiResponse<T>>(url, data, { params, timeout }), loading)
+export function post<TData = unknown, T = unknown>(url: string, data?: TData, params?: Dict<unknown>, timeout?: number) {
+  return promise<T>(request.post<ApiResponse<T>>(url, data, { params, timeout }))
 }
 
 /** 发送 GET 请求并将 Blob 响应下载为文件。 */
-export async function getExportFile(fileName: string, url: string, params?: Dict<unknown>, loading?: LoadingTarget): Promise<boolean> {
-  startLoading(loading)
-  try {
-    const response = await request.get<Blob>(url, { params, responseType: 'blob', skipGlobalErrorMessage: true } as ExportRequestConfig)
+export async function getExportFile(fileName: string, url: string, params?: Dict<unknown>): Promise<boolean> {
+  const response = await request.get<Blob>(url, { params, responseType: 'blob', skipGlobalErrorMessage: true } as ExportRequestConfig)
 
-    return downloadExportResponse(response, fileName)
-  } finally {
-    finishLoading(loading)
-  }
+  return downloadExportResponse(response, fileName)
 }
 
 /** 发送 POST 请求并将 Blob 响应下载为 Excel 文件。 */
-export async function postExportExcel<TData = unknown>(
-  fileName: string,
-  url: string,
-  params?: Dict<unknown>,
-  data?: TData,
-  loading?: LoadingTarget,
-): Promise<boolean> {
-  startLoading(loading)
-  try {
-    const response = await request.post<Blob>(url, data, { params, responseType: 'blob', skipGlobalErrorMessage: true } as ExportRequestConfig)
+export async function postExportExcel<TData = unknown>(fileName: string, url: string, params?: Dict<unknown>, data?: TData): Promise<boolean> {
+  const response = await request.post<Blob>(url, data, { params, responseType: 'blob', skipGlobalErrorMessage: true } as ExportRequestConfig)
 
-    return downloadExportResponse(response, fileName, 'application/vnd.ms-excel')
-  } finally {
-    finishLoading(loading)
-  }
+  return downloadExportResponse(response, fileName, 'application/vnd.ms-excel')
 }
 
 /** 发送指定方法的 Blob 请求并触发浏览器下载。 */
-export async function downloadRequest(
-  url: string,
-  method: string,
-  data?: unknown,
-  params?: Dict<unknown>,
-  loading?: LoadingTarget,
-): Promise<boolean> {
-  startLoading(loading)
-  try {
-    const response = await request.request<Blob>({
-      url,
-      method,
-      data,
-      params,
-      responseType: 'blob',
-      skipGlobalErrorMessage: true,
-    } as ExportRequestConfig)
+export async function downloadRequest(url: string, method: string, data?: unknown, params?: Dict<unknown>): Promise<boolean> {
+  const response = await request.request<Blob>({
+    url,
+    method,
+    data,
+    params,
+    responseType: 'blob',
+    skipGlobalErrorMessage: true,
+  } as ExportRequestConfig)
 
-    return downloadExportResponse(response, 'download')
-  } finally {
-    finishLoading(loading)
-  }
+  return downloadExportResponse(response, 'download')
 }
 
 /** 发送 POST 请求并返回可逐块读取的原始响应。 */
@@ -260,13 +205,13 @@ export function postStream(base: string, path: string, data?: unknown): Promise<
 }
 
 /** 发送 PUT 请求。 */
-export function put<TData = unknown, T = unknown>(url: string, data?: TData, params?: Dict<unknown>, loading?: LoadingTarget, timeout?: number) {
-  return promise<T>(request.put<ApiResponse<T>>(url, data, { params, timeout }), loading)
+export function put<TData = unknown, T = unknown>(url: string, data?: TData, params?: Dict<unknown>, timeout?: number) {
+  return promise<T>(request.put<ApiResponse<T>>(url, data, { params, timeout }))
 }
 
 /** 发送 DELETE 请求。 */
-export function del<TData = unknown, T = unknown>(url: string, params?: Dict<unknown>, data?: TData, loading?: LoadingTarget, timeout?: number) {
-  return promise<T>(request.delete<ApiResponse<T>>(url, { params, data, timeout }), loading)
+export function del<TData = unknown, T = unknown>(url: string, params?: Dict<unknown>, data?: TData, timeout?: number) {
+  return promise<T>(request.delete<ApiResponse<T>>(url, { params, data, timeout }))
 }
 
 export default request

@@ -1,6 +1,5 @@
 import type LogicFlow from '@logicflow/core'
-import { get, post, put } from '../../core/request'
-import type { LoadingTarget } from '../../core/types'
+import { get, post, put, getExportFile } from '../../core/request'
 import type {
   DefaultModelSettingPayload,
   Dict,
@@ -10,13 +9,13 @@ import type {
   KnowledgeWorkflowAction,
   KnowledgeWorkflowDebugPayload,
   KnowledgeWorkflowDetail,
+  WorkflowStoreTemplate,
 } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
-interface KnowledgeWorkflowPayload {
-  default_model_setting?: DefaultModelSettingPayload
-  work_flow: LogicFlow.GraphConfigData
-}
+type KnowledgeWorkflowPayload =
+  | { default_model_setting?: DefaultModelSettingPayload; work_flow: LogicFlow.GraphConfigData; work_flow_template?: never }
+  | { work_flow_template: WorkflowStoreTemplate; work_flow?: never }
 
 interface CreateKnowledgeWorkflowPayload extends KnowledgeCreatePayload {
   work_flow: LogicFlow.GraphConfigData
@@ -44,41 +43,39 @@ const putKnowledgeWorkflowPublish = (knowledgeId: string) => {
 }
 
 /** 上传知识库调试文件，返回文件访问地址（末段为 file_id）。 */
-const postKnowledgeUploadFile = (knowledgeId: string, file: File, loading?: LoadingTarget) => {
+const postKnowledgeUploadFile = (knowledgeId: string, file: File) => {
   const payload = new FormData()
   payload.append('file', file)
   payload.append('source_id', knowledgeId)
   payload.append('source_type', 'KNOWLEDGE')
-  return post<FormData, string>('/oss/file', payload, undefined, loading)
+  return post<FormData, string>('/oss/file', payload)
 }
 
 /** 获取数据源节点的动态表单配置。 */
-const getKnowledgeWorkflowFormList = (
-  knowledgeId: string,
-  type: 'local' | 'tool',
-  id: string,
-  node: Dict<unknown>,
-  loading?: LoadingTarget,
-) => {
-  return post<{ node: Dict<unknown> }, Dict<unknown>[]>(`${getPrefix()}/${knowledgeId}/datasource/${type}/${id}/form_list`, { node }, undefined, loading)
+const getKnowledgeWorkflowFormList = (knowledgeId: string, type: 'local' | 'tool', id: string, node: Dict<unknown>) => {
+  return post<{ node: Dict<unknown> }, Dict<unknown>[]>(`${getPrefix()}/${knowledgeId}/datasource/${type}/${id}/form_list`, { node })
 }
 
 /** 提交知识库工作流调试任务。 */
-const postKnowledgeWorkflowDebug = (knowledgeId: string, payload: KnowledgeWorkflowDebugPayload, loading?: LoadingTarget) => {
-  return post<KnowledgeWorkflowDebugPayload, KnowledgeWorkflowAction>(`${getPrefix()}/${knowledgeId}/debug`, payload, undefined, loading)
+const postKnowledgeWorkflowDebug = (knowledgeId: string, payload: KnowledgeWorkflowDebugPayload) => {
+  return post<KnowledgeWorkflowDebugPayload, KnowledgeWorkflowAction>(`${getPrefix()}/${knowledgeId}/debug`, payload)
 }
 
 /** 轮询知识库工作流调试任务详情。 */
-const getKnowledgeWorkflowAction = (knowledgeId: string, actionId: string, loading?: LoadingTarget) => {
-  return get<KnowledgeWorkflowAction>(`${getPrefix()}/${knowledgeId}/action/${actionId}`, undefined, loading)
+const getKnowledgeWorkflowAction = (knowledgeId: string, actionId: string) => {
+  return get<KnowledgeWorkflowAction>(`${getPrefix()}/${knowledgeId}/action/${actionId}`)
 }
 
 /** 取消知识库工作流调试任务。 */
-const postCancelKnowledgeWorkflowAction = (knowledgeId: string, actionId: string, loading?: LoadingTarget) => {
-  return post<undefined, boolean>(`${getPrefix()}/${knowledgeId}/action/${actionId}/cancel`, undefined, undefined, loading)
+const postCancelKnowledgeWorkflowAction = (knowledgeId: string, actionId: string) => {
+  return post<undefined, boolean>(`${getPrefix()}/${knowledgeId}/action/${actionId}/cancel`)
 }
 
+/** 导出知识库工作流文件，不包含知识库文档。 */
+const exportKnowledgeWorkflow = (knowledgeId: string, name: string) => getExportFile(`${name}.kbwf`, `${getPrefix()}/${knowledgeId}/workflow/export`)
+
 export default {
+  exportKnowledgeWorkflow,
   postKnowledgeWorkflow,
   putKnowledgeWorkflow,
   putKnowledgeWorkflowPublish,

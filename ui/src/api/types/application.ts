@@ -3,6 +3,7 @@
 import type LogicFlow from '@logicflow/core'
 import { APPLICATION_TYPE } from '@/api/enums'
 import type { DefaultModelSettingPayload } from './model'
+import type { WorkflowStoreTemplate } from './workflow-template'
 
 export type ApplicationType = (typeof APPLICATION_TYPE)[keyof typeof APPLICATION_TYPE]
 
@@ -85,20 +86,8 @@ export interface PromptGeneratePayload {
   prompt: string
 }
 
-/** 智能体模板中心的模板及下载元数据。 */
-export interface ApplicationStoreTemplate {
-  id: string
-  name: string
-  desc?: string | null
-  description?: string | null
-  icon?: string
-  label?: string | null
-  downloads?: number
-  readMe?: string
-  downloadUrl?: string
-  downloadCallbackUrl?: string
-  [key: string]: unknown
-}
+/** 智能体模板复用工作流模板的展示与下载元数据。 */
+export type ApplicationStoreTemplate = WorkflowStoreTemplate
 
 export interface ApplicationStoreResponse {
   additionalProperties: { tags: { key: string; name: string }[] }

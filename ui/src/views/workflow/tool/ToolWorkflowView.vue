@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { nextTick, onMounted, provide, ref, useTemplateRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import { cloneDeep } from 'lodash'
@@ -8,13 +8,18 @@ import { TOOL_TYPE } from '@/api/enums'
 import ModelApi from '@/api/admin/workspace/model/model'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
-import type { DefaultModelSettingPayload, ToolItem, ToolWorkflowDetail } from '@/api/types'
+import type { DefaultModelSettingPayload, ToolItem, ToolWorkflowDetail, WorkflowVersion, WorkflowStoreTemplate } from '@/api/types'
 import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonDefaultModelSetting from '@/views/workflow/components/default-model-setting/ButtonDefaultModelSetting.vue'
+
+import ButtonPublishHistory from './ButtonPublishHistory.vue'
+import DebugDrawer from './debug/DebugDrawer.vue'
+import ButtonTemplateStore from './ButtonTemplateStore.vue'
+import { goBack } from './navigation'
 
 defineOptions({ name: 'ToolWorkflowView' })
 
@@ -27,17 +32,13 @@ const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
 }
 
 const route = useRoute()
-const router = useRouter()
 const toolId = route.params.toolId as string
-const workspaceId = route.params.workspaceId as string
 
 const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflowRef')
 
 /* 工具工作流加载与保存 */
 const toolDetail = ref<ToolItem>()
 const loading = ref(false)
-const saving = ref(false)
-const publishing = ref(false)
 const savedWorkflow = ref<LogicFlow.GraphData>()
 const saveTime = ref<Date | string>()
 
@@ -57,20 +58,133 @@ function hasUnsavedChanges() {
 }
 
 function saveToolWorkflow(graphData = getGraphData(), showMessage = false) {
-  if (!graphData) return Promise.resolve<ToolWorkflowDetail | undefined>(undefined)
+  if (!graphData || historyVisible.value) return Promise.resolve<ToolWorkflowDetail | undefined>(undefined)
 
-  saving.value = true
-  return ToolWorkflowApi.putToolWorkflow(toolId, { work_flow: graphData, default_model_setting: cloneDeep(defaultModelSetting.value) })
-    .then((toolWorkflow) => {
+  const workflowSnapshot = cloneDeep(graphData)
+
+  return ToolWorkflowApi.putToolWorkflow(toolId, { work_flow: workflowSnapshot, default_model_setting: cloneDeep(defaultModelSetting.value) }).then(
+    (toolWorkflow) => {
       defaultModelSetting.value = cloneDeep(toolWorkflow.default_model_setting ?? {})
       saveTime.value = toolWorkflow.update_time || new Date()
-      setSavedWorkflow(graphData)
+      setSavedWorkflow(workflowSnapshot)
       if (showMessage) MsgSuccess('保存成功')
       return toolWorkflow
+    },
+  )
+}
+
+/* 自动保存：一分钟周期，按资源类型和工具独立记录开关。 */
+const AUTO_SAVE_INTERVAL = 60_000
+const autoSaveStorageKey = `workflowAutoSave:tool:${toolId}`
+const autoSaveEnabled = ref(localStorage.getItem(autoSaveStorageKey) === 'true')
+let autoSaveTimer: ReturnType<typeof setInterval> | undefined
+const confirmingExit = ref(false)
+
+function stopAutoSave() {
+  if (autoSaveTimer !== undefined) clearInterval(autoSaveTimer)
+  autoSaveTimer = undefined
+}
+
+function startAutoSave() {
+  stopAutoSave()
+  autoSaveTimer = setInterval(() => {
+    if (loading.value || confirmingExit.value || historyVisible.value || !hasUnsavedChanges()) return
+    loading.value = true
+    saveToolWorkflow()
+      .catch(() => {
+        // 保存失败保留改动，下个周期继续尝试。
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  }, AUTO_SAVE_INTERVAL)
+}
+
+function handleAutoSaveChange() {
+  if (autoSaveEnabled.value) {
+    startAutoSave()
+    localStorage.setItem(autoSaveStorageKey, 'true')
+  } else {
+    stopAutoSave()
+    localStorage.removeItem(autoSaveStorageKey)
+  }
+}
+
+/* 调试前保存当前画布，运行参数由基础节点声明。 */
+const debugDrawerRef = useTemplateRef<InstanceType<typeof DebugDrawer>>('debugDrawerRef')
+async function handleDebug() {
+  if (loading.value || historyVisible.value) return
+  loading.value = true
+  try {
+    await workflowRef.value?.validate()
+    if (hasUnsavedChanges()) await saveToolWorkflow()
+    const graph = getGraphData()
+    if (graph) debugDrawerRef.value?.open(graph)
+  } catch {
+    // 校验与请求错误由各自流程提示，失败时不打开调试。
+  } finally {
+    loading.value = false
+  }
+}
+
+function closeDebug() {
+  debugDrawerRef.value?.close()
+}
+
+/* 模板中心：确认后由服务端替换工作流，再刷新画布与保存基准。 */
+const templateStoreButtonRef = useTemplateRef<InstanceType<typeof ButtonTemplateStore>>('templateStoreButtonRef')
+
+function handleUseTemplate(template: WorkflowStoreTemplate) {
+  if (loading.value || historyVisible.value) return
+
+  return MsgConfirm('提示', `使用 ${template.name} 将覆盖当前工作流？`, {
+    confirmButtonText: '确认',
+    confirmButtonType: 'primary',
+  })
+    .then(() => {
+      loading.value = true
+      return ToolWorkflowApi.putToolWorkflow(toolId, { work_flow_template: cloneDeep(template) }).then(() => {
+        return loadToolWorkflow().then(() => {
+          templateStoreButtonRef.value?.close()
+          MsgSuccess('应用成功')
+        })
+      })
+    })
+    .catch(() => {
+      // 取消或请求失败时保留模板中心，接口错误由请求层提示。
     })
     .finally(() => {
-      saving.value = false
+      loading.value = false
     })
+}
+
+/* 发布历史：预览保留原草稿，恢复后交由页面保存流程持久化。 */
+const historyVisible = ref(false)
+const previewVersion = ref<WorkflowVersion>()
+let workflowBeforePreview: LogicFlow.GraphData | undefined
+
+function handlePreviewVersion(version: WorkflowVersion) {
+  if (loading.value) return
+  if (!previewVersion.value) workflowBeforePreview = cloneDeep(getGraphData())
+  previewVersion.value = version
+  workflowRef.value?.render(cloneDeep(version.work_flow))
+  nextTick(() => workflowRef.value?.fitView())
+}
+
+// 所有退出入口统一通过显隐状态清理预览；恢复版本时提前清空草稿快照。
+watch(historyVisible, (visible) => {
+  if (visible) return
+  if (workflowBeforePreview) workflowRef.value?.render(cloneDeep(workflowBeforePreview))
+  workflowBeforePreview = undefined
+  previewVersion.value = undefined
+})
+
+function handleRestoreVersion(version = previewVersion.value) {
+  if (!version || loading.value) return
+  workflowRef.value?.render(cloneDeep(version.work_flow))
+  workflowBeforePreview = undefined
+  historyVisible.value = false
+  nextTick(() => workflowRef.value?.fitView())
 }
 
 /* 应用默认模型设置：抽屉提交后暂存，保存失败时从详情回滚。 */
@@ -86,63 +200,74 @@ function handleSaveDefaultModelSetting(settings: DefaultModelSettingPayload) {
 }
 
 function handleSave() {
-  saveToolWorkflow(undefined, true)
+  if (loading.value || historyVisible.value) return
+  loading.value = true
+  return saveToolWorkflow(undefined, true).finally(() => {
+    loading.value = false
+  })
 }
 
 function handlePublish() {
-  if (!workflowRef.value) return
-
-  publishing.value = true
-  workflowRef.value
+  if (!workflowRef.value || loading.value || historyVisible.value) return
+  loading.value = true
+  return workflowRef.value
     .validate()
-    .then(() => saveToolWorkflow()) // 先保存未落库的画布改动
+    .then(() => saveToolWorkflow())
     .then(() => ToolWorkflowApi.putToolWorkflowPublish(toolId))
     .then(() => MsgSuccess('发布成功'))
-    .catch(() => MsgError('发布失败'))
-    .finally(() => {
-      publishing.value = false
-    })
-}
-
-function loadToolWorkflow() {
-  loading.value = true
-  return Promise.all([ToolApi.getToolDetail(toolId), ToolWorkflowApi.getToolWorkflow(toolId)])
-    .then(([tool, toolWorkflow]) => {
-      toolDetail.value = tool
-      defaultModelSetting.value = cloneDeep(toolWorkflow.default_model_setting ?? {})
-      saveTime.value = toolWorkflow.update_time
-
-      const workflow = toolWorkflow.work_flow?.nodes?.length ? toolWorkflow.work_flow : DEFAULT_WORKFLOW
-      workflowRef.value?.render(cloneDeep(workflow))
-
-      return nextTick().then(() => {
-        const graphData = getGraphData()
-        if (graphData) setSavedWorkflow(graphData)
-        workflowRef.value?.fitView()
-      })
+    .catch(() => {
+      MsgError('发布失败')
     })
     .finally(() => {
       loading.value = false
     })
 }
 
-/* 退出工具工作流 */
-function goBack() {
-  const folderId = toolDetail.value?.folder_id
-  router.push({
-    name: 'workspace-tools',
-    params: { workspaceId },
-    query: folderId ? { folderId } : undefined,
+/* 导出服务端工作流，先保存当前未提交的画布改动。 */
+async function handleExportWorkflow() {
+  if (!toolDetail.value || loading.value || historyVisible.value) return
+  loading.value = true
+  try {
+    if (hasUnsavedChanges()) await saveToolWorkflow()
+    await ToolApi.exportTool(toolId, toolDetail.value.name)
+  } catch {
+    MsgError('导出工作流失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+function loadToolWorkflow() {
+  return Promise.all([ToolApi.getToolDetail(toolId), ToolWorkflowApi.getToolWorkflow(toolId)]).then(([tool, toolWorkflow]) => {
+    toolDetail.value = tool
+    defaultModelSetting.value = cloneDeep(toolWorkflow.default_model_setting ?? {})
+    saveTime.value = toolWorkflow.update_time
+
+    const workflow = toolWorkflow.work_flow?.nodes?.length ? toolWorkflow.work_flow : DEFAULT_WORKFLOW
+    workflowRef.value?.render(cloneDeep(workflow))
+
+    return nextTick().then(() => {
+      const graphData = getGraphData()
+      if (graphData) setSavedWorkflow(graphData)
+      workflowRef.value?.fitView()
+    })
   })
 }
 
+/* 退出工具工作流 */
 function handleBack() {
+  if (loading.value || confirmingExit.value) return
+  if (historyVisible.value) {
+    historyVisible.value = false
+    return
+  }
   if (!hasUnsavedChanges()) {
-    goBack()
+    goBack(toolDetail.value?.folder_id)
     return
   }
 
   // 保存失败时保留当前页面，避免丢失尚未写入服务端的画布数据。
+  confirmingExit.value = true
   MsgConfirm('提示', '当前工作流尚未保存，是否保存后退出？', {
     cancelButtonText: '直接退出',
     confirmButtonText: '保存并退出',
@@ -150,46 +275,113 @@ function handleBack() {
     distinguishCancelAndClose: true,
   })
     .then(() => {
-      return saveToolWorkflow(undefined, true).then(() => goBack())
+      loading.value = true
+      return saveToolWorkflow(undefined, true).then(() => goBack(toolDetail.value?.folder_id))
     })
     .catch((action: Action) => {
-      if (action === 'cancel') goBack()
+      if (action === 'cancel') goBack(toolDetail.value?.folder_id)
+    })
+    .finally(() => {
+      loading.value = false
+      confirmingExit.value = false
     })
 }
 
 onMounted(() => {
+  if (autoSaveEnabled.value) startAutoSave()
+  loading.value = true
   loadToolWorkflow()
+    .catch(() => {})
+    .finally(() => {
+      loading.value = false
+    })
 })
+onBeforeUnmount(() => stopAutoSave())
 </script>
 
 <template>
-  <WorkflowViewLayout :loading="loading" :title="toolDetail?.name" :save-time="saveTime" @back="handleBack">
+  <WorkflowViewLayout
+    :loading="loading"
+    :title="toolDetail?.name"
+    :save-time="saveTime"
+    :history-visible="historyVisible"
+    :can-restore-version="!!previewVersion"
+    @back="handleBack"
+    @restore-version="handleRestoreVersion()"
+  >
     <template #icon>
-      <ToolIcon :icon="toolDetail?.icon" :type="toolDetail?.tool_type ?? TOOL_TYPE.WORKFLOW" :size="32" class="shrink-0" />
+      <ToolIcon :icon="toolDetail?.icon" :type="toolDetail?.tool_type ?? TOOL_TYPE.WORKFLOW" :size="24" class="shrink-0" />
     </template>
     <template #actions>
+      <!-- 模板中心 -->
+      <ButtonTemplateStore ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"
         :model-api="ModelApi"
         :get-graph-data="getGraphData"
-        :disabled="loading || saving || publishing"
+        :disabled="loading"
+        @open="closeDebug"
         @save="handleSaveDefaultModelSetting"
         @apply-to-all="handleApplyDefaultModelToAll"
       />
 
+      <!-- 调试工具工作流 -->
+      <el-button plain :disabled="loading" @click="handleDebug">
+        <MkIcon name="icon_play_outlined" />
+        <span>调试</span>
+      </el-button>
       <!-- 保存 -->
-      <el-button plain :loading="saving" :disabled="loading || saving" @click="handleSave"> 保存 </el-button>
+      <el-button plain :disabled="loading" @click="handleSave">
+        <MkIcon name="icon_save_outlined" />
+        <span>保存</span>
+      </el-button>
       <!-- 发布 -->
-      <el-button type="primary" :loading="publishing" :disabled="loading || saving || publishing" @click="handlePublish"> 发布 </el-button>
+      <el-button type="primary" :disabled="loading" @click="handlePublish"> 发布 </el-button>
+      <!-- 更多操作 -->
+      <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
+        <el-button text class="h-7! w-7! px-0!">
+          <MkIcon name="icon_more_outlined" class="rotate-90" :size="20" />
+        </el-button>
+        <template #dropdown>
+          <MkDropdownMenu class="w-37">
+            <!-- 导出工作流 -->
+            <MkDropdownItem @click="handleExportWorkflow">
+              <template #icon><MkIcon name="icon_export_outlined" /></template>
+              <span>导出工作流</span>
+            </MkDropdownItem>
+            <!-- 发布历史 -->
+            <ButtonPublishHistory
+              v-model:visible="historyVisible"
+              :tool-id="toolId"
+              :selected-id="previewVersion?.id"
+              :disabled="loading"
+              @open="closeDebug"
+              @preview="handlePreviewVersion"
+              @restore="handleRestoreVersion"
+            />
+            <!-- 自动保存 -->
+            <MkDropdownItem @click.stop>
+              <template #icon><MkIcon name="icon_save_outlined" /></template>
+              <span>自动保存</span>
+              <el-switch v-model="autoSaveEnabled" class="ml-auto" size="small" @click.stop @change="handleAutoSaveChange" />
+            </MkDropdownItem>
+          </MkDropdownMenu>
+        </template>
+      </MkDropdown>
     </template>
 
-    <WorkflowCanvas
-      ref="workflowRef"
-      class="min-h-0 flex-1"
-      :default-model-settings="defaultModelSetting"
-      :loop-workflow-mode="WorkflowMode.ToolLoop"
-      :workflow-mode="WorkflowMode.Tool"
-    />
+    <!-- 主画布：历史预览期间禁止编辑。 -->
+    <div class="relative min-h-0 flex-1" :inert="!!previewVersion">
+      <WorkflowCanvas
+        ref="workflowRef"
+        class="h-full"
+        :default-model-settings="defaultModelSetting"
+        :loop-workflow-mode="WorkflowMode.ToolLoop"
+        :workflow-mode="WorkflowMode.Tool"
+      />
+    </div>
+    <!-- 调试抽屉 -->
+    <DebugDrawer ref="debugDrawerRef" :tool-id="toolId" />
   </WorkflowViewLayout>
 </template>

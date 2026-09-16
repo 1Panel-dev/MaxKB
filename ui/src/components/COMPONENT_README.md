@@ -450,6 +450,9 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 
 ### MkDynamicsForm、MkDynamicsFormConstructor
 
+表单配置加载、字段联动请求与 Tree 懒加载的 loading 由组件在请求前开启，并在 `finally` 中释放；
+不向 API 请求方法传递 loading，动态请求脚本也不再通过 `extra.loading` 获取状态。
+
 `MkDynamicsForm` 根据字段配置渲染动态表单，统一维护字段值、默认值、显隐规则和表单校验；
 `MkDynamicsFormConstructor` 用于新增或编辑单个字段配置。该组件族位于 `components` 直属目录，
 使用方必须从 `@/components/mk-dynamics-form` 手动导入，不安装为 Vue 插件，也不全局注册其内部

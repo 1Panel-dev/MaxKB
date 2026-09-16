@@ -195,37 +195,47 @@ function triggerFieldRequest(
   target: Dict<DynamicFormValue>,
   requestLoading: Ref<boolean>,
 ) {
-  const executeRequest = new Function('self', 'triggerSetting', 'request', 'extra', triggerSetting.request || 'return request.get(extra.renderTemplate(triggerSetting.url));') as (
+  const executeRequest = new Function(
+    'self',
+    'triggerSetting',
+    'request',
+    'extra',
+    triggerSetting.request || 'return request.get(extra.renderTemplate(triggerSetting.url));',
+  ) as (
     self: Dict<DynamicFormValue>,
     setting: DynamicFormTriggerSetting,
     requestHelpers: typeof request,
     extra: Dict<DynamicFormValue>,
   ) => Promise<DynamicFormValue>
 
-  const requestPromise = executeRequest(target, triggerSetting, request, {
-    loading: requestLoading,
-    renderTemplate: (url: string) => renderTemplate(url, { trigger_value: triggerValue, ...props.otherParams }),
-  })
+  requestLoading.value = true
+  return Promise.resolve()
+    .then(() =>
+      executeRequest(target, triggerSetting, request, {
+        renderTemplate: (url: string) => renderTemplate(url, { trigger_value: triggerValue, ...props.otherParams }),
+      }),
+    )
+    .then((response) => {
+      if (!triggerSetting.change && !triggerSetting.change_field) {
+        return
+      }
+      const applyResponse = new Function(
+        'self',
+        'triggerSetting',
+        'response',
+        'extra',
+        triggerSetting.change ||
+          `self[triggerSetting.change_field]=[
+            ...response.data.shared_model.map((model) => ({ ...model, type: 'share' })),
+            ...response.data.model.map((model) => ({ ...model, type: 'workspace' }))
+          ];`,
+      ) as (self: Dict<DynamicFormValue>, setting: DynamicFormTriggerSetting, response: DynamicFormValue, extra: Dict<DynamicFormValue>) => void
 
-  if (!triggerSetting.change && !triggerSetting.change_field) {
-    return
-  }
-
-  void requestPromise.then((response) => {
-    const applyResponse = new Function(
-      'self',
-      'triggerSetting',
-      'response',
-      'extra',
-      triggerSetting.change ||
-        `self[triggerSetting.change_field]=[
-          ...response.data.shared_model.map((model) => ({ ...model, type: 'share' })),
-          ...response.data.model.map((model) => ({ ...model, type: 'workspace' }))
-        ];`,
-    ) as (self: Dict<DynamicFormValue>, setting: DynamicFormTriggerSetting, response: DynamicFormValue, extra: Dict<DynamicFormValue>) => void
-
-    applyResponse(target, triggerSetting, response, { formData: formValue.value, getDefault: getFormDefaultValue })
-  })
+      applyResponse(target, triggerSetting, response, { formData: formValue.value, getDefault: getFormDefaultValue })
+    })
+    .finally(() => {
+      requestLoading.value = false
+    })
 }
 
 function initializeFieldDefault(field: FormField) {
@@ -263,7 +273,10 @@ function getResponseFields(response: FormField[] | DynamicFormResponse<FormField
 
 async function resolveFormFields(source: DynamicFormSource): Promise<FormField[]> {
   if (typeof source === 'string') {
-    return get<FormField[]>(source, {}, loading)
+    loading.value = true
+    return get<FormField[]>(source).finally(() => {
+      loading.value = false
+    })
   }
   if (Array.isArray(source)) {
     return source
@@ -298,7 +311,15 @@ defineExpose({ initDefaultData: initializeFieldDefault, render, ruleFormRef, val
 </script>
 
 <template>
-  <el-form ref="ruleFormRef" v-loading="loading" :model="formValue" label-position="top" require-asterisk-position="right" v-bind="$attrs" @submit.prevent>
+  <el-form
+    ref="ruleFormRef"
+    v-loading="loading"
+    :model="formValue"
+    label-position="top"
+    require-asterisk-position="right"
+    v-bind="$attrs"
+    @submit.prevent
+  >
     <slot :form-value="formValue" />
     <template v-for="field in formFieldList" :key="field.field">
       <FormItem
