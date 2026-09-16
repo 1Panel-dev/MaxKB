@@ -62,9 +62,12 @@ function sourceChange(nodeId: string) {
   }
   const type = isLocalSource(node) ? 'local' : 'tool'
   const id = isLocalSource(node) ? node.type : (node.properties.node_data?.tool_lib_id ?? node.type)
-  KnowledgeWorkflowApi.getKnowledgeWorkflowFormList(props.knowledgeId, type, id, node as unknown as Dict<unknown>, loading).then((fields) => {
-    dynamicsFormRef.value?.render(fields as unknown as FormField[])
-  })
+  loading.value = true
+  return KnowledgeWorkflowApi.getKnowledgeWorkflowFormList(props.knowledgeId, type, id, node as unknown as Dict<unknown>)
+    .then((fields) => dynamicsFormRef.value?.render(fields as unknown as FormField[]))
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 function validate() {

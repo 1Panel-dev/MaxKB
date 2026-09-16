@@ -68,7 +68,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleShortcut))
   <el-button
     :type="searchVisible ? 'primary' : 'default'"
     text
-    :style="{ background: searchVisible ? 'var(--mk-primary-transparent-10)' : 'transparent' }"
+    :style="{ background: searchVisible ? 'var(--mk-primary-transparent-10)' : '' }"
     @click="openSearch"
   >
     <MkIcon name="icon_search-outlined" size="18" />

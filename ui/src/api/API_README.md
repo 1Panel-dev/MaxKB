@@ -11,7 +11,7 @@ src/api/
 │   │   └── types.ts                  # 认证 API 与认证 Store 共用类型
 │   ├── core/                         # Admin 请求基础能力
 │   │   ├── request.ts                # Axios 实例、HTTP 方法与统一响应解包
-│   │   └── types.ts                  # Admin 请求协议和 loading 类型
+│   │   └── types.ts                  # Admin 请求协议类型
 │   ├── system/                       # 系统管理业务接口
 │   │   ├── chat-user/                # 对话用户、用户组及认证接口
 │   │   ├── settings/                 # 登录认证、邮件与外观设置接口
@@ -61,7 +61,7 @@ src/api/
 - 一类资源的增删改查放在同一个最终资源文件中。调用方直接导入该文件，不为业务目录创建聚合
   入口，也不创建汇总所有业务接口的 `api.ts`。
 - 工具基础信息和工具工作流使用后端不同资源接口：`workspace/tool/tool.ts` 维护工具增删改查，
-  `workspace/tool/workflow.ts` 维护工具工作流的加载、保存和发布。
+  `workspace/tool/workflow.ts` 维护工具工作流的加载、保存、发布与调试。
   工具工作流保存请求的 `default_model_setting` 与详情响应统一复用 `DefaultModelSettingPayload`。
 - 每个业务接口函数必须添加简短的 JSDoc，说明接口的业务作用；注释应描述“获取什么”“保存什么”
   或“对哪个资源执行什么操作”，不重复参数类型、请求方法等代码已经清楚表达的信息。
@@ -103,6 +103,12 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 共用类型 `WorkflowVersion` 和 `WorkflowVersionPayload` 位于 `types/workflow-version.ts`，
 通过 `@/api/types` 导出。`ButtonApplicationPublishHistory` 内部调用智能体版本 API，公共发布历史
 UI 组件只接收数据和事件，不接收 API 或推测其他工作流的接口地址。
+`workspace/tool/workflow-version.ts` 单独维护工具 `tool_version` 资源，提供
+`getWorkflowVersions(toolId)` 和 `putWorkflowVersion(toolId, versionId, payload)`，
+复用上述版本类型，由 `views/workflow/tool/ButtonPublishHistory.vue` 调用。
+工具版本接口同样尚未支持 `description`，且未返回版本的默认模型配置。
+`workspace/knowledge/workflow-version.ts` 维护知识库 `knowledge_version` 资源，提供同名查询与编辑方法，
+由知识库 `ButtonPublishHistory.vue` 调用；知识库版本也尚未支持更新说明和默认模型配置。
 
 v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明上限 1000。
 当前仓库后端的版本编辑序列化器只处理 `name`，列表和详情也未返回 `description`；
@@ -110,9 +116,10 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 
 ### 智能体模板中心
 
-`admin/tool-store.ts` 的 `getStoreApplicationList(query)` 查询智能体模板，直接返回
-`ApplicationStoreResponse`，不再返回 `unknown`。模板元数据使用 `ApplicationStoreTemplate`，
-与响应类型一起维护在 `api/types/application.ts`，经 `@/api/types` 导入。
+`admin/store.ts` 的 `getStoreApplicationList(query)` 查询智能体模板，直接返回
+`ApplicationStoreResponse`，不再返回 `unknown`。公共模板元数据为 `api/types/workflow-template.ts` 的 `WorkflowStoreTemplate`，
+智能体 `ApplicationStoreTemplate` 为其类型别名，响应结构仍由 `api/types/application.ts` 维护。
+类型统一经 `@/api/types` 导入；各资源业务入口整理响应字段，公共 UI 不调用接口。
 创建或覆盖工作流时通过已有智能体 API 提交 `work_flow_template`，成功后的刷新与导航由 View 负责。
 
 ### 模型选项查询
@@ -235,7 +242,8 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 - token 和平台公开档案由 `stores/auth.ts` 管理，语言由 `stores/user.ts` 管理；Router、Axios 等业务代码通过
   `stores/index.ts` 导出的 `useStore()` 按需访问 Store；401 响应统一清除 token 并跳转 Admin
   登录页。
-- loading 不作为 API 函数参数，由调用接口的页面或 Store 管理。
+- loading 不作为业务 API 或 Admin、Chat 底层请求封装的参数；JSON 请求、文件上传和下载均遵循此规则。
+  由调用接口的页面、组件或 Store 在请求前开启 loading，并在 Promise 的 `finally` 中释放，确保成功和失败都恢复状态。
 - 流式 POST 请求使用 `postStream` 返回原始 `Response`，由业务组件按具体协议解析数据块；
   参数顺序为 `postStream(base, path, data?, config?)`，`config.signal` 用于取消请求。
   鉴权、语言请求头和错误状态仍由请求基础设施统一处理。
@@ -300,3 +308,27 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 `ApplicationDetail` 复用 `ApplicationFormPayload` 中的配置字段，并保留详情接口的 `model`
 和可空描述。复制通过 `getApplicationDetail` 获取完整配置，将 `model` 映射为 `model_id`，
 再调用 `postApplication` 创建副本；不使用卡片列表摘要作为复制数据。
+
+### 工具工作流调试
+
+`workspace/tool/workflow.ts` 的 `postToolWorkflowDebug(toolId, parameters)` 使用 Admin `postStream`
+请求 `/<toolId>/debug`，返回原始 SSE Response；输入参数来自工具基础节点，`chat_record_id` 用于识别
+执行记录，表单续跑沿用该 ID 并传入 `position`。`getToolWorkflowRecord(toolId, recordId)` 查询
+`/<toolId>/tool_record/<recordId>`，返回 `ToolWorkflowRecord` 的运行状态、输出及节点详情。
+工具调试读取服务端已保存工作流，画布页面在调试前保存未提交改动。
+
+### 工具工作流模板中心
+
+`admin/store.ts` 的 `getStoreToolWorkflowList(query)` 查询 `/workspace/store/tool_workflow_template`，
+返回 `ToolWorkflowStoreResponse`，其中 `apps` 复用 `WorkflowStoreTemplate[]`。
+`workspace/tool/workflow.ts` 的 `putToolWorkflow` 支持两种互斥载荷：保存 `work_flow` 与默认模型设置，
+或提交 `work_flow_template` 由服务端下载并覆盖当前工具工作流。模板覆盖后由 View 重新查询详情，
+同步默认模型设置、保存时间和图快照；确认取消或请求失败不关闭模板中心。
+
+### 知识库工作流模板与导出
+
+`admin/store.ts` 的 `getStoreKnowledgeList(query)` 查询 `/workspace/store/knowledge_template`，
+返回 `KnowledgeWorkflowStoreResponse`，其中 `apps` 使用公共 `WorkflowStoreTemplate[]`。
+`putKnowledgeWorkflow` 接受互斥的 `work_flow` 保存载荷或 `work_flow_template` 覆盖载荷，覆盖成功后由 View 重载详情。
+`exportKnowledgeWorkflow(knowledgeId, name)` 通过 GET `/<knowledgeId>/workflow/export` 下载 `.kbwf` 文件，
+只导出工作流，不调用包含文档的知识库包导出接口。

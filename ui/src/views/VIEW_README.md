@@ -129,30 +129,39 @@ query，不写入新的文件夹 ID，进入详情时也不携带该 query。`Wo
 局部替换，接口只返回布尔值或部分数据时调用 `refreshApplicationDetail()` 重新获取详情。切换二级
 菜单不会重新挂载详情容器，也不会自动重复请求详情。
 
-智能体模板中心参照工具商店按列表、卡片、详情和创建流程组织：
+工作流模板中心的公共 UI 放在 workflow 下，application 列表与工作流分别提供业务入口：
 
 ```text
-src/views/application/template-store/
-├── TemplateStoreDialog.vue        # 模板列表、搜索与工作流覆盖确认
+src/views/workflow/components/template-store/
+├── TemplateStoreDialog.vue        # 模板列表、搜索、加载及空状态
 ├── TemplateStoreDetailDrawer.vue  # 模板详情与使用入口
 └── components/
     └── TemplateCard.vue           # 模板卡片及详情抽屉的按需挂载
 ```
 
-模板中心直接平铺全部模板，支持名称搜索，不展示分类导航、分类锚点或卡片分类文字。
-`TemplateStoreDialog.open(folderId)` 接收创建目标目录，默认用于模板创建；
-工作流模式传入 `source="work_flow"`，选择模板后发出 `use(template)`，由工作流页面处理确认和请求。
-弹窗不接收智能体 ID 或 API；页面通过 `applying` 传入忙碌状态，成功后调用 `close()`，失败保留弹窗。
-卡片负责打开详情抽屉，卡片和详情的使用操作统一通过 `use(template)` 交给 `TemplateStoreDialog`。
-模板中心按 `source` 选择创建智能体或覆盖工作流，统一管理一份 `AdvancedCreateDialog`，
-传入目标 `folderId`，创建成功后关闭模板中心并通知刷新；配套浮层在 `closed` 后卸载。
+公共组件接收 `WorkflowStoreTemplate`，不调用 API、不依赖资源创建弹窗。
+`TemplateStoreDialog` 接收 `templates`、`resource`、`loading`；`resource` 为
+`application` / `knowledge` / `tool`，只决定卡片与详情图标。通过 `open()` 打开并发送空关键词
+`search`，名称搜索发送去除首尾空格后的关键词；使用模板统一发出 `use(template)`。
+列表平铺模板，不展示分类导航、锚点或分类文字。`loading` 期间禁止搜索和使用，成功后由业务入口
+调用 `close()`；取消或失败保留模板中心。详情在关闭动画结束后卸载。
+
+`application/components/ButtonTemplateStore.vue` 调用智能体模板查询接口，整理描述字段，
+记录打开时的目标 `folderId`，收到 `use` 后按需挂载 `AdvancedCreateDialog`。
+创建弹窗关闭后卸载，取消创建时保留模板中心；创建成功沿用原流程进入智能体工作流。
 `create-application/AdvancedCreateDialog.open(template?)` 同时承接普通高级创建与商店模板创建。
 传入模板时回填名称、描述，隐藏内置模板选择并提交 `work_flow_template`；无参数时保留空白和知识库问答助手选择，
-提交 `work_flow` 及开场白。创建成功刷新用户基础资料、发出 `refresh` 并进入智能体工作流，
-提交期间禁止重复提交与关闭，关闭后清理草稿并发出 `closed`。
-`ApplicationView` 在批量选择按钮之后、创建入口之前组合
-`components/ButtonTemplateStore.vue`，位置及样式与工具商店入口一致，批量选择模式下隐藏。
-入口传入当前文件夹 ID，转发创建成功的 `refresh` 事件刷新智能体列表。
+提交 `work_flow` 及开场白。创建成功刷新用户基础资料并进入智能体工作流，提交期间禁止重复提交与关闭。
+`ApplicationView` 在批量选择按钮之后、创建入口之前组合 `components/ButtonTemplateStore.vue`，
+传入当前文件夹 ID，批量选择模式下隐藏。
+
+`workflow/application/ButtonTemplateStore.vue` 负责工作流页按钮、模板查询和弹窗实例，
+通过 `v-model:loading` 与页面共用加载状态，查询和应用模板均使用该状态；
+发出 `open`、`use`，通过 `close()` 供 View 在应用成功后关闭。View 负责覆盖确认、提交模板及重载画布。
+`workflow/tool/ButtonTemplateStore.vue` 使用相同的公共 UI，查询工具工作流模板接口并整理描述字段。
+工具 View 在确认覆盖后提交 `work_flow_template`，重新加载工具与工作流详情，更新默认模型、画布和
+保存基准，成功后关闭模板中心；打开模板中心时关闭调试。
+`workflow/knowledge/ButtonTemplateStore.vue` 按相同边界查询知识库模板，由知识库 View 确认覆盖、重载详情并关闭弹窗。
 
 知识库列表按相同方式维护卡片、菜单 Action 和批量流程：
 
@@ -348,7 +357,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `application-detail/overview/OverviewView.vue`                         | 智能体概览内容                         |
 | `application-detail/setting/SimpleSettingView.vue`                     | 简易智能体设置内容                     |
 | `workflow/application/ApplicationWorkflowView.vue`                     | 智能体工作流页面头部与全屏画布         |
-| `workflow/knowledge/KnowledgeWorkflowView.vue` | 知识库工作流加载、保存、发布与全屏画布 |
+| `workflow/knowledge/KnowledgeWorkflowView.vue` | 知识库工作流加载、自动保存、发布历史、模板覆盖、导出、调试与全屏画布 |
 | `workflow/tool/ToolWorkflowView.vue`                                   | 工具工作流页面头部与全屏画布           |
 | `chat/ChatView.vue`                                                    | Chat 入口的对话页面                    |
 | `error/NotFoundView.vue`                                               | Admin 未匹配路由和全局 404 页面        |
@@ -400,12 +409,14 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 `min-h-0 flex-1` 占满头部下方空间。页面保留画布 Ref、资源与模式配置、接口调用、保存和退出确认
 逻辑，布局组件只负责展示。添加组件入口由画布右上角的 `AddNode` 统一提供，页面不再转发节点选择事件。
 
-## 智能体工作流自动保存
+## 工作流自动保存
 
 `ApplicationWorkflowView` 使用 `workflowAutoSave:application:<applicationId>` 浏览器存储开关，
-按资源类型和智能体独立记录，不读取旧的全局 `workflowAutoSave` 开关。默认关闭，开启后每
-60 秒检查并保存未保存的画布改动。加载、保存、发布和退出确认期间跳过，关闭开关或卸载页面时
-清理定时器；仅开启时写入存储，关闭开关时删除当前智能体的存储项。自动保存复用页面保存流程，不弹成功提示；成功更新保存时间和本次提交的图快照，
+`ToolWorkflowView` 使用 `workflowAutoSave:tool:<toolId>`，
+`KnowledgeWorkflowView` 使用 `workflowAutoSave:knowledge:<knowledgeId>`，按资源类型与资源 ID 独立记录，
+不读取旧的全局 `workflowAutoSave` 开关。默认关闭，开启后每
+60 秒检查并保存未保存的画布改动。加载、保存、发布、发布历史和退出确认期间跳过，关闭开关或卸载页面时
+清理定时器；仅开启时写入存储，关闭开关时删除当前资源的存储项。自动保存复用页面保存流程，不弹成功提示；成功更新保存时间和本次提交的图快照，
 失败保留未保存状态供后续周期重试。请求期间继续编辑的内容不会被标记为已保存。
 
 ## 工作流发布历史
@@ -426,13 +437,21 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 `close` / `closed` 事件。页面监听 `historyVisible`，关闭抽屉与头部返回统一恢复草稿并清理预览；
 恢复版本时先清空草稿快照再关闭，保留已恢复的版本。编辑弹窗的 `closeEdit()` 仅用于保存成功后关闭表单。
 
-同目录 `EditPublishVersionDialog.vue` 只维护表单副本与校验，通过 `open(version)` 回填、
+同目录 `EditPublishVersionDialog.vue` 只维护表单副本与校验。`mode` 默认为 `edit`，显示“编辑”，
+通过 `open(version)` 回填；`mode="publish"` 显示“发布内容”，通过 `open()` 打开空白表单。通过
 `submit(payload)` 提交、`close()` 关闭，外部传入 `saving`。标题必填且最多 64 字，更新说明最多
-1000 字；按钮沿设计显示“发布”，实际编辑请求由业务组件执行，不创建新发布。
+1000 字，标题拒绝纯空白；两种模式的提交按钮均显示“发布”。编辑请求由业务组件执行，
+不创建新发布；提交期间禁止编辑表单和关闭弹窗。
 `DescriptionDialog.vue` 通过 `open(content)` 展示纯文本更新说明并保留换行，空内容显示
 “暂无更新说明”。两个弹窗均不依赖业务 API，复用 `MkDialog` 的延迟挂载和关闭销毁能力。
 
-后续 knowledge、tool 在各自目录实现业务入口，复用 `PublishHistoryDrawer`（内部包含两个弹窗），不引入通用 API 适配层。
+`workflow/tool/ButtonPublishHistory.vue` 为工具提供独立业务入口，调用工具 `tool_version` API，
+编辑成功后重新查询列表。复用 `PublishHistoryDrawer`、历史模式头部与预览/恢复交互。
+工具头部采用默认模型设置、带图标的保存、发布和更多菜单；更多菜单包含发布历史与自动保存。
+工具历史模式下返回仅退出预览，恢复版本回到编辑态后由手动或自动保存持久化；版本接口未返回
+默认模型配置，预览与恢复保留当前配置。
+`workflow/knowledge/ButtonPublishHistory.vue` 使用独立 `knowledge_version` API，复用相同 UI 和预览/恢复流程，
+编辑成功只重新查询列表；知识库版本同样不含默认模型配置，不引入通用 API 适配层。
 
 `ApplicationWorkflowView` 已接入更多菜单中的发布历史。打开时关闭调试，面板打开期间跳过
 自动保存；首次预览保留当前画布草稿，切换版本不覆盖草稿，关闭预览恢复原草稿。
@@ -567,11 +586,10 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 “副本”，确认后创建到打开时的当前文件夹。复制成功刷新列表及用户权限，简易应用进入设置页，
 工作流应用进入画布；请求失败保留表单。弹窗按需挂载，在 `closed` 后卸载。
 
-`workflow/application/ApplicationWorkflowView.vue` 直接维护头部的模板中心按钮和弹窗 Ref，
-入口位于默认模型设置之前，监听弹窗的 `use(template)` 事件。
-按钮复用 `application/template-store/TemplateStoreDialog.vue`，以 `source="work_flow"` 打开；
-加载、保存或发布期间禁止打开。页面确认覆盖后提交 `work_flow_template`，重新加载详情、画布和
-已保存基准；完成后关闭模板中心并提示成功。取消或失败保留模板中心。
+`workflow/application/ApplicationWorkflowView.vue` 在默认模型设置之前引用 `ButtonTemplateStore`，
+通过 `open` 关闭调试面板，通过 `use(template)` 执行覆盖确认和请求；加载、保存或发布期间禁止打开。
+页面确认覆盖后提交 `work_flow_template`，重新加载详情、画布和已保存基准；完成后通过按钮组件的
+`close()` 关闭模板中心并提示成功。取消或失败保留模板中心。
 
 ## 智能体工作流调试
 
@@ -590,3 +608,52 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 当前概览使用 v3 `overviewRead` 权限；简易设置只允许 SIMPLE 类型及编辑权限，不作为工作流返回目标。
 无可访问详情时回退对应列表。System 暂无详情父路由，当前回退 System 资源管理智能体列表。
 `ApplicationWorkflowView` 保留未保存确认以及保存后退出流程，导航统一调用该工具函数。
+
+## 工具工作流调试
+
+`workflow/tool/ToolWorkflowView.vue` 在默认模型设置后提供调试按钮，先校验画布，有未保存改动时
+保存成功后再打开调试。打开默认模型设置或发布历史时关闭调试抽屉。
+`tool/debug/DebugDrawer.vue` 接收 `toolId`，通过 `open(graph)` 从已保存图的工具基础节点读取输入字段，
+管理字符串、整数、浮点数、布尔值及 JSON 数组/对象参数，校验后交给 `ResultDrawer` 运行。
+`ResultDrawer.vue` 负责 SSE 消费、流式回复、输出参数和节点执行详情，复用现有
+`ConversationStream`、回复块聚合与渲染组件、`ExecutionDetailContent`，不使用 v2 的动态 API 或聊天 Store。
+运行结束后读取执行记录；表单节点通过同一 `chat_record_id` 和 `position` 续跑。
+运行期间禁止重复执行，返回参数保留输入，再次运行创建新记录；关闭或卸载中断前端读取，
+不表示服务端任务已停止。两个抽屉复用 `MkDrawer`，关闭动画期间保持挂载。
+
+## 工具工作流返回导航
+
+`workflow/tool/navigation.ts` 统一提供 `goBack(folderId?)`，使用资源上下文判断返回范围：
+System 资源管理返回 `system-resource-tools`，System 共享资源返回 `system-shared-tools`，
+Workspace 返回 `workspace-tools` 并携带当前 `workspaceId` 和可选 `folderId` query，
+由工具列表的 `FolderTree` 恢复所属目录。工具 View 只负责历史预览退出、未保存确认及保存后退出，
+不再维护路由跳转细节。
+
+## 工具工作流导出
+
+`ToolWorkflowView` 更多菜单底部提供“导出工作流”，复用 `ToolApi.exportTool` 下载 `.tool` 文件。
+存在未保存画布改动时先保存，保存失败不发起导出；导出期间禁止重复操作并暂停自动保存。
+文件内容由后端从已保存工作流生成，沿用公共下载方法的文件名与错误响应处理。
+
+## 工作流页面加载状态
+
+application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控制整页遮罩和操作禁用，
+不再拆分 `saving`、`publishing`、`exporting` 或 `openingDebug`。最外层操作负责开启状态并在
+`finally` 中释放；内部保存、加载详情方法只返回 Promise，不修改 loading。发布的校验、保存、发布，
+模板覆盖及重新加载，以及调试前保存、导出前保存均保持完整流程的 loading。
+自动保存同样复用该状态；历史显隐和退出确认属于交互状态，独立维护。抽屉内部请求状态仍由抽屉管理。
+
+### 知识库工作流导航与导出
+
+`workflow/knowledge/navigation.ts` 统一返回入口：Workspace 返回当前知识库详情，System 资源管理和共享资源返回各自知识库列表。
+历史模式下返回只退出预览；普通编辑态返回保留未保存确认。更多菜单的导出工作流先保存未提交改动，
+再调用专用 `.kbwf` 导出接口；保存失败不导出。知识库原有文件上传、数据源表单与任务轮询调试流程保持独立。
+
+## 智能体工作流发布
+
+`ApplicationWorkflowView` 直接管理发布按钮与 `EditPublishVersionDialog` 的发布模式，
+点击后先校验画布，通过后调用弹窗的 `open()` 打开“发布内容”表单；
+校验失败不打开弹窗。表单通过 `submit` 将标题和更新说明交给 `ApplicationWorkflowView`。
+页面复用整页 `loading`，提交时保存当前工作流、调用发布接口，映射 `name` 为
+`publish_name`，更新说明使用 `publish_desc`。成功后更新详情与保存时间，关闭弹窗并提示；
+保存或发布失败保留表单以便重试。旧 `ApplicationPublishDialog` 不再使用。

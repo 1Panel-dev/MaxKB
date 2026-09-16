@@ -3,6 +3,7 @@
 import type LogicFlow from '@logicflow/core'
 import { TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
 import type { DynamicFormField } from './common'
+import type { WorkflowStoreTemplate } from './workflow-template'
 import type { DefaultModelSettingPayload } from '@/api/types/model.ts'
 
 export type ToolScope = (typeof TOOL_SCOPE)[keyof typeof TOOL_SCOPE]
@@ -159,4 +160,23 @@ export interface UpdateStoreToolPayload {
   icon: string
   label: string
   versions: ToolStoreVersion[]
+}
+
+/** 工具工作流调试完成后的执行记录。 */
+export interface ToolWorkflowRecord {
+  id: string
+  state: string
+  run_time?: number
+  meta: {
+    output?: unknown
+    details?:
+      | import('@/workflow-canvas/details/types').ExecutionNodeDetail[]
+      | Record<string, import('@/workflow-canvas/details/types').ExecutionNodeDetail>
+  }
+}
+
+/** 工作流工具模板商店的查询响应。 */
+export interface ToolWorkflowStoreResponse {
+  additionalProperties: { tags: ToolStoreTag[] }
+  apps: WorkflowStoreTemplate[]
 }

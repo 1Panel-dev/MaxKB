@@ -2,13 +2,12 @@
 import type { DynamicFormValue } from '../../type'
 import { computed, ref, useAttrs, nextTick, inject } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
-import { get, post, put, del } from '@/api/admin/core/request'
+import { post } from '@/api/admin/core/request'
 import { cloneDeep } from 'lodash'
 import { formItemContextKey } from 'element-plus'
 import type { LoadFunction } from 'element-plus'
 const getExtra = inject('get_extra') as DynamicFormValue
 const elFormItem = inject(formItemContextKey, void 0)
-const request = { get, post, put, del }
 
 defineOptions({ name: 'DynamicFormTree' })
 
@@ -50,7 +49,6 @@ const propsData = computed(() => {
 
 const attrs = useAttrs() as DynamicFormValue
 const treeRef = ref<DynamicFormValue>(null)
-const requestCall = new Function('request', 'extra', 'return  request.post(extra.url,extra.body,{},extra.loading).then(extra.then);')
 function renderTemplate(template: string, data: DynamicFormValue) {
   return template.replace(/\$\{(\w+)\}/g, (match, key) => {
     return data[key] !== undefined ? data[key] : match
@@ -58,25 +56,26 @@ function renderTemplate(template: string, data: DynamicFormValue) {
 }
 
 const loadNode: LoadFunction = (node, resolve) => {
-  requestCall(request, {
-    url: renderTemplate(
-      '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' + attrs.fetch_list_function,
-      {
-        ...props.otherParams,
-        ...(getExtra ? getExtra() : {}),
-      },
-    ),
-    body: { current_node: node.level === 0 ? undefined : node.data },
-    then: (res: DynamicFormValue) => {
-      resolve(res)
-      res.forEach((childNode: DynamicFormValue) => {
+  const url = renderTemplate(
+    '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' + attrs.fetch_list_function,
+    {
+      ...props.otherParams,
+      ...(getExtra ? getExtra() : {}),
+    },
+  )
+  loading.value = true
+  return post<{ current_node: DynamicFormValue }, DynamicFormValue[]>(url, { current_node: node.level === 0 ? undefined : node.data })
+    .then((children) => {
+      resolve(children)
+      children.forEach((childNode) => {
         if (childNode.is_exist) {
           treeRef.value?.setChecked(childNode.token, true, false)
         }
       })
-    },
-    loading: loading,
-  })
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField; otherParams: DynamicFormValue }>(), {
   modelValue: () => [],

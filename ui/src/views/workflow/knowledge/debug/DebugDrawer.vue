@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick, provide, ref, useTemplateRef, type Component, type Ref } from 'vue'
+import { computed, nextTick, provide, ref, useTemplateRef, type Component } from 'vue'
 import type LogicFlow from '@logicflow/core'
 import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import type { LoadingTarget } from '@/api/admin/core/types'
 import type { Dict } from '@/api/types'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import type { FormField } from '@/components/mk-dynamics-form'
@@ -19,9 +18,7 @@ type ActionStep = 'data_source' | 'knowledge_base' | 'result'
 const actionComponents: Record<ActionStep, Component> = { data_source: DataSource, knowledge_base: KnowledgeBase, result: Result }
 
 // mk-dynamics-form 的上传项通过 inject('upload') 获取上传函数；返回值的 data 为文件地址（末段即 file_id）。
-provide('upload', (file: File, loading?: Ref<boolean>) =>
-  KnowledgeWorkflowApi.postKnowledgeUploadFile(props.knowledgeId, file, loading as LoadingTarget).then((url) => ({ data: url })),
-)
+provide('upload', (file: File) => KnowledgeWorkflowApi.postKnowledgeUploadFile(props.knowledgeId, file).then((url) => ({ data: url })))
 
 const visible = ref(false)
 const loading = ref(false)
@@ -58,14 +55,18 @@ function prev() {
 function submit() {
   actionRef.value?.validate().then(() => {
     formPayload.value[active.value as 'data_source' | 'knowledge_base'] = actionRef.value?.getData() ?? {}
-    KnowledgeWorkflowApi.postKnowledgeWorkflowDebug(
-      props.knowledgeId,
-      { data_source: formPayload.value.data_source, knowledge_base: formPayload.value.knowledge_base },
-      loading,
-    ).then((action) => {
-      actionId.value = action.id
-      active.value = 'result'
+    loading.value = true
+    return KnowledgeWorkflowApi.postKnowledgeWorkflowDebug(props.knowledgeId, {
+      data_source: formPayload.value.data_source,
+      knowledge_base: formPayload.value.knowledge_base,
     })
+      .then((action) => {
+        actionId.value = action.id
+        active.value = 'result'
+      })
+      .finally(() => {
+        loading.value = false
+      })
   })
 }
 

@@ -100,3 +100,9 @@ export interface KnowledgeWorkflowTemplate {
   downloadUrl: string
   downloadCallbackUrl?: string
 }
+
+/** 知识库工作流模板商店响应。 */
+export interface KnowledgeWorkflowStoreResponse {
+  additionalProperties: { tags: { key: string; name: string }[] }
+  apps: import('./workflow-template').WorkflowStoreTemplate[]
+}

@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import { nextTick, ref, useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import StoreApi from '@/api/admin/store'
 import type { ApplicationStoreTemplate } from '@/api/types'
 import TemplateStoreDialog from '@/views/workflow/components/template-store/TemplateStoreDialog.vue'
-import AdvancedCreateDialog from '../create-application/AdvancedCreateDialog.vue'
 
-defineOptions({ name: 'ButtonTemplateStore' })
-const props = defineProps<{ folderId: string }>()
+defineOptions({ name: 'ButtonApplicationTemplateStore' })
+const emit = defineEmits<{ open: []; use: [template: ApplicationStoreTemplate] }>()
 const templateStoreDialogRef = useTemplateRef<InstanceType<typeof TemplateStoreDialog>>('templateStoreDialogRef')
-const targetFolderId = ref('default')
-const createDialogMounted = ref(false)
-const createDialogRef = useTemplateRef<InstanceType<typeof AdvancedCreateDialog>>('createDialogRef')
 
 const templates = ref<ApplicationStoreTemplate[]>([])
-const loading = ref(false)
+const loading = defineModel<boolean>('loading', { default: false })
 
 function loadTemplates(keyword: string) {
+  if (loading.value) return
   loading.value = true
   templates.value = []
   return StoreApi.getStoreApplicationList(keyword ? { name: keyword } : undefined)
@@ -28,20 +25,21 @@ function loadTemplates(keyword: string) {
 }
 
 function handleOpen() {
-  targetFolderId.value = props.folderId || 'default'
+  if (loading.value) return
+  emit('open')
   templateStoreDialogRef.value?.open()
 }
 
-function handleUse(template: ApplicationStoreTemplate) {
-  if (createDialogMounted.value) return
-  createDialogMounted.value = true
-  nextTick(() => createDialogRef.value?.open(template))
+function close() {
+  templateStoreDialogRef.value?.close()
 }
+
+defineExpose({ close })
 </script>
 
 <template>
   <!-- 打开模板中心 -->
-  <el-button plain @click="handleOpen">
+  <el-button plain :disabled="loading" @click="handleOpen">
     <MkIcon name="icon_template_outlined" />
     <span>模板中心</span>
   </el-button>
@@ -51,7 +49,6 @@ function handleUse(template: ApplicationStoreTemplate) {
     :templates="templates"
     :loading="loading"
     @search="loadTemplates"
-    @use="handleUse"
+    @use="emit('use', $event)"
   />
-  <AdvancedCreateDialog v-if="createDialogMounted" ref="createDialogRef" :folder-id="targetFolderId" @closed="createDialogMounted = false" />
 </template>

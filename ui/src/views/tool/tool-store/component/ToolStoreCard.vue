@@ -44,7 +44,7 @@ function handleApply(tool = props.tool) {
 <template>
   <MkSourceCard :title="tool.name">
     <template #icon>
-      <ToolIcon :icon="tool.icon" :size="32" :type="tool.tool_type" />
+      <ToolIcon :icon="tool.icon" :size="24" :type="tool.tool_type" />
     </template>
     <template #title="{ title }">
       <h6 class="min-w-0 truncate" :title="title">{{ title }}</h6>
