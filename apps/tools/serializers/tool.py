@@ -1640,7 +1640,7 @@ class ToolSerializer(serializers.Serializer):
             SUPPORTED_MODEL_TYPES = ["LLM"]
             model_exist = QuerySet(Model).filter(id=model_id, model_type__in=SUPPORTED_MODEL_TYPES).exists()
             if not model_exist:
-                raise Exception(_("Model does not exists or is not an LLM model"))
+                raise Exception(_("Model does not exist or is not an LLM model"))
 
             def process():
                 model = get_model_instance_by_model_workspace_id(
