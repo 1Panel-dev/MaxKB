@@ -13,7 +13,10 @@ from models_provider.impl.minimax_model_provider.credential.itv import ImageToVi
 from models_provider.impl.minimax_model_provider.credential.llm import MiniMaxLLMModelCredential
 from models_provider.impl.minimax_model_provider.credential.tti import MiniMaxTextToImageModelCredential
 from models_provider.impl.minimax_model_provider.credential.tts import MiniMaxTTSModelCredential
-from models_provider.impl.minimax_model_provider.credential.ttv import TextToVideoModelCredential
+from models_provider.impl.minimax_model_provider.credential.ttv import (
+    MiniMaxH3TextToVideoModelCredential,
+    TextToVideoModelCredential,
+)
 from models_provider.impl.minimax_model_provider.model.llm import MiniMaxChatModel
 from models_provider.impl.minimax_model_provider.model.tti import MiniMaxTextToImageModel
 from models_provider.impl.minimax_model_provider.model.tts import MiniMaxTextToSpeech
@@ -26,6 +29,7 @@ minimax_llm_model_credential = MiniMaxLLMModelCredential()
 minimax_tts_model_credential = MiniMaxTTSModelCredential()
 minimax_tti_model_credential = MiniMaxTextToImageModelCredential()
 minimax_ttv_model_credential = TextToVideoModelCredential()
+minimax_h3_ttv_model_credential = MiniMaxH3TextToVideoModelCredential()
 minimax_itv_model_credential = ImageToVideoModelCredential()
 
 minimax_m2_7 = ModelInfo(
@@ -87,6 +91,8 @@ minimax_tti_list = [
     ModelInfo("image-01", _(""), ModelTypeConst.TTI, minimax_tti_model_credential, MiniMaxTextToImageModel),
 ]
 minimax_ttv_list = [
+    ModelInfo("MiniMax-H3", _(""), ModelTypeConst.TTV, minimax_h3_ttv_model_credential, GenerationVideoModel),
+    ModelInfo("MiniMax-H3-Max", _(""), ModelTypeConst.TTV, minimax_h3_ttv_model_credential, GenerationVideoModel),
     ModelInfo("MiniMax-Hailuo-2.3", _(""), ModelTypeConst.TTV, minimax_ttv_model_credential, GenerationVideoModel),
 ]
 
