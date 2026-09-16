@@ -5,7 +5,7 @@ export interface WorkflowVersion {
   id: string
   name: string
   /** 更新说明；旧版本接口可能不返回。 */
-  description?: string | null
+  publish_desc?: string | null
   work_flow: LogicFlow.GraphConfigData
   publish_user_name: string
   create_time: string
@@ -15,5 +15,5 @@ export interface WorkflowVersion {
 /** 发布历史的标题和更新说明编辑内容。 */
 export interface WorkflowVersionPayload {
   name: string
-  description: string
+  publish_desc: string
 }

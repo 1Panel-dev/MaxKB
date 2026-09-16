@@ -21,7 +21,7 @@ from typing import Dict, List
 
 import requests
 import uuid_utils.compat as uuid
-from application.workflow.common import Workflow
+from application.workflow.common import new_instance
 from application.long_term_memory import schedule_extract_long_term_memory
 from application.models.application import Application, ApplicationFolder, ApplicationTypeChoices, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
@@ -1107,6 +1107,12 @@ class ApplicationOperateSerializer(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     user_id = serializers.UUIDField(required=True, label=_("User ID"))
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
+    publish_name = serializers.CharField(
+        required=False, max_length=128, allow_null=True, allow_blank=True, label=_("Publish Name")
+    )
+    publish_desc = serializers.CharField(
+        required=False, max_length=1024, allow_null=True, allow_blank=True, label=_("Publish Desc")
+    )
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -1260,6 +1266,10 @@ class ApplicationOperateSerializer(serializers.Serializer):
             self.is_valid()
         user_id = self.data.get("user_id")
         workspace_id = self.data.get("workspace_id")
+        name = (instance or {}).get("publish_name")
+        if not name or not str(name).strip():
+            raise AppApiException(500, _("publish_name is required"))
+        publish_desc = (instance or {}).get("publish_desc") or ""
         user = QuerySet(User).filter(id=user_id).first()
         application = (
             QuerySet(Application).filter(id=self.data.get("application_id"), workspace_id=workspace_id).first()
@@ -1268,7 +1278,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             work_flow = application.work_flow
             if work_flow is None:
                 raise AppApiException(500, _("work_flow is a required field"))
-            Workflow.new_instance(work_flow).is_valid()
+            new_instance(work_flow).is_valid()
             base_node = get_base_node_work_flow(work_flow)
             if base_node is not None:
                 node_data = base_node.get("properties").get("node_data")
@@ -1283,9 +1293,10 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version = ApplicationVersion(
             work_flow=application.work_flow,
             application=application,
-            name=timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S"),
+            name=name,
             publish_user_id=user_id,
             publish_user_name=user.username,
+            publish_desc=publish_desc,
             workspace_id=workspace_id,
         )
         self.reset_application_version(work_flow_version, application)

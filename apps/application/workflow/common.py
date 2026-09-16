@@ -194,6 +194,9 @@ class Workflow:
             prompt = node_field.reset_variable(prompt)
         return prompt
 
+    def is_valid(self):
+        pass
+
 
 class WorkflowType(Enum):
     # 应用

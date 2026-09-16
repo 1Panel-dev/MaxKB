@@ -9,16 +9,17 @@ defineOptions({ name: 'EditPublishVersionDialog' })
 const props = defineProps<{ saving?: boolean }>()
 const emit = defineEmits<{ submit: [payload: WorkflowVersionPayload] }>()
 const visible = ref(false)
-const versionForm = reactive<WorkflowVersionPayload>({ name: '', description: '' })
+/** 表单内部使用 description 命名，提交时映射为后端字段 publish_desc。 */
+const versionForm = reactive<{ name: string; description: string }>({ name: '', description: '' })
 const formRef = useTemplateRef<FormInstance>('formRef')
-const rules: FormRules<WorkflowVersionPayload> = {
+const rules: FormRules<{ name: string; description: string }> = {
   name: [{ required: true, message: '请输入标题', trigger: 'blur' }],
 }
 
 /* 编辑副本并校验，接口提交和成功关闭由业务组件处理。 */
 function open(version: WorkflowVersion) {
   versionForm.name = version.name || datetimeFormat(version.create_time)
-  versionForm.description = version.description ?? ''
+  versionForm.description = version.publish_desc ?? ''
   visible.value = true
 }
 
@@ -26,7 +27,7 @@ function handleSubmit() {
   if (props.saving) return
   formRef.value?.validate((valid) => {
     if (!valid || props.saving) return
-    emit('submit', { name: versionForm.name.trim(), description: versionForm.description })
+    emit('submit', { name: versionForm.name.trim(), publish_desc: versionForm.description })
   })
 }
 
