@@ -337,7 +337,7 @@ class ChatSerializers(serializers.Serializer):
                 if chat_record:
                     old_details = chat_record.details
                     if position and chat_record.messages:
-                        messages = [*chat_record.messages, *messages]
+                        messages = list({m.get("id"): m for m in [*chat_record.messages, *messages]}.values())
             details = wf_manage.get_details(position=position, old_details=old_details)
             self.update_chat_record(chat_user_id, chat_record_id_str, wf_manage.context, messages, details)
             ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
