@@ -167,12 +167,22 @@ const detail = ref<ExecutionNodeDetail[]>([
     is_submit: true,
   }),
 
+  // ===== Web 数据源 =====
+  base(WorkflowNodeType.DataSourceWebNode, 16, 'Web 数据源', {
+    selector: '.content',
+    source_url: 'https://example.com/docs',
+    document_list: [
+      { name: '前言', content: '本文介绍 MaxKB 的安装步骤与系统要求。' },
+      { name: '快速开始', content: '下载镜像后，通过 docker compose 一键启动。' },
+    ],
+  }),
+
   // ===== 循环 =====
   {
     type: WorkflowNodeType.LoopNode,
     name: '循环',
     status: 200,
-    index: 16,
+    index: 17,
     run_time: 4.567,
     loop_type: 'ARRAY',
     loop_node_data: {

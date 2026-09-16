@@ -1,4 +1,5 @@
 import DataSourceWebNode from './index.vue'
+import DataSourceWebNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -8,4 +9,4 @@ class DataSourceWebNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.DataSourceWebNode, model: WorkflowNodeModel, view: DataSourceWebNodeView }
+export default { type: WorkflowNodeType.DataSourceWebNode, model: WorkflowNodeModel, view: DataSourceWebNodeView, details: DataSourceWebNodeDetail }
