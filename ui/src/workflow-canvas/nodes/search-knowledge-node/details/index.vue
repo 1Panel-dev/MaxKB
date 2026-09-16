@@ -17,6 +17,10 @@ interface SearchParagraph {
   document_name?: string
   knowledge_name?: string
   knowledge_type?: string
+  meta?: {
+    source_file_id?: string
+    source_url?: string
+  }
   similarity?: number
   title?: string
 }
