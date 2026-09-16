@@ -109,3 +109,48 @@ class TextToVideoModelCredential(BaseForm, BaseModelCredential):
         :return: Parameter setting form.
         """
         return MiniMaxModelParams()
+
+
+class MiniMaxH3ModelParams(BaseForm):
+    """
+    Parameters for the MiniMax H3 / H3-Max (V2) text-to-video model.
+    """
+
+    resolution = SingleSelect(
+        _('Resolution'), text_field='label', value_field='value',
+        option_list=[
+            {'label': '480P', 'value': '480P'},
+            {'label': '768P', 'value': '768P'},
+            {'label': '2K', 'value': '2K'},
+        ],
+        required=True, default_value='2K',
+    )
+    duration = SliderField(
+        _('Duration (seconds)'), _min=4, _max=15, _step=1, precision=0,
+        required=True, default_value=4,
+    )
+    ratio = SingleSelect(
+        _('Aspect Ratio'), text_field='label', value_field='value',
+        option_list=[
+            {'label': '16:9', 'value': '16:9'},
+            {'label': '21:9', 'value': '21:9'},
+            {'label': '4:3', 'value': '4:3'},
+            {'label': '1:1', 'value': '1:1'},
+            {'label': '3:4', 'value': '3:4'},
+            {'label': '9:16', 'value': '9:16'},
+        ],
+        required=True, default_value='16:9',
+    )
+
+
+class MiniMaxH3TextToVideoModelCredential(TextToVideoModelCredential):
+    """
+    Credential for the MiniMax H3 / H3-Max (V2) text-to-video model.
+    Uses the V2 endpoint and requires resolution / duration / ratio.
+    """
+
+    api_base = forms.TextInputField('API URL', required=True,
+                                    default_value='https://api.minimax.io/v2')
+
+    def get_model_params_setting_form(self, model_name: str):
+        return MiniMaxH3ModelParams()

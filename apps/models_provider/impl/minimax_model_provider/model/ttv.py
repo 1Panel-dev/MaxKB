@@ -16,6 +16,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     max_retries: int = 3
     retry_delay: int = 10  # seconds
 
+    v2_models: ClassVar[tuple] = ("MiniMax-H3", "MiniMax-H3-Max")
     v2_extra_fields: ClassVar[tuple] = ("resolution", "duration", "ratio", "callback_url")
     v2_success_status: ClassVar[frozenset] = frozenset({"succeeded", "Success"})
     v2_fail_status: ClassVar[frozenset] = frozenset({"failed", "Fail", "cancelled", "Cancel"})
@@ -69,6 +70,9 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         return base.rstrip("/")
 
     def _v2(self) -> bool:
+        """V2 logic is bound to the model name; fall back to URL detection."""
+        if self.model_name in self.v2_models:
+            return True
         return self._detect_api_version() == "v2"
 
     def _safe_call(self, method, url, **kwargs):
