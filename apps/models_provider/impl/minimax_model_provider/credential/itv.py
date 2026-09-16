@@ -109,3 +109,37 @@ class ImageToVideoModelCredential(BaseForm, BaseModelCredential):
         :return: Parameter setting form.
         """
         return MiniMaxModelParams()
+
+
+class MiniMaxH3ImageParams(BaseForm):
+    """
+    Parameters for the MiniMax H3 / H3-Max (V2) image-to-video model.
+    ratio is always adaptive for image-to-video, so it is not exposed.
+    """
+
+    resolution = SingleSelect(
+        _('Resolution'), text_field='label', value_field='value',
+        option_list=[
+            {'label': '480P', 'value': '480P'},
+            {'label': '768P', 'value': '768P'},
+            {'label': '2K', 'value': '2K'},
+        ],
+        required=True, default_value='768P',
+    )
+    duration = SliderField(
+        _('Duration (seconds)'), _min=4, _max=15, _step=1, precision=0,
+        required=True, default_value=4,
+    )
+
+
+class MiniMaxH3ImageToVideoModelCredential(ImageToVideoModelCredential):
+    """
+    Credential for the MiniMax H3 / H3-Max (V2) image-to-video model.
+    Uses the V2 endpoint and requires resolution / duration.
+    """
+
+    api_base = forms.TextInputField('API URL', required=True,
+                                    default_value='https://api.minimax.io/v2')
+
+    def get_model_params_setting_form(self, model_name: str):
+        return MiniMaxH3ImageParams()
