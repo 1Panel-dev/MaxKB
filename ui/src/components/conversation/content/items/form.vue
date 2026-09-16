@@ -1,6 +1,8 @@
 <template>
   <div class="content-form">
+    <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="leadingText|| ''"></MdPreview>
     <MkDynamicsForm ref="dynamicsFormRef" :view="is_submit" :render-data="form_field_list" v-model="form_data" />
+     <MdPreview class="!h-auto"  editorId="conversation-text" :modelValue="trailingText|| ''"></MdPreview>
     <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit" @click="submit">
       {{ is_submit ? '已提交' : '提交' }}
     </el-button>
@@ -17,9 +19,11 @@ const sendMessage = inject<(opts: any) => void>('sendMessage')
 const props = defineProps<{
   content: any
 }>()
-
+const form_content_format=computed(()=>props.content.form_content_format)
 const _submit = ref(false)
 const form_field_list = computed(() => props.content.form_field_list || [])
+const [leadingText, trailingText] = form_content_format.value.split('{{form}}').map(s => s.trim());
+
 const is_submit = computed(() => _submit.value || !!props.content.is_submit)
 const _form_data = ref<any>({})
 const form_data = computed({
