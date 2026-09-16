@@ -250,6 +250,7 @@ class KnowledgeWorkflow(AppModelMixin):
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
     is_publish = models.BooleanField(verbose_name="是否发布", default=False, db_index=True)
     publish_time = models.DateTimeField(verbose_name="发布时间", null=True, blank=True)
+    default_model_setting = models.JSONField(verbose_name="默认模型", default=dict)
 
     class Meta:
         db_table = "knowledge_workflow"
@@ -267,6 +268,7 @@ class KnowledgeWorkflowVersion(AppModelMixin):
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
     publish_user_id = models.UUIDField(verbose_name="发布者id", max_length=128, default=None, null=True)
     publish_user_name = models.CharField(verbose_name="发布者名称", max_length=128, default="")
+    default_model_setting = models.JSONField(verbose_name="默认模型", default=dict)
 
     class Meta:
         db_table = "knowledge_workflow_version"
