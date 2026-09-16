@@ -165,6 +165,7 @@ class ApplicationVersion(AppModelMixin):
     name = models.CharField(verbose_name="版本名称", max_length=128, default="")
     publish_user_id = models.UUIDField(verbose_name="发布者id", max_length=128, default=None, null=True)
     publish_user_name = models.CharField(verbose_name="发布者名称", max_length=128, default="")
+    publish_desc = models.CharField(verbose_name="更新说明", max_length=1024, default="")
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     application_name = models.CharField(max_length=128, verbose_name="应用名称")
     desc = models.CharField(max_length=512, verbose_name="引用描述", default="")

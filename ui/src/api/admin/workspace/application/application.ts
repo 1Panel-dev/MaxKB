@@ -69,8 +69,11 @@ const putBatchMoveApplications = (applicationIds: string[], folderId: string) =>
 }
 
 /** 发布工作空间智能体。 */
-const putApplicationPublish = (applicationId: string) => {
-  return put<Record<string, never>, ApplicationDetail>(`${getPrefix()}/${applicationId}/publish`, {})
+const putApplicationPublish = (applicationId: string, publishName: string, publishDesc?: string) => {
+  return put<Record<string, unknown>, ApplicationDetail>(`${getPrefix()}/${applicationId}/publish`, {
+    publish_name: publishName,
+    publish_desc: publishDesc,
+  })
 }
 
 /** 使用指定模型流式生成或优化系统提示词。 */

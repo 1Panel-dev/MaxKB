@@ -16,6 +16,7 @@ import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonPublishHistory from './ButtonPublishHistory.vue'
 import TemplateStoreDialog from '@/views/application/template-store/TemplateStoreDialog.vue'
 import DebugPanel from './debug/DebugPanel.vue'
+import ApplicationPublishDialog from './components/ApplicationPublishDialog.vue'
 import { getResourceScope } from '@/utils/resource-context.ts'
 import { goBack } from './navigation'
 
@@ -211,21 +212,19 @@ function handleSaveDefaultModelSetting(settings: DefaultModelSettingPayload) {
   return handleSave()
 }
 
-/* 发布工作流 */
+/* 发布工作流：先校验画布，再由弹窗收集发布标题与更新说明 */
+const publishDialogRef = useTemplateRef<InstanceType<typeof ApplicationPublishDialog>>('publishDialogRef')
+
 function handlePublish() {
   workflowRef.value?.validate().then(() => {
-    publishing.value = true
-    return saveApplication(undefined, false)
-      .then(() => ApplicationApi.putApplicationPublish(applicationId))
-      .then((application) => {
-        applicationDetail.value = application
-        saveTime.value = application.update_time || saveTime.value
-        MsgSuccess('发布成功')
-      })
-      .finally(() => {
-        publishing.value = false
-      })
+    publishDialogRef.value?.open()
   })
+}
+
+/* 发布成功：更新详情与保存时间，保持与保存流程一致 */
+function handlePublished(application: ApplicationDetail) {
+  applicationDetail.value = application
+  saveTime.value = application.update_time || saveTime.value
 }
 
 /* 退出工作流 */
@@ -382,5 +381,7 @@ onBeforeUnmount(() => stopAutoSave())
     <DebugPanel ref="debugPanelRef" />
     <!-- 模版中心 -->
     <TemplateStoreDialog ref="templateStoreDialogRef" source="work_flow" :applying="saving" @use="handleUseTemplate" />
+    <!-- 发布弹窗 -->
+    <ApplicationPublishDialog ref="publishDialogRef" :resource-id="applicationId" @published="handlePublished" />
   </WorkflowViewLayout>
 </template>

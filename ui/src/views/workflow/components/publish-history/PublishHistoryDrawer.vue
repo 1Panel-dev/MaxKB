@@ -36,7 +36,7 @@ function handleSubmit(payload: WorkflowVersionPayload) {
 }
 
 function handleShowDescription(version: WorkflowVersion) {
-  descriptionDialogRef.value?.open(version.description ?? '')
+  descriptionDialogRef.value?.open(version.publish_desc ?? '')
 }
 
 function closeEdit() {
