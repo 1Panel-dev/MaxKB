@@ -36,7 +36,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from knowledge.models import File, FileSourceType, Knowledge
 from langchain_core.messages import AIMessage, HumanMessage
-from application.flow.backend.sandbox_mcp import SandboxMCPBackend
+from application.workflow.backend.sandbox_mcp import SandboxMCPBackend
 from maxkb.const import CONFIG, PROJECT_DIR
 from models_provider.models import Model
 from rest_framework import serializers, status
@@ -1593,7 +1593,7 @@ class ToolSerializer(serializers.Serializer):
         input_field_list = serializers.ListField(required=False, default=list, label=_("Input Field List"))
 
         def generate_code(self):
-            from application.flow.tools import to_stream_response_simple
+            from common.utils.common import to_stream_response_simple
             from models_provider.tools import get_model_instance_by_model_workspace_id
 
             self.is_valid(raise_exception=True)
