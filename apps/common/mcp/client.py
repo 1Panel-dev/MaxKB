@@ -1,6 +1,6 @@
 """Compatibility exports and client factory for the dedicated MCP backend."""
 
-from application.flow.backend.sandbox_mcp import SandboxMCPBackend
+from application.workflow.backend.sandbox_mcp import SandboxMCPBackend
 from common.mcp.config import InternalMCPConfig, validate_mcp_servers
 
 

@@ -24,6 +24,7 @@ import pytz
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
+from django.http import StreamingHttpResponse
 from django.utils.translation import gettext as _
 from maxkb.settings import TIME_ZONE
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
@@ -524,3 +525,12 @@ def reset_value(value):
         c = datetime.timezone(eastern._utcoffset)
         value = value.astimezone(c)
     return value
+
+
+def to_stream_response_simple(stream_event):
+    r = StreamingHttpResponse(
+        streaming_content=stream_event, content_type="text/event-stream;charset=utf-8", charset="utf-8"
+    )
+
+    r["Cache-Control"] = "no-cache"
+    return r

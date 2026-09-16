@@ -23,7 +23,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from rest_framework import serializers
 from rest_framework.request import Request
 
-from application.flow.tools import to_stream_response_simple
+from common.utils.common import to_stream_response_simple
 from application.models import (
     Application,
     ApplicationVersion,

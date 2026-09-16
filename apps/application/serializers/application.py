@@ -21,7 +21,7 @@ from typing import Dict, List
 
 import requests
 import uuid_utils.compat as uuid
-from application.flow.common import Workflow
+from application.workflow.common import Workflow
 from application.long_term_memory import schedule_extract_long_term_memory
 from application.models.application import Application, ApplicationFolder, ApplicationTypeChoices, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
@@ -51,7 +51,7 @@ from django.utils.translation import gettext_lazy as _
 from knowledge.models import File, FileSourceType, Knowledge, KnowledgeScope
 from knowledge.serializers.common import BatchMoveSerializer, BatchSerializer
 from knowledge.serializers.knowledge import KnowledgeModelSerializer, KnowledgeSerializer
-from application.flow.backend.sandbox_mcp import SandboxMCPBackend
+from application.workflow.backend.sandbox_mcp import SandboxMCPBackend
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
 from models_provider.models import Model

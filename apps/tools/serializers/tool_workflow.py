@@ -22,7 +22,7 @@ from typing import Dict, List
 
 import requests
 import uuid_utils.compat as uuid
-from application.flow.tools import to_stream_response_simple
+from common.utils.common import to_stream_response_simple
 from application.workflow.common import WorkflowType, new_instance
 from application.workflow.message.aggregator import AggregationManager
 from application.workflow.nodes import get_node_class

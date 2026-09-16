@@ -2,7 +2,6 @@ from contextlib import nullcontext
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 
-from application.flow.i_step_node import KnowledgeWorkflowPostHandler
 from common.exception.app_exception import AppApiException
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase
@@ -48,7 +47,7 @@ from knowledge.serializers.knowledge_sync import (
     KnowledgeSyncSettingOperationSerializer,
     KnowledgeSyncSettingRequest,
 )
-from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer
+from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer, finalize_knowledge_action
 from knowledge.serializers.problem import ProblemInstanceSerializer, ProblemSerializer
 from knowledge.services.document_strategy import (
     apply_length_strategy,
@@ -1047,12 +1046,9 @@ class KnowledgeScheduleTests(SimpleTestCase):
 
 
 class WorkflowKnowledgeScheduleTests(SimpleTestCase):
-    @patch("application.flow.i_step_node.merge_workflow_incremental_snapshot")
-    @patch("application.flow.i_step_node.get_workflow_state", return_value=KnowledgeActionState.SUCCESS)
-    @patch("application.flow.i_step_node.QuerySet")
-    def test_incremental_workflow_uses_stable_snapshot_merge(
-        self, query_set, _get_workflow_state, merge_workflow_snapshot
-    ):
+    @patch("knowledge.serializers.knowledge_workflow.merge_workflow_incremental_snapshot")
+    @patch("knowledge.serializers.knowledge_workflow.QuerySet")
+    def test_incremental_workflow_uses_stable_snapshot_merge(self, query_set, merge_workflow_snapshot):
         sync_log = MagicMock(
             id="00000000-0000-0000-0000-000000000032",
             knowledge_id="00000000-0000-0000-0000-000000000033",
@@ -1070,15 +1066,16 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
             "deleted_count": 0,
             "failed_count": 0,
         }
-        workflow = MagicMock(context={"start_time": timezone.now().timestamp()})
         document_cleanup = MagicMock()
 
-        KnowledgeWorkflowPostHandler(
-            None,
+        # 新引擎:完成收尾由 finalize_knowledge_action 内联处理,state/run_time 由调用方算好传入
+        finalize_knowledge_action(
             "00000000-0000-0000-0000-000000000036",
+            KnowledgeActionState.SUCCESS,
+            0.0,
             str(sync_log.id),
             document_cleanup,
-        ).handler(workflow)
+        )
 
         merge_workflow_snapshot.assert_called_once_with(sync_log)
         update = log_query.filter.return_value.update.call_args.kwargs
