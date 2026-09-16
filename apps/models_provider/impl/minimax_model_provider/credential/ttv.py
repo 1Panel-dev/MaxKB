@@ -150,7 +150,7 @@ class MiniMaxH3TextToVideoModelCredential(TextToVideoModelCredential):
     """
 
     api_base = forms.TextInputField('API URL', required=True,
-                                    default_value='https://api.minimax.io/v2')
+                                    default_value='https://api.minimaxi.com/v2')
 
     def get_model_params_setting_form(self, model_name: str):
         return MiniMaxH3ModelParams()
