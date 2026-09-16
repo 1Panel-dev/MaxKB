@@ -27,8 +27,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue'
-import { useChatStoreByType } from './common/use-chat-store'
-import type { ChatType } from './common/types'
+import { useChatStoreByType } from './common/use-chat-store/index.ts'
+import type { ChatType } from './common/types.ts'
 import ChatPanel from './chat-panel/index.vue'
 import Sidebar from './sidebar/index.vue'
 

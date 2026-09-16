@@ -241,8 +241,8 @@ import { CircleCloseFilled, Paperclip, Promotion, VideoPause } from '@element-pl
 import ContentList from '../content-list/index.vue'
 import Loading from '../loading/index.vue'
 import { Scroll } from '../index'
-import { useChatStoreByType } from '../common/use-chat-store'
-import type { ChatType } from '../common/types'
+import { useChatStoreByType } from '../common/use-chat-store/index.ts'
+import type { ChatType } from '../common/types.ts'
 import { nanoid } from 'nanoid'
 const props = withDefaults(
   defineProps<{
