@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import Content from '@/components/conversation/content/index.vue'
+import Content from '@/conversation-panel/content/index.vue'
 
 const props = defineProps<{ contentList: Array<any> }>()
 

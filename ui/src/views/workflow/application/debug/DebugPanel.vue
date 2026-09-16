@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Aim, Close, FullScreen } from '@element-plus/icons-vue'
-import Conversation from '@/components/conversation/index.vue'
+import Conversation from '@/conversation-panel/index.vue'
 
 defineOptions({ name: 'DebugPanel' })
 
