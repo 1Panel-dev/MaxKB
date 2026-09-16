@@ -71,7 +71,11 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     # ---------- API 版本探测 / URL 构建 ----------
 
     def _detect_api_version(self) -> str:
-        """根据 api_base 路径判断当前使用 V1 还是 V2 (MiniMax-H3)。"""
+        """探测当前使用 V1 还是 V2 (MiniMax-H3)。"""
+        # 模型名包含 H3 -> V2
+        if self.model_name and "H3" in self.model_name.upper():
+            return "v2"
+        # api_base 路径包含 /v2 -> V2
         base_path = self.api_base.split("://", 1)[-1] if "://" in self.api_base else self.api_base
         if "/v2" in base_path:
             return "v2"

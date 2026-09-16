@@ -9,11 +9,17 @@ from models_provider.base_model_provider import (
     ModelTypeConst,
     ModelInfoManage,
 )
-from models_provider.impl.minimax_model_provider.credential.itv import ImageToVideoModelCredential
+from models_provider.impl.minimax_model_provider.credential.itv import (
+    ImageToVideoModelCredential,
+    MiniMaxH3ImageToVideoModelCredential,
+)
 from models_provider.impl.minimax_model_provider.credential.llm import MiniMaxLLMModelCredential
 from models_provider.impl.minimax_model_provider.credential.tti import MiniMaxTextToImageModelCredential
 from models_provider.impl.minimax_model_provider.credential.tts import MiniMaxTTSModelCredential
-from models_provider.impl.minimax_model_provider.credential.ttv import TextToVideoModelCredential
+from models_provider.impl.minimax_model_provider.credential.ttv import (
+    MiniMaxH3TextToVideoModelCredential,
+    TextToVideoModelCredential,
+)
 from models_provider.impl.minimax_model_provider.model.llm import MiniMaxChatModel
 from models_provider.impl.minimax_model_provider.model.tti import MiniMaxTextToImageModel
 from models_provider.impl.minimax_model_provider.model.tts import MiniMaxTextToSpeech
@@ -27,6 +33,8 @@ minimax_tts_model_credential = MiniMaxTTSModelCredential()
 minimax_tti_model_credential = MiniMaxTextToImageModelCredential()
 minimax_ttv_model_credential = TextToVideoModelCredential()
 minimax_itv_model_credential = ImageToVideoModelCredential()
+minimax_h3_ttv_model_credential = MiniMaxH3TextToVideoModelCredential()
+minimax_h3_itv_model_credential = MiniMaxH3ImageToVideoModelCredential()
 
 minimax_m2_7 = ModelInfo(
     "MiniMax-M2.7",
@@ -87,10 +95,14 @@ minimax_tti_list = [
     ModelInfo("image-01", _(""), ModelTypeConst.TTI, minimax_tti_model_credential, MiniMaxTextToImageModel),
 ]
 minimax_ttv_list = [
+    ModelInfo("MiniMax-H3", _(""), ModelTypeConst.TTV, minimax_h3_ttv_model_credential, GenerationVideoModel),
+    ModelInfo("MiniMax-H3-Max", _(""), ModelTypeConst.TTV, minimax_h3_ttv_model_credential, GenerationVideoModel),
     ModelInfo("MiniMax-Hailuo-2.3", _(""), ModelTypeConst.TTV, minimax_ttv_model_credential, GenerationVideoModel),
 ]
 
 model_info_itv_list = [
+    ModelInfo("MiniMax-H3", _(""), ModelTypeConst.ITV, minimax_h3_itv_model_credential, GenerationVideoModel),
+    ModelInfo("MiniMax-H3-Max", _(""), ModelTypeConst.ITV, minimax_h3_itv_model_credential, GenerationVideoModel),
     ModelInfo("MiniMax-Hailuo-2.3", _(""), ModelTypeConst.ITV, minimax_itv_model_credential, GenerationVideoModel),
 ]
 model_info_manage = (
