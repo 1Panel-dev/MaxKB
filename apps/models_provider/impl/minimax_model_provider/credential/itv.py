@@ -14,14 +14,47 @@ from common.utils.logger import maxkb_logger
 
 class MiniMaxModelParams(BaseForm):
     """
-    Parameters class for the Qwen Text-to-Video model.
-    Defines fields such as Video size, number of Videos, and style.
+    Parameters class for the MiniMax V1 (legacy) Video model.
     """
 
     aigc_watermark = SwitchField(
         TooltipLabel(_("Watermark"), _("Whether to add watermark")),
         attrs={"active-value": True, "inactive-value": False},
         default_value=False,
+    )
+
+
+class MiniMaxH3ModelParams(BaseForm):
+    """
+    Parameters class for the MiniMax V2 (MiniMax-H3) Video model.
+    """
+
+    resolution = forms.SingleSelect(
+        TooltipLabel(_("Resolution"), _("Output video resolution.")),
+        required=True,
+        default_value="480P",
+        option_list=[{"value": value, "label": value} for value in ["480P", "768P", "2K"]],
+        text_field="label",
+        value_field="value",
+    )
+
+    duration = forms.SliderField(
+        TooltipLabel(_("Duration"), _("Video duration in seconds (4-15).")),
+        4,
+        15,
+        1,
+        0,
+        required=True,
+        default_value=10,
+    )
+
+    ratio = forms.SingleSelect(
+        TooltipLabel(_("Aspect ratio"), _("Output video aspect ratio.")),
+        required=False,
+        default_value="16:9",
+        option_list=[{"value": value, "label": value} for value in ["16:9", "9:16", "1:1", "4:3", "3:4"]],
+        text_field="label",
+        value_field="value",
     )
 
 
@@ -103,3 +136,17 @@ class ImageToVideoModelCredential(BaseForm, BaseModelCredential):
         :return: Parameter setting form.
         """
         return MiniMaxModelParams()
+
+
+class MiniMaxH3ImageToVideoModelCredential(ImageToVideoModelCredential):
+    """
+    Credential for the MiniMax H3 / H3-Max (V2) image-to-video model.
+    Uses the V2 endpoint and requires resolution / duration / ratio.
+    """
+
+    # BaseForm 只收集本类的字段（vars(self.__class__) 不走 MRO），继承字段需重新声明
+    api_base = forms.TextInputField("API URL", required=True, default_value="https://api.minimaxi.com/v2")
+    api_key = PasswordInputField("API Key", required=True)
+
+    def get_model_params_setting_form(self, model_name: str):
+        return MiniMaxH3ModelParams()
