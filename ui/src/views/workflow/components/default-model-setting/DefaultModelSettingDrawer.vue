@@ -176,15 +176,6 @@ function handleClosed() {
   emit('closed')
 }
 
-function resetData() {
-  savedSettings.value = {}
-  modelSettings.value = normalizeSettings({})
-  models.value = []
-  providerOptions.value = []
-  loading.value = false
-  applying.value = false
-}
-
 function handleBeforeClose(
   done = () => {
     visible.value = false
@@ -207,6 +198,14 @@ function handleBeforeClose(
       if (action === 'cancel') done()
     })
 }
+function resetData() {
+  savedSettings.value = {}
+  modelSettings.value = normalizeSettings({})
+  models.value = []
+  providerOptions.value = []
+  loading.value = false
+  applying.value = false
+}
 defineExpose({ open })
 </script>
 
@@ -217,6 +216,7 @@ defineExpose({ open })
     size="420"
     class="top-header! h-layout-content! max-w-full rounded-tl-xl!"
     :modal="false"
+    modal-penetrable
     :lock-scroll="false"
     :before-close="handleBeforeClose"
     @closed="handleClosed"

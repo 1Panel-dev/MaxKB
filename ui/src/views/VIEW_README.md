@@ -410,23 +410,29 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 ## 工作流发布历史
 
-`workflow/components/publish-history/ButtonPublishHistory.vue` 封装发布历史菜单入口与面板挂载，
-通过 `v-model:visible` 与页面共享显隐状态，接收 `resourceId`、完整版本 `api`、`selectedId` 和
-`disabled`，转发 `preview`、`restore`、`update`、`close`，打开时发出 `open`。
-面板通过 Teleport 展示在页面右侧、头部下方，页面无需再单独引用 `PublishHistory`。
-所在的 `MkDropdown` 必须设置 `persistent`，避免菜单收起后销毁面板入口。
+`workflow/application/ButtonPublishHistory.vue` 封装智能体发布历史菜单入口、
+面板显隐、列表查询以及版本编辑请求。内部直接调用 application 的版本 API；页面仅传
+`applicationId`、`selectedId`、`disabled` 和 `v-model:visible`，接收 `open`、`preview`、
+`restore` 事件。每次打开重新查询，编辑成功后关闭弹窗并重新调用 `getWorkflowVersions` 刷新列表，
+不向页面发送更新事件；保存失败保留弹窗与草稿。所在 `MkDropdown` 设置 `persistent`，避免收起菜单时销毁面板入口。
 
-`workflow/components/publish-history/PublishHistory.vue` 为工作流页面共用的发布历史面板，
-接收 `resourceId`、完整版本 `api`、`selectedId` 和 `disabled`。挂载时查询列表，保留服务端
-发布时间倒序，首项标记“最近发布”；显示标题、发布人和创建时间。面板绝对定位在父级右侧，
-调用方提供相对定位容器。通过 `preview(version)`、`restore(version)`、`update(version)` 和
-`close` 将画布与页面动作交给 View，不读取路由或操作画布。
+`workflow/components/publish-history/PublishHistoryDrawer.vue` 为纯 UI 面板，接收 `versions`、`loading`、
+`saving`、`selectedId`，保留传入顺序并将首项标为“最近发布”，显示标题、发布人及创建时间。
+内部管理编辑与更新说明弹窗，通过 `submit(payload, versionId)` 交给业务组件保存，成功后由业务组件
+调用 `closeEdit()` 关闭编辑弹窗。通过 `preview`、`restore` 通知业务组件，不接收 API、不查询数据，
+也不操作路由或画布。面板复用 `MkDrawer`，通过 `v-model` 控制显隐，宽度 320，使用
+`top-header`、`h-layout-content` 留出页面头部，不显示遮罩、不锁定滚动，内部复用 Drawer 的滚动区。
+抽屉实例保留，由 `MkDrawer` 延迟渲染并在关闭动画结束后销毁内容，不再额外维护挂载状态或转发
+`close` / `closed` 事件。页面监听 `historyVisible`，关闭抽屉与头部返回统一恢复草稿并清理预览；
+恢复版本时先清空草稿快照再关闭，保留已恢复的版本。编辑弹窗的 `closeEdit()` 仅用于保存成功后关闭表单。
 
-同目录 `EditPublishVersionDialog.vue` 使用 `open(version)` 回填副本：标题必填、最多 64 字，
-更新说明可选、最多 1000 字；确认按钮沿设计显示“发布”，调用版本编辑接口，不创建新发布。
-成功后更新列表及预览标题，失败保留弹窗与草稿，提交期间禁止重复提交和关闭。
-`UpdateDescriptionDialog.vue` 通过 `open(content)` 展示纯文本更新说明，保留换行，无内容时显示
-“暂无更新说明”；两者复用 `MkDialog` 的延迟挂载与关闭销毁能力。
+同目录 `EditPublishVersionDialog.vue` 只维护表单副本与校验，通过 `open(version)` 回填、
+`submit(payload)` 提交、`close()` 关闭，外部传入 `saving`。标题必填且最多 64 字，更新说明最多
+1000 字；按钮沿设计显示“发布”，实际编辑请求由业务组件执行，不创建新发布。
+`DescriptionDialog.vue` 通过 `open(content)` 展示纯文本更新说明并保留换行，空内容显示
+“暂无更新说明”。两个弹窗均不依赖业务 API，复用 `MkDialog` 的延迟挂载和关闭销毁能力。
+
+后续 knowledge、tool 在各自目录实现业务入口，复用 `PublishHistoryDrawer`（内部包含两个弹窗），不引入通用 API 适配层。
 
 `ApplicationWorkflowView` 已接入更多菜单中的发布历史。打开时关闭调试，面板打开期间跳过
 自动保存；首次预览保留当前画布草稿，切换版本不覆盖草稿，关闭预览恢复原草稿。

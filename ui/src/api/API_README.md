@@ -101,7 +101,8 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 `getWorkflowVersions(applicationId)` 返回按创建时间倒序的完整 `WorkflowVersion[]`；
 `putWorkflowVersion(applicationId, versionId, payload)` 编辑标题与更新说明，返回更新后的版本。
 共用类型 `WorkflowVersion` 和 `WorkflowVersionPayload` 位于 `types/workflow-version.ts`，
-通过 `@/api/types` 导出。页面传入完整 API 对象，发布历史面板不推测其他工作流的接口地址。
+通过 `@/api/types` 导出。`ButtonApplicationPublishHistory` 内部调用智能体版本 API，公共发布历史
+UI 组件只接收数据和事件，不接收 API 或推测其他工作流的接口地址。
 
 v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明上限 1000。
 当前仓库后端的版本编辑序列化器只处理 `name`，列表和详情也未返回 `description`；

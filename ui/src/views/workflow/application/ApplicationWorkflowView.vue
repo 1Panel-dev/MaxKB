@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
-import WorkflowVersionApi from '@/api/admin/workspace/application/workflow-version'
 import ModelApi from '@/api/admin/workspace/model/model'
 import type { ApplicationDetail, ApplicationStoreTemplate, DefaultModelSettingPayload, WorkflowVersion } from '@/api/types'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
@@ -14,7 +13,7 @@ import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
-import ButtonPublishHistory from '../components/publish-history/ButtonPublishHistory.vue'
+import ButtonPublishHistory from './ButtonPublishHistory.vue'
 import TemplateStoreDialog from '@/views/application/template-store/TemplateStoreDialog.vue'
 import DebugPanel from './debug/DebugPanel.vue'
 import { getResourceScope } from '@/utils/resource-context.ts'
@@ -151,24 +150,20 @@ function handlePreviewVersion(version: WorkflowVersion) {
   nextTick(() => workflowRef.value?.fitView())
 }
 
-function handleCloseHistory() {
+// 所有退出入口统一通过显隐状态清理预览；恢复版本时提前清空草稿快照。
+watch(historyVisible, (visible) => {
+  if (visible) return
   if (workflowBeforePreview) workflowRef.value?.render(cloneDeep(workflowBeforePreview))
   workflowBeforePreview = undefined
   previewVersion.value = undefined
-  historyVisible.value = false
-}
+})
 
 function handleRestoreVersion(version = previewVersion.value) {
   if (!version || loading.value || saving.value || publishing.value) return
   workflowRef.value?.render(cloneDeep(version.work_flow))
   workflowBeforePreview = undefined
-  previewVersion.value = undefined
   historyVisible.value = false
   nextTick(() => workflowRef.value?.fitView())
-}
-
-function handleUpdateVersion(version: WorkflowVersion) {
-  if (previewVersion.value?.id === version.id) previewVersion.value = version
 }
 
 /* 模板中心 */
@@ -219,17 +214,17 @@ function handleSaveDefaultModelSetting(settings: DefaultModelSettingPayload) {
 /* 发布工作流 */
 function handlePublish() {
   workflowRef.value?.validate().then(() => {
-    // publishing.value = true
-    // return saveApplication(undefined, false)
-    //   .then(() => ApplicationApi.putApplicationPublish(applicationId))
-    //   .then((application) => {
-    //     applicationDetail.value = application
-    //     saveTime.value = application.update_time || saveTime.value
-    //     MsgSuccess('发布成功')
-    //   })
-    //   .finally(() => {
-    //     publishing.value = false
-    //   })
+    publishing.value = true
+    return saveApplication(undefined, false)
+      .then(() => ApplicationApi.putApplicationPublish(applicationId))
+      .then((application) => {
+        applicationDetail.value = application
+        saveTime.value = application.update_time || saveTime.value
+        MsgSuccess('发布成功')
+      })
+      .finally(() => {
+        publishing.value = false
+      })
   })
 }
 
@@ -237,8 +232,7 @@ function handlePublish() {
 function handleBack() {
   if (loading.value || saving.value || confirmingExit.value) return
   if (historyVisible.value) {
-    handleCloseHistory()
-    return
+    historyVisible.value = false
   }
   if (!hasUnsavedChanges()) {
     goBack(applicationId)
@@ -301,7 +295,7 @@ onBeforeUnmount(() => stopAutoSave())
     :title="applicationDetail?.name"
     :save-time="saveTime"
     :history-visible="historyVisible"
-    :can-restore-version="!!previewVersion && !loading && !saving && !publishing"
+    :can-restore-version="!!previewVersion"
     @back="handleBack"
     @restore-version="handleRestoreVersion()"
   >
@@ -355,15 +349,11 @@ onBeforeUnmount(() => stopAutoSave())
             <!-- 发布历史 -->
             <ButtonPublishHistory
               v-model:visible="historyVisible"
-              :resource-id="applicationId"
-              :api="WorkflowVersionApi"
+              :application-id="applicationId"
               :selected-id="previewVersion?.id"
-              :disabled="loading || saving || publishing"
               @open="closeDebug"
               @preview="handlePreviewVersion"
               @restore="handleRestoreVersion"
-              @update="handleUpdateVersion"
-              @close="handleCloseHistory"
             />
             <!-- 自动保存 -->
             <MkDropdownItem @click.stop>
