@@ -141,7 +141,7 @@ class ApplicationChatUserStats(AppModelMixin):
     chat_user_type = models.CharField(max_length=64, verbose_name="对话用户类型", choices=ChatUserType.choices,
                                       default=ChatUserType.ANONYMOUS_USER)
     application = models.ForeignKey(Application, on_delete=models.CASCADE, verbose_name="应用id")
-    access_num = models.IntegerField(default=0, verbose_name="访问总次数次数")
+    access_num = models.IntegerField(default=0, verbose_name="访问总次数")
     intraday_access_num = models.IntegerField(default=0, verbose_name="当日访问次数")
 
     class Meta:
