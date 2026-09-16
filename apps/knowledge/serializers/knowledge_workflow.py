@@ -256,7 +256,14 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 "workspace_id": knowledge.workspace_id,
             },
         }
-        self._launch_knowledge_workflow(instance, user, knowledge_action_id, knowledge_workflow.work_flow, sync_log_id)
+        self._launch_knowledge_workflow(
+            instance,
+            user,
+            knowledge_action_id,
+            knowledge_workflow.work_flow,
+            knowledge_workflow.default_model_setting,
+            sync_log_id,
+        )
         # 需要把文件改成永久文件
         data_source = instance.get("data_source") or {}
         file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
@@ -277,7 +284,9 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             "meta": meta,
         }
 
-    def _launch_knowledge_workflow(self, instance: Dict, user, knowledge_action_id, work_flow, sync_log_id=None):
+    def _launch_knowledge_workflow(
+        self, instance: Dict, user, knowledge_action_id, work_flow, default_model_setting={}, sync_log_id=None
+    ):
         """
         在新引擎上异步启动知识库工作流(action/upload_document 共用):
         动态解析数据源起点 -> 注册到运行注册表(供停止)-> run() 每节点起线程立即返回,
@@ -290,6 +299,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             "workspace_id": self.data.get("workspace_id"),
             "user_id": str(user.id),
             **instance,
+            "default_model_setting": default_model_setting,
         }
         workflow = new_instance(work_flow, WorkflowType.KNOWLEDGE)
         start_time = time.time()
@@ -365,7 +375,13 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             },
         }
         # 线上上传走已发布版本的 work_flow,执行链路与 action 一致(新引擎异步执行)
-        self._launch_knowledge_workflow(instance, user, knowledge_action_id, knowledge_workflow_version.work_flow)
+        self._launch_knowledge_workflow(
+            instance,
+            user,
+            knowledge_action_id,
+            knowledge_workflow_version.work_flow,
+            knowledge_workflow_version.default_model_setting,
+        )
         return {
             "id": knowledge_action_id,
             "knowledge_id": self.data.get("knowledge_id"),
@@ -715,6 +731,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 publish_user_id=user_id,
                 publish_user_name=user.username,
                 workspace_id=workspace_id,
+                default_model_setting=knowledge_workflow.default_model_setting,
             )
             work_flow_version.save()
             QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).update(
@@ -732,8 +749,12 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                         "knowledge_id": self.data.get("knowledge_id"),
                         "workspace_id": self.data.get("workspace_id"),
                         "work_flow": instance.get("work_flow", {}),
+                        "default_model_setting": instance.get("default_model_setting", {}),
                     },
-                    defaults={"work_flow": instance.get("work_flow")},
+                    defaults={
+                        "work_flow": instance.get("work_flow"),
+                        "default_model_setting": instance.get("default_model_setting", {}),
+                    },
                 )
                 update_resource_mapping_by_knowledge(self.data.get("knowledge_id"))
                 return self.one()

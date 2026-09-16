@@ -479,6 +479,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     workflow["work_flow"] = k.work_flow
                     workflow["is_publish"] = k.is_publish
                     workflow["publish_time"] = k.publish_time
+                    workflow["default_model_setting"] = k.default_model_setting
             meta = json.loads(knowledge_dict.get("meta", "{}"))
             return {
                 **knowledge_dict,
