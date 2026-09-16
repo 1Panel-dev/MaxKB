@@ -1,10 +1,11 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @file： aggregation_manager.py
-    @date：2026/7/22 16:24
-    @desc: 聚合管理器
+@project: MaxKB
+@file： aggregation_manager.py
+@date：2026/7/22 16:24
+@desc: 聚合管理器
 """
+
 from typing import Dict, List
 
 from application.workflow.message.struct.content import Content
@@ -29,9 +30,11 @@ class AggregationManager:
     def aggregate(self, chunk: Content) -> None:
         """
         聚合内容块
-        
+
         @param chunk: 内容块
         """
+        if not AggregatorFactory.is_aggregatable(chunk):
+            return
         key = f"{chunk.id}_{chunk.type.value if hasattr(chunk.type, 'value') else chunk.type}"
 
         idx = self._key_to_index.get(key)
@@ -53,7 +56,7 @@ class AggregationManager:
     def get_contents(self) -> List[Dict]:
         """
         获取所有聚合后的内容（字典格式）
-        
+
         @return: 内容字典列表
         """
         return [content.to_dict() for content in self._contents]

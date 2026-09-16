@@ -8,16 +8,16 @@
 
 from typing import Dict, Type, Optional
 
-from application.workflow.message.aggregator.impl import ProgressAggregator
-from application.workflow.message.struct.content import Content
-from application.workflow.message.struct.progress_content import ProgressContent
-from application.workflow.message.struct.text_content import TextContent
-from application.workflow.message.struct.reasoning_content import ReasoningContent
-from application.workflow.message.struct.tool_content import ToolContent
 from application.workflow.message.aggregator.content_aggregator import ContentAggregator
-from application.workflow.message.aggregator.impl.text_aggregator import TextAggregator
+from application.workflow.message.aggregator.impl import FormAggregator
 from application.workflow.message.aggregator.impl.reasoning_aggregator import ReasoningAggregator
+from application.workflow.message.aggregator.impl.text_aggregator import TextAggregator
 from application.workflow.message.aggregator.impl.tool_aggregator import ToolAggregator
+from application.workflow.message.struct.content import Content
+from application.workflow.message.struct.form_content import FormContent
+from application.workflow.message.struct.reasoning_content import ReasoningContent
+from application.workflow.message.struct.text_content import TextContent
+from application.workflow.message.struct.tool_content import ToolContent
 
 
 class AggregatorFactory:
@@ -30,7 +30,7 @@ class AggregatorFactory:
         TextContent: TextAggregator(),
         ReasoningContent: ReasoningAggregator(),
         ToolContent: ToolAggregator(),
-        ProgressContent: ProgressAggregator(),
+        FormContent: FormAggregator(),
     }
 
     @classmethod
@@ -56,3 +56,15 @@ class AggregatorFactory:
         @return: 聚合器实例或None
         """
         return cls._aggregators.get(content_class)
+
+    @classmethod
+    def is_aggregatable(cls, chunk: Content) -> bool:
+        """
+        判断给定的内容对象是否可以被聚合
+
+        @param chunk: 内容对象实例
+        @return: True 表示有对应的聚合器，False 表示没有
+        """
+        if chunk is None:
+            return False
+        return type(chunk) in cls._aggregators
