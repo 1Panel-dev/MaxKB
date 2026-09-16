@@ -41,14 +41,7 @@ defineSlots<{
 
       <div class="flex shrink-0 items-center">
         <!-- 恢复选中的历史版本 -->
-        <el-button
-          v-if="historyVisible"
-          :type="canRestoreVersion ? 'primary' : 'info'"
-          :disabled="!canRestoreVersion"
-          @click="emit('restoreVersion')"
-        >
-          恢复此版本
-        </el-button>
+        <el-button v-if="historyVisible" type="primary" :disabled="!canRestoreVersion" @click="emit('restoreVersion')"> 恢复此版本 </el-button>
         <!-- 保留操作入口实例，避免切换头部时卸载其发布历史面板。 -->
         <div v-show="!historyVisible" class="flex items-center">
           <slot name="actions" />
