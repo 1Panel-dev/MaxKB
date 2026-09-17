@@ -103,7 +103,7 @@ class MCPToolHandler:
         return {
             "tools": [
                 {
-                    "name": f"agent_{str(self.application.id)[:8]}",
+                    "name": f"agent_{str(self.application.id)}",
                     "description": self.build_description(),
                     "inputSchema": {
                         "type": "object",
