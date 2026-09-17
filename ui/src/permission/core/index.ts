@@ -1,4 +1,4 @@
-import { Role, RoleConstants, Compare, Permission, AggregatePermission, type PermissionContext, type PermissionFactory, type RoleFactory } from './common'
+import { Role, RoleConstants, Compare, Permission,Edition, AggregatePermission, type PermissionContext, type PermissionFactory, type RoleFactory } from './common'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/resource-context'
 
@@ -78,6 +78,17 @@ export const buildBaseResourcePermission = (permission: Permission, resourceId: 
         .addRole(new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId))
         .compare(Compare.OR)
         .build()
-
+/**
+ * 判断当前系统环境
+ * @param edition 
+ * @returns 
+ */
+export const hasEdition=(edition:Edition)=>{
+    const { auth } = useStore()
+  if(edition==Edition.PE||edition==Edition.EE){
+    return auth.baseProfile?.license_is_valid
+  }
+  return true
+}
 export { Role, RoleConstants, Compare } from './common'
 export { PermissionConstants } from './data'

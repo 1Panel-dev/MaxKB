@@ -12,4 +12,4 @@ import model from './model'
 import system from './system'
 import trigger from './trigger'
 
-export default { application, knowledge, tool, model, trigger, ...system }
+export default { application, knowledge, tool, model, trigger, system }

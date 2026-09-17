@@ -27,7 +27,8 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
         router
         :persistent="false"
       >
-        <template v-for="item in systemMenuItems" :key="item.name">
+        <template v-for="item in systemMenuItems" :key="item.name" >
+          <template v-if="item.permission? item.permission():true">
           <!-- 有子菜单 -->
           <el-sub-menu v-if="item.children?.length && item.route" :index="router.resolve(item.route).path" popper-class="mk-system-sidebar-menu-popper">
             <template #title>
@@ -48,6 +49,9 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
             <MkIcon v-if="item.icon" :name="getSystemMenuIcon(item)" :size="18" />
             <template #title>{{ item.label }}</template>
           </el-menu-item>
+
+          </template>
+         
         </template>
       </el-menu>
     </el-scrollbar>

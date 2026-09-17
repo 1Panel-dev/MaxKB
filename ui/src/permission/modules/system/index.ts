@@ -16,5 +16,5 @@ import loginAuth from './loginAuth'
 import appearance from './appearance'
 import email from './email'
 import operationLog from './operationLog'
-
-export default { user, workspace, role, userGroup, authorization, chatUser, chatUserGroup, chatAuth, portal, loginAuth, appearance, email, operationLog }
+import homepage from './homepage'
+export default { user, workspace,homepage, role, userGroup, authorization, chatUser, chatUserGroup, chatAuth, portal, loginAuth, appearance, email, operationLog }

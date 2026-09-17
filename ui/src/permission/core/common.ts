@@ -210,6 +210,12 @@ export const RoleConstants = {
   EXTENDS_USER: new Role('EXTENDS_USER'),
 } as const
 
+export enum  Edition{
+  CE="CE",
+  EE="EE",
+  PE="PE"
+}
+
 /** 单条权限，对应后端 `common/auth/struct/permission.py` 的 Permission。 */
 export class Permission {
   constructor(
