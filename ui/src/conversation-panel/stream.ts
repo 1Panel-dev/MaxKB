@@ -1,35 +1,32 @@
 export class ConversationStream {
   private response: any
-  private onChunk: (chunk: any) => void
-  private onFinish: () => void
-  private onError: (e: any) => void
+  private onNext: (chunk: any) => void
+  private onComplete: (e?: any) => void
   private cancelled = false
-  private finished = false
+  private completed = false
   private reader: ReadableStreamDefaultReader<any> | null = null
 
   constructor(
     response: any,
-    onChunk: (chunk: any) => void,
-    onFinish: () => void,
-    onError: (e: any) => void,
+    onNext: (chunk: any) => void,
+    onComplete: (e?: any) => void,
   ) {
     this.response = response
-    this.onChunk = onChunk
-    this.onFinish = onFinish
-    this.onError = onError
+    this.onComplete = onComplete
+    this.onNext = onNext
   }
 
-  private finish() {
-    if (this.finished || this.cancelled) return
-    this.finished = true
-    this.onFinish()
+  private complete(e?:any) {
+    if (this.completed || this.cancelled) return
+    this.completed = true
+    this.onComplete(e)
   }
 
   async start() {
     try {
       this.reader = this.response.body?.getReader()
       if (!this.reader) {
-        this.finish()
+        this.complete()
         return
       }
 
@@ -37,7 +34,7 @@ export class ConversationStream {
       let buffer = ''
 
       while (true) {
-        if (this.cancelled || this.finished) break
+        if (this.cancelled || this.completed) break
 
         const { done, value } = await this.reader.read()
 
@@ -50,7 +47,7 @@ export class ConversationStream {
         buffer = lines.pop() || ''
 
         for (const line of lines) {
-          if (this.cancelled || this.finished) break
+          if (this.cancelled || this.completed) break
           const trimmed = line.trim()
           if (!trimmed) continue
 
@@ -58,13 +55,13 @@ export class ConversationStream {
           if (trimmed.startsWith('data:')) {
             const data = trimmed.slice(5).trim()
             if (data === '[DONE]') {
-              this.finish()
+              this.complete()
               return
             }
 
             try {
               const chunk = JSON.parse(data)
-              this.onChunk(chunk)
+              this.onNext(chunk)
             } catch (e) {
               // Skip invalid JSON
             }
@@ -73,14 +70,14 @@ export class ConversationStream {
       }
 
       // 处理 buffer 中剩余的数据
-      if (!this.cancelled && !this.finished && buffer.trim()) {
+      if (!this.cancelled && !this.completed && buffer.trim()) {
         const trimmed = buffer.trim()
         if (trimmed.startsWith('data:')) {
           const data = trimmed.slice(5).trim()
           if (data !== '[DONE]') {
             try {
               const chunk = JSON.parse(data)
-              this.onChunk(chunk)
+              this.onNext(chunk)
             } catch (e) {
               // Skip invalid JSON
             }
@@ -89,11 +86,11 @@ export class ConversationStream {
       }
 
       if (!this.cancelled) {
-        this.finish()
+        this.complete()
       }
     } catch (e) {
-      if (!this.cancelled && !this.finished) {
-        this.onError(e)
+      if (!this.cancelled && !this.completed) {
+        this.complete(e)
       }
     } finally {
       this.reader = null
