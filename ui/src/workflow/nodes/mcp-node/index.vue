@@ -482,11 +482,11 @@ function changeTool() {
           },
           input_type: input_type,
           source: 'referencing',
-          required: args_schema.properties[item].required?.indexOf(item2) !== -1,
+          required: (args_schema.properties[item].required || []).indexOf(item2) !== -1,
           props_info: {
             rules: [
               {
-                required: args_schema.properties[item].required?.indexOf(item2) !== -1,
+                required: (args_schema.properties[item].required || []).indexOf(item2) !== -1,
                 message: t('dynamicsForm.tip.requiredMessage'),
                 trigger: 'blur',
               },
@@ -518,11 +518,11 @@ function changeTool() {
         },
         input_type: input_type,
         source: 'referencing',
-        required: args_schema.required?.indexOf(item) !== -1,
+        required: (args_schema.required || []).indexOf(item) !== -1,
         props_info: {
           rules: [
             {
-              required: args_schema.required?.indexOf(item) !== -1,
+              required: (args_schema.required || []).indexOf(item) !== -1,
               message: t('dynamicsForm.tip.requiredMessage'),
               trigger: 'blur',
             },
