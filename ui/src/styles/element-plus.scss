@@ -345,10 +345,6 @@
     outline: none !important;
     padding: 5px calc(var(--spacing) * 2);
   }
-  &__original:focus-visible + .el-checkbox-button__inner {
-    outline: 2px solid var(--mk-primary) !important;
-    outline-offset: 2px;
-  }
 }
 
 .el-checkbox-group {
@@ -710,6 +706,12 @@
   &.el-tooltip.is-dark {
     max-width: 320px;
   }
+}
+
+
+/* progress */
+.el-progress-bar__inner {
+  background: linear-gradient(90deg, #adc6ff 0%, #3370ff 100%);
 }
 
 /* radio */

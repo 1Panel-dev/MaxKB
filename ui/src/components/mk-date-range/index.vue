@@ -8,6 +8,7 @@ defineOptions({ name: 'MkDateRange' })
 
 type DatePreset = 7 | 30 | 90 | 183 | 'custom'
 
+const props = defineProps<{ defaultValue?: MkDateRangeValue }>()
 const emit = defineEmits<{ change: [value: MkDateRangeValue] }>()
 
 const datePresetOptions: OptionItem<DatePreset>[] = [
@@ -18,15 +19,25 @@ const datePresetOptions: OptionItem<DatePreset>[] = [
   { label: '自定义', value: 'custom' },
 ]
 
-const datePreset = ref<DatePreset>(7)
-const customDateRange = ref<string[]>([])
+/* 默认范围只在挂载时回填，不触发查询。 */
+const initialRange = props.defaultValue ?? { startTime: beforeDay(7), endTime: beforeDay(0) }
+const initialEndTime = initialRange.endTime || beforeDay(0)
+const datePreset = ref<DatePreset>(
+  datePresetOptions.find(({ value }) => value !== 'custom' && initialRange.startTime === beforeDay(value) && initialEndTime === beforeDay(0))
+    ?.value ?? 'custom',
+)
+const customDateRange = ref<string[] | null>(initialRange.startTime ? [initialRange.startTime, initialEndTime] : [])
 
 function handleDatePresetChange(preset: DatePreset) {
-  emit('change', { startTime: beforeDay(preset), endTime: '' })
+  if (preset === 'custom') return
+  const startTime = beforeDay(preset)
+  const endTime = beforeDay(0)
+  customDateRange.value = [startTime, endTime]
+  emit('change', { startTime, endTime })
 }
 
 function handleCustomDateRangeChange() {
-  emit('change', { startTime: customDateRange.value[0] ?? '', endTime: customDateRange.value[1] ?? '' })
+  emit('change', { startTime: customDateRange.value?.[0] ?? '', endTime: customDateRange.value?.[1] || beforeDay(0) })
 }
 </script>
 

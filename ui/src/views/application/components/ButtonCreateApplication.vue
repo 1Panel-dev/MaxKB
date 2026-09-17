@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef, type CSSProperties } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import { useStore } from '@/stores'
@@ -11,7 +11,16 @@ defineOptions({ name: 'CreateApplicationDropdown' })
 
 const { auth } = useStore()
 
-const props = defineProps<{ folderId: string }>()
+const props = withDefaults(
+  defineProps<{
+    folderId: string
+    trigger?: 'click' | 'hover' | 'contextmenu'
+    popperStyle?: CSSProperties
+    popperClass?: string
+    fitTriggerWidth?: boolean
+  }>(),
+  { trigger: 'click', fitTriggerWidth: false },
+)
 
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -19,6 +28,21 @@ defineSlots<{
   /** 创建菜单触发器，只能渲染一个有效根节点 */
   trigger?(): unknown
 }>()
+
+/* 自定义触发卡片与菜单等宽 */
+const triggerRef = useTemplateRef<HTMLDivElement>('triggerRef')
+const dropdownWidth = ref<number>()
+const dropdownStyle = computed(() => ({
+  ...props.popperStyle,
+  ...(props.fitTriggerWidth && dropdownWidth.value ? { width: `${dropdownWidth.value}px` } : {}),
+}))
+const customDropdownWidth = computed(() => props.fitTriggerWidth || !!props.popperStyle?.width || !!props.popperClass)
+
+function handleVisibleChange(visible: boolean) {
+  if (visible && props.fitTriggerWidth) {
+    dropdownWidth.value = triggerRef.value?.getBoundingClientRect().width
+  }
+}
 
 /* 智能体创建表单 */
 const simpleCreateDialogRef = useTemplateRef<InstanceType<typeof SimpleCreateDialog>>('simpleCreateDialogRef')
@@ -55,19 +79,29 @@ function handleRefresh() {
 </script>
 
 <template>
-  <MkDropdown trigger="click" placement="bottom-end" persistent>
-    <slot name="trigger">
-      <el-button type="primary">
-        <span class="mr-1">创建</span>
-        <MkIcon name="icon_down_outlined" :size="14" />
-      </el-button>
-    </slot>
+  <MkDropdown
+    :trigger="trigger"
+    placement="bottom-end"
+    persistent
+    :class="{ 'w-full': $slots.trigger }"
+    :popper-style="dropdownStyle"
+    :popper-class="popperClass"
+    @visible-change="handleVisibleChange"
+  >
+    <div v-if="$slots.trigger" ref="triggerRef" class="w-full cursor-pointer">
+      <slot name="trigger" />
+    </div>
+    <!-- 创建智能体 -->
+    <el-button v-else type="primary">
+      <span class="mr-1">创建</span>
+      <MkIcon name="icon_down_outlined" :size="14" />
+    </el-button>
 
     <template #dropdown>
-      <MkDropdownMenu class="w-77!">
-        <MkDropdownItem class="py-2!" @click="handleOpenSimpleApplicationCreate">
+      <MkDropdownMenu :class="[popperClass, customDropdownWidth ? 'w-full!' : 'w-77!']">
+        <MkDropdownItem class="py-2! items-start!" @click="handleOpenSimpleApplicationCreate">
           <template #icon>
-            <el-avatar shape="square" :size="24">
+            <el-avatar shape="square" :size="24" class="mt-2">
               <img style="width: 65%" src="@/assets/application/icon_simple_application.svg" alt="" />
             </el-avatar>
           </template>
@@ -76,9 +110,9 @@ function handleRefresh() {
             <p class="text-sm text-N500 whitespace-normal">通过表单设置方式，快速搭建基础功能的智能体</p>
           </div>
         </MkDropdownItem>
-        <MkDropdownItem class="py-2!" @click="handleOpenAdvancedApplicationCreate">
+        <MkDropdownItem class="py-2! items-start!" @click="handleOpenAdvancedApplicationCreate">
           <template #icon>
-            <el-avatar shape="square" class="bg-warning! -mt-5!" :size="24">
+            <el-avatar shape="square" class="bg-warning! mt-2" :size="24">
               <img style="width: 65%" src="@/assets/application/icon_workflow_application.svg" alt="" />
             </el-avatar>
           </template>

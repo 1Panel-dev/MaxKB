@@ -20,3 +20,5 @@ export type * from './trigger'
 export type * from './related-resources'
 export type * from './workflow-version'
 export type * from './workflow-template'
+
+export type * from './homepage'

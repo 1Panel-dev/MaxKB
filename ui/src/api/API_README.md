@@ -332,3 +332,13 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 `putKnowledgeWorkflow` 接受互斥的 `work_flow` 保存载荷或 `work_flow_template` 覆盖载荷，覆盖成功后由 View 重载详情。
 `exportKnowledgeWorkflow(knowledgeId, name)` 通过 GET `/<knowledgeId>/workflow/export` 下载 `.kbwf` 文件，
 只导出工作流，不调用包含文档的知识库包导出接口。
+
+### 工作空间首页
+
+`admin/workspace/homepage.ts` 维护 `/workspace/<workspaceId>/homepage` 的四类资源汇总、
+每日趋势、三类排行分页、Tokens／对话总量及三类导出。每个接口均以必填的 `workspaceId` 为首个参数，
+由调用方显式传入，API 文件不再自行读取当前路由。
+资源汇总、日期范围、趋势及排行记录类型在 `types/homepage.ts`，统一从 `@/api/types` 导入。
+`getRanking` 与 `exportRanking` 通过 `HomeRankingKind` 选择后端排行路径，名称及起止日期
+筛选保持一致；分页使用 `ParamsPage` 与 `ResponsePage`。导出沿用 `getExportFile`。
+工作空间总量接口返回数值，不与 System 首页的对象响应混用。

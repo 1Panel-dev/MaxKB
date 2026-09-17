@@ -11,7 +11,7 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
-import CreateKnowledgeDropdown from './create-knowledge/CreateKnowledgeDropdown.vue'
+import ButtonCreateKnowledge from './components/ButtonCreateKnowledge.vue'
 import {
   AuthorizeKnowledgeAction,
   DeleteKnowledgeAction,
@@ -198,7 +198,7 @@ function handleBatchDelete() {
               <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
             </el-button>
             <!-- 创建 -->
-            <CreateKnowledgeDropdown v-if="!batchSelectionMode" :folder-id="createFolderId" @refresh="refreshKnowledge" />
+            <ButtonCreateKnowledge v-if="!batchSelectionMode" :folder-id="createFolderId" @refresh="refreshKnowledge" />
           </template>
         </div>
       </component>
@@ -238,12 +238,7 @@ function handleBatchDelete() {
                   />
 
                   <!-- 导出 -->
-                  <ExportKnowledgeAction
-                    v-model:loading="knowledgeOperationLoading"
-                    label="导出"
-                    :api="KnowledgeApi"
-                    :knowledge="knowledge"
-                  />
+                  <ExportKnowledgeAction v-model:loading="knowledgeOperationLoading" label="导出" :api="KnowledgeApi" :knowledge="knowledge" />
                   <!-- 删除 -->
                   <DeleteKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"

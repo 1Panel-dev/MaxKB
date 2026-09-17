@@ -53,6 +53,10 @@ import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynam
 - Props、Emits、Slots 保持类型化。类型归属遵循 [API_README.md](../api/API_README.md)，
   API 与组件共用类型从 `@/api/types` 导入。
 - 样式默认 `scoped`；组件专属样式留在组件目录，应用级规则放在 `src/styles`。
+- 今后新增 Card、`div` 等展示组件或布局元素的循环时，统一使用外层
+  `<template v-for="..." :key="...">` 承载循环与唯一键，内部实际标签保留样式、Props、
+  事件及内容，避免将循环指令与展示属性混写。此规则适用于页面、公共组件、对话面板、
+  布局和工作流画布；已有循环暂不批量改写。
 - 不编写 `aria-label`；按钮前添加简短中文用途注释，已有注释不重复添加。
 - `global` 不创建仅用于二次导出的聚合入口。
 - `el-input-number` 设置 `controls-position="right"` 时，同时设置 `align="left"`。
@@ -384,12 +388,31 @@ const avatar = ref('')
 还会优先展示 Theme Store 中配置的 `loginLogo`。两个组件都只接收可选的 `height`，其余主题与
 Logo 数据统一从 Theme Store 获取。
 
+### MkEchart、MkLineChart
+
+手动导入 `mk-echart/index.vue` 的 `MkEchart` 接收原生 ECharts `option`，负责实例创建、
+深层配置更新、容器尺寸监听和卸载销毁。通过元素 Ref 定位，不需要唯一 DOM ID；隐藏容器
+有实际尺寸后才初始化。`width` 默认 `100%`，`height` 默认 `200px`，公开 `resize()`。
+基础容器注册 Canvas 渲染器，具体图表由对应封装按需注册。
+
+折线图从 `mk-echart/LineCharts.vue` 导入为 `MkLineChart`，接收
+`option: { xData, yData }`，类型由同目录 `types.ts` 提供。
+`yData` 使用 ECharts 折线系列配置，可传 `name`、`data`、`smooth` 等。默认开启面积填充，
+透明度为 `0.05`；`area: false` 可关闭默认填充，显式 `areaStyle` 可覆盖默认配置。尺寸属性与基础容器一致。
+标题由页面展示；内置图例、坐标轴与提示，两条及以上系列显示图例，单条隐藏。`valueFormatter` 默认使用 `numberFormat`，Tokens 图表传入 `formatTokenNumber`，当前图表颜色直接使用固定颜色值，不跟随主题切换。
+
+```vue
+<MkLineChart :option="{ xData: dates, yData: [{ name: '对话轮次', data: counts, area: true }] }" />
+```
+
 ### MkDateRange
 
 组合日期预设下拉框和自定义日期区间选择器。默认显示“过去 7 天”，仅在用户修改筛选条件时通过
 `change` 返回 `{ startTime, endTime }`；组件挂载时不主动触发 `change`。预设日期的 `endTime` 为
-空字符串，自定义日期清空时两个字段均为空字符串。组件不绑定具体接口字段，使用方负责初始化
+当前日期（`YYYY-MM-DD`）；自定义日期缺少结束日期时同样使用当前日期，清空时开始日期为空。组件不绑定具体接口字段，使用方负责初始化
 默认查询参数，并将筛选结果映射为业务查询参数。
+`defaultValue` 接收 `{ startTime, endTime }`，仅在挂载时回填：匹配预设范围时选中对应预设，
+否则显示自定义日期。切换到自定义时保留当前范围，不立即触发查询，选定日期后触发 `change`。
 
 ### MkDragUpload
 

@@ -28,6 +28,10 @@ import './styles/index.scss'
 
 ## 基础样式
 
+全局焦点轮廓统一在 `app.scss` 通过 `*:focus-visible { outline: none !important; }` 移除，
+Admin 和 Chat 共用。组件不单独恢复焦点 `outline`，包括通过隐藏输入框的焦点为相邻可见元素
+绘制轮廓的情况；组件原有的 `border`、`box-shadow` 和焦点行为不受此规则影响。
+
 不要使用会影响所有元素间距的宽泛重置规则，例如：
 
 ```scss
@@ -276,6 +280,10 @@ Tailwind 类。
 
 ### 主题色
 
+首页资源卡片通过各资源的固定 `color` 配置设置图标、背景和悬停边框，不随主题色切换。
+颜色配置使用 RGB 通道字符串，模板通过 `rgb()` 设置原色、`rgba()` 设置浅色背景。
+卡片背景由上层半透明渐变和下层白色渐变组成，CSS 背景列表中前面的图层位于上方。
+
 当前主题色为：
 
 ```scss
@@ -403,7 +411,7 @@ Tree 的 `.el-tree-node__content` 统一保留 4px 底部间距，使同级节�
 按钮式多选使用 `el-checkbox-group` 和 `el-checkbox-button`，外观与按钮式单选一致：
 组容器提供圆角边框、4px 内边距和间距，选中项使用主题色文字与浅色背景，不显示相邻按钮连接阴影。
 规则统一维护在 `element-plus.scss` 的 checkbox 分组；仅包含 `el-checkbox-button` 的组容器
-应用该布局，普通复选框组不受影响。保留禁用状态和键盘焦点提示。
+应用该布局，普通复选框组不受影响。保留禁用状态，焦点轮廓遵循全局移除规则。
 
 Element Plus 所需的 `light-3` 至 `light-9` 和 `dark-2` 色阶使用 `color-mix()` 根据主题色生成。业务代码通常不需要直接修改 `--el-color-primary-*`。
 
@@ -455,3 +463,8 @@ npm run type-check
 npm run build-only
 npm run build-only-chat
 ```
+
+## 排行名次
+
+`mk-rank` 提供 20px 圆形名次徽标，前三名叠加 `mk-rank-1`、`mk-rank-2`、
+`mk-rank-3`，使用固定渐变配色。样式统一维护在 `app.scss`。

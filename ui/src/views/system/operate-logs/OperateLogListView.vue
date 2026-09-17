@@ -36,7 +36,7 @@ function handleSearchChange(query?: Dict<unknown>) {
 }
 
 // 时间筛选
-const operateLogDateQuery = ref<Dict<unknown>>({ start_time: beforeDay(7), end_time: '' })
+const operateLogDateQuery = ref<Dict<unknown>>({ start_time: beforeDay(7), end_time: beforeDay(0) })
 
 function handleDateFilterChange({ startTime, endTime }: MkDateRangeValue) {
   operateLogDateQuery.value = { start_time: startTime, end_time: endTime }
