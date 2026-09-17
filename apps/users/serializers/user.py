@@ -238,9 +238,16 @@ class UserProfileSerializer(serializers.Serializer):
         role_name = [user.role]
         if user_role_relation_model:
             user_role_relations = (
-                user_role_relation_model.objects.filter(user_id=user.id).select_related("role").distinct("role_id")
+                user_role_relation_model.objects.filter(user_id=user.id, workspace_id="None")
+                .select_related("role")
+                .distinct("role_id")
             )
-            role_name = [relation.role.role_name for relation in user_role_relations]
+            role_name = [
+                role.role_name
+                for role in sorted(
+                    (relation.role for relation in user_role_relations), key=lambda role: not role.internal
+                )
+            ]
 
         return {
             "id": user.id,
