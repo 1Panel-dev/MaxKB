@@ -92,7 +92,10 @@ onMounted(() => loadRanking())
         <MkDateRange :default-value="{ startTime: initialRange.start_time, endTime: initialRange.end_time }" @change="handleRangeChange" />
       </div>
       <!-- 导出当前筛选下的完整排行榜 -->
-      <el-button plain :loading="exporting" :disabled="loading" @click="handleExport">导出</el-button>
+      <el-button plain :loading="exporting" :disabled="loading" @click="handleExport">
+        <MkIcon name="icon_export_outlined" />
+        <span>导出</span>
+      </el-button>
     </div>
 
     <MkTable v-loading="loading" v-model:pagination-config="pagination" :data="records" @current-change="loadRanking" @size-change="handleSearch">
