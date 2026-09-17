@@ -12,6 +12,7 @@
 import { hasPermission, buildBasePermission, buildBaseResourcePermission, RoleConstants, Compare } from './core'
 import type { Permission } from './core/common'
 
+
 /** 工作空间级：命中权限位 / 系统管理员 / 该空间管理员 即可。workspaceId 内部取当前路由。 */
 export const can = (p: Permission): boolean => hasPermission(buildBasePermission(p))
 

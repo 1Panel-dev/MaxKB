@@ -26,6 +26,7 @@ function createMenuItems(routes: readonly MenuRouteRecord[]): LayoutMenuItem[] {
         activeIcon: route.meta?.activeIcon,
         icon: route.meta?.icon,
         route: { name: route.name! },
+        permission:route.meta?.permission as LayoutMenuItem['permission'],
         children: children.length ? children : undefined,
       }
     })

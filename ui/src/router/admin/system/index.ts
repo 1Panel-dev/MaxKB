@@ -2,7 +2,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { systemApplicationRoutes } from './modules/application'
 import { systemKnowledgeRoutes } from './modules/knowledge'
-
+import perm from "@/permission/index"
 export const systemRoutes: RouteRecordRaw = {
   path: '/system',
   component: () => import('@/layout/AppLayout.vue'),
@@ -13,7 +13,10 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'home',
       name: 'system-home',
       component: () => import('@/views/system/SystemView.vue'),
-      meta: { title: '首页', activeIcon: 'icon_screen_filled', icon: 'icon_screen_outlined', order: 0 },
+      meta: { title: '首页', activeIcon: 'icon_screen_filled', icon: 'icon_screen_outlined', order: 0,
+        permission: perm.system.homepage.read,
+        next:'system-identity'
+       },
     },
     {
       path: 'identity',
