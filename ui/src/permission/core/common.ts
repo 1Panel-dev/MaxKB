@@ -236,10 +236,11 @@ export class Permission {
 
   /** 非资源权限 key，对应后端 `Permission.__str__`。 */
   toString(): string {
-    const sub = this.subGroup !== this.group ? `_${this.subGroup}` : ''
-    const flag = this.flag ? `_${this.flag}` : ''
-    return `${this.group}${sub}_${this.operate}${flag}`
-  }
+  const sub = this.subGroup !== this.group ? `_${this.subGroup}` : ''
+  const flag = this.flag ? `_${this.flag}` : ''
+  const operate = this.operate ? `:${this.operate}` : ''
+  return `${this.group}${sub}${operate}${flag}`
+}
 
   /** 资源级权限 key，对应后端 `Permission.get_resource_permission_key`。 */
   getResourcePermissionKey(): string {
@@ -250,7 +251,7 @@ export class Permission {
 
   /** 判定时使用的最终 key，对应后端 `AggregatePermission._match_permission`。 */
   toPermissionKey(): string {
-    return this.resourceId ? this.getResourcePermissionKey() : this.toString()
+    return this.resourceId ? this.getResourcePermissionKey() : this.group
   }
 
   /** 基于上下文派生出带 workspace / resource 的权限副本。 */
