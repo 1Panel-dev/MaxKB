@@ -1,18 +1,27 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef, type CSSProperties } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import CreateBaseKnowledgeDialog from './BaseKnowledgeDialog.vue'
-import CreateWebKnowledgeDialog from './WebKnowledgeDialog.vue'
-import CreateLarkKnowledgeDialog from './LarkKnowledgeDialog.vue'
-import CreateWorkflowKnowledgeDialog from './WorkflowKnowledgeDialog.vue'
+import CreateBaseKnowledgeDialog from '../create-knowledge/BaseKnowledgeDialog.vue'
+import CreateWebKnowledgeDialog from '../create-knowledge/WebKnowledgeDialog.vue'
+import CreateLarkKnowledgeDialog from '../create-knowledge/LarkKnowledgeDialog.vue'
+import CreateWorkflowKnowledgeDialog from '../create-knowledge/WorkflowKnowledgeDialog.vue'
 
-defineOptions({ name: 'CreateKnowledgeDropdown' })
+defineOptions({ name: 'ButtonCreateKnowledge' })
 
-const props = defineProps<{ folderId: string }>()
+const props = withDefaults(
+  defineProps<{
+    folderId: string
+    trigger?: 'click' | 'hover' | 'contextmenu'
+    popperStyle?: CSSProperties
+    popperClass?: string
+    fitTriggerWidth?: boolean
+  }>(),
+  { trigger: 'click', fitTriggerWidth: false },
+)
 const { auth } = useStore()
 
 defineSlots<{
@@ -21,6 +30,21 @@ defineSlots<{
 }>()
 
 const emit = defineEmits<{ refresh: [] }>()
+
+/* 自定义触发卡片与菜单等宽 */
+const triggerRef = useTemplateRef<HTMLDivElement>('triggerRef')
+const dropdownWidth = ref<number>()
+const dropdownStyle = computed(() => ({
+  ...props.popperStyle,
+  ...(props.fitTriggerWidth && dropdownWidth.value ? { width: `${dropdownWidth.value}px` } : {}),
+}))
+const customDropdownWidth = computed(() => props.fitTriggerWidth || !!props.popperStyle?.width || !!props.popperClass)
+
+function handleVisibleChange(visible: boolean) {
+  if (visible && props.fitTriggerWidth) {
+    dropdownWidth.value = triggerRef.value?.getBoundingClientRect().width
+  }
+}
 
 /* 各类型知识库创建 */
 const createBaseKnowledgeDialogRef = useTemplateRef<InstanceType<typeof CreateBaseKnowledgeDialog>>('createBaseKnowledgeDialogRef')
@@ -68,16 +92,25 @@ function handleImportCreate(file: UploadFile) {
 </script>
 
 <template>
-  <MkDropdown trigger="click" placement="bottom-end" persistent>
-    <slot name="trigger">
-      <!-- 创建知识库 -->
-      <el-button type="primary">
-        <span class="mr-1">创建</span>
-        <MkIcon name="icon_down_outlined" :size="14" />
-      </el-button>
-    </slot>
+  <MkDropdown
+    :trigger="trigger"
+    placement="bottom-end"
+    persistent
+    :class="{ 'w-full': $slots.trigger }"
+    :popper-style="dropdownStyle"
+    :popper-class="popperClass"
+    @visible-change="handleVisibleChange"
+  >
+    <div v-if="$slots.trigger" ref="triggerRef" class="w-full cursor-pointer">
+      <slot name="trigger" />
+    </div>
+    <!-- 创建知识库 -->
+    <el-button v-else type="primary">
+      <span class="mr-1">创建</span>
+      <MkIcon name="icon_down_outlined" :size="14" />
+    </el-button>
     <template #dropdown>
-      <MkDropdownMenu class="w-77!">
+      <MkDropdownMenu :class="[popperClass, customDropdownWidth ? 'w-full!' : 'w-77!']">
         <!-- 创建通用知识库 -->
         <MkDropdownItem class="py-2!" @click="handleCreateBaseKnowledge">
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.BASE" /></template>
@@ -87,7 +120,7 @@ function handleImportCreate(file: UploadFile) {
           </div>
         </MkDropdownItem>
         <!-- 创建 Web 知识库 -->
-        <MkDropdownItem class="py-2!">
+        <MkDropdownItem class="py-2!" @click="handleCreateWebKnowledge">
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.WEB" /></template>
           <div class="min-w-0">
             <p>Web 知识库</p>

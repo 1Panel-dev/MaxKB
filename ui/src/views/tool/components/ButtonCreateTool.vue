@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef, type CSSProperties } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
@@ -11,11 +11,20 @@ import McpFormDrawer from '../tool-form/McpFormDrawer.vue'
 import SkillToolFormDrawer from '../tool-form/SkillToolFormDrawer.vue'
 import WorkflowFormDialog from '../tool-form/WorkflowFormDialog.vue'
 
-defineOptions({ name: 'ToolCreateDropdown' })
+defineOptions({ name: 'ButtonCreateTool' })
 
 const { auth } = useStore()
 
-const props = defineProps<{ folderId: string }>()
+const props = withDefaults(
+  defineProps<{
+    folderId: string
+    trigger?: 'click' | 'hover' | 'contextmenu'
+    popperStyle?: CSSProperties
+    popperClass?: string
+    fitTriggerWidth?: boolean
+  }>(),
+  { trigger: 'click', fitTriggerWidth: false },
+)
 
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -23,6 +32,21 @@ defineSlots<{
   /** 创建菜单触发器，只能渲染一个有效根节点 */
   trigger?(): unknown
 }>()
+
+/* 自定义触发卡片与菜单等宽 */
+const triggerRef = useTemplateRef<HTMLDivElement>('triggerRef')
+const dropdownWidth = ref<number>()
+const dropdownStyle = computed(() => ({
+  ...props.popperStyle,
+  ...(props.fitTriggerWidth && dropdownWidth.value ? { width: `${dropdownWidth.value}px` } : {}),
+}))
+const customDropdownWidth = computed(() => props.fitTriggerWidth || !!props.popperStyle?.width || !!props.popperClass)
+
+function handleVisibleChange(visible: boolean) {
+  if (visible && props.fitTriggerWidth) {
+    dropdownWidth.value = triggerRef.value?.getBoundingClientRect().width
+  }
+}
 
 /* 工具创建表单 */
 const toolFormDrawerRef = useTemplateRef<InstanceType<typeof ToolFormDrawer>>('toolFormDrawerRef')
@@ -74,37 +98,63 @@ function handleRefresh() {
 </script>
 
 <template>
-  <MkDropdown trigger="click" placement="bottom-end" persistent>
-    <slot name="trigger">
-      <el-button type="primary">
-        <span class="mr-1">创建</span>
-        <MkIcon name="icon_down_outlined" :size="14" />
-      </el-button>
-    </slot>
+  <MkDropdown
+    :trigger="trigger"
+    placement="bottom-end"
+    persistent
+    :class="{ 'w-full': $slots.trigger }"
+    :popper-style="dropdownStyle"
+    :popper-class="popperClass"
+    @visible-change="handleVisibleChange"
+  >
+    <div v-if="$slots.trigger" ref="triggerRef" class="w-full cursor-pointer">
+      <slot name="trigger" />
+    </div>
+    <!-- 创建工具 -->
+    <el-button v-else type="primary">
+      <span class="mr-1">创建</span>
+      <MkIcon name="icon_down_outlined" :size="14" />
+    </el-button>
 
     <template #dropdown>
-      <MkDropdownMenu class="w-77!">
+      <MkDropdownMenu :class="[popperClass, customDropdownWidth ? 'w-full!' : 'w-77!']">
+        <!-- 创建工具 -->
         <MkDropdownItem class="py-2!" @click="handleOpenToolForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.CUSTOM" /></template>
           <span>工具</span>
         </MkDropdownItem>
+        <!-- 创建工作流工具 -->
         <MkDropdownItem class="py-2!" @click="handleOpenWorkflowForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.WORKFLOW" /></template>
           <span>工作流</span>
         </MkDropdownItem>
+        <!-- 创建 Skill -->
         <MkDropdownItem class="py-2!" @click="handleOpenSkillForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.SKILL" /></template>
           <span>Skills</span>
         </MkDropdownItem>
+        <!-- 创建 MCP -->
         <MkDropdownItem class="py-2!" @click="handleOpenMcpForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.MCP" /></template>
           <span>MCP</span>
         </MkDropdownItem>
+        <!-- 创建数据源 -->
         <MkDropdownItem class="py-2!" @click="handleOpenDataSourceForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.DATA_SOURCE" /></template>
           <span>数据源</span>
         </MkDropdownItem>
-        <el-upload ref="elUploadRef" action="#" :auto-upload="false" class="mk-import-button" :file-list="[]" :limit="1" multiple :on-change="handleImportCreate" :show-file-list="false">
+        <!-- 导入创建 -->
+        <el-upload
+          ref="elUploadRef"
+          action="#"
+          :auto-upload="false"
+          class="mk-import-button"
+          :file-list="[]"
+          :limit="1"
+          multiple
+          :on-change="handleImportCreate"
+          :show-file-list="false"
+        >
           <MkDropdownItem class="w-full py-2!">
             <template #icon>
               <img src="@/assets/mk_icon_import.svg" alt="" />

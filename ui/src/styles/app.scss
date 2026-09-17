@@ -13,6 +13,11 @@
   box-sizing: border-box;
 }
 
+/* 全局焦点轮廓 */
+*:focus-visible {
+  outline: none !important;
+}
+
 html,
 body,
 #app {
@@ -186,6 +191,35 @@ h6 {
   text-decoration: none;
   &:hover {
     text-decoration: underline;
+  }
+}
+
+/* rank */
+.mk-rank {
+  align-items: center;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  display: flex;
+  font-weight: 500;
+  height: calc(var(--spacing) * 6);
+  justify-content: center;
+  width: calc(var(--spacing) * 6);
+  &-1 {
+    background: linear-gradient(180deg, #fee4b1 0%, #feca88 100%);
+    border-color: #ffe89d;
+    color: #c85719;
+  }
+
+  &-2 {
+    background: linear-gradient(180deg, #c6d7ff 0%, #b6d2f7 100%);
+    border-color: #d6e2ff;
+    color: #2b5fd9;
+  }
+
+  &-3 {
+    background: linear-gradient(180deg, #ffe1cf 0%, #f4c5af 100%);
+    border-color: #ffe7cc;
+    color: #cc710a;
   }
 }
 

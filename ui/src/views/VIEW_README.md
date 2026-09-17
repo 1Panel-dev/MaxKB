@@ -129,6 +129,10 @@ query，不写入新的文件夹 ID，进入详情时也不携带该 query。`Wo
 局部替换，接口只返回布尔值或部分数据时调用 `refreshApplicationDetail()` 重新获取详情。切换二级
 菜单不会重新挂载详情容器，也不会自动重复请求详情。
 
+`application/components/ButtonCreateApplication.vue` 支持通过 `trigger` Prop 配置下拉触发方式，
+默认为 `click`，传入 `hover` 时悬停展开，也支持响应式切换；同名 `trigger` 插槽用于自定义触发内容，
+自定义触发区域统一使用全宽和手型光标。
+
 工作流模板中心的公共 UI 放在 workflow 下，application 列表与工作流分别提供业务入口：
 
 ```text
@@ -176,8 +180,9 @@ src/views/knowledge/
 │       ├── ExportKnowledgeAction.vue    # Excel、文档 ZIP 与知识库包导出
 │       ├── MoveKnowledgeAction.vue
 │       └── DeleteKnowledgeAction.vue
+├── components/
+│   └── ButtonCreateKnowledge.vue        # 知识库创建菜单与弹窗入口
 ├── create-knowledge/
-│   ├── CreateKnowledgeDropdown.vue       # 知识库创建菜单与弹窗入口
 │   ├── CreateBaseKnowledgeDialog.vue     # 通用知识库创建
 │   ├── CreateWebKnowledgeDialog.vue      # Web 站点配置与创建
 │   ├── CreateLarkKnowledgeDialog.vue     # 飞书应用配置与创建
@@ -199,7 +204,7 @@ src/views/knowledge/
 更新卡片所属目录，在具体目录转出时通过 `delete` 移除卡片，在全部目录或转入当前目录时保留。
 批量转移与删除使用对应批量接口，成功后退出选择模式并刷新列表。
 
-`CreateKnowledgeDropdown` 内聚四类创建弹窗 Ref 和打开动作，列表页传入目标 `folderId`，通过
+`ButtonCreateKnowledge` 内聚四类创建弹窗 Ref 和打开动作，列表页传入目标 `folderId`，通过
 `refresh` 刷新列表。入口支持 `trigger` 插槽替换默认创建按钮，下拉使用 `persistent`。
 各弹窗接收 `folderId`，通过 `open()` 打开；工作流额外接受可选的商店模板。共用的
 `KnowledgeBaseForm` 负责名称、描述、Embedding 模型必填校验以及工作空间和共享模型查询，
@@ -222,7 +227,7 @@ src/views/knowledge/
 src/views/tool/
 ├── ToolView.vue
 ├── components/
-│   ├── CreateToolDropdown.vue     # 工具创建入口
+│   ├── ButtonCreateTool.vue     # 工具创建入口
 │   └── ButtonToolStore.vue    # 工具商店入口
 ├── tool-form/                     # 各类型工具创建、编辑表单
 │   ├── DataSourceFormDrawer.vue
@@ -657,3 +662,52 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 页面复用整页 `loading`，提交时保存当前工作流、调用发布接口，映射 `name` 为
 `publish_name`，更新说明使用 `publish_desc`。成功后更新详情与保存时间，关闭弹窗并提示；
 保存或发布失败保留表单以便重试。旧 `ApplicationPublishDialog` 不再使用。
+
+## 工作空间首页
+
+`home/HomeView.vue` 组合快捷创建、资源概况、使用统计和 Top 5 排行榜。首页按当前路由
+`workspaceId` 重新挂载各业务区，切换工作空间时清理旧筛选、数据和抽屉。
+首页普通组件放在 `home/components/`；排行榜流程集中在 `home/ranking/`，包含
+`HomeRankings.vue` 和 `RankingDrawer.vue`。
+排行配置与展示计算保留在各自组件内，不单独维护首页 `constants.ts`、`statistics.ts`。
+`HomeView` 向 `HomeResourceOverview` 传入完整首页 API 对象，组件通过 `typeof HomepageApi`
+约束 `api` Prop 并调用 `props.api`。资源概况、使用统计和排行均由 `HomeView` 显式传入
+`workspaceId`，排行榜继续向详情抽屉传递；调用首页接口时逐次传入此 ID，不在 API 内读取路由。
+统计组件按 `workspaceId` 设置 key，切换工作空间时重载数据并清理旧筛选与排行榜详情。
+
+快捷创建通过插槽复用智能体、知识库、工具和模型的现有入口，目标文件夹为当前工作空间根目录；
+保留创建流程中的用户资料刷新及详情／工作流导航，停留首页的成功操作刷新资源概况与智能体选项。
+资源卡片使用命名路由进入当前工作空间的对应列表。
+
+`HomeView` 管理监控区的智能体列表查询、选择器和 `applicationId`，向 `HomeStatistics`
+传入完整 `HomepageApi` 与选中的 ID。统计组件监听工作空间和智能体 ID 变化加载数据，
+通过 `application` 插槽提供 `loading`，由 View 渲染选择器并控制请求期间禁用。
+选择器通过 `remote-method` 按名称请求前 200 个智能体；选项和选中值复用 `ApplicationIcon`，
+全部智能体使用 `icon_all_outlined`。清空回到全部，已选智能体图标独立保留，避免搜索结果变化后丢失。
+
+统计区、排行榜和详情抽屉直接复用 `MkDateRange`，将 `change` 的 `startTime`、`endTime`
+映射为接口的 `start_time`、`end_time`。默认查询与组件的过去 7 天预设一致，结束日期为当天。
+抽屉初始查询继承排行日期，通过 `MkDateRange.defaultValue` 同步回填日期选择器；
+公共组件暂不支持禁用。智能体筛选仅影响使用统计。
+活跃用户汇总是每日活跃人数之和，标为“累计活跃人次”；反馈展示点赞和点踩数量。
+`HomeStatistics` 直接使用公共 `MkLineChart`，传入日期和指标系列；实例、尺寸监听和销毁由
+`MkEchart` 管理，不再保留首页专用图表包装组件。
+
+排行榜详情继承打开时的日期与排行类型，独立维护名称搜索、分页和导出；搜索、日期及页容量
+变化重置页码，排名包含分页偏移。占比使用工作空间同期总量，不用 Top 5 或搜索结果合计替代。
+各业务区分别维护 loading 和失败状态，失败不伪装为零数据；首页不新增前端权限控制。
+
+`application/components/ButtonCreateApplication.vue`、`knowledge/components/ButtonCreateKnowledge.vue`
+与 `tool/components/ButtonCreateTool.vue` 支持 `trigger`（默认 `click`）、
+`popperStyle`、`popperClass` 和 `fitTriggerWidth`，三者保持相同的触发与浮层配置约定。
+`popperClass` 同时应用到浮层和菜单。
+默认菜单保持固定宽度；传入 `popperStyle.width` 或 `popperClass` 时，菜单填满浮层，宽度由调用方控制。
+`fitTriggerWidth` 默认关闭，只有显式开启时才在展开时测量自定义触发器宽度，并覆盖 `popperStyle.width`；
+首页快捷创建开启此配置，其他页面不因使用触发器插槽而自动等宽。`w-full` 样式类不触发测量。
+
+首页排行榜卡片由 `home/components/ranking/RankingCard.vue` 渲染，接收 `title`、`records`、
+`loading`、排行类型 `kind` 及总量 `total`，名称读取与占比计算由卡片内部处理；`detail` 事件交给父组件打开抽屉，`description` 插槽提供
+`record`、`index`，由父组件定义每行说明文案。
+
+排行榜 API 由 `HomeView` 传入 `HomeRankings`，再传给 `RankingDrawer`。两者的 `api`
+均使用 `typeof HomepageApi` 约束，查询、汇总和导出统一通过 `props.api` 调用。
