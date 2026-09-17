@@ -43,13 +43,10 @@ export function useStreamManager() {
         currentStream = new ConversationStream(
           response,
           onStream,
-          () => {
-            currentStream = null
-            onFinish?.()
-          },
           (e) => {
             currentStream = null
-            onFailure?.(e)
+            if (e) onFailure?.(e)
+            else onFinish?.()
           },
         )
         currentStream.start()
@@ -92,13 +89,10 @@ export function useStreamManager() {
       currentStream = new ConversationStream(
         response,
         onStream,
-        () => {
+        (e) => {
           currentStream = null
-          onFinish?.()
-        },
-        () => {
-          currentStream = null
-          onFailure?.()
+          if (e) onFailure?.()
+          else onFinish?.()
         },
       )
       currentStream.start()
