@@ -14,6 +14,7 @@ import time
 import traceback
 from typing import List
 
+import uuid_utils.compat as uuid
 from django.utils.translation import gettext_lazy as _
 from pypdf import PdfReader
 from pypdf.generic import Destination
@@ -21,6 +22,7 @@ from pypdf.generic import Destination
 from common.handle.base_split_handle import BaseSplitHandle
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import SplitModel, smart_split_paragraph
+from knowledge.models import File
 
 default_pattern_list = [
     re.compile("(?<=^)# .*|(?<=\\n)# .*"),
@@ -81,7 +83,7 @@ class PdfSplitHandle(BaseSplitHandle):
                     return {"name": file.name, "content": result}
 
                 # 没有目录的pdf
-                content = self.handle_pdf_content(file, pdf_document)
+                content = self.handle_pdf_content(file, pdf_document, save_image)
 
                 if pattern_list is not None and len(pattern_list) > 0:
                     split_model = SplitModel(pattern_list, with_filter, limit)
@@ -97,7 +99,7 @@ class PdfSplitHandle(BaseSplitHandle):
         return {"name": file.name, "content": split_model.parse(content)}
 
     @staticmethod
-    def handle_pdf_content(file, pdf_document):
+    def handle_pdf_content(file, pdf_document, save_image):
         # 第一步:收集所有字体大小
         font_sizes = []
         page_lines = []
@@ -118,6 +120,7 @@ class PdfSplitHandle(BaseSplitHandle):
 
         # 第二步:提取内容
         content = ""
+        image_list = []
         for page_num, page in enumerate(pdf_document.pages):
             start_time = time.time()
 
@@ -136,13 +139,22 @@ class PdfSplitHandle(BaseSplitHandle):
                     content += f"{text}\n"
 
             for image_index in range(PdfSplitHandle.get_page_image_count(page)):
-                content += f"![image](image_{page_num}_{image_index})\n\n"
+                try:
+                    image = page.images[image_index]
+                except Exception as e:
+                    maxkb_logger.warning(f"File: {file.name}, Page: {page_num + 1}, Image: {image_index}, error: {e}")
+                    continue
+                image_id = uuid.uuid7()
+                image_list.append(File(id=image_id, file_name=image.name, meta={"debug": False, "content": image.data}))
+                content += f"![image](./oss/file/{image_id})\n\n"
 
             content = content.replace("\0", "")
 
             elapsed_time = time.time() - start_time
             maxkb_logger.debug(f"File: {file.name}, Page: {page_num + 1}, Time: {elapsed_time:.3f}s")
 
+        if image_list:
+            save_image(image_list)
         return content
 
     @staticmethod
@@ -613,7 +625,7 @@ class PdfSplitHandle(BaseSplitHandle):
         try:
             with open(temp_file_path, "rb") as pdf_file:
                 pdf_document = PdfReader(pdf_file)
-                return self.handle_pdf_content(file, pdf_document)
+                return self.handle_pdf_content(file, pdf_document, save_image)
         except BaseException as e:
             traceback.print_exception(e)
             return f"{e}"
