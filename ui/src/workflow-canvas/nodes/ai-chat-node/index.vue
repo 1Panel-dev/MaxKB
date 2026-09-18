@@ -144,12 +144,12 @@ onMounted(() => {
                 </el-tooltip>
               </div>
               <!-- // TODO 生成 -->
-              <!-- <PromptGenerate
+              <PromptGenerate
                 :model-id="formData.model_id"
                 :provider-options="providerOptions"
                 :disabled="formData.model_id_type === 'reference' || !formData.model_id"
                 @replace="formData.system = $event"
-              /> -->
+              />
             </div>
           </template>
           <MdEditorMagnify
