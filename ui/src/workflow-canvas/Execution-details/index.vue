@@ -61,7 +61,7 @@ const sortedDetail = computed<ExecutionNodeDetail[]>(() =>
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="space-y-2">
     <template v-for="(item, index) in sortedDetail" :key="index">
       <component
         :is="nodeDetailComponent(item.type)"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/details/BaseHeader.vue'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 
 defineOptions({ name: 'ToolCustomNodeDetail' })
 
@@ -12,20 +12,22 @@ defineProps<{
 
 <template>
   <DetailContainer :data="data">
-    <template #header="{ show }">
-      <BaseHeader :data="data" :show="show" />
+    <template #header>
+      <BaseHeader :data="data" />
     </template>
 
-    <div v-if="data.index != 0" class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">输入</h5>
-      <div class="break-all border-t border-dashed px-3 py-2 text-N900">
+    <!-- 输入 -->
+    <div v-if="data.index != 0" class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">输入</h6>
+      <div class="break-all">
         {{ data.params || '-' }}
       </div>
     </div>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">输出</h5>
-      <div class="break-all border-t border-dashed px-3 py-2 text-N900">
+    <!-- 输出 -->
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">输出</h6>
+      <div class="break-all">
         {{ data.result || '-' }}
       </div>
     </div>

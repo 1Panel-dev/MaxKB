@@ -74,7 +74,7 @@ ui/
 │   │   ├── component/         # Reusable workflow canvas UI
 │   │   ├── config/            # Maintainable node data, menus, mappings, and constants
 │   │   ├── core/              # Stable canvas behavior and shared node infrastructure
-│   │   ├── details/           # Node execution detail dispatch and shared presentation
+│   │   ├── Execution-details/ # Node execution detail dispatch and shared presentation
 │   │   ├── icons/             # Workflow node icons
 │   │   ├── node-menu/         # Basic, tool, and application node selection menus
 │   │   ├── nodes/             # Workflow node definitions and components

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/details/BaseHeader.vue'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 
 defineOptions({ name: 'TextToVideoNodeDetail' })
 
@@ -12,43 +12,30 @@ defineProps<{
 
 <template>
   <DetailContainer :data="data">
-    <template #header="{ show }">
-      <BaseHeader :data="data" :show="show" show-tokens />
+    <template #header>
+      <BaseHeader :data="data" show-tokens />
     </template>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">本次对话</h5>
-      <div class="whitespace-pre-wrap border-t border-dashed px-3 py-2 text-N900">
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">本次对话</h6>
+      <div class="whitespace-pre-wrap">
         {{ data.question || '-' }}
       </div>
     </div>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">负向提示词</h5>
-      <div class="whitespace-pre-wrap border-t border-dashed px-3 py-2 text-N900">
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">负向提示词</h6>
+      <div class="whitespace-pre-wrap">
         {{ data.negative_prompt || '-' }}
       </div>
     </div>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">AI 回答</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">
-        <MdPreview
-          v-if="data.answer"
-          editor-id="preview-only"
-          :model-value="data.answer"
-          class="text-to-video-answer"
-          noImgZoomIn
-        />
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">AI 回答</h6>
+      <div class="space-y-2">
+        <MdPreview v-if="data.answer" :model-value="data.answer" noImgZoomIn />
         <template v-else>-</template>
       </div>
     </div>
   </DetailContainer>
 </template>
-
-<style scoped lang="scss">
-:deep(.text-to-video-answer.md-editor) {
-  background: transparent;
-  height: auto;
-}
-</style>

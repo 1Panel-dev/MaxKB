@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import DetailContainer from '@/workflow-canvas/details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 
 defineOptions({ name: 'SearchKnowledgeNodeDetail' })
 
@@ -26,49 +26,36 @@ interface SearchParagraph {
 }
 
 const sortedParagraphs = computed<SearchParagraph[]>(() =>
-  [...((props.data?.paragraph_list as SearchParagraph[] | undefined) || [])].sort(
-    (a, b) => (b.similarity || 0) - (a.similarity || 0),
-  ),
+  [...((props.data?.paragraph_list as SearchParagraph[] | undefined) || [])].sort((a, b) => (b.similarity || 0) - (a.similarity || 0)),
 )
 </script>
 
 <template>
   <DetailContainer :data="data">
-    <template #header="{ show }">
-      <BaseHeader :data="data" :show="show" />
+    <template #header>
+      <BaseHeader :data="data" />
     </template>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">检索内容</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">{{ data.question || '-' }}</div>
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">检索内容</h6>
+      <div>{{ data.question || '-' }}</div>
     </div>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">检索结果</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">检索结果</h6>
+      <div class="space-y-2">
         <template v-if="sortedParagraphs.length > 0">
-          <div
-            v-for="(paragraph, paragraphIndex) in sortedParagraphs"
-            :key="paragraphIndex"
-            class="overflow-hidden rounded-md bg-white p-2 mb-2"
-          >
+          <div v-for="(paragraph, paragraphIndex) in sortedParagraphs" :key="paragraphIndex" class="overflow-hidden rounded-md bg-white p-2 mb-2">
             <div class="flex-between">
-              <span class="truncate">{{ paragraphIndex + 1 }}.{{ paragraph.title || '-' }}</span>
+              <span class="truncate">#{{ paragraphIndex + 1 }} {{ paragraph.title || '-' }}</span>
               <span class="ml-2 shrink-0 text-primary">
                 {{ paragraph.similarity?.toFixed(3) }}
               </span>
             </div>
-            <el-scrollbar height="150" class="mt-1">
-              <MdPreview
-                :model-value="paragraph.content"
-                class="paragraph-answer"
-                no-img-zoom-in
-              />
+            <el-scrollbar max-height="150" class="mt-1">
+              <MdPreview :model-value="paragraph.content" no-img-zoom-in />
             </el-scrollbar>
-            <div
-              v-if="paragraph.document_name?.trim()"
-              class="mt-1 flex items-center gap-1"
-            >
+            <div v-if="paragraph.document_name?.trim()" class="mt-1 flex items-center gap-1">
               <img :src="getFileIconUrl(paragraph.document_name.trim())" alt="" width="20" />
               <a
                 v-if="paragraph.meta?.source_file_id || paragraph.meta?.source_url"
@@ -94,10 +81,3 @@ const sortedParagraphs = computed<SearchParagraph[]>(() =>
     </div>
   </DetailContainer>
 </template>
-
-<style scoped lang="scss">
-:deep(.paragraph-answer.md-editor) {
-  background: transparent;
-  height: auto;
-}
-</style>

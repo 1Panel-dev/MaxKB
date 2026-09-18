@@ -20,7 +20,7 @@
 src/workflow-canvas/
 ├── component/          # NodeAdd、NodeSearch、节点设置及预留的 NodeControl
 ├── config/             # 节点数据、映射、常量及预留的本地化配置
-├── details/            # 执行详情：顶层分发入口与公共卡壳，节点内容由 nodes/*/details/ 提供
+├── Execution-details/  # 执行详情：顶层分发入口与公共卡壳，节点内容由 nodes/*/details/ 提供
 ├── core/               # 稳定的画布内核与所有节点共用的基础能力
 │   ├── edge/           # 普通边、循环边及边删除按钮
 │   └── node-container/ # 节点容器、锚点按钮及私有的条件、操作下拉组件
@@ -388,20 +388,22 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 卡片悬停时显示排序手柄；ELSE 独立渲染并固定末尾。排序后按位置更新分支名称，保留分支 ID，
 并同步刷新锚点顺序与连线。
 
-### 执行详情（`details/`）
+### 执行详情（`Execution-details/`）
 
 节点执行详情与画布节点注册同源，通过节点类型分发：
 
-- `details/index.vue`（`ExecutionDetailContent`）是顶层分发层：接收 `detail` 数组和 `workflowMode`，
+- `Execution-details/index.vue`（`ExecutionDetailContent`）是顶层分发层：接收 `detail` 数组和 `workflowMode`，
   按 `index` 升序，逐项按节点类型渲染对应节点的详情组件。类型到详情组件的映射来自
   `import.meta.glob('../nodes/*/index.ts')` 收集的默认导出中的 `details` 字段，与画布节点注册同一份
   清单，不按目录名推断，也不再单独维护映射表。未注册详情的类型当前跳过渲染。
-- `details/DetailContainer.vue` 是与节点类型无关的布局容器：提供 `#header` 具名
-  插槽（透出折叠 `show`）、折叠体默认插槽承载节点内容，以及 `showContentOnError` 决定失败时是否仍
+- `Execution-details/DetailContainer.vue` 是与节点类型无关的布局容器：提供 `#header` 具名
+  插槽、折叠体默认插槽承载节点内容，以及 `showContentOnError` 决定失败时是否仍
   展示内容（默认失败只显示错误日志块）。
-- `details/BaseHeader.vue` 是公共头部：折叠箭头、节点图标、名称、耗时和状态图标；是否显示 tokens 由
+- 折叠交互与箭头统一由 `DetailContainer` 内的 `MkCollapse` 提供，通过 `v-model:expanded` 绑定
+  `show`，默认收起；内容保留 `v-if="show"`，收起时卸载节点详情。
+- `Execution-details/BaseHeader.vue` 是公共头部：节点图标、名称、耗时和状态图标；是否显示 tokens 由
   节点通过 `show-tokens` 布尔控制，tokens 数值由 `BaseHeader` 从 `data` 自行计算，容器不参与该判断。
-- 详情载荷类型 `ExecutionNodeDetail` 在 `details/types.ts`，以开放索引签名承载各节点动态字段，仅显式
+- 详情载荷类型 `ExecutionNodeDetail` 在 `Execution-details/types.ts`，以开放索引签名承载各节点动态字段，仅显式
   声明外层卡片通用字段；分发和模式统一使用 `WorkflowMode` 枚举，不自造字符串联合类型。
 
 每个节点的详情入口统一为 `nodes/<node-type>/details/index.vue`，并在该节点 `index.ts` 的默认导出中通过
@@ -413,9 +415,12 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
   共用部分不强行抽取。
 
 文件类型图标复用 `@/utils/icon` 的 `getFileIconUrl`。
-详情内的灰底标题块直接使用内联 Tailwind（`overflow-hidden rounded-md bg-N100` + `h5.px-3.py-2` +
-`border-t border-dashed px-3 py-2 text-N900`），不引入独立的区块组件。只读 Markdown 回答复用全局
-`MdPreview`，并在节点内通过 `:deep()` 覆盖其固定高度与背景以融入灰底。
+所有节点执行详情的内容区统一使用 `mk-gray-card py-2! rounded-xl!` 卡片和 `h6.mb-2` 标题，
+标题与正文之间不加分隔线，内容列表使用 8px 间距。展示标签后的冒号统一使用中文 `：`，
+不替换实际数据、URL 或代码中的冒号。各模式保留原有字段、显隐条件和专属交互；
+检索段落、文档分段等白底子卡片保留层级及元信息分隔线，不引入独立的区块组件。
+只读 Markdown 回答复用全局 `MdPreview`，透明背景与自适应高度由全局预览样式统一提供，
+节点不重复添加局部覆盖或固定 `editor-id`。
 
 循环详情是唯一递归点，负责循环设置和轮次选择，将选中轮次的子节点交给 `ExecutionDetailContent` 排序、分发，
 并传 `show-content-on-error`，允许整体失败时查看已执行子节点。递归数据不得包含循环自身；

@@ -181,6 +181,7 @@ onMounted(() => {
               </el-form-item>
             </div>
             <el-form-item
+              class="mt-2"
               v-else-if="item.source === 'referencing'"
               :prop="'variable_list.' + index + '.reference'"
               :rules="{ required: true, message: '请选择变量', trigger: 'change' }"
