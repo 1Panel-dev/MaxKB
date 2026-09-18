@@ -1,6 +1,9 @@
+import { CHAT_TYPE } from '@/conversation-panel/common/enums'
+import FileApi from '@/api/admin/file'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
 import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { debugApi } from '../../../api'
+import ConversationApi from '@/api/admin/workspace/conversation'
 import { useStreamManager } from '../shared/use-stream-manager'
 import { useMessagePagination } from '../shared/use-message-pagination'
 import { useConversationCrud } from '../shared/use-conversation-crud'
@@ -19,33 +22,27 @@ const loading = ref<boolean>(false)
 
 // ── 会话 CRUD ─────────────────────────────────────────
 const { conversations, loadConversations, loadMore } = useConversationCrud({
-  pageConversationAPI: (query: any) =>
-    debugApi.history(query.currentPage, query.pageSize, currentApplicationId),
+  pageConversationAPI: (query: any) => ConversationApi.getConversationPage(query.currentPage, query.pageSize, currentApplicationId),
 })
 
 // ── 消息分页 ─────────────────────────────────────────
-const { messages, hasMore, loadMessages, loadMoreMessages, pushMessage, resetMsgState } =
-  useMessagePagination(
-    {
-      pageConversationMessage: (cid: string, query: any) =>
-        debugApi.records(cid, query.currentPage, query.pageSize, currentApplicationId),
-    },
-    loading,
-  )
+const { messages, hasMore, loadMessages, loadMoreMessages, pushMessage, resetMsgState } = useMessagePagination(
+  {
+    pageConversationMessage: (cid: string, query: any) =>
+      ConversationApi.getConversationRecordPage(cid, query.currentPage, query.pageSize, currentApplicationId),
+  },
+  loading,
+)
 
 // ── 流式管理 ─────────────────────────────────────────
 const streamManager = useStreamManager()
 
 // ── 计算属性 ─────────────────────────────────────────
-const currentConversation = computed(
-  () => conversations.value.find((c) => c.id === currentChatId.value) || null,
-)
+const currentConversation = computed(() => conversations.value.find((c) => c.id === currentChatId.value) || null)
 
 export function useDebugStore() {
   const route = useRoute()
-  const applicationId = computed(
-    () => (route.params.id as string) || (route.params.applicationId as string) || '',
-  )
+  const applicationId = computed(() => (route.params.id as string) || (route.params.applicationId as string) || '')
 
   // 更新当前 applicationId
   watch(
@@ -58,8 +55,8 @@ export function useDebugStore() {
 
   const fetchAppInfo = async (appId?: string) => {
     try {
-      const { getApi } = await import('../../../api')
-      const api = getApi('DEBUG')
+      const { getApi } = await import('../../get-api')
+      const api = getApi(CHAT_TYPE.DEBUG)
     } catch (e) {
       // 静默处理
     }
@@ -101,29 +98,29 @@ export function useDebugStore() {
   }
 
   const openChat = async (appId?: string) => {
-    return await debugApi.open(appId || applicationId.value)
+    return await ConversationApi.getConversationOpen(appId || applicationId.value)
   }
 
   const deleteChat = async (id: string) => {
-    await debugApi.deleteChat(id, applicationId.value)
+    await ConversationApi.deleteConversation(id, applicationId.value)
     const idx = conversations.value.findIndex((c) => c.id === id)
     if (idx >= 0) conversations.value.splice(idx, 1)
   }
 
   const renameChat = async (id: string, name: string) => {
-    await debugApi.modifyChat(id, { abstract: name }, applicationId.value)
+    await ConversationApi.putConversation(id, { abstract: name }, applicationId.value)
     const c = conversations.value.find((x) => x.id === id)
     if (c) c.abstract = name
   }
 
-  const chat = (chatId: string, data: any) => debugApi.chat(chatId, data, currentApplicationId)
+  const chat = (chatId: string, data: any) => ConversationApi.postConversationMessage(chatId, data, currentApplicationId)
 
   // ── 文件上传 ─────────────────────────────────────────
   const uploadFile = async (file: File, chatId: string): Promise<{ url: string; name: string }> => {
     loading.value = true
     // 无会话时前端生成草稿 chat_id（不调后端 open），与发送保持同一个 id。
     const cid = chatId || getChatId()
-    const res = await debugApi.uploadFile(file, cid)
+    const res = await FileApi.postUploadFile(file, cid, FILE_SOURCE_TYPE.CHAT).request
     loading.value = false
     return { url: res, name: file.name }
   }
@@ -134,7 +131,7 @@ export function useDebugStore() {
     await streamManager.switchConversation({
       cid,
       loadMessages,
-      resumeStream: (chatRecordId: string) => debugApi.resumeStream(cid, chatRecordId, currentApplicationId),
+      resumeStream: (chatRecordId: string) => ConversationApi.postResumeConversationMessage(cid, chatRecordId, currentApplicationId),
       getLastMessage: () => messages.value[messages.value.length - 1] ?? null,
       onStream: (chunk) => {
         const lastMsg = messages.value[messages.value.length - 1]

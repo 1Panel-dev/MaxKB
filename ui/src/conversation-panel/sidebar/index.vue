@@ -87,6 +87,7 @@
 </template>
 
 <script setup lang="ts">
+import { CHAT_TYPE } from '@/conversation-panel/common/enums'
 import { ref, nextTick } from 'vue'
 import { Plus, MoreFilled, Edit, Delete, ChatDotRound } from '@element-plus/icons-vue'
 import { useChatStoreByType } from '../common/use-chat-store'
@@ -98,7 +99,7 @@ const props = withDefaults(
     open: boolean
     mode: 'push' | 'drawer'
   }>(),
-  { type: 'CHAT' },
+  { type: CHAT_TYPE.CHAT },
 )
 
 const emit = defineEmits<{

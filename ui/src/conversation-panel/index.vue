@@ -26,6 +26,7 @@
 </template>
 
 <script setup lang="ts">
+import { CHAT_TYPE } from '@/conversation-panel/common/enums.ts'
 import { ref, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue'
 import { useChatStoreByType } from './common/use-chat-store/index.ts'
 import type { ChatType } from './common/types.ts'
@@ -42,7 +43,7 @@ const props = withDefaults(
     defaultMode?: LayoutMode
   }>(),
   {
-    type: 'CHAT',
+    type: CHAT_TYPE.CHAT,
     defaultOpen: 'auto',
     defaultMode: 'auto',
   },

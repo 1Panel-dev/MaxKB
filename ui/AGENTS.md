@@ -65,6 +65,7 @@ ui/
 │   │   ├── global/            # Frequently used components auto-registered by Vite
 │   │   │   └── mk-icon/       # Unified SVG Symbol and Element Plus icon component
 │   │   └── <component-name>/   # Less-frequent shared components imported explicitly
+│   ├── conversation-panel/    # Conversation UI, local state, streaming, and API mode selection
 │   ├── constants/             # Cross-feature constants grouped by domain
 │   │   └── CONSTANT_README.md # Shared constant placement and naming rules
 │   ├── layout/                # Shared application shells, headers, sidebars, types, and helpers
@@ -117,7 +118,7 @@ ui/
 ```
 
 Internationalization is not yet integrated; `src/locales/` has not been created. Chat currently has a
-placeholder route page and a reserved independent API directory. Add files to the matching feature
+placeholder route page and an independent API client with conversation endpoints. Add files to the matching feature
 directory instead of creating parallel top-level structures.
 
 Structural responsibilities:

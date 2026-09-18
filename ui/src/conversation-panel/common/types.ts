@@ -1,3 +1,5 @@
+import type { CHAT_TYPE } from './enums'
+
 export interface Conversation {
   id: string
   abstract: string
@@ -20,4 +22,4 @@ export interface StreamChunk {
   [key: string]: any
 }
 
-export type ChatType = 'CHAT' | 'DEBUG'
+export type ChatType = (typeof CHAT_TYPE)[keyof typeof CHAT_TYPE]

@@ -22,3 +22,4 @@ export type * from './workflow-version'
 export type * from './workflow-template'
 
 export type * from './homepage'
+export type * from './file'

@@ -236,6 +236,7 @@
 </template>
 
 <script setup lang="ts">
+import { CHAT_TYPE } from '@/conversation-panel/common/enums.ts'
 import { ref, computed, nextTick, watch, onMounted, reactive, provide } from 'vue'
 import { CircleCloseFilled, Paperclip, Promotion, VideoPause } from '@element-plus/icons-vue'
 import ContentList from '../content-list/index.vue'
@@ -250,7 +251,7 @@ const props = withDefaults(
     appInfo?: { name: string; icon: string } | null
     showHeader?: boolean
   }>(),
-  { type: 'CHAT', showHeader: true },
+  { type: CHAT_TYPE.CHAT, showHeader: true },
 )
 
 const emit = defineEmits<{
