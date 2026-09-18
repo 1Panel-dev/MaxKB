@@ -58,5 +58,3 @@ ENV PATH=/opt/py3/bin:$PATH \
     SEAWEEDFS_VOLUMES=/opt/maxkb/data/seaweedfs \
     SEAWEEDFS_S3_BUCKET=maxkb \
     SEAWEEDFS_S3_ENDPOINT=http://127.0.0.1:8333
-
-EXPOSE 6379 8333 9333
