@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/details/BaseHeader.vue'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 
 defineOptions({ name: 'LoopBreakNodeDetail' })
 
@@ -12,15 +12,13 @@ defineProps<{
 
 <template>
   <DetailContainer :data="data">
-    <template #header="{ show }">
-      <BaseHeader :data="data" :show="show" />
+    <template #header>
+      <BaseHeader :data="data" />
     </template>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">输出参数</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">
-        <p><span class="mr-1 text-N600">是否退出:</span>{{ data.is_break }}</p>
-      </div>
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">输出参数</h6>
+      <div><span class="text-N600">是否退出：</span>{{ data.is_break }}</div>
     </div>
   </DetailContainer>
 </template>

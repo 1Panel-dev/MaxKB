@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/details/BaseHeader.vue'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 
 defineOptions({ name: 'AiChatKnowledgeDetails' })
 
@@ -12,22 +12,22 @@ defineProps<{
 
 <template>
   <DetailContainer :data="data">
-    <template #header="{ show }">
-      <BaseHeader :data="data" :show="show" show-tokens />
+    <template #header>
+      <BaseHeader :data="data" show-tokens />
     </template>
 
     <!-- 系统提示词 -->
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">系统提示词</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">{{ data.system || '-' }}</div>
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">系统提示词</h6>
+      <div>{{ data.system || '-' }}</div>
     </div>
 
     <!-- 用户提示词 -->
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">用户提示词</h5>
-      <div class="whitespace-pre-wrap border-t border-dashed px-3 py-2 text-N900">
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">用户提示词</h6>
+      <div class="whitespace-pre-wrap space-y-2">
         <template v-if="Array.isArray(data.question)">
-          <div v-for="(item, qIndex) in data.question" :key="qIndex" class="mb-2">
+          <div v-for="(item, qIndex) in data.question" :key="qIndex">
             <el-image
               v-if="item.type === 'image_url'"
               :src="item.image_url?.url || item.image_url"
@@ -55,34 +55,20 @@ defineProps<{
     </div>
 
     <!-- 思考过程 -->
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">思考过程</h5>
-      <div class="whitespace-pre-wrap border-t border-dashed px-3 py-2 text-N900">
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">思考过程</h6>
+      <div class="whitespace-pre-wrap">
         {{ data.reasoning_content || '-' }}
       </div>
     </div>
 
     <!-- AI 回答 -->
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">AI 回答</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">
-        <MdPreview
-          v-if="data.answer"
-          editor-id="preview-only"
-          :model-value="data.answer"
-          class="ai-chat-answer"
-          noImgZoomIn
-        />
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">AI 回答</h6>
+      <div>
+        <MdPreview v-if="data.answer" :model-value="data.answer" noImgZoomIn />
         <template v-else>-</template>
       </div>
     </div>
   </DetailContainer>
 </template>
-
-<style scoped lang="scss">
-/* 只读回答需要自适应高度并融入区块灰底，覆盖全局 Markdown 编辑器的固定高度与背景。 */
-:deep(.ai-chat-answer.md-editor) {
-  background: transparent;
-  height: auto;
-}
-</style>

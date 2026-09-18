@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/details/BaseHeader.vue'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 
 defineOptions({ name: 'ConditionNodeDetail' })
 
@@ -12,13 +12,13 @@ defineProps<{
 
 <template>
   <DetailContainer :data="data">
-    <template #header="{ show }">
-      <BaseHeader :data="data" :show="show" />
+    <template #header>
+      <BaseHeader :data="data" />
     </template>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">条件结果</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">{{ data.branch_name || '-' }}</div>
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">条件结果</h6>
+      <div>{{ data.branch_name || '-' }}</div>
     </div>
   </DetailContainer>
 </template>

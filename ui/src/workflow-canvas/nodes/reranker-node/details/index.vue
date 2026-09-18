@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 
 defineOptions({ name: 'RerankerNodeDetail' })
 
@@ -14,42 +14,31 @@ defineProps<{
 
 <template>
   <DetailContainer :data="data">
-    <template #header="{ show }">
-      <BaseHeader :data="data" :show="show" />
+    <template #header>
+      <BaseHeader :data="data" />
     </template>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">检索内容</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">{{ data.question || '-' }}</div>
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">检索内容</h6>
+      <div>{{ data.question || '-' }}</div>
     </div>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">重排内容</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">重排内容</h6>
+      <div class="space-y-2">
         <template v-if="data.document_list?.length > 0">
           <template v-for="(paragraph, paragraphIndex) in data.document_list" :key="paragraphIndex">
             <div class="mb-2 overflow-hidden rounded-md bg-white p-2">
               <div class="flex-between">
-                <span class="truncate">{{ Number(paragraphIndex) + 1 }}.{{ paragraph.metadata?.title || '-' }}</span>
+                <span class="truncate">#{{ Number(paragraphIndex) + 1 }} {{ paragraph.metadata?.title || '-' }}</span>
                 <span class="ml-2 shrink-0 text-primary">
-                  {{
-                    paragraph.metadata?.similarity != null
-                      ? Number(paragraph.metadata.similarity).toFixed(3)
-                      : ''
-                  }}
+                  {{ paragraph.metadata?.similarity != null ? Number(paragraph.metadata.similarity).toFixed(3) : '' }}
                 </span>
               </div>
-              <el-scrollbar height="150" class="mt-1">
-                <MdPreview
-                  :model-value="paragraph.page_content || paragraph.metadata?.content || ''"
-                  class="paragraph-answer"
-                  no-img-zoom-in
-                />
+              <el-scrollbar max-height="150" class="mt-1">
+                <MdPreview :model-value="paragraph.page_content || paragraph.metadata?.content || ''" no-img-zoom-in />
               </el-scrollbar>
-              <div
-                v-if="paragraph.metadata?.document_name?.trim()"
-                class="mt-1 flex items-center gap-1"
-              >
+              <div v-if="paragraph.metadata?.document_name?.trim()" class="mt-1 flex items-center gap-1">
                 <img :src="getFileIconUrl(paragraph.metadata.document_name.trim())" alt="" width="20" />
                 <a
                   v-if="paragraph.metadata?.source_file_id || paragraph.metadata?.source_url"
@@ -75,33 +64,22 @@ defineProps<{
       </div>
     </div>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">重排结果</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">重排结果</h6>
+      <div class="space-y-2">
         <template v-if="data.result_list?.length > 0">
           <template v-for="(paragraph, paragraphIndex) in data.result_list" :key="paragraphIndex">
             <div class="mb-2 overflow-hidden rounded-md bg-white p-2">
               <div class="flex-between">
                 <span class="truncate">{{ Number(paragraphIndex) + 1 }}.{{ paragraph.metadata?.title || '-' }}</span>
                 <span class="ml-2 shrink-0 text-primary">
-                  {{
-                    paragraph.metadata?.relevance_score != null
-                      ? Number(paragraph.metadata.relevance_score).toFixed(3)
-                      : ''
-                  }}
+                  {{ paragraph.metadata?.relevance_score != null ? Number(paragraph.metadata.relevance_score).toFixed(3) : '' }}
                 </span>
               </div>
               <el-scrollbar height="150" class="mt-1">
-                <MdPreview
-                  :model-value="paragraph.page_content || paragraph.metadata?.content || ''"
-                  class="paragraph-answer"
-                  no-img-zoom-in
-                />
+                <MdPreview :model-value="paragraph.page_content || paragraph.metadata?.content || ''" no-img-zoom-in />
               </el-scrollbar>
-              <div
-                v-if="paragraph.metadata?.document_name?.trim()"
-                class="mt-1 flex items-center gap-1"
-              >
+              <div v-if="paragraph.metadata?.document_name?.trim()" class="mt-1 flex items-center gap-1">
                 <img :src="getFileIconUrl(paragraph.metadata.document_name.trim())" alt="" width="20" />
                 <a
                   v-if="paragraph.metadata?.source_file_id || paragraph.metadata?.source_url"
@@ -128,10 +106,3 @@ defineProps<{
     </div>
   </DetailContainer>
 </template>
-
-<style scoped lang="scss">
-:deep(.paragraph-answer.md-editor) {
-  background: transparent;
-  height: auto;
-}
-</style>

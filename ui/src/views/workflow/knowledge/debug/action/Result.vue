@@ -2,8 +2,8 @@
 import { computed, onUnmounted, ref, watch } from 'vue'
 import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import type { KnowledgeWorkflowAction } from '@/api/types'
-import ExecutionDetailContent from '@/workflow-canvas/details/index.vue'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import ExecutionDetailContent from '@/workflow-canvas/Execution-details/index.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'DebugResult' })

@@ -39,6 +39,8 @@ function open(graph: LogicFlow.GraphData) {
 
 function fieldRules(field: ToolInputField): FormItemRule[] {
   return [
+    // 必填规则覆盖 change、blur 和提交校验，避免 FormItem 自动补充无文案的 required 规则。
+    { required: field.is_required, message: '请输入' },
     {
       validator: (_rule, value, callback) => {
         if (field.type === 'array' || field.type === 'dict') {
@@ -53,7 +55,7 @@ function fieldRules(field: ToolInputField): FormItemRule[] {
           return
         }
         if (value === undefined || value === '') {
-          callback(field.is_required ? new Error('请输入参数') : undefined)
+          callback(field.is_required ? new Error('请输入') : undefined)
           return
         }
         callback()

@@ -97,6 +97,8 @@
 
     p {
       padding: 0 !important;
+      margin: 0 !important;
+      line-height: 22px !important;
     }
 
     sup[data-title] {
@@ -142,6 +144,12 @@
   .mk-markdown-editor .md-editor-preview img {
     max-width: 100% !important;
   }
+}
+
+/* Markdown 预览模式 */
+.mk-markdown-editor.md-editor-previewOnly {
+  height: auto !important;
+  background: transparent !important;
 }
 
 /* 上标说明浮层由 sup-popover.ts 挂载到 body，使用独立类名限定范围。 */

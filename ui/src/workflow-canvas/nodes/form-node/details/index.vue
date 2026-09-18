@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import DetailContainer from '@/workflow-canvas/details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 
 defineOptions({ name: 'FormNodeDetail' })
 
@@ -22,22 +22,17 @@ watch(
 
 <template>
   <DetailContainer :data="data">
-    <template #header="{ show }">
-      <BaseHeader :data="data" :show="show" />
+    <template #header>
+      <BaseHeader :data="data" />
     </template>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">
         输出参数
         <span v-if="!data.is_submit" class="text-danger">(未提交)</span>
-      </h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">
-        <MkDynamicsForm
-          v-model="formData"
-          :render-data="data.form_field_list"
-          :view="true"
-          label-position="top"
-        />
+      </h6>
+      <div>
+        <MkDynamicsForm v-model="formData" :render-data="data.form_field_list" :view="true" label-position="top" />
       </div>
     </div>
   </DetailContainer>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/details/BaseHeader.vue'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/details/types'
+import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
 
 defineOptions({ name: 'VariableAssignNodeDetail' })
 
@@ -12,24 +12,26 @@ defineProps<{
 
 <template>
   <DetailContainer :data="data">
-    <template #header="{ show }">
-      <BaseHeader :data="data" :show="show" />
+    <template #header>
+      <BaseHeader :data="data" />
     </template>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">输入参数</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">
-        <p v-for="(f, i) in data.result_list" :key="i" class="mb-2">
-          <span class="mr-1 text-N600">{{ f.name }} ({{ f.input_type }}):</span>{{ f.input_value }}
+    <!-- 输入参数 -->
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">输入参数</h6>
+      <div class="space-y-2">
+        <p v-for="(assignment, assignmentIndex) in data.result_list" :key="assignmentIndex">
+          <span class="text-N600">{{ assignment.name }} ({{ assignment.input_type }})：</span>{{ assignment.input_value }}
         </p>
       </div>
     </div>
 
-    <div class="overflow-hidden rounded-md bg-N100">
-      <h5 class="px-3 py-2">输出参数</h5>
-      <div class="border-t border-dashed px-3 py-2 text-N900">
-        <p v-for="(f, i) in data.result_list" :key="i" class="mb-2">
-          <span class="mr-1 text-N600">{{ f.name }} ({{ f.output_type }}):</span>{{ f.output_value }}
+    <!-- 输出参数 -->
+    <div class="mk-gray-card py-2! rounded-xl!">
+      <h6 class="mb-2">输出参数</h6>
+      <div class="space-y-2">
+        <p v-for="(assignment, assignmentIndex) in data.result_list" :key="assignmentIndex">
+          <span class="text-N600">{{ assignment.name }} ({{ assignment.output_type }})：</span>{{ assignment.output_value }}
         </p>
       </div>
     </div>

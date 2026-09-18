@@ -170,8 +170,8 @@ export interface ToolWorkflowRecord {
   meta: {
     output?: unknown
     details?:
-      | import('@/workflow-canvas/details/types').ExecutionNodeDetail[]
-      | Record<string, import('@/workflow-canvas/details/types').ExecutionNodeDetail>
+      | import('@/workflow-canvas/Execution-details/types').ExecutionNodeDetail[]
+      | Record<string, import('@/workflow-canvas/Execution-details/types').ExecutionNodeDetail>
   }
 }
 

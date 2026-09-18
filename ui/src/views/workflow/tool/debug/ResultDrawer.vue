@@ -7,7 +7,7 @@ import { MsgError } from '@/utils/message'
 import { ConversationStream } from '@/conversation-panel/stream'
 import { aggregators } from '@/conversation-panel'
 import ContentList from '@/conversation-panel/content-list/index.vue'
-import ExecutionDetailContent from '@/workflow-canvas/details/index.vue'
+import ExecutionDetailContent from '@/workflow-canvas/Execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'ToolWorkflowDebugResultDrawer' })
@@ -129,8 +129,8 @@ defineExpose({ open, close })
       <el-tab-pane label="输出" name="output">
         <h4 class="mk-title-decoration mb-4 mt-4">回复内容</h4>
 
-        <!-- // TODO: 回复内容 -->
-        <el-card class="small whitespace-pre-wrap" shadow="never">
+        <!-- // TODO: 回复内容 调样式-->
+        <el-card class="small" shadow="never">
           <ContentList :content-list="blocks" />
           <div v-if="running">回答中...</div>
         </el-card>
@@ -152,7 +152,7 @@ defineExpose({ open, close })
       </el-tab-pane>
       <el-tab-pane label="执行详情" name="details">
         <!-- TODO 执行详情 -->
-        <ExecutionDetailContent :detail="executionDetails" :workflow-mode="WorkflowMode.Tool"></ExecutionDetailContent>
+        <ExecutionDetailContent class="mt-6" :detail="executionDetails" :workflow-mode="WorkflowMode.Tool"></ExecutionDetailContent>
       </el-tab-pane>
     </el-tabs>
   </MkDrawer>
