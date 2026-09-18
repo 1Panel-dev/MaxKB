@@ -1,6 +1,8 @@
+import FileApi from '@/api/chat/file'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { chatApi } from '../../../api'
+import ConversationApi from '@/api/chat/conversation'
 import { useStreamManager } from '../shared/use-stream-manager'
 import { useMessagePagination } from '../shared/use-message-pagination'
 import { useConversationCrud } from '../shared/use-conversation-crud'
@@ -17,32 +19,23 @@ const composerResetSignal = ref(0)
 
 // ── 会话 CRUD ─────────────────────────────────────────
 const { conversations, loadConversations, loadMore } = useConversationCrud({
-  pageConversationAPI: (query: any) => chatApi.history(query.currentPage, query.pageSize),
+  pageConversationAPI: (query: any) => ConversationApi.getConversationPage(query.currentPage, query.pageSize),
 })
 
 // ── 消息分页 ─────────────────────────────────────────
-const {
-  messages,
-  loading,
-  hasMore,
-  loadMessages,
-  loadMoreMessages,
-  pushMessage,
-  resetMsgState,
-} = useMessagePagination({
-  pageConversationMessage: (cid: string, query: any) =>
-    chatApi.records(cid, query.currentPage, query.pageSize),
+const { messages, loading, hasMore, loadMessages, loadMoreMessages, pushMessage, resetMsgState } = useMessagePagination({
+  pageConversationMessage: (cid: string, query: any) => ConversationApi.getConversationRecordPage(cid, query.currentPage, query.pageSize),
 })
 
 // ── 流式管理 ─────────────────────────────────────────
 const streamManager = useStreamManager()
 
 // ── 计算属性 ─────────────────────────────────────────
-const currentConversation = computed(() => conversations.value.find(c => c.id === currentChatId.value) || null)
+const currentConversation = computed(() => conversations.value.find((c) => c.id === currentChatId.value) || null)
 
 export function useChatStore() {
   const route = useRoute()
-  const applicationId = computed(() => route.params.id as string || route.params.applicationId as string || '')
+  const applicationId = computed(() => (route.params.id as string) || (route.params.applicationId as string) || '')
 
   const fetchAppInfo = async (applicationId?: string) => {
     try {
@@ -55,18 +48,14 @@ export function useChatStore() {
   // ── 流式聚合（内部） ─────────────────────────────────
   const appendChunk = (message: ChatMessage, chunk: any) => {
     if (!chunk) return
-    const contentArray = Array.isArray(chunk.content)
-      ? chunk.content
-      : chunk.type ? [chunk] : null
+    const contentArray = Array.isArray(chunk.content) ? chunk.content : chunk.type ? [chunk] : null
     if (!contentArray) return
 
     contentArray.forEach((item: any) => {
       if (!item?.type) return
       const aggregator = aggregators[item.type]
       if (!aggregator) return
-      const index = message.content.findIndex(
-        (c: any) => c.id === item.id && c.type === item.type,
-      )
+      const index = message.content.findIndex((c: any) => c.id === item.id && c.type === item.type)
       if (index >= 0) {
         message.content[index] = aggregator(message.content[index], item)
       } else {
@@ -92,26 +81,26 @@ export function useChatStore() {
   }
 
   const openChat = async (appId?: string) => {
-    return await chatApi.open()
+    return await ConversationApi.getConversationOpen()
   }
 
   const deleteChat = async (id: string) => {
-    await chatApi.deleteChat(id)
+    await ConversationApi.deleteConversation(id)
     const idx = conversations.value.findIndex((c) => c.id === id)
     if (idx >= 0) conversations.value.splice(idx, 1)
   }
 
   const renameChat = async (id: string, name: string) => {
-    await chatApi.modifyChat(id, { abstract: name })
+    await ConversationApi.putConversation(id, { abstract: name })
     const c = conversations.value.find((x) => x.id === id)
     if (c) c.abstract = name
   }
 
-  const chat = (chatId: string, data: any) => chatApi.chat(chatId, data)
+  const chat = (chatId: string, data: any) => ConversationApi.postConversationMessage(chatId, data)
 
   // ── 文件上传 ─────────────────────────────────────────
   const uploadFile = async (file: File): Promise<{ url: string; name: string }> => {
-    const res = await chatApi.uploadFile(file, '')
+    const res = await FileApi.postUploadFile(file, '', FILE_SOURCE_TYPE.CHAT).request
     return { url: res, name: file.name }
   }
 
@@ -120,7 +109,7 @@ export function useChatStore() {
     await streamManager.switchConversation({
       cid,
       loadMessages,
-      resumeStream: (chatRecordId: string) => chatApi.resumeStream(cid, chatRecordId),
+      resumeStream: (chatRecordId: string) => ConversationApi.postResumeConversationMessage(cid, chatRecordId),
       getLastMessage: () => messages.value[messages.value.length - 1] ?? null,
       onStream: (chunk) => {
         const lastMsg = messages.value[messages.value.length - 1]
@@ -133,7 +122,7 @@ export function useChatStore() {
       onFailure: () => {
         const lastMsg = messages.value[messages.value.length - 1]
         if (lastMsg) lastMsg.write_ed = true
-      }
+      },
     })
   }
 

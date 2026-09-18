@@ -1,6 +1,7 @@
+import { CHAT_TYPE } from '@/conversation-panel/common/enums'
 import type { ChatMessage } from '../../types'
 import { ConversationStream } from '../../../stream'
-import { chatApi, debugApi } from '../../../api'
+import { getApi } from '../../get-api'
 
 export interface StartStreamOptions {
   cid: string
@@ -40,15 +41,11 @@ export function useStreamManager() {
 
     request()
       .then((response: any) => {
-        currentStream = new ConversationStream(
-          response,
-          onStream,
-          (e) => {
-            currentStream = null
-            if (e) onFailure?.(e)
-            else onFinish?.()
-          },
-        )
+        currentStream = new ConversationStream(response, onStream, (e) => {
+          currentStream = null
+          if (e) onFailure?.(e)
+          else onFinish?.()
+        })
         currentStream.start()
       })
       .catch((e: any) => {
@@ -57,16 +54,7 @@ export function useStreamManager() {
   }
 
   const switchConversation = async (opts: SwitchOptions) => {
-    const {
-      cid,
-      loadMessages,
-      resumeStream,
-      getLastMessage,
-      onStream,
-      onFinish,
-      onFailure,
-      skipLoadMessages,
-    } = opts
+    const { cid, loadMessages, resumeStream, getLastMessage, onStream, onFinish, onFailure, skipLoadMessages } = opts
 
     // 先关闭旧流
     closeStream()
@@ -86,15 +74,11 @@ export function useStreamManager() {
         onFailure?.()
         return
       }
-      currentStream = new ConversationStream(
-        response,
-        onStream,
-        (e) => {
-          currentStream = null
-          if (e) onFailure?.()
-          else onFinish?.()
-        },
-      )
+      currentStream = new ConversationStream(response, onStream, (e) => {
+        currentStream = null
+        if (e) onFailure?.()
+        else onFinish?.()
+      })
       currentStream.start()
     } catch (e) {
       console.error('resume stream failed', e)
@@ -108,8 +92,8 @@ export function useStreamManager() {
   // 若此刻就 abort 本地流，服务端 generator 不再被消费，[DONE] 那段永远跑不到。
   const stopWorkflow = (cid: string, apiType: 'chat' | 'debug' = 'chat', applicationId?: string) => {
     if (!currentStream || !cid) return
-    const api = apiType === 'debug' ? debugApi : chatApi
-    api.cancelChat(cid, applicationId).catch(() => {})
+    const api = getApi(apiType === 'debug' ? CHAT_TYPE.DEBUG : CHAT_TYPE.CHAT)
+    api.postCancelConversationMessage(cid, applicationId).catch(() => {})
   }
 
   const cancelWorkflow = (cid: string, apiType: 'chat' | 'debug' = 'chat', applicationId?: string) => {
@@ -119,8 +103,8 @@ export function useStreamManager() {
     // debug 的 chat_id 是前端本地草稿，首发消息前服务端并不存在该会话，
     // 此时调用 cancel_chat_message 只会命中不存在的 chat_id，必须跳过。
     if (!wasStreaming || !cid) return
-    const api = apiType === 'debug' ? debugApi : chatApi
-    api.cancelChat(cid, applicationId).catch(() => {})
+    const api = getApi(apiType === 'debug' ? CHAT_TYPE.DEBUG : CHAT_TYPE.CHAT)
+    api.postCancelConversationMessage(cid, applicationId).catch(() => {})
   }
 
   return {

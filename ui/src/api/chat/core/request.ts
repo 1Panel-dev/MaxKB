@@ -1,6 +1,6 @@
 /** 提供 Chat API 的 Axios 实例与常用 HTTP 请求封装。 */
 
-import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosHeaders, type AxiosResponse, type AxiosProgressEvent, type InternalAxiosRequestConfig } from 'axios'
 import { useStore } from '@/stores'
 import type { ApiResponse } from './types'
 import type { Dict } from '@/api/types'
@@ -55,6 +55,10 @@ request.interceptors.response.use(
     return response
   },
   async (error: unknown) => {
+    if (axios.isCancel(error)) {
+      return Promise.reject(error)
+    }
+
     if (!axios.isAxiosError<ApiResponse<unknown>>(error)) {
       return Promise.reject(error)
     }
@@ -91,6 +95,41 @@ export function put<TData = unknown, T = unknown>(url: string, data?: TData, par
 /** 发送 DELETE 请求。 */
 export function del<TData = unknown, T = unknown>(url: string, params?: Dict<unknown>, data?: TData, timeout?: number) {
   return promise<T>(request.delete<ApiResponse<T>>(url, { params, data, timeout }))
+}
+
+/** 发送流式 POST 请求，返回原始 `Response` 供 SSE 读取。 */
+export function postStream(base: string, path: string, data?: unknown) {
+  const { auth, user } = useStore()
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (auth.token) {
+    headers['Authorization'] = `Bearer ${auth.token}`
+  }
+  if (user.language) {
+    headers['Accept-Language'] = user.language
+  }
+  return fetch(`${base}${path.startsWith('/') ? path : `/${path}`}`, {
+    method: 'POST',
+    headers,
+    body: data === undefined ? undefined : JSON.stringify(data),
+  })
+}
+
+/** 上传文件，支持进度回调与取消，响应统一解包。 */
+export function postUpload<T = unknown>(url: string, data: FormData, onProgress?: (percent: number, event: AxiosProgressEvent) => void) {
+  const controller = new AbortController()
+  const uploadRequest = promise<T>(
+    request.post<ApiResponse<T>>(url, data, {
+      signal: controller.signal,
+      onUploadProgress: onProgress
+        ? (event) => {
+            if (event.total && event.total > 0) {
+              onProgress(Math.min(100, Math.max(0, Math.round((event.loaded / event.total) * 100))), event)
+            }
+          }
+        : undefined,
+    }),
+  )
+  return { request: uploadRequest, abort: () => controller.abort() }
 }
 
 export default request

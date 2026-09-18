@@ -1,12 +1,13 @@
 # API 目录说明
 
-`src/api` 负责前端与服务端之间的通信，按照应用入口隔离 Admin 与 Chat 请求体系。当前只实现
-Admin API；Chat 目录作为独立体系预留。
+`src/api` 负责前端与服务端之间的通信，按照应用入口隔离 Admin 与 Chat 请求体系。
+Admin 与 Chat 分别维护请求客户端和业务接口。
 
 ```text
 src/api/
 ├── constants.ts                     # Admin 与 Chat 的 API base 路径常量
 ├── admin/
+│   ├── file.ts                       # 通用文件上传、进度与取消
 │   ├── auth/                         # Admin 登录认证与当前用户接口
 │   │   └── types.ts                  # 认证 API 与认证 Store 共用类型
 │   ├── core/                         # Admin 请求基础能力
@@ -18,6 +19,7 @@ src/api/
 │   │   ├── shared-resources/         # System 共享资源接口
 │   │   └── <resource>.ts             # 其他 System 单资源接口
 │   ├── workspace/                    # 工作空间业务接口
+│   │   ├── conversation.ts           # 调试对话、历史会话与语音接口
 │   │   ├── application/              # 智能体接口
 │   │   ├── knowledge/                # 知识库接口
 │   │   ├── model/                    # 模型接口
@@ -25,8 +27,12 @@ src/api/
 │   │   ├── tool/                     # 工具、工具工作流及工具商店接口
 │   │   └── <resource>.ts             # 工作空间公共资源接口
 │   └── provider.ts                   # Workspace 与 System 共用的模型供应商接口
-├── chat/                             # Chat 独立请求体系，当前预留
-│   └── README.md                     # Chat API 边界与后续实现说明
+├── chat/                             # Chat 独立请求体系
+│   ├── core/request.ts               # JSON 与流式请求
+│   ├── core/types.ts                 # Chat 请求协议类型
+│   ├── file.ts                       # Chat 文件上传、进度与取消
+│   ├── conversation.ts               # 正式对话、历史会话与语音接口
+│   └── README.md                     # Chat API 边界说明
 ├── enums/                            # 后端固定枚举值
 │   ├── index.ts                      # API 枚举值的唯一导入入口
 │   └── <domain>.ts                   # 按明确业务域拆分的枚举值
@@ -342,3 +348,31 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 `getRanking` 与 `exportRanking` 通过 `HomeRankingKind` 选择后端排行路径，名称及起止日期
 筛选保持一致；分页使用 `ParamsPage` 与 `ResponsePage`。导出沿用 `getExportFile`。
 工作空间总量接口返回数值，不与 System 首页的对象响应混用。
+
+### 对话面板接口
+
+`admin/workspace/conversation.ts` 集中维护调试对话的打开、发送、取消、续传、历史会话、
+记录分页、删除、修改和语音识别接口，保留可选 `applicationId` 对历史资源范围的选择。
+其中 `postSpeechToText(applicationId, data)` 请求指定智能体的
+`/workspace/<workspaceId>/application/<applicationId>/speech_to_text`，loading 由调用方管理。
+`chat/conversation.ts` 维护正式对话对应的接口。两者使用各自 `core/request.ts` 的请求方法；
+`postStream` 返回原始 `Response`，由 `conversation-panel/stream.ts` 解析。
+
+面板内部的 `conversation-panel/common/get-api.ts` 通过 `ChatType` 选择完整 API 对象，
+仅负责模式判断，不声明 URL 或发送请求；固定模式的 Store 直接导入对应业务 API。
+面板模式值统一维护在 `conversation-panel/common/enums.ts` 的 `CHAT_TYPE`，
+`common/types.ts` 中的 `ChatType` 从该对象派生。
+
+### 通用文件上传
+
+`admin/file.ts` 与 `chat/file.ts` 分别提供 `postUploadFile(file, sourceId, sourceType, onProgress?)`，
+通过各自请求客户端向 `/oss/file` 提交 FormData 的 `file`、`source_id` 和 `source_type`。
+返回值统一为 `{ request, abort }`，`request` 解包得到文件地址，`abort()` 中断客户端请求。
+普通上传直接等待 `request`，需要进度时传入 `(percent, event)`；只有能获取上传总量时才回调
+0–100 的百分比，100 表示请求体已上传，不代表服务端处理成功，完成状态以 `request` 为准。
+取消时 Promise 仍拒绝，由调用方处理状态，请求层不弹出通用错误提示；loading 由调用方在
+`finally` 中恢复。
+
+资源类型使用 `@/api/enums` 的 `FILE_SOURCE_TYPE` 与 `@/api/types` 的 `FileSourceType`，
+包括知识库、智能体、工具、文档、对话及三种临时文件有效期。对话 Store 使用
+`FILE_SOURCE_TYPE.CHAT` 调用对应 File API，对话 API 不再维护上传接口。
