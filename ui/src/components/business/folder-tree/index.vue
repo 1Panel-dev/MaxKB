@@ -82,10 +82,17 @@ const sortOptions: { label: string; value: FolderSort; divided?: boolean }[] = [
   { label: '按创建时间降序', value: FOLDER_SORT.CREATE_TIME_DESC },
   { label: '按名称升序', value: FOLDER_SORT.NAME_ASC, divided: true },
   { label: '按名称降序', value: FOLDER_SORT.NAME_DESC },
-  { label: '按用户拖拽排序', value: FOLDER_SORT.CUSTOM, divided: true },
+  { label: '按拖拽排序', value: FOLDER_SORT.CUSTOM, divided: true },
 ]
 
 const currentSort = ref<FolderSort>(FOLDER_SORT.CREATE_TIME_DESC)
+const currentSortIcon = computed(() => {
+  if (currentSort.value === FOLDER_SORT.CUSTOM) return 'icon_drag_outlined'
+  if (currentSort.value === FOLDER_SORT.CREATE_TIME_ASC || currentSort.value === FOLDER_SORT.NAME_ASC) {
+    return 'icon_sort-a-to-z_outlined'
+  }
+  return 'icon_sort-z-to-a_outlined'
+})
 
 const sortTreeData = computed(() => {
   return sortFolders(folderTreeData.value, FOLDER_ENTRY_ID.ALL)
@@ -354,8 +361,9 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
     <div class="flex shrink-0 items-center gap-2 px-4 pb-2">
       <MkSearchInput v-model="searchKeyword" class="min-w-0 flex-1" />
       <MkDropdown trigger="click" placement="bottom-end">
+        <!-- 选择文件夹排序方式 -->
         <el-button plain class="shrink-0 min-w-8! w-8!">
-          <MkIcon name="icon_moments-categories_outlined" />
+          <MkIcon :name="currentSortIcon" />
         </el-button>
         <template #dropdown>
           <MkDropdownMenu class="w-48">
