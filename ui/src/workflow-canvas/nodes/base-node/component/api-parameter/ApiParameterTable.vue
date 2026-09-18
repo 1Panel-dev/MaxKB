@@ -39,12 +39,13 @@ function deleteField(index: number) {
   <div class="w-full">
     <div class="flex-between">
       <span>接口传参</span>
+      <!-- 添加接口参数 -->
       <el-button text type="primary" @click="openDialog()"><MkIcon name="icon_add_outlined" /></el-button>
     </div>
     <MkTable
       class="mt-2 border"
       v-if="inputFields.length"
-      :datav-model:data="inputFields"
+      v-model:data="inputFields"
       sortable
       size="small"
       row-key="variable"
