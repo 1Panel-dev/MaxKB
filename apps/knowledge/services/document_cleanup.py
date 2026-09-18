@@ -6,6 +6,7 @@ from django.db import transaction
 from django.db.models import QuerySet
 
 from knowledge.models import (
+    ContentOrigin,
     Document,
     DocumentTag,
     File,
@@ -14,7 +15,7 @@ from knowledge.models import (
     Problem,
     ProblemParagraphMapping,
 )
-from knowledge.task.embedding import delete_embedding_by_document_list
+from knowledge.task.embedding import delete_embedding_by_document_list, delete_embedding_by_paragraph_ids
 
 
 def _delete_problems_and_mappings(paragraph_ids: list[str]) -> None:
@@ -27,6 +28,24 @@ def _delete_problems_and_mappings(paragraph_ids: list[str]) -> None:
         QuerySet(ProblemParagraphMapping).filter(problem_id__in=problem_ids).values_list("problem_id", flat=True)
     )
     QuerySet(Problem).filter(id__in=problem_ids - remaining_problem_ids).delete()
+
+
+def delete_synced_paragraph_data(document_id, paragraph_ids: Iterable[str]) -> list[str]:
+    """Delete missing source paragraphs inside the caller's document-sync transaction.
+
+    Asset rows cascade with paragraphs. Keep the underlying files, which may also
+    be referenced by retained paragraphs or other documents.
+    """
+    paragraphs = QuerySet(Paragraph).filter(
+        document_id=document_id, id__in=list(paragraph_ids), origin=ContentOrigin.SYNCED
+    )
+    existing_ids = [str(paragraph_id) for paragraph_id in paragraphs.values_list("id", flat=True)]
+    if not existing_ids:
+        return []
+    _delete_problems_and_mappings(existing_ids)
+    delete_embedding_by_paragraph_ids(existing_ids)
+    paragraphs.delete()
+    return existing_ids
 
 
 @transaction.atomic

@@ -18,6 +18,7 @@ from knowledge.models import (
     ProblemParagraphMapping,
     SyncState,
 )
+from knowledge.services.document_cleanup import delete_synced_paragraph_data
 from knowledge.services.document_strategy import (
     document_source_hash,
     normalize_document_strategy,
@@ -65,6 +66,7 @@ class MergeResult:
     created_ids: List[str] = field(default_factory=list)
     updated_ids: List[str] = field(default_factory=list)
     disabled_ids: List[str] = field(default_factory=list)
+    deleted_ids: List[str] = field(default_factory=list)
     conflict_ids: List[str] = field(default_factory=list)
     unchanged_ids: List[str] = field(default_factory=list)
 
@@ -74,15 +76,35 @@ class MergeResult:
 
 
 class IncrementalDocumentSync:
-    def __init__(self, document: Document, strategy: Optional[Dict] = None):
+    def __init__(self, document: Document, strategy: Optional[Dict] = None, *, source_authoritative: bool = False):
         self.document = document
         self.strategy = normalize_document_strategy(strategy if strategy is not None else document.doc_strategy)
+        # Lark follows source updates/deletes; other connectors retain three-way conflict handling.
+        # Neither policy may overwrite manually created paragraphs.
+        self.source_authoritative = source_authoritative
 
     @staticmethod
     def _snapshot(item: Dict) -> Dict:
         return {"title": item.get("title") or "", "content": item.get("content") or ""}
 
     def _match(self, remote: Dict, unmatched: List[Paragraph]) -> Optional[Paragraph]:
+        unmatched = [p for p in unmatched if p.origin == ContentOrigin.SYNCED]
+        if self.source_authoritative:
+            by_hash = next(
+                (
+                    p
+                    for p in unmatched
+                    if (p.source_hash or paragraph_hash(p.title, p.content)) == remote["source_hash"]
+                ),
+                None,
+            )
+            if by_hash is not None:
+                return by_hash
+            by_title = [p for p in unmatched if _normalized_title(p.title) == _normalized_title(remote["title"])]
+            # Repeated headings are paired in source order after unchanged chunks are reserved.
+            return next(
+                (p for p in by_title if p.source_key == remote["source_key"]), by_title[0] if by_title else None
+            )
         exact = next((p for p in unmatched if p.source_key and p.source_key == remote["source_key"]), None)
         if exact:
             return exact
@@ -98,6 +120,51 @@ class IncrementalDocumentSync:
         return None
 
     def _merge_matched(self, paragraph: Paragraph, remote: Dict, result: MergeResult):
+        if self.source_authoritative:
+            # An unchanged source chunk must not overwrite a user's local edits.
+            if (paragraph.source_hash or paragraph_hash(paragraph.title, paragraph.content)) == remote[
+                "source_hash"
+            ] and paragraph.sync_state != SyncState.REMOTE_DELETED:
+                updated_fields = []
+                if paragraph.source_key != remote["source_key"]:
+                    paragraph.source_key = remote["source_key"]
+                    updated_fields.append("source_key")
+                old_split = normalize_document_strategy(self.document.doc_strategy)["split"]
+                if old_split["child_length"] != self.strategy["split"]["child_length"]:
+                    paragraph.chunks = text_to_chunk(paragraph.content, self.strategy["split"]["child_length"])
+                    updated_fields.append("chunks")
+                    result.updated_ids.append(str(paragraph.id))
+                else:
+                    result.unchanged_ids.append(str(paragraph.id))
+                if updated_fields:
+                    paragraph.save(update_fields=[*updated_fields, "update_time"])
+                return
+            paragraph.title, paragraph.content = remote["title"], remote["content"]
+            paragraph.chunks = text_to_chunk(paragraph.content, self.strategy["split"]["child_length"])
+            paragraph.source_key = remote["source_key"]
+            paragraph.source_hash = remote["source_hash"]
+            paragraph.source_snapshot = self._snapshot(remote)
+            paragraph.source_updated_at = remote.get("source_updated_at")
+            paragraph.local_state = LocalState.CLEAN
+            paragraph.sync_state = SyncState.ACTIVE
+            paragraph.is_active = True
+            paragraph.save(
+                update_fields=[
+                    "title",
+                    "content",
+                    "chunks",
+                    "source_key",
+                    "source_hash",
+                    "source_snapshot",
+                    "source_updated_at",
+                    "local_state",
+                    "sync_state",
+                    "is_active",
+                    "update_time",
+                ]
+            )
+            result.updated_ids.append(str(paragraph.id))
+            return
         base = paragraph.source_snapshot or {"title": paragraph.title, "content": paragraph.content}
         local = {"title": paragraph.title or "", "content": paragraph.content or ""}
         incoming = self._snapshot(remote)
@@ -170,6 +237,11 @@ class IncrementalDocumentSync:
         return paragraph
 
     def _handle_remote_deletes(self, unmatched: List[Paragraph], result: MergeResult):
+        if self.source_authoritative:
+            missing_ids = [p.id for p in unmatched if p.origin == ContentOrigin.SYNCED]
+            if missing_ids:
+                result.deleted_ids.extend(delete_synced_paragraph_data(self.document.id, missing_ids))
+            return
         for paragraph in unmatched:
             if paragraph.origin != ContentOrigin.SYNCED:
                 continue
@@ -203,6 +275,8 @@ class IncrementalDocumentSync:
         auto_mappings = ProblemParagraphMapping.objects.filter(
             document_id=self.document.id, meta__index_source="paragraph_title"
         )
+        if self.source_authoritative:
+            auto_mappings = auto_mappings.filter(paragraph__origin=ContentOrigin.SYNCED)
         if not self.strategy["index"]["title_as_question"]:
             problem_ids = list(auto_mappings.values_list("problem_id", flat=True))
             auto_mappings.delete()
@@ -244,17 +318,49 @@ class IncrementalDocumentSync:
             for paragraph in existing
         ):
             raise ValueError("Remote synchronization returned an empty paragraph snapshot")
-        unmatched = list(existing)
+        unmatched = [paragraph for paragraph in existing if paragraph.origin == ContentOrigin.SYNCED]
         ordered_synced, result = [], MergeResult()
-        for remote in remote_list:
-            paragraph = self._match(remote, unmatched)
+        matches = [None] * len(remote_list)
+        if self.source_authoritative:
+            # Reserve every unchanged chunk before matching changed chunks by title. Otherwise
+            # an inserted chunk under a repeated heading could consume an unchanged old chunk.
+            for index, remote in enumerate(remote_list):
+                paragraph = next(
+                    (
+                        p
+                        for p in unmatched
+                        if (p.source_hash or paragraph_hash(p.title, p.content)) == remote["source_hash"]
+                    ),
+                    None,
+                )
+                if paragraph is not None:
+                    matches[index] = paragraph
+                    unmatched.remove(paragraph)
+        for index, remote in enumerate(remote_list):
+            if matches[index] is None:
+                paragraph = self._match(remote, unmatched)
+                if paragraph is not None:
+                    matches[index] = paragraph
+                    unmatched.remove(paragraph)
+
+        if self.source_authoritative:
+            self._handle_remote_deletes(unmatched, result)
+            # Release changing keys together before a heading reorder swaps unique source keys.
+            rekey_ids = [
+                paragraph.id
+                for remote, paragraph in zip(remote_list, matches)
+                if paragraph is not None and paragraph.source_key != remote["source_key"]
+            ]
+            if rekey_ids:
+                Paragraph.objects.filter(document=self.document, id__in=rekey_ids).update(source_key="")
+        for remote, paragraph in zip(remote_list, matches):
             if paragraph is None:
                 paragraph = self._create(remote, result)
             else:
-                unmatched.remove(paragraph)
                 self._merge_matched(paragraph, remote, result)
             ordered_synced.append(paragraph)
-        self._handle_remote_deletes(unmatched, result)
+        if not self.source_authoritative:
+            self._handle_remote_deletes(unmatched, result)
         self._reorder(ordered_synced, existing)
         self._sync_title_questions(ordered_synced)
 
@@ -264,9 +370,10 @@ class IncrementalDocumentSync:
             or self.document.visual_strategy_hash != hashes["visual_strategy_hash"]
             or self.document.index_strategy_hash != hashes["index_strategy_hash"]
         ):
-            for paragraph_id in Paragraph.objects.filter(document=self.document, is_active=True).values_list(
-                "id", flat=True
-            ):
+            active_paragraphs = Paragraph.objects.filter(document=self.document, is_active=True)
+            if self.source_authoritative:
+                active_paragraphs = active_paragraphs.filter(origin=ContentOrigin.SYNCED)
+            for paragraph_id in active_paragraphs.values_list("id", flat=True):
                 value = str(paragraph_id)
                 if value not in result.reembed_ids:
                     result.updated_ids.append(value)

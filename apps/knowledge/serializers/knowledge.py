@@ -150,14 +150,22 @@ class KnowledgeEditRequest(serializers.Serializer):
 
     def is_valid(self, *, knowledge: Knowledge = None):
         super().is_valid(raise_exception=True)
-        if "doc_strategy" in self.data and knowledge.type != KnowledgeType.WEB:
-            raise serializers.ValidationError(
-                {"doc_strategy": _("Document strategy settings only support Web knowledge")}
-            )
-        if "meta" in self.data and self.data.get("meta") is not None:
+        if knowledge.type != KnowledgeType.WEB:
+            if self.validated_data.get("doc_strategy") is not None:
+                raise serializers.ValidationError(
+                    {
+                        "doc_strategy": _(
+                            "Knowledge-base-level default document processing strategies are only supported for Web knowledge bases. "
+                            "Configure document-level strategies through the document import or synchronization API."
+                        )
+                    }
+                )
+            # Non-Web detail responses contain null; do not treat it as a strategy update.
+            self.validated_data.pop("doc_strategy", None)
+        if "meta" in self.validated_data and self.validated_data.get("meta") is not None:
             knowledge_meta_valid_map = self.get_knowledge_meta_valid_map()
             valid_class = knowledge_meta_valid_map.get(knowledge.type)
-            meta_serializer = valid_class(data=self.data.get("meta"))
+            meta_serializer = valid_class(data=self.validated_data.get("meta"))
             meta_serializer.is_valid(raise_exception=True)
             self._validated_data["meta"] = meta_serializer.validated_data
 
@@ -520,7 +528,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 knowledge.desc = instance.get("desc")
             if "meta" in instance:
                 knowledge.meta = validated_data.get("meta")
-            if "doc_strategy" in instance:
+            if "doc_strategy" in validated_data:
                 knowledge.meta = {
                     **(knowledge.meta or {}),
                     "doc_strategy": normalize_document_strategy(validated_data.get("doc_strategy")),

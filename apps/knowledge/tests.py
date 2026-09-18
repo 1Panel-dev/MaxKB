@@ -49,6 +49,7 @@ from knowledge.serializers.knowledge_sync import (
 )
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer, finalize_knowledge_action
 from knowledge.serializers.problem import ProblemInstanceSerializer, ProblemSerializer
+from knowledge.services.document_cleanup import delete_synced_paragraph_data
 from knowledge.services.document_strategy import (
     apply_length_strategy,
     document_source_hash,
@@ -669,10 +670,15 @@ class WebDocumentStrategyRequestTests(SimpleTestCase):
         self.assertEqual(serializer.validated_data["doc_strategy"]["split"]["max_length"], 2048)
 
     def test_non_web_knowledge_rejects_document_strategy_settings(self):
-        serializer = KnowledgeEditRequest(data={"doc_strategy": {"split": {"max_length": 2048}}})
+        for knowledge_type in KnowledgeType:
+            if knowledge_type == KnowledgeType.WEB:
+                continue
+            for strategy in ({}, {"split": {"max_length": 2048}}):
+                with self.subTest(knowledge_type=knowledge_type, strategy=strategy):
+                    serializer = KnowledgeEditRequest(data={"doc_strategy": strategy})
 
-        with self.assertRaises(ValidationError):
-            serializer.is_valid(knowledge=MagicMock(type=KnowledgeType.BASE))
+                    with self.assertRaises(ValidationError):
+                        serializer.is_valid(knowledge=MagicMock(type=knowledge_type))
 
     def test_knowledge_sync_type_supports_all_three_modes(self):
         field = KnowledgeSerializer.SyncWeb().fields["sync_type"]
@@ -797,6 +803,61 @@ class WebDocumentStrategyRequestTests(SimpleTestCase):
         handler(MagicMock(tag=None, url="https://example.com/docs"), MagicMock(status=200, content="updated"))
 
         delete_document_data.assert_not_called()
+
+
+class KnowledgeModelUpdateTests(SimpleTestCase):
+    @patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge")
+    @patch("knowledge.serializers.knowledge.QuerySet")
+    def test_model_update_preserves_meta_when_strategy_is_omitted_or_inapplicable_null(self, query_set, update_mapping):
+        knowledge_id = "00000000-0000-0000-0000-000000000011"
+        model_id = "00000000-0000-0000-0000-000000000012"
+        for knowledge_type in KnowledgeType:
+            payloads = [{"embedding_model_id": model_id}]
+            if knowledge_type != KnowledgeType.WEB:
+                payloads.append({"embedding_model_id": model_id, "doc_strategy": None})
+            for payload in payloads:
+                with self.subTest(knowledge_type=knowledge_type, payload=payload):
+                    original_meta = {"sync_setting": {"enabled": True}}
+                    if knowledge_type == KnowledgeType.WEB:
+                        original_meta["doc_strategy"] = normalize_document_strategy({"split": {"max_length": 1024}})
+                    knowledge = MagicMock(id=knowledge_id, type=knowledge_type, meta=original_meta.copy())
+                    query_set.return_value.get.return_value = knowledge
+                    operation = KnowledgeSerializer.Operate(
+                        data={
+                            "user_id": "00000000-0000-0000-0000-000000000013",
+                            "workspace_id": "workspace-id",
+                            "knowledge_id": knowledge_id,
+                        }
+                    )
+
+                    # Exercise the edit path with mocked persistence, without opening a database transaction.
+                    KnowledgeSerializer.Operate.edit.__wrapped__(operation, payload, select_one=False)
+
+                    self.assertEqual(knowledge.embedding_model_id, model_id)
+                    self.assertEqual(knowledge.meta, original_meta)
+                    knowledge.save.assert_called_once_with()
+                    update_mapping.assert_called_with(knowledge_id)
+
+    @patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge")
+    @patch("knowledge.serializers.knowledge.QuerySet")
+    def test_web_knowledge_explicit_null_strategy_still_resets_to_defaults(self, query_set, _update_mapping):
+        knowledge = MagicMock(
+            type=KnowledgeType.WEB,
+            meta={"selector": "body", "doc_strategy": {"split": {"max_length": 1024}}},
+        )
+        query_set.return_value.get.return_value = knowledge
+        operation = KnowledgeSerializer.Operate(
+            data={
+                "user_id": "00000000-0000-0000-0000-000000000013",
+                "workspace_id": "workspace-id",
+                "knowledge_id": "00000000-0000-0000-0000-000000000011",
+            }
+        )
+
+        KnowledgeSerializer.Operate.edit.__wrapped__(operation, {"doc_strategy": None}, select_one=False)
+
+        self.assertEqual(knowledge.meta, {"selector": "body", "doc_strategy": normalize_document_strategy(None)})
+        knowledge.save.assert_called_once_with()
 
 
 class WebKnowledgeSyncTaskTests(SimpleTestCase):
@@ -1195,6 +1256,217 @@ class WebImageAssetTests(SimpleTestCase):
 
 
 class IncrementalSyncTests(SimpleTestCase):
+    def test_manual_paragraphs_never_match_remote_keys_hashes_or_titles(self):
+        service = IncrementalDocumentSync(Document())
+        remote = prepare_remote_paragraphs([{"title": "Title", "content": "remote"}])[0]
+        for fields in (
+            {"source_key": remote["source_key"]},
+            {"source_hash": remote["source_hash"]},
+            {},
+        ):
+            with self.subTest(fields=fields):
+                manual = Paragraph(title="Title", content="manual", position=1, origin=ContentOrigin.MANUAL, **fields)
+                self.assertIsNone(service._match(remote, [manual]))
+
+    def test_source_authoritative_update_overwrites_changed_imported_content(self):
+        service = IncrementalDocumentSync(Document(), source_authoritative=True)
+        paragraph = Paragraph(
+            title="Title",
+            content="local edit",
+            source_hash="old",
+            source_snapshot={"title": "Title", "content": "base"},
+            origin=ContentOrigin.SYNCED,
+            local_state=LocalState.MODIFIED,
+            hit_num=7,
+        )
+        original_id = paragraph.id
+        paragraph.save = MagicMock()
+        remote = prepare_remote_paragraphs([{"title": "Title", "content": "remote edit"}])[0]
+        result = MergeResult()
+
+        service._merge_matched(paragraph, remote, result)
+
+        self.assertEqual(paragraph.id, original_id)
+        self.assertEqual(paragraph.hit_num, 7)
+        self.assertEqual(paragraph.content, "remote edit")
+        self.assertEqual(paragraph.source_hash, remote["source_hash"])
+        self.assertEqual(paragraph.local_state, LocalState.CLEAN)
+        self.assertEqual(paragraph.sync_state, SyncState.ACTIVE)
+        self.assertEqual(result.updated_ids, [str(original_id)])
+        self.assertEqual(result.conflict_ids, [])
+
+    def test_source_authoritative_matches_titles_without_position_limit(self):
+        service = IncrementalDocumentSync(Document(), source_authoritative=True)
+        paragraph = Paragraph(title="Title", content="old", position=20, origin=ContentOrigin.SYNCED)
+        remote = prepare_remote_paragraphs([{"title": "Title", "content": "new"}])[0]
+
+        self.assertIs(service._match(remote, [paragraph]), paragraph)
+
+    def test_source_authoritative_new_title_does_not_reuse_an_old_key(self):
+        service = IncrementalDocumentSync(Document(), source_authoritative=True)
+        paragraph = Paragraph(title="Old", content="old", source_key="block-1", origin=ContentOrigin.SYNCED)
+        remote = prepare_remote_paragraphs([{"title": "New", "content": "new", "source_key": "block-1"}])[0]
+
+        self.assertIsNone(service._match(remote, [paragraph]))
+
+    @patch("knowledge.services.incremental_sync.Paragraph.objects")
+    @patch("knowledge.services.incremental_sync.Document.objects")
+    def test_source_authoritative_reserves_unchanged_duplicate_headings_before_updates(self, documents, paragraphs):
+        strategy = normalize_document_strategy(None)
+        document = Document(doc_strategy=strategy, sync_version=1, **strategy_hashes(strategy))
+        document.save = MagicMock()
+        originals = prepare_remote_paragraphs(
+            [
+                {"title": "Title", "content": "first"},
+                {"title": "Title", "content": "second"},
+            ]
+        )
+        first, second = [
+            Paragraph(
+                title=item["title"],
+                content=item["content"],
+                source_key=item["source_key"],
+                source_hash=item["source_hash"],
+                origin=ContentOrigin.SYNCED,
+            )
+            for item in originals
+        ]
+        first.save, second.save = MagicMock(), MagicMock()
+        documents.select_for_update.return_value.get.return_value = document
+        paragraphs.select_for_update.return_value.filter.return_value.order_by.return_value = [first, second]
+        service = IncrementalDocumentSync(document, source_authoritative=True)
+        with patch.object(service, "_reorder"), patch.object(service, "_sync_title_questions"):
+            result = IncrementalDocumentSync.merge.__wrapped__(
+                service,
+                [
+                    {"title": "Title", "content": "changed"},
+                    {"title": "Title", "content": "first"},
+                ],
+            )
+
+        self.assertEqual(result.unchanged_ids, [str(first.id)])
+        self.assertEqual(result.updated_ids, [str(second.id)])
+        self.assertEqual(first.content, "first")
+        self.assertEqual(second.content, "changed")
+        self.assertEqual(first.source_key, originals[1]["source_key"])
+        self.assertEqual(second.source_key, originals[0]["source_key"])
+        paragraphs.filter.assert_called_once_with(document=document, id__in=[second.id, first.id])
+        paragraphs.filter.return_value.update.assert_called_once_with(source_key="")
+        paragraphs.create.assert_not_called()
+
+    def test_source_authoritative_unchanged_chunk_preserves_local_content(self):
+        service = IncrementalDocumentSync(Document(), source_authoritative=True)
+        remote = prepare_remote_paragraphs([{"title": "Title", "content": "base"}])[0]
+        paragraph = Paragraph(
+            title="Title",
+            content="local edit",
+            source_key=remote["source_key"],
+            source_hash=remote["source_hash"],
+            origin=ContentOrigin.SYNCED,
+            local_state=LocalState.MODIFIED,
+        )
+        paragraph.save = MagicMock()
+        result = MergeResult()
+
+        service._merge_matched(paragraph, remote, result)
+
+        self.assertEqual(paragraph.content, "local edit")
+        paragraph.save.assert_not_called()
+        self.assertEqual(result.unchanged_ids, [str(paragraph.id)])
+
+    def test_source_authoritative_custom_child_length_rechunks_unchanged_content(self):
+        service = IncrementalDocumentSync(
+            Document(doc_strategy=normalize_document_strategy(None)),
+            {"split": {"child_length": 50}},
+            source_authoritative=True,
+        )
+        remote = prepare_remote_paragraphs([{"title": "Title", "content": "x" * 120}])[0]
+        paragraph = Paragraph(
+            title="Title",
+            content="x" * 120,
+            source_hash=remote["source_hash"],
+            chunks=["x" * 120],
+            origin=ContentOrigin.SYNCED,
+        )
+        paragraph.save = MagicMock()
+        result = MergeResult()
+
+        service._merge_matched(paragraph, remote, result)
+
+        self.assertGreater(len(paragraph.chunks), 1)
+        self.assertEqual("".join(paragraph.chunks), paragraph.content)
+        self.assertEqual(result.updated_ids, [str(paragraph.id)])
+
+    @patch("knowledge.services.incremental_sync.delete_synced_paragraph_data")
+    def test_source_authoritative_deletes_missing_imported_but_not_manual_paragraphs(self, cleanup):
+        document = Document()
+        service = IncrementalDocumentSync(document, source_authoritative=True)
+        synced = Paragraph(origin=ContentOrigin.SYNCED)
+        edited = Paragraph(origin=ContentOrigin.SYNCED, local_state=LocalState.MODIFIED)
+        manual = Paragraph(origin=ContentOrigin.MANUAL)
+        cleanup.return_value = [str(synced.id), str(edited.id)]
+        result = MergeResult()
+
+        service._handle_remote_deletes([synced, manual, edited], result)
+
+        cleanup.assert_called_once_with(document.id, [synced.id, edited.id])
+        self.assertEqual(result.deleted_ids, cleanup.return_value)
+        self.assertEqual(result.disabled_ids, [])
+        self.assertEqual(result.conflict_ids, [])
+
+    @patch("knowledge.services.incremental_sync.delete_synced_paragraph_data")
+    def test_three_way_policy_still_retains_remote_deleted_paragraphs(self, cleanup):
+        synced = Paragraph(origin=ContentOrigin.SYNCED)
+        synced.save = MagicMock()
+        result = MergeResult()
+
+        IncrementalDocumentSync(Document())._handle_remote_deletes([synced], result)
+
+        cleanup.assert_not_called()
+        self.assertFalse(synced.is_active)
+        self.assertEqual(synced.sync_state, SyncState.REMOTE_DELETED)
+        self.assertEqual(result.disabled_ids, [str(synced.id)])
+
+    @patch("knowledge.services.incremental_sync.delete_synced_paragraph_data")
+    @patch("knowledge.services.incremental_sync.Paragraph.objects")
+    @patch("knowledge.services.incremental_sync.Document.objects")
+    def test_authoritative_empty_snapshot_does_not_delete_existing_content(self, documents, paragraphs, cleanup):
+        document = Document()
+        documents.select_for_update.return_value.get.return_value = document
+        paragraphs.select_for_update.return_value.filter.return_value.order_by.return_value = [
+            Paragraph(origin=ContentOrigin.SYNCED),
+        ]
+        service = IncrementalDocumentSync(document, source_authoritative=True)
+
+        with self.assertRaisesRegex(ValueError, "empty paragraph snapshot"):
+            IncrementalDocumentSync.merge.__wrapped__(service, [])
+
+        cleanup.assert_not_called()
+
+    @patch("knowledge.services.incremental_sync.Paragraph.objects")
+    @patch("knowledge.services.incremental_sync.Document.objects")
+    def test_authoritative_merge_keeps_manual_content_and_saves_new_strategy(self, documents, paragraphs):
+        document = Document(knowledge=Knowledge(), doc_strategy=normalize_document_strategy(None), sync_version=1)
+        document.save = MagicMock()
+        manual = Paragraph(title="Title", content="manual", origin=ContentOrigin.MANUAL)
+        manual.save = MagicMock()
+        documents.select_for_update.return_value.get.return_value = document
+        paragraphs.select_for_update.return_value.filter.return_value.order_by.return_value = [manual]
+        created = Paragraph(title="Title", content="remote", origin=ContentOrigin.SYNCED)
+        paragraphs.create.return_value = created
+        active = paragraphs.filter.return_value.filter.return_value
+        active.values_list.return_value = [created.id]
+        service = IncrementalDocumentSync(document, {"split": {"child_length": 50}}, source_authoritative=True)
+        with patch.object(service, "_reorder"), patch.object(service, "_sync_title_questions"):
+            result = IncrementalDocumentSync.merge.__wrapped__(service, [{"title": "Title", "content": "remote"}])
+
+        self.assertEqual(result.created_ids, [str(created.id)])
+        self.assertEqual(manual.content, "manual")
+        manual.save.assert_not_called()
+        paragraphs.filter.return_value.filter.assert_called_once_with(origin=ContentOrigin.SYNCED)
+        self.assertEqual(document.doc_strategy["split"]["child_length"], 50)
+        self.assertEqual(document.sync_version, 2)
+
     def test_fallback_source_key_survives_content_change(self):
         first = prepare_remote_paragraphs([{"title": "Overview", "content": "v1"}])
         second = prepare_remote_paragraphs([{"title": "Overview", "content": "v2"}])
@@ -1307,6 +1579,36 @@ class IncrementalSyncTests(SimpleTestCase):
 
         incremental_sync.assert_not_called()
         document.save.assert_called_once_with(update_fields=["last_sync_time", "update_time"])
+
+
+class SyncedParagraphCleanupTests(SimpleTestCase):
+    @patch("knowledge.services.document_cleanup.delete_embedding_by_paragraph_ids")
+    @patch("knowledge.services.document_cleanup.QuerySet")
+    def test_cleanup_is_scoped_and_preserves_shared_problems(self, query_set, delete_vectors):
+        paragraph_query, mapping_query, problem_query = MagicMock(), MagicMock(), MagicMock()
+        query_set.side_effect = lambda model: {
+            Paragraph: paragraph_query,
+            ProblemParagraphMapping: mapping_query,
+            Problem: problem_query,
+        }[model]
+        paragraph_query.filter.return_value.values_list.return_value = ["synced-id"]
+        removed_mappings, remaining_mappings = MagicMock(), MagicMock()
+        mapping_query.filter.side_effect = [removed_mappings, remaining_mappings]
+        removed_mappings.values_list.return_value = ["shared-problem", "orphan-problem"]
+        remaining_mappings.values_list.return_value = ["shared-problem"]
+
+        result = delete_synced_paragraph_data("doc-id", ["synced-id", "manual-id", "other-doc-id"])
+
+        paragraph_query.filter.assert_called_once_with(
+            document_id="doc-id",
+            id__in=["synced-id", "manual-id", "other-doc-id"],
+            origin=ContentOrigin.SYNCED,
+        )
+        removed_mappings.delete.assert_called_once()
+        problem_query.filter.assert_called_once_with(id__in={"orphan-problem"})
+        delete_vectors.assert_called_once_with(["synced-id"])
+        paragraph_query.filter.return_value.delete.assert_called_once()
+        self.assertEqual(result, ["synced-id"])
 
 
 class ParagraphAssetTests(SimpleTestCase):
