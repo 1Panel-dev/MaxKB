@@ -42,9 +42,11 @@ function handleOpenToolForm() {
 function handleFormClosed() {
   formMounted.value = false
 }
+defineExpose({ handleOpenToolForm })
 </script>
 
 <template>
+  <!-- 编辑工具 -->
   <MkDropdownItem @click="handleOpenToolForm">
     <template #icon><MkIcon name="icon_edit_outlined" /></template>
     <span>{{ label }}</span>

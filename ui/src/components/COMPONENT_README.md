@@ -191,6 +191,11 @@ Symbol ID 变化时同步引用。
 智能体无自定义图标时回退默认图标；知识库兼容数字和字符串类型，通过 `KNOWLEDGE_TYPE_MAP`
 映射，未知类型回退默认。触发器 `SCHEDULED` 使用定时图标，其他类型使用事件图标。
 
+`LoadingIcon` 位于 `global/mk-icon/LoadingIcon.vue`，模板中自动注册，显示透明背景的持续加载图标。
+`size` 默认 `24`，同步设置容器宽高及
+`--el-loading-spinner-size`。数字按 px 处理，字符串需携带 CSS 单位，例如
+`<LoadingIcon :size="24" />` 或 `<LoadingIcon size="2rem" />`。
+
 ### MkInfiniteScroll
 
 分页列表的滚动触底加载组件，使用 `IntersectionObserver` 监听组件所在滚动区域的底部，不依赖

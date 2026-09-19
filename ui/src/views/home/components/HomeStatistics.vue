@@ -67,7 +67,7 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
 
 <template>
   <section>
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="mb-4 flex-align-center flex-wrap justify-between gap-3">
       <h4>监控</h4>
       <div class="flex flex-wrap gap-3">
         <MkDateRange @change="handleRangeChange" />
@@ -80,10 +80,10 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
         <template v-for="metric in metrics" :key="metric.id">
           <el-card shadow="never">
             <p class="text-N600">{{ metric.title }}</p>
-            <div class="mt-1 flex items-center gap-4 tabular-nums">
+            <div class="mt-1 flex-align-center gap-4 tabular-nums">
               <template v-if="metric.id === 'feedback'">
                 <template v-for="(series, index) in metric.series" :key="series.name">
-                  <div class="flex items-center gap-2" :title="series.name">
+                  <div class="flex-align-center gap-2" :title="series.name">
                     <MkIcon
                       :name="index === 0 ? 'icon_thumbsup_filled' : 'icon_thumbdown_filled'"
                       :size="16"

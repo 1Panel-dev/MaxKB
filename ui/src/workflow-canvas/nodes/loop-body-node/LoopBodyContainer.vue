@@ -77,11 +77,11 @@ defineExpose({ zoom })
   <div class="workflow-node-container relative overflow-visible">
     <div ref="stepContainerRef" class="step-container p-4" :class="{ isSelected: nodeSelected, error: nodeStatus !== 200 }">
       <div class="flex-between">
-        <div class="flex min-w-0 items-center gap-2">
+        <div class="flex-align-center min-w-0 gap-2">
           <component :is="iconComponent(`${model.type}-icon`)" class="mr-1" :size="24" :item="model.properties.node_data" />
           <h4 class="truncate break-all" :title="String(model.properties.stepName ?? '')">{{ model.properties.stepName }}</h4>
         </div>
-        <div class="flex items-center gap-1" @pointerdown.stop @mousedown.stop @keydown.stop @click.stop>
+        <div class="flex-align-center gap-1" @pointerdown.stop @mousedown.stop @keydown.stop @click.stop>
           <el-button text :title="enlarge ? '还原' : '放大'" @click="enlargeHandle">
             <MkIcon name="icon_magnify_outlined" :size="20" />
           </el-button>

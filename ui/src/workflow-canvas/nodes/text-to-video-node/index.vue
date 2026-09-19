@@ -107,7 +107,7 @@ onMounted(() => {
           :rules="{ whitespace: true, required: true, message: '请输入正向提示词', trigger: 'blur' }"
         >
           <template #label>
-            <div class="flex items-center gap-1">
+            <div class="flex-align-center gap-1">
               <span class="mk-required">提示词(正向)</span>
 
               <MkTooltip content="正向提示词，用来描述生成视频中期望包含的元素和视觉特点" placement="right">
@@ -121,7 +121,7 @@ onMounted(() => {
         <!-- 提示词(负向) -->
         <el-form-item prop="negative_prompt">
           <template #label>
-            <div class="flex items-center gap-1">
+            <div class="flex-align-center gap-1">
               <span>提示词(负向)</span>
               <MkTooltip content="反向提示词，用来描述不希望在画面中看到的内容，可以对画面进行限制" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
@@ -138,7 +138,7 @@ onMounted(() => {
 
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
-          <span class="flex items-center gap-1">
+          <span class="flex-align-center gap-1">
             返回内容
             <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />

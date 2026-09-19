@@ -73,10 +73,10 @@ onMounted(() => loadSetting())
       ><el-input v-model="form.config.idpMetaUrl" placeholder="请输入 Idp MetaData Url"
     /></el-form-item>
     <el-form-item
-      ><div class="flex flex-col"><span>开启请求签名</span><el-switch v-model="form.config.wantAssertionsSigned" class="self-start" /></div
+      ><div class="flex-column"><span>开启请求签名</span><el-switch v-model="form.config.wantAssertionsSigned" class="self-start" /></div
     ></el-form-item>
     <el-form-item
-      ><div class="flex flex-col"><span>开启断言签名</span><el-switch v-model="form.config.wantAuthnRequestsSigned" class="self-start" /></div
+      ><div class="flex-column"><span>开启断言签名</span><el-switch v-model="form.config.wantAuthnRequestsSigned" class="self-start" /></div
     ></el-form-item>
     <el-form-item label="SP Private Key" prop="config.privateKey"
       ><el-input v-model="form.config.privateKey" placeholder="请输入 SP Private Key" type="password" autocomplete="new-password" show-password
@@ -90,7 +90,7 @@ onMounted(() => loadSetting())
     /></el-form-item>
     <el-form-item label="SP ACS" prop="config.spAcs"><el-input v-model="form.config.spAcs" placeholder="请输入 SP ACS" /></el-form-item>
     <el-form-item
-      ><div class="flex flex-col"><span>启用 SAML2 认证</span><el-switch v-model="form.is_active" class="self-start" /></div
+      ><div class="flex-column"><span>启用 SAML2 认证</span><el-switch v-model="form.is_active" class="self-start" /></div
     ></el-form-item>
     <!-- 保存 -->
     <el-button type="primary" @click="submit">保存</el-button>

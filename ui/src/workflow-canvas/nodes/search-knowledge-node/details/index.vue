@@ -55,7 +55,7 @@ const sortedParagraphs = computed<SearchParagraph[]>(() =>
             <el-scrollbar max-height="150" class="mt-1">
               <MdPreview :model-value="paragraph.content" no-img-zoom-in />
             </el-scrollbar>
-            <div v-if="paragraph.document_name?.trim()" class="mt-1 flex items-center gap-1">
+            <div v-if="paragraph.document_name?.trim()" class="mt-1 flex-align-center gap-1">
               <img :src="getFileIconUrl(paragraph.document_name.trim())" alt="" width="20" />
               <a
                 v-if="paragraph.meta?.source_file_id || paragraph.meta?.source_url"
@@ -70,7 +70,7 @@ const sortedParagraphs = computed<SearchParagraph[]>(() =>
                 {{ paragraph.document_name.trim() }}
               </span>
             </div>
-            <div class="mt-1 flex items-center gap-1 border-t border-dashed pt-1">
+            <div class="mt-1 flex-align-center gap-1 border-t border-dashed pt-1">
               <KnowledgeIcon :type="paragraph.knowledge_type" :size="18" />
               <span class="truncate">{{ paragraph.knowledge_name || '-' }}</span>
             </div>

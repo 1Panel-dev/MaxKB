@@ -186,7 +186,7 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
           </el-radio-button>
           <el-radio-button label="自定义" value="custom" />
         </el-radio-group>
-        <div v-if="isCustomTheme" class="flex items-center gap-3">
+        <div v-if="isCustomTheme" class="flex-align-center gap-3">
           <span>自定义颜色</span>
           <el-color-picker v-model="customThemeColor" @change="handleThemeColorChange" />
         </div>
@@ -239,7 +239,7 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
         <div class="theme-setting-grid grid gap-6">
           <PlatformPreview :data="themeSetting" />
 
-          <div class="flex flex-col gap-3">
+          <div class="flex-column gap-3">
             <el-checkbox v-model="themeSetting.showUserManual" label="用户手册" />
             <div class="ml-6">
               <el-input

@@ -22,7 +22,7 @@ function handleUserSelect(user: CommonUserOption) {
 <template>
   <MkSearchList :data="users" :default-active="activeId" :props="{ label: 'nick_name', value: 'id' }" @click="handleUserSelect">
     <template #default="{ row }">
-      <div class="flex min-w-0 flex-1 items-center gap-2">
+      <div class="flex-align-center min-w-0 flex-1 gap-2">
         <span class="min-w-0 truncate" :title="row.nick_name">{{ row.nick_name }}</span>
         <span v-if="(auth.isEE || auth.isPE) && row.roles?.length" class="min-w-0 truncate text-N600" :title="getUserRoleText(row)"> ({{ getUserRoleText(row) }}) </span>
       </div>

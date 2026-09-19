@@ -173,7 +173,7 @@ onMounted(() => {
 
     <el-form-item label="账号登录验证码设置" required>
       <div class="w-full mk-gray-card p-4!">
-        <div class="flex items-center gap-2">
+        <div class="flex-align-center gap-2">
           <span>登录失败</span>
           <el-input-number
             v-model="form.max_attempts"
@@ -187,7 +187,7 @@ onMounted(() => {
           <span>次显示验证码</span>
           <span class="text-N500">(值为-1时，不显示验证码)</span>
         </div>
-        <div class="flex items-center gap-2 mt-4">
+        <div class="flex-align-center gap-2 mt-4">
           <span>登录失败</span>
           <el-input-number
             v-model="form.failed_attempts"

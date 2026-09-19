@@ -309,6 +309,17 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 仅提交 `is_active`。`Trigger` 为分页摘要，`TriggerDetail` 为含任务参数的完整详情；
 `TriggerPayload` 用于新建和编辑，ID 在新建前生成以展示事件回调 URL。
 
+### 资源触发器
+
+`workspace/trigger/resource-trigger.ts` 独立维护工具、智能体资源端的触发器列表、详情、新建、编辑和移除。
+接口前缀为 `/workspace/<workspaceId>/<sourceType>/<sourceId>/trigger`，资源类型使用
+`RESOURCE_TYPE.TOOL` / `RESOURCE_TYPE.APPLICATION` 的后端值；工作空间从资源上下文显式传入。
+`ResourceTriggerResource`、`ResourceTrigger`、`ResourceTriggerDetail` 定义在 `types/trigger.ts`。
+详情的 `trigger_task` 是单对象，普通触发器详情是数组，调用表单负责统一结构。
+新建提交含一个固定任务的 `TriggerPayload`；资源编辑只更新当前资源任务的参数和 meta，保留其他任务，
+名称和周期等配置仍属于整个触发器。移除删除当前资源任务，最后一个任务移除后删除触发器。
+列表沿用后端仅返回已启用触发器的行为，loading 由调用组件维护。
+
 ### 知识库工作流
 
 `workspace/knowledge/knowledge.ts` 的 `getKnowledgeDetail` 返回 `KnowledgeDetail`，包含知识库
@@ -322,6 +333,14 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 `ApplicationDetail` 复用 `ApplicationFormPayload` 中的配置字段，并保留详情接口的 `model`
 和可空描述。复制通过 `getApplicationDetail` 获取完整配置，将 `model` 映射为 `model_id`，
 再调用 `postApplication` 创建副本；不使用卡片列表摘要作为复制数据。
+
+### 工具执行记录
+
+`workspace/tool/tool.ts` 的 `getToolRecordPage` 查询 `/<toolId>/tool_record/<currentPage>/<pageSize>`，
+支持 `source_name`、`source_type`、`state` 筛选，后端固定按创建时间倒序返回。
+`getToolRecordDetail` 查询 `/<toolId>/tool_record/<recordId>`，返回状态、耗时和 `meta` 中的输入、输出、
+错误及节点详情。共用类型 `ToolExecutionRecord`、`ToolExecutionRecordDetail` 维护在 `types/tool.ts`；
+调用来源使用 `TOOL_RECORD_SOURCE`。抽屉负责 loading 和分页状态，不重复解包响应。
 
 ### 工具工作流调试
 

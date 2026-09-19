@@ -68,7 +68,7 @@ onBeforeUnmount(() => anchorGuard.reset())
     <template #label>
       <div class="flex-between">
         <span>检索范围</span>
-        <div class="flex items-center gap-2">
+        <div class="flex-align-center gap-2">
           <el-button
             v-if="formData.search_scope_type === 'custom'"
             link
@@ -96,11 +96,11 @@ onBeforeUnmount(() => anchorGuard.reset())
     </template>
     <div v-if="formData.search_scope_type === 'custom'" class="w-full">
       <span v-if="!selectedKnowledge.length" class="text-N600">请选择关联知识库</span>
-      <div v-else class="flex flex-col gap-1">
+      <div v-else class="space-y-1">
         <template v-for="knowledge in selectedKnowledge" :key="knowledge.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">
-              <span class="flex min-w-0 items-center gap-2">
+              <span class="flex-align-center min-w-0 gap-2">
                 <KnowledgeIcon :type="knowledge.type" :size="20" class="shrink-0 small" />
                 <span class="truncate" :title="knowledge.name || knowledge.id">{{ knowledge.name || knowledge.id }}</span>
               </span>
@@ -120,7 +120,7 @@ onBeforeUnmount(() => anchorGuard.reset())
     >
       <el-radio-group class="mb-1" :model-value="formData.search_scope_source" :validate-event="false" @update:model-value="changeScopeSource">
         <el-radio value="knowledge">
-          <span class="flex items-center gap-1">
+          <span class="flex-align-center gap-1">
             <span>知识库列表</span>
             <span class="relative inline-flex">
               <MkTooltip
@@ -140,7 +140,7 @@ onBeforeUnmount(() => anchorGuard.reset())
           </span>
         </el-radio>
         <el-radio value="document">
-          <span class="flex items-center gap-1">
+          <span class="flex-align-center gap-1">
             <span>文档列表</span>
             <span class="relative inline-flex">
               <MkTooltip

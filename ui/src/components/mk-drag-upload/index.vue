@@ -48,13 +48,13 @@ defineExpose({ clearFiles })
   <div class="w-full">
     <template v-if="selectedFile">
       <el-card class="small" shadow="never">
-        <div class="flex items-center gap-2">
+        <div class="flex-align-center gap-2">
           <img :src="getFileIconUrl(selectedFile.name)" alt="" class="w-10 shrink-0 object-contain" />
           <div class="min-w-0 flex-1">
             <p class="truncate" :title="selectedFile.name">{{ selectedFile.name }}</p>
             <span class="text-sm text-N500">{{ formatFileSize(selectedFile.size) }}</span>
           </div>
-          <div class="flex shrink-0 items-center gap-1">
+          <div class="flex-align-center shrink-0 gap-1">
             <slot name="download" :file="selectedFile" />
             <!-- 删除文件 -->
             <el-button :disabled="disabled" text @click="handleRemove">

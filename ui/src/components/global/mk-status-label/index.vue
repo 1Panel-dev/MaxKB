@@ -36,7 +36,7 @@ const label = computed(() =>
 </script>
 
 <template>
-  <span class="flex items-center gap-2">
+  <span class="flex-align-center gap-2">
     <MkIcon v-if="presentation?.icon" :icon="presentation.icon" :class="presentation.className" />
     <MkIcon v-else-if="status === undefined && !active" name="icon_ban_filled" class="text-N500!" />
     <span>{{ label }}</span>

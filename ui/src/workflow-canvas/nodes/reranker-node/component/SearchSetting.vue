@@ -38,7 +38,7 @@ function submit() {
       <div class="grid grid-cols-2 gap-4">
         <el-form-item>
           <template #label>
-            <span class="flex items-center gap-1">
+            <span class="flex-align-center gap-1">
               Score 高于
               <MkTooltip content="Score 越高相关性越强。" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip>
             </span>

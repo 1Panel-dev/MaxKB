@@ -152,7 +152,7 @@ onMounted(() => loadTriggers())
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <div class="flex items-center gap-3">
+        <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 新建触发器 -->
           <el-button type="primary" @click="handleOpenTriggerDrawer()">
@@ -175,7 +175,7 @@ onMounted(() => loadTriggers())
         <el-table-column type="selection" width="48" reserve-selection />
         <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
           <template #default="{ row }"
-            ><div class="flex items-center gap-2">
+            ><div class="flex-align-center gap-2">
               <TriggerIcon :type="row.trigger_type" :size="24" /><span>{{ row.name }}</span>
             </div></template
           >
@@ -199,7 +199,7 @@ onMounted(() => loadTriggers())
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <div class="flex items-center gap-3">
+            <div class="flex-align-center gap-3">
               <!-- 修改触发器状态 -->
               <span @click.stop>
                 <el-switch v-model="row.is_active" :before-change="() => handleChangeStatus(row)" size="small" class="mr-3" />

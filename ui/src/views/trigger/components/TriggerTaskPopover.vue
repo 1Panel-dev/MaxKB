@@ -28,7 +28,7 @@ const taskGroups = computed(() =>
     <el-scrollbar max-height="320px">
       <div v-for="(group, groupIndex) in taskGroups" :key="group.type" class="px-3 py-2" :class="{ 'border-t': groupIndex > 0 }">
         <p class="mb-2 text-N500">{{ group.label }}</p>
-        <div v-for="(task, taskIndex) in group.tasks" :key="taskIndex" class="flex h-8 items-center gap-2 text-N900">
+        <div v-for="(task, taskIndex) in group.tasks" :key="taskIndex" class="flex-align-center h-8 gap-2 text-N900">
           <ApplicationIcon v-if="group.type === RESOURCE_TYPE.APPLICATION" :icon="task.icon ?? undefined" :size="20" class="shrink-0" />
           <ToolIcon v-else :icon="task.icon ?? undefined" :size="20" class="shrink-0" />
           <span class="truncate" :title="task.name || '-'">{{ task.name || '-' }}</span>

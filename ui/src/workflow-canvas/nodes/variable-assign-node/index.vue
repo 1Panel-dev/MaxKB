@@ -97,7 +97,7 @@ onMounted(() => {
   <NodeContainer :node-model="model">
     <el-form ref="variableAssignNodeFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <template v-for="(item, index) in formData.variable_list" :key="item.id">
-        <div class="mb-2 flex items-center gap-1">
+        <div class="mb-2 flex-align-center gap-1">
           <div class="mk-gray-card flex-1">
             <!-- 变量 -->
             <el-form-item

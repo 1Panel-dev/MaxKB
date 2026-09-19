@@ -61,10 +61,10 @@ defineExpose({ open })
 <template>
   <MkDrawer v-model="drawerVisible" :title="currentGroup?.name" @closed="resetData">
     <template #header>
-      <div class="flex min-w-0 items-center gap-2">
+      <div class="flex-align-center min-w-0 gap-2">
         <h4 class="min-w-0 truncate" :title="currentGroup?.name">{{ currentGroup?.name }}</h4>
         <el-divider direction="vertical" />
-        <span class="flex shrink-0 items-center text-N500">
+        <span class="flex-align-center shrink-0 text-N500">
           <MkIcon name="icon_member_filled" class="mr-1" />
           {{ currentGroup?.count }}
         </span>

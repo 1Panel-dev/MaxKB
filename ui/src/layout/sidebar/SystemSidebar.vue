@@ -16,7 +16,7 @@ const isSystemMenuActive = (systemMenuItem: LayoutMenuItem) => route.matched.som
 const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActive(systemMenuItem) ? (systemMenuItem.activeIcon ?? systemMenuItem.icon) : systemMenuItem.icon)
 </script>
 <template>
-  <div class="mk-system-sidebar flex h-full flex-col">
+  <div class="mk-system-sidebar flex-column h-full">
     <el-scrollbar class="min-h-0 flex-1">
       <el-menu class="mt-2!" :class="props.collapsed ? 'px-3.5!' : 'px-4!'" :collapse="props.collapsed"
         :collapse-transition="false" :default-active="route.path" router :persistent="false">
@@ -58,7 +58,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
     <!-- 收起导航按钮 -->
     <div :class="props.collapsed ? 'px-3.5' : 'px-4'" class="py-2">
       <button type="button" :class="props.collapsed ? 'p-2.75' : 'px-2 p-2.75'"
-        class="mk-system-sidebar-toggle flex w-full cursor-pointer items-center gap-2 rounded-md"
+        class="mk-system-sidebar-toggle flex-align-center w-full cursor-pointer gap-2 rounded-md"
         @click="emit('toggle')">
         <MkIcon name="icon_side-fold_outlined" :size="18" :class="props.collapsed && 'rotate-180'" />
         <span class="whitespace-nowrap transition-opacity duration-100"

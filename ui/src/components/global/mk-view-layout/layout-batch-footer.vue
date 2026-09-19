@@ -17,8 +17,8 @@ function handleSelectAllChange(selected: boolean | string | number) {
 </script>
 
 <template>
-  <footer class="flex shrink-0 items-center border-t bg-white px-6 py-4">
-    <div class="mr-4 flex items-center gap-3">
+  <footer class="flex-align-center shrink-0 border-t bg-white px-6 py-4">
+    <div class="mr-4 flex-align-center gap-3">
       <el-checkbox :indeterminate="isIndeterminate" :model-value="allSelected" @change="handleSelectAllChange" />
       <span>已选 {{ selectedCount }}/{{ total }}</span>
     </div>

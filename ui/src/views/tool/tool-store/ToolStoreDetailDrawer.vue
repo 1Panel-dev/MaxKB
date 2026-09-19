@@ -39,11 +39,11 @@ defineExpose({ open })
     <template v-if="toolDetail">
       <div class="border-b pb-6 mb-3">
         <div class="flex-between gap-4">
-          <div class="flex min-w-0 items-center gap-4">
+          <div class="flex-align-center min-w-0 gap-4">
             <ToolIcon :icon="toolDetail.icon" :size="60" :type="toolDetail.tool_type" />
             <div class="min-w-0">
               <h3 class="truncate" :title="toolDetail.name">{{ toolDetail.name }}</h3>
-              <span class="flex items-center gap-1 text-N600">
+              <span class="flex-align-center gap-1 text-N600">
                 <MkIcon v-if="toolDetail.downloads !== undefined" name="icon_download_outlined" />
                 {{ toolDetail.downloads && numberFormat(toolDetail.downloads) }}
               </span>

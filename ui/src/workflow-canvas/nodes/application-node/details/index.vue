@@ -29,7 +29,7 @@ defineProps<{
         <div v-if="data.document_list?.length > 0">
           <p class="mb-1 text-N600">文档：</p>
           <div class="flex flex-wrap gap-2">
-            <div v-for="(f, i) in data.document_list" :key="i" class="flex items-center rounded-md bg-white px-2 py-1">
+            <div v-for="(f, i) in data.document_list" :key="i" class="flex-align-center rounded-md bg-white px-2 py-1">
               <img :src="getFileIconUrl(f?.name)" alt="" width="24" />
               <span class="ml-1 max-w-[200px] truncate" :title="f?.name">{{ f?.name }}</span>
             </div>
@@ -67,7 +67,7 @@ defineProps<{
         <div v-if="data.other_list?.length > 0">
           <p class="mb-1 text-N600">其他：</p>
           <div class="flex flex-wrap gap-2">
-            <div v-for="(f, i) in data.other_list" :key="i" class="flex items-center rounded-md bg-white px-2 py-1">
+            <div v-for="(f, i) in data.other_list" :key="i" class="flex-align-center rounded-md bg-white px-2 py-1">
               <img :src="getFileIconUrl(f?.name)" alt="" width="24" />
               <span class="ml-1 max-w-[200px] truncate" :title="f?.name">{{ f?.name }}</span>
             </div>

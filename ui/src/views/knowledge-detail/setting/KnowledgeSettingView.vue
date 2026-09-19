@@ -141,7 +141,7 @@ function handleSave() {
     >
       <el-form-item label="知识库类型" required>
         <el-card shadow="never" class="small w-full" style="--el-card-padding: 8px 12px">
-          <div class="flex items-center gap-2">
+          <div class="flex-align-center gap-2">
             <KnowledgeIcon :type="knowledge.type" />
             <div>
               <div>{{ knowledgeTypeLabel }}</div>
@@ -190,7 +190,7 @@ function handleSave() {
         </el-form-item>
         <el-form-item>
           <template #label>
-            <div class="flex items-center gap-1">
+            <div class="flex-align-center gap-1">
               <span>上传的每个文档最大 (MB)</span>
               <MkTooltip content="建议根据服务器配置调整，否则可能会造成服务宕机" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />

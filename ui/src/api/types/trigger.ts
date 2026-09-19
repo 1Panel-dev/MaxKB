@@ -95,3 +95,27 @@ export interface TriggerTaskRecordDetail {
     details?: Record<string, Record<string, unknown>> | Record<string, unknown>[]
   }
 }
+
+/** 资源端触发器绑定的唯一执行资源。 */
+export interface ResourceTriggerResource {
+  workspace_id: string
+  source_type: TriggerTaskSource
+  source_id: string
+}
+
+export interface ResourceTrigger {
+  id: string
+  name: string
+  desc: string
+  trigger_type: TriggerType
+  trigger_setting: TriggerSetting
+  is_active: boolean
+  meta?: Record<string, unknown>
+}
+
+/** 资源接口只返回当前资源的一条任务。 */
+export interface ResourceTriggerDetail extends ResourceTrigger {
+  trigger_task: TriggerTaskPayload
+  application_task?: Partial<import('./application').ApplicationDetail>
+  tool_task?: Partial<import('./tool').ToolItem>
+}

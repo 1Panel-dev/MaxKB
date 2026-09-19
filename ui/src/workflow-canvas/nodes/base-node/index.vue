@@ -244,7 +244,7 @@ onMounted(() => {
       >
         <template #label>
           <div class="flex-between">
-            <span class="flex items-center gap-1">
+            <span class="flex-align-center gap-1">
               <span :class="formData.long_term_enable ? 'mk-required' : ''">长期记忆</span>
 
               <MkTooltip
@@ -254,7 +254,7 @@ onMounted(() => {
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>
-            <span class="flex items-center gap-2">
+            <span class="flex-align-center gap-2">
               <!-- 长期记忆设置 -->
               <LongTermSetting
                 v-if="formData.long_term_enable"
@@ -273,13 +273,13 @@ onMounted(() => {
       <el-form-item class="mb-2!">
         <template #label>
           <div class="flex-between w-full">
-            <span class="flex items-center gap-1">
+            <span class="flex-align-center gap-1">
               文件上传
               <MkTooltip content="开启后，问答页面会显示上传文件的按钮。" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>
-            <span class="flex items-center gap-2">
+            <span class="flex-align-center gap-2">
               <FileUploadSetting v-if="formData.file_upload_enable" v-model="fileUploadSetting" />
               <el-switch :model-value="formData.file_upload_enable" size="small" @change="changeFileUploadEnabled" />
             </span>
@@ -303,7 +303,7 @@ onMounted(() => {
       <!-- 语音输入 -->
       <div class="flex-between">
         <span :class="formData.stt_model_enable ? 'mk-required' : ''">语音输入</span>
-        <span class="flex items-center gap-3">
+        <span class="flex-align-center gap-3">
           <el-checkbox v-if="formData.stt_model_enable" v-model="formData.stt_autosend">自动发送</el-checkbox>
           <el-switch v-model="formData.stt_model_enable" size="small" @change="changeSpeechInputEnabled" />
         </span>
@@ -353,7 +353,7 @@ onMounted(() => {
       <!-- 语音播放 -->
       <div class="flex-between mt-4">
         <span :class="formData.tts_model_enable && formData.tts_type !== 'BROWSER' ? 'mk-required' : ''">语音播放</span>
-        <span class="flex items-center gap-3">
+        <span class="flex-align-center gap-3">
           <el-checkbox v-if="formData.tts_model_enable" v-model="formData.tts_autoplay">自动播放</el-checkbox>
           <el-switch v-model="formData.tts_model_enable" size="small" @change="changeSpeechPlaybackEnabled" />
         </span>

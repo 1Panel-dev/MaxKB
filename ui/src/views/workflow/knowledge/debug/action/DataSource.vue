@@ -119,7 +119,7 @@ defineExpose({ validate, getData })
               style="--el-card-padding: 4px 12px"
               @click="sourceChange(node.id)"
             >
-              <div class="flex items-center gap-2">
+              <div class="flex-align-center gap-2">
                 <component :is="iconComponent(`${node.type}-icon`)" class="size-5" />
                 <span class="min-w-0 truncate">{{ node.properties.stepName }}</span>
               </div>

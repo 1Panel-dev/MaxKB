@@ -56,7 +56,7 @@ const condition = computed({
     <template #dropdown>
       <div class="w-84 px-4 py-3">
         <h6>执行条件</h6>
-        <div class="mt-2 flex items-center gap-2">
+        <div class="mt-2 flex-align-center gap-2">
           <span>前置</span>
           <el-select v-model="condition" size="small" class="w-15!">
             <el-option label="所有" value="AND" />

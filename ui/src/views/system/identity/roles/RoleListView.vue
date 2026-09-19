@@ -137,13 +137,13 @@ onMounted(() => loadRoles())
     <template #default="{ Header }">
       <template v-if="currentRole">
         <component :is="Header">
-          <div class="flex min-w-0 flex-1 items-center gap-2">
+          <div class="flex-align-center min-w-0 flex-1 gap-2">
             <h4 class="min-w-0 truncate" :title="currentRole.role_name">
               {{ currentRole.role_name }}
             </h4>
             <el-tag type="info" size="small" class="shrink-0"> {{ currentRole.internal ? '系' : ROLE_TYPE_LABELS[currentRole.type] }}</el-tag>
             <el-divider class="shrink-0" direction="vertical" />
-            <span class="flex shrink-0 items-center text-N500">
+            <span class="flex-align-center shrink-0 text-N500">
               <MkIcon name="icon_member_filled" class="mr-1" />{{ currentRole.user_count ?? 0 }}
             </span>
           </div>

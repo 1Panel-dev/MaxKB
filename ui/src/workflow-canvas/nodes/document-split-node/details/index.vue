@@ -42,7 +42,7 @@ const activeTab = ref(0)
     <!-- 输入参数 -->
     <div class="mk-gray-card py-2! rounded-xl!">
       <h6 class="mb-2">输入参数</h6>
-      <div class="flex flex-col gap-2">
+      <div class="space-y-2">
         <div><span class="text-N600">分段规则：</span>{{ data.split_strategy || '-' }}</div>
         <div><span class="text-N600">分段长度：</span>{{ data.chunk_size ?? '-' }}</div>
         <div class="truncate" :title="inputNames"><span class="text-N600">输入内容：</span>{{ inputNames || '-' }}</div>

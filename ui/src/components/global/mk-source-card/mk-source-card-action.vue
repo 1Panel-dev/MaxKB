@@ -5,7 +5,7 @@ defineSlots<{ default: () => unknown }>()
 </script>
 
 <template>
-  <div class="group-hover-visible ml-auto flex shrink-0 items-center gap-2" @click.stop @keydown.stop>
+  <div class="group-hover-visible ml-auto flex-align-center shrink-0 gap-2" @click.stop @keydown.stop>
     <slot />
   </div>
 </template>

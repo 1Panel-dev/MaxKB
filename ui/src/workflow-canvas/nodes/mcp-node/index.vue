@@ -344,7 +344,7 @@ onMounted(() => {
           <el-select v-else :teleported="false" v-model="form_data.mcp_tool_id" filterable @change="mcpToolSelectChange" @wheel="handleNodeWheel">
             <template v-for="mcpTool in mcpToolSelectOptions" :key="mcpTool.id">
               <el-option :label="mcpTool.name" :value="mcpTool.id">
-                <div class="flex items-center gap-2">
+                <div class="flex-align-center gap-2">
                   <ToolIcon :size="20" :icon="mcpTool.icon" :type="mcpTool.tool_type" />
                   <span>{{ mcpTool.name }}</span>
                   <el-tag v-if="mcpTool.scope === 'SHARED'" size="small" type="info">共享</el-tag>
@@ -366,7 +366,7 @@ onMounted(() => {
           </template>
           <el-select v-model="form_data.mcp_tool" filterable :teleported="false" @change="changeTool" @wheel="handleNodeWheel">
             <el-option v-for="item in form_data.mcp_tools" :key="item.name" :label="item.name" :value="item.name">
-              <div class="flex items-center gap-1">
+              <div class="flex-align-center gap-1">
                 <MkTooltip :content="item.description" placement="top-start">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>

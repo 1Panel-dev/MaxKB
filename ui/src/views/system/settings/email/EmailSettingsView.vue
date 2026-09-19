@@ -80,13 +80,13 @@ onMounted(() => loadEmailSetting())
         />
       </el-form-item>
       <el-form-item>
-        <div class="flex flex-col">
+        <div class="flex-column">
           <p>启用 SSL<span class="text-N500">（如果 SMTP 端口是 465，通常需要启用 SSL）</span></p>
           <el-switch v-model="emailSetting.email_use_ssl" class="self-start" />
         </div>
       </el-form-item>
       <el-form-item>
-        <div class="flex flex-col">
+        <div class="flex-column">
           <p>启用 TLS<span class="text-N500">（如果 SMTP 端口是 587，通常需要启用 TL）</span></p>
           <el-switch v-model="emailSetting.email_use_tls" class="self-start" />
         </div>

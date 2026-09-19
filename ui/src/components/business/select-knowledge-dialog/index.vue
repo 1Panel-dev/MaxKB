@@ -101,7 +101,7 @@ defineExpose({ open })
   <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" width="1200" @closed="resetData">
     <template #header="{ titleId }">
       <div class="flex-between pr-8">
-        <div class="flex items-center gap-2">
+        <div class="flex-align-center gap-2">
           <h4 :id="titleId">知识库</h4>
           <span class="text-N600!">所选知识库必须使用相同的 Embedding 模型</span>
         </div>
@@ -140,7 +140,7 @@ defineExpose({ open })
                     :label="knowledge.name"
                     @update:model-value="toggleKnowledge(knowledge)"
                   >
-                    <div class="flex min-w-0 flex-1 items-center gap-2">
+                    <div class="flex-align-center min-w-0 flex-1 gap-2">
                       <KnowledgeIcon :type="knowledge.type" class="shrink-0" />
                       <span class="min-w-0 flex-1 truncate" :title="knowledge.name">{{ knowledge.name }}</span>
                     </div>
@@ -158,7 +158,7 @@ defineExpose({ open })
     </MkViewLayout>
     <template #footer>
       <div class="flex-between -mx-6 border-t px-6 pt-4">
-        <div class="flex items-center gap-2">
+        <div class="flex-align-center gap-2">
           <span class="text-N600">已选 {{ selectedKnowledge.length }}</span>
           <el-button v-if="selectedKnowledge.length" link type="primary" @click="selectedKnowledge = []">清空</el-button>
         </div>

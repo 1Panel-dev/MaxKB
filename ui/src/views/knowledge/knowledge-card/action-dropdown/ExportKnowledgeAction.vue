@@ -53,7 +53,7 @@ function handleExportKnowledge(method: (typeof exportOptions)[number]['method'])
     <MkDropdown class="w-full" trigger="hover" placement="right-start" :append-to="submenuContainer ?? undefined" :disabled="loading">
       <!-- 展开知识库导出菜单 -->
       <div ref="exportTriggerRef" class="flex-between w-full gap-2 p-2">
-        <div class="flex items-center gap-2">
+        <div class="flex-align-center gap-2">
           <MkIcon name="icon_export_outlined" class="text-N600!" />
           <span>{{ label }}</span>
         </div>

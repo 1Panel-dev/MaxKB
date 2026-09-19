@@ -97,7 +97,7 @@ onMounted(() => {
         <!-- 语音文件 -->
         <el-form-item prop="audio_list" :rules="{ required: true, message: '请选择', trigger: 'change' }">
           <template #label>
-            <span class="flex items-center gap-1">
+            <span class="flex-align-center gap-1">
               语音文件
               <MkTooltip placement="right">
                 <template #content>
@@ -111,7 +111,7 @@ onMounted(() => {
         </el-form-item>
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
-          <span class="flex items-center gap-1">
+          <span class="flex-align-center gap-1">
             返回内容
             <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />

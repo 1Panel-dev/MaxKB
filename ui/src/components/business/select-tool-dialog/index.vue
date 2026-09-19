@@ -103,7 +103,7 @@ defineExpose({ open })
   <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" :title="title" width="1200" @closed="resetData">
     <template #header="{ titleId }">
       <div class="flex-between pr-8">
-        <div class="flex items-center gap-2">
+        <div class="flex-align-center gap-2">
           <h4 :id="titleId">{{ title }}</h4>
         </div>
 
@@ -130,7 +130,7 @@ defineExpose({ open })
               <el-popover placement="bottom-start" :width="360" :show-after="500" :persistent="false" popper-class="border-none! rounded-xl!">
                 <template #reference>
                   <MkCardCheckbox :model-value="selectedToolIds.includes(tool.id)" :label="tool.name" @update:model-value="toggleTool(tool)">
-                    <div class="flex min-w-0 flex-1 items-center gap-2">
+                    <div class="flex-align-center min-w-0 flex-1 gap-2">
                       <ToolIcon :icon="tool.icon" :type="tool.tool_type" class="shrink-0" />
                       <span class="min-w-0 flex-1 truncate" :title="tool.name">{{ tool.name }}</span>
                     </div>
@@ -151,7 +151,7 @@ defineExpose({ open })
     </MkViewLayout>
     <template #footer>
       <div class="flex-between -mx-6 border-t px-6 pt-4">
-        <div class="flex items-center gap-2">
+        <div class="flex-align-center gap-2">
           <span class="text-N600">已选 {{ selectedTool.length }}</span>
           <el-button v-if="selectedTool.length" link type="primary" @click="selectedTool = []">清空</el-button>
         </div>

@@ -165,7 +165,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="account-login flex h-full flex-col" :class="{ 'is-preview': preview }">
+  <div class="account-login flex-column h-full" :class="{ 'is-preview': preview }">
     <div class="min-h-0 flex-1">
       <h2 class="mb-4">
         {{ loginMethod === LOGIN_METHOD.LDAP ? 'LDAP 登录' : LOGIN_METHOD_LABELS[loginMethod] }}

@@ -158,7 +158,7 @@ defineExpose({ open })
     >
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
-        <div class="flex w-full items-center gap-3">
+        <div class="flex-align-center w-full gap-3">
           <!-- // TODO 修改头像 -->
           <ToolIcon :icon="dataSourceForm.icon" :size="32" :type="TOOL_TYPE.DATA_SOURCE" />
           <el-input

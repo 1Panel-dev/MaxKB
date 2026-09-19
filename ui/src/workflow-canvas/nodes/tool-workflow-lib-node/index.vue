@@ -145,7 +145,7 @@ onBeforeUnmount(() => {
             >
               <template #label>
                 <div class="flex-between w-full gap-2">
-                  <div class="flex min-w-0 items-center gap-1">
+                  <div class="flex-align-center min-w-0 gap-1">
                     <span class="max-w-32 truncate" :class="{ 'mk-required': field.is_required }" :title="field.label || field.name || field.field">
                       {{ field.label || field.name || field.field }}
                     </span>
@@ -188,7 +188,7 @@ onBeforeUnmount(() => {
 
         <!-- 返回内容 -->
         <div v-if="showReturnContent" class="flex-between mt-4 w-full">
-          <span class="flex items-center gap-1">
+          <span class="flex-align-center gap-1">
             返回内容
             <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />

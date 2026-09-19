@@ -138,7 +138,7 @@ defineExpose({ open, close })
 <template>
   <MkDrawer v-model="visible" title="查看关联资源" size="60%" @closed="handleClosed">
     <template v-if="targetResource">
-      <div class="flex items-center mb-4">
+      <div class="flex-align-center mb-4">
         <span class="mr-4 mk-N600!">{{ resourceLabels[resourceType] }}</span>
 
         <ResourceIcon
@@ -172,7 +172,7 @@ defineExpose({ open, close })
         <el-table-column prop="name" label="名称" min-width="160" show-overflow-tooltip>
           <template #default="{ row }">
             <!-- // TODO: 资源跳转 -->
-            <div class="flex items-center gap-2">
+            <div class="flex-align-center gap-2">
               <ResourceIcon :resource-type="row.resourceType" :type="row.type" :icon="row.icon" :providers="providers" />
               <span>{{ row.name }}</span>
             </div>

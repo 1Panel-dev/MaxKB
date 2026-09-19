@@ -239,6 +239,9 @@ src/views/tool/
 │   │   ├── input-field/
 │   │   └── python-code/
 │   └── tool-custom/
+├── execution-record/              # 工具执行记录列表与详情抽屉
+│   ├── ExecutionRecordDrawer.vue
+│   └── ExecutionDetailDrawer.vue
 ├── tool-card/
 │   ├── ToolCard.vue               # 工具卡片展示与操作插槽
 │   ├── InitParamDialog.vue        # 配置工具启动参数
@@ -250,6 +253,7 @@ src/views/tool/
 │       ├── DeleteToolAction.vue
 │       ├── EditToolAction.vue
 │       ├── ExportToolAction.vue
+│       ├── ExecutionRecordToolAction.vue
 │       ├── InitParamAction.vue
 │       ├── MoveToolAction.vue
 │       ├── ToolWorkflowAction.vue
@@ -263,6 +267,18 @@ src/views/tool/
     ├── ToolStoreDetailDrawer.vue  # 商店工具详情
     └── ToolStoreDialog.vue        # 商店分类、查询及添加成功后的列表刷新
 ```
+
+`tool-card/action-dropdown/ExecutionRecordToolAction.vue` 维护执行记录入口，两个抽屉
+`ExecutionRecordDrawer.vue` 和 `ExecutionDetailDrawer.vue` 统一放在 `tool/execution-record/`。
+Workspace 的自定义工具和工作流工具菜单
+展示“执行记录”，页面传入完整 Tool API；点击后挂载抽屉，关闭动画结束后卸载。
+列表使用 `MkComplexSearch`、`MkTable` 和 `MkStatusLabel`，支持触发来源名称、类型、状态筛选；
+接口按执行时间倒序返回。详情保留输入、输出、错误及工作流节点详情，支持上一条／下一条跨页浏览。
+
+`ToolCard` 仅在非 `disabled`、非批量选择模式下发出 `click` 事件。`ToolView` 点击工作流工具进入
+工作流画布（支持 Ctrl / Command 新标签页打开），其他类型复用编辑 Action 打开对应表单。
+`EditToolAction` 通过 `defineExpose` 暴露 `handleOpenToolForm()`；列表按工具 ID 保存组件 ref，
+卡片点击通过 ref 调用，与编辑菜单共用同一表单实例，保存后继续局部更新卡片。
 
 各类型表单只维护本类型特有字段和流程，并统一放在 `tool/tool-form/`；创建入口和编辑 Action
 共同复用这些表单。启动参数、输入参数、Python 内容等已有表单片段应从
@@ -538,19 +554,29 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 `trigger/trigger-form/request-parameters/RequestParameters.vue` 用 `MkTable` 展示事件请求参数，
 表格包含参数、数据类型、描述、必填开关和编辑/删除操作，标题栏的加号打开新增 Dialog，
 同目录 `RequestParameterDialog.vue` 负责新增、编辑及参数名必填与重名校验；确认后回写，取消保留原值。
-`trigger/trigger-form/task-execution/parameters/` 内 `ApplicationParameter.vue` 与 `ToolParameter.vue`
-分别生成智能体和工具字段，共用 `ParameterForm.vue` 的输入、事件引用、初始化和校验；
-`types.ts` 仅维护跨组件使用的字段描述类型，不再单独拆分每个组件专用的参数工具文件。
-初始化只补全缺失值，不覆盖已有自定义配置；切回定时或移除全部事件参数时，引用参数恢复自定义默认值。
+`trigger/trigger-form/task-execution/` 直接按三个场景组织任务执行组件：
+
+- `TriggerTaskExecution.vue`：触发器页面的多任务分组、选择、移除、折叠与校验；组件内管理
+  智能体和工具选择弹窗，使用 `v-model` 回写任务、`v-model:loading` 同步加载状态，提供 `validate`、`reset`。
+- `ToolTaskExecution.vue`：资源入口固定当前工具，只编辑参数，不允许增删或替换执行资源。
+- `ApplicationTaskExecution.vue`：资源入口固定当前智能体，遵循相同的单任务约束。
+- `TaskParameterForm.vue`：三个组件共用的参数表单，接收按资源类型区分的 `resource`，内部生成
+  智能体或工具字段，统一处理自定义输入、事件引用、默认值及校验；字段描述类型保留在文件内。
+
+参数初始化只补全缺失值，不覆盖已有自定义配置；切回定时或移除全部事件参数时，引用参数恢复自定义默认值。
 智能体包含 Question、启用的文件类型、用户输入和接口参数；工具包含普通输入和工作流用户输入。
 抽屉采用类型卡片选择，选中卡片内显示配置，触发周期与 Cron 通过切换按钮切换；新建时需选择周期。
-`trigger/trigger-form/task-execution/TaskExecution.vue` 维护任务分组、展开收起、移除及参数表单，
-组件内管理智能体与工具选择弹窗、资源详情加载和任务参数保留，通过 `v-model` 回写任务、
-`v-model:loading` 同步加载状态、`change` 通知清理校验，并提供 `validate`、`expandAll`、`reset`。
-任务 UI 沿用 AI Chat 技能区的 `MkCollapse` 分组和紧凑资源卡片，保存前先展开全部任务，待参数表单挂载后统一校验。
-抽屉负责触发器详情查询与保存，将详情资源快照通过 `initialResources` 传入任务组件；
-任务组件新增资源后展开任务，抽屉保存时调用分组组件校验全部参数。
-保存时校验所有任务，包括折叠的任务；接口失败保持抽屉打开。
+任务 UI 使用 `MkCollapse` 分组和紧凑资源卡片，保存前展开任务并校验所有参数，包括折叠的任务。
+`TriggerFormDrawer` 负责请求与保存，通过可选 `resource` 区分普通触发器和固定资源模式；
+资源模式使用传入的完整 `resourceApi`，将资源详情中的单任务转换为内部任务数组，保存时保留任务 ID 和参数。
+加载工具任务时补查完整工具详情和必要的工作流定义，避免后端摘要缺少工作流输入字段。
+接口失败保持抽屉打开并禁止提交不完整详情，提交期间禁止关闭抽屉。
+
+`trigger/resource-trigger/ResourceTriggerDialog.vue` 负责资源端的触发器列表弹窗，接收完整
+`ResourceTriggerApi` 和资源上下文（所属工作空间、资源类型、资源 ID），展示名称、周期和空状态。
+添加、编辑按需挂载 `TriggerFormDrawer`，保存成功刷新列表，抽屉关闭后卸载；移除调用资源关联删除接口。
+工具菜单的 `tool/tool-card/action-dropdown/TriggerToolAction.vue` 为自定义工具、工作流工具提供入口，
+点击后挂载列表弹窗，关闭后卸载，暂不增加权限判断。列表与表单已支持智能体资源上下文，智能体菜单入口另行接入。
 
 `trigger/components/TriggerTaskPopover.vue` 接收分页记录的 `tasks`，在任务列按智能体和工具
 展示数量标签，悬浮时分组显示资源图标及名称；无任务时显示 `-`，不发起额外请求。

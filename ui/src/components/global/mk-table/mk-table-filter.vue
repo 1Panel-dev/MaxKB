@@ -47,9 +47,9 @@ function handleConfirm() {
     </template>
 
     <el-scrollbar max-height="280px">
-      <div class="flex flex-col gap-2 p-3 pb-0">
+      <div class="flex-column gap-2 p-3 pb-0">
         <el-checkbox :indeterminate="selectionIndeterminate" :model-value="allSelected" class="mr-0!" @change="handleSelectAllChange"> 全部 </el-checkbox>
-        <el-checkbox-group v-model="pendingValues" class="flex flex-col gap-2">
+        <el-checkbox-group v-model="pendingValues" class="flex-column gap-2">
           <el-checkbox v-for="option in options" :key="option.value" :value="option.value" class="mk-table-filter__option mr-0! w-full min-w-0">
             <span class="block min-w-0 truncate" :title="option.label">{{ option.label }}</span>
           </el-checkbox>

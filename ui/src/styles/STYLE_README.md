@@ -116,7 +116,7 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 示例：
 
 ```vue
-<div class="flex items-center gap-2 rounded-md px-3 py-2 text-N900 hover:bg-gray-100">
+<div class="flex-align-center gap-2 rounded-md px-3 py-2 text-N900 hover:bg-gray-100">
   菜单项
 </div>
 ```
@@ -125,17 +125,24 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 
 稳定重复使用的布局组合统一定义在 `tailwind.css`。当前提供：
 
-| 工具类            | 作用                                       |
-| ----------------- | ------------------------------------------ |
-| `absolute-center` | 绝对定位，相对最近的定位祖先水平和垂直居中 |
-| `flex-between`    | 横向排列，两侧贴边，并在垂直方向居中       |
-| `flex-center`     | 横向排列，在水平和垂直两个方向居中         |
-| `flex-col-center` | 纵向排列，在水平和垂直两个方向居中         |
-| `flex-wrap`       | 横向排列，自动换行，行间距为 8px           |
+| 工具类              | 作用                                              |
+| ------------------- | ------------------------------------------------- |
+| `absolute-center`   | 绝对定位，相对最近的定位祖先水平和垂直居中        |
+| `flex-align-center` | Flex 布局，交叉轴居中，等价于 `flex items-center` |
+| `flex-between`      | 横向排列，两侧贴边，并在垂直方向居中              |
+| `flex-center`       | 横向排列，在水平和垂直两个方向居中                |
+| `flex-col-center`   | 纵向排列，在水平和垂直两个方向居中                |
+| `flex-column`       | Flex 布局，纵向排列，等价于 `flex flex-col`       |
+| `flex-wrap`         | 横向排列，自动换行，行间距为 8px                  |
 
 ```vue
 <div class="relative h-40">
   <div class="absolute-center">居中内容</div>
+</div>
+
+<div class="flex-align-center gap-2">
+  <span>图标</span>
+  <span>文字</span>
 </div>
 
 <div class="flex-between">
@@ -152,14 +159,32 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
   <span>首页</span>
 </div>
 
+<div class="flex-column h-full">
+  <div class="shrink-0">头部</div>
+  <div class="min-h-0 flex-1">内容</div>
+</div>
+
 <div class="flex-wrap">
   <span>选项一</span>
   <span>选项二</span>
 </div>
 ```
 
+普通布局中的 `flex items-center` 统一使用 `flex-align-center`；间距、尺寸继续组合原子类。
+该工具类仅设置 `display: flex` 和 `align-items: center`，不设置方向、主轴对齐或间距；
+`inline-flex items-center` 保留原写法，不替换为块级 Flex 布局。
 仅在布局语义与工具类完全一致时使用。需要覆盖排列方向或对齐方式的响应式布局继续组合 Tailwind
 原子类，不为少量差异继续增加相似工具类。
+
+静态纵向 Flex 布局中的 `flex flex-col` 统一使用 `flex-column`，仅设置 `display: flex`
+和 `flex-direction: column`；`gap-*`、`flex-1`、`min-h-0` 等按实际需要单独组合。
+动态或响应式切换方向继续使用内置 `flex-col`，不改变该类仅设置排列方向的含义；
+双轴居中的纵向布局继续使用 `flex-col-center`。
+
+子元素自然按块级纵向排列、仅需要上下间距时，优先使用 `space-y-*`，不额外引入 Flex。
+`space-y-*` 通过直接子元素的外边距提供间距，不负责换行、拉伸或剩余高度分配；
+有 `flex-1`、`self-*`、滚动高度约束、行内子元素或子元素外边距依赖时，不直接替换
+`flex-column gap-*`。条件显隐和第三方组件场景需检查实际渲染结构及间距。
 
 ## 常用卡片样式
 
@@ -191,7 +216,7 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 ```html
 <div class="group">
   <div>始终显示的内容</div>
-  <div class="group-hover-visible ml-auto flex items-center">悬浮操作</div>
+  <div class="group-hover-visible ml-auto flex-align-center">悬浮操作</div>
 </div>
 ```
 

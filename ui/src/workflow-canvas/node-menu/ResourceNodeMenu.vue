@@ -141,7 +141,7 @@ onMounted(() => {
       <FolderTree v-model="currentFolderId" :can-edit="false" :show-shared="isToolMenu" :source="source" @select="loadResources" />
     </aside>
 
-    <section v-loading="loading" class="flex min-w-0 flex-1 flex-col">
+    <section v-loading="loading" class="flex-column min-w-0 flex-1">
       <div class="shrink-0 p-3">
         <MkSearchInput v-model="searchKeyword" placeholder="按名称搜索" />
       </div>
@@ -157,7 +157,7 @@ onMounted(() => {
                   @click="emit('select', resource.node)"
                   @pointerdown="handleNodeDragStart($event, resource.node)"
                 >
-                  <div class="flex items-center gap-2">
+                  <div class="flex-align-center gap-2">
                     <ToolIcon v-if="isToolMenu" :icon="resource.icon" :size="20" :type="resource.toolType" />
                     <ApplicationIcon v-else :icon="resource.icon" :size="20" />
                     <span class="min-w-0 flex-1 truncate" :title="resource.name">{{ resource.name }}</span>
@@ -165,7 +165,7 @@ onMounted(() => {
                 </el-card>
               </template>
               <div class="p-3">
-                <div class="flex min-w-0 items-center gap-2">
+                <div class="flex-align-center min-w-0 gap-2">
                   <ToolIcon v-if="isToolMenu" :icon="resource.icon" :size="24" :type="resource.toolType" />
                   <ApplicationIcon v-else :icon="resource.icon" :size="24" />
                   <p class="min-w-0 flex-1 break-all truncate" :title="resource.name">{{ resource.name }}</p>

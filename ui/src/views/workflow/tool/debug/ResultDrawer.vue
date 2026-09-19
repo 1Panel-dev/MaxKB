@@ -117,7 +117,7 @@ defineExpose({ open, close })
 <template>
   <MkDrawer v-model="visible" title="调试结果" :modal="false" @close="close">
     <template #header>
-      <div class="-ml-2 flex items-center">
+      <div class="-ml-2 flex-align-center">
         <!-- 返回输入参数 -->
         <el-button class="mr-1" text @click="visible = false">
           <MkIcon name="icon_arrow-left_outlined" :size="20" />

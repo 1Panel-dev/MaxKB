@@ -132,7 +132,7 @@ function deleteNode() {
           复制
         </MkDropdownItem>
         <div v-if="canChangeEnabled" class="flex-between px-3 py-1" @click.stop>
-          <span class="flex items-center gap-2">
+          <span class="flex-align-center gap-2">
             <MkIcon name="icon_yes_outlined" class="text-N600!" />
             <span>启用状态</span>
           </span>

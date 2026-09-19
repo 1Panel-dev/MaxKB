@@ -78,7 +78,7 @@ function toUrl(url?: string) {
           <MkDropdownItem @click.stop class="p-0!">
             <MkDropdown class="w-full" trigger="hover" placement="left-start">
               <div class="flex-between w-full gap-2 p-2">
-                <div class="flex items-center gap-2">
+                <div class="flex-align-center gap-2">
                   <MkIcon name="icon_translate_outlined" class="text-N600!" />
                   <span>语言</span>
                 </div>

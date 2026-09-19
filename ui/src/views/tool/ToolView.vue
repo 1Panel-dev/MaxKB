@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import { onMounted, computed, ref, useTemplateRef } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
@@ -20,10 +22,12 @@ import {
   DeleteToolAction,
   EditToolAction,
   ExportToolAction,
+  ExecutionRecordToolAction,
   InitParamAction,
   McpConfigAction,
   MoveToolAction,
   ToolWorkflowAction,
+  TriggerToolAction,
 } from './tool-card/action-dropdown'
 import ButtonCreateTool from './components/ButtonCreateTool.vue'
 import ButtonToolStore from './components/ButtonToolStore.vue'
@@ -83,6 +87,26 @@ function loadStoreTools() {
   StoreApi.getStoreToolList({ name: '' }).then((res) => {
     storeTools.value = res.apps
   })
+}
+
+/* 卡片打开工具 */
+const route = useRoute()
+const router = useRouter()
+const editToolActionRefs: Record<string, InstanceType<typeof EditToolAction> | null> = {}
+
+function handleOpenTool(tool: ToolItem, event: MouseEvent) {
+  if (isShared.value || batchSelectionMode.value) return
+  if (tool.tool_type !== TOOL_TYPE.WORKFLOW) return editToolActionRefs[tool.id]?.handleOpenToolForm()
+
+  const workflowRoute = {
+    name: 'workflow-tool',
+    params: { toolId: tool.id, workspaceId: route.params.workspaceId },
+  } as const
+  if (event.ctrlKey || event.metaKey) {
+    window.open(router.resolve(workflowRoute).href)
+    return
+  }
+  return router.push(workflowRoute)
 }
 
 /* 工具维护 */
@@ -194,14 +218,14 @@ onMounted(() => {
 
     <template #default="{ Footer, Header }">
       <component :is="Header">
-        <div class="flex min-w-0 flex-1 items-center gap-4">
+        <div class="flex-align-center min-w-0 flex-1 gap-4">
           <h4 class="min-w-0 truncate" :title="currentFolder?.name">{{ currentFolder?.name }}</h4>
           <el-divider direction="vertical" />
           <el-select v-model="toolType" class="w-30!" :empty-values="[null, undefined]" :value-on-clear="null" @change="refreshTool">
             <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="option.label" :value="option.value" />
           </el-select>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <template v-if="!isShared">
             <!-- 批量选择 -->
@@ -234,12 +258,25 @@ onMounted(() => {
                 :shared="isShared"
                 :store-tools="storeTools"
                 :tool="tool"
+                @click="handleOpenTool(tool, $event)"
                 @selected="handleToolSelect(tool.id, $event)"
                 @update="handleToolUpdate"
               >
                 <template #action-dropdown>
                   <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" :tool="tool" />
-                  <EditToolAction label="编辑" :api="ToolApi" :tool="tool" @update="handleToolUpdate" />
+                  <!-- 编辑工具 -->
+                  <EditToolAction
+                    :ref="
+                      (instance) => {
+                        if (instance) editToolActionRefs[tool.id] = instance as InstanceType<typeof EditToolAction>
+                        else delete editToolActionRefs[tool.id]
+                      }
+                    "
+                    label="编辑"
+                    :api="ToolApi"
+                    :tool="tool"
+                    @update="handleToolUpdate"
+                  />
                   <InitParamAction
                     v-if="(tool.init_field_list?.length ?? 0) > 0"
                     v-model:loading="toolOperationLoading"
@@ -258,11 +295,23 @@ onMounted(() => {
                   <!-- 资源授权 -->
                   <AuthorizeToolAction label="资源授权" :tool="tool" />
 
-                  <!-- // TODO: 触发器 (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW')-->
+                  <!-- 工具触发器 -->
+                  <TriggerToolAction
+                    v-if="tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW"
+                    label="触发器"
+                    :api="ResourceTriggerApi"
+                    :tool="tool"
+                  />
                   <!-- 查看关联资源 -->
                   <RelatedResourcesToolAction label="查看关联资源" :api="RelatedResourcesApi" :tool="tool" />
 
-                  <!-- // TODO: 查看执行记录    (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW')-->
+                  <!-- 查看执行记录 -->
+                  <ExecutionRecordToolAction
+                    v-if="tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW"
+                    label="查看执行记录"
+                    :api="ToolApi"
+                    :tool="tool"
+                  />
                   <!-- 复制 -->
                   <CopyToolAction v-model:loading="toolOperationLoading" label="复制" :api="ToolApi" :tool="tool" @refresh="refreshTool" />
                   <!-- 移动到 -->

@@ -31,7 +31,7 @@ const strategyLabel = (strategy?: string) => {
 
     <div v-for="(group, groupI) in data.group_list" :key="groupI" class="mk-gray-card py-2! rounded-xl!">
       <h6 class="mb-2">{{ group.label }}输入参数</h6>
-      <el-scrollbar height="200">
+      <el-scrollbar max-height="200">
         <div class="space-y-2">
           <p v-for="(f, i) in group.variable_list" :key="i">
             <span class="text-N600">{{ `${f.node_name}.${f.field}` }}：</span>{{ f.value }}

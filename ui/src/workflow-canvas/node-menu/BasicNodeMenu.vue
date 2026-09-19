@@ -47,14 +47,14 @@ function handleNodeDragStart(event: PointerEvent, workflowNode: WorkflowMenuNode
                     @click="emit('select', workflowNode)"
                     @pointerdown="handleNodeDragStart($event, workflowNode)"
                   >
-                    <div class="flex items-center gap-2">
+                    <div class="flex-align-center gap-2">
                       <component :is="iconComponent(`${workflowNode.type}-icon`)" :size="20" />
                       <span>{{ workflowNode.label }}</span>
                     </div>
                   </el-card>
                 </template>
                 <div class="p-3">
-                  <div class="flex min-w-0 items-center gap-2">
+                  <div class="flex-align-center min-w-0 gap-2">
                     <component :is="iconComponent(`${workflowNode.type}-icon`)" :size="24" />
                     <p class="min-w-0 flex-1 break-all truncate">{{ workflowNode.label }}</p>
                   </div>

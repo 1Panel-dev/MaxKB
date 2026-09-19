@@ -67,7 +67,7 @@ onMounted(() => loadSetting)
       ><el-input v-model="form.config.redirectUrl" placeholder="请输入回调地址"
     /></el-form-item>
     <el-form-item
-      ><div class="flex flex-col">
+      ><div class="flex-column">
         <span>启用 CAS 认证</span>
         <el-switch v-model="form.is_active" class="self-start" />
       </div>

@@ -155,17 +155,17 @@ onBeforeUnmount(() => {
   <NodeContainer :node-model="model">
     <el-form ref="conditionNodeFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <div ref="branchListRef">
-        <div v-for="(branch, branchIndex) in sortableBranches" :key="branch.id" class="condition-branch mb-2 flex items-center gap-1">
+        <div v-for="(branch, branchIndex) in sortableBranches" :key="branch.id" class="condition-branch mb-2 flex-align-center gap-1">
           <div v-branch-resize="branch.id" class="mk-gray-card group/branch min-w-0 flex-1">
             <div class="condition-branch-handle flex-between min-h-6">
-              <div class="flex items-center">
+              <div class="flex-align-center">
                 <!-- 拖拽排序分支 -->
                 <el-button v-if="sortableBranches.length > 1" link class="hidden! group-hover/branch:inline-flex!">
                   <MkIcon name="icon_drag_outlined" />
                 </el-button>
                 <span>{{ branch.type }}</span>
               </div>
-              <div v-if="branch.conditions.length > 1" class="flex items-center gap-2 text-N600">
+              <div v-if="branch.conditions.length > 1" class="flex-align-center gap-2 text-N600">
                 <span>符合以下</span>
                 <el-select
                   v-model="branch.condition"
@@ -231,7 +231,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
       </div>
-      <div v-if="elseBranch" class="mb-2 flex items-center gap-1">
+      <div v-if="elseBranch" class="mb-2 flex-align-center gap-1">
         <div :key="elseBranch.id" v-branch-resize="elseBranch.id" class="mk-gray-card min-w-0 flex-1">
           <div class="flex-between min-h-6">
             <span>{{ elseBranch.type }}</span>

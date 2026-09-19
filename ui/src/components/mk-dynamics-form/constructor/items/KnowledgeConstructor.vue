@@ -83,7 +83,7 @@ function removeKnowledge(knowledgeId: string) {
     <MkCollapse class="w-full" trigger-class="pb-2">
       <template #label>
         <div class="flex-between w-full">
-          <div class="flex items-center">
+          <div class="flex-align-center">
             <span class="mk-required">可选知识库</span>
             <span v-if="availableKnowledge.length">({{ availableKnowledge.length }})</span>
           </div>
@@ -97,7 +97,7 @@ function removeKnowledge(knowledgeId: string) {
         <template v-for="knowledge in availableKnowledge" :key="knowledge.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">
-              <span class="flex min-w-0 items-center gap-2">
+              <span class="flex-align-center min-w-0 gap-2">
                 <KnowledgeIcon :type="knowledge.type" :size="20" class="shrink-0" />
                 <span class="min-w-0 flex-1 truncate" :title="knowledge.name">{{ knowledge.name }}</span>
               </span>

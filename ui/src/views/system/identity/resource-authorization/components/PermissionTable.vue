@@ -147,7 +147,7 @@ watch(
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col">
+  <div class="flex-column min-h-0 flex-1">
     <div class="mb-4 flex-between">
       <div>
         <!-- 配置权限 -->
@@ -171,7 +171,7 @@ watch(
       <el-table-column type="selection" width="40" reserve-selection />
       <el-table-column class-name="resource-name-column" label="名称" min-width="260" prop="name">
         <template #default="{ row }: { row: ResourcePermissionItem }">
-          <div class="flex min-w-0 flex-1 items-center gap-2">
+          <div class="flex-align-center min-w-0 flex-1 gap-2">
             <MkIcon v-if="row.resource_type === 'folder'" name="icon_file-folder_colorful" :size="18" />
             <span v-else-if="resourceType === RESOURCE_TYPE.MODEL" class="block h-5 w-5 shrink-0" :innerHTML="getModelProviderIcon(row)" />
 

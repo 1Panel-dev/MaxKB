@@ -163,7 +163,7 @@ defineExpose({ open })
     >
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
-        <div class="flex w-full items-center gap-3">
+        <div class="flex-align-center w-full gap-3">
           <!-- // TODO修改头像 -->
           <ToolIcon :icon="mcpForm.icon" :size="32" :type="TOOL_TYPE.MCP" />
           <el-input v-model="mcpForm.name" maxlength="64" placeholder="请输入 MCP 名称" show-word-limit @blur="mcpForm.name = mcpForm.name.trim()" />

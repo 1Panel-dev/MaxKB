@@ -64,21 +64,21 @@ watch(
             @change="handleApplicationChange"
           >
             <el-option label="全部智能体" value="all">
-              <div class="flex items-center gap-2">
+              <div class="flex-align-center gap-2">
                 <MkIcon name="icon_card_outlined" :size="20" class="shrink-0 text-N600" />
                 <span>全部智能体</span>
               </div>
             </el-option>
             <template v-for="application in applications" :key="application.id">
               <el-option :label="application.name" :value="application.id">
-                <div class="flex items-center gap-2">
+                <div class="flex-align-center gap-2">
                   <ApplicationIcon :icon="application.icon" :size="20" class="shrink-0" />
                   <span class="truncate" :title="application.name">{{ application.name }}</span>
                 </div>
               </el-option>
             </template>
             <template #label="{ label, value }">
-              <div class="flex items-center gap-2">
+              <div class="flex-align-center gap-2">
                 <MkIcon v-if="value === 'all'" name="icon_card_outlined" :size="18" class="shrink-0" />
                 <ApplicationIcon v-else :icon="selectedApplication?.icon" :size="18" class="shrink-0" />
                 <span class="truncate" :title="label">{{ label }}</span>

@@ -46,7 +46,7 @@ onMounted(() => {
           :rules="{ type: 'array', required: true, message: '请选择文档', trigger: 'change' }"
         >
           <template #label>
-            <span class="flex items-center gap-1">
+            <span class="flex-align-center gap-1">
               <span class="mk-required">选择文档</span>
               <MkTooltip placement="right">
                 <template #content

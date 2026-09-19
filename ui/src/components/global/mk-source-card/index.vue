@@ -71,7 +71,7 @@ function handleSelectedChange(selected: boolean | string | number) {
     :tabindex="props.selectable ? 0 : undefined"
     :shadow="props.disabled ? 'always' : 'hover'"
     class="mk-source-card group relative"
-    body-class="flex h-full flex-col"
+    body-class="flex-column h-full"
     @click="handleSelect"
   >
     <div v-if="props.selectable" class="absolute top-4 right-4 z-10" @click.stop @keydown.stop>
@@ -79,12 +79,12 @@ function handleSelectedChange(selected: boolean | string | number) {
     </div>
 
     <header class="flex-between items-start gap-2" :class="{ 'pr-7': props.selectable }">
-      <div class="flex min-w-0 flex-1 items-center gap-3">
+      <div class="flex-align-center min-w-0 flex-1 gap-3">
         <div v-if="slots.icon" class="flex shrink-0">
           <slot name="icon" />
         </div>
         <div class="min-w-0 flex-1">
-          <div class="flex min-w-0 items-center gap-2">
+          <div class="flex-align-center min-w-0 gap-2">
             <slot name="title" :title="props.title">
               <h6 class="min-w-0 truncate" :title="props.title">{{ props.title }}</h6>
             </slot>
@@ -107,7 +107,7 @@ function handleSelectedChange(selected: boolean | string | number) {
       <slot />
     </div>
 
-    <footer v-if="hasFooter" class="flex items-center gap-2">
+    <footer v-if="hasFooter" class="flex-align-center gap-2">
       <slot name="footer" :Action="SourceCardAction" :ActionDropdown="MkSourceCardActionDropdown" />
     </footer>
   </el-card>

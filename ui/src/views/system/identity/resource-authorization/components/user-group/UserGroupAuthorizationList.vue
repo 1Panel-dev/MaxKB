@@ -24,7 +24,7 @@ function handleOpenMembersDrawer(userGroup: SystemUserGroup) {
 <template>
   <MkSearchList :data="userGroups" :default-active="activeId" :props="{ label: 'name', value: 'id' }" @click="handleUserGroupSelect">
     <template #default="{ row }">
-      <div class="flex min-w-0 flex-1 items-center gap-2">
+      <div class="flex-align-center min-w-0 flex-1 gap-2">
         <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
         <span class="mk-link text-primary" @click.stop="handleOpenMembersDrawer(row)"> ({{ row.count }}) </span>
       </div>

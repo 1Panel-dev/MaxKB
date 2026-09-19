@@ -74,7 +74,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleShortcut))
     <MkIcon name="icon_search-outlined" size="18" />
   </el-button>
   <el-card v-if="searchVisible" shadow="always" class="workflow-search-container" style="--el-card-padding: 8px 12px">
-    <div class="flex items-center gap-1">
+    <div class="flex-align-center gap-1">
       <el-input ref="searchInputRef" v-model="searchKeyword" clearable placeholder="请输入节点名称" @keyup.enter="searchNext(1)" />
       <span class="shrink-0">
         {{ matchedNodes.length ? `${currentIndex + 1}/${matchedNodes.length}` : searchKeyword && '无结果' }}

@@ -58,7 +58,7 @@ function handleApply(tool = props.tool) {
     <p class="line-clamp-2" :title="tool.desc ?? undefined">{{ tool.desc || '-' }}</p>
 
     <template #footer="{ Action }">
-      <span class="-mb-3 flex items-center gap-1 text-sm text-N600 group-hover:hidden group-focus-within:hidden">
+      <span class="-mb-3 flex-align-center gap-1 text-sm text-N600 group-hover:hidden group-focus-within:hidden">
         <MkIcon v-if="tool.downloads !== undefined" name="icon_download_outlined" />
         {{ tool.downloads && numberFormat(tool.downloads) }}
       </span>

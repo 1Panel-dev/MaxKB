@@ -51,7 +51,7 @@ const platformMenuItems = computed<PreviewMenuItem[]>(() => [
             <div class="border-t py-1">
               <template v-for="menuItem in accountMenuItems" :key="menuItem.label">
                 <div class="flex-between h-8 px-3 w-full">
-                  <span class="flex items-center gap-2">
+                  <span class="flex-align-center gap-2">
                     <MkIcon :name="menuItem.iconName" class="text-N600!" />
                     <span>{{ menuItem.label }}</span>
                   </span>
@@ -61,13 +61,13 @@ const platformMenuItems = computed<PreviewMenuItem[]>(() => [
               </template>
             </div>
             <div class="border-t py-1">
-              <div v-for="menuItem in platformMenuItems" :key="menuItem.label" class="flex h-8 items-center gap-2 px-3">
+              <div v-for="menuItem in platformMenuItems" :key="menuItem.label" class="flex-align-center h-8 gap-2 px-3">
                 <MkIcon :name="menuItem.iconName" class="text-N600!" />
                 <span>{{ menuItem.label }}</span>
               </div>
             </div>
             <div class="border-t py-1">
-              <div class="flex h-8 items-center gap-2 px-3">
+              <div class="flex-align-center h-8 gap-2 px-3">
                 <MkIcon name="icon_logout_outlined" class="text-N600!" />
                 <span>退出登录</span>
               </div>

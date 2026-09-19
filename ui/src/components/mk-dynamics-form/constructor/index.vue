@@ -87,14 +87,14 @@ defineExpose({ getData, validate, render })
 </script>
 
 <template>
-  <div v-if="enableVisibility" class="flex max-h-[inherit] min-h-0 flex-col">
+  <div v-if="enableVisibility" class="flex-column max-h-[inherit] min-h-0">
     <el-tabs v-model="activeTab" class="shrink-0">
       <el-tab-pane label="基本信息" name="basic" />
       <el-tab-pane label="显隐设置" name="visibility" />
     </el-tabs>
 
     <!-- 导航固定，内容独立滚动；两个表单保持挂载，供统一回填、取值和校验。 -->
-    <el-scrollbar class="mk-scrollbar-right mt-4 flex h-auto! min-h-0 flex-auto flex-col" wrap-class="h-auto! min-h-0 flex-auto">
+    <el-scrollbar class="mk-scrollbar-right mt-4 flex-column h-auto! min-h-0 flex-auto" wrap-class="h-auto! min-h-0 flex-auto">
       <BasicInfoConstructor v-show="activeTab === 'basic'" ref="basicRef" v-model="formData" :input-type-list="fieldTypeOptions" v-bind="$attrs" />
       <VisibilityConstructor v-show="activeTab === 'visibility'" ref="visibilityRef" :initial-value="visibilityRules" :left-options="leftOptions" />
     </el-scrollbar>

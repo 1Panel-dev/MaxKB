@@ -67,7 +67,7 @@ defineExpose({ close, open })
       </el-form-item>
       <el-form-item class="mk-hide-asterisk" prop="expression">
         <template #label>
-          <span class="flex items-center gap-1">
+          <span class="flex-align-center gap-1">
             <span class="mk-required">表达式</span>
             <MkTooltip placement="right">
               <template #content>
