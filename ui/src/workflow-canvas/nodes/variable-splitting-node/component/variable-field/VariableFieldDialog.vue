@@ -14,12 +14,12 @@ const currentIndex = ref<number | undefined>(undefined)
 const formData = ref<VariableField>({ field: '', label: '', expression: '' })
 
 const rules: FormRules<VariableField> = {
-  label: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
+  label: [{ whitespace: true, required: true, message: '请输入显示名称', trigger: 'blur' }],
   field: [
-    { required: true, message: '请输入变量', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入变量', trigger: 'blur' },
     { pattern: /^[a-zA-Z0-9_]+$/, message: '变量可由字母、数字、下划线组成', trigger: 'blur' },
   ],
-  expression: [{ required: true, message: '请输入表达式', trigger: 'blur' }],
+  expression: [{ whitespace: true, required: true, message: '请输入表达式', trigger: 'blur' }],
 }
 
 const visible = ref(false)
@@ -69,7 +69,7 @@ defineExpose({ close, open })
         <template #label>
           <span class="flex items-center gap-1">
             <span class="mk-required">表达式</span>
-            <el-tooltip placement="right">
+            <MkTooltip placement="right">
               <template #content>
                 请使用 JSON Path 表达式拆分变量，例如：$.store.book
                 <a
@@ -81,7 +81,7 @@ defineExpose({ close, open })
                 >
               </template>
               <MkIcon name="icon_info_outlined" class="text-N600!" />
-            </el-tooltip>
+            </MkTooltip>
           </span>
         </template>
         <el-input v-model="formData.expression" :maxlength="64" show-word-limit placeholder="请输入表达式" />

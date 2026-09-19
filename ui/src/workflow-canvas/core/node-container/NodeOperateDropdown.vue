@@ -119,7 +119,7 @@ function deleteNode() {
 <template>
   <MkDropdown v-if="visible" :teleported="false" trigger="click" @visible-change="emit('visible-change', $event)">
     <el-button text>
-      <MkIcon name="icon_more_outlined" :size="20"/>
+      <MkIcon name="icon_more_outlined" :size="20" />
     </el-button>
     <template #dropdown>
       <MkDropdownMenu class="min-w-36">
@@ -153,7 +153,7 @@ function deleteNode() {
 
   <MkDialog v-model="nodeNameDialogVisible" title="节点名称" append-to-body @submit.prevent>
     <el-form ref="titleFormRef" :model="nodeNameForm" label-position="top">
-      <el-form-item prop="title" :rules="[{ required: true, message: '请输入', trigger: 'blur' }]">
+      <el-form-item prop="title" :rules="[{ whitespace: true, required: true, message: '请输入', trigger: 'blur' }]">
         <el-input v-model="nodeNameForm.title" @blur="nodeNameForm.title = nodeNameForm.title.trim()" />
       </el-form-item>
     </el-form>

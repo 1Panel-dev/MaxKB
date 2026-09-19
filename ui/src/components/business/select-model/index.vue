@@ -172,11 +172,11 @@ function openModelParams() {
     </el-select>
     <div v-if="canEditModelParams" class="absolute inset-y-px right-3 flex items-center gap-2">
       <el-divider direction="vertical" />
-      <el-tooltip content="模型参数设置" placement="top" :disabled="disabled || !modelValue">
+      <MkTooltip content="模型参数设置" placement="top" :disabled="disabled || !modelValue">
         <el-button text class="-mr-1" :disabled="disabled || !modelValue" @click.stop="openModelParams">
           <MkIcon name="icon_preferences_outlined" />
         </el-button>
-      </el-tooltip>
+      </MkTooltip>
     </div>
   </div>
   <ModelParamsDialog v-if="canEditModelParams" ref="modelParamsDialogRef" @submit="emit('update:modelParams', $event)" />

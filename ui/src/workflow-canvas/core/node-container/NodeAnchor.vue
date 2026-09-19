@@ -20,7 +20,7 @@ function openNodeMenu() {
 </script>
 
 <template>
-  <el-tooltip :disabled="!canOpenNodeMenu || tooltipSuppressed" :enterable="false" placement="top">
+  <MkTooltip :disabled="!canOpenNodeMenu || tooltipSuppressed" :enterable="false" placement="top">
     <template #content>点击添加节点<br />拖拽连接节点</template>
     <div
       class="workflow-node-anchor"
@@ -37,5 +37,5 @@ function openNodeMenu() {
     >
       <MkIcon v-if="!connected || anchorData.type === 'right'" name="icon_add_bold_outlined" class="text-white!" :size="12" />
     </div>
-  </el-tooltip>
+  </MkTooltip>
 </template>

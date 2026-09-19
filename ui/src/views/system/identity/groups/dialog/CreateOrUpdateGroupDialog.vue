@@ -13,7 +13,7 @@ const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
 const groupForm = reactive<{ id?: string; name: string }>({ name: '' })
-const formRules: FormRules = { name: [{ required: true, message: '请输入用户组名称', trigger: 'blur' }] }
+const formRules: FormRules = { name: [{ whitespace: true, required: true, message: '请输入用户组名称', trigger: 'blur' }] }
 
 function open(group?: { id: string; name: string }) {
   if (group) {

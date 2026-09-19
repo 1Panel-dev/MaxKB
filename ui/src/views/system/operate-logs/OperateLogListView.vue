@@ -183,11 +183,11 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="70" fixed="right">
           <template #default="{ row }">
-            <el-tooltip effect="dark" content="API详情" placement="top">
+            <MkTooltip effect="dark" content="API详情" placement="top">
               <el-button type="primary" text @click.stop="handleOpenDetail(row)">
                 <MkIcon name="icon_describe_outlined" />
               </el-button>
-            </el-tooltip>
+            </MkTooltip>
           </template>
         </el-table-column>
       </MkTable>

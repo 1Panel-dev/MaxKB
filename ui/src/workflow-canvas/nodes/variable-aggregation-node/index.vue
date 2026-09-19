@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
                   v-if="formData.strategy === 'variable_to_dict'"
                   class="small w-25 shrink-0"
                   :prop="`group_list.${gIndex}.variable_list.${vIndex}.key`"
-                  :rules="{ required: true, message: '请输入键名', trigger: 'blur' }"
+                  :rules="{ whitespace: true, required: true, message: '请输入键名', trigger: 'blur' }"
                 >
                   <el-input v-model="item.key" placeholder="请输入键名" maxlength="256" />
                 </el-form-item>

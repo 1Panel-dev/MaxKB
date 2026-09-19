@@ -176,11 +176,11 @@ onMounted(() => loadWorkspaceOptions())
       <component :is="Header">
         <h4>{{ title }}</h4>
         <!-- 创建工作空间 -->
-        <el-tooltip content="创建工作空间" placement="top">
+        <MkTooltip content="创建工作空间" placement="top">
           <el-button text type="primary" class="-mr-1" @click="handleOpenWorkspaceDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
-        </el-tooltip>
+        </MkTooltip>
       </component>
       <MkSearchList :data="workspacesList" :default-active="currentWorkspace?.id" @click="handleWorkspaceSelect">
         <template #action-dropdown="{ row: workspace }">
@@ -247,11 +247,11 @@ onMounted(() => loadWorkspaceOptions())
           <el-table-column label="操作" width="70" fixed="right">
             <template #default="{ row }">
               <!-- 移除成员 -->
-              <el-tooltip content="移除" placement="top">
+              <MkTooltip content="移除" placement="top">
                 <el-button type="primary" text @click="handleRemoveMember(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
-              </el-tooltip>
+              </MkTooltip>
             </template>
           </el-table-column>
 

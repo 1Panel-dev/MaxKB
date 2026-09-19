@@ -178,11 +178,11 @@ onMounted(() => {
       <component :is="Header">
         <h4>{{ title }}</h4>
         <!-- 创建用户组 -->
-        <el-tooltip content="创建用户组" placement="top">
+        <MkTooltip content="创建用户组" placement="top">
           <el-button class="-mr-1" text type="primary" @click="handleOpenGroupDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
-        </el-tooltip>
+        </MkTooltip>
       </component>
       <MkSearchList v-loading="loadingGroups" :data="userGroups" :default-active="currentGroup?.id" @click="handleGroupSelect">
         <template #action-dropdown="{ row }">
@@ -248,11 +248,11 @@ onMounted(() => {
           <el-table-column label="操作" width="70" fixed="right">
             <template #default="{ row }">
               <!-- 移除成员 -->
-              <el-tooltip content="移除" placement="top">
+              <MkTooltip content="移除" placement="top">
                 <el-button type="primary" text @click="handleRemoveMembers(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
-              </el-tooltip>
+              </MkTooltip>
             </template>
           </el-table-column>
           <template #footer-batch-actions>

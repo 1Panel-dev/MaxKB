@@ -30,11 +30,11 @@ const submitText = computed(() => (isEdit.value ? '保存' : '创建'))
 
 const userFormRules = reactive<FormRules<ChatUserPayload>>({
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 4, max: 64, message: '长度应为 4-64 个字符', trigger: 'blur' },
   ],
   nick_name: [
-    { required: true, message: '请输入姓名', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入姓名', trigger: 'blur' },
     { min: 1, max: 64, message: '长度应为 1-64 个字符', trigger: 'blur' },
   ],
   email: [{ type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }],
@@ -71,7 +71,12 @@ async function submitUser() {
       userSubmitting.value = true
 
       if (isEdit.value) {
-        ChatUserApi.putChatUser(editingUserId.value, { email: userForm.email, nick_name: userForm.nick_name, phone: userForm.phone, user_group_ids: userForm.user_group_ids })
+        ChatUserApi.putChatUser(editingUserId.value, {
+          email: userForm.email,
+          nick_name: userForm.nick_name,
+          phone: userForm.phone,
+          user_group_ids: userForm.user_group_ids,
+        })
           .then(() => {
             MsgSuccess('编辑成功')
             emit('refresh', false)
@@ -100,7 +105,13 @@ async function submitUser() {
 
 function open(user?: ChatUser) {
   if (user) {
-    Object.assign(userForm, { username: user.username, email: user.email ?? '', nick_name: user.nick_name, phone: user.phone ?? '', user_group_ids: [...user.user_group_ids] })
+    Object.assign(userForm, {
+      username: user.username,
+      email: user.email ?? '',
+      nick_name: user.nick_name,
+      phone: user.phone ?? '',
+      user_group_ids: [...user.user_group_ids],
+    })
     editingUserId.value = user.id
     isEdit.value = true
   }
@@ -126,7 +137,14 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="drawerVisible" :title="drawerTitle" @closed="resetData">
-    <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-position="top" require-asterisk-position="right" @submit.prevent="submitUser">
+    <el-form
+      ref="userFormRef"
+      :model="userForm"
+      :rules="userFormRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent="submitUser"
+    >
       <section>
         <h4 class="mk-title-decoration mb-4">基本信息</h4>
         <el-form-item label="用户名" prop="username">
@@ -157,7 +175,16 @@ defineExpose({ open })
       <section>
         <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
         <el-form-item label="用户组" prop="user_group_ids">
-          <el-select v-model="userForm.user_group_ids" class="w-full" :loading="userGroupOptionsLoading" clearable filterable multiple placeholder="请选择用户组" fit-input-width>
+          <el-select
+            v-model="userForm.user_group_ids"
+            class="w-full"
+            :loading="userGroupOptionsLoading"
+            clearable
+            filterable
+            multiple
+            placeholder="请选择用户组"
+            fit-input-width
+          >
             <el-option v-for="userGroup in userGroupOptions" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
           </el-select>
         </el-form-item>

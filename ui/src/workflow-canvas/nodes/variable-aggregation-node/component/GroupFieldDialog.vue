@@ -18,9 +18,9 @@ const currentIndex = ref<number | undefined>(undefined)
 const formData = ref<GroupFieldForm>({ field: '', label: '' })
 
 const rules: FormRules<GroupFieldForm> = {
-  label: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
+  label: [{ whitespace: true, required: true, message: '请输入显示名称', trigger: 'blur' }],
   field: [
-    { required: true, message: '请输入变量', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入变量', trigger: 'blur' },
     { pattern: /^[a-zA-Z0-9_]+$/, message: '变量可由字母、数字、下划线组成', trigger: 'blur' },
   ],
 }

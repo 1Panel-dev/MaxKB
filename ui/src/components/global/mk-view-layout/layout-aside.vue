@@ -48,7 +48,7 @@ function toggleAside(event: MouseEvent) {
         <LayoutAsideContent />
       </div>
     </aside>
-    <el-tooltip v-if="props.collapsible" :content="asideCollapsed ? '展开' : '收起'" placement="right">
+    <MkTooltip v-if="props.collapsible" :content="asideCollapsed ? '展开' : '收起'" placement="right">
       <button
         type="button"
         class="absolute top-15 z-10 cursor-pointer border bg-white shadow-md h-6 transition-all duration-200 hover:text-primary"
@@ -57,6 +57,6 @@ function toggleAside(event: MouseEvent) {
       >
         <MkIcon name="icon_left_outlined" :class="asideCollapsed && 'rotate-180'"  :size="12" />
       </button>
-    </el-tooltip>
+    </MkTooltip>
   </div>
 </template>

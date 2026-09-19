@@ -105,12 +105,12 @@ onMounted(() => {
         <span class="flex items-center gap-1">
           {{ item.label }}
 
-          <el-tooltip placement="right" v-if="item.value === 'ref_variables'">
+          <MkTooltip placement="right" v-if="item.value === 'ref_variables'">
             <template #content>
               <div class="whitespace-pre-wrap">{{ referenceOptionsHelp }}</div>
             </template>
             <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
-          </el-tooltip>
+          </MkTooltip>
         </span>
       </el-radio>
     </el-radio-group>
@@ -132,7 +132,7 @@ onMounted(() => {
           <el-form-item
             :label="index === 0 ? '标签' : ''"
             :prop="`option_list.${index}.label`"
-            :rules="[{ required: formValue.required, message: '请输入标签', trigger: ['blur', 'change'] }]"
+            :rules="[{ whitespace: true, required: formValue.required, message: '请输入标签', trigger: ['blur', 'change'] }]"
             class="flex-1 small"
           >
             <el-input v-model="option.label" placeholder="请输入标签" />
@@ -140,7 +140,7 @@ onMounted(() => {
           <el-form-item
             :label="index === 0 ? '选项值' : ''"
             :prop="`option_list.${index}.value`"
-            :rules="[{ required: formValue.required, message: '请输入选项值', trigger: ['blur', 'change'] }]"
+            :rules="[{ whitespace: true, required: formValue.required, message: '请输入选项值', trigger: ['blur', 'change'] }]"
             class="flex-1 small"
           >
             <el-input v-model="option.value" placeholder="请输入选项值" />

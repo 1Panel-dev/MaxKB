@@ -181,7 +181,7 @@ function handleSave() {
           />
         </el-form-item>
       </template>
-      <MkCollapse v-else-if="knowledge.type === KNOWLEDGE_TYPE.BASE" indicator-position="after" trigger="indicator" trigger-class="pt-0 mb-2">
+      <MkCollapse v-else-if="knowledge.type === KNOWLEDGE_TYPE.BASE" indicator-position="after" trigger="indicator" trigger-class="mb-2">
         <template #label>
           <h6>其他设置</h6>
         </template>
@@ -192,9 +192,9 @@ function handleSave() {
           <template #label>
             <div class="flex items-center gap-1">
               <span>上传的每个文档最大 (MB)</span>
-              <el-tooltip content="建议根据服务器配置调整，否则可能会造成服务宕机" placement="right">
+              <MkTooltip content="建议根据服务器配置调整，否则可能会造成服务宕机" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
-              </el-tooltip>
+              </MkTooltip>
             </div>
           </template>
           <MkSlider v-model="settingForm.file_size_limit" show-input :min="1" :max="1000" />

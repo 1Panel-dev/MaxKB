@@ -50,8 +50,8 @@ const editId = ref<string>()
 const originalForm = ref('')
 const dataSourceForm = reactive<DataSourceFormModel>({ code: codeTemplate, desc: '', icon: '', init_field_list: [], input_field_list: [], name: '' })
 const formRules: FormRules<DataSourceFormModel> = {
-  code: [{ required: true, message: '请输入数据源内容', trigger: 'blur' }],
-  name: [{ required: true, message: '请输入数据源名称', trigger: 'blur' }],
+  code: [{ whitespace: true, required: true, message: '请输入数据源内容', trigger: 'blur' }],
+  name: [{ whitespace: true, required: true, message: '请输入数据源名称', trigger: 'blur' }],
 }
 
 function handleSubmit() {
@@ -147,13 +147,27 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="visible" :before-close="handleBeforeClose" :title="title" size="60%" @closed="handleClosed">
-    <el-form ref="formRef" v-loading="formLoading" :model="dataSourceForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form
+      ref="formRef"
+      v-loading="formLoading"
+      :model="dataSourceForm"
+      :rules="formRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
           <!-- // TODO 修改头像 -->
           <ToolIcon :icon="dataSourceForm.icon" :size="32" :type="TOOL_TYPE.DATA_SOURCE" />
-          <el-input v-model="dataSourceForm.name" maxlength="64" placeholder="请输入数据源名称" show-word-limit @blur="dataSourceForm.name = dataSourceForm.name.trim()" />
+          <el-input
+            v-model="dataSourceForm.name"
+            maxlength="64"
+            placeholder="请输入数据源名称"
+            show-word-limit
+            @blur="dataSourceForm.name = dataSourceForm.name.trim()"
+          />
         </div>
       </el-form-item>
       <el-form-item label="描述">

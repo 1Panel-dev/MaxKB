@@ -25,7 +25,7 @@ const visible = ref(false)
 const loading = ref(false)
 const currentTool = ref<ToolStoreItem>()
 const storeToolForm = reactive<StoreToolForm>({ name: '' })
-const formRules: FormRules<StoreToolForm> = { name: [{ required: true, message: '请输入工具名称', trigger: 'blur' }] }
+const formRules: FormRules<StoreToolForm> = { name: [{ whitespace: true, required: true, message: '请输入工具名称', trigger: 'blur' }] }
 
 function handleSubmit() {
   formRef.value?.validate((valid) => {

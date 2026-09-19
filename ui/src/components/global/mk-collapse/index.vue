@@ -31,7 +31,7 @@ const expanded = computed({
 
 <template>
   <section>
-    <div class="py-2" :class="triggerClass" :style="triggerStyle" @click="trigger === 'header' && (expanded = !expanded)">
+    <div :class="triggerClass" :style="triggerStyle" @click="trigger === 'header' && (expanded = !expanded)">
       <div class="flex w-full items-center gap-2 text-left" :class="{ 'cursor-pointer': trigger === 'header' }">
         <!-- 展开或收起内容 -->
         <button

@@ -1,0 +1,10 @@
+/** 跨业务复用的任务状态，按需扩展。 */
+export const STATE_TYPES = {
+  PENDING: 'PENDING',
+  STARTED: 'STARTED',
+  SUCCESS: 'SUCCESS',
+  FAILURE: 'FAILURE',
+  REVOKE: 'REVOKE',
+  REVOKED: 'REVOKED',
+  TRIGGER_ERROR: 'TRIGGER_ERROR',
+} as const

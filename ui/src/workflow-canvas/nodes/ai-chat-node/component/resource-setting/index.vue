@@ -104,9 +104,9 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
 </script>
 
 <template>
-  <div class="space-y-1">
+  <div class="space-y-2">
     <!-- MCP -->
-    <MkCollapse trigger-class="py-0!">
+    <MkCollapse>
       <template #label>
         <div class="flex-between min-w-0 flex-1">
           <span
@@ -116,7 +116,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
         </div>
       </template>
 
-      <div v-if="mcpCount" class="mt-2 mb-2 flex flex-col gap-1">
+      <div v-if="mcpCount" class="mt-2 mb-2 space-y-2">
         <template v-for="resource in selectedMcpTools" :key="resource.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">
@@ -141,7 +141,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       </div>
     </MkCollapse>
     <!-- 工具 -->
-    <MkCollapse trigger-class="py-1!">
+    <MkCollapse>
       <template #label>
         <div class="flex-between min-w-0 flex-1">
           <span
@@ -153,7 +153,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
         </div>
       </template>
 
-      <div v-if="selectedTools.length" class="mb-2 flex flex-col gap-1">
+      <div v-if="selectedTools.length" class="mt-2 mb-2 space-y-2">
         <template v-for="resource in selectedTools" :key="resource.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">
@@ -168,19 +168,19 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       </div>
     </MkCollapse>
     <!-- Skills -->
-    <MkCollapse trigger-class="py-1!">
+    <MkCollapse>
       <template #label>
         <div class="flex-between min-w-0 flex-1">
           <span
             >Skills<span v-if="selectedSkills.length">（{{ selectedSkills.length }}）</span></span
           >
-          <el-button text type="primary" title="添加Skills" @click.stop="openToolDialog(true)">
+          <el-button text type="primary" @click.stop="openToolDialog(true)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
         </div>
       </template>
 
-      <div v-if="selectedSkills.length" class="mb-2 flex flex-col gap-1">
+      <div v-if="selectedSkills.length" class="mt-2 mb-2 space-y-2">
         <template v-for="resource in selectedSkills" :key="resource.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">
@@ -195,7 +195,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       </div>
     </MkCollapse>
     <!-- 智能体 -->
-    <MkCollapse v-if="showApplications" trigger-class="py-1!">
+    <MkCollapse v-if="showApplications">
       <template #label>
         <div class="flex-between min-w-0 flex-1">
           <span
@@ -207,7 +207,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
         </div>
       </template>
 
-      <div v-if="selectedApplications.length" class="mb-2 flex flex-col gap-1">
+      <div v-if="selectedApplications.length" class="mt-2 mb-2 space-y-2">
         <template v-for="resource in selectedApplications" :key="resource.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">

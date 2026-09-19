@@ -62,12 +62,26 @@ import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynam
 - `el-input-number` 设置 `controls-position="right"` 时，同时设置 `align="left"`。
 - Tooltip、Popover、Popconfirm、Dropdown 的触发插槽只保留一个有实际布局盒的根节点；
   多个元素用 `span` 或 `div` 包裹，不使用 `template` 或 `display: contents` 代替。
+- 名称、标题、标签及必填业务文本使用独立的 `whitespace: true` 规则拒绝纯空白，保留原有
+  `trim()` 清理逻辑。数字、布尔、选择项、数组和允许空白的原始参数值不统一套用；自定义
+  `validator` 需要空白检查时拆成独立规则，避免覆盖内置校验。动态表单仅文本框、文本域的
+  默认规则及构造器生成的必填规则启用该检查，密码和服务端显式校验协议保持原有行为。
 - 业务弹窗 `open()` 先重置再回填，关闭动画结束的 `closed` 统一清理表单、校验和临时状态。
   父级负责校验或请求时，子组件提交数据后由父级成功调用 `close()`，失败保持打开。
 - 仅登录表单支持回车提交；其他业务表单使用 `@submit.prevent`，保存、添加由按钮触发。
   自定义 `submit` 事件不等于原生表单提交。
 
 ## 全局 UI 组件
+
+### MkTooltip
+
+普通提示统一使用 `MkTooltip`，业务代码不直接使用 `el-tooltip`。默认悬停 500ms 后显示，
+延迟由 `global/mk-tooltip/constants.ts` 的 `TOOLTIP_SHOW_DELAY` 维护；提前移开时由 Element Plus 取消显示。
+`showAfter` 可按需覆盖，其他 Tooltip 属性、事件（包括 `update:visible`）通过 `$attrs` 透传，
+支持默认触发插槽和 `content` 插槽，保持原有关闭延迟及可移入行为。
+显式控制 `visible` 时，显示时机由调用方负责，`showAfter` 不参与受控显示。
+Admin、Chat 共用的 `App.vue` 通过 Config Provider 的 `table.tooltipOptions` 为表格溢出提示
+配置同一延迟，不额外开启溢出提示。原生 `title`、Popover、下拉菜单及图表提示保持各自行为。
 
 ### MdEditor、MdEditorMagnify、MdPreview
 
@@ -214,6 +228,17 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 ### MkStatusLabel
 
 `active` 控制布尔状态，默认“已启用 / 已禁用”；用 `activeText`、`inactiveText` 修改文案。
+多状态通过 `status` 直接传入 `STATE_LABELS` 的状态键，文案统一读取 `constants/state.ts`。
+传入 `status` 时仅显示该状态配置的图标；未配置状态或没有图标时只显示文案，不回退到其他状态图标。
+未传 `status` 时，`active` 为 true 显示成功图标，为 false 显示 `icon_ban_filled`。
+组件直接使用公共枚举 `STATE_TYPES` 匹配图标；新增状态需补齐 `STATE_LABELS` 文案，图标可按需配置。
+`status` 优先于 `active`，状态文案统一使用 `STATE_LABELS`，不提供 `text` 覆盖。
+
+```vue
+<MkStatusLabel :active="enabled" />
+<MkStatusLabel :status="row.state" />
+<MkStatusLabel status="TRIGGER_ERROR" />
+```
 
 ### MkTable
 

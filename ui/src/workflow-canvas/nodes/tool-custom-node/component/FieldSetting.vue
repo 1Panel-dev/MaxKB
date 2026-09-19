@@ -2,20 +2,20 @@
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { ToolInputField, ToolInputFieldType } from '@/api/types'
+import type { ToolInputField } from '@/api/types'
 
 defineOptions({ name: 'WorkflowToolInputFieldDialog' })
 
 const emit = defineEmits<{ submit: [field: ToolInputField, index?: number] }>()
 
-const inputFieldTypes: ToolInputFieldType[] = ['string', 'int', 'float', 'dict', 'array']
+const inputFieldTypes: ToolInputField['type'][] = ['string', 'int', 'float', 'dict', 'array']
 const formRef = useTemplateRef<FormInstance>('formRef')
 const visible = ref(false)
 const editing = ref(false)
 const currentIndex = ref<number>()
 const inputFieldForm = ref<ToolInputField>({ desc: '', is_required: true, name: '', source: 'reference', type: 'string' })
 const formRules: FormRules<ToolInputField> = {
-  name: [{ required: true, message: '请输入参数名称', trigger: 'blur' }],
+  name: [{ whitespace: true, required: true, message: '请输入参数名称', trigger: 'blur' }],
 }
 
 // 弹窗仅维护参数草稿，节点接收提交后关闭。

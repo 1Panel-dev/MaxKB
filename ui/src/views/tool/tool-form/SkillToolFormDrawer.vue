@@ -39,7 +39,7 @@ const originalForm = ref('')
 const skillForm = reactive<SkillFormModel>({ code: '', desc: '', fileList: [], icon: '', init_field_list: [], name: '' })
 const formRules: FormRules<SkillFormModel> = {
   fileList: [{ required: true, message: '请上传 Skill ZIP 文件', trigger: 'change' }],
-  name: [{ required: true, message: '请输入 Skill 名称', trigger: 'blur' }],
+  name: [{ whitespace: true, required: true, message: '请输入 Skill 名称', trigger: 'blur' }],
 }
 
 function removeUploadFile(file: UploadFile, fileList: UploadFiles) {
@@ -192,13 +192,27 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="visible" :before-close="handleBeforeClose" :title="title" size="60%" @closed="handleClosed">
-    <el-form ref="formRef" v-loading="formLoading" :model="skillForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form
+      ref="formRef"
+      v-loading="formLoading"
+      :model="skillForm"
+      :rules="formRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
           <!-- // TODO 头像修改 -->
           <ToolIcon :icon="skillForm.icon" :size="32" :type="TOOL_TYPE.SKILL" />
-          <el-input v-model="skillForm.name" maxlength="64" placeholder="请输入 Skill 名称" show-word-limit @blur="skillForm.name = skillForm.name.trim()" />
+          <el-input
+            v-model="skillForm.name"
+            maxlength="64"
+            placeholder="请输入 Skill 名称"
+            show-word-limit
+            @blur="skillForm.name = skillForm.name.trim()"
+          />
         </div>
       </el-form-item>
       <el-form-item label="描述">

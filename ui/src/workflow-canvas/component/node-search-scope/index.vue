@@ -123,7 +123,7 @@ onBeforeUnmount(() => anchorGuard.reset())
           <span class="flex items-center gap-1">
             <span>知识库列表</span>
             <span class="relative inline-flex">
-              <el-tooltip
+              <MkTooltip
                 :teleported="false"
                 placement="right"
                 @show="anchorGuard.setOverlayVisible('knowledge-help', true)"
@@ -135,7 +135,7 @@ onBeforeUnmount(() => anchorGuard.reset())
                 <span class="inline-flex">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </span>
-              </el-tooltip>
+              </MkTooltip>
             </span>
           </span>
         </el-radio>
@@ -143,7 +143,7 @@ onBeforeUnmount(() => anchorGuard.reset())
           <span class="flex items-center gap-1">
             <span>文档列表</span>
             <span class="relative inline-flex">
-              <el-tooltip
+              <MkTooltip
                 :teleported="false"
                 placement="right"
                 @show="anchorGuard.setOverlayVisible('document-help', true)"
@@ -155,7 +155,7 @@ onBeforeUnmount(() => anchorGuard.reset())
                 <span class="inline-flex">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </span>
-              </el-tooltip>
+              </MkTooltip>
             </span>
           </span>
         </el-radio>

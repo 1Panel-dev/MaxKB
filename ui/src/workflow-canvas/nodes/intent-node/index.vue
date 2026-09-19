@@ -172,7 +172,11 @@ onMounted(() => {
           </el-button>
         </div>
         <template v-for="(item, index) in formData.branch" :key="item.id">
-          <el-form-item :prop="`branch.${index}.content`" :rules="{ required: true, message: '请输入', trigger: 'blur' }" class="small">
+          <el-form-item
+            :prop="`branch.${index}.content`"
+            :rules="{ whitespace: true, required: true, message: '请输入', trigger: 'blur' }"
+            class="small"
+          >
             <div class="flex items-center gap-2 w-full">
               <div class="min-w-0 flex-1">
                 <el-input v-model="item.content" :disabled="item.isOther" placeholder="请输入" />

@@ -176,11 +176,11 @@ function handleBatchDelete() {
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <el-tooltip content="创建文件夹" placement="top">
+        <MkTooltip content="创建文件夹" placement="top">
           <el-button text type="primary" class="-mr-1" @click="handleCreateFolder">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
-        </el-tooltip>
+        </MkTooltip>
       </component>
 
       <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.KNOWLEDGE" draggable @select="handleFolderSelect" />

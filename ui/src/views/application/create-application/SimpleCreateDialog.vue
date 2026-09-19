@@ -33,7 +33,7 @@ const loading = ref(false)
 const applicationFormRef = ref<FormInstance>()
 const applicationForm = reactive<SimpleApplicationDraft>({ desc: '', name: '' })
 const applicationFormRules: FormRules<SimpleApplicationDraft> = {
-  name: [{ required: true, message: '请输入智能体名称', trigger: 'blur' }],
+  name: [{ whitespace: true, required: true, message: '请输入智能体名称', trigger: 'blur' }],
 }
 const createDisabled = computed(() => !applicationForm.name.trim())
 

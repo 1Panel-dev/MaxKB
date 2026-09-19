@@ -132,14 +132,18 @@ defineExpose({ open })
     <div v-loading="formLoading" class="mx-auto w-full max-w-200">
       <MkDynamicsForm ref="dynamicsFormRef" v-model="modelFormData" :render-data="credentialFields">
         <template #default>
-          <el-form-item class="mk-hide-asterisk" prop="name" :rules="{ required: true, message: '请输入模型名称', trigger: 'blur' }">
+          <el-form-item
+            class="mk-hide-asterisk"
+            prop="name"
+            :rules="{ whitespace: true, required: true, message: '请输入模型名称', trigger: 'blur' }"
+          >
             <template #label>
               <span class="inline-flex items-center gap-2">
                 <span class="mk-required"> 模型名称</span>
 
-                <el-tooltip content="MaxKB 中自定义的模型名称" placement="right">
+                <MkTooltip content="MaxKB 中自定义的模型名称" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
-                </el-tooltip>
+                </MkTooltip>
               </span>
             </template>
             <el-input v-model="modelForm.name" maxlength="64" placeholder="请给基础模型设置一个名称" @blur="modelForm.name = modelForm.name.trim()" />
@@ -171,9 +175,9 @@ defineExpose({ open })
                 <template #default>
                   <div class="flex items-center gap-2">
                     <span>{{ option.name }} </span>
-                    <el-tooltip v-if="option.desc" :content="option.desc" placement="right">
+                    <MkTooltip v-if="option.desc" :content="option.desc" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
-                    </el-tooltip>
+                    </MkTooltip>
                   </div>
                 </template>
               </el-option>

@@ -13,7 +13,7 @@ const loading = ref(false)
 const formRef = ref<FormInstance>()
 const roleForm = reactive<RolePayload>({ role_name: '' })
 const rules: FormRules<RolePayload> = {
-  role_name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+  role_name: [{ whitespace: true, required: true, message: '请输入角色名称', trigger: 'blur' }],
   role_type: [{ required: true, message: '请选择继承角色', trigger: 'change' }],
 }
 const roleTypeOptions = ref<RoleType[]>([ROLE_TYPE.ADMIN, ROLE_TYPE.WORKSPACE_MANAGE, ROLE_TYPE.USER])

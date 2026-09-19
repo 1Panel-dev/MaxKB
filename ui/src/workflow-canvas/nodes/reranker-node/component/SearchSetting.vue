@@ -40,7 +40,7 @@ function submit() {
           <template #label>
             <span class="flex items-center gap-1">
               Score 高于
-              <el-tooltip content="Score 越高相关性越强。" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></el-tooltip>
+              <MkTooltip content="Score 越高相关性越强。" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip>
             </span>
           </template>
           <el-input-number

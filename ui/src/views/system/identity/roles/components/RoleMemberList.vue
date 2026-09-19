@@ -116,9 +116,9 @@ watch(
       <el-table-column v-if="currentRole.type !== ROLE_TYPE.ADMIN" prop="workspace_name" label="工作空间" min-width="180" show-overflow-tooltip />
       <el-table-column label="操作" width="70" fixed="right">
         <template #default="{ row }">
-          <el-tooltip content="移除" placement="top">
+          <MkTooltip content="移除" placement="top">
             <el-button type="primary" text @click="handleRemoveMember(row)"><MkIcon name="icon_assigned_outlined" /></el-button>
-          </el-tooltip>
+          </MkTooltip>
         </template>
       </el-table-column>
       <template #footer-batch-actions>

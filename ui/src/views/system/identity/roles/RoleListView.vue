@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import RoleApi from '@/api/admin/system/role'
-import { ROLE_TYPE } from '@/api/enums'
 import type { RoleItem, RoleType } from '@/api/types'
 import { ROLE_TYPE_LABELS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -17,6 +16,7 @@ const loadingRoles = ref(false)
 const filterText = ref('')
 const AllRoles = ref<RoleItem[]>([])
 const currentRole = ref<RoleItem>()
+const expandedRoleTypes = ref<Partial<Record<RoleType, boolean>>>({})
 
 const roleGroups = computed(() => {
   const keyword = filterText.value.trim().toLowerCase()
@@ -34,6 +34,9 @@ function loadRoles(selectedRoleId?: string) {
       AllRoles.value = roles
       currentRole.value =
         AllRoles.value.find(({ id }) => id === selectedRoleId) ?? AllRoles.value.find(({ id }) => id === currentRole.value?.id) ?? AllRoles.value[0]
+      if (currentRole.value) {
+        expandedRoleTypes.value[currentRole.value.type] = true
+      }
     })
     .finally(() => {
       loadingRoles.value = false
@@ -42,12 +45,6 @@ function loadRoles(selectedRoleId?: string) {
 
 function handleRoleSelect(role: RoleItem) {
   currentRole.value = role
-}
-
-// 默认展开的角色组
-const DEFAULT_EXPANDED_ROLE_TYPES = new Set<RoleType>([ROLE_TYPE.ADMIN, ROLE_TYPE.WORKSPACE_MANAGE, ROLE_TYPE.USER])
-function isRoleGroupDefaultExpanded(roleType: RoleType) {
-  return DEFAULT_EXPANDED_ROLE_TYPES.has(roleType)
 }
 
 /* 创建、重命名角色 */
@@ -85,11 +82,12 @@ onMounted(() => loadRoles())
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <el-tooltip content="创建角色" placement="top">
+        <MkTooltip content="创建角色" placement="top">
+          <!-- 创建角色 -->
           <el-button class="-mr-1" text type="primary" @click="handleOpenRoleDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
-        </el-tooltip>
+        </MkTooltip>
       </component>
 
       <div class="px-4">
@@ -100,9 +98,10 @@ onMounted(() => loadRoles())
           <MkCollapse
             v-for="roleGroup in roleGroups"
             :key="roleGroup.type"
-            :default-expanded="isRoleGroupDefaultExpanded(roleGroup.type)"
+            v-model:expanded="expandedRoleTypes[roleGroup.type]"
+            :default-expanded="false"
             :title="roleGroup.label"
-            trigger-class="text-N500"
+            trigger-class="text-N500 py-2!"
           >
             <div class="space-y-1">
               <MkListItem

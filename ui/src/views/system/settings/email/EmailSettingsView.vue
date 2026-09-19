@@ -19,11 +19,11 @@ const emailFormRef = useTemplateRef<FormInstance>('emailFormRef')
 const emailSetting = reactive<EmailSettingPayload>({ ...defaultEmailSetting })
 const loading = ref(false)
 const rules: FormRules<EmailSettingPayload> = {
-  email_host: [{ required: true, message: '请输入 SMTP Host', trigger: 'blur' }],
-  email_port: [{ required: true, message: '请输入 SMTP Port', trigger: 'blur' }],
-  email_host_user: [{ required: true, message: '请输入 SMTP 账户', trigger: 'blur' }],
+  email_host: [{ whitespace: true, required: true, message: '请输入 SMTP Host', trigger: 'blur' }],
+  email_port: [{ whitespace: true, required: true, message: '请输入 SMTP Port', trigger: 'blur' }],
+  email_host_user: [{ whitespace: true, required: true, message: '请输入 SMTP 账户', trigger: 'blur' }],
   email_host_password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  from_email: [{ required: true, message: '请输入发件人邮箱', trigger: 'blur' }],
+  from_email: [{ whitespace: true, required: true, message: '请输入发件人邮箱', trigger: 'blur' }],
 }
 
 /* 邮箱设置加载与提交 */

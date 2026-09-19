@@ -60,8 +60,8 @@ const themeSetting = reactive<ThemeSettingForm>({ ...initialThemeSetting })
 const selectedTheme = ref(THEME_OPTIONS.some((option) => option.value === normalizedInitialThemeColor) ? normalizedInitialThemeColor : 'custom')
 const customThemeColor = ref(initialThemeSetting.theme)
 const formRules: FormRules<ThemeSettingForm> = {
-  slogan: [{ required: true, message: '请输入网站欢迎语', trigger: 'blur' }],
-  title: [{ required: true, message: '请输入网站名称', trigger: 'blur' }],
+  slogan: [{ whitespace: true, required: true, message: '请输入网站欢迎语', trigger: 'blur' }],
+  title: [{ whitespace: true, required: true, message: '请输入网站名称', trigger: 'blur' }],
 }
 
 const isCustomTheme = computed(() => selectedTheme.value === 'custom')

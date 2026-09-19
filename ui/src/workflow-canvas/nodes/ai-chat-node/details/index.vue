@@ -2,7 +2,7 @@
 import ApplicationDetails from './application.vue'
 import KnowledgeDetails from './knowledge.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types.ts'
 
 defineOptions({ name: 'AiChatNodeDetail' })
 

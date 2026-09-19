@@ -106,13 +106,17 @@ onMounted(() => {
     <h6 class="mk-title-decoration mb-2">节点设置</h6>
     <div class="mk-gray-card">
       <el-form ref="formNodeFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item prop="form_content_format" class="mk-hide-asterisk" :rules="{ required: true, message: '请填写表单输出内容', trigger: 'blur' }">
+        <el-form-item
+          prop="form_content_format"
+          class="mk-hide-asterisk"
+          :rules="{ whitespace: true, required: true, message: '请填写表单输出内容', trigger: 'blur' }"
+        >
           <template #label>
             <div class="flex items-center gap-1">
               <span class="mk-required">表单输出内容</span>
-              <el-tooltip placement="right" content="设置执行该节点输出的内容，{ form } 为表单的占位符">
+              <MkTooltip placement="right" content="设置执行该节点输出的内容，{ form } 为表单的占位符">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
-              </el-tooltip>
+              </MkTooltip>
             </div>
           </template>
           <MdEditorMagnify v-model="formData.form_content_format" title="表单输出内容" @wheel="handleNodeWheel" />

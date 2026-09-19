@@ -40,12 +40,12 @@ const errMessage = computed(() => {
     <template #title="{ title }">
       <h6 class="min-w-0 truncate" :title="title">{{ title }}</h6>
 
-      <el-tooltip :content="errMessage" v-if="model.status === MODEL_STATUS.ERROR">
+      <MkTooltip :content="errMessage" v-if="model.status === MODEL_STATUS.ERROR">
         <MkIcon name="icon_warning_filled" class="text-danger!" />
-      </el-tooltip>
-      <el-tooltip v-if="model.status === MODEL_STATUS.PAUSE_DOWNLOAD" :content="`基础模型: ${model.model_name} 下载失败`">
+      </MkTooltip>
+      <MkTooltip v-if="model.status === MODEL_STATUS.PAUSE_DOWNLOAD" :content="`基础模型: ${model.model_name} 下载失败`">
         <MkIcon name="icon_warning_filled" type="danger" />
-      </el-tooltip>
+      </MkTooltip>
     </template>
     <template #tag>
       <el-tag v-if="props.shared" size="small" type="info">共享</el-tag>

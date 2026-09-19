@@ -15,10 +15,10 @@ function handleOpenDialog() {
 </script>
 
 <template>
-  <el-tooltip content="修改用户密码" placement="top">
+  <MkTooltip content="修改用户密码" placement="top">
     <el-button type="primary" text @click.stop="handleOpenDialog">
       <MkIcon name="icon-key_outlined" />
     </el-button>
-  </el-tooltip>
+  </MkTooltip>
   <UserPwdDialog ref="dialogRef" @refresh="emit('refresh')" />
 </template>

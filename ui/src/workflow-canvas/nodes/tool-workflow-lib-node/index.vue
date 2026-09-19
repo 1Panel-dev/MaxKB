@@ -149,9 +149,9 @@ onBeforeUnmount(() => {
                     <span class="max-w-32 truncate" :class="{ 'mk-required': field.is_required }" :title="field.label || field.name || field.field">
                       {{ field.label || field.name || field.field }}
                     </span>
-                    <el-tooltip v-if="field.desc" :content="field.desc" placement="right">
+                    <MkTooltip v-if="field.desc" :content="field.desc" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!" />
-                    </el-tooltip>
+                    </MkTooltip>
                     <el-tag size="small" type="info">{{ field.type }}</el-tag>
                   </div>
                   <el-select
@@ -190,9 +190,9 @@ onBeforeUnmount(() => {
         <div v-if="showReturnContent" class="flex-between mt-4 w-full">
           <span class="flex items-center gap-1">
             返回内容
-            <el-tooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
-            </el-tooltip>
+            </MkTooltip>
           </span>
           <el-switch v-model="formData.is_result" size="small" />
         </div>

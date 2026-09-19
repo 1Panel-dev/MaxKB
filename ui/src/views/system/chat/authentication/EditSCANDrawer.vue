@@ -14,7 +14,12 @@ const formRef = useTemplateRef<FormInstance>('formRef')
 const form = reactive<QrLoginPlatformPayload>({ key: LOGIN_METHOD.WECOM, isActive: false, config: {} })
 
 const rules = computed<FormRules>(() =>
-  Object.fromEntries(Object.keys(form.config).map((key) => [`config.${key}`, [{ required: true, message: `请输入${SCAN_FIELD_LABELS[key] ?? key}`, trigger: 'blur' }]])),
+  Object.fromEntries(
+    Object.keys(form.config).map((key) => [
+      `config.${key}`,
+      [{ whitespace: true, required: true, message: `请输入${SCAN_FIELD_LABELS[key] ?? key}`, trigger: 'blur' }],
+    ]),
+  ),
 )
 function submit() {
   formRef.value?.validate((valid) => {

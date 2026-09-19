@@ -47,7 +47,7 @@ defineExpose({ open, close })
         label="参数"
         prop="variable"
         :rules="[
-          { required: true, message: '请输入参数', trigger: 'blur' },
+          { whitespace: true, required: true, message: '请输入参数', trigger: 'blur' },
           { pattern: /^[a-zA-Z0-9_]+$/, message: '仅支持字母、数字和下划线', trigger: 'blur' },
         ]"
       >
