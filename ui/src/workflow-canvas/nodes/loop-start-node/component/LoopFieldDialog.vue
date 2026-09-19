@@ -14,7 +14,7 @@ const fieldFormRef = ref<FormInstance>()
 const form = ref<LoopInputField>({ field: '', label: '' })
 const rules: FormRules<LoopInputField> = {
   field: [
-    { required: true, message: '请输入参数', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入参数', trigger: 'blur' },
     { pattern: /^[a-zA-Z0-9_]+$/, message: '参数只能包含英文字母、数字、下划线', trigger: 'blur' },
     {
       validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
@@ -27,7 +27,7 @@ const rules: FormRules<LoopInputField> = {
       trigger: 'blur',
     },
   ],
-  label: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
+  label: [{ whitespace: true, required: true, message: '请输入显示名称', trigger: 'blur' }],
 }
 
 // 打开时初始化，关闭动画结束后清理编辑状态。

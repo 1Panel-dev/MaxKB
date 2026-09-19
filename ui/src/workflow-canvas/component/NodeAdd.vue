@@ -38,11 +38,11 @@ function handleDragStart(node: NodeMenuItem, event: PointerEvent) {
 
 <template>
   <div v-click-outside="() => (menuVisible = false)" class="relative">
-    <el-tooltip content="添加组件" placement="left">
+    <MkTooltip content="添加组件" placement="left">
       <el-button text @click="toggleMenu">
         <MkIcon name="icon_more-add_filled" :size="18" />
       </el-button>
-    </el-tooltip>
+    </MkTooltip>
 
     <el-collapse-transition>
       <NodeMenu

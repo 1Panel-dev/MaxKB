@@ -201,7 +201,7 @@
               style="display: none"
               @change="handleFileSelect"
             />
-            <el-tooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
+            <MkTooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
               <template #content>
                 <div class="break-all pre-wrap">
                   支持上传图片、文档、音频、视频文件，最多{{ maxFiles }}个，单个文件最大{{
@@ -216,7 +216,7 @@
               >
                 <el-icon :size="20"><Paperclip /></el-icon>
               </el-button>
-            </el-tooltip>
+            </MkTooltip>
             <el-divider direction="vertical" />
             <el-button v-if="!loading" text class="sent-button" :disabled="!canSend" @click="send">
               <el-icon :size="20">

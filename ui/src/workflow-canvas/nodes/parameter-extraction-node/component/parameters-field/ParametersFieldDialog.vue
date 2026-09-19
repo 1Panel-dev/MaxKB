@@ -16,10 +16,10 @@ const formData = ref<ParameterField>({ field: '', label: '', parameter_type: '',
 
 const rules: FormRules<ParameterField> = {
   field: [
-    { required: true, message: '请输入参数', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入参数', trigger: 'blur' },
     { pattern: /^[a-zA-Z0-9_]+$/, message: '参数可由字母、数字、下划线组成', trigger: 'blur' },
   ],
-  label: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
+  label: [{ whitespace: true, required: true, message: '请输入显示名称', trigger: 'blur' }],
   parameter_type: [{ required: true, message: '请选择参数类型', trigger: 'change' }],
 }
 

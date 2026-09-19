@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 
 defineOptions({ name: 'DocumentExtractNodeDetail' })
 
@@ -19,9 +19,9 @@ defineProps<{
     <div class="mk-gray-card py-2! rounded-xl!">
       <h6 class="flex items-center gap-1 mb-2">
         <span>输出参数</span>
-        <el-tooltip content="多个文件的内容会按文件顺序拼接输出" placement="right">
+        <MkTooltip content="多个文件的内容会按文件顺序拼接输出" placement="right">
           <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
-        </el-tooltip>
+        </MkTooltip>
       </h6>
 
       <el-scrollbar max-height="200">

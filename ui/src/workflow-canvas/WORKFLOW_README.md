@@ -62,7 +62,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 同一节点的多个 `createAnchorGuard()` 实例共享浮层状态，最后一个浮层关闭或卸载后才恢复
 节点原本的 `hittable` 状态。
 
-锚点按钮与 `el-tooltip` 集中在 `core/node-container/NodeAnchor.vue`。`workflow-node.ts` 负责
+锚点按钮与 `MkTooltip` 集中在 `core/node-container/NodeAnchor.vue`。`workflow-node.ts` 负责
 锚点坐标、连接状态，并将 LogicFlow 组件的挂载、Props 更新和卸载同步到现有 Vue Teleport
 容器；`teleport.connect()` 的可选第五个参数用于传入组件 Props。节点容器
 保留菜单开关与外部点击关闭逻辑，不维护锚点 tooltip 的状态或虚拟触发器。
@@ -399,8 +399,10 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 - `Execution-details/DetailContainer.vue` 是与节点类型无关的布局容器：提供 `#header` 具名
   插槽、折叠体默认插槽承载节点内容，以及 `showContentOnError` 决定失败时是否仍
   展示内容（默认失败只显示错误日志块）。
-- 折叠交互与箭头统一由 `DetailContainer` 内的 `MkCollapse` 提供，通过 `v-model:expanded` 绑定
-  `show`，默认收起；内容保留 `v-if="show"`，收起时卸载节点详情。
+- `DetailContainer` 的卡片标题与空白区域均可点击切换展开状态；内部 `MkCollapse` 使用
+  `trigger="indicator"`，箭头独立切换并阻止冒泡，避免重复切换。通过 `v-model:expanded` 绑定
+  `show`，默认收起；内容保留 `v-if="show"`，收起时卸载节点详情。内容区阻止点击冒泡，
+  保留链接、表单、轮次选择及嵌套详情的独立交互。
 - `Execution-details/BaseHeader.vue` 是公共头部：节点图标、名称、耗时和状态图标；是否显示 tokens 由
   节点通过 `show-tokens` 布尔控制，tokens 数值由 `BaseHeader` 从 `data` 自行计算，容器不参与该判断。
 - 详情载荷类型 `ExecutionNodeDetail` 在 `Execution-details/types.ts`，以开放索引签名承载各节点动态字段，仅显式

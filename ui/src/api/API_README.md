@@ -174,6 +174,9 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 
 ## 枚举与类型组织
 
+`enums/state.ts` 的 `STATE_TYPES` 维护跨业务复用的任务状态，联合类型 `State` 定义在
+`types/state.ts`。触发器及后续文件等业务直接引用公共状态，新增状态时保持已有接口值不变。
+
 API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文档统一维护。
 
 后端字段的固定枚举值放在 `src/api/enums/<domain>.ts`，使用 `as const` 对象声明，并通过
@@ -183,6 +186,9 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 `src/api/enums` 按明确业务域拆分文件，不创建收集无关枚举的通用文件。枚举的联合类型在对应的
 `src/api/types/<domain>.ts` 中由枚举对象派生，并继续通过 `@/api/types` 对外提供。例如
 `TOOL_TYPE` 从 `@/api/enums` 导入，`ToolType` 从 `@/api/types` 导入。
+
+触发器参数来源、间隔单位和请求字段类型直接在对应接口字段中声明字符串联合类型，
+不单独导出运行时枚举；表单选项使用对应字符串值。触发周期继续复用 `TRIGGER_SCHEDULE_TYPE`。
 
 新增或移动类型时按以下顺序判断：
 
@@ -296,6 +302,8 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 ### 触发器维护
 
 `workspace/trigger/trigger.ts` 维护分页、详情、新建、编辑、删除及批量接口。
+`getTriggerTaskRecordPage` 按触发器查询执行记录，支持名称、状态、资源类型和执行时间排序；
+`getTriggerTaskRecordDetails` 通过触发器、任务、记录 ID 查询执行详情，类型定义在 `api/types/trigger.ts`。
 `putBatchActivateTrigger(ids, isActive)` 提交 `{ id_list, is_active }` 到 `batch_activate`；
 `putBatchDeleteTrigger(ids)` 提交 `{ id_list }` 到 `batch_delete`。单项启停通过 `putTrigger`
 仅提交 `is_active`。`Trigger` 为分页摘要，`TriggerDetail` 为含任务参数的完整详情；

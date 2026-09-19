@@ -40,16 +40,20 @@ defineExpose({ open })
         <template #label>
           <span class="flex items-center gap-1">
             <span>外置参数设置（最多可显示3个）</span>
-            <el-tooltip placement="right" content="仅支持模型、知识库、开关、日期、树形选项卡、单选框、多选框组件类型">
+            <MkTooltip placement="right" content="仅支持模型、知识库、开关、日期、树形选项卡、单选框、多选框组件类型">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
-            </el-tooltip>
+            </MkTooltip>
           </span>
         </template>
         <el-select v-model="currentSetting.exposed_fields" multiple :multiple-limit="3" placeholder="请选择">
           <el-option v-for="field in exposedFieldOptions" :key="field.field" :label="formatLabel(field.label, field.field)" :value="field.field" />
         </el-select>
       </el-form-item>
-      <el-form-item label="其他参数收纳菜单标题" prop="menu_title" :rules="[{ required: true, message: '请输入', trigger: 'blur' }]">
+      <el-form-item
+        label="其他参数收纳菜单标题"
+        prop="menu_title"
+        :rules="[{ whitespace: true, required: true, message: '请输入', trigger: 'blur' }]"
+      >
         <el-input v-model="currentSetting.menu_title" maxlength="64" show-word-limit placeholder="请输入" />
       </el-form-item>
     </el-form>

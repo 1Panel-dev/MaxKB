@@ -2,15 +2,15 @@
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
-import { TRIGGER_BODY_TYPE } from '@/api/enums'
 import type { TriggerBodyField } from '@/api/types'
 
 const props = defineProps<{ fields: TriggerBodyField[] }>()
 const emit = defineEmits<{ submit: [field: TriggerBodyField, index?: number] }>()
+const bodyFieldTypeOptions: TriggerBodyField['type'][] = ['string', 'int', 'dict', 'array', 'float', 'boolean']
 const visible = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 const editingIndex = ref<number>()
-const createDefaultField = (): TriggerBodyField => ({ field: '', type: TRIGGER_BODY_TYPE.STRING, desc: '', required: false })
+const createDefaultField = (): TriggerBodyField => ({ field: '', type: 'string', desc: '', required: false })
 const formData = ref<TriggerBodyField>(createDefaultField())
 const rules: FormRules<TriggerBodyField> = {
   field: [
@@ -55,16 +55,17 @@ defineExpose({ open, close })
       <el-form-item label="参数名" prop="field">
         <el-input v-model="formData.field" placeholder="请输入参数名" />
       </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select v-model="formData.type" placeholder="请选择参数类型">
-          <el-option v-for="type in TRIGGER_BODY_TYPE" :key="type" :label="type" :value="type" />
+      <el-form-item label="数据类型" prop="type">
+        <el-select v-model="formData.type" placeholder="请选择数据类型">
+          <el-option v-for="type in bodyFieldTypeOptions" :key="type" :label="type" :value="type" />
         </el-select>
       </el-form-item>
       <el-form-item label="描述" prop="desc">
         <el-input v-model="formData.desc" type="textarea" :rows="3" placeholder="请输入描述" />
       </el-form-item>
-      <el-form-item prop="required" class="mb-0!">
-        <el-checkbox v-model="formData.required">必填</el-checkbox>
+
+      <el-form-item label="是否必填">
+        <el-switch v-model="formData.required" />
       </el-form-item>
     </el-form>
     <template #footer>

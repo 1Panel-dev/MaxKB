@@ -46,7 +46,7 @@ defineExpose({ open, close })
         label="参数"
         prop="field"
         :rules="[
-          { required: true, message: '请输入参数', trigger: 'blur' },
+          { whitespace: true, required: true, message: '请输入参数', trigger: 'blur' },
           { pattern: /^[a-zA-Z0-9_]+$/, message: '仅支持字母、数字和下划线', trigger: 'blur' },
         ]"
       >
@@ -58,7 +58,7 @@ defineExpose({ open, close })
           @blur="currentField.field = currentField.field.trim()"
         />
       </el-form-item>
-      <el-form-item label="显示名称" prop="label" :rules="{ required: true, message: '请输入显示名称', trigger: 'blur' }">
+      <el-form-item label="显示名称" prop="label" :rules="{ whitespace: true, required: true, message: '请输入显示名称', trigger: 'blur' }">
         <el-input v-model="currentField.label" maxlength="64" show-word-limit placeholder="请输入显示名称" />
       </el-form-item>
     </el-form>

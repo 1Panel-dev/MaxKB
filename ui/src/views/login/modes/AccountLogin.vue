@@ -47,7 +47,7 @@ const accountLoginForm = reactive<AccountLoginForm>({ captcha: '', password: '',
 const accountLoginRules = reactive<FormRules<AccountLoginForm>>({
   captcha: [{ required: false, message: '请输入验证码', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  username: [{ whitespace: true, required: true, message: '请输入用户名', trigger: 'blur' }],
 })
 
 const handleLogin = async () => {

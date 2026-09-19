@@ -217,14 +217,18 @@ defineExpose({ open })
         <div class="mx-auto w-full max-w-200 pt-4" v-loading="dynamicsLoading">
           <MkDynamicsForm ref="dynamicsFormRef" v-model="modelFormData" :render-data="credentialFields">
             <template #default>
-              <el-form-item class="mk-hide-asterisk" prop="name" :rules="{ required: true, message: '请输入模型名称', trigger: 'blur' }">
+              <el-form-item
+                class="mk-hide-asterisk"
+                prop="name"
+                :rules="{ whitespace: true, required: true, message: '请输入模型名称', trigger: 'blur' }"
+              >
                 <template #label>
                   <span class="inline-flex items-center gap-2">
                     <span class="mk-required"> 模型名称</span>
 
-                    <el-tooltip content="MaxKB 中自定义的模型名称" placement="right">
+                    <MkTooltip content="MaxKB 中自定义的模型名称" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
-                    </el-tooltip>
+                    </MkTooltip>
                   </span>
                 </template>
                 <el-input
@@ -239,7 +243,7 @@ defineExpose({ open })
                 <template #label>
                   <span class="inline-flex items-center gap-2">
                     <span class="mk-required"> 模型类型</span>
-                    <el-tooltip placement="right">
+                    <MkTooltip placement="right">
                       <template #content>
                         <p>大语言模型：在智能体中与AI对话的推理模型。</p>
                         <p>向量模型：在知识库中对文档内容进行向量化的模型。</p>
@@ -252,7 +256,7 @@ defineExpose({ open })
                         <p>图生视频：在高级智能体中用于图生视频的模型。</p>
                       </template>
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
-                    </el-tooltip>
+                    </MkTooltip>
                   </span>
                 </template>
                 <el-select v-model="modelForm.model_type" class="w-full" placeholder="请选择模型类型" @change="handleModelTypeChange">
@@ -284,9 +288,9 @@ defineExpose({ open })
                     <template #default>
                       <div class="flex items-center gap-2">
                         <span>{{ option.name }} </span>
-                        <el-tooltip v-if="option.desc" :content="option.desc" placement="right">
+                        <MkTooltip v-if="option.desc" :content="option.desc" placement="right">
                           <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
-                        </el-tooltip>
+                        </MkTooltip>
                       </div>
                     </template>
                   </el-option>
@@ -297,10 +301,10 @@ defineExpose({ open })
 
           <!-- 高级设置 -->
           <MkCollapse
-            class="mt-2"
+            class="mt-4"
             v-if="modelForm.model_name && modelForm.model_type && modelForm.model_type !== 'RERANKER'"
             indicator-position="after"
-            trigger-class="mb-2 w-fit"
+            trigger-class="mb-3 w-fit"
           >
             <template #label>
               <h6>高级设置</h6>

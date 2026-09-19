@@ -214,7 +214,7 @@ onMounted(() => {
 <template>
   <NodeContainer :node-model="model">
     <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="名称" prop="name" :rules="{ required: true, message: '请输入智能体名称', trigger: 'blur' }">
+      <el-form-item label="名称" prop="name" :rules="{ whitespace: true, required: true, message: '请输入智能体名称', trigger: 'blur' }">
         <el-input
           v-model="formData.name"
           maxlength="64"
@@ -247,12 +247,12 @@ onMounted(() => {
             <span class="flex items-center gap-1">
               <span :class="formData.long_term_enable ? 'mk-required' : ''">长期记忆</span>
 
-              <el-tooltip
+              <MkTooltip
                 content="开启后，从开启时间记录新对话并按周期生成记忆，可通过 {{开始.memory}} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。"
                 placement="right"
               >
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
-              </el-tooltip>
+              </MkTooltip>
             </span>
             <span class="flex items-center gap-2">
               <!-- 长期记忆设置 -->
@@ -275,9 +275,9 @@ onMounted(() => {
           <div class="flex-between w-full">
             <span class="flex items-center gap-1">
               文件上传
-              <el-tooltip content="开启后，问答页面会显示上传文件的按钮。" placement="right">
+              <MkTooltip content="开启后，问答页面会显示上传文件的按钮。" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
-              </el-tooltip>
+              </MkTooltip>
             </span>
             <span class="flex items-center gap-2">
               <FileUploadSetting v-if="formData.file_upload_enable" v-model="fileUploadSetting" />

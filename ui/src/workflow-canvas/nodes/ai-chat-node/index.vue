@@ -139,9 +139,9 @@ onMounted(() => {
             <div class="flex-between">
               <div class="flex items-center gap-1">
                 <span>系统提示词</span>
-                <el-tooltip content="设定模型扮演的角色或遵循的指令" placement="right">
+                <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
-                </el-tooltip>
+                </MkTooltip>
               </div>
               <!-- // TODO 生成 -->
               <PromptGenerate
@@ -161,13 +161,17 @@ onMounted(() => {
         </el-form-item>
 
         <!-- 用户提示词 -->
-        <el-form-item class="mk-hide-asterisk" prop="prompt" :rules="{ required: true, message: '请输入用户提示词', trigger: 'blur' }">
+        <el-form-item
+          class="mk-hide-asterisk"
+          prop="prompt"
+          :rules="{ whitespace: true, required: true, message: '请输入用户提示词', trigger: 'blur' }"
+        >
           <template #label>
             <span class="flex items-center gap-1">
               <span class="mk-required">用户提示词</span>
-              <el-tooltip content="用户向模型提出的问题或输入的指令" placement="right">
+              <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
-              </el-tooltip>
+              </MkTooltip>
             </span>
           </template>
           <MdEditorMagnify
@@ -210,12 +214,12 @@ onMounted(() => {
             <template #label>
               <span class="flex items-center gap-1">
                 <span>选择图片</span>
-                <el-tooltip placement="right">
+                <MkTooltip placement="right">
                   <template #content>
                     <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>
                   </template>
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
-                </el-tooltip>
+                </MkTooltip>
               </span>
             </template>
             <NodeCascader ref="imageCascaderRef" v-model="formData.image_list" :node-model="model" placeholder="请选择" />
@@ -225,12 +229,12 @@ onMounted(() => {
             <template #label>
               <span class="flex items-center gap-1">
                 选择视频
-                <el-tooltip placement="right">
+                <MkTooltip placement="right">
                   <template #content>
                     <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>
                   </template>
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
-                </el-tooltip>
+                </MkTooltip>
               </span>
             </template>
             <NodeCascader v-model="formData.video_list" :node-model="model" placeholder="请选择" />
@@ -260,9 +264,9 @@ onMounted(() => {
         <div class="flex-between w-full" v-if="showSettings">
           <span class="flex items-center gap-1">
             返回内容
-            <el-tooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
-            </el-tooltip>
+            </MkTooltip>
           </span>
           <span>
             <el-switch v-model="formData.is_result" size="small" />

@@ -179,7 +179,7 @@ watch(
             <ApplicationIcon v-else-if="resourceType === RESOURCE_TYPE.APPLICATION" :icon="row?.icon ?? undefined" :size="20" />
             <KnowledgeIcon v-else-if="resourceType === RESOURCE_TYPE.KNOWLEDGE" :type="row.icon ?? undefined" :size="20" />
 
-            <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
+            <span class="min-w-0 truncate">{{ row.name }}</span>
           </div>
         </template>
       </el-table-column>

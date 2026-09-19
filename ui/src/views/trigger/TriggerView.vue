@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import TriggerTaskRecordDrawer from './execution-record/TriggerTaskRecordDrawer.vue'
 import TriggerApi from '@/api/admin/workspace/trigger/trigger'
 import CommonApi from '@/api/admin/workspace/common'
 import { TRIGGER_TYPE } from '@/api/enums'
@@ -64,12 +65,17 @@ function handleSearchChange(query?: Dict<unknown>) {
 }
 
 /* 新建、编辑 */
+const recordDrawerRef = ref<InstanceType<typeof TriggerTaskRecordDrawer>>()
 const triggerDrawerRef = ref<InstanceType<typeof TriggerFormDrawer>>()
 const tableRef = ref<{ clearSelection: () => void }>()
 const selectedTriggers = ref<Trigger[]>([])
 
 function handleOpenTriggerDrawer(trigger?: Trigger) {
   triggerDrawerRef.value?.open(trigger?.id)
+}
+
+function handleOpenRecordDrawer(trigger: Trigger) {
+  recordDrawerRef.value?.open(trigger.id)
 }
 
 function handleDeleteTrigger(trigger: Trigger) {
@@ -202,18 +208,25 @@ onMounted(() => loadTriggers())
 
               <div class="flex">
                 <!-- 编辑当前触发器 -->
-                <el-tooltip content="编辑" placement="top">
+                <MkTooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenTriggerDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
-                </el-tooltip>
+                </MkTooltip>
+
+                <!-- 查看触发器执行记录 -->
+                <MkTooltip content="执行记录" placement="top">
+                  <el-button type="primary" text @click.stop="handleOpenRecordDrawer(row)">
+                    <MkIcon name="icon_schedule-report_outlined" />
+                  </el-button>
+                </MkTooltip>
                 <!-- 删除当前触发器 -->
 
-                <el-tooltip content="删除" placement="top">
+                <MkTooltip content="删除" placement="top">
                   <el-button type="primary" text @click.stop="handleDeleteTrigger(row)">
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
-                </el-tooltip>
+                </MkTooltip>
               </div>
             </div>
           </template>
@@ -229,5 +242,6 @@ onMounted(() => loadTriggers())
       </MkTable>
     </template>
   </MkViewLayout>
+  <TriggerTaskRecordDrawer ref="recordDrawerRef" />
   <TriggerFormDrawer ref="triggerDrawerRef" @refresh="loadTriggers" />
 </template>

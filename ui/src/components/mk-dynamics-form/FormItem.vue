@@ -32,7 +32,13 @@ const props = defineProps<{
   formField: FormField
   view: boolean
   otherParams: Dict<DynamicFormValue>
-  trigger: (triggerField: string, triggerValue: DynamicFormValue, triggerSetting: DynamicFormTriggerSetting, target: Dict<DynamicFormValue>, loading: Ref<boolean>) => void
+  trigger: (
+    triggerField: string,
+    triggerValue: DynamicFormValue,
+    triggerSetting: DynamicFormTriggerSetting,
+    target: Dict<DynamicFormValue>,
+    loading: Ref<boolean>,
+  ) => void
   initDefaultData: (formField: FormField) => void
   defaultItemWidth: string
   formValue: Dict<DynamicFormValue>
@@ -107,7 +113,12 @@ const validationRules = computed<FormItemRule | FormItemRule[]>(() => {
   if (fieldProps.value.rules) {
     return fieldProps.value.rules.map(deserializeRule)
   }
-  return { message: errorMessage.value, required: props.formField.required !== false, trigger: props.formField.input_type === 'Slider' ? 'blur' : ['blur', 'change'] }
+  return {
+    message: errorMessage.value,
+    required: props.formField.required !== false,
+    whitespace: ['TextInput', 'TextareaInput'].includes(props.formField.input_type),
+    trigger: props.formField.input_type === 'Slider' ? 'blur' : ['blur', 'change'],
+  }
 })
 
 function executeInitialTriggers(target: Dict<DynamicFormValue>, triggerMap?: DynamicFormTriggerMap) {

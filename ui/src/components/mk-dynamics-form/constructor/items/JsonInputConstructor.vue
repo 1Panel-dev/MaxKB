@@ -94,10 +94,10 @@ onMounted(() => {
         <span class="flex items-center gap-1">
           {{ item.label }}
 
-          <el-tooltip placement="right" v-if="item.value === 'ref_variables'">
+          <MkTooltip placement="right" v-if="item.value === 'ref_variables'">
             <template #content> 变量的值必须符合: JSON 格式 </template>
             <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
-          </el-tooltip>
+          </MkTooltip>
         </span>
       </el-radio>
     </el-radio-group>

@@ -48,12 +48,12 @@ onMounted(() => {
           <template #label>
             <span class="flex items-center gap-1">
               <span class="mk-required">选择文档</span>
-              <el-tooltip placement="right">
+              <MkTooltip placement="right">
                 <template #content
                   ><div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div></template
                 >
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
-              </el-tooltip>
+              </MkTooltip>
             </span>
           </template>
           <NodeCascader ref="documentCascaderRef" v-model="formData.document_list" :node-model="model" placeholder="请选择文档" />

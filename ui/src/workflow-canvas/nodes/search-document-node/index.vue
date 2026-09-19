@@ -117,13 +117,13 @@ onMounted(() => {
           <el-radio-group v-model="formData.search_mode">
             <el-radio value="auto">
               <span class="flex items-center gap-1"
-                >自动<el-tooltip content="根据检索问题自动匹配文档标签" placement="right"
-                  ><MkIcon name="icon_info_outlined" class="text-N600!" /></el-tooltip
+                >自动<MkTooltip content="根据检索问题自动匹配文档标签" placement="right"
+                  ><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip
               ></span>
             </el-radio>
             <el-radio v-if="formData.search_scope_type === 'custom'" value="custom">
               <span class="flex items-center gap-1"
-                >手动<el-tooltip content="手动设置标签过滤条件" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></el-tooltip
+                >手动<MkTooltip content="手动设置标签过滤条件" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip
               ></span>
             </el-radio>
           </el-radio-group>

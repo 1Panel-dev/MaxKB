@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
-import ExecutionDetailContent from '@/workflow-canvas/Execution-details/index.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 
 defineOptions({ name: 'LoopNodeDetail' })
 
@@ -50,7 +50,7 @@ const currentLoopDetail = computed<ExecutionNodeDetail[]>(() => Object.values(pr
       <h6 class="mb-2">循环详情</h6>
       <div class="space-y-2">
         <template v-if="loopKeys.length > 0">
-          <el-radio-group v-model="currentLoop" class="mb-2">
+          <el-radio-group v-model="currentLoop" class="mb-2 bg-white!">
             <el-radio-button v-for="key in loopKeys" :key="key" :value="key"> {{ Number(key) + 1 }} </el-radio-button>
           </el-radio-group>
           <ExecutionDetailContent :detail="currentLoopDetail" :workflow-mode="workflowMode" />

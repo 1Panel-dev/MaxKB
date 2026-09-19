@@ -10,7 +10,7 @@ const dialogVisible = ref(false)
 const editingIndex = ref<number>()
 const form = ref<ToolOutputField>(createField())
 const rules: FormRules<ToolOutputField> = {
-  field: [{ required: true, message: '请输入参数', trigger: 'blur' }],
+  field: [{ whitespace: true, required: true, message: '请输入参数', trigger: 'blur' }],
 }
 
 function createField(): ToolOutputField {
@@ -46,7 +46,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" :title="editingIndex === undefined ? '添加参数' : '编辑参数'" align-center  @closed="resetData">
+  <MkDialog v-model="dialogVisible" :title="editingIndex === undefined ? '添加参数' : '编辑参数'" align-center @closed="resetData">
     <el-form label-position="top" ref="formRef" :rules="rules" :model="form" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="参数" prop="field">
         <el-input v-model="form.field" placeholder="请输入参数" maxlength="64" show-word-limit @blur="form.field = form.field.trim()" />

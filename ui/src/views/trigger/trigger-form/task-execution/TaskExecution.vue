@@ -109,7 +109,7 @@ defineExpose({ validate, reset })
 <template>
   <div class="w-full space-y-2">
     <template v-for="group in taskGroups" :key="group.type">
-      <MkCollapse trigger-class="py-0!" :default-expanded="true">
+      <MkCollapse :default-expanded="true">
         <template #label>
           <div class="flex-between min-w-0 flex-1">
             <span
@@ -125,7 +125,7 @@ defineExpose({ validate, reset })
         <div v-if="group.tasks.length" class="mt-2 flex flex-col gap-1">
           <template v-for="task in group.tasks" :key="taskKey(task)">
             <el-card class="small" shadow="never">
-              <MkCollapse trigger-class="py-0!">
+              <MkCollapse>
                 <template #label>
                   <div class="flex-between min-w-0 flex-1">
                     <span class="flex min-w-0 items-center gap-2">

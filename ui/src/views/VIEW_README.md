@@ -355,39 +355,39 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 ## 页面功能登记
 
-| 页面                                                                   | 功能说明                               |
-| ---------------------------------------------------------------------- | -------------------------------------- |
-| `application/ApplicationView.vue`                                      | 工作空间智能体目录与智能体卡片页面     |
-| `application-detail/WorkspaceApplicationDetail.vue`                    | 工作空间智能体详情上下文与资源详情布局 |
-| `application-detail/overview/OverviewView.vue`                         | 智能体概览内容                         |
-| `application-detail/setting/SimpleSettingView.vue`                     | 简易智能体设置内容                     |
-| `workflow/application/ApplicationWorkflowView.vue`                     | 智能体工作流页面头部与全屏画布         |
-| `workflow/knowledge/KnowledgeWorkflowView.vue` | 知识库工作流加载、自动保存、发布历史、模板覆盖、导出、调试与全屏画布 |
-| `workflow/tool/ToolWorkflowView.vue`                                   | 工具工作流页面头部与全屏画布           |
-| `chat/ChatView.vue`                                                    | Chat 入口的对话页面                    |
-| `error/NotFoundView.vue`                                               | Admin 未匹配路由和全局 404 页面        |
-| `home/HomeView.vue`                                                    | Workspace 首页                         |
-| `knowledge/KnowledgeView.vue`                                          | 工作空间知识库目录与知识库卡片页面     |
-| `knowledge-detail/setting/KnowledgeSettingView.vue` | 知识库基本信息、来源配置与上传限制设置 |
-| `knowledge/KnowledgeDetailView.vue`                                    | 知识库详情页面                         |
-| `knowledge/DocumentDetailView.vue`                                     | 知识库文档详情页面                     |
-| `login/LoginView.vue`                                                  | Admin 登录页面                         |
-| `login/ForgotPasswordView.vue`                                         | 忘记密码页面                           |
-| `model/ModelView.vue`                                                  | 工作空间模型目录与模型卡片页面         |
-| `system/identity/groups/GroupsListView.vue`                            | 用户组列表页面                         |
-| `system/identity/resource-authorization/ResourceAuthorizationView.vue` | 工作空间用户组与用户的分类资源授权页面 |
-| `system/identity/roles/RoleListView.vue`                               | 角色列表页面                           |
-| `system/identity/users/UserListView.vue`                               | 用户列表页面                           |
-| `system/identity/workspaces/WorkspaceListView.vue`                     | 工作空间列表页面                       |
-| `system/chat/user-groups/GroupsListView.vue`                           | 对话用户组及组成员管理页面             |
-| `system/chat/users/UserListView.vue`                                   | 对话用户列表、配额及用户导入管理页面   |
-| `system/settings/theme/ThemeSettingView.vue`                           | 系统外观设置和登录外观预览页面         |
-| `system/settings/authentication/AuthenticationView.vue`                | 系统登录及认证源配置页面               |
-| `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面             |
-| `system/operate-logs/OperateLogListView.vue`                           | 系统操作日志查询与清理页面             |
-| `system/shared-resources/SharedModelview.vue`                          | System 共享模型查询与模型卡片页面      |
-| `trigger/TriggerView.vue` | 工作空间触发器查询、新建、编辑及单项和批量启停、删除 |
-| `tool/ToolView.vue`                                                    | 工作空间工具目录与工具卡片页面         |
+| 页面                                                                   | 功能说明                                                             |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `application/ApplicationView.vue`                                      | 工作空间智能体目录与智能体卡片页面                                   |
+| `application-detail/WorkspaceApplicationDetail.vue`                    | 工作空间智能体详情上下文与资源详情布局                               |
+| `application-detail/overview/OverviewView.vue`                         | 智能体概览内容                                                       |
+| `application-detail/setting/SimpleSettingView.vue`                     | 简易智能体设置内容                                                   |
+| `workflow/application/ApplicationWorkflowView.vue`                     | 智能体工作流页面头部与全屏画布                                       |
+| `workflow/knowledge/KnowledgeWorkflowView.vue`                         | 知识库工作流加载、自动保存、发布历史、模板覆盖、导出、调试与全屏画布 |
+| `workflow/tool/ToolWorkflowView.vue`                                   | 工具工作流页面头部与全屏画布                                         |
+| `chat/ChatView.vue`                                                    | Chat 入口的对话页面                                                  |
+| `error/NotFoundView.vue`                                               | Admin 未匹配路由和全局 404 页面                                      |
+| `home/HomeView.vue`                                                    | Workspace 首页                                                       |
+| `knowledge/KnowledgeView.vue`                                          | 工作空间知识库目录与知识库卡片页面                                   |
+| `knowledge-detail/setting/KnowledgeSettingView.vue`                    | 知识库基本信息、来源配置与上传限制设置                               |
+| `knowledge/KnowledgeDetailView.vue`                                    | 知识库详情页面                                                       |
+| `knowledge/DocumentDetailView.vue`                                     | 知识库文档详情页面                                                   |
+| `login/LoginView.vue`                                                  | Admin 登录页面                                                       |
+| `login/ForgotPasswordView.vue`                                         | 忘记密码页面                                                         |
+| `model/ModelView.vue`                                                  | 工作空间模型目录与模型卡片页面                                       |
+| `system/identity/groups/GroupsListView.vue`                            | 用户组列表页面                                                       |
+| `system/identity/resource-authorization/ResourceAuthorizationView.vue` | 工作空间用户组与用户的分类资源授权页面                               |
+| `system/identity/roles/RoleListView.vue`                               | 角色列表页面                                                         |
+| `system/identity/users/UserListView.vue`                               | 用户列表页面                                                         |
+| `system/identity/workspaces/WorkspaceListView.vue`                     | 工作空间列表页面                                                     |
+| `system/chat/user-groups/GroupsListView.vue`                           | 对话用户组及组成员管理页面                                           |
+| `system/chat/users/UserListView.vue`                                   | 对话用户列表、配额及用户导入管理页面                                 |
+| `system/settings/theme/ThemeSettingView.vue`                           | 系统外观设置和登录外观预览页面                                       |
+| `system/settings/authentication/AuthenticationView.vue`                | 系统登录及认证源配置页面                                             |
+| `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面                                           |
+| `system/operate-logs/OperateLogListView.vue`                           | 系统操作日志查询与清理页面                                           |
+| `system/shared-resources/SharedModelview.vue`                          | System 共享模型查询与模型卡片页面                                    |
+| `trigger/TriggerView.vue`                                              | 工作空间触发器查询、新建、编辑及单项和批量启停、删除                 |
+| `tool/ToolView.vue`                                                    | 工作空间工具目录与工具卡片页面                                       |
 
 ## 备注要求
 
@@ -535,7 +535,8 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 `trigger/trigger-form/TriggerFormDrawer.vue` 共用新建和编辑流程，编辑时查询详情并保留任务 ID、参数、
 启用状态及 meta。定时支持每日、每周、每月、间隔和五段 Cron；事件支持 URL、Token 和请求参数。
 任务选择复用 `SelectApplicationDialog` 与 `SelectToolDialog`，工具限定自定义和工作流类型。
-`trigger/trigger-form/request-parameters/RequestParameters.vue` 用 `MkFormList` 展示和删除事件请求参数，
+`trigger/trigger-form/request-parameters/RequestParameters.vue` 用 `MkTable` 展示事件请求参数，
+表格包含参数、数据类型、描述、必填开关和编辑/删除操作，标题栏的加号打开新增 Dialog，
 同目录 `RequestParameterDialog.vue` 负责新增、编辑及参数名必填与重名校验；确认后回写，取消保留原值。
 `trigger/trigger-form/task-execution/parameters/` 内 `ApplicationParameter.vue` 与 `ToolParameter.vue`
 分别生成智能体和工具字段，共用 `ParameterForm.vue` 的输入、事件引用、初始化和校验；
@@ -553,6 +554,10 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 
 `trigger/components/TriggerTaskPopover.vue` 接收分页记录的 `tasks`，在任务列按智能体和工具
 展示数量标签，悬浮时分组显示资源图标及名称；无任务时显示 `-`，不发起额外请求。
+
+`trigger/execution-record/TriggerTaskRecordDrawer.vue` 通过列表操作列打开，负责执行记录分页、
+名称/状态/类型筛选、执行时间排序及跨页浏览。`ExecutionDetailDrawer.vue` 根据当前记录查询详情，
+展示智能体问答、工具输入输出、触发错误及工作流节点详情；状态展示直接使用 `MkStatusLabel` 和共享 `STATE_LABELS`。
 
 ## 查看关联资源 Action
 

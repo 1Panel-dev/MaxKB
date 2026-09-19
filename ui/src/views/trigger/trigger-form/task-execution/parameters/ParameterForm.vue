@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import type { FormInstance, FormItemRule } from 'element-plus'
-import { TRIGGER_PARAMETER_SOURCE, TRIGGER_TYPE } from '@/api/enums'
+import { TRIGGER_TYPE } from '@/api/enums'
 import type { TriggerBodyField, TriggerParameters, TriggerType } from '@/api/types'
 import { get, set } from 'lodash'
 import type { TriggerParameter } from '@/api/types'
@@ -32,7 +32,7 @@ watch(
 /** 只补全缺失输入，编辑和折叠时不覆盖已保存参数。 */
 function initializeTaskParameters(parameters: TriggerParameters, fields: TaskParameterField[]) {
   fields.forEach((field) => {
-    if (!get(parameters, field.path)) set(parameters, field.path, { source: TRIGGER_PARAMETER_SOURCE.CUSTOM, value: field.defaultValue })
+    if (!get(parameters, field.path)) set(parameters, field.path, { source: 'custom', value: field.defaultValue })
   })
   return parameters
 }
@@ -45,8 +45,8 @@ function getTaskParameter(parameters: TriggerParameters, field: TaskParameterFie
 function resetUnavailableReferences(parameters: TriggerParameters, fields: TaskParameterField[]) {
   fields.forEach((field) => {
     const parameter = getTaskParameter(parameters, field)
-    if (parameter.source === TRIGGER_PARAMETER_SOURCE.REFERENCE) {
-      parameter.source = TRIGGER_PARAMETER_SOURCE.CUSTOM
+    if (parameter.source === 'reference') {
+      parameter.source = 'custom'
       parameter.value = field.defaultValue
     }
   })
@@ -54,12 +54,15 @@ function resetUnavailableReferences(parameters: TriggerParameters, fields: TaskP
 
 function getParameterRules(field: TaskParameterField): FormItemRule[] {
   return [
+    ...(getTaskParameter(parameters.value, field).source === 'custom'
+      ? [{ whitespace: true, required: field.required, message: `请输入${field.label}`, trigger: 'change' }]
+      : []),
     {
       validator: (_rule, _value, callback) => {
         const parameter = getTaskParameter(parameters.value, field)
         const value = parameter.value
         if (
-          parameter.source === TRIGGER_PARAMETER_SOURCE.REFERENCE &&
+          parameter.source === 'reference' &&
           (props.triggerType !== TRIGGER_TYPE.EVENT ||
             !Array.isArray(value) ||
             value.length !== 2 ||
@@ -83,7 +86,7 @@ defineExpose({ validate })
 </script>
 
 <template>
-  <el-form ref="formRef" :model="parameters" :disabled="disabled" label-position="top" hide-required-asterisk @submit.prevent>
+  <el-form class="space-y-2!" ref="formRef" :model="parameters" :disabled="disabled" label-position="top" hide-required-asterisk @submit.prevent>
     <el-form-item
       v-for="field in fields"
       :key="JSON.stringify(field.path)"
@@ -100,18 +103,15 @@ defineExpose({ validate })
             :teleported="false"
             size="small"
             class="w-24!"
-            @change="
-              getTaskParameter(parameters, field).value =
-                getTaskParameter(parameters, field).source === TRIGGER_PARAMETER_SOURCE.REFERENCE ? [] : field.defaultValue
-            "
+            @change="getTaskParameter(parameters, field).value = getTaskParameter(parameters, field).source === 'reference' ? [] : field.defaultValue"
           >
-            <el-option label="引用" :value="TRIGGER_PARAMETER_SOURCE.REFERENCE" />
-            <el-option label="自定义" :value="TRIGGER_PARAMETER_SOURCE.CUSTOM" />
+            <el-option label="引用" value="reference" />
+            <el-option label="自定义" value="custom" />
           </el-select>
         </div>
       </template>
       <el-cascader
-        v-if="getTaskParameter(parameters, field).source === TRIGGER_PARAMETER_SOURCE.REFERENCE"
+        v-if="getTaskParameter(parameters, field).source === 'reference'"
         v-model="getTaskParameter(parameters, field).value"
         :options="referenceOptions"
         class="w-full"

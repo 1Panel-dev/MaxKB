@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import ExecutionDetailContent from '@/workflow-canvas/Execution-details/index.vue'
+import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 
 defineOptions({ name: 'DetailsDemo' })
 

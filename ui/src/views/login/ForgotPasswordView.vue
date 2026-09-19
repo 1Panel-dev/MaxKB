@@ -43,14 +43,14 @@ const validateConfirmPassword = (_rule: unknown, value: string, callback: (error
 const forgotPasswordRules = reactive<FormRules<ForgotPasswordForm>>({
   confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
   email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' },
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 30, message: '密码长度应为 6-30 位', trigger: 'blur' },
   ],
-  verificationCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+  verificationCode: [{ whitespace: true, required: true, message: '请输入验证码', trigger: 'blur' }],
 })
 
 const startCountdown = () => {
@@ -121,7 +121,14 @@ onMounted(() => {
 
     <h2 class="mt-4">修改密码</h2>
 
-    <el-form ref="forgotPasswordFormRef" :model="forgotPasswordForm" :rules="forgotPasswordRules" class="mt-4" @submit.prevent="handleResetPassword" size="large">
+    <el-form
+      ref="forgotPasswordFormRef"
+      :model="forgotPasswordForm"
+      :rules="forgotPasswordRules"
+      class="mt-4"
+      @submit.prevent="handleResetPassword"
+      size="large"
+    >
       <el-form-item prop="email">
         <el-input v-model="forgotPasswordForm.email" autocomplete="email" placeholder="请输入邮箱" />
       </el-form-item>
@@ -136,11 +143,25 @@ onMounted(() => {
       </el-form-item>
 
       <el-form-item prop="password">
-        <el-input v-model="forgotPasswordForm.password" autocomplete="new-password" maxlength="30" placeholder="请输入6-30位密码" show-password type="password" />
+        <el-input
+          v-model="forgotPasswordForm.password"
+          autocomplete="new-password"
+          maxlength="30"
+          placeholder="请输入6-30位密码"
+          show-password
+          type="password"
+        />
       </el-form-item>
 
       <el-form-item prop="confirmPassword">
-        <el-input v-model="forgotPasswordForm.confirmPassword" autocomplete="new-password" maxlength="30" placeholder="请输入确认密码" show-password type="password" />
+        <el-input
+          v-model="forgotPasswordForm.confirmPassword"
+          autocomplete="new-password"
+          maxlength="30"
+          placeholder="请输入确认密码"
+          show-password
+          type="password"
+        />
       </el-form-item>
 
       <el-button native-type="submit" type="primary" class="w-full" :loading="isSubmitting">修改密码</el-button>

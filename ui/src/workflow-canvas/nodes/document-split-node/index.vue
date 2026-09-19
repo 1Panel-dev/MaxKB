@@ -108,14 +108,14 @@ onBeforeUnmount(() => anchorGuard.reset())
             <div class="flex-between w-full gap-2">
               <span class="flex items-center gap-1">
                 <span>子分块长度</span>
-                <el-tooltip effect="dark" placement="right">
+                <MkTooltip effect="dark" placement="right">
                   <template #content>
                     核心目标是平衡检索精度与召回效率<br />
                     避免过短拆分：单块＜50 字易导致语义碎片化，检索时可能因缺少上下文无法匹配查询意图<br />
                     避免过长拆分：单块＞500 字会增加冗余信息，降低检索精准度，且占用更多存储和计算资源
                   </template>
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
-                </el-tooltip>
+                </MkTooltip>
               </span>
               <el-select
                 v-model="formData.chunk_size_type"
@@ -155,9 +155,9 @@ onBeforeUnmount(() => anchorGuard.reset())
             <div class="flex-between w-full gap-2">
               <div class="flex items-center gap-1">
                 <span> 分段标识 </span>
-                <el-tooltip effect="dark" content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。" placement="right">
+                <MkTooltip effect="dark" content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
-                </el-tooltip>
+                </MkTooltip>
               </div>
               <el-select
                 :teleported="false"
@@ -236,9 +236,9 @@ onBeforeUnmount(() => anchorGuard.reset())
             <div class="flex-between w-full gap-2">
               <div class="flex items-center gap-1">
                 <span> 自动清洗 </span>
-                <el-tooltip effect="dark" content="去掉重复多余符号空格、空行、制表符" placement="right">
+                <MkTooltip effect="dark" content="去掉重复多余符号空格、空行、制表符" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
-                </el-tooltip>
+                </MkTooltip>
               </div>
               <el-select
                 v-model="formData.with_filter_type"

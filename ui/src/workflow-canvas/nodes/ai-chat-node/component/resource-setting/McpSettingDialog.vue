@@ -105,7 +105,12 @@ defineExpose({ open })
         </el-select>
       </el-form-item>
 
-      <el-form-item v-else label="MCP 服务配置" prop="mcp_servers" :rules="{ required: true, message: '请输入 MCP 服务配置', trigger: 'blur' }">
+      <el-form-item
+        v-else
+        label="MCP 服务配置"
+        prop="mcp_servers"
+        :rules="{ whitespace: true, required: true, message: '请输入 MCP 服务配置', trigger: 'blur' }"
+      >
         <el-input v-model="formData.mcp_servers" :placeholder="MCP_SERVER_EXAMPLE" :rows="10" type="textarea" />
       </el-form-item>
     </el-form>

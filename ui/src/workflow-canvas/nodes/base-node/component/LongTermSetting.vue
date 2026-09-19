@@ -213,11 +213,11 @@ function submit() {
                     <div class="flex-between mb-2">
                       <span class="mk-required">{{ scheduleMode === 'preset' ? '触发周期' : 'Cron 表达式' }}</span>
                       <!-- 切换周期设置与 Cron 表达式 -->
-                      <el-tooltip :content="scheduleMode === 'preset' ? '切换为 Cron 表达式' : '切换为周期设置'" placement="top">
+                      <MkTooltip :content="scheduleMode === 'preset' ? '切换为 Cron 表达式' : '切换为周期设置'" placement="top">
                         <el-button text type="primary" @click="scheduleMode = scheduleMode === 'preset' ? 'cron' : 'preset'">
                           <MkIcon name="icon_swich" />
                         </el-button>
-                      </el-tooltip>
+                      </MkTooltip>
                     </div>
                     <el-form-item
                       v-if="scheduleMode === 'preset'"
@@ -237,7 +237,10 @@ function submit() {
                     <el-form-item
                       v-else
                       prop="long_term_trigger_setting.cron_expression"
-                      :rules="{ required: true, validator: validateCron, trigger: ['blur', 'change'] }"
+                      :rules="[
+                        { required: true, whitespace: true, message: '请输入有效的Cron 表达式', trigger: ['blur', 'change'] },
+                        { validator: validateCron, trigger: ['blur', 'change'] },
+                      ]"
                       class="mb-0!"
                     >
                       <el-input v-model="formData.long_term_trigger_setting.cron_expression" placeholder="请输入Cron表达式（如：0 0 1 * *）" />

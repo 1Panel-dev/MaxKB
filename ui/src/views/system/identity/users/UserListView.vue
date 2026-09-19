@@ -214,19 +214,19 @@ onMounted(() => loadSystemUsers())
 
               <div class="flex">
                 <!-- 编辑 -->
-                <el-tooltip content="编辑" placement="top">
+                <MkTooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
-                </el-tooltip>
+                </MkTooltip>
                 <!-- 修改用户密码 -->
                 <ButtonChangeUserPassword :user="row" @refresh="loadSystemUsers(false)" />
                 <!-- 删除 -->
-                <el-tooltip content="删除" placement="top">
+                <MkTooltip content="删除" placement="top">
                   <el-button type="primary" text @click.stop="deleteUser(row)">
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
-                </el-tooltip>
+                </MkTooltip>
               </div>
             </div>
           </template>

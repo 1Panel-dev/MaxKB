@@ -213,11 +213,11 @@ onMounted(() => loadChatUsers())
               <el-divider direction="vertical" />
               <div class="flex">
                 <!-- 编辑 -->
-                <el-tooltip content="编辑" placement="top">
+                <MkTooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
-                </el-tooltip>
+                </MkTooltip>
                 <!-- 修改用户密码 -->
                 <ButtonChangeUserPassword :user="row" @refresh="loadChatUsers(false)" />
                 <!-- 更多 -->

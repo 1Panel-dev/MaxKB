@@ -37,8 +37,8 @@ const editId = ref<string>()
 const originalForm = ref('')
 const mcpForm = reactive<McpFormModel>({ code: '', desc: '', icon: '', name: '' })
 const formRules: FormRules<McpFormModel> = {
-  code: [{ required: true, message: '请输入 MCP Server Config', trigger: 'blur' }],
-  name: [{ required: true, message: '请输入 MCP 名称', trigger: 'blur' }],
+  code: [{ whitespace: true, required: true, message: '请输入 MCP Server Config', trigger: 'blur' }],
+  name: [{ whitespace: true, required: true, message: '请输入 MCP 名称', trigger: 'blur' }],
 }
 
 function isValidConfig() {
@@ -152,7 +152,15 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="visible" :before-close="handleBeforeClose" :title="title" size="60%" @closed="handleClosed">
-    <el-form ref="formRef" v-loading="formLoading" :model="mcpForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form
+      ref="formRef"
+      v-loading="formLoading"
+      :model="mcpForm"
+      :rules="formRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">

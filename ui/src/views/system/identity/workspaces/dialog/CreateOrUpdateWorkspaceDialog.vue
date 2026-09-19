@@ -13,7 +13,7 @@ const dialogVisible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
 const workspaceForm = reactive<WorkspaceItem>({ name: '' })
-const workspaceRules: FormRules<WorkspaceItem> = { name: [{ required: true, message: '请输入工作空间名称', trigger: 'blur' }] }
+const workspaceRules: FormRules<WorkspaceItem> = { name: [{ whitespace: true, required: true, message: '请输入工作空间名称', trigger: 'blur' }] }
 function open(workspace?: WorkspaceItem) {
   resetData()
   if (workspace) {

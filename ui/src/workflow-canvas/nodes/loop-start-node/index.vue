@@ -12,11 +12,11 @@
         <template v-for="(item, index) in loopInputFields" :key="index">
           <div class="group flex-between">
             <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-            <el-tooltip effect="dark" content="复制参数" placement="top">
+            <MkTooltip effect="dark" content="复制参数" placement="top">
               <el-button class="group-hover-visible" link @click="copyText(`{{loop.${item.value}}}`)">
                 <MkIcon name="icon_copy_outlined" />
               </el-button>
-            </el-tooltip>
+            </MkTooltip>
           </div>
         </template>
       </div>

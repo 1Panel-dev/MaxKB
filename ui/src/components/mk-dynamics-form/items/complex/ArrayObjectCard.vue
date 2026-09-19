@@ -96,11 +96,11 @@ defineExpose({ validate, field: props.field })
         label-position="top"
         require-asterisk-position="right"
       ></DynamicsForm>
-      <el-tooltip effect="dark" content="删除" placement="top">
+      <MkTooltip effect="dark" content="删除" placement="top">
         <el-button text @click.stop="deleteKnowledge(item)" class="delete-button">
           <MkIcon name="icon_delete-trash_outlined"></MkIcon>
         </el-button>
-      </el-tooltip>
+      </MkTooltip>
     </el-card>
     <el-card shadow="never" class="card-add box-card" @click="addCard">
       <div class="flex-center">

@@ -28,14 +28,14 @@ const form = reactive<AuthProviderSettingPayload>({
   is_active: false,
 })
 const rules = reactive<FormRules<AuthProviderSettingPayload>>({
-  'config.authEndpoint': [{ required: true, message: '请输入授权端地址', trigger: 'blur' }],
-  'config.tokenEndpoint': [{ required: true, message: '请输入 Token 端地址', trigger: 'blur' }],
-  'config.userInfoEndpoint': [{ required: true, message: '请输入用户信息端地址', trigger: 'blur' }],
-  'config.scope': [{ required: true, message: '请输入 Scope', trigger: 'blur' }],
-  'config.clientId': [{ required: true, message: '请输入客户端 ID', trigger: 'blur' }],
-  'config.clientSecret': [{ required: true, message: '请输入客户端密钥', trigger: 'blur' }],
-  'config.fieldMapping': [{ required: true, message: '请输入字段映射', trigger: 'blur' }],
-  'config.redirectUrl': [{ required: true, message: '请输入回调地址', trigger: 'blur' }],
+  'config.authEndpoint': [{ whitespace: true, required: true, message: '请输入授权端地址', trigger: 'blur' }],
+  'config.tokenEndpoint': [{ whitespace: true, required: true, message: '请输入 Token 端地址', trigger: 'blur' }],
+  'config.userInfoEndpoint': [{ whitespace: true, required: true, message: '请输入用户信息端地址', trigger: 'blur' }],
+  'config.scope': [{ whitespace: true, required: true, message: '请输入 Scope', trigger: 'blur' }],
+  'config.clientId': [{ whitespace: true, required: true, message: '请输入客户端 ID', trigger: 'blur' }],
+  'config.clientSecret': [{ whitespace: true, required: true, message: '请输入客户端密钥', trigger: 'blur' }],
+  'config.fieldMapping': [{ whitespace: true, required: true, message: '请输入字段映射', trigger: 'blur' }],
+  'config.redirectUrl': [{ whitespace: true, required: true, message: '请输入回调地址', trigger: 'blur' }],
 })
 
 function loadSetting() {
@@ -45,7 +45,12 @@ function loadSetting() {
     .then((setting) => {
       const settingConfig = setting.config ?? {}
       Object.assign(form, setting, {
-        config: { ...form.config, ...settingConfig, fieldMapping: settingConfig.fieldMapping || defaultFieldMapping, redirectUrl: settingConfig.redirectUrl || defaultRedirectUrl },
+        config: {
+          ...form.config,
+          ...settingConfig,
+          fieldMapping: settingConfig.fieldMapping || defaultFieldMapping,
+          redirectUrl: settingConfig.redirectUrl || defaultRedirectUrl,
+        },
       })
     })
     .finally(() => {
@@ -66,17 +71,27 @@ onMounted(() => loadSetting())
 
 <template>
   <el-form ref="authFormRef" v-loading="loading" class="max-w-200" :model="form" :rules="rules" label-position="top">
-    <el-form-item label="授权端地址" prop="config.authEndpoint"><el-input v-model="form.config.authEndpoint" placeholder="请输入授权端地址" /></el-form-item>
-    <el-form-item label="Token 端地址" prop="config.tokenEndpoint"><el-input v-model="form.config.tokenEndpoint" placeholder="请输入 Token 端地址" /></el-form-item>
-    <el-form-item label="用户信息端地址" prop="config.userInfoEndpoint"><el-input v-model="form.config.userInfoEndpoint" placeholder="请输入用户信息端地址" /></el-form-item>
+    <el-form-item label="授权端地址" prop="config.authEndpoint"
+      ><el-input v-model="form.config.authEndpoint" placeholder="请输入授权端地址"
+    /></el-form-item>
+    <el-form-item label="Token 端地址" prop="config.tokenEndpoint"
+      ><el-input v-model="form.config.tokenEndpoint" placeholder="请输入 Token 端地址"
+    /></el-form-item>
+    <el-form-item label="用户信息端地址" prop="config.userInfoEndpoint"
+      ><el-input v-model="form.config.userInfoEndpoint" placeholder="请输入用户信息端地址"
+    /></el-form-item>
     <el-form-item label="Scope" prop="config.scope"><el-input v-model="form.config.scope" placeholder="openid+profile+email" /></el-form-item>
     <el-form-item label="State"><el-input v-model="form.config.state" placeholder="请输入" /></el-form-item>
     <el-form-item label="客户端 ID" prop="config.clientId"><el-input v-model="form.config.clientId" placeholder="请输入客户端 ID" /></el-form-item>
     <el-form-item label="客户端密钥" prop="config.clientSecret"
       ><el-input v-model="form.config.clientSecret" type="password" autocomplete="new-password" show-password placeholder="请输入客户端密钥"
     /></el-form-item>
-    <el-form-item label="字段映射" prop="config.fieldMapping"><el-input v-model="form.config.fieldMapping" placeholder="请输入字段映射" /></el-form-item>
-    <el-form-item label="回调地址" prop="config.redirectUrl"><el-input v-model="form.config.redirectUrl" placeholder="请输入回调地址" /></el-form-item>
+    <el-form-item label="字段映射" prop="config.fieldMapping"
+      ><el-input v-model="form.config.fieldMapping" placeholder="请输入字段映射"
+    /></el-form-item>
+    <el-form-item label="回调地址" prop="config.redirectUrl"
+      ><el-input v-model="form.config.redirectUrl" placeholder="请输入回调地址"
+    /></el-form-item>
     <el-form-item
       ><div class="flex flex-col"><span>启用 OIDC 认证</span><el-switch v-model="form.is_active" class="self-start" /></div
     ></el-form-item>

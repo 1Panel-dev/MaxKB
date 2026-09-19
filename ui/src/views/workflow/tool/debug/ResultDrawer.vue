@@ -7,7 +7,7 @@ import { MsgError } from '@/utils/message'
 import { ConversationStream } from '@/conversation-panel/stream'
 import { aggregators } from '@/conversation-panel'
 import ContentList from '@/conversation-panel/content-list/index.vue'
-import ExecutionDetailContent from '@/workflow-canvas/Execution-details/index.vue'
+import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'ToolWorkflowDebugResultDrawer' })

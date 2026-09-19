@@ -55,11 +55,11 @@ function handleDeleteParam(index: number) {
 <template>
   <div class="flex-between mb-2">
     <span>模型参数</span>
-    <el-tooltip content="添加参数" placement="top">
+    <MkTooltip content="添加参数" placement="top">
       <el-button text type="primary" @click.stop="handleOpenParamDialog()">
         <MkIcon name="icon_add_outlined" />
       </el-button>
-    </el-tooltip>
+    </MkTooltip>
   </div>
 
   <MkTable :data="modelParams" size="small">

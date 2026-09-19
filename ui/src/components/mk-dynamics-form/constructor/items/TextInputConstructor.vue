@@ -28,7 +28,7 @@ const getData = () => {
     props_info: {
       rules: formValue.value.required
         ? [
-            { required: true, message: `请输入 ${formValue.value.label}` },
+            { whitespace: true, required: true, message: `请输入 ${formValue.value.label}` },
             {
               min: formValue.value.minlength,
               max: formValue.value.maxlength,
@@ -97,7 +97,7 @@ onMounted(() => {
     class="mk-hide-asterisk"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: '请输入默认值' }, ...rules] : rules"
+    :rules="formValue.required ? [{ whitespace: true, required: true, message: '请输入默认值' }, ...rules] : rules"
   >
     <template #label>
       <div class="flex-between">

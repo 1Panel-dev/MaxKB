@@ -39,15 +39,15 @@ const submitText = computed(() => (isEdit.value ? '保存' : '创建'))
 
 const userFormRules = reactive<FormRules<SystemUserPayload>>({
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 4, max: 64, message: '长度应为 4-64 个字符', trigger: 'blur' },
   ],
   nick_name: [
-    { required: true, message: '请输入姓名', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入姓名', trigger: 'blur' },
     { min: 1, max: 64, message: '长度应为 1-64 个字符', trigger: 'blur' },
   ],
   email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { whitespace: true, required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' },
   ],
   phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
@@ -150,7 +150,10 @@ function open(user?: SystemUser) {
       nick_name: user.nick_name,
       phone: user.phone,
       role_setting: user.role_setting?.length
-        ? user.role_setting.map((item: SystemUserRoleAssignment) => ({ ...item, workspace_ids: item.workspace_ids.includes('None') ? [] : item.workspace_ids }))
+        ? user.role_setting.map((item: SystemUserRoleAssignment) => ({
+            ...item,
+            workspace_ids: item.workspace_ids.includes('None') ? [] : item.workspace_ids,
+          }))
         : [{ role_id: '', workspace_ids: [] }],
       user_group_ids: user.user_group_ids ?? [],
     })
@@ -189,7 +192,14 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="drawerVisible" :title="drawerTitle" @closed="resetData">
-    <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-position="top" require-asterisk-position="right" @submit.prevent="submitUser">
+    <el-form
+      ref="userFormRef"
+      :model="userForm"
+      :rules="userFormRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent="submitUser"
+    >
       <section>
         <h4 class="mk-title-decoration mb-4">基本信息</h4>
         <el-form-item label="用户名" prop="username">
@@ -236,7 +246,13 @@ defineExpose({ open })
                 fit-input-width
                 @change="handleRoleChange(roleAssignment, index)"
               >
-                <el-option v-for="roleOption in roleOptions" :key="roleOption.id" :label="roleOption.name" :title="roleOption.name" :value="roleOption.id" />
+                <el-option
+                  v-for="roleOption in roleOptions"
+                  :key="roleOption.id"
+                  :label="roleOption.name"
+                  :title="roleOption.name"
+                  :value="roleOption.id"
+                />
               </el-select>
             </el-form-item>
 

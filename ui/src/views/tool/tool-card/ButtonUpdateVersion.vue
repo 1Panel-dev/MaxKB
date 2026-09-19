@@ -49,7 +49,7 @@ function handleUpdateStoreTool() {
 <template>
   <span v-if="availableStoreTool" class="group/update relative inline-flex h-[6px] w-[6px] shrink-0 items-center justify-center">
     <span class="mk-dot-success group-hover/update:opacity-0" />
-    <el-tooltip content="更新版本">
+    <MkTooltip content="更新版本">
       <el-button
         class="absolute-center invisible opacity-0 group-hover/update:visible group-hover/update:opacity-100"
         text
@@ -57,6 +57,6 @@ function handleUpdateStoreTool() {
       >
         <MkIcon name="icon_replace_outlined" />
       </el-button>
-    </el-tooltip>
+    </MkTooltip>
   </span>
 </template>

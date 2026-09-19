@@ -1,6 +1,6 @@
 import { get, post, put, del } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { Dict, Trigger, TriggerDetail, TriggerPayload } from '@/api/types'
+import type { Dict, Trigger, TriggerDetail, TriggerPayload, TriggerTaskRecord, TriggerTaskRecordDetail } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => `/workspace/${getWorkspaceId()}/trigger`
@@ -23,4 +23,21 @@ const putBatchDeleteTrigger = (triggerIds: string[]) => put<{ id_list: string[] 
 const putBatchActivateTrigger = (triggerIds: string[], isActive: boolean) =>
   put<{ id_list: string[]; is_active: boolean }, boolean>(`${getPrefix()}/batch_activate`, { id_list: triggerIds, is_active: isActive })
 
-export default { getTriggerPage, getTriggerDetail, postTrigger, putTrigger, deleteTrigger, putBatchDeleteTrigger, putBatchActivateTrigger }
+/** 获取触发器执行记录分页。 */
+const getTriggerTaskRecordPage = (triggerId: string, page: ParamsPage, query: Dict<unknown> = {}) =>
+  get<ResponsePage<TriggerTaskRecord>>(`${getPrefix()}/${triggerId}/task_record/${page.currentPage}/${page.pageSize}`, { ...query })
+/** 获取单条任务执行详情。 */
+const getTriggerTaskRecordDetails = (triggerId: string, taskId: string, recordId: string) =>
+  get<TriggerTaskRecordDetail>(`${getPrefix()}/${triggerId}/trigger_task/${taskId}/trigger_task_record/${recordId}`)
+
+export default {
+  getTriggerTaskRecordPage,
+  getTriggerTaskRecordDetails,
+  getTriggerPage,
+  getTriggerDetail,
+  postTrigger,
+  putTrigger,
+  deleteTrigger,
+  putBatchDeleteTrigger,
+  putBatchActivateTrigger,
+}

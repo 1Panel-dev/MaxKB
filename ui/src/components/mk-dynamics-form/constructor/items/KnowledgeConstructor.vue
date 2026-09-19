@@ -80,7 +80,7 @@ function removeKnowledge(knowledgeId: string) {
 
 <template>
   <el-form-item ref="knowledgeFormItemRef" prop="knowledge_list" :rules="[{ required: true, message: '请选择可选知识库', type: 'array', min: 1 }]">
-    <MkCollapse class="w-full" trigger-class="pt-0 pb-2">
+    <MkCollapse class="w-full" trigger-class="pb-2">
       <template #label>
         <div class="flex-between w-full">
           <div class="flex items-center">

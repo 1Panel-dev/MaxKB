@@ -28,8 +28,8 @@ const ruleFormRef = ref<FormInstance>()
 const componentFormRef = ref<DynamicFormConstructorExpose>()
 
 const rules: FormRules<DynamicFormConstructorState> = {
-  label: [{ required: true, message: '请输入显示名称' }],
-  field: [{ required: true, message: '请输入参数' }],
+  label: [{ whitespace: true, required: true, message: '请输入显示名称' }],
+  field: [{ whitespace: true, required: true, message: '请输入参数' }],
   input_type: [{ required: true, message: '请选择组件类型' }],
 }
 
@@ -98,6 +98,12 @@ defineExpose({ validate, getData, render })
         <el-option v-for="item in inputTypeList" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
     </el-form-item>
-    <component v-if="form.input_type && currentConstructor" ref="componentFormRef" :model-value="form" @update:model-value="updateForm" :is="currentConstructor"></component>
+    <component
+      v-if="form.input_type && currentConstructor"
+      ref="componentFormRef"
+      :model-value="form"
+      @update:model-value="updateForm"
+      :is="currentConstructor"
+    ></component>
   </el-form>
 </template>

@@ -38,8 +38,8 @@ const originalForm = ref('')
 
 const toolForm = reactive<ToolFormModel>({ name: '', desc: '', code: '', icon: '', init_field_list: [], input_field_list: [] })
 const formRules: FormRules<ToolFormModel> = {
-  code: [{ required: true, message: '请输入工具内容', trigger: 'blur' }],
-  name: [{ required: true, message: '请输入工具名称', trigger: 'blur' }],
+  code: [{ whitespace: true, required: true, message: '请输入工具内容', trigger: 'blur' }],
+  name: [{ whitespace: true, required: true, message: '请输入工具名称', trigger: 'blur' }],
 }
 
 function handleSubmit() {

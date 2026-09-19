@@ -11,8 +11,8 @@ const dialogVisible = ref(false)
 const editingIndex = ref<number>()
 const form = ref<ToolInputField>(createField())
 const rules: FormRules<ToolInputField> = {
-  field: [{ required: true, message: '请输入参数', trigger: 'blur' }],
-  label: [{ required: true, message: '请输入显示名', trigger: 'blur' }],
+  field: [{ whitespace: true, required: true, message: '请输入参数', trigger: 'blur' }],
+  label: [{ whitespace: true, required: true, message: '请输入显示名', trigger: 'blur' }],
 }
 
 function createField(): ToolInputField {

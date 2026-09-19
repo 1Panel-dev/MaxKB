@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import DetailContainer from '@/workflow-canvas/Execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/Execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/Execution-details/types'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 
 defineOptions({ name: 'SearchKnowledgeNodeDetail' })
 

@@ -9,7 +9,6 @@ import type { DefaultModelSettingPayload } from '@/api/types/model.ts'
 export type ToolScope = (typeof TOOL_SCOPE)[keyof typeof TOOL_SCOPE]
 export type ToolType = (typeof TOOL_TYPE)[keyof typeof TOOL_TYPE]
 
-export type ToolInputFieldType = 'array' | 'dict' | 'float' | 'int' | 'string'
 export type ToolInputFieldSource = 'custom' | 'reference'
 
 export interface ToolInputField {
@@ -17,7 +16,7 @@ export interface ToolInputField {
   is_required: boolean
   name: string
   source: ToolInputFieldSource
-  type: ToolInputFieldType
+  type: 'array' | 'dict' | 'float' | 'int' | 'string'
 }
 
 export interface ToolDebugField extends ToolInputField {
@@ -170,8 +169,8 @@ export interface ToolWorkflowRecord {
   meta: {
     output?: unknown
     details?:
-      | import('@/workflow-canvas/Execution-details/types').ExecutionNodeDetail[]
-      | Record<string, import('@/workflow-canvas/Execution-details/types').ExecutionNodeDetail>
+      | import('@/workflow-canvas/execution-details/types').ExecutionNodeDetail[]
+      | Record<string, import('@/workflow-canvas/execution-details/types').ExecutionNodeDetail>
   }
 }
 

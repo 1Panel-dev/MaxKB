@@ -367,9 +367,9 @@ onMounted(() => {
           <el-select v-model="form_data.mcp_tool" filterable :teleported="false" @change="changeTool" @wheel="handleNodeWheel">
             <el-option v-for="item in form_data.mcp_tools" :key="item.name" :label="item.name" :value="item.name">
               <div class="flex items-center gap-1">
-                <el-tooltip :content="item.description" placement="top-start">
+                <MkTooltip :content="item.description" placement="top-start">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
-                </el-tooltip>
+                </MkTooltip>
                 <span>{{ item.name }}</span>
               </div>
             </el-option>

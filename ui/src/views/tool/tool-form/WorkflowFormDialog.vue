@@ -32,7 +32,7 @@ const loading = ref(false)
 const formLoading = ref(false)
 const editId = ref<string>()
 const workflowForm = reactive<WorkflowFormModel>({ desc: '', icon: '', name: '', work_flow: {} })
-const formRules: FormRules<WorkflowFormModel> = { name: [{ required: true, message: '请输入工作流名称', trigger: 'blur' }] }
+const formRules: FormRules<WorkflowFormModel> = { name: [{ whitespace: true, required: true, message: '请输入工作流名称', trigger: 'blur' }] }
 
 function handleSubmit() {
   formRef.value?.validate((valid) => {
