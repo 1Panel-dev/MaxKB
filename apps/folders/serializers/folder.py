@@ -281,7 +281,7 @@ class FolderSerializer(serializers.Serializer):
                         Q(permission_list__overlap=[ResourcePermission.MANAGE, ResourcePermissionRole.ROLE])
                     ).count()
                     if auth_list != len(source_ids):
-                        raise AppApiException(500, _('This folder contains resources that you dont have permission'))
+                        raise AppApiException(500, _('This folder contains resources that you don\'t have permission'))
                     self.delete_source(node)
                     node.delete()
 
