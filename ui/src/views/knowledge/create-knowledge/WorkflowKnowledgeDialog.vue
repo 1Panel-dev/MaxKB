@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { nextTick, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
-import type { KnowledgeWorkflowTemplate } from '@/api/types'
+import type { KnowledgeWorkflowTemplate, WorkflowStoreTemplate } from '@/api/types'
 import { knowledgeTemplate } from '../template.ts'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
@@ -12,7 +12,7 @@ import KnowledgeBaseForm from './components/KnowledgeBaseForm.vue'
 
 defineOptions({ name: 'CreateWorkflowKnowledgeDialog' })
 const props = defineProps<{ folderId: string }>()
-const emit = defineEmits<{ refresh: [] }>()
+const emit = defineEmits<{ refresh: []; closed: [] }>()
 const { auth } = useStore()
 const route = useRoute()
 const router = useRouter()
@@ -29,10 +29,24 @@ function resetData() {
   loading.value = false
 }
 
-function open(template?: KnowledgeWorkflowTemplate) {
+function open(template?: KnowledgeWorkflowTemplate & Partial<Pick<WorkflowStoreTemplate, 'name' | 'desc' | 'description'>>) {
   resetData()
   workflowTemplate.value = template ? cloneDeep(template) : undefined
   dialogVisible.value = true
+  nextTick(() => {
+    if (template && baseFormRef.value) {
+      Object.assign(baseFormRef.value.form, { name: template.name ?? '', desc: template.description ?? template.desc ?? '' })
+    }
+  })
+}
+
+function handleBeforeClose(done: () => void) {
+  if (!loading.value) done()
+}
+
+function handleClosed() {
+  resetData()
+  emit('closed')
 }
 
 /* 校验并创建，成功后刷新资料并进入画布 */
@@ -72,7 +86,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建工作流知识库" align-center @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="创建工作流知识库" align-center :before-close="handleBeforeClose" @closed="handleClosed">
     <KnowledgeBaseForm ref="baseFormRef" :disabled="loading" />
     <template #footer>
       <!-- 取消创建 -->

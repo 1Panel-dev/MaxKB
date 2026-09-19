@@ -12,6 +12,7 @@ import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
 import ButtonCreateKnowledge from './components/ButtonCreateKnowledge.vue'
+import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
 import {
   AuthorizeKnowledgeAction,
   DeleteKnowledgeAction,
@@ -192,13 +193,19 @@ function handleBatchDelete() {
         <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <template v-if="!isShared">
-            <!-- 批量选择 -->
-            <el-button :type="batchSelectionMode ? 'primary' : undefined" :disabled="!knowledgeData.length" plain @click="toggleBatchSelection">
-              <MkIcon name="icon_Batch_outlined" />
-              <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
-            </el-button>
-            <!-- 创建 -->
-            <ButtonCreateKnowledge v-if="!batchSelectionMode" :folder-id="createFolderId" @refresh="refreshKnowledge" />
+            <span>
+              <!-- 批量选择 -->
+              <el-button :type="batchSelectionMode ? 'primary' : undefined" :disabled="!knowledgeData.length" plain @click="toggleBatchSelection">
+                <MkIcon name="icon_Batch_outlined" />
+                <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
+              </el-button>
+            </span>
+            <template v-if="!batchSelectionMode">
+              <!-- 模板中心 -->
+              <ButtonTemplateStore :folder-id="createFolderId" @refresh="refreshKnowledge" />
+              <!-- 创建 -->
+              <ButtonCreateKnowledge :folder-id="createFolderId" @refresh="refreshKnowledge" />
+            </template>
           </template>
         </div>
       </component>

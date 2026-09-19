@@ -63,7 +63,7 @@ function handleClick(event: MouseEvent) {
     </p>
 
     <template #footer="{ Action, ActionDropdown }">
-      <MkStatusLabel :active="tool.is_active" />
+      <MkStatusLabel :active="tool.is_active" class="text-N600!"/>
       <component :is="Action" v-if="!disabled">
         <!-- 修改工具状态 -->
         <ToolStatusSwitch v-model:loading="loading" :api="api" :tool="tool" @update="emit('update', $event)" />

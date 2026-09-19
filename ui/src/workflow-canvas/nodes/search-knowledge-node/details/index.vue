@@ -47,12 +47,12 @@ const sortedParagraphs = computed<SearchParagraph[]>(() =>
         <template v-if="sortedParagraphs.length > 0">
           <div v-for="(paragraph, paragraphIndex) in sortedParagraphs" :key="paragraphIndex" class="overflow-hidden rounded-md bg-white p-2 mb-2">
             <div class="flex-between">
-              <span class="truncate">#{{ paragraphIndex + 1 }} {{ paragraph.title || '-' }}</span>
-              <span class="ml-2 shrink-0 text-primary">
+              <span class="text-N600 text-sm font-medium">#{{ paragraphIndex + 1 }} {{ paragraph.title || '-' }}</span>
+              <span class="text-primary text-sm">
                 {{ paragraph.similarity?.toFixed(3) }}
               </span>
             </div>
-            <el-scrollbar max-height="150" class="mt-1">
+            <el-scrollbar max-height="150" class="my-2">
               <MdPreview :model-value="paragraph.content" no-img-zoom-in />
             </el-scrollbar>
             <div v-if="paragraph.document_name?.trim()" class="mt-1 flex-align-center gap-1">

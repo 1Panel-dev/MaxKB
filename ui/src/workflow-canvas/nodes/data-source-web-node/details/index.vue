@@ -31,7 +31,7 @@ defineProps<{
         <div class="space-y-2">
           <template v-for="(file_content, index) in data.document_list" :key="index">
             <el-card shadow="never">
-              <h4 class="mb-1">{{ file_content.name }}</h4>
+              <h6 class="mb-1">{{ file_content.name }}</h6>
               <MdPreview v-if="file_content.content" :model-value="file_content.content" no-img-zoom-in />
               <template v-else>-</template>
             </el-card>

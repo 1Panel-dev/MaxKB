@@ -52,7 +52,6 @@ function handleModelChange(modelId: string) {
 </script>
 
 <template>
-  <!-- // TODO  -->
   <SelectModel
     v-bind="$attrs"
     :model-value="props.modelValue?.model_id ?? ''"

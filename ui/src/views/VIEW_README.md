@@ -100,7 +100,8 @@ src/views/application/
 │       ├── DeleteApplicationAction.vue
 │       ├── ExportApplicationAction.vue
 │       ├── MoveApplicationAction.vue
-│       └── SettingApplicationAction.vue
+│       ├── SettingApplicationAction.vue
+│       └── TriggerApplicationAction.vue
 ├── create-application/
 │   ├── AdvancedCreateDialog.vue      # 高级智能体创建弹窗
 │   ├── CreateApplicationDropdown.vue # 简易、高级和导入创建入口
@@ -117,7 +118,7 @@ src/views/application-detail/
 ```
 
 `ApplicationCard` 只维护展示内容、批量选择状态和 `action-dropdown` 插槽；`ApplicationView` 组合
-设置、移动、导出和删除 Action，并管理批量选择、批量移动和批量删除流程。需要请求的 Action 接收
+设置、触发器、移动、导出和删除 Action，并管理批量选择、批量移动和批量删除流程。需要请求的 Action 接收
 页面传入的完整 Application API。单项移动在具体目录中通过 `delete` 通知页面局部移除卡片，在
 “全部智能体”中保留卡片；移动弹窗复用公共 `MoveToDialog`。非批量选择状态点击卡片时，卡片通过
 `click` 事件通知 `ApplicationView` 进入详情路由。`WorkspaceApplicationDetail` 返回列表时根据详情的
@@ -133,7 +134,7 @@ query，不写入新的文件夹 ID，进入详情时也不携带该 query。`Wo
 默认为 `click`，传入 `hover` 时悬停展开，也支持响应式切换；同名 `trigger` 插槽用于自定义触发内容，
 自定义触发区域统一使用全宽和手型光标。
 
-工作流模板中心的公共 UI 放在 workflow 下，application 列表与工作流分别提供业务入口：
+工作流模板中心的公共 UI 放在 workflow 下，application、knowledge 列表与工作流分别提供业务入口：
 
 ```text
 src/views/workflow/components/template-store/
@@ -181,7 +182,8 @@ src/views/knowledge/
 │       ├── MoveKnowledgeAction.vue
 │       └── DeleteKnowledgeAction.vue
 ├── components/
-│   └── ButtonCreateKnowledge.vue        # 知识库创建菜单与弹窗入口
+│   ├── ButtonCreateKnowledge.vue        # 知识库创建菜单与弹窗入口
+│   └── ButtonTemplateStore.vue          # 知识库模板中心与模板创建入口
 ├── create-knowledge/
 │   ├── CreateBaseKnowledgeDialog.vue     # 通用知识库创建
 │   ├── CreateWebKnowledgeDialog.vue      # Web 站点配置与创建
@@ -203,6 +205,11 @@ src/views/knowledge/
 调用 `putLarkKnowledge`，其他类型调用 `putKnowledge`，只提交 `folder_id`；成功后通过 `move`
 更新卡片所属目录，在具体目录转出时通过 `delete` 移除卡片，在全部目录或转入当前目录时保留。
 批量转移与删除使用对应批量接口，成功后退出选择模式并刷新列表。
+
+`knowledge/components/ButtonTemplateStore.vue` 在非共享、非批量选择模式下展示于创建入口前，
+查询知识库模板并记录打开时的目标文件夹。选择模板后按需挂载 `WorkflowKnowledgeDialog`，
+回填模板名称与描述，仍需选择向量模型；提交沿用 `work_flow_template`。创建成功关闭模板中心、
+刷新列表并进入知识库工作流，取消创建保留模板中心；创建弹窗在 `closed` 后卸载。
 
 `ButtonCreateKnowledge` 内聚四类创建弹窗 Ref 和打开动作，列表页传入目标 `folderId`，通过
 `refresh` 刷新列表。入口支持 `trigger` 插槽替换默认创建按钮，下拉使用 `persistent`。
@@ -576,7 +583,9 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 `ResourceTriggerApi` 和资源上下文（所属工作空间、资源类型、资源 ID），展示名称、周期和空状态。
 添加、编辑按需挂载 `TriggerFormDrawer`，保存成功刷新列表，抽屉关闭后卸载；移除调用资源关联删除接口。
 工具菜单的 `tool/tool-card/action-dropdown/TriggerToolAction.vue` 为自定义工具、工作流工具提供入口，
-点击后挂载列表弹窗，关闭后卸载，暂不增加权限判断。列表与表单已支持智能体资源上下文，智能体菜单入口另行接入。
+智能体菜单通过 `application/application-card/action-dropdown/TriggerApplicationAction.vue` 提供相同入口，
+由 `ApplicationView` 传入完整 `ResourceTriggerApi` 和当前智能体，固定当前智能体为执行资源。
+两个入口均在点击后挂载列表弹窗，关闭后卸载，暂不增加权限判断。
 
 `trigger/components/TriggerTaskPopover.vue` 接收分页记录的 `tasks`，在任务列按智能体和工具
 展示数量标签，悬浮时分组显示资源图标及名称；无任务时显示 `-`，不发起额外请求。
