@@ -76,7 +76,7 @@ defineProps<{
                   {{ paragraph.metadata?.relevance_score != null ? Number(paragraph.metadata.relevance_score).toFixed(3) : '' }}
                 </span>
               </div>
-              <el-scrollbar height="150" class="mt-1">
+              <el-scrollbar max-height="150" class="my-2">
                 <MdPreview :model-value="paragraph.page_content || paragraph.metadata?.content || ''" no-img-zoom-in />
               </el-scrollbar>
               <div v-if="paragraph.metadata?.document_name?.trim()" class="mt-1 flex-align-center gap-1">

@@ -20,6 +20,7 @@ function loadTriggers() {
     .then((result) => {
       triggersData.value = result
     })
+    .catch(() => {})
     .finally(() => {
       loading.value = false
     })
@@ -92,32 +93,32 @@ defineExpose({ open })
         </div>
       </div>
     </template>
-    <div v-loading="loading" class="min-h-30 space-y-2">
-      <template v-for="trigger in triggersData" :key="trigger.id">
-        <div class="flex-between gap-3 rounded-md border px-2 py-1">
-          <div class="flex-align-center min-w-0 flex-1 gap-2">
-            <TriggerIcon :type="trigger.trigger_type" :size="20" class="shrink-0" />
-            <span class="truncate" :title="trigger.name">{{ trigger.name }}</span>
-          </div>
-          <span
-            v-if="trigger.trigger_type === TRIGGER_TYPE.SCHEDULED"
-            class="max-w-52 truncate text-sm text-N600"
-            :title="getScheduleLabel(trigger.trigger_setting)"
-            >{{ getScheduleLabel(trigger.trigger_setting) }}</span
-          >
-          <div class="flex-align-center shrink-0">
-            <!-- 编辑触发器 -->
-            <MkTooltip content="编辑" placement="top">
-              <el-button text :disabled="loading" @click="handleOpenForm(trigger.id)"><MkIcon name="icon_edit_outlined" /></el-button>
-            </MkTooltip>
-            <!-- 移除当前资源的触发器 -->
-            <MkTooltip content="移除" placement="top">
-              <el-button text :disabled="loading" @click="handleRemoveTrigger(trigger)"><MkIcon name="icon_close_outlined" /></el-button>
-            </MkTooltip>
-          </div>
-        </div>
-      </template>
-      <MkEmpty v-if="!loading && !triggersData.length" />
+    <div v-loading="loading" class="min-h-30">
+      <div class="space-y-2">
+        <template v-for="trigger in triggersData" :key="trigger.id">
+          <el-card shadow="never" class="small">
+            <div class="flex-between gap-3">
+              <div class="flex-align-center min-w-0 flex-1 gap-2">
+                <TriggerIcon :type="trigger.trigger_type" :size="20" class="shrink-0" />
+                <span class="truncate" :title="trigger.name">{{ trigger.name }}</span>
+              </div>
+              <span v-if="trigger.trigger_type === TRIGGER_TYPE.SCHEDULED" class="text-N600" :title="getScheduleLabel(trigger.trigger_setting)">{{
+                getScheduleLabel(trigger.trigger_setting)
+              }}</span>
+              <div class="flex-align-center shrink-0">
+                <!-- 编辑触发器 -->
+
+                <el-button text :disabled="loading" @click="handleOpenForm(trigger.id)"><MkIcon name="icon_edit_outlined" /></el-button>
+
+                <!-- 移除当前资源的触发器 -->
+
+                <el-button text :disabled="loading" @click="handleRemoveTrigger(trigger)"><MkIcon name="icon_close_outlined" /></el-button>
+              </div>
+            </div>
+          </el-card>
+        </template>
+      </div>
+      <MkEmpty v-if="!triggersData.length" />
     </div>
   </MkDialog>
   <TriggerFormDrawer

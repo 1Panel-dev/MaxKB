@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import CommonApi from '@/api/admin/workspace/common'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
+import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import type { ApplicationDetail, Dict, FolderItem, OptionItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
@@ -19,6 +20,7 @@ import {
   ExportApplicationAction,
   MoveApplicationAction,
   SettingApplicationAction,
+  TriggerApplicationAction,
 } from './application-card/action-dropdown'
 import ButtonCreateApplication from './components/ButtonCreateApplication.vue'
 import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
@@ -234,7 +236,8 @@ function handleBatchDelete() {
                 <template #action-dropdown>
                   <!-- 设置 -->
                   <SettingApplicationAction label="设置" :application="application" />
-                  <!-- TODO 触发器 -->
+                  <!-- 智能体触发器 -->
+                  <TriggerApplicationAction label="触发器" :api="ResourceTriggerApi" :application="application" />
                   <!-- 资源授权 -->
                   <AuthorizeApplicationAction label="资源授权" :application="application" />
                   <!-- 查看关联资源 -->

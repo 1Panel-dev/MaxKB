@@ -2,6 +2,7 @@ export { default as DeleteApplicationAction } from './DeleteApplicationAction.vu
 export { default as ExportApplicationAction } from './ExportApplicationAction.vue'
 export { default as MoveApplicationAction } from './MoveApplicationAction.vue'
 export { default as SettingApplicationAction } from './SettingApplicationAction.vue'
+export { default as TriggerApplicationAction } from './TriggerApplicationAction.vue'
 export { default as AuthorizeApplicationAction } from './AuthorizeApplicationAction.vue'
 export { default as RelatedResourcesApplicationAction } from './RelatedResourcesApplicationAction.vue'
 export { default as CopyApplicationAction } from './copy-application-action/CopyApplicationAction.vue'
