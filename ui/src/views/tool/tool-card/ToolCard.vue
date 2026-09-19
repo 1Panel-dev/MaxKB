@@ -6,7 +6,7 @@ import ButtonUpdateVersion from './ButtonUpdateVersion.vue'
 
 defineOptions({ name: 'ToolCard' })
 
-defineProps<{
+const props = defineProps<{
   api: typeof ToolApi
   disabled?: boolean
   selectable?: boolean
@@ -18,18 +18,23 @@ defineProps<{
 
 const loading = defineModel<boolean>('loading', { default: false })
 
-const emit = defineEmits<{ selected: [selected: boolean]; update: [tool: ToolItem] }>()
+const emit = defineEmits<{ click: [event: MouseEvent]; selected: [selected: boolean]; update: [tool: ToolItem] }>()
 
 defineSlots<{ actions?: () => unknown; 'action-dropdown'?: () => unknown }>()
+function handleClick(event: MouseEvent) {
+  if (!props.disabled && !props.selectable) emit('click', event)
+}
 </script>
 
 <template>
   <MkSourceCard
     :create_time="tool.create_time"
+    :disabled="disabled"
     :nick_name="tool.nick_name || '-'"
     :selectable="selectable"
     :selected="selected"
     :title="tool.name"
+    @click="handleClick"
     @selected="emit('selected', $event)"
   >
     <template #icon>

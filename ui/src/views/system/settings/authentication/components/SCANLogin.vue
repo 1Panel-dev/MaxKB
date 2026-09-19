@@ -96,14 +96,14 @@ onMounted(loadQrPlatforms)
     <template v-for="platform in qrLoginPlatforms" :key="platform.key">
       <el-card shadow="hover">
         <div class="flex-between mb-4">
-          <div class="flex items-center gap-2">
+          <div class="flex-align-center gap-2">
             <img :src="platform.logo" :alt="LOGIN_METHOD_LABELS[platform.key]" class="h-6 w-6" />
             <h4>{{ LOGIN_METHOD_LABELS[platform.key] }}</h4>
             <el-tag v-if="platform.isValid" size="small" type="success">有效</el-tag>
             <!-- <el-tag v-if="!platform.isValid" size="small" type="danger">无效</el-tag> -->
           </div>
 
-          <div v-if="platform.isValid" class="flex items-center gap-2">
+          <div v-if="platform.isValid" class="flex-align-center gap-2">
             <span>{{ platform.isActive ? '已启用' : '已关闭' }}</span>
             <el-switch v-model="platform.isActive" @change="handlePlatformStatusChange(platform)" />
           </div>

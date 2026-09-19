@@ -31,7 +31,7 @@ function handleDeleteInputField(index: number) {
 <template>
   <section>
     <div class="mb-4 flex-between">
-      <div class="flex items-center gap-2">
+      <div class="flex-align-center gap-2">
         <h4 class="mk-title-decoration">输入参数</h4>
         <span class="text-N600">使用工具时显示</span>
       </div>

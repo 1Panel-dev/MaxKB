@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, reactive, ref, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Top, Loading } from '@element-plus/icons-vue'
+import { Loading } from '@element-plus/icons-vue'
 import type { ScrollbarInstance } from 'element-plus'
+import ChatInput from '@/conversation-panel/chat-input/index.vue'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import SelectModel from '@/components/business/select-model/index.vue'
 import type { ModelItem, ModelProviderItem, PromptGenerateMessage, PromptGeneratePayload } from '@/api/types'
@@ -28,6 +29,8 @@ const PROMPT_TEMPLATE = `请根据用户描述生成一个完整的 AI 角色人
 const visible = ref(false)
 const loading = ref(false)
 const inputValue = ref('')
+const chatInputRef = useTemplateRef<InstanceType<typeof ChatInput>>('chatInputRef')
+
 const applicationId = ref('')
 const activeModelId = ref('')
 const messages = ref<PromptGenerateMessage[]>([])
@@ -107,7 +110,7 @@ async function generate(regenerate = false) {
   lastRequestMessages.value = requestMessages
   const answer = reactive<PromptGenerateMessage>({ content: '', role: 'ai' })
   messages.value = [...requestMessages, answer]
-  if (!regenerate) inputValue.value = ''
+  if (!regenerate) chatInputRef.value?.clear()
   loading.value = true
   const controller = new AbortController()
   abortController = controller
@@ -139,12 +142,6 @@ watch(visible, (value) => {
   if (!value) stopGenerate()
 })
 
-function handleKeydown(event: KeyboardEvent) {
-  if (event.isComposing || event.key !== 'Enter' || event.shiftKey) return
-  event.preventDefault()
-  void generate()
-}
-
 function replacePrompt() {
   if (!latestAnswer.value || loading.value) return
   emit('replace', latestAnswer.value)
@@ -160,7 +157,7 @@ onBeforeUnmount(() => abortController?.abort())
   </el-button>
   <MkDialog v-model="visible" title="生成提示词" width="720" @closed="resetData">
     <template #header="{ titleId, titleClass }">
-      <div class="flex items-center justify-between gap-4 pr-10">
+      <div class="flex-align-center justify-between gap-4 pr-10">
         <span :id="titleId" :class="titleClass" class="shrink-0">生成提示词</span>
         <div class="min-w-0 w-70">
           <SelectModel v-model="activeModelId" :options="modelOptions" :provider-options="providerOptions" :disabled="loading" teleported />
@@ -169,8 +166,8 @@ onBeforeUnmount(() => abortController?.abort())
       </div>
     </template>
 
-    <div class="flex flex-col gap-4 rounded-xl bg-N100 p-4">
-      <div v-if="loading" class="flex items-center gap-2">
+    <div class="space-y-4 rounded-xl bg-N100 p-4">
+      <div v-if="loading" class="flex-align-center gap-2">
         <MkIcon :icon="Loading" class="animate-spin text-primary" />
         <span>生成中</span>
       </div>
@@ -182,46 +179,17 @@ onBeforeUnmount(() => abortController?.abort())
         <el-button class="ml-0!" :disabled="!activeModelId" @click="generate(true)">重新生成</el-button>
       </div>
 
-      <div class="prompt-generate-input relative overflow-hidden rounded-2xl bg-white">
-        <el-input
-          v-model="inputValue"
-          :autosize="{ minRows: 3, maxRows: 6 }"
-          maxlength="100000"
-          placeholder="请输入提示词主题"
-          type="textarea"
-          resize="none"
-          @keydown="handleKeydown"
-        />
-        <!-- 停止生成 -->
-        <el-button v-if="loading" class="absolute right-3 bottom-3" circle type="primary" @click="stopGenerate">
-          <span class="h-3 w-3 rounded-sm bg-white" />
-        </el-button>
-        <!-- 生成提示词 -->
-        <el-button
-          v-else
-          class="absolute right-3 bottom-3"
-          circle
-          type="primary"
-          :disabled="!inputValue.trim() || !activeModelId || !applicationId"
-          @click="generate()"
-        >
-          <MkIcon :icon="Top" />
-        </el-button>
-      </div>
+      <ChatInput
+        ref="chatInputRef"
+        v-model="inputValue"
+        placeholder="请输入提示词主题"
+        :maxlength="100000"
+        :loading="loading"
+        :submit-disabled="!activeModelId || !applicationId"
+        paste-as-text
+        @submit="generate()"
+        @stop="stopGenerate"
+      />
     </div>
   </MkDialog>
 </template>
-
-<style scoped lang="scss">
-.prompt-generate-input {
-  :deep(.el-textarea__inner) {
-    padding: calc(var(--spacing) * 3) calc(var(--spacing) * 4) calc(var(--spacing) * 13);
-    border-radius: var(--el-border-radius-round);
-  }
-
-  :deep(.el-button.is-disabled) {
-    background-color: var(--mk-N400);
-    border-color: var(--mk-N400);
-  }
-}
-</style>

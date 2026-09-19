@@ -83,7 +83,7 @@ onMounted(() => {
     <template #default="{ Header }">
       <component :is="Header">
         <h4>{{ currentProvider.name }}</h4>
-        <div class="flex items-center">
+        <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <ButtonAddModel :api="SystemSharedApi" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
         </div>

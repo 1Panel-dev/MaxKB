@@ -104,7 +104,7 @@ onMounted(() => {
   <el-form-item v-if="getModel" label="赋值方式">
     <el-radio-group @change="resetOptions" v-model="formValue.assignment_method">
       <el-radio :value="item.value" v-for="(item, index) in assignmentMethodOptions" :key="index">
-        <span class="flex items-center gap-1">
+        <span class="flex-align-center gap-1">
           {{ item.label }}
 
           <MkTooltip placement="right" v-if="item.value === 'ref_variables'">

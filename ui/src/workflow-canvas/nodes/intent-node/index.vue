@@ -177,11 +177,11 @@ onMounted(() => {
             :rules="{ whitespace: true, required: true, message: '请输入', trigger: 'blur' }"
             class="small"
           >
-            <div class="flex items-center gap-2 w-full">
+            <div class="flex-align-center gap-2 w-full">
               <div class="min-w-0 flex-1">
                 <el-input v-model="item.content" :disabled="item.isOther" placeholder="请输入" />
               </div>
-              <div class="flex w-4 shrink-0 items-center justify-center">
+              <div class="flex-align-center w-4 shrink-0 justify-center">
                 <el-button
                   v-if="!item.isOther"
                   text

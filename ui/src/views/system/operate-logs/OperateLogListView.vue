@@ -129,7 +129,7 @@ onMounted(() => {
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <div class="flex items-center">
+        <div class="flex-align-center">
           <MkDateRange class="mr-3" @change="handleDateFilterChange" />
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" class="mr-3" />
           <!-- 清除策略 导出-->

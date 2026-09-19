@@ -69,13 +69,13 @@ defineExpose({ closeEdit })
       <template v-for="(version, index) in versions" :key="version.id">
         <MkListItem :active="selectedId === version.id" @click="handlePreview(version)">
           <div class="min-w-0 flex-1 pl-2">
-            <div class="flex items-center gap-2">
+            <div class="flex-align-center gap-2">
               <h6 class="text-N900! truncate" :title="version.name || datetimeFormat(version.create_time)">
                 {{ version.name || datetimeFormat(version.create_time) }}
               </h6>
               <el-tag v-if="index === 0" size="small" class="shrink-0">最近发布</el-tag>
             </div>
-            <div class="mt-1 flex items-center gap-1">
+            <div class="mt-1 flex-align-center gap-1">
               <el-avatar :size="18" class="bg-primary-gradient!">
                 <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 54%" />
               </el-avatar>

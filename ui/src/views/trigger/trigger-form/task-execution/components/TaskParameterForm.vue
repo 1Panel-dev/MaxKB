@@ -1,18 +1,87 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import type { FormInstance, FormItemRule } from 'element-plus'
-import { TRIGGER_TYPE } from '@/api/enums'
-import type { TriggerBodyField, TriggerParameters, TriggerType } from '@/api/types'
+import { RESOURCE_TYPE, TRIGGER_TYPE } from '@/api/enums'
+import type { ApplicationDetail, ToolItem, TriggerBodyField, TriggerParameters, TriggerType } from '@/api/types'
 import { get, set } from 'lodash'
 import type { TriggerParameter } from '@/api/types'
-import type { TaskParameterField } from './types'
+interface TaskParameterField {
+  path: string[]
+  label: string
+  required: boolean
+  defaultValue: string
+}
+
+type TaskResource =
+  | { type: typeof RESOURCE_TYPE.APPLICATION; data?: Partial<ApplicationDetail> }
+  | { type: typeof RESOURCE_TYPE.TOOL; data?: Partial<ToolItem> }
 
 const props = defineProps<{
   disabled?: boolean
-  fields: TaskParameterField[]
+  resource: TaskResource
   triggerType: TriggerType
   body: TriggerBodyField[]
 }>()
+function getApplicationFields(application?: Partial<ApplicationDetail>): TaskParameterField[] {
+  const fields: TaskParameterField[] = [{ path: ['question'], label: 'Question', required: true, defaultValue: '' }]
+  const properties = application?.work_flow?.nodes?.find((node) => node.type === 'base-node')?.properties ?? {}
+  const nodeData = properties.node_data ?? {}
+  if (nodeData.file_upload_enable) {
+    const fileLabels = { document: '文档', image: '图片', audio: '音频', video: '视频', other: '其他文件' }
+    Object.entries(fileLabels).forEach(([type, label]) => {
+      if (nodeData.file_upload_setting?.[type]) fields.push({ path: [`${type}_list`], label, required: true, defaultValue: '[]' })
+    })
+  }
+  const userFields = properties.user_input_field_list as
+    | { field: string; required?: boolean; default_value?: unknown; label?: string | { label?: string } }[]
+    | undefined
+  userFields?.forEach((field) => {
+    fields.push({
+      path: ['user_input_field_list', field.field],
+      label: (typeof field.label === 'string' ? field.label : field.label?.label) || field.field,
+      required: field.required ?? false,
+      defaultValue:
+        typeof field.default_value === 'string' ? field.default_value : field.default_value === undefined ? '' : JSON.stringify(field.default_value),
+    })
+  })
+  const apiFields = properties.api_input_field_list as { variable: string; is_required?: boolean; default_value?: unknown }[] | undefined
+  apiFields?.forEach((field) => {
+    fields.push({
+      path: ['api_input_field_list', field.variable],
+      label: field.variable,
+      required: field.is_required ?? false,
+      defaultValue:
+        typeof field.default_value === 'string' ? field.default_value : field.default_value === undefined ? '' : JSON.stringify(field.default_value),
+    })
+  })
+  return fields
+}
+function getToolFields(tool?: Partial<ToolItem>): TaskParameterField[] {
+  const fields: TaskParameterField[] = (tool?.input_field_list ?? []).map((field) => ({
+    path: [field.name],
+    label: field.name,
+    required: field.is_required,
+    defaultValue: '',
+  }))
+  const properties = tool?.work_flow?.nodes?.find((node) => node.type === 'tool-base-node')?.properties ?? {}
+  const userFields = properties.user_input_field_list as
+    | { field: string; is_required?: boolean; required?: boolean; default_value?: unknown; label?: string | { label?: string } }[]
+    | undefined
+  userFields?.forEach((field) => {
+    fields.push({
+      path: ['user_input_field_list', field.field],
+      label: (typeof field.label === 'string' ? field.label : field.label?.label) || field.field,
+      required: field.is_required ?? field.required ?? false,
+      defaultValue:
+        typeof field.default_value === 'string' ? field.default_value : field.default_value === undefined ? '' : JSON.stringify(field.default_value),
+    })
+  })
+  return fields
+}
+const fields = computed(() =>
+  props.resource.type === RESOURCE_TYPE.APPLICATION ? getApplicationFields(props.resource.data) : getToolFields(props.resource.data),
+)
+
 const parameters = defineModel<TriggerParameters>({ required: true })
 const formRef = ref<FormInstance>()
 const showSource = computed(() => props.triggerType === TRIGGER_TYPE.EVENT && props.body.some(({ field }) => field.trim()))
@@ -20,10 +89,10 @@ const referenceOptions = computed(() => [
   { label: 'body', value: 'body', children: props.body.filter(({ field }) => field.trim()).map(({ field }) => ({ label: field, value: field })) },
 ])
 watch(
-  [() => props.fields, showSource],
-  ([fields, canReference]) => {
-    initializeTaskParameters(parameters.value, fields)
-    if (!canReference) resetUnavailableReferences(parameters.value, fields)
+  [() => props.resource.type, () => props.resource.data, showSource],
+  ([, , canReference]) => {
+    initializeTaskParameters(parameters.value, fields.value)
+    if (!canReference) resetUnavailableReferences(parameters.value, fields.value)
     formRef.value?.clearValidate()
   },
   { immediate: true },

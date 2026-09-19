@@ -2,8 +2,7 @@
 import { computed, nextTick, ref } from 'vue'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import type { ApplicationDetail, ToolItem, TriggerBodyField, TriggerTaskPayload, TriggerTaskSource, TriggerType } from '@/api/types'
-import ApplicationParameter from './parameters/ApplicationParameter.vue'
-import ToolParameter from './parameters/ToolParameter.vue'
+import TaskParameterForm from './components/TaskParameterForm.vue'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
@@ -24,8 +23,8 @@ const toolDialogRef = ref<InstanceType<typeof SelectToolDialog>>()
 const loadedResources = ref<Record<string, Partial<ApplicationDetail & ToolItem>>>({})
 const resources = computed(() => ({ ...props.initialResources, ...loadedResources.value }))
 const expandedTaskGroups = ref<TriggerTaskSource[]>([RESOURCE_TYPE.APPLICATION, RESOURCE_TYPE.TOOL])
-const expandedTaskKeys = ref<string[]>([])
-const parameterRefs = ref<(InstanceType<typeof ApplicationParameter> | InstanceType<typeof ToolParameter>)[]>([])
+const collapsedTaskKeys = ref<string[]>([])
+const parameterRefs = ref<InstanceType<typeof TaskParameterForm>[]>([])
 const taskKey = (task: TriggerTaskPayload) => `${task.source_type}:${task.source_id}`
 const taskGroups = computed(() =>
   [
@@ -93,12 +92,12 @@ function handleRemoveTask(task: TriggerTaskPayload) {
 function reset() {
   loadedResources.value = {}
   expandedTaskGroups.value = [RESOURCE_TYPE.APPLICATION, RESOURCE_TYPE.TOOL]
-  expandedTaskKeys.value = []
+  collapsedTaskKeys.value = []
 }
 async function validate() {
   // 先展开所有任务，等待参数表单挂载后再统一校验。
   expandedTaskGroups.value = [RESOURCE_TYPE.APPLICATION, RESOURCE_TYPE.TOOL]
-  expandedTaskKeys.value = tasks.value.map(taskKey)
+  collapsedTaskKeys.value = []
   await nextTick()
   const validations = await Promise.all(parameterRefs.value.map((parameter) => parameter.validate().catch(() => false)))
   return validations.every(Boolean)
@@ -109,7 +108,12 @@ defineExpose({ validate, reset })
 <template>
   <div class="w-full space-y-2">
     <template v-for="group in taskGroups" :key="group.type">
-      <MkCollapse :default-expanded="true">
+      <MkCollapse
+        :expanded="expandedTaskGroups.includes(group.type)"
+        @update:expanded="
+          expandedTaskGroups = $event ? [...expandedTaskGroups, group.type] : expandedTaskGroups.filter((type) => type !== group.type)
+        "
+      >
         <template #label>
           <div class="flex-between min-w-0 flex-1">
             <span
@@ -122,13 +126,18 @@ defineExpose({ validate, reset })
           </div>
         </template>
 
-        <div v-if="group.tasks.length" class="mt-2 flex flex-col gap-1">
+        <div v-if="group.tasks.length" class="mt-2 space-y-1">
           <template v-for="task in group.tasks" :key="taskKey(task)">
             <el-card class="small" shadow="never">
-              <MkCollapse>
+              <MkCollapse
+                :expanded="!collapsedTaskKeys.includes(taskKey(task))"
+                @update:expanded="
+                  collapsedTaskKeys = $event ? collapsedTaskKeys.filter((key) => key !== taskKey(task)) : [...collapsedTaskKeys, taskKey(task)]
+                "
+              >
                 <template #label>
                   <div class="flex-between min-w-0 flex-1">
-                    <span class="flex min-w-0 items-center gap-2">
+                    <span class="flex-align-center min-w-0 gap-2">
                       <ApplicationIcon
                         v-if="task.source_type === RESOURCE_TYPE.APPLICATION"
                         :icon="resources[taskKey(task)]?.icon"
@@ -153,21 +162,11 @@ defineExpose({ validate, reset })
                   </div>
                 </template>
                 <div class="my-2">
-                  <ApplicationParameter
-                    v-if="task.source_type === RESOURCE_TYPE.APPLICATION"
+                  <TaskParameterForm
                     ref="parameterRefs"
                     v-model="task.parameter"
                     :disabled="disabled"
-                    :application="resources[taskKey(task)]"
-                    :trigger-type="triggerType"
-                    :body="body"
-                  />
-                  <ToolParameter
-                    v-else
-                    ref="parameterRefs"
-                    v-model="task.parameter"
-                    :disabled="disabled"
-                    :tool="resources[taskKey(task)]"
+                    :resource="{ type: task.source_type, data: resources[taskKey(task)] }"
                     :trigger-type="triggerType"
                     :body="body"
                   />

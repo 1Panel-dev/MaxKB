@@ -68,7 +68,7 @@ onMounted(() => loadSetting())
       ><el-input v-model="form.config.ldap_mapping" type="textarea" :rows="4" placeholder="请输入 LDAP 属性映射"
     /></el-form-item>
     <el-form-item>
-      <div class="flex flex-col">
+      <div class="flex-column">
         <span>启用 LDAP 认证</span>
         <el-switch v-model="form.is_active" class="self-start" />
       </div>

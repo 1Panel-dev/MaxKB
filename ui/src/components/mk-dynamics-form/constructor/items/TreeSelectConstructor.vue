@@ -224,7 +224,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
         <template #default="{ data, node }">
           <div class="flex-between min-w-0 flex-1 gap-2">
             <div class="min-w-0 flex-1 truncate" :title="`${data.label}-${data.value}`">{{ data.label }}-{{ data.value }}</div>
-            <div class="flex shrink-0 items-center">
+            <div class="flex-align-center shrink-0">
               <el-button text @click.stop="openEditDialog(data)">
                 <MkIcon name="icon_edit_outlined"></MkIcon>
               </el-button>

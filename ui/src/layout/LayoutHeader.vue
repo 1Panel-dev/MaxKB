@@ -15,9 +15,9 @@ function switchMode() {
 
 <template>
   <header class="flex-between h-header px-6">
-    <div class="flex items-center">
+    <div class="flex-align-center">
       <LogoFull class="h-9 shrink-0" />
-      <div v-if="!preview" class="flex items-center gap-5 ml-5">
+      <div v-if="!preview" class="flex-align-center gap-5 ml-5">
         <el-divider direction="vertical" />
         <!-- 企业版: 工作空间下拉框 -->
         <HeaderWorkspaceDropdown v-if="isWorkspace(mode)" />
@@ -25,7 +25,7 @@ function switchMode() {
       </div>
     </div>
 
-    <div class="flex items-center gap-5">
+    <div class="flex-align-center gap-5">
       <el-button v-if="!preview" class="bg-primary-gradient" round>
         <MkIcon name="icon_launch_outlined" />
         <span>升级</span>

@@ -115,7 +115,7 @@ defineExpose({ open })
     >
       <el-table-column label="触发任务" min-width="130" show-overflow-tooltip>
         <template #default="{ row }"
-          ><div class="flex items-center gap-2">
+          ><div class="flex-align-center gap-2">
             <ApplicationIcon v-if="row.source_type === RESOURCE_TYPE.APPLICATION" :icon="row.source_icon" :size="20" />
             <ToolIcon v-else :icon="row.source_icon" :type="row.type" :size="20" />
             <span class="min-w-0 flex-1 truncate">{{ row.source_name }}</span>

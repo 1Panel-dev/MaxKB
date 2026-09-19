@@ -141,7 +141,7 @@ function openModelParams() {
           :label="model.name"
           :value="model.id"
         >
-          <div class="flex h-full items-center gap-2">
+          <div class="flex-align-center h-full gap-2">
             <span class="h-5 w-5 shrink-0" v-html="group.icon" />
             <span class="min-w-0 flex-1 truncate" :title="model.name">{{ model.name }}</span>
             <el-tag v-if="model.source === 'shared'" size="small" type="info">共享</el-tag>
@@ -151,7 +151,7 @@ function openModelParams() {
       </el-option-group>
 
       <template #label="{ label, value }">
-        <div class="flex items-center" :class="multiple ? 'gap-1' : 'gap-2'">
+        <div class="flex-align-center" :class="multiple ? 'gap-1' : 'gap-2'">
           <span v-if="getProviderIcon(value)" class="shrink-0" :class="multiple ? 'h-4 w-4' : 'h-5 w-5'" v-html="getProviderIcon(value)" />
           <span class="truncate" :title="label">{{ label }}</span>
         </div>
@@ -170,7 +170,7 @@ function openModelParams() {
         </slot>
       </template>
     </el-select>
-    <div v-if="canEditModelParams" class="absolute inset-y-px right-3 flex items-center gap-2">
+    <div v-if="canEditModelParams" class="absolute inset-y-px right-3 flex-align-center gap-2">
       <el-divider direction="vertical" />
       <MkTooltip content="模型参数设置" placement="top" :disabled="disabled || !modelValue">
         <el-button text class="-mr-1" :disabled="disabled || !modelValue" @click.stop="openModelParams">

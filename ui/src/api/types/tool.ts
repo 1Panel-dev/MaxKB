@@ -1,7 +1,7 @@
 /** Workspace 工具列表和工具维护共用的业务类型。 */
 
 import type LogicFlow from '@logicflow/core'
-import { TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
+import { TOOL_RECORD_SOURCE, TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
 import type { DynamicFormField } from './common'
 import type { WorkflowStoreTemplate } from './workflow-template'
 import type { DefaultModelSettingPayload } from '@/api/types/model.ts'
@@ -178,4 +178,25 @@ export interface ToolWorkflowRecord {
 export interface ToolWorkflowStoreResponse {
   additionalProperties: { tags: ToolStoreTag[] }
   apps: WorkflowStoreTemplate[]
+}
+
+/** 工具执行记录摘要及详情共用字段。 */
+export interface ToolExecutionRecordDetail {
+  id: string
+  state: import('./state').State
+  run_time?: number | null
+  meta?: {
+    input?: unknown
+    output?: unknown
+    err_message?: string
+    details?: ToolWorkflowRecord['meta']['details']
+  }
+}
+
+export interface ToolExecutionRecord extends ToolExecutionRecordDetail {
+  source_type: (typeof TOOL_RECORD_SOURCE)[keyof typeof TOOL_RECORD_SOURCE]
+  source_name?: string | null
+  source_icon?: string | null
+  trigger_type?: import('./trigger').TriggerType | null
+  create_time: string
 }

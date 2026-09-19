@@ -116,13 +116,13 @@ onMounted(() => {
         <el-form-item label="检索设置">
           <el-radio-group v-model="formData.search_mode">
             <el-radio value="auto">
-              <span class="flex items-center gap-1"
+              <span class="flex-align-center gap-1"
                 >自动<MkTooltip content="根据检索问题自动匹配文档标签" placement="right"
                   ><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip
               ></span>
             </el-radio>
             <el-radio v-if="formData.search_scope_type === 'custom'" value="custom">
-              <span class="flex items-center gap-1"
+              <span class="flex-align-center gap-1"
                 >手动<MkTooltip content="手动设置标签过滤条件" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip
               ></span>
             </el-radio>
@@ -137,7 +137,7 @@ onMounted(() => {
           <NodeCascader ref="questionCascaderRef" v-model="formData.question_reference" :node-model="model" placeholder="请选择检索问题" />
         </el-form-item>
         <template v-else>
-          <div class="-mt-2 mb-2 flex items-center gap-2 text-sm text-N600">
+          <div class="-mt-2 mb-2 flex-align-center gap-2 text-sm text-N600">
             满足以下
             <el-select
               v-model="formData.search_condition_type"

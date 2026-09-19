@@ -70,7 +70,7 @@ const previewThemeInfo = computed<ThemeInfo>(() => ({
 <template>
   <div class="login-preview overflow-hidden rounded-md">
     <div class="browser-bar flex items-end px-2">
-      <div class="browser-tab flex items-center gap-2 rounded-t-md bg-white px-2">
+      <div class="browser-tab flex-align-center gap-2 rounded-t-md bg-white px-2">
         <img v-if="websiteIcon" :src="websiteIcon" alt="" class="size-4 object-contain" />
         <LogoIcon v-else class="h-4" />
         <span class="min-w-0 flex-1 truncate font-semibold text-sm" :title="data.title || 'MaxKB'">

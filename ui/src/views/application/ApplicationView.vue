@@ -201,7 +201,7 @@ function handleBatchDelete() {
     <template #default="{ Footer, Header }">
       <component :is="Header">
         <h4 class="min-w-0 truncate" :title="currentFolder.name">{{ currentFolder.name }}</h4>
-        <div class="flex items-center gap-3">
+        <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 批量选择 -->
           <span>

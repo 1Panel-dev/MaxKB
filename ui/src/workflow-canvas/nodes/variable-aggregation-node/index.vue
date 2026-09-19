@@ -163,7 +163,7 @@ onBeforeUnmount(() => {
           <div class="mk-white-card mb-2">
             <div class="flex-between mb-2 gap-2">
               <span class="min-w-0 truncate" :title="group.label">{{ group.label }}</span>
-              <div class="flex shrink-0 items-center gap-1">
+              <div class="flex-align-center shrink-0 gap-1">
                 <!-- 编辑组 -->
                 <el-button text @click="openAddOrEditDialog(group, gIndex)">
                   <MkIcon name="icon_edit_outlined" />

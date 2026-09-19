@@ -44,7 +44,7 @@ function toggleAside(event: MouseEvent) {
 <template>
   <div class="group relative flex h-full shrink-0 transition-[width] duration-200 ease-out" :class="asideCollapsed ? '' : 'w-sidebar-expanded'">
     <aside class="h-full overflow-hidden border-r transition-[width] duration-200 ease-out" :class="asideCollapsed ? 'w-0 border-none' : 'w-sidebar-expanded'">
-      <div v-show="!asideCollapsed" class="flex h-full w-sidebar-expanded flex-col">
+      <div v-show="!asideCollapsed" class="flex-column h-full w-sidebar-expanded">
         <LayoutAsideContent />
       </div>
     </aside>
@@ -52,7 +52,11 @@ function toggleAside(event: MouseEvent) {
       <button
         type="button"
         class="absolute top-15 z-10 cursor-pointer border bg-white shadow-md h-6 transition-all duration-200 hover:text-primary"
-        :class="asideCollapsed ? 'left-0 rounded-r-full border-l-0 w-5 flex items-center pl-[2px]' : 'right-0 translate-x-1/2 rounded-full w-6 flex-center group-hover-visible'"
+        :class="
+          asideCollapsed
+            ? 'left-0 rounded-r-full border-l-0 w-5 flex-align-center pl-[2px]'
+            : 'right-0 translate-x-1/2 rounded-full w-6 flex-center group-hover-visible'
+        "
         @click="toggleAside"
       >
         <MkIcon name="icon_left_outlined" :class="asideCollapsed && 'rotate-180'"  :size="12" />

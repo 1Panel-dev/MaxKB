@@ -54,7 +54,7 @@ defineExpose({ validate })
       <component :is="iconComponent(`${selectedNodeField.type}-icon`)" :size="20" :item="selectedNodeField" class="small" />
     </template>
     <template #default="{ data }">
-      <span class="flex items-center gap-1" @wheel="handleNodeWheel">
+      <span class="flex-align-center gap-1" @wheel="handleNodeWheel">
         <component :is="iconComponent(`${data.type}-icon`)" :size="16" :item="data" class="small" />
         <span>{{ data.label }}</span>
       </span>

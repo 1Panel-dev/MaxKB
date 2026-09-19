@@ -93,7 +93,7 @@ onMounted(() => loadSetting())
       ><el-input v-model="form.config.redirectUrl" placeholder="请输入回调地址"
     /></el-form-item>
     <el-form-item
-      ><div class="flex flex-col"><span>启用 OIDC 认证</span><el-switch v-model="form.is_active" class="self-start" /></div
+      ><div class="flex-column"><span>启用 OIDC 认证</span><el-switch v-model="form.is_active" class="self-start" /></div
     ></el-form-item>
     <!-- 保存 -->
     <el-button type="primary" @click="submit">保存</el-button>

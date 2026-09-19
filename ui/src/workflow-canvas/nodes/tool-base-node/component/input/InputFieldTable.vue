@@ -38,7 +38,7 @@ function saveTitle(data: ToolFieldConfig) {
   <div class="w-full">
     <div class="flex-between gap-2">
       <span class="min-w-0 truncate" :title="config.title">{{ config.title }}</span>
-      <div class="flex shrink-0 items-center">
+      <div class="flex-align-center shrink-0">
         <!-- 设置标题 -->
         <el-button text type="primary" @click="titleDialogRef?.open(config)"><MkIcon name="icon_setting" /></el-button>
         <!-- 添加参数 -->

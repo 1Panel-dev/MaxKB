@@ -38,7 +38,7 @@ defineProps<{
               <el-scrollbar max-height="150" class="mt-1">
                 <MdPreview :model-value="paragraph.page_content || paragraph.metadata?.content || ''" no-img-zoom-in />
               </el-scrollbar>
-              <div v-if="paragraph.metadata?.document_name?.trim()" class="mt-1 flex items-center gap-1">
+              <div v-if="paragraph.metadata?.document_name?.trim()" class="mt-1 flex-align-center gap-1">
                 <img :src="getFileIconUrl(paragraph.metadata.document_name.trim())" alt="" width="20" />
                 <a
                   v-if="paragraph.metadata?.source_file_id || paragraph.metadata?.source_url"
@@ -53,7 +53,7 @@ defineProps<{
                   {{ paragraph.metadata.document_name.trim() }}
                 </span>
               </div>
-              <div class="mt-1 flex items-center gap-1 border-t border-dashed pt-1">
+              <div class="mt-1 flex-align-center gap-1 border-t border-dashed pt-1">
                 <KnowledgeIcon :type="paragraph.metadata?.knowledge_type" :size="18" />
                 <span class="truncate">{{ paragraph.metadata?.knowledge_name || '-' }}</span>
               </div>
@@ -79,7 +79,7 @@ defineProps<{
               <el-scrollbar height="150" class="mt-1">
                 <MdPreview :model-value="paragraph.page_content || paragraph.metadata?.content || ''" no-img-zoom-in />
               </el-scrollbar>
-              <div v-if="paragraph.metadata?.document_name?.trim()" class="mt-1 flex items-center gap-1">
+              <div v-if="paragraph.metadata?.document_name?.trim()" class="mt-1 flex-align-center gap-1">
                 <img :src="getFileIconUrl(paragraph.metadata.document_name.trim())" alt="" width="20" />
                 <a
                   v-if="paragraph.metadata?.source_file_id || paragraph.metadata?.source_url"
@@ -94,7 +94,7 @@ defineProps<{
                   {{ paragraph.metadata.document_name.trim() }}
                 </span>
               </div>
-              <div class="mt-1 flex items-center gap-1 border-t border-dashed pt-1">
+              <div class="mt-1 flex-align-center gap-1 border-t border-dashed pt-1">
                 <KnowledgeIcon :type="paragraph.metadata?.knowledge_type" :size="18" />
                 <span class="truncate">{{ paragraph.metadata?.knowledge_name || '-' }}</span>
               </div>

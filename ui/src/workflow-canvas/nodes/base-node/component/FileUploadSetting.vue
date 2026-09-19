@@ -88,7 +88,7 @@ function resetData() {
         <div class="w-full space-y-2">
           <template v-for="fileType in fileTypes" :key="fileType.field">
             <MkCardCheckbox v-model="formData[fileType.field]" :label="fileType.label">
-              <div class="flex min-w-0 items-center gap-3">
+              <div class="flex-align-center min-w-0 gap-3">
                 <img class="shrink-0 w-6" :src="fileType.icon" :alt="fileType.label" />
                 <div class="min-w-0 flex-1">
                   <h6>{{ fileType.label }}</h6>
@@ -99,7 +99,7 @@ function resetData() {
           </template>
 
           <MkCardCheckbox v-model="formData.other" label="其他文件">
-            <div class="flex min-w-0 items-center gap-3">
+            <div class="flex-align-center min-w-0 gap-3">
               <img class="shrink-0 w-6" src="@/assets/file-type/unknown-icon.svg" />
               <div class="min-w-0 flex-1">
                 <h6 class="mb-2">其他文件</h6>

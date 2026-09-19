@@ -2,7 +2,7 @@
   <div class="w-full">
     <div class="flex-between">
       <span>循环变量</span>
-      <div class="flex items-center">
+      <div class="flex-align-center">
         <el-button text type="primary" @click="openAddDialog()">
           <MkIcon name="icon_add_outlined" />
         </el-button>

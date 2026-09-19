@@ -156,7 +156,7 @@ defineExpose({ open })
             shadow="hover"
             @click="handleTemplateSelect('blank')"
           >
-            <div class="flex h-full items-center justify-center gap-2">
+            <div class="flex-align-center h-full justify-center gap-2">
               <MkIcon name="icon_add_outlined" :size="16" />
               <span>空白创建</span>
             </div>

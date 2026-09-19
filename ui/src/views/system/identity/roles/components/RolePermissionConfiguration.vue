@@ -135,7 +135,7 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
 </script>
 
 <template>
-  <div class="relative flex min-h-0 flex-1 flex-col">
+  <div class="relative flex-column min-h-0 flex-1">
     <MkTable
       :key="permissionTableKey"
       class="role-permission-table"

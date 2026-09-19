@@ -120,7 +120,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
         <template v-for="resource in selectedMcpTools" :key="resource.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">
-              <span class="flex min-w-0 items-center gap-2">
+              <span class="flex-align-center min-w-0 gap-2">
                 <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
                 <span class="truncate" :title="resource.name">{{ resource.name }}</span>
               </span>
@@ -131,7 +131,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
 
         <el-card v-if="setting.mcp_servers" class="small" shadow="never">
           <div class="flex-between">
-            <span class="flex min-w-0 items-center gap-2">
+            <span class="flex-align-center min-w-0 gap-2">
               <ToolIcon :size="20" class="shrink-0 small" type="MCP" />
               <span>自定义 MCP 服务</span>
             </span>
@@ -157,7 +157,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
         <template v-for="resource in selectedTools" :key="resource.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">
-              <span class="flex min-w-0 items-center gap-2">
+              <span class="flex-align-center min-w-0 gap-2">
                 <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
                 <span class="truncate" :title="resource.name">{{ resource.name }}</span>
               </span>
@@ -184,7 +184,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
         <template v-for="resource in selectedSkills" :key="resource.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">
-              <span class="flex min-w-0 items-center gap-2">
+              <span class="flex-align-center min-w-0 gap-2">
                 <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
                 <span class="truncate" :title="resource.name">{{ resource.name }}</span>
               </span>
@@ -211,7 +211,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
         <template v-for="resource in selectedApplications" :key="resource.id">
           <el-card class="small" shadow="never">
             <div class="flex-between">
-              <span class="flex min-w-0 items-center gap-2">
+              <span class="flex-align-center min-w-0 gap-2">
                 <ApplicationIcon :icon="resource.icon" :size="20" class="shrink-0 small" />
                 <span class="truncate" :title="resource.name">{{ resource.name }}</span>
               </span>

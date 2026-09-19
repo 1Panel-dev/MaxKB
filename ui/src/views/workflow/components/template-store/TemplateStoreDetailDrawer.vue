@@ -35,13 +35,13 @@ defineExpose({ open })
     <template v-if="workflowTemplate">
       <div class="border-b pb-6 mb-3">
         <div class="flex-between gap-4">
-          <div class="flex min-w-0 items-center gap-4">
+          <div class="flex-align-center min-w-0 gap-4">
             <el-avatar class="bg-transparent!" shape="square" :size="60">
               <img :src="resetUrl(workflowTemplate.icon, true)" alt="" />
             </el-avatar>
             <div class="min-w-0">
               <h2 class="truncate" :title="workflowTemplate.name">{{ workflowTemplate.name }}</h2>
-              <span class="flex items-center gap-1 text-N600">
+              <span class="flex-align-center gap-1 text-N600">
                 <MkIcon name="icon_download_outlined" />
                 {{ numberFormat(workflowTemplate.downloads) }}
               </span>

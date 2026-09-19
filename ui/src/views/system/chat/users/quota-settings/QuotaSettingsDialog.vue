@@ -138,7 +138,7 @@ defineExpose({ open })
 
       <template v-if="quotaSettingsForm.quotaType === QUOTA_TYPE.PERIODIC">
         <el-form-item label="周期" prop="periodValue">
-          <div class="flex items-center gap-2">
+          <div class="flex-align-center gap-2">
             <span>每</span>
             <el-input-number v-model="quotaSettingsForm.periodValue" :min="1" :max="365" class="w-40!" align="left" controls-position="right" />
             <el-select v-model="quotaSettingsForm.periodType" class="w-40!">

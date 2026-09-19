@@ -26,7 +26,7 @@ function changeInputValue(value: number | undefined) {
 </script>
 
 <template>
-  <div class="flex w-full items-center gap-4" :class="{ 'flex-col': props.vertical }">
+  <div class="flex-align-center w-full gap-4" :class="{ 'flex-col': props.vertical }">
     <el-slider
       v-bind="props"
       :show-input="false"

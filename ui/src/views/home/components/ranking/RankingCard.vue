@@ -36,11 +36,11 @@ function getRecordPercentage(record: HomeRankingRecord) {
     <div v-else class="space-y-6">
       <template v-for="(record, index) in records" :key="index">
         <div class="flex-between gap-3">
-          <div class="flex min-w-0 flex-1 items-center gap-3">
+          <div class="flex-align-center min-w-0 flex-1 gap-3">
             <span class="mk-rank shrink-0" :class="index < 3 ? `mk-rank-${index + 1}` : 'text-N600'">{{ index + 1 }}</span>
             <div class="min-w-0">
               <h6 class="truncate" :title="getRankingName(record)">{{ getRankingName(record) }}</h6>
-              <p class="text-sm text-N600 flex items-center gap-2">
+              <p class="text-sm text-N600 flex-align-center gap-2">
                 <slot name="description" :record="record" :index="index" />
               </p>
             </div>

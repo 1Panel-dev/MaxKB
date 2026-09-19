@@ -269,7 +269,7 @@ onBeforeUnmount(() => {
     <div ref="stepContainerRef" class="step-container p-4" :class="{ isSelected: nodeSelected, error: node_status !== 200 }">
       <div>
         <div class="flex-between">
-          <div class="flex min-w-0 flex-1 items-center" @dragstart.prevent @drag.prevent @dragover.prevent @dragend.prevent>
+          <div class="flex-align-center min-w-0 flex-1" @dragstart.prevent @drag.prevent @dragover.prevent @dragend.prevent>
             <component :is="iconComponent(`${model.type}-icon`)" class="mr-2 shrink-0" :size="24" :item="model?.properties.node_data" />
             <h4
               class="truncate"
@@ -278,7 +278,7 @@ onBeforeUnmount(() => {
             ></h4>
           </div>
 
-          <div class="flex shrink-0 items-center gap-1" @pointerdown.stop @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
+          <div class="flex-align-center shrink-0 gap-1" @pointerdown.stop @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode">
               <MkIcon name="icon_down_outlined" :size="20"/>
             </el-button>
@@ -314,7 +314,7 @@ onBeforeUnmount(() => {
             <template v-if="nodeFields.length > 0">
               <div class="flex-between mt-2">
                 <h6 class="mk-title-decoration my-2">{{ output_title }}</h6>
-                <div v-if="exceptionNodeList.includes(String(model.type))" class="flex items-center gap-2">
+                <div v-if="exceptionNodeList.includes(String(model.type))" class="flex-align-center gap-2">
                   <span>异常捕获</span>
                   <el-switch v-model="enable_exception" size="small" />
                 </div>

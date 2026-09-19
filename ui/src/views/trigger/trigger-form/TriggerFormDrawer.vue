@@ -5,14 +5,28 @@ import { TRIGGER_SCHEDULE_OPTIONS } from '@/constants/trigger'
 import type { FormInstance, FormRules } from 'element-plus'
 import TriggerApi from '@/api/admin/workspace/trigger/trigger'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
-import { RESOURCE_TYPE, TRIGGER_TYPE, TRIGGER_SCHEDULE_TYPE } from '@/api/enums'
-import type { ApplicationDetail, ToolItem, TriggerPayload, TriggerSetting } from '@/api/types'
-import TaskExecution from './task-execution/TaskExecution.vue'
+import { RESOURCE_TYPE, TOOL_TYPE, TRIGGER_TYPE, TRIGGER_SCHEDULE_TYPE } from '@/api/enums'
+import type { ApplicationDetail, ToolItem, TriggerDetail, TriggerPayload, TriggerSetting, ResourceTriggerResource } from '@/api/types'
+import TriggerTaskExecution from './task-execution/TriggerTaskExecution.vue'
+import ToolTaskExecution from './task-execution/ToolTaskExecution.vue'
+import ApplicationTaskExecution from './task-execution/ApplicationTaskExecution.vue'
+import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
+import ApplicationApi from '@/api/admin/workspace/application/application'
+import ToolApi from '@/api/admin/workspace/tool/tool'
+import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import RequestParameters from './request-parameters/RequestParametersTable.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
+import { v4 as uuidv4 } from 'uuid'
 
-const emit = defineEmits<{ refresh: [] }>()
+const props = withDefaults(
+  defineProps<{
+    resource?: ResourceTriggerResource
+    resourceApi?: typeof ResourceTriggerApi
+  }>(),
+  { resourceApi: () => ResourceTriggerApi },
+)
+const emit = defineEmits<{ refresh: []; closed: [] }>()
 /* 抽屉生命周期与详情 */
 const visible = ref(false)
 const loading = ref(false)
@@ -21,21 +35,12 @@ const detailFailed = ref(false)
 const editingId = ref<string>()
 const formRef = ref<FormInstance>()
 const presetScheduleType = ref<TriggerSetting['schedule_type']>()
-const taskExecutionRef = ref<InstanceType<typeof TaskExecution>>()
+const taskExecutionRef = ref<{ validate: () => Promise<boolean | undefined>; reset?: () => void }>()
 const resources = ref<Record<string, Partial<ApplicationDetail & ToolItem>>>({})
-
-// HTTP 部署中 randomUUID 可能不可用，使用浏览器安全随机数生成 UUID。
-function createTriggerUuid() {
-  const bytes = crypto.getRandomValues(new Uint8Array(16))
-  bytes[6] = (bytes[6]! & 0x0f) | 0x40
-  bytes[8] = (bytes[8]! & 0x3f) | 0x80
-  const hex = Array.from(bytes, (value) => value.toString(16).padStart(2, '0')).join('')
-  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
-}
 
 function createDefaultForm(): TriggerPayload {
   return {
-    id: createTriggerUuid(),
+    id: uuidv4(),
     name: '',
     desc: '',
     trigger_type: TRIGGER_TYPE.SCHEDULED,
@@ -46,7 +51,7 @@ function createDefaultForm(): TriggerPayload {
       days: [1],
       interval_unit: 'minutes',
       interval_value: 1,
-      token: createTriggerUuid().replaceAll('-', ''),
+      token: uuidv4().replaceAll('-', ''),
       body: [],
     },
   }
@@ -54,36 +59,83 @@ function createDefaultForm(): TriggerPayload {
 const form = ref<TriggerPayload>(createDefaultForm())
 const eventUrl = computed(() => `${window.location.origin}${ADMIN_API_BASE_PATH}/trigger/v1/webhook/${form.value.id}`)
 
+/** 工具触发任务需要完整的输入定义，工作流工具额外加载画布。 */
+function loadToolResource(toolId: string) {
+  return ToolApi.getToolDetail(toolId).then((tool) => {
+    if (tool.tool_type === TOOL_TYPE.WORKFLOW && !tool.work_flow)
+      return WorkflowApi.getToolWorkflow(tool.id).then((workflow) => ({ ...tool, work_flow: workflow.work_flow }))
+    return tool
+  })
+}
+
+function fillDetail(detail: TriggerDetail) {
+  const defaults = createDefaultForm()
+  form.value = cloneDeep({
+    id: detail.id,
+    name: detail.name,
+    desc: detail.desc ?? '',
+    trigger_type: detail.trigger_type,
+    is_active: detail.is_active,
+    meta: detail.meta,
+    trigger_task: detail.trigger_task,
+    trigger_setting: {
+      ...defaults.trigger_setting,
+      ...detail.trigger_setting,
+      days: detail.trigger_setting.days?.map(Number) ?? defaults.trigger_setting.days,
+    },
+  })
+  detail.application_task_list?.forEach((application) => {
+    if (application.id) resources.value[`${RESOURCE_TYPE.APPLICATION}:${application.id}`] = application
+  })
+  detail.tool_task_list?.forEach((tool) => {
+    if (tool.id) resources.value[`${RESOURCE_TYPE.TOOL}:${tool.id}`] = tool
+  })
+}
+
 function open(triggerId?: string) {
   resetData()
   editingId.value = triggerId
   visible.value = true
-  if (!triggerId) return
+  const resource = props.resource
+  if (!triggerId && !resource) return
   loading.value = true
-  return TriggerApi.getTriggerDetail(triggerId)
+
+  // 资源详情为单任务，统一转换成表单内部的任务数组。
+  const detailRequest = triggerId
+    ? resource
+      ? props.resourceApi.getResourceTriggerDetail(resource, triggerId).then(
+          (detail): TriggerDetail => ({
+            ...detail,
+            trigger_task: [detail.trigger_task],
+            application_task_list: detail.application_task ? [detail.application_task] : [],
+            tool_task_list: detail.tool_task ? [detail.tool_task] : [],
+          }),
+        )
+      : TriggerApi.getTriggerDetail(triggerId)
+    : Promise.resolve(undefined)
+
+  return detailRequest
     .then((detail) => {
       if (!visible.value) return
-      const defaults = createDefaultForm()
-      form.value = cloneDeep({
-        id: detail.id,
-        name: detail.name,
-        desc: detail.desc ?? '',
-        trigger_type: detail.trigger_type,
-        is_active: detail.is_active,
-        meta: detail.meta,
-        trigger_task: detail.trigger_task,
-        trigger_setting: {
-          ...defaults.trigger_setting,
-          ...detail.trigger_setting,
-          days: detail.trigger_setting.days?.map(Number) ?? defaults.trigger_setting.days,
-        },
-      })
-      detail.application_task_list?.forEach((application) => {
-        if (application.id) resources.value[`${RESOURCE_TYPE.APPLICATION}:${application.id}`] = application
-      })
-      detail.tool_task_list?.forEach((tool) => {
-        if (tool.id) resources.value[`${RESOURCE_TYPE.TOOL}:${tool.id}`] = tool
-      })
+      if (detail) fillDetail(detail)
+      else if (resource) {
+        form.value.trigger_task = [{ source_type: resource.source_type, source_id: resource.source_id, parameter: {} }]
+      }
+      // 补齐工具工作流参数；新建智能体任务时读取完整智能体详情。
+      return Promise.all(
+        form.value.trigger_task.map((task) => {
+          const key = `${task.source_type}:${task.source_id}`
+          if (task.source_type === RESOURCE_TYPE.TOOL)
+            return loadToolResource(task.source_id).then((tool) => {
+              resources.value[key] = tool
+            })
+          if (!resources.value[key])
+            return ApplicationApi.getApplicationDetail(task.source_id).then((application) => {
+              resources.value[key] = application
+            })
+          return Promise.resolve()
+        }),
+      )
     })
     .catch(() => {
       detailFailed.value = true
@@ -136,7 +188,7 @@ function handleSwitchScheduleMode() {
 }
 
 const triggerTypeOptions = [
-  { value: TRIGGER_TYPE.SCHEDULED, label: '定时触发', description: '到设定时间后，自动提炼周期内所有对话，生成记忆' },
+  { value: TRIGGER_TYPE.SCHEDULED, label: '定时触发', description: '到设定时间后执行任务' },
   { value: TRIGGER_TYPE.EVENT, label: '事件触发', description: '当某个事件发生时执行任务' },
 ]
 function handleSelectTriggerType(type: TriggerPayload['trigger_type']) {
@@ -145,7 +197,7 @@ function handleSelectTriggerType(type: TriggerPayload['trigger_type']) {
   formRef.value?.clearValidate('trigger_setting')
 }
 function handleRefreshToken() {
-  form.value.trigger_setting.token = createTriggerUuid().replaceAll('-', '')
+  form.value.trigger_setting.token = uuidv4().replaceAll('-', '')
 }
 
 const rules: FormRules<TriggerPayload> = {
@@ -211,7 +263,14 @@ function handleSave() {
           ...(setting.schedule_type === TRIGGER_SCHEDULE_TYPE.DAILY ? {} : { days: setting.days }),
         }
       payload.trigger_setting = activeSetting
-      const request = editingId.value ? TriggerApi.putTrigger(editingId.value, payload) : TriggerApi.postTrigger(payload)
+      const resource = props.resource
+      const request = resource
+        ? editingId.value
+          ? props.resourceApi.putResourceTrigger(resource, editingId.value, payload)
+          : props.resourceApi.postResourceTrigger(resource, payload)
+        : editingId.value
+          ? TriggerApi.putTrigger(editingId.value, payload)
+          : TriggerApi.postTrigger(payload)
       return request.then(() => {
         MsgSuccess(editingId.value ? '保存成功' : '创建成功')
         visible.value = false
@@ -230,16 +289,25 @@ function resetData() {
   saving.value = false
   detailFailed.value = false
   resources.value = {}
-  taskExecutionRef.value?.reset()
+  taskExecutionRef.value?.reset?.()
   presetScheduleType.value = undefined
   formRef.value?.clearValidate()
+}
+
+function handleBeforeClose(done: () => void) {
+  if (!saving.value) done()
+}
+
+function handleClosed() {
+  resetData()
+  emit('closed')
 }
 
 defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="editingId ? '编辑触发器' : '创建触发器'" @closed="resetData">
+  <MkDrawer v-model="visible" :title="editingId ? '编辑触发器' : '创建触发器'" @closed="handleClosed" :before-close="handleBeforeClose">
     <div v-loading="loading">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
         <el-form-item label="触发器名称" prop="name"
@@ -329,7 +397,8 @@ defineExpose({ open })
         <!-- 任务执行 -->
         <el-form-item label="任务执行" prop="trigger_task">
           <div class="mk-gray-card w-full p-4! rounded-xl!">
-            <TaskExecution
+            <TriggerTaskExecution
+              v-if="!resource"
               ref="taskExecutionRef"
               v-model="form.trigger_task"
               :initial-resources="resources"
@@ -338,6 +407,24 @@ defineExpose({ open })
               :body="form.trigger_setting.body ?? []"
               :disabled="saving || loading"
               @change="formRef?.clearValidate('trigger_task')"
+            />
+            <ToolTaskExecution
+              v-else-if="resource.source_type === RESOURCE_TYPE.TOOL && !loading && !detailFailed"
+              ref="taskExecutionRef"
+              v-model="form.trigger_task"
+              :tool="resources[`${resource.source_type}:${resource.source_id}`]"
+              :trigger-type="form.trigger_type"
+              :body="form.trigger_setting.body ?? []"
+              :disabled="saving || loading"
+            />
+            <ApplicationTaskExecution
+              v-else-if="resource.source_type === RESOURCE_TYPE.APPLICATION && !loading && !detailFailed"
+              ref="taskExecutionRef"
+              v-model="form.trigger_task"
+              :application="resources[`${resource.source_type}:${resource.source_id}`]"
+              :trigger-type="form.trigger_type"
+              :body="form.trigger_setting.body ?? []"
+              :disabled="saving || loading"
             />
           </div>
         </el-form-item>

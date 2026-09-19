@@ -148,7 +148,7 @@ defineExpose({ open })
 <template>
   <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" title="工具商店" width="1200" @closed="handleClosed">
     <template #header="{ titleId }">
-      <div class="relative flex items-center">
+      <div class="relative flex-align-center">
         <h4 :id="titleId">工具商店</h4>
         <MkSearchInput v-model="searchKeyword" class="absolute left-1/2 w-80! -translate-x-3/4" placeholder="搜索" @change="loadStoreTools" />
       </div>

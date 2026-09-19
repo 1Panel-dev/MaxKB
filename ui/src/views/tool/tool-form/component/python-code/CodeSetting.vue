@@ -11,7 +11,7 @@ const code = defineModel<string>({ required: true })
 <template>
   <section>
     <div class="mb-4 flex-between">
-      <div class="flex items-center gap-2">
+      <div class="flex-align-center gap-2">
         <h4 class="mk-title-decoration mk-required">工具内容（Python）</h4>
         <span class="text-N600">使用工具时不显示</span>
       </div>

@@ -123,7 +123,7 @@ defineExpose({ clearSelection, tableRef })
 </script>
 
 <template>
-  <div class="mk-table relative flex w-full min-h-0 flex-1 flex-col">
+  <div class="mk-table relative flex-column w-full min-h-0 flex-1">
     <el-table
       ref="tableRef"
       :class="{ 'mk-table__resizable--borderless': props.resizable, small: props.size === 'small' }"

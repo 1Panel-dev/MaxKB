@@ -124,7 +124,7 @@ onMounted(() => loadSystemUsers())
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <div class="flex items-center">
+        <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 导入用户 -->
           <ButtonImportUsers @refresh="loadSystemUsers()" />
@@ -200,7 +200,7 @@ onMounted(() => loadSystemUsers())
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <div class="flex items-center gap-3">
+            <div class="flex-align-center gap-3">
               <span @click.stop>
                 <el-switch
                   v-model="row.is_active"

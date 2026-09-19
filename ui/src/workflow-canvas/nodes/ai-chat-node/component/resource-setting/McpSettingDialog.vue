@@ -96,7 +96,7 @@ defineExpose({ open })
       >
         <el-select v-model="formData.mcp_tool_ids" class="w-full" :loading="loading" filterable multiple placeholder="请选择 MCP 工具">
           <el-option v-for="option in mcpOptions" :key="option.id" :label="option.name" :value="option.id">
-            <div class="flex items-center gap-2">
+            <div class="flex-align-center gap-2">
               <ToolIcon :icon="option.icon" :size="20" :type="option.tool_type" />
               <span>{{ option.name }}</span>
               <el-tag v-if="option.source === 'shared'" size="small" type="info">共享</el-tag>

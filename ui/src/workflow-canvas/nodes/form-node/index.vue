@@ -112,7 +112,7 @@ onMounted(() => {
           :rules="{ whitespace: true, required: true, message: '请填写表单输出内容', trigger: 'blur' }"
         >
           <template #label>
-            <div class="flex items-center gap-1">
+            <div class="flex-align-center gap-1">
               <span class="mk-required">表单输出内容</span>
               <MkTooltip placement="right" content="设置执行该节点输出的内容，{ form } 为表单的占位符">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />

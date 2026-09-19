@@ -357,8 +357,8 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
 </script>
 
 <template>
-  <div v-loading="loading" class="flex min-h-0 flex-1 flex-col">
-    <div class="flex shrink-0 items-center gap-2 px-4 pb-2">
+  <div v-loading="loading" class="flex-column min-h-0 flex-1">
+    <div class="flex-align-center shrink-0 gap-2 px-4 pb-2">
       <MkSearchInput v-model="searchKeyword" class="min-w-0 flex-1" />
       <MkDropdown trigger="click" placement="bottom-end">
         <!-- 选择文件夹排序方式 -->

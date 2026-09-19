@@ -60,7 +60,7 @@ onBeforeUnmount(() => anchorGuard.reset())
   <NodeContainer :node-model="model">
     <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <div class="mk-gray-card">
-        <div v-if="conditions.length > 1" class="mb-2 flex items-center gap-2 text-N600">
+        <div v-if="conditions.length > 1" class="mb-2 flex-align-center gap-2 text-N600">
           <span>符合以下</span>
           <el-select
             v-model="formData.condition"

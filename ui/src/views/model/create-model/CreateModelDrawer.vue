@@ -286,7 +286,7 @@ defineExpose({ open })
                 >
                   <el-option v-for="option in baseModelOptions" :key="option.name" :label="option.name" :value="option.name">
                     <template #default>
-                      <div class="flex items-center gap-2">
+                      <div class="flex-align-center gap-2">
                         <span>{{ option.name }} </span>
                         <MkTooltip v-if="option.desc" :content="option.desc" placement="right">
                           <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>

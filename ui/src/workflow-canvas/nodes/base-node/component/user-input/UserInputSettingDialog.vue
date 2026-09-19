@@ -38,7 +38,7 @@ defineExpose({ open })
     <el-form :model="currentSetting" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item>
         <template #label>
-          <span class="flex items-center gap-1">
+          <span class="flex-align-center gap-1">
             <span>外置参数设置（最多可显示3个）</span>
             <MkTooltip placement="right" content="仅支持模型、知识库、开关、日期、树形选项卡、单选框、多选框组件类型">
               <MkIcon name="icon_info_outlined" class="text-N600!" />

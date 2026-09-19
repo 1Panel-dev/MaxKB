@@ -26,7 +26,7 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(layoutTh
     <div class="login-background"></div>
 
     <header class="login-header flex-between">
-      <div class="flex items-center gap-4">
+      <div class="flex-align-center gap-4">
         <img v-if="layoutThemeInfo?.loginLogo" :src="layoutThemeInfo.loginLogo" alt="MaxKB" class="h-9.5 max-w-50 object-contain object-left" />
         <LogoFull v-else height="38" />
         <el-divider v-if="layoutThemeInfo?.slogan" direction="vertical" />

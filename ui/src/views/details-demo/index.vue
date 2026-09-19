@@ -214,7 +214,7 @@ const detail = ref<ExecutionNodeDetail[]>([
 <template>
   <div class="min-h-screen bg-N100 p-6">
     <div class="mx-auto max-w-[480px]">
-      <div class="mb-4 flex items-center gap-3">
+      <div class="mb-4 flex-align-center gap-3">
         <h3>执行详情样式 Demo</h3>
         <el-radio-group v-model="mode" size="small">
           <el-radio-button :value="WorkflowMode.Application">application</el-radio-button>

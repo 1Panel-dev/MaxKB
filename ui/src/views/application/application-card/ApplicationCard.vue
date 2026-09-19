@@ -44,7 +44,7 @@ function handleOpen() {
       <MkStatusLabel :active="application.is_publish" active-text="已发布" inactive-text="未发布" />
       <template v-if="application.is_publish">
         <el-divider direction="vertical" />
-        <span class="flex items-center gap-2">
+        <span class="flex-align-center gap-2">
           <MkIcon name="icon_time_outlined" class="text-N500!" />
           <span class="text-N600">{{ dateFormat(application.update_time) }}</span>
         </span>

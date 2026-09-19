@@ -21,11 +21,11 @@ const tokenCount = computed(() => (props.data?.message_tokens || 0) + (props.dat
 
 <template>
   <div class="flex-between w-full">
-    <div class="flex items-center gap-2">
+    <div class="flex-align-center gap-2">
       <component :is="nodeIconComponent" v-if="nodeIconComponent" :size="24" />
       <h6>{{ data.name }}</h6>
     </div>
-    <div class="flex items-center gap-3 text-N600">
+    <div class="flex-align-center gap-3 text-N600">
       <span v-if="showTokens">{{ formatTokenNumber(tokenCount) }} tokens</span>
       <span v-if="!isRunning">{{ data?.run_time?.toFixed(2) || '0.00' }} s</span>
 

@@ -38,7 +38,7 @@ function handleUseTemplate() {
     </template>
     <p class="line-clamp-2" :title="template.desc || '-'">{{ template.desc || '-' }}</p>
     <template #footer="{ Action }">
-      <span class="-mb-3 flex items-center gap-1 text-sm text-N600 group-hover:hidden group-focus-within:hidden">
+      <span class="-mb-3 flex-align-center gap-1 text-sm text-N600 group-hover:hidden group-focus-within:hidden">
         <template v-if="template.downloads !== undefined">
           <MkIcon name="icon_download_outlined" />
           {{ numberFormat(template.downloads) }}

@@ -48,21 +48,13 @@ onBeforeUnmount(() => stopDownloadPolling())
 
 <template>
   <div class="model-download-status bg-white/94">
-    <div v-loading="true" class="download-spinner h-7 w-7" element-loading-background="transparent" role="status"></div>
+    <LoadingIcon class="h-7 w-7" />
     <span class="mk-dotting my-2 ml-2 text-N600">下载中</span>
     <el-button text type="primary" :loading="cancelLoading" @click.stop="handleCancelDownload"> 取消下载 </el-button>
   </div>
 </template>
 
 <style scoped lang="scss">
-.download-spinner {
-  --el-loading-spinner-size: 24px;
-
-  :deep(.el-loading-spinner .path) {
-    stroke-width: 4px;
-  }
-}
-
 .model-download-status {
   align-items: center;
   border-radius: var(--el-card-border-radius);

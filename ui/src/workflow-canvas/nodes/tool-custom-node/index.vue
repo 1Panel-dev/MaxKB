@@ -110,8 +110,8 @@ onMounted(() => {
               }"
             >
               <template #label>
-                <div class="flex w-full items-center justify-between gap-2">
-                  <div class="flex min-w-0 items-center gap-1">
+                <div class="flex-align-center w-full justify-between gap-2">
+                  <div class="flex-align-center min-w-0 gap-1">
                     <span class="max-w-32 truncate" :class="{ 'mk-required': field.is_required }" :title="field.name">{{ field.name }}</span>
                     <MkTooltip v-if="field.desc" :content="field.desc" effect="dark" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!" />
@@ -119,7 +119,7 @@ onMounted(() => {
                     <el-tag size="small" type="info">{{ field.type }}</el-tag>
                   </div>
 
-                  <div class="flex shrink-0 items-center">
+                  <div class="flex-align-center shrink-0">
                     <el-button text type="primary" @click.stop="handleOpenInputField(field, index)">
                       <MkIcon name="icon_edit_outlined" />
                     </el-button>
@@ -141,7 +141,7 @@ onMounted(() => {
         </el-form-item>
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showReturnContent">
-          <span class="flex items-center gap-1">
+          <span class="flex-align-center gap-1">
             返回内容
             <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />

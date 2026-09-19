@@ -27,7 +27,7 @@ const hasActionDropdown = computed(() => hasRenderableSlotContent(slots['action-
 
 <template>
   <div
-    class="group flex cursor-pointer items-center rounded-md px-2 py-[9px] hover:bg-N900/10"
+    class="group flex-align-center cursor-pointer rounded-md px-2 py-[9px] hover:bg-N900/10"
     :class="{ 'bg-primary/10 font-medium text-primary hover:bg-primary/10': active }"
     @click="emit('click')"
   >
@@ -37,7 +37,12 @@ const hasActionDropdown = computed(() => hasRenderableSlotContent(slots['action-
       </span>
     </slot>
     <!-- 操作区保留布局宽度，hover/focus 时显示，并阻止触发行点击。 -->
-    <div v-if="$slots.action || hasActionDropdown" class="group-hover-visible ml-auto flex shrink-0 items-center font-normal text-N900" @click.stop @keydown.stop>
+    <div
+      v-if="$slots.action || hasActionDropdown"
+      class="group-hover-visible ml-auto flex-align-center shrink-0 font-normal text-N900"
+      @click.stop
+      @keydown.stop
+    >
       <MkDropdown v-if="hasActionDropdown" trigger="click" :teleported="false">
         <el-button text>
           <MkIcon name="icon_more_outlined" />

@@ -66,6 +66,12 @@
   transform: translate(-50%, -50%);
 }
 
+/* Flex 布局，交叉轴居中 */
+@utility flex-align-center {
+  align-items: center;
+  display: flex;
+}
+
 /* 横向排列，两侧贴边并垂直居中 */
 @utility flex-between {
   align-items: center;
@@ -86,6 +92,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+/* Flex 布局，纵向排列 */
+@utility flex-column {
+  display: flex;
+  flex-direction: column;
 }
 
 /* 横向排列，自动换行且行间距为 8px */

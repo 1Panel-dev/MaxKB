@@ -91,7 +91,7 @@ watch(
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col">
+  <div class="flex-column min-h-0 flex-1">
     <div class="flex-between mb-4">
       <div>
         <!-- 添加成员 -->

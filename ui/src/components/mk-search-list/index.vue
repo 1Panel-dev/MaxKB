@@ -93,7 +93,7 @@ function selectRow(row: T, index: number) {
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col">
+  <div class="flex-column min-h-0 flex-1">
     <MkSearchInput v-model="searchKeyword" class="shrink-0 px-4" />
 
     <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1 px-4 py-2" @end-reached="loadMore">

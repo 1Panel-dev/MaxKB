@@ -106,7 +106,7 @@ const LayoutContent: FunctionalComponent = () => {
         class: ['-mx-6 min-h-0 flex-1', customFooterNodes.length ? '' : '-mb-6'],
         onScroll: (data: ScrollData) => emit('scroll', data),
         ref: contentScrollbarRef,
-        viewClass: 'flex min-h-full flex-col px-6 pb-6',
+        viewClass: 'flex-column min-h-full px-6 pb-6',
       },
       { default: () => bodyNodes },
     ),
@@ -118,7 +118,7 @@ defineExpose({ getScrollContainer, setScrollTop })
 </script>
 
 <template>
-  <div v-loading="props.loading" class="flex h-full min-h-0 flex-col" v-bind="$attrs">
+  <div v-loading="props.loading" class="flex-column h-full min-h-0" v-bind="$attrs">
     <div v-if="$slots.top" class="shrink-0 border-b px-4 py-3">
       <slot name="top" />
     </div>
@@ -130,7 +130,7 @@ defineExpose({ getScrollContainer, setScrollTop })
         </template>
       </LayoutAside>
 
-      <main class="mb-6 flex min-h-0 min-w-0 flex-1 flex-col px-6">
+      <main class="mb-6 flex-column min-h-0 min-w-0 flex-1 px-6">
         <LayoutContent />
       </main>
     </div>

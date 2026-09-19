@@ -29,7 +29,7 @@ const selectedKnowledgeIds = computed({
   <div class="w-full">
     <el-select v-model="selectedKnowledgeIds" multiple v-bind="$attrs" class="w-full" placeholder="请选择知识库">
       <el-option v-for="knowledge in availableKnowledge" :key="knowledge.id" :label="knowledge.name" :value="knowledge.id">
-        <div class="flex min-w-0 items-center gap-2">
+        <div class="flex-align-center min-w-0 gap-2">
           <KnowledgeIcon :type="knowledge.type" :size="20" class="shrink-0" />
           <span class="truncate" :title="knowledge.name">{{ knowledge.name }}</span>
         </div>

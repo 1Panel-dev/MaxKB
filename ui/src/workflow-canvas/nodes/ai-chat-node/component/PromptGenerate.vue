@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Top, Loading } from '@element-plus/icons-vue'
 import type { ScrollbarInstance } from 'element-plus'
+import ChatInput from '@/conversation-panel/chat-input/index.vue'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ModelItem, ModelProviderItem, PromptGenerateMessage, PromptGeneratePayload } from '@/api/types'
 import { MsgError } from '@/utils/message'
-import { ConversationStream } from "@/conversation-panel/stream";
+import { ConversationStream } from '@/conversation-panel/stream'
 defineOptions({ name: 'AiChatNodePromptGenerate' })
 const props = defineProps<{
   modelId: string
@@ -85,6 +85,8 @@ const PROMPT_TEMPLATE = `请根据用户描述生成一个完整的AI角色人�
 const visible = ref(false)
 const loading = ref(false)
 const inputValue = ref('')
+const chatInputRef = useTemplateRef<InstanceType<typeof ChatInput>>('chatInputRef')
+
 const applicationId = ref('')
 const activeModelId = ref('')
 const messages = ref<PromptGenerateMessage[]>([])
@@ -117,37 +119,42 @@ function scrollToBottom() {
   nextTick(() => scrollbarRef.value?.setScrollTop(Number.MAX_SAFE_INTEGER))
 }
 
-let conversationStream: ConversationStream | undefined = undefined;
+let conversationStream: ConversationStream | undefined = undefined
 
 function generatePrompt(regenerate = false) {
   const content = inputValue.value.trim()
   if (loading.value || !applicationId.value || !activeModelId.value) return
+  if (!regenerate && !content) return
   if (regenerate) {
     messages.value.push({ content: 'Re generate', role: 'user' })
-  }else{
-      messages.value.push({ content: content, role: 'user' })
+  } else {
+    messages.value.push({ content: content, role: 'user' })
   }
-  inputValue.value = ''
+  chatInputRef.value?.clear()
   loading.value = true
   const payload: PromptGeneratePayload = { messages: [...messages.value], prompt: PROMPT_TEMPLATE }
   const answer = reactive<PromptGenerateMessage>({ content: '', role: 'ai' })
   messages.value.push(answer)
-  ApplicationApi.postPromptGenerate(applicationId.value, activeModelId.value, payload).then(response=>{
- conversationStream = new ConversationStream(response,
-    (chunk) => {
-      answer.content+=chunk.content
-      scrollToBottom()
-    }, (error) => {
-      if (error) {
-        messages.value = messages.value.filter((message) => message !== answer)
-        if (!(error instanceof Error) || error.name !== 'StreamRequestError') {
-          MsgError(error instanceof Error ? error.message : '提示词生成失败')
+  // TODO 系统管理需要换接口
+  ApplicationApi.postPromptGenerate(applicationId.value, activeModelId.value, payload).then((response) => {
+    conversationStream = new ConversationStream(
+      response,
+      (chunk) => {
+        answer.content += chunk.content
+        scrollToBottom()
+      },
+      (error) => {
+        if (error) {
+          messages.value = messages.value.filter((message) => message !== answer)
+          if (!(error instanceof Error) || error.name !== 'StreamRequestError') {
+            MsgError(error instanceof Error ? error.message : '生成失败')
+          }
         }
-      }
-      conversationStream = undefined
-      loading.value = false
-    })
-  conversationStream.start()
+        conversationStream = undefined
+        loading.value = false
+      },
+    )
+    conversationStream.start()
   })
 }
 
@@ -155,16 +162,9 @@ function generatePrompt(regenerate = false) {
 function stopGenerate() {
   if (conversationStream) {
     conversationStream.cancel()
-    loading.value=false
+    loading.value = false
     conversationStream = undefined
   }
-}
-
-/** Enter 提交主题，Shift+Enter 和输入法组合输入保留原生行为。 */
-function handleKeydown(event: KeyboardEvent) {
-  if (event.isComposing || event.key !== 'Enter' || event.shiftKey) return
-  event.preventDefault()
-  void generatePrompt()
 }
 
 /** 将最新生成结果交给父节点替换系统提示词，并关闭弹窗。 */
@@ -175,7 +175,7 @@ function replacePrompt() {
 }
 
 /** 重新生成按钮的预留入口，当前尚未调用重试流程。 */
-function handleReGenerate() { 
+function handleReGenerate() {
   generatePrompt(true)
 }
 
@@ -191,9 +191,13 @@ watch(visible, (value) => {
     <MkIcon name="icon_star" />
   </el-button>
   <MkDialog v-model="visible" title="生成提示词" @closed="resetData">
-    <div class="flex flex-col gap-4 rounded-xl bg-N100 p-4">
-      <div v-if="loading" class="flex items-center gap-2">
-        <MkIcon :icon="Loading" class="animate-spin text-primary" />
+    <div class="space-y-4 rounded-xl bg-N100 p-4">
+      <p class="flex-align-center gap-2">
+        <MkIcon name="icon_star" />
+        <span>提示词显示在这里</span>
+      </p>
+      <div v-if="loading" class="flex-align-center gap-2">
+        <LoadingIcon :size="20" />
         <span>生成中</span>
       </div>
       <el-scrollbar v-if="latestAnswer" ref="scrollbarRef" max-height="320">
@@ -206,21 +210,17 @@ watch(visible, (value) => {
         <el-button class="ml-0!" :disabled="!activeModelId" @click="handleReGenerate">重新生成</el-button>
       </div>
 
-      <div class="prompt-generate-input relative overflow-hidden rounded-2xl bg-white">
-        <el-input v-model="inputValue" :autosize="{ minRows: 3, maxRows: 6 }" maxlength="100000" placeholder="请输入提示词主题"
-          type="textarea" resize="none" @keydown="handleKeydown" />
-        <!-- 停止生成：生成期间显示，请求取消逻辑待接入。 -->
-        <el-button v-if="loading" class="absolute right-3 bottom-3" circle type="primary" @click="stopGenerate">
-          <span class="h-3 w-3 rounded-sm bg-white" />
-        </el-button>
-        <!-- 发送：提交输入主题；缺少主题、模型或智能体时禁用。 -->
-        <el-button v-else class="absolute right-3 bottom-3" circle type="primary"
-          :disabled="!inputValue.trim() || !activeModelId || !applicationId" @click="generatePrompt()">
-          <MkIcon :icon="Top" />
-        </el-button>
-      </div>
+      <ChatInput
+        ref="chatInputRef"
+        v-model="inputValue"
+        placeholder="请输入提示词主题"
+        :maxlength="100000"
+        :loading="loading"
+        :submit-disabled="!activeModelId || !applicationId"
+        paste-as-text
+        @submit="generatePrompt()"
+        @stop="stopGenerate"
+      />
     </div>
   </MkDialog>
 </template>
-
-<style scoped lang="scss"></style>

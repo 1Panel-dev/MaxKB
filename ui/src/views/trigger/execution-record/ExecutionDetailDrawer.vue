@@ -47,7 +47,7 @@ watch(
 <template>
   <MkDrawer v-model="visible" size="840" :modal="false">
     <template #header>
-      <div class="-ml-2 flex items-center">
+      <div class="-ml-2 flex-align-center">
         <!-- 返回输入参数 -->
         <el-button class="mr-1" text @click="visible = false">
           <MkIcon name="icon_arrow-left_outlined" :size="20" />
@@ -62,7 +62,7 @@ watch(
         <div class="grid grid-cols-4 gap-4">
           <div class="min-w-0">
             <p class="mb-1 text-N600">触发任务</p>
-            <div class="flex items-center gap-2">
+            <div class="flex-align-center gap-2">
               <ToolIcon
                 v-if="isTool"
                 :icon="record.source_icon ?? undefined"

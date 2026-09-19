@@ -121,7 +121,7 @@ defineExpose({ open })
       @submit.prevent
     >
       <el-form-item label="名称" prop="name">
-        <div class="flex w-full items-center gap-3">
+        <div class="flex-align-center w-full gap-3">
           <!-- // TODO 编辑icon 统一处理 -->
           <ToolIcon :icon="workflowForm.icon" :size="32" :type="TOOL_TYPE.WORKFLOW" />
           <el-input

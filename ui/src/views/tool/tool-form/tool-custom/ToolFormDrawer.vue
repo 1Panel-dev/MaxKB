@@ -154,7 +154,7 @@ defineExpose({ open })
     >
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
-        <div class="flex w-full items-center gap-3">
+        <div class="flex-align-center w-full gap-3">
           <!-- TODO 统一修改修改工具头像 -->
           <ToolIcon :icon="toolForm.icon" />
           <el-input
@@ -185,7 +185,7 @@ defineExpose({ open })
 
       <ToolCodeSetting v-model="toolForm.code" class="mb-6" show-generate />
       <section>
-        <div class="mb-4 flex items-center gap-2">
+        <div class="mb-4 flex-align-center gap-2">
           <h4 class="mk-title-decoration">输出参数</h4>
           <span class="text-N600">使用工具时显示</span>
         </div>

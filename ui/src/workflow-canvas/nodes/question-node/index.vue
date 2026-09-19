@@ -109,7 +109,7 @@ onMounted(() => {
         <!-- 系统提示词 -->
         <el-form-item>
           <template #label>
-            <div class="flex items-center gap-1">
+            <div class="flex-align-center gap-1">
               <span>系统提示词</span>
               <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
@@ -131,7 +131,7 @@ onMounted(() => {
           :rules="{ whitespace: true, required: true, message: '请输入用户提示词', trigger: 'blur' }"
         >
           <template #label>
-            <div class="flex items-center gap-1">
+            <div class="flex-align-center gap-1">
               <span class="mk-required">用户提示词</span>
               <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
@@ -171,7 +171,7 @@ onMounted(() => {
 
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
-          <span class="flex items-center gap-1">
+          <span class="flex-align-center gap-1">
             返回内容
             <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
