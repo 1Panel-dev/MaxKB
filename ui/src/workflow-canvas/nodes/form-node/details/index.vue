@@ -26,7 +26,7 @@ watch(
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">
         输出参数
         <span v-if="!data.is_submit" class="text-danger">(未提交)</span>

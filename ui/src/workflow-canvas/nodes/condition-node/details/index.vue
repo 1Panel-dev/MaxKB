@@ -16,7 +16,7 @@ defineProps<{
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">条件结果</h6>
       <div>{{ data.branch_name || '-' }}</div>
     </div>

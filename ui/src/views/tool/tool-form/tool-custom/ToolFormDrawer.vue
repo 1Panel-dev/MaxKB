@@ -189,7 +189,7 @@ defineExpose({ open })
           <h4 class="mk-title-decoration">输出参数</h4>
           <span class="text-N600">使用工具时显示</span>
         </div>
-        <div class="mk-gray-card py-2!">结果 {result}</div>
+        <div class="mk-gray-card-sm rounded-md!">结果 {result}</div>
       </section>
     </el-form>
 

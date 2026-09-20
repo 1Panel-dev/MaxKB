@@ -16,7 +16,7 @@ defineProps<{
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出参数</h6>
       <div><span class="text-N600">是否退出：</span>{{ data.is_break }}</div>
     </div>

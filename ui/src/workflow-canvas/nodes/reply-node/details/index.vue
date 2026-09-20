@@ -16,7 +16,7 @@ defineProps<{
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">回复内容</h6>
       <div>
         <el-scrollbar max-height="150">

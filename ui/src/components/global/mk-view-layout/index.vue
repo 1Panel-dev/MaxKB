@@ -2,8 +2,8 @@
 import { computed, Fragment, h, isVNode, ref, type FunctionalComponent, type VNode, type VNodeChild, useSlots } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElScrollbar } from 'element-plus'
-import LayoutAside from './layout-aside.vue'
-import LayoutBatchFooter from './layout-batch-footer.vue'
+import LayoutAside from './LayoutAside.vue'
+import LayoutBatchFooter from './LayoutBatchFooter.vue'
 
 defineOptions({ name: 'MkViewLayout', inheritAttrs: false })
 
@@ -97,7 +97,11 @@ const LayoutContent: FunctionalComponent = () => {
   const customHeaderNodes = contentNodes.filter((node) => node.type === LayoutHeader)
   const customFooterNodes = contentNodes.filter((node) => node.type === LayoutFooter)
   const bodyNodes = contentNodes.filter((node) => node.type !== LayoutHeader && node.type !== LayoutFooter)
-  const headerNodes = customHeaderNodes.length ? customHeaderNodes : title.value ? [h('header', { class: 'flex-between shrink-0 py-4 gap-4' }, [h('h4', title.value)])] : []
+  const headerNodes = customHeaderNodes.length
+    ? customHeaderNodes
+    : title.value
+      ? [h('header', { class: 'flex-between shrink-0 py-4 gap-4' }, [h('h4', title.value)])]
+      : []
   return [
     ...headerNodes,
     h(

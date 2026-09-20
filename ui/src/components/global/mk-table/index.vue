@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import type { TableInstance } from 'element-plus'
-import LayoutBatchFooter from '../mk-view-layout/layout-batch-footer.vue'
+import LayoutBatchFooter from '../mk-view-layout/LayoutBatchFooter.vue'
 import { useSortable, type SortableChange } from '@/utils/use-sortable'
 import { get } from 'lodash'
 

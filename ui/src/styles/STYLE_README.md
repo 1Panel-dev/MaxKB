@@ -188,11 +188,25 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 
 ## 常用卡片样式
 
-`mk-gray-card` 用于需要 N100 灰色背景的内容卡片，统一使用 6px 圆角、12px 内边距。
+灰色内容卡片统一使用 N100 背景，按尺寸选择以下独立类名，无需叠加 `mk-gray-card`：
+
+| 尺寸       | 类名              | 内边距              | 圆角 |
+| ---------- | ----------------- | ------------------- | ---- |
+| 大         | `mk-gray-card-lg` | 16px                | 12px |
+| 中（默认） | `mk-gray-card`    | 12px                | 6px  |
+| 小         | `mk-gray-card-sm` | 上下 8px、左右 12px | 12px |
 
 ```html
-<div class="mk-gray-card">卡片内容</div>
+<div class="mk-gray-card-lg">大号卡片</div>
+<div class="mk-gray-card">中号卡片</div>
+<div class="mk-gray-card-sm">小号卡片</div>
 ```
+
+符合以上规格的卡片直接使用对应类名，不再叠加 `p-4!`、`py-2!` 或 `rounded-xl!`。
+自定义工具的输出参数结果展示保留 6px 圆角，使用 `mk-gray-card-sm rounded-md!`。
+
+白色内容卡片使用 `mk-white-card` 或 `mk-white-card-sm`，内边距和圆角与同尺寸灰色卡片一致。
+两种背景的尺寸类均可独立使用，包含对应背景色，无需叠加基础类。
 
 ## 常用交互工具类
 

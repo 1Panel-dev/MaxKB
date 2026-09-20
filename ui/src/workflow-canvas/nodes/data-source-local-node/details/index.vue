@@ -26,7 +26,7 @@ const fileList = computed<SourceFile[]>(() => (props.data?.file_list as SourceFi
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">文件列表</h6>
       <div class="space-y-2">
         <template v-if="fileList.length > 0">

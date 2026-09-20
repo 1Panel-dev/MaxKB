@@ -6,12 +6,15 @@ defineOptions({ name: 'WorkspaceRelationTags' })
 const props = defineProps<{ tableRenderParams: Record<'property' | 'value', string>; tags?: string[]; tagWorkspace?: Record<string, string[]> }>()
 
 const tableData = computed(() => {
-  return Object.entries(props.tagWorkspace ?? {}).map(([tagName, workspaces]) => ({ property: tagName, value: workspaces[0] === 'None' ? '-' : workspaces.join(', ') }))
+  return Object.entries(props.tagWorkspace ?? {}).map(([tagName, workspaces]) => ({
+    property: tagName,
+    value: workspaces[0] === 'None' ? '-' : workspaces.join(', '),
+  }))
 })
 </script>
 
 <template>
-  <el-popover placement="bottom" trigger="hover" :width="420" :persistent="false">
+  <el-popover placement="bottom" trigger="hover" :width="420" :persistent="false" :show-after="300">
     <template #reference>
       <MkTagGroup :tags="tags" popover-disabled class="cursor-pointer" />
     </template>

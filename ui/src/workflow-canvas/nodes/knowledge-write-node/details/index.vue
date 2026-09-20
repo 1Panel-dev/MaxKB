@@ -31,7 +31,7 @@ const activeTab = ref(0)
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">写入内容（每个文档仅展示前 5 个分段）</h6>
       <div class="space-y-2">
         <el-tabs v-if="writeContent.length > 0" v-model="activeTab" class="paragraph-tabs">

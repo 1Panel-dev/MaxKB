@@ -22,14 +22,14 @@ const strategyLabel = (strategy?: string) => {
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">聚合策略</h6>
       <div class="whitespace-pre-wrap">
         {{ strategyLabel(data.strategy) }}
       </div>
     </div>
 
-    <div v-for="(group, groupI) in data.group_list" :key="groupI" class="mk-gray-card py-2! rounded-xl!">
+    <div v-for="(group, groupI) in data.group_list" :key="groupI" class="mk-gray-card-sm">
       <h6 class="mb-2">{{ group.label }}输入参数</h6>
       <el-scrollbar max-height="200">
         <div class="space-y-2">
@@ -40,7 +40,7 @@ const strategyLabel = (strategy?: string) => {
       </el-scrollbar>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出参数</h6>
       <el-scrollbar max-height="200">
         <div class="space-y-2">

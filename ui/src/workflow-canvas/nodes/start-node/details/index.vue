@@ -17,7 +17,7 @@ defineProps<{
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输入参数</h6>
       <div class="space-y-2">
         <p><span class="mr-1 text-N600">问题：</span>{{ data.question || '-' }}</p>

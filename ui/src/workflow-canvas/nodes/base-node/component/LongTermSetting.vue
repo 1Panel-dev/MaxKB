@@ -207,7 +207,7 @@ function submit() {
               </template>
               <template #subtitle>{{ trigger.description }}</template>
               <template v-if="formData.long_term_trigger_type === trigger.value" #default>
-                <div class="mk-gray-card rounded-xl! p-4! text-N900" @click.stop @keydown.stop>
+                <div class="mk-gray-card-lg text-N900" @click.stop @keydown.stop>
                   <!-- 定时 -->
                   <template v-if="trigger.value === 'SCHEDULED'">
                     <div class="flex-between mb-2">

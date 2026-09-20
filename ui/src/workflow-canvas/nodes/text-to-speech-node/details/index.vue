@@ -16,7 +16,7 @@ defineProps<{
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输入参数</h6>
       <div class="space-y-2">
         <p class="text-N600">文本内容：</p>
@@ -24,7 +24,7 @@ defineProps<{
       </div>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出参数</h6>
       <div class="space-y-2">
         <p class="text-N600">音频文件：</p>

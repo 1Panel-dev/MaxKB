@@ -2,8 +2,8 @@
 import { computed, h, type FunctionalComponent } from 'vue'
 import { dateFormat } from '@/utils/time'
 import { hasRenderableSlotContent } from '@/utils/vnode'
-import MkSourceCardAction from './mk-source-card-action.vue'
-import MkSourceCardActionDropdown from './mk-source-card-action-dropdown.vue'
+import MkSourceCardAction from './MkSourceCardAction.vue'
+import MkSourceCardActionDropdown from './MkSourceCardActionDropdown.vue'
 
 /**
 

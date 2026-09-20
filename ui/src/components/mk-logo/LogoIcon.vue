@@ -1,21 +1,27 @@
 <script setup lang="ts">
-import { useAttrs } from 'vue'
+import { computed, useAttrs } from 'vue'
 import { useStore } from '@/stores'
 
 defineOptions({ name: 'LogoIcon', inheritAttrs: false })
 
-withDefaults(defineProps<{ height?: number | string }>(), { height: 36 })
+const props = withDefaults(defineProps<{ height?: number | string }>(), { height: 36 })
+
+// 显式设置 CSS 高度，避免图片的 height 属性被全局 height: auto 覆盖。
+const logoHeight = computed(() => {
+  const height = String(props.height).trim()
+  return /^\d+(\.\d+)?$/.test(height) ? `${height}px` : height
+})
 
 const attrs = useAttrs()
 const { theme } = useStore()
 </script>
 
 <template>
-  <img v-if="theme.isDefaultTheme" v-bind="attrs" alt="MaxKB" :height="height" src="@/assets/mk-logo/logo.svg" class="max-w-none" />
+  <img v-if="theme.isDefaultTheme" v-bind="attrs" alt="MaxKB" :style="{ height: logoHeight }" src="@/assets/mk-logo/logo.svg" class="max-w-none" />
   <svg
     v-else
     v-bind="attrs"
-    :height="height"
+    :style="{ height: logoHeight }"
     class="max-w-none text-primary"
     role="img"
     viewBox="0 0 232.4409 232.4409"

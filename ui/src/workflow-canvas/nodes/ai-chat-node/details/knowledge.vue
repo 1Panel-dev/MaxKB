@@ -17,13 +17,13 @@ defineProps<{
     </template>
 
     <!-- 系统提示词 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">系统提示词</h6>
       <div>{{ data.system || '-' }}</div>
     </div>
 
     <!-- 用户提示词 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">用户提示词</h6>
       <div class="whitespace-pre-wrap space-y-2">
         <template v-if="Array.isArray(data.question)">
@@ -55,7 +55,7 @@ defineProps<{
     </div>
 
     <!-- 思考过程 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">思考过程</h6>
       <div class="whitespace-pre-wrap">
         {{ data.reasoning_content || '-' }}
@@ -63,7 +63,7 @@ defineProps<{
     </div>
 
     <!-- AI 回答 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">AI 回答</h6>
       <div>
         <MdPreview v-if="data.answer" :model-value="data.answer" noImgZoomIn />

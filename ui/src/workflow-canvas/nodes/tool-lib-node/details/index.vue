@@ -16,14 +16,14 @@ defineProps<{
       <BaseHeader :data="data" />
     </template>
 
-    <div v-if="data.index != 0" class="mk-gray-card py-2! rounded-xl!">
+    <div v-if="data.index != 0" class="mk-gray-card-sm">
       <h6 class="mb-2">输入</h6>
       <div class="break-all">
         {{ data.params || '-' }}
       </div>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出</h6>
       <div class="break-all">
         {{ data.result || '-' }}

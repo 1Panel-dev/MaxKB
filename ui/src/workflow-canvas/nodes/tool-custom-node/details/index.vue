@@ -17,7 +17,7 @@ defineProps<{
     </template>
 
     <!-- 输入 -->
-    <div v-if="data.index != 0" class="mk-gray-card py-2! rounded-xl!">
+    <div v-if="data.index != 0" class="mk-gray-card-sm">
       <h6 class="mb-2">输入</h6>
       <div class="break-all">
         {{ data.params || '-' }}
@@ -25,7 +25,7 @@ defineProps<{
     </div>
 
     <!-- 输出 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出</h6>
       <div class="break-all">
         {{ data.result || '-' }}

@@ -34,7 +34,7 @@ const currentLoopDetail = computed<ExecutionNodeDetail[]>(() => Object.values(pr
     </template>
 
     <!-- 循环设置 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">循环设置</h6>
       <div class="space-y-2">
         <p><span class="text-N600">循环类型：</span>{{ data.loop_type || '-' }}</p>
@@ -46,7 +46,7 @@ const currentLoopDetail = computed<ExecutionNodeDetail[]>(() => Object.values(pr
     </div>
 
     <!-- 循环详情 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">循环详情</h6>
       <div class="space-y-2">
         <template v-if="loopKeys.length > 0">

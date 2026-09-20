@@ -49,6 +49,8 @@ import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynam
   此规则适用于公共、页面和画布按钮组件；文件名、导入名、模板标签及已有的
   `defineOptions.name` 保持一致，打开方法仍可命名为 `handleOpenXxx`。
 - 目录使用 kebab-case，默认入口为 `index.vue`，通过 `defineOptions` 声明 PascalCase 多单词组件名。
+  `global/` 下除默认入口 `index.vue` 外，Vue 组件文件统一使用 PascalCase（大驼峰），例如
+  `MkDropdownMenu.vue`、`LayoutBatchFooter.vue`，与组件名及导入名保持一致。
   Markdown 编辑器、CodeMirror 和 Logo 按下文的专用入口使用。
 - Props、Emits、Slots 保持类型化。类型归属遵循 [API_README.md](../api/API_README.md)，
   API 与组件共用类型从 `@/api/types` 导入。
@@ -417,6 +419,8 @@ const avatar = ref('')
 默认主题下展示内置蓝紫渐变 Logo，自定义主题下使用 Theme Store 中的当前主题色。`LogoFull`
 还会优先展示 Theme Store 中配置的 `loginLogo`。两个组件都只接收可选的 `height`，其余主题与
 Logo 数据统一从 Theme Store 获取。
+`height` 通过 CSS 高度应用到所有图片和 SVG 分支，数字及纯数字字符串按 px 处理，也支持
+`24px`、`2rem` 等 CSS 长度；例如 `:height="24"` 和 `height="24"` 均显示为 24px 高。
 
 ### MkEchart、MkLineChart
 
