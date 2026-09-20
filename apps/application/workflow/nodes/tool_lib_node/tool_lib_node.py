@@ -57,7 +57,9 @@ class ToolLibNodeSerializer(serializers.Serializer):
         # 归还链接到连接池
         connection.close()
         if f_lib is None:
-            raise Exception(_("The function has been deleted"))
+            raise AppApiException(500, _("Tool has been deleted"))
+        if not f_lib.is_active:
+            raise AppApiException(500, _("Tool is not active"))
 
 
 def get_field_value(debug_field_list, name, is_required):
