@@ -1,6 +1,17 @@
 import type LogicFlow from '@logicflow/core'
 import { get, put, postStream } from '../../core/request'
-import type { DefaultModelSettingPayload, ToolWorkflowDetail, ToolWorkflowRecord, WorkflowStoreTemplate } from '@/api/types'
+import type { ParamsPage, ResponsePage } from '../../core/types'
+import type {
+  DefaultModelSettingPayload,
+  Dict,
+  ToolExecutionRecord,
+  ToolExecutionRecordDetail,
+  ToolWorkflowDetail,
+  ToolWorkflowRecord,
+  WorkflowStoreTemplate,
+  WorkflowVersion,
+  WorkflowVersionPayload,
+} from '@/api/types'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 import { getWorkspaceId } from '@/utils/resource-context'
 
@@ -35,4 +46,31 @@ const postToolWorkflowDebug = (toolId: string, parameters: Record<string, unknow
 /** 查询工具工作流调试的输出和节点执行记录。 */
 const getToolWorkflowRecord = (toolId: string, recordId: string) => get<ToolWorkflowRecord>(`${getPrefix()}/${toolId}/tool_record/${recordId}`)
 
-export default { getToolWorkflow, putToolWorkflow, putToolWorkflowPublish, postToolWorkflowDebug, getToolWorkflowRecord }
+/** 获取工具发布历史，按发布时间倒序返回完整版本快照。 */
+const getWorkflowVersions = (toolId: string) => get<WorkflowVersion[]>(`${getPrefix()}/${toolId}/tool_version`)
+
+/** 修改工具历史版本标题和更新说明，更新说明需要服务端支持 description 字段。 */
+const putWorkflowVersion = (toolId: string, versionId: string, data: WorkflowVersionPayload) =>
+  put<WorkflowVersionPayload, WorkflowVersion>(`${getPrefix()}/${toolId}/tool_version/${versionId}`, data)
+
+/** 获取工具执行记录分页，按执行时间倒序返回。 */
+const getToolExecutionRecordPage = (toolId: string, page: ParamsPage, query?: Dict<unknown>) => {
+  return get<ResponsePage<ToolExecutionRecord>>(`${getPrefix()}/${toolId}/tool_record/${page.currentPage}/${page.pageSize}`, query)
+}
+
+/** 获取工具执行记录的输入输出及节点详情。 */
+const getToolExecutionRecordDetail = (toolId: string, recordId: string) => {
+  return get<ToolExecutionRecordDetail>(`${getPrefix()}/${toolId}/tool_record/${recordId}`)
+}
+
+export default {
+  getToolExecutionRecordPage,
+  getToolExecutionRecordDetail,
+  getWorkflowVersions,
+  putWorkflowVersion,
+  getToolWorkflow,
+  putToolWorkflow,
+  putToolWorkflowPublish,
+  postToolWorkflowDebug,
+  getToolWorkflowRecord,
+}

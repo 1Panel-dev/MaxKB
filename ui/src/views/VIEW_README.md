@@ -246,9 +246,6 @@ src/views/tool/
 │   │   ├── input-field/
 │   │   └── python-code/
 │   └── tool-custom/
-├── execution-record/              # 工具执行记录列表与详情抽屉
-│   ├── ExecutionRecordDrawer.vue
-│   └── ExecutionDetailDrawer.vue
 ├── tool-card/
 │   ├── ToolCard.vue               # 工具卡片展示与操作插槽
 │   ├── InitParamDialog.vue        # 配置工具启动参数
@@ -276,9 +273,9 @@ src/views/tool/
 ```
 
 `tool-card/action-dropdown/ExecutionRecordToolAction.vue` 维护执行记录入口，两个抽屉
-`ExecutionRecordDrawer.vue` 和 `ExecutionDetailDrawer.vue` 统一放在 `tool/execution-record/`。
+`ExecutionRecordDrawer.vue` 和 `ExecutionDetailDrawer.vue` 统一放在 `workflow/tool/execution-record/`。
 Workspace 的自定义工具和工作流工具菜单
-展示“执行记录”，页面传入完整 Tool API；点击后挂载抽屉，关闭动画结束后卸载。
+展示“执行记录”，页面传入工具的完整 Workflow API；点击后挂载抽屉，关闭动画结束后卸载。
 列表使用 `MkComplexSearch`、`MkTable` 和 `MkStatusLabel`，支持触发来源名称、类型、状态筛选；
 接口按执行时间倒序返回。详情保留输入、输出、错误及工作流节点详情，支持上一条／下一条跨页浏览。
 
@@ -751,3 +748,12 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 
 排行榜 API 由 `HomeView` 传入 `HomeRankings`，再传给 `RankingDrawer`。两者的 `api`
 均使用 `typeof HomepageApi` 约束，查询、汇总和导出统一通过 `props.api` 调用。
+
+## 知识库工作流执行记录
+
+`workflow/knowledge/ButtonExecutionRecord.vue` 封装更多菜单入口、抽屉挂载与打开逻辑，接收
+`knowledgeId`，菜单属性（如 `divided`）透传到 `MkDropdownItem`，内部提供知识库 Workflow API。
+`workflow/knowledge/execution-record/` 维护记录列表和详情抽屉，由该按钮组件打开，
+关闭动画结束后卸载。列表复用 `MkComplexSearch`、`MkTable` 和 `MkStatusLabel`，支持发起人、
+状态筛选及跨页浏览，每 6 秒刷新；关闭或卸载停止轮询。待执行、执行中任务经确认后取消，成功刷新列表。
+抽屉接收完整知识库 Workflow API；详情查询复用调试任务接口，使用 `ExecutionDetailContent` 展示节点结果。

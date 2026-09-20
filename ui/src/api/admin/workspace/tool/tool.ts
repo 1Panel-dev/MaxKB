@@ -1,6 +1,6 @@
 import { del, downloadRequest, getExportFile, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { Dict, ToolExecutionRecord, ToolExecutionRecordDetail, ToolDebugPayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
+import type { Dict, ToolDebugPayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
@@ -101,19 +101,7 @@ const putBatchMoveTools = (toolIds: string[], folderId: string) => {
   return put<{ folder_id: string; id_list: string[] }, boolean>(`${getPrefix()}/batch_move`, { folder_id: folderId, id_list: toolIds })
 }
 
-/** 获取工具执行记录分页，按执行时间倒序返回。 */
-const getToolRecordPage = (toolId: string, page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<ToolExecutionRecord>>(`${getPrefix()}/${toolId}/tool_record/${page.currentPage}/${page.pageSize}`, query)
-}
-
-/** 获取工具执行记录的输入输出及节点详情。 */
-const getToolRecordDetail = (toolId: string, recordId: string) => {
-  return get<ToolExecutionRecordDetail>(`${getPrefix()}/${toolId}/tool_record/${recordId}`)
-}
-
 export default {
-  getToolRecordPage,
-  getToolRecordDetail,
   getToolPage,
   exportTool,
   deleteTool,

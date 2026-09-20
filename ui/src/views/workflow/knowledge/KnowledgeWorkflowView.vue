@@ -15,6 +15,7 @@ import { defaultKnowledgeNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
+import ButtonExecutionRecord from './ButtonExecutionRecord.vue'
 import DebugDrawer from './debug/DebugDrawer.vue'
 import ButtonTemplateStore from './ButtonTemplateStore.vue'
 import ButtonPublishHistory from './ButtonPublishHistory.vue'
@@ -359,6 +360,8 @@ onBeforeUnmount(stopAutoSave)
               <template #icon><MkIcon name="icon_export_outlined" /></template>
               <span>导出工作流</span>
             </MkDropdownItem>
+            <!-- 查看执行记录 -->
+            <ButtonExecutionRecord divided :knowledge-id="knowledgeId" />
             <!-- 发布历史 -->
             <ButtonPublishHistory
               v-model:visible="historyVisible"
@@ -369,6 +372,7 @@ onBeforeUnmount(stopAutoSave)
               @preview="handlePreviewVersion"
               @restore="handleRestoreVersion"
             />
+
             <!-- 自动保存 -->
             <MkDropdownItem @click.stop>
               <template #icon><MkIcon name="icon_save_outlined" /></template>
