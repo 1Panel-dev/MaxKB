@@ -27,6 +27,13 @@ class XInferenceReranker(MaxKBBaseModel, BaseDocumentCompressor):
         return XInferenceReranker(server_url=model_credential.get('server_url'), model_uid=model_name,
                                   api_key=model_credential.get('api_key'), top_n=model_kwargs.get('top_n', 3))
 
+    @staticmethod
+    def _get_document_text(result: Dict[str, Any]) -> str:
+        document = result.get('document')
+        if isinstance(document, dict):
+            return document.get('text', '')
+        return document or ''
+
     top_n: Optional[int] = 3
 
     def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \
@@ -50,5 +57,5 @@ class XInferenceReranker(MaxKBBaseModel, BaseDocumentCompressor):
         client = RESTfulClient(self.server_url, self.api_key)
         model: RESTfulRerankModelHandle = client.get_model(self.model_uid)
         res = model.rerank([document.page_content for document in documents], query, self.top_n, return_documents=True)
-        return [Document(page_content=d.get('document', {}).get('text'),
+        return [Document(page_content=self._get_document_text(d),
                          metadata={'relevance_score': d.get('relevance_score')}) for d in res.get('results', [])]
