@@ -708,7 +708,6 @@
   }
 }
 
-
 /* progress */
 .el-progress-bar__inner {
   background: linear-gradient(90deg, #adc6ff 0%, #3370ff 100%);
@@ -1098,6 +1097,8 @@
   }
   &:not(&--small) {
     --el-tag-font-size: 14px;
+    height: 20px;
+    color: var(--mk-N900) !important;
   }
   &--small {
     padding: 4px;
@@ -1146,6 +1147,8 @@
     .el-tag__content {
       font-weight: 400;
     }
+    height: auto;
+    align-items: inherit;
   }
 
   &__close {

@@ -176,10 +176,10 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
 </script>
 
 <template>
-  <MkViewLayout class="system-settings-theme" :loading="loading" title="">
+  <MkViewLayout class="system-settings-theme" :loading="loading">
     <template #default="{ Footer }">
-      <div class="space-y-4">
-        <h6 class="mt-6">平台主题色</h6>
+      <div class="min-w-215 space-y-4">
+        <!-- 平台主题色 -->
         <el-radio-group v-model="selectedTheme" @change="handleThemeColorChange">
           <el-radio-button v-for="themeOption in THEME_OPTIONS" :key="themeOption.value" :label="themeOption.label" :value="themeOption.value">
             {{ themeOption.label }}
@@ -191,13 +191,14 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
           <el-color-picker v-model="customThemeColor" @change="handleThemeColorChange" />
         </div>
         <el-divider class="mb-4!" />
+        <!-- 平台登录设置 -->
         <div class="flex-between">
           <h6>平台登录设置</h6>
 
           <el-button text type="primary" class="-mr-1" @click="handleRestoreLoginDefaults">恢复默认</el-button>
         </div>
 
-        <div class="theme-setting-grid grid gap-6">
+        <div class="grid grid-cols-[2fr_1fr] gap-6">
           <LoginPreview :data="themeSetting" />
 
           <div class="space-y-2">
@@ -231,12 +232,13 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
         </div>
 
         <el-divider class="mb-4!" />
+        <!-- 平台设置 -->
         <div class="flex-between">
           <h6>平台设置</h6>
           <el-button text type="primary" class="-mr-1" @click="handleRestorePlatformDefaults">恢复默认</el-button>
         </div>
 
-        <div class="theme-setting-grid grid gap-6">
+        <div class="grid grid-cols-[2fr_1fr] gap-6">
           <PlatformPreview :data="themeSetting" />
 
           <div class="flex-column gap-3">
@@ -278,21 +280,9 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
       </div>
 
       <component :is="Footer">
-        <el-button @click="handleAbandonChanges">放弃更新</el-button>
+        <el-button plain @click="handleAbandonChanges">放弃更新</el-button>
         <el-button type="primary" @click="handleSaveTheme">保存并应用</el-button>
       </component>
     </template>
   </MkViewLayout>
 </template>
-
-<style scoped lang="scss">
-.theme-setting-grid {
-  grid-template-columns: minmax(520px, 2fr) minmax(300px, 1fr);
-}
-
-@media (max-width: 1120px) {
-  .theme-setting-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-</style>

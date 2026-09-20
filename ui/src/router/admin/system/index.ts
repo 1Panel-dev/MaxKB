@@ -2,7 +2,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { systemApplicationRoutes } from './modules/application'
 import { systemKnowledgeRoutes } from './modules/knowledge'
-import perm from "@/permission/index"
+import perm from '@/permission/index'
 export const systemRoutes: RouteRecordRaw = {
   path: '/system',
   component: () => import('@/layout/AppLayout.vue'),
@@ -13,118 +13,126 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'home',
       name: 'system-home',
       component: () => import('@/views/system/SystemView.vue'),
-      meta: { title: '首页', activeIcon: 'icon_screen_filled', icon: 'icon_screen_outlined', order: 0,
+      meta: {
+        title: '首页',
+        activeIcon: 'icon_screen_filled',
+        icon: 'icon_screen_outlined',
+        order: 0,
         permission: perm.system.homepage.read,
-        next:'system-identity'
-       },
+        next: 'system-identity',
+      },
     },
     {
       path: 'identity',
       name: 'system-identity',
       redirect: { name: 'system-users' },
-      meta: { title: '身份与权限', icon: 'icon_account_outlined', order: 10,
-        permission:() =>
-            {
-              return (
-                perm.system.user.read() ||
-                perm.system.workspace.read() ||
-                perm.system.role.read() ||
-                perm.system.userGroup.read() ||
-                (
-                  perm.system.authorization.application.read() ||
-                  perm.system.authorization.knowledge.read() ||
-                  perm.system.authorization.tool.read() ||
-                  perm.system.authorization.model.read()
-                )
-            );
-          },
-          next:'system-resource'
+      meta: {
+        title: '身份与权限',
+        icon: 'icon_account_outlined',
+        order: 10,
+        permission: () => {
+          return (
+            perm.system.user.read() ||
+            perm.system.workspace.read() ||
+            perm.system.role.read() ||
+            perm.system.userGroup.read() ||
+            perm.system.authorization.application.read() ||
+            perm.system.authorization.knowledge.read() ||
+            perm.system.authorization.tool.read() ||
+            perm.system.authorization.model.read()
+          )
+        },
+        next: 'system-resource',
       },
       children: [
-        { path: 'users', name: 'system-users', component: () => import('@/views/system/identity/users/UserListView.vue'),
-           meta: { title: '用户管理', order: 10,
-            permission:perm.system.user.read,
-            next:'system-workspace'
-          },
+        {
+          path: 'users',
+          name: 'system-users',
+          component: () => import('@/views/system/identity/users/UserListView.vue'),
+          meta: { title: '用户管理', order: 10, permission: perm.system.user.read, next: 'system-workspace' },
         },
         {
           path: 'workspace',
           name: 'system-workspace',
           component: () => import('@/views/system/identity/workspaces/WorkspaceListView.vue'),
-          meta: { title: '工作空间', order: 20,
-            permission:perm.system.workspace.read,
-            next:'system-roles'
-          },
+          meta: { title: '工作空间', order: 20, permission: perm.system.workspace.read, next: 'system-roles' },
         },
         {
           path: 'roles',
           name: 'system-roles',
           component: () => import('@/views/system/identity/roles/RoleListView.vue'),
-          meta: { title: '角色管理', order: 30,
-            permission:perm.system.role.read,
-            next:'system-groups'
-          },
+          meta: { title: '角色管理', order: 30, permission: perm.system.role.read, next: 'system-groups' },
         },
         {
           path: 'groups',
           name: 'system-groups',
           component: () => import('@/views/system/identity/groups/GroupsListView.vue'),
-          meta: { title: '用户组', order: 40,
-            permission:perm.system.userGroup.read,
-            next:'system-authorization'
-          },
+          meta: { title: '用户组', order: 40, permission: perm.system.userGroup.read, next: 'system-authorization' },
         },
         {
           path: 'authorization',
           name: 'system-authorization',
           redirect: { name: 'system-authorization-applications' },
-          meta: { title: '资源授权', order: 50,
-            permission:() =>
-            {
+          meta: {
+            title: '资源授权',
+            order: 50,
+            permission: () => {
               return (
                 perm.system.authorization.application.read() ||
                 perm.system.authorization.knowledge.read() ||
                 perm.system.authorization.tool.read() ||
                 perm.system.authorization.model.read()
-            );
-          },
-          next:'system-resource'
+              )
+            },
+            next: 'system-resource',
           },
           children: [
             {
               path: 'applications',
               name: 'system-authorization-applications',
               component: () => import('@/views/system/identity/resource-authorization/ResourceAuthorizationView.vue'),
-              meta: { title: '智能体', order: 10, resource: RESOURCE_TYPE.APPLICATION,
-                permission:perm.system.authorization.application.read,
-                next:'system-authorization-knowledge'
+              meta: {
+                title: '智能体',
+                order: 10,
+                resource: RESOURCE_TYPE.APPLICATION,
+                permission: perm.system.authorization.application.read,
+                next: 'system-authorization-knowledge',
               },
             },
             {
               path: 'knowledge',
               name: 'system-authorization-knowledge',
               component: () => import('@/views/system/identity/resource-authorization/ResourceAuthorizationView.vue'),
-              meta: { title: '知识库', order: 20, resource: RESOURCE_TYPE.KNOWLEDGE,
-                permission:perm.system.authorization.knowledge.read,
-                next:'system-authorization-tools'
+              meta: {
+                title: '知识库',
+                order: 20,
+                resource: RESOURCE_TYPE.KNOWLEDGE,
+                permission: perm.system.authorization.knowledge.read,
+                next: 'system-authorization-tools',
               },
             },
             {
               path: 'tools',
               name: 'system-authorization-tools',
               component: () => import('@/views/system/identity/resource-authorization/ResourceAuthorizationView.vue'),
-              meta: { title: '工具', order: 30, resource: RESOURCE_TYPE.TOOL,
-                permission:perm.system.authorization.tool.read,
-                next:'system-authorization-models'
+              meta: {
+                title: '工具',
+                order: 30,
+                resource: RESOURCE_TYPE.TOOL,
+                permission: perm.system.authorization.tool.read,
+                next: 'system-authorization-models',
               },
             },
             {
               path: 'models',
               name: 'system-authorization-models',
               component: () => import('@/views/system/identity/resource-authorization/ResourceAuthorizationView.vue'),
-              meta: { title: '模型', order: 40, resource: RESOURCE_TYPE.MODEL,
-                permission:perm.system.authorization.model.read,
-                next:'system-resource'
+              meta: {
+                title: '模型',
+                order: 40,
+                resource: RESOURCE_TYPE.MODEL,
+                permission: perm.system.authorization.model.read,
+                next: 'system-resource',
               },
             },
           ],
@@ -135,50 +143,40 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'resource',
       name: 'system-resource',
       redirect: { name: 'system-resource-applications' },
-      meta: { title: '资源管理', icon: 'icon_setting', order: 20, resourceScope: 'system-resource',
-        permission:() =>
-            {
-              return (
-                perm.application.system.jumpRead() ||
-                perm.knowledge.system.jumpRead() ||
-                perm.tool.system.read() ||
-                perm.model.system.read()
-            );
-          },
-          next:'system-share'
+      meta: {
+        title: '资源管理',
+        icon: 'icon_setting',
+        order: 20,
+        resourceScope: 'system-resource',
+        permission: () => {
+          return perm.application.system.jumpRead() || perm.knowledge.system.jumpRead() || perm.tool.system.read() || perm.model.system.read()
+        },
+        next: 'system-share',
       },
       children: [
-        { path: 'applications',
+        {
+          path: 'applications',
           name: 'system-resource-applications',
           component: () => import('@/views/system/SystemView.vue'),
-          meta: { title: '智能体', order: 10,
-            permission:perm.application.system.jumpRead,
-            next:'system-resource-knowledge'
-          },
+          meta: { title: '智能体', order: 10, permission: perm.application.system.jumpRead, next: 'system-resource-knowledge' },
         },
-        { path: 'knowledge',
+        {
+          path: 'knowledge',
           name: 'system-resource-knowledge',
           component: () => import('@/views/system/SystemView.vue'),
-          meta: { title: '知识库', order: 20,
-            permission:perm.knowledge.system.jumpRead,
-            next:'system-resource-tools'
-          },
+          meta: { title: '知识库', order: 20, permission: perm.knowledge.system.jumpRead, next: 'system-resource-tools' },
         },
-        { path: 'tools',
+        {
+          path: 'tools',
           name: 'system-resource-tools',
           component: () => import('@/views/system/SystemView.vue'),
-          meta: { title: '工具', order: 30,
-            permission:perm.tool.system.read,
-            next:'system-resource-models'
-          },
+          meta: { title: '工具', order: 30, permission: perm.tool.system.read, next: 'system-resource-models' },
         },
-        { path: 'models',
+        {
+          path: 'models',
           name: 'system-resource-models',
           component: () => import('@/views/system/SystemView.vue'),
-          meta: { title: '模型', order: 40,
-            permission:perm.model.system.read,
-            next:'system-share'
-          },
+          meta: { title: '模型', order: 40, permission: perm.model.system.read, next: 'system-share' },
         },
       ],
     },
@@ -188,47 +186,40 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'share',
       name: 'system-share',
       redirect: { name: 'system-shared-knowledge' },
-      meta: { title: '共享资源', icon: 'icon_setting', order: 30, resourceScope: 'system-shared',
-        permission:() =>
-            {
-              return (
-                perm.knowledge.share.jumpRead() ||
-                perm.model.share.read() ||
-                perm.tool.share.read()
-            );
-          },
-          next:'system-chat'
+      meta: {
+        title: '共享资源',
+        icon: 'icon_setting',
+        order: 30,
+        resourceScope: 'system-shared',
+        permission: () => {
+          return perm.knowledge.share.jumpRead() || perm.model.share.read() || perm.tool.share.read()
+        },
+        next: 'system-chat-management',
       },
       children: [
-        { path: 'knowledge',
+        {
+          path: 'knowledge',
           name: 'system-shared-knowledge',
           component: () => import('@/views/system/SystemView.vue'),
-          meta: { title: '知识库', order: 10,
-            permission:perm.knowledge.share.jumpRead,
-            next:'system-shared-models'
-          },
+          meta: { title: '知识库', order: 10, permission: perm.knowledge.share.jumpRead, next: 'system-shared-models' },
         },
-        { path: 'models',
+        {
+          path: 'models',
           name: 'system-shared-models',
           component: () => import('@/views/system/shared-resources/SharedModelview.vue'),
-          meta: { title: '模型', order: 20,
-            permission:perm.model.share.read,
-            next:'system-shared-tools'
-          },
+          meta: { title: '模型', order: 20, permission: perm.model.share.read, next: 'system-shared-tools' },
         },
-        { path: 'tools',
+        {
+          path: 'tools',
           name: 'system-shared-tools',
           component: () => import('@/views/system/SystemView.vue'),
-          meta: { title: '工具', order: 30,
-            permission:perm.tool.share.read,
-            next:'system-chat'
-          },
+          meta: { title: '工具', order: 30, permission: perm.tool.share.read, next: 'system-chat-management' },
         },
       ],
     },
     {
-      path: 'chat',
-      name: 'system-chat',
+      path: 'chat-management',
+      name: 'system-chat-management',
       redirect: { name: 'system-chat-users' },
       meta: { title: '对话端管理', icon: 'icon_contacts_outlined', order: 40,
         permission:() =>
@@ -243,38 +234,32 @@ export const systemRoutes: RouteRecordRaw = {
           next:'system-settings'
       },
       children: [
-        { path: 'users',
+        {
+          path: 'users',
           name: 'system-chat-users',
-          component: () => import('@/views/system/chat/users/UserListView.vue'),
-          meta: { title: '对话用户', order: 10,
-            permission:perm.system.chatUser.read,
-            next:'system-chat-groups'
-          },
+          component: () => import('@/views/system/chat-management/users/UserListView.vue'),
+          meta: { title: '对话用户', order: 10, permission: perm.system.chatUser.read, next: 'system-chat-management-groups' },
         },
-        { path: 'groups',
+        {
+          path: 'groups',
           name: 'system-chat-groups',
-          component: () => import('@/views/system/chat/user-groups/GroupsListView.vue'),
-          meta: { title: '对话用户组', order: 20,
-            permission:perm.system.chatUserGroup.read,
-            next:'system-chat-authentication'
-          },
+          component: () => import('@/views/system/chat-management/user-groups/GroupsListView.vue'),
+          meta: { title: '对话用户组', order: 20, permission: perm.system.chatUserGroup.read, next: 'system-chat-management-authentication' },
         },
         {
           path: 'authentication',
           name: 'system-chat-authentication',
-          component: () => import('@/views/system/chat/authentication/AuthenticationView.vue'),
+          component: () => import('@/views/system/chat-management/authentication/AuthenticationView.vue'),
           meta: { title: '对话用户认证', order: 30,
             permission:perm.system.chatAuth.read,
             next:'system-portal-access'
           },
         },
-        { path: 'portal-access',
+        {
+          path: 'portal-access',
           name: 'system-portal-access',
-          component: () => import('@/views/system/SystemView.vue'),
-          meta: { title: '门户访问设置', order: 40,
-            permission:perm.system.portal.read,
-            next:'system-settings'
-          },
+          component: () => import('@/views/system/chat-management/portal-setting/PortalSettingView.vue'),
+          meta: { title: '门户访问设置', order: 40, permission: perm.system.portal.read, next: 'system-settings' },
         },
       ],
     },
@@ -282,42 +267,33 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'settings',
       name: 'system-settings',
       redirect: { name: 'system-login-authentication' },
-      meta: { title: '系统设置', icon: 'icon_setting', order: 50,
-        permission:() =>
-            {
-              return (
-                perm.system.loginAuth.read() ||
-                perm.system.appearance.read() ||
-                perm.system.email.read()
-            );
-          },
-          next:'system-logs'
+      meta: {
+        title: '系统设置',
+        icon: 'icon_setting',
+        order: 50,
+        permission: () => {
+          return perm.system.loginAuth.read() || perm.system.appearance.read() || perm.system.email.read()
+        },
+        next: 'system-logs',
       },
       children: [
         {
           path: 'authentication',
           name: 'system-login-authentication',
           component: () => import('@/views/system/settings/authentication/AuthenticationView.vue'),
-          meta: { title: '系统用户认证', order: 10,
-            permission:perm.system.loginAuth.read,
-            next:'system-theme'
-          },
+          meta: { title: '系统用户认证', order: 10, permission: perm.system.loginAuth.read, next: 'system-theme' },
         },
-        { path: 'theme',
+        {
+          path: 'theme',
           name: 'system-theme',
           component: () => import('@/views/system/settings/theme/ThemeSettingView.vue'),
-          meta: { title: '外观设置', order: 20,
-            permission:perm.system.appearance.read,
-            next:'system-email'
-          },
+          meta: { title: '外观设置', order: 20, permission: perm.system.appearance.read, next: 'system-email' },
         },
-        { path: 'email',
+        {
+          path: 'email',
           name: 'system-email',
           component: () => import('@/views/system/settings/email/EmailSettingsView.vue'),
-          meta: { title: '邮箱设置', order: 30,
-            permission:perm.system.email.read,
-            next:'system-logs'
-          },
+          meta: { title: '邮箱设置', order: 30, permission: perm.system.email.read, next: 'system-logs' },
         },
       ],
     },
@@ -325,9 +301,13 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'logs',
       name: 'system-logs',
       component: () => import('@/views/system/operate-logs/OperateLogListView.vue'),
-      meta: { title: '操作日志', icon: 'icon_logs_outlined', activeIcon: 'icon_logs_filled', order: 60,
-        permission:perm.system.operationLog.read,
-        next:'system-home'
+      meta: {
+        title: '操作日志',
+        icon: 'icon_logs_outlined',
+        activeIcon: 'icon_logs_filled',
+        order: 60,
+        permission: perm.system.operationLog.read,
+        next: 'system-home',
       },
     },
   ],

@@ -36,12 +36,12 @@ const sortedParagraphs = computed<SearchParagraph[]>(() =>
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">检索内容</h6>
       <div>{{ data.question || '-' }}</div>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">检索结果</h6>
       <div class="space-y-2">
         <template v-if="sortedParagraphs.length > 0">

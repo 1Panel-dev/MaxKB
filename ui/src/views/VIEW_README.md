@@ -401,6 +401,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/identity/workspaces/WorkspaceListView.vue`                     | 工作空间列表页面                                                     |
 | `system/chat/user-groups/GroupsListView.vue`                           | 对话用户组及组成员管理页面                                           |
 | `system/chat/users/UserListView.vue`                                   | 对话用户列表、配额及用户导入管理页面                                 |
+| `system/chat/portal-setting/PortalSettingView.vue`                      | 门户基本信息、访问开关、认证配置与门户预览；跨域详细配置暂保留说明入口 |
 | `system/settings/theme/ThemeSettingView.vue`                           | 系统外观设置和登录外观预览页面                                       |
 | `system/settings/authentication/AuthenticationView.vue`                | 系统登录及认证源配置页面                                             |
 | `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面                                           |
@@ -410,6 +411,10 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `tool/ToolView.vue`                                                    | 工作空间工具目录与工具卡片页面                                       |
 
 ## 备注要求
+
+门户设置的 `components/ButtonEditPortal.vue`、`ButtonPortalAuthSetting.vue` 和
+`ButtonPortalCorsSetting.vue` 分别封装对应按钮、弹窗及表单状态。页面保留默认配置、统一保存和
+预览布局；编辑组件暴露草稿预览，认证组件暴露 `open()` 供首次开启认证时联动打开。
 
 - 新增路由级页面时，必须在“页面功能登记”中添加一条简洁、明确的功能说明。
 - 页面职责改变、文件重命名或目录移动时，必须同步修改登记内容。

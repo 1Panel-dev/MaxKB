@@ -172,7 +172,7 @@ onMounted(() => {
     </el-form-item>
 
     <el-form-item label="账号登录验证码设置" required>
-      <div class="w-full mk-gray-card p-4!">
+      <div class="w-full mk-gray-card-lg">
         <div class="flex-align-center gap-2">
           <span>登录失败</span>
           <el-input-number
@@ -213,7 +213,7 @@ onMounted(() => {
       </div>
     </el-form-item>
     <p class="mb-2">第三方用户默认角色分配</p>
-    <div class="w-full mk-gray-card p-4!">
+    <div class="w-full mk-gray-card-lg">
       <el-form-item label="角色" prop="role_id">
         <el-select
           v-model="form.role_id"

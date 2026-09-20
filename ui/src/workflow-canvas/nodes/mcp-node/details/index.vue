@@ -16,14 +16,14 @@ defineProps<{
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">工具</h6>
       <div>
         {{ data.mcp_tool || '-' }}
       </div>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">工具参数</h6>
       <div class="space-y-2">
         <p v-for="(value, name) in data.tool_params" :key="name">
@@ -32,7 +32,7 @@ defineProps<{
       </div>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出参数</h6>
       <div class="break-all space-y-2">
         <p v-for="(f, i) in data.result" :key="i"><span class="text-N600">result：</span>{{ f }}</p>

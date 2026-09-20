@@ -40,7 +40,7 @@ const activeTab = ref(0)
     </template>
 
     <!-- 输入参数 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输入参数</h6>
       <div class="space-y-2">
         <div><span class="text-N600">分段规则：</span>{{ data.split_strategy || '-' }}</div>
@@ -50,7 +50,7 @@ const activeTab = ref(0)
     </div>
 
     <!-- 输出参数 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出参数 <span class="text-N600 font-normal">（每个文档仅展示前 5 个分段）</span></h6>
       <div class="space-y-2">
         <el-tabs v-if="documentList.length > 0" v-model="activeTab" class="paragraph-tabs">

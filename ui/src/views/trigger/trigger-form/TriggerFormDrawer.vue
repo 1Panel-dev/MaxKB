@@ -333,7 +333,7 @@ defineExpose({ open })
               <template #subtitle>{{ option.description }}</template>
               <template v-if="form.trigger_type === option.value" #default>
                 <el-form-item prop="trigger_setting" class="mb-0!" @click.stop @keydown.stop>
-                  <div class="mk-gray-card w-full p-4! rounded-xl! text-N900">
+                  <div class="mk-gray-card-lg w-full text-N900">
                     <!-- 定时触发 -->
                     <template v-if="option.value === TRIGGER_TYPE.SCHEDULED">
                       <div class="flex-between mb-2">
@@ -396,7 +396,7 @@ defineExpose({ open })
         </el-form-item>
         <!-- 任务执行 -->
         <el-form-item label="任务执行" prop="trigger_task">
-          <div class="mk-gray-card w-full p-4! rounded-xl!">
+          <div class="mk-gray-card-lg w-full">
             <TriggerTaskExecution
               v-if="!resource"
               ref="taskExecutionRef"

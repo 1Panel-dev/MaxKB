@@ -29,7 +29,7 @@ const showContent = computed(() => isSuccess.value || props.showContentOnError)
       <!-- 内容区独立交互，避免链接、表单和嵌套详情点击时收起外层卡片。 -->
       <div v-if="show" class="mt-4 cursor-auto space-y-2" @click.stop>
         <slot v-if="showContent" />
-        <div v-else class="mk-gray-card py-2! rounded-xl!">
+        <div v-else class="mk-gray-card-sm">
           <h6 class="mb-2">错误日志</h6>
           <div>{{ data.err_message || '-' }}</div>
         </div>

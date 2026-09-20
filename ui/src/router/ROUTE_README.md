@@ -56,6 +56,13 @@ System 使用 `AppLayout`，左侧导航根据 `scope: 'system'` 对应路由的
 
 System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。需要复用 Workspace 详情页面时，在 System 路由树中注册独立路由名并复用同一个页面组件，以保留访问来源。
 
+对话端管理根地址为 `/admin/system/chat-management`（`system-chat-management`），默认进入
+`users`（`system-chat-users`）。子路由还包括 `groups`
+（`system-chat-groups`）、`authentication`（`system-chat-authentication`）
+和 `portal-access`（`system-portal-access`），页面组件统一位于 `views/system/chat-management/`。
+门户访问设置渲染 `views/system/chat-management/portal-setting/PortalSettingView.vue`，提供门户访问
+配置和右侧界面预览。
+
 各子路由通过 `meta.resource` 向页面传入对应的后端资源类型。
 
 复用路由按模块放在 `admin/system/modules`，文件名与 `admin/workspace/modules` 保持对应；`system/index.ts` 只负责系统导航路由和模块汇总。

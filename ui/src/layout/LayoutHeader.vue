@@ -16,7 +16,7 @@ function switchMode() {
 <template>
   <header class="flex-between h-header px-6">
     <div class="flex-align-center">
-      <LogoFull class="h-9 shrink-0" />
+      <LogoFull class="shrink-0" />
       <div v-if="!preview" class="flex-align-center gap-5 ml-5">
         <el-divider direction="vertical" />
         <!-- 企业版: 工作空间下拉框 -->

@@ -30,7 +30,7 @@ withDefaults(
       popper-class="mk-tag-group__popper"
       trigger="hover"
       :popper-style="{ maxWidth: '250px', width: 'auto' }"
-      :show-after="200"
+      :show-after="300"
       v-if="tags?.length > 1"
     >
       <template #reference>

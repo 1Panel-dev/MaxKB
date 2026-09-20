@@ -17,7 +17,7 @@ defineProps<{
     </template>
 
     <!-- 输入参数 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输入参数</h6>
       <div class="space-y-2">
         <p v-for="(assignment, assignmentIndex) in data.result_list" :key="assignmentIndex">
@@ -27,7 +27,7 @@ defineProps<{
     </div>
 
     <!-- 输出参数 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出参数</h6>
       <div class="space-y-2">
         <p v-for="(assignment, assignmentIndex) in data.result_list" :key="assignmentIndex">

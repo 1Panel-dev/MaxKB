@@ -91,13 +91,13 @@ watch(
       <h4 class="mk-title-decoration my-4">执行详情</h4>
 
       <template v-if="triggerFailed">
-        <div class="mk-gray-card py-2! rounded-xl! mb-2">
+        <div class="mk-gray-card-sm mb-2">
           <h6 class="mb-2">触发器入参</h6>
           <div>
             {{ detail?.meta?.input }}
           </div>
         </div>
-        <div class="mk-gray-card py-2! rounded-xl!">
+        <div class="mk-gray-card-sm">
           <h6 class="mb-2">错误信息</h6>
           <div>
             {{ detail?.meta?.err_message }}

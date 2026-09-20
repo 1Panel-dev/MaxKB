@@ -119,15 +119,39 @@ h6 {
 /* card */
 // 灰色背景卡片
 .mk-gray-card {
-  background-color: var(--mk-N100) !important;
   border-radius: 6px;
   padding: calc(var(--spacing) * 3);
+
+  &,
+  &-lg,
+  &-sm {
+    background-color: var(--mk-N100) !important;
+  }
+
+  &-lg {
+    border-radius: 12px;
+    padding: calc(var(--spacing) * 4);
+  }
+
+  &-sm {
+    border-radius: 12px;
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+  }
 }
+
 // 白色背景卡片
 .mk-white-card {
-  background-color: white !important;
   border-radius: 6px;
   padding: calc(var(--spacing) * 3);
+  &,
+  &-sm {
+    background-color: white !important;
+  }
+
+  &-sm {
+    border-radius: 12px;
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+  }
 }
 
 // 资源的card grid布局

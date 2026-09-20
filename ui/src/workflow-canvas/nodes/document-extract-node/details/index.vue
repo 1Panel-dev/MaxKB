@@ -16,7 +16,7 @@ defineProps<{
       <BaseHeader :data="data" />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="flex-align-center gap-1 mb-2">
         <span>输出参数</span>
         <MkTooltip content="多个文件的内容会按文件顺序拼接输出" placement="right">

@@ -16,12 +16,12 @@ defineProps<{
       <BaseHeader :data="data" show-tokens />
     </template>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">系统提示词</h6>
       <div>{{ data.system || '-' }}</div>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">历史记录</h6>
       <div class="space-y-2">
         <template v-if="data.history_message?.length > 0">
@@ -40,7 +40,7 @@ defineProps<{
       </div>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">本次对话</h6>
       <div class="whitespace-pre-wrap space-y-2">
         <div v-if="data.video_list?.length > 0" class="flex flex-wrap gap-2">
@@ -50,7 +50,7 @@ defineProps<{
       </div>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">思考过程</h6>
       <div class="space-y-2">
         <MdPreview v-if="data.reasoning_content" :model-value="data.reasoning_content" noImgZoomIn />
@@ -58,7 +58,7 @@ defineProps<{
       </div>
     </div>
 
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">AI 回答</h6>
       <div class="space-y-2">
         <MdPreview v-if="data.answer" :model-value="data.answer" noImgZoomIn />

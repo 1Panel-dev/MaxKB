@@ -17,13 +17,13 @@ defineProps<{
     </template>
 
     <!-- 系统提示词 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">系统提示词</h6>
       <div>{{ data.system || '-' }}</div>
     </div>
 
     <!-- 历史记录 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">历史记录</h6>
       <div class="space-y-2">
         <template v-if="data.history_message?.length > 0">
@@ -37,7 +37,7 @@ defineProps<{
     </div>
 
     <!-- 本次对话 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">本次对话</h6>
       <div class="whitespace-pre-wrap">
         {{ data.question || '-' }}
@@ -45,7 +45,7 @@ defineProps<{
     </div>
 
     <!-- 回答 -->
-    <div class="mk-gray-card py-2! rounded-xl!">
+    <div class="mk-gray-card-sm">
       <h6 class="mb-2">回答</h6>
       <div>
         <MdPreview v-if="data.answer" :model-value="data.answer" noImgZoomIn />
