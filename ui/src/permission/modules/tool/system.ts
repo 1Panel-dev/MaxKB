@@ -1,7 +1,8 @@
 /** 系统「工具资源管理」按钮权限（系统 > 资源管理 > 工具）。全局判定，无 id。 */
 
 import { canSys } from '../../policy'
-import { PermissionConstants as P } from '../../core'
+import { PermissionConstants as P,hasEdition} from '../../core'
+import { Edition } from '@/permission/core/common'
 
 const system = {
   // —— 系统页不提供 ——
@@ -19,7 +20,10 @@ const system = {
   folderAuth: () => false,
   folderManage: () => false,
 
-  read: () => canSys(P.RESOURCE_TOOL_READ),
+  /**
+   * 系统「工具资源管理」（系统 > 资源管理 > 工具）只读权限
+   * */
+  read: () => canSys(P.RESOURCE_TOOL_READ) && hasEdition(Edition.PE),
   isShare: () => canSys(P.SHARED_TOOL_READ),
 
   // —— 工具资源 ——

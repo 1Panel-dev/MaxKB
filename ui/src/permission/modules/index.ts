@@ -12,4 +12,25 @@ import model from './model'
 import system from './system'
 import trigger from './trigger'
 
-export default { application, knowledge, tool, model, trigger, system }
+export default {
+  /**
+   *「应用」在各场景下的按钮权限
+   * */
+  application,
+  /**
+   * 「知识库」各场景按钮权限
+   * */
+  knowledge,
+  /**
+   * 「工具」各场景按钮权限
+   *  */
+  tool,
+  /**
+   * 「模型」各场景按钮权限
+   * */
+  model,
+  trigger,
+  /**
+   * 「系统全局」按钮权限
+   * */
+  system }

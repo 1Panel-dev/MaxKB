@@ -1,7 +1,8 @@
 /** 系统「共享知识库」按钮权限（系统 > 共享 > 知识库）。全局判定，无 id。 */
 
 import { canSys } from '../../policy'
-import { PermissionConstants as P } from '../../core'
+import { PermissionConstants as P,hasEdition} from '../../core'
+import { Edition } from '@/permission/core/common'
 
 const share = {
   // —— 共享页不提供 ——
@@ -74,7 +75,10 @@ const share = {
   knowledgeChatUserEdit: () => canSys(P.SHARED_KNOWLEDGE_CHAT_USER_EDIT),
 
   // —— 组合：进入知识库 ——
-  jumpRead: () => canSys(P.SHARED_KNOWLEDGE_DOCUMENT_READ) || canSys(P.SHARED_KNOWLEDGE_WORKFLOW_READ),
+  /**
+   * 系统「共享知识库」（系统 > 共享 > 知识库）进入权限
+   * */
+  jumpRead: () => canSys(P.SHARED_KNOWLEDGE_WORKFLOW_READ) && hasEdition(Edition.PE),
 }
 
 export default share

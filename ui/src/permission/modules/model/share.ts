@@ -1,7 +1,8 @@
 /** 系统「共享模型」按钮权限（系统 > 共享 > 模型）。全局判定，无 id。 */
 
 import { canSys } from '../../policy'
-import { PermissionConstants as P } from '../../core'
+import { PermissionConstants as P,hasEdition} from '../../core'
+import { Edition } from '@/permission/core/common'
 
 const share = {
   // —— 共享页不提供 ——
@@ -15,6 +16,11 @@ const share = {
   folderDelete: () => false,
   folderAuth: () => false,
   folderManage: () => false,
+
+  /**
+   * 系统「共享模型」（系统 > 共享 > 模型）只读权限
+   */
+  read: () => canSys(P.SHARED_MODEL_READ) && hasEdition(Edition.PE),
 
   // —— 模型资源 ——
   create: () => canSys(P.SHARED_MODEL_CREATE),
