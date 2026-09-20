@@ -14,7 +14,9 @@ from application.workflow.message.struct.reasoning_content import ReasoningConte
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from application.workflow.tools import Reasoning
+from common.exception.app_exception import AppApiException
 from knowledge.models import File
+from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
@@ -32,6 +34,15 @@ class VideoUnderstandNodeSerializer(serializers.Serializer):
     video_list = serializers.ListField(required=False, label=_("video"))
     model_params_setting = serializers.JSONField(required=False, default=dict, label=_("Model parameter settings"))
     model_setting = serializers.DictField(required=False, label="Model settings")
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        # reference / default 在运行时才解析,此处只校验自定义模型
+        if (self.data.get("model_id_type") or "custom") in ("reference", "default"):
+            return
+        model_id = self.data.get("model_id")
+        if not model_id or not QuerySet(Model).filter(id=model_id).exists():
+            raise AppApiException(500, _("The model of the node does not exist"))
 
 
 class VideoUnderstandNode(INode):

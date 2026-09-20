@@ -19,7 +19,9 @@ from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.utils.common import split_and_transcribe, any_to_mp3
+from common.exception.app_exception import AppApiException
 from knowledge.models import File
+from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
@@ -32,6 +34,15 @@ class SpeechToTextNodeSerializer(serializers.Serializer):
     is_result = serializers.BooleanField(required=False, label=_("Whether to return content"))
     audio_list = serializers.ListField(required=True, label=_("The audio file cannot be empty"))
     model_params_setting = serializers.DictField(required=False, label=_("Model parameter settings"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        # reference / default 在运行时才解析,此处只校验自定义模型
+        if (self.data.get("stt_model_id_type") or "custom") in ("reference", "default"):
+            return
+        model_id = self.data.get("stt_model_id")
+        if not model_id or not QuerySet(Model).filter(id=model_id).exists():
+            raise AppApiException(500, _("The model of the node does not exist"))
 
 
 def _process_audio_item(audio_item, model):

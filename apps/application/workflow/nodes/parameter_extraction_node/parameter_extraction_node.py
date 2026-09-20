@@ -18,6 +18,7 @@ from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id, get_model_credential
+from common.exception.app_exception import AppApiException
 
 prompt = """
 Please strictly process the text according to the following requirements:
@@ -47,6 +48,15 @@ class ParameterExtractionNodeSerializer(serializers.Serializer):
     model_id_reference = serializers.ListField(
         required=False, child=serializers.CharField(), allow_empty=True, label=_("Reference Field")
     )
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        # reference / default 在运行时才解析,此处只校验自定义模型
+        if (self.data.get("model_id_type") or "custom") in ("reference", "default"):
+            return
+        model_id = self.data.get("model_id")
+        if not model_id or not QuerySet(Model).filter(id=model_id).exists():
+            raise AppApiException(500, _("The model of the node does not exist"))
 
 
 def _get_default_model_params_setting(model_id):
