@@ -93,15 +93,16 @@ def delete_orphan_chats(orphan_chat_ids):
 
 def clean_method(query_conditions, clean_log=True):
     batch_size = 500
+    last_record_id = None
     while True:
         with transaction.atomic():
-            chat_records = (
-                ChatRecord.objects.filter(query_conditions)
-                .select_related("chat")
-                .only("id", "chat_id", "create_time")[:batch_size]
-            )
+            records = ChatRecord.objects.filter(query_conditions)
+            if last_record_id is not None:
+                records = records.filter(id__gt=last_record_id)
+            chat_records = list(records.order_by("id").only("id", "chat_id", "create_time")[:batch_size])
             if not chat_records:
                 break
+            last_record_id = chat_records[-1].id
             chat_record_ids = [record.id for record in chat_records]
             chat_ids = {record.chat_id for record in chat_records}
 
@@ -114,21 +115,11 @@ def clean_method(query_conditions, clean_log=True):
 
             # 收集需要删除的文件
             files_to_delete = []
-            for record in chat_records:
-                max_create_time = next(
-                    (
-                        item["max_create_time"]
-                        for item in max_create_times
-                        if str(item["chat_id"]) == str(record.chat_id)
-                    ),
-                    None,
+            for item in max_create_times:
+                files_to_delete.extend(
+                    File.objects.filter(source_id=str(item["chat_id"]), create_time__lt=item["max_create_time"])
                 )
-                if max_create_time:
-                    files_to_delete.extend(
-                        File.objects.filter(source_id=str(record.chat_id), create_time__lt=max_create_time)
-                    )
             # 删除 ChatRecord
-            deleted_count = 0
             if clean_log:
                 deleted_count = ChatRecord.objects.filter(id__in=chat_record_ids).delete()[0]
                 maxkb_logger.info(f"[clean_chat_log] delete chat_records, count={deleted_count}")
@@ -150,7 +141,7 @@ def clean_method(query_conditions, clean_log=True):
                 delete_orphan_chats(orphan_chat_ids)
             File.objects.filter(id__in=[file.id for file in files_to_delete]).delete()
 
-            if deleted_count < batch_size:
+            if len(chat_records) < batch_size:
                 break
 
     if clean_log:
