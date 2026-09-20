@@ -7,6 +7,7 @@
 """
 
 import uuid_utils.compat as uuid
+from django.db import connection
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -19,6 +20,7 @@ from application.workflow.message.struct.content import Position
 from application.workflow.status import Status
 from application.workflow.workflow_manage import WorkflowManage, CallBack
 from chat.serializers.chat_history import ChatHistory
+from common.exception.app_exception import AppApiException
 
 
 def string_to_uuid(input_str):
@@ -35,6 +37,13 @@ class ApplicationNodeSerializer(serializers.Serializer):
     audio_list = serializers.ListField(required=False, label=_("Audio"))
     video_list = serializers.ListField(required=False, label=_("Video"))
     node_data = serializers.DictField(required=False, allow_null=True, label=_("Form Data"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        application_id = self.data.get("application_id")
+        f_app = QuerySet(Application).filter(id=application_id).first()
+        if f_app is None:
+            raise AppApiException(500, _("The application has been deleted"))
 
 
 class ApplicationNode(INode):
