@@ -9,9 +9,9 @@ from common.storage.seaweedfs import get_bucket, get_s3_client, is_seaweedfs_ena
 from common.utils.common import get_sha256_hash
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
-from django.db import models
+from django.db import connections, models, transaction
 from django.db.models import QuerySet
-from django.db.models.signals import pre_delete
+from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from models_provider.models import Model
 from mptt.fields import TreeForeignKey
@@ -707,21 +707,22 @@ class File(AppModelMixin):
         yield from _read_with_offset()
 
 
-@receiver(pre_delete, sender=File)
-def on_delete_file(sender, instance, **kwargs):
+@receiver(post_delete, sender=File)
+def on_delete_file(sender, instance, using, **kwargs):
     if instance.storage_type == "seaweedfs":
-        # Deduped references share a key; only delete the S3 object when no other file points to the same key
+        from knowledge.services.file_cleanup import delete_file_object
+
+        bucket = get_bucket()
         key = instance.meta.get("seaweedfs_key", f"files/{instance.id}")
-        shared = QuerySet(File).filter(sha256_hash=instance.sha256_hash).exclude(id=instance.id).exists()
+        file_id = instance.id
+        transaction.on_commit(lambda: delete_file_object(bucket, key, file_id, using), using=using, robust=True)
+    elif instance.loid is not None:
+        # post_delete sees the complete batch removed; unlink remains in the same PG transaction.
+        shared = File.objects.using(using).filter(storage_type="pg", loid=instance.loid).exists()
         if not shared:
-            try:
-                get_s3_client().delete_object(Bucket=get_bucket(), Key=key)
-            except Exception:
-                pass
-    else:
-        exist = QuerySet(File).filter(loid=instance.loid).exclude(id=instance.id).exists()
-        if not exist:
-            select_one(f"SELECT lo_unlink({instance.loid})", [])
+            with connections[using].cursor() as cursor:
+                # Multiple deleted rows may refer to the same large object.
+                cursor.execute("SELECT lo_unlink(oid) FROM pg_largeobject_metadata WHERE oid = %s", [instance.loid])
 
 
 class PublicFileAccess(AppModelMixin):

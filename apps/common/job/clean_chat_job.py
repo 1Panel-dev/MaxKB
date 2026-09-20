@@ -148,7 +148,7 @@ def clean_method(query_conditions, clean_log=True):
                 # 删除已经没有关联 ChatRecord 的 Chat
                 orphan_chat_ids = [chat_id for chat_id in chat_ids if count_map.get(chat_id, 0) == 0]
                 delete_orphan_chats(orphan_chat_ids)
-            File.objects.filter(loid__in=[file.loid for file in files_to_delete]).delete()
+            File.objects.filter(id__in=[file.id for file in files_to_delete]).delete()
 
             if deleted_count < batch_size:
                 break
