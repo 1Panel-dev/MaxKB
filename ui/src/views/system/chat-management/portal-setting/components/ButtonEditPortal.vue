@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { EditPen } from '@element-plus/icons-vue'
 import type { PortalSetting } from '@/api/types'
 import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 import defaultLogo from '@/assets/mk-logo/logo.svg'
@@ -20,7 +19,6 @@ const portalRules: FormRules = {
     { whitespace: true, message: '门户名称不能为空白', trigger: 'blur' },
   ],
 }
-const preview = computed(() => (editVisible.value ? { name: portalForm.name.trim() || '智能体门户', logo: portalForm.logo } : null))
 
 function handleOpenPortalEdit() {
   handleClosePortalEdit()
@@ -53,21 +51,19 @@ function handleClosePortalEdit() {
   logoChanged.value = false
   portalFormRef.value?.clearValidate()
 }
-
-defineExpose({ preview })
 </script>
 
 <template>
   <!-- 编辑门户名称与 Logo -->
-  <el-button text title="编辑门户信息" :disabled="saving" @click="handleOpenPortalEdit">
-    <MkIcon :icon="EditPen" />
+  <el-button text :disabled="saving" @click="handleOpenPortalEdit">
+    <MkIcon name="icon_edit_outlined" />
   </el-button>
-  <MkDialog v-model="editVisible" title="编辑门户信息" :show-close="!saving" @closed="handleClosePortalEdit">
+  <MkDialog v-model="editVisible" title="编辑" @closed="handleClosePortalEdit">
     <el-form ref="portalFormRef" :model="portalForm" :rules="portalRules" label-position="top" @submit.prevent>
-      <el-form-item label="门户 Logo">
+      <!-- <el-form-item label="门户 Logo">
         <MkEditAvatar v-model="portalForm.logo" :default-icon="defaultLogo" :size="48" :editable="!saving" @change="handleLogoChange" />
-      </el-form-item>
-      <el-form-item label="门户名称" prop="name">
+      </el-form-item> -->
+      <el-form-item label="名称" prop="name">
         <el-input v-model="portalForm.name" maxlength="64" show-word-limit :disabled="saving" placeholder="请输入门户名称" />
       </el-form-item>
     </el-form>
