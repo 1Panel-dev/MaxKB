@@ -42,16 +42,22 @@ export interface KnowledgeTagGroup {
   values: { id: string; value: string; create_time: string; update_time: string }[]
 }
 
-/** 知识库工作流调试任务状态。 */
+/** 知识库工作流任务状态。 */
 export type KnowledgeWorkflowActionState = 'STARTED' | 'PENDING' | 'SUCCESS' | 'FAILURE' | 'REVOKE' | 'REVOKED'
 
-/** 知识库工作流调试任务，details 按节点 id 聚合各节点执行详情。 */
-export interface KnowledgeWorkflowAction {
+/** 知识库工作流执行记录摘要。 */
+export interface KnowledgeExecutionRecord {
   id: string
   knowledge_id: string
   state: KnowledgeWorkflowActionState
+  run_time?: number | null
+  create_time?: string
+  meta?: Record<string, unknown> & { user_name?: string }
+}
+
+/** 知识库工作流执行详情，调试与历史记录共用。 */
+export interface KnowledgeWorkflowAction extends KnowledgeExecutionRecord {
   details: Record<string, Record<string, unknown>>
-  meta?: Record<string, unknown>
 }
 
 /** 知识库工作流调试提交参数。 */

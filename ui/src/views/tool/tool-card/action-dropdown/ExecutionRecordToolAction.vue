@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type { ToolItem } from '@/api/types'
-import ExecutionRecordDrawer from '../../execution-record/ExecutionRecordDrawer.vue'
+import ExecutionRecordDrawer from '@/views/workflow/tool/execution-record/ExecutionRecordDrawer.vue'
 
-const props = defineProps<{ api: typeof ToolApi; tool: ToolItem; label: string }>()
+const props = defineProps<{ api: typeof WorkflowApi; tool: ToolItem; label: string }>()
 
 /* 执行记录抽屉按需挂载。 */
 const drawerMounted = ref(false)

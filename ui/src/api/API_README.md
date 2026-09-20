@@ -103,17 +103,17 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 
 ### 工作流发布历史
 
-`workspace/application/workflow-version.ts` 维护智能体 `application_version` 资源：
+`workspace/application/workflow.ts` 维护智能体 `application_version` 资源：
 `getWorkflowVersions(applicationId)` 返回按创建时间倒序的完整 `WorkflowVersion[]`；
 `putWorkflowVersion(applicationId, versionId, payload)` 编辑标题与更新说明，返回更新后的版本。
 共用类型 `WorkflowVersion` 和 `WorkflowVersionPayload` 位于 `types/workflow-version.ts`，
 通过 `@/api/types` 导出。`ButtonApplicationPublishHistory` 内部调用智能体版本 API，公共发布历史
 UI 组件只接收数据和事件，不接收 API 或推测其他工作流的接口地址。
-`workspace/tool/workflow-version.ts` 单独维护工具 `tool_version` 资源，提供
+`workspace/tool/workflow.ts` 同时维护工具 `tool_version` 资源，提供
 `getWorkflowVersions(toolId)` 和 `putWorkflowVersion(toolId, versionId, payload)`，
 复用上述版本类型，由 `views/workflow/tool/ButtonPublishHistory.vue` 调用。
 工具版本接口同样尚未支持 `description`，且未返回版本的默认模型配置。
-`workspace/knowledge/workflow-version.ts` 维护知识库 `knowledge_version` 资源，提供同名查询与编辑方法，
+`workspace/knowledge/workflow.ts` 维护知识库 `knowledge_version` 资源，提供同名查询与编辑方法，
 由知识库 `ButtonPublishHistory.vue` 调用；知识库版本也尚未支持更新说明和默认模型配置。
 
 v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明上限 1000。
@@ -336,11 +336,19 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 
 ### 工具执行记录
 
-`workspace/tool/tool.ts` 的 `getToolRecordPage` 查询 `/<toolId>/tool_record/<currentPage>/<pageSize>`，
+`workspace/tool/workflow.ts` 的 `getToolExecutionRecordPage` 查询 `/<toolId>/tool_record/<currentPage>/<pageSize>`，
 支持 `source_name`、`source_type`、`state` 筛选，后端固定按创建时间倒序返回。
-`getToolRecordDetail` 查询 `/<toolId>/tool_record/<recordId>`，返回状态、耗时和 `meta` 中的输入、输出、
+`getToolExecutionRecordDetail` 查询 `/<toolId>/tool_record/<recordId>`，返回状态、耗时和 `meta` 中的输入、输出、
 错误及节点详情。共用类型 `ToolExecutionRecord`、`ToolExecutionRecordDetail` 维护在 `types/tool.ts`；
 调用来源使用 `TOOL_RECORD_SOURCE`。抽屉负责 loading 和分页状态，不重复解包响应。
+
+### 知识库执行记录
+
+`workspace/knowledge/workflow.ts` 集中维护工作流、发布版本和执行记录接口。
+`getKnowledgeExecutionRecordPage` 请求 `/<knowledgeId>/action/<currentPage>/<pageSize>`，
+支持 `user_name`、`state` 筛选；详情和取消复用 `getKnowledgeWorkflowAction`、
+`postCancelKnowledgeWorkflowAction`，对应 GET `action/<actionId>` 和 POST `action/<actionId>/cancel`。
+`KnowledgeExecutionRecord` 为分页摘要，`KnowledgeWorkflowAction` 扩展节点详情；均从 `@/api/types` 导入。
 
 ### 工具工作流调试
 

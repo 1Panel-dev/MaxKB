@@ -5,6 +5,7 @@ import { onMounted, computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
+import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import SharedApi from '@/api/admin/workspace/shared'
 import StoreApi from '@/api/admin/store.ts'
@@ -309,7 +310,7 @@ onMounted(() => {
                   <ExecutionRecordToolAction
                     v-if="tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW"
                     label="查看执行记录"
-                    :api="ToolApi"
+                    :api="WorkflowApi"
                     :tool="tool"
                   />
                   <!-- 复制 -->

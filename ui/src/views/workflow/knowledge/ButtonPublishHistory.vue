@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import WorkflowVersionApi from '@/api/admin/workspace/knowledge/workflow-version'
+import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
@@ -31,7 +31,7 @@ function handleOpen() {
 }
 
 function loadWorkflowVersions() {
-  return WorkflowVersionApi.getWorkflowVersions(props.knowledgeId).then((result) => {
+  return WorkflowApi.getWorkflowVersions(props.knowledgeId).then((result) => {
     versions.value = result
   })
 }
@@ -42,7 +42,7 @@ const publishHistoryDrawerRef = useTemplateRef<InstanceType<typeof PublishHistor
 function handleSubmit(payload: WorkflowVersionPayload, versionId: string) {
   if (loading.value || !versionId) return
   loading.value = true
-  return WorkflowVersionApi.putWorkflowVersion(props.knowledgeId, versionId, payload)
+  return WorkflowApi.putWorkflowVersion(props.knowledgeId, versionId, payload)
     .then(() => {
       publishHistoryDrawerRef.value?.closeEdit()
       MsgSuccess('修改成功')
@@ -56,7 +56,7 @@ function handleSubmit(payload: WorkflowVersionPayload, versionId: string) {
 
 <template>
   <!-- 打开知识库发布历史 -->
-  <MkDropdownItem divided @click="handleOpen">
+  <MkDropdownItem @click="handleOpen">
     <template #icon><MkIcon name="icon_history_outlined" /></template>
     <span>发布历史</span>
   </MkDropdownItem>

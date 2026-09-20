@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import type ToolApi from '@/api/admin/workspace/tool/tool'
-import { TOOL_RECORD_SOURCE, KNOWLEDGE_TYPE } from '@/api/enums'
-import type { ToolExecutionRecord, ToolExecutionRecordDetail } from '@/api/types'
+import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import type { KnowledgeWorkflowAction, KnowledgeExecutionRecord } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 const props = defineProps<{
-  api: typeof ToolApi
-  toolId: string
-  record: ToolExecutionRecord
+  api: typeof WorkflowApi
+  knowledgeId: string
+  record: KnowledgeExecutionRecord
   previousDisabled: boolean
   nextDisabled: boolean
 }>()
@@ -20,26 +19,29 @@ const emit = defineEmits<{ previous: []; next: [] }>()
 
 /* 当前任务的执行结果 */
 const loading = ref(false)
-const detail = ref<ToolExecutionRecordDetail>()
+const detail = ref<KnowledgeWorkflowAction>()
 const runTime = computed(() => detail.value?.run_time ?? props.record.run_time)
-const nodeDetails = computed<ExecutionNodeDetail[]>(() => Object.values(detail.value?.meta?.details ?? {}))
+const nodeDetails = computed<ExecutionNodeDetail[]>(() => Object.values(detail.value?.details ?? {}) as ExecutionNodeDetail[])
 
-function loadDetail() {
-  loading.value = true
-  detail.value = undefined
+function loadDetail(showLoading: boolean) {
+  if (showLoading) {
+    loading.value = true
+    detail.value = undefined
+  }
   return props.api
-    .getToolRecordDetail(props.toolId, props.record.id)
+    .getKnowledgeWorkflowAction(props.knowledgeId, props.record.id)
     .then((result) => {
       detail.value = result
     })
     .finally(() => {
-      loading.value = false
+      if (showLoading) loading.value = false
     })
 }
 watch(
-  [() => props.record.id, visible],
-  ([, opened]) => {
-    if (opened) void loadDetail()
+  [() => props.record, visible],
+  ([record, opened], [previousRecord, previouslyOpened]) => {
+    // 同一条记录的轮询刷新保留已有详情，不显示加载遮罩。
+    if (opened) void loadDetail(!previouslyOpened || record.id !== previousRecord?.id)
   },
   { immediate: true },
 )
@@ -62,15 +64,9 @@ watch(
       <el-card shadow="never">
         <div class="grid grid-cols-4 gap-4">
           <div class="min-w-0">
-            <p class="mb-1 text-N600">触发来源</p>
-            <div class="flex-align-center gap-2">
-              <KnowledgeIcon v-if="record.source_type === TOOL_RECORD_SOURCE.KNOWLEDGE" :type="KNOWLEDGE_TYPE.WORKFLOW" :size="20" />
-              <TriggerIcon v-else-if="record.source_type === TOOL_RECORD_SOURCE.TRIGGER" :type="record.trigger_type ?? undefined" :size="20" />
-              <ApplicationIcon v-else :icon="record.source_icon ?? undefined" :size="20" />
-              <span class="min-w-0 flex-1 truncate" :title="record.source_name ?? undefined">{{ record.source_name || '-' }}</span>
-            </div>
+            <p class="mb-1 text-N600">发起人</p>
+            <p>{{ detail?.meta?.user_name || record.meta?.user_name || '-' }}</p>
           </div>
-          <!-- // TODO 共享资源需要显示工作空间 -->
           <div>
             <p class="mb-1 text-N600">状态</p>
             <MkStatusLabel :status="detail?.state ?? record.state" />
@@ -89,7 +85,7 @@ watch(
       <h4 class="mk-title-decoration my-4">执行详情</h4>
 
       <div v-if="detail" class="space-y-2">
-        <ExecutionDetailContent v-if="nodeDetails.length" :detail="nodeDetails" :workflow-mode="WorkflowMode.Tool" />
+        <ExecutionDetailContent v-if="nodeDetails.length" :detail="nodeDetails" :workflow-mode="WorkflowMode.Knowledge" />
       </div>
     </div>
     <template #footer>

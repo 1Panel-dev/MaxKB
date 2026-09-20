@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import WorkflowVersionApi from '@/api/admin/workspace/application/workflow-version'
+import WorkflowApi from '@/api/admin/workspace/application/workflow'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
@@ -28,7 +28,7 @@ function handleOpen() {
 
 function loadWorkflowVersions() {
   loading.value = true
-  return WorkflowVersionApi.getWorkflowVersions(props.applicationId)
+  return WorkflowApi.getWorkflowVersions(props.applicationId)
     .then((result) => {
       versions.value = result
     })
@@ -44,7 +44,7 @@ const publishHistoryDrawerRef = useTemplateRef<InstanceType<typeof PublishHistor
 function handleSubmit(payload: WorkflowVersionPayload, versionId?: string) {
   saving.value = true
   if (versionId) {
-    return WorkflowVersionApi.putWorkflowVersion(props.applicationId, versionId, payload)
+    return WorkflowApi.putWorkflowVersion(props.applicationId, versionId, payload)
       .then(() => {
         publishHistoryDrawerRef.value?.closeEdit()
         MsgSuccess('修改成功')
