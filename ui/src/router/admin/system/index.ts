@@ -236,7 +236,7 @@ export const systemRoutes: RouteRecordRaw = {
               return (
                 perm.system.chatUser.read() ||
                 perm.system.chatUserGroup.read() ||
-                perm.system.chatAuth.edit() ||
+                perm.system.chatAuth.read() ||
                 perm.system.portal.read()
             );
           },
@@ -264,7 +264,7 @@ export const systemRoutes: RouteRecordRaw = {
           name: 'system-chat-authentication',
           component: () => import('@/views/system/chat/authentication/AuthenticationView.vue'),
           meta: { title: '对话用户认证', order: 30,
-            permission:perm.system.chatAuth.edit,
+            permission:perm.system.chatAuth.read,
             next:'system-portal-access'
           },
         },

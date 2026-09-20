@@ -235,10 +235,10 @@ export const PermissionConstants = {
   USER_GROUP_DELETE: p(Group.CHAT_USER_GROUP, Group.CHAT_USER_GROUP, Operate.DELETE, 3),
   USER_GROUP_ADD_MEMBER: p(Group.CHAT_USER_GROUP, Group.CHAT_USER_GROUP, Operate.ADD_MEMBER, 4),
   USER_GROUP_REMOVE_MEMBER: p(Group.CHAT_USER_GROUP, Group.CHAT_USER_GROUP, Operate.REMOVE_MEMBER, 5),
-  CHAT_USER_AUTH_READ: p(Group.CHAT_USER_GROUP, Group.CHAT_USER_GROUP, Operate.READ, 6),
 
   // ==================== CHAT_USER_AUTH ====================
-  CHAT_USER_AUTH_EDIT: p(Group.CHAT_USER_AUTH, Group.CHAT_USER_AUTH, Operate.EDIT, 0),
+  CHAT_USER_AUTH_READ: p(Group.CHAT_USER_AUTH, Group.CHAT_USER_AUTH, Operate.READ, 0),
+  CHAT_USER_AUTH_EDIT: p(Group.CHAT_USER_AUTH, Group.CHAT_USER_AUTH, Operate.EDIT, 1),
 
   // ==================== PORTAL ====================
   PORTAL_READ: p(Group.PORTAL, Group.PORTAL, Operate.READ, 0),
