@@ -46,6 +46,7 @@ from system_manage.serializers.resource_mapping_serializers import ResourceMappi
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolFolder, ToolRecord, ToolScope, ToolType
 from tools.models.tool_workflow import ToolWorkflow
+from tools.serializers.tool_icon import delete_tool_icon, download_tool_icon
 from trigger.models import Trigger, TriggerTask
 from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
 
@@ -713,8 +714,7 @@ class ToolSerializer(serializers.Serializer):
             tool = QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).first()
             if tool is None:
                 raise serializers.ValidationError(_("Tool not found"))
-            if tool.template_id is None and tool.icon != "":
-                QuerySet(File).filter(id=tool.icon.split("/")[-1]).delete()
+            delete_tool_icon(tool.icon, tool.id)
             if tool.tool_type == ToolType.SKILL:
                 QuerySet(File).filter(id=tool.code).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=tool.id).delete()
@@ -1165,6 +1165,7 @@ class ToolSerializer(serializers.Serializer):
             if not query_set.exists():
                 raise AppApiException(500, _("Tool id does not exist"))
 
+        @transaction.atomic
         def edit(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -1172,8 +1173,7 @@ class ToolSerializer(serializers.Serializer):
             if tool is None:
                 raise AppApiException(500, _("Function does not exist"))
             # 删除旧的图片
-            if tool.icon != "":
-                QuerySet(File).filter(id=tool.icon.split("/")[-1]).delete()
+            delete_tool_icon(tool.icon, tool.id)
             if self.data.get("image") is None:
                 tool.icon = ""
             else:
@@ -1312,6 +1312,7 @@ class ToolSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         tool_id = serializers.CharField(required=True, label=_("tool id"))
 
+        @transaction.atomic
         def add(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -1346,7 +1347,7 @@ class ToolSerializer(serializers.Serializer):
                 desc=tool_data.get("desc"),
                 code=tool_data.get("code"),
                 user_id=self.data.get("user_id"),
-                icon=instance.get("icon", ""),
+                icon=download_tool_icon(instance.get("icon"), tool_id),
                 workspace_id=self.data.get("workspace_id"),
                 input_field_list=tool_data.get("input_field_list", []),
                 init_field_list=tool_data.get("init_field_list", []),
@@ -1386,6 +1387,7 @@ class ToolSerializer(serializers.Serializer):
         icon = serializers.CharField(required=True, label=_("icon"), allow_null=True, allow_blank=True)
         versions = serializers.ListField(required=True, label=_("versions"), child=serializers.DictField())
 
+        @transaction.atomic
         def update_tool(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -1422,7 +1424,9 @@ class ToolSerializer(serializers.Serializer):
             tool.code = tool_data.get("code")
             tool.input_field_list = tool_data.get("input_field_list", [])
             tool.init_field_list = tool_data.get("init_field_list", [])
-            tool.icon = self.data.get("icon", tool.icon)
+            old_icon = tool.icon
+            tool.icon = download_tool_icon(self.data.get("icon"), tool.id)
+            delete_tool_icon(old_icon, tool.id)
             tool.version = version_name
             # tool.is_active = False
             tool.save()
@@ -1663,8 +1667,7 @@ class ToolBatchOperateSerializer(serializers.Serializer):
         tool_query_set = QuerySet(Tool).filter(id__in=id_list, workspace_id=workspace_id)
 
         for tool in tool_query_set:
-            if tool.template_id is None and tool.icon != "":
-                QuerySet(File).filter(id=tool.icon.split("/")[-1]).delete()
+            delete_tool_icon(tool.icon, tool.id)
             if tool.tool_type == ToolType.SKILL:
                 QuerySet(File).filter(id=tool.code).delete()
 
