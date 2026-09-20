@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { Setting } from '@element-plus/icons-vue'
 import type { PortalSetting, PortalSettingPayload } from '@/api/types'
 import { MsgError } from '@/utils/message'
 
@@ -63,7 +62,7 @@ defineExpose({ open })
 <template>
   <!-- 配置身份认证 -->
   <el-button text type="primary" title="身份认证设置" :disabled="saving" @click="handleOpenAuthSetting">
-    <MkIcon :icon="Setting" />
+    <MkIcon name="icon-setting" />
   </el-button>
   <MkDialog v-model="authVisible" title="身份认证设置" :show-close="!saving" @closed="handleClosed">
     <el-form label-position="top" :disabled="saving" @submit.prevent>

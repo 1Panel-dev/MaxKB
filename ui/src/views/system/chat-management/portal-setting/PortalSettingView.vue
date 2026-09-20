@@ -38,15 +38,15 @@ const portalApiUrl = new URL('/api/portal', window.location.origin).href
 
 /* 接口尚未接入，页面使用默认配置；保存回填时保留现有配置对象。 */
 function savePortalSetting(payload: PortalSettingPayload | FormData) {
-  saving.value = true
-  return PortalApi.putPortalSetting(payload)
-    .then((setting) => {
-      Object.assign(portalSetting, setting)
-      MsgSuccess('保存成功')
-    })
-    .finally(() => {
-      saving.value = false
-    })
+  // saving.value = true
+  // return PortalApi.putPortalSetting(payload)
+  //   .then((setting) => {
+  //     Object.assign(portalSetting, setting)
+  //     MsgSuccess('保存成功')
+  //   })
+  //   .finally(() => {
+  //     saving.value = false
+  //   })
 }
 
 function handleAccessChange(field: AccessField, value: string | number | boolean) {
@@ -60,10 +60,10 @@ function handleAccessChange(field: AccessField, value: string | number | boolean
 }
 
 /* 编辑草稿预览与认证入口联动 */
-const editPortalButtonRef = useTemplateRef<InstanceType<typeof ButtonEditPortal>>('editPortalButtonRef')
+
 const authSettingButtonRef = useTemplateRef<InstanceType<typeof ButtonPortalAuthSetting>>('authSettingButtonRef')
-const previewName = computed(() => editPortalButtonRef.value?.preview?.name ?? portalSetting.name)
-const previewLogo = computed(() => editPortalButtonRef.value?.preview?.logo ?? portalSetting.logo)
+const previewName = computed(() => portalSetting.name)
+const previewLogo = computed(() => portalSetting.logo)
 </script>
 
 <template>

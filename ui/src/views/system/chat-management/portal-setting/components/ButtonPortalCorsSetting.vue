@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Setting } from '@element-plus/icons-vue'
 
 defineProps<{ disabled?: boolean }>()
 
@@ -14,7 +13,7 @@ function handleOpenCorsSetting() {
 <template>
   <!-- 查看跨域配置说明 -->
   <el-button text type="primary" title="跨域设置" :disabled="disabled" @click="handleOpenCorsSetting">
-    <MkIcon :icon="Setting" />
+     <MkIcon name="icon-setting" />
   </el-button>
   <MkDialog v-model="corsVisible" title="跨域设置" :width="480">
     <p class="text-N600">跨域访问配置暂未开放，请联系管理员配置允许访问的来源。</p>
