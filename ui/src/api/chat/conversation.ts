@@ -17,6 +17,10 @@ const postResumeConversationMessage = (chatId: string, chatRecordId: string) =>
 /** 获取历史会话分页。 */
 const getConversationPage = (page: number, size: number) => get(`/historical_conversation/${page}/${size}`)
 
+/** 获取单条会话记录详情(含执行详情 execution_details、知识来源、tokens、耗时)。 */
+const getConversationRecordDetail = (chatId: string, chatRecordId: string) =>
+  get(`/historical_conversation/${chatId}/record/${chatRecordId}`)
+
 /** 获取会话记录分页。 */
 const getConversationRecordPage = (chatId: string, page: number, size: number) => get(`/historical_conversation_record/${chatId}/${page}/${size}`)
 
@@ -35,6 +39,7 @@ export default {
   postCancelConversationMessage,
   postResumeConversationMessage,
   getConversationPage,
+  getConversationRecordDetail,
   getConversationRecordPage,
   deleteConversation,
   putConversation,

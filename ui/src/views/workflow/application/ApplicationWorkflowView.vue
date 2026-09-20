@@ -15,7 +15,7 @@ import ButtonDefaultModelSetting from '../components/default-model-setting/Butto
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonPublishHistory from './ButtonPublishHistory.vue'
 import ButtonTemplateStore from './ButtonTemplateStore.vue'
-import DebugPanel from './debug/DebugPanel.vue'
+import DebugPanel from '@/conversation-panel/view/debug/index.vue'
 import EditPublishVersionDialog from '../components/publish-history/EditPublishVersionDialog.vue'
 import { getResourceScope } from '@/utils/resource-context.ts'
 import { goBack } from './navigation'

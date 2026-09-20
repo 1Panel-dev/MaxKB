@@ -4,10 +4,10 @@ import { cloneDeep } from 'lodash'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type { ToolWorkflowRecord } from '@/api/types'
 import { MsgError } from '@/utils/message'
-import { ConversationStream } from '@/conversation-panel/stream'
-import { aggregators } from '@/conversation-panel'
-import ContentList from '@/conversation-panel/content-list/index.vue'
-import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
+import { ConversationStream } from '@/conversation-panel/core/stream'
+import { aggregators } from '@/conversation-panel/core/aggregators'
+import ContentList from '@/conversation-panel/components/content-list/index.vue'
+import ExecutionDetailContent from '@/workflow-canvas/details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'ToolWorkflowDebugResultDrawer' })
@@ -70,6 +70,7 @@ async function execute(extra: Record<string, unknown> = {}) {
     if (!response.body) throw new Error('未收到调试响应')
     let streamError: unknown
     stream = new ConversationStream(response, receiveChunk, (error?: unknown) => {
+      console.log(error)
       if (error) streamError = error
       running.value = false
     })
