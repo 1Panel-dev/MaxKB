@@ -1,6 +1,11 @@
 /** 系统「首页」按钮权限 → $perm.homepage.* */
 
-import { canSys } from '../../policy'
-import { PermissionConstants as P } from '../../core'
+import { PermissionConstants as P, hasPermission, RoleConstants, Compare} from '../../core'
 
-export default { read: () => canSys(P.HOMEPAGE_READ), export: () => canSys(P.HOMEPAGE_EXPORT) }
+export default {
+  /**
+   * 系统「首页」只读权限
+   */
+  read: () => hasPermission([RoleConstants.ADMIN,P.HOMEPAGE_READ],Compare.OR),
+  export: () => hasPermission([RoleConstants.ADMIN,P.HOMEPAGE_EXPORT],Compare.OR)
+}

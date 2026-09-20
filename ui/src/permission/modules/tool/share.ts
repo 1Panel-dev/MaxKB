@@ -1,7 +1,8 @@
 /** 系统「共享工具」按钮权限（系统 > 共享 > 工具）。全局判定，无 id。 */
 
 import { canSys } from '../../policy'
-import { PermissionConstants as P } from '../../core'
+import { PermissionConstants as P,hasEdition} from '../../core'
+import { Edition } from '@/permission/core/common'
 
 const share = {
   // —— 共享页不提供 ——
@@ -21,7 +22,10 @@ const share = {
   folderAuth: () => false,
   folderManage: () => false,
 
-  read: () => canSys(P.SHARED_TOOL_READ),
+  /**
+   * 系统「共享工具」（系统 > 共享 > 工具）只读权限
+   */
+  read: () => canSys(P.SHARED_TOOL_READ) && hasEdition(Edition.PE),
 
   // —— 工具资源 ——
   create: () => canSys(P.SHARED_TOOL_CREATE),

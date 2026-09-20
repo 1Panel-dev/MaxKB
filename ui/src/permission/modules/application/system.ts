@@ -4,7 +4,8 @@
  */
 
 import { canSys } from '../../policy'
-import { PermissionConstants as P } from '../../core'
+import { PermissionConstants as P,hasEdition} from '../../core'
+import { Edition } from '@/permission/core/common'
 
 const system = {
   // —— 系统页不提供的操作 ——
@@ -53,7 +54,10 @@ const system = {
   chatLogAddKnowledge: () => canSys(P.RESOURCE_APPLICATION_CHAT_LOG_ADD_KNOWLEDGE),
 
   // —— 组合：跳转/进入应用 ——
-  jumpRead: () => canSys(P.RESOURCE_APPLICATION_OVERVIEW_READ) || canSys(P.RESOURCE_APPLICATION_READ),
+  /**
+   * 系统「应用资源管理」（系统 > 资源管理 > 应用）进入权限
+   * */
+  jumpRead: () => canSys(P.RESOURCE_APPLICATION_READ) && hasEdition(Edition.PE),
 }
 
 export default system

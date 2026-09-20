@@ -1,7 +1,8 @@
 /** 系统「知识库资源管理」按钮权限（系统 > 资源管理 > 知识库）。全局判定，无 id。 */
 
 import { canSys } from '../../policy'
-import { PermissionConstants as P } from '../../core'
+import { PermissionConstants as P,hasEdition} from '../../core'
+import { Edition } from '@/permission/core/common'
 
 const system = {
   // —— 系统页不提供 ——
@@ -75,7 +76,10 @@ const system = {
   knowledgeChatUserEdit: () => canSys(P.RESOURCE_KNOWLEDGE_CHAT_USER_EDIT),
 
   // —— 组合：进入知识库 ——
-  jumpRead: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ),
+  /**
+   * 系统「知识库资源管理」（系统 > 资源管理 > 知识库）进入权限
+   * */
+  jumpRead: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ) && hasEdition(Edition.PE),
 }
 
 export default system

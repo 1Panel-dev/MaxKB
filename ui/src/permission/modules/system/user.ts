@@ -4,6 +4,9 @@ import { canSys } from '../../policy'
 import { PermissionConstants as P } from '../../core'
 
 export default {
+  /**
+   * 系统「用户管理」只读权限
+   * */
   read: () => canSys(P.USER_READ),
   create: () => canSys(P.USER_CREATE),
   edit: () => canSys(P.USER_EDIT),

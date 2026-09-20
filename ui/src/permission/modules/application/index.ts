@@ -3,4 +3,8 @@
 import workspace from './workspace'
 import system from './system'
 
-export default { workspace, system }
+export default { workspace,
+  /**
+   * 系统「应用」权限
+   * */
+  system }

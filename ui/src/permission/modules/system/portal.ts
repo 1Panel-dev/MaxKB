@@ -3,4 +3,8 @@
 import { canSys } from '../../policy'
 import { PermissionConstants as P } from '../../core'
 
-export default { read: () => canSys(P.PORTAL_READ), edit: () => canSys(P.PORTAL_EDIT) }
+export default {
+  /**
+   * 系统「门户访问设置」只读权限
+   */
+  read: () => canSys(P.PORTAL_READ), edit: () => canSys(P.PORTAL_EDIT) }
