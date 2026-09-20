@@ -42,9 +42,10 @@ class INode:
     # 序列化校验器
     serializer_class: Optional[Type[serializers.Serializer]] = None
 
-    @staticmethod
-    def is_valid(data):
-        INode.serializer_class(data=data).is_valid(raise_exception=True)
+    @classmethod
+    def is_valid(cls, data):
+        if cls.serializer_class:
+            cls.serializer_class(data=data).is_valid(raise_exception=True)
 
     def __init__(self, node, workflow_manage, get_node_parameters: Callable[[Node], dict]):
         self.node = node

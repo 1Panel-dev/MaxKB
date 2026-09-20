@@ -41,6 +41,7 @@ from common.utils.tool_code import ToolExecutor
 from knowledge.models import File
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
+from common.exception.app_exception import AppApiException
 
 
 class AgentCallBack:
@@ -97,6 +98,15 @@ class ChatNodeSerializer(serializers.Serializer):
     video_list = serializers.ListField(required=False, label=_("video"))
     image_list = serializers.ListField(required=False, label=_("picture"))
     vision = serializers.BooleanField(required=False, default=False, label=_("vision"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        # reference / default 在运行时才解析,此处只校验自定义模型
+        if (self.data.get("model_id_type") or "custom") in ("reference", "default"):
+            return
+        model_id = self.data.get("model_id")
+        if not model_id or not QuerySet(Model).filter(id=model_id).exists():
+            raise AppApiException(500, _("The model of the node does not exist"))
 
 
 def _get_default_model_params_setting(model_id):
@@ -639,7 +649,7 @@ class AIChatNode(INode):
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
         aggregation = AggregationManager()
-        for m in self.data.get("messages"):
+        for m in self.data.get("messages") or []:
             aggregation.aggregate(m)
         messages = aggregation.get_contents()
         details.update(

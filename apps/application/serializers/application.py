@@ -21,7 +21,7 @@ from typing import Dict, List
 
 import requests
 import uuid_utils.compat as uuid
-from application.workflow.common import new_instance
+from application.workflow.common import new_instance, WorkflowType
 from application.long_term_memory import schedule_extract_long_term_memory
 from application.models.application import Application, ApplicationFolder, ApplicationTypeChoices, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
@@ -1278,7 +1278,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             work_flow = application.work_flow
             if work_flow is None:
                 raise AppApiException(500, _("work_flow is a required field"))
-            new_instance(work_flow).is_valid()
+            new_instance(work_flow).is_valid(workflow_type=WorkflowType.APPLICATION)
             base_node = get_base_node_work_flow(work_flow)
             if base_node is not None:
                 node_data = base_node.get("properties").get("node_data")
