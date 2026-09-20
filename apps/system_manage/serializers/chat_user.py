@@ -14,12 +14,13 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.constants.exception_code_constants import ExceptionCodeConstants
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import password_encrypt
 from common.utils.rsa_util import decrypt
 from system_manage.models import ChatUser, UserGroup, UserGroupRelation
-from system_manage.models.chat_user_token_quota import ChatUserTokenQuota
+from system_manage.models.chat_user_token_quota import ChatUserTokenQuota, QuotaType
 from users.serializers.user import PASSWORD_REGEX
 
 
@@ -39,6 +40,28 @@ def add_or_edit_user_group_relation(user, user_group_ids):
         raise AppApiException(500, _("Some user groups do not exist"))
 
     UserGroupRelation.objects.bulk_create([UserGroupRelation(user=user, group=group) for group in groups])
+
+
+def build_token_quota(quota: ChatUserTokenQuota, now=None) -> dict:
+    """
+    将配额记录投影为前端使用的 token_quota 结构
+    按周期配额在读取时滚动计算有效值，不落库
+    """
+    now = now or timezone.now()
+    effective_used = quota.used_tokens
+    effective_period_end = quota.period_end
+    if quota.quota_type == QuotaType.PERIODIC and quota.period_end and now >= quota.period_end:
+        effective_used = 0
+        delta_kwargs = {f"{quota.period_type.lower()}s": quota.period_value}
+        while effective_period_end <= now:
+            effective_period_end += relativedelta(**delta_kwargs)
+    return {
+        "quota_type": quota.quota_type,
+        "used_tokens": effective_used,
+        "token_limit": quota.token_limit,
+        "total_tokens": quota.total_tokens,
+        "period_end": effective_period_end.isoformat() if effective_period_end else None,
+    }
 
 
 class ChatUserSerializer(serializers.Serializer):
@@ -152,28 +175,14 @@ class ChatUserSerializer(serializers.Serializer):
                 user.update(user_groups_map.get(str(user["id"]), {"user_group_ids": [], "user_group_names": []}))
 
             # 合并 Token 配额数据
-            quotas = ChatUserTokenQuota.objects.filter(user_id__in=user_ids)
-            now = timezone.now()
-            quota_map = {}
-            for q in quotas:
-                effective_used = q.used_tokens
-                effective_period_end = q.period_end
-                if q.quota_type == "PERIODIC" and q.period_end and now >= q.period_end:
-                    effective_used = 0
-                    effective_period_end = q.period_end
-                    delta_kwargs = {f"{q.period_type.lower()}s": q.period_value}
-                    while effective_period_end <= now:
-                        effective_period_end += relativedelta(**delta_kwargs)
-                quota_map[str(q.user_id)] = {
-                    "quota_type": q.quota_type,
-                    "used_tokens": effective_used,
-                    "token_limit": q.token_limit,
-                    "total_tokens": q.total_tokens,
-                    "period_end": effective_period_end.isoformat() if effective_period_end else None,
-                }
-            for user in result["records"]:
-                quota = quota_map.get(str(user["id"]), None)
-                user["token_quota"] = quota
+            license_is_valid = DatabaseModelManage.get_model("license_is_valid") or (lambda: False)
+            license_is_valid = license_is_valid() if license_is_valid() is not None else False
+            if license_is_valid:
+                quotas = ChatUserTokenQuota.objects.filter(user_id__in=user_ids)
+                now = timezone.now()
+                quota_map = {str(q.user_id): build_token_quota(q, now) for q in quotas}
+                for user in result["records"]:
+                    user["token_quota"] = quota_map.get(str(user["id"]))
 
             return result
 
@@ -670,10 +679,24 @@ class ChatUserProfileSerializer(serializers.Serializer):
         """
         if not user:
             return {}
+        license_is_valid = DatabaseModelManage.get_model("license_is_valid") or (lambda: False)
+        license_is_valid = license_is_valid() if license_is_valid() is not None else False
+        token_quota = None
+        if license_is_valid:
+            quota = ChatUserTokenQuota.objects.filter(user_id=str(user.id)).first()
+            if quota:
+                quota_detail = build_token_quota(quota)
+                token_quota = {
+                    "quota_type": quota_detail["quota_type"],
+                    "used_tokens": quota_detail["used_tokens"],
+                    "token_limit": quota_detail["token_limit"],
+                    "total_tokens": quota_detail["total_tokens"],
+                }
         return {
             "id": user.id,
             "username": user.username,
             "nick_name": user.nick_name,
             "email": user.email,
             "source": user.source,
+            "token_quota": token_quota,
         }
