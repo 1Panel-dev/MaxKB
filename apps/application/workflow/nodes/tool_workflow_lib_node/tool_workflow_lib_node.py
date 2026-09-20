@@ -19,7 +19,7 @@ from application.workflow.i_node import INode, Signal
 from application.workflow.message.struct.content import Position
 from application.workflow.status import Status
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.exception.app_exception import ChatException
+from common.exception.app_exception import ChatException, AppApiException
 from common.field.common import ObjectField
 from tools.models import Tool, ToolType, ToolWorkflowVersion
 
@@ -43,7 +43,9 @@ class ToolWorkflowLibNodeSerializer(serializers.Serializer):
         # 归还链接到连接池
         connection.close()
         if f_lib is None:
-            raise Exception(_("The function has been deleted"))
+            raise AppApiException(500, _("Tool has been deleted"))
+        if not f_lib.is_active:
+            raise AppApiException(500, _("Tool is not active"))
 
 
 def valid_function(tool_lib, workspace_id):
