@@ -1870,14 +1870,14 @@ class PermissionConstants(Enum):
 
     # ==================== 对话用户认证 ====================
     CHAT_USER_AUTH_READ = (
-        Permission(group=Group.CHAT_USER_GROUP, sub_group=Group.CHAT_USER_GROUP, operate=Operate.READ, bit_index=6),
+        Permission(group=Group.CHAT_USER_AUTH, sub_group=Group.CHAT_USER_AUTH, operate=Operate.READ, bit_index=0),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN], category=Category.CHAT_CLIENT, scope=[PermissionScopeConstants.SYSTEM]
         ),
     )
 
     CHAT_USER_AUTH_EDIT = (
-        Permission(group=Group.CHAT_USER_AUTH, sub_group=Group.CHAT_USER_AUTH, operate=Operate.EDIT, bit_index=0),
+        Permission(group=Group.CHAT_USER_AUTH, sub_group=Group.CHAT_USER_AUTH, operate=Operate.EDIT, bit_index=1),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN], category=Category.CHAT_CLIENT, scope=[PermissionScopeConstants.SYSTEM]
         ),
