@@ -12,6 +12,7 @@ from functools import reduce
 
 import requests
 import uuid_utils.compat as uuid
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage, AIMessage
 from rest_framework import serializers
@@ -21,8 +22,10 @@ from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
+from common.exception.app_exception import AppApiException
 from common.utils.common import bytes_to_uploaded_file
 from knowledge.models import FileSourceType
+from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from oss.serializers.file import FileSerializer
 
@@ -43,6 +46,15 @@ class ImageGenerateNodeSerializer(serializers.Serializer):
     dialogue_type = serializers.CharField(required=False, default="NODE", label=_("Conversation storage type"))
     is_result = serializers.BooleanField(required=False, label=_("Whether to return content"))
     model_params_setting = serializers.JSONField(required=False, default=dict, label=_("Model parameter settings"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        # reference / default 在运行时才解析,此处只校验自定义模型
+        if (self.data.get("model_id_type") or "custom") in ("reference", "default"):
+            return
+        model_id = self.data.get("model_id")
+        if not model_id or not QuerySet(Model).filter(id=model_id).exists():
+            raise AppApiException(500, _("The model of the node does not exist"))
 
 
 class ImageGenerateNode(INode):

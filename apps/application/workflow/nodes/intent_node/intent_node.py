@@ -12,6 +12,7 @@ from rest_framework import serializers
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.status import Status
+from common.exception.app_exception import AppApiException
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id, get_model_credential
 from .prompt_template import PROMPT_TEMPLATE
@@ -33,6 +34,15 @@ class IntentNodeSerializer(serializers.Serializer):
     dialogue_number = serializers.IntegerField(required=True, label=_("Number of multi-round conversations"))
     model_params_setting = serializers.DictField(required=False, label=_("Model parameter settings"))
     branch = IntentBranchSerializer(many=True)
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        # reference / default 在运行时才解析,此处只校验自定义模型
+        if (self.data.get("model_id_type") or "custom") in ("reference", "default"):
+            return
+        model_id = self.data.get("model_id")
+        if not model_id or not QuerySet(Model).filter(id=model_id).exists():
+            raise AppApiException(500, _("The model of the node does not exist"))
 
 
 def _get_default_model_params_setting(model_id):
