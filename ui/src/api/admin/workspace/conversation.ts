@@ -29,6 +29,10 @@ const getConversationPage = (page: number, size: number, applicationId?: string)
   return get(`/workspace/${wsId}/historical_conversation/${page}/${size}`)
 }
 
+ 
+const getConversationRecordDetail = (chatId: string, chatRecordId: string, applicationId?: string) =>
+  get(`/workspace/${getWorkspaceId()}/application/${applicationId}/chat/${chatId}/chat_record/${chatRecordId}`)
+
 /** 获取会话记录分页。 */
 const getConversationRecordPage = (chatId: string, page: number, size: number, applicationId?: string) => {
   const wsId = getWorkspaceId()
@@ -66,6 +70,7 @@ export default {
   postCancelConversationMessage,
   postResumeConversationMessage,
   getConversationPage,
+  getConversationRecordDetail,
   getConversationRecordPage,
   deleteConversation,
   putConversation,

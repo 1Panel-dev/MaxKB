@@ -6,7 +6,7 @@ import ChatInput from '@/conversation-panel/chat-input/index.vue'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ModelItem, ModelProviderItem, PromptGenerateMessage, PromptGeneratePayload } from '@/api/types'
 import { MsgError } from '@/utils/message'
-import { ConversationStream } from '@/conversation-panel/stream'
+import { ConversationStream } from "@/conversation-panel/core/stream";
 defineOptions({ name: 'AiChatNodePromptGenerate' })
 const props = defineProps<{
   modelId: string

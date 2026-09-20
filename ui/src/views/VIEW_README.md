@@ -635,9 +635,10 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 
 ## 智能体工作流调试
 
-`workflow/application/debug/DebugPanel.vue` 封装调试对话、面板显隐、放大/还原及局部样式，
-通过 `open()`、`close()` 控制，关闭时重置放大状态。对话内容只在面板打开时挂载，保留关闭动画。
-`ApplicationWorkflowView` 直接渲染调试按钮和 `<DebugPanel ref="debugPanelRef" />`，
+调试对话面板已内聚到会话模块:`@/conversation-panel/view/debug/index.vue` 自带面板显隐、
+放大/还原(放大/关闭按钮由 `@/conversation-panel/components/header/debug/index.vue` 提供)及局部样式，
+通过 `open()`、`close()` 控制,关闭时重置放大状态,保留关闭动画。
+`ApplicationWorkflowView` 直接渲染调试按钮和 `<DebugPanel ref="debugPanelRef" />`(即上述 debug 视图),
 通过 `handleDebug` 在存在未保存改动时先保存，成功后调用面板的 `open()`。
 打开模板中心或默认模型设置时，页面调用 `close()` 关闭调试。
 
