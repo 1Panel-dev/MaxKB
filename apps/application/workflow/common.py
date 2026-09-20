@@ -10,6 +10,8 @@
 from enum import Enum
 from typing import List, Dict
 
+from django.utils.translation import gettext as _
+from common.exception.app_exception import AppApiException
 from common.utils.common import group_by
 
 
@@ -106,6 +108,15 @@ class NodeField:
         return prompt
 
 
+class WorkflowType(Enum):
+    # 应用
+    APPLICATION = "APPLICATION"
+    # 知识库
+    KNOWLEDGE = "KNOWLEDGE"
+    # 工具
+    TOOL = "TOOL"
+
+
 class Workflow:
     """
     节点列表
@@ -194,17 +205,39 @@ class Workflow:
             prompt = node_field.reset_variable(prompt)
         return prompt
 
-    def is_valid(self):
-        pass
+    def is_valid(self, workflow_type: WorkflowType):
+        """
+        校验工作流数据:一趟遍历同时统计节点id出现次数、校验每个节点的参数
+        """
+        start_node_list = []
+        for node in self.nodes:
+            if node.id == "start-node":
+                start_node_list.append(node)
+            self.is_valid_node(node, workflow_type)
+        self.is_valid_start_node(start_node_list)
 
+    def is_valid_start_node(self, start_node_list: List[Node]):
+        """
+        校验开始节点:有且只有一个 start-node
+        """
+        if len(start_node_list) == 0:
+            raise AppApiException(500, _("The starting node is required"))
+        if len(start_node_list) > 1:
+            raise AppApiException(500, _("There can only be one starting node"))
 
-class WorkflowType(Enum):
-    # 应用
-    APPLICATION = "APPLICATION"
-    # 知识库
-    KNOWLEDGE = "KNOWLEDGE"
-    # 工具
-    TOOL = "TOOL"
+    def is_valid_node(self, node: Node, workflow_type: WorkflowType = WorkflowType.APPLICATION):
+        """
+        校验单个节点:交给该节点类型对应的序列化器
+        """
+        from application.workflow.nodes import node_map
+
+        node_class = node_map.get(node.type, {}).get(workflow_type)
+        if node_class is None or node_class.serializer_class is None:
+            return
+        try:
+            node_class.serializer_class(data=get_node_parameters(node)).is_valid(raise_exception=True)
+        except AppApiException as e:
+            raise AppApiException(500, f"{node.properties.get('stepName')}:{e.message}")
 
 
 def new_instance(flow_obj: Dict, workflow_type: WorkflowType = WorkflowType.APPLICATION):

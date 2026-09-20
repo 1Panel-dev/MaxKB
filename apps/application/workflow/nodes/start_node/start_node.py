@@ -36,7 +36,6 @@ class ApplicationSerializer(serializers.Serializer):
 
 
 class StarNode(INode):
-    serializer_class = ApplicationSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION]
     type = "start-node"
 
