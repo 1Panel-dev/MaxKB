@@ -193,3 +193,4 @@ tmp/
 config.yml
 .SANDBOX_BANNED_HOSTS
 copilot-instructions.md
+.ai/
