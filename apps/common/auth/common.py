@@ -10,8 +10,9 @@ import hashlib
 import json
 import threading
 
-from django.core import signing, cache
+from django.core import cache
 
+from common import signing
 from common.constants.cache_version import Cache_Version
 from common.utils.rsa_util import encrypt, decrypt
 

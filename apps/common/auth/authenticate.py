@@ -10,11 +10,11 @@ from importlib import import_module
 
 from django.conf import settings
 from django.core import cache
-from django.core import signing
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.extensions import OpenApiAuthenticationExtension
 from rest_framework.authentication import TokenAuthentication
 
+from common import signing
 from common.exception.app_exception import AppAuthenticationFailed, AppEmbedIdentityFailed, AppChatNumOutOfBoundsFailed, \
     AppApiException
 from common.utils.logger import maxkb_logger
