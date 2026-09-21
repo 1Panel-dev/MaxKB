@@ -25,6 +25,7 @@ export default {
     sendMessage: 'Successful',
     vectorizationSuccess: 'Successful',
     nameMessage: 'Document name cannot be empty!',
+    nameInvalidCharacters: 'Document name cannot contain the following characters: : \\ / ? * [ ]',
     importMessage: 'Successful',
     migrationSuccess: 'Successful',
     replaceSuccess: 'Successful',
