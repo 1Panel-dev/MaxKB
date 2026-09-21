@@ -419,7 +419,9 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 ## 备注要求
 
 门户设置的 `components/ButtonEditPortal.vue`、`ButtonPortalAuthSetting.vue` 和
-`ButtonPortalCorsSetting.vue` 分别封装对应按钮、浮层及表单状态。认证组件使用 `MkDrawer`，
+`ButtonPortalCorsSetting.vue` 分别封装对应按钮、浮层及表单状态，通过 `disabled` 接收页面统一的
+编辑限制。页面使用 `perm.system.portal.edit()` 判断门户编辑权限，无权限时禁用配置、复制按钮、
+访问开关及浮层表单和按钮，保存入口同步校验权限。认证组件使用 `MkDrawer`，
 打开时与系统 `LoginSetting` 共用 `AuthSettingApi.getLoginSetting()`，通过返回的 `login_methods`
 生成登录方式选项，复用登录方式标签，初始保留账号登录。提供默认登录方式及验证码与账号锁定设置；默认方式
 仅可选已勾选项，取消勾选当前默认项时回退到首个可选项。认证组件暴露 `open()` 供首次开启认证

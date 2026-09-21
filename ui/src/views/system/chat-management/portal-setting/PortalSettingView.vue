@@ -6,6 +6,7 @@ import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
 import { copyText } from '@/utils/clipboard'
 import { resetUrl } from '@/utils/icon'
 import { MsgSuccess } from '@/utils/message'
+import { perm } from '@/permission'
 import PortalPreview from './components/PortalPreview.vue'
 import ButtonEditPortal from './components/ButtonEditPortal.vue'
 import ButtonPortalAuthSetting from './components/ButtonPortalAuthSetting.vue'
@@ -49,6 +50,8 @@ function loadPortalSetting() {
 
 /* 保存门户配置：接口返回完整配置，成功后整体回填作为页面唯一数据来源 */
 function savePortalSetting(payload: PortalSettingPayload | FormData): Promise<void> {
+  if (!canEditPortal.value || saving.value) return Promise.resolve()
+
   saving.value = true
   return PortalApi.putPortalSetting(payload)
     .then((setting) => {
@@ -61,7 +64,7 @@ function savePortalSetting(payload: PortalSettingPayload | FormData): Promise<vo
 }
 
 function handleAccessChange(field: AccessField, value: string | number | boolean) {
-  if (saving.value) return
+  if (!canEditPortal.value || saving.value) return
   if (field === 'enable_auth' && value && !portalSetting.auth_config.login_value?.length) {
     handleOpenAuthSetting(true)
     return
@@ -81,6 +84,8 @@ function savePortalCorsSetting(origins: string[]) {
 }
 
 function handleOpenAuthSetting(enableAfterSave = false) {
+  if (!canEditPortal.value || saving.value) return
+
   authSettingButtonRef.value?.open(enableAfterSave)
 }
 
@@ -97,6 +102,9 @@ const previewName = computed(() => portalSetting.name)
 const previewLogo = computed(() => resetUrl(portalSetting.logo))
 
 onMounted(() => loadPortalSetting())
+
+// 权限 控制
+const canEditPortal = computed(() => perm.system.portal.edit())
 </script>
 
 <template>
@@ -111,7 +119,7 @@ onMounted(() => loadPortalSetting())
               <h4 class="truncate" :title="previewName">{{ previewName }}</h4>
             </div>
             <!-- 编辑门户名称与 Logo -->
-            <ButtonEditPortal :setting="portalSetting" :saving="saving" :save="savePortalSetting" />
+            <ButtonEditPortal :setting="portalSetting" :saving="saving" :disabled="!canEditPortal" :save="savePortalSetting" />
           </div>
         </el-card>
         <el-card shadow="never">
@@ -122,6 +130,7 @@ onMounted(() => loadPortalSetting())
               <div class="flex-between mb-2 gap-2">
                 <span>门户公开访问链接</span>
                 <el-switch
+                  :disabled="!canEditPortal || saving"
                   :model-value="portalSetting.enable_public_access"
                   size="small"
                   @change="handleAccessChange('enable_public_access', $event)"
@@ -130,7 +139,7 @@ onMounted(() => loadPortalSetting())
               <el-input :model-value="portalAccessUrl" readonly>
                 <template #suffix>
                   <!-- 复制门户公开访问链接 -->
-                  <el-button text @click="copyText(portalAccessUrl)" class="-mr-1">
+                  <el-button text :disabled="!canEditPortal" @click="copyText(portalAccessUrl)" class="-mr-1">
                     <MkIcon name="icon_copy_outlined" class="text-N600" />
                   </el-button>
                 </template>
@@ -140,12 +149,17 @@ onMounted(() => loadPortalSetting())
             <div>
               <div class="flex-between mb-2 gap-2">
                 <span>智能体后端 API 访问</span>
-                <el-switch :model-value="portalSetting.enable_api" size="small" @change="handleAccessChange('enable_api', $event)" />
+                <el-switch
+                  :disabled="!canEditPortal || saving"
+                  :model-value="portalSetting.enable_api"
+                  size="small"
+                  @change="handleAccessChange('enable_api', $event)"
+                />
               </div>
               <el-input :model-value="portalApiUrl" readonly>
                 <template #suffix>
                   <!-- 复制智能体后端 API 访问 -->
-                  <el-button text @click="copyText(portalApiUrl)" class="-mr-1">
+                  <el-button text :disabled="!canEditPortal" @click="copyText(portalApiUrl)" class="-mr-1">
                     <MkIcon name="icon_copy_outlined" class="text-N600" />
                   </el-button>
                 </template>
@@ -156,6 +170,7 @@ onMounted(() => loadPortalSetting())
               <div class="flex-between mb-2 gap-2">
                 <span>知识库后端 API 检索</span>
                 <el-switch
+                  :disabled="!canEditPortal || saving"
                   :model-value="portalSetting.enable_knowledge_base_api"
                   size="small"
                   @change="handleAccessChange('enable_knowledge_base_api', $event)"
@@ -164,7 +179,7 @@ onMounted(() => loadPortalSetting())
               <el-input :model-value="portalApiUrl" readonly>
                 <template #suffix>
                   <!-- 复制知识库后端 API 检索 -->
-                  <el-button text @click="copyText(portalApiUrl)" class="-mr-1">
+                  <el-button text :disabled="!canEditPortal" @click="copyText(portalApiUrl)" class="-mr-1">
                     <MkIcon name="icon_copy_outlined" class="text-N600" />
                   </el-button>
                 </template>
@@ -174,16 +189,32 @@ onMounted(() => loadPortalSetting())
               <span>身份认证</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置身份认证 -->
-                <ButtonPortalAuthSetting ref="authSettingButtonRef" :setting="portalSetting" :saving="saving" :save="savePortalAuthSetting" />
-                <el-switch :model-value="portalSetting.enable_auth" size="small" @change="handleAccessChange('enable_auth', $event)" />
+                <ButtonPortalAuthSetting
+                  ref="authSettingButtonRef"
+                  :setting="portalSetting"
+                  :saving="saving"
+                  :disabled="!canEditPortal"
+                  :save="savePortalAuthSetting"
+                />
+                <el-switch
+                  :disabled="!canEditPortal || saving"
+                  :model-value="portalSetting.enable_auth"
+                  size="small"
+                  @change="handleAccessChange('enable_auth', $event)"
+                />
               </div>
             </div>
             <div class="flex-between gap-2">
               <span>跨域设置</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置跨域地址 -->
-                <ButtonPortalCorsSetting v-model="portalCorsOrigins" :saving="saving" :save="savePortalCorsSetting" />
-                <el-switch :model-value="portalSetting.enable_cors" size="small" @change="handleAccessChange('enable_cors', $event)" />
+                <ButtonPortalCorsSetting v-model="portalCorsOrigins" :saving="saving" :disabled="!canEditPortal" :save="savePortalCorsSetting" />
+                <el-switch
+                  :disabled="!canEditPortal || saving"
+                  :model-value="portalSetting.enable_cors"
+                  size="small"
+                  @change="handleAccessChange('enable_cors', $event)"
+                />
               </div>
             </div>
           </div>

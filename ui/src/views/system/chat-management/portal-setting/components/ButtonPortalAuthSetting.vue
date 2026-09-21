@@ -6,7 +6,7 @@ import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
 import type { LoginMethod, PortalSetting, PortalSettingPayload } from '@/api/types'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 
-const props = defineProps<{ setting: PortalSetting; saving: boolean; save: (payload: PortalSettingPayload) => Promise<void> }>()
+const props = defineProps<{ disabled: boolean; setting: PortalSetting; saving: boolean; save: (payload: PortalSettingPayload) => Promise<void> }>()
 
 /* 登录方式与默认登录方式 */
 const loginMethodOptions = ref<string[]>([LOGIN_METHOD.LOCAL])
@@ -37,6 +37,8 @@ const authRules: FormRules<typeof authForm> = {
 
 /* 抽屉回填与重置，草稿不直接修改门户配置 */
 function open(enableAfterSave = false) {
+  if (props.disabled || props.saving) return
+
   enableAuthAfterSave.value = enableAfterSave
   const config = props.setting.auth_config
   Object.assign(authForm, {
@@ -66,8 +68,10 @@ function handleClosed() {
 
 /* 保存认证配置，仅提交后端读取的字段并保留其余配置 */
 function handleSaveAuthSetting() {
+  if (props.disabled || props.saving || loginMethodsLoading.value) return
+
   authFormRef.value?.validate((valid) => {
-    if (!valid || props.saving || loginMethodsLoading.value) return
+    if (!valid || props.disabled || props.saving || loginMethodsLoading.value) return
     return props
       .save({
         ...(enableAuthAfterSave.value ? { enable_auth: true } : {}),
@@ -90,12 +94,12 @@ defineExpose({ open })
 
 <template>
   <!-- 配置身份认证 -->
-  <el-button text type="primary" title="身份认证设置" :disabled="saving" @click="handleOpenAuthSetting">
+  <el-button text type="primary" title="身份认证设置" :disabled="disabled || saving" @click="handleOpenAuthSetting">
     <MkIcon name="icon_setting" />
   </el-button>
   <MkDrawer v-model="authVisible" title="身份认证设置" @closed="handleClosed">
     <el-form
-      v-loading="loginMethodsLoading"
+      v-loading="loginMethodsLoading || saving"
       ref="authFormRef"
       :model="authForm"
       :rules="authRules"

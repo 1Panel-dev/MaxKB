@@ -25,7 +25,7 @@ defineProps<{ name: string; logo: string | null }>()
         <el-avatar :size="32" class="shrink-0 bg-primary-gradient!">
           <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 54%" />
         </el-avatar>
-        <span>用户名</span>
+        <span>姓名</span>
       </div>
     </div>
     <div class="min-w-0 flex-1 p-6">

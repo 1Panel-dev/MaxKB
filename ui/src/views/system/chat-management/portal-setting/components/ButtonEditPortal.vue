@@ -4,7 +4,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { PortalSetting } from '@/api/types'
 import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 
-const props = defineProps<{ setting: PortalSetting; saving: boolean; save: (payload: FormData) => Promise<void> }>()
+const props = defineProps<{ disabled: boolean; setting: PortalSetting; saving: boolean; save: (payload: FormData) => Promise<void> }>()
 
 /* 门户名称与 Logo */
 const editVisible = ref(false)
@@ -17,6 +17,8 @@ const portalRules: FormRules = {
 }
 
 function handleOpenPortalEdit() {
+  if (props.disabled || props.saving) return
+
   handleClosePortalEdit()
   portalForm.name = props.setting.name
   portalForm.logo = props.setting.logo || ''
@@ -31,9 +33,9 @@ function handleLogoChange(icon: string, file: File | null) {
 }
 
 function handleSavePortalInfo() {
-  if (props.saving) return
+  if (props.disabled || props.saving) return
   portalFormRef.value?.validate((valid) => {
-    if (!valid || props.saving) return
+    if (!valid || props.disabled || props.saving) return
     const payload = new FormData()
     payload.append('name', portalForm.name.trim())
     if (logoChanged.value) payload.append('logo', logoFile.value || '')
@@ -54,14 +56,22 @@ function handleClosePortalEdit() {
 
 <template>
   <!-- 编辑门户名称与 Logo -->
-  <el-button text @click="handleOpenPortalEdit">
+  <el-button text :disabled="disabled || saving" @click="handleOpenPortalEdit">
     <MkIcon name="icon_edit_outlined" />
   </el-button>
   <MkDialog v-model="editVisible" title="编辑" @closed="handleClosePortalEdit">
-    <el-form ref="portalFormRef" :model="portalForm" :rules="portalRules" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form
+      v-loading="saving"
+      ref="portalFormRef"
+      :model="portalForm"
+      :rules="portalRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <el-form-item label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
-          <MkEditAvatar v-model="portalForm.logo" @change="handleLogoChange" :size="32">
+          <MkEditAvatar :editable="!saving" v-model="portalForm.logo" @change="handleLogoChange" :size="32">
             <template #default="{ icon }">
               <PortalIcon :icon="icon" />
             </template>
