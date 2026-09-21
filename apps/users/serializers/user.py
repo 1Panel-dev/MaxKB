@@ -461,7 +461,10 @@ class UserManageSerializer(serializers.Serializer):
                     for user_id, roles in user_role_setting_mapping.items()
                 }
                 result_user_role_workspace_mapping = {
-                    user_id: {role_name: workspace_names for role_name, workspace_names in roles.items()}
+                    user_id: [
+                        {"role_name": role_name, "workspace": workspace_names}
+                        for role_name, workspace_names in roles.items()
+                    ]
                     for user_id, roles in user_role_workspace_mapping.items()
                 }
 
