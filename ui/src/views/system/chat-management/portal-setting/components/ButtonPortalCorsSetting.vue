@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { MsgSuccess } from '@/utils/message'
 
-defineProps<{ disabled?: boolean }>()
+const props = defineProps<{ saving?: boolean; save: (origins: string[]) => Promise<void> }>()
 const allowedOrigins = defineModel<string[]>({ default: () => [] })
 
 /* 跨域地址草稿，取消不修改已保存配置。 */
@@ -16,9 +15,19 @@ function handleOpenCorsSetting() {
   corsVisible.value = true
 }
 
+/* 按行解析跨域地址，去掉行首尾空白与空行 */
+function parseCorsOrigins(value: string) {
+  return value
+    .split('\n')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+}
+
 function handleSaveCorsSetting() {
-  // TODO
-  corsVisible.value = false
+  if (props.saving) return
+  return props.save(parseCorsOrigins(corsAddressDraft.value)).then(() => {
+    corsVisible.value = false
+  })
 }
 
 function handleClosed() {
@@ -35,9 +44,9 @@ function handleClosed() {
     <el-input v-model="corsAddressDraft" type="textarea" :rows="8" :placeholder="corsAddressPlaceholder" />
     <template #footer>
       <!-- 取消跨域设置 -->
-      <el-button plain @click="corsVisible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="corsVisible = false">取消</el-button>
       <!-- 保存跨域地址 -->
-      <el-button type="primary" :disabled="disabled" @click="handleSaveCorsSetting">保存</el-button>
+      <el-button type="primary" :loading="saving" @click="handleSaveCorsSetting">保存</el-button>
     </template>
   </MkDialog>
 </template>

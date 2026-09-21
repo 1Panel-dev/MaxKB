@@ -56,7 +56,7 @@ class PortalView(APIView):
     @log(menu="Portal", operate="Save portal configuration")
     @has_permissions(PermissionConstants.PORTAL_EDIT, RoleConstants.ADMIN)
     def put(self, request: Request):
-        return result.success(PortalSerializer().edit(request.data))
+        return result.success(PortalSerializer(data=request.data).edit(request.data))
 
 
 class PortalLoginView(APIView):

@@ -19,8 +19,6 @@ class Portal(AppModelMixin):
 
     logo = models.CharField(max_length=512, null=True, blank=True, verbose_name="门户Logo地址")
 
-    tab_logo = models.CharField(max_length=512, null=True, blank=True, verbose_name="浏览器Tab Logo地址")
-
     enable_public_access = models.BooleanField(default=True, verbose_name="是否开启公开访问")
     # API服务配置
     enable_api = models.BooleanField(default=True, verbose_name="是否开启API服务")

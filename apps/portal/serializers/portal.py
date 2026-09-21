@@ -45,9 +45,6 @@ class PortalSerializer(serializers.Serializer):
     logo = serializers.CharField(
         required=False, allow_null=True, allow_blank=True, label=_("portal logo"), help_text=_("portal logo")
     )
-    tab_logo = serializers.CharField(
-        required=False, allow_null=True, allow_blank=True, label=_("tab logo"), help_text=_("tab logo")
-    )
     enable_public_access = serializers.BooleanField(
         required=False, label=_("enable public access"), help_text=_("enable public access")
     )
@@ -65,9 +62,7 @@ class PortalSerializer(serializers.Serializer):
             model = Portal
             fields = "__all__"
 
-    def one(self, with_valid=True):
-        if with_valid:
-            self.is_valid(raise_exception=True)
+    def one(self):
         portal = Portal.objects.first()
         if portal is None:
             raise AppApiException(500, _("Portal configuration does not exist"))
@@ -101,11 +96,11 @@ class PortalSerializer(serializers.Serializer):
         portal = Portal.objects.first()
         if portal is None:
             raise AppApiException(500, _("Portal configuration does not exist"))
-        file_fields = ["logo", "tab_logo", "id", "create_time", "update_time"]
+        file_fields = ["logo", "id", "create_time", "update_time"]
         for field, value in instance.items():
             if hasattr(portal, field) and field not in file_fields:
                 setattr(portal, field, value)
-        for field_name in ["logo", "tab_logo"]:
+        for field_name in ["logo"]:
             if field_name in instance:
                 self._handle_file_field(portal, field_name, instance.get(field_name))
         portal.save()

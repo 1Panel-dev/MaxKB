@@ -44,10 +44,6 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(default="智能体门户", max_length=64, verbose_name="门户名称")),
                 ("description", models.TextField(blank=True, max_length=256, null=True, verbose_name="门户描述")),
                 ("logo", models.CharField(blank=True, max_length=512, null=True, verbose_name="门户Logo地址")),
-                (
-                    "tab_logo",
-                    models.CharField(blank=True, max_length=512, null=True, verbose_name="浏览器Tab Logo地址"),
-                ),
                 ("enable_public_access", models.BooleanField(default=True, verbose_name="是否开启公开访问")),
                 ("enable_api", models.BooleanField(default=True, verbose_name="是否开启API服务")),
                 ("enable_knowledge_base_api", models.BooleanField(default=True, verbose_name="是否开启知识库API")),
