@@ -12,13 +12,12 @@ from __future__ import annotations
 import threading
 from typing import List, Dict, Optional, Callable
 
-from langchain_core.prompts import PromptTemplate
-
 from application.workflow.common import Workflow, WorkflowType, Node, get_node_parameters
 from application.workflow.i_node import INode, Signal
-from application.workflow.message.struct.content import Content, Position
+from application.workflow.message.struct.content import Content
 
 from application.workflow.status import Status
+from common.utils.prompt_template import render_prompt
 
 
 class CallBack:
@@ -223,9 +222,8 @@ class WorkflowManage:
         @param prompt: 提示词
         @return: 处理后的提示词
         """
-        prompt = self.workflow.reset_prompt(prompt)
-        prompt_template = PromptTemplate.from_template(prompt, template_format="jinja2")
-        return prompt_template.format(context=self.context)
+        input_template = self.workflow.reset_prompt(prompt)
+        return render_prompt(input_template, self.context)
 
     def get_reference_field(self, node_id, fields):
         """
