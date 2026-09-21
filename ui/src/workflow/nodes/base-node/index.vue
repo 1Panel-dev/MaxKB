@@ -77,11 +77,6 @@
             </div>
           </div>
         </template>
-        <div v-if="form_data.long_term_enable" class="w-full">
-          <el-text type="info" class="color-secondary font-small">
-            {{ $t('views.application.longTermMemory.modelSettingTip') }}
-          </el-text>
-        </div>
       </el-form-item>
       <el-form-item>
         <template #label>
@@ -137,7 +132,10 @@
         </template>
         <div v-show="form_data.stt_model_enable" class="w-full">
           <el-radio-group v-model="form_data.stt_model_id_type">
-            <el-radio :label="$t('views.application.form.voiceInput.defaultModel')" value="default" />
+            <el-radio
+              :label="$t('views.application.form.voiceInput.defaultModel')"
+              value="default"
+            />
             <el-radio :label="$t('views.application.form.voiceInput.custom')" value="custom" />
           </el-radio-group>
         </div>
@@ -177,7 +175,10 @@
         <div class="w-full">
           <el-radio-group v-model="form_data.tts_type" v-show="form_data.tts_model_enable">
             <el-radio :label="$t('views.application.form.voicePlay.browser')" value="BROWSER" />
-            <el-radio :label="$t('views.application.form.voicePlay.defaultModel')" value="DEFAULT" />
+            <el-radio
+              :label="$t('views.application.form.voicePlay.defaultModel')"
+              value="DEFAULT"
+            />
             <el-radio :label="$t('views.application.form.voicePlay.custom')" value="CUSTOM" />
           </el-radio-group>
         </div>
