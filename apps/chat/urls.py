@@ -44,8 +44,8 @@ v3=[
     path('api_key/<str:api_key_id>', v3_views.ChatUserApiKeyView.Operate.as_view()),
     path('portal/application/<int:current_page>/<int:page_size>', v3_views.PortalApplicationView.as_view(), name='v3_portal_application'),
     path('portal/chat/<int:current_page>/<int:page_size>', v3_views.PortalHistoricalConversationView.as_view(), name='v3_portal_historical_conversation'),
-    path('knowledge/<uuid:knowledge_id>/retrieve', retrieve_view),
-    path('knowledge/<uuid:knowledge_id>/mcp', knowledge_mcp_view),
+    path('knowledge/<str:knowledge_id>/retrieve', retrieve_view),
+    path('knowledge/<str:knowledge_id>/mcp', knowledge_mcp_view),
 ]
 v2=[
     path('embed', v2_views.ChatEmbedView.as_view()),
