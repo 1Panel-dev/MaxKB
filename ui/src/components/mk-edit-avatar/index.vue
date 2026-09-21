@@ -121,7 +121,7 @@ onBeforeUnmount(() => fileReader?.abort())
       </button>
     </template>
 
-    <div v-click-outside="closeOutside" class="text-N900" @keydown.esc.stop="close" @click.stop>
+    <div v-click-outside="closeOutside" class="p-4" @keydown.esc.stop="close" @click.stop>
       <div class="mb-1">Logo 设置<span class="ml-0.5 text-danger">*</span></div>
       <el-radio-group v-model="logoMode" :disabled="reading" class="mb-2">
         <el-radio value="default">默认 Logo</el-radio>
@@ -142,16 +142,14 @@ onBeforeUnmount(() => fileReader?.abort())
           <img v-if="draftIcon" :src="draftIcon" alt="自定义头像预览" class="h-full w-full object-contain" />
           <MkIcon v-else :icon="Plus" :size="28" />
         </button>
-        <p class="mt-1 text-N600">支持 JPG、PNG、GIF，文件大小不超过 10MB</p>
+        <p class="text-N600">支持 JPG、PNG、GIF，文件大小不超过 10MB</p>
       </div>
 
-      <div class="mt-4 flex justify-end gap-3">
+      <div class="mt-4 text-right">
         <!-- 取消头像修改 -->
-        <el-button class="min-w-20" @click="close">取消</el-button>
+        <el-button plain @click="close">取消</el-button>
         <!-- 确认头像修改 -->
-        <el-button class="ml-0! min-w-20" type="primary" :loading="reading" :disabled="logoMode === 'custom' && !draftIcon" @click="confirm">
-          确定
-        </el-button>
+        <el-button type="primary" :loading="reading" @click="confirm"> 确定 </el-button>
       </div>
     </div>
   </el-popover>
