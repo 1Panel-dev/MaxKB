@@ -7,7 +7,6 @@ app_name = "knowledge"
 # @formatter:off
 # fmt: off
 urlpatterns = [
-    path('workspace/<str:workspace_id>/knowledge/<uuid:knowledge_id>/external_service', ExternalServiceView.as_view()),
     path('workspace/knowledge/document/template/export', views.Template.as_view()),
     path('workspace/knowledge/document/table_template/export', views.TableTemplate.as_view()),
     path('workspace/store/knowledge_template', views.KnowledgeView.StoreKnowledge.as_view()),
@@ -30,6 +29,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/workflow/import', views.KnowledgeWorkflowView.Import.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/generate_related', views.KnowledgeView.GenerateRelated.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/embedding', views.KnowledgeView.Embedding.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/external_service', ExternalServiceView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tokenize', views.KnowledgeView.Tokenize.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/hit_test', views.KnowledgeView.HitTest.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/export', views.KnowledgeView.Export.as_view()),
