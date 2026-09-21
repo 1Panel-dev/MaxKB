@@ -560,7 +560,7 @@ long syscall(long number, ...) {
 static int is_allow_dl(const char *filename) {
     ensure_config_loaded();
     if (!filename || !*filename) return 1;
-    if (!allow_dl_open && strstr(filename, "_ctypes")) { // 不允许使用ctypes
+    if (!allow_dl_open && (strstr(filename, "_ctypes") || strstr(filename, "_cffi"))) { // 不允许使用ctypes和cffi
         throw_permission_denied_err(true, "open dynamic link library");
     }
     if (!allow_dl_paths || !*allow_dl_paths) return 0;
