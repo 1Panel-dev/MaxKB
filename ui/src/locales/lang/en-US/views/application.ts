@@ -45,7 +45,7 @@ export default {
     roundTriggerTip:
       'After accumulating N rounds, automatically extract N rounds of conversation to generate memory',
     triggerInterval: 'Trigger Interval',
-    scheduledTrigger: 'Scheduled Trigger',
+    scheduledTrigger: 'Timed Trigger',
     scheduledTriggerTip:
       'After reaching the set time, automatically extract all conversations within the cycle to generate memory',
     cronExpressionInvalid: 'Cron expression is invalid',
