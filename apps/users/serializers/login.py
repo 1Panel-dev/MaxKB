@@ -11,12 +11,12 @@ import base64
 import json
 
 from captcha.image import ImageCaptcha
-from django.core import signing
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import ApplicationAccessToken
+from common import signing
 from common.auth.common import FileToken
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version

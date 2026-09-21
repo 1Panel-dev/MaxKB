@@ -7,13 +7,13 @@
     @desc:
 """
 import uuid_utils.compat as uuid
-from django.core import signing
 from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import ApplicationAccessToken, ChatUserType, Application, ApplicationVersion
+from common import signing
 from common.auth.common import ChatUserToken, ChatAuthentication, FileToken
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
