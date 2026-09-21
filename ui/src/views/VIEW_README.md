@@ -178,6 +178,8 @@ src/views/knowledge/
 │   └── action-dropdown/
 │       ├── index.ts
 │       ├── SettingKnowledgeAction.vue   # 跳转知识库设置
+│       ├── KeywordIndexKnowledgeAction.vue # 分词索引入口
+│       ├── mcp-config-action/           # MCP 配置入口与专属只读弹窗
 │       ├── ExportKnowledgeAction.vue    # Excel、文档 ZIP 与知识库包导出
 │       ├── MoveKnowledgeAction.vue
 │       └── DeleteKnowledgeAction.vue
@@ -198,6 +200,10 @@ src/views/knowledge/
 组合单项转移、删除 Action，并管理批量选择、全选、批量转移与批量删除。共享知识库不展示这些操作。
 `SettingKnowledgeAction` 暂不增加权限判断，点击后携带当前
 `workspaceId` 和知识库 ID 跳转 `workspace-knowledge-setting`；阻止事件冒泡，避免同时触发卡片详情跳转。
+“设置”之后依次组合 `KeywordIndexKnowledgeAction` 和 `McpConfigKnowledgeAction`，接收完整
+Knowledge API 并复用页面操作 loading。分词索引不增加确认弹窗，调用成功后只提示“操作成功”；
+MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需挂载、关闭后卸载。
+两者接口暂为本地占位，MCP 返回空文本，分词索引模拟成功，尚不执行服务端操作。
 `ExportKnowledgeAction` 接收完整 Knowledge API，暂不增加权限判断；悬停“导出”展开右侧
 子菜单，分别导出文档 Excel、文档 ZIP 和可再次导入的知识库包。
 导出复用页面操作 loading，防止重复请求，结束或失败后恢复；共享知识库不展示该入口。
@@ -401,7 +407,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/identity/workspaces/WorkspaceListView.vue`                     | 工作空间列表页面                                                     |
 | `system/chat/user-groups/GroupsListView.vue`                           | 对话用户组及组成员管理页面                                           |
 | `system/chat/users/UserListView.vue`                                   | 对话用户列表、配额及用户导入管理页面                                 |
-| `system/chat/portal-setting/PortalSettingView.vue`                      | 门户基本信息、访问开关、认证配置与门户预览；跨域详细配置暂保留说明入口 |
+| `system/chat-management/portal-setting/PortalSettingView.vue`           | 门户基本信息、访问开关、认证配置、跨域地址编辑与门户预览 |
 | `system/settings/theme/ThemeSettingView.vue`                           | 系统外观设置和登录外观预览页面                                       |
 | `system/settings/authentication/AuthenticationView.vue`                | 系统登录及认证源配置页面                                             |
 | `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面                                           |
@@ -413,8 +419,14 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 ## 备注要求
 
 门户设置的 `components/ButtonEditPortal.vue`、`ButtonPortalAuthSetting.vue` 和
-`ButtonPortalCorsSetting.vue` 分别封装对应按钮、弹窗及表单状态。页面保留默认配置、统一保存和
-预览布局；编辑组件暴露草稿预览，认证组件暴露 `open()` 供首次开启认证时联动打开。
+`ButtonPortalCorsSetting.vue` 分别封装对应按钮、浮层及表单状态。认证组件使用 `MkDrawer`，
+打开时与系统 `LoginSetting` 共用 `AuthSettingApi.getLoginSetting()`，通过返回的 `login_methods`
+生成登录方式选项，复用登录方式标签，初始保留账号登录。提供默认登录方式及验证码与账号锁定设置；默认方式
+仅可选已勾选项，取消勾选当前默认项时回退到首个可选项。认证组件暴露 `open()` 供首次开启认证
+时联动打开；当前认证配置仅保存到页面内存，取消不回写，刷新后恢复默认配置，待接口接入后持久化。
+跨域组件通过 `v-model` 接收地址数组，弹窗按一行一个地址编辑；保存时清理行首尾空白和空行，
+取消不回写，关闭后清理草稿。空数组表示不限制来源的配置意图；目前地址仅保存在页面内存，
+尚未对接 `cors_config` 或实际跨域策略。
 
 - 新增路由级页面时，必须在“页面功能登记”中添加一条简洁、明确的功能说明。
 - 页面职责改变、文件重命名或目录移动时，必须同步修改登记内容。

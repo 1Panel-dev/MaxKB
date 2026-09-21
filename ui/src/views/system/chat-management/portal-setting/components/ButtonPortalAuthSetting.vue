@@ -1,50 +1,63 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import type { PortalSetting, PortalSettingPayload } from '@/api/types'
-import { MsgError } from '@/utils/message'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
+import { LOGIN_METHOD } from '@/api/enums'
+import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
+import type { LoginMethod, PortalSetting, PortalSettingPayload } from '@/api/types'
+import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 
 const props = defineProps<{ setting: PortalSetting; saving: boolean; save: (payload: PortalSettingPayload) => Promise<void> }>()
 
-/* 身份认证设置，仅修改已有后端消费的字段并保留其他配置 */
+/* 登录方式与默认登录方式 */
+const loginMethodOptions = ref<string[]>([LOGIN_METHOD.LOCAL])
+const loginMethodsLoading = ref(false)
+
+function loadLoginMethodOptions() {
+  loginMethodsLoading.value = true
+  return AuthSettingApi.getLoginSetting()
+    .then((setting) => {
+      loginMethodOptions.value = setting.login_methods ?? [LOGIN_METHOD.LOCAL]
+    })
+    .finally(() => {
+      loginMethodsLoading.value = false
+    })
+}
 const authVisible = ref(false)
 const enableAuthAfterSave = ref(false)
-const authForm = reactive({ localLogin: true, maxAttempts: 1, failedAttempts: 5, lockTime: 10 })
+const authFormRef = useTemplateRef<FormInstance>('authFormRef')
+const authForm = reactive({
+  loginMethods: [LOGIN_METHOD.LOCAL] as string[],
+  defaultLoginMethod: LOGIN_METHOD.LOCAL as string,
+  maxAttempts: 1,
+  failedAttempts: 5,
+  lockTime: 10,
+})
+const defaultLoginMethodOptions = computed(() => loginMethodOptions.value.filter((method) => authForm.loginMethods.includes(method)))
+const authRules: FormRules<typeof authForm> = {
+  loginMethods: [{ type: 'array', required: true, min: 1, message: '请选择至少一种登录方式', trigger: 'change' }],
+  defaultLoginMethod: [{ required: true, message: '请选择默认登录方式', trigger: 'change' }],
+}
 
+function handleLoginMethodsChange() {
+  if (!authForm.loginMethods.includes(authForm.defaultLoginMethod)) {
+    authForm.defaultLoginMethod = defaultLoginMethodOptions.value[0] ?? ''
+  }
+}
+
+/* 抽屉回填与重置，草稿不直接修改门户配置 */
 function open(enableAfterSave = false) {
-  handleClosed()
   enableAuthAfterSave.value = enableAfterSave
   const config = props.setting.auth_config
   Object.assign(authForm, {
-    localLogin: config?.login_value?.includes('LOCAL') ?? true,
-    maxAttempts: config?.max_attempts ?? 1,
-    failedAttempts: config?.failed_attempts ?? 5,
-    lockTime: config?.lock_time ?? 10,
+    loginMethods: [...(config.login_value ?? [LOGIN_METHOD.LOCAL])],
+    defaultLoginMethod: config.default_value ?? LOGIN_METHOD.LOCAL,
+    maxAttempts: config.max_attempts ?? 1,
+    failedAttempts: config.failed_attempts ?? 5,
+    lockTime: config.lock_time ?? 10,
   })
+  handleLoginMethodsChange()
   authVisible.value = true
-}
-
-function handleSaveAuthSetting() {
-  const config = props.setting.auth_config
-  const loginMethods = (config.login_value || []).filter((method) => method !== 'LOCAL')
-  if (authForm.localLogin) loginMethods.unshift('LOCAL')
-  if (!loginMethods.length) {
-    MsgError('请至少开启一种登录方式')
-    return
-  }
-  return props
-    .save({
-      ...(enableAuthAfterSave.value ? { enable_auth: true } : {}),
-      auth_config: {
-        ...config,
-        login_value: loginMethods,
-        max_attempts: authForm.maxAttempts,
-        failed_attempts: authForm.failedAttempts,
-        lock_time: authForm.lockTime,
-      },
-    })
-    .then(() => {
-      authVisible.value = false
-    })
+  loadLoginMethodOptions()
 }
 
 function handleOpenAuthSetting() {
@@ -53,7 +66,36 @@ function handleOpenAuthSetting() {
 
 function handleClosed() {
   enableAuthAfterSave.value = false
-  Object.assign(authForm, { localLogin: true, maxAttempts: 1, failedAttempts: 5, lockTime: 10 })
+  Object.assign(authForm, {
+    loginMethods: [LOGIN_METHOD.LOCAL],
+    defaultLoginMethod: LOGIN_METHOD.LOCAL,
+    maxAttempts: 1,
+    failedAttempts: 5,
+    lockTime: 10,
+  })
+  authFormRef.value?.clearValidate()
+}
+
+/* 保存认证配置，保留其他配置字段 */
+function handleSaveAuthSetting() {
+  authFormRef.value?.validate((valid) => {
+    if (!valid || props.saving || loginMethodsLoading.value) return
+    return props
+      .save({
+        ...(enableAuthAfterSave.value ? { enable_auth: true } : {}),
+        auth_config: {
+          ...props.setting.auth_config,
+          login_value: [...authForm.loginMethods],
+          default_value: authForm.defaultLoginMethod,
+          max_attempts: authForm.maxAttempts,
+          failed_attempts: authForm.failedAttempts,
+          lock_time: authForm.lockTime,
+        },
+      })
+      .then(() => {
+        authVisible.value = false
+      })
+  })
 }
 
 defineExpose({ open })
@@ -62,54 +104,57 @@ defineExpose({ open })
 <template>
   <!-- 配置身份认证 -->
   <el-button text type="primary" title="身份认证设置" :disabled="saving" @click="handleOpenAuthSetting">
-    <MkIcon name="icon-setting" />
+    <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="authVisible" title="身份认证设置" :show-close="!saving" @closed="handleClosed">
-    <el-form label-position="top" :disabled="saving" @submit.prevent>
-      <el-form-item label="登录方式">
-        <el-checkbox v-model="authForm.localLogin">本地账号登录</el-checkbox>
-        <p class="w-full text-sm text-N600">使用对话用户账号登录门户。</p>
+  <MkDrawer v-model="authVisible" title="身份认证设置" @closed="handleClosed">
+    <el-form
+      v-loading="loginMethodsLoading"
+      ref="authFormRef"
+      :model="authForm"
+      :rules="authRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item label="登录方式" prop="loginMethods">
+        <el-checkbox-group v-model="authForm.loginMethods" class="flex-wrap" @change="handleLoginMethodsChange">
+          <template v-for="loginMethod in loginMethodOptions" :key="loginMethod">
+            <el-checkbox :value="loginMethod" class="w-32">{{ LOGIN_METHOD_LABELS[loginMethod as LoginMethod] || loginMethod }}</el-checkbox>
+          </template>
+        </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="登录失败几次后显示验证码（0 为始终显示，-1 为不显示）">
-        <el-input-number
-          v-model="authForm.maxAttempts"
-          :min="-1"
-          :max="100"
-          :precision="0"
-          :value-on-clear="1"
-          controls-position="right"
-          align="left"
-        />
+      <el-form-item label="默认登录方式" prop="defaultLoginMethod">
+        <el-select v-model="authForm.defaultLoginMethod" placeholder="请选择默认登录方式">
+          <el-option
+            v-for="loginMethod in defaultLoginMethodOptions"
+            :key="loginMethod"
+            :value="loginMethod"
+            :label="LOGIN_METHOD_LABELS[loginMethod as LoginMethod] || loginMethod"
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item label="连续登录失败次数上限">
-        <el-input-number
-          v-model="authForm.failedAttempts"
-          :min="1"
-          :max="100"
-          :precision="0"
-          :value-on-clear="5"
-          controls-position="right"
-          align="left"
-        />
+      <el-form-item label="账号登录验证码设置" required>
+        <div class="mk-gray-card-lg w-full space-y-4">
+          <div class="flex-align-center gap-2">
+            <span class="shrink-0">登录失败</span>
+            <el-input-number v-model="authForm.maxAttempts" class="w-32!" :min="-1" :max="100" :precision="0" :value-on-clear="1" />
+            <span class="shrink-0">次显示验证码</span>
+          </div>
+          <div class="flex-align-center gap-2">
+            <span class="shrink-0">登录失败</span>
+            <el-input-number v-model="authForm.failedAttempts" class="w-32!" :min="1" :max="100" :precision="0" :value-on-clear="5" />
+            <span class="shrink-0">次，锁定账号</span>
+            <el-input-number v-model="authForm.lockTime" class="w-32!" :min="1" :max="1440" :precision="0" :value-on-clear="10" />
+            <span class="shrink-0">分钟</span>
+          </div>
+        </div>
       </el-form-item>
-      <el-form-item label="账号锁定时间（分钟）">
-        <el-input-number
-          v-model="authForm.lockTime"
-          :min="1"
-          :max="1440"
-          :precision="0"
-          :value-on-clear="10"
-          controls-position="right"
-          align="left"
-        />
-      </el-form-item>
-      <p class="text-sm text-N600">失败次数与锁定时间的自定义配置在专业版、企业版生效。</p>
     </el-form>
     <template #footer>
       <!-- 取消认证设置 -->
-      <el-button :disabled="saving" @click="authVisible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="authVisible = false">取消</el-button>
       <!-- 保存认证设置 -->
-      <el-button type="primary" :loading="saving" @click="handleSaveAuthSetting">保存</el-button>
+      <el-button type="primary" :loading="saving" :disabled="loginMethodsLoading" @click="handleSaveAuthSetting">保存</el-button>
     </template>
-  </MkDialog>
+  </MkDrawer>
 </template>
