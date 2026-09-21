@@ -6,7 +6,6 @@ import type { Dict, OptionItem, WorkspaceItem, SystemUserGroup, SystemUserGroupM
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
-import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 import { useStore } from '@/stores'
@@ -152,7 +151,9 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
       ).then(() => {
         MsgSuccess('移除成功')
         const removedRelationIds = new Set(members.map(({ system_user_group_relation_id }) => system_user_group_relation_id))
-        userGroupMembers.value = userGroupMembers.value.filter(({ system_user_group_relation_id }) => !removedRelationIds.has(system_user_group_relation_id))
+        userGroupMembers.value = userGroupMembers.value.filter(
+          ({ system_user_group_relation_id }) => !removedRelationIds.has(system_user_group_relation_id),
+        )
         paginationConfig.value.total = userGroupMembers.value.length
         selectedGroupMembers.value = []
         loadUserGroups()
@@ -241,7 +242,7 @@ onMounted(() => {
           <el-table-column prop="username" label="用户名" min-width="198" show-overflow-tooltip />
           <el-table-column label="角色" min-width="198">
             <template #default="{ row }">
-              <WorkspaceRelationTags :table-render-params="{ property: '角色', value: '工作空间' }" :tags="row.roles" />
+              <MkTagGroup :tags="row.roles" />
             </template>
           </el-table-column>
           <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip />
@@ -265,5 +266,10 @@ onMounted(() => {
     </template>
   </MkViewLayout>
   <CreateOrUpdateGroupDialog ref="groupDialogRef" :workspace-id="selectedWorkspaceId" @refresh="handleGroupSaved" />
-  <CreateGroupMemberDialog ref="memberDialogRef" :workspace-id="selectedWorkspaceId" :current-group="currentGroup" @refresh="loadUserGroupMembers(true)" />
+  <CreateGroupMemberDialog
+    ref="memberDialogRef"
+    :workspace-id="selectedWorkspaceId"
+    :current-group="currentGroup"
+    @refresh="loadUserGroupMembers(true)"
+  />
 </template>

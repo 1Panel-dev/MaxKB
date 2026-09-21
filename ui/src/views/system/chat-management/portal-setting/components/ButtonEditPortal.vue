@@ -59,10 +59,10 @@ function handleClosePortalEdit() {
     <MkIcon name="icon_edit_outlined" />
   </el-button>
   <MkDialog v-model="editVisible" title="编辑" @closed="handleClosePortalEdit">
-    <el-form ref="portalFormRef" :model="portalForm" :rules="portalRules" label-position="top" @submit.prevent>
+    <el-form ref="portalFormRef" :model="portalForm" :rules="portalRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
-          <!-- <MkEditAvatar v-model="portalForm.logo" :default-icon="defaultLogo" :size="32" @change="handleLogoChange" /> -->
+          <MkEditAvatar v-model="portalForm.logo" :default-icon="defaultLogo" :size="32" @change="handleLogoChange" />
           <el-input v-model="portalForm.name" maxlength="64" show-word-limit :disabled="saving" placeholder="请输入门户名称" />
         </div>
       </el-form-item>
