@@ -4,7 +4,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { PortalSetting } from '@/api/types'
 import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 
-const props = defineProps<{ setting: PortalSetting; save: (payload: FormData) => Promise<void> }>()
+const props = defineProps<{ setting: PortalSetting; saving: boolean; save: (payload: FormData) => Promise<void> }>()
 
 /* 门户名称与 Logo */
 const editVisible = ref(false)
@@ -31,8 +31,9 @@ function handleLogoChange(icon: string, file: File | null) {
 }
 
 function handleSavePortalInfo() {
+  if (props.saving) return
   portalFormRef.value?.validate((valid) => {
-    if (!valid) return
+    if (!valid || props.saving) return
     const payload = new FormData()
     payload.append('name', portalForm.name.trim())
     if (logoChanged.value) payload.append('logo', logoFile.value || '')
@@ -71,9 +72,9 @@ function handleClosePortalEdit() {
     </el-form>
     <template #footer>
       <!-- 取消编辑 -->
-      <el-button plain @click="editVisible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="editVisible = false">取消</el-button>
       <!-- 保存门户信息 -->
-      <el-button type="primary" @click="handleSavePortalInfo">保存</el-button>
+      <el-button type="primary" :loading="saving" @click="handleSavePortalInfo">保存</el-button>
     </template>
   </MkDialog>
 </template>

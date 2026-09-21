@@ -111,7 +111,7 @@ onMounted(() => loadPortalSetting())
               <h4 class="truncate" :title="previewName">{{ previewName }}</h4>
             </div>
             <!-- 编辑门户名称与 Logo -->
-            <ButtonEditPortal :setting="portalSetting" :save="savePortalSetting" />
+            <ButtonEditPortal :setting="portalSetting" :saving="saving" :save="savePortalSetting" />
           </div>
         </el-card>
         <el-card shadow="never">
