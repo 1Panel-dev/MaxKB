@@ -9,11 +9,13 @@
 
 import json
 import uuid_utils.compat as uuid
-from django.core import signing
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.auth.common import ChatToken
+from common.auth.constants.operate_constants import Operate
+from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
@@ -183,14 +185,8 @@ class PortalLoginSerializer(serializers.Serializer):
         cache.delete(cache_key, version=system_version)
         cache.delete(system_get_key(f"portal_{username}_lock"), version=system_version)
 
-        token = signing.dumps(
-            {
-                "username": user.username,
-                "id": str(user.id),
-                "type": "PORTAL_USER",
-            }
-        )
-        version, get_key = Cache_Version.TOKEN.value
+        token = ChatToken(str(user.id), AuthenticationType.CHAT_USER, str(Operate.LOCAL)).to_token()
+        version, get_key = Cache_Version.CHAT_USER_TOKEN.value
         timeout = CONFIG.get_session_timeout()
         cache.set(get_key(token), user, timeout=timeout, version=version)
         record_log(
