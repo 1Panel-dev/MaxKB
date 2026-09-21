@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { getMatchedChildRouteList } from '@/router/admin/utils'
 import type { LayoutMenuItem } from './types'
+import ResourceDetailMenu from './sidebar/ResourceDetailMenu.vue'
 
 defineOptions({ name: 'ResourceDetailLayout' })
 
@@ -16,10 +17,6 @@ const route = useRoute()
 const router = useRouter()
 const detailMenuItems = computed(() => getMatchedChildRouteList(route))
 const activeDetailMenuName = computed(() => route.meta.detailActiveMenu ?? String(route.name ?? ''))
-
-function isDetailMenuActive(detailMenuItem: LayoutMenuItem) {
-  return detailMenuItem.name === activeDetailMenuName.value
-}
 
 function navigateBack() {
   emit('back')
@@ -35,6 +32,7 @@ function navigateToDetailMenu(detailMenuItem: LayoutMenuItem) {
     <template #aside="{ Header }">
       <component :is="Header">
         <div class="flex-align-center min-w-0 gap-2">
+          <!-- 返回资源列表 -->
           <el-button class="-ml-1" text @click="navigateBack">
             <MkIcon name="icon_arrow-left_outlined" :size="20" />
           </el-button>
@@ -43,20 +41,7 @@ function navigateToDetailMenu(detailMenuItem: LayoutMenuItem) {
       </component>
 
       <el-scrollbar class="min-h-0 flex-1">
-        <div class="space-y-1 px-4">
-          <template v-for="detailMenuItem in detailMenuItems" :key="detailMenuItem.name">
-            <MkListItem :active="isDetailMenuActive(detailMenuItem)" @click="navigateToDetailMenu(detailMenuItem)">
-              <template #default="{ active }">
-                <MkIcon
-                  v-if="detailMenuItem.icon"
-                  class="mr-3"
-                  :name="active ? (detailMenuItem.activeIcon ?? detailMenuItem.icon) : detailMenuItem.icon"
-                />
-                <span class="min-w-0 flex-1 truncate" :title="detailMenuItem.label">{{ detailMenuItem.label }}</span>
-              </template>
-            </MkListItem>
-          </template>
-        </div>
+        <ResourceDetailMenu :menu-items="detailMenuItems" :active-name="activeDetailMenuName" @select="navigateToDetailMenu" />
       </el-scrollbar>
     </template>
 

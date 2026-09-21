@@ -80,14 +80,16 @@ const previewLogo = computed(() => portalSetting.logo)
   <MkViewLayout title="门户访问设置">
     <div class="flex min-w-215 flex-1 gap-4">
       <div class="w-95 shrink-0 space-y-4">
-        <el-card shadow="never" body-class="flex-between gap-3">
-          <div class="flex-align-center min-w-0 gap-2">
-            <img v-if="previewLogo" :src="previewLogo" alt="门户 Logo" class="size-6 shrink-0 object-contain" />
-            <LogoIcon v-else :height="24" class="shrink-0" />
-            <h4 class="truncate" :title="previewName">{{ previewName }}</h4>
+        <el-card shadow="never">
+          <div class="flex-between gap-3">
+            <div class="flex-align-center min-w-0 gap-2">
+              <img v-if="previewLogo" :src="previewLogo" alt="门户 Logo" class="size-6 shrink-0 object-contain" />
+              <LogoIcon v-else :height="24" class="shrink-0" />
+              <h4 class="truncate" :title="previewName">{{ previewName }}</h4>
+            </div>
+            <!-- 编辑门户名称与 Logo -->
+            <ButtonEditPortal ref="editPortalButtonRef" :setting="portalSetting" :save="savePortalSetting" />
           </div>
-          <!-- 编辑门户名称与 Logo -->
-          <ButtonEditPortal v-if="perm.system.portal.edit()" ref="editPortalButtonRef" :setting="portalSetting" :saving="saving" :save="savePortalSetting" />
         </el-card>
         <el-card shadow="never">
           <div class="space-y-4">
@@ -149,7 +151,7 @@ const previewLogo = computed(() => portalSetting.logo)
               <span>身份认证</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置身份认证 -->
-                <ButtonPortalAuthSetting ref="authSettingButtonRef" :setting="portalSetting" :saving="saving" :save="savePortalAuthSetting" />
+                <ButtonPortalAuthSetting ref="authSettingButtonRef" :setting="portalSetting" :save="savePortalAuthSetting" />
                 <el-switch :model-value="portalSetting.enable_auth" size="small" @change="handleAccessChange('enable_auth', $event)" />
               </div>
             </div>
@@ -157,7 +159,7 @@ const previewLogo = computed(() => portalSetting.logo)
               <span>跨域设置</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置跨域地址 -->
-                <ButtonPortalCorsSetting v-model="portalCorsOrigins" :disabled="saving" />
+                <ButtonPortalCorsSetting v-model="portalCorsOrigins" />
                 <el-switch :model-value="portalSetting.enable_cors" size="small" @change="handleAccessChange('enable_cors', $event)" />
               </div>
             </div>

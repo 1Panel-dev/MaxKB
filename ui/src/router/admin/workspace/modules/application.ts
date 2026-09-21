@@ -19,7 +19,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
         path: ':applicationId/:type',
         name: 'workspace-application-detail-layout',
         component: () => import('@/views/application-detail/WorkspaceApplicationDetail.vue'),
-        meta: { title: '智能体详情', hidden: true },
+        meta: { title: '智能体详情', hidden: true, resourceDetailRoot: true },
         children: [
           {
             path: 'overview',
