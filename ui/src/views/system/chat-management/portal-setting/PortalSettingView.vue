@@ -91,6 +91,7 @@ const previewLogo = computed(() => portalSetting.logo)
         <el-card shadow="never">
           <div class="space-y-4">
             <h4>访问设置</h4>
+            <!-- 门户公开访问链接 -->
             <div>
               <div class="flex-between mb-2 gap-2">
                 <span>门户公开访问链接</span>
@@ -109,6 +110,7 @@ const previewLogo = computed(() => portalSetting.logo)
                 </template>
               </el-input>
             </div>
+            <!-- 智能体后端 API 访问 -->
             <div>
               <div class="flex-between mb-2 gap-2">
                 <span>智能体后端 API 访问</span>
@@ -123,6 +125,7 @@ const previewLogo = computed(() => portalSetting.logo)
                 </template>
               </el-input>
             </div>
+            <!-- 知识库后端 API 检索 -->
             <div>
               <div class="flex-between mb-2 gap-2">
                 <span>知识库后端 API 检索</span>
