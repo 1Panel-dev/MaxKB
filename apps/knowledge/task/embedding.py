@@ -3,7 +3,7 @@
 import traceback
 from typing import List
 
-from celery_once import QueueOnce
+from celery_once import AlreadyQueued, QueueOnce
 from common.config.embedding_config import ModelManage
 from common.event.listener_manage import (
     ListenerManagement,
@@ -12,13 +12,14 @@ from common.event.listener_manage import (
     UpdateProblemArgs,
 )
 from common.utils.logger import maxkb_logger
+from django.db import transaction
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from models_provider.models import Model
 from models_provider.tools import get_model, get_model_default_params
 from ops import celery_app
 
-from knowledge.models import Document, State, TaskType
+from knowledge.models import Document, Paragraph, State, TaskType
 from knowledge.serializers.common import drop_knowledge_index
 
 
@@ -156,6 +157,27 @@ def embedding_by_data_list(args: List, model_id):
 @celery_app.task(base=QueueOnce, once={"keys": ["document_id"]}, name="celery:tokenize_by_document")
 def tokenize_by_document(document_id, state_list):
     ListenerManagement.tokenize_by_document(document_id, state_list)
+
+
+@celery_app.task(base=QueueOnce, once={"keys": ["knowledge_id"]}, name="celery:tokenize_by_knowledge")
+def tokenize_by_knowledge(knowledge_id):
+    """为知识库全部文档提交分词任务，复用文档任务的状态管理和锁。"""
+    # 先提交状态更新，再分发文档任务，避免 worker 读到未提交的状态。
+    with transaction.atomic():
+        ListenerManagement.update_status(
+            QuerySet(Document).filter(knowledge_id=knowledge_id), TaskType.TOKENIZE, State.PENDING
+        )
+        ListenerManagement.update_status(
+            QuerySet(Paragraph).filter(knowledge_id=knowledge_id), TaskType.TOKENIZE, State.PENDING
+        )
+        ListenerManagement.get_aggregation_document_status_by_knowledge_id(knowledge_id)()
+    document_ids = QuerySet(Document).filter(knowledge_id=knowledge_id).values_list("id", flat=True)
+    state_list = [state.value for state in State]
+    for document_id in document_ids.iterator():
+        try:
+            tokenize_by_document.delay(document_id, state_list)
+        except AlreadyQueued:
+            continue
 
 
 def delete_embedding_by_document(document_id):

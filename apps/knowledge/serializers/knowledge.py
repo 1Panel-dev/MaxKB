@@ -94,7 +94,7 @@ from knowledge.serializers.knowledge_workflow import (
     KnowledgeWorkflowModelSerializer,
     KnowledgeWorkflowSerializer,
 )
-from knowledge.task.embedding import delete_embedding_by_knowledge, embedding_by_knowledge
+from knowledge.task.embedding import delete_embedding_by_knowledge, embedding_by_knowledge, tokenize_by_knowledge
 from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_replace_web_knowledge, sync_web_knowledge
 from system_manage.services.resource_mapping import get_tool_id_list
@@ -393,6 +393,15 @@ class KnowledgeSerializer(serializers.Serializer):
                 embedding_by_knowledge.delay(knowledge_id, embedding_model_id)
             except AlreadyQueued:
                 raise AppApiException(500, _("Failed to send the vectorization task, please try again later!"))
+
+        def tokenize(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            knowledge_id = self.data.get("knowledge_id")
+            try:
+                tokenize_by_knowledge.delay(knowledge_id)
+            except AlreadyQueued:
+                raise AppApiException(500, _("The task is being executed, please do not send it repeatedly."))
 
         def generate_related(self, instance: Dict, with_valid=True):
             if with_valid:

@@ -304,6 +304,12 @@ class EmbeddingAPI(SyncWebAPI):
     pass
 
 
+class TokenizeAPI(KnowledgeReadAPI):
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
 class GetModelAPI(SyncWebAPI):
     @staticmethod
     def get_parameters():

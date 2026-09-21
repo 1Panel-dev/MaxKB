@@ -25,6 +25,7 @@ from knowledge.api.knowledge import (
     GenerateRelatedAPI,
     HitTestAPI,
     EmbeddingAPI,
+    TokenizeAPI,
     GetModelAPI,
     KnowledgeExportAPI,
     KnowledgeBatchOperateAPI,
@@ -537,6 +538,41 @@ class KnowledgeView(APIView):
                 KnowledgeSerializer.Operate(
                     data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
                 ).embedding()
+            )
+
+    class Tokenize(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["PUT"],
+            summary=_("Tokenize knowledge base"),
+            description=_("Tokenize knowledge base"),
+            operation_id=_("Tokenize knowledge base"),  # type: ignore
+            parameters=TokenizeAPI.get_parameters(),
+            request=TokenizeAPI.get_request(),
+            responses=TokenizeAPI.get_response(),
+            tags=[_("Knowledge Base")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_TOKEN.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_TOKEN.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                compare=CompareConstants.AND,
+            ),
+        )
+        @log(
+            menu="Knowledge Base",
+            operate="Tokenize knowledge base",
+            get_operation_object=lambda r, k: get_knowledge_operation_object(k.get("knowledge_id")),
+        )
+        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(
+                KnowledgeSerializer.Operate(
+                    data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
+                ).tokenize()
             )
 
     class Export(APIView):
