@@ -7,11 +7,12 @@
 @desc:
 """
 
-from typing import Dict, Optional, Callable
+from typing import Dict, Callable
 
-from application.workflow.common import Workflow, WorkflowType, Node
+from application.workflow.common import Workflow, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.workflow_manage import WorkflowManage, CallBack
+from common.utils.prompt_template import render_prompt
 
 
 class LoopWorkFlowManage(WorkflowManage):
@@ -34,13 +35,10 @@ class LoopWorkFlowManage(WorkflowManage):
         return self.parent_workflow_manage.get_context(node_id, key)
 
     def generate_prompt(self, prompt):
-        prompt = self.workflow.reset_prompt(prompt)
-        prompt = self.parent_workflow_manage.workflow.reset_prompt(prompt)
+        input_template = self.workflow.reset_prompt(prompt)
+        input_template = self.parent_workflow_manage.workflow.reset_prompt(input_template)
         context = {**self.context, **self.parent_workflow_manage.context}
-        from langchain_core.prompts import PromptTemplate
-
-        prompt_template = PromptTemplate.from_template(prompt, template_format="jinja2")
-        return prompt_template.format(context=context)
+        return render_prompt(input_template, context)
 
     def get_reference_field(self, node_id, fields):
         """
