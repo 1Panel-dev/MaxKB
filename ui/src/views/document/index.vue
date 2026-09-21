@@ -1469,6 +1469,10 @@ async function changeState(row: any) {
 }
 
 function editName(val: string, id: string) {
+  if (/[:\\/?*\[\]]/.test(val)) {
+    MsgError(t('views.document.tip.nameInvalidCharacters'))
+    return
+  }
   if (val) {
     const obj = {
       name: val,

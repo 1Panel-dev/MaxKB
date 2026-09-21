@@ -25,6 +25,7 @@ export default {
     sendMessage: '发送成功',
     vectorizationSuccess: '批量向量化成功',
     nameMessage: '文件名称不能为空！',
+    nameInvalidCharacters: '文件名称不能包含以下特殊字符：: \\ / ? * [ ]',
     importMessage: '导入成功',
     migrationSuccess: '迁移成功',
     replaceSuccess: '替换成功',
