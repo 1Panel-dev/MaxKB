@@ -17,7 +17,7 @@
     >
       <el-form-item
         v-if="modelSettingEnable"
-        :label="$t('views.application.longTermMemory.title')"
+        :label="$t('views.application.form.aiModel.label')"
         prop="long_term_model_id"
         :rules="modelIdRules"
       >
