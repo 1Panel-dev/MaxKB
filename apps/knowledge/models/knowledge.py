@@ -162,6 +162,10 @@ class KnowledgeFolder(MPTTModel, AppModelMixin):
         order_insertion_by = ["name"]
 
 
+def default_external_service():
+    return {"enabled": False, "authentication": False}
+
+
 class Knowledge(AppModelMixin):
     """
     知识库表
@@ -186,6 +190,7 @@ class Knowledge(AppModelMixin):
     embedding_model = models.ForeignKey(Model, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     file_size_limit = models.IntegerField(verbose_name="文件大小限制", default=100)
     file_count_limit = models.IntegerField(verbose_name="文件数量限制", default=50)
+    external_service = models.JSONField(default=default_external_service, verbose_name="外部检索服务")
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:

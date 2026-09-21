@@ -19,15 +19,14 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
-from common.auth.constants.role_constants import RoleConstants
 from common.config.embedding_config import VectorStore
-from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.utils.common import flat_map, get_file_content
 from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, Paragraph, Knowledge, SearchMode, SourceType
 from knowledge.services.multimodal_retrieval import get_hit_asset_map
 from knowledge.services.retrieval_stats import get_recall_tracker, record_recall_safely
+from knowledge.services.retrieval_access import filter_workflow_knowledge
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
@@ -178,18 +177,27 @@ def _record_recalled_items(embedding_list: List[Dict], paragraph_list: List[Dict
     record_recall_safely(recalled_items, tracker=get_recall_tracker(workflow_manage))
 
 
-def _list_paragraph(embedding_list: List, vector):
+def _list_paragraph(embedding_list: List, vector, knowledge_ids=None, document_ids=None):
     paragraph_id_list = [row.get("paragraph_id") for row in embedding_list]
     if paragraph_id_list is None or len(paragraph_id_list) == 0:
         return []
+    query = QuerySet(Paragraph).filter(id__in=paragraph_id_list)
+    if knowledge_ids is not None:
+        query = query.filter(
+            knowledge_id__in=knowledge_ids,
+            is_active=True,
+            document_id__in=QuerySet(Document).filter(knowledge_id__in=knowledge_ids, is_active=True).values("id"),
+        )
+    if document_ids is not None:
+        query = query.filter(document_id__in=document_ids)
     paragraph_list = native_search(
-        QuerySet(Paragraph).filter(id__in=paragraph_id_list),
+        query,
         get_file_content(
             os.path.join(PROJECT_DIR, "apps", "application", "sql", "list_knowledge_paragraph_by_paragraph_id.sql")
         ),
         with_table_name=True,
     )
-    if len(paragraph_list) != len(paragraph_id_list):
+    if knowledge_ids is None and len(paragraph_list) != len(paragraph_id_list):
         exist_paragraph_list = [row.get("id") for row in paragraph_list]
         for paragraph_id in paragraph_id_list:
             if paragraph_id not in exist_paragraph_list:
@@ -250,15 +258,11 @@ class SearchKnowledgeNode(INode):
                     .distinct()
                 ]
 
-        get_knowledge_list_of_authorized = DatabaseModelManage.get_model("get_knowledge_list_of_authorized")
-        chat_user_type = workflow_params.get("chat_user_type")
-        if get_knowledge_list_of_authorized is not None and RoleConstants.CHAT_USER.value.name == chat_user_type:
-            knowledge_id_list = get_knowledge_list_of_authorized(workflow_params.get("chat_user_id"), knowledge_id_list)
-
         workspace_id = workflow_params.get("workspace_id")
         knowledge_id_list = filter_authorized_ids("knowledge", knowledge_id_list, workspace_id)
+        knowledge_id_list = filter_workflow_knowledge(knowledge_id_list, workflow_params)
 
-        if len(knowledge_id_list) == 0:
+        if len(knowledge_id_list) == 0 or document_id_list == []:
             self._write_empty_result(question)
             return
 
@@ -293,7 +297,8 @@ class SearchKnowledgeNode(INode):
             self._write_empty_result(question)
             return
 
-        paragraph_list = _list_paragraph(embedding_list, vector)
+        knowledge_id_list = filter_workflow_knowledge(knowledge_id_list, workflow_params)
+        paragraph_list = _list_paragraph(embedding_list, vector, knowledge_id_list, document_id_list)
         hit_asset_map = get_hit_asset_map(embedding_list)
         result = [
             reset_paragraph

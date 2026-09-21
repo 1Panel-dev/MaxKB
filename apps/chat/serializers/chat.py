@@ -45,6 +45,7 @@ from application.workflow.message_queue import get_message_queue
 from application.workflow.nodes import get_start_node
 from application.workflow.workflow_manage import WorkflowManage, CallBack
 from application.workflow.workflow_run_registry import WorkflowRunRegistry
+from knowledge.services.retrieval_access import identity_from_server
 from chat.template.agent_simple import build_workflow
 from common import result
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed, ChatException
@@ -285,6 +286,7 @@ class ChatSerializers(serializers.Serializer):
             ChatRecord(id=chat_record_id_str, **self.get_defaults_record(message_dict)).save(force_insert=True)
 
         parameters = {
+            "retrieval_identity": identity_from_server(chat_user_id, chat_user_type, debug),
             "history_chat_record": history_chat_record,
             "question": message,
             "chat_id": chat_id,

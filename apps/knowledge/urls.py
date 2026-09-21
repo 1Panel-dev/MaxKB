@@ -1,11 +1,13 @@
 from django.urls import path
 
 from . import views
+from knowledge.views.external_service import ExternalServiceView
 
 app_name = "knowledge"
 # @formatter:off
 # fmt: off
 urlpatterns = [
+    path('workspace/<str:workspace_id>/knowledge/<uuid:knowledge_id>/external_service', ExternalServiceView.as_view()),
     path('workspace/knowledge/document/template/export', views.Template.as_view()),
     path('workspace/knowledge/document/table_template/export', views.TableTemplate.as_view()),
     path('workspace/store/knowledge_template', views.KnowledgeView.StoreKnowledge.as_view()),

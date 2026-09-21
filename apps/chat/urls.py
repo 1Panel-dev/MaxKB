@@ -2,12 +2,15 @@ from django.urls import path, include
 
 from application.views import ChatRecordDetailView, ChatRecordLinkView
 from chat.views import v2 as v2_views, v3 as v3_views
+from chat.views.v3.knowledge import knowledge_mcp_view, retrieve_view
 
 app_name = "chat"
 # @formatter:off
 # fmt: off
 
 v3=[
+ path('knowledge/<uuid:knowledge_id>/retrieve', retrieve_view),
+ path('knowledge/<uuid:knowledge_id>/mcp', knowledge_mcp_view),
  # ---- application 作用域：application_id 从 path 获取 ----
  path('application/<str:application_id>/',  include([
   path("profile",v3_views.ApplicationProfile.as_view(), name='v3_profile'),

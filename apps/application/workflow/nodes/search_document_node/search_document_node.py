@@ -13,10 +13,9 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
-from common.auth.constants.role_constants import RoleConstants
-from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, DocumentTag, Knowledge
+from knowledge.services.retrieval_access import filter_workflow_knowledge
 
 
 class SearchDocumentNodeSerializer(serializers.Serializer):
@@ -213,21 +212,20 @@ class SearchDocumentNode(INode):
                     QuerySet(Document).filter(knowledge_id__in=ref_knowledge_ids).values_list("id", flat=True)
                 )
 
-        get_knowledge_list_of_authorized = DatabaseModelManage.get_model("get_knowledge_list_of_authorized")
-        chat_user_type = workflow_params.get("chat_user_type")
-
-        if get_knowledge_list_of_authorized is not None and RoleConstants.CHAT_USER.value.name == chat_user_type:
-            actual_knowledge_ids = list(
-                QuerySet(Document).filter(id__in=document_id_list).values_list("knowledge_id", flat=True).distinct()
-            )
-            authorized_knowledge_ids = get_knowledge_list_of_authorized(
-                workflow_params.get("chat_user_id"), [str(k_id) for k_id in actual_knowledge_ids]
-            )
-            document_id_list = list(
-                QuerySet(Document)
-                .filter(id__in=document_id_list, knowledge_id__in=authorized_knowledge_ids)
-                .values_list("id", flat=True)
-            )
+        actual_knowledge_ids = list(
+            QuerySet(Document)
+            .filter(id__in=document_id_list or [], is_active=True)
+            .values_list("knowledge_id", flat=True)
+            .distinct()
+        )
+        authorized_knowledge_ids = filter_workflow_knowledge(
+            filter_authorized_ids("knowledge", actual_knowledge_ids, workspace_id), workflow_params
+        )
+        document_id_list = list(
+            QuerySet(Document)
+            .filter(id__in=document_id_list or [], knowledge_id__in=authorized_knowledge_ids, is_active=True)
+            .values_list("id", flat=True)
+        )
 
         if search_mode == "auto":
             matched_doc_ids = _handle_auto_tags(self.workflow_manage, document_id_list, question_reference)
@@ -239,7 +237,13 @@ class SearchDocumentNode(INode):
             final_document_ids = list(matched_document_ids)
 
         final_document_ids = [str(doc_id) for doc_id in final_document_ids]
-        document_items = list(QuerySet(Document).filter(id__in=final_document_ids).values())
+        authorized_knowledge_ids = filter_workflow_knowledge(authorized_knowledge_ids, workflow_params)
+        document_items = list(
+            QuerySet(Document)
+            .filter(id__in=final_document_ids, knowledge_id__in=authorized_knowledge_ids, is_active=True)
+            .values()
+        )
+        final_document_ids = [str(doc["id"]) for doc in document_items]
         final_knowledge_ids = list(set(str(doc["knowledge_id"]) for doc in document_items))
         knowledge_items = list(QuerySet(Knowledge).filter(id__in=final_knowledge_ids).values())
 

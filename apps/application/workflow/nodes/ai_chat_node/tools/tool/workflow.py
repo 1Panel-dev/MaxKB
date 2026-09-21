@@ -81,7 +81,9 @@ def _save_workflow_tool_record(
     ).save()
 
 
-def get_workflow_func(source_type, source_id, tool, qv, workspace_id):
+def get_workflow_func(source_type, source_id, tool, qv, workspace_id, workflow_params=None):
+    from knowledge.services.retrieval_access import inherited_retrieval_context
+
     tool_id = tool.id
 
     def inner(**kwargs):
@@ -100,6 +102,7 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id):
             "workspace_id": workspace_id,
             "default_model_setting": qv.default_model_setting or {},
             **kwargs,
+            **inherited_retrieval_context({"workspace_id": workspace_id, **(workflow_params or {})}),
         }
 
         # WorkflowManage.run() 在后台线程异步执行节点，完成时机由 on_complete 回调驱动，
@@ -157,7 +160,7 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id):
     return inner
 
 
-def get_workflow_tools(source_type, source_id, tool_workflow_ids, workspace_id):
+def get_workflow_tools(source_type, source_id, tool_workflow_ids, workspace_id, workflow_params=None):
     tools = QuerySet(Tool).filter(
         id__in=tool_workflow_ids, is_active=True, tool_type=ToolType.WORKFLOW, workspace_id=workspace_id
     )
@@ -170,7 +173,7 @@ def get_workflow_tools(source_type, source_id, tool_workflow_ids, workspace_id):
     results = []
     for tool in tools:
         qv = qd.get(tool.id)
-        func = get_workflow_func(source_type, source_id, tool, qv, workspace_id)
+        func = get_workflow_func(source_type, source_id, tool, qv, workspace_id, workflow_params)
         args = get_workflow_args(tool, qv)
         tool = StructuredTool.from_function(
             func=func,

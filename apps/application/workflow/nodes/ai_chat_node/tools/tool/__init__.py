@@ -13,7 +13,7 @@ from .workflow import get_workflow_tools
 __all__ = ["get_tool_tools", "get_workflow_tools", "get_custom_tools"]
 
 
-def get_tool_tools(source_type, source_id, tool_ids, workspace_id):
+def get_tool_tools(source_type, source_id, tool_ids, workspace_id, workflow_params=None):
     """
     构建工具（Tool）类工具：内部按 tool_type 拆分 workflow / custom，合并返回 LangChain tools。
 
@@ -21,6 +21,6 @@ def get_tool_tools(source_type, source_id, tool_ids, workspace_id):
     """
     if not tool_ids:
         return []
-    return get_workflow_tools(source_type, source_id, tool_ids, workspace_id) + get_custom_tools(
+    return get_workflow_tools(source_type, source_id, tool_ids, workspace_id, workflow_params) + get_custom_tools(
         source_type, source_id, tool_ids, workspace_id
     )

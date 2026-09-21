@@ -22,6 +22,7 @@ from common.database_model_manage.database_model_manage import DatabaseModelMana
 from common.exception.app_exception import ChatException, AppApiException
 from common.field.common import ObjectField
 from tools.models import Tool, ToolType, ToolWorkflowVersion
+from knowledge.services.retrieval_access import inherited_retrieval_context
 
 
 class InputField(serializers.Serializer):
@@ -108,6 +109,7 @@ class ToolWorkflowLibNode(INode):
             "form_data": workflow_params.get("form_data"),
             "default_model_setting": tool_workflow_version.default_model_setting or {},
             **parameters,
+            **inherited_retrieval_context(workflow_params),
         }
 
         node_id = self.get_node_id()
