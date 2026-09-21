@@ -6,6 +6,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
 import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
 import { MsgSuccess, MsgError } from '@/utils/message'
+import perm from '@/permission'
 
 const emit = defineEmits<{ refresh: [] }>()
 const visible = ref(false)
@@ -82,7 +83,7 @@ defineExpose({ open })
       <!-- 校验 -->
       <el-button plain @click="handleValidatePlatform">校验</el-button>
       <!-- 保存 -->
-      <el-button type="primary" @click="submit">保存</el-button>
+      <el-button v-if="perm.system.loginAuth.edit()" type="primary" @click="submit">保存</el-button>
     </template>
   </MkDrawer>
 </template>

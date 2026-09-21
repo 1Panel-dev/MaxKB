@@ -9,6 +9,7 @@ import PortalPreview from './components/PortalPreview.vue'
 import ButtonEditPortal from './components/ButtonEditPortal.vue'
 import ButtonPortalAuthSetting from './components/ButtonPortalAuthSetting.vue'
 import ButtonPortalCorsSetting from './components/ButtonPortalCorsSetting.vue'
+import perm from '@/permission/index.ts'
 
 type AccessField = 'enable_public_access' | 'enable_api' | 'enable_knowledge_base_api' | 'enable_auth' | 'enable_cors'
 
@@ -86,7 +87,7 @@ const previewLogo = computed(() => portalSetting.logo)
             <h4 class="truncate" :title="previewName">{{ previewName }}</h4>
           </div>
           <!-- 编辑门户名称与 Logo -->
-          <ButtonEditPortal ref="editPortalButtonRef" :setting="portalSetting" :saving="saving" :save="savePortalSetting" />
+          <ButtonEditPortal v-if="perm.system.portal.edit()" ref="editPortalButtonRef" :setting="portalSetting" :saving="saving" :save="savePortalSetting" />
         </el-card>
         <el-card shadow="never">
           <div class="space-y-4">

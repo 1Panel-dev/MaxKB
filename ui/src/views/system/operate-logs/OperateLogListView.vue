@@ -9,6 +9,7 @@ import ButtonCleanStrategy from './clean-strategy/ButtonCleanStrategy.vue'
 import OperateLogDetailDialog from './dialog/OperateLogDetailDialog.vue'
 import { beforeDay, datetimeFormat } from '@/utils/time'
 import { useStore } from '@/stores'
+import perm from '@/permission/index.ts'
 
 const { auth } = useStore()
 /* 日志筛选与列表 */
@@ -133,12 +134,12 @@ onMounted(() => {
           <MkDateRange class="mr-3" @change="handleDateFilterChange" />
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" class="mr-3" />
           <!-- 清除策略 导出-->
-          <el-button plain @click="handleExport">
+          <el-button v-if="perm.system.operationLog.export()" plain @click="handleExport">
             <MkIcon name="icon_export_outlined" />
             <span>导出</span>
           </el-button>
           <!-- 清除策略 -->
-          <ButtonCleanStrategy />
+          <ButtonCleanStrategy v-if="perm.system.operationLog.clearPolicy()" />
         </div>
       </component>
 

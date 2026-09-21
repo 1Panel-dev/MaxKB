@@ -12,6 +12,7 @@ import UserFromDrawer from './UserFromDrawer.vue'
 import ButtonImportUsers from './import-users/ButtonImportUsers.vue'
 import ButtonChangeUserPassword from './user-password/ButtonChangeUserPassword.vue'
 import ButtonBatchSetUserRole from './batch-set-user-role/ButtonBatchSetUserRole.vue'
+import perm from '@/permission/index.ts'
 
 const { auth, user } = useStore()
 
@@ -128,9 +129,9 @@ onMounted(() => loadSystemUsers())
         <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 导入用户 -->
-          <ButtonImportUsers @refresh="loadSystemUsers()" />
+          <ButtonImportUsers v-if="perm.system.user.import()" @refresh="loadSystemUsers()" />
           <!-- 创建用户 -->
-          <el-button type="primary" @click="handleOpenUserFormDrawer()">
+          <el-button v-if="perm.system.user.create()" type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
             <span>创建用户</span>
           </el-button>
@@ -222,7 +223,7 @@ onMounted(() => loadSystemUsers())
               <div class="flex">
                 <!-- 编辑 -->
                 <MkTooltip content="编辑" placement="top">
-                  <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
+                  <el-button v-if="perm.system.user.edit()" type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
                 </MkTooltip>
@@ -230,7 +231,7 @@ onMounted(() => loadSystemUsers())
                 <ButtonChangeUserPassword :user="row" @refresh="loadSystemUsers(false)" />
                 <!-- 删除 -->
                 <MkTooltip content="删除" placement="top">
-                  <el-button type="primary" text @click.stop="deleteUser(row)">
+                  <el-button v-if="perm.system.user.delete()" type="primary" text @click.stop="deleteUser(row)">
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
                 </MkTooltip>
@@ -242,12 +243,12 @@ onMounted(() => loadSystemUsers())
         <template #footer-batch-actions>
           <!-- 批量设置角色 -->
           <ButtonBatchSetUserRole
-            v-if="auth.isEE || auth.isPE"
+            v-if="(auth.isEE || auth.isPE) && perm.system.user.setRole()"
             :user-ids="batchSelectedUsers.map(({ id }) => id)"
             @refresh="loadSystemUsers(false)"
           />
           <!-- 批量删除 -->
-          <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
+          <el-button v-if="perm.system.user.delete()" type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
       </MkTable>
     </template>

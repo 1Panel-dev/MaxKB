@@ -5,6 +5,7 @@ import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
+import perm from '@/permission'
 
 defineOptions({ name: 'SamlAuthenticationSetting' })
 const samlApiBaseUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api/saml2`
@@ -93,6 +94,6 @@ onMounted(() => loadSetting())
       ><div class="flex-column"><span>启用 SAML2 认证</span><el-switch v-model="form.is_active" class="self-start" /></div
     ></el-form-item>
     <!-- 保存 -->
-    <el-button type="primary" @click="submit">保存</el-button>
+    <el-button v-if="perm.system.loginAuth.edit()" type="primary" @click="submit">保存</el-button>
   </el-form>
 </template>

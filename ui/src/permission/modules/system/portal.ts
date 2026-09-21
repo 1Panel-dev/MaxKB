@@ -7,4 +7,8 @@ export default {
   /**
    * 系统「门户访问设置」只读权限
    */
-  read: () => canSys(P.PORTAL_READ), edit: () => canSys(P.PORTAL_EDIT) }
+  read: () => canSys(P.PORTAL_READ),
+  /**
+   * 系统「门户访问设置」编辑权限
+   */
+  edit: () => canSys(P.PORTAL_EDIT) }

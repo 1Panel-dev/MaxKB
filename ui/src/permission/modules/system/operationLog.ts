@@ -9,4 +9,12 @@ export default {
    * 系统「操作日志」只读权限
    */
   read: () => canSys(P.OPERATION_LOG_READ) && hasEdition(Edition.PE),
-  export: () => canSys(P.OPERATION_LOG_EXPORT), clearPolicy: () => canSys(P.OPERATION_LOG_CLEAR_POLICY) }
+  /**
+   * 系统「操作日志」导出权限
+   */
+  export: () => canSys(P.OPERATION_LOG_EXPORT),
+  /**
+   * 系统「操作日志」清除策略权限
+   */
+  clearPolicy: () => canSys(P.OPERATION_LOG_CLEAR_POLICY)
+}

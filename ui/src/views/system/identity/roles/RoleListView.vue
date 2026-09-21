@@ -7,6 +7,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import RoleMemberList from './components/RoleMemberList.vue'
 import RolePermissionConfiguration from './components/RolePermissionConfiguration.vue'
 import CreateOrUpdateRoleDialog from './dialog/CreateOrUpdateRoleDialog.vue'
+import perm from '@/permission/index.ts'
 
 type RoleDetailTab = 'permission' | 'member'
 const currentTab = ref<RoleDetailTab>('permission')
@@ -84,7 +85,7 @@ onMounted(() => loadRoles())
         <h4>{{ title }}</h4>
         <MkTooltip content="创建角色" placement="top">
           <!-- 创建角色 -->
-          <el-button class="-mr-1" text type="primary" @click="handleOpenRoleDialog()">
+          <el-button v-if="perm.system.role.create()" class="-mr-1" text type="primary" @click="handleOpenRoleDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </MkTooltip>
@@ -119,11 +120,11 @@ onMounted(() => loadRoles())
                 </template>
                 <template v-if="!role.internal" #action-dropdown>
                   <!-- 重命名 -->
-                  <MkDropdownItem @click="handleOpenRoleDialog(role)">
+                  <MkDropdownItem v-if="perm.system.role.edit()" @click="handleOpenRoleDialog(role)">
                     <template #icon><MkIcon name="icon_rename_outlined" /></template>重命名
                   </MkDropdownItem>
                   <!-- 删除 -->
-                  <MkDropdownItem divided @click="handleDeleteRole(role)">
+                  <MkDropdownItem v-if="perm.system.role.delete()" divided @click="handleDeleteRole(role)">
                     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>删除
                   </MkDropdownItem>
                 </template>

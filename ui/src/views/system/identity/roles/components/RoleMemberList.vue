@@ -5,6 +5,7 @@ import { ROLE_TYPE } from '@/api/enums'
 import type { Dict, OptionItem, RoleItem, RoleMember } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import AddMemberDrawer from '../AddMemberDrawer.vue'
+import perm from '@/permission/index.ts'
 
 const props = defineProps<{ currentRole: RoleItem }>()
 const loading = ref(false)
@@ -95,7 +96,7 @@ watch(
     <div class="flex-between mb-4">
       <div>
         <!-- 添加成员 -->
-        <el-button type="primary" @click="handleOpenAddMemberDrawer"> <MkIcon name="icon_add_outlined" />添加成员 </el-button>
+        <el-button type="primary" v-if="perm.system.workspace.addMember()" @click="handleOpenAddMemberDrawer"> <MkIcon name="icon_add_outlined" />添加成员 </el-button>
       </div>
 
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />
@@ -117,12 +118,12 @@ watch(
       <el-table-column label="操作" width="70" fixed="right">
         <template #default="{ row }">
           <MkTooltip content="移除" placement="top">
-            <el-button type="primary" text @click="handleRemoveMember(row)"><MkIcon name="icon_assigned_outlined" /></el-button>
+            <el-button v-if="perm.system.workspace.removeMember()" type="primary" text @click="handleRemoveMember(row)"><MkIcon name="icon_assigned_outlined" /></el-button>
           </MkTooltip>
         </template>
       </el-table-column>
       <template #footer-batch-actions>
-        <el-button type="danger" plain @click="handleBatchDelete">移除</el-button>
+        <el-button v-if="perm.system.workspace.removeMember()" type="danger" plain @click="handleBatchDelete">移除</el-button>
       </template>
     </MkTable>
   </div>

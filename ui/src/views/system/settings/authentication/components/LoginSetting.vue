@@ -9,6 +9,7 @@ import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 import { useStore } from '@/stores'
+import perm from '@/permission'
 
 defineOptions({ name: 'AuthenticationSetting' })
 const { auth } = useStore()
@@ -244,6 +245,6 @@ onMounted(() => {
         </el-select>
       </el-form-item>
     </div>
-    <el-button class="mt-4" type="primary" @click="submit">保存</el-button>
+    <el-button v-if="perm.system.loginAuth.edit()" class="mt-4" type="primary" @click="submit">保存</el-button>
   </el-form>
 </template>

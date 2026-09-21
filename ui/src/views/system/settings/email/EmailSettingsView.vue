@@ -4,6 +4,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { EmailSettingPayload } from '@/api/types'
 import EmailSettingApi from '@/api/admin/system/settings/email-setting'
 import { MsgSuccess } from '@/utils/message'
+import perm from '@/permission'
 
 const defaultEmailSetting: EmailSettingPayload = {
   email_host: '',
@@ -93,7 +94,7 @@ onMounted(() => loadEmailSetting())
       </el-form-item>
 
       <!-- 保存 -->
-      <el-button type="primary" @click="submitEmailSetting('save')">保存</el-button>
+      <el-button v-if="perm.system.email.edit()" type="primary" @click="submitEmailSetting('save')">保存</el-button>
       <!-- 测试连接 -->
       <el-button plain @click="submitEmailSetting('test')">测试连接</el-button>
     </el-form>
