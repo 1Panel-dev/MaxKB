@@ -40,7 +40,7 @@ export default {
     roundTrigger: '按轮次触发',
     roundTriggerTip: '累计到N轮后，自动提炼N轮对话，生成记忆',
     triggerInterval: '触发间隔',
-    scheduledTrigger: '按时间触发',
+    scheduledTrigger: '定时触发',
     scheduledTriggerTip: '到设定时间后，自动提炼周期内所有对话，生成记忆',
     cronExpressionInvalid: 'Cron表达式不合法',
     tips1: `开启后，从开启时间记录新对话并按周期生成记忆，可通过`,
