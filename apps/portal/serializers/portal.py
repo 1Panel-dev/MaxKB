@@ -55,7 +55,11 @@ class PortalSerializer(serializers.Serializer):
     enable_auth = serializers.BooleanField(required=False, label=_("enable auth"), help_text=_("enable auth"))
     auth_config = serializers.JSONField(required=False, label=_("auth config"), help_text=_("auth config"))
     enable_cors = serializers.BooleanField(required=False, label=_("enable cors"), help_text=_("enable cors"))
-    cors_config = serializers.JSONField(required=False, label=_("cors config"), help_text=_("cors config"))
+    cross_domain_list = serializers.ListSerializer(
+        required=False,
+        child=serializers.CharField(required=True, label=_("Cross-domain address")),
+        label=_("Cross-domain list"),
+    )
 
     class Model(serializers.ModelSerializer):
         class Meta:

@@ -15,12 +15,13 @@ function handleOpenCorsSetting() {
   corsVisible.value = true
 }
 
-/* 按行解析跨域地址，去掉行首尾空白与空行 */
+/* 按行解析跨域地址，去掉行首尾空白与空行后按顺序去重 */
 function parseCorsOrigins(value: string) {
-  return value
+  const origins = value
     .split('\n')
     .map((origin) => origin.trim())
     .filter(Boolean)
+  return [...new Set(origins)]
 }
 
 function handleSaveCorsSetting() {

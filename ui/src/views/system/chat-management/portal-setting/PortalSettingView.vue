@@ -29,7 +29,7 @@ const portalSetting = reactive<PortalSetting>({
     lock_time: 10,
   },
   enable_cors: false,
-  cors_config: {},
+  cross_domain_list: [],
 })
 const loading = ref(false)
 const saving = ref(false)
@@ -75,9 +75,9 @@ function savePortalAuthSetting(payload: PortalSettingPayload) {
   return savePortalSetting(payload)
 }
 
-/* 跨域地址保存：写入 cors_config 的 cross_domain_list，保留其余字段 */
+/* 跨域地址保存 */
 function savePortalCorsSetting(origins: string[]) {
-  return savePortalSetting({ cors_config: { ...portalSetting.cors_config, cross_domain_list: origins } })
+  return savePortalSetting({ cross_domain_list: origins })
 }
 
 function handleOpenAuthSetting(enableAfterSave = false) {
@@ -88,9 +88,9 @@ function handleOpenAuthSetting(enableAfterSave = false) {
 
 const authSettingButtonRef = useTemplateRef<InstanceType<typeof ButtonPortalAuthSetting>>('authSettingButtonRef')
 const portalCorsOrigins = computed({
-  get: () => portalSetting.cors_config.cross_domain_list ?? [],
+  get: () => portalSetting.cross_domain_list ?? [],
   set: (origins: string[]) => {
-    portalSetting.cors_config = { ...portalSetting.cors_config, cross_domain_list: origins }
+    portalSetting.cross_domain_list = origins
   },
 })
 const previewName = computed(() => portalSetting.name)
