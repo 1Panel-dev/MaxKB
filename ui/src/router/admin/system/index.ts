@@ -252,12 +252,12 @@ export const systemRoutes: RouteRecordRaw = {
           component: () => import('@/views/system/chat-management/authentication/AuthenticationView.vue'),
           meta: { title: '对话用户认证', order: 30,
             permission:perm.system.chatAuth.read,
-            next:'system-portal-access'
+            next:'system-portal-setting'
           },
         },
         {
-          path: 'portal-access',
-          name: 'system-portal-access',
+          path: 'portal-setting',
+          name: 'system-portal-setting',
           component: () => import('@/views/system/chat-management/portal-setting/PortalSettingView.vue'),
           meta: { title: '门户访问设置', order: 40, permission: perm.system.portal.read, next: 'system-settings' },
         },

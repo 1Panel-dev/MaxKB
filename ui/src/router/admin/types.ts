@@ -17,6 +17,8 @@ declare module 'vue-router' {
     activeMenu?: string
     /** 资源详情页需要保持激活的二级菜单路由名称。 */
     detailActiveMenu?: string
+    /** 资源详情导航根，仅配置在挂载详情容器的路由上。 */
+    resourceDetailRoot?: boolean
     /** iconfont Symbol ID */
     icon?: string
     order?: number

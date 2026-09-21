@@ -321,6 +321,9 @@
     line-height: 22px;
     font-weight: 400;
   }
+  &__inner:before {
+    top: 6px !important;
+  }
 }
 
 .el-checkbox-button {
@@ -1208,5 +1211,8 @@
     em:hover {
       color: var(--el-color-primary-light-5);
     }
+  }
+  &:focus {
+    color: inherit;
   }
 }

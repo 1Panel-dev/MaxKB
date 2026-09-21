@@ -244,7 +244,7 @@ function handleBatchDelete() {
                   <RelatedResourcesApplicationAction label="查看关联资源" :api="RelatedResourcesApi" :application="application" />
                   <!-- 复制 -->
                   <CopyApplicationAction
-                    v-if="$perm.application.workspace.copy(application.id)"
+
                     v-model:loading="applicationOperationLoading"
                     label="复制"
                     :api="ApplicationApi"

@@ -26,7 +26,7 @@ function createMenuItems(routes: readonly MenuRouteRecord[]): LayoutMenuItem[] {
         activeIcon: route.meta?.activeIcon,
         icon: route.meta?.icon,
         route: { name: route.name! },
-        permission:route.meta?.permission as LayoutMenuItem['permission'],
+        permission: route.meta?.permission as LayoutMenuItem['permission'],
         children: children.length ? children : undefined,
       }
     })
@@ -41,13 +41,7 @@ export function getChildRouteList(scope: RouteScope): LayoutMenuItem[] {
 
 /** 根据当前匹配路由生成所属详情父路由的二级侧栏目录。 */
 export function getMatchedChildRouteList(route: RouteLocationNormalizedLoaded): LayoutMenuItem[] {
-  const activeRouteName = route.meta.detailActiveMenu ?? route.name
+  const detailRoot = route.matched.find((matchedRoute) => matchedRoute.meta.resourceDetailRoot === true)
 
-  if (!activeRouteName) return []
-
-  const parentRoute = [...route.matched]
-    .reverse()
-    .find((matchedRoute) => matchedRoute.children.some((childRoute) => childRoute.name === activeRouteName))
-
-  return createMenuItems(parentRoute?.children ?? [])
+  return createMenuItems(detailRoot?.children ?? [])
 }

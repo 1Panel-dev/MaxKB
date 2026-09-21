@@ -407,7 +407,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/identity/workspaces/WorkspaceListView.vue`                     | 工作空间列表页面                                                     |
 | `system/chat/user-groups/GroupsListView.vue`                           | 对话用户组及组成员管理页面                                           |
 | `system/chat/users/UserListView.vue`                                   | 对话用户列表、配额及用户导入管理页面                                 |
-| `system/chat-management/portal-setting/PortalSettingView.vue`           | 门户基本信息、访问开关、认证配置、跨域地址编辑与门户预览 |
+| `system/chat-management/portal-setting/PortalSettingView.vue`          | 门户基本信息、访问开关、认证配置、跨域地址编辑与门户预览             |
 | `system/settings/theme/ThemeSettingView.vue`                           | 系统外观设置和登录外观预览页面                                       |
 | `system/settings/authentication/AuthenticationView.vue`                | 系统登录及认证源配置页面                                             |
 | `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面                                           |
@@ -625,14 +625,17 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 
 `KnowledgeCard` 在非批量选择模式下通过 `click` 通知列表进入知识库详情。
 `knowledge-detail/WorkspaceKnowledgeDetailView.vue` 查询并展示知识库名称，复用
-`ResourceDetailLayout` 生成“文档”、“工作流”和“设置”目录，返回列表时恢复所属文件夹。
+`ResourceDetailLayout` 生成资料库、工作流、检索优化、授权与集成、设置目录，返回列表时恢复所属文件夹。
+资料库包含文档、图片、标签管理；检索优化包含召回测试、问题、自定义分词；授权与集成包含
+对话用户、外部检索服务。新增页面分别放在 `knowledge-detail/` 下的 `image/`、`tag/`、
+`recall-test/`、`question/`、`dictionary/`、`chat-user/`、`external-retrieval/`，暂只展示占位内容。
 容器通过 `knowledge-detail/context.ts` 提供只读详情与替换能力；设置页复用已加载详情，保存成功后
 更新容器数据，同步名称等展示。基本信息复用创建流程的 `KnowledgeBaseForm`，类型配置和校验留在
 设置页中。当前设置页仅接入 Workspace 路由和 API，暂不增加前端权限判断。
 更换向量模型需确认，先保存再重新向量化，整条流程禁止重复提交；向量化失败时保留原模型比较基准，
 允许再次保存重试。Web、飞书设置保留未编辑的 `meta` 字段，上传限制使用详情顶层值。
 `knowledge-detail/document/DocumentListView.vue` 为文档列表子页面，目前保留占位内容；
-文档详情作为同一容器的子路由。System 详情仍使用原有独立占位页面。
+文档详情路由暂未启用，System 知识库详情路由暂未注册。
 
 `KnowledgeWorkflowView` 复用 `ButtonDefaultModelSetting`，从知识库详情读取默认模型配置，
 随工作流保存提交并将配置传入画布；支持应用到所有节点，保存失败回滚至已保存配置。

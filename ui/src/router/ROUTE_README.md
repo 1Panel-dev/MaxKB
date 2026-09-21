@@ -59,7 +59,7 @@ System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。
 对话端管理根地址为 `/admin/system/chat-management`（`system-chat-management`），默认进入
 `users`（`system-chat-users`）。子路由还包括 `groups`
 （`system-chat-groups`）、`authentication`（`system-chat-authentication`）
-和 `portal-access`（`system-portal-access`），页面组件统一位于 `views/system/chat-management/`。
+和 `portal-setting`（`system-portal-setting`），页面组件统一位于 `views/system/chat-management/`。
 门户访问设置渲染 `views/system/chat-management/portal-setting/PortalSettingView.vue`，提供门户访问
 配置和右侧界面预览。
 
@@ -113,18 +113,19 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 
 路由扩展字段定义在 `admin/types.ts`：
 
-| 字段               | 类型                                                  | 说明                                                   |
-| ------------------ | ----------------------------------------------------- | ------------------------------------------------------ |
-| `scope`            | `'workspace' \| 'system'`                             | 标记生成哪一套框架导航，只配置在布局根路由上           |
-| `resourceScope`    | `'workspace' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承 |
-| `activeIcon`       | `string`                                              | 菜单激活状态的 iconfont Symbol ID                      |
-| `activeMenu`       | `string`                                              | 进入子页面时需要保持激活的侧栏菜单路径                 |
-| `detailActiveMenu` | `string`                                              | 更深层详情页面需要保持激活的二级菜单路由名称           |
-| `title`            | `string`                                              | 页面标题，同时作为导航名称                             |
-| `icon`             | `string`                                              | iconfont Symbol ID，子目录通常可以不配置               |
-| `order`            | `number`                                              | 同级导航排序，数字越小越靠前                           |
-| `hidden`           | `boolean`                                             | 设置为 `true` 时不显示在导航中                         |
-| `resource`         | `ResourceAuthorizationType`                           | 系统资源授权页面当前管理的后端资源类型                 |
+| 字段                 | 类型                                                  | 说明                                                   |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| `scope`              | `'workspace' \| 'system'`                             | 标记生成哪一套框架导航，只配置在布局根路由上           |
+| `resourceScope`      | `'workspace' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承 |
+| `activeIcon`         | `string`                                              | 菜单激活状态的 iconfont Symbol ID                      |
+| `activeMenu`         | `string`                                              | 进入子页面时需要保持激活的侧栏菜单路径                 |
+| `resourceDetailRoot` | `boolean`                                             | 标记资源详情导航根，仅在详情容器路由自身配置           |
+| `detailActiveMenu`   | `string`                                              | 更深层详情页面需要保持激活的二级菜单路由名称           |
+| `title`              | `string`                                              | 页面标题，同时作为导航名称                             |
+| `icon`               | `string`                                              | iconfont Symbol ID，子目录通常可以不配置               |
+| `order`              | `number`                                              | 同级导航排序，数字越小越靠前                           |
+| `hidden`             | `boolean`                                             | 设置为 `true` 时不显示在导航中                         |
+| `resource`           | `ResourceAuthorizationType`                           | 系统资源授权页面当前管理的后端资源类型                 |
 
 ## 导航生成
 
@@ -139,8 +140,8 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 `WorkspaceSidebar` 和 `SystemSidebar` 分别调用该方法，不需要在页面组件中维护菜单数组。
 
 资源详情页面统一使用 `ResourceDetailLayout`。`admin/utils.ts` 中的
-`getMatchedChildRouteList(route)` 根据当前匹配路由找到所属详情父路由，并复用与
-`getChildRouteList(scope)` 相同的过滤、排序和菜单字段转换逻辑生成二级导航。详情子路由通过
+`getMatchedChildRouteList(route)` 从 `route.matched` 的记录自身 meta 中查找 `resourceDetailRoot: true`，定位详情父路由，并复用与
+`getChildRouteList(scope)` 相同的过滤、排序和菜单字段转换逻辑生成二级导航。详情菜单支持一级入口与二级折叠分组混排，分组直接使用路由 `children`。详情子路由通过
 `title`、`icon`、`activeIcon` 和 `order` 配置二级菜单；更深层页面通过
 `detailActiveMenu` 指定需要保持激活的二级菜单路由名称，不配置 `parentPath` 或 `parentName`。
 `ResourceDetailLayout` 切换二级菜单时保留当前 query；详情容器返回列表时按业务来源状态透传或
@@ -323,10 +324,15 @@ System 共享资源页面：
 - 每次新增、删除、移动或修改路由时，必须同步更新本文件。
 
 工作空间知识库卡片进入 `workspace-knowledge-detail`，默认重定向到“文档”子路由。
-详情容器复用 `ResourceDetailLayout`，二级目录包含“文档”、“工作流”和“设置”；`setting`
+详情容器复用 `ResourceDetailLayout`，菜单依次为“资料库（文档、图片、标签管理）”、
+“工作流”、“检索优化（召回测试、问题、自定义分词）”、“授权与集成（对话用户、外部检索服务）”、
+“设置”。资料库分组使用空 path，保留原 `/document` 地址；图片和标签分别使用 `/image`、`/tag`。
+检索优化使用 `/retrieval/recall`、`/retrieval/question`、`/retrieval/dictionary`；
+授权与集成使用 `/integration/chat-user`、`/integration/external-retrieval`。
+分组不挂载页面组件，直接访问分组时重定向到首个子页。新增七个页面暂为占位 View。`setting`
 渲染 `knowledge-detail/setting/KnowledgeSettingView.vue`，使用容器提供的知识库详情。`workflow-entry`
 仅作为目录跳转入口，重定向到独立的 `workflow-knowledge` 全屏画布。画布返回知识库详情。
-文档详情继续保留原地址，并通过 `detailActiveMenu` 高亮“文档”。
+文档详情路由当前尚未启用；后续接入时通过 `detailActiveMenu` 高亮“文档”。
 
 智能体工作流返回通过 `views/workflow/application/navigation.ts` 动态读取详情父路由的 `children`。
 Workspace 父路由为 `workspace-application-detail-layout`；System 详情实现时使用

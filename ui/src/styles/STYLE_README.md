@@ -507,3 +507,12 @@ npm run build-only-chat
 
 `mk-rank` 提供 20px 圆形名次徽标，前三名叠加 `mk-rank-1`、`mk-rank-2`、
 `mk-rank-3`，使用固定渐变配色。样式统一维护在 `app.scss`。
+
+## 资源详情导航
+
+`layout/sidebar/ResourceDetailMenu.vue` 统一资源详情的单层与二级菜单样式，供
+`ResourceDetailLayout` 使用。分组使用 `el-collapse / el-collapse-item`，允许同时展开多个分组；
+叶子菜单复用 `MkListItem`，二级项仅缩进内容，选中背景保持整行宽度。
+折叠标题沿用菜单行的字号、行高、圆角、内边距与悬停颜色，移除 Collapse 默认分隔线和内容留白。
+覆盖样式限定在组件 scoped 范围内，不影响 SystemSidebar 或其他 Collapse。
+分组首次默认展开，路由切换时展开当前叶子所属分组，普通渲染不重置手动收起状态。

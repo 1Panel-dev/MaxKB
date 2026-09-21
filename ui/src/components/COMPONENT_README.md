@@ -355,16 +355,20 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 ### MkEditAvatar（修改头像）
 
-手动导入 `@/components/mk-edit-avatar/index.vue`，不参与全局注册。`defaultIcon` 必填，接收默认
-图标图片 URL；字符串 `v-model` 为当前自定义头像 URL，空字符串表示使用默认图标。
-`size` 默认为 `32`（px），`editable` 默认为 `true`，设为 `false` 时仅展示头像。
+手动导入 `@/components/mk-edit-avatar/index.vue`，不参与全局注册。字符串 `v-model` 为当前
+自定义头像 URL，空字符串表示使用默认图标；不再接收 `defaultIcon`。
+`size` 默认为 `32`（px），控制触发区传给插槽的尺寸；弹层预览和上传区域固定为 80px。
+`editable` 默认为 `true`，设为 `false` 时仅展示头像。
 
-默认插槽替换触发区的头像内容，透出 `{ icon, size }`；`icon` 为当前 `v-model` 值，空值可由
-`ToolIcon` 等资源组件自行回退。未提供插槽时展示当前头像或 `defaultIcon` 图片。
-触发按钮及悬停、聚焦、点击行为由 `MkEditAvatar` 统一维护，插槽内只放展示内容，不嵌套按钮。
-`ToolFormDrawer` 通过此插槽渲染 `ToolIcon`，并将头像绑定到 `toolForm.icon`。
+必填默认插槽同时渲染触发区和默认 Logo 预览，透出 `{ icon, size }`。触发区传入当前头像
+（空值转为 `undefined`）和 `props.size`；默认预览始终传入 `icon: undefined`、固定的 `size: 80`，不读取组件的
+`props.size`。插槽参数由调用方按需使用，不会自动覆盖插槽内组件的尺寸。
+调用方必须使用插槽的 `icon`，由 `PortalIcon`、`ToolIcon` 等资源组件自行展示默认图标，
+不要在插槽内直接绑定外部头像值。
+触发区由 `MkEditAvatar` 的 `span` 容器承载，统一处理悬停，插槽内只放展示内容。
+门户编辑通过此插槽渲染 `PortalIcon`，并将头像绑定到 `portalForm.logo`。
 
-悬停、聚焦或点击头像打开 Logo 设置，打开后保持显示以便选择本地文件；取消、点击外部或 Escape
+悬停头像打开 Logo 设置，打开后保持显示以便选择本地文件；取消、点击外部或弹层内按 Escape
 关闭并丢弃草稿，确定后才更新 `v-model` 并触发 `change(icon, file)`。
 自定义图片支持 JPG、PNG、GIF，大小不超过 10MB；确认时 `icon` 为本地 Data URL，`file`
 为所选 `File`，未重新选文件或使用默认 Logo 时为 `null`。组件不请求上传接口；调用方负责上传
@@ -374,13 +378,16 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 <script setup lang="ts">
 import { ref } from 'vue'
 import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
-import defaultIcon from '@/assets/mk_icon_upload.svg'
 
 const avatar = ref('')
 </script>
 
 <template>
-  <MkEditAvatar v-model="avatar" :default-icon="defaultIcon" />
+  <MkEditAvatar v-model="avatar">
+    <template #default="{ icon, size: previewSize }">
+      <PortalIcon :icon="icon" :size="previewSize" />
+    </template>
+  </MkEditAvatar>
 </template>
 ```
 
