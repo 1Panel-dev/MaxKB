@@ -357,12 +357,12 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 手动导入 `@/components/mk-edit-avatar/index.vue`，不参与全局注册。字符串 `v-model` 为当前
 自定义头像 URL，空字符串表示使用默认图标；不再接收 `defaultIcon`。
-`size` 默认为 `32`（px），控制触发区传给插槽的尺寸；弹层预览和上传区域固定为 80px。
+`size` 默认为 `32`（px），只设置 `referenceRef` 触发容器的宽高；弹层预览和上传区域固定为 80px。
 `editable` 默认为 `true`，设为 `false` 时仅展示头像。
 
-必填默认插槽同时渲染触发区和默认 Logo 预览，透出 `{ icon, size }`。触发区传入当前头像
-（空值转为 `undefined`）和 `props.size`；默认预览始终传入 `icon: undefined`、固定的 `size: 80`，不读取组件的
-`props.size`。插槽参数由调用方按需使用，不会自动覆盖插槽内组件的尺寸。
+必填默认插槽同时渲染触发区和默认 Logo 预览，只透出 `{ icon }`。触发区传入当前头像
+（空值转为 `undefined`）；默认预览始终传入 `icon: undefined`。两处容器通过样式让插槽的
+直接子元素填满各自宽高，不向插槽传递 `size`，也不修改插槽组件的 Props。
 调用方必须使用插槽的 `icon`，由 `PortalIcon`、`ToolIcon` 等资源组件自行展示默认图标，
 不要在插槽内直接绑定外部头像值。
 触发区由 `MkEditAvatar` 的 `span` 容器承载，统一处理悬停，插槽内只放展示内容。
@@ -384,8 +384,8 @@ const avatar = ref('')
 
 <template>
   <MkEditAvatar v-model="avatar">
-    <template #default="{ icon, size: previewSize }">
-      <PortalIcon :icon="icon" :size="previewSize" />
+    <template #default="{ icon }">
+      <PortalIcon :icon="icon" />
     </template>
   </MkEditAvatar>
 </template>
