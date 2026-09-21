@@ -170,7 +170,7 @@ onMounted(() => loadSystemUsers())
           <template #default="{ row }">
             <WorkspaceRelationTags
               :columns="[
-                { prop: 'role', label: '角色' },
+                { prop: 'role_name', label: '角色' },
                 { prop: 'workspace', label: '工作空间' },
               ]"
               :tags="row.role_name"
