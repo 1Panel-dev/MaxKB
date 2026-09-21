@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import JSEncrypt from 'jsencrypt'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -29,6 +29,7 @@ const isSubmitting = ref(false)
 const isSendingCode = ref(false)
 const countdown = ref(0)
 let countdownTimer: number | undefined
+const isSendCodeDisabled = computed(() => !forgotPasswordForm.email.trim() || isSendingCode.value || countdown.value > 0)
 
 const validateConfirmPassword = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
   if (!value) {
@@ -136,8 +137,8 @@ onMounted(() => {
       <el-form-item prop="verificationCode">
         <div class="flex w-full gap-3">
           <el-input v-model="forgotPasswordForm.verificationCode" placeholder="请输入验证码" />
-          <el-button plain class="w-35 shrink-0" :disabled="countdown > 0" :loading="isSendingCode" @click="handleSendCode">
-            {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+          <el-button plain class="w-35 shrink-0" :disabled="isSendCodeDisabled" :loading="isSendingCode" @click="handleSendCode">
+            {{ countdown > 0 ? `重新发送 (${countdown}s)` : '获取验证码' }}
           </el-button>
         </div>
       </el-form-item>
