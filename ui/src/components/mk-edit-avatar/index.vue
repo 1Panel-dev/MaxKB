@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{ editable?: boolean; size?: number }>(),
 })
 const avatar = defineModel<string>({ default: '' })
 const emit = defineEmits<{ change: [icon: string, file: File | null] }>()
-defineSlots<{ default(props: { icon: string | undefined; size: number }): unknown }>()
+defineSlots<{ default(props: { icon: string | undefined }): unknown }>()
 
 // 头像编辑草稿：确认前不修改外部值。
 const visible = ref(false)
@@ -101,8 +101,14 @@ onBeforeUnmount(() => fileReader?.abort())
   <el-popover :visible="visible" :width="414" placement="bottom-start" @after-leave="clearDraft">
     <template #reference>
       <!-- 悬停修改头像 -->
-      <span ref="referenceRef" class="inline-flex" :class="{ 'cursor-pointer': props.editable }" @mouseenter="open">
-        <slot :icon="avatar || undefined" :size="props.size" />
+      <span
+        ref="referenceRef"
+        class="inline-flex shrink-0 [&>*]:h-full! [&>*]:w-full!"
+        :class="{ 'cursor-pointer': props.editable }"
+        :style="{ width: `${props.size}px`, height: `${props.size}px` }"
+        @mouseenter="open"
+      >
+        <slot :icon="avatar || undefined" />
       </span>
     </template>
 
@@ -112,8 +118,8 @@ onBeforeUnmount(() => fileReader?.abort())
         <el-radio value="default">默认 Logo</el-radio>
         <el-radio value="custom">自定义上传</el-radio>
       </el-radio-group>
-      <div v-if="logoMode === 'default'">
-        <slot :icon="undefined" :size="80" />
+      <div v-if="logoMode === 'default'" class="h-20 w-20 [&>*]:h-full! [&>*]:w-full!">
+        <slot :icon="undefined" />
       </div>
 
       <div v-else>
@@ -128,7 +134,7 @@ onBeforeUnmount(() => fileReader?.abort())
           :on-change="selectImage"
         >
           <el-avatar v-if="draftIcon" :size="80" shape="square">
-            <img :src="draftIcon" alt="自定义头像预览" class="object-cover" />
+            <img :src="draftIcon" class="object-cover" />
           </el-avatar>
 
           <div v-else class="flex-center h-20 w-20 rounded-md border border-dashed bg-N200 hover:border-primary">

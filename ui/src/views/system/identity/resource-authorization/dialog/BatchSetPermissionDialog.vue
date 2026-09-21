@@ -5,13 +5,20 @@ import { getPermissionOptions } from '../constants'
 
 defineOptions({ name: 'BatchSetPermissionDialog' })
 
+const props = defineProps<{ disabled: boolean }>()
 const emit = defineEmits<{ submit: [permission: ResourcePermission] }>()
 
 const visible = ref(false)
 const permission = ref<ResourcePermission>()
 
 function open() {
+  if (props.disabled) return
+
   visible.value = true
+}
+
+function close() {
+  visible.value = false
 }
 
 function resetData() {
@@ -19,18 +26,18 @@ function resetData() {
 }
 
 function handleSubmit() {
-  if (!permission.value) return
+  if (props.disabled || !permission.value) return
 
   emit('submit', permission.value)
   visible.value = false
 }
 
-defineExpose({ open })
+defineExpose({ open, close })
 </script>
 
 <template>
   <MkDialog v-model="visible" title="配置权限" @closed="resetData">
-    <el-radio-group v-model="permission" class="vertical-radio-group">
+    <el-radio-group v-model="permission" class="vertical-radio-group" :disabled="disabled">
       <el-radio v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value" :value="permissionOption.value">
         <p>{{ permissionOption.label }}</p>
         <p v-if="permissionOption.description" class="text-N500 mt-1">
@@ -39,8 +46,10 @@ defineExpose({ open })
       </el-radio>
     </el-radio-group>
     <template #footer>
+      <!-- 取消批量配置 -->
       <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :disabled="!permission" @click="handleSubmit">确认</el-button>
+      <!-- 确认批量配置 -->
+      <el-button type="primary" :disabled="disabled || !permission" @click="handleSubmit">确认</el-button>
     </template>
   </MkDialog>
 </template>

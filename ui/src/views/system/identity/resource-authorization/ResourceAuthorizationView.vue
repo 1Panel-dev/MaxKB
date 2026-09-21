@@ -1,13 +1,22 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import CommonSystemApi from '@/api/admin/system/common'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import ResourceAuthorizationApi from '@/api/admin/system/resource-authorization'
 import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
-import type { ResourceAuthorizationType, ResourcePermissionItem, ResourcePermissionPayload, CommonUserOption, OptionItem, SystemUserGroup, WorkspaceItem } from '@/api/types'
+import type {
+  ResourceAuthorizationType,
+  ResourcePermissionItem,
+  ResourcePermissionPayload,
+  CommonUserOption,
+  OptionItem,
+  SystemUserGroup,
+  WorkspaceItem,
+} from '@/api/types'
 import { useStore } from '@/stores'
+import { perm } from '@/permission'
 import { MsgSuccess } from '@/utils/message'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import PermissionTable from './components/PermissionTable.vue'
@@ -19,7 +28,12 @@ const { auth } = useStore()
 const route = useRoute()
 
 const resourceType = ref<ResourceAuthorizationType>((route.meta.resource as ResourceAuthorizationType) ?? RESOURCE_TYPE.APPLICATION)
-const resourceTypeOptions: OptionItem<ResourceAuthorizationType>[] = [RESOURCE_TYPE.APPLICATION, RESOURCE_TYPE.KNOWLEDGE, RESOURCE_TYPE.TOOL, RESOURCE_TYPE.MODEL].map((value) => ({
+const resourceTypeOptions: OptionItem<ResourceAuthorizationType>[] = [
+  RESOURCE_TYPE.APPLICATION,
+  RESOURCE_TYPE.KNOWLEDGE,
+  RESOURCE_TYPE.TOOL,
+  RESOURCE_TYPE.MODEL,
+].map((value) => ({
   label: RESOURCE_AUTHORIZATION_LABELS[value],
   value,
 }))
@@ -51,7 +65,10 @@ const selectedUserGroupId = ref('')
 const selectedUserId = ref('')
 
 function loadAuthorizationTargets() {
-  return Promise.all([UserGroupsApi.getSystemUserGroups(selectedWorkspaceId.value), CommonSystemApi.getWorkspaceMembers(selectedWorkspaceId.value)]).then(([groups, users]) => {
+  return Promise.all([
+    UserGroupsApi.getSystemUserGroups(selectedWorkspaceId.value),
+    CommonSystemApi.getWorkspaceMembers(selectedWorkspaceId.value),
+  ]).then(([groups, users]) => {
     userGroups.value = groups
     workspaceMembers.value = users
     selectedUserGroupId.value = groups[0]?.id ?? ''
@@ -75,6 +92,7 @@ function handleUserSelect(user: CommonUserOption) {
 }
 
 /* 资源权限 */
+
 const loadingPermissions = ref(false)
 const resourcePermissions = ref<ResourcePermissionItem[]>([])
 
@@ -129,6 +147,8 @@ function buildResourceTree(resourceItems: ResourcePermissionItem[]) {
 /* 保存权限 */
 
 function handlePermissionsSubmit(permissions: ResourcePermissionPayload[]) {
+  if (!canEditResourcePermission.value || loadingPermissions.value) return
+
   const targetId = targetType.value === 'user-group' ? selectedUserGroupId.value : selectedUserId.value
 
   if (!targetId) return
@@ -155,6 +175,15 @@ onMounted(() => {
     loadingView.value = false
   })
 })
+
+// 权限
+const resourceEditPermissions: Record<ResourceAuthorizationType, () => boolean> = {
+  [RESOURCE_TYPE.APPLICATION]: perm.system.authorization.application.edit,
+  [RESOURCE_TYPE.KNOWLEDGE]: perm.system.authorization.knowledge.edit,
+  [RESOURCE_TYPE.TOOL]: perm.system.authorization.tool.edit,
+  [RESOURCE_TYPE.MODEL]: perm.system.authorization.model.edit,
+}
+const canEditResourcePermission = computed(() => resourceEditPermissions[resourceType.value]())
 </script>
 
 <template>
@@ -171,7 +200,12 @@ onMounted(() => {
         </el-tabs>
       </component>
 
-      <UserGroupAuthorizationList v-if="targetType === 'user-group'" :active-id="selectedUserGroupId" :user-groups="userGroups" @select="handleUserGroupSelect" />
+      <UserGroupAuthorizationList
+        v-if="targetType === 'user-group'"
+        :active-id="selectedUserGroupId"
+        :user-groups="userGroups"
+        @select="handleUserGroupSelect"
+      />
       <UserAuthorizationList v-else :active-id="selectedUserId" :users="workspaceMembers" @select="handleUserSelect" />
     </template>
 
@@ -180,12 +214,23 @@ onMounted(() => {
         <div class="w-full">
           <h4 class="mb-4">资源权限配置</h4>
           <el-tabs v-model="resourceType" class="w-full" @tab-change="loadResourcePermissions">
-            <el-tab-pane v-for="resourceTypeOption in resourceTypeOptions" :key="resourceTypeOption.value" :label="resourceTypeOption.label" :name="resourceTypeOption.value" />
+            <el-tab-pane
+              v-for="resourceTypeOption in resourceTypeOptions"
+              :key="resourceTypeOption.value"
+              :label="resourceTypeOption.label"
+              :name="resourceTypeOption.value"
+            />
           </el-tabs>
         </div>
       </component>
 
-      <PermissionTable v-loading="loadingPermissions" :data="resourcePermissions" :resource-type="resourceType" @submit="handlePermissionsSubmit" />
+      <PermissionTable
+        v-loading="loadingPermissions"
+        :data="resourcePermissions"
+        :resource-type="resourceType"
+        :disabled="!canEditResourcePermission || loadingPermissions"
+        @submit="handlePermissionsSubmit"
+      />
     </template>
   </MkViewLayout>
 </template>

@@ -16,7 +16,7 @@ import BatchSetPermissionDialog from '../dialog/BatchSetPermissionDialog.vue'
 
 defineOptions({ name: 'ResourcePermissionTable' })
 
-const props = defineProps<{ data: ResourcePermissionItem[]; resourceType: ResourceAuthorizationType }>()
+const props = defineProps<{ data: ResourcePermissionItem[]; resourceType: ResourceAuthorizationType; disabled: boolean }>()
 const emit = defineEmits<{ submit: [permissions: ResourcePermissionPayload[]] }>()
 
 const permissionSearchFields = computed<OptionItem<string>[]>(() => [
@@ -99,6 +99,8 @@ function buildPermissionPayload(permission: ResourcePermission, resource: Resour
 }
 
 function handlePermissionChange(permission: ResourcePermission, resource: ResourcePermissionItem) {
+  if (props.disabled) return
+
   emit('submit', [...buildPermissionPayload(permission, resource).values()])
 }
 
@@ -113,10 +115,14 @@ function handleSelectionChange(selection: unknown[]) {
 const batchPermissionDialogRef = useTemplateRef<InstanceType<typeof BatchSetPermissionDialog>>('batchPermissionDialogRef')
 
 function handleOpenBatchDialog() {
+  if (props.disabled || !batchSelectedResources.value.length) return
+
   batchPermissionDialogRef.value?.open()
 }
 
 function handleBatchSubmit(permission: ResourcePermission) {
+  if (props.disabled || !batchSelectedResources.value.length) return
+
   const payloadMap = new Map<string, ResourcePermissionPayload>()
   batchSelectedResources.value.forEach((resource) => {
     buildPermissionPayload(permission, resource).forEach((payload, id) => {
@@ -127,6 +133,15 @@ function handleBatchSubmit(permission: ResourcePermission) {
   tableRef.value?.clearSelection()
   batchSelectedResources.value = []
 }
+
+watch(
+  () => props.resourceType,
+  () => {
+    tableRef.value?.clearSelection()
+    batchSelectedResources.value = []
+    batchPermissionDialogRef.value?.close()
+  },
+)
 
 /* 模型供应商图标 */
 const modelProviders = ref<ModelProviderItem[]>([])
@@ -150,8 +165,8 @@ watch(
   <div class="flex-column min-h-0 flex-1">
     <div class="mb-4 flex-between">
       <div>
-        <!-- 配置权限 -->
-        <el-button type="primary" :disabled="batchSelectedResources.length === 0" @click="handleOpenBatchDialog">
+        <!-- 批量配置权限 -->
+        <el-button type="primary" :disabled="disabled || batchSelectedResources.length === 0" @click="handleOpenBatchDialog">
           <MkIcon name="icon-lock" />
           <span>配置权限</span>
         </el-button>
@@ -168,7 +183,7 @@ watch(
       show-overflow-tooltip
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="40" reserve-selection />
+      <el-table-column type="selection" width="40" reserve-selection :selectable="() => !disabled" />
       <el-table-column class-name="resource-name-column" label="名称" min-width="260" prop="name">
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <div class="flex-align-center min-w-0 flex-1 gap-2">
@@ -185,7 +200,7 @@ watch(
       </el-table-column>
       <el-table-column label="操作权限" width="450">
         <template #default="{ row }: { row: ResourcePermissionItem }">
-          <el-radio-group :model-value="row.permission" @change="handlePermissionChange($event as ResourcePermission, row)">
+          <el-radio-group :model-value="row.permission" :disabled="disabled" @change="handlePermissionChange($event as ResourcePermission, row)">
             <template v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value">
               <el-radio :value="permissionOption.value">{{ permissionOption.label }}</el-radio>
             </template>
@@ -194,7 +209,7 @@ watch(
       </el-table-column>
     </MkTable>
 
-    <BatchSetPermissionDialog ref="batchPermissionDialogRef" @submit="handleBatchSubmit" />
+    <BatchSetPermissionDialog ref="batchPermissionDialogRef" :disabled="disabled" @submit="handleBatchSubmit" />
   </div>
 </template>
 

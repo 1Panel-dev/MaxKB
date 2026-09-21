@@ -127,7 +127,7 @@ onMounted(() => loadPortalSetting())
                   @change="handleAccessChange('enable_public_access', $event)"
                 />
               </div>
-              <el-input :model-value="portalAccessUrl">
+              <el-input :model-value="portalAccessUrl" readonly>
                 <template #suffix>
                   <!-- 复制门户公开访问链接 -->
                   <el-button text @click="copyText(portalAccessUrl)" class="-mr-1">
@@ -142,7 +142,7 @@ onMounted(() => loadPortalSetting())
                 <span>智能体后端 API 访问</span>
                 <el-switch :model-value="portalSetting.enable_api" size="small" @change="handleAccessChange('enable_api', $event)" />
               </div>
-              <el-input :model-value="portalApiUrl">
+              <el-input :model-value="portalApiUrl" readonly>
                 <template #suffix>
                   <!-- 复制智能体后端 API 访问 -->
                   <el-button text @click="copyText(portalApiUrl)" class="-mr-1">
@@ -161,7 +161,7 @@ onMounted(() => loadPortalSetting())
                   @change="handleAccessChange('enable_knowledge_base_api', $event)"
                 />
               </div>
-              <el-input :model-value="portalApiUrl">
+              <el-input :model-value="portalApiUrl" readonly>
                 <template #suffix>
                   <!-- 复制知识库后端 API 检索 -->
                   <el-button text @click="copyText(portalApiUrl)" class="-mr-1">
