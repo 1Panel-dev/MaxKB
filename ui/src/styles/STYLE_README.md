@@ -511,8 +511,8 @@ npm run build-only-chat
 ## 资源详情导航
 
 `layout/sidebar/ResourceDetailMenu.vue` 统一资源详情的单层与二级菜单样式，供
-`ResourceDetailLayout` 使用。分组使用 `el-collapse / el-collapse-item`，允许同时展开多个分组；
+`ResourceDetailLayout` 使用。分组使用 `MkCollapse`，允许同时展开多个分组；
 叶子菜单复用 `MkListItem`，二级项仅缩进内容，选中背景保持整行宽度。
-折叠标题沿用菜单行的字号、行高、圆角、内边距与悬停颜色，移除 Collapse 默认分隔线和内容留白。
-覆盖样式限定在组件 scoped 范围内，不影响 SystemSidebar 或其他 Collapse。
+通过 `indicator-position="after"` 将箭头放到右侧，通过 `trigger-class` 统一标题的圆角、
+内边距与悬停颜色，标题使用 `label` 插槽；无需额外的深层样式覆盖。
 分组首次默认展开，路由切换时展开当前叶子所属分组，普通渲染不重置手动收起状态。

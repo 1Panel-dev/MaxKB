@@ -19,6 +19,8 @@ declare module 'vue-router' {
     detailActiveMenu?: string
     /** 资源详情导航根，仅配置在挂载详情容器的路由上。 */
     resourceDetailRoot?: boolean
+    /** 按资源类型等业务参数决定详情菜单是否显示，不用于权限判断。 */
+    detailMenuVisible?: (params: RouteParamsGeneric) => boolean
     /** iconfont Symbol ID */
     icon?: string
     order?: number

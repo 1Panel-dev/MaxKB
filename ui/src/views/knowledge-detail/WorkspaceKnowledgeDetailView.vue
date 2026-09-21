@@ -56,7 +56,7 @@ watch(
 <template>
   <ResourceDetailLayout :loading="loading" @back="handleBack">
     <template #resource-header>
-      <KnowledgeIcon v-if="knowledge" :type="knowledge.type" />
+      <KnowledgeIcon :type="knowledge?.type" />
       <h6 class="min-w-0 truncate" :title="knowledge?.name">{{ knowledge?.name }}</h6>
     </template>
   </ResourceDetailLayout>
