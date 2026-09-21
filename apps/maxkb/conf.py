@@ -47,7 +47,9 @@ class Config(dict):
         "REDIS_MAX_CONNECTIONS": 100,
         # 外置语言包路径
         "EXTERNAL_LOCALE_PATH": "/opt/maxkb/local/locales",
-        "FILE_AUTH": "1"
+        "FILE_AUTH": "1",
+        # 请求体内存上限（字节）。ENV: MAXKB_DATA_UPLOAD_MAX_MEMORY_SIZE；FILE: DATA_UPLOAD_MAX_MEMORY_SIZE。
+        "DATA_UPLOAD_MAX_MEMORY_SIZE": 100 * 1024 * 1024,
     }
 
     def get_debug(self) -> bool:

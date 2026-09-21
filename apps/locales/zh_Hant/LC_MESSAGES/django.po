@@ -2124,6 +2124,15 @@ msgstr "結束--->向量知識庫: {knowledge_id}"
 msgid "Unknown exception"
 msgstr "未知錯誤"
 
+#: apps/common/exception/handle_exception.py:108
+msgid ""
+"Request body exceeded DATA_UPLOAD_MAX_MEMORY_SIZE. Increase "
+"MAXKB_DATA_UPLOAD_MAX_MEMORY_SIZE (environment variable) or "
+"DATA_UPLOAD_MAX_MEMORY_SIZE (config file), in bytes."
+msgstr ""
+"請求體超過了 DATA_UPLOAD_MAX_MEMORY_SIZE。請調高環境變數 "
+"MAXKB_DATA_UPLOAD_MAX_MEMORY_SIZE，或設定檔中的 DATA_UPLOAD_MAX_MEMORY_SIZE（單位：位元組）。"
+
 #: apps/common/field/common.py:48
 msgid "not a function"
 msgstr "不是函數"

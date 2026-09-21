@@ -13,12 +13,19 @@ from rest_framework.exceptions import ValidationError, ErrorDetail, APIException
 from rest_framework.utils.serializer_helpers import ReturnDict
 from rest_framework.views import exception_handler
 
-from common import result
-from common.exception.app_exception import AppApiException
-
+from django.core.exceptions import RequestDataTooBig, SuspiciousOperation
 from django.utils.translation import gettext_lazy as _
 
+from common import result
+from common.exception.app_exception import AppApiException
 from common.utils.logger import maxkb_logger
+
+
+def _is_data_upload_too_big(exc):
+    """Request body larger than DATA_UPLOAD_MAX_MEMORY_SIZE."""
+    if isinstance(exc, RequestDataTooBig):
+        return True
+    return isinstance(exc, SuspiciousOperation) and "DATA_UPLOAD_MAX_MEMORY_SIZE" in str(exc)
 
 
 def to_result(key, args, parent_key=None):
@@ -94,6 +101,15 @@ def get_label(key, exc_detail):
 
 
 def handle_exception(exc, context):
+    if _is_data_upload_too_big(exc):
+        maxkb_logger.warning(str(exc))
+        return result.error(
+            _(
+                "Request body exceeded DATA_UPLOAD_MAX_MEMORY_SIZE. "
+                "Increase MAXKB_DATA_UPLOAD_MAX_MEMORY_SIZE (environment variable) "
+                "or DATA_UPLOAD_MAX_MEMORY_SIZE (config file), in bytes."
+            )
+        )
     exception_class = exc.__class__
     # 先调用REST framework默认的异常处理方法获得标准错误响应对象
     response = exception_handler(exc, context)

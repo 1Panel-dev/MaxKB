@@ -11,6 +11,7 @@ import {
 } from '@/request/index'
 import type { Ref } from 'vue'
 import type { KeyValue, pageRequest } from '@/api/type/common'
+import { putDocumentBatch } from '@/api/document-batch'
 
 import useStore from '@/stores'
 
@@ -316,13 +317,7 @@ const putMulDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return put(
-    `${prefix.value}/${knowledge_id}/document/batch_create`,
-    data,
-    {},
-    loading,
-    1000 * 60 * 5,
-  )
+  return putDocumentBatch(`${prefix.value}/${knowledge_id}/document/batch_create`, data, loading)
 }
 
 /**

@@ -2117,6 +2117,13 @@ msgstr ""
 msgid "Unknown exception"
 msgstr ""
 
+#: apps/common/exception/handle_exception.py:108
+msgid ""
+"Request body exceeded DATA_UPLOAD_MAX_MEMORY_SIZE. Increase "
+"MAXKB_DATA_UPLOAD_MAX_MEMORY_SIZE (environment variable) or "
+"DATA_UPLOAD_MAX_MEMORY_SIZE (config file), in bytes."
+msgstr ""
+
 #: apps/common/field/common.py:48
 msgid "not a function"
 msgstr ""

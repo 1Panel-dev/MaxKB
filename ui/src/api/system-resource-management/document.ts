@@ -12,6 +12,7 @@ import {
 import type { Ref } from 'vue'
 import type { KeyValue } from '@/api/type/common'
 import type { pageRequest } from '@/api/type/common'
+import { putDocumentBatch } from '@/api/document-batch'
 
 const prefix = '/system/resource/knowledge'
 
@@ -307,7 +308,7 @@ const putMulDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/document/batch_create`, data, {}, loading, 1000 * 60 * 5)
+  return putDocumentBatch(`${prefix}/${knowledge_id}/document/batch_create`, data, loading)
 }
 
 /**

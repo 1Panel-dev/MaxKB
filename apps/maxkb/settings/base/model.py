@@ -151,6 +151,9 @@ USE_TZ = True
 
 # 文件上传配置
 DATA_UPLOAD_MAX_NUMBER_FILES = 1000
+# embedding / compress 会以 JSON 提交大段文本，与 web 进程使用同一上限，默认 100 MiB。
+# ENV: MAXKB_DATA_UPLOAD_MAX_MEMORY_SIZE（字节）；FILE: 配置项 DATA_UPLOAD_MAX_MEMORY_SIZE（字节）。
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(CONFIG.get('DATA_UPLOAD_MAX_MEMORY_SIZE', 100 * 1024 * 1024))
 
 # 支持的语言
 LANGUAGES = CONFIG.get_languages()
