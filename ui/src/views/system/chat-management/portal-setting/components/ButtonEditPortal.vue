@@ -60,16 +60,14 @@ function handleClosePortalEdit() {
   </el-button>
   <MkDialog v-model="editVisible" title="编辑" @closed="handleClosePortalEdit">
     <el-form ref="portalFormRef" :model="portalForm" :rules="portalRules" label-position="top" @submit.prevent>
-      <!-- <el-form-item label="门户 Logo">
-        <MkEditAvatar v-model="portalForm.logo" :default-icon="defaultLogo" :size="48" :editable="!saving" @change="handleLogoChange" />
-      </el-form-item> -->
       <el-form-item label="名称" prop="name">
+        <!-- <MkEditAvatar v-model="portalForm.logo" :default-icon="defaultLogo" :size="48" :editable="!saving" @change="handleLogoChange" /> -->
         <el-input v-model="portalForm.name" maxlength="64" show-word-limit :disabled="saving" placeholder="请输入门户名称" />
       </el-form-item>
     </el-form>
     <template #footer>
       <!-- 取消编辑 -->
-      <el-button :disabled="saving" @click="editVisible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="editVisible = false">取消</el-button>
       <!-- 保存门户信息 -->
       <el-button type="primary" :loading="saving" @click="handleSavePortalInfo">保存</el-button>
     </template>

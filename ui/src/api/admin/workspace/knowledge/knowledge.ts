@@ -90,7 +90,23 @@ const postKnowledgeImport = (file: File, folderId: string) => {
   return post<FormData, { knowledge_id: string; type: KnowledgeItem['type'] }>(`${getPrefix()}/import_knowledge`, payload)
 }
 
+/** 获取知识库 MCP 配置详情，暂返回空配置供交互联调。 */
+const getKnowledgeMcpConfig = (knowledgeId: string): Promise<string> => {
+  // TODO 接入 MCP 配置查询接口，使用 knowledgeId 获取配置文本。
+  void knowledgeId
+  return Promise.resolve('')
+}
+
+/** 执行知识库分词索引，暂模拟成功供交互联调。 */
+const postKnowledgeKeywordIndex = (knowledgeId: string): Promise<void> => {
+  // TODO 接入分词索引接口，使用 knowledgeId 提交索引任务。
+  void knowledgeId
+  return Promise.resolve()
+}
+
 export default {
+  getKnowledgeMcpConfig,
+  postKnowledgeKeywordIndex,
   exportKnowledgeExcel,
   exportKnowledgeZip,
   exportKnowledge,

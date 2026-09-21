@@ -32,6 +32,8 @@ const portalSetting = reactive<PortalSetting>({
   cors_config: {},
 })
 const saving = ref(false)
+// 跨域地址暂存于页面，待接口协议确定后接入 cors_config。
+const portalCorsOrigins = ref<string[]>([])
 
 const portalAccessUrl = new URL('/portal', window.location.origin).href
 const portalApiUrl = new URL('/api/portal', window.location.origin).href
@@ -57,6 +59,13 @@ function handleAccessChange(field: AccessField, value: string | number | boolean
   }
   // 使用服务端确认的值渲染开关，失败时保留原配置。
   return savePortalSetting({ [field]: Boolean(value) })
+}
+
+/* 认证接口暂未接入，保存到当前页面配置供再次打开回填。 */
+function savePortalAuthSetting(payload: PortalSettingPayload) {
+  Object.assign(portalSetting, payload)
+  MsgSuccess('已应用到当前页面')
+  return Promise.resolve()
 }
 
 /* 编辑草稿预览与认证入口联动 */
@@ -136,15 +145,15 @@ const previewLogo = computed(() => portalSetting.logo)
               <span>身份认证</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置身份认证 -->
-                <ButtonPortalAuthSetting ref="authSettingButtonRef" :setting="portalSetting" :saving="saving" :save="savePortalSetting" />
+                <ButtonPortalAuthSetting ref="authSettingButtonRef" :setting="portalSetting" :saving="saving" :save="savePortalAuthSetting" />
                 <el-switch :model-value="portalSetting.enable_auth" size="small" @change="handleAccessChange('enable_auth', $event)" />
               </div>
             </div>
             <div class="flex-between gap-2">
               <span>跨域设置</span>
               <div class="flex-align-center gap-2">
-                <!-- 查看跨域配置说明 -->
-                <ButtonPortalCorsSetting :disabled="saving" />
+                <!-- 配置跨域地址 -->
+                <ButtonPortalCorsSetting v-model="portalCorsOrigins" :disabled="saving" />
                 <el-switch :model-value="portalSetting.enable_cors" size="small" @change="handleAccessChange('enable_cors', $event)" />
               </div>
             </div>

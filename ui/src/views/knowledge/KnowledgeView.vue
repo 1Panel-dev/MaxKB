@@ -17,6 +17,8 @@ import {
   AuthorizeKnowledgeAction,
   DeleteKnowledgeAction,
   ExportKnowledgeAction,
+  KeywordIndexKnowledgeAction,
+  McpConfigKnowledgeAction,
   MoveKnowledgeAction,
   RelatedResourcesKnowledgeAction,
   SettingKnowledgeAction,
@@ -228,6 +230,20 @@ function handleBatchDelete() {
                   <!-- TODO 生成问题 -->
                   <!-- 设置 -->
                   <SettingKnowledgeAction label="设置" :knowledge="knowledge" />
+                  <!-- 分词索引 -->
+                  <KeywordIndexKnowledgeAction
+                    v-model:loading="knowledgeOperationLoading"
+                    label="分词索引"
+                    :api="KnowledgeApi"
+                    :knowledge="knowledge"
+                  />
+                  <!-- MCP 配置详情 -->
+                  <McpConfigKnowledgeAction
+                    v-model:loading="knowledgeOperationLoading"
+                    label="MCP 配置详情"
+                    :api="KnowledgeApi"
+                    :knowledge="knowledge"
+                  />
                   <!-- 资源授权 -->
                   <AuthorizeKnowledgeAction label="资源授权" :knowledge="knowledge" />
 

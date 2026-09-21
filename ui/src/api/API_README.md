@@ -149,6 +149,10 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 
 ### 知识库维护
 
+`getKnowledgeMcpConfig(knowledgeId)` 与 `postKnowledgeKeywordIndex(knowledgeId)` 为预留接口方法，
+目前不发送 HTTP 请求：前者返回空配置文本，后者模拟成功。后续确认后端协议后替换方法内部实现。
+MCP 入口加载配置后打开只读及复制弹窗；分词索引入口仅调用方法并在成功后提示“操作成功”。
+
 `exportKnowledgeExcel`、`exportKnowledgeZip`、`exportKnowledge` 分别通过 GET 请求知识库
 `/<knowledgeId>/export`、`export_zip`、`export_knowledge`，复用 `getExportFile` 下载。
 三种结果分别为文档 Excel、包含图片的文档 ZIP 和可导入创建的知识库 ZIP；优先使用服务端文件名。

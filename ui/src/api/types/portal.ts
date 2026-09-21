@@ -2,6 +2,7 @@ import type { Dict } from './common'
 
 export interface PortalAuthConfig extends Dict<unknown> {
   login_value?: string[]
+  default_value?: string
   max_attempts?: number
   failed_attempts?: number
   lock_time?: number
