@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Share } from '@element-plus/icons-vue'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
@@ -27,7 +26,7 @@ function handleKeywordIndex() {
 <template>
   <!-- 执行分词索引 -->
   <MkDropdownItem :disabled="loading" @click.stop="handleKeywordIndex">
-    <template #icon><MkIcon :icon="Share" /></template>
+    <template #icon><MkIcon name="icon_external_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>
 </template>

@@ -780,3 +780,10 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 关闭动画结束后卸载。列表复用 `MkComplexSearch`、`MkTable` 和 `MkStatusLabel`，支持发起人、
 状态筛选及跨页浏览，每 6 秒刷新；关闭或卸载停止轮询。待执行、执行中任务经确认后取消，成功刷新列表。
 抽屉接收完整知识库 Workflow API；详情查询复用调试任务接口，使用 `ExecutionDetailContent` 展示节点结果。
+
+## 智能体详情占位页面
+
+`application-detail/integration/IntegrationView.vue`、`chat-user/ChatUserListView.vue`、
+`operation-log/OperationLogView.vue` 分别承接接入第三方、对话用户、操作日志，目前仅展示占位内容，
+标题及详情框架继续由 `ResourceDetailLayout` 提供。设置菜单按资源类型选择现有简易设置页面
+或高级智能体全屏工作流，不另建高级设置 View。

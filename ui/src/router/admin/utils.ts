@@ -1,4 +1,4 @@
-import type { RouteLocationNormalizedLoaded, RouteMeta, RouteRecordName, RouteRecordRaw } from 'vue-router'
+import type { RouteLocationNormalizedLoaded, RouteParamsGeneric, RouteMeta, RouteRecordName, RouteRecordRaw } from 'vue-router'
 import type { LayoutMenuItem } from '@/layout/types'
 import type { RouteScope } from './types'
 import { systemRoutes } from './system'
@@ -13,12 +13,13 @@ interface MenuRouteRecord {
 const scopedRoutes: RouteRecordRaw[] = [workspaceRoutes, systemRoutes]
 
 /** 将路由记录递归转换为 Layout 菜单。 */
-function createMenuItems(routes: readonly MenuRouteRecord[]): LayoutMenuItem[] {
+function createMenuItems(routes: readonly MenuRouteRecord[], detailParams?: RouteParamsGeneric): LayoutMenuItem[] {
   return routes
     .filter((route) => route.name && route.meta?.title && route.meta.hidden !== true)
+    .filter((route) => !detailParams || (route.meta?.detailMenuVisible?.(detailParams) ?? true))
     .sort((a, b) => (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER))
     .map((route) => {
-      const children = route.children ? createMenuItems(route.children) : []
+      const children = route.children ? createMenuItems(route.children, detailParams) : []
 
       return {
         name: String(route.name),
@@ -43,5 +44,5 @@ export function getChildRouteList(scope: RouteScope): LayoutMenuItem[] {
 export function getMatchedChildRouteList(route: RouteLocationNormalizedLoaded): LayoutMenuItem[] {
   const detailRoot = route.matched.find((matchedRoute) => matchedRoute.meta.resourceDetailRoot === true)
 
-  return createMenuItems(detailRoot?.children ?? [])
+  return createMenuItems(detailRoot?.children ?? [], route.params)
 }

@@ -343,3 +343,14 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 新增或调整详情页时在路由中维护这些条件，不在工作流返回函数中新增页面名称分支。
 无可访问子页面或详情父路由尚未实现时，分别返回 `workspace-application-list` 或
 `system-resource-applications`。
+
+### 智能体详情导航
+
+详情导航依次显示概览、设置、接入第三方、对话用户、操作日志。
+`detailMenuVisible(params)` 仅用于详情菜单的业务类型筛选，不用于权限判断，也不影响一级导航。
+简易设置保留 `setting` 和 `workspace-application-simple-setting`；高级设置使用
+`workflow-entry` 和 `workspace-application-workflow-setting`，重定向至 `workflow-application`，
+携带当前工作空间、智能体 ID 和 query。两个入口都显示“设置”，按 `APPLICATION_TYPE` 互斥显示。
+高级设置的 `canAccess` 固定返回 false，避免工作流返回时重新进入画布；原有概览和简易设置的
+返回权限条件保持不变。新增页面未添加权限判断。
+`integration`、`chat-user`、`operation-log` 分别对应接入第三方、对话用户、操作日志占位页面。
