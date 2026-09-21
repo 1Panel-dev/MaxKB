@@ -27,6 +27,7 @@ const userTableRef = useTemplateRef('userTableRef')
 const systemUsersLoading = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const systemUsersData = ref<SystemUser[]>([])
+
 const searchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
@@ -168,9 +169,12 @@ onMounted(() => loadSystemUsers())
         <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
           <template #default="{ row }">
             <WorkspaceRelationTags
-              :table-render-params="{ property: '角色', value: '工作空间' }"
+              :columns="[
+                { prop: 'role', label: '角色' },
+                { prop: 'workspace', label: '工作空间' },
+              ]"
               :tags="row.role_name"
-              :tag-workspace="row.role_workspace"
+              :data="row.role_workspace"
             />
           </template>
         </el-table-column>
@@ -180,9 +184,12 @@ onMounted(() => loadSystemUsers())
             <span v-if="!row.user_group_names?.length">-</span>
             <WorkspaceRelationTags
               v-else
-              :table-render-params="{ property: '用户组', value: '工作空间' }"
+              :columns="[
+                { prop: 'user_group_names', label: '用户组' },
+                { prop: 'workspace', label: '工作空间' },
+              ]"
               :tags="row.user_group_names"
-              :tag-workspace="row.user_group_workspace"
+              :data="row.user_group_workspace ?? []"
             />
           </template>
         </el-table-column>

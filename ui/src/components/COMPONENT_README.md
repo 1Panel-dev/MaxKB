@@ -660,9 +660,12 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 ### WorkspaceRelationTags
 
 用于展示标签组，并在悬浮表格中展示每个标签关联的工作空间。
-`tags` 控制表格单元格中的折叠标签；`tagWorkspace` 使用标签名称作为键、工作空间
-名称数组作为值；`tableRenderParams.property` 和 `tableRenderParams.value` 分别设置
-悬浮表格的标签列与工作空间列标题。
+`tags` 控制表格单元格中的折叠标签；`data` 接收关联记录数组，`columns` 按顺序配置
+`prop`（字段名）和 `label`（列名），列宽由表格自动分配。组件不转换接口数据结构，
+旧对象映射由调用页面转换为行数组。用户组直接传入 `user_group_workspace` 数组，
+使用 `workspace`、`user_group_names` 两列；角色映射由用户列表页面转换。
+数组单元格以“、”连接，空数组、空字符串、null 和 undefined 显示 `-`，长文本使用溢出提示。
+`data` 为空时禁用关联浮层，保留标签展示；内部 `MkTagGroup` 的标签浮层保持禁用。
 
 ### ResourceAuthorizationDrawer
 

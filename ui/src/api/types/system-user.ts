@@ -52,6 +52,7 @@ export interface SystemUser {
   role_workspace?: Record<string, string[]>
   role_setting?: SystemUserRoleAssignment[]
   user_group_names?: string[]
+  user_group_workspace?: { workspace: string; user_group_names: string[] }[]
   user_group_ids?: string[]
   create_time: string
   update_time?: string

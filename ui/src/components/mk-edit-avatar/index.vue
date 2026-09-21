@@ -122,7 +122,7 @@ onBeforeUnmount(() => fileReader?.abort())
     </template>
 
     <div v-click-outside="closeOutside" class="p-4" @keydown.esc.stop="close" @click.stop>
-      <div class="mb-1">Logo 设置<span class="ml-0.5 text-danger">*</span></div>
+      <div class="mb-1">Logo 设置</div>
       <el-radio-group v-model="logoMode" :disabled="reading" class="mb-2">
         <el-radio value="default">默认 Logo</el-radio>
         <el-radio value="custom">自定义上传</el-radio>

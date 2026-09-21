@@ -671,8 +671,10 @@
 /* popover */
 .el-popover {
   --el-popover-border-radius: var(--el-border-radius-base);
+
   &.el-popper {
     padding: 0;
+    line-height: var(--mk-line-height-base);
     color: var(--el-text-color-primary) !important;
   }
 }
