@@ -32,6 +32,7 @@ const importUsersForm = reactive<ImportUsersForm>({ files: [], syncType: '', use
 const importUsersFormRules: FormRules<ImportUsersForm> = {
   files: [{ required: true, type: 'array', min: 1, message: '请上传文件', trigger: 'change' }],
   syncType: [{ required: true, message: '请选择用户来源', trigger: 'change' }],
+  userGroupId: [{ required: true, message: '请选择用户组', trigger: 'change' }],
 }
 const isLocalFileSource = computed(() => importUsersForm.syncType === LOCAL_FILE_SOURCE)
 const canImport = computed(() => Boolean(importUsersForm.syncType) && (!isLocalFileSource.value || importUsersForm.files.length > 0))
@@ -186,7 +187,7 @@ defineExpose({ open })
         />
       </el-form-item>
 
-      <el-form-item label="用户组">
+      <el-form-item label="用户组" prop="userGroupId">
         <el-select
           v-model="importUsersForm.userGroupId"
           class="w-full"
