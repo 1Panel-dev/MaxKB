@@ -65,7 +65,14 @@ from knowledge.models import (
     Termbase,
 )
 from knowledge.services.document_strategy import normalize_document_strategy
-from knowledge.services.knowledge_sync_schedule import remove_knowledge_sync_job
+from knowledge.services.knowledge_archive import (
+    ARCHIVE_VERSION,
+    export_resources,
+    portable_knowledge_meta,
+    restore_resources,
+    validate_archive,
+)
+from knowledge.services.knowledge_sync_schedule import deploy_knowledge_sync_job, remove_knowledge_sync_job
 from knowledge.services.multimodal_retrieval import (
     MAX_QUERY_IMAGE_COUNT,
     get_hit_asset_map,
@@ -664,6 +671,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     QuerySet(File).filter(source_id__in=document_id_list, source_type=FileSourceType.DOCUMENT)
                 )
             source_file_map = {str(source_file.source_id): source_file for source_file in source_file_list}
+            source_files_by_id = {str(source_file.id): source_file for source_file in source_file_list}
 
             # 查询标签和文档标签关联
             tag_list = list(QuerySet(Tag).filter(knowledge_id=knowledge_id).values("id", "key", "value"))
@@ -685,7 +693,9 @@ class KnowledgeSerializer(serializers.Serializer):
             for doc in document_list:
                 if with_source_file:
                     doc.meta = {**doc.meta} if doc.meta else {}
-                    source_file = source_file_map.get(str(doc.id))
+                    source_file = source_files_by_id.get(str(doc.meta.get("source_file_id"))) or source_file_map.get(
+                        str(doc.id)
+                    )
                     if source_file:
                         doc.meta["source_file_id"] = str(source_file.id)
                     else:
@@ -747,15 +757,21 @@ class KnowledgeSerializer(serializers.Serializer):
                         f.write(source_file.get_bytes())
 
                 knowledge_json = {
+                    "archive_version": ARCHIVE_VERSION,
+                    "source_knowledge_id": str(knowledge.id),
                     "name": knowledge.name,
                     "desc": knowledge.desc,
                     "type": knowledge.type,
-                    "meta": {} if knowledge.type == KnowledgeType.LARK else (knowledge.meta if knowledge.meta else {}),
+                    "meta": portable_knowledge_meta(knowledge),
+                    "external_service": knowledge.external_service,
                     "file_size_limit": knowledge.file_size_limit,
                     "file_count_limit": knowledge.file_count_limit,
                     "tags": [{"key": t["key"], "value": t["value"]} for t in tag_list],
                     "termbase": terms,
                     "source_file_list": source_file_export_list,
+                    "resources": export_resources(
+                        knowledge, document_list, source_file_list, tempdir, source_file_export_list
+                    ),
                 }
 
                 with open(os.path.join(tempdir, "knowledge.json"), "w", encoding="utf-8") as f:
@@ -954,6 +970,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
             # knowledge.json -> knowledge
             knowledge_data = json.loads(zf.read("knowledge.json"))
+            resources = validate_archive(knowledge_data, zf)
             source_file_meta_map = {
                 str(source_file.get("id")): source_file
                 for source_file in knowledge_data.get("source_file_list", [])
@@ -981,12 +998,20 @@ class KnowledgeSerializer(serializers.Serializer):
                 user_id=user_id,
                 workspace_id=workspace_id,
                 folder_id=folder_id,
+                **(
+                    {"external_service": knowledge_data["external_service"]}
+                    if "external_service" in knowledge_data
+                    else {}
+                ),
             )
             knowledge.save()
 
+            if resources is not None:
+                restore_resources(knowledge, knowledge_data, zf)
+
             # 图片
             old_to_new_file_map = {}
-            for name in namelist:
+            for name in namelist if resources is None else []:
                 if name.startswith("oss/file/") and name != "oss/file/":
                     old_id = name.split("/")[-1]
                     if not old_id:
@@ -1003,15 +1028,17 @@ class KnowledgeSerializer(serializers.Serializer):
                     old_to_new_file_map[old_id] = str(new_file.id)
 
             # knowledge.xlsx -> doc + para + problem
-            xlsx_bytes = io.BytesIO(zf.read("knowledge.xlsx"))
-            workbook = openpyxl.load_workbook(xlsx_bytes)
+            sheets = []
+            if resources is None:
+                xlsx_bytes = io.BytesIO(zf.read("knowledge.xlsx"))
+                sheets = openpyxl.load_workbook(xlsx_bytes).worksheets
 
             document_model_list = []
             paragraph_model_list = []
             problem_paragraph_object_list = []
             doc_tags_map = {}
 
-            for sheet in workbook.worksheets:
+            for sheet in sheets:
                 doc_name = sheet.title
                 rows = list(sheet.iter_rows(min_row=2, values_only=True))
                 if not rows:
@@ -1112,14 +1139,15 @@ class KnowledgeSerializer(serializers.Serializer):
             QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
 
             # 问题
-            problem_model_list, problem_paragraph_mapping_list = ProblemParagraphManage(
-                problem_paragraph_object_list, knowledge_id
-            ).to_problem_model_list()
-            bulk_create_in_batches(Problem, problem_model_list, batch_size=1000)
-            bulk_create_in_batches(ProblemParagraphMapping, problem_paragraph_mapping_list, batch_size=1000)
+            if resources is None:
+                problem_model_list, problem_paragraph_mapping_list = ProblemParagraphManage(
+                    problem_paragraph_object_list, knowledge_id
+                ).to_problem_model_list()
+                bulk_create_in_batches(Problem, problem_model_list, batch_size=1000)
+                bulk_create_in_batches(ProblemParagraphMapping, problem_paragraph_mapping_list, batch_size=1000)
 
             # Tag
-            tag_list = knowledge_data.get("tags", [])
+            tag_list = knowledge_data.get("tags", []) if resources is None else []
             if tag_list:
                 tag_model_list = []
                 tag_key_value_to_model = {}
@@ -1169,6 +1197,9 @@ class KnowledgeSerializer(serializers.Serializer):
             ).auth_resource(str(knowledge_id))
 
             update_resource_mapping_by_knowledge(str(knowledge_id))
+
+            if (knowledge.meta.get("sync_setting") or {}).get("enabled"):
+                transaction.on_commit(partial(deploy_knowledge_sync_job, str(knowledge_id)), robust=True)
 
             zf.close()
             return {"knowledge_id": str(knowledge_id), "type": knowledge.type}

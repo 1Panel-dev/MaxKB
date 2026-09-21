@@ -584,7 +584,16 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             )
             tool_model_list = [self.to_tool(tool, workspace_id, user_id) for tool in tool_list]
             KnowledgeWorkflow.objects.filter(workspace_id=workspace_id, knowledge_id=knowledge_id).update_or_create(
-                knowledge_id=knowledge_id, workspace_id=workspace_id, defaults={"work_flow": work_flow}
+                knowledge_id=knowledge_id,
+                workspace_id=workspace_id,
+                defaults={
+                    "work_flow": work_flow,
+                    **(
+                        {"default_model_setting": knowledge_workflow["default_model_setting"]}
+                        if "default_model_setting" in knowledge_workflow
+                        else {}
+                    ),
+                },
             )
 
             if is_import_tool:
