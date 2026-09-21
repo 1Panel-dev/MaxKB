@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import uuid_utils.compat as uuid
+from django.contrib.postgres.fields import ArrayField
 from common.mixins.app_model_mixin import AppModelMixin
 from django.db import models
 
@@ -32,7 +33,9 @@ class Portal(AppModelMixin):
 
     enable_cors = models.BooleanField(default=False, verbose_name="是否开启跨域设置")
 
-    cors_config = models.JSONField(default=dict, blank=True, verbose_name="跨域配置")
+    cross_domain_list = ArrayField(
+        verbose_name="跨域列表", base_field=models.CharField(max_length=512, blank=True), default=list
+    )
 
     class Meta:
         db_table = "portal"

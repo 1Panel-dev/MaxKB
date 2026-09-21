@@ -37,7 +37,11 @@ class PortalAPI(APIMixin):
                         "enable_auth": {"type": "boolean", "description": "是否开启身份认证"},
                         "auth_config": {"type": "object", "description": "身份认证配置"},
                         "enable_cors": {"type": "boolean", "description": "是否开启跨域设置"},
-                        "cors_config": {"type": "object", "description": "跨域配置"},
+                        "cross_domain_list": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "跨域列表",
+                        },
                     },
                 }
             }
