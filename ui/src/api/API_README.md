@@ -60,9 +60,12 @@ src/api/
 
 ## 业务接口组织
 
-`admin/system/portal.ts` 通过 Admin `/portal` 读取和局部保存门户配置，公共类型维护在
-`types/portal.ts`。JSON 用于访问开关和认证配置，门户名称与 Logo 使用 FormData；保存返回完整配置。
-认证配置保留未编辑字段，跨域 `cors_config` 暂按不透明对象保留，待后端定义其字段与执行协议。
+`admin/system/chat-management/portal-setting.ts` 通过 Admin `/portal` 读取和局部保存门户配置，
+公共类型维护在 `types/portal.ts`。JSON 用于访问开关和认证、跨域配置，门户名称与 Logo 使用
+FormData；保存返回完整配置，页面以该返回值作为唯一数据来源。
+认证配置保留未编辑字段，仅提交后端读取的 `login_value`、`max_attempts`、`failed_attempts`、
+`lock_time`；跨域配置写入 `cross_domain_list`（对齐后端 `ApplicationApiKey.cross_domain_list`），
+并保留 `cors_config` 中的其他字段。
 
 - 业务 API 先按 Admin 入口下的 `auth`、`workspace`、`system` 等一级业务域归类。Workspace 和
   System 内部可继续按明确的功能域建立子目录，例如 `workspace/application/`、

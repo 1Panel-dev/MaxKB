@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, reactive, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import PortalApi from '@/api/admin/system/chat-management/portal-setting.ts'
 import type { PortalSetting, PortalSettingPayload } from '@/api/types'
 import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
 import { copyText } from '@/utils/clipboard'
+import { resetUrl } from '@/utils/icon'
 import { MsgSuccess } from '@/utils/message'
 import PortalPreview from './components/PortalPreview.vue'
 import ButtonEditPortal from './components/ButtonEditPortal.vue'
 import ButtonPortalAuthSetting from './components/ButtonPortalAuthSetting.vue'
 import ButtonPortalCorsSetting from './components/ButtonPortalCorsSetting.vue'
-import perm from '@/permission/index.ts'
 
 type AccessField = 'enable_public_access' | 'enable_api' | 'enable_knowledge_base_api' | 'enable_auth' | 'enable_cors'
 
@@ -18,7 +18,6 @@ const portalSetting = reactive<PortalSetting>({
   name: '智能体门户',
   description: '',
   logo: '',
-  tab_logo: '',
   enable_public_access: true,
   enable_api: true,
   enable_knowledge_base_api: true,
@@ -32,52 +31,76 @@ const portalSetting = reactive<PortalSetting>({
   enable_cors: false,
   cors_config: {},
 })
+const loading = ref(false)
 const saving = ref(false)
-// 跨域地址暂存于页面，待接口协议确定后接入 cors_config。
-const portalCorsOrigins = ref<string[]>([])
 
 const portalAccessUrl = new URL('/portal', window.location.origin).href
 const portalApiUrl = new URL('/api/portal', window.location.origin).href
 
-/* 接口尚未接入，页面使用默认配置；保存回填时保留现有配置对象。 */
-function savePortalSetting(payload: PortalSettingPayload | FormData) {
-  // saving.value = true
-  // return PortalApi.putPortalSetting(payload)
-  //   .then((setting) => {
-  //     Object.assign(portalSetting, setting)
-  //     MsgSuccess('保存成功')
-  //   })
-  //   .finally(() => {
-  //     saving.value = false
-  //   })
+/* 进入页面加载门户配置，失败时保留默认配置 */
+function loadPortalSetting() {
+  loading.value = true
+  return PortalApi.getPortalSetting()
+    .then((setting) => Object.assign(portalSetting, setting))
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+/* 保存门户配置：接口返回完整配置，成功后整体回填作为页面唯一数据来源 */
+function savePortalSetting(payload: PortalSettingPayload | FormData): Promise<void> {
+  saving.value = true
+  return PortalApi.putPortalSetting(payload)
+    .then((setting) => {
+      Object.assign(portalSetting, setting)
+      MsgSuccess('保存成功')
+    })
+    .finally(() => {
+      saving.value = false
+    })
 }
 
 function handleAccessChange(field: AccessField, value: string | number | boolean) {
   if (saving.value) return
   if (field === 'enable_auth' && value && !portalSetting.auth_config.login_value?.length) {
-    authSettingButtonRef.value?.open(true)
+    handleOpenAuthSetting(true)
     return
   }
   // 使用服务端确认的值渲染开关，失败时保留原配置。
   return savePortalSetting({ [field]: Boolean(value) })
 }
 
-/* 认证接口暂未接入，保存到当前页面配置供再次打开回填。 */
+/* 认证配置保存，payload 已保留未编辑字段 */
 function savePortalAuthSetting(payload: PortalSettingPayload) {
-  Object.assign(portalSetting, payload)
-  MsgSuccess('已应用到当前页面')
-  return Promise.resolve()
+  return savePortalSetting(payload)
+}
+
+/* 跨域地址保存：写入 cors_config 的 cross_domain_list，保留其余字段 */
+function savePortalCorsSetting(origins: string[]) {
+  return savePortalSetting({ cors_config: { ...portalSetting.cors_config, cross_domain_list: origins } })
+}
+
+function handleOpenAuthSetting(enableAfterSave = false) {
+  authSettingButtonRef.value?.open(enableAfterSave)
 }
 
 /* 编辑草稿预览与认证入口联动 */
 
 const authSettingButtonRef = useTemplateRef<InstanceType<typeof ButtonPortalAuthSetting>>('authSettingButtonRef')
+const portalCorsOrigins = computed({
+  get: () => portalSetting.cors_config.cross_domain_list ?? [],
+  set: (origins: string[]) => {
+    portalSetting.cors_config = { ...portalSetting.cors_config, cross_domain_list: origins }
+  },
+})
 const previewName = computed(() => portalSetting.name)
-const previewLogo = computed(() => portalSetting.logo)
+const previewLogo = computed(() => resetUrl(portalSetting.logo))
+
+onMounted(() => loadPortalSetting())
 </script>
 
 <template>
-  <MkViewLayout title="门户访问设置">
+  <MkViewLayout title="门户访问设置" :loading="loading">
     <div class="flex min-w-215 flex-1 gap-4">
       <div class="w-95 shrink-0 space-y-4">
         <el-card shadow="never">
@@ -88,7 +111,7 @@ const previewLogo = computed(() => portalSetting.logo)
               <h4 class="truncate" :title="previewName">{{ previewName }}</h4>
             </div>
             <!-- 编辑门户名称与 Logo -->
-            <ButtonEditPortal ref="editPortalButtonRef" :setting="portalSetting" :save="savePortalSetting" />
+            <ButtonEditPortal :setting="portalSetting" :save="savePortalSetting" />
           </div>
         </el-card>
         <el-card shadow="never">
@@ -151,7 +174,7 @@ const previewLogo = computed(() => portalSetting.logo)
               <span>身份认证</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置身份认证 -->
-                <ButtonPortalAuthSetting ref="authSettingButtonRef" :setting="portalSetting" :save="savePortalAuthSetting" />
+                <ButtonPortalAuthSetting ref="authSettingButtonRef" :setting="portalSetting" :saving="saving" :save="savePortalAuthSetting" />
                 <el-switch :model-value="portalSetting.enable_auth" size="small" @change="handleAccessChange('enable_auth', $event)" />
               </div>
             </div>
@@ -159,7 +182,7 @@ const previewLogo = computed(() => portalSetting.logo)
               <span>跨域设置</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置跨域地址 -->
-                <ButtonPortalCorsSetting v-model="portalCorsOrigins" />
+                <ButtonPortalCorsSetting v-model="portalCorsOrigins" :saving="saving" :save="savePortalCorsSetting" />
                 <el-switch :model-value="portalSetting.enable_cors" size="small" @change="handleAccessChange('enable_cors', $event)" />
               </div>
             </div>
