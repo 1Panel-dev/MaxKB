@@ -2,10 +2,10 @@ import hmac
 import hashlib
 import pickle
 import os
-import socket
+import uuid_utils.compat as uuid
 from kombu.serialization import register
 
-_local_secret_key = os.environ.get('MAXKB_HMAC_SIGNED_SERIALIZER_SECRET_KEY', 'default_hmac_signed_serializer_secret_key:' + os.getenv('MAXKB_VERSION', socket.gethostname()))
+_local_secret_key = os.environ.get('MAXKB_HMAC_SIGNED_SERIALIZER_SECRET_KEY', os.getenv('MAXKB_SECRET_KEY', uuid.uuid7()))
 try:
     from xpack import get_md5
     _local_secret_key = get_md5()
