@@ -9,6 +9,7 @@ import MkSearchList from '@/components/mk-search-list/index.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 import { useStore } from '@/stores'
+import perm from '@/permission/index.ts'
 const { auth } = useStore()
 
 /* 选择工作空间列表 */
@@ -179,7 +180,7 @@ onMounted(() => {
       <component :is="Header">
         <h4>{{ title }}</h4>
         <!-- 创建用户组 -->
-        <MkTooltip content="创建用户组" placement="top">
+        <MkTooltip v-if="perm.system.userGroup.create()" content="创建用户组" placement="top">
           <el-button class="-mr-1" text type="primary" @click="handleOpenGroupDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
@@ -188,14 +189,14 @@ onMounted(() => {
       <MkSearchList v-loading="loadingGroups" :data="userGroups" :default-active="currentGroup?.id" @click="handleGroupSelect">
         <template #action-dropdown="{ row }">
           <!-- 重命名用户组 -->
-          <MkDropdownItem @click="handleOpenGroupDialog(row)">
+          <MkDropdownItem v-if="perm.system.userGroup.edit()" @click="handleOpenGroupDialog(row)">
             <template #icon>
               <MkIcon name="icon_rename_outlined" />
             </template>
             <span>重命名</span>
           </MkDropdownItem>
           <!-- 删除用户组 -->
-          <MkDropdownItem divided @click="deleteGroup(row)">
+          <MkDropdownItem v-if="perm.system.userGroup.delete()" divided @click="deleteGroup(row)">
             <template #icon>
               <MkIcon name="icon_delete-trash_outlined" />
             </template>
@@ -221,7 +222,7 @@ onMounted(() => {
         <div class="flex-between mb-4">
           <div>
             <!-- 添加成员 -->
-            <el-button type="primary" @click="handleOpenMemberDialog">
+            <el-button v-if="perm.system.userGroup.addMember()" type="primary" @click="handleOpenMemberDialog">
               <MkIcon name="icon_add_outlined" />
               <span>添加成员</span>
             </el-button>
@@ -250,7 +251,7 @@ onMounted(() => {
             <template #default="{ row }">
               <!-- 移除成员 -->
               <MkTooltip content="移除" placement="top">
-                <el-button type="primary" text @click="handleRemoveMembers(row)">
+                <el-button v-if="perm.system.userGroup.removeMember()" type="primary" text @click="handleRemoveMembers(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
               </MkTooltip>
@@ -258,7 +259,7 @@ onMounted(() => {
           </el-table-column>
           <template #footer-batch-actions>
             <!-- 批量移除成员 -->
-            <el-button type="danger" plain @click="handleRemoveMembers()">移除</el-button>
+            <el-button v-if="perm.system.userGroup.removeMember()" type="danger" plain @click="handleRemoveMembers()">移除</el-button>
           </template>
         </MkTable>
       </template>

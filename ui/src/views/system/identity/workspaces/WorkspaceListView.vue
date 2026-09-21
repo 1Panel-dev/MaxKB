@@ -7,6 +7,7 @@ import MkSearchList from '@/components/mk-search-list/index.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import AddMemberDrawer from './AddMemberDrawer.vue'
 import CreateOrUpdateWorkspaceDialog from './dialog/CreateOrUpdateWorkspaceDialog.vue'
+import perm from '@/permission/index.ts'
 
 /* 添加工作空间表单dialog */
 const workspaceDialogRef = useTemplateRef<InstanceType<typeof CreateOrUpdateWorkspaceDialog>>('workspaceDialogRef')
@@ -177,7 +178,7 @@ onMounted(() => loadWorkspaceOptions())
         <h4>{{ title }}</h4>
         <!-- 创建工作空间 -->
         <MkTooltip content="创建工作空间" placement="top">
-          <el-button text type="primary" class="-mr-1" @click="handleOpenWorkspaceDialog()">
+          <el-button v-if="perm.system.workspace.create()" text type="primary" class="-mr-1" @click="handleOpenWorkspaceDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </MkTooltip>
@@ -185,14 +186,14 @@ onMounted(() => loadWorkspaceOptions())
       <MkSearchList :data="workspacesList" :default-active="currentWorkspace?.id" @click="handleWorkspaceSelect">
         <template #action-dropdown="{ row: workspace }">
           <!-- 重命名工作空间 -->
-          <MkDropdownItem @click="handleOpenWorkspaceDialog(workspace)">
+          <MkDropdownItem v-if="perm.system.workspace.edit()" @click="handleOpenWorkspaceDialog(workspace)">
             <template #icon>
               <MkIcon name="icon_rename_outlined" />
             </template>
             <span>重命名</span>
           </MkDropdownItem>
           <!-- 删除工作空间 -->
-          <MkDropdownItem divided @click="handleWorkspaceDelete(workspace)">
+          <MkDropdownItem v-if="perm.system.workspace.delete()" divided @click="handleWorkspaceDelete(workspace)">
             <template #icon>
               <MkIcon name="icon_delete-trash_outlined" />
             </template>
@@ -220,7 +221,7 @@ onMounted(() => loadWorkspaceOptions())
         <div class="flex-between mb-4">
           <div>
             <!-- 添加成员 -->
-            <el-button type="primary" @click="handleOpenAddMemberDrawer">
+            <el-button v-if="perm.system.workspace.addMember()" type="primary" @click="handleOpenAddMemberDrawer">
               <MkIcon name="icon_add_outlined" />
               <span>添加成员</span>
             </el-button>
@@ -248,7 +249,7 @@ onMounted(() => loadWorkspaceOptions())
             <template #default="{ row }">
               <!-- 移除成员 -->
               <MkTooltip content="移除" placement="top">
-                <el-button type="primary" text @click="handleRemoveMember(row)">
+                <el-button v-if="perm.system.workspace.removeMember()" type="primary" text @click="handleRemoveMember(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
               </MkTooltip>
@@ -257,7 +258,7 @@ onMounted(() => loadWorkspaceOptions())
 
           <template #footer-batch-actions>
             <!-- 批量移除成员 -->
-            <el-button type="danger" plain @click="handleBatchDelete">移除</el-button>
+            <el-button v-if="perm.system.workspace.removeMember()" type="danger" plain @click="handleBatchDelete">移除</el-button>
           </template>
         </MkTable>
       </template>

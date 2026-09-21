@@ -9,5 +9,8 @@ export default {
    * 系统「外观设置」只读权限
    */
   read: () => canSys(P.APPEARANCE_SETTINGS_READ) && hasEdition(Edition.PE),
+  /**
+   * 系统「外观设置」编辑权限
+   */
   edit: () => canSys(P.APPEARANCE_SETTINGS_EDIT)
  }

@@ -5,6 +5,7 @@ import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
+import perm from '@/permission'
 
 defineOptions({ name: 'LdapAuthenticationSetting' })
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
@@ -75,7 +76,7 @@ onMounted(() => loadSetting())
     </el-form-item>
     <div>
       <!-- 保存 -->
-      <el-button type="primary" @click="submit('save')">保存</el-button>
+      <el-button v-if="perm.system.loginAuth.edit()" type="primary" @click="submit('save')">保存</el-button>
       <!-- 测试连接 -->
       <el-button plain @click="submit('test')">测试连接</el-button>
     </div>

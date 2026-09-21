@@ -5,6 +5,7 @@ import ChatUserAuthApi from '@/api/admin/system/chat-management/chat-user-auth'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
+import perm from '@/permission'
 
 defineOptions({ name: 'CasAuthenticationSetting' })
 
@@ -72,6 +73,6 @@ onMounted(() => loadSetting)
         <el-switch v-model="form.is_active" class="self-start" />
       </div>
     </el-form-item>
-    <el-button type="primary" @click="submit">保存</el-button>
+    <el-button v-if="perm.system.chatAuth.edit()" type="primary" @click="submit">保存</el-button>
   </el-form>
 </template>

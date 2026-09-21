@@ -8,6 +8,7 @@ import { useStore } from '@/stores'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import LoginPreview from './components/LoginPreview.vue'
 import PlatformPreview from './components/PlatformPreview.vue'
+import perm from '@/permission/index.ts'
 
 type ThemeImageField = 'icon' | 'loginImage' | 'loginLogo'
 type ThemeImageValue = File | string
@@ -281,7 +282,7 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
 
       <component :is="Footer">
         <el-button plain @click="handleAbandonChanges">放弃更新</el-button>
-        <el-button type="primary" @click="handleSaveTheme">保存并应用</el-button>
+        <el-button v-if="perm.system.appearance.edit()" type="primary" @click="handleSaveTheme">保存并应用</el-button>
       </component>
     </template>
   </MkViewLayout>

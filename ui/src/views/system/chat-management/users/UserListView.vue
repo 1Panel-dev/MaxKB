@@ -12,6 +12,7 @@ import ButtonImportUsers from './import-users/ButtonImportUsers.vue'
 import ButtonChangeUserPassword from './user-password/ButtonChangeUserPassword.vue'
 import ButtonBatchSetUserGroup from './batch-set-user-group/ButtonBatchSetUserGroup.vue'
 import ButtonQuotaSettings from './quota-settings/ButtonQuotaSettings.vue'
+import perm from '@/permission/index.ts'
 
 /* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
@@ -137,9 +138,9 @@ onMounted(() => loadChatUsers())
         <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 导入用户 -->
-          <ButtonImportUsers @refresh="loadChatUsers(true)" />
+          <ButtonImportUsers v-if="perm.system.chatUser.sync()" @refresh="loadChatUsers(true)" />
           <!-- 创建用户 -->
-          <el-button type="primary" @click="handleOpenUserFormDrawer()">
+          <el-button v-if="perm.system.chatUser.create()" type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
             <span>创建用户</span>
           </el-button>
@@ -214,7 +215,7 @@ onMounted(() => loadChatUsers())
               <div class="flex">
                 <!-- 编辑 -->
                 <MkTooltip content="编辑" placement="top">
-                  <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
+                  <el-button v-if="perm.system.chatUser.edit()" type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
                 </MkTooltip>
@@ -223,9 +224,9 @@ onMounted(() => loadChatUsers())
                 <!-- 更多 -->
                 <MkTableMoreDropdown class="ml-1" persistent>
                   <!-- 配额设置 -->
-                  <ButtonQuotaSettings :user-ids="row.id" dropdown @refresh="loadChatUsers()" />
+                  <ButtonQuotaSettings v-if="perm.system.chatUser.quotaSetting()" :user-ids="row.id" dropdown @refresh="loadChatUsers()" />
                   <!-- 删除 -->
-                  <MkDropdownItem divided @click="deleteUser(row)">
+                  <MkDropdownItem v-if="perm.system.chatUser.delete()" divided @click="deleteUser(row)">
                     <template #icon>
                       <MkIcon name="icon_delete-trash_outlined" />
                     </template>
@@ -239,11 +240,11 @@ onMounted(() => loadChatUsers())
 
         <template #footer-batch-actions>
           <!-- 批量设置用户组 -->
-          <ButtonBatchSetUserGroup :user-ids="batchSelectedUsers.map(({ id }) => id)" @refresh="loadChatUsers(false)" />
+          <ButtonBatchSetUserGroup v-if="perm.system.chatUser.userGroup()" :user-ids="batchSelectedUsers.map(({ id }) => id)" @refresh="loadChatUsers(false)" />
           <!-- 批量配额设置-->
-          <ButtonQuotaSettings :user-ids="batchSelectedUsers.map(({ id }) => id)" @refresh="loadChatUsers()" />
+          <ButtonQuotaSettings v-if="perm.system.chatUser.quotaSetting()" :user-ids="batchSelectedUsers.map(({ id }) => id)" @refresh="loadChatUsers()" />
           <!-- 批量删除-->
-          <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
+          <el-button v-if="perm.system.chatUser.delete()" type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
       </MkTable>
     </template>
