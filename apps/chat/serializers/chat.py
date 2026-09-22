@@ -462,6 +462,10 @@ class ChatSerializers(serializers.Serializer):
         chat_info = self.get_chat_info()
         chat_info.get_application()
         chat_info.get_chat_user(asker=(instance.get('form_data') or {}).get('asker'))
+        if instance.get('chat_record_id'):
+            if not QuerySet(ChatRecord).filter(id=instance.get('chat_record_id'),
+                                               chat_id=self.data.get('chat_id')).exists():
+                raise ChatException(500, _("Conversation does not exist"))
         self.is_valid_chat_id(chat_info)
         if not self.data.get('debug'):
             self.is_valid_chat_user()
