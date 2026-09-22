@@ -38,7 +38,8 @@ class VoteView(APIView):
         return result.success(VoteSerializer(
             data={'application_id': request.auth.application_id,
                   'chat_id': chat_id,
-                  'chat_record_id': chat_record_id
+                  'chat_record_id': chat_record_id,
+                  'chat_user_id': request.auth.chat_user_id,
                   }).vote(request.data))
 
 
