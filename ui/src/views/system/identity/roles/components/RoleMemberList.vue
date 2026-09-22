@@ -96,7 +96,7 @@ watch(
     <div class="flex-between mb-4">
       <div>
         <!-- 添加成员 -->
-        <el-button type="primary" v-if="perm.system.workspace.addMember()" @click="handleOpenAddMemberDrawer"> <MkIcon name="icon_add_outlined" />添加成员 </el-button>
+        <el-button type="primary" v-if="perm.system.role.addMember()" @click="handleOpenAddMemberDrawer"> <MkIcon name="icon_add_outlined" />添加成员 </el-button>
       </div>
 
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />
@@ -117,13 +117,13 @@ watch(
       <el-table-column v-if="currentRole.type !== ROLE_TYPE.ADMIN" prop="workspace_name" label="工作空间" min-width="180" show-overflow-tooltip />
       <el-table-column label="操作" width="70" fixed="right">
         <template #default="{ row }">
-          <MkTooltip content="移除" placement="top">
-            <el-button v-if="perm.system.workspace.removeMember()" type="primary" text @click="handleRemoveMember(row)"><MkIcon name="icon_assigned_outlined" /></el-button>
+          <MkTooltip content="移除" placement="top" v-if="perm.system.role.removeMember()">
+            <el-button type="primary" text @click="handleRemoveMember(row)"><MkIcon name="icon_assigned_outlined" /></el-button>
           </MkTooltip>
         </template>
       </el-table-column>
       <template #footer-batch-actions>
-        <el-button v-if="perm.system.workspace.removeMember()" type="danger" plain @click="handleBatchDelete">移除</el-button>
+        <el-button v-if="perm.system.role.removeMember()" type="danger" plain @click="handleBatchDelete">移除</el-button>
       </template>
     </MkTable>
   </div>

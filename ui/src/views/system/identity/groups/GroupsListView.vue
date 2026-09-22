@@ -250,8 +250,8 @@ onMounted(() => {
           <el-table-column label="操作" width="70" fixed="right">
             <template #default="{ row }">
               <!-- 移除成员 -->
-              <MkTooltip content="移除" placement="top">
-                <el-button v-if="perm.system.userGroup.removeMember()" type="primary" text @click="handleRemoveMembers(row)">
+              <MkTooltip content="移除" placement="top" v-if="perm.system.userGroup.removeMember()">
+                <el-button type="primary" text @click="handleRemoveMembers(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
               </MkTooltip>

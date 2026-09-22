@@ -177,8 +177,8 @@ onMounted(() => loadWorkspaceOptions())
       <component :is="Header">
         <h4>{{ title }}</h4>
         <!-- 创建工作空间 -->
-        <MkTooltip content="创建工作空间" placement="top">
-          <el-button v-if="perm.system.workspace.create()" text type="primary" class="-mr-1" @click="handleOpenWorkspaceDialog()">
+        <MkTooltip content="创建工作空间" placement="top" v-if="perm.system.workspace.create()">
+          <el-button text type="primary" class="-mr-1" @click="handleOpenWorkspaceDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </MkTooltip>
@@ -248,8 +248,8 @@ onMounted(() => loadWorkspaceOptions())
           <el-table-column label="操作" width="70" fixed="right">
             <template #default="{ row }">
               <!-- 移除成员 -->
-              <MkTooltip content="移除" placement="top">
-                <el-button v-if="perm.system.workspace.removeMember()" type="primary" text @click="handleRemoveMember(row)">
+              <MkTooltip content="移除" placement="top" v-if="perm.system.workspace.removeMember()">
+                <el-button type="primary" text @click="handleRemoveMember(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
               </MkTooltip>

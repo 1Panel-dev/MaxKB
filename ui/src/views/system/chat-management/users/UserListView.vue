@@ -209,13 +209,13 @@ onMounted(() => loadChatUsers())
           <template #default="{ row }">
             <div class="flex-align-center gap-3">
               <span @click.stop>
-                <el-switch v-model="row.is_active" size="small" :before-change="() => handleChangeStatus(row)" />
+                <el-switch v-model="row.is_active" size="small" :disabled="!perm.system.chatUser.edit()" :before-change="() => handleChangeStatus(row)" />
               </span>
               <el-divider direction="vertical" />
               <div class="flex">
                 <!-- 编辑 -->
-                <MkTooltip content="编辑" placement="top">
-                  <el-button v-if="perm.system.chatUser.edit()" type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
+                <MkTooltip content="编辑" placement="top" v-if="perm.system.chatUser.edit()">
+                  <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
                 </MkTooltip>

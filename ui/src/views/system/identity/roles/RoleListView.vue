@@ -83,9 +83,9 @@ onMounted(() => loadRoles())
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip content="创建角色" placement="top">
+        <MkTooltip content="创建角色" placement="top" v-if="perm.system.role.create()">
           <!-- 创建角色 -->
-          <el-button v-if="perm.system.role.create()" class="-mr-1" text type="primary" @click="handleOpenRoleDialog()">
+          <el-button class="-mr-1" text type="primary" @click="handleOpenRoleDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </MkTooltip>

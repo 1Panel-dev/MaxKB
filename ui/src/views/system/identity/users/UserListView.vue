@@ -212,7 +212,7 @@ onMounted(() => loadSystemUsers())
               <span @click.stop>
                 <el-switch
                   v-model="row.is_active"
-                  :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id"
+                  :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id || !perm.system.user.edit()"
                   :before-change="() => handleChangeStatus(row)"
                   size="small"
                   class="mr-3"
@@ -222,16 +222,16 @@ onMounted(() => loadSystemUsers())
 
               <div class="flex">
                 <!-- 编辑 -->
-                <MkTooltip content="编辑" placement="top">
-                  <el-button v-if="perm.system.user.edit()" type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
+                <MkTooltip content="编辑" placement="top" v-if="perm.system.user.edit()">
+                  <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
                 </MkTooltip>
                 <!-- 修改用户密码 -->
                 <ButtonChangeUserPassword :user="row" @refresh="loadSystemUsers(false)" />
                 <!-- 删除 -->
-                <MkTooltip content="删除" placement="top">
-                  <el-button v-if="perm.system.user.delete()" type="primary" text @click.stop="deleteUser(row)">
+                <MkTooltip content="删除" placement="top" v-if="perm.system.user.delete()" >
+                  <el-button type="primary" text @click.stop="deleteUser(row)">
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
                 </MkTooltip>
