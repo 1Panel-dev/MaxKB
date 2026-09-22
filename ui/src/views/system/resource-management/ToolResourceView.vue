@@ -92,7 +92,7 @@ function handleToolUpdate(tool: ToolItem) {
 }
 
 function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
-  const target = { name: 'system-resource-tool-workflow', params: { workspaceId: tool.workspace_id, toolId: tool.id } }
+  const target = { name: 'system-resource-workflow-tool', params: { toolId: tool.id } }
   if (event.ctrlKey || event.metaKey) {
     window.open(router.resolve(target).href)
     return
@@ -213,9 +213,9 @@ onMounted(() => {
         <el-table-column label="创建时间" width="180"
           ><template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template></el-table-column
         >
-        <el-table-column label="操作" width="110" fixed="right">
+        <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <div class="flex-align-center">
+            <div class="flex-align-center gap-3">
               <!-- 启用或禁用工具 -->
               <ToolStatusSwitch
                 v-if="perm.tool.system.switch()"
@@ -224,12 +224,10 @@ onMounted(() => {
                 :tool="row"
                 @update="handleToolUpdate"
               />
-              <!-- 更多工具操作 -->
-              <MkTableMoreDropdown persistent>
+              <!-- 工具操作，前两个外露，其余进入更多菜单 -->
+              <MkTableOperationGroup>
                 <!-- 编辑商店工具名称 -->
-                <MkDropdownItem v-if="row.template_id && perm.tool.system.edit()" @click="handleOpenRename(row)"
-                  ><template #icon><MkIcon name="icon_edit_outlined" /></template>编辑</MkDropdownItem
-                >
+                <MkAction v-if="row.template_id && perm.tool.system.edit()" label="编辑" icon="icon_edit_outlined" @click="handleOpenRename(row)" />
                 <!-- 编辑工具配置 -->
                 <EditToolAction
                   v-if="!row.template_id && perm.tool.system.edit()"
@@ -239,9 +237,7 @@ onMounted(() => {
                   @update="handleToolUpdate"
                 />
                 <!-- 打开工具工作流 -->
-                <MkDropdownItem v-if="row.tool_type === TOOL_TYPE.WORKFLOW" @click="handleOpenWorkflow(row, $event)"
-                  ><template #icon><MkIcon name="icon_setting" /></template>工作流</MkDropdownItem
-                >
+                <MkAction v-if="row.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" icon="icon_setting" @click="handleOpenWorkflow(row, $event)" />
                 <!-- 配置启动参数 -->
                 <InitParamAction
                   v-if="row.init_field_list?.length && perm.tool.system.edit()"
@@ -288,10 +284,15 @@ onMounted(() => {
                   :tool="row"
                 />
                 <!-- 删除工具 -->
-                <MkDropdownItem v-if="perm.tool.system.delete()" divided :disabled="operationLoading" @click="handleDeleteTool(row)"
-                  ><template #icon><MkIcon name="icon_delete-trash_outlined" /></template>删除</MkDropdownItem
-                >
-              </MkTableMoreDropdown>
+                <MkAction
+                  v-if="perm.tool.system.delete()"
+                  label="删除"
+                  icon="icon_delete-trash_outlined"
+                  divided
+                  :disabled="operationLoading"
+                  @click="handleDeleteTool(row)"
+                />
+              </MkTableOperationGroup>
             </div>
           </template>
         </el-table-column>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
+import { useRouter } from 'vue-router'
 import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import CommonSystemApi from '@/api/admin/system/common'
 import type { ParamsPage } from '@/api/admin/core/types'
@@ -9,6 +10,8 @@ import { TOOL_TYPE_OPTIONS } from '@/constants'
 import ToolCard from '@/views/tool/tool-card/ToolCard.vue'
 import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
 import { DeleteToolAction, EditToolAction, ExportToolAction, InitParamAction, McpConfigAction } from '@/views/tool/tool-card/action-dropdown'
+
+const router = useRouter()
 
 /* 共享工具查询 */
 const toolsData = ref<ToolItem[]>([])
@@ -44,7 +47,15 @@ function handleSearchChange(query?: Dict<unknown>) {
 const toolOperationLoading = ref(false)
 const editToolActionRefs: Record<string, InstanceType<typeof EditToolAction> | null> = {}
 
-function handleOpenTool(tool: ToolItem) {
+function handleOpenTool(tool: ToolItem, event: MouseEvent) {
+  if (tool.tool_type === TOOL_TYPE.WORKFLOW) {
+    const target = { name: 'system-shared-tool-workflow', params: { toolId: tool.id } }
+    if (event.ctrlKey || event.metaKey) {
+      window.open(router.resolve(target).href)
+      return
+    }
+    return router.push(target)
+  }
   editToolActionRefs[tool.id]?.handleOpenToolForm()
 }
 
@@ -68,7 +79,7 @@ function handleToolUpdate(tool: ToolItem) {
         <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 创建共享工具 -->
-          <ButtonCreateTool :api="SystemSharedToolApi" folder-id="" :show-workflow="false" @refresh="refreshTools" />
+          <ButtonCreateTool :api="SystemSharedToolApi" folder-id="" @refresh="refreshTools" />
         </div>
       </component>
       <div v-loading="toolOperationLoading" class="min-h-0 flex-1">
@@ -81,7 +92,7 @@ function handleToolUpdate(tool: ToolItem) {
                 :tool="tool"
                 :shared="true"
                 :store-tools="[]"
-                @click="handleOpenTool(tool)"
+                @click="handleOpenTool(tool, $event)"
                 @update="handleToolUpdate"
               >
                 <template #action-dropdown>

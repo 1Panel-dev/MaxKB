@@ -332,8 +332,8 @@ src/views/system/shared-resources/
 导出、删除 Action。列表使用 `MkInfiniteScroll` 分页加载，支持类型、名称和创建者筛选；
 创建与删除后重新查询，编辑和启停成功后替换对应卡片数据。
 `ButtonCreateTool` 可接收完整 `api`，默认使用 Workspace Tool API；`showWorkflow` 默认开启，
-共享页关闭该入口，因为共享工作流画布尚未接入。共享页支持普通工具、Skills、MCP、数据源及
-导入创建，已有工作流工具只编辑基础信息。共享页不组合工作空间专用的移动、授权和触发器入口。
+共享页开启工作流创建，创建后进入 `system-shared-tool-workflow`。共享页支持普通工具、Skills、MCP、数据源及
+导入创建，工作流卡片点击进入画布（支持 Ctrl / Command 新标签页），编辑菜单仍修改基础信息。共享页不组合工作空间专用的移动、授权和触发器入口。
 
 System 用户页面按业务流程归拢操作入口和专属 Dialog。入口组件管理弹窗 Ref、打开动作并转发
 `refresh`；列表页负责查询、批量选择和刷新策略，创建与编辑共用的 `UserFromDrawer` 仍由页面管理。
@@ -809,7 +809,11 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 保存后发送 `refresh`。共享模型页继续组合相同业务 Action，在卡片菜单中自动显示为菜单项。
 资源管理删除保留页面专属确认、引用数量提示、加载状态和分页回退，通过 `MkAction` 展示，
 不强行复用卡片的 `DeleteModelAction`。
-工具操作列继续使用 `MkTableMoreDropdown`。
+工具操作列同样使用 `MkTableOperationGroup`，按现有模板顺序和显隐条件外露前两个操作；
+启停开关位于操作组外，不计入两个操作。商店工具改名、System 工作流跳转和带引用提示、
+分页回退的删除继续由资源管理页维护，通过 `MkAction` 展示。
+工具 `action-dropdown` 内的各操作统一使用 `MkAction`，Workspace 和共享工具卡片仍通过
+`MkDropdownMenu` 自动显示菜单项，保留原有 API、权限条件、事件和浮层生命周期。
 名称、类型、创建者（工具另含来源）筛选和工作空间表头筛选变化后回到第一页；分页大小变化由
 `MkTable` 重置页码。工作空间列及选项查询只在企业版开启，`workspace_ids` 沿用 JSON 数组字符串。
 页面使用 v3 的 System 权限方法保留迁移前已有的操作权限，不增加创建、导入、批量或复制入口。
@@ -820,7 +824,10 @@ MCP 配置、授权、导出、触发器和执行记录。页面显式传入对�
 商店工具只修改名称，不开放模板代码编辑；编辑与启停合并返回数据，保留列表中的工作空间等展示字段。
 工具维护表单的 API 联合包含 System 资源对象，该范围没有 `postTool`，不通过伪造创建接口满足类型。
 
-资源管理中的工作流进入 `system-resource-tool-workflow`，由 `ToolWorkflowView` 选择 System
+资源管理中的工作流进入 `system-resource-workflow-tool`，由 `ToolWorkflowView` 选择 System
 工具、工作流和模型 API，并把工作流 API 传给发布历史与调试抽屉；返回资源管理工具列表。
 `TriggerToolAction` 和 `ResourceTriggerDialog` 透传可选 `toolApi`、`toolWorkflowApi`，
 由 `TriggerFormDrawer` 查询当前资源的完整输入定义；未传时保持 Workspace 默认接口。
+
+工具工作流按三种 `resourceScope` 选择完整工具、工作流与模型 API，并透传到默认模型、历史、调试抽屉。
+System 两种工作流入口只传 `toolId`，不传路由工作空间；共享范围默认模型选项使用共享模型列表。

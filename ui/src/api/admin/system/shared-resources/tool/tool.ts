@@ -4,6 +4,10 @@ import type { Dict, ToolDebugPayload, ToolItem, ToolPayload, ToolPylintIssue } f
 
 const prefix = '/system/shared/tool'
 
+/** 获取当前系统范围可用的工具选项。 */
+const getToolListWithShared = (query?: Dict<unknown>) =>
+  get<{ tools: ToolItem[]; shared_tools: ToolItem[] }>(`${prefix}/tool_list`, query).then(({ tools, shared_tools }) => [...tools, ...shared_tools])
+
 /** 获取工具分页列表。 */
 const getToolPage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<ToolItem>>(`${prefix}/${page.currentPage}/${page.pageSize}`, query)
@@ -70,6 +74,7 @@ const postToolTestConnection = (payload: ToolPayload) => {
 }
 
 export default {
+  getToolListWithShared,
   getToolPage,
   exportTool,
   deleteTool,

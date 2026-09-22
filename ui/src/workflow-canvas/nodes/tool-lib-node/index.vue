@@ -3,7 +3,7 @@ import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { ToolInputField } from '@/api/types'
-import ToolApi from '@/api/admin/workspace/tool/tool'
+import { useWorkflowStore } from '@/workflow-canvas/store'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { isLastNode } from '@/workflow-canvas/core/utils'
@@ -26,6 +26,7 @@ interface ToolLibNodeForm {
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const model = getModel()
+const store = useWorkflowStore(inject<string>('apiType', 'workspace'))
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 
@@ -75,7 +76,8 @@ function refreshToolFields() {
     return
   }
 
-  ToolApi.getToolDetail(toolId)
+  store.force
+    .getToolById(toolId)
     .then((tool) => {
       const previousFields = formData.value.input_field_list
       formData.value.name = tool.name

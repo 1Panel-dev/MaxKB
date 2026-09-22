@@ -455,3 +455,10 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 当前 Workspace 关联资源 API 一致。`resource-trigger.ts` 使用
 `/system/resource/<sourceType>/<sourceId>/trigger`，资源上下文与触发器载荷复用公共类型。
 System 接口由资源管理服务提供；本地开源后端没有对应扩展时，需要连接提供这些接口的部署。
+
+### System 共享工具工作流
+
+`system/shared-resources/tool/tool-workflow.ts` 维护共享工具的工作流详情、保存、发布、调试、
+版本和执行记录，前缀为 `/system/shared/tool`，调用只传资源 ID，不读取工作空间。
+两种 System 工具 API 的 `getToolListWithShared` 查询各自 `/tool_list` 并合并 `tools`、`shared_tools`，
+供画布的工具菜单及 MCP 选项使用。系统扩展接口需连接支持相应协议的部署进行联调。

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Comment, Fragment, Text, computed, defineComponent, h, isVNode, provide, type PropType, type VNode } from 'vue'
-import MkTableMoreDropdown from './MkTableMoreDropdown.vue'
-import { actionContextKey, type ActionContext } from '../mk-action/context'
+import MkTableMoreDropdown from '../mk-table/MkTableMoreDropdown.vue'
+import { actionContextKey, type ActionContext } from './context'
 
 /* 每个操作只挂载一次，由所在位置提供展示模式。 */
 const ActionPlacement = defineComponent({

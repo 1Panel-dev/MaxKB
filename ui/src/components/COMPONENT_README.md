@@ -295,6 +295,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 ### MkTableOperationGroup、MkAction
 
+`MkTableOperationGroup` 与 `MkAction`、`context.ts` 统一维护在 `global/mk-action/`。
 表格操作列使用 `MkTableOperationGroup` 默认插槽声明操作，按模板顺序将前 `maxVisible` 个操作
 （默认 2）显示为图标按钮，其余自动进入 More；没有剩余操作时不显示 More。
 每个直接子组件代表一个操作，业务 Action 内使用 `MkAction` 作为展示入口。
