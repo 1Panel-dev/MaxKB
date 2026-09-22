@@ -169,7 +169,9 @@ onMounted(() => loadSystemUsers())
 
         <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
           <template #default="{ row }">
+            <span v-if="!row.role_workspace?.length">-</span>
             <WorkspaceRelationTags
+              v-else
               :columns="[
                 { prop: 'role_name', label: '角色' },
                 { prop: 'workspace', label: '工作空间' },
@@ -209,8 +211,7 @@ onMounted(() => loadSystemUsers())
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center gap-3">
-
-              <span @click.stop >
+              <span @click.stop>
                 <el-switch
                   v-model="row.is_active"
                   :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id || !perm.system.user.edit()"
@@ -231,7 +232,7 @@ onMounted(() => loadSystemUsers())
                 <!-- 修改用户密码 -->
                 <ButtonChangeUserPassword :user="row" @refresh="loadSystemUsers(false)" />
                 <!-- 删除 -->
-                <MkTooltip content="删除" placement="top" v-if="perm.system.user.delete()" >
+                <MkTooltip content="删除" placement="top" v-if="perm.system.user.delete()">
                   <el-button type="primary" text @click.stop="deleteUser(row)">
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>

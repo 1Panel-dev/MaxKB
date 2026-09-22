@@ -427,6 +427,9 @@
       padding: 0;
       border-top: var(--el-border);
     }
+    .el-dialog__headerbtn {
+      top: 16px;
+    }
     .dialog-content {
       padding: 0;
       max-height: none;
