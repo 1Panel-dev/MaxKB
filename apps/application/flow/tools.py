@@ -736,6 +736,21 @@ async def save_tool_record(tool_id, tool_info, tool_result, source_id, source_ty
     await sync_to_async(close_old_connections)()
     tool = await sync_to_async(lambda: QuerySet(Tool).filter(id=tool_id).first())()
     tool_info["icon"] = tool.icon
+
+    # 工作流/函数库工具执行完会由各自的后置处理器先写入一条带 details 的完整记录
+    # （ToolWorkflowPostHandler、函数库节点自记录）。同一次执行再走这里会多出一条
+    # 只有 input/output 的降级记录，导致工具执行记录重复，因此已有完整记录时跳过。
+    def _has_detailed_record():
+        return (
+            QuerySet(ToolRecord)
+            .filter(tool_id=tool_id, source_id=source_id, source_type=source_type)
+            .filter(meta__has_key="details")
+            .first()
+        ) is not None
+
+    if await sync_to_async(_has_detailed_record)():
+        return
+
     tool_record = ToolRecord(
         id=uuid.uuid7(),
         workspace_id=tool.workspace_id,
