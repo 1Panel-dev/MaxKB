@@ -5,6 +5,8 @@ import type RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import ModelProviderApi from '@/api/admin/model-provider'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
+import { useStore } from '@/stores'
+import { isSystemSharedResource } from '@/utils/resource-context'
 import type { Dict, ModelProviderItem, OptionItem, RelatedResource, ResourceType } from '@/api/types'
 import ResourceIcon from './ResourceIcon.vue'
 import type { RelatedResourceTarget } from './types'
@@ -12,11 +14,12 @@ import type { RelatedResourceTarget } from './types'
 defineOptions({ name: 'RelatedResourcesDrawer' })
 const props = defineProps<{
   api: typeof RelatedResourcesApi
-  showWorkspace?: boolean
 }>()
 const emit = defineEmits<{ closed: [] }>()
 
 /* 当前资源与展示配置 */
+const { auth } = useStore()
+const showWorkspace = computed(() => isSystemSharedResource() && (auth.isEE || auth.isPE))
 const visible = ref(false)
 const resourceType = ref<ResourceType>(RESOURCE_TYPE.APPLICATION)
 const targetResource = ref<RelatedResourceTarget>()
@@ -56,10 +59,10 @@ function loadResources() {
   const isDependency = relationDirection.value === 'dependency'
   const { resource_type, ...query } = searchQuery.value
   if (resource_type) query[isDependency ? 'target_type' : 'source_type'] = resource_type
-  if (selectedWorkspaceIds.value.length) query.workspace_ids = JSON.stringify(selectedWorkspaceIds.value)
-  const request = isDependency ? props.api.getResourceDependencies : props.api.getResourceDependents
+  if (showWorkspace.value && selectedWorkspaceIds.value.length) query.workspace_ids = JSON.stringify(selectedWorkspaceIds.value)
+  const request = isDependency ? props.api.getUsingResources : props.api.getUsedByResources
   loading.value = true
-  return request(targetResource.value.workspace_id, resourceType.value, targetResource.value.id, { ...pagination.value }, query)
+  return request(resourceType.value, targetResource.value.id, { ...pagination.value }, query)
     .then((page) => {
       relatedResources.value = page.records
       pagination.value.total = page.total
@@ -106,7 +109,7 @@ function open(type: ResourceType, resource: RelatedResourceTarget) {
       providers.value = result
     })
   }
-  if (props.showWorkspace) {
+  if (showWorkspace.value) {
     WorkspaceApi.getSystemWorkspaceList().then((workspaces) => {
       workspaceOptions.value = workspaces.flatMap(({ id, name }) => (id ? [{ value: id, label: name }] : []))
     })

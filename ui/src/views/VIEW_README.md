@@ -324,13 +324,16 @@ Action 放入 `views/system/shared-resources/<card-name>/action-dropdown/`。Act
 
 ```text
 src/views/system/shared-resources/
-├── SharedModelview.vue
-└── model-card/action-dropdown/
-    ├── index.ts
-    └── shared-model-info-action/
-        ├── SharedModelInfoAction.vue
-        └── SharedModelInfoDrawer.vue
+├── ModelSharedview.vue
+└── ToolSharedView.vue
 ```
+
+`ToolSharedView` 使用 System 共享工具 API，复用 `ToolCard` 和编辑、启动参数、MCP 配置、
+导出、删除 Action。列表使用 `MkInfiniteScroll` 分页加载，支持类型、名称和创建者筛选；
+创建与删除后重新查询，编辑和启停成功后替换对应卡片数据。
+`ButtonCreateTool` 可接收完整 `api`，默认使用 Workspace Tool API；`showWorkflow` 默认开启，
+共享页关闭该入口，因为共享工作流画布尚未接入。共享页支持普通工具、Skills、MCP、数据源及
+导入创建，已有工作流工具只编辑基础信息。共享页不组合工作空间专用的移动、授权和触发器入口。
 
 System 用户页面按业务流程归拢操作入口和专属 Dialog。入口组件管理弹窗 Ref、打开动作并转发
 `refresh`；列表页负责查询、批量选择和刷新策略，创建与编辑共用的 `UserFromDrawer` 仍由页面管理。
@@ -412,7 +415,10 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/settings/authentication/AuthenticationView.vue`                | 系统登录及认证源配置页面                                             |
 | `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面                                           |
 | `system/operate-logs/OperateLogListView.vue`                           | 系统操作日志查询与清理页面                                           |
-| `system/shared-resources/SharedModelview.vue`                          | System 共享模型查询与模型卡片页面                                    |
+| `system/resource-management/ModelResourceView.vue` | System 模型分页、筛选、编辑、授权与删除 |
+| `system/resource-management/ToolResourceView.vue` | System 工具分页、筛选、维护与工作流入口 |
+| `system/shared-resources/ModelSharedview.vue`                          | System 共享模型查询与模型卡片页面                                    |
+| `system/shared-resources/ToolSharedView.vue`                           | System 共享工具查询与工具维护页面                                    |
 | `trigger/TriggerView.vue`                                              | 工作空间触发器查询、新建、编辑及单项和批量启停、删除                 |
 | `tool/ToolView.vue`                                                    | 工作空间工具目录与工具卡片页面                                       |
 
@@ -552,7 +558,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 ## 模型创建入口
 
 `model/create-model/ButtonAddModel.vue` 和 `CreateModelDrawer.vue` 通过必填的 `api` 接收完整
-模型 API 对象。Workspace 模型页传入 `ModelApi`，System 共享模型页传入 `SystemSharedApi`；
+模型 API 对象。Workspace 模型页传入 `ModelApi`，System 共享模型页传入 `SystemSharedModelApi`；
 创建抽屉只调用传入的 API，不再自行判断资源范围。
 `ButtonAddModel` 默认渲染主按钮，也支持通过默认作用域插槽的 `open()` 定制触发按钮，
 `SelectModel` 的下拉页脚使用该插槽复用同一创建流程。创建成功后保留基础资料刷新，再触发
@@ -615,10 +621,14 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 模型、知识库、应用、工具卡片的 `action-dropdown/` 分别提供
 `RelatedResourcesModelAction`、`RelatedResourcesKnowledgeAction`、
 `RelatedResourcesApplicationAction`、`RelatedResourcesToolAction`，在更多菜单展示“查看关联资源”。
-列表页面按对应资源的 `workspace.relateMap(resource.id)` 控制入口权限，共享知识库、工具和模型不展示。
+工作空间列表保留已有入口行为；System 共享模型页增加该 Action，不新增权限判断。
 页面传入完整 `RelatedResourcesApi` 和当前资源。Action 点击后按需挂载
 `RelatedResourcesDrawer`，传入对应 `RESOURCE_TYPE` 和包含 `workspace_id` 的资源快照；
 工作空间 ID 来自资源数据，缺失时提示并停止打开，关闭后卸载抽屉。
+共享模型页只传入模型数据、文案和完整 System 共享关联资源 API，不传 `shared` 或工作空间显示标记。
+共享模型允许缺少 `workspace_id`；抽屉内部仅在 System 共享资源且为企业版或专业版时显示工作空间列与筛选。
+抽屉调用接口时不传工作空间 ID，
+Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 模型及非工作流工具默认展示“引用此资源的资源”，其他资源默认展示“依赖的资源”。
 资源名称仅展示文本，暂不支持打开目标资源。
 
@@ -787,3 +797,30 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 `operation-log/OperationLogView.vue` 分别承接接入第三方、对话用户、操作日志，目前仅展示占位内容，
 标题及详情框架继续由 `ResourceDetailLayout` 提供。设置菜单按资源类型选择现有简易设置页面
 或高级智能体全屏工作流，不另建高级设置 View。
+
+## System 资源管理模型与工具
+
+`system/resource-management/ModelResourceView.vue` 与 `ToolResourceView.vue` 使用
+`MkViewLayout`、`MkComplexSearch` 和 `MkTable` 展示跨工作空间资源。
+模型操作列通过 `MkTableOperationGroup` 按插槽顺序外露编辑与资源授权，其余操作自动进入 More；
+参数设置的显隐条件直接写在 Action 上，业务 Action 复用 `MkAction` 适配按钮与菜单。
+模型 `action-dropdown` 中的编辑、删除、参数设置、授权和关联资源入口统一使用 `MkAction`。
+资源管理页复用 `EditModelAction`，传入 System API、供应商和禁用状态；该 Action 内聚编辑抽屉，
+保存后发送 `refresh`。共享模型页继续组合相同业务 Action，在卡片菜单中自动显示为菜单项。
+资源管理删除保留页面专属确认、引用数量提示、加载状态和分页回退，通过 `MkAction` 展示，
+不强行复用卡片的 `DeleteModelAction`。
+工具操作列继续使用 `MkTableMoreDropdown`。
+名称、类型、创建者（工具另含来源）筛选和工作空间表头筛选变化后回到第一页；分页大小变化由
+`MkTable` 重置页码。工作空间列及选项查询只在企业版开启，`workspace_ids` 沿用 JSON 数组字符串。
+页面使用 v3 的 System 权限方法保留迁移前已有的操作权限，不增加创建、导入、批量或复制入口。
+删除保留资源引用数量提示，删除末页最后一条后退回上一页。
+
+模型复用编辑抽屉、参数设置、授权和关联资源 Action；工具复用各类型编辑表单、启停、启动参数、
+MCP 配置、授权、导出、触发器和执行记录。页面显式传入对应 System 业务 API。
+商店工具只修改名称，不开放模板代码编辑；编辑与启停合并返回数据，保留列表中的工作空间等展示字段。
+工具维护表单的 API 联合包含 System 资源对象，该范围没有 `postTool`，不通过伪造创建接口满足类型。
+
+资源管理中的工作流进入 `system-resource-tool-workflow`，由 `ToolWorkflowView` 选择 System
+工具、工作流和模型 API，并把工作流 API 传给发布历史与调试抽屉；返回资源管理工具列表。
+`TriggerToolAction` 和 `ResourceTriggerDialog` 透传可选 `toolApi`、`toolWorkflowApi`，
+由 `TriggerFormDrawer` 查询当前资源的完整输入定义；未传时保持 Workspace 默认接口。

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type LogicFlow from '@logicflow/core'
-import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemModelApi from '@/api/admin/system/resource-management/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type { DefaultModelSettingPayload } from '@/api/types'
 import DefaultModelSettingDrawer from './DefaultModelSettingDrawer.vue'
 
@@ -10,7 +11,7 @@ defineOptions({ name: 'ButtonDefaultModelSetting' })
 const props = withDefaults(
   defineProps<{
     modelValue?: DefaultModelSettingPayload
-    modelApi: typeof ModelApi
+    modelApi: typeof ModelApi | typeof SystemModelApi
     getGraphData: () => LogicFlow.GraphData | undefined
     disabled?: boolean
   }>(),

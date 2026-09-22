@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
+import type ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
+
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import type { ResourceTrigger, ResourceTriggerResource, TriggerSetting } from '@/api/types'
@@ -6,7 +10,12 @@ import { TRIGGER_TYPE, TRIGGER_SCHEDULE_TYPE } from '@/api/enums'
 import { MsgSuccess } from '@/utils/message'
 import TriggerFormDrawer from '../trigger-form/TriggerFormDrawer.vue'
 
-const props = defineProps<{ api: typeof ResourceTriggerApi; resource: ResourceTriggerResource }>()
+const props = defineProps<{
+  toolApi?: typeof ToolApi | typeof SystemToolApi
+  toolWorkflowApi?: typeof ToolWorkflowApi
+  api: typeof ResourceTriggerApi
+  resource: ResourceTriggerResource
+}>()
 const emit = defineEmits<{ closed: [] }>()
 
 /* 当前资源的触发器列表 */
@@ -122,6 +131,8 @@ defineExpose({ open })
     </div>
   </MkDialog>
   <TriggerFormDrawer
+    :tool-api="toolApi"
+    :tool-workflow-api="toolWorkflowApi"
     v-if="formMounted"
     ref="triggerFormRef"
     :resource="resource"

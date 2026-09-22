@@ -4,6 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem, ToolPayload } from '@/api/types'
 import { useStore } from '@/stores'
@@ -15,7 +17,7 @@ const { auth } = useStore()
 const route = useRoute()
 const router = useRouter()
 
-const props = defineProps<{ api: typeof ToolApi; folderId: string; title: string }>()
+const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; folderId: string; title: string }>()
 
 const emit = defineEmits<{ closed: []; refresh: []; update: [tool: ToolItem] }>()
 
@@ -42,7 +44,11 @@ function handleSubmit() {
     loading.value = true
     const currentEditId = editId.value
     const isEdit = Boolean(currentEditId)
-    const request = currentEditId ? props.api.putTool(currentEditId, payload) : props.api.postTool({ ...payload, folder_id: props.folderId || null })
+    const request = currentEditId
+      ? props.api.putTool(currentEditId, payload)
+      : 'postTool' in props.api
+        ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
+        : Promise.reject(new Error('资源管理不支持创建工具'))
 
     request
       .then((savedTool) => {

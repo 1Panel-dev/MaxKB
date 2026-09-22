@@ -5,9 +5,13 @@ import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { TOOL_TYPE } from '@/api/enums'
-import ModelApi from '@/api/admin/workspace/model/model'
-import ToolApi from '@/api/admin/workspace/tool/tool'
-import ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
+import WorkspaceModelApi from '@/api/admin/workspace/model'
+import WorkspaceToolApi from '@/api/admin/workspace/tool/tool'
+import WorkspaceToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
+import SystemModelApi from '@/api/admin/system/resource-management/model'
+import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
+import SystemToolWorkflowApi from '@/api/admin/system/resource-management/tool/tool-workflow'
+import { getResourceScope, isSystemResource } from '@/utils/resource-context'
 import type { DefaultModelSettingPayload, ToolItem, ToolWorkflowDetail, WorkflowVersion, WorkflowStoreTemplate } from '@/api/types'
 import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
@@ -22,6 +26,12 @@ import ButtonTemplateStore from './ButtonTemplateStore.vue'
 import { goBack } from './navigation'
 
 defineOptions({ name: 'ToolWorkflowView' })
+
+// 保存、调试与版本历史保持进入页面时的资源范围。
+const ModelApi = isSystemResource() ? SystemModelApi : WorkspaceModelApi
+const ToolApi = isSystemResource() ? SystemToolApi : WorkspaceToolApi
+const ToolWorkflowApi = isSystemResource() ? SystemToolWorkflowApi : WorkspaceToolWorkflowApi
+provide('resourceScope', getResourceScope())
 
 // 为画布节点中的 SelectModel 提供参数表单接口。
 provide('getModelParamsForm', ModelApi.getModelParamsForm)
@@ -352,6 +362,7 @@ onBeforeUnmount(() => stopAutoSave())
             </MkDropdownItem>
             <!-- 发布历史 -->
             <ButtonPublishHistory
+              :api="ToolWorkflowApi"
               v-model:visible="historyVisible"
               :tool-id="toolId"
               :selected-id="previewVersion?.id"
@@ -382,6 +393,6 @@ onBeforeUnmount(() => stopAutoSave())
       />
     </div>
     <!-- 调试抽屉 -->
-    <DebugDrawer ref="debugDrawerRef" :tool-id="toolId" />
+    <DebugDrawer :api="ToolWorkflowApi" ref="debugDrawerRef" :tool-id="toolId" />
   </WorkflowViewLayout>
 </template>

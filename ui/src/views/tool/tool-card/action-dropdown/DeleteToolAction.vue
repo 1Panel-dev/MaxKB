@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { ToolItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DeleteToolAction' })
 
-const props = defineProps<{ api: typeof ToolApi; label: string; tool: ToolItem }>()
+const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi; label: string; tool: ToolItem }>()
 
 const loading = defineModel<boolean>('loading', { default: false })
 

@@ -2,13 +2,15 @@
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { Dict, ToolItem } from '@/api/types'
 import { MkDynamicsForm, type DynamicFormValue } from '@/components/mk-dynamics-form'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'InitParamDialog' })
 
-const props = defineProps<{ api: typeof ToolApi }>()
+const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi }>()
 
 const emit = defineEmits<{ closed: []; update: [tool: ToolItem] }>()
 

@@ -14,6 +14,20 @@ export const workflowRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/workflow/tool/ToolWorkflowView.vue'),
     meta: { title: '工具工作流', resourceScope: 'workspace' },
   },
+
+  {
+    path: '/system/resource//tool/:toolId/workflow',
+    name: 'system-resource-tool-workflow',
+    component: () => import('@/views/workflow/tool/ToolWorkflowView.vue'),
+    meta: { title: '工具工作流', resourceScope: 'system-resource' },
+  },
+  {
+    path: '/system/shared/tool/:toolId/workflow',
+    name: 'system-resource-tool-workflow',
+    component: () => import('@/views/workflow/tool/ToolWorkflowView.vue'),
+    meta: { title: '工具工作流', resourceScope: 'system-shared' },
+  },
+
   {
     path: '/workspace/:workspaceId/knowledge/:knowledgeId/workflow',
     name: 'workflow-knowledge',

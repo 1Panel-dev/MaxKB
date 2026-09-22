@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type ModelApi from '@/api/admin/workspace/model/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { ModelItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -23,8 +23,6 @@ function handleDeleteModel() {
 </script>
 
 <template>
-  <MkDropdownItem divided @click="handleDeleteModel">
-    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-    <span>{{ label }}</span>
-  </MkDropdownItem>
+  <!-- 删除模型 -->
+  <MkAction :label="label" icon="icon_delete-trash_outlined" divided @click="handleDeleteModel" />
 </template>

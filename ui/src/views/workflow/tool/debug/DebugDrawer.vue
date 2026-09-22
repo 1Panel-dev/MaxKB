@@ -5,11 +5,12 @@ import type { FormInstance, FormItemRule } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import type { ToolInputField } from '@/workflow-canvas/nodes/tool-base-node/types'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import ResultDrawer from './ResultDrawer.vue'
 import JsonInput from '@/components/codemirror-editor/Json.vue'
 
 defineOptions({ name: 'ToolWorkflowDebugDrawer' })
-const props = defineProps<{ toolId: string }>()
+const props = defineProps<{ toolId: string; api?: typeof WorkflowApi }>()
 const visible = ref(false)
 const inputFields = ref<ToolInputField[]>([])
 const inputValues = ref<Record<string, unknown>>({})
@@ -122,5 +123,5 @@ defineExpose({ open, close })
       <el-button type="primary" :loading="running" @click="handleRun">运行</el-button>
     </template>
   </MkDrawer>
-  <ResultDrawer ref="resultDrawerRef" :tool-id="props.toolId" v-model:running="running" />
+  <ResultDrawer :api="api" ref="resultDrawerRef" :tool-id="props.toolId" v-model:running="running" />
 </template>

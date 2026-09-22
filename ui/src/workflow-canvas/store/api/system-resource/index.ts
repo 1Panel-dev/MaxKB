@@ -1,2 +1,10 @@
-import modelAPI from '@/api/admin/workspace/model/model'
-export default { getModelListWithShared: modelAPI.getModelListWithShared, getModelParamsForm: modelAPI.getModelParamsForm }
+import WorkspaceApi from '../workspace'
+import ModelApi from '@/api/admin/system/resource-management/model'
+import ToolApi from '@/api/admin/system/resource-management/tool/tool'
+
+export default {
+  ...WorkspaceApi,
+  getModelListWithShared: ModelApi.getModelListWithShared,
+  getModelParamsForm: ModelApi.getModelParamsForm,
+  getToolById: ToolApi.getToolDetail,
+}

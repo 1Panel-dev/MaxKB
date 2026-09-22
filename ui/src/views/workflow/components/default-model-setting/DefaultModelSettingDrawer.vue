@@ -3,7 +3,8 @@ import { computed, provide, ref, watch } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
 import type LogicFlow from '@logicflow/core'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
-import type ModelApi from '@/api/admin/workspace/model/model'
+import type SystemModelApi from '@/api/admin/system/resource-management/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import ModelProviderApi from '@/api/admin/model-provider'
 import type { DefaultModelSettingPayload, DefaultModelType, ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
 import SelectModel from '@/components/business/select-model/index.vue'
@@ -16,7 +17,7 @@ const defaultModelTypes = ['LLM', 'TTS', 'STT', 'IMAGE', 'TTI', 'TTV', 'ITV', 'R
 
 const props = defineProps<{
   modelValue?: DefaultModelSettingPayload
-  modelApi: typeof ModelApi
+  modelApi: typeof ModelApi | typeof SystemModelApi
   getGraphData: () => LogicFlow.GraphData | undefined
   disabled?: boolean
 }>()

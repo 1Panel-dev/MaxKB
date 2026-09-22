@@ -209,7 +209,8 @@ onMounted(() => loadSystemUsers())
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center gap-3">
-              <span @click.stop>
+
+              <span @click.stop >
                 <el-switch
                   v-model="row.is_active"
                   :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id || !perm.system.user.edit()"

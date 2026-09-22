@@ -10,7 +10,7 @@ import {
   type FormField,
   type VisibilityFieldOption,
 } from '@/components/mk-dynamics-form'
-import ModelApi from '@/api/admin/workspace/model/model'
+import ModelApi from '@/api/admin/workspace/model'
 
 defineOptions({ name: 'MkDynamicsFormDemo' })
 provide('getSelectModelList', ModelApi.getModelListWithShared)

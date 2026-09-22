@@ -244,6 +244,8 @@ System 共享资源页面：
 /admin/system/share/tools
 ```
 
+`system-shared-tools` 渲染 `views/system/shared-resources/ToolSharedView.vue`，提供共享工具管理页面。
+
 共享资源路由是 System 导航的一部分，继续在 `admin/system/index.ts` 的 `share` 子路由中维护。
 已实现的共享资源页面放在 `views/system/shared-resources/`，由页面处理 System 范围的查询和操作，
 可按需复用 Workspace 对应资源的卡片等展示组件。
@@ -354,3 +356,13 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 高级设置的 `canAccess` 固定返回 false，避免工作流返回时重新进入画布；原有概览和简易设置的
 返回权限条件保持不变。新增页面未添加权限判断。
 `integration`、`chat-user`、`operation-log` 分别对应接入第三方、对话用户、操作日志占位页面。
+
+### System 资源管理模型与工具
+
+`/system/resource/models`、`/system/resource/tools` 分别渲染
+`views/system/resource-management/ModelResourceView.vue` 和 `ToolResourceView.vue`，
+继承 `resourceScope: 'system-resource'`，保留原导航名称、顺序与权限。
+资源管理工具的全屏工作流使用 `system-resource-tool-workflow`，地址为
+`/system/resource/workspace/:workspaceId/tool/:toolId/workflow`，在 `admin/workflow/index.ts`
+注册，复用 `ToolWorkflowView`。`workspaceId` 来自工具数据，用于画布辅助资源选择；
+工具自身的查询、编辑、调试和发布使用 System API，返回 `system-resource-tools`。

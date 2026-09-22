@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import type ModelApi from '@/api/admin/workspace/model/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { ModelItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'

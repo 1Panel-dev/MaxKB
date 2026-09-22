@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem } from '@/api/types'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
@@ -8,7 +10,7 @@ import InitParamDialog from './InitParamDialog.vue'
 
 defineOptions({ name: 'ToolStatusSwitch' })
 
-const props = defineProps<{ api: typeof ToolApi; tool: ToolItem }>()
+const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; tool: ToolItem }>()
 
 const loading = defineModel<boolean>('loading', { default: false })
 
@@ -17,12 +19,14 @@ const emit = defineEmits<{ update: [tool: ToolItem] }>()
 const initParamDialogRef = useTemplateRef<InstanceType<typeof InitParamDialog>>('initParamDialogRef')
 
 function handleToolStatusChange() {
+  if (loading.value) return false
   if (props.tool.is_active) {
     return MsgConfirm(`是否禁用工具：${props.tool.name}？`, '禁用后，引用了该工具的资源执行会报错 ，请谨慎操作。', { confirmButtonText: '禁用' })
       .then(() => updateToolStatus(false))
       .catch(() => false)
   }
 
+  loading.value = true
   return props.api
     .getToolDetail(props.tool.id)
     .then((toolDetail) => {
@@ -39,6 +43,9 @@ function handleToolStatusChange() {
       return updateToolStatus(true)
     })
     .catch(() => false)
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 function hasMissingInitParams(tool: ToolItem) {
@@ -67,7 +74,7 @@ function updateToolStatus(active: boolean) {
 
 <template>
   <div>
-    <el-switch :model-value="tool.is_active" class="mr-3" size="small" :before-change="handleToolStatusChange" />
+    <el-switch :disabled="loading" :model-value="tool.is_active" class="mr-3" size="small" :before-change="handleToolStatusChange" />
     <el-divider direction="vertical" />
   </div>
 

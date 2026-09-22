@@ -196,5 +196,9 @@ defineExpose({ clearSelection, tableRef })
   .el-table__column-resize-proxy {
     border-left: 2px solid var(--el-color-primary);
   }
+
+  thead th {
+    border-bottom: none !important;
+  }
 }
 </style>

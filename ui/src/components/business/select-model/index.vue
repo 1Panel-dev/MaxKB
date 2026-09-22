@@ -6,7 +6,7 @@ import type { ModelProviderItem, ModelItem } from '@/api/types'
 import { groupBy } from 'lodash'
 import ModelParamsDialog from './ModelParamsDialog.vue'
 import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
-import ModelApi from '@/api/admin/workspace/model/model'
+import ModelApi from '@/api/admin/workspace/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import { isWorkspaceResource, isSystemSharedResource } from '@/utils/resource-context'
 defineOptions({ name: 'SelectModel', inheritAttrs: false })

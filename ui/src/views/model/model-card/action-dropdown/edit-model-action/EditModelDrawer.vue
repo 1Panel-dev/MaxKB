@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue'
-import type ModelApi from '@/api/admin/workspace/model/model'
+import type ModelApi from '@/api/admin/workspace/model'
+import type SystemResourceModelApi from '@/api/admin/system/resource-management/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { BaseModelOption, Dict, ModelItem, ModelPayload, ModelProviderItem } from '@/api/types'
 import ProviderApi from '@/api/admin/model-provider'
@@ -10,7 +11,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'EditModelDrawer' })
 
-const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi }>()
+const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi | typeof SystemResourceModelApi }>()
 
 const emit = defineEmits<{ closed: []; refresh: [] }>()
 

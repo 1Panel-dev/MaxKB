@@ -135,8 +135,9 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 主画布从 `resourceScope` 注入读取范围（默认 `workspace`），通过节点上下文传递为 `apiType`。
 
 当前 `workspace` 适配模型、供应商、模型参数、MCP 工具、共享工具选项、工具详情和标签查询；
-`system-resource` 仅接入模型列表与参数表单且沿用 Workspace API，`system-shared`、
-`workspace-shared` 为空占位，不能据目录名认定已支持完整 System 或共享范围。
+`system-resource` 使用 System 模型选项、参数表单与工具详情 API，其他辅助资源查询复用
+`workspace` 适配器，并从工具工作流路由读取明确的所属工作空间 ID；不回退到 undefined 工作空间。
+`system-shared`、`workspace-shared` 仍为空占位，不能据目录名认定已支持完整共享范围。
 节点资源查询可调用此适配器或既有业务 API；工作流加载、保存与发布仍由 View 编排，核心层不承载请求。
 
 ### 表格文本省略

@@ -4,11 +4,13 @@ import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ToolDebugPayload, ToolPayload } from '@/api/types'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'ToolDebugDrawer' })
 
-const props = defineProps<{ api: typeof ToolApi }>()
+const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi }>()
 
 const formRef = ref<FormInstance>()
 const dynamicsFormRef = ref<InstanceType<typeof MkDynamicsForm>>()

@@ -2,13 +2,14 @@
 import { computed, onMounted, ref } from 'vue'
 import type { Dict, ModelItem, ModelProviderItem, OptionItem } from '@/api/types'
 import { MODEL_TYPE_LABELS } from '@/constants'
-import SystemSharedApi from '@/api/admin/system/shared-resources/model'
+import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import RelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
 import CommonSystemApi from '@/api/admin/system/common'
 import ProviderApi from '@/api/admin/model-provider'
 import ModelCard from '@/views/model/model-card/ModelCard.vue'
 import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
 import ModelProvider from '@/views/model/components/ModelProvider.vue'
-import { DeleteModelAction, EditModelAction, ParamSettingAction } from '@/views/model/model-card/action-dropdown'
+import { DeleteModelAction, EditModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 
@@ -48,7 +49,7 @@ function loadModels() {
   const provider = currentProvider.value.provider
   const query = { ...modelQuery.value, ...(provider !== 'all' ? { provider } : {}) }
 
-  return SystemSharedApi.getModelList(query)
+  return SystemSharedModelApi.getModelList(query)
     .then((models) => {
       ModelItems.value = models
     })
@@ -85,18 +86,27 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <ButtonAddModel :api="SystemSharedApi" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
+          <!-- 添加模型 -->
+          <ButtonAddModel :api="SystemSharedModelApi" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
         </div>
       </component>
       <div v-loading="loading">
         <div v-if="ModelItems.length" class="mk-resource-card-grid">
           <template v-for="model in ModelItems" :key="model.id">
-            <ModelCard :api="SystemSharedApi" :model="model" :provider="getModelProvider(model)" :refresh="loadModels" :shared="true">
+            <ModelCard :api="SystemSharedModelApi" :model="model" :provider="getModelProvider(model)" :refresh="loadModels" :shared="true">
               <template #action-dropdown>
-                <EditModelAction label="编辑" :api="SystemSharedApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
-                <ParamSettingAction v-if="model.model_type !== 'RERANKER'" label="模型参数设置" :api="SystemSharedApi" :model="model" />
+                <!-- 编辑 -->
+                <EditModelAction label="编辑" :api="SystemSharedModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
+                <!-- // TODO 授权工作空间 -->
 
-                <DeleteModelAction label="删除" :api="SystemSharedApi" :model="model" @refresh="loadModels" />
+                <!-- 模型参数设置 -->
+                <ParamSettingAction v-if="model.model_type !== 'RERANKER'" label="模型参数设置" :api="SystemSharedModelApi" :model="model" />
+
+                <!-- 查看关联资源 -->
+                <RelatedResourcesModelAction label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
+
+                <!-- 删除 -->
+                <DeleteModelAction label="删除" :api="SystemSharedModelApi" :model="model" @refresh="loadModels" />
               </template>
             </ModelCard>
           </template>
