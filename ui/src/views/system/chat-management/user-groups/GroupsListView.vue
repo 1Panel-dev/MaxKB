@@ -136,8 +136,8 @@ onMounted(() => loadChatUserGroups())
       <component :is="Header">
         <h4>{{ title }}</h4>
         <!-- 创建用户组 -->
-        <MkTooltip content="创建用户组" placement="top">
-          <el-button v-if="perm.system.chatUserGroup.create()" text type="primary" @click="handleOpenGroupDialog()">
+        <MkTooltip content="创建用户组" placement="top" v-if="perm.system.chatUserGroup.create()">
+          <el-button text type="primary" @click="handleOpenGroupDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </MkTooltip>
@@ -203,8 +203,8 @@ onMounted(() => loadChatUserGroups())
           <el-table-column label="操作" width="70" fixed="right">
             <template #default="{ row }">
               <!-- 移除成员 -->
-              <MkTooltip content="移除" placement="top">
-                <el-button v-if="perm.system.chatUserGroup.removeMember()" type="primary" text @click="handleRemoveMembers(row)">
+              <MkTooltip content="移除" placement="top" v-if="perm.system.chatUserGroup.removeMember()">
+                <el-button type="primary" text @click="handleRemoveMembers(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
               </MkTooltip>
