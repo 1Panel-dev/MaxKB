@@ -267,7 +267,7 @@ class TriggerView(APIView):
             tags=[_("Trigger")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TRIGGER_READ.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.TRIGGER_READ.get_workspace_permission(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):

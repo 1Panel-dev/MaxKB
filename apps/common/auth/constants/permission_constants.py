@@ -286,7 +286,7 @@ class PermissionConstants(Enum):
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE],
         ),
     )
 
@@ -304,7 +304,7 @@ class PermissionConstants(Enum):
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE],
         ),
     )
 
@@ -313,7 +313,7 @@ class PermissionConstants(Enum):
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE],
         ),
     )
 
@@ -322,7 +322,7 @@ class PermissionConstants(Enum):
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE],
         ),
     )
 
