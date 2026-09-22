@@ -183,7 +183,7 @@ onMounted(() => loadTriggers())
         <el-table-column prop="trigger_type" label="类型" width="120">
           <template #default="{ row }">{{ triggerTypeLabels[row.trigger_type as TriggerType] || row.trigger_type }}</template>
         </el-table-column>
-        <el-table-column prop="is_active" label="状态" width="120">
+        <el-table-column prop="is_active" label="启用状态" width="120">
           <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
         </el-table-column>
         <el-table-column prop="desc" label="描述" min-width="170" show-overflow-tooltip />

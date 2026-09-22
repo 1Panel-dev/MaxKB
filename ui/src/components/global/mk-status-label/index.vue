@@ -9,10 +9,10 @@ defineOptions({ name: 'MkStatusLabel' })
 
 const props = withDefaults(
   defineProps<{
-    active?: boolean
+    active?: boolean // 启用状态
     activeText?: string
     inactiveText?: string
-    status?: State
+    status?: State // 多种状态
   }>(),
   { activeText: '已启用', inactiveText: '已禁用' },
 )
