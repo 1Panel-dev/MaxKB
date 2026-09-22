@@ -59,7 +59,7 @@ def get_provider(provider):
     @param provider: 供应商字符串
     @return: 供应商实例
     """
-    return ModelProvideConstants[provider].value
+    return ModelProvideConstants[provider]
 
 
 def get_model_list(provider, model_type):

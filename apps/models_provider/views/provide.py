@@ -33,19 +33,16 @@ class Provide(APIView):
                     len(
                         [
                             item
-                            for item in ModelProvideConstants[key].value.get_model_type_list()
+                            for item in ModelProvideConstants[key].get_model_type_list()
                             if item["value"] == model_type
                         ]
                     )
                     > 0
                 ):
-                    providers.append(ModelProvideConstants[key].value.get_model_provide_info().to_dict())
+                    providers.append(ModelProvideConstants[key].get_model_provide_info().to_dict())
             return result.success(providers)
         return result.success(
-            [
-                ModelProvideConstants[key].value.get_model_provide_info().to_dict()
-                for key in ModelProvideConstants.__members__
-            ]
+            [ModelProvideConstants[key].get_model_provide_info().to_dict() for key in ModelProvideConstants.__members__]
         )
 
     class ModelTypeList(APIView):
@@ -62,7 +59,7 @@ class Provide(APIView):
         )
         def get(self, request: Request):
             provider = request.query_params.get("provider")
-            return result.success(ModelProvideConstants[provider].value.get_model_type_list())
+            return result.success(ModelProvideConstants[provider].get_model_type_list())
 
     class ModelList(APIView):
         authentication_classes = [TokenAuth]
@@ -80,7 +77,7 @@ class Provide(APIView):
             provider = request.query_params.get("provider")
             model_type = request.query_params.get("model_type")
 
-            return result.success(ModelProvideConstants[provider].value.get_model_list(model_type))
+            return result.success(ModelProvideConstants[provider].get_model_list(model_type))
 
     class ModelParamsForm(APIView):
         authentication_classes = [TokenAuth]
@@ -118,5 +115,5 @@ class Provide(APIView):
             model_type = request.query_params.get("model_type")
             model_name = request.query_params.get("model_name")
             return result.success(
-                ModelProvideConstants[provider].value.get_model_credential(model_type, model_name).to_form_list()
+                ModelProvideConstants[provider].get_model_credential(model_type, model_name).to_form_list()
             )
