@@ -732,6 +732,8 @@ async def _yield_mcp_response(
 
 
 async def save_tool_record(tool_id, tool_info, tool_result, source_id, source_type):
+    from django.db import close_old_connections
+    await sync_to_async(close_old_connections)()
     tool = await sync_to_async(lambda: QuerySet(Tool).filter(id=tool_id).first())()
     tool_info["icon"] = tool.icon
     tool_record = ToolRecord(
