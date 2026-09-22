@@ -372,7 +372,18 @@ class BaseChatStep(IChatStep):
             mcp_tools = QuerySet(Tool).filter(id__in=mcp_tool_ids).values()
             for mcp_tool in mcp_tools:
                 if mcp_tool and mcp_tool["is_active"]:
-                    mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool["code"])}
+                    mcp_tool_config = json.loads(mcp_tool["code"])
+                    # 引用多个 MCP 工具时服务名是用户自定义的，可能重名；直接合并会
+                    # 静默覆盖前面的服务，只有最后一个生效。这里显式报错指出冲突服务名。
+                    conflict_servers = set(mcp_servers_config) & set(mcp_tool_config)
+                    if conflict_servers:
+                        raise AppApiException(
+                            500,
+                            _(
+                                "MCP server 【{servers}】 is defined in multiple referenced MCP tools, rename it so every server takes effect"
+                            ).format(servers="、".join(sorted(conflict_servers))),
+                        )
+                    mcp_servers_config = {**mcp_servers_config, **mcp_tool_config}
         # 校验代码是否包括禁止的关键字
         ToolExecutor().validate_mcp_transport(json.dumps(mcp_servers_config))
 
