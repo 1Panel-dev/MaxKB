@@ -361,7 +361,6 @@ export class AggregatePermission {
 
   private checkPermission(permission: Permission, userPermissions: Map<string, bigint>): boolean {
     const key = permission.toPermissionKey()
-    console.log(key)
     const raw = userPermissions.get(key)
     if (raw == null) return false
     return (raw & permission.bit()) !== 0n
