@@ -27,7 +27,7 @@ interface ResumeParameters {
   chunkId?: string
   chatRecordId?: string
 }
-const props = defineProps<{ toolId: string }>()
+const props = defineProps<{ toolId: string; api?: typeof WorkflowApi }>()
 const running = defineModel<boolean>('running', { default: false })
 const visible = ref(false)
 const activeTab = ref('output')
@@ -58,7 +58,7 @@ async function execute(extra: Record<string, unknown> = {}) {
   errorMessage.value = ''
   record.value = undefined
   try {
-    const response = await WorkflowApi.postToolWorkflowDebug(props.toolId, { ...inputParameters, ...extra, chat_record_id: recordId })
+    const response = await (props.api ?? WorkflowApi).postToolWorkflowDebug(props.toolId, { ...inputParameters, ...extra, chat_record_id: recordId })
     if (!visible.value) {
       await response.body?.cancel()
       return
@@ -77,7 +77,7 @@ async function execute(extra: Record<string, unknown> = {}) {
     await stream.start()
     if (!visible.value) return
     if (streamError) throw streamError
-    const result = await WorkflowApi.getToolWorkflowRecord(props.toolId, recordId)
+    const result = await (props.api ?? WorkflowApi).getToolWorkflowRecord(props.toolId, recordId)
     if (visible.value) record.value = result
   } catch (error) {
     if (visible.value) {

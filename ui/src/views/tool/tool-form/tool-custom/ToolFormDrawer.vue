@@ -4,6 +4,8 @@ import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { DynamicFormField, ToolInputField, ToolItem, ToolPayload } from '@/api/types'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolDebugDrawer from './ToolDebugDrawer.vue'
@@ -15,7 +17,7 @@ defineOptions({ name: 'ToolFormDrawer' })
 
 const { auth } = useStore()
 
-const props = defineProps<{ api: typeof ToolApi; title: string; folderId: string }>()
+const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; title: string; folderId: string }>()
 
 const emit = defineEmits<{ closed: []; refresh: []; update: [tool: ToolItem] }>()
 
@@ -50,7 +52,11 @@ function handleSubmit() {
     const payload: ToolPayload = cloneDeep(toolForm)
     const currentEditId = editId.value
     const isEdit = Boolean(currentEditId)
-    const request = currentEditId ? props.api.putTool(currentEditId, payload) : props.api.postTool({ ...payload, folder_id: props.folderId || null })
+    const request = currentEditId
+      ? props.api.putTool(currentEditId, payload)
+      : 'postTool' in props.api
+        ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
+        : Promise.reject(new Error('资源管理不支持创建工具'))
 
     request
       .then((savedTool) => {

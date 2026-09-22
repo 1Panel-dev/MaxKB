@@ -2,6 +2,7 @@
 import { computed, ref, useTemplateRef, type CSSProperties } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
@@ -17,13 +18,15 @@ const { auth } = useStore()
 
 const props = withDefaults(
   defineProps<{
+    api?: typeof ToolApi | typeof SystemSharedToolApi
+    showWorkflow?: boolean
     folderId: string
     trigger?: 'click' | 'hover' | 'contextmenu'
     popperStyle?: CSSProperties
     popperClass?: string
     fitTriggerWidth?: boolean
   }>(),
-  { trigger: 'click', fitTriggerWidth: false },
+  { api: () => ToolApi, showWorkflow: true, trigger: 'click', fitTriggerWidth: false },
 )
 
 const emit = defineEmits<{ refresh: [] }>()
@@ -79,7 +82,8 @@ function handleOpenDataSourceForm() {
 const elUploadRef = ref<UploadInstance>()
 function handleImportCreate(file: UploadFile) {
   if (!file.raw) return
-  ToolApi.postToolImport(file.raw, props.folderId)
+  props.api
+    .postToolImport(file.raw, props.folderId)
     .then(() => {
       return auth.loadAuthBaseProfile().then(() => {
         MsgSuccess('导入成功')
@@ -124,7 +128,7 @@ function handleRefresh() {
           <span>工具</span>
         </MkDropdownItem>
         <!-- 创建工作流工具 -->
-        <MkDropdownItem class="py-2!" @click="handleOpenWorkflowForm">
+        <MkDropdownItem v-if="showWorkflow" class="py-2!" @click="handleOpenWorkflowForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.WORKFLOW" /></template>
           <span>工作流</span>
         </MkDropdownItem>
@@ -165,9 +169,9 @@ function handleRefresh() {
       </MkDropdownMenu>
     </template>
   </MkDropdown>
-  <ToolFormDrawer ref="toolFormDrawerRef" title="创建工具" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
-  <WorkflowFormDialog ref="workflowFormDialogRef" title="创建工作流" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
-  <SkillToolFormDrawer ref="skillToolFormDrawerRef" title="创建 Skill" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
-  <McpFormDrawer ref="mcpFormDrawerRef" title="创建 MCP" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
-  <DataSourceFormDrawer ref="dataSourceFormDrawerRef" title="创建数据源" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
+  <ToolFormDrawer ref="toolFormDrawerRef" title="创建工具" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
+  <WorkflowFormDialog ref="workflowFormDialogRef" title="创建工作流" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
+  <SkillToolFormDrawer ref="skillToolFormDrawerRef" title="创建 Skill" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
+  <McpFormDrawer ref="mcpFormDrawerRef" title="创建 MCP" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
+  <DataSourceFormDrawer ref="dataSourceFormDrawerRef" title="创建数据源" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
 </template>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { ToolItem } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vue'
@@ -11,7 +13,7 @@ import WorkflowFormDialog from '@/views/tool/tool-form/WorkflowFormDialog.vue'
 
 defineOptions({ name: 'EditToolAction' })
 
-const props = defineProps<{ api: typeof ToolApi; label: string; tool: ToolItem }>()
+const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; label: string; tool: ToolItem }>()
 
 const emit = defineEmits<{ update: [tool: ToolItem] }>()
 

@@ -7,7 +7,7 @@ import PublishHistoryDrawer from '@/views/workflow/components/publish-history/Pu
 
 defineOptions({ name: 'ButtonToolPublishHistory' })
 
-const props = defineProps<{ toolId: string; selectedId?: string; disabled?: boolean }>()
+const props = defineProps<{ api?: typeof WorkflowApi; toolId: string; selectedId?: string; disabled?: boolean }>()
 const visible = defineModel<boolean>('visible', { default: false })
 const emit = defineEmits<{
   open: []
@@ -29,7 +29,8 @@ function handleOpen() {
 
 function loadWorkflowVersions() {
   loading.value = true
-  return WorkflowApi.getWorkflowVersions(props.toolId)
+  return (props.api ?? WorkflowApi)
+    .getWorkflowVersions(props.toolId)
     .then((result) => {
       versions.value = result
     })
@@ -45,7 +46,8 @@ const publishHistoryDrawerRef = useTemplateRef<InstanceType<typeof PublishHistor
 function handleSubmit(payload: WorkflowVersionPayload, versionId: string) {
   if (saving.value || !versionId) return
   saving.value = true
-  return WorkflowApi.putWorkflowVersion(props.toolId, versionId, payload)
+  return (props.api ?? WorkflowApi)
+    .putWorkflowVersion(props.toolId, versionId, payload)
     .then(() => {
       publishHistoryDrawerRef.value?.closeEdit()
       MsgSuccess('修改成功')

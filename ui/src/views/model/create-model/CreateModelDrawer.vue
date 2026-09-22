@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import type { BaseModelOption, Dict, DynamicFormField, ModelPayload, ModelProviderItem, ModelTypeOption } from '@/api/types'
-import type ModelApi from '@/api/admin/workspace/model/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import ProviderApi from '@/api/admin/model-provider'
 import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'

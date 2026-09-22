@@ -293,6 +293,23 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `clearSelection()`。操作栏与 `MkViewLayout` 复用 `LayoutBatchFooter`，统一全选、半选、数量和
 取消行为；它在主内容滚动区域内吸附于页面底部，不随表格内容滚出可视区域。
 
+### MkTableOperationGroup、MkAction
+
+表格操作列使用 `MkTableOperationGroup` 默认插槽声明操作，按模板顺序将前 `maxVisible` 个操作
+（默认 2）显示为图标按钮，其余自动进入 More；没有剩余操作时不显示 More。
+每个直接子组件代表一个操作，业务 Action 内使用 `MkAction` 作为展示入口。
+整个操作的显隐条件必须写在直接子组件的 `v-if` 上；不通过 `v-show` 或子组件内部条件控制计数。
+支持展开 `template` Fragment，忽略注释和文本；循环操作提供稳定且唯一的 key。
+禁用操作仍占位。开关等独立控件放在操作栏外，页面按实际入口数量设置操作列宽。
+
+`MkAction` 位于 `global/mk-action/index.vue`，适用于表格和卡片，接收 `label`、SVG Symbol 名称
+`icon`、`disabled`、`divided`，发出 `click`。
+通过上下文自动选择图标按钮加 Tooltip 或图标加文字菜单项；独立使用默认显示按钮，
+放入 `MkDropdownMenu` 时显示菜单项。点击阻止冒泡，`divided` 在按钮模式和自动 More 首项中不生效。
+业务 Action 保留自己的请求与浮层生命周期，不需要传递展示模式或维护操作配置数组。
+操作栏内部复用 `MkTableMoreDropdown` 并开启 `persistent`，菜单收起时保留业务 Action 与已打开浮层。
+操作跨越外露和 More 边界时会重新挂载，业务浮层打开期间不要重排入口或改变 `maxVisible`。
+
 ### MkTagGroup
 
 始终渲染首个标签，更多标签折叠为 `+N`，悬浮展示剩余内容。
@@ -699,12 +716,14 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 ### RelatedResourcesDrawer
 
 入口 `business/related-resources-drawer/index.vue`。传入完整 `api: typeof RelatedResourcesApi`，
-通过 `open(resourceType, resource)` 传入含 `workspace_id` 的资源快照，用其所属工作空间查询。
+通过 `open(resourceType, resource)` 传入资源快照，`workspace_id` 可选。查询只传资源类型、资源 ID、分页与筛选；
+Workspace API 内部使用 `getWorkspaceId()`，System 共享 API 不接收工作空间 ID。
 `close()` 关闭，`closed` 在动画结束清理后触发。页面按范围选择真实 API，抽屉不拼接 System URL。
 
 关系页签为“依赖 / 被依赖”，分别查询依赖的资源和引用当前资源的资源；模型、非工作流工具默认被依赖。
 切换方向清空搜索、工作空间筛选与分页，资源名称当前仅展示，不提供跳转或相关回调。
-`showWorkspace` 由调用方决定，开启后查询工作空间选项并提供多选筛选，`workspace_ids` 当前传 JSON 字符串。
+抽屉内部通过 `isSystemSharedResource() && (auth.isEE || auth.isPE)` 判断是否显示工作空间列及筛选，
+不接收 `showWorkspace` Prop。仅条件成立时查询工作空间选项并传递 `workspace_ids`（JSON 字符串）。
 供应商图标由抽屉查询后传给内部 `ResourceIcon`，模型供应商标识来自关系记录的 `icon`。
 当前查询没有请求版本校验，不保证旧响应在切换或关闭后被忽略。
 

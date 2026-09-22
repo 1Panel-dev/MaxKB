@@ -3,7 +3,7 @@ import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MODEL_STATUS } from '@/api/enums'
 import type { KnowledgeCreatePayload, ModelItem, ModelProviderItem } from '@/api/types'
-import ModelApi from '@/api/admin/workspace/model/model'
+import ModelApi from '@/api/admin/workspace/model'
 import ModelProviderApi from '@/api/admin/model-provider'
 import SelectModel from '@/components/business/select-model/index.vue'
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type ModelApi from '@/api/admin/workspace/model/model'
+import type ModelApi from '@/api/admin/workspace/model'
+import type SystemResourceModelApi from '@/api/admin/system/resource-management/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { DynamicFormField, ModelItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
@@ -8,7 +9,7 @@ import AdvancedSettingsTable from '../../../advanced-settings-table/AdvancedSett
 
 defineOptions({ name: 'ParamSettingDrawer' })
 
-const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi }>()
+const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi | typeof SystemResourceModelApi }>()
 
 const emit = defineEmits<{ closed: [] }>()
 

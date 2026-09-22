@@ -45,6 +45,8 @@ export interface ToolPylintIssue {
 }
 
 export interface ToolItem {
+  workspace_name?: string
+  resource_count?: number
   code?: string
   create_time?: string
   desc?: string | null

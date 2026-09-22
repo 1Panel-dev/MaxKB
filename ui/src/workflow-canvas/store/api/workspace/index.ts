@@ -1,6 +1,6 @@
 import { get, post } from '@/api/admin/core/request'
 import type { KnowledgeTagGroup } from '@/api/types'
-import modelAPI from '@/api/admin/workspace/model/model'
+import modelAPI from '@/api/admin/workspace/model'
 import providerAPI from '@/api/admin/model-provider'
 import toolAPI from '@/api/admin/workspace/tool/tool'
 import type { McpTool } from '@/workflow-canvas/store'

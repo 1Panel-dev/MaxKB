@@ -23,6 +23,9 @@ export interface ModelProviderItem {
 }
 
 export interface ModelItem {
+  workspace_name?: string
+  resource_count?: number
+  update_time?: string
   create_time?: string
   id: string
   meta?: Record<string, unknown>

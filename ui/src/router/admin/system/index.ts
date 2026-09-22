@@ -145,7 +145,7 @@ export const systemRoutes: RouteRecordRaw = {
       redirect: { name: 'system-resource-applications' },
       meta: {
         title: '资源管理',
-        icon: 'icon_setting',
+        icon: 'icon_project-settings-outlined',
         order: 20,
         resourceScope: 'system-resource',
         permission: () => {
@@ -169,13 +169,13 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'tools',
           name: 'system-resource-tools',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/resource-management/ToolResourceView.vue'),
           meta: { title: '工具', order: 30, permission: perm.tool.system.read, next: 'system-resource-models' },
         },
         {
           path: 'models',
           name: 'system-resource-models',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/resource-management/ModelResourceView.vue'),
           meta: { title: '模型', order: 40, permission: perm.model.system.read, next: 'system-share' },
         },
       ],
@@ -188,7 +188,7 @@ export const systemRoutes: RouteRecordRaw = {
       redirect: { name: 'system-shared-knowledge' },
       meta: {
         title: '共享资源',
-        icon: 'icon_setting',
+        icon: 'icon_folder-share_outlined',
         order: 30,
         resourceScope: 'system-shared',
         permission: () => {
@@ -201,19 +201,20 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'knowledge',
           name: 'system-shared-knowledge',
           component: () => import('@/views/system/SystemView.vue'),
-          meta: { title: '知识库', order: 10, permission: perm.knowledge.share.jumpRead, next: 'system-shared-models' },
+          meta: { title: '知识库', order: 10, permission: perm.knowledge.share.jumpRead, next: 'system-shared-tools' },
+        },
+
+        {
+          path: 'tools',
+          name: 'system-shared-tools',
+          component: () => import('@/views/system/shared-resources/ToolSharedView.vue'),
+          meta: { title: '工具', order: 20, permission: perm.tool.share.read, next: 'system-shared-models' },
         },
         {
           path: 'models',
           name: 'system-shared-models',
-          component: () => import('@/views/system/shared-resources/SharedModelview.vue'),
-          meta: { title: '模型', order: 20, permission: perm.model.share.read, next: 'system-shared-tools' },
-        },
-        {
-          path: 'tools',
-          name: 'system-shared-tools',
-          component: () => import('@/views/system/SystemView.vue'),
-          meta: { title: '工具', order: 30, permission: perm.tool.share.read, next: 'system-chat-management' },
+          component: () => import('@/views/system/shared-resources/ModelSharedview.vue'),
+          meta: { title: '模型', order: 30, permission: perm.model.share.read, next: 'system-chat-management' },
         },
       ],
     },
@@ -221,17 +222,14 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'chat-management',
       name: 'system-chat-management',
       redirect: { name: 'system-chat-users' },
-      meta: { title: '对话端管理', icon: 'icon_contacts_outlined', order: 40,
-        permission:() =>
-            {
-              return (
-                perm.system.chatUser.read() ||
-                perm.system.chatUserGroup.read() ||
-                perm.system.chatAuth.read() ||
-                perm.system.portal.read()
-            );
-          },
-          next:'system-settings'
+      meta: {
+        title: '对话端管理',
+        icon: 'icon_contacts_outlined',
+        order: 40,
+        permission: () => {
+          return perm.system.chatUser.read() || perm.system.chatUserGroup.read() || perm.system.chatAuth.read() || perm.system.portal.read()
+        },
+        next: 'system-settings',
       },
       children: [
         {
@@ -250,10 +248,7 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'authentication',
           name: 'system-chat-authentication',
           component: () => import('@/views/system/chat-management/authentication/AuthenticationView.vue'),
-          meta: { title: '对话用户认证', order: 30,
-            permission:perm.system.chatAuth.read,
-            next:'system-portal-setting'
-          },
+          meta: { title: '对话用户认证', order: 30, permission: perm.system.chatAuth.read, next: 'system-portal-setting' },
         },
         {
           path: 'portal-setting',

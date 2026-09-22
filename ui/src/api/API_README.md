@@ -16,17 +16,18 @@ src/api/
 │   ├── system/                       # 系统管理业务接口
 │   │   ├── chat-user/                # 对话用户、用户组及认证接口
 │   │   ├── settings/                 # 登录认证、邮件与外观设置接口
+│   │   ├── resource-management/      # System 资源管理接口
 │   │   ├── shared-resources/         # System 共享资源接口
 │   │   └── <resource>.ts             # 其他 System 单资源接口
 │   ├── workspace/                    # 工作空间业务接口
 │   │   ├── conversation.ts           # 调试对话、历史会话与语音接口
 │   │   ├── application/              # 智能体接口
 │   │   ├── knowledge/                # 知识库接口
-│   │   ├── model/                    # 模型接口
+│   │   ├── model.ts                  # 模型接口
 │   │   ├── trigger/                   # 触发器查询及维护接口
 │   │   ├── tool/                     # 工具、工具工作流及工具商店接口
 │   │   └── <resource>.ts             # 工作空间公共资源接口
-│   └── provider.ts                   # Workspace 与 System 共用的模型供应商接口
+│   └── model-provider.ts                   # Workspace 与 System 共用的模型供应商接口
 ├── chat/                             # Chat 独立请求体系
 │   ├── core/request.ts               # JSON 与流式请求
 │   ├── core/types.ts                 # Chat 请求协议类型
@@ -136,7 +137,7 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 
 ### 模型选项查询
 
-`workspace/model/model.ts` 的 `getModelListWithShared(query)` 请求
+`workspace/model.ts` 的 `getModelListWithShared(query)` 请求
 `/workspace/<workspaceId>/model_list`，支持 `name`、`model_type`、`model_name` 筛选。
 将 `shared_model` 与 `model` 按共享在前的顺序合并为 `ModelItem[]`，分别标记
 `source: 'shared'` 与 `source: 'workspace'`。`SelectModel` 的接口选项统一通过此方法查询，
@@ -148,6 +149,13 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 非分页列表，用于文件夹菜单和工具选择弹窗。`getToolListWithShared(query)` 请求 `tool/tool_list`，
 将响应的 `tools` 与 `shared_tools` 合并为 `ToolItem[]`，用于包含已授权共享工具的选项查询；
 按工具类型筛选时使用 `tool_type`。`workspace/shared.ts` 的 `getAllTool(query)` 仅查询共享工具。
+
+### System 共享工具
+
+`system/shared-resources/tool/tool.ts` 使用 `/system/shared/tool`，维护分页、详情、创建、更新、删除、
+导入导出、连接测试、代码检查与调试、Skill 上传下载。路径沿用 v2 System 共享工具协议。
+共享工具 API 不提供工作空间文件夹移动或批量接口；复用卡片、Action 和表单接收完整 Workspace
+与 System 共享 API 的联合类型，不补造接口以匹配 Workspace 方法集合。
 
 ### 知识库维护
 
@@ -301,13 +309,17 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 ### 关联资源
 
 `admin/workspace/related-resources.ts` 维护关联资源查询：
-`getResourceDependencies` 查询当前资源依赖的资源，对应后端 `mapping_resource`；
-`getResourceDependents` 查询引用当前资源的资源，对应后端 `resource_mapping`。
-前端按关联资源语义命名，后端接口路径保持不变。方法接收工作空间 ID、资源类型、资源 ID、`ParamsPage`
-和查询参数；工作空间 ID 由目标资源数据的 `workspace_id` 显式传入，不读取路由。返回 `ResponsePage<RelatedResource>`，
+`getUsingResources` 查询当前资源依赖的资源，对应后端 `mapping_resource`；
+`getUsedByResources` 查询引用当前资源的资源，对应后端 `resource_mapping`。
+前端按关联资源语义命名，后端接口路径保持不变。方法接收资源类型、资源 ID、`ParamsPage`
+和查询参数；Workspace 接口内部通过 `getWorkspaceId()` 读取当前路由工作空间，调用方不传工作空间 ID。返回 `ResponsePage<RelatedResource>`，
 不传 loading，不重复解包响应。`RelatedResource` 通过 `@/api/types` 导出，保留
 `source_*`、`target_*` 字段。依赖查询按 `target_type` 筛选，被依赖查询按 `source_type`
-筛选，类型数组沿用请求层的数组序列化。页面负责按资源范围传入完整 API，未推测 System 接口。
+筛选，类型数组沿用请求层的数组序列化。页面负责按资源范围传入完整 API。
+
+`system/shared-resources/related-resources.ts` 沿用 v2 `/system/shared/resource_mapping` 和
+`/system/shared/mapping_resource`，方法只接收资源类型、资源 ID、分页和查询条件，不接收
+`workspaceId`。工作空间筛选继续通过 `query.workspace_ids` 传入；两类 API 使用相同参数签名，抽屉直接调用页面传入的完整 API。
 
 ### 触发器维护
 
@@ -421,3 +433,25 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 资源类型使用 `@/api/enums` 的 `FILE_SOURCE_TYPE` 与 `@/api/types` 的 `FileSourceType`，
 包括知识库、智能体、工具、文档、对话及三种临时文件有效期。对话 Store 使用
 `FILE_SOURCE_TYPE.CHAT` 调用对应 File API，对话 API 不再维护上传接口。
+
+### System 资源管理模型与工具
+
+`views/system/resource-management/` 页面导入的 API 对象统一使用 `System` 前缀，
+例如 `SystemModelApi`、`SystemToolApi`、`SystemToolWorkflowApi`、`SystemRelatedResourcesApi`、
+`SystemResourceTriggerApi`、`SystemCommonApi`、`SystemWorkspaceApi` 和 `SystemModelProviderApi`。
+此处前缀用于区分页面中的 API 引用；共用供应商接口仍使用原有模块和请求地址。
+
+`admin/system/resource-management/model.ts`、`tool/tool.ts` 沿用 v2 已有的
+`/system/resource/model` 与 `/system/resource/tool`，适配 v3 请求解包与命名。
+分页使用 `ParamsPage` / `ResponsePage`；模型、工具的 `workspace_name`、`resource_count` 和
+更新时间维护在各自公共业务类型中。页面维护 loading，不传入请求方法。
+模型选项使用 `/model/model_list` 并合并 `shared_model`、`model`；参数表单与配置更新使用
+资源自身 ID。工具仅提供既有的查询、编辑、删除、导出、调试、连接测试、代码检查及 Skill 文件接口，
+不声明资源管理范围不存在的创建、导入接口。
+
+`tool/tool-workflow.ts` 独立维护 System 工具工作流详情、保存、发布、调试、版本历史和执行记录，
+协议与 Workspace 工作流接口一致。`related-resources.ts` 使用
+`/system/resource/resource_mapping` 与 `/system/resource/mapping_resource`，参数签名与
+当前 Workspace 关联资源 API 一致。`resource-trigger.ts` 使用
+`/system/resource/<sourceType>/<sourceId>/trigger`，资源上下文与触发器载荷复用公共类型。
+System 接口由资源管理服务提供；本地开源后端没有对应扩展时，需要连接提供这些接口的部署。

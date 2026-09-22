@@ -12,6 +12,7 @@ import ToolTaskExecution from './task-execution/ToolTaskExecution.vue'
 import ApplicationTaskExecution from './task-execution/ApplicationTaskExecution.vue'
 import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import ApplicationApi from '@/api/admin/workspace/application/application'
+import type SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import RequestParameters from './request-parameters/RequestParametersTable.vue'
@@ -23,8 +24,10 @@ const props = withDefaults(
   defineProps<{
     resource?: ResourceTriggerResource
     resourceApi?: typeof ResourceTriggerApi
+    toolApi?: typeof ToolApi | typeof SystemToolApi
+    toolWorkflowApi?: typeof WorkflowApi
   }>(),
-  { resourceApi: () => ResourceTriggerApi },
+  { resourceApi: () => ResourceTriggerApi, toolApi: () => ToolApi, toolWorkflowApi: () => WorkflowApi },
 )
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 /* 抽屉生命周期与详情 */
@@ -61,9 +64,9 @@ const eventUrl = computed(() => `${window.location.origin}${ADMIN_API_BASE_PATH}
 
 /** 工具触发任务需要完整的输入定义，工作流工具额外加载画布。 */
 function loadToolResource(toolId: string) {
-  return ToolApi.getToolDetail(toolId).then((tool) => {
+  return props.toolApi.getToolDetail(toolId).then((tool) => {
     if (tool.tool_type === TOOL_TYPE.WORKFLOW && !tool.work_flow)
-      return WorkflowApi.getToolWorkflow(tool.id).then((workflow) => ({ ...tool, work_flow: workflow.work_flow }))
+      return props.toolWorkflowApi.getToolWorkflow(tool.id).then((workflow) => ({ ...tool, work_flow: workflow.work_flow }))
     return tool
   })
 }
