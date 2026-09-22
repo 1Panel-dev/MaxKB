@@ -32,6 +32,10 @@ def custom_get_token_ids(text: str):
     return tokenizer.encode(text)
 
 
+# 复用固定线程池，避免每次 token 计数都新建/销毁线程；线程只在首次调用时创建
+_token_count_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="maxkb-token-count")
+
+
 def _convert_delta_to_message_chunk(
     _dict: Mapping[str, Any], default_class: type[BaseMessageChunk]
 ) -> BaseMessageChunk:
@@ -100,18 +104,17 @@ class BaseChatOpenAI(ChatOpenAI):
         timeout: Optional[float] = 0.5,
     ) -> int:
         if self.usage_metadata is None or self.usage_metadata == {}:
-            with ThreadPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(super().get_num_tokens_from_messages, messages, tools)
-                try:
-                    response = future.result(timeout=timeout)
-                    maxkb_logger.info("请求成功（未超时）")
-                    return response
-                except Exception as e:
-                    if isinstance(e, ReadTimeout):
-                        raise  # 继续抛出
-                    else:
-                        tokenizer = TokenizerManage.get_tokenizer()
-                        return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
+            future = _token_count_executor.submit(super().get_num_tokens_from_messages, messages, tools)
+            try:
+                response = future.result(timeout=timeout)
+                maxkb_logger.info("请求成功（未超时）")
+                return response
+            except Exception as e:
+                if isinstance(e, ReadTimeout):
+                    raise  # 继续抛出
+                else:
+                    tokenizer = TokenizerManage.get_tokenizer()
+                    return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
         return self.usage_metadata.get("input_tokens", self.usage_metadata.get("prompt_tokens", 0))
 

@@ -72,9 +72,7 @@ class ModelPullManage:
     @staticmethod
     def pull(model: Model, credential: Dict):
         try:
-            response = ModelProvideConstants[model.provider].value.down_model(
-                model.model_type, model.model_name, credential
-            )
+            response = ModelProvideConstants[model.provider].down_model(model.model_type, model.model_name, credential)
             down_model_chunk = {}
             last_update_time = time.time()
 
@@ -117,7 +115,7 @@ class ModelSerializer(serializers.Serializer):
             "status": model.status,
             "meta": model.meta,
             "credential": ModelProvideConstants[model.provider]
-            .value.get_model_credential(model.model_type, model.model_name)
+            .get_model_credential(model.model_type, model.model_name)
             .encryption_dict(credential),
             "workspace_id": model.workspace_id,
             "nick_name": model.user.nick_name if model.user else "",
@@ -272,8 +270,8 @@ class ModelSerializer(serializers.Serializer):
             model_type = self.data.get("model_type")
             model_name = self.data.get("model_name")
             credential = self.data.get("credential")
-            provider_handler = ModelProvideConstants[provider].value
-            model_credential = ModelProvideConstants[provider].value.get_model_credential(model_type, model_name)
+            provider_handler = ModelProvideConstants[provider]
+            model_credential = ModelProvideConstants[provider].get_model_credential(model_type, model_name)
             source_model_credential = json.loads(rsa_long_decrypt(model.credential))
             source_encryption_model_credential = model_credential.encryption_dict(source_model_credential)
             if credential is not None:
@@ -303,7 +301,7 @@ class ModelSerializer(serializers.Serializer):
                     500, _("base model【{model_name}】already exists").format(model_name=self.data.get("name"))
                 )
             default_params = {item["field"]: item["default_value"] for item in self.data.get("model_params_form")}
-            ModelProvideConstants[self.data.get("provider")].value.is_valid_credential(
+            ModelProvideConstants[self.data.get("provider")].is_valid_credential(
                 self.data.get("model_type"),
                 self.data.get("model_name"),
                 self.data.get("credential"),
