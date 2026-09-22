@@ -150,7 +150,7 @@ onMounted(() => loadSystemUsers())
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
         <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
-        <el-table-column width="100" label="状态">
+        <el-table-column width="100" label="启用状态">
           <template #default="{ row }">
             <MkStatusLabel :active="row.is_active" />
           </template>
