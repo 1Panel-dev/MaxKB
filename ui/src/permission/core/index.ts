@@ -59,7 +59,6 @@ export const hasPermission = (permission: PermissionInput | PermissionInput[], c
 export const buildBasePermission = (permission: Permission, workspaceId: string | undefined = getWorkspaceId()): AggregatePermission =>
   AggregatePermission.builder()
     .addPermission(permission.newWorkspacePermission(workspaceId))
-    .addRole(RoleConstants.ADMIN)
     .addRole(new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId))
     .compare(Compare.OR)
     .build()
@@ -80,8 +79,8 @@ export const buildBaseResourcePermission = (permission: Permission, resourceId: 
         .build()
 /**
  * 判断当前系统环境
- * @param edition 
- * @returns 
+ * @param edition
+ * @returns
  */
 export const hasEdition=(edition:Edition)=>{
     const { auth } = useStore()

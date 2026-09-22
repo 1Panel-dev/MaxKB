@@ -9,12 +9,15 @@
  * 复杂/特殊按钮可绕过这里，直接用 core 的 hasPermission + 常量自行组合。
  */
 
+import { getWorkspaceId } from '@/utils/resource-context'
 import { hasPermission, buildBasePermission, buildBaseResourcePermission, RoleConstants, Compare } from './core'
 import type { Permission } from './core/common'
 
 
 /** 工作空间级：命中权限位 / 系统管理员 / 该空间管理员 即可。workspaceId 内部取当前路由。 */
-export const can = (p: Permission): boolean => hasPermission(buildBasePermission(p))
+export const can = (p: Permission): boolean => {
+  return hasPermission(buildBasePermission(p,getWorkspaceId()))
+}
 
 /** 工作空间资源级：命中该资源权限位 / 系统管理员 / 该空间管理员 即可。 */
 export const canRes = (p: Permission, id: string): boolean => hasPermission(buildBaseResourcePermission(p, id))
