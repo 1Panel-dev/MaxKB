@@ -58,11 +58,9 @@ class WorkSpaceUserGroupResourcePermissionView(APIView):
         tags=[_("Resources authorization")],  # type: ignore
     )
     @has_permissions(
-        lambda r, kwargs: PermissionConstants[
-            kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"
-        ]._build_workspace_permission(),
+        lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"],
         RoleConstants.ADMIN,
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        RoleConstants.WORKSPACE_MANAGE,
     )
     def get(self, request: Request, workspace_id: str, user_group_id: str, resource: str):
         return result.success(

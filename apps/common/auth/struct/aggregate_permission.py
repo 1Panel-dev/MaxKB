@@ -73,7 +73,7 @@ class AggregatePermission:
     @staticmethod
     def _match_permission(permission: Union[PermissionConstants, Permission], user_permissions: dict) -> bool:
         p = permission.value if isinstance(permission, PermissionConstants) else permission
-        key = p.get_resource_permission_key(p.resource_id) if p.resource_id else str(p)
+        key = p.get_resource_permission_key(p.resource_id)
         return key in user_permissions and (user_permissions[key] & p.bit()) > 0
 
     @staticmethod
