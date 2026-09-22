@@ -47,6 +47,16 @@ class VoteSerializer(serializers.Serializer):
 
     chat_record_id = serializers.UUIDField(required=True,
                                            label=_("Conversation record id"))
+    chat_user_id = serializers.UUIDField(required=True, label=_("Chat User ID"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        chat_user_id = self.data.get('chat_user_id')
+        chat_record_id = self.data.get('chat_record_id')
+        chat_id = self.data.get('chat_id')
+        if QuerySet(ChatRecord).filter(chat_id=chat_id, chat_record_id=chat_record_id,
+                                       chat__chat_user_id=chat_user_id).exists():
+            raise AppApiException(500, _('Chat is not exist'))
 
     @transaction.atomic
     def vote(self, instance: Dict, with_valid=True):
