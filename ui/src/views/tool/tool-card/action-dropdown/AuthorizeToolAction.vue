@@ -22,10 +22,7 @@ function handleDrawerClosed() {
 
 <template>
   <!-- 资源授权 -->
-  <MkDropdownItem @click="handleOpenAuthorization">
-    <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
-    <span>{{ label }}</span>
-  </MkDropdownItem>
+  <MkAction :label="label" icon="icon_passkeys_outlined" @click="handleOpenAuthorization" />
   <ResourceAuthorizationDrawer
     v-if="drawerMounted"
     ref="authorizationDrawerRef"

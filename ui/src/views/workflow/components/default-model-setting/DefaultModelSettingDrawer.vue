@@ -3,6 +3,7 @@ import { computed, provide, ref, watch } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
 import type LogicFlow from '@logicflow/core'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import type SharedModelApi from '@/api/admin/system/shared-resources/model'
 import type SystemModelApi from '@/api/admin/system/resource-management/model'
 import type ModelApi from '@/api/admin/workspace/model'
 import ModelProviderApi from '@/api/admin/model-provider'
@@ -17,7 +18,7 @@ const defaultModelTypes = ['LLM', 'TTS', 'STT', 'IMAGE', 'TTI', 'TTV', 'ITV', 'R
 
 const props = defineProps<{
   modelValue?: DefaultModelSettingPayload
-  modelApi: typeof ModelApi | typeof SystemModelApi
+  modelApi: typeof ModelApi | typeof SystemModelApi | typeof SharedModelApi
   getGraphData: () => LogicFlow.GraphData | undefined
   disabled?: boolean
 }>()
@@ -44,9 +45,11 @@ function loadModelOptions() {
   const providerRequest = ModelProviderApi.getProviderList().then((providers) => {
     providerOptions.value = providers
   })
-  const modelRequest = props.modelApi.getModelListWithShared().then((modelList) => {
-    models.value = modelList
-  })
+  const modelRequest = ('getModelListWithShared' in props.modelApi ? props.modelApi.getModelListWithShared() : props.modelApi.getModelList()).then(
+    (modelList) => {
+      models.value = modelList
+    },
+  )
   // 模型列表只查询一次，各类型选择器从完整列表中过滤选项。
   return Promise.all([providerRequest, modelRequest]).finally(() => {
     loading.value = false

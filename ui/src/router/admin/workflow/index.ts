@@ -16,14 +16,14 @@ export const workflowRoutes: RouteRecordRaw[] = [
   },
 
   {
-    path: '/system/resource//tool/:toolId/workflow',
-    name: 'system-resource-tool-workflow',
+    path: '/system/resource/tool/:toolId/workflow',
+    name: 'system-resource-workflow-tool',
     component: () => import('@/views/workflow/tool/ToolWorkflowView.vue'),
     meta: { title: '工具工作流', resourceScope: 'system-resource' },
   },
   {
     path: '/system/shared/tool/:toolId/workflow',
-    name: 'system-resource-tool-workflow',
+    name: 'system-shared-workflow-tool',
     component: () => import('@/views/workflow/tool/ToolWorkflowView.vue'),
     meta: { title: '工具工作流', resourceScope: 'system-shared' },
   },

@@ -36,10 +36,7 @@ function handleDialogClosed() {
 
 <template>
   <!-- 查看工具触发器 -->
-  <MkDropdownItem @click="handleOpenTriggers">
-    <template #icon><MkIcon name="icon-laser" /></template>
-    <span>{{ label }}</span>
-  </MkDropdownItem>
+  <MkAction :label="label" icon="icon-laser" @click="handleOpenTriggers" />
   <ResourceTriggerDialog
     :tool-api="toolApi"
     :tool-workflow-api="toolWorkflowApi"

@@ -49,10 +49,7 @@ defineExpose({ handleOpenToolForm })
 
 <template>
   <!-- 编辑工具 -->
-  <MkDropdownItem @click="handleOpenToolForm">
-    <template #icon><MkIcon name="icon_edit_outlined" /></template>
-    <span>{{ label }}</span>
-  </MkDropdownItem>
+  <MkAction :label="label" icon="icon_edit_outlined" @click="handleOpenToolForm" />
 
   <template v-if="formMounted">
     <DataSourceFormDrawer

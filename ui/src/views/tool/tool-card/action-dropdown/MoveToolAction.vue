@@ -44,10 +44,8 @@ function handleDialogClosed() {
 </script>
 
 <template>
-  <MkDropdownItem @click="handleOpenMoveTool">
-    <template #icon><MkIcon name="icon_move2_outlined" /></template>
-    <span>{{ label }}</span>
-  </MkDropdownItem>
+  <!-- 移动工具 -->
+  <MkAction :label="label" icon="icon_move2_outlined" @click="handleOpenMoveTool" />
 
   <MoveToDialog
     v-if="dialogMounted"

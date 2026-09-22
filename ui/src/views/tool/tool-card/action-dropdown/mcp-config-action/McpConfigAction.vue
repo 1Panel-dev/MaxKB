@@ -34,10 +34,8 @@ function handleDialogClosed() {
 </script>
 
 <template>
-  <MkDropdownItem @click="handleOpenMcpConfig">
-    <template #icon><MkIcon name="icon_describe_outlined" /></template>
-    <span>{{ label }}</span>
-  </MkDropdownItem>
+  <!-- 查看 MCP 配置 -->
+  <MkAction :label="label" icon="icon_describe_outlined" @click="handleOpenMcpConfig" />
 
   <McpConfigDialog v-if="dialogMounted" ref="mcpConfigDialogRef" @closed="handleDialogClosed" />
 </template>

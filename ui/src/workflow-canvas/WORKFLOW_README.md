@@ -135,9 +135,10 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 主画布从 `resourceScope` 注入读取范围（默认 `workspace`），通过节点上下文传递为 `apiType`。
 
 当前 `workspace` 适配模型、供应商、模型参数、MCP 工具、共享工具选项、工具详情和标签查询；
-`system-resource` 使用 System 模型选项、参数表单与工具详情 API，其他辅助资源查询复用
-`workspace` 适配器，并从工具工作流路由读取明确的所属工作空间 ID；不回退到 undefined 工作空间。
-`system-shared`、`workspace-shared` 仍为空占位，不能据目录名认定已支持完整共享范围。
+`system-resource` 与 `system-shared` 独立提供系统模型、供应商、参数表单、工具选项与详情、MCP 和标签查询，
+不继承 Workspace 适配器，不要求路由工作空间。System MCP 查询要求部署提供对应
+`/system/resource/<resourceType>/<id>/mcp_tools` 或 `/system/shared/<resourceType>/<id>/mcp_tools` 扩展接口，尚未完成运行验证。
+`workspace-shared` 仍为空占位。共享业务选择弹窗（知识库、智能体及 AI 对话内工具选择）仍保留原有 Workspace 接入，尚未适配完整系统范围。
 节点资源查询可调用此适配器或既有业务 API；工作流加载、保存与发布仍由 View 编排，核心层不承载请求。
 
 ### 表格文本省略
@@ -448,7 +449,7 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
   当前三个页面加载完成后调用 `render()`，等待 Vue 更新后记录图快照并 `fitView()`。
 - View 显式传入成对的 `workflowMode` / `loopWorkflowMode`，分别用于主画布和循环体菜单。
 - 页面共用 `views/workflow/components/WorkflowViewLayout.vue`，由其展示标题、保存时间与返回入口，
-  页面通过 `actions` 插槽提供按钮；当前三个路由均为 Workspace 全屏路由。
+  页面通过 `actions` 插槽提供按钮；智能体与知识库为 Workspace 全屏路由，工具额外支持两种 System 全屏路由。
 
 `WorkflowCanvas` 的 Props：
 
@@ -536,3 +537,6 @@ git diff --check
 
 若当前迁移中的预留文件仍存在已知类型错误，应在交付说明中明确区分，不要通过改变现有画布业务
 逻辑来绕过。
+
+System 工具节点菜单直接查询当前范围工具选项，不展示 Workspace 文件夹；普通工具节点通过
+Store 强制刷新工具详情，与工作流工具节点保持相同的资源范围。

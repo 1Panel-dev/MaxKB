@@ -29,8 +29,6 @@ function handleDeleteTool() {
 </script>
 
 <template>
-  <MkDropdownItem divided @click="handleDeleteTool">
-    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-    <span>{{ label }}</span>
-  </MkDropdownItem>
+  <!-- 删除工具 -->
+  <MkAction :label="label" icon="icon_delete-trash_outlined" divided @click="handleDeleteTool" />
 </template>

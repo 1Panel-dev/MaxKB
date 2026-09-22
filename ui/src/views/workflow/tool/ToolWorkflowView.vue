@@ -11,7 +11,10 @@ import WorkspaceToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
 import SystemModelApi from '@/api/admin/system/resource-management/model'
 import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
 import SystemToolWorkflowApi from '@/api/admin/system/resource-management/tool/tool-workflow'
-import { getResourceScope, isSystemResource } from '@/utils/resource-context'
+import SharedModelApi from '@/api/admin/system/shared-resources/model'
+import SharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import SharedToolWorkflowApi from '@/api/admin/system/shared-resources/tool/tool-workflow'
+import { getResourceScope, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import type { DefaultModelSettingPayload, ToolItem, ToolWorkflowDetail, WorkflowVersion, WorkflowStoreTemplate } from '@/api/types'
 import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
@@ -28,9 +31,9 @@ import { goBack } from './navigation'
 defineOptions({ name: 'ToolWorkflowView' })
 
 // 保存、调试与版本历史保持进入页面时的资源范围。
-const ModelApi = isSystemResource() ? SystemModelApi : WorkspaceModelApi
-const ToolApi = isSystemResource() ? SystemToolApi : WorkspaceToolApi
-const ToolWorkflowApi = isSystemResource() ? SystemToolWorkflowApi : WorkspaceToolWorkflowApi
+const ModelApi = isSystemResource() ? SystemModelApi : isSystemSharedResource() ? SharedModelApi : WorkspaceModelApi
+const ToolApi = isSystemResource() ? SystemToolApi : isSystemSharedResource() ? SharedToolApi : WorkspaceToolApi
+const ToolWorkflowApi = isSystemResource() ? SystemToolWorkflowApi : isSystemSharedResource() ? SharedToolWorkflowApi : WorkspaceToolWorkflowApi
 provide('resourceScope', getResourceScope())
 
 // 为画布节点中的 SelectModel 提供参数表单接口。

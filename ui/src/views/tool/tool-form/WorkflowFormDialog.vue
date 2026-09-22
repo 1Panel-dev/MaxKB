@@ -10,6 +10,7 @@ import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem, ToolPayload } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
+import { isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'WorkflowFormDialog' })
 
@@ -62,8 +63,8 @@ function handleSubmit() {
           }
 
           return router.push({
-            name: 'workflow-tool',
-            params: { toolId: savedTool.id, workspaceId: route.params.workspaceId },
+            name: isSystemSharedResource() ? 'system-shared-tool-workflow' : 'workflow-tool',
+            params: isSystemSharedResource() ? { toolId: savedTool.id } : { toolId: savedTool.id, workspaceId: route.params.workspaceId },
           })
         })
       })

@@ -362,7 +362,11 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 `/system/resource/models`、`/system/resource/tools` 分别渲染
 `views/system/resource-management/ModelResourceView.vue` 和 `ToolResourceView.vue`，
 继承 `resourceScope: 'system-resource'`，保留原导航名称、顺序与权限。
-资源管理工具的全屏工作流使用 `system-resource-tool-workflow`，地址为
-`/system/resource/workspace/:workspaceId/tool/:toolId/workflow`，在 `admin/workflow/index.ts`
-注册，复用 `ToolWorkflowView`。`workspaceId` 来自工具数据，用于画布辅助资源选择；
+资源管理工具的全屏工作流使用 `system-resource-workflow-tool`，地址为
+`/system/resource/tool/:toolId/workflow`，在 `admin/workflow/index.ts`
+注册，复用 `ToolWorkflowView`。系统工作流路由不携带 `workspaceId`，画布辅助查询使用对应 System API；
 工具自身的查询、编辑、调试和发布使用 System API，返回 `system-resource-tools`。
+
+共享工具工作流使用 `system-shared-tool-workflow`，地址为 `/system/shared/tool/:toolId/workflow`，
+与资源管理共用 `ToolWorkflowView`，通过 `resourceScope` 选择接口。共享工具卡片点击及创建成功后
+进入该路由，Ctrl / Command 点击支持新标签页；退出返回 `system-shared-tools`。

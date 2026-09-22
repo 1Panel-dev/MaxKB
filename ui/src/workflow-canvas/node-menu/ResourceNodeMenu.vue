@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import SharedApi from '@/api/admin/workspace/shared'
@@ -12,11 +12,15 @@ import { isWorkFlow } from '@/utils/application'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { applicationNode, toolLibNode, toolWorkflowLibNode } from '@/workflow-canvas/config/node-data'
 import { useRoute } from 'vue-router'
+import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowKind } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'ResourceNodeMenu' })
 
 const route = useRoute()
+const resourceScope = inject<string>('resourceScope', 'workspace')
+const store = useWorkflowStore(resourceScope)
+const isSystemScope = resourceScope === 'system-resource' || resourceScope === 'system-shared'
 const props = defineProps<{
   source: NodeMenuResourceSource
   dataSource?: boolean
@@ -73,7 +77,6 @@ function createApplicationNode(application: ApplicationDetail): NodeMenuItem {
 }
 
 function loadTools(folder?: FolderItem) {
-  // TODO 共享资源和资源管理需要不同的api，后续需要拆分
   const isSharedFolder = folder?.id === FOLDER_ENTRY_ID.SHARED
   const requestApi = isSharedFolder ? SharedApi : ToolApi
   const folderQuery = {
@@ -81,7 +84,10 @@ function loadTools(folder?: FolderItem) {
     ...(!isSharedFolder ? { folder_id: folder?.id || FOLDER_ENTRY_ID.ALL } : {}),
   }
 
-  return requestApi.getAllTool(folderQuery).then((tools) => {
+  const request = isSystemScope
+    ? store.force.getToolListWithShared(props.dataSource ? { tool_type: TOOL_TYPE.DATA_SOURCE } : { tool_type_list: SUPPORTED_TOOL_TYPES })
+    : requestApi.getAllTool(folderQuery)
+  return request.then((tools) => {
     resourceItems.value = tools
       .filter(
         (tool) =>
@@ -137,7 +143,7 @@ onMounted(() => {
 
 <template>
   <div class="flex h-140 min-h-0">
-    <aside class="flex w-sidebar-expanded shrink-0 border-r pt-3">
+    <aside v-if="!isSystemScope" class="flex w-sidebar-expanded shrink-0 border-r pt-3">
       <FolderTree v-model="currentFolderId" :can-edit="false" :show-shared="isToolMenu" :source="source" @select="loadResources" />
     </aside>
 
