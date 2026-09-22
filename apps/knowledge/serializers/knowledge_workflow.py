@@ -504,8 +504,9 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                             "auth_target_type": AuthTargetType.TOOL.value,
                         }
                     ).auth_resource_batch([t.id for t in tool_model_list])
-                return True
             update_resource_mapping_by_knowledge(knowledge_id)
+            if is_import_tool:
+                return True
 
         @staticmethod
         def to_knowledge_workflow(knowledge_workflow, update_tool_map):
@@ -674,7 +675,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                         "workspace_id": self.data.get("workspace_id"),
                         "knowledge_id": str(self.data.get("knowledge_id")),
                     }
-                ).import_({"file": bytes_to_uploaded_file(res.content, "file.kbwf")}, is_import_tool=False)
+                ).import_({"file": bytes_to_uploaded_file(res.content, "file.kbwf")}, is_import_tool=True)
 
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
