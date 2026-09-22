@@ -251,7 +251,7 @@ export class Permission {
 
   /** 判定时使用的最终 key，对应后端 `AggregatePermission._match_permission`。 */
   toPermissionKey(): string {
-    return this.resourceId ? this.getResourcePermissionKey() : this.group
+    return this.resourceId||this.workspaceId ? this.getResourcePermissionKey() : this.group
   }
 
   /** 基于上下文派生出带 workspace / resource 的权限副本。 */
@@ -361,6 +361,7 @@ export class AggregatePermission {
 
   private checkPermission(permission: Permission, userPermissions: Map<string, bigint>): boolean {
     const key = permission.toPermissionKey()
+    console.log(key)
     const raw = userPermissions.get(key)
     if (raw == null) return false
     return (raw & permission.bit()) !== 0n
