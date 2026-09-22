@@ -255,56 +255,35 @@ class ParagraphSerializers(serializers.Serializer):
                 _paragraph.chunks = text_to_chunk(instance.get("content", ""))
 
             if "problem_list" in instance:
-                update_problem_list = list(
-                    filter(lambda row: "id" in row and row.get("id") is not None, instance.get("problem_list"))
-                )
+                # 段落与问题的关联早已迁移为 Problem + ProblemParagraphMapping（见
+                # Create.save），这里旧逻辑仍按 paragraph_id/document_id 直接写 Problem，
+                # 而模型中这些字段不存在，必然抛 FieldError。改为与 Create 一致：
+                # 重建该段落的映射关系，复用知识库内已存在的同内容问题。
+                paragraph_id = self.data.get("paragraph_id")
+                knowledge_id = self.data.get("knowledge_id")
 
-                create_problem_list = list(filter(lambda row: row.get("id") is None, instance.get("problem_list")))
+                # 解除旧关联（Problem 本体保留，可能被其他段落引用）
+                QuerySet(ProblemParagraphMapping).filter(paragraph_id=paragraph_id).delete()
 
-                # 问题集合
-                problem_list = QuerySet(Problem).filter(paragraph_id=self.data.get("paragraph_id"))
-
-                # 校验前端 携带过来的id
-                for update_problem in update_problem_list:
-                    if not set([str(row.id) for row in problem_list]).__contains__(update_problem.get("id")):
-                        raise AppApiException(500, _("Problem id does not exist"))
-                # 对比需要删除的问题
-                delete_problem_list = (
-                    list(
-                        filter(
-                            lambda row: (
-                                not [str(update_row.get("id")) for update_row in update_problem_list].__contains__(
-                                    str(row.id)
-                                )
-                            ),
-                            problem_list,
+                if instance.get("problem_list"):
+                    problem_paragraph_object_list = [
+                        ProblemParagraphObject(
+                            knowledge_id,
+                            self.data.get("document_id"),
+                            str(paragraph_id),
+                            problem.get("content"),
                         )
-                    )
-                    if len(update_problem_list) > 0
-                    else []
-                )
-                # 删除问题
-                QuerySet(Problem).filter(id__in=[row.id for row in delete_problem_list]).delete() if len(
-                    delete_problem_list
-                ) > 0 else None
-                # 插入新的问题
-                QuerySet(Problem).bulk_create(
-                    [
-                        Problem(
-                            id=uuid.uuid7(),
-                            content=p.get("content"),
-                            paragraph_id=self.data.get("paragraph_id"),
-                            knowledge_id=self.data.get("knowledge_id"),
-                            document_id=self.data.get("document_id"),
-                        )
-                        for p in create_problem_list
+                        for problem in instance.get("problem_list")
                     ]
-                ) if len(create_problem_list) else None
-
-                # 修改问题集合
-                QuerySet(Problem).bulk_update(
-                    [Problem(id=row.get("id"), content=row.get("content")) for row in update_problem_list], ["content"]
-                ) if len(update_problem_list) > 0 else None
+                    problem_model_list, problem_paragraph_mapping_list = ProblemParagraphManage(
+                        problem_paragraph_object_list, knowledge_id
+                    ).to_problem_model_list()
+                    # 插入新问题（已存在的同内容问题会被复用，不会重复创建）
+                    QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
+                    # 重建段落关联
+                    QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
+                        problem_paragraph_mapping_list
+                    ) > 0 else None
 
             _paragraph.save()
             update_document_char_length(self.data.get("document_id"))
