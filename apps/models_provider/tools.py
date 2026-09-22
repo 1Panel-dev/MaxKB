@@ -7,12 +7,10 @@
 @desc:
 """
 
-import json
 from typing import Dict
 
 from common.config.embedding_config import ModelManage
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.utils.rsa_util import rsa_long_decrypt
 from django.db import connection
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
@@ -35,7 +33,7 @@ def get_model_(provider, model_type, model_name, credential, model_id, use_local
     model = get_provider(provider).get_model(
         model_type,
         model_name,
-        json.loads(rsa_long_decrypt(credential)),
+        ModelManage.get_decrypted_credential(model_id, credential),
         model_id=model_id,
         use_local=use_local,
         streaming=True,
@@ -110,14 +108,22 @@ def is_valid_credential(
 
 
 def get_model_by_id(_id, workspace_id):
+    # 同一工作空间读取模型行是高频路径，命中缓存可省一次 DB 查询。
+    # 跨工作空间的授权读取不走缓存，始终保持走权限校验，避免越权风险。
+    cached = ModelManage.get_model_row(_id)
+    if cached is not None and cached.workspace_id == workspace_id:
+        return cached
     model = QuerySet(Model).filter(id=_id).first()
     # 归还链接到连接池
     connection.close()
     get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
-    if model and model.workspace_id != workspace_id and get_authorized_model is not None:
+    authorized = model is not None and model.workspace_id != workspace_id and get_authorized_model is not None
+    if authorized:
         model = get_authorized_model(QuerySet(Model).filter(id=_id), workspace_id).first()
     if model is None:
         raise Exception(_("Model does not exist"))
+    if not authorized:
+        ModelManage.set_model_row(_id, model)
     return model
 
 

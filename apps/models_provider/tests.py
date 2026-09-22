@@ -37,7 +37,7 @@ class EmbeddingCapabilityContractTests(SimpleTestCase):
         embedding_classes = {
             model_info.model_class
             for provider in ModelProvideConstants
-            for model_info in provider.value.get_model_info_manage().model_list
+            for model_info in ModelProvideConstants[provider].get_model_info_manage().model_list
             if model_info.model_type == ModelTypeConst.EMBEDDING.name
         }
 
