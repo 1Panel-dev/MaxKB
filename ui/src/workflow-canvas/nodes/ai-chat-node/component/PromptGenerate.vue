@@ -199,7 +199,7 @@ watch(visible, (value) => {
   <MkDialog v-model="visible" title="生成提示词" @closed="resetData">
     <div class="space-y-4 rounded-xl bg-N100 p-4">
       <p class="flex-align-center gap-2">
-        <MkIcon name="icon_star" />
+        <MkIcon name="icon_star" class="text-primary" />
         <span>提示词显示在这里</span>
       </p>
       <div v-if="loading" class="flex-align-center gap-2">
@@ -216,7 +216,7 @@ watch(visible, (value) => {
         <el-button class="ml-0!" :disabled="!activeModelId" @click="handleReGenerate">重新生成</el-button>
       </div>
 
-      <div class="prompt-input overflow-hidden rounded-xl border bg-white transition-colors hover:border-primary focus-within:border-primary">
+      <div class="mk-conversation-input border transition-colors hover:border-primary focus-within:border-primary">
         <el-input
           v-model="inputValue"
           type="textarea"
@@ -226,20 +226,13 @@ watch(visible, (value) => {
           :maxlength="100000"
           @keydown="handleInputKeydown"
         />
-        <div class="flex justify-end px-2 pb-2 pt-1">
+        <div class="text-right">
           <!-- 停止生成提示词 -->
-          <el-button v-if="loading" class="input-action" circle type="primary" @click="stopGenerate">
+          <el-button v-if="loading" circle type="primary" @click="stopGenerate">
             <MkIcon name="icon_stop_filled" />
           </el-button>
           <!-- 发送主题并生成提示词 -->
-          <el-button
-            v-else
-            class="input-action"
-            circle
-            type="primary"
-            :disabled="!inputValue.trim() || !activeModelId || !applicationId"
-            @click="generatePrompt()"
-          >
+          <el-button v-else circle type="primary" :disabled="!inputValue.trim() || !activeModelId || !applicationId" @click="generatePrompt()">
             <MkIcon :icon="Top" :size="16" />
           </el-button>
         </div>
@@ -248,26 +241,4 @@ watch(visible, (value) => {
   </MkDialog>
 </template>
 
-<style scoped lang="scss">
-/* 提示词主题输入与操作栏 */
-.prompt-input {
-  :deep(.el-textarea__inner) {
-    background: transparent;
-    border-radius: 0;
-    box-shadow: none;
-    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 2) 0;
-  }
-
-  .input-action {
-    height: calc(var(--spacing) * 6);
-    min-height: 0;
-    padding: 0;
-    width: calc(var(--spacing) * 6);
-
-    &.is-disabled {
-      background-color: var(--mk-N400);
-      border-color: var(--mk-N400);
-    }
-  }
-}
-</style>
+<style scoped lang="scss"></style>

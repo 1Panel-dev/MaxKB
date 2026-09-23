@@ -137,14 +137,30 @@
     }
   }
   &.is-circle {
-    height: var(--el-button-size);
-    &:hover,
-    &:active,
-    &.is-active {
-      box-shadow: var(--el-box-shadow-lighter);
-      color: var(--el-text-color-primary);
-      background: white;
-      border-color: var(--el-border-color);
+    width: 32px;
+    height: 32px;
+    --el-button-hover-text-color: var(--el-text-color-primary);
+    --el-button-hover-bg-color: white;
+    --el-button-hover-border-color: var(--el-border-color);
+    &.el-button--large {
+      width: var(--el-button-size) !important;
+      height: var(--el-button-size) !important;
+    }
+    &:not(.is-disabled) {
+      &:hover,
+      &:active,
+      &.is-active {
+        box-shadow: var(--el-box-shadow-lighter);
+      }
+    }
+    &.el-button--primary {
+      --el-button-hover-text-color: white;
+      --el-button-hover-bg-color: var(--el-color-primary-light-1) !important;
+      --el-button-hover-border-color: var(--el-color-primary-light-1) !important;
+      &.is-disabled {
+        --el-button-disabled-bg-color: var(--mk-N400);
+        --el-button-disabled-border-color: var(--mk-N400);
+      }
     }
   }
   &.is-text.is-has-bg:not(.is-disabled) {
@@ -1178,6 +1194,7 @@
 
 /* textarea */
 .el-textarea {
+  --el-input-placeholder-color: var(--mk-N500);
   --el-input-text-color: var(--el-text-color-primary);
   &:has(.el-input__inner[readonly]) {
     --el-input-focus-border-color: var(--el-input-border-color);

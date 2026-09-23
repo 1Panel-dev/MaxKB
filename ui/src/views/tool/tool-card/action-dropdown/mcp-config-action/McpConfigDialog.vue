@@ -22,7 +22,8 @@ defineExpose({ open })
   <MkDialog v-model="visible" title="MCP 配置详情" @closed="emit('closed')">
     <div class="group mcp-config-detail relative">
       <el-input v-model="config" :autosize="{ minRows: 8, maxRows: 24 }" disabled type="textarea" />
-      <el-button class="group-hover-visible absolute right-3 top-3 z-10 h-8 shadow-md" circle title="复制配置" @click="copyText(config)">
+      <!-- 复制 MCP 配置 -->
+      <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle title="复制配置" @click="copyText(config)">
         <MkIcon name="icon_copy_outlined" />
       </el-button>
     </div>
