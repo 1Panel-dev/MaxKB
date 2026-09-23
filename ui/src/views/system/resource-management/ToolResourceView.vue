@@ -100,42 +100,6 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
   return router.push(target)
 }
 
-/* 商店工具仅允许修改名称，不开放模板代码编辑。 */
-const renameVisible = ref(false)
-const renameLoading = ref(false)
-const renamingTool = ref<ToolItem>()
-const renameForm = ref({ name: '' })
-const renameFormRef = useTemplateRef<FormInstance>('renameFormRef')
-
-function handleOpenRename(tool: ToolItem) {
-  renamingTool.value = tool
-  renameForm.value = { name: tool.name }
-  renameVisible.value = true
-}
-
-function handleRename() {
-  if (renameLoading.value || !renamingTool.value) return
-  const toolId = renamingTool.value.id
-  return renameFormRef.value?.validate().then(() => {
-    renameLoading.value = true
-    return SystemToolApi.putTool(toolId, { name: renameForm.value.name.trim() })
-      .then((tool) => {
-        handleToolUpdate(tool)
-        MsgSuccess('修改成功')
-        renameVisible.value = false
-      })
-      .finally(() => {
-        renameLoading.value = false
-      })
-  })
-}
-
-function handleRenameClosed() {
-  renamingTool.value = undefined
-  renameForm.value = { name: '' }
-  renameFormRef.value?.clearValidate()
-}
-
 /* 删除后重新查询，保留筛选并处理末页删空。 */
 function handleDeleteTool(tool: ToolItem) {
   return MsgConfirm(
@@ -226,16 +190,10 @@ onMounted(() => {
               />
               <!-- 工具操作，前两个外露，其余进入更多菜单 -->
               <MkTableOperationGroup>
-                <!-- 编辑商店工具名称 -->
-                <MkAction v-if="row.template_id && perm.tool.system.edit()" label="编辑" icon="icon_edit_outlined" @click="handleOpenRename(row)" />
                 <!-- 编辑工具配置 -->
-                <EditToolAction
-                  v-if="!row.template_id && perm.tool.system.edit()"
-                  label="编辑"
-                  :api="SystemToolApi"
-                  :tool="row"
-                  @update="handleToolUpdate"
-                />
+                <EditToolAction label="编辑" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
+                <!-- 资源授权 -->
+                <AuthorizeToolAction v-if="perm.tool.system.auth()" label="资源授权" :tool="row" />
                 <!-- 打开工具工作流 -->
                 <MkAction v-if="row.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" icon="icon_setting" @click="handleOpenWorkflow(row, $event)" />
                 <!-- 配置启动参数 -->
@@ -247,8 +205,7 @@ onMounted(() => {
                   :tool="row"
                   @update="handleToolUpdate"
                 />
-                <!-- 资源授权 -->
-                <AuthorizeToolAction v-if="perm.tool.system.auth()" label="资源授权" :tool="row" />
+
                 <!-- 导出工具 -->
                 <ExportToolAction
                   v-if="!row.template_id && perm.tool.system.export()"
@@ -299,17 +256,4 @@ onMounted(() => {
       </MkTable>
     </template>
   </MkViewLayout>
-  <MkDialog v-model="renameVisible" title="编辑工具" :show-close="!renameLoading" @closed="handleRenameClosed">
-    <el-form ref="renameFormRef" :model="renameForm" label-position="top" @submit.prevent>
-      <el-form-item prop="name" label="名称" :rules="{ required: true, whitespace: true, message: '请输入工具名称', trigger: 'blur' }"
-        ><el-input v-model="renameForm.name" maxlength="64" show-word-limit :disabled="renameLoading"
-      /></el-form-item>
-    </el-form>
-    <template #footer>
-      <!-- 取消编辑 -->
-      <el-button :disabled="renameLoading" @click="renameVisible = false">取消</el-button>
-      <!-- 保存工具名称 -->
-      <el-button type="primary" :loading="renameLoading" @click="handleRename">保存</el-button>
-    </template>
-  </MkDialog>
 </template>
