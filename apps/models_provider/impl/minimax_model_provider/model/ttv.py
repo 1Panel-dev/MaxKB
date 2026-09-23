@@ -1,5 +1,7 @@
+import json
 import time
 from typing import Dict, ClassVar
+from urllib.parse import urlparse
 
 import requests
 
@@ -18,6 +20,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
     v2_models: ClassVar[tuple] = ("MiniMax-H3", "MiniMax-H3-Max")
     v2_extra_fields: ClassVar[tuple] = ("resolution", "duration", "ratio", "callback_url")
+    official_hosts: ClassVar[tuple] = ("api.minimaxi.com", "api.minimaxi.com.cn", "api.minimaxi.io")
     v2_success_status: ClassVar[frozenset] = frozenset({"succeeded", "Success"})
     v2_fail_status: ClassVar[frozenset] = frozenset({"failed", "Fail", "cancelled", "Cancel"})
 
@@ -75,6 +78,160 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
             return True
         return self._detect_api_version() == "v2"
 
+    def _is_private_deploy(self) -> bool:
+        """私有部署：api_base 主机不是官方 MiniMax 云端域名时，走本地 OpenAI 兼容的 /v1/videos 接口。"""
+        host = (urlparse(self.api_base).hostname or "").lower()
+        return not any(host == h or host.endswith("." + h) for h in self.official_hosts)
+
+    def _generate_video_private(self, prompt, first_frame_url=None, last_frame_url=None, **kwargs):
+        """私有部署：api_base 即完整地址，直接发 multipart/form-data。
+
+        私有部署可能直接返回视频二进制（此时原样返回），也可能返回 JSON（视频 URL 或异步任务 id）。
+        """
+        url = self.api_base
+        fields = {"model": self.model_name, "prompt": prompt}
+        # 透传 model_params_setting 里的参数（width/height/fps/seed/extra_params 等），不从 UI 表单约束
+        for key, value in (self.params or {}).items():
+            if value is None:
+                continue
+            if isinstance(value, (dict, list, bool)):
+                value = json.dumps(value, ensure_ascii=False)
+            fields[str(key)] = value
+
+        headers = {"Authorization": f"Bearer {self.api_key}"}
+        files = {key: (None, str(value)) for key, value in fields.items()}
+        maxkb_logger.info(f"提交私有部署视频生成任务，模型: {self.model_name} -> {url}")
+
+        body = self._post_private(url, headers, files)
+        # 私有部署可能直接返回视频二进制
+        if isinstance(body, (bytes, bytearray)):
+            maxkb_logger.info("私有部署直接返回视频二进制")
+            return body
+        # 返回 JSON：先找同步生成的视频 URL
+        video_url = self._find_video_url(body)
+        if video_url:
+            maxkb_logger.info(f"私有部署视频生成成功，视频 URL: {video_url}")
+            return video_url
+        # 否则按异步任务处理，用 video id 轮询
+        video_id = self._find_video_id(body)
+        if video_id:
+            return self._poll_private_task(video_id)
+        raise RuntimeError(f"私有部署返回内容既非视频二进制也无可识别的视频地址/任务 id: {body}")
+
+    def _post_private(self, url, headers, files):
+        """私有部署 POST 提交，带重试；能解析为 JSON 则返回 JSON，否则返回视频二进制。"""
+        for attempt in range(self.max_retries):
+            try:
+                response = requests.post(url, headers=headers, files=files, timeout=600)
+                response.raise_for_status()
+                return self._parse_private_body(response)
+            except (requests.exceptions.ProxyError, requests.exceptions.ConnectionError,
+                    requests.exceptions.Timeout) as e:
+                maxkb_logger.error(f"⚠️ 网络错误: {e}，正在重试 {attempt + 1}/{self.max_retries}...")
+                time.sleep(self.retry_delay)
+            except requests.exceptions.HTTPError as e:
+                raise RuntimeError(
+                    f"私有部署 HTTP 请求失败: {e.response.text if hasattr(e, 'response') else str(e)}")
+        raise RuntimeError("多次重试后仍无法连接到私有部署服务")
+
+    @staticmethod
+    def _parse_private_body(response):
+        """私有部署可能直接返回视频二进制：能解析成 JSON 才当 JSON，否则原样返回二进制。"""
+        try:
+            return response.json()
+        except ValueError:
+            return response.content
+
+    def _poll_private_task(self, video_id: str) -> str:
+        """异步任务：轮询 GET {api_base}/{video_id} 直至成功/失败。"""
+        query_url = f"{self.api_base.rstrip('/')}/{video_id}"
+        headers = {"Authorization": f"Bearer {self.api_key}"}
+        max_attempts = 60
+        for attempt in range(max_attempts):
+            try:
+                response = requests.get(query_url, headers=headers, timeout=60)
+                response.raise_for_status()
+                body = self._parse_private_body(response)
+            except (requests.exceptions.ProxyError, requests.exceptions.ConnectionError,
+                    requests.exceptions.Timeout) as e:
+                maxkb_logger.error(f"⚠️ 网络错误: {e}，正在重试 {attempt + 1}/{max_attempts}...")
+                time.sleep(self.retry_delay)
+                continue
+            except requests.exceptions.HTTPError as e:
+                raise RuntimeError(
+                    f"私有部署查询任务失败: {e.response.text if hasattr(e, 'response') else str(e)}")
+            if isinstance(body, (bytes, bytearray)):
+                maxkb_logger.info("私有部署查询直接返回视频二进制")
+                return body
+            status = self._find_status(body)
+            maxkb_logger.info(f"私有部署任务状态 (尝试 {attempt + 1}/{max_attempts}): {status}")
+            if status in self.v2_success_status:
+                video_url = self._find_video_url(body)
+                if video_url:
+                    maxkb_logger.info(f"私有部署任务成功，视频 URL: {video_url}")
+                    return video_url
+                raise RuntimeError(f"私有部署任务成功但未找到视频地址: {body}")
+            if status in self.v2_fail_status:
+                raise RuntimeError(f"视频生成失败，状态: {status}, 返回: {body}")
+            time.sleep(self.retry_delay)
+        raise RuntimeError(f"任务超时：经过 {max_attempts} 次轮询后仍未完成")
+
+    @staticmethod
+    def _find_video_url(obj):
+        """递归查找返回体里第一个以 http 开头的视频地址。"""
+        if isinstance(obj, dict):
+            for value in obj.values():
+                if isinstance(value, str) and value.startswith("http"):
+                    return value
+                if isinstance(value, (dict, list)):
+                    found = GenerationVideoModel._find_video_url(value)
+                    if found:
+                        return found
+        elif isinstance(obj, list):
+            for value in obj:
+                found = GenerationVideoModel._find_video_url(value)
+                if found:
+                    return found
+        return None
+
+    @staticmethod
+    def _find_video_id(obj):
+        """递归查找返回体里第一个视频/任务 id。"""
+        id_keys = {"video_id", "videoId", "task_id", "taskId", "job_id", "jobId", "id"}
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                if key in id_keys and isinstance(value, str) and value:
+                    return value
+                if isinstance(value, (dict, list)):
+                    found = GenerationVideoModel._find_video_id(value)
+                    if found:
+                        return found
+        elif isinstance(obj, list):
+            for value in obj:
+                found = GenerationVideoModel._find_video_id(value)
+                if found:
+                    return found
+        return None
+
+    @staticmethod
+    def _find_status(obj):
+        """递归查找返回体里的状态字段值。"""
+        status_keys = {"status", "state", "status_message", "message"}
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                if key in status_keys and isinstance(value, str) and value:
+                    return value
+                if isinstance(value, (dict, list)):
+                    found = GenerationVideoModel._find_status(value)
+                    if found:
+                        return found
+        elif isinstance(obj, list):
+            for value in obj:
+                found = GenerationVideoModel._find_status(value)
+                if found:
+                    return found
+        return None
+
     def _safe_call(self, method, url, **kwargs):
         """带重试的请求封装"""
         headers = {"Authorization": f"Bearer {self.api_key}"}
@@ -113,6 +270,9 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
         返回: 视频下载 URL
         """
+        # 私有部署（本地 /v1/videos，OpenAI 兼容 multipart 接口）
+        if self._is_private_deploy():
+            return self._generate_video_private(prompt, first_frame_url, last_frame_url, **kwargs)
         # 自动兼容 V1 / V2 (MiniMax-H3) 两套参数逻辑
         if self._v2():
             return self._generate_video_v2(prompt, first_frame_url, last_frame_url, **kwargs)
