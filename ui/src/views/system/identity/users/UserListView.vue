@@ -211,16 +211,14 @@ onMounted(() => loadSystemUsers())
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center gap-3">
-              <span @click.stop>
-                <el-switch
-                  v-model="row.is_active"
-                  :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id || !perm.system.user.edit()"
-                  :before-change="() => handleChangeStatus(row)"
-                  size="small"
-                  class="mr-3"
-                />
-                <el-divider direction="vertical" />
-              </span>
+              <!-- 修改状态 -->
+              <el-switch
+                v-model="row.is_active"
+                :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id || !perm.system.user.edit()"
+                :before-change="() => handleChangeStatus(row)"
+                size="small"
+              />
+              <el-divider direction="vertical" />
 
               <div class="flex">
                 <!-- 编辑 -->
