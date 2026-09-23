@@ -10,6 +10,8 @@ import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 import { useStore } from '@/stores'
 import perm from '@/permission/index.ts'
+import { LOGIN_METHOD } from '@/api/enums'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 const { auth } = useStore()
 
 /* 选择工作空间列表 */
@@ -116,6 +118,11 @@ const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
+  {
+    label: '用户来源',
+    value: 'source',
+    options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({ label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label, value })),
+  },
 ]
 const userGroupMembers = ref<SystemUserGroupMember[]>([])
 function handleMemberSearch(query?: Dict<unknown>) {
