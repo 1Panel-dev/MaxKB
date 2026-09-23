@@ -2,7 +2,7 @@
 import { onMounted, ref, useTemplateRef } from 'vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import type { Dict, OptionItem, WorkspaceItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
+import type { Dict, OptionItem, WorkspaceItem, SystemUserGroup, SystemUserGroupMember, LoginMethod } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
@@ -253,7 +253,11 @@ onMounted(() => {
               <MkTagGroup :tags="row.roles" />
             </template>
           </el-table-column>
-          <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip />
+          <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip>
+            <template #default="{ row }">
+              {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="70" fixed="right">
             <template #default="{ row }">
               <!-- 移除成员 -->
