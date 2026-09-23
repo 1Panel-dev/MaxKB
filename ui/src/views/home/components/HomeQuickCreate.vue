@@ -59,7 +59,7 @@ onMounted(() =>
         </template>
       </ButtonCreateApplication>
       <!-- 创建知识库 -->
-      <ButtonCreateKnowledge trigger="hover" fit-trigger-width popper-class="rounded-xl!" :folder-id="workspaceId" @refresh="handleCreateKnowledge">
+      <ButtonCreateKnowledge trigger="hover" fit-trigger-width popper-class="rounded-xl!" folder-id="default" @refresh="handleCreateKnowledge">
         <template #trigger>
           <el-card shadow="hover">
             <div class="flex-between gap-3">
@@ -74,7 +74,7 @@ onMounted(() =>
         </template>
       </ButtonCreateKnowledge>
       <!-- 创建工具 -->
-      <ButtonCreateTool trigger="hover" fit-trigger-width popper-class="rounded-xl!" :folder-id="workspaceId" @refresh="handleCreateTool">
+      <ButtonCreateTool trigger="hover" fit-trigger-width popper-class="rounded-xl!" folder-id="default" @refresh="handleCreateTool">
         <template #trigger>
           <el-card shadow="hover">
             <div class="flex-between gap-3">

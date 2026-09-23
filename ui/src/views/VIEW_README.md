@@ -302,7 +302,9 @@ Workspace 的自定义工具和工作流工具菜单
 把不同工具类型的字段重新合并到一个通用表单中。所有调用 `postTool` 创建工具的流程在接口成功后
 先调用 `auth.loadAuthBaseProfile()` 刷新当前用户基础资料，再执行成功提示以及列表刷新或工作流页面
 跳转；`putTool` 编辑流程不触发该刷新。跨资源范围复用且需要请求的 Action 和表单接收页面传入的完整 Tool API，不额外
-维护逐方法接口类型；固定服务于 Workspace 工具商店的 `StoreToolFormDialog` 直接内聚对应请求。
+维护逐方法接口类型；`ApplyStoreToolDialog` 内聚商店应用请求，提交时通过
+`isSystemSharedResource()` 选择 System 共享资源或 Workspace 的 Tool API 和 Tool Store API，
+覆盖内置工具、工作流模板及商店工具三个分支。
 工具启用状态属于固定的卡片内交互，由 `ToolStatusSwitch`
 使用卡片传入的 Tool API 更新，并通过 `update` 事件通知页面替换列表数据。工具批量选择状态、
 批量移动和批量删除流程由 `ToolView` 管理；`MoveToolAction` 复用公共 `MoveToDialog` 完成单个工具移动，
