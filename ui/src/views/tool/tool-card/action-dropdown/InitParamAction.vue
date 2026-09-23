@@ -37,7 +37,10 @@ function handleDialogClosed() {
 
 <template>
   <!-- 配置启动参数 -->
-  <MkAction :label="label" icon="icon_preferences_outlined" @click="handleOpenInitParam" />
+  <MkDropdownItem @click="handleOpenInitParam">
+    <template #icon><MkIcon name="icon_preferences_outlined" /></template>
+    <span>{{ label }}</span>
+  </MkDropdownItem>
 
   <InitParamDialog v-if="dialogMounted" ref="initParamDialogRef" :api="api" @closed="handleDialogClosed" @update="emit('update', $event)" />
 </template>

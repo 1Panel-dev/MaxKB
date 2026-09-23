@@ -10,6 +10,7 @@ defineOptions({ name: 'EditModelAction' })
 
 const props = defineProps<{
   api: typeof ModelApi | typeof SystemSharedModelApi | typeof SystemResourceModelApi
+  display?: 'menu' | 'button'
   disabled?: boolean
   label: string
   model: ModelItem
@@ -33,7 +34,7 @@ function handleDrawerClosed() {
 
 <template>
   <!-- 编辑模型 -->
-  <MkAction :label="label" icon="icon_edit_outlined" :disabled="disabled" @click="handleOpenEditModel" />
+  <MkAction :display="display" :label="label" icon="icon_edit_outlined" :disabled="disabled" @click="handleOpenEditModel" />
 
   <EditModelDrawer v-if="drawerMounted" ref="editModelDrawerRef" :api="api" @closed="handleDrawerClosed" @refresh="emit('refresh')" />
 </template>

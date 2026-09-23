@@ -293,23 +293,12 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `clearSelection()`。操作栏与 `MkViewLayout` 复用 `LayoutBatchFooter`，统一全选、半选、数量和
 取消行为；它在主内容滚动区域内吸附于页面底部，不随表格内容滚出可视区域。
 
-### MkTableOperationGroup、MkAction
+### MkAction
 
-`MkTableOperationGroup` 与 `MkAction`、`context.ts` 统一维护在 `global/mk-action/`。
-表格操作列使用 `MkTableOperationGroup` 默认插槽声明操作，按模板顺序将前 `maxVisible` 个操作
-（默认 2）显示为图标按钮，其余自动进入 More；没有剩余操作时不显示 More。
-每个直接子组件代表一个操作，业务 Action 内使用 `MkAction` 作为展示入口。
-整个操作的显隐条件必须写在直接子组件的 `v-if` 上；不通过 `v-show` 或子组件内部条件控制计数。
-支持展开 `template` Fragment，忽略注释和文本；循环操作提供稳定且唯一的 key。
-禁用操作仍占位。开关等独立控件放在操作栏外，页面按实际入口数量设置操作列宽。
-
-`MkAction` 位于 `global/mk-action/index.vue`，适用于表格和卡片，接收 `label`、SVG Symbol 名称
-`icon`、`disabled`、`divided`，发出 `click`。
-通过上下文自动选择图标按钮加 Tooltip 或图标加文字菜单项；独立使用默认显示按钮，
-放入 `MkDropdownMenu` 时显示菜单项。点击阻止冒泡，`divided` 在按钮模式和自动 More 首项中不生效。
-业务 Action 保留自己的请求与浮层生命周期，不需要传递展示模式或维护操作配置数组。
-操作栏内部复用 `MkTableMoreDropdown` 并开启 `persistent`，菜单收起时保留业务 Action 与已打开浮层。
-操作跨越外露和 More 边界时会重新挂载，业务浮层打开期间不要重排入口或改变 `maxVisible`。
+`global/mk-table/MkAction.vue` 统一单个操作的两种外观，通过 `display="menu"`（默认）或
+`display="button"` 显式选择菜单项或带 Tooltip 的图标按钮，不注入或推断展示上下文。
+接收 `label`、SVG Symbol 名称 `icon`、`disabled`、`divided`，发出 `click` 并阻止点击冒泡。
+`divided` 仅用于菜单模式。页面自行组合外露操作与 `MkTableMoreDropdown`，不自动分配位置。
 
 ### MkTagGroup
 

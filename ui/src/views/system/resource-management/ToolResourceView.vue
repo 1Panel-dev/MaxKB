@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { FormInstance } from 'element-plus'
 import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
 import SystemToolWorkflowApi from '@/api/admin/system/resource-management/tool/tool-workflow'
 import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
@@ -12,7 +11,6 @@ import type { Dict, OptionItem, ToolItem } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS } from '@/constants'
 import { useStore } from '@/stores'
-import perm from '@/permission'
 import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolStatusSwitch from '@/views/tool/tool-card/ToolStatusSwitch.vue'
@@ -177,28 +175,22 @@ onMounted(() => {
         <el-table-column label="创建时间" width="180"
           ><template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template></el-table-column
         >
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="140" fixed="right">
           <template #default="{ row }">
-            <div class="flex-align-center gap-3">
+            <div class="flex-align-center gap-1">
               <!-- 启用或禁用工具 -->
-              <ToolStatusSwitch
-                v-if="perm.tool.system.switch()"
-                v-model:loading="operationLoading"
-                :api="SystemToolApi"
-                :tool="row"
-                @update="handleToolUpdate"
-              />
-              <!-- 工具操作，前两个外露，其余进入更多菜单 -->
-              <MkTableOperationGroup>
-                <!-- 编辑工具配置 -->
-                <EditToolAction label="编辑" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
-                <!-- 资源授权 -->
-                <AuthorizeToolAction v-if="perm.tool.system.auth()" label="资源授权" :tool="row" />
+              <ToolStatusSwitch class="mr-1!" v-model:loading="operationLoading" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
+              <!-- 编辑工具配置 -->
+              <EditToolAction display="button" label="编辑" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
+              <!-- 更多工具操作 -->
+              <MkTableMoreDropdown persistent>
                 <!-- 打开工具工作流 -->
-                <MkAction v-if="row.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" icon="icon_setting" @click="handleOpenWorkflow(row, $event)" />
+                <MkDropdownItem v-if="row.tool_type === TOOL_TYPE.WORKFLOW" @click="handleOpenWorkflow(row, $event)">
+                  <template #icon><MkIcon name="icon_setting" /></template>工作流
+                </MkDropdownItem>
                 <!-- 配置启动参数 -->
                 <InitParamAction
-                  v-if="row.init_field_list?.length && perm.tool.system.edit()"
+                  v-if="row.init_field_list?.length"
                   v-model:loading="operationLoading"
                   label="启动参数"
                   :api="SystemToolApi"
@@ -206,17 +198,14 @@ onMounted(() => {
                   @update="handleToolUpdate"
                 />
 
+                <!-- 资源授权 -->
+                <AuthorizeToolAction label="资源授权" :tool="row" />
+
                 <!-- 导出工具 -->
-                <ExportToolAction
-                  v-if="!row.template_id && perm.tool.system.export()"
-                  v-model:loading="operationLoading"
-                  label="导出"
-                  :api="SystemToolApi"
-                  :tool="row"
-                />
+                <ExportToolAction v-if="!row.template_id" v-model:loading="operationLoading" label="导出" :api="SystemToolApi" :tool="row" />
                 <!-- 查看 MCP 配置 -->
                 <McpConfigAction
-                  v-if="row.tool_type === TOOL_TYPE.MCP && perm.tool.system.edit()"
+                  v-if="row.tool_type === TOOL_TYPE.MCP"
                   v-model:loading="operationLoading"
                   label="MCP 配置详情"
                   :api="SystemToolApi"
@@ -226,30 +215,25 @@ onMounted(() => {
                 <TriggerToolAction
                   :tool-api="SystemToolApi"
                   :tool-workflow-api="SystemToolWorkflowApi"
-                  v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type) && perm.tool.system.triggerRead()"
+                  v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type)"
                   label="触发器"
                   :api="SystemResourceTriggerApi"
                   :tool="row"
                 />
                 <!-- 查看关联资源 -->
-                <RelatedResourcesToolAction v-if="perm.tool.system.relateMap()" label="查看关联资源" :api="SystemRelatedResourcesApi" :tool="row" />
+                <RelatedResourcesToolAction label="查看关联资源" :api="SystemRelatedResourcesApi" :tool="row" />
                 <!-- 查看执行记录 -->
                 <ExecutionRecordToolAction
-                  v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type) && perm.tool.system.record()"
+                  v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type)"
                   label="执行记录"
                   :api="SystemToolWorkflowApi"
                   :tool="row"
                 />
                 <!-- 删除工具 -->
-                <MkAction
-                  v-if="perm.tool.system.delete()"
-                  label="删除"
-                  icon="icon_delete-trash_outlined"
-                  divided
-                  :disabled="operationLoading"
-                  @click="handleDeleteTool(row)"
-                />
-              </MkTableOperationGroup>
+                <MkDropdownItem divided :disabled="operationLoading" @click="handleDeleteTool(row)">
+                  <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>删除
+                </MkDropdownItem>
+              </MkTableMoreDropdown>
             </div>
           </template>
         </el-table-column>

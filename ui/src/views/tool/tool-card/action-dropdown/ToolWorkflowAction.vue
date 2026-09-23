@@ -27,5 +27,8 @@ function handleOpenWorkflow(event: MouseEvent) {
 
 <template>
   <!-- 打开工具工作流 -->
-  <MkAction :label="label" icon="icon_setting" @click="handleOpenWorkflow" />
+  <MkDropdownItem @click="handleOpenWorkflow">
+    <template #icon><MkIcon name="icon_setting" /></template>
+    <span>{{ label }}</span>
+  </MkDropdownItem>
 </template>

@@ -25,7 +25,10 @@ function handleDrawerClosed() {
 
 <template>
   <!-- 模型参数设置 -->
-  <MkAction :label="label" icon="icon_preferences_outlined" @click="handleOpenParamSetting" />
+  <MkDropdownItem @click="handleOpenParamSetting">
+    <template #icon><MkIcon name="icon_preferences_outlined" /></template>
+    <span>{{ label }}</span>
+  </MkDropdownItem>
 
   <ParamSettingDrawer v-if="drawerMounted" ref="paramSettingDrawerRef" :api="api" @closed="handleDrawerClosed" />
 </template>

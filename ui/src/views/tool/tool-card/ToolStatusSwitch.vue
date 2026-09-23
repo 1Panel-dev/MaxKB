@@ -8,7 +8,7 @@ import type { ToolItem } from '@/api/types'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import InitParamDialog from './InitParamDialog.vue'
 
-defineOptions({ name: 'ToolStatusSwitch' })
+defineOptions({ name: 'ToolStatusSwitch', inheritAttrs: false })
 
 const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; tool: ToolItem }>()
 
@@ -73,7 +73,7 @@ function updateToolStatus(active: boolean) {
 </script>
 
 <template>
-  <div>
+  <div class="flex-align-center" v-bind="$attrs">
     <el-switch :disabled="loading" :model-value="tool.is_active" class="mr-3" size="small" :before-change="handleToolStatusChange" />
     <el-divider direction="vertical" />
   </div>

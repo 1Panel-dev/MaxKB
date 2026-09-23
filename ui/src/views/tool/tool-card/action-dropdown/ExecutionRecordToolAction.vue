@@ -20,6 +20,9 @@ function handleDrawerClosed() {
 
 <template>
   <!-- 查看执行记录 -->
-  <MkAction :label="label" icon="icon_schedule-report_outlined" @click="handleOpenExecutionRecords" />
+  <MkDropdownItem @click="handleOpenExecutionRecords">
+    <template #icon><MkIcon name="icon_schedule-report_outlined" /></template>
+    <span>{{ label }}</span>
+  </MkDropdownItem>
   <ExecutionRecordDrawer v-if="drawerMounted" ref="executionRecordDrawerRef" :api="props.api" :tool-id="tool.id" @closed="handleDrawerClosed" />
 </template>
