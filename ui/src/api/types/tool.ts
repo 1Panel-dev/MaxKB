@@ -117,8 +117,6 @@ export interface ToolStoreTag {
   name: string
 }
 
-export type ToolStoreSource = 'internal' | 'store'
-
 export interface ToolStoreItem {
   desc?: string | null
   description?: string | null
@@ -130,7 +128,6 @@ export interface ToolStoreItem {
   label?: string | null
   name: string
   readMe?: string
-  source: ToolStoreSource
   tags?: string[]
   tool_type: ToolType
   version?: string | null
@@ -139,15 +136,12 @@ export interface ToolStoreItem {
 
 export interface ToolStoreResponse {
   additionalProperties: { tags: ToolStoreTag[] }
-  apps: Omit<ToolStoreItem, 'source' | 'tool_type'>[]
+  apps: Omit<ToolStoreItem, 'tool_type'>[]
 }
 
-export interface AddInternalToolPayload {
+export interface AddStoreToolPayload {
   folder_id: string
   name: string
-}
-
-export interface AddStoreToolPayload extends AddInternalToolPayload {
   download_callback_url: string
   download_url: string
   icon: string

@@ -49,9 +49,7 @@ function handleSubmit() {
     const toolStoreApi = isSharedResource ? SystemSharedToolStoreApi : WorkspaceToolStoreApi
     let request: Promise<ToolItem>
 
-    if (tool.source === 'internal') {
-      request = toolStoreApi.postInternalTool(tool.id, commonPayload)
-    } else if (tool.label === 'workflow_template') {
+    if (tool.label === 'workflow_template') {
       request = toolApi.postTool({ ...commonPayload, code: '{}', tool_type: TOOL_TYPE.WORKFLOW, work_flow_template: tool })
     } else {
       request = toolStoreApi.postStoreTool(tool.id, {

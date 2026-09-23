@@ -1,17 +1,5 @@
 import { get } from './core/request'
-import type {
-  ApplicationStoreResponse,
-  KnowledgeWorkflowStoreResponse,
-  Dict,
-  ToolItem,
-  ToolStoreResponse,
-  ToolWorkflowStoreResponse,
-} from '@/api/types'
-
-/** 获取系统内置工具。 */
-const getInternalToolList = (query?: Dict<unknown>) => {
-  return get<ToolItem[]>('/workspace/internal/tool', query)
-}
+import type { ApplicationStoreResponse, KnowledgeWorkflowStoreResponse, Dict, ToolStoreResponse, ToolWorkflowStoreResponse } from '@/api/types'
 
 /** 获取工具商店列表。 */
 const getStoreToolList = (query?: Dict<unknown>) => {
@@ -33,4 +21,4 @@ const getStoreToolWorkflowList = (query?: Dict<unknown>) => {
   return get<ToolWorkflowStoreResponse>('/workspace/store/tool_workflow_template', query)
 }
 
-export default { getInternalToolList, getStoreApplicationList, getStoreKnowledgeList, getStoreToolList, getStoreToolWorkflowList }
+export default { getStoreApplicationList, getStoreKnowledgeList, getStoreToolList, getStoreToolWorkflowList }

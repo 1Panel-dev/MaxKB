@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import type { ToolStoreItem } from '@/api/types'
-import { resetUrl } from '@/utils/icon'
 import { numberFormat } from '@/utils/number'
 import ToolStoreDetailDrawer from '../ToolStoreDetailDrawer.vue'
 
@@ -17,22 +16,9 @@ const toolTypeLabel = computed(() => (props.tool.label === 'data_source' ? '数�
 const detailDrawerMounted = ref(false)
 const detailDrawerRef = useTemplateRef<InstanceType<typeof ToolStoreDetailDrawer>>('detailDrawerRef')
 
-function openDetailDrawer(content?: string) {
+function openDetailDrawer() {
   detailDrawerMounted.value = true
-  nextTick(() => detailDrawerRef.value?.open(props.tool, content))
-}
-
-function handleOpenDetail() {
-  if (props.tool.source !== 'internal' || !props.tool.icon?.includes('icon.png')) {
-    openDetailDrawer()
-    return
-  }
-
-  const detailUrl = resetUrl(props.tool.icon.replace('icon.png', 'detail.md'))
-  fetch(detailUrl)
-    .then((response) => (response.ok ? response.text() : Promise.reject(response)))
-    .then((content) => openDetailDrawer(content))
-    .catch(() => openDetailDrawer())
+  nextTick(() => detailDrawerRef.value?.open(props.tool))
 }
 
 /* 应用工具交由商店弹窗统一处理。 */
@@ -66,7 +52,7 @@ function handleApply(tool = props.tool) {
       <component :is="Action" class="flex-1!">
         <div class="flex min-w-0 flex-1" @click.stop>
           <!-- 查看工具详情 -->
-          <el-button class="flex-1!" plain @click="handleOpenDetail">详情</el-button>
+          <el-button class="flex-1!" plain @click="openDetailDrawer()">详情</el-button>
           <!-- 应用工具 -->
           <el-button class="flex-1!" type="primary" @click="handleApply()"> 应用 </el-button>
         </div>

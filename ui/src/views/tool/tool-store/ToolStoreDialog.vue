@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, shallowRef, useTemplateRef } from 'vue'
 import StoreApi from '@/api/admin/store.ts'
 import { TOOL_TYPE } from '@/api/enums'
-import type { ToolItem, ToolStoreItem, ToolStoreTag, ToolType } from '@/api/types'
+import type { ToolStoreItem, ToolStoreTag, ToolType } from '@/api/types'
 import ToolStoreCard from './component/ToolStoreCard.vue'
 import ApplyStoreToolDialog from './ApplyStoreToolDialog.vue'
 
@@ -58,35 +58,21 @@ function getStoreToolType(label?: string | null): ToolType {
   return TOOL_TYPE.CUSTOM
 }
 
-function normalizeInternalTool(tool: ToolItem): ToolStoreItem {
-  return {
-    desc: tool.desc,
-    icon: tool.icon,
-    id: tool.id,
-    label: tool.label,
-    name: tool.name,
-    source: 'internal',
-    tool_type: TOOL_TYPE.INTERNAL,
-    version: tool.version,
-  }
-}
-
 function loadStoreTools() {
   loading.value = true
   storeTools.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
   const query = appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : undefined
 
-  Promise.all([StoreApi.getInternalToolList(query), StoreApi.getStoreToolList(query)])
-    .then(([internalTools, storeResponse]) => {
+  StoreApi.getStoreToolList(query)
+    .then((storeResponse) => {
       const appStoreTools: ToolStoreItem[] = storeResponse.apps.map((tool) => ({
         ...tool,
         desc: tool.description ?? tool.desc,
-        source: 'store',
         tool_type: getStoreToolType(tool.label),
       }))
       storeTags.value = storeResponse.additionalProperties.tags
-      storeTools.value = [...internalTools.map(normalizeInternalTool), ...appStoreTools]
+      storeTools.value = appStoreTools
       return nextTick(() => {
         contentScrollContainer.value = storeLayoutRef.value?.getScrollContainer()
         activeCategoryId.value = toolStoreCategories.value[0]?.id ?? ''
@@ -184,7 +170,7 @@ defineExpose({ open })
           </div>
 
           <div class="mk-resource-card-grid-sm">
-            <template v-for="tool in storeTools" :key="`${tool.source}-${tool.id}`">
+            <template v-for="tool in storeTools" :key="tool.id">
               <ToolStoreCard :category-title="categoryTitles[tool.label || 'other'] ?? tool.label ?? '其他'" :tool="tool" @apply="handleApplyTool" />
             </template>
           </div>
@@ -195,7 +181,7 @@ defineExpose({ open })
           <section v-for="category in toolStoreCategories" :id="`tool-store-category-${category.id}`" :key="category.id" class="mb-8 scroll-mt-4">
             <h4 class="mb-4">{{ category.title }}</h4>
             <div class="mk-resource-card-grid-sm">
-              <template v-for="tool in category.tools" :key="`${tool.source}-${tool.id}`">
+              <template v-for="tool in category.tools" :key="tool.id">
                 <ToolStoreCard :category-title="category.title" :tool="tool" @apply="handleApplyTool" />
               </template>
             </div>
