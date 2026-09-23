@@ -804,18 +804,13 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 
 `system/resource-management/ModelResourceView.vue` 与 `ToolResourceView.vue` 使用
 `MkViewLayout`、`MkComplexSearch` 和 `MkTable` 展示跨工作空间资源。
-模型操作列通过 `MkTableOperationGroup` 按插槽顺序外露编辑与资源授权，其余操作自动进入 More；
-参数设置的显隐条件直接写在 Action 上，业务 Action 复用 `MkAction` 适配按钮与菜单。
-模型 `action-dropdown` 中的编辑、删除、参数设置、授权和关联资源入口统一使用 `MkAction`。
-资源管理页复用 `EditModelAction`，传入 System API、供应商和禁用状态；该 Action 内聚编辑抽屉，
-保存后发送 `refresh`。共享模型页继续组合相同业务 Action，在卡片菜单中自动显示为菜单项。
-资源管理删除保留页面专属确认、引用数量提示、加载状态和分页回退，通过 `MkAction` 展示，
-不强行复用卡片的 `DeleteModelAction`。
-工具操作列同样使用 `MkTableOperationGroup`，按现有模板顺序和显隐条件外露前两个操作；
-启停开关位于操作组外，不计入两个操作。商店工具改名、System 工作流跳转和带引用提示、
-分页回退的删除继续由资源管理页维护，通过 `MkAction` 展示。
-工具 `action-dropdown` 内的各操作统一使用 `MkAction`，Workspace 和共享工具卡片仍通过
-`MkDropdownMenu` 自动显示菜单项，保留原有 API、权限条件、事件和浮层生命周期。
+模型操作列使用 `EditModelAction display="button"` 展示编辑按钮，其余操作放入 `MkTableMoreDropdown`；
+`EditModelAction` 透传 `display` 给 `MkAction`，默认保持菜单模式，内部管理编辑抽屉，保存后发出 `refresh`。
+模型和工具仅编辑、资源授权四个 Action 使用 `MkAction` 并透传显式 `display`，默认菜单模式；
+其他业务 Action 继续使用 `MkDropdownItem`，页面按现有布局显式选择按钮或菜单。
+工具操作列保留独立启停开关，
+其余操作放入 `MkTableMoreDropdown`。菜单开启 `persistent`，业务 Action 使用 `MkDropdownItem`，
+保留各自 API、权限条件、事件和浮层生命周期。资源管理页保留带引用提示和分页回退的独立删除流程。
 名称、类型、创建者（工具另含来源）筛选和工作空间表头筛选变化后回到第一页；分页大小变化由
 `MkTable` 重置页码。工作空间列及选项查询只在企业版开启，`workspace_ids` 沿用 JSON 数组字符串。
 页面使用 v3 的 System 权限方法保留迁移前已有的操作权限，不增加创建、导入、批量或复制入口。

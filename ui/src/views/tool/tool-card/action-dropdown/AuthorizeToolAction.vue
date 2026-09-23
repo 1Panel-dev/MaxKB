@@ -5,7 +5,7 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import ResourceAuthorizationDrawer from '@/components/business/resource-authorization-drawer/index.vue'
 
 defineOptions({ name: 'AuthorizeToolAction' })
-const props = defineProps<{ tool: ToolItem; label: string }>()
+const props = defineProps<{ tool: ToolItem; label: string; display?: 'menu' | 'button' }>()
 
 const drawerMounted = ref(false)
 const authorizationDrawerRef = useTemplateRef<InstanceType<typeof ResourceAuthorizationDrawer>>('authorizationDrawerRef')
@@ -22,7 +22,7 @@ function handleDrawerClosed() {
 
 <template>
   <!-- 资源授权 -->
-  <MkAction :label="label" icon="icon_passkeys_outlined" @click="handleOpenAuthorization" />
+  <MkAction :display="display" :label="label" icon="icon_passkeys_outlined" @click="handleOpenAuthorization" />
   <ResourceAuthorizationDrawer
     v-if="drawerMounted"
     ref="authorizationDrawerRef"

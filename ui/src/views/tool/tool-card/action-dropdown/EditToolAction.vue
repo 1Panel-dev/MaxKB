@@ -13,7 +13,12 @@ import WorkflowFormDialog from '@/views/tool/tool-form/WorkflowFormDialog.vue'
 
 defineOptions({ name: 'EditToolAction' })
 
-const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; label: string; tool: ToolItem }>()
+const props = defineProps<{
+  api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi
+  display?: 'menu' | 'button'
+  label: string
+  tool: ToolItem
+}>()
 
 const emit = defineEmits<{ update: [tool: ToolItem] }>()
 
@@ -49,7 +54,7 @@ defineExpose({ handleOpenToolForm })
 
 <template>
   <!-- 编辑工具 -->
-  <MkAction :label="label" icon="icon_edit_outlined" @click="handleOpenToolForm" />
+  <MkAction :display="display" :label="label" icon="icon_edit_outlined" @click="handleOpenToolForm" />
 
   <template v-if="formMounted">
     <DataSourceFormDrawer

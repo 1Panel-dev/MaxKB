@@ -60,7 +60,10 @@ function handleFormClosed() {
 
 <template>
   <!-- 复制工具 -->
-  <MkAction :label="label" icon="icon_copy_outlined" @click="handleCopyTool" />
+  <MkDropdownItem @click="handleCopyTool">
+    <template #icon><MkIcon name="icon_copy_outlined" /></template>
+    <span>{{ label }}</span>
+  </MkDropdownItem>
 
   <template v-if="formMounted">
     <ToolFormDrawer

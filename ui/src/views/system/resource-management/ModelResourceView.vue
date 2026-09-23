@@ -149,11 +149,12 @@ onMounted(() => {
         <el-table-column label="创建时间" width="180"
           ><template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template></el-table-column
         >
-        <el-table-column label="操作" width="140" fixed="right">
+        <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
-            <MkTableOperationGroup>
+            <div class="flex-align-center gap-1">
               <!-- 编辑模型 -->
               <EditModelAction
+                display="button"
                 label="编辑"
                 :api="SystemModelApi"
                 :model="row"
@@ -161,20 +162,26 @@ onMounted(() => {
                 :disabled="loading"
                 @refresh="loadModels"
               />
+
               <!-- 资源授权 -->
-              <AuthorizeModelAction label="资源授权" :model="row" />
-              <!-- 模型参数设置 -->
-              <ParamSettingAction
-                v-if="['TTS', 'LLM', 'IMAGE', 'TTI', 'STT', 'EMBEDDING'].includes(row.model_type)"
-                label="模型参数设置"
-                :api="SystemModelApi"
-                :model="row"
-              />
-              <!-- 查看关联资源 -->
-              <RelatedResourcesModelAction label="查看关联资源" :api="SystemRelatedResourcesApi" :model="row" />
-              <!-- 删除模型 -->
-              <MkAction label="删除" icon="icon_delete-trash_outlined" divided :disabled="loading" @click="handleDeleteModel(row)" />
-            </MkTableOperationGroup>
+              <AuthorizeModelAction display="button" label="资源授权" :model="row" />
+              <!-- 更多模型操作 -->
+              <MkTableMoreDropdown persistent>
+                <!-- 模型参数设置 -->
+                <ParamSettingAction
+                  v-if="['TTS', 'LLM', 'IMAGE', 'TTI', 'STT', 'EMBEDDING'].includes(row.model_type)"
+                  label="模型参数设置"
+                  :api="SystemModelApi"
+                  :model="row"
+                />
+                <!-- 查看关联资源 -->
+                <RelatedResourcesModelAction label="查看关联资源" :api="SystemRelatedResourcesApi" :model="row" />
+                <!-- 删除模型 -->
+                <MkDropdownItem divided :disabled="loading" @click="handleDeleteModel(row)">
+                  <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>删除
+                </MkDropdownItem>
+              </MkTableMoreDropdown>
+            </div>
           </template>
         </el-table-column>
       </MkTable>

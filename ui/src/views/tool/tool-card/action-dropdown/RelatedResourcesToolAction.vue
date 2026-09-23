@@ -33,6 +33,9 @@ function handleDrawerClosed() {
 
 <template>
   <!-- 查看关联资源 -->
-  <MkAction :label="label" icon="icon_mindnote_outlined" @click="handleOpenRelatedResources" />
+  <MkDropdownItem @click="handleOpenRelatedResources">
+    <template #icon><MkIcon name="icon_mindnote_outlined" /></template>
+    <span>{{ label }}</span>
+  </MkDropdownItem>
   <RelatedResourcesDrawer v-if="drawerMounted" ref="relatedResourcesDrawerRef" :api="api" @closed="handleDrawerClosed" />
 </template>
