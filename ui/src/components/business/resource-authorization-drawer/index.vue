@@ -31,7 +31,7 @@ const targetId = ref('')
 const folderData = ref<FolderItem>()
 const submitting = ref(false)
 
-/* System 资源管理使用专属用户授权接口，用户组沿用现有接口。 */
+/* System 资源管理使用专属用户/用户组授权接口，工作空间沿用现有接口。 */
 const authorizationApi = computed(() => (isSystemResource() ? SystemResourceAuthorizationApi : ResourceAuthorizationApi))
 
 /* 资源类型与权限选项 */
@@ -164,7 +164,7 @@ defineExpose({ open })
         v-if="targetType === 'user-group' && targetId && workspaceId"
         :key="targetId"
         :submitting="submitting"
-        :api="ResourceAuthorizationApi"
+        :api="authorizationApi"
         :workspace-id="workspaceId"
         :target-id="targetId"
         :type="authorizationType"
