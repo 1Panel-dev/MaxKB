@@ -90,23 +90,18 @@ const postKnowledgeImport = (file: File, folderId: string) => {
   return post<FormData, { knowledge_id: string; type: KnowledgeItem['type'] }>(`${getPrefix()}/import_knowledge`, payload)
 }
 
-/** 获取知识库 MCP 配置详情，暂返回空配置供交互联调。 */
-const getKnowledgeMcpConfig = (knowledgeId: string): Promise<string> => {
-  // TODO 接入 MCP 配置查询接口，使用 knowledgeId 获取配置文本。
-  void knowledgeId
-  return Promise.resolve('')
-}
+/** 获取知识库外部检索服务生成的 MCP 连接配置。 */
+const getKnowledgeMcpConfig = (knowledgeId: string): Promise<string> =>
+  get<{ mcp_config: Record<string, unknown> }>(`${getPrefix()}/${knowledgeId}/external_service`).then(({ mcp_config }) =>
+    JSON.stringify(mcp_config, null, 2),
+  )
 
-/** 执行知识库分词索引，暂模拟成功供交互联调。 */
-const postKnowledgeKeywordIndex = (knowledgeId: string): Promise<void> => {
-  // TODO 接入分词索引接口，使用 knowledgeId 提交索引任务。
-  void knowledgeId
-  return Promise.resolve()
-}
+/** 提交知识库分词索引任务。 */
+const putKnowledgeKeywordIndex = (knowledgeId: string) => put<undefined, void>(`${getPrefix()}/${knowledgeId}/tokenize`)
 
 export default {
   getKnowledgeMcpConfig,
-  postKnowledgeKeywordIndex,
+  putKnowledgeKeywordIndex,
   exportKnowledgeExcel,
   exportKnowledgeZip,
   exportKnowledge,

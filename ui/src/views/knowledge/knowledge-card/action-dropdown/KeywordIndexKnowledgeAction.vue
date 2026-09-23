@@ -13,9 +13,9 @@ function handleKeywordIndex() {
   if (loading.value) return
   loading.value = true
   return props.api
-    .postKnowledgeKeywordIndex(props.knowledge.id)
+    .putKnowledgeKeywordIndex(props.knowledge.id)
     .then(() => {
-      MsgSuccess('操作成功')
+      MsgSuccess('提交成功')
     })
     .finally(() => {
       loading.value = false
