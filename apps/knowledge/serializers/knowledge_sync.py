@@ -10,12 +10,13 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from knowledge.models import Knowledge, KnowledgeSyncLog, KnowledgeSyncType, KnowledgeType
+from knowledge.models import Knowledge, KnowledgeSyncLog, KnowledgeSyncType, KnowledgeType, KnowledgeWorkflow
 from knowledge.services.knowledge_sync_schedule import (
     SCHEDULED_KNOWLEDGE_TYPES,
     deploy_knowledge_sync_job,
     normalize_knowledge_sync_setting,
 )
+from knowledge.services.workflow_sync_source import validate_workflow_sync_source
 
 
 class KnowledgeSyncSettingRequest(serializers.Serializer):
@@ -82,11 +83,16 @@ class KnowledgeSyncSettingOperationSerializer(serializers.Serializer):
         selected_knowledge = self.validated_data["knowledge"]
         if selected_knowledge.type == KnowledgeType.WORKFLOW and setting_serializer.validated_data["enabled"]:
             workflow_input = (selected_knowledge.meta or {}).get("workflow_sync_input") or {}
-            data_source = workflow_input.get("data_source") or {}
-            if not data_source:
-                raise serializers.ValidationError(_("Run the workflow once before enabling scheduled synchronization"))
-            if data_source.get("file_list"):
-                raise serializers.ValidationError(_("Local file data sources cannot be synchronized on a schedule"))
+            work_flow = (
+                QuerySet(KnowledgeWorkflow)
+                .filter(knowledge_id=selected_knowledge.id)
+                .values_list("work_flow", flat=True)
+                .first()
+            )
+            try:
+                validate_workflow_sync_source(work_flow, workflow_input)
+            except ValueError as exc:
+                raise serializers.ValidationError(_(str(exc))) from exc
         knowledge_id = selected_knowledge.id
         with transaction.atomic():
             knowledge = QuerySet(Knowledge).select_for_update().get(id=knowledge_id)

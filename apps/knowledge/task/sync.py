@@ -29,9 +29,11 @@ from knowledge.models import (
     KnowledgeSyncTrigger,
     KnowledgeSyncType,
     KnowledgeType,
+    KnowledgeWorkflow,
 )
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer
 from knowledge.services.document_cleanup import delete_document_data
+from knowledge.services.workflow_sync_source import validate_workflow_sync_source
 from knowledge.task.handler import (
     get_save_handler,
     get_sync_handler,
@@ -316,24 +318,12 @@ def scheduled_sync_workflow_knowledge(knowledge_id: str, sync_log_id: str | None
         else:
             QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(total_count=total_count)
         workflow_input = deepcopy(meta.get("workflow_sync_input") or {})
-        if not workflow_input.get("data_source"):
-            raise ValueError("Workflow knowledge has no saved synchronization input")
-        if workflow_input["data_source"].get("file_list"):
-            raise ValueError("Local file data sources cannot be synchronized on a schedule")
+        work_flow = (
+            QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge.id).values_list("work_flow", flat=True).first()
+        )
+        validate_workflow_sync_source(work_flow, workflow_input)
         if knowledge.user is None:
             raise ValueError("Workflow knowledge has no owner available for scheduled synchronization")
-        if sync_type == KnowledgeSyncType.COMPLETE:
-            document_ids = list(
-                QuerySet(Document)
-                .filter(
-                    knowledge_id=knowledge.id,
-                    type=KnowledgeType.WORKFLOW,
-                    resource_type=DocumentResourceType.DOCUMENT,
-                )
-                .values_list("id", flat=True)
-            )
-            delete_document_data(document_ids)
-            QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(deleted_count=len(document_ids))
         action = KnowledgeWorkflowActionSerializer(
             data={"workspace_id": knowledge.workspace_id, "knowledge_id": str(knowledge.id)}
         ).action(workflow_input, knowledge.user, True, str(sync_log.id))

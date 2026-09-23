@@ -5,12 +5,24 @@ from unittest.mock import MagicMock, patch
 from django.test import SimpleTestCase
 
 from application.workflow.nodes.ai_chat_node.ai_chat_node import AIChatNode, _get_upstream_knowledge_images
+from application.workflow.nodes.data_source_web_node.data_source_web_node import DataSourceWebNode
 from application.workflow.nodes.search_knowledge_node.search_knowledge_node import (
     _get_recalled_image_list,
     _record_recalled_items,
     _reset_paragraph,
 )
 from knowledge.models import SourceType
+from common.utils.fork import ChildLink, Fork
+
+
+class DataSourceWebNodeTests(SimpleTestCase):
+    def test_failed_web_fetch_fails_workflow_instead_of_returning_an_empty_snapshot(self):
+        node = DataSourceWebNode.__new__(DataSourceWebNode)
+        node._check_cancelled = MagicMock()
+        handler = node._get_collect_handler([])
+
+        with self.assertRaisesRegex(ValueError, "unavailable"):
+            handler(ChildLink("https://example.com", None), Fork.Response.error("unavailable"))
 
 
 class SearchKnowledgeNodeTests(SimpleTestCase):

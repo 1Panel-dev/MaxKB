@@ -20,6 +20,7 @@ from knowledge.models import (
     KnowledgeSyncTrigger,
     KnowledgeSyncType,
     KnowledgeType,
+    KnowledgeWorkflow,
     LocalState,
     Paragraph,
     ParagraphAsset,
@@ -78,7 +79,12 @@ from knowledge.services.retrieval_stats import (
     get_recall_tracker,
     record_recall,
 )
-from knowledge.services.workflow_sync import merge_workflow_incremental_snapshot, workflow_document_identity
+from knowledge.services.workflow_sync import (
+    finalize_workflow_complete_snapshot,
+    merge_workflow_incremental_snapshot,
+    workflow_document_identity,
+)
+from knowledge.services.workflow_sync_source import validate_workflow_sync_source
 from knowledge.task.handler import get_save_handler, get_sync_handler, normalize_web_url
 from knowledge.task.sync import (
     get_selector_list,
@@ -1200,6 +1206,56 @@ class KnowledgeScheduleTests(SimpleTestCase):
 
 
 class WorkflowKnowledgeScheduleTests(SimpleTestCase):
+    @patch("knowledge.services.workflow_sync._delete_workflow_documents")
+    @patch("knowledge.services.workflow_sync.QuerySet")
+    def test_complete_snapshot_replaces_old_only_after_success(self, query_set, delete_documents):
+        sync_log = MagicMock(knowledge_id="knowledge-id", create_time=timezone.now())
+        document_query = MagicMock()
+        new_query = MagicMock()
+        old_query = MagicMock()
+        new_query.values_list.return_value = ["new-id"]
+        old_query.values_list.return_value = ["old-id"]
+        document_query.filter.return_value = document_query
+        document_query.filter.side_effect = lambda **filters: (
+            new_query
+            if "create_time__gte" in filters
+            else old_query
+            if "create_time__lt" in filters
+            else document_query
+        )
+        document_query.count.return_value = 1
+        query_set.return_value = document_query
+        delete_documents.side_effect = lambda document_ids: list(document_ids)
+
+        success = finalize_workflow_complete_snapshot.__wrapped__(sync_log, True)
+        self.assertEqual(success["synced_count"], 1)
+        self.assertEqual(success["deleted_count"], 1)
+        delete_documents.assert_called_with(["old-id"])
+
+        failure = finalize_workflow_complete_snapshot.__wrapped__(sync_log, False)
+        self.assertEqual(failure["failed_count"], 1)
+        delete_documents.assert_called_with(["new-id"])
+
+    def test_schedule_accepts_web_and_tool_sources_but_rejects_local_source(self):
+        for node_type in ("data-source-web-node", "tool-lib-node"):
+            with self.subTest(node_type=node_type):
+                validate_workflow_sync_source(
+                    {"nodes": [{"id": "source", "type": node_type, "properties": {"kind": "data-source"}}]},
+                    {"data_source": {"node_id": "source", "source_url": "https://example.com"}},
+                )
+        with self.assertRaisesRegex(ValueError, "Local file"):
+            validate_workflow_sync_source(
+                {"nodes": [{"id": "source", "type": "data-source-local-node", "properties": {"kind": "data-source"}}]},
+                {"data_source": {"node_id": "source"}},
+            )
+        with self.assertRaisesRegex(ValueError, "no longer exists"):
+            validate_workflow_sync_source({"nodes": []}, {"data_source": {"node_id": "source"}})
+        with self.assertRaisesRegex(ValueError, "source URL"):
+            validate_workflow_sync_source(
+                {"nodes": [{"id": "source", "type": "data-source-web-node", "properties": {"kind": "data-source"}}]},
+                {"data_source": {"node_id": "source"}},
+            )
+
     @patch("knowledge.task.sync.KnowledgeWorkflowActionSerializer")
     @patch("knowledge.task.sync.KnowledgeSyncLog.objects.create")
     @patch("knowledge.task.sync.QuerySet")
@@ -1222,9 +1278,14 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         log_query.filter.return_value.exists.return_value = False
         document_query = MagicMock()
         document_query.filter.return_value.count.return_value = 1
+        workflow_query = MagicMock()
+        workflow_query.filter.return_value.values_list.return_value.first.return_value = {
+            "nodes": [{"id": "start-node", "type": "data-source-local-node", "properties": {"kind": "data-source"}}]
+        }
         query_set.side_effect = lambda model: {
             Knowledge: knowledge_query,
             KnowledgeSyncLog: log_query,
+            KnowledgeWorkflow: workflow_query,
         }.get(model, document_query)
         create_log.return_value = MagicMock(id="00000000-0000-0000-0000-000000000038")
 
@@ -1282,7 +1343,7 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
             meta={
                 "sync_setting": {"enabled": True, "sync_type": "incremental"},
                 "workflow_sync_input": {
-                    "data_source": {"node_id": "start-node"},
+                    "data_source": {"node_id": "start-node", "source_url": "https://example.com"},
                     "knowledge_base": {},
                 },
             },
@@ -1293,9 +1354,14 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         log_query.filter.return_value.exists.return_value = False
         document_query = MagicMock()
         document_query.filter.return_value.count.return_value = 2
+        workflow_query = MagicMock()
+        workflow_query.filter.return_value.values_list.return_value.first.return_value = {
+            "nodes": [{"id": "start-node", "type": "data-source-web-node", "properties": {"kind": "data-source"}}]
+        }
         query_set.side_effect = lambda model: {
             Knowledge: knowledge_query,
             KnowledgeSyncLog: log_query,
+            KnowledgeWorkflow: workflow_query,
         }.get(model, document_query)
         sync_log = MagicMock(id="00000000-0000-0000-0000-000000000028")
         create_log.return_value = sync_log
@@ -1304,13 +1370,26 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         self.assertTrue(scheduled_sync_workflow_knowledge.run(str(knowledge.id)))
 
         workflow_input = action_serializer.return_value.action.call_args.args[0]
-        self.assertEqual(workflow_input["data_source"], {"node_id": "start-node"})
+        self.assertEqual(workflow_input["data_source"], {"node_id": "start-node", "source_url": "https://example.com"})
         action_serializer.return_value.action.assert_called_once_with(
             workflow_input,
             knowledge.user,
             True,
             str(sync_log.id),
         )
+
+        knowledge.meta["sync_setting"]["sync_type"] = "complete"
+        with patch("knowledge.task.sync.delete_document_data") as delete_documents:
+            self.assertTrue(scheduled_sync_workflow_knowledge.run(str(knowledge.id)))
+        delete_documents.assert_not_called()
+
+        knowledge.meta["sync_setting"]["sync_type"] = "incremental"
+        knowledge.meta["workflow_sync_input"]["data_source"] = {"node_id": "start-node", "query": "updated"}
+        workflow_query.filter.return_value.values_list.return_value.first.return_value = {
+            "nodes": [{"id": "start-node", "type": "tool-lib-node", "properties": {"kind": "data-source"}}]
+        }
+        self.assertTrue(scheduled_sync_workflow_knowledge.run(str(knowledge.id)))
+        self.assertEqual(action_serializer.return_value.action.call_args.args[0]["data_source"]["query"], "updated")
 
     @patch("knowledge.serializers.knowledge_workflow.WorkflowRunRegistry")
     @patch("knowledge.serializers.knowledge_workflow.new_instance")

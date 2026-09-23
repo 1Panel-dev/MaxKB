@@ -63,6 +63,28 @@ def _delete_workflow_documents(document_ids) -> list[str]:
     return existing_ids
 
 
+@transaction.atomic
+def finalize_workflow_complete_snapshot(sync_log: KnowledgeSyncLog, success: bool) -> dict:
+    """Keep the old snapshot until a complete workflow run has succeeded."""
+    documents = QuerySet(Document).filter(
+        knowledge_id=sync_log.knowledge_id,
+        type=KnowledgeType.WORKFLOW,
+        resource_type=DocumentResourceType.DOCUMENT,
+    )
+    new_ids = list(documents.filter(create_time__gte=sync_log.create_time).values_list("id", flat=True))
+    old_ids = list(documents.filter(create_time__lt=sync_log.create_time).values_list("id", flat=True))
+    deleted_count = len(_delete_workflow_documents(old_ids if success else new_ids))
+    return {
+        "total_count": QuerySet(Document)
+        .filter(knowledge_id=sync_log.knowledge_id, resource_type=DocumentResourceType.DOCUMENT)
+        .count(),
+        "synced_count": len(new_ids) if success else 0,
+        "skipped_count": 0,
+        "deleted_count": deleted_count,
+        "failed_count": 0 if success else 1,
+    }
+
+
 def workflow_document_identity(document: Document) -> str:
     meta = document.meta or {}
     for field in DOCUMENT_IDENTITY_FIELDS:

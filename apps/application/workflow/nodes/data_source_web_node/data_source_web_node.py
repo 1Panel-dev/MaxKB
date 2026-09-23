@@ -51,16 +51,14 @@ class DataSourceWebNode(INode):
 
     def _get_collect_handler(self, document_list):
         def handler(child_link: ChildLink, response: Fork.Response):
-            if response.status == 200:
-                try:
-                    document_name = (
-                        child_link.tag.text
-                        if child_link.tag is not None and len(child_link.tag.text.strip()) > 0
-                        else child_link.url
-                    )
-                    document_list.append({"name": document_name.strip(), "content": response.content})
-                except Exception as e:
-                    maxkb_logger.error(f"{str(e)}:{traceback.format_exc()}")
+            if response.status != 200:
+                raise ValueError(response.message or f"Failed to fetch Web source: {child_link.url}")
+            document_name = (
+                child_link.tag.text
+                if child_link.tag is not None and len(child_link.tag.text.strip()) > 0
+                else child_link.url
+            )
+            document_list.append({"name": document_name.strip(), "content": response.content})
             # 已取消则抛出 CancelledException,由引擎结束流程
             self._check_cancelled()
 
@@ -88,6 +86,7 @@ class DataSourceWebNode(INode):
                     node_id=self.get_node_id(), error=str(e), traceback=traceback.format_exc()
                 )
             )
+            raise
 
         self.write_context("document_list", document_list)
         self.write_context("source_url", source_url)

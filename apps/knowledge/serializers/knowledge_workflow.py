@@ -53,7 +53,7 @@ from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.common import update_resource_mapping_by_knowledge
 from knowledge.serializers.knowledge_model import KnowledgeModelSerializer
 from knowledge.services.document_cleanup import delete_document_data
-from knowledge.services.workflow_sync import merge_workflow_incremental_snapshot
+from knowledge.services.workflow_sync import finalize_workflow_complete_snapshot, merge_workflow_incremental_snapshot
 from system_manage.models import AuthTargetType
 from system_manage.models.resource_mapping import ResourceType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
@@ -97,7 +97,9 @@ def finalize_knowledge_action(knowledge_action_id, state, run_time, sync_log_id=
     if sync_log_id is not None:
         sync_log = QuerySet(KnowledgeSyncLog).filter(id=sync_log_id).first()
         if sync_log is not None:
-            if (
+            if sync_log.sync_type == KnowledgeSyncType.COMPLETE:
+                stats = finalize_workflow_complete_snapshot(sync_log, state == State.SUCCESS)
+            elif (
                 state == State.SUCCESS
                 and sync_log.sync_type in {KnowledgeSyncType.INCREMENTAL, KnowledgeSyncType.REPLACE}
                 and document_cleanup is not None
