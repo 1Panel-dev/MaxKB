@@ -41,6 +41,11 @@ const searchFields: OptionItem<string>[] = [
       { label: '禁用', value: false },
     ],
   },
+  {
+    label: '用户来源',
+    value: 'source',
+    options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({ label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label, value })),
+  },
 ]
 const systemUserQuery = ref<Dict<unknown>>()
 
