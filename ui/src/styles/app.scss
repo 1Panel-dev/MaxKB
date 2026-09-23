@@ -166,6 +166,29 @@ h6 {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
 }
 
+/* conversation 生成input */
+.mk-conversation-input {
+  background: white;
+  border-radius: 16px;
+  padding: 12px;
+  .el-textarea__inner {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+}
+
+/* link */
+.mk-link {
+  color: var(--mk-primary);
+  cursor: pointer;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 /* radio */
 // 卡片内单选：文字在左，选择框在右并垂直居中。
 .mk-card-radio.el-radio {
@@ -205,16 +228,6 @@ h6 {
   .el-radio__input {
     flex-shrink: 0;
     margin-top: 3px;
-  }
-}
-
-/* link */
-.mk-link {
-  color: var(--mk-primary);
-  cursor: pointer;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
   }
 }
 

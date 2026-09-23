@@ -29,7 +29,7 @@ defineExpose({ open })
       <el-input v-model="config" :autosize="{ minRows: 8, maxRows: 24 }" disabled type="textarea" />
       <!-- 复制 MCP 配置 -->
       <el-button
-        class="group-hover-visible absolute right-3 top-3 z-10 h-8 shadow-md"
+        class="group-hover-visible absolute right-3 top-3 z-10 shadow-md"
         circle
         title="复制配置"
         :disabled="!config"

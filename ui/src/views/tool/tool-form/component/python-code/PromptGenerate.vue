@@ -196,7 +196,7 @@ onBeforeUnmount(() => abortController?.abort())
         />
         <div class="flex justify-end px-2 pb-2 pt-1">
           <!-- 停止生成提示词 -->
-          <el-button v-if="loading" class="input-action" circle type="primary" @click="stopGenerate">
+          <el-button v-if="loading" class="input-action" circle size="small" type="primary" @click="stopGenerate">
             <MkIcon name="icon_stop_filled" />
           </el-button>
           <!-- 发送主题并生成提示词 -->
@@ -204,6 +204,7 @@ onBeforeUnmount(() => abortController?.abort())
             v-else
             class="input-action"
             circle
+            size="small"
             type="primary"
             :disabled="!inputValue.trim() || !activeModelId || !applicationId"
             @click="generate()"
@@ -227,10 +228,8 @@ onBeforeUnmount(() => abortController?.abort())
   }
 
   .input-action {
-    height: calc(var(--spacing) * 6);
     min-height: 0;
     padding: 0;
-    width: calc(var(--spacing) * 6);
 
     &.is-disabled {
       background-color: var(--mk-N400);

@@ -444,6 +444,12 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 所有 `el-button` 的 `:active` 和 `.is-active` 视觉统一复用各自的 hover 样式，不额外加深背景、
 边框或文字颜色；普通、plain、text、link、circle 及各语义类型按钮均遵循该规则。
 
+圆形按钮统一使用 `circle`，通过 `size="small"`、默认尺寸、`size="large"` 分别选择
+24px、32px、40px，不在业务样式或工具类中重复设置对应的宽高。全局保留
+`.el-button.is-circle` 的 `height: var(--el-button-size, var(--el-component-size))`，抵消普通按钮的
+`height: auto`。Element Plus 默认尺寸未定义 `--el-button-size`，必须回退到 32px 的
+`--el-component-size`，避免高度由内容和内边距撑开；业务需要的内边距和禁用颜色单独保留。
+
 Tree 的 `.el-tree-node__content` 统一保留 4px 底部间距，使同级节点及展开后的父子节点行
 保持一致间距；规则维护在 `element-plus.scss` 的 tree 分组。
 
