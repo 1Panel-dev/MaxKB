@@ -10,13 +10,13 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'workspace-knowledge-list',
-        component: () => import('@/views/knowledge/KnowledgeView.vue'),
+        component: () => import('@/views/knowledge/index.vue'),
         meta: { title: '知识库列表', hidden: true },
       },
       {
         path: ':knowledgeId',
         name: 'workspace-knowledge-detail',
-        component: () => import('@/views/knowledge-detail/WorkspaceKnowledgeDetailView.vue'),
+        component: () => import('@/views/knowledge-detail/index.vue'),
         redirect: { name: 'workspace-knowledge-document-list' },
         meta: { title: '知识库详情', hidden: true, resourceDetailRoot: true },
         children: [
@@ -29,19 +29,19 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
               {
                 path: 'document',
                 name: 'workspace-knowledge-document-list',
-                component: () => import('@/views/knowledge-detail/document/DocumentListView.vue'),
+                component: () => import('@/views/knowledge-detail/document/index.vue'),
                 meta: { title: '文档', order: 10 },
               },
               {
                 path: 'image',
                 name: 'workspace-knowledge-image-list',
-                component: () => import('@/views/knowledge-detail/image/ImageListView.vue'),
+                component: () => import('@/views/knowledge-detail/image/index.vue'),
                 meta: { title: '图片', order: 20 },
               },
               {
                 path: 'tag',
                 name: 'workspace-knowledge-tag',
-                component: () => import('@/views/knowledge-detail/tag/TagManagementView.vue'),
+                component: () => import('@/views/knowledge-detail/tag/index.vue'),
                 meta: { title: '标签管理', order: 30 },
               },
             ],
@@ -61,19 +61,19 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
               {
                 path: 'recall',
                 name: 'workspace-knowledge-recall-test',
-                component: () => import('@/views/knowledge-detail/recall-test/RecallTestView.vue'),
+                component: () => import('@/views/knowledge-detail/recall-test/index.vue'),
                 meta: { title: '召回测试', order: 10 },
               },
               {
                 path: 'question',
                 name: 'workspace-knowledge-question',
-                component: () => import('@/views/knowledge-detail/question/QuestionListView.vue'),
+                component: () => import('@/views/knowledge-detail/question/index.vue'),
                 meta: { title: '问题', order: 20 },
               },
               {
                 path: 'dictionary',
                 name: 'workspace-knowledge-dictionary',
-                component: () => import('@/views/knowledge-detail/dictionary/DictionaryView.vue'),
+                component: () => import('@/views/knowledge-detail/dictionary/index.vue'),
                 meta: { title: '自定义分词', order: 30 },
               },
             ],
@@ -87,13 +87,13 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
               {
                 path: 'chat-user',
                 name: 'workspace-knowledge-chat-user',
-                component: () => import('@/views/knowledge-detail/chat-user/ChatUserListView.vue'),
+                component: () => import('@/views/knowledge-detail/chat-user/index.vue'),
                 meta: { title: '对话用户', order: 10 },
               },
               {
                 path: 'external-retrieval',
                 name: 'workspace-knowledge-external-retrieval',
-                component: () => import('@/views/knowledge-detail/external-retrieval/ExternalRetrievalView.vue'),
+                component: () => import('@/views/knowledge-detail/external-retrieval/index.vue'),
                 meta: { title: '外部检索服务', order: 20 },
               },
             ],
@@ -101,7 +101,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
           {
             path: 'setting',
             name: 'workspace-knowledge-setting',
-            component: () => import('@/views/knowledge-detail/setting/KnowledgeSettingView.vue'),
+            component: () => import('@/views/knowledge-detail/setting/index.vue'),
             meta: { title: '设置', icon: 'icon_setting', activeIcon: 'icon_setting_filled', order: 50 },
           },
           // {

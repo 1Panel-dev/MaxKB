@@ -46,7 +46,7 @@ Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当
 地址、登录成功和从 System 返回 Workspace 时统一进入 `/admin/workspace/default`。父路由的
 `scope` 会合并到匹配的子路由 `meta` 中。
 
-触发器列表地址为 `/admin/workspace/:workspaceId/trigger`，渲染 `views/trigger/TriggerView.vue`。
+触发器列表地址为 `/admin/workspace/:workspaceId/trigger`，渲染 `views/trigger/index.vue`。
 
 每个业务模块在 `admin/workspace/modules` 中独立维护。模块的列表、创建、详情、编辑等页面应放在同一个路由文件中。
 
@@ -60,7 +60,7 @@ System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。
 `users`（`system-chat-users`）。子路由还包括 `groups`
 （`system-chat-groups`）、`authentication`（`system-chat-authentication`）
 和 `portal-setting`（`system-portal-setting`），页面组件统一位于 `views/system/chat-management/`。
-门户访问设置渲染 `views/system/chat-management/portal-setting/PortalSettingView.vue`，提供门户访问
+门户访问设置渲染 `views/system/chat-management/portal-setting/index.vue`，提供门户访问
 配置和右侧界面预览。
 
 各子路由通过 `meta.resource` 向页面传入对应的后端资源类型。
@@ -85,7 +85,7 @@ Login、Workflow 路由没有挂载 `AppLayout`，因此不会出现在左侧导
 
 登录页面地址为 `/login`；忘记密码使用独立页面 `/forgot-password`，两者均复用登录布局且不挂载 `AppLayout`。
 
-Admin 使用末尾 catch-all 路由 `not-found` 渲染 `views/error/NotFoundView.vue`。直接访问不存在的
+Admin 使用末尾 catch-all 路由 `not-found` 渲染 `views/error/index.vue`。直接访问不存在的
 页面或 Admin API 返回需要全局处理的 404 时，统一进入该页面。
 
 ## Admin 导航拦截器
@@ -244,7 +244,7 @@ System 共享资源页面：
 /admin/system/share/tools
 ```
 
-`system-shared-tools` 渲染 `views/system/shared-resources/ToolSharedView.vue`，提供共享工具管理页面。
+`system-shared-tools` 渲染 `views/system/shared-resources/tool/index.vue`，提供共享工具管理页面。
 
 共享资源路由是 System 导航的一部分，继续在 `admin/system/index.ts` 的 `share` 子路由中维护。
 已实现的共享资源页面放在 `views/system/shared-resources/`，由页面处理 System 范围的查询和操作，
@@ -256,7 +256,7 @@ System 共享资源页面：
 {
   path: 'settings',
   name: 'system-settings',
-  component: () => import('@/views/system/SystemView.vue'),
+  component: () => import('@/views/system/index.vue'),
   meta: {
     title: '系统设置',
     icon: 'icon_setting',
@@ -281,7 +281,7 @@ System 共享资源页面：
     {
       path: 'users',
       name: 'system-users',
-      component: () => import('@/views/system/identity/users/UserListView.vue'),
+      component: () => import('@/views/system/identity/users/index.vue'),
       meta: {
         title: '用户管理',
         order: 10,
@@ -301,7 +301,7 @@ System 共享资源页面：
 {
   path: 'users/:id/edit',
   name: 'system-user-edit',
-  component: () => import('@/views/system/UserEditView.vue'),
+  component: () => import('@/views/system/user-edit/index.vue'),
   meta: {
     title: '编辑用户',
     hidden: true,
@@ -332,7 +332,7 @@ System 共享资源页面：
 检索优化使用 `/retrieval/recall`、`/retrieval/question`、`/retrieval/dictionary`；
 授权与集成使用 `/integration/chat-user`、`/integration/external-retrieval`。
 分组不挂载页面组件，直接访问分组时重定向到首个子页。新增七个页面暂为占位 View。`setting`
-渲染 `knowledge-detail/setting/KnowledgeSettingView.vue`，使用容器提供的知识库详情。`workflow-entry`
+渲染 `knowledge-detail/setting/index.vue`，使用容器提供的知识库详情。`workflow-entry`
 仅作为目录跳转入口，重定向到独立的 `workflow-knowledge` 全屏画布。画布返回知识库详情。
 文档详情路由当前尚未启用；后续接入时通过 `detailActiveMenu` 高亮“文档”。
 
@@ -360,7 +360,7 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 ### System 资源管理模型与工具
 
 `/system/resource/models`、`/system/resource/tools` 分别渲染
-`views/system/resource-management/ModelResourceView.vue` 和 `ToolResourceView.vue`，
+`views/system/resource-management/model/index.vue` 和 `tool/index.vue`，
 继承 `resourceScope: 'system-resource'`，保留原导航名称、顺序与权限。
 资源管理工具的全屏工作流使用 `system-resource-workflow-tool`，地址为
 `/system/resource/tool/:toolId/workflow`，在 `admin/workflow/index.ts`

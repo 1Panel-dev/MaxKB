@@ -12,19 +12,19 @@ export const applicationRoutes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'workspace-application-list',
-        component: () => import('@/views/application/ApplicationView.vue'),
+        component: () => import('@/views/application/index.vue'),
         meta: { title: '智能体列表', hidden: true },
       },
       {
         path: ':applicationId/:type',
         name: 'workspace-application-detail-layout',
-        component: () => import('@/views/application-detail/WorkspaceApplicationDetail.vue'),
+        component: () => import('@/views/application-detail/index.vue'),
         meta: { title: '智能体详情', hidden: true, resourceDetailRoot: true },
         children: [
           {
             path: 'overview',
             name: 'workspace-application-overview',
-            component: () => import('@/views/application-detail/overview/OverviewView.vue'),
+            component: () => import('@/views/application-detail/overview/index.vue'),
             meta: {
               title: '概览',
               icon: 'icon_screen_outlined',
@@ -36,7 +36,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
           {
             path: 'setting',
             name: 'workspace-application-simple-setting',
-            component: () => import('@/views/application-detail/setting/SimpleSettingView.vue'),
+            component: () => import('@/views/application-detail/setting/index.vue'),
             meta: {
               title: '设置',
               icon: 'icon_setting',
@@ -67,19 +67,19 @@ export const applicationRoutes: RouteRecordRaw[] = [
           {
             path: 'integration',
             name: 'workspace-application-integration',
-            component: () => import('@/views/application-detail/integration/IntegrationView.vue'),
+            component: () => import('@/views/application-detail/integration/index.vue'),
             meta: { title: '接入第三方', icon: 'icon_dataset_outlined', activeIcon: 'icon_dataset_filled', order: 30 },
           },
           {
             path: 'chat-user',
             name: 'workspace-application-chat-user',
-            component: () => import('@/views/application-detail/chat-user/ChatUserListView.vue'),
+            component: () => import('@/views/application-detail/chat-user/index.vue'),
             meta: { title: '对话用户', icon: 'icon_contacts_outlined', activeIcon: 'icon_contacts_outlined', order: 40 },
           },
           {
             path: 'operation-log',
             name: 'workspace-application-operation-log',
-            component: () => import('@/views/application-detail/operation-log/OperationLogView.vue'),
+            component: () => import('@/views/application-detail/operation-log/index.vue'),
             meta: { title: '操作日志', icon: 'icon_logs_outlined', activeIcon: 'icon_logs_filled', order: 50 },
           },
         ],

@@ -5,33 +5,33 @@ export const workflowRoutes: RouteRecordRaw[] = [
   {
     path: '/workspace/:workspaceId/application/:applicationId/workflow',
     name: 'workflow-application',
-    component: () => import('@/views/workflow/application/ApplicationWorkflowView.vue'),
+    component: () => import('@/views/workflow/application/index.vue'),
     meta: { title: '智能体工作流', resourceScope: 'workspace' },
   },
   {
     path: '/workspace/:workspaceId/tool/:toolId/workflow',
     name: 'workflow-tool',
-    component: () => import('@/views/workflow/tool/ToolWorkflowView.vue'),
+    component: () => import('@/views/workflow/tool/index.vue'),
     meta: { title: '工具工作流', resourceScope: 'workspace' },
   },
 
   {
     path: '/system/resource/tool/:toolId/workflow',
     name: 'system-resource-workflow-tool',
-    component: () => import('@/views/workflow/tool/ToolWorkflowView.vue'),
+    component: () => import('@/views/workflow/tool/index.vue'),
     meta: { title: '工具工作流', resourceScope: 'system-resource' },
   },
   {
     path: '/system/shared/tool/:toolId/workflow',
     name: 'system-shared-workflow-tool',
-    component: () => import('@/views/workflow/tool/ToolWorkflowView.vue'),
+    component: () => import('@/views/workflow/tool/index.vue'),
     meta: { title: '工具工作流', resourceScope: 'system-shared' },
   },
 
   {
     path: '/workspace/:workspaceId/knowledge/:knowledgeId/workflow',
     name: 'workflow-knowledge',
-    component: () => import('@/views/workflow/knowledge/KnowledgeWorkflowView.vue'),
+    component: () => import('@/views/workflow/knowledge/index.vue'),
     meta: { title: '知识库工作流', resourceScope: 'workspace' },
   },
 ]
