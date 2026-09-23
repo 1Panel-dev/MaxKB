@@ -97,6 +97,7 @@ class KnowledgeSyncStatus(models.TextChoices):
     RUNNING = "running", "同步中"
     SUCCESS = "success", "同步成功"
     FAILURE = "failure", "同步失败"
+    SKIPPED = "skipped", "已跳过"
 
 
 class KnowledgeSyncTrigger(models.TextChoices):

@@ -18,4 +18,20 @@ class Migration(migrations.Migration):
             name="external_service",
             field=models.JSONField(default=default_external_service, verbose_name="外部检索服务"),
         ),
+        migrations.AlterField(
+            model_name="knowledgesynclog",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("running", "同步中"),
+                    ("success", "同步成功"),
+                    ("failure", "同步失败"),
+                    ("skipped", "已跳过"),
+                ],
+                db_index=True,
+                default="running",
+                max_length=16,
+                verbose_name="同步状态",
+            ),
+        ),
     ]

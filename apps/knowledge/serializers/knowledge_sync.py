@@ -10,7 +10,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from knowledge.models import Knowledge, KnowledgeSyncLog, KnowledgeSyncType
+from knowledge.models import Knowledge, KnowledgeSyncLog, KnowledgeSyncType, KnowledgeType
 from knowledge.services.knowledge_sync_schedule import (
     SCHEDULED_KNOWLEDGE_TYPES,
     deploy_knowledge_sync_job,
@@ -22,14 +22,13 @@ class KnowledgeSyncSettingRequest(serializers.Serializer):
     enabled = serializers.BooleanField(required=True, label=_("Enable scheduled synchronization"))
     schedule_type = serializers.ChoiceField(
         required=True,
-        choices=["daily", "cron"],
+        choices=["daily", "weekly", "monthly", "interval", "cron"],
         label=_("Schedule type"),
     )
-    time = serializers.RegexField(
-        required=False,
-        regex=r"^([01]\d|2[0-3]):([0-5]\d)$",
-        label=_("Daily synchronization time"),
-    )
+    time = serializers.JSONField(required=False, label=_("Synchronization time"))
+    days = serializers.ListField(required=False, child=serializers.IntegerField())
+    interval_unit = serializers.ChoiceField(required=False, choices=["minutes", "hours"])
+    interval_value = serializers.IntegerField(required=False)
     cron_expression = serializers.CharField(required=False, allow_blank=False, label=_("Cron expression"))
     sync_type = serializers.ChoiceField(
         required=True,
@@ -38,9 +37,14 @@ class KnowledgeSyncSettingRequest(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        if attrs["schedule_type"] == "daily" and not attrs.get("time"):
-            raise serializers.ValidationError({"time": _("This field is required for a daily schedule")})
-        if attrs["schedule_type"] == "cron" and not attrs.get("cron_expression"):
+        schedule_type = attrs["schedule_type"]
+        if schedule_type in {"daily", "weekly", "monthly"} and not attrs.get("time"):
+            raise serializers.ValidationError({"time": _("This field is required for a scheduled time")})
+        if schedule_type in {"weekly", "monthly"} and not attrs.get("days"):
+            raise serializers.ValidationError({"days": _("This field is required for a weekly or monthly schedule")})
+        if schedule_type == "interval" and (not attrs.get("interval_unit") or attrs.get("interval_value") is None):
+            raise serializers.ValidationError({"interval_value": _("An interval unit and value are required")})
+        if schedule_type == "cron" and not attrs.get("cron_expression"):
             raise serializers.ValidationError({"cron_expression": _("This field is required for a Cron schedule")})
         try:
             return normalize_knowledge_sync_setting(attrs)
@@ -75,7 +79,15 @@ class KnowledgeSyncSettingOperationSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         setting_serializer = KnowledgeSyncSettingRequest(data=setting)
         setting_serializer.is_valid(raise_exception=True)
-        knowledge_id = self.validated_data["knowledge"].id
+        selected_knowledge = self.validated_data["knowledge"]
+        if selected_knowledge.type == KnowledgeType.WORKFLOW and setting_serializer.validated_data["enabled"]:
+            workflow_input = (selected_knowledge.meta or {}).get("workflow_sync_input") or {}
+            data_source = workflow_input.get("data_source") or {}
+            if not data_source:
+                raise serializers.ValidationError(_("Run the workflow once before enabling scheduled synchronization"))
+            if data_source.get("file_list"):
+                raise serializers.ValidationError(_("Local file data sources cannot be synchronized on a schedule"))
+        knowledge_id = selected_knowledge.id
         with transaction.atomic():
             knowledge = QuerySet(Knowledge).select_for_update().get(id=knowledge_id)
             knowledge.meta = {**(knowledge.meta or {}), "sync_setting": setting_serializer.validated_data}

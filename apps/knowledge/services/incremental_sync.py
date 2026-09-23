@@ -76,12 +76,20 @@ class MergeResult:
 
 
 class IncrementalDocumentSync:
-    def __init__(self, document: Document, strategy: Optional[Dict] = None, *, source_authoritative: bool = False):
+    def __init__(
+        self,
+        document: Document,
+        strategy: Optional[Dict] = None,
+        *,
+        source_authoritative: bool = False,
+        replace_content: bool = False,
+    ):
         self.document = document
         self.strategy = normalize_document_strategy(strategy if strategy is not None else document.doc_strategy)
         # Lark follows source updates/deletes; other connectors retain three-way conflict handling.
         # Neither policy may overwrite manually created paragraphs.
         self.source_authoritative = source_authoritative
+        self.replace_content = replace_content
 
     @staticmethod
     def _snapshot(item: Dict) -> Dict:
@@ -122,9 +130,12 @@ class IncrementalDocumentSync:
     def _merge_matched(self, paragraph: Paragraph, remote: Dict, result: MergeResult):
         if self.source_authoritative:
             # An unchanged source chunk must not overwrite a user's local edits.
-            if (paragraph.source_hash or paragraph_hash(paragraph.title, paragraph.content)) == remote[
-                "source_hash"
-            ] and paragraph.sync_state != SyncState.REMOTE_DELETED:
+            if (
+                not self.replace_content
+                and (paragraph.source_hash or paragraph_hash(paragraph.title, paragraph.content))
+                == remote["source_hash"]
+                and paragraph.sync_state != SyncState.REMOTE_DELETED
+            ):
                 updated_fields = []
                 if paragraph.source_key != remote["source_key"]:
                     paragraph.source_key = remote["source_key"]

@@ -981,7 +981,7 @@ class WebKnowledgeSyncTaskTests(SimpleTestCase):
 
 
 class KnowledgeScheduleTests(SimpleTestCase):
-    def test_daily_setting_is_normalized_to_cron(self):
+    def test_daily_setting_uses_trigger_schedule_fields(self):
         serializer = KnowledgeSyncSettingRequest(
             data={
                 "enabled": True,
@@ -992,7 +992,38 @@ class KnowledgeScheduleTests(SimpleTestCase):
         )
 
         self.assertTrue(serializer.is_valid(), serializer.errors)
-        self.assertEqual(serializer.validated_data["cron_expression"], "30 1 * * *")
+        self.assertEqual(
+            serializer.validated_data,
+            {
+                "enabled": True,
+                "schedule_type": "daily",
+                "time": ["01:30"],
+                "sync_type": "incremental",
+            },
+        )
+
+    def test_only_active_trigger_schedule_fields_are_returned(self):
+        self.assertEqual(
+            normalize_knowledge_sync_setting(
+                {
+                    "enabled": True,
+                    "schedule_type": "interval",
+                    "interval_unit": "minutes",
+                    "interval_value": 5,
+                    "time": ["01:00"],
+                    "days": [1],
+                    "cron_expression": "0 1 * * *",
+                    "sync_type": "replace",
+                }
+            ),
+            {
+                "enabled": True,
+                "schedule_type": "interval",
+                "interval_unit": "minutes",
+                "interval_value": 5,
+                "sync_type": "replace",
+            },
+        )
 
     def test_custom_cron_is_validated(self):
         self.assertEqual(
@@ -1016,6 +1047,25 @@ class KnowledgeScheduleTests(SimpleTestCase):
         )
         self.assertFalse(serializer.is_valid())
         self.assertIn("non_field_errors", serializer.errors)
+
+    def test_preset_periods_and_minimum_interval(self):
+        for setting in [
+            {"schedule_type": "weekly", "days": [1], "time": ["01:00"]},
+            {"schedule_type": "monthly", "days": [31], "time": ["01:00"]},
+            {"schedule_type": "interval", "interval_unit": "hours", "interval_value": 1},
+            {"schedule_type": "interval", "interval_unit": "minutes", "interval_value": 5},
+        ]:
+            with self.subTest(setting=setting):
+                serializer = KnowledgeSyncSettingRequest(data={"enabled": True, "sync_type": "incremental", **setting})
+                self.assertTrue(serializer.is_valid(), serializer.errors)
+        for setting in [
+            {"schedule_type": "interval", "interval_unit": "minutes", "interval_value": 4},
+            {"schedule_type": "cron", "cron_expression": "*/4 * * * *"},
+            {"schedule_type": "daily", "time": ["01:00", "01:03"]},
+        ]:
+            with self.subTest(setting=setting):
+                serializer = KnowledgeSyncSettingRequest(data={"enabled": True, "sync_type": "incremental", **setting})
+                self.assertFalse(serializer.is_valid())
 
     @patch("knowledge.services.knowledge_sync_schedule._get_scheduler")
     @patch("knowledge.services.knowledge_sync_schedule.QuerySet")
@@ -1078,35 +1128,111 @@ class KnowledgeScheduleTests(SimpleTestCase):
                 self.assertFalse(serializer.get_setting()["enabled"])
 
     @patch("knowledge.task.sync.celery_app.send_task")
+    @patch("knowledge.task.sync.KnowledgeSyncLog.objects.create")
     @patch("knowledge.task.sync.QuerySet")
-    def test_generic_scheduled_entry_dispatches_lark_task(self, query_set, send_task):
+    def test_generic_scheduled_entry_dispatches_lark_task(self, query_set, create_log, send_task):
         knowledge = MagicMock(
             id="00000000-0000-0000-0000-000000000025",
             type=KnowledgeType.LARK,
+            workspace_id="workspace-id",
             meta={"sync_setting": {"enabled": True}},
         )
-        query_set.return_value.filter.return_value.first.return_value = knowledge
+        knowledge_query = MagicMock()
+        knowledge_query.select_for_update.return_value.filter.return_value.first.return_value = knowledge
+        log_query = MagicMock()
+        log_query.filter.return_value.exists.return_value = False
+        query_set.side_effect = lambda model: knowledge_query if model is Knowledge else log_query
+        sync_log = MagicMock(id="00000000-0000-0000-0000-000000000030")
+        create_log.return_value = sync_log
 
-        self.assertTrue(scheduled_sync_knowledge.run(str(knowledge.id)))
+        with patch("knowledge.task.sync.transaction.atomic", return_value=nullcontext()):
+            self.assertTrue(scheduled_sync_knowledge.run(str(knowledge.id)))
 
-        send_task.assert_called_once_with("celery:scheduled_sync_lark_knowledge", args=[str(knowledge.id)])
+        send_task.assert_called_once_with(
+            "celery:scheduled_sync_lark_knowledge", args=[str(knowledge.id), str(sync_log.id)]
+        )
+        self.assertEqual(create_log.call_args.kwargs["status"], KnowledgeSyncStatus.RUNNING)
 
     @patch("knowledge.task.sync.scheduled_sync_workflow_knowledge.delay")
+    @patch("knowledge.task.sync.KnowledgeSyncLog.objects.create")
     @patch("knowledge.task.sync.QuerySet")
-    def test_generic_scheduled_entry_dispatches_workflow_task(self, query_set, delay):
+    def test_generic_scheduled_entry_dispatches_workflow_task(self, query_set, create_log, delay):
         knowledge = MagicMock(
             id="00000000-0000-0000-0000-000000000026",
             type=KnowledgeType.WORKFLOW,
+            workspace_id="workspace-id",
             meta={"sync_setting": {"enabled": True}},
         )
-        query_set.return_value.filter.return_value.first.return_value = knowledge
+        knowledge_query = MagicMock()
+        knowledge_query.select_for_update.return_value.filter.return_value.first.return_value = knowledge
+        log_query = MagicMock()
+        log_query.filter.return_value.exists.return_value = False
+        query_set.side_effect = lambda model: knowledge_query if model is Knowledge else log_query
+        sync_log = MagicMock(id="00000000-0000-0000-0000-000000000031")
+        create_log.return_value = sync_log
 
-        self.assertTrue(scheduled_sync_knowledge.run(str(knowledge.id)))
+        with patch("knowledge.task.sync.transaction.atomic", return_value=nullcontext()):
+            self.assertTrue(scheduled_sync_knowledge.run(str(knowledge.id)))
 
-        delay.assert_called_once_with(str(knowledge.id))
+        delay.assert_called_once_with(str(knowledge.id), str(sync_log.id))
+
+    @patch("knowledge.task.sync.celery_app.send_task")
+    @patch("knowledge.task.sync.KnowledgeSyncLog.objects.create")
+    @patch("knowledge.task.sync.QuerySet")
+    def test_overlapping_schedule_is_skipped_with_a_log(self, query_set, create_log, send_task):
+        knowledge = MagicMock(
+            id="00000000-0000-0000-0000-000000000032",
+            type=KnowledgeType.LARK,
+            workspace_id="workspace-id",
+            meta={"sync_setting": {"enabled": True, "sync_type": "incremental"}},
+        )
+        knowledge_query = MagicMock()
+        knowledge_query.select_for_update.return_value.filter.return_value.first.return_value = knowledge
+        log_query = MagicMock()
+        log_query.filter.return_value.exists.return_value = True
+        query_set.side_effect = lambda model: knowledge_query if model is Knowledge else log_query
+
+        with patch("knowledge.task.sync.transaction.atomic", return_value=nullcontext()):
+            self.assertFalse(scheduled_sync_knowledge.run(str(knowledge.id)))
+
+        self.assertEqual(create_log.call_args.kwargs["status"], KnowledgeSyncStatus.SKIPPED)
+        send_task.assert_not_called()
 
 
 class WorkflowKnowledgeScheduleTests(SimpleTestCase):
+    @patch("knowledge.task.sync.KnowledgeWorkflowActionSerializer")
+    @patch("knowledge.task.sync.KnowledgeSyncLog.objects.create")
+    @patch("knowledge.task.sync.QuerySet")
+    def test_local_file_input_is_not_scheduled(self, query_set, create_log, action_serializer):
+        knowledge = MagicMock(
+            id="00000000-0000-0000-0000-000000000037",
+            workspace_id="workspace-id",
+            type=KnowledgeType.WORKFLOW,
+            user=MagicMock(),
+            meta={
+                "sync_setting": {"enabled": True, "sync_type": "incremental"},
+                "workflow_sync_input": {
+                    "data_source": {"node_id": "start-node", "file_list": [{"file_id": "file-id"}]}
+                },
+            },
+        )
+        knowledge_query = MagicMock()
+        knowledge_query.filter.return_value.first.return_value = knowledge
+        log_query = MagicMock()
+        log_query.filter.return_value.exists.return_value = False
+        document_query = MagicMock()
+        document_query.filter.return_value.count.return_value = 1
+        query_set.side_effect = lambda model: {
+            Knowledge: knowledge_query,
+            KnowledgeSyncLog: log_query,
+        }.get(model, document_query)
+        create_log.return_value = MagicMock(id="00000000-0000-0000-0000-000000000038")
+
+        self.assertFalse(scheduled_sync_workflow_knowledge.run(str(knowledge.id)))
+
+        action_serializer.assert_not_called()
+        self.assertEqual(log_query.filter.return_value.update.call_args.kwargs["status"], KnowledgeSyncStatus.FAILURE)
+
     @patch("knowledge.serializers.knowledge_workflow.merge_workflow_incremental_snapshot")
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
     def test_incremental_workflow_uses_stable_snapshot_merge(self, query_set, merge_workflow_snapshot):
@@ -1373,6 +1499,29 @@ class IncrementalSyncTests(SimpleTestCase):
         self.assertEqual(paragraph.content, "local edit")
         paragraph.save.assert_not_called()
         self.assertEqual(result.unchanged_ids, [str(paragraph.id)])
+
+    def test_replace_content_overwrites_local_edit_with_unchanged_source_hash(self):
+        service = IncrementalDocumentSync(Document(), source_authoritative=True, replace_content=True)
+        remote = prepare_remote_paragraphs([{"title": "Title", "content": "base"}])[0]
+        paragraph = Paragraph(
+            title="Title",
+            content="local edit",
+            source_key=remote["source_key"],
+            source_hash=remote["source_hash"],
+            origin=ContentOrigin.SYNCED,
+            local_state=LocalState.MODIFIED,
+            hit_num=7,
+        )
+        paragraph.save = MagicMock()
+        result = MergeResult()
+
+        service._merge_matched(paragraph, remote, result)
+
+        self.assertEqual(paragraph.content, "base")
+        self.assertEqual(paragraph.hit_num, 7)
+        self.assertEqual(paragraph.local_state, LocalState.CLEAN)
+        self.assertEqual(result.updated_ids, [str(paragraph.id)])
+        paragraph.save.assert_called_once()
 
     def test_source_authoritative_custom_child_length_rechunks_unchanged_content(self):
         service = IncrementalDocumentSync(
@@ -1740,6 +1889,7 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
         sync_log = MagicMock(
             knowledge_id="00000000-0000-0000-0000-000000000081",
             create_time=timezone.now(),
+            sync_type=KnowledgeSyncType.INCREMENTAL,
         )
         old_document = MagicMock(
             id="00000000-0000-0000-0000-000000000082",
@@ -1805,10 +1955,43 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
 
         stats = merge_workflow_incremental_snapshot.__wrapped__(sync_log)
 
-        incremental_sync.assert_called_once_with(old_document, new_document.doc_strategy)
+        incremental_sync.assert_called_once_with(
+            old_document, new_document.doc_strategy, source_authoritative=False, replace_content=False
+        )
         delete_documents.assert_called_once_with([str(new_document.id)])
         self.assertEqual(old_document.id, "00000000-0000-0000-0000-000000000082")
         self.assertEqual(stats["skipped_count"], 1)
+
+    @patch("knowledge.services.workflow_sync._delete_workflow_documents")
+    @patch("knowledge.services.workflow_sync.QuerySet")
+    def test_replace_snapshot_keeps_unmatched_old_documents(self, query_set, delete_documents):
+        sync_log = MagicMock(
+            knowledge_id="00000000-0000-0000-0000-000000000091",
+            create_time=timezone.now(),
+            sync_type=KnowledgeSyncType.REPLACE,
+        )
+        old_document = Document(id="00000000-0000-0000-0000-000000000092", name="Old", meta={})
+        new_document = Document(id="00000000-0000-0000-0000-000000000093", name="New", meta={})
+        document_query = MagicMock()
+
+        def filter_documents(**kwargs):
+            result = MagicMock()
+            if "create_time__gte" in kwargs:
+                result.__iter__.return_value = iter([new_document])
+            elif "create_time__lt" in kwargs:
+                result.__iter__.return_value = iter([old_document])
+            else:
+                result.count.return_value = 2
+            return result
+
+        document_query.filter.side_effect = filter_documents
+        query_set.side_effect = lambda model: document_query if model is Document else MagicMock()
+
+        stats = merge_workflow_incremental_snapshot.__wrapped__(sync_log)
+
+        delete_documents.assert_not_called()
+        self.assertEqual(stats["deleted_count"], 0)
+        self.assertEqual(stats["synced_count"], 1)
 
     @patch("knowledge.services.paragraph_assets._write_asset_description")
     def test_visual_failure_preserves_existing_text_as_description(self, write_description):

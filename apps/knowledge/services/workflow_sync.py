@@ -14,6 +14,7 @@ from knowledge.models import (
     FileSourceType,
     Knowledge,
     KnowledgeSyncLog,
+    KnowledgeSyncType,
     KnowledgeType,
     Paragraph,
     Problem,
@@ -151,7 +152,13 @@ def merge_workflow_incremental_snapshot(sync_log: KnowledgeSyncLog) -> dict:
                     for paragraph in source_paragraphs
                 ]
             )
-            result = IncrementalDocumentSync(old_document, new_document.doc_strategy).merge(remote_paragraphs)
+            replace_content = sync_log.sync_type == KnowledgeSyncType.REPLACE
+            result = IncrementalDocumentSync(
+                old_document,
+                new_document.doc_strategy,
+                source_authoritative=replace_content,
+                replace_content=replace_content,
+            ).merge(remote_paragraphs)
             changed_paragraphs = QuerySet(Paragraph).filter(id__in=result.reembed_ids)
             assets = sync_paragraph_assets(changed_paragraphs, old_document.visual_strategy_hash)
             process_visual_assets(assets, old_document.doc_strategy)
@@ -199,7 +206,7 @@ def merge_workflow_incremental_snapshot(sync_log: KnowledgeSyncLog) -> dict:
     # A successful workflow run represents a complete output snapshot. Remove old generated
     # documents that were not emitted this time, but never touch standalone image resources.
     deleted_count = 0
-    if new_documents and failed_count == 0:
+    if new_documents and failed_count == 0 and sync_log.sync_type != KnowledgeSyncType.REPLACE:
         stale_ids = [str(document.id) for document in old_documents if document.id not in matched_old_ids]
         if stale_ids:
             deleted_count = len(_delete_workflow_documents(stale_ids))

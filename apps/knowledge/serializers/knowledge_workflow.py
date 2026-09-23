@@ -99,7 +99,7 @@ def finalize_knowledge_action(knowledge_action_id, state, run_time, sync_log_id=
         if sync_log is not None:
             if (
                 state == State.SUCCESS
-                and sync_log.sync_type == KnowledgeSyncType.INCREMENTAL
+                and sync_log.sync_type in {KnowledgeSyncType.INCREMENTAL, KnowledgeSyncType.REPLACE}
                 and document_cleanup is not None
             ):
                 stats = merge_workflow_incremental_snapshot(sync_log)
