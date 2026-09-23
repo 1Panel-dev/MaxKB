@@ -51,7 +51,7 @@ onMounted(() =>
               <MkIcon name="icon_creat-robot_colorful" :size="24" />
               <div class="min-w-0 flex-1">
                 <h6>创建智能体</h6>
-                <p class="text-sm text-N600">从模板或空白创建</p>
+                <p class="text-sm text-N600">手动搭建、AI 生成或导入创建</p>
               </div>
               <MkIcon name="icon_down_outlined" />
             </div>
@@ -66,7 +66,7 @@ onMounted(() =>
               <MkIcon name="icon_creat-book_colorful" :size="24" />
               <div class="min-w-0 flex-1">
                 <h6>创建知识库</h6>
-                <p class="text-sm text-N600">上传文档或 web 站点</p>
+                <p class="text-sm text-N600">从本地文档、web网站等多来源创建</p>
               </div>
               <MkIcon name="icon_down_outlined" />
             </div>
@@ -81,7 +81,7 @@ onMounted(() =>
               <MkIcon name="icon_creat-busy_colorful" :size="24" />
               <div class="min-w-0 flex-1">
                 <h6>创建工具</h6>
-                <p class="text-sm text-N600">脚本工具或工作流工具</p>
+                <p class="text-sm text-N600">创建或接入脚本、工作流、MCP 等工具</p>
               </div>
               <MkIcon name="icon_down_outlined" />
             </div>
@@ -97,7 +97,7 @@ onMounted(() =>
               <MkIcon name="icon_creat-model_colorful" :size="24" />
               <div class="min-w-0 flex-1">
                 <h6>添加模型</h6>
-                <p class="text-sm text-N600">配置大语言/向量等模型</p>
+                <p class="text-sm text-N600">配置大语言、向量等模型</p>
               </div>
             </div>
           </el-card>

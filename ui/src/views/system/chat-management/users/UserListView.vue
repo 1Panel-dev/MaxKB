@@ -208,10 +208,16 @@ onMounted(() => loadChatUsers())
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center gap-3">
-              <span @click.stop>
-                <el-switch v-model="row.is_active" size="small" :disabled="!perm.system.chatUser.edit()" :before-change="() => handleChangeStatus(row)" />
-              </span>
+              <!-- 修改状态 -->
+              <el-switch
+                v-model="row.is_active"
+                size="small"
+                :disabled="!perm.system.chatUser.edit()"
+                :before-change="() => handleChangeStatus(row)"
+              />
+
               <el-divider direction="vertical" />
+
               <div class="flex">
                 <!-- 编辑 -->
                 <MkTooltip content="编辑" placement="top" v-if="perm.system.chatUser.edit()">
@@ -240,9 +246,17 @@ onMounted(() => loadChatUsers())
 
         <template #footer-batch-actions>
           <!-- 批量设置用户组 -->
-          <ButtonBatchSetUserGroup v-if="perm.system.chatUser.userGroup()" :user-ids="batchSelectedUsers.map(({ id }) => id)" @refresh="loadChatUsers(false)" />
+          <ButtonBatchSetUserGroup
+            v-if="perm.system.chatUser.userGroup()"
+            :user-ids="batchSelectedUsers.map(({ id }) => id)"
+            @refresh="loadChatUsers(false)"
+          />
           <!-- 批量配额设置-->
-          <ButtonQuotaSettings v-if="perm.system.chatUser.quotaSetting()" :user-ids="batchSelectedUsers.map(({ id }) => id)" @refresh="loadChatUsers()" />
+          <ButtonQuotaSettings
+            v-if="perm.system.chatUser.quotaSetting()"
+            :user-ids="batchSelectedUsers.map(({ id }) => id)"
+            @refresh="loadChatUsers()"
+          />
           <!-- 批量删除-->
           <el-button v-if="perm.system.chatUser.delete()" type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
