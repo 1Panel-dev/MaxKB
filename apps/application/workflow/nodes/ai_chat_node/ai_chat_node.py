@@ -339,7 +339,7 @@ class AIChatNode(INode):
             chat_id,
             workspace_id,
             workflow_type,
-            is_result,
+            is_result=is_result,
         )
         if not mcp_handled:
             message_list_with_system = [SystemMessage(system)] + message_list
@@ -490,7 +490,6 @@ class AIChatNode(INode):
         chat_id,
         workspace_id,
         workflow_type,
-        text_content_id,
         is_result=False,
     ):
         # 工具记录来源（source_type / source_id）
@@ -515,7 +514,7 @@ class AIChatNode(INode):
         if tools or mcp_servers_config or skill_tool_ids:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
             # 使用可变状态在回调间共享（answer 累积、当前文本 content id、工具 content id 映射）
-            state = {"answer": "", "text_id": text_content_id, "tool_id_map": {}}
+            state = {"answer": ""}
             tool_stream = ToolCallStreamManagement()
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
 
@@ -592,6 +591,7 @@ class AIChatNode(INode):
                         )
                     )
                 else:
+                    state["answer"] = state["answer"] + chunk.content
                     if is_result and chunk.content:
                         self.write(
                             TextContent(
