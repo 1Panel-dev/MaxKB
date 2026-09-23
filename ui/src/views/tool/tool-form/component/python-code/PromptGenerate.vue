@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, reactive, ref, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Loading } from '@element-plus/icons-vue'
+import { Loading, Top } from '@element-plus/icons-vue'
 import type { ScrollbarInstance } from 'element-plus'
-import ChatInput from '@/conversation-panel/chat-input/index.vue'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import SelectModel from '@/components/business/select-model/index.vue'
 import type { ModelItem, ModelProviderItem, PromptGenerateMessage, PromptGeneratePayload } from '@/api/types'
@@ -29,7 +28,6 @@ const PROMPT_TEMPLATE = `请根据用户描述生成一个完整的 AI 角色人
 const visible = ref(false)
 const loading = ref(false)
 const inputValue = ref('')
-const chatInputRef = useTemplateRef<InstanceType<typeof ChatInput>>('chatInputRef')
 
 const applicationId = ref('')
 const activeModelId = ref('')
@@ -110,7 +108,7 @@ async function generate(regenerate = false) {
   lastRequestMessages.value = requestMessages
   const answer = reactive<PromptGenerateMessage>({ content: '', role: 'ai' })
   messages.value = [...requestMessages, answer]
-  if (!regenerate) chatInputRef.value?.clear()
+  if (!regenerate) inputValue.value = ''
   loading.value = true
   const controller = new AbortController()
   abortController = controller
@@ -132,6 +130,13 @@ async function generate(regenerate = false) {
       abortController = undefined
     }
   }
+}
+
+// 主题输入：回车发送，Shift+Enter 换行，中文输入法确认时不提交。
+function handleInputKeydown(event: KeyboardEvent) {
+  if (event.isComposing || event.key !== 'Enter' || event.shiftKey) return
+  event.preventDefault()
+  generate()
 }
 
 function stopGenerate() {
@@ -179,17 +184,58 @@ onBeforeUnmount(() => abortController?.abort())
         <el-button class="ml-0!" :disabled="!activeModelId" @click="generate(true)">重新生成</el-button>
       </div>
 
-      <ChatInput
-        ref="chatInputRef"
-        v-model="inputValue"
-        placeholder="请输入提示词主题"
-        :maxlength="100000"
-        :loading="loading"
-        :submit-disabled="!activeModelId || !applicationId"
-        paste-as-text
-        @submit="generate()"
-        @stop="stopGenerate"
-      />
+      <div class="prompt-input overflow-hidden rounded-xl border bg-white transition-colors hover:border-primary focus-within:border-primary">
+        <el-input
+          v-model="inputValue"
+          type="textarea"
+          resize="none"
+          :autosize="{ minRows: 1, maxRows: 10 }"
+          placeholder="请输入提示词主题"
+          :maxlength="100000"
+          @keydown="handleInputKeydown"
+        />
+        <div class="flex justify-end px-2 pb-2 pt-1">
+          <!-- 停止生成提示词 -->
+          <el-button v-if="loading" class="input-action" circle type="primary" @click="stopGenerate">
+            <MkIcon name="icon_stop_filled" />
+          </el-button>
+          <!-- 发送主题并生成提示词 -->
+          <el-button
+            v-else
+            class="input-action"
+            circle
+            type="primary"
+            :disabled="!inputValue.trim() || !activeModelId || !applicationId"
+            @click="generate()"
+          >
+            <MkIcon :icon="Top" :size="16" />
+          </el-button>
+        </div>
+      </div>
     </div>
   </MkDialog>
 </template>
+
+<style scoped lang="scss">
+/* 提示词主题输入与操作栏 */
+.prompt-input {
+  :deep(.el-textarea__inner) {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 2) 0;
+  }
+
+  .input-action {
+    height: calc(var(--spacing) * 6);
+    min-height: 0;
+    padding: 0;
+    width: calc(var(--spacing) * 6);
+
+    &.is-disabled {
+      background-color: var(--mk-N400);
+      border-color: var(--mk-N400);
+    }
+  }
+}
+</style>

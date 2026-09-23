@@ -319,9 +319,9 @@ AI 对话节点的提示词、历史记录、视觉理解和输出思考表单�
 弹窗顶部复用 `SelectModel`，仅修改本次生成使用的模型；主体展示最新结果与主题输入框，支持停止和重新生成。
 重新生成复用上次请求消息，关闭时终止请求并在关闭动画结束后清理会话；点击替换后通过 `replace` 交由节点回写系统提示词。
 生成接口沿用智能体已保存的参数，弹窗不提供独立模型参数设置。
-主题输入复用 `conversation-panel/chat-input`，内部采用 Element Plus 自适应文本域与底部操作栏。
-通过 `v-model`、`maxlength`、`loading`、`submitDisabled` 控制输入和按钮，`submit` / `stop`
-分别触发生成和停止；提示词场景开启 `pasteAsText`，长文本直接粘贴到输入框，不转为附件事件。
+主题输入直接在 `PromptGenerate.vue` 内使用 Element Plus 自适应文本域与底部发送／停止按钮，
+通过本地输入值、模型和智能体状态控制提交；Enter 发送、Shift+Enter 换行，输入法组合期间不提交。
+长文本使用原生纯文本粘贴，输入上限为 100000 字符，不转为附件事件。
 AI 对话、图片理解和视频理解统一复用 `component/ThinkingSetting.vue`，后续同类入口也应复用。
 组件通过 `v-model` 接收 `types.ts` 的 `ReasoningSettingData`，由节点的输出思考开关以 `v-if` 挂载，
 遵循通用设置弹窗规则；开始、结束标签当前不设必填。
