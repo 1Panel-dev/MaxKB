@@ -6,7 +6,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import ForgotPasswordApi from '@/api/admin/auth/forgot-password'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import LoginLayout from './components/LoginLayout.vue'
+import LoginLayout from '../components/LoginLayout.vue'
 
 interface ForgotPasswordForm {
   confirmPassword: string

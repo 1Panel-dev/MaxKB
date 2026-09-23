@@ -19,7 +19,7 @@ const router = createRouter({
     ...workflowRoutes,
     workspaceRoutes,
     systemRoutes,
-    { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/error/NotFoundView.vue'), meta: { title: '页面不存在' } },
+    { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/error/index.vue'), meta: { title: '页面不存在' } },
   ],
 })
 

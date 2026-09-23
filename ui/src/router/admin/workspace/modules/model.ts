@@ -4,7 +4,7 @@ export const modelRoutes: RouteRecordRaw[] = [
   {
     path: 'model',
     name: 'workspace-model',
-    component: () => import('@/views/model/ModelView.vue'),
+    component: () => import('@/views/model/index.vue'),
     meta: { title: '模型', icon: 'icon_dataset_outlined', activeIcon: 'icon_dataset_filled', order: 50 },
   },
 ]
