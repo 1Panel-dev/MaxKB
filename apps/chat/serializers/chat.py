@@ -12,6 +12,7 @@ import os
 import queue
 import queue as thread_queue
 import threading
+import time
 
 import uuid_utils
 import uuid_utils.compat as uuid
@@ -221,21 +222,15 @@ class ChatSerializers(serializers.Serializer):
         }
 
     @staticmethod
-    def _usage_from_context(workflow_context):
-        """从 workflow_context 汇总 token 用量：prompt=message_tokens, completion=answer_tokens。"""
-        prompt_tokens = sum(
-            v.get("message_tokens", 0)
-            for v in workflow_context.values()
-            if isinstance(v, dict) and "message_tokens" in v
-        )
-        completion_tokens = sum(
-            v.get("answer_tokens", 0) for v in workflow_context.values() if isinstance(v, dict) and "answer_tokens" in v
-        )
+    def _usage_from_details(details):
+        """从节点详情列表汇总 token 用量：prompt=message_tokens, completion=answer_tokens。"""
+        prompt_tokens = sum((d.get("message_tokens") or 0) for d in details if isinstance(d, dict))
+        completion_tokens = sum((d.get("answer_tokens") or 0) for d in details if isinstance(d, dict))
         return {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens}
 
     @staticmethod
-    def update_chat_record(chat_user_id, chat_record_id, workflow_context, messages, details):
-        usage = ChatSerializers._usage_from_context(workflow_context)
+    def update_chat_record(chat_user_id, chat_record_id, workflow_context, messages, details, run_time):
+        usage = ChatSerializers._usage_from_details(details)
         message_tokens = usage["prompt_tokens"]
         answer_tokens = usage["completion_tokens"]
         ChatUserTokenQuota.consume(chat_user_id, message_tokens + answer_tokens)
@@ -245,6 +240,7 @@ class ChatSerializers(serializers.Serializer):
             message_tokens=message_tokens,
             answer_tokens=answer_tokens,
             details=details,
+            run_time=run_time,
         )
 
     # ---------- 执行 ----------
@@ -341,7 +337,8 @@ class ChatSerializers(serializers.Serializer):
                     if position and chat_record.messages:
                         messages = list({m.get("id"): m for m in [*chat_record.messages, *messages]}.values())
             details = wf_manage.get_details(position=position, old_details=old_details)
-            self.update_chat_record(chat_user_id, chat_record_id_str, wf_manage.context, messages, details)
+            run_time = time.time() - wf_manage.start_time
+            self.update_chat_record(chat_user_id, chat_record_id_str, wf_manage.context, messages, details, run_time)
             ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
             # 表单续跑时 message_dict.content 为空;保留原记录里的用户问题,避免 WORKFLOW 历史丢问题
             question = chat_record.question if (chat_record and chat_record.question) else message_dict
@@ -395,7 +392,7 @@ class ChatSerializers(serializers.Serializer):
                         end_frame = base_to_response.to_stream_end(
                             chat_id,
                             chat_record_id_str,
-                            usage=self._usage_from_context(work_flow_manage.context),
+                            usage=self._usage_from_details(work_flow_manage.get_details()),
                         )
                         if end_frame is not None:
                             yield "data: " + end_frame + "\n\n"
@@ -422,7 +419,7 @@ class ChatSerializers(serializers.Serializer):
                     break
                 if msg_type == "error":
                     raise data
-            usage = self._usage_from_context(work_flow_manage.context)
+            usage = self._usage_from_details(work_flow_manage.get_details())
             return base_to_response.to_block(chat_id, chat_record_id_str, aggregation.get_contents(), usage)
 
     def chat(self, instance: dict, base_to_response: BaseToResponse = SystemToResponse()):
