@@ -9,6 +9,7 @@ import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import TriggerFormDrawer from './trigger-form/TriggerFormDrawer.vue'
 import TriggerTaskPopover from './components/TriggerTaskPopover.vue'
+import perm from '@/permission/index.ts'
 
 /* 触发器筛选与分页查询 */
 const loading = ref(false)
@@ -155,7 +156,7 @@ onMounted(() => loadTriggers())
         <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 新建触发器 -->
-          <el-button type="primary" @click="handleOpenTriggerDrawer()">
+          <el-button v-if="perm.trigger.create()" type="primary" @click="handleOpenTriggerDrawer()">
             <MkIcon name="icon_add_outlined" />
             <span>创建</span>
           </el-button>
@@ -202,27 +203,27 @@ onMounted(() => loadTriggers())
             <div class="flex-align-center gap-3">
               <!-- 修改触发器状态 -->
               <span @click.stop>
-                <el-switch v-model="row.is_active" :before-change="() => handleChangeStatus(row)" size="small" class="mr-3" />
+                <el-switch v-model="row.is_active" :disabled="!perm.trigger.edit()" :before-change="() => handleChangeStatus(row)" size="small" class="mr-3" />
                 <el-divider direction="vertical" />
               </span>
 
               <div class="flex">
                 <!-- 编辑当前触发器 -->
-                <MkTooltip content="编辑" placement="top">
+                <MkTooltip content="编辑" placement="top" v-if="perm.trigger.edit()" >
                   <el-button type="primary" text @click.stop="handleOpenTriggerDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
                 </MkTooltip>
 
                 <!-- 查看触发器执行记录 -->
-                <MkTooltip content="执行记录" placement="top">
+                <MkTooltip content="执行记录" placement="top" v-if="perm.trigger.record()">
                   <el-button type="primary" text @click.stop="handleOpenRecordDrawer(row)">
                     <MkIcon name="icon_schedule-report_outlined" />
                   </el-button>
                 </MkTooltip>
-                <!-- 删除当前触发器 -->
 
-                <MkTooltip content="删除" placement="top">
+                <!-- 删除当前触发器 -->
+                <MkTooltip content="删除" placement="top" v-if="perm.trigger.delete()" >
                   <el-button type="primary" text @click.stop="handleDeleteTrigger(row)">
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
@@ -233,11 +234,11 @@ onMounted(() => loadTriggers())
         </el-table-column>
         <template #footer-batch-actions>
           <!-- 批量启用所选触发器 -->
-          <el-button type="primary" plain @click="handleBatchActivate(true)">启用</el-button>
+          <el-button v-if="perm.trigger.edit()" type="primary" plain @click="handleBatchActivate(true)">启用</el-button>
           <!-- 批量禁用所选触发器 -->
-          <el-button type="primary" plain @click="handleBatchActivate(false)">禁用</el-button>
+          <el-button v-if="perm.trigger.edit()" type="primary" plain @click="handleBatchActivate(false)">禁用</el-button>
           <!-- 批量删除所选触发器 -->
-          <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
+          <el-button v-if="perm.trigger.delete()" type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
       </MkTable>
     </template>
