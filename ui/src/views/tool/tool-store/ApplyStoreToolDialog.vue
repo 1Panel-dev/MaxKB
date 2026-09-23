@@ -3,14 +3,22 @@ import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import WorkspaceToolStoreApi from '@/api/admin/workspace/tool/store'
+import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import SystemSharedToolStoreApi from '@/api/admin/system/shared-resources/tool/store'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem, ToolStoreItem } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
+import { isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'StoreToolFormDialog' })
 
-const props = defineProps<{ folderId?: string }>()
+const props = withDefaults(
+  defineProps<{
+    folderId: string
+  }>(),
+  { folderId: 'default' },
+)
 
 const { auth } = useStore()
 
@@ -36,14 +44,17 @@ function handleSubmit() {
     loading.value = true
 
     const commonPayload = { folder_id: props.folderId || 'default', name }
+    const isSharedResource = isSystemSharedResource()
+    const toolApi = isSharedResource ? SystemSharedToolApi : ToolApi
+    const toolStoreApi = isSharedResource ? SystemSharedToolStoreApi : WorkspaceToolStoreApi
     let request: Promise<ToolItem>
 
     if (tool.source === 'internal') {
-      request = WorkspaceToolStoreApi.postInternalTool(tool.id, commonPayload)
+      request = toolStoreApi.postInternalTool(tool.id, commonPayload)
     } else if (tool.label === 'workflow_template') {
-      request = ToolApi.postTool({ ...commonPayload, code: '{}', tool_type: TOOL_TYPE.WORKFLOW, work_flow_template: tool })
+      request = toolApi.postTool({ ...commonPayload, code: '{}', tool_type: TOOL_TYPE.WORKFLOW, work_flow_template: tool })
     } else {
-      request = WorkspaceToolStoreApi.postStoreTool(tool.id, {
+      request = toolStoreApi.postStoreTool(tool.id, {
         ...commonPayload,
         download_callback_url: tool.downloadCallbackUrl ?? '',
         download_url: tool.downloadUrl ?? '',

@@ -79,7 +79,7 @@ function handleToolUpdate(tool: ToolItem) {
         <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 创建共享工具 -->
-          <ButtonCreateTool :api="SystemSharedToolApi" folder-id="" @refresh="refreshTools" />
+          <ButtonCreateTool folder-id="default" :api="SystemSharedToolApi" @refresh="refreshTools" />
         </div>
       </component>
       <div v-loading="toolOperationLoading" class="min-h-0 flex-1">

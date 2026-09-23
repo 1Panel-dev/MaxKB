@@ -19,14 +19,13 @@ const { auth } = useStore()
 const props = withDefaults(
   defineProps<{
     api?: typeof ToolApi | typeof SystemSharedToolApi
-    showWorkflow?: boolean
     folderId: string
     trigger?: 'click' | 'hover' | 'contextmenu'
     popperStyle?: CSSProperties
     popperClass?: string
     fitTriggerWidth?: boolean
   }>(),
-  { api: () => ToolApi, showWorkflow: true, trigger: 'click', fitTriggerWidth: false },
+  { api: () => ToolApi, trigger: 'click', fitTriggerWidth: false, folderId: 'default' },
 )
 
 const emit = defineEmits<{ refresh: [] }>()
@@ -128,7 +127,7 @@ function handleRefresh() {
           <span>工具</span>
         </MkDropdownItem>
         <!-- 创建工作流工具 -->
-        <MkDropdownItem v-if="showWorkflow" class="py-2!" @click="handleOpenWorkflowForm">
+        <MkDropdownItem class="py-2!" @click="handleOpenWorkflowForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.WORKFLOW" /></template>
           <span>工作流</span>
         </MkDropdownItem>

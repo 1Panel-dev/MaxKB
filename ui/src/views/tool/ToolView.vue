@@ -241,7 +241,7 @@ onMounted(() => {
               <!-- 工具商店 -->
               <ButtonToolStore :folder-id="currentFolder.id" @refresh="refreshTool" />
               <!-- 创建 -->
-              <ButtonCreateTool :folder-id="currentFolder.id" @refresh="refreshTool" />
+              <ButtonCreateTool :folder-id="currentFolder.id" :api="ToolApi" @refresh="refreshTool" />
             </template>
           </template>
         </div>
