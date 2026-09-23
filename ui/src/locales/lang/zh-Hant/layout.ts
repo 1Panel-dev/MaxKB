@@ -39,6 +39,6 @@ export default {
     daysValid: '天有效',
   },
   copyright: '版權所有 © 2014-2026 杭州飛致雲信息科技有限公司',
-  userManualUrl: 'https://maxkb.cn/docs/v2/',
+  userManualUrl: 'https://docs.fit2cloud.com/maxkb/',
   forumUrl: 'https://github.com/1Panel-dev/MaxKB/discussions',
 }
