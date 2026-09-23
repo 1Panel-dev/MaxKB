@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import threading
+import time
 from typing import List, Dict, Optional, Callable
 
 from application.workflow.common import Workflow, WorkflowType, Node, get_node_parameters
@@ -64,6 +65,7 @@ class WorkflowManage:
         self.signal = None
         self.details = {"position": {}, "details": {}}
         self.start_node = get_start_node(workflow, self)
+        self.start_time = time.time()
 
     def run(self):
         """

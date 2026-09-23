@@ -114,6 +114,12 @@ class LoopNode(INode):
         def on_complete(wf_manage, error):
             loop_details_list = self.data.setdefault("loop_details_list", [])
             loop_details_list.append(wf_manage.get_details())
+            self.data["message_tokens"] = (self.data.get("message_tokens") or 0) + sum(
+                (n.data.get("message_tokens") or 0) for n in wf_manage.nodes
+            )
+            self.data["answer_tokens"] = (self.data.get("answer_tokens") or 0) + sum(
+                (n.data.get("answer_tokens") or 0) for n in wf_manage.nodes
+            )
             self.write_context("index", index)
             self.write_context("item", item)
             last_context = self.workflow_manage.get_context(self.node.id, "last_context")
@@ -193,7 +199,13 @@ class LoopNode(INode):
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
-            {"params": self.data.get("params"), "index": self.get_context("index"), "item": self.get_context("item")}
+            {
+                "params": self.data.get("params"),
+                "index": self.get_context("index"),
+                "item": self.get_context("item"),
+                "message_tokens": self.data.get("message_tokens"),
+                "answer_tokens": self.data.get("answer_tokens"),
+            }
         )
         loop_details = []
         position_index = 0
