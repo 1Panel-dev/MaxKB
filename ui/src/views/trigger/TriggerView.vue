@@ -175,11 +175,12 @@ onMounted(() => loadTriggers())
       >
         <el-table-column type="selection" width="48" reserve-selection />
         <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
-          <template #default="{ row }"
-            ><div class="flex-align-center gap-2">
-              <TriggerIcon :type="row.trigger_type" :size="24" /><span>{{ row.name }}</span>
-            </div></template
-          >
+          <template #default="{ row }">
+            <div class="flex-align-center gap-2">
+              <TriggerIcon :type="row.trigger_type" :size="24" />
+              <span>{{ row.name }}</span>
+            </div>
+          </template>
         </el-table-column>
         <el-table-column prop="trigger_type" label="类型" width="120">
           <template #default="{ row }">{{ triggerTypeLabels[row.trigger_type as TriggerType] || row.trigger_type }}</template>
@@ -202,14 +203,13 @@ onMounted(() => loadTriggers())
           <template #default="{ row }">
             <div class="flex-align-center gap-3">
               <!-- 修改触发器状态 -->
-              <span @click.stop>
-                <el-switch v-model="row.is_active" :disabled="!perm.trigger.edit()" :before-change="() => handleChangeStatus(row)" size="small" class="mr-3" />
-                <el-divider direction="vertical" />
-              </span>
+
+              <el-switch v-model="row.is_active" :disabled="!perm.trigger.edit()" :before-change="() => handleChangeStatus(row)" size="small" />
+              <el-divider direction="vertical" />
 
               <div class="flex">
                 <!-- 编辑当前触发器 -->
-                <MkTooltip content="编辑" placement="top" v-if="perm.trigger.edit()" >
+                <MkTooltip content="编辑" placement="top" v-if="perm.trigger.edit()">
                   <el-button type="primary" text @click.stop="handleOpenTriggerDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
@@ -223,7 +223,7 @@ onMounted(() => loadTriggers())
                 </MkTooltip>
 
                 <!-- 删除当前触发器 -->
-                <MkTooltip content="删除" placement="top" v-if="perm.trigger.delete()" >
+                <MkTooltip content="删除" placement="top" v-if="perm.trigger.delete()">
                   <el-button type="primary" text @click.stop="handleDeleteTrigger(row)">
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
