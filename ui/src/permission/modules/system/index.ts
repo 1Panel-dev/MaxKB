@@ -17,6 +17,7 @@ import appearance from './appearance'
 import email from './email'
 import operationLog from './operationLog'
 import homepage from './homepage'
+import other from './other'
 export default {
   /**
    * 系统「用户管理」按钮权限
@@ -73,4 +74,9 @@ export default {
   /**
    * 系统「操作日志」按钮权限
    */
-  operationLog }
+  operationLog,
+  /**
+   * 系统「其他」按钮权限
+   */
+  other
+}

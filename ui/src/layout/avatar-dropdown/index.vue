@@ -5,6 +5,7 @@ import LoginApi from '@/api/admin/auth/login'
 import { LOGIN_METHOD } from '@/api/enums'
 import { useStore } from '@/stores'
 import ChangePasswordDialog from './ChangePasswordDialog.vue'
+import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'AvatarDropdown' })
 
@@ -65,17 +66,17 @@ function toUrl(url?: string) {
         <el-divider />
         <MkDropdownMenu>
           <!-- 修改密码 -->
-          <MkDropdownItem @click="handleOpenChangePassword">
+          <MkDropdownItem @click="handleOpenChangePassword" v-if="perm.system.other.changePassword()">
             <template #icon><MkIcon name="icon-key_outlined" /></template>
             <span>修改密码</span>
           </MkDropdownItem>
           <!-- // TODO API Key -->
-          <MkDropdownItem>
+          <MkDropdownItem v-if="perm.system.other.systemApiKey()">
             <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
             <span>API Key</span>
           </MkDropdownItem>
           <!-- // TODO 语言 -->
-          <MkDropdownItem @click.stop class="p-0!">
+          <MkDropdownItem @click.stop class="p-0!" v-if="perm.system.other.SWITCH_LANGUAGE()">
             <MkDropdown class="w-full" trigger="hover" placement="left-start">
               <div class="flex-between w-full gap-2 p-2">
                 <div class="flex-align-center gap-2">
@@ -113,7 +114,7 @@ function toUrl(url?: string) {
             <span>论坛求助</span>
           </MkDropdownItem>
           <!-- // TODO 关于 -->
-          <MkDropdownItem>
+          <MkDropdownItem v-if="perm.system.other.about()">
             <template #icon><MkIcon name="icon_info_outlined" /></template>
             <span>关于</span>
           </MkDropdownItem>
