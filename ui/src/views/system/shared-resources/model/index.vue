@@ -98,7 +98,6 @@ onMounted(() => {
                 <!-- 编辑 -->
                 <EditModelAction label="编辑" :api="SystemSharedModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
                 <!-- // TODO 授权工作空间 -->
-
                 <!-- 模型参数设置 -->
                 <ParamSettingAction v-if="model.model_type !== 'RERANKER'" label="模型参数设置" :api="SystemSharedModelApi" :model="model" />
 

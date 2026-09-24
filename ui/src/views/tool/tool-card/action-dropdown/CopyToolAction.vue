@@ -2,6 +2,7 @@
 import { nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { ToolItem } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vue'
@@ -12,7 +13,7 @@ import WorkflowFormDialog from '@/views/tool/tool-form/WorkflowFormDialog.vue'
 
 defineOptions({ name: 'CopyToolAction' })
 
-const props = defineProps<{ api: typeof ToolApi; label: string; tool: ToolItem }>()
+const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi; label: string; tool: ToolItem }>()
 
 const loading = defineModel<boolean>('loading', { default: false })
 
