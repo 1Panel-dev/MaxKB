@@ -18,7 +18,7 @@
 
 ```text
 src/workflow-canvas/
-├── component/          # NodeAdd、NodeSearch、节点设置及预留的 NodeControl
+├── component/          # NodeAdd、NodeSearch、节点设置及 NodeControl 画布控制栏
 ├── config/             # 节点数据、映射、常量及预留的本地化配置
 ├── Execution-details/  # 执行详情：顶层分发入口与公共卡壳，节点内容由 nodes/*/details/ 提供
 ├── core/               # 稳定的画布内核与所有节点共用的基础能力
@@ -119,7 +119,10 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 左上角工具栏挂载 `NodeAdd` 和 `NodeSearch`。搜索按 `properties.stepName` 忽略大小写匹配，
 选中并聚焦结果；`Ctrl/Cmd + F` 打开，Enter 或上下按钮循环切换，Escape 关闭并清空选择。
-`NodeControl.vue` 文件存在，但主画布中的控制栏尚未挂载；Dagre 和框选插件已注册。
+`NodeControl.vue` 通过 `logicFlow` 接收当前画布实例，挂载在左下角。提供框选/平移切换、
+以视口中心缩放、缩放比例与恢复 100%、适应画布、批量展开收起及自动布局。缩放读数监听
+画布变换事件；实例切换或组件卸载时解绑事件并关闭框选。自动布局等待循环体布局完成后
+整理主画布，执行期间禁止重复布局；空画布禁用依赖节点的操作。
 
 `core/shortcut.ts` 负责复制、粘贴及删除：粘贴针对当前活动画布，重新生成节点、边及锚点关联 ID，
 按模式过滤节点，并按鼠标位置平移。Backspace 删除前检查受保护节点并确认，循环辅助边不能单独删除。

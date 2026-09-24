@@ -25,9 +25,7 @@ function handleOpenPortalEdit() {
   editVisible.value = true
 }
 
-function handleLogoChange(icon: string, file: File | null) {
-  // 保留已有图片及尚未保存的文件，只有新选图片或恢复默认时更新。
-  if (icon && !file) return
+function handleLogoChange(file: File | null) {
   logoFile.value = file
   logoChanged.value = true
 }
@@ -71,7 +69,7 @@ function handleClosePortalEdit() {
     >
       <el-form-item label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
-          <MkEditAvatar :editable="!saving" v-model="portalForm.logo" @change="handleLogoChange" :size="32">
+          <MkEditAvatar v-model="portalForm.logo" @change="handleLogoChange" :size="32">
             <template #default="{ icon }">
               <PortalIcon :icon="icon" />
             </template>

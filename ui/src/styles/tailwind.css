@@ -28,6 +28,7 @@
   --spacing-chat-sidebar: var(--mk-chat-sidebar-width);
 
   /* shadows */
+  --shadow-lg: var(--mk-box-shadow-lg);
   --shadow-md: var(--el-box-shadow-light);
   --shadow-sm: var(--el-box-shadow-lighter);
 

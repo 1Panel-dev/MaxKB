@@ -306,6 +306,11 @@ Workspace 的自定义工具和工作流工具菜单
 代码围栏，普通编辑区直接回写表单草稿，放大编辑器通过 `header-extra` 的 `replaceCode` 回调
 替换全屏草稿，点击“确定”后再同步表单。公共组件统一处理 `ConversationStream`、停止、重新生成和输入交互，
 不接收工具表单、不判断资源范围，不维护原始输入、暂停或继续状态。
+
+`ToolFormDrawer` 通过 `MkEditAvatar` 暂存确认后的头像文件；保存校验通过后先调用 Admin
+`postUploadFile`，将返回地址写入 `toolForm.icon` 再提交工具。恢复默认时直接提交空字符串，
+未更换图片时不上传；上传失败保留文件供重试，上传成功后清空暂存文件，避免工具保存失败后重复上传。
+
 工具列表页面通过 `ToolCard` 的 `actions` 和 `action-dropdown` 插槽组合
 操作；编辑 Action 负责按 `TOOL_TYPE` 打开对应类型表单，启动参数 Action 获取工具详情后打开
 `InitParamDialog`，MCP 配置 Action 获取 MCP 工具详情后打开 `McpConfigDialog`。工作流 Action 进入

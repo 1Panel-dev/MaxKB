@@ -47,6 +47,9 @@
   --mk-sidebar-expanded-width: 240px;
   --mk-sidebar-width: 68px;
 
+  /* shadows */
+  --mk-box-shadow-lg: 0 6px 24px 0 rgb(var(--mk-N900-rgb) / 8%);
+
   // 对话
   --mk-chat-sidebar-width: 280px;
 }

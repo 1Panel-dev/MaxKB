@@ -365,7 +365,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 手动导入 `@/components/mk-edit-avatar/index.vue`，不参与全局注册。字符串 `v-model` 为当前
 自定义头像 URL，空字符串表示使用默认图标；不再接收 `defaultIcon`。
 `size` 默认为 `32`（px），只设置 `referenceRef` 触发容器的宽高；弹层预览和上传区域固定为 80px。
-`editable` 默认为 `true`，设为 `false` 时仅展示头像。
+`disabled` 默认为 `false`，直接传给 `el-popover` 控制禁用，不额外维护禁用状态监听。
 
 必填默认插槽同时渲染触发区和默认 Logo 预览，只透出 `{ icon }`。触发区传入当前头像
 （空值转为 `undefined`）；默认预览始终传入 `icon: undefined`。两处容器通过样式让插槽的
@@ -376,10 +376,14 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 门户编辑通过此插槽渲染 `PortalIcon`，并将头像绑定到 `portalForm.logo`。
 
 悬停头像打开 Logo 设置，打开后保持显示以便选择本地文件；取消、点击外部或弹层内按 Escape
-关闭并丢弃草稿，确定后才更新 `v-model` 并触发 `change(icon, file)`。
-自定义图片支持 JPG、PNG、GIF，大小不超过 10MB；确认时 `icon` 为本地 Data URL，`file`
-为所选 `File`，未重新选文件或使用默认 Logo 时为 `null`。组件不请求上传接口；调用方负责上传
-和持久化，并可将返回的图片 URL 写回 `v-model`。
+关闭并丢弃草稿。选择新图片后确定，先将预览地址写入 `v-model`，再触发 `change(file)`；保留已有自定义
+头像直接确定时不触发事件。恢复默认时先将 `v-model` 设为空，再触发 `change(null)`。
+自定义图片支持 JPG、PNG、GIF，大小不超过 10MB；组件通过 `URL.createObjectURL` 创建预览，
+统一释放不再被 `previewIcon` 或 `v-model` 使用的临时地址，卸载时释放剩余地址。
+调用方不重复创建或释放预览地址；确认后即可通过插槽展示新头像，关闭弹层不会释放仍在显示的地址。
+`blob:` 地址仅供当前组件存续期间预览，不能提交给后端作为持久图片地址。
+组件只通过 `change(file)` 通知调用方，不请求接口，也不规定文件何时上传。
+调用方按业务流程处理文件，通过 `v-model` 传入用于展示的头像地址。
 
 ```vue
 <script setup lang="ts">

@@ -5,42 +5,37 @@ import type { UploadFile, UploadInstance } from 'element-plus'
 
 defineOptions({ name: 'MkEditAvatar' })
 
-const props = withDefaults(defineProps<{ editable?: boolean; size?: number }>(), {
-  editable: true,
+const props = withDefaults(defineProps<{ disabled?: boolean; size?: number }>(), {
+  disabled: false,
   size: 32,
 })
 const avatar = defineModel<string>({ default: '' })
-const emit = defineEmits<{ change: [icon: string, file: File | null] }>()
+const emit = defineEmits<{ change: [file: File | null] }>()
 defineSlots<{ default(props: { icon: string | undefined }): unknown }>()
 
 // 头像编辑草稿：确认前不修改外部值。
 const visible = ref(false)
 const logoMode = ref<'default' | 'custom'>('default')
-const draftIcon = ref('')
+const previewIcon = ref('')
 const draftFile = ref<File | null>(null)
-const reading = ref(false)
 const referenceRef = useTemplateRef<HTMLElement>('referenceRef')
 const uploadRef = useTemplateRef<UploadInstance>('uploadRef')
 
-let fileReader: FileReader | undefined
-
 function open() {
-  if (!props.editable || visible.value) return
+  if (visible.value) return
   logoMode.value = avatar.value ? 'custom' : 'default'
-  draftIcon.value = logoMode.value === 'custom' ? avatar.value : ''
+  previewIcon.value = logoMode.value === 'custom' ? avatar.value : ''
   draftFile.value = null
   visible.value = true
 }
 
 function close() {
   visible.value = false
-  fileReader?.abort()
-  reading.value = false
 }
 
 function clearDraft() {
   if (visible.value) return
-  draftIcon.value = ''
+  previewIcon.value = ''
   draftFile.value = null
   uploadRef.value?.clearFiles()
 }
@@ -51,11 +46,14 @@ function closeOutside(event: MouseEvent) {
 }
 
 function confirm() {
-  if (reading.value || (logoMode.value === 'custom' && !draftIcon.value)) return
-  const icon = logoMode.value === 'default' ? '' : draftIcon.value
-  const file = logoMode.value === 'custom' ? draftFile.value : null
-  avatar.value = icon
-  emit('change', icon, file)
+  if (logoMode.value === 'custom' && !previewIcon.value) return
+  if (logoMode.value === 'default') {
+    avatar.value = ''
+    emit('change', null)
+  } else if (draftFile.value) {
+    avatar.value = previewIcon.value
+    emit('change', draftFile.value)
+  }
   close()
 }
 
@@ -72,39 +70,40 @@ function selectImage(uploadFile: UploadFile) {
     ElMessage.warning('文件大小不能超过 10MB')
     return
   }
-  fileReader?.abort()
-  const reader = new FileReader()
-  fileReader = reader
-  reading.value = true
-  reader.onload = () => {
-    draftIcon.value = String(reader.result)
-    draftFile.value = file
-    reading.value = false
+  previewIcon.value = URL.createObjectURL(file)
+  draftFile.value = file
+}
+
+// 临时地址由组件统一管理，仍用于头像或弹层预览时不释放。
+function releaseUnusedPreview(icon: string) {
+  if (icon.startsWith('blob:') && icon !== avatar.value && icon !== previewIcon.value) {
+    URL.revokeObjectURL(icon)
   }
-  reader.onerror = () => {
-    reading.value = false
-    ElMessage.error('图片读取失败，请重新选择')
-  }
-  reader.readAsDataURL(file)
 }
 
 watch(
-  () => props.editable,
-  (editable) => {
-    if (!editable) close()
+  [avatar, previewIcon],
+  (_current, [previousAvatar, previousPreview]) => {
+    releaseUnusedPreview(previousAvatar)
+    if (previousPreview !== previousAvatar) releaseUnusedPreview(previousPreview)
   },
+  { flush: 'sync' },
 )
-onBeforeUnmount(() => fileReader?.abort())
+onBeforeUnmount(() => {
+  if (previewIcon.value.startsWith('blob:') && previewIcon.value !== avatar.value) URL.revokeObjectURL(previewIcon.value)
+  if (avatar.value.startsWith('blob:')) URL.revokeObjectURL(avatar.value)
+})
 </script>
 
 <template>
-  <el-popover :visible="visible" :width="414" placement="bottom-start" @after-leave="clearDraft">
+  <!-- 单向控制显隐，避免选择文件时鼠标移出触发自动关闭。 -->
+  <el-popover :visible="visible" :disabled="props.disabled" :width="414" placement="bottom-start" @after-leave="clearDraft">
     <template #reference>
       <!-- 悬停修改头像 -->
       <span
         ref="referenceRef"
         class="inline-flex shrink-0 [&>*]:h-full! [&>*]:w-full!"
-        :class="{ 'cursor-pointer': props.editable }"
+        :class="{ 'cursor-pointer': !props.disabled }"
         :style="{ width: `${props.size}px`, height: `${props.size}px` }"
         @mouseenter="open"
       >
@@ -114,7 +113,7 @@ onBeforeUnmount(() => fileReader?.abort())
 
     <div v-click-outside="closeOutside" class="p-4" @keydown.esc.stop="close" @click.stop>
       <div class="mb-1">Logo 设置</div>
-      <el-radio-group v-model="logoMode" :disabled="reading" class="mb-2">
+      <el-radio-group v-model="logoMode" class="mb-2">
         <el-radio value="default">默认 Logo</el-radio>
         <el-radio value="custom">自定义上传</el-radio>
       </el-radio-group>
@@ -130,11 +129,10 @@ onBeforeUnmount(() => fileReader?.abort())
           accept="image/jpeg,image/png,image/gif"
           :auto-upload="false"
           :show-file-list="false"
-          :disabled="reading"
           :on-change="selectImage"
         >
-          <el-avatar v-if="draftIcon" :size="80" shape="square">
-            <img :src="draftIcon" class="object-cover" />
+          <el-avatar v-if="previewIcon" :size="80" shape="square">
+            <img :src="previewIcon" class="object-cover" />
           </el-avatar>
 
           <div v-else class="flex-center h-20 w-20 rounded-md border border-dashed bg-N200 hover:border-primary">
@@ -148,7 +146,7 @@ onBeforeUnmount(() => fileReader?.abort())
         <!-- 取消头像修改 -->
         <el-button plain @click="close">取消</el-button>
         <!-- 确认头像修改 -->
-        <el-button type="primary" :loading="reading" :disabled="logoMode === 'custom' && !draftIcon" @click="confirm">确定</el-button>
+        <el-button type="primary" :disabled="logoMode === 'custom' && !previewIcon" @click="confirm">确定</el-button>
       </div>
     </div>
   </el-popover>

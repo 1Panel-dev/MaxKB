@@ -274,7 +274,7 @@
 .el-card.is-always-shadow,
 .el-card.is-hover-shadow:hover,
 .el-card.is-hover-shadow:focus {
-  box-shadow: 0px 6px 24px 0px rgb(var(--mk-N900-rgb) / 8%);
+  box-shadow: var(--mk-box-shadow-lg);
 }
 
 /* cascader */
