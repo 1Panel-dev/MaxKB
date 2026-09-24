@@ -20,16 +20,14 @@ from rest_framework import serializers
 from application.models import Application
 from common.constants.cache_version import Cache_Version
 from common.auth.constants.role_constants import RoleConstants
-from common.constants.resource_permission_constants import ResourceAuthType, ResourcePermissionConstants
 from common.db.search import native_search, native_page_search, get_dynamics_model
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from knowledge.models import Knowledge
 from maxkb.conf import PROJECT_DIR
-from maxkb.settings import edition
 from models_provider.models import Model
-from system_manage.models import WorkspaceUserResourcePermission, WorkspaceUserGroupResourcePermission
+from system_manage.models import WorkspaceUserGroupResourcePermission
 from tools.models import Tool
 from users.models.user_group import SystemUserGroupRelation
 
@@ -167,61 +165,6 @@ class UserGroupResourcePermissionSerializer(serializers.Serializer):
             ),
             "resource_query_set": resource_query_set,
         }
-
-    def auth_resource_batch(self, resource_id_list: list):
-        self.is_valid(raise_exception=True)
-        auth_target_type = self.data.get("auth_target_type")
-        workspace_id = self.data.get("workspace_id")
-        user_id = self.data.get("user_id")
-        wurp = (
-            QuerySet(WorkspaceUserResourcePermission)
-            .filter(auth_target_type=auth_target_type, workspace_id=workspace_id, user_id=user_id)
-            .first()
-        )
-        auth_type = (
-            wurp.auth_type
-            if wurp
-            else (ResourceAuthType.RESOURCE_PERMISSION_GROUP if edition == "CE" else ResourceAuthType.ROLE)
-        )
-        workspace_user_resource_permission = [
-            WorkspaceUserResourcePermission(
-                target=resource_id,
-                auth_target_type=auth_target_type,
-                permission_list=[ResourcePermissionConstants.VIEW, ResourcePermissionConstants.MANAGE]
-                if auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP
-                else [ResourcePermissionConstants.ROLE],
-                workspace_id=workspace_id,
-                user_id=user_id,
-                auth_type=auth_type,
-            )
-            for resource_id in resource_id_list
-        ]
-        QuerySet(WorkspaceUserResourcePermission).bulk_create(workspace_user_resource_permission)
-        # 刷新缓存
-        version = Cache_Version.PERMISSION_LIST.get_version()
-        key = Cache_Version.PERMISSION_LIST.get_key(user_id=user_id)
-        cache.delete(key, version=version)
-        return True
-
-    def auth_resource(self, resource_id: str, is_folder=False):
-        self.is_valid(raise_exception=True)
-        auth_target_type = self.data.get("auth_target_type")
-        workspace_id = self.data.get("workspace_id")
-        user_id = self.data.get("user_id")
-
-        WorkspaceUserResourcePermission(
-            target=resource_id,
-            auth_target_type=auth_target_type,
-            permission_list=[ResourcePermissionConstants.VIEW, ResourcePermissionConstants.MANAGE],
-            workspace_id=workspace_id,
-            user_id=user_id,
-            auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP,
-        ).save()
-        # 刷新缓存
-        version = Cache_Version.PERMISSION_LIST.get_version()
-        key = Cache_Version.PERMISSION_LIST.get_key(user_id=user_id)
-        cache.delete(key, version=version)
-        return True
 
     def list(self, instance, user, with_valid=True):
         if with_valid:
@@ -508,7 +451,7 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
         ]
 
         if save_list:
-            QuerySet(WorkspaceUserResourcePermission).bulk_create(save_list)
+            QuerySet(WorkspaceUserGroupResourcePermission).bulk_create(save_list)
 
         version = Cache_Version.PERMISSION_LIST.get_version()
         for user_group_id in user_group_ids:
