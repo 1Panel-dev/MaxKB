@@ -31,13 +31,13 @@ import { goBack } from './navigation'
 defineOptions({ name: 'ToolWorkflowView' })
 
 // 保存、调试与版本历史保持进入页面时的资源范围。
-const ModelApi = isSystemResource() ? SystemModelApi : isSystemSharedResource() ? SharedModelApi : WorkspaceModelApi
-const ToolApi = isSystemResource() ? SystemToolApi : isSystemSharedResource() ? SharedToolApi : WorkspaceToolApi
-const ToolWorkflowApi = isSystemResource() ? SystemToolWorkflowApi : isSystemSharedResource() ? SharedToolWorkflowApi : WorkspaceToolWorkflowApi
+const requestModelApi = isSystemResource() ? SystemModelApi : isSystemSharedResource() ? SharedModelApi : WorkspaceModelApi
+const requestToolApi = isSystemResource() ? SystemToolApi : isSystemSharedResource() ? SharedToolApi : WorkspaceToolApi
+const requestApi = isSystemResource() ? SystemToolWorkflowApi : isSystemSharedResource() ? SharedToolWorkflowApi : WorkspaceToolWorkflowApi
 provide('resourceScope', getResourceScope())
 
 // 为画布节点中的 SelectModel 提供参数表单接口。
-provide('getModelParamsForm', ModelApi.getModelParamsForm)
+provide('getModelParamsForm', requestModelApi.getModelParamsForm)
 
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
   nodes: cloneDeep(defaultToolNodes),
@@ -75,15 +75,15 @@ function saveToolWorkflow(graphData = getGraphData(), showMessage = false) {
 
   const workflowSnapshot = cloneDeep(graphData)
 
-  return ToolWorkflowApi.putToolWorkflow(toolId, { work_flow: workflowSnapshot, default_model_setting: cloneDeep(defaultModelSetting.value) }).then(
-    (toolWorkflow) => {
+  return requestApi
+    .putToolWorkflow(toolId, { work_flow: workflowSnapshot, default_model_setting: cloneDeep(defaultModelSetting.value) })
+    .then((toolWorkflow) => {
       defaultModelSetting.value = cloneDeep(toolWorkflow.default_model_setting ?? {})
       saveTime.value = toolWorkflow.update_time || new Date()
       setSavedWorkflow(workflowSnapshot)
       if (showMessage) MsgSuccess('保存成功')
       return toolWorkflow
-    },
-  )
+    })
 }
 
 /* 自动保存：一分钟周期，按资源类型和工具独立记录开关。 */
@@ -156,7 +156,7 @@ function handleUseTemplate(template: WorkflowStoreTemplate) {
   })
     .then(() => {
       loading.value = true
-      return ToolWorkflowApi.putToolWorkflow(toolId, { work_flow_template: cloneDeep(template) }).then(() => {
+      return requestApi.putToolWorkflow(toolId, { work_flow_template: cloneDeep(template) }).then(() => {
         return loadToolWorkflow().then(() => {
           templateStoreButtonRef.value?.close()
           MsgSuccess('应用成功')
@@ -226,7 +226,7 @@ function handlePublish() {
   return workflowRef.value
     .validate()
     .then(() => saveToolWorkflow())
-    .then(() => ToolWorkflowApi.putToolWorkflowPublish(toolId))
+    .then(() => requestApi.putToolWorkflowPublish(toolId))
     .then(() => MsgSuccess('发布成功'))
     .catch(() => {
       MsgError('发布失败')
@@ -242,7 +242,7 @@ async function handleExportWorkflow() {
   loading.value = true
   try {
     if (hasUnsavedChanges()) await saveToolWorkflow()
-    await ToolApi.exportTool(toolId, toolDetail.value.name)
+    await requestToolApi.exportTool(toolId, toolDetail.value.name)
   } catch {
     MsgError('导出工作流失败')
   } finally {
@@ -251,7 +251,7 @@ async function handleExportWorkflow() {
 }
 
 function loadToolWorkflow() {
-  return Promise.all([ToolApi.getToolDetail(toolId), ToolWorkflowApi.getToolWorkflow(toolId)]).then(([tool, toolWorkflow]) => {
+  return Promise.all([requestToolApi.getToolDetail(toolId), requestApi.getToolWorkflow(toolId)]).then(([tool, toolWorkflow]) => {
     toolDetail.value = tool
     defaultModelSetting.value = cloneDeep(toolWorkflow.default_model_setting ?? {})
     saveTime.value = toolWorkflow.update_time
@@ -331,7 +331,7 @@ onBeforeUnmount(() => stopAutoSave())
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"
-        :model-api="ModelApi"
+        :model-api="requestModelApi"
         :get-graph-data="getGraphData"
         :disabled="loading"
         @open="closeDebug"
@@ -365,7 +365,7 @@ onBeforeUnmount(() => stopAutoSave())
             </MkDropdownItem>
             <!-- 发布历史 -->
             <ButtonPublishHistory
-              :api="ToolWorkflowApi"
+              :api="requestApi"
               v-model:visible="historyVisible"
               :tool-id="toolId"
               :selected-id="previewVersion?.id"
@@ -396,6 +396,6 @@ onBeforeUnmount(() => stopAutoSave())
       />
     </div>
     <!-- 调试抽屉 -->
-    <DebugDrawer :api="ToolWorkflowApi" ref="debugDrawerRef" :tool-id="toolId" />
+    <DebugDrawer :api="requestApi" ref="debugDrawerRef" :tool-id="toolId" />
   </WorkflowViewLayout>
 </template>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Top } from '@element-plus/icons-vue'
 import type { ScrollbarInstance } from 'element-plus'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ModelItem, ModelProviderItem, PromptGenerateMessage, PromptGeneratePayload } from '@/api/types'
@@ -106,7 +105,6 @@ function resetData() {
 /** 初始化当前智能体与模型，并打开生成弹窗。 */
 function open() {
   if (props.disabled) return
-  resetData()
   applicationId.value = route.params.applicationId as string
   activeModelId.value = props.modelId
   visible.value = true
@@ -157,10 +155,21 @@ function generatePrompt(regenerate = false) {
   })
 }
 
-// 主题输入：回车发送，Shift+Enter 换行，中文输入法确认时不提交。
+// 主题输入：回车发送，组合键换行，中文输入法确认时不提交。
 function handleInputKeydown(event: KeyboardEvent) {
-  if (event.isComposing || event.key !== 'Enter' || event.shiftKey) return
+  if (event.isComposing || event.key !== 'Enter') return
   event.preventDefault()
+  if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
+    const textarea = event.target
+    if (!(textarea instanceof HTMLTextAreaElement)) return
+    const startPos = textarea.selectionStart
+    const endPos = textarea.selectionEnd
+    const content = inputValue.value.slice(0, startPos) + '\n' + inputValue.value.slice(endPos)
+    if (textarea.maxLength >= 0 && content.length > textarea.maxLength) return
+    inputValue.value = content
+    nextTick(() => textarea.setSelectionRange(startPos + 1, startPos + 1))
+    return
+  }
   generatePrompt()
 }
 
@@ -198,24 +207,22 @@ watch(visible, (value) => {
   </el-button>
   <MkDialog v-model="visible" title="生成提示词" @closed="resetData">
     <div class="space-y-4 rounded-xl bg-N100 p-4">
-      <p class="flex-align-center gap-2">
-        <MkIcon name="icon_star" class="text-primary" />
-        <span>提示词显示在这里</span>
-      </p>
-      <div v-if="loading" class="flex-align-center gap-2">
-        <LoadingIcon :size="20" />
-        <span>生成中</span>
-      </div>
       <el-scrollbar v-if="latestAnswer" ref="scrollbarRef" max-height="320">
         <div class="whitespace-pre-wrap break-words">{{ latestAnswer }}</div>
       </el-scrollbar>
-      <div v-if="!loading" class="flex gap-3">
-        <!-- 替换：将最新结果回写到节点的系统提示词。 -->
-        <el-button type="primary" :disabled="!latestAnswer" @click="replacePrompt">替换</el-button>
-        <!-- 重新生成：预留按钮，重试逻辑待接入。 -->
-        <el-button class="ml-0!" :disabled="!activeModelId" @click="handleReGenerate">重新生成</el-button>
-      </div>
 
+      <div v-else-if="loading" class="flex-align-center gap-2">
+        <LoadingIcon :size="16" />
+        <span class="mk-dotting">生成中</span>
+      </div>
+      <p v-else class="flex-align-center gap-2">
+        <MkIcon name="icon_star" class="text-primary!" />
+        <span>提示词显示在这里</span>
+      </p>
+      <div v-if="!loading && latestAnswer.length">
+        <el-button type="primary" :disabled="!latestAnswer" @click="replacePrompt">替换</el-button>
+        <el-button plain :disabled="!activeModelId" @click="handleReGenerate">重新生成</el-button>
+      </div>
       <div class="mk-conversation-input border transition-colors hover:border-primary focus-within:border-primary">
         <el-input
           v-model="inputValue"
@@ -224,16 +231,17 @@ watch(visible, (value) => {
           :autosize="{ minRows: 1, maxRows: 10 }"
           placeholder="请输入提示词"
           :maxlength="100000"
-          @keydown="handleInputKeydown"
+          @keydown.stop="handleInputKeydown"
+          @paste.stop
         />
         <div class="text-right">
           <!-- 停止生成提示词 -->
           <el-button v-if="loading" circle type="primary" @click="stopGenerate">
-            <MkIcon name="icon_stop_filled" />
+            <MkIcon name="icon_square_filled" />
           </el-button>
           <!-- 发送主题并生成提示词 -->
           <el-button v-else circle type="primary" :disabled="!inputValue.trim() || !activeModelId || !applicationId" @click="generatePrompt()">
-            <MkIcon :icon="Top" :size="16" />
+            <MkIcon name="icon_arrow-up_outlined" />
           </el-button>
         </div>
       </div>

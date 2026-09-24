@@ -45,14 +45,14 @@ function handleSubmit() {
 
     const commonPayload = { folder_id: props.folderId || 'default', name }
     const isSharedResource = isSystemSharedResource()
-    const toolApi = isSharedResource ? SystemSharedToolApi : ToolApi
-    const toolStoreApi = isSharedResource ? SystemSharedToolStoreApi : WorkspaceToolStoreApi
     let request: Promise<ToolItem>
 
     if (tool.label === 'workflow_template') {
-      request = toolApi.postTool({ ...commonPayload, code: '{}', tool_type: TOOL_TYPE.WORKFLOW, work_flow_template: tool })
+      const requestApi = isSharedResource ? SystemSharedToolApi : ToolApi
+      request = requestApi.postTool({ ...commonPayload, code: '{}', tool_type: TOOL_TYPE.WORKFLOW, work_flow_template: tool })
     } else {
-      request = toolStoreApi.postStoreTool(tool.id, {
+      const requestApi = isSharedResource ? SystemSharedToolStoreApi : WorkspaceToolStoreApi
+      request = requestApi.postStoreTool(tool.id, {
         ...commonPayload,
         download_callback_url: tool.downloadCallbackUrl ?? '',
         download_url: tool.downloadUrl ?? '',

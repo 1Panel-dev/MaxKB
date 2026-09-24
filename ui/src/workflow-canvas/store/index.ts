@@ -50,7 +50,7 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
   if (!api) {
     throw new Error(`[useWorkflowStore] unknown apiType: "${apiType}"`)
   }
-  const resolvedApi: ApiModule = api
+  const requestApi: ApiModule = api
 
   const cache = cacheMap.get(apiType) ?? new Map<string, unknown>()
   cacheMap.set(apiType, cache)
@@ -77,37 +77,37 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
   function build(force: boolean): WorkflowStoreApi {
     return {
       getAllTags(knowledgeIds: string[]): Promise<KnowledgeTagGroup[]> {
-        if (!resolvedApi.getAllTags) return Promise.resolve([])
-        return withCache(`knowledge-tags:${JSON.stringify(knowledgeIds)}`, () => resolvedApi.getAllTags!(knowledgeIds), force)
+        if (!requestApi.getAllTags) return Promise.resolve([])
+        return withCache(`knowledge-tags:${JSON.stringify(knowledgeIds)}`, () => requestApi.getAllTags!(knowledgeIds), force)
       },
       getModelListWithShared(query?: Dict<unknown>): Promise<ModelItem[]> {
-        return withCache(`model:${JSON.stringify(query ?? {})}`, () => resolvedApi.getModelListWithShared(query), force)
+        return withCache(`model:${JSON.stringify(query ?? {})}`, () => requestApi.getModelListWithShared(query), force)
       },
       getProviderList(): Promise<ModelProviderItem[]> {
-        return withCache('provider', () => resolvedApi.getProviderList(), force)
+        return withCache('provider', () => requestApi.getProviderList(), force)
       },
       getModelParamsForm(modelId: string): Promise<DynamicFormField[]> {
-        return withCache(`modelParamsForm:${modelId}`, () => resolvedApi.getModelParamsForm(modelId), force)
+        return withCache(`modelParamsForm:${modelId}`, () => requestApi.getModelParamsForm(modelId), force)
       },
       getMcpTools(resourceType: string, resourceId: string, mcpServers: string): Promise<McpTool[]> {
-        if (!resolvedApi.getMcpTools) return Promise.resolve([])
+        if (!requestApi.getMcpTools) return Promise.resolve([])
         return withCache(
           `mcp-tools:${resourceType}:${resourceId}:${mcpServers}`,
-          () => resolvedApi.getMcpTools!(resourceType, resourceId, mcpServers),
+          () => requestApi.getMcpTools!(resourceType, resourceId, mcpServers),
           force,
         )
       },
       getToolListWithShared(query?: Dict<unknown>): Promise<ToolItem[]> {
-        if (!resolvedApi.getToolListWithShared) return Promise.resolve([])
-        return withCache(`tool-list:${JSON.stringify(query ?? {})}`, () => resolvedApi.getToolListWithShared!(query), force)
+        if (!requestApi.getToolListWithShared) return Promise.resolve([])
+        return withCache(`tool-list:${JSON.stringify(query ?? {})}`, () => requestApi.getToolListWithShared!(query), force)
       },
       getToolById(toolId: string): Promise<ToolItem> {
-        if (!resolvedApi.getToolById) return Promise.resolve({} as ToolItem)
-        return withCache(`tool:${toolId}`, () => resolvedApi.getToolById!(toolId), force)
+        if (!requestApi.getToolById) return Promise.resolve({} as ToolItem)
+        return withCache(`tool:${toolId}`, () => requestApi.getToolById!(toolId), force)
       },
       getKnowledgeTags(knowledgeIds: string[]): Promise<KnowledgeTagGroup[]> {
-        if (!resolvedApi.getKnowledgeTags) return Promise.resolve([])
-        return withCache(`knowledge-tags:${JSON.stringify(knowledgeIds)}`, () => resolvedApi.getKnowledgeTags!(knowledgeIds), force)
+        if (!requestApi.getKnowledgeTags) return Promise.resolve([])
+        return withCache(`knowledge-tags:${JSON.stringify(knowledgeIds)}`, () => requestApi.getKnowledgeTags!(knowledgeIds), force)
       },
     }
   }

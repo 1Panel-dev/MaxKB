@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { EditorState } from '@codemirror/state'
 import { linter, type Diagnostic } from '@codemirror/lint'
 import { python } from '@codemirror/lang-python'
 import { Codemirror } from 'vue-codemirror'
 import ToolApi from '@/api/admin/workspace/tool/tool'
+import SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { ToolPylintIssue } from '@/api/types'
+import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'PythonCodeEditor', inheritAttrs: false })
 
@@ -15,6 +18,13 @@ defineProps<{ title?: string }>()
 const emit = defineEmits<{ submitDialog: [code: string] }>()
 
 defineSlots<{ 'header-extra'?(): unknown }>()
+
+// Python 校验使用当前资源范围的工具接口。
+const requestApi = computed(() => {
+  if (isSystemResource()) return SystemResourceToolApi
+  if (isSystemSharedResource()) return SystemSharedToolApi
+  return ToolApi
+})
 
 function getDocumentPosition(state: EditorState, line: number, column: number) {
   const safeLine = Math.max(1, Math.min(line, state.doc.lines))
@@ -35,7 +45,8 @@ const codeLinter = linter(
     const lintSource = view.state.doc.toString()
     if (!lintSource.trim()) return []
 
-    return ToolApi.postToolPylint(lintSource)
+    return requestApi.value
+      .postToolPylint(lintSource)
       .then((issues) => {
         if (lintSource !== view.state.doc.toString()) return []
         return issues.slice(0, 50).map((issue) => createDiagnostic(view.state, issue))
