@@ -87,14 +87,14 @@ function getProviderIcon(modelId: unknown) {
 // 创建模型：根据当前资源范围传入完整 API，创建后由调用方刷新选项。
 const selectRef = useTemplateRef<SelectInstance>('selectRef')
 const allModelProvider: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
-const createModelApi = computed(() => {
+const requestApi = computed(() => {
   if (isWorkspaceResource()) return ModelApi
   if (isSystemSharedResource()) return SystemSharedModelApi
   return undefined
 })
 
 function handleOpenCreateModel(open: () => void) {
-  if (props.disabled || !props.canAdd || !createModelApi.value) return
+  if (props.disabled || !props.canAdd || !requestApi.value) return
   selectRef.value?.blur()
   open()
 }
@@ -157,9 +157,9 @@ function openModelParams() {
         </div>
       </template>
 
-      <template v-if="canAdd && createModelApi" #footer>
+      <template v-if="canAdd && requestApi" #footer>
         <slot name="footer">
-          <ButtonAddModel :api="createModelApi" :current-provider="allModelProvider" :providers="providerOptions" @refresh="emit('refresh')">
+          <ButtonAddModel :api="requestApi" :current-provider="allModelProvider" :providers="providerOptions" @refresh="emit('refresh')">
             <template #default="{ open }">
               <el-button type="primary" link :disabled="disabled" @click.stop="handleOpenCreateModel(open)">
                 <MkIcon name="icon_add_outlined" />

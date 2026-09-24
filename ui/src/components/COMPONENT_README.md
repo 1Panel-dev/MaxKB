@@ -480,7 +480,9 @@ Python 与 JSON 编辑器通过 `<style lang="scss" scoped src="./style.scss">` 
 编辑器单独设置高度。不在全局 `app.scss` 中覆盖 `.cm-editor`。
 
 基于 CodeMirror 6 的 Python 代码编辑器，通过 `v-model` 管理代码，并在组件内部调用工具 pylint
-接口生成诊断。组件最多展示 50 条诊断，并在代码停止输入 500ms 后检查。编辑器提供内置全屏
+接口生成诊断。组件通过资源上下文方法判断当前路由范围，分别选择 Workspace、System 资源管理
+或 System 共享资源的工具 API；普通编辑与全屏编辑使用相同的接口选择逻辑。
+组件最多展示 50 条诊断，并在代码停止输入 500ms 后检查。编辑器提供内置全屏
 入口；全屏确认时更新 `v-model` 并触发 `submit-dialog`，`header-extra` 插槽用于添加全屏标题栏操作。
 
 ### JsonInput

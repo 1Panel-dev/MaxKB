@@ -81,9 +81,9 @@ function handleSearchChange(query?: Dict<unknown>) {
 }
 
 function loadKnowledgePage(pagination: { currentPage: number; pageSize: number }) {
-  const request = isShared.value ? SharedApi : KnowledgeApi
+  const requestApi = isShared.value ? SharedApi : KnowledgeApi
   const folderId = isShared.value ? {} : { folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL }
-  return request.getKnowledgePage(pagination, { ...knowledgeQuery.value, ...folderId })
+  return requestApi.getKnowledgePage(pagination, { ...knowledgeQuery.value, ...folderId })
 }
 
 /* 知识库维护 */

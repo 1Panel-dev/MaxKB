@@ -76,9 +76,9 @@ function handleSearchChange(query?: Dict<unknown>) {
 const toolType = ref<ToolType | ''>('')
 
 function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
-  const request = isShared.value ? SharedApi : ToolApi
+  const requestApi = isShared.value ? SharedApi : ToolApi
   const folderId = isShared.value ? {} : { folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL }
-  return request.getToolPage(pagination, { ...toolQuery.value, tool_type: toolType.value, ...folderId })
+  return requestApi.getToolPage(pagination, { ...toolQuery.value, tool_type: toolType.value, ...folderId })
 }
 
 // 加载工具商店

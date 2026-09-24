@@ -32,7 +32,7 @@ const folderData = ref<FolderItem>()
 const submitting = ref(false)
 
 /* System 资源管理使用专属用户/用户组授权接口，工作空间沿用现有接口。 */
-const authorizationApi = computed(() => (isSystemResource() ? SystemResourceAuthorizationApi : ResourceAuthorizationApi))
+const requestApi = computed(() => (isSystemResource() ? SystemResourceAuthorizationApi : ResourceAuthorizationApi))
 
 /* 资源类型与权限选项 */
 const folderPermissionMap = {
@@ -105,13 +105,13 @@ function submitPermissions(permission: ResourcePermission, includeChildren: bool
   const authorizationRef = isUserGroup ? userGroupAuthorizationRef.value : userAuthorizationRef.value
   submitting.value = true
   const request = isUserGroup
-    ? authorizationApi.value.putResourceUserGroupAuthorization(
+    ? requestApi.value.putResourceUserGroupAuthorization(
         workspaceId,
         targetId.value,
         authorizationType.value,
         pendingSubjectIds.value.map((id) => ({ user_group_id: id, ...permissionScope })),
       )
-    : authorizationApi.value.putResourceAuthorization(
+    : requestApi.value.putResourceAuthorization(
         workspaceId,
         targetId.value,
         authorizationType.value,
@@ -164,7 +164,7 @@ defineExpose({ open })
         v-if="targetType === 'user-group' && targetId && workspaceId"
         :key="targetId"
         :submitting="submitting"
-        :api="authorizationApi"
+        :api="requestApi"
         :workspace-id="workspaceId"
         :target-id="targetId"
         :type="authorizationType"
@@ -177,7 +177,7 @@ defineExpose({ open })
         v-if="targetType === 'user' && targetId && workspaceId"
         :key="targetId"
         :submitting="submitting"
-        :api="authorizationApi"
+        :api="requestApi"
         :workspace-id="workspaceId"
         :target-id="targetId"
         :type="authorizationType"

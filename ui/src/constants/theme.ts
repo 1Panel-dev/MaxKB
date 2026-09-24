@@ -24,7 +24,7 @@ export const DEFAULT_THEME_SETTING = { icon: '', loginLogo: '', loginImage: '', 
 
 export const DEFAULT_PLATFORM_SETTING = {
   showUserManual: true,
-  userManualUrl: 'https://maxkb.cn/docs/v2/',
+  userManualUrl: 'https://docs.fit2cloud.com/maxkb/',
   showForum: true,
   forumUrl: 'https://bbs.fit2cloud.com/c/mk/11',
   showProject: true,

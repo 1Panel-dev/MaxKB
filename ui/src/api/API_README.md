@@ -96,6 +96,11 @@ FormData；保存返回完整配置，页面以该返回值作为唯一数据来
 
 ### 四类特殊资源 API
 
+根据资源范围或业务上下文选择出的 API 对象统一命名为 `requestApi`，包括 `computed` 结果和
+局部变量，不使用 `toolApi`、`authorizationApi` 或 `request` 等名称。同一作用域确需同时使用
+多套 API 时，以 `request` 为前缀加业务名区分，例如 `requestModelApi`、`requestToolApi`。
+直接导入的 API 保持 PascalCase 命名；请求返回的 Promise 不属于此命名规则。
+
 `application`、`knowledge`、`model`、`tool` 是需要同时考虑 Workspace、System 资源管理和
 System 共享资源的四类特殊资源。其接口按真实后端边界分别维护在 `admin/workspace/` 与
 `admin/system/` 下，不把不同范围的 URL 合并为页面侧 API Map，也不让卡片或 Action 根据路由拼接

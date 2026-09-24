@@ -22,6 +22,11 @@ const loadingSize = computed(() => (typeof props.size === 'number' ? `${props.si
 </template>
 <style scoped lang="scss">
 .loading-icon {
+  :deep(.el-loading-spinner .circular) {
+    display: block;
+    margin-inline: auto;
+  }
+
   :deep(.el-loading-spinner .path) {
     stroke-width: 4px;
   }
