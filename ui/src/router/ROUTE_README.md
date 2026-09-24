@@ -367,6 +367,6 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 注册，复用 `ToolWorkflowView`。系统工作流路由不携带 `workspaceId`，画布辅助查询使用对应 System API；
 工具自身的查询、编辑、调试和发布使用 System API，返回 `system-resource-tools`。
 
-共享工具工作流使用 `system-shared-tool-workflow`，地址为 `/system/shared/tool/:toolId/workflow`，
+共享工具工作流使用 `system-shared-workflow-tool`，地址为 `/system/shared/tool/:toolId/workflow`，
 与资源管理共用 `ToolWorkflowView`，通过 `resourceScope` 选择接口。共享工具卡片点击及创建成功后
 进入该路由，Ctrl / Command 点击支持新标签页；退出返回 `system-shared-tools`。
