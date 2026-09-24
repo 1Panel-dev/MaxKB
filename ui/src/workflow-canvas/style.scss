@@ -76,7 +76,6 @@
   }
 }
 
-
 /* node container*/
 .workflow-node-container {
   .step-container {
@@ -88,7 +87,7 @@
     overflow: visible;
 
     &:hover {
-      box-shadow: 0px 6px 24px 0px rgb(var(--mk-N900-rgb) / 8%);
+      box-shadow: var(--mk-box-shadow-lg);
     }
 
     &.isSelected {

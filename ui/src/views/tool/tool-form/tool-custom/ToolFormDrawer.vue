@@ -3,11 +3,14 @@ import { reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { DynamicFormField, ToolInputField, ToolItem } from '@/api/types'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
+import FileApi from '@/api/admin/file'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 import ToolDebugDrawer from './ToolDebugDrawer.vue'
 import InitFieldTable from '../component/init-field/InitFieldTable.vue'
 import InputFieldTable from '../component/input-field/InputFieldTable.vue'
@@ -45,29 +48,45 @@ const formRules: FormRules<ToolFormModel> = {
   name: [{ whitespace: true, required: true, message: '请输入工具名称', trigger: 'blur' }],
 }
 
+// 暂存确认后的头像文件，恢复默认时清空。
+const iconFile = ref<File | null>(null)
+function handleIconChange(file: File | null) {
+  iconFile.value = file
+}
+
 function handleSubmit() {
-  formRef.value?.validate((valid) => {
-    if (!valid) return
+  return formRef.value?.validate((valid) => {
+    if (!valid || loading.value) return
 
     loading.value = true
-    const payload = cloneDeep(toolForm)
-    delete payload.workspace_id
     const currentEditId = editId.value
     const isEdit = Boolean(currentEditId)
-    const request = currentEditId
-      ? props.api.putTool(currentEditId, payload)
-      : 'postTool' in props.api
-        ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
-        : Promise.reject(new Error('资源管理不支持创建工具'))
+    // 新头像先上传并替换预览地址，再提交完整工具表单。
+    const uploadIcon = iconFile.value
+      ? FileApi.postUploadFile(iconFile.value, currentEditId, FILE_SOURCE_TYPE.TOOL).request.then((icon) => {
+          toolForm.icon = icon
+          iconFile.value = null
+        })
+      : Promise.resolve()
 
-    request
-      .then((savedTool) => {
-        const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
-        return refreshCurrentUser.then(() => {
-          MsgSuccess(isEdit ? '保存成功' : '创建成功')
-          visible.value = false
-          if (isEdit) emit('update', savedTool)
-          else emit('refresh')
+    return uploadIcon
+      .then(() => {
+        const payload = cloneDeep(toolForm)
+        delete payload.workspace_id
+        const request = currentEditId
+          ? props.api.putTool(currentEditId, payload)
+          : 'postTool' in props.api
+            ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
+            : Promise.reject(new Error('资源管理不支持创建工具'))
+
+        return request.then((savedTool) => {
+          const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
+          return refreshCurrentUser.then(() => {
+            MsgSuccess(isEdit ? '保存成功' : '创建成功')
+            visible.value = false
+            if (isEdit) emit('update', savedTool)
+            else emit('refresh')
+          })
         })
       })
       .finally(() => {
@@ -122,6 +141,7 @@ function open(tool?: ToolItem, asCopy = false) {
 }
 
 function handleBeforeClose() {
+  if (loading.value) return
   if (JSON.stringify(toolForm) === originalForm.value) {
     visible.value = false
     return
@@ -135,6 +155,7 @@ function handleBeforeClose() {
 
 function resetData() {
   Object.assign(toolForm, { name: '', desc: '', code: '', icon: '', init_field_list: [], input_field_list: [], workspace_id: undefined })
+  iconFile.value = null
   editId.value = undefined
   originalForm.value = ''
   loading.value = false
@@ -154,7 +175,7 @@ defineExpose({ open })
   <MkDrawer v-model="visible" :before-close="handleBeforeClose" :title="title" size="60%" @closed="handleClosed">
     <el-form
       ref="formRef"
-      v-loading="formLoading"
+      v-loading="formLoading || loading"
       :model="toolForm"
       :rules="formRules"
       label-position="top"
@@ -164,8 +185,12 @@ defineExpose({ open })
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
-          <!-- TODO 统一修改修改工具头像 -->
-          <ToolIcon :icon="toolForm.icon" />
+          <!-- // TODO 修改工具头像 -->
+          <MkEditAvatar v-model="toolForm.icon" @change="handleIconChange">
+            <template #default="{ icon }">
+              <ToolIcon :icon="icon" />
+            </template>
+          </MkEditAvatar>
           <el-input
             v-model="toolForm.name"
             maxlength="64"

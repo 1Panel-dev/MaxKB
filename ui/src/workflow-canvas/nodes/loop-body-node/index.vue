@@ -88,7 +88,7 @@ const validate = () => {
 
 const loopLayout = () => {
   const extension = lf.value?.extension as { dagre?: { layout?: () => unknown } } | undefined
-  extension?.dagre?.layout?.()
+  return extension?.dagre?.layout?.()
 }
 
 const renderGraphData = (data?: LogicFlow.GraphConfigData) => {

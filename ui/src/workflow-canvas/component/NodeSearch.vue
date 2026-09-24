@@ -65,12 +65,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleShortcut))
 </script>
 
 <template>
-  <el-button
-    :type="searchVisible ? 'primary' : 'default'"
-    text
-    :style="{ background: searchVisible ? 'var(--mk-primary-transparent-10)' : '' }"
-    @click="openSearch"
-  >
+  <!-- 打开节点搜索 -->
+  <el-button text :class="searchVisible ? 'bg-primary/10! text-primary!' : 'text-N600!'" @click="openSearch">
     <MkIcon name="icon_search-outlined" size="18" />
   </el-button>
   <el-card v-if="searchVisible" shadow="always" class="workflow-search-container" style="--el-card-padding: 8px 12px">

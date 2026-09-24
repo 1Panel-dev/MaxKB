@@ -14,7 +14,7 @@
 
 `tailwind.css` 内部按照 `@import`、`@theme`、`@custom-variant`、`@layer base`、
 `@layer components`、`@utility` 的顺序组织；不存在的部分直接省略。`@theme` 内部按照颜色、
-背景图片、间距、排版分组，每组通过注释标明职责，不将不同类型的 Token 混合排序。
+背景图片、间距、阴影、排版分组，每组通过注释标明职责，不将不同类型的 Token 混合排序。
 
 `src/main.ts` 和 `src/chat.ts` 应按以下顺序加载样式：
 
@@ -207,6 +207,21 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 
 白色内容卡片使用 `mk-white-card` 或 `mk-white-card-sm`，内边距和圆角与同尺寸灰色卡片一致。
 两种背景的尺寸类均可独立使用，包含对应背景色，无需叠加基础类。
+
+## 阴影
+
+大号阴影统一由 `variables.scss` 中的 `--mk-box-shadow-lg` 定义，值为
+`0 6px 24px 0 rgb(var(--mk-N900-rgb) / 8%)`。`tailwind.css` 将其映射为 `shadow-lg`，
+业务模板直接使用该工具类，悬停效果使用 `hover:shadow-lg`：
+
+```html
+<div class="shadow-lg">常驻阴影</div>
+<div class="hover:shadow-lg">悬停阴影</div>
+```
+
+普通 CSS/SCSS 使用 `box-shadow: var(--mk-box-shadow-lg)`。Element Plus 卡片的常驻、
+悬停和焦点阴影复用该变量。现有 `shadow-sm`、`shadow-md` 分别保持映射到
+`--el-box-shadow-lighter`、`--el-box-shadow-light`。
 
 ## 常用交互工具类
 

@@ -453,6 +453,7 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 
 `admin/file.ts` 与 `chat/file.ts` 分别提供 `postUploadFile(file, sourceId, sourceType, onProgress?)`，
 通过各自请求客户端向 `/oss/file` 提交 FormData 的 `file`、`source_id` 和 `source_type`。
+Admin 上传尚未创建的资源文件时，`sourceId` 可传 `undefined`，省略 `source_id` 并使用后端默认值。
 返回值统一为 `{ request, abort }`，`request` 解包得到文件地址，`abort()` 中断客户端请求。
 普通上传直接等待 `request`，需要进度时传入 `(percent, event)`；只有能获取上传总量时才回调
 0–100 的百分比，100 表示请求体已上传，不代表服务端处理成功，完成状态以 `request` 为准。

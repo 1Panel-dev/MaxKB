@@ -13,6 +13,7 @@ import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canva
 import type { DefaultModelSettingPayload } from '@/api/types'
 import NodeAdd from './component/NodeAdd.vue'
 import NodeSearch from './component/NodeSearch.vue'
+import NodeControl from './component/NodeControl.vue'
 defineOptions({ name: 'WorkflowCanvas' })
 
 type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void }
@@ -190,8 +191,7 @@ defineExpose({ onmousedown, validate, getGraphData, addNode, clearGraphData, ren
     <div id="graph" ref="containerRef" class="h-full w-full" />
     <!-- 辅助工具栏 -->
     <TeleportContainer :flow-id="flowId" />
-    <!-- // TODO: 临时注释掉，后续加 -->
-    <!-- <Control class="workflow-control" v-if="lf" :lf="lf"></Control> -->
+    <NodeControl v-if="lf" :logic-flow="lf" />
     <div class="absolute left-4 top-4 z-10">
       <el-card shadow="always" style="--el-card-padding: 8px">
         <NodeAdd v-if="lf" :workflow-mode="workflowMode" @dragstart="onmousedown" @select="addNode" class="mb-1" />
