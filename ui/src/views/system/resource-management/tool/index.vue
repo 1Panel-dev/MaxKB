@@ -132,10 +132,10 @@ onMounted(() => {
 <template>
   <MkViewLayout>
     <template #default="{ Header, title }">
-      <component :is="Header"
-        ><h4>{{ title }}</h4>
-        <MkComplexSearch :fields="searchFields" @change="handleSearchChange"
-      /></component>
+      <component :is="Header">
+        <h4>{{ title }}</h4>
+        <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+      </component>
       <MkTable
         v-model:pagination-config="pagination"
         v-loading="loading || operationLoading"
@@ -146,35 +146,34 @@ onMounted(() => {
         resizable
       >
         <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
-          <template #default="{ row }"
-            ><div class="flex-align-center gap-2">
-              <ToolIcon :icon="row.icon" :type="row.tool_type" :size="20" class="shrink-0" /><span class="truncate" :title="row.name">{{
-                row.name
-              }}</span>
-            </div></template
-          >
+          <template #default="{ row }">
+            <div class="flex-align-center gap-2">
+              <ToolIcon :icon="row.icon" :type="row.tool_type" :size="20" class="shrink-0" />
+              <span class="truncate" :title="row.name">{{ row.name }}</span>
+            </div>
+          </template>
         </el-table-column>
-        <el-table-column prop="tool_type" label="类型" width="120"
-          ><template #default="{ row }">{{ toolTypeLabels.get(row.tool_type) ?? row.tool_type }}</template></el-table-column
-        >
-        <el-table-column label="来源" width="120"
-          ><template #default="{ row }">{{ row.template_id ? '工具商店' : '自定义' }}</template></el-table-column
-        >
-        <el-table-column label="状态" width="120"
-          ><template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template
-        ></el-table-column>
+        <el-table-column prop="tool_type" label="类型" width="120">
+          <template #default="{ row }">{{ toolTypeLabels.get(row.tool_type) ?? row.tool_type }}</template>
+        </el-table-column>
+        <el-table-column label="来源" width="120">
+          <template #default="{ row }">{{ row.template_id ? '工具商店' : '自定义' }}</template>
+        </el-table-column>
+        <el-table-column label="状态" width="120">
+          <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
+        </el-table-column>
         <el-table-column v-if="auth.isEE" prop="workspace_name" label="工作空间" min-width="160" show-overflow-tooltip>
-          <template #header
-            ><MkTableFilter v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange"
-          /></template>
+          <template #header>
+            <MkTableFilter v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange" />
+          </template>
         </el-table-column>
         <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column label="更新时间" width="180"
-          ><template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template></el-table-column
-        >
-        <el-table-column label="创建时间" width="180"
-          ><template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template></el-table-column
-        >
+        <el-table-column label="更新时间" width="180">
+          <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
+        </el-table-column>
+        <el-table-column label="创建时间" width="180">
+          <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
+        </el-table-column>
         <el-table-column label="操作" width="140" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center gap-1">
@@ -186,7 +185,8 @@ onMounted(() => {
               <MkTableMoreDropdown persistent>
                 <!-- 打开工具工作流 -->
                 <MkDropdownItem v-if="row.tool_type === TOOL_TYPE.WORKFLOW" @click="handleOpenWorkflow(row, $event)">
-                  <template #icon><MkIcon name="icon_setting" /></template>工作流
+                  <template #icon><MkIcon name="icon_setting" /></template>
+                  工作流
                 </MkDropdownItem>
                 <!-- 配置启动参数 -->
                 <InitParamAction
@@ -200,9 +200,6 @@ onMounted(() => {
 
                 <!-- 资源授权 -->
                 <AuthorizeToolAction label="资源授权" :tool="row" />
-
-                <!-- 导出工具 -->
-                <ExportToolAction v-if="!row.template_id" v-model:loading="operationLoading" label="导出" :api="SystemToolApi" :tool="row" />
                 <!-- 查看 MCP 配置 -->
                 <McpConfigAction
                   v-if="row.tool_type === TOOL_TYPE.MCP"
@@ -225,13 +222,16 @@ onMounted(() => {
                 <!-- 查看执行记录 -->
                 <ExecutionRecordToolAction
                   v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type)"
-                  label="执行记录"
+                  label="查看执行记录"
                   :api="SystemToolWorkflowApi"
                   :tool="row"
                 />
+                <!-- 导出工具 -->
+                <ExportToolAction v-if="!row.template_id" v-model:loading="operationLoading" label="导出" :api="SystemToolApi" :tool="row" />
                 <!-- 删除工具 -->
                 <MkDropdownItem divided :disabled="operationLoading" @click="handleDeleteTool(row)">
-                  <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>删除
+                  <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                  删除
                 </MkDropdownItem>
               </MkTableMoreDropdown>
             </div>

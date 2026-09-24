@@ -1,15 +1,27 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
+import SystemSharedRelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
 import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import CommonSystemApi from '@/api/admin/system/common'
+import SystemSharedToolWorkflowApi from '@/api/admin/system/shared-resources/tool/tool-workflow'
 import type { ParamsPage } from '@/api/admin/core/types'
 import type { Dict, OptionItem, ToolItem, ToolType } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS } from '@/constants'
 import ToolCard from '@/views/tool/tool-card/ToolCard.vue'
 import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
-import { DeleteToolAction, EditToolAction, ExportToolAction, InitParamAction, McpConfigAction } from '@/views/tool/tool-card/action-dropdown'
+import {
+  RelatedResourcesToolAction,
+  DeleteToolAction,
+  EditToolAction,
+  ExportToolAction,
+  ExecutionRecordToolAction,
+  InitParamAction,
+  McpConfigAction,
+  CopyToolAction,
+} from '@/views/tool/tool-card/action-dropdown'
+import ButtonToolStore from '@/views/tool/components/ButtonToolStore.vue'
 
 const router = useRouter()
 
@@ -63,6 +75,15 @@ function handleToolUpdate(tool: ToolItem) {
   const toolIndex = toolsData.value.findIndex(({ id }) => id === tool.id)
   if (toolIndex >= 0) toolsData.value.splice(toolIndex, 1, tool)
 }
+
+function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
+  const target = { name: 'system-shared-workflow-tool', params: { toolId: tool.id } }
+  if (event.ctrlKey || event.metaKey) {
+    window.open(router.resolve(target).href)
+    return
+  }
+  return router.push(target)
+}
 </script>
 
 <template>
@@ -78,6 +99,8 @@ function handleToolUpdate(tool: ToolItem) {
         </div>
         <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+          <!-- 工具商店 -->
+          <ButtonToolStore folder-id="default" @refresh="refreshTools" />
           <!-- 创建共享工具 -->
           <ButtonCreateTool folder-id="default" :api="SystemSharedToolApi" @refresh="refreshTools" />
         </div>
@@ -109,6 +132,19 @@ function handleToolUpdate(tool: ToolItem) {
                     :tool="tool"
                     @update="handleToolUpdate"
                   />
+                  <!-- 复制 -->
+                  <CopyToolAction
+                    v-model:loading="toolOperationLoading"
+                    label="复制"
+                    :api="SystemSharedToolApi"
+                    :tool="tool"
+                    @refresh="refreshTools"
+                  />
+                  <!-- 工作流 -->
+                  <MkDropdownItem v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" @click="handleOpenWorkflow(tool, $event)">
+                    <template #icon><MkIcon name="icon_setting" /></template>
+                    工作流
+                  </MkDropdownItem>
                   <!-- 配置启动参数 -->
                   <InitParamAction
                     v-if="(tool.init_field_list?.length ?? 0) > 0"
@@ -126,6 +162,16 @@ function handleToolUpdate(tool: ToolItem) {
                     :api="SystemSharedToolApi"
                     :tool="tool"
                   />
+                  <!-- 查看关联资源 -->
+                  <RelatedResourcesToolAction label="查看关联资源" :api="SystemSharedRelatedResourcesApi" :tool="tool" />
+                  <!-- 查看执行记录 -->
+                  <ExecutionRecordToolAction
+                    v-if="tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW"
+                    label="查看执行记录"
+                    :api="SystemSharedToolWorkflowApi"
+                    :tool="tool"
+                  />
+                  <!--  TODO 授权工作空间 -->
                   <!-- 导出共享工具 -->
                   <ExportToolAction
                     v-if="!tool.template_id"

@@ -264,7 +264,6 @@ onMounted(() => {
                 @update="handleToolUpdate"
               >
                 <template #action-dropdown>
-                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" :tool="tool" />
                   <!-- 编辑工具 -->
                   <EditToolAction
                     :ref="
@@ -278,6 +277,9 @@ onMounted(() => {
                     :tool="tool"
                     @update="handleToolUpdate"
                   />
+                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" :tool="tool" />
+                  <!-- 复制 -->
+                  <CopyToolAction v-model:loading="toolOperationLoading" label="复制" :api="ToolApi" :tool="tool" @refresh="refreshTool" />
                   <InitParamAction
                     v-if="(tool.init_field_list?.length ?? 0) > 0"
                     v-model:loading="toolOperationLoading"
@@ -313,8 +315,6 @@ onMounted(() => {
                     :api="WorkflowApi"
                     :tool="tool"
                   />
-                  <!-- 复制 -->
-                  <CopyToolAction v-model:loading="toolOperationLoading" label="复制" :api="ToolApi" :tool="tool" @refresh="refreshTool" />
                   <!-- 移动到 -->
                   <MoveToolAction
                     v-model:loading="toolOperationLoading"
@@ -346,8 +346,8 @@ onMounted(() => {
         @batch-cancel="cancelBatchSelection"
       >
         <template #footer-batch-actions>
-          <el-button type="primary" plain :disabled="!selectedToolCount" @click="handleOpenBatchMove"> 移动到 </el-button>
-          <el-button type="danger" plain :disabled="!selectedToolCount" @click="handleBatchDelete"> 删除 </el-button>
+          <el-button type="primary" plain :disabled="!selectedToolCount" @click="handleOpenBatchMove">移动到</el-button>
+          <el-button type="danger" plain :disabled="!selectedToolCount" @click="handleBatchDelete">删除</el-button>
         </template>
       </component>
     </template>
