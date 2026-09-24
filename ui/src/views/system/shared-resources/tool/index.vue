@@ -61,7 +61,7 @@ const editToolActionRefs: Record<string, InstanceType<typeof EditToolAction> | n
 
 function handleOpenTool(tool: ToolItem, event: MouseEvent) {
   if (tool.tool_type === TOOL_TYPE.WORKFLOW) {
-    const target = { name: 'system-shared-tool-workflow', params: { toolId: tool.id } }
+    const target = { name: 'system-shared-workflow-tool', params: { toolId: tool.id } }
     if (event.ctrlKey || event.metaKey) {
       window.open(router.resolve(target).href)
       return

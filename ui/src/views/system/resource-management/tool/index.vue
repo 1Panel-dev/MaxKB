@@ -38,7 +38,7 @@ const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedWorkspaceIds = ref<string[]>([])
 const searchFields = computed(() => [
-  { label: '工具名称', value: 'name' },
+  { label: '名称', value: 'name' },
   { label: '类型', value: 'tool_type', options: TOOL_TYPE_OPTIONS.filter(({ value }) => value) },
   {
     label: '来源',

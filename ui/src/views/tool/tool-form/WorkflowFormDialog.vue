@@ -63,7 +63,7 @@ function handleSubmit() {
           }
 
           return router.push({
-            name: isSystemSharedResource() ? 'system-shared-tool-workflow' : 'workflow-tool',
+            name: isSystemSharedResource() ? 'system-shared-workflow-tool' : 'workflow-tool',
             params: isSystemSharedResource() ? { toolId: savedTool.id } : { toolId: savedTool.id, workspaceId: route.params.workspaceId },
           })
         })

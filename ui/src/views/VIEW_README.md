@@ -348,7 +348,7 @@ src/views/system/shared-resources/
 导出、删除 Action。列表使用 `MkInfiniteScroll` 分页加载，支持类型、名称和创建者筛选；
 创建与删除后重新查询，编辑和启停成功后替换对应卡片数据。
 `ButtonCreateTool` 可接收完整 `api`，默认使用 Workspace Tool API；`showWorkflow` 默认开启，
-共享页开启工作流创建，创建后进入 `system-shared-tool-workflow`。共享页支持普通工具、Skills、MCP、数据源及
+共享页开启工作流创建，创建后进入 `system-shared-workflow-tool`。共享页支持普通工具、Skills、MCP、数据源及
 导入创建，工作流卡片点击进入画布（支持 Ctrl / Command 新标签页），编辑菜单仍修改基础信息。共享页不组合工作空间专用的移动、授权和触发器入口。
 
 System 用户页面按业务流程归拢操作入口和专属 Dialog。入口组件管理弹窗 Ref、打开动作并转发
