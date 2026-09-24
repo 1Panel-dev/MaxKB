@@ -127,8 +127,10 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 ### 资源查询（`store/`）
 
-`useWorkflowStore(apiType)` 是画布查询适配器，不是 Pinia Store。它自动收集 `store/api/*/index.ts`，
-按范围、方法与查询参数缓存结果并复用在途请求；`store.force.xxx()` 跳过已完成缓存，仍复用同键在途请求。
+`useWorkflowStore(apiType)` 是画布资源接口适配器，不是 Pinia Store。它自动收集 `store/api/*/index.ts`，
+查询方法按范围、方法与查询参数缓存结果并复用在途请求；`store.force.xxx()` 跳过已完成缓存，仍复用同键在途请求。
+`postPromptGenerate` 是流式生成方法，始终直接转发到对应范围的 Application API，不缓存或去重；
+通过普通 Store 或 `force` 调用都会发起新请求，返回独立的 Response 流。
 模型选项统一调用 `store.getModelListWithShared(query)`，由 API 合并工作空间和已授权共享模型；
 强制刷新使用 `store.force.getModelListWithShared(query)`。动态表单配置器通过
 `getSelectModelList` 注入使用该能力，循环体转发同名注入。
@@ -314,16 +316,22 @@ ID 数组及 `tool_list`、`skill_tool_list`、`application_list` 回显快照�
 读取资源配置、通过 `update` 提交局部变更；资源选项由 Props 传入，未接入数据源时默认为空数组。
 
 AI 对话节点的提示词、历史记录、视觉理解和输出思考表单直接在节点入口维护，统一使用全局
-`MdEditorMagnify` 和节点表单样式；`component/PromptGenerate.vue` 同时封装生成按钮与弹窗，
-接收 `modelId`、`disabled`、`modelOptions` 和 `providerOptions`，内部读取当前路由的智能体 ID。
-弹窗顶部复用 `SelectModel`，仅修改本次生成使用的模型；主体展示最新结果与主题输入框，支持停止和重新生成。
-重新生成复用上次请求消息，关闭时终止请求并在关闭动画结束后清理会话；点击替换后通过 `replace` 交由节点回写系统提示词。
-生成接口沿用智能体已保存的参数，弹窗不提供独立模型参数设置。
-主题输入直接在 `PromptGenerate.vue` 内使用 Element Plus 自适应文本域与底部发送／停止按钮，
-通过本地输入值、模型和智能体状态控制提交；Enter 发送，Ctrl/Shift/Alt/Meta + Enter 在光标处换行，
-输入法组合期间不提交，纯空白内容不可发送。
-长文本使用原生纯文本粘贴，输入上限为 100000 字符，不转为附件事件；输入框的键盘和粘贴事件
-停止冒泡，避免触发画布快捷键或节点粘贴。
+`MdEditorMagnify` 和节点表单样式。AI 对话、图片理解和视频理解的系统提示词生成统一使用
+`workflow-canvas/component/PromptGenerate.vue`，内部复用公共业务组件 `GenerateContent`。
+节点只传 `modelId` 并监听 `replace` 回写自己的 `system`；默认模型从当前工作流配置读取，
+自定义模型使用节点配置的模型 ID，引用变量无法在编辑时确定模型，生成入口禁用。
+图片理解和视频理解使用 IMAGE 模型，AI 对话使用 LLM 模型，现有提示词接口支持这两种类型。
+共享组件维护提示词模板和请求上下文，不依赖某个节点，也不接收未使用的模型或供应商选项。
+组件将画布注入的 `apiType` 传给 `useWorkflowStore`，通过 `store.postPromptGenerate` 发起生成；
+Store 适配器统一选择 Workspace、System 资源管理或 System 共享资源的 Application API。
+循环画布已转发同一上下文，组件不再单独判断资源范围。生成方法不使用 Store 的查询缓存或请求去重。
+接口仍要求当前路由的智能体 ID，生成使用智能体已保存的模型参数；没有智能体 ID 时禁用入口，
+工具和知识库工作流尚未接入对应的提示词生成接口。弹窗不提供独立模型或参数设置。
+公共组件统一维护主题输入、会话消息与 `ConversationStream`；重新生成在历史中追加用户消息
+`Re generate` 后请求，停止通过 `cancel()` 终止读取，关闭动画结束后清理会话。
+点击替换后通过 `replace` 交由节点回写系统提示词。
+Enter 发送、组合键换行、输入法保护、纯空白校验及文本粘贴统一遵循公共组件约定，
+键盘和粘贴事件停止冒泡，避免触发画布快捷键或节点粘贴。
 AI 对话、图片理解和视频理解统一复用 `component/ThinkingSetting.vue`，后续同类入口也应复用。
 组件通过 `v-model` 接收 `types.ts` 的 `ReasoningSettingData`，由节点的输出思考开关以 `v-if` 挂载，
 遵循通用设置弹窗规则；开始、结束标签当前不设必填。

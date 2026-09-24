@@ -193,6 +193,7 @@ Node.js must satisfy `^22.18.0 || >=24.12.0` as declared in `package.json`.
 Admin and Chat use ports 3000 and 3001 respectively, with `strictPort` enabled.
 `npm run lint` currently delegates to `lint:*`, but no matching scripts are defined. Use
 `npx eslint <changed-files>` for targeted linting until those scripts are configured.
+ESLint enforces multi-word Vue component names, with `index` globally exempted in `eslint.config.ts`.
 
 ## Vite Configuration
 

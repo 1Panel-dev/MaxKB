@@ -10,7 +10,7 @@ import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import PromptGenerate from './component/PromptGenerate.vue'
+import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
 import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
 import ResourceSetting from './component/resource-setting/index.vue'
 import type { AiChatNodeForm } from './types'
@@ -98,6 +98,12 @@ model.properties.node_data = normalizedForm
 
 const formData = computed(() => model.properties.node_data as AiChatNodeForm)
 
+// 提示词生成使用当前生效的模型；引用变量在运行前无法确定模型。
+const promptModelId = computed(() => {
+  if (formData.value.model_id_type === 'reference') return ''
+  return formData.value.model_id_type === 'default' ? (model.getDefaultModelConfig('LLM')?.model_id ?? '') : formData.value.model_id
+})
+
 const showSettings = computed(() =>
   [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
 )
@@ -143,13 +149,8 @@ onMounted(() => {
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </div>
-              <!-- // TODO 生成 -->
-              <PromptGenerate
-                :model-id="formData.model_id"
-                :provider-options="providerOptions"
-                :disabled="formData.model_id_type === 'reference' || !formData.model_id"
-                @replace="formData.system = $event"
-              />
+              <!-- 生成系统提示词 -->
+              <PromptGenerate :model-id="promptModelId" @replace="formData.system = $event" />
             </div>
           </template>
           <MdEditorMagnify

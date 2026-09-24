@@ -11,7 +11,7 @@ import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import InitFieldTable from './component/init-field/InitFieldTable.vue'
 import InputFieldTable from './component/input-field/InputFieldTable.vue'
-import ToolCodeSetting from './component/python-code/CodeSetting.vue'
+import ToolCodeGenerate from './component/python-code/CodeGenerate.vue'
 
 defineOptions({ name: 'DataSourceFormDrawer' })
 
@@ -190,7 +190,7 @@ defineExpose({ open })
 
       <InitFieldTable v-model="dataSourceForm.init_field_list" class="mb-6" />
       <InputFieldTable v-model="dataSourceForm.input_field_list" class="mb-6" />
-      <ToolCodeSetting v-model="dataSourceForm.code" />
+      <ToolCodeGenerate v-model="dataSourceForm.code" />
     </el-form>
 
     <template #footer>

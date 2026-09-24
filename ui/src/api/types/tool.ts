@@ -31,6 +31,21 @@ export interface ToolDebugPayload {
   input_field_list: ToolInputField[]
 }
 
+export interface ToolGenerateMessage {
+  content: string
+  role: 'user' | 'ai'
+}
+
+/** 工具代码生成沿用 v2 的模型、参数定义与多轮消息协议。 */
+export interface ToolGenerateCodePayload {
+  messages: ToolGenerateMessage[]
+  prompt: string
+  model_id: string
+  model_params_setting: Record<string, unknown>
+  init_field_list: DynamicFormField[]
+  input_field_list: ToolInputField[]
+}
+
 export interface ToolPylintIssue {
   column: number
   endColumn: number

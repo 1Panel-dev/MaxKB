@@ -1,6 +1,7 @@
 import { get, post } from '@/api/admin/core/request'
 import type { KnowledgeTagGroup } from '@/api/types'
 import type { McpTool } from '@/workflow-canvas/store'
+import ApplicationApi from '@/api/admin/system/shared-resources/application/application'
 import ModelApi from '@/api/admin/system/shared-resources/model'
 import ToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import ProviderApi from '@/api/admin/model-provider'
@@ -13,6 +14,7 @@ const getMcpTools = (resourceType: string, resourceId: string, mcpServers: strin
 const getAllTags = (knowledgeIds: string[]) => get<KnowledgeTagGroup[]>('/system/shared/knowledge/tags', { 'knowledge_ids[]': knowledgeIds })
 
 export default {
+  postPromptGenerate: ApplicationApi.postPromptGenerate,
   getMcpTools,
   getAllTags,
   getModelListWithShared: ModelApi.getModelList,
