@@ -430,6 +430,9 @@
       max-height: none;
       height: calc(100vh - 154px);
     }
+    .el-dialog__headerbtn {
+      top: 22px;
+    }
   }
   //  专属带侧边栏结构的dialog
   &.mk-aside-content-dialog {
@@ -734,7 +737,7 @@
 
 /* progress */
 .el-progress-bar__inner {
-  background: linear-gradient(90deg, #adc6ff 0%, #3370ff 100%);
+  background: linear-gradient(90deg, rgb(var(--mk-primary-rgb) / 20%) 0%, var(--el-color-primary) 100%);
 }
 
 /* radio */

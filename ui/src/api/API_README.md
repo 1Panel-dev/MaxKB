@@ -162,6 +162,30 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 共享工具 API 不提供工作空间文件夹移动或批量接口；复用卡片、Action 和表单接收完整 Workspace
 与 System 共享 API 的联合类型，不补造接口以匹配 Workspace 方法集合。
 
+### 工具代码生成
+
+三个范围的 `tool/tool.ts` 均提供 `postToolGenerateCode(payload)`，沿用 v2 的
+`/workspace/<workspaceId>/tool/generate_code`、`/system/resource/tool/generate_code` 和
+`/system/shared/tool/generate_code`。无需工具或智能体 ID，创建中的工具也可生成代码。
+`ToolGenerateCodePayload`、`ToolGenerateMessage` 定义在 `types/tool.ts`；请求包含 `messages`、
+`prompt`、`init_field_list`、`input_field_list`、`model_id` 和 `model_params_setting`。
+返回原始 SSE Response，业务入口通过 `request(messages)` 回调交给 `GenerateContent`，
+公共组件复用 `ConversationStream` 读取数据，处理 `content` 和 `error` 数据块。
+停止生成与 AI 节点一致，通过 `ConversationStream.cancel()` 停止读取并清理流实例。
+工具表单组件 `ToolCodeGenerate` 内部通过资源上下文选择完整 Tool/Model API；
+调用方只传工具表单，不逐层传递 API、工作空间及参数列表。
+
+### 系统提示词生成
+
+Workspace、System 资源管理和 System 共享资源的 `application/application.ts` 均提供
+`postPromptGenerate(applicationId, modelId, payload)`，请求结构共用 `PromptGeneratePayload`。
+路径分别为 `/workspace/<workspaceId>/application/<applicationId>/model/<modelId>/prompt_generate`、
+`/system/resource/application/<applicationId>/model/<modelId>/prompt_generate` 和
+`/system/shared/application/<applicationId>/model/<modelId>/prompt_generate`，System 接口不依赖工作空间 ID。
+均返回原始 SSE Response，由公共生成组件读取。画布的 `PromptGenerate` 通过
+`useWorkflowStore(apiType).postPromptGenerate` 调用；三个范围的 Store 适配器分别引用对应的
+Application API，直接转发生成请求，不使用查询缓存或请求去重。
+
 ### 知识库维护
 
 `getKnowledgeMcpConfig(knowledgeId)` 与 `postKnowledgeKeywordIndex(knowledgeId)` 为预留接口方法，

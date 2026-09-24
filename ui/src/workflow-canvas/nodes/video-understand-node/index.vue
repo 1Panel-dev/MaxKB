@@ -5,6 +5,7 @@ import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
 import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
+import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
 import { fileTooltip } from '@/workflow-canvas/config/constants'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
@@ -81,6 +82,12 @@ const formData = computed<VideoUnderstandNodeForm>({
   set: (value) => (model.properties.node_data = value),
 })
 
+// 提示词生成使用当前生效的模型；引用变量在运行前无法确定模型。
+const promptModelId = computed(() => {
+  if (formData.value.model_id_type === 'reference') return ''
+  return formData.value.model_id_type === 'default' ? (model.getDefaultModelConfig('IMAGE')?.model_id ?? '') : formData.value.model_id
+})
+
 const showSettings = computed(() =>
   [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
 )
@@ -129,10 +136,8 @@ onMounted(() => {
                 </MkTooltip>
               </div>
               <div class="-mr-1">
-                <!-- // TODO: 生成 统一处理 -->
-                <el-button type="primary" text :disabled="!formData.model_id">
-                  <MkIcon name="icon_star"></MkIcon>
-                </el-button>
+                <!-- 生成系统提示词 -->
+                <PromptGenerate :model-id="promptModelId" @replace="formData.system = $event" />
               </div>
             </div>
           </template>

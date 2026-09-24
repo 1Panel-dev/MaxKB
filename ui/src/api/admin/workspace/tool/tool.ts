@@ -1,6 +1,7 @@
-import { del, downloadRequest, getExportFile, get, post, put } from '../../core/request'
+import { del, downloadRequest, getExportFile, get, post, postStream, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { Dict, ToolDebugPayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
+import type { Dict, ToolDebugPayload, ToolGenerateCodePayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
+import { ADMIN_API_BASE_PATH } from '@/api/constants'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
@@ -46,10 +47,10 @@ const postToolPylint = (code: string) => {
   return post<{ code: string }, ToolPylintIssue[]>(`${getPrefix()}/pylint`, { code })
 }
 
-// const generateCode = (data: any) => {
-//   const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
-//   return postStream(`${p}${getPrefix()}/generate_code`, data)
-// }
+/** 根据需求与参数定义流式生成工具 Python 代码。 */
+const postToolGenerateCode = (payload: ToolGenerateCodePayload) => {
+  return postStream(ADMIN_API_BASE_PATH, `${getPrefix()}/generate_code`, payload)
+}
 
 /** 调试普通工具代码并返回运行结果。 */
 const postToolDebug = (payload: ToolDebugPayload) => {
@@ -110,6 +111,7 @@ export default {
 
   postTool,
   postToolDebug,
+  postToolGenerateCode,
   postToolImport,
   putUploadSkillFile,
   postToolPylint,

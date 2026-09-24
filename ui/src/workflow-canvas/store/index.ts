@@ -1,4 +1,4 @@
-import type { Dict, DynamicFormField, KnowledgeTagGroup, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
+import type { Dict, DynamicFormField, KnowledgeTagGroup, ModelItem, ModelProviderItem, PromptGeneratePayload, ToolItem } from '@/api/types'
 
 export interface McpTool {
   args_schema: Record<string, unknown>
@@ -17,9 +17,10 @@ type ApiModule = {
   getToolListWithShared?: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById?: (toolId: string) => Promise<ToolItem>
   getKnowledgeTags?: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
+  postPromptGenerate: (applicationId: string, modelId: string, payload: PromptGeneratePayload) => Promise<Response>
 }
 
-// useWorkflowStore 返回的包装接口:默认走缓存,通过 store.force.xxx() 强制刷新。
+// 查询默认走缓存，通过 store.force.xxx() 强制刷新；生成请求始终直接转发。
 export type WorkflowStoreApi = {
   getAllTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
   getModelListWithShared: (query?: Dict<unknown>) => Promise<ModelItem[]>
@@ -29,6 +30,7 @@ export type WorkflowStoreApi = {
   getToolListWithShared: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById: (toolId: string) => Promise<ToolItem>
   getKnowledgeTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
+  postPromptGenerate: (applicationId: string, modelId: string, payload: PromptGeneratePayload) => Promise<Response>
 }
 
 type WorkflowStore = WorkflowStoreApi & { force: WorkflowStoreApi }
@@ -76,6 +78,8 @@ export function useWorkflowStore(apiType: string): WorkflowStore {
   // 生成一组接口方法;force 为 true 时对应的调用会跳过缓存强制刷新。
   function build(force: boolean): WorkflowStoreApi {
     return {
+      // 每次生成都需要独立的响应流，不缓存或复用在途请求。
+      postPromptGenerate: requestApi.postPromptGenerate,
       getAllTags(knowledgeIds: string[]): Promise<KnowledgeTagGroup[]> {
         if (!requestApi.getAllTags) return Promise.resolve([])
         return withCache(`knowledge-tags:${JSON.stringify(knowledgeIds)}`, () => requestApi.getAllTags!(knowledgeIds), force)

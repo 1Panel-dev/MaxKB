@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { DynamicFormField, ToolInputField, ToolItem, ToolPayload } from '@/api/types'
+import type { DynamicFormField, ToolInputField, ToolItem } from '@/api/types'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
@@ -11,7 +11,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolDebugDrawer from './ToolDebugDrawer.vue'
 import InitFieldTable from '../component/init-field/InitFieldTable.vue'
 import InputFieldTable from '../component/input-field/InputFieldTable.vue'
-import ToolCodeSetting from '../component/python-code/CodeSetting.vue'
+import ToolCodeGenerate from '../component/python-code/CodeGenerate.vue'
 
 defineOptions({ name: 'ToolFormDrawer' })
 
@@ -22,6 +22,7 @@ const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | t
 const emit = defineEmits<{ closed: []; refresh: []; update: [tool: ToolItem] }>()
 
 interface ToolFormModel {
+  workspace_id?: string
   desc: string
   code: string
   icon: string
@@ -49,7 +50,8 @@ function handleSubmit() {
     if (!valid) return
 
     loading.value = true
-    const payload: ToolPayload = cloneDeep(toolForm)
+    const payload = cloneDeep(toolForm)
+    delete payload.workspace_id
     const currentEditId = editId.value
     const isEdit = Boolean(currentEditId)
     const request = currentEditId
@@ -83,6 +85,7 @@ function handleOpenDebug() {
 
 function fillToolForm(tool: ToolItem) {
   Object.assign(toolForm, {
+    workspace_id: tool.workspace_id,
     code: tool.code ?? '',
     desc: tool.desc ?? '',
     icon: tool.icon ?? '',
@@ -131,7 +134,7 @@ function handleBeforeClose() {
 }
 
 function resetData() {
-  Object.assign(toolForm, { name: '', desc: '', code: '', icon: '', init_field_list: [], input_field_list: [] })
+  Object.assign(toolForm, { name: '', desc: '', code: '', icon: '', init_field_list: [], input_field_list: [], workspace_id: undefined })
   editId.value = undefined
   originalForm.value = ''
   loading.value = false
@@ -189,7 +192,7 @@ defineExpose({ open })
       <!-- 输入参数 -->
       <InputFieldTable v-model="toolForm.input_field_list" class="mb-6" />
 
-      <ToolCodeSetting v-model="toolForm.code" class="mb-6" show-generate />
+      <ToolCodeGenerate v-model="toolForm.code" :tool-form="toolForm" class="mb-6" show-generate />
       <section>
         <div class="mb-4 flex-align-center gap-2">
           <h4 class="mk-title-decoration">输出参数</h4>

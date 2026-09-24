@@ -152,7 +152,6 @@ defineExpose({ open, close })
         </template>
       </el-tab-pane>
       <el-tab-pane label="执行详情" name="details">
-        <!-- TODO 执行详情 -->
         <ExecutionDetailContent class="mt-6" :detail="executionDetails" :workflow-mode="WorkflowMode.Tool"></ExecutionDetailContent>
       </el-tab-pane>
     </el-tabs>

@@ -295,8 +295,18 @@ Workspace 的自定义工具和工作流工具菜单
 各类型表单只维护本类型特有字段和流程，并统一放在 `tool/tool-form/`；创建入口和编辑 Action
 共同复用这些表单。启动参数、输入参数、Python 内容等已有表单片段应从
 `tool/tool-form/component/` 复用，
-不在类型目录中重复实现。`ToolCodeSetting` 的生成入口默认隐藏，只由普通自定义工具表单通过
-`showGenerate` 显式开启。工具列表页面通过 `ToolCard` 的 `actions` 和 `action-dropdown` 插槽组合
+不在类型目录中重复实现。`ToolCodeGenerate` 的生成入口默认隐藏，只由普通自定义工具表单通过
+`showGenerate` 显式开启。`python-code/CodeGenerate.vue` 直接复用公共业务组件
+`GenerateContent`，在普通编辑区及放大编辑器的 `header-extra` 插槽提供生成入口，
+不再单独封装 Python 生成组件。`ToolFormDrawer` 只绑定代码并传入完整 `toolForm`，不管理生成弹窗。
+`CodeGenerate` 内部按当前资源范围选择 Tool/Model API，从 `toolForm` 读取工作空间及参数定义，
+打开时复制启动参数与输入参数。表单中的 `workspace_id` 仅供生成时筛选模型，保存工具前移除。
+`CodeGenerate` 维护模型选择、参数设置、v2 工具代码模板及 `generate_code` 请求载荷，通过
+`request` 属性提供请求函数、`header-extra` 插槽放置模型选择；替换时移除外层 Python Markdown
+代码围栏，普通编辑区直接回写表单草稿，放大编辑器通过 `header-extra` 的 `replaceCode` 回调
+替换全屏草稿，点击“确定”后再同步表单。公共组件统一处理 `ConversationStream`、停止、重新生成和输入交互，
+不接收工具表单、不判断资源范围，不维护原始输入、暂停或继续状态。
+工具列表页面通过 `ToolCard` 的 `actions` 和 `action-dropdown` 插槽组合
 操作；编辑 Action 负责按 `TOOL_TYPE` 打开对应类型表单，启动参数 Action 获取工具详情后打开
 `InitParamDialog`，MCP 配置 Action 获取 MCP 工具详情后打开 `McpConfigDialog`。工作流 Action 进入
 独立的工具工作流画布；创建工作流工具后直接进入该画布，其他类型表单创建成功后通过 `refresh`

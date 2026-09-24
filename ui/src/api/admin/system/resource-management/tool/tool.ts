@@ -1,6 +1,7 @@
-import { del, downloadRequest, getExportFile, get, post, put } from '../../../core/request'
+import { del, downloadRequest, getExportFile, get, post, postStream, put } from '../../../core/request'
 import type { ParamsPage, ResponsePage } from '../../../core/types'
-import type { Dict, ToolDebugPayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
+import type { Dict, ToolDebugPayload, ToolGenerateCodePayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
+import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
 const prefix = '/system/resource/tool'
 
@@ -26,6 +27,11 @@ const putTool = (toolId: string, payload: ToolPayload) => {
 /** 检查System 资源工具的 Python 代码。 */
 const postToolPylint = (code: string) => {
   return post<{ code: string }, ToolPylintIssue[]>(`${prefix}/pylint`, { code })
+}
+
+/** 根据需求与参数定义流式生成 System 资源工具 Python 代码。 */
+const postToolGenerateCode = (payload: ToolGenerateCodePayload) => {
+  return postStream(ADMIN_API_BASE_PATH, `${prefix}/generate_code`, payload)
 }
 
 /** 调试普通工具代码并返回运行结果。 */
@@ -68,6 +74,7 @@ export default {
   getToolDetail,
   downloadSkillFile,
   postToolDebug,
+  postToolGenerateCode,
   putUploadSkillFile,
   postToolPylint,
   postToolTestConnection,

@@ -17,7 +17,7 @@ defineProps<{ title?: string }>()
 
 const emit = defineEmits<{ submitDialog: [code: string] }>()
 
-defineSlots<{ 'header-extra'?(): unknown }>()
+defineSlots<{ 'header-extra'?(props: { replaceCode: (value: string) => void }): unknown }>()
 
 // Python 校验使用当前资源范围的工具接口。
 const requestApi = computed(() => {
@@ -71,6 +71,10 @@ function closeEditorDialog() {
   dialogVisible.value = false
 }
 
+function replaceDialogCode(value: string) {
+  dialogCode.value = value
+}
+
 function submitEditorDialog() {
   code.value = dialogCode.value
   emit('submitDialog', dialogCode.value)
@@ -88,9 +92,9 @@ function submitEditorDialog() {
 
   <MkDialog v-model="dialogVisible" :title="title" append-to-body fullscreen>
     <template #header="{ titleClass, titleId }">
-      <div class="flex-between pr-8">
+      <div class="flex-between mr-4">
         <span :id="titleId" :class="titleClass">{{ title }}</span>
-        <slot name="header-extra" />
+        <slot name="header-extra" :replace-code="replaceDialogCode" />
       </div>
     </template>
 

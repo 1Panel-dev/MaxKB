@@ -484,6 +484,8 @@ Python 与 JSON 编辑器通过 `<style lang="scss" scoped src="./style.scss">` 
 或 System 共享资源的工具 API；普通编辑与全屏编辑使用相同的接口选择逻辑。
 组件最多展示 50 条诊断，并在代码停止输入 500ms 后检查。编辑器提供内置全屏
 入口；全屏确认时更新 `v-model` 并触发 `submit-dialog`，`header-extra` 插槽用于添加全屏标题栏操作。
+该插槽提供 `replaceCode(value: string)` 回调，仅替换全屏编辑草稿；点击“确定”后才回写
+外层 `v-model`，直接关闭则丢弃草稿。
 
 ### JsonInput
 
@@ -583,6 +585,22 @@ Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选
 ## 跨页面业务组件
 
 业务组件显式导入，可调用固定业务 API；页面保留自身的列表查询、路由和保存编排。
+
+### GenerateContent
+
+`business/generate-content/index.vue` 封装生成入口按钮和弹窗，供提示词与 Python
+代码生成复用，不通过 `mode` 判断业务。`title`、`placeholder`、`emptyText` 提供文案，
+`disabled` 统一控制入口、发送和重新生成，生成期间由内部 `loading` 阻止重复提交。
+工具侧在弹窗关闭时允许打开选模型，打开后根据模型及参数加载状态设置 `disabled`。
+`request(messages)` 接收 `PromptGenerateMessage[]` 并返回原始 `Promise<Response>`，调用方负责
+选择 API、模板和请求参数。公共组件统一使用 `ConversationStream` 处理流式结果、错误、停止、
+重新生成和会话清理，不感知工具表单、资源范围或模型接口。
+
+`header-extra` 插槽提供 `{ loading }`，用于放置模型选择等业务设置；`open` 事件初始化业务上下文，
+`closed` 在关闭动画结束后清理业务状态，`replace(content)` 交由调用方处理结果并回写。
+重新生成追加用户消息 `Re generate` 后请求；停止调用当前流的 `cancel()`，保留已生成内容。
+输入支持 Enter 发送、Ctrl/Shift/Alt/Meta + Enter 在光标处换行、原生文本粘贴，拒绝纯空白，
+输入法组合期间不提交；键盘和粘贴事件停止冒泡，输入上限 100000 字符。
 
 ### FolderTree
 
