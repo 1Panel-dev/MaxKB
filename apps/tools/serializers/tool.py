@@ -506,6 +506,7 @@ class ToolSerializer(serializers.Serializer):
                 name=instance.get("name"),
                 desc=instance.get("desc"),
                 code=instance.get("code"),
+                icon=instance.get("icon") or "",
                 user_id=self.data.get("user_id"),
                 workspace_id=self.data.get("workspace_id"),
                 input_field_list=instance.get("input_field_list", []),
@@ -515,6 +516,20 @@ class ToolSerializer(serializers.Serializer):
                 folder_id=instance.get("folder_id", self.data.get("workspace_id")),
                 is_active=False,
             ).save()
+
+            # 新建时上传的图标尚无工具 ID，将临时文件归属到新工具。
+            icon = instance.get("icon") or ""
+            if icon.startswith("./oss/file/"):
+                try:
+                    icon_file_id = uuid.UUID(icon.removeprefix("./oss/file/"))
+                except ValueError:
+                    pass
+                else:
+                    QuerySet(File).filter(
+                        id=icon_file_id,
+                        source_type=FileSourceType.TOOL,
+                        source_id=FileSourceType.TEMPORARY_120_MINUTE,
+                    ).update(source_id=tool_id)
 
             # 自动授权给创建者
             UserResourcePermissionSerializer(
@@ -690,6 +705,8 @@ class ToolSerializer(serializers.Serializer):
             QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).update(
                 **edit_dict
             )
+            if "icon" in edit_dict and tool.icon != edit_dict["icon"]:
+                delete_tool_icon(tool.icon, tool.id)
             if "is_active" in instance:
                 QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get("id")).update(
                     is_active=instance.get("is_active")

@@ -5,6 +5,8 @@ import requests
 from django.test import SimpleTestCase
 
 from common.exception.app_exception import AppApiException
+from knowledge.models import FileSourceType
+from tools.serializers.tool import ToolSerializer
 from tools.serializers.tool_icon import delete_tool_icon, download_tool_icon
 
 
@@ -76,3 +78,62 @@ class ToolIconTests(SimpleTestCase):
             self.assertEqual(query.return_value.filter.call_args.kwargs["id"], file_id)
             self.assertEqual(query.return_value.filter.call_args.kwargs["source_id"], "tool-id")
             query.return_value.filter.return_value.delete.assert_called_once()
+
+
+class ToolCreateIconTests(SimpleTestCase):
+    def test_create_persists_uploaded_icon_and_assigns_its_file_to_tool(self):
+        icon_file_id = UUID("00000000-0000-0000-0000-000000000001")
+        icon = f"./oss/file/{icon_file_id}"
+        with (
+            patch("tools.serializers.tool.Tool") as tool,
+            patch("tools.serializers.tool.QuerySet") as query,
+            patch("tools.serializers.tool.UserResourcePermissionSerializer"),
+            patch.object(ToolSerializer.Operate, "one"),
+            patch("django.db.transaction.Atomic.__enter__"),
+            patch("django.db.transaction.Atomic.__exit__", return_value=False),
+        ):
+            serializer = ToolSerializer.Create(data={"user_id": str(icon_file_id), "workspace_id": "workspace"})
+            serializer.is_valid(raise_exception=True)
+            serializer.insert({"name": "tool", "code": "pass", "icon": icon}, with_valid=False)
+
+            tool.return_value.save.assert_called_once()
+            self.assertEqual(tool.call_args.kwargs["icon"], icon)
+            query.assert_called_once()
+            self.assertEqual(
+                query.return_value.filter.call_args.kwargs,
+                {
+                    "id": icon_file_id,
+                    "source_type": FileSourceType.TOOL,
+                    "source_id": FileSourceType.TEMPORARY_120_MINUTE,
+                },
+            )
+            query.return_value.filter.return_value.update.assert_called_once_with(source_id=tool.call_args.kwargs["id"])
+
+
+class ToolEditIconTests(SimpleTestCase):
+    def test_replacing_or_resetting_icon_deletes_previous_owned_file(self):
+        tool_id = UUID("00000000-0000-0000-0000-000000000001")
+        old_icon = "./oss/file/00000000-0000-0000-0000-000000000002"
+        new_icon = "./oss/file/00000000-0000-0000-0000-000000000003"
+        with (
+            patch("tools.serializers.tool.QuerySet") as query,
+            patch("tools.serializers.tool.delete_tool_icon") as delete_icon,
+            patch.object(ToolSerializer.Operate, "one"),
+            patch("django.db.transaction.Atomic.__enter__"),
+            patch("django.db.transaction.Atomic.__exit__", return_value=False),
+        ):
+            stored_tool = query.return_value.filter.return_value.first.return_value
+            stored_tool.id = tool_id
+            stored_tool.icon = old_icon
+            serializer = ToolSerializer.Operate(data={"id": str(tool_id), "workspace_id": "workspace"})
+            serializer.is_valid(raise_exception=True)
+
+            for icon in (new_icon, ""):
+                with self.subTest(icon=icon):
+                    serializer.edit({"icon": icon}, with_valid=False)
+                    delete_icon.assert_called_with(old_icon, tool_id)
+                    delete_icon.reset_mock()
+
+            serializer.edit({"icon": old_icon}, with_valid=False)
+            serializer.edit({"name": "renamed"}, with_valid=False)
+            delete_icon.assert_not_called()
