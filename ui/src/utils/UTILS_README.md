@@ -79,8 +79,9 @@ MkTable、MkFormList 的排序优先使用其公开属性；普通列表再直�
 `application`、`knowledge`、`model`、`tool` 是使用资源上下文的四类特殊资源。工作空间 id 和这
 四类资源的当前路由范围统一通过 `resource-context.ts` 读取。Workspace API、权限等非组件代码使用
 `getWorkspaceId()` 获取当前工作空间；页面和组件使用 `isWorkspaceResource()`、
-`isSystemResource()`、`isSystemSharedResource()` 区分 Workspace、System 资源管理和 System 共享
-资源。资源范围只读取路由 `meta.resourceScope`，不要根据 path 或路由名称重复判断，也不要把这些
+`isWorkspaceSharedResource()`、`isSystemResource()`、`isSystemSharedResource()` 区分 Workspace
+普通资源、Workspace 共享资源、System 资源管理和 System 共享资源。`isWorkspaceResource()` 仅匹配
+`workspace`，不包含 `workspace-shared`。资源范围只读取路由 `meta.resourceScope`，不要根据 path 或路由名称重复判断，也不要把这些
 判断扩展到普通 System 页面。
 
 ## VNode 插槽内容判断

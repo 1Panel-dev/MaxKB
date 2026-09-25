@@ -23,6 +23,7 @@ src/api/
 │   │   ├── conversation.ts           # 调试对话、历史会话与语音接口
 │   │   ├── application/              # 智能体接口
 │   │   ├── knowledge/                # 知识库接口
+│   │   ├── shared/                   # 工作空间可用的共享模型、工具、知识库查询
 │   │   ├── model.ts                  # 模型接口
 │   │   ├── trigger/                   # 触发器查询及维护接口
 │   │   ├── tool/                     # 工具、工具工作流及工具商店接口
@@ -101,7 +102,7 @@ FormData；保存返回完整配置，页面以该返回值作为唯一数据来
 多套 API 时，以 `request` 为前缀加业务名区分，例如 `requestModelApi`、`requestToolApi`。
 直接导入的 API 保持 PascalCase 命名；请求返回的 Promise 不属于此命名规则。
 
-`application`、`knowledge`、`model`、`tool` 是需要同时考虑 Workspace、System 资源管理和
+`application`、`knowledge`、`model`、`tool` 是需要同时考虑 Workspace 普通资源、Workspace 共享资源、System 资源管理和
 System 共享资源的四类特殊资源。其接口按真实后端边界分别维护在 `admin/workspace/` 与
 `admin/system/` 下，不把不同范围的 URL 合并为页面侧 API Map，也不让卡片或 Action 根据路由拼接
 System 接口地址。
@@ -153,7 +154,7 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 `workspace/tool/tool.ts` 的 `getAllTool(query)` 查询支持 `folder_id` 筛选的工作空间工具
 非分页列表，用于文件夹菜单和工具选择弹窗。`getToolListWithShared(query)` 请求 `tool/tool_list`，
 将响应的 `tools` 与 `shared_tools` 合并为 `ToolItem[]`，用于包含已授权共享工具的选项查询；
-按工具类型筛选时使用 `tool_type`。`workspace/shared.ts` 的 `getAllTool(query)` 仅查询共享工具。
+按工具类型筛选时使用 `tool_type`。`workspace/shared/tool.ts` 的 `getAllTool(query)` 仅查询共享工具。
 
 ### System 共享工具
 
@@ -200,7 +201,7 @@ MCP 入口加载配置后打开只读及复制弹窗；分词索引入口仅调�
 `/workspace/<workspaceId>/knowledge/import_knowledge`，响应为 `{ knowledge_id, type }`。
 后端校验知识库导出包并创建资源；导入成功后的用户权限和列表刷新由调用页面负责。
 
-`workspace/knowledge/knowledge.ts` 与 `workspace/shared.ts` 的 `getAllKnowledge(query)`
+`workspace/knowledge/knowledge.ts` 与 `workspace/shared/knowledge/knowledge.ts` 的 `getAllKnowledge(query)`
 分别查询工作空间及共享知识库的非分页列表，返回 `KnowledgeItem[]`，用于关联知识库选择等
 需要全量选项的场景。原有 `getKnowledgePage` 继续用于分页列表。
 
@@ -492,3 +493,30 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 版本和执行记录，前缀为 `/system/shared/tool`，调用只传资源 ID，不读取工作空间。
 两种 System 工具 API 的 `getToolListWithShared` 查询各自 `/tool_list` 并合并 `tools`、`shared_tools`，
 供画布的工具菜单及 MCP 选项使用。系统扩展接口需连接支持相应协议的部署进行联调。
+
+### 知识库文档
+
+`workspace/knowledge/document.ts` 仅维护文档分页查询，路径为
+`/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<currentPage>/<pageSize>`。
+分页使用 `ParamsPage` / `ResponsePage<DocumentItem>`，支持 `name`、`create_user` 筛选；
+文档页传 `resource_type: 'document'`，创建者选项复用 Workspace `common.ts` 的 `getAllUsers`。
+类型从 `@/api/types` 导入，命中处理枚举从 `@/api/enums` 导入。API 不接收 loading，不重复包装响应。
+
+### 工作空间共享资源查询
+
+`workspace/shared/` 按最终资源文件拆分：`model.ts` 提供 `getModelList`，`tool.ts` 提供
+`getToolPage`、`getAllTool`，`knowledge/knowledge.ts` 提供 `getKnowledgePage`、`getAllKnowledge`、`getKnowledgeDetail`。
+上述资源查询沿用 `/system/shared/workspace/<workspaceId>/<resource>`，工作空间 ID 在调用时读取。
+调用方直接导入对应资源文件，与普通工作空间 API 同时使用时分别命名为
+`SharedModelApi`、`SharedToolApi`、`SharedKnowledgeApi`；目录不提供聚合入口。
+
+`workspace/shared/knowledge/document.ts` 提供 `getDocumentPage(knowledgeId, page, query)`，
+请求 `/system/shared/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<currentPage>/<pageSize>`。
+共享与普通知识库文档查询统一使用 `ParamsPage`、`ResponsePage<DocumentItem>` 和 `Dict<unknown>`，
+不传 loading，不保留 v2 的 `Result` 或下划线分页参数。两个文件各自默认导出 API 对象。
+
+共享知识库 `getKnowledgeDetail(knowledgeId)` 请求知识库资源 `/<knowledgeId>`，返回 `KnowledgeDetail`。
+
+Workspace 共享知识库详情由 `resourceScope: 'workspace-shared'` 选择上述完整共享 API 对象；
+普通详情继续使用 `workspace/knowledge/`。共享详情和文档查询不使用 System 共享资源管理 API，
+也不回退到普通 Workspace 知识库接口。文档创建者选项沿用共享列表的 System `common.ts` 查询。

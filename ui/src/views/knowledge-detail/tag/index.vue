@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 defineOptions({ name: 'TagManagementView' })
+
+defineProps<ResourceDetailPageProps>()
 </script>
 
 <template>

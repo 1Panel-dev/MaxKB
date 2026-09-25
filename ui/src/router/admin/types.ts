@@ -4,12 +4,12 @@ import type { RouteParamsGeneric } from 'vue-router'
 import type { ResourceAuthorizationType } from '@/api/types'
 
 export type RouteScope = 'workspace' | 'system'
-export type ResourceScope = 'workspace' | 'system-resource' | 'system-shared'
+export type ResourceScope = 'workspace' | 'workspace-shared' | 'system-resource' | 'system-shared'
 
 declare module 'vue-router' {
   interface RouteMeta {
     scope?: RouteScope
-    /** 当前页面使用的资源范围，用于区分 Workspace、System 资源管理和 System 共享资源。 */
+    /** 当前页面使用的资源范围，区分 Workspace 普通、共享资源及 System 资源管理、共享资源。 */
     resourceScope?: ResourceScope
     /** 侧栏菜单激活状态的 iconfont Symbol ID */
     activeIcon?: string

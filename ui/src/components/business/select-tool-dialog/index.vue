@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import ToolApi from '@/api/admin/workspace/tool/tool'
-import SharedApi from '@/api/admin/workspace/shared'
+import SharedToolApi from '@/api/admin/workspace/shared/tool'
 import type { FolderItem, ToolItem, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
@@ -42,7 +42,7 @@ function refreshTool() {
   toolOptions.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
   const shared = currentFolder.value.id === FOLDER_ENTRY_ID.SHARED
-  const requestApi = shared ? SharedApi : ToolApi
+  const requestApi = shared ? SharedToolApi : ToolApi
   return requestApi
     .getAllTool({
       tool_type_list: props.toolTypes,

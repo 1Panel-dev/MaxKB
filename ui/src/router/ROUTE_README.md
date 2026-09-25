@@ -27,7 +27,8 @@ src/router/
 │       └── modules/
 │           ├── home.ts          # 首页
 │           ├── application.ts         # 智能体
-│           ├── knowledge.ts     # 知识库
+│           ├── knowledge.ts     # 知识库列表及普通详情
+│           ├── knowledge-shared.ts # 工作空间共享知识库详情
 │           ├── tool.ts          # 工具
 │           ├── model.ts         # 模型
 │           └── trigger.ts       # 触发器
@@ -48,7 +49,7 @@ Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当
 
 触发器列表地址为 `/admin/workspace/:workspaceId/trigger`，渲染 `views/trigger/index.vue`。
 
-每个业务模块在 `admin/workspace/modules` 中独立维护。模块的列表、创建、详情、编辑等页面应放在同一个路由文件中。
+每个业务模块在 `admin/workspace/modules` 中独立维护。模块的列表、创建、详情、编辑等页面默认放在同一个路由文件中；较长的模块可按资源范围拆分。知识库的共享详情维护在 `knowledge-shared.ts`，由 `workspace/index.ts` 与 `knowledgeRoutes` 并列汇总，两个模块共同继承 Workspace 布局；共享详情显式配置资源范围和激活菜单。
 
 ### System
 
@@ -116,7 +117,7 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 | 字段                 | 类型                                                  | 说明                                                   |
 | -------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
 | `scope`              | `'workspace' \| 'system'`                             | 标记生成哪一套框架导航，只配置在布局根路由上           |
-| `resourceScope`      | `'workspace' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承 |
+| `resourceScope`      | `'workspace' \| 'workspace-shared' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承 |
 | `activeIcon`         | `string`                                              | 菜单激活状态的 iconfont Symbol ID                      |
 | `activeMenu`         | `string`                                              | 进入子页面时需要保持激活的侧栏菜单路径                 |
 | `resourceDetailRoot` | `boolean`                                             | 标记资源详情导航根，仅在详情容器路由自身配置           |
@@ -179,13 +180,13 @@ const mode = computed(() => route.meta.scope ?? 'workspace')
 ## 资源范围判断
 
 `application`、`knowledge`、`model`、`tool` 是需要跨资源范围维护的四类特殊资源。
-`resourceScope` 只用于区分这四类资源在 Workspace、System 资源管理和 System 共享资源中的接口与
+`resourceScope` 只用于区分这四类资源在 Workspace 普通资源、Workspace 共享资源、System 资源管理和 System 共享资源中的接口与
 展示差异，不作为所有业务页面的通用模式字段。Workspace 在布局根路由配置 `workspace`；System
 的“资源管理”和“共享资源”分别在对应父路由配置 `system-resource`、`system-shared`，子路由通过
-Vue Router 的 meta 合并自动继承。
+Vue Router 的 meta 合并自动继承。Workspace 共享详情父路由覆盖为 `workspace-shared`，布局 `scope` 仍为 `workspace`。
 
 业务页面和组件统一使用 `src/utils/resource-context.ts` 中的 `isWorkspaceResource()`、
-`isSystemResource()` 和 `isSystemSharedResource()` 判断当前资源范围，不根据 path 或路由名称重复
+`isWorkspaceSharedResource()`、`isSystemResource()` 和 `isSystemSharedResource()` 判断当前资源范围，不根据 path 或路由名称重复
 判断。非资源页面不配置 `resourceScope`。
 
 `resourceScope` 负责表达当前路由语义，页面据此决定展示和选用哪个业务 API；卡片、Action、
@@ -370,3 +371,12 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 共享工具工作流使用 `system-shared-workflow-tool`，地址为 `/system/shared/tool/:toolId/workflow`，
 与资源管理共用 `ToolWorkflowView`，通过 `resourceScope` 选择接口。共享工具卡片点击及创建成功后
 进入该路由，Ctrl / Command 点击支持新标签页；退出返回 `system-shared-tools`。
+
+### Workspace 共享知识库详情
+
+共享知识库卡片进入 `workspace-shared-knowledge-detail`，地址为
+`/admin/workspace/:workspaceId/shared/knowledge/:knowledgeId`，默认重定向到
+`workspace-shared-knowledge-document-list`（`document`）。详情父路由配置
+`resourceScope: 'workspace-shared'` 和 `activeMenu: 'workspace-knowledge'`，复用知识库详情容器和文档页，侧栏仍高亮 Workspace 知识库。
+共享详情目前仅注册“资料库 → 文档”，后续页面需接入对应共享接口后再注册，不跳转普通设置或工作流。
+返回列表时使用 `folderId: 'shared'` 恢复共享目录。

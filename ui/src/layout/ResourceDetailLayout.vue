@@ -1,5 +1,13 @@
+<script lang="ts">
+/** 资源详情布局直接传给当前子页面的标题栏属性。 */
+export interface ResourceDetailPageProps {
+  headerTarget: HTMLElement | null
+  title: string
+}
+</script>
+
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, shallowRef } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { getMatchedChildRouteList } from '@/router/admin/utils'
 import type { LayoutMenuItem } from './types'
@@ -17,6 +25,11 @@ const route = useRoute()
 const router = useRouter()
 const detailMenuItems = computed(() => getMatchedChildRouteList(route))
 const activeDetailMenuName = computed(() => route.meta.detailActiveMenu ?? String(route.name ?? ''))
+
+/* 提供整个标题栏的挂载位置和当前路由标题。 */
+const headerTarget = shallowRef<HTMLElement | null>(null)
+const title = computed(() => route.meta.title ?? '')
+const detailPageRef = shallowRef<{ customHeader?: boolean } | null>(null)
 
 function navigateBack() {
   emit('back')
@@ -47,9 +60,12 @@ function navigateToDetailMenu(detailMenuItem: LayoutMenuItem) {
 
     <template #default="{ Header }">
       <component :is="Header">
-        <h4>{{ route.meta.title }}</h4>
+        <div v-show="detailPageRef?.customHeader" ref="headerTarget" class="w-full min-w-0" />
+        <h4 v-if="!detailPageRef?.customHeader">{{ title }}</h4>
       </component>
-      <RouterView />
+      <RouterView v-slot="{ Component }">
+        <component :is="Component" ref="detailPageRef" :header-target="headerTarget" :title="title" />
+      </RouterView>
     </template>
   </MkViewLayout>
 </template>

@@ -2,7 +2,7 @@
 import { computed, inject, onMounted, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application'
-import SharedApi from '@/api/admin/workspace/shared'
+import SharedToolApi from '@/api/admin/workspace/shared/tool'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import type { ApplicationDetail, ApplicationType, FolderItem, ToolItem, ToolType } from '@/api/types'
@@ -78,7 +78,7 @@ function createApplicationNode(application: ApplicationDetail): NodeMenuItem {
 
 function loadTools(folder?: FolderItem) {
   const isSharedFolder = folder?.id === FOLDER_ENTRY_ID.SHARED
-  const requestApi = isSharedFolder ? SharedApi : ToolApi
+  const requestApi = isSharedFolder ? SharedToolApi : ToolApi
   const folderQuery = {
     ...(props.dataSource ? { tool_type: TOOL_TYPE.DATA_SOURCE } : { tool_type_list: SUPPORTED_TOOL_TYPES }),
     ...(!isSharedFolder ? { folder_id: folder?.id || FOLDER_ENTRY_ID.ALL } : {}),

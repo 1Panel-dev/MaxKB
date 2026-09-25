@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import SharedApi from '@/api/admin/workspace/shared'
+import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge.ts'
 import type { Dict, FolderItem, KnowledgeItem, OptionItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
@@ -32,7 +32,7 @@ const router = useRouter()
 
 function handleOpenKnowledge(knowledge: KnowledgeItem) {
   void router.push({
-    name: 'workspace-knowledge-detail',
+    name: isShared.value ? 'workspace-shared-knowledge-detail' : 'workspace-knowledge-detail',
     params: { workspaceId: route.params.workspaceId, knowledgeId: knowledge.id },
   })
 }
@@ -81,7 +81,7 @@ function handleSearchChange(query?: Dict<unknown>) {
 }
 
 function loadKnowledgePage(pagination: { currentPage: number; pageSize: number }) {
-  const requestApi = isShared.value ? SharedApi : KnowledgeApi
+  const requestApi = isShared.value ? SharedKnowledgeApi : KnowledgeApi
   const folderId = isShared.value ? {} : { folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL }
   return requestApi.getKnowledgePage(pagination, { ...knowledgeQuery.value, ...folderId })
 }

@@ -2,6 +2,9 @@
 import { computed, provide, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
+import { FOLDER_ENTRY_ID } from '@/constants'
+import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import type { KnowledgeDetail } from '@/api/types'
 import ResourceDetailLayout from '@/layout/ResourceDetailLayout.vue'
 import { knowledgeDetailContextKey } from './context'
@@ -14,6 +17,7 @@ const router = useRouter()
 const knowledge = ref<KnowledgeDetail>()
 const loading = ref(false)
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
+const requestApi = computed(() => (isWorkspaceSharedResource() ? SharedKnowledgeApi : KnowledgeApi))
 
 function replaceKnowledgeDetail(detail: KnowledgeDetail) {
   knowledge.value = detail
@@ -27,7 +31,8 @@ provide(knowledgeDetailContextKey, {
 function loadKnowledgeDetail() {
   knowledge.value = undefined
   loading.value = true
-  return KnowledgeApi.getKnowledgeDetail(knowledgeId.value)
+  return requestApi.value
+    .getKnowledgeDetail(knowledgeId.value)
     .then((detail) => {
       knowledge.value = detail
     })
@@ -37,15 +42,16 @@ function loadKnowledgeDetail() {
 }
 
 function handleBack() {
+  const folderId = isWorkspaceSharedResource() ? FOLDER_ENTRY_ID.SHARED : knowledge.value?.folder_id
   void router.push({
     name: 'workspace-knowledge-list',
     params: { workspaceId: route.params.workspaceId },
-    query: knowledge.value?.folder_id ? { folderId: knowledge.value.folder_id } : {},
+    query: folderId ? { folderId } : {},
   })
 }
 
 watch(
-  knowledgeId,
+  [() => route.params.workspaceId, knowledgeId, () => route.meta.resourceScope],
   () => {
     void loadKnowledgeDetail().catch(() => {})
   },

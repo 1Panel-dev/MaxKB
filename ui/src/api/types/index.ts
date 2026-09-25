@@ -25,3 +25,5 @@ export type * from './homepage'
 export type * from './file'
 export type * from './state'
 export type * from './portal'
+
+export type * from './document'

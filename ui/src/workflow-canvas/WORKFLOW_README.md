@@ -99,7 +99,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 知识库及知识库循环模式的“数据源”页签复用工具资源菜单和工具文件夹，通过 `dataSource`
 区分查询：数据源传 `tool_type: TOOL_TYPE.DATA_SOURCE`，普通工具传
 `tool_type_list: [TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW]`。当前工作空间使用 `ToolApi.getAllTool`，
-共享目录使用 `SharedApi.getAllTool`；菜单只展示启用且类型匹配的资源。
+共享目录使用 `SharedToolApi.getAllTool`（`workspace/shared/tool.ts`）；菜单只展示启用且类型匹配的资源。
 数据源点击和拖拽共用节点构造，使用 `tool-lib-node`，写入 `kind: WorkflowKind.DataSource`、
 `condition: 'OR'`、`tool_lib_id` 与输入参数初始值；引用参数初始化为空数组，其余为空字符串。
 各资源页签通过独立的 KeepAlive key 保留目录和搜索状态，数据源不会进入智能体查询分支。

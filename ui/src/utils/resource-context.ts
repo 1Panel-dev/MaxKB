@@ -16,6 +16,11 @@ export const isWorkspaceResource = () => {
   return router.currentRoute.value.meta.resourceScope === 'workspace'
 }
 
+/** 判断当前路由是否属于工作空间共享资源。 */
+export const isWorkspaceSharedResource = () => {
+  return router.currentRoute.value.meta.resourceScope === 'workspace-shared'
+}
+
 /** 判断当前路由是否属于 System 资源管理。 */
 export const isSystemResource = () => {
   return router.currentRoute.value.meta.resourceScope === 'system-resource'

@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import SharedApi from '@/api/admin/workspace/shared'
+import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
 import type { FolderItem, KnowledgeItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
@@ -44,7 +44,7 @@ function refreshKnowledge() {
   knowledgeOptions.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
   const shared = currentFolder.value.id === FOLDER_ENTRY_ID.SHARED
-  const requestApi = shared ? SharedApi : KnowledgeApi
+  const requestApi = shared ? SharedKnowledgeApi : KnowledgeApi
   return requestApi
     .getAllKnowledge({
       ...(shared ? {} : { folder_id: currentFolder.value.id }),
