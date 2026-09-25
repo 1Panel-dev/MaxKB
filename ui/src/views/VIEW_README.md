@@ -69,7 +69,7 @@ src/views/<feature>/<page>/
 
 ## 四类特殊资源
 
-`application`、`knowledge`、`model`、`tool` 是需要同时支持 Workspace、System 资源管理和
+`application`、`knowledge`、`model`、`tool` 是需要同时支持 Workspace 普通资源、Workspace 共享资源、System 资源管理和
 System 共享资源的四类特殊资源。它们统一遵循以下页面组织规则：
 
 - 可跨范围复用的资源卡片保留在对应基础资源目录的 `<resource>-card/` 中；System 页面复用该
@@ -88,7 +88,7 @@ System 共享资源的四类特殊资源。它们统一遵循以下页面组织�
 资源卡片的共享外壳使用全局自动注册的 `MkSourceCard`，模板无需手动导入。其操作插槽约定
 以 `../components/COMPONENT_README.md` 为准；各资源的业务 Card 与 Action 继续显式导入。
 
-这套三范围资源规则只适用于上述四类特殊资源，不扩展到普通 System 设置、身份管理或其他页面。
+这套资源范围规则只适用于上述四类特殊资源，不扩展到普通 System 设置、身份管理或其他页面。
 
 当前智能体列表按卡片展示、菜单 Action 和页面批量流程分层维护：
 
@@ -666,7 +666,13 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 设置页中。当前设置页仅接入 Workspace 路由和 API，暂不增加前端权限判断。
 更换向量模型需确认，先保存再重新向量化，整条流程禁止重复提交；向量化失败时保留原模型比较基准，
 允许再次保存重试。Web、飞书设置保留未编辑的 `meta` 字段，上传限制使用详情顶层值。
-`knowledge-detail/document/index.vue` 为文档列表子页面，目前保留占位内容；
+`knowledge-detail/document/index.vue` 仅维护文档列表查询，使用 `MkComplexSearch`、`MkTable`。
+搜索只提供名称 `name` 和创建者 `create_user`；创建者通过 Workspace `CommonApi.getAllUsers`
+加载，支持按 `nick_name` 远程搜索。列表使用 `documentData`、`paginationConfig`、`documentQuery`，
+查询方法为 `loadDocuments`，搜索处理为 `handleSearchChange`，搜索变化后回到第一页。
+切换工作空间、知识库或资源范围时重置筛选与页码；无轮询、排序入口、选择列和文档操作。
+文档分页接口维护在 `workspace/knowledge/document.ts`，页面管理 loading，状态仅作展示。
+
 文档详情路由暂未启用，System 知识库详情路由暂未注册。
 
 `KnowledgeWorkflowView` 复用 `ButtonDefaultModelSetting`，从知识库详情读取默认模型配置，
@@ -846,3 +852,27 @@ MCP 配置、授权、导出、触发器和执行记录。页面显式传入对�
 
 工具工作流按三种 `resourceScope` 选择完整工具、工作流与模型 API，并透传到默认模型、历史、调试抽屉。
 System 两种工作流入口只传 `toolId`，不传路由工作空间；共享范围默认模型选项使用共享模型列表。
+
+## 资源详情页自定义标题栏
+
+标题栏能力统一放在 `layout/ResourceDetailLayout.vue`，不另建 Header 组件或注入上下文。
+Layout 预留整个右侧标题栏的 `headerTarget`，通过 `RouterView` 作用域插槽将 `headerTarget`
+和当前路由 `title` 作为 props 直接传给子页面，不修改路由配置。
+详情子页面从该 Vue 文件导入 `ResourceDetailPageProps` 并声明 props。普通页面无需编写标题栏模板，
+由 Layout 显示默认路由标题。需要自定义的页面通过 `defineExpose({ customHeader: true })` 声明，
+再使用 `<Teleport v-if="headerTarget" :to="headerTarget">` 组合标题、搜索与操作。
+Layout 读取当前页面实例的声明决定是否显示默认标题，挂载位置始终保留；不增加路由字段。
+Layout 保留标题栏固定位置和外层间距，页面负责内部布局。
+切换子页面时随 Teleport 卸载清理内容，不需要注册计数或 DOM 检测。
+资源入口只负责详情数据和侧栏 `resource-header`，无需转发标题栏属性。
+文档页将标题与搜索放入标题栏，表格在正文中独立显示 loading。
+
+## Workspace 共享知识库详情
+
+知识库列表根据当前目录进入普通或 `workspace-shared-knowledge-detail` 共享详情路由。
+两者复用 `knowledge-detail/index.vue` 和文档页，由页面通过 `isWorkspaceSharedResource()`
+选择 `workspace/knowledge/` 或 `workspace/shared/knowledge/` 的完整 API 对象。
+共享详情目前仅提供资料库中的文档页，设置与工作流尚未接入共享接口，不注册对应共享入口。
+容器监听工作空间、知识库和资源范围变化重新加载；共享详情返回列表携带 `folderId: 'shared'`，
+普通详情继续恢复所属文件夹。文档创建者选项在共享范围使用 System `CommonApi`，普通范围使用
+Workspace `CommonApi`；范围变化同时清空搜索控件、筛选、创建者选项与分页。

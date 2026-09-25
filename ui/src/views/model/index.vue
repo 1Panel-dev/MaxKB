@@ -5,7 +5,7 @@ import { MODEL_TYPE_LABELS } from '@/constants'
 import CommonApi from '@/api/admin/workspace/common'
 import ModelApi from '@/api/admin/workspace/model'
 import CommonSystemApi from '@/api/admin/system/common'
-import SharedApi from '@/api/admin/workspace/shared.ts'
+import SharedModelApi from '@/api/admin/workspace/shared/model'
 import ProviderApi from '@/api/admin/model-provider.ts'
 import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import ModelCard from './model-card/ModelCard.vue'
@@ -60,7 +60,7 @@ function loadModels() {
   const provider = currentProvider.value.provider
   const query = { ...modelQuery.value, ...(provider !== 'all' && provider !== 'shared' ? { provider } : {}) }
 
-  const request = isShared.value ? SharedApi.getModelList(modelQuery.value) : ModelApi.getModelList(query)
+  const request = isShared.value ? SharedModelApi.getModelList(modelQuery.value) : ModelApi.getModelList(query)
 
   return request
     .then((models) => {

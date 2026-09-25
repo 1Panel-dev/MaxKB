@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { computed, reactive, ref, useTemplateRef, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
@@ -124,6 +125,8 @@ function handleSave() {
       saving.value = false
     })
 }
+
+defineProps<ResourceDetailPageProps>()
 </script>
 
 <template>

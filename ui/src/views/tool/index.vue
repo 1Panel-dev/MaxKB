@@ -7,7 +7,7 @@ import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import ToolApi from '@/api/admin/workspace/tool/tool'
-import SharedApi from '@/api/admin/workspace/shared'
+import SharedToolApi from '@/api/admin/workspace/shared/tool'
 import StoreApi from '@/api/admin/store.ts'
 import type { Dict, FolderItem, OptionItem, ToolItem, ToolStoreResponse, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
@@ -76,7 +76,7 @@ function handleSearchChange(query?: Dict<unknown>) {
 const toolType = ref<ToolType | ''>('')
 
 function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
-  const requestApi = isShared.value ? SharedApi : ToolApi
+  const requestApi = isShared.value ? SharedToolApi : ToolApi
   const folderId = isShared.value ? {} : { folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL }
   return requestApi.getToolPage(pagination, { ...toolQuery.value, tool_type: toolType.value, ...folderId })
 }

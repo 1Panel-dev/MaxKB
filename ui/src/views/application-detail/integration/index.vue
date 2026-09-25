@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 defineOptions({ name: 'IntegrationView' })
+
+defineProps<ResourceDetailPageProps>()
 </script>
 
 <template>

@@ -24,7 +24,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             path: '',
             name: 'workspace-knowledge-library',
             redirect: { name: 'workspace-knowledge-document-list' },
-            meta: { title: '资料库', icon: 'icon_describe_outlined', order: 10 },
+            meta: { title: '资料库', icon: 'icon-draft', order: 10 },
             children: [
               {
                 path: 'document',
@@ -50,13 +50,13 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             path: 'workflow-entry',
             name: 'workspace-knowledge-workflow',
             redirect: (to) => ({ name: 'workflow-knowledge', params: { workspaceId: to.params.workspaceId, knowledgeId: to.params.knowledgeId } }),
-            meta: { title: '工作流', icon: 'icon_mindnote_outlined', order: 20 },
+            meta: { title: '工作流', icon: 'icon_ticket-flow_outlined', order: 20 },
           },
           {
             path: 'retrieval',
             name: 'workspace-knowledge-retrieval',
             redirect: { name: 'workspace-knowledge-recall-test' },
-            meta: { title: '检索优化', icon: 'icon-laser', order: 30 },
+            meta: { title: '检索优化', icon: 'icon_trace_outlined', order: 30 },
             children: [
               {
                 path: 'recall',
@@ -82,7 +82,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             path: 'integration',
             name: 'workspace-knowledge-integration',
             redirect: { name: 'workspace-knowledge-chat-user' },
-            meta: { title: '授权与集成', icon: 'icon_admin_outlined', order: 40 },
+            meta: { title: '授权与集成', icon: 'icon_personal-privacy_outlined', order: 40 },
             children: [
               {
                 path: 'chat-user',

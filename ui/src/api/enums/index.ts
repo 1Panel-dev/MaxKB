@@ -10,3 +10,5 @@ export * from './knowledge'
 export * from './trigger'
 export * from './file'
 export * from './state'
+
+export * from './document'
