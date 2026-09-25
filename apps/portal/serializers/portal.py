@@ -33,6 +33,16 @@ from users.serializers.login import LoginRequest
 system_version, system_get_key = Cache_Version.SYSTEM.value
 
 
+class LogoField(serializers.CharField):
+    """门户Logo字段，兼容字符串URL（JSON）与 multipart 上传文件"""
+
+    def to_internal_value(self, data):
+        if data is not None and hasattr(data, "read"):
+            # multipart 上传的文件对象（InMemoryUploadedFile / TemporaryUploadedFile）
+            return data
+        return super().to_internal_value(data)
+
+
 class PortalSerializer(serializers.Serializer):
     name = serializers.CharField(required=False, label=_("portal name"), help_text=_("portal name"))
     description = serializers.CharField(
@@ -42,7 +52,7 @@ class PortalSerializer(serializers.Serializer):
         label=_("portal description"),
         help_text=_("portal description"),
     )
-    logo = serializers.CharField(
+    logo = LogoField(
         required=False, allow_null=True, allow_blank=True, label=_("portal logo"), help_text=_("portal logo")
     )
     enable_public_access = serializers.BooleanField(
