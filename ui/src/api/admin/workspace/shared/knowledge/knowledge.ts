@@ -1,6 +1,6 @@
 import { get } from '../../../core/request'
 import type { ParamsPage, ResponsePage } from '../../../core/types'
-import type { Dict, KnowledgeDetail, KnowledgeItem } from '@/api/types'
+import type { Dict, KnowledgeTagGroup, KnowledgeDetail, KnowledgeItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => `/system/shared/workspace/${getWorkspaceId()}/knowledge`
@@ -15,4 +15,7 @@ const getAllKnowledge = (query?: Dict<unknown>) => get<KnowledgeItem[]>(getPrefi
 /** 获取工作空间共享的知识库详情。 */
 const getKnowledgeDetail = (knowledgeId: string) => get<KnowledgeDetail>(`${getPrefix()}/${knowledgeId}`)
 
-export default { getKnowledgePage, getAllKnowledge, getKnowledgeDetail }
+/** 获取知识库按标签名称分组的标签选项。 */
+const getKnowledgeTags = (knowledgeId: string) => get<KnowledgeTagGroup[]>(`${getPrefix()}/${knowledgeId}/tags`)
+
+export default { getKnowledgeTags, getKnowledgePage, getAllKnowledge, getKnowledgeDetail }

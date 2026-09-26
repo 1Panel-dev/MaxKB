@@ -498,9 +498,18 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 
 `workspace/knowledge/document.ts` 仅维护文档分页查询，路径为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<currentPage>/<pageSize>`。
-分页使用 `ParamsPage` / `ResponsePage<DocumentItem>`，支持 `name`、`create_user`、`status`、`task_type` 筛选；
+分页使用 `ParamsPage` / `ResponsePage<DocumentItem>`，支持 `name`、`create_user`、`status`、`task_type`、`is_active`、`hit_handling_method` 和 `tags` 筛选；
 文件任务使用 `DOCUMENT_TASK_STATE` 的字符状态及 `DOCUMENT_TASK_TYPE` 的任务位置，
 不使用通用 `STATE_TYPES`；选择全部时省略状态与任务类型，非任务专属状态省略任务类型。
+文件状态响应还包含 `REVOKE: '4'`、`REVOKED: '5'`、`IGNORED: 'n'`。
+`DocumentItem.status_meta` 使用可空的 `DocumentStatusMeta`：`aggs` 为 `{ status, count }[]`，
+`state_time` 按任务编号、状态字符两级索引时间字符串；两项均可缺省。
+`DocumentTaskState` 和 `DocumentTaskType` 从文档枚举派生，统一从 `@/api/types` 导入。
+启用状态传布尔值，`false` 不省略；单选全部时省略该字段。`tags` 传数组，沿用 Axios 的
+`tags[]` 序列化，内容为标签 ID 或特殊值 `NO_TAG`，不传标签名称或 JSON 字符串。
+`workspace/knowledge/knowledge.ts` 和 `workspace/shared/knowledge/knowledge.ts` 的
+`getKnowledgeTags(knowledgeId)` 分别请求对应资源前缀的 `/<knowledgeId>/tags`，返回
+`KnowledgeTagGroup[]`；页面将分组转换为级联选项，MkTableFilter 内部展开父组并去重，页面直接用组件返回的叶子标签 ID 数组查询。
 文档页传 `resource_type: 'document'`，创建者选项复用 Workspace `common.ts` 的 `getAllUsers`。
 类型从 `@/api/types` 导入，命中处理枚举从 `@/api/enums` 导入。API 不接收 loading，不重复包装响应。
 

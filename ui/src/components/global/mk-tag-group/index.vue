@@ -14,7 +14,7 @@ withDefaults(
     /** 首个标签的类型 */
     type?: TagProps['type']
   }>(),
-  { popoverDisabled: false, tags: () => [], type: 'info' },
+  { popoverDisabled: false, tags: () => [], type: 'info', size: 'small' },
 )
 </script>
 

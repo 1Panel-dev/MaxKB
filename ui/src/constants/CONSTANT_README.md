@@ -37,8 +37,11 @@ const knowledgeTypeLabel = KNOWLEDGE_TYPE_LABELS[knowledgeType]
 `trigger.ts` 的 `TRIGGER_SCHEDULE_OPTIONS` 统一提供触发器与长期记忆的周期级联选项，
 包含周期文案、执行时间和间隔数值；使用方只读，配置回填与校验仍由各自组件维护。
 
-`state.ts` 的 `STATE_LABELS` 统一维护公共枚举 `STATE_TYPES` 的展示文案。触发器、文件等业务
+`state.ts` 的 `STATE_LABELS` 统一维护公共枚举 `STATE_TYPES` 的展示文案。触发器等使用通用状态协议的业务
 按需复用 `api/enums/state.ts` 中的状态值；新增状态时同步补齐文案和 `MkStatusLabel` 的图标映射。
+`STATE_LABELS` 还提供 `EMBEDDING`（索引中）、`GENERATE`（生成中）、`SYNC`（同步中）、
+`TOKENIZE`（分词索引中）的任务阶段文案，文档筛选直接复用对应文案。接口值继续使用
+`DOCUMENT_TASK_STATE` 和 `DOCUMENT_TASK_TYPE` 映射，不将展示状态键直接提交为文档任务状态。
 
 `document.ts` 的 `DOCUMENT_HIT_HANDLING_LABELS` 维护文档命中处理方式的展示文案，
 映射键引用 API 枚举 `DOCUMENT_HIT_HANDLING`。

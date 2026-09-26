@@ -1122,11 +1122,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  &:not(&--small) {
-    --el-tag-font-size: 14px;
-    height: 20px;
-    color: var(--mk-N900) !important;
-  }
+
   &--small {
     padding: 4px;
   }

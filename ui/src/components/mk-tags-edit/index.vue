@@ -57,22 +57,10 @@ function removeTag(tag: string) {
       @blur="confirmTag"
       @keyup.enter="confirmTag"
     />
-    <el-button class="add-tag-button" plain v-else size="small" @click="showTagInput">
+    <el-button class="mk-add-tag-button" plain v-else size="small" @click="showTagInput">
       <MkIcon name="icon_add_outlined" size="14" />
       <span>添加后缀名</span>
     </el-button>
   </div>
 </template>
-<style lang="scss" scoped>
-.mk-tags-edit {
-  .add-tag-button {
-    padding: 0 8px;
-    height: 24px;
-    line-height: 24px;
-    font-size: 14px;
-    border: 1px dashed var(--el-border-color);
-    border-radius: var(--el-border-radius-small);
-    color: var(--mk-N500);
-  }
-}
-</style>
+<style lang="scss" scoped></style>

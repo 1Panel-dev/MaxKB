@@ -43,23 +43,17 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- // TODO 待设计 -->
   <el-form-item label="单次上传最多文件数" required prop="limit">
     <el-input-number
       style="width: 100%"
       v-model="formValue.limit"
-      :rules="[{ required: true, message: '单次上传最多文件数必填', trigger: 'change' }]"
+      :rules="[{ required: true, message: '请输入', trigger: 'change' }]"
       :min="0"
       controls-position="right"
       align="left"
     />
   </el-form-item>
-  <el-form-item
-    label="每个文件最大(MB)"
-    required
-    prop="max_file_size"
-    :rules="[{ required: true, message: '每个文件最大(MB)必填', trigger: 'change' }]"
-  >
+  <el-form-item label="每个文件最大(MB)" required prop="max_file_size" :rules="[{ required: true, message: '请输入', trigger: 'change' }]">
     <el-input-number style="width: 100%" v-model="formValue.max_file_size" :min="0" controls-position="right" align="left" />
   </el-form-item>
   <el-form-item label="文件类型" required prop="accept" :rules="[{ required: true, message: '文件类型必填', trigger: 'change' }]">

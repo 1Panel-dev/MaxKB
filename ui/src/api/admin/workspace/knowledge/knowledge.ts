@@ -1,6 +1,14 @@
 import { del, get, getExportFile, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { Dict, KnowledgeDetail, KnowledgeItem, KnowledgeCreatePayload, WebKnowledgeCreatePayload, LarkKnowledgeCreatePayload } from '@/api/types'
+import type {
+  Dict,
+  KnowledgeTagGroup,
+  KnowledgeDetail,
+  KnowledgeItem,
+  KnowledgeCreatePayload,
+  WebKnowledgeCreatePayload,
+  LarkKnowledgeCreatePayload,
+} from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
@@ -99,7 +107,11 @@ const getKnowledgeMcpConfig = (knowledgeId: string): Promise<string> =>
 /** 提交知识库分词索引任务。 */
 const putKnowledgeKeywordIndex = (knowledgeId: string) => put<undefined, void>(`${getPrefix()}/${knowledgeId}/tokenize`)
 
+/** 获取知识库按标签名称分组的标签选项。 */
+const getKnowledgeTags = (knowledgeId: string) => get<KnowledgeTagGroup[]>(`${getPrefix()}/${knowledgeId}/tags`)
+
 export default {
+  getKnowledgeTags,
   getKnowledgeMcpConfig,
   putKnowledgeKeywordIndex,
   exportKnowledgeExcel,

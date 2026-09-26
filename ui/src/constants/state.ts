@@ -5,6 +5,10 @@ import type { State } from '@/api/types'
 export const STATE_LABELS: Record<State, string> = {
   [STATE_TYPES.PENDING]: '排队中',
   [STATE_TYPES.STARTED]: '执行中',
+  [STATE_TYPES.EMBEDDING]: '索引中',
+  [STATE_TYPES.GENERATE]: '生成中',
+  [STATE_TYPES.SYNC]: '同步中',
+  [STATE_TYPES.TOKENIZE]: '分词索引中',
   [STATE_TYPES.SUCCESS]: '成功',
   [STATE_TYPES.FAILURE]: '失败',
   [STATE_TYPES.REVOKE]: '取消中',
