@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 
 defineOptions({ name: 'SettingKnowledgeAction' })
@@ -12,7 +13,7 @@ function handleSettingKnowledge(event: MouseEvent) {
   event.stopPropagation()
   void router.push({
     name: 'workspace-knowledge-setting',
-    params: { workspaceId: route.params.workspaceId, knowledgeId: props.knowledge.id },
+    params: { workspaceId: route.params.workspaceId, knowledgeId: props.knowledge.id, type: KNOWLEDGE_TYPE_MAP[props.knowledge.type] },
   })
 }
 </script>

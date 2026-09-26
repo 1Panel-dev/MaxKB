@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CommonApi from '@/api/admin/workspace/common'
@@ -33,7 +34,7 @@ const router = useRouter()
 function handleOpenKnowledge(knowledge: KnowledgeItem) {
   void router.push({
     name: isShared.value ? 'workspace-shared-knowledge-detail' : 'workspace-knowledge-detail',
-    params: { workspaceId: route.params.workspaceId, knowledgeId: knowledge.id },
+    params: { workspaceId: route.params.workspaceId, knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
   })
 }
 
@@ -287,9 +288,9 @@ function handleBatchDelete() {
         @batch-cancel="cancelBatchSelection"
       >
         <template #footer-batch-actions>
-          <el-button type="primary" plain :disabled="knowledgeOperationLoading || !selectedKnowledgeCount" @click="handleOpenBatchMove"
-            >转移到</el-button
-          >
+          <el-button type="primary" plain :disabled="knowledgeOperationLoading || !selectedKnowledgeCount" @click="handleOpenBatchMove">
+            转移到
+          </el-button>
           <el-button type="danger" plain :disabled="knowledgeOperationLoading || !selectedKnowledgeCount" @click="handleBatchDelete">删除</el-button>
         </template>
       </component>

@@ -274,7 +274,7 @@ function handleBack() {
     return
   }
   if (!hasUnsavedChanges()) {
-    goBack(knowledgeId)
+    goBack(knowledgeId, knowledgeDetail.value?.type)
     return
   }
 
@@ -287,10 +287,10 @@ function handleBack() {
     distinguishCancelAndClose: true,
   })
     .then(() => {
-      return saveKnowledgeWorkflow(undefined, true).then(() => goBack(knowledgeId))
+      return saveKnowledgeWorkflow(undefined, true).then(() => goBack(knowledgeId, knowledgeDetail.value?.type))
     })
     .catch((action: Action) => {
-      if (action === 'cancel') goBack(knowledgeId)
+      if (action === 'cancel') goBack(knowledgeId, knowledgeDetail.value?.type)
     })
     .finally(() => {
       loading.value = false
@@ -347,7 +347,7 @@ onBeforeUnmount(stopAutoSave)
         <span>保存</span>
       </el-button>
       <!-- 发布 -->
-      <el-button type="primary" :disabled="loading" @click="handlePublish"> 发布 </el-button>
+      <el-button type="primary" :disabled="loading" @click="handlePublish">发布</el-button>
       <!-- 更多操作 -->
       <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
         <el-button text class="h-7! w-7! px-0!">

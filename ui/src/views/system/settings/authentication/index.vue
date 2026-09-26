@@ -46,7 +46,7 @@ const activeAuthenticationComponent = computed(() => authenticationTabs.find((ta
       </component>
 
       <KeepAlive>
-        <component :is="activeAuthenticationComponent" :key="activeName" />
+        <component :is="activeAuthenticationComponent" />
       </KeepAlive>
     </template>
   </MkViewLayout>

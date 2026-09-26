@@ -44,13 +44,7 @@ function handleDragStart(node: NodeMenuItem, event: PointerEvent) {
     </el-tabs>
 
     <KeepAlive>
-      <BasicNodeMenu
-        v-if="activeTab === 'basic'"
-        key="basic"
-        :workflow-mode="workflowMode"
-        @dragstart="handleDragStart"
-        @select="emit('select', $event)"
-      />
+      <BasicNodeMenu v-if="activeTab === 'basic'" :workflow-mode="workflowMode" @dragstart="handleDragStart" @select="emit('select', $event)" />
 
       <ResourceNodeMenu
         v-else

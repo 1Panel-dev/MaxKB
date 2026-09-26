@@ -45,7 +45,14 @@ Workspace 使用 `AppLayout`，左侧导航根据 `scope: 'workspace'` 对应路
 
 Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当前路由参数为准。应用根
 地址、登录成功和从 System 返回 Workspace 时统一进入 `/admin/workspace/default`。父路由的
-`scope` 会合并到匹配的子路由 `meta` 中。
+ `scope` 会合并到匹配的子路由 `meta` 中。
+
+顶部工作空间切换统一由 `layout/header-workspace-dropdown/index.vue` 处理：选择不同工作空间时，
+通过 `router.resolve()` 生成目标地址，再调用 `window.location.assign()` 整页加载，重新初始化
+用户资料、权限和页面状态。智能体详情及其子页切换后进入目标工作空间的智能体列表；普通或共享
+知识库详情及其子页切换后进入目标工作空间的知识库列表，不携带原详情的资源参数、query 或 hash。
+其他页面保留当前路由名称、其他参数、query 和 hash；选择当前工作空间不刷新。
+不要改为仅 `router.push()` 或依赖组件 `key` 重建来替代整页加载。
 
 触发器列表地址为 `/admin/workspace/:workspaceId/trigger`，渲染 `views/trigger/index.vue`。
 
@@ -211,11 +218,11 @@ Workspace 页面：
 
 /admin/workspace/:workspaceId/knowledge
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/workflow
-/admin/workspace/:workspaceId/knowledge/:knowledgeId
-/admin/workspace/:workspaceId/knowledge/:knowledgeId/document
-/admin/workspace/:workspaceId/knowledge/:knowledgeId/setting
-/admin/workspace/:workspaceId/knowledge/:knowledgeId/workflow-entry
-/admin/workspace/:workspaceId/knowledge/:knowledgeId/document/:documentId
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/document
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/setting
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/workflow-entry
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/document/:documentId
 ```
 
 智能体详情路由的 `type` 来自当前 `ApplicationDetail.type`；卡片概览和简易智能体设置等详情入口
@@ -327,6 +334,9 @@ System 共享资源页面：
 - 每次新增、删除、移动或修改路由时，必须同步更新本文件。
 
 工作空间知识库卡片进入 `workspace-knowledge-detail`，默认重定向到“文档”子路由。
+普通与共享知识库详情的 `type` 通过 `KNOWLEDGE_TYPE_MAP[knowledge.type]` 转换为
+`BASE`、`WEB`、`LARK`、`WORKFLOW`，地址不使用接口数字枚举；卡片、设置、创建成功跳转及工作流返回详情
+必须与 `knowledgeId` 一并传入。独立知识库工作流地址保持不变。
 详情容器复用 `ResourceDetailLayout`，菜单依次为“资料库（文档、图片、标签管理）”、
 “工作流”、“检索优化（召回测试、问题、自定义分词）”、“授权与集成（对话用户、外部检索服务）”、
 “设置”。资料库分组使用空 path，保留原 `/document` 地址；图片和标签分别使用 `/image`、`/tag`。
@@ -375,7 +385,7 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 ### Workspace 共享知识库详情
 
 共享知识库卡片进入 `workspace-shared-knowledge-detail`，地址为
-`/admin/workspace/:workspaceId/shared/knowledge/:knowledgeId`，默认重定向到
+`/admin/workspace/:workspaceId/shared/knowledge/:knowledgeId/:type`，默认重定向到
 `workspace-shared-knowledge-document-list`（`document`）。详情父路由配置
 `resourceScope: 'workspace-shared'` 和 `activeMenu: 'workspace-knowledge'`，复用知识库详情容器和文档页，侧栏仍高亮 Workspace 知识库。
 共享详情目前仅注册“资料库 → 文档”，后续页面需接入对应共享接口后再注册，不跳转普通设置或工作流。

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, reactive } from 'vue'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
@@ -60,7 +61,7 @@ function submit() {
           emit('refresh')
           return router.push({
             name: 'workspace-knowledge-document-list',
-            params: { knowledgeId: knowledge.id, workspaceId: route.params.workspaceId },
+            params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type], workspaceId: route.params.workspaceId },
           })
         })
       })

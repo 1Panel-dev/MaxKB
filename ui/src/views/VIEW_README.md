@@ -201,7 +201,7 @@ src/views/knowledge/
 `KnowledgeCard` 只负责展示、选择状态和 `action-dropdown` 插槽；页面传入完整 Knowledge API，
 组合单项转移、删除 Action，并管理批量选择、全选、批量转移与批量删除。共享知识库不展示这些操作。
 `SettingKnowledgeAction` 暂不增加权限判断，点击后携带当前
-`workspaceId` 和知识库 ID 跳转 `workspace-knowledge-setting`；阻止事件冒泡，避免同时触发卡片详情跳转。
+`workspaceId`、知识库 ID 和 `KNOWLEDGE_TYPE_MAP[knowledge.type]` 跳转 `workspace-knowledge-setting`；阻止事件冒泡，避免同时触发卡片详情跳转。
 “设置”之后依次组合 `KeywordIndexKnowledgeAction` 和 `McpConfigKnowledgeAction`，接收完整
 Knowledge API 并复用页面操作 loading。分词索引不增加确认弹窗，调用成功后只提示“操作成功”；
 MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需挂载、关闭后卸载。
@@ -228,7 +228,7 @@ MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需�
 模型加载后仅在未选择时默认选中首个可用模型；重置表单时恢复该默认值，无可用模型时保持为空。
 刷新选项不覆盖用户选择或设置页回填的模型。
 创建前校验表单，提交期间禁止重复提交和关闭；成功后刷新用户基础资料并通知列表刷新，
-普通类型进入文档列表，工作流进入画布。每次打开及关闭动画结束后清理表单，工作流模板使用
+普通类型将接口返回的 `knowledge.type` 通过 `KNOWLEDGE_TYPE_MAP` 转为字符串后进入文档列表，工作流进入画布。每次打开及关闭动画结束后清理表单，工作流模板使用
 `cloneDeep` 隔离；创建流程使用 Workspace API，不通过路由字符串推测 System 范围。
 飞书创建沿用扩展接口 `/lark/save`，部署环境需要提供该接口。
 “导入创建”沿用智能体和工具的菜单文件选择交互，调用 `postKnowledgeImport` 上传文件及当前
@@ -670,8 +670,13 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 搜索只提供名称 `name` 和创建者 `create_user`；创建者通过 Workspace `CommonApi.getAllUsers`
 加载，支持按 `nick_name` 远程搜索。列表使用 `documentData`、`paginationConfig`、`documentQuery`，
 查询方法为 `loadDocuments`，搜索处理为 `handleSearchChange`，搜索变化后回到第一页。
-切换工作空间、知识库或资源范围时重置筛选与页码；无轮询、排序入口、选择列和文档操作。
-文档分页接口维护在 `workspace/knowledge/document.ts`，页面管理 loading，状态仅作展示。
+文档页通过 `onMounted` 加载文档列表，创建者选项在展开下拉或输入关键词时通过 `remoteMethod`
+按需加载，不在进入页面时预加载；其他列表页的同类创建者筛选遵循相同方式。不额外监听路由重置状态。切换工作空间
+整页加载并返回知识库列表；当前知识库与共享资源入口均从其他页面进入，挂载时初始化筛选和分页。
+无轮询、排序入口、选择列和文档操作。
+文档分页接口维护在 `workspace/knowledge/document.ts`，页面管理 loading。文件状态表头使用
+`MkDropdown` 单选筛选全部、成功、失败、索引中、分词索引中、排队中和生成中；查询组合
+`status` 与可选的 `task_type`，切换选项清除旧任务类型并回到第一页，保留名称和创建者条件。
 
 文档详情路由暂未启用，System 知识库详情路由暂未注册。
 
@@ -746,7 +751,7 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 
 ### 知识库工作流导航与导出
 
-`workflow/knowledge/navigation.ts` 统一返回入口：Workspace 返回当前知识库详情，System 资源管理和共享资源返回各自知识库列表。
+`workflow/knowledge/navigation.ts` 统一返回入口：Workspace 将详情中的 `type` 通过 `KNOWLEDGE_TYPE_MAP` 转为字符串后返回当前知识库详情，详情尚未加载时使用 `WORKFLOW`；System 资源管理和共享资源返回各自知识库列表。
 历史模式下返回只退出预览；普通编辑态返回保留未保存确认。更多菜单的导出工作流先保存未提交改动，
 再调用专用 `.kbwf` 导出接口；保存失败不导出。知识库原有文件上传、数据源表单与任务轮询调试流程保持独立。
 
@@ -769,7 +774,7 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 `HomeView` 向 `HomeResourceOverview` 传入完整首页 API 对象，组件通过 `typeof HomepageApi`
 约束 `api` Prop 并调用 `props.api`。资源概况、使用统计和排行均由 `HomeView` 显式传入
 `workspaceId`，排行榜继续向详情抽屉传递；调用首页接口时逐次传入此 ID，不在 API 内读取路由。
-统计组件按 `workspaceId` 设置 key，切换工作空间时重载数据并清理旧筛选与排行榜详情。
+顶部切换工作空间时统一整页加载，重载统计数据并清理旧筛选与排行榜详情，统计组件无需额外设置工作空间 key。
 
 快捷创建通过插槽复用智能体、知识库、工具和模型的现有入口，目标文件夹为当前工作空间根目录；
 保留创建流程中的用户资料刷新及详情／工作流导航，停留首页的成功操作刷新资源概况与智能体选项。

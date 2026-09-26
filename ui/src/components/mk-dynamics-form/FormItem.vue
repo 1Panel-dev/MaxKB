@@ -180,7 +180,6 @@ defineExpose({ validate })
 <template>
   <el-form-item
     v-loading="loading"
-    :key="formField.field"
     :style="formItemStyle"
     :prop="formField.field"
     :rules="validationRules"

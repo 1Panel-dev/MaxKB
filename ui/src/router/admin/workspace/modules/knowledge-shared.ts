@@ -3,7 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 /** 工作空间知识库模块下的共享详情路由。 */
 export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
   {
-    path: 'shared/knowledge/:knowledgeId',
+    path: 'shared/knowledge/:knowledgeId/:type',
     name: 'workspace-shared-knowledge-detail',
     component: () => import('@/views/knowledge-detail/index.vue'),
     redirect: { name: 'workspace-shared-knowledge-document-list' },
