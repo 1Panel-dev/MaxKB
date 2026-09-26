@@ -1,0 +1,10 @@
+/* 对话模块公共样式，由 view/chat 与 view/debug 的 scoped SCSS 通过 @use 引入。
+ * 公共类名使用 conversation-panel- 前缀；标题栏使用 mk-conversation-header。
+ * 样式受入口组件作用域限制，跨子组件内部的规则需使用 :deep()。
+ * 组件专属布局和交互样式保留在所属组件的 scoped 样式中。
+ */
+
+/* 对话标题栏：在中性底色上叠加浅主题色。 */
+.mk-conversation-header {
+  background: color-mix(in srgb, var(--mk-primary) 5%, var(--mk-N100));
+}

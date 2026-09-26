@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application'
@@ -125,7 +126,13 @@ defineExpose({ open })
         <template v-if="!loading">
           <div v-if="applicationOptions.length" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             <template v-for="application in applicationOptions" :key="application.id">
-              <el-popover placement="bottom-start" :width="360" :show-after="500" :persistent="false" popper-class="border-none! rounded-xl!">
+              <el-popover
+                placement="bottom-start"
+                :width="360"
+                :show-after="TOOLTIP_SHOW_DELAY"
+                :persistent="false"
+                popper-class="border-none! rounded-xl!"
+              >
                 <template #reference>
                   <MkCardCheckbox
                     :model-value="selectedApplicationIds.includes(application.id)"

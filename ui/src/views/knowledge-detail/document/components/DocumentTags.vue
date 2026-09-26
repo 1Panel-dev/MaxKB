@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed } from 'vue'
 import type { DocumentItem } from '@/api/types'
 
@@ -12,9 +13,9 @@ const tagCount = computed(() => props.document.tag_count ?? props.document.tags?
 
 <template>
   <div class="flex-align-center gap-1">
-    <el-popover v-if="tagCount" trigger="hover" placement="bottom-start" width="auto">
+    <el-popover v-if="tagCount" trigger="hover" placement="bottom-start" width="auto" :show-after="TOOLTIP_SHOW_DELAY" :persistent="false">
       <template #reference>
-        <el-tag type="info" effect="plain" class="shrink-0">
+        <el-tag type="info" effect="plain" class="shrink-0 cursor-pointer">
           <span class="flex-align-center gap-1 text-N900 py-1">
             <MkIcon name="icon_tag" />
             <!-- TODO tag字号 -->

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, ref } from 'vue'
 import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
 import type { DocumentStatusMeta, DocumentTaskState, DocumentTaskType, State } from '@/api/types'
@@ -90,9 +91,17 @@ const aggregateStatus = computed(() => getAggregateDocumentStatus(taskStatuses.v
 </script>
 
 <template>
-  <el-popover v-model:visible="visible" placement="bottom-start" trigger="hover" width="auto" :persistent="false" :disabled="!aggregateStatus">
+  <el-popover
+    v-model:visible="visible"
+    placement="bottom-start"
+    trigger="hover"
+    width="auto"
+    :show-after="TOOLTIP_SHOW_DELAY"
+    :persistent="false"
+    :disabled="!aggregateStatus"
+  >
     <template #reference>
-      <span class="inline-flex">
+      <span class="inline-flex cursor-pointer">
         <MkStatusLabel v-if="aggregateStatus" :status="aggregateStatus.displayStatus" />
         <span v-else>-</span>
       </span>

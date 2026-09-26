@@ -1,26 +1,3 @@
-<template>
-  <transition name="debug-panel">
-    <div v-if="debug.visible.value" class="workflow-debug-panel" :class="{ expanded: debug.expanded.value }">
-      <ConversationLayout
-        class="h-full"
-        :left-open="bundle.list.leftSideOpen.value"
-        :right-open="bundle.detail.rightSideOpen.value"
-        :left-mode="leftMode"
-        :right-mode="rightMode"
-        @mask-click="closeDrawers"
-      >
-        <template #left><ConversationList /></template>
-        <template #main>
-          <ChatPanel>
-            <template #header><DebugHeader /></template>
-          </ChatPanel>
-        </template>
-        <template #right><ExecutionDetail /></template>
-      </ConversationLayout>
-    </div>
-  </transition>
-</template>
-
 <script setup lang="ts">
 import { computed, onMounted, onBeforeUnmount, provide, watch } from 'vue'
 import ConversationLayout from '../../core/layout/index.vue'
@@ -72,56 +49,81 @@ watch(
 )
 </script>
 
-<style scoped lang="scss">
+<template>
+  <!-- 面板挂载到 body，以视口定位，不参与工作流页面布局。 -->
+  <Teleport to="body">
+    <transition name="debug-panel">
+      <div
+        v-if="debug.visible.value"
+        class="workflow-debug-panel overflow-hidden border border-N300 bg-white shadow-lg"
+        :class="{ expanded: debug.expanded.value }"
+      >
+        <ConversationLayout
+          :left-open="bundle.list.leftSideOpen.value"
+          :right-open="bundle.detail.rightSideOpen.value"
+          :left-mode="leftMode"
+          :right-mode="rightMode"
+          @mask-click="closeDrawers"
+        >
+          <template #left><ConversationList /></template>
+          <template #main>
+            <ChatPanel>
+              <template #header><DebugHeader /></template>
+            </ChatPanel>
+          </template>
+          <template #right><ExecutionDetail /></template>
+        </ConversationLayout>
+      </div>
+    </transition>
+  </Teleport>
+</template>
+
+<style lang="scss">
+@use '../../index.scss';
+
+/* 调试面板定位与展开布局 */
 .workflow-debug-panel {
-  position: absolute;
-  top: calc(var(--mk-header-height) + 12px);
-  right: 12px;
-  bottom: 12px;
-  width: 460px;
-  max-width: calc(100vw - 24px);
-  z-index: 20;
-  background: var(--mk-N0, #fff);
-  border: 1px solid var(--mk-N200, #dcdfe6);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
+  bottom: calc(var(--spacing) * 3);
+  height: min(calc(var(--spacing) * 170), 90vh);
+  max-width: calc(100vw - var(--spacing) * 6);
+  position: fixed;
+  right: calc(var(--spacing) * 3);
   transition:
-    width 0.25s ease,
-    top 0.25s ease,
-    right 0.25s ease,
-    bottom 0.25s ease,
-    border-radius 0.25s ease;
+    width 0.25s ease-in-out,
+    right 0.25s ease-in-out,
+    bottom 0.25s ease-in-out,
+    border-radius 0.25s ease-in-out;
+  width: calc(var(--spacing) * 115);
+  z-index: 20;
+
+  &.expanded {
+    border: none;
+    border-radius: 0;
+    bottom: 0;
+    height: 100dvh;
+    max-width: 100vw;
+    right: 0;
+    width: 50vw;
+
+    /* 窗口变窄时增加面板占比，保留对话区可用宽度。 */
+    @media (max-width: 1024px) {
+      width: 90vw;
+    }
+
+    @media (max-width: 768px) {
+      width: 100vw;
+    }
+  }
 }
 
-/* 放大:宽度占视口 50%,高度 100% */
-.workflow-debug-panel.expanded {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 50vw;
-  max-width: 100vw;
-  border-radius: 0;
-}
-
-/* 面板内的对话框自带移动端样式:小屏下会把输入框 fixed 到整个视口。
-   这里把它约束回面板内部,避免输入框脱离面板铺满视口。 */
-.workflow-debug-panel :deep(.panel-input) {
-  position: relative !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-}
-
+/* 使用透明度动画，避免面板横向位移超出视口。 */
 .debug-panel-enter-active,
 .debug-panel-leave-active {
-  transition:
-    transform 0.25s ease,
-    opacity 0.25s ease;
+  transition: opacity 0.25s ease;
 }
 .debug-panel-enter-from,
 .debug-panel-leave-to {
-  transform: translateX(16px);
   opacity: 0;
 }
 </style>

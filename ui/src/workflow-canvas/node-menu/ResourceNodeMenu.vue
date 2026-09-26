@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, inject, onMounted, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application'
@@ -155,7 +156,7 @@ onMounted(() => {
       <el-scrollbar class="min-h-0 flex-1">
         <div v-if="filteredResourceItems.length" class="grid grid-cols-2 gap-3 px-3 pb-3">
           <template v-for="resource in filteredResourceItems" :key="resource.id">
-            <el-popover placement="right" :width="280" :show-after="500" :persistent="false">
+            <el-popover placement="right" :width="280" :show-after="TOOLTIP_SHOW_DELAY" :persistent="false">
               <template #reference>
                 <el-card
                   class="small cursor-pointer"
