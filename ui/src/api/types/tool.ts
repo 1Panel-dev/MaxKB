@@ -210,4 +210,5 @@ export interface ToolExecutionRecord extends ToolExecutionRecordDetail {
   source_icon?: string | null
   trigger_type?: import('./trigger').TriggerType | null
   create_time: string
+  workspace_name?: string
 }

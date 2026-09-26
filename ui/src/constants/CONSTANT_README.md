@@ -39,3 +39,6 @@ const knowledgeTypeLabel = KNOWLEDGE_TYPE_LABELS[knowledgeType]
 
 `state.ts` 的 `STATE_LABELS` 统一维护公共枚举 `STATE_TYPES` 的展示文案。触发器、文件等业务
 按需复用 `api/enums/state.ts` 中的状态值；新增状态时同步补齐文案和 `MkStatusLabel` 的图标映射。
+
+`document.ts` 的 `DOCUMENT_HIT_HANDLING_LABELS` 维护文档命中处理方式的展示文案，
+映射键引用 API 枚举 `DOCUMENT_HIT_HANDLING`。

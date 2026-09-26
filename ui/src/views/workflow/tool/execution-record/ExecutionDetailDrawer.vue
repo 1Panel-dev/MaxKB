@@ -4,6 +4,7 @@ import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import { TOOL_RECORD_SOURCE, KNOWLEDGE_TYPE } from '@/api/enums'
 import type { ToolExecutionRecord, ToolExecutionRecordDetail } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
+import { isSystemSharedResource } from '@/utils/resource-context'
 import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { WorkflowMode } from '@/workflow-canvas/types'
@@ -70,7 +71,12 @@ watch(
               <span class="min-w-0 flex-1 truncate" :title="record.source_name ?? undefined">{{ record.source_name || '-' }}</span>
             </div>
           </div>
-          <!-- // TODO 共享资源需要显示工作空间 -->
+
+          <!-- TODO 可能需要调整ui -->
+          <div v-if="isSystemSharedResource()">
+            <p class="mb-1 text-N600">工作空间</p>
+            {{ record?.workspace_name || '-' }}
+          </div>
           <div>
             <p class="mb-1 text-N600">状态</p>
             <MkStatusLabel :status="detail?.state ?? record.state" />
