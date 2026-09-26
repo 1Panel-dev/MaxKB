@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import type { TagProps } from 'element-plus'
 
 defineOptions({ name: 'MkTagGroup' })
@@ -30,7 +31,7 @@ withDefaults(
       popper-class="mk-tag-group__popper"
       trigger="hover"
       :popper-style="{ maxWidth: '250px', width: 'auto' }"
-      :show-after="300"
+      :show-after="TOOLTIP_SHOW_DELAY"
       v-if="tags?.length > 1"
     >
       <template #reference>

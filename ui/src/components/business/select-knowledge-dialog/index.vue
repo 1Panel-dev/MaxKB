@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
@@ -133,7 +134,13 @@ defineExpose({ open })
         <template v-if="!loading">
           <div v-if="filteredKnowledge.length" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             <template v-for="knowledge in filteredKnowledge" :key="knowledge.id">
-              <el-popover placement="bottom-start" :width="360" :show-after="500" :persistent="false" popper-class="border-none! rounded-xl!">
+              <el-popover
+                placement="bottom-start"
+                :width="360"
+                :show-after="TOOLTIP_SHOW_DELAY"
+                :persistent="false"
+                popper-class="border-none! rounded-xl!"
+              >
                 <template #reference>
                   <MkCardCheckbox
                     :model-value="selectedKnowledgeIds.includes(knowledge.id)"
@@ -147,7 +154,7 @@ defineExpose({ open })
                   </MkCardCheckbox>
                 </template>
                 <template #default>
-                  <KnowledgeCard :knowledge="knowledge" disabled> </KnowledgeCard>
+                  <KnowledgeCard :knowledge="knowledge" disabled></KnowledgeCard>
                 </template>
               </el-popover>
             </template>

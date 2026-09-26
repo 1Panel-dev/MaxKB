@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, ref } from 'vue'
 import { getMenuNodes, type WorkflowMenuNode } from '@/workflow-canvas/node-menu/menu'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
@@ -39,7 +40,7 @@ function handleNodeDragStart(event: PointerEvent, workflowNode: WorkflowMenuNode
           <p class="mb-3 mt-3 font-semibold text-sm text-N600">{{ group.label }}</p>
           <div class="grid grid-cols-2 gap-3">
             <template v-for="workflowNode in group.list" :key="workflowNode.type">
-              <el-popover placement="right" :width="280" :show-after="500" :persistent="false">
+              <el-popover placement="right" :width="280" :show-after="TOOLTIP_SHOW_DELAY" :persistent="false">
                 <template #reference>
                   <el-card
                     class="small cursor-pointer"

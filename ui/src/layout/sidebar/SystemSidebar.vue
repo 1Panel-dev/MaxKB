@@ -13,24 +13,37 @@ const systemMenuItems = getChildRouteList('system')
 
 const isSystemMenuActive = (systemMenuItem: LayoutMenuItem) => route.matched.some((matchedRoute) => matchedRoute.name === systemMenuItem.name)
 
-const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActive(systemMenuItem) ? (systemMenuItem.activeIcon ?? systemMenuItem.icon) : systemMenuItem.icon)
+const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
+  isSystemMenuActive(systemMenuItem) ? (systemMenuItem.activeIcon ?? systemMenuItem.icon) : systemMenuItem.icon
 </script>
 <template>
   <div class="mk-system-sidebar flex-column h-full">
     <el-scrollbar class="min-h-0 flex-1">
-      <el-menu class="mt-2!" :class="props.collapsed ? 'px-3.5!' : 'px-4!'" :collapse="props.collapsed"
-        :collapse-transition="false" :default-active="route.path" router :persistent="false">
+      <el-menu
+        class="mt-2!"
+        :class="props.collapsed ? 'px-3.5!' : 'px-4!'"
+        :collapse="props.collapsed"
+        :collapse-transition="false"
+        :default-active="route.path"
+        router
+        :persistent="false"
+      >
         <template v-for="item in systemMenuItems" :key="item.name">
           <template v-if="item.permission ? item.permission() : true">
             <!-- 有子菜单 -->
-            <el-sub-menu v-if="item.children?.length && item.route" :index="router.resolve(item.route).path"
-              popper-class="mk-system-sidebar-menu-popper">
+            <el-sub-menu
+              v-if="item.children?.length && item.route"
+              :index="router.resolve(item.route).path"
+              popper-class="mk-system-sidebar-menu-popper"
+            >
               <template #title>
                 <MkIcon v-if="item.icon" :name="getSystemMenuIcon(item)" :size="18" />
                 <span>{{ item.label }}</span>
               </template>
               <el-menu-item-group>
-                <template #title v-if="props.collapsed"><span>{{ item.label }}</span></template>
+                <template #title v-if="props.collapsed">
+                  <span>{{ item.label }}</span>
+                </template>
                 <template v-for="child in item.children" :key="child.name">
                   <template v-if="child.permission ? child.permission() : true">
                     <el-menu-item :index="child.route ? router.resolve(child.route).path : child.name">
@@ -45,9 +58,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
               <MkIcon v-if="item.icon" :name="getSystemMenuIcon(item)" :size="18" />
               <template #title>{{ item.label }}</template>
             </el-menu-item>
-
           </template>
-
         </template>
       </el-menu>
     </el-scrollbar>
@@ -57,12 +68,16 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
     </div>
     <!-- 收起导航按钮 -->
     <div :class="props.collapsed ? 'px-3.5' : 'px-4'" class="py-2">
-      <button type="button" :class="props.collapsed ? 'p-2.75' : 'px-2 p-2.75'"
+      <button
+        type="button"
+        :class="props.collapsed ? 'p-2.75' : 'px-2 p-2.75'"
         class="mk-system-sidebar-toggle flex-align-center w-full cursor-pointer gap-2 rounded-md"
-        @click="emit('toggle')">
+        @click="emit('toggle')"
+      >
         <MkIcon name="icon_side-fold_outlined" :size="18" :class="props.collapsed && 'rotate-180'" />
-        <span class="whitespace-nowrap transition-opacity duration-100"
-          :class="props.collapsed ? 'opacity-0' : 'delay-200 opacity-100'"> 收起导航 </span>
+        <span class="whitespace-nowrap transition-opacity duration-100" :class="props.collapsed ? 'opacity-0' : 'delay-200 opacity-100'">
+          收起导航
+        </span>
       </button>
     </div>
   </div>
@@ -70,7 +85,6 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
 <style lang="scss">
 .mk-system-sidebar,
 .mk-system-sidebar-menu-popper {
-
   /* menu */
   .el-menu {
     background: none !important;
@@ -143,7 +157,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
   }
 
   .el-menu-item-group {
-    >ul {
+    > ul {
       display: flex;
       flex-direction: column;
       gap: calc(var(--spacing) * 1);
@@ -158,7 +172,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
 
   // 菜单收起
   .el-menu--collapse {
-    >.el-menu-item {
+    > .el-menu-item {
       min-height: calc(var(--spacing) * 10);
 
       .el-menu-tooltip__trigger {
@@ -166,13 +180,13 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
       }
     }
 
-    >.el-sub-menu {
-      >.el-sub-menu__title {
+    > .el-sub-menu {
+      > .el-sub-menu__title {
         min-height: calc(var(--spacing) * 10);
         padding: 11px !important;
       }
 
-      &.is-active>.el-sub-menu__title {
+      &.is-active > .el-sub-menu__title {
         background-color: white;
       }
     }
@@ -186,8 +200,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActiv
 }
 
 .el-popper.mk-system-sidebar-menu-popper {
-  background-color: var(--mk-N200);
-  background-image: rgb(var(--mk-primary-rgb) / 5%);
+  background: color-mix(in srgb, var(--mk-primary) 5%, var(--mk-N100));
   border-radius: var(--el-border-radius-base);
 
   .el-menu {

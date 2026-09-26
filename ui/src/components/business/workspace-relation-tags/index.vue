@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 defineOptions({ name: 'WorkspaceRelationTags' })
 
 interface RelationColumn {
@@ -19,7 +20,7 @@ function formatCellValue(value: unknown): string {
 </script>
 
 <template>
-  <el-popover placement="bottom" trigger="hover" :width="420" :persistent="false" :show-after="300" :disabled="!data.length">
+  <el-popover placement="bottom" trigger="hover" :width="420" :persistent="false" :show-after="TOOLTIP_SHOW_DELAY" :disabled="!data.length">
     <template #reference>
       <MkTagGroup :tags="tags" popover-disabled :class="{ 'cursor-pointer': data.length }" />
     </template>

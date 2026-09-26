@@ -1,6 +1,6 @@
 <template>
   <!-- 带输入框的主面板:header + message-list + message-input -->
-  <main class="main-panel chat-panel" @drop.prevent="handleDrop" @dragover.prevent>
+  <main class="main-panel" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 头部可被替换(如 debug 用 debug header);默认普通 chat header -->
     <slot name="header"><ChatHeader /></slot>
     <MessageList :app-name="list.appInfo.value?.name || 'AI 助手'" />
@@ -41,15 +41,5 @@ const handleDrop = (e: DragEvent) => input.addFiles(e.dataTransfer?.files)
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-@media only screen and (max-width: 768px) {
-  .panel-input {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-  }
 }
 </style>

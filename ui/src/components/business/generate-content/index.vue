@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, reactive, ref, useTemplateRef, wat
 import type { ScrollbarInstance } from 'element-plus'
 import type { PromptGenerateMessage } from '@/api/types'
 import { ConversationStream } from '@/conversation-panel/core/stream'
+import { inputShortcut } from '@/conversation-panel/core/shortcuts'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'GenerateContent' })
@@ -107,21 +108,8 @@ function replaceContent() {
 }
 
 // 需求输入：回车发送，组合键在光标处换行，输入法确认时不提交。
-function handleInputKeydown(event: KeyboardEvent) {
-  if (event.isComposing || event.key !== 'Enter') return
-  event.preventDefault()
-  if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
-    const textarea = event.target
-    if (!(textarea instanceof HTMLTextAreaElement)) return
-    const startPos = textarea.selectionStart
-    const endPos = textarea.selectionEnd
-    const content = inputValue.value.slice(0, startPos) + '\n' + inputValue.value.slice(endPos)
-    if (textarea.maxLength >= 0 && content.length > textarea.maxLength) return
-    inputValue.value = content
-    nextTick(() => textarea.setSelectionRange(startPos + 1, startPos + 1))
-    return
-  }
-  generateContent()
+function handleKeydown(event: KeyboardEvent) {
+  inputShortcut(event, inputValue, () => generateContent())
 }
 
 // 关闭或卸载时停止读取，关闭动画结束后清理会话。
@@ -162,7 +150,7 @@ onBeforeUnmount(stopGenerate)
         <!-- 重新生成内容 -->
         <el-button plain :disabled="disabled" @click="generateContent(true)">重新生成</el-button>
       </div>
-      <div class="mk-conversation-input border transition-colors hover:border-primary focus-within:border-primary">
+      <div class="mk-input-box border transition-colors hover:border-primary focus-within:border-primary">
         <el-input
           v-model="inputValue"
           type="textarea"
@@ -170,7 +158,7 @@ onBeforeUnmount(stopGenerate)
           :autosize="{ minRows: 1, maxRows: 10 }"
           :placeholder="placeholder"
           :maxlength="100000"
-          @keydown.stop="handleInputKeydown"
+          @keydown.stop="handleKeydown"
           @paste.stop
         />
         <div class="text-right">

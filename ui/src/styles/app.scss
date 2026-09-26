@@ -186,8 +186,8 @@ h6 {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
 }
 
-/* conversation 生成input */
-.mk-conversation-input {
+/* 对话与内容生成共用的输入容器。 */
+.mk-input-box {
   background: white;
   border-radius: 16px;
   padding: 12px;
@@ -196,6 +196,9 @@ h6 {
     border-radius: 0;
     box-shadow: none;
     padding: 0;
+  }
+  .el-textarea__clear {
+    top: 10px;
   }
 }
 

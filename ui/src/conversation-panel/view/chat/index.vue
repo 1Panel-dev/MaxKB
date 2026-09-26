@@ -63,3 +63,7 @@ watch(
   },
 )
 </script>
+
+<style scoped lang="scss">
+@use '../../index.scss';
+</style>

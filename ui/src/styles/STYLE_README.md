@@ -26,6 +26,26 @@ import './styles/index.scss'
 
 项目样式必须位于 Element Plus 官方样式之后，确保 `element-plus.scss` 中的 CSS 变量映射可以生效。Tailwind 必须与 Sass 入口分开，不要在 `index.scss` 中引入 Tailwind，避免 Tailwind 经过 Sass 处理而产生构建警告或错误结果。
 
+## 对话模块公共样式
+
+`src/conversation-panel/index.scss` 是对话模块公共样式入口，由模块内的
+`view/chat/index.vue` 和 `view/debug/index.vue` 在 `<style scoped lang="scss">` 中通过
+`@use '../../index.scss';` 引入，不在脚本或应用入口重复引入。
+仅放置对话模块内复用的样式，公共类名使用 `conversation-panel-` 前缀；组件专属布局、
+定位和交互样式继续保留在所属组件的 scoped 样式中。引入后的规则受各入口组件作用域限制，
+不会自动作用于所有子组件内部；确需跨子组件内部的规则使用 `:deep()`。
+不依赖工作流页面的祖先选择器，确保挂载到 body 的 Debug 面板仍能匹配。
+
+对话标题栏统一使用 `mk-conversation-header`，以 N100 为底色，通过同色渐变叠加 5% 主题色。
+公共入口通过 `:deep()` 匹配子组件标题栏，目前 Debug 标题栏已接入。
+
+## 共享输入容器
+
+`mk-input-box` 是对话与内容生成共用的基础样式类，定义在 `app.scss`，负责输入容器的背景、
+圆角、内边距及内部 textarea 样式重置。对话输入区叠加 `conversation-message-input`，
+作为对话专属样式入口；对应样式保留在 `conversation-panel/components/message-input/index.vue`
+的 scoped 样式中。生成输入区使用 `mk-input-box`，不叠加对话专属类。
+
 ## 基础样式
 
 全局焦点轮廓统一在 `app.scss` 通过 `*:focus-visible { outline: none !important; }` 移除，

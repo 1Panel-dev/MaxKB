@@ -77,13 +77,14 @@ import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynam
 
 ### MkTooltip
 
-普通提示统一使用 `MkTooltip`，业务代码不直接使用 `el-tooltip`。默认悬停 500ms 后显示，
+普通提示统一使用 `MkTooltip`，业务代码不直接使用 `el-tooltip`。默认悬停 300ms 后显示，
 延迟由 `global/mk-tooltip/constants.ts` 的 `TOOLTIP_SHOW_DELAY` 维护；提前移开时由 Element Plus 取消显示。
-`showAfter` 可按需覆盖，其他 Tooltip 属性、事件（包括 `update:visible`）通过 `$attrs` 透传，
+项目中所有显式 `show-after` / `showAfter` 配置（包括 Popover）统一引用 `TOOLTIP_SHOW_DELAY`，不写死延迟数值。
+`MkTooltip` 的 `showAfter` 默认值使用该常量；其他 Tooltip 属性、事件（包括 `update:visible`）通过 `$attrs` 透传，
 支持默认触发插槽和 `content` 插槽，保持原有关闭延迟及可移入行为。
 显式控制 `visible` 时，显示时机由调用方负责，`showAfter` 不参与受控显示。
 Admin、Chat 共用的 `App.vue` 通过 Config Provider 的 `table.tooltipOptions` 为表格溢出提示
-配置同一延迟，不额外开启溢出提示。原生 `title`、Popover、下拉菜单及图表提示保持各自行为。
+配置同一延迟，不额外开启溢出提示。原生 `title`、未显式配置延迟的浮层、下拉菜单及图表提示保持各自行为。
 
 ### MdEditor、MdEditorMagnify、MdPreview
 
@@ -655,6 +656,8 @@ Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选
 重新生成追加用户消息 `Re generate` 后请求；停止调用当前流的 `cancel()`，保留已生成内容。
 输入支持 Enter 发送、Ctrl/Shift/Alt/Meta + Enter 在光标处换行、原生文本粘贴，拒绝纯空白，
 输入法组合期间不提交；键盘和粘贴事件停止冒泡，输入上限 100000 字符。
+回车与组合键换行复用 `conversation-panel/core/shortcuts.ts` 的 `inputShortcut`，
+发送条件由组件保留；该工具不接管原生文本粘贴或附件上传。
 
 ### FolderTree
 
