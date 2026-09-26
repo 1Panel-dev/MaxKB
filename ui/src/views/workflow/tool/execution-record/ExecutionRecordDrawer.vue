@@ -3,9 +3,10 @@ import { computed, ref } from 'vue'
 import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import { TOOL_RECORD_SOURCE, KNOWLEDGE_TYPE, STATE_TYPES } from '@/api/enums'
 import type { Dict, ToolExecutionRecord } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
 import { STATE_LABELS } from '@/constants/state'
+import { datetimeFormat } from '@/utils/time'
+import { isSystemSharedResource } from '@/utils/resource-context'
 
 const props = defineProps<{ api: typeof WorkflowApi; toolId: string }>()
 const emit = defineEmits<{ closed: [] }>()
@@ -36,9 +37,9 @@ const searchFields = [
     label: '资源类型',
     value: 'source_type',
     options: [
-      { label: '智能体', value: TOOL_RECORD_SOURCE.APPLICATION },
-      { label: '知识库', value: TOOL_RECORD_SOURCE.KNOWLEDGE },
-      { label: '触发器', value: TOOL_RECORD_SOURCE.TRIGGER },
+      { label: sourceLabels[TOOL_RECORD_SOURCE.APPLICATION], value: TOOL_RECORD_SOURCE.APPLICATION },
+      { label: sourceLabels[TOOL_RECORD_SOURCE.KNOWLEDGE], value: TOOL_RECORD_SOURCE.KNOWLEDGE },
+      { label: sourceLabels[TOOL_RECORD_SOURCE.TRIGGER], value: TOOL_RECORD_SOURCE.TRIGGER },
     ],
   },
 ]
@@ -124,8 +125,8 @@ defineExpose({ open })
       @size-change="loadRecords()"
     >
       <el-table-column label="触发来源" min-width="130" show-overflow-tooltip>
-        <template #default="{ row }"
-          ><div class="flex-align-center gap-2">
+        <template #default="{ row }">
+          <div class="flex-align-center gap-2">
             <ApplicationIcon v-if="row.source_type === TOOL_RECORD_SOURCE.APPLICATION" :icon="row.source_icon" :size="20" />
             <KnowledgeIcon v-else-if="row.source_type === TOOL_RECORD_SOURCE.KNOWLEDGE" :type="KNOWLEDGE_TYPE.WORKFLOW" :size="20" />
             <TriggerIcon v-else-if="row.source_type === TOOL_RECORD_SOURCE.TRIGGER" :type="row.trigger_type ?? undefined" :size="20" />
@@ -133,19 +134,23 @@ defineExpose({ open })
           </div>
         </template>
       </el-table-column>
-      <!-- // TODO 共享资源需要显示工作空间 -->
-      <el-table-column label="类型" width="90"
-        ><template #default="{ row }">{{ sourceLabels[row.source_type as keyof typeof sourceLabels] || '-' }}</template></el-table-column
-      >
-      <el-table-column label="状态" width="100"
-        ><template #default="{ row }"><MkStatusLabel :status="row.state" /></template
-      ></el-table-column>
-      <el-table-column label="耗时" width="90"
-        ><template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template></el-table-column
-      >
-      <el-table-column label="执行时间" prop="create_time" width="180"
-        ><template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template></el-table-column
-      >
+      <el-table-column v-if="isSystemSharedResource()" prop="workspace_name" label="工作空间" show-overflow-tooltip>
+        <template #default="{ row }">
+          {{ row.workspace_name }}
+        </template>
+      </el-table-column>
+      <el-table-column label="类型" width="90">
+        <template #default="{ row }">{{ sourceLabels[row.source_type as keyof typeof sourceLabels] || '-' }}</template>
+      </el-table-column>
+      <el-table-column label="状态" width="100">
+        <template #default="{ row }"><MkStatusLabel :status="row.state" /></template>
+      </el-table-column>
+      <el-table-column label="耗时" width="90">
+        <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
+      </el-table-column>
+      <el-table-column label="执行时间" prop="create_time" width="180">
+        <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="70">
         <template #default="{ row }">
           <!-- 查看执行详情 -->

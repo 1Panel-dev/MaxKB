@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, type Component } from 'vue'
-import { SuccessFilled, CircleCloseFilled, Loading } from '@element-plus/icons-vue'
 import { formatTokenNumber } from '@/utils/number'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
 import type { ExecutionNodeDetail } from './types'
@@ -29,9 +28,9 @@ const tokenCount = computed(() => (props.data?.message_tokens || 0) + (props.dat
       <span v-if="showTokens">{{ formatTokenNumber(tokenCount) }} tokens</span>
       <span v-if="!isRunning">{{ data?.run_time?.toFixed(2) || '0.00' }} s</span>
 
-      <MkIcon v-if="isSuccess" :icon="SuccessFilled" class="text-success!" />
-      <MkIcon v-else-if="isRunning" :icon="Loading" class="is-loading" />
-      <MkIcon v-else :icon="CircleCloseFilled" class="text-danger!" />
+      <MkIcon v-if="isSuccess" name="icon_succeed_colorful" />
+      <LoadingIcon v-else-if="isRunning" :size="16" />
+      <MkIcon v-else name="icon_close_colorful" />
     </div>
   </div>
 </template>

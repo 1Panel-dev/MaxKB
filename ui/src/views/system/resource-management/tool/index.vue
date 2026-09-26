@@ -158,7 +158,7 @@ onMounted(() => {
         <el-table-column label="来源" width="120">
           <template #default="{ row }">{{ row.template_id ? '工具商店' : '自定义' }}</template>
         </el-table-column>
-        <el-table-column label="状态" width="120">
+        <el-table-column label="启用状态" width="100">
           <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
         </el-table-column>
         <el-table-column v-if="auth.isEE" prop="workspace_name" label="工作空间" min-width="160" show-overflow-tooltip>

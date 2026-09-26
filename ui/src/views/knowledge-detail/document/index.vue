@@ -6,10 +6,12 @@ import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
-import { DOCUMENT_HIT_HANDLING, DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
+import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
+import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
 import type { Dict, DocumentItem, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
+import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'DocumentListView' })
 defineProps<ResourceDetailPageProps>()
@@ -54,7 +56,6 @@ function loadDocuments() {
       ...documentQuery.value,
       status: documentStatusFilter.value.status,
       task_type: documentStatusFilter.value.task_type,
-      resource_type: 'document',
     })
     .then((page) => {
       documentData.value = page.records
@@ -90,24 +91,46 @@ onMounted(() => {
     :max-table-height="210"
     @current-change="loadDocuments"
     @size-change="loadDocuments"
+    resizable
   >
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip />
 
     <el-table-column prop="status" label="文件状态" width="120">
-      <template #default="{ row }">
-        <StatusValue :status="row.status" :status-meta="row.status_meta"></StatusValue>
-      </template>
-    </el-table-column>
-    <el-table-column prop="char_length" label="字符数" width="110" />
-    <el-table-column prop="paragraph_count" label="分段数" width="100" />
-    <el-table-column prop="hit_num" label="召回次数" width="120" />
-    <el-table-column label="命中处理" width="110">
-      <template #default="{ row }">{{ row.hit_handling_method === DOCUMENT_HIT_HANDLING.DIRECTLY_RETURN ? '直接返回' : '模型优化' }}</template>
+      <!-- // TODO: 补充文档状态类型 -->
+      <template #default="{ row }"><MkStatusLabel :active="row.status" /></template>
     </el-table-column>
     <el-table-column label="启用状态" width="100">
       <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
     </el-table-column>
-    <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
+    <el-table-column prop="char_length" label="字符数">
+      <template #default="{ row }">
+        {{ numberFormat(row.char_length) }}
+      </template>
+    </el-table-column>
+    <el-table-column prop="paragraph_count" label="分段">
+      <template #default="{ row }">
+        {{ numberFormat(row.paragraph_count) }}
+      </template>
+    </el-table-column>
+    <!-- 标签 -->
+
+    <el-table-column label="召回处理" width="110">
+      <template #default="{ row }: { row: DocumentItem }">
+        {{ DOCUMENT_HIT_HANDLING_LABELS[row.hit_handling_method] }}
+      </template>
+    </el-table-column>
+    <el-table-column prop="hit_num" label="召回次数">
+      <template #default="{ row }">
+        {{ numberFormat(row.hit_num) }}
+      </template>
+    </el-table-column>
+    <el-table-column label="最后一次召回时间" width="180">
+      <template #default="{ row }">{{ datetimeFormat(row.last_hit_time) }}</template>
+    </el-table-column>
+    <el-table-column prop="nick_name" label="创建者" show-overflow-tooltip />
+    <el-table-column label="更新时间" width="180">
+      <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
+    </el-table-column>
     <el-table-column label="创建时间" width="180">
       <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
