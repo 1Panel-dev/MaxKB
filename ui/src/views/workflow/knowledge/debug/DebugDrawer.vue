@@ -108,7 +108,7 @@ defineExpose({ open, close })
       <keep-alive :include="['DataSource', 'KnowledgeBase']">
         <component
           :is="actionComponents[active]"
-          :key="actionKey"
+          :key="`${actionKey}:${active}`"
           ref="actionRef"
           v-model:loading="loading"
           :workflow="currentWorkflow"

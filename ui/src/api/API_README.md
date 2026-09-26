@@ -498,7 +498,9 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 
 `workspace/knowledge/document.ts` 仅维护文档分页查询，路径为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<currentPage>/<pageSize>`。
-分页使用 `ParamsPage` / `ResponsePage<DocumentItem>`，支持 `name`、`create_user` 筛选；
+分页使用 `ParamsPage` / `ResponsePage<DocumentItem>`，支持 `name`、`create_user`、`status`、`task_type` 筛选；
+文件任务使用 `DOCUMENT_TASK_STATE` 的字符状态及 `DOCUMENT_TASK_TYPE` 的任务位置，
+不使用通用 `STATE_TYPES`；选择全部时省略状态与任务类型，非任务专属状态省略任务类型。
 文档页传 `resource_type: 'document'`，创建者选项复用 Workspace `common.ts` 的 `getAllUsers`。
 类型从 `@/api/types` 导入，命中处理枚举从 `@/api/enums` 导入。API 不接收 loading，不重复包装响应。
 

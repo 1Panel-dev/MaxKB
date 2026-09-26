@@ -14,7 +14,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
         meta: { title: '知识库列表', hidden: true },
       },
       {
-        path: ':knowledgeId',
+        path: ':knowledgeId/:type',
         name: 'workspace-knowledge-detail',
         component: () => import('@/views/knowledge-detail/index.vue'),
         redirect: { name: 'workspace-knowledge-document-list' },
@@ -104,12 +104,6 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             component: () => import('@/views/knowledge-detail/setting/index.vue'),
             meta: { title: '设置', icon: 'icon_setting', activeIcon: 'icon_setting_filled', order: 50 },
           },
-          // {
-          //   path: 'document/:documentId',
-          //   name: 'workspace-knowledge-document-detail',
-          //   component: () => import('@/views/knowledge-detail/DocumentDetailView.vue'),
-          //   meta: { title: '文档详情', hidden: true, detailActiveMenu: 'workspace-knowledge-document-list' },
-          // },
         ],
       },
     ],

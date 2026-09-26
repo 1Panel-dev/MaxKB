@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
 import CommonApi from '@/api/admin/workspace/common'
-import SystemCommonApi from '@/api/admin/system/common'
-import { DOCUMENT_HIT_HANDLING } from '@/api/enums'
+import CommonSystemApi from '@/api/admin/system/common'
+import { DOCUMENT_HIT_HANDLING, DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import type { Dict, DocumentItem, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
@@ -15,11 +15,10 @@ defineOptions({ name: 'DocumentListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
-/* 文档筛选与分页查询 */
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
-const requestDocumentApi = computed(() => (isWorkspaceSharedResource() ? SharedDocumentApi : DocumentApi))
-const requestCommonApi = computed(() => (isWorkspaceSharedResource() ? SystemCommonApi : CommonApi))
+
+/* 文档筛选与分页查询 */
 const loading = ref(false)
 const documentData = ref<DocumentItem[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
@@ -31,15 +30,32 @@ const searchFields = computed(() => [
 ])
 
 function loadCreatorOptions(keyword: string) {
-  return requestCommonApi.value.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
+  const requestCommonApi = isWorkspaceSharedResource() ? CommonSystemApi : CommonApi
+  return requestCommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
     creatorOptions.value = users.map(({ id, nick_name }) => ({ label: nick_name, value: id }))
   })
 }
 
+// 过滤项
+interface DocumentStatusFilter {
+  label: string
+  status?: (typeof DOCUMENT_TASK_STATE)[keyof typeof DOCUMENT_TASK_STATE]
+  task_type?: (typeof DOCUMENT_TASK_TYPE)[keyof typeof DOCUMENT_TASK_TYPE]
+}
+const allStatusFilter: DocumentStatusFilter = { label: '全部' }
+
+const documentStatusFilter = ref<DocumentStatusFilter>(allStatusFilter)
+
 function loadDocuments() {
   loading.value = true
-  return requestDocumentApi.value
-    .getDocumentPage(knowledgeId.value, paginationConfig.value, { ...documentQuery.value, resource_type: 'document' })
+  const requestApi = isWorkspaceSharedResource() ? SharedDocumentApi : DocumentApi
+  return requestApi
+    .getDocumentPage(knowledgeId.value, paginationConfig.value, {
+      ...documentQuery.value,
+      status: documentStatusFilter.value.status,
+      task_type: documentStatusFilter.value.task_type,
+      resource_type: 'document',
+    })
     .then((page) => {
       documentData.value = page.records
       paginationConfig.value.total = page.total
@@ -55,30 +71,16 @@ function handleSearchChange(query?: Dict<unknown>) {
   return loadDocuments()
 }
 
-watch(
-  [() => route.params.workspaceId, knowledgeId, () => route.meta.resourceScope],
-  () => {
-    documentData.value = []
-    documentQuery.value = {}
-    creatorOptions.value = []
-    paginationConfig.value.currentPage = 1
-    paginationConfig.value.total = 0
-    void loadCreatorOptions('').catch(() => {})
-    void loadDocuments().catch(() => {})
-  },
-  { immediate: true },
-)
+onMounted(() => {
+  void loadDocuments().catch(() => {})
+})
 </script>
 
 <template>
   <Teleport v-if="headerTarget" :to="headerTarget">
     <div class="flex-between w-full gap-4">
       <h4>{{ title }}</h4>
-      <MkComplexSearch
-        :key="`${route.meta.resourceScope}/${route.params.workspaceId}/${knowledgeId}`"
-        :fields="searchFields"
-        @change="handleSearchChange"
-      />
+      <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
     </div>
   </Teleport>
   <MkTable
@@ -90,9 +92,10 @@ watch(
     @size-change="loadDocuments"
   >
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip />
-    <el-table-column label="标签" min-width="150" show-overflow-tooltip>
+
+    <el-table-column prop="status" label="文件状态" width="120">
       <template #default="{ row }">
-        {{ row.tags?.map((tag: { key: string; value: string }) => `${tag.key}: ${tag.value}`).join('，') || '-' }}
+        <StatusValue :status="row.status" :status-meta="row.status_meta"></StatusValue>
       </template>
     </el-table-column>
     <el-table-column prop="char_length" label="字符数" width="110" />

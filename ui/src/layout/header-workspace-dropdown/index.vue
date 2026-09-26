@@ -27,7 +27,19 @@ watch(
 function handleWorkspaceSelect(workspace: WorkspaceItem) {
   const workspaceId = workspace.id ?? 'default'
   if (workspaceId === route.params.workspaceId || !route.name) return
-  void router.push({ name: route.name, params: { ...route.params, workspaceId }, query: route.query, hash: route.hash })
+  // 详情中的资源属于原工作空间，切换后回到对应列表。
+  let listRouteName: string | undefined
+  if (route.meta.resourceDetailRoot) {
+    if (route.params.applicationId) listRouteName = 'workspace-application-list'
+    else if (route.params.knowledgeId) listRouteName = 'workspace-knowledge-list'
+  }
+  const targetRoute = router.resolve(
+    listRouteName
+      ? { name: listRouteName, params: { workspaceId } }
+      : { name: route.name, params: { ...route.params, workspaceId }, query: route.query, hash: route.hash },
+  )
+  // 切换工作空间时整页加载，重新初始化用户权限和页面状态。
+  window.location.assign(targetRoute.href)
 }
 </script>
 

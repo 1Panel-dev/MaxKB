@@ -119,7 +119,6 @@ function handleDeleteTool(tool: ToolItem) {
 }
 
 onMounted(() => {
-  loadCreatorOptions('')
   loadTools()
   if (auth.isEE) {
     SystemWorkspaceApi.getSystemWorkspaceList().then((workspaces) => {

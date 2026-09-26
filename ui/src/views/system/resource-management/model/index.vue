@@ -88,7 +88,6 @@ function handleDeleteModel(model: ModelItem) {
 }
 
 onMounted(() => {
-  loadCreatorOptions('')
   loadModels()
   SystemModelProviderApi.getProviderList().then((result) => {
     providers.value = result
@@ -138,17 +137,17 @@ onMounted(() => {
         </el-table-column>
         <el-table-column prop="model_name" label="基础模型" min-width="180" show-overflow-tooltip />
         <el-table-column v-if="auth.isEE" prop="workspace_name" label="工作空间" min-width="160" show-overflow-tooltip>
-          <template #header
-            ><MkTableFilter v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange"
-          /></template>
+          <template #header>
+            <MkTableFilter v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange" />
+          </template>
         </el-table-column>
         <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column label="更新时间" width="180"
-          ><template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template></el-table-column
-        >
-        <el-table-column label="创建时间" width="180"
-          ><template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template></el-table-column
-        >
+        <el-table-column label="更新时间" width="180">
+          <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
+        </el-table-column>
+        <el-table-column label="创建时间" width="180">
+          <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
+        </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center gap-1">
@@ -178,7 +177,8 @@ onMounted(() => {
                 <RelatedResourcesModelAction label="查看关联资源" :api="SystemRelatedResourcesApi" :model="row" />
                 <!-- 删除模型 -->
                 <MkDropdownItem divided :disabled="loading" @click="handleDeleteModel(row)">
-                  <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>删除
+                  <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                  删除
                 </MkDropdownItem>
               </MkTableMoreDropdown>
             </div>

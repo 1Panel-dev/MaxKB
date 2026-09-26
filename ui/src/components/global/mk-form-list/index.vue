@@ -71,24 +71,26 @@ function removeRow(index: number) {
 
 <template>
   <div ref="rowsRef" class="w-full">
-    <div v-for="(item, index) in formRows" :key="getRowKey(item, index)" class="mk-form-list__row flex w-full gap-2">
-      <!-- 拖拽排序 -->
-      <el-button
-        v-if="sortable"
-        link
-        class="mk-form-list__handle shrink-0 text-N600 -mr-2 h-8!"
-        :class="{ 'mt-8': firstRowHasLabel && index === 0 }"
-        :disabled="sortDisabled"
-      >
-        <MkIcon name="icon_drag_outlined" />
-      </el-button>
-      <slot :index="index" :item="item" />
-      <el-form-item class="shrink-0" :class="firstRowHasLabel ? (index === 0 ? 'mt-8' : 'mt-0.5') : 'mt-1'">
-        <el-button :disabled="formRows.length <= minRows" text @click="removeRow(index)">
-          <MkIcon name="icon_delete-trash_outlined" class="text-N600" />
+    <template v-for="(item, index) in formRows" :key="getRowKey(item, index)">
+      <div class="mk-form-list__row flex w-full gap-2">
+        <!-- 拖拽排序 -->
+        <el-button
+          v-if="sortable"
+          link
+          class="mk-form-list__handle shrink-0 text-N600 -mr-2 h-8!"
+          :class="{ 'mt-8': firstRowHasLabel && index === 0 }"
+          :disabled="sortDisabled"
+        >
+          <MkIcon name="icon_drag_outlined" />
         </el-button>
-      </el-form-item>
-    </div>
+        <slot :index="index" :item="item" />
+        <el-form-item class="shrink-0" :class="firstRowHasLabel ? (index === 0 ? 'mt-8' : 'mt-0.5') : 'mt-1'">
+          <el-button :disabled="formRows.length <= minRows" text @click="removeRow(index)">
+            <MkIcon name="icon_delete-trash_outlined" class="text-N600" />
+          </el-button>
+        </el-form-item>
+      </div>
+    </template>
   </div>
 
   <el-button v-if="showAddButton" class="-mt-1" link type="primary" @click="addRow">
