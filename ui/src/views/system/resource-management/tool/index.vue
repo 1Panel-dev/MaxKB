@@ -161,9 +161,9 @@ onMounted(() => {
         <el-table-column label="启用状态" width="100">
           <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
         </el-table-column>
-        <el-table-column v-if="auth.isEE" prop="workspace_name" label="工作空间" min-width="160" show-overflow-tooltip>
+        <el-table-column v-if="auth.isEE" prop="workspace_name" min-width="160" show-overflow-tooltip>
           <template #header>
-            <MkTableFilter v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange" />
+            <MkTableFilter mode="multiple" v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange" />
           </template>
         </el-table-column>
         <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />

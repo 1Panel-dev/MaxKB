@@ -239,6 +239,8 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 传入 `status` 时仅显示该状态配置的图标；未配置状态或没有图标时只显示文案，不回退到其他状态图标。
 未传 `status` 时，`active` 为 true 显示成功图标，为 false 显示 `icon_ban_filled`。
 组件直接使用公共枚举 `STATE_TYPES` 匹配图标；新增状态需补齐 `STATE_LABELS` 文案，图标可按需配置。
+`STARTED`、`PENDING`、`REVOKE` 及 `EMBEDDING`、`GENERATE`、`SYNC`、`TOKENIZE`
+统一显示内置加载图标，使用方直接传入 `status`，无需额外组合 `LoadingIcon`。
 `status` 优先于 `active`，状态文案统一使用 `STATE_LABELS`，不提供 `text` 覆盖。
 
 ```vue
@@ -279,9 +281,57 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 虚拟表格、跨页和跨列表拖拽不属于该接口。排序工具不会深拷贝普通表格的行对象；工作流使用方应在
 数据写回边界自行 `cloneDeep`，保持 LogicFlow 的可观察树约束。
 
-表头需要多选筛选时使用 `MkTableFilter`。`label` 设置表头文案，`options` 接收
-`OptionItem<string>[]`，必填 `v-model` 绑定已选字符串数组；打开时复制为草稿，确认或重置后
-写回并触发 `change`。过长的选项文案会显示省略号，悬停时可查看完整文案。
+`MkTableFilter` 放在 `global/mk-table/mk-table-filter/`，公共入口为 `index.vue`。
+入口统一选择模式、渲染触发按钮、计算筛选高亮和回写模型；三个内部组件分别维护对应交互：
+`TableFilterSingle.vue` 复用 `MkDropdown`、`MkDropdownMenu` 和 `MkDropdownItem`，
+`TableFilterMultiple.vue` 管理多选草稿及确认，`TableFilterCascader.vue` 管理级联面板及即时提交。
+内部组件通过默认插槽接收同一个触发按钮，只向入口发送 `select` 和 `open`；页面只使用
+`MkTableFilter`，不直接引用模式组件。多选与级联继续使用 Popover，不强行统一其提交和关闭行为。
+
+表头筛选使用 `MkTableFilter`，`label` 设置表头文案，必填 `v-model` 保存已生效的条件。
+`mode` 支持以下模式，默认 `multiple`；调用时显式填写 `mode`，便于区分筛选方式：
+
+| 模式       | options / v-model                                         | 生效方式                                                    |
+| ---------- | --------------------------------------------------------- | ----------------------------------------------------------- |
+| `multiple` | `TableFilterOption[]` / 字符串、数字或布尔值数组          | 打开时复制草稿，确定后提交；重置提交 `[]`；点击外部丢弃草稿 |
+| `single`   | `TableFilterOption[]` / 字符串、数字或布尔值，加 `null`   | 点击立即提交并关闭；“全部”提交 `null`                       |
+| `cascader` | Element Plus `CascaderOption[]` / 由 `cascaderProps` 决定 | 勾选立即提交；多选保持打开，单选提交后关闭                  |
+
+`TableFilterOption` 位于 `global/mk-table/mk-table-filter/types.ts`，包含 `label`、`value` 和可选
+`disabled`；扁平选项不使用空字符串作为业务值。`false`、`0` 都是有效筛选条件，正确高亮筛选图标。
+多选“全部”只操作可用选项，保留已选禁用项；无草稿选择时仍通过“重置”清空。
+过长的扁平选项文案省略，悬停查看完整文案。
+
+级联默认配置为 `{ multiple: true, checkStrictly: true, emitPath: false, showPrefix: false }`，与 v2 文档标签筛选一致：
+父子节点独立选择，隐藏节点前的选择框。静态多选时，组件保留面板的原始勾选，
+对外将选中的父组递归展开为可用叶子节点并去重；页面直接使用回写值，不再自行转换父组。
+单选、父子联动和懒加载沿用原生返回值；`emitPath: true` 时返回对应叶子的完整路径。
+外部模型变更同步面板；自身提交后的模型回写保留原始父组勾选，关闭再打开也保持。
+通过 `cascaderProps` 覆盖字段映射、单多选、路径输出及懒加载等原生配置。
+级联多选重置为 `[]`，单选重置为 `null`；单选模型需声明可空类型。
+`width` 可覆盖弹层宽度，扁平模式默认 192px，级联默认自适应。
+
+`change(value)` 在写回模型后触发，类型跟随模型；`open` 在每次打开时触发，供页面加载选项。
+组件不请求业务接口、不转换查询参数。文档文件状态用唯一选项值映射为 `status` 和 `task_type`，
+映射和分页重置由页面负责，切换条件时一起更新这两个参数，避免残留任务类型。
+
+```vue
+<!-- 多选：保留确定与重置 -->
+<MkTableFilter mode="multiple" v-model="workspaceIds" label="工作空间" :options="workspaceOptions" @change="reload" />
+<!-- 单选：enabled 声明为 boolean | null -->
+<MkTableFilter
+  v-model="enabled"
+  mode="single"
+  label="启用状态"
+  :options="[
+    { label: '已启用', value: true },
+    { label: '已禁用', value: false },
+  ]"
+  @change="reload"
+/>
+<!-- 级联：tagIds 为标签值数组，选项通过 children 组织 -->
+<MkTableFilter v-model="tagIds" mode="cascader" label="标签" :options="tagOptions" @open="loadTagOptions" @change="reload" />
+```
 
 表格操作列需要 More 菜单时使用 `MkTableMoreDropdown`。组件统一提供点击型、右下定位的 More
 按钮以及 `MkDropdownMenu`，默认插槽中直接放置 `MkDropdownItem`；插槽为空，或其中的条件菜单项

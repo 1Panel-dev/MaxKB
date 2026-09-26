@@ -72,6 +72,26 @@ h6 {
   line-height: var(--mk-line-height-base);
 }
 
+/* button */
+// 资源菜单的导入按钮
+.mk-import-button {
+  width: 100%;
+  .el-upload {
+    width: 100%;
+  }
+}
+// 添加标签虚线按钮
+.mk-add-tag-button {
+  min-width: auto !important;
+  padding: 0 6px;
+  height: 24px;
+  line-height: 24px;
+  font-size: 14px;
+  border: 1px dashed var(--el-border-color);
+  border-radius: var(--el-border-radius-small);
+  color: var(--mk-N500);
+}
+
 /* dot */
 // 状态圆点
 .mk-dot-danger {
@@ -306,14 +326,5 @@ h6 {
     height: 67%;
     content: '';
     background: var(--el-color-primary);
-  }
-}
-
-/* upload-button */
-// 资源菜单的导入按钮
-.mk-import-button {
-  width: 100%;
-  .el-upload {
-    width: 100%;
   }
 }

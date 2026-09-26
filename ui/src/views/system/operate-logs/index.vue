@@ -153,7 +153,13 @@ onMounted(() => {
       >
         <el-table-column prop="menu" min-width="140" show-overflow-tooltip>
           <template #header>
-            <MkTableFilter v-model="selectedOperateMenus" label="操作菜单" :options="operateMenuOptions" @change="handleOperateMenuChange" />
+            <MkTableFilter
+              mode="multiple"
+              v-model="selectedOperateMenus"
+              label="操作菜单"
+              :options="operateMenuOptions"
+              @change="handleOperateMenuChange"
+            />
           </template>
         </el-table-column>
         <el-table-column label="操作详情" min-width="220" show-overflow-tooltip>
@@ -164,7 +170,13 @@ onMounted(() => {
         </el-table-column>
         <el-table-column v-if="auth.isEE" min-width="160">
           <template #header>
-            <MkTableFilter v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleWorkspaceChange" />
+            <MkTableFilter
+              mode="multiple"
+              v-model="selectedWorkspaceIds"
+              label="工作空间"
+              :options="workspaceOptions"
+              @change="handleWorkspaceChange"
+            />
           </template>
           <template #default="{ row }">{{ row.workspace_name || '-' }}</template>
         </el-table-column>

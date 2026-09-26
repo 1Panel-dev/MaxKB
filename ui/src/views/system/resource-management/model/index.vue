@@ -136,9 +136,9 @@ onMounted(() => {
           <template #default="{ row }">{{ MODEL_TYPE_LABELS[row.model_type] ?? row.model_type }}</template>
         </el-table-column>
         <el-table-column prop="model_name" label="基础模型" min-width="180" show-overflow-tooltip />
-        <el-table-column v-if="auth.isEE" prop="workspace_name" label="工作空间" min-width="160" show-overflow-tooltip>
+        <el-table-column v-if="auth.isEE" prop="workspace_name" min-width="160" show-overflow-tooltip>
           <template #header>
-            <MkTableFilter v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange" />
+            <MkTableFilter mode="multiple" v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange" />
           </template>
         </el-table-column>
         <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
