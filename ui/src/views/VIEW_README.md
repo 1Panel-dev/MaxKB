@@ -824,8 +824,7 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 
 ## 智能体详情占位页面
 
-`application-detail/integration/index.vue`、`chat-user/index.vue`、
-`operation-log/index.vue` 分别承接接入第三方、对话用户、操作日志，目前仅展示占位内容，
+`application-detail/integration/index.vue` 承接接入第三方，目前仅展示占位内容，
 标题及详情框架继续由 `ResourceDetailLayout` 提供。设置菜单按资源类型选择现有简易设置页面
 或高级智能体全屏工作流，不另建高级设置 View。
 
@@ -866,7 +865,9 @@ Layout 预留整个右侧标题栏的 `headerTarget`，通过 `RouterView` 作�
 详情子页面从该 Vue 文件导入 `ResourceDetailPageProps` 并声明 props。普通页面无需编写标题栏模板，
 由 Layout 显示默认路由标题。需要自定义的页面通过 `defineExpose({ customHeader: true })` 声明，
 再使用 `<Teleport v-if="headerTarget" :to="headerTarget">` 组合标题、搜索与操作。
-Layout 读取当前页面实例的声明决定是否显示默认标题，挂载位置始终保留；不增加路由字段。
+Layout 读取当前页面实例的声明决定是否显示默认标题；默认和自定义标题模式均保留挂载位置，不增加路由字段。
+不需要标题栏的页面通过 `defineExpose({ hideHeader: true })` 隐藏整个主区 Header，包括挂载位置和留白；
+`hideHeader` 优先于 `customHeader`，未声明时保持原有标题行为，切换页面后按当前实例恢复。
 Layout 保留标题栏固定位置和外层间距，页面负责内部布局。
 切换子页面时随 Teleport 卸载清理内容，不需要注册计数或 DOM 检测。
 资源入口只负责详情数据和侧栏 `resource-header`，无需转发标题栏属性。
@@ -906,3 +907,42 @@ Layout 保留标题栏固定位置和外层间距，页面负责内部布局。
 容器监听工作空间、知识库和资源范围变化重新加载；共享详情返回列表携带 `folderId: 'shared'`，
 普通详情继续恢复所属文件夹。文档创建者选项在共享范围使用 System `CommonApi`，普通范围使用
 Workspace `CommonApi`；范围变化同时清空搜索控件、筛选、创建者选项与分页。
+
+## 智能体对话用户
+
+`application-detail/chat-user/index.vue` 通过 `hideHeader: true` 隐藏详情主区标题栏，负责工作空间智能体的用户组查询、
+用户搜索和分页、自动授权及用户授权保存。内部使用普通 Flex 双栏容器，不嵌套 `MkViewLayout`；
+外层 `ResourceDetailLayout` 统一负责标题栏显隐和整体滚动，内部视觉排列与 System 用户组页面对齐。
+侧栏使用 `w-sidebar-expanded` 和 `MkSearchList`，由列表统一管理搜索、选中态、独立滚动和空态。
+右侧展示组名、成员数和自动授权；下方工具栏左侧保存、右侧 `MkComplexSearch`，
+用户列表复用 `MkTable` 及其高度约束，无用户组时显示空态，不额外添加主区滚动容器。
+通过 `workspace/chat-user.ts` 请求；当前不接入 `perm`。勾选按当前用户组跨页保留，切换组时清空；
+自动授权开启时禁用手动授权，切换成功后清空旧勾选并重新读取用户状态。筛选和用户组切换回到第一页，
+页面通过 `onMounted` 加载用户组；切换工作空间由顶部入口整页加载，不额外监听路由重置状态，
+也不为搜索组件设置工作空间或智能体 key。来源标签复用登录方式枚举与标签，兼容 `OAUTH2` 返回值。
+
+## 智能体对话日志
+
+`application-detail/chat-log/index.vue` 参考 `system/operate-logs`，通过 `customHeader` 和 Teleport
+使用详情布局的标题栏，组合标题、`MkDateRange`、`MkComplexSearch`、导出和清除策略入口，
+不嵌套 `MkViewLayout`。挂载时查询过去 7 天，搜索、日期和反馈筛选变化后回到第一页，
+不监听工作空间路由参数，也不新增权限判断。
+列表使用 `MkTable`，勾选用于导出；无勾选时导出当前筛选结果。列表和导出使用同一组查询条件，
+切换筛选或分页后清空旧选择。点赞、点踩最小值使用 `MkTableFilter mode="custom"` 的默认作用域插槽编辑，
+页面只维护已生效值和全 0 的 `resetValue`；浮层、草稿、重置与确认由公共组件管理，确认或重置后重新查询。
+自定义日期清空后清空列表并禁用导出，重新选择有效日期再查询。
+来源枚举位于 `api/enums/chat-log.ts`，页面标签位于本功能的 `constants.ts`。
+
+`clean-strategy/` 按操作日志页拆分 `ButtonCleanStrategy` 和 `CleanStrategyDialog`，
+每次打开重新读取智能体详情；日志保留天数为 1–100000，文件保留天数不超过日志保留天数。
+保存使用专用清除策略接口，只更新当前智能体，成功刷新详情上下文后关闭，失败保留弹窗。
+详情上下文的 `refreshApplicationDetail(showLoading = true)` 默认显示整页 loading；
+清除策略弹窗在打开和保存后均传 `false`，仅由弹窗自身的 loading 管理请求，避免内外重复遮罩。
+传 `false` 的请求不修改外层 loading 的开始或结束状态。
+点击日志行打开本功能的 `ChatLogDetailDrawer.vue`，选择列只处理勾选，不打开详情。
+详情抽屉参考 v2 使用当前摘要作为标题，宽度为 `60%`，暴露 `open()`、`close()`。
+页面按需挂载后调用 `open()`，在 `closed` 后清空当前记录并卸载，保留关闭动画。
+底部上一条／下一条切换整条对话日志；页面负责当前记录、首尾禁用及跨列表分页查询，
+跨页成功后同步列表页码并切换至首条／末条，失败保留原记录和页码，加载期间禁用切换。
+正文暂时留空，不查询或展示聊天内容，也不显示聊天记录分页器。
+添加到知识库的页面组件尚未接入。

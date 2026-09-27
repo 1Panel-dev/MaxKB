@@ -6,7 +6,7 @@ export type DocumentTaskType = (typeof DOCUMENT_TASK_TYPE)[keyof typeof DOCUMENT
 
 /** 文件各任务的分段计数及状态发生时间。 */
 export interface DocumentStatusMeta {
-  aggs?: { status: string; count: number }[]
+  aggs?: { status: string | null; count: number }[]
   state_time?: Partial<Record<DocumentTaskType, Partial<Record<DocumentTaskState, string>>>>
 }
 

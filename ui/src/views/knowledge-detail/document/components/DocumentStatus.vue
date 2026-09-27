@@ -43,8 +43,8 @@ interface DocumentTaskStatus {
   failed: boolean
 }
 
-function getTaskState(status: string, type: DocumentTaskType) {
-  return status.at(-type) ?? DOCUMENT_TASK_STATE.IGNORED
+function getTaskState(status: string | null | undefined, type: DocumentTaskType) {
+  return status?.at(-type) ?? DOCUMENT_TASK_STATE.IGNORED
 }
 
 /** 按从右起的任务位置解析状态，并汇总对应分段数量。 */

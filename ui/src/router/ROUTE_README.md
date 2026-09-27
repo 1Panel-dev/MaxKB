@@ -359,14 +359,16 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 
 ### 智能体详情导航
 
-详情导航依次显示概览、设置、接入第三方、对话用户、操作日志。
+详情导航依次显示概览、设置、接入第三方、对话用户、对话日志。
 `detailMenuVisible(params)` 仅用于详情菜单的业务类型筛选，不用于权限判断，也不影响一级导航。
 简易设置保留 `setting` 和 `workspace-application-simple-setting`；高级设置使用
 `workflow-entry` 和 `workspace-application-workflow-setting`，重定向至 `workflow-application`，
 携带当前工作空间、智能体 ID 和 query。两个入口都显示“设置”，按 `APPLICATION_TYPE` 互斥显示。
 高级设置的 `canAccess` 固定返回 false，避免工作流返回时重新进入画布；原有概览和简易设置的
 返回权限条件保持不变。新增页面未添加权限判断。
-`integration`、`chat-user`、`operation-log` 分别对应接入第三方、对话用户、操作日志占位页面。
+`integration` 对应接入第三方占位页面，`chat-user` 对应对话用户授权页面。
+对话日志沿用 `operation-log` 路径和 `workspace-application-operation-log` 路由名，
+组件改为 `views/application-detail/chat-log/index.vue`，标题为“对话日志”。
 
 ### System 资源管理模型与工具
 

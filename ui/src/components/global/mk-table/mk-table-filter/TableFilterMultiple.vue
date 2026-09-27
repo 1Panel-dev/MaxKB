@@ -70,7 +70,7 @@ function handleConfirm() {
       <!-- 清除多选筛选 -->
       <el-button class="min-w-12! w-12!" size="small" @click="handleReset">重置</el-button>
       <!-- 确认多选筛选 -->
-      <el-button class="min-w-12! w-12!" :disabled="pendingValues.length === 0" size="small" type="primary" @click="handleConfirm">确定</el-button>
+      <el-button class="min-w-12! w-12!" size="small" type="primary" @click="handleConfirm">确定</el-button>
     </div>
   </el-popover>
 </template>

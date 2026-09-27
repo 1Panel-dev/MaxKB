@@ -29,7 +29,7 @@ const activeDetailMenuName = computed(() => route.meta.detailActiveMenu ?? Strin
 /* 提供整个标题栏的挂载位置和当前路由标题。 */
 const headerTarget = shallowRef<HTMLElement | null>(null)
 const title = computed(() => route.meta.title ?? '')
-const detailPageRef = shallowRef<{ customHeader?: boolean } | null>(null)
+const detailPageRef = shallowRef<{ customHeader?: boolean; hideHeader?: boolean } | null>(null)
 
 function navigateBack() {
   emit('back')
@@ -59,7 +59,7 @@ function navigateToDetailMenu(detailMenuItem: LayoutMenuItem) {
     </template>
 
     <template #default="{ Header }">
-      <component :is="Header">
+      <component :is="Header" v-if="!detailPageRef?.hideHeader">
         <div v-show="detailPageRef?.customHeader" ref="headerTarget" class="w-full min-w-0" />
         <h4 v-if="!detailPageRef?.customHeader">{{ title }}</h4>
       </component>

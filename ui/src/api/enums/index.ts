@@ -12,3 +12,4 @@ export * from './file'
 export * from './state'
 
 export * from './document'
+export * from './chat-log'

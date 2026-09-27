@@ -88,7 +88,7 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
                       :name="index === 0 ? 'icon_thumbsup_filled' : 'icon_thumbdown_filled'"
                       :size="16"
                       class="shrink-0"
-                      :class="index === 0 ? 'text-[#FFCC00]!' : 'text-danger!'"
+                      :class="index === 0 ? 'text-[#FFC60A]!' : 'text-danger!'"
                     />
                     <h2>{{ numberFormat(series.total) }}</h2>
                   </div>

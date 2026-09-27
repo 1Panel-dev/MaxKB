@@ -36,17 +36,17 @@ function replaceApplicationDetail(applicationDetail: ApplicationDetail) {
   application.value = applicationDetail
 }
 
-function refreshApplicationDetail() {
+function refreshApplicationDetail(showLoading = true) {
   const currentApplicationId = applicationId.value
   if (!currentApplicationId) return Promise.resolve()
 
-  loading.value = true
+  if (showLoading) loading.value = true
   return ApplicationApi.getApplicationDetail(currentApplicationId)
     .then((applicationDetail) => {
       replaceApplicationDetail(applicationDetail)
     })
     .finally(() => {
-      loading.value = false
+      if (showLoading) loading.value = false
     })
 }
 
