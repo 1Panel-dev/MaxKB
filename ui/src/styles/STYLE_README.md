@@ -29,22 +29,29 @@ import './styles/index.scss'
 ## 对话模块公共样式
 
 `src/conversation-panel/index.scss` 是对话模块公共样式入口，由模块内的
-`view/chat/index.vue` 和 `view/debug/index.vue` 在 `<style scoped lang="scss">` 中通过
+`view/chat/index.vue` 和 `view/debug/index.vue` 在 `<style lang="scss">` 中通过
 `@use '../../index.scss';` 引入，不在脚本或应用入口重复引入。
-仅放置对话模块内复用的样式，公共类名使用 `conversation-panel-` 前缀；组件专属布局、
-定位和交互样式继续保留在所属组件的 scoped 样式中。引入后的规则受各入口组件作用域限制，
-不会自动作用于所有子组件内部；确需跨子组件内部的规则使用 `:deep()`。
+仅放置对话模块内复用的样式，公共类名使用 `conversation-panel-` 前缀，标题栏和主面板
+使用 `mk-conversation-` 前缀；组件专属布局、定位和交互样式继续保留在所属组件的 scoped
+样式中。公共入口不使用 scoped，通过带模块前缀的类名直接匹配子组件，无需 `:deep()`。
 不依赖工作流页面的祖先选择器，确保挂载到 body 的 Debug 面板仍能匹配。
 
 对话标题栏统一使用 `mk-conversation-header`，以 N100 为底色，通过同色渐变叠加 5% 主题色。
-公共入口通过 `:deep()` 匹配子组件标题栏，目前 Debug 标题栏已接入。
+目前 Debug 标题栏已接入。聊天与只读展示主面板统一使用 `mk-conversation-main`，
+复用纵向 Flex 布局、白色背景与溢出裁剪。Layout 的 `main` 插槽不增加包装层，
+应传入单个以 `mk-conversation-main` 为根元素的面板。面板通过 `flex: 1` 分配侧栏之间的
+剩余宽度，高度由父级 Flex 默认拉伸；内部纵向排列标题、消息列表和输入区。
+当前 `overflow: hidden` 已允许面板在 Flex 主轴上收缩，无需重复设置 `min-width: 0`；
+也不额外设置 `min-height: 0`、`height: 100%` 或 `max-height: 100%`，消息列表负责内部滚动。
 
 ## 共享输入容器
 
 `mk-input-box` 是对话与内容生成共用的基础样式类，定义在 `app.scss`，负责输入容器的背景、
-圆角、内边距及内部 textarea 样式重置。对话输入区叠加 `conversation-message-input`，
-作为对话专属样式入口；对应样式保留在 `conversation-panel/components/message-input/index.vue`
-的 scoped 样式中。生成输入区使用 `mk-input-box`，不叠加对话专属类。
+圆角、内边距及内部 textarea 样式重置。对话输入区叠加 `mk-conversation-message-input`，
+作为对话专属样式入口，样式维护在 `conversation-panel/index.scss`。默认边框使用 60% 不透明度
+的 N350，`:focus-within` 时切换为 60% 不透明度的主题色，并统一提供边框颜色过渡，
+模板无需重复添加 `transition-colors` 或 `focus-within:border-primary`。
+生成输入区使用 `mk-input-box`，不叠加对话专属类。
 
 ## 基础样式
 
@@ -315,6 +322,11 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 ## 滚动区域
 
 组件内需要展示滚动条时优先使用 Element Plus 的 `el-scrollbar`，保持滚动条样式和交互一致。
+
+`el-textarea` 保留原生文本域滚动，由 `element-plus.scss` 统一对齐 `el-scrollbar` 的外观：
+Chromium/Safari 使用 6px 滚动条、4px 圆角滑块和透明轨道，滑块复用 Element Plus 滚动条
+颜色与透明度变量，默认 30%、悬停 50%。Firefox 使用 `scrollbar-width: thin` 和
+`scrollbar-color` 兼容，悬停文本域时加深滑块。原生滚动条的显隐及精确尺寸仍受浏览器和系统影响。
 
 ## 布局尺寸
 

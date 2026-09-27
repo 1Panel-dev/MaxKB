@@ -44,7 +44,6 @@ defineProps<{
               :key="i"
               :src="f.url"
               fit="cover"
-              class="block h-10 w-10 rounded-md"
               :preview-src-list="data.image_list.map((img: any) => img.url)"
               :initial-index="i"
               :zoom-rate="1.2"

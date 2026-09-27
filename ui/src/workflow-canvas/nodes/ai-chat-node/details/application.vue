@@ -46,7 +46,6 @@ defineProps<{
               v-if="item.type === 'image_url'"
               :src="item.image_url?.url || item.image_url"
               fit="cover"
-              class="block h-10 w-10 rounded-md"
               :zoom-rate="1.2"
               :max-scale="7"
               :min-scale="0.2"
@@ -54,7 +53,7 @@ defineProps<{
             <video
               v-else-if="item.type === 'video_url'"
               :src="item.video_url?.url || item.video_url"
-              class="block w-[170px] rounded-md"
+              class="block w-14 rounded-md"
               autoplay
               controls
             />

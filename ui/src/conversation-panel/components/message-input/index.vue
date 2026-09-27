@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CircleCloseFilled, Paperclip, Promotion, VideoPause } from '@element-plus/icons-vue'
+import { Headset } from '@element-plus/icons-vue'
+import { getFileExtension, getFileIconUrl } from '@/utils/icon'
+import { formatFileSize } from '@/utils/number'
 import { inputShortcut } from '../../core/shortcuts'
 import { useMessageInputStore } from './index'
 
 const {
   question,
   fileList,
-  showDelete,
   maxFiles,
   maxSizeMB,
   acceptList,
@@ -15,10 +16,8 @@ const {
   placeholder,
   canSend,
   imageFiles,
-  documentFiles,
   audioFiles,
   videoFiles,
-  getFileIcon,
   addFiles,
   removeFile,
   send,
@@ -50,91 +49,41 @@ const handleKeydown = (e: KeyboardEvent) => {
 </script>
 
 <template>
-  <div class="mk-input-box conversation-message-input w-full border shadow-lg transition-colors focus-within:border-primary">
-    <!-- 文件预览区域 -->
-    <div v-if="fileList.length" class="mb-3 space-y-2">
-      <!-- 图片预览 -->
-      <el-space v-if="imageFiles.length" wrap>
-        <template v-for="(file, index) in imageFiles" :key="file.uid">
-          <div class="relative" @mouseenter="showDelete = file.url || ''" @mouseleave="showDelete = ''">
-            <!-- 移除图片附件 -->
-            <button
-              v-if="showDelete === file.url"
-              type="button"
-              class="attachment-remove absolute -top-[5px] -right-[5px] z-1"
-              @click="removeFile(index)"
-            >
-              <MkIcon :icon="CircleCloseFilled" />
-            </button>
-            <el-image v-if="file.url" :src="file.url" fit="cover" class="block h-10 w-10 rounded-md" />
-            <el-image v-else-if="file.previewUrl" :src="file.previewUrl" fit="cover" class="block h-10 w-10 rounded-md" />
-          </div>
-        </template>
-      </el-space>
-
-      <!-- 文档预览 -->
-      <el-row v-if="documentFiles.length" :gutter="8" class="gap-y-2">
-        <template v-for="(file, index) in documentFiles" :key="file.uid">
-          <el-col :xs="24" :sm="12">
-            <el-card shadow="never" body-class="p-2!" class="cursor-pointer" @mouseenter="showDelete = file.url || ''" @mouseleave="showDelete = ''">
-              <div class="flex-between gap-2">
-                <div class="flex-align-center min-w-0 gap-1">
-                  <img :src="getFileIcon(file.name)" alt="" class="w-6 shrink-0" />
-                  <span class="truncate" :title="file.name">{{ file.name }}</span>
-                </div>
-                <!-- 移除文档附件 -->
-                <button v-if="showDelete === file.url" type="button" class="attachment-remove" @click="removeFile(index)">
-                  <MkIcon :icon="CircleCloseFilled" />
-                </button>
+  <div class="mk-input-box mk-conversation-message-input w-full shadow-lg">
+    <!-- 文件预览区域：所有类型按上传顺序横向排列。 // TODO 未来会改成横向有左右按钮控制 -->
+    <el-scrollbar v-if="fileList.length" class="mb-3 h-auto!" view-class="flex-align-center gap-2">
+      <template v-for="(file, index) in fileList" :key="file.uid">
+        <div class="group relative shrink-0">
+          <el-image
+            v-if="imageFiles.includes(file) && (file.url || file.previewUrl)"
+            :src="file.url || file.previewUrl"
+            :alt="file.name"
+            :title="file.name"
+            fit="cover"
+          />
+          <video v-else-if="videoFiles.includes(file) && file.url" :src="file.url" :title="file.name" controls autoplay class="object-cover" />
+          <el-card shadow="never" v-else class="small w-60 rounded-lg!">
+            <div class="flex-align-center gap-2">
+              <MkIcon v-if="audioFiles.includes(file)" :icon="Headset" :size="24" class="shrink-0 text-N600" />
+              <img v-else :src="getFileIconUrl(file.name)" alt="" class="w-8 shrink-0" />
+              <div class="min-w-0 flex-1">
+                <div class="truncate" :title="file.name">{{ file.name }}</div>
+                <div class="text-sm text-N500">{{ getFileExtension(file.name).toUpperCase() || '文件' }} – {{ formatFileSize(file.size) }}</div>
               </div>
-            </el-card>
-          </el-col>
-        </template>
-      </el-row>
-
-      <!-- 音频预览 -->
-      <el-row v-if="audioFiles.length" :gutter="8" class="gap-y-2">
-        <template v-for="(file, index) in audioFiles" :key="file.uid">
-          <el-col :xs="24" :sm="12">
-            <el-card shadow="never" body-class="p-2!" class="cursor-pointer" @mouseenter="showDelete = file.url || ''" @mouseleave="showDelete = ''">
-              <div class="flex-between gap-2">
-                <div class="flex-align-center min-w-0 gap-1">
-                  <img :src="getFileIcon(file.name)" alt="" class="w-6 shrink-0" />
-                  <span class="truncate" :title="file.name">{{ file.name }}</span>
-                </div>
-                <!-- 移除音频附件 -->
-                <button v-if="showDelete === file.url" type="button" class="attachment-remove" @click="removeFile(index)">
-                  <MkIcon :icon="CircleCloseFilled" />
-                </button>
-              </div>
-            </el-card>
-          </el-col>
-        </template>
-      </el-row>
-
-      <!-- 视频预览 -->
-      <el-space v-if="videoFiles.length" wrap>
-        <template v-for="(file, index) in videoFiles" :key="file.uid">
-          <div class="relative" @mouseenter="showDelete = file.url || ''" @mouseleave="showDelete = ''">
-            <!-- 移除视频附件 -->
-            <button
-              v-if="showDelete === file.url"
-              type="button"
-              class="attachment-remove absolute -top-[5px] -right-[5px] z-1"
-              @click="removeFile(index)"
-            >
-              <MkIcon :icon="CircleCloseFilled" />
-            </button>
-            <video v-if="file.url" :src="file.url" controls class="block w-25 rounded-md" autoplay />
+            </div>
+          </el-card>
+          <!-- 移除附件 -->
+          <div class="group-hover-visible attachment-remove" @click="removeFile(index)">
+            <MkIcon name="icon_close_bold_outlined" class="text-white!" :size="6" />
           </div>
-        </template>
-      </el-space>
-    </div>
+        </div>
+      </template>
+    </el-scrollbar>
 
     <!-- 输入框 -->
     <el-input
       v-model="question"
-      :autosize="{ minRows: 1, maxRows: 10 }"
+      :autosize="{ minRows: 1, maxRows: 7 }"
       type="textarea"
       resize="none"
       :placeholder="placeholder"
@@ -145,45 +94,35 @@ const handleKeydown = (e: KeyboardEvent) => {
     />
 
     <!-- 操作栏 -->
-    <div class="mt-2 flex-align-center justify-end">
+    <div class="text-right mt-3">
       <input ref="fileInputRef" type="file" multiple :accept="acceptList" class="hidden" @change="handleFileSelect" />
-      <MkTooltip placement="top" popper-class="max-w-75">
+      <MkTooltip placement="top">
         <template #content>
-          <div class="break-all whitespace-pre-wrap">支持上传图片、文档、音频、视频文件，最多{{ maxFiles }}个，单个文件最大{{ maxSizeMB }}MB</div>
+          <div class="break-all whitespace-pre-wrap">
+            可拖拽到输入框内上传文件
+            <br />
+            上传文件：最多{{ maxFiles }}个，每个文件限制{{ maxSizeMB }}MB
+            <br />
+            <!-- // TODO: 类型格式处理 -->
+            文件类型：{{ acceptList }}
+          </div>
         </template>
         <!-- 上传文件 -->
         <el-button text :disabled="loading || fileList.length >= maxFiles" @click="fileInputRef?.click()">
-          <MkIcon :icon="Paperclip" :size="20" />
+          <MkIcon name="icon_attachment_outlined" :size="18" class="text-N900!" />
         </el-button>
       </MkTooltip>
-      <el-divider direction="vertical" />
-      <!-- 发送 -->
-      <el-button v-if="!loading" text :disabled="!canSend" @click="send">
-        <MkIcon :icon="Promotion" :size="20" />
-      </el-button>
+      <el-divider direction="vertical" class="ml-3! mr-4!" />
       <!-- 停止回复 -->
-      <el-button v-else text @click="stop">
-        <MkIcon :icon="VideoPause" :size="20" />
+      <el-button v-if="loading" circle type="primary" @click="stop">
+        <MkIcon name="icon_square_filled" />
+      </el-button>
+      <!-- 发送 -->
+      <el-button v-else circle type="primary" :disabled="!canSend" @click="send()">
+        <MkIcon name="icon_arrow-up_outlined" />
       </el-button>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
-/* 附件删除按钮，供图片、文档、音频和视频预览复用。 */
-.attachment-remove {
-  align-items: center;
-  background: transparent;
-  border: 0;
-  color: var(--mk-N600);
-  cursor: pointer;
-  display: flex;
-  flex-shrink: 0;
-  justify-content: center;
-  padding: 0;
-
-  &:hover {
-    color: var(--mk-danger);
-  }
-}
-</style>
+<style scoped lang="scss"></style>

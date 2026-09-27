@@ -161,7 +161,7 @@ onBeforeUnmount(stopGenerate)
           @keydown.stop="handleKeydown"
           @paste.stop
         />
-        <div class="text-right">
+        <div class="text-right mt-3">
           <!-- 停止生成内容 -->
           <el-button v-if="loading" circle type="primary" @click="stopGenerate">
             <MkIcon name="icon_square_filled" />

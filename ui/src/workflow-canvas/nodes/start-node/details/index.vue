@@ -20,10 +20,14 @@ defineProps<{
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">输入参数</h6>
       <div class="space-y-2">
-        <p><span class="mr-1 text-N600">问题：</span>{{ data.question || '-' }}</p>
+        <p>
+          <span class="mr-1 text-N600">问题：</span>
+          {{ data.question || '-' }}
+        </p>
 
         <p v-for="(f, i) in data.global_fields" :key="i">
-          <span class="mr-1 text-N600">{{ f.label }}：</span>{{ f.value }}
+          <span class="mr-1 text-N600">{{ f.label }}：</span>
+          {{ f.value }}
         </p>
 
         <div v-if="data.document_list?.length > 0">
@@ -44,7 +48,6 @@ defineProps<{
               :key="i"
               :src="f.url"
               fit="cover"
-              class="block h-10 w-10 rounded-md"
               :preview-src-list="data.image_list.map((img: any) => img.url)"
               :initial-index="i"
               :zoom-rate="1.2"
