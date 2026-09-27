@@ -100,3 +100,31 @@ export interface BatchSetChatUserQuotaResult {
   success_count: number
   failed_count: number
 }
+
+/** 对话用户授权所属的资源。 */
+export interface ChatUserAuthorizationResource {
+  resource_id: string
+  resource_type: string
+}
+
+/** 资源内的对话用户组自动授权状态。 */
+export interface ChatUserAuthorizationGroup {
+  id: string
+  name: string
+  is_auth: boolean
+}
+
+/** 用户组内的对话用户资源授权状态。 */
+export interface ChatUserAuthorization extends Pick<ChatUserBase, 'id' | 'username' | 'nick_name' | 'source'> {
+  is_auth: boolean
+}
+
+export interface ChatUserGroupAuthorizationPayload {
+  user_group_id: string
+  is_auth: boolean
+}
+
+export interface ChatUserAuthorizationPayload {
+  chat_user_id: string
+  is_auth: boolean
+}

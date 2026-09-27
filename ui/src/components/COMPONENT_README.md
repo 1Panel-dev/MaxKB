@@ -283,9 +283,10 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 数据写回边界自行 `cloneDeep`，保持 LogicFlow 的可观察树约束。
 
 `MkTableFilter` 放在 `global/mk-table/mk-table-filter/`，公共入口为 `index.vue`。
-入口统一选择模式、渲染触发按钮、计算筛选高亮和回写模型；三个内部组件分别维护对应交互：
+入口统一选择模式、渲染触发按钮、计算筛选高亮和回写模型；四个内部组件分别维护对应交互：
 `TableFilterSingle.vue` 复用 `MkDropdown`、`MkDropdownMenu` 和 `MkDropdownItem`，
-`TableFilterMultiple.vue` 管理多选草稿及确认，`TableFilterCascader.vue` 管理级联面板及即时提交。
+`TableFilterMultiple.vue` 管理多选草稿及确认，`TableFilterCascader.vue` 管理级联面板及即时提交，
+`TableFilterCustom.vue` 管理对象草稿和自定义内容；多选与自定义模式共用 `TableFilterActions.vue` 的重置、确定按钮。
 内部组件通过默认插槽接收同一个触发按钮，只向入口发送 `select` 和 `open`；页面只使用
 `MkTableFilter`，不直接引用模式组件。多选与级联继续使用 Popover，不强行统一其提交和关闭行为。
 
@@ -297,6 +298,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 | `multiple` | `TableFilterOption[]` / 字符串、数字或布尔值数组          | 打开时复制草稿，确定后提交；重置提交 `[]`；点击外部丢弃草稿 |
 | `single`   | `TableFilterOption[]` / 字符串、数字或布尔值，加 `null`   | 点击立即提交并关闭；“全部”提交 `null`                       |
 | `cascader` | Element Plus `CascaderOption[]` / 由 `cascaderProps` 决定 | 勾选立即提交；多选保持打开，单选提交后关闭                  |
+| `custom` | 不传 options / 自定义对象 | 打开时深拷贝草稿，确定后提交；重置提交 `resetValue` |
 
 `TableFilterOption` 位于 `global/mk-table/mk-table-filter/types.ts`，包含 `label`、`value` 和可选
 `disabled`；扁平选项不使用空字符串作为业务值。`false`、`0` 都是有效筛选条件，正确高亮筛选图标。
@@ -310,7 +312,14 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 外部模型变更同步面板；自身提交后的模型回写保留原始父组勾选，关闭再打开也保持。
 通过 `cascaderProps` 覆盖字段映射、单多选、路径输出及懒加载等原生配置。
 级联多选重置为 `[]`，单选重置为 `null`；单选模型需声明可空类型。
-`width` 可覆盖弹层宽度，扁平模式默认 192px，级联默认自适应。
+`width` 可覆盖弹层宽度，扁平模式默认 192px，级联默认自适应，自定义模式默认 240px。
+
+自定义模式通过默认作用域插槽接收 `{ value }`，`value` 是可编辑的独立对象草稿，字段类型跟随
+`v-model` 推断；页面用 `v-model="value.xxx"` 绑定输入，不直接修改页面已生效的筛选。
+`resetValue` 传入完整的默认对象，未传时回退 `{}`；固定表单字段应显式传入，避免重置后缺失字段。
+重置和确定都关闭浮层、回写模型并触发 `change`；点击外部关闭不提交，再次打开按当前模型回填。
+草稿、提交值和默认值之间使用 Lodash 深拷贝隔离，图标按已生效对象是否与 `resetValue` 深度相等决定高亮。
+自定义内容放在内置滚动区，页面不再编写 Popover、开关状态或重置、确定按钮。
 
 `change(value)` 在写回模型后触发，类型跟随模型；`open` 在每次打开时触发，供页面加载选项。
 组件不请求业务接口、不转换查询参数。文档文件状态用唯一选项值映射为 `status` 和 `task_type`，
@@ -332,6 +341,24 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 />
 <!-- 级联：tagIds 为标签值数组，选项通过 children 组织 -->
 <MkTableFilter v-model="tagIds" mode="cascader" label="标签" :options="tagOptions" @open="loadTagOptions" @change="reload" />
+```
+
+```vue
+<!-- 自定义反馈筛选；feedback 为 { min_star: 0, min_trample: 0 } -->
+<MkTableFilter
+  v-model="feedback"
+  mode="custom"
+  label="用户反馈"
+  :reset-value="{ min_star: 0, min_trample: 0 }"
+  @change="reload"
+>
+  <template #default="{ value }">
+    <div class="space-y-3">
+      <el-input-number v-model="value.min_star" :min="0" :value-on-clear="0" controls-position="right" align="left" />
+      <el-input-number v-model="value.min_trample" :min="0" :value-on-clear="0" controls-position="right" align="left" />
+    </div>
+  </template>
+</MkTableFilter>
 ```
 
 表格操作列需要 More 菜单时使用 `MkTableMoreDropdown`。组件统一提供点击型、右下定位的 More

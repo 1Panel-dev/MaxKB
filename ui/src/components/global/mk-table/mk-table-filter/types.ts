@@ -1,4 +1,5 @@
 import type { CascaderValue, CheckboxValueType } from 'element-plus'
+import type { Dict } from '@/api/types'
 
 export interface TableFilterOption {
   label: string
@@ -6,4 +7,6 @@ export interface TableFilterOption {
   disabled?: boolean
 }
 
-export type TableFilterValue = CascaderValue | CheckboxValueType | CheckboxValueType[] | null | undefined
+export type TableFilterCustomValue = Dict<unknown>
+
+export type TableFilterValue = CascaderValue | CheckboxValueType | CheckboxValueType[] | TableFilterCustomValue | null | undefined

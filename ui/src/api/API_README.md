@@ -504,6 +504,7 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 文件状态响应还包含 `REVOKE: '4'`、`REVOKED: '5'`、`IGNORED: 'n'`。
 `DocumentItem.status_meta` 使用可空的 `DocumentStatusMeta`：`aggs` 为 `{ status, count }[]`，
 `state_time` 按任务编号、状态字符两级索引时间字符串；两项均可缺省。
+无分段时聚合项的 `status` 可为 `null`，按忽略状态解析，不计入成功数量。
 `DocumentTaskState` 和 `DocumentTaskType` 从文档枚举派生，统一从 `@/api/types` 导入。
 启用状态传布尔值，`false` 不省略；单选全部时省略该字段。`tags` 传数组，沿用 Axios 的
 `tags[]` 序列化，内容为标签 ID 或特殊值 `NO_TAG`，不传标签名称或 JSON 字符串。
@@ -531,3 +532,22 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 Workspace 共享知识库详情由 `resourceScope: 'workspace-shared'` 选择上述完整共享 API 对象；
 普通详情继续使用 `workspace/knowledge/`。共享详情和文档查询不使用 System 共享资源管理 API，
 也不回退到普通 Workspace 知识库接口。文档创建者选项沿用共享列表的 System `common.ts` 查询。
+
+### 资源对话用户授权
+
+`workspace/chat-user.ts` 使用 Admin 请求客户端，通过资源的 `user_group` 查询和保存组自动授权，
+通过 `user_group_id/<groupId>` 查询分页用户及保存逐用户授权，沿用已有接口路径与请求体。
+使用 `ParamsPage`、`ResponsePage`，调用方直接读取已解包数据并管理 loading。
+公共授权类型维护在 `types/chat-user.ts`，经 `@/api/types` 导出。当前由工作空间智能体详情页调用；
+仓库内开源后端尚未注册这组资源授权路径，实际联调依赖提供这些接口的后端环境。
+
+### 智能体对话日志
+
+`workspace/application/chat-log.ts` 使用 Admin 请求客户端，日志分页请求
+`/<applicationId>/chat/<currentPage>/<pageSize>`，导出使用 `postExportExcel` 请求
+`/<applicationId>/chat/export`，查询包含日期、摘要或用户及点赞、点踩下限；
+导出请求体为 `{ select_ids }`，空数组表示导出当前筛选结果。
+日志业务类型经 `@/api/types` 导出，来源枚举经 `@/api/enums` 导出，loading 由调用方维护。
+清除策略通过 PUT `batch_clean_time` 提交当前智能体的单元素 `id_list`、`clean_time`、
+`file_clean_time`，避免调用通用应用编辑流程；成功后页面刷新应用详情。
+聊天记录、标注、添加知识库接口保留在同一 API 文件，尚未接入本次日志列表页面。

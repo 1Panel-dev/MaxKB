@@ -10,8 +10,8 @@ import type { ApplicationDetail } from '@/api/types'
 export interface ApplicationDetailContext {
   /** 当前共享详情，子页面不能直接替换其引用。 */
   application: ComputedRef<ApplicationDetail | undefined>
-  /** 重新请求当前 applicationId 的完整详情。 */
-  refreshApplicationDetail: () => Promise<void>
+  /** 重新请求当前 applicationId 的完整详情；showLoading 默认 true，传 false 不修改整页加载状态。 */
+  refreshApplicationDetail: (showLoading?: boolean) => Promise<void>
   /** 使用接口返回的完整详情更新上下文，避免额外请求。 */
   replaceApplicationDetail: (applicationDetail: ApplicationDetail) => void
 }

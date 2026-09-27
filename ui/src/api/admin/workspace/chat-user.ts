@@ -1,63 +1,35 @@
-import type { Ref } from 'vue'
-import { Result } from '@/request/Result'
-import { get, put } from '@/request/index'
-import type { ChatUserGroupItem, ChatUserGroupUserItem, putUserGroupUserParams } from '@/api/type/workspaceChatUser'
-import type { pageRequest, PageList } from '@/api/type/common'
+import { get, put } from '../core/request'
+import type { ParamsPage, ResponsePage } from '../core/types'
+import type {
+  ChatUserAuthorization,
+  ChatUserAuthorizationGroup,
+  ChatUserAuthorizationResource,
+  ChatUserGroupAuthorizationPayload,
+  ChatUserAuthorizationPayload,
+  Dict,
+} from '@/api/types'
+import { getWorkspaceId } from '@/utils/resource-context'
 
-import useStore from '@/stores'
-const prefix: any = { _value: '/workspace/' }
-Object.defineProperty(prefix, 'value', {
-  get: function () {
-    const { user } = useStore()
-    return this._value + user.getWorkspaceId()
-  },
-})
-/**
- * 获取用户组列表
- */
-const getUserGroupList: (resource: any, loading?: Ref<boolean>) => Promise<Result<ChatUserGroupItem[]>> = (resource, loading) => {
-  return get(`${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group`, undefined, loading)
+const getPrefix = (resource: ChatUserAuthorizationResource) => `/workspace/${getWorkspaceId()}/${resource.resource_type}/${resource.resource_id}`
+
+/** 获取资源的对话用户组及自动授权状态。 */
+const getUserGroupList = (resource: ChatUserAuthorizationResource) => {
+  return get<ChatUserAuthorizationGroup[]>(`${getPrefix(resource)}/user_group`)
 }
 
-/**
- * 修改用户组列表授权
- */
-const editUserGroupList: (resource: any, data: { user_group_id: string, is_auth: boolean }[], loading?: Ref<boolean>) => Promise<Result<any>> = (resource, data, loading) => {
-  return put(`${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group`, data, undefined, loading)
+/** 保存资源的用户组自动授权设置。 */
+const putUserGroupAuthorization = (resource: ChatUserAuthorizationResource, data: ChatUserGroupAuthorizationPayload[]) => {
+  return put<ChatUserGroupAuthorizationPayload[], boolean>(`${getPrefix(resource)}/user_group`, data)
 }
 
-/**
- * 获取用户组的用户列表
- */
-const getUserGroupUserList: (
-  resource: any,
-  user_group_id: string,
-  page: pageRequest,
-  params?: any,
-  loading?: Ref<boolean>,
-) => Promise<Result<PageList<ChatUserGroupUserItem[]>>> = (resource, user_group_id, page, params, loading) => {
-  return get(
-    `${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group_id/${user_group_id}/${page.current_page}/${page.page_size}`,
-    params,
-    loading,
-  )
+/** 分页查询用户组内的对话用户及资源授权状态。 */
+const getUserGroupUserList = (resource: ChatUserAuthorizationResource, userGroupId: string, page: ParamsPage, query?: Dict<unknown>) => {
+  return get<ResponsePage<ChatUserAuthorization>>(`${getPrefix(resource)}/user_group_id/${userGroupId}/${page.currentPage}/${page.pageSize}`, query)
 }
 
-/**
- * 更新用户组的用户列表
- */
-const putUserGroupUser: (
-  resource: any,
-  user_group_id: string,
-  data: putUserGroupUserParams[],
-  loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (resource, user_group_id, data, loading) => {
-  return put(`${prefix.value}/${resource.resource_type}/${resource.resource_id}/user_group_id/${user_group_id}`, data, undefined, loading)
+/** 保存用户组内的对话用户资源授权。 */
+const putUserGroupUser = (resource: ChatUserAuthorizationResource, userGroupId: string, data: ChatUserAuthorizationPayload[]) => {
+  return put<ChatUserAuthorizationPayload[], boolean>(`${getPrefix(resource)}/user_group_id/${userGroupId}`, data)
 }
 
-export default {
-  getUserGroupList,
-  editUserGroupList,
-  getUserGroupUserList,
-  putUserGroupUser
-}
+export default { getUserGroupList, putUserGroupAuthorization, getUserGroupUserList, putUserGroupUser }

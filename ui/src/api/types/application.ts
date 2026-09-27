@@ -32,6 +32,8 @@ export interface ApplicationDetail extends Omit<ApplicationFormPayload, 'desc'> 
 }
 
 export interface ApplicationFormPayload {
+  clean_time?: number
+  file_clean_time?: number
   default_model_setting?: DefaultModelSettingPayload
   name?: string
   desc?: string
