@@ -29,16 +29,11 @@ defineProps<{
             <span class="mr-1 text-N600">{{ history.role }}：</span>
             <template v-if="Array.isArray(history.content)">
               <span v-for="(h, i) in history.content" :key="i">
-                <el-image
-                  v-if="h.type === 'image_url'"
-                  :src="h.image_url.url"
-                  fit="cover"
-                  class="mr-2 inline-block h-10 w-10 rounded-md"
-                  :zoom-rate="1.2"
-                  :max-scale="7"
-                  :min-scale="0.2"
-                />
-                <span v-else>{{ h.text }}<br /></span>
+                <el-image v-if="h.type === 'image_url'" :src="h.image_url.url" fit="cover" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" />
+                <span v-else>
+                  {{ h.text }}
+                  <br />
+                </span>
               </span>
             </template>
             <span v-else>{{ history.content }}</span>
@@ -57,7 +52,6 @@ defineProps<{
             :key="i"
             :src="f.url || (f.file_id ? `./oss/file/${f.file_id}` : '')"
             fit="cover"
-            class="block h-10 w-10 rounded-md"
             :preview-src-list="data.image_list.map((img: any) => img.url || (img.file_id ? `./oss/file/${img.file_id}` : ''))"
             :initial-index="i"
             :zoom-rate="1.2"

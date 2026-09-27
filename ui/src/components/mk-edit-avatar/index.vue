@@ -131,10 +131,7 @@ onBeforeUnmount(() => {
           :show-file-list="false"
           :on-change="selectImage"
         >
-          <el-avatar v-if="previewIcon" :size="80" shape="square">
-            <img :src="previewIcon" class="object-cover" />
-          </el-avatar>
-
+          <el-image v-if="previewIcon" :src="previewIcon" fit="cover" class="h-20 w-20" />
           <div v-else class="flex-center h-20 w-20 rounded-md border border-dashed bg-N200 hover:border-primary">
             <MkIcon name="icon_add_outlined" :size="24" />
           </div>

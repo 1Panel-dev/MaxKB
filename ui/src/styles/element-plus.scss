@@ -598,6 +598,16 @@
     }
   }
 }
+
+/* image */
+.el-image {
+  border-radius: var(--el-border-radius-base);
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--mk-N300);
+  display: block;
+}
+
 /* message-box */
 .el-message-box {
   --el-messagebox-padding-primary: 24px;
@@ -1198,6 +1208,62 @@
   &:has(.el-input__inner[readonly]) {
     --el-input-focus-border-color: var(--el-input-border-color);
     --el-input-hover-border-color: var(--el-input-border-color);
+  }
+}
+
+/* 文本域原生滚动条与 el-scrollbar 的滑块外观保持一致。 */
+.el-textarea__inner {
+  &::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: color-mix(
+      in srgb,
+      var(--el-scrollbar-bg-color, var(--el-text-color-secondary)) calc(var(--el-scrollbar-opacity, 0.3) * 100%),
+      transparent
+    );
+    border-radius: 4px;
+
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--el-scrollbar-hover-bg-color, var(--el-text-color-secondary)) calc(var(--el-scrollbar-hover-opacity, 0.5) * 100%),
+        transparent
+      );
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-color: color-mix(
+        in srgb,
+        var(--el-scrollbar-bg-color, var(--el-text-color-secondary)) calc(var(--el-scrollbar-opacity, 0.3) * 100%),
+        transparent
+      )
+      transparent;
+    scrollbar-width: thin;
+
+    &:hover {
+      scrollbar-color: color-mix(
+          in srgb,
+          var(--el-scrollbar-hover-bg-color, var(--el-text-color-secondary)) calc(var(--el-scrollbar-hover-opacity, 0.5) * 100%),
+          transparent
+        )
+        transparent;
+    }
   }
 }
 

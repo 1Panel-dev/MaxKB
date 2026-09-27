@@ -1,26 +1,3 @@
-<template>
-  <!-- 布局壳(纯展示):左/主/右三区 + 挤压/抽屉 + 遮罩。状态由外层传入,自身不含业务。 -->
-  <div class="relative flex h-full overflow-hidden">
-    <aside class="side-panel left shrink-0 overflow-hidden bg-N100" :class="[leftMode, { open: leftOpen }]" :style="{ '--side-w': leftWidth + 'px' }">
-      <div class="side-panel__inner"><slot name="left" /></div>
-    </aside>
-
-    <div class="flex-column min-w-0 flex-1"><slot name="main" /></div>
-
-    <aside
-      v-if="hasRight"
-      class="side-panel right shrink-0 overflow-hidden bg-N100"
-      :class="[rightMode, { open: rightOpen }]"
-      :style="{ '--side-w': rightWidth + 'px' }"
-    >
-      <div class="side-panel__inner"><slot name="right" /></div>
-    </aside>
-
-    <!-- 点击遮罩收起抽屉侧栏 -->
-    <div v-if="showMask" class="absolute inset-0 z-30 bg-N900/40" @click="$emit('mask-click')" />
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
 import type { SidePanelMode } from './types'
@@ -50,6 +27,28 @@ const hasRight = computed(() => !!slots.right)
 const showMask = computed(() => (props.leftMode === 'drawer' && props.leftOpen) || (props.rightMode === 'drawer' && props.rightOpen))
 </script>
 
+<template>
+  <!-- 布局壳(纯展示):左/主/右三区 + 挤压/抽屉 + 遮罩。状态由外层传入,自身不含业务。 -->
+  <div class="relative flex h-full overflow-hidden">
+    <aside class="side-panel left shrink-0 overflow-hidden bg-N100" :class="[leftMode, { open: leftOpen }]" :style="{ '--side-w': leftWidth + 'px' }">
+      <div class="side-panel__inner"><slot name="left" /></div>
+    </aside>
+
+    <slot name="main" />
+
+    <aside
+      v-if="hasRight"
+      class="side-panel right shrink-0 overflow-hidden bg-N100"
+      :class="[rightMode, { open: rightOpen }]"
+      :style="{ '--side-w': rightWidth + 'px' }"
+    >
+      <div class="side-panel__inner"><slot name="right" /></div>
+    </aside>
+
+    <!-- 点击遮罩收起抽屉侧栏 -->
+    <div v-if="showMask" class="absolute inset-0 z-30 bg-N900/40" @click="$emit('mask-click')" />
+  </div>
+</template>
 <style scoped lang="scss">
 .side-panel {
   /* 固定侧栏内容宽度，避免展开和收起时内容变形。 */
