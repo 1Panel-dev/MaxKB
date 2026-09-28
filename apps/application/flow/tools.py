@@ -45,6 +45,12 @@ from knowledge.models.knowledge_action import State
 from langchain_core.messages import AIMessageChunk, BaseMessage, BaseMessageChunk, ToolMessage
 from langchain_core.tools import StructuredTool
 from langchain_core.utils._merge import merge_lists as _original_merge_lists
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from .anthropic_tool_content import (
+    collect_input_json_deltas,
+    finalize_anthropic_assistant_content,
+    is_anthropic_tool_finish,
+)
 from langgraph.checkpoint.memory import MemorySaver
 from maxkb.const import CONFIG
 from pydantic import Field, create_model
@@ -480,6 +486,7 @@ async def _yield_mcp_response(
         tool_calls_info = {}  # tool_id -> {'name': ..., 'input': ...}
         # key(index/id) -> {'id': ..., 'name': ..., 'arguments': ...}
         _tool_fragments = {}
+        _anthropic_chunks = []
 
         def _merge_arguments(entry, part_args):
             if not isinstance(part_args, str):
@@ -517,10 +524,12 @@ async def _yield_mcp_response(
                 return f"id:{_extract_tool_id(str(raw_id).strip())}"
             return None
 
-        def _upsert_fragment(key, raw_id, func_name, part_args):
+        def _upsert_fragment(key, raw_id, func_name, part_args, index=None):
             if key is None:
                 return
-            entry = _tool_fragments.setdefault(key, {"id": "", "name": "", "arguments": ""})
+            entry = _tool_fragments.setdefault(key, {"id": "", "name": "", "arguments": "", "index": index})
+            if index is not None:
+                entry["index"] = index
 
             if raw_id and str(raw_id).strip():
                 new_id = str(raw_id).strip()
@@ -546,7 +555,7 @@ async def _yield_mcp_response(
                 for tc_chunk in chunk[0].tool_call_chunks or []:
                     raw_id = tc_chunk.get("id")
                     key = _get_fragment_key(tc_chunk.get("index"), raw_id)
-                    _upsert_fragment(key, raw_id, tc_chunk.get("name"), tc_chunk.get("args", ""))
+                    _upsert_fragment(key, raw_id, tc_chunk.get("name"), tc_chunk.get("args", ""), tc_chunk.get("index"))
 
                 # ----------------------------------------------------------------
                 # 1.1 兼容部分模型将工具调用放在 chunk.tool_calls，且 tool_call_chunks
@@ -561,7 +570,7 @@ async def _yield_mcp_response(
                     if has_tool_call_chunks and (part_args == "" or part_args == {} or part_args == []):
                         part_args = ""
                     key = _get_fragment_key(tool_call.get("index"), raw_id)
-                    _upsert_fragment(key, raw_id, tool_call.get("name"), part_args)
+                    _upsert_fragment(key, raw_id, tool_call.get("name"), part_args, tool_call.get("index"))
 
                 # ----------------------------------------------------------------
                 # 1.2 兼容 invalid_tool_calls 分片（部分模型会把中间 JSON 片段放这里）
@@ -569,7 +578,13 @@ async def _yield_mcp_response(
                 for invalid_tool_call in chunk[0].invalid_tool_calls or []:
                     raw_id = invalid_tool_call.get("id")
                     key = _get_fragment_key(invalid_tool_call.get("index"), raw_id)
-                    _upsert_fragment(key, raw_id, invalid_tool_call.get("name"), invalid_tool_call.get("args", ""))
+                    _upsert_fragment(
+                        key,
+                        raw_id,
+                        invalid_tool_call.get("name"),
+                        invalid_tool_call.get("args", ""),
+                        invalid_tool_call.get("index"),
+                    )
 
                 # ----------------------------------------------------------------
                 # 2. 兼容 additional_kwargs['tool_calls'] 方式（旧格式/非流式情况）
@@ -585,14 +600,28 @@ async def _yield_mcp_response(
                         func_name = tool_call.get("name")
                         part_args = tool_call.get("arguments", "")
                     key = _get_fragment_key(tool_call.get("index"), raw_id)
-                    _upsert_fragment(key, raw_id, func_name, part_args)
+                    _upsert_fragment(key, raw_id, func_name, part_args, tool_call.get("index"))
+
+                if isinstance(chunk[0].content, list):
+                    for block in chunk[0].content:
+                        if not isinstance(block, dict) or block.get("type") != "tool_use":
+                            continue
+                        key = _get_fragment_key(block.get("index"), block.get("id"))
+                        _upsert_fragment(
+                            key,
+                            block.get("id"),
+                            block.get("name"),
+                            block.get("input", ""),
+                            block.get("index"),
+                        )
+                    for index, partial_json in collect_input_json_deltas(chunk[0].content).items():
+                        key = _get_fragment_key(index, None)
+                        _upsert_fragment(key, None, None, partial_json, index)
 
                 # ----------------------------------------------------------------
                 # 3. 检测工具调用结束，更新 tool_calls_info
                 # ----------------------------------------------------------------
-                is_finish_chunk = (
-                    chunk[0].response_metadata.get("finish_reason") == "tool_calls" or chunk[0].chunk_position == "last"
-                )
+                is_finish_chunk = is_anthropic_tool_finish(chunk[0].response_metadata, chunk[0].chunk_position)
 
                 if is_finish_chunk:
                     # 在 finish chunk 时，将所有未完成的 fragment 标记完成并更新 tool_calls_info
@@ -673,6 +702,26 @@ async def _yield_mcp_response(
                         fixed_tool_calls.append(tc)
                     chunk[0].additional_kwargs["tool_calls"] = fixed_tool_calls
 
+                has_anthropic_content = isinstance(chunk[0].content, list) and any(
+                    isinstance(block, dict) and block.get("type") in ("tool_use", "input_json_delta")
+                    for block in chunk[0].content
+                )
+                if _anthropic_chunks or has_anthropic_content:
+                    _anthropic_chunks.append(chunk[0])
+                    if not is_finish_chunk:
+                        continue
+                    combined_chunk = _anthropic_chunks[0]
+                    for buffered_chunk in _anthropic_chunks[1:]:
+                        combined_chunk += buffered_chunk
+                    _anthropic_chunks.clear()
+                    if isinstance(combined_chunk.content, list):
+                        combined_chunk.content = finalize_anthropic_assistant_content(
+                            combined_chunk.content,
+                            tool_calls=combined_chunk.tool_calls,
+                            fragments=_tool_fragments,
+                        )
+                    chunk[0] = combined_chunk
+
                 yield chunk[0]
 
             if mcp_output_enable and isinstance(chunk[0], ToolMessage):
@@ -699,7 +748,7 @@ async def _yield_mcp_response(
                         if tool_lib_id:
                             await save_tool_record(tool_lib_id, tool_info, tool_result, source_id, source_type)
                         tool_result = json.dumps(text_result, ensure_ascii=False)
-                    except Exception as e:
+                    except Exception:
                         tool_result = chunk[0].content
                     content = generate_tool_message_complete(
                         tool_info.get("icon", ""), tool_info["name"], tool_info["input"], tool_result
