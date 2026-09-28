@@ -13,3 +13,5 @@ from .valid import *
 from .resource_mapping import *
 from .system_chat_user import *
 from .user_group_resource_permission import *
+from .resource_chat_user import *
+from .resource_chat_user_group import *
