@@ -82,6 +82,7 @@ from knowledge.serializers.paragraph import (
     ParagraphSerializers,
     delete_problems_and_mappings,
 )
+from knowledge.services import validate_knowledge_file_size
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.document_strategy import (
     apply_length_strategy,
@@ -1227,6 +1228,8 @@ class DocumentSerializers(serializers.Serializer):
                 DocumentInstanceQASerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
             file_list = instance.get("file_list")
+            knowledge = Knowledge.objects.get(id=self.data.get("knowledge_id"))
+            validate_knowledge_file_size(knowledge, file_list)
             document_list = flat_map([self.parse_qa_file(file) for file in file_list])
             return DocumentSerializers.Batch(
                 data={
@@ -1241,6 +1244,8 @@ class DocumentSerializers(serializers.Serializer):
                 DocumentInstanceTableSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
             file_list = instance.get("file_list")
+            knowledge = Knowledge.objects.get(id=self.data.get("knowledge_id"))
+            validate_knowledge_file_size(knowledge, file_list)
             document_list = flat_map([self.parse_table_file(file) for file in file_list])
             return DocumentSerializers.Batch(
                 data={
@@ -1319,16 +1324,11 @@ class DocumentSerializers(serializers.Serializer):
             query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
-            if not query_set.exists():
+            knowledge = query_set.first()
+            if knowledge is None:
                 raise AppApiException(500, _("Knowledge id does not exist"))
             files = instance.get("file")
-            knowledge = Knowledge.objects.filter(id=self.data.get("knowledge_id")).first()
-            for f in files:
-                if f.size > 1024 * 1024 * knowledge.file_size_limit:
-                    raise AppApiException(
-                        500,
-                        _("The maximum size of the uploaded file cannot exceed {}MB").format(knowledge.file_size_limit),
-                    )
+            validate_knowledge_file_size(knowledge, files)
 
         def parse(self, instance):
             self.is_valid(instance=instance, raise_exception=True)
@@ -2073,8 +2073,10 @@ class DocumentSerializers(serializers.Serializer):
             query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
             if workspace_id and workspace_id != "None":
                 query_set = query_set.filter(workspace_id=workspace_id)
-            if not query_set.exists():
+            knowledge = query_set.first()
+            if knowledge is None:
                 raise AppApiException(500, _("Knowledge id does not exist"))
+            validate_knowledge_file_size(knowledge, [self.data.get("file")])
             if (
                 not QuerySet(Document)
                 .filter(id=self.data.get("document_id"), knowledge_id=self.data.get("knowledge_id"))

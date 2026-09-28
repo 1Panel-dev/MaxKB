@@ -13,6 +13,7 @@ from knowledge.models import (
     ContentOrigin,
     Document,
     DocumentResourceType,
+    File,
     FileSourceType,
     Knowledge,
     KnowledgeSyncLog,
@@ -73,6 +74,7 @@ from knowledge.services.paragraph_assets import (
     resolve_visual_processor,
     sync_paragraph_assets,
 )
+from knowledge.services import validate_knowledge_file_size
 from knowledge.services.retrieval_stats import (
     collect_recall_asset_ids,
     collect_recall_source_ids,
@@ -95,9 +97,110 @@ from knowledge.task.sync import (
 )
 from knowledge.vector.pg_vector import PGVector
 from knowledge.views.document import _get_document_split_payload
+from oss.serializers.file import FileSerializer
 from knowledge.web_assets import internalize_web_images
 from PIL import Image
 from rest_framework.exceptions import ValidationError
+
+
+class KnowledgeUploadSizeLimitTests(SimpleTestCase):
+    def test_each_knowledge_base_uses_its_own_file_size_limit(self):
+        file = SimpleUploadedFile("example.txt", b"x")
+        file.size = 1024 * 1024 + 1
+        small_knowledge = Knowledge(file_size_limit=1)
+        large_knowledge = Knowledge(file_size_limit=2)
+
+        with self.assertRaises(AppApiException):
+            validate_knowledge_file_size(small_knowledge, [file])
+        validate_knowledge_file_size(large_knowledge, [file])
+        stored_file = MagicMock(spec=["file_size"], file_size=1024 * 1024 + 1)
+        with self.assertRaises(AppApiException):
+            validate_knowledge_file_size(small_knowledge, [stored_file])
+
+    def test_image_upload_uses_knowledge_limit_above_100_mb(self):
+        image_buffer = BytesIO()
+        Image.new("RGB", (1, 1)).save(image_buffer, format="PNG")
+        file = SimpleUploadedFile("example.png", image_buffer.getvalue(), content_type="image/png")
+        file.size = 101 * 1024 * 1024
+
+        ImageDocumentService._validate_image(file, Knowledge(file_size_limit=200))
+        with self.assertRaises(AppApiException):
+            ImageDocumentService._validate_image(file, Knowledge(file_size_limit=50))
+
+    @patch("knowledge.serializers.document.QuerySet")
+    @patch("knowledge.serializers.document.Knowledge.objects.get")
+    def test_imports_reject_oversize_file_before_parsing(self, get_knowledge, query_set):
+        get_knowledge.return_value = Knowledge(file_size_limit=1)
+        query_set.return_value.filter.return_value.exists.return_value = True
+        file = SimpleUploadedFile("example.csv", b"x")
+        file.size = 1024 * 1024 + 1
+        for method_name, parser_name in (("save_qa", "parse_qa_file"), ("save_table", "parse_table_file")):
+            with self.subTest(method=method_name):
+                serializer = DocumentSerializers.Create(data={"knowledge_id": "00000000-0000-0000-0000-000000000001"})
+                setattr(serializer, parser_name, MagicMock())
+
+                with self.assertRaises(AppApiException):
+                    getattr(serializer, method_name)({"file_list": [file]})
+                getattr(serializer, parser_name).assert_not_called()
+
+    @patch("knowledge.serializers.document.QuerySet")
+    def test_replace_source_file_rejects_oversize_file(self, query_set):
+        query_set.return_value.filter.return_value.filter.return_value.first.return_value = Knowledge(file_size_limit=1)
+        file = SimpleUploadedFile("example.txt", b"x")
+        file.size = 1024 * 1024 + 1
+        serializer = DocumentSerializers.ReplaceSourceFile(
+            data={
+                "workspace_id": "workspace",
+                "knowledge_id": "00000000-0000-0000-0000-000000000001",
+                "document_id": "00000000-0000-0000-0000-000000000002",
+                "file": file,
+            }
+        )
+
+        with self.assertRaises(AppApiException):
+            serializer.is_valid(raise_exception=True)
+
+    @patch("oss.serializers.file.QuerySet")
+    def test_knowledge_file_upload_rejects_oversize_file_before_storage(self, query_set):
+        query_set.return_value.filter.return_value.first.return_value = Knowledge(file_size_limit=1)
+        file = SimpleUploadedFile("example.txt", b"x")
+        file.size = 1024 * 1024 + 1
+        serializer = FileSerializer(
+            data={
+                "file": file,
+                "source_id": "00000000-0000-0000-0000-000000000001",
+                "source_type": FileSourceType.KNOWLEDGE.value,
+            }
+        )
+
+        with self.assertRaises(AppApiException):
+            serializer.upload()
+
+    @patch("knowledge.serializers.knowledge_workflow.KnowledgeAction")
+    @patch("knowledge.serializers.knowledge_workflow.QuerySet")
+    def test_workflow_rejects_oversize_stored_file_before_starting(self, query_set, knowledge_action):
+        knowledge_query = MagicMock()
+        knowledge_query.filter.return_value.filter.return_value.exists.return_value = True
+        knowledge_query.filter.return_value.first.return_value = Knowledge(file_size_limit=1)
+        workflow_query = MagicMock()
+        workflow_query.filter.return_value.first.return_value = MagicMock()
+        file_query = MagicMock()
+        file_query.filter.return_value = [MagicMock(spec=["file_size"], file_size=1024 * 1024 + 1)]
+        query_set.side_effect = lambda model: {
+            Knowledge: knowledge_query,
+            KnowledgeWorkflow: workflow_query,
+            File: file_query,
+        }[model]
+        serializer = KnowledgeWorkflowActionSerializer(
+            data={"workspace_id": "workspace", "knowledge_id": "00000000-0000-0000-0000-000000000001"}
+        )
+
+        with self.assertRaises(AppApiException):
+            serializer.action(
+                {"data_source": {"file_list": [{"file_id": "00000000-0000-0000-0000-000000000002"}]}},
+                MagicMock(),
+            )
+        knowledge_action.assert_not_called()
 
 
 class ProblemRecallSerializerTests(SimpleTestCase):

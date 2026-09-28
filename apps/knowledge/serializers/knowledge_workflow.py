@@ -52,6 +52,7 @@ from knowledge.models import (
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.common import update_resource_mapping_by_knowledge
 from knowledge.serializers.knowledge_model import KnowledgeModelSerializer
+from knowledge.services import validate_knowledge_file_size
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.workflow_sync import finalize_workflow_complete_snapshot, merge_workflow_incremental_snapshot
 from system_manage.models import AuthTargetType
@@ -234,12 +235,16 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
+        knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
+        data_source = instance.get("data_source") or {}
+        file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
+        file_list = list(QuerySet(File).filter(id__in=file_ids)) if file_ids else []
+        validate_knowledge_file_size(knowledge, file_list)
         knowledge_action_id = uuid.uuid7()
         meta = {"user_id": str(user.id), "user_name": user.username}
         KnowledgeAction(
             id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED, meta=meta
         ).save()
-        knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
         if sync_log_id is None:
             knowledge.meta = {
                 **(knowledge.meta or {}),
@@ -267,10 +272,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             sync_log_id,
         )
         # 需要把文件改成永久文件
-        data_source = instance.get("data_source") or {}
-        file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
         knowledge_id = str(self.data.get("knowledge_id"))
-        file_list = list(QuerySet(File).filter(id__in=file_ids))
         for file in file_list:
             meta = dict(file.meta or {})
             meta.update(debug=False, knowledge_id=knowledge_id)
@@ -355,6 +357,11 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
         if not knowledge_workflow.is_publish:
             raise AppApiException(500, _("The knowledge base workflow has not been published"))
+        knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
+        data_source = instance.get("data_source") or {}
+        file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
+        if file_ids:
+            validate_knowledge_file_size(knowledge, QuerySet(File).filter(id__in=file_ids))
         knowledge_workflow_version = (
             QuerySet(KnowledgeWorkflowVersion)
             .filter(knowledge_id=self.data.get("knowledge_id"))
@@ -366,7 +373,6 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         KnowledgeAction(
             id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED, meta=meta
         ).save()
-        knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
         instance["knowledge_base"] = {
             **(instance.get("knowledge_base") or {}),
             "knowledge": {

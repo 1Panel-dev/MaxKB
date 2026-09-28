@@ -25,6 +25,7 @@ from knowledge.models import (
     ParagraphAsset,
     SyncState,
 )
+from knowledge.services import validate_knowledge_file_size
 from knowledge.services.document_strategy import (
     document_source_hash,
     normalize_document_strategy,
@@ -75,12 +76,7 @@ class ImageDocumentService:
                 500,
                 _("Unsupported image format. Supported formats: jpg, jpeg, png, webp, bmp"),
             )
-        size_limit = min(100, knowledge.file_size_limit)
-        if file.size > 1024 * 1024 * size_limit:
-            raise AppApiException(
-                500,
-                _("The maximum size of the uploaded file cannot exceed {}MB").format(size_limit),
-            )
+        validate_knowledge_file_size(knowledge, [file])
         position = file.tell()
         try:
             image = Image.open(file)

@@ -25,6 +25,7 @@ from homepage.serializers.homepage import (
     is_workspace_manage,
 )
 from knowledge.models import Document, File, FileSourceType, Knowledge, PublicFileAccess
+from knowledge.services import validate_knowledge_file_size
 from maxkb.const import CONFIG
 from rest_framework import serializers
 from system_manage.models import WorkspaceUserResourcePermission
@@ -365,6 +366,11 @@ class FileSerializer(serializers.Serializer):
     def upload(self, with_valid=True, user_id=None):
         if with_valid:
             self.is_valid(raise_exception=True)
+        if self.data.get("source_type") == FileSourceType.KNOWLEDGE.value:
+            knowledge = QuerySet(Knowledge).filter(id=self.data.get("source_id")).first()
+            if knowledge is None:
+                raise AppApiException(500, _("Knowledge id does not exist"))
+            validate_knowledge_file_size(knowledge, [self.data.get("file")])
         meta = self.data.get("meta", None)
         if not meta:
             meta = {"debug": True}
