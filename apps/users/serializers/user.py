@@ -9,8 +9,8 @@
 import datetime
 import json
 import os
-import random
 import re
+import secrets
 from collections import defaultdict
 
 import uuid_utils.compat as uuid
@@ -1173,8 +1173,7 @@ class SendEmailSerializer(serializers.Serializer):
         email = self.data.get("email")
         state = self.data.get("type")
         # 生成随机验证码
-        code = "".join(list(map(lambda i: random.choice(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
-                                                         ]), range(6))))
+        code = "".join(secrets.choice('1234567890') for _ in range(6))
         # 获取邮件模板
         language = get_language()
         file = open(
