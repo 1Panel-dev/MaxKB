@@ -83,6 +83,9 @@ function handleRangeChange({ startTime, endTime }: MkDateRangeValue) {
 function handleOpenRanking(kind: HomeRankingKind) {
   selectedKind.value = kind
 }
+function handleRankingDrawerClosed() {
+  selectedKind.value = undefined
+}
 onMounted(loadRankings)
 </script>
 <template>
@@ -131,6 +134,13 @@ onMounted(loadRankings)
         <template #description="{ record }">对话 {{ numberFormat(record.chat_record_count) }} 次</template>
       </RankingCard>
     </div>
-    <RankingDrawer :api="api" v-if="selectedKind" :workspace-id="workspaceId" :initial-kind="selectedKind" :initial-range="range" />
+    <RankingDrawer
+      v-if="selectedKind"
+      :api="api"
+      :workspace-id="workspaceId"
+      :initial-kind="selectedKind"
+      :initial-range="range"
+      @closed="handleRankingDrawerClosed"
+    />
   </section>
 </template>
