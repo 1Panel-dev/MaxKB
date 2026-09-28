@@ -193,6 +193,7 @@ defineExpose({ clearSelection, tableRef })
       > .el-table__append-wrapper {
         background: var(--el-bg-color);
         border-bottom: var(--el-table-border);
+        cursor: pointer;
         flex-shrink: 0;
         left: 0;
         order: -1;
@@ -200,6 +201,10 @@ defineExpose({ clearSelection, tableRef })
         top: 0;
         width: 100cqw;
         z-index: 3;
+
+        &:hover {
+          background: var(--el-table-row-hover-bg-color);
+        }
       }
 
       > .el-table__body,

@@ -197,7 +197,7 @@ onMounted(() => {
   >
     <template v-if="showQuickCreate" #body-prepend>
       <!-- 快速创建空白文档 -->
-      <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" :loading="loading" @create="handleCreateDocument" />
+      <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
     </template>
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip />
 
