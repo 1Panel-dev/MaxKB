@@ -1,48 +1,34 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Headset } from '@element-plus/icons-vue'
-import { getFileExtension, getFileIconUrl } from '@/utils/icon'
+import { getFileExtension, getFileIconUrl, isAudio, isVideo } from '@/utils/icon'
 import { formatFileSize } from '@/utils/number'
 import { inputShortcut } from '../../core/shortcuts'
 import { useMessageInputStore } from './index'
 
-const {
-  question,
-  fileList,
-  maxFiles,
-  maxSizeMB,
-  acceptList,
-  loading,
-  placeholder,
-  canSend,
-  imageFiles,
-  audioFiles,
-  videoFiles,
-  addFiles,
-  removeFile,
-  send,
-  stop,
-} = useMessageInputStore()
+const { question, fileList, maxFiles, maxSizeMB, acceptList, loading, placeholder, canSend, imageFiles, addFiles, removeFile, send, stop } =
+  useMessageInputStore()
 
+// 选择和粘贴附件统一交给输入 Store 处理。
 const fileInputRef = ref<HTMLInputElement | null>(null)
 
-const handleFileSelect = (e: Event) => {
-  const input = e.target as HTMLInputElement
+const handleFileSelect = (event: Event) => {
+  const input = event.target as HTMLInputElement
   addFiles(input.files)
   input.value = ''
 }
 
-const handlePaste = (e: ClipboardEvent) => {
-  const files = e.clipboardData?.files
+const handlePaste = (event: ClipboardEvent) => {
+  const files = event.clipboardData?.files
   if (!files?.length) return
-  e.preventDefault()
+  event.preventDefault()
   addFiles(files)
 }
 
-const handleKeydown = (e: KeyboardEvent) => {
+// 移动端保留回车换行，桌面端沿用公共发送快捷键。
+const handleKeydown = (event: KeyboardEvent) => {
   const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  if (isMobile && e.key === 'Enter') return
-  inputShortcut(e, question, () => {
+  if (isMobile && event.key === 'Enter') return
+  inputShortcut(event, question, () => {
     if (canSend.value) send()
   })
 }
@@ -50,25 +36,43 @@ const handleKeydown = (e: KeyboardEvent) => {
 
 <template>
   <div class="mk-input-box mk-conversation-message-input w-full shadow-lg">
-    <!-- 文件预览区域：所有类型按上传顺序横向排列。 // TODO 未来会改成横向有左右按钮控制 -->
-    <el-scrollbar v-if="fileList.length" class="mb-3 h-auto!" view-class="flex-align-center gap-2">
+    <!-- 附件按上传顺序排列，超出可视范围时显示滚动箭头。 -->
+    <MkHorizontalScroll v-if="fileList.length" class="mb-3">
       <template v-for="(file, index) in fileList" :key="file.uid">
         <div class="group relative shrink-0">
-          <el-image
-            v-if="imageFiles.includes(file) && (file.url || file.previewUrl)"
-            :src="file.url || file.previewUrl"
-            :alt="file.name"
-            :title="file.name"
-            fit="cover"
-          />
-          <video v-else-if="videoFiles.includes(file) && file.url" :src="file.url" :title="file.name" controls autoplay class="object-cover" />
-          <el-card shadow="never" v-else class="small w-60 rounded-lg!">
+          <!-- 图片 -->
+          <el-image v-if="imageFiles.includes(file)" :src="file.url || file.previewUrl" :alt="file.name" :title="file.name" fit="cover" />
+          <!-- 音频 -->
+          <MkAudio v-else-if="isAudio(file.name)" :src="file.previewUrl || file.url || ''" :name="file.name">
+            <el-card shadow="never" class="small w-60 rounded-lg! cursor-pointer">
+              <div class="flex-align-center gap-2">
+                <img :src="getFileIconUrl(file.name)" alt="" class="w-8 shrink-0" />
+                <div class="min-w-0 flex-1">
+                  <div class="truncate" :title="file.name">{{ file.name }}</div>
+                  <div class="text-sm text-N500">{{ getFileExtension(file.name) || '文件' }} – {{ formatFileSize(file.size) }}</div>
+                </div>
+              </div>
+            </el-card>
+          </MkAudio>
+          <!-- 视频 -->
+          <MkVideo v-else-if="isVideo(file.name)" :src="file.previewUrl || file.url || ''" :name="file.name">
+            <el-card shadow="never" class="small w-60 rounded-lg! cursor-pointer">
+              <div class="flex-align-center gap-2">
+                <img :src="getFileIconUrl(file.name)" alt="" class="w-8 shrink-0" />
+                <div class="min-w-0 flex-1">
+                  <div class="truncate" :title="file.name">{{ file.name }}</div>
+                  <div class="text-sm text-N500">{{ getFileExtension(file.name) || '文件' }} – {{ formatFileSize(file.size) }}</div>
+                </div>
+              </div>
+            </el-card>
+          </MkVideo>
+          <!-- 文档 -->
+          <el-card v-else shadow="never" class="small w-60 rounded-lg!">
             <div class="flex-align-center gap-2">
-              <MkIcon v-if="audioFiles.includes(file)" :icon="Headset" :size="24" class="shrink-0 text-N600" />
-              <img v-else :src="getFileIconUrl(file.name)" alt="" class="w-8 shrink-0" />
+              <img :src="getFileIconUrl(file.name)" alt="" class="w-8 shrink-0" />
               <div class="min-w-0 flex-1">
                 <div class="truncate" :title="file.name">{{ file.name }}</div>
-                <div class="text-sm text-N500">{{ getFileExtension(file.name).toUpperCase() || '文件' }} – {{ formatFileSize(file.size) }}</div>
+                <div class="text-sm text-N500">{{ getFileExtension(file.name) || '文件' }} – {{ formatFileSize(file.size) }}</div>
               </div>
             </div>
           </el-card>
@@ -78,7 +82,7 @@ const handleKeydown = (e: KeyboardEvent) => {
           </div>
         </div>
       </template>
-    </el-scrollbar>
+    </MkHorizontalScroll>
 
     <!-- 输入框 -->
     <el-input
@@ -124,5 +128,3 @@ const handleKeydown = (e: KeyboardEvent) => {
     </div>
   </div>
 </template>
-
-<style scoped lang="scss"></style>

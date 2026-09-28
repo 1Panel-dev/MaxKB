@@ -75,6 +75,47 @@ import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynam
 
 ## 全局 UI 组件
 
+### MkHorizontalScroll
+
+全局横向滚动组件，位于 `global/mk-horizontal-scroll/index.vue`，模板自动注册。
+通过默认插槽传入内容，内部横向 Flex 排列并提供 8px 间距；固定宽度的内容应设置 `shrink-0`。
+左右箭头分别在对应方向可滚动时显示，到达边界即隐藏；按钮绝对定位在容器两侧并垂直居中，
+不占用内容宽度。每次点击平滑滚动可视宽度的 80%。
+底层使用 `el-scrollbar`，隐藏横向滚动条，保留触控板和触屏的原生横向滚动。
+`ResizeObserver` 监听容器和内容尺寸，自动响应内容增删、图片加载及窗口缩放；卸载时清理监听。
+外部间距由使用方通过 `class` 设置，不在组件内绑定附件业务。
+
+```vue
+<MkHorizontalScroll class="mb-3">
+  <template v-for="file in files" :key="file.uid">
+    <el-card class="w-60 shrink-0">{{ file.name }}</el-card>
+  </template>
+</MkHorizontalScroll>
+```
+
+### MkAudio、MkVideo
+
+位于 `global/mk-media-preview/`，两个全局组件分别提供音频、视频遮罩播放器。
+传入必填 `src`、`name`；通过默认插槽传入触发内容，卡片、图标、文件大小及样式由调用方维护。
+`src` 为空时不打开预览；触发区域支持点击、Enter 和空格打开，遮罩内居中显示原生音频或视频控制条并尝试自动播放；
+自动播放受浏览器策略限制时可手动播放。关闭按钮、点击遮罩或 Esc 关闭预览，立即卸载播放器。
+附件删除或列表清空导致组件卸载时也会清理播放器；地址变化时关闭旧预览。
+预览采用页面遮罩，不主动请求浏览器全屏，视频原生控制条仍可提供全屏功能。
+内部入口 `index.vue`（`MkMediaPreview`） 统一无样式的触发容器与媒体遮罩，不使用 `MkDialog`。
+遮罩通过 Teleport 挂载到 body，使用 `ElOverlay` 与 `useZIndex` 管理遮罩和层级，
+`useLockscreen` 锁定背景滚动，`TrapFocus` 约束键盘焦点；打开时聚焦关闭按钮，关闭后焦点返回触发区。
+预览区处理 Esc 关闭，界面只展示居中的播放器和右上角关闭按钮。业务方使用两个公开组件，
+不直接调用内部组件。组件不创建或释放 Object URL，由调用方维护地址生命周期。
+
+```vue
+<MkAudio :src="audioUrl" name="录音.mp3">
+  <el-card>录音附件卡片</el-card>
+</MkAudio>
+<MkVideo :src="videoUrl" name="演示.mp4">
+  <el-card>视频附件卡片</el-card>
+</MkVideo>
+```
+
 ### MkTooltip
 
 普通提示统一使用 `MkTooltip`，业务代码不直接使用 `el-tooltip`。默认悬停 300ms 后显示，
@@ -549,10 +590,11 @@ const avatar = ref('')
 ### MkTagsEdit
 
 手动导入 `@/components/mk-tags-edit/index.vue`，通过必填的 `string[]` 类型 `v-model`
-编辑标签。可选 `reservedTags` 接收保留标签数组，默认为空；组件检查保留值与当前列表的
-重复项，并提示“该标签已存在”。输入失焦或按回车时去除首尾空格，空值不添加；默认保留大小写
-和前导点。业务需要格式化时通过 `normalizeTag(tag)` 传入转换函数，在重复检查前执行。
-`addText` 默认为“添加标签”。组件内部维护输入框显隐与自动聚焦，根节点阻止点击冒泡；外部间距通过 `class` 设置。
+编辑文件后缀。可选 `presetExtensions` 接收预设文件后缀数组，默认为空。
+输入失焦或按回车时，组件内部去除首尾空格和一个前导点，并转为大写，空值不添加；
+重复检查对预设后缀与当前列表应用相同规则，兼容已有的小写后缀，重复时提示“文件后缀已存在”。
+已有数据不自动改写，新添加的后缀按上述格式保存。添加按钮和输入提示固定为“添加后缀名”。
+组件内部维护输入框显隐与自动聚焦，根节点阻止点击冒泡；外部间距通过 `class` 设置。
 
 ### MkCardCheckbox
 

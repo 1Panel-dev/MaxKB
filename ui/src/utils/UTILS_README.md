@@ -10,7 +10,7 @@ src/utils/
 ├── UTILS_README.md       # utils 目录的放置、拆分、命名和注释规则
 ├── array.ts              # 跨页面复用的数组转换、筛选、去重等处理函数
 ├── clipboard.ts          # 剪贴板文本复制和成功反馈
-├── file.ts               # 文件后缀识别、类型白名单校验和图标匹配
+├── icon.ts               # 文件后缀识别、类型判断和图标匹配
 ├── message.ts            # Element Plus 全局消息提示的统一封装
 ├── number.ts             # 跨页面复用的数字计算、转换和格式化函数
 ├── resource-context.ts   # 当前路由的资源范围和工作空间上下文判断
@@ -106,3 +106,11 @@ export function uniqueBy() {
   // ...
 }
 ```
+
+## 文件类型与图标
+
+`icon.ts` 的 `getFileExtension()` 返回不含点号的大写后缀，无有效后缀时返回空字符串。
+`isImage()`、`isDocument()`、`isAudio()`、`isVideo()` 统一复用 `constants/file-type.ts` 的四组常量。
+`getFileIconUrl()` 为文档返回对应后缀图标，为音视频分别返回 `file-audio-icon.svg`、
+`file-video-icon.svg`，其他类型回退到 `unknown-icon.svg`；图片预览由调用方单独处理。
+DOC、ZIP 保留历史图标兼容，但不加入消息附件的文档类型白名单。

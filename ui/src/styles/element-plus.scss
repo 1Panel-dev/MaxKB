@@ -566,6 +566,12 @@
   }
 }
 
+/* image viewer */
+.el-image-viewer__mask {
+  background: var(--el-overlay-color-lighter);
+  opacity: 1;
+}
+
 /* input */
 .el-input {
   --el-input-text-color: var(--el-text-color-primary);
@@ -1181,6 +1187,7 @@
       font-weight: 400;
     }
     height: auto;
+    line-height: 22px;
     align-items: inherit;
   }
 

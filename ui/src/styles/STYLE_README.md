@@ -523,6 +523,9 @@ Drawer 的 `header` 插槽内时，组合 `absolute-center` 和宽度工具类�
 </el-steps>
 ```
 
+图片预览遮罩 `.el-image-viewer__mask` 统一使用 `var(--el-overlay-color-lighter)`，
+并将元素 `opacity` 设为 `1`，避免与背景色自身透明度叠加；与媒体预览遮罩保持一致。
+
 ### 普通 CSS 中叠加透明度
 
 使用 `color-mix()`，只依赖一个主题色变量：

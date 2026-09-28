@@ -45,3 +45,6 @@ const knowledgeTypeLabel = KNOWLEDGE_TYPE_LABELS[knowledgeType]
 
 `document.ts` 的 `DOCUMENT_HIT_HANDLING_LABELS` 维护文档命中处理方式的展示文案，
 映射键引用 API 枚举 `DOCUMENT_HIT_HANDLING`。
+
+`file-type.ts` 维护图片、文档、视频和音频的文件扩展名常量，扩展名统一使用大写。
+使用方判断文件类型时先将后缀转换为大写，再与对应常量匹配。

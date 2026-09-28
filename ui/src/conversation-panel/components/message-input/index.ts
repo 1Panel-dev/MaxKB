@@ -1,15 +1,7 @@
 import { ref, computed, reactive, watch, inject, type Ref, type InjectionKey } from 'vue'
+import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants/file-type'
+import { isImage, isDocument, isAudio, isVideo } from '@/utils/icon'
 import type { ChatMessage, Conversation, SendMessageOptions } from '../../core/types'
-
-const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
-const documentExts = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
-const videoExts = ['mp4', 'avi', 'mkv', 'mov', 'flv', 'wmv']
-const audioExts = ['mp3', 'wav', 'ogg', 'aac', 'm4a']
-const getExt = (name: string) => name.split('.').pop()?.toLowerCase() || ''
-const isImage = (name: string) => imageExts.includes(getExt(name))
-const isDocument = (name: string) => documentExts.includes(getExt(name))
-const isAudio = (name: string) => audioExts.includes(getExt(name))
-const isVideo = (name: string) => videoExts.includes(getExt(name))
 
 export interface FileItem {
   uid: number
@@ -22,7 +14,14 @@ export interface FileItem {
   uploading?: boolean
 }
 
-// 只声明本组件真正用到的依赖(接口隔离),不接收整个别人的 store
+type MessageAttachmentKey = 'image_list' | 'document_list' | 'audio_list' | 'video_list' | 'other_list'
+type MessageAttachment = Pick<FileItem, 'url' | 'file_id' | 'name'>
+type QuestionMessage = {
+  type: 'QUESTION'
+  content: string
+} & Partial<Record<MessageAttachmentKey, MessageAttachment[]>>
+
+// 仅注入消息输入所需的会话、上传和发送能力。
 export interface MessageInputDeps {
   // 来自 conversation-list
   conversations: Ref<Conversation[]>
@@ -41,70 +40,57 @@ export interface MessageInputDeps {
  * message-input 组件 store:本组件独有——输入内容 + 暂存文件 + 发送。
  */
 export function createMessageInputStore(deps: MessageInputDeps) {
-  const { conversations, getChatId, renameChat, composerResetSignal, messages, loading, sendMessage, uploadFile, stop } =
-    deps
+  const { conversations, getChatId, renameChat, composerResetSignal, messages, loading, sendMessage, uploadFile, stop } = deps
 
+  // 输入状态与附件限制
   const question = ref('')
   const fileList = ref<FileItem[]>([])
-  const uploadPromises = ref<Promise<any>[]>([])
-  const showDelete = ref('')
   const sending = ref(false)
   const maxFiles = 10
   const maxSizeMB = 50
-  const acceptList = [...imageExts, ...documentExts, ...videoExts, ...audioExts].map((e) => `.${e}`).join(',')
+
+  // TODO 格式 不行
+  const acceptList = [...IMAGE_EXTENSIONS, ...DOCUMENT_EXTENSIONS, ...VIDEO_EXTENSIONS, ...AUDIO_EXTENSIONS].map((e) => `.${e}`).join(',')
 
   const placeholder = computed(() => (loading.value ? '正在回复中...' : '输入消息...'))
-  const canSend = computed(
-    () => (question.value.trim() || fileList.value.length > 0) && !loading.value && !sending.value,
-  )
+  const canSend = computed(() => (question.value.trim().length > 0 || fileList.value.length > 0) && !loading.value && !sending.value)
 
-  const imageFiles = computed(() => fileList.value.filter((f) => isImage(f.name)))
-  const documentFiles = computed(() => fileList.value.filter((f) => isDocument(f.name)))
-  const audioFiles = computed(() => fileList.value.filter((f) => isAudio(f.name)))
-  const videoFiles = computed(() => fileList.value.filter((f) => isVideo(f.name)))
+  const imageFiles = computed(() => fileList.value.filter((attachment) => isImage(attachment.name)))
 
-  const getFileIcon = (name: string) => {
-    const ext = getExt(name)
-    const doc = 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg'
-    const audio = 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/headset.svg'
-    const iconMap: Record<string, string> = {
-      pdf: doc, doc, docx: doc, xls: doc, xlsx: doc, txt: doc, md: doc, html: doc, csv: doc,
-      mp3: audio, wav: audio, ogg: audio, aac: audio, m4a: audio,
-    }
-    return iconMap[ext] || doc
-  }
+  // 附件上传与本地预览
+  const uploadPromises = ref<Promise<void>[]>([])
 
-  const validateFile = (file: File) =>
-    fileList.value.length < maxFiles && file.size > 0 && file.size <= maxSizeMB * 1024 * 1024
+  const validateFile = (file: File) => fileList.value.length < maxFiles && file.size > 0 && file.size <= maxSizeMB * 1024 * 1024
 
   const addFile = (file: File) => {
     if (!validateFile(file)) return
-    const item: FileItem = reactive({
+    const attachment: FileItem = reactive({
       uid: Date.now() + Math.random(),
       name: file.name,
       size: file.size,
       raw: file,
       uploading: true,
     })
-    if (isImage(file.name)) item.previewUrl = URL.createObjectURL(file)
-    fileList.value.push(item)
+    if (isImage(file.name) || isAudio(file.name) || isVideo(file.name)) {
+      attachment.previewUrl = URL.createObjectURL(file)
+    }
+    fileList.value.push(attachment)
 
     const uploadPromise = (async () => {
       try {
-        const cid = getChatId()
-        const url = await uploadFile(file, cid)
-        item.url = url
-        const parts = url.split('/')
-        item.file_id = parts[parts.length - 1]
+        const chatId = getChatId()
+        const url = await uploadFile(file, chatId)
+        attachment.url = url
+        attachment.file_id = url.split('/').pop()
       } catch (e) {
         console.error('upload failed:', e)
       } finally {
-        item.uploading = false
+        attachment.uploading = false
       }
     })()
     uploadPromises.value.push(uploadPromise)
     uploadPromise.finally(() => {
-      uploadPromises.value = uploadPromises.value.filter((p) => p !== uploadPromise)
+      uploadPromises.value = uploadPromises.value.filter((pendingUpload) => pendingUpload !== uploadPromise)
     })
   }
 
@@ -114,61 +100,57 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   }
 
   const removeFile = (index: number) => {
-    const item = fileList.value[index]
-    if (!item) return
-    if (item.previewUrl) URL.revokeObjectURL(item.previewUrl)
+    const attachment = fileList.value[index]
+    if (!attachment) return
+    if (attachment.previewUrl) URL.revokeObjectURL(attachment.previewUrl)
     fileList.value.splice(index, 1)
   }
 
   const clearFiles = () => {
-    fileList.value.forEach((f) => {
-      if (f.previewUrl) URL.revokeObjectURL(f.previewUrl)
+    fileList.value.forEach((attachment) => {
+      if (attachment.previewUrl) URL.revokeObjectURL(attachment.previewUrl)
     })
     fileList.value = []
   }
 
+  // 等待附件上传后发送，首条消息同步会话标题。
   const send = async () => {
-    if (sending.value || !canSend.value) return
+    if (!canSend.value) return
     sending.value = true
     try {
       if (uploadPromises.value.length) await Promise.all(uploadPromises.value)
 
-      const text = question.value.trim()
-      const cid = getChatId()
+      const questionText = question.value.trim()
+      const chatId = getChatId()
 
-      // 首条消息:此刻把会话 push 进左侧列表(标题乐观更新),流结束后 renameChat 落库
+      // 首条消息先显示会话标题，流结束后再保存标题。
       const isFirstMessage = messages.value.length === 0
-      const abstract = text.substring(0, 256)
-      if (isFirstMessage && !conversations.value.some((c: any) => c.id === cid)) {
-        conversations.value.unshift({ id: cid, abstract: text ? abstract : '新对话' })
+      const abstract = questionText.substring(0, 256)
+      if (isFirstMessage && !conversations.value.some((conversation) => conversation.id === chatId)) {
+        conversations.value.unshift({ id: chatId, abstract: questionText ? abstract : '新对话' })
       }
 
-      const pick = (pred: (n: string) => boolean) =>
-        fileList.value.filter((f) => pred(f.name)).map((f) => ({ url: f.url, file_id: f.file_id, name: f.name }))
-      const images = pick(isImage)
-      const documents = pick(isDocument)
-      const audio = pick(isAudio)
-      const video = pick(isVideo)
-      const other = fileList.value
-        .filter((f) => !isImage(f.name) && !isDocument(f.name) && !isAudio(f.name) && !isVideo(f.name))
-        .map((f) => ({ url: f.url, file_id: f.file_id, name: f.name }))
+      // 一次遍历完成附件分类，仅提交有附件的字段。
+      const message: QuestionMessage = { type: 'QUESTION', content: questionText }
+      for (const attachment of fileList.value) {
+        let attachmentKey: MessageAttachmentKey = 'other_list'
+        if (isImage(attachment.name)) attachmentKey = 'image_list'
+        else if (isDocument(attachment.name)) attachmentKey = 'document_list'
+        else if (isAudio(attachment.name)) attachmentKey = 'audio_list'
+        else if (isVideo(attachment.name)) attachmentKey = 'video_list'
 
-      const questionContent: any = { type: 'QUESTION', content: text }
-      const message: any = { content: text, type: 'QUESTION' }
-      if (images.length) questionContent.image_list = message.image_list = images
-      if (documents.length) questionContent.document_list = message.document_list = documents
-      if (audio.length) questionContent.audio_list = message.audio_list = audio
-      if (video.length) questionContent.video_list = message.video_list = video
-      if (other.length) questionContent.other_list = message.other_list = other
+        const attachments = (message[attachmentKey] ??= [])
+        attachments.push({ url: attachment.url, file_id: attachment.file_id, name: attachment.name })
+      }
 
       sendMessage({
-        chatId: cid,
+        chatId,
         message,
         newQuestion: true,
-        questionContent,
+        questionContent: { ...message },
         reChat: false,
         onComplete: (e) => {
-          if (!e && isFirstMessage && text) renameChat(cid, abstract).catch(() => {})
+          if (!e && isFirstMessage && questionText) renameChat(chatId, abstract).catch(() => {})
         },
       })
       question.value = ''
@@ -193,23 +175,18 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   return {
     question,
     fileList,
-    showDelete,
     maxFiles,
     maxSizeMB,
     acceptList,
-    loading: loading,
+    loading,
     placeholder,
     canSend,
     imageFiles,
-    documentFiles,
-    audioFiles,
-    videoFiles,
-    getFileIcon,
     addFile,
     addFiles,
     removeFile,
     send,
-    stop: stop,
+    stop,
   }
 }
 

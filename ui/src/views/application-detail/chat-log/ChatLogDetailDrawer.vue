@@ -41,10 +41,10 @@ defineExpose({ open, close })
     </template>
     <div v-loading="props.loading">对话内容后续接入</div>
     <template #footer>
-      <!-- 浏览上一条对话日志 -->
-      <el-button plain :disabled="props.previousDisabled || props.loading" @click="handlePrevious">上一条</el-button>
-      <!-- 浏览下一条对话日志 -->
-      <el-button plain :disabled="props.nextDisabled || props.loading" @click="handleNext">下一条</el-button>
+      <!-- 浏览上一个对话日志 -->
+      <el-button plain :disabled="props.previousDisabled || props.loading" @click="handlePrevious">上一个</el-button>
+      <!-- 浏览下一个对话日志 -->
+      <el-button plain :disabled="props.nextDisabled || props.loading" @click="handleNext">下一个</el-button>
     </template>
   </MkDrawer>
 </template>
