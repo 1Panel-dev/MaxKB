@@ -310,7 +310,7 @@ class SystemHomePageSerializer(serializers.Serializer):
                     auth, data["user_id"], data.get("workspace_id")
                 ),
             )
-            return {query.aggregate(total_count=Count("id"))["total_count"]}
+            return query.aggregate(total_count=Count("id"))["total_count"]
 
     class ApplicationTokensRanking(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, allow_null=True, label=_("Workspace ID"))
