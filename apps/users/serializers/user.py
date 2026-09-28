@@ -10,8 +10,8 @@
 import datetime
 import json
 import os
-import random
 import re
+import secrets
 from collections import defaultdict
 
 import uuid_utils.compat as uuid
@@ -1024,7 +1024,9 @@ class SendEmailSerializer(serializers.Serializer):
         email = self.data.get("email")
         state = self.data.get("type")
         check_verify_code_lockout(email, state)
-        code = "".join(random.choices("0123456789", k=6))
+        # 生成随机验证码
+        code = "".join(secrets.choice("1234567890") for _ in range(6))
+        # 获取邮件模板
         language = get_language()
         template_path = os.path.join(PROJECT_DIR, "apps", "common", "template", f"email_template_{language}.html")
         with open(template_path, "r", encoding="utf-8") as template_file:
