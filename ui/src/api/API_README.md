@@ -496,8 +496,11 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 
 ### 知识库文档
 
-`workspace/knowledge/document.ts` 仅维护文档分页查询，路径为
+`workspace/knowledge/document.ts` 维护文档分页查询，路径为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<currentPage>/<pageSize>`。
+`putQuickCreateDocuments(knowledgeId, documents)` 通过 PUT `document/batch_create` 创建空白文档，
+载荷为 `DocumentQuickCreatePayload[]`（仅含 `name`），返回 `DocumentItem[]`；名称上限 128 字符。
+共享文档 API 不增加创建接口；文档页监听公共 MkQuickCreate 的 `create` 事件，管理创建请求和提交状态。
 分页使用 `ParamsPage` / `ResponsePage<DocumentItem>`，支持 `name`、`create_user`、`status`、`task_type`、`is_active`、`hit_handling_method` 和 `tags` 筛选；
 文件任务使用 `DOCUMENT_TASK_STATE` 的字符状态及 `DOCUMENT_TASK_TYPE` 的任务位置，
 不使用通用 `STATE_TYPES`；选择全部时省略状态与任务类型，非任务专属状态省略任务类型。

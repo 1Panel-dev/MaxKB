@@ -8,7 +8,7 @@ import type { Dict } from '@/api/types'
 import { MsgError } from '@/utils/message'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
-const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes
+const DEFAULT_TIMEOUT = 30 * 60 * 1000 // 30 minutes
 
 interface ExportRequestConfig extends AxiosRequestConfig {
   skipGlobalErrorMessage?: boolean

@@ -256,6 +256,31 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 `paginationConfig` 由组件接收，其余 Table 属性和事件通过 `$attrs` 传入，列继续使用
 `el-table-column`。
 
+`body-prepend` 插槽用于在表头下、数据行之前插入独立操作区，例如快速创建。内部借用
+Element Plus `append`，仅在传入该插槽时将直属表体滚动容器设为纵向 Flex，并将插槽排到前面；
+内容自然占位，不写固定高度，不向 `data` 插入占位记录，不影响选择、排序、分页总数和空状态。
+该插槽用于默认的 `table-layout="fixed"` 表格；不与 `table-layout="auto"` 混用。
+操作区通过 sticky 固定在表头下方，纵向、横向滚动均保持原位，背景遮挡经过的普通列和固定列。
+表体使用 inline-size 容器，操作区宽度通过 `100cqw` 跟随表体可视宽度，滚动内容保留完整列宽；
+表单展开和错误提示仍自然占位。表单状态、请求与成功后的刷新由调用方维护，MkTable 不内置业务创建逻辑。
+
+`MkQuickCreate` 位于 `global/mk-table/MkQuickCreate.vue`，自动注册，供 `body-prepend` 插槽组合。
+组件只提供行内快速创建交互，不依赖文档 API 或业务 ID。点击创建只发出 `create(name)` 事件，
+由页面管理请求、`loading`、成功提示及列表刷新；成功后通过组件 ref 调用 `close()` 清空并收起，失败保留输入。
+`text` 默认为“快速创建”，`placeholder` 默认为“请输入名称”，`maxlength` 默认为 256。
+组件不使用 Form 或表单校验；空名称、纯空白及提交期间禁用创建按钮，提交前 trim。
+Esc 或取消清理草稿；`loading` 默认为 false，为 true 时禁止创建和取消。组件不等待 Promise，不自动收起。
+
+```vue
+<MkTable :data="documentData">
+  <template #body-prepend>
+    <!-- 快速创建空白文档 -->
+    <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" :loading="creatingDocument" @create="handleCreateDocument" />
+  </template>
+  <el-table-column prop="name" label="文档名称" />
+</MkTable>
+```
+
 `paginationConfig` 包含 `currentPage`、`pageSize`、`total` 和可选 `pageSizes`；不传则隐藏分页器，
 `pageSizes` 默认 `[10, 20, 50, 100]`。
 
@@ -437,6 +462,39 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 仍可传默认对象。
 
 ## 手动导入的共享 UI
+
+### MkEditName（行内编辑名称）
+
+手动导入 `@/components/mk-edit-name/index.vue`，不全局注册。必填 `v-model` 保存已生效名称，
+必填 `save(name): Promise<string>` 由调用方执行业务请求并返回最终保存的名称；失败必须 reject，
+不可吞掉错误后当作成功返回。组件不调用业务 API，仅在保存成功后回写模型。
+
+默认展示名称，`prefix` 插槽放文档等业务图标；长名称省略并提供原生 title。悬停或内部获得焦点时
+显示编辑按钮，点击后进入输入态并选中名称。Enter 或失焦保存，Esc 取消；输入法选词不提交。
+保存前清理首尾空格，拒绝空名称和纯空白；`maxlength` 可限制长度，`validate(name)` 可返回
+业务错误文案，返回 `undefined` 表示通过。名称未变化直接退出，不请求。
+保存期间只读并显示 loading，失败保留草稿及错误提示，允许重新聚焦后修改、重试或取消。
+名称展示区域保留父级点击行为，编辑按钮和输入区域阻止点击冒泡。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import MkEditName from '@/components/mk-edit-name/index.vue'
+
+const documentName = ref('DataEase 快速入门')
+// 示例：真实使用时在这里等待业务 API，返回服务端最终名称。
+async function saveDocumentName(name: string): Promise<string> {
+  return name
+}
+</script>
+
+<template>
+  <MkEditName v-model="documentName" :save="saveDocumentName" />
+</template>
+```
+
+表格通过列默认插槽使用，列表以资源 ID 为 key；该列不再启用 `show-overflow-tooltip`，避免编辑时
+叠加表格提示。单元格可用宽度控制组件宽度，业务图标在编辑态隐藏。
 
 ### MkEditAvatar（修改头像）
 

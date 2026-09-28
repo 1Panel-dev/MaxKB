@@ -181,7 +181,7 @@ onMounted(() => loadChatLogs())
   >
     <el-table-column type="selection" width="40" />
     <el-table-column prop="abstract" label="摘要" min-width="220" show-overflow-tooltip />
-    <el-table-column prop="chat_record_count" label="对话提问数" width="100" />
+    <el-table-column prop="chat_record_count" label="对话次数" width="100" />
     <el-table-column width="140">
       <template #header>
         <MkTableFilter

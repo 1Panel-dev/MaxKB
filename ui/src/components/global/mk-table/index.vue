@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, type VNode } from 'vue'
 import type { TableInstance } from 'element-plus'
 import LayoutBatchFooter from '../mk-view-layout/LayoutBatchFooter.vue'
 import { useSortable, type SortableChange } from '@/utils/use-sortable'
@@ -39,6 +39,12 @@ const emit = defineEmits<{
 }>()
 
 const tableRef = ref<TableInstance>()
+
+defineSlots<{
+  default?: () => VNode[]
+  'body-prepend'?: () => VNode[]
+  'footer-batch-actions'?: () => VNode[]
+}>()
 
 /** 行排序：只处理当前传入的平面数据，保持显示顺序与数组索引一致。 */
 const sortableRows = computed({
@@ -126,7 +132,11 @@ defineExpose({ clearSelection, tableRef })
   <div class="mk-table relative flex-column w-full min-h-0 flex-1">
     <el-table
       ref="tableRef"
-      :class="{ 'mk-table__resizable--borderless': props.resizable, small: props.size === 'small' }"
+      :class="{
+        'mk-table__resizable--borderless': props.resizable,
+        'mk-table__body-prepend': !!$slots['body-prepend'],
+        small: props.size === 'small',
+      }"
       :data="props.data"
       :max-height="tableHeight"
       :row-key="props.rowKey"
@@ -135,6 +145,9 @@ defineExpose({ clearSelection, tableRef })
       @selection-change="handleSelectionChange"
     >
       <slot />
+      <template v-if="$slots['body-prepend']" #append>
+        <slot name="body-prepend" />
+      </template>
     </el-table>
 
     <div class="mt-4 flex justify-end" v-if="props.paginationConfig">
@@ -166,6 +179,37 @@ defineExpose({ clearSelection, tableRef })
 </template>
 
 <style scoped lang="scss">
+/* 表体顶部插槽：自然占位并固定在滚动区域顶部，不影响嵌套表格。 */
+:deep(.mk-table__body-prepend) {
+  > .el-table__inner-wrapper > .el-table__body-wrapper {
+    container-type: inline-size;
+
+    > .el-scrollbar > .el-scrollbar__wrap > .el-scrollbar__view {
+      display: flex !important;
+      flex-direction: column;
+      min-width: 100%;
+      width: max-content;
+
+      > .el-table__append-wrapper {
+        background: var(--el-bg-color);
+        border-bottom: var(--el-table-border);
+        flex-shrink: 0;
+        left: 0;
+        order: -1;
+        position: sticky;
+        top: 0;
+        width: 100cqw;
+        z-index: 3;
+      }
+
+      > .el-table__body,
+      > .el-table__empty-block {
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
 :deep(.mk-table__resizable--borderless) {
   border: none !important;
 
