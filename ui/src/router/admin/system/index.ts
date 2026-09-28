@@ -12,7 +12,7 @@ export const systemRoutes: RouteRecordRaw = {
     {
       path: 'home',
       name: 'system-home',
-      component: () => import('@/views/system/index.vue'),
+      component: () => import('@/views/system/home/index.vue'),
       meta: {
         title: '首页',
         activeIcon: 'icon_screen_filled',

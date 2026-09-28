@@ -4,8 +4,7 @@ import type { ApplicationDetail, ApplicationFormPayload, Dict, PromptGeneratePay
 import { getWorkspaceId } from '@/utils/resource-context'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
-const getPrefix = () => {
-  const workspaceId = getWorkspaceId()
+const getPrefix = (workspaceId = getWorkspaceId()) => {
   return `/workspace/${workspaceId}/application`
 }
 
@@ -17,8 +16,8 @@ const getAllApplication = (query?: Dict<unknown>) => {
 }
 
 /** 获取工作空间智能体列表。 */
-const getApplicationPage = (page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<ApplicationDetail>>(`${getPrefix()}/${page.currentPage}/${page.pageSize}`, query)
+const getApplicationPage = (page: ParamsPage, query?: Dict<unknown>, workspaceId?: string) => {
+  return get<ResponsePage<ApplicationDetail>>(`${getPrefix(workspaceId)}/${page.currentPage}/${page.pageSize}`, query)
 }
 
 /** 获取工作空间智能体详情。 */
