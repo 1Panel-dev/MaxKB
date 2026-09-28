@@ -77,6 +77,7 @@ from knowledge.services.paragraph_assets import (
     sync_paragraph_assets,
     validate_paragraph_file_references,
 )
+from knowledge.services.paragraph_files import migrate_paragraph_files
 from knowledge.services import validate_knowledge_file_size
 from knowledge.services.retrieval_stats import (
     collect_recall_asset_ids,
@@ -2055,6 +2056,243 @@ class SyncedParagraphCleanupTests(SimpleTestCase):
         delete_vectors.assert_called_once_with(["synced-id"])
         paragraph_query.filter.return_value.delete.assert_called_once()
         self.assertEqual(result, ["synced-id"])
+
+
+class ParagraphFileMigrationTests(SimpleTestCase):
+    @patch("knowledge.serializers.paragraph.QuerySet")
+    def test_target_document_must_belong_to_target_knowledge(self, query_set):
+        source_knowledge_id = "00000000-0000-0000-0000-000000000001"
+        target_knowledge_id = "00000000-0000-0000-0000-000000000002"
+        source_document_id = "00000000-0000-0000-0000-000000000003"
+        target_document_id = "00000000-0000-0000-0000-000000000004"
+        knowledge_query = MagicMock()
+        knowledge_query.filter.return_value.exists.return_value = True
+        document_query = MagicMock()
+        document_query.filter.return_value = [
+            Document(id=source_document_id, knowledge_id=source_knowledge_id),
+            Document(id=target_document_id, knowledge_id=source_knowledge_id),
+        ]
+        query_set.side_effect = lambda model: {Knowledge: knowledge_query, Document: document_query}[model]
+        serializer = ParagraphSerializers.Migrate(
+            data={
+                "workspace_id": "workspace",
+                "knowledge_id": source_knowledge_id,
+                "target_knowledge_id": target_knowledge_id,
+                "document_id": source_document_id,
+                "target_document_id": target_document_id,
+                "paragraph_id_list": ["00000000-0000-0000-0000-000000000005"],
+            }
+        )
+
+        with self.assertRaises(AppApiException):
+            serializer.is_valid(raise_exception=True)
+
+    @patch("knowledge.serializers.paragraph.update_document_char_length")
+    @patch("knowledge.serializers.paragraph.update_embedding_document_id")
+    @patch("knowledge.serializers.paragraph.migrate_paragraph_files")
+    @patch("knowledge.serializers.paragraph.Paragraph.objects")
+    @patch("knowledge.serializers.paragraph.QuerySet")
+    def test_paragraph_migration_moves_files_before_owner_update(
+        self, query_set, paragraph_objects, move_files, _update_embedding, _update_char_length
+    ):
+        knowledge_id = "00000000-0000-0000-0000-000000000001"
+        source_document_id = "00000000-0000-0000-0000-000000000002"
+        target_document_id = "00000000-0000-0000-0000-000000000003"
+        paragraph = Paragraph(id="00000000-0000-0000-0000-000000000004")
+        paragraph_list = MagicMock()
+        paragraph_list.__iter__.return_value = iter([paragraph])
+        paragraph_query = MagicMock()
+        paragraph_query.filter.return_value = paragraph_list
+        knowledge_query = MagicMock()
+        target_knowledge = Knowledge(id=knowledge_id)
+        knowledge_query.filter.return_value.first.return_value = target_knowledge
+        mapping_query = MagicMock()
+        mapping_query.filter.return_value = []
+        query_set.side_effect = lambda model: {
+            Paragraph: paragraph_query,
+            Knowledge: knowledge_query,
+            ProblemParagraphMapping: mapping_query,
+        }[model]
+        paragraph_objects.filter.return_value.__iter__.return_value = iter([])
+        serializer = MagicMock(
+            data={
+                "knowledge_id": knowledge_id,
+                "target_knowledge_id": knowledge_id,
+                "document_id": source_document_id,
+                "target_document_id": target_document_id,
+                "paragraph_id_list": [str(paragraph.id)],
+            }
+        )
+
+        ParagraphSerializers.Migrate.migrate.__wrapped__(serializer, with_valid=False)
+
+        move_files.assert_called_once_with(paragraph_list, target_document_id, target_knowledge)
+        paragraph_list.update.assert_called_once_with(document_id=target_document_id)
+
+    @patch.object(Paragraph, "save")
+    @patch.object(File, "save", autospec=True)
+    @patch("knowledge.services.paragraph_files.File.objects")
+    @patch("knowledge.services.paragraph_files.ParagraphAsset.objects")
+    def test_document_owned_file_is_copied_with_moved_paragraph(
+        self, asset_objects, file_objects, save_file, save_paragraph
+    ):
+        file_id = "00000000-0000-0000-0000-000000000001"
+        paragraph_id = "00000000-0000-0000-0000-000000000002"
+        asset_id = "00000000-0000-0000-0000-000000000003"
+        source_file = File(
+            id=file_id,
+            file_name="image.png",
+            source_type=FileSourceType.DOCUMENT,
+            source_id="old-document",
+            meta={"content_type": "image/png", "original_size": 5},
+        )
+        source_file.get_bytes = MagicMock(return_value=b"image")
+        file_objects.filter.return_value = [source_file]
+        asset_objects.filter.return_value.values.return_value = [
+            {"id": asset_id, "paragraph_id": paragraph_id, "file_id": file_id}
+        ]
+        paragraph = Paragraph(
+            id=paragraph_id,
+            knowledge_id="old-knowledge",
+            document_id="old-document",
+            content=f"![image](./oss/file/{file_id})",
+            content_schema=[{"type": "image", "file_id": file_id}],
+            source_snapshot={"content": f"![image](./oss/file/{file_id})"},
+            chunks=[f"./oss/file/{file_id}"],
+        )
+        target_knowledge = Knowledge(id="new-knowledge", file_size_limit=1)
+
+        migrate_paragraph_files([paragraph], "new-document", target_knowledge)
+
+        copied, content = save_file.call_args.args
+        self.assertEqual(content, b"image")
+        self.assertEqual(copied.source_type, FileSourceType.PARAGRAPH)
+        self.assertEqual(copied.source_id, paragraph_id)
+        self.assertEqual(copied.meta["original_size"], len(content))
+        self.assertIn(str(copied.id), paragraph.content)
+        self.assertEqual(paragraph.content_schema[0]["file_id"], str(copied.id))
+        self.assertIn(str(copied.id), paragraph.source_snapshot["content"])
+        self.assertIn(str(copied.id), paragraph.chunks[0])
+        save_paragraph.assert_called_once()
+        asset_objects.filter.return_value.update.assert_any_call(file_id=str(copied.id))
+        asset_objects.filter.return_value.update.assert_any_call(
+            document_id="new-document", knowledge_id=target_knowledge.id
+        )
+        self.assertEqual(source_file.source_id, "old-document")
+
+    @patch.object(Paragraph, "save")
+    @patch.object(File, "save", autospec=True)
+    @patch("knowledge.services.paragraph_files.File.objects")
+    @patch("knowledge.services.paragraph_files.ParagraphAsset.objects")
+    def test_same_knowledge_document_move_copies_document_attachment(
+        self, asset_objects, file_objects, save_file, save_paragraph
+    ):
+        file_id = "00000000-0000-0000-0000-000000000001"
+        paragraph_id = "00000000-0000-0000-0000-000000000002"
+        source_file = File(
+            id=file_id,
+            file_name="attachment.pdf",
+            source_type=FileSourceType.DOCUMENT,
+            source_id="old-document",
+        )
+        source_file.get_bytes = MagicMock(return_value=b"attachment")
+        file_objects.filter.return_value = [source_file]
+        asset_objects.filter.return_value.values.return_value = []
+        paragraph = Paragraph(
+            id=paragraph_id,
+            knowledge_id="same-knowledge",
+            document_id="old-document",
+            content=f"[attachment](./oss/file/{file_id})",
+        )
+
+        migrate_paragraph_files([paragraph], "new-document", Knowledge(id="same-knowledge"))
+
+        copied = save_file.call_args.args[0]
+        self.assertEqual(copied.source_type, FileSourceType.PARAGRAPH)
+        self.assertEqual(copied.source_id, paragraph_id)
+        self.assertIn(str(copied.id), paragraph.content)
+        save_paragraph.assert_called_once()
+        asset_objects.filter.return_value.update.assert_called_once_with(
+            document_id="new-document", knowledge_id="same-knowledge"
+        )
+
+    @patch.object(Paragraph, "save")
+    @patch.object(File, "save", autospec=True)
+    @patch("knowledge.services.paragraph_files.File.objects")
+    @patch("knowledge.services.paragraph_files.ParagraphAsset.objects")
+    def test_paragraph_owned_file_keeps_its_id_when_owner_moves(
+        self, asset_objects, file_objects, save_file, save_paragraph
+    ):
+        paragraph_id = "00000000-0000-0000-0000-000000000002"
+        file_id = "00000000-0000-0000-0000-000000000001"
+        file_objects.filter.return_value = [
+            File(id=file_id, source_type=FileSourceType.PARAGRAPH, source_id=paragraph_id, meta={"original_size": 5})
+        ]
+        asset_objects.filter.return_value.values.return_value = [
+            {"id": "asset-id", "paragraph_id": paragraph_id, "file_id": file_id}
+        ]
+        paragraph = Paragraph(
+            id=paragraph_id,
+            knowledge_id="old-knowledge",
+            document_id="old-document",
+            content=f"![image](./oss/file/{file_id})",
+        )
+        target_knowledge = Knowledge(id="new-knowledge", file_size_limit=1)
+
+        migrate_paragraph_files([paragraph], "new-document", target_knowledge)
+
+        save_file.assert_not_called()
+        save_paragraph.assert_not_called()
+        self.assertIn(file_id, paragraph.content)
+        asset_objects.filter.return_value.update.assert_called_once_with(
+            document_id="new-document", knowledge_id=target_knowledge.id
+        )
+
+    @patch.object(Paragraph, "save")
+    @patch.object(File, "save", autospec=True)
+    @patch("knowledge.services.paragraph_files.File.objects")
+    @patch("knowledge.services.paragraph_files.ParagraphAsset.objects")
+    def test_cross_knowledge_move_checks_target_limit_before_copy(
+        self, asset_objects, file_objects, save_file, save_paragraph
+    ):
+        file_id = "00000000-0000-0000-0000-000000000001"
+        file_objects.filter.return_value = [
+            File(
+                id=file_id,
+                source_type=FileSourceType.PARAGRAPH,
+                source_id="00000000-0000-0000-0000-000000000002",
+                meta={"original_size": 1024 * 1024 + 1},
+            )
+        ]
+        asset_objects.filter.return_value.values.return_value = []
+        paragraph = Paragraph(id="00000000-0000-0000-0000-000000000002", knowledge_id="old-knowledge")
+
+        with self.assertRaises(AppApiException):
+            migrate_paragraph_files([paragraph], "new-document", Knowledge(id="new-knowledge", file_size_limit=1))
+
+        save_file.assert_not_called()
+        save_paragraph.assert_not_called()
+        asset_objects.filter.return_value.update.assert_not_called()
+
+    @patch.object(File, "save", autospec=True)
+    @patch("knowledge.services.paragraph_files.File.objects")
+    @patch("knowledge.services.paragraph_files.ParagraphAsset.objects")
+    def test_migration_rejects_file_owned_by_another_resource(self, asset_objects, file_objects, save_file):
+        file_id = "00000000-0000-0000-0000-000000000001"
+        file_objects.filter.return_value = [File(id=file_id, source_type=FileSourceType.CHAT, source_id="chat-id")]
+        asset_objects.filter.return_value.values.return_value = []
+        paragraph = Paragraph(
+            id="00000000-0000-0000-0000-000000000002",
+            knowledge_id="old-knowledge",
+            document_id="old-document",
+            content=f"[attachment](./oss/file/{file_id})",
+        )
+
+        with self.assertRaises(AppApiException):
+            migrate_paragraph_files([paragraph], "new-document", Knowledge(id="new-knowledge"))
+
+        save_file.assert_not_called()
+        asset_objects.filter.return_value.update.assert_not_called()
 
 
 class ParagraphAssetTests(SimpleTestCase):

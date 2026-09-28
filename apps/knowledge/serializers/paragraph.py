@@ -28,6 +28,7 @@ from knowledge.models import (
 )
 from knowledge.services.document_strategy import stable_hash
 from knowledge.services.paragraph_assets import validate_paragraph_file_references
+from knowledge.services.paragraph_files import migrate_paragraph_files
 from knowledge.serializers.common import (
     BatchSerializer,
     ProblemParagraphManage,
@@ -702,24 +703,24 @@ class ParagraphSerializers(serializers.Serializer):
             )
             document_id = self.data.get("document_id")
             target_document_id = self.data.get("target_document_id")
+            target_knowledge_id = self.data.get("target_knowledge_id")
             if document_id == target_document_id:
                 raise AppApiException(5000, _("The document to be migrated is consistent with the target document"))
-            if len([document for document in document_list if str(document.id) == self.data.get("document_id")]) < 1:
-                raise AppApiException(
-                    5000,
-                    _("The document id does not exist [{document_id}]").format(
-                        document_id=self.data.get("document_id")
-                    ),
-                )
-            if (
-                len([document for document in document_list if str(document.id) == self.data.get("target_document_id")])
-                < 1
+            if not any(
+                str(document.id) == document_id and str(document.knowledge_id) == self.data.get("knowledge_id")
+                for document in document_list
             ):
                 raise AppApiException(
                     5000,
-                    _("The target document id does not exist [{document_id}]").format(
-                        document_id=self.data.get("target_document_id")
-                    ),
+                    _("The document id does not exist [{document_id}]").format(document_id=document_id),
+                )
+            if not any(
+                str(document.id) == target_document_id and str(document.knowledge_id) == target_knowledge_id
+                for document in document_list
+            ):
+                raise AppApiException(
+                    5000,
+                    _("The target document id does not exist [{document_id}]").format(document_id=target_document_id),
                 )
 
         @transaction.atomic
@@ -734,6 +735,10 @@ class ParagraphSerializers(serializers.Serializer):
             paragraph_list = QuerySet(Paragraph).filter(
                 knowledge_id=knowledge_id, document_id=document_id, id__in=paragraph_id_list
             )
+            target_knowledge = QuerySet(Knowledge).filter(id=target_knowledge_id).first()
+            if target_knowledge is None:
+                raise AppApiException(500, _("Knowledge id does not exist"))
+            migrate_paragraph_files(paragraph_list, target_document_id, target_knowledge)
             problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(paragraph__in=paragraph_list)
             # 同数据集迁移
             if target_knowledge_id == knowledge_id:
@@ -795,7 +800,6 @@ class ParagraphSerializers(serializers.Serializer):
                 QuerySet(ProblemParagraphMapping).bulk_update(
                     problem_paragraph_mapping_list, ["problem_id", "knowledge_id", "document_id"]
                 )
-                target_knowledge = QuerySet(Knowledge).filter(id=target_knowledge_id).first()
                 knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
                 embedding_model_id = None
                 if target_knowledge.embedding_model_id != knowledge.embedding_model_id:

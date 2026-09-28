@@ -37,7 +37,7 @@ from knowledge.services import validate_knowledge_file_size
 
 
 IMAGE_PATTERN = re.compile(r"!\[(?P<caption>[^\]]*)\]\([^)]*/oss/file/(?P<file_id>[0-9a-fA-F-]{32,36})[^)]*\)")
-FILE_REFERENCE_PATTERN = re.compile(r"/oss/file/(?P<file_id>[0-9a-fA-F-]{32,36})(?![0-9a-fA-F-])")
+FILE_REFERENCE_PATTERN = re.compile(r"/oss/(?:file|image)/(?P<file_id>[0-9a-fA-F-]{32,36})(?![0-9a-fA-F-])")
 
 
 def validate_paragraph_file_references(knowledge_id, contents: Iterable[str]) -> None:
