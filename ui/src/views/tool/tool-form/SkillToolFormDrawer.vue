@@ -273,7 +273,7 @@ defineExpose({ open })
           >
             <template #download>
               <el-button v-if="editId" :disabled="loading" link @click="handleDownload">
-                <MkIcon name="icon_download_outlined" :size="16" class="text-N600" />
+                <MkIcon name="icon_download_outlined" class="text-N600" />
               </el-button>
             </template>
           </MkDragUpload>

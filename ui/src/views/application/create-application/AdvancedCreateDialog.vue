@@ -157,7 +157,7 @@ defineExpose({ open })
             @click="handleTemplateSelect('blank')"
           >
             <div class="flex-align-center h-full justify-center gap-2">
-              <MkIcon name="icon_add_outlined" :size="16" />
+              <MkIcon name="icon_add_outlined" />
               <span>空白创建</span>
             </div>
           </el-card>

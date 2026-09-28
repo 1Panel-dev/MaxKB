@@ -127,7 +127,14 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       const isFirstMessage = messages.value.length === 0
       const abstract = questionText.substring(0, 256)
       if (isFirstMessage && !conversations.value.some((conversation) => conversation.id === chatId)) {
-        conversations.value.unshift({ id: chatId, abstract: questionText ? abstract : '新对话' })
+        // 本地新会话尚未由历史接口返回，使用首次发送时间展示相对时间。
+        const createTime = new Date().toISOString()
+        conversations.value.unshift({
+          id: chatId,
+          abstract: questionText ? abstract : '新对话',
+          create_time: createTime,
+          update_time: createTime,
+        })
       }
 
       // 一次遍历完成附件分类，仅提交有附件的字段。

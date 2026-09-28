@@ -1,69 +1,69 @@
-import { ref, computed, inject, type InjectionKey } from 'vue'
+import { computed, inject, ref, type InjectionKey } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import type { Conversation } from '../../core/types'
 
-// 只声明本组件真正用到的依赖(接口隔离到函数级)
+// 由 Chat / Debug 入口注入本组件需要的会话接口。
 export interface ConversationListDeps {
-  pageConversations: (page: number, size: number) => Promise<any>
-  remove: (id: string) => Promise<any>
-  rename: (id: string, data: { abstract: string }) => Promise<any>
+  pageConversations: (page: number, size: number) => Promise<{ records?: Conversation[] } | null | undefined>
+  remove: (id: string) => Promise<unknown>
+  rename: (id: string, data: { abstract: string }) => Promise<unknown>
 }
 
-/**
- * conversation-list 组件 store:本组件独有——会话列表 + 当前会话 + 应用信息 + 左侧开合。
- */
+/** 管理左侧会话列表、当前会话和侧栏展示状态。 */
 export function createConversationListStore(deps: ConversationListDeps) {
   const { pageConversations, remove, rename } = deps
 
-  // 切换会话时主动驱动 message-list 加载。延迟绑定(view 里 bindLoader(msgs.load)),
-  // 以打破「list 需要 msgs.load、msgs 需要 list 的 currentChatId」的实例化环。
-  let loadMessages: () => void = () => {}
-  const bindLoader = (fn: () => void) => (loadMessages = fn)
-
-  const conversations = ref<Conversation[]>([])
-  const currentChatId = ref('')
+  // 应用信息与侧栏开合
   const appInfo = ref<{ name: string; icon: string } | null>(null)
   const leftSideOpen = ref(true)
-  // composer 重置信号:新建/切换会话时自增,message-input 监听后清空暂存文件与输入
-  const composerResetSignal = ref(0)
 
-  const currentConversation = computed(
-    () => conversations.value.find((c) => c.id === currentChatId.value) || null,
-  )
+  const toggleLeftSide = () => (leftSideOpen.value = !leftSideOpen.value)
 
-  // 列表分页
+  // 历史会话分页
+  const conversations = ref<Conversation[]>([])
   const pageSize = 50
-  const page = ref(1)
+  const currentPage = ref(1)
   const hasMore = ref(true)
 
-  const loadConversations = async (p = 1) => {
+  const loadConversations = async (page = 1) => {
     try {
-      const res = await pageConversations(p, pageSize)
-      const records = res?.records || []
-      conversations.value = p === 1 ? records : [...conversations.value, ...records]
-      page.value = p
+      const response = await pageConversations(page, pageSize)
+      const records = response?.records || []
+      conversations.value = page === 1 ? records : [...conversations.value, ...records]
+      currentPage.value = page
       hasMore.value = records.length >= pageSize
-    } catch (e) {
-      // 历史接口在部分模式下可能不存在,静默处理
+    } catch {
+      // 部分模式可能不提供历史接口，加载失败时保留现有列表和分页状态。
     }
   }
+
   const loadMore = async () => {
     if (!hasMore.value) return
-    await loadConversations(page.value + 1)
+    await loadConversations(currentPage.value + 1)
   }
+
+  // 当前会话与输入区重置
+  const currentChatId = ref('')
+  const currentConversation = computed(() => conversations.value.find((conversation) => conversation.id === currentChatId.value) || null)
+  // 新建或切换会话时递增，由 message-input 监听并清空暂存文件与输入。
+  const composerResetSignal = ref(0)
+
+  // View 在两个 Store 创建后绑定加载方法，避免与 message-list 循环初始化。
+  let loadMessages: () => void = () => {}
+  const bindLoader = (loader: () => void) => (loadMessages = loader)
 
   const resetComposer = () => {
     composerResetSignal.value++
   }
 
-  // 惰性取 chat_id:已有原样返回,为空才前端生成(幂等,保证上传文件 source_id 与发送一致)
+  // 仅在需要时生成会话 ID，保证上传文件的 source_id 与发送消息使用同一 ID。
   const getChatId = () => {
     if (currentChatId.value) return currentChatId.value
     currentChatId.value = uuidv4()
     return currentChatId.value
   }
 
-  // 先写入单一数据源 currentChatId,再驱动 message-list 加载(load 内部读 currentChatId)
+  // 消息加载会读取 currentChatId，必须先更新 ID 再触发加载。
   const selectConversation = (id: string) => {
     resetComposer()
     currentChatId.value = id
@@ -76,10 +76,12 @@ export function createConversationListStore(deps: ConversationListDeps) {
     loadMessages()
   }
 
+  // 会话维护：请求成功后更新本地列表。
   const deleteChat = async (id: string) => {
     await remove(id)
-    const idx = conversations.value.findIndex((c) => c.id === id)
-    if (idx >= 0) conversations.value.splice(idx, 1)
+    const conversationIndex = conversations.value.findIndex((conversation) => conversation.id === id)
+    if (conversationIndex >= 0) conversations.value.splice(conversationIndex, 1)
+
     if (currentChatId.value === id) {
       currentChatId.value = conversations.value[0]?.id || ''
       loadMessages()
@@ -88,8 +90,8 @@ export function createConversationListStore(deps: ConversationListDeps) {
 
   const renameChat = async (id: string, name: string) => {
     await rename(id, { abstract: name })
-    const c = conversations.value.find((x) => x.id === id)
-    if (c) c.abstract = name
+    const conversation = conversations.value.find((conversation) => conversation.id === id)
+    if (conversation) conversation.abstract = name
   }
 
   return {
@@ -109,12 +111,13 @@ export function createConversationListStore(deps: ConversationListDeps) {
     newConversation,
     deleteChat,
     renameChat,
-    toggleLeftSide: () => (leftSideOpen.value = !leftSideOpen.value),
+    toggleLeftSide,
   }
 }
 
 export type ConversationListStore = ReturnType<typeof createConversationListStore>
 
+// 会话视图内共享 Store
 export const CONVERSATION_LIST_KEY: InjectionKey<ConversationListStore> = Symbol('conversation-list')
 
 export function useConversationListStore(): ConversationListStore {

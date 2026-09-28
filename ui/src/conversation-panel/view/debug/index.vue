@@ -41,12 +41,10 @@ onMounted(() => {
   bundle.list.loadConversations()
 })
 onBeforeUnmount(() => bundle.msgs.cancel())
-watch(
-  () => bundle.list.currentChatId.value,
-  () => {
-    if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
-  },
-)
+// 新建或重新选择会话时，即使会话 ID 不变也收起左侧抽屉。
+watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSignal.value], () => {
+  if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
+})
 </script>
 
 <template>

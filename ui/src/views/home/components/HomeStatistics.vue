@@ -86,7 +86,6 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
                   <div class="flex-align-center gap-2" :title="series.name">
                     <MkIcon
                       :name="index === 0 ? 'icon_thumbsup_filled' : 'icon_thumbdown_filled'"
-                      :size="16"
                       class="shrink-0"
                       :class="index === 0 ? 'text-[#FFC60A]!' : 'text-danger!'"
                     />

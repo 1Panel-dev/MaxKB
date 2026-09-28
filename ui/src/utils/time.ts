@@ -57,3 +57,20 @@ export function dateFormat<T extends Timestamp>(timestamp: T): string | T {
 
   return formatDateParts(date)
 }
+
+/**
+ * 格式化相对时间：不足 10 分钟显示“刚刚”，不足 1 小时按 10 分钟向下取整，
+ * 不足 24 小时显示整小时，不足 8 天显示整天，其余显示 YYYY-MM-DD。
+ * 空值或无效时间返回空字符串，未来时间显示“刚刚”；天数按每 24 小时计算。
+ */
+export function relativeTimeFormat(timestamp: Timestamp): string {
+  const date = getCheckedDate(timestamp)
+  if (!date) return ''
+
+  const elapsedMinutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000))
+  if (elapsedMinutes < 10) return '刚刚'
+  if (elapsedMinutes < 60) return `${Math.floor(elapsedMinutes / 10) * 10}分钟前`
+  if (elapsedMinutes < 1440) return `${Math.floor(elapsedMinutes / 60)}小时前`
+  if (elapsedMinutes < 8 * 1440) return `${Math.floor(elapsedMinutes / 1440)}天前`
+  return formatDateParts(date)
+}

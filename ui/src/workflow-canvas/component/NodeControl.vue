@@ -104,22 +104,12 @@ async function layout() {
   <el-card class="absolute bottom-4 right-4 z-10" shadow="always" style="--el-card-padding: 8px" @pointerdown.stop @wheel.stop>
     <div class="flex-align-center gap-2">
       <!-- 切换为框选节点 -->
-      <el-button
-        text
-        :class="selectionMode ? 'bg-primary/10! text-primary!' : 'text-N600!'"
-        :aria-pressed="selectionMode"
-        @click="changeCursor(true)"
-      >
+      <el-button text :class="{ 'bg-primary/10! text-primary!': selectionMode }" :aria-pressed="selectionMode" @click="changeCursor(true)">
         <MkIcon name="icon_cursor_outlined" :size="18" />
       </el-button>
 
       <!-- 切换为拖动画布 -->
-      <el-button
-        text
-        :class="!selectionMode ? 'bg-primary/10! text-primary!' : 'text-N600!'"
-        :aria-pressed="!selectionMode"
-        @click="changeCursor(false)"
-      >
+      <el-button text :class="{ 'bg-primary/10! text-primary!': !selectionMode }" :aria-pressed="!selectionMode" @click="changeCursor(false)">
         <MkIcon name="icon_raisehand_outlined" :size="18" />
       </el-button>
 

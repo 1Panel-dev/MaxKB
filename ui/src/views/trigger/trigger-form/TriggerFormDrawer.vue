@@ -370,7 +370,7 @@ defineExpose({ open })
                       <el-input v-model="eventUrl" readonly>
                         <template #suffix>
                           <el-button text @click="copyText(eventUrl)" class="-mr-1">
-                            <MkIcon name="icon_copy_outlined" class="text-N600" />
+                            <MkIcon name="icon_copy_outlined" />
                           </el-button>
                         </template>
                       </el-input>
@@ -380,11 +380,11 @@ defineExpose({ open })
                       <el-input v-model="form.trigger_setting.token" readonly>
                         <template #suffix>
                           <el-button text @click="copyText(form.trigger_setting.token)">
-                            <MkIcon name="icon_copy_outlined" class="text-N600" />
+                            <MkIcon name="icon_copy_outlined" />
                           </el-button>
                           <!-- 刷新Token -->
                           <el-button text @click="handleRefreshToken" class="-mr-1">
-                            <MkIcon name="icon_refresh_outlined" class="text-N600" />
+                            <MkIcon name="icon_refresh_outlined" />
                           </el-button>
                         </template>
                       </el-input>

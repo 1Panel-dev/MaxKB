@@ -85,7 +85,7 @@ function handleSelect(value: TableFilterValue) {
     <!-- 打开表头筛选 -->
     <el-button text>
       <span class="mr-1 font-semibold">{{ label }}</span>
-      <MkIcon name="icon-filter" :class="hasSelection ? 'text-primary!' : 'text-N600'" />
+      <MkIcon name="icon-filter" :class="{ 'text-primary!': hasSelection }" />
     </el-button>
   </component>
 </template>
