@@ -145,7 +145,7 @@ onMounted(() => loadChatUserGroups())
 
 <template>
   <div v-loading="loading" class="-mx-6 -mb-6 flex min-h-0 flex-1">
-    <aside class="flex-column w-sidebar-expanded shrink-0 border-r">
+    <aside class="flex-column h-layout-content w-sidebar-expanded shrink-0 border-r">
       <div class="shrink-0 p-4">
         <h4>用户组</h4>
       </div>
@@ -153,7 +153,7 @@ onMounted(() => loadChatUserGroups())
       <MkSearchList :data="chatUserGroups" :default-active="currentGroup?.id" @click="handleSelectGroup" />
     </aside>
 
-    <section class="flex-column min-w-0 flex-1 pl-6">
+    <section class="flex-column min-w-0 flex-1 px-6">
       <template v-if="currentGroup">
         <div class="flex-between shrink-0 gap-4 py-4">
           <div class="flex-align-center min-w-0 flex-1 gap-2">

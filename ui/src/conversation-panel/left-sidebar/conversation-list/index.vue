@@ -33,6 +33,8 @@ const conversationTime = (conversation: Conversation) => relativeTimeFormat(conv
     </MkListItem>
     <div class="flex-between pl-2 mt-4">
       <div class="text-N600 font-medium">历史对话</div>
+
+      <!-- // TODO: 全部清空对话 -->
       <el-button text>
         <MkIcon name="icon_delete-trash_outlined" />
       </el-button>

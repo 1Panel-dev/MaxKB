@@ -2,7 +2,7 @@
 import { onMounted, ref, watch } from 'vue'
 import SystemHomepageApi from '@/api/admin/system/homepage'
 import WorkspaceApi from '@/api/admin/system/workspace'
-import ApplicationApi from '@/api/admin/workspace/application/application'
+import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { ApplicationDetail, WorkspaceItem } from '@/api/types'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import { useStore } from '@/stores'
@@ -36,7 +36,10 @@ const applicationsLoading = ref(false)
 const selectedApplication = ref<ApplicationDetail>()
 function loadApplications(query = '') {
   applicationsLoading.value = true
-  return ApplicationApi.getApplicationPage({ currentPage: 1, pageSize: 200 }, { name: query }, selectedWorkspaceId.value)
+  return SystemApplicationApi.getApplicationPage(
+    { currentPage: 1, pageSize: 200 },
+    { name: query, workspace_ids: JSON.stringify([selectedWorkspaceId.value]) },
+  )
     .then((result) => {
       applications.value = result.records
     })
