@@ -289,11 +289,9 @@ class SystemHomePageSerializer(serializers.Serializer):
                     auth, data["user_id"], data.get("workspace_id")
                 ),
             )
-            return {
-                "total_tokens": query.aggregate(
-                    total_tokens=Coalesce(Sum(F("message_tokens") + F("answer_tokens"), output_field=IntegerField()), 0)
-                )["total_tokens"]
-            }
+            return query.aggregate(
+                total_tokens=Coalesce(Sum(F("message_tokens") + F("answer_tokens"), output_field=IntegerField()), 0)
+            )["total_tokens"]
 
     class ChatRecordAggregation(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, allow_null=True, label=_("Workspace ID"))
@@ -312,7 +310,7 @@ class SystemHomePageSerializer(serializers.Serializer):
                     auth, data["user_id"], data.get("workspace_id")
                 ),
             )
-            return {"total_count": query.aggregate(total_count=Count("id"))["total_count"]}
+            return {query.aggregate(total_count=Count("id"))["total_count"]}
 
     class ApplicationTokensRanking(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, allow_null=True, label=_("Workspace ID"))
@@ -371,7 +369,7 @@ class SystemHomePageSerializer(serializers.Serializer):
         def export(self, auth, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            tokens_total = SystemHomePageSerializer.TokensAggregation(data=self.data).aggregation(auth)["total_tokens"]
+            tokens_total = SystemHomePageSerializer.TokensAggregation(data=self.data).aggregation(auth)
             queryset = self.get_queryset(auth, with_valid=False)
             workbook = openpyxl.Workbook(write_only=True)
             worksheet = workbook.create_sheet(title="Sheet1")
@@ -561,7 +559,7 @@ class SystemHomePageSerializer(serializers.Serializer):
         def export(self, auth, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            token_count = SystemHomePageSerializer.TokensAggregation(data=self.data).aggregation(auth)["total_tokens"]
+            token_count = SystemHomePageSerializer.TokensAggregation(data=self.data).aggregation(auth)
             queryset, asker_map = self.get_queryset(auth, with_valid=False)
             workbook = openpyxl.Workbook(write_only=True)
             worksheet = workbook.create_sheet(title="Sheet1")
