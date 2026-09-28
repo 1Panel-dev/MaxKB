@@ -6,8 +6,10 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
-import { TOOL_TYPE } from '@/api/enums'
+import { FILE_SOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
+import FileApi from '@/api/admin/file'
 import type { ToolItem, ToolPayload } from '@/api/types'
+import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import { isSystemSharedResource } from '@/utils/resource-context'
@@ -37,34 +39,52 @@ const editId = ref<string>()
 const workflowForm = reactive<WorkflowFormModel>({ desc: '', icon: '', name: '', work_flow: {} })
 const formRules: FormRules<WorkflowFormModel> = { name: [{ whitespace: true, required: true, message: '请输入工作流名称', trigger: 'blur' }] }
 
-function handleSubmit() {
-  formRef.value?.validate((valid) => {
-    if (!valid) return
+// 暂存确认后的头像文件，恢复默认时清空。
+const iconFile = ref<File | null>(null)
+function handleIconChange(file: File | null) {
+  iconFile.value = file
+}
 
-    const payload: ToolPayload = { ...cloneDeep(workflowForm), code: 'None', tool_type: TOOL_TYPE.WORKFLOW }
+function handleSubmit() {
+  return formRef.value?.validate((valid) => {
+    if (!valid || loading.value) return
+
     loading.value = true
     const currentEditId = editId.value
     const isEdit = Boolean(currentEditId)
-    const request = currentEditId
-      ? props.api.putTool(currentEditId, payload)
-      : 'postTool' in props.api
-        ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
-        : Promise.reject(new Error('资源管理不支持创建工具'))
+    // 新头像先上传并替换预览地址，再提交完整工具表单。
+    const uploadIcon = iconFile.value
+      ? FileApi.postUploadFile(iconFile.value, currentEditId, FILE_SOURCE_TYPE.TOOL).request.then((icon) => {
+          workflowForm.icon = icon
+          iconFile.value = null
+        })
+      : Promise.resolve()
 
-    request
-      .then((savedTool) => {
-        const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
-        return refreshCurrentUser.then(() => {
-          MsgSuccess(isEdit ? '保存成功' : '创建成功')
-          visible.value = false
-          if (isEdit) {
-            emit('update', savedTool)
-            return
-          }
+    return uploadIcon
+      .then(() => {
+        const payload: ToolPayload = { ...cloneDeep(workflowForm), code: 'None', tool_type: TOOL_TYPE.WORKFLOW }
+        const request = currentEditId
+          ? props.api.putTool(currentEditId, payload)
+          : 'postTool' in props.api
+            ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
+            : Promise.reject(new Error('资源管理不支持创建工具'))
 
-          return router.push({
-            name: isSystemSharedResource() ? 'system-shared-workflow-tool' : 'workflow-tool',
-            params: isSystemSharedResource() ? { toolId: savedTool.id } : { toolId: savedTool.id, workspaceId: route.params.workspaceId },
+        return request.then((savedTool) => {
+          const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
+          return refreshCurrentUser.then(() => {
+            MsgSuccess(isEdit ? '保存成功' : '创建成功')
+            visible.value = false
+            if (isEdit) {
+              emit('update', savedTool)
+              return
+            }
+
+            return router
+              .push({
+                name: isSystemSharedResource() ? 'system-shared-workflow-tool' : 'workflow-tool',
+                params: isSystemSharedResource() ? { toolId: savedTool.id } : { toolId: savedTool.id, workspaceId: route.params.workspaceId },
+              })
+              .then(() => {})
           })
         })
       })
@@ -100,8 +120,14 @@ function open(tool?: ToolItem, asCopy = false) {
     })
 }
 
+function handleBeforeClose(done: () => void) {
+  if (loading.value) return
+  done()
+}
+
 function resetData() {
   Object.assign(workflowForm, { desc: '', icon: '', name: '', work_flow: {} })
+  iconFile.value = null
   editId.value = undefined
   loading.value = false
   formLoading.value = false
@@ -117,10 +143,10 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="title" @closed="handleClosed">
+  <MkDialog v-model="visible" :before-close="handleBeforeClose" :title="title" @closed="handleClosed">
     <el-form
       ref="formRef"
-      v-loading="formLoading"
+      v-loading="formLoading || loading"
       :model="workflowForm"
       :rules="formRules"
       label-position="top"
@@ -129,8 +155,12 @@ defineExpose({ open })
     >
       <el-form-item label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
-          <!-- // TODO 编辑icon 统一处理 -->
-          <ToolIcon :icon="workflowForm.icon" :size="32" :type="TOOL_TYPE.WORKFLOW" />
+          <!-- 设置工具头像 -->
+          <MkEditAvatar v-model="workflowForm.icon" @change="handleIconChange">
+            <template #default="{ icon }">
+              <ToolIcon :icon="icon" :type="TOOL_TYPE.WORKFLOW" />
+            </template>
+          </MkEditAvatar>
           <el-input
             v-model="workflowForm.name"
             maxlength="64"
@@ -154,7 +184,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading || formLoading" @click="visible = false">取消</el-button>
       <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
         {{ editId ? '保存' : '创建' }}
       </el-button>

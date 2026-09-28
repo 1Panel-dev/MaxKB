@@ -5,8 +5,10 @@ import type { FormInstance, FormRules, UploadFile, UploadFiles, UploadUserFile }
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
-import { TOOL_TYPE } from '@/api/enums'
+import { FILE_SOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
+import FileApi from '@/api/admin/file'
 import type { DynamicFormField, ToolItem, ToolPayload } from '@/api/types'
+import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
@@ -42,6 +44,12 @@ const skillForm = reactive<SkillFormModel>({ code: '', desc: '', fileList: [], i
 const formRules: FormRules<SkillFormModel> = {
   fileList: [{ required: true, message: '请上传 Skill ZIP 文件', trigger: 'change' }],
   name: [{ whitespace: true, required: true, message: '请输入 Skill 名称', trigger: 'blur' }],
+}
+
+// 暂存确认后的头像文件，恢复默认时清空。
+const iconFile = ref<File | null>(null)
+function handleIconChange(file: File | null) {
+  iconFile.value = file
 }
 
 function removeUploadFile(file: UploadFile, fileList: UploadFiles) {
@@ -94,34 +102,44 @@ function handleRemoveFile() {
 }
 
 function handleSubmit() {
-  formRef.value?.validate((valid) => {
-    if (!valid) return
+  return formRef.value?.validate((valid) => {
+    if (!valid || loading.value) return
 
-    const payload: ToolPayload = {
-      code: skillForm.code,
-      desc: skillForm.desc,
-      icon: skillForm.icon,
-      init_field_list: cloneDeep(skillForm.init_field_list),
-      name: skillForm.name,
-      tool_type: TOOL_TYPE.SKILL,
-    }
     loading.value = true
     const currentEditId = editId.value
     const isEdit = Boolean(currentEditId)
-    const request = currentEditId
-      ? props.api.putTool(currentEditId, payload)
-      : 'postTool' in props.api
-        ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
-        : Promise.reject(new Error('资源管理不支持创建工具'))
+    // 新头像先上传并替换预览地址，再提交完整工具表单。
+    const uploadIcon = iconFile.value
+      ? FileApi.postUploadFile(iconFile.value, currentEditId, FILE_SOURCE_TYPE.TOOL).request.then((icon) => {
+          skillForm.icon = icon
+          iconFile.value = null
+        })
+      : Promise.resolve()
 
-    request
-      .then((savedTool) => {
-        const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
-        return refreshCurrentUser.then(() => {
-          MsgSuccess(isEdit ? '保存成功' : '创建成功')
-          visible.value = false
-          if (isEdit) emit('update', savedTool)
-          else emit('refresh')
+    return uploadIcon
+      .then(() => {
+        const payload: ToolPayload = {
+          code: skillForm.code,
+          desc: skillForm.desc,
+          icon: skillForm.icon,
+          init_field_list: cloneDeep(skillForm.init_field_list),
+          name: skillForm.name,
+          tool_type: TOOL_TYPE.SKILL,
+        }
+        const request = currentEditId
+          ? props.api.putTool(currentEditId, payload)
+          : 'postTool' in props.api
+            ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
+            : Promise.reject(new Error('资源管理不支持创建工具'))
+
+        return request.then((savedTool) => {
+          const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
+          return refreshCurrentUser.then(() => {
+            MsgSuccess(isEdit ? '保存成功' : '创建成功')
+            visible.value = false
+            if (isEdit) emit('update', savedTool)
+            else emit('refresh')
+          })
         })
       })
       .finally(() => {
@@ -167,6 +185,7 @@ function open(tool?: ToolItem, asCopy = false) {
 }
 
 function handleBeforeClose() {
+  if (loading.value) return
   if (JSON.stringify(skillForm) === originalForm.value) {
     visible.value = false
     return
@@ -180,6 +199,7 @@ function handleBeforeClose() {
 
 function resetData() {
   Object.assign(skillForm, { code: '', desc: '', fileList: [], icon: '', init_field_list: [], name: '' })
+  iconFile.value = null
   editId.value = undefined
   originalForm.value = ''
   loading.value = false
@@ -200,7 +220,7 @@ defineExpose({ open })
   <MkDrawer v-model="visible" :before-close="handleBeforeClose" :title="title" size="60%" @closed="handleClosed">
     <el-form
       ref="formRef"
-      v-loading="formLoading"
+      v-loading="formLoading || loading"
       :model="skillForm"
       :rules="formRules"
       label-position="top"
@@ -210,8 +230,12 @@ defineExpose({ open })
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
-          <!-- // TODO 头像修改 -->
-          <ToolIcon :icon="skillForm.icon" :size="32" :type="TOOL_TYPE.SKILL" />
+          <!-- 设置工具头像 -->
+          <MkEditAvatar v-model="skillForm.icon" @change="handleIconChange">
+            <template #default="{ icon }">
+              <ToolIcon :icon="icon" :type="TOOL_TYPE.SKILL" />
+            </template>
+          </MkEditAvatar>
           <el-input
             v-model="skillForm.name"
             maxlength="64"
@@ -258,7 +282,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain :disabled="loading" @click="handleBeforeClose">取消</el-button>
+      <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">取消</el-button>
       <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
         {{ editId ? '保存' : '创建' }}
       </el-button>
