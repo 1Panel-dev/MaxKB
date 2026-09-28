@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { CascaderOption } from 'element-plus'
+import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
@@ -9,15 +10,17 @@ import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
-import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
+import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, KNOWLEDGE_TYPE, STATE_TYPES } from '@/api/enums'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
 import { STATE_LABELS } from '@/constants/state'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { numberFormat } from '@/utils/number'
+import { MsgSuccess } from '@/utils/message'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
+import { useKnowledgeDetailContext } from '../context'
 
 defineOptions({ name: 'DocumentListView' })
 defineProps<ResourceDetailPageProps>()
@@ -25,6 +28,29 @@ defineExpose({ customHeader: true })
 
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
+const { knowledge } = useKnowledgeDetailContext()
+
+/* 快速创建 */
+const showQuickCreate = computed(() => knowledge.value?.type === KNOWLEDGE_TYPE.BASE && !isWorkspaceSharedResource())
+const quickCreateRef = ref<InstanceType<typeof MkQuickCreate>>()
+
+function handleCreateDocument(name: string) {
+  loading.value = true
+  return DocumentApi.putQuickCreateDocuments(knowledgeId.value, [{ name }])
+    .then(() => {
+      // 创建成功即清理草稿，后续刷新失败不恢复为可重复提交的输入。
+      quickCreateRef.value?.close()
+      MsgSuccess('创建成功')
+      paginationConfig.value.currentPage = 1
+      return loadDocuments()
+    })
+    .catch(() => {
+      // 请求层统一提示错误，创建失败时保留输入。
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
 
 /* 文档筛选与分页查询 */
 const loading = ref(false)
@@ -169,7 +195,10 @@ onMounted(() => {
     @size-change="loadDocuments"
     resizable
   >
-    <!-- <template #append>快速添加</template> -->
+    <template v-if="showQuickCreate" #body-prepend>
+      <!-- 快速创建空白文档 -->
+      <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" :loading="loading" @create="handleCreateDocument" />
+    </template>
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip />
 
     <el-table-column width="140">

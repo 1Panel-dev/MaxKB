@@ -4,6 +4,11 @@ export type DocumentHitHandling = (typeof DOCUMENT_HIT_HANDLING)[keyof typeof DO
 export type DocumentTaskState = (typeof DOCUMENT_TASK_STATE)[keyof typeof DOCUMENT_TASK_STATE]
 export type DocumentTaskType = (typeof DOCUMENT_TASK_TYPE)[keyof typeof DOCUMENT_TASK_TYPE]
 
+/** 快速创建空白文档的请求数据。 */
+export interface DocumentQuickCreatePayload {
+  name: string
+}
+
 /** 文件各任务的分段计数及状态发生时间。 */
 export interface DocumentStatusMeta {
   aggs?: { status: string | null; count: number }[]
