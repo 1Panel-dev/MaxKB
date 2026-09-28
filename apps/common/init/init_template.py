@@ -6,10 +6,20 @@
     @date：2025/12/1 17:16
     @desc:
 """
+import secrets
 from typing import Any
 
+from jinja2 import pass_context
 from jinja2.sandbox import SandboxedEnvironment
 from langchain_core.prompts.string import DEFAULT_FORMATTER_MAPPING, _HAS_JINJA2
+
+
+@pass_context
+def secure_random_filter(context, seq):
+    try:
+        return secrets.choice(seq)
+    except IndexError:
+        return context.environment.undefined("No random item, sequence was empty.")
 
 
 def jinja2_formatter(template: str, /, **kwargs: Any) -> str:
@@ -47,7 +57,9 @@ def jinja2_formatter(template: str, /, **kwargs: Any) -> str:
     # Use a restricted sandbox that blocks ALL attribute/method access
     # Only simple variable lookups like {{variable}} are allowed
     # Attribute access like {{variable.attr}} or {{variable.method()}} is blocked
-    return SandboxedEnvironment().from_string(template).render(**kwargs)
+    environment = SandboxedEnvironment()
+    environment.filters['random'] = secure_random_filter
+    return environment.from_string(template).render(**kwargs)
 
 
 def run():
