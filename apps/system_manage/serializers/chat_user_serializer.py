@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models import ApplicationAccessToken, ChatUserType
+from application.models import ApplicationAccessToken
 from common.auth.common import ChatToken
 from common.auth.constants.operate_constants import Operate
 from common.constants.authentication_type import AuthenticationType
