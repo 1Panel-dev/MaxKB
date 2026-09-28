@@ -273,6 +273,27 @@ class KnowledgeArchiveTests(SimpleTestCase):
         source = self.created[Document][0].meta["source_file_id"]
         self.assertEqual(next(content for file, content in self.file_writes if str(file.id) == source), self.file_bytes)
 
+    def test_paragraph_owned_file_round_trips_with_paragraph_owner(self):
+        attachment = File(
+            id=uid(11),
+            file_name="attachment.pdf",
+            source_id=str(self.paragraph.id),
+            source_type=FileSourceType.PARAGRAPH,
+        )
+        self.rows[File].append(attachment)
+        self.paragraph.content += f" [attachment](./oss/file/{attachment.id})"
+        with patch.object(attachment, "get_bytes", return_value=b"attachment"):
+            payload = self.export()
+        with ZipFile(io.BytesIO(payload)) as archive:
+            data = json.loads(archive.read("knowledge.json"))
+            file_row = next(row for row in data["resources"]["files"] if row["id"] == str(attachment.id))
+            self.assertEqual(file_row["paragraph_id"], str(self.paragraph.id))
+
+        self.import_archive(payload)
+        restored = next(file for file, _ in self.file_writes if file.file_name == "attachment.pdf")
+        self.assertEqual(restored.source_type, FileSourceType.PARAGRAPH)
+        self.assertEqual(restored.source_id, str(self.created[Paragraph][0].id))
+
     def test_workflow_bundle_preserves_default_models_and_sync_inputs(self):
         self.knowledge.type = KnowledgeType.WORKFLOW
         self.knowledge.meta["workflow_sync_input"] = {"data_source": {"query": "saved input"}}

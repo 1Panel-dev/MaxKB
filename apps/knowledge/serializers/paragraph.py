@@ -27,6 +27,7 @@ from knowledge.models import (
     TaskType,
 )
 from knowledge.services.document_strategy import stable_hash
+from knowledge.services.paragraph_assets import validate_paragraph_file_references
 from knowledge.serializers.common import (
     BatchSerializer,
     ProblemParagraphManage,
@@ -285,6 +286,8 @@ class ParagraphSerializers(serializers.Serializer):
         def edit(self, instance: Dict):
             self.is_valid()
             EditParagraphSerializers(data=instance).is_valid(raise_exception=True)
+            if instance.get("content") is not None:
+                validate_paragraph_file_references(self.data.get("knowledge_id"), [instance["content"]])
             _paragraph = QuerySet(Paragraph).get(id=self.data.get("paragraph_id"))
             update_keys = ["title", "content", "is_active"]
             for update_key in update_keys:
@@ -412,6 +415,7 @@ class ParagraphSerializers(serializers.Serializer):
                 self.is_valid()
             knowledge_id = self.data.get("knowledge_id")
             document_id = self.data.get("document_id")
+            validate_paragraph_file_references(knowledge_id, [instance.get("content")])
 
             # 先将同一文档中的所有段落位置向下移动一位
             Paragraph.objects.filter(document_id=document_id).update(position=F("position") + 1)

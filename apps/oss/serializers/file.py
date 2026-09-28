@@ -24,7 +24,7 @@ from homepage.serializers.homepage import (
     is_extends_workspace_manage,
     is_workspace_manage,
 )
-from knowledge.models import Document, File, FileSourceType, Knowledge, PublicFileAccess
+from knowledge.models import Document, File, FileSourceType, Knowledge, Paragraph, PublicFileAccess
 from knowledge.services import validate_knowledge_file_size
 from maxkb.const import CONFIG
 from rest_framework import serializers
@@ -169,6 +169,16 @@ def _deny():
     raise AppUnauthorizedFailed(403, gettext("No permission to access"))
 
 
+def _knowledge_id_for_file_source(source_type, source_id):
+    if source_type == FileSourceType.DOCUMENT:
+        return QuerySet(Document).filter(id=source_id).values_list("knowledge_id", flat=True).first()
+    if source_type == FileSourceType.PARAGRAPH:
+        return QuerySet(Paragraph).filter(id=source_id).values_list("knowledge_id", flat=True).first()
+    if source_type == FileSourceType.KNOWLEDGE:
+        return source_id
+    return None
+
+
 def auth(file, mk_file_auth):
     if CONFIG.get("FILE_AUTH", "1") != "1":
         return
@@ -226,14 +236,8 @@ def _auth_chat(file, token):
             _check_anonymous_login(file.source_id)
         return
 
-    # DOCUMENT / KNOWLEDGE
-    if file.source_type == FileSourceType.DOCUMENT:
-        knowledge_id = QuerySet(Document).filter(id=file.source_id).values_list("knowledge_id", flat=True).first()
-        if knowledge_id is None:
-            _deny()
-    elif file.source_type == FileSourceType.KNOWLEDGE:
-        knowledge_id = file.source_id
-    else:
+    knowledge_id = _knowledge_id_for_file_source(file.source_type, file.source_id)
+    if knowledge_id is None:
         _deny()
         return
     ## 如果是匿名的就要看可访问的应用是否
@@ -304,11 +308,8 @@ def _auth_system(file, user_id):
             auth_target_type="APPLICATION",
             read_permission="APPLICATION:READ",
         )
-    elif file.source_type in (FileSourceType.DOCUMENT, FileSourceType.KNOWLEDGE):
-        if file.source_type == FileSourceType.DOCUMENT:
-            knowledge_id = QuerySet(Document).filter(id=file.source_id).values_list("knowledge_id", flat=True).first()
-        else:
-            knowledge_id = file.source_id
+    elif file.source_type in (FileSourceType.DOCUMENT, FileSourceType.PARAGRAPH, FileSourceType.KNOWLEDGE):
+        knowledge_id = _knowledge_id_for_file_source(file.source_type, file.source_id)
         knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first() if knowledge_id else None
         if knowledge is None:
             _deny()
@@ -366,8 +367,21 @@ class FileSerializer(serializers.Serializer):
     def upload(self, with_valid=True, user_id=None):
         if with_valid:
             self.is_valid(raise_exception=True)
-        if self.data.get("source_type") == FileSourceType.KNOWLEDGE.value:
-            knowledge = QuerySet(Knowledge).filter(id=self.data.get("source_id")).first()
+        source_type = self.data.get("source_type")
+        if source_type in (
+            FileSourceType.KNOWLEDGE.value,
+            FileSourceType.DOCUMENT.value,
+            FileSourceType.PARAGRAPH.value,
+        ):
+            knowledge_id = _knowledge_id_for_file_source(source_type, self.data.get("source_id"))
+            if knowledge_id is None and source_type != FileSourceType.KNOWLEDGE.value:
+                raise AppApiException(
+                    500,
+                    _("Paragraph id does not exist")
+                    if source_type == FileSourceType.PARAGRAPH.value
+                    else _("Document id does not exist"),
+                )
+            knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
             if knowledge is None:
                 raise AppApiException(500, _("Knowledge id does not exist"))
             validate_knowledge_file_size(knowledge, [self.data.get("file")])

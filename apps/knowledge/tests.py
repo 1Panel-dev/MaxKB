@@ -2,7 +2,7 @@ from contextlib import nullcontext
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase
 from django.utils import timezone
@@ -31,6 +31,7 @@ from knowledge.models import (
     SourceType,
     SyncState,
 )
+from knowledge.models.knowledge import on_delete_paragraph
 from knowledge.models.knowledge_action import State as KnowledgeActionState
 from knowledge.serializers.document import (
     DocumentBatchAddTagSerializer,
@@ -51,6 +52,7 @@ from knowledge.serializers.knowledge_sync import (
 )
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer, finalize_knowledge_action
 from knowledge.serializers.problem import ProblemInstanceSerializer, ProblemSerializer
+from knowledge.serializers.paragraph import ParagraphSerializers
 from knowledge.services.document_cleanup import delete_synced_paragraph_data
 from knowledge.services.document_strategy import (
     apply_length_strategy,
@@ -73,6 +75,7 @@ from knowledge.services.paragraph_assets import (
     process_visual_assets,
     resolve_visual_processor,
     sync_paragraph_assets,
+    validate_paragraph_file_references,
 )
 from knowledge.services import validate_knowledge_file_size
 from knowledge.services.retrieval_stats import (
@@ -97,8 +100,8 @@ from knowledge.task.sync import (
 )
 from knowledge.vector.pg_vector import PGVector
 from knowledge.views.document import _get_document_split_payload
-from oss.serializers.file import FileSerializer
-from knowledge.web_assets import internalize_web_images
+from knowledge.web_assets import _cache_web_image, internalize_web_images
+from oss.serializers.file import FileSerializer, _auth_system, _knowledge_id_for_file_source
 from PIL import Image
 from rest_framework.exceptions import ValidationError
 
@@ -116,6 +119,9 @@ class KnowledgeUploadSizeLimitTests(SimpleTestCase):
         stored_file = MagicMock(spec=["file_size"], file_size=1024 * 1024 + 1)
         with self.assertRaises(AppApiException):
             validate_knowledge_file_size(small_knowledge, [stored_file])
+        compressed_file = MagicMock(spec=["file_size", "meta"], file_size=1, meta={"original_size": 1024 * 1024 + 1})
+        with self.assertRaises(AppApiException):
+            validate_knowledge_file_size(small_knowledge, [compressed_file])
 
     def test_image_upload_uses_knowledge_limit_above_100_mb(self):
         image_buffer = BytesIO()
@@ -175,6 +181,104 @@ class KnowledgeUploadSizeLimitTests(SimpleTestCase):
 
         with self.assertRaises(AppApiException):
             serializer.upload()
+
+    @patch("oss.serializers.file.File")
+    @patch("oss.serializers.file.QuerySet")
+    def test_document_file_upload_uses_its_knowledge_limit_before_storage(self, query_set, file_model):
+        knowledge_id = "00000000-0000-0000-0000-000000000001"
+        document_id = "00000000-0000-0000-0000-000000000002"
+        document_query = MagicMock()
+        document_query.filter.return_value.values_list.return_value.first.return_value = knowledge_id
+        knowledge_query = MagicMock()
+        knowledge_query.filter.return_value.first.return_value = Knowledge(file_size_limit=1)
+        query_set.side_effect = lambda model: {Document: document_query, Knowledge: knowledge_query}[model]
+        file = SimpleUploadedFile("example.txt", b"x")
+        file.size = 1024 * 1024 + 1
+        serializer = FileSerializer(
+            data={"file": file, "source_id": document_id, "source_type": FileSourceType.DOCUMENT.value}
+        )
+
+        with self.assertRaises(AppApiException):
+            serializer.upload()
+        file_model.assert_not_called()
+
+        knowledge_query.filter.return_value.first.return_value = Knowledge(file_size_limit=2)
+        serializer = FileSerializer(
+            data={"file": file, "source_id": document_id, "source_type": FileSourceType.DOCUMENT.value}
+        )
+        serializer.upload()
+        file_model.return_value.save.assert_called_once_with(b"x")
+
+    @patch("oss.serializers.file.File")
+    @patch("oss.serializers.file.QuerySet")
+    def test_paragraph_file_upload_uses_its_knowledge_limit_before_storage(self, query_set, file_model):
+        knowledge_id = "00000000-0000-0000-0000-000000000001"
+        paragraph_id = "00000000-0000-0000-0000-000000000003"
+        paragraph_query = MagicMock()
+        paragraph_query.filter.return_value.values_list.return_value.first.return_value = knowledge_id
+        knowledge_query = MagicMock()
+        knowledge_query.filter.return_value.first.return_value = Knowledge(file_size_limit=1)
+        query_set.side_effect = lambda model: {Paragraph: paragraph_query, Knowledge: knowledge_query}[model]
+        file = SimpleUploadedFile("attachment.pdf", b"x")
+        file.size = 1024 * 1024 + 1
+        serializer = FileSerializer(
+            data={"file": file, "source_id": paragraph_id, "source_type": FileSourceType.PARAGRAPH.value}
+        )
+
+        with self.assertRaises(AppApiException):
+            serializer.upload()
+        file_model.assert_not_called()
+        self.assertEqual(_knowledge_id_for_file_source(FileSourceType.PARAGRAPH, paragraph_id), knowledge_id)
+
+        knowledge_query.filter.return_value.first.return_value = Knowledge(file_size_limit=2)
+        serializer = FileSerializer(
+            data={"file": file, "source_id": paragraph_id, "source_type": FileSourceType.PARAGRAPH.value}
+        )
+        serializer.upload()
+        file_model.return_value.save.assert_called_once_with(b"x")
+
+    @patch("knowledge.models.knowledge.File.objects")
+    def test_deleting_paragraph_removes_its_owned_files(self, file_objects):
+        paragraph = Paragraph(id="00000000-0000-0000-0000-000000000003")
+
+        on_delete_paragraph(Paragraph, paragraph, "default")
+
+        file_objects.using.return_value.filter.assert_called_once_with(
+            source_type=FileSourceType.PARAGRAPH, source_id=str(paragraph.id)
+        )
+        file_objects.using.return_value.filter.return_value.delete.assert_called_once()
+
+    @patch("oss.serializers.file._check_workspace_resource_permission")
+    @patch("oss.serializers.file.get_auth")
+    @patch("oss.serializers.file.QuerySet")
+    def test_paragraph_file_read_uses_knowledge_permission(self, query_set, get_auth, check_permission):
+        user_query, paragraph_query, knowledge_query = MagicMock(), MagicMock(), MagicMock()
+        user_query.filter.return_value.first.return_value = MagicMock()
+        paragraph_query.filter.return_value.values_list.return_value.first.return_value = "knowledge-id"
+        knowledge_query.filter.return_value.first.return_value = Knowledge(
+            id="00000000-0000-0000-0000-000000000001", workspace_id="workspace"
+        )
+        query_set.side_effect = lambda model: {
+            "User": user_query,
+            "Paragraph": paragraph_query,
+            "Knowledge": knowledge_query,
+        }[model.__name__]
+        file = File(source_type=FileSourceType.PARAGRAPH, source_id="paragraph-id")
+
+        _auth_system(file, "user-id")
+
+        check_permission.assert_called_once_with(
+            get_auth.return_value,
+            "user-id",
+            workspace_id="workspace",
+            target_id=knowledge_query.filter.return_value.first.return_value.id,
+            auth_target_type="KNOWLEDGE",
+            read_permission="KNOWLEDGE:READ",
+        )
+
+        paragraph_query.filter.return_value.values_list.return_value.first.return_value = None
+        with self.assertRaises(AppUnauthorizedFailed):
+            _auth_system(file, "user-id")
 
     @patch("knowledge.serializers.knowledge_workflow.KnowledgeAction")
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
@@ -1543,6 +1647,17 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
 
 
 class WebImageAssetTests(SimpleTestCase):
+    @patch("knowledge.web_assets.File")
+    @patch("knowledge.web_assets.QuerySet")
+    @patch("knowledge.web_assets.Fork.requests_get")
+    def test_remote_image_over_knowledge_limit_is_not_stored(self, requests_get, query_set, file_model):
+        requests_get.return_value.status_code = 200
+        requests_get.return_value.content = b"x" * (1024 * 1024 + 1)
+        query_set.return_value.filter.return_value.first.return_value = Knowledge(file_size_limit=1)
+
+        self.assertIsNone(_cache_web_image("https://example.com/image.png", "knowledge-id"))
+        file_model.assert_not_called()
+
     @patch(
         "knowledge.web_assets._cache_web_image",
         return_value="00000000-0000-0000-0000-000000000001",
@@ -1943,6 +2058,66 @@ class SyncedParagraphCleanupTests(SimpleTestCase):
 
 
 class ParagraphAssetTests(SimpleTestCase):
+    @patch("knowledge.services.paragraph_assets.Knowledge.objects")
+    @patch("knowledge.services.paragraph_assets.File.objects")
+    def test_paragraph_image_and_attachment_use_knowledge_limit(self, file_objects, knowledge_objects):
+        file_id = "00000000-0000-0000-0000-000000000003"
+        file_objects.filter.return_value = [
+            MagicMock(spec=["file_size", "meta"], file_size=1, meta={"original_size": 1024 * 1024 + 1})
+        ]
+        knowledge_objects.filter.return_value.first.return_value = Knowledge(file_size_limit=1)
+        contents = [
+            f"![image](./oss/file/{file_id})",
+            f"[attachment](./oss/file/{file_id})",
+            f'<video src="./oss/file/{file_id}"></video>',
+        ]
+
+        with self.assertRaises(AppApiException):
+            validate_paragraph_file_references("knowledge-id", contents)
+        file_objects.filter.assert_called_once_with(id__in={file_id})
+
+        knowledge_objects.filter.return_value.first.return_value = Knowledge(file_size_limit=2)
+        validate_paragraph_file_references("knowledge-id", contents)
+
+    @patch(
+        "knowledge.serializers.paragraph.validate_paragraph_file_references",
+        side_effect=AppApiException(500, "too large"),
+    )
+    @patch("knowledge.serializers.paragraph.Paragraph.objects")
+    def test_manual_paragraph_rejects_oversize_reference_before_saving(self, paragraph_objects, validate_references):
+        serializer = MagicMock(
+            data={
+                "knowledge_id": "00000000-0000-0000-0000-000000000001",
+                "document_id": "00000000-0000-0000-0000-000000000002",
+            },
+        )
+        content = "[attachment](./oss/file/00000000-0000-0000-0000-000000000003)"
+
+        with self.assertRaises(AppApiException):
+            ParagraphSerializers.Create.save.__wrapped__(serializer, {"content": content}, with_valid=False)
+        validate_references.assert_called_once_with(serializer.data["knowledge_id"], [content])
+        paragraph_objects.filter.assert_not_called()
+
+    @patch(
+        "knowledge.services.paragraph_assets.validate_paragraph_file_references",
+        side_effect=AppApiException(500, "too large"),
+    )
+    @patch("knowledge.services.paragraph_assets.ParagraphAsset.objects")
+    def test_document_paragraph_rejects_oversize_reference_before_asset_sync(self, asset_objects, validate_references):
+        paragraph = Paragraph(
+            id="00000000-0000-0000-0000-000000000001",
+            document_id="00000000-0000-0000-0000-000000000002",
+            knowledge_id="00000000-0000-0000-0000-000000000003",
+            content="![image](./oss/file/00000000-0000-0000-0000-000000000004)",
+        )
+
+        with self.assertRaises(AppApiException):
+            sync_paragraph_assets.__wrapped__([paragraph])
+        validate_references.assert_called_once()
+        self.assertEqual(validate_references.call_args.args[0], paragraph.knowledge_id)
+        self.assertEqual(list(validate_references.call_args.args[1]), [paragraph.content])
+        asset_objects.select_for_update.assert_not_called()
+
     def test_image_is_kept_inside_paragraph_schema(self):
         content = "before ![chart](./oss/file/00000000-0000-0000-0000-000000000003) after"
         schema = paragraph_content_schema(content)

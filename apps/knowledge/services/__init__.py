@@ -8,7 +8,8 @@ def validate_knowledge_file_size(knowledge, files):
     for file in files:
         size = getattr(file, "size", None)
         if size is None:
-            size = file.file_size
+            # PostgreSQL stores compressed bytes, while the limit applies to the uploaded file.
+            size = (getattr(file, "meta", None) or {}).get("original_size", file.file_size)
         if size > 1024 * 1024 * knowledge.file_size_limit:
             raise AppApiException(
                 500,

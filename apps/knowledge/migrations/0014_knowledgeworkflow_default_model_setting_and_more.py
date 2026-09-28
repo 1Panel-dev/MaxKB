@@ -28,6 +28,7 @@ class Migration(migrations.Migration):
                     ("APPLICATION", "Application"),
                     ("TOOL", "Tool"),
                     ("DOCUMENT", "Document"),
+                    ("PARAGRAPH", "Paragraph"),
                     ("CHAT", "Chat"),
                     ("SYSTEM", "System"),
                     ("TEMPORARY_30_MINUTE", "Temporary 30 Minute"),

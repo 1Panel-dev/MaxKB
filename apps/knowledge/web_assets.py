@@ -10,14 +10,13 @@ from django.db.models import QuerySet
 from common.utils.common import get_sha256_hash, guess_image_format
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
-from knowledge.models import File, FileSourceType
+from knowledge.models import File, FileSourceType, Knowledge
 
 
 REMOTE_IMAGE_PATTERN = re.compile(
     r'!\[(?P<caption>[^\]]*)\]\((?P<url>https?://[^\s)]+)(?:\s+["\'][^"\']*["\'])?\)',
     flags=re.IGNORECASE,
 )
-MAX_WEB_IMAGE_SIZE = 20 * 1024 * 1024
 MAX_WEB_IMAGES_PER_DOCUMENT = 100
 IMAGE_EXTENSION = {"jpeg": "jpg", "svg+xml": "svg", "x-icon": "ico"}
 
@@ -41,7 +40,10 @@ def _cache_web_image(source_url: str, knowledge_id) -> str | None:
                 )
             },
         )
-        if response.status_code != 200 or not response.content or len(response.content) > MAX_WEB_IMAGE_SIZE:
+        if response.status_code != 200 or not response.content:
+            return None
+        knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
+        if knowledge is None or len(response.content) > knowledge.file_size_limit * 1024 * 1024:
             return None
         image_format = guess_image_format(response.content, source_url)
         sha256_hash = get_sha256_hash(response.content)

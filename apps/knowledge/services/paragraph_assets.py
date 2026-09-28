@@ -26,15 +26,33 @@ from knowledge.models import (
     ContentOrigin,
     Embedding,
     File,
+    Knowledge,
     Paragraph,
     ParagraphAsset,
     SourceType,
     SyncState,
 )
 from knowledge.services.document_strategy import normalize_document_strategy, strategy_hashes
+from knowledge.services import validate_knowledge_file_size
 
 
 IMAGE_PATTERN = re.compile(r"!\[(?P<caption>[^\]]*)\]\([^)]*/oss/file/(?P<file_id>[0-9a-fA-F-]{32,36})[^)]*\)")
+FILE_REFERENCE_PATTERN = re.compile(r"/oss/file/(?P<file_id>[0-9a-fA-F-]{32,36})(?![0-9a-fA-F-])")
+
+
+def validate_paragraph_file_references(knowledge_id, contents: Iterable[str]) -> None:
+    file_ids = {
+        match.group("file_id") for content in contents for match in FILE_REFERENCE_PATTERN.finditer(content or "")
+    }
+    if not file_ids:
+        return
+    files = list(File.objects.filter(id__in=file_ids))
+    if not files:
+        return
+    knowledge = Knowledge.objects.filter(id=knowledge_id).first()
+    if knowledge is None:
+        raise AppApiException(500, _("Knowledge id does not exist"))
+    validate_knowledge_file_size(knowledge, files)
 
 
 def paragraph_asset_source_key(paragraph: Paragraph, position: int) -> str:
@@ -66,6 +84,11 @@ def sync_paragraph_assets(paragraphs: Iterable[Paragraph], visual_strategy_hash:
     paragraphs = list(paragraphs)
     if not paragraphs:
         return []
+
+    for knowledge_id in {paragraph.knowledge_id for paragraph in paragraphs}:
+        validate_paragraph_file_references(
+            knowledge_id, (paragraph.content for paragraph in paragraphs if paragraph.knowledge_id == knowledge_id)
+        )
 
     document_ids = {paragraph.document_id for paragraph in paragraphs}
     touched_paragraph_ids = {paragraph.id for paragraph in paragraphs}

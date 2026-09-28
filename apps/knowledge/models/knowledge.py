@@ -528,6 +528,8 @@ class FileSourceType(models.TextChoices):
     TOOL = "TOOL"
     # 文档
     DOCUMENT = "DOCUMENT"
+    # 段落 source_id 为段落id
+    PARAGRAPH = "PARAGRAPH"
     # 对话
     CHAT = "CHAT"
     SYSTEM = "SYSTEM"
@@ -711,6 +713,11 @@ class File(AppModelMixin):
                     break
 
         yield from _read_with_offset()
+
+
+@receiver(post_delete, sender=Paragraph)
+def on_delete_paragraph(sender, instance, using, **kwargs):
+    File.objects.using(using).filter(source_type=FileSourceType.PARAGRAPH, source_id=str(instance.id)).delete()
 
 
 @receiver(post_delete, sender=File)
