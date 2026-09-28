@@ -101,9 +101,9 @@ onMounted(loadRankings)
         @detail="handleOpenRanking('tokens')"
       >
         <template #description="{ record }">
-          <span>对话 {{ numberFormat(record.chat_record_count) }} 次 </span>
+          <span>对话 {{ numberFormat(record.chat_record_count) }} 次</span>
           <el-divider direction="vertical" />
-          <span> 均 {{ formatTokenNumber(getRankingAverage('tokens', record)) }} Tokens </span>
+          <span>均 {{ formatTokenNumber(getRankingAverage('tokens', record)) }} Tokens</span>
         </template>
       </RankingCard>
       <RankingCard
@@ -115,9 +115,9 @@ onMounted(loadRankings)
         @detail="handleOpenRanking('questions')"
       >
         <template #description="{ record }">
-          <span>活跃用户 {{ numberFormat(record.chat_user_count) }} </span>
+          <span>活跃用户 {{ numberFormat(record.chat_user_count) }}</span>
           <el-divider direction="vertical" />
-          <span> 均 {{ numberFormat(getRankingAverage('questions', record)) }} 轮/人</span>
+          <span>均 {{ numberFormat(getRankingAverage('questions', record)) }} 轮/人</span>
         </template>
       </RankingCard>
       <RankingCard
@@ -128,7 +128,7 @@ onMounted(loadRankings)
         :total="tokenTotal"
         @detail="handleOpenRanking('userTokens')"
       >
-        <template #description="{ record }"> 对话 {{ numberFormat(record.chat_record_count) }} 次 </template>
+        <template #description="{ record }">对话 {{ numberFormat(record.chat_record_count) }} 次</template>
       </RankingCard>
     </div>
     <RankingDrawer :api="api" v-if="selectedKind" :workspace-id="workspaceId" :initial-kind="selectedKind" :initial-range="range" />
