@@ -2,6 +2,7 @@
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
+import { DOCUMENT_EXTENSIONS, IMAGE_EXTENSIONS, AUDIO_EXTENSIONS, VIDEO_EXTENSIONS } from '@/constants/file-type'
 import documentIcon from '@/assets/file-type/file-document-icon.svg'
 import imageIcon from '@/assets/file-type/file-image-icon.svg'
 import audioIcon from '@/assets/file-type/file-audio-icon.svg'
@@ -32,17 +33,13 @@ const rules: FormRules<FileUploadSettingData> = {
 }
 
 const fileTypes = [
-  { field: 'document', label: '文档', icon: documentIcon, description: 'TXT、MD、DOCX、HTML、CSV、XLSX、XLS、PDF' },
-  { field: 'image', label: '图片', icon: imageIcon, description: 'JPG、JPEG、PNG、GIF' },
-  { field: 'audio', label: '音频', icon: audioIcon, description: 'MP3、WAV、OGG、AAC、M4A' },
-  { field: 'video', label: '视频', icon: videoIcon, description: 'MP4、AVI、MKV、MOV、FLV、WMV' },
+  { field: 'document', label: '文档', icon: documentIcon, extensions: DOCUMENT_EXTENSIONS },
+  { field: 'image', label: '图片', icon: imageIcon, extensions: IMAGE_EXTENSIONS },
+  { field: 'audio', label: '音频', icon: audioIcon, extensions: AUDIO_EXTENSIONS },
+  { field: 'video', label: '视频', icon: videoIcon, extensions: VIDEO_EXTENSIONS },
 ] as const
 
-const reservedExtensions = fileTypes.flatMap(({ description }) => description.split('、'))
-
-function normalizeExtension(extension: string) {
-  return extension.replace(/^\./, '').toUpperCase()
-}
+const presetExtensions = fileTypes.flatMap(({ extensions }) => extensions)
 
 function submit() {
   formRef.value?.validate((valid) => {
@@ -65,6 +62,7 @@ function resetData() {
 </script>
 
 <template>
+  <!-- 打开文件上传设置 -->
   <el-button text type="primary" @click="open">
     <MkIcon name="icon_setting" />
   </el-button>
@@ -92,7 +90,7 @@ function resetData() {
                 <img class="shrink-0 w-6" :src="fileType.icon" :alt="fileType.label" />
                 <div class="min-w-0 flex-1">
                   <h6>{{ fileType.label }}</h6>
-                  <p class="mt-1 break-all text-sm text-N600">{{ fileType.description }}</p>
+                  <p class="mt-1 break-all text-sm text-N600">{{ fileType.extensions.join('、') }}</p>
                 </div>
               </div>
             </MkCardCheckbox>
@@ -103,12 +101,7 @@ function resetData() {
               <img class="shrink-0 w-6" src="@/assets/file-type/unknown-icon.svg" />
               <div class="min-w-0 flex-1">
                 <h6 class="mb-2">其他文件</h6>
-                <MkTagsEdit
-                  v-model="formData.otherExtensions"
-                  :reserved-tags="reservedExtensions"
-                  :normalize-tag="normalizeExtension"
-                  add-text="添加后缀名"
-                />
+                <MkTagsEdit v-model="formData.otherExtensions" :preset-extensions="presetExtensions" />
               </div>
             </div>
           </MkCardCheckbox>
@@ -117,7 +110,9 @@ function resetData() {
     </el-form>
 
     <template #footer>
+      <!-- 取消设置 -->
       <el-button plain @click="visible = false">取消</el-button>
+      <!-- 保存文件上传设置 -->
       <el-button type="primary" @click="submit">确定</el-button>
     </template>
   </MkDialog>

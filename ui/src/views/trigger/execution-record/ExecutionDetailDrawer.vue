@@ -111,10 +111,10 @@ watch(
       />
     </div>
     <template #footer>
-      <!-- 浏览上一条执行记录 -->
-      <el-button plain :disabled="previousDisabled || loading" @click="emit('previous')">上一条</el-button>
-      <!-- 浏览下一条执行记录 -->
-      <el-button plain :disabled="nextDisabled || loading" @click="emit('next')">下一条</el-button>
+      <!-- 浏览上一个执行记录 -->
+      <el-button plain :disabled="previousDisabled || loading" @click="emit('previous')">上一个</el-button>
+      <!-- 浏览下一个执行记录 -->
+      <el-button plain :disabled="nextDisabled || loading" @click="emit('next')">下一个</el-button>
     </template>
   </MkDrawer>
 </template>

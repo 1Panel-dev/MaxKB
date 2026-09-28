@@ -6,8 +6,8 @@ import { MsgWarning } from '@/utils/message'
 defineOptions({ name: 'MkTagsEdit' })
 
 const tags = defineModel<string[]>({ required: true })
-const props = withDefaults(defineProps<{ reservedTags?: readonly string[]; normalizeTag?: (tag: string) => string }>(), {
-  reservedTags: () => [],
+const props = withDefaults(defineProps<{ presetExtensions?: readonly string[] }>(), {
+  presetExtensions: () => [],
 })
 
 // 标签编辑：自动聚焦，确认时清理输入并检查重复值。
@@ -20,11 +20,17 @@ function showTagInput() {
   nextTick(() => inputRef.value?.focus())
 }
 
+function normalizeExtension(extension: string) {
+  return extension.trim().replace(/^\./, '').toUpperCase()
+}
+
 function confirmTag() {
-  const input = tagInput.value.trim()
-  const tag = props.normalizeTag ? props.normalizeTag(input) : input
+  const tag = normalizeExtension(tagInput.value)
   if (tag) {
-    if (props.reservedTags.includes(tag) || tags.value.includes(tag)) {
+    if (
+      props.presetExtensions.some((presetExtension) => normalizeExtension(presetExtension) === tag) ||
+      tags.value.some((currentTag) => normalizeExtension(currentTag) === tag)
+    ) {
       MsgWarning('文件后缀已存在')
     } else {
       tags.value = [...tags.value, tag]
@@ -57,6 +63,7 @@ function removeTag(tag: string) {
       @blur="confirmTag"
       @keyup.enter="confirmTag"
     />
+    <!-- 添加文件后缀 -->
     <el-button class="mk-add-tag-button" plain v-else size="small" @click="showTagInput">
       <MkIcon name="icon_add_outlined" size="14" />
       <span>添加后缀名</span>

@@ -30,7 +30,11 @@ const showMask = computed(() => (props.leftMode === 'drawer' && props.leftOpen) 
 <template>
   <!-- 布局壳(纯展示):左/主/右三区 + 挤压/抽屉 + 遮罩。状态由外层传入,自身不含业务。 -->
   <div class="relative flex h-full overflow-hidden">
-    <aside class="side-panel left shrink-0 overflow-hidden bg-N100" :class="[leftMode, { open: leftOpen }]" :style="{ '--side-w': leftWidth + 'px' }">
+    <aside
+      class="side-panel left shrink-0 overflow-hidden bg-N100"
+      :class="[leftMode, { open: leftOpen }]"
+      :style="{ '--mk-chat-sidebar-width': leftWidth + 'px' }"
+    >
       <div class="side-panel__inner"><slot name="left" /></div>
     </aside>
 
@@ -46,17 +50,24 @@ const showMask = computed(() => (props.leftMode === 'drawer' && props.leftOpen) 
     </aside>
 
     <!-- 点击遮罩收起抽屉侧栏 -->
-    <div v-if="showMask" class="absolute inset-0 z-30 bg-N900/40" @click="$emit('mask-click')" />
+    <div v-if="showMask" class="mk-conversation-mask" @click="$emit('mask-click')" />
   </div>
 </template>
 <style scoped lang="scss">
+.mk-conversation-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: var(--el-overlay-color-lighter);
+}
+
 .side-panel {
   /* 固定侧栏内容宽度，避免展开和收起时内容变形。 */
   &__inner {
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    width: var(--side-w);
+    width: var(--mk-chat-sidebar-width);
   }
 
   /* 挤压侧栏参与布局，仅展开时显示分隔线。 */
@@ -66,7 +77,7 @@ const showMask = computed(() => (props.leftMode === 'drawer' && props.leftOpen) 
     width: 0;
 
     &.open {
-      width: var(--side-w);
+      width: var(--mk-chat-sidebar-width);
 
       &.left {
         border-right: 1px solid var(--mk-N350);
@@ -86,7 +97,7 @@ const showMask = computed(() => (props.leftMode === 'drawer' && props.leftOpen) 
     transition:
       transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 0.25s;
-    width: var(--side-w);
+    width: var(--mk-chat-sidebar-width);
     z-index: 40;
 
     &.left {
