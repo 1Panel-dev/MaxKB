@@ -436,6 +436,11 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 筛选保持一致；分页使用 `ParamsPage` 与 `ResponsePage`。导出沿用 `getExportFile`。
 工作空间总量接口返回数值，不与 System 首页的对象响应混用。
 
+System 首页的智能体选项使用 `system/resource-management/application/application.ts` 的
+`getApplicationPage(page, query)`，请求 `/system/resource/application/<currentPage>/<pageSize>`。
+工作空间筛选通过 `query.workspace_ids` 传入所选工作空间 ID 的 JSON 数组字符串；名称筛选使用 `name`。
+Workspace 智能体分页方法只接收分页与查询条件，从当前资源上下文读取工作空间。
+
 ### 对话面板接口
 
 `admin/workspace/conversation.ts` 集中维护调试对话的打开、发送、取消、续传、历史会话、

@@ -2,9 +2,7 @@
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import PortalApi from '@/api/admin/system/chat-management/portal-setting.ts'
 import type { PortalSetting, PortalSettingPayload } from '@/api/types'
-import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
 import { copyText } from '@/utils/clipboard'
-import { resetUrl } from '@/utils/icon'
 import { MsgSuccess } from '@/utils/message'
 import { perm } from '@/permission'
 import PortalPreview from './components/PortalPreview.vue'
@@ -99,7 +97,6 @@ const portalCorsOrigins = computed({
   },
 })
 const previewName = computed(() => portalSetting.name)
-const previewLogo = computed(() => resetUrl(portalSetting.logo))
 
 onMounted(() => loadPortalSetting())
 
@@ -114,8 +111,7 @@ const canEditPortal = computed(() => perm.system.portal.edit())
         <el-card shadow="never">
           <div class="flex-between gap-3">
             <div class="flex-align-center min-w-0 gap-2">
-              <img v-if="previewLogo" :src="previewLogo" alt="门户 Logo" class="size-6 shrink-0 object-contain" />
-              <LogoIcon v-else :height="24" class="shrink-0" />
+              <PortalIcon :icon="portalSetting.logo ?? undefined" />
               <h4 class="truncate" :title="previewName">{{ previewName }}</h4>
             </div>
             <!-- 编辑门户名称与 Logo -->
@@ -220,7 +216,7 @@ const canEditPortal = computed(() => perm.system.portal.edit())
           </div>
         </el-card>
       </div>
-      <PortalPreview :name="previewName" :logo="previewLogo" />
+      <PortalPreview :name="previewName" :logo="portalSetting.logo" />
     </div>
   </MkViewLayout>
 </template>

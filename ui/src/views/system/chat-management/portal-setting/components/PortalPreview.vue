@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
-
 defineProps<{ name: string; logo: string | null }>()
 </script>
 
@@ -8,8 +6,7 @@ defineProps<{ name: string; logo: string | null }>()
   <section class="flex min-h-140 min-w-0 flex-1 overflow-hidden rounded-xl border">
     <div class="flex-column w-chat-sidebar shrink-0 border-r bg-N100 p-4">
       <div class="flex-align-center mb-5 gap-2">
-        <img v-if="logo" :src="logo" alt="门户 Logo" :height="24" class="shrink-0 object-contain" />
-        <LogoIcon v-else :height="24" class="shrink-0" />
+        <PortalIcon :icon="logo ?? undefined" />
         <h4 class="min-w-0 flex-1 truncate" :title="name">{{ name }}</h4>
         <MkIcon name="icon_sidebar_outlined" class="shrink-0" />
       </div>
