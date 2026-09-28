@@ -1637,7 +1637,8 @@ class DocumentSerializers(serializers.Serializer):
             response = HttpResponse(content_type="application/zip")
             zip_buffer = io.BytesIO()
             with TemporaryDirectory() as tempdir:
-                knowledge_file = os.path.join(tempdir, f"{knowledge.name}.xlsx")
+                safe_name = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", knowledge.name).strip(" .") or "knowledge"
+                knowledge_file = os.path.join(tempdir, f"{safe_name}.xlsx")
                 workbook.save(knowledge_file)
                 for r in res:
                     write_image(tempdir, r)
