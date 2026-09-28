@@ -65,7 +65,7 @@ defineExpose({ close: resetDraft })
     <!-- 展开快速创建 -->
     <el-button v-else ref="triggerRef" type="primary" link @click="handleShowCreateInput">
       <MkIcon name="icon_add_outlined" />
-      <span class="ml-1">{{ props.text }}</span>
+      <span>{{ props.text }}</span>
     </el-button>
   </div>
 </template>
