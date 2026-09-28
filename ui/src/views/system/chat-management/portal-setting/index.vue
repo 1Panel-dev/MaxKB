@@ -140,7 +140,7 @@ const canEditPortal = computed(() => perm.system.portal.edit())
                 <template #suffix>
                   <!-- 复制门户公开访问链接 -->
                   <el-button text :disabled="!canEditPortal" @click="copyText(portalAccessUrl)" class="-mr-1">
-                    <MkIcon name="icon_copy_outlined" class="text-N600" />
+                    <MkIcon name="icon_copy_outlined" />
                   </el-button>
                 </template>
               </el-input>
@@ -160,7 +160,7 @@ const canEditPortal = computed(() => perm.system.portal.edit())
                 <template #suffix>
                   <!-- 复制智能体后端 API 访问 -->
                   <el-button text :disabled="!canEditPortal" @click="copyText(portalApiUrl)" class="-mr-1">
-                    <MkIcon name="icon_copy_outlined" class="text-N600" />
+                    <MkIcon name="icon_copy_outlined" />
                   </el-button>
                 </template>
               </el-input>
@@ -180,7 +180,7 @@ const canEditPortal = computed(() => perm.system.portal.edit())
                 <template #suffix>
                   <!-- 复制知识库后端 API 检索 -->
                   <el-button text :disabled="!canEditPortal" @click="copyText(portalApiUrl)" class="-mr-1">
-                    <MkIcon name="icon_copy_outlined" class="text-N600" />
+                    <MkIcon name="icon_copy_outlined" />
                   </el-button>
                 </template>
               </el-input>

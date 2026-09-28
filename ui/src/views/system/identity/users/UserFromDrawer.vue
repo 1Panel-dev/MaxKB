@@ -221,7 +221,7 @@ defineExpose({ open })
           <el-input v-model="userForm.password" readonly>
             <template #suffix>
               <el-button text @click="copyText(userForm.password)" class="-mr-1">
-                <MkIcon name="icon_copy_outlined" class="text-N600" />
+                <MkIcon name="icon_copy_outlined" />
               </el-button>
             </template>
           </el-input>

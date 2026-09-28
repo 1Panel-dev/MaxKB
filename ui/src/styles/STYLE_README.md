@@ -31,8 +31,8 @@ import './styles/index.scss'
 `src/conversation-panel/index.scss` 是对话模块公共样式入口，由模块内的
 `view/chat/index.vue` 和 `view/debug/index.vue` 在 `<style lang="scss">` 中通过
 `@use '../../index.scss';` 引入，不在脚本或应用入口重复引入。
-仅放置对话模块内复用的样式，公共类名使用 `conversation-panel-` 前缀，标题栏和主面板
-使用 `mk-conversation-` 前缀；组件专属布局、定位和交互样式继续保留在所属组件的 scoped
+仅放置对话模块内复用的样式，公共类名使用 `conversation-panel-` 前缀，标题栏、主面板、侧栏和遮罩
+使用 `mk-conversation-` 前缀；其他组件专属布局、定位和交互样式继续保留在所属组件的 scoped
 样式中。公共入口不使用 scoped，通过带模块前缀的类名直接匹配子组件，无需 `:deep()`。
 不依赖工作流页面的祖先选择器，确保挂载到 body 的 Debug 面板仍能匹配。
 
@@ -43,6 +43,11 @@ import './styles/index.scss'
 剩余宽度，高度由父级 Flex 默认拉伸；内部纵向排列标题、消息列表和输入区。
 当前 `overflow: hidden` 已允许面板在 Flex 主轴上收缩，无需重复设置 `min-width: 0`；
 也不额外设置 `min-height: 0`、`height: 100%` 或 `max-height: 100%`，消息列表负责内部滚动。
+
+左右侧栏统一使用 `mk-conversation-side-panel`，内容容器使用
+`mk-conversation-side-panel__inner`。`.left` 引用 `--mk-chat-sidebar-width`，`.right`
+引用 `--mk-chat-right-width`，通过侧栏内部变量统一内容固定宽度、push 展开宽度和 drawer
+宽度。push 收起时外层宽度为零，drawer 通过位移收起；内容宽度不随开合动画变化。
 
 ## 共享输入容器
 

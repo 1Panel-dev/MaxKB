@@ -5,7 +5,7 @@
       <span>执行详情</span>
       <!-- 关闭执行详情 -->
       <button type="button" class="execution-detail-panel__close" @click="closeRightSide()">
-        <MkIcon :icon="Close" :size="16" />
+        <MkIcon :icon="Close" />
       </button>
     </div>
     <div class="execution-detail-panel__body">

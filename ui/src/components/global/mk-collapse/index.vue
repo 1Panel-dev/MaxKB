@@ -49,7 +49,7 @@ const expanded = computed({
             class="transition-transform text-N600!"
             :class="{ '-rotate-90': !expanded }"
           />
-          <MkIcon v-else name="icon_down_outlined" :size="16" class="transition-transform text-N600!" :class="{ '-rotate-180': expanded }" />
+          <MkIcon v-else name="icon_down_outlined" class="transition-transform text-N600!" :class="{ '-rotate-180': expanded }" />
         </button>
         <slot name="label">
           <span>{{ title }}</span>

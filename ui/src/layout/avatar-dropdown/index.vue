@@ -57,8 +57,8 @@ function toUrl(url?: string) {
           <el-avatar :size="40" class="bg-primary-gradient! mt-1">
             <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 54%" />
           </el-avatar>
-          <div>
-            <div class="font-medium text-lg">{{ user.userInfo?.nick_name }}</div>
+          <div class="min-w-0">
+            <h4>{{ user.userInfo?.nick_name }}</h4>
             <div class="text-N600">{{ user.userInfo?.username }}</div>
             <MkTagGroup v-if="user.userInfo?.role_name?.length" :tags="user.userInfo?.role_name" size="small" class="mt-2" type="primary" />
           </div>

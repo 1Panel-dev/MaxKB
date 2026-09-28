@@ -58,7 +58,7 @@ defineExpose({ clearFiles })
             <slot name="download" :file="selectedFile" />
             <!-- 删除文件 -->
             <el-button :disabled="disabled" text @click="handleRemove">
-              <MkIcon name="icon_delete-trash_outlined" :size="16" class="text-N600" />
+              <MkIcon name="icon_delete-trash_outlined" />
             </el-button>
           </div>
         </div>

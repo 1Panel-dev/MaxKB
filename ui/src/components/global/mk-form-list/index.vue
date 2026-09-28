@@ -86,7 +86,7 @@ function removeRow(index: number) {
         <slot :index="index" :item="item" />
         <el-form-item class="shrink-0" :class="firstRowHasLabel ? (index === 0 ? 'mt-8' : 'mt-0.5') : 'mt-1'">
           <el-button :disabled="formRows.length <= minRows" text @click="removeRow(index)">
-            <MkIcon name="icon_delete-trash_outlined" class="text-N600" />
+            <MkIcon name="icon_delete-trash_outlined" />
           </el-button>
         </el-form-item>
       </div>

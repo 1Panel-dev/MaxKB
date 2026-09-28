@@ -12,6 +12,89 @@
   position: relative;
 }
 
+/* 对话左右两侧 */
+.mk-conversation-side-panel {
+  /* 固定侧栏内容宽度，避免展开和收起时内容变形。 */
+  &__inner {
+    height: 100%;
+    width: var(--mk-conversation-side-panel-width);
+  }
+
+  /* 方向只负责宽度来源和外观，内容与展开模式共用同一宽度。 */
+  &.left {
+    --mk-conversation-side-panel-width: var(--mk-chat-sidebar-width);
+
+    background: color-mix(in srgb, var(--mk-primary) 5%, var(--mk-N100));
+  }
+
+  &.right {
+    background: white;
+    --mk-conversation-side-panel-width: var(--mk-chat-right-width);
+  }
+
+  /* 抽屉侧栏覆盖主区，层级高于遮罩。 */
+  &.drawer {
+    bottom: 0;
+    position: absolute;
+    top: 0;
+    transition:
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.25s;
+    width: var(--mk-conversation-side-panel-width);
+    z-index: 40;
+
+    &.left {
+      left: 0;
+
+      &:not(.open) {
+        transform: translateX(-100%);
+      }
+    }
+
+    &.open {
+      box-shadow: var(--mk-box-shadow-lg);
+      transform: translateX(0);
+    }
+
+    &.right {
+      right: 0;
+
+      &:not(.open) {
+        transform: translateX(100%);
+      }
+    }
+  }
+  /* 挤压侧栏通过宽度动画参与布局。 */
+  &.push {
+    min-width: 0;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0;
+
+    &.open {
+      width: var(--mk-conversation-side-panel-width);
+    }
+  }
+  /* 抽屉保留分隔线，挤压模式仅展开时显示。 */
+  &.drawer,
+  &.push.open {
+    &.left {
+      border-right: 1px solid var(--mk-N350);
+    }
+
+    &.right {
+      border-left: 1px solid var(--mk-N350);
+    }
+  }
+}
+
+/* 对话主抽屉遮罩层 */
+.mk-conversation-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: var(--el-overlay-color-lighter);
+}
+
 /* 对话标题栏：在中性底色上叠加浅主题色。 */
 .mk-conversation-header {
   background: color-mix(in srgb, var(--mk-primary) 5%, var(--mk-N100));

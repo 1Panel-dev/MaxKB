@@ -56,12 +56,10 @@ onBeforeUnmount(() => {
 })
 
 watch(isMobile, (m) => (bundle.list.leftSideOpen.value = !m))
-watch(
-  () => bundle.list.currentChatId.value,
-  () => {
-    if (isMobile.value) bundle.list.leftSideOpen.value = false
-  },
-)
+// 新建或重新选择会话时，即使会话 ID 不变也收起左侧抽屉。
+watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSignal.value], () => {
+  if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
+})
 </script>
 
 <style lang="scss">
