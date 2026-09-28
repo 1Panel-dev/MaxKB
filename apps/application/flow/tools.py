@@ -736,6 +736,11 @@ async def save_tool_record(tool_id, tool_info, tool_result, source_id, source_ty
     await sync_to_async(close_old_connections)()
     tool = await sync_to_async(lambda: QuerySet(Tool).filter(id=tool_id).first())()
     tool_info["icon"] = tool.icon
+    if tool.tool_type == ToolType.WORKFLOW:
+        # 工作流工具在内部工作流执行完成时，已由 ToolWorkflowPostHandler 落库一条含 details 的完整执行记录
+        # （内部工作流是同步执行的，一定先于 ToolMessage 处理完成）；此处再保存会产生一条 meta.input 为 JSON
+        # 字符串且无执行详情的重复降级记录（#7053），直接跳过。函数库等其他类型工具仍需要这条记录。
+        return
     tool_record = ToolRecord(
         id=uuid.uuid7(),
         workspace_id=tool.workspace_id,
