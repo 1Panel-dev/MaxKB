@@ -1,4 +1,4 @@
-import { get, postStream } from '@/api/admin/core/request'
+import { del, get, getExportFile, postStream } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type { ApplicationDetail, Dict, PromptGeneratePayload } from '@/api/types'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
@@ -15,7 +15,19 @@ const postPromptGenerate = (applicationId: string, modelId: string, payload: Pro
   return postStream(ADMIN_API_BASE_PATH, `${prefix}/${applicationId}/model/${modelId}/prompt_generate`, payload)
 }
 
+/** 删除系统资源管理智能体。 */
+const deleteApplication = (applicationId: string) => {
+  return del<undefined, boolean>(`${prefix}/${applicationId}`)
+}
+
+/** 导出系统资源管理智能体文件。 */
+const exportApplication = (applicationId: string, applicationName: string) => {
+  return getExportFile(`${applicationName}.mk`, `${prefix}/${applicationId}/export`)
+}
+
 export default {
   getApplicationPage,
   postPromptGenerate,
+  deleteApplication,
+  exportApplication,
 }
