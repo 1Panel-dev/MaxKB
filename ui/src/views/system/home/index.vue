@@ -69,63 +69,61 @@ onMounted(() => {
 })
 </script>
 <template>
-  <el-scrollbar class="h-full">
-    <!-- 切换工作空间 -->
-    <div class="px-6 py-4">
+  <MkViewLayout title="">
+    <template #top>
       <WorkspaceDropdown v-model="selectedWorkspaceId" :options="workspaceOptions" @select="handleWorkspaceSelect" />
-    </div>
-    <el-divider />
+    </template>
+
     <!-- 资源 -->
-    <div class="px-6 py-4">
-      <h4 class="mb-4 mt-4">资源</h4>
-      <HomeResourceOverview :key="selectedWorkspaceId" :api="SystemHomepageApi" :workspace-id="selectedWorkspaceId" />
-      <!-- 监控 -->
-      <HomeStatistics
-        :key="selectedWorkspaceId"
-        class="mt-4"
-        :workspace-id="selectedWorkspaceId"
-        :application-id="applicationId"
-        :api="SystemHomepageApi"
-      >
-        <template #application="{ loading }">
-          <el-select
-            v-model="applicationId"
-            filterable
-            remote
-            fit-input-width
-            class="w-55!"
-            :remote-method="loadApplications"
-            :loading="applicationsLoading"
-            :disabled="loading"
-            @change="handleApplicationChange"
-          >
-            <el-option label="全部智能体" value="all">
+
+    <h4 class="mb-4 mt-4">资源</h4>
+    <HomeResourceOverview :key="selectedWorkspaceId" :api="SystemHomepageApi" :workspace-id="selectedWorkspaceId" />
+    <!-- 监控 -->
+    <HomeStatistics
+      :key="selectedWorkspaceId"
+      class="mt-4"
+      :workspace-id="selectedWorkspaceId"
+      :application-id="applicationId"
+      :api="SystemHomepageApi"
+    >
+      <template #application="{ loading }">
+        <el-select
+          v-model="applicationId"
+          filterable
+          remote
+          fit-input-width
+          class="w-55!"
+          :remote-method="loadApplications"
+          :loading="applicationsLoading"
+          :disabled="loading"
+          @change="handleApplicationChange"
+        >
+          <el-option label="全部智能体" value="all">
+            <div class="flex-align-center gap-2">
+              <MkIcon name="icon_card_outlined" :size="20" class="shrink-0 text-N600" />
+              <span>全部智能体</span>
+            </div>
+          </el-option>
+          <!--  TODO 全部智能体 -->
+          <template v-for="application in applications" :key="application.id">
+            <el-option :label="application.name" :value="application.id">
               <div class="flex-align-center gap-2">
-                <MkIcon name="icon_card_outlined" :size="20" class="shrink-0 text-N600" />
-                <span>全部智能体</span>
+                <ApplicationIcon :icon="application.icon" :size="20" class="shrink-0" />
+                <span class="truncate" :title="application.name">{{ application.name }}</span>
               </div>
             </el-option>
-            <!--  TODO 全部智能体 -->
-            <template v-for="application in applications" :key="application.id">
-              <el-option :label="application.name" :value="application.id">
-                <div class="flex-align-center gap-2">
-                  <ApplicationIcon :icon="application.icon" :size="20" class="shrink-0" />
-                  <span class="truncate" :title="application.name">{{ application.name }}</span>
-                </div>
-              </el-option>
-            </template>
-            <template #label="{ label, value }">
-              <div class="flex-align-center gap-2">
-                <MkIcon v-if="value === 'all'" name="icon_card_outlined" :size="18" class="shrink-0" />
-                <ApplicationIcon v-else :icon="selectedApplication?.icon" :size="18" class="shrink-0" />
-                <span class="truncate" :title="label">{{ label }}</span>
-              </div>
-            </template>
-          </el-select>
-        </template>
-      </HomeStatistics>
-      <!-- 排行榜 TOP5 -->
-      <HomeRankings :key="selectedWorkspaceId" class="mt-4" :workspace-id="selectedWorkspaceId" :api="SystemHomepageApi" />
-    </div>
-  </el-scrollbar>
+          </template>
+          <template #label="{ label, value }">
+            <div class="flex-align-center gap-2">
+              <MkIcon v-if="value === 'all'" name="icon_card_outlined" :size="18" class="shrink-0" />
+              <ApplicationIcon v-else :icon="selectedApplication?.icon" :size="18" class="shrink-0" />
+              <span class="truncate" :title="label">{{ label }}</span>
+            </div>
+          </template>
+        </el-select>
+      </template>
+    </HomeStatistics>
+    <!-- 排行榜 TOP5 -->
+    <HomeRankings :key="selectedWorkspaceId" class="mt-4" :workspace-id="selectedWorkspaceId" :api="SystemHomepageApi" />
+  </MkViewLayout>
 </template>
