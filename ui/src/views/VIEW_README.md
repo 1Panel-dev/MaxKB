@@ -698,7 +698,9 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 接口成功后刷新列表回显，不在请求前切换状态，不单独封装 Action。
 页面保留列表、多选、任务状态展示判断与刷新方法，不维护各 Action 的请求流程。
 `DocumentStatus`、`DocumentTags` 等纯展示组件继续留在 `document/components/`。
-页面不再维护这些弹窗 Ref 和打开方法；承载入口的 `MkTableMoreDropdown` 使用 `persistent`，避免菜单收起时卸载弹窗。
+页面不再维护这些弹窗 Ref 和打开方法。行内更多菜单使用 `MkTableMoreDropdown`；批量操作栏使用
+`MkDropdown` 搭配非 text 的“更多操作 + 下箭头”按钮和 `MkDropdownMenu`，点击展开。
+两种菜单均保留 `persistent`，避免菜单收起时卸载 Action 内的弹窗。
 不新增前端权限判断；共享文档不展示选择列及操作入口。
 文档分页接口维护在 `workspace/knowledge/document.ts`，页面管理 loading。文件状态表头使用
 `MkDropdown` 单选筛选全部、成功、失败、索引中、分词索引中、排队中和生成中；查询组合

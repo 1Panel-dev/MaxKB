@@ -8,7 +8,7 @@ import type { Dict, ToolItem } from '@/api/types'
 import { MkDynamicsForm, type DynamicFormValue } from '@/components/mk-dynamics-form'
 import { MsgSuccess } from '@/utils/message'
 
-defineOptions({ name: 'InitParamDialog' })
+defineOptions({ name: 'InitParamDrawer' })
 
 const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi }>()
 
@@ -67,7 +67,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="配置启动参数" @closed="handleClosed">
+  <MkDrawer v-model="visible" title="启动参数" @closed="handleClosed">
     <MkDynamicsForm v-if="toolDetail" ref="dynamicsFormRef" v-model="initParams" :render-data="toolDetail.init_field_list ?? []" />
 
     <template #footer>
@@ -76,5 +76,5 @@ defineExpose({ open })
         {{ enableAfterSave ? '保存并启用' : '保存' }}
       </el-button>
     </template>
-  </MkDialog>
+  </MkDrawer>
 </template>
