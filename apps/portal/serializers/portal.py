@@ -76,11 +76,62 @@ class PortalSerializer(serializers.Serializer):
             model = Portal
             fields = "__all__"
 
+    @staticmethod
+    def _is_license_valid():
+        license_validator = DatabaseModelManage.get_model("license_is_valid") or (lambda: False)
+        license_status = license_validator()
+        return license_status if license_status is not None else False
+
+    def _get_enabled_auth_types(self):
+        # 无有效授权（license）或 ChatUserPlatformSource 模型不存在时，仅提供 LOCAL 登录
+        if not self._is_license_valid():
+            return []
+        chat_platform_source_model = DatabaseModelManage.get_model("chat_platform")
+        if chat_platform_source_model is None:
+            return []
+        return list(
+            chat_platform_source_model.objects.filter(is_active=True, is_valid=True)
+            .order_by("type")
+            .values_list("auth_type", flat=True)
+        )
+
+    def _enrich_auth_config(self, auth_config):
+        auth_config = dict(auth_config or {})
+        auth_config.setdefault("type", "LOCAL")
+        auth_config.setdefault("max_attempts", 1)
+        auth_config.setdefault("failed_attempts", 5)
+        auth_config.setdefault("lock_time", 10)
+
+        enabled_auth_types = self._get_enabled_auth_types()
+        all_available_auths = ["LOCAL"] + enabled_auth_types
+
+        if "login_value" not in auth_config:
+            auth_config["login_value"] = all_available_auths
+        else:
+            auth_config["login_value"] = [
+                method for method in auth_config.get("login_value", []) if method in all_available_auths
+            ]
+
+        options = [{"label": _(_type), "value": _type} for _type in all_available_auths]
+        options.sort(key=lambda x: (0 if x["value"] == "LOCAL" else 1, x["label"]))
+        auth_types = [{"label": _(_type), "value": _type} for _type in auth_config["login_value"]]
+        auth_types.sort(key=lambda x: (0 if x["value"] == "LOCAL" else 1, x["label"]))
+
+        auth_config["system_options"] = options
+        auth_config["auth_types"] = auth_types
+        return auth_config
+
     def one(self):
         portal = Portal.objects.first()
         if portal is None:
             raise AppApiException(500, _("Portal configuration does not exist"))
-        return PortalSerializer.Model(portal).data
+        data = PortalSerializer.Model(portal).data
+        # 授权无效时不展示 auth_config，避免暴露认证配置
+        if self._is_license_valid():
+            data["auth_config"] = self._enrich_auth_config(data["auth_config"])
+        else:
+            data["auth_config"] = {}
+        return data
 
     def _upload_file(self, file_obj):
         file_id = uuid.uuid7()
