@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { computed, ref, watch } from 'vue'
 import TriggerApi from '@/api/admin/workspace/trigger/trigger'
 import { RESOURCE_TYPE, TOOL_TYPE, STATE_TYPES } from '@/api/enums'
@@ -75,7 +76,8 @@ watch(
           </div>
           <div>
             <p class="mb-1 text-N600">状态</p>
-            <MkStatusLabel :status="record.state" />
+            <MkStatusLabel v-if="EXECUTION_STATUS_OPTIONS[record.state]" v-bind="EXECUTION_STATUS_OPTIONS[record.state]" />
+            <span v-else>{{ record.state }}</span>
           </div>
           <div>
             <p class="mb-1 text-N600">耗时</p>

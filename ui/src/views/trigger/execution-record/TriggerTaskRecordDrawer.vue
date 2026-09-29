@@ -5,7 +5,7 @@ import { RESOURCE_TYPE, STATE_TYPES } from '@/api/enums'
 import type { Dict, TriggerTaskRecord } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
-import { STATE_LABELS } from '@/constants/state'
+import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 
 /* 当前触发器记录查询 */
 const visible = ref(false)
@@ -20,9 +20,9 @@ const searchFields = [
     label: '状态',
     value: 'state',
     options: [
-      { label: STATE_LABELS[STATE_TYPES.SUCCESS], value: STATE_TYPES.SUCCESS },
-      { label: STATE_LABELS[STATE_TYPES.STARTED], value: STATE_TYPES.STARTED },
-      { label: STATE_LABELS[STATE_TYPES.FAILURE], value: STATE_TYPES.FAILURE },
+      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].label, value: STATE_TYPES.SUCCESS },
+      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].label, value: STATE_TYPES.STARTED },
+      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].label, value: STATE_TYPES.FAILURE },
     ],
   },
   {
@@ -114,26 +114,29 @@ defineExpose({ open })
       @size-change="loadRecords()"
     >
       <el-table-column label="触发任务" min-width="130" show-overflow-tooltip>
-        <template #default="{ row }"
-          ><div class="flex-align-center gap-2">
+        <template #default="{ row }">
+          <div class="flex-align-center gap-2">
             <ApplicationIcon v-if="row.source_type === RESOURCE_TYPE.APPLICATION" :icon="row.source_icon" :size="20" />
             <ToolIcon v-else :icon="row.source_icon" :type="row.type" :size="20" />
             <span class="min-w-0 flex-1 truncate">{{ row.source_name }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="类型" width="80"
-        ><template #default="{ row }">{{ row.source_type === RESOURCE_TYPE.APPLICATION ? '智能体' : '工具' }}</template></el-table-column
-      >
-      <el-table-column label="状态" width="100"
-        ><template #default="{ row }"><MkStatusLabel :status="row.state" /></template
-      ></el-table-column>
-      <el-table-column label="耗时" width="90"
-        ><template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template></el-table-column
-      >
-      <el-table-column label="执行时间" prop="create_time" width="180"
-        ><template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template></el-table-column
-      >
+      <el-table-column label="类型" width="80">
+        <template #default="{ row }">{{ row.source_type === RESOURCE_TYPE.APPLICATION ? '智能体' : '工具' }}</template>
+      </el-table-column>
+      <el-table-column label="状态" width="100">
+        <template #default="{ row }: { row: TriggerTaskRecord }">
+          <MkStatusLabel v-if="EXECUTION_STATUS_OPTIONS[row.state]" v-bind="EXECUTION_STATUS_OPTIONS[row.state]" />
+          <span v-else>{{ row.state }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="耗时" width="90">
+        <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
+      </el-table-column>
+      <el-table-column label="执行时间" prop="create_time" width="180">
+        <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="70">
         <template #default="{ row }">
           <!-- 查看执行详情 -->

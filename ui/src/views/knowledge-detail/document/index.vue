@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { CascaderOption } from 'element-plus'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
@@ -10,17 +10,19 @@ import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
-import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, KNOWLEDGE_TYPE, STATE_TYPES } from '@/api/enums'
+import { DOCUMENT_TASK_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
-import { STATE_LABELS } from '@/constants/state'
-import type { Dict, DocumentHitHandling, DocumentItem, DocumentTaskType, OptionItem } from '@/api/types'
+import { DOCUMENT_STATUS_FILTER_OPTIONS } from './status'
+import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
+import { isDocumentTaskRunning } from './utils.ts'
 import {
+  BatchEmbeddingDocumentAction,
   CancelDocumentTaskAction,
   DeleteDocumentAction,
   DocumentTagsAction,
@@ -86,37 +88,8 @@ function loadCreatorOptions(keyword: string) {
 
 /* 过滤项 */
 // 文档状态
-interface DocumentStatusFilter {
-  label: string
-  value: string
-  status: (typeof DOCUMENT_TASK_STATE)[keyof typeof DOCUMENT_TASK_STATE]
-  task_type?: (typeof DOCUMENT_TASK_TYPE)[keyof typeof DOCUMENT_TASK_TYPE]
-}
-const documentStatusOptions: DocumentStatusFilter[] = [
-  { label: STATE_LABELS[STATE_TYPES.SUCCESS], value: STATE_TYPES.SUCCESS, status: DOCUMENT_TASK_STATE.SUCCESS },
-  { label: STATE_LABELS[STATE_TYPES.FAILURE], value: STATE_TYPES.FAILURE, status: DOCUMENT_TASK_STATE.FAILURE },
-  {
-    label: STATE_LABELS[STATE_TYPES.EMBEDDING],
-    value: STATE_TYPES.EMBEDDING,
-    status: DOCUMENT_TASK_STATE.STARTED,
-    task_type: DOCUMENT_TASK_TYPE.EMBEDDING,
-  },
-  {
-    label: STATE_LABELS[STATE_TYPES.TOKENIZE],
-    value: STATE_TYPES.TOKENIZE,
-    status: DOCUMENT_TASK_STATE.STARTED,
-    task_type: DOCUMENT_TASK_TYPE.TOKENIZE,
-  },
-  { label: STATE_LABELS[STATE_TYPES.PENDING], value: STATE_TYPES.PENDING, status: DOCUMENT_TASK_STATE.PENDING },
-  {
-    label: STATE_LABELS[STATE_TYPES.GENERATE],
-    value: STATE_TYPES.GENERATE,
-    status: DOCUMENT_TASK_STATE.STARTED,
-    task_type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM,
-  },
-]
 const selectedDocumentStatus = ref<string | null>(null)
-const documentStatusFilter = computed(() => documentStatusOptions.find(({ value }) => value === selectedDocumentStatus.value))
+const documentStatusFilter = computed(() => DOCUMENT_STATUS_FILTER_OPTIONS.find(({ value }) => value === selectedDocumentStatus.value))
 
 // 启用状态
 const documentActiveOptions = [
@@ -162,8 +135,32 @@ function handleDocumentFilterChange() {
   return loadDocuments()
 }
 
-function loadDocuments(): Promise<void> {
-  loading.value = true
+/* 文档列表轮询：后台刷新保留筛选、分页和选择。 */
+let pollingTimer: ReturnType<typeof setTimeout> | undefined
+let pollingActive = false
+
+function stopPolling() {
+  clearTimeout(pollingTimer)
+  pollingTimer = undefined
+}
+
+function schedulePolling() {
+  stopPolling()
+  if (!pollingActive) return
+  pollingTimer = setTimeout(() => {
+    if (loading.value || operationLoading.value) {
+      schedulePolling()
+      return
+    }
+    void loadDocuments(false).catch(() => {
+      // 请求层统一提示错误，失败后仍由 finally 安排下一次轮询。
+    })
+  }, 6000)
+}
+
+function loadDocuments(showLoading = true): Promise<void> {
+  stopPolling()
+  if (showLoading) loading.value = true
   const requestApi = isWorkspaceSharedResource() ? SharedDocumentApi : DocumentApi
   return requestApi
     .getDocumentPage(knowledgeId.value, paginationConfig.value, {
@@ -175,17 +172,19 @@ function loadDocuments(): Promise<void> {
       tags: selectedDocumentTags.value.length ? selectedDocumentTags.value : undefined,
     })
     .then((page) => {
+      if (!pollingActive) return
       documentData.value = page.records
       paginationConfig.value.total = page.total
       // 删除或迁移最后一页文档后，回到仍有数据的最后一页。
       const lastPage = Math.max(1, Math.ceil(page.total / paginationConfig.value.pageSize))
       if (paginationConfig.value.currentPage > lastPage) {
         paginationConfig.value.currentPage = lastPage
-        return loadDocuments()
+        return loadDocuments(showLoading)
       }
     })
     .finally(() => {
-      loading.value = false
+      if (showLoading) loading.value = false
+      schedulePolling()
     })
 }
 
@@ -229,12 +228,6 @@ function handleChangeActive(document: DocumentItem) {
     })
 }
 
-// 按状态字符串中从右起的任务位置，判断任务是否排队或执行中。
-function isTaskRunning(document: DocumentItem, taskType: DocumentTaskType) {
-  const state = document.status?.at(-taskType)
-  return state === DOCUMENT_TASK_STATE.PENDING || state === DOCUMENT_TASK_STATE.STARTED
-}
-
 // 操作成功后清空勾选并刷新文档列表。
 function refreshAfterOperation() {
   clearDocumentSelection()
@@ -242,7 +235,13 @@ function refreshAfterOperation() {
 }
 
 onMounted(() => {
+  pollingActive = true
   loadDocuments()
+})
+
+onBeforeUnmount(() => {
+  pollingActive = false
+  stopPolling()
 })
 </script>
 
@@ -259,8 +258,8 @@ onMounted(() => {
     :data="documentData"
     v-model:pagination-config="paginationConfig"
     :max-table-height="210"
-    @current-change="loadDocuments"
-    @size-change="loadDocuments"
+    @current-change="loadDocuments()"
+    @size-change="loadDocuments()"
     @selection-change="handleSelectionChange"
     resizable
   >
@@ -279,7 +278,7 @@ onMounted(() => {
           v-model="selectedDocumentStatus"
           mode="single"
           label="文件状态"
-          :options="documentStatusOptions"
+          :options="DOCUMENT_STATUS_FILTER_OPTIONS"
           @change="handleDocumentFilterChange"
         />
       </template>
@@ -367,10 +366,8 @@ onMounted(() => {
             <!-- 向量化或取消向量化 -->
             <EmbeddingDocumentAction
               :api="DocumentApi"
-              display="button"
               :knowledge-id="knowledgeId"
               :document="row"
-              :document-ids="[row.id]"
               v-model:loading="operationLoading"
               @refresh="refreshAfterOperation"
             />
@@ -410,7 +407,7 @@ onMounted(() => {
                 :document-ids="[row.id]"
                 :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
                 label="取消生成问题"
-                v-if="isTaskRunning(row, DOCUMENT_TASK_TYPE.GENERATE_PROBLEM)"
+                v-if="isDocumentTaskRunning(row, DOCUMENT_TASK_TYPE.GENERATE_PROBLEM)"
                 @refresh="refreshAfterOperation"
               />
               <!-- 生成问题 -->
@@ -474,7 +471,7 @@ onMounted(() => {
                 :api="DocumentApi"
                 :knowledge-id="knowledgeId"
                 v-model:loading="operationLoading"
-                :document-ids="[row.id]"
+                :document="row"
                 @refresh="refreshAfterOperation"
               />
             </MkTableMoreDropdown>
@@ -484,12 +481,11 @@ onMounted(() => {
     </el-table-column>
     <template v-if="!isWorkspaceSharedResource()" #footer-batch-actions>
       <!-- 批量向量化 -->
-      <EmbeddingDocumentAction
+      <BatchEmbeddingDocumentAction
         :api="DocumentApi"
-        batch
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
-        :disabled="operationLoading"
+        v-model:loading="operationLoading"
         @refresh="refreshAfterOperation"
       />
       <!-- 批量分词索引 -->
@@ -510,24 +506,20 @@ onMounted(() => {
         :disabled="operationLoading"
         @refresh="refreshAfterOperation"
       />
+      <!-- 批量文档设置 -->
+      <el-button>设置</el-button>
+
+      <!-- 批量添加标签 -->
+      <el-button>添加标签</el-button>
+
       <!-- 更多批量操作 -->
-      <MkDropdown class="ml-3" trigger="click" placement="bottom-end" persistent :disabled="operationLoading">
+      <MkDropdown class="ml-3" trigger="click" placement="bottom-end" hide-when-empty>
         <!-- 展开更多批量操作 -->
-        <el-button :disabled="operationLoading">
-          更多操作
-          <MkIcon name="icon_down_outlined" class="ml-1" />
+        <el-button plain type="primary" class="min-w-0! w-8!">
+          <MkIcon name="icon_more_outlined" />
         </el-button>
         <template #dropdown>
           <MkDropdownMenu>
-            <!-- 批量文档设置 -->
-            <SettingDocumentAction
-              :api="DocumentApi"
-              :knowledge-id="knowledgeId"
-              :documents="selectedDocuments"
-              batch
-              :disabled="operationLoading"
-              @refresh="refreshAfterOperation"
-            />
             <!-- 批量迁移文档 -->
             <MigrateDocumentAction
               :api="DocumentApi"
@@ -536,14 +528,7 @@ onMounted(() => {
               :disabled="operationLoading"
               @refresh="refreshAfterOperation"
             />
-            <!-- 批量添加标签 -->
-            <DocumentTagsAction
-              :api="DocumentApi"
-              :knowledge-id="knowledgeId"
-              :document-ids="selectedDocumentIds"
-              :disabled="operationLoading"
-              @refresh="refreshAfterOperation"
-            />
+
             <!-- 批量同步文档 -->
             <SyncDocumentAction
               :api="DocumentApi"
@@ -588,7 +573,7 @@ onMounted(() => {
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
               :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
-              label="取消生成问题"
+              label="取消生成"
               @refresh="refreshAfterOperation"
             />
             <!-- 批量删除文档 -->

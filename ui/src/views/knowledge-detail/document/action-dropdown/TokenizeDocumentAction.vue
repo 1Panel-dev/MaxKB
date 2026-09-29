@@ -4,6 +4,7 @@ import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { computed } from 'vue'
 import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import type { DocumentItem } from '@/api/types'
+import { isDocumentTaskRunning } from '../utils'
 
 defineOptions({ name: 'TokenizeDocumentAction' })
 const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documentIds: string[]; document?: DocumentItem; batch?: boolean }>()
@@ -11,10 +12,7 @@ const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 
 // 行操作根据任务状态切换为取消；批量操作始终提交分词索引。
-const running = computed(() => {
-  const state = props.document?.status?.at(-DOCUMENT_TASK_TYPE.TOKENIZE)
-  return state === DOCUMENT_TASK_STATE.PENDING || state === DOCUMENT_TASK_STATE.STARTED
-})
+const running = computed(() => isDocumentTaskRunning(props.document, DOCUMENT_TASK_TYPE.TOKENIZE))
 function handleTokenize() {
   const ids = [...props.documentIds]
   if (!ids.length || loading.value) return

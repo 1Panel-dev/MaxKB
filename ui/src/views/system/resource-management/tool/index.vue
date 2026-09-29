@@ -229,7 +229,7 @@ onMounted(() => {
                 <!-- 导出工具 -->
                 <ExportToolAction v-if="!row.template_id" v-model:loading="operationLoading" label="导出" :api="SystemToolApi" :tool="row" />
                 <!-- 删除工具 -->
-                <MkDropdownItem divided :disabled="operationLoading" @click="handleDeleteTool(row)">
+                <MkDropdownItem divided @click="handleDeleteTool(row)">
                   <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                   删除
                 </MkDropdownItem>

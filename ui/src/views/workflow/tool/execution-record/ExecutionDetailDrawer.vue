@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { computed, ref, watch } from 'vue'
 import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import { TOOL_RECORD_SOURCE, KNOWLEDGE_TYPE } from '@/api/enums'
@@ -79,7 +80,11 @@ watch(
           </div>
           <div>
             <p class="mb-1 text-N600">状态</p>
-            <MkStatusLabel :status="detail?.state ?? record.state" />
+            <MkStatusLabel
+              v-if="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state]"
+              v-bind="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state]"
+            />
+            <span v-else>{{ detail?.state ?? record.state }}</span>
           </div>
           <div>
             <p class="mb-1 text-N600">耗时</p>

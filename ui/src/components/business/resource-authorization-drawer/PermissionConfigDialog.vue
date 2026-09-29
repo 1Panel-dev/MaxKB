@@ -44,7 +44,7 @@ defineExpose({ open, close })
 
 <template>
   <MkDialog v-model="visible" :title="scopeOnly ? '生效资源' : '配置权限'" :show-close="!loading" @closed="resetData">
-    <el-radio-group v-if="!scopeOnly" v-model="permission" class="vertical-radio-group" :disabled="loading">
+    <el-radio-group v-if="!scopeOnly" v-model="permission" class="mk-radio-group-vertical" :disabled="loading">
       <el-radio v-for="option in options" :key="option.value" :value="option.value">
         <p>{{ option.label }}</p>
         <p v-if="option.description" class="mt-1 text-N500">{{ option.description }}</p>
@@ -55,7 +55,7 @@ defineExpose({ open, close })
         <el-divider class="my-4!" />
         <h6 class="mb-2">生效资源</h6>
       </template>
-      <el-radio-group v-model="includeChildren" class="vertical-radio-group" :disabled="loading">
+      <el-radio-group v-model="includeChildren" class="mk-radio-group-vertical" :disabled="loading">
         <el-radio :value="false">仅当前资源</el-radio>
         <el-radio :value="true" :disabled="!canIncludeChildren">包含所有子文件夹</el-radio>
       </el-radio-group>

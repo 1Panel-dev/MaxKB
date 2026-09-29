@@ -1,27 +1,34 @@
 <script setup lang="ts">
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { DocumentItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DeleteDocumentAction' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documentIds: string[]; batch?: boolean }>()
+const props = defineProps<{
+  api: typeof DocumentApi
+  knowledgeId: string
+  document?: DocumentItem
+  documentIds?: string[]
+  batch?: boolean
+}>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 
 // 确认后删除单个或选中文档；刷新后的分页总数以服务端为准。
 function handleDelete() {
-  if (!props.documentIds.length || loading.value) return
-  const ids = [...props.documentIds]
-  const documentId = ids[0]!
-  return MsgConfirm(`删除 ${ids.length} 个文档`, '删除后无法恢复，是否继续？')
+  const { batch, document, knowledgeId } = props
+  const ids = [...(props.documentIds ?? [])]
+  // 批量确认展示数量，单个确认展示文档名称；确认期间保留本次删除目标。
+  const confirmation = batch
+    ? MsgConfirm(`是否删除选中的 ${ids.length} 个文档？`, '所选文档中的分段会跟随删除，请谨慎操作。')
+    : MsgConfirm(`确认删除文档：${document!.name}？`, `此文档下的 ${document!.paragraph_count} 个分段都会被删除，请谨慎操作。`)
+  return confirmation
     .then(() => {
-      if (loading.value) return
       loading.value = true
-      const request = props.batch
-        ? props.api.putBatchDeleteDocuments(props.knowledgeId, ids)
-        : props.api.deleteDocument(props.knowledgeId, documentId)
+      const request = batch ? props.api.putBatchDeleteDocuments(knowledgeId, ids) : props.api.deleteDocument(knowledgeId, document!.id)
       return request
         .then(() => {
-          MsgSuccess('操作成功')
+          MsgSuccess('删除成功')
           emit('refresh')
         })
         .finally(() => {
@@ -34,5 +41,5 @@ function handleDelete() {
 
 <template>
   <!-- 删除单个或选中文档 -->
-  <MkAction label="删除" :disabled="loading || !documentIds.length" @click="handleDelete" />
+  <MkAction label="删除" @click="handleDelete" />
 </template>

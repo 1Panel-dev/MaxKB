@@ -2,16 +2,17 @@
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, ref } from 'vue'
 import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
-import type { DocumentStatusMeta, DocumentTaskState, DocumentTaskType, State } from '@/api/types'
+import type { DocumentStatusMeta, DocumentTaskState, DocumentTaskType } from '@/api/types'
+import { DOCUMENT_STATUS_OPTIONS } from '../status'
 
 defineOptions({ name: 'DocumentStatus' })
 const props = defineProps<{ status: string; statusMeta?: DocumentStatusMeta | null }>()
 
 const DOCUMENT_TASKS = [
-  { type: DOCUMENT_TASK_TYPE.EMBEDDING, label: '向量化', startedStatus: STATE_TYPES.EMBEDDING },
-  { type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM, label: '生成问题', startedStatus: STATE_TYPES.GENERATE },
-  { type: DOCUMENT_TASK_TYPE.SYNC, label: '同步', startedStatus: STATE_TYPES.SYNC },
-  { type: DOCUMENT_TASK_TYPE.TOKENIZE, label: '分词索引', startedStatus: STATE_TYPES.TOKENIZE },
+  { type: DOCUMENT_TASK_TYPE.EMBEDDING, label: '向量化', startedStatus: 'EMBEDDING' },
+  { type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM, label: '生成问题', startedStatus: 'GENERATE' },
+  { type: DOCUMENT_TASK_TYPE.SYNC, label: '同步', startedStatus: 'SYNC' },
+  { type: DOCUMENT_TASK_TYPE.TOKENIZE, label: '分词索引', startedStatus: 'TOKENIZE' },
 ] as const
 
 const DOCUMENT_STATUS_PRIORITY = [
@@ -23,7 +24,7 @@ const DOCUMENT_STATUS_PRIORITY = [
   DOCUMENT_TASK_STATE.SUCCESS,
 ] as const
 
-const DOCUMENT_STATUS_DISPLAY: Partial<Record<DocumentTaskState, State>> = {
+const DOCUMENT_STATUS_DISPLAY: Partial<Record<DocumentTaskState, keyof typeof DOCUMENT_STATUS_OPTIONS>> = {
   [DOCUMENT_TASK_STATE.PENDING]: STATE_TYPES.PENDING,
   [DOCUMENT_TASK_STATE.REVOKE]: STATE_TYPES.REVOKE,
   // 文件状态沿用 v2：取消完成展示成功，明细完成数仍只统计真正成功的分段。
@@ -36,7 +37,7 @@ interface DocumentTaskStatus {
   type: DocumentTaskType
   label: string
   state: DocumentTaskState
-  displayStatus: State
+  displayStatus: keyof typeof DOCUMENT_STATUS_OPTIONS
   completed: number
   total: number
   time: string
@@ -102,7 +103,7 @@ const aggregateStatus = computed(() => getAggregateDocumentStatus(taskStatuses.v
   >
     <template #reference>
       <span class="inline-flex cursor-pointer">
-        <MkStatusLabel v-if="aggregateStatus" :status="aggregateStatus.displayStatus" />
+        <MkStatusLabel v-if="aggregateStatus" v-bind="DOCUMENT_STATUS_OPTIONS[aggregateStatus.displayStatus]" />
         <span v-else>-</span>
       </span>
     </template>
@@ -110,7 +111,7 @@ const aggregateStatus = computed(() => getAggregateDocumentStatus(taskStatuses.v
       <template v-for="task in taskStatuses" :key="task.type">
         <div class="flex-align-center gap-3 whitespace-nowrap">
           <span>{{ task.label }}:</span>
-          <MkStatusLabel :status="task.displayStatus" />
+          <MkStatusLabel v-bind="DOCUMENT_STATUS_OPTIONS[task.displayStatus]" />
           <span :class="task.failed ? 'text-danger' : ''">完成 {{ task.completed }}/{{ task.total }}</span>
           <span v-if="task.time" class="text-N500">{{ task.time }}</span>
         </div>

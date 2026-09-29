@@ -506,6 +506,9 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 批量任务沿用 v2 的 `id_list` / `state_list`；生成问题使用 `document_id_list`，
 添加标签使用 `document_ids` / `tag_ids`，迁移和批量导出直接提交文档 ID 数组。
 向量化、生成问题默认排除成功分段，也可选择全部分段。任务类型使用 `DOCUMENT_TASK_TYPE`。
+单项向量化使用 `putDocumentRefresh(knowledgeId, documentId, stateList)` 请求 `/<documentId>/refresh`；
+单项取消使用 `putCancelTask(knowledgeId, documentId, taskType)` 请求 `/<documentId>/cancel_task`，提交 `{ type }`。
+批量向量化与取消分别沿用 `batch_refresh` 和 `batch_cancel_task`，不以单元素批量请求代替单项接口。
 文档设置的共享载荷为 `DocumentSettingPayload`，生成问题使用 `DocumentGeneratePayload`；
 单项设置通过 `meta` 保留来源数据，批量设置将 `allow_download` 放在顶层。
 飞书同步沿用 v2 扩展接口 `/knowledge/lark/<knowledgeId>/_batch`，需部署环境支持。

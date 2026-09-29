@@ -4,7 +4,7 @@ import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import { TOOL_RECORD_SOURCE, KNOWLEDGE_TYPE, STATE_TYPES } from '@/api/enums'
 import type { Dict, ToolExecutionRecord } from '@/api/types'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
-import { STATE_LABELS } from '@/constants/state'
+import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { datetimeFormat } from '@/utils/time'
 import { isSystemSharedResource } from '@/utils/resource-context'
 
@@ -28,9 +28,9 @@ const searchFields = [
     label: '状态',
     value: 'state',
     options: [
-      { label: STATE_LABELS[STATE_TYPES.SUCCESS], value: STATE_TYPES.SUCCESS },
-      { label: STATE_LABELS[STATE_TYPES.STARTED], value: STATE_TYPES.STARTED },
-      { label: STATE_LABELS[STATE_TYPES.FAILURE], value: STATE_TYPES.FAILURE },
+      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].label, value: STATE_TYPES.SUCCESS },
+      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].label, value: STATE_TYPES.STARTED },
+      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].label, value: STATE_TYPES.FAILURE },
     ],
   },
   {
@@ -143,7 +143,10 @@ defineExpose({ open })
         <template #default="{ row }">{{ sourceLabels[row.source_type as keyof typeof sourceLabels] || '-' }}</template>
       </el-table-column>
       <el-table-column label="状态" width="100">
-        <template #default="{ row }"><MkStatusLabel :status="row.state" /></template>
+        <template #default="{ row }: { row: ToolExecutionRecord }">
+          <MkStatusLabel v-if="EXECUTION_STATUS_OPTIONS[row.state]" v-bind="EXECUTION_STATUS_OPTIONS[row.state]" />
+          <span v-else>{{ row.state }}</span>
+        </template>
       </el-table-column>
       <el-table-column label="耗时" width="90">
         <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
