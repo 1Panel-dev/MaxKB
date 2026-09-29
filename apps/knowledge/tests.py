@@ -1464,6 +1464,18 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
                 {"data_source": {"node_id": "source"}},
             )
 
+    def test_schedule_accepts_remote_tool_folder_but_rejects_uploaded_files(self):
+        tool_flow = {"nodes": [{"id": "source", "type": "tool-lib-node", "properties": {"kind": "data-source"}}]}
+        validate_workflow_sync_source(
+            tool_flow,
+            {"data_source": {"node_id": "source", "file_list": [{"type": "folder", "token": "folder-token"}]}},
+        )
+        with self.assertRaisesRegex(ValueError, "Local file"):
+            validate_workflow_sync_source(
+                tool_flow,
+                {"data_source": {"node_id": "source", "file_list": [{"file_id": "uploaded-file-id"}]}},
+            )
+
     @patch("knowledge.task.sync.KnowledgeWorkflowActionSerializer")
     @patch("knowledge.task.sync.KnowledgeSyncLog.objects.create")
     @patch("knowledge.task.sync.QuerySet")
@@ -1592,12 +1604,18 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         delete_documents.assert_not_called()
 
         knowledge.meta["sync_setting"]["sync_type"] = "incremental"
-        knowledge.meta["workflow_sync_input"]["data_source"] = {"node_id": "start-node", "query": "updated"}
+        knowledge.meta["workflow_sync_input"]["data_source"] = {
+            "node_id": "start-node",
+            "file_list": [{"type": "folder", "token": "folder-token"}],
+        }
         workflow_query.filter.return_value.values_list.return_value.first.return_value = {
             "nodes": [{"id": "start-node", "type": "tool-lib-node", "properties": {"kind": "data-source"}}]
         }
         self.assertTrue(scheduled_sync_workflow_knowledge.run(str(knowledge.id)))
-        self.assertEqual(action_serializer.return_value.action.call_args.args[0]["data_source"]["query"], "updated")
+        self.assertEqual(
+            action_serializer.return_value.action.call_args.args[0]["data_source"]["file_list"],
+            [{"type": "folder", "token": "folder-token"}],
+        )
 
     @patch("knowledge.serializers.knowledge_workflow.WorkflowRunRegistry")
     @patch("knowledge.serializers.knowledge_workflow.new_instance")
