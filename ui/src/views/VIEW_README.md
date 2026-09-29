@@ -666,14 +666,25 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 设置页中。当前设置页仅接入 Workspace 路由和 API，暂不增加前端权限判断。
 更换向量模型需确认，先保存再重新向量化，整条流程禁止重复提交；向量化失败时保留原模型比较基准，
 允许再次保存重试。Web、飞书设置保留未编辑的 `meta` 字段，上传限制使用详情顶层值。
-`knowledge-detail/document/index.vue` 仅维护文档列表查询，使用 `MkComplexSearch`、`MkTable`。
+`knowledge-detail/document/index.vue` 维护文档列表查询、多选和文档操作，使用 `MkComplexSearch`、`MkTable`。
 搜索只提供名称 `name` 和创建者 `create_user`；创建者通过 Workspace `CommonApi.getAllUsers`
 加载，支持按 `nick_name` 远程搜索。列表使用 `documentData`、`paginationConfig`、`documentQuery`，
 查询方法为 `loadDocuments`，搜索处理为 `handleSearchChange`，搜索变化后回到第一页。
 文档页通过 `onMounted` 加载文档列表，创建者选项在展开下拉或输入关键词时通过 `remoteMethod`
 按需加载，不在进入页面时预加载；其他列表页的同类创建者筛选遵循相同方式。不额外监听路由重置状态。切换工作空间
 整页加载并返回知识库列表；当前知识库与共享资源入口均从其他页面进入，挂载时初始化筛选和分页。
-无轮询、排序入口、选择列和文档操作。
+无轮询和排序入口。非共享文档显示选择列，按文档 ID 跨页保留选择，搜索或筛选变化时清空；
+选中后通过 `footer-batch-actions` 展示批量操作。右侧固定操作列提供启停、向量化、分词索引和更多菜单，
+运行或排队中的任务切换为取消入口。Web、飞书提供同步，普通与工作流文档提供原文下载和替换。
+单项与批量操作共用页面请求状态，删除和同步先确认，成功后清空选择并刷新，导出和下载保留选择。
+文档操作入口与专属弹窗合并放在 `document/components/`：`ButtonDocumentTask` 负责向量化分段范围与生成问题配置，
+`ButtonDocumentSetting` 负责召回及来源设置，`ButtonMigrateDocument` 选择目标知识库，
+`ButtonDocumentTags` 添加已有标签和移除文档标签关联。组件接收知识库 ID、文档 ID 或文档数组及禁用状态，
+点击时快照本次操作对象，内部管理弹窗和请求，成功后通过 `refresh` 通知页面刷新，失败保留输入。
+任务组件通过 `action` 区分向量化与生成问题，通过 `batch` 切换批量按钮；行内入口使用 `display` 区分菜单与图标按钮。
+设置组件通过 `batch` 区分单项与批量，标签组件通过 `manageTags` 区分标签管理与批量添加。
+页面不再维护这些弹窗 Ref 和打开方法；承载入口的 `MkTableMoreDropdown` 使用 `persistent`，避免菜单收起时卸载弹窗。
+不新增前端权限判断；共享文档不展示选择列及操作入口。
 文档分页接口维护在 `workspace/knowledge/document.ts`，页面管理 loading。文件状态表头使用
 `MkDropdown` 单选筛选全部、成功、失败、索引中、分词索引中、排队中和生成中；查询组合
 `status` 与可选的 `task_type`，切换选项清除旧任务类型并回到第一页，保留名称和创建者条件。

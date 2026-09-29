@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import type { CascaderOption } from 'element-plus'
+import type { CascaderOption, UploadFile } from 'element-plus'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
@@ -13,13 +13,17 @@ import CommonSystemApi from '@/api/admin/system/common'
 import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, KNOWLEDGE_TYPE, STATE_TYPES } from '@/api/enums'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
 import { STATE_LABELS } from '@/constants/state'
-import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
+import type { Dict, DocumentHitHandling, DocumentItem, DocumentTaskType, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { numberFormat } from '@/utils/number'
-import { MsgSuccess } from '@/utils/message'
+import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
+import ButtonDocumentTask from './components/ButtonDocumentTask.vue'
+import ButtonDocumentSetting from './components/ButtonDocumentSetting.vue'
+import ButtonMigrateDocument from './components/ButtonMigrateDocument.vue'
+import ButtonDocumentTags from './components/ButtonDocumentTags.vue'
 import { useKnowledgeDetailContext } from '../context'
 
 defineOptions({ name: 'DocumentListView' })
@@ -29,6 +33,121 @@ defineExpose({ customHeader: true })
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const { knowledge } = useKnowledgeDetailContext()
+
+/* 文档多选：翻页保留选择，查询条件变化时清空。 */
+const documentTableRef = ref<{ clearSelection: () => void }>()
+const selectedDocuments = ref<DocumentItem[]>([])
+const selectedDocumentIds = computed(() => selectedDocuments.value.map(({ id }) => id))
+
+function handleSelectionChange(documents: unknown[]) {
+  selectedDocuments.value = documents as DocumentItem[]
+}
+
+function clearDocumentSelection() {
+  documentTableRef.value?.clearSelection()
+  selectedDocuments.value = []
+}
+
+/* 单项与批量文档操作 */
+const operationLoading = ref(false)
+const canSyncDocuments = computed(() => knowledge.value?.type === KNOWLEDGE_TYPE.WEB || knowledge.value?.type === KNOWLEDGE_TYPE.LARK)
+
+function getSelectedDocuments(document?: DocumentItem) {
+  return document ? [document] : selectedDocuments.value
+}
+
+function isTaskRunning(document: DocumentItem, taskType: DocumentTaskType) {
+  const state = document.status?.at(-taskType)
+  return state === DOCUMENT_TASK_STATE.PENDING || state === DOCUMENT_TASK_STATE.STARTED
+}
+
+function refreshAfterOperation() {
+  clearDocumentSelection()
+  return loadDocuments()
+}
+
+function runDocumentOperation(request: () => Promise<unknown>, refresh = true) {
+  if (operationLoading.value) return Promise.resolve()
+  operationLoading.value = true
+  return request()
+    .then(() => {
+      MsgSuccess('操作成功')
+      if (refresh) return refreshAfterOperation()
+    })
+    .catch(() => {
+      // 请求层统一提示错误，失败保留选择以便重试。
+    })
+    .finally(() => {
+      operationLoading.value = false
+    })
+}
+
+function handleCancelTask(taskType: DocumentTaskType, document?: DocumentItem) {
+  const ids = getSelectedDocuments(document).map(({ id }) => id)
+  if (ids.length) return runDocumentOperation(() => DocumentApi.putBatchCancelDocumentTask(knowledgeId.value, ids, taskType))
+}
+
+function handleTokenize(document?: DocumentItem) {
+  const ids = getSelectedDocuments(document).map(({ id }) => id)
+  if (ids.length) return runDocumentOperation(() => DocumentApi.putBatchTokenizeDocuments(knowledgeId.value, ids, Object.values(DOCUMENT_TASK_STATE)))
+}
+
+function handleChangeActive(document: DocumentItem) {
+  return runDocumentOperation(() => DocumentApi.putDocumentActive(knowledgeId.value, document.id, !document.is_active))
+}
+
+function handleExport(format: 'excel' | 'zip', document?: DocumentItem) {
+  const ids = getSelectedDocuments(document).map(({ id }) => id)
+  if (ids.length) return runDocumentOperation(() => DocumentApi.exportDocuments(knowledgeId.value, ids, format), false)
+}
+
+function handleDownload(document: DocumentItem) {
+  return runDocumentOperation(() => DocumentApi.downloadDocumentSource(knowledgeId.value, document), false)
+}
+
+function handleReplace(file: UploadFile, document: DocumentItem) {
+  if (file.raw) {
+    const sourceFile = file.raw
+    return runDocumentOperation(() => DocumentApi.postReplaceDocumentSource(knowledgeId.value, document.id, sourceFile))
+  }
+}
+
+function handleSync(document?: DocumentItem) {
+  const documents = getSelectedDocuments(document)
+  if (!documents.length || operationLoading.value) return
+  if (document?.type === KNOWLEDGE_TYPE.WEB && !document.meta?.source_url) {
+    MsgInfo('文档没有来源地址，请先在设置中填写文档地址')
+    return
+  }
+  const ids = documents.map(({ id }) => id)
+  return MsgConfirm('同步文档', '同步后将覆盖现有文档内容，是否继续？', { confirmButtonText: '同步' })
+    .then(() => {
+      return runDocumentOperation(() =>
+        knowledge.value?.type === KNOWLEDGE_TYPE.LARK
+          ? DocumentApi.putSyncLarkDocuments(knowledgeId.value, ids)
+          : DocumentApi.putSyncDocuments(knowledgeId.value, ids),
+      )
+    })
+    .catch(() => {})
+}
+
+function handleDelete(document?: DocumentItem) {
+  const documents = getSelectedDocuments(document)
+  if (!documents.length || operationLoading.value) return
+  const ids = documents.map(({ id }) => id)
+  return MsgConfirm(`删除 ${ids.length} 个文档`, '删除后无法恢复，是否继续？')
+    .then(() => {
+      return runDocumentOperation(() => {
+        const request = document
+          ? DocumentApi.deleteDocument(knowledgeId.value, document.id)
+          : DocumentApi.putBatchDeleteDocuments(knowledgeId.value, ids)
+        return request.then(() => {
+          paginationConfig.value.total = Math.max(0, paginationConfig.value.total - ids.length)
+        })
+      })
+    })
+    .catch(() => {})
+}
 
 /* 快速创建 */
 const showQuickCreate = computed(() => knowledge.value?.type === KNOWLEDGE_TYPE.BASE && !isWorkspaceSharedResource())
@@ -143,11 +262,12 @@ function loadDocumentTagOptions() {
 }
 
 function handleDocumentFilterChange() {
+  clearDocumentSelection()
   paginationConfig.value.currentPage = 1
   return loadDocuments()
 }
 
-function loadDocuments() {
+function loadDocuments(): Promise<void> {
   loading.value = true
   const requestApi = isWorkspaceSharedResource() ? SharedDocumentApi : DocumentApi
   return requestApi
@@ -162,6 +282,12 @@ function loadDocuments() {
     .then((page) => {
       documentData.value = page.records
       paginationConfig.value.total = page.total
+      // 删除或迁移最后一页文档后，回到仍有数据的最后一页。
+      const lastPage = Math.max(1, Math.ceil(page.total / paginationConfig.value.pageSize))
+      if (paginationConfig.value.currentPage > lastPage) {
+        paginationConfig.value.currentPage = lastPage
+        return loadDocuments()
+      }
     })
     .finally(() => {
       loading.value = false
@@ -169,6 +295,7 @@ function loadDocuments() {
 }
 
 function handleSearchChange(query?: Dict<unknown>) {
+  clearDocumentSelection()
   documentQuery.value = query ?? {}
   paginationConfig.value.currentPage = 1
   return loadDocuments()
@@ -187,18 +314,23 @@ onMounted(() => {
     </div>
   </Teleport>
   <MkTable
-    v-loading="loading"
+    ref="documentTableRef"
+    v-loading="loading || operationLoading"
     :data="documentData"
     v-model:pagination-config="paginationConfig"
     :max-table-height="210"
     @current-change="loadDocuments"
     @size-change="loadDocuments"
+    @selection-change="handleSelectionChange"
     resizable
   >
     <template v-if="showQuickCreate" #body-prepend>
       <!-- 快速创建空白文档 -->
       <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
     </template>
+
+    <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" fixed="left" reserve-selection />
+
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip />
 
     <el-table-column width="140">
@@ -283,5 +415,6 @@ onMounted(() => {
     <el-table-column label="创建时间" width="180">
       <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
+
   </MkTable>
 </template>

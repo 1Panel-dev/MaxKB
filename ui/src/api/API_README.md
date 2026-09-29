@@ -501,6 +501,16 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 
 ### 知识库文档
 
+`workspace/knowledge/document.ts` 同时维护文档启停、删除、召回设置、向量化、分词索引、
+任务取消、生成问题、迁移、同步、导出、原文件下载/替换及标签关联。
+批量任务沿用 v2 的 `id_list` / `state_list`；生成问题使用 `document_id_list`，
+添加标签使用 `document_ids` / `tag_ids`，迁移和批量导出直接提交文档 ID 数组。
+向量化、生成问题默认排除成功分段，也可选择全部分段。任务类型使用 `DOCUMENT_TASK_TYPE`。
+文档设置的共享载荷为 `DocumentSettingPayload`，生成问题使用 `DocumentGeneratePayload`；
+单项设置通过 `meta` 保留来源数据，批量设置将 `allow_download` 放在顶层。
+飞书同步沿用 v2 扩展接口 `/knowledge/lark/<knowledgeId>/_batch`，需部署环境支持。
+共享文档 API 继续仅提供查询，不增加写入方法。
+
 `workspace/knowledge/document.ts` 维护文档分页查询，路径为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<currentPage>/<pageSize>`。
 `putQuickCreateDocuments(knowledgeId, documents)` 通过 PUT `document/batch_create` 创建空白文档，

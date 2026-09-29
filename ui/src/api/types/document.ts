@@ -9,6 +9,23 @@ export interface DocumentQuickCreatePayload {
   name: string
 }
 
+/** 文档召回及来源设置。 */
+export interface DocumentSettingPayload {
+  hit_handling_method: DocumentHitHandling
+  directly_return_similarity: number
+  meta?: Record<string, unknown>
+  allow_download?: boolean
+}
+
+/** 根据文档分段生成问题。 */
+export interface DocumentGeneratePayload {
+  document_id_list: string[]
+  model_id: string
+  model_params_setting: Record<string, unknown>
+  prompt: string
+  state_list: DocumentTaskState[]
+}
+
 /** 文件各任务的分段计数及状态发生时间。 */
 export interface DocumentStatusMeta {
   aggs?: { status: string | null; count: number }[]
