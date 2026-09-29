@@ -1,10 +1,13 @@
-import type { Dict } from './common'
+import type { Dict, OptionItem } from './common'
 
 export interface PortalAuthConfig extends Dict<unknown> {
+  type?: string
   login_value?: string[]
   max_attempts?: number
   failed_attempts?: number
   lock_time?: number
+  system_options?: OptionItem<string>[]
+  auth_types?: OptionItem<string>[]
 }
 
 export interface PortalSetting {
