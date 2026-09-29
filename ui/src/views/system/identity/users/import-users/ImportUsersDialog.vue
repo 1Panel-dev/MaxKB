@@ -223,7 +223,6 @@ function submitImportUsers() {
 }
 
 function open() {
-  resetData()
   dialogVisible.value = true
   void Promise.all([loadSourceOptions(), loadRoleOptions(), loadWorkspaceOptions()])
 }

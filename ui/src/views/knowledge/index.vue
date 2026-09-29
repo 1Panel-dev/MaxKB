@@ -8,7 +8,7 @@ import CommonSystemApi from '@/api/admin/system/common'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge.ts'
 import type { Dict, FolderItem, KnowledgeItem, OptionItem } from '@/api/types'
-import { RESOURCE_TYPE } from '@/api/enums'
+import { KNOWLEDGE_TYPE, RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
@@ -17,12 +17,15 @@ import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
 import {
   AuthorizeKnowledgeAction,
   DeleteKnowledgeAction,
+  EmbeddingKnowledgeAction,
   ExportKnowledgeAction,
+  GenerateQuestionsAction,
   KeywordIndexKnowledgeAction,
   McpConfigKnowledgeAction,
   MoveKnowledgeAction,
   RelatedResourcesKnowledgeAction,
   SettingKnowledgeAction,
+  SyncKnowledgeAction,
 } from './knowledge-card/action-dropdown'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -226,9 +229,19 @@ function handleBatchDelete() {
                 @selected="handleKnowledgeSelect(knowledge.id, $event)"
               >
                 <template v-if="!isShared" #action-dropdown>
-                  <!-- TODO 同步 -->
-                  <!-- TODO 向量化 -->
-                  <!-- TODO 生成问题 -->
+                  <!-- 同步 -->
+                  <SyncKnowledgeAction
+                    v-if="knowledge.type === KNOWLEDGE_TYPE.WEB"
+                    v-model:loading="knowledgeOperationLoading"
+                    label="同步"
+                    :api="KnowledgeApi"
+                    :knowledge="knowledge"
+                  />
+                  <!-- 向量化 -->
+                  <EmbeddingKnowledgeAction v-model:loading="knowledgeOperationLoading" label="向量化" :api="KnowledgeApi" :knowledge="knowledge" />
+                  <!-- 生成问题 -->
+                  <GenerateQuestionsAction v-model:loading="knowledgeOperationLoading" label="生成问题" :api="KnowledgeApi" :knowledge="knowledge" />
+
                   <!-- 设置 -->
                   <SettingKnowledgeAction label="设置" :knowledge="knowledge" />
                   <!-- 分词索引 -->

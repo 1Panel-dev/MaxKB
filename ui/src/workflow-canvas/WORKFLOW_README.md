@@ -67,7 +67,9 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 容器；`teleport.connect()` 的可选第五个参数用于传入组件 Props。节点容器
 保留菜单开关与外部点击关闭逻辑，不维护锚点 tooltip 的状态或虚拟触发器。
 
-画布弹窗统一使用 `MkDialog`，由公共组件负责打开时挂载、关闭动画结束后卸载。
+画布弹窗统一使用 `MkDialog`，由公共组件负责内部内容打开时挂载、关闭动画结束后卸载；
+外层节点弹窗的业务实例通常常驻。遵循 `COMPONENT_README.md` 的生命周期规则，
+`open()` 回填本次节点配置，`closed` 清理局部草稿和校验，不在两端重复重置。
 保留业务 `open()`、`close()` 和 `closed` 流程，不在调用处根据可见状态直接卸载。
 
 ### `config/`
@@ -134,7 +136,8 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 查询方法按范围、方法与查询参数缓存结果并复用在途请求；`store.force.xxx()` 跳过已完成缓存，仍复用同键在途请求。
 `postPromptGenerate` 是流式生成方法，始终直接转发到对应范围的 Application API，不缓存或去重；
 通过普通 Store 或 `force` 调用都会发起新请求，返回独立的 Response 流。
-模型选项统一调用 `store.getModelListWithShared(query)`，由 API 合并工作空间和已授权共享模型；
+模型选项统一调用 `store.getModelListWithShared(query)`，由对应范围 API 查询；Workspace 和
+System 资源管理合并普通与共享模型，System 共享范围仅返回标记 `source: 'shared'` 的共享模型。
 强制刷新使用 `store.force.getModelListWithShared(query)`。动态表单配置器通过
 `getSelectModelList` 注入使用该能力，循环体转发同名注入。
 主画布从 `resourceScope` 注入读取范围（默认 `workspace`），通过节点上下文传递为 `apiType`。

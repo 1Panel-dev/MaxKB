@@ -26,7 +26,6 @@ const rules: FormRules<ParameterField> = {
 const visible = ref(false)
 
 function open(data?: ParameterField, index?: number) {
-  resetData()
   if (data) {
     formData.value = cloneDeep(data)
     editing.value = true

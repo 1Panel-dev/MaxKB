@@ -3,7 +3,7 @@ import { MsgSuccess } from '@/utils/message'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import type { DocumentTaskType } from '@/api/types'
 
-defineOptions({ name: 'CancelDocumentTaskAction' })
+defineOptions({ name: 'BatchCancelTaskAction' })
 const props = defineProps<{
   api: typeof DocumentApi
   knowledgeId: string
@@ -36,5 +36,5 @@ function handleCancelTask() {
 
 <template>
   <!-- 取消文档任务 -->
-  <MkAction :label="label" :display="display" :divided="divided" :disabled="loading || !documentIds.length" @click="handleCancelTask" />
+  <MkAction :label="label" :display="display" :divided="divided" :disabled="loading" @click="handleCancelTask" />
 </template>

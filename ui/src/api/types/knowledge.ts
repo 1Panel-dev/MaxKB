@@ -3,6 +3,19 @@
 import type LogicFlow from '@logicflow/core'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { DefaultModelSettingPayload } from './model'
+import type { DocumentTaskState } from './document'
+
+/** 生成关联问题共用的模型与提示词配置。 */
+export interface RelatedQuestionsConfig {
+  model_id: string
+  model_params_setting: Record<string, unknown>
+  prompt: string
+}
+
+/** 对知识库中指定任务状态的分段生成关联问题。 */
+export interface KnowledgeGeneratePayload extends RelatedQuestionsConfig {
+  state_list: DocumentTaskState[]
+}
 
 export type KnowledgeType = (typeof KNOWLEDGE_TYPE)[keyof typeof KNOWLEDGE_TYPE]
 

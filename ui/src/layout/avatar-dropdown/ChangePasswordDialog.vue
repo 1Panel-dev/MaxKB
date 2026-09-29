@@ -39,7 +39,6 @@ const userPasswordRules = reactive<FormRules<UpdatePasswordForm>>({
 })
 
 function open() {
-  resetData()
   dialogVisible.value = true
 }
 

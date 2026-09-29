@@ -1,5 +1,5 @@
 import type { DOCUMENT_HIT_HANDLING, DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
-import type { KnowledgeType } from './knowledge'
+import type { KnowledgeGeneratePayload, KnowledgeType } from './knowledge'
 export type DocumentHitHandling = (typeof DOCUMENT_HIT_HANDLING)[keyof typeof DOCUMENT_HIT_HANDLING]
 export type DocumentTaskState = (typeof DOCUMENT_TASK_STATE)[keyof typeof DOCUMENT_TASK_STATE]
 export type DocumentTaskType = (typeof DOCUMENT_TASK_TYPE)[keyof typeof DOCUMENT_TASK_TYPE]
@@ -18,12 +18,8 @@ export interface DocumentSettingPayload {
 }
 
 /** 根据文档分段生成问题。 */
-export interface DocumentGeneratePayload {
+export interface DocumentGeneratePayload extends KnowledgeGeneratePayload {
   document_id_list: string[]
-  model_id: string
-  model_params_setting: Record<string, unknown>
-  prompt: string
-  state_list: DocumentTaskState[]
 }
 
 /** 文件各任务的分段计数及状态发生时间。 */

@@ -5,7 +5,7 @@ import type { DocumentItem, DocumentTaskState } from '@/api/types'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { MsgSuccess } from '@/utils/message'
 import DocumentEmbeddingDialog from './DocumentEmbeddingDialog.vue'
-import { isDocumentTaskRunning } from '../../utils.ts'
+import { isDocumentTaskRunning } from '../../status'
 
 defineOptions({ name: 'EmbeddingDocumentAction' })
 const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; document: DocumentItem }>()

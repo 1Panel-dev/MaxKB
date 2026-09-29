@@ -30,7 +30,6 @@ function resetData() {
 }
 
 function open(template?: KnowledgeWorkflowTemplate & Partial<Pick<WorkflowStoreTemplate, 'name' | 'desc' | 'description'>>) {
-  resetData()
   workflowTemplate.value = template ? cloneDeep(template) : undefined
   dialogVisible.value = true
   nextTick(() => {

@@ -29,7 +29,6 @@ const rules: FormRules<TriggerBodyField> = {
 function open(field?: TriggerBodyField, index?: number) {
   editingIndex.value = index
   formData.value = field ? cloneDeep(field) : createDefaultField()
-  formRef.value?.clearValidate()
   visible.value = true
 }
 function close() {

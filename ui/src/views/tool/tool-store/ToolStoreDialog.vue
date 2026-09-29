@@ -86,11 +86,6 @@ function loadStoreTools() {
 
 function open(targetFolderId: string) {
   folderId.value = targetFolderId || 'default'
-  searchKeyword.value = ''
-  appliedSearchKeyword.value = ''
-  storeTools.value = []
-  activeCategoryId.value = ''
-  contentScrollContainer.value = undefined
   visible.value = true
   loadStoreTools()
 }
@@ -125,6 +120,11 @@ function handleAddSuccess() {
 }
 
 function handleClosed() {
+  searchKeyword.value = ''
+  appliedSearchKeyword.value = ''
+  storeTools.value = []
+  activeCategoryId.value = ''
+  contentScrollContainer.value = undefined
   loading.value = false
 }
 

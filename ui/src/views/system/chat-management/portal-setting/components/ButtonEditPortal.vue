@@ -19,7 +19,6 @@ const portalRules: FormRules = {
 function handleOpenPortalEdit() {
   if (props.disabled || props.saving) return
 
-  handleClosePortalEdit()
   portalForm.name = props.setting.name
   portalForm.logo = props.setting.logo || ''
   editVisible.value = true

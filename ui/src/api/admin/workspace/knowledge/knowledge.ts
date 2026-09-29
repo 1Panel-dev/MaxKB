@@ -5,6 +5,7 @@ import type {
   KnowledgeTagGroup,
   KnowledgeDetail,
   KnowledgeItem,
+  KnowledgeGeneratePayload,
   KnowledgeCreatePayload,
   WebKnowledgeCreatePayload,
   LarkKnowledgeCreatePayload,
@@ -60,9 +61,19 @@ const putLarkKnowledge = (knowledgeId: string, payload: Partial<KnowledgeItem>) 
   return put<Partial<KnowledgeItem>, KnowledgeItem>(`${getPrefix()}/lark/${knowledgeId}`, payload)
 }
 
+/** 根据知识库中的分段生成关联问题。 */
+const putGenerateKnowledgeQuestions = (knowledgeId: string, payload: KnowledgeGeneratePayload) => {
+  return put(`${getPrefix()}/${knowledgeId}/generate_related`, payload)
+}
+
 /** 对知识库中的文档重新向量化。 */
 const putReEmbeddingKnowledge = (knowledgeId: string) => {
   return put<undefined, boolean>(`${getPrefix()}/${knowledgeId}/embedding`)
+}
+
+/** 同步 Web 知识库。 */
+const putSyncWebKnowledge = (knowledgeId: string, syncType: 'replace' | 'complete') => {
+  return put<undefined, boolean>(`${getPrefix()}/${knowledgeId}/sync`, undefined, { sync_type: syncType })
 }
 
 /** 批量删除工作空间知识库。 */
@@ -127,6 +138,8 @@ export default {
   putKnowledge,
   putLarkKnowledge,
   putReEmbeddingKnowledge,
+  putGenerateKnowledgeQuestions,
+  putSyncWebKnowledge,
   putBatchDeleteKnowledge,
   putBatchMoveKnowledge,
   postKnowledgeImport,

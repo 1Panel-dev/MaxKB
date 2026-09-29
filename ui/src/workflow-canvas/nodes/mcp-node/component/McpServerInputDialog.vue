@@ -1,5 +1,5 @@
 <template>
-  <MkDialog v-model="dialogVisible" title="设置变量">
+  <MkDialog v-model="dialogVisible" title="设置变量" @closed="resetData">
     <el-form ref="formRef" label-position="top" :model="form" require-asterisk-position="right" @submit.prevent>
       <el-form-item
         v-for="item in inputFieldList"
@@ -35,9 +35,14 @@ const form = reactive<Record<string, string>>({})
 const inputFieldList = ref<string[]>([])
 
 function open(vars: string[]) {
-  Object.keys(form).forEach((key) => delete form[key])
   inputFieldList.value = vars
   dialogVisible.value = true
+}
+
+function resetData() {
+  Object.keys(form).forEach((key) => delete form[key])
+  inputFieldList.value = []
+  formRef.value?.clearValidate()
 }
 
 const submit = async (formEl: FormInstance | null) => {

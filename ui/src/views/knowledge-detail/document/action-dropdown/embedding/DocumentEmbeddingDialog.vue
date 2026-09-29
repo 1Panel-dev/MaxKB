@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { DOCUMENT_TASK_STATE } from '@/api/enums'
 import type { DocumentTaskState } from '@/api/types'
 
@@ -9,11 +9,6 @@ const visible = defineModel<boolean>({ default: false })
 const emit = defineEmits<{ submit: [stateList: DocumentTaskState[]] }>()
 const scope = ref<'error' | 'all'>('error')
 
-// 每次打开默认处理未成功分段；请求失败时保留当前选择。
-watch(visible, (value) => {
-  if (value) scope.value = 'error'
-})
-
 function handleSubmit() {
   if (props.loading) return
   const stateList = Object.values(DOCUMENT_TASK_STATE).filter((state) => scope.value === 'all' || state !== DOCUMENT_TASK_STATE.SUCCESS)
@@ -22,7 +17,7 @@ function handleSubmit() {
 </script>
 
 <template>
-  <MkDialog v-model="visible" width="420" title="选择分段">
+  <MkDialog v-model="visible" width="420" title="选择分段" @closed="scope = 'error'">
     <el-radio-group v-model="scope" class="mk-radio-group-vertical">
       <el-radio value="error">仅执行未成功部分</el-radio>
       <el-radio value="all">全部分段</el-radio>

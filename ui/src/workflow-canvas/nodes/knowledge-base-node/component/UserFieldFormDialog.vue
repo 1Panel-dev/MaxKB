@@ -52,7 +52,6 @@ function resetData() {
 }
 
 function open(field?: FormField, index?: number) {
-  resetData()
   if (field) currentField.value = normalizeField(field)
   editingIndex.value = index
   dialogVisible.value = true

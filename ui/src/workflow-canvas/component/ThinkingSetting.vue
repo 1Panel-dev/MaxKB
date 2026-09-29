@@ -18,7 +18,6 @@ const formData = ref<ReasoningSettingData>({
 })
 
 function open() {
-  resetData()
   formData.value = cloneDeep(setting.value)
   visible.value = true
 }

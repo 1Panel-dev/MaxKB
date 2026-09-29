@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { FormInstance } from 'element-plus'
-import { DOCUMENT_TASK_STATE } from '@/api/enums'
-import type { ModelItem, ModelProviderItem } from '@/api/types'
+import { nextTick, ref, useTemplateRef } from 'vue'
+import type { DocumentTaskState, RelatedQuestionsConfig } from '@/api/types'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import ModelApi from '@/api/admin/workspace/model'
-import ModelProviderApi from '@/api/admin/model-provider'
-import SelectModel from '@/components/business/select-model/index.vue'
+import GenerateQuestionsDialog from '@/components/business/generate-questions/GenerateQuestionsDialog.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'GenerateDocumentQuestionsAction' })
@@ -19,74 +15,54 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 const emit = defineEmits<{ refresh: [] }>()
-const visible = ref(false)
-const loading = ref(false)
-const optionLoading = ref(false)
+const loading = defineModel<boolean>('loading', { default: false })
+
+/* 打开时固定目标文档，单项与批量共用文档生成接口。 */
+const dialogMounted = ref(false)
+const dialogRef = useTemplateRef<InstanceType<typeof GenerateQuestionsDialog>>('dialogRef')
 const targetDocumentIds = ref<string[]>([])
-const scope = ref<'error' | 'all'>('error')
-const formRef = ref<FormInstance>()
-const form = ref({ model_id: '', model_params_setting: {} as Record<string, unknown>, prompt: '' })
-const modelOptions = ref<ModelItem[]>([])
-const providerOptions = ref<ModelProviderItem[]>([])
+const targetKnowledgeId = ref('')
 
 function handleOpenDialog() {
-  if (props.disabled || loading.value || optionLoading.value || !props.documentIds.length) return
-  const ids = props.documentIds
-  targetDocumentIds.value = [...ids]
-  scope.value = 'error'
-  form.value = {
-    model_id: '',
-    model_params_setting: {},
-    prompt: '请根据以下内容生成相关问题，每个问题使用 <question></question> 标签包裹。只输出问题。\n内容：{data}',
-  }
-  visible.value = true
-  optionLoading.value = true
-  Promise.all([ModelApi.getModelListWithShared({ model_type: 'LLM' }), ModelProviderApi.getProviderListByModelType('LLM')])
-    .then(([models, providers]) => {
-      modelOptions.value = models
-      providerOptions.value = providers
-    })
-    .catch(() => {
-      // 请求层统一提示错误，保留当前输入。
-    })
-    .finally(() => {
-      optionLoading.value = false
-    })
+  if (props.disabled || loading.value || dialogMounted.value || !props.documentIds.length) return
+  targetDocumentIds.value = [...props.documentIds]
+  targetKnowledgeId.value = props.knowledgeId
+  dialogMounted.value = true
+  return nextTick(() => dialogRef.value?.open())
 }
 
-async function handleSubmit() {
-  if (loading.value || optionLoading.value) return
-  if (!(await formRef.value?.validate().catch(() => false))) return
+/* Action 负责提交和成功后的页面刷新，失败保留配置。 */
+function handleSubmit(config: RelatedQuestionsConfig, stateList: DocumentTaskState[]) {
+  if (props.disabled || loading.value) return
   loading.value = true
-  const stateList = Object.values(DOCUMENT_TASK_STATE).filter((state) => scope.value === 'all' || state !== DOCUMENT_TASK_STATE.SUCCESS)
-  const request = props.api.putGenerateDocumentQuestions(props.knowledgeId, {
-    ...form.value,
-    document_id_list: targetDocumentIds.value,
-    state_list: stateList,
-  })
-  return request
+  return props.api
+    .putGenerateDocumentQuestions(targetKnowledgeId.value, {
+      ...config,
+      document_id_list: targetDocumentIds.value,
+      state_list: stateList,
+    })
     .then(() => {
       MsgSuccess('任务已提交')
-      visible.value = false
+      dialogRef.value?.close()
       emit('refresh')
     })
-    .catch(() => {
-      // 请求层统一提示错误，保留当前输入。
-    })
+    .catch(() => {})
     .finally(() => {
       loading.value = false
     })
 }
 
 function handleClosed() {
+  dialogMounted.value = false
   targetDocumentIds.value = []
-  formRef.value?.clearValidate()
+  targetKnowledgeId.value = ''
 }
 </script>
 
 <template>
-  <!-- 生成问题入口 -->
+  <!-- 批量生成问题 -->
   <el-button v-if="batch" :disabled="disabled || loading || !documentIds.length" @click="handleOpenDialog">生成问题</el-button>
+  <!-- 单个文档生成问题 -->
   <MkAction
     v-else
     :display="display ?? 'menu'"
@@ -95,41 +71,5 @@ function handleClosed() {
     :disabled="disabled || loading || !documentIds.length"
     @click="handleOpenDialog"
   />
-  <MkDialog v-model="visible" title="生成问题" :show-close="!loading && !optionLoading" @closed="handleClosed">
-    <el-form ref="formRef" :model="form" label-position="top" :disabled="loading || optionLoading" @submit.prevent>
-      <p class="mb-4 text-N600">提示词使用 {data} 引用分段内容，生成的问题需使用 &lt;question&gt;&lt;/question&gt; 标签包裹。</p>
-      <el-form-item label="AI 模型" prop="model_id" :rules="[{ required: true, message: '请选择 AI 模型', trigger: 'change' }]">
-        <SelectModel
-          v-model="form.model_id"
-          v-model:model-params="form.model_params_setting"
-          :options="modelOptions"
-          :provider-options="providerOptions"
-          can-edit-params
-          :disabled="loading || optionLoading"
-        />
-      </el-form-item>
-      <el-form-item
-        label="提示词"
-        prop="prompt"
-        :rules="[
-          { required: true, message: '请输入提示词', trigger: 'blur' },
-          { whitespace: true, message: '提示词不能为空白', trigger: 'blur' },
-        ]"
-      >
-        <el-input v-model="form.prompt" type="textarea" :rows="7" />
-      </el-form-item>
-      <el-form-item label="选择分段">
-        <el-radio-group v-model="scope">
-          <el-radio value="error">未成功的分段</el-radio>
-          <el-radio value="all">全部分段</el-radio>
-        </el-radio-group>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <!-- 取消任务配置 -->
-      <el-button :disabled="loading || optionLoading" @click="visible = false">取消</el-button>
-      <!-- 提交文档任务 -->
-      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">确认</el-button>
-    </template>
-  </MkDialog>
+  <GenerateQuestionsDialog v-if="dialogMounted" ref="dialogRef" :loading="loading" @submit="handleSubmit" @closed="handleClosed" />
 </template>

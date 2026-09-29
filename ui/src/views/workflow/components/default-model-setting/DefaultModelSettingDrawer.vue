@@ -45,11 +45,9 @@ function loadModelOptions() {
   const providerRequest = ModelProviderApi.getProviderList().then((providers) => {
     providerOptions.value = providers
   })
-  const modelRequest = ('getModelListWithShared' in props.modelApi ? props.modelApi.getModelListWithShared() : props.modelApi.getModelList()).then(
-    (modelList) => {
-      models.value = modelList
-    },
-  )
+  const modelRequest = props.modelApi.getModelListWithShared().then((modelList) => {
+    models.value = modelList
+  })
   // 模型列表只查询一次，各类型选择器从完整列表中过滤选项。
   return Promise.all([providerRequest, modelRequest]).finally(() => {
     loading.value = false

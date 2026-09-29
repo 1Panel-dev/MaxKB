@@ -95,6 +95,9 @@ function openAddChildDialog(node: TreeNode) {
 
 function closeAddDialog() {
   addDialog.visible = false
+}
+
+function handleAddClosed() {
   addDialog.mode = 'root'
   addDialog.parentNode = null
   addDialog.formList = []
@@ -142,6 +145,9 @@ function openEditDialog(node: TreeNode) {
 
 function closeEditDialog() {
   editDialog.visible = false
+}
+
+function handleEditClosed() {
   editDialog.targetNode = null
   editDialog.form.label = ''
   editDialog.form.value = ''
@@ -263,7 +269,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
     />
   </el-form-item>
   <!-- 添加弹窗 -->
-  <MkDialog v-model="addDialog.visible" :title="addDialog.mode === 'root' ? '添加一级选项' : '添加子选项'">
+  <MkDialog v-model="addDialog.visible" :title="addDialog.mode === 'root' ? '添加一级选项' : '添加子选项'" @closed="handleAddClosed">
     <el-form :model="addDialog" label-position="top" require-asterisk-position="right" @submit.prevent>
       <MkFormList v-model="addDialog.formList" :default-item="createEmptyRow" item-key="key">
         <template #default="{ index, item: option }">
@@ -283,7 +289,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
   </MkDialog>
 
   <!-- 编辑弹窗 -->
-  <MkDialog :close-on-click-modal="true" :close-on-press-escape="true" v-model="editDialog.visible" title="编辑">
+  <MkDialog :close-on-click-modal="true" :close-on-press-escape="true" v-model="editDialog.visible" title="编辑" @closed="handleEditClosed">
     <el-form :model="editDialog.form" label-position="top" require-asterisk-position="right" @submit.prevent>
       <div class="flex gap-2">
         <el-form-item label="标签" required class="min-w-0 flex-1 small">

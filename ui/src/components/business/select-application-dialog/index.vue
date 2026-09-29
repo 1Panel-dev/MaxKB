@@ -68,7 +68,6 @@ function selectFolder(folder?: FolderItem) {
 }
 
 function open(application: (Partial<ApplicationDetail> & { id: string })[]) {
-  resetData()
   selectedApplication.value = cloneDeep(application)
   visible.value = true
   void refreshApplication()

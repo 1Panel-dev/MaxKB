@@ -46,6 +46,8 @@
   `<!-- 修改用户密码 -->`、`<!-- 更多 -->`、`<!-- 删除 -->`、`<!-- 批量设置角色 -->`。
   备注紧邻对应按钮、菜单项或封装后的入口组件；批量操作明确标注“批量”，名称按实际业务职责
   填写。今后新增或调整同类页面时统一补齐，不因操作已封装为组件或按钮已有文案而省略。
+- Dialog 生命周期遵循 `COMPONENT_README.md` 的挂载方式规则：常驻实例在 `closed` 清理，
+  关闭后卸载的实例依赖重新初始化，`open()` 不重复清空，只处理业务回填和查询。
 - 页面模板的事件绑定不直接调用 Dialog、Drawer 等组件实例暴露的 `open()` 方法。应在对应业务
   流程的方法区域定义语义明确的 `handleOpenXxx` 处理函数，由处理函数调用组件实例的 `open()`，
   模板只绑定该处理函数；创建和编辑共用同一浮层时，可通过处理函数的可选参数区分操作场景。
@@ -181,6 +183,9 @@ src/views/knowledge/
 │   └── action-dropdown/
 │       ├── index.ts
 │       ├── SettingKnowledgeAction.vue   # 跳转知识库设置
+│       ├── EmbeddingKnowledgeAction.vue # 提交知识库向量化任务
+│       ├── GenerateQuestionsAction.vue # 知识库生成关联问题
+│       ├── sync-knowledge-action/       # Web 知识库同步入口与方式选择弹窗
 │       ├── KeywordIndexKnowledgeAction.vue # 分词索引入口
 │       ├── mcp-config-action/           # MCP 配置入口与专属只读弹窗
 │       ├── ExportKnowledgeAction.vue    # Excel、文档 ZIP 与知识库包导出
@@ -201,6 +206,16 @@ src/views/knowledge/
 
 `KnowledgeCard` 只负责展示、选择状态和 `action-dropdown` 插槽；页面传入完整 Knowledge API，
 组合单项转移、删除 Action，并管理批量选择、全选、批量转移与批量删除。共享知识库不展示这些操作。
+`GenerateQuestionsAction` 在非共享知识库菜单提供“生成问题”，复用公共
+`GenerateQuestionsDialog`，打开时固定知识库 ID，提交知识库生成接口；共用页面 loading，
+成功提示并关闭，失败保留表单。不新增权限判断。
+`EmbeddingKnowledgeAction` 在非共享知识库菜单中提供“向量化”，接收完整 Knowledge API，
+直接调用 `putReEmbeddingKnowledge`，提交成功后提示“提交成功”；复用页面操作 loading，
+阻止重复提交并在请求结束后恢复，不额外增加权限判断或配置弹窗。
+`SyncKnowledgeAction` 仅在非共享 Web 知识库菜单展示，不增加权限判断。专属弹窗按需挂载、
+关闭后卸载，默认“替换同步”，也支持“整体同步”，并展示数据覆盖提示；调用
+`putSyncWebKnowledge`，成功提示“同步任务发送成功”并关闭。复用页面操作 loading，
+提交期间禁止重复提交和关闭，失败保留弹窗与当前选择。
 `SettingKnowledgeAction` 暂不增加权限判断，点击后携带当前
 `workspaceId`、知识库 ID 和 `KNOWLEDGE_TYPE_MAP[knowledge.type]` 跳转 `workspace-knowledge-setting`；阻止事件冒泡，避免同时触发卡片详情跳转。
 “设置”之后依次组合 `KeywordIndexKnowledgeAction` 和 `McpConfigKnowledgeAction`，接收完整
@@ -224,12 +239,13 @@ MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需�
 `refresh` 刷新列表。入口支持 `trigger` 插槽替换默认创建按钮，下拉使用 `persistent`。
 各弹窗接收 `folderId`，通过 `open()` 打开；工作流额外接受可选的商店模板。共用的
 `KnowledgeBaseForm` 负责名称、描述、Embedding 模型必填校验以及工作空间和共享模型查询，
-通过 `ModelApi.getModelListWithShared({ model_type: 'EMBEDDING' })` 一次加载模型选项，
+根据 `isSystemSharedResource()` 选择 System 共享 Model API 或 Workspace Model API，
+通过 `getModelListWithShared({ model_type: 'EMBEDDING' })` 一次加载模型选项，
 复用 `SelectModel`，允许创建模型后刷新选项。Web、飞书的特有字段留在对应弹窗中。
 模型加载后仅在未选择时默认选中首个可用模型；重置表单时恢复该默认值，无可用模型时保持为空。
 刷新选项不覆盖用户选择或设置页回填的模型。
 创建前校验表单，提交期间禁止重复提交和关闭；成功后刷新用户基础资料并通知列表刷新，
-普通类型将接口返回的 `knowledge.type` 通过 `KNOWLEDGE_TYPE_MAP` 转为字符串后进入文档列表，工作流进入画布。每次打开及关闭动画结束后清理表单，工作流模板使用
+普通类型将接口返回的 `knowledge.type` 通过 `KNOWLEDGE_TYPE_MAP` 转为字符串后进入文档列表，工作流进入画布。常驻弹窗在关闭动画结束后清理表单，打开时只回填本次模板与显示，工作流模板使用
 `cloneDeep` 隔离；创建流程使用 Workspace API，不通过路由字符串推测 System 范围。
 飞书创建沿用扩展接口 `/lark/save`，部署环境需要提供该接口。
 “导入创建”沿用智能体和工具的菜单文件选择交互，调用 `postKnowledgeImport` 上传文件及当前
@@ -682,23 +698,31 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 运行或排队中的任务切换为取消入口。Web、飞书提供同步，普通与工作流文档提供原文下载和替换。
 单项与批量操作共用页面请求状态，删除和同步先确认，成功后清空选择并刷新，导出和下载保留选择。
 文档操作统一放在 `document/action-dropdown/`，通过该目录 `index.ts` 导出，页面显式组合各 Action。
-文档任务是否排队或执行中统一通过 `document/utils/task-status.ts` 的 `isDocumentTaskRunning(document, taskType)` 判断，
+文档状态展示、筛选配置和任务运行状态判断统一维护在 `document/status.ts`。
+文档任务是否排队或执行中通过其中的 `isDocumentTaskRunning(document, taskType)` 判断，
 页面及 Action 不重复解析状态字符串；文档或任务状态缺失时返回 `false`。
-`EmbeddingDocumentAction` 负责单项向量化与取消向量化，`BatchEmbeddingDocumentAction` 负责批量向量化按钮，`GenerateDocumentQuestionsAction` 负责生成问题配置，`SettingDocumentAction` 负责召回及来源设置，
+`EmbeddingDocumentAction` 负责单项向量化与取消向量化，`BatchEmbeddingAction` 负责批量向量化按钮，`GenerateDocumentQuestionsAction` 负责文档生成问题入口和提交，`SettingDocumentAction` 负责召回及来源设置，
 `MigrateDocumentAction` 选择目标知识库，`DocumentTagsAction` 添加已有标签和移除文档标签关联；
-这些 Action 继续将操作入口与专属弹窗放在同一组件内。组件接收完整 Document API、知识库 ID、文档 ID 或文档数组及禁用状态，
+生成问题复用公共配置弹窗，其余 Action 按下文维护各自专属弹窗。组件接收完整 Document API、知识库 ID、文档 ID 或文档数组及禁用状态，
 点击时快照本次操作对象，内部管理弹窗和请求，成功后通过 `refresh` 通知页面刷新，失败保留输入。
 单项向量化仅传 `document`，内部判断排队或执行状态，固定展示行内图标按钮，分别调用单项向量化和取消接口。
-批量向量化仅传 `document-ids`，使用独立的 `BatchEmbeddingDocumentAction` 普通按钮；
-批量取消向量化继续使用 `CancelDocumentTaskAction` 菜单项，单项和批量请求均通过 `v-model:loading` 共用页面操作状态。
+批量向量化仅传 `document-ids`，使用独立的 `BatchEmbeddingAction` 普通按钮；
+批量取消向量化继续使用 `BatchCancelTaskAction` 菜单项，单项和批量请求均通过 `v-model:loading` 共用页面操作状态。
 向量化相关文件集中在 `document/action-dropdown/embedding/`，包含两个 Action 和共用的 `DocumentEmbeddingDialog.vue`；
 Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内部使用，管理分段范围与确认事件，
 请求和成功关闭由各自 Action 负责；打开时快照文档目标，失败保留范围选择。
-生成问题仍通过 `batch` 切换批量按钮，通过 `display` 区分行内菜单与图标按钮。
+生成问题通过 `batch` 切换批量按钮，通过 `display` 区分行内菜单与图标按钮。
+单项与批量复用公共 `GenerateQuestionsDialog`，Action 打开时保存知识库、文档 ID 快照，
+提交同一文档批量接口并通过 `refresh` 刷新状态；通过 `v-model:loading` 复用页面操作状态。
+公共弹窗按需挂载、关闭后卸载，不负责选择提交接口。当前尚无段落页，后续段落入口复用公共
+弹窗时关闭 `showParagraphScope`，由段落 Action 提交段落接口，不扩展公共弹窗的接口分支。
 设置组件通过 `batch` 区分单项与批量，标签组件通过 `manageTags` 区分标签管理与批量添加。
-`CancelDocumentTaskAction`、`TokenizeDocumentAction`、`SyncDocumentAction`、
+分词索引集中在 `document/action-dropdown/tokenize/`：`TokenizeDocumentAction` 接收单个 `document`，
+按运行状态调用单项分词或取消接口；`BatchTokenizeAction` 接收 `documentIds`，仅调用批量分词接口。
+两个 Action 均处理全部分段状态，通过 `v-model:loading` 共用页面操作状态，成功后通知页面刷新。
+`BatchCancelTaskAction`、`SyncDocumentAction`、
 `ExportDocumentAction`、`DownloadDocumentAction`、`ReplaceDocumentAction` 和 `DeleteDocumentAction`
-分别负责任务取消、分词、同步、导出、下载、替换与删除，单项和批量入口复用对应组件。
+分别负责任务取消、同步、导出、下载、替换与删除，单项和批量入口复用对应组件。
 直接请求的 Action 通过 `v-model:loading` 共用页面操作状态，各 Action 自行管理请求、
 防重复提交、成功提示与失败处理，不额外抽取统一请求封装；需要刷新时发出 `refresh`，导出与下载不发出。
 `DeleteDocumentAction` 单个删除传 `document`，确认框展示文档名称并调用单个删除接口；

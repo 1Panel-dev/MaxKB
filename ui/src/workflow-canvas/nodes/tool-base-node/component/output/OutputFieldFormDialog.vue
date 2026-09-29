@@ -25,7 +25,6 @@ function resetData() {
 }
 
 function open(field?: ToolOutputField, index?: number) {
-  resetData()
   if (field) form.value = cloneDeep(field)
   editingIndex.value = index
   dialogVisible.value = true

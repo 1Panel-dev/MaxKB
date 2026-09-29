@@ -4,8 +4,10 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { MODEL_STATUS } from '@/api/enums'
 import type { KnowledgeCreatePayload, ModelItem, ModelProviderItem } from '@/api/types'
 import ModelApi from '@/api/admin/workspace/model'
+import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import ModelProviderApi from '@/api/admin/model-provider'
 import SelectModel from '@/components/business/select-model/index.vue'
+import { isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'KnowledgeBaseForm' })
 defineProps<{ disabled?: boolean }>()
@@ -34,14 +36,15 @@ function reset() {
   formRef.value?.clearValidate()
 }
 
-/* 可用的工作空间及共享 Embedding 模型 */
+/* 当前资源范围可用的 Embedding 模型 */
 const loading = ref(false)
 const modelOptions = ref<ModelItem[]>([])
 const providerOptions = ref<ModelProviderItem[]>([])
 
 function loadModelOptions() {
   loading.value = true
-  return Promise.all([ModelApi.getModelListWithShared({ model_type: 'EMBEDDING' }), ModelProviderApi.getProviderListByModelType('EMBEDDING')])
+  const requestModelApi = isSystemSharedResource() ? SystemSharedModelApi : ModelApi
+  return Promise.all([requestModelApi.getModelListWithShared({ model_type: 'EMBEDDING' }), ModelProviderApi.getProviderListByModelType('EMBEDDING')])
     .then(([models, providers]) => {
       modelOptions.value = models
       providerOptions.value = providers
