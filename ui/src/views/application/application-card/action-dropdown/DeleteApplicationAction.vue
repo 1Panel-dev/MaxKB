@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type ApplicationApi from '@/api/admin/workspace/application/application'
+import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { ApplicationDetail } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DeleteApplicationAction' })
 
-const props = defineProps<{ api: typeof ApplicationApi; application: ApplicationDetail; label: string }>()
+const props = defineProps<{ api: typeof ApplicationApi | typeof SystemResourceApplicationApi; application: ApplicationDetail; label: string }>()
 
 const loading = defineModel<boolean>('loading', { default: false })
 

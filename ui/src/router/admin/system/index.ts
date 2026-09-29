@@ -157,7 +157,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'applications',
           name: 'system-resource-applications',
-          component: () => import('@/views/system/index.vue'),
+          component: () => import('@/views/system/resource-management/application/index.vue'),
           meta: { title: '智能体', order: 10, permission: perm.application.system.jumpRead, next: 'system-resource-knowledge' },
         },
         {

@@ -85,9 +85,7 @@ onMounted(() => {
     <template #top>
       <WorkspaceDropdown v-model="selectedWorkspaceId" :options="workspaceOptions" @select="handleWorkspaceSelect" />
     </template>
-
     <!-- 资源 -->
-
     <h4 class="mb-4 mt-4">资源</h4>
     <HomeResourceOverview :key="selectedWorkspaceId" :api="SystemHomepageApi" :workspace-id="selectedWorkspaceId" />
     <!-- 监控 -->
@@ -117,7 +115,6 @@ onMounted(() => {
               <span>全部智能体</span>
             </div>
           </el-option>
-          <!--  TODO 全部智能体 -->
           <template v-for="application in applications" :key="application.id">
             <el-option :label="application.name" :value="application.id">
               <div class="flex-align-center gap-2">
