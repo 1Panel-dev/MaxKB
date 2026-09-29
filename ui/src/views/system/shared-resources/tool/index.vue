@@ -150,7 +150,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                     <template #icon><MkIcon name="icon_setting" /></template>
                     工作流
                   </MkDropdownItem>
-                  <!-- 配置启动参数 -->
+                  <!-- 启动参数 -->
                   <InitParamAction
                     v-if="(tool.init_field_list?.length ?? 0) > 0"
                     v-model:loading="toolOperationLoading"

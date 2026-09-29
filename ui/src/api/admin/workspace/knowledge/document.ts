@@ -26,12 +26,15 @@ const putQuickCreateDocuments = (knowledgeId: string, documents: DocumentQuickCr
 const putDocumentActive = (knowledgeId: string, documentId: string, isActive: boolean) =>
   put(`${getPrefix(knowledgeId)}/${documentId}`, { is_active: isActive })
 
+
+
 /** 删除单个文档。 */
 const deleteDocument = (knowledgeId: string, documentId: string) => del(`${getPrefix(knowledgeId)}/${documentId}`)
 
 /** 批量删除文档。 */
 const putBatchDeleteDocuments = (knowledgeId: string, documentIds: string[]) =>
   put(`${getPrefix(knowledgeId)}/batch_delete`, { id_list: documentIds })
+
 
 /** 批量提交文档向量化。 */
 const putBatchRefreshDocuments = (knowledgeId: string, documentIds: string[], stateList: DocumentTaskState[]) =>

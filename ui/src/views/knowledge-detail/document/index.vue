@@ -469,6 +469,8 @@ onMounted(() => {
               </template>
               <!-- 删除文档 -->
               <DeleteDocumentAction
+                divided
+                icon="icon_delete-trash_outlined"
                 :api="DocumentApi"
                 :knowledge-id="knowledgeId"
                 v-model:loading="operationLoading"
@@ -509,89 +511,98 @@ onMounted(() => {
         @refresh="refreshAfterOperation"
       />
       <!-- 更多批量操作 -->
-      <MkTableMoreDropdown persistent>
-        <!-- 批量文档设置 -->
-        <SettingDocumentAction
-          :api="DocumentApi"
-          :knowledge-id="knowledgeId"
-          :documents="selectedDocuments"
-          batch
-          :disabled="operationLoading"
-          @refresh="refreshAfterOperation"
-        />
-        <!-- 批量迁移文档 -->
-        <MigrateDocumentAction
-          :api="DocumentApi"
-          :knowledge-id="knowledgeId"
-          :document-ids="selectedDocumentIds"
-          :disabled="operationLoading"
-          @refresh="refreshAfterOperation"
-        />
-        <!-- 批量添加标签 -->
-        <DocumentTagsAction
-          :api="DocumentApi"
-          :knowledge-id="knowledgeId"
-          :document-ids="selectedDocumentIds"
-          :disabled="operationLoading"
-          @refresh="refreshAfterOperation"
-        />
-        <!-- 批量同步文档 -->
-        <SyncDocumentAction
-          :api="DocumentApi"
-          :knowledge-id="knowledgeId"
-          v-model:loading="operationLoading"
-          :documents="selectedDocuments"
-          :knowledge-type="knowledge?.type"
-          batch
-          @refresh="refreshAfterOperation"
-        />
-        <!-- 批量导出 Excel -->
-        <ExportDocumentAction
-          :api="DocumentApi"
-          :knowledge-id="knowledgeId"
-          v-model:loading="operationLoading"
-          :document-ids="selectedDocumentIds"
-          format="excel"
-        />
-        <!-- 批量导出 ZIP -->
-        <ExportDocumentAction
-          :api="DocumentApi"
-          :knowledge-id="knowledgeId"
-          v-model:loading="operationLoading"
-          :document-ids="selectedDocumentIds"
-          format="zip"
-        />
-        <!-- 批量取消向量化 -->
-        <CancelDocumentTaskAction
-          :api="DocumentApi"
-          :knowledge-id="knowledgeId"
-          v-model:loading="operationLoading"
-          :document-ids="selectedDocumentIds"
-          :task-type="DOCUMENT_TASK_TYPE.EMBEDDING"
-          label="取消向量化"
-          divided
-          @refresh="refreshAfterOperation"
-        />
-        <!-- 批量取消生成问题 -->
-        <CancelDocumentTaskAction
-          :api="DocumentApi"
-          :knowledge-id="knowledgeId"
-          v-model:loading="operationLoading"
-          :document-ids="selectedDocumentIds"
-          :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
-          label="取消生成问题"
-          @refresh="refreshAfterOperation"
-        />
-        <!-- 批量删除文档 -->
-        <DeleteDocumentAction
-          :api="DocumentApi"
-          :knowledge-id="knowledgeId"
-          v-model:loading="operationLoading"
-          :document-ids="selectedDocumentIds"
-          batch
-          @refresh="refreshAfterOperation"
-        />
-      </MkTableMoreDropdown>
+      <MkDropdown class="ml-3" trigger="click" placement="bottom-end" persistent :disabled="operationLoading">
+        <!-- 展开更多批量操作 -->
+        <el-button :disabled="operationLoading">
+          更多操作
+          <MkIcon name="icon_down_outlined" class="ml-1" />
+        </el-button>
+        <template #dropdown>
+          <MkDropdownMenu>
+            <!-- 批量文档设置 -->
+            <SettingDocumentAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              :documents="selectedDocuments"
+              batch
+              :disabled="operationLoading"
+              @refresh="refreshAfterOperation"
+            />
+            <!-- 批量迁移文档 -->
+            <MigrateDocumentAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              :document-ids="selectedDocumentIds"
+              :disabled="operationLoading"
+              @refresh="refreshAfterOperation"
+            />
+            <!-- 批量添加标签 -->
+            <DocumentTagsAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              :document-ids="selectedDocumentIds"
+              :disabled="operationLoading"
+              @refresh="refreshAfterOperation"
+            />
+            <!-- 批量同步文档 -->
+            <SyncDocumentAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              v-model:loading="operationLoading"
+              :documents="selectedDocuments"
+              :knowledge-type="knowledge?.type"
+              batch
+              @refresh="refreshAfterOperation"
+            />
+            <!-- 批量导出 Excel -->
+            <ExportDocumentAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              v-model:loading="operationLoading"
+              :document-ids="selectedDocumentIds"
+              format="excel"
+            />
+            <!-- 批量导出 ZIP -->
+            <ExportDocumentAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              v-model:loading="operationLoading"
+              :document-ids="selectedDocumentIds"
+              format="zip"
+            />
+            <!-- 批量取消向量化 -->
+            <CancelDocumentTaskAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              v-model:loading="operationLoading"
+              :document-ids="selectedDocumentIds"
+              :task-type="DOCUMENT_TASK_TYPE.EMBEDDING"
+              label="取消向量化"
+              divided
+              @refresh="refreshAfterOperation"
+            />
+            <!-- 批量取消生成问题 -->
+            <CancelDocumentTaskAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              v-model:loading="operationLoading"
+              :document-ids="selectedDocumentIds"
+              :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
+              label="取消生成问题"
+              @refresh="refreshAfterOperation"
+            />
+            <!-- 批量删除文档 -->
+            <DeleteDocumentAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              v-model:loading="operationLoading"
+              :document-ids="selectedDocumentIds"
+              batch
+              @refresh="refreshAfterOperation"
+            />
+          </MkDropdownMenu>
+        </template>
+      </MkDropdown>
     </template>
   </MkTable>
 </template>

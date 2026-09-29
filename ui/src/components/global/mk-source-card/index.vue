@@ -78,7 +78,7 @@ function handleSelectedChange(selected: boolean | string | number) {
       <el-checkbox :model-value="props.selected" @change="handleSelectedChange" />
     </div>
 
-    <header class="flex-between items-start gap-2" :class="{ 'pr-7': props.selectable }">
+    <header class="flex-between items-start gap-2">
       <div class="flex-align-center min-w-0 flex-1 gap-3">
         <div v-if="slots.icon" class="flex shrink-0">
           <slot name="icon" />

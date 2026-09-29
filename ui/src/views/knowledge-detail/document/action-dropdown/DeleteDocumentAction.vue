@@ -34,5 +34,5 @@ function handleDelete() {
 
 <template>
   <!-- 删除单个或选中文档 -->
-  <MkAction label="删除" icon="icon_delete-trash_outlined" divided :disabled="loading || !documentIds.length" @click="handleDelete" />
+  <MkAction label="删除" :disabled="loading || !documentIds.length" @click="handleDelete" />
 </template>

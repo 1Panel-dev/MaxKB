@@ -188,7 +188,7 @@ onMounted(() => {
                   <template #icon><MkIcon name="icon_setting" /></template>
                   工作流
                 </MkDropdownItem>
-                <!-- 配置启动参数 -->
+                <!-- 启动参数 -->
                 <InitParamAction
                   v-if="row.init_field_list?.length"
                   v-model:loading="operationLoading"

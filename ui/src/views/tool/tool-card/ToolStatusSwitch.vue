@@ -6,7 +6,7 @@ import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/t
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem } from '@/api/types'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
-import InitParamDialog from './InitParamDialog.vue'
+import InitParamDrawer from './InitParamDrawer.vue'
 
 defineOptions({ name: 'ToolStatusSwitch', inheritAttrs: false })
 
@@ -16,7 +16,7 @@ const loading = defineModel<boolean>('loading', { default: false })
 
 const emit = defineEmits<{ update: [tool: ToolItem] }>()
 
-const initParamDialogRef = useTemplateRef<InstanceType<typeof InitParamDialog>>('initParamDialogRef')
+const initParamDrawerRef = useTemplateRef<InstanceType<typeof InitParamDrawer>>('initParamDrawerRef')
 
 function handleToolStatusChange() {
   if (loading.value) return false
@@ -36,7 +36,7 @@ function handleToolStatusChange() {
       }
 
       if (hasMissingInitParams(toolDetail)) {
-        initParamDialogRef.value?.open(toolDetail, true, true)
+        initParamDrawerRef.value?.open(toolDetail, true, true)
         return false
       }
 
@@ -75,5 +75,5 @@ function updateToolStatus(active: boolean) {
 <template>
   <el-switch :disabled="loading" :model-value="tool.is_active" size="small" :before-change="handleToolStatusChange" v-bind="$attrs" />
 
-  <InitParamDialog ref="initParamDialogRef" :api="api" @update="emit('update', $event)" />
+  <InitParamDrawer ref="initParamDrawerRef" :api="api" @update="emit('update', $event)" />
 </template>
