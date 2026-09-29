@@ -24,8 +24,7 @@ const composing = ref(false)
 const blurredDuringComposition = ref(false)
 const nameRules = computed<FormRules>(() => ({
   name: [
-    { required: true, message: '请输入名称' },
-    { whitespace: true, message: '名称不能只有空格' },
+    { required: true, whitespace: true, message: '请输入名称' },
     ...(props.maxlength === undefined ? [] : [{ max: props.maxlength, message: `名称不能超过 ${props.maxlength} 个字符` }]),
   ],
 }))

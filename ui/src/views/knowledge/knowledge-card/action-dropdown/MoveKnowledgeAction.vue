@@ -29,14 +29,15 @@ function handleMoveKnowledge(targetFolderId: string) {
   loading.value = true
   const updateKnowledge = KNOWLEDGE_TYPE_MAP[props.knowledge.type] === KNOWLEDGE_TYPE_KEY.LARK ? props.api.putLarkKnowledge : props.api.putKnowledge
   return updateKnowledge(props.knowledge.id, { folder_id: targetFolderId })
+    .finally(() => {
+      // 转出当前文件夹会卸载卡片，先释放页面操作状态。
+      loading.value = false
+    })
     .then(() => {
       MsgSuccess('转移成功')
       moveToDialogRef.value?.close()
       emit('move', props.knowledge.id, targetFolderId)
       if (props.currentFolderId !== FOLDER_ENTRY_ID.ALL && props.currentFolderId !== targetFolderId) emit('delete', props.knowledge.id)
-    })
-    .finally(() => {
-      loading.value = false
     })
 }
 

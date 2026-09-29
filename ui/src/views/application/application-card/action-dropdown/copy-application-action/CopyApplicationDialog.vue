@@ -85,21 +85,11 @@ function submit() {
   })
 }
 
-function resetData() {
-  Object.assign(applicationForm, { name: '', desc: '' })
-  applicationPayload.value = {}
-  submitting.value = false
-  applicationFormRef.value?.clearValidate()
-}
-function handleClosed() {
-  resetData()
-  emit('closed')
-}
 defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="复制智能体" :show-close="!submitting" @closed="handleClosed">
+  <MkDialog v-model="visible" title="复制智能体" :show-close="!submitting" @closed="emit('closed')">
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"

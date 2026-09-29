@@ -15,16 +15,11 @@ function open(mcpConfig: string) {
   visible.value = true
 }
 
-function handleClosed() {
-  config.value = ''
-  emit('closed')
-}
-
 defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="MCP 配置详情" @closed="handleClosed">
+  <MkDialog v-model="visible" title="MCP 配置详情" @closed="emit('closed')">
     <div class="group knowledge-mcp-config-detail relative">
       <el-input v-model="config" :autosize="{ minRows: 8, maxRows: 24 }" disabled type="textarea" />
       <!-- 复制 MCP 配置 -->

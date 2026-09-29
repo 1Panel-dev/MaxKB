@@ -36,7 +36,6 @@ function resetData() {
 }
 
 function open() {
-  resetData()
   dialogVisible.value = true
 }
 

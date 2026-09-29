@@ -11,6 +11,11 @@ const getModelList = (query?: Dict<unknown>) => {
   return get<ModelItem[]>(prefix, query)
 }
 
+/** 获取 System 共享范围的模型选项，并标记共享来源。 */
+// TODO 资源共享的模型是不是都是共享的
+const getModelListWithShared = (query?: Dict<unknown>): Promise<ModelItem[]> =>
+  getModelList(query).then((models) => models.map((model): ModelItem => ({ ...model, source: 'shared' })))
+
 /** 创建 System 共享模型。 */
 const postModel = (payload: ModelPayload) => {
   return post<ModelPayload, ModelItem>(prefix, payload)
@@ -51,4 +56,15 @@ const putPauseModelDownload = (modelId: string) => {
   return put<undefined, boolean>(`${prefix}/${modelId}/pause_download`)
 }
 
-export default { deleteModel, getModelDetail, getModelList, getModelMeta, getModelParamsForm, postModel, putModel, putModelParamsForm, putPauseModelDownload }
+export default {
+  deleteModel,
+  getModelDetail,
+  getModelList,
+  getModelListWithShared,
+  getModelMeta,
+  getModelParamsForm,
+  postModel,
+  putModel,
+  putModelParamsForm,
+  putPauseModelDownload,
+}

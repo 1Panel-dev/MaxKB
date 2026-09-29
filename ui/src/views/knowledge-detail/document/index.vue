@@ -12,7 +12,7 @@ import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import { DOCUMENT_TASK_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
-import { DOCUMENT_STATUS_FILTER_OPTIONS } from './status'
+import { DOCUMENT_STATUS_FILTER_OPTIONS, isDocumentTaskRunning } from './status'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
@@ -20,10 +20,9 @@ import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
-import { isDocumentTaskRunning } from './utils.ts'
 import {
-  BatchEmbeddingDocumentAction,
-  CancelDocumentTaskAction,
+  BatchEmbeddingAction,
+  BatchCancelTaskAction,
   DeleteDocumentAction,
   DocumentTagsAction,
   EmbeddingDocumentAction,
@@ -35,6 +34,7 @@ import {
   SettingDocumentAction,
   SyncDocumentAction,
   TokenizeDocumentAction,
+  BatchTokenizeAction,
 } from './action-dropdown'
 import { useKnowledgeDetailContext } from '../context'
 
@@ -230,6 +230,8 @@ function handleChangeActive(document: DocumentItem) {
 
 // 操作成功后清空勾选并刷新文档列表。
 function refreshAfterOperation() {
+  // 清空勾选会卸载批量 Action，先释放操作状态，避免其 finally 无法回写 loading。
+  operationLoading.value = false
   clearDocumentSelection()
   return loadDocuments()
 }
@@ -377,7 +379,6 @@ onBeforeUnmount(() => {
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
               :document="row"
-              :document-ids="[row.id]"
               @refresh="refreshAfterOperation"
             />
             <!-- 更多文档操作 -->
@@ -400,7 +401,7 @@ onBeforeUnmount(() => {
                 @refresh="refreshAfterOperation"
               />
               <!-- 取消生成问题 -->
-              <CancelDocumentTaskAction
+              <BatchCancelTaskAction
                 :api="DocumentApi"
                 :knowledge-id="knowledgeId"
                 v-model:loading="operationLoading"
@@ -413,6 +414,7 @@ onBeforeUnmount(() => {
               <!-- 生成问题 -->
               <GenerateDocumentQuestionsAction
                 :api="DocumentApi"
+                v-model:loading="operationLoading"
                 v-else
                 :knowledge-id="knowledgeId"
                 :document-ids="[row.id]"
@@ -481,7 +483,7 @@ onBeforeUnmount(() => {
     </el-table-column>
     <template v-if="!isWorkspaceSharedResource()" #footer-batch-actions>
       <!-- 批量向量化 -->
-      <BatchEmbeddingDocumentAction
+      <BatchEmbeddingAction
         :api="DocumentApi"
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
@@ -489,17 +491,17 @@ onBeforeUnmount(() => {
         @refresh="refreshAfterOperation"
       />
       <!-- 批量分词索引 -->
-      <TokenizeDocumentAction
+      <BatchTokenizeAction
         :api="DocumentApi"
         :knowledge-id="knowledgeId"
         v-model:loading="operationLoading"
         :document-ids="selectedDocumentIds"
-        batch
         @refresh="refreshAfterOperation"
       />
       <!-- 批量生成问题 -->
       <GenerateDocumentQuestionsAction
         :api="DocumentApi"
+        v-model:loading="operationLoading"
         batch
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
@@ -556,7 +558,7 @@ onBeforeUnmount(() => {
               format="zip"
             />
             <!-- 批量取消向量化 -->
-            <CancelDocumentTaskAction
+            <BatchCancelTaskAction
               :api="DocumentApi"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
@@ -567,7 +569,7 @@ onBeforeUnmount(() => {
               @refresh="refreshAfterOperation"
             />
             <!-- 批量取消生成问题 -->
-            <CancelDocumentTaskAction
+            <BatchCancelTaskAction
               :api="DocumentApi"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"

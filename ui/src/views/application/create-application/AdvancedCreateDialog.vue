@@ -81,7 +81,6 @@ function submit() {
 }
 
 function open(template?: ApplicationStoreTemplate) {
-  resetData()
   if (template) {
     storeTemplate.value = cloneDeep(template)
     Object.assign(applicationForm, { name: template.name, desc: template.desc || '' })

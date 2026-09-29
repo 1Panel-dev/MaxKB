@@ -54,6 +54,10 @@
     --el-alert-bg-color: var(--el-color-success-light-8);
     --el-color-error: var(--el-color-success);
   }
+  &--primary {
+    --el-alert-bg-color: var(--el-color-primary-light-8);
+    --el-color-error: var(--el-color-primary);
+  }
   &__title {
     color: var(--el-text-color-primary);
   }

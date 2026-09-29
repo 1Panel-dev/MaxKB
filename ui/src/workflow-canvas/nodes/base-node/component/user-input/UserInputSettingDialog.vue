@@ -20,7 +20,6 @@ function resetData() {
 }
 
 function open(setting: UserInputSetting) {
-  resetData()
   currentSetting.value = cloneDeep(setting)
   settingDialogVisible.value = true
 }

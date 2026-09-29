@@ -83,10 +83,10 @@ provide('getModelParamsForm', (modelId: string) => {
 function loadModels() {
   modelLoading.value = true
   const workspaceId = props.toolForm?.workspace_id
-  const modelRequest =
-    'getModelListWithShared' in requestModelApi.value
-      ? requestModelApi.value.getModelListWithShared({ model_type: 'LLM', ...(workspaceId ? { workspace_id: workspaceId } : {}) })
-      : requestModelApi.value.getModelList({ model_type: 'LLM' })
+  const modelRequest = requestModelApi.value.getModelListWithShared({
+    model_type: 'LLM',
+    ...(!isSystemSharedResource() && workspaceId ? { workspace_id: workspaceId } : {}),
+  })
   return Promise.all([modelRequest, ModelProviderApi.getProviderListByModelType('LLM')])
     .then(([models, providers]) => {
       modelOptions.value = models

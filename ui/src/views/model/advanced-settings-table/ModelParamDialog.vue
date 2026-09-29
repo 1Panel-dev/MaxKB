@@ -18,7 +18,6 @@ function resetData() {
 }
 
 function open(field?: FormField) {
-  resetData()
   if (field) {
     editing.value = true
     currentField.value = cloneDeep(field)

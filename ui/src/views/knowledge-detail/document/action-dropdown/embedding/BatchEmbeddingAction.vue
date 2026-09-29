@@ -2,10 +2,9 @@
 import { ref } from 'vue'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import type { DocumentTaskState } from '@/api/types'
-import { MsgSuccess } from '@/utils/message'
 import DocumentEmbeddingDialog from './DocumentEmbeddingDialog.vue'
 
-defineOptions({ name: 'BatchEmbeddingDocumentAction' })
+defineOptions({ name: 'BatchEmbeddingAction' })
 const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documentIds: string[] }>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
@@ -27,7 +26,6 @@ function handleSubmit(stateList: DocumentTaskState[]) {
   return props.api
     .putBatchRefreshDocuments(targetKnowledgeId.value, targetDocumentIds.value, stateList)
     .then(() => {
-      MsgSuccess('任务已提交')
       visible.value = false
       emit('refresh')
     })
@@ -40,6 +38,6 @@ function handleSubmit(stateList: DocumentTaskState[]) {
 
 <template>
   <!-- 批量向量化 -->
-  <el-button :disabled="loading || !documentIds.length" @click="handleOpen">向量化</el-button>
+  <el-button plain :disabled="loading" @click="handleOpen">向量化</el-button>
   <DocumentEmbeddingDialog v-model="visible" :loading="loading" @submit="handleSubmit" />
 </template>

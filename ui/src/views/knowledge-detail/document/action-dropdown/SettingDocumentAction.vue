@@ -85,14 +85,7 @@ function handleClosed() {
   <MkDialog v-model="visible" title="文档设置" :show-close="!loading" @closed="handleClosed">
     <el-form ref="formRef" :model="form" label-position="top" :disabled="loading" @submit.prevent>
       <template v-if="document?.type === KNOWLEDGE_TYPE.WEB">
-        <el-form-item
-          label="文档地址"
-          prop="source_url"
-          :rules="[
-            { required: true, message: '请输入文档地址', trigger: 'blur' },
-            { whitespace: true, message: '文档地址不能为空白', trigger: 'blur' },
-          ]"
-        >
+        <el-form-item label="文档地址" prop="source_url" :rules="[{ required: true, whitespace: true, message: '请输入文档地址', trigger: 'blur' }]">
           <el-input v-model="form.source_url" />
         </el-form-item>
         <el-form-item label="选择器"><el-input v-model="form.selector" /></el-form-item>

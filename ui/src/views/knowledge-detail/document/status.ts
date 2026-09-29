@@ -1,4 +1,6 @@
+/** 文档状态展示、筛选配置及任务运行状态判断。 */
 import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
+import type { DocumentItem, DocumentTaskType } from '@/api/types'
 import type { StatusLabelOptions } from '@/components/global/mk-status-label/types'
 
 // 文档展示阶段独立于执行记录接口状态，筛选值不直接提交给后端。
@@ -44,3 +46,9 @@ export const DOCUMENT_STATUS_FILTER_OPTIONS: DocumentStatusFilter[] = [
     task_type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM,
   },
 ]
+
+/** 按状态字符串从右起的任务位置判断是否排队或执行中；缺少文档或状态时返回 false。 */
+export function isDocumentTaskRunning(document: DocumentItem | undefined, taskType: DocumentTaskType): boolean {
+  const state = document?.status?.at(-taskType)
+  return state === DOCUMENT_TASK_STATE.PENDING || state === DOCUMENT_TASK_STATE.STARTED
+}

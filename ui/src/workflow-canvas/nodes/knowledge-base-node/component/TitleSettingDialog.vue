@@ -15,7 +15,6 @@ function resetData() {
 }
 
 function open(config: KnowledgeFieldConfig) {
-  resetData()
   form.value = cloneDeep(config)
   dialogVisible.value = true
 }

@@ -16,7 +16,6 @@ function resetData() {
   formRef.value?.clearValidate()
 }
 function open() {
-  resetData()
   formData.value = { ...cloneDeep(defaultForm), ...cloneDeep(setting.value) }
   visible.value = true
 }

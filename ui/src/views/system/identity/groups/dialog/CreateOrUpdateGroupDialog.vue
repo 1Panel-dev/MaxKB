@@ -41,7 +41,7 @@ function submit() {
 }
 
 function resetData() {
-  Object.assign(groupForm, { name: '' })
+  Object.assign(groupForm, { id: undefined, name: '' })
   loading.value = false
   formRef.value?.clearValidate()
 }

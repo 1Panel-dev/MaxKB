@@ -20,7 +20,6 @@ const formRules: FormRules<ToolInputField> = {
 
 // 弹窗仅维护参数草稿，节点接收提交后关闭。
 function open(field?: ToolInputField, index?: number) {
-  resetData()
   if (field) {
     inputFieldForm.value = cloneDeep(field)
     editing.value = true

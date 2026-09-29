@@ -78,7 +78,6 @@ function selectFolder(folder?: FolderItem) {
 }
 
 function open(tool: (Partial<ToolItem> & { id: string })[]) {
-  resetData()
   selectedTool.value = cloneDeep(tool)
   visible.value = true
   void refreshTool()

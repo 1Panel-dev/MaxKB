@@ -29,7 +29,6 @@ function resetData() {
 }
 
 function open() {
-  resetData()
   visible.value = true
   handleSearch()
 }

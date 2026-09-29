@@ -64,11 +64,20 @@ import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynam
 - `el-input-number` 设置 `controls-position="right"` 时，同时设置 `align="left"`。
 - Tooltip、Popover、Popconfirm、Dropdown 的触发插槽只保留一个有实际布局盒的根节点；
   多个元素用 `span` 或 `div` 包裹，不使用 `template` 或 `display: contents` 代替。
-- 名称、标题、标签及必填业务文本使用独立的 `whitespace: true` 规则拒绝纯空白，保留原有
-  `trim()` 清理逻辑。数字、布尔、选择项、数组和允许空白的原始参数值不统一套用；自定义
-  `validator` 需要空白检查时拆成独立规则，避免覆盖内置校验。动态表单仅文本框、文本域的
+- 名称、标题、标签及必填业务文本将 `whitespace: true` 与 `required` 写在同一条规则中，
+  统一使用原有“请输入…”提示，不拆分空白校验规则或单独提示空白错误，保留原有 `trim()` 清理逻辑。
+  数字、布尔、选择项、数组和允许空白的原始参数值不统一套用；自定义 `validator` 与内置
+  必填、空白校验规则分开，避免覆盖内置校验。动态表单仅文本框、文本域的
   默认规则及构造器生成的必填规则启用该检查，密码和服务端显式校验协议保持原有行为。
-- 业务弹窗 `open()` 先重置再回填，关闭动画结束的 `closed` 统一清理表单、校验和临时状态。
+- 业务弹窗的生命周期按实际挂载方式处理，不在 `open()` 与 `closed` 两端重复重置：
+  - 保留业务组件实例时，默认值在声明处初始化，关闭动画结束的 `closed` 统一清理表单、编辑 ID、
+    校验和临时状态；`open()` 只回填本次数据、恢复业务缓存、发起必要查询并显示弹窗。
+  - 所有调用方均在 `closed` 后卸载整个业务组件时，局部状态由下次挂载重新初始化，`closed` 只通知
+    父级卸载；计时器、订阅、流式请求等资源释放仍需保留。
+  - 同时存在常驻和按需挂载调用方时，按常驻组件保留关闭清理；`MkDialog` 的 `destroyOnClose`
+    只销毁内部内容，不等于销毁外层业务组件，不能据此删除外层状态重置。
+  - `close()` 只发起关闭，表单清理放在 `closed`，避免关闭动画中内容跳变；依赖本次参数的默认值、
+    编辑快照、动态字段及每次打开必须重新查询的数据仍在 `open()` 初始化。
   父级负责校验或请求时，子组件提交数据后由父级成功调用 `close()`，失败保持打开。
 - 仅登录表单支持回车提交；其他业务表单使用 `@submit.prevent`，保存、添加由按钮触发。
   自定义 `submit` 事件不等于原生表单提交。
@@ -775,6 +784,30 @@ Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选
 
 业务组件显式导入，可调用固定业务 API；页面保留自身的列表查询、路由和保存编排。
 
+### GenerateQuestionsDialog
+
+`business/generate-questions/GenerateQuestionsDialog.vue` 共用关联问题配置，
+知识库和文档 Action 显式导入，打开时挂载、`closed` 后卸载，局部状态依赖重新挂载初始化。传入提交
+`loading`，通过 `open()` 打开、`close()` 关闭，不传 `modelApi`。
+弹窗通过 `isSystemResource()`、`isSystemSharedResource()` 选择 System 资源管理、System 共享资源
+或 Workspace Model API，统一查询当前范围的 LLM 选项和模型参数；供应商使用公共 API 查询，
+并为 `SelectModel` 提供模型参数查询；支持创建模型后刷新，
+下拉使用 `teleported`。模型选项与参数查询共用一个 `modelLoading`，通过 `finally` 释放；
+表单禁用状态统一为 `loading || modelLoading`，失败提示由请求层处理。
+提交请求状态由 Action 传入的 `loading` 管理，表单校验后再次检查状态，避免重复提交。
+
+弹窗只通过资源上下文工具判断范围，不持有知识库/文档/段落 ID，也不调用生成接口。`submit(config, stateList)`
+返回 `RelatedQuestionsConfig` 与任务状态数组，由各 Action 补齐目标 ID、提交各自接口、提示、
+关闭和刷新。`showParagraphScope` 默认开启，每次打开默认仅处理未成功部分；段落场景传
+`false` 隐藏范围，返回空状态数组，调用方只提交配置与段落 ID，不传 `state_list`。
+
+表单状态保留在 Dialog，同目录 `prompt-cache.ts` 负责按用户读取与保存模型、参数、提示词，
+不注册专用 Store；每次打开读取缓存，提交时保留其他用户的最新记录。
+沿用 v2 的 `localStorage.PROMPT_CACHE` 及 `[{ user, formValue }]` 数组结构，直接读取已有配置，
+保存时只替换当前用户记录，同一用户跨工作空间共用配置；不再传入工作空间 ID。
+不保存目标 ID 或分段范围；缓存用 `cloneDeep` 隔离，模型失效时清空模型及参数。
+取消不保存，提交前校验必填与纯空白提示词；提交失败保留表单，缓存不可用不阻止生成。
+
 ### GenerateContent
 
 `business/generate-content/index.vue` 封装生成入口按钮和弹窗，供提示词与 Python
@@ -838,7 +871,7 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 手动导入 `business/select-application-dialog/index.vue` 和 `business/select-tool-dialog/index.vue`。
 两者沿用知识库选择弹窗的目录、名称搜索、三列卡片、悬停详情、跨目录选择和清空交互；
 `open()` 接收已选资源对象数组，`submit` 返回深拷贝后的资源对象数组，兼容只有 ID 的旧数据。
-每次打开先重置临时状态；取消不提交。
+打开时回填本次选择并查询资源，临时状态在 `closed` 清理；取消不提交。
 
 智能体通过 `getAllApplication` 全量查询已发布资源，不展示共享目录。工具通过工作空间或共享
 `getAllTool` 全量查询，仅展示启用资源；`toolTypes` 默认包含自定义、工作流和内置工具，

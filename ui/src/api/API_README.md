@@ -149,6 +149,10 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 `source: 'shared'` 与 `source: 'workspace'`。`SelectModel` 的接口选项统一通过此方法查询，
 工作流通过 Store 同名方法使用缓存或强制刷新。模型管理列表继续使用 `getModelList`。
 
+`system/shared-resources/model.ts` 同样提供 `getModelListWithShared(query)`，沿用
+`/system/shared/model` 查询共享模型，为每项标记 `source: 'shared'`；不查询工作空间模型。
+共享工作流、代码生成和默认模型设置统一调用此方法，模型管理继续使用 `getModelList`。
+
 ### 工具列表查询
 
 `workspace/tool/tool.ts` 的 `getAllTool(query)` 查询支持 `folder_id` 筛选的工作空间工具
@@ -189,6 +193,13 @@ Application API，直接转发生成请求，不使用查询缓存或请求去�
 
 ### 知识库维护
 
+关联问题生成按资源归属提交：`putGenerateKnowledgeQuestions` PUT 到
+`/<knowledgeId>/generate_related`；`putGenerateDocumentQuestions` PUT 到
+`/<knowledgeId>/document/batch_generate_related`，单项也使用单元素 `document_id_list`。
+`RelatedQuestionsConfig` 共用模型、模型参数及提示词，`KnowledgeGeneratePayload` 增加
+`state_list`，`DocumentGeneratePayload` 再增加 `document_id_list`，类型从 `@/api/types` 导入。
+公共配置弹窗只返回表单与状态，各 Action 调用各自完整业务 API。
+
 `getKnowledgeMcpConfig(knowledgeId)` 与 `postKnowledgeKeywordIndex(knowledgeId)` 为预留接口方法，
 目前不发送 HTTP 请求：前者返回空配置文本，后者模拟成功。后续确认后端协议后替换方法内部实现。
 MCP 入口加载配置后打开只读及复制弹窗；分词索引入口仅调用方法并在成功后提示“操作成功”。
@@ -213,6 +224,10 @@ MCP 入口加载配置后打开只读及复制弹窗；分词索引入口仅调�
 `putReEmbeddingKnowledge` 使用 PUT 请求 `/<knowledgeId>/embedding` 重新向量化。
 设置页更换向量模型时先确认、保存，再调用该接口；Web、飞书配置通过 `meta` 提交，保留未编辑的
 已有配置，文件数量与大小限制仍作为知识库顶层字段提交。
+
+`putSyncWebKnowledge(knowledgeId, syncType)` 使用 PUT 请求 `/<knowledgeId>/sync`，
+查询参数 `sync_type` 为 `replace`（替换同步）或 `complete`（整体同步），不传请求体。
+仅用于 Web 知识库；页面负责方式选择、覆盖提示、loading 与任务提交成功提示。
 
 知识库创建通过 `postKnowledge`、`postWebKnowledge` 分别提交到 `/base`、`/web`；
 `postLarkKnowledge` 沿用飞书扩展接口 `/lark/save`，当前开源后端未包含该实现。
@@ -509,6 +524,9 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 单项向量化使用 `putDocumentRefresh(knowledgeId, documentId, stateList)` 请求 `/<documentId>/refresh`；
 单项取消使用 `putCancelTask(knowledgeId, documentId, taskType)` 请求 `/<documentId>/cancel_task`，提交 `{ type }`。
 批量向量化与取消分别沿用 `batch_refresh` 和 `batch_cancel_task`，不以单元素批量请求代替单项接口。
+单项分词使用 `putDocumentTokenize(knowledgeId, documentId, stateList)` 请求 `/<documentId>/tokenize`，
+提交 `{ state_list }`；批量分词使用 `putBatchTokenizeDocuments` 请求 `batch_tokenize`，
+提交 `{ id_list, state_list }`。两者均包含全部七种分段状态；单项取消分词复用 `putCancelTask`，任务类型为 `TOKENIZE`。
 文档设置的共享载荷为 `DocumentSettingPayload`，生成问题使用 `DocumentGeneratePayload`；
 单项设置通过 `meta` 保留来源数据，批量设置将 `allow_download` 放在顶层。
 飞书同步沿用 v2 扩展接口 `/knowledge/lark/<knowledgeId>/_batch`，需部署环境支持。

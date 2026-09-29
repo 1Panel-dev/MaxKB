@@ -73,7 +73,6 @@ watch(
             </div>
           </div>
 
-          <!-- TODO 可能需要调整ui -->
           <div v-if="isSystemSharedResource()">
             <p class="mb-1 text-N600">工作空间</p>
             {{ record?.workspace_name || '-' }}

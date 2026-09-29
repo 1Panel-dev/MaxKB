@@ -15,7 +15,6 @@ const formRef = ref<FormInstance>()
 const workspaceForm = reactive<WorkspaceItem>({ name: '' })
 const workspaceRules: FormRules<WorkspaceItem> = { name: [{ whitespace: true, required: true, message: '请输入工作空间名称', trigger: 'blur' }] }
 function open(workspace?: WorkspaceItem) {
-  resetData()
   if (workspace) {
     workspaceForm.id = workspace?.id
     workspaceForm.name = workspace?.name
@@ -40,7 +39,7 @@ function submit() {
 }
 
 function resetData() {
-  Object.assign(workspaceForm, { name: '' })
+  Object.assign(workspaceForm, { id: undefined, name: '' })
   loading.value = false
   formRef.value?.clearValidate()
 }

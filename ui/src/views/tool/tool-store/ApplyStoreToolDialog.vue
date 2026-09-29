@@ -83,19 +83,11 @@ function open(tool: ToolStoreItem) {
   visible.value = true
 }
 
-function handleClosed() {
-  currentTool.value = undefined
-  loading.value = false
-  storeToolForm.name = ''
-  formRef.value?.clearValidate()
-  emit('closed')
-}
-
 defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :show-close="!loading" title="添加工具" @closed="handleClosed">
+  <MkDialog v-model="visible" :show-close="!loading" title="添加工具" @closed="emit('closed')">
     <el-form ref="formRef" :model="storeToolForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="名称" prop="name">
         <el-input

@@ -35,7 +35,6 @@ function loadTriggers() {
     })
 }
 function open() {
-  triggersData.value = []
   visible.value = true
   return loadTriggers()
 }

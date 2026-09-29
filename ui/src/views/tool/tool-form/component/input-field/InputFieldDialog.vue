@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ToolInputField } from '@/api/types'
@@ -22,7 +22,6 @@ function open(field?: ToolInputField) {
   }
 
   visible.value = true
-  nextTick(() => formRef.value?.clearValidate())
 }
 
 function handleSubmit() {

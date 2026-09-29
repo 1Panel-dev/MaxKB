@@ -14,7 +14,6 @@ const formData = ref<KnowledgeSearchSetting>(cloneDeep(defaultSearchSetting))
 const formRef = useTemplateRef<FormInstance>('formRef')
 
 function open() {
-  resetData()
   formData.value = cloneDeep(setting.value)
   visible.value = true
 }

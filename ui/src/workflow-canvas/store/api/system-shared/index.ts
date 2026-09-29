@@ -17,7 +17,7 @@ export default {
   postPromptGenerate: ApplicationApi.postPromptGenerate,
   getMcpTools,
   getAllTags,
-  getModelListWithShared: ModelApi.getModelList,
+  getModelListWithShared: ModelApi.getModelListWithShared,
   getProviderList: ProviderApi.getProviderList,
   getModelParamsForm: ModelApi.getModelParamsForm,
   getToolListWithShared: ToolApi.getToolListWithShared,
