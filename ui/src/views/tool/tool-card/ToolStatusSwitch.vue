@@ -73,10 +73,7 @@ function updateToolStatus(active: boolean) {
 </script>
 
 <template>
-  <div class="flex-align-center" v-bind="$attrs">
-    <el-switch :disabled="loading" :model-value="tool.is_active" class="mr-3" size="small" :before-change="handleToolStatusChange" />
-    <el-divider direction="vertical" />
-  </div>
+  <el-switch :disabled="loading" :model-value="tool.is_active" size="small" :before-change="handleToolStatusChange" v-bind="$attrs" />
 
   <InitParamDialog ref="initParamDialogRef" :api="api" @update="emit('update', $event)" />
 </template>

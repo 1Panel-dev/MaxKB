@@ -150,7 +150,7 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
-            <div class="flex-align-center gap-1">
+            <div class="flex-align-center">
               <!-- 编辑模型 -->
               <EditModelAction
                 display="button"

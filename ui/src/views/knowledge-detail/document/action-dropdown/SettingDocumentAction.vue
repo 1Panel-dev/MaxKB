@@ -3,12 +3,12 @@ import { ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { DOCUMENT_HIT_HANDLING, KNOWLEDGE_TYPE } from '@/api/enums'
 import type { DocumentItem, DocumentSettingPayload } from '@/api/types'
-import DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
 import { MsgSuccess } from '@/utils/message'
 
-defineOptions({ name: 'ButtonDocumentSetting' })
-const props = defineProps<{ knowledgeId: string; documents: DocumentItem[]; batch?: boolean; disabled?: boolean }>()
+defineOptions({ name: 'SettingDocumentAction' })
+const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documents: DocumentItem[]; batch?: boolean; disabled?: boolean }>()
 const emit = defineEmits<{ refresh: [] }>()
 const visible = ref(false)
 const loading = ref(false)
@@ -54,9 +54,9 @@ async function handleSubmit() {
       data.meta.source_url = form.value.source_url.trim()
       data.meta.selector = form.value.selector
     }
-    request = DocumentApi.putDocumentSetting(props.knowledgeId, document.value.id, data)
+    request = props.api.putDocumentSetting(props.knowledgeId, document.value.id, data)
   } else {
-    request = DocumentApi.putBatchDocumentSetting(props.knowledgeId, targetDocumentIds.value, { ...data, allow_download: form.value.allow_download })
+    request = props.api.putBatchDocumentSetting(props.knowledgeId, targetDocumentIds.value, { ...data, allow_download: form.value.allow_download })
   }
   return request
     .then(() => {

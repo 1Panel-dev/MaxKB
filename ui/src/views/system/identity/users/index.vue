@@ -215,7 +215,7 @@ onMounted(() => loadSystemUsers())
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <div class="flex-align-center gap-3">
+            <div class="flex-align-center">
               <!-- 修改状态 -->
               <el-switch
                 v-model="row.is_active"
@@ -223,7 +223,7 @@ onMounted(() => loadSystemUsers())
                 :before-change="() => handleChangeStatus(row)"
                 size="small"
               />
-              <el-divider direction="vertical" />
+              <el-divider direction="vertical" class="ml-3! mr-2!" />
 
               <div class="flex">
                 <!-- 编辑 -->

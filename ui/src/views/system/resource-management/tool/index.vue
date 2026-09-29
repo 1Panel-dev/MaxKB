@@ -175,9 +175,10 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="140" fixed="right">
           <template #default="{ row }">
-            <div class="flex-align-center gap-1">
+            <div class="flex-align-center">
               <!-- 启用或禁用工具 -->
-              <ToolStatusSwitch class="mr-1!" v-model:loading="operationLoading" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
+              <ToolStatusSwitch v-model:loading="operationLoading" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
+              <el-divider direction="vertical" class="ml-3! mr-2!" />
               <!-- 编辑工具配置 -->
               <EditToolAction display="button" label="编辑" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
               <!-- 更多工具操作 -->

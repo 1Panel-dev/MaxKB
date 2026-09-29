@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import type ToolApi from '@/api/admin/workspace/tool/tool'
-import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { ToolItem, ToolStoreResponse } from '@/api/types'
-import ToolStatusSwitch from './ToolStatusSwitch.vue'
 import ButtonUpdateVersion from './ButtonUpdateVersion.vue'
 
 defineOptions({ name: 'ToolCard' })
 
 const props = defineProps<{
-  api: typeof ToolApi | typeof SystemSharedToolApi
   disabled?: boolean
   selectable?: boolean
   selected?: boolean
@@ -66,8 +62,7 @@ function handleClick(event: MouseEvent) {
     <template #footer="{ Action, ActionDropdown }">
       <MkStatusLabel :active="tool.is_active" class="text-N600!" />
       <component :is="Action" v-if="!disabled">
-        <!-- 修改工具状态 -->
-        <ToolStatusSwitch v-model:loading="loading" :api="api" :tool="tool" @update="emit('update', $event)" />
+        <slot name="actions" />
         <component :is="ActionDropdown">
           <slot name="action-dropdown" />
         </component>

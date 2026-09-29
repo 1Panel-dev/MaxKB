@@ -23,7 +23,8 @@
 - `action-dropdown/` 目录目前只优先用于 `application`、`knowledge`、`model`、`tool` 四类特殊
   资源，用于维护跨 Workspace、System 资源管理或 System 共享资源复用的卡片 Action。其他业务
   暂不主动创建这类目录，操作入口和配套流程优先留在所属页面或组件中；出现明确的跨范围共享需求
-  后再评估是否采用相同结构。
+  后再评估是否采用相同结构。按明确需求，文档页使用 `knowledge-detail/document/action-dropdown/`
+  集中维护行操作、批量操作及其专属弹窗；不因此扩展其他普通页面的目录规则。
 - 仅供一个页面使用的代码放在该页面功能目录；同一功能下多个页面复用的代码放在它们最近的
   共同功能目录中。
 - 不要为了复用一个页面内部实现而提前移动到 `src/components`。
@@ -322,8 +323,9 @@ Workspace 的自定义工具和工作流工具菜单
 维护逐方法接口类型；`ApplyStoreToolDialog` 内聚商店应用请求，提交时通过
 `isSystemSharedResource()` 选择 System 共享资源或 Workspace 的 Tool API 和 Tool Store API，
 覆盖工作流模板及商店工具两个分支；历史内置工具由 ToolStore 提供，不再从数据库加载。
-工具启用状态属于固定的卡片内交互，由 `ToolStatusSwitch`
-使用卡片传入的 Tool API 更新，并通过 `update` 事件通知页面替换列表数据。工具批量选择状态、
+工具启用状态由 Workspace 工具页和 System 共享工具页通过 `ToolCard` 的 `actions` 插槽组合
+`ToolStatusSwitch`，页面直接传入对应 Tool API 和操作 loading，并通过 `update` 事件替换列表数据。
+`ToolCard` 不再接收 Tool API，仅提供操作插槽；版本更新仍通过卡片的 loading 和 update 通道处理。工具批量选择状态、
 批量移动和批量删除流程由 `ToolView` 管理；`MoveToolAction` 复用公共 `MoveToDialog` 完成单个工具移动，
 在具体目录中通过 `delete` 通知页面局部移除卡片，在“全部工具”中保留卡片。`ToolCard` 只把选择模式与选中状态传给 `MkSourceCard`。
 工具商店列表由 `ToolView` 统一加载并经 `ToolCard` 传给 `ButtonUpdateVersion`，卡片和更新按钮
@@ -677,12 +679,25 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 选中后通过 `footer-batch-actions` 展示批量操作。右侧固定操作列提供启停、向量化、分词索引和更多菜单，
 运行或排队中的任务切换为取消入口。Web、飞书提供同步，普通与工作流文档提供原文下载和替换。
 单项与批量操作共用页面请求状态，删除和同步先确认，成功后清空选择并刷新，导出和下载保留选择。
-文档操作入口与专属弹窗合并放在 `document/components/`：`ButtonDocumentTask` 负责向量化分段范围与生成问题配置，
-`ButtonDocumentSetting` 负责召回及来源设置，`ButtonMigrateDocument` 选择目标知识库，
-`ButtonDocumentTags` 添加已有标签和移除文档标签关联。组件接收知识库 ID、文档 ID 或文档数组及禁用状态，
+文档操作统一放在 `document/action-dropdown/`，通过该目录 `index.ts` 导出，页面显式组合各 Action。
+`EmbeddingDocumentAction` 负责向量化分段范围与取消向量化，`GenerateDocumentQuestionsAction` 负责生成问题配置，`SettingDocumentAction` 负责召回及来源设置，
+`MigrateDocumentAction` 选择目标知识库，`DocumentTagsAction` 添加已有标签和移除文档标签关联；
+这些 Action 继续将操作入口与专属弹窗放在同一组件内。组件接收完整 Document API、知识库 ID、文档 ID 或文档数组及禁用状态，
 点击时快照本次操作对象，内部管理弹窗和请求，成功后通过 `refresh` 通知页面刷新，失败保留输入。
-任务组件通过 `action` 区分向量化与生成问题，通过 `batch` 切换批量按钮；行内入口使用 `display` 区分菜单与图标按钮。
+向量化和生成问题使用独立 Action，通过 `batch` 切换批量按钮；行内入口使用 `display` 区分菜单与图标按钮。
+单项向量化传入 `document`，由 `EmbeddingDocumentAction` 内部判断排队或执行状态并切换取消入口，
+取消请求通过 `v-model:loading` 共用页面操作状态；页面不再拆分向量化和取消向量化两个入口。
 设置组件通过 `batch` 区分单项与批量，标签组件通过 `manageTags` 区分标签管理与批量添加。
+`CancelDocumentTaskAction`、`TokenizeDocumentAction`、`SyncDocumentAction`、
+`ExportDocumentAction`、`DownloadDocumentAction`、`ReplaceDocumentAction` 和 `DeleteDocumentAction`
+分别负责任务取消、分词、同步、导出、下载、替换与删除，单项和批量入口复用对应组件。
+直接请求的 Action 通过 `v-model:loading` 共用页面操作状态，各 Action 自行管理请求、
+防重复提交、成功提示与失败处理，不额外抽取统一请求封装；需要刷新时发出 `refresh`，导出与下载不发出。
+删除后分页总数和页码回退由页面重新查询服务端处理，不在 Action 中维护分页数据。
+启停开关直接使用页面内的 `el-switch`，由页面 `handleChangeActive` 管理请求，
+接口成功后刷新列表回显，不在请求前切换状态，不单独封装 Action。
+页面保留列表、多选、任务状态展示判断与刷新方法，不维护各 Action 的请求流程。
+`DocumentStatus`、`DocumentTags` 等纯展示组件继续留在 `document/components/`。
 页面不再维护这些弹窗 Ref 和打开方法；承载入口的 `MkTableMoreDropdown` 使用 `persistent`，避免菜单收起时卸载弹窗。
 不新增前端权限判断；共享文档不展示选择列及操作入口。
 文档分页接口维护在 `workspace/knowledge/document.ts`，页面管理 loading。文件状态表头使用
