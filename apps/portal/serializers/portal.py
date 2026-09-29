@@ -220,7 +220,7 @@ class PortalLoginSerializer(serializers.Serializer):
             "description": portal.description or "",
             "logo": portal.logo or "",
             "enable_auth": portal.enable_auth,
-            "authentication_type": auth_config.get("type", "password") if portal.enable_auth else "",
+            "authentication_type": auth_config.get("type", "LOCAL") if portal.enable_auth else "",
             "login_value": auth_config.get("login_value", []) if portal.enable_auth else [],
             "max_attempts": auth_config.get("max_attempts", 1) if portal.enable_auth else 1,
             "rsa_key": get_key_pair_by_sql().get("key", ""),
