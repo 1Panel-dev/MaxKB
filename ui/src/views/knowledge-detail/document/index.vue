@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import type { CascaderOption, UploadFile } from 'element-plus'
+import type { CascaderOption } from 'element-plus'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
@@ -17,13 +17,23 @@ import type { Dict, DocumentHitHandling, DocumentItem, DocumentTaskType, OptionI
 import { datetimeFormat } from '@/utils/time'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { numberFormat } from '@/utils/number'
-import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
+import { MsgSuccess } from '@/utils/message'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
-import ButtonDocumentTask from './components/ButtonDocumentTask.vue'
-import ButtonDocumentSetting from './components/ButtonDocumentSetting.vue'
-import ButtonMigrateDocument from './components/ButtonMigrateDocument.vue'
-import ButtonDocumentTags from './components/ButtonDocumentTags.vue'
+import {
+  CancelDocumentTaskAction,
+  DeleteDocumentAction,
+  DocumentTagsAction,
+  EmbeddingDocumentAction,
+  GenerateDocumentQuestionsAction,
+  DownloadDocumentAction,
+  ExportDocumentAction,
+  MigrateDocumentAction,
+  ReplaceDocumentAction,
+  SettingDocumentAction,
+  SyncDocumentAction,
+  TokenizeDocumentAction,
+} from './action-dropdown'
 import { useKnowledgeDetailContext } from '../context'
 
 defineOptions({ name: 'DocumentListView' })
@@ -33,121 +43,6 @@ defineExpose({ customHeader: true })
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const { knowledge } = useKnowledgeDetailContext()
-
-/* 文档多选：翻页保留选择，查询条件变化时清空。 */
-const documentTableRef = ref<{ clearSelection: () => void }>()
-const selectedDocuments = ref<DocumentItem[]>([])
-const selectedDocumentIds = computed(() => selectedDocuments.value.map(({ id }) => id))
-
-function handleSelectionChange(documents: unknown[]) {
-  selectedDocuments.value = documents as DocumentItem[]
-}
-
-function clearDocumentSelection() {
-  documentTableRef.value?.clearSelection()
-  selectedDocuments.value = []
-}
-
-/* 单项与批量文档操作 */
-const operationLoading = ref(false)
-const canSyncDocuments = computed(() => knowledge.value?.type === KNOWLEDGE_TYPE.WEB || knowledge.value?.type === KNOWLEDGE_TYPE.LARK)
-
-function getSelectedDocuments(document?: DocumentItem) {
-  return document ? [document] : selectedDocuments.value
-}
-
-function isTaskRunning(document: DocumentItem, taskType: DocumentTaskType) {
-  const state = document.status?.at(-taskType)
-  return state === DOCUMENT_TASK_STATE.PENDING || state === DOCUMENT_TASK_STATE.STARTED
-}
-
-function refreshAfterOperation() {
-  clearDocumentSelection()
-  return loadDocuments()
-}
-
-function runDocumentOperation(request: () => Promise<unknown>, refresh = true) {
-  if (operationLoading.value) return Promise.resolve()
-  operationLoading.value = true
-  return request()
-    .then(() => {
-      MsgSuccess('操作成功')
-      if (refresh) return refreshAfterOperation()
-    })
-    .catch(() => {
-      // 请求层统一提示错误，失败保留选择以便重试。
-    })
-    .finally(() => {
-      operationLoading.value = false
-    })
-}
-
-function handleCancelTask(taskType: DocumentTaskType, document?: DocumentItem) {
-  const ids = getSelectedDocuments(document).map(({ id }) => id)
-  if (ids.length) return runDocumentOperation(() => DocumentApi.putBatchCancelDocumentTask(knowledgeId.value, ids, taskType))
-}
-
-function handleTokenize(document?: DocumentItem) {
-  const ids = getSelectedDocuments(document).map(({ id }) => id)
-  if (ids.length) return runDocumentOperation(() => DocumentApi.putBatchTokenizeDocuments(knowledgeId.value, ids, Object.values(DOCUMENT_TASK_STATE)))
-}
-
-function handleChangeActive(document: DocumentItem) {
-  return runDocumentOperation(() => DocumentApi.putDocumentActive(knowledgeId.value, document.id, !document.is_active))
-}
-
-function handleExport(format: 'excel' | 'zip', document?: DocumentItem) {
-  const ids = getSelectedDocuments(document).map(({ id }) => id)
-  if (ids.length) return runDocumentOperation(() => DocumentApi.exportDocuments(knowledgeId.value, ids, format), false)
-}
-
-function handleDownload(document: DocumentItem) {
-  return runDocumentOperation(() => DocumentApi.downloadDocumentSource(knowledgeId.value, document), false)
-}
-
-function handleReplace(file: UploadFile, document: DocumentItem) {
-  if (file.raw) {
-    const sourceFile = file.raw
-    return runDocumentOperation(() => DocumentApi.postReplaceDocumentSource(knowledgeId.value, document.id, sourceFile))
-  }
-}
-
-function handleSync(document?: DocumentItem) {
-  const documents = getSelectedDocuments(document)
-  if (!documents.length || operationLoading.value) return
-  if (document?.type === KNOWLEDGE_TYPE.WEB && !document.meta?.source_url) {
-    MsgInfo('文档没有来源地址，请先在设置中填写文档地址')
-    return
-  }
-  const ids = documents.map(({ id }) => id)
-  return MsgConfirm('同步文档', '同步后将覆盖现有文档内容，是否继续？', { confirmButtonText: '同步' })
-    .then(() => {
-      return runDocumentOperation(() =>
-        knowledge.value?.type === KNOWLEDGE_TYPE.LARK
-          ? DocumentApi.putSyncLarkDocuments(knowledgeId.value, ids)
-          : DocumentApi.putSyncDocuments(knowledgeId.value, ids),
-      )
-    })
-    .catch(() => {})
-}
-
-function handleDelete(document?: DocumentItem) {
-  const documents = getSelectedDocuments(document)
-  if (!documents.length || operationLoading.value) return
-  const ids = documents.map(({ id }) => id)
-  return MsgConfirm(`删除 ${ids.length} 个文档`, '删除后无法恢复，是否继续？')
-    .then(() => {
-      return runDocumentOperation(() => {
-        const request = document
-          ? DocumentApi.deleteDocument(knowledgeId.value, document.id)
-          : DocumentApi.putBatchDeleteDocuments(knowledgeId.value, ids)
-        return request.then(() => {
-          paginationConfig.value.total = Math.max(0, paginationConfig.value.total - ids.length)
-        })
-      })
-    })
-    .catch(() => {})
-}
 
 /* 快速创建 */
 const showQuickCreate = computed(() => knowledge.value?.type === KNOWLEDGE_TYPE.BASE && !isWorkspaceSharedResource())
@@ -301,6 +196,51 @@ function handleSearchChange(query?: Dict<unknown>) {
   return loadDocuments()
 }
 
+/* 批量操作 */
+const documentTableRef = ref<{ clearSelection: () => void }>()
+const selectedDocuments = ref<DocumentItem[]>([])
+const selectedDocumentIds = computed(() => selectedDocuments.value.map(({ id }) => id))
+
+function handleSelectionChange(documents: unknown[]) {
+  selectedDocuments.value = documents as DocumentItem[]
+}
+
+function clearDocumentSelection() {
+  documentTableRef.value?.clearSelection()
+  selectedDocuments.value = []
+}
+
+/* 单项与批量文档操作 */
+// 共用操作状态，防止重复提交。
+const operationLoading = ref(false)
+
+// 文档启停由服务端结果与列表刷新回显，避免开关提前修改状态。
+function handleChangeActive(document: DocumentItem) {
+  if (operationLoading.value) return false
+  operationLoading.value = true
+  return DocumentApi.putDocumentActive(knowledgeId.value, document.id, !document.is_active)
+    .then(() => {
+      MsgSuccess('操作成功')
+      return refreshAfterOperation().then(() => false)
+    })
+    .catch(() => false)
+    .finally(() => {
+      operationLoading.value = false
+    })
+}
+
+// 按状态字符串中从右起的任务位置，判断任务是否排队或执行中。
+function isTaskRunning(document: DocumentItem, taskType: DocumentTaskType) {
+  const state = document.status?.at(-taskType)
+  return state === DOCUMENT_TASK_STATE.PENDING || state === DOCUMENT_TASK_STATE.STARTED
+}
+
+// 操作成功后清空勾选并刷新文档列表。
+function refreshAfterOperation() {
+  clearDocumentSelection()
+  return loadDocuments()
+}
+
 onMounted(() => {
   loadDocuments()
 })
@@ -415,6 +355,243 @@ onMounted(() => {
     <el-table-column label="创建时间" width="180">
       <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
+    <el-table-column v-if="!isWorkspaceSharedResource()" label="操作" width="160" fixed="right">
+      <template #default="{ row }: { row: DocumentItem }">
+        <div class="flex-align-center" @click.stop>
+          <!-- 启用或禁用文档 -->
+          <el-switch :model-value="row.is_active" size="small" :disabled="operationLoading" :before-change="() => handleChangeActive(row)" />
 
+          <el-divider direction="vertical" class="ml-3! mr-2!" />
+
+          <div class="flex">
+            <!-- 向量化或取消向量化 -->
+            <EmbeddingDocumentAction
+              :api="DocumentApi"
+              display="button"
+              :knowledge-id="knowledgeId"
+              :document="row"
+              :document-ids="[row.id]"
+              v-model:loading="operationLoading"
+              @refresh="refreshAfterOperation"
+            />
+            <!-- 分词索引或取消分词索引 -->
+            <TokenizeDocumentAction
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              v-model:loading="operationLoading"
+              :document="row"
+              :document-ids="[row.id]"
+              @refresh="refreshAfterOperation"
+            />
+            <!-- 更多文档操作 -->
+            <MkTableMoreDropdown persistent>
+              <!-- 文档设置 -->
+              <SettingDocumentAction
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                :documents="[row]"
+                :disabled="operationLoading"
+                @refresh="refreshAfterOperation"
+              />
+              <!-- 同步文档 -->
+              <SyncDocumentAction
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                v-model:loading="operationLoading"
+                :documents="[row]"
+                :knowledge-type="knowledge?.type"
+                @refresh="refreshAfterOperation"
+              />
+              <!-- 取消生成问题 -->
+              <CancelDocumentTaskAction
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                v-model:loading="operationLoading"
+                :document-ids="[row.id]"
+                :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
+                label="取消生成问题"
+                v-if="isTaskRunning(row, DOCUMENT_TASK_TYPE.GENERATE_PROBLEM)"
+                @refresh="refreshAfterOperation"
+              />
+              <!-- 生成问题 -->
+              <GenerateDocumentQuestionsAction
+                :api="DocumentApi"
+                v-else
+                :knowledge-id="knowledgeId"
+                :document-ids="[row.id]"
+                :disabled="operationLoading"
+                @refresh="refreshAfterOperation"
+              />
+              <!-- 设置文档标签 -->
+              <DocumentTagsAction
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                :document-ids="[row.id]"
+                manage-tags
+                :disabled="operationLoading"
+                @refresh="refreshAfterOperation"
+              />
+              <!-- 迁移文档 -->
+              <MigrateDocumentAction
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                :document-ids="[row.id]"
+                :disabled="operationLoading"
+                @refresh="refreshAfterOperation"
+              />
+              <!-- 导出文档 Excel -->
+              <ExportDocumentAction
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                v-model:loading="operationLoading"
+                :document-ids="[row.id]"
+                format="excel"
+              />
+              <!-- 导出文档 ZIP -->
+              <ExportDocumentAction
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                v-model:loading="operationLoading"
+                :document-ids="[row.id]"
+                format="zip"
+              />
+              <template v-if="knowledge?.type === KNOWLEDGE_TYPE.BASE || knowledge?.type === KNOWLEDGE_TYPE.WORKFLOW">
+                <!-- 下载原文档 -->
+                <DownloadDocumentAction :api="DocumentApi" :knowledge-id="knowledgeId" v-model:loading="operationLoading" :document="row" />
+                <!-- 替换原文档 -->
+                <ReplaceDocumentAction
+                  :api="DocumentApi"
+                  :knowledge-id="knowledgeId"
+                  v-model:loading="operationLoading"
+                  :document="row"
+                  @refresh="refreshAfterOperation"
+                />
+              </template>
+              <!-- 删除文档 -->
+              <DeleteDocumentAction
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                v-model:loading="operationLoading"
+                :document-ids="[row.id]"
+                @refresh="refreshAfterOperation"
+              />
+            </MkTableMoreDropdown>
+          </div>
+        </div>
+      </template>
+    </el-table-column>
+    <template v-if="!isWorkspaceSharedResource()" #footer-batch-actions>
+      <!-- 批量向量化 -->
+      <EmbeddingDocumentAction
+        :api="DocumentApi"
+        batch
+        :knowledge-id="knowledgeId"
+        :document-ids="selectedDocumentIds"
+        :disabled="operationLoading"
+        @refresh="refreshAfterOperation"
+      />
+      <!-- 批量分词索引 -->
+      <TokenizeDocumentAction
+        :api="DocumentApi"
+        :knowledge-id="knowledgeId"
+        v-model:loading="operationLoading"
+        :document-ids="selectedDocumentIds"
+        batch
+        @refresh="refreshAfterOperation"
+      />
+      <!-- 批量生成问题 -->
+      <GenerateDocumentQuestionsAction
+        :api="DocumentApi"
+        batch
+        :knowledge-id="knowledgeId"
+        :document-ids="selectedDocumentIds"
+        :disabled="operationLoading"
+        @refresh="refreshAfterOperation"
+      />
+      <!-- 更多批量操作 -->
+      <MkTableMoreDropdown persistent>
+        <!-- 批量文档设置 -->
+        <SettingDocumentAction
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          :documents="selectedDocuments"
+          batch
+          :disabled="operationLoading"
+          @refresh="refreshAfterOperation"
+        />
+        <!-- 批量迁移文档 -->
+        <MigrateDocumentAction
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          :document-ids="selectedDocumentIds"
+          :disabled="operationLoading"
+          @refresh="refreshAfterOperation"
+        />
+        <!-- 批量添加标签 -->
+        <DocumentTagsAction
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          :document-ids="selectedDocumentIds"
+          :disabled="operationLoading"
+          @refresh="refreshAfterOperation"
+        />
+        <!-- 批量同步文档 -->
+        <SyncDocumentAction
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          v-model:loading="operationLoading"
+          :documents="selectedDocuments"
+          :knowledge-type="knowledge?.type"
+          batch
+          @refresh="refreshAfterOperation"
+        />
+        <!-- 批量导出 Excel -->
+        <ExportDocumentAction
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          v-model:loading="operationLoading"
+          :document-ids="selectedDocumentIds"
+          format="excel"
+        />
+        <!-- 批量导出 ZIP -->
+        <ExportDocumentAction
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          v-model:loading="operationLoading"
+          :document-ids="selectedDocumentIds"
+          format="zip"
+        />
+        <!-- 批量取消向量化 -->
+        <CancelDocumentTaskAction
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          v-model:loading="operationLoading"
+          :document-ids="selectedDocumentIds"
+          :task-type="DOCUMENT_TASK_TYPE.EMBEDDING"
+          label="取消向量化"
+          divided
+          @refresh="refreshAfterOperation"
+        />
+        <!-- 批量取消生成问题 -->
+        <CancelDocumentTaskAction
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          v-model:loading="operationLoading"
+          :document-ids="selectedDocumentIds"
+          :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
+          label="取消生成问题"
+          @refresh="refreshAfterOperation"
+        />
+        <!-- 批量删除文档 -->
+        <DeleteDocumentAction
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          v-model:loading="operationLoading"
+          :document-ids="selectedDocumentIds"
+          batch
+          @refresh="refreshAfterOperation"
+        />
+      </MkTableMoreDropdown>
+    </template>
   </MkTable>
 </template>

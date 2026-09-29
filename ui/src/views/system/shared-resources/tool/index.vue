@@ -10,6 +10,7 @@ import type { Dict, OptionItem, ToolItem, ToolType } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS } from '@/constants'
 import ToolCard from '@/views/tool/tool-card/ToolCard.vue'
+import ToolStatusSwitch from '@/views/tool/tool-card/ToolStatusSwitch.vue'
 import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
 import {
   RelatedResourcesToolAction,
@@ -111,13 +112,17 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
             <template v-for="tool in toolsData" :key="tool.id">
               <ToolCard
                 v-model:loading="toolOperationLoading"
-                :api="SystemSharedToolApi"
                 :tool="tool"
                 :shared="true"
                 :store-tools="[]"
                 @click="handleOpenTool(tool, $event)"
                 @update="handleToolUpdate"
               >
+                <template #actions>
+                  <!-- 修改工具状态 -->
+                  <ToolStatusSwitch v-model:loading="toolOperationLoading" :api="SystemSharedToolApi" :tool="tool" @update="handleToolUpdate" />
+                  <el-divider direction="vertical" class="ml-1!" />
+                </template>
                 <template #action-dropdown>
                   <!-- 编辑共享工具 -->
                   <EditToolAction

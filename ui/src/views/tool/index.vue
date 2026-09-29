@@ -16,6 +16,7 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolCard from './tool-card/ToolCard.vue'
+import ToolStatusSwitch from './tool-card/ToolStatusSwitch.vue'
 import {
   AuthorizeToolAction,
   RelatedResourcesToolAction,
@@ -214,7 +215,7 @@ onMounted(() => {
         </MkTooltip>
       </component>
 
-      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.TOOL" @select="handleFolderSelect" draggable> </FolderTree>
+      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.TOOL" @select="handleFolderSelect" draggable></FolderTree>
     </template>
 
     <template #default="{ Footer, Header }">
@@ -252,7 +253,6 @@ onMounted(() => {
             <template v-for="tool in toolsData" :key="tool.id">
               <ToolCard
                 v-model:loading="toolOperationLoading"
-                :api="ToolApi"
                 :disabled="isShared"
                 :selectable="batchSelectionMode"
                 :selected="selectedToolIds.includes(tool.id)"
@@ -263,6 +263,11 @@ onMounted(() => {
                 @selected="handleToolSelect(tool.id, $event)"
                 @update="handleToolUpdate"
               >
+                <template #actions>
+                  <!-- 修改工具状态 -->
+                  <ToolStatusSwitch v-model:loading="toolOperationLoading" :api="ToolApi" :tool="tool" @update="handleToolUpdate" />
+                  <el-divider direction="vertical" class="ml-1!"/>
+                </template>
                 <template #action-dropdown>
                   <!-- 编辑工具 -->
                   <EditToolAction

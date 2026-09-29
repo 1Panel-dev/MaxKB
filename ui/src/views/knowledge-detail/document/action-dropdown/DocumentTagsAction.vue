@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { KnowledgeTagGroup } from '@/api/types'
-import DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import { MsgSuccess } from '@/utils/message'
 
-defineOptions({ name: 'ButtonDocumentTags' })
-const props = defineProps<{ knowledgeId: string; documentIds: string[]; manageTags?: boolean; disabled?: boolean }>()
+defineOptions({ name: 'DocumentTagsAction' })
+const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documentIds: string[]; manageTags?: boolean; disabled?: boolean }>()
 const emit = defineEmits<{ refresh: [] }>()
 const visible = ref(false)
 const loading = ref(false)
@@ -30,7 +30,7 @@ function handleOpenDialog() {
   optionLoading.value = true
   Promise.all([
     KnowledgeApi.getKnowledgeTags(props.knowledgeId),
-    manageTags && ids[0] ? DocumentApi.getDocumentTags(props.knowledgeId, ids[0]) : Promise.resolve([]),
+    manageTags && ids[0] ? props.api.getDocumentTags(props.knowledgeId, ids[0]) : Promise.resolve([]),
   ])
     .then(([groups, currentTags]) => {
       tagGroups.value = groups
@@ -47,13 +47,14 @@ function handleOpenDialog() {
 function handleAddTags() {
   if (loading.value || !selectedTagIds.value.length) return
   loading.value = true
-  return DocumentApi.postAddDocumentTags(props.knowledgeId, targetDocumentIds.value, selectedTagIds.value)
+  return props.api
+    .postAddDocumentTags(props.knowledgeId, targetDocumentIds.value, selectedTagIds.value)
     .then(() => {
       MsgSuccess('添加成功')
       emit('refresh')
       selectedTagIds.value = []
       if (manage.value && targetDocumentIds.value[0]) {
-        return DocumentApi.getDocumentTags(props.knowledgeId, targetDocumentIds.value[0]).then((groups) => {
+        return props.api.getDocumentTags(props.knowledgeId, targetDocumentIds.value[0]).then((groups) => {
           documentTagGroups.value = groups
         })
       }
@@ -71,7 +72,8 @@ function handleDeleteTag(tagId: string) {
   const documentId = targetDocumentIds.value[0]
   if (loading.value || !documentId) return
   loading.value = true
-  return DocumentApi.putDeleteDocumentTags(props.knowledgeId, documentId, [tagId])
+  return props.api
+    .putDeleteDocumentTags(props.knowledgeId, documentId, [tagId])
     .then(() => {
       MsgSuccess('移除成功')
       documentTagGroups.value = documentTagGroups.value.map((group) => ({ ...group, values: group.values.filter(({ id }) => id !== tagId) }))

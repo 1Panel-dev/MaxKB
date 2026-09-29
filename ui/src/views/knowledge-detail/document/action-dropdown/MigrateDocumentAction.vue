@@ -2,11 +2,11 @@
 import { ref } from 'vue'
 import type { KnowledgeItem } from '@/api/types'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { MsgSuccess } from '@/utils/message'
 
-defineOptions({ name: 'ButtonMigrateDocument' })
-const props = defineProps<{ knowledgeId: string; documentIds: string[]; disabled?: boolean }>()
+defineOptions({ name: 'MigrateDocumentAction' })
+const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documentIds: string[]; disabled?: boolean }>()
 const emit = defineEmits<{ refresh: [] }>()
 const visible = ref(false)
 const loading = ref(false)
@@ -37,7 +37,8 @@ function handleOpenDialog() {
 function handleSubmit() {
   if (!targetKnowledgeId.value || loading.value) return
   loading.value = true
-  return DocumentApi.putMigrateDocuments(props.knowledgeId, targetKnowledgeId.value, targetDocumentIds.value)
+  return props.api
+    .putMigrateDocuments(props.knowledgeId, targetKnowledgeId.value, targetDocumentIds.value)
     .then(() => {
       MsgSuccess('迁移成功')
       visible.value = false
