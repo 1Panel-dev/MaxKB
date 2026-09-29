@@ -9,6 +9,7 @@ import PortalPreview from './components/PortalPreview.vue'
 import ButtonEditPortal from './components/ButtonEditPortal.vue'
 import ButtonPortalAuthSetting from './components/ButtonPortalAuthSetting.vue'
 import ButtonPortalCorsSetting from './components/ButtonPortalCorsSetting.vue'
+import { useStore } from '@/stores'
 
 type AccessField = 'enable_public_access' | 'enable_api' | 'enable_knowledge_base_api' | 'enable_auth' | 'enable_cors'
 
@@ -32,7 +33,7 @@ const portalSetting = reactive<PortalSetting>({
 })
 const loading = ref(false)
 const saving = ref(false)
-
+const { auth } = useStore()
 const portalAccessUrl = new URL('/portal', window.location.origin).href
 const portalApiUrl = new URL('/api/portal', window.location.origin).href
 
@@ -186,6 +187,7 @@ const canEditPortal = computed(() => perm.system.portal.edit())
               <div class="flex-align-center gap-2">
                 <!-- 配置身份认证 -->
                 <ButtonPortalAuthSetting
+                  v-if="auth.isPE || auth.isEE"
                   ref="authSettingButtonRef"
                   :setting="portalSetting"
                   :saving="saving"
