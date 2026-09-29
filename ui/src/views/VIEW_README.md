@@ -636,7 +636,7 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 
 `trigger/execution-record/TriggerTaskRecordDrawer.vue` 通过列表操作列打开，负责执行记录分页、
 名称/状态/类型筛选、执行时间排序及跨页浏览。`ExecutionDetailDrawer.vue` 根据当前记录查询详情，
-展示智能体问答、工具输入输出、触发错误及工作流节点详情；状态展示直接使用 `MkStatusLabel` 和共享 `STATE_LABELS`。
+展示智能体问答、工具输入输出、触发错误及工作流节点详情；状态展示通过共享 `EXECUTION_STATUS_OPTIONS` 向 `MkStatusLabel` 传入 `type + label`，筛选复用同一配置的文案。
 
 ## 查看关联资源 Action
 
@@ -675,32 +675,42 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 文档页通过 `onMounted` 加载文档列表，创建者选项在展开下拉或输入关键词时通过 `remoteMethod`
 按需加载，不在进入页面时预加载；其他列表页的同类创建者筛选遵循相同方式。不额外监听路由重置状态。切换工作空间
 整页加载并返回知识库列表；当前知识库与共享资源入口均从其他页面进入，挂载时初始化筛选和分页。
-无轮询和排序入口。非共享文档显示选择列，按文档 ID 跨页保留选择，搜索或筛选变化时清空；
+普通与共享文档列表沿用 v2 的 6 秒轮询间隔，在请求结束后安排下一次静默刷新，保留当前筛选、
+分页和勾选，不显示列表 loading；操作请求期间推迟轮询，失败后继续重试，卸载时停止且不再重新调度。
+无排序入口。非共享文档显示选择列，按文档 ID 跨页保留选择，搜索或筛选变化时清空；
 选中后通过 `footer-batch-actions` 展示批量操作。右侧固定操作列提供启停、向量化、分词索引和更多菜单，
 运行或排队中的任务切换为取消入口。Web、飞书提供同步，普通与工作流文档提供原文下载和替换。
 单项与批量操作共用页面请求状态，删除和同步先确认，成功后清空选择并刷新，导出和下载保留选择。
 文档操作统一放在 `document/action-dropdown/`，通过该目录 `index.ts` 导出，页面显式组合各 Action。
-`EmbeddingDocumentAction` 负责向量化分段范围与取消向量化，`GenerateDocumentQuestionsAction` 负责生成问题配置，`SettingDocumentAction` 负责召回及来源设置，
+文档任务是否排队或执行中统一通过 `document/utils/task-status.ts` 的 `isDocumentTaskRunning(document, taskType)` 判断，
+页面及 Action 不重复解析状态字符串；文档或任务状态缺失时返回 `false`。
+`EmbeddingDocumentAction` 负责单项向量化与取消向量化，`BatchEmbeddingDocumentAction` 负责批量向量化按钮，`GenerateDocumentQuestionsAction` 负责生成问题配置，`SettingDocumentAction` 负责召回及来源设置，
 `MigrateDocumentAction` 选择目标知识库，`DocumentTagsAction` 添加已有标签和移除文档标签关联；
 这些 Action 继续将操作入口与专属弹窗放在同一组件内。组件接收完整 Document API、知识库 ID、文档 ID 或文档数组及禁用状态，
 点击时快照本次操作对象，内部管理弹窗和请求，成功后通过 `refresh` 通知页面刷新，失败保留输入。
-向量化和生成问题使用独立 Action，通过 `batch` 切换批量按钮；行内入口使用 `display` 区分菜单与图标按钮。
-单项向量化传入 `document`，由 `EmbeddingDocumentAction` 内部判断排队或执行状态并切换取消入口，
-取消请求通过 `v-model:loading` 共用页面操作状态；页面不再拆分向量化和取消向量化两个入口。
+单项向量化仅传 `document`，内部判断排队或执行状态，固定展示行内图标按钮，分别调用单项向量化和取消接口。
+批量向量化仅传 `document-ids`，使用独立的 `BatchEmbeddingDocumentAction` 普通按钮；
+批量取消向量化继续使用 `CancelDocumentTaskAction` 菜单项，单项和批量请求均通过 `v-model:loading` 共用页面操作状态。
+向量化相关文件集中在 `document/action-dropdown/embedding/`，包含两个 Action 和共用的 `DocumentEmbeddingDialog.vue`；
+Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内部使用，管理分段范围与确认事件，
+请求和成功关闭由各自 Action 负责；打开时快照文档目标，失败保留范围选择。
+生成问题仍通过 `batch` 切换批量按钮，通过 `display` 区分行内菜单与图标按钮。
 设置组件通过 `batch` 区分单项与批量，标签组件通过 `manageTags` 区分标签管理与批量添加。
 `CancelDocumentTaskAction`、`TokenizeDocumentAction`、`SyncDocumentAction`、
 `ExportDocumentAction`、`DownloadDocumentAction`、`ReplaceDocumentAction` 和 `DeleteDocumentAction`
 分别负责任务取消、分词、同步、导出、下载、替换与删除，单项和批量入口复用对应组件。
 直接请求的 Action 通过 `v-model:loading` 共用页面操作状态，各 Action 自行管理请求、
 防重复提交、成功提示与失败处理，不额外抽取统一请求封装；需要刷新时发出 `refresh`，导出与下载不发出。
+`DeleteDocumentAction` 单个删除传 `document`，确认框展示文档名称并调用单个删除接口；
+批量删除传 `batch` 和 `document-ids`，确认框展示数量并调用批量删除接口。
 删除后分页总数和页码回退由页面重新查询服务端处理，不在 Action 中维护分页数据。
 启停开关直接使用页面内的 `el-switch`，由页面 `handleChangeActive` 管理请求，
 接口成功后刷新列表回显，不在请求前切换状态，不单独封装 Action。
 页面保留列表、多选、任务状态展示判断与刷新方法，不维护各 Action 的请求流程。
 `DocumentStatus`、`DocumentTags` 等纯展示组件继续留在 `document/components/`。
 页面不再维护这些弹窗 Ref 和打开方法。行内更多菜单使用 `MkTableMoreDropdown`；批量操作栏使用
-`MkDropdown` 搭配非 text 的“更多操作 + 下箭头”按钮和 `MkDropdownMenu`，点击展开。
-两种菜单均保留 `persistent`，避免菜单收起时卸载 Action 内的弹窗。
+`MkDropdown` 搭配非 text 的 More 图标按钮和 `MkDropdownMenu`，点击展开。
+批量 More 开启 `hide-when-empty`，按标准菜单插槽判断空内容，不强制开启 `persistent`；不检查业务 Action 内部的条件渲染。
 不新增前端权限判断；共享文档不展示选择列及操作入口。
 文档分页接口维护在 `workspace/knowledge/document.ts`，页面管理 loading。文件状态表头使用
 `MkDropdown` 单选筛选全部、成功、失败、索引中、分词索引中、排队中和生成中；查询组合
@@ -926,8 +936,9 @@ Layout 保留标题栏固定位置和外层间距，页面负责内部布局。
 文件状态的解析、聚合与展示统一放在文档页的 `components/DocumentStatus.vue`。组件接收 `status`、`statusMeta`，按从右起的任务位置解析向量化、生成问题、
 同步、分词索引；聚合优先级为取消中、执行中、排队中、失败、取消完成、成功，
 同优先级取字符串最左侧的任务，忽略 `n` 及未知状态；无有效任务时显示 `-`。
-汇总与悬浮明细均复用 `MkStatusLabel`，任务执行中文案使用 `STATE_TYPES` 对应阶段，
-文案和加载图标均由 `MkStatusLabel` 统一呈现。保持 v2 的取消完成显示成功规则，不修改通用状态语义。
+汇总与悬浮明细均复用 `MkStatusLabel`，通过文档本地 `status.ts` 的 `DOCUMENT_STATUS_OPTIONS`
+传入图标类型和文案；`DOCUMENT_STATUS_FILTER_OPTIONS` 复用对应文案并维护筛选请求映射。
+文档配置独立于执行记录配置。保持 v2 的取消完成显示成功规则，不修改通用状态语义。
 悬浮内容按需渲染，展示各任务名称、状态、成功分段数／总数和时间；分段计数读取 `status_meta.aggs`，
 成功数只累计状态 `2`，失败与取消完成的进度使用危险色。
 时间读取 `state_time[taskType]` 的排队时间，取消完成读取取消完成时间；缺失元数据使用 0/0 并隐藏时间。

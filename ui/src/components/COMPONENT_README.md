@@ -193,6 +193,11 @@ Drawer 没有 `MkDialog` 的外壳挂载控制；需要按需挂载时，由业�
 菜单项通过 `icon` Prop 传 Element Plus 图标，或使用 `icon` 插槽；`selectable` 预留勾选位，
 `selected` 控制选中。触发器遵循单根节点规则。
 
+`hide-when-empty` 默认关闭。开启后检查 `dropdown` 插槽，展开标准 `MkDropdownMenu` 的默认插槽
+和 Fragment，忽略注释、空白文本；没有有效 VNode 时不渲染下拉入口，不改变 `persistent`。
+业务 Action 的组件 VNode 视为有效内容，不检查其内部的 `v-if`。此能力用于文档批量 More，
+表格和卡片 More 保持原有的默认插槽判断。
+
 ### MkViewLayout
 
 满高页面布局，`loading` 覆盖整个根节点。`title` 默认读取路由标题，传空字符串隐藏；
@@ -276,19 +281,21 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 
 ### MkStatusLabel
 
-`active` 控制布尔状态，默认“已启用 / 已禁用”；用 `activeText`、`inactiveText` 修改文案。
-多状态通过 `status` 直接传入 `STATE_LABELS` 的状态键，文案统一读取 `constants/state.ts`。
-传入 `status` 时仅显示该状态配置的图标；未配置状态或没有图标时只显示文案，不回退到其他状态图标。
-未传 `status` 时，`active` 为 true 显示成功图标，为 false 显示 `icon_ban_filled`。
-组件直接使用公共枚举 `STATE_TYPES` 匹配图标；新增状态需补齐 `STATE_LABELS` 文案，图标可按需配置。
-`STARTED`、`PENDING`、`REVOKE` 及 `EMBEDDING`、`GENERATE`、`SYNC`、`TOKENIZE`
-统一显示内置加载图标，使用方直接传入 `status`，无需额外组合 `LoadingIcon`。
-`status` 优先于 `active`，状态文案统一使用 `STATE_LABELS`，不提供 `text` 覆盖。
+提供 `success`、`failure`、`loading`、`disabled` 四种图标类型，通过 `type + label` 展示业务状态。
+组件不依赖 API 状态枚举或业务文案；业务方维护状态与 `{ type, label }` 的映射。
+`StatusLabelType`、`StatusLabelOptions` 从 `global/mk-status-label/types.ts` 导入。
+传入 `type` 时使用该类型和外部 `label`，优先于布尔模式，不回退到启用／禁用文案。
+
+未传 `type` 时保留 `active` 便捷模式，默认“已启用 / 已禁用”；
+`activeText`、`inactiveText` 可修改文案，`inactiveIcon` 可覆盖未激活图标（默认 `icon_ban_filled`）。
+成功图标固定为 `icon_succeed_colorful`，失败图标为 `icon_close_colorful`，加载类型使用 `LoadingIcon`，
+禁用图标使用灰色样式。`inactiveIcon` 仅影响布尔模式。
+不再接收 `status`；未知业务状态由调用方显示原始文案，不伪装成成功或禁用状态。
 
 ```vue
 <MkStatusLabel :active="enabled" />
-<MkStatusLabel :status="row.state" />
-<MkStatusLabel status="TRIGGER_ERROR" />
+<MkStatusLabel type="loading" label="索引中" />
+<MkStatusLabel v-bind="executionStatus" />
 ```
 
 ### MkTable

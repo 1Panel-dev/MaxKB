@@ -26,8 +26,6 @@ const putQuickCreateDocuments = (knowledgeId: string, documents: DocumentQuickCr
 const putDocumentActive = (knowledgeId: string, documentId: string, isActive: boolean) =>
   put(`${getPrefix(knowledgeId)}/${documentId}`, { is_active: isActive })
 
-
-
 /** 删除单个文档。 */
 const deleteDocument = (knowledgeId: string, documentId: string) => del(`${getPrefix(knowledgeId)}/${documentId}`)
 
@@ -35,18 +33,35 @@ const deleteDocument = (knowledgeId: string, documentId: string) => del(`${getPr
 const putBatchDeleteDocuments = (knowledgeId: string, documentIds: string[]) =>
   put(`${getPrefix(knowledgeId)}/batch_delete`, { id_list: documentIds })
 
+/** 单个文档向量化。 */
+const putDocumentRefresh = (knowledgeId: string, documentId: string, stateList: DocumentTaskState[]) =>
+  put(`${getPrefix(knowledgeId)}/${documentId}/refresh`, { state_list: stateList })
 
-/** 批量提交文档向量化。 */
+/** 批量文档向量化。 */
 const putBatchRefreshDocuments = (knowledgeId: string, documentIds: string[], stateList: DocumentTaskState[]) =>
   put(`${getPrefix(knowledgeId)}/batch_refresh`, { id_list: documentIds, state_list: stateList })
 
-/** 批量提交文档分词索引。 */
+/** 单个文档分词索引。 */
+const putDocumentTokenize: (knowledge_id: string, document_id: string, state_list: Array<string>, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  document_id,
+  state_list,
+  loading,
+) => {
+  return put(`${getPrefix(knowledge_id)}/${document_id}/tokenize`, { state_list }, undefined, loading)
+}
+/** 批量文档分词索引。 */
 const putBatchTokenizeDocuments = (knowledgeId: string, documentIds: string[], stateList: DocumentTaskState[]) =>
   put(`${getPrefix(knowledgeId)}/batch_tokenize`, { id_list: documentIds, state_list: stateList })
+
+/** 单个取消文档任务。 */
+const putCancelTask = (knowledgeId: string, documentId: string, taskType: DocumentTaskType) =>
+  put(`${getPrefix(knowledgeId)}/${documentId}/cancel_task`, { type: taskType })
 
 /** 批量取消指定文档任务。 */
 const putBatchCancelDocumentTask = (knowledgeId: string, documentIds: string[], taskType: DocumentTaskType) =>
   put(`${getPrefix(knowledgeId)}/batch_cancel_task`, { id_list: documentIds, type: taskType })
+
 
 /** 保存单个文档的召回及来源设置。 */
 const putDocumentSetting = (knowledgeId: string, documentId: string, data: DocumentSettingPayload) =>
@@ -103,8 +118,10 @@ export default {
   putDocumentActive,
   deleteDocument,
   putBatchDeleteDocuments,
+  putDocumentRefresh,
   putBatchRefreshDocuments,
   putBatchTokenizeDocuments,
+  putCancelTask,
   putBatchCancelDocumentTask,
   putDocumentSetting,
   putBatchDocumentSetting,

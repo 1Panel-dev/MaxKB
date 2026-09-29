@@ -37,7 +37,7 @@ defineExpose({ open, close })
 
 <template>
   <MkDialog v-model="visible" title="配置权限" @closed="resetData">
-    <el-radio-group v-model="permission" class="vertical-radio-group" :disabled="disabled">
+    <el-radio-group v-model="permission" class="mk-radio-group-vertical" :disabled="disabled">
       <el-radio v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value" :value="permissionOption.value">
         <p>{{ permissionOption.label }}</p>
         <p v-if="permissionOption.description" class="text-N500 mt-1">

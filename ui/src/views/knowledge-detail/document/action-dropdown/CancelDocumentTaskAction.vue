@@ -36,12 +36,5 @@ function handleCancelTask() {
 
 <template>
   <!-- 取消文档任务 -->
-  <MkAction
-    :label="label"
-    icon="icon_close_outlined"
-    :display="display"
-    :divided="divided"
-    :disabled="loading || !documentIds.length"
-    @click="handleCancelTask"
-  />
+  <MkAction :label="label" :display="display" :divided="divided" :disabled="loading || !documentIds.length" @click="handleCancelTask" />
 </template>

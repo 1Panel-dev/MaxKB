@@ -6,7 +6,7 @@ import type { Dict, KnowledgeExecutionRecord } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
 import { MsgConfirm } from '@/utils/message'
-import { STATE_LABELS } from '@/constants/state'
+import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 
 const props = defineProps<{ api: typeof WorkflowApi; knowledgeId: string }>()
 const emit = defineEmits<{ closed: [] }>()
@@ -24,7 +24,7 @@ const searchFields = [
     value: 'state',
     options: [STATE_TYPES.PENDING, STATE_TYPES.STARTED, STATE_TYPES.SUCCESS, STATE_TYPES.FAILURE, STATE_TYPES.REVOKE, STATE_TYPES.REVOKED].map(
       (state) => ({
-        label: STATE_LABELS[state],
+        label: EXECUTION_STATUS_OPTIONS[state].label,
         value: state,
       }),
     ),
@@ -152,15 +152,18 @@ defineExpose({ open, close })
       <el-table-column label="发起人" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">{{ row.meta?.user_name || '-' }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="100"
-        ><template #default="{ row }"><MkStatusLabel :status="row.state" /></template
-      ></el-table-column>
-      <el-table-column label="耗时" width="90"
-        ><template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template></el-table-column
-      >
-      <el-table-column label="执行时间" prop="create_time" width="180"
-        ><template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template></el-table-column
-      >
+      <el-table-column label="状态" width="100">
+        <template #default="{ row }: { row: KnowledgeExecutionRecord }">
+          <MkStatusLabel v-if="EXECUTION_STATUS_OPTIONS[row.state]" v-bind="EXECUTION_STATUS_OPTIONS[row.state]" />
+          <span v-else>{{ row.state }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="耗时" width="90">
+        <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
+      </el-table-column>
+      <el-table-column label="执行时间" prop="create_time" width="180">
+        <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="100">
         <template #default="{ row }">
           <!-- 查看执行详情 -->
@@ -169,9 +172,9 @@ defineExpose({ open, close })
           </MkTooltip>
           <!-- 取消执行 -->
           <MkTooltip v-if="row.state === STATE_TYPES.PENDING || row.state === STATE_TYPES.STARTED" content="取消执行" placement="top">
-            <el-button text type="danger" :disabled="cancelling || loading" @click="cancelExecution(row)"
-              ><MkIcon name="icon_close_outlined"
-            /></el-button>
+            <el-button text type="danger" :disabled="cancelling || loading" @click="cancelExecution(row)">
+              <MkIcon name="icon_close_outlined" />
+            </el-button>
           </MkTooltip>
         </template>
       </el-table-column>
