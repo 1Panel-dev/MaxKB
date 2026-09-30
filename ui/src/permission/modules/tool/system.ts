@@ -11,7 +11,6 @@ const system = {
   batchMove: () => false,
   import: () => false,
   copy: () => false,
-  jumpRead: () => false,
   authToWorkspace: () => false,
   folderRead: () => false,
   folderCreate: () => false,

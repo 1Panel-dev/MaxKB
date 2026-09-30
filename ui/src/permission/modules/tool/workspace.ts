@@ -11,7 +11,6 @@ const workspace = {
   batchDelete: () => can(P.TOOL_BATCH_DELETE),
   batchMove: () => can(P.TOOL_BATCH_MOVE),
   import: () => can(P.TOOL_IMPORT),
-  jumpRead: () => false,
   debug: () => false,
   authToWorkspace: () => false,
 

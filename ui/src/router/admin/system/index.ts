@@ -149,7 +149,7 @@ export const systemRoutes: RouteRecordRaw = {
         order: 20,
         resourceScope: 'system-resource',
         permission: () => {
-          return perm.application.system.jumpRead() || perm.knowledge.system.jumpRead() || perm.tool.system.read() || perm.model.system.read()
+          return perm.application.system.read() || perm.knowledge.system.read() || perm.tool.system.read() || perm.model.system.read()
         },
         next: 'system-share',
       },
@@ -158,13 +158,13 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'applications',
           name: 'system-resource-applications',
           component: () => import('@/views/system/resource-management/application/index.vue'),
-          meta: { title: '智能体', order: 10, permission: perm.application.system.jumpRead, next: 'system-resource-knowledge' },
+          meta: { title: '智能体', order: 10, permission: perm.application.system.read, next: 'system-resource-knowledge' },
         },
         {
           path: 'knowledge',
           name: 'system-resource-knowledge',
           component: () => import('@/views/system/index.vue'),
-          meta: { title: '知识库', order: 20, permission: perm.knowledge.system.jumpRead, next: 'system-resource-tools' },
+          meta: { title: '知识库', order: 20, permission: perm.knowledge.system.read, next: 'system-resource-tools' },
         },
         {
           path: 'tools',
@@ -192,7 +192,7 @@ export const systemRoutes: RouteRecordRaw = {
         order: 30,
         resourceScope: 'system-shared',
         permission: () => {
-          return perm.knowledge.share.jumpRead() || perm.model.share.read() || perm.tool.share.read()
+          return perm.knowledge.share.read() || perm.model.share.read() || perm.tool.share.read()
         },
         next: 'system-chat-management',
       },
@@ -201,7 +201,7 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'knowledge',
           name: 'system-shared-knowledge',
           component: () => import('@/views/system/index.vue'),
-          meta: { title: '知识库', order: 10, permission: perm.knowledge.share.jumpRead, next: 'system-shared-tools' },
+          meta: { title: '知识库', order: 10, permission: perm.knowledge.share.read, next: 'system-shared-tools' },
         },
 
         {

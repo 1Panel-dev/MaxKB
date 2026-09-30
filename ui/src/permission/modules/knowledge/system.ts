@@ -77,9 +77,9 @@ const system = {
 
   // —— 组合：进入知识库 ——
   /**
-   * 系统「知识库资源管理」（系统 > 资源管理 > 知识库）进入权限
+   * 系统「知识库资源管理」（系统 > 资源管理 > 知识库）只读权限
    * */
-  jumpRead: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ) && hasEdition(Edition.PE),
 }
 
 export default system

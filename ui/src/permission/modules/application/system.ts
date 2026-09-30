@@ -55,9 +55,9 @@ const system = {
 
   // —— 组合：跳转/进入应用 ——
   /**
-   * 系统「应用资源管理」（系统 > 资源管理 > 应用）进入权限
+   * 系统「应用资源管理」（系统 > 资源管理 > 应用）只读权限
    * */
-  jumpRead: () => canSys(P.RESOURCE_APPLICATION_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.RESOURCE_APPLICATION_READ) && hasEdition(Edition.PE),
 }
 
 export default system

@@ -7,7 +7,6 @@ import { Edition } from '@/permission/core/common'
 const system = {
   // —— 系统页不提供 ——
   create: () => false,
-  jumpRead: () => false,
   debug: () => false,
   authToWorkspace: () => false,
   folderRead: () => false,
