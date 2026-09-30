@@ -198,6 +198,9 @@ Drawer 没有 `MkDialog` 的外壳挂载控制；需要按需挂载时，由业�
 ### MkDropdown、MkDropdownMenu、MkDropdownItem
 
 `MkDropdown` 默认 `persistent: false`，透传 Dropdown 属性、事件，公开 `handleOpen()`、`handleClose()`。
+开启 `persistent` 时仍延迟到首次展开才挂载菜单内容，之后收起保留 Action 及其业务浮层，直到所属
+组件卸载；未打开过的菜单不提前挂载。状态由组件内部维护，外部 `visible-change` 事件继续正常触发。
+已打开过的多个菜单会分别保留；Dialog、Drawer 仍应点击时挂载并在 `closed` 后卸载。
 `dropdown` 插槽内组合 `MkDropdownMenu`、`MkDropdownItem`，不在业务中重复组装底层组件。
 菜单项通过 `icon` Prop 传 Element Plus 图标，或使用 `icon` 插槽；`selectable` 预留勾选位，
 `selected` 控制选中。触发器遵循单根节点规则。
@@ -446,7 +449,9 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 表格操作列需要 More 菜单时使用 `MkTableMoreDropdown`。组件统一提供点击型、右下定位的 More
 按钮以及 `MkDropdownMenu`，默认插槽中直接放置 `MkDropdownItem`；插槽为空，或其中的条件菜单项
 均未渲染时，不显示 More 触发器。其他 Dropdown 属性和事件通过 `$attrs` 传入，菜单容器样式通过
-`menu-class` 设置。
+`menu-class` 设置。默认启用 `persistent`，复用 `MkDropdown` 的首次展开后保留机制，避免收起菜单
+销毁 Action 中打开的 Dialog 或 Drawer；无需页面自行监听 `visible-change`。纯操作菜单可显式
+传入 `:persistent="false"`，收起后释放菜单内容。
 
 包含 `type="selection"` 的选择列时，选择数据会显示页面底部操作栏。批量按钮放入
 `footer-batch-actions` 插槽，当前选择通过 `selection-change` 返回。组件暴露 `tableRef` 和
@@ -476,7 +481,8 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `footer` 提供常驻内容及 `Action`、`ActionDropdown`：前者是悬浮/焦点操作容器，后者包裹 More 菜单，
 内部直接放 `MkDropdownItem`，空菜单隐藏入口。仅需要开关或按钮时使用 `Action` 即可。
 无有效 `footer` 内容时不渲染底栏，默认内容区不额外保留底部间距；有底栏时保留 16px 分隔。
-`ActionDropdown` 固定 `persistent`，其管理的业务浮层应打开时挂载、`closed` 后卸载。
+`ActionDropdown` 固定 `persistent`，复用 `MkDropdown` 的首次展开后保留机制，不在卡片列表初始化时
+提前挂载菜单内容；其管理的业务浮层应打开时挂载、`closed` 后卸载。
 
 `selectable` 开启卡片选择，`selected` Prop 控制选中，`selected` 事件返回新状态。
 点击卡片或复选框切换，`Action` 在选择模式下不渲染；页面负责选择集合、批量操作和特殊内容显隐。

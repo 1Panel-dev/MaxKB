@@ -271,7 +271,7 @@ onBeforeUnmount(() => {
       <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
     </template>
 
-    <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" fixed="left" reserve-selection />
+    <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" reserve-selection />
 
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip />
 
@@ -502,7 +502,7 @@ onBeforeUnmount(() => {
       <el-button>添加标签</el-button>
 
       <!-- 更多批量操作 -->
-      <MkDropdown class="ml-3" trigger="click" placement="bottom-end" hide-when-empty>
+      <MkDropdown class="ml-3" trigger="click" placement="bottom-end" hide-when-empty persistent>
         <!-- 展开更多批量操作 -->
         <el-button plain type="primary" class="min-w-0! w-8!">
           <MkIcon name="icon_more_outlined" />

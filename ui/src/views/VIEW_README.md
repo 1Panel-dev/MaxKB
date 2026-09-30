@@ -46,6 +46,10 @@
   `<!-- 修改用户密码 -->`、`<!-- 更多 -->`、`<!-- 删除 -->`、`<!-- 批量设置角色 -->`。
   备注紧邻对应按钮、菜单项或封装后的入口组件；批量操作明确标注“批量”，名称按实际业务职责
   填写。今后新增或调整同类页面时统一补齐，不因操作已封装为组件或按钮已有文案而省略。
+- 下拉菜单中包含自带 Dialog 或 Drawer 的 Action 时，使用公共组件的延迟保留机制：
+  `MkTableMoreDropdown` 和资源卡片菜单默认启用，直接使用 `MkDropdown` 时传入 `persistent`。
+  公共组件在首次展开后保留菜单，页面不自行维护菜单挂载状态或通过 `visible-change` 控制保留。
+  仅调用页面方法、且浮层挂载在菜单外的操作不需要保留菜单。
 - Dialog 生命周期遵循 `COMPONENT_README.md` 的挂载方式规则：常驻实例在 `closed` 清理，
   关闭后卸载的实例依赖重新初始化，`open()` 不重复清空，只处理业务回填和查询。
 - 页面模板的事件绑定不直接调用 Dialog、Drawer 等组件实例暴露的 `open()` 方法。应在对应业务
@@ -701,6 +705,8 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 `KNOWLEDGE_TYPE_KEY` 判断，不从详情或文档数据读取类型，也不通过 `knowledgeType` Prop 传递。
 Web 来源地址与选择器仅在单项设置中编辑，批量设置不展示这两个字段。
 文档操作统一放在 `document/action-dropdown/`，通过该目录 `index.ts` 导出，页面显式组合各 Action。
+文档页行操作使用 `MkTableMoreDropdown` 默认的延迟保留机制，批量操作菜单显式设置 `persistent`；
+首次展开才挂载菜单内容，收起后保留 Action 及其弹窗，生命周期统一由公共组件管理。
 文档状态展示、筛选配置和任务运行状态判断统一维护在 `document/status.ts`。
 文档任务是否排队或执行中通过其中的 `isDocumentTaskRunning(document, taskType)` 判断，
 页面及 Action 不重复解析状态字符串；文档或任务状态缺失时返回 `false`。
