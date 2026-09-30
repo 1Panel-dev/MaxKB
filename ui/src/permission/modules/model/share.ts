@@ -7,7 +7,6 @@ import { Edition } from '@/permission/core/common'
 const share = {
   // —— 共享页不提供 ——
   isShare: () => false,
-  jumpRead: () => false,
   debug: () => false,
   auth: () => false,
   folderRead: () => false,

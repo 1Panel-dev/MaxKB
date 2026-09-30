@@ -7,7 +7,6 @@ const workspace = {
   // —— 工作空间级 ——
   isShare: () => can(P.MODEL_READ),
   create: () => can(P.MODEL_CREATE),
-  jumpRead: () => false,
   debug: () => false,
   authToWorkspace: () => false,
 

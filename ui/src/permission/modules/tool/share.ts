@@ -9,7 +9,6 @@ const share = {
   isShare: () => false,
   batchDelete: () => false,
   batchMove: () => false,
-  jumpRead: () => false,
   auth: () => false,
   triggerRead: () => false,
   triggerCreate: () => false,
