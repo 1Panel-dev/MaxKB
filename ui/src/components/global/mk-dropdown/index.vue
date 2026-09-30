@@ -15,6 +15,12 @@ withDefaults(defineProps<{ popperOptions?: Partial<Options>; persistent?: boolea
 })
 
 const dropdownRef = ref<DropdownInstance>()
+// 保留模式也延迟到首次展开，避免列表初始化时挂载每一行的菜单及业务浮层。
+const hasOpened = ref(false)
+
+function handleVisibleChange(visible: boolean) {
+  if (visible) hasOpened.value = true
+}
 
 const slots = defineSlots<{
   /** 下拉触发器，必须只渲染一个有效根节点 */
@@ -54,8 +60,9 @@ defineExpose({ handleOpen, handleClose })
     v-if="!hideWhenEmpty || hasDropdownContent(slots.dropdown?.())"
     class="mk-dropdown"
     ref="dropdownRef"
-    :persistent="persistent"
+    :persistent="persistent && hasOpened"
     v-bind="$attrs"
+    @visible-change="handleVisibleChange"
   >
     <slot />
     <template #dropdown>

@@ -4,7 +4,7 @@ import { hasRenderableSlotContent } from '@/utils/vnode'
 
 defineOptions({ name: 'MkTableMoreDropdown', inheritAttrs: false })
 
-defineProps<{ menuClass?: string }>()
+withDefaults(defineProps<{ menuClass?: string; persistent?: boolean }>(), { persistent: true })
 
 defineSlots<{
   /** 表格 More 菜单项，仅使用 MkDropdownItem */
@@ -16,7 +16,14 @@ const hasDropdownItems = computed(() => hasRenderableSlotContent(slots.default?.
 </script>
 
 <template>
-  <MkDropdown v-if="hasDropdownItems" class="mk-table-more-dropdown [button+&]:ml-1" trigger="click" placement="bottom-end" v-bind="$attrs">
+  <MkDropdown
+    v-if="hasDropdownItems"
+    class="mk-table-more-dropdown [button+&]:ml-1"
+    trigger="click"
+    placement="bottom-end"
+    :persistent="persistent"
+    v-bind="$attrs"
+  >
     <el-button type="primary" text @click.stop>
       <MkIcon name="icon_more_outlined" />
     </el-button>
