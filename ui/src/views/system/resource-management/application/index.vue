@@ -39,7 +39,7 @@ const searchFields = computed(() => [
     ],
   },
 ])
-const selectedStatusType = ref<string[]>([])
+const selectedStatusType = ref<boolean | null>(null)
 const applicationStatusOptions = computed(() => [
   { value: true, label: '已发布' },
   { value: false, label: '未发布' },
@@ -56,7 +56,7 @@ function loadApplicationPage() {
   return SystemResourceApplicationApi.getApplicationPage(pagination.value, {
     ...applicationQuery.value,
     ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
-    status: selectedStatusType.value,
+    ...(selectedStatusType.value !== null ? { status: JSON.stringify([selectedStatusType.value]) } : {}),
   })
     .then((page) => {
       applicationData.value = page.records
