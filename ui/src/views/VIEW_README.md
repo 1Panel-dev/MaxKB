@@ -23,7 +23,7 @@
 - `action-dropdown/` 目录目前只优先用于 `application`、`knowledge`、`model`、`tool` 四类特殊
   资源，用于维护跨 Workspace、System 资源管理或 System 共享资源复用的卡片 Action。其他业务
   暂不主动创建这类目录，操作入口和配套流程优先留在所属页面或组件中；出现明确的跨范围共享需求
-  后再评估是否采用相同结构。按明确需求，文档页使用 `knowledge-detail/document/action-dropdown/`
+  后再评估是否采用相同结构。按明确需求，文档页使用 `knowledge-detail/library/document/action-dropdown/`
   集中维护行操作、批量操作及其专属弹窗；不因此扩展其他普通页面的目录规则。
 - 仅供一个页面使用的代码放在该页面功能目录；同一功能下多个页面复用的代码放在它们最近的
   共同功能目录中。
@@ -229,6 +229,7 @@ MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需�
 `ExportKnowledgeAction` 接收完整 Knowledge API，暂不增加权限判断；悬停“导出”展开右侧
 子菜单，分别导出文档 Excel、文档 ZIP 和可再次导入的知识库包。
 导出复用页面操作 loading，防止重复请求，结束或失败后恢复；共享知识库不展示该入口。
+子菜单使用默认挂载方式，不查询父级浮层或指定 `append-to`；Action 不额外解析下载错误并弹出提示。
 切换文件夹退出批量模式，搜索或刷新列表清空选择。转移复用公共 `MoveToDialog`：单项飞书知识库
 调用 `putLarkKnowledge`，其他类型调用 `putKnowledge`，只提交 `folder_id`；成功后通过 `move`
 更新卡片所属目录，在具体目录转出时通过 `delete` 移除卡片，在全部目录或转入当前目录时保留。
@@ -681,14 +682,16 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 `knowledge-detail/index.vue` 查询并展示知识库名称，复用
 `ResourceDetailLayout` 生成资料库、工作流、检索优化、授权与集成、设置目录，返回列表时恢复所属文件夹。
 资料库包含文档、图片、标签管理；检索优化包含召回测试、问题、自定义分词；授权与集成包含
-对话用户、外部检索服务。新增页面分别放在 `knowledge-detail/` 下的 `image/`、`tag/`、
-`recall-test/`、`question/`、`dictionary/`、`chat-user/`、`external-retrieval/`，暂只展示占位内容。
+对话用户、外部检索服务。资料库页面统一放在 `knowledge-detail/library/` 下，包含 `document/`、
+`image/`、`tag/`；文档专属组件及 Action 随 `document/` 集中维护。其他页面继续放在
+`knowledge-detail/` 下的 `recall-test/`、`question/`、`dictionary/`、`chat-user/`、`external-retrieval/`。
+图片、标签管理及这五个页面暂只展示占位内容。
 容器通过 `knowledge-detail/context.ts` 提供只读详情与替换能力；设置页复用已加载详情，保存成功后
 更新容器数据，同步名称等展示。基本信息复用创建流程的 `KnowledgeBaseForm`，类型配置和校验留在
 设置页中。当前设置页仅接入 Workspace 路由和 API，暂不增加前端权限判断。
 更换向量模型需确认，先保存再重新向量化，整条流程禁止重复提交；向量化失败时保留原模型比较基准，
 允许再次保存重试。Web、飞书设置保留未编辑的 `meta` 字段，上传限制使用详情顶层值。
-`knowledge-detail/document/index.vue` 维护文档列表查询、多选和文档操作，使用 `MkComplexSearch`、`MkTable`。
+`knowledge-detail/library/document/index.vue` 维护文档列表查询、多选和文档操作，使用 `MkComplexSearch`、`MkTable`。
 搜索只提供名称 `name` 和创建者 `create_user`；创建者通过 Workspace `CommonApi.getAllUsers`
 加载，支持按 `nick_name` 远程搜索。列表使用 `documentData`、`paginationConfig`、`documentQuery`，
 查询方法为 `loadDocuments`，搜索处理为 `handleSearchChange`，搜索变化后回到第一页。
@@ -731,9 +734,22 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 分词索引集中在 `document/action-dropdown/tokenize/`：`TokenizeDocumentAction` 接收单个 `document`，
 按运行状态调用单项分词或取消接口；`BatchTokenizeAction` 接收 `documentIds`，仅调用批量分词接口。
 两个 Action 均处理全部分段状态，通过 `v-model:loading` 共用页面操作状态，成功后通知页面刷新。
-`BatchCancelTaskAction`、`SyncDocumentAction`、
+`BatchCancelTaskAction`、
 `ExportDocumentAction`、`DownloadDocumentAction`、`ReplaceDocumentAction` 和 `DeleteDocumentAction`
-分别负责任务取消、同步、导出、下载、替换与删除，单项和批量入口复用对应组件。
+分别负责任务取消、导出、下载、替换与删除，单项和批量入口复用对应组件。
+导出操作集中在 `document/action-dropdown/export/`，通过上层 `index.ts` 导出。
+`ExportDocumentAction` 接收 `label` 和单个 `document`；`BatchExportDocumentAction` 接收 `label`、
+`documentIds`。两个 Action 直接从路由读取 `knowledgeId`，批量 Action 从详情上下文读取知识库名称
+作为下载回退文件名，页面不再传 `knowledge-id` 或 `knowledge-name`。
+两个 Action 分别调用单项、批量的 Excel/ZIP 接口，批量仅选一个文档时仍调用批量接口。
+知识库类型仍只从路由读取。行操作与批量操作均只组合一个“导出”入口，
+悬停展开“导出文档 Excel”“导出文档 ZIP”，不再从页面传入 `format`。
+子菜单使用默认挂载方式，不指定 `append-to`；下载复用页面 loading，保留列表和勾选状态，
+不额外解析下载错误或提示成功，请求结束后统一恢复 loading。
+同步操作集中在 `document/action-dropdown/sync/`，通过上层 `index.ts` 导出。
+`SyncDocumentAction` 接收 `label` 和单个 `document`，`BatchSyncDocumentAction` 接收 `label` 和
+`documentIds`（模板使用 `:document-ids`），不使用 `documents` 或 `batch`。单项 Web 文档同步前校验来源地址；确认前固定本次目标与路由类型，
+分别调用 Web 或飞书的单项、批量同步接口，共用页面 loading，成功后通知页面刷新。
 直接请求的 Action 通过 `v-model:loading` 共用页面操作状态，各 Action 自行管理请求、
 防重复提交、成功提示与失败处理，不额外抽取统一请求封装；需要刷新时发出 `refresh`，导出与下载不发出。
 `DeleteDocumentAction` 单个删除传 `document`，确认框展示文档名称并调用单个删除接口；

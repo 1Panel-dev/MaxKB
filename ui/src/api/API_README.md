@@ -311,6 +311,7 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 - GET 文件导出使用 `getExportFile`；需要通过 POST 同时传递查询参数和可选请求体的 Excel 导出
   使用 `postExportExcel`；Skill 压缩包等指定请求方法的文件下载使用 `downloadRequest`。请求层统一
   获取 Blob、解析 `Content-Disposition` 文件名并触发浏览器下载；业务 API 只需传入接口地址及业务参数。
+  `downloadRequest` 的第五个参数可指定回退文件名，缺省为 `download`；服务端文件名始终优先。
 - 业务代码通过 `api.method().then(...)` 处理接口成功后的状态变化；通用接口错误由请求层统一
   提示，不在调用处重复使用 `try/catch` 或 `.catch()` 提示相同错误。只有业务降级、状态恢复等
   非提示类失败处理可以按需保留失败分支。
@@ -520,6 +521,11 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 任务取消、生成问题、迁移、同步、导出、原文件下载/替换及标签关联。
 批量任务沿用 v2 的 `id_list` / `state_list`；生成问题使用 `document_id_list`，
 添加标签使用 `document_ids` / `tag_ids`，迁移和批量导出直接提交文档 ID 数组。
+文档导出分别提供四个接口，不以单元素批量请求代替单项接口：
+`exportDocument`、`exportDocumentZip` 使用 GET 请求 `/<documentId>/export`、`/<documentId>/export_zip`；
+`exportMulDocument`、`exportMulDocumentZip` 使用 POST 请求 `batch_export`、`batch_export_zip`，请求体直接为 ID 数组。
+单项参数为知识库 ID、文档 ID、文档名称；批量参数为知识库 ID、文档 ID 数组、知识库名称。
+服务端未提供文件名时，分别以文档名称或知识库名称加 `.xlsx` / `.zip` 回退，沿用 v2 下载命名。
 向量化、生成问题默认排除成功分段，也可选择全部分段。任务类型使用 `DOCUMENT_TASK_TYPE`。
 单项向量化使用 `putDocumentRefresh(knowledgeId, documentId, stateList)` 请求 `/<documentId>/refresh`；
 单项取消使用 `putCancelTask(knowledgeId, documentId, taskType)` 请求 `/<documentId>/cancel_task`，提交 `{ type }`。
@@ -529,7 +535,12 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 提交 `{ id_list, state_list }`。两者均包含全部七种分段状态；单项取消分词复用 `putCancelTask`，任务类型为 `TOKENIZE`。
 文档设置的共享载荷为 `DocumentSettingPayload`，生成问题使用 `DocumentGeneratePayload`；
 单项设置通过 `meta` 保留来源数据，批量设置将 `allow_download` 放在顶层。
-飞书同步沿用 v2 扩展接口 `/knowledge/lark/<knowledgeId>/_batch`，需部署环境支持。
+文档同步区分单项和批量，不以单元素批量请求代替单项接口：
+`putDocumentSync` 请求 `/<knowledgeId>/document/<documentId>/sync`，
+`putMulSyncDocument` 请求 `/<knowledgeId>/document/batch_sync`；
+`putLarkDocumentSync` 请求 `/lark/<knowledgeId>/document/<documentId>/sync`，
+`putMulLarkSyncDocument` 请求 `/lark/<knowledgeId>/_batch`。上述路径均相对工作空间的 `knowledge` 前缀，
+全部使用 PUT；单项不传请求体，批量提交 `{ id_list }`。飞书接口需部署环境支持。
 共享文档 API 继续仅提供查询，不增加写入方法。
 
 `workspace/knowledge/document.ts` 维护文档分页查询，路径为

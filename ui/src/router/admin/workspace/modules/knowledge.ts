@@ -29,19 +29,19 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
               {
                 path: 'document',
                 name: 'workspace-knowledge-document-list',
-                component: () => import('@/views/knowledge-detail/document/index.vue'),
+                component: () => import('@/views/knowledge-detail/library/document/index.vue'),
                 meta: { title: '文档', order: 10 },
               },
               {
                 path: 'image',
                 name: 'workspace-knowledge-image-list',
-                component: () => import('@/views/knowledge-detail/image/index.vue'),
+                component: () => import('@/views/knowledge-detail/library/image/index.vue'),
                 meta: { title: '图片', order: 20 },
               },
               {
                 path: 'tag',
                 name: 'workspace-knowledge-tag',
-                component: () => import('@/views/knowledge-detail/tag/index.vue'),
+                component: () => import('@/views/knowledge-detail/library/tag/index.vue'),
                 meta: { title: '标签管理', order: 30 },
               },
             ],

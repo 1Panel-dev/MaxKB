@@ -18,7 +18,7 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
           {
             path: 'document',
             name: 'workspace-shared-knowledge-document-list',
-            component: () => import('@/views/knowledge-detail/document/index.vue'),
+            component: () => import('@/views/knowledge-detail/library/document/index.vue'),
             meta: { title: '文档', order: 10 },
           },
         ],

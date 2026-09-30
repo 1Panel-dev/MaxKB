@@ -31,10 +31,12 @@ import {
   BatchGenerateQuestionsAction,
   DownloadDocumentAction,
   ExportDocumentAction,
+  BatchExportDocumentAction,
   MigrateDocumentAction,
   ReplaceDocumentAction,
   SettingDocumentAction,
   SyncDocumentAction,
+  BatchSyncDocumentAction,
   TokenizeDocumentAction,
   BatchTokenizeAction,
 } from './action-dropdown'
@@ -384,13 +386,14 @@ onBeforeUnmount(() => {
             />
             <!-- 更多文档操作 -->
             <MkTableMoreDropdown>
-              <!-- 同步文档 -->
+              <!-- 同步 -->
               <SyncDocumentAction
                 v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK"
+                label="同步"
                 :api="DocumentApi"
                 :knowledge-id="knowledgeId"
+                :document="row"
                 v-model:loading="operationLoading"
-                :documents="[row]"
                 @refresh="refreshAfterOperation"
               />
               <!-- 生成或取消生成问题 -->
@@ -426,22 +429,9 @@ onBeforeUnmount(() => {
                 :disabled="operationLoading"
                 @refresh="refreshAfterOperation"
               />
-              <!-- 导出文档 Excel -->
-              <ExportDocumentAction
-                :api="DocumentApi"
-                :knowledge-id="knowledgeId"
-                v-model:loading="operationLoading"
-                :document-ids="[row.id]"
-                format="excel"
-              />
-              <!-- 导出文档 ZIP -->
-              <ExportDocumentAction
-                :api="DocumentApi"
-                :knowledge-id="knowledgeId"
-                v-model:loading="operationLoading"
-                :document-ids="[row.id]"
-                format="zip"
-              />
+              <!-- 导出文档 -->
+              <ExportDocumentAction label="导出" :api="DocumentApi" v-model:loading="operationLoading" :document="row" />
+
               <template v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.BASE || knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW">
                 <!-- 下载原文档 -->
                 <DownloadDocumentAction :api="DocumentApi" :knowledge-id="knowledgeId" v-model:loading="operationLoading" :document="row" />
@@ -509,6 +499,16 @@ onBeforeUnmount(() => {
         </el-button>
         <template #dropdown>
           <MkDropdownMenu>
+            <!-- 批量同步 -->
+            <BatchSyncDocumentAction
+              v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK"
+              label="同步"
+              :api="DocumentApi"
+              :knowledge-id="knowledgeId"
+              v-model:loading="operationLoading"
+              :document-ids="selectedDocumentIds"
+              @refresh="refreshAfterOperation"
+            />
             <!-- 批量迁移文档 -->
             <MigrateDocumentAction
               :api="DocumentApi"
@@ -518,31 +518,8 @@ onBeforeUnmount(() => {
               @refresh="refreshAfterOperation"
             />
 
-            <!-- 批量同步文档 -->
-            <SyncDocumentAction
-              :api="DocumentApi"
-              :knowledge-id="knowledgeId"
-              v-model:loading="operationLoading"
-              :documents="selectedDocuments"
-              batch
-              @refresh="refreshAfterOperation"
-            />
-            <!-- 批量导出 Excel -->
-            <ExportDocumentAction
-              :api="DocumentApi"
-              :knowledge-id="knowledgeId"
-              v-model:loading="operationLoading"
-              :document-ids="selectedDocumentIds"
-              format="excel"
-            />
-            <!-- 批量导出 ZIP -->
-            <ExportDocumentAction
-              :api="DocumentApi"
-              :knowledge-id="knowledgeId"
-              v-model:loading="operationLoading"
-              :document-ids="selectedDocumentIds"
-              format="zip"
-            />
+            <!-- 批量导出文档 -->
+            <BatchExportDocumentAction label="导出" :api="DocumentApi" v-model:loading="operationLoading" :document-ids="selectedDocumentIds" />
             <!-- 批量取消向量化 -->
             <BatchCancelTaskAction
               :api="DocumentApi"

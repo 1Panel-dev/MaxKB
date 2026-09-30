@@ -178,7 +178,7 @@ export async function postExportExcel<TData = unknown>(fileName: string, url: st
 }
 
 /** 发送指定方法的 Blob 请求并触发浏览器下载。 */
-export async function downloadRequest(url: string, method: string, data?: unknown, params?: Dict<unknown>): Promise<boolean> {
+export async function downloadRequest(url: string, method: string, data?: unknown, params?: Dict<unknown>, fileName = 'download'): Promise<boolean> {
   const response = await request.request<Blob>({
     url,
     method,
@@ -188,7 +188,7 @@ export async function downloadRequest(url: string, method: string, data?: unknow
     skipGlobalErrorMessage: true,
   } as ExportRequestConfig)
 
-  return downloadExportResponse(response, 'download')
+  return downloadExportResponse(response, fileName)
 }
 
 /** 发送 POST 请求并返回可逐块读取的原始响应。 */

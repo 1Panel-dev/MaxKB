@@ -624,6 +624,9 @@
   --el-messagebox-border-radius: 12px;
   --el-messagebox-font-size: 16px;
   --el-messagebox-content-color: var(--el-text-color-primary);
+  &__container {
+    align-items: start;
+  }
   &__headerbtn {
     right: 20px;
     top: 20px;

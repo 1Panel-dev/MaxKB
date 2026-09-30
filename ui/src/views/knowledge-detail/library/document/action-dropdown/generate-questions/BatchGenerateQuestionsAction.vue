@@ -40,7 +40,7 @@ function handleSubmit(config: RelatedQuestionsConfig, stateList: DocumentTaskSta
       state_list: stateList,
     })
     .then(() => {
-      MsgSuccess('任务已提交')
+      MsgSuccess('操作成功')
       dialogRef.value?.close()
       emit('refresh')
     })
@@ -59,6 +59,6 @@ function handleClosed() {
 
 <template>
   <!-- 批量生成问题 -->
-  <el-button :disabled="disabled || loading || !documentIds.length" @click="handleOpenDialog">生成问题</el-button>
+  <el-button plain :disabled="disabled || loading" @click="handleOpenDialog">生成问题</el-button>
   <GenerateQuestionsDialog v-if="dialogMounted" ref="dialogRef" :loading="loading" @submit="handleSubmit" @closed="handleClosed" />
 </template>

@@ -313,12 +313,12 @@ defineExpose({ open })
   <MkDrawer v-model="visible" :title="editingId ? '编辑触发器' : '创建触发器'" @closed="handleClosed" :before-close="handleBeforeClose">
     <div v-loading="loading">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item label="触发器名称" prop="name"
-          ><el-input v-model="form.name" maxlength="64" show-word-limit placeholder="请输入触发器名称"
-        /></el-form-item>
-        <el-form-item label="描述" prop="desc"
-          ><el-input v-model="form.desc" type="textarea" :rows="3" maxlength="200" show-word-limit placeholder="请输入"
-        /></el-form-item>
+        <el-form-item label="触发器名称" prop="name">
+          <el-input v-model="form.name" maxlength="64" show-word-limit placeholder="请输入触发器名称" />
+        </el-form-item>
+        <el-form-item label="描述" prop="desc">
+          <el-input v-model="form.desc" type="textarea" :rows="3" maxlength="200" show-word-limit placeholder="请输入" />
+        </el-form-item>
         <el-form-item label="类型" required>
           <div class="w-full space-y-2">
             <MkSourceCard
@@ -340,9 +340,9 @@ defineExpose({ open })
                     <!-- 定时触发 -->
                     <template v-if="option.value === TRIGGER_TYPE.SCHEDULED">
                       <div class="flex-between mb-2">
-                        <span class="mk-required">{{
-                          form.trigger_setting.schedule_type === TRIGGER_SCHEDULE_TYPE.CRON ? 'Cron 表达式' : '触发周期'
-                        }}</span>
+                        <span class="mk-required">
+                          {{ form.trigger_setting.schedule_type === TRIGGER_SCHEDULE_TYPE.CRON ? 'Cron 表达式' : '触发周期' }}
+                        </span>
                         <!-- 切换周期设置与 Cron 表达式 -->
                         <MkTooltip
                           :content="form.trigger_setting.schedule_type === TRIGGER_SCHEDULE_TYPE.CRON ? '切换为周期设置' : '切换为 Cron 表达式'"
@@ -388,7 +388,7 @@ defineExpose({ open })
                           </el-button>
                         </template>
                       </el-input>
-                      <!-- TODO 请求参数 -->
+
                       <RequestParameters v-model="form.trigger_setting.body" />
                     </template>
                   </div>
@@ -437,9 +437,9 @@ defineExpose({ open })
       <!-- 取消触发器编辑 -->
       <el-button :disabled="saving" @click="visible = false">取消</el-button>
       <!-- 保存触发器配置 -->
-      <el-button type="primary" :loading="saving" :disabled="loading || detailFailed" @click="handleSave">{{
-        editingId ? '保存' : '创建'
-      }}</el-button>
+      <el-button type="primary" :loading="saving" :disabled="loading || detailFailed" @click="handleSave">
+        {{ editingId ? '保存' : '创建' }}
+      </el-button>
     </template>
   </MkDrawer>
 </template>

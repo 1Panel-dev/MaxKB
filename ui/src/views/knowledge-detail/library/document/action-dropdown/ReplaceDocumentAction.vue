@@ -30,8 +30,8 @@ function handleReplace(file: UploadFile) {
   <!-- 替换原文档 -->
   <el-upload action="#" :auto-upload="false" :show-file-list="false" :file-list="[]" :disabled="loading" :on-change="handleReplace">
     <MkDropdownItem :disabled="loading">
-      <template #icon><MkIcon name="icon_upload_outlined" /></template>
-      替换原文档
+      <template #icon><MkIcon name="icon_doc-replace_outlined" /></template>
+      <span>替换原文档</span>
     </MkDropdownItem>
   </el-upload>
 </template>

@@ -95,7 +95,7 @@ defineExpose({ open, close })
 
 <template>
   <MkDialog v-model="visible" title="生成问题" @closed="emit('closed')">
-    <el-form ref="formRef" :model="form" label-position="top" :disabled="loading || modelLoading" @submit.prevent>
+    <el-form ref="formRef" :model="form" label-position="top" v-loading="loading || modelLoading" @submit.prevent>
       <el-alert :closable="false" :title="promptTip" type="primary" class="mb-4! items-start! whitespace-pre-line" show-icon>
         <template #icon><MkIcon name="icon_info_filled" class="mt-2" /></template>
       </el-alert>
