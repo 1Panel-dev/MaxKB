@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import type { FormInstance } from 'element-plus'
-import { DOCUMENT_HIT_HANDLING, KNOWLEDGE_TYPE } from '@/api/enums'
+import { DOCUMENT_HIT_HANDLING } from '@/api/enums'
 import type { DocumentItem, DocumentSettingPayload } from '@/api/types'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'SettingDocumentAction' })
 const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documents: DocumentItem[]; batch?: boolean; disabled?: boolean }>()
 const emit = defineEmits<{ refresh: [] }>()
+const route = useRoute()
+const knowledgeType = computed(() => route.params.type)
 const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
@@ -50,7 +54,7 @@ async function handleSubmit() {
   let request: Promise<unknown>
   if (document.value) {
     data.meta = { ...document.value.meta, allow_download: form.value.allow_download }
-    if (document.value.type === KNOWLEDGE_TYPE.WEB) {
+    if (knowledgeType.value === KNOWLEDGE_TYPE_KEY.WEB) {
       data.meta.source_url = form.value.source_url.trim()
       data.meta.selector = form.value.selector
     }
@@ -84,7 +88,7 @@ function handleClosed() {
   <MkAction label="设置" icon="icon_setting" :disabled="disabled || loading || !documents.length" @click="handleOpenDialog" />
   <MkDialog v-model="visible" title="文档设置" :show-close="!loading" @closed="handleClosed">
     <el-form ref="formRef" :model="form" label-position="top" :disabled="loading" @submit.prevent>
-      <template v-if="document?.type === KNOWLEDGE_TYPE.WEB">
+      <template v-if="document && knowledgeType === KNOWLEDGE_TYPE_KEY.WEB">
         <el-form-item label="文档地址" prop="source_url" :rules="[{ required: true, whitespace: true, message: '请输入文档地址', trigger: 'blur' }]">
           <el-input v-model="form.source_url" />
         </el-form-item>
@@ -109,7 +113,7 @@ function handleClosed() {
           align="left"
         />
       </el-form-item>
-      <el-checkbox v-model="form.allow_download">{{ document?.type === KNOWLEDGE_TYPE.WEB ? '允许预览' : '允许下载' }}</el-checkbox>
+      <el-checkbox v-model="form.allow_download">{{ knowledgeType === KNOWLEDGE_TYPE_KEY.WEB ? '允许预览' : '允许下载' }}</el-checkbox>
     </el-form>
     <template #footer>
       <!-- 取消文档设置 -->

@@ -10,9 +10,10 @@ import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
-import { DOCUMENT_TASK_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
+import { DOCUMENT_TASK_TYPE } from '@/api/enums'
+import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
-import { DOCUMENT_STATUS_FILTER_OPTIONS, isDocumentTaskRunning } from './status'
+import { DOCUMENT_STATUS_FILTER_OPTIONS } from './status'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
@@ -26,7 +27,8 @@ import {
   DeleteDocumentAction,
   DocumentTagsAction,
   EmbeddingDocumentAction,
-  GenerateDocumentQuestionsAction,
+  GenerateQuestionsAction,
+  BatchGenerateQuestionsAction,
   DownloadDocumentAction,
   ExportDocumentAction,
   MigrateDocumentAction,
@@ -36,7 +38,6 @@ import {
   TokenizeDocumentAction,
   BatchTokenizeAction,
 } from './action-dropdown'
-import { useKnowledgeDetailContext } from '../context'
 
 defineOptions({ name: 'DocumentListView' })
 defineProps<ResourceDetailPageProps>()
@@ -44,10 +45,10 @@ defineExpose({ customHeader: true })
 
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
-const { knowledge } = useKnowledgeDetailContext()
+const knowledgeType = computed(() => route.params.type)
 
 /* 快速创建 */
-const showQuickCreate = computed(() => knowledge.value?.type === KNOWLEDGE_TYPE.BASE && !isWorkspaceSharedResource())
+const showQuickCreate = computed(() => knowledgeType.value === KNOWLEDGE_TYPE_KEY.BASE && !isWorkspaceSharedResource())
 const quickCreateRef = ref<InstanceType<typeof MkQuickCreate>>()
 
 function handleCreateDocument(name: string) {
@@ -382,42 +383,29 @@ onBeforeUnmount(() => {
               @refresh="refreshAfterOperation"
             />
             <!-- 更多文档操作 -->
-            <MkTableMoreDropdown persistent>
+            <MkTableMoreDropdown>
+              <!-- 同步文档 -->
+              <SyncDocumentAction
+                v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK"
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                v-model:loading="operationLoading"
+                :documents="[row]"
+                @refresh="refreshAfterOperation"
+              />
+              <!-- 生成或取消生成问题 -->
+              <GenerateQuestionsAction
+                :api="DocumentApi"
+                v-model:loading="operationLoading"
+                :knowledge-id="knowledgeId"
+                :document="row"
+                @refresh="refreshAfterOperation"
+              />
               <!-- 文档设置 -->
               <SettingDocumentAction
                 :api="DocumentApi"
                 :knowledge-id="knowledgeId"
                 :documents="[row]"
-                :disabled="operationLoading"
-                @refresh="refreshAfterOperation"
-              />
-              <!-- 同步文档 -->
-              <SyncDocumentAction
-                :api="DocumentApi"
-                :knowledge-id="knowledgeId"
-                v-model:loading="operationLoading"
-                :documents="[row]"
-                :knowledge-type="knowledge?.type"
-                @refresh="refreshAfterOperation"
-              />
-              <!-- 取消生成问题 -->
-              <BatchCancelTaskAction
-                :api="DocumentApi"
-                :knowledge-id="knowledgeId"
-                v-model:loading="operationLoading"
-                :document-ids="[row.id]"
-                :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
-                label="取消生成问题"
-                v-if="isDocumentTaskRunning(row, DOCUMENT_TASK_TYPE.GENERATE_PROBLEM)"
-                @refresh="refreshAfterOperation"
-              />
-              <!-- 生成问题 -->
-              <GenerateDocumentQuestionsAction
-                :api="DocumentApi"
-                v-model:loading="operationLoading"
-                v-else
-                :knowledge-id="knowledgeId"
-                :document-ids="[row.id]"
                 :disabled="operationLoading"
                 @refresh="refreshAfterOperation"
               />
@@ -454,7 +442,7 @@ onBeforeUnmount(() => {
                 :document-ids="[row.id]"
                 format="zip"
               />
-              <template v-if="knowledge?.type === KNOWLEDGE_TYPE.BASE || knowledge?.type === KNOWLEDGE_TYPE.WORKFLOW">
+              <template v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.BASE || knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW">
                 <!-- 下载原文档 -->
                 <DownloadDocumentAction :api="DocumentApi" :knowledge-id="knowledgeId" v-model:loading="operationLoading" :document="row" />
                 <!-- 替换原文档 -->
@@ -499,10 +487,9 @@ onBeforeUnmount(() => {
         @refresh="refreshAfterOperation"
       />
       <!-- 批量生成问题 -->
-      <GenerateDocumentQuestionsAction
+      <BatchGenerateQuestionsAction
         :api="DocumentApi"
         v-model:loading="operationLoading"
-        batch
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
         :disabled="operationLoading"
@@ -537,7 +524,6 @@ onBeforeUnmount(() => {
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
               :documents="selectedDocuments"
-              :knowledge-type="knowledge?.type"
               batch
               @refresh="refreshAfterOperation"
             />

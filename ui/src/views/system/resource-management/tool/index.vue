@@ -182,7 +182,7 @@ onMounted(() => {
               <!-- 编辑工具配置 -->
               <EditToolAction display="button" label="编辑" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
               <!-- 更多工具操作 -->
-              <MkTableMoreDropdown persistent>
+              <MkTableMoreDropdown>
                 <!-- 打开工具工作流 -->
                 <MkDropdownItem v-if="row.tool_type === TOOL_TYPE.WORKFLOW" @click="handleOpenWorkflow(row, $event)">
                   <template #icon><MkIcon name="icon_setting" /></template>

@@ -697,11 +697,14 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 选中后通过 `footer-batch-actions` 展示批量操作。右侧固定操作列提供启停、向量化、分词索引和更多菜单，
 运行或排队中的任务切换为取消入口。Web、飞书提供同步，普通与工作流文档提供原文下载和替换。
 单项与批量操作共用页面请求状态，删除和同步先确认，成功后清空选择并刷新，导出和下载保留选择。
+文档页及其 Action 的知识库类型统一读取响应式路由参数 `route.params.type`，使用
+`KNOWLEDGE_TYPE_KEY` 判断，不从详情或文档数据读取类型，也不通过 `knowledgeType` Prop 传递。
+Web 来源地址与选择器仅在单项设置中编辑，批量设置不展示这两个字段。
 文档操作统一放在 `document/action-dropdown/`，通过该目录 `index.ts` 导出，页面显式组合各 Action。
 文档状态展示、筛选配置和任务运行状态判断统一维护在 `document/status.ts`。
 文档任务是否排队或执行中通过其中的 `isDocumentTaskRunning(document, taskType)` 判断，
 页面及 Action 不重复解析状态字符串；文档或任务状态缺失时返回 `false`。
-`EmbeddingDocumentAction` 负责单项向量化与取消向量化，`BatchEmbeddingAction` 负责批量向量化按钮，`GenerateDocumentQuestionsAction` 负责文档生成问题入口和提交，`SettingDocumentAction` 负责召回及来源设置，
+`EmbeddingDocumentAction` 负责单项向量化与取消向量化，`BatchEmbeddingAction` 负责批量向量化按钮，`GenerateQuestionsAction` 负责单项生成问题与取消生成，`BatchGenerateQuestionsAction` 负责批量生成问题，`SettingDocumentAction` 负责召回及来源设置，
 `MigrateDocumentAction` 选择目标知识库，`DocumentTagsAction` 添加已有标签和移除文档标签关联；
 生成问题复用公共配置弹窗，其余 Action 按下文维护各自专属弹窗。组件接收完整 Document API、知识库 ID、文档 ID 或文档数组及禁用状态，
 点击时快照本次操作对象，内部管理弹窗和请求，成功后通过 `refresh` 通知页面刷新，失败保留输入。
@@ -711,7 +714,9 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 向量化相关文件集中在 `document/action-dropdown/embedding/`，包含两个 Action 和共用的 `DocumentEmbeddingDialog.vue`；
 Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内部使用，管理分段范围与确认事件，
 请求和成功关闭由各自 Action 负责；打开时快照文档目标，失败保留范围选择。
-生成问题通过 `batch` 切换批量按钮，通过 `display` 区分行内菜单与图标按钮。
+生成问题相关 Action 集中在 `document/action-dropdown/generate-questions/`，通过上层 `index.ts` 导出。
+`GenerateQuestionsAction` 接收单个 `document`，内部判断任务状态并处理生成与单项取消，通过 `display` 区分菜单与图标按钮。
+`BatchGenerateQuestionsAction` 接收 `documentIds`，使用独立的批量生成按钮；批量取消继续使用 `BatchCancelTaskAction`。
 单项与批量复用公共 `GenerateQuestionsDialog`，Action 打开时保存知识库、文档 ID 快照，
 提交同一文档批量接口并通过 `refresh` 刷新状态；通过 `v-model:loading` 复用页面操作状态。
 公共弹窗按需挂载、关闭后卸载，不负责选择提交接口。当前尚无段落页，后续段落入口复用公共
