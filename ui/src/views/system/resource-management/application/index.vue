@@ -56,7 +56,7 @@ function loadApplicationPage() {
   return SystemResourceApplicationApi.getApplicationPage(pagination.value, {
     ...applicationQuery.value,
     ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
-    ...(selectedStatusType.value.length ? { status: JSON.stringify(selectedStatusType.value) } : {}),
+    status: selectedStatusType.value,
   })
     .then((page) => {
       applicationData.value = page.records
