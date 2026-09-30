@@ -54,7 +54,7 @@ function loadModels() {
       modelOptions.value = models
       providerOptions.value = providers
       if (!modelAvailable.value) {
-        form.value.model_id = ''
+        form.value.model_id = models.find(({ status }) => status === MODEL_STATUS.SUCCESS)?.id ?? ''
         form.value.model_params_setting = {}
       }
     })
@@ -97,7 +97,7 @@ defineExpose({ open, close })
   <MkDialog v-model="visible" title="生成问题" @closed="emit('closed')">
     <el-form ref="formRef" :model="form" label-position="top" :disabled="loading || modelLoading" @submit.prevent>
       <el-alert :closable="false" :title="promptTip" type="primary" class="mb-4! items-start! whitespace-pre-line" show-icon>
-        <template #icon><MkIcon name="icon_info_filled" class="mt-2"/></template>
+        <template #icon><MkIcon name="icon_info_filled" class="mt-2" /></template>
       </el-alert>
       <el-form-item label="AI 模型" prop="model_id" :rules="[{ required: true, message: '请选择 AI 模型', trigger: 'change' }]">
         <SelectModel
