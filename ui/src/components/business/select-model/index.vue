@@ -143,7 +143,7 @@ function openModelParams() {
         >
           <div class="flex-align-center h-full gap-2">
             <span class="h-5 w-5 shrink-0" v-html="group.icon" />
-            <span class="min-w-0 flex-1 truncate" :title="model.name">{{ model.name }}</span>
+            <span class="min-w-0 truncate" :title="model.name">{{ model.name }}</span>
             <el-tag v-if="model.source === 'shared'" size="small" type="info">共享</el-tag>
             <span v-if="model.status !== MODEL_STATUS.SUCCESS" class="text-danger">不可用</span>
           </div>
