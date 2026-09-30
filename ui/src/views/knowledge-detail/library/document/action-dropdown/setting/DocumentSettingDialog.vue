@@ -4,21 +4,18 @@ import { useRoute } from 'vue-router'
 import type { FormInstance } from 'element-plus'
 import { DOCUMENT_HIT_HANDLING } from '@/api/enums'
 import type { DocumentItem, DocumentSettingPayload } from '@/api/types'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
-import { MsgSuccess } from '@/utils/message'
+import { cloneDeep } from 'lodash'
 
-defineOptions({ name: 'SettingDocumentAction' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documents: DocumentItem[]; batch?: boolean; disabled?: boolean }>()
-const emit = defineEmits<{ refresh: [] }>()
+defineOptions({ name: 'DocumentSettingDialog' })
+const props = defineProps<{ loading: boolean; batch?: boolean }>()
+const emit = defineEmits<{ submit: [data: DocumentSettingPayload]; closed: [] }>()
 const route = useRoute()
 const knowledgeType = computed(() => route.params.type)
 const visible = ref(false)
-const loading = ref(false)
 const formRef = ref<FormInstance>()
 const document = ref<DocumentItem>()
-const targetDocumentIds = ref<string[]>([])
 const form = ref({
   hit_handling_method: DOCUMENT_HIT_HANDLING.OPTIMIZATION as DocumentSettingPayload['hit_handling_method'],
   directly_return_similarity: 0.9,
@@ -27,13 +24,9 @@ const form = ref({
   allow_download: true,
 })
 
-function handleOpenDialog() {
-  if (props.disabled || loading.value || !props.documents.length) return
-  const documents = props.documents
-  const batch = props.batch
-  document.value = batch ? undefined : documents[0]
-  targetDocumentIds.value = documents.map(({ id }) => id)
-  const current = document.value
+// 单项设置回填文档，批量设置使用默认值。
+function open(current?: DocumentItem) {
+  document.value = current ? cloneDeep(current) : undefined
   form.value = {
     hit_handling_method: current?.hit_handling_method ?? DOCUMENT_HIT_HANDLING.OPTIMIZATION,
     directly_return_similarity: current?.directly_return_similarity ?? 0.9,
@@ -45,54 +38,38 @@ function handleOpenDialog() {
 }
 
 async function handleSubmit() {
-  if (loading.value || !(await formRef.value?.validate().catch(() => false))) return
-  loading.value = true
+  if (props.loading || !(await formRef.value?.validate().catch(() => false))) return
   const data: DocumentSettingPayload = {
     hit_handling_method: form.value.hit_handling_method,
     directly_return_similarity: form.value.directly_return_similarity,
   }
-  let request: Promise<unknown>
   if (document.value) {
     data.meta = { ...document.value.meta, allow_download: form.value.allow_download }
     if (knowledgeType.value === KNOWLEDGE_TYPE_KEY.WEB) {
       data.meta.source_url = form.value.source_url.trim()
       data.meta.selector = form.value.selector
     }
-    request = props.api.putDocumentSetting(props.knowledgeId, document.value.id, data)
   } else {
-    request = props.api.putBatchDocumentSetting(props.knowledgeId, targetDocumentIds.value, { ...data, allow_download: form.value.allow_download })
+    data.allow_download = form.value.allow_download
   }
-  return request
-    .then(() => {
-      MsgSuccess('设置成功')
-      visible.value = false
-      emit('refresh')
-    })
-    .catch(() => {
-      // 请求层统一提示错误，保留当前输入。
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  emit('submit', data)
 }
 
-function handleClosed() {
-  document.value = undefined
-  targetDocumentIds.value = []
-  formRef.value?.clearValidate()
+function close() {
+  visible.value = false
 }
+
+defineExpose({ open, close })
 </script>
 
 <template>
-  <!-- 文档设置入口 -->
-  <MkAction label="设置" icon="icon_setting" :disabled="disabled || loading || !documents.length" @click="handleOpenDialog" />
-  <MkDialog v-model="visible" title="文档设置" :show-close="!loading" @closed="handleClosed">
-    <el-form ref="formRef" :model="form" label-position="top" :disabled="loading" @submit.prevent>
-      <template v-if="document && knowledgeType === KNOWLEDGE_TYPE_KEY.WEB">
+  <MkDialog v-model="visible" title="文档设置" @closed="emit('closed')">
+    <el-form ref="formRef" :model="form" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <template v-if="!batch && knowledgeType === KNOWLEDGE_TYPE_KEY.WEB">
         <el-form-item label="文档地址" prop="source_url" :rules="[{ required: true, whitespace: true, message: '请输入文档地址', trigger: 'blur' }]">
           <el-input v-model="form.source_url" />
         </el-form-item>
-        <el-form-item label="选择器"><el-input v-model="form.selector" /></el-form-item>
+        <el-form-item label="选择器"><el-input v-model="form.selector" placeholder="默认为 body，可输入 .classname/#idname/tagname"/></el-form-item>
       </template>
       <el-form-item label="召回处理">
         <el-radio-group v-model="form.hit_handling_method">

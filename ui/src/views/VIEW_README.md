@@ -717,6 +717,10 @@ Web 来源地址与选择器仅在单项设置中编辑，批量设置不展示�
 `MigrateDocumentAction` 选择目标知识库，`DocumentTagsAction` 添加已有标签和移除文档标签关联；
 生成问题复用公共配置弹窗，其余 Action 按下文维护各自专属弹窗。组件接收完整 Document API、知识库 ID、文档 ID 或文档数组及禁用状态，
 点击时快照本次操作对象，内部管理弹窗和请求，成功后通过 `refresh` 通知页面刷新，失败保留输入。
+迁移操作集中在 `document/action-dropdown/migrate/`，`MigrateDocumentAction.vue` 负责入口与弹窗按需挂载，
+`DocumentMigrateDialog.vue` 负责目标知识库查询、选择及迁移请求；关闭动画结束后卸载，失败保留输入。
+Action 继续通过上层 `action-dropdown/index.ts` 导出，单项与批量入口共用；入口文案由必填 `label` 传入，
+图标由可选 `icon` 传入，不传时不显示图标。
 单项向量化仅传 `document`，内部判断排队或执行状态，固定展示行内图标按钮，分别调用单项向量化和取消接口。
 批量向量化仅传 `document-ids`，使用独立的 `BatchEmbeddingAction` 普通按钮；
 批量取消向量化继续使用 `BatchCancelTaskAction` 菜单项，单项和批量请求均通过 `v-model:loading` 共用页面操作状态。
@@ -730,7 +734,15 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 提交同一文档批量接口并通过 `refresh` 刷新状态；通过 `v-model:loading` 复用页面操作状态。
 公共弹窗按需挂载、关闭后卸载，不负责选择提交接口。当前尚无段落页，后续段落入口复用公共
 弹窗时关闭 `showParagraphScope`，由段落 Action 提交段落接口，不扩展公共弹窗的接口分支。
-设置组件通过 `batch` 区分单项与批量，标签组件通过 `manageTags` 区分标签管理与批量添加。
+设置操作集中在 `document/action-dropdown/setting/`，通过上层 `index.ts` 导出两个入口。
+`SettingDocumentAction` 接收单个 `document`，展示菜单项；`BatchSettingDocumentAction` 接收
+`documentIds`，展示批量设置按钮。入口文案由 `label` 传入，单项图标由可选 `icon` 传入。
+两个入口通过 `v-model:loading` 共用页面操作状态，打开时固定操作目标，分别调用单项和批量设置接口。
+共用的 `DocumentSettingDialog.vue` 负责表单回填、校验和提交数据，按需挂载、关闭动画结束后卸载；
+弹窗通过 `batch` 参数区分批量模式，批量入口显式传入；文档地址和选择器仅在 `!batch` 且为 Web 知识库时显示。
+单项保留文档原有 `meta`，批量使用默认配置并将 `allow_download`
+放在顶层。请求与成功关闭由 Action 负责，成功通知页面刷新，失败保留表单。
+标签组件通过 `manageTags` 区分标签管理与批量添加。
 分词索引集中在 `document/action-dropdown/tokenize/`：`TokenizeDocumentAction` 接收单个 `document`，
 按运行状态调用单项分词或取消接口；`BatchTokenizeAction` 接收 `documentIds`，仅调用批量分词接口。
 两个 Action 均处理全部分段状态，通过 `v-model:loading` 共用页面操作状态，成功后通知页面刷新。

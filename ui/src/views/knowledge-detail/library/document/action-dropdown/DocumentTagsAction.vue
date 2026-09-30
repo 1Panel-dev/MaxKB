@@ -104,7 +104,7 @@ function handleClosed() {
     @click="handleOpenDialog"
   />
   <MkDialog v-model="visible" :title="manage ? '标签设置' : '添加标签'" :show-close="!loading && !optionLoading" @closed="handleClosed">
-    <el-form label-position="top" @submit.prevent>
+    <el-form label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="标签">
         <el-select
           v-model="selectedTagIds"
