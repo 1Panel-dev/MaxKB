@@ -35,8 +35,8 @@ const selectedKnowledgeIds = computed({
         </div>
       </el-option>
       <template #label="{ label, value }">
-        <span class="inline-flex max-w-full items-center gap-2">
-          <KnowledgeIcon :type="knowledgeById.get(value)?.type" :size="14" class="shrink-0" style="--el-avatar-border-radius: 4px" />
+        <span class="flex-align-center gap-2">
+          <KnowledgeIcon :type="knowledgeById.get(value)?.type" :size="16" class="shrink-0 small" />
           <span class="truncate" :title="label">{{ label }}</span>
         </span>
       </template>
