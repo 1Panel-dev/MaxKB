@@ -1,4 +1,4 @@
-import { del, downloadRequest, get, getExportFile, post, put } from '../../core/request'
+import { del, downloadRequest, get, getExportFile, post, postExportExcel, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   Dict,
@@ -8,7 +8,6 @@ import type {
   DocumentSettingPayload,
   DocumentTaskState,
   DocumentTaskType,
-  KnowledgeTagGroup,
 } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
@@ -49,6 +48,10 @@ const putDocumentTokenize = (knowledgeId: string, documentId: string, stateList:
 const putBatchTokenizeDocuments = (knowledgeId: string, documentIds: string[], stateList: DocumentTaskState[]) =>
   put(`${getPrefix(knowledgeId)}/batch_tokenize`, { id_list: documentIds, state_list: stateList })
 
+/** 单个/批量生成关联问题。 */
+const putGenerateDocumentQuestions = (knowledgeId: string, data: DocumentGeneratePayload) =>
+  put(`${getPrefix(knowledgeId)}/batch_generate_related`, data)
+
 /** 单个取消文档任务。 */
 const putCancelTask = (knowledgeId: string, documentId: string, taskType: DocumentTaskType) =>
   put(`${getPrefix(knowledgeId)}/${documentId}/cancel_task`, { type: taskType })
@@ -56,6 +59,21 @@ const putCancelTask = (knowledgeId: string, documentId: string, taskType: Docume
 /** 批量取消指定文档任务。 */
 const putBatchCancelDocumentTask = (knowledgeId: string, documentIds: string[], taskType: DocumentTaskType) =>
   put(`${getPrefix(knowledgeId)}/batch_cancel_task`, { id_list: documentIds, type: taskType })
+
+/** 同步单个 Web 文档。 */
+const putDocumentSync = (knowledgeId: string, documentId: string) => put(`${getPrefix(knowledgeId)}/${documentId}/sync`)
+
+/** 批量同步 Web 文档。 */
+const putMulSyncDocument = (knowledgeId: string, documentIds: string[]) =>
+  put<{ id_list: string[] }, boolean>(`${getPrefix(knowledgeId)}/batch_sync`, { id_list: documentIds })
+
+/** 同步单个飞书文档。 */
+const putLarkDocumentSync = (knowledgeId: string, documentId: string) =>
+  put(`/workspace/${getWorkspaceId()}/knowledge/lark/${knowledgeId}/document/${documentId}/sync`)
+
+/** 批量同步飞书文档。 */
+const putMulLarkSyncDocument = (knowledgeId: string, documentIds: string[]) =>
+  put<{ id_list: string[] }, boolean>(`/workspace/${getWorkspaceId()}/knowledge/lark/${knowledgeId}/_batch`, { id_list: documentIds })
 
 /** 保存单个文档的召回及来源设置。 */
 const putDocumentSetting = (knowledgeId: string, documentId: string, data: DocumentSettingPayload) =>
@@ -65,24 +83,25 @@ const putDocumentSetting = (knowledgeId: string, documentId: string, data: Docum
 const putBatchDocumentSetting = (knowledgeId: string, documentIds: string[], data: DocumentSettingPayload) =>
   put(`${getPrefix(knowledgeId)}/batch_hit_handling`, { ...data, id_list: documentIds })
 
-/** 根据文档内容生成关联问题。 */
-const putGenerateDocumentQuestions = (knowledgeId: string, data: DocumentGeneratePayload) =>
-  put(`${getPrefix(knowledgeId)}/batch_generate_related`, data)
-
 /** 将选中文档迁移至目标知识库。 */
 const putMigrateDocuments = (knowledgeId: string, targetKnowledgeId: string, documentIds: string[]) =>
   put(`${getPrefix(knowledgeId)}/migrate/${targetKnowledgeId}`, documentIds)
 
-/** 同步 Web 文档。 */
-const putSyncDocuments = (knowledgeId: string, documentIds: string[]) => put(`${getPrefix(knowledgeId)}/batch_sync`, { id_list: documentIds })
+/** 将单个文档导出为 Excel。 */
+const exportDocument = (knowledgeId: string, documentId: string, documentName: string) =>
+  getExportFile(`${documentName.trim()}.xlsx`, `${getPrefix(knowledgeId)}/${documentId}/export`)
 
-/** 同步飞书文档。 */
-const putSyncLarkDocuments = (knowledgeId: string, documentIds: string[]) =>
-  put(`/workspace/${getWorkspaceId()}/knowledge/lark/${knowledgeId}/_batch`, { id_list: documentIds })
+/** 将选中文档批量导出为 Excel。 */
+const exportMulDocument = (knowledgeId: string, documentIds: string[], knowledgeName: string) =>
+  postExportExcel(`${knowledgeName.trim()}.xlsx`, `${getPrefix(knowledgeId)}/batch_export`, undefined, documentIds)
 
-/** 导出所选文档为 Excel 或 ZIP。 */
-const exportDocuments = (knowledgeId: string, documentIds: string[], format: 'excel' | 'zip') =>
-  downloadRequest(`${getPrefix(knowledgeId)}/${format === 'excel' ? 'batch_export' : 'batch_export_zip'}`, 'POST', documentIds)
+/** 将单个文档及图片导出为 ZIP。 */
+const exportDocumentZip = (knowledgeId: string, documentId: string, documentName: string) =>
+  getExportFile(`${documentName.trim()}.zip`, `${getPrefix(knowledgeId)}/${documentId}/export_zip`)
+
+/** 将选中文档及图片批量导出为 ZIP。 */
+const exportMulDocumentZip = (knowledgeId: string, documentIds: string[], knowledgeName: string) =>
+  downloadRequest(`${getPrefix(knowledgeId)}/batch_export_zip`, 'POST', documentIds, undefined, `${knowledgeName.trim()}.zip`)
 
 /** 下载文档原文件。 */
 const downloadDocumentSource = (knowledgeId: string, document: DocumentItem) =>
@@ -94,17 +113,6 @@ const postReplaceDocumentSource = (knowledgeId: string, documentId: string, file
   data.append('file', file)
   return post(`${getPrefix(knowledgeId)}/${documentId}/replace_source_file`, data)
 }
-
-/** 查询文档当前标签。 */
-const getDocumentTags = (knowledgeId: string, documentId: string) => get<KnowledgeTagGroup[]>(`${getPrefix(knowledgeId)}/${documentId}/tags`)
-
-/** 批量添加文档标签。 */
-const postAddDocumentTags = (knowledgeId: string, documentIds: string[], tagIds: string[]) =>
-  post(`${getPrefix(knowledgeId)}/batch_add_tag`, { document_ids: documentIds, tag_ids: tagIds })
-
-/** 移除文档标签关联。 */
-const putDeleteDocumentTags = (knowledgeId: string, documentId: string, tagIds: string[]) =>
-  put(`${getPrefix(knowledgeId)}/${documentId}/tags/batch_delete`, tagIds)
 
 export default {
   getDocumentPage,
@@ -122,12 +130,14 @@ export default {
   putBatchDocumentSetting,
   putGenerateDocumentQuestions,
   putMigrateDocuments,
-  putSyncDocuments,
-  putSyncLarkDocuments,
-  exportDocuments,
+  putDocumentSync,
+  putMulSyncDocument,
+  putLarkDocumentSync,
+  putMulLarkSyncDocument,
+  exportDocument,
+  exportMulDocument,
+  exportDocumentZip,
+  exportMulDocumentZip,
   downloadDocumentSource,
   postReplaceDocumentSource,
-  getDocumentTags,
-  postAddDocumentTags,
-  putDeleteDocumentTags,
 }

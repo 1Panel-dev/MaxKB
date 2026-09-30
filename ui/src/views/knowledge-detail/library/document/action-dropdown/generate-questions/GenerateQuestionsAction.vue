@@ -62,7 +62,7 @@ function handleSubmit(config: RelatedQuestionsConfig, stateList: DocumentTaskSta
       state_list: stateList,
     })
     .then(() => {
-      MsgSuccess('任务已提交')
+      MsgSuccess('操作成功')
       dialogRef.value?.close()
       emit('refresh')
     })
@@ -84,8 +84,8 @@ function handleClosed() {
   <MkAction
     :display="display ?? 'menu'"
     :label="running ? '取消生成问题' : '生成问题'"
-    :icon="running ? undefined : 'icon_new-chat_outlined'"
-    :disabled="disabled || loading || !document.id"
+    :icon="running ? 'icon_close_outlined' : 'icon_link-record_outlined'"
+    :disabled="disabled || loading"
     @click="running ? handleCancelQuestions() : handleOpenDialog()"
   />
   <GenerateQuestionsDialog v-if="dialogMounted" ref="dialogRef" :loading="loading" @submit="handleSubmit" @closed="handleClosed" />

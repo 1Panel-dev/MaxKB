@@ -40,7 +40,7 @@ const knowledgeTypeLabel = KNOWLEDGE_TYPE_LABELS[knowledgeType]
 `state.ts` 的 `EXECUTION_STATUS_OPTIONS` 维护触发器、工具和知识库工作流执行记录共用的
 中文文案与图标类型，仅包含 `PENDING`、`STARTED`、`SUCCESS`、`FAILURE`、`REVOKE`、
 `REVOKED`、`TRIGGER_ERROR` 七种接口状态，列表筛选及执行详情复用该配置。新增状态只需在业务配置中补齐展示，
-不修改 `MkStatusLabel`。文档任务使用 `views/knowledge-detail/document/status.ts` 的独立配置，
+不修改 `MkStatusLabel`。文档任务使用 `views/knowledge-detail/library/document/status.ts` 的独立配置，
 筛选查询仍映射 `DOCUMENT_TASK_STATE` 与 `DOCUMENT_TASK_TYPE`，不提交展示状态键。
 
 `document.ts` 的 `DOCUMENT_HIT_HANDLING_LABELS` 维护文档命中处理方式的展示文案，

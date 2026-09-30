@@ -18,8 +18,7 @@ const tagCount = computed(() => props.document.tag_count ?? props.document.tags?
         <el-tag type="info" effect="plain" class="shrink-0 cursor-pointer">
           <span class="flex-align-center gap-1 text-N900 py-1">
             <MkIcon name="icon_tag" />
-            <!-- TODO tag字号 -->
-            <span>{{ tagCount }}</span>
+            <span class="text-base">{{ tagCount }}</span>
           </span>
         </el-tag>
       </template>
