@@ -75,15 +75,15 @@ const putLarkDocumentSync = (knowledgeId: string, documentId: string) =>
 const putMulLarkSyncDocument = (knowledgeId: string, documentIds: string[]) =>
   put<{ id_list: string[] }, boolean>(`/workspace/${getWorkspaceId()}/knowledge/lark/${knowledgeId}/_batch`, { id_list: documentIds })
 
-/** 保存单个文档的召回及来源设置。 */
+/** 单个文档设置。 */
 const putDocumentSetting = (knowledgeId: string, documentId: string, data: DocumentSettingPayload) =>
   put(`${getPrefix(knowledgeId)}/${documentId}`, data)
 
-/** 批量保存文档召回设置。 */
+/** 批量文档设置。 */
 const putBatchDocumentSetting = (knowledgeId: string, documentIds: string[], data: DocumentSettingPayload) =>
   put(`${getPrefix(knowledgeId)}/batch_hit_handling`, { ...data, id_list: documentIds })
 
-/** 将选中文档迁移至目标知识库。 */
+/** 批量/单个迁移至目标知识库。 */
 const putMigrateDocuments = (knowledgeId: string, targetKnowledgeId: string, documentIds: string[]) =>
   put(`${getPrefix(knowledgeId)}/migrate/${targetKnowledgeId}`, documentIds)
 

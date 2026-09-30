@@ -35,6 +35,7 @@ import {
   MigrateDocumentAction,
   ReplaceDocumentAction,
   SettingDocumentAction,
+  BatchSettingDocumentAction,
   SyncDocumentAction,
   BatchSyncDocumentAction,
   TokenizeDocumentAction,
@@ -386,30 +387,12 @@ onBeforeUnmount(() => {
             />
             <!-- 更多文档操作 -->
             <MkTableMoreDropdown>
-              <!-- 同步 -->
-              <SyncDocumentAction
-                v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK"
-                label="同步"
-                :api="DocumentApi"
-                :knowledge-id="knowledgeId"
-                :document="row"
-                v-model:loading="operationLoading"
-                @refresh="refreshAfterOperation"
-              />
               <!-- 生成或取消生成问题 -->
               <GenerateQuestionsAction
                 :api="DocumentApi"
                 v-model:loading="operationLoading"
                 :knowledge-id="knowledgeId"
                 :document="row"
-                @refresh="refreshAfterOperation"
-              />
-              <!-- 文档设置 -->
-              <SettingDocumentAction
-                :api="DocumentApi"
-                :knowledge-id="knowledgeId"
-                :documents="[row]"
-                :disabled="operationLoading"
                 @refresh="refreshAfterOperation"
               />
               <!-- 设置文档标签 -->
@@ -421,8 +404,32 @@ onBeforeUnmount(() => {
                 :disabled="operationLoading"
                 @refresh="refreshAfterOperation"
               />
+              <!-- 同步 -->
+              <SyncDocumentAction
+                v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK"
+                label="同步"
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                :document="row"
+                v-model:loading="operationLoading"
+                @refresh="refreshAfterOperation"
+              />
+
+              <!-- 文档设置 -->
+              <SettingDocumentAction
+                label="设置"
+                icon="icon_setting"
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                :document="row"
+                v-model:loading="operationLoading"
+                @refresh="refreshAfterOperation"
+              />
+
               <!-- 迁移文档 -->
               <MigrateDocumentAction
+                label="迁移"
+                icon="icon_move2_outlined"
                 :api="DocumentApi"
                 :knowledge-id="knowledgeId"
                 :document-ids="[row.id]"
@@ -486,7 +493,14 @@ onBeforeUnmount(() => {
         @refresh="refreshAfterOperation"
       />
       <!-- 批量文档设置 -->
-      <el-button>设置</el-button>
+      <BatchSettingDocumentAction
+        label="设置"
+        :api="DocumentApi"
+        :knowledge-id="knowledgeId"
+        :document-ids="selectedDocumentIds"
+        v-model:loading="operationLoading"
+        @refresh="refreshAfterOperation"
+      />
 
       <!-- 批量添加标签 -->
       <el-button>添加标签</el-button>
@@ -511,6 +525,7 @@ onBeforeUnmount(() => {
             />
             <!-- 批量迁移文档 -->
             <MigrateDocumentAction
+              label="迁移"
               :api="DocumentApi"
               :knowledge-id="knowledgeId"
               :document-ids="selectedDocumentIds"

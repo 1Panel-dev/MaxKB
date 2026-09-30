@@ -101,8 +101,8 @@ function handleSave() {
 
       const embeddingModelChanged = originalEmbeddingModelId.value !== payload.embedding_model_id
       const confirmation = embeddingModelChanged
-        ? MsgConfirm('更换向量模型', '更换向量模型后，需要对知识库中的文档重新向量化，是否继续？', {
-            confirmButtonText: '保存并重新向量化',
+        ? MsgConfirm('提示', '修改知识库向量模型后，需要对知识库向量化，是否继续保存？', {
+            confirmButtonText: '向量化',
             confirmButtonType: 'primary',
           })
         : Promise.resolve()
@@ -154,17 +154,13 @@ defineProps<ResourceDetailPageProps>()
         </el-card>
       </el-form-item>
       <template v-if="knowledge.type === KNOWLEDGE_TYPE.WEB">
-        <el-form-item label="Web 站点 URL" prop="source_url">
-          <el-input
-            v-model="settingForm.source_url"
-            placeholder="请输入 Web 站点 URL"
-            @blur="settingForm.source_url = settingForm.source_url.trim()"
-          />
+        <el-form-item label="Web 根地址" prop="source_url">
+          <el-input v-model="settingForm.source_url" placeholder="请输入 Web 根地址" @blur="settingForm.source_url = settingForm.source_url.trim()" />
         </el-form-item>
         <el-form-item label="选择器" prop="selector">
           <el-input
             v-model="settingForm.selector"
-            placeholder="请输入 CSS 选择器，默认 body"
+            placeholder="默认为 body，可输入 .classname/#idname/tagname"
             @blur="settingForm.selector = settingForm.selector.trim()"
           />
         </el-form-item>
