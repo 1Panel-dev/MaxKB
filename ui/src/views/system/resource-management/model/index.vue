@@ -165,7 +165,7 @@ onMounted(() => {
               <!-- 资源授权 -->
               <AuthorizeModelAction display="button" label="资源授权" :model="row" />
               <!-- 更多模型操作 -->
-              <MkTableMoreDropdown persistent>
+              <MkTableMoreDropdown>
                 <!-- 模型参数设置 -->
                 <ParamSettingAction
                   v-if="['TTS', 'LLM', 'IMAGE', 'TTI', 'STT', 'EMBEDDING'].includes(row.model_type)"

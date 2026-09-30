@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import { KNOWLEDGE_TYPE } from '@/api/enums'
-import type { DocumentItem, KnowledgeType } from '@/api/types'
+import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
+import type { DocumentItem } from '@/api/types'
 import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'SyncDocumentAction' })
@@ -9,9 +11,10 @@ const props = defineProps<{
   api: typeof DocumentApi
   knowledgeId: string
   documents: DocumentItem[]
-  knowledgeType?: KnowledgeType
   batch?: boolean
 }>()
+const route = useRoute()
+const knowledgeType = computed(() => route.params.type)
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -19,7 +22,7 @@ const emit = defineEmits<{ refresh: [] }>()
 function handleSync() {
   if (!props.documents.length || loading.value) return
   const document = props.batch ? undefined : props.documents[0]
-  if (document?.type === KNOWLEDGE_TYPE.WEB && !document.meta?.source_url) {
+  if (document && knowledgeType.value === KNOWLEDGE_TYPE_KEY.WEB && !document.meta?.source_url) {
     MsgInfo('文档没有来源地址，请先在设置中填写文档地址')
     return
   }
@@ -29,7 +32,7 @@ function handleSync() {
       if (loading.value) return
       loading.value = true
       const request =
-        props.knowledgeType === KNOWLEDGE_TYPE.LARK
+        knowledgeType.value === KNOWLEDGE_TYPE_KEY.LARK
           ? props.api.putSyncLarkDocuments(props.knowledgeId, ids)
           : props.api.putSyncDocuments(props.knowledgeId, ids)
       return request
@@ -47,11 +50,5 @@ function handleSync() {
 
 <template>
   <!-- 同步单个或选中文档 -->
-  <MkAction
-    v-if="knowledgeType === KNOWLEDGE_TYPE.WEB || knowledgeType === KNOWLEDGE_TYPE.LARK"
-    :label="batch ? '同步文档' : '同步'"
-    icon="icon_refresh_outlined"
-    :disabled="loading || !documents.length"
-    @click="handleSync"
-  />
+  <MkAction :label="batch ? '同步文档' : '同步'" icon="icon_refresh_outlined" @click="handleSync" />
 </template>

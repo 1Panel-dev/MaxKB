@@ -227,7 +227,7 @@ onMounted(() => loadChatUsers())
                 <!-- 修改用户密码 -->
                 <ButtonChangeUserPassword :user="row" @refresh="loadChatUsers(false)" />
                 <!-- 更多 -->
-                <MkTableMoreDropdown persistent>
+                <MkTableMoreDropdown>
                   <!-- 配额设置 -->
                   <ButtonQuotaSettings v-if="perm.system.chatUser.quotaSetting()" :user-ids="row.id" dropdown @refresh="loadChatUsers()" />
                   <!-- 删除 -->

@@ -118,13 +118,7 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="状态" width="150">
           <template #header>
-            <MkTableFilter
-              mode="multiple"
-              v-model="selectedStatusType"
-              label="状态"
-              :options="applicationStatusOptions"
-              @change="handleFilterChange"
-            />
+            <MkTableFilter mode="single" v-model="selectedStatusType" label="状态" :options="applicationStatusOptions" @change="handleFilterChange" />
           </template>
           <template #default="{ row }">
             <MkStatusLabel :active="row.is_publish" active-text="已发布" inactive-text="未发布" inactive-icon="icon_time_filled" />
@@ -145,9 +139,8 @@ onMounted(() => {
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
-              <MkTableMoreDropdown persistent>
-                <!-- TODO 对话&管理 -->
-
+              <!-- TODO 对话&管理 -->
+              <MkTableMoreDropdown>
                 <!-- 资源授权 -->
                 <AuthorizeApplicationAction label="资源授权" :application="row" />
                 <!-- 智能体触发器 -->
