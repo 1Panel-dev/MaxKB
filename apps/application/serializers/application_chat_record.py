@@ -153,6 +153,34 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
         return result
 
     @staticmethod
+    def execution_order_key(item):
+        # ChatRecord.details is stored as PostgreSQL jsonb, which does not
+        # preserve object key order, so a details dict read back from the
+        # database is no longer in node execution order. Every node records
+        # its execution sequence in "index" (see INode.get_details), so sort
+        # by it; entries without an index are auxiliary records (e.g.
+        # problem_padding) and keep their stored order after the indexed ones.
+        index = item.get("index") if isinstance(item, dict) else None
+        return (index is None, index if isinstance(index, int) else 0)
+
+    @staticmethod
+    def sort_loop_node_iterations(execution_details):
+        # Per-iteration dicts of a loop node are keyed by runtime_node_id and
+        # suffer from the same jsonb key-order loss; restore the inner
+        # execution order too.
+        for item in execution_details:
+            loop_node_data = item.get("loop_node_data") if isinstance(item, dict) else None
+            if isinstance(loop_node_data, list):
+                for i, iteration in enumerate(loop_node_data):
+                    if isinstance(iteration, dict):
+                        loop_node_data[i] = dict(
+                            sorted(
+                                iteration.items(),
+                                key=lambda kv: ApplicationChatRecordQuerySerializers.execution_order_key(kv[1]),
+                            )
+                        )
+
+    @staticmethod
     def reset_chat_record(chat_record, show_source, show_exec):
         knowledge_list = []
         paragraph_list = []
@@ -214,6 +242,11 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
                 if (True if show_exec else chat_record.details[key].get("type") == "start-node")
             ]
         }
+        # A details dict read back from the database is in PostgreSQL jsonb key
+        # order, not execution order (the debug window reads the in-memory
+        # cache and is unaffected); restore the execution order before output.
+        show_exec_dict["execution_details"].sort(key=ApplicationChatRecordQuerySerializers.execution_order_key)
+        ApplicationChatRecordQuerySerializers.sort_loop_node_iterations(show_exec_dict["execution_details"])
         return {
             **ChatRecordSerializerModel(chat_record).data,
             "padding_problem_text": chat_record.details.get("problem_padding").get("padding_problem_text")
