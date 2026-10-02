@@ -338,6 +338,9 @@ const validate = () => {
   }
 
   const fieldList = props.nodeModel.properties?.user_input_field_list || []
+  const globalFields =
+    props.nodeModel.get_up_node_field_list(true, true).find((node: any) => node.value === 'global')
+      ?.children || []
   for (const field of fieldList) {
     for (const cond of field.visibility_rules?.conditions || []) {
       if (!cond.field || cond.field.length < 2 || !cond.field[0] || !cond.field[1]) continue
@@ -345,7 +348,11 @@ const validate = () => {
         cond.field[0] === props.nodeModel.id ||
         (props.nodeModel.id === 'base-node' && cond.field[0] === 'global')
       if (isCurrentNode) {
-        if (!fieldList.some((f: any) => f.field === cond.field[1])) {
+        const exists =
+          cond.field[0] === 'global'
+            ? globalFields.some((f: any) => f.value === cond.field[1])
+            : fieldList.some((f: any) => f.field === cond.field[1])
+        if (!exists) {
           return Promise.reject({
             node: props.nodeModel,
             errMessage: t('workflow.variable.NoReferencing'),
