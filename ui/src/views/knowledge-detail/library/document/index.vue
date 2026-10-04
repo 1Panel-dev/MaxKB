@@ -396,14 +396,14 @@ onBeforeUnmount(() => {
                 @refresh="refreshAfterOperation"
               />
               <!-- 设置文档标签 -->
-              <DocumentTagsAction
+              <!-- <DocumentTagsAction
                 :api="DocumentApi"
                 :knowledge-id="knowledgeId"
                 :document-ids="[row.id]"
                 manage-tags
                 :disabled="operationLoading"
                 @refresh="refreshAfterOperation"
-              />
+              /> -->
               <!-- 同步 -->
               <SyncDocumentAction
                 v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK"
@@ -503,7 +503,7 @@ onBeforeUnmount(() => {
       />
 
       <!-- 批量添加标签 -->
-      <el-button>添加标签</el-button>
+      <!-- <el-button>添加标签</el-button> -->
 
       <!-- 更多批量操作 -->
       <MkDropdown class="ml-3" trigger="click" placement="bottom-end" hide-when-empty persistent>
