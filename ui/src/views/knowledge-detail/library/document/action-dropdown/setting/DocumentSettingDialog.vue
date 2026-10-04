@@ -69,32 +69,50 @@ defineExpose({ open, close })
         <el-form-item label="文档地址" prop="source_url" :rules="[{ required: true, whitespace: true, message: '请输入文档地址', trigger: 'blur' }]">
           <el-input v-model="form.source_url" />
         </el-form-item>
-        <el-form-item label="选择器"><el-input v-model="form.selector" placeholder="默认为 body，可输入 .classname/#idname/tagname"/></el-form-item>
+        <el-form-item label="选择器"><el-input v-model="form.selector" placeholder="默认为 body，可输入 .classname/#idname/tagname" /></el-form-item>
       </template>
-      <el-form-item label="召回处理">
+      <el-form-item>
+        <template #label>
+          <span class="flex-align-center gap-1">
+            <span>召回处理</span>
+            <MkTooltip placement="right" content="用户提问时，命中文档下的分段时按照设置的方式进行处理。">
+              <MkIcon name="icon_info_outlined" class="text-N600!" />
+            </MkTooltip>
+          </span>
+        </template>
         <el-radio-group v-model="form.hit_handling_method">
           <template v-for="(label, value) in DOCUMENT_HIT_HANDLING_LABELS" :key="value">
             <el-radio :value="value">{{ label }}</el-radio>
           </template>
         </el-radio-group>
       </el-form-item>
-      <el-form-item v-if="form.hit_handling_method === DOCUMENT_HIT_HANDLING.DIRECTLY_RETURN" label="相似度阈值">
-        <el-input-number
-          v-model="form.directly_return_similarity"
-          :min="0"
-          :max="1"
-          :precision="3"
-          :step="0.1"
-          :value-on-clear="0"
-          controls-position="right"
-          align="left"
-        />
+
+      <el-form-item class="-mt-3" v-if="form.hit_handling_method === DOCUMENT_HIT_HANDLING.DIRECTLY_RETURN">
+        <div class="w-full mk-gray-card-lg">
+          <div class="flex-align-center gap-2">
+            <span>相似度高于</span>
+            <el-input-number
+              v-model="form.directly_return_similarity"
+              :min="0"
+              :max="1"
+              :precision="3"
+              :step="0.1"
+              :value-on-clear="0"
+              controls-position="right"
+              align="left"
+              class="w-40!"
+            />
+            <span>直接返回分段内容</span>
+          </div>
+        </div>
       </el-form-item>
-      <el-checkbox v-model="form.allow_download">{{ knowledgeType === KNOWLEDGE_TYPE_KEY.WEB ? '允许预览' : '允许下载' }}</el-checkbox>
+      <el-checkbox v-model="form.allow_download">
+        {{ knowledgeType === KNOWLEDGE_TYPE_KEY.WEB ? '允许在知识来源中预览' : '允许在知识来源中下载' }}
+      </el-checkbox>
     </el-form>
     <template #footer>
       <!-- 取消文档设置 -->
-      <el-button :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
       <!-- 保存文档设置 -->
       <el-button type="primary" :loading="loading" @click="handleSubmit">确认</el-button>
     </template>

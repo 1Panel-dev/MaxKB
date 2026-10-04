@@ -41,7 +41,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
               {
                 path: 'tag',
                 name: 'workspace-knowledge-tag',
-                component: () => import('@/views/knowledge-detail/library/tag/index.vue'),
+                component: () => import('@/views/knowledge-detail/library/tags/index.vue'),
                 meta: { title: '标签管理', order: 30 },
               },
             ],
