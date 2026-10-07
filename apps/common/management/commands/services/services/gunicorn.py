@@ -29,6 +29,9 @@ class GunicornService(BaseService):
             '--max-requests-jitter', '2048',
             '--timeout', '30',
             '--graceful-timeout', '300',
+            # gunicorn's default of 4094 bytes rejects long-but-legitimate request
+            # lines (e.g. hundreds of knowledge_ids[] params); 8190 is the max it accepts.
+            '--limit-request-line', '8190',
             '--access-logformat', log_format,
             '--access-logfile', '/dev/null',
             '--error-logfile', '-'
