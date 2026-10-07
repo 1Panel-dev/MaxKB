@@ -34,7 +34,14 @@ builtins.__import__ = TorchBlocker()
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'maxkb.settings')
 os.environ['TIKTOKEN_CACHE_DIR'] = '/opt/maxkb-app/model/tokenizer/openai-tiktoken-cl100k-base'
-csv.field_size_limit(sys.maxsize)
+# csv.field_size_limit 在 Windows 上为 32 位 C long，直接传 sys.maxsize 会 OverflowError，需逐步回退
+_csv_field_size_limit = sys.maxsize
+while True:
+    try:
+        csv.field_size_limit(_csv_field_size_limit)
+        break
+    except OverflowError:
+        _csv_field_size_limit = int(_csv_field_size_limit / 10)
 application = get_wsgi_application()
 
 

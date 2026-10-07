@@ -106,7 +106,7 @@ class XlsxSplitHandle(BaseSplitHandle):
 
         return data
 
-    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
+    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image, split_mode=None):
         buffer = get_buffer(file)
         try:
             validate_xlsx_buffer(io.BytesIO(buffer))

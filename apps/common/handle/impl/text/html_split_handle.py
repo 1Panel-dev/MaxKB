@@ -50,7 +50,7 @@ class HTMLSplitHandle(BaseSplitHandle):
             a.unwrap()
         return str(soup)
 
-    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
+    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image, split_mode=None):
         buffer = get_buffer(file)
         if type(limit) is str:
             limit = int(limit)

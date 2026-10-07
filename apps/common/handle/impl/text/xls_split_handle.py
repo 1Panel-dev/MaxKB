@@ -57,7 +57,7 @@ def handle_sheet(file_name, sheet, limit: int):
 
 
 class XlsSplitHandle(BaseSplitHandle):
-    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
+    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image, split_mode=None):
         buffer = get_buffer(file)
         try:
             if type(limit) is str:

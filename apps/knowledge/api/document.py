@@ -43,6 +43,11 @@ class DocumentSplitAPI(APIMixin):
                     'with_filter': {
                         'type': 'boolean',
                         'description': '是否清除特殊字符'
+                    },
+                    'split_mode': {
+                        'type': 'string',
+                        'enum': ['intelligent', 'advanced'],
+                        'description': '分段模式：智能分段优先目录，高级分段使用自定义规则；省略时保留原有行为'
                     }
                 }
             }

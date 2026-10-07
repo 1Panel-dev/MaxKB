@@ -196,7 +196,7 @@ class DocSplitHandle(BaseSplitHandle):
              for element
              in elements])
 
-    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
+    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image, split_mode=None):
         file_name = os.path.basename(file.name)
         try:
             if type(limit) is str:

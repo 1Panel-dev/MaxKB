@@ -1,0 +1,4 @@
+paddleocr==3.3.2
+paddlepaddle==3.2.2
+pypdf==6.16.1
+pypdfium2==4.30.0

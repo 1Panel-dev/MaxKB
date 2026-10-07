@@ -20,6 +20,7 @@ from pypdf import PdfReader
 from pypdf.generic import Destination
 
 from common.handle.base_split_handle import BaseSplitHandle
+from common.handle.impl.text.pdf_ocr import PdfOcrError, ocr_enabled, recognize_pdf_page
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import SplitModel, smart_split_paragraph
 from knowledge.models import File
@@ -57,10 +58,12 @@ class PdfSplitHandle(BaseSplitHandle):
         limit: int,
         get_buffer,
         save_image,
+        split_mode=None,
     ):
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             # 将上传的文件保存到临时文件中
-            for chunk in file.chunks():
+            chunks = file.chunks() if hasattr(file, "chunks") else iter(lambda: file.read(64 * 1024), b"")
+            for chunk in chunks:
                 temp_file.write(chunk)
             # 获取临时文件的路径
             temp_file_path = temp_file.name
@@ -72,13 +75,18 @@ class PdfSplitHandle(BaseSplitHandle):
                     limit = int(limit)
                 if type(with_filter) is str:
                     with_filter = with_filter.lower() == "true"
+                # 用户显式分段规则优先于 PDF 目录和内部链接。
+                has_user_pattern = pattern_list is not None and len(pattern_list) > 0
                 # 处理有目录的pdf
-                result = self.handle_toc(pdf_document, limit)
+                use_structure = not has_user_pattern and split_mode != "advanced" and not (
+                    ocr_enabled() and any(self.page_needs_ocr(page) for page in pdf_document.pages)
+                )
+                result = self.handle_toc(pdf_document, limit) if use_structure else None
                 if result is not None:
                     return {"name": file.name, "content": result}
 
                 # 没目录但是有链接的pdf
-                result = self.handle_links(pdf_document, pattern_list, with_filter, limit)
+                result = self.handle_links(pdf_document, pattern_list, with_filter, limit) if use_structure else None
                 if result is not None and len(result) > 0:
                     return {"name": file.name, "content": result}
 
@@ -89,6 +97,8 @@ class PdfSplitHandle(BaseSplitHandle):
                     split_model = SplitModel(pattern_list, with_filter, limit)
                 else:
                     split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
+        except PdfOcrError:
+            raise
         except BaseException as e:
             maxkb_logger.error(f"File: {file.name}, error: {e}, {traceback.format_exc()}")
             return {"name": file.name, "content": []}
@@ -103,8 +113,13 @@ class PdfSplitHandle(BaseSplitHandle):
         # 第一步:收集所有字体大小
         font_sizes = []
         page_lines = []
-        for page in pdf_document.pages:
+        ocr_pages = set()
+        for page_number, page in enumerate(pdf_document.pages, 1):
             lines = PdfSplitHandle.extract_page_lines(page)
+            if ocr_enabled() and PdfSplitHandle.page_needs_ocr(page):
+                text = recognize_pdf_page(pdf_document, page_number)
+                lines = [(line.strip(), 0) for line in text.splitlines() if line.strip()]
+                ocr_pages.add(page_number - 1)
             page_lines.append(lines)
             for line_text, font_size in lines:
                 if line_text and font_size > 0:
@@ -138,7 +153,11 @@ class PdfSplitHandle(BaseSplitHandle):
                 else:  # 正文
                     content += f"{text}\n"
 
-            for image_index in range(PdfSplitHandle.get_page_image_count(page)):
+            # Keep OCR pages separated without attaching their original scan images.
+            if page_num in ocr_pages:
+                content += "\n"
+            image_count = 0 if page_num in ocr_pages else PdfSplitHandle.get_page_image_count(page)
+            for image_index in range(image_count):
                 try:
                     image = page.images[image_index]
                 except Exception as e:
@@ -200,6 +219,13 @@ class PdfSplitHandle(BaseSplitHandle):
             return len(page.images)
         except BaseException:
             return 0
+
+    @staticmethod
+    def page_needs_ocr(page):
+        return (
+            len(PdfSplitHandle.extract_page_text(page).strip()) < 20
+            and PdfSplitHandle.get_page_image_count(page) > 0
+        )
 
     @staticmethod
     def extract_page_text(page):
@@ -626,6 +652,8 @@ class PdfSplitHandle(BaseSplitHandle):
             with open(temp_file_path, "rb") as pdf_file:
                 pdf_document = PdfReader(pdf_file)
                 return self.handle_pdf_content(file, pdf_document, save_image)
+        except PdfOcrError:
+            raise
         except BaseException as e:
             traceback.print_exception(e)
             return f"{e}"

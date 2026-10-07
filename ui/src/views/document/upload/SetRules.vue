@@ -189,6 +189,7 @@ function changeHandle(val: boolean) {
 function splitDocument() {
   loading.value = true
   const fd = new FormData()
+  fd.append('split_mode', radio.value === '2' ? 'advanced' : 'intelligent')
   documentsFiles.value.forEach((item) => {
     if (item?.raw) {
       fd.append('file', item?.raw)

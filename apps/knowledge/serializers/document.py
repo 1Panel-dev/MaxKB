@@ -195,6 +195,9 @@ class DocumentEditInstanceSerializer(serializers.Serializer):
 
 class DocumentSplitRequest(serializers.Serializer):
     file = serializers.ListField(required=True, label=_("file list"))
+    split_mode = serializers.ChoiceField(
+        choices=["intelligent", "advanced"], required=False, label=_("split mode")
+    )
     limit = serializers.IntegerField(required=False, label=_("limit"))
     patterns = serializers.ListField(
         required=False, child=serializers.CharField(required=True, label=_("patterns")), label=_("patterns")
@@ -1231,6 +1234,7 @@ class DocumentSerializers(serializers.Serializer):
                         instance.get("patterns", None),
                         instance.get("with_filter", None),
                         instance.get("limit", 4096),
+                        instance.get("split_mode", None),
                     )
                     for f in file_list
                 ],
@@ -1252,7 +1256,7 @@ class DocumentSerializers(serializers.Serializer):
                     file.source_id = self.data.get("knowledge_id")
                     file.save(file_bytes)
 
-        def file_to_paragraph(self, file, pattern_list: List, with_filter: bool, limit: int):
+        def file_to_paragraph(self, file, pattern_list: List, with_filter: bool, limit: int, split_mode=None):
             # 保存源文件
             file_id = uuid.uuid7()
             raw_file = File(
@@ -1268,14 +1272,18 @@ class DocumentSerializers(serializers.Serializer):
             get_buffer = FileBufferHandle().get_buffer
             for split_handle in split_handles:
                 if split_handle.support(file, get_buffer):
-                    result = split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, self.save_image)
+                    result = split_handle.handle(
+                        file, pattern_list, with_filter, limit, get_buffer, self.save_image, split_mode=split_mode
+                    )
                     if isinstance(result, list):
                         for item in result:
                             item["source_file_id"] = file_id
                         return result
                     result["source_file_id"] = file_id
                     return [result]
-            result = default_split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, self.save_image)
+            result = default_split_handle.handle(
+                file, pattern_list, with_filter, limit, get_buffer, self.save_image, split_mode=split_mode
+            )
             if isinstance(result, list):
                 for item in result:
                     item["source_file_id"] = file_id

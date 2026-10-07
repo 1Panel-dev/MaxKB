@@ -51,11 +51,13 @@ split_handles = [
 ]
 
 
-def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int, save_inner_image):
+def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int, save_inner_image, split_mode=None):
     get_buffer = FileBufferHandle().get_buffer
     for split_handle in split_handles:
         if split_handle.support(file, get_buffer):
-            return split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, save_inner_image)
+            return split_handle.handle(
+                file, pattern_list, with_filter, limit, get_buffer, save_inner_image, split_mode=split_mode
+            )
     raise Exception(_("Unsupported file format"))
 
 
@@ -144,7 +146,7 @@ def filter_image_file(result_list: list, image_list):
 
 
 class ZipSplitHandle(BaseSplitHandle):
-    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
+    def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image, split_mode=None):
         if type(limit) is str:
             limit = int(limit)
         if type(with_filter) is str:
@@ -165,7 +167,9 @@ class ZipSplitHandle(BaseSplitHandle):
                     try:
                         # 处理一下文件名
                         f.name = get_file_name(f.name)
-                        value = file_to_paragraph(f, pattern_list, with_filter, limit, save_image)
+                        value = file_to_paragraph(
+                            f, pattern_list, with_filter, limit, save_image, split_mode=split_mode
+                        )
                         if isinstance(value, list):
                             result = [*result, *value]
                         else:
