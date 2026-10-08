@@ -8,6 +8,7 @@
 """
 
 import base64
+import contextlib
 import json
 import re
 from functools import reduce
@@ -19,7 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage, AIMessageChunk
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.content import NodeInfo, Position, Content
@@ -218,6 +219,14 @@ class AIChatNode(INode):
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "ai-chat-node"
 
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self.async_runner = AsyncRunner()
+
+    def cancel(self):
+        self.async_runner.cancel()
+        super().cancel()
+
     def write(self, message: Content):
         super().write(message)
         if not self.data.get("messages"):
@@ -345,9 +354,15 @@ class AIChatNode(INode):
             message_list_with_system = [SystemMessage(system)] + message_list
 
             if stream:
-                r = chat_model.stream(message_list_with_system)
-                self._stream_response(
-                    r, chat_model, message_list_with_system, question.content, reasoning_content_id, text_content_id
+                self.async_runner.run_async(
+                    lambda: self._stream_response(
+                        chat_model.astream(message_list_with_system),
+                        chat_model,
+                        message_list_with_system,
+                        question.content,
+                        reasoning_content_id,
+                        text_content_id,
+                    )
                 )
             else:
                 r = chat_model.invoke(message_list_with_system)
@@ -370,40 +385,71 @@ class AIChatNode(INode):
                 videos = _process_videos(video, model)
         return HumanMessage(content=[*videos, *images, {"type": "text", "text": question_str}])
 
-    def _stream_response(self, response, chat_model, message_list, question, reasoning_content_id, text_content_id):
-        node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
-        model_setting = self.get_context("model_setting") or {}
-        reasoning = Reasoning(
-            model_setting.get("reasoning_content_start", "<think>"),
-            model_setting.get("reasoning_content_end", "</think>"),
-        )
-        answer = ""
-        reasoning_content = ""
-        response_reasoning_content = False
+    async def _stream_response(
+        self, response, chat_model, message_list, question, reasoning_content_id, text_content_id
+    ):
+        try:
+            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
+            model_setting = self.get_context("model_setting") or {}
+            reasoning = Reasoning(
+                model_setting.get("reasoning_content_start", "<think>"),
+                model_setting.get("reasoning_content_end", "</think>"),
+            )
+            answer = ""
+            reasoning_content = ""
+            response_reasoning_content = False
 
-        for chunk in response:
-            self._check_cancelled()
-            reasoning_chunk = reasoning.get_reasoning_content(chunk)
-            content_chunk = reasoning_chunk.get("content")
-            if "reasoning_content" in chunk.additional_kwargs:
-                response_reasoning_content = True
-                reasoning_content_chunk = chunk.additional_kwargs.get("reasoning_content", "")
-            else:
-                reasoning_content_chunk = reasoning_chunk.get("reasoning_content")
-            answer += content_chunk
-            if reasoning_content_chunk is None:
-                reasoning_content_chunk = ""
-            reasoning_content += reasoning_content_chunk
-            reasoning_end = False
-            if content_chunk:
-                if not reasoning_end:
+            async for chunk in response:
+                self._check_cancelled()
+                reasoning_chunk = reasoning.get_reasoning_content(chunk)
+                content_chunk = reasoning_chunk.get("content")
+                if "reasoning_content" in chunk.additional_kwargs:
+                    response_reasoning_content = True
+                    reasoning_content_chunk = chunk.additional_kwargs.get("reasoning_content", "")
+                else:
+                    reasoning_content_chunk = reasoning_chunk.get("reasoning_content")
+                answer += content_chunk
+                if reasoning_content_chunk is None:
+                    reasoning_content_chunk = ""
+                reasoning_content += reasoning_content_chunk
+                reasoning_end = False
+                if content_chunk:
+                    if not reasoning_end:
+                        self.write(
+                            ReasoningContent(
+                                reasoning_content_id, "", Status.SUCCESS, node_info, Position(self.get_node_id())
+                            )
+                        )
                     self.write(
-                        ReasoningContent(
-                            reasoning_content_id, "", Status.SUCCESS, node_info, Position(self.get_node_id())
+                        TextContent(
+                            text_content_id, content_chunk, Status.RUNNING, node_info, Position(self.get_node_id())
                         )
                     )
+                if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
+                    self.write(
+                        ReasoningContent(
+                            reasoning_content_id,
+                            reasoning_content_chunk,
+                            Status.RUNNING,
+                            node_info,
+                            Position(self.get_node_id()),
+                        )
+                    )
+
+            reasoning_end = reasoning.get_end_reasoning_content()
+            answer += reasoning_end.get("content")
+            reasoning_content_chunk = ""
+            if not response_reasoning_content:
+                reasoning_content_chunk = reasoning_end.get("reasoning_content")
+            if reasoning_end.get("content"):
                 self.write(
-                    TextContent(text_content_id, content_chunk, Status.RUNNING, node_info, Position(self.get_node_id()))
+                    TextContent(
+                        text_content_id,
+                        reasoning_end.get("content"),
+                        Status.RUNNING,
+                        node_info,
+                        Position(self.get_node_id()),
+                    )
                 )
             if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
                 self.write(
@@ -416,33 +462,11 @@ class AIChatNode(INode):
                     )
                 )
 
-        reasoning_end = reasoning.get_end_reasoning_content()
-        answer += reasoning_end.get("content")
-        reasoning_content_chunk = ""
-        if not response_reasoning_content:
-            reasoning_content_chunk = reasoning_end.get("reasoning_content")
-        if reasoning_end.get("content"):
-            self.write(
-                TextContent(
-                    text_content_id,
-                    reasoning_end.get("content"),
-                    Status.RUNNING,
-                    node_info,
-                    Position(self.get_node_id()),
-                )
-            )
-        if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
-            self.write(
-                ReasoningContent(
-                    reasoning_content_id,
-                    reasoning_content_chunk,
-                    Status.RUNNING,
-                    node_info,
-                    Position(self.get_node_id()),
-                )
-            )
-
-        self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
+            self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
+        # 无论正常结束、抛异常还是被取消中断,都关闭 LLM 流式响应底层连接
+        finally:
+            with contextlib.suppress(Exception):
+                await response.aclose()
 
     def _invoke_response(self, response, chat_model, message_list, question, is_result=False, text_content_id=None):
         model_setting = self.get_context("model_setting") or {}

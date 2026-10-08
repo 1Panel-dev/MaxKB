@@ -14,17 +14,11 @@ from typing import Optional, Type, Callable
 
 from rest_framework import serializers
 
-from application.workflow.common import Node
+from application.workflow.common import CancelledException, Node
 from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.progress_content import ProgressContent
 from application.workflow.status import Status
 from common.utils.logger import maxkb_logger
-
-
-class CancelledException(Exception):
-    """工作流取消异常"""
-
-    pass
 
 
 class Signal(str, Enum):

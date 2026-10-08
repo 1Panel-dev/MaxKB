@@ -12,8 +12,8 @@ import traceback
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
-from application.workflow.i_node import CancelledException, INode
+from application.workflow.common import CancelledException, WorkflowType
+from application.workflow.i_node import INode
 from common.utils.fork import ChildLink, Fork, ForkManage
 from common.utils.logger import maxkb_logger
 

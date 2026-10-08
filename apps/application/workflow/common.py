@@ -7,6 +7,9 @@
 @desc:
 """
 
+import asyncio
+import contextlib
+import threading
 from enum import Enum
 from typing import List, Dict
 
@@ -246,3 +249,52 @@ def new_instance(flow_obj: Dict, workflow_type: WorkflowType = WorkflowType.APPL
     nodes = [Node(node.get("id"), node.get("type"), **node) for node in nodes]
     edges = [Edge(edge.get("id"), edge.get("type"), **edge) for edge in edges]
     return Workflow(nodes, edges)
+
+
+class CancelledException(Exception):
+    """工作流取消异常"""
+
+    pass
+
+
+class AsyncRunner:
+    """跨线程取消感知地运行异步协程;cancel() 置位事件使阻塞中的流式中断并抛 CancelledException。"""
+
+    def __init__(self):
+        self.cancel_event = threading.Event()
+
+    def cancel(self):
+        """请求取消(任意线程可调);只置旗标,真正中断发生在事件循环内。"""
+        self.cancel_event.set()
+
+    def run_async(self, async_factory):
+        """在独立事件循环里运行 async_factory() 的协程;被取消则抛 CancelledException。"""
+        return asyncio.run(self.await_or_cancel(async_factory()))
+
+    async def _wait_cancel(self):
+        # 轮询取消旗标,置位即结束,充当竞速对手
+        while not self.cancel_event.is_set():
+            await asyncio.sleep(0)
+
+    async def await_or_cancel(self, _async):
+        """竞速等待:流式完成返回其结果;取消先到则抛 CancelledException。"""
+
+        # 真正要跑的流式协程,包成 task 才能与 waiter 一起放进 asyncio.wait
+        stream = asyncio.create_task(_async)
+        # 把"是否已取消"伪装成一个可等待的 task,充当 stream 的竞速对手。
+        waiter = asyncio.create_task(self._wait_cancel())
+        # 同时等两个 task,谁先完成(返回)谁进入 done;FIRST_COMPLETED = 取先到者。
+        done, _ = await asyncio.wait({stream, waiter}, return_when=asyncio.FIRST_COMPLETED)
+        # stream_done 为真 -> 流式自己先跑完;为假 -> 是 waiter 先完成,即取消先到。
+        stream_done = stream in done
+        # 无论谁赢,都把两个 task cancel 并等它们退干净,防止"输掉的那一方"
+        # 还悬在事件循环里。await 吞掉 CancelledError(取消是本意,不算错误)。
+        for task in (stream, waiter):
+            task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
+
+        # 流式正常结束:把它的返回值交给调用方。
+        if stream_done:
+            return stream.result()
+        raise CancelledException()

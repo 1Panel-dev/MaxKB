@@ -273,6 +273,10 @@ class WorkflowManage:
             return None
 
     def cancel(self):
-        self.signal = Signal.CANCELLED
-        for node in self.nodes:
+        with self._lock:
+            if self.signal == Signal.CANCELLED:
+                return
+            self.signal = Signal.CANCELLED
+            nodes = list(self.nodes)
+        for node in nodes:
             node.cancel()
