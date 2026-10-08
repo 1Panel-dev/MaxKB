@@ -444,7 +444,7 @@ onBeforeUnmount(() => {
               /> -->
               <!-- 同步 -->
               <SyncDocumentAction
-                v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK"
+                v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE"
                 label="同步"
                 :api="DocumentApi"
                 :knowledge-id="knowledgeId"

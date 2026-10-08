@@ -231,7 +231,7 @@ function handleBatchDelete() {
                 <template v-if="!isShared" #action-dropdown>
                   <!-- 同步 -->
                   <SyncKnowledgeAction
-                    v-if="knowledge.type === KNOWLEDGE_TYPE.WEB"
+                    v-if="knowledge.type !== KNOWLEDGE_TYPE.BASE"
                     v-model:loading="knowledgeOperationLoading"
                     label="同步"
                     :api="KnowledgeApi"

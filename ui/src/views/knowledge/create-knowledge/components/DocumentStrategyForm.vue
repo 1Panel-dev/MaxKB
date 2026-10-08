@@ -3,9 +3,14 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { DocumentStrategy, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
 import ModelApi from '@/api/admin/workspace/model'
+import SystemResourceModelApi from '@/api/admin/system/resource-management/model'
+import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import ProviderApi from '@/api/admin/model-provider'
 import ToolApi from '@/api/admin/workspace/tool/tool'
+import SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import SelectModel from '@/components/business/select-model/index.vue'
+import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'DocumentStrategyForm' })
 
@@ -61,6 +66,16 @@ function getStrategy(): DocumentStrategy {
 }
 
 /* 视觉模型与工具选项 */
+const requestModelApi = computed(() => {
+  if (isSystemResource()) return SystemResourceModelApi
+  if (isSystemSharedResource()) return SystemSharedModelApi
+  return ModelApi
+})
+const requestToolApi = computed(() => {
+  if (isSystemResource()) return SystemResourceToolApi
+  if (isSystemSharedResource()) return SystemSharedToolApi
+  return ToolApi
+})
 const optionsLoading = ref(false)
 const modelOptions = ref<ModelItem[]>([])
 const providerOptions = ref<ModelProviderItem[]>([])
@@ -69,9 +84,9 @@ const selectedVisualTool = computed(() => toolOptions.value.find((tool) => tool.
 function loadOptions() {
   optionsLoading.value = true
   return Promise.all([
-    ModelApi.getModelListWithShared({ model_type: 'IMAGE' }),
+    requestModelApi.value.getModelListWithShared({ model_type: 'IMAGE' }),
     ProviderApi.getProviderList({ model_type: 'IMAGE' }),
-    ToolApi.getToolListWithShared(),
+    requestToolApi.value.getToolListWithShared(),
   ])
     .then(([models, providers, tools]) => {
       modelOptions.value = models

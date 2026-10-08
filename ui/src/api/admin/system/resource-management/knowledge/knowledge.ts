@@ -1,6 +1,6 @@
 import { del, get, getExportFile, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import type { Dict, KnowledgeDetail, KnowledgeItem, KnowledgeGeneratePayload } from '@/api/types'
+import type { Dict, KnowledgeDetail, KnowledgeItem, KnowledgeGeneratePayload, KnowledgeSyncType } from '@/api/types'
 
 const prefix = '/system/resource/knowledge'
 
@@ -39,7 +39,7 @@ const putReEmbeddingKnowledge = (knowledgeId: string) => {
 }
 
 /** 同步 Web 知识库。 */
-const putSyncWebKnowledge = (knowledgeId: string, syncType: 'replace' | 'complete') => {
+const putSyncWebKnowledge = (knowledgeId: string, syncType: KnowledgeSyncType) => {
   return put<undefined, boolean>(`${prefix}/${knowledgeId}/sync`, undefined, { sync_type: syncType })
 }
 

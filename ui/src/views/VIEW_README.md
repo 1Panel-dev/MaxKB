@@ -217,11 +217,14 @@ src/views/knowledge/
 直接调用 `putReEmbeddingKnowledge`，提交成功后提示“提交成功”；复用页面操作 loading，
 阻止重复提交并在请求结束后恢复，不额外增加权限判断或配置弹窗。
 `SyncKnowledgeAction` 仅在非共享 Web 知识库菜单展示，不增加权限判断。专属弹窗按需挂载、
-关闭后卸载，默认“替换同步”，也支持“整体同步”，并展示数据覆盖提示；调用
+关闭后卸载，默认“增量同步”，也支持“替换同步”和“整体同步”；增量同步提示跳过未更新文档、
+更新已变更文档的分段，其他方式展示数据覆盖提示；调用
 `putSyncWebKnowledge`，成功提示“同步任务发送成功”并关闭。复用页面操作 loading，
 提交期间禁止重复提交和关闭，失败保留弹窗与当前选择。
 `SettingKnowledgeAction` 暂不增加权限判断，点击后携带当前
-`workspaceId`、知识库 ID 和 `KNOWLEDGE_TYPE_MAP[knowledge.type]` 跳转 `workspace-knowledge-setting`；阻止事件冒泡，避免同时触发卡片详情跳转。
+`workspaceId`、知识库 ID 和 `KNOWLEDGE_TYPE_MAP[knowledge.type]`，通用类型跳转
+`workspace-knowledge-setting`，其他类型直接跳转 `workspace-knowledge-base-setting`；
+阻止事件冒泡，避免同时触发卡片详情跳转。
 “设置”之后依次组合 `KeywordIndexKnowledgeAction` 和 `McpConfigKnowledgeAction`，接收完整
 Knowledge API 并复用页面操作 loading。分词索引不增加确认弹窗，调用成功后只提示“操作成功”；
 MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需挂载、关闭后卸载。
@@ -245,6 +248,8 @@ MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需�
 通过 `doc_strategy` 提交；智能分段默认策略与后端一致，高级分段使用与触发器类型相同的卡片外壳，
 在选中卡片内展开配置，默认选择一级至四级标题标识、500–4096 分段长度、256 子块长度并开启自动清洗。
 分段标识支持自定义正则表达式，留空使用后端默认规则；启用视觉增强后必须选择模型或工具。
+视觉模型和工具选项按当前资源范围选择 Workspace、System 资源管理或 System 共享资源的完整 API，
+通过 `isSystemResource()`、`isSystemSharedResource()` 判断，供应商继续使用共用 Provider API。
 
 `ButtonCreateKnowledge` 内聚四类创建浮层 Ref 和打开动作，列表页传入目标 `folderId`，通过
 `refresh` 刷新列表。入口支持 `trigger` 插槽替换默认创建按钮，下拉使用 `persistent`。
@@ -448,7 +453,9 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `home/index.vue`                                                       | Workspace 首页                                                       |
 | `knowledge/index.vue`                                                  | 工作空间知识库目录与知识库卡片页面                                   |
 | `knowledge-detail/index.vue`                                           | 知识库详情页面                                                       |
-| `knowledge-detail/setting/index.vue`                                  | 知识库基本信息、来源配置与上传限制设置                               |
+| `knowledge-detail/setting/base/index.vue`                             | 知识库基本信息、来源配置与上传限制设置                               |
+| `knowledge-detail/setting/document-strategy/index.vue`                | Web 知识库文档处理策略占位页面                                       |
+| `knowledge-detail/setting/scheduled-sync/index.vue`                   | Web、飞书与工作流知识库定时同步占位页面                              |
 | `login/index.vue`                                                      | Admin 登录页面                                                       |
 | `login/forgot-password/index.vue`                                     | 忘记密码页面                                                         |
 | `model/index.vue`                                                      | 工作空间模型目录与模型卡片页面                                       |
@@ -694,7 +701,12 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 图片、标签管理及这五个页面暂只展示占位内容。
 容器通过 `knowledge-detail/context.ts` 提供只读详情与替换能力；设置页复用已加载详情，保存成功后
 更新容器数据，同步名称等展示。基本信息复用创建流程的 `KnowledgeBaseForm`，类型配置和校验留在
-设置页中。当前设置页仅接入 Workspace 路由和 API，暂不增加前端权限判断。
+`setting/base/index.vue` 中，通用知识库标题为“设置”，其他类型为“基础设置”。
+通用知识库只有单个设置菜单；Web 的设置分组包含基础设置、文档处理策略、定时同步，
+飞书和工作流包含基础设置、定时同步。`setting/document-strategy/` 与
+`setting/scheduled-sync/` 分别承接文档处理策略和定时同步，当前仅展示占位内容。
+设置菜单的类型筛选由路由维护，不在 View 中重复维护菜单。
+当前设置页仅接入 Workspace 路由和 API，暂不增加前端权限判断。
 更换向量模型需确认，先保存再重新向量化，整条流程禁止重复提交；向量化失败时保留原模型比较基准，
 允许再次保存重试。Web、飞书设置保留未编辑的 `meta` 字段，上传限制使用详情顶层值。
 `knowledge-detail/library/document/index.vue` 维护文档列表查询、多选和文档操作，使用 `MkComplexSearch`、`MkTable`。
