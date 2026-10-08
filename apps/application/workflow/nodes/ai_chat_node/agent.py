@@ -24,7 +24,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.checkpoint.memory import MemorySaver
 
 from application.workflow.backend.sandbox_shell import SandboxShellBackend
-from application.workflow.i_node import CancelledException
+from application.workflow.common import CancelledException
 from application.workflow.nodes.ai_chat_node.tools.skill import init_skills
 from maxkb.const import CONFIG
 
