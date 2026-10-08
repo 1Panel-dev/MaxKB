@@ -3,14 +3,9 @@ import type { BaseModelOption, DynamicFormField, ModelProviderItem, ModelTypeOpt
 
 const prefix = '/provider'
 
-/** 获取全部模型供应商。 */
-const getProviderList = () => {
-  return get<ModelProviderItem[]>(prefix)
-}
-
-/** 获取支持指定模型类型的供应商。 */
-const getProviderListByModelType = (modelType: string) => {
-  return get<ModelProviderItem[]>(prefix, { model_type: modelType })
+/** 获取模型供应商，可按模型类型筛选。 */
+const getProviderList = (query?: { model_type?: string }) => {
+  return get<ModelProviderItem[]>(prefix, query)
 }
 
 /** 获取创建模型所需的动态表单。 */
@@ -33,4 +28,4 @@ const getBaseModelList = (provider: string, modelType: string) => {
   return get<BaseModelOption[]>(`${prefix}/model_list`, { model_type: modelType, provider })
 }
 
-export default { getBaseModelList, getBaseModelParamsForm, getModelCreateForm, getModelTypeList, getProviderList, getProviderListByModelType }
+export default { getBaseModelList, getBaseModelParamsForm, getModelCreateForm, getModelTypeList, getProviderList }

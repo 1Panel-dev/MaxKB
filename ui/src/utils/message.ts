@@ -7,7 +7,7 @@ type MessageOverrides = Omit<Partial<MessageOptions>, 'message' | 'type'>
 type ConfirmContent = NonNullable<ElMessageBoxOptions['message']>
 type ConfirmOverrides = Omit<ElMessageBoxOptions, 'boxType' | 'message' | 'title'>
 
-const DEFAULT_MESSAGE_OPTIONS: MessageOverrides = { duration: 3_000, showClose: true }
+const DEFAULT_MESSAGE_OPTIONS: MessageOverrides = { duration: 3_000, showClose: true, grouping: true }
 
 function MKMessage(type: MessageType, message: MessageContent, options?: MessageOverrides) {
   return ElMessage({ ...DEFAULT_MESSAGE_OPTIONS, ...options, message, type })

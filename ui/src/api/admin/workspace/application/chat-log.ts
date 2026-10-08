@@ -30,10 +30,6 @@ const getChatRecordLog = (applicationId: string, chatId: string, page: ParamsPag
     order_asc: orderAsc,
   })
 
-/** 获取聊天记录详情。 */
-const getChatRecordDetails = (applicationId: string, chatId: string, chatRecordId: string) =>
-  get<Dict<unknown>>(`${getPrefix()}/${applicationId}/chat/${chatId}/chat_record/${chatRecordId}`)
-
 /** 获取聊天记录的标注段落。 */
 const getMarkChatRecord = (applicationId: string, chatId: string, chatRecordId: string) =>
   get<Dict<unknown>[]>(`${getPrefix()}/${applicationId}/chat/${chatId}/chat_record/${chatRecordId}/improve`)
@@ -67,7 +63,6 @@ export default {
   putChatLogCleanTime,
   postChatLogAddKnowledge,
   getChatRecordLog,
-  getChatRecordDetails,
   getMarkChatRecord,
   putChatRecordLog,
   deleteMarkChatRecord,

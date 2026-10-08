@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, provide, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
-import type { ToolWorkflowRecord } from '@/api/types'
+import type { ToolExecutionRecordDetail } from '@/api/types'
 import { MsgError } from '@/utils/message'
 import { ConversationStream } from '@/conversation-panel/core/stream'
 import { aggregators } from '@/conversation-panel/core/aggregators'
@@ -32,13 +32,13 @@ const running = defineModel<boolean>('running', { default: false })
 const visible = ref(false)
 const activeTab = ref('output')
 const blocks = ref<DebugBlock[]>([])
-const record = ref<ToolWorkflowRecord>()
+const record = ref<ToolExecutionRecordDetail>()
 const errorMessage = ref('')
 let inputParameters: Record<string, unknown> = {}
 let recordId = ''
 let stream: ConversationStream | undefined
-const executionDetails = computed(() => Object.values(record.value?.meta.details ?? {}))
-const output = computed(() => JSON.stringify(record.value?.meta.output ?? {}, null, 2))
+const executionDetails = computed(() => Object.values(record.value?.meta?.details ?? {}))
+const output = computed(() => JSON.stringify(record.value?.meta?.output ?? {}, null, 2))
 
 function receiveChunk(chunk: DebugChunk) {
   if (chunk.chat_record_id) recordId = chunk.chat_record_id
@@ -77,7 +77,7 @@ async function execute(extra: Record<string, unknown> = {}) {
     await stream.start()
     if (!visible.value) return
     if (streamError) throw streamError
-    const result = await (props.api ?? WorkflowApi).getToolWorkflowRecord(props.toolId, recordId)
+    const result = await (props.api ?? WorkflowApi).getToolExecutionRecordDetail(props.toolId, recordId)
     if (visible.value) record.value = result
   } catch (error) {
     if (visible.value) {

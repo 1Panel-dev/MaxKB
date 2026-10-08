@@ -7,7 +7,6 @@ import type {
   ToolExecutionRecord,
   ToolExecutionRecordDetail,
   ToolWorkflowDetail,
-  ToolWorkflowRecord,
   WorkflowStoreTemplate,
   WorkflowVersion,
   WorkflowVersionPayload,
@@ -43,9 +42,6 @@ const putToolWorkflowPublish = (toolId: string) => {
 const postToolWorkflowDebug = (toolId: string, parameters: Record<string, unknown>) =>
   postStream(ADMIN_API_BASE_PATH, `${getPrefix()}/${toolId}/debug`, parameters)
 
-/** 查询工具工作流调试的输出和节点执行记录。 */
-const getToolWorkflowRecord = (toolId: string, recordId: string) => get<ToolWorkflowRecord>(`${getPrefix()}/${toolId}/tool_record/${recordId}`)
-
 /** 获取工具发布历史，按发布时间倒序返回完整版本快照。 */
 const getWorkflowVersions = (toolId: string) => get<WorkflowVersion[]>(`${getPrefix()}/${toolId}/tool_version`)
 
@@ -72,5 +68,4 @@ export default {
   putToolWorkflow,
   putToolWorkflowPublish,
   postToolWorkflowDebug,
-  getToolWorkflowRecord,
 }

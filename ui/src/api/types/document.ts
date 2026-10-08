@@ -49,3 +49,6 @@ export interface DocumentItem {
   create_time: string
   update_time: string
 }
+
+/** 单个文档的局部更新字段。 */
+export type DocumentUpdatePayload = Partial<Pick<DocumentItem, 'name' | 'is_active' | 'hit_handling_method' | 'directly_return_similarity' | 'meta'>>

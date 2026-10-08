@@ -37,7 +37,7 @@ function handleSubmit(data: DocumentSettingPayload) {
   if (loading.value) return
   loading.value = true
   return props.api
-    .putDocumentSetting(targetKnowledgeId.value, targetDocumentId.value, data)
+    .putDocument(targetKnowledgeId.value, targetDocumentId.value, data)
     .then(() => {
       MsgSuccess('设置成功')
       settingDialogRef.value?.close()

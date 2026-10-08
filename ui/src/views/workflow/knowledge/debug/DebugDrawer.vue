@@ -2,6 +2,8 @@
 import { computed, nextTick, provide, ref, useTemplateRef, type Component } from 'vue'
 import type LogicFlow from '@logicflow/core'
 import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import FileApi from '@/api/admin/file'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { Dict } from '@/api/types'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import type { FormField } from '@/components/mk-dynamics-form'
@@ -18,7 +20,7 @@ type ActionStep = 'data_source' | 'knowledge_base' | 'result'
 const actionComponents: Record<ActionStep, Component> = { data_source: DataSource, knowledge_base: KnowledgeBase, result: Result }
 
 // mk-dynamics-form 的上传项通过 inject('upload') 获取上传函数；返回值的 data 为文件地址（末段即 file_id）。
-provide('upload', (file: File) => KnowledgeWorkflowApi.postKnowledgeUploadFile(props.knowledgeId, file).then((url) => ({ data: url })))
+provide('upload', (file: File) => FileApi.postUploadFile(file, props.knowledgeId, FILE_SOURCE_TYPE.KNOWLEDGE).request.then((url) => ({ data: url })))
 
 const visible = ref(false)
 const loading = ref(false)

@@ -44,7 +44,10 @@ const providerOptions = ref<ModelProviderItem[]>([])
 function loadModelOptions() {
   loading.value = true
   const requestModelApi = isSystemSharedResource() ? SystemSharedModelApi : ModelApi
-  return Promise.all([requestModelApi.getModelListWithShared({ model_type: 'EMBEDDING' }), ModelProviderApi.getProviderListByModelType('EMBEDDING')])
+  return Promise.all([
+    requestModelApi.getModelListWithShared({ model_type: 'EMBEDDING' }),
+    ModelProviderApi.getProviderList({ model_type: 'EMBEDDING' }),
+  ])
     .then(([models, providers]) => {
       modelOptions.value = models
       providerOptions.value = providers

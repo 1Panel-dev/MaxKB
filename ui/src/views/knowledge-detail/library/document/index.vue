@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { CascaderOption } from 'element-plus'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
+import MkEditName from '@/components/mk-edit-name/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
@@ -19,6 +20,7 @@ import { datetimeFormat } from '@/utils/time'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
+import { getFileIconUrl } from '@/utils/icon'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
 import {
@@ -70,6 +72,25 @@ function handleCreateDocument(name: string) {
     .finally(() => {
       loading.value = false
     })
+}
+
+/* 文档名称编辑 */
+function validateDocumentName(name: string): string | undefined {
+  if (/[:\\/?*\[\]]/.test(name)) {
+    return '文件名称不能包含以下特殊字符：: \\ / ? * [ ]'
+  }
+}
+
+function saveDocumentName(documentId: string, name: string): Promise<string> {
+  return DocumentApi.putDocument(knowledgeId.value, documentId, { name }).then((document) => {
+    // 轮询可能已替换行对象，按 ID 更新当前列表中的名称与更新时间。
+    const currentDocument = documentData.value.find(({ id }) => id === documentId)
+    if (currentDocument) {
+      currentDocument.name = document.name
+      currentDocument.update_time = document.update_time
+    }
+    return document.name
+  })
 }
 
 /* 文档筛选与分页查询 */
@@ -221,7 +242,7 @@ const operationLoading = ref(false)
 function handleChangeActive(document: DocumentItem) {
   if (operationLoading.value) return false
   operationLoading.value = true
-  return DocumentApi.putDocumentActive(knowledgeId.value, document.id, !document.is_active)
+  return DocumentApi.putDocument(knowledgeId.value, document.id, { is_active: !document.is_active })
     .then(() => {
       MsgSuccess('操作成功')
       return refreshAfterOperation().then(() => false)
@@ -276,7 +297,24 @@ onBeforeUnmount(() => {
 
     <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" reserve-selection />
 
-    <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip />
+    <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip>
+      <template #default="{ row }: { row: DocumentItem }">
+        <!-- 编辑文档名称 -->
+        <MkEditName
+          :key="row.id"
+          v-model="row.name"
+          :disabled="isWorkspaceSharedResource()"
+          :maxlength="128"
+          :validate="validateDocumentName"
+          :save="(name) => saveDocumentName(row.id, name)"
+        >
+          <template #prefix>
+            <img v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB" src="@/assets/file-type/web-link-icon.svg" alt="" class="size-5" />
+            <img v-else :src="getFileIconUrl(row.name)" alt="" class="size-5" />
+          </template>
+        </MkEditName>
+      </template>
+    </el-table-column>
 
     <el-table-column width="140">
       <template #header>

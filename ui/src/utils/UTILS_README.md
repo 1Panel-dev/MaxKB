@@ -102,8 +102,9 @@ MkTable、MkFormList 的排序优先使用其公开属性；普通列表再直�
 
 轻量反馈按需从 `utils/message.ts` 导入 `MsgSuccess`、`MsgInfo`、`MsgWarning` 或 `MsgError`，
 不要在业务代码和请求层直接调用 `ElMessage`。
-消息默认显示关闭按钮并在 `3000ms` 后关闭；特殊场景通过第二个参数覆盖 Element Plus 消息
-选项。确认操作统一按需导入 `MsgConfirm(title, message, options?)`，默认提供确认、取消按钮和
+消息默认显示关闭按钮、在 `3000ms` 后关闭，并通过 `grouping: true` 合并相同内容的消息；
+调用方无需重复传入。特殊场景通过第二个参数覆盖 Element Plus 消息选项，包括 `grouping: false`。
+确认操作统一按需导入 `MsgConfirm(title, message, options?)`，默认提供确认、取消按钮和
 warning 类型；输入和普通警告弹窗继续直接使用 `ElMessageBox`。
 
 ```ts
