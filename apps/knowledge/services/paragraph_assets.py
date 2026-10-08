@@ -9,6 +9,7 @@ from typing import Callable, Dict, Iterable, List, Optional
 import uuid_utils.compat as uuid
 from common.config.embedding_config import ModelManage
 from common.exception.app_exception import AppApiException
+from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
 from common.utils.ts_vecto_util import to_ts_vector
@@ -356,9 +357,11 @@ def resolve_visual_processor(
                 if field.get("name") in available
             }
             init_params = tool.init_params
-            if isinstance(init_params, str) and init_params.strip():
-                init_params = json.loads(init_params)
-            output = ToolExecutor().exec_code(tool.code, {**(init_params or {}), **params})
+            if isinstance(init_params, str):
+                init_params = json.loads(rsa_long_decrypt(init_params)) if init_params.strip() else {}
+            init_defaults = {field["field"]: field.get("default_value") for field in (tool.init_field_list or [])}
+            all_params = {**init_defaults, **(init_params or {}), **params}
+            output = ToolExecutor().exec_code(tool.code, all_params)
             if isinstance(output, dict):
                 return output
             return {"description": str(output)}
