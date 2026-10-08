@@ -2,10 +2,16 @@
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
+import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 
 defineOptions({ name: 'EmbeddingKnowledgeAction' })
 
-const props = defineProps<{ api: typeof KnowledgeApi; knowledge: KnowledgeItem; label: string }>()
+const props = defineProps<{
+  api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi
+  display?: 'menu' | 'button'
+  knowledge: KnowledgeItem
+  label: string
+}>()
 const loading = defineModel<boolean>('loading', { default: false })
 
 /* 知识库向量化 */
@@ -25,8 +31,11 @@ function handleEmbedding() {
 
 <template>
   <!-- 执行向量化 -->
-  <MkDropdownItem :disabled="loading" @click.stop="handleEmbedding">
-    <template #icon><MkIcon name="icon_sheet-datareference_outlined" /></template>
-    <span>{{ label }}</span>
-  </MkDropdownItem>
+  <MkAction
+    :display="display"
+    :label="label"
+    icon="icon_sheet-datareference_outlined"
+    :disabled="loading"
+    @click="handleEmbedding"
+  />
 </template>

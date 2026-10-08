@@ -2,10 +2,11 @@
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
+import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 
 defineOptions({ name: 'KeywordIndexKnowledgeAction' })
 
-const props = defineProps<{ api: typeof KnowledgeApi; knowledge: KnowledgeItem; label: string }>()
+const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
 const loading = defineModel<boolean>('loading', { default: false })
 
 /* 知识库分词索引 */
