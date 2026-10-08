@@ -75,7 +75,7 @@ defineExpose({ open, close })
         <template #label>
           <span class="flex-align-center gap-1">
             <span>召回处理</span>
-            <MkTooltip placement="right" content="用户提问时，命中文档下的分段时按照设置的方式进行处理。">
+            <MkTooltip placement="right" content="用户提问时，召回的分段按照设置进行处理。">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>

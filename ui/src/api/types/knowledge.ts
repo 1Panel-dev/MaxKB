@@ -101,10 +101,18 @@ export interface KnowledgeCreatePayload {
   type: KnowledgeType
 }
 
+/** Web 文档分段、视觉处理和索引策略。 */
+export interface DocumentStrategy {
+  split: { mode: 'smart' | 'advanced'; patterns: string[] | null; min_length: number; max_length: number; child_length: number; auto_clean: boolean }
+  visual: { enabled: boolean; strategy: 'model' | 'tool'; model_id: string | null; tool_id: string | null }
+  index: { title_as_question: boolean }
+}
+
 /** 创建 Web 知识库的站点配置。 */
 export interface WebKnowledgeCreatePayload extends KnowledgeCreatePayload {
   source_url: string
   selector: string
+  doc_strategy?: DocumentStrategy
 }
 
 /** 创建飞书知识库的应用配置。 */

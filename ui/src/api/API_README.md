@@ -601,3 +601,6 @@ Workspace 共享知识库详情由 `resourceScope: 'workspace-shared'` 选择上
 清除策略通过 PUT `batch_clean_time` 提交当前智能体的单元素 `id_list`、`clean_time`、
 `file_clean_time`，避免调用通用应用编辑流程；成功后页面刷新应用详情。
 聊天记录、标注、添加知识库接口保留在同一 API 文件，尚未接入本次日志列表页面。
+
+Web 知识库创建的 `WebKnowledgeCreatePayload.doc_strategy` 使用公共 `DocumentStrategy` 类型，
+包含 `split`、`visual` 和 `index`，字段与后端文档处理策略协议一致。

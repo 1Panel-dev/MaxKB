@@ -6,7 +6,7 @@ import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import CreateBaseKnowledgeDialog from '../create-knowledge/BaseKnowledgeDialog.vue'
-import CreateWebKnowledgeDialog from '../create-knowledge/WebKnowledgeDialog.vue'
+import CreateWebKnowledgeDrawer from '../create-knowledge/WebKnowledgeDrawer.vue'
 import CreateLarkKnowledgeDialog from '../create-knowledge/LarkKnowledgeDialog.vue'
 import CreateWorkflowKnowledgeDialog from '../create-knowledge/WorkflowKnowledgeDialog.vue'
 
@@ -48,7 +48,7 @@ function handleVisibleChange(visible: boolean) {
 
 /* 各类型知识库创建 */
 const createBaseKnowledgeDialogRef = useTemplateRef<InstanceType<typeof CreateBaseKnowledgeDialog>>('createBaseKnowledgeDialogRef')
-const createWebKnowledgeDialogRef = useTemplateRef<InstanceType<typeof CreateWebKnowledgeDialog>>('createWebKnowledgeDialogRef')
+const createWebKnowledgeDrawerRef = useTemplateRef<InstanceType<typeof CreateWebKnowledgeDrawer>>('createWebKnowledgeDrawerRef')
 const createLarkKnowledgeDialogRef = useTemplateRef<InstanceType<typeof CreateLarkKnowledgeDialog>>('createLarkKnowledgeDialogRef')
 
 const createWorkflowKnowledgeDialogRef = useTemplateRef<InstanceType<typeof CreateWorkflowKnowledgeDialog>>('createWorkflowKnowledgeDialogRef')
@@ -58,7 +58,7 @@ function handleCreateBaseKnowledge() {
 }
 
 function handleCreateWebKnowledge() {
-  createWebKnowledgeDialogRef.value?.open()
+  createWebKnowledgeDrawerRef.value?.open()
 }
 
 function handleCreateLarkKnowledge() {
@@ -165,7 +165,7 @@ function handleImportCreate(file: UploadFile) {
   </MkDropdown>
 
   <CreateBaseKnowledgeDialog ref="createBaseKnowledgeDialogRef" :folder-id="folderId" @refresh="emit('refresh')" />
-  <CreateWebKnowledgeDialog ref="createWebKnowledgeDialogRef" :folder-id="folderId" @refresh="emit('refresh')" />
+  <CreateWebKnowledgeDrawer ref="createWebKnowledgeDrawerRef" :folder-id="folderId" @refresh="emit('refresh')" />
   <CreateLarkKnowledgeDialog ref="createLarkKnowledgeDialogRef" :folder-id="folderId" @refresh="emit('refresh')" />
   <CreateWorkflowKnowledgeDialog ref="createWorkflowKnowledgeDialogRef" :folder-id="folderId" @refresh="emit('refresh')" />
 </template>
