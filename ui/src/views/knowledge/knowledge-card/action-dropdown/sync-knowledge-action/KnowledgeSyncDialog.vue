@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'KnowledgeSyncDialog' })
-const props = defineProps<{ api: typeof KnowledgeApi; knowledgeId: string }>()
+const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi; knowledgeId: string }>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ closed: [] }>()
 

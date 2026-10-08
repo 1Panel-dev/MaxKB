@@ -163,7 +163,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'knowledge',
           name: 'system-resource-knowledge',
-          component: () => import('@/views/system/index.vue'),
+          component: () => import('@/views/system/resource-management/knowledge/index.vue'),
           meta: { title: '知识库', order: 20, permission: perm.knowledge.system.read, next: 'system-resource-tools' },
         },
         {
