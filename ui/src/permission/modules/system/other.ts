@@ -1,7 +1,8 @@
 /** 系统「其他/关于」类按钮权限 → $perm.other.* */
 
 import { canSys } from '../../policy'
-import { PermissionConstants as P, hasPermission, RoleConstants, Compare} from '../../core'
+import { PermissionConstants as P, hasPermission, RoleConstants, Compare, hasEdition} from '../../core'
+import { Edition } from '@/permission/core/common'
 
 export default {
   /**
@@ -23,7 +24,7 @@ export default {
   /**
    * 系统「其他/关于」系统APIKey权限
    */
-  systemApiKey: () => hasPermission([RoleConstants.ADMIN,RoleConstants.WORKSPACE_MANAGE,P.SYSTEM_API_KEY_EDIT],Compare.OR),
+  systemApiKey: () => hasPermission([RoleConstants.ADMIN,RoleConstants.WORKSPACE_MANAGE,P.SYSTEM_API_KEY_EDIT],Compare.OR) && (hasEdition(Edition.PE)||hasEdition(Edition.EE)),
   /**
    * 系统「其他/关于」门户权限
    */

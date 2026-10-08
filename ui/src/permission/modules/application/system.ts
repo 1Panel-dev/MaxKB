@@ -57,7 +57,7 @@ const system = {
   /**
    * 系统「应用资源管理」（系统 > 资源管理 > 应用）只读权限
    * */
-  read: () => canSys(P.RESOURCE_APPLICATION_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.RESOURCE_APPLICATION_READ) && hasEdition(Edition.EE),
 }
 
 export default system

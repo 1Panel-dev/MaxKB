@@ -86,7 +86,7 @@ export const buildBaseResourcePermission = (permission: Permission, resourceId: 
 export const hasEdition=(edition:Edition)=>{
     const { auth } = useStore()
   if(edition==Edition.PE||edition==Edition.EE){
-    return auth.baseProfile?.license_is_valid
+    return auth.baseProfile?.license_is_valid && edition==auth.baseProfile?.edition
   }
   return true
 }

@@ -79,7 +79,7 @@ const system = {
   /**
    * 系统「知识库资源管理」（系统 > 资源管理 > 知识库）只读权限
    * */
-  read: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ) && hasEdition(Edition.EE),
 }
 
 export default system

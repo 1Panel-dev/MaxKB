@@ -7,6 +7,6 @@ export default {
   /**
    * 系统「首页」只读权限
    */
-  read: () => hasPermission([RoleConstants.ADMIN,P.HOMEPAGE_READ],Compare.OR) && hasEdition(Edition.PE),
+  read: () => hasPermission([RoleConstants.ADMIN,P.HOMEPAGE_READ],Compare.OR) && hasEdition(Edition.EE),
   export: () => hasPermission([RoleConstants.ADMIN,P.HOMEPAGE_EXPORT],Compare.OR)
 }

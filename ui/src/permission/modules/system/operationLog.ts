@@ -8,7 +8,7 @@ export default {
   /**
    * 系统「操作日志」只读权限
    */
-  read: () => canSys(P.OPERATION_LOG_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.OPERATION_LOG_READ) && (hasEdition(Edition.PE)||hasEdition(Edition.EE)),
   /**
    * 系统「操作日志」导出权限
    */

@@ -8,7 +8,7 @@ export default {
   /**
    * 系统「用户认证」只读权限
    */
-  read: () => canSys(P.LOGIN_AUTH_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.LOGIN_AUTH_READ) && (hasEdition(Edition.PE)||hasEdition(Edition.EE)),
   /**
    * 系统「用户认证」编辑权限
    */

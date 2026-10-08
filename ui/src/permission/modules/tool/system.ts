@@ -22,7 +22,7 @@ const system = {
   /**
    * 系统「工具资源管理」（系统 > 资源管理 > 工具）只读权限
    * */
-  read: () => canSys(P.RESOURCE_TOOL_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.RESOURCE_TOOL_READ) && hasEdition(Edition.EE),
   isShare: () => canSys(P.SHARED_TOOL_READ),
 
   // —— 工具资源 ——

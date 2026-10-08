@@ -19,7 +19,7 @@ const share = {
   /**
    * 系统「共享模型」（系统 > 共享 > 模型）只读权限
    */
-  read: () => canSys(P.SHARED_MODEL_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.SHARED_MODEL_READ) && hasEdition(Edition.EE),
 
   // —— 模型资源 ——
   create: () => canSys(P.SHARED_MODEL_CREATE),
