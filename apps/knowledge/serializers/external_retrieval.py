@@ -10,7 +10,7 @@ from maxkb.const import CONFIG
 class StrictSerializer(serializers.Serializer):
     def to_internal_value(self, data):
         if not isinstance(data, dict) or set(data) - set(self.fields):
-            raise serializers.ValidationError("Invalid or unknown fields.")
+            raise serializers.ValidationError({"non_field_errors": ["Invalid or unknown fields."]})
         return super().to_internal_value(data)
 
 
@@ -32,7 +32,7 @@ class RetrievalRequest(StrictSerializer):
 
     def to_internal_value(self, data):
         if isinstance(data, dict) and not isinstance(data.get("query_text"), str):
-            raise serializers.ValidationError("query_text must be a string.")
+            raise serializers.ValidationError({"query_text": ["query_text must be a string."]})
         return super().to_internal_value(data)
 
     def validate_similarity(self, value):
@@ -62,12 +62,13 @@ class ExternalServiceSerializer(serializers.Serializer):
     workspace_id = serializers.CharField()
     knowledge_id = serializers.UUIDField()
 
+    def get_knowledge_queryset(self, lock=False):
+        query = Knowledge.objects.select_for_update() if lock else Knowledge.objects.all()
+        return query.filter(id=self.validated_data["knowledge_id"], workspace_id=self.validated_data["workspace_id"])
+
     def get_knowledge(self, lock=False):
         self.is_valid(raise_exception=True)
-        query = Knowledge.objects.select_for_update() if lock else Knowledge.objects.all()
-        knowledge = query.filter(
-            id=self.validated_data["knowledge_id"], workspace_id=self.validated_data["workspace_id"]
-        ).first()
+        knowledge = self.get_knowledge_queryset(lock=lock).first()
         if knowledge is None:
             from common.exception.app_exception import NotFound404
 

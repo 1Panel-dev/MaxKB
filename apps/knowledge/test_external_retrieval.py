@@ -7,6 +7,7 @@ from uuid import UUID
 
 from django.test import RequestFactory, SimpleTestCase
 from django.urls import resolve
+from rest_framework.exceptions import ValidationError
 
 from chat.views.v3 import knowledge as views
 from knowledge.models import Knowledge, SourceType
@@ -43,6 +44,19 @@ class RetrievalSettingsTests(SimpleTestCase):
         self.assertTrue(ExternalServiceSettings(data={"enabled": True}).is_valid())
         for data in ({}, [], {"knowledge_id": KID}, {"authentication": None}):
             self.assertFalse(ExternalServiceSettings(data=data).is_valid())
+
+    def test_invalid_fields_produce_serializable_validation_errors(self):
+        for serializer_class, data in (
+            (ExternalServiceSettings, {"knowledge_id": KID}),
+            (ExternalServiceSettings, []),
+            (RetrievalRequest, {"query_text": 5}),
+            (RetrievalRequest, {"query_text": "hello", "user_id": UID}),
+        ):
+            with self.subTest(serializer=serializer_class.__name__, data=data):
+                serializer = serializer_class(data=data)
+                with self.assertRaises(ValidationError):
+                    serializer.is_valid(raise_exception=True)
+                self.assertIsInstance(json.loads(json.dumps(serializer.errors)), dict)
 
     def test_enabling_old_service_preserves_legacy_auth_until_explicitly_changed(self):
         item = knowledge()
