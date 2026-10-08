@@ -107,7 +107,7 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <ApplicationIcon :icon="row.icon" class="shrink-0" />
-              <span class="truncate" :title="row.name">{{ row.name }}</span>
+              <span class="truncate">{{ row.name }}</span>
             </div>
           </template>
         </el-table-column>

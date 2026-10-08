@@ -701,6 +701,10 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 搜索只提供名称 `name` 和创建者 `create_user`；创建者通过 Workspace `CommonApi.getAllUsers`
 加载，支持按 `nick_name` 远程搜索。列表使用 `documentData`、`paginationConfig`、`documentQuery`，
 查询方法为 `loadDocuments`，搜索处理为 `handleSearchChange`，搜索变化后回到第一页。
+文档名称列显式导入非全局 `MkEditName`，名称上限 128 字符，保存成功后按文档 ID 更新当前行的
+名称与更新时间；失败交由组件保留草稿。共享文档只读展示名称，列不叠加表格溢出提示。
+名称校验通过 `validate` 回调拒绝 `: \ / ? * [ ]`，命中任一字符时弹出提示并阻止保存。
+
 文档页通过 `onMounted` 加载文档列表，创建者选项在展开下拉或输入关键词时通过 `remoteMethod`
 按需加载，不在进入页面时预加载；其他列表页的同类创建者筛选遵循相同方式。不额外监听路由重置状态。切换工作空间
 整页加载并返回知识库列表；当前知识库与共享资源入口均从其他页面进入，挂载时初始化筛选和分页。

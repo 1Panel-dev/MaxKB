@@ -70,7 +70,7 @@ function loadOptions() {
   optionsLoading.value = true
   return Promise.all([
     ModelApi.getModelListWithShared({ model_type: 'IMAGE' }),
-    ProviderApi.getProviderListByModelType('IMAGE'),
+    ProviderApi.getProviderList({ model_type: 'IMAGE' }),
     ToolApi.getToolListWithShared(),
   ])
     .then(([models, providers, tools]) => {
@@ -137,6 +137,9 @@ defineExpose({ validate, getStrategy })
                       v-model="strategy.split.min_length"
                       :min="50"
                       :max="100000"
+                      :step="1"
+                      step-strictly
+                      :value-on-clear="50"
                       controls-position="right"
                       align="left"
                       class="min-w-0 flex-1"
@@ -146,6 +149,9 @@ defineExpose({ validate, getStrategy })
                       v-model="strategy.split.max_length"
                       :min="50"
                       :max="100000"
+                      :step="1"
+                      :value-on-clear="50"
+                      step-strictly
                       controls-position="right"
                       align="left"
                       class="min-w-0 flex-1"
@@ -163,8 +169,11 @@ defineExpose({ validate, getStrategy })
                   </template>
                   <el-input-number
                     v-model="strategy.split.child_length"
-                    :min="50"
-                    :max="100000"
+                    :min="64"
+                    :max="1024"
+                    :step="1"
+                    step-strictly
+                    :value-on-clear="64"
                     controls-position="right"
                     align="left"
                     class="w-full!"

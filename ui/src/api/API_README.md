@@ -143,6 +143,9 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 
 ### 模型选项查询
 
+`model-provider.ts` 的 `getProviderList(query?)` 统一查询 `GET /provider`；不传参数获取全部供应商，
+传入 `{ model_type }` 筛选支持指定模型类型的供应商，不再单独封装按类型查询方法。
+
 `workspace/model.ts` 的 `getModelListWithShared(query)` 请求
 `/workspace/<workspaceId>/model_list`，支持 `name`、`model_type`、`model_name` 筛选。
 将 `shared_model` 与 `model` 按共享在前的顺序合并为 `ModelItem[]`，分别标记
@@ -422,8 +425,10 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 
 `workspace/tool/workflow.ts` 的 `postToolWorkflowDebug(toolId, parameters)` 使用 Admin `postStream`
 请求 `/<toolId>/debug`，返回原始 SSE Response；输入参数来自工具基础节点，`chat_record_id` 用于识别
-执行记录，表单续跑沿用该 ID 并传入 `position`。`getToolWorkflowRecord(toolId, recordId)` 查询
-`/<toolId>/tool_record/<recordId>`，返回 `ToolWorkflowRecord` 的运行状态、输出及节点详情。
+执行记录，表单续跑沿用该 ID 并传入 `position`。调试结果与执行详情统一通过
+`getToolExecutionRecordDetail(toolId, recordId)` 查询 `/<toolId>/tool_record/<recordId>`，
+返回 `ToolExecutionRecordDetail` 的运行状态、输出及节点详情。Workspace、System 资源管理和
+System 共享资源分别保留各自路径下的同名接口，不再重复封装调试专用查询。
 工具调试读取服务端已保存工作流，画布页面在调试前保存未提交改动。
 
 ### 工具工作流模板中心
@@ -485,6 +490,8 @@ Admin 上传尚未创建的资源文件时，`sourceId` 可传 `undefined`，省
 资源类型使用 `@/api/enums` 的 `FILE_SOURCE_TYPE` 与 `@/api/types` 的 `FileSourceType`，
 包括知识库、智能体、工具、文档、对话及三种临时文件有效期。对话 Store 使用
 `FILE_SOURCE_TYPE.CHAT` 调用对应 File API，对话 API 不再维护上传接口。
+知识库工作流调试上传复用 Admin `FileApi.postUploadFile`，传知识库 ID 与 `FILE_SOURCE_TYPE.KNOWLEDGE`，
+通过返回的 `request` 获取文件地址，再适配动态表单的 `{ data: url }` 返回协议；工作流 API 不重复封装上传。
 
 ### System 资源管理模型与工具
 
@@ -516,6 +523,11 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 供画布的工具菜单及 MCP 选项使用。系统扩展接口需连接支持相应协议的部署进行联调。
 
 ### 知识库文档
+
+`putDocument(knowledgeId, documentId, data)` 统一通过 PUT `/<documentId>` 更新名称、启用状态和单项设置，
+不按更新字段重复封装同一接口。载荷 `DocumentUpdatePayload` 仅包含可更新字段，按需传入
+`name`、`is_active`、`hit_handling_method`、`directly_return_similarity`、`meta`，返回更新后的
+`DocumentItem`。名称上限 128 字符；共享文档仍只提供查询。
 
 `workspace/knowledge/document.ts` 同时维护文档启停、删除、召回设置、向量化、分词索引、
 任务取消、生成问题、迁移、同步、导出、原文件下载/替换及标签关联。

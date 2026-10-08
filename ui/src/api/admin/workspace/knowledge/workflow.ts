@@ -46,15 +46,6 @@ const putKnowledgeWorkflowPublish = (knowledgeId: string) => {
   return put<undefined, boolean>(`${getPrefix()}/${knowledgeId}/publish`)
 }
 
-/** 上传知识库调试文件，返回文件访问地址（末段为 file_id）。 */
-const postKnowledgeUploadFile = (knowledgeId: string, file: File) => {
-  const payload = new FormData()
-  payload.append('file', file)
-  payload.append('source_id', knowledgeId)
-  payload.append('source_type', 'KNOWLEDGE')
-  return post<FormData, string>('/oss/file', payload)
-}
-
 /** 获取数据源节点的动态表单配置。 */
 const getKnowledgeWorkflowFormList = (knowledgeId: string, type: 'local' | 'tool', id: string, node: Dict<unknown>) => {
   return post<{ node: Dict<unknown> }, Dict<unknown>[]>(`${getPrefix()}/${knowledgeId}/datasource/${type}/${id}/form_list`, { node })
@@ -97,7 +88,6 @@ export default {
   postKnowledgeWorkflow,
   putKnowledgeWorkflow,
   putKnowledgeWorkflowPublish,
-  postKnowledgeUploadFile,
   getKnowledgeWorkflowFormList,
   postKnowledgeWorkflowDebug,
   getKnowledgeWorkflowAction,

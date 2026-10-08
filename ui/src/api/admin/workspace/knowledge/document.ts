@@ -8,6 +8,7 @@ import type {
   DocumentSettingPayload,
   DocumentTaskState,
   DocumentTaskType,
+  DocumentUpdatePayload,
 } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
@@ -21,9 +22,9 @@ const getDocumentPage = (knowledgeId: string, page: ParamsPage, query?: Dict<unk
 const putQuickCreateDocuments = (knowledgeId: string, documents: DocumentQuickCreatePayload[]) =>
   put<DocumentQuickCreatePayload[], DocumentItem[]>(`${getPrefix(knowledgeId)}/batch_create`, documents)
 
-/** 更新文档启用状态。 */
-const putDocumentActive = (knowledgeId: string, documentId: string, isActive: boolean) =>
-  put(`${getPrefix(knowledgeId)}/${documentId}`, { is_active: isActive })
+/** 更新文档名称、启用状态或设置，返回保存后的文档。 */
+const putDocument = (knowledgeId: string, documentId: string, data: DocumentUpdatePayload) =>
+  put<DocumentUpdatePayload, DocumentItem>(`${getPrefix(knowledgeId)}/${documentId}`, data)
 
 /** 删除单个文档。 */
 const deleteDocument = (knowledgeId: string, documentId: string) => del(`${getPrefix(knowledgeId)}/${documentId}`)
@@ -75,10 +76,6 @@ const putLarkDocumentSync = (knowledgeId: string, documentId: string) =>
 const putMulLarkSyncDocument = (knowledgeId: string, documentIds: string[]) =>
   put<{ id_list: string[] }, boolean>(`/workspace/${getWorkspaceId()}/knowledge/lark/${knowledgeId}/_batch`, { id_list: documentIds })
 
-/** 单个文档设置。 */
-const putDocumentSetting = (knowledgeId: string, documentId: string, data: DocumentSettingPayload) =>
-  put(`${getPrefix(knowledgeId)}/${documentId}`, data)
-
 /** 批量文档设置。 */
 const putBatchDocumentSetting = (knowledgeId: string, documentIds: string[], data: DocumentSettingPayload) =>
   put(`${getPrefix(knowledgeId)}/batch_hit_handling`, { ...data, id_list: documentIds })
@@ -117,7 +114,7 @@ const postReplaceDocumentSource = (knowledgeId: string, documentId: string, file
 export default {
   getDocumentPage,
   putQuickCreateDocuments,
-  putDocumentActive,
+  putDocument,
   deleteDocument,
   putBatchDeleteDocuments,
   putDocumentRefresh,
@@ -126,7 +123,6 @@ export default {
   putBatchTokenizeDocuments,
   putCancelTask,
   putBatchCancelDocumentTask,
-  putDocumentSetting,
   putBatchDocumentSetting,
   putGenerateDocumentQuestions,
   putMigrateDocuments,

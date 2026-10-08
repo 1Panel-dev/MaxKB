@@ -172,19 +172,6 @@ export interface UpdateStoreToolPayload {
   versions: ToolStoreVersion[]
 }
 
-/** 工具工作流调试完成后的执行记录。 */
-export interface ToolWorkflowRecord {
-  id: string
-  state: string
-  run_time?: number
-  meta: {
-    output?: unknown
-    details?:
-      | import('@/workflow-canvas/execution-details/types').ExecutionNodeDetail[]
-      | Record<string, import('@/workflow-canvas/execution-details/types').ExecutionNodeDetail>
-  }
-}
-
 /** 工作流工具模板商店的查询响应。 */
 export interface ToolWorkflowStoreResponse {
   additionalProperties: { tags: ToolStoreTag[] }
@@ -200,7 +187,9 @@ export interface ToolExecutionRecordDetail {
     input?: unknown
     output?: unknown
     err_message?: string
-    details?: ToolWorkflowRecord['meta']['details']
+    details?:
+      | import('@/workflow-canvas/execution-details/types').ExecutionNodeDetail[]
+      | Record<string, import('@/workflow-canvas/execution-details/types').ExecutionNodeDetail>
   }
 }
 

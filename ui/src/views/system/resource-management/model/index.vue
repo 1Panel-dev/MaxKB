@@ -120,7 +120,7 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <span v-if="getProvider(row).icon" class="h-5 w-5 shrink-0" v-html="getProvider(row).icon" />
-              <span class="truncate" :title="row.name">{{ row.name }}</span>
+              <span class="truncate">{{ row.name }}</span>
             </div>
           </template>
         </el-table-column>
@@ -128,7 +128,7 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <span v-if="getProvider(row).icon" class="h-5 w-5 shrink-0" v-html="getProvider(row).icon" />
-              <span class="truncate" :title="getProvider(row).name">{{ getProvider(row).name }}</span>
+              <span class="truncate">{{ getProvider(row).name }}</span>
             </div>
           </template>
         </el-table-column>

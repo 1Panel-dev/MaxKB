@@ -47,7 +47,7 @@ function handleModelTypeChange(value: string) {
     return
   }
   loading.value = true
-  ProviderApi.getProviderListByModelType(value)
+  ProviderApi.getProviderList({ model_type: value })
     .then((providers) => {
       providerOptions.value = providers
     })

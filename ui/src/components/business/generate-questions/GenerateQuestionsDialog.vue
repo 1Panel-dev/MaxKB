@@ -49,7 +49,7 @@ const modelAvailable = computed(() => modelOptions.value.some(({ id, status }) =
 
 function loadModels() {
   modelLoading.value = true
-  return Promise.all([requestModelApi.value.getModelListWithShared({ model_type: 'LLM' }), ModelProviderApi.getProviderListByModelType('LLM')])
+  return Promise.all([requestModelApi.value.getModelListWithShared({ model_type: 'LLM' }), ModelProviderApi.getProviderList({ model_type: 'LLM' })])
     .then(([models, providers]) => {
       modelOptions.value = models
       providerOptions.value = providers

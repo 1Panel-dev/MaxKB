@@ -87,7 +87,7 @@ function loadModels() {
     model_type: 'LLM',
     ...(!isSystemSharedResource() && workspaceId ? { workspace_id: workspaceId } : {}),
   })
-  return Promise.all([modelRequest, ModelProviderApi.getProviderListByModelType('LLM')])
+  return Promise.all([modelRequest, ModelProviderApi.getProviderList({ model_type: 'LLM' })])
     .then(([models, providers]) => {
       modelOptions.value = models
       providerOptions.value = providers
