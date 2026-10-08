@@ -114,9 +114,9 @@ defineExpose({ validate, getStrategy })
                   <template #label>
                     <span class="flex-align-center gap-1">
                       分段标识
-                      <el-tooltip content="按所选标题标识分段，也可输入自定义正则表达式；留空使用默认规则" placement="top">
-                        <MkIcon name="InfoFilled" class="text-N600" :size="16" />
-                      </el-tooltip>
+                      <MkTooltip content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。" placement="top">
+                        <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
+                      </MkTooltip>
                     </span>
                   </template>
                   <el-select
@@ -135,7 +135,7 @@ defineExpose({ validate, getStrategy })
                   <div class="flex-align-center w-full gap-2">
                     <el-input-number
                       v-model="strategy.split.min_length"
-                      :min="0"
+                      :min="50"
                       :max="100000"
                       controls-position="right"
                       align="left"
@@ -156,15 +156,15 @@ defineExpose({ validate, getStrategy })
                   <template #label>
                     <span class="flex-align-center gap-1">
                       子块长度
-                      <el-tooltip content="分段内容进一步拆分为子块，用于向量化检索" placement="top">
-                        <MkIcon name="InfoFilled" class="text-N600" :size="16" />
-                      </el-tooltip>
+                      <MkTooltip content="子块长度仅用户向量检索，命中后将回溯显示其所在分段" placement="top">
+                        <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
+                      </MkTooltip>
                     </span>
                   </template>
                   <el-input-number
                     v-model="strategy.split.child_length"
                     :min="50"
-                    :max="2048"
+                    :max="100000"
                     controls-position="right"
                     align="left"
                     class="w-full!"
