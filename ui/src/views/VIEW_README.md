@@ -200,7 +200,7 @@ src/views/knowledge/
 │   └── ButtonTemplateStore.vue          # 知识库模板中心与模板创建入口
 ├── create-knowledge/
 │   ├── CreateBaseKnowledgeDialog.vue     # 通用知识库创建
-│   ├── CreateWebKnowledgeDialog.vue      # Web 站点配置与创建
+│   ├── WebKnowledgeDrawer.vue            # Web 站点配置与两步创建抽屉
 │   ├── CreateLarkKnowledgeDialog.vue     # 飞书应用配置与创建
 │   ├── CreateWorkflowKnowledgeDialog.vue # 工作流知识库创建
 │   └── components/
@@ -240,9 +240,15 @@ MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需�
 回填模板名称与描述，仍需选择向量模型；提交沿用 `work_flow_template`。创建成功关闭模板中心、
 刷新列表并进入知识库工作流，取消创建保留模板中心；创建弹窗在 `closed` 后卸载。
 
-`ButtonCreateKnowledge` 内聚四类创建弹窗 Ref 和打开动作，列表页传入目标 `folderId`，通过
+`WebKnowledgeDrawer` 使用底部两步抽屉，基本信息校验后进入文档处理策略，支持返回修改。
+`create-knowledge/components/DocumentStrategyForm.vue` 维护分段、视觉增强和标题问题索引，
+通过 `doc_strategy` 提交；智能分段默认策略与后端一致，高级分段使用与触发器类型相同的卡片外壳，
+在选中卡片内展开配置，默认选择一级至四级标题标识、500–4096 分段长度、256 子块长度并开启自动清洗。
+分段标识支持自定义正则表达式，留空使用后端默认规则；启用视觉增强后必须选择模型或工具。
+
+`ButtonCreateKnowledge` 内聚四类创建浮层 Ref 和打开动作，列表页传入目标 `folderId`，通过
 `refresh` 刷新列表。入口支持 `trigger` 插槽替换默认创建按钮，下拉使用 `persistent`。
-各弹窗接收 `folderId`，通过 `open()` 打开；工作流额外接受可选的商店模板。共用的
+各创建浮层接收 `folderId`，通过 `open()` 打开；工作流额外接受可选的商店模板。共用的
 `KnowledgeBaseForm` 负责名称、描述、Embedding 模型必填校验以及工作空间和共享模型查询，
 根据 `isSystemSharedResource()` 选择 System 共享 Model API 或 Workspace Model API，
 通过 `getModelListWithShared({ model_type: 'EMBEDDING' })` 一次加载模型选项，
