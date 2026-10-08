@@ -168,6 +168,30 @@ const getOptionsValue = () => {
           ['global', 'chat', 'output'].includes(v.value) && v.children && v.children.length > 0,
       )
     : raw.filter((v: any) => v.children && v.children.length > 0)
+  if (props.nodeModel&&props.nodeModel.type == 'base-node') {
+    return injectDraftSiblings(
+      list
+        .filter((item: any) => {
+          return item.type == 'global'
+        })
+        .map((item: any) => {
+          return {
+            ...item,
+            children: item.children.filter((item: any) => {
+              return ![
+                'time',
+                'history_context',
+                'chat_id',
+                'chat_user_id',
+                'chat_user_type',
+                'chat_user_group',
+                'chat_user',
+              ].includes(item.value)
+            }),
+          }
+        }),
+    )
+  }
   return injectDraftSiblings(list)
 }
 
