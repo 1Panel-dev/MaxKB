@@ -1411,7 +1411,7 @@
                 {{ $t('aiChat.executionDetails.title') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
-                <template v-for="(cLoop, cIndex) in data.details" :key="cIndex">
+                <template v-for="(cLoop, cIndex) in Object.values(data.details||{}).sort((x: any, y: any) => (x.index || 0) - (y.index || 0))" :key="cIndex">
                   <ExecutionDetailCard :data="cLoop" :type="type"></ExecutionDetailCard>
                 </template>
               </div>
