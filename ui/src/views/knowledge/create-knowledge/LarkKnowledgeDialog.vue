@@ -78,13 +78,13 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="创建飞书知识库" align-center :show-close="!loading" @closed="resetData">
-    <KnowledgeBaseForm ref="baseFormRef" :disabled="loading" />
+    <KnowledgeBaseForm ref="baseFormRef" v-loading="loading" />
     <el-form
       class="mt-4"
       ref="knowledgeFormRef"
       :model="knowledgeForm"
       :rules="knowledgeFormRules"
-      :disabled="loading"
+      v-loading="loading"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent

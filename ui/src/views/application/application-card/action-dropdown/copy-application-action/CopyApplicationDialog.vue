@@ -94,7 +94,7 @@ defineExpose({ open })
       ref="applicationFormRef"
       :model="applicationForm"
       :rules="rules"
-      :disabled="submitting"
+      v-loading="submitting"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent

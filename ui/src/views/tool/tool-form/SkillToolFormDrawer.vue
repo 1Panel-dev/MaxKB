@@ -266,7 +266,6 @@ defineExpose({ open })
             ref="uploadRef"
             v-model="skillForm.fileList"
             accept=".zip"
-            :disabled="loading"
             :tip-text="`支持格式：ZIP，大小不超过 ${maxFileSizeMb} MB`"
             @change="handleFileChange"
             @remove="handleRemoveFile"

@@ -1,5 +1,5 @@
 import type { State } from './state'
-import type { RESOURCE_TYPE, TRIGGER_SCHEDULE_TYPE, TRIGGER_TYPE } from '@/api/enums'
+import type { RESOURCE_TYPE, SCHEDULE_TYPE, TRIGGER_TYPE } from '@/api/enums'
 
 export type TriggerType = (typeof TRIGGER_TYPE)[keyof typeof TRIGGER_TYPE]
 
@@ -44,7 +44,7 @@ export interface TriggerBodyField {
   required?: boolean
 }
 export interface TriggerSetting {
-  schedule_type?: (typeof TRIGGER_SCHEDULE_TYPE)[keyof typeof TRIGGER_SCHEDULE_TYPE]
+  schedule_type?: (typeof SCHEDULE_TYPE)[keyof typeof SCHEDULE_TYPE]
   interval_unit?: 'minutes' | 'hours'
   interval_value?: number
   days?: (number | string)[]

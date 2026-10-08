@@ -74,6 +74,7 @@ watch(
 
 /* 保存设置；更换向量模型时先确认，保存完成后重新向量化 */
 function handleSave() {
+  if (saving.value) return
   saving.value = true
   return Promise.all([baseFormRef.value?.validate(), settingFormRef.value?.validate().catch(() => false)])
     .then(([baseValid, settingValid]) => {
@@ -130,14 +131,13 @@ defineProps<ResourceDetailPageProps>()
 </script>
 
 <template>
-  <div v-if="knowledge" class="max-w-200 pb-6">
-    <KnowledgeBaseForm ref="baseFormRef" :disabled="saving" />
+  <div v-if="knowledge" v-loading="saving" class="max-w-200 pb-6">
+    <KnowledgeBaseForm ref="baseFormRef" />
     <el-form
       class="mt-4"
       ref="settingFormRef"
       :model="settingForm"
       :rules="settingRules"
-      :disabled="saving"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent

@@ -5,6 +5,11 @@
 
 ## 放置规则
 
+- 创建、保存或提交表单时，使用页面／弹窗内容容器的 loading 遮罩，或仅使用提交按钮的 loading，
+  不使用 `el-form.disabled` 或给每个字段、子表单逐项传入提交状态的 `disabled`。
+  方法入口保留重复提交保护，关闭、取消及步骤切换仍可按提交状态禁用；权限、只读、字段联动和
+  选项加载等业务禁用条件继续保留，不与提交 loading 混用。
+
 - 当前新增功能暂不接入前端权限判断，包括按权限隐藏入口、禁用控件或拦截操作，等待用户明确
   指令后再增加。已有功能的权限逻辑不随新功能开发移除；导入或创建后的用户资料刷新继续保留。
 - `views/<feature>/` 是页面功能边界。每个独立功能页面使用自己的目录，路由页面和该页面专用
@@ -454,8 +459,8 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `knowledge/index.vue`                                                  | 工作空间知识库目录与知识库卡片页面                                   |
 | `knowledge-detail/index.vue`                                           | 知识库详情页面                                                       |
 | `knowledge-detail/setting/base/index.vue`                             | 知识库基本信息、来源配置与上传限制设置                               |
-| `knowledge-detail/setting/document-strategy/index.vue`                | Web 知识库文档处理策略占位页面                                       |
-| `knowledge-detail/setting/scheduled-sync/index.vue`                   | Web、飞书与工作流知识库定时同步占位页面                              |
+| `knowledge-detail/setting/document-strategy/index.vue`                | Web 知识库文档处理策略回填、校验与保存                                       |
+| `knowledge-detail/setting/scheduled-sync/index.vue`                   | Web、飞书与工作流知识库定时同步设置与日志                              |
 | `login/index.vue`                                                      | Admin 登录页面                                                       |
 | `login/forgot-password/index.vue`                                     | 忘记密码页面                                                         |
 | `model/index.vue`                                                      | 工作空间模型目录与模型卡片页面                                       |
@@ -547,7 +552,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 通过 `open(version)` 回填；`mode="publish"` 显示“发布内容”，通过 `open()` 打开空白表单。通过
 `submit(payload)` 提交、`close()` 关闭，外部传入 `saving`。标题必填且最多 64 字，更新说明最多
 1000 字，标题拒绝纯空白；两种模式的提交按钮均显示“发布”。编辑请求由业务组件执行，
-不创建新发布；提交期间禁止编辑表单和关闭弹窗。
+不创建新发布；提交期间使用表单内容 loading 遮罩，保留关闭保护，不设置表单 disabled。
 `DescriptionDialog.vue` 通过 `open(content)` 展示纯文本更新说明并保留换行，空内容显示
 “暂无更新说明”。两个弹窗均不依赖业务 API，复用 `MkDialog` 的延迟挂载和关闭销毁能力。
 
@@ -703,8 +708,23 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 更新容器数据，同步名称等展示。基本信息复用创建流程的 `KnowledgeBaseForm`，类型配置和校验留在
 `setting/base/index.vue` 中，通用知识库标题为“设置”，其他类型为“基础设置”。
 通用知识库只有单个设置菜单；Web 的设置分组包含基础设置、文档处理策略、定时同步，
-飞书和工作流包含基础设置、定时同步。`setting/document-strategy/` 与
-`setting/scheduled-sync/` 分别承接文档处理策略和定时同步，当前仅展示占位内容。
+飞书和工作流包含基础设置、定时同步。`setting/document-strategy/` 复用
+`DocumentStrategyForm`，通过 `setStrategy()` 回填详情的 `doc_strategy` 为独立草稿，
+通过 `validate()` 和 `getStrategy()` 校验并单独保存该字段。保存成功合并接口返回数据到详情上下文，
+失败保留草稿，保存期间使用内容容器 loading 遮罩和按钮 loading，不禁用表单字段。
+方法入口防止重复提交。标题栏通过 Teleport 展示下次同步生效说明，
+保存不立即发起同步。智能分段回填时保留高级分段的编辑默认值，提交仍使用智能分段的固定策略。
+`setting/scheduled-sync/` 维护“同步设置”和“同步日志”两个页签，暂不调用同步设置和日志接口。
+设置使用关闭定时同步、每日 00:00、增量同步的默认草稿，切换知识库时重置。
+同步周期直接使用与触发器定时触发一致的 `el-cascader` 和 `SCHEDULE_OPTION`，
+支持每日、每周、每月和按间隔，并通过切换按钮使用 Cron 输入，不再维护独立周期浮层组件。
+周期校验与触发器保持相同的组织方式，直接写在页面 `FormRules` 中；同步方式卡片和日志标签
+复用 `constants/knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS`，与手动同步弹窗保持一致，不单独维护 `sync-setting.ts`。
+周日期使用 1（周一）至 7（周日），同步间隔至少 5 分钟，完整 Cron 校验待接口接入后由服务端完成。
+页面维护启用开关和三种同步方式，同步说明与手动同步共用。
+保存入口只校验周期并提示配置仅保留在页面中，不提交请求或更新详情 meta。
+`components/SyncLogTable.vue` 在日志页签按需挂载，复用 MkTable 保留日志列、状态及分页，
+当前展示空数据，不查询或生成模拟日志。
 设置菜单的类型筛选由路由维护，不在 View 中重复维护菜单。
 当前设置页仅接入 Workspace 路由和 API，暂不增加前端权限判断。
 更换向量模型需确认，先保存再重新向量化，整条流程禁止重复提交；向量化失败时保留原模型比较基准，

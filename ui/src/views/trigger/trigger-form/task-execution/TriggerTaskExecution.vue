@@ -13,7 +13,7 @@ const props = defineProps<{
   initialResources: Record<string, Partial<ApplicationDetail & ToolItem>>
   triggerType: TriggerType
   body: TriggerBodyField[]
-  disabled: boolean
+  disabled?: boolean
 }>()
 const tasks = defineModel<TriggerTaskPayload[]>({ required: true })
 const emit = defineEmits<{ change: [] }>()
@@ -116,9 +116,10 @@ defineExpose({ validate, reset })
       >
         <template #label>
           <div class="flex-between min-w-0 flex-1">
-            <span
-              >{{ group.label }}<span v-if="group.tasks.length">（{{ group.tasks.length }}）</span></span
-            >
+            <span>
+              {{ group.label }}
+              <span v-if="group.tasks.length">（{{ group.tasks.length }}）</span>
+            </span>
             <!-- 添加该分组的执行任务 -->
             <el-button text type="primary" :disabled="disabled" :title="`添加${group.label}`" @click.stop="handleOpenTaskDialog(group.type)">
               <MkIcon name="icon_add_outlined" />
@@ -151,9 +152,9 @@ defineExpose({ validate, reset })
                         :size="20"
                         class="shrink-0 small"
                       />
-                      <span class="truncate" :title="resources[taskKey(task)]?.name || task.source_id">{{
-                        resources[taskKey(task)]?.name || task.source_id
-                      }}</span>
+                      <span class="truncate" :title="resources[taskKey(task)]?.name || task.source_id">
+                        {{ resources[taskKey(task)]?.name || task.source_id }}
+                      </span>
                     </span>
                     <!-- 移除执行任务 -->
                     <el-button text :disabled="disabled" @click.stop="handleRemoveTask(task)">

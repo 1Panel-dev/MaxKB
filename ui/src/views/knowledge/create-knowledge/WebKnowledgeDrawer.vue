@@ -101,18 +101,17 @@ defineExpose({ open })
         </el-steps>
       </div>
     </template>
-    <MkViewLayout title="">
+    <MkViewLayout title="" :loading="loading">
       <template #default="{ Footer }">
         <div class="mx-auto w-full max-w-200 pt-6">
           <section v-show="activeStep === 0">
             <h4 class="mb-5 border-l-2 border-primary pl-2">基本信息</h4>
-            <KnowledgeBaseForm ref="baseFormRef" :disabled="loading" />
+            <KnowledgeBaseForm ref="baseFormRef" />
             <el-form
               class="mt-4"
               ref="knowledgeFormRef"
               :model="knowledgeForm"
               :rules="knowledgeFormRules"
-              :disabled="loading"
               label-position="top"
               require-asterisk-position="right"
               @submit.prevent
