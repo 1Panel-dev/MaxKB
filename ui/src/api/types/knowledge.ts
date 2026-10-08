@@ -1,7 +1,7 @@
 /** Workspace 知识库列表和知识库卡片共用的业务类型。 */
 
 import type LogicFlow from '@logicflow/core'
-import { KNOWLEDGE_TYPE } from '@/api/enums'
+import { KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
 import type { DefaultModelSettingPayload } from './model'
 import type { DocumentTaskState } from './document'
 
@@ -18,6 +18,8 @@ export interface KnowledgeGeneratePayload extends RelatedQuestionsConfig {
 }
 
 export type KnowledgeType = (typeof KNOWLEDGE_TYPE)[keyof typeof KNOWLEDGE_TYPE]
+
+export type KnowledgeSyncType = (typeof KNOWLEDGE_SYNC_TYPE)[keyof typeof KNOWLEDGE_SYNC_TYPE]
 
 export interface KnowledgeItem {
   application_mapping_count?: number

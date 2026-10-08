@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 
 export const knowledgeRoutes: RouteRecordRaw[] = [
   {
@@ -101,8 +102,47 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
           {
             path: 'setting',
             name: 'workspace-knowledge-setting',
-            component: () => import('@/views/knowledge-detail/setting/index.vue'),
-            meta: { title: '设置', icon: 'icon_setting', activeIcon: 'icon_setting_filled', order: 50 },
+            component: () => import('@/views/knowledge-detail/setting/base/index.vue'),
+            meta: {
+              title: '设置',
+              icon: 'icon_setting',
+              activeIcon: 'icon_setting_filled',
+              order: 50,
+              detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE,
+            },
+          },
+          {
+            // 设置分组只提供菜单层级，子页面统一使用 setting 前缀。
+            path: '',
+            name: 'workspace-knowledge-settings',
+            redirect: (to) => ({ name: 'workspace-knowledge-base-setting', params: to.params, query: to.query, hash: to.hash }),
+            meta: {
+              title: '设置',
+              icon: 'icon_setting',
+              activeIcon: 'icon_setting_filled',
+              order: 50,
+              detailMenuVisible: (params) => params.type !== KNOWLEDGE_TYPE_KEY.BASE,
+            },
+            children: [
+              {
+                path: 'setting/base',
+                name: 'workspace-knowledge-base-setting',
+                component: () => import('@/views/knowledge-detail/setting/base/index.vue'),
+                meta: { title: '基础设置', order: 10 },
+              },
+              {
+                path: 'setting/document-strategy',
+                name: 'workspace-knowledge-document-strategy',
+                component: () => import('@/views/knowledge-detail/setting/document-strategy/index.vue'),
+                meta: { title: '文档处理策略', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.WEB },
+              },
+              {
+                path: 'setting/scheduled-sync',
+                name: 'workspace-knowledge-scheduled-sync',
+                component: () => import('@/views/knowledge-detail/setting/scheduled-sync/index.vue'),
+                meta: { title: '定时同步', order: 30 },
+              },
+            ],
           },
         ],
       },

@@ -9,9 +9,9 @@ import type { KnowledgeItem } from '@/api/types'
 import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
-import { useKnowledgeDetailContext } from '../context'
+import { useKnowledgeDetailContext } from '../../context'
 
-defineOptions({ name: 'KnowledgeSettingView' })
+defineOptions({ name: 'KnowledgeBaseSettingView' })
 
 const { knowledge, replaceKnowledgeDetail } = useKnowledgeDetailContext()
 

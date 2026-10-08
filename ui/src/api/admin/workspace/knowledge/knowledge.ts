@@ -6,6 +6,7 @@ import type {
   KnowledgeDetail,
   KnowledgeItem,
   KnowledgeGeneratePayload,
+  KnowledgeSyncType,
   KnowledgeCreatePayload,
   WebKnowledgeCreatePayload,
   LarkKnowledgeCreatePayload,
@@ -72,7 +73,7 @@ const putReEmbeddingKnowledge = (knowledgeId: string) => {
 }
 
 /** 同步 Web 知识库。 */
-const putSyncWebKnowledge = (knowledgeId: string, syncType: 'replace' | 'complete') => {
+const putSyncWebKnowledge = (knowledgeId: string, syncType: KnowledgeSyncType) => {
   return put<undefined, boolean>(`${getPrefix()}/${knowledgeId}/sync`, undefined, { sync_type: syncType })
 }
 

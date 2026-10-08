@@ -229,7 +229,8 @@ MCP 入口加载配置后打开只读及复制弹窗；分词索引入口仅调�
 已有配置，文件数量与大小限制仍作为知识库顶层字段提交。
 
 `putSyncWebKnowledge(knowledgeId, syncType)` 使用 PUT 请求 `/<knowledgeId>/sync`，
-查询参数 `sync_type` 为 `replace`（替换同步）或 `complete`（整体同步），不传请求体。
+Workspace 与 System 资源管理接口的查询参数 `sync_type` 均支持 `incremental`（增量同步）、
+`replace`（替换同步）和 `complete`（整体同步），不传请求体。
 仅用于 Web 知识库；页面负责方式选择、覆盖提示、loading 与任务提交成功提示。
 
 知识库创建通过 `postKnowledge`、`postWebKnowledge` 分别提交到 `/base`、`/web`；

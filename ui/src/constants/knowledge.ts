@@ -6,7 +6,6 @@ export const KNOWLEDGE_TYPE_KEY = {
   BASE: 'BASE',
   WEB: 'WEB',
   LARK: 'LARK',
-  YUQUE: 'YUQUE',
   WORKFLOW: 'WORKFLOW',
 } as const
 

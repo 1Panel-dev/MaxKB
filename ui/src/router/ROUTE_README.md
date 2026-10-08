@@ -221,6 +221,9 @@ Workspace 页面：
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/:type
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/document
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/setting
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/setting/base
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/setting/document-strategy
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/setting/scheduled-sync
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/workflow-entry
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/document/:documentId
 ```
@@ -344,8 +347,19 @@ System 共享资源页面：
 普通和共享文档路由均引用 `library/document/index.vue`，文件分组不增加 URL 层级。
 检索优化使用 `/retrieval/recall`、`/retrieval/question`、`/retrieval/dictionary`；
 授权与集成使用 `/integration/chat-user`、`/integration/external-retrieval`。
-分组不挂载页面组件，直接访问分组时重定向到首个子页。新增七个页面暂为占位 View。`setting`
-渲染 `knowledge-detail/setting/index.vue`，使用容器提供的知识库详情。`workflow-entry`
+分组不挂载页面组件，直接访问分组时重定向到首个子页。新增七个页面暂为占位 View。
+设置菜单使用 `detailMenuVisible(params)` 按知识库类型筛选，不增加权限判断：
+通用知识库保留单个“设置”，沿用 `/setting` 和 `workspace-knowledge-setting`；
+Web 展示“设置 → 基础设置、文档处理策略、定时同步”；飞书和工作流展示
+“设置 → 基础设置、定时同步”。设置分组使用空 path，子页分别使用
+`/setting/base`、`/setting/document-strategy`、`/setting/scheduled-sync`，路由名分别为
+`workspace-knowledge-base-setting`、`workspace-knowledge-document-strategy`、
+`workspace-knowledge-scheduled-sync`。基础设置与通用设置复用
+`knowledge-detail/setting/base/index.vue` 和容器提供的详情，其他两个设置页暂为占位。
+设置路由不配置类型访问守卫，菜单显隐由 `detailMenuVisible` 控制。
+列表设置按钮按知识库类型直接进入通用设置或基础设置。
+`workspace-knowledge-settings` 仅提供菜单分组层级，
+命名访问时重定向到基础设置，保留参数、query 和 hash。`workflow-entry`
 仅作为目录跳转入口，重定向到独立的 `workflow-knowledge` 全屏画布。画布返回知识库详情。
 文档详情路由当前尚未启用；后续接入时通过 `detailActiveMenu` 高亮“文档”。
 
