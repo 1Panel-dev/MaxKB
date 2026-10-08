@@ -222,6 +222,8 @@ Keep these behaviors:
   why the current implementation exists. If the requested change is likely to remove a requirement
   or introduce a regression, pause before editing, explain the risk, recommend a safer approach,
   and wait for confirmation.
+- 表单创建、保存和提交使用页面／弹窗内容 loading 或按钮 loading，不逐项禁用表单字段；
+  详细规则见 `src/views/VIEW_README.md`。
 - Keep UI code typed and data-driven.
 - Use Lodash `cloneDeep` for deep cloning; do not use `structuredClone`.
 - Explicitly import APIs used from Vue, Vue Router, and Pinia; do not restore API auto import.

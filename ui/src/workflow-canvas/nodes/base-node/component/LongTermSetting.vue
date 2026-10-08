@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { TRIGGER_SCHEDULE_OPTIONS } from '@/constants/trigger'
+import { SCHEDULE_OPTION } from '@/constants/schedule'
 import type { CascaderOption, FormInstance } from 'element-plus'
 import SelectModel from '@/components/business/select-model/index.vue'
 import type { ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
@@ -94,7 +94,7 @@ function validateRounds(_rule: unknown, value: unknown, callback: (error?: Error
 }
 
 function validateSchedule(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
-  let options = TRIGGER_SCHEDULE_OPTIONS
+  let options = SCHEDULE_OPTION
   let selectedOption: CascaderOption | undefined
   for (const value of scheduleValue.value) {
     selectedOption = options.find((option) => option.value === value)
@@ -226,7 +226,7 @@ function submit() {
                     >
                       <el-cascader
                         v-model="scheduleValue"
-                        :options="TRIGGER_SCHEDULE_OPTIONS"
+                        :options="SCHEDULE_OPTION"
                         :teleported="false"
                         class="w-full"
                         clearable

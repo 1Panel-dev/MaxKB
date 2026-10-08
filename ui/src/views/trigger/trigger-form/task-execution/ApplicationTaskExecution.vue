@@ -4,7 +4,7 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import type { ApplicationDetail, TriggerBodyField, TriggerTaskPayload, TriggerType } from '@/api/types'
 import TaskParameterForm from './components/TaskParameterForm.vue'
 
-const props = defineProps<{ application?: Partial<ApplicationDetail>; triggerType: TriggerType; body: TriggerBodyField[]; disabled: boolean }>()
+const props = defineProps<{ application?: Partial<ApplicationDetail>; triggerType: TriggerType; body: TriggerBodyField[]; disabled?: boolean }>()
 const tasks = defineModel<TriggerTaskPayload[]>({ required: true })
 const task = computed(() => tasks.value[0])
 const expanded = ref(true)

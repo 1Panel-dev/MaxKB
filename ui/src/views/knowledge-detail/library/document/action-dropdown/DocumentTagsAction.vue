@@ -104,16 +104,9 @@ function handleClosed() {
     @click="handleOpenDialog"
   />
   <MkDialog v-model="visible" :title="manage ? '标签设置' : '添加标签'" :show-close="!loading && !optionLoading" @closed="handleClosed">
-    <el-form label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form v-loading="loading || optionLoading" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="标签">
-        <el-select
-          v-model="selectedTagIds"
-          multiple
-          filterable
-          placeholder="请选择标签"
-          :loading="optionLoading"
-          :disabled="loading || optionLoading"
-        >
+        <el-select v-model="selectedTagIds" multiple filterable placeholder="请选择标签" :loading="optionLoading">
           <template v-for="group in tagGroups" :key="group.key">
             <el-option-group :label="group.key">
               <template v-for="tag in group.values" :key="tag.id">

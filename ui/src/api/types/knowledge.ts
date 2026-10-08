@@ -26,6 +26,7 @@ export interface KnowledgeItem {
   char_length?: number | null
   create_time?: string
   desc?: string | null
+  doc_strategy?: DocumentStrategy | null
   document_count?: number | null
   embedding_model_id?: string | null
   file_count_limit?: number

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import { TRIGGER_SCHEDULE_OPTIONS } from '@/constants/trigger'
+import { SCHEDULE_OPTION } from '@/constants/schedule'
 import type { FormInstance, FormRules } from 'element-plus'
 import TriggerApi from '@/api/admin/workspace/trigger/trigger'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
-import { RESOURCE_TYPE, TOOL_TYPE, TRIGGER_TYPE, TRIGGER_SCHEDULE_TYPE } from '@/api/enums'
+import { RESOURCE_TYPE, TOOL_TYPE, TRIGGER_TYPE, SCHEDULE_TYPE } from '@/api/enums'
 import type { ApplicationDetail, ToolItem, TriggerDetail, TriggerPayload, TriggerSetting, ResourceTriggerResource } from '@/api/types'
 import TriggerTaskExecution from './task-execution/TriggerTaskExecution.vue'
 import ToolTaskExecution from './task-execution/ToolTaskExecution.vue'
@@ -152,16 +152,16 @@ function open(triggerId?: string) {
 const scheduleValue = computed<Array<number | string>>({
   get: () => {
     const setting = form.value.trigger_setting
-    if (setting.schedule_type === TRIGGER_SCHEDULE_TYPE.INTERVAL) {
-      return setting.interval_unit && setting.interval_value ? [TRIGGER_SCHEDULE_TYPE.INTERVAL, setting.interval_unit, setting.interval_value] : []
+    if (setting.schedule_type === SCHEDULE_TYPE.INTERVAL) {
+      return setting.interval_unit && setting.interval_value ? [SCHEDULE_TYPE.INTERVAL, setting.interval_unit, setting.interval_value] : []
     }
     const time = setting.time?.[0]
     if (!time) return []
-    if (setting.schedule_type === TRIGGER_SCHEDULE_TYPE.DAILY) return [TRIGGER_SCHEDULE_TYPE.DAILY, time]
+    if (setting.schedule_type === SCHEDULE_TYPE.DAILY) return [SCHEDULE_TYPE.DAILY, time]
     const day = setting.days?.[0]
     if (day === undefined) return []
-    if (setting.schedule_type === TRIGGER_SCHEDULE_TYPE.WEEKLY) return [TRIGGER_SCHEDULE_TYPE.WEEKLY, Number(day), time]
-    if (setting.schedule_type === TRIGGER_SCHEDULE_TYPE.MONTHLY) return [TRIGGER_SCHEDULE_TYPE.MONTHLY, String(day), time]
+    if (setting.schedule_type === SCHEDULE_TYPE.WEEKLY) return [SCHEDULE_TYPE.WEEKLY, Number(day), time]
+    if (setting.schedule_type === SCHEDULE_TYPE.MONTHLY) return [SCHEDULE_TYPE.MONTHLY, String(day), time]
     return []
   },
   set: (value) => {
@@ -171,21 +171,21 @@ const scheduleValue = computed<Array<number | string>>({
       return
     }
     const [scheduleType, dayOrUnit, timeOrInterval] = value
-    if (scheduleType === TRIGGER_SCHEDULE_TYPE.INTERVAL) {
+    if (scheduleType === SCHEDULE_TYPE.INTERVAL) {
       Object.assign(setting, { schedule_type: scheduleType, interval_unit: dayOrUnit, interval_value: timeOrInterval })
-    } else if (scheduleType === TRIGGER_SCHEDULE_TYPE.WEEKLY || scheduleType === TRIGGER_SCHEDULE_TYPE.MONTHLY) {
+    } else if (scheduleType === SCHEDULE_TYPE.WEEKLY || scheduleType === SCHEDULE_TYPE.MONTHLY) {
       Object.assign(setting, { schedule_type: scheduleType, days: [dayOrUnit], time: [timeOrInterval] })
     } else {
-      Object.assign(setting, { schedule_type: TRIGGER_SCHEDULE_TYPE.DAILY, time: [dayOrUnit] })
+      Object.assign(setting, { schedule_type: SCHEDULE_TYPE.DAILY, time: [dayOrUnit] })
     }
   },
 })
 function handleSwitchScheduleMode() {
   const setting = form.value.trigger_setting
-  if (setting.schedule_type === TRIGGER_SCHEDULE_TYPE.CRON) setting.schedule_type = presetScheduleType.value
+  if (setting.schedule_type === SCHEDULE_TYPE.CRON) setting.schedule_type = presetScheduleType.value
   else {
     presetScheduleType.value = setting.schedule_type
-    setting.schedule_type = TRIGGER_SCHEDULE_TYPE.CRON
+    setting.schedule_type = SCHEDULE_TYPE.CRON
   }
   formRef.value?.clearValidate('trigger_setting')
 }
@@ -218,13 +218,13 @@ const rules: FormRules<TriggerPayload> = {
           else if (new Set(body.map(({ field }) => field.trim())).size !== body.length) error = '请求参数名称不能重复'
         } else if (!setting.schedule_type) {
           error = '请选择触发周期'
-        } else if (setting.schedule_type === TRIGGER_SCHEDULE_TYPE.CRON) {
+        } else if (setting.schedule_type === SCHEDULE_TYPE.CRON) {
           if (setting.cron_expression?.trim().split(/\s+/).length !== 5) error = '请输入有效的Cron 表达式'
-        } else if (setting.schedule_type === TRIGGER_SCHEDULE_TYPE.INTERVAL) {
+        } else if (setting.schedule_type === SCHEDULE_TYPE.INTERVAL) {
           if (!Number.isInteger(setting.interval_value) || (setting.interval_value ?? 0) < 1) error = '请选择触发周期'
         } else {
           if (!setting.time?.length || setting.time.some((time) => !/^([01]\d|2[0-3]):[0-5]\d$/.test(time))) error = '请选择触发周期'
-          if ([TRIGGER_SCHEDULE_TYPE.WEEKLY, TRIGGER_SCHEDULE_TYPE.MONTHLY].some((type) => type === setting.schedule_type) && !setting.days?.length)
+          if ([SCHEDULE_TYPE.WEEKLY, SCHEDULE_TYPE.MONTHLY].some((type) => type === setting.schedule_type) && !setting.days?.length)
             error = '请选择触发周期'
         }
         callback(error ? new Error(error) : undefined)
@@ -251,11 +251,11 @@ function handleSave() {
       let activeSetting: TriggerSetting
       if (payload.trigger_type === TRIGGER_TYPE.EVENT)
         activeSetting = { token: setting.token, body: setting.body?.map((field) => ({ ...field, field: field.field.trim() })) }
-      else if (setting.schedule_type === TRIGGER_SCHEDULE_TYPE.CRON)
-        activeSetting = { schedule_type: TRIGGER_SCHEDULE_TYPE.CRON, cron_expression: setting.cron_expression?.trim() }
-      else if (setting.schedule_type === TRIGGER_SCHEDULE_TYPE.INTERVAL)
+      else if (setting.schedule_type === SCHEDULE_TYPE.CRON)
+        activeSetting = { schedule_type: SCHEDULE_TYPE.CRON, cron_expression: setting.cron_expression?.trim() }
+      else if (setting.schedule_type === SCHEDULE_TYPE.INTERVAL)
         activeSetting = {
-          schedule_type: TRIGGER_SCHEDULE_TYPE.INTERVAL,
+          schedule_type: SCHEDULE_TYPE.INTERVAL,
           interval_unit: setting.interval_unit,
           interval_value: setting.interval_value,
         }
@@ -263,7 +263,7 @@ function handleSave() {
         activeSetting = {
           schedule_type: setting.schedule_type,
           time: setting.time,
-          ...(setting.schedule_type === TRIGGER_SCHEDULE_TYPE.DAILY ? {} : { days: setting.days }),
+          ...(setting.schedule_type === SCHEDULE_TYPE.DAILY ? {} : { days: setting.days }),
         }
       payload.trigger_setting = activeSetting
       const resource = props.resource
@@ -311,7 +311,7 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="visible" :title="editingId ? '编辑触发器' : '创建触发器'" @closed="handleClosed" :before-close="handleBeforeClose">
-    <div v-loading="loading">
+    <div v-loading="loading || saving">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
         <el-form-item label="触发器名称" prop="name">
           <el-input v-model="form.name" maxlength="64" show-word-limit placeholder="请输入触发器名称" />
@@ -341,11 +341,11 @@ defineExpose({ open })
                     <template v-if="option.value === TRIGGER_TYPE.SCHEDULED">
                       <div class="flex-between mb-2">
                         <span class="mk-required">
-                          {{ form.trigger_setting.schedule_type === TRIGGER_SCHEDULE_TYPE.CRON ? 'Cron 表达式' : '触发周期' }}
+                          {{ form.trigger_setting.schedule_type === SCHEDULE_TYPE.CRON ? 'Cron 表达式' : '触发周期' }}
                         </span>
                         <!-- 切换周期设置与 Cron 表达式 -->
                         <MkTooltip
-                          :content="form.trigger_setting.schedule_type === TRIGGER_SCHEDULE_TYPE.CRON ? '切换为周期设置' : '切换为 Cron 表达式'"
+                          :content="form.trigger_setting.schedule_type === SCHEDULE_TYPE.CRON ? '切换为周期设置' : '切换为 Cron 表达式'"
                           placement="top"
                         >
                           <el-button text type="primary" @click="handleSwitchScheduleMode">
@@ -354,9 +354,9 @@ defineExpose({ open })
                         </MkTooltip>
                       </div>
                       <el-cascader
-                        v-if="form.trigger_setting.schedule_type !== TRIGGER_SCHEDULE_TYPE.CRON"
+                        v-if="form.trigger_setting.schedule_type !== SCHEDULE_TYPE.CRON"
                         v-model="scheduleValue"
-                        :options="TRIGGER_SCHEDULE_OPTIONS"
+                        :options="SCHEDULE_OPTION"
                         :teleported="false"
                         class="w-full"
                         clearable
@@ -408,7 +408,6 @@ defineExpose({ open })
               v-model:loading="loading"
               :trigger-type="form.trigger_type"
               :body="form.trigger_setting.body ?? []"
-              :disabled="saving || loading"
               @change="formRef?.clearValidate('trigger_task')"
             />
             <ToolTaskExecution
@@ -418,7 +417,6 @@ defineExpose({ open })
               :tool="resources[`${resource.source_type}:${resource.source_id}`]"
               :trigger-type="form.trigger_type"
               :body="form.trigger_setting.body ?? []"
-              :disabled="saving || loading"
             />
             <ApplicationTaskExecution
               v-else-if="resource.source_type === RESOURCE_TYPE.APPLICATION && !loading && !detailFailed"
@@ -427,7 +425,6 @@ defineExpose({ open })
               :application="resources[`${resource.source_type}:${resource.source_id}`]"
               :trigger-type="form.trigger_type"
               :body="form.trigger_setting.body ?? []"
-              :disabled="saving || loading"
             />
           </div>
         </el-form-item>

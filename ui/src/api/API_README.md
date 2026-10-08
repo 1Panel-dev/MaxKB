@@ -255,7 +255,7 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 `TOOL_TYPE` 从 `@/api/enums` 导入，`ToolType` 从 `@/api/types` 导入。
 
 触发器参数来源、间隔单位和请求字段类型直接在对应接口字段中声明字符串联合类型，
-不单独导出运行时枚举；表单选项使用对应字符串值。触发周期继续复用 `TRIGGER_SCHEDULE_TYPE`。
+不单独导出运行时枚举；表单选项使用对应字符串值。触发周期继续复用 `SCHEDULE_TYPE`。
 
 新增或移动类型时按以下顺序判断：
 
@@ -617,3 +617,21 @@ Workspace 共享知识库详情由 `resourceScope: 'workspace-shared'` 选择上
 
 Web 知识库创建的 `WebKnowledgeCreatePayload.doc_strategy` 使用公共 `DocumentStrategy` 类型，
 包含 `split`、`visual` 和 `index`，字段与后端文档处理策略协议一致。
+
+Web 知识库详情及更新响应的顶层 `doc_strategy` 使用 `DocumentStrategy | null`，由
+`KnowledgeItem` 声明；非 Web 类型返回 null。文档处理策略设置通过 `putKnowledge` 仅提交
+`{ doc_strategy }`，服务端合并到知识库 meta，保留其他来源配置，保存不立即发起同步。
+
+### 知识库定时同步
+
+下列接口定义暂时保留，`setting/scheduled-sync/` 页面尚不调用查询、保存或日志接口。
+
+`workspace/knowledge/sync.ts` 提供 `getKnowledgeSyncSetting`、`putKnowledgeSyncSetting`，
+分别通过 GET、PUT `/<knowledgeId>/sync_setting` 查询和保存 Web、飞书及工作流知识库同步设置。
+`KnowledgeSyncSetting` 定义在 `types/knowledge-sync.ts`，包含 `enabled`、`schedule_type`、
+`sync_type` 及当前周期的时间、日期、间隔或 Cron 字段；`time` 为 HH:mm 数组，
+每周日期为 1–7，每月日期为 1–31。服务端校验至少 5 分钟的频率，保存不立即发起同步。
+`getKnowledgeSyncLogPage(knowledgeId, page)` 查询 `/<knowledgeId>/sync_log/<currentPage>/<pageSize>`，
+使用 `ResponsePage<KnowledgeSyncLog>`，返回文档计数、消息、四种执行状态、毫秒及秒数耗时，
+包含手动和定时任务。周期类型统一复用 `enums/schedule.ts` 的 `SCHEDULE_TYPE`，
+触发器、长期记忆及知识库同步共享同一协议值；日志状态仍维护在 `enums/knowledge.ts`，均经 `@/api/enums` 导入。

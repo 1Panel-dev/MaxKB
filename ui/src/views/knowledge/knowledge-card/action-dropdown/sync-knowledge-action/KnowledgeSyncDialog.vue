@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import { KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
+import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import type { KnowledgeSyncType } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
@@ -14,11 +15,6 @@ const emit = defineEmits<{ closed: [] }>()
 /* Web 知识库同步方式与提交 */
 const visible = ref(false)
 const syncType = ref<KnowledgeSyncType>(KNOWLEDGE_SYNC_TYPE.INCREMENTAL)
-const syncOptions = [
-  { value: KNOWLEDGE_SYNC_TYPE.INCREMENTAL, label: '增量同步', description: '文档内容无更新时跳过，有更新时则更新文档的分段' },
-  { value: KNOWLEDGE_SYNC_TYPE.REPLACE, label: '替换同步', description: '重新获取 Web 站点文档，替换本地知识库中相同URL的文档' },
-  { value: KNOWLEDGE_SYNC_TYPE.COMPLETE, label: '整体同步', description: '先删除知识库中所有文档，重新从Web站点获取文档' },
-] as const
 
 function open() {
   visible.value = true
@@ -44,8 +40,8 @@ defineExpose({ open })
 <template>
   <MkDialog v-model="visible" title="同步知识库" :show-close="!loading" @closed="emit('closed')">
     <p class="mb-2">同步方式</p>
-    <el-radio-group v-model="syncType" :disabled="loading" class="space-y-2">
-      <template v-for="option in syncOptions" :key="option.value">
+    <el-radio-group v-model="syncType" v-loading="loading" class="space-y-2">
+      <template v-for="option in KNOWLEDGE_SYNC_OPTIONS" :key="option.value">
         <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': syncType === option.value }">
           <el-radio :value="option.value" class="mk-card-radio">
             <h6>{{ option.label }}</h6>

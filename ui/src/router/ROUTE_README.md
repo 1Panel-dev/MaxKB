@@ -355,7 +355,8 @@ Web 展示“设置 → 基础设置、文档处理策略、定时同步”；�
 `/setting/base`、`/setting/document-strategy`、`/setting/scheduled-sync`，路由名分别为
 `workspace-knowledge-base-setting`、`workspace-knowledge-document-strategy`、
 `workspace-knowledge-scheduled-sync`。基础设置与通用设置复用
-`knowledge-detail/setting/base/index.vue` 和容器提供的详情，其他两个设置页暂为占位。
+`knowledge-detail/setting/base/index.vue` 和容器提供的详情。文档处理策略页复用
+`DocumentStrategyForm` 回填及保存策略，定时同步页提供同步设置与分页日志。
 设置路由不配置类型访问守卫，菜单显隐由 `detailMenuVisible` 控制。
 列表设置按钮按知识库类型直接进入通用设置或基础设置。
 `workspace-knowledge-settings` 仅提供菜单分组层级，

@@ -8,6 +8,7 @@ export * from './resource-authorization'
 export * from './tool'
 export * from './knowledge'
 export * from './trigger'
+export * from './schedule'
 export * from './file'
 export * from './state'
 

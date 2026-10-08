@@ -23,7 +23,7 @@ watch(
 </script>
 
 <template>
-  <div class="space-y-1 px-4">
+  <div class="space-y-1 px-4 pb-3">
     <template v-for="menuItem in props.menuItems" :key="menuItem.name">
       <!-- 展开或收起菜单分组 -->
       <MkCollapse

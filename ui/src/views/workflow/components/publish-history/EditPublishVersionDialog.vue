@@ -60,7 +60,7 @@ defineExpose({ open, close })
       ref="formRef"
       :model="versionForm"
       :rules="rules"
-      :disabled="saving"
+      v-loading="saving"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent

@@ -86,7 +86,7 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="创建工作流知识库" align-center :before-close="handleBeforeClose" @closed="handleClosed">
-    <KnowledgeBaseForm ref="baseFormRef" :disabled="loading" />
+    <KnowledgeBaseForm ref="baseFormRef" v-loading="loading" />
     <template #footer>
       <!-- 取消创建 -->
       <el-button plain :disabled="loading" @click="dialogVisible = false">取消</el-button>
