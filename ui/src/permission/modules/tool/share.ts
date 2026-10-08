@@ -24,7 +24,7 @@ const share = {
   /**
    * 系统「共享工具」（系统 > 共享 > 工具）只读权限
    */
-  read: () => canSys(P.SHARED_TOOL_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.SHARED_TOOL_READ) && hasEdition(Edition.EE),
 
   // —— 工具资源 ——
   create: () => canSys(P.SHARED_TOOL_CREATE),

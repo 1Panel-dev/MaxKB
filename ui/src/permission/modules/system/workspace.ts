@@ -8,7 +8,7 @@ export default {
   /**
    * 系统「工作空间」只读权限
    * */
-  read: () => hasPermission([RoleConstants.ADMIN,RoleConstants.WORKSPACE_MANAGE,P.WORKSPACE_READ],Compare.OR) && hasEdition(Edition.PE),
+  read: () => hasPermission([RoleConstants.ADMIN,RoleConstants.WORKSPACE_MANAGE,P.WORKSPACE_READ],Compare.OR) && hasEdition(Edition.EE),
   /**
    * 系统「工作空间」创建权限
    */

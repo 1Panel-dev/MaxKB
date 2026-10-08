@@ -19,7 +19,7 @@ const system = {
   /**
    * 系统「模型资源管理」（系统 > 资源管理 > 模型）只读权限
    * */
-  read: () => canSys(P.RESOURCE_MODEL_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.RESOURCE_MODEL_READ) && hasEdition(Edition.EE),
   isShare: () => canSys(P.MODEL_READ),
 
   // —— 模型资源 ——

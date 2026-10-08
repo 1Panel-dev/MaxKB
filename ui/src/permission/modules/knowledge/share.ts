@@ -78,7 +78,7 @@ const share = {
   /**
    * 系统「共享知识库」（系统 > 共享 > 知识库）只读权限
    * */
-  read: () => canSys(P.SHARED_KNOWLEDGE_WORKFLOW_READ) && hasEdition(Edition.PE),
+  read: () => canSys(P.SHARED_KNOWLEDGE_WORKFLOW_READ) && hasEdition(Edition.EE),
 }
 
 export default share
