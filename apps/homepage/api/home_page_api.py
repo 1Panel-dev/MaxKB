@@ -400,28 +400,3 @@ class ModelAggregationAPI(APIMixin):
                 description=_("Workspace ID"),
             ),
         ]
-
-
-def system_parameters(api_class):
-    """系统管理端点参数：workspace_id 由 PATH 必填改为可选 query 参数（传了查指定工作空间，缺省查全局）"""
-    params = api_class.get_parameters()
-    return [
-        (
-            OpenApiParameter(
-                name="workspace_id",
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=False,
-                description=_("Workspace ID (optional; omit to query across all workspaces)"),
-            )
-            if _param_name(p) == "workspace_id"
-            else p
-        )
-        for p in params
-    ]
-
-
-def _param_name(param):
-    if isinstance(param, dict):
-        return param.get("name")
-    return getattr(param, "name", None)
