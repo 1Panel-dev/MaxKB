@@ -37,7 +37,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 path: 'image',
                 name: 'workspace-knowledge-image-list',
                 component: () => import('@/views/knowledge-detail/library/image/index.vue'),
-                meta: { title: '图片', order: 20 },
+                meta: { title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE },
               },
               {
                 path: 'tag',

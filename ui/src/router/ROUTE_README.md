@@ -379,6 +379,7 @@ System 共享资源页面：
 详情容器复用 `ResourceDetailLayout`，菜单依次为“资料库（文档、图片、标签管理）”、
 “工作流”、“检索优化（召回测试、问题、自定义分词）”、“授权与集成（对话用户、外部检索服务）”、
 “设置”。资料库分组使用空 path，保留原 `/document` 地址；图片和标签分别使用 `/image`、`/tag`。
+图片菜单通过路由 `detailMenuVisible(params)` 判断，仅 `BASE` 类型显示，其他类型不显示。
 对应 View 统一位于 `views/knowledge-detail/library/` 下的 `document/`、`image/`、`tag/`；
 普通和共享文档路由均引用 `library/document/index.vue`，文件分组不增加 URL 层级。
 检索优化使用 `/retrieval/recall`、`/retrieval/question`、`/retrieval/dictionary`；

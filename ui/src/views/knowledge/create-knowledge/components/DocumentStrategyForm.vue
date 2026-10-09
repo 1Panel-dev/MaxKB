@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import type { DocumentStrategy, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
@@ -41,7 +41,7 @@ const splitPatternOptions = ['#', '##', '###', '####', '#####', '######'].map((h
   label: heading,
   value: `(?m)^${heading} .*`,
 }))
-const splitPatterns = ref<string[]>(splitPatternOptions.slice(0, 4).map((option) => option.value))
+const splitPatterns = ref<string[]>([])
 const splitOptions = [
   { value: 'smart', title: '智能分段（推荐）', desc: '不了解如何设置分段规则时推荐使用智能分段' },
   { value: 'advanced', title: '高级分段', desc: '用户可根据文档规范自行设置分段标识符、分段长度以及清洗规则' },
@@ -62,9 +62,9 @@ function setStrategy(value?: DocumentStrategy | null) {
   })
   Object.assign(strategy.visual, { enabled: false, strategy: 'model', model_id: null, tool_id: null, ...cloneDeep(value?.visual) })
   Object.assign(strategy.index, { title_as_question: false, ...cloneDeep(value?.index) })
-  splitPatterns.value =
-    value?.split.mode === 'advanced' ? cloneDeep(value.split.patterns ?? []) : splitPatternOptions.slice(0, 4).map((option) => option.value)
+  splitPatterns.value = value?.split.mode === 'advanced' ? cloneDeep(value.split.patterns ?? []) : []
   formRef.value?.clearValidate()
+  void handleVisualChange()
 }
 function getStrategy(): DocumentStrategy {
   return {
@@ -94,28 +94,48 @@ const requestToolApi = computed(() => {
   if (isSystemSharedResource()) return SystemSharedToolApi
   return ToolApi
 })
-const optionsLoading = ref(false)
+const modelOptionsLoading = ref(false)
+const toolOptionsLoading = ref(false)
 const modelOptions = ref<ModelItem[]>([])
 const providerOptions = ref<ModelProviderItem[]>([])
 const toolOptions = ref<ToolItem[]>([])
 const selectedVisualTool = computed(() => toolOptions.value.find((tool) => tool.id === strategy.visual.tool_id))
-function loadOptions() {
-  optionsLoading.value = true
-  return Promise.all([
-    requestModelApi.value.getModelListWithShared({ model_type: 'IMAGE' }),
-    ProviderApi.getProviderList({ model_type: 'IMAGE' }),
-    requestToolApi.value.getToolListWithShared(),
-  ])
-    .then(([models, providers, tools]) => {
+function loadModelOptions() {
+  if (!strategy.visual.enabled || strategy.visual.strategy !== 'model' || modelOptionsLoading.value) return
+  modelOptionsLoading.value = true
+  return Promise.all([requestModelApi.value.getModelListWithShared({ model_type: 'IMAGE' }), ProviderApi.getProviderList({ model_type: 'IMAGE' })])
+    .then(([models, providers]) => {
       modelOptions.value = models
       providerOptions.value = providers
-      toolOptions.value = tools
+    })
+    .catch(() => {
+      // 请求层统一提示错误，保留已有选项供再次加载。
     })
     .finally(() => {
-      optionsLoading.value = false
+      modelOptionsLoading.value = false
     })
 }
-onMounted(loadOptions)
+
+function loadToolOptions() {
+  if (!strategy.visual.enabled || strategy.visual.strategy !== 'tool' || toolOptionsLoading.value) return
+  toolOptionsLoading.value = true
+  return requestToolApi.value
+    .getToolListWithShared()
+    .then((tools) => {
+      toolOptions.value = tools
+    })
+    .catch(() => {
+      // 请求层统一提示错误，保留已有选项供再次加载。
+    })
+    .finally(() => {
+      toolOptionsLoading.value = false
+    })
+}
+
+function handleVisualChange() {
+  if (!strategy.visual.enabled) return
+  return strategy.visual.strategy === 'model' ? loadModelOptions() : loadToolOptions()
+}
 defineExpose({ validate, getStrategy, setStrategy })
 </script>
 
@@ -153,15 +173,7 @@ defineExpose({ validate, getStrategy, setStrategy })
                     </MkTooltip>
                   </span>
                 </template>
-                <el-select
-                  v-model="splitPatterns"
-                  multiple
-                  filterable
-                  allow-create
-                  default-first-option
-                  placeholder="请选择或输入分段标识"
-                  class="w-full"
-                >
+                <el-select v-model="splitPatterns" multiple filterable allow-create default-first-option placeholder="请选择分段标识" class="w-full">
                   <el-option v-for="pattern in splitPatternOptions" :key="pattern.value" :label="pattern.label" :value="pattern.value" />
                 </el-select>
               </el-form-item>
@@ -232,11 +244,11 @@ defineExpose({ validate, getStrategy, setStrategy })
           <h6>视觉增强</h6>
           <p class="mt-1 text-N600 text-sm">识别文档中图片，将图片按照策略发给模型或工具处理，并将返回内容写入图片的描述中</p>
         </div>
-        <el-switch v-model="strategy.visual.enabled" />
+        <el-switch v-model="strategy.visual.enabled" @change="handleVisualChange" />
       </div>
       <div v-if="strategy.visual.enabled" class="mk-gray-card-lg mt-4">
         <el-form-item label="增强策略" required>
-          <el-radio-group v-model="strategy.visual.strategy">
+          <el-radio-group v-model="strategy.visual.strategy" @change="handleVisualChange">
             <el-radio value="model">模型增强</el-radio>
             <el-radio value="tool">工具增强</el-radio>
           </el-radio-group>
@@ -252,11 +264,11 @@ defineExpose({ validate, getStrategy, setStrategy })
             v-model="visualModelId"
             :options="modelOptions"
             :provider-options="providerOptions"
-            :disabled="optionsLoading"
+            :disabled="modelOptionsLoading"
             placeholder="请选择视觉模型"
             teleported
             can-add
-            @refresh="loadOptions"
+            @refresh="loadModelOptions"
           />
         </el-form-item>
         <el-form-item
@@ -266,7 +278,7 @@ defineExpose({ validate, getStrategy, setStrategy })
           :rules="{ required: true, message: '请选择增强工具', trigger: 'change' }"
           class="mb-0! mt-4"
         >
-          <el-select v-model="strategy.visual.tool_id" placeholder="请选择增强工具" filterable class="w-full">
+          <el-select v-model="strategy.visual.tool_id" :loading="toolOptionsLoading" placeholder="请选择增强工具" filterable class="w-full">
             <template #label="{ label }">
               <div class="flex-align-center gap-2">
                 <ToolIcon

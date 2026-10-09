@@ -92,7 +92,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="drawerVisible" direction="btt" content-class="h-full p-0!" @closed="resetData">
+  <MkDrawer v-model="drawerVisible" direction="btt" @closed="resetData">
     <template #header>
       <div class="flex w-full">
         <h4>创建 Web 知识库</h4>
@@ -102,53 +102,51 @@ defineExpose({ open })
         </el-steps>
       </div>
     </template>
-    <MkViewLayout title="" :loading="loading">
-      <template #default="{ Footer }">
-        <div class="mx-auto w-full max-w-200 pt-6">
-          <section v-show="activeStep === 0">
-            <h4 class="mb-5 border-l-2 border-primary pl-2">基本信息</h4>
-            <KnowledgeBaseForm ref="baseFormRef" />
-            <el-form
-              class="mt-4"
-              ref="knowledgeFormRef"
-              :model="knowledgeForm"
-              :rules="knowledgeFormRules"
-              label-position="top"
-              require-asterisk-position="right"
-              @submit.prevent
-            >
-              <el-form-item label="Web 根地址" prop="source_url">
-                <el-input
-                  v-model="knowledgeForm.source_url"
-                  placeholder="请输入 Web 根地址"
-                  @blur="knowledgeForm.source_url = knowledgeForm.source_url.trim()"
-                />
-              </el-form-item>
-              <el-form-item label="选择器" prop="selector">
-                <el-input
-                  v-model="knowledgeForm.selector"
-                  placeholder="默认为 body，可输入 .classname/#idname/tagname"
-                  @blur="knowledgeForm.selector = knowledgeForm.selector.trim()"
-                />
-              </el-form-item>
-            </el-form>
-          </section>
-          <section v-show="activeStep === 1">
-            <h4 class="mb-5 mk-title-decoration">文档处理策略</h4>
-            <DocumentStrategyForm ref="strategyFormRef" />
-          </section>
-        </div>
-        <component :is="Footer">
-          <!-- 取消创建 -->
-          <el-button plain :disabled="loading" @click="drawerVisible = false">取消</el-button>
-          <!-- 返回基本信息 -->
-          <el-button v-if="activeStep === 1" plain :disabled="loading" @click="activeStep = 0">上一步</el-button>
-          <!-- 校验基本信息并进入策略配置 -->
-          <el-button v-if="activeStep === 0" type="primary" :loading="loading" @click="handleNext">下一步</el-button>
-          <!-- 创建知识库 -->
-          <el-button v-else type="primary" :loading="loading" @click="submit">创建</el-button>
-        </component>
-      </template>
-    </MkViewLayout>
+
+    <div class="mx-auto w-full max-w-200" v-loading="loading">
+      <section v-show="activeStep === 0">
+        <h4 class="mb-4 mk-title-decoration">基本信息</h4>
+        <KnowledgeBaseForm ref="baseFormRef" />
+        <el-form
+          class="mt-4"
+          ref="knowledgeFormRef"
+          :model="knowledgeForm"
+          :rules="knowledgeFormRules"
+          label-position="top"
+          require-asterisk-position="right"
+          @submit.prevent
+        >
+          <el-form-item label="Web 根地址" prop="source_url">
+            <el-input
+              v-model="knowledgeForm.source_url"
+              placeholder="请输入 Web 根地址"
+              @blur="knowledgeForm.source_url = knowledgeForm.source_url.trim()"
+            />
+          </el-form-item>
+          <el-form-item label="选择器" prop="selector">
+            <el-input
+              v-model="knowledgeForm.selector"
+              placeholder="默认为 body，可输入 .classname/#idname/tagname"
+              @blur="knowledgeForm.selector = knowledgeForm.selector.trim()"
+            />
+          </el-form-item>
+        </el-form>
+      </section>
+      <section v-show="activeStep === 1">
+        <h4 class="mb-5 mk-title-decoration">文档处理策略</h4>
+        <DocumentStrategyForm ref="strategyFormRef" />
+      </section>
+    </div>
+
+    <template #footer>
+      <!-- 取消创建 -->
+      <el-button plain :disabled="loading" @click="drawerVisible = false">取消</el-button>
+      <!-- 返回基本信息 -->
+      <el-button v-if="activeStep === 1" plain :disabled="loading" @click="activeStep = 0">上一步</el-button>
+      <!-- 校验基本信息并进入策略配置 -->
+      <el-button v-if="activeStep === 0" type="primary" :loading="loading" @click="handleNext">下一步</el-button>
+      <!-- 创建知识库 -->
+      <el-button v-else type="primary" :loading="loading" @click="submit">创建</el-button>
+    </template>
   </MkDrawer>
 </template>

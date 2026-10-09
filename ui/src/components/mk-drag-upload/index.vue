@@ -1,104 +1,85 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
-import type { UploadFile, UploadFiles, UploadInstance, UploadUserFile } from 'element-plus'
-import uploadImage from '@/assets/mk_icon_upload.svg'
-import { getFileIconUrl } from '@/utils/icon'
-import { formatFileSize } from '@/utils/number'
+import type { UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
+import SingleFileUpload from './SingleFileUpload.vue'
+import MultipleFileUpload from './MultipleFileUpload.vue'
+import type { DragUploadFile } from './types'
 
 defineOptions({ name: 'MkDragUpload' })
 
-withDefaults(defineProps<{ accept?: string; disabled?: boolean; dragText?: string; replaceText?: string; selectText?: string; tipText?: string }>(), {
-  accept: '',
-  disabled: false,
-  dragText: '将文件拖至此区域或',
-  replaceText: '更换文件',
-  selectText: '选择文件上传',
-  tipText: '',
-})
+defineProps<{
+  accept?: string
+  disabled?: boolean
+  multiple?: boolean
+  limit?: number
+  sizeLimit?: number
+  dragText?: string
+  replaceText?: string
+  selectText?: string
+  tipText?: string
+}>()
 
-const emit = defineEmits<{ change: [file: UploadFile, fileList: UploadFiles]; remove: [file: UploadUserFile] }>()
+const emit = defineEmits<{
+  change: [file: UploadFile, fileList: UploadFiles]
+  remove: [file: UploadUserFile]
+  retry: [file: DragUploadFile]
+  exceed: [files: File[], fileList: UploadUserFile[]]
+}>()
 
-defineSlots<{ download?(props: { file: UploadUserFile }): unknown }>()
+defineSlots<{
+  download?(props: { file: DragUploadFile }): unknown
+}>()
 
-const fileList = defineModel<UploadUserFile[]>({ required: true })
-const uploadRef = useTemplateRef<UploadInstance>('uploadRef')
-const selectedFile = computed(() => fileList.value[0])
+const fileList = defineModel<DragUploadFile[]>({ required: true })
+const uploadingCount = computed(() => fileList.value.filter((file) => file.status === 'uploading').length)
+const uploadRef = useTemplateRef<InstanceType<typeof SingleFileUpload> | InstanceType<typeof MultipleFileUpload>>('uploadRef')
 
+/* 转发单文件、多文件组件的事件和公开方法。 */
 function handleFileChange(file: UploadFile, files: UploadFiles) {
   emit('change', file, files)
+}
+
+function handleFileRemove(file: UploadUserFile) {
+  emit('remove', file)
+}
+
+function handleRetry(file: DragUploadFile) {
+  emit('retry', file)
+}
+
+function handleExceed(files: File[], filesList: UploadUserFile[]) {
+  emit('exceed', files, filesList)
 }
 
 function clearFiles() {
   uploadRef.value?.clearFiles()
 }
 
-function handleRemove() {
-  if (!selectedFile.value) return
-
-  const file = selectedFile.value
-  fileList.value = []
-  clearFiles()
-  emit('remove', file)
+function handleRemove(file: UploadUserFile) {
+  uploadRef.value?.handleRemove(file)
 }
 
-defineExpose({ clearFiles })
+defineExpose({ clearFiles, handleRemove, uploadingCount })
 </script>
 
 <template>
-  <div class="w-full">
-    <template v-if="selectedFile">
-      <el-card class="small" shadow="never">
-        <div class="flex-align-center gap-2">
-          <img :src="getFileIconUrl(selectedFile.name)" alt="" class="w-10 shrink-0 object-contain" />
-          <div class="min-w-0 flex-1">
-            <p class="truncate" :title="selectedFile.name">{{ selectedFile.name }}</p>
-            <span class="text-sm text-N500">{{ formatFileSize(selectedFile.size) }}</span>
-          </div>
-          <div class="flex-align-center shrink-0 gap-1">
-            <slot name="download" :file="selectedFile" />
-            <!-- 删除文件 -->
-            <el-button :disabled="disabled" text @click="handleRemove">
-              <MkIcon name="icon_delete-trash_outlined" />
-            </el-button>
-          </div>
-        </div>
-      </el-card>
-      <div class="mt-2 flex gap-3">
-        <el-upload
-          ref="uploadRef"
-          v-model:file-list="fileList"
-          action="#"
-          :accept="accept"
-          :auto-upload="false"
-          :disabled="disabled"
-          :on-change="handleFileChange"
-          :show-file-list="false"
-        >
-          <el-button :disabled="disabled" link type="primary">更换文件</el-button>
-        </el-upload>
-      </div>
-    </template>
-
-    <el-upload
-      v-else
-      ref="uploadRef"
-      v-model:file-list="fileList"
-      action="#"
-      :accept="accept"
-      :auto-upload="false"
-      class="w-full"
-      :disabled="disabled"
-      drag
-      :on-change="handleFileChange"
-      :show-file-list="false"
-    >
-      <div class="mb-2 flex justify-center">
-        <img :src="uploadImage" alt="" />
-      </div>
-      <div class="el-upload__text">
-        <p>将文件拖至此区域或 <em>选择文件上传</em></p>
-        <p v-if="tipText" class="text-N600">{{ tipText }}</p>
-      </div>
-    </el-upload>
-  </div>
+  <component
+    :is="multiple ? MultipleFileUpload : SingleFileUpload"
+    ref="uploadRef"
+    v-model="fileList"
+    :accept="accept"
+    :disabled="disabled"
+    :limit="limit"
+    :size-limit="multiple ? sizeLimit : undefined"
+    :drag-text="dragText"
+    :replace-text="replaceText"
+    :select-text="selectText"
+    :tip-text="tipText"
+    @change="handleFileChange"
+    @remove="handleFileRemove"
+    @retry="handleRetry"
+    @exceed="handleExceed"
+  >
+    <template v-if="$slots.download" #download="{ file }"><slot name="download" :file="file" /></template>
+  </component>
 </template>

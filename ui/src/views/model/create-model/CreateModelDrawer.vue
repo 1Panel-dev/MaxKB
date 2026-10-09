@@ -224,7 +224,7 @@ defineExpose({ open })
               >
                 <template #label>
                   <span class="inline-flex items-center gap-2">
-                    <span class="mk-required"> 模型名称</span>
+                    <span class="mk-required">模型名称</span>
 
                     <MkTooltip content="MaxKB 中自定义的模型名称" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
@@ -242,7 +242,7 @@ defineExpose({ open })
               <el-form-item class="mk-hide-asterisk" prop="model_type" :rules="{ required: true, message: '请选择模型类型', trigger: 'change' }">
                 <template #label>
                   <span class="inline-flex items-center gap-2">
-                    <span class="mk-required"> 模型类型</span>
+                    <span class="mk-required">模型类型</span>
                     <MkTooltip placement="right">
                       <template #content>
                         <p>大语言模型：在智能体中与AI对话的推理模型。</p>
@@ -271,8 +271,8 @@ defineExpose({ open })
               >
                 <template #label>
                   <span class="inline-flex items-center gap-2">
-                    <span class="mk-required"> 基础模型</span>
-                    <span class="text-warning"> 列表中未列出的模型，直接输入模型名称，回车即可添加 </span>
+                    <span class="mk-required">基础模型</span>
+                    <span class="text-warning">列表中未列出的模型，直接输入模型名称，回车即可添加</span>
                   </span>
                 </template>
                 <el-select
@@ -287,7 +287,7 @@ defineExpose({ open })
                   <el-option v-for="option in baseModelOptions" :key="option.name" :label="option.name" :value="option.name">
                     <template #default>
                       <div class="flex-align-center gap-2">
-                        <span>{{ option.name }} </span>
+                        <span>{{ option.name }}</span>
                         <MkTooltip v-if="option.desc" :content="option.desc" placement="right">
                           <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
                         </MkTooltip>

@@ -126,6 +126,8 @@ const getKnowledgeMcpConfig = (knowledgeId: string): Promise<string> =>
 const putKnowledgeKeywordIndex = (knowledgeId: string) => put<undefined, void>(`${getPrefix()}/${knowledgeId}/tokenize`)
 
 /** 获取知识库按标签名称分组的标签选项。 */
+
+// TODO
 const getKnowledgeTags = (knowledgeId: string) => get<KnowledgeTagGroup[]>(`${getPrefix()}/${knowledgeId}/tags`)
 
 export default {

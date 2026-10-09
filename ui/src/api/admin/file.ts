@@ -1,5 +1,5 @@
 import type { AxiosProgressEvent } from 'axios'
-import { postUpload } from './core/request'
+import { postUpload, del } from './core/request'
 import type { FileSourceType } from '@/api/types'
 
 /** 上传资源文件，支持可选的进度回调与取消操作。 */
@@ -16,4 +16,7 @@ const postUploadFile = (
   return postUpload<string>('/oss/file', formData, onProgress)
 }
 
-export default { postUploadFile }
+/** 删除已上传的资源文件。 */
+const deleteFile = (fileId: string) => del(`/oss/file/${fileId}`)
+
+export default { postUploadFile, deleteFile }

@@ -672,11 +672,37 @@ Logo 数据统一从 Theme Store 获取。
 
 ### MkDragUpload
 
-组合拖拽选择区和已选文件卡片，通过 `v-model` 管理 Element Plus `UploadUserFile[]`。`accept`
-直接传给上传控件；`dragText`、`selectText`、`tipText` 和 `replaceText` 可替换展示文案。组件只负责
-文件选择与展示，使用方通过 `change` 执行校验和上传，通过 `remove` 清理业务数据；`download`
-作用域插槽提供当前文件，由使用方按业务需要放置下载按钮。组件暴露 `clearFiles()`，用于请求失败
-或表单重置时清空上传控件内部状态。
+`mk-drag-upload/index.vue` 为统一入口，根据 `multiple` 选择 `SingleFileUpload.vue` 或
+`MultipleFileUpload.vue`，转发 Props、事件、插槽和公开方法。单文件的卡片、更换及整体清理逻辑
+放在 `SingleFileUpload.vue`，多文件的常驻拖拽区、文件列表及逐项删除逻辑放在
+`MultipleFileUpload.vue`，不在一个实现中混合两种模式的状态分支。
+两种模式均通过 `v-model` 管理兼容 Element Plus `UploadUserFile[]` 的 `DragUploadFile[]`，
+类型定义位于 `mk-drag-upload/types.ts`，可携带 `file_id`、`errMsg` 和 `canRetry`。
+`multiple` 默认为 `false`，单文件模式选择后展示默认卡片和更换入口；传入 `multiple` 后支持
+多文件选择，拖拽区保持显示。`accept`、`limit` 直接传给上传控件，多文件模式内部也校验文件格式、
+空文件和重复文件；超出数量时提示并发出 `exceed`。`sizeLimit` 为多文件的单文件大小上限（MB），
+默认 100；超限保留 `fail` 卡片和大小错误提示，不允许重试。格式不支持、空文件及重复选择移除；
+目录中的 `.DS_Store` 格式不支持时静默移除。
+`dragText`、`selectText`、`tipText` 和 `replaceText` 可替换默认文案，格式或限制说明通过
+`tipText` 展示。文件列表由各模式组件直接展示，多文件模式展示
+已选数量或上传完成汇总和两列 `el-card.small` 文件卡片；`download` 作用域插槽为文件卡片提供下载操作。
+多文件列表使用 Element Plus 的 `ready`、`uploading`、`success`、`fail` 状态展示进度和失败原因，
+可重试失败文件、其他失败文件、上传中文件依次置顶。尚未上传的文件显示已选择，不计入完成数。
+多文件组件通过 `inject('upload')` 获取调用方提供的 `DragUploadHandler`：
+`(file, onProgress) => { request: Promise<string>, abort }`。选择文件后先发出 `change`，等待
+调用方列表回写并完成组件校验，再上传保留的 `ready` 文件；进度回调更新 `percentage`，请求成功后
+从响应地址提取 `file_id` 并标记 `success`，网络失败标记 `fail` 并允许重试。100% 表示传输完成，成功状态以请求响应为准。
+单个和全部重试仅对 `fail` 且 `canRetry` 的文件生效，有注入接口时直接重新上传；未注入时
+保持文件选择模式，重试逐文件发出 `retry(file)`。删除、清空和卸载时取消仍在进行的上传。
+使用方可通过 `change` 增加业务校验，通过 `remove` 清理业务数据。具体接口由页面
+`provide<DragUploadHandler>('upload', handler)` 提供，不写入公共组件。
+多文件组件移除 `success` 且具有 `file_id` 的文件时，直接调用 Admin `FileApi.deleteFile(file_id)`
+删除服务端文件；`remove` 事件仍用于通知调用方清理业务数据。
+数量限制使用 `limit`，不通过展示插槽控制行为。
+组件暴露 `clearFiles()` 清空控件状态、`handleRemove(file)` 移除文件和响应式 `uploadingCount` 上传中数量。
+多文件组件的默认选择文案内提供“选择文件夹”，内部维护隐藏的目录选择 input，选择后逐项
+加入上传控件并触发相同的 `change` 流程；等待调用方校验回写后再计算数量限制，超限发出
+`exceed`。多文件通用校验由组件负责，具体请求由业务页面提供。
 
 ### PythonCodeEditor
 

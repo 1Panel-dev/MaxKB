@@ -413,6 +413,11 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 `KnowledgeWorkflowDetail`。前端详情与保存协议的 `default_model_setting` 复用
 `DefaultModelSettingPayload`；服务端需支持该字段的持久化与回传（当前仓库知识库后端尚未实现）。
 
+`postKnowledgeWorkflowImport(knowledgeId, payload)` 使用 POST `/<knowledgeId>/upload_document`
+执行已发布版本的文档导入，参数复用 `KnowledgeWorkflowDebugPayload`，结果为
+`KnowledgeWorkflowAction`；调试仍调用独立的 `/debug`。文档页导入 Drawer 复用工作流的
+数据源、知识库输入及结果 Action，执行详情沿用 `getKnowledgeWorkflowAction`。
+
 ### 智能体复制
 
 `ApplicationDetail` 复用 `ApplicationFormPayload` 中的配置字段，并保留详情接口的 `model`
@@ -500,7 +505,8 @@ Admin 上传尚未创建的资源文件时，`sourceId` 可传 `undefined`，省
 普通上传直接等待 `request`，需要进度时传入 `(percent, event)`；只有能获取上传总量时才回调
 0–100 的百分比，100 表示请求体已上传，不代表服务端处理成功，完成状态以 `request` 为准。
 取消时 Promise 仍拒绝，由调用方处理状态，请求层不弹出通用错误提示；loading 由调用方在
-`finally` 中恢复。
+`finally` 中恢复。Admin `FileApi.deleteFile(fileId)` 通过 DELETE `/oss/file/<fileId>` 删除已上传文件，
+返回值沿用请求层统一解包，不使用 v2 的 `Result` 包装。
 
 资源类型使用 `@/api/enums` 的 `FILE_SOURCE_TYPE` 与 `@/api/types` 的 `FileSourceType`，
 包括知识库、智能体、工具、文档、对话及三种临时文件有效期。对话 Store 使用
@@ -539,6 +545,27 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 
 ### 知识库文档
 
+文档地址及飞书导入也维护在 `workspace/knowledge/document.ts`：
+`postWebDocument` 向 `/<knowledgeId>/document/web` 提交 `WebDocumentImportPayload`，包含
+`source_url_list`、`selector` 与 `doc_strategy`。
+`getLarkDocumentList` 沿用 POST `/lark/<knowledgeId>/<folderToken>/doc_list`，支持 `page_token`，
+返回 `LarkDocumentList` 的 `files`、`has_more` 和 `next_page_token`。
+`postImportLarkDocuments` 沿用 POST `/lark/<knowledgeId>/import` 的文档数组协议，
+每项为 `LarkDocumentImportPayload`（名称、token、类型及处理策略）。飞书接口属于扩展端；
+当前仓库未包含 v3 实现，`doc_strategy` 的持久化与执行需要扩展端支持，不能视为已联调。
+上述跨 API 与 UI 的类型统一通过 `@/api/types` 导出。
+
+文档上传复用 `workspace/knowledge/document.ts`：`postSplitDocuments` 向 `document/split`
+发送多文件 FormData（重复 `file` 字段）与 JSON 字符串 `doc_strategy`，返回 `DocumentSplitResult[]`；
+页面将解析结果的 `content` 转为 `paragraphs`，保留 `source_file_id` 与策略，再通过
+`putBatchCreateDocuments` PUT `document/batch_create` 创建文档，与空白文档创建共用同一接口封装。
+`postImportTableDocumentFiles` 和 `postImportQADocumentFiles` 分别向 `document/table` 和
+`document/qa` 发送多文件 FormData，
+由服务端解析并创建。`exportTableDocumentTemplate` 和 `exportQADocumentTemplate` 分别使用 GET
+`/workspace/knowledge/document/table_template/export` 和 `/workspace/knowledge/document/template/export`，查询参数 `type` 为
+`excel` / `csv`。上传解析与创建类型维护在 `types/document.ts`，统一通过 `@/api/types` 导入。
+共享文档 API 不提供上传写入方法。
+
 `putDocument(knowledgeId, documentId, data)` 统一通过 PUT `/<documentId>` 更新名称、启用状态和单项设置，
 不按更新字段重复封装同一接口。载荷 `DocumentUpdatePayload` 仅包含可更新字段，按需传入
 `name`、`is_active`、`hit_handling_method`、`directly_return_similarity`、`meta`，返回更新后的
@@ -572,8 +599,9 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 
 `workspace/knowledge/document.ts` 维护文档分页查询，路径为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<currentPage>/<pageSize>`。
-`putQuickCreateDocuments(knowledgeId, documents)` 通过 PUT `document/batch_create` 创建空白文档，
-载荷为 `DocumentQuickCreatePayload[]`（仅含 `name`），返回 `DocumentItem[]`；名称上限 128 字符。
+`putBatchCreateDocuments(knowledgeId, documents)` 统一通过 PUT `document/batch_create` 批量创建文档，
+空白创建提交 `DocumentQuickCreatePayload[]`（仅含 `name`），解析后创建提交 `DocumentImportPayload[]`，
+返回 `DocumentItem[]`；名称上限 128 字符。不按创建场景重复封装同一接口。
 共享文档 API 不增加创建接口；文档页监听公共 MkQuickCreate 的 `create` 事件，管理创建请求和提交状态。
 分页使用 `ParamsPage` / `ResponsePage<DocumentItem>`，支持 `name`、`create_user`、`status`、`task_type`、`is_active`、`hit_handling_method` 和 `tags` 筛选；
 文件任务使用 `DOCUMENT_TASK_STATE` 的字符状态及 `DOCUMENT_TASK_TYPE` 的任务位置，
