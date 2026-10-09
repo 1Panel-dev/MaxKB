@@ -156,7 +156,7 @@ onMounted(() => {
               <MkTableMoreDropdown>
                 <!-- 同步 Web 知识库 -->
                 <SyncKnowledgeAction
-                  v-if="row.type === KNOWLEDGE_TYPE.WEB"
+                  v-if="row.type !== KNOWLEDGE_TYPE.BASE"
                   v-model:loading="knowledgeOperationLoading"
                   label="同步"
                   :api="SystemResourceKnowledgeApi"

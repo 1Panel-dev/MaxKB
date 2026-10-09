@@ -170,6 +170,15 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 共享工具 API 不提供工作空间文件夹移动或批量接口；复用卡片、Action 和表单接收完整 Workspace
 与 System 共享 API 的联合类型，不补造接口以匹配 Workspace 方法集合。
 
+### System 共享知识库
+
+`system/shared-resources/knowledge/knowledge.ts` 使用 `/system/shared/knowledge`，维护分页、详情、
+通用 / Web / 飞书 / 工作流创建、导入、删除、重新向量化、Web 同步、关联问题、分词索引、MCP
+配置与三种导出。工作流创建在 Workspace 与 System 共享范围均由同一个 Knowledge API 的
+`postKnowledgeWorkflow` 提交；`workspace/knowledge/workflow.ts` 仅维护已创建知识库的工作流
+画布接口。System 共享范围没有工作空间文件夹、批量接口或独立的知识库工作流 API 文件。复用创建入口
+和卡片 Action 时使用完整 Workspace / System 资源管理 / System 共享知识库 API 的联合类型，由页面显式传入当前范围的 API。
+
 ### 工具代码生成
 
 三个范围的 `tool/tool.ts` 均提供 `postToolGenerateCode(payload)`，沿用 v2 的

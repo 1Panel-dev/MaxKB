@@ -104,6 +104,12 @@ export interface KnowledgeCreatePayload {
   type: KnowledgeType
 }
 
+/** 创建工作流知识库的请求参数。 */
+export interface KnowledgeWorkflowCreatePayload extends KnowledgeCreatePayload {
+  work_flow: LogicFlow.GraphConfigData
+  work_flow_template?: KnowledgeWorkflowTemplate
+}
+
 /** Web 文档分段、视觉处理和索引策略。 */
 export interface DocumentStrategy {
   split: { mode: 'smart' | 'advanced'; patterns: string[] | null; min_length: number; max_length: number; child_length: number; auto_clean: boolean }

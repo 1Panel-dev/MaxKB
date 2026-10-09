@@ -2,11 +2,12 @@
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import KnowledgeSyncDialog from './KnowledgeSyncDialog.vue'
 
 defineOptions({ name: 'SyncKnowledgeAction' })
-defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
+defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
 const loading = defineModel<boolean>('loading', { default: false })
 
 /* 知识库同步弹窗按需挂载 */

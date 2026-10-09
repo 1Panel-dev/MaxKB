@@ -4,10 +4,7 @@ import { get, post, put, getExportFile } from '../../core/request'
 import type {
   DefaultModelSettingPayload,
   Dict,
-  KnowledgeItem,
   KnowledgeExecutionRecord,
-  KnowledgeCreatePayload,
-  KnowledgeWorkflowTemplate,
   KnowledgeWorkflowAction,
   KnowledgeWorkflowDebugPayload,
   KnowledgeWorkflowDetail,
@@ -21,19 +18,9 @@ type KnowledgeWorkflowPayload =
   | { default_model_setting?: DefaultModelSettingPayload; work_flow: LogicFlow.GraphConfigData; work_flow_template?: never }
   | { work_flow_template: WorkflowStoreTemplate; work_flow?: never }
 
-interface CreateKnowledgeWorkflowPayload extends KnowledgeCreatePayload {
-  work_flow: LogicFlow.GraphConfigData
-  work_flow_template?: KnowledgeWorkflowTemplate
-}
-
 const getPrefix = () => {
   const workspaceId = getWorkspaceId()
   return `/workspace/${workspaceId}/knowledge`
-}
-
-/** 创建工作流知识库。 */
-const postKnowledgeWorkflow = (payload: CreateKnowledgeWorkflowPayload) => {
-  return post<CreateKnowledgeWorkflowPayload, KnowledgeItem>(`${getPrefix()}/workflow`, payload)
 }
 
 /** 保存知识库工作流。 */
@@ -85,7 +72,6 @@ export default {
   getWorkflowVersions,
   putWorkflowVersion,
   exportKnowledgeWorkflow,
-  postKnowledgeWorkflow,
   putKnowledgeWorkflow,
   putKnowledgeWorkflowPublish,
   getKnowledgeWorkflowFormList,

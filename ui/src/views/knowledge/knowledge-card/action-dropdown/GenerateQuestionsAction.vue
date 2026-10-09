@@ -5,9 +5,10 @@ import type { DocumentTaskState, KnowledgeItem, RelatedQuestionsConfig } from '@
 import GenerateQuestionsDialog from '@/components/business/generate-questions/GenerateQuestionsDialog.vue'
 import { MsgSuccess } from '@/utils/message'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 
 defineOptions({ name: 'GenerateQuestionsAction' })
-const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
+const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
 const loading = defineModel<boolean>('loading', { default: false })
 
 /* 知识库生成问题配置：按需挂载并固定本次操作目标。 */

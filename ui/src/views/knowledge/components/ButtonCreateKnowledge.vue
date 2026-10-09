@@ -2,6 +2,7 @@
 import { computed, ref, useTemplateRef, type CSSProperties } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
@@ -14,13 +15,14 @@ defineOptions({ name: 'ButtonCreateKnowledge' })
 
 const props = withDefaults(
   defineProps<{
+    api?: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi
     folderId: string
     trigger?: 'click' | 'hover' | 'contextmenu'
     popperStyle?: CSSProperties
     popperClass?: string
     fitTriggerWidth?: boolean
   }>(),
-  { trigger: 'click', fitTriggerWidth: false },
+  { api: () => KnowledgeApi, trigger: 'click', fitTriggerWidth: false },
 )
 const { auth } = useStore()
 
@@ -76,7 +78,7 @@ const importing = ref(false)
 function handleImportCreate(file: UploadFile) {
   if (!file.raw || importing.value) return
   importing.value = true
-  return KnowledgeApi.postKnowledgeImport(file.raw, props.folderId)
+  return props.api.postKnowledgeImport(file.raw, props.folderId)
     .then(() => {
       // 先刷新新资源权限，再通知列表加载导入的知识库。
       return auth.loadAuthBaseProfile().then(() => {
@@ -164,8 +166,8 @@ function handleImportCreate(file: UploadFile) {
     </template>
   </MkDropdown>
 
-  <CreateBaseKnowledgeDialog ref="createBaseKnowledgeDialogRef" :folder-id="folderId" @refresh="emit('refresh')" />
-  <CreateWebKnowledgeDrawer ref="createWebKnowledgeDrawerRef" :folder-id="folderId" @refresh="emit('refresh')" />
-  <CreateLarkKnowledgeDialog ref="createLarkKnowledgeDialogRef" :folder-id="folderId" @refresh="emit('refresh')" />
-  <CreateWorkflowKnowledgeDialog ref="createWorkflowKnowledgeDialogRef" :folder-id="folderId" @refresh="emit('refresh')" />
+  <CreateBaseKnowledgeDialog ref="createBaseKnowledgeDialogRef" :api="api" :folder-id="folderId" @refresh="emit('refresh')" />
+  <CreateWebKnowledgeDrawer ref="createWebKnowledgeDrawerRef" :api="api" :folder-id="folderId" @refresh="emit('refresh')" />
+  <CreateLarkKnowledgeDialog ref="createLarkKnowledgeDialogRef" :api="api" :folder-id="folderId" @refresh="emit('refresh')" />
+  <CreateWorkflowKnowledgeDialog ref="createWorkflowKnowledgeDialogRef" :api="api" :folder-id="folderId" @refresh="emit('refresh')" />
 </template>

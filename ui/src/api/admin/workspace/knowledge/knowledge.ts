@@ -8,6 +8,7 @@ import type {
   KnowledgeGeneratePayload,
   KnowledgeSyncType,
   KnowledgeCreatePayload,
+  KnowledgeWorkflowCreatePayload,
   WebKnowledgeCreatePayload,
   LarkKnowledgeCreatePayload,
 } from '@/api/types'
@@ -45,6 +46,11 @@ const postWebKnowledge = (payload: WebKnowledgeCreatePayload) => {
 /** 创建飞书知识库，沿用飞书扩展接口。 */
 const postLarkKnowledge = (payload: LarkKnowledgeCreatePayload) => {
   return post<LarkKnowledgeCreatePayload, KnowledgeItem>(`${getPrefix()}/lark/save`, payload)
+}
+
+/** 创建工作流知识库。 */
+const postKnowledgeWorkflow = (payload: KnowledgeWorkflowCreatePayload) => {
+  return post<KnowledgeWorkflowCreatePayload, KnowledgeItem>(`${getPrefix()}/workflow`, payload)
 }
 
 /** 删除工作空间知识库。 */
@@ -132,6 +138,7 @@ export default {
   postKnowledge,
   postWebKnowledge,
   postLarkKnowledge,
+  postKnowledgeWorkflow,
   deleteKnowledge,
   getAllKnowledge,
   getKnowledgeDetail,

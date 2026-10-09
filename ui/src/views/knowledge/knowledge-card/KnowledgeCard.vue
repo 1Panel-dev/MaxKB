@@ -4,7 +4,13 @@ import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'KnowledgeCard' })
 
-const props = defineProps<{ knowledge: KnowledgeItem; shared?: boolean; selectable?: boolean; selected?: boolean }>()
+const props = defineProps<{
+  disabled?: boolean
+  knowledge: KnowledgeItem
+  shared?: boolean
+  selectable?: boolean
+  selected?: boolean
+}>()
 
 const emit = defineEmits<{ click: []; selected: [selected: boolean] }>()
 defineSlots<{ 'action-dropdown'?: () => unknown }>()
@@ -48,7 +54,7 @@ function handleOpen() {
         <span class="text-N600">字符</span>
       </span>
 
-      <component :is="Action" v-if="!shared">
+      <component :is="Action" v-if="!disabled">
         <component :is="ActionDropdown">
           <slot name="action-dropdown" />
         </component>

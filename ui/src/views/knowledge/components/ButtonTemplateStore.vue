@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import StoreApi from '@/api/admin/store'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type { WorkflowStoreTemplate } from '@/api/types'
 import TemplateStoreDialog from '@/views/workflow/components/template-store/TemplateStoreDialog.vue'
 import WorkflowKnowledgeDialog from '../create-knowledge/WorkflowKnowledgeDialog.vue'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'ButtonTemplateStore' })
-const props = defineProps<{ folderId: string }>()
+const props = withDefaults(
+  defineProps<{ api?: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>(),
+  { api: () => KnowledgeApi },
+)
 const templateStoreDialogRef = useTemplateRef<InstanceType<typeof TemplateStoreDialog>>('templateStoreDialogRef')
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -71,6 +76,7 @@ function handleCreated() {
   <WorkflowKnowledgeDialog
     v-if="createDialogMounted"
     ref="createDialogRef"
+    :api="api"
     :folder-id="targetFolderId"
     @closed="createDialogMounted = false"
     @refresh="handleCreated"

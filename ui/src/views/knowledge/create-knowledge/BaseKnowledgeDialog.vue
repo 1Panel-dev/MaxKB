@@ -3,13 +3,14 @@ import { ref, useTemplateRef } from 'vue'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { useRoute, useRouter } from 'vue-router'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import KnowledgeBaseForm from './components/KnowledgeBaseForm.vue'
 
 defineOptions({ name: 'CreateBaseKnowledgeDialog' })
-const props = defineProps<{ folderId: string }>()
+const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>()
 const emit = defineEmits<{ refresh: [] }>()
 const { auth } = useStore()
 const route = useRoute()
@@ -37,7 +38,7 @@ function submit() {
     .then((validationResults) => {
       if (!validationResults.every(Boolean) || !baseFormRef.value) return
       const baseForm = baseFormRef.value.form
-      return KnowledgeApi.postKnowledge({
+      return props.api.postKnowledge({
         name: baseForm.name.trim(),
         desc: baseForm.desc.trim(),
         embedding_model_id: baseForm.embedding_model_id,
