@@ -13,10 +13,10 @@ from rest_framework import serializers
 from knowledge.models import Knowledge, KnowledgeSyncLog, KnowledgeSyncType, KnowledgeType, KnowledgeWorkflow
 from knowledge.services.knowledge_sync_schedule import (
     SCHEDULED_KNOWLEDGE_TYPES,
-    deploy_knowledge_sync_job,
     normalize_knowledge_sync_setting,
 )
 from knowledge.services.workflow_sync_source import validate_workflow_sync_source
+from knowledge.tasks import deploy_knowledge_sync_job
 
 
 class KnowledgeSyncSettingRequest(serializers.Serializer):
@@ -98,7 +98,7 @@ class KnowledgeSyncSettingOperationSerializer(serializers.Serializer):
             knowledge = QuerySet(Knowledge).select_for_update().get(id=knowledge_id)
             knowledge.meta = {**(knowledge.meta or {}), "sync_setting": setting_serializer.validated_data}
             knowledge.save(update_fields=["meta", "update_time"])
-            transaction.on_commit(partial(deploy_knowledge_sync_job, str(knowledge.id)))
+            transaction.on_commit(partial(deploy_knowledge_sync_job.delay, str(knowledge.id)))
         return setting_serializer.validated_data
 
 

@@ -72,7 +72,6 @@ from knowledge.services.knowledge_archive import (
     restore_resources,
     validate_archive,
 )
-from knowledge.services.knowledge_sync_schedule import deploy_knowledge_sync_job, remove_knowledge_sync_job
 from knowledge.services.multimodal_retrieval import (
     MAX_QUERY_IMAGE_COUNT,
     get_hit_asset_map,
@@ -104,6 +103,7 @@ from knowledge.serializers.knowledge_workflow import (
 from knowledge.task.embedding import delete_embedding_by_knowledge, embedding_by_knowledge, tokenize_by_knowledge
 from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_replace_web_knowledge, sync_web_knowledge
+from knowledge.tasks import deploy_knowledge_sync_job, remove_knowledge_sync_job
 from system_manage.services.resource_mapping import get_tool_id_list
 from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
 
@@ -572,7 +572,7 @@ class KnowledgeSerializer(serializers.Serializer):
             QuerySet(WorkspaceUserResourcePermission).filter(target=knowledge.id).delete()
             drop_knowledge_index(knowledge_id=knowledge.id)
             knowledge.delete()
-            transaction.on_commit(partial(remove_knowledge_sync_job, str(self.data.get("knowledge_id"))))
+            transaction.on_commit(partial(remove_knowledge_sync_job.delay, str(self.data.get("knowledge_id"))))
             QuerySet(File).filter(source_id=self.data.get("knowledge_id")).delete()
             QuerySet(File).filter(
                 source_id__in=[str(i) for i in document_query_set.values_list("id", flat=True)]
@@ -1199,7 +1199,7 @@ class KnowledgeSerializer(serializers.Serializer):
             update_resource_mapping_by_knowledge(str(knowledge_id))
 
             if (knowledge.meta.get("sync_setting") or {}).get("enabled"):
-                transaction.on_commit(partial(deploy_knowledge_sync_job, str(knowledge_id)), robust=True)
+                transaction.on_commit(partial(deploy_knowledge_sync_job.delay, str(knowledge_id)), robust=True)
 
             zf.close()
             return {"knowledge_id": str(knowledge_id), "type": knowledge.type}
