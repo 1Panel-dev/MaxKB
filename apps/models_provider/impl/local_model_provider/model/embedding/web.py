@@ -37,6 +37,7 @@ class LocalEmbedding(MaxKBBaseModel, BaseModel, Embeddings):
         res = requests.post(
             f'{CONFIG.get("LOCAL_MODEL_PROTOCOL")}://{bind}{prefix}/api/model/{self.model_id}/embed_query',
             {'text': text})
+        res.raise_for_status()
         result = res.json()
         if result.get('code', 500) == 200:
             return result.get('data')
@@ -48,6 +49,7 @@ class LocalEmbedding(MaxKBBaseModel, BaseModel, Embeddings):
         res = requests.post(
             f'{CONFIG.get("LOCAL_MODEL_PROTOCOL")}://{bind}{prefix}/api/model/{self.model_id}/embed_documents',
             {'texts': texts})
+        res.raise_for_status()
         result = res.json()
         if result.get('code', 500) == 200:
             return result.get('data')
