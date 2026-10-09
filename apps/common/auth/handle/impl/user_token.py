@@ -100,7 +100,7 @@ def get_permissions(
                     for group, permissions in group_by(
                         all_permissions, lambda _permission: _permission.value.group
                     ).items():
-                        k = f"{group}:{_.workspace_id}:{_.target}"
+                        k = f"{group}:w:{_.workspace_id}:r:{_.target}"
                         bits = reduce(lambda x, y: x | y, [_permission.value.bit() for _permission in permissions], 0)
                         permission_map[k] = permission_map.get(k, 0) | bits
                 elif _.auth_type == ResourceAuthType.ROLE:
@@ -110,7 +110,7 @@ def get_permissions(
                     for role_id in role_ids:
                         for m in role_permission_mapping_dict.get(str(role_id)) or []:
                             p = PERMISSION_STR_MAP.get(m.permission_id)
-                            if p is not None and PermissionScopeConstants.WORKSPACE in p.meta.scope:
+                            if p is not None and PermissionScopeConstants.WORKSPACE_RESOURCE in p.meta.scope:
                                 permissions.append(p)
 
                     for group, ps in group_by(permissions, lambda p: p.value.group).items():

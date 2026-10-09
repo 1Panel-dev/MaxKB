@@ -353,7 +353,7 @@ class PermissionConstants(Enum):
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE],
         ),
     )
 
@@ -363,7 +363,7 @@ class PermissionConstants(Enum):
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE],
         ),
     )
 
