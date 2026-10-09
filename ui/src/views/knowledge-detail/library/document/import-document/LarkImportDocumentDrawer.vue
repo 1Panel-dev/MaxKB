@@ -2,13 +2,13 @@
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import type { ElTree, LoadFunction } from 'element-plus'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import type { KnowledgeDetail, LarkDocumentNode } from '@/api/types'
+import type { LarkDocumentNode } from '@/api/types'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'LarkImportDocumentDrawer' })
-const props = defineProps<{ api: typeof DocumentApi; knowledge: KnowledgeDetail }>()
+const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; folderToken: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
 /* 飞书文件树与选择状态：只导入未导入的文件，文件夹用于导航。 */
@@ -22,7 +22,6 @@ const checkedTokens = ref<string[]>([])
 const selectedDocuments = ref<LarkDocumentNode[]>([])
 const treeRef = useTemplateRef<InstanceType<typeof ElTree>>('treeRef')
 const strategyRef = useTemplateRef<InstanceType<typeof DocumentStrategyForm>>('strategyRef')
-const folderToken = computed(() => String(props.knowledge.meta?.folder_token ?? ''))
 const selectableNodes = computed(() => loadedNodes.value.filter((node) => !node.is_exist))
 const allChecked = computed(() => selectableNodes.value.length > 0 && selectableNodes.value.every((node) => checkedTokens.value.includes(node.token)))
 const indeterminate = computed(() => !allChecked.value && selectableNodes.value.some((node) => checkedTokens.value.includes(node.token)))
@@ -45,7 +44,7 @@ function handleAllCheck(checked: unknown) {
 
 /* 懒加载目录：一次读完该目录分页，失败恢复可重试状态。 */
 const loadNode: LoadFunction = (node, resolve, reject) => {
-  const token = node.level === 0 ? folderToken.value : String(node.data.token)
+  const token = node.level === 0 ? props.folderToken : String(node.data.token)
   if (!token) {
     resolve([])
     return
@@ -53,7 +52,7 @@ const loadNode: LoadFunction = (node, resolve, reject) => {
   pendingLoads.value += 1
   const folderDocuments: LarkDocumentNode[] = []
   function loadPage(pageToken?: string): Promise<void> {
-    return props.api.getLarkDocumentList(props.knowledge.id, token, pageToken ? { page_token: pageToken } : {}).then((page) => {
+    return props.api.getLarkDocumentList(props.knowledgeId, token, pageToken ? { page_token: pageToken } : {}).then((page) => {
       folderDocuments.push(...page.files)
       if (page.has_more && page.next_page_token) return loadPage(page.next_page_token)
     })
@@ -91,9 +90,6 @@ function handleNext() {
   strategyMounted.value = true
   activeStep.value = 1
 }
-function handleStrategyMounted() {
-  strategyRef.value?.setStrategy(props.knowledge.doc_strategy)
-}
 function handleSubmit() {
   if (loading.value || !strategyRef.value) return
   loading.value = true
@@ -104,7 +100,7 @@ function handleSubmit() {
       const strategy = strategyRef.value.getStrategy()
       return props.api
         .postImportLarkDocuments(
-          props.knowledge.id,
+          props.knowledgeId,
           selectedDocuments.value.map(({ name, token, type }) => ({
             name,
             token,
@@ -129,7 +125,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" direction="btt" size="100%" :show-close="!loading" @closed="emit('closed')">
+  <MkDrawer v-model="visible" direction="btt" @closed="emit('closed')">
     <template #header>
       <div class="flex w-full">
         <h4>导入文档</h4>
@@ -149,42 +145,41 @@ defineExpose({ open })
             <li>导入文档前，建议规范文档的分段标识。</li>
           </ol>
         </el-alert>
-        <el-alert v-if="!folderToken" type="warning" title="请先在知识库设置中配置飞书文件夹 Token" :closable="false" />
-        <template v-else>
-          <div class="mk-gray-card-lg mb-3">
-            <el-checkbox :model-value="allChecked" :indeterminate="indeterminate" :disabled="pendingLoads > 0" @change="handleAllCheck">
-              全部文档
-            </el-checkbox>
-          </div>
-          <el-tree
-            ref="treeRef"
-            :props="treeProps"
-            :load="loadNode"
-            node-key="token"
-            lazy
-            show-checkbox
-            style="--el-tree-node-content-height: 44px"
-            @check="handleCheck"
-          >
-            <template #default="{ data }: { data: LarkDocumentNode }">
-              <div class="flex-align-center gap-2 py-2">
-                <img v-if="data.type === 'folder'" src="@/assets/file-type/file-icon.svg" alt="" class="size-5" />
-                <img
-                  v-else
-                  :src="getFileIconUrl(data.type === 'docx' ? `${data.name}.docx` : data.type === 'sheet' ? `${data.name}.xlsx` : data.name)"
-                  alt=""
-                  class="size-5"
-                />
-                <span :title="data.name" class="truncate">{{ data.name }}</span>
-                <span v-if="data.is_exist" class="text-N600 text-sm">已导入</span>
-              </div>
-            </template>
-          </el-tree>
-        </template>
+
+        <div class="mk-gray-card-lg mb-3">
+          <el-checkbox :model-value="allChecked" :indeterminate="indeterminate" :disabled="pendingLoads > 0" @change="handleAllCheck">
+            全部文档
+          </el-checkbox>
+        </div>
+
+        <el-tree
+          ref="treeRef"
+          :props="treeProps"
+          :load="loadNode"
+          node-key="token"
+          lazy
+          show-checkbox
+          style="--el-tree-node-content-height: 44px"
+          @check="handleCheck"
+        >
+          <template #default="{ data }: { data: LarkDocumentNode }">
+            <div class="flex-align-center gap-2 py-2">
+              <img v-if="data.type === 'folder'" src="@/assets/file-type/file-icon.svg" alt="" class="size-5" />
+              <img
+                v-else
+                :src="getFileIconUrl(data.type === 'docx' ? `${data.name}.docx` : data.type === 'sheet' ? `${data.name}.xlsx` : data.name)"
+                alt=""
+                class="size-5"
+              />
+              <span :title="data.name" class="truncate">{{ data.name }}</span>
+              <span v-if="data.is_exist" class="text-N600 text-sm">已导入</span>
+            </div>
+          </template>
+        </el-tree>
       </section>
       <section v-if="strategyMounted" v-show="activeStep === 1">
         <h4 class="mb-4 mk-title-decoration">文档处理策略</h4>
-        <DocumentStrategyForm ref="strategyRef" @vue:mounted="handleStrategyMounted" />
+        <DocumentStrategyForm ref="strategyRef" />
       </section>
     </div>
     <template #footer>

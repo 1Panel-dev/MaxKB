@@ -120,7 +120,7 @@ onMounted(() => {
         <el-table-column prop="name" label="名称" min-width="200" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
-              <KnowledgeIcon :type="row.type" class="shrink-0" />
+              <KnowledgeIcon :type="row.type" :size="20" class="shrink-0" />
               <span class="truncate" :title="row.name">{{ row.name }}</span>
             </div>
           </template>
