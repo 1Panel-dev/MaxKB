@@ -12,6 +12,8 @@ export interface FileItem {
   file_id?: string
   previewUrl?: string
   uploading?: boolean
+  /** 上传进度 0-100 */
+  progress?: number
 }
 
 type MessageAttachmentKey = 'image_list' | 'document_list' | 'audio_list' | 'video_list' | 'other_list'
@@ -32,15 +34,21 @@ export interface MessageInputDeps {
   messages: Ref<ChatMessage[]>
   loading: Ref<boolean>
   sendMessage: (opts: SendMessageOptions) => void
-  uploadFile: (file: File, chatId: string) => Promise<string>
+  uploadFile: (file: File, chatId: string, onProgress?: (percent: number) => void) => Promise<string>
   stop: () => void
+  /** 禁用输入与发送，如门户没有可用智能体时；不传时始终可用。 */
+  disabled?: Readonly<Ref<boolean>>
 }
+
+// 上传请求返回前进度条的最大值
+const UPLOAD_PROGRESS_PENDING_MAX = 95
 
 /**
  * message-input 组件 store:本组件独有——输入内容 + 暂存文件 + 发送。
  */
 export function createMessageInputStore(deps: MessageInputDeps) {
   const { conversations, getChatId, renameChat, composerResetSignal, messages, loading, sendMessage, uploadFile, stop } = deps
+  const disabled = computed(() => deps.disabled?.value ?? false)
 
   // 输入状态与附件限制
   const question = ref('')
@@ -52,14 +60,24 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   // TODO 格式 不行
   const acceptList = [...IMAGE_EXTENSIONS, ...DOCUMENT_EXTENSIONS, ...VIDEO_EXTENSIONS, ...AUDIO_EXTENSIONS].map((e) => `.${e}`).join(',')
 
-  const placeholder = computed(() => (loading.value ? '正在回复中...' : '输入消息...'))
-  const canSend = computed(() => (question.value.trim().length > 0 || fileList.value.length > 0) && !loading.value && !sending.value)
+  const placeholder = computed(() => {
+    if (disabled.value) return '暂无可用智能体'
+    return loading.value ? '正在回复中...' : '输入消息...'
+  })
+  // 附件上传完成前不能发送，否则消息中的附件没有地址
+  const isUploading = computed(() => fileList.value.some((attachment) => attachment.uploading))
+  const canSend = computed(
+    () =>
+      !disabled.value &&
+      (question.value.trim().length > 0 || fileList.value.length > 0) &&
+      !loading.value &&
+      !sending.value &&
+      !isUploading.value,
+  )
 
   const imageFiles = computed(() => fileList.value.filter((attachment) => isImage(attachment.name)))
 
   // 附件上传与本地预览
-  const uploadPromises = ref<Promise<void>[]>([])
-
   const validateFile = (file: File) => fileList.value.length < maxFiles && file.size > 0 && file.size <= maxSizeMB * 1024 * 1024
 
   const addFile = (file: File) => {
@@ -70,32 +88,31 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       size: file.size,
       raw: file,
       uploading: true,
+      progress: 0,
     })
     if (isImage(file.name) || isAudio(file.name) || isVideo(file.name)) {
       attachment.previewUrl = URL.createObjectURL(file)
     }
     fileList.value.push(attachment)
 
-    const uploadPromise = (async () => {
-      try {
-        const chatId = getChatId()
-        const url = await uploadFile(file, chatId)
+    // 文件发送完后服务端仍在处理，进度停在 95% 直到接口返回
+    uploadFile(file, getChatId(), (percent) => {
+      attachment.progress = Math.min(percent, UPLOAD_PROGRESS_PENDING_MAX)
+    })
+      .then((url) => {
         attachment.url = url
         attachment.file_id = url.split('/').pop()
-      } catch (e) {
+      })
+      .catch((e) => {
         console.error('upload failed:', e)
-      } finally {
+      })
+      .finally(() => {
         attachment.uploading = false
-      }
-    })()
-    uploadPromises.value.push(uploadPromise)
-    uploadPromise.finally(() => {
-      uploadPromises.value = uploadPromises.value.filter((pendingUpload) => pendingUpload !== uploadPromise)
-    })
+      })
   }
 
   const addFiles = (files: FileList | File[] | null | undefined) => {
-    if (!files) return
+    if (!files || disabled.value) return
     Array.from(files).forEach(addFile)
   }
 
@@ -113,13 +130,11 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     fileList.value = []
   }
 
-  // 等待附件上传后发送，首条消息同步会话标题。
+  // 发送消息，首条消息同步会话标题。附件上传中时 canSend 为 false。
   const send = async () => {
     if (!canSend.value) return
     sending.value = true
     try {
-      if (uploadPromises.value.length) await Promise.all(uploadPromises.value)
-
       const questionText = question.value.trim()
       const chatId = getChatId()
 
@@ -186,6 +201,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     maxSizeMB,
     acceptList,
     loading,
+    disabled,
     placeholder,
     canSend,
     imageFiles,

@@ -30,7 +30,7 @@ class ChatPermissionConstants(Enum):
         return self._build_workspace_permission("application_id")
 
     def _build_workspace_permission(self, resource_id_key=None):
-        def permission_factory(_, **kwargs):
+        def permission_factory(_, kwargs):
             return Permission(
                 group=self.value.group,
                 sub_group=self.value.sub_group,

@@ -21,20 +21,21 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.api.application_api import SpeechToTextAPI, TextToSpeechAPI
-from application.models import ChatUserType, ChatSourceChoices, ApplicationAccessToken
+from application.models import ChatUserType, ChatSourceChoices, ApplicationAccessToken, ChatRecord
 from chat.api.chat_api import ChatAPI
 from chat.api.chat_authentication_api import ChatAuthenticationAPI, ChatAuthenticationProfileAPI, ChatOpenAPI, OpenAIAPI
 from chat.serializers.chat import (
     OpenAIChatSerializer,
     ChatSerializers,
     OpenChatSerializers,
+    ResumeSerializers,
     SpeechToTextSerializers,
     TextToSpeechSerializers,
 )
 from chat.serializers.chat_authentication import (
     AnonymousAuthenticationSerializer,
     ApplicationProfileSerializer,
-    AuthProfileSerializer,
+    ChatAuthProfileSerializer,
 )
 from common.auth import ChatTokenAuth
 from common.auth.authentication import has_permissions
@@ -138,7 +139,7 @@ class AnonymousAuthentication(APIView):
         tags=[_("V3 Chat")],  # type: ignore
     )
     def post(self, request: Request):
-        serializer = AnonymousAuthenticationSerializer(data=request.query_params)
+        serializer = AnonymousAuthenticationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         token = serializer.auth(request)
         response = result.success(
@@ -152,8 +153,10 @@ class AnonymousAuthentication(APIView):
         )
         is_https = request.scheme == "https"
 
-        application_id = serializer.validated_data.get("application_id")
-        cookie_path = f"{CONFIG.get_chat_path()}/{application_id}" if application_id else CONFIG.get_chat_path()
+        access_token = request.data.get("access_token")
+        cookie_path = (
+            f"{CONFIG.get_chat_path()}/{access_token}/" if access_token else f"{CONFIG.get_chat_path()}/portal/"
+        )
         response.set_cookie(
             key="mk_file_auth",
             value=token,
@@ -183,7 +186,7 @@ class ApplicationProfile(APIView):
         return result.success(ApplicationProfileSerializer(data={"application_id": application_id}).profile())
 
 
-class AuthProfile(APIView):
+class ChatAuthProfile(APIView):
     @extend_schema(
         methods=["GET"],
         description=_("Get application authentication information"),
@@ -195,7 +198,7 @@ class AuthProfile(APIView):
     )
     def get(self, request: Request):
         return result.success(
-            AuthProfileSerializer(data={"application_id": request.query_params.get("application_id")}).profile()
+            ChatAuthProfileSerializer(data={"access_token": request.query_params.get("access_token")}).profile()
         )
 
 
@@ -291,6 +294,47 @@ class CancelWorkflowView(APIView):
             return result.success({"status": "not_found", "chat_id": chat_id})
         else:
             return result.fail(500, _("Failed to cancel workflow"))
+
+
+class ResumeStreamView(APIView):
+    authentication_classes = [ChatTokenAuth]
+
+    @extend_schema(
+        methods=["POST"],
+        description=_("Resume stream for workflow"),
+        summary=_("Resume stream for workflow"),
+        operation_id=_("V3 Resume stream for workflow"),  # type: ignore
+        parameters=[
+            OpenApiParameter(
+                name="application_id",
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.PATH,
+                description=_("Application ID"),
+            ),
+            OpenApiParameter(
+                name="chat_id", type=OpenApiTypes.UUID, location=OpenApiParameter.PATH, description=_("Chat ID")
+            ),
+            OpenApiParameter(
+                name="chat_record_id",
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.PATH,
+                description=_("Conversation record id"),
+            ),
+        ],
+        responses=None,
+        tags=[_("V3 Chat")],  # type: ignore
+    )
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def post(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
+        # 对话端只能续传当前对话用户在该应用下的会话记录
+        if not ChatRecord.objects.filter(
+            id=chat_record_id,
+            chat_id=chat_id,
+            chat__application_id=application_id,
+            chat__chat_user_id=str(request.user.id),
+        ).exists():
+            raise AppApiException(500, _("Conversation does not exist"))
+        return ResumeSerializers(data={"chat_id": chat_id, "chat_record_id": chat_record_id}).resume(request)
 
 
 class CaptchaView(APIView):

@@ -12,6 +12,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from chat.serializers.chat_authentication import PortalAuthProfileSerializer
 from common import result
 from common.auth import ChatTokenAuth
 from common.utils.common import query_params_to_single_dict
@@ -21,6 +22,20 @@ from chat.serializers.portal import (
     PortalApplicationSerializer,
     PortalHistoricalConversationSerializer,
 )
+
+
+class PortalAuthProfile(APIView):
+    @extend_schema(
+        methods=["GET"],
+        description=_("Get portal authentication information"),
+        summary=_("Get portal authentication information"),
+        operation_id=_("Get portal authentication information"),  # type: ignore
+        parameters=None,
+        responses=None,
+        tags=[_("V3 Chat")],  # type: ignore
+    )
+    def get(self, request: Request):
+        return result.success(PortalAuthProfileSerializer.profile())
 
 
 class PortalApplicationView(APIView):

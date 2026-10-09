@@ -1055,3 +1055,46 @@ Workspace `CommonApi`；范围变化同时清空搜索控件、筛选、创建�
 跨页成功后同步列表页码并切换至首条／末条，失败保留原记录和页码，加载期间禁用切换。
 正文暂时留空，不查询或展示聊天内容，也不显示聊天记录分页器。
 添加到知识库的页面组件尚未接入。
+
+## 对话端单应用与门户对话页面
+
+`views/chat/index.vue`（`chat-home`、`chat-home-detail`）与 `views/portal/index.vue`
+（`portal-application`、`portal-application-chat`）分别渲染对话面板的 chat、portal 视图。页面只负责：
+
+- 以 `auth.token` 作为面板的 `key`，token 变化（401 重新认证、登录）时重建面板并重新加载数据；
+  token 被清除后不渲染面板，等待守卫重新认证。
+- token 变化时重新加载当前对话用户档案，供侧栏账户入口展示。
+
+对话面板 chat 模式的装配函数 `view/chat/index.ts` 通过 `ChatConversationRouting` 获取智能体 ID
+与会话地址，单应用使用默认实现（智能体 ID 取自 `auth.applicationId`，地址为 `/:accessToken/c/:chatId`），
+portal 模式传入门户实现（智能体 ID 取自路由 `applicationId`，地址为 `/portal/a/:applicationId/c/:chatId`）：
+
+- 加载智能体名称与图标；切换智能体时停止当前生成，重新加载智能体信息与会话列表。
+- 当前会话与地址双向同步：`currentChatId` 变化时替换地址，新建对话（ID 为空）去掉会话 ID；
+  地址变化（含浏览器前进、后退）时切换到对应会话；初始地址带会话 ID 时打开该会话。
+- 会话列表 Store 不感知路由；debug 模式的地址不含会话 ID，不做同步。
+- 侧栏账户信息由 chat、debug 装配函数分别从各自入口的用户 Store 提供，侧栏组件不直接读取 Store。
+
+portal 模式（`view/portal/`）复用 chat 模式装配，左侧使用 `left-sidebar/portal-conversation-list/`：
+按智能体分组展示门户历史对话（`/v3/portal/chat`），每组最多显示最近 5 条。当前智能体的分组以会话列表
+Store 为准，新建、重命名、删除即时生效；离开某个智能体时把其最新会话写回分组，并先用进入分组已有的会话填充会话列表，
+避免列表加载完成前显示上一个智能体的会话。展开其他智能体的分组时
+按智能体查询最近 5 条会话（`/v3/application/:id/chat/1/5`）刷新分组，失败时保留分组接口返回的会话。点击当前智能体的会话
+直接切换，点击其他智能体的会话跳转到对应地址。
+点击智能体行选中该智能体并进入其新建对话（`portal-application`），没有选中会话时该行高亮；点击右侧箭头只展开或收起会话。
+
+门户首页 `portal-home` 也渲染该页面：地址中没有智能体时不请求会话与智能体信息，分组加载后替换到第一个
+智能体的 `portal-application`；没有可访问的智能体时消息区显示“暂无可用智能体”空状态。
+门户主区域使用 `main/portal-chat-panel`，不修改共用的 `main/chat-panel`：标题栏的新建对话使用门户侧栏 Store 的
+`newConversation`，没有当前智能体时以空状态代替消息列表。没有当前智能体时，
+chat 装配函数通过 `disabled` 禁用输入框与附件。
+
+“全部智能体”（`portal-application-list`）在同一门户布局中把主区域换成 `main/portal-application-panel`：
+按名称搜索（输入防抖 300ms）并以卡片展示智能体，点击卡片或悬停显示的“去对话”进入该智能体的新建对话。
+卡片由 `components/portal-application-cards` 提供，全部智能体页与选择智能体抽屉共用。
+
+侧栏“新建对话”与侧栏收起时标题栏的“新建对话”（门户视图向 `ChatHeader` 传入 `newConversation`）
+在当前智能体中新建；没有当前智能体时（全部智能体页、门户首页空状态）打开 `SelectApplicationDrawer` 选择智能体，抽屉的搜索条件与结果独立于全部智能体页，每次打开重新查询。
+抽屉自己管理显隐并暴露 `open()`；门户视图持有抽屉的 ref，通过 `createPortalConversation` 的
+`openApplicationSelector` 传入门户侧栏 Store。Store 的 `newConversation` 有当前智能体时打开其
+`portal-application` 地址，地址中会话 ID 清空后由 chat 装配函数的会话同步新建对话。

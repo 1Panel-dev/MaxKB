@@ -5,7 +5,7 @@ import { formatFileSize } from '@/utils/number'
 import { inputShortcut } from '../../core/shortcuts'
 import { useMessageInputStore } from './index'
 
-const { question, fileList, maxFiles, maxSizeMB, acceptList, loading, placeholder, canSend, imageFiles, addFiles, removeFile, send, stop } =
+const { question, fileList, maxFiles, maxSizeMB, acceptList, loading, disabled, placeholder, canSend, imageFiles, addFiles, removeFile, send, stop } =
   useMessageInputStore()
 
 // 选择和粘贴附件统一交给输入 Store 处理。
@@ -76,6 +76,10 @@ const handleKeydown = (event: KeyboardEvent) => {
               </div>
             </div>
           </el-card>
+          <!-- 上传进度：主题色从左到右填充，上传完成后隐藏 -->
+          <div v-if="file.uploading" class="pointer-events-none absolute inset-0 overflow-hidden rounded-lg">
+            <div class="h-full bg-primary/15 transition-[width] duration-200" :style="{ width: `${file.progress ?? 0}%` }" />
+          </div>
           <!-- 移除附件 -->
           <div class="group-hover-visible attachment-remove" @click="removeFile(index)">
             <MkIcon name="icon_close_bold_outlined" class="text-white!" :size="6" />
@@ -91,6 +95,7 @@ const handleKeydown = (event: KeyboardEvent) => {
       type="textarea"
       resize="none"
       :placeholder="placeholder"
+      :disabled="disabled"
       :maxlength="100000"
       @keydown.enter="handleKeydown"
       @paste="handlePaste"
@@ -112,7 +117,7 @@ const handleKeydown = (event: KeyboardEvent) => {
           </div>
         </template>
         <!-- 上传文件 -->
-        <el-button text :disabled="loading || fileList.length >= maxFiles" @click="fileInputRef?.click()">
+        <el-button text :disabled="disabled || loading || fileList.length >= maxFiles" @click="fileInputRef?.click()">
           <MkIcon name="icon_attachment_outlined" :size="18" class="text-N900!" />
         </el-button>
       </MkTooltip>

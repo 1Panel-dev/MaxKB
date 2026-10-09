@@ -2,6 +2,8 @@
 export type * from './application'
 export type * from './common'
 export type * from './chat-user'
+export type * from './chat-auth'
+export type * from './chat-application'
 export type * from './chat-user-groups'
 export type * from './login'
 export type * from './system-user'

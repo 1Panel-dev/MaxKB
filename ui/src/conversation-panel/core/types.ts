@@ -1,5 +1,11 @@
 import type { CHAT_TYPE } from './enums'
 
+/** 侧栏账户入口展示的当前用户，由 Chat / Debug 入口按各自的用户 Store 提供。 */
+export interface ConversationAccount {
+  nickName?: string
+  username?: string
+}
+
 export interface Conversation {
   id: string
   abstract: string
@@ -59,7 +65,7 @@ export interface ConversationApiAdapter {
   rename: (chatId: string, data: { abstract: string }) => Promise<any>
   chatMessage: (chatId: string, data: any) => Promise<Response>
   resumeMessage: (chatId: string, chatRecordId: string) => Promise<Response>
-  uploadFile: (file: File, chatId: string) => Promise<string>
+  uploadFile: (file: File, chatId: string, onProgress?: (percent: number) => void) => Promise<string>
   cancel: (chatId: string) => Promise<any>
 }
 

@@ -37,9 +37,9 @@ from chat.serializers.chat import (
     TextToSpeechSerializers,
 )
 from chat.serializers.chat_authentication import (
-    AnonymousAuthenticationV2Serializer,
+    AnonymousAuthenticationSerializer,
     ApplicationProfileSerializer,
-    AuthProfileV2Serializer,
+    ChatAuthProfileSerializer,
 )
 from common.auth import ChatTokenAuth
 from common.auth.authentication import has_permissions
@@ -137,12 +137,12 @@ class AnonymousAuthentication(APIView):
         description=_("Application Anonymous Certification"),
         summary=_("Application Anonymous Certification"),
         operation_id=_("Application Anonymous Certification"),  # type: ignore
-        request=AnonymousAuthenticationV2Serializer,
+        request=AnonymousAuthenticationSerializer,
         responses=None,
         tags=[_("Chat")],  # type: ignore
     )
     def post(self, request: Request):
-        token, f_token = AnonymousAuthenticationV2Serializer(data=request.data).auth(request)
+        token = AnonymousAuthenticationSerializer(data=request.data).auth(request)
         response = result.success(
             token,
             headers={
@@ -156,7 +156,7 @@ class AnonymousAuthentication(APIView):
 
         response.set_cookie(
             key="mk_file_auth",
-            value=f_token,
+            value=token,
             max_age=7 * 24 * 3600,
             path=f"{CONFIG.get_chat_path()}/{request.data.get('access_token')}",
             secure=is_https,
@@ -196,7 +196,7 @@ class AuthProfile(APIView):
     )
     def get(self, request: Request):
         return result.success(
-            AuthProfileV2Serializer(data={"access_token": request.query_params.get("access_token")}).profile()
+            ChatAuthProfileSerializer(data={"access_token": request.query_params.get("access_token")}).profile()
         )
 
 

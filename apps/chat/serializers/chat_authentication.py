@@ -15,22 +15,21 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import ApplicationAccessToken, Application, ApplicationVersion
-from common.auth.common import ChatToken
+from common.auth.common import ChatToken, parse_token
 from common.auth.constants.operate_constants import Operate
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import NotFound404, AppUnauthorizedFailed, AppApiException
 from common.utils.rsa_util import get_key_pair_by_sql
+from portal.models import Portal
 
 
 class AnonymousAuthenticationSerializer(serializers.Serializer):
-    """v3 匿名认证：application_id 为可选 query 参数。
-    传入时颁发应用级令牌，未传入时颁发全局令牌。"""
-
-    application_id = serializers.UUIDField(required=False, label=_("application_id"))
+    access_token = serializers.CharField(required=False, label=_("access_token"))
 
     def auth(self, request):
+        self.is_valid(raise_exception=True)
         token = request.META.get("HTTP_AUTHORIZATION")
         token_details = {}
         try:
@@ -42,60 +41,29 @@ class AnonymousAuthenticationSerializer(serializers.Serializer):
         chat_user_id = token_details.get("id") or str(uuid.uuid7())
         _type = AuthenticationType.CHAT_USER
 
-        application_id = self.validated_data.get("application_id")
-        if application_id:
-            application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application_id).first()
+        access_token = self.data.get("access_token")
+        if access_token:
+            application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
             if application_access_token is None or not application_access_token.is_active:
                 raise AppApiException(500, _("Invalid application_id"))
-            application_id = str(application_id)
+            application_id = str(application_access_token.application_id)
             return ChatToken(
                 chat_user_id, _type, str(Operate.ANNOTATION_AUTH), application_id=application_id
             ).to_token()
-        return (ChatToken(chat_user_id, _type, str(Operate.ANNOTATION_AUTH)).to_token(),)
+        return ChatToken(chat_user_id, _type, str(Operate.ANNOTATION_AUTH)).to_token()
 
 
-class AnonymousAuthenticationV2Serializer(serializers.Serializer):
-    """v2 匿名认证：application_id 不在 path，从 access_token 解出并写进 token，
-    供 ChatUserToken handler 收窄到该应用。"""
-
+class ChatAuthProfileSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=True, label=_("access_token"))
-
-    def auth(self, request, with_valid=True):
-        token = request.META.get("HTTP_AUTHORIZATION")
-        token_details = {}
-        try:
-            # 校验token
-            if token is not None:
-                token_details = signing.loads(token[7:])
-        except Exception:
-            pass
-        if with_valid:
-            self.is_valid(raise_exception=True)
-        access_token = self.data.get("access_token")
-        application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
-        if application_access_token is None or not application_access_token.is_active:
-            raise NotFound404(404, _("Invalid access_token"))
-        chat_user_id = token_details.get("user_id") or token_details.get("id") or str(uuid.uuid7())
-        _type = AuthenticationType.CHAT_USER
-        application_id = str(application_access_token.application_id)
-        return ChatToken(
-            chat_user_id, _type, str(Operate.ANNOTATION_AUTH), application_id=application_id
-        ).to_token(), FileToken(chat_user_id, _type, application_id=application_id).to_token()
-
-
-class AuthProfileSerializer(serializers.Serializer):
-    """v3: 直接通过 application_id 获取认证 profile"""
-
-    application_id = serializers.UUIDField(required=True, label=_("application_id"))
 
     def profile(self):
         self.is_valid(raise_exception=True)
-        application_id = self.validated_data.get("application_id")
-        application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application_id).first()
+        access_token = self.data.get("access_token")
+        application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
         if application_access_token is None:
-            raise NotFound404(404, _("Invalid application_id"))
+            raise NotFound404(404, _("Invalid access_token"))
         if not application_access_token.is_active:
-            raise NotFound404(404, _("Invalid application_id"))
+            raise NotFound404(404, _("Invalid access_token"))
         login_value = application_access_token.authentication_value.get("login_value", [])
         chat_platform = DatabaseModelManage.get_model("chat_platform")
         if chat_platform is not None:
@@ -104,29 +72,39 @@ class AuthProfileSerializer(serializers.Serializer):
             if "LOCAL" in application_access_token.authentication_value.get("login_value", []):
                 login_value.insert(0, "LOCAL")
         return {
-            "application_name": application_access_token.application.name,
-            "authentication": application_access_token.authentication,
-            "authentication_type": application_access_token.authentication_value.get("type", "password"),
             "max_attempts": application_access_token.authentication_value.get("max_attempts", 1),
+            "enable_auth": application_access_token.authentication,
             "login_value": login_value,
-            "rsaKey": get_key_pair_by_sql().get("key"),
+            "rsa_key": get_key_pair_by_sql().get("key"),
+            "meta": {
+                "application_name": application_access_token.application.name,
+                "application_id": str(application_access_token.application_id),
+            },
         }
 
 
-class AuthProfileV2Serializer(serializers.Serializer):
-    """v2: 通过 access_token 查表得到 application_id，委托给 AuthProfileSerializer"""
-
-    access_token = serializers.CharField(required=True, label=_("access_token"))
-
-    def profile(self):
-        self.is_valid(raise_exception=True)
-        access_token = self.validated_data.get("access_token")
-        application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
-        if application_access_token is None:
+class PortalAuthProfileSerializer(serializers.Serializer):
+    @staticmethod
+    def profile():
+        portal = Portal.objects.first()
+        if portal is None:
+            return {
+                "max_attempts": 1,
+                "enable_auth": False,
+                "login_value": ["LOCAL"],
+                "rsa_key": get_key_pair_by_sql().get("key"),
+                "meta": {},
+            }
+        if not portal.enable_public_access:
             raise NotFound404(404, _("Invalid access_token"))
-        if not application_access_token.is_active:
-            raise NotFound404(404, _("Invalid access_token"))
-        return AuthProfileSerializer(data={"application_id": application_access_token.application_id}).profile()
+        auth_config = portal.auth_config
+        return {
+            "max_attempts": auth_config.get("max_attempts", 1),
+            "enable_auth": portal.enable_auth,
+            "login_value": auth_config.get("login_value", []),
+            "rsa_key": get_key_pair_by_sql().get("key"),
+            "meta": {},
+        }
 
 
 class ApplicationProfileSerializer(serializers.Serializer):

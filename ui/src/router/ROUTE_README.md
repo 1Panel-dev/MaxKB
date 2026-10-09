@@ -33,8 +33,8 @@ src/router/
 │           ├── model.ts         # 模型
 │           └── trigger.ts       # 触发器
 └── chat/
-    ├── index.ts                 # Chat Router
-    └── routes.ts                # Chat 路由表
+    ├── index.ts                 # Chat Router 与认证守卫
+    └── routes.ts                # Chat 路由表（门户与单应用对话）
 ```
 
 ## 路由分类
@@ -115,7 +115,42 @@ Admin Router 在 `admin/index.ts` 中统一处理导航初始化：
 
 ### Chat
 
-Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由加入 Admin 路由表。
+Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由加入 Admin 路由表。门户与单应用对话
+共用这一个入口，门户部署在 `/chat/portal/` 下。
+
+门户路由统一放在 `/portal` 下并配置 `meta.portal: true`：`portal-home`（`/portal`）、
+`portal-login`（`/portal/login`）、`portal-application-list`（`/portal/applications`，全部智能体）、
+`portal-application`（`/portal/a/:applicationId`，新建对话）、
+`portal-application-chat`（`/portal/a/:applicationId/c/:chatId`），
+`portal-home`、`portal-application-list`、`portal-application`、`portal-application-chat` 共用门户对话页 `views/portal/index.vue`，
+访问 `portal-home` 时由页面在分组加载后进入第一个智能体的新建对话。`portal-login` 与 `chat-login` 共用 `views/chat/login/index.vue`，页面按 Store
+当前认证场景显示门户或应用名称，并使用对应场景登录。不要把门户页面放到 `/login` 等一级路径，否则会与 `/:accessToken/` 冲突。
+
+单应用对话路由以 `/:accessToken/` 开头，兼容 v2 对话地址：`chat-home`（`/:accessToken/`）、
+`chat-home-detail`（`/:accessToken/c/:chatId`）和 `chat-login`（`/:accessToken/login`）。
+静态段 `/portal` 优先于动态参数匹配；后端生成的 accessToken 为 16 位十六进制字符串，不会等于 `portal`。
+
+根路径 `/` 重定向到 `portal-home`；匹配不到的地址由末尾 catch-all 路由 `chat-not-found` 渲染
+`views/chat/error/index.vue`，保留原地址。Router base 优先读取 `window.MaxKB.prefix`（后端按 `CHAT_PATH`
+替换），再回退到 `VITE_BASE_PATH`。
+
+认证场景（scope）由路由决定：门户路由为 `PORTAL_AUTH_SCOPE`，单应用路由为其 accessToken。
+Chat 导航守卫（`chat/index.ts`）：
+
+1. `/portal` 下未定义的子路径会被单应用路由匹配为 `accessToken = 'portal'`，重定向到 `portal-home`。
+2. 获取目标场景的认证前置配置（`AuthProfile`），与当前场景相同时复用。accessToken 无效、应用已停用或门户
+   未开放导致获取失败时，进入 `chat-not-found` 并保留原地址；匿名认证失败时同样处理。
+3. 判断时只读取目标场景在本地存储中的 token，不切换 Store 的当前场景。
+4. 进入登录页或已有 token 时，调用 `auth.activate()` 切换当前场景后放行。
+5. `enable_auth` 为 false 时获取匿名 token，切换当前场景后放行。匿名认证与登录都携带该场景本地保存的
+   token，后端据此沿用同一对话用户。401 时 token 只在 Store 中清除并标记为失效，本地存储保留以便
+   重新认证时携带；退出登录才从本地存储删除。
+6. 否则跳转到对应登录页（`portal-login` 或 `chat-login`），并通过 `redirect` 查询参数保留原地址。
+
+当前场景只在放行前切换，请求层直接读取 `auth.token`，导航未完成时不会带上目标场景的 token。
+
+接口返回 401（`/auth/` 认证接口除外）时，请求层调用 `reauthenticate()`：将当前场景的 token 标记为失效（Store 中清除，本地存储保留），并以
+`force: true` 重新导航到当前地址，由守卫重新匿名认证或跳转登录页。同一时间只处理一次。
 
 ## RouteMeta 字段
 

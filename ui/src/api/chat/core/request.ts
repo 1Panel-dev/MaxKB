@@ -1,7 +1,8 @@
 /** 提供 Chat API 的 Axios 实例与常用 HTTP 请求封装。 */
 
 import axios, { AxiosHeaders, type AxiosResponse, type AxiosProgressEvent, type InternalAxiosRequestConfig } from 'axios'
-import { useStore } from '@/stores'
+import { reauthenticate } from '@/router/chat'
+import { useStore } from '@/stores/chat'
 import type { ApiResponse } from './types'
 import type { Dict } from '@/api/types'
 import { MsgError } from '@/utils/message'
@@ -15,7 +16,8 @@ function setRequestHeaders(config: InternalAxiosRequestConfig) {
   if (!(config.headers instanceof AxiosHeaders)) {
     config.headers = new AxiosHeaders(config.headers)
   }
-  if (auth.token) {
+  // 请求已指定 Authorization 时不覆盖，如匿名认证携带上次的匿名 token
+  if (auth.token && !config.headers.has('Authorization')) {
     config.headers.set('Authorization', `Bearer ${auth.token}`)
   }
   if (user.language) {
@@ -32,9 +34,21 @@ async function getResponseErrorMessage(error: unknown) {
 
   const responseData = error.response?.data
   if (typeof responseData === 'string') {
-    return responseData
+    // 网关或后端调试页返回的 HTML 不适合直接展示，交由调用方使用通用提示
+    return isHtmlResponse(responseData) ? undefined : responseData
   }
   return responseData?.message
+}
+
+function isHtmlResponse(responseText: string) {
+  return /^\s*<(!doctype|html)/i.test(responseText)
+}
+
+/** 根据 HTTP 状态生成通用错误提示。 */
+function getStatusErrorMessage(status?: number) {
+  if (status === 404) return '请求的资源不存在'
+  if (status && status >= 500) return '服务异常，请稍后重试'
+  return '请求失败，请稍后重试'
 }
 
 export const request = axios.create({
@@ -63,8 +77,16 @@ request.interceptors.response.use(
       return Promise.reject(error)
     }
 
+    // token 失效时重新认证；认证接口自身的 401（如登录失败）仍按普通错误提示
+    const requestUrl = error.config?.url ?? ''
+    const status = error.response?.status
+    if (status === 401 && !requestUrl.startsWith('/v3/auth/')) {
+      reauthenticate()
+      return Promise.reject(error)
+    }
+
     const responseMessage = await getResponseErrorMessage(error)
-    MsgError(responseMessage || error.message)
+    MsgError(responseMessage || getStatusErrorMessage(status))
     return Promise.reject(error)
   },
 )
