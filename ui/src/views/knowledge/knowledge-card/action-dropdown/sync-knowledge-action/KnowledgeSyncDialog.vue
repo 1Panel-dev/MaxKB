@@ -5,10 +5,11 @@ import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-managem
 import { KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import type { KnowledgeSyncType } from '@/api/types'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'KnowledgeSyncDialog' })
-const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi; knowledgeId: string }>()
+const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi; knowledgeId: string }>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ closed: [] }>()
 

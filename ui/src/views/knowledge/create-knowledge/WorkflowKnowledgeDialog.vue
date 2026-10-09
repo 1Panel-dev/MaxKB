@@ -4,14 +4,15 @@ import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type { KnowledgeWorkflowTemplate, WorkflowStoreTemplate } from '@/api/types'
 import { knowledgeTemplate } from '../template.ts'
-import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import KnowledgeBaseForm from './components/KnowledgeBaseForm.vue'
 
 defineOptions({ name: 'CreateWorkflowKnowledgeDialog' })
-const props = defineProps<{ folderId: string }>()
+const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 const { auth } = useStore()
 const route = useRoute()
@@ -56,25 +57,25 @@ function submit() {
     .then((validationResults) => {
       if (!validationResults.every(Boolean) || !baseFormRef.value) return
       const baseForm = baseFormRef.value.form
-      return WorkflowApi.postKnowledgeWorkflow({
-        name: baseForm.name.trim(),
-        desc: baseForm.desc.trim(),
-        embedding_model_id: baseForm.embedding_model_id,
-        folder_id: props.folderId,
-        type: KNOWLEDGE_TYPE.WORKFLOW,
-        work_flow: cloneDeep(knowledgeTemplate.default),
-        work_flow_template: workflowTemplate.value ? cloneDeep(workflowTemplate.value) : undefined,
-      }).then((knowledge) => {
-        return auth.loadAuthBaseProfile().then(() => {
-          MsgSuccess('创建成功')
-          dialogVisible.value = false
-          emit('refresh')
-          return router.push({
-            name: 'workflow-knowledge',
-            params: { knowledgeId: knowledge.id, workspaceId: route.params.workspaceId },
+      return props.api.postKnowledgeWorkflow({
+          name: baseForm.name.trim(),
+          desc: baseForm.desc.trim(),
+          embedding_model_id: baseForm.embedding_model_id,
+          folder_id: props.folderId,
+          type: KNOWLEDGE_TYPE.WORKFLOW,
+          work_flow: cloneDeep(knowledgeTemplate.default),
+          work_flow_template: workflowTemplate.value ? cloneDeep(workflowTemplate.value) : undefined,
+        }).then((knowledge) => {
+          return auth.loadAuthBaseProfile().then(() => {
+            MsgSuccess('创建成功')
+            dialogVisible.value = false
+            emit('refresh')
+            return router.push({
+              name: 'workflow-knowledge',
+              params: { knowledgeId: knowledge.id, workspaceId: route.params.workspaceId },
+            })
           })
         })
-      })
     })
     .finally(() => {
       loading.value = false

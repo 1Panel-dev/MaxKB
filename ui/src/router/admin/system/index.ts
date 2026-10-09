@@ -200,7 +200,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'knowledge',
           name: 'system-shared-knowledge',
-          component: () => import('@/views/system/index.vue'),
+          component: () => import('@/views/system/shared-resources/knowledge/index.vue'),
           meta: { title: '知识库', order: 10, permission: perm.knowledge.share.read, next: 'system-shared-tools' },
         },
 

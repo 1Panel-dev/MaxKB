@@ -4,10 +4,11 @@ import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import KnowledgeMcpConfigDialog from './KnowledgeMcpConfigDialog.vue'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 
 defineOptions({ name: 'McpConfigKnowledgeAction' })
 
-const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
+const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
 const loading = defineModel<boolean>('loading', { default: false })
 
 /* 知识库 MCP 配置详情 */

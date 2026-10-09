@@ -4,13 +4,14 @@ import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import KnowledgeBaseForm from './components/KnowledgeBaseForm.vue'
 
 defineOptions({ name: 'CreateLarkKnowledgeDialog' })
-const props = defineProps<{ folderId: string }>()
+const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>()
 const emit = defineEmits<{ refresh: [] }>()
 const { auth } = useStore()
 const route = useRoute()
@@ -47,26 +48,26 @@ function submit() {
     .then((validationResults) => {
       if (!validationResults.every(Boolean) || !baseFormRef.value) return
       const baseForm = baseFormRef.value.form
-      return KnowledgeApi.postLarkKnowledge({
-        name: baseForm.name.trim(),
-        desc: baseForm.desc.trim(),
-        embedding_model_id: baseForm.embedding_model_id,
-        folder_id: props.folderId,
-        type: KNOWLEDGE_TYPE.LARK,
-        app_id: knowledgeForm.app_id.trim(),
-        app_secret: knowledgeForm.app_secret,
-        folder_token: knowledgeForm.folder_token.trim(),
-      }).then((knowledge) => {
-        return auth.loadAuthBaseProfile().then(() => {
-          MsgSuccess('创建成功')
-          dialogVisible.value = false
-          emit('refresh')
-          return router.push({
-            name: 'workspace-knowledge-document-list',
-            params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type], workspaceId: route.params.workspaceId },
+      return props.api.postLarkKnowledge({
+          name: baseForm.name.trim(),
+          desc: baseForm.desc.trim(),
+          embedding_model_id: baseForm.embedding_model_id,
+          folder_id: props.folderId,
+          type: KNOWLEDGE_TYPE.LARK,
+          app_id: knowledgeForm.app_id.trim(),
+          app_secret: knowledgeForm.app_secret,
+          folder_token: knowledgeForm.folder_token.trim(),
+        }).then((knowledge) => {
+          return auth.loadAuthBaseProfile().then(() => {
+            MsgSuccess('创建成功')
+            dialogVisible.value = false
+            emit('refresh')
+            return router.push({
+              name: 'workspace-knowledge-document-list',
+              params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type], workspaceId: route.params.workspaceId },
+            })
           })
         })
-      })
     })
     .finally(() => {
       loading.value = false

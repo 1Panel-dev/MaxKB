@@ -223,6 +223,7 @@ function handleBatchDelete() {
               <KnowledgeCard
                 :knowledge="knowledge"
                 :shared="isShared"
+                :disabled="isShared"
                 :selectable="batchSelectionMode"
                 :selected="selectedKnowledgeIds.includes(knowledge.id)"
                 @click="handleOpenKnowledge(knowledge)"

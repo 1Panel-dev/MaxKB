@@ -214,7 +214,9 @@ src/views/knowledge/
 ```
 
 `KnowledgeCard` 只负责展示、选择状态和 `action-dropdown` 插槽；页面传入完整 Knowledge API，
-组合单项转移、删除 Action，并管理批量选择、全选、批量转移与批量删除。共享知识库不展示这些操作。
+组合单项转移、删除 Action，并管理批量选择、全选、批量转移与批量删除。工作空间共享知识库保持只读，
+不传操作插槽并传入 `disabled`；System 共享知识库页传入 `shared`、不传 `disabled`，保留共享标识，
+并组合同步、向量化、生成问题、分词索引、MCP 配置、关联资源、导出及删除等菜单操作。
 `GenerateQuestionsAction` 在非共享知识库菜单提供“生成问题”，复用公共
 `GenerateQuestionsDialog`，打开时固定知识库 ID，提交知识库生成接口；共用页面 loading，
 成功提示并关闭，失败保留表单。不新增权限判断。
@@ -257,7 +259,10 @@ MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需�
 通过 `isSystemResource()`、`isSystemSharedResource()` 判断，供应商继续使用共用 Provider API。
 
 `ButtonCreateKnowledge` 内聚四类创建浮层 Ref 和打开动作，列表页传入目标 `folderId`，通过
-`refresh` 刷新列表。入口支持 `trigger` 插槽替换默认创建按钮，下拉使用 `persistent`。
+`refresh` 刷新列表。入口支持 `trigger` 插槽替换默认创建按钮，下拉使用 `persistent`。默认使用
+Workspace 知识库 API；System 共享知识库页传入完整 System 共享知识库 API，创建、导入与工作流创建
+均不读取工作空间 ID。创建入口及模板中心只接收一个完整 Knowledge API，工作流创建也使用该对象的
+`postKnowledgeWorkflow`；已创建知识库的工作流画布接口仍由 `workspace/knowledge/workflow.ts` 维护。
 各创建浮层接收 `folderId`，通过 `open()` 打开；工作流额外接受可选的商店模板。共用的
 `KnowledgeBaseForm` 负责名称、描述、Embedding 模型必填校验以及工作空间和共享模型查询，
 根据 `isSystemSharedResource()` 选择 System 共享 Model API 或 Workspace Model API，
@@ -267,7 +272,8 @@ MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需�
 刷新选项不覆盖用户选择或设置页回填的模型。
 创建前校验表单，提交期间禁止重复提交和关闭；成功后刷新用户基础资料并通知列表刷新，
 普通类型将接口返回的 `knowledge.type` 通过 `KNOWLEDGE_TYPE_MAP` 转为字符串后进入文档列表，工作流进入画布。常驻弹窗在关闭动画结束后清理表单，打开时只回填本次模板与显示，工作流模板使用
-`cloneDeep` 隔离；创建流程使用 Workspace API，不通过路由字符串推测 System 范围。
+`cloneDeep` 隔离；创建流程默认使用 Workspace API，不通过路由字符串推测 System 范围；System
+共享页通过入口显式传入对应 API，创建成功后仅刷新共享列表，不进入工作空间详情或工作流路由。
 飞书创建沿用扩展接口 `/lark/save`，部署环境需要提供该接口。
 “导入创建”沿用智能体和工具的菜单文件选择交互，调用 `postKnowledgeImport` 上传文件及当前
 `folderId`，导入成功后先刷新用户基础资料，再通知知识库列表刷新。上传期间禁止重复导入，
@@ -382,6 +388,8 @@ Action 放入 `views/system/shared-resources/<card-name>/action-dropdown/`。Act
 
 ```text
 src/views/system/shared-resources/
+├── knowledge/
+│   └── index.vue
 ├── model/
 │   └── index.vue
 └── tool/
@@ -394,6 +402,12 @@ src/views/system/shared-resources/
 `ButtonCreateTool` 可接收完整 `api`，默认使用 Workspace Tool API；`showWorkflow` 默认开启，
 共享页开启工作流创建，创建后进入 `system-shared-workflow-tool`。共享页支持普通工具、Skills、MCP、数据源及
 导入创建，工作流卡片点击进入画布（支持 Ctrl / Command 新标签页），编辑菜单仍修改基础信息。共享页不组合工作空间专用的移动、授权和触发器入口。
+
+`KnowledgeSharedView` 使用 System 共享知识库 API，复用 `KnowledgeCard`、创建入口和模板中心。
+卡片点击绑定页面的 `handleOpenKnowledge`，详情路由暂未接入，方法内保留 `router.push` 的 TODO。
+创建、模板创建和导入均使用 System 共享接口；Web 同步、向量化、关联问题、分词索引、
+MCP 配置、关联资源、导出与删除通过复用 Action 组合，授权工作空间暂保留 TODO，不组合工作空间专用的设置、
+文件夹移动或批量操作。
 
 System 用户页面按业务流程归拢操作入口和专属 Dialog。入口组件管理弹窗 Ref、打开动作并转发
 `refresh`；列表页负责查询、批量选择和刷新策略，创建与编辑共用的 `UserFromDrawer` 仍由页面管理。

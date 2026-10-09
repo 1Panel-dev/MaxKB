@@ -255,7 +255,8 @@ System 共享资源页面：
 /admin/system/share/tools
 ```
 
-`system-shared-tools` 渲染 `views/system/shared-resources/tool/index.vue`，提供共享工具管理页面。
+`system-shared-knowledge` 渲染 `views/system/shared-resources/knowledge/index.vue`，提供共享知识库
+卡片管理页面；`system-shared-tools` 渲染 `views/system/shared-resources/tool/index.vue`，提供共享工具管理页面。
 
 共享资源路由是 System 导航的一部分，继续在 `admin/system/index.ts` 的 `share` 子路由中维护。
 已实现的共享资源页面放在 `views/system/shared-resources/`，由页面处理 System 范围的查询和操作，
