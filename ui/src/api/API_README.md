@@ -624,7 +624,7 @@ Web 知识库详情及更新响应的顶层 `doc_strategy` 使用 `DocumentStrat
 
 ### 知识库定时同步
 
-下列接口定义暂时保留，`setting/scheduled-sync/` 页面尚不调用查询、保存或日志接口。
+`setting/scheduled-sync/` 页面调用设置查询、保存和日志分页接口；保存返回的规范化配置用于回填。
 
 `workspace/knowledge/sync.ts` 提供 `getKnowledgeSyncSetting`、`putKnowledgeSyncSetting`，
 分别通过 GET、PUT `/<knowledgeId>/sync_setting` 查询和保存 Web、飞书及工作流知识库同步设置。
@@ -634,4 +634,5 @@ Web 知识库详情及更新响应的顶层 `doc_strategy` 使用 `DocumentStrat
 `getKnowledgeSyncLogPage(knowledgeId, page)` 查询 `/<knowledgeId>/sync_log/<currentPage>/<pageSize>`，
 使用 `ResponsePage<KnowledgeSyncLog>`，返回文档计数、消息、四种执行状态、毫秒及秒数耗时，
 包含手动和定时任务。周期类型统一复用 `enums/schedule.ts` 的 `SCHEDULE_TYPE`，
-触发器、长期记忆及知识库同步共享同一协议值；日志状态仍维护在 `enums/knowledge.ts`，均经 `@/api/enums` 导入。
+触发器、长期记忆及知识库同步共享同一协议值；日志状态使用 `enums/knowledge.ts` 的 `KNOWLEDGE_SYNC_STATUS`，为 `running`、`success`、
+`failure`、`skipped` 字符串；`KnowledgeSyncStatus` 与 `KnowledgeSyncLog` 经 `@/api/types` 导入。

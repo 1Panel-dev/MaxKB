@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from common.utils.logger import maxkb_logger
 from knowledge.models import Knowledge, KnowledgeType
+from knowledge.services.sync_status import recover_stale_sync_logs
 from knowledge.task.sync import scheduled_sync_knowledge
 
 
@@ -173,4 +174,5 @@ def restore_knowledge_sync_jobs() -> None:
         elif job_id.startswith(LEGACY_WEB_SYNC_JOB_PREFIX):
             job.remove()
     for knowledge_id in active_ids:
+        recover_stale_sync_logs(knowledge_id)
         deploy_knowledge_sync_job(knowledge_id)

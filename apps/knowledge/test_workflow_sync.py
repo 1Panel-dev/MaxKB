@@ -251,6 +251,13 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
 
 
 class WorkflowActionSourceTests(SimpleTestCase):
+    def setUp(self):
+        heartbeat_patch = patch(
+            "knowledge.serializers.knowledge_workflow.start_sync_heartbeat", return_value=lambda: None
+        )
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+
     @patch("knowledge.serializers.knowledge_workflow.KnowledgeAction")
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
     def test_published_remote_upload_also_saves_input_for_scheduling(self, query_set, _action):
@@ -290,9 +297,15 @@ class WorkflowActionSourceTests(SimpleTestCase):
     @patch("knowledge.serializers.knowledge_workflow.finalize_workflow_complete_snapshot")
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
     def test_failed_incremental_action_cleans_its_output_and_marks_log_failed(self, query_set, cleanup):
-        log = SimpleNamespace(sync_type=KnowledgeSyncType.INCREMENTAL, id="log")
+        log = SimpleNamespace(
+            sync_type=KnowledgeSyncType.INCREMENTAL,
+            status=KnowledgeSyncStatus.RUNNING,
+            id="log",
+            knowledge_id="knowledge",
+        )
         log_query = MagicMock()
         log_query.filter.return_value.first.return_value = log
+        log_query.select_for_update.return_value.get.return_value = log
         query_set.side_effect = lambda model: log_query if model is KnowledgeSyncLog else MagicMock()
         cleanup.return_value = {
             "total_count": 1,
@@ -302,7 +315,7 @@ class WorkflowActionSourceTests(SimpleTestCase):
             "failed_count": 1,
         }
         source = {"source_scope": "scope"}
-        finalize_knowledge_action("action", State.FAILURE, 0.1, "log", MagicMock(), source)
+        finalize_knowledge_action.__wrapped__("action", State.FAILURE, 0.1, "log", MagicMock(), source)
         cleanup.assert_called_once_with(log, False, source)
         self.assertEqual(log_query.filter.return_value.update.call_args.kwargs["status"], KnowledgeSyncStatus.FAILURE)
 

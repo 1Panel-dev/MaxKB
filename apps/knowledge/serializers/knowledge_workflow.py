@@ -54,6 +54,7 @@ from knowledge.serializers.common import update_resource_mapping_by_knowledge
 from knowledge.serializers.knowledge_model import KnowledgeModelSerializer
 from knowledge.services import validate_knowledge_file_size
 from knowledge.services.document_cleanup import delete_document_data
+from knowledge.services.sync_status import start_sync_heartbeat
 from knowledge.services.workflow_sync import finalize_workflow_complete_snapshot, merge_workflow_incremental_snapshot
 from knowledge.services.workflow_sync_source import validate_workflow_sync_source, workflow_source_meta
 from system_manage.models import AuthTargetType
@@ -90,6 +91,7 @@ def hand_node(node, update_tool_map):
         node.get("properties", {}).get("node_data", {})["tool_lib_id"] = update_tool_map.get(tool_lib_id, tool_lib_id)
 
 
+@transaction.atomic
 def finalize_knowledge_action(
     knowledge_action_id, state, run_time, sync_log_id=None, document_cleanup=None, workflow_source=None
 ):
@@ -101,6 +103,14 @@ def finalize_knowledge_action(
     if sync_log_id is not None:
         sync_log = QuerySet(KnowledgeSyncLog).filter(id=sync_log_id).first()
         if sync_log is not None:
+            QuerySet(Knowledge).select_for_update().get(id=sync_log.knowledge_id)
+            sync_log = QuerySet(KnowledgeSyncLog).select_for_update().get(id=sync_log_id)
+            if sync_log.status == KnowledgeSyncStatus.SUCCESS:
+                return
+            if sync_log.status != KnowledgeSyncStatus.RUNNING:
+                finalize_workflow_complete_snapshot(sync_log, False, workflow_source)
+                QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(state=State.FAILURE)
+                return
             if sync_log.sync_type == KnowledgeSyncType.COMPLETE or state != State.SUCCESS:
                 stats = finalize_workflow_complete_snapshot(sync_log, state == State.SUCCESS, workflow_source)
             elif (
@@ -136,7 +146,7 @@ def finalize_knowledge_action(
                     "failed_count": 0 if state == State.SUCCESS else 1,
                 }
             is_success = state == State.SUCCESS
-            QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(
+            QuerySet(KnowledgeSyncLog).filter(id=sync_log.id, status=KnowledgeSyncStatus.RUNNING).update(
                 status=KnowledgeSyncStatus.SUCCESS
                 if is_success and not stats["failed_count"]
                 else KnowledgeSyncStatus.FAILURE,
@@ -328,6 +338,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         }
         workflow = new_instance(work_flow, WorkflowType.KNOWLEDGE)
         start_time = time.time()
+        stop_heartbeat = start_sync_heartbeat(None)
 
         def get_node_parameters(node):
             return node.properties.get("node_data", {})
@@ -345,6 +356,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(details=wf_manage.get_details())
 
         def on_complete(wf_manage, error):
+            stop_heartbeat()
             WorkflowRunRegistry.unregister(str(knowledge_action_id))
             details = wf_manage.get_details()
             cancelled = wf_manage.signal == Signal.CANCELLED
@@ -357,8 +369,14 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
 
         call_back = CallBack(on_next, on_complete)
         work_flow_manage = WorkflowManage(workflow, parameters, WorkflowType.KNOWLEDGE, call_back, get_start_node_fn)
-        WorkflowRunRegistry.register(str(knowledge_action_id), None, work_flow_manage)
-        work_flow_manage.run()
+        stop_heartbeat = start_sync_heartbeat(sync_log_id)
+        try:
+            WorkflowRunRegistry.register(str(knowledge_action_id), None, work_flow_manage)
+            work_flow_manage.run()
+        except Exception:
+            stop_heartbeat()
+            WorkflowRunRegistry.unregister(str(knowledge_action_id))
+            raise
         return work_flow_manage
 
     @staticmethod

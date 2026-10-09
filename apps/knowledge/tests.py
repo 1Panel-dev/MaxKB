@@ -1076,6 +1076,23 @@ class KnowledgeModelUpdateTests(SimpleTestCase):
 
 
 class WebKnowledgeSyncTaskTests(SimpleTestCase):
+    def setUp(self):
+        transaction_patch = patch("knowledge.task.sync.transaction.atomic", return_value=nullcontext())
+        transaction_patch.start()
+        self.addCleanup(transaction_patch.stop)
+        super().setUp()
+        heartbeat_patch = patch("knowledge.task.sync.start_sync_heartbeat", return_value=lambda: None)
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+        heartbeat_patch = patch("knowledge.task.sync.recover_stale_sync_logs", return_value=lambda: None)
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+        heartbeat_patch = patch(
+            "knowledge.serializers.knowledge_workflow.start_sync_heartbeat", return_value=lambda: None
+        )
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+
     @patch("knowledge.task.sync.delete_document_data")
     @patch("knowledge.task.sync.KnowledgeSyncLog.objects.create")
     @patch("knowledge.task.sync.QuerySet")
@@ -1096,7 +1113,7 @@ class WebKnowledgeSyncTaskTests(SimpleTestCase):
             Knowledge: knowledge_query,
             Document: document_query,
         }.get(model, log_query)
-        sync_log = MagicMock(id="log-id")
+        sync_log = MagicMock(id="log-id", status=KnowledgeSyncStatus.RUNNING)
         create_log.return_value = sync_log
 
         def handler_factory(_knowledge_id, _user_id, _strategy, _sync_type, successful_urls, stats):
@@ -1177,7 +1194,7 @@ class WebKnowledgeSyncTaskTests(SimpleTestCase):
     @patch("knowledge.task.sync.ForkManage")
     @patch("knowledge.task.sync.delete_document_data")
     @patch("knowledge.task.sync.QuerySet")
-    def test_complete_sync_cleans_documents_before_crawling(
+    def test_complete_sync_replaces_documents_after_successful_crawl(
         self, query_set, delete_document_data, fork_manage, _get_save_handler
     ):
         events = []
@@ -1192,10 +1209,24 @@ class WebKnowledgeSyncTaskTests(SimpleTestCase):
 
         delete_document_data.assert_called_once_with(["document-id"])
         fork_manage.return_value.fork.assert_called_once()
-        self.assertEqual(events, ["cleanup", "crawl"])
+        self.assertEqual(events, ["crawl", "cleanup"])
 
 
 class KnowledgeScheduleTests(SimpleTestCase):
+    def setUp(self):
+        super().setUp()
+        heartbeat_patch = patch("knowledge.task.sync.start_sync_heartbeat", return_value=lambda: None)
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+        heartbeat_patch = patch("knowledge.task.sync.recover_stale_sync_logs", return_value=lambda: None)
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+        heartbeat_patch = patch(
+            "knowledge.serializers.knowledge_workflow.start_sync_heartbeat", return_value=lambda: None
+        )
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+
     def test_daily_setting_uses_trigger_schedule_fields(self):
         serializer = KnowledgeSyncSettingRequest(
             data={
@@ -1415,6 +1446,20 @@ class KnowledgeScheduleTests(SimpleTestCase):
 
 
 class WorkflowKnowledgeScheduleTests(SimpleTestCase):
+    def setUp(self):
+        super().setUp()
+        heartbeat_patch = patch("knowledge.task.sync.start_sync_heartbeat", return_value=lambda: None)
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+        heartbeat_patch = patch("knowledge.task.sync.recover_stale_sync_logs", return_value=lambda: None)
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+        heartbeat_patch = patch(
+            "knowledge.serializers.knowledge_workflow.start_sync_heartbeat", return_value=lambda: None
+        )
+        heartbeat_patch.start()
+        self.addCleanup(heartbeat_patch.stop)
+
     @patch("knowledge.services.workflow_sync._delete_workflow_documents")
     @patch("knowledge.services.workflow_sync.QuerySet")
     def test_complete_snapshot_replaces_old_only_after_success(self, query_set, delete_documents):
@@ -1521,6 +1566,7 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
     def test_incremental_workflow_uses_stable_snapshot_merge(self, query_set, merge_workflow_snapshot):
         sync_log = MagicMock(
+            status=KnowledgeSyncStatus.RUNNING,
             id="00000000-0000-0000-0000-000000000032",
             knowledge_id="00000000-0000-0000-0000-000000000033",
             create_time=timezone.now(),
@@ -1529,6 +1575,7 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         action_query = MagicMock()
         log_query = MagicMock()
         log_query.filter.return_value.first.return_value = sync_log
+        log_query.select_for_update.return_value.get.return_value = sync_log
         query_set.side_effect = lambda model: log_query if model is KnowledgeSyncLog else action_query
         merge_workflow_snapshot.return_value = {
             "total_count": 1,
@@ -1540,7 +1587,7 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         document_cleanup = MagicMock()
 
         # 新引擎:完成收尾由 finalize_knowledge_action 内联处理,state/run_time 由调用方算好传入
-        finalize_knowledge_action(
+        finalize_knowledge_action.__wrapped__(
             "00000000-0000-0000-0000-000000000036",
             KnowledgeActionState.SUCCESS,
             0.0,
@@ -2503,6 +2550,7 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
         delete_documents,
     ):
         sync_log = MagicMock(
+            status=KnowledgeSyncStatus.RUNNING,
             knowledge_id="00000000-0000-0000-0000-000000000081",
             create_time=timezone.now(),
             sync_type=KnowledgeSyncType.INCREMENTAL,
@@ -2584,6 +2632,7 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
     @patch("knowledge.services.workflow_sync.QuerySet")
     def test_replace_snapshot_keeps_unmatched_old_documents(self, query_set, delete_documents):
         sync_log = MagicMock(
+            status=KnowledgeSyncStatus.RUNNING,
             knowledge_id="00000000-0000-0000-0000-000000000091",
             create_time=timezone.now(),
             sync_type=KnowledgeSyncType.REPLACE,

@@ -8,6 +8,7 @@
 """
 
 import traceback
+from uuid import uuid4
 from copy import deepcopy
 from time import perf_counter
 from typing import List
@@ -21,8 +22,6 @@ from django.utils.translation import gettext_lazy as _
 from knowledge.models import (
     Document,
     DocumentResourceType,
-    File,
-    FileSourceType,
     Knowledge,
     KnowledgeSyncLog,
     KnowledgeSyncStatus,
@@ -33,6 +32,7 @@ from knowledge.models import (
 )
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer
 from knowledge.services.document_cleanup import delete_document_data
+from knowledge.services.sync_status import recover_stale_sync_logs, start_sync_heartbeat
 from knowledge.services.workflow_sync_source import validate_workflow_sync_source
 from knowledge.task.handler import (
     get_save_handler,
@@ -66,7 +66,7 @@ def _finish_unstarted_scheduled_sync(sync_log_id, status, message):
         updates = {"status": status, "message": message}
         if status == KnowledgeSyncStatus.FAILURE:
             updates["failed_count"] = 1
-        QuerySet(KnowledgeSyncLog).filter(id=sync_log_id).update(**updates)
+        QuerySet(KnowledgeSyncLog).filter(id=sync_log_id, status=KnowledgeSyncStatus.RUNNING).update(**updates)
 
 
 @celery_app.task(base=QueueOnce, once={"keys": ["knowledge_id"]}, name="celery:sync_web_knowledge")
@@ -105,6 +105,11 @@ def sync_replace_web_knowledge(
     started_at = perf_counter()
     stats = _new_sync_stats()
     sync_log = None
+    snapshot_id = None
+
+    def stop_heartbeat():
+        pass
+
     try:
         if sync_type not in WEB_SYNC_TYPES:
             raise ValueError(f"Unsupported Web knowledge synchronization type: {sync_type}")
@@ -132,12 +137,16 @@ def sync_replace_web_knowledge(
                     trigger_type=trigger_type,
                 )
             )
+            if sync_log.status != KnowledgeSyncStatus.RUNNING:
+                return {**stats, "status": KnowledgeSyncStatus.SKIPPED}
+            stop_heartbeat = start_sync_heartbeat(str(sync_log.id))
         maxkb_logger.info(
             _("Start--->Start synchronization web knowledge base:{knowledge_id}, type:{sync_type}").format(
                 knowledge_id=knowledge_id, sync_type=sync_type
             )
         )
         if sync_type == "complete":
+            snapshot_id = str(sync_log.id) if sync_log is not None else str(uuid4())
             document_ids = list(
                 QuerySet(Document)
                 .filter(
@@ -147,18 +156,37 @@ def sync_replace_web_knowledge(
                 )
                 .values_list("id", flat=True)
             )
-            delete_document_data(document_ids)
-            QuerySet(File).filter(
-                source_type=FileSourceType.KNOWLEDGE,
-                source_id=str(knowledge_id),
-                meta__source_url__isnull=False,
-            ).delete()
             ForkManage(url, get_selector_list(selector)).fork(
                 2,
                 set(),
-                get_save_handler(knowledge_id, user_id, selector, doc_strategy, stats),
+                get_save_handler(
+                    knowledge_id, user_id, selector, doc_strategy, stats, {"web_sync_run_id": snapshot_id}
+                ),
             )
-            stats["deleted_count"] = len(document_ids)
+            if stats["failed_count"]:
+                _discard_web_snapshot(knowledge_id, snapshot_id)
+                stats["synced_count"] = 0
+            else:
+                # Publish only after the whole crawl succeeded; recovery uses the same knowledge lock.
+                with transaction.atomic():
+                    QuerySet(Knowledge).select_for_update().get(id=knowledge_id)
+                    if sync_log is not None:
+                        current_log = QuerySet(KnowledgeSyncLog).get(id=sync_log.id)
+                        if current_log.status != KnowledgeSyncStatus.RUNNING:
+                            raise ValueError("Synchronization is no longer running")
+                    delete_document_data(document_ids)
+                    stats["deleted_count"] = len(document_ids)
+                    if sync_log is not None:
+                        # Commit publication and the terminal log together; recovery must not
+                        # mistake an already-published snapshot for abandoned temporary output.
+                        QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(
+                            status=KnowledgeSyncStatus.SUCCESS,
+                            total_count=max(stats["total_count"], stats["synced_count"], stats["deleted_count"]),
+                            synced_count=stats["synced_count"],
+                            deleted_count=stats["deleted_count"],
+                            duration_ms=max(0, round((perf_counter() - started_at) * 1000)),
+                        )
+                stats["deleted_count"] = len(document_ids)
         else:
             visited_urls, successful_urls = set(), set()
             ForkManage(url, get_selector_list(selector)).fork(
@@ -166,7 +194,7 @@ def sync_replace_web_knowledge(
                 visited_urls,
                 get_sync_handler(knowledge_id, user_id, doc_strategy, sync_type, successful_urls, stats),
             )
-            if sync_type == "incremental" and normalize_web_url(url) in successful_urls:
+            if sync_type == "incremental" and not stats["failed_count"] and normalize_web_url(url) in successful_urls:
                 crawled_urls = {normalize_web_url(item) for item in visited_urls}
                 stale_document_ids = [
                     document.id
@@ -191,6 +219,9 @@ def sync_replace_web_knowledge(
     except Exception as e:
         stats["failed_count"] += 1
         stats["message"] = str(e)
+        if snapshot_id is not None:
+            _discard_web_snapshot(knowledge_id, snapshot_id)
+            stats["synced_count"] = 0
         if sync_log is None:
             _finish_unstarted_scheduled_sync(sync_log_id, KnowledgeSyncStatus.FAILURE, str(e))
         maxkb_logger.error(
@@ -199,10 +230,13 @@ def sync_replace_web_knowledge(
             )
         )
     finally:
+        stop_heartbeat()
         stats["duration_ms"] = max(0, round((perf_counter() - started_at) * 1000))
         stats["status"] = KnowledgeSyncStatus.FAILURE if stats["failed_count"] else KnowledgeSyncStatus.SUCCESS
-        if sync_log is not None:
-            QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(
+        if stats["failed_count"] and not stats["message"]:
+            stats["message"] = f"Failed to synchronize {stats['failed_count']} document(s); old documents were retained"
+        if sync_log is not None and sync_log.status == KnowledgeSyncStatus.RUNNING:
+            QuerySet(KnowledgeSyncLog).filter(id=sync_log.id, status=KnowledgeSyncStatus.RUNNING).update(
                 status=stats["status"],
                 total_count=stats["total_count"],
                 synced_count=stats["synced_count"],
@@ -213,6 +247,15 @@ def sync_replace_web_knowledge(
                 message=stats["message"],
             )
     return stats
+
+
+def _discard_web_snapshot(knowledge_id, snapshot_id):
+    document_ids = list(
+        QuerySet(Document)
+        .filter(knowledge_id=knowledge_id, meta__web_sync_run_id=snapshot_id)
+        .values_list("id", flat=True)
+    )
+    delete_document_data(document_ids)
 
 
 @celery_app.task(name="celery:scheduled_sync_web_knowledge")
@@ -240,6 +283,8 @@ def scheduled_sync_web_knowledge(knowledge_id: str, sync_type: str = "incrementa
         if sync_log_id is not None
         else sync_setting.get("sync_type", sync_type)
     )
+    if sync_log_id is not None and QuerySet(KnowledgeSyncLog).get(id=sync_log_id).status != KnowledgeSyncStatus.RUNNING:
+        return False
     if sync_type not in WEB_SYNC_TYPES:
         maxkb_logger.warning(f"Scheduled Web knowledge synchronization type is invalid: {sync_type}")
         _finish_unstarted_scheduled_sync(sync_log_id, KnowledgeSyncStatus.FAILURE, "Invalid synchronization type")
@@ -278,6 +323,8 @@ def scheduled_sync_workflow_knowledge(knowledge_id: str, sync_log_id: str | None
     """Run a workflow knowledge base with the most recently saved input snapshot."""
     started_at = perf_counter()
     sync_log = QuerySet(KnowledgeSyncLog).filter(id=sync_log_id).first() if sync_log_id is not None else None
+    if sync_log is not None and sync_log.status != KnowledgeSyncStatus.RUNNING:
+        return False
     try:
         knowledge = QuerySet(Knowledge).filter(id=knowledge_id, type=KnowledgeType.WORKFLOW).first()
         if knowledge is None:
@@ -361,6 +408,7 @@ def scheduled_sync_knowledge(knowledge_id: str):
             maxkb_logger.info(f"Scheduled knowledge synchronization is disabled: {knowledge_id}")
             return False
         sync_type = setting.get("sync_type", KnowledgeSyncType.INCREMENTAL)
+        recover_stale_sync_logs(knowledge.id)
         running = (
             QuerySet(KnowledgeSyncLog).filter(knowledge_id=knowledge.id, status=KnowledgeSyncStatus.RUNNING).exists()
         )

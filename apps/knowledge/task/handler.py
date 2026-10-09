@@ -37,7 +37,7 @@ def _increment_stats(stats, field, amount=1):
         stats[field] = stats.get(field, 0) + amount
 
 
-def get_save_handler(knowledge_id, user_id, selector, doc_strategy=None, stats=None):
+def get_save_handler(knowledge_id, user_id, selector, doc_strategy=None, stats=None, source_meta=None):
     knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
     strategy = normalize_document_strategy(
         doc_strategy
@@ -55,7 +55,7 @@ def get_save_handler(knowledge_id, user_id, selector, doc_strategy=None, stats=N
                     {
                         "name": document_name,
                         "paragraphs": paragraphs,
-                        "meta": {"source_url": child_link.url, "selector": selector},
+                        "meta": {**(source_meta or {}), "source_url": child_link.url, "selector": selector},
                         "type": KnowledgeType.WEB,
                         "doc_strategy": strategy,
                     },

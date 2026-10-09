@@ -27,7 +27,7 @@ export const KNOWLEDGE_TYPE_LABELS = {
 
 /** 手动同步与定时同步共用的同步方式选项。 */
 export const KNOWLEDGE_SYNC_OPTIONS = [
-  { value: KNOWLEDGE_SYNC_TYPE.INCREMENTAL, label: '增量同步', description: '文档内容无更新时跳过，有更新时则更新文档的分段' },
-  { value: KNOWLEDGE_SYNC_TYPE.REPLACE, label: '替换同步', description: '重新获取 Web 站点文档，替换本地知识库中相同URL的文档' },
-  { value: KNOWLEDGE_SYNC_TYPE.COMPLETE, label: '整体同步', description: '先删除知识库中所有文档，重新从Web站点获取文档' },
+  { value: KNOWLEDGE_SYNC_TYPE.INCREMENTAL, label: '增量同步', description: '跳过未更新的文档，更新有变化的文档，并清理来源中已不存在的文档' },
+  { value: KNOWLEDGE_SYNC_TYPE.REPLACE, label: '替换同步', description: '重新获取来源文档并替换匹配的文档，保留未匹配的旧文档' },
+  { value: KNOWLEDGE_SYNC_TYPE.COMPLETE, label: '整体同步', description: '重新获取来源文档并重建该来源的文档，保留其他来源的文档' },
 ] as const

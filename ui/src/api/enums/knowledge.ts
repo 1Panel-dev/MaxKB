@@ -4,5 +4,8 @@ export const KNOWLEDGE_TYPE = { BASE: 0, WEB: 1, LARK: 2, WORKFLOW: 4 } as const
 /** Web 知识库同步方式。 */
 export const KNOWLEDGE_SYNC_TYPE = { INCREMENTAL: 'incremental', REPLACE: 'replace', COMPLETE: 'complete' } as const
 
+/** 知识库同步日志状态。 */
+export const KNOWLEDGE_SYNC_STATUS = { RUNNING: 'running', SUCCESS: 'success', FAILURE: 'failure', SKIPPED: 'skipped' } as const
+
 /** 知识库分段检索模式。 */
 export const KNOWLEDGE_SEARCH_MODE = { EMBEDDING: 'embedding', KEYWORDS: 'keywords', BLEND: 'blend' } as const

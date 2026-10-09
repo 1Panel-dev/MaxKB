@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import { cloneDeep } from 'lodash'
+import SyncApi from '@/api/admin/workspace/knowledge/sync'
 import { KNOWLEDGE_SYNC_TYPE, SCHEDULE_TYPE } from '@/api/enums'
 import type { KnowledgeSyncSetting, KnowledgeSyncScheduleType } from '@/api/types'
 import { SCHEDULE_OPTION } from '@/constants/schedule'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { MsgInfo } from '@/utils/message'
+import { MsgSuccess } from '@/utils/message'
 import { useKnowledgeDetailContext } from '../../context'
 import SyncLogTable from './components/SyncLogTable.vue'
 
@@ -14,12 +16,15 @@ defineOptions({ name: 'KnowledgeScheduledSyncView' })
 
 defineProps<ResourceDetailPageProps>()
 
-// 接口暂未接入，页面只维护本地设置草稿。
-const { knowledge } = useKnowledgeDetailContext()
+// 回填后台配置，草稿与详情中的配置独立。
+const { knowledge, replaceKnowledgeDetail } = useKnowledgeDetailContext()
 const activeTab = ref('settings')
+const loading = ref(false)
+const saving = ref(false)
+const settingLoaded = ref(false)
 type SyncSettingDraft = Omit<KnowledgeSyncSetting, 'schedule_type'> & { schedule_type?: KnowledgeSyncScheduleType }
 function createDefaultSyncSetting(): SyncSettingDraft {
-  return { enabled: false, schedule_type: SCHEDULE_TYPE.DAILY, time: ['00:00'], sync_type: KNOWLEDGE_SYNC_TYPE.INCREMENTAL }
+  return { enabled: false, schedule_type: SCHEDULE_TYPE.DAILY, time: ['01:00'], sync_type: KNOWLEDGE_SYNC_TYPE.INCREMENTAL }
 }
 const syncSetting = ref<SyncSettingDraft>(createDefaultSyncSetting())
 const formRef = useTemplateRef<FormInstance>('formRef')
@@ -102,21 +107,50 @@ const rules: FormRules<SyncSettingDraft> = {
 }
 
 function handleSave() {
-  return formRef.value
-    ?.validate()
+  const detail = knowledge.value
+  const form = formRef.value
+  if (saving.value || loading.value || !settingLoaded.value || !detail || !form) return
+  saving.value = true
+  return form
+    .validate()
     .then(() => {
-      MsgInfo('当前配置仅保留在页面中，暂未接入保存接口')
+      if (!syncSetting.value.schedule_type) return
+      const setting: KnowledgeSyncSetting = { ...cloneDeep(syncSetting.value), schedule_type: syncSetting.value.schedule_type }
+      return SyncApi.putKnowledgeSyncSetting(detail.id, setting).then((savedSetting) => {
+        syncSetting.value = cloneDeep(savedSetting)
+        replaceKnowledgeDetail({ ...detail, meta: { ...detail.meta, sync_setting: savedSetting } })
+        MsgSuccess('保存成功')
+      })
     })
     .catch(() => {})
+    .finally(() => {
+      saving.value = false
+    })
+}
+
+function loadSyncSetting(knowledgeId: string) {
+  loading.value = true
+  settingLoaded.value = false
+  return SyncApi.getKnowledgeSyncSetting(knowledgeId)
+    .then((setting) => {
+      syncSetting.value = cloneDeep(setting)
+      presetScheduleType.value = setting.schedule_type === SCHEDULE_TYPE.CRON ? SCHEDULE_TYPE.DAILY : setting.schedule_type
+      settingLoaded.value = true
+    })
+    .catch(() => {})
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 watch(
   () => knowledge.value?.id,
-  () => {
+  (knowledgeId) => {
     activeTab.value = 'settings'
     syncSetting.value = createDefaultSyncSetting()
     presetScheduleType.value = undefined
     formRef.value?.clearValidate()
+    if (knowledgeId) void loadSyncSetting(knowledgeId)
   },
   { immediate: true },
 )
@@ -128,7 +162,7 @@ watch(
       <el-tab-pane label="同步设置" name="settings" />
       <el-tab-pane label="同步日志" name="logs" />
     </el-tabs>
-    <div v-show="activeTab === 'settings'" class="min-h-40">
+    <div v-show="activeTab === 'settings'" v-loading="loading || saving" class="min-h-40">
       <el-form ref="formRef" :model="syncSetting" :rules="rules" class="max-w-200 pb-6" label-position="top" @submit.prevent>
         <el-form-item>
           <template #label>
@@ -175,9 +209,9 @@ watch(
           </el-form-item>
         </div>
         <!-- 保存定时同步设置 -->
-        <el-button type="primary" class="mt-4" @click="handleSave">保存</el-button>
+        <el-button type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">保存</el-button>
       </el-form>
     </div>
-    <SyncLogTable v-if="activeTab === 'logs'" />
+    <SyncLogTable v-if="activeTab === 'logs' && knowledge" :knowledge-id="knowledge.id" />
   </div>
 </template>
