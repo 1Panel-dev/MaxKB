@@ -242,7 +242,8 @@ class INode:
         取消运行
         @return:
         """
-        self.status = Status.CANCELLED
+        if self.status in [Status.RUNNING, Status.BEFORE_RUNNING]:
+            self.status = Status.CANCELLED
 
     def _check_cancelled(self):
         """
