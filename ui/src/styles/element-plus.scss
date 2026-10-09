@@ -344,6 +344,8 @@
   --el-checkbox-disabled-checked-input-fill: var(--mk-N400);
   --el-checkbox-disabled-checked-input-border-color: var(--mk-N400);
   --el-checkbox-disabled-checked-icon-color: white;
+  --el-checkbox-disabled-border-color: var(--mk-N400);
+  --el-checkbox-disabled-input-fill: var(--mk-N200);
   --el-checkbox-checked-text-color: var(--el-text-color-primary);
   margin: 0;
   height: unset;
@@ -351,8 +353,12 @@
     line-height: 22px;
     font-weight: 400;
   }
-  &__inner:before {
-    top: 6px !important;
+  &__inner {
+    &.is-disabled {
+    }
+    &:before {
+      top: 6px !important;
+    }
   }
 }
 
@@ -784,6 +790,21 @@
   &__input {
     &.is-checked + .el-radio__label {
       color: var(--el-text-color-primary) !important;
+    }
+    &.is-disabled {
+      .el-radio__inner {
+        background-color: var(--mk-N200);
+        border-color: var(--mk-N400);
+      }
+      &.is-checked {
+        .el-radio__inner {
+          background-color: var(--mk-N400);
+          border-color: var(--mk-N400);
+          &::after {
+            background-color: var(--mk-N200);
+          }
+        }
+      }
     }
   }
   &__inner {

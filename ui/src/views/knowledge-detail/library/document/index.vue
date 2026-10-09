@@ -52,7 +52,7 @@ defineExpose({ customHeader: true })
 
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
-const knowledgeType = computed(() => route.params.type)
+const knowledgeType = computed(() => String(route.params.type ?? ''))
 const { knowledge } = useKnowledgeDetailContext()
 
 /* 快速创建 */
@@ -292,9 +292,12 @@ onBeforeUnmount(() => {
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
         <!-- 导入 Web、飞书或工作流文档 -->
         <ButtonImportDocument
-          v-if="knowledge && !showQuickCreate && !isWorkspaceSharedResource()"
+          v-if="!showQuickCreate && !isWorkspaceSharedResource()"
           :api="DocumentApi"
-          :knowledge="knowledge"
+          :knowledge-id="knowledgeId"
+          :knowledge-type="knowledgeType"
+          :folder-token="String(knowledge?.meta?.folder_token ?? '')"
+          :workflow="knowledge?.work_flow"
           @refresh="handleImportDocumentSuccess"
         />
         <!-- 上传文档 -->
