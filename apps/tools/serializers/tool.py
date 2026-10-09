@@ -46,6 +46,7 @@ from system_manage.serializers.resource_mapping_serializers import ResourceMappi
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolFolder, ToolRecord, ToolScope, ToolType
 from tools.models.tool_workflow import ToolWorkflow
+from tools.serializers.init_field import InitField, InitFieldListField, sanitize_init_field_list, validate_init_field_list
 from trigger.models import Trigger, TriggerTask
 from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
 
@@ -169,6 +170,8 @@ def validate_mcp_config(servers: Dict):
 
 
 class ToolModelSerializer(serializers.ModelSerializer):
+    init_field_list = InitFieldListField(read_only=True)
+
     class Meta:
         model = Tool
         fields = [
@@ -212,6 +215,8 @@ class ToolRecordModelSerializer(serializers.ModelSerializer):
 
 
 class ToolExportModelSerializer(serializers.ModelSerializer):
+    init_field_list = InitFieldListField(read_only=True)
+
     class Meta:
         model = Tool
         fields = [
@@ -268,17 +273,6 @@ class ToolInputField(serializers.Serializer):
     )
 
 
-class InitField(serializers.Serializer):
-    field = serializers.CharField(required=True, label=_("field name"))
-    label = serializers.CharField(required=True, label=_("field label"))
-    required = serializers.BooleanField(required=True, label=_("required"))
-    input_type = serializers.CharField(required=True, label=_("input type"))
-    default_value = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    show_default_value = serializers.BooleanField(required=False, default=False)
-    props_info = serializers.DictField(required=False, default=dict)
-    attrs = serializers.DictField(required=False, default=dict)
-
-
 class ToolCreateRequest(serializers.Serializer):
     name = serializers.CharField(required=True, label=_("tool name"))
 
@@ -288,7 +282,7 @@ class ToolCreateRequest(serializers.Serializer):
 
     input_field_list = serializers.ListField(required=False, default=list, label=_("input field list"))
 
-    init_field_list = serializers.ListField(required=False, default=list, label=_("init field list"))
+    init_field_list = InitField(required=False, default=list, many=True, label=_("init field list"))
 
     is_active = serializers.BooleanField(required=False, label=_("Is active"))
 
@@ -304,7 +298,7 @@ class ToolEditRequest(serializers.Serializer):
         allow_null=True,
     )
     input_field_list = serializers.ListField(required=False, default=list, allow_null=True, label=_("input field list"))
-    init_field_list = serializers.ListField(required=False, default=list, allow_null=True, label=_("init field list"))
+    init_field_list = InitField(required=False, default=list, allow_null=True, many=True, label=_("init field list"))
     init_params = serializers.DictField(required=False, default=dict, allow_null=True, label=_("init params"))
     is_active = serializers.BooleanField(
         required=False,
@@ -327,7 +321,7 @@ class DebugField(serializers.Serializer):
 class ToolDebugRequest(serializers.Serializer):
     code = serializers.CharField(required=True, label=_("tool content"))
     input_field_list = serializers.ListField(required=False, default=list, label=_("input field list"))
-    init_field_list = serializers.ListField(required=False, default=list, label=_("init field list"))
+    init_field_list = InitField(required=False, default=list, many=True, label=_("init field list"))
     init_params = serializers.DictField(required=False, default=dict, label=_("init params"))
     debug_field_list = DebugField(required=True, many=True)
 
@@ -453,7 +447,7 @@ class ToolSerializer(serializers.Serializer):
                     {
                         **tool,
                         "input_field_list": json.loads(tool.get("input_field_list", "[]")),
-                        "init_field_list": json.loads(tool.get("init_field_list", "[]")),
+                        "init_field_list": sanitize_init_field_list(json.loads(tool.get("init_field_list", "[]"))),
                     }
                     for tool in results
                     if tool["resource_type"] == "tool"
@@ -508,7 +502,7 @@ class ToolSerializer(serializers.Serializer):
                 user_id=self.data.get("user_id"),
                 workspace_id=self.data.get("workspace_id"),
                 input_field_list=instance.get("input_field_list", []),
-                init_field_list=instance.get("init_field_list", []),
+                init_field_list=validate_init_field_list(instance.get("init_field_list", [])),
                 scope=instance.get("scope", ToolScope.WORKSPACE),
                 tool_type=instance.get("tool_type", ToolType.CUSTOM),
                 folder_id=instance.get("folder_id", self.data.get("workspace_id")),
@@ -675,6 +669,9 @@ class ToolSerializer(serializers.Serializer):
                 for field in edit_field_list
                 if (field in instance and instance.get(field) is not None)
             }
+
+            if "init_field_list" in edit_dict:
+                edit_dict["init_field_list"] = validate_init_field_list(edit_dict["init_field_list"])
 
             tool = QuerySet(Tool).filter(
                 id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
@@ -963,7 +960,7 @@ class ToolSerializer(serializers.Serializer):
                 code=tool.get("code"),
                 template_id=tool.get("template_id"),
                 input_field_list=tool.get("input_field_list"),
-                init_field_list=tool.get("init_field_list"),
+                init_field_list=validate_init_field_list(tool.get("init_field_list")),
                 is_active=False
                 if (len((tool.get("init_field_list") or [])) > 0 or tool.get("tool_type") == ToolType.WORKFLOW)
                 else tool.get("is_active"),
@@ -1141,7 +1138,7 @@ class ToolSerializer(serializers.Serializer):
                 user_id=user_id,
                 workspace_id=self.data.get("workspace_id"),
                 input_field_list=tool.get("input_field_list"),
-                init_field_list=tool.get("init_field_list", []),
+                init_field_list=validate_init_field_list(tool.get("init_field_list", [])),
                 tool_type=tool.get("tool_type"),
                 folder_id=folder_id,
                 scope=scope,
@@ -1256,7 +1253,7 @@ class ToolSerializer(serializers.Serializer):
                 icon=internal_tool.icon,
                 workspace_id=self.data.get("workspace_id"),
                 input_field_list=internal_tool.input_field_list,
-                init_field_list=internal_tool.init_field_list,
+                init_field_list=validate_init_field_list(internal_tool.init_field_list),
                 scope=ToolScope.WORKSPACE,
                 tool_type=ToolType.CUSTOM,
                 folder_id=instance.get("folder_id", self.data.get("workspace_id")),
@@ -1372,7 +1369,7 @@ class ToolSerializer(serializers.Serializer):
                 icon=instance.get("icon", ""),
                 workspace_id=self.data.get("workspace_id"),
                 input_field_list=tool_data.get("input_field_list", []),
-                init_field_list=tool_data.get("init_field_list", []),
+                init_field_list=validate_init_field_list(tool_data.get("init_field_list", [])),
                 scope=ToolScope.WORKSPACE,
                 tool_type=tool_data.get("tool_type", ToolType.CUSTOM),
                 folder_id=instance.get("folder_id", self.data.get("workspace_id")),
@@ -1444,7 +1441,7 @@ class ToolSerializer(serializers.Serializer):
             tool.desc = tool_data.get("desc")
             tool.code = tool_data.get("code")
             tool.input_field_list = tool_data.get("input_field_list", [])
-            tool.init_field_list = tool_data.get("init_field_list", [])
+            tool.init_field_list = validate_init_field_list(tool_data.get("init_field_list", []))
             tool.icon = self.data.get("icon", tool.icon)
             tool.version = version_name
             # tool.is_active = False
@@ -1841,7 +1838,7 @@ class ToolTreeSerializer(serializers.Serializer):
                 post_records_handler=lambda record: {
                     **record,
                     "input_field_list": json.loads(record.get("input_field_list", "[]")),
-                    "init_field_list": json.loads(record.get("init_field_list", "[]")),
+                    "init_field_list": sanitize_init_field_list(json.loads(record.get("init_field_list", "[]"))),
                 },
             )
             return ResourceMappingSerializer().get_resource_count(result)
@@ -1874,7 +1871,7 @@ class ToolTreeSerializer(serializers.Serializer):
                     {
                         **tool,
                         "input_field_list": json.loads(tool.get("input_field_list", "[]")),
-                        "init_field_list": json.loads(tool.get("init_field_list", "[]")),
+                        "init_field_list": sanitize_init_field_list(json.loads(tool.get("init_field_list", "[]"))),
                     }
                     for tool in results
                     if tool["resource_type"] == "tool"
