@@ -6,6 +6,7 @@
 """
 
 import re
+import contextlib
 from functools import reduce
 
 from django.db.models import QuerySet
@@ -13,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage, SystemMessage
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
@@ -72,6 +73,14 @@ class QuestionNode(INode):
     serializer_class = QuestionNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "question-node"
+
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self.async_runner = AsyncRunner()
+
+    def cancel(self):
+        self.async_runner.cancel()
+        super().cancel()
 
     def execute(self):
         node_params = self.get_parameters()
@@ -138,22 +147,38 @@ class QuestionNode(INode):
             [{"content": m.content, "role": m.type} for m in message_list],
         )
 
-        response = chat_model.stream(message_list)
-        answer = ""
+        self._check_cancelled()
+        self.async_runner.run_async(
+            lambda: self._stream_response(
+                chat_model.astream(message_list),
+                chat_model,
+                message_list,
+                is_result,
+            )
+        )
 
-        for chunk in response:
-            self._check_cancelled()
-            answer += chunk.content
+    async def _stream_response(self, response, chat_model, message_list, is_result):
+        try:
+            answer = ""
+            async for chunk in response:
+                self._check_cancelled()
+                answer += chunk.content
+                if is_result:
+                    node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
+                    self.write(
+                        TextContent(
+                            self.get_node_id(), chunk.content, Status.SUCCESS, node_info, Position(self.get_node_id())
+                        )
+                    )
 
-        message_tokens = chat_model.get_num_tokens_from_messages(message_list)
-        answer_tokens = chat_model.get_num_tokens(answer)
-        self.write_context("message_tokens", message_tokens)
-        self.write_context("answer_tokens", answer_tokens)
-        self.write_context("answer", answer)
-
-        if is_result:
-            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(TextContent(self.get_node_id(), answer, Status.SUCCESS, node_info, Position(self.get_node_id())))
+            message_tokens = chat_model.get_num_tokens_from_messages(message_list)
+            answer_tokens = chat_model.get_num_tokens(answer)
+            self.write_context("message_tokens", message_tokens)
+            self.write_context("answer_tokens", answer_tokens)
+            self.write_context("answer", answer)
+        finally:
+            with contextlib.suppress(Exception):
+                await response.aclose()
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
