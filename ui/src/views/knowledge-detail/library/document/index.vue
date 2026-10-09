@@ -21,13 +21,15 @@ import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
+import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
+import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
+import { useKnowledgeDetailContext } from '../../context'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
 import {
   BatchEmbeddingAction,
   BatchCancelTaskAction,
   DeleteDocumentAction,
-  DocumentTagsAction,
   EmbeddingDocumentAction,
   GenerateQuestionsAction,
   BatchGenerateQuestionsAction,
@@ -51,6 +53,7 @@ defineExpose({ customHeader: true })
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const knowledgeType = computed(() => route.params.type)
+const { knowledge } = useKnowledgeDetailContext()
 
 /* 快速创建 */
 const showQuickCreate = computed(() => knowledgeType.value === KNOWLEDGE_TYPE_KEY.BASE && !isWorkspaceSharedResource())
@@ -58,7 +61,7 @@ const quickCreateRef = ref<InstanceType<typeof MkQuickCreate>>()
 
 function handleCreateDocument(name: string) {
   loading.value = true
-  return DocumentApi.putQuickCreateDocuments(knowledgeId.value, [{ name }])
+  return DocumentApi.putBatchCreateDocuments(knowledgeId.value, [{ name }])
     .then(() => {
       // 创建成功即清理草稿，后续刷新失败不恢复为可重复提交的输入。
       quickCreateRef.value?.close()
@@ -220,6 +223,15 @@ function handleSearchChange(query?: Dict<unknown>) {
   return loadDocuments()
 }
 
+/* 导入成功后清空查询条件，重新加载第一页。 */
+function handleImportDocumentSuccess() {
+  selectedDocumentStatus.value = null
+  selectedDocumentActive.value = null
+  selectedDocumentHitHandling.value = null
+  selectedDocumentTags.value = []
+  return handleSearchChange()
+}
+
 /* 批量操作 */
 const documentTableRef = ref<{ clearSelection: () => void }>()
 const selectedDocuments = ref<DocumentItem[]>([])
@@ -276,7 +288,25 @@ onBeforeUnmount(() => {
   <Teleport v-if="headerTarget" :to="headerTarget">
     <div class="flex-between w-full gap-4">
       <h4>{{ title }}</h4>
-      <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+      <div class="flex-align-center gap-3">
+        <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+        <!-- 导入 Web、飞书或工作流文档 -->
+        <ButtonImportDocument
+          v-if="knowledge && !showQuickCreate && !isWorkspaceSharedResource()"
+          :api="DocumentApi"
+          :knowledge="knowledge"
+          @refresh="handleImportDocumentSuccess"
+        />
+        <!-- 上传文档 -->
+        <ButtonUploadDocument
+          v-if="showQuickCreate"
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          :file-count-limit="knowledge?.file_count_limit"
+          :file-size-limit="knowledge?.file_size_limit"
+          @refresh="handleImportDocumentSuccess"
+        />
+      </div>
     </div>
   </Teleport>
   <MkTable

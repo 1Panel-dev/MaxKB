@@ -43,6 +43,10 @@ const postKnowledgeWorkflowDebug = (knowledgeId: string, payload: KnowledgeWorkf
   return post<KnowledgeWorkflowDebugPayload, KnowledgeWorkflowAction>(`${getPrefix()}/${knowledgeId}/debug`, payload)
 }
 
+/** 使用已发布知识库工作流执行正式文档导入。 */
+const postKnowledgeWorkflowImport = (knowledgeId: string, payload: KnowledgeWorkflowDebugPayload) =>
+  post<KnowledgeWorkflowDebugPayload, KnowledgeWorkflowAction>(`${getPrefix()}/${knowledgeId}/upload_document`, payload)
+
 /** 获取知识库工作流执行详情，供调试轮询和执行记录共用。 */
 const getKnowledgeWorkflowAction = (knowledgeId: string, actionId: string) => {
   return get<KnowledgeWorkflowAction>(`${getPrefix()}/${knowledgeId}/action/${actionId}`)
@@ -76,6 +80,7 @@ export default {
   putKnowledgeWorkflowPublish,
   getKnowledgeWorkflowFormList,
   postKnowledgeWorkflowDebug,
+  postKnowledgeWorkflowImport,
   getKnowledgeWorkflowAction,
   postCancelKnowledgeWorkflowAction,
 }

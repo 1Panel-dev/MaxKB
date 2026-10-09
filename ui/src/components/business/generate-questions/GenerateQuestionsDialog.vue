@@ -96,8 +96,9 @@ defineExpose({ open, close })
 <template>
   <MkDialog v-model="visible" title="生成问题" @closed="emit('closed')">
     <el-form ref="formRef" :model="form" label-position="top" require-asterisk-position="right" v-loading="loading || modelLoading" @submit.prevent>
-      <el-alert :closable="false" :title="promptTip" type="primary" class="mb-4! items-start! whitespace-pre-line" show-icon>
-        <template #icon><MkIcon name="icon_info_filled" class="mt-2" /></template>
+      <el-alert :closable="false" type="primary" class="mb-4!" show-icon>
+        <template #icon><MkIcon name="icon_info_filled" /></template>
+        {{ promptTip }}
       </el-alert>
       <el-form-item label="AI 模型" prop="model_id" :rules="[{ required: true, message: '请选择 AI 模型', trigger: 'change' }]">
         <SelectModel

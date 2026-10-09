@@ -3,12 +3,18 @@ import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   Dict,
   DocumentGeneratePayload,
+  DocumentImportPayload,
+  DocumentSplitResult,
+  DocumentStrategy,
   DocumentItem,
   DocumentQuickCreatePayload,
   DocumentSettingPayload,
   DocumentTaskState,
   DocumentTaskType,
   DocumentUpdatePayload,
+  WebDocumentImportPayload,
+  LarkDocumentList,
+  LarkDocumentImportPayload,
 } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
@@ -18,9 +24,51 @@ const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowl
 const getDocumentPage = (knowledgeId: string, page: ParamsPage, query?: Dict<unknown>) =>
   get<ResponsePage<DocumentItem>>(`${getPrefix(knowledgeId)}/${page.currentPage}/${page.pageSize}`, query)
 
-/** 批量创建仅包含名称的空白文档。 */
-const putQuickCreateDocuments = (knowledgeId: string, documents: DocumentQuickCreatePayload[]) =>
-  put<DocumentQuickCreatePayload[], DocumentItem[]>(`${getPrefix(knowledgeId)}/batch_create`, documents)
+/** 批量创建空白文档或导入text文档。 */
+const putBatchCreateDocuments = (knowledgeId: string, documents: DocumentQuickCreatePayload[] | DocumentImportPayload[]) =>
+  put<DocumentQuickCreatePayload[] | DocumentImportPayload[], DocumentItem[]>(`${getPrefix(knowledgeId)}/batch_create`, documents)
+
+/** 按处理策略解析文本文件，返回分段与原文件关联信息。 */
+const postSplitDocuments = (knowledgeId: string, files: File[], strategy: DocumentStrategy) => {
+  const data = new FormData()
+  files.forEach((file) => data.append('file', file))
+  data.append('doc_strategy', JSON.stringify(strategy))
+  return post<FormData, DocumentSplitResult[]>(`${getPrefix(knowledgeId)}/split`, data)
+}
+
+/** 导入表格文件，每个 sheet 由服务端创建独立文档。 */
+const postImportTableDocumentFiles = (knowledgeId: string, files: File[]) => {
+  const data = new FormData()
+  files.forEach((file) => data.append('file', file))
+  return post<FormData, DocumentItem[]>(`${getPrefix(knowledgeId)}/table`, data)
+}
+
+/** 导入 QA 问答对文件。 */
+const postImportQADocumentFiles = (knowledgeId: string, files: File[]) => {
+  const data = new FormData()
+  files.forEach((file) => data.append('file', file))
+  return post<FormData, DocumentItem[]>(`${getPrefix(knowledgeId)}/qa`, data)
+}
+
+/** 按地址导入 Web 文档并应用文档处理策略。 */
+const postWebDocument = (knowledgeId: string, payload: WebDocumentImportPayload) =>
+  post<WebDocumentImportPayload, boolean>(`${getPrefix(knowledgeId)}/web`, payload)
+
+/** 查询飞书文件夹中的文件，支持分页加载。 */
+const getLarkDocumentList = (knowledgeId: string, folderToken: string, query: { page_token?: string } = {}) =>
+  post<{ page_token?: string }, LarkDocumentList>(`/workspace/${getWorkspaceId()}/knowledge/lark/${knowledgeId}/${folderToken}/doc_list`, query)
+
+/** 导入所选飞书文档，沿用飞书扩展接口。 */
+const postImportLarkDocuments = (knowledgeId: string, documents: LarkDocumentImportPayload[]) =>
+  post<LarkDocumentImportPayload[], boolean>(`/workspace/${getWorkspaceId()}/knowledge/lark/${knowledgeId}/import`, documents)
+
+/** 下载表格模板。 */
+const exportTableDocumentTemplate = (format: 'excel' | 'csv') =>
+  getExportFile(`${format}-template.${format === 'excel' ? 'xlsx' : 'csv'}`, '/workspace/knowledge/document/table_template/export', { type: format })
+
+/** 下载 QA 模板。 */
+const exportQADocumentTemplate = (format: 'excel' | 'csv') =>
+  getExportFile(`${format}-template.${format === 'excel' ? 'xlsx' : 'csv'}`, '/workspace/knowledge/document/template/export', { type: format })
 
 /** 更新文档名称、启用状态或设置，返回保存后的文档。 */
 const putDocument = (knowledgeId: string, documentId: string, data: DocumentUpdatePayload) =>
@@ -113,7 +161,15 @@ const postReplaceDocumentSource = (knowledgeId: string, documentId: string, file
 
 export default {
   getDocumentPage,
-  putQuickCreateDocuments,
+  putBatchCreateDocuments,
+  postSplitDocuments,
+  postImportTableDocumentFiles,
+  postImportQADocumentFiles,
+  postWebDocument,
+  getLarkDocumentList,
+  postImportLarkDocuments,
+  exportTableDocumentTemplate,
+  exportQADocumentTemplate,
   putDocument,
   deleteDocument,
   putBatchDeleteDocuments,

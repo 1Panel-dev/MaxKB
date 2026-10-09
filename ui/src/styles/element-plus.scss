@@ -46,6 +46,15 @@
 
 /* alert */
 .el-alert {
+  --el-alert-padding: 9px 16px;
+  align-items: flex-start !important;
+  white-space: pre-line;
+  &__icon {
+    margin-right: 8px !important;
+    width: 16px !important;
+    font-size: 16px !important;
+    margin-top: 3px;
+  }
   &--error {
     --el-alert-bg-color: var(--el-color-danger-light-8);
     --el-color-error: var(--el-color-danger);
@@ -58,8 +67,9 @@
     --el-alert-bg-color: var(--el-color-primary-light-8);
     --el-color-error: var(--el-color-primary);
   }
-  &__title {
-    color: var(--el-text-color-primary);
+  &__title,
+  &__description {
+    color: var(--el-text-color-primary) !important;
   }
 }
 
@@ -399,7 +409,7 @@
   }
   &__headerbtn {
     right: 20px;
-    top: 24px;
+    top: 22px;
     width: 28px;
     height: 28px;
     padding: 4px;
