@@ -64,6 +64,7 @@ from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
+from tools.serializers.init_field import validate_init_field_list
 from tools.serializers.tool import ToolExportModelSerializer
 from trigger.models import Trigger, TriggerTask
 from users.models import User
@@ -1028,7 +1029,7 @@ class ApplicationSerializer(serializers.Serializer):
             code=tool.get("code"),
             template_id=tool.get("template_id"),
             input_field_list=tool.get("input_field_list"),
-            init_field_list=tool.get("init_field_list"),
+            init_field_list=validate_init_field_list(tool.get("init_field_list")),
             is_active=False if len((tool.get("init_field_list") or [])) > 0 else tool.get("is_active"),
             tool_type=tool.get("tool_type", "CUSTOM") or "CUSTOM",
             scope=ToolScope.WORKSPACE,
@@ -1649,7 +1650,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             code=tool.get("code"),
             template_id=tool.get("template_id"),
             input_field_list=tool.get("input_field_list"),
-            init_field_list=tool.get("init_field_list"),
+            init_field_list=validate_init_field_list(tool.get("init_field_list")),
             is_active=False if len((tool.get("init_field_list") or [])) > 0 else tool.get("is_active"),
             scope=ToolScope.WORKSPACE,
             folder_id=workspace_id,

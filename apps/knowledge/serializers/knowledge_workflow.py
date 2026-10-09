@@ -49,6 +49,7 @@ from system_manage.models import AuthTargetType
 from system_manage.models.resource_mapping import ResourceType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
+from tools.serializers.init_field import validate_init_field_list
 from tools.serializers.tool import ToolExportModelSerializer
 from users.models import User
 
@@ -549,7 +550,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 code=tool.get("code"),
                 template_id=tool.get("template_id"),
                 input_field_list=tool.get("input_field_list"),
-                init_field_list=tool.get("init_field_list"),
+                init_field_list=validate_init_field_list(tool.get("init_field_list")),
                 is_active=False if len((tool.get("init_field_list") or [])) > 0 else tool.get("is_active"),
                 tool_type=tool.get("tool_type", "CUSTOM") or "CUSTOM",
                 scope=ToolScope.SHARED if workspace_id == "None" else ToolScope.WORKSPACE,
