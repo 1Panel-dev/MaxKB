@@ -35,6 +35,7 @@ from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import FileSourceType
 from knowledge.models.knowledge_action import State
+from knowledge.services.workflow_sync_source import tool_document_source_meta
 from oss.serializers.file import FileSerializer
 from tools.models import Tool, ToolRecord, ToolTaskTypeChoices
 
@@ -240,11 +241,33 @@ class ToolLibNode(INode):
                     for chunk in file_bytes:
                         chunks.append(base64.b64decode(chunk))
                     file = bytes_to_uploaded_file(b"".join(chunks), file_result.get("name"))
-                    file_url = self.upload_knowledge_file(file)
-                    download_file_list.append({"file_id": file_url.split("/")[-1], "name": file_result.get("name")})
+                    source_meta = {
+                        **(workflow_params.get("workflow_source") or {}),
+                        **tool_document_source_meta(item, file_result, self.get_node_id(), tool_lib_id, tool_lib.name),
+                    }
+                    file_url = self.upload_knowledge_file(file, source_meta)
+                    download_file_list.append(
+                        {"file_id": file_url.split("/")[-1], "name": file_result.get("name"), "meta": source_meta}
+                    )
                 result = download_file_list
             else:
                 result = function_executor.exec_code(tool_lib.code, all_params)
+                if isinstance(result, list):
+                    result = [
+                        {
+                            **document,
+                            "meta": {
+                                **(workflow_params.get("workflow_source") or {}),
+                                **(document.get("meta") or {}),
+                                **tool_document_source_meta(
+                                    document, {}, self.get_node_id(), tool_lib_id, tool_lib.name
+                                ),
+                            },
+                        }
+                        if isinstance(document, dict)
+                        else document
+                        for document in result
+                    ]
         else:
             result = self.tool_exec_record(tool_lib, all_params)
 
@@ -306,9 +329,10 @@ class ToolLibNode(INode):
             )
             raise e
 
-    def upload_knowledge_file(self, file):
+    def upload_knowledge_file(self, file, source_meta=None):
         knowledge_id = self.get_workflow_parameters().get("knowledge_id")
         meta = {
+            **(source_meta or {}),
             "debug": False,
             "knowledge_id": knowledge_id,
         }

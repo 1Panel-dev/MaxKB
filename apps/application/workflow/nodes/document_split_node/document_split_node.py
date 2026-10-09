@@ -188,6 +188,7 @@ class DocumentSplitNode(INode):
                     document_name_relate_problem,
                     document_name_relate_problem_reference,
                     chunk_size,
+                    doc.get("meta"),
                 )
 
             paragraph_list += results
@@ -217,12 +218,13 @@ class DocumentSplitNode(INode):
         document_name_relate_problem,
         document_name_relate_problem_reference,
         chunk_size,
+        source_meta=None,
     ):
         """处理文档分割结果"""
         item["meta"] = {
+            **(source_meta or {}),
             "knowledge_id": knowledge_id,
             "source_file_id": source_file_id,
-            "source_url": file_name,
         }
         if item.get("name", "file.txt") == "file.txt":
             item["name"] = file_name

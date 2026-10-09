@@ -49,7 +49,7 @@ class DataSourceWebNode(INode):
             },
         ]
 
-    def _get_collect_handler(self, document_list):
+    def _get_collect_handler(self, document_list, source_meta=None, selector="body"):
         def handler(child_link: ChildLink, response: Fork.Response):
             if response.status != 200:
                 raise ValueError(response.message or f"Failed to fetch Web source: {child_link.url}")
@@ -58,7 +58,18 @@ class DataSourceWebNode(INode):
                 if child_link.tag is not None and len(child_link.tag.text.strip()) > 0
                 else child_link.url
             )
-            document_list.append({"name": document_name.strip(), "content": response.content})
+            document_list.append(
+                {
+                    "name": document_name.strip(),
+                    "content": response.content,
+                    "meta": {
+                        **(source_meta or {}),
+                        "source_type": "web",
+                        "source_url": child_link.url,
+                        "selector": selector,
+                    },
+                }
+            )
             # 已取消则抛出 CancelledException,由引擎结束流程
             self._check_cancelled()
 
@@ -74,7 +85,8 @@ class DataSourceWebNode(INode):
         selector = serializer.validated_data.get("selector") or "body"
 
         document_list = []
-        collect_handler = self._get_collect_handler(document_list)
+        source_meta = workflow_params.get("workflow_source") or {}
+        collect_handler = self._get_collect_handler(document_list, source_meta, selector)
 
         try:
             ForkManage(source_url, selector.split(" ") if selector else []).fork(3, set(), collect_handler)

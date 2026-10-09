@@ -55,6 +55,7 @@ from knowledge.serializers.knowledge_model import KnowledgeModelSerializer
 from knowledge.services import validate_knowledge_file_size
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.workflow_sync import finalize_workflow_complete_snapshot, merge_workflow_incremental_snapshot
+from knowledge.services.workflow_sync_source import validate_workflow_sync_source, workflow_source_meta
 from system_manage.models import AuthTargetType
 from system_manage.models.resource_mapping import ResourceType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
@@ -89,7 +90,9 @@ def hand_node(node, update_tool_map):
         node.get("properties", {}).get("node_data", {})["tool_lib_id"] = update_tool_map.get(tool_lib_id, tool_lib_id)
 
 
-def finalize_knowledge_action(knowledge_action_id, state, run_time, sync_log_id=None, document_cleanup=None):
+def finalize_knowledge_action(
+    knowledge_action_id, state, run_time, sync_log_id=None, document_cleanup=None, workflow_source=None
+):
     """
     知识库工作流执行结束后的收尾:更新 KnowledgeAction 的最终状态/耗时,并在同步场景下收尾 KnowledgeSyncLog。
     与具体执行引擎解耦——state/run_time 由调用方按各自引擎算好传入。
@@ -98,14 +101,20 @@ def finalize_knowledge_action(knowledge_action_id, state, run_time, sync_log_id=
     if sync_log_id is not None:
         sync_log = QuerySet(KnowledgeSyncLog).filter(id=sync_log_id).first()
         if sync_log is not None:
-            if sync_log.sync_type == KnowledgeSyncType.COMPLETE:
-                stats = finalize_workflow_complete_snapshot(sync_log, state == State.SUCCESS)
+            if sync_log.sync_type == KnowledgeSyncType.COMPLETE or state != State.SUCCESS:
+                stats = finalize_workflow_complete_snapshot(sync_log, state == State.SUCCESS, workflow_source)
             elif (
                 state == State.SUCCESS
                 and sync_log.sync_type in {KnowledgeSyncType.INCREMENTAL, KnowledgeSyncType.REPLACE}
                 and document_cleanup is not None
             ):
-                stats = merge_workflow_incremental_snapshot(sync_log)
+                try:
+                    stats = merge_workflow_incremental_snapshot(sync_log, workflow_source)
+                except Exception:
+                    maxkb_logger.exception(
+                        f"Failed to finalize workflow synchronization: action_id={knowledge_action_id}"
+                    )
+                    stats = finalize_workflow_complete_snapshot(sync_log, False, workflow_source)
             else:
                 stats = {
                     "total_count": QuerySet(Document)
@@ -137,7 +146,7 @@ def finalize_knowledge_action(knowledge_action_id, state, run_time, sync_log_id=
                 deleted_count=stats["deleted_count"],
                 failed_count=stats["failed_count"],
                 duration_ms=max(0, round(run_time * 1000)),
-                message=f"Workflow action {knowledge_action_id}: {state}",
+                message=f"Workflow action {knowledge_action_id}: {state}; failed_documents={stats['failed_count']}",
             )
 
 
@@ -184,6 +193,23 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             query_set = query_set.filter(workspace_id=workspace_id)
         if not query_set.exists():
             raise AppApiException(500, _("Knowledge id does not exist"))
+
+    @staticmethod
+    def save_sync_input(knowledge, work_flow, instance):
+        if ((knowledge.meta or {}).get("sync_setting") or {}).get("enabled"):
+            try:
+                validate_workflow_sync_source(work_flow, instance)
+            except ValueError:
+                # Uploading local files must not replace an already scheduled remote source.
+                return
+        knowledge.meta = {
+            **(knowledge.meta or {}),
+            "workflow_sync_input": {
+                "data_source": deepcopy(instance.get("data_source") or {}),
+                "knowledge_base": deepcopy(instance.get("knowledge_base") or {}),
+            },
+        }
+        knowledge.save(update_fields=["meta", "update_time"])
 
     def get_query_set(self, instance: Dict):
         query_set = (
@@ -246,14 +272,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED, meta=meta
         ).save()
         if sync_log_id is None:
-            knowledge.meta = {
-                **(knowledge.meta or {}),
-                "workflow_sync_input": {
-                    "data_source": deepcopy(instance.get("data_source") or {}),
-                    "knowledge_base": deepcopy(instance.get("knowledge_base") or {}),
-                },
-            }
-            knowledge.save(update_fields=["meta", "update_time"])
+            self.save_sync_input(knowledge, knowledge_workflow.work_flow, instance)
         instance["knowledge_base"] = {
             **(instance.get("knowledge_base") or {}),
             "knowledge": {
@@ -304,6 +323,8 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             "user_id": str(user.id),
             **instance,
             "default_model_setting": default_model_setting,
+            "workflow_source": workflow_source_meta(work_flow, instance),
+            "sync_log_id": str(sync_log_id) if sync_log_id else None,
         }
         workflow = new_instance(work_flow, WorkflowType.KNOWLEDGE)
         start_time = time.time()
@@ -330,7 +351,9 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             state = self.compute_knowledge_state(details, error, cancelled)
             run_time = time.time() - start_time
             QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(details=details)
-            finalize_knowledge_action(knowledge_action_id, state, run_time, sync_log_id, delete_document_data)
+            finalize_knowledge_action(
+                knowledge_action_id, state, run_time, sync_log_id, delete_document_data, parameters["workflow_source"]
+            )
 
         call_back = CallBack(on_next, on_complete)
         work_flow_manage = WorkflowManage(workflow, parameters, WorkflowType.KNOWLEDGE, call_back, get_start_node_fn)
@@ -373,6 +396,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         KnowledgeAction(
             id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED, meta=meta
         ).save()
+        self.save_sync_input(knowledge, knowledge_workflow_version.work_flow, instance)
         instance["knowledge_base"] = {
             **(instance.get("knowledge_base") or {}),
             "knowledge": {

@@ -1,5 +1,6 @@
 from contextlib import nullcontext
 from io import BytesIO
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
@@ -1422,11 +1423,12 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         new_query = MagicMock()
         old_query = MagicMock()
         new_query.values_list.return_value = ["new-id"]
+        new_query.__iter__.return_value = [SimpleNamespace(id="new-id", name="new", meta={})]
         old_query.values_list.return_value = ["old-id"]
         document_query.filter.return_value = document_query
         document_query.filter.side_effect = lambda **filters: (
             new_query
-            if "create_time__gte" in filters
+            if "meta__workflow_sync_log_id" in filters
             else old_query
             if "create_time__lt" in filters
             else document_query
@@ -1435,12 +1437,13 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         query_set.return_value = document_query
         delete_documents.side_effect = lambda document_ids: list(document_ids)
 
-        success = finalize_workflow_complete_snapshot.__wrapped__(sync_log, True)
+        source = {"source_scope": "scope"}
+        success = finalize_workflow_complete_snapshot.__wrapped__(sync_log, True, source)
         self.assertEqual(success["synced_count"], 1)
         self.assertEqual(success["deleted_count"], 1)
         delete_documents.assert_called_with(["old-id"])
 
-        failure = finalize_workflow_complete_snapshot.__wrapped__(sync_log, False)
+        failure = finalize_workflow_complete_snapshot.__wrapped__(sync_log, False, source)
         self.assertEqual(failure["failed_count"], 1)
         delete_documents.assert_called_with(["new-id"])
 
@@ -1545,7 +1548,7 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
             document_cleanup,
         )
 
-        merge_workflow_snapshot.assert_called_once_with(sync_log)
+        merge_workflow_snapshot.assert_called_once_with(sync_log, None)
         update = log_query.filter.return_value.update.call_args.kwargs
         self.assertEqual(update["status"], KnowledgeSyncStatus.SUCCESS)
         self.assertEqual(update["synced_count"], 0)
@@ -2531,15 +2534,16 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
 
         def filter_documents(**kwargs):
             result = MagicMock()
-            if "create_time__gte" in kwargs:
+            if "meta__workflow_sync_log_id" in kwargs:
                 result.__iter__.return_value = iter([new_document])
             elif "create_time__lt" in kwargs:
                 result.__iter__.return_value = iter([old_document])
             else:
-                result.count.return_value = 1
+                return document_query
             return result
 
         document_query.filter.side_effect = filter_documents
+        document_query.count.return_value = 1
         paragraph_query = MagicMock()
 
         def filter_paragraphs(**kwargs):
@@ -2566,7 +2570,8 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
         incremental_sync.return_value.merge.return_value = MergeResult()
         delete_documents.return_value = [str(new_document.id)]
 
-        stats = merge_workflow_incremental_snapshot.__wrapped__(sync_log)
+        with patch("knowledge.services.workflow_sync.transaction.atomic"):
+            stats = merge_workflow_incremental_snapshot.__wrapped__(sync_log, {"source_scope": "scope"})
 
         incremental_sync.assert_called_once_with(
             old_document, new_document.doc_strategy, source_authoritative=False, replace_content=False
@@ -2589,18 +2594,19 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
 
         def filter_documents(**kwargs):
             result = MagicMock()
-            if "create_time__gte" in kwargs:
+            if "meta__workflow_sync_log_id" in kwargs:
                 result.__iter__.return_value = iter([new_document])
             elif "create_time__lt" in kwargs:
                 result.__iter__.return_value = iter([old_document])
             else:
-                result.count.return_value = 2
+                return document_query
             return result
 
         document_query.filter.side_effect = filter_documents
+        document_query.count.return_value = 2
         query_set.side_effect = lambda model: document_query if model is Document else MagicMock()
 
-        stats = merge_workflow_incremental_snapshot.__wrapped__(sync_log)
+        stats = merge_workflow_incremental_snapshot.__wrapped__(sync_log, {"source_scope": "scope"})
 
         delete_documents.assert_not_called()
         self.assertEqual(stats["deleted_count"], 0)

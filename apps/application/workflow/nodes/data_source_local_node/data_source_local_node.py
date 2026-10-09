@@ -44,7 +44,18 @@ class DataSourceLocalNode(INode):
     def execute(self):
         # 文件列表来自工作流入参 data_source.file_list，写入本节点输出供下游节点引用
         workflow_params = self.get_workflow_parameters()
-        file_list = (workflow_params.get("data_source") or {}).get("file_list")
+        file_list = [
+            {
+                **file,
+                "meta": {
+                    **(file.get("meta") or {}),
+                    **(workflow_params.get("workflow_source") or {}),
+                    "source_type": "local",
+                    "source_file_id": file.get("file_id"),
+                },
+            }
+            for file in (workflow_params.get("data_source") or {}).get("file_list") or []
+        ]
         self.write_context("file_list", file_list)
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):

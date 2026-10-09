@@ -42,6 +42,7 @@ from knowledge.services.document_strategy import (
     strategy_hashes,
 )
 from knowledge.services.incremental_sync import prepare_remote_paragraphs
+from knowledge.services.workflow_sync_source import DOCUMENT_IDENTITY_FIELDS
 
 
 class ParagraphInstanceSerializer(serializers.Serializer):
@@ -273,6 +274,23 @@ class KnowledgeWriteNode(INode):
         workflow_params = self.get_workflow_parameters()
         knowledge_id = workflow_params.get("knowledge_id")
         workspace_id = workflow_params.get("workspace_id")
+        workflow_source = workflow_params.get("workflow_source") or {}
+        sync_log_id = workflow_params.get("sync_log_id")
+        for document in document_list:
+            meta = {**workflow_source, **(document.get("meta") or {})}
+            # Execution ownership comes from the engine, never from upstream document content.
+            if workflow_source.get("source_scope"):
+                meta["source_scope"] = workflow_source["source_scope"]
+            meta["workflow_action_id"] = str(workflow_params["knowledge_action_id"])
+            if sync_log_id:
+                if not any(str(meta.get(field) or "").strip() for field in DOCUMENT_IDENTITY_FIELDS):
+                    raise serializers.ValidationError(
+                        "Scheduled workflow documents require a stable source key, token or URL"
+                    )
+                meta["workflow_sync_log_id"] = str(sync_log_id)
+            else:
+                meta.pop("workflow_sync_log_id", None)
+            document["meta"] = meta
 
         document_model_list = []
         paragraph_model_list = []

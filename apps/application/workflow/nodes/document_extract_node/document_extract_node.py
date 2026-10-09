@@ -99,7 +99,14 @@ class DocumentExtractNode(INode):
                     buffer.seek(0)
                     file_content = split_handle.get_content(buffer, save_image)
                     content.append("### " + doc["name"] + "\n" + file_content)
-                    document_list.append({"id": str(file.id), "name": doc["name"], "content": file_content})
+                    document_list.append(
+                        {
+                            "id": str(file.id),
+                            "name": doc["name"],
+                            "content": file_content,
+                            "meta": {**(doc.get("meta") or {}), "source_file_id": str(file.id)},
+                        }
+                    )
                     break
 
         self.write_context("content", splitter.join(content))
