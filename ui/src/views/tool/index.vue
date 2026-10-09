@@ -233,7 +233,7 @@ onMounted(() => {
           <template v-if="!isShared">
             <!-- 批量选择 -->
             <span>
-              <el-button :disabled="!toolsData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
+              <el-button v-if="perm.tool.workspace.batchMove() || perm.tool.workspace.batchDelete()" :disabled="!toolsData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
                 <MkIcon name="icon_Batch_outlined" />
                 <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
               </el-button>
