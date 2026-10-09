@@ -7,6 +7,7 @@
 @desc:
 """
 
+import sys
 import time
 from typing import Dict
 
@@ -28,12 +29,16 @@ class LocalEmbedding(MaxKBBaseEmbeddingModel, HuggingFaceEmbeddings):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        device = model_credential.get("device")
+        # Avoid automatic MPS selection on macOS: Metal failures can terminate the service.
+        if device is None and sys.platform == "darwin":
+            device = "cpu"
         for attempt in range(max_retries):
             try:
                 embedding = LocalEmbedding(
                     model_name=model_name,
                     cache_folder=model_credential.get("cache_folder"),
-                    model_kwargs={"device": model_credential.get("device")},
+                    model_kwargs={"device": device},
                     encode_kwargs={"normalize_embeddings": True},
                 )
                 # 测试一下是否真的能用
