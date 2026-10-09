@@ -18,6 +18,7 @@ import {
   ParamSettingAction,
   RelatedResourcesModelAction,
 } from './model-card/action-dropdown'
+import perm from '@/permission/index.ts'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 
@@ -99,7 +100,7 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <ButtonAddModel v-if="!isShared" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" :api="ModelApi" />
+          <ButtonAddModel v-if="!isShared && perm.model.workspace.create()" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" :api="ModelApi" />
         </div>
       </component>
       <div v-loading="loading">
@@ -115,15 +116,15 @@ onMounted(() => {
             >
               <template #action-dropdown>
                 <!-- 编辑 -->
-                <EditModelAction label="编辑" :api="ModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
+                <EditModelAction v-if="perm.model.workspace.modify(model.id)" label="编辑" :api="ModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
                 <!-- 模型参数设置 -->
-                <ParamSettingAction v-if="model.model_type !== 'RERANKER'" label="模型参数设置" :api="ModelApi" :model="model" />
+                <ParamSettingAction v-if="model.model_type !== 'RERANKER' && perm.model.workspace.paramSetting(model.id)" label="模型参数设置" :api="ModelApi" :model="model" />
                 <!-- 资源授权 -->
-                <AuthorizeModelAction label="资源授权" :model="model" />
+                <AuthorizeModelAction v-if="perm.model.workspace.auth(model.id)" label="资源授权" :model="model" />
                 <!-- 查看关联资源 -->
-                <RelatedResourcesModelAction label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
+                <RelatedResourcesModelAction v-if="perm.model.workspace.relateMap(model.id)" label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
                 <!-- 删除 -->
-                <DeleteModelAction label="删除" :api="ModelApi" :model="model" @refresh="loadModels" />
+                <DeleteModelAction v-if="perm.model.workspace.delete(model.id)" label="删除" :api="ModelApi" :model="model" @refresh="loadModels" />
               </template>
             </ModelCard>
           </template>

@@ -11,6 +11,7 @@ import { useStore } from '@/stores'
 import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { EditModelAction, AuthorizeModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
+import perm from '@/permission'
 
 const { auth } = useStore()
 
@@ -160,23 +161,24 @@ onMounted(() => {
                 :provider="getProvider(row)"
                 :disabled="loading"
                 @refresh="loadModels"
+                v-if="perm.model.system.modify()"
               />
 
               <!-- 资源授权 -->
-              <AuthorizeModelAction display="button" label="资源授权" :model="row" />
+              <AuthorizeModelAction v-if="perm.model.system.auth()" display="button" label="资源授权" :model="row" />
               <!-- 更多模型操作 -->
               <MkTableMoreDropdown>
                 <!-- 模型参数设置 -->
                 <ParamSettingAction
-                  v-if="['TTS', 'LLM', 'IMAGE', 'TTI', 'STT', 'EMBEDDING'].includes(row.model_type)"
+                  v-if="['TTS', 'LLM', 'IMAGE', 'TTI', 'STT', 'EMBEDDING'].includes(row.model_type) && perm.model.system.paramSetting()"
                   label="模型参数设置"
                   :api="SystemModelApi"
                   :model="row"
                 />
                 <!-- 查看关联资源 -->
-                <RelatedResourcesModelAction label="查看关联资源" :api="SystemRelatedResourcesApi" :model="row" />
+                <RelatedResourcesModelAction v-if="perm.model.system.relateMap()" label="查看关联资源" :api="SystemRelatedResourcesApi" :model="row" />
                 <!-- 删除模型 -->
-                <MkDropdownItem divided :disabled="loading" @click="handleDeleteModel(row)">
+                <MkDropdownItem v-if="perm.model.system.delete()" divided :disabled="loading" @click="handleDeleteModel(row)">
                   <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                   删除
                 </MkDropdownItem>

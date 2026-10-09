@@ -23,10 +23,25 @@ const system = {
   isShare: () => canSys(P.MODEL_READ),
 
   // —— 模型资源 ——
+  /**
+   * 系统「模型资源管理」（系统 > 资源管理 > 模型）编辑权限
+   * */
   modify: () => canSys(P.RESOURCE_MODEL_EDIT),
+  /**
+   * 系统「模型资源管理」（系统 > 资源管理 > 模型）模型参数设置权限
+   * */
   paramSetting: () => canSys(P.RESOURCE_MODEL_EDIT),
+  /**
+   * 系统「模型资源管理」（系统 > 资源管理 > 模型）删除权限
+   * */
   delete: () => canSys(P.RESOURCE_MODEL_DELETE),
+  /**
+   * 系统「模型资源管理」（系统 > 资源管理 > 模型）资源授权权限
+   * */
   auth: () => canSys(P.RESOURCE_MODEL_AUTH),
+  /**
+   * 系统「模型资源管理」（系统 > 资源管理 > 模型）查看关联资源权限
+   * */
   relateMap: () => canSys(P.RESOURCE_MODEL_RELATE_RESOURCE_VIEW),
 }
 
