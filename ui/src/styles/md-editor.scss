@@ -13,8 +13,15 @@
   margin: 0;
   font-size: inherit;
   word-break: break-word;
+  overflow-x: auto;
   table {
-    display: block;
+    display: table;
+    width: max-content;
+    min-width: 100%;
+  }
+  .md-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
   }
   p {
     padding: 0 !important;

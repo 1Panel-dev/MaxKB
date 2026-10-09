@@ -59,6 +59,15 @@ config({
       tokens[idx].attrSet('target', '_blank')
       return md.renderer.renderToken(tokens, idx, options)
     }
+
+    // 表格过宽时只让表格自身横向滚动,避免整段回答跟着一起横向拖动
+    const renderToken = md.renderer.renderToken.bind(md.renderer)
+    md.renderer.rules.table_open = (tokens, idx, options) => {
+      return `<div class="md-table-wrap">${renderToken(tokens, idx, options)}`
+    }
+    md.renderer.rules.table_close = (tokens, idx, options) => {
+      return `${renderToken(tokens, idx, options)}</div>`
+    }
   },
 })
 
