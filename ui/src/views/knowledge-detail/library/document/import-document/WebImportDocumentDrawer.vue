@@ -2,12 +2,11 @@
 import { computed, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import type { KnowledgeDetail } from '@/api/types'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'WebImportDocumentDrawer' })
-const props = defineProps<{ api: typeof DocumentApi; knowledge: KnowledgeDetail }>()
+const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
 /* Web 地址与处理策略 */
@@ -15,10 +14,10 @@ const visible = ref(false)
 const loading = ref(false)
 const activeStep = ref(0)
 const strategyMounted = ref(false)
-const form = ref({ addresses: '', selector: String(props.knowledge.meta?.selector ?? '') })
+const form = ref({ source_url: '', selector: '' })
 const sourceUrls = computed(() => [
   ...new Set(
-    form.value.addresses
+    form.value.source_url
       .split(/\r?\n/)
       .map((url) => url.trim())
       .filter(Boolean),
@@ -27,23 +26,7 @@ const sourceUrls = computed(() => [
 const formRef = ref<FormInstance>()
 const strategyRef = useTemplateRef<InstanceType<typeof DocumentStrategyForm>>('strategyRef')
 const rules: FormRules = {
-  addresses: [
-    { required: true, whitespace: true, message: '请输入文档地址', trigger: 'blur' },
-    {
-      validator: (_rule, _value, callback) => {
-        const valid = sourceUrls.value.every((address) => {
-          try {
-            const url = new URL(address)
-            return ['http:', 'https:'].includes(url.protocol) && Boolean(url.hostname)
-          } catch {
-            return false
-          }
-        })
-        callback(valid ? undefined : new Error('请输入正确的文档地址，一行一个，仅支持 HTTP 或 HTTPS'))
-      },
-      trigger: 'blur',
-    },
-  ],
+  source_url: [{ required: true, whitespace: true, message: '请输入文档地址', trigger: 'blur' }],
 }
 function open() {
   visible.value = true
@@ -60,9 +43,6 @@ function handleNext() {
       /* 表单展示校验错误。 */
     })
 }
-function handleStrategyMounted() {
-  strategyRef.value?.setStrategy(props.knowledge.doc_strategy)
-}
 function handleSubmit() {
   if (loading.value || !strategyRef.value) return
   loading.value = true
@@ -71,13 +51,13 @@ function handleSubmit() {
     .then((valid) => {
       if (!valid || !strategyRef.value) return
       return props.api
-        .postWebDocument(props.knowledge.id, {
+        .postWebDocument(props.knowledgeId, {
           source_url_list: sourceUrls.value,
           selector: form.value.selector.trim() || 'body',
           doc_strategy: strategyRef.value.getStrategy(),
         })
         .then(() => {
-          MsgSuccess('导入任务提交成功')
+          MsgSuccess('导入成功')
           visible.value = false
           emit('refresh')
         })
@@ -93,7 +73,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" direction="btt" size="100%" :show-close="!loading" @closed="emit('closed')">
+  <MkDrawer v-model="visible" direction="btt" @closed="emit('closed')">
     <template #header>
       <div class="flex w-full">
         <h4>导入文档</h4>
@@ -107,8 +87,8 @@ defineExpose({ open })
       <section v-show="activeStep === 0">
         <h4 class="mb-4 mk-title-decoration">基本信息</h4>
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-          <el-form-item label="文档地址" prop="addresses">
-            <el-input v-model="form.addresses" type="textarea" :rows="5" placeholder="请输入文档地址，一行一个，地址不正确会导入失败" />
+          <el-form-item label="文档地址" prop="source_url">
+            <el-input v-model="form.source_url" type="textarea" :rows="5" placeholder="请输入文档地址，一行一个，地址不正确文档会导入失败。" />
           </el-form-item>
           <el-form-item label="选择器">
             <el-input v-model="form.selector" placeholder="默认为 body，可输入 .classname/#idname/tagname" />
@@ -117,7 +97,7 @@ defineExpose({ open })
       </section>
       <section v-if="strategyMounted" v-show="activeStep === 1">
         <h4 class="mb-4 mk-title-decoration">文档处理策略</h4>
-        <DocumentStrategyForm ref="strategyRef" @vue:mounted="handleStrategyMounted" />
+        <DocumentStrategyForm ref="strategyRef" />
       </section>
     </div>
     <template #footer>

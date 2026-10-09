@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, provide, ref, useTemplateRef, type Component } from 'vue'
 import type { AxiosProgressEvent } from 'axios'
+import type LogicFlow from '@logicflow/core'
 import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
-import type { Dict, KnowledgeDetail, KnowledgeWorkflowDebugPayload } from '@/api/types'
+import type { Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import DataSource from '@/views/workflow/knowledge/debug/action/DataSource.vue'
@@ -13,7 +14,7 @@ import Result from '@/views/workflow/knowledge/debug/action/Result.vue'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowImportDocumentDrawer' })
-const props = defineProps<{ knowledge: KnowledgeDetail }>()
+const props = defineProps<{ knowledgeId: string; workflow?: LogicFlow.GraphConfigData }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
 /* 复用工作流 Action，上传适配保留进度、取消和上传中保护。 */
@@ -49,7 +50,7 @@ const actionId = ref<string>()
 const formPayload = ref<KnowledgeWorkflowDebugPayload>({ data_source: {}, knowledge_base: {} })
 const actionRef = useTemplateRef<{ validate: () => Promise<unknown>; getData: () => Dict<unknown> }>('actionRef')
 const hasKnowledgeBaseInput = computed(() => {
-  const node = props.knowledge.work_flow?.nodes?.find((node) => node.type === WorkflowNodeType.KnowledgeBase)
+  const node = props.workflow?.nodes?.find((node) => node.type === WorkflowNodeType.KnowledgeBase)
   return ((node?.properties?.user_input_field_list as FormField[] | undefined)?.length ?? 0) > 0
 })
 const busy = computed(() => loading.value || uploadingCount.value > 0)
@@ -97,7 +98,7 @@ function handleSubmit() {
       const data = getActionData()
       if (!data) return
       formPayload.value[step] = data
-      return KnowledgeWorkflowApi.postKnowledgeWorkflowImport(props.knowledge.id, formPayload.value).then((action) => {
+      return KnowledgeWorkflowApi.postKnowledgeWorkflowImport(props.knowledgeId, formPayload.value).then((action) => {
         actionId.value = action.id
         active.value = 'result'
         emit('refresh')
@@ -132,8 +133,8 @@ defineExpose({ open })
           :is="actionComponents[active]"
           ref="actionRef"
           v-model:loading="loading"
-          :workflow="knowledge.work_flow ?? null"
-          :knowledge-id="knowledge.id"
+          :workflow="workflow ?? null"
+          :knowledge-id="knowledgeId"
           :action-id="actionId"
         />
       </keep-alive>
