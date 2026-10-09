@@ -37,6 +37,20 @@ def _increment_stats(stats, field, amount=1):
         stats[field] = stats.get(field, 0) + amount
 
 
+def _web_documents_by_url(knowledge):
+    if knowledge is None:
+        return {}
+    return {
+        normalize_web_url((document.meta or {}).get("source_url", "")): document
+        for document in QuerySet(Document).filter(
+            knowledge=knowledge,
+            type=KnowledgeType.WEB,
+            resource_type=DocumentResourceType.DOCUMENT,
+        )
+        if (document.meta or {}).get("source_url")
+    }
+
+
 def get_save_handler(knowledge_id, user_id, selector, doc_strategy=None, stats=None, source_meta=None):
     knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
     strategy = normalize_document_strategy(
@@ -44,20 +58,25 @@ def get_save_handler(knowledge_id, user_id, selector, doc_strategy=None, stats=N
         if doc_strategy is not None
         else ((knowledge.meta or {}).get("doc_strategy") if knowledge else None)
     )
+    document_by_url = _web_documents_by_url(knowledge)
 
     def handler(child_link: ChildLink, response: Fork.Response):
         if response.status == 200:
             try:
+                existing = document_by_url.get(normalize_web_url(child_link.url))
+                selected_strategy = (
+                    normalize_document_strategy(existing.doc_strategy) if existing is not None else strategy
+                )
                 document_name = _document_name(child_link)
                 content = internalize_web_images(response.content, knowledge_id)
-                paragraphs = parse_web_content(content, strategy)
+                paragraphs = parse_web_content(content, selected_strategy)
                 DocumentSerializers.Create(data={"knowledge_id": knowledge_id, "user_id": user_id}).save(
                     {
                         "name": document_name,
                         "paragraphs": paragraphs,
                         "meta": {**(source_meta or {}), "source_url": child_link.url, "selector": selector},
                         "type": KnowledgeType.WEB,
-                        "doc_strategy": strategy,
+                        "doc_strategy": selected_strategy,
                     },
                     with_valid=True,
                 )
@@ -89,15 +108,7 @@ def get_sync_handler(
         if doc_strategy is not None
         else ((knowledge.meta or {}).get("doc_strategy") if knowledge else None)
     )
-    document_by_url = {
-        normalize_web_url((document.meta or {}).get("source_url", "")): document
-        for document in QuerySet(Document).filter(
-            knowledge=knowledge,
-            type=KnowledgeType.WEB,
-            resource_type=DocumentResourceType.DOCUMENT,
-        )
-        if (document.meta or {}).get("source_url")
-    }
+    document_by_url = _web_documents_by_url(knowledge)
 
     def handler(child_link: ChildLink, response: Fork.Response):
         if response.status == 200:
@@ -108,11 +119,15 @@ def get_sync_handler(
                 document_name = _document_name(child_link)
                 existing = document_by_url.get(source_url)
                 if existing is not None and sync_type == "incremental":
-                    # 增量同步使用文档自身策略，并复用本次爬取结果，避免重复请求。
+                    # 存量文档沿用自身策略，知识库策略仅用于新 URL。
                     previous_sync_version = existing.sync_version
-                    DocumentSerializers.Sync(data={"knowledge_id": knowledge.id, "document_id": existing.id}).sync(
-                        response=response
-                    )
+                    DocumentSerializers.Sync(
+                        data={
+                            "knowledge_id": knowledge.id,
+                            "document_id": existing.id,
+                            "strategy_mode": "default",
+                        }
+                    ).sync(response=response)
                     if stats is not None:
                         refreshed = QuerySet(Document).filter(id=existing.id).first()
                         sync_state = Status.of(refreshed.status)[TaskType.SYNC] if refreshed is not None else None
@@ -124,13 +139,13 @@ def get_sync_handler(
                             _increment_stats(stats, "synced_count")
                     return
 
-                selected_strategy = (
-                    normalize_document_strategy(existing.doc_strategy) if existing is not None else strategy
-                )
                 selected_selector = (
                     (existing.meta or {}).get("selector")
                     if existing is not None
                     else (knowledge.meta or {}).get("selector")
+                )
+                selected_strategy = (
+                    normalize_document_strategy(existing.doc_strategy) if existing is not None else strategy
                 )
                 content = internalize_web_images(response.content, knowledge.id)
                 paragraphs = parse_web_content(content, selected_strategy)

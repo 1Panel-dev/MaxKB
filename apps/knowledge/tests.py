@@ -941,14 +941,55 @@ class WebDocumentStrategyRequestTests(SimpleTestCase):
         instance = create_document.return_value.save.call_args.args[0]
         self.assertEqual(instance["doc_strategy"]["split"]["max_length"], 777)
 
+    @patch("knowledge.serializers.document.DocumentSerializers.Create")
+    @patch("knowledge.task.handler.internalize_web_images", side_effect=lambda content, _knowledge_id: content)
+    @patch("knowledge.task.handler.QuerySet")
+    def test_new_url_uses_saved_processing_strategy_in_every_knowledge_sync_mode(
+        self, query_set, _internalize_web_images, create_document
+    ):
+        strategy = normalize_document_strategy(
+            {
+                "split": {"max_length": 50, "child_length": 50},
+                "visual": {"enabled": True, "model_id": "00000000-0000-0000-0000-000000000041"},
+                "index": {"title_as_question": True},
+            }
+        )
+        knowledge = MagicMock(id="knowledge-id", meta={"selector": "body", "doc_strategy": strategy})
+        knowledge_query = MagicMock()
+        knowledge_query.filter.return_value.first.return_value = knowledge
+        document_query = MagicMock()
+        document_query.filter.return_value.__iter__.return_value = []
+        query_set.side_effect = lambda model: knowledge_query if model is Knowledge else document_query
+        content = "a" * 120
+        source_url = "https://example.com/new-page"
+
+        for sync_type in ("incremental", "replace", "complete"):
+            with self.subTest(sync_type=sync_type):
+                create_document.reset_mock()
+                if sync_type == "complete":
+                    handler = get_save_handler(knowledge.id, "user-id", "body")
+                else:
+                    handler = get_sync_handler(knowledge.id, "user-id", sync_type=sync_type)
+                handler(MagicMock(tag=None, url=source_url), MagicMock(status=200, content=content))
+
+                create_document.return_value.save.assert_called_once()
+                instance = create_document.return_value.save.call_args.args[0]
+                self.assertEqual(instance["meta"]["source_url"], source_url)
+                self.assertEqual(instance["doc_strategy"], strategy)
+                self.assertEqual([p["content"] for p in instance["paragraphs"]], ["a" * 50, "a" * 50, "a" * 20])
+
     @patch("knowledge.serializers.document.DocumentSerializers.Sync")
     @patch("knowledge.task.handler.QuerySet")
-    def test_incremental_crawl_reuses_response_and_document_strategy(self, query_set, sync_document):
-        knowledge = MagicMock(id="knowledge-id", meta={"doc_strategy": {}})
+    def test_incremental_crawl_reuses_response_and_preserves_document_strategy(self, query_set, sync_document):
+        strategy = normalize_document_strategy(
+            {"visual": {"enabled": True, "strategy": "model", "model_id": "00000000-0000-0000-0000-000000000041"}}
+        )
+        knowledge = MagicMock(id="knowledge-id", meta={"doc_strategy": strategy})
         existing = MagicMock(
             id="document-id",
             type=KnowledgeType.WEB,
             meta={"source_url": "https://example.com/docs/"},
+            doc_strategy=normalize_document_strategy(None),
         )
         knowledge_query = MagicMock()
         knowledge_query.filter.return_value.first.return_value = knowledge
@@ -961,6 +1002,13 @@ class WebDocumentStrategyRequestTests(SimpleTestCase):
         handler = get_sync_handler("knowledge-id", "user-id", successful_urls=successful_urls)
         handler(MagicMock(tag=None, url="https://example.com/docs#top"), response)
 
+        sync_document.assert_called_once_with(
+            data={
+                "knowledge_id": knowledge.id,
+                "document_id": existing.id,
+                "strategy_mode": "default",
+            }
+        )
         sync_document.return_value.sync.assert_called_once_with(response=response)
         self.assertEqual(successful_urls, {"https://example.com/docs"})
 
@@ -985,13 +1033,69 @@ class WebDocumentStrategyRequestTests(SimpleTestCase):
         query_set.side_effect = lambda model: knowledge_query if model is Knowledge else document_query
         create_document.return_value.save.return_value = {"id": "new-document-id"}
 
-        handler = get_sync_handler("knowledge-id", "user-id", sync_type="replace")
+        strategy = normalize_document_strategy(
+            {
+                "split": {"max_length": 888},
+                "visual": {"enabled": True, "strategy": "model", "model_id": "00000000-0000-0000-0000-000000000042"},
+            }
+        )
+        handler = get_sync_handler("knowledge-id", "user-id", doc_strategy=strategy, sync_type="replace")
         handler(MagicMock(tag=None, url="https://example.com/docs"), MagicMock(status=200, content="updated"))
 
         instance = create_document.return_value.save.call_args.args[0]
-        self.assertEqual(instance["doc_strategy"]["split"]["max_length"], 777)
+        self.assertEqual(instance["doc_strategy"], normalize_document_strategy(existing.doc_strategy))
         self.assertEqual(instance["meta"]["selector"], ".content")
         delete_document_data.assert_called_once_with(["old-document-id"])
+
+    @patch("knowledge.task.handler.delete_document_data")
+    @patch("knowledge.serializers.document.DocumentSerializers.Create")
+    @patch("knowledge.task.handler.internalize_web_images", side_effect=lambda content, _knowledge_id: content)
+    @patch("knowledge.task.handler.QuerySet")
+    def test_recreated_existing_urls_keep_their_strategy_while_new_urls_use_knowledge_strategy(
+        self, query_set, _internalize_web_images, create_document, delete_document_data
+    ):
+        old_strategy = normalize_document_strategy(
+            {
+                "split": {"max_length": 50, "child_length": 50},
+                "visual": {"enabled": True, "model_id": "00000000-0000-0000-0000-000000000041"},
+                "index": {"title_as_question": True},
+            }
+        )
+        new_strategy = normalize_document_strategy({"split": {"max_length": 80, "child_length": 80}})
+        knowledge = MagicMock(id="knowledge-id", meta={"selector": "body", "doc_strategy": new_strategy})
+        existing = MagicMock(
+            id="old-document-id",
+            meta={"source_url": "https://example.com/existing/"},
+            doc_strategy=old_strategy,
+        )
+        knowledge_query = MagicMock()
+        knowledge_query.filter.return_value.first.return_value = knowledge
+        document_query = MagicMock()
+        document_query.filter.return_value.__iter__.return_value = [existing]
+        query_set.side_effect = lambda model: knowledge_query if model is Knowledge else document_query
+        create_document.return_value.save.return_value = {}
+
+        for sync_type in ("replace", "complete"):
+            with self.subTest(sync_type=sync_type):
+                create_document.reset_mock()
+                delete_document_data.reset_mock()
+                if sync_type == "complete":
+                    handler = get_save_handler(knowledge.id, "user-id", "body", new_strategy)
+                else:
+                    handler = get_sync_handler(knowledge.id, "user-id", new_strategy, sync_type)
+                for url in ("https://example.com/existing#top", "https://example.com/new"):
+                    handler(MagicMock(tag=None, url=url), MagicMock(status=200, content="a" * 120))
+
+                self.assertEqual(create_document.return_value.save.call_count, 2)
+                old_instance, new_instance = [call.args[0] for call in create_document.return_value.save.call_args_list]
+                self.assertEqual(old_instance["doc_strategy"], old_strategy)
+                self.assertEqual(new_instance["doc_strategy"], new_strategy)
+                self.assertEqual([p["content"] for p in old_instance["paragraphs"]], ["a" * 50, "a" * 50, "a" * 20])
+                self.assertEqual([p["content"] for p in new_instance["paragraphs"]], ["a" * 80, "a" * 40])
+                if sync_type == "replace":
+                    delete_document_data.assert_called_once_with([existing.id])
+                else:
+                    delete_document_data.assert_not_called()
 
     @patch("knowledge.task.handler.delete_document_data")
     @patch("knowledge.serializers.document.DocumentSerializers.Create")
@@ -1021,6 +1125,58 @@ class WebDocumentStrategyRequestTests(SimpleTestCase):
 
 
 class KnowledgeModelUpdateTests(SimpleTestCase):
+    @patch("knowledge.task.sync.QuerySet")
+    @patch("knowledge.serializers.knowledge.sync_replace_web_knowledge.delay")
+    @patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge")
+    @patch("knowledge.serializers.knowledge.QuerySet")
+    def test_saved_strategy_takes_effect_on_next_manual_or_scheduled_sync(
+        self, query_set, _update_mapping, delay, task_query_set
+    ):
+        knowledge = MagicMock(
+            id="00000000-0000-0000-0000-000000000011",
+            user_id="00000000-0000-0000-0000-000000000013",
+            type=KnowledgeType.WEB,
+            meta={
+                "source_url": "https://example.com",
+                "selector": "body",
+                "doc_strategy": normalize_document_strategy(None),
+                "sync_setting": {"enabled": True, "sync_type": "incremental"},
+            },
+        )
+        query_set.return_value.get.return_value = knowledge
+        task_query_set.return_value.filter.return_value.first.return_value = knowledge
+        operation = KnowledgeSerializer.Operate(
+            data={"workspace_id": "default", "knowledge_id": knowledge.id, "user_id": knowledge.user_id}
+        )
+        strategy = normalize_document_strategy(
+            {
+                "split": {"max_length": 1024},
+                "visual": {"enabled": True, "model_id": "00000000-0000-0000-0000-000000000042"},
+                "index": {"title_as_question": True},
+            }
+        )
+
+        KnowledgeSerializer.Operate.edit.__wrapped__(operation, {"doc_strategy": strategy}, select_one=False)
+
+        delay.assert_not_called()
+        self.assertEqual(knowledge.meta["doc_strategy"], strategy)
+        self.assertEqual(knowledge.meta["source_url"], "https://example.com")
+        sync = KnowledgeSerializer.SyncWeb(data={"user_id": knowledge.user_id})
+        for sync_type in ("incremental", "replace", "complete"):
+            with self.subTest(sync_type=sync_type):
+                delay.reset_mock()
+                getattr(sync, f"{sync_type}_sync")(knowledge)
+                delay.assert_called_once()
+                self.assertEqual(delay.call_args.args[4], strategy)
+                self.assertEqual(delay.call_args.args[5], sync_type)
+
+                delay.reset_mock()
+                knowledge.meta["sync_setting"]["sync_type"] = sync_type
+                self.assertTrue(scheduled_sync_web_knowledge.run(str(knowledge.id)))
+                delay.assert_called_once()
+                self.assertEqual(delay.call_args.args[4], strategy)
+                self.assertEqual(delay.call_args.args[5], sync_type)
+
     @patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge")
     @patch("knowledge.serializers.knowledge.QuerySet")
     def test_model_update_preserves_meta_when_strategy_is_omitted_or_inapplicable_null(self, query_set, update_mapping):
@@ -1339,14 +1495,17 @@ class KnowledgeScheduleTests(SimpleTestCase):
 
     @patch("knowledge.task.sync.sync_replace_web_knowledge.delay")
     @patch("knowledge.task.sync.QuerySet")
-    def test_scheduled_entry_uses_saved_sync_type_and_records_log(self, query_set, delay):
+    def test_scheduled_entry_uses_saved_strategy_and_sync_type_and_records_log(self, query_set, delay):
+        strategy = normalize_document_strategy(
+            {"visual": {"enabled": True, "strategy": "model", "model_id": "00000000-0000-0000-0000-000000000043"}}
+        )
         knowledge = MagicMock(
             id="00000000-0000-0000-0000-000000000022",
             user_id="00000000-0000-0000-0000-000000000023",
             meta={
                 "source_url": "https://example.com",
                 "selector": "body",
-                "doc_strategy": {},
+                "doc_strategy": strategy,
                 "sync_setting": {"enabled": True, "sync_type": "complete"},
             },
         )
@@ -1355,6 +1514,7 @@ class KnowledgeScheduleTests(SimpleTestCase):
         self.assertTrue(scheduled_sync_web_knowledge.run(str(knowledge.id)))
 
         self.assertEqual(delay.call_args.args[-1], "complete")
+        self.assertEqual(delay.call_args.args[4], strategy)
         self.assertTrue(delay.call_args.kwargs["record_log"])
         self.assertEqual(delay.call_args.kwargs["trigger_type"], KnowledgeSyncTrigger.SCHEDULED)
 
@@ -2094,6 +2254,59 @@ class IncrementalSyncTests(SimpleTestCase):
 
         incremental_sync.assert_not_called()
         document.save.assert_called_once_with(update_fields=["last_sync_time", "update_time"])
+
+    @patch("knowledge.serializers.document.IncrementalDocumentSync")
+    @patch("knowledge.serializers.document.process_visual_assets")
+    @patch("knowledge.serializers.document.sync_paragraph_assets")
+    @patch("knowledge.serializers.document.internalize_web_images", side_effect=lambda content, _knowledge_id: content)
+    @patch("knowledge.serializers.document.parse_web_content")
+    @patch("knowledge.serializers.document.ListenerManagement")
+    @patch("knowledge.serializers.document.QuerySet")
+    def test_enabling_visual_strategy_reprocesses_unchanged_source(
+        self, query_set, _listener, parse_content, _internalize_images, sync_assets, process_assets, incremental_sync
+    ):
+        paragraphs = [{"title": "Overview", "content": "![chart](./oss/file/00000000-0000-0000-0000-000000000031)"}]
+        old_strategy = normalize_document_strategy(None)
+        strategy = normalize_document_strategy(
+            {"visual": {"enabled": True, "strategy": "model", "model_id": "00000000-0000-0000-0000-000000000032"}}
+        )
+        document = Document(
+            id="00000000-0000-0000-0000-000000000033",
+            knowledge_id="00000000-0000-0000-0000-000000000034",
+            name="docs",
+            type=KnowledgeType.WEB,
+            meta={"source_url": "https://example.com", "selector": "body"},
+            doc_strategy=old_strategy,
+            source_hash=document_source_hash(prepare_remote_paragraphs(paragraphs)),
+            **strategy_hashes(old_strategy),
+        )
+        paragraph_id = "00000000-0000-0000-0000-000000000035"
+        incremental_sync.return_value.merge.return_value = MergeResult(updated_ids=[paragraph_id])
+        document_query = MagicMock()
+        document_query.filter.return_value.first.return_value = document
+        paragraph_query = MagicMock()
+        query_set.side_effect = lambda model: document_query if model is Document else paragraph_query
+        parse_content.return_value = paragraphs
+        assets = [MagicMock()]
+        sync_assets.return_value = assets
+        serializer = DocumentSerializers.Sync(
+            data={
+                "knowledge_id": str(document.knowledge_id),
+                "document_id": str(document.id),
+                "strategy_mode": "custom",
+                "doc_strategy": strategy,
+            }
+        )
+        serializer._validated_data = {"strategy_mode": "custom", "doc_strategy": strategy}
+        with patch.object(serializer, "is_valid"):
+            DocumentSerializers.Sync.sync.__wrapped__(
+                serializer, with_embedding=False, response=MagicMock(status=200, content=paragraphs[0]["content"])
+            )
+
+        incremental_sync.assert_called_once_with(document, strategy)
+        incremental_sync.return_value.merge.assert_called_once_with(paragraphs)
+        paragraph_query.filter.assert_any_call(id__in=[paragraph_id])
+        process_assets.assert_called_once_with(assets, strategy)
 
 
 class SyncedParagraphCleanupTests(SimpleTestCase):
