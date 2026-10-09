@@ -15,8 +15,8 @@ from common.result import result
 
 
 class SystemToResponse(BaseToResponse):
-    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens,
-                          prompt_tokens, other_params: dict = None,
+    def to_block_response(self, chat_id, chat_record_id, content, is_end, prompt_tokens,
+                          completion_tokens, other_params: dict = None,
                           _status=status.HTTP_200_OK):
         if other_params is None:
             other_params = {}
@@ -27,8 +27,8 @@ class SystemToResponse(BaseToResponse):
                               code=_status)
 
     def to_stream_chunk_response(self, chat_id, chat_record_id, node_id, up_node_id_list, content, is_end,
-                                 completion_tokens,
-                                 prompt_tokens, other_params: dict = None):
+                                 prompt_tokens,
+                                 completion_tokens, other_params: dict = None):
         if other_params is None:
             other_params = {}
         chunk = json.dumps({'chat_id': str(chat_id), 'chat_record_id': str(chat_record_id), 'operate': True,
