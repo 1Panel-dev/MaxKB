@@ -24,6 +24,7 @@ import {
   RelatedResourcesToolAction,
   TriggerToolAction,
 } from '@/views/tool/tool-card/action-dropdown'
+import perm from '@/permission'
 
 const { auth } = useStore()
 const router = useRouter()
@@ -177,10 +178,10 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 启用或禁用工具 -->
-              <ToolStatusSwitch v-model:loading="operationLoading" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
+              <ToolStatusSwitch v-model:loading="operationLoading" :api="SystemToolApi" :tool="row" :disabled="!perm.tool.system.edit() || operationLoading" @update="handleToolUpdate" />
               <el-divider direction="vertical" class="ml-3! mr-2!" />
               <!-- 编辑工具配置 -->
-              <EditToolAction display="button" label="编辑" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
+              <EditToolAction v-if="perm.tool.system.edit()" display="button" label="编辑" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
               <!-- 更多工具操作 -->
               <MkTableMoreDropdown>
                 <!-- 打开工具工作流 -->
@@ -199,7 +200,7 @@ onMounted(() => {
                 />
 
                 <!-- 资源授权 -->
-                <AuthorizeToolAction label="资源授权" :tool="row" />
+                <AuthorizeToolAction v-if="perm.tool.system.auth()" label="资源授权" :tool="row" />
                 <!-- 查看 MCP 配置 -->
                 <McpConfigAction
                   v-if="row.tool_type === TOOL_TYPE.MCP"
@@ -212,24 +213,24 @@ onMounted(() => {
                 <TriggerToolAction
                   :tool-api="SystemToolApi"
                   :tool-workflow-api="SystemToolWorkflowApi"
-                  v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type)"
+                  v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type) && perm.tool.system.triggerRead()"
                   label="触发器"
                   :api="SystemResourceTriggerApi"
                   :tool="row"
                 />
                 <!-- 查看关联资源 -->
-                <RelatedResourcesToolAction label="查看关联资源" :api="SystemRelatedResourcesApi" :tool="row" />
+                <RelatedResourcesToolAction v-if="perm.tool.system.relateMap()" label="查看关联资源" :api="SystemRelatedResourcesApi" :tool="row" />
                 <!-- 查看执行记录 -->
                 <ExecutionRecordToolAction
-                  v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type)"
+                  v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type) && perm.tool.system.record()"
                   label="查看执行记录"
                   :api="SystemToolWorkflowApi"
                   :tool="row"
                 />
                 <!-- 导出工具 -->
-                <ExportToolAction v-if="!row.template_id" v-model:loading="operationLoading" label="导出" :api="SystemToolApi" :tool="row" />
+                <ExportToolAction v-if="!row.template_id && perm.tool.system.export()" v-model:loading="operationLoading" label="导出" :api="SystemToolApi" :tool="row" />
                 <!-- 删除工具 -->
-                <MkDropdownItem divided @click="handleDeleteTool(row)">
+                <MkDropdownItem divided @click="handleDeleteTool(row)" v-if="perm.tool.system.delete()">
                   <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                   删除
                 </MkDropdownItem>

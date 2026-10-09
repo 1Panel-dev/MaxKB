@@ -33,6 +33,7 @@ import {
 } from './tool-card/action-dropdown'
 import ButtonCreateTool from './components/ButtonCreateTool.vue'
 import ButtonToolStore from './components/ButtonToolStore.vue'
+import perm from '@/permission/index.ts'
 
 /* 当前文件夹 */
 
@@ -242,7 +243,7 @@ onMounted(() => {
               <!-- 工具商店 -->
               <ButtonToolStore :folder-id="currentFolder.id" @refresh="refreshTool" />
               <!-- 创建 -->
-              <ButtonCreateTool :folder-id="currentFolder.id" :api="ToolApi" @refresh="refreshTool" />
+              <ButtonCreateTool v-if="perm.tool.workspace.create()" :folder-id="currentFolder.id" :api="ToolApi" @refresh="refreshTool" />
             </template>
           </template>
         </div>
@@ -265,12 +266,13 @@ onMounted(() => {
               >
                 <template #actions>
                   <!-- 修改工具状态 -->
-                  <ToolStatusSwitch v-model:loading="toolOperationLoading" :api="ToolApi" :tool="tool" @update="handleToolUpdate" />
+                  <ToolStatusSwitch :disabled="!perm.tool.workspace.edit(tool.id)" v-model:loading="toolOperationLoading" :api="ToolApi" :tool="tool" @update="handleToolUpdate" />
                   <el-divider direction="vertical" class="ml-1!"/>
                 </template>
                 <template #action-dropdown>
                   <!-- 编辑工具 -->
                   <EditToolAction
+                    v-if="perm.tool.workspace.edit(tool.id)"
                     :ref="
                       (instance) => {
                         if (instance) editToolActionRefs[tool.id] = instance as InstanceType<typeof EditToolAction>
@@ -301,21 +303,21 @@ onMounted(() => {
                     :tool="tool"
                   />
                   <!-- 资源授权 -->
-                  <AuthorizeToolAction label="资源授权" :tool="tool" />
+                  <AuthorizeToolAction v-if="perm.tool.workspace.auth(tool.id)" label="资源授权" :tool="tool" />
 
                   <!-- 工具触发器 -->
                   <TriggerToolAction
-                    v-if="tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW"
+                    v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.workspace.triggerRead(tool.id)"
                     label="触发器"
                     :api="ResourceTriggerApi"
                     :tool="tool"
                   />
                   <!-- 查看关联资源 -->
-                  <RelatedResourcesToolAction label="查看关联资源" :api="RelatedResourcesApi" :tool="tool" />
+                  <RelatedResourcesToolAction v-if="perm.tool.workspace.relateMap(tool.id)" label="查看关联资源" :api="RelatedResourcesApi" :tool="tool" />
 
                   <!-- 查看执行记录 -->
                   <ExecutionRecordToolAction
-                    v-if="tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW"
+                    v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.workspace.record(tool.id)"
                     label="查看执行记录"
                     :api="WorkflowApi"
                     :tool="tool"
@@ -330,9 +332,9 @@ onMounted(() => {
                     @delete="handleDeleteTool"
                   />
                   <!-- 导出 -->
-                  <ExportToolAction v-if="!tool.template_id" v-model:loading="toolOperationLoading" label="导出" :api="ToolApi" :tool="tool" />
+                  <ExportToolAction v-if="!tool.template_id && perm.tool.workspace.export(tool.id)" v-model:loading="toolOperationLoading" label="导出" :api="ToolApi" :tool="tool" />
                   <!-- 删除 -->
-                  <DeleteToolAction v-model:loading="toolOperationLoading" label="删除" :api="ToolApi" :tool="tool" @delete="handleDeleteTool" />
+                  <DeleteToolAction v-if="perm.tool.workspace.delete(tool.id)" v-model:loading="toolOperationLoading" label="删除" :api="ToolApi" :tool="tool" @delete="handleDeleteTool" />
                 </template>
               </ToolCard>
             </template>
@@ -351,8 +353,8 @@ onMounted(() => {
         @batch-cancel="cancelBatchSelection"
       >
         <template #footer-batch-actions>
-          <el-button type="primary" plain :disabled="!selectedToolCount" @click="handleOpenBatchMove">移动到</el-button>
-          <el-button type="danger" plain :disabled="!selectedToolCount" @click="handleBatchDelete">删除</el-button>
+          <el-button v-if="perm.tool.workspace.batchMove()" type="primary" plain :disabled="!selectedToolCount" @click="handleOpenBatchMove">移动到</el-button>
+          <el-button v-if="perm.tool.workspace.batchDelete()" type="danger" plain :disabled="!selectedToolCount" @click="handleBatchDelete">删除</el-button>
         </template>
       </component>
     </template>
