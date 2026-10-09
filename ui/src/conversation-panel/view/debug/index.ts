@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import ConversationApi from '@/api/admin/workspace/conversation'
+import { useStore } from '@/stores'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { ConversationApiAdapter } from '../../core/types'
@@ -24,14 +25,16 @@ export function createDebugConversation(): ConversationBundle {
     rename: (id, data) => ConversationApi.putConversation(id, data, appId.value),
     chatMessage: (cid, data) => ConversationApi.postConversationMessage(cid, data, appId.value),
     resumeMessage: (cid, rid) => ConversationApi.postResumeConversationMessage(cid, rid, appId.value),
-    uploadFile: (file, cid) => FileApi.postUploadFile(file, cid, FILE_SOURCE_TYPE.CHAT).request,
+    uploadFile: (file, cid, onProgress) => FileApi.postUploadFile(file, cid, FILE_SOURCE_TYPE.CHAT, onProgress).request,
     cancel: (cid) => ConversationApi.postCancelConversationMessage(cid, appId.value),
   }
   // currentChatId 单一数据源在 list;msgs 只读借用,list 通过 bindLoader 主动驱动加载
+  const { user } = useStore()
   const list = createConversationListStore({
     pageConversations: api.pageConversations,
     remove: api.remove,
     rename: api.rename,
+    account: computed(() => (user.userInfo ? { nickName: user.userInfo.nick_name, username: user.userInfo.username } : null)),
   })
   const msgs = createMessageListStore({
     pageRecords: api.pageRecords,

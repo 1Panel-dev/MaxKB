@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useStore } from '@/stores'
 import { formatTokenNumber } from '@/utils/number'
 import { MsgInfo } from '@/utils/message'
+import { useConversationListStore } from './index'
 
 defineOptions({ name: 'ConversationAccountMenu' })
 
 const props = defineProps<{ usedTokens?: number; totalTokens?: number }>()
-const { user } = useStore()
+const { account } = useConversationListStore()
 const menuVisible = ref(false)
-const displayName = computed(() => user.userInfo?.nick_name || user.userInfo?.username || '用户')
+const displayName = computed(() => account.value?.nickName || account.value?.username || '用户')
 
 // 配额尚未接入时保留空值展示，不将缺失数据表示为零用量。
 const tokenPercentage = computed(() => {
@@ -46,7 +46,7 @@ const handleAccountAction = (action: string) => MsgInfo(`${action}功能暂未�
             </el-avatar>
             <div class="min-w-0">
               <h4 class="truncate" :title="displayName">{{ displayName }}</h4>
-              <div class="truncate text-N600" :title="user.userInfo?.username">{{ user.userInfo?.username || '-' }}</div>
+              <div class="truncate text-N600" :title="account?.username">{{ account?.username || '-' }}</div>
             </div>
           </div>
           <div class="mb-1 flex-align-center gap-3">

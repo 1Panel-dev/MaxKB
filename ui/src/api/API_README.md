@@ -33,6 +33,10 @@ src/api/
 │   ├── core/request.ts               # JSON 与流式请求
 │   ├── core/types.ts                 # Chat 请求协议类型
 │   ├── file.ts                       # Chat 文件上传、进度与取消
+│   ├── auth.ts                       # 门户与单应用的认证前置配置、匿名认证、登录与登出
+│   ├── chat-user.ts                  # 当前对话用户档案
+│   ├── application.ts                # 对话端智能体信息（v3 application/<id>/profile）
+│   ├── portal.ts                     # 门户全部智能体（v3 portal/application）与按智能体分组的历史对话（v3 portal/chat）
 │   ├── conversation.ts               # 正式对话、历史会话与语音接口
 │   └── README.md                     # Chat API 边界说明
 ├── enums/                            # 后端固定枚举值
@@ -478,7 +482,8 @@ Workspace 智能体分页方法只接收分页与查询条件，从当前资源�
 记录分页、删除、修改和语音识别接口，保留可选 `applicationId` 对历史资源范围的选择。
 其中 `postSpeechToText(applicationId, data)` 请求指定智能体的
 `/workspace/<workspaceId>/application/<applicationId>/speech_to_text`，loading 由调用方管理。
-`chat/conversation.ts` 维护正式对话对应的接口。两者使用各自 `core/request.ts` 的请求方法；
+`chat/conversation.ts` 维护正式对话对应的 v3 接口，路径为 `/v3/application/<applicationId>/...`，除取消生成外均以
+`applicationId` 为首个参数；chat 模式的 `createChatConversation(getApplicationId)` 由使用方提供当前智能体 ID。两者使用各自 `core/request.ts` 的请求方法；
 `postStream` 返回原始 `Response`，由 `conversation-panel/stream.ts` 解析。
 
 面板内部的 `conversation-panel/common/get-api.ts` 通过 `ChatType` 选择完整 API 对象，

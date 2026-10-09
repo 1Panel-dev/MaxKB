@@ -10,7 +10,7 @@ export interface MessageListDeps {
   chatMessage: (chatId: string, data: any) => Promise<Response>
   resumeMessage: (chatId: string, chatRecordId: string) => Promise<Response>
   cancel: (chatId: string) => Promise<any>
-  uploadFile: (file: File, chatId: string) => Promise<string>
+  uploadFile: (file: File, chatId: string, onProgress?: (percent: number) => void) => Promise<string>
   // 只读获取当前会话 id(单一数据源在 conversation-list)。必须无副作用:不可惰性创建,
   // 否则无会话时的 stop/cancel/loadMore 会凭空生成 id 并误请求后端。
   getChatId: () => string

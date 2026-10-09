@@ -10,7 +10,7 @@
         </svg>
       </button>
       <!-- 新建对话 -->
-      <button class="header-btn" @click="list.newConversation()">
+      <button class="header-btn" @click="handleNewConversation">
         <el-icon :size="18"><Plus /></el-icon>
       </button>
     </template>
@@ -26,12 +26,17 @@
 </template>
 
 <script setup lang="ts">
-import { Operation, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import { useConversationListStore } from '../../../left-sidebar/conversation-list/index'
-import { useExecutionDetailStore } from '../../../right-sidebar/execution-detail/index'
+
+const props = defineProps<{
+  /** 新建对话；不传时在当前应用中新建（门户在没有当前智能体时改为选择智能体） */
+  newConversation?: () => void
+}>()
 
 const list = useConversationListStore()
-const detail = useExecutionDetailStore()
+
+const handleNewConversation = () => (props.newConversation ? props.newConversation() : list.newConversation())
 </script>
 
 <style scoped lang="scss">
