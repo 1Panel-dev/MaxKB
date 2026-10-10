@@ -163,7 +163,7 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column label="操作详情" min-width="220" show-overflow-tooltip>
-          <template #default="{ row }"> {{ row.operate }}{{ row.operation_object?.name ? `【${row.operation_object.name}】` : '' }} </template>
+          <template #default="{ row }">{{ row.operate }}{{ row.operation_object?.name ? `【${row.operation_object.name}】` : '' }}</template>
         </el-table-column>
         <el-table-column label="操作用户" min-width="130" show-overflow-tooltip>
           <template #default="{ row }">{{ row.user?.username || '-' }}</template>
