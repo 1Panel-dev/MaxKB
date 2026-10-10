@@ -1,13 +1,19 @@
 # coding=utf-8
-
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
 from rest_framework.views import APIView, Request
 
-from common.auth import TokenAuth, AllTokenAuth
-from common.auth.authentication import has_permissions
+from application.models import Application
+from common.auth import TokenAuth, AllTokenAuth, ChatTokenAuth
+from common.auth.authentication import has_permissions, get_is_permissions
+from common.auth.constants.chat_permission_constants import ChatPermissionConstants
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
+from common.constants.authentication_type import UserType
 from common.exception.app_exception import AppUnauthorizedFailed
 from common.log.log import log
 from common.result import result
@@ -107,8 +113,29 @@ class GetUrlView(APIView):
         tags=[_("Chat")],  # type: ignore
     )
     def get(self, request: Request, application_id: str):
-        if "application_id" in request.user.kwargs and str(request.user.kwargs.get("application_id")) != application_id:
-            return result.error(_("No permission"))
+        if isinstance(request.user.type, UserType):
+            application = QuerySet(Application).filter(id=application_id).first()
+            if application is None:
+                raise AppUnauthorizedFailed(403, _("No permission to access"))
+            is_permissions = get_is_permissions(
+                request, workspace_id=application.workspace_id, application_id=application_id
+            )
+            if not is_permissions(
+                PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                ViewPermission(
+                    [RoleConstants.USER.get_workspace_role()],
+                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                    compare=CompareConstants.AND,
+                ),
+                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ):
+                raise AppUnauthorizedFailed(403, _("No permission to access"))
+        else:
+            is_permissions = get_is_permissions(request, application_id=application_id)
+            if not is_permissions(ChatPermissionConstants.get_aggregate_permissions()):
+                raise AppUnauthorizedFailed(403, _("No permission to access"))
+
         url = request.query_params.get("url")
         result_data = get_url_content(url, application_id)
         return result.success(result_data)
