@@ -56,43 +56,27 @@ function handleFileRemove() {
   nextTick(() => importFormRef.value?.validateField('files'))
 }
 
-function requestDownloadTemplate(): Promise<unknown> | undefined {
-  // TODO：接入 props.api 的标签模板下载请求，复用请求层文件下载能力并返回 Promise。
-  return undefined
-}
-
 function handleDownloadTemplate() {
   if (loading.value || downloadLoading.value) return
-  const request = requestDownloadTemplate()
-  if (!request) {
-    MsgWarning('标签模板下载接口尚未接入')
-    return
-  }
-
   downloadLoading.value = true
-  return request.finally(() => {
+  return props.api.exportKnowledgeTagTemplate(props.knowledgeId).finally(() => {
     downloadLoading.value = false
   })
-}
-
-function requestImportTags(): Promise<unknown> | undefined {
-  // TODO：接入 props.api 的标签导入请求，传入 props.knowledgeId、importForm.files[0].raw 并返回 Promise。
-  // 成功关闭和刷新已处理，失败应 reject。
-  return undefined
 }
 
 function handleImport() {
   if (loading.value || downloadLoading.value) return
   importFormRef.value?.validate((valid) => {
     if (!valid || loading.value || downloadLoading.value) return
-    const request = requestImportTags()
-    if (!request) {
-      MsgWarning('标签导入接口尚未接入，当前文件尚未上传')
+    const file = importForm.files[0]?.raw
+    if (!file) {
+      MsgWarning('请重新选择上传文件')
       return
     }
 
     loading.value = true
-    return request
+    return props.api
+      .postImportKnowledgeTags(props.knowledgeId, file)
       .then(() => {
         MsgSuccess('导入成功')
         visible.value = false
@@ -137,7 +121,7 @@ function handleImport() {
     <template #footer>
       <!-- 取消标签导入 -->
       <el-button plain :disabled="loading || downloadLoading" @click="visible = false">取消</el-button>
-      <!-- 导入标签，接口待接入 -->
+      <!-- 导入标签 -->
       <el-button type="primary" :loading="loading" :disabled="!importForm.files.length || downloadLoading" @click="handleImport">导入</el-button>
     </template>
   </MkDialog>

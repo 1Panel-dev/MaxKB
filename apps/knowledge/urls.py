@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 from knowledge.views.external_service import ExternalServiceView
+from knowledge.views.tag_import import KnowledgeTagImportView, KnowledgeTagTemplateView
 
 app_name = "knowledge"
 # @formatter:off
@@ -38,6 +39,8 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/transform_workflow', views.KnowledgeView.TransformWorkflow.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tags', views.KnowledgeTagView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tags/batch_delete', views.KnowledgeTagView.BatchDelete.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tags/import', KnowledgeTagImportView.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tags/template/export', KnowledgeTagTemplateView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tags/<str:tag_id>', views.KnowledgeTagView.Operate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tags/<str:tag_id>/<str:delete_type>', views.KnowledgeTagView.Delete.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document', views.DocumentView.as_view()),
