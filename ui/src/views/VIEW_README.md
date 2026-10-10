@@ -474,6 +474,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `home/index.vue`                                                       | Workspace 首页                                                       |
 | `knowledge/index.vue`                                                  | 工作空间知识库目录与知识库卡片页面                                   |
 | `knowledge-detail/index.vue`                                           | 知识库详情页面                                                       |
+| `knowledge-detail/library/tags/index.vue`                             | 标签分组查询、创建、单值编辑、删除与关联文档管理                       |
 | `knowledge-detail/setting/base/index.vue`                             | 知识库基本信息、来源配置与上传限制设置                               |
 | `knowledge-detail/setting/document-strategy/index.vue`                | Web 知识库文档处理策略回填、校验与保存                                       |
 | `knowledge-detail/setting/scheduled-sync/index.vue`                   | Web、飞书与工作流知识库定时同步设置与日志                              |
@@ -717,9 +718,9 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 `ResourceDetailLayout` 生成资料库、工作流、检索优化、授权与集成、设置目录，返回列表时恢复所属文件夹。
 资料库包含文档、图片、标签管理；检索优化包含召回测试、问题、自定义分词；授权与集成包含
 对话用户、外部检索服务。资料库页面统一放在 `knowledge-detail/library/` 下，包含 `document/`、
-`image/`、`tag/`；文档专属组件及 Action 随 `document/` 集中维护。其他页面继续放在
+`image/`、`tags/`；文档专属组件及 Action 随 `document/` 集中维护。其他页面继续放在
 `knowledge-detail/` 下的 `recall-test/`、`question/`、`dictionary/`、`chat-user/`、`external-retrieval/`。
-图片、标签管理及这五个页面暂只展示占位内容。
+图片及这五个页面暂只展示占位内容。
 容器通过 `knowledge-detail/context.ts` 提供只读详情与替换能力；设置页复用已加载详情，保存成功后
 更新容器数据，同步名称等展示。基本信息复用创建流程的 `KnowledgeBaseForm`，类型配置和校验留在
 `setting/base/index.vue` 中，通用知识库标题为“设置”，其他类型为“基础设置”。
@@ -842,6 +843,44 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 `status` 与可选的 `task_type`，切换选项清除旧任务类型并回到第一页，保留名称和创建者条件。
 
 文档详情路由暂未启用，System 知识库详情路由暂未注册。
+
+### 资料库标签管理
+
+`knowledge-detail/library/tags/index.vue` 复用详情布局的 `customHeader` 与 Teleport，
+维护搜索、导入入口、创建入口和标签表格，不嵌套页面布局或修改路由。
+通过 `workspace/knowledge/knowledge.ts` 查询全量分组，前端按标签名或值搜索并保留完整命中分组；
+先按标签组分页，再展开各组标签值，分页总数为标签组数。
+`MkTable` 合并选择列和标签名，选择行为与工作空间成员表格一致，不额外联动同组记录；
+批量底栏按实际选中记录数统计，删除确认明确影响所选记录所属标签及其全部值。
+标签名旁提供新增值、编辑标签、删除标签；行末提供编辑值和删除值，
+数量链接打开同目录 `TagDocumentDrawer.vue`。
+
+`library/tags/components/TagFormDialog.vue` 为标签管理和后续文档入口共用的创建、编辑弹窗，
+接收知识库 ID 与完整 Tags API，参考添加成员流程复用 `MkDialog`、`el-form` 和 `MkFormList`。
+创建允许多行标签名与值；新增值锁定标签名；编辑值回填单项并锁定标签名。
+标签名最多 64 字、标签值最多 128 字，校验必填、纯空白和表单内重复组合。
+创建与单个已有标签值编辑使用已确认接口；整组编辑或编辑中增删行走独立请求入口，
+保留编辑前快照、已有 ID 与清理首尾空格后的当前草稿，交由请求入口按 V3 协议映射参数。
+所有分支共用校验、loading、成功关闭和刷新；多行接口未接入时仅提示并保留草稿，
+不即时删除、不拼接多次旧请求、不模拟成功。
+常驻弹窗在 `closed` 清理草稿和校验。
+
+`library/tags/components/ButtonImportTags.vue` 在同一组件内维护导入按钮与弹窗，
+复用 `MkDialog`、`el-form` 和 `MkDragUpload`，不再单独拆分导入 Dialog。
+支持单个 XLS、XLSX 文件的选择、拖拽、更换、删除及必填校验，关闭后清理文件和校验状态。
+接收知识库 ID 与完整 Tags API，页面监听 `refresh` 重新查询标签列表；已预接提交 loading、重复提交保护、
+成功提示和关闭弹窗，失败保留文件。模板下载有独立 loading 和重复点击保护，下载期间禁止提交与关闭，
+结束后恢复状态，不关闭弹窗或刷新列表。导入、模板下载接口尚未确认，真实请求保留 TODO；
+请求占位返回 `undefined` 时仅提示尚未接入，不发送请求、不模拟成功或刷新列表。
+
+`TagDocumentDrawer.vue` 接收知识库 ID 与完整 Document API，通过 `open(tag)` 固定当前标签，
+以“已关联文档／未关联文档”两页签共用表格，提供搜索、启用状态筛选、分页、单个与批量关联／取消关联；创建时间仅展示，不提供排序入口。
+启用状态复用 `MkTableFilter mode="single"`，支持全部、已启用、已禁用；查询传布尔 `is_active`，全部时省略。
+名称或状态筛选后回到第一页并清空选择，切换页签时重置筛选条件。
+文档图标和时间格式沿用文档列表，状态使用 `MkStatusLabel`；批量操作放在顶部，不再显示页面批量底栏。
+搜索、分页和页签切换清空选择，关联变更后重新查询并通知标签页刷新数量，末页为空时回退。
+抽屉在 `closed` 重置标签、筛选、分页和选择，不新增权限判断或共享范围接口。
+文档页原有标签查询继续使用 Knowledge API，共享标签查询保持原接口，不启用尚未接入的文档标签入口。
 
 `KnowledgeWorkflowView` 复用 `ButtonDefaultModelSetting`，从知识库详情读取默认模型配置，
 随工作流保存提交并将配置传入画布；支持应用到所有节点，保存失败回滚至已保存配置。

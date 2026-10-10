@@ -55,7 +55,18 @@ export interface KnowledgeDetail extends KnowledgeItem {
 /** 按标签名称分组的知识库标签。 */
 export interface KnowledgeTagGroup {
   key: string
-  values: { id: string; value: string; create_time: string; update_time: string }[]
+  values: { id: string; value: string; doc_count?: number; create_time: string; update_time: string }[]
+}
+
+/** 创建知识库标签的名称和值。 */
+export interface KnowledgeTagPayload {
+  key: string
+  value: string
+}
+
+/** 编辑单个知识库标签，保留现有接口的 ID 字段。 */
+export interface KnowledgeTagUpdatePayload extends KnowledgeTagPayload {
+  id: string
 }
 
 /** 知识库工作流任务状态。 */
