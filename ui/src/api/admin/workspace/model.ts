@@ -1,6 +1,8 @@
-import { del, get, post, put } from '../core/request'
+import { del, get, post, postStream, put } from '../core/request'
 import type { Dict, DynamicFormField, ModelPayload, ModelItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
+import type { PromptGeneratePayload } from '@/api/types'
+import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
 const getPrefix = () => {
   const workspaceId = getWorkspaceId()
@@ -62,6 +64,14 @@ const putPauseModelDownload = (modelId: string) => {
   return put<undefined, boolean>(`${getPrefix()}/${modelId}/pause_download`)
 }
 
+
+/** 使用指定模型流式生成或优化系统提示词。 */
+const postPromptGenerate = (modelId: string, payload: PromptGeneratePayload) => {
+  return postStream(ADMIN_API_BASE_PATH, `/workspace/${getWorkspaceId()}/model/${modelId}/prompt_generate`, {
+    ...payload,
+  })
+}
+
 export default {
   deleteModel,
   getModelDetail,
@@ -70,6 +80,7 @@ export default {
   getModelMeta,
   getModelParamsForm,
   postModel,
+  postPromptGenerate,
   putModel,
   putModelParamsForm,
   putPauseModelDownload,

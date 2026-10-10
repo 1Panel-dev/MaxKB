@@ -86,6 +86,7 @@ export interface PromptGenerateMessage {
 export interface PromptGeneratePayload {
   messages: PromptGenerateMessage[]
   prompt: string
+  model_params_setting?: Record<string, unknown>
 }
 
 /** 智能体模板复用工作流模板的展示与下载元数据。 */

@@ -16,6 +16,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/model', views.ModelSetting.as_view()),
     path('workspace/<str:workspace_id>/model_list', views.ModelList.as_view()),
     path('workspace/<str:workspace_id>/model/<str:model_id>/model_params_form', views.ModelSetting.ModelParamsForm.as_view()),
+    path('workspace/<str:workspace_id>/model/<str:model_id>/prompt_generate', views.ModelPromptGenerateView.as_view()),
     path('workspace/<str:workspace_id>/model/<str:model_id>', views.ModelSetting.Operate.as_view()),
     path('workspace/<str:workspace_id>/model/<str:model_id>/pause_download', views.ModelSetting.PauseDownload.as_view()),
     path('workspace/<str:workspace_id>/model/<str:model_id>/meta', views.ModelSetting.ModelMeta.as_view()),

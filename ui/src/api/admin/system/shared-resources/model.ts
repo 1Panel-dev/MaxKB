@@ -1,5 +1,6 @@
-import { del, get, post, put } from '../../core/request'
-import type { Dict, DynamicFormField, ModelItem, ModelPayload } from '@/api/types'
+import { del, get, post, postStream, put } from '../../core/request'
+import type { Dict, DynamicFormField, ModelItem, ModelPayload, PromptGeneratePayload } from '@/api/types'
+import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
 const prefix = '/system/shared/model'
 
@@ -56,6 +57,12 @@ const putPauseModelDownload = (modelId: string) => {
   return put<undefined, boolean>(`${prefix}/${modelId}/pause_download`)
 }
 
+
+/** 使用指定模型流式生成或优化系统提示词。 */
+const postPromptGenerate = (modelId: string, payload: PromptGeneratePayload) => {
+  return postStream(ADMIN_API_BASE_PATH, `/system/shared/model/${modelId}/prompt_generate`, { ...payload })
+}
+
 export default {
   deleteModel,
   getModelDetail,
@@ -64,6 +71,7 @@ export default {
   getModelMeta,
   getModelParamsForm,
   postModel,
+  postPromptGenerate,
   putModel,
   putModelParamsForm,
   putPauseModelDownload,

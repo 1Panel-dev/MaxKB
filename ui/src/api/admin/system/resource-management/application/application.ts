@@ -1,7 +1,6 @@
-import { del, get, getExportFile, postStream } from '@/api/admin/core/request'
+import { del, get, getExportFile } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import type { ApplicationDetail, Dict, PromptGeneratePayload } from '@/api/types'
-import { ADMIN_API_BASE_PATH } from '@/api/constants'
+import type { ApplicationDetail, Dict } from '@/api/types'
 
 const prefix = '/system/resource/application'
 
@@ -10,10 +9,6 @@ const getApplicationPage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<ApplicationDetail>>(`${prefix}/${page.currentPage}/${page.pageSize}`, query)
 }
 
-/** 使用指定模型流式生成或优化 System 资源智能体的系统提示词。 */
-const postPromptGenerate = (applicationId: string, modelId: string, payload: PromptGeneratePayload) => {
-  return postStream(ADMIN_API_BASE_PATH, `${prefix}/${applicationId}/model/${modelId}/prompt_generate`, payload)
-}
 
 /** 删除系统资源管理智能体。 */
 const deleteApplication = (applicationId: string) => {
@@ -27,7 +22,6 @@ const exportApplication = (applicationId: string, applicationName: string) => {
 
 export default {
   getApplicationPage,
-  postPromptGenerate,
   deleteApplication,
   exportApplication,
 }

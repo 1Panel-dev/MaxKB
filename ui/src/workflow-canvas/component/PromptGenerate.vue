@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue'
-import { useRoute } from 'vue-router'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import type { PromptGenerateMessage } from '@/api/types'
 import GenerateContent from '@/components/business/generate-content/index.vue'
 defineOptions({ name: 'PromptGenerate' })
 const props = defineProps<{
   modelId: string
+  modelParamsSetting?: Record<string, unknown>
 }>()
 const emit = defineEmits<{ replace: [prompt: string] }>()
-const route = useRoute()
 
 // 资源范围沿用画布传递的 apiType，循环内节点也使用同一上下文。
 const apiType = inject<string>('apiType', 'workspace')
@@ -79,24 +78,22 @@ const PROMPT_TEMPLATE = `请根据用户描述生成一个完整的AI角色人�
 
 输出时不得包含任何解释或附加说明，只能返回符合以上格式的内容。`
 
-// 生成上下文：沿用节点模型和当前智能体已保存的模型参数。
-const applicationId = ref('')
+// 生成上下文：沿用节点模型和节点自身已保存的模型参数。
 const activeModelId = ref('')
 
 function initGenerate() {
-  applicationId.value = route.params.applicationId as string
   activeModelId.value = props.modelId
 }
 
 function resetData() {
-  applicationId.value = ''
   activeModelId.value = ''
 }
 
 function requestGeneratePrompt(messages: PromptGenerateMessage[]) {
-  return store.postPromptGenerate(applicationId.value, activeModelId.value, {
+  return store.postPromptGenerate(activeModelId.value, {
     messages,
     prompt: PROMPT_TEMPLATE,
+    model_params_setting: props.modelParamsSetting,
   })
 }
 </script>
@@ -106,7 +103,7 @@ function requestGeneratePrompt(messages: PromptGenerateMessage[]) {
     title="生成提示词"
     placeholder="请输入提示词"
     empty-text="提示词显示在这里"
-    :disabled="!modelId || !route.params.applicationId"
+    :disabled="!modelId"
     :request="requestGeneratePrompt"
     @open="initGenerate"
     @closed="resetData"

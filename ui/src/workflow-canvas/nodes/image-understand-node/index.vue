@@ -138,7 +138,7 @@ onMounted(() => {
               </div>
               <div class="-mr-1">
                 <!-- 生成系统提示词 -->
-                <PromptGenerate :model-id="promptModelId" @replace="formData.system = $event" />
+                <PromptGenerate :model-id="promptModelId" :model-params-setting="formData.model_params_setting" @replace="formData.system = $event" />
               </div>
             </div>
           </template>
