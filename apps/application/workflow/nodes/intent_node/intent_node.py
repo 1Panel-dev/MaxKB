@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage, SystemMessage
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import AsyncRunner, CancelledException, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.status import Status
 from common.exception.app_exception import AppApiException
@@ -56,6 +56,14 @@ class IntentNode(INode):
     serializer_class = IntentNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "intent-node"
+
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self.async_runner = AsyncRunner()
+
+    def cancel(self):
+        self.async_runner.cancel()
+        super().cancel()
 
     def execute(self):
         workflow_params = self.get_workflow_parameters()
@@ -120,7 +128,7 @@ class IntentNode(INode):
 
         try:
             self._check_cancelled()
-            r = chat_model.invoke(message_list)
+            r = self.async_runner.run_async(lambda: self._await_invoke(chat_model, message_list))
             classification_result = r.content.strip()
             matched_branch = self._parse_classification_result(classification_result, branch)
 
@@ -135,6 +143,8 @@ class IntentNode(INode):
 
             self.complete(Status.SUCCESS, [self.branch_anchor(matched_branch["id"])])
 
+        except CancelledException:
+            raise  # 取消必须放行给 INode.run 置 CANCELLED,不能被 except Exception 吞成 other_branch
         except Exception as e:
             other_branch = self._find_other_branch(branch)
             if other_branch:
@@ -144,6 +154,10 @@ class IntentNode(INode):
                 self.complete(Status.SUCCESS, [self.branch_anchor(other_branch["id"])])
             else:
                 raise Exception(f"error: {str(e)}")
+
+    async def _await_invoke(self, chat_model, message_list):
+        """走原生 async 调用;协程被取消时 langchain 会断开底层连接,真正停止模型请求。"""
+        return await chat_model.ainvoke(message_list)
 
     def _get_history_message(self, history_chat_record, dialogue_number):
         start_index = len(history_chat_record) - dialogue_number

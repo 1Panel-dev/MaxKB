@@ -1,4 +1,5 @@
 # coding=utf-8
+import asyncio
 import uuid_utils.compat as uuid
 import requests
 from functools import reduce
@@ -9,7 +10,7 @@ from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
@@ -54,6 +55,14 @@ class TextToVideoNode(INode):
     serializer_class = TextToVideoNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "text-to-video-node"
+
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self.async_runner = AsyncRunner()
+
+    def cancel(self):
+        self.async_runner.cancel()
+        super().cancel()
 
     def execute(self):
         maxkb_logger.info(f"[TextToVideoNode] execute START, node_id={self.get_node_id()}")
@@ -117,7 +126,7 @@ class TextToVideoNode(INode):
         self.write_context("negative_prompt", self.workflow_manage.generate_prompt(negative_prompt))
 
         self._check_cancelled()
-        video_urls = ttv_model.generate_video(question, negative_prompt)
+        video_urls = self.async_runner.run_async(lambda: self._await_generate(ttv_model, question, negative_prompt))
         maxkb_logger.info(
             f"[TextToVideoNode] generate_video result: {video_urls is not None}, node_id={self.get_node_id()}"
         )
@@ -144,6 +153,9 @@ class TextToVideoNode(INode):
             self.write(
                 TextContent(str(uuid.uuid7()), video_label, Status.SUCCESS, node_info, Position(self.get_node_id()))
             )
+
+    async def _await_generate(self, ttv_model, question, negative_prompt):
+        return await asyncio.to_thread(ttv_model.generate_video, question, negative_prompt)
 
     def _upload_file(self, file, workflow_type, workflow_params):
         if workflow_type == WorkflowType.KNOWLEDGE:
