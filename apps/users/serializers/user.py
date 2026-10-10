@@ -44,12 +44,16 @@ from rest_framework import serializers
 from system_manage.models import AuthTargetType, SettingType, SystemSetting, WorkspaceUserResourcePermission
 from users.models import User
 
+# 允许的密码特殊字符（覆盖常见英文标点，含 : , ; ? < > / " ' [ ] { } | \ 等）
+PASSWORD_SPECIAL_CHARS = '!"#$%&\\\'()*+,-./:;<=>?@[\\\\]^_`{|}~'
+
 PASSWORD_REGEX = re.compile(
     r"^"  # 开始
     r"(?=.*[a-z])"  # 至少一个小写字母
-    r"(?=.*[-_!@#$%^&*`~.()+=])"  # 至少一个指定的特殊字符
-    r"(?:(?=.*[A-Z])|(?=.*\d))"  # 至少一个大写字母 或 数字
-    r"[a-zA-Z0-9-_!@#$%^&*`~.()+=]{6,20}"  # 总长度6~20个合法字符
+    r"(?=.*[A-Z])"  # 至少一个大写字母
+    r"(?=.*\d)"  # 至少一个数字
+    r"(?=.*[" + re.escape(PASSWORD_SPECIAL_CHARS) + r"])"  # 至少一个特殊字符
+    r"[a-zA-Z0-9" + re.escape(PASSWORD_SPECIAL_CHARS) + r"]{6,20}"  # 长度6~20，允许全部合法字符
     r"$"  # 结束
 )
 
