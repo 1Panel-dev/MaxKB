@@ -212,6 +212,6 @@ watch(
         <el-button type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">保存</el-button>
       </el-form>
     </div>
-    <SyncLogTable v-if="activeTab === 'logs' && knowledge" :knowledge-id="knowledge.id" />
+    <SyncLogTable v-if="activeTab === 'logs' && knowledge" :api="SyncApi" :knowledge-id="knowledge.id" />
   </div>
 </template>

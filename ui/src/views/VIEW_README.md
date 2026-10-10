@@ -738,11 +738,13 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 保存使用内容 loading 与按钮 loading，入口防止重复提交，不禁用各表单字段。
 `putKnowledgeSyncSetting` 成功后，以后台返回值更新草稿和详情 `meta.sync_setting`；失败保留草稿。
 同步方式复用 `constants/knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS`，按当前来源描述三种方式。
-`components/SyncLogTable.vue` 在日志页签按需挂载，接收知识库 ID，调用分页日志接口。
+`components/SyncLogTable.vue` 在日志页签按需挂载，接收知识库 ID 和 `index.vue` 传入的完整同步 API 对象，
+通过 `api.getKnowledgeSyncLogPage` 调用分页日志接口。
 日志表格沿用同步时间、同步内容、同步方式、同步状态、耗时五列，不新增操作入口。
 同步内容按“共 N 个文档（已同步、跳过、删除、失败）”展示，仅附加非零的跳过、删除和失败计数；
 跳过执行时直接展示原因，后台结果信息通过同步内容的悬停提示查看。
-状态使用圆点和“成功 / 失败 / 同步中 / 已跳过”文案，完整同步使用“完整同步”标签。
+状态复用 `MkStatusLabel`，同步中使用 `loading`，成功和失败分别使用 `success`、`failure`，
+不配置跳过状态；完整同步使用“完整同步”标签。
 进入日志页签、切换知识库和分页时查询，不做定时刷新。
 设置菜单的类型筛选由路由维护；当前仅接入 Workspace 接口，暂不增加前端权限判断。
 更换向量模型需确认，先保存再重新向量化，整条流程禁止重复提交；向量化失败时保留原模型比较基准，
