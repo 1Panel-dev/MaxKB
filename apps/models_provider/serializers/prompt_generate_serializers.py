@@ -61,13 +61,16 @@ class PromptGenerateSerializers(serializers.Serializer):
         if model.model_type not in (ModelTypeConst.LLM.name, ModelTypeConst.IMAGE.name):
             raise AppApiException(400, _("Model does not exists or is not an LLM model"))
         # 共享/系统级模型:workspace_id 为字符串 "None",不校验传入的工作空间;否则必须属于传入的工作空间
-        if model.workspace_id != "None" and self.data.get("workspace_id") != model.workspace_id:
+        if (
+            model.workspace_id != "None"
+            and self.data.get("workspace_id")
+            and self.data.get("workspace_id") != model.workspace_id
+        ):
             raise AppApiException(403, _("Model is not visible to the workspace"))
         return model
 
     def generate_prompt(self):
         model = self.is_valid(raise_exception=True)
-        workspace_id = self.data.get("workspace_id")
         model_id = self.data.get("model_id")
         model_params_setting = self.data.get("model_params_setting") or {}
         prompt = self.data.get("prompt")
@@ -84,7 +87,7 @@ class PromptGenerateSerializers(serializers.Serializer):
                 model_instance = ModelManage.get_model(model_id, lambda _id: get_model(model, **model_params))
             else:
                 model_instance = get_model_instance_by_model_workspace_id(
-                    model_id=model_id, workspace_id=workspace_id, **model_params_setting
+                    model_id=model_id, workspace_id=model.workspace_id, **model_params_setting
                 )
             try:
                 for r in model_instance.stream(
