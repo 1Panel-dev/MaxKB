@@ -32,9 +32,11 @@ from knowledge.api.document import (
     DocumentTagsAPI,
     DocumentTreeReadAPI,
     QaDocumentCreateAPI,
+    QaDocumentCreateByFileAPI,
     RefreshAPI,
     SyncWebAPI,
     TableDocumentCreateAPI,
+    TableDocumentCreateByFileAPI,
     TemplateExportAPI,
     WebDocumentCreateAPI,
 )
@@ -1292,6 +1294,47 @@ class QaDocumentView(APIView):
         )
 
 
+class QaDocumentByFileView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        summary=_("Create QA documents from uploaded files"),
+        description=_("Create QA documents from uploaded files"),
+        operation_id=_("Create QA documents from uploaded files"),  # type: ignore
+        request=QaDocumentCreateByFileAPI.get_request(),
+        parameters=QaDocumentCreateByFileAPI.get_parameters(),
+        responses=QaDocumentCreateByFileAPI.get_response(),
+        tags=[_("Knowledge Base/Documentation")],  # type: ignore
+    )
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        ViewPermission(
+            [RoleConstants.USER.get_workspace_role()],
+            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+            compare=CompareConstants.AND,
+        ),
+    )
+    @log(
+        menu="document",
+        operate="Create QA documents from uploaded files",
+        get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+            get_knowledge_operation_object(keywords.get("knowledge_id")),
+            {
+                "name": str(r.data.get("file_id_list", [])),
+                "file_id_list": r.data.get("file_id_list", []),
+            },
+        ),
+    )
+    def post(self, request: Request, workspace_id: str, knowledge_id: str):
+        return result.success(
+            DocumentSerializers.Create(
+                data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
+            ).save_qa_by_file_ids(request.data)
+        )
+
+
 class TableDocumentView(APIView):
     authentication_classes = [TokenAuth]
     parser_classes = [MultiPartParser]
@@ -1331,6 +1374,47 @@ class TableDocumentView(APIView):
             DocumentSerializers.Create(
                 data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
             ).save_table({"file_list": request.FILES.getlist("file")}, with_valid=True)
+        )
+
+
+class TableDocumentByFileView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        summary=_("Create table documents from uploaded files"),
+        description=_("Create table documents from uploaded files"),
+        operation_id=_("Create table documents from uploaded files"),  # type: ignore
+        request=TableDocumentCreateByFileAPI.get_request(),
+        parameters=TableDocumentCreateByFileAPI.get_parameters(),
+        responses=TableDocumentCreateByFileAPI.get_response(),
+        tags=[_("Knowledge Base/Documentation")],  # type: ignore
+    )
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        ViewPermission(
+            [RoleConstants.USER.get_workspace_role()],
+            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+            compare=CompareConstants.AND,
+        ),
+    )
+    @log(
+        menu="document",
+        operate="Create table documents from uploaded files",
+        get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+            get_knowledge_operation_object(keywords.get("knowledge_id")),
+            {
+                "name": str(r.data.get("file_id_list", [])),
+                "file_id_list": r.data.get("file_id_list", []),
+            },
+        ),
+    )
+    def post(self, request: Request, workspace_id: str, knowledge_id: str):
+        return result.success(
+            DocumentSerializers.Create(
+                data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
+            ).save_table_by_file_ids(request.data)
         )
 
 

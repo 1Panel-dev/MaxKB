@@ -9,6 +9,11 @@ export interface DocumentQuickCreatePayload {
   name: string
 }
 
+/** 使用已上传文件创建表格或 QA 文档。 */
+export interface DocumentFileImportPayload {
+  file_id_list: string[]
+}
+
 /** 文档召回及来源设置。 */
 export interface DocumentSettingPayload {
   hit_handling_method: DocumentHitHandling

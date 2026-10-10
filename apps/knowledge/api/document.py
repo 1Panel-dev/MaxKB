@@ -11,6 +11,7 @@ from knowledge.serializers.document import (
     DocumentBatchGenerateRelatedSerializer,
     DocumentBatchRefreshSerializer,
     DocumentInstanceSerializer,
+    DocumentInstanceFileIdsSerializer,
     DocumentMigrateSerializer,
     DocumentRefreshSerializer,
     DocumentWebInstanceSerializer,
@@ -289,6 +290,22 @@ class TableDocumentCreateAPI(APIMixin):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
+
+
+class TableDocumentCreateByFileAPI(TableDocumentCreateAPI):
+    @staticmethod
+    def get_request():
+        return DocumentInstanceFileIdsSerializer
+
+
+class QaDocumentCreateByFileAPI(TableDocumentCreateByFileAPI):
+    pass
+
+
+class DocumentCreateByFileAPI(TableDocumentCreateByFileAPI):
+    @staticmethod
+    def get_parameters():
+        return [parameter for parameter in TableDocumentCreateAPI.get_parameters() if parameter.name != "workspace_id"]
 
 
 class QaDocumentCreateAPI(TableDocumentCreateAPI):

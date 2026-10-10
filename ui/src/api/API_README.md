@@ -559,9 +559,10 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 发送多文件 FormData（重复 `file` 字段）与 JSON 字符串 `doc_strategy`，返回 `DocumentSplitResult[]`；
 页面将解析结果的 `content` 转为 `paragraphs`，保留 `source_file_id` 与策略，再通过
 `putBatchCreateDocuments` PUT `document/batch_create` 创建文档，与空白文档创建共用同一接口封装。
-`postImportTableDocumentFiles` 和 `postImportQADocumentFiles` 分别向 `document/table` 和
-`document/qa` 发送多文件 FormData，
-由服务端解析并创建。`exportTableDocumentTemplate` 和 `exportQADocumentTemplate` 分别使用 GET
+`postImportTableDocumentsByFileIds` 和 `postImportQADocumentsByFileIds` 分别向
+`document/table_by_file_ids` 和 `document/qa_by_file_ids` 发送 `DocumentFileImportPayload`
+（`{ file_id_list: string[] }`），复用上传成功后的文件 ID，由服务端解析并创建，不再次上传文件。
+`exportTableDocumentTemplate` 和 `exportQADocumentTemplate` 分别使用 GET
 `/workspace/knowledge/document/table_template/export` 和 `/workspace/knowledge/document/template/export`，查询参数 `type` 为
 `excel` / `csv`。上传解析与创建类型维护在 `types/document.ts`，统一通过 `@/api/types` 导入。
 共享文档 API 不提供上传写入方法。

@@ -38,6 +38,7 @@ from common.utils.logger import maxkb_logger
 from common.utils.split_model import flat_map
 from django.contrib.postgres.fields import JSONField
 from django.core import validators
+from django.core.files.base import ContentFile
 from django.db import models, transaction
 from django.db.models import F, Func, QuerySet, Value
 from django.db.models.aggregates import Max
@@ -259,6 +260,20 @@ class DocumentInstanceTableSerializer(serializers.Serializer):
     file_list = serializers.ListSerializer(
         required=True, label=_("file list"), child=serializers.FileField(required=True, label=_("file"))
     )
+
+
+class DocumentInstanceFileIdsSerializer(serializers.Serializer):
+    file_id_list = serializers.ListField(
+        required=True,
+        allow_empty=False,
+        child=serializers.UUIDField(),
+        label=_("file id list"),
+    )
+
+    def validate_file_id_list(self, value):
+        if len(value) != len(set(value)):
+            raise serializers.ValidationError(_("Duplicate file ids are not allowed"))
+        return value
 
 
 class DocumentRefreshSerializer(serializers.Serializer):
@@ -1255,18 +1270,61 @@ class DocumentSerializers(serializers.Serializer):
                 }
             ).batch_save(document_list)
 
-        def parse_qa_file(self, file):
-            #  保存源文件
-            source_file_id = uuid.uuid7()
-            source_file = File(
-                id=source_file_id,
-                file_name=file.name,
-                source_type=FileSourceType.KNOWLEDGE,
-                source_id=self.data.get("knowledge_id"),
-                meta={},
+        def save_table_by_file_ids(self, instance: Dict):
+            return self._save_by_file_ids(instance, self.parse_table_file)
+
+        def save_qa_by_file_ids(self, instance: Dict):
+            return self._save_by_file_ids(instance, self.parse_qa_file)
+
+        def _save_by_file_ids(self, instance: Dict, parse_file):
+            request_serializer = DocumentInstanceFileIdsSerializer(data=instance)
+            request_serializer.is_valid(raise_exception=True)
+            self.is_valid(raise_exception=True)
+            knowledge_id = self.data.get("knowledge_id")
+            knowledge = QuerySet(Knowledge).filter(id=knowledge_id, workspace_id=self.data.get("workspace_id")).first()
+            if knowledge is None:
+                raise AppApiException(500, _("Knowledge id does not exist"))
+            file_ids = request_serializer.validated_data["file_id_list"]
+            temporary_types = [
+                FileSourceType.TEMPORARY_30_MINUTE,
+                FileSourceType.TEMPORARY_120_MINUTE,
+                FileSourceType.TEMPORARY_1_DAY,
+            ]
+            files = {
+                file.id: file
+                for file in QuerySet(File).filter(
+                    Q(source_type=FileSourceType.KNOWLEDGE, source_id=str(knowledge_id))
+                    | Q(source_type__in=temporary_types, meta__user_id=str(self.data.get("user_id"))),
+                    id__in=file_ids,
+                )
+            }
+            if len(files) != len(file_ids):
+                raise AppApiException(500, _("File does not exist or no permission to access"))
+            source_files = [files[file_id] for file_id in file_ids]
+            validate_knowledge_file_size(knowledge, source_files)
+            document_list = []
+            for source_file in source_files:
+                with ContentFile(source_file.get_bytes(), name=source_file.file_name) as file:
+                    validate_knowledge_file_size(knowledge, [file])
+                    document_list.extend(parse_file(file, source_file_id=source_file.id))
+            # Keep uploaded sources after the temporary-file cleanup window.
+            QuerySet(File).filter(id__in=file_ids).update(
+                source_type=FileSourceType.KNOWLEDGE, source_id=str(knowledge_id)
             )
-            source_file.save(file.read())
-            file.seek(0)
+            return DocumentSerializers.Batch(data=self.data).batch_save(document_list)
+
+        def parse_qa_file(self, file, source_file_id=None):
+            if source_file_id is None:
+                source_file_id = uuid.uuid7()
+                source_file = File(
+                    id=source_file_id,
+                    file_name=file.name,
+                    source_type=FileSourceType.KNOWLEDGE,
+                    source_id=self.data.get("knowledge_id"),
+                    meta={},
+                )
+                source_file.save(file.read())
+                file.seek(0)
 
             get_buffer = FileBufferHandle().get_buffer
             for parse_qa_handle in parse_qa_handle_list:
@@ -1277,18 +1335,18 @@ class DocumentSerializers(serializers.Serializer):
                     return documents
             raise AppApiException(500, _("Unsupported file format"))
 
-        def parse_table_file(self, file):
-            #  保存源文件
-            source_file_id = uuid.uuid7()
-            source_file = File(
-                id=source_file_id,
-                file_name=file.name,
-                source_type=FileSourceType.KNOWLEDGE,
-                source_id=self.data.get("knowledge_id"),
-                meta={},
-            )
-            source_file.save(file.read())
-            file.seek(0)
+        def parse_table_file(self, file, source_file_id=None):
+            if source_file_id is None:
+                source_file_id = uuid.uuid7()
+                source_file = File(
+                    id=source_file_id,
+                    file_name=file.name,
+                    source_type=FileSourceType.KNOWLEDGE,
+                    source_id=self.data.get("knowledge_id"),
+                    meta={},
+                )
+                source_file.save(file.read())
+                file.seek(0)
 
             get_buffer = FileBufferHandle().get_buffer
             for parse_table_handle in parse_table_handle_list:

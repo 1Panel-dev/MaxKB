@@ -99,15 +99,20 @@ function handleSubmit() {
   if (!validateImportFiles()) return
   if (previewVisible.value && !previewRef.value?.validate()) return
   const files = successfulFiles.value.flatMap((file) => (file.raw ? [file.raw] : []))
-  if (!files.length) return
+  const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
+  if (props.mode !== 'text' && fileIds.length !== successfulFiles.value.length) {
+    MsgWarning('文件上传结果缺少文件 ID，请重新上传')
+    return
+  }
+  if (props.mode === 'text' && !files.length) return
   loading.value = true
   let importRequest: Promise<boolean>
   if (props.mode === 'table') {
-    // 表格由服务端解析并创建文档。
-    importRequest = props.api.postImportTableDocumentFiles(props.knowledgeId, files).then(() => true)
+    // 复用已上传表格，由服务端解析并创建文档。
+    importRequest = props.api.postImportTableDocumentsByFileIds(props.knowledgeId, fileIds).then(() => true)
   } else if (props.mode === 'qa') {
-    // QA 问答对由服务端解析并创建文档。
-    importRequest = props.api.postImportQADocumentFiles(props.knowledgeId, files).then(() => true)
+    // 复用已上传 QA 文件，由服务端解析并创建文档。
+    importRequest = props.api.postImportQADocumentsByFileIds(props.knowledgeId, fileIds).then(() => true)
   } else if (previewVisible.value) {
     if (previewDocuments.value.every((document) => !document.content.length)) {
       MsgWarning('没有可导入的分段，请重新生成预览')

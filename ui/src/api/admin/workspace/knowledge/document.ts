@@ -3,6 +3,7 @@ import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   Dict,
   DocumentGeneratePayload,
+  DocumentFileImportPayload,
   DocumentImportPayload,
   DocumentSplitResult,
   DocumentStrategy,
@@ -36,19 +37,13 @@ const postSplitDocuments = (knowledgeId: string, files: File[], strategy: Docume
   return post<FormData, DocumentSplitResult[]>(`${getPrefix(knowledgeId)}/split`, data)
 }
 
-/** 导入表格文件，每个 sheet 由服务端创建独立文档。 */
-const postImportTableDocumentFiles = (knowledgeId: string, files: File[]) => {
-  const data = new FormData()
-  files.forEach((file) => data.append('file', file))
-  return post<FormData, DocumentItem[]>(`${getPrefix(knowledgeId)}/table`, data)
-}
+/** 从已上传表格创建文档，每个 sheet 由服务端创建独立文档。 */
+const postImportTableDocumentsByFileIds = (knowledgeId: string, fileIds: string[]) =>
+  post<DocumentFileImportPayload, DocumentItem[]>(`${getPrefix(knowledgeId)}/table_by_file_ids`, { file_id_list: fileIds })
 
-/** 导入 QA 问答对文件。 */
-const postImportQADocumentFiles = (knowledgeId: string, files: File[]) => {
-  const data = new FormData()
-  files.forEach((file) => data.append('file', file))
-  return post<FormData, DocumentItem[]>(`${getPrefix(knowledgeId)}/qa`, data)
-}
+/** 从已上传文件创建 QA 问答对文档。 */
+const postImportQADocumentsByFileIds = (knowledgeId: string, fileIds: string[]) =>
+  post<DocumentFileImportPayload, DocumentItem[]>(`${getPrefix(knowledgeId)}/qa_by_file_ids`, { file_id_list: fileIds })
 
 /** 按地址导入 Web 文档并应用文档处理策略。 */
 const postWebDocument = (knowledgeId: string, payload: WebDocumentImportPayload) =>
@@ -163,8 +158,8 @@ export default {
   getDocumentPage,
   putBatchCreateDocuments,
   postSplitDocuments,
-  postImportTableDocumentFiles,
-  postImportQADocumentFiles,
+  postImportTableDocumentsByFileIds,
+  postImportQADocumentsByFileIds,
   postWebDocument,
   getLarkDocumentList,
   postImportLarkDocuments,
