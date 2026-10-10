@@ -38,7 +38,7 @@ defineExpose({ validate, getData })
 <template>
   <MkDynamicsForm ref="dynamicsFormRef" v-model="formData" :render-data="baseFormList" label-position="top" require-asterisk-position="right">
     <template #default>
-      <h4 class="mb-4 mt-1">{{ chatTitle }}</h4>
+      <h4 class="mb-4 mk-title-decoration">{{ chatTitle }}</h4>
     </template>
   </MkDynamicsForm>
 </template>

@@ -1,149 +1,167 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
-import { computed, ref, useAttrs, nextTick, inject } from 'vue'
-import type { FormField } from '@/components/mk-dynamics-form/type'
+import { computed, inject, nextTick, ref, toRaw, useAttrs, useTemplateRef, watch } from 'vue'
+import { cloneDeep, isEqual } from 'lodash'
+import { formItemContextKey, type TableInstance, type TreeNode } from 'element-plus'
+import type { Dict } from '@/api/types'
 import { post } from '@/api/admin/core/request'
-import { cloneDeep } from 'lodash'
-import { formItemContextKey } from 'element-plus'
-import type { LoadFunction } from 'element-plus'
-const getExtra = inject('get_extra') as DynamicFormValue
-const elFormItem = inject(formItemContextKey, void 0)
+import { getFileIconUrl } from '@/utils/icon'
+import type { DynamicFormValue, FormField } from '../../type'
 
-defineOptions({ name: 'DynamicFormTree' })
+defineOptions({ name: 'DynamicFormTree', inheritAttrs: false })
 
-const allCheck = ref<boolean>(false)
-
-const handleAllCheckChange = (checked: boolean) => {
-  if (checked) {
-    const nodes = Object.values(treeRef.value?.store.nodesMap || {}) as DynamicFormValue[]
-    nodes.forEach((node) => {
-      if (!node.disabled) {
-        treeRef.value?.setChecked(node.data, true, false)
-      }
-    })
-  } else {
-    treeRef.value?.setCheckedKeys([])
-  }
-}
-const textField = computed(() => {
-  return props.formField.text_field ? props.formField.text_field : 'label'
-})
-
-const valueField = computed(() => {
-  return props.formField.value_field ? props.formField.value_field : 'value'
-})
-const childrenField = computed(() => {
-  return props.formField.childrenField ? props.formField.childrenField : 'children'
-})
-const options = computed(() => {
-  return props.formField.option_list ? props.formField.option_list : []
-})
-const propsData = computed(() => {
-  return {
-    label: textField,
-    children: childrenField,
-    isLeaf: (data: DynamicFormValue) => data.leaf,
-    disabled: (data: DynamicFormValue) => data.disabled,
-  }
-})
-
-const attrs = useAttrs() as DynamicFormValue
-const treeRef = ref<DynamicFormValue>(null)
-function renderTemplate(template: string, data: DynamicFormValue) {
-  return template.replace(/\$\{(\w+)\}/g, (match, key) => {
-    return data[key] !== undefined ? data[key] : match
-  })
+interface DocumentRow extends Dict<DynamicFormValue> {
+  hasChildren: boolean
 }
 
-const loadNode: LoadFunction = (node, resolve) => {
-  const url = renderTemplate(
-    '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' + attrs.fetch_list_function,
-    {
-      ...props.otherParams,
-      ...(getExtra ? getExtra() : {}),
-    },
-  )
-  loading.value = true
-  return post<{ current_node: DynamicFormValue }, DynamicFormValue[]>(url, { current_node: node.level === 0 ? undefined : node.data })
-    .then((children) => {
-      resolve(children)
-      children.forEach((childNode) => {
-        if (childNode.is_exist) {
-          treeRef.value?.setChecked(childNode.token, true, false)
-        }
-      })
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
 const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField; otherParams: DynamicFormValue }>(), {
   modelValue: () => [],
 })
+const emit = defineEmits<{ 'update:modelValue': [value: DynamicFormValue[]]; change: [value: DynamicFormValue[]] }>()
+const attrs = useAttrs()
+const getExtra = inject<() => Dict<DynamicFormValue>>('get_extra')
+const elFormItem = inject(formItemContextKey, undefined)
 
-const emit = defineEmits(['update:modelValue', 'change'])
+// 字段映射与表格数据，保留完整节点对象作为选中值。
+const textField = computed(() => props.formField.text_field || 'label')
+const valueField = computed(() => props.formField.value_field || 'value')
+const childrenField = computed(() => props.formField.childrenField || 'children')
+const options = computed(() => props.formField.option_list ?? [])
+const lazy = computed(() => Boolean(props.formField.attrs?.lazy ?? attrs.lazy))
+const documentRows = ref<DocumentRow[]>([])
+const documentTableRef = useTemplateRef<{ tableRef?: TableInstance }>('documentTableRef')
+const tableKey = ref(0)
+const pendingLoads = ref(0)
+const documentNodes = new Map<string | number, DocumentRow>()
+const originalNodes = new WeakMap<DocumentRow, Dict<DynamicFormValue>>()
+let restoringSelection = false
 
-const modelValueProxy = computed({
-  get: () => {
-    if (!props.modelValue) {
-      emit('update:modelValue', [])
+function normalizeDocuments(documents: Dict<DynamicFormValue>[]): DocumentRow[] {
+  return documents.map((document) => {
+    const row: DocumentRow = {
+      ...document,
+      hasChildren: lazy.value && (document.leaf === false || (document.leaf !== true && (document.type === 'folder' || !document.type))),
     }
-    return props.modelValue
-  },
-  set: (v: DynamicFormValue[]) => {
-    emit('update:modelValue', v)
-  },
-})
-const change = () => {
-  modelValueProxy.value = cloneDeep(treeRef.value?.getCheckedNodes() || [])
-  nextTick(() => {
-    if (elFormItem?.validate) {
-      elFormItem.validate('change')
+    originalNodes.set(row, document)
+    documentNodes.set(row[valueField.value], row)
+    if (Array.isArray(document[childrenField.value])) {
+      row[childrenField.value] = normalizeDocuments(document[childrenField.value])
     }
+    return row
   })
 }
 
-const loading = ref<boolean>(false)
+function handleSelectionChange(selection: unknown[]) {
+  if (restoringSelection) return
+  const selectedDocuments = cloneDeep((selection as DocumentRow[]).map((row) => originalNodes.get(toRaw(row)) ?? row))
+  if (isEqual(selectedDocuments, props.modelValue ?? [])) return
+  emit('update:modelValue', selectedDocuments)
+  emit('change', selectedDocuments)
+  nextTick(() => elFormItem?.validate('change').catch(() => {}))
+}
+
+function restoreSelection() {
+  const table = documentTableRef.value?.tableRef
+  if (!table) return
+  const selectedKeys = new Set((props.modelValue ?? []).map((document: Dict<DynamicFormValue>) => document[valueField.value]))
+  restoringSelection = true
+  table.clearSelection()
+  documentNodes.forEach((row, key) => {
+    if (row.is_exist || selectedKeys.has(key)) table.toggleRowSelection(row, true, true)
+  })
+  restoringSelection = false
+  handleSelectionChange(table.getSelectionRows() as DocumentRow[])
+}
+
+// 懒加载沿用工具数据源协议，根目录不传 current_node。
+function renderTemplate(template: string, data: Dict<DynamicFormValue>) {
+  return template.replace(/\$\{(\w+)\}/g, (match, key) => (data[key] !== undefined ? String(data[key]) : match))
+}
+const requestUrl = computed(() =>
+  renderTemplate(
+    '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' +
+      (props.formField.attrs?.fetch_list_function ?? attrs.fetch_list_function),
+    { ...props.otherParams, ...getExtra?.() },
+  ),
+)
+
+function loadDocuments(currentNode?: Dict<DynamicFormValue>) {
+  pendingLoads.value += 1
+  return post<{ current_node?: Dict<DynamicFormValue> }, Dict<DynamicFormValue>[]>(requestUrl.value, { current_node: currentNode })
+    .then(normalizeDocuments)
+    .finally(() => {
+      pendingLoads.value -= 1
+    })
+}
+
+function loadNode(document: DocumentRow, treeNode: TreeNode, resolve: (documents: DocumentRow[]) => void) {
+  return loadDocuments(originalNodes.get(toRaw(document)) ?? document)
+    .then((documents) => {
+      resolve(documents)
+      return nextTick(restoreSelection)
+    })
+    .catch(() => {
+      // Table 无 reject 回调，恢复加载标记以便再次展开重试。
+      treeNode.loading = false
+    })
+}
+
+watch(
+  [options, lazy, requestUrl],
+  () => {
+    documentNodes.clear()
+    documentRows.value = []
+    tableKey.value += 1
+    if (!lazy.value) {
+      documentRows.value = normalizeDocuments(options.value)
+      return nextTick(restoreSelection)
+    }
+    return loadDocuments()
+      .then((documents) => {
+        documentRows.value = documents
+        return nextTick(restoreSelection)
+      })
+      .catch(() => {
+        // 请求层统一提示错误。
+      })
+  },
+  { immediate: true, deep: true },
+)
+watch(() => props.modelValue, restoreSelection, { deep: true })
 </script>
 
 <template>
-  <div v-loading="loading" class="w-full">
-    <div class="card-never border-r-6 mb-16">
-      <el-checkbox v-model="allCheck" label="全选" size="large" class="ml-24" @change="handleAllCheckChange" />
-    </div>
-    <div style="height: calc(100vh - 450px)">
-      <el-scrollbar>
-        <el-tree
-          :data="options"
-          @check-change="change"
-          v-loading="loading"
-          style="width: 100%"
-          :props="propsData"
-          :load="loadNode"
-          :lazy="attrs.lazy"
-          show-checkbox
-          :node-key="valueField"
-          ref="treeRef"
-        >
-          <template #default="{ node, data }">
-            <div class="flex align-center lighter">
-              <img :src="data.icon" alt="" height="20" v-if="data.icon" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="20" v-else-if="data.type === 'folder'" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="22" v-else-if="data.type === 'docx' || data.name.endsWith('.docx')" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="22" v-else-if="data.type === 'sheet' || data.name.endsWith('.xlsx')" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="22" v-else-if="data.name.endsWith('xls')" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="22" v-else-if="data.name.endsWith('csv')" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="22" v-else-if="data.name.endsWith('.pdf')" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="22" v-else-if="data.name.endsWith('.html')" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="22" v-else-if="data.name.endsWith('.txt')" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="22" v-else-if="data.name.endsWith('.zip')" />
-              <img src="@/assets/empty/no-data.svg" alt="" height="22" v-else-if="data.name.endsWith('.md')" />
-
-              <span class="ml-4">{{ node.label }}</span>
-            </div>
-          </template>
-        </el-tree>
-      </el-scrollbar>
-    </div>
-  </div>
+  <MkTable
+    :key="tableKey"
+    ref="documentTableRef"
+    v-loading="pendingLoads > 0"
+    :data="documentRows"
+    :row-key="valueField"
+    :tree-props="{ children: childrenField, hasChildren: 'hasChildren', checkStrictly: false }"
+    :load="loadNode"
+    :max-table-height="430"
+    :lazy="lazy"
+    @selection-change="handleSelectionChange"
+  >
+    <!-- 选择文档或文件夹，全选由表格维护 -->
+    <el-table-column type="selection" width="40" reserve-selection :selectable="(row: DocumentRow) => !row.disabled && !row.is_exist" />
+    <el-table-column class-name="expand-name-column" label="全部文档" :prop="textField">
+      <template #default="{ row }: { row: DocumentRow }">
+        <div class="flex-align-center min-w-0 flex-1 gap-2">
+          <img v-if="row.icon" :src="row.icon" alt="" class="w-4.5 shrink-0" />
+          <img v-else-if="row.type === 'folder'" src="@/assets/file-type/file-icon.svg" alt="" class="w-4.5 shrink-0" />
+          <img
+            v-else
+            :src="
+              getFileIconUrl(
+                row.type === 'docx' ? `${row.name}.docx` : row.type === 'sheet' ? `${row.name}.xlsx` : String(row.name ?? row[textField] ?? ''),
+              )
+            "
+            alt=""
+            class="w-4.5 shrink-0"
+          />
+          <span :title="row[textField]" class="min-w-0 truncate">{{ row[textField] }}</span>
+        </div>
+      </template>
+    </el-table-column>
+  </MkTable>
 </template>
