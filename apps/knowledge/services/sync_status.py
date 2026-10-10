@@ -3,16 +3,70 @@
 from datetime import timedelta
 from threading import Event, Thread
 
+from celery_once.helpers import import_backend, queue_once_key
 from common.utils.logger import maxkb_logger
 from django.db import close_old_connections, transaction
 from django.db.models import Q, QuerySet
 from django.utils import timezone
 
-from knowledge.models import Document, Knowledge, KnowledgeSyncLog, KnowledgeSyncStatus
+from knowledge.models import Document, Knowledge, KnowledgeSyncLog, KnowledgeSyncStatus, KnowledgeType
 from knowledge.services.workflow_sync import _delete_workflow_documents
 
 SYNC_HEARTBEAT_SECONDS = 60
 SYNC_STALE_TIMEOUT = timedelta(hours=1)
+SYNC_QUEUE_TASKS = {
+    KnowledgeType.WEB: "celery:sync_replace_web_knowledge",
+    KnowledgeType.LARK: "celery:scheduled_sync_lark_knowledge",
+    KnowledgeType.WORKFLOW: "celery:scheduled_sync_workflow_knowledge",
+}
+
+
+def _clear_sync_queue_lock(knowledge):
+    """Release only the interrupted knowledge's QueueOnce lock, under its database row lock."""
+    from ops import celery_app
+
+    task_name = SYNC_QUEUE_TASKS.get(knowledge.type)
+    if task_name is not None:
+        backend = import_backend(celery_app.conf.ONCE)
+        backend.clear_lock(queue_once_key(task_name, {"knowledge_id": str(knowledge.id)}, ["knowledge_id"]))
+
+
+def fail_running_sync_logs_on_startup():
+    """End interrupted runs before the worker starts accepting new tasks; do not resume them."""
+    knowledge_ids = list(
+        QuerySet(KnowledgeSyncLog)
+        .filter(status=KnowledgeSyncStatus.RUNNING)
+        .order_by()
+        .values_list("knowledge_id", flat=True)
+        .distinct()
+    )
+    failed = 0
+    for knowledge_id in knowledge_ids:
+        with transaction.atomic():
+            knowledge = QuerySet(Knowledge).select_for_update().filter(id=knowledge_id).first()
+            running_logs = (
+                QuerySet(KnowledgeSyncLog)
+                .select_for_update()
+                .filter(knowledge_id=knowledge_id, status=KnowledgeSyncStatus.RUNNING)
+            )
+            now = timezone.now()
+            interrupted = 0
+            for sync_log in running_logs:
+                interrupted += (
+                    QuerySet(KnowledgeSyncLog)
+                    .filter(id=sync_log.id, status=KnowledgeSyncStatus.RUNNING)
+                    .update(
+                        status=KnowledgeSyncStatus.FAILURE,
+                        failed_count=max(sync_log.failed_count, 1),
+                        duration_ms=max(0, round((now - sync_log.create_time).total_seconds() * 1000)),
+                        message="Synchronization interrupted by service restart",
+                        update_time=now,
+                    )
+                )
+            if interrupted and knowledge is not None:
+                _clear_sync_queue_lock(knowledge)
+            failed += interrupted
+    return failed
 
 
 def start_sync_heartbeat(sync_log_id):

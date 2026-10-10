@@ -1,6 +1,17 @@
 """Worker entry points for managing knowledge synchronization schedules."""
 
+from celery.signals import worker_init
+from common.utils.logger import maxkb_logger
 from ops import celery_app
+
+
+@worker_init.connect
+def fail_interrupted_knowledge_synchronizations(sender=None, **kwargs):
+    from knowledge.services.sync_status import fail_running_sync_logs_on_startup
+
+    failed = fail_running_sync_logs_on_startup()
+    if failed:
+        maxkb_logger.info(f"Marked {failed} interrupted knowledge synchronizations as failed on startup")
 
 
 @celery_app.task(name="celery:deploy_knowledge_sync_job")
