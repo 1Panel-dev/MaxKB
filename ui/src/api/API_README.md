@@ -198,14 +198,13 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 
 ### 系统提示词生成
 
-Workspace、System 资源管理和 System 共享资源的 `application/application.ts` 均提供
-`postPromptGenerate(applicationId, modelId, payload)`，请求结构共用 `PromptGeneratePayload`。
-路径分别为 `/workspace/<workspaceId>/application/<applicationId>/model/<modelId>/prompt_generate`、
-`/system/resource/application/<applicationId>/model/<modelId>/prompt_generate` 和
-`/system/shared/application/<applicationId>/model/<modelId>/prompt_generate`，System 接口不依赖工作空间 ID。
+Workspace、System 资源管理和 System 共享资源均把 `postPromptGenerate(modelId, payload)` 放在对应范围的
+`model.ts`，请求结构共用 `PromptGeneratePayload`（含 `model_params_setting`）。
+路径为 `/workspace/<workspaceId>/model/<modelId>/prompt_generate` 与 `/system/model/<modelId>/prompt_generate`，
+System 接口不依赖工作空间 ID。
 均返回原始 SSE Response，由公共生成组件读取。画布的 `PromptGenerate` 通过
 `useWorkflowStore(apiType).postPromptGenerate` 调用；三个范围的 Store 适配器分别引用对应的
-Application API，直接转发生成请求，不使用查询缓存或请求去重。
+Model API，直接转发生成请求，不使用查询缓存或请求去重。
 
 ### 知识库维护
 

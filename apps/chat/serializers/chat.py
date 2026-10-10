@@ -8,7 +8,6 @@
 """
 
 import json
-import os
 import queue
 import queue as thread_queue
 import threading
@@ -20,7 +19,6 @@ from django.db.models import QuerySet
 from django.http import StreamingHttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from rest_framework import serializers
 from rest_framework.request import Request
 
@@ -53,11 +51,8 @@ from common.exception.app_exception import AppApiException, AppChatNumOutOfBound
 from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.openai_to_response import OpenaiToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
-from common.utils.common import get_file_content
 from common.utils.logger import maxkb_logger
-from maxkb.conf import PROJECT_DIR
-from models_provider.models import Model, Status
-from models_provider.tools import get_model_instance_by_model_workspace_id
+from models_provider.models import Status
 from system_manage.models.chat_user_token_quota import ChatUserTokenQuota
 
 _CHAT_UNSET = object()
@@ -674,93 +669,6 @@ class ResumeSerializers(serializers.Serializer):
                     yield self._sse(msg_id, json.dumps(msg, ensure_ascii=False))
         finally:
             yield "data: [DONE]\n\n"
-
-
-# ==================== 提示词生成 ====================
-
-SYSTEM_ROLE = get_file_content(os.path.join(PROJECT_DIR, "apps", "chat", "template", "generate_prompt_system"))
-
-
-class ChatMessagesSerializers(serializers.Serializer):
-    role = serializers.CharField(required=True, label=_("Role"))
-    content = serializers.CharField(required=True, label=_("Content"))
-
-
-class GeneratePromptSerializers(serializers.Serializer):
-    prompt = serializers.CharField(required=True, label=_("Prompt template"))
-    messages = serializers.ListSerializer(child=ChatMessagesSerializers(), required=True, label=_("Chat context"))
-
-    def is_valid(self, *, raise_exception=False):
-        super().is_valid(raise_exception=True)
-        messages = self.data.get("messages")
-
-        if len(messages) > 30:
-            raise AppApiException(400, _("Too many messages"))
-
-        for index in range(len(messages)):
-            role = messages[index].get("role")
-            if role == "ai" and index % 2 != 1:
-                raise AppApiException(400, _("Authentication failed. Please verify that the parameters are correct."))
-            if role == "user" and index % 2 != 0:
-                raise AppApiException(400, _("Authentication failed. Please verify that the parameters are correct."))
-            if role not in ["user", "ai"]:
-                raise AppApiException(400, _("Authentication failed. Please verify that the parameters are correct."))
-
-
-class PromptGenerateSerializer(serializers.Serializer):
-    workspace_id = serializers.CharField(required=False, label=_("Workspace ID"))
-    model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model"))
-    application_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Application"))
-
-    def is_valid(self, *, raise_exception=False):
-        super().is_valid(raise_exception=True)
-        workspace_id = self.data.get("workspace_id")
-        query_set = QuerySet(Application).filter(id=self.data.get("application_id"))
-        if workspace_id:
-            query_set = query_set.filter(workspace_id=workspace_id)
-        application = query_set.first()
-        if application is None:
-            raise AppApiException(500, _("Application id does not exist"))
-        return application
-
-    def generate_prompt(self, instance: dict):
-        application = self.is_valid(raise_exception=True)
-        GeneratePromptSerializers(data=instance).is_valid(raise_exception=True)
-        workspace_id = self.data.get("workspace_id")
-        model_id = self.data.get("model_id")
-        prompt = instance.get("prompt")
-        messages = instance.get("messages")
-
-        message = messages[-1]["content"]
-        q = prompt.replace("{userInput}", message)
-
-        messages[-1]["content"] = q
-        SUPPORTED_MODEL_TYPES = ["LLM", "IMAGE"]
-        model_exist = QuerySet(Model).filter(id=model_id, model_type__in=SUPPORTED_MODEL_TYPES).exists()
-        if not model_exist:
-            raise Exception(_("Model does not exists or is not an LLM model"))
-
-        def process():
-            model = get_model_instance_by_model_workspace_id(
-                model_id=model_id, workspace_id=workspace_id, **application.model_params_setting
-            )
-            try:
-                for r in model.stream(
-                    [
-                        SystemMessage(content=SYSTEM_ROLE),
-                        *[
-                            HumanMessage(content=m.get("content"))
-                            if m.get("role") == "user"
-                            else AIMessage(content=m.get("content"))
-                            for m in messages
-                        ],
-                    ]
-                ):
-                    yield "data: " + json.dumps({"content": r.content}) + "\n\n"
-            except Exception as e:
-                yield "data: " + json.dumps({"error": str(e)}) + "\n\n"
-
-        return to_stream_response_simple(process())
 
 
 # ==================== 语音 ====================

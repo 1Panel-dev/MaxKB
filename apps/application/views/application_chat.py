@@ -20,16 +20,16 @@ from application.api.application_chat import (
 )
 from application.models import ChatUserType, Application, ChatSourceChoices
 from application.serializers.application_chat import ApplicationChatQuerySerializers
-from chat.api.chat_api import ChatAPI, PromptGenerateAPI, PageHistoricalConversationAPI, HistoricalConversationRecordAPI
+from chat.api.chat_api import ChatAPI, PageHistoricalConversationAPI, HistoricalConversationRecordAPI
 from chat.api.chat_authentication_api import ChatOpenAPI
-from chat.serializers.chat import DebugChatSerializers, OpenChatSerializers, PromptGenerateSerializer, ResumeSerializers
+from chat.serializers.chat import DebugChatSerializers, OpenChatSerializers, ResumeSerializers
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
 from common.auth.struct.aggregate_permission import ViewPermission
-from common.log.log import log, _get_ip_address
+from common.log.log import _get_ip_address
 from common.result import result
 from common.utils.common import query_params_to_single_dict
 
@@ -273,40 +273,6 @@ class ResumeStreamView(APIView):
     )
     def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str):
         return ResumeSerializers(data={"chat_id": chat_id, "chat_record_id": chat_record_id}).resume(request)
-
-
-class PromptGenerateView(APIView):
-    authentication_classes = [TokenAuth]
-
-    @extend_schema(
-        methods=["POST"],
-        description=_("generate prompt"),
-        summary=_("generate prompt"),
-        operation_id=_("generate prompt"),  # type: ignore
-        request=PromptGenerateAPI.get_request(),
-        parameters=PromptGenerateAPI.get_parameters(),
-        responses=None,
-        tags=[_("Application")],  # type: ignore
-    )
-    @has_permissions(
-        PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
-        PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-    )
-    @log(
-        menu="Application",
-        operate="Generate prompt",
-        get_operation_object=lambda r, k: get_application_operation_object(k.get("application_id")),
-    )
-    def post(self, request: Request, workspace_id: str, model_id: str, application_id: str):
-        return PromptGenerateSerializer(
-            data={"workspace_id": workspace_id, "model_id": model_id, "application_id": application_id}
-        ).generate_prompt(instance=request.data)
 
 
 class DebugHistoricalConversation(APIView):

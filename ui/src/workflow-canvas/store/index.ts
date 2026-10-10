@@ -17,7 +17,7 @@ type ApiModule = {
   getToolListWithShared?: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById?: (toolId: string) => Promise<ToolItem>
   getKnowledgeTags?: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
-  postPromptGenerate: (applicationId: string, modelId: string, payload: PromptGeneratePayload) => Promise<Response>
+  postPromptGenerate: (modelId: string, payload: PromptGeneratePayload) => Promise<Response>
 }
 
 // 查询默认走缓存，通过 store.force.xxx() 强制刷新；生成请求始终直接转发。
@@ -30,7 +30,7 @@ export type WorkflowStoreApi = {
   getToolListWithShared: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById: (toolId: string) => Promise<ToolItem>
   getKnowledgeTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
-  postPromptGenerate: (applicationId: string, modelId: string, payload: PromptGeneratePayload) => Promise<Response>
+  postPromptGenerate: (modelId: string, payload: PromptGeneratePayload) => Promise<Response>
 }
 
 type WorkflowStore = WorkflowStoreApi & { force: WorkflowStoreApi }

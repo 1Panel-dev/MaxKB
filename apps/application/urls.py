@@ -42,7 +42,6 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<str:application_id>/speech_to_text', views.SpeechToText.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/play_demo_text', views.PlayDemoText.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/mcp_tools', views.McpServers.as_view()),
-    path('workspace/<str:workspace_id>/application/<str:application_id>/model/<str:model_id>/prompt_generate', views.PromptGenerateView.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_message', views.ChatView.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/cancel_chat_message', views.CancelWorkflowView.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_record/<str:chat_record_id>/resume_chat_message', views.ResumeStreamView.as_view()),

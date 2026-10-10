@@ -134,7 +134,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 `useWorkflowStore(apiType)` 是画布资源接口适配器，不是 Pinia Store。它自动收集 `store/api/*/index.ts`，
 查询方法按范围、方法与查询参数缓存结果并复用在途请求；`store.force.xxx()` 跳过已完成缓存，仍复用同键在途请求。
-`postPromptGenerate` 是流式生成方法，始终直接转发到对应范围的 Application API，不缓存或去重；
+`postPromptGenerate` 是流式生成方法，始终直接转发到对应范围的 Model API，不缓存或去重；
 通过普通 Store 或 `force` 调用都会发起新请求，返回独立的 Response 流。
 模型选项统一调用 `store.getModelListWithShared(query)`，由对应范围 API 查询；Workspace 和
 System 资源管理合并普通与共享模型，System 共享范围仅返回标记 `source: 'shared'` 的共享模型。
@@ -330,10 +330,10 @@ AI 对话节点的提示词、历史记录、视觉理解和输出思考表单�
 图片理解和视频理解使用 IMAGE 模型，AI 对话使用 LLM 模型，现有提示词接口支持这两种类型。
 共享组件维护提示词模板和请求上下文，不依赖某个节点，也不接收未使用的模型或供应商选项。
 组件将画布注入的 `apiType` 传给 `useWorkflowStore`，通过 `store.postPromptGenerate` 发起生成；
-Store 适配器统一选择 Workspace、System 资源管理或 System 共享资源的 Application API。
+Store 适配器统一选择 Workspace、System 资源管理或 System 共享资源的 Model API。
 循环画布已转发同一上下文，组件不再单独判断资源范围。生成方法不使用 Store 的查询缓存或请求去重。
-接口仍要求当前路由的智能体 ID，生成使用智能体已保存的模型参数；没有智能体 ID 时禁用入口，
-工具和知识库工作流尚未接入对应的提示词生成接口。弹窗不提供独立模型或参数设置。
+生成接口不再依赖应用，改用节点自身已保存的模型参数（`model_params_setting`）并随请求体提交，
+因此智能体、工具和知识库工作流均可使用；弹窗不提供独立模型或参数设置。
 公共组件统一维护主题输入、会话消息与 `ConversationStream`；重新生成在历史中追加用户消息
 `Re generate` 后请求，停止通过 `cancel()` 终止读取，关闭动画结束后清理会话。
 点击替换后通过 `replace` 交由节点回写系统提示词。

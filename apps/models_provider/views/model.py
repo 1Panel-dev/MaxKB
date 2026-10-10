@@ -20,9 +20,11 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from models_provider.api.model import DefaultModelResponse, GetModelApi, ModelCreateAPI, ModelEditApi, ModelListResponse
+from models_provider.api.prompt_generate import PromptGenerateAPI
 from models_provider.api.provide import ProvideApi
 from models_provider.models import Model
 from models_provider.serializers.model_serializer import ModelSerializer, WorkspaceSharedModelSerializer
+from models_provider.serializers.prompt_generate_serializers import PromptGenerateSerializers
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from system_manage.views import encryption_str
@@ -381,3 +383,33 @@ class ModelList(APIView):
                 data={**query_params_to_single_dict(request.query_params), "user_id": str(request.user.id)}
             ).model_list(workspace_id=workspace_id, with_valid=True)
         )
+
+
+class ModelPromptGenerateView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=["POST"],
+        summary=_("Generate prompt"),
+        description=_("Generate prompt by model"),
+        operation_id=_("Generate prompt"),  # type: ignore
+        parameters=PromptGenerateAPI.get_parameters(workspace=True),
+        request=PromptGenerateAPI.get_request(),
+        responses=None,
+        tags=[_("Model")],  # type: ignore
+    )
+    @has_permissions(
+        PermissionConstants.MODEL_READ.get_workspace_model_permission(),
+        PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        RoleConstants.USER.get_workspace_role(),
+    )
+    @log(
+        menu="model",
+        operate="Generate prompt",
+        get_operation_object=lambda r, k: get_model_operation_object(k.get("model_id")),
+    )
+    def post(self, request: Request, workspace_id: str, model_id: str):
+        return PromptGenerateSerializers(
+            data={**request.data, "workspace_id": workspace_id, "model_id": model_id}
+        ).generate_prompt()
