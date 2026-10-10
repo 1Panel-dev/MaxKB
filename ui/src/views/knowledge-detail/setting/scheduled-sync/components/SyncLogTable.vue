@@ -72,9 +72,7 @@ watch(
       </el-table-column>
       <el-table-column label="同步内容" min-width="400" show-overflow-tooltip>
         <template #default="{ row }">
-          <MkTooltip :disabled="!row.message" :content="row.message" placement="top">
-            <span>{{ getSyncContent(row) }}</span>
-          </MkTooltip>
+          <span>{{ getSyncContent(row) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="同步方式" width="140">

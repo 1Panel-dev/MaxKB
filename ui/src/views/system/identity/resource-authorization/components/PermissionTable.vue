@@ -184,7 +184,7 @@ watch(
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="40" reserve-selection :selectable="() => !disabled" />
-      <el-table-column class-name="resource-name-column" label="名称" min-width="260" prop="name">
+      <el-table-column class-name="expand-name-column" label="名称" min-width="260" prop="name">
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <div class="flex-align-center min-w-0 flex-1 gap-2">
             <MkIcon v-if="row.resource_type === 'folder'" name="icon_file-folder_colorful" :size="18" />
@@ -212,16 +212,3 @@ watch(
     <BatchSetPermissionDialog ref="batchPermissionDialogRef" :disabled="disabled" @submit="handleBatchSubmit" />
   </div>
 </template>
-
-<style scoped lang="scss">
-:deep(.resource-name-column .cell) {
-  align-items: center;
-  display: flex;
-
-  .el-table__expand-icon,
-  .el-table__indent,
-  .el-table__placeholder {
-    flex-shrink: 0;
-  }
-}
-</style>

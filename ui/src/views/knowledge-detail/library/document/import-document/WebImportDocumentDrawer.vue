@@ -102,9 +102,9 @@ defineExpose({ open })
     </div>
     <template #footer>
       <!-- 取消导入 -->
-      <el-button :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
       <!-- 返回基本信息 -->
-      <el-button v-if="activeStep === 1" :disabled="loading" @click="activeStep = 0">上一步</el-button>
+      <el-button plain v-if="activeStep === 1" :disabled="loading" @click="activeStep = 0">上一步</el-button>
       <!-- 进入文档处理策略 -->
       <el-button v-if="activeStep === 0" type="primary" @click="handleNext">下一步</el-button>
       <!-- 提交 Web 文档导入 -->

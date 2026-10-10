@@ -1068,14 +1068,19 @@ Web、飞书和工作流知识库的非共享文档页在标题栏组合
 不传完整 `knowledge`，不重复查询知识库。
 入口按类型挂载独立的 `WebImportDocumentDrawer.vue`、`LarkImportDocumentDrawer.vue`、
 `WorkflowImportDocumentDrawer.vue`，关闭动画结束后卸载。
-Web 和飞书使用全屏底部 Drawer，分别通过地址表单和飞书懒加载文件树进入文档处理策略；
+Web 和飞书使用全屏底部 Drawer，分别通过地址表单和飞书 `MkTable` 懒加载目录表格进入文档处理策略；
 策略复用 `DocumentStrategyForm`，使用组件默认策略，不回显知识库策略，上一步保留草稿。
 Web 抽屉只接收完整 Document API 与知识库 ID，地址和选择器初始为空；
 飞书抽屉额外接收文件夹 Token，工作流抽屉只接收知识库 ID 和图数据；所有导入组件均不接收 `KnowledgeDetail`。
 Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `body`。
 飞书按 `meta.folder_token` 查询目录并读取全部分页，已导入文档勾选且不可重复导入；
-全选覆盖当前已加载节点，选择文件夹时由树懒加载子节点，加载期间禁止进入下一步。
-正式导入只提交未导入的文件，不将文件夹作为文档。
+表格使用原生 `type="selection"` 选择列和名称列，表头全选覆盖当前已加载节点；
+初始化仅加载根目录，文件夹默认收起，展开与收起由 Table 维护。
+不重复保存表格选择状态，在下一步通过 `getSelectionRows()` 获取待导入文档。
+文件夹持续保留懒加载标记，由 Table 维护层级和缩进，避免与普通树数据混用导致层级丢失。
+原生选择维护已加载节点的父子联动与半选，勾选文件夹不请求子目录，只有展开时加载。
+展开已选文件夹时新加载的节点继承勾选，加载期间禁止进入下一步。
+正式导入沿用 v2，仅过滤已导入项，保留所选文件夹的名称、Token 和类型，不在前端递归展开文件夹。
 两者提交成功关闭并刷新列表，失败保留输入、选择和策略。
 工作流导入 Drawer 与 DebugDrawer 使用相同的三步 Action，直接引用
 `views/workflow/knowledge/debug/action/` 的 DataSource、KnowledgeBase 和 Result，

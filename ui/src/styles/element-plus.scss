@@ -1116,6 +1116,18 @@
     border-right: 1px solid var(--el-table-border-color);
   }
 
+  /* 树形名称列：展开图标、缩进与业务内容同行。 */
+  .expand-name-column > .cell {
+    align-items: center;
+    display: flex;
+
+    .el-table__expand-icon,
+    .el-table__indent,
+    .el-table__placeholder {
+      flex-shrink: 0;
+    }
+  }
+
   [class*='el-table__row--level'] .el-table__expand-icon {
     align-items: center;
     display: inline-flex;
