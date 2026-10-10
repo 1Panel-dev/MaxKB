@@ -374,7 +374,7 @@ class DocumentView(APIView):
                         "knowledge_id": knowledge_id,
                         "workspace_id": workspace_id,
                     }
-                ).sync()
+                ).sync(user=request.user.profile)
             )
 
     class Refresh(APIView):

@@ -92,6 +92,7 @@ from knowledge.services.document_strategy import (
     strategy_hashes,
 )
 from knowledge.services.incremental_sync import IncrementalDocumentSync, prepare_remote_paragraphs
+from knowledge.services.workflow_document_sync import is_workflow_web_document, sync_workflow_web_document
 from knowledge.services.paragraph_assets import process_visual_assets, sync_paragraph_assets
 from knowledge.task.embedding import (
     delete_embedding_by_paragraph_ids,
@@ -687,17 +688,21 @@ class DocumentSerializers(serializers.Serializer):
             first = QuerySet(Document).filter(id=document_id, knowledge_id=self.data.get("knowledge_id")).first()
             if first is None:
                 raise AppApiException(500, _("document id not exist"))
-            if first.type != KnowledgeType.WEB or first.resource_type != DocumentResourceType.DOCUMENT:
+            if not is_workflow_web_document(first) and (
+                first.type != KnowledgeType.WEB or first.resource_type != DocumentResourceType.DOCUMENT
+            ):
                 raise AppApiException(500, _("Synchronization is only supported for web site types"))
 
         @transaction.atomic
-        def sync(self, with_valid=True, with_embedding=True, response: Fork.Response | None = None):
+        def sync(self, with_valid=True, with_embedding=True, response: Fork.Response | None = None, user=None):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.initial_data.get("document_id")
             document = (
                 QuerySet(Document).filter(id=document_id, knowledge_id=self.initial_data.get("knowledge_id")).first()
             )
+            if is_workflow_web_document(document):
+                return sync_workflow_web_document(document, user)
             state = State.SUCCESS
             if document.type != KnowledgeType.WEB or document.resource_type != DocumentResourceType.DOCUMENT:
                 return True

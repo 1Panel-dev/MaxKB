@@ -89,7 +89,13 @@ class DataSourceWebNode(INode):
         collect_handler = self._get_collect_handler(document_list, source_meta, selector)
 
         try:
-            ForkManage(source_url, selector.split(" ") if selector else []).fork(3, set(), collect_handler)
+            sync_document = workflow_params.get("workflow_sync_document")
+            if sync_document:
+                response = Fork(source_url, selector.split(" ")).fork()
+                collect_handler(ChildLink(source_url, None), response)
+                document_list[0]["name"] = sync_document["name"]
+            else:
+                ForkManage(source_url, selector.split(" ") if selector else []).fork(3, set(), collect_handler)
         except CancelledException:
             raise
         except Exception as e:

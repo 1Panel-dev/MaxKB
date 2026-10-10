@@ -14,6 +14,7 @@ from knowledge.models import (
     Knowledge,
     KnowledgeSyncLog,
     KnowledgeSyncStatus,
+    KnowledgeSyncTrigger,
     KnowledgeSyncType,
     KnowledgeType,
     KnowledgeWorkflow,
@@ -151,7 +152,11 @@ class KnowledgeSyncLogQuerySerializer(KnowledgeSyncSettingOperationSerializer):
     def page(self, current_page, page_size):
         self.is_valid(raise_exception=True)
         knowledge = self.validated_data["knowledge"]
-        query_set = QuerySet(KnowledgeSyncLog).filter(knowledge_id=knowledge.id).order_by("-create_time")
+        query_set = (
+            QuerySet(KnowledgeSyncLog)
+            .filter(knowledge_id=knowledge.id, trigger_type=KnowledgeSyncTrigger.SCHEDULED)
+            .order_by("-create_time")
+        )
         page = page_search(
             current_page,
             page_size,

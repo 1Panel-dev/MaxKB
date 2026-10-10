@@ -33,6 +33,7 @@ from knowledge.models import (
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.sync_status import recover_stale_sync_logs, start_sync_heartbeat
+from knowledge.services.workflow_sync import has_running_workflow_document_sync
 from knowledge.services.workflow_sync_source import validate_workflow_sync_source, workflow_source_meta
 from knowledge.task.handler import (
     get_save_handler,
@@ -422,6 +423,8 @@ def scheduled_sync_knowledge(knowledge_id: str):
         running = (
             QuerySet(KnowledgeSyncLog).filter(knowledge_id=knowledge.id, status=KnowledgeSyncStatus.RUNNING).exists()
         )
+        if knowledge.type == KnowledgeType.WORKFLOW and not running:
+            running = has_running_workflow_document_sync(knowledge.id)
         sync_log = KnowledgeSyncLog.objects.create(
             knowledge=knowledge,
             workspace_id=knowledge.workspace_id,

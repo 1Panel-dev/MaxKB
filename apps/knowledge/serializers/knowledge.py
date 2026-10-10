@@ -1383,7 +1383,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 selector,
                 doc_strategy,
                 sync_type,
-                record_log=True,
+                record_log=False,
                 trigger_type=KnowledgeSyncTrigger.MANUAL,
             )
 

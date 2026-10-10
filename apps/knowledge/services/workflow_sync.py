@@ -1,6 +1,8 @@
 """Stable document and paragraph reconciliation for scheduled workflow knowledge runs."""
 
 from collections import defaultdict
+from dataclasses import dataclass
+from datetime import datetime
 from django.db import transaction
 from django.db.models import QuerySet
 
@@ -23,7 +25,26 @@ from knowledge.models import (
 from knowledge.services.incremental_sync import IncrementalDocumentSync, prepare_remote_paragraphs
 from knowledge.services.paragraph_assets import process_visual_assets, sync_paragraph_assets
 from knowledge.services.workflow_sync_source import DOCUMENT_IDENTITY_FIELDS
+from knowledge.models.knowledge_action import KnowledgeAction, State
 from ops import celery_app
+
+
+@dataclass(frozen=True)
+class WorkflowDocumentSyncRun:
+    """Snapshot ownership for manual document sync, without a scheduled sync log."""
+
+    id: object
+    knowledge_id: object
+    create_time: datetime
+    sync_type: str = KnowledgeSyncType.INCREMENTAL
+
+
+def has_running_workflow_document_sync(knowledge_id) -> bool:
+    return (
+        QuerySet(KnowledgeAction)
+        .filter(knowledge_id=knowledge_id, state=State.STARTED, meta__document_sync_id__isnull=False)
+        .exists()
+    )
 
 
 def _delete_problems_and_mappings(paragraph_ids) -> None:
@@ -67,27 +88,36 @@ def _delete_workflow_documents(document_ids) -> list[str]:
     return existing_ids
 
 
-def _workflow_snapshot_documents(sync_log: KnowledgeSyncLog, workflow_source: dict | None):
+def _workflow_snapshot_documents(
+    sync_log: KnowledgeSyncLog | WorkflowDocumentSyncRun, workflow_source: dict | None, document_id=None
+):
     """Select this execution and only earlier documents from its proven source scope."""
     documents = QuerySet(Document).filter(
         knowledge_id=sync_log.knowledge_id,
         type=KnowledgeType.WORKFLOW,
         resource_type=DocumentResourceType.DOCUMENT,
     )
-    new_documents = documents.filter(meta__workflow_sync_log_id=str(sync_log.id))
+    ownership = (
+        "meta__workflow_action_id" if isinstance(sync_log, WorkflowDocumentSyncRun) else "meta__workflow_sync_log_id"
+    )
+    new_documents = documents.filter(**{ownership: str(sync_log.id)})
     source_scope = (workflow_source or {}).get("source_scope")
     old_documents = (
         documents.filter(meta__source_scope=source_scope, create_time__lt=sync_log.create_time)
         if source_scope
         else documents.none()
     )
+    if document_id is not None:
+        old_documents = old_documents.filter(id=document_id)
     return new_documents, old_documents
 
 
 @transaction.atomic
-def finalize_workflow_complete_snapshot(sync_log: KnowledgeSyncLog, success: bool, workflow_source=None) -> dict:
+def finalize_workflow_complete_snapshot(
+    sync_log: KnowledgeSyncLog | WorkflowDocumentSyncRun, success: bool, workflow_source=None, document_id=None
+) -> dict:
     """Keep the old snapshot until a complete workflow run has succeeded."""
-    new_documents, old_documents = _workflow_snapshot_documents(sync_log, workflow_source)
+    new_documents, old_documents = _workflow_snapshot_documents(sync_log, workflow_source, document_id)
     new_document_list = list(new_documents)
     identities = [workflow_document_identity(document) for document in new_document_list]
     if success and len(set(identities)) != len(identities):
@@ -144,11 +174,19 @@ def _copy_document_relations(source: Document, target: Document, source_paragrap
 
 
 @transaction.atomic
-def merge_workflow_incremental_snapshot(sync_log: KnowledgeSyncLog, workflow_source=None) -> dict:
+def merge_workflow_incremental_snapshot(
+    sync_log: KnowledgeSyncLog | WorkflowDocumentSyncRun, workflow_source=None, document_id=None
+) -> dict:
     """Merge newly generated workflow documents into the previous stable snapshot."""
-    new_query, old_query = _workflow_snapshot_documents(sync_log, workflow_source)
+    new_query, old_query = _workflow_snapshot_documents(sync_log, workflow_source, document_id)
     new_documents, old_documents = list(new_query), list(old_query)
     identities = [workflow_document_identity(document) for document in new_documents]
+    if document_id is not None and (
+        len(new_documents) != 1
+        or len(old_documents) != 1
+        or identities[0] != workflow_document_identity(old_documents[0])
+    ):
+        raise ValueError("Single-document workflow synchronization must output the selected source document only")
     if len(set(identities)) != len(identities):
         raise ValueError("Workflow output contains duplicate source document identities")
     old_by_identity = defaultdict(list)
@@ -248,7 +286,7 @@ def merge_workflow_incremental_snapshot(sync_log: KnowledgeSyncLog, workflow_sou
     # A successful workflow run represents a complete output snapshot. Remove old generated
     # documents that were not emitted this time, but never touch standalone image resources.
     deleted_count = 0
-    if failed_count == 0 and sync_log.sync_type != KnowledgeSyncType.REPLACE:
+    if document_id is None and failed_count == 0 and sync_log.sync_type != KnowledgeSyncType.REPLACE:
         stale_ids = [str(document.id) for document in old_documents if document.id not in matched_old_ids]
         if stale_ids:
             deleted_count = len(_delete_workflow_documents(stale_ids))

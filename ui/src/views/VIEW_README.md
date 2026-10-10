@@ -740,7 +740,7 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 `putKnowledgeSyncSetting` 成功后，以后台返回值更新草稿和详情 `meta.sync_setting`；失败保留草稿。
 同步方式复用 `constants/knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS`，按当前来源描述三种方式。
 `components/SyncLogTable.vue` 在日志页签按需挂载，接收知识库 ID 和 `index.vue` 传入的完整同步 API 对象，
-通过 `api.getKnowledgeSyncLogPage` 调用分页日志接口。
+通过 `api.getKnowledgeSyncLogPage` 调用分页日志接口；接口仅返回定时任务触发的记录，手动同步不写入此日志。
 日志表格沿用同步时间、同步内容、同步方式、同步状态、耗时五列，不新增操作入口。
 同步内容按“共 N 个文档（已同步、跳过、删除、失败）”展示，仅附加非零的跳过、删除和失败计数；
 跳过执行时直接展示原因，后台结果信息通过同步内容的悬停提示查看。
@@ -765,7 +765,9 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 分页和勾选，不显示列表 loading；操作请求期间推迟轮询，失败后继续重试，卸载时停止且不再重新调度。
 无排序入口。非共享文档显示选择列，按文档 ID 跨页保留选择，搜索或筛选变化时清空；
 选中后通过 `footer-batch-actions` 展示批量操作。右侧固定操作列提供启停、向量化、分词索引和更多菜单，
-运行或排队中的任务切换为取消入口。Web、飞书提供同步，普通与工作流文档提供原文下载和替换。
+运行或排队中的任务切换为取消入口。Web、飞书提供同步；工作流知识库仅为 `meta.source_type=web`
+的文档提供单项同步，沿原 Web 数据源分支执行提取、分段并只合并所选文档，不抓取链接或清理其他来源。
+本地上传的工作流文档不提供同步入口。普通与工作流文档提供原文下载和替换。
 单项与批量操作共用页面请求状态，删除和同步先确认，成功后清空选择并刷新，导出和下载保留选择。
 文档页及其 Action 的知识库类型统一读取响应式路由参数 `route.params.type`，使用
 `KNOWLEDGE_TYPE_KEY` 判断，不从详情或文档数据读取类型，也不通过 `knowledgeType` Prop 传递。
@@ -824,7 +826,8 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 同步操作集中在 `document/action-dropdown/sync/`，通过上层 `index.ts` 导出。
 `SyncDocumentAction` 接收 `label` 和单个 `document`，`BatchSyncDocumentAction` 接收 `label` 和
 `documentIds`（模板使用 `:document-ids`），不使用 `documents` 或 `batch`。单项 Web 文档同步前校验来源地址；确认前固定本次目标与路由类型，
-分别调用 Web 或飞书的单项、批量同步接口，共用页面 loading，成功后通知页面刷新。
+分别调用 Web 或飞书的单项、批量同步接口；工作流 Web 文档复用单项接口，由后台启动工作流，
+确认内容说明沿原提取、分段配置同步，提交成功提示“同步任务发送成功”。共用页面 loading，成功后通知页面刷新。
 直接请求的 Action 通过 `v-model:loading` 共用页面操作状态，各 Action 自行管理请求、
 防重复提交、成功提示与失败处理，不额外抽取统一请求封装；需要刷新时发出 `refresh`，导出与下载不发出。
 `DeleteDocumentAction` 单个删除传 `document`，确认框展示文档名称并调用单个删除接口；
