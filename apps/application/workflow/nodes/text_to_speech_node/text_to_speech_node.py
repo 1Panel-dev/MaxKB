@@ -5,6 +5,7 @@
 @desc:
 """
 
+import asyncio
 import io
 import mimetypes
 
@@ -14,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from pydub import AudioSegment
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
@@ -69,6 +70,14 @@ class TextToSpeechNode(INode):
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "text-to-speech-node"
 
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self.async_runner = AsyncRunner()
+
+    def cancel(self):
+        self.async_runner.cancel()
+        super().cancel()
+
     def execute(self):
         node_params = self.get_parameters()
         workflow_params = self.get_workflow_parameters()
@@ -109,19 +118,11 @@ class TextToSpeechNode(INode):
         max_length = 1024
         content_chunks = [content[i : i + max_length] for i in range(0, len(content), max_length)]
 
-        audio_segments = []
-        temp_files = []
-
-        for chunk in content_chunks:
-            self._check_cancelled()
-            self.write_context("content", chunk)
-            workspace_id = workflow_params.get("workspace_id")
-            model = get_model_instance_by_model_workspace_id(tts_model_id, workspace_id, **(model_params_setting or {}))
-            audio_byte = model.text_to_speech(chunk)
-            temp_file = io.BytesIO(audio_byte)
-            audio_segment = AudioSegment.from_file(temp_file)
-            audio_segments.append(audio_segment)
-            temp_files.append(temp_file)
+        workspace_id = workflow_params.get("workspace_id")
+        audio_segments = self.async_runner.run_async(
+            lambda: self._process_tts_chunks(content_chunks, tts_model_id, workspace_id, model_params_setting)
+        )
+        self.write_context("content", content_chunks[-1] if content_chunks else "")
 
         combined_audio = AudioSegment.empty()
         for segment in audio_segments:
@@ -137,8 +138,6 @@ class TextToSpeechNode(INode):
         file_id = file_url.split("/")[-1]
         audio_list = [{"file_id": file_id, "file_name": file_name, "url": file_url}]
 
-        for temp_file in temp_files:
-            temp_file.close()
         output_buffer.close()
 
         audio_label = f'<audio src="{file_url}" controls style="width: 300px; height: 43px"></audio>'
@@ -150,6 +149,22 @@ class TextToSpeechNode(INode):
             self.write(
                 TextContent(self.get_node_id(), audio_label, Status.SUCCESS, node_info, Position(self.get_node_id()))
             )
+
+    async def _process_tts_chunks(self, content_chunks, tts_model_id, workspace_id, model_params_setting):
+        def process():
+            audio_segments = []
+            for chunk in content_chunks:
+                self._check_cancelled()
+                model = get_model_instance_by_model_workspace_id(
+                    tts_model_id, workspace_id, **(model_params_setting or {})
+                )
+                audio_byte = model.text_to_speech(chunk)
+                temp_file = io.BytesIO(audio_byte)
+                audio_segment = AudioSegment.from_file(temp_file)
+                audio_segments.append(audio_segment)
+            return audio_segments
+
+        return await asyncio.to_thread(process)
 
     def _upload_file(self, file, workflow_params, workflow_type):
         if workflow_type == WorkflowType.KNOWLEDGE:

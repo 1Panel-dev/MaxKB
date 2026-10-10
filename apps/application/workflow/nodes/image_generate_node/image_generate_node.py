@@ -7,6 +7,7 @@
 @desc:
 """
 
+import asyncio
 import base64
 from functools import reduce
 
@@ -17,7 +18,7 @@ from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage, AIMessage
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
@@ -61,6 +62,14 @@ class ImageGenerateNode(INode):
     serializer_class = ImageGenerateNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "image-generate-node"
+
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self.async_runner = AsyncRunner()
+
+    def cancel(self):
+        self.async_runner.cancel()
+        super().cancel()
 
     def execute(self):
         node_params = self.get_parameters()
@@ -112,7 +121,7 @@ class ImageGenerateNode(INode):
         self.write_context("dialogue_type", dialogue_type)
 
         self._check_cancelled()
-        image_urls = tti_model.generate_image(question, negative_prompt)
+        image_urls = self.async_runner.run_async(lambda: self._await_generate(tti_model, question, negative_prompt))
 
         file_urls = []
         for image_url in image_urls:
@@ -140,6 +149,9 @@ class ImageGenerateNode(INode):
             self.write(
                 TextContent(str(uuid.uuid7()), answer, Status.SUCCESS, node_info, position=Position(self.get_node_id()))
             )
+
+    async def _await_generate(self, tti_model, question, negative_prompt):
+        return await asyncio.to_thread(tti_model.generate_image, question, negative_prompt)
 
     def _get_history_message(self, history_chat_record, dialogue_number):
         start_index = len(history_chat_record) - dialogue_number

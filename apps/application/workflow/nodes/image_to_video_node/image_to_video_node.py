@@ -1,4 +1,5 @@
 # coding=utf-8
+import asyncio
 import base64
 import uuid_utils.compat as uuid
 import requests
@@ -10,7 +11,7 @@ from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
@@ -57,6 +58,14 @@ class ImageToVideoNode(INode):
     serializer_class = ImageToVideoNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "image-to-video-node"
+
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self.async_runner = AsyncRunner()
+
+    def cancel(self):
+        self.async_runner.cancel()
+        super().cancel()
 
     def execute(self):
         maxkb_logger.info(f"[ImageToVideoNode] execute START, node_id={self.get_node_id()}")
@@ -136,7 +145,9 @@ class ImageToVideoNode(INode):
         last_frame_url = self._get_file_base64(last_frame_url)
 
         self._check_cancelled()
-        video_urls = ttv_model.generate_video(question, negative_prompt, first_frame_url, last_frame_url)
+        video_urls = self.async_runner.run_async(
+            lambda: self._await_generate(ttv_model, question, negative_prompt, first_frame_url, last_frame_url)
+        )
         maxkb_logger.info(
             f"[ImageToVideoNode] generate_video result: {video_urls is not None}, node_id={self.get_node_id()}"
         )
@@ -163,6 +174,11 @@ class ImageToVideoNode(INode):
             self.write(
                 TextContent(str(uuid.uuid7()), video_label, Status.SUCCESS, node_info, Position(self.get_node_id()))
             )
+
+    async def _await_generate(self, ttv_model, question, negative_prompt, first_frame_url, last_frame_url):
+        return await asyncio.to_thread(
+            ttv_model.generate_video, question, negative_prompt, first_frame_url, last_frame_url
+        )
 
     def _get_file_base64(self, image_url):
         try:

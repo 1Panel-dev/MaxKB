@@ -5,6 +5,7 @@
 @desc:
 """
 
+import asyncio
 import os
 import tempfile
 from concurrent.futures import ThreadPoolExecutor
@@ -13,7 +14,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
@@ -73,6 +74,14 @@ class SpeechToTextNode(INode):
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "speech-to-text-node"
 
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self.async_runner = AsyncRunner()
+
+    def cancel(self):
+        self.async_runner.cancel()
+        super().cancel()
+
     def execute(self):
         node_params = self.get_parameters()
         workflow_params = self.get_workflow_parameters()
@@ -115,7 +124,7 @@ class SpeechToTextNode(INode):
         self.write_context("audio_list", audio_list)
 
         self._check_cancelled()
-        result = _process_audio_items(audio_list, stt_model)
+        result = self.async_runner.run_async(lambda: self._await_process(audio_list, stt_model))
         content = []
         result_content = []
         for item in result:
@@ -131,6 +140,9 @@ class SpeechToTextNode(INode):
         if is_result:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
             self.write(TextContent(self.get_node_id(), answer, Status.SUCCESS, node_info, Position(self.get_node_id())))
+
+    async def _await_process(self, audio_list, stt_model):
+        return await asyncio.to_thread(_process_audio_items, audio_list, stt_model)
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
