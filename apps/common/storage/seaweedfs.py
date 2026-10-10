@@ -8,7 +8,7 @@ def is_seaweedfs_enabled() -> bool:
 
 
 def get_bucket() -> str:
-    return CONFIG.get("S3_BUCKET") or "maxkb"
+    return CONFIG.get("S3_BUCKET") or CONFIG.get("S3_BUCKET_NAME") or "maxkb"
 
 
 def get_s3_client():

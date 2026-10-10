@@ -81,7 +81,6 @@ from knowledge.serializers.document_strategy import (
 from knowledge.serializers.paragraph import (
     ParagraphInstanceSerializer,
     ParagraphSerializers,
-    delete_problems_and_mappings,
 )
 from knowledge.services import validate_knowledge_file_size
 from knowledge.services.document_cleanup import delete_document_data
@@ -95,7 +94,6 @@ from knowledge.services.document_strategy import (
 from knowledge.services.incremental_sync import IncrementalDocumentSync, prepare_remote_paragraphs
 from knowledge.services.paragraph_assets import process_visual_assets, sync_paragraph_assets
 from knowledge.task.embedding import (
-    delete_embedding_by_document_list,
     delete_embedding_by_paragraph_ids,
     embedding_by_document,
     embedding_by_document_list,
@@ -846,7 +844,13 @@ class DocumentSerializers(serializers.Serializer):
 
         def download_source_file(self, mk_file_auth=None):
             self.is_valid(raise_exception=True)
-            file = QuerySet(File).filter(source_id=self.data.get("document_id")).first()
+            document_id = self.data.get("document_id")
+            source_file_id = (
+                QuerySet(Document).filter(id=document_id).values_list("meta__source_file_id", flat=True).first()
+            )
+            files = QuerySet(File).filter(source_id=document_id, source_type=FileSourceType.DOCUMENT)
+            file = files.filter(id=source_file_id).first() if source_file_id else None
+            file = file or files.first()
             if not file:
                 raise AppApiException(500, _("File not exist. Only manually uploaded documents are supported"))
             return FileSerializer.Operate(data={"id": file.id}).get(mk_file_auth=mk_file_auth, with_valid=True)
@@ -1663,20 +1667,7 @@ class DocumentSerializers(serializers.Serializer):
                 document_id_list = self.validate_document_ids(instance)
             else:
                 document_id_list = instance.get("id_list")
-            source_file_ids = [
-                doc["meta"].get("source_file_id")
-                for doc in Document.objects.filter(id__in=document_id_list).values("meta")
-            ]
-            QuerySet(File).filter(id__in=source_file_ids).delete()
-            QuerySet(Document).filter(id__in=document_id_list).delete()
-            QuerySet(DocumentTag).filter(document_id__in=document_id_list).delete()
-            paragraph_ids = QuerySet(Paragraph).filter(document_id__in=document_id_list).values_list("id", flat=True)
-            # 删除问题关系
-            delete_problems_and_mappings(paragraph_ids)
-            # 删除段落
-            QuerySet(Paragraph).filter(document_id__in=document_id_list).delete()
-            # 删除向量库
-            delete_embedding_by_document_list(document_id_list)
+            delete_document_data(document_id_list)
             return True
 
         def batch_cancel(self, instance: Dict, with_valid=True):

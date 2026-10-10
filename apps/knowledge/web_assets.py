@@ -54,6 +54,7 @@ def _cache_web_image(source_url: str, knowledge_id) -> str | None:
                 source_id=str(knowledge_id),
                 sha256_hash=sha256_hash,
                 meta__source_url=source_url,
+                storage_type="seaweedfs",
             )
             .first()
         )

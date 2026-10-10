@@ -258,6 +258,15 @@ class KnowledgeArchiveTests(SimpleTestCase):
         callback = self.on_commit.call_args.args[0]
         self.assertEqual(callback.args, (result["knowledge_id"],))
 
+    @patch("knowledge.tasks.deploy_knowledge_sync_job.delay")
+    def test_enabled_archive_dispatches_schedule_registration_only_after_commit(self, delay):
+        result = self.import_archive(self.export())
+
+        delay.assert_not_called()
+        self.on_commit.assert_called_once()
+        self.on_commit.call_args.args[0]()
+        delay.assert_called_once_with(result["knowledge_id"])
+
     def test_original_source_file_is_restored_once_when_also_an_image_asset(self):
         self.import_archive(self.export(with_source_file=True))
         self.assertEqual(len(self.file_writes), 1)

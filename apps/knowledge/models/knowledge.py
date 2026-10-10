@@ -4,6 +4,7 @@ from enum import Enum
 
 import uuid_utils.compat as uuid
 from common.db.sql_execute import select_one
+from common.exception.app_exception import AppApiException
 from common.mixins.app_model_mixin import AppModelMixin
 from common.storage.seaweedfs import get_bucket, get_s3_client, is_seaweedfs_enabled
 from common.utils.common import get_sha256_hash
@@ -13,6 +14,7 @@ from django.db import connections, models, transaction
 from django.db.models import QuerySet
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from models_provider.models import Model
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
@@ -590,63 +592,34 @@ class File(AppModelMixin):
     def save(self, bytea=None, force_insert=False, force_update=False, using=None, update_fields=None):
         if bytea is None:
             raise ValueError("bytea参数不能为空")
+        if not is_seaweedfs_enabled():
+            raise AppApiException(500, _("OSS storage is not configured"))
 
+        old_pg_loid = self.loid if not self._state.adding and self.storage_type == "pg" else None
         sha256_hash = get_sha256_hash(bytea)
         self.sha256_hash = sha256_hash
-        existing_file = QuerySet(File).filter(sha256_hash=sha256_hash).first()
+        # PG rows are retained for V2 reads; V3 writes can only reuse OSS objects.
+        existing_file = QuerySet(File).filter(sha256_hash=sha256_hash, storage_type="seaweedfs").first()
+        self.storage_type = "seaweedfs"
+        self.loid = None
+        if "original_size" in self.meta:
+            self.meta = {**self.meta, "original_size": len(bytea)}
         if existing_file:
-            self.loid = existing_file.loid
             self.file_size = existing_file.file_size
-            self.storage_type = existing_file.storage_type
-            if existing_file.storage_type == "seaweedfs":
-                # Point to the canonical S3 key; this file has no object of its own
-                canonical_key = existing_file.meta.get("seaweedfs_key", f"files/{existing_file.id}")
-                self.meta = {**self.meta, "seaweedfs_key": canonical_key}
-            return super().save()
-
-        if is_seaweedfs_enabled():
-            self.storage_type = "seaweedfs"
+            canonical_key = existing_file.meta.get("seaweedfs_key", f"files/{existing_file.id}")
+            self.meta = {**self.meta, "seaweedfs_key": canonical_key}
+        else:
             self.file_size = len(bytea)
-            self.loid = None
             self.meta = {**self.meta, "seaweedfs_key": f"files/{self.id}"}
             get_s3_client().put_object(Bucket=get_bucket(), Key=f"files/{self.id}", Body=bytea)
-        else:
-            self.storage_type = "pg"
-            compressed_data = self._compress_data(bytea)
-            self.file_size = len(compressed_data)
-            self.loid = self._create_large_object()
-            self.meta = {**self.meta, "original_size": len(bytea)}
-            self._write_compressed_data(compressed_data)
 
+        if old_pg_loid is not None:
+            using = self._state.db or "default"
+            with transaction.atomic(using=using):
+                result = super().save()
+                _unlink_unreferenced_pg_object(old_pg_loid, using)
+            return result
         return super().save()
-
-    def _compress_data(self, data, compression_level=9):
-        """压缩数据到内存"""
-        buffer = io.BytesIO()
-        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-            zipinfo = zipfile.ZipInfo(self.file_name)
-            zipinfo.compress_type = zipfile.ZIP_DEFLATED
-            zip_file.writestr(zipinfo, data, compresslevel=compression_level)
-
-        return buffer.getvalue()
-
-    def _create_large_object(self):
-        result = select_one("SELECT lo_creat(-1)::int8 as lo_id;", [])
-        return result["lo_id"]
-
-    def _write_compressed_data(self, data, block_size=64 * 1024):
-        buffer = io.BytesIO(data)
-        offset = 0
-
-        while True:
-            chunk = buffer.read(block_size)
-            if not chunk:
-                break
-
-            offset += len(chunk)
-            select_one(
-                "SELECT lo_put(%s::oid, %s::bigint, %s::bytea)::VARCHAR;", [self.loid, offset - len(chunk), chunk]
-            )
 
     def get_bytes(self):
         if self.storage_type == "seaweedfs":
@@ -715,6 +688,14 @@ class File(AppModelMixin):
         yield from _read_with_offset()
 
 
+def _unlink_unreferenced_pg_object(loid, using):
+    shared = File.objects.using(using).filter(storage_type="pg", loid=loid).exists()
+    if not shared:
+        with connections[using].cursor() as cursor:
+            # Multiple removed or replaced rows may refer to the same large object.
+            cursor.execute("SELECT lo_unlink(oid) FROM pg_largeobject_metadata WHERE oid = %s", [loid])
+
+
 @receiver(post_delete, sender=Paragraph)
 def on_delete_paragraph(sender, instance, using, **kwargs):
     File.objects.using(using).filter(source_type=FileSourceType.PARAGRAPH, source_id=str(instance.id)).delete()
@@ -731,11 +712,7 @@ def on_delete_file(sender, instance, using, **kwargs):
         transaction.on_commit(lambda: delete_file_object(bucket, key, file_id, using), using=using, robust=True)
     elif instance.loid is not None:
         # post_delete sees the complete batch removed; unlink remains in the same PG transaction.
-        shared = File.objects.using(using).filter(storage_type="pg", loid=instance.loid).exists()
-        if not shared:
-            with connections[using].cursor() as cursor:
-                # Multiple deleted rows may refer to the same large object.
-                cursor.execute("SELECT lo_unlink(oid) FROM pg_largeobject_metadata WHERE oid = %s", [instance.loid])
+        _unlink_unreferenced_pg_object(instance.loid, using)
 
 
 class PublicFileAccess(AppModelMixin):
