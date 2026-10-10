@@ -515,6 +515,17 @@ class ImageDocumentTests(SimpleTestCase):
             desc="",
             type=KnowledgeType.BASE,
         )
+        strategy = normalize_document_strategy(
+            {
+                "split": {"child_length": 50},
+                "visual": {
+                    "enabled": True,
+                    "strategy": "model",
+                    "model_id": "00000000-0000-0000-0000-000000000046",
+                },
+                "index": {"title_as_question": True},
+            }
+        )
         file = MagicMock(
             id="00000000-0000-0000-0000-000000000043",
             file_name="scene.png",
@@ -522,11 +533,11 @@ class ImageDocumentTests(SimpleTestCase):
             meta={
                 "image_preview": {
                     "caption": "风景",
-                    "ocr_text": "",
-                    "description": "群山与草地",
+                    "ocr_text": "识别文字",
+                    "description": "群山与草地" + "景" * 110,
                     "process_status": "success",
                     "process_error": "",
-                    "doc_strategy": normalize_document_strategy(None),
+                    "doc_strategy": strategy,
                     "imported": False,
                 }
             },
@@ -534,7 +545,6 @@ class ImageDocumentTests(SimpleTestCase):
         file_query = MagicMock()
         file_query.filter.return_value.select_for_update.return_value = [file]
         update_query = MagicMock()
-        query_set.side_effect = [file_query, update_query]
         document = MagicMock(id="00000000-0000-0000-0000-000000000044")
         paragraph = MagicMock(id="00000000-0000-0000-0000-000000000045")
         document_model.return_value = document
@@ -542,18 +552,44 @@ class ImageDocumentTests(SimpleTestCase):
         service = ImageDocumentService("workspace", str(knowledge.id), "user-id")
         service.get_knowledge = MagicMock(return_value=knowledge)
 
-        document_ids = ImageDocumentService.import_previews.__wrapped__(service, [file.id])
+        for file_name, title, caption in (("scene.png", "scene", "风景"), ("scene.v2.png", "scene.v2", "")):
+            with self.subTest(file_name=file_name, caption=caption):
+                file.file_name = file_name
+                file.meta["image_preview"]["caption"] = caption
+                query_set.side_effect = [file_query, update_query]
+                update_query.reset_mock()
+                incremental_sync.reset_mock()
+                paragraph_model.reset_mock()
+                expected_content = (caption + "\n识别文字\n群山与草地" + "景" * 110).strip()
 
-        self.assertEqual(document_ids, [str(document.id)])
-        self.assertEqual(document_model.call_args.kwargs["resource_type"], DocumentResourceType.IMAGE)
-        self.assertEqual(document_model.call_args.kwargs["char_length"], len("风景\n群山与草地"))
-        self.assertEqual(paragraph_model.call_args.kwargs["content_schema"][0]["file_id"], str(file.id))
-        self.assertEqual(create_asset.call_args.kwargs["file_id"], file.id)
-        update_query.filter.return_value.update.assert_called_once()
-        update_values = update_query.filter.return_value.update.call_args.kwargs
-        self.assertEqual(update_values["source_type"], FileSourceType.DOCUMENT)
-        self.assertEqual(update_values["source_id"], str(document.id))
-        incremental_sync.return_value._sync_title_questions.assert_called_once_with([paragraph])
+                document_ids = ImageDocumentService.import_previews.__wrapped__(service, [file.id])
+
+                self.assertEqual(document_ids, [str(document.id)])
+                document_values = document_model.call_args.kwargs
+                self.assertEqual(document_values["resource_type"], DocumentResourceType.IMAGE)
+                self.assertEqual(document_values["name"], file_name)
+                self.assertEqual(document_values["char_length"], len(expected_content))
+                self.assertEqual(document_values["doc_strategy"], strategy)
+                self.assertEqual(
+                    document_values["source_hash"],
+                    document_source_hash([{"title": title, "content": expected_content}]),
+                )
+                paragraph_model.assert_called_once()
+                paragraph.save.assert_called_once()
+                paragraph_values = paragraph_model.call_args.kwargs
+                self.assertEqual(paragraph_values["title"], title)
+                self.assertEqual(paragraph_values["content"], expected_content)
+                self.assertGreater(len(paragraph_values["chunks"]), 1)
+                self.assertTrue(all(len(chunk) <= 50 for chunk in paragraph_values["chunks"]))
+                self.assertEqual(paragraph_values["content_schema"][0]["file_id"], str(file.id))
+                self.assertEqual(paragraph_values["content_schema"][0]["caption"], caption)
+                self.assertEqual(create_asset.call_args.kwargs["file_id"], file.id)
+                update_query.filter.return_value.update.assert_called_once()
+                update_values = update_query.filter.return_value.update.call_args.kwargs
+                self.assertEqual(update_values["source_type"], FileSourceType.DOCUMENT)
+                self.assertEqual(update_values["source_id"], str(document.id))
+                incremental_sync.return_value._sync_title_questions.assert_called_once_with([paragraph])
+                self.assertEqual(incremental_sync.call_args.args[1], strategy)
 
 
 class MultimodalVectorSearchTests(SimpleTestCase):

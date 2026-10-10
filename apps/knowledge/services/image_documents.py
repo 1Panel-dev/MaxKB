@@ -286,7 +286,7 @@ class ImageDocumentService:
                 id=uuid.uuid7(),
                 document_id=document.id,
                 knowledge_id=knowledge.id,
-                title=preview.get("caption") or Path(file.file_name).stem,
+                title=Path(file.file_name).stem,
                 content=content,
                 chunks=text_to_chunk(content, strategy["split"]["child_length"]),
                 content_schema=[
