@@ -1,10 +1,29 @@
-/** 查询文档当前标签。 */
-const getDocumentTags = (knowledgeId: string, documentId: string) => get<KnowledgeTagGroup[]>(`${getPrefix(knowledgeId)}/${documentId}/tags`)
+import { del, post, put } from '../../core/request'
+import type { KnowledgeTagPayload, KnowledgeTagUpdatePayload } from '@/api/types'
+import { getWorkspaceId } from '@/utils/resource-context'
 
-/** 批量添加文档标签。 */
-const postAddDocumentTags = (knowledgeId: string, documentIds: string[], tagIds: string[]) =>
-  post(`${getPrefix(knowledgeId)}/batch_add_tag`, { document_ids: documentIds, tag_ids: tagIds })
+const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/tags`
 
-/** 移除文档标签关联。 */
-const putDeleteDocumentTags = (knowledgeId: string, documentId: string, tagIds: string[]) =>
-  put(`${getPrefix(knowledgeId)}/${documentId}/tags/batch_delete`, tagIds)
+// TODO：接入标签导入、模板下载、整组／多行编辑接口。
+// 请求路径、参数和响应类型以 V3 接口协议为准。
+
+/** 创建知识库标签或为已有标签新增值。 */
+const postKnowledgeTags = (knowledgeId: string, tags: KnowledgeTagPayload[]) => post<KnowledgeTagPayload[], void>(getPrefix(knowledgeId), tags)
+
+/** 编辑单个知识库标签，不支持多行编辑。 */
+const putKnowledgeTag = (knowledgeId: string, tagId: string, tag: KnowledgeTagUpdatePayload) =>
+  put<KnowledgeTagUpdatePayload, void>(`${getPrefix(knowledgeId)}/${tagId}`, tag)
+
+/** 删除整个标签分组或单个标签值。 */
+const deleteKnowledgeTag = (knowledgeId: string, tagId: string, type: 'key' | 'one') =>
+  del<undefined, void>(`${getPrefix(knowledgeId)}/${tagId}/${type}`)
+
+/** 批量删除所选标签，直接提交标签 ID 数组。 */
+const putBatchDeleteKnowledgeTags = (knowledgeId: string, tagIds: string[]) => put<string[], void>(`${getPrefix(knowledgeId)}/batch_delete`, tagIds)
+
+export default {
+  postKnowledgeTags,
+  putKnowledgeTag,
+  deleteKnowledgeTag,
+  putBatchDeleteKnowledgeTags,
+}

@@ -619,6 +619,29 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 文档页传 `resource_type: 'document'`，创建者选项复用 Workspace `common.ts` 的 `getAllUsers`。
 类型从 `@/api/types` 导入，命中处理枚举从 `@/api/enums` 导入。API 不接收 loading，不重复包装响应。
 
+### 知识库标签与文档关联
+
+`workspace/knowledge/tags.ts` 维护标签创建、编辑和删除，前缀为
+`/workspace/<workspaceId>/knowledge/<knowledgeId>/tags`，工作空间由 `getWorkspaceId()` 读取。
+标签查询暂保留在 `workspace/knowledge/knowledge.ts`，`getKnowledgeTags(knowledgeId)` 返回非分页 `KnowledgeTagGroup[]`；
+标签值中的可选 `doc_count` 表示关联文档数量。`postKnowledgeTags` 直接提交
+`KnowledgeTagPayload[]`（`key`、`value`），用于创建标签和新增标签值；
+`putKnowledgeTag` 向 `/<tagId>` 提交 `KnowledgeTagUpdatePayload`（`id`、`key`、`value`），仅用于已有的单项编辑。
+`deleteKnowledgeTag` 按路径末尾 `key` 删除整个标签、`one` 删除单个标签值；
+`putBatchDeleteKnowledgeTags` 使用 PUT `batch_delete`，请求体直接为标签 ID 数组，不包装为 `id_list`。
+标签类型统一维护在 `types/knowledge.ts`。多行编辑等待 V3 新协议，不组合旧接口模拟整组保存，
+也不声明推测的新接口；导入、模板下载尚未接入，三个待接请求入口的页面状态处理已预留。
+
+文档与标签的关联由 `workspace/knowledge/document.ts` 维护，不使用标签删除接口代替取消关联。
+`getDocumentTags` 查询 `document/<documentId>/tags`，返回分组标签；
+`postAddDocumentTags` POST 到 `document/batch_add_tag`，提交 `{ document_ids, tag_ids }`；
+`putDeleteDocumentTags` PUT 到 `document/<documentId>/tags/batch_delete`，直接提交标签 ID 数组。
+`putUnlinkTagDocuments` PUT 到知识库下的 `tag/<tagId>/docs_delete`，提交 `{ id_list: documentIds }`，
+用于取消同一标签与单个或多个文档的关联。
+关联文档列表复用 `getDocumentPage`，传 `resource_type: 'document'`、`tags: [tagId]`，
+未关联列表另传 `tag_exclude: true`；标签数组沿用请求层的 `tags[]` 序列化。
+名称使用 `name`；关联文档抽屉不传 `order_by`，按接口默认顺序展示。
+
 ### 工作空间共享资源查询
 
 `workspace/shared/` 按最终资源文件拆分：`model.ts` 提供 `getModelList`，`tool.ts` 提供

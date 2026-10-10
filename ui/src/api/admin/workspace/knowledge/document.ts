@@ -16,6 +16,7 @@ import type {
   WebDocumentImportPayload,
   LarkDocumentList,
   LarkDocumentImportPayload,
+  KnowledgeTagGroup,
 } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
@@ -154,7 +155,26 @@ const postReplaceDocumentSource = (knowledgeId: string, documentId: string, file
   return post(`${getPrefix(knowledgeId)}/${documentId}/replace_source_file`, data)
 }
 
+/** 查询文档当前标签。 */
+const getDocumentTags = (knowledgeId: string, documentId: string) => get<KnowledgeTagGroup[]>(`${getPrefix(knowledgeId)}/${documentId}/tags`)
+
+/** 给指定文档批量添加已有标签。 */
+const postAddDocumentTags = (knowledgeId: string, documentIds: string[], tagIds: string[]) =>
+  post(`${getPrefix(knowledgeId)}/batch_add_tag`, { document_ids: documentIds, tag_ids: tagIds })
+
+/** 从单个文档移除指定标签，不删除标签本身。 */
+const putDeleteDocumentTags = (knowledgeId: string, documentId: string, tagIds: string[]) =>
+  put(`${getPrefix(knowledgeId)}/${documentId}/tags/batch_delete`, tagIds)
+
+/** 取消指定标签与单个或多个文档的关联。 */
+const putUnlinkTagDocuments = (knowledgeId: string, tagId: string, documentIds: string[]) =>
+  put(`/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/tag/${tagId}/docs_delete`, { id_list: documentIds })
+
 export default {
+  getDocumentTags,
+  postAddDocumentTags,
+  putDeleteDocumentTags,
+  putUnlinkTagDocuments,
   getDocumentPage,
   putBatchCreateDocuments,
   postSplitDocuments,
