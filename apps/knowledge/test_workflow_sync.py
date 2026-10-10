@@ -120,6 +120,9 @@ class SnapshotQuery:
 
 class WorkflowSnapshotIsolationTests(SimpleTestCase):
     def setUp(self):
+        embedding_patch = patch("knowledge.services.workflow_sync.schedule_workflow_document_embedding")
+        self.schedule_embedding = embedding_patch.start()
+        self.addCleanup(embedding_patch.stop)
         self.sync_log = SimpleNamespace(
             id="log", knowledge_id="knowledge", create_time=10, sync_type=KnowledgeSyncType.INCREMENTAL
         )
@@ -163,6 +166,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
 
     def test_complete_sync_deletes_only_older_documents_from_selected_source(self):
         stats = self.run_complete(True, self.source)
+        self.schedule_embedding.assert_called_once_with(["new"], "knowledge")
         self.assertEqual(stats["total_count"], 1)
         self.assertEqual(stats["deleted_count"], 1)
         self.assertEqual(
@@ -171,6 +175,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
 
     def test_failed_run_deletes_only_its_own_output(self):
         stats = self.run_complete(False, self.source)
+        self.schedule_embedding.assert_not_called()
         self.assertEqual(stats["total_count"], 1)
         self.assertEqual(stats["failed_count"], 1)
         self.assertEqual(
@@ -245,6 +250,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
                 self.assertEqual(stats["deleted_count"], 0)
                 self.assertEqual(stats["failed_count"], 0)
                 self.assertIn(local_document, self.documents)
+                self.schedule_embedding.assert_not_called()
 
     def test_incremental_total_includes_new_and_deleted_source_documents_only(self):
         with (
@@ -255,6 +261,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
         self.assertEqual(stats["total_count"], 2)
         self.assertEqual(stats["synced_count"], 1)
         self.assertEqual(stats["deleted_count"], 1)
+        self.schedule_embedding.assert_called_once_with(["new"], "knowledge")
 
     def test_duplicate_remote_identity_fails_before_changing_old_documents(self):
         duplicate = deepcopy(self.documents[4])
@@ -273,6 +280,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
         duplicate.id = "duplicate"
         self.documents.append(duplicate)
         stats = self.run_complete(True, self.source)
+        self.schedule_embedding.assert_not_called()
         self.assertEqual(stats["failed_count"], 1)
         self.assertIn("old", {document.id for document in self.documents})
         self.assertNotIn("new", {document.id for document in self.documents})
@@ -298,6 +306,42 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
         self.assertEqual(stats["deleted_count"], 0)
         self.assertIn("old", {document.id for document in self.documents})
         self.assertNotIn("new", {document.id for document in self.documents})
+        self.schedule_embedding.assert_not_called()
+
+    @patch("knowledge.services.workflow_sync.celery_app.send_task")
+    @patch("knowledge.services.workflow_sync.transaction.on_commit")
+    @patch("knowledge.services.workflow_sync._copy_document_relations")
+    @patch("knowledge.services.workflow_sync.process_visual_assets")
+    @patch("knowledge.services.workflow_sync.sync_paragraph_assets")
+    @patch("knowledge.services.workflow_sync.transaction.atomic")
+    @patch("knowledge.services.workflow_sync.IncrementalDocumentSync")
+    def test_changed_snapshot_embeds_stable_paragraphs_after_commit(
+        self, merger, _atomic, _assets, _process, _copy, on_commit, send_task
+    ):
+        merger.return_value.merge.return_value = SimpleNamespace(reembed_ids=["stable-paragraph"], disabled_ids=[])
+        self.documents[4].meta["token"] = "old"
+        for document in (self.documents[0], self.documents[4]):
+            document.doc_strategy = {}
+            document.visual_strategy_hash = ""
+            document.save = MagicMock()
+        knowledge_query = MagicMock()
+        knowledge_query.filter.return_value.values_list.return_value.first.return_value = "model"
+        with (
+            patch(
+                "knowledge.services.workflow_sync.QuerySet",
+                side_effect=lambda model: knowledge_query if model is Knowledge else self.query(model),
+            ),
+            patch("knowledge.services.workflow_sync._delete_workflow_documents", side_effect=self.delete),
+        ):
+            stats = merge_workflow_incremental_snapshot.__wrapped__(self.sync_log, self.source)
+        self.assertEqual(stats["synced_count"], 1)
+        self.assertNotIn("new", {document.id for document in self.documents})
+        self.assertIn("old", {document.id for document in self.documents})
+        self.schedule_embedding.assert_not_called()
+        send_task.assert_not_called()
+        on_commit.assert_called_once()
+        on_commit.call_args.args[0]()
+        send_task.assert_called_once_with("celery:embedding_by_paragraph_list", args=[["stable-paragraph"], "model"])
 
 
 class WorkflowActionSourceTests(SimpleTestCase):
@@ -476,8 +520,9 @@ class WorkflowSyncLogCountingTests(SimpleTestCase):
             self.workflow_input, self.knowledge.user, True, str(create_log.return_value.id)
         )
 
+    @patch("knowledge.serializers.knowledge_workflow.schedule_workflow_document_embedding")
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
-    def test_completion_without_merger_counts_only_this_execution_output(self, query_set):
+    def test_completion_without_merger_counts_only_this_execution_output(self, query_set, schedule_embedding):
         log = SimpleNamespace(
             id="log",
             knowledge_id=self.knowledge.id,
@@ -495,8 +540,9 @@ class WorkflowSyncLogCountingTests(SimpleTestCase):
             if model is KnowledgeSyncLog
             else MagicMock()
         )
-        for _ in range(2):
+        for index in range(2):
             document = deepcopy(self.documents[0])
+            document.id = f"new-{index}"
             document.meta["workflow_sync_log_id"] = "log"
             self.documents.append(document)
         finalize_knowledge_action.__wrapped__("action", State.SUCCESS, 1.0, "log")
@@ -504,6 +550,7 @@ class WorkflowSyncLogCountingTests(SimpleTestCase):
         self.assertEqual(stats["total_count"], 2)
         self.assertEqual(stats["synced_count"], 2)
         self.assertEqual(stats["status"], KnowledgeSyncStatus.SUCCESS)
+        schedule_embedding.assert_called_once_with(["new-0", "new-1"], self.knowledge.id)
 
 
 class HistoricalWorkflowSyncLogTests(SimpleTestCase):

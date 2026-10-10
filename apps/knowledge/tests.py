@@ -1657,9 +1657,10 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         heartbeat_patch.start()
         self.addCleanup(heartbeat_patch.stop)
 
+    @patch("knowledge.services.workflow_sync.schedule_workflow_document_embedding")
     @patch("knowledge.services.workflow_sync._delete_workflow_documents")
     @patch("knowledge.services.workflow_sync.QuerySet")
-    def test_complete_snapshot_replaces_old_only_after_success(self, query_set, delete_documents):
+    def test_complete_snapshot_replaces_old_only_after_success(self, query_set, delete_documents, schedule_embedding):
         sync_log = MagicMock(knowledge_id="knowledge-id", create_time=timezone.now())
         document_query = MagicMock()
         new_query = MagicMock()
@@ -1684,10 +1685,12 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         self.assertEqual(success["synced_count"], 1)
         self.assertEqual(success["deleted_count"], 1)
         delete_documents.assert_called_with(["old-id"])
+        schedule_embedding.assert_called_once_with(["new-id"], "knowledge-id")
 
         failure = finalize_workflow_complete_snapshot.__wrapped__(sync_log, False, source)
         self.assertEqual(failure["failed_count"], 1)
         delete_documents.assert_called_with(["new-id"])
+        schedule_embedding.assert_called_once()
 
     def test_schedule_accepts_web_and_tool_sources_but_rejects_local_source(self):
         for node_type in ("data-source-web-node", "tool-lib-node"):

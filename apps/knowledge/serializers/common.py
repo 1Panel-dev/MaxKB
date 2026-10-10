@@ -282,6 +282,8 @@ def create_knowledge_index(knowledge_id=None, document_id=None):
         k_id = knowledge_id
     else:
         document = QuerySet(Document).filter(id=document_id).first()
+        if document is None:
+            return
         k_id = document.knowledge_id
 
     sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{k_id}'"

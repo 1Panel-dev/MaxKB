@@ -382,7 +382,10 @@ class KnowledgeWriteNode(INode):
         user_id = workflow_params.get("user_id")
 
         document_model_list, knowledge_id, workspace_id = self.save(documents, user_id)
-        self.post_embedding(document_model_list, knowledge_id, workspace_id)
+        # Sync outputs are snapshots that may be merged or discarded at completion.
+        # The finalizer schedules embeddings only for the retained documents/paragraphs.
+        if not workflow_params.get("sync_log_id") and not workflow_params.get("workflow_sync_document"):
+            self.post_embedding(document_model_list, knowledge_id, workspace_id)
 
         write_content_list = [
             {

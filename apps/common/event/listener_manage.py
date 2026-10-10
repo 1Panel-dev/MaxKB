@@ -296,6 +296,8 @@ class ListenerManagement:
     @staticmethod
     def post_update_document_status(document_id, task_type: TaskType):
         _document = QuerySet(Document).filter(id=document_id).first()
+        if _document is None:
+            return
 
         status = Status(_document.status)
         if status[task_type] == State.REVOKE:
@@ -399,7 +401,8 @@ class ListenerManagement:
                 is_the_task_interrupted,
             )
             # 检查是否存在索引
-            create_knowledge_index(document_id=document_id)
+            if not is_the_task_interrupted():
+                create_knowledge_index(document_id=document_id)
         except Exception as e:
             maxkb_logger.error(
                 _("Vectorized document: {document_id} error {error} {traceback}").format(
@@ -407,10 +410,12 @@ class ListenerManagement:
                 )
             )
         finally:
-            ListenerManagement.post_update_document_status(document_id, TaskType.EMBEDDING)
-            ListenerManagement.get_aggregation_document_status(document_id)()
-            maxkb_logger.info(_("End--->Embedding document: {document_id}").format(document_id=document_id))
-            rlock.un_lock("embedding:" + str(document_id))
+            try:
+                ListenerManagement.post_update_document_status(document_id, TaskType.EMBEDDING)
+                ListenerManagement.get_aggregation_document_status(document_id)()
+                maxkb_logger.info(_("End--->Embedding document: {document_id}").format(document_id=document_id))
+            finally:
+                rlock.un_lock("embedding:" + str(document_id))
 
     @staticmethod
     def embedding_by_knowledge(knowledge_id, embedding_model: MaxKBBaseEmbeddingModel):

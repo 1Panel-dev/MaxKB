@@ -59,6 +59,7 @@ from knowledge.services.workflow_sync import (
     WorkflowDocumentSyncRun,
     finalize_workflow_complete_snapshot,
     merge_workflow_incremental_snapshot,
+    schedule_workflow_document_embedding,
 )
 from knowledge.services.workflow_sync_source import validate_workflow_sync_source, workflow_source_meta
 from system_manage.models import AuthTargetType
@@ -163,16 +164,15 @@ def finalize_knowledge_action(
                     )
                     stats = finalize_workflow_complete_snapshot(sync_log, False, workflow_source, **sync_scope)
             else:
-                synced_count = (
-                    QuerySet(Document)
-                    .filter(
-                        knowledge_id=sync_log.knowledge_id,
-                        type=KnowledgeType.WORKFLOW,
-                        resource_type=DocumentResourceType.DOCUMENT,
-                        meta__workflow_sync_log_id=str(sync_log.id),
-                    )
-                    .count()
+                retained_documents = QuerySet(Document).filter(
+                    knowledge_id=sync_log.knowledge_id,
+                    type=KnowledgeType.WORKFLOW,
+                    resource_type=DocumentResourceType.DOCUMENT,
+                    meta__workflow_sync_log_id=str(sync_log.id),
                 )
+                retained_ids = list(retained_documents.values_list("id", flat=True))
+                schedule_workflow_document_embedding(retained_ids, sync_log.knowledge_id)
+                synced_count = len(retained_ids)
                 stats = {
                     "total_count": synced_count + sync_log.deleted_count,
                     "synced_count": synced_count,

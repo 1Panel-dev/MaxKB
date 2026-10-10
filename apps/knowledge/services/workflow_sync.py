@@ -116,6 +116,18 @@ def _workflow_snapshot_documents(
     return new_documents, old_documents
 
 
+def schedule_workflow_document_embedding(document_ids, knowledge_id) -> None:
+    """Embed retained workflow output only after the snapshot transaction commits."""
+    document_ids = [str(document_id) for document_id in document_ids]
+    if not document_ids:
+        return
+    model_id = QuerySet(Knowledge).filter(id=knowledge_id).values_list("embedding_model_id", flat=True).first()
+    if model_id:
+        transaction.on_commit(
+            lambda: celery_app.send_task("celery:embedding_by_document_list", args=[document_ids, str(model_id)])
+        )
+
+
 @transaction.atomic
 def finalize_workflow_complete_snapshot(
     sync_log: KnowledgeSyncLog | WorkflowDocumentSyncRun, success: bool, workflow_source=None, document_id=None
@@ -129,6 +141,8 @@ def finalize_workflow_complete_snapshot(
     new_ids = [document.id for document in new_document_list]
     old_ids = list(old_documents.values_list("id", flat=True))
     deleted_count = len(_delete_workflow_documents(old_ids if success else new_ids))
+    if success:
+        schedule_workflow_document_embedding(new_ids, sync_log.knowledge_id)
     return {
         # Old and new versions represent the same source snapshot; exclude other sources.
         "total_count": max(len(new_ids), len(old_ids)),
@@ -208,6 +222,7 @@ def merge_workflow_incremental_snapshot(
             if document.id not in matched_old_ids
         ]
         if not candidates:
+            schedule_workflow_document_embedding([new_document.id], sync_log.knowledge_id)
             synced_count += 1
             continue
         if len(candidates) > 1:
