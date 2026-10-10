@@ -25,11 +25,7 @@ class WebSnapshotFailureTests(SimpleTestCase):
         self.old_documents.__iter__.return_value = [
             SimpleNamespace(id="old", meta={"source_url": "https://example.com/section/child"})
         ]
-        self.new_documents = MagicMock()
-        self.new_documents.values_list.return_value = ["staged"]
-        self.document_query.filter.side_effect = lambda **filters: (
-            self.new_documents if "meta__web_sync_run_id" in filters else self.old_documents
-        )
+        self.document_query.filter.return_value = self.old_documents
         query_patch = patch(
             "knowledge.task.sync.QuerySet",
             side_effect=lambda model: {
@@ -47,7 +43,7 @@ class WebSnapshotFailureTests(SimpleTestCase):
     @patch("knowledge.task.sync.get_sync_handler")
     @patch("knowledge.task.sync.ForkManage")
     def test_failed_subtree_never_deletes_missing_descendants(self, crawler, handler, cleanup):
-        def collect(_knowledge, _user, _strategy, _mode, successful_urls, stats):
+        def collect(_knowledge, _user, _strategy, _mode, successful_urls, stats, **_kwargs):
             successful_urls.add("https://example.com")
             stats["failed_count"] = 1
             return MagicMock()
@@ -64,9 +60,10 @@ class WebSnapshotFailureTests(SimpleTestCase):
     @patch("knowledge.task.sync.delete_document_data")
     @patch("knowledge.task.sync.get_save_handler")
     @patch("knowledge.task.sync.ForkManage")
-    def test_partial_complete_run_discards_only_its_staged_documents(self, crawler, handler, cleanup):
-        def collect(_knowledge, _user, _selector, _strategy, stats, _source_meta):
-            stats.update(synced_count=1, failed_count=1)
+    def test_partial_complete_run_does_not_publish_prepared_documents(self, crawler, handler, cleanup):
+        def collect(_knowledge, _user, _selector, _strategy, stats, _source_meta, *, prepared_documents):
+            prepared_documents.append({"name": "prepared"})
+            stats["failed_count"] = 1
             return MagicMock()
 
         handler.side_effect = collect
@@ -76,9 +73,7 @@ class WebSnapshotFailureTests(SimpleTestCase):
         self.assertEqual(result["synced_count"], 0)
         self.assertEqual(result["deleted_count"], 0)
         self.assertEqual(result["status"], KnowledgeSyncStatus.FAILURE)
-        cleanup.assert_called_once_with(["staged"])
-        snapshot_id = handler.call_args.args[-1]["web_sync_run_id"]
-        self.document_query.filter.assert_any_call(knowledge_id="knowledge", meta__web_sync_run_id=snapshot_id)
+        cleanup.assert_not_called()
 
     @patch("knowledge.task.sync.delete_document_data")
     @patch("knowledge.task.sync.get_save_handler")
@@ -90,7 +85,7 @@ class WebSnapshotFailureTests(SimpleTestCase):
         )
         self.assertEqual(result["status"], KnowledgeSyncStatus.FAILURE)
         self.assertEqual(result["message"], "crawl interrupted")
-        cleanup.assert_called_once_with(["staged"])
+        cleanup.assert_not_called()
 
 
 class SyncHeartbeatTests(SimpleTestCase):

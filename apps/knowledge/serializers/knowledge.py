@@ -1300,7 +1300,8 @@ class KnowledgeSerializer(serializers.Serializer):
                     "doc_strategy": normalize_document_strategy(instance.get("doc_strategy")),
                 }
 
-            folder_id = instance.get("folder_id", self.data.get("workspace_id"))
+            payload = self.data if with_valid else self.initial_data
+            folder_id = instance.get("folder_id", payload.get("workspace_id"))
             selector = instance.get("selector")
             doc_strategy = instance.get("doc_strategy")
 
@@ -1309,11 +1310,11 @@ class KnowledgeSerializer(serializers.Serializer):
                 id=knowledge_id,
                 name=instance.get("name"),
                 desc=instance.get("desc"),
-                user_id=self.data.get("user_id"),
+                user_id=payload.get("user_id"),
                 type=instance.get("type", KnowledgeType.WEB),
-                scope=self.data.get("scope", KnowledgeScope.WORKSPACE),
+                scope=payload.get("scope", KnowledgeScope.WORKSPACE),
                 folder_id=folder_id,
-                workspace_id=self.data.get("workspace_id"),
+                workspace_id=payload.get("workspace_id"),
                 embedding_model_id=instance.get("embedding_model_id"),
                 meta={
                     "source_url": instance.get("source_url"),
@@ -1327,14 +1328,14 @@ class KnowledgeSerializer(serializers.Serializer):
             # 自动资源给授权当前用户
             UserResourcePermissionSerializer(
                 data={
-                    "workspace_id": self.data.get("workspace_id"),
-                    "user_id": self.data.get("user_id"),
+                    "workspace_id": payload.get("workspace_id"),
+                    "user_id": payload.get("user_id"),
                     "auth_target_type": AuthTargetType.KNOWLEDGE.value,
                 }
             ).auth_resource(str(knowledge_id))
 
             sync_web_knowledge.delay(
-                str(knowledge_id), self.data.get("user_id"), instance.get("source_url"), selector, doc_strategy
+                str(knowledge_id), payload.get("user_id"), instance.get("source_url"), selector, doc_strategy
             )
             update_resource_mapping_by_knowledge(str(knowledge_id))
             return {**KnowledgeModelSerializer(knowledge).data, "document_list": []}

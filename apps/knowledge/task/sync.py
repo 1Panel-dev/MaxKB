@@ -8,7 +8,6 @@
 """
 
 import traceback
-from uuid import uuid4
 from copy import deepcopy
 from time import perf_counter
 from typing import List
@@ -31,6 +30,7 @@ from knowledge.models import (
     KnowledgeWorkflow,
 )
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer
+from knowledge.serializers.document import DocumentSerializers
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.sync_status import recover_stale_sync_logs, start_sync_heartbeat
 from knowledge.services.workflow_sync import has_running_workflow_document_sync
@@ -39,6 +39,7 @@ from knowledge.task.handler import (
     get_save_handler,
     get_sync_handler,
     get_sync_web_document_handler,
+    is_web_sync_document,
     normalize_web_url,
 )
 from ops import celery_app
@@ -77,7 +78,15 @@ def sync_web_knowledge(knowledge_id: str, user_id, url: str, selector: str, doc_
             _("Start--->Start synchronization web knowledge base:{knowledge_id}").format(knowledge_id=knowledge_id)
         )
         ForkManage(url, get_selector_list(selector)).fork(
-            2, set(), get_save_handler(knowledge_id, user_id, selector, doc_strategy)
+            2,
+            set(),
+            get_save_handler(
+                knowledge_id,
+                user_id,
+                selector,
+                doc_strategy,
+                source_meta={"web_sync_source_url": normalize_web_url(url)},
+            ),
         )
 
         maxkb_logger.info(
@@ -106,7 +115,6 @@ def sync_replace_web_knowledge(
     started_at = perf_counter()
     stats = _new_sync_stats()
     sync_log = None
-    snapshot_id = None
 
     def stop_heartbeat():
         pass
@@ -117,16 +125,16 @@ def sync_replace_web_knowledge(
         knowledge = QuerySet(Knowledge).filter(id=knowledge_id, type=KnowledgeType.WEB).first()
         if knowledge is None:
             raise ValueError(f"Web knowledge does not exist: {knowledge_id}")
-        initial_total = (
-            QuerySet(Document)
-            .filter(
+        documents = [
+            document
+            for document in QuerySet(Document).filter(
                 knowledge_id=knowledge_id,
                 type=KnowledgeType.WEB,
                 resource_type=DocumentResourceType.DOCUMENT,
             )
-            .count()
-        )
-        stats["total_count"] = initial_total if isinstance(initial_total, int) else 0
+            if is_web_sync_document(document, url)
+        ]
+        stats["total_count"] = len(documents)
         if record_log:
             sync_log = (
                 QuerySet(KnowledgeSyncLog).get(id=sync_log_id)
@@ -147,68 +155,65 @@ def sync_replace_web_knowledge(
             )
         )
         if sync_type == "complete":
-            snapshot_id = str(sync_log.id) if sync_log is not None else str(uuid4())
-            document_ids = list(
-                QuerySet(Document)
-                .filter(
-                    knowledge_id=knowledge_id,
-                    type=KnowledgeType.WEB,
-                    resource_type=DocumentResourceType.DOCUMENT,
-                )
-                .values_list("id", flat=True)
-            )
+            document_ids = [document.id for document in documents]
+            prepared_documents = []
             ForkManage(url, get_selector_list(selector)).fork(
                 2,
                 set(),
                 get_save_handler(
-                    knowledge_id, user_id, selector, doc_strategy, stats, {"web_sync_run_id": snapshot_id}
+                    knowledge_id,
+                    user_id,
+                    selector,
+                    doc_strategy,
+                    stats,
+                    {"web_sync_source_url": normalize_web_url(url)},
+                    prepared_documents=prepared_documents,
                 ),
             )
-            if stats["failed_count"]:
-                _discard_web_snapshot(knowledge_id, snapshot_id)
-                stats["synced_count"] = 0
-            else:
-                # Publish only after the whole crawl succeeded; recovery uses the same knowledge lock.
+            if not stats["failed_count"]:
+                if not prepared_documents:
+                    raise ValueError("Web synchronization returned an empty document snapshot")
+                # No documents or embedding jobs are published until the complete crawl succeeds.
                 with transaction.atomic():
                     QuerySet(Knowledge).select_for_update().get(id=knowledge_id)
                     if sync_log is not None:
                         current_log = QuerySet(KnowledgeSyncLog).get(id=sync_log.id)
                         if current_log.status != KnowledgeSyncStatus.RUNNING:
                             raise ValueError("Synchronization is no longer running")
-                    delete_document_data(document_ids)
-                    stats["deleted_count"] = len(document_ids)
+                    for instance in prepared_documents:
+                        DocumentSerializers.Create(data={"knowledge_id": knowledge_id, "user_id": user_id}).save(
+                            instance, with_valid=True, raise_on_enqueue_failure=False
+                        )
+                    deleted_ids = delete_document_data(document_ids)
                     if sync_log is not None:
                         # Commit publication and the terminal log together; recovery must not
                         # mistake an already-published snapshot for abandoned temporary output.
                         QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(
                             status=KnowledgeSyncStatus.SUCCESS,
-                            total_count=max(stats["total_count"], stats["synced_count"], stats["deleted_count"]),
-                            synced_count=stats["synced_count"],
-                            deleted_count=stats["deleted_count"],
+                            total_count=max(stats["total_count"], len(prepared_documents)),
+                            synced_count=len(prepared_documents),
+                            deleted_count=len(deleted_ids),
                             duration_ms=max(0, round((perf_counter() - started_at) * 1000)),
                         )
-                stats["deleted_count"] = len(document_ids)
+                stats["synced_count"] = len(prepared_documents)
+                stats["deleted_count"] = len(deleted_ids)
         else:
             visited_urls, successful_urls = set(), set()
             ForkManage(url, get_selector_list(selector)).fork(
                 2,
                 visited_urls,
-                get_sync_handler(knowledge_id, user_id, doc_strategy, sync_type, successful_urls, stats),
+                get_sync_handler(
+                    knowledge_id, user_id, doc_strategy, sync_type, successful_urls, stats, sync_source_url=url
+                ),
             )
             if sync_type == "incremental" and not stats["failed_count"] and normalize_web_url(url) in successful_urls:
                 crawled_urls = {normalize_web_url(item) for item in visited_urls}
                 stale_document_ids = [
                     document.id
-                    for document in QuerySet(Document).filter(
-                        knowledge_id=knowledge_id,
-                        type=KnowledgeType.WEB,
-                        resource_type=DocumentResourceType.DOCUMENT,
-                    )
-                    if (document.meta or {}).get("source_url")
-                    and normalize_web_url(document.meta["source_url"]) not in crawled_urls
+                    for document in documents
+                    if normalize_web_url((document.meta or {}).get("source_url", "")) not in crawled_urls
                 ]
-                delete_document_data(stale_document_ids)
-                stats["deleted_count"] += len(stale_document_ids)
+                stats["deleted_count"] += len(delete_document_data(stale_document_ids))
         stats["total_count"] = max(
             stats["total_count"],
             stats["synced_count"] + stats["skipped_count"] + stats["failed_count"],
@@ -220,9 +225,6 @@ def sync_replace_web_knowledge(
     except Exception as e:
         stats["failed_count"] += 1
         stats["message"] = str(e)
-        if snapshot_id is not None:
-            _discard_web_snapshot(knowledge_id, snapshot_id)
-            stats["synced_count"] = 0
         if sync_log is None:
             _finish_unstarted_scheduled_sync(sync_log_id, KnowledgeSyncStatus.FAILURE, str(e))
         maxkb_logger.error(
@@ -248,15 +250,6 @@ def sync_replace_web_knowledge(
                 message=stats["message"],
             )
     return stats
-
-
-def _discard_web_snapshot(knowledge_id, snapshot_id):
-    document_ids = list(
-        QuerySet(Document)
-        .filter(knowledge_id=knowledge_id, meta__web_sync_run_id=snapshot_id)
-        .values_list("id", flat=True)
-    )
-    delete_document_data(document_ids)
 
 
 @celery_app.task(name="celery:scheduled_sync_web_knowledge")

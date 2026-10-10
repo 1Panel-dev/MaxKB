@@ -112,6 +112,23 @@ from oss.serializers.file import FileSerializer
 from rest_framework import serializers
 from xlwt import Utils
 
+
+def _enqueue_sync_embedding(task, task_args, document_id, paragraph_ids=None):
+    """Queue committed sync content without turning a broker failure into a false rollback."""
+    try:
+        task.delay(*task_args)
+    except AlreadyQueued:
+        return
+    except Exception:
+        maxkb_logger.exception(f"Failed to queue embedding for synchronized document: {document_id}")
+        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.FAILURE)
+        paragraphs = QuerySet(Paragraph).filter(document_id=document_id)
+        if paragraph_ids is not None:
+            paragraphs = paragraphs.filter(id__in=paragraph_ids)
+        ListenerManagement.update_status(paragraphs, TaskType.EMBEDDING, State.FAILURE)
+        ListenerManagement.get_aggregation_document_status(document_id)()
+
+
 default_split_handle = TextSplitHandle()
 split_handles = [
     HTMLSplitHandle(),
@@ -707,58 +724,64 @@ class DocumentSerializers(serializers.Serializer):
             if document.type != KnowledgeType.WEB or document.resource_type != DocumentResourceType.DOCUMENT:
                 return True
             try:
-                ListenerManagement.update_status(
-                    QuerySet(Document).filter(id=document_id), TaskType.SYNC, State.PENDING
-                )
-                ListenerManagement.get_aggregation_document_status(document_id)()
-                source_url = document.meta.get("source_url")
-                selector_list = (
-                    document.meta.get("selector").split(" ")
-                    if "selector" in document.meta and document.meta.get("selector") is not None
-                    else []
-                )
-                result = response or Fork(source_url, selector_list).fork()
-                if result.status == 200:
-                    strategy_mode = self.validated_data.get("strategy_mode", "default") if with_valid else "default"
-                    split_strategy = normalize_document_strategy(
-                        self.validated_data.get("doc_strategy") if strategy_mode == "custom" else document.doc_strategy
+                with transaction.atomic():
+                    ListenerManagement.update_status(
+                        QuerySet(Document).filter(id=document_id), TaskType.SYNC, State.PENDING
                     )
-                    content = internalize_web_images(result.content, document.knowledge_id)
-                    paragraphs = parse_web_content(content, split_strategy)
-                    incoming_source_hash = document_source_hash(prepare_remote_paragraphs(paragraphs))
-                    incoming_strategy_hashes = strategy_hashes(split_strategy)
-                    strategy_unchanged = all(
-                        getattr(document, key) == value for key, value in incoming_strategy_hashes.items()
+                    ListenerManagement.get_aggregation_document_status(document_id)()
+                    source_url = document.meta.get("source_url")
+                    selector_list = (
+                        document.meta.get("selector").split(" ")
+                        if "selector" in document.meta and document.meta.get("selector") is not None
+                        else []
                     )
-                    if document.source_hash == incoming_source_hash and strategy_unchanged:
-                        document.last_sync_time = timezone.now()
-                        document.save(update_fields=["last_sync_time", "update_time"])
-                        merge_result = None
-                    else:
-                        merge_result = IncrementalDocumentSync(document, split_strategy).merge(paragraphs)
-                    if merge_result is None:
-                        changed_paragraphs = QuerySet(Paragraph).none()
-                    else:
-                        changed_paragraphs = QuerySet(Paragraph).filter(id__in=merge_result.reembed_ids)
-                    assets = sync_paragraph_assets(changed_paragraphs, document.visual_strategy_hash)
-                    process_visual_assets(assets, split_strategy)
-                    if merge_result is not None and merge_result.disabled_ids:
-                        delete_embedding_by_paragraph_ids(merge_result.disabled_ids)
-                    # 只重建新增或有效内容变化的向量，稳定段落 ID 与问题关联都保持不变。
-                    if with_embedding and merge_result is not None and merge_result.reembed_ids:
-                        embedding_model_id = get_embedding_model_id_by_knowledge_id(document.knowledge_id)
-                        ListenerManagement.update_status(changed_paragraphs, TaskType.EMBEDDING, State.PENDING)
-                        ListenerManagement.get_aggregation_document_status(document_id)()
-                        transaction.on_commit(
-                            partial(
-                                embedding_by_paragraph_list.delay,
-                                list(merge_result.reembed_ids),
-                                embedding_model_id,
-                            )
+                    result = response or Fork(source_url, selector_list).fork()
+                    if result.status == 200:
+                        strategy_mode = self.validated_data.get("strategy_mode", "default") if with_valid else "default"
+                        split_strategy = normalize_document_strategy(
+                            self.validated_data.get("doc_strategy")
+                            if strategy_mode == "custom"
+                            else document.doc_strategy
                         )
+                        content = internalize_web_images(result.content, document.knowledge_id)
+                        paragraphs = parse_web_content(content, split_strategy)
+                        incoming_source_hash = document_source_hash(prepare_remote_paragraphs(paragraphs))
+                        incoming_strategy_hashes = strategy_hashes(split_strategy)
+                        strategy_unchanged = all(
+                            getattr(document, key) == value for key, value in incoming_strategy_hashes.items()
+                        )
+                        if document.source_hash == incoming_source_hash and strategy_unchanged:
+                            document.last_sync_time = timezone.now()
+                            document.save(update_fields=["last_sync_time", "update_time"])
+                            merge_result = None
+                        else:
+                            merge_result = IncrementalDocumentSync(document, split_strategy).merge(paragraphs)
+                        if merge_result is None:
+                            changed_paragraphs = QuerySet(Paragraph).none()
+                        else:
+                            changed_paragraphs = QuerySet(Paragraph).filter(id__in=merge_result.reembed_ids)
+                        assets = sync_paragraph_assets(changed_paragraphs, document.visual_strategy_hash)
+                        process_visual_assets(assets, split_strategy)
+                        if merge_result is not None and merge_result.disabled_ids:
+                            delete_embedding_by_paragraph_ids(merge_result.disabled_ids)
+                        # 只重建新增或有效内容变化的向量，稳定段落 ID 与问题关联都保持不变。
+                        if with_embedding and merge_result is not None and merge_result.reembed_ids:
+                            embedding_model_id = get_embedding_model_id_by_knowledge_id(document.knowledge_id)
+                            ListenerManagement.update_status(changed_paragraphs, TaskType.EMBEDDING, State.PENDING)
+                            ListenerManagement.get_aggregation_document_status(document_id)()
+                            transaction.on_commit(
+                                partial(
+                                    _enqueue_sync_embedding,
+                                    embedding_by_paragraph_list,
+                                    (list(merge_result.reembed_ids), embedding_model_id),
+                                    document_id,
+                                    list(merge_result.reembed_ids),
+                                ),
+                                robust=True,
+                            )
 
-                else:
-                    state = State.FAILURE
+                    else:
+                        state = State.FAILURE
             except Exception as e:
                 maxkb_logger.error(f"{str(e)}:{traceback.format_exc()}")
                 state = State.FAILURE
@@ -932,7 +955,7 @@ class DocumentSerializers(serializers.Serializer):
             delete_document_data([self.data.get("document_id")])
             return True
 
-        def refresh(self, state_list=None, with_valid=True):
+        def refresh(self, state_list=None, with_valid=True, raise_on_enqueue_failure=True):
             if state_list is None:
                 state_list = [
                     State.PENDING.value,
@@ -947,7 +970,6 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
             embedding_model_id = knowledge.embedding_model_id
-            knowledge_user_id = knowledge.user_id
             embedding_model = QuerySet(Model).filter(id=embedding_model_id).first()
             if embedding_model is None:
                 raise AppApiException(500, _("Model does not exist"))
@@ -974,7 +996,18 @@ class DocumentSerializers(serializers.Serializer):
                 except AlreadyQueued:
                     raise AppApiException(500, _("The task is being executed, please do not send it repeatedly."))
 
-            transaction.on_commit(enqueue_embedding)
+            if raise_on_enqueue_failure:
+                transaction.on_commit(enqueue_embedding)
+            else:
+                transaction.on_commit(
+                    partial(
+                        _enqueue_sync_embedding,
+                        embedding_by_document,
+                        (document_id, embedding_model_id, state_list),
+                        document_id,
+                    ),
+                    robust=True,
+                )
 
         def tokenize(self, state_list=None, with_valid=True):
             if state_list is None:
@@ -1104,13 +1137,17 @@ class DocumentSerializers(serializers.Serializer):
             return True
 
         @staticmethod
-        def post_embedding(result, document_id, knowledge_id):
-            DocumentSerializers.Operate(data={"knowledge_id": knowledge_id, "document_id": document_id}).refresh()
+        def post_embedding(result, document_id, knowledge_id, raise_on_enqueue_failure=True):
+            operation = DocumentSerializers.Operate(data={"knowledge_id": knowledge_id, "document_id": document_id})
+            if raise_on_enqueue_failure:
+                operation.refresh()
+            else:
+                operation.refresh(raise_on_enqueue_failure=False)
             return result
 
         @post(post_function=post_embedding)
         @transaction.atomic
-        def save(self, instance: Dict, with_valid=True, **kwargs):
+        def save(self, instance: Dict, with_valid=True, raise_on_enqueue_failure=True, **kwargs):
             if with_valid:
                 DocumentInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
@@ -1157,6 +1194,7 @@ class DocumentSerializers(serializers.Serializer):
                 ),
                 document_id,
                 knowledge_id,
+                raise_on_enqueue_failure,
             )
 
         @staticmethod

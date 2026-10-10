@@ -786,6 +786,12 @@ class DocumentStrategyTests(SimpleTestCase):
 
 
 class WebDocumentStrategyRequestTests(SimpleTestCase):
+    def setUp(self):
+        super().setUp()
+        atomic_patch = patch("knowledge.task.handler.transaction.atomic", return_value=nullcontext())
+        atomic_patch.start()
+        self.addCleanup(atomic_patch.stop)
+
     def test_document_split_multipart_payload_includes_json_strategy(self):
         request = MagicMock()
         request.FILES.getlist.return_value = [SimpleUploadedFile("example.txt", b"content")]
@@ -1367,7 +1373,7 @@ class WebKnowledgeSyncTaskTests(SimpleTestCase):
         sync_log = MagicMock(id="log-id", status=KnowledgeSyncStatus.RUNNING)
         create_log.return_value = sync_log
 
-        def handler_factory(_knowledge_id, _user_id, _strategy, _sync_type, successful_urls, stats):
+        def handler_factory(_knowledge_id, _user_id, _strategy, _sync_type, successful_urls, stats, **_kwargs):
             successful_urls.add(root_url)
             stats["synced_count"] = 1
             stats["skipped_count"] = 1
@@ -1404,7 +1410,7 @@ class WebKnowledgeSyncTaskTests(SimpleTestCase):
         root_url = "https://example.com"
         successful_urls = None
 
-        def handler_factory(_knowledge_id, _user_id, _strategy, _sync_type, success_set, _stats):
+        def handler_factory(_knowledge_id, _user_id, _strategy, _sync_type, success_set, _stats, **_kwargs):
             nonlocal successful_urls
             successful_urls = success_set
             return MagicMock()
@@ -1450,13 +1456,27 @@ class WebKnowledgeSyncTaskTests(SimpleTestCase):
     ):
         events = []
         document_query = MagicMock()
-        document_query.filter.return_value.values_list.return_value = ["document-id"]
+        document_query.filter.return_value.__iter__.return_value = [
+            SimpleNamespace(id="document-id", meta={"source_url": "https://example.com"})
+        ]
         file_query = MagicMock()
         query_set.side_effect = lambda model: document_query if model is Document else file_query
-        delete_document_data.side_effect = lambda _document_ids: events.append("cleanup")
+
+        def cleanup(document_ids):
+            events.append("cleanup")
+            return document_ids
+
+        delete_document_data.side_effect = cleanup
+
+        def prepare(*_args, prepared_documents):
+            prepared_documents.append({"name": "new"})
+            return MagicMock()
+
+        _get_save_handler.side_effect = prepare
         fork_manage.return_value.fork.side_effect = lambda *_args: events.append("crawl")
 
-        sync_replace_web_knowledge.run("knowledge-id", "user-id", "https://example.com", "body", {}, "complete")
+        with patch("knowledge.task.sync.DocumentSerializers.Create"):
+            sync_replace_web_knowledge.run("knowledge-id", "user-id", "https://example.com", "body", {}, "complete")
 
         delete_document_data.assert_called_once_with(["document-id"])
         fork_manage.return_value.fork.assert_called_once()
@@ -2007,6 +2027,12 @@ class WebImageAssetTests(SimpleTestCase):
 
 
 class IncrementalSyncTests(SimpleTestCase):
+    def setUp(self):
+        super().setUp()
+        atomic_patch = patch("knowledge.serializers.document.transaction.atomic", return_value=nullcontext())
+        atomic_patch.start()
+        self.addCleanup(atomic_patch.stop)
+
     def test_manual_paragraphs_never_match_remote_keys_hashes_or_titles(self):
         service = IncrementalDocumentSync(Document())
         remote = prepare_remote_paragraphs([{"title": "Title", "content": "remote"}])[0]

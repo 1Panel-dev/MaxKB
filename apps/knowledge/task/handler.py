@@ -6,6 +6,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 from common.utils.fork import ChildLink, Fork, remove_fragment
 from common.utils.logger import maxkb_logger
+from django.db import transaction
 from django.db.models import QuerySet
 from knowledge.models import State, Status, TaskType
 from knowledge.models.knowledge import Document, DocumentResourceType, Knowledge, KnowledgeType
@@ -25,6 +26,24 @@ def normalize_web_url(source_url: str) -> str:
     parsed = urlsplit(value)
     path = parsed.path.rstrip("/")
     return urlunsplit((parsed.scheme.lower(), parsed.netloc.lower(), path, parsed.query, ""))
+
+
+def is_web_sync_document(document, source_url: str) -> bool:
+    """Limit cleanup to this crawl, with a URL-boundary fallback for legacy documents."""
+    meta = document.meta or {}
+    root_url = normalize_web_url(source_url)
+    if "web_sync_source_url" in meta:
+        return bool(meta["web_sync_source_url"]) and normalize_web_url(meta["web_sync_source_url"]) == root_url
+    if not meta.get("source_url"):
+        return False
+    root = urlsplit(root_url)
+    page = urlsplit(normalize_web_url(meta["source_url"]))
+    prefix = root.path
+    if prefix.endswith((".html", ".htm")):
+        prefix = prefix.rsplit("/", 1)[0]
+    return (root.scheme, root.netloc) == (page.scheme, page.netloc) and (
+        page.path == prefix or page.path.startswith(prefix + "/")
+    )
 
 
 def _document_name(child_link: ChildLink) -> str:
@@ -51,7 +70,9 @@ def _web_documents_by_url(knowledge):
     }
 
 
-def get_save_handler(knowledge_id, user_id, selector, doc_strategy=None, stats=None, source_meta=None):
+def get_save_handler(
+    knowledge_id, user_id, selector, doc_strategy=None, stats=None, source_meta=None, prepared_documents=None
+):
     knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
     strategy = normalize_document_strategy(
         doc_strategy
@@ -59,6 +80,10 @@ def get_save_handler(knowledge_id, user_id, selector, doc_strategy=None, stats=N
         else ((knowledge.meta or {}).get("doc_strategy") if knowledge else None)
     )
     document_by_url = _web_documents_by_url(knowledge)
+    source_meta = {
+        "web_sync_source_url": normalize_web_url((knowledge.meta or {}).get("source_url", "")) if knowledge else None,
+        **(source_meta or {}),
+    }
 
     def handler(child_link: ChildLink, response: Fork.Response):
         if response.status == 200:
@@ -70,16 +95,22 @@ def get_save_handler(knowledge_id, user_id, selector, doc_strategy=None, stats=N
                 document_name = _document_name(child_link)
                 content = internalize_web_images(response.content, knowledge_id)
                 paragraphs = parse_web_content(content, selected_strategy)
-                DocumentSerializers.Create(data={"knowledge_id": knowledge_id, "user_id": user_id}).save(
-                    {
-                        "name": document_name,
-                        "paragraphs": paragraphs,
-                        "meta": {**(source_meta or {}), "source_url": child_link.url, "selector": selector},
-                        "type": KnowledgeType.WEB,
-                        "doc_strategy": selected_strategy,
-                    },
-                    with_valid=True,
-                )
+                if existing is not None and not paragraphs:
+                    raise ValueError("Remote synchronization returned an empty paragraph snapshot")
+                instance = {
+                    "name": document_name,
+                    "paragraphs": paragraphs,
+                    "meta": {**source_meta, "source_url": child_link.url, "selector": selector},
+                    "type": KnowledgeType.WEB,
+                    "doc_strategy": selected_strategy,
+                }
+                if prepared_documents is not None:
+                    prepared_documents.append(instance)
+                    return
+                with transaction.atomic():
+                    DocumentSerializers.Create(data={"knowledge_id": knowledge_id, "user_id": user_id}).save(
+                        instance, with_valid=True, raise_on_enqueue_failure=False
+                    )
                 _increment_stats(stats, "synced_count")
             except Exception as e:
                 _increment_stats(stats, "failed_count")
@@ -97,6 +128,7 @@ def get_sync_handler(
     sync_type="incremental",
     successful_urls=None,
     stats=None,
+    sync_source_url=None,
 ):
     knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
     if knowledge is None:
@@ -109,6 +141,9 @@ def get_sync_handler(
         else ((knowledge.meta or {}).get("doc_strategy") if knowledge else None)
     )
     document_by_url = _web_documents_by_url(knowledge)
+    sync_source_url = normalize_web_url(
+        sync_source_url if sync_source_url is not None else (knowledge.meta or {}).get("source_url", "")
+    )
 
     def handler(child_link: ChildLink, response: Fork.Response):
         if response.status == 200:
@@ -149,20 +184,28 @@ def get_sync_handler(
                 )
                 content = internalize_web_images(response.content, knowledge.id)
                 paragraphs = parse_web_content(content, selected_strategy)
-                created = DocumentSerializers.Create(data={"knowledge_id": knowledge.id, "user_id": user_id}).save(
-                    {
-                        "name": document_name,
-                        "paragraphs": paragraphs,
-                        "meta": {"source_url": source_url, "selector": selected_selector},
-                        "type": KnowledgeType.WEB,
-                        "doc_strategy": selected_strategy,
-                    },
-                    with_valid=True,
-                )
-                if existing is not None:
-                    # 新文档完整落库后再删除旧文档，避免解析或向量化失败造成数据丢失。
-                    delete_document_data([existing.id])
-                    _increment_stats(stats, "deleted_count")
+                if existing is not None and not paragraphs:
+                    raise ValueError("Remote synchronization returned an empty paragraph snapshot")
+                deleted_ids = []
+                with transaction.atomic():
+                    created = DocumentSerializers.Create(data={"knowledge_id": knowledge.id, "user_id": user_id}).save(
+                        {
+                            "name": document_name,
+                            "paragraphs": paragraphs,
+                            "meta": {
+                                "source_url": source_url,
+                                "selector": selected_selector,
+                                "web_sync_source_url": sync_source_url,
+                            },
+                            "type": KnowledgeType.WEB,
+                            "doc_strategy": selected_strategy,
+                        },
+                        with_valid=True,
+                        raise_on_enqueue_failure=False,
+                    )
+                    if existing is not None:
+                        deleted_ids = delete_document_data([existing.id])
+                _increment_stats(stats, "deleted_count", len(deleted_ids))
                 created_id = created.get("id") if isinstance(created, dict) else None
                 if created_id:
                     document_by_url[source_url] = QuerySet(Document).filter(id=created_id).first()
@@ -189,7 +232,7 @@ def get_sync_web_document_handler(knowledge_id, user_id, doc_strategy=None):
                     {
                         "name": source_url[0:128],
                         "paragraphs": paragraphs,
-                        "meta": {"source_url": source_url, "selector": selector},
+                        "meta": {"source_url": source_url, "selector": selector, "web_sync_source_url": None},
                         "type": KnowledgeType.WEB,
                         "doc_strategy": strategy,
                     },
@@ -202,7 +245,12 @@ def get_sync_web_document_handler(knowledge_id, user_id, doc_strategy=None):
             Document(
                 name=source_url[0:128],
                 knowledge_id=knowledge_id,
-                meta={"source_url": source_url, "selector": selector, "allow_download": True},
+                meta={
+                    "source_url": source_url,
+                    "selector": selector,
+                    "allow_download": True,
+                    "web_sync_source_url": None,
+                },
                 type=KnowledgeType.WEB,
                 char_length=0,
                 status=State.FAILURE,
