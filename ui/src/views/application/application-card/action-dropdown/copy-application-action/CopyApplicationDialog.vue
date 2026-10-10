@@ -89,7 +89,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="复制智能体" :show-close="!submitting" @closed="emit('closed')">
+  <MkDialog v-model="visible" title="复制智能体" @closed="emit('closed')">
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"

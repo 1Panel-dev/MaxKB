@@ -109,14 +109,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog
-    v-model="dialogVisible"
-    title="创建高级智能体"
-    align-center
-    :before-close="handleBeforeClose"
-    :show-close="!loading"
-    @closed="handleClosed"
-  >
+  <MkDialog v-model="dialogVisible" title="创建高级智能体" align-center :before-close="handleBeforeClose" @closed="handleClosed">
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"

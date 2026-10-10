@@ -13,7 +13,6 @@ const getModelList = (query?: Dict<unknown>) => {
 }
 
 /** 获取 System 共享范围的模型选项，并标记共享来源。 */
-// TODO 资源共享的模型是不是都是共享的
 const getModelListWithShared = (query?: Dict<unknown>): Promise<ModelItem[]> =>
   getModelList(query).then((models) => models.map((model): ModelItem => ({ ...model, source: 'shared' })))
 
@@ -56,7 +55,6 @@ const getModelMeta = (modelId: string) => {
 const putPauseModelDownload = (modelId: string) => {
   return put<undefined, boolean>(`${prefix}/${modelId}/pause_download`)
 }
-
 
 /** 使用指定模型流式生成或优化系统提示词。 */
 const postPromptGenerate = (modelId: string, payload: PromptGeneratePayload) => {

@@ -143,7 +143,7 @@ defineExpose({ open })
         </el-steps>
       </div>
     </template>
-    <div v-loading="loading" class="h-full">
+    <div v-loading="loading" class="mx-auto w-full max-w-200">
       <keep-alive :key="actionKey" :include="['DataSource', 'KnowledgeBase']">
         <component
           :is="actionComponents[active]"
@@ -157,7 +157,7 @@ defineExpose({ open })
     </div>
     <template #footer>
       <!-- 取消导入 -->
-      <el-button v-if="active !== 'result'" :disabled="busy" @click="visible = false">取消</el-button>
+      <el-button v-if="active !== 'result'" plain :disabled="busy" @click="visible = false">取消</el-button>
       <!-- 继续导入 -->
       <el-button v-if="active === 'result'" plain @click="handleContinueImport">继续导入</el-button>
       <!-- 返回数据源 -->

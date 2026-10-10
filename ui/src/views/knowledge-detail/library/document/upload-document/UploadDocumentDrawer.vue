@@ -3,6 +3,7 @@ import { computed, provide, ref, useTemplateRef } from 'vue'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
+import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import type { DocumentSplitResult } from '@/api/types'
 import DocumentImportPreview from './DocumentImportPreview.vue'
@@ -50,9 +51,10 @@ function handleDownloadTemplate(type: 'excel' | 'csv') {
 }
 
 function validateImportFiles() {
-  if (loading.value || uploadComponentUploading.value) return false
-  if (!successfulFiles.value.length) {
-    MsgWarning('没有上传成功的文件，请重新上传')
+  if (loading.value) return false
+  const message = getUploadValidationMessage(selectedFiles.value)
+  if (message) {
+    MsgWarning(message)
     return false
   }
   return true

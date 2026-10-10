@@ -138,7 +138,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="title" :show-close="!loading" @closed="resetData">
+  <MkDialog v-model="visible" :title="title" @closed="resetData">
     <el-form ref="formRef" v-loading="loading" :model="tagForm" label-position="top" @submit.prevent>
       <MkFormList v-model="tagForm.tags" :default-item="defaultTag" @update:model-value="handleRowsChange">
         <template #default="{ index, item: tag }">

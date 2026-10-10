@@ -64,14 +64,11 @@ function validateFile(file: DragUploadFile) {
     handleRemove(file)
     return false
   }
+  const fileIndex = fileList.value.findIndex((selected) => selected.uid === file.uid)
   if (
-    fileList.value.some(
-      (selected) =>
-        selected.uid !== file.uid &&
-        selected.name === file.name &&
-        selected.size === file.size &&
-        selected.raw?.lastModified === file.raw?.lastModified,
-    )
+    fileList.value
+      .slice(0, fileIndex)
+      .some((selected) => selected.name === file.name && selected.size === file.size && selected.raw?.lastModified === file.raw?.lastModified)
   ) {
     handleRemove(file)
     return false
@@ -126,7 +123,6 @@ function handleUpload(file: DragUploadFile) {
       return request.then((response) => {
         if (file.status !== 'uploading') return
         const split_path = response.split('/')
-        // TODO
         file.file_id = split_path[split_path.length - 1]
         file.percentage = 100
         file.status = 'success'
@@ -167,6 +163,12 @@ function handleRemove(file: DragUploadFile) {
   if (file.status === 'success' && file.file_id) {
     void FileApi.deleteFile(file.file_id).catch(() => {
       // 请求层统一提示删除失败，临时文件仍按有效期清理。
+    })
+  }
+  // 同步清理 ElUpload 的内部列表，避免后续 change 回写已移除的重复文件。
+  if (file.uid !== undefined) {
+    void Promise.resolve(uploadRef.value?.handleRemove({ ...file, uid: file.uid, status: file.status ?? 'ready' })).catch(() => {
+      // 控件已移除该文件时，仍以调用方列表的清理结果为准。
     })
   }
   fileList.value = fileList.value.filter((selected) => selected.uid !== file.uid)

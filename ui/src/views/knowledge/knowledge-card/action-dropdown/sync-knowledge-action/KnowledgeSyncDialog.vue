@@ -39,7 +39,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="同步知识库" :show-close="!loading" @closed="emit('closed')">
+  <MkDialog v-model="visible" title="同步知识库" @closed="emit('closed')">
     <p class="mb-2">同步方式</p>
     <el-radio-group v-model="syncType" v-loading="loading" class="space-y-2">
       <template v-for="option in KNOWLEDGE_SYNC_OPTIONS" :key="option.value">

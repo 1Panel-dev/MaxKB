@@ -78,7 +78,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建飞书知识库" align-center :show-close="!loading" @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="创建飞书知识库" align-center @closed="resetData">
     <KnowledgeBaseForm ref="baseFormRef" v-loading="loading" />
     <el-form
       class="mt-4"

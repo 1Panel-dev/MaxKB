@@ -38,15 +38,7 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog
-    align-center
-    v-model="visible"
-    class="move-to-dialog"
-    content-class="move-to-dialog__content"
-    title="移动到"
-    :show-close="!loading"
-    @closed="resetData"
-  >
+  <MkDialog align-center v-model="visible" class="move-to-dialog" content-class="move-to-dialog__content" title="移动到" @closed="resetData">
     <FolderTree
       v-model="selectedTargetId"
       class="move-to-dialog__folder-tree"

@@ -39,19 +39,25 @@ const accept = computed(() => fileTypes.value.map((type) => `.${type.toLowerCase
 const formats = computed(() => fileTypes.value.map((type) => type.toUpperCase()).join('、'))
 const fileSizeLimit = computed(() => Number(props.formField.attrs?.file_size_limit ?? attrs.file_size_limit) || 50)
 const fileCountLimit = computed(() => Number(props.formField.attrs?.file_count_limit ?? attrs.file_count_limit) || 100)
-const tipText = computed(
-  () => `单次上传最多 ${fileCountLimit.value} 个文件，每个文件最大 ${fileSizeLimit.value} MB${formats.value ? `；支持格式：${formats.value}` : ''}`,
-)
 </script>
 
 <template>
-  <MkDragUpload
-    v-model="selectedFiles"
-    multiple
-    :disabled="inputDisabled"
-    :accept="accept"
-    :limit="fileCountLimit"
-    :size-limit="fileSizeLimit"
-    :tip-text="tipText"
-  />
+  <div class="w-full">
+    <el-alert type="primary" :closable="false" show-icon class="mb-4!">
+      <template #icon><MkIcon name="icon_info_filled" /></template>
+      <ol class="list-inside list-decimal space-y-1">
+        <li>文件上传前，建议规范文件的分段标识</li>
+        <li>每次最多上传 {{ fileCountLimit }} 个文件，每个文件不超过 {{ fileSizeLimit }} MB</li>
+      </ol>
+    </el-alert>
+    <MkDragUpload
+      v-model="selectedFiles"
+      multiple
+      :disabled="inputDisabled"
+      :accept="accept"
+      :limit="fileCountLimit"
+      :size-limit="fileSizeLimit"
+      :tip-text="formats ? `支持格式：${formats}` : ''"
+    />
+  </div>
 </template>

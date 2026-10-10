@@ -4,6 +4,7 @@ import type { FormItemRule } from 'element-plus'
 import { get } from 'lodash'
 import type { Dict } from '@/api/types'
 import bus from '@/utils/bus'
+import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import FormItemLabel from './FormItemLabel.vue'
 import type { DynamicFormTriggerMap, DynamicFormTriggerSetting, DynamicFormValue, FormField, FormFieldLabel, SerializedFormRule } from './type'
 
@@ -95,7 +96,7 @@ const errorMessage = computed(() => {
     return fieldProps.value.err_msg
   }
   const label = isString(props.formField.label) ? props.formField.label : props.formField.label?.label
-  return `${label || props.formField.field} 不能为空`
+  return `请输入 ${label || props.formField.field}`
 })
 
 function deserializeRule(rule: SerializedFormRule): FormItemRule {
@@ -110,6 +111,20 @@ function deserializeRule(rule: SerializedFormRule): FormItemRule {
 }
 
 const validationRules = computed<FormItemRule | FormItemRule[]>(() => {
+  if (props.formField.input_type === 'LocalFileUpload') {
+    // 文件字段在提交时校验，错误统一由 MkDynamicsForm 使用 MsgWarning 提示。
+    const uploadRules: FormItemRule[] = [
+      {
+        required: props.formField.required !== false,
+        validator: (_rule, value, callback) => {
+          const message = getUploadValidationMessage(Array.isArray(value) ? value : [], props.formField.required !== false)
+          callback(message ? new Error(message) : undefined)
+        },
+      },
+      ...(fieldProps.value.rules?.map(deserializeRule) ?? []),
+    ]
+    return uploadRules.map((rule) => ({ ...rule, trigger: [] }))
+  }
   if (fieldProps.value.rules) {
     return fieldProps.value.rules.map(deserializeRule)
   }
@@ -183,6 +198,7 @@ defineExpose({ validate })
     :style="formItemStyle"
     :prop="formField.field"
     :rules="validationRules"
+    :show-message="formField.input_type !== 'LocalFileUpload'"
     :class="fieldLabel && getFieldComponent(fieldLabel.input_type) ? 'mk-hide-asterisk' : ''"
   >
     <template v-if="formField.label" #label>

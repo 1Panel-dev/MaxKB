@@ -172,6 +172,9 @@ Admin、Chat 入口调用 `configureMarkdownEditor()` 配置本地高亮、KaTeX
 
 ### MkDialog
 
+Dialog 和 Drawer 的 `show-close` 不根据 loading 或提交状态动态判断，默认保留关闭按钮；
+业务需要固定隐藏关闭按钮时，可继续使用 `:show-close="false"`。
+
 布尔 `v-model` 控制显示，默认宽度 `600`、挂载到 body、显示关闭按钮、关闭后销毁，
 禁止点击遮罩和 Escape 关闭。其余 Dialog 属性、事件通过 `$attrs` 透传。
 提供默认、`header`、`subtitle`、`footer` 插槽；`subtitle` 不替代标题，`header` 透出原生关闭与标题参数。
@@ -682,6 +685,7 @@ Logo 数据统一从 Theme Store 获取。
 多文件选择，拖拽区保持显示。`accept`、`limit` 直接传给上传控件，多文件模式内部也校验文件格式、
 空文件和重复文件；超出数量时提示并发出 `exceed`。`sizeLimit` 为多文件的单文件大小上限（MB），
 默认 100；超限保留 `fail` 卡片和大小错误提示，不允许重试。格式不支持、空文件及重复选择移除；
+重复选择保留列表中最先加入的文件，移除时同步清理上传控件内部列表，避免回写未上传的重复项。
 目录中的 `.DS_Store` 格式不支持时静默移除。
 `dragText`、`selectText`、`tipText` 和 `replaceText` 可替换默认文案，格式或限制说明通过
 `tipText` 展示。文件列表由各模式组件直接展示，多文件模式展示
@@ -772,6 +776,11 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 上传适配兼容上层返回的 Promise 或 `{ request, abort }`，响应支持地址字符串或 `{ data: 地址 }`；
 文件夹选择、进度、失败重试、取消和成功文件删除由 `MkDragUpload` 维护，文件值采用
 `DragUploadFile[]`，失败状态为 `fail`。
+
+`LocalFileUpload` 和文档上传页共用 `mk-drag-upload/validation.ts` 的文件状态校验，失败统一
+使用 `MsgWarning`，文件字段不展示行内错误。存在待上传或上传中文件时阻止继续；必填且没有
+成功文件时提示重新上传，非必填字段允许空列表。动态表单保留配置的其他校验规则，文件字段
+仅在调用表单 `validate()` 时校验和提示，其他字段的校验展示方式不变。
 
 `MkDynamicsForm` 根据字段配置渲染动态表单，统一维护字段值、默认值、显隐规则和表单校验；
 `MkDynamicsFormConstructor` 用于新增或编辑单个字段配置。该组件族位于 `components` 直属目录，
