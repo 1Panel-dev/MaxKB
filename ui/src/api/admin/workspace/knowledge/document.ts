@@ -29,7 +29,7 @@ const getDocumentPage = (knowledgeId: string, page: ParamsPage, query?: Dict<unk
 const putBatchCreateDocuments = (knowledgeId: string, documents: DocumentQuickCreatePayload[] | DocumentImportPayload[]) =>
   put<DocumentQuickCreatePayload[] | DocumentImportPayload[], DocumentItem[]>(`${getPrefix(knowledgeId)}/batch_create`, documents)
 
-/** 按处理策略解析文本文件，返回分段与原文件关联信息。 */
+/** 分段预览 */
 const postSplitDocuments = (knowledgeId: string, files: File[], strategy: DocumentStrategy) => {
   const data = new FormData()
   files.forEach((file) => data.append('file', file))

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
-import type { ElTree, LoadFunction } from 'element-plus'
+import { nextTick, ref, useTemplateRef } from 'vue'
+import type { TableInstance, TreeNode } from 'element-plus'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import type { LarkDocumentNode } from '@/api/types'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
@@ -11,80 +11,80 @@ defineOptions({ name: 'LarkImportDocumentDrawer' })
 const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; folderToken: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
-/* 飞书文件树与选择状态：只导入未导入的文件，文件夹用于导航。 */
+/* 飞书目录与选择：仅展开时加载，文件夹沿用 v2 导入协议。 */
+interface LarkDocumentRow extends LarkDocumentNode {
+  hasChildren: boolean
+}
 const visible = ref(false)
 const loading = ref(false)
 const pendingLoads = ref(0)
 const activeStep = ref(0)
 const strategyMounted = ref(false)
-const loadedNodes = ref<LarkDocumentNode[]>([])
-const checkedTokens = ref<string[]>([])
+const documentRows = ref<LarkDocumentRow[]>([])
+const documentTableRef = useTemplateRef<{ tableRef?: TableInstance }>('documentTableRef')
 const selectedDocuments = ref<LarkDocumentNode[]>([])
-const treeRef = useTemplateRef<InstanceType<typeof ElTree>>('treeRef')
 const strategyRef = useTemplateRef<InstanceType<typeof DocumentStrategyForm>>('strategyRef')
-const selectableNodes = computed(() => loadedNodes.value.filter((node) => !node.is_exist))
-const allChecked = computed(() => selectableNodes.value.length > 0 && selectableNodes.value.every((node) => checkedTokens.value.includes(node.token)))
-const indeterminate = computed(() => !allChecked.value && selectableNodes.value.some((node) => checkedTokens.value.includes(node.token)))
-const treeProps = {
-  label: 'name',
-  isLeaf: (node: LarkDocumentNode) => node.type !== 'folder',
-  disabled: (node: LarkDocumentNode) => node.is_exist,
+const folderRequests = new Map<string, Promise<LarkDocumentRow[]>>()
+function selectImportedDocuments(documents: LarkDocumentRow[]) {
+  documents.filter((document) => document.is_exist).forEach((document) => documentTableRef.value?.tableRef?.toggleRowSelection(document, true, true))
 }
 function open() {
   visible.value = true
-}
-function handleCheck() {
-  checkedTokens.value = (treeRef.value?.getCheckedKeys() ?? []).map(String)
-}
-function handleAllCheck(checked: unknown) {
-  const tokens = loadedNodes.value.filter((node) => node.is_exist || Boolean(checked)).map((node) => node.token)
-  treeRef.value?.setCheckedKeys(tokens)
-  handleCheck()
+  void loadFolder(props.folderToken)
+    .then((documents) => {
+      documentRows.value = documents
+      return nextTick(() => selectImportedDocuments(documents))
+    })
+    .catch(() => {
+      /* 请求层提示错误，可通过重新打开抽屉重试。 */
+    })
 }
 
-/* 懒加载目录：一次读完该目录分页，失败恢复可重试状态。 */
-const loadNode: LoadFunction = (node, resolve, reject) => {
-  const token = node.level === 0 ? props.folderToken : String(node.data.token)
-  if (!token) {
-    resolve([])
-    return
-  }
+/* 懒加载目录：读取全部分页，同一目录请求复用，失败可重试。 */
+function loadFolder(token: string): Promise<LarkDocumentRow[]> {
+  if (!token) return Promise.resolve([])
+  const existingRequest = folderRequests.get(token)
+  if (existingRequest) return existingRequest
   pendingLoads.value += 1
-  const folderDocuments: LarkDocumentNode[] = []
+  const folderDocuments: LarkDocumentRow[] = []
   function loadPage(pageToken?: string): Promise<void> {
     return props.api.getLarkDocumentList(props.knowledgeId, token, pageToken ? { page_token: pageToken } : {}).then((page) => {
-      folderDocuments.push(...page.files)
+      folderDocuments.push(...page.files.map((document) => ({ ...document, hasChildren: document.type === 'folder' })))
       if (page.has_more && page.next_page_token) return loadPage(page.next_page_token)
     })
   }
-  void loadPage()
-    .then(() => {
-      const selectLoaded = allChecked.value
-      loadedNodes.value.push(...folderDocuments)
-      resolve(folderDocuments)
-      return nextTick(() => {
-        folderDocuments.forEach((document) => {
-          if (document.is_exist || selectLoaded) treeRef.value?.setChecked(document.token, true, false)
-        })
-        handleCheck()
-      })
-    })
-    .catch(() => {
-      reject?.()
+  const request = loadPage()
+    .then(() => folderDocuments)
+    .catch((error: unknown) => {
+      folderRequests.delete(token)
+      throw error
     })
     .finally(() => {
       pendingLoads.value -= 1
+    })
+  folderRequests.set(token, request)
+  return request
+}
+function loadNode(document: LarkDocumentRow, treeNode: TreeNode, resolve: (documents: LarkDocumentRow[]) => void) {
+  void loadFolder(document.token)
+    .then((documents) => {
+      resolve(documents)
+      return nextTick(() => selectImportedDocuments(documents))
+    })
+    .catch(() => {
+      /* Table 无 reject 回调，恢复加载标记以便再次展开重试。 */
+      treeNode.loading = false
     })
 }
 
 /* 处理策略与正式导入 */
 function handleNext() {
   if (loading.value || pendingLoads.value) return
-  selectedDocuments.value = ((treeRef.value?.getCheckedNodes(true) ?? []) as LarkDocumentNode[]).filter(
-    (node) => node.type !== 'folder' && !node.is_exist,
+  selectedDocuments.value = ((documentTableRef.value?.tableRef?.getSelectionRows() ?? []) as LarkDocumentNode[]).filter(
+    (document) => !document.is_exist,
   )
   if (!selectedDocuments.value.length) {
-    MsgWarning('请选择需要导入的文档')
+    MsgWarning('请选择文档')
     return
   }
   strategyMounted.value = true
@@ -109,7 +109,7 @@ function handleSubmit() {
           })),
         )
         .then(() => {
-          MsgSuccess('导入任务提交成功')
+          MsgSuccess('导入成功')
           visible.value = false
           emit('refresh')
         })
@@ -146,36 +146,32 @@ defineExpose({ open })
           </ol>
         </el-alert>
 
-        <div class="mk-gray-card-lg mb-3">
-          <el-checkbox :model-value="allChecked" :indeterminate="indeterminate" :disabled="pendingLoads > 0" @change="handleAllCheck">
-            全部文档
-          </el-checkbox>
-        </div>
-
-        <el-tree
-          ref="treeRef"
-          :props="treeProps"
+        <MkTable
+          ref="documentTableRef"
+          v-loading="pendingLoads > 0"
+          :data="documentRows"
+          row-key="token"
           :load="loadNode"
-          node-key="token"
+          :max-table-height="430"
           lazy
-          show-checkbox
-          style="--el-tree-node-content-height: 44px"
-          @check="handleCheck"
         >
-          <template #default="{ data }: { data: LarkDocumentNode }">
-            <div class="flex-align-center gap-2 py-2">
-              <img v-if="data.type === 'folder'" src="@/assets/file-type/file-icon.svg" alt="" class="size-5" />
-              <img
-                v-else
-                :src="getFileIconUrl(data.type === 'docx' ? `${data.name}.docx` : data.type === 'sheet' ? `${data.name}.xlsx` : data.name)"
-                alt=""
-                class="size-5"
-              />
-              <span :title="data.name" class="truncate">{{ data.name }}</span>
-              <span v-if="data.is_exist" class="text-N600 text-sm">已导入</span>
-            </div>
-          </template>
-        </el-tree>
+          <!-- 选择文档或文件夹，全选由表格维护 -->
+          <el-table-column type="selection" width="40" reserve-selection :selectable="(row: LarkDocumentRow) => !row.is_exist" />
+          <el-table-column class-name="expand-name-column" label="全部文档" prop="name">
+            <template #default="{ row }: { row: LarkDocumentRow }">
+              <div class="flex-align-center min-w-0 flex-1 gap-2">
+                <img v-if="row.type === 'folder'" src="@/assets/file-type/file-icon.svg" alt="" class="w-4.5 shrink-0" />
+                <img
+                  v-else
+                  :src="getFileIconUrl(row.type === 'docx' ? `${row.name}.docx` : row.type === 'sheet' ? `${row.name}.xlsx` : row.name)"
+                  alt=""
+                  class="w-4.5 shrink-0"
+                />
+                <span :title="row.name" class="min-w-0 truncate">{{ row.name }}</span>
+              </div>
+            </template>
+          </el-table-column>
+        </MkTable>
       </section>
       <section v-if="strategyMounted" v-show="activeStep === 1">
         <h4 class="mb-4 mk-title-decoration">文档处理策略</h4>
@@ -184,9 +180,9 @@ defineExpose({ open })
     </div>
     <template #footer>
       <!-- 取消导入 -->
-      <el-button :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
       <!-- 返回文档选择 -->
-      <el-button v-if="activeStep === 1" :disabled="loading" @click="activeStep = 0">上一步</el-button>
+      <el-button plain v-if="activeStep === 1" :disabled="loading" @click="activeStep = 0">上一步</el-button>
       <!-- 进入文档处理策略 -->
       <el-button v-if="activeStep === 0" type="primary" :disabled="!folderToken || pendingLoads > 0" @click="handleNext">下一步</el-button>
       <!-- 提交飞书文档导入 -->

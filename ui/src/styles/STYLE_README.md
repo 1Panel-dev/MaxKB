@@ -505,6 +505,11 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 `height: auto`。Element Plus 默认尺寸未定义 `--el-button-size`，必须回退到 32px 的
 `--el-component-size`，避免高度由内容和内边距撑开；业务需要的内边距和禁用颜色单独保留。
 
+树形 Table 的名称列统一通过 `el-table-column` 的 `class-name="expand-name-column"`
+启用同行布局。样式维护在 `element-plus.scss` 的 table 分组，令单元格使用纵向居中的 Flex，
+并禁止展开图标、缩进和占位元素收缩，使长名称截断时保持目录层级。
+资源授权 `PermissionTable` 和飞书导入表格共用该类，页面不再重复声明对应的 `:deep()` 样式。
+
 Tree 的 `.el-tree-node__content` 统一保留 4px 底部间距，使同级节点及展开后的父子节点行
 保持一致间距；规则维护在 `element-plus.scss` 的 tree 分组。
 
