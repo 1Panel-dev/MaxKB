@@ -79,7 +79,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="修改密码" :show-close="!passwordSubmitting" @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="修改密码" @closed="resetData">
     <el-form
       ref="userPasswordFormRef"
       :model="userPasswordForm"

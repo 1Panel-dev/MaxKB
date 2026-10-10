@@ -61,14 +61,13 @@ function handleDeleteParagraph(index: number) {
           <template v-for="(document, index) in documents" :key="index">
             <!-- 切换预览文档 -->
             <el-card
-              class="small cursor-pointer"
+              class="small cursor-pointer hover:border-primary!"
               shadow="never"
-              :class="{ 'border-primary! bg-primary/10': selectedDocumentIndex === index }"
-              tabindex="0"
+              :class="{ 'border-primary! bg-primary/10!': selectedDocumentIndex === index }"
               @click="handleSelectDocument(index)"
               @keydown.enter="handleSelectDocument(index)"
             >
-              <div class="flex-align-center gap-3">
+              <div class="flex-align-center gap-2">
                 <img :src="getFileIconUrl(document.name)" alt="" class="size-6 shrink-0" />
                 <span class="truncate" :title="document.name">{{ document.name }}</span>
               </div>

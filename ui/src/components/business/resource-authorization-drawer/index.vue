@@ -153,7 +153,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="drawerVisible" title="资源授权" :size="920" :show-close="!submitting" @closed="handleClosed">
+  <MkDrawer v-model="drawerVisible" title="资源授权" :size="920" @closed="handleClosed">
     <el-tabs v-model="targetType" :before-leave="() => !submitting">
       <el-tab-pane label="按用户组" name="user-group" />
       <el-tab-pane label="按用户" name="user" />

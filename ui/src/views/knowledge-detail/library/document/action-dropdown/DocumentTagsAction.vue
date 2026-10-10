@@ -103,7 +103,7 @@ function handleClosed() {
     :disabled="disabled || loading || !documentIds.length"
     @click="handleOpenDialog"
   />
-  <MkDialog v-model="visible" :title="manage ? '标签设置' : '添加标签'" :show-close="!loading && !optionLoading" @closed="handleClosed">
+  <MkDialog v-model="visible" :title="manage ? '标签设置' : '添加标签'" @closed="handleClosed">
     <el-form v-loading="loading || optionLoading" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="标签">
         <el-select v-model="selectedTagIds" multiple filterable placeholder="请选择标签" :loading="optionLoading">

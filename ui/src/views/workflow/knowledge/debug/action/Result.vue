@@ -56,6 +56,7 @@ onUnmounted(stopPolling)
 <template>
   <div>
     <h4 class="mb-4 mk-title-decoration">执行结果</h4>
+    <!-- // TODO 这里状态ui没有考虑执行中情况 -->
     <div class="mb-4">
       <el-alert v-if="state === 'SUCCESS'" title="执行成功" type="success" show-icon :closable="false" />
       <el-alert v-else-if="state === 'FAILURE'" title="执行失败" type="error" show-icon :closable="false" />

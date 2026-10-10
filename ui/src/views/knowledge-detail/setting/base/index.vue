@@ -143,7 +143,7 @@ defineProps<ResourceDetailPageProps>()
       @submit.prevent
     >
       <el-form-item label="知识库类型" required>
-        <el-card shadow="never" class="small w-full" style="--el-card-padding: 8px 12px">
+        <el-card shadow="never" class="small w-full">
           <div class="flex-align-center gap-2">
             <KnowledgeIcon :type="knowledge.type" />
             <div>

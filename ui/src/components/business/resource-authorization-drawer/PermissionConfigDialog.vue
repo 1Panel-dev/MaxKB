@@ -43,7 +43,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="scopeOnly ? '生效资源' : '配置权限'" :show-close="!loading" @closed="resetData">
+  <MkDialog v-model="visible" :title="scopeOnly ? '生效资源' : '配置权限'" @closed="resetData">
     <el-radio-group v-if="!scopeOnly" v-model="permission" class="mk-radio-group-vertical" :disabled="loading">
       <el-radio v-for="option in options" :key="option.value" :value="option.value">
         <p>{{ option.label }}</p>

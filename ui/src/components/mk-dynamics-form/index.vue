@@ -4,6 +4,7 @@ import type { FormInstance } from 'element-plus'
 import { cloneDeep, isEqual } from 'lodash'
 import { del, get, post, put } from '@/api/admin/core/request'
 import type { Dict } from '@/api/types'
+import { MsgWarning } from '@/utils/message'
 import FormItem from './FormItem.vue'
 import type {
   DynamicFormResponse,
@@ -304,7 +305,18 @@ async function validate() {
     }
   }
 
-  return Promise.all([...formItemRefs.value.map((item) => item.validate()), ruleFormRef.value?.validate() ?? Promise.resolve()])
+  const formValidation = ruleFormRef.value?.validate().catch((error: unknown) => {
+    if (error && typeof error === 'object') {
+      const invalidFields = error as Record<string, { message?: string }[]>
+      const uploadField = formFieldList.value.find(
+        (field) => field.input_type === 'LocalFileUpload' && isFieldVisible(field) && invalidFields[field.field]?.[0]?.message,
+      )
+      const message = uploadField && invalidFields[uploadField.field]?.[0]?.message
+      if (message) MsgWarning(message)
+    }
+    throw error
+  })
+  return Promise.all([...formItemRefs.value.map((item) => item.validate()), formValidation ?? Promise.resolve()])
 }
 
 defineExpose({ initDefaultData: initializeFieldDefault, render, ruleFormRef, validate })

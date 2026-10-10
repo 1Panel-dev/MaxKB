@@ -95,7 +95,7 @@ function handleImport() {
     <MkIcon name="icon_import_outlined" />
     <span>导入</span>
   </el-button>
-  <MkDialog v-model="visible" title="导入标签" :show-close="!loading && !downloadLoading" @closed="resetData">
+  <MkDialog v-model="visible" title="导入标签" @closed="resetData">
     <el-form ref="importFormRef" v-loading="loading" :model="importForm" :rules="rules" label-position="top" @submit.prevent>
       <el-form-item prop="files" :required="false">
         <template #label>

@@ -18,7 +18,7 @@ const syncStatusOptions: Partial<Record<KnowledgeSyncStatus, StatusLabelOptions>
   [KNOWLEDGE_SYNC_STATUS.RUNNING]: { type: 'loading', label: '同步中' },
   [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: '成功' },
   [KNOWLEDGE_SYNC_STATUS.FAILURE]: { type: 'failure', label: '失败' },
-  [KNOWLEDGE_SYNC_STATUS.SKIPPED]: { type: 'failure', label: '已跳过' },
+  [KNOWLEDGE_SYNC_STATUS.SKIPPED]: { type: 'failure', label: '跳过' },
 }
 
 function getSyncContent(log: KnowledgeSyncLog) {
