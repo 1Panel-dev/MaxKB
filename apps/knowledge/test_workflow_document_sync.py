@@ -19,16 +19,22 @@ from knowledge.models import (
     KnowledgeSyncType,
     KnowledgeType,
     KnowledgeWorkflow,
+    File,
 )
 from knowledge.models.knowledge_action import State
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer, finalize_knowledge_action
 from knowledge.services.workflow_document_sync import (
-    _launch_document_sync,
     sync_workflow_web_document,
     workflow_document_sync_input,
 )
-from knowledge.services.workflow_sync import finalize_workflow_complete_snapshot, merge_workflow_incremental_snapshot
+from knowledge.services.workflow_sync import (
+    WorkflowDocumentSyncRun,
+    finalize_workflow_complete_snapshot,
+    merge_workflow_incremental_snapshot,
+)
+from knowledge.serializers.knowledge_sync import KnowledgeSyncLogQuerySerializer
+from knowledge.models.knowledge_action import KnowledgeAction
 from knowledge.test_workflow_sync import SnapshotQuery
 from knowledge.views.document import DocumentView
 
@@ -177,23 +183,17 @@ class WorkflowDocumentRequestTests(SimpleTestCase):
         self.log_query.filter.return_value.exists.return_value = False
 
     @patch("knowledge.services.workflow_document_sync.recover_stale_sync_logs")
-    @patch("knowledge.services.workflow_document_sync.transaction.on_commit")
+    @patch("knowledge.services.workflow_document_sync.has_running_workflow_document_sync", return_value=False)
     @patch("knowledge.services.workflow_document_sync.KnowledgeSyncLog.objects.create")
     @patch("knowledge.services.workflow_document_sync.QuerySet")
-    def test_manual_sync_launches_after_commit_with_schedule_disabled(self, query_set, create_log, on_commit, _recover):
+    def test_manual_sync_starts_workflow_without_scheduled_log(self, query_set, create_log, _running, _recover):
         self.configure_queries()
         query_set.side_effect = self.query
-        create_log.return_value.id = "log"
         with patch("knowledge.serializers.knowledge_workflow.KnowledgeWorkflowActionSerializer") as action:
             self.assertTrue(sync_workflow_web_document.__wrapped__(self.document, self.user))
-            self.assertEqual(create_log.call_args.kwargs["trigger_type"], KnowledgeSyncTrigger.MANUAL)
-            self.assertEqual(create_log.call_args.kwargs["total_count"], 1)
-            action.assert_not_called()
-            on_commit.call_args.args[0]()
+            create_log.assert_not_called()
             workflow_input, target = workflow_document_sync_input(self.knowledge, self.workflow, self.document)
-            action.return_value.action.assert_called_once_with(
-                workflow_input, self.user, True, "log", sync_document=target
-            )
+            action.return_value.action.assert_called_once_with(workflow_input, self.user, True, sync_document=target)
 
     @patch("knowledge.services.workflow_document_sync.recover_stale_sync_logs")
     @patch("knowledge.services.workflow_document_sync.KnowledgeSyncLog.objects.create")
@@ -206,15 +206,25 @@ class WorkflowDocumentRequestTests(SimpleTestCase):
             sync_workflow_web_document.__wrapped__(self.document)
         create_log.assert_not_called()
 
-    @patch("knowledge.services.workflow_document_sync.maxkb_logger")
+    @patch("knowledge.services.workflow_document_sync.recover_stale_sync_logs")
+    @patch("knowledge.services.workflow_document_sync.has_running_workflow_document_sync", return_value=True)
     @patch("knowledge.services.workflow_document_sync.QuerySet")
     @patch("knowledge.serializers.knowledge_workflow.KnowledgeWorkflowActionSerializer")
-    def test_launch_failure_marks_the_single_document_log_failed(self, action, query_set, _logger):
-        action.return_value.action.side_effect = RuntimeError("failed to launch")
-        workflow_input, target = workflow_document_sync_input(self.knowledge, self.workflow, self.document)
-        _launch_document_sync(KNOWLEDGE_ID, "default", workflow_input, self.user, "log", target)
-        self.assertEqual(
-            query_set.return_value.filter.return_value.update.call_args.kwargs["status"], KnowledgeSyncStatus.FAILURE
+    def test_existing_manual_sync_prevents_overlap_without_log(self, action, query_set, _running, _recover):
+        self.configure_queries()
+        query_set.side_effect = self.query
+        with self.assertRaises(AppApiException):
+            sync_workflow_web_document.__wrapped__(self.document, self.user)
+        action.assert_not_called()
+
+    @patch("knowledge.serializers.knowledge_sync.page_search")
+    @patch("knowledge.serializers.knowledge_sync.QuerySet")
+    def test_scheduled_log_pagination_excludes_historical_manual_runs(self, query_set, page_search):
+        query_set.return_value.filter.return_value.first.return_value = self.knowledge
+        page_search.return_value = {"total": 1, "records": [], "current": 1, "size": 10}
+        KnowledgeSyncLogQuerySerializer(data={"knowledge_id": KNOWLEDGE_ID, "workspace_id": "default"}).page(1, 10)
+        query_set.return_value.filter.assert_any_call(
+            knowledge_id=KNOWLEDGE_ID, trigger_type=KnowledgeSyncTrigger.SCHEDULED
         )
 
 
@@ -347,8 +357,86 @@ class WorkflowDocumentMergeIsolationTests(SimpleTestCase):
         self.assertEqual(stats["failed_count"], 1)
         self.assertEqual({document.id for document in self.documents}, {DOCUMENT_ID, "other-web", "local"})
 
+    def test_manual_failed_snapshot_discards_only_its_action_output(self):
+        output = self.documents[-1]
+        output.meta.pop("workflow_sync_log_id")
+        output.meta["workflow_action_id"] = "manual-action"
+        run = WorkflowDocumentSyncRun("manual-action", "knowledge", 10)
+        with (
+            patch("knowledge.services.workflow_sync.QuerySet", side_effect=self.query),
+            patch("knowledge.services.workflow_sync._delete_workflow_documents", side_effect=self.delete),
+        ):
+            stats = finalize_workflow_complete_snapshot.__wrapped__(run, False, self.source, document_id=DOCUMENT_ID)
+        self.assertEqual(stats["failed_count"], 1)
+        self.assertEqual({document.id for document in self.documents}, {DOCUMENT_ID, "other-web", "local"})
+
 
 class WorkflowDocumentEngineTests(SimpleTestCase):
+    @patch("knowledge.serializers.knowledge_workflow.validate_knowledge_file_size")
+    @patch("knowledge.serializers.knowledge_workflow.transaction.on_commit")
+    @patch("knowledge.serializers.knowledge_workflow.KnowledgeAction")
+    @patch("knowledge.serializers.knowledge_workflow.QuerySet")
+    def test_manual_action_is_reserved_before_commit_and_keeps_saved_schedule_inputs(
+        self, query_set, action_model, on_commit, _size
+    ):
+        knowledge = SimpleNamespace(id=KNOWLEDGE_ID, name="knowledge", desc="", workspace_id="default")
+        workflow = SimpleNamespace(work_flow={"nodes": []}, default_model_setting={})
+        knowledge_query, workflow_query = MagicMock(), MagicMock()
+        knowledge_query.filter.return_value = knowledge_query
+        knowledge_query.first.return_value = knowledge
+        workflow_query.filter.return_value.first.return_value = workflow
+        query_set.side_effect = lambda model: {
+            Knowledge: knowledge_query,
+            KnowledgeWorkflow: workflow_query,
+            File: MagicMock(),
+        }[model]
+        serializer = KnowledgeWorkflowActionSerializer(data={"knowledge_id": KNOWLEDGE_ID, "workspace_id": "default"})
+        target = {"id": DOCUMENT_ID}
+        with (
+            patch.object(serializer, "save_sync_input") as save_input,
+            patch.object(serializer, "_launch_knowledge_workflow") as launch,
+            patch("knowledge.serializers.knowledge_workflow.maxkb_logger"),
+        ):
+            serializer.action(
+                {"data_source": {}, "knowledge_base": {}},
+                SimpleNamespace(id="user", username="user"),
+                sync_document=target,
+            )
+            action_model.return_value.save.assert_called_once()
+            self.assertEqual(action_model.call_args.kwargs["meta"]["document_sync_id"], DOCUMENT_ID)
+            save_input.assert_not_called()
+            launch.assert_not_called()
+            on_commit.call_args.args[0]()
+            self.assertIsNone(launch.call_args.args[-1])
+            self.assertEqual(launch.call_args.kwargs["sync_document"], target)
+            launch.side_effect = RuntimeError("failed to start")
+            with patch("knowledge.serializers.knowledge_workflow.QuerySet") as failure_query:
+                on_commit.call_args.args[0]()
+            failure_query.return_value.filter.return_value.update.assert_called_once_with(state=State.FAILURE)
+
+    @patch("knowledge.serializers.knowledge_workflow.finalize_workflow_complete_snapshot")
+    @patch("knowledge.serializers.knowledge_workflow.merge_workflow_incremental_snapshot")
+    @patch("knowledge.serializers.knowledge_workflow.QuerySet")
+    def test_manual_completion_merges_selected_output_without_touching_scheduled_logs(self, query_set, merge, cleanup):
+        action = SimpleNamespace(id="manual-action", knowledge_id=KNOWLEDGE_ID, create_time=10, state=State.STARTED)
+        action_query, knowledge_query = MagicMock(), MagicMock()
+        action_query.get.return_value = action
+        action_query.select_for_update.return_value.get.return_value = action
+        query_set.side_effect = lambda model: {KnowledgeAction: action_query, Knowledge: knowledge_query}[model]
+        merge.return_value = {"failed_count": 0}
+        finalize_knowledge_action.__wrapped__(
+            action.id, State.SUCCESS, 1.0, workflow_source={"source_scope": "scope"}, sync_document_id=DOCUMENT_ID
+        )
+        merge.assert_called_once_with(
+            WorkflowDocumentSyncRun(action.id, KNOWLEDGE_ID, 10), {"source_scope": "scope"}, document_id=DOCUMENT_ID
+        )
+        action_query.filter.return_value.update.assert_called_once_with(state=State.SUCCESS, run_time=1.0)
+        cleanup.assert_not_called()
+        action.state = State.SUCCESS
+        merge.reset_mock()
+        finalize_knowledge_action.__wrapped__(action.id, State.SUCCESS, 1.0, sync_document_id=DOCUMENT_ID)
+        merge.assert_not_called()
+
     @patch("knowledge.serializers.knowledge_workflow.start_sync_heartbeat", return_value=lambda: None)
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
     @patch("knowledge.serializers.knowledge_workflow.WorkflowRunRegistry")

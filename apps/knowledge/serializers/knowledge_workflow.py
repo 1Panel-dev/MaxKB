@@ -113,9 +113,12 @@ def finalize_knowledge_action(
         action = QuerySet(KnowledgeAction).get(id=knowledge_action_id)
         QuerySet(Knowledge).select_for_update().get(id=action.knowledge_id)
         action = QuerySet(KnowledgeAction).select_for_update().get(id=knowledge_action_id)
-        if action.state in {State.SUCCESS, State.FAILURE, State.REVOKED}:
+        if action.state == State.SUCCESS:
             return
         sync_run = WorkflowDocumentSyncRun(action.id, action.knowledge_id, action.create_time)
+        if action.state in {State.FAILURE, State.REVOKED}:
+            finalize_workflow_complete_snapshot(sync_run, False, workflow_source, document_id=sync_document_id)
+            return
         if state == State.SUCCESS:
             try:
                 stats = merge_workflow_incremental_snapshot(sync_run, workflow_source, document_id=sync_document_id)

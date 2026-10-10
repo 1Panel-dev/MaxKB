@@ -42,7 +42,11 @@ class WorkflowDocumentSyncRun:
 def has_running_workflow_document_sync(knowledge_id) -> bool:
     return (
         QuerySet(KnowledgeAction)
-        .filter(knowledge_id=knowledge_id, state=State.STARTED, meta__document_sync_id__isnull=False)
+        .filter(
+            knowledge_id=knowledge_id,
+            state__in=[State.PENDING, State.STARTED, State.REVOKE],
+            meta__document_sync_id__isnull=False,
+        )
         .exists()
     )
 

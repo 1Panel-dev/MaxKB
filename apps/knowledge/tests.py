@@ -949,7 +949,7 @@ class WebDocumentStrategyRequestTests(SimpleTestCase):
         serializer.incremental_sync(knowledge)
 
         self.assertEqual(delay.call_args.args[-1], "incremental")
-        self.assertTrue(delay.call_args.kwargs["record_log"])
+        self.assertFalse(delay.call_args.kwargs["record_log"])
         self.assertEqual(delay.call_args.kwargs["trigger_type"], KnowledgeSyncTrigger.MANUAL)
 
     def test_selector_list_ignores_extra_spaces(self):
@@ -1595,10 +1595,11 @@ class KnowledgeScheduleTests(SimpleTestCase):
         )
         self.assertEqual(create_log.call_args.kwargs["status"], KnowledgeSyncStatus.RUNNING)
 
+    @patch("knowledge.task.sync.has_running_workflow_document_sync", return_value=False)
     @patch("knowledge.task.sync.scheduled_sync_workflow_knowledge.delay")
     @patch("knowledge.task.sync.KnowledgeSyncLog.objects.create")
     @patch("knowledge.task.sync.QuerySet")
-    def test_generic_scheduled_entry_dispatches_workflow_task(self, query_set, create_log, delay):
+    def test_generic_scheduled_entry_dispatches_workflow_task(self, query_set, create_log, delay, _running):
         knowledge = MagicMock(
             id="00000000-0000-0000-0000-000000000026",
             type=KnowledgeType.WORKFLOW,
