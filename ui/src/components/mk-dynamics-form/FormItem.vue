@@ -116,7 +116,7 @@ const validationRules = computed<FormItemRule | FormItemRule[]>(() => {
   return {
     message: errorMessage.value,
     required: props.formField.required !== false,
-    whitespace: ['TextInput', 'TextareaInput'].includes(props.formField.input_type),
+    ...(['TextInput', 'TextareaInput'].includes(props.formField.input_type) ? { whitespace: true } : {}),
     trigger: props.formField.input_type === 'Slider' ? 'blur' : ['blur', 'change'],
   }
 })
