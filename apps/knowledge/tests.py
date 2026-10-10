@@ -65,6 +65,7 @@ from knowledge.services.document_strategy import (
 from knowledge.services.image_documents import ImageDocumentService
 from knowledge.services.incremental_sync import IncrementalDocumentSync, MergeResult, prepare_remote_paragraphs
 from knowledge.services.knowledge_sync_schedule import (
+    DEFAULT_KNOWLEDGE_SYNC_SETTING,
     deploy_knowledge_sync_job,
     normalize_knowledge_sync_setting,
 )
@@ -1158,6 +1159,64 @@ class WebDocumentStrategyRequestTests(SimpleTestCase):
         handler(MagicMock(tag=None, url="https://example.com/docs"), MagicMock(status=200, content="updated"))
 
         delete_document_data.assert_not_called()
+
+
+class WebKnowledgeCreationTests(SimpleTestCase):
+    def setUp(self):
+        self.save = self.enterContext(patch("knowledge.serializers.knowledge.Knowledge.save", autospec=True))
+        self.enterContext(patch("knowledge.serializers.knowledge.UserResourcePermissionSerializer"))
+        self.enterContext(patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge"))
+        self.crawl = self.enterContext(patch("knowledge.serializers.knowledge.sync_web_knowledge.delay"))
+        self.deploy_schedule = self.enterContext(
+            patch("knowledge.serializers.knowledge.deploy_knowledge_sync_job.delay")
+        )
+
+    def create_web(self, with_valid=True):
+        serializer = KnowledgeSerializer.Create(
+            data={"user_id": "00000000-0000-0000-0000-000000000012", "workspace_id": "default"}
+        )
+        response = serializer.save_web(
+            {
+                "name": "Web docs",
+                "folder_id": "default",
+                "embedding_model_id": "00000000-0000-0000-0000-000000000013",
+                "source_url": "https://example.com",
+                "selector": ".content",
+                "doc_strategy": {"split": {"max_length": 1024}},
+            },
+            with_valid=with_valid,
+        )
+        return self.save.call_args.args[0], response
+
+    def test_web_creation_persists_and_returns_disabled_default_sync_setting(self):
+        for with_valid in (True, False):
+            with self.subTest(with_valid=with_valid):
+                self.save.reset_mock()
+                self.crawl.reset_mock()
+                knowledge, response = self.create_web(with_valid)
+                self.save.assert_called_once()
+                self.assertEqual(knowledge.meta["sync_setting"], DEFAULT_KNOWLEDGE_SYNC_SETTING)
+                self.assertFalse(knowledge.meta["sync_setting"]["enabled"])
+                self.assertEqual(response["meta"]["sync_setting"], DEFAULT_KNOWLEDGE_SYNC_SETTING)
+                self.assertEqual(knowledge.meta["doc_strategy"]["split"]["max_length"], 1024)
+                self.crawl.assert_called_once_with(
+                    str(knowledge.id),
+                    "00000000-0000-0000-0000-000000000012",
+                    "https://example.com",
+                    ".content",
+                    knowledge.meta["doc_strategy"],
+                )
+                self.deploy_schedule.assert_not_called()
+
+    def test_sync_defaults_are_independent_between_created_knowledge_bases(self):
+        first, _response = self.create_web()
+        first.meta["sync_setting"]["enabled"] = True
+        first.meta["sync_setting"]["time"].append("02:00")
+        second, _response = self.create_web()
+        self.assertFalse(second.meta["sync_setting"]["enabled"])
+        self.assertEqual(second.meta["sync_setting"]["time"], ["01:00"])
+        self.assertFalse(DEFAULT_KNOWLEDGE_SYNC_SETTING["enabled"])
+        self.assertEqual(DEFAULT_KNOWLEDGE_SYNC_SETTING["time"], ["01:00"])
 
 
 class KnowledgeModelUpdateTests(SimpleTestCase):

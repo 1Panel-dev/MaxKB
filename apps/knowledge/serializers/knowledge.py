@@ -6,6 +6,7 @@ import re
 import tempfile
 import zipfile
 from collections import defaultdict
+from copy import deepcopy
 from functools import partial, reduce
 from tempfile import TemporaryDirectory
 from typing import Dict, List
@@ -72,6 +73,7 @@ from knowledge.services.knowledge_archive import (
     restore_resources,
     validate_archive,
 )
+from knowledge.services.knowledge_sync_schedule import DEFAULT_KNOWLEDGE_SYNC_SETTING
 from knowledge.services.multimodal_retrieval import (
     MAX_QUERY_IMAGE_COUNT,
     get_hit_asset_map,
@@ -1318,6 +1320,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     "selector": selector,
                     "embedding_model_id": instance.get("embedding_model_id"),
                     "doc_strategy": doc_strategy,
+                    "sync_setting": deepcopy(DEFAULT_KNOWLEDGE_SYNC_SETTING),
                 },
             )
             knowledge.save()
