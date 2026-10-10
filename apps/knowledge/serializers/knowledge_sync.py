@@ -10,7 +10,14 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from knowledge.models import Knowledge, KnowledgeSyncLog, KnowledgeSyncType, KnowledgeType, KnowledgeWorkflow
+from knowledge.models import (
+    Knowledge,
+    KnowledgeSyncLog,
+    KnowledgeSyncStatus,
+    KnowledgeSyncType,
+    KnowledgeType,
+    KnowledgeWorkflow,
+)
 from knowledge.services.knowledge_sync_schedule import (
     SCHEDULED_KNOWLEDGE_TYPES,
     normalize_knowledge_sync_setting,
@@ -103,6 +110,7 @@ class KnowledgeSyncSettingOperationSerializer(serializers.Serializer):
 
 
 class KnowledgeSyncLogSerializer(serializers.ModelSerializer):
+    total_count = serializers.SerializerMethodField()
     duration_seconds = serializers.SerializerMethodField()
 
     class Meta:
@@ -124,6 +132,17 @@ class KnowledgeSyncLogSerializer(serializers.ModelSerializer):
             "message",
         ]
 
+    def get_total_count(self, instance):
+        # Older workflow logs counted the entire knowledge base instead of the selected source.
+        if (
+            self.context.get("knowledge_type") == KnowledgeType.WORKFLOW
+            and instance.status == KnowledgeSyncStatus.SUCCESS
+        ):
+            if instance.sync_type == KnowledgeSyncType.COMPLETE:
+                return max(instance.synced_count, instance.deleted_count)
+            return instance.synced_count + instance.skipped_count + instance.deleted_count + instance.failed_count
+        return instance.total_count
+
     def get_duration_seconds(self, instance):
         return round(instance.duration_ms / 1000, 3)
 
@@ -131,13 +150,12 @@ class KnowledgeSyncLogSerializer(serializers.ModelSerializer):
 class KnowledgeSyncLogQuerySerializer(KnowledgeSyncSettingOperationSerializer):
     def page(self, current_page, page_size):
         self.is_valid(raise_exception=True)
-        query_set = (
-            QuerySet(KnowledgeSyncLog).filter(knowledge_id=self.validated_data["knowledge"].id).order_by("-create_time")
-        )
+        knowledge = self.validated_data["knowledge"]
+        query_set = QuerySet(KnowledgeSyncLog).filter(knowledge_id=knowledge.id).order_by("-create_time")
         page = page_search(
             current_page,
             page_size,
             query_set,
-            lambda item: KnowledgeSyncLogSerializer(item).data,
+            lambda item: KnowledgeSyncLogSerializer(item, context={"knowledge_type": knowledge.type}).data,
         )
         return Page(page["total"], page["records"], page["current"], page["size"])

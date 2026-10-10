@@ -126,21 +126,19 @@ def finalize_knowledge_action(
                     )
                     stats = finalize_workflow_complete_snapshot(sync_log, False, workflow_source)
             else:
-                stats = {
-                    "total_count": QuerySet(Document)
-                    .filter(
-                        knowledge_id=sync_log.knowledge_id,
-                        resource_type=DocumentResourceType.DOCUMENT,
-                    )
-                    .count(),
-                    "synced_count": QuerySet(Document)
+                synced_count = (
+                    QuerySet(Document)
                     .filter(
                         knowledge_id=sync_log.knowledge_id,
                         type=KnowledgeType.WORKFLOW,
                         resource_type=DocumentResourceType.DOCUMENT,
-                        create_time__gte=sync_log.create_time,
+                        meta__workflow_sync_log_id=str(sync_log.id),
                     )
-                    .count(),
+                    .count()
+                )
+                stats = {
+                    "total_count": synced_count + sync_log.deleted_count,
+                    "synced_count": synced_count,
                     "skipped_count": 0,
                     "deleted_count": sync_log.deleted_count,
                     "failed_count": 0 if state == State.SUCCESS else 1,

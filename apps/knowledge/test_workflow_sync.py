@@ -23,6 +23,8 @@ from knowledge.services.workflow_sync_source import tool_document_source_meta, w
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer, finalize_knowledge_action
 from knowledge.models import KnowledgeSyncLog, KnowledgeSyncStatus
 from knowledge.models.knowledge_action import State
+from knowledge.serializers.knowledge_sync import KnowledgeSyncLogSerializer
+from knowledge.task.sync import scheduled_sync_workflow_knowledge
 
 
 class WorkflowSourceMetaTests(SimpleTestCase):
@@ -161,6 +163,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
 
     def test_complete_sync_deletes_only_older_documents_from_selected_source(self):
         stats = self.run_complete(True, self.source)
+        self.assertEqual(stats["total_count"], 1)
         self.assertEqual(stats["deleted_count"], 1)
         self.assertEqual(
             {document.id for document in self.documents}, {"local", "other-source", "legacy", "new", "concurrent"}
@@ -168,6 +171,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
 
     def test_failed_run_deletes_only_its_own_output(self):
         stats = self.run_complete(False, self.source)
+        self.assertEqual(stats["total_count"], 1)
         self.assertEqual(stats["failed_count"], 1)
         self.assertEqual(
             {document.id for document in self.documents}, {"old", "local", "other-source", "legacy", "concurrent"}
@@ -188,6 +192,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
             ),
         ):
             stats = merge_workflow_incremental_snapshot.__wrapped__(self.sync_log, self.source)
+        self.assertEqual(stats["total_count"], 1)
         self.assertEqual(stats["deleted_count"], 1)
         self.assertEqual(
             {document.id for document in self.documents}, {"local", "other-source", "legacy", "concurrent"}
@@ -204,8 +209,52 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
             ),
         ):
             stats = merge_workflow_incremental_snapshot.__wrapped__(self.sync_log, self.source)
+        self.assertEqual(stats["total_count"], 0)
         self.assertEqual(stats["deleted_count"], 0)
         self.assertIn("old", {document.id for document in self.documents})
+
+    @patch("knowledge.services.workflow_sync._copy_document_relations")
+    @patch("knowledge.services.workflow_sync.process_visual_assets")
+    @patch("knowledge.services.workflow_sync.sync_paragraph_assets")
+    @patch("knowledge.services.workflow_sync.transaction.atomic")
+    @patch("knowledge.services.workflow_sync.IncrementalDocumentSync")
+    def test_unchanged_web_documents_exclude_local_upload_from_sync_total(self, merger, *_mocks):
+        merger.return_value.merge.return_value = SimpleNamespace(reembed_ids=[], disabled_ids=[])
+        for sync_type in (KnowledgeSyncType.INCREMENTAL, KnowledgeSyncType.REPLACE):
+            with self.subTest(sync_type=sync_type):
+                self.sync_log.sync_type = sync_type
+                local_document = self.document("local", 1, {"source_scope": "local-scope", "source_type": "local"})
+                self.documents = [local_document]
+                for index in range(25):
+                    meta = {"source_scope": "scope", "source_type": "web", "source_url": f"https://example.com/{index}"}
+                    old_document = self.document(f"old-{index}", 1, meta)
+                    new_document = self.document(f"new-{index}", 11, {**meta, "workflow_sync_log_id": "log"})
+                    for document in (old_document, new_document):
+                        document.doc_strategy = {}
+                        document.visual_strategy_hash = ""
+                        document.save = MagicMock()
+                    self.documents.extend([old_document, new_document])
+                with (
+                    patch("knowledge.services.workflow_sync.QuerySet", side_effect=self.query),
+                    patch("knowledge.services.workflow_sync._delete_workflow_documents", side_effect=self.delete),
+                ):
+                    stats = merge_workflow_incremental_snapshot.__wrapped__(self.sync_log, self.source)
+                self.assertEqual(stats["total_count"], 25)
+                self.assertEqual(stats["skipped_count"], 25)
+                self.assertEqual(stats["synced_count"], 0)
+                self.assertEqual(stats["deleted_count"], 0)
+                self.assertEqual(stats["failed_count"], 0)
+                self.assertIn(local_document, self.documents)
+
+    def test_incremental_total_includes_new_and_deleted_source_documents_only(self):
+        with (
+            patch("knowledge.services.workflow_sync.QuerySet", side_effect=self.query),
+            patch("knowledge.services.workflow_sync._delete_workflow_documents", side_effect=self.delete),
+        ):
+            stats = merge_workflow_incremental_snapshot.__wrapped__(self.sync_log, self.source)
+        self.assertEqual(stats["total_count"], 2)
+        self.assertEqual(stats["synced_count"], 1)
+        self.assertEqual(stats["deleted_count"], 1)
 
     def test_duplicate_remote_identity_fails_before_changing_old_documents(self):
         duplicate = deepcopy(self.documents[4])
@@ -245,6 +294,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
         ):
             stats = merge_workflow_incremental_snapshot.__wrapped__(self.sync_log, self.source)
         self.assertEqual(stats["failed_count"], 1)
+        self.assertEqual(stats["total_count"], 1)
         self.assertEqual(stats["deleted_count"], 0)
         self.assertIn("old", {document.id for document in self.documents})
         self.assertNotIn("new", {document.id for document in self.documents})
@@ -373,6 +423,120 @@ class WorkflowActionSourceTests(SimpleTestCase):
         self.assertEqual(parameters["sync_log_id"], "log")
         self.assertEqual(parameters["workflow_source"]["source_type"], "web")
         self.assertTrue(parameters["workflow_source"]["source_scope"])
+
+
+class WorkflowSyncLogCountingTests(SimpleTestCase):
+    def setUp(self):
+        self.workflow_input = {"data_source": {"node_id": "web", "source_url": "https://example.com"}}
+        self.workflow = {
+            "nodes": [{"id": "web", "type": "data-source-web-node", "properties": {"kind": "data-source"}}]
+        }
+        self.source = workflow_source_meta(self.workflow, self.workflow_input)
+        self.knowledge = SimpleNamespace(
+            id="00000000-0000-0000-0000-000000000013",
+            workspace_id="workspace",
+            user=SimpleNamespace(id="user"),
+            meta={"sync_setting": {"enabled": True}, "workflow_sync_input": self.workflow_input},
+        )
+        self.documents = [
+            SimpleNamespace(
+                knowledge_id=self.knowledge.id,
+                type=KnowledgeType.WORKFLOW,
+                resource_type=DocumentResourceType.DOCUMENT,
+                meta={**self.source, "workflow_sync_log_id": "old-log"},
+            )
+            for _ in range(25)
+        ]
+        for meta in ({"source_scope": "local", "source_type": "local"}, {"source_scope": "other-source"}, {}):
+            document = deepcopy(self.documents[0])
+            document.meta = meta
+            self.documents.append(document)
+        image = deepcopy(self.documents[0])
+        image.resource_type = DocumentResourceType.IMAGE
+        self.documents.append(image)
+
+    @patch("knowledge.task.sync.KnowledgeWorkflowActionSerializer")
+    @patch("knowledge.task.sync.KnowledgeSyncLog.objects.create")
+    @patch("knowledge.task.sync.QuerySet")
+    def test_scheduled_run_starts_with_selected_web_source_total(self, query_set, create_log, action):
+        knowledge_query, workflow_query, log_query = MagicMock(), MagicMock(), MagicMock()
+        knowledge_query.filter.return_value.first.return_value = self.knowledge
+        workflow_query.filter.return_value.values_list.return_value.first.return_value = self.workflow
+        log_query.filter.return_value.exists.return_value = False
+        query_set.side_effect = lambda model: {
+            Knowledge: knowledge_query,
+            KnowledgeWorkflow: workflow_query,
+            KnowledgeSyncLog: log_query,
+            Document: SnapshotQuery(self.documents),
+        }[model]
+        action.return_value.action.return_value = {"id": "action"}
+        self.assertTrue(scheduled_sync_workflow_knowledge.run(self.knowledge.id))
+        self.assertEqual(create_log.call_args.kwargs["total_count"], 25)
+        action.return_value.action.assert_called_once_with(
+            self.workflow_input, self.knowledge.user, True, str(create_log.return_value.id)
+        )
+
+    @patch("knowledge.serializers.knowledge_workflow.QuerySet")
+    def test_completion_without_merger_counts_only_this_execution_output(self, query_set):
+        log = SimpleNamespace(
+            id="log",
+            knowledge_id=self.knowledge.id,
+            sync_type=KnowledgeSyncType.INCREMENTAL,
+            status=KnowledgeSyncStatus.RUNNING,
+            deleted_count=0,
+        )
+        log_query = MagicMock()
+        log_query.filter.return_value.first.return_value = log
+        log_query.select_for_update.return_value.get.return_value = log
+        query_set.side_effect = lambda model: (
+            SnapshotQuery(self.documents)
+            if model is Document
+            else log_query
+            if model is KnowledgeSyncLog
+            else MagicMock()
+        )
+        for _ in range(2):
+            document = deepcopy(self.documents[0])
+            document.meta["workflow_sync_log_id"] = "log"
+            self.documents.append(document)
+        finalize_knowledge_action.__wrapped__("action", State.SUCCESS, 1.0, "log")
+        stats = log_query.filter.return_value.update.call_args.kwargs
+        self.assertEqual(stats["total_count"], 2)
+        self.assertEqual(stats["synced_count"], 2)
+        self.assertEqual(stats["status"], KnowledgeSyncStatus.SUCCESS)
+
+
+class HistoricalWorkflowSyncLogTests(SimpleTestCase):
+    def serialize(self, *, knowledge_type=KnowledgeType.WORKFLOW, **counts):
+        log = KnowledgeSyncLog(
+            total_count=26,
+            status=counts.pop("status", KnowledgeSyncStatus.SUCCESS),
+            sync_type=counts.pop("sync_type", KnowledgeSyncType.INCREMENTAL),
+            **counts,
+        )
+        return KnowledgeSyncLogSerializer(log, context={"knowledge_type": knowledge_type}).data
+
+    def test_existing_mixed_source_log_displays_actual_sync_total(self):
+        data = self.serialize(skipped_count=25)
+        self.assertEqual(data["total_count"], 25)
+        self.assertEqual(data["skipped_count"], 25)
+        self.assertEqual(data["synced_count"], 0)
+
+    def test_existing_incremental_log_includes_deletions(self):
+        data = self.serialize(synced_count=2, skipped_count=22, deleted_count=1)
+        self.assertEqual(data["total_count"], 25)
+
+    def test_existing_complete_log_does_not_count_both_versions_of_the_snapshot(self):
+        data = self.serialize(sync_type=KnowledgeSyncType.COMPLETE, synced_count=25, deleted_count=25)
+        self.assertEqual(data["total_count"], 25)
+
+    def test_running_failed_and_other_knowledge_logs_keep_recorded_total(self):
+        for status in (KnowledgeSyncStatus.RUNNING, KnowledgeSyncStatus.FAILURE, KnowledgeSyncStatus.SKIPPED):
+            with self.subTest(status=status):
+                self.assertEqual(self.serialize(status=status, skipped_count=25)["total_count"], 26)
+        for knowledge_type in (KnowledgeType.WEB, KnowledgeType.LARK):
+            with self.subTest(knowledge_type=knowledge_type):
+                self.assertEqual(self.serialize(knowledge_type=knowledge_type, skipped_count=25)["total_count"], 26)
 
 
 class WorkflowSourceFileCleanupTests(SimpleTestCase):

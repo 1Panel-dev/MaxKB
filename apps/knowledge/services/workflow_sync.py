@@ -96,9 +96,8 @@ def finalize_workflow_complete_snapshot(sync_log: KnowledgeSyncLog, success: boo
     old_ids = list(old_documents.values_list("id", flat=True))
     deleted_count = len(_delete_workflow_documents(old_ids if success else new_ids))
     return {
-        "total_count": QuerySet(Document)
-        .filter(knowledge_id=sync_log.knowledge_id, resource_type=DocumentResourceType.DOCUMENT)
-        .count(),
+        # Old and new versions represent the same source snapshot; exclude other sources.
+        "total_count": max(len(new_ids), len(old_ids)),
         "synced_count": len(new_ids) if success else 0,
         "skipped_count": 0,
         "deleted_count": deleted_count,
@@ -253,16 +252,9 @@ def merge_workflow_incremental_snapshot(sync_log: KnowledgeSyncLog, workflow_sou
         stale_ids = [str(document.id) for document in old_documents if document.id not in matched_old_ids]
         if stale_ids:
             deleted_count = len(_delete_workflow_documents(stale_ids))
-    total_count = (
-        QuerySet(Document)
-        .filter(
-            knowledge_id=sync_log.knowledge_id,
-            resource_type=DocumentResourceType.DOCUMENT,
-        )
-        .count()
-    )
     return {
-        "total_count": total_count,
+        # Count each incoming document once, plus missing source documents removed by this run.
+        "total_count": len(new_documents) + deleted_count,
         "synced_count": synced_count,
         "skipped_count": skipped_count,
         "deleted_count": deleted_count,

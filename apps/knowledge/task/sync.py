@@ -33,7 +33,7 @@ from knowledge.models import (
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.sync_status import recover_stale_sync_logs, start_sync_heartbeat
-from knowledge.services.workflow_sync_source import validate_workflow_sync_source
+from knowledge.services.workflow_sync_source import validate_workflow_sync_source, workflow_source_meta
 from knowledge.task.handler import (
     get_save_handler,
     get_sync_handler,
@@ -351,8 +351,22 @@ def scheduled_sync_workflow_knowledge(knowledge_id: str, sync_log_id: str | None
         )
         if sync_type not in WEB_SYNC_TYPES:
             raise ValueError(f"Unsupported workflow knowledge synchronization type: {sync_type}")
+        workflow_input = deepcopy(meta.get("workflow_sync_input") or {})
+        work_flow = (
+            QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge.id).values_list("work_flow", flat=True).first()
+        )
+        source_scope = workflow_source_meta(work_flow, workflow_input).get("source_scope")
         total_count = (
-            QuerySet(Document).filter(knowledge_id=knowledge.id, resource_type=DocumentResourceType.DOCUMENT).count()
+            QuerySet(Document)
+            .filter(
+                knowledge_id=knowledge.id,
+                type=KnowledgeType.WORKFLOW,
+                resource_type=DocumentResourceType.DOCUMENT,
+                meta__source_scope=source_scope,
+            )
+            .count()
+            if source_scope
+            else 0
         )
         if sync_log is None:
             sync_log = KnowledgeSyncLog.objects.create(
@@ -364,10 +378,6 @@ def scheduled_sync_workflow_knowledge(knowledge_id: str, sync_log_id: str | None
             )
         else:
             QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(total_count=total_count)
-        workflow_input = deepcopy(meta.get("workflow_sync_input") or {})
-        work_flow = (
-            QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge.id).values_list("work_flow", flat=True).first()
-        )
         validate_workflow_sync_source(work_flow, workflow_input)
         if knowledge.user is None:
             raise ValueError("Workflow knowledge has no owner available for scheduled synchronization")
