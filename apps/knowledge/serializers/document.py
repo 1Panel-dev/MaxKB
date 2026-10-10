@@ -968,10 +968,13 @@ class DocumentSerializers(serializers.Serializer):
             )
             ListenerManagement.get_aggregation_document_status(document_id)()
 
-            try:
-                embedding_by_document.delay(document_id, embedding_model_id, state_list)
-            except AlreadyQueued as e:
-                raise AppApiException(500, _("The task is being executed, please do not send it repeatedly."))
+            def enqueue_embedding():
+                try:
+                    embedding_by_document.delay(document_id, embedding_model_id, state_list)
+                except AlreadyQueued:
+                    raise AppApiException(500, _("The task is being executed, please do not send it repeatedly."))
+
+            transaction.on_commit(enqueue_embedding)
 
         def tokenize(self, state_list=None, with_valid=True):
             if state_list is None:
