@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type SyncApi from '@/api/admin/workspace/knowledge/sync'
+import SyncApi from '@/api/admin/workspace/knowledge/sync'
 import { KNOWLEDGE_SYNC_STATUS, KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
 import type { KnowledgeSyncLog, KnowledgeSyncStatus } from '@/api/types'
 import type { StatusLabelOptions } from '@/components/global/mk-status-label/types'
@@ -8,7 +8,7 @@ import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'KnowledgeSyncLogTable' })
-const props = defineProps<{ api: typeof SyncApi; knowledgeId: string }>()
+const props = defineProps<{ knowledgeId: string }>()
 
 // 进入日志页签、切换知识库和翻页时查询。
 const loading = ref(false)
@@ -18,6 +18,7 @@ const syncStatusOptions: Partial<Record<KnowledgeSyncStatus, StatusLabelOptions>
   [KNOWLEDGE_SYNC_STATUS.RUNNING]: { type: 'loading', label: '同步中' },
   [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: '成功' },
   [KNOWLEDGE_SYNC_STATUS.FAILURE]: { type: 'failure', label: '失败' },
+  [KNOWLEDGE_SYNC_STATUS.SKIPPED]: { type: 'failure', label: '已跳过' },
 }
 
 function getSyncContent(log: KnowledgeSyncLog) {
@@ -35,8 +36,7 @@ function getSyncContent(log: KnowledgeSyncLog) {
 function loadSyncLogs() {
   if (loading.value) return
   loading.value = true
-  return props.api
-    .getKnowledgeSyncLogPage(props.knowledgeId, paginationConfig.value)
+  return SyncApi.getKnowledgeSyncLogPage(props.knowledgeId, paginationConfig.value)
     .then((page) => {
       syncLogs.value = page.records
       paginationConfig.value.total = page.total
@@ -73,7 +73,9 @@ watch(
       </el-table-column>
       <el-table-column label="同步内容" min-width="400" show-overflow-tooltip>
         <template #default="{ row }">
-          <span>{{ getSyncContent(row) }}</span>
+          <MkTooltip :disabled="!row.message" :content="row.message" placement="top">
+            <span>{{ getSyncContent(row) }}</span>
+          </MkTooltip>
         </template>
       </el-table-column>
       <el-table-column label="同步方式" width="140">

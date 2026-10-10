@@ -105,7 +105,16 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="调试" size="800" :close-on-click-modal="false" :close-on-press-escape="false" @closed="close">
+  <MkDrawer v-model="visible" direction="btt" @closed="close">
+    <!-- <template #header>
+      <div class="flex w-full">
+        <h4>调试</h4>
+        <el-steps :active="activeStep" finish-status="success" class="absolute-center w-85!">
+          <el-step title="选择数据源" />
+          <el-step title="文档处理设置" />
+        </el-steps>
+      </div>
+    </template> -->
     <div v-loading="loading" class="h-full">
       <keep-alive :include="['DataSource', 'KnowledgeBase']">
         <component
