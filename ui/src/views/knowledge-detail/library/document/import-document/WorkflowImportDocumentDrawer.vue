@@ -14,7 +14,7 @@ import Result from '@/views/workflow/knowledge/debug/action/Result.vue'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowImportDocumentDrawer' })
-const props = defineProps<{ knowledgeId: string; workflow?: LogicFlow.GraphConfigData }>()
+const props = defineProps<{ knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
 /* 复用工作流 Action，上传适配保留进度、取消和上传中保护。 */
@@ -43,18 +43,25 @@ provide('delFile', FileApi.deleteFile)
 type ActionStep = 'data_source' | 'knowledge_base' | 'result'
 const actionComponents: Record<ActionStep, Component> = { data_source: DataSource, knowledge_base: KnowledgeBase, result: Result }
 const visible = ref(false)
+const currentWorkflow = ref<LogicFlow.GraphConfigData | null>(null)
 const loading = ref(false)
 const active = ref<ActionStep>('data_source')
+const activeStep = computed(() => ({ data_source: 0, knowledge_base: 1, result: 2 })[active.value])
 const actionKey = ref(0)
 const actionId = ref<string>()
 const formPayload = ref<KnowledgeWorkflowDebugPayload>({ data_source: {}, knowledge_base: {} })
 const actionRef = useTemplateRef<{ validate: () => Promise<unknown>; getData: () => Dict<unknown> }>('actionRef')
-const hasKnowledgeBaseInput = computed(() => {
-  const node = props.workflow?.nodes?.find((node) => node.type === WorkflowNodeType.KnowledgeBase)
-  return ((node?.properties?.user_input_field_list as FormField[] | undefined)?.length ?? 0) > 0
-})
+const knowledgeBaseNode = computed(() => currentWorkflow.value?.nodes?.find((node) => node.type === WorkflowNodeType.KnowledgeBase))
+const hasKnowledgeBaseInput = computed(
+  () => ((knowledgeBaseNode.value?.properties?.user_input_field_list as FormField[] | undefined)?.length ?? 0) > 0,
+)
+const userInputTitle = computed(() => knowledgeBaseNode.value?.properties?.user_input_config?.title || '用户输入')
+const showNext = computed(() => hasKnowledgeBaseInput.value && active.value === 'data_source')
+const showPrev = computed(() => hasKnowledgeBaseInput.value && active.value === 'knowledge_base')
+const showImport = computed(() => (hasKnowledgeBaseInput.value ? active.value === 'knowledge_base' : active.value === 'data_source'))
 const busy = computed(() => loading.value || uploadingCount.value > 0)
-function open() {
+function open(workflow?: LogicFlow.GraphConfigData) {
+  currentWorkflow.value = workflow ?? null
   visible.value = true
 }
 function getActionData() {
@@ -127,22 +134,22 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="visible" direction="btt" @closed="emit('closed')">
-    <!-- <template #header>
+    <template #header>
       <div class="flex w-full">
         <h4>导入文档</h4>
-        <el-steps :active="activeStep" finish-status="success" class="absolute-center w-85!">
-          <el-step title="导入文档" />
-          <el-step title="文档处理策略" />
+        <el-steps v-if="hasKnowledgeBaseInput" :active="activeStep" finish-status="success" class="absolute-center w-85!">
+          <el-step title="选择数据源" />
+          <el-step :title="userInputTitle" />
         </el-steps>
       </div>
-    </template> -->
+    </template>
     <div v-loading="loading" class="h-full">
       <keep-alive :key="actionKey" :include="['DataSource', 'KnowledgeBase']">
         <component
           :is="actionComponents[active]"
           ref="actionRef"
           v-model:loading="loading"
-          :workflow="workflow ?? null"
+          :workflow="currentWorkflow"
           :knowledge-id="knowledgeId"
           :action-id="actionId"
         />
@@ -152,23 +159,15 @@ defineExpose({ open })
       <!-- 取消导入 -->
       <el-button v-if="active !== 'result'" :disabled="busy" @click="visible = false">取消</el-button>
       <!-- 继续导入 -->
-      <el-button v-if="active === 'result'" @click="handleContinueImport">继续导入</el-button>
+      <el-button v-if="active === 'result'" plain @click="handleContinueImport">继续导入</el-button>
       <!-- 返回数据源 -->
-      <el-button v-if="hasKnowledgeBaseInput && active === 'knowledge_base'" :disabled="busy" @click="handlePrevious">上一步</el-button>
-      <!-- 进入知识库输入 -->
-      <el-button v-if="hasKnowledgeBaseInput && active === 'data_source'" :disabled="busy" @click="handleNext">下一步</el-button>
+      <el-button v-if="showPrev" plain :disabled="busy" @click="handlePrevious">上一步</el-button>
+      <!-- 进入用户输入 -->
+      <el-button v-if="showNext" type="primary" :disabled="busy" @click="handleNext">下一步</el-button>
       <!-- 执行工作流导入 -->
-      <el-button
-        v-if="hasKnowledgeBaseInput ? active === 'knowledge_base' : active === 'data_source'"
-        type="primary"
-        :loading="loading"
-        :disabled="uploadingCount > 0"
-        @click="handleSubmit"
-      >
-        导入
-      </el-button>
+      <el-button v-if="showImport" type="primary" :loading="loading" :disabled="uploadingCount > 0" @click="handleSubmit">开始导入</el-button>
       <!-- 完成导入 -->
-      <el-button v-if="active === 'result'" type="primary" @click="handleFinish">完成</el-button>
+      <el-button v-if="active === 'result'" type="primary" @click="handleFinish">前往文档</el-button>
     </template>
   </MkDrawer>
 </template>

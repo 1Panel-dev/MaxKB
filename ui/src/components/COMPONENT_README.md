@@ -762,6 +762,17 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 表单配置加载、字段联动请求与 Tree 懒加载的 loading 由组件在请求前开启，并在 `finally` 中释放；
 不向 API 请求方法传递 loading，动态请求脚本也不再通过 `extra.loading` 获取状态。
 
+动态表单 `Tree` 字段使用 `MkTable` 展示文档与文件夹，复用原生复选列、全选和父子选择联动。
+保留 `text_field`、`value_field`、`childrenField` 映射，选中值仍为原始节点对象数组；
+已导入节点自动选中且不可取消，`disabled` 节点不可选择。懒加载先查询根目录，展开时通过
+原有工具数据源接口提交 `current_node` 查询子节点；非懒加载使用 `option_list`。
+
+动态表单 `LocalFileUpload` 字段复用 `MkDragUpload` 的多文件模式，将
+`file_type_list`、`file_size_limit`、`file_count_limit` 映射为格式、大小和数量限制。
+上传适配兼容上层返回的 Promise 或 `{ request, abort }`，响应支持地址字符串或 `{ data: 地址 }`；
+文件夹选择、进度、失败重试、取消和成功文件删除由 `MkDragUpload` 维护，文件值采用
+`DragUploadFile[]`，失败状态为 `fail`。
+
 `MkDynamicsForm` 根据字段配置渲染动态表单，统一维护字段值、默认值、显隐规则和表单校验；
 `MkDynamicsFormConstructor` 用于新增或编辑单个字段配置。该组件族位于 `components` 直属目录，
 使用方必须从 `@/components/mk-dynamics-form` 手动导入，不安装为 Vue 插件，也不全局注册其内部

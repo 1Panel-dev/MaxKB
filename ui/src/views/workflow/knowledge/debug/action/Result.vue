@@ -15,7 +15,9 @@ const POLL_INTERVAL = 2000
 
 const knowledgeAction = ref<KnowledgeWorkflowAction>()
 const state = computed(() => knowledgeAction.value?.state ?? 'PENDING')
-const detail = computed<ExecutionNodeDetail[]>(() => (knowledgeAction.value ? (Object.values(knowledgeAction.value.details) as ExecutionNodeDetail[]) : []))
+const detail = computed<ExecutionNodeDetail[]>(() =>
+  knowledgeAction.value ? (Object.values(knowledgeAction.value.details) as ExecutionNodeDetail[]) : [],
+)
 
 let pollingTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -53,7 +55,7 @@ onUnmounted(stopPolling)
 
 <template>
   <div>
-    <h4 class="mb-4 mt-1">执行详情</h4>
+    <h4 class="mb-4 mk-title-decoration">执行结果</h4>
     <div class="mb-4">
       <el-alert v-if="state === 'SUCCESS'" title="执行成功" type="success" show-icon :closable="false" />
       <el-alert v-else-if="state === 'FAILURE'" title="执行失败" type="error" show-icon :closable="false" />

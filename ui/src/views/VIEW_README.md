@@ -1117,7 +1117,8 @@ Web、飞书和工作流知识库的非共享文档页在标题栏组合
 Web 和飞书使用全屏底部 Drawer，分别通过地址表单和飞书 `MkTable` 懒加载目录表格进入文档处理策略；
 策略复用 `DocumentStrategyForm`，使用组件默认策略，不回显知识库策略，上一步保留草稿。
 Web 抽屉只接收完整 Document API 与知识库 ID，地址和选择器初始为空；
-飞书抽屉额外接收文件夹 Token，工作流抽屉只接收知识库 ID 和图数据；所有导入组件均不接收 `KnowledgeDetail`。
+飞书抽屉额外接收文件夹 Token，工作流抽屉只通过 Prop 接收知识库 ID，图数据在打开时通过
+`open(workflow)` 传入并保存在抽屉本地；所有导入组件均不接收 `KnowledgeDetail`。
 Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `body`。
 飞书按 `meta.folder_token` 查询目录并读取全部分页，已导入文档勾选且不可重复导入；
 表格使用原生 `type="selection"` 选择列和名称列，表头全选覆盖当前已加载节点；
