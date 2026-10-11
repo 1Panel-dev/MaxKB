@@ -3,17 +3,16 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { computed, reactive, ref, useTemplateRef, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { KnowledgeItem } from '@/api/types'
 import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
-import { useKnowledgeDetailContext } from '../../context'
+import { useKnowledgeSettingContext } from '../../context'
 
 defineOptions({ name: 'KnowledgeBaseSettingView' })
 
-const { knowledge, replaceKnowledgeDetail } = useKnowledgeDetailContext()
+const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeSettingContext()
 
 /* 详情与基本信息 */
 
@@ -110,10 +109,12 @@ function handleSave() {
 
       return confirmation.then(() => {
         const request =
-          detail.type === KNOWLEDGE_TYPE.LARK ? KnowledgeApi.putLarkKnowledge(detail.id, payload) : KnowledgeApi.putKnowledge(detail.id, payload)
+          detail.type === KNOWLEDGE_TYPE.LARK && 'putLarkKnowledge' in resourceApi.knowledge
+            ? resourceApi.knowledge.putLarkKnowledge(detail.id, payload)
+            : resourceApi.knowledge.putKnowledge(detail.id, payload)
         // 返回完整请求链，向量化失败时保留原模型基准，允许再次保存重试。
         return request.then((savedKnowledge) => {
-          const embeddingRequest = embeddingModelChanged ? KnowledgeApi.putReEmbeddingKnowledge(detail.id) : Promise.resolve()
+          const embeddingRequest = embeddingModelChanged ? resourceApi.knowledge.putReEmbeddingKnowledge(detail.id) : Promise.resolve()
           return embeddingRequest.then(() => {
             replaceKnowledgeDetail({ ...detail, ...savedKnowledge })
             MsgSuccess('保存成功')
@@ -131,9 +132,10 @@ defineProps<ResourceDetailPageProps>()
 </script>
 
 <template>
-  <div v-if="knowledge" v-loading="saving" class="max-w-200 pb-6">
+  <div v-loading="saving" class="max-w-200 pb-6">
     <KnowledgeBaseForm ref="baseFormRef" />
     <el-form
+      v-if="knowledge"
       class="mt-4"
       ref="settingFormRef"
       :model="settingForm"

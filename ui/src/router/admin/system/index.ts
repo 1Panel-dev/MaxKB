@@ -1,7 +1,8 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { systemApplicationRoutes } from './modules/application'
-import { systemKnowledgeRoutes } from './modules/knowledge'
+import { systemResourceKnowledgeRoutes } from './modules/knowledge-system-resource'
+import { systemSharedKnowledgeRoutes } from './modules/knowledge-system-shared'
 import perm from '@/permission/index'
 export const systemRoutes: RouteRecordRaw = {
   path: '/system',
@@ -151,7 +152,7 @@ export const systemRoutes: RouteRecordRaw = {
         permission: () => {
           return perm.application.system.read() || perm.knowledge.system.read() || perm.tool.system.read() || perm.model.system.read()
         },
-        next: 'system-share',
+        next: 'system-shared',
       },
       children: [
         {
@@ -176,15 +177,14 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'models',
           name: 'system-resource-models',
           component: () => import('@/views/system/resource-management/model/index.vue'),
-          meta: { title: '模型', order: 40, permission: perm.model.system.read, next: 'system-share' },
+          meta: { title: '模型', order: 40, permission: perm.model.system.read, next: 'system-shared' },
         },
       ],
     },
     ...systemApplicationRoutes,
-    ...systemKnowledgeRoutes,
     {
-      path: 'share',
-      name: 'system-share',
+      path: 'shared',
+      name: 'system-shared',
       redirect: { name: 'system-shared-knowledge' },
       meta: {
         title: '共享资源',
@@ -218,6 +218,8 @@ export const systemRoutes: RouteRecordRaw = {
         },
       ],
     },
+    ...systemResourceKnowledgeRoutes,
+    ...systemSharedKnowledgeRoutes,
     {
       path: 'chat-management',
       name: 'system-chat-management',

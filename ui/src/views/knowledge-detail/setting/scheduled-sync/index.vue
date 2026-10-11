@@ -2,7 +2,6 @@
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
-import SyncApi from '@/api/admin/workspace/knowledge/sync'
 import { KNOWLEDGE_SYNC_TYPE, SCHEDULE_TYPE } from '@/api/enums'
 import type { KnowledgeSyncSetting, KnowledgeSyncScheduleType } from '@/api/types'
 import { SCHEDULE_OPTION } from '@/constants/schedule'
@@ -17,7 +16,7 @@ defineOptions({ name: 'KnowledgeScheduledSyncView' })
 defineProps<ResourceDetailPageProps>()
 
 // 回填后台配置，草稿与详情中的配置独立。
-const { knowledge, replaceKnowledgeDetail } = useKnowledgeDetailContext()
+const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 const activeTab = ref('settings')
 const loading = ref(false)
 const saving = ref(false)
@@ -107,6 +106,7 @@ const rules: FormRules<SyncSettingDraft> = {
 }
 
 function handleSave() {
+  if (!resourceApi.sync) return
   const detail = knowledge.value
   const form = formRef.value
   if (saving.value || loading.value || !settingLoaded.value || !detail || !form) return
@@ -116,7 +116,7 @@ function handleSave() {
     .then(() => {
       if (!syncSetting.value.schedule_type) return
       const setting: KnowledgeSyncSetting = { ...cloneDeep(syncSetting.value), schedule_type: syncSetting.value.schedule_type }
-      return SyncApi.putKnowledgeSyncSetting(detail.id, setting).then((savedSetting) => {
+      return resourceApi.sync?.putKnowledgeSyncSetting(detail.id, setting).then((savedSetting) => {
         syncSetting.value = cloneDeep(savedSetting)
         replaceKnowledgeDetail({ ...detail, meta: { ...detail.meta, sync_setting: savedSetting } })
         MsgSuccess('保存成功')
@@ -129,9 +129,12 @@ function handleSave() {
 }
 
 function loadSyncSetting(knowledgeId: string) {
+  // TODO 补了接口就可以了
+  if (!resourceApi.sync) return Promise.resolve()
   loading.value = true
   settingLoaded.value = false
-  return SyncApi.getKnowledgeSyncSetting(knowledgeId)
+  return resourceApi.sync
+    .getKnowledgeSyncSetting(knowledgeId)
     .then((setting) => {
       syncSetting.value = cloneDeep(setting)
       presetScheduleType.value = setting.schedule_type === SCHEDULE_TYPE.CRON ? SCHEDULE_TYPE.DAILY : setting.schedule_type
@@ -212,6 +215,6 @@ watch(
         <el-button type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">保存</el-button>
       </el-form>
     </div>
-    <SyncLogTable v-if="activeTab === 'logs' && knowledge" :api="SyncApi" :knowledge-id="knowledge.id" />
+    <SyncLogTable v-if="activeTab === 'logs' && knowledge" :api="resourceApi.sync" :knowledge-id="knowledge.id" />
   </div>
 </template>

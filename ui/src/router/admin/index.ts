@@ -1,5 +1,11 @@
 import NProgress from 'nprogress'
-import { createRouter, createWebHistory , type RouteLocationNormalizedLoaded,type RouteLocationNormalized,type RouteLocationResolvedGeneric} from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalizedLoaded,
+  type RouteLocationNormalized,
+  type RouteLocationResolvedGeneric,
+} from 'vue-router'
 import { useStore } from '@/stores'
 import { loginRoutes } from './login'
 import { systemRoutes } from './system'
@@ -42,7 +48,7 @@ router.beforeEach(async (to, from) => {
   }
 
   // 当前路由有权限，放行
-  if (!to.meta?.permission || (to.meta.permission as (route:RouteLocationNormalizedLoaded)=>boolean)(to)) {
+  if (!to.meta?.permission || (to.meta.permission as (route: RouteLocationNormalizedLoaded) => boolean)(to)) {
     return true
   }
 
@@ -65,7 +71,9 @@ router.beforeEach(async (to, from) => {
 
     const nextRoute = router.resolve({ name: nextName })
     if (nextRoute?.name) {
-      const nextPermission = nextRoute.meta?.permission as ((route?:RouteLocationNormalized |RouteLocationResolvedGeneric| RouteLocationNormalizedLoaded)=>boolean)
+      const nextPermission = nextRoute.meta?.permission as (
+        route?: RouteLocationNormalized | RouteLocationResolvedGeneric | RouteLocationNormalizedLoaded,
+      ) => boolean
       if (!nextPermission || nextPermission(nextRoute)) {
         return { name: nextName, replace: true }
       }

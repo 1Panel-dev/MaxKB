@@ -17,7 +17,7 @@ const mode = computed<LayoutMode>(() => route.meta.scope ?? 'workspace')
     <LayoutHeader :mode="preview ? 'workspace' : mode" :preview="preview" />
     <div class="flex">
       <aside v-if="preview" class="h-layout-content w-sidebar"></aside>
-      <LayoutSidebar v-else :mode="mode" />
+      <LayoutSidebar v-else-if="!route.meta.hideSidebar" :mode="mode" />
       <main class="mk-layout__main h-layout-content w-full overflow-hidden rounded-tl-xl bg-white transition-[margin] duration-200">
         <RouterView v-if="!preview" />
       </main>

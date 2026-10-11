@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
+import { useRouter } from 'vue-router'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import type { ParamsPage } from '@/api/admin/core/types'
 import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import SystemSharedRelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
@@ -21,9 +23,12 @@ import {
 } from '@/views/knowledge/knowledge-card/action-dropdown'
 
 /* 共享知识库详情入口 */
+const router = useRouter()
 function handleOpenKnowledge(knowledge: KnowledgeItem) {
-  // TODO: 补齐系统共享知识库详情路由后，使用当前知识库的 id、type 调用 router.push。
-  void knowledge
+  void router.push({
+    name: 'system-shared-knowledge-detail',
+    params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
+  })
 }
 
 /* 共享知识库查询 */

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import SyncApi from '@/api/admin/workspace/knowledge/sync'
+import type SyncApi from '@/api/admin/workspace/knowledge/sync'
 import { KNOWLEDGE_SYNC_STATUS, KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
 import type { KnowledgeSyncLog, KnowledgeSyncStatus } from '@/api/types'
 import type { StatusLabelOptions } from '@/components/global/mk-status-label/types'
@@ -8,7 +8,7 @@ import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'KnowledgeSyncLogTable' })
-const props = defineProps<{ knowledgeId: string }>()
+const props = defineProps<{ knowledgeId: string; api?: typeof SyncApi }>()
 
 // 进入日志页签、切换知识库和翻页时查询。
 const loading = ref(false)
@@ -34,9 +34,11 @@ function getSyncContent(log: KnowledgeSyncLog) {
   return `共${log.total_count}个文档 (${counts.join('，')})`
 }
 function loadSyncLogs() {
+  if (!props.api) return
   if (loading.value) return
   loading.value = true
-  return SyncApi.getKnowledgeSyncLogPage(props.knowledgeId, paginationConfig.value)
+  return props.api
+    .getKnowledgeSyncLogPage(props.knowledgeId, paginationConfig.value)
     .then((page) => {
       syncLogs.value = page.records
       paginationConfig.value.total = page.total
