@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import SystemCommonApi from '@/api/admin/system/common'
 import SystemWorkspaceApi from '@/api/admin/system/workspace'
@@ -23,6 +25,15 @@ import {
 } from '@/views/knowledge/knowledge-card/action-dropdown/index.ts'
 
 const { auth } = useStore()
+const router = useRouter()
+
+/* 系统资源知识库详情入口 */
+function handleOpenKnowledge(knowledge: KnowledgeItem) {
+  void router.push({
+    name: 'system-resource-knowledge-detail',
+    params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
+  })
+}
 
 /* 工具分页与筛选 */
 const loading = ref(false)
@@ -142,7 +153,7 @@ onMounted(() => {
         <el-table-column label="创建时间" width="180">
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 向量化 -->
@@ -153,6 +164,8 @@ onMounted(() => {
                 :api="SystemResourceKnowledgeApi"
                 :knowledge="row"
               />
+              <!-- 进入知识库详情 -->
+              <MkAction display="button" label="知识库详情" icon="icon_admin_outlined" @click="handleOpenKnowledge(row)" />
               <MkTableMoreDropdown>
                 <!-- 同步 Web 知识库 -->
                 <SyncKnowledgeAction

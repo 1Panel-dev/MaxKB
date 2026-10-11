@@ -25,6 +25,8 @@ declare module 'vue-router' {
     icon?: string
     order?: number
     hidden?: boolean
+    /** 隐藏 AppLayout 的应用侧栏，保留顶部栏和页面自身导航。 */
+    hideSidebar?: boolean
     /** 系统资源授权页面当前管理的资源类型。 */
     resource?: ResourceAuthorizationType
     /** 详情返回导航的可访问性判断，由业务路由配置。 */

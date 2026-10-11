@@ -104,6 +104,8 @@ FormData；保存返回完整配置，页面以该返回值作为唯一数据来
 根据资源范围或业务上下文选择出的 API 对象统一命名为 `requestApi`，包括 `computed` 结果和
 局部变量，不使用 `toolApi`、`authorizationApi` 或 `request` 等名称。同一作用域确需同时使用
 多套 API 时，以 `request` 为前缀加业务名区分，例如 `requestModelApi`、`requestToolApi`。
+知识库详情上下文的多模块接口入口使用 `resourceApi.knowledge / sync`，通过响应式 getter
+读取当前范围，无需 `.value`；方法内选定单个接口对象时仍命名为 `requestApi`。
 直接导入的 API 保持 PascalCase 命名；请求返回的 Promise 不属于此命名规则。
 
 `application`、`knowledge`、`model`、`tool` 是需要同时考虑 Workspace 普通资源、Workspace 共享资源、System 资源管理和
@@ -111,7 +113,9 @@ System 共享资源的四类特殊资源。其接口按真实后端边界分别�
 `admin/system/` 下，不把不同范围的 URL 合并为页面侧 API Map，也不让卡片或 Action 根据路由拼接
 System 接口地址。
 
-页面根据路由 `resourceScope` 选择当前范围的完整业务 API 对象，并将其传给需要请求的 Card
+页面根据路由 `resourceScope` 选择当前范围的完整业务 API 对象；知识库详情由功能本地
+`views/knowledge-detail/context.ts` 集中装配，当前由详情入口与 setting 子页复用该选择，library 暂不迁移。缺失设置 API 模块保持未提供，
+不回退其他资源范围。页面将选定对象传给需要请求的 Card
 Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 API 对象；不要为每组 Action
 额外维护逐方法接口，例如 `ModelActionApi`，也不要使用不断扩展的 `Pick<typeof XxxApi, ...>`。
 完整 API 对象的方法集合不同时，共用组件使用完整对象类型的联合，例如

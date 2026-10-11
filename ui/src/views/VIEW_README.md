@@ -267,8 +267,10 @@ Workspace 知识库 API；System 共享知识库页传入完整 System 共享知
 `postKnowledgeWorkflow`；已创建知识库的工作流画布接口仍由 `workspace/knowledge/workflow.ts` 维护。
 各创建浮层接收 `folderId`，通过 `open()` 打开；工作流额外接受可选的商店模板。共用的
 `KnowledgeBaseForm` 负责名称、描述、Embedding 模型必填校验以及工作空间和共享模型查询，
-根据 `isSystemSharedResource()` 选择 System 共享 Model API 或 Workspace Model API，
-通过 `getModelListWithShared({ model_type: 'EMBEDDING' })` 一次加载模型选项，
+根据资源范围在组件内部选择模型接口：System 资源管理使用 System Model API，
+System 共享使用 System 共享 Model API，Workspace 普通与共享资源均使用 Workspace Model API，
+通过 `getModelListWithShared({ model_type: 'EMBEDDING' })` 加载模型选项；
+Workspace 普通与共享场景均合并当前工作空间模型与已授权共享模型，
 复用 `SelectModel`，允许创建模型后刷新选项。Web、飞书的特有字段留在对应弹窗中。
 模型加载后仅在未选择时默认选中首个可用模型；重置表单时恢复该默认值，无可用模型时保持为空。
 刷新选项不覆盖用户选择或设置页回填的模型。
@@ -406,7 +408,9 @@ src/views/system/shared-resources/
 导入创建，工作流卡片点击进入画布（支持 Ctrl / Command 新标签页），编辑菜单仍修改基础信息。共享页不组合工作空间专用的移动、授权和触发器入口。
 
 `KnowledgeSharedView` 使用 System 共享知识库 API，复用 `KnowledgeCard`、创建入口和模板中心。
-卡片点击绑定页面的 `handleOpenKnowledge`，详情路由暂未接入，方法内保留 `router.push` 的 TODO。
+卡片点击通过页面的 `handleOpenKnowledge` 进入 `system-shared-knowledge-detail`，
+携带知识库 ID 和由 `KNOWLEDGE_TYPE_MAP` 转换的类型。资源管理知识库表格在向量化按钮旁组合
+`icon_admin_outlined` 详情按钮，进入 `system-resource-knowledge-detail`。两个入口不携带 Workspace ID。
 创建、模板创建和导入均使用 System 共享接口；Web 同步、向量化、关联问题、分词索引、
 MCP 配置、关联资源、导出与删除通过复用 Action 组合，授权工作空间暂保留 TODO，不组合工作空间专用的设置、
 文件夹移动或批量操作。
@@ -721,7 +725,9 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 `image/`、`tags/`；文档专属组件及 Action 随 `document/` 集中维护。其他页面继续放在
 `knowledge-detail/` 下的 `recall-test/`、`question/`、`dictionary/`、`chat-user/`、`external-retrieval/`。
 图片及这五个页面暂只展示占位内容。
-容器通过 `knowledge-detail/context.ts` 提供只读详情与替换能力；设置页复用已加载详情，保存成功后
+容器通过 `knowledge-detail/context.ts` 装配资源范围、知识库 ID、设置所需的完整业务 API 对象和返回列表路由，
+并提供只读详情与替换能力。详情入口与 setting 的 API 选择集中在该上下文；library 保持原有接口调用方式。
+Action、Drawer、Dialog 继续通过 props 接收完整 API。设置页复用已加载详情，保存成功后
 更新容器数据，同步名称等展示。基本信息复用创建流程的 `KnowledgeBaseForm`，类型配置和校验留在
 `setting/base/index.vue` 中，通用知识库标题为“设置”，其他类型为“基础设置”。
 通用知识库只有单个设置菜单；Web 的设置分组包含基础设置、文档处理策略、定时同步，
@@ -747,7 +753,8 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 状态复用 `MkStatusLabel`，同步中使用 `loading`，成功和失败分别使用 `success`、`failure`，
 不配置跳过状态；完整同步使用“完整同步”标签。
 进入日志页签、切换知识库和分页时查询，不做定时刷新。
-设置菜单的类型筛选由路由维护；当前仅接入 Workspace 接口，暂不增加前端权限判断。
+设置菜单的类型筛选由路由维护；基础设置和文档策略通过上下文接入 Workspace 与 System 管理接口，
+定时同步目前仅提供 Workspace 模块，不新增前端权限判断。
 更换向量模型需确认，先保存再重新向量化，整条流程禁止重复提交；向量化失败时保留原模型比较基准，
 允许再次保存重试。Web、飞书设置保留未编辑的 `meta` 字段，上传限制使用详情顶层值。
 `knowledge-detail/library/document/index.vue` 维护文档列表查询、多选和文档操作，使用 `MkComplexSearch`、`MkTable`。
@@ -846,7 +853,15 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 `MkDropdown` 单选筛选全部、成功、失败、索引中、分词索引中、排队中和生成中；查询组合
 `status` 与可选的 `task_type`，切换选项清除旧任务类型并回到第一页，保留名称和创建者条件。
 
-文档详情路由暂未启用，System 知识库详情路由暂未注册。
+文档详情路由暂未启用。System 资源管理与共享资源已注册共用知识库详情路由，
+列表导航已接入。System 详情路由在 System 根路由的 children 汇总，通过详情父路由的 `hideSidebar: true` 隐藏系统管理 Sidebar，保留系统 Header 和知识库详情目录；
+容器使用上下文选定的详情 API，并返回各自 System 列表。System 基础设置、策略保存使用对应 Knowledge API，
+基础表单 `KnowledgeBaseForm` 内部根据资源范围选择完整模型 API，不接收外部 `modelApi`；
+Workspace 普通与共享资源均使用 Workspace 模型选项接口，System 资源管理使用 System 模型接口，
+System 共享使用系统共享模型接口。
+System 暂无前端 Sync API 模块，定时同步页仍展示设置及日志布局，不发送 Workspace 请求。
+library 的接口调整已撤回，文档和标签沿用原有调用方式，System library API 适配尚未实施。
+路由结构及来源配置见 `src/router/ROUTE_README.md`。
 
 ### 资料库标签管理
 
@@ -1172,8 +1187,9 @@ Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `bod
 ## Workspace 共享知识库详情
 
 知识库列表根据当前目录进入普通或 `workspace-shared-knowledge-detail` 共享详情路由。
-两者复用 `knowledge-detail/index.vue` 和文档页，由页面通过 `isWorkspaceSharedResource()`
-选择 `workspace/knowledge/` 或 `workspace/shared/knowledge/` 的完整 API 对象。
+两者复用 `knowledge-detail/index.vue` 和文档页；详情容器通过上下文选择对应详情 API，
+文档页继续自行通过 `isWorkspaceSharedResource()` 选择 `workspace/knowledge/` 或
+`workspace/shared/knowledge/` 的完整 API 对象。
 共享详情目前仅提供资料库中的文档页，设置与工作流尚未接入共享接口，不注册对应共享入口。
 容器监听工作空间、知识库和资源范围变化重新加载；共享详情返回列表携带 `folderId: 'shared'`，
 普通详情继续恢复所属文件夹。文档创建者选项在共享范围使用 System `CommonApi`，普通范围使用
@@ -1260,3 +1276,26 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 抽屉自己管理显隐并暴露 `open()`；门户视图持有抽屉的 ref，通过 `createPortalConversation` 的
 `openApplicationSelector` 传入门户侧栏 Store。Store 的 `newConversation` 有当前智能体时打开其
 `portal-application` 地址，地址中会话 ID 清空后由 chat 装配函数的会话同步新建对话。
+
+
+### 知识库详情上下文装配
+
+上下文只维护共享详情数据、更新能力及多个子页面共用的接口。仅由单个子页面使用的接口，
+在该页面内部按资源范围选择，不为单页接口增加 context 配置或转发 getter。
+定时同步接口属于定时同步页自身职责；未提供对应范围接口时，不回退到 Workspace，
+也不为 Workspace 共享只读资源增加写接口。当前 `sync` 尚保留在详情上下文，后续调整时按此规则收回定时同步页。
+
+`provideKnowledgeDetailContext` 在详情入口装配并提供上下文，`useKnowledgeDetailContext` 供子页读取。
+基础设置和文档策略通过 `useKnowledgeSettingContext` 获取可管理范围的完整 Knowledge API 类型，
+该设置上下文的 `resourceApi` 仅提供 `knowledge`；定时同步从普通详情上下文读取 `sync`，不重复暴露。
+不在页面用方法是否存在判断可写能力；上下文边界排除 Workspace 共享只读范围，
+共享路由不注册设置页，也不增加写接口。
+上下文按响应式 `resourceScope` 选择完整 Knowledge、Sync API 对象，
+统一通过响应式 `resourceApi.knowledge / sync` 提供接口，脚本调用不需要 `.value`；
+详情查询与保存使用同一个完整 Knowledge API 对象，不存在的设置模块保持 undefined。
+返回列表路由独立提供；不要在 setup 时解构 `resourceApi` 内的具体 API，以免固定为旧范围的对象。
+不根据 URL 猜测来源，不为补齐方法集合构造请求，不让缺失模块回退 Workspace。
+目前仅详情入口及 setting 下的基础设置、文档策略、定时同步页面采用上下文 API；
+library 下的文档、标签与迁移组件保留原有调用方式，不装配到上下文。
+同步日志通过完整 Sync API props 请求。展示组件不接收上下文 API。
+System 飞书专用保存方法尚未提供，基础设置沿该范围现有 `putKnowledge` 协议；Workspace 飞书保留专用方法。

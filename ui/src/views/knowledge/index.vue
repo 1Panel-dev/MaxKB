@@ -42,16 +42,23 @@ function handleOpenKnowledge(knowledge: KnowledgeItem) {
 }
 
 /* 当前文件夹 */
-const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.KNOWLEDGE].all })
+const allKnowledgeFolder = FOLDER_ENTRIES[RESOURCE_TYPE.KNOWLEDGE].all
+const currentFolderId = ref<string>(FOLDER_ENTRY_ID.ALL)
+const currentFolder = ref<FolderItem>({ ...allKnowledgeFolder })
 const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
 
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
+  currentFolderId.value = folder.id
   currentFolder.value = folder
   if (folderChanged) {
     cancelBatchSelection()
     refreshKnowledge()
   }
+}
+
+function handleFolderLoaded(folder?: FolderItem) {
+  handleFolderSelect(folder ?? allKnowledgeFolder)
 }
 
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -190,7 +197,14 @@ function handleBatchDelete() {
         </MkTooltip>
       </component>
 
-      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.KNOWLEDGE" draggable @select="handleFolderSelect" />
+      <FolderTree
+        ref="folderTreeRef"
+        v-model="currentFolderId"
+        :source="RESOURCE_TYPE.KNOWLEDGE"
+        draggable
+        @loaded="handleFolderLoaded"
+        @select="handleFolderSelect"
+      />
     </template>
 
     <template #default="{ Footer, Header }">

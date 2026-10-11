@@ -21,7 +21,8 @@ src/router/
 │   │   ├── index.ts             # 系统管理路由汇总
 │   │   └── modules/
 │   │       ├── application.ts         # System 来源的智能体详情路由
-│   │       └── knowledge.ts     # System 来源的知识库详情路由
+│   │       ├── knowledge-system-resource.ts # System 资源管理知识库详情路由
+│   │       └── knowledge-system-shared.ts # System 共享资源知识库详情路由
 │   └── workspace/
 │       ├── index.ts             # 工作空间模块汇总
 │       └── modules/
@@ -62,7 +63,8 @@ Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当
 
 System 使用 `AppLayout`，左侧导航根据 `scope: 'system'` 对应路由的 `children` 自动生成。
 
-System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。需要复用 Workspace 详情页面时，在 System 路由树中注册独立路由名并复用同一个页面组件，以保留访问来源。
+System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。需要复用 Workspace 详情页面时使用独立路由名保留访问来源。System 知识库详情在 `system/index.ts` 的 children 注册，
+继承 System 的 AppLayout，在主区展示详情目录和内容区。
 
 对话端管理根地址为 `/admin/system/chat-management`（`system-chat-management`），默认进入
 `users`（`system-chat-users`）。子路由还包括 `groups`
@@ -168,6 +170,7 @@ Chat 导航守卫（`chat/index.ts`）：
 | `icon`               | `string`                                              | iconfont Symbol ID，子目录通常可以不配置               |
 | `order`              | `number`                                              | 同级导航排序，数字越小越靠前                           |
 | `hidden`             | `boolean`                                             | 设置为 `true` 时不显示在导航中                         |
+| `hideSidebar`        | `boolean`                                             | 隐藏 AppLayout 应用侧栏，保留顶部栏和页面自身导航；子页继承 |
 | `resource`           | `ResourceAuthorizationType`                           | 系统资源授权页面当前管理的后端资源类型                 |
 
 ## 导航生成
@@ -270,30 +273,33 @@ Workspace 页面：
 文件夹 ID，只清除已有的 `folderId`；进入详情时也不继续携带该 query。`folderId` 不作为详情 path
 参数。
 
-System 复用页面（仅替换根前缀）：
+System 复用页面：
 
 ```text
 /admin/system/application/:applicationId
 /admin/system/application/:applicationId/edit
 
-/admin/system/knowledge/:knowledgeId
-/admin/system/knowledge/:knowledgeId/document/:documentId
+/admin/system/resource/knowledge/:knowledgeId/:type
+/admin/system/resource/knowledge/:knowledgeId/:type/document
+/admin/system/shared/knowledge/:knowledgeId/:type
+/admin/system/shared/knowledge/:knowledgeId/:type/document
 ```
 
-两套详情路由使用不同的路由名称并复用相同页面组件。除 `/workspace`、`/system` 根前缀外，后续模块路径保持一致。
+不同来源的详情路由使用独立名称并复用相同页面组件。System 知识库详情沿用对应列表的
+`resource` / `shared` 目录，详情地址不携带 `workspaceId`。
 
 System 共享资源页面：
 
 ```text
-/admin/system/share/knowledge
-/admin/system/share/models
-/admin/system/share/tools
+/admin/system/shared/knowledge
+/admin/system/shared/models
+/admin/system/shared/tools
 ```
 
 `system-shared-knowledge` 渲染 `views/system/shared-resources/knowledge/index.vue`，提供共享知识库
 卡片管理页面；`system-shared-tools` 渲染 `views/system/shared-resources/tool/index.vue`，提供共享工具管理页面。
 
-共享资源路由是 System 导航的一部分，继续在 `admin/system/index.ts` 的 `share` 子路由中维护。
+共享资源路由是 System 导航的一部分，继续在 `admin/system/index.ts` 的 `shared` 子路由中维护。
 已实现的共享资源页面放在 `views/system/shared-resources/`，由页面处理 System 范围的查询和操作，
 可按需复用 Workspace 对应资源的卡片等展示组件。
 
@@ -446,3 +452,31 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 `resourceScope: 'workspace-shared'` 和 `activeMenu: 'workspace-knowledge'`，复用知识库详情容器和文档页，侧栏仍高亮 Workspace 知识库。
 共享详情目前仅注册“资料库 → 文档”，后续页面需接入对应共享接口后再注册，不跳转普通设置或工作流。
 返回列表时使用 `folderId: 'shared'` 恢复共享目录。
+
+
+### System 知识库详情路由
+
+`admin/system/modules/knowledge-system-resource.ts` 导出 `systemResourceKnowledgeRoutes`，
+`admin/system/modules/knowledge-system-shared.ts` 导出 `systemSharedKnowledgeRoutes`，由 `system/index.ts`
+展开到 System 根路由的 children，使用完整的 `/system/resource/knowledge/:knowledgeId/:type`、
+`/system/shared/knowledge/:knowledgeId/:type` 地址，继承系统管理的 AppLayout。
+详情父路由显式配置 `scope: 'system'` 和对应 `resourceScope`，子页继承资源范围。共享资源统一使用 `shared` 前缀，父路由名为 `system-shared`，相关 `next` 同步使用该名称。
+不保留 `/system/share` 别名，列表及详情均使用 `/system/shared` 地址。
+两种详情父路由分别为 `system-resource-knowledge-detail`、`system-shared-knowledge-detail`，
+均配置 `hidden`、`hideSidebar`、`resourceDetailRoot`，隐藏系统应用侧栏并保留系统顶部栏与详情目录，复用 `knowledge-detail/index.vue`，默认重定向到各自的文档页。
+参数 `type` 沿用 Workspace 的字符串知识库类型。
+
+各来源在自己的模块文件中显式维护 children，不使用共用子路由生成函数。
+Workspace 普通和 System 两种管理来源分别配置资料库、检索优化、授权与集成和设置目录，
+共用 View 组件并保持知识库类型显隐规则。Workspace 共享仍仅配置资料库中的文档页。
+System 画布尚未接入对应 API，因此两种 System 详情均不注册工作流入口；
+Workspace 普通来源继续保留 `workflow-knowledge` 入口。
+
+System 资源管理知识库表格的详情按钮和共享知识库卡片分别进入对应详情父路由，
+携带 `knowledgeId` 和经 `KNOWLEDGE_TYPE_MAP` 转换的 `type`，不携带 `workspaceId`。
+`AppLayout` 响应当前路由 `meta.hideSidebar` 控制应用侧栏；返回普通列表后自动恢复侧栏。
+预览模式继续保留侧栏占位。`hidden` 仅控制菜单项显隐，不代替 `hideSidebar`。
+详情容器使用 System 主区的高度，按来源查询知识库详情，并返回对应 System 列表。
+详情上下文按资源范围集中装配 API，基础设置和文档策略已使用对应管理 API；
+System Sync 模块暂未提供，定时同步页仍展示设置及日志布局，不回退 Workspace 接口。
+library 接口调整暂未实施，文档及标签保持原有请求方式，System library 适配仍待后续处理。

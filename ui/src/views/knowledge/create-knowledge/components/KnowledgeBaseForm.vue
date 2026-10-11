@@ -3,11 +3,12 @@ import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MODEL_STATUS } from '@/api/enums'
 import type { KnowledgeCreatePayload, ModelItem, ModelProviderItem } from '@/api/types'
+import SystemModelApi from '@/api/admin/system/resource-management/model'
 import ModelApi from '@/api/admin/workspace/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import ModelProviderApi from '@/api/admin/model-provider'
 import SelectModel from '@/components/business/select-model/index.vue'
-import { isSystemSharedResource } from '@/utils/resource-context'
+import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'KnowledgeBaseForm' })
 defineProps<{ disabled?: boolean }>()
@@ -43,7 +44,7 @@ const providerOptions = ref<ModelProviderItem[]>([])
 
 function loadModelOptions() {
   loading.value = true
-  const requestModelApi = isSystemSharedResource() ? SystemSharedModelApi : ModelApi
+  const requestModelApi = isSystemResource() ? SystemModelApi : isSystemSharedResource() ? SystemSharedModelApi : ModelApi
   return Promise.all([
     requestModelApi.getModelListWithShared({ model_type: 'EMBEDDING' }),
     ModelProviderApi.getProviderList({ model_type: 'EMBEDDING' }),
