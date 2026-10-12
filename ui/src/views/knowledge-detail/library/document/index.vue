@@ -32,6 +32,7 @@ import {
   BatchEmbeddingAction,
   BatchCancelTaskAction,
   DeleteDocumentAction,
+  DocumentTagsAction,
   EmbeddingDocumentAction,
   GenerateQuestionsAction,
   BatchGenerateQuestionsAction,
@@ -364,7 +365,7 @@ onBeforeUnmount(() => {
     v-loading="loading || operationLoading"
     :data="documentData"
     v-model:pagination-config="paginationConfig"
-    :max-table-height="210"
+    :max-table-height="240"
     @current-change="loadDocuments()"
     @size-change="loadDocuments()"
     @selection-change="handleSelectionChange"
@@ -514,15 +515,8 @@ onBeforeUnmount(() => {
                 :document="row"
                 @refresh="refreshAfterOperation"
               />
-              <!-- 设置文档标签 -->
-              <!-- <DocumentTagsAction
-                :api="DocumentApi"
-                :knowledge-id="knowledgeId"
-                :document-ids="[row.id]"
-                manage-tags
-                :disabled="operationLoading"
-                @refresh="refreshAfterOperation"
-              /> -->
+              <!-- TODO: 设置文档标签 -->
+              <DocumentTagsAction label="标签设置" icon="icon_tag" :disabled="operationLoading" />
               <!-- 同步 -->
               <SyncDocumentAction
                 v-if="
@@ -625,7 +619,7 @@ onBeforeUnmount(() => {
         @refresh="refreshAfterOperation"
       />
 
-      <!-- 批量添加标签 -->
+      <!-- // TODO 批量添加标签 -->
       <!-- <el-button>添加标签</el-button> -->
 
       <!-- 更多批量操作 -->
