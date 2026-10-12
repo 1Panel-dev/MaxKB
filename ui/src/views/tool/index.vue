@@ -266,7 +266,7 @@ onMounted(() => {
               >
                 <template #actions>
                   <!-- 修改工具状态 -->
-                  <ToolStatusSwitch :disabled="!perm.tool.workspace.edit(tool.id)" v-model:loading="toolOperationLoading" :api="ToolApi" :tool="tool" @update="handleToolUpdate" />
+                  <ToolStatusSwitch :disabled="!perm.tool.workspace.switch(tool.id)" v-model:loading="toolOperationLoading" :api="ToolApi" :tool="tool" @update="handleToolUpdate" />
                   <el-divider direction="vertical" class="ml-1!"/>
                 </template>
                 <template #action-dropdown>
@@ -286,7 +286,7 @@ onMounted(() => {
                   />
                   <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" :tool="tool" />
                   <!-- 复制 -->
-                  <CopyToolAction v-model:loading="toolOperationLoading" label="复制" :api="ToolApi" :tool="tool" @refresh="refreshTool" />
+                  <CopyToolAction v-if="perm.tool.workspace.copy(tool.id)" v-model:loading="toolOperationLoading" label="复制" :api="ToolApi" :tool="tool" @refresh="refreshTool" />
                   <InitParamAction
                     v-if="(tool.init_field_list?.length ?? 0) > 0"
                     v-model:loading="toolOperationLoading"

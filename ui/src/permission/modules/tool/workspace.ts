@@ -34,6 +34,9 @@ const workspace = {
    * 工作空间「工具」编辑权限
    */
   edit: (id: string) => canRes(P.TOOL_EDIT, id),
+  /**
+   * 工作空间「工具」修改工具状态权限
+   */
   switch: (id: string) => canRes(P.TOOL_EDIT, id),
   /**
    * 工作空间「工具」复制权限

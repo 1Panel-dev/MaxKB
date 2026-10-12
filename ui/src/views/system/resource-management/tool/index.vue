@@ -178,7 +178,7 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 启用或禁用工具 -->
-              <ToolStatusSwitch v-model:loading="operationLoading" :api="SystemToolApi" :tool="row" :disabled="!perm.tool.system.edit() || operationLoading" @update="handleToolUpdate" />
+              <ToolStatusSwitch v-model:loading="operationLoading" :api="SystemToolApi" :tool="row" :disabled="!perm.tool.system.switch() || operationLoading" @update="handleToolUpdate" />
               <el-divider direction="vertical" class="ml-3! mr-2!" />
               <!-- 编辑工具配置 -->
               <EditToolAction v-if="perm.tool.system.edit()" display="button" label="编辑" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />

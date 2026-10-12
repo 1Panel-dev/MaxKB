@@ -30,6 +30,9 @@ const system = {
    * 系统「工具资源管理」（系统 > 资源管理 > 工具）编辑权限
    * */
   edit: () => canSys(P.RESOURCE_TOOL_EDIT),
+  /**
+   * 系统「工具资源管理」（系统 > 资源管理 > 工具）修改工具状态权限
+   * */
   switch: () => canSys(P.RESOURCE_TOOL_EDIT),
   debug: () => canSys(P.RESOURCE_TOOL_EDIT),
   /**
