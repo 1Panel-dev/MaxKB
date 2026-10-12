@@ -246,6 +246,10 @@ class DocumentSplitRequest(serializers.Serializer):
     doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
 
+class DocumentImportRequest(DocumentSplitRequest):
+    file = serializers.ListField(required=True, allow_empty=False, child=serializers.FileField(), label=_("file list"))
+
+
 class DocumentWebInstanceSerializer(serializers.Serializer):
     source_url_list = serializers.ListField(
         required=True,
@@ -1319,6 +1323,23 @@ class DocumentSerializers(serializers.Serializer):
                     "user_id": self.data.get("user_id"),
                 }
             ).batch_save(document_list)
+
+        def save_text(self, instance: Dict):
+            request_serializer = DocumentImportRequest(data=instance)
+            request_serializer.is_valid(raise_exception=True)
+            # Parse and persist in one transaction; the existing batch flow applies visual/index strategies.
+            with transaction.atomic():
+                documents = DocumentSerializers.Split(data=self.initial_data).parse(request_serializer.validated_data)
+                if not any(document.get("content") for document in documents):
+                    raise AppApiException(500, _("No importable paragraphs found"))
+                document_list = [
+                    {
+                        **{key: value for key, value in document.items() if key != "content"},
+                        "paragraphs": document["content"],
+                    }
+                    for document in documents
+                ]
+                return DocumentSerializers.Batch(data=self.initial_data).batch_save(document_list)
 
         def save_table_by_file_ids(self, instance: Dict):
             return self._save_by_file_ids(instance, self.parse_table_file)

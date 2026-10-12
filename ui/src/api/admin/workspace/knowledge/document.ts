@@ -41,6 +41,14 @@ const postSplitDocuments = (knowledgeId: string, files: File[], strategy: Docume
   return post<FormData, DocumentSplitResult[]>(`${getPrefix(knowledgeId)}/split`, data)
 }
 
+/** 按处理策略直接解析文本文件并写入知识库。 */
+const postImportTextDocuments = (knowledgeId: string, files: File[], strategy: DocumentStrategy) => {
+  const data = new FormData()
+  files.forEach((file) => data.append('file', file))
+  data.append('doc_strategy', JSON.stringify(strategy))
+  return post<FormData, DocumentItem[]>(`${getPrefix(knowledgeId)}/import`, data)
+}
+
 /** 从已上传表格创建文档，每个 sheet 由服务端创建独立文档。 */
 const postImportTableDocumentsByFileIds = (knowledgeId: string, fileIds: string[]) =>
   post<DocumentFileImportPayload, DocumentItem[]>(`${getPrefix(knowledgeId)}/table_by_file_ids`, { file_id_list: fileIds })
@@ -182,6 +190,7 @@ export default {
   getDocumentPage,
   putBatchCreateDocuments,
   postSplitDocuments,
+  postImportTextDocuments,
   postImportTableDocumentsByFileIds,
   postImportQADocumentsByFileIds,
   postWebDocument,

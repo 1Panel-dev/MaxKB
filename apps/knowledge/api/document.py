@@ -60,6 +60,16 @@ class DocumentSplitAPI(APIMixin):
         }
 
 
+class DocumentImportAPI(DocumentSplitAPI):
+    @staticmethod
+    def get_parameters():
+        return DocumentBatchAPI.get_parameters()
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
 class ImagePreviewAPI(APIMixin):
     @staticmethod
     def get_parameters():

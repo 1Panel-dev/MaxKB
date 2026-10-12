@@ -128,17 +128,10 @@ function handleSubmit() {
       )
       .then(() => true)
   } else {
-    // 文本校验处理策略，解析成功后批量创建文档。
+    // 文本校验处理策略，由单次请求在服务端完成解析与入库。
     importRequest = Promise.resolve(strategyRef.value?.validate()).then((valid) => {
       if (!valid || !strategyRef.value) return false
-      return props.api.postSplitDocuments(props.knowledgeId, files, strategyRef.value.getStrategy()).then((documents) => {
-        return props.api
-          .putBatchCreateDocuments(
-            props.knowledgeId,
-            documents.map(({ content, ...document }) => ({ ...document, paragraphs: content })),
-          )
-          .then(() => true)
-      })
+      return props.api.postImportTextDocuments(props.knowledgeId, files, strategyRef.value.getStrategy()).then(() => true)
     })
   }
   return importRequest

@@ -25,6 +25,7 @@ from knowledge.api.document import (
     DocumentDownloadSourceAPI,
     DocumentEditAPI,
     DocumentExportAPI,
+    DocumentImportAPI,
     DocumentMigrateAPI,
     DocumentReadAPI,
     DocumentSplitAPI,
@@ -276,6 +277,45 @@ class DocumentView(APIView):
                         "knowledge_id": knowledge_id,
                     }
                 ).parse(_get_document_split_payload(request))
+            )
+
+    class Import(APIView):
+        authentication_classes = [TokenAuth]
+        parser_classes = [MultiPartParser]
+
+        @extend_schema(
+            methods=["POST"],
+            description=_("Import text files and create documents"),
+            summary=_("Import text files and create documents"),
+            operation_id=_("Import text files and create documents"),  # type: ignore
+            parameters=DocumentImportAPI.get_parameters(),
+            request=DocumentImportAPI.get_request(),
+            responses=DocumentImportAPI.get_response(),
+            tags=[_("Knowledge Base/Documentation")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                compare=CompareConstants.AND,
+            ),
+        )
+        @log(
+            menu="document",
+            operate="Import text files and create documents",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get("knowledge_id")),
+                {"name": f"[{','.join(file.name for file in r.FILES.getlist('file'))}]"},
+            ),
+        )
+        def post(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(
+                DocumentSerializers.Create(
+                    data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "user_id": request.user.id}
+                ).save_text(_get_document_split_payload(request))
             )
 
     class SplitPattern(APIView):

@@ -45,6 +45,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tags/<str:tag_id>/<str:delete_type>', views.KnowledgeTagView.Delete.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document', views.DocumentView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/split', views.DocumentView.Split.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/import', views.DocumentView.Import.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/split_pattern', views.DocumentView.SplitPattern.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/batch_create', views.DocumentView.BatchCreate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/batch_sync', views.DocumentView.BatchSync.as_view()),
