@@ -24,7 +24,6 @@ import {
   McpConfigKnowledgeAction,
   MoveKnowledgeAction,
   RelatedResourcesKnowledgeAction,
-  SettingKnowledgeAction,
   SyncKnowledgeAction,
 } from './knowledge-card/action-dropdown'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
@@ -37,6 +36,13 @@ const router = useRouter()
 function handleOpenKnowledge(knowledge: KnowledgeItem) {
   void router.push({
     name: isShared.value ? 'workspace-shared-knowledge-detail' : 'workspace-knowledge-detail',
+    params: { workspaceId: route.params.workspaceId, knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
+  })
+}
+
+function handleOpenKnowledgeSetting(knowledge: KnowledgeItem) {
+  void router.push({
+    name: knowledge.type === KNOWLEDGE_TYPE.BASE ? 'workspace-knowledge-setting' : 'workspace-knowledge-base-setting',
     params: { workspaceId: route.params.workspaceId, knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
   })
 }
@@ -258,7 +264,10 @@ function handleBatchDelete() {
                   <GenerateQuestionsAction v-model:loading="knowledgeOperationLoading" label="生成问题" :api="KnowledgeApi" :knowledge="knowledge" />
 
                   <!-- 设置 -->
-                  <SettingKnowledgeAction label="设置" :knowledge="knowledge" />
+                  <MkDropdownItem @click.stop="handleOpenKnowledgeSetting(knowledge)">
+                    <template #icon><MkIcon name="icon_setting" /></template>
+                    设置
+                  </MkDropdownItem>
                   <!-- 分词索引 -->
                   <KeywordIndexKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"

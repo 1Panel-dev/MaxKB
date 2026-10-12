@@ -191,7 +191,6 @@ src/views/knowledge/
 │   ├── KnowledgeCard.vue
 │   └── action-dropdown/
 │       ├── index.ts
-│       ├── SettingKnowledgeAction.vue   # 跳转知识库设置
 │       ├── EmbeddingKnowledgeAction.vue # 提交知识库向量化任务
 │       ├── GenerateQuestionsAction.vue # 知识库生成关联问题
 │       ├── sync-knowledge-action/       # Web 知识库同步入口与方式选择弹窗
@@ -216,7 +215,7 @@ src/views/knowledge/
 `KnowledgeCard` 只负责展示、选择状态和 `action-dropdown` 插槽；页面传入完整 Knowledge API，
 组合单项转移、删除 Action，并管理批量选择、全选、批量转移与批量删除。工作空间共享知识库保持只读，
 不传操作插槽并传入 `disabled`；System 共享知识库页传入 `shared`、不传 `disabled`，保留共享标识，
-并组合同步、向量化、生成问题、分词索引、MCP 配置、关联资源、导出及删除等菜单操作。
+并组合同步、向量化、生成问题、设置、分词索引、MCP 配置、关联资源、导出及删除等菜单操作。
 `GenerateQuestionsAction` 在非共享知识库菜单提供“生成问题”，复用公共
 `GenerateQuestionsDialog`，打开时固定知识库 ID，提交知识库生成接口；共用页面 loading，
 成功提示并关闭，失败保留表单。不新增权限判断。
@@ -228,10 +227,12 @@ src/views/knowledge/
 更新已变更文档的分段，其他方式展示数据覆盖提示；调用
 `putSyncWebKnowledge`，成功提示“同步任务发送成功”并关闭。复用页面操作 loading，
 提交期间禁止重复提交和关闭，失败保留弹窗与当前选择。
-`SettingKnowledgeAction` 暂不增加权限判断，点击后携带当前
-`workspaceId`、知识库 ID 和 `KNOWLEDGE_TYPE_MAP[knowledge.type]`，通用类型跳转
-`workspace-knowledge-setting`，其他类型直接跳转 `workspace-knowledge-base-setting`；
-阻止事件冒泡，避免同时触发卡片详情跳转。
+设置菜单由 Workspace、System 资源管理和 System 共享知识库列表各自使用 `MkDropdownItem` 渲染，
+通过页面的 `handleOpenKnowledgeSetting` 跳转，不单独封装 Action，也不新增权限判断。
+通用类型进入各自的 `workspace-knowledge-setting`、`system-resource-knowledge-setting`、
+`system-shared-knowledge-setting`，其他类型进入对应前缀的 `knowledge-base-setting`。
+三个入口均传入知识库 ID 和 `KNOWLEDGE_TYPE_MAP[knowledge.type]`；仅 Workspace 传入当前
+`workspaceId`。点击阻止事件冒泡，避免同时进入卡片详情；Workspace 共享知识库仍不展示操作菜单。
 “设置”之后依次组合 `KeywordIndexKnowledgeAction` 和 `McpConfigKnowledgeAction`，接收完整
 Knowledge API 并复用页面操作 loading。分词索引不增加确认弹窗，调用成功后只提示“操作成功”；
 MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需挂载、关闭后卸载。
@@ -412,8 +413,8 @@ src/views/system/shared-resources/
 携带知识库 ID 和由 `KNOWLEDGE_TYPE_MAP` 转换的类型。资源管理知识库表格在向量化按钮旁组合
 `icon_admin_outlined` 详情按钮，进入 `system-resource-knowledge-detail`。两个入口不携带 Workspace ID。
 创建、模板创建和导入均使用 System 共享接口；Web 同步、向量化、关联问题、分词索引、
-MCP 配置、关联资源、导出与删除通过复用 Action 组合，授权工作空间暂保留 TODO，不组合工作空间专用的设置、
-文件夹移动或批量操作。
+MCP 配置、关联资源、导出与删除通过复用 Action 组合，设置菜单由页面直接跳转到 System 共享设置页。
+授权工作空间暂保留 TODO，不组合工作空间专用的文件夹移动或批量操作。
 
 System 用户页面按业务流程归拢操作入口和专属 Dialog。入口组件管理弹窗 Ref、打开动作并转发
 `refresh`；列表页负责查询、批量选择和刷新策略，创建与编辑共用的 `UserFromDrawer` 仍由页面管理。
