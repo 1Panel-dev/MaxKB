@@ -10,6 +10,7 @@ import ModelCard from '@/views/model/model-card/ModelCard.vue'
 import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
 import ModelProvider from '@/views/model/components/ModelProvider.vue'
 import { DeleteModelAction, EditModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
+import perm from '@/permission'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 
@@ -87,7 +88,7 @@ onMounted(() => {
         <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 添加模型 -->
-          <ButtonAddModel :api="SystemSharedModelApi" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
+          <ButtonAddModel v-if="perm.model.share.create()" :api="SystemSharedModelApi" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
         </div>
       </component>
       <div v-loading="loading">
@@ -96,16 +97,16 @@ onMounted(() => {
             <ModelCard :api="SystemSharedModelApi" :model="model" :provider="getModelProvider(model)" :refresh="loadModels" :shared="true">
               <template #action-dropdown>
                 <!-- 编辑 -->
-                <EditModelAction label="编辑" :api="SystemSharedModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
+                <EditModelAction v-if="perm.model.share.modify()" label="编辑" :api="SystemSharedModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
                 <!-- // TODO 授权工作空间 -->
                 <!-- 模型参数设置 -->
-                <ParamSettingAction v-if="model.model_type !== 'RERANKER'" label="模型参数设置" :api="SystemSharedModelApi" :model="model" />
+                <ParamSettingAction v-if="model.model_type !== 'RERANKER' && perm.model.share.paramSetting()" label="模型参数设置" :api="SystemSharedModelApi" :model="model" />
 
                 <!-- 查看关联资源 -->
-                <RelatedResourcesModelAction label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
+                <RelatedResourcesModelAction v-if="perm.model.share.relateMap()" label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
 
                 <!-- 删除 -->
-                <DeleteModelAction label="删除" :api="SystemSharedModelApi" :model="model" @refresh="loadModels" />
+                <DeleteModelAction v-if="perm.model.share.delete()" label="删除" :api="SystemSharedModelApi" :model="model" @refresh="loadModels" />
               </template>
             </ModelCard>
           </template>

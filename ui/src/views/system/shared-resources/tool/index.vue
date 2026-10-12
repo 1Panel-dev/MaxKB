@@ -23,6 +23,7 @@ import {
   CopyToolAction,
 } from '@/views/tool/tool-card/action-dropdown'
 import ButtonToolStore from '@/views/tool/components/ButtonToolStore.vue'
+import perm from '@/permission'
 
 const router = useRouter()
 
@@ -103,7 +104,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
           <!-- 工具商店 -->
           <ButtonToolStore folder-id="default" @refresh="refreshTools" />
           <!-- 创建共享工具 -->
-          <ButtonCreateTool folder-id="default" :api="SystemSharedToolApi" @refresh="refreshTools" />
+          <ButtonCreateTool v-if="perm.tool.share.create()" folder-id="default" :api="SystemSharedToolApi" @refresh="refreshTools" />
         </div>
       </component>
       <div v-loading="toolOperationLoading" class="min-h-0 flex-1">
@@ -120,12 +121,13 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
               >
                 <template #actions>
                   <!-- 修改工具状态 -->
-                  <ToolStatusSwitch v-model:loading="toolOperationLoading" :api="SystemSharedToolApi" :tool="tool" @update="handleToolUpdate" />
+                  <ToolStatusSwitch v-if="perm.tool.share.switch()" v-model:loading="toolOperationLoading" :api="SystemSharedToolApi" :tool="tool" @update="handleToolUpdate" />
                   <el-divider direction="vertical" class="ml-1!" />
                 </template>
                 <template #action-dropdown>
                   <!-- 编辑共享工具 -->
                   <EditToolAction
+                    v-if="perm.tool.share.edit()"
                     :ref="
                       (instance) => {
                         if (instance) editToolActionRefs[tool.id] = instance as InstanceType<typeof EditToolAction>
@@ -139,6 +141,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   />
                   <!-- 复制 -->
                   <CopyToolAction
+                    v-if="perm.tool.share.copy()"
                     v-model:loading="toolOperationLoading"
                     label="复制"
                     :api="SystemSharedToolApi"
@@ -168,10 +171,10 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                     :tool="tool"
                   />
                   <!-- 查看关联资源 -->
-                  <RelatedResourcesToolAction label="查看关联资源" :api="SystemSharedRelatedResourcesApi" :tool="tool" />
+                  <RelatedResourcesToolAction v-if="perm.tool.share.relateMap()" label="查看关联资源" :api="SystemSharedRelatedResourcesApi" :tool="tool" />
                   <!-- 查看执行记录 -->
                   <ExecutionRecordToolAction
-                    v-if="tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW"
+                    v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.share.record()"
                     label="查看执行记录"
                     :api="SystemSharedToolWorkflowApi"
                     :tool="tool"
@@ -179,7 +182,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <!--  TODO 授权工作空间 -->
                   <!-- 导出共享工具 -->
                   <ExportToolAction
-                    v-if="!tool.template_id"
+                    v-if="!tool.template_id && perm.tool.share.export()"
                     v-model:loading="toolOperationLoading"
                     label="导出"
                     :api="SystemSharedToolApi"
@@ -187,6 +190,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   />
                   <!-- 删除共享工具 -->
                   <DeleteToolAction
+                    v-if="perm.tool.share.delete()"
                     v-model:loading="toolOperationLoading"
                     label="删除"
                     :api="SystemSharedToolApi"
