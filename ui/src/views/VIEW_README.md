@@ -478,7 +478,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `home/index.vue`                                                       | Workspace 首页                                                       |
 | `knowledge/index.vue`                                                  | 工作空间知识库目录与知识库卡片页面                                   |
 | `knowledge-detail/index.vue`                                           | 知识库详情页面                                                       |
-| `knowledge-detail/library/tags/index.vue`                             | 标签分组查询、创建、单值编辑、删除与关联文档管理                       |
+| `knowledge-detail/library/tags/index.vue`                             | 标签分组查询、创建、重命名、单值编辑、删除与关联文档管理               |
 | `knowledge-detail/setting/base/index.vue`                             | 知识库基本信息、来源配置与上传限制设置                               |
 | `knowledge-detail/setting/document-strategy/index.vue`                | Web 知识库文档处理策略回填、校验与保存                                       |
 | `knowledge-detail/setting/scheduled-sync/index.vue`                   | Web、飞书与工作流知识库定时同步设置与日志                              |
@@ -874,15 +874,19 @@ library 的接口调整已撤回，文档和标签沿用原有调用方式，Sys
 标签名旁提供新增值、编辑标签、删除标签；行末提供编辑值和删除值，
 数量链接打开同目录 `TagDocumentDrawer.vue`。
 
-`library/tags/components/TagFormDialog.vue` 为标签管理和后续文档入口共用的创建、编辑弹窗，
+`library/tags/components/CreateTagDialog.vue` 为顶部创建和标签旁新增值共用的创建弹窗，
 接收知识库 ID 与完整 Tags API，参考添加成员流程复用 `MkDialog`、`el-form` 和 `MkFormList`。
-创建允许多行标签名与值；新增值锁定标签名；编辑值回填单项并锁定标签名。
-标签名最多 64 字、标签值最多 128 字，校验必填、纯空白和表单内重复组合。
-创建与单个已有标签值编辑使用已确认接口；整组编辑或编辑中增删行走独立请求入口，
-保留编辑前快照、已有 ID 与清理首尾空格后的当前草稿，交由请求入口按 V3 协议映射参数。
-所有分支共用校验、loading、成功关闭和刷新；多行接口未接入时仅提示并保留草稿，
-不即时删除、不拼接多次旧请求、不模拟成功。
-常驻弹窗在 `closed` 清理草稿和校验。
+创建允许多行标签名与值；新增值通过 `open(key)` 回填并锁定标签名，新增行沿用该名称。
+顶部创建标题为“创建标签”，传入标签名时标题为“添加标签值”。
+两个入口统一通过 `postKnowledgeTags` 提交标签数组，校验表单内重复组合。
+同目录 `EditTagDialog.vue` 共用标签重命名和单值编辑，通过 `open(tag, field)` 回填独立草稿。
+重命名只显示标签名；编辑值只显示一行并锁定标签名。两个入口均提交完整 `id`、`key`、`value`，
+请求路径 ID 与载荷 ID 一致，仅修改当前编辑字段，未编辑字段原样保留。
+两种编辑均使用 `putKnowledgeTag`，不提供增删行或多行编辑，不组合多个请求模拟保存。
+两个弹窗均保留 `MkDialog` 默认 600px 宽度，标签名最多 64 字、标签值最多 128 字，
+校验必填与纯空白，提交时清理可编辑字段首尾空格。各自维护 loading、防重复提交与关闭保护；
+成功后提示、关闭并发出 `refresh`，失败保留草稿；常驻实例在 `closed` 清理草稿和校验。
+后续文档入口直接复用上述弹窗，不复制创建和编辑逻辑。
 
 `library/tags/components/ButtonImportTags.vue` 在同一组件内维护导入按钮与弹窗，
 复用 `MkDialog`、`el-form` 和 `MkDragUpload`，不再单独拆分导入 Dialog。

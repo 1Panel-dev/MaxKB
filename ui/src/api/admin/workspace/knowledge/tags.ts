@@ -4,13 +4,10 @@ import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/tags`
 
-// TODO：接入标签整组／多行编辑接口。
-// 请求路径、参数和响应类型以 V3 接口协议为准。
-
 /** 创建知识库标签或为已有标签新增值。 */
 const postKnowledgeTags = (knowledgeId: string, tags: KnowledgeTagPayload[]) => post<KnowledgeTagPayload[], void>(getPrefix(knowledgeId), tags)
 
-/** 编辑单个知识库标签，不支持多行编辑。 */
+/** 重命名知识库标签或编辑单个标签值。 */
 const putKnowledgeTag = (knowledgeId: string, tagId: string, tag: KnowledgeTagUpdatePayload) =>
   put<KnowledgeTagUpdatePayload, void>(`${getPrefix(knowledgeId)}/${tagId}`, tag)
 

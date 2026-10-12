@@ -27,7 +27,6 @@ const documentData = ref<DocumentItem[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 10, total: 0 })
 const documentTableRef = ref<{ clearSelection: () => void }>()
 const selectedDocuments = ref<DocumentItem[]>([])
-const selectedDocumentIds = computed(() => new Set(selectedDocuments.value.map(({ id }) => id)))
 
 /* 两个页签复用同一文档查询，未关联页通过 tag_exclude 排除当前标签。 */
 function loadDocuments(): Promise<void> {
@@ -76,10 +75,6 @@ function clearSelection() {
 
 function handleSelectionChange(selection: unknown[]) {
   selectedDocuments.value = selection as DocumentItem[]
-}
-
-function getRowClass({ row }: { row: DocumentItem }) {
-  return selectedDocumentIds.value.has(row.id) ? '[&>td]:bg-primary/10!' : ''
 }
 
 function handleDocumentFilterChange() {
@@ -157,58 +152,54 @@ defineExpose({ open })
         <MkSearchInput v-if="activeTab === 'linked'" v-model="searchName" class="w-60!" @change="handleDocumentFilterChange" />
         <MkComplexSearch v-else :fields="[{ label: '名称', value: 'name' }]" @change="handleComplexSearchChange" />
       </div>
-      <!-- 仅遮罩表格，指示器固定在表体靠上位置，避免随记录数量上下跳动。 -->
-      <div v-loading="loading" element-loading-custom-class="[&>.el-loading-spinner]:top-20!" class="relative">
-        <MkTable
-          ref="documentTableRef"
-          v-model:pagination-config="paginationConfig"
-          :data="documentData"
-          :row-class-name="getRowClass"
-          row-key="id"
-          @current-change="loadDocuments"
-          @size-change="loadDocuments"
-          @selection-change="handleSelectionChange"
-        >
-          <el-table-column type="selection" width="40" />
-          <el-table-column prop="name" label="文档名称" min-width="200">
-            <template #default="{ row }: { row: DocumentItem }">
-              <div class="flex-align-center gap-2">
-                <img :src="getFileIconUrl(row.name)" alt="" class="size-5 shrink-0" />
-                <span class="truncate" :title="row.name">{{ row.name }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="is_active" label="启用状态" width="120">
-            <template #header>
-              <MkTableFilter
-                v-model="selectedDocumentActive"
-                mode="single"
-                label="启用状态"
-                :options="documentActiveOptions"
-                @change="handleDocumentFilterChange"
-              />
-            </template>
-            <template #default="{ row }: { row: DocumentItem }">
-              <MkStatusLabel :active="row.is_active" />
-            </template>
-          </el-table-column>
-          <el-table-column prop="create_time" label="创建时间" width="180">
-            <template #default="{ row }: { row: DocumentItem }">{{ datetimeFormat(row.create_time) }}</template>
-          </el-table-column>
-          <el-table-column label="操作" width="70" fixed="right">
-            <template #default="{ row }: { row: DocumentItem }">
-              <!-- 关联或取消关联当前文档 -->
-              <MkAction
-                display="button"
-                :label="activeTab === 'linked' ? '取消关联' : '关联'"
-                :icon="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'"
-                :disabled="loading"
-                @click="handleLinkDocuments([row.id])"
-              />
-            </template>
-          </el-table-column>
-        </MkTable>
-      </div>
+      <MkTable
+        ref="documentTableRef"
+        v-model:pagination-config="paginationConfig"
+        v-loading="loading"
+        :data="documentData"
+        @current-change="loadDocuments"
+        @size-change="loadDocuments"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="40" />
+        <el-table-column prop="name" label="文档名称" min-width="200">
+          <template #default="{ row }: { row: DocumentItem }">
+            <div class="flex-align-center gap-2">
+              <img :src="getFileIconUrl(row.name)" alt="" class="size-5 shrink-0" />
+              <span class="truncate" :title="row.name">{{ row.name }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="is_active" label="启用状态" width="120">
+          <template #header>
+            <MkTableFilter
+              v-model="selectedDocumentActive"
+              mode="single"
+              label="启用状态"
+              :options="documentActiveOptions"
+              @change="handleDocumentFilterChange"
+            />
+          </template>
+          <template #default="{ row }: { row: DocumentItem }">
+            <MkStatusLabel :active="row.is_active" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="create_time" label="创建时间" width="180">
+          <template #default="{ row }: { row: DocumentItem }">{{ datetimeFormat(row.create_time) }}</template>
+        </el-table-column>
+        <el-table-column label="操作" width="70" fixed="right">
+          <template #default="{ row }: { row: DocumentItem }">
+            <!-- 关联或取消关联当前文档 -->
+            <MkAction
+              display="button"
+              :label="activeTab === 'linked' ? '取消关联' : '关联'"
+              :icon="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'"
+              :disabled="loading"
+              @click="handleLinkDocuments([row.id])"
+            />
+          </template>
+        </el-table-column>
+      </MkTable>
     </div>
   </MkDrawer>
 </template>
