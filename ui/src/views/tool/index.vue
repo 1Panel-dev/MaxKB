@@ -60,6 +60,14 @@ const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infini
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
+  {
+    label: '状态',
+    value: 'is_active',
+    options: [
+      { value: true, label: '已启用' },
+      { value: false, label: '已禁用' },
+    ],
+  },
   { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const toolQuery = ref<Dict<unknown>>()

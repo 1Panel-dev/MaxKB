@@ -33,7 +33,6 @@ const resourceTypeOptions = Object.entries(resourceLabels).map(([value, label]) 
 const searchFields = [
   { label: '名称', value: 'resource_name' },
   { label: '创建者', value: 'user_name' },
-  { label: '类型', value: 'resource_type', multiple: true, options: resourceTypeOptions },
 ]
 const relationTabs = [
   { value: 'dependency', label: '依赖' },
@@ -53,12 +52,13 @@ const resourceRows = computed(() =>
 )
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchQuery = ref<Dict<unknown>>({})
+const selectedResourceType = ref<string | null>(null)
 
 function loadResources() {
   if (!visible.value || !targetResource.value) return
   const isDependency = relationDirection.value === 'dependency'
-  const { resource_type, ...query } = searchQuery.value
-  if (resource_type) query[isDependency ? 'target_type' : 'source_type'] = resource_type
+  const query: Dict<unknown> = { ...searchQuery.value }
+  if (selectedResourceType.value) query[isDependency ? 'target_type' : 'source_type'] = [selectedResourceType.value]
   if (showWorkspace.value && selectedWorkspaceIds.value.length) query.workspace_ids = JSON.stringify(selectedWorkspaceIds.value)
   const request = isDependency ? props.api.getUsingResources : props.api.getUsedByResources
   loading.value = true
@@ -80,16 +80,17 @@ function searchResources(query?: Dict<unknown>) {
 
 function changeDirection() {
   searchQuery.value = {}
+  selectedResourceType.value = null
   selectedWorkspaceIds.value = []
   relatedResources.value = []
   pagination.value = { currentPage: 1, pageSize: 20, total: 0 }
   loadResources()
 }
 
-/* 工作空间筛选：确认或重置后从第一页查询。 */
+/* 表头筛选：确认或重置后从第一页查询。 */
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedWorkspaceIds = ref<string[]>([])
-function handleWorkspaceFilterChange() {
+function handleFilterChange() {
   pagination.value.currentPage = 1
   loadResources()
 }
@@ -130,6 +131,7 @@ function resetData() {
   relatedResources.value = []
   pagination.value = { currentPage: 1, pageSize: 20, total: 0 }
   searchQuery.value = {}
+  selectedResourceType.value = null
   relationDirection.value = 'dependency'
   workspaceOptions.value = []
   selectedWorkspaceIds.value = []
@@ -183,6 +185,9 @@ defineExpose({ open, close })
         </el-table-column>
         <el-table-column prop="desc" label="描述" min-width="160" show-overflow-tooltip />
         <el-table-column label="类型" min-width="100">
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedResourceType" label="类型" :options="resourceTypeOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }">{{ resourceLabels[row.resourceType as ResourceType] }}</template>
         </el-table-column>
         <el-table-column v-if="showWorkspace" prop="workspace_name" label="工作空间" min-width="140" show-overflow-tooltip>
@@ -193,7 +198,7 @@ defineExpose({ open, close })
               v-model="selectedWorkspaceIds"
               label="工作空间"
               :options="workspaceOptions"
-              @change="handleWorkspaceFilterChange"
+              @change="handleFilterChange"
             />
           </template>
         </el-table-column>

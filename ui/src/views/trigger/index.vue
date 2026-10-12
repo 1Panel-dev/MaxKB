@@ -15,30 +15,29 @@ import perm from '@/permission/index.ts'
 const loading = ref(false)
 const triggerData = ref<Trigger[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const triggerQuery = ref<Dict<unknown>>({})
+const triggerSearchQuery = ref<Dict<unknown>>({})
 const triggerTypeLabels: Record<TriggerType, string> = {
   [TRIGGER_TYPE.SCHEDULED]: '定时触发',
   [TRIGGER_TYPE.EVENT]: '事件触发',
 }
+const triggerTypeOptions = Object.entries(triggerTypeLabels).map(([value, label]) => ({ value, label }))
+const triggerStatusOptions = [
+  { label: '已启用', value: true },
+  { label: '已禁用', value: false },
+]
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
-  {
-    label: '类型',
-    value: 'type',
-    options: Object.entries(triggerTypeLabels).map(([value, label]) => ({ value, label })),
-  },
   { label: '任务', value: 'task' },
-  {
-    label: '状态',
-    value: 'is_active',
-    options: [
-      { label: '已启用', value: 'true' },
-      { label: '已禁用', value: 'false' },
-    ],
-  },
   { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
+const selectedTriggerType = ref<string | null>(null)
+const selectedStatus = ref<boolean | null>(null)
+const triggerQuery = computed<Dict<unknown>>(() => ({
+  ...triggerSearchQuery.value,
+  ...(selectedTriggerType.value ? { type: selectedTriggerType.value } : {}),
+  ...(selectedStatus.value !== null ? { is_active: selectedStatus.value } : {}),
+}))
 
 function loadCreatorOptions(keyword: string) {
   return CommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
@@ -60,7 +59,13 @@ function loadTriggers(): Promise<void> {
 
 function handleSearchChange(query?: Dict<unknown>) {
   tableRef.value?.clearSelection()
-  triggerQuery.value = query ?? {}
+  triggerSearchQuery.value = query ?? {}
+  paginationConfig.value.currentPage = 1
+  loadTriggers()
+}
+
+function handleFilterChange() {
+  tableRef.value?.clearSelection()
   paginationConfig.value.currentPage = 1
   loadTriggers()
 }
@@ -183,9 +188,27 @@ onMounted(() => loadTriggers())
           </template>
         </el-table-column>
         <el-table-column prop="trigger_type" label="类型" width="120">
+          <template #header>
+            <MkTableFilter
+              mode="single"
+              v-model="selectedTriggerType"
+              label="类型"
+              :options="triggerTypeOptions"
+              @change="handleFilterChange"
+            />
+          </template>
           <template #default="{ row }">{{ triggerTypeLabels[row.trigger_type as TriggerType] || row.trigger_type }}</template>
         </el-table-column>
         <el-table-column prop="is_active" label="启用状态" width="120">
+          <template #header>
+            <MkTableFilter
+              mode="single"
+              v-model="selectedStatus"
+              label="状态"
+              :options="triggerStatusOptions"
+              @change="handleFilterChange"
+            />
+          </template>
           <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
         </el-table-column>
         <el-table-column prop="desc" label="描述" min-width="170" show-overflow-tooltip />

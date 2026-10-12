@@ -16,33 +16,30 @@ const visible = ref(false)
 const loading = ref(false)
 const recordData = ref<ToolExecutionRecord[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const searchQuery = ref<Dict<unknown>>()
+const searchInput = ref<Dict<unknown>>({})
 const sourceLabels = {
   [TOOL_RECORD_SOURCE.APPLICATION]: '智能体',
   [TOOL_RECORD_SOURCE.KNOWLEDGE]: '知识库',
   [TOOL_RECORD_SOURCE.TRIGGER]: '触发器',
 }
-const searchFields = [
-  { label: '触发来源', value: 'source_name' },
-  {
-    label: '状态',
-    value: 'state',
-    options: [
-      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].label, value: STATE_TYPES.SUCCESS },
-      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].label, value: STATE_TYPES.STARTED },
-      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].label, value: STATE_TYPES.FAILURE },
-    ],
-  },
-  {
-    label: '资源类型',
-    value: 'source_type',
-    options: [
-      { label: sourceLabels[TOOL_RECORD_SOURCE.APPLICATION], value: TOOL_RECORD_SOURCE.APPLICATION },
-      { label: sourceLabels[TOOL_RECORD_SOURCE.KNOWLEDGE], value: TOOL_RECORD_SOURCE.KNOWLEDGE },
-      { label: sourceLabels[TOOL_RECORD_SOURCE.TRIGGER], value: TOOL_RECORD_SOURCE.TRIGGER },
-    ],
-  },
+const sourceTypeOptions = [
+  { label: sourceLabels[TOOL_RECORD_SOURCE.APPLICATION], value: TOOL_RECORD_SOURCE.APPLICATION },
+  { label: sourceLabels[TOOL_RECORD_SOURCE.KNOWLEDGE], value: TOOL_RECORD_SOURCE.KNOWLEDGE },
+  { label: sourceLabels[TOOL_RECORD_SOURCE.TRIGGER], value: TOOL_RECORD_SOURCE.TRIGGER },
 ]
+const stateOptions = [
+  { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].label, value: STATE_TYPES.SUCCESS },
+  { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].label, value: STATE_TYPES.STARTED },
+  { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].label, value: STATE_TYPES.FAILURE },
+]
+const searchFields = [{ label: '触发来源', value: 'source_name' }]
+const selectedSourceType = ref<string | null>(null)
+const selectedState = ref<string | null>(null)
+const searchQuery = computed<Dict<unknown>>(() => ({
+  ...searchInput.value,
+  ...(selectedSourceType.value ? { source_type: selectedSourceType.value } : {}),
+  ...(selectedState.value ? { state: selectedState.value } : {}),
+}))
 function loadRecords(page = pagination.value.currentPage): Promise<ToolExecutionRecord[]> {
   loading.value = true
   return props.api
@@ -58,13 +55,20 @@ function loadRecords(page = pagination.value.currentPage): Promise<ToolExecution
 }
 
 function searchRecords(query?: Dict<unknown>) {
-  searchQuery.value = query ?? {}
+  searchInput.value = query ?? {}
+  pagination.value.currentPage = 1
+  loadRecords()
+}
+
+function handleFilterChange() {
   pagination.value.currentPage = 1
   loadRecords()
 }
 
 function open() {
-  searchQuery.value = undefined
+  searchInput.value = {}
+  selectedSourceType.value = null
+  selectedState.value = null
   closeDetails()
   recordData.value = []
   pagination.value = { currentPage: 1, pageSize: 20, total: 0 }
@@ -140,9 +144,27 @@ defineExpose({ open })
         </template>
       </el-table-column>
       <el-table-column label="类型" width="90">
+        <template #header>
+          <MkTableFilter
+            mode="single"
+            v-model="selectedSourceType"
+            label="类型"
+            :options="sourceTypeOptions"
+            @change="handleFilterChange"
+          />
+        </template>
         <template #default="{ row }">{{ sourceLabels[row.source_type as keyof typeof sourceLabels] || '-' }}</template>
       </el-table-column>
       <el-table-column label="状态" width="100">
+        <template #header>
+          <MkTableFilter
+            mode="single"
+            v-model="selectedState"
+            label="状态"
+            :options="stateOptions"
+            @change="handleFilterChange"
+          />
+        </template>
         <template #default="{ row }: { row: ToolExecutionRecord }">
           <MkStatusLabel v-if="EXECUTION_STATUS_OPTIONS[row.state]" v-bind="EXECUTION_STATUS_OPTIONS[row.state]" />
           <span v-else>{{ row.state }}</span>

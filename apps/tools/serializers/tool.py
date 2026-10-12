@@ -623,7 +623,7 @@ class ToolSerializer(serializers.Serializer):
                 return None
             try:
                 return common_convert_value(_type, value)
-            except Exception as e:
+            except Exception:
                 raise AppApiException(
                     500,
                     _("Field: {name} Type: {type} Value: {value} Type conversion error").format(
@@ -1087,7 +1087,7 @@ class ToolSerializer(serializers.Serializer):
             tool_instance_bytes = self.data.get("file").read()
             try:
                 tool_instance = RestrictedUnpickler(io.BytesIO(tool_instance_bytes)).load()
-            except Exception as e:
+            except Exception:
                 raise AppApiException(1001, _("Unsupported file format"))
             tool = tool_instance.tool
             tool["id"] = tool_id
@@ -1109,7 +1109,7 @@ class ToolSerializer(serializers.Serializer):
             tool_instance_bytes = self.data.get("file").read()
             try:
                 tool_instance = RestrictedUnpickler(io.BytesIO(tool_instance_bytes)).load()
-            except Exception as e:
+            except Exception:
                 raise AppApiException(1001, _("Unsupported file format"))
             if self.data.get("folder_id") is None:
                 folder_id = self.data.get("workspace_id")
@@ -1731,6 +1731,7 @@ class ToolTreeSerializer(serializers.Serializer):
             child=serializers.CharField(), required=False, label=_("tool type list"), allow_null=True, allow_empty=True
         )
         create_user = serializers.UUIDField(required=False, label=_("create user"), allow_null=True)
+        is_active = serializers.BooleanField(required=False, label=_("is active"), allow_null=True)
 
         def page_tool(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
@@ -1791,6 +1792,10 @@ class ToolTreeSerializer(serializers.Serializer):
 
             if scope is not None:
                 tool_query_set = tool_query_set.filter(scope=scope)
+
+            is_active = self.data.get("is_active")
+            if is_active is not None:
+                tool_query_set = tool_query_set.filter(is_active=is_active)
 
             tool_type_list = self.data.get("tool_type_list")
             if tool_type_list:

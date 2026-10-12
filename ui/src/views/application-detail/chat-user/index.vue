@@ -46,17 +46,23 @@ function handleSelectGroup(group: ChatUserAuthorizationGroup) {
 
 // 用户筛选与分页，仅维护当前页的授权勾选
 const chatUsers = ref<ChatUserAuthorization[]>([])
-const chatUserQuery = ref<Dict<unknown>>()
+const chatUserSearchQuery = ref<Dict<unknown>>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
-  {
-    label: '用户来源',
-    value: 'source',
-    options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({ value, label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label })),
-  },
+  { label: '用户名', value: 'username' },
 ]
+
+// 表头用户来源筛选
+const selectedSource = ref<string | null>(null)
+const sourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
+  label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label,
+  value,
+}))
+const chatUserQuery = computed<Dict<unknown>>(() => ({
+  ...chatUserSearchQuery.value,
+  ...(selectedSource.value !== null ? { source: selectedSource.value } : {}),
+}))
 
 function formatUserSource(source: string) {
   if (source === LOGIN_METHOD.LOCAL) return '本地创建'
@@ -80,7 +86,12 @@ function refreshChatUsers() {
 }
 
 function handleSearchChange(query?: Dict<unknown>) {
-  chatUserQuery.value = query
+  chatUserSearchQuery.value = query
+  paginationConfig.value.currentPage = 1
+  return refreshChatUsers()
+}
+
+function handleSourceChange() {
   paginationConfig.value.currentPage = 1
   return refreshChatUsers()
 }
@@ -180,6 +191,9 @@ onMounted(() => loadChatUserGroups())
           <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
           <el-table-column prop="username" label="用户名" show-overflow-tooltip />
           <el-table-column prop="source" label="用户来源" show-overflow-tooltip>
+            <template #header>
+              <MkTableFilter mode="single" v-model="selectedSource" label="用户来源" :options="sourceOptions" @change="handleSourceChange" />
+            </template>
             <template #default="{ row }">{{ formatUserSource(row.source) }}</template>
           </el-table-column>
           <el-table-column :width="140" align="center">

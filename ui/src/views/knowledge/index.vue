@@ -75,6 +75,16 @@ const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infini
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
+  {
+    label: '类型',
+    value: 'type',
+    options: [
+      { value: KNOWLEDGE_TYPE.BASE, label: '通用知识库' },
+      { value: KNOWLEDGE_TYPE.WEB, label: 'Web 知识库' },
+      { value: KNOWLEDGE_TYPE.LARK, label: '飞书知识库' },
+      { value: KNOWLEDGE_TYPE.WORKFLOW, label: '工作流知识库' },
+    ],
+  },
   { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const knowledgeQuery = ref<Dict<unknown>>()

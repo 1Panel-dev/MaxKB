@@ -6,7 +6,7 @@ import ApplicationApi from '@/api/admin/workspace/application/application'
 import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import type { ApplicationDetail, Dict, FolderItem, OptionItem } from '@/api/types'
-import { RESOURCE_TYPE } from '@/api/enums'
+import { APPLICATION_TYPE, RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
@@ -59,15 +59,24 @@ const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infini
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
   {
-    label: '发布状态',
-    value: 'publish_status',
+    label: '状态',
+    value: 'status',
     options: [
-      { label: '已发布', value: 'published' },
       { label: '未发布', value: 'unpublished' },
+      { label: '已发布', value: 'published' },
+      { label: '已上架', value: 'on_portal' },
     ],
   },
+  {
+    label: '类型',
+    value: 'type',
+    options: [
+      { label: '简易', value: APPLICATION_TYPE.SIMPLE },
+      { label: '高级', value: APPLICATION_TYPE.WORK_FLOW },
+    ],
+  },
+  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const applicationQuery = ref<Dict<unknown>>()
 

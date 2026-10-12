@@ -6,7 +6,7 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import TagsApi from '@/api/admin/workspace/knowledge/tags'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
-import type { KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
+import type { Dict, KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import CreateTagDialog from './components/CreateTagDialog.vue'
 import EditTagDialog from './components/EditTagDialog.vue'
@@ -74,7 +74,8 @@ function loadTags() {
     })
 }
 
-function handleSearchChange() {
+function handleSearchChange(query?: Dict<unknown>) {
+  searchText.value = typeof query?.name === 'string' ? query.name : ''
   tagPage.value.currentPage = 1
   clearSelection()
 }
@@ -178,7 +179,7 @@ onMounted(() => {
     <div class="flex-between gap-4">
       <h4>{{ title }}</h4>
       <div class="flex-align-center">
-        <MkSearchInput v-model="searchText" class="w-60! mr-3" :disabled="loading || operationLoading" @input="handleSearchChange" />
+        <MkComplexSearch :fields="[{ label: '名称', value: 'name' }]" class="mr-3" @change="handleSearchChange" />
         <!-- 导入标签，成功后刷新列表 -->
         <ButtonImportTags :api="TagsApi" :knowledge-id="knowledgeId" :disabled="loading || operationLoading" @refresh="loadTags" />
         <!-- 创建标签 -->

@@ -1,17 +1,21 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： application_chat.py
-    @date：2025/6/10 13:54
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： application_chat.py
+@date：2025/6/10 13:54
+@desc:
 """
+
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
-from application.serializers.application_chat import ApplicationChatQuerySerializers, \
-    ApplicationChatResponseSerializers, ApplicationChatRecordExportRequest
+from application.serializers.application_chat import (
+    ApplicationChatQuerySerializers,
+    ApplicationChatResponseSerializers,
+    ApplicationChatRecordExportRequest,
+)
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, ResultPageSerializer
 
@@ -38,16 +42,17 @@ class ApplicationChatQueryAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="application_id",
                 description="application ID",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
-            ), OpenApiParameter(
+            ),
+            OpenApiParameter(
                 name="start_time",
                 description="start Time",
                 type=OpenApiTypes.STR,
@@ -68,6 +73,12 @@ class ApplicationChatQueryAPI(APIMixin):
             OpenApiParameter(
                 name="username",
                 description="username",
+                type=OpenApiTypes.STR,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="source",
+                description="source",
                 type=OpenApiTypes.STR,
                 required=False,
             ),
@@ -109,17 +120,16 @@ class ApplicationChatQueryPageAPI(APIMixin):
                 name="current_page",
                 description=_("Current page"),
                 type=OpenApiTypes.INT,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="page_size",
                 description=_("Page size"),
                 type=OpenApiTypes.INT,
-                location='path',
+                location="path",
                 required=True,
             ),
-
         ]
 
     @staticmethod

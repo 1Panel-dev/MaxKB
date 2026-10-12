@@ -58,6 +58,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
     start_time = serializers.DateField(format="%Y-%m-%d", label=_("Start time"))
     end_time = serializers.DateField(format="%Y-%m-%d", label=_("End time"))
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    source = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Source"))
     min_star = serializers.IntegerField(required=False, min_value=0, label=_("Minimum number of likes"))
     min_trample = serializers.IntegerField(required=False, min_value=0, label=_("Minimum number of clicks"))
     comparer = serializers.CharField(
@@ -96,6 +97,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                     "application_chat.application_id": models.CharField(),
                     "application_chat.abstract": models.CharField(),
                     "application_chat.asker": models.JSONField(),
+                    "application_chat.source": models.JSONField(),
                     "star_num": models.IntegerField(),
                     "trample_num": models.IntegerField(),
                     "comparer": models.CharField(),
@@ -113,6 +115,8 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         }
         if "abstract" in self.data and self.data.get("abstract") is not None:
             base_query_dict["application_chat.abstract__icontains"] = self.data.get("abstract")
+        if "source" in self.data and self.data.get("source") is not None:
+            base_query_dict["application_chat.source__type"] = self.data.get("source")
         if select_ids is not None and len(select_ids) > 0:
             base_query_dict["application_chat.id__in"] = select_ids
         base_condition = Q(**base_query_dict)

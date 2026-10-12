@@ -347,6 +347,7 @@ class ToolView(APIView):
                         "tool_type": request.query_params.get("tool_type"),
                         "user_id": request.user.id,
                         "create_user": request.query_params.get("create_user"),
+                        "is_active": request.query_params.get("is_active"),
                     }
                 ).page_tool_with_folders(current_page, page_size)
             )
