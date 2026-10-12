@@ -7,6 +7,14 @@ export default {
   clearChat: '清空对话',
   history: '历史记录',
   only20history: '仅显示最近 20 条对话',
+  deleteChat: {
+    title: '确认删除该对话记录？',
+    message: '删除后不可恢复。',
+  },
+  clearChatConfirm: {
+    title: '确认清空所有对话记录？',
+    message: '清空后不可恢复。',
+  },
   question_count: '条提问',
   exportRecords: '导出聊天记录',
   exportPDF: '导出 PDF',

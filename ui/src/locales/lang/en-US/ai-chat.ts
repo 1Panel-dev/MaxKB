@@ -7,6 +7,14 @@ export default {
   clearChat: 'Clear Chat',
   history: 'Chat History',
   only20history: 'Showing only the last 20 chats',
+  deleteChat: {
+    title: 'Delete this chat record?',
+    message: 'It cannot be recovered after deletion.',
+  },
+  clearChatConfirm: {
+    title: 'Clear all chat records?',
+    message: 'They cannot be recovered after being cleared.',
+  },
   question_count: 'Questions',
   exportRecords: 'Export Chat History',
   exportPDF: 'Export PDF',

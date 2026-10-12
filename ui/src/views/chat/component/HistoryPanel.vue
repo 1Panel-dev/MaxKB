@@ -213,6 +213,8 @@
 <script setup lang="ts">
 import { ref, computed, inject, type Ref } from 'vue'
 import { isAppIcon } from '@/utils/common'
+import { t } from '@/locales'
+import { MsgConfirm } from '@/utils/message'
 import EditTitleDialog from './EditTitleDialog.vue'
 
 const scrollData = inject('scrollData') as any
@@ -270,11 +272,25 @@ const handleClickList = (item: any) => {
 }
 
 const deleteChatLog = (row: any) => {
-  emit('deleteLog', row)
+  MsgConfirm(t('aiChat.deleteChat.title'), t('aiChat.deleteChat.message'), {
+    confirmButtonText: t('common.confirm'),
+    confirmButtonClass: 'danger',
+  })
+    .then(() => {
+      emit('deleteLog', row)
+    })
+    .catch(() => {})
 }
 
 const clearChat = () => {
-  emit('clearChat')
+  MsgConfirm(t('aiChat.clearChatConfirm.title'), t('aiChat.clearChatConfirm.message'), {
+    confirmButtonText: t('common.confirm'),
+    confirmButtonClass: 'danger',
+  })
+    .then(() => {
+      emit('clearChat')
+    })
+    .catch(() => {})
 }
 
 function editLogTitle(row: any) {

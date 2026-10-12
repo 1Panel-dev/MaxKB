@@ -7,6 +7,14 @@ export default {
   clearChat: '清空對話',
   history: '歷史記錄',
   only20history: '僅顯示最近 20 條對話',
+  deleteChat: {
+    title: '確認刪除該對話記錄？',
+    message: '刪除後不可恢復。',
+  },
+  clearChatConfirm: {
+    title: '確認清空所有對話記錄？',
+    message: '清空後不可恢復。',
+  },
   question_count: '條提問',
   exportRecords: '導出聊天記錄',
   exportPDF: '匯出PDF',
