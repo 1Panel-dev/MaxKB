@@ -21,12 +21,10 @@ class AppNode extends HtmlResize.view {
   app: any
   root?: any
   VueNode: any
-  up_node_field_dict?: Dict<Array<any>>
   constructor(props: any, VueNode: any) {
     super(props)
     this.component = VueNode
     this.isMounted = false
-    props.model.clear_next_node_field = this.clear_next_node_field.bind(this)
     props.model.get_up_node_field_dict = this.get_up_node_field_dict.bind(this)
     props.model.get_node_field_list = this.get_node_field_list.bind(this)
     props.model.get_up_node_field_list = this.get_up_node_field_list.bind(this)
@@ -116,20 +114,20 @@ class AppNode extends HtmlResize.view {
     return result
   }
   get_up_node_field_dict(contain_self: boolean, use_cache: boolean) {
-    if (!this.up_node_field_dict || !use_cache) {
+    if (!this.props.model.up_node_field_dict || !use_cache) {
       const up_node_list = this.props.graphModel.getNodeIncomingNode(this.props.model.id)
-      this.up_node_field_dict = up_node_list
+      this.props.model.up_node_field_dict = up_node_list
         .filter((node) => node.id != 'start-node' && node.id != 'loop-start-node')
         .map((node) => node.get_up_node_field_dict(true, use_cache))
         .reduce((pre, next) => ({ ...pre, ...next }), {})
     }
     if (contain_self) {
       return {
-        ...this.up_node_field_dict,
+        ...this.props.model.up_node_field_dict,
         [this.props.model.id]: this.get_node_field_list(),
       }
     }
-    return this.up_node_field_dict ? this.up_node_field_dict : {}
+    return this.props.model.up_node_field_dict ? this.props.model.up_node_field_dict : {}
   }
 
   get_up_node_field_list(contain_self: boolean, use_cache: boolean) {
@@ -151,15 +149,6 @@ class AppNode extends HtmlResize.view {
     return [...start_node_field_list, ...result]
   }
 
-  clear_next_node_field(contain_self: boolean) {
-    const next_node_list = this.props.graphModel.getNodeOutgoingNode(this.props.model.id)
-    next_node_list.forEach((node) => {
-      node.clear_next_node_field(true)
-    })
-    if (contain_self) {
-      this.up_node_field_dict = undefined
-    }
-  }
   getAnchorShape(anchorData: any) {
     const { x, y, type } = anchorData
     let isConnect = false
@@ -322,6 +311,19 @@ class AppNode extends HtmlResize.view {
 }
 
 class AppNodeModel extends HtmlResize.model {
+  up_node_field_dict?: Dict<Array<any>>
+
+  // 循环体视图挂载前也需要清理缓存，不能依赖视图绑定方法。
+  clear_next_node_field(contain_self: boolean) {
+    const next_node_list = this.graphModel.getNodeOutgoingNode(this.id)
+    next_node_list.forEach((node: any) => {
+      node.clear_next_node_field(true)
+    })
+    if (contain_self) {
+      this.up_node_field_dict = undefined
+    }
+  }
+
   refreshDeges() {
     // 更新节点连接边的path
     this.incoming.edges.forEach((edge: any) => {
