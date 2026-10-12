@@ -17,6 +17,7 @@ const loading = ref(false)
 const operateLogs = ref<OperateLog[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchFields: OptionItem<string>[] = [
+  { label: '操作详情', value: 'operate' },
   { label: '操作用户', value: 'user' },
   { label: 'IP 地址', value: 'ip_address' },
   {
