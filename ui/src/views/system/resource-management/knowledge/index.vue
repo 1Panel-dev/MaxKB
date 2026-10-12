@@ -45,18 +45,15 @@ const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedWorkspaceIds = ref<string[]>([])
 const searchFields = computed(() => [
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
   { label: '名称', value: 'name' },
-  {
-    label: '类型',
-    value: 'type',
-    options: [
-      { value: KNOWLEDGE_TYPE.BASE, label: '通用知识库' },
-      { value: KNOWLEDGE_TYPE.WEB, label: 'Web 知识库' },
-      { value: KNOWLEDGE_TYPE.LARK, label: '飞书知识库' },
-      { value: KNOWLEDGE_TYPE.WORKFLOW, label: '工作流知识库' },
-    ],
-  },
+  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+])
+const selectedType = ref<number | null>(null)
+const typeOptions = computed(() => [
+  { value: KNOWLEDGE_TYPE.BASE, label: '通用知识库' },
+  { value: KNOWLEDGE_TYPE.WEB, label: 'Web 知识库' },
+  { value: KNOWLEDGE_TYPE.LARK, label: '飞书知识库' },
+  { value: KNOWLEDGE_TYPE.WORKFLOW, label: '工作流知识库' },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -70,6 +67,7 @@ function loadKnowledgePage() {
   return SystemResourceKnowledgeApi.getKnowledgePage(pagination.value, {
     ...KnowledgeQuery.value,
     ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
+    ...(selectedType.value !== null && selectedType.value !== undefined ? { type: selectedType.value } : {}),
   })
     .then((page) => {
       knowledgeData.value = page.records
@@ -137,6 +135,9 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="type" label="类型" width="200">
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedType" label="类型" :options="typeOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }">
             {{ getKnowledgeType(row) }}
           </template>

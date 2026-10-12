@@ -20,14 +20,6 @@ const searchFields: OptionItem<string>[] = [
   { label: '操作详情', value: 'operate' },
   { label: '操作用户', value: 'user' },
   { label: 'IP 地址', value: 'ip_address' },
-  {
-    label: '状态',
-    value: 'status',
-    options: [
-      { label: '成功', value: '200' },
-      { label: '失败', value: '500' },
-    ],
-  },
 ]
 const operateLogSearchQuery = ref<Dict<unknown>>()
 
@@ -82,11 +74,24 @@ function handleWorkspaceChange() {
   loadOperateLogs()
 }
 
+// 状态筛选
+const selectedStatus = ref<number>()
+const statusOptions: OptionItem<number>[] = [
+  { label: '成功', value: 200 },
+  { label: '失败', value: 500 },
+]
+
+function handleStatusChange() {
+  paginationConfig.value.currentPage = 1
+  loadOperateLogs()
+}
+
 const operateLogQuery = computed<Dict<unknown>>(() => ({
   ...operateLogDateQuery.value,
   ...operateLogSearchQuery.value,
   ...(selectedOperateMenus.value.length ? { menu: JSON.stringify(selectedOperateMenus.value) } : {}),
   ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
+  ...(selectedStatus.value != null ? { status: selectedStatus.value } : {}),
 }))
 
 function loadOperateLogs(resetQuery = false) {
@@ -181,7 +186,16 @@ onMounted(() => {
           </template>
           <template #default="{ row }">{{ row.workspace_name || '-' }}</template>
         </el-table-column>
-        <el-table-column label="状态" width="90">
+        <el-table-column min-width="110">
+          <template #header>
+            <MkTableFilter
+              mode="single"
+              v-model="selectedStatus"
+              label="状态"
+              :options="statusOptions"
+              @change="handleStatusChange"
+            />
+          </template>
           <template #default="{ row }">
             <span class="inline-flex items-center gap-2">
               <span :class="row.status === 200 ? 'mk-dot-success' : 'mk-dot-danger'" />

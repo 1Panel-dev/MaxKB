@@ -28,21 +28,19 @@ const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedWorkspaceIds = ref<string[]>([])
 const searchFields = computed(() => [
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
   { label: '名称', value: 'name' },
-  {
-    label: '类型',
-    value: 'type',
-    options: [
-      { value: APPLICATION_TYPE.WORK_FLOW, label: '高级' },
-      { value: APPLICATION_TYPE.SIMPLE, label: '简易' },
-    ],
-  },
+  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
-const selectedStatusType = ref<boolean | null>(null)
+const selectedType = ref<string | null>(null)
+const typeOptions = computed(() => [
+  { value: APPLICATION_TYPE.SIMPLE, label: '简易' },
+  { value: APPLICATION_TYPE.WORK_FLOW, label: '高级' },
+])
+const selectedStatus = ref<string | null>(null)
 const applicationStatusOptions = computed(() => [
-  { value: true, label: '已发布' },
-  { value: false, label: '未发布' },
+  { value: 'unpublished', label: '未发布' },
+  { value: 'published', label: '已发布' },
+  { value: 'on_portal', label: '已上架' },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -56,7 +54,8 @@ function loadApplicationPage() {
   return SystemResourceApplicationApi.getApplicationPage(pagination.value, {
     ...applicationQuery.value,
     ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
-    ...(selectedStatusType.value !== null ? { status: JSON.stringify([selectedStatusType.value]) } : {}),
+    ...(selectedStatus.value ? { status: selectedStatus.value } : {}),
+    ...(selectedType.value ? { type: selectedType.value } : {}),
   })
     .then((page) => {
       applicationData.value = page.records
@@ -112,6 +111,9 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="type" label="类型" width="150">
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedType" label="类型" :options="typeOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }">
             <el-tag v-if="isWorkFlow(row.type)" type="warning" size="small">高级</el-tag>
             <el-tag v-else type="primary" class="default" size="small">简易</el-tag>
@@ -119,7 +121,7 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="状态" width="150">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedStatusType" label="状态" :options="applicationStatusOptions" @change="handleFilterChange" />
+            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="applicationStatusOptions" @change="handleFilterChange" />
           </template>
           <template #default="{ row }">
             <MkStatusLabel :active="row.is_publish" active-text="已发布" inactive-text="未发布" inactive-icon="icon_time_filled" />

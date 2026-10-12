@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useStore } from '@/stores'
 import UserManageApi from '@/api/admin/system/user-manage'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
@@ -30,27 +30,31 @@ const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const systemUsersData = ref<SystemUser[]>([])
 
 const searchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
+  { label: '用户名', value: 'username' },
   { label: '邮箱', value: 'email' },
-  {
-    label: '状态',
-    value: 'is_active',
-    options: [
-      { label: '启用', value: true },
-      { label: '禁用', value: false },
-    ],
-  },
-  {
-    label: '用户来源',
-    value: 'source',
-    options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({ label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label, value })),
-  },
 ]
-const systemUserQuery = ref<Dict<unknown>>()
+const systemUserSearchQuery = ref<Dict<unknown>>()
+const sourceFilterOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
+  label: value === LOGIN_METHOD.LOCAL ? '系统用户' : label,
+  value,
+}))
+const selectedStatus = ref<boolean | null>(null)
+const selectedSource = ref<string | null>(null)
+
+const systemUserQuery = computed<Dict<unknown>>(() => ({
+  ...systemUserSearchQuery.value,
+  ...(selectedStatus.value !== null ? { is_active: selectedStatus.value } : {}),
+  ...(selectedSource.value !== null ? { source: selectedSource.value } : {}),
+}))
 
 function handleSearchChange(query?: Dict<unknown>) {
-  systemUserQuery.value = query
+  systemUserSearchQuery.value = query
+  paginationConfig.value.currentPage = 1
+  loadSystemUsers()
+}
+
+function handleHeaderFilterChange() {
   paginationConfig.value.currentPage = 1
   loadSystemUsers()
 }
@@ -58,7 +62,7 @@ function handleSearchChange(query?: Dict<unknown>) {
 function loadSystemUsers(resetQuery = false) {
   systemUsersLoading.value = true
   if (resetQuery) {
-    systemUserQuery.value = undefined
+    systemUserSearchQuery.value = undefined
     paginationConfig.value.currentPage = 1
   }
   return UserManageApi.getUserManagePage(paginationConfig.value, systemUserQuery.value)
@@ -155,7 +159,19 @@ onMounted(() => loadSystemUsers())
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
         <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
-        <el-table-column width="100" label="启用状态">
+        <el-table-column width="140" label="启用状态">
+          <template #header>
+            <MkTableFilter
+              mode="single"
+              v-model="selectedStatus"
+              label="启用状态"
+              :options="[
+                { label: '已启用', value: true },
+                { label: '已禁用', value: false },
+              ]"
+              @change="handleHeaderFilterChange"
+            />
+          </template>
           <template #default="{ row }">
             <MkStatusLabel :active="row.is_active" />
           </template>
@@ -203,6 +219,15 @@ onMounted(() => loadSystemUsers())
         </el-table-column>
 
         <el-table-column label="用户来源">
+          <template #header>
+            <MkTableFilter
+              mode="single"
+              v-model="selectedSource"
+              label="用户来源"
+              :options="sourceFilterOptions"
+              @change="handleHeaderFilterChange"
+            />
+          </template>
           <template #default="{ row }">
             {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
           </template>

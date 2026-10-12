@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups.ts'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { ListItem, ChatUserGroupMember, LoginMethod, OptionItem, Dict } from '@/api/types'
@@ -68,10 +68,20 @@ const membersLoading = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
-  { label: '用户来源', value: 'source' },
+  { label: '用户名', value: 'username' },
 ]
+
+/* 表头筛选 */
+const selectedMemberSource = ref<string | null>(null)
+const memberSourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
+  label: value === LOGIN_METHOD.LOCAL ? '系统用户' : label,
+  value,
+}))
+const memberListQuery = computed<Dict<unknown>>(() => ({
+  ...memberQuery.value,
+  ...(selectedMemberSource.value !== null ? { source: selectedMemberSource.value } : {}),
+}))
 
 const groupMembers = ref<ChatUserGroupMember[]>([])
 
@@ -81,7 +91,7 @@ function loadGroupMembers(resetPage = false) {
   if (resetPage) paginationConfig.value.currentPage = 1
 
   membersLoading.value = true
-  return ChatGroupsApi.getChatUserGroupMembers(groupId, paginationConfig.value, memberQuery.value)
+  return ChatGroupsApi.getChatUserGroupMembers(groupId, paginationConfig.value, memberListQuery.value)
     .then((page) => {
       groupMembers.value = page.records
       paginationConfig.value.total = page.total
@@ -93,6 +103,10 @@ function loadGroupMembers(resetPage = false) {
 
 function handleMemberSearch(query?: Dict<unknown>) {
   memberQuery.value = query
+  loadGroupMembers(true)
+}
+
+function handleMemberFilterChange() {
   loadGroupMembers(true)
 }
 
@@ -196,6 +210,9 @@ onMounted(() => loadChatUserGroups())
           <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
           <el-table-column prop="username" label="用户名" show-overflow-tooltip />
           <el-table-column prop="source" label="用户来源">
+            <template #header>
+              <MkTableFilter mode="single" v-model="selectedMemberSource" label="用户来源" :options="memberSourceOptions" @change="handleMemberFilterChange" />
+            </template>
             <template #default="{ row }">
               {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
             </template>

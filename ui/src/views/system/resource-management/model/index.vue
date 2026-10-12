@@ -22,12 +22,14 @@ const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const modelQuery = ref<Dict<unknown>>()
 const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
+const selectedModelType = ref('')
+const selectedProvider = ref('')
 const selectedWorkspaceIds = ref<string[]>([])
 const searchFields = computed(() => [
   { label: '模型名称', value: 'name' },
-  { label: '模型类型', value: 'model_type', options: Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => ({ value, label })) },
   { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
+const modelTypeOptions = Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => ({ value, label }))
 
 function loadCreatorOptions(keyword: string) {
   return SystemCommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
@@ -39,6 +41,8 @@ function loadModels() {
   loading.value = true
   return SystemModelApi.getModelPage(pagination.value, {
     ...modelQuery.value,
+    ...(selectedModelType.value ? { model_type: selectedModelType.value } : {}),
+    ...(selectedProvider.value ? { provider: selectedProvider.value } : {}),
     ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
   })
     .then((page) => {
@@ -63,6 +67,7 @@ function handleFilterChange() {
 /* 供应商展示 */
 const providers = ref<ModelProviderItem[]>([])
 const providerById = computed(() => new Map(providers.value.map((provider) => [provider.provider, provider])))
+const providerOptions = computed(() => providers.value.map((provider) => ({ value: provider.provider, label: provider.name })))
 
 function getProvider(model: ModelItem): ModelProviderItem {
   return providerById.value.get(model.provider) ?? { provider: model.provider, name: model.provider, icon: '' }
@@ -126,6 +131,9 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="provider" label="供应商" min-width="160" show-overflow-tooltip>
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedProvider" label="供应商" :options="providerOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <span v-if="getProvider(row).icon" class="h-5 w-5 shrink-0" v-html="getProvider(row).icon" />
@@ -134,6 +142,9 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="model_type" label="模型类型" width="140">
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedModelType" label="模型类型" :options="modelTypeOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }">{{ MODEL_TYPE_LABELS[row.model_type] ?? row.model_type }}</template>
         </el-table-column>
         <el-table-column prop="model_name" label="基础模型" min-width="180" show-overflow-tooltip />
