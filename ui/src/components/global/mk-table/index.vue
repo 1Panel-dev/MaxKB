@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T extends object">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, type VNode } from 'vue'
-import type { TableInstance } from 'element-plus'
+import type { TableColumnCtx, TableInstance } from 'element-plus'
 import LayoutBatchFooter from '../mk-view-layout/LayoutBatchFooter.vue'
 import { useSortable, type SortableChange } from '@/utils/use-sortable'
 import { get } from 'lodash'
@@ -34,6 +34,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   'current-change': [currentPage: number]
   'selection-change': [selection: unknown[]]
+  'row-click': [row: T, column: TableColumnCtx<T> | null, event: PointerEvent]
   'size-change': [pageSize: number]
   'update:paginationConfig': [paginationConfig: PaginationConfig]
   'update:data': [data: T[]]
@@ -41,6 +42,21 @@ const emit = defineEmits<{
 }>()
 
 const tableRef = ref<TableInstance>()
+
+/** 行内名称编辑：失焦的这次点击不再触发行点击，下一次点击恢复。 */
+let nameEditingOnPointerDown = false
+
+function handlePointerDown(event: PointerEvent) {
+  const editor = document.activeElement instanceof HTMLElement ? document.activeElement.closest('[data-mk-edit-name-editing]') : null
+  nameEditingOnPointerDown = !!editor && event.currentTarget instanceof HTMLElement && event.currentTarget.contains(editor)
+}
+
+function handleRowClick(row: T, column: TableColumnCtx<T> | null, event: PointerEvent) {
+  const skipRowClick = nameEditingOnPointerDown
+  nameEditingOnPointerDown = false
+  if (skipRowClick && event.detail > 0) return
+  emit('row-click', row, column, event)
+}
 
 defineSlots<{
   default?: () => VNode[]
@@ -176,6 +192,8 @@ defineExpose({ clearSelection, tableRef })
       :border="props.resizable"
       @select="handleSelect"
       @selection-change="handleSelectionChange"
+      @pointerdown.capture="handlePointerDown"
+      @row-click="handleRowClick"
     >
       <slot />
       <template v-if="$slots['body-prepend']" #append>

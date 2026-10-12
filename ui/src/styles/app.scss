@@ -174,6 +174,23 @@ h6 {
   }
 }
 
+// 段落card
+.mk-paragraph-card {
+  &.active {
+    background-color: rgb(var(--mk-primary-rgb) / 10%) !important;
+    border-color: var(--mk-primary) !important;
+  }
+
+  &.selectable:hover {
+    background-color: white;
+    border-color: var(--mk-primary);
+  }
+
+  &:hover {
+    background-color: var(--mk-N100);
+  }
+}
+
 // 资源的card grid布局
 .mk-resource-card-grid {
   display: grid;

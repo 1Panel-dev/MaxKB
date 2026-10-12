@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
@@ -153,19 +153,20 @@ function handlePreviewVersion(version: WorkflowVersion) {
   nextTick(() => workflowRef.value?.fitView())
 }
 
-// 所有退出入口统一通过显隐状态清理预览；恢复版本时提前清空草稿快照。
-watch(historyVisible, (visible) => {
+// 抽屉显隐和页面返回统一处理预览；恢复版本时提前清空草稿快照。
+function handleHistoryVisibleChange(visible: boolean) {
+  historyVisible.value = visible
   if (visible) return
   if (workflowBeforePreview) workflowRef.value?.render(cloneDeep(workflowBeforePreview))
   workflowBeforePreview = undefined
   previewVersion.value = undefined
-})
+}
 
 function handleRestoreVersion(version = previewVersion.value) {
   if (!version || loading.value) return
   workflowRef.value?.render(cloneDeep(version.work_flow))
   workflowBeforePreview = undefined
-  historyVisible.value = false
+  handleHistoryVisibleChange(false)
   nextTick(() => workflowRef.value?.fitView())
 }
 
@@ -249,7 +250,7 @@ function handlePublish(payload: WorkflowVersionPayload) {
 function handleBack() {
   if (loading.value || confirmingExit.value) return
   if (historyVisible.value) {
-    historyVisible.value = false
+    handleHistoryVisibleChange(false)
   }
   if (!hasUnsavedChanges()) {
     goBack(applicationId)
@@ -345,7 +346,7 @@ onBeforeUnmount(() => stopAutoSave())
       <!-- 保存 -->
       <el-button plain :disabled="loading" @click="handleSave()">
         <MkIcon name="icon_save_outlined" />
-        <span> 保存 </span>
+        <span>保存</span>
       </el-button>
 
       <!-- 发布 -->
@@ -364,7 +365,8 @@ onBeforeUnmount(() => stopAutoSave())
             </MkDropdownItem>
             <!-- 发布历史 -->
             <ButtonPublishHistory
-              v-model:visible="historyVisible"
+              :visible="historyVisible"
+              @update:visible="handleHistoryVisibleChange"
               :application-id="applicationId"
               :selected-id="previewVersion?.id"
               @open="closeDebug"

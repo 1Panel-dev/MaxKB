@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router'
 import type { TableColumnCtx } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import TagsApi from '@/api/admin/workspace/knowledge/tags'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import type { Dict, KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -63,7 +62,7 @@ function clearSelection() {
 function loadTags() {
   clearSelection()
   loading.value = true
-  return KnowledgeApi.getKnowledgeTags(knowledgeId.value)
+  return TagsApi.getKnowledgeTags(knowledgeId.value)
     .then((groups) => {
       tagGroups.value = groups
       const lastPage = Math.max(1, Math.ceil(filteredTagGroups.value.length / tagPage.value.pageSize))

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import ChatLogApi from '@/api/admin/workspace/application/chat-log'
+import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import { MsgSuccess } from '@/utils/message'
 import { useApplicationDetailContext } from '../../context'
 
 defineOptions({ name: 'ChatLogCleanStrategyDialog' })
-const props = defineProps<{ applicationId: string }>()
+const props = defineProps<{ api: typeof ChatLogApi; applicationId: string }>()
 const { application, refreshApplicationDetail } = useApplicationDetailContext()
 
 // 读取成功后打开弹窗，查询与保存共用 loading
@@ -33,7 +33,8 @@ function open() {
 function handleSubmit() {
   if (loading.value) return
   loading.value = true
-  return ChatLogApi.putChatLogCleanTime(props.applicationId, days.value, Math.min(fileDays.value, days.value))
+  return props.api
+    .putChatLogCleanTime(props.applicationId, days.value, Math.min(fileDays.value, days.value))
     .then(() => {
       return refreshApplicationDetail(false).then(() => {
         MsgSuccess('保存成功')

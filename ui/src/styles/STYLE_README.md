@@ -240,6 +240,10 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 白色内容卡片使用 `mk-white-card` 或 `mk-white-card-sm`，内边距和圆角与同尺寸灰色卡片一致。
 两种背景的尺寸类均可独立使用，包含对应背景色，无需叠加基础类。
 
+段落卡片使用 `app.scss` 中的 `mk-paragraph-card`，普通模式悬停背景为 N100；多选模式添加
+`selectable`，未选中卡片悬停为主题色边框、白色背景。已选卡片添加 `active`，沿用
+`MkSourceCard` 的主题色边框和 10% 主题色背景，选中背景在悬停时保留。
+
 ## 阴影
 
 大号阴影统一由 `variables.scss` 中的 `--mk-box-shadow-lg` 定义，值为

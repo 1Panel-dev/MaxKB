@@ -1,3 +1,5 @@
+import type { RelatedQuestionsConfig } from './knowledge'
+
 /** 文档分段的查询响应与新增载荷。 */
 export interface ParagraphItem {
   id: string
@@ -8,6 +10,23 @@ export interface ParagraphItem {
   is_active: boolean
   create_time: string
   update_time: string
+  hit_num: number
+  last_hit_time: string | null
+}
+
+/** 分段关联的问题及详情。 */
+export interface ParagraphProblem {
+  id: string
+  content: string
+}
+
+export interface ParagraphDetail extends ParagraphItem {
+  problem_list: ParagraphProblem[]
+}
+
+export interface ParagraphUpdatePayload {
+  title: string
+  content: string
 }
 
 export interface ParagraphQuery {
@@ -19,4 +38,10 @@ export interface ParagraphCreatePayload {
   title: string
   content: string
   is_active: boolean
+  problem_list?: { content: string }[]
+}
+
+/** 为选中的分段生成关联问题。 */
+export interface ParagraphGeneratePayload extends RelatedQuestionsConfig {
+  paragraph_id_list: string[]
 }

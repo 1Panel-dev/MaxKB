@@ -487,7 +487,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `knowledge-detail/index.vue`                    | 知识库详情页面                                                       |
 | `knowledge-detail/library/tags/index.vue`       | 标签分组查询、创建、重命名、单值编辑、删除与关联文档管理             |
 | `knowledge-detail/workflow-transform/index.vue` | 非工作流知识库转换说明、确认与进入画布                               |
-| `knowledge-detail/paragraph/index.vue`          | 普通 Workspace 文档分段查询、目录定位、批量勾选与新增                |
+| `knowledge-detail/paragraph/index.vue`          | 普通 Workspace 文档分段查询、目录定位、批量操作、新增、编辑与详情          |
 
 |
 | `knowledge-detail/setting/base/index.vue` | 知识库基本信息、来源配置与上传限制设置 |
@@ -566,7 +566,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 `workflow/application/ButtonPublishHistory.vue` 封装智能体发布历史菜单入口、
 面板显隐、列表查询以及版本编辑请求。内部直接调用 application 的版本 API；页面仅传
-`applicationId`、`selectedId`、`disabled` 和 `v-model:visible`，接收 `open`、`preview`、
+`applicationId`、`selectedId`、`disabled` 和 `visible`，接收 `update:visible`、`open`、`preview`、
 `restore` 事件。每次打开重新查询，编辑成功后关闭弹窗并重新调用 `getWorkflowVersions` 刷新列表，
 不向页面发送更新事件；保存失败保留弹窗与草稿。所在 `MkDropdown` 设置 `persistent`，避免收起菜单时销毁面板入口。
 
@@ -577,7 +577,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 也不操作路由或画布。面板复用 `MkDrawer`，通过 `v-model` 控制显隐，宽度 320，使用
 `top-header`、`h-layout-content` 留出页面头部，不显示遮罩、不锁定滚动，内部复用 Drawer 的滚动区。
 抽屉实例保留，由 `MkDrawer` 延迟渲染并在关闭动画结束后销毁内容，不再额外维护挂载状态或转发
-`close` / `closed` 事件。页面监听 `historyVisible`，关闭抽屉与头部返回统一恢复草稿并清理预览；
+`close` / `closed` 事件。页面在 `update:visible` 事件与头部返回方法中统一处理显隐，关闭时立即恢复草稿并清理预览；
 恢复版本时先清空草稿快照再关闭，保留已恢复的版本。编辑弹窗的 `closeEdit()` 仅用于保存成功后关闭表单。
 
 同目录 `EditPublishVersionDialog.vue` 只维护表单副本与校验。`mode` 默认为 `edit`，显示“编辑”，
@@ -816,8 +816,8 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 `BatchGenerateQuestionsAction` 接收 `documentIds`，使用独立的批量生成按钮；批量取消继续使用 `BatchCancelTaskAction`。
 单项与批量复用公共 `GenerateQuestionsDialog`，Action 打开时保存知识库、文档 ID 快照，
 提交同一文档批量接口并通过 `refresh` 刷新状态；通过 `v-model:loading` 复用页面操作状态。
-公共弹窗按需挂载、关闭后卸载，不负责选择提交接口。当前尚无段落页，后续段落入口复用公共
-弹窗时关闭 `showParagraphScope`，由段落 Action 提交段落接口，不扩展公共弹窗的接口分支。
+公共弹窗按需挂载、关闭后卸载，不负责选择提交接口。段落页复用公共弹窗时关闭
+`showParagraphScope`，由段落按钮提交段落接口，不扩展公共弹窗的接口分支。
 设置操作集中在 `document/action-dropdown/setting/`，通过上层 `index.ts` 导出两个入口。
 `SettingDocumentAction` 接收单个 `document`，展示菜单项；`BatchSettingDocumentAction` 接收
 `documentIds`，展示批量设置按钮。入口文案由 `label` 传入，单项图标由可选 `icon` 传入。
@@ -868,10 +868,44 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 保留自身交互。分段页与知识库详情容器路由同级，复用 `MkViewLayout` 的顶部栏、侧栏和主区滚动；
 顶部展示接口查询的文档名称、标题／内容搜索、批量选择和添加分段，侧栏按服务端位置排列全部
 查询结果，点击定位正文，滚动同步高亮。正文使用 `MdPreview`；空文档展示空态。
-批量选择支持勾选、全选、取消，当前只提供选择状态，不提交批量写操作。
-`CreateParagraphDialog.vue` 在点击时挂载、关闭动画结束后卸载，标题最多 256 字符，
-内容必填且最多 102400 字符；页面负责新增请求，提交使用内容和按钮 loading，失败保留输入。
-成功关闭弹窗并清空搜索，重新查询服务端排序，不因刷新失败恢复已提交草稿。
+批量选择支持点击整张卡片或复选框切换勾选、全选、取消、“迁移至”、“生成问题”和“删除”；
+复选框阻止点击冒泡，避免重复切换。`paragraph/migrate/` 集中维护
+`ButtonMigrateParagraph` 和 `ParagraphMigrateDialog`，沿用 chat-log 添加知识库的知识库／文档
+选择样式，保留知识库和文档图标；迁移 API 由分段页传入完整 Paragraph API 对象。
+打开时固定所选分段 ID，选择知识库后查询全部文档并排除当前文档，允许迁移至同知识库其他文档。
+知识库和文档必选，成功关闭动画结束后通过 `success(paragraphIds)` 返回本次迁移的固定 ID，
+页面从本地列表移除对应分段、清空勾选并更新目录定位，不重新查询分段接口，失败保留表单。
+`paragraph/components/ButtonGenerateQuestions.vue` 封装批量生成入口，
+接收页面传入的完整 Paragraph API，打开时固定知识库、文档和勾选分段。复用公共
+`GenerateQuestionsDialog` 并传入 `showParagraphScope=false`，仅提交生成配置和所选分段 ID，
+不传 `state_list`；请求成功关闭后重新查询当前筛选结果并清空选择，失败保留配置。
+批量删除按钮和请求逻辑直接维护在 `paragraph/index.vue`，不单独拆分组件。
+确认前固定所选分段与所属文档，确认后提交批量删除接口；成功从本地列表移除本次删除的分段、
+清空勾选并更新目录定位，不重新查询分段接口。
+取消或失败保留选择，确认及请求期间阻止重复操作。
+`paragraph/paragraph-dialog/` 维护两个独立弹窗，以本地组件组合左右布局：
+
+- `CreateParagraphDialog.vue` 组合 `components/ParagraphForm.vue` 与 `components/ParagraphQuestions.vue`，
+  管理添加请求，底部提供取消和添加。
+- `EditParagraphDialog.vue` 组合 `ParagraphForm`、`ParagraphPreview` 与 `ParagraphQuestions`，
+  支持 `open(paragraph, initialMode?)`，初始模式默认为 `detail`，也可传入 `edit`。
+  详情点击编辑进入表单；取消编辑回到原详情，保存成功回到更新后的详情。
+- `ParagraphForm` 使用 `v-model` 接收标题和正文，通过 `validate()` 暴露校验；标题最多 256 字符，
+  内容必填且最多 100000 字符。正文使用 `MdEditor`，默认关闭预览，提供 Markdown 工具栏及字数统计；
+  通过必填的 `knowledgeId` 将图片上传到当前知识库，复用 `FileApi` 和 `FILE_SOURCE_TYPE.KNOWLEDGE`。
+  提交由 Dialog 编排。
+- `ParagraphPreview` 只展示标题、Markdown 正文、召回次数和最近召回时间，通过 `edit` 事件通知 Dialog。
+- `ParagraphQuestions` 管理问题草稿、校验、添加和移除，问题必填、去除首尾空格、最多 256 字符且不重复。
+  无 `paragraphId` 时维护本地草稿并随新增分段提交；已有分段通过专属接口即时添加或解除关联，
+  不删除问题本身。通过 `v-model:loading`、`v-model:adding` 与 Dialog 协调操作状态。
+
+两个 Dialog 和三个组件均提供默认 `false` 的 `disabled`，表示业务只读：表单不可修改、问题操作隐藏，
+详情不展示编辑入口，Dialog 方法同时阻止保存；编辑 Dialog 在只读时强制详情模式，动态切为只读也返回详情。
+提交状态继续使用内容／按钮 loading，不作为表单 `disabled`；问题组件的 `blocked` 仅协调加载与保存期间的操作入口。
+两个 Dialog 均接收完整 Paragraph API 和知识库／文档 ID，打开时固定目标，点击时挂载、关闭动画结束后卸载。
+详情加载失败提供重试；请求失败保留草稿。正文保存不提交 `problem_list`，取消编辑不撤销即时保存的问题关联。
+新增成功关闭弹窗并通知页面清空搜索、重新查询服务端排序；编辑成功通知页面刷新当前筛选结果。
+分段卡片在非批量模式提供“详情”入口，批量生成问题继续使用 `components/ButtonGenerateQuestions.vue`。
 Workspace 共享及 System 分段入口暂未接入，不回退 Workspace API。
 
 System 资源管理与共享资源已注册共用知识库详情路由，
@@ -1086,8 +1120,9 @@ System 共享管理 Knowledge API；成功后进入画布，失败保留转换�
 `workflow/knowledge/ButtonExecutionRecord.vue` 封装更多菜单入口、抽屉挂载与打开逻辑，接收
 `knowledgeId`，菜单属性（如 `divided`）透传到 `MkDropdownItem`，内部提供知识库 Workflow API。
 `workflow/knowledge/execution-record/` 维护记录列表和详情抽屉，由该按钮组件打开；
-非共享的工作流文档页在“导入文档”左侧提供“执行记录”按钮，直接复用同一个记录抽屉并传入
-当前知识库 ID 与完整知识库 Workflow API。两个入口均在点击时挂载抽屉，
+工作流文档页在“导入文档”左侧使用 `knowledge-detail/library/document/components/ButtonExecutionRecord.vue`
+封装“执行记录”按钮与同一个记录抽屉，页面传入当前知识库 ID 与完整知识库 Workflow API，
+按钮组件维护抽屉挂载状态和打开逻辑。两个入口均在点击时挂载抽屉，
 关闭动画结束后卸载。列表复用 `MkComplexSearch`、`MkTable` 和 `MkStatusLabel`，支持发起人、
 状态筛选及跨页浏览，每 6 秒刷新；关闭或卸载停止轮询。待执行、执行中任务经确认后取消，成功刷新列表。
 抽屉接收完整知识库 Workflow API；详情查询复用调试任务接口，使用 `ExecutionDetailContent` 展示节点结果。
@@ -1266,11 +1301,14 @@ Workspace `CommonApi`；范围变化同时清空搜索控件、筛选、创建�
 使用详情布局的标题栏，组合标题、`MkDateRange`、`MkComplexSearch`、导出和清除策略入口，
 不嵌套 `MkViewLayout`。挂载时查询过去 7 天，搜索、日期和反馈筛选变化后回到第一页，
 不监听工作空间路由参数，也不新增权限判断。
-列表使用 `MkTable`，勾选用于导出；无勾选时导出当前筛选结果。列表和导出使用同一组查询条件，
+列表使用 `MkTable`，勾选用于导出和批量添加到知识库；无勾选时导出当前筛选结果。列表和导出使用同一组查询条件，
 切换筛选或分页后清空旧选择。点赞、点踩最小值使用 `MkTableFilter mode="custom"` 的默认作用域插槽编辑，
 页面只维护已生效值和全 0 的 `resetValue`；浮层、草稿、重置与确认由公共组件管理，确认或重置后重新查询。
 自定义日期清空后清空列表并禁用导出，重新选择有效日期再查询。
 来源枚举位于 `api/enums/chat-log.ts`，页面标签位于本功能的 `constants.ts`。
+
+`chat-log/index.vue` 统一导入完整 ChatLog API 对象，通过 `api` Prop 传给清除策略与添加知识库
+按钮，并继续透传至弹窗；子组件仅类型导入 ChatLog API。知识库及文档选项 API 暂由添加知识库弹窗直接导入。
 
 `clean-strategy/` 按操作日志页拆分 `ButtonCleanStrategy` 和 `CleanStrategyDialog`，
 每次打开重新读取智能体详情；日志保留天数为 1–100000，文件保留天数不超过日志保留天数。
@@ -1284,7 +1322,10 @@ Workspace `CommonApi`；范围变化同时清空搜索控件、筛选、创建�
 底部上一条／下一条切换整条对话日志；页面负责当前记录、首尾禁用及跨列表分页查询，
 跨页成功后同步列表页码并切换至首条／末条，失败保留原记录和页码，加载期间禁用切换。
 正文暂时留空，不查询或展示聊天内容，也不显示聊天记录分页器。
-添加到知识库的页面组件尚未接入。
+`add-knowledge/` 集中维护 `ButtonAddKnowledge` 和 `AddKnowledgeDialog`，批量入口固定打开时的
+对话 ID，弹窗参考 `DocumentMigrateDialog` 的顶部标签表单与带知识库图标的可搜索下拉框。
+每次打开查询当前工作空间知识库，选择知识库后查询全部文档并清空旧文档选择；知识库与
+文档必选，提交期间使用内容 loading。成功关闭、清空表格勾选并刷新标注数量，失败保留选择。
 
 ## 对话端单应用与门户对话页面
 

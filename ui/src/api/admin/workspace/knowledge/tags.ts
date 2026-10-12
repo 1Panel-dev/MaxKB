@@ -1,8 +1,11 @@
-import { del, getExportFile, post, put } from '../../core/request'
-import type { KnowledgeTagPayload, KnowledgeTagUpdatePayload } from '@/api/types'
+import { del, get, getExportFile, post, put } from '../../core/request'
+import type { KnowledgeTagGroup, KnowledgeTagPayload, KnowledgeTagUpdatePayload } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/tags`
+
+/** 获取知识库按标签名称分组的标签选项。 */
+const getKnowledgeTags = (knowledgeId: string) => get<KnowledgeTagGroup[]>(getPrefix(knowledgeId))
 
 /** 创建知识库标签或为已有标签新增值。 */
 const postKnowledgeTags = (knowledgeId: string, tags: KnowledgeTagPayload[]) => post<KnowledgeTagPayload[], void>(getPrefix(knowledgeId), tags)
@@ -29,6 +32,7 @@ const postImportKnowledgeTags = (knowledgeId: string, file: File) => {
 const exportKnowledgeTagTemplate = (knowledgeId: string) => getExportFile('标签模板.xlsx', `${getPrefix(knowledgeId)}/template/export`)
 
 export default {
+  getKnowledgeTags,
   postKnowledgeTags,
   putKnowledgeTag,
   deleteKnowledgeTag,

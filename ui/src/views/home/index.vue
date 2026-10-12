@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import HomepageApi from '@/api/admin/workspace/homepage'
 import ApplicationApi from '@/api/admin/workspace/application/application'
@@ -29,16 +29,9 @@ function loadApplications(query = '') {
 function handleApplicationChange(value: string) {
   selectedApplication.value = applications.value.find((application) => application.id === value)
 }
-watch(
-  workspaceId,
-  () => {
-    applicationId.value = 'all'
-    applications.value = []
-    selectedApplication.value = undefined
-    loadApplications()
-  },
-  { immediate: true },
-)
+onMounted(() => {
+  void loadApplications()
+})
 </script>
 <template>
   <MkViewLayout title="">

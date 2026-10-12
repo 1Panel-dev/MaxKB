@@ -241,8 +241,8 @@ onBeforeUnmount(() => {
       </div>
 
       <el-button link type="primary" @click="addBranch">
-        <MkIcon name="icon_add_outlined" class="mr-1" />
-        添加分支
+        <MkIcon name="icon_add_outlined" />
+        <span>添加分支</span>
       </el-button>
     </el-form>
   </NodeContainer>

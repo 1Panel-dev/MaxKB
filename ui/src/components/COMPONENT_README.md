@@ -319,6 +319,11 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 `paginationConfig` 由组件接收，其余 Table 属性和事件通过 `$attrs` 传入，列继续使用
 `el-table-column`。
 
+`row-click(row, column, event)` 由组件统一转发，保持 Element Plus 的参数。
+与 `MkEditName` 配合时，组件在按下阶段识别当前表格内正在编辑的名称输入框；
+点击空白使名称失焦保存的同一次点击不发出 `row-click`，下一次正常点击继续转发。
+不阻止失焦、勾选和按钮交互，业务页面无需绑定 `pointerdown` 或维护编辑判断。
+
 `body-prepend` 插槽用于在表头下、数据行之前插入独立操作区，例如快速创建。内部借用
 Element Plus `append`，仅在传入该插槽时将直属表体滚动容器设为纵向 Flex，并将插槽排到前面；
 内容自然占位，不写固定高度，不向 `data` 插入占位记录，不影响选择、排序、分页总数和空状态。
@@ -460,7 +465,9 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `footer-batch-actions` 插槽，当前选择通过 `selection-change` 返回。组件暴露 `tableRef` 和
 `clearSelection()`。操作栏与 `MkViewLayout` 复用 `LayoutBatchFooter`，统一全选、半选、数量和
 取消行为；它在主内容滚动区域内吸附于页面底部，不随表格内容滚出可视区域。
-分页表格暂不支持跨页勾选，翻页或切换每页条数时统一清空选择，选择列不配置 `reserve-selection`。
+分页表格暂不支持跨页勾选，翻页或切换每页条数时统一清空选择。
+有轮询刷新的表格选择列配置 `reserve-selection`，按 `row-key` 保留同一页刷新后的勾选；
+其他分页表格不配置该属性，不自行实现轮询选择恢复。
 非分页表格不受此限制，可按数据刷新、搜索和懒加载需求保留选择。
 
 `selectionGroupKey` 可按需开启同组选择，接受字段路径或返回字符串／数字的函数；不传时保持
@@ -564,6 +571,8 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 业务错误文案并通过消息提示，返回 `undefined` 表示通过。名称未变化直接退出，不请求。
 保存期间输入框只读，失败保留草稿，接口错误由请求层提示，允许重新聚焦后修改、重试或取消。
 名称展示区域保留父级点击行为，编辑按钮和输入区域阻止点击冒泡。
+编辑期间根节点自动设置内部标记 `data-mk-edit-name-editing`，供 `MkTable` 识别编辑焦点；
+退出编辑时移除，调用方无需传入标记或编辑状态。
 
 ```vue
 <script setup lang="ts">
