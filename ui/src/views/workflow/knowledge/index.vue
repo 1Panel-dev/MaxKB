@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
-import type { Action } from 'element-plus'
+import type { Action, UploadFile, UploadInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import ModelApi from '@/api/admin/workspace/model'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import type { DefaultModelSettingPayload, KnowledgeDetail, KnowledgeWorkflowDetail, WorkflowVersion, WorkflowStoreTemplate } from '@/api/types'
-import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
+import { MsgConfirm, MsgSuccess, MsgError, MsgWarning } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultKnowledgeNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
@@ -19,6 +20,7 @@ import ButtonExecutionRecord from './ButtonExecutionRecord.vue'
 import DebugDrawer from './debug/DebugDrawer.vue'
 import ButtonTemplateStore from './ButtonTemplateStore.vue'
 import ButtonPublishHistory from './ButtonPublishHistory.vue'
+import WorkflowImportDocumentDrawer from '@/views/knowledge-detail/library/document/import-document/WorkflowImportDocumentDrawer.vue'
 import { goBack } from './navigation'
 
 defineOptions({ name: 'KnowledgeWorkflowView' })
@@ -32,6 +34,7 @@ const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
 }
 
 const route = useRoute()
+const router = useRouter()
 const knowledgeId = route.params.knowledgeId as string
 
 const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflowRef')
@@ -225,9 +228,58 @@ function handlePublish() {
     .validate()
     .then(() => saveKnowledgeWorkflow())
     .then(() => KnowledgeWorkflowApi.putKnowledgeWorkflowPublish(knowledgeId))
-    .then(() => MsgSuccess('发布成功'))
+    .then(() => {
+      if (knowledgeDetail.value) knowledgeDetail.value.is_publish = true
+      MsgSuccess('发布成功')
+    })
     .catch(() => {
       // 校验与接口错误由各自流程提示。
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+/* 导入文档：使用已发布工作流，复用文档页的正式导入抽屉。 */
+const importDocumentDrawerMounted = ref(false)
+const importDocumentDrawerRef = useTemplateRef<InstanceType<typeof WorkflowImportDocumentDrawer>>('importDocumentDrawerRef')
+
+function handleImportDocument() {
+  if (loading.value || historyVisible.value || importDocumentDrawerMounted.value || !knowledgeDetail.value) return
+  if (!knowledgeDetail.value.is_publish) {
+    MsgWarning('当前知识库的工作流未发布，无法导入文档，请先发布工作流。')
+    return
+  }
+  closeDebug()
+  importDocumentDrawerMounted.value = true
+  return nextTick(() => importDocumentDrawerRef.value?.open(cloneDeep(savedWorkflow.value ?? knowledgeDetail.value?.work_flow)))
+}
+
+/* 导入工作流：选择 kbwf 文件，确认覆盖后重新加载服务端图及默认模型配置。 */
+const workflowUploadRef = useTemplateRef<UploadInstance>('workflowUploadRef')
+
+function handleImportWorkflow(uploadFile: UploadFile) {
+  const file = uploadFile.raw
+  workflowUploadRef.value?.clearFiles()
+  if (!file || loading.value || historyVisible.value) return
+  if (!file.name.toLowerCase().endsWith('.kbwf')) {
+    MsgWarning('请选择 .kbwf 格式的工作流文件')
+    return
+  }
+  closeDebug()
+  // 确认期间暂停自动保存，避免覆盖流程与旧草稿保存并发。
+  loading.value = true
+  return MsgConfirm('提示', `使用 ${file.name.replace(/\.kbwf$/i, '')} 将覆盖当前工作流？`, {
+    confirmButtonText: '确认',
+    confirmButtonType: 'primary',
+  })
+    .then(() => {
+      return KnowledgeWorkflowApi.importKnowledgeWorkflow(knowledgeId, file).then(() => {
+        return loadKnowledgeWorkflow().then(() => MsgSuccess('导入成功'))
+      })
+    })
+    .catch(() => {
+      // 取消不修改草稿，接口错误由请求层提示。
     })
     .finally(() => {
       loading.value = false
@@ -250,6 +302,14 @@ async function handleExportWorkflow() {
 
 function loadKnowledgeWorkflow() {
   return KnowledgeApi.getKnowledgeDetail(knowledgeId).then((knowledge) => {
+    // 直接访问画布时也先转换非工作流知识库，不为原类型初始化或保存工作流。
+    if (knowledge.type !== KNOWLEDGE_TYPE.WORKFLOW) {
+      return router.replace({
+        name: 'workspace-knowledge-workflow',
+        params: { workspaceId: route.params.workspaceId, knowledgeId, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
+        query: route.query,
+      })
+    }
     knowledgeDetail.value = knowledge
     defaultModelSetting.value = cloneDeep(knowledge.default_model_setting ?? {})
     savedDefaultModelSetting.value = cloneDeep(defaultModelSetting.value)
@@ -355,6 +415,27 @@ onBeforeUnmount(stopAutoSave)
         </el-button>
         <template #dropdown>
           <MkDropdownMenu class="w-37">
+            <!-- 导入工作流文档 -->
+            <MkDropdownItem :disabled="loading" @click="handleImportDocument">
+              <template #icon><MkIcon name="icon_import_outlined" /></template>
+              <span>导入文档</span>
+            </MkDropdownItem>
+            <!-- 导入工作流 -->
+            <el-upload
+              ref="workflowUploadRef"
+              accept=".kbwf"
+              :auto-upload="false"
+              :show-file-list="false"
+              class="mk-import-button"
+              :limit="1"
+              :disabled="loading || historyVisible"
+              :on-change="handleImportWorkflow"
+            >
+              <MkDropdownItem :disabled="loading" class="w-full">
+                <template #icon><MkIcon name="icon_import_outlined" /></template>
+                <span>导入工作流</span>
+              </MkDropdownItem>
+            </el-upload>
             <!-- 导出工作流 -->
             <MkDropdownItem @click="handleExportWorkflow">
               <template #icon><MkIcon name="icon_export_outlined" /></template>
@@ -395,6 +476,13 @@ onBeforeUnmount(stopAutoSave)
       />
     </div>
 
+    <!-- 文档导入抽屉 -->
+    <WorkflowImportDocumentDrawer
+      v-if="importDocumentDrawerMounted"
+      ref="importDocumentDrawerRef"
+      :knowledge-id="knowledgeId"
+      @closed="importDocumentDrawerMounted = false"
+    />
     <!-- 调试抽屉 -->
     <DebugDrawer ref="debugDrawerRef" :knowledge-id="knowledgeId" />
   </WorkflowViewLayout>

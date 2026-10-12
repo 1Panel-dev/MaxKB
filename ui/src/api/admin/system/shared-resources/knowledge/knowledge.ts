@@ -1,4 +1,5 @@
 import { del, get, getExportFile, post, put } from '@/api/admin/core/request'
+import type LogicFlow from '@logicflow/core'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type {
   Dict,
@@ -83,7 +84,12 @@ const getKnowledgeMcpConfig = (knowledgeId: string): Promise<string> =>
 /** 提交知识库分词索引任务。 */
 const putKnowledgeKeywordIndex = (knowledgeId: string) => put<undefined, void>(`${prefix}/${knowledgeId}/tokenize`)
 
+/** 将系统共享知识库转换为工作流知识库，保留已有文档。 */
+const postTransformWorkflow = (knowledgeId: string, payload: { work_flow: LogicFlow.GraphConfigData }) =>
+  post<{ work_flow: LogicFlow.GraphConfigData }, boolean>(`${prefix}/${knowledgeId}/transform_workflow`, payload)
+
 export default {
+  postTransformWorkflow,
   deleteKnowledge,
   exportKnowledge,
   exportKnowledgeExcel,

@@ -133,6 +133,7 @@ function handleCurrentPageChange(currentPage: number) {
     return
   }
 
+  clearSelection()
   emit('update:paginationConfig', { ...props.paginationConfig, currentPage })
   emit('current-change', currentPage)
 }
@@ -142,6 +143,7 @@ function handlePageSizeChange(pageSize: number) {
     return
   }
 
+  clearSelection()
   emit('update:paginationConfig', { ...props.paginationConfig, currentPage: 1, pageSize })
   emit('size-change', pageSize)
 }

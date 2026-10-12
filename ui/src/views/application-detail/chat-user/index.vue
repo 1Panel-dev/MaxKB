@@ -38,18 +38,16 @@ function loadChatUserGroups() {
 function handleSelectGroup(group: ChatUserAuthorizationGroup) {
   if (loading.value || currentGroup.value?.id === group.id) return
   currentGroup.value = group
-  checkedUsers.value = {}
   chatUsers.value = []
   paginationConfig.value.currentPage = 1
   paginationConfig.value.total = 0
   return refreshChatUsers()
 }
 
-// 用户筛选与分页，保留当前用户组跨页的授权勾选
+// 用户筛选与分页，仅维护当前页的授权勾选
 const chatUsers = ref<ChatUserAuthorization[]>([])
 const chatUserQuery = ref<Dict<unknown>>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const checkedUsers = ref<Dict<boolean>>({})
 const searchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
@@ -69,11 +67,7 @@ function formatUserSource(source: string) {
 function loadChatUsers() {
   if (!currentGroup.value) return Promise.resolve()
   return ChatUserApi.getUserGroupUserList(resource.value, currentGroup.value.id, paginationConfig.value, chatUserQuery.value).then((page) => {
-    chatUsers.value = page.records.map((chatUser) => {
-      const isAuth = checkedUsers.value[chatUser.id] ?? chatUser.is_auth
-      checkedUsers.value[chatUser.id] = isAuth
-      return { ...chatUser, is_auth: isAuth }
-    })
+    chatUsers.value = page.records
     paginationConfig.value.total = page.total
   })
 }
@@ -91,14 +85,13 @@ function handleSearchChange(query?: Dict<unknown>) {
   return refreshChatUsers()
 }
 
-// 当前页批量授权与跨页保存
+// 当前页批量授权与保存
 const allChecked = computed(() => chatUsers.value.length > 0 && chatUsers.value.every((chatUser) => chatUser.is_auth))
 const allIndeterminate = computed(() => !allChecked.value && chatUsers.value.some((chatUser) => chatUser.is_auth))
 const authorizationDisabled = computed(() => loading.value || !currentGroup.value || currentGroup.value.is_auth)
 
 function handleRowChange(value: CheckboxValueType, chatUser: ChatUserAuthorization) {
   chatUser.is_auth = value === true
-  checkedUsers.value[chatUser.id] = chatUser.is_auth
 }
 
 function handleCheckAll(value: CheckboxValueType) {
@@ -109,7 +102,7 @@ function handleSave() {
   const group = currentGroup.value
   if (!group || authorizationDisabled.value) return
   const userGroupId = group.id
-  const payload = Object.entries(checkedUsers.value).map(([chat_user_id, is_auth]) => ({ chat_user_id, is_auth }))
+  const payload = chatUsers.value.map(({ id, is_auth }) => ({ chat_user_id: id, is_auth }))
   loading.value = true
   return ChatUserApi.putUserGroupUser(resource.value, userGroupId, payload)
     .then(() => {
@@ -129,7 +122,6 @@ function handleAutoAuthorizationChange(value: string | number | boolean) {
   return ChatUserApi.putUserGroupAuthorization(resource.value, [{ user_group_id: group.id, is_auth: isAuth }])
     .then(() => {
       group.is_auth = isAuth
-      checkedUsers.value = {}
       chatUsers.value = []
       return loadChatUsers().then(() => {
         MsgSuccess('保存成功')

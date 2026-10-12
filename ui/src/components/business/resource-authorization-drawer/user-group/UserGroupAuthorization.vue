@@ -22,7 +22,7 @@ const emit = defineEmits<{ configure: [subjectIds: string[], permission?: Resour
 /* 根目录不提供“不授权”，按“查看”展示接口返回的该权限。 */
 const canSelectNotAuth = computed(() => props.permissionOptions.some(({ value }) => value === RESOURCE_PERMISSION.NOT_AUTH))
 
-/* 查询与跨页选择 */
+/* 查询与当前页选择 */
 const searchFields = [{ label: '名称', value: 'name' }]
 const loading = ref(false)
 const permissionGroups = ref<ResourceUserGroupPermission[]>([])
@@ -116,7 +116,7 @@ onMounted(() => loadPermissions())
       @size-change="loadPermissions"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="40" reserve-selection />
+      <el-table-column type="selection" width="40" />
       <el-table-column prop="name" label="用户组" min-width="160" show-overflow-tooltip />
       <el-table-column label="成员数" min-width="100">
         <template #default="{ row }">

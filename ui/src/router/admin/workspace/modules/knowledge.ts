@@ -15,6 +15,12 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
         meta: { title: '知识库列表', hidden: true },
       },
       {
+        path: ':knowledgeId/:type/document/:documentId',
+        name: 'workspace-knowledge-paragraph',
+        component: () => import('@/views/knowledge-detail/paragraph/index.vue'),
+        meta: { title: '文档分段', hidden: true, resourceDetailRoot: true },
+      },
+      {
         path: ':knowledgeId/:type',
         name: 'workspace-knowledge-detail',
         component: () => import('@/views/knowledge-detail/index.vue'),
@@ -50,7 +56,17 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
           {
             path: 'workflow-entry',
             name: 'workspace-knowledge-workflow',
-            redirect: (to) => ({ name: 'workflow-knowledge', params: { workspaceId: to.params.workspaceId, knowledgeId: to.params.knowledgeId } }),
+            component: () => import('@/views/knowledge-detail/workflow-transform/index.vue'),
+            beforeEnter: (to) => {
+              if (to.params.type === KNOWLEDGE_TYPE_KEY.WORKFLOW) {
+                return {
+                  name: 'workflow-knowledge',
+                  params: { workspaceId: to.params.workspaceId, knowledgeId: to.params.knowledgeId },
+                  query: to.query,
+                  hash: to.hash,
+                }
+              }
+            },
             meta: { title: '工作流', icon: 'icon_ticket-flow_outlined', order: 20 },
           },
           {
