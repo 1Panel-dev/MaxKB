@@ -101,7 +101,7 @@ class KnowledgeWorkflowUploadDocumentView(APIView):
                     "workspace_id": workspace_id,
                     "knowledge_id": knowledge_id,
                 }
-            ).upload_document(request.data, request.user, True)
+            ).upload_document(request.data, request.user.profile, True)
         )
 
 

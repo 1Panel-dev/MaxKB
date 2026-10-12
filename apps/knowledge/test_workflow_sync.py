@@ -4,6 +4,8 @@ from unittest.mock import MagicMock, patch
 
 from django.test import SimpleTestCase
 
+from common.auth.struct.auth import Principal
+from common.constants.authentication_type import UserType
 from knowledge.models import (
     Document,
     DocumentResourceType,
@@ -25,6 +27,7 @@ from knowledge.models import KnowledgeSyncLog, KnowledgeSyncStatus
 from knowledge.models.knowledge_action import State
 from knowledge.serializers.knowledge_sync import KnowledgeSyncLogSerializer
 from knowledge.task.sync import scheduled_sync_workflow_knowledge
+from knowledge.views.knowledge_workflow import KnowledgeWorkflowUploadDocumentView
 
 
 class WorkflowSourceMetaTests(SimpleTestCase):
@@ -351,6 +354,24 @@ class WorkflowActionSourceTests(SimpleTestCase):
         )
         heartbeat_patch.start()
         self.addCleanup(heartbeat_patch.stop)
+
+    def test_upload_view_passes_authenticated_profile_to_workflow(self):
+        user = SimpleNamespace(id="user", username="user")
+        request = SimpleNamespace(
+            user=Principal(user.id, UserType.SYSTEM_USER, user),
+            data={"data_source": {"node_id": "source", "file_list": [{"token": "remote"}]}},
+        )
+        with (
+            patch("common.auth.authentication._build") as permissions,
+            patch("knowledge.views.knowledge_workflow.KnowledgeWorkflowActionSerializer") as serializer,
+        ):
+            permissions.return_value.hasPermission.return_value = True
+            serializer.return_value.upload_document.return_value = {"id": "action"}
+            response = KnowledgeWorkflowUploadDocumentView().post(
+                request, workspace_id="workspace", knowledge_id="knowledge"
+            )
+            self.assertEqual(response.status_code, 200)
+            serializer.return_value.upload_document.assert_called_once_with(request.data, user, True)
 
     @patch("knowledge.serializers.knowledge_workflow.KnowledgeAction")
     @patch("knowledge.serializers.knowledge_workflow.QuerySet")
