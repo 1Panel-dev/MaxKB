@@ -31,6 +31,13 @@ function handleOpenKnowledge(knowledge: KnowledgeItem) {
   })
 }
 
+function handleOpenKnowledgeSetting(knowledge: KnowledgeItem) {
+  void router.push({
+    name: knowledge.type === KNOWLEDGE_TYPE.BASE ? 'system-shared-knowledge-setting' : 'system-shared-knowledge-base-setting',
+    params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
+  })
+}
+
 /* 共享知识库查询 */
 const knowledgeData = ref<KnowledgeItem[]>([])
 const knowledgeQuery = ref<Dict<unknown>>()
@@ -114,6 +121,11 @@ function handleSearchChange(query?: Dict<unknown>) {
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                   />
+                  <!-- 设置 -->
+                  <MkDropdownItem @click.stop="handleOpenKnowledgeSetting(knowledge)">
+                    <template #icon><MkIcon name="icon_setting" /></template>
+                    设置
+                  </MkDropdownItem>
                   <!-- 分词索引 -->
                   <KeywordIndexKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"

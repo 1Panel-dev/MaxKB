@@ -20,7 +20,6 @@ import {
   KeywordIndexKnowledgeAction,
   McpConfigKnowledgeAction,
   RelatedResourcesKnowledgeAction,
-  SettingKnowledgeAction,
   SyncKnowledgeAction,
 } from '@/views/knowledge/knowledge-card/action-dropdown/index.ts'
 
@@ -31,6 +30,13 @@ const router = useRouter()
 function handleOpenKnowledge(knowledge: KnowledgeItem) {
   void router.push({
     name: 'system-resource-knowledge-detail',
+    params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
+  })
+}
+
+function handleOpenKnowledgeSetting(knowledge: KnowledgeItem) {
+  void router.push({
+    name: knowledge.type === KNOWLEDGE_TYPE.BASE ? 'system-resource-knowledge-setting' : 'system-resource-knowledge-base-setting',
     params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
   })
 }
@@ -157,6 +163,8 @@ onMounted(() => {
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
+              <!-- 进入知识库详情 -->
+              <MkAction display="button" label="管理" icon="icon_admin_outlined" @click="handleOpenKnowledge(row)" />
               <!-- 向量化 -->
               <EmbeddingKnowledgeAction
                 v-model:loading="knowledgeOperationLoading"
@@ -165,8 +173,6 @@ onMounted(() => {
                 :api="SystemResourceKnowledgeApi"
                 :knowledge="row"
               />
-              <!-- 进入知识库详情 -->
-              <MkAction display="button" label="知识库详情" icon="icon_admin_outlined" @click="handleOpenKnowledge(row)" />
               <MkTableMoreDropdown>
                 <!-- 同步 Web 知识库 -->
                 <SyncKnowledgeAction
@@ -184,7 +190,10 @@ onMounted(() => {
                   :knowledge="row"
                 />
                 <!-- 设置 -->
-                <SettingKnowledgeAction label="设置" :knowledge="row" />
+                <MkDropdownItem @click.stop="handleOpenKnowledgeSetting(row)">
+                  <template #icon><MkIcon name="icon_setting" /></template>
+                  设置
+                </MkDropdownItem>
                 <!-- 分词索引 -->
                 <KeywordIndexKnowledgeAction
                   v-model:loading="knowledgeOperationLoading"
