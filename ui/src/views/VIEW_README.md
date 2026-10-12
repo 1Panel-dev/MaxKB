@@ -1195,6 +1195,8 @@ Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `bod
 `views/workflow/knowledge/debug/action/` 的 DataSource、KnowledgeBase 和 Result，
 有知识库用户输入字段时显示第二步；通过正式 `/upload_document` 接口执行已发布工作流。
 上传提供临时文件、进度及取消能力，上传中阻止切换或提交，失败文件不提交；
+`file_id` 与上传成功状态校验仅用于本地文件数据源；飞书等工具数据源的 `file_list`
+保留远程文件或文件夹选择值，由后端工具负责下载，不要求本地上传 ID。
 继续导入重建 Action 并清空载荷，提交及完成后通知列表刷新。不新增权限判断。
 飞书扩展接口沿用 v2；当前仓库缺少 v3 飞书后端，新增的每文件 `doc_strategy` 字段需扩展端联调确认。
 

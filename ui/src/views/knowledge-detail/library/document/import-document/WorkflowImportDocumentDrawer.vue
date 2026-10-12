@@ -66,7 +66,9 @@ function open(workflow?: LogicFlow.GraphConfigData) {
 }
 function getActionData() {
   const data = actionRef.value?.getData() ?? {}
-  if (Array.isArray(data.file_list)) {
+  const sourceNode = currentWorkflow.value?.nodes?.find((node) => node.id === data.node_id)
+  // 本地上传校验 file_id；工具数据源的 file_list 保留远程文件选择协议。
+  if (sourceNode?.type === WorkflowNodeType.DataSourceLocalNode && Array.isArray(data.file_list)) {
     const successfulFiles = data.file_list.filter((file) => file.file_id && (!file.status || file.status === 'success'))
     data.file_list = successfulFiles
     if (!successfulFiles.length) {
