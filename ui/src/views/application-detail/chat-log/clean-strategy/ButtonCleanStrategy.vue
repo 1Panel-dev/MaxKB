@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
+import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import CleanStrategyDialog from './CleanStrategyDialog.vue'
 
 defineOptions({ name: 'ButtonCleanStrategy' })
 
-const props = defineProps<{ applicationId: string }>()
+const props = defineProps<{ api: typeof ChatLogApi; applicationId: string }>()
 const dialogRef = useTemplateRef<InstanceType<typeof CleanStrategyDialog>>('dialogRef')
 
 function handleOpenDialog() {
@@ -18,5 +19,5 @@ function handleOpenDialog() {
     <MkIcon name="icon_clear_outlined" />
     <span>清除策略</span>
   </el-button>
-  <CleanStrategyDialog ref="dialogRef" :application-id="props.applicationId" />
+  <CleanStrategyDialog :api="props.api" ref="dialogRef" :application-id="props.applicationId" />
 </template>

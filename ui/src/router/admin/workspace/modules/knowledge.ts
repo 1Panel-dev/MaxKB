@@ -14,12 +14,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/knowledge/index.vue'),
         meta: { title: '知识库列表', hidden: true },
       },
-      {
-        path: ':knowledgeId/:type/document/:documentId',
-        name: 'workspace-knowledge-paragraph',
-        component: () => import('@/views/knowledge-detail/paragraph/index.vue'),
-        meta: { title: '文档分段', hidden: true, resourceDetailRoot: true },
-      },
+
       {
         path: ':knowledgeId/:type',
         name: 'workspace-knowledge-detail',
@@ -161,6 +156,12 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             ],
           },
         ],
+      },
+      {
+        path: ':knowledgeId/:type/document/:documentId',
+        name: 'workspace-knowledge-paragraph',
+        component: () => import('@/views/knowledge-detail/paragraph/index.vue'),
+        meta: { title: '文档分段', hidden: true, resourceDetailRoot: true },
       },
     ],
   },

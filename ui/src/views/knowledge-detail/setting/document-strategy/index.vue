@@ -49,7 +49,9 @@ defineExpose({ customHeader: true })
   <Teleport v-if="headerTarget" :to="headerTarget">
     <div class="flex-align-center flex-wrap gap-2">
       <h4>{{ title }}</h4>
-      <span class="text-N600">同步知识库时若有新的 URL 按该策略执行，策略变更后下次同步知识库时生效</span>
+      <MkTooltip content="同步知识库时若有新的 URL 按该策略执行，策略变更后下次同步知识库时生效" placement="right">
+        <MkIcon name="icon_info_outlined" class="text-N600!" />
+      </MkTooltip>
     </div>
   </Teleport>
   <div v-loading="saving" class="max-w-200">

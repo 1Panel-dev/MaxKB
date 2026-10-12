@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import type { KnowledgeWorkflowAction } from '@/api/types'
 import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
@@ -48,7 +48,7 @@ function startPolling() {
   pollingTimer = setTimeout(pollAction, 0)
 }
 
-watch(() => props.actionId, startPolling, { immediate: true })
+onMounted(startPolling)
 
 onUnmounted(stopPolling)
 </script>

@@ -62,7 +62,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="文档迁移到" @closed="emit('closed')">
+  <MkDialog v-model="visible" title="迁移至" @closed="emit('closed')">
     <el-form ref="migrateFormRef" :model="migrateForm" :rules="migrateRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="选择知识库" prop="targetKnowledgeId">
         <el-select v-model="migrateForm.targetKnowledgeId" fit-input-width filterable placeholder="请选择知识库" :loading="optionLoading">

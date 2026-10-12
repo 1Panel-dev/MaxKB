@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref } from 'vue'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
 import type { ChatUserSyncConflict, ListItem, LoginMethod, RoleType, SystemUserGroup } from '@/api/types'
@@ -100,14 +100,14 @@ function loadWorkspaceOptions() {
   workspaceLoading.value = true
   if (!auth.isEE) {
     workspaceOptions.value = [{ id: DEFAULT_WORKSPACE_ID, name: '默认工作空间' }]
-    importUsersForm.workspaceId ||= DEFAULT_WORKSPACE_ID
+    handleWorkspaceChange(importUsersForm.workspaceId || DEFAULT_WORKSPACE_ID)
     workspaceLoading.value = false
     return Promise.resolve()
   }
   return CurrentUserApi.getCurrentUserWorkspaceList()
     .then((workspaces) => {
       workspaceOptions.value = workspaces
-      importUsersForm.workspaceId ||= workspaces[0]?.id || ''
+      handleWorkspaceChange(importUsersForm.workspaceId || workspaces[0]?.id || '')
     })
     .finally(() => {
       workspaceLoading.value = false
@@ -129,21 +129,19 @@ function loadUserGroupOptions() {
     })
 }
 
-watch(
-  () => importUsersForm.workspaceId,
-  (workspaceId) => {
-    if (workspaceId) {
-      importUsersForm.userGroupIds = []
-      loadUserGroupOptions()
-    }
-  },
-)
-
 /* 导入用户表单联动 */
+function handleWorkspaceChange(workspaceId: string) {
+  if (workspaceId === importUsersForm.workspaceId) return
+  importUsersForm.workspaceId = workspaceId
+  importUsersForm.userGroupIds = []
+  userGroupOptions.value = []
+  void loadUserGroupOptions()
+}
+
 function handleSourceChange(source: ImportUserSource | '') {
   if (source && !importUsersForm.role) {
     importUsersForm.role = ROLE_TYPE.USER
-    importUsersForm.workspaceId = workspaceOptions.value[0]?.id || DEFAULT_WORKSPACE_ID
+    handleWorkspaceChange(workspaceOptions.value[0]?.id || DEFAULT_WORKSPACE_ID)
   }
   if (source !== LOCAL_FILE_SOURCE) {
     importUsersForm.files = []
@@ -154,10 +152,10 @@ function handleSourceChange(source: ImportUserSource | '') {
 
 function handleRoleChange(role: RoleType | '') {
   if (role === ROLE_TYPE.ADMIN) {
-    importUsersForm.workspaceId = ''
+    handleWorkspaceChange('')
     importUsersForm.userGroupIds = []
   } else if (role) {
-    importUsersForm.workspaceId ||= workspaceOptions.value[0]?.id || DEFAULT_WORKSPACE_ID
+    handleWorkspaceChange(importUsersForm.workspaceId || workspaceOptions.value[0]?.id || DEFAULT_WORKSPACE_ID)
     if (role !== ROLE_TYPE.USER) importUsersForm.userGroupIds = []
   }
   nextTick(() => importUsersFormRef.value?.clearValidate(['role', 'workspaceId']))
@@ -266,7 +264,10 @@ defineExpose({ open })
       <el-form-item v-if="isLocalFileSource" prop="files" :required="false">
         <template #label>
           <div class="flex-between w-full">
-            <span>上传文件<span class="ml-1 text-danger">*</span></span>
+            <span>
+              上传文件
+              <span class="ml-1 text-danger">*</span>
+            </span>
             <el-button link type="primary" @click="handleDownloadTemplate">下载模板</el-button>
           </div>
         </template>
@@ -287,7 +288,12 @@ defineExpose({ open })
       </el-form-item>
 
       <el-form-item v-if="showWorkspace" label="工作空间" prop="workspaceId">
-        <el-select v-model="importUsersForm.workspaceId" :loading="workspaceLoading" placeholder="请选择工作空间">
+        <el-select
+          :model-value="importUsersForm.workspaceId"
+          :loading="workspaceLoading"
+          placeholder="请选择工作空间"
+          @change="handleWorkspaceChange"
+        >
           <el-option
             v-for="workspaceOption in workspaceOptions"
             :key="workspaceOption.id"

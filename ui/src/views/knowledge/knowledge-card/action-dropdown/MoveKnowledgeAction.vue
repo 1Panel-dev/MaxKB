@@ -34,7 +34,7 @@ function handleMoveKnowledge(targetFolderId: string) {
       loading.value = false
     })
     .then(() => {
-      MsgSuccess('转移成功')
+      MsgSuccess('移动成功')
       moveToDialogRef.value?.close()
       emit('move', props.knowledge.id, targetFolderId)
       if (props.currentFolderId !== FOLDER_ENTRY_ID.ALL && props.currentFolderId !== targetFolderId) emit('delete', props.knowledge.id)

@@ -566,7 +566,20 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 `workspace/knowledge/paragraph.ts` 维护普通 Workspace 文档分段接口，前缀为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<documentId>/paragraph`。
 `getParagraphList` 查询完整分段列表，支持 `title`、`content`，服务端按 `position`、创建时间排序；
-`postParagraph` 提交 `title`、`content`、`is_active`，返回新增分段，默认插入首位并触发索引。
+`postParagraph` 提交 `title`、`content`、`is_active` 和可选的 `problem_list: [{ content }]`，
+返回新增分段详情，默认插入首位并触发索引。
+`getParagraphDetail` 查询 `/<paragraphId>`，返回 `ParagraphDetail`，包含 `problem_list`、
+`hit_num` 和 `last_hit_time`。`putParagraph` 向同一路径提交标题和正文，解包后端三元素编辑响应的
+首项为最新详情；不提交 `problem_list`，关联关系通过专属接口维护。
+`postParagraphProblem` 向 `/<paragraphId>/problem` 提交 `{ content }`，创建或复用问题并关联分段；
+`putUnassociateParagraphProblem` PUT 到 `/unassociation`，以查询参数传递 `paragraph_id`、
+`problem_id`，不传请求体，仅解除当前分段的关联。
+`putMigrateParagraphs` 向分段前缀下的 `/migrate/knowledge/<targetKnowledgeId>/document/<targetDocumentId>`
+提交 PUT `{ id_list }`，将所选分段迁移到目标文档；目标不能为当前文档。
+`putGenerateParagraphQuestions` 向分段前缀下的 `/batch_generate_related` 提交 PUT
+`ParagraphGeneratePayload`，包含生成配置与 `paragraph_id_list`，不包含 `state_list`。
+`putBatchDeleteParagraphs` 向分段前缀下的 `/batch_delete` 提交 PUT `{ id_list }`，
+删除所选分段并由服务端清理关联问题、映射及索引。
 响应及载荷类型维护在 `types/paragraph.ts`，通过 `@/api/types` 导入。
 标题最多 256 字符，内容必填且最多 102400 字符；loading、弹窗和成功后刷新由页面维护。
 本次只接入普通 Workspace，不为其他范围推测接口或回退 Workspace。
@@ -643,7 +656,7 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 `DocumentTaskState` 和 `DocumentTaskType` 从文档枚举派生，统一从 `@/api/types` 导入。
 启用状态传布尔值，`false` 不省略；单选全部时省略该字段。`tags` 传数组，沿用 Axios 的
 `tags[]` 序列化，内容为标签 ID 或特殊值 `NO_TAG`，不传标签名称或 JSON 字符串。
-`workspace/knowledge/knowledge.ts` 和 `workspace/shared/knowledge/knowledge.ts` 的
+`workspace/knowledge/tags.ts` 和 `workspace/shared/knowledge/tags.ts` 的
 `getKnowledgeTags(knowledgeId)` 分别请求对应资源前缀的 `/<knowledgeId>/tags`，返回
 `KnowledgeTagGroup[]`；页面将分组转换为级联选项，MkTableFilter 内部展开父组并去重，页面直接用组件返回的叶子标签 ID 数组查询。
 文档页传 `resource_type: 'document'`，创建者选项复用 Workspace `common.ts` 的 `getAllUsers`。
@@ -651,9 +664,9 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 
 ### 知识库标签与文档关联
 
-`workspace/knowledge/tags.ts` 维护标签创建、编辑和删除，前缀为
+`workspace/knowledge/tags.ts` 维护标签查询、创建、编辑和删除，前缀为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/tags`，工作空间由 `getWorkspaceId()` 读取。
-标签查询暂保留在 `workspace/knowledge/knowledge.ts`，`getKnowledgeTags(knowledgeId)` 返回非分页 `KnowledgeTagGroup[]`；
+`getKnowledgeTags(knowledgeId)` 返回非分页 `KnowledgeTagGroup[]`；
 标签值中的可选 `doc_count` 表示关联文档数量。`postKnowledgeTags` 直接提交
 `KnowledgeTagPayload[]`（`key`、`value`），用于创建标签和新增标签值；
 `putKnowledgeTag` 向 `/<tagId>` 提交完整 `KnowledgeTagUpdatePayload`（`id`、`key`、`value`），
@@ -692,6 +705,10 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 共享与普通知识库文档查询统一使用 `ParamsPage`、`ResponsePage<DocumentItem>` 和 `Dict<unknown>`，
 不传 loading，不保留 v2 的 `Result` 或下划线分页参数。两个文件各自默认导出 API 对象。
 
+`workspace/shared/knowledge/tags.ts` 提供只读的 `getKnowledgeTags(knowledgeId)`，
+请求 `/system/shared/workspace/<workspaceId>/knowledge/<knowledgeId>/tags`，返回 `KnowledgeTagGroup[]`。
+与普通工作空间标签 API 同时使用时，分别导入为 `SharedTagsApi` 与 `TagsApi`。
+
 共享知识库 `getKnowledgeDetail(knowledgeId)` 请求知识库资源 `/<knowledgeId>`，返回 `KnowledgeDetail`。
 
 Workspace 共享知识库详情由 `resourceScope: 'workspace-shared'` 选择上述完整共享 API 对象；
@@ -715,7 +732,10 @@ Workspace 共享知识库详情由 `resourceScope: 'workspace-shared'` 选择上
 日志业务类型经 `@/api/types` 导出，来源枚举经 `@/api/enums` 导出，loading 由调用方维护。
 清除策略通过 PUT `batch_clean_time` 提交当前智能体的单元素 `id_list`、`clean_time`、
 `file_clean_time`，避免调用通用应用编辑流程；成功后页面刷新应用详情。
-聊天记录、标注、添加知识库接口保留在同一 API 文件，尚未接入本次日志列表页面。
+添加知识库通过 POST `/<applicationId>/add_knowledge` 提交 `ChatLogAddKnowledgePayload`
+（`knowledge_id`、`document_id`、`chat_ids`），将所选对话的问答写入目标文档。
+目标文档选项通过 `workspace/knowledge/document.ts` 的 `getAllDocuments(knowledgeId)`
+请求不分页的文档列表。聊天记录与标注接口保留在同一 API 文件，尚未接入日志详情正文。
 
 Web 知识库创建的 `WebKnowledgeCreatePayload.doc_strategy` 使用公共 `DocumentStrategy` 类型，
 包含 `split`、`visual` 和 `index`，字段与后端文档处理策略协议一致。

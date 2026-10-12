@@ -3,7 +3,6 @@ import type LogicFlow from '@logicflow/core'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   Dict,
-  KnowledgeTagGroup,
   KnowledgeDetail,
   KnowledgeItem,
   KnowledgeGeneratePayload,
@@ -89,7 +88,7 @@ const putBatchDeleteKnowledge = (knowledgeIds: string[]) => {
   return put<{ id_list: string[] }, boolean>(`${getPrefix()}/batch_delete`, { id_list: knowledgeIds })
 }
 
-/** 批量转移工作空间知识库。 */
+/** 批量移动工作空间知识库。 */
 const putBatchMoveKnowledge = (knowledgeIds: string[], folderId: string) => {
   return put<{ id_list: string[]; folder_id: string }, boolean>(`${getPrefix()}/batch_move`, { id_list: knowledgeIds, folder_id: folderId })
 }
@@ -130,13 +129,7 @@ const putKnowledgeKeywordIndex = (knowledgeId: string) => put<undefined, void>(`
 const postTransformWorkflow = (knowledgeId: string, payload: { work_flow: LogicFlow.GraphConfigData }) =>
   post<{ work_flow: LogicFlow.GraphConfigData }, boolean>(`${getPrefix()}/${knowledgeId}/transform_workflow`, payload)
 
-/** 获取知识库按标签名称分组的标签选项。 */
-
-// TODO
-const getKnowledgeTags = (knowledgeId: string) => get<KnowledgeTagGroup[]>(`${getPrefix()}/${knowledgeId}/tags`)
-
 export default {
-  getKnowledgeTags,
   getKnowledgeMcpConfig,
   putKnowledgeKeywordIndex,
   exportKnowledgeExcel,

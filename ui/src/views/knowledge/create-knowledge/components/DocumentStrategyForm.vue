@@ -225,11 +225,15 @@ defineExpose({ validate, getStrategy, setStrategy })
                   class="w-full!"
                 />
               </el-form-item>
-              <el-form-item label="自动清洗" class="mb-0!">
-                <div>
-                  <el-switch v-model="strategy.split.auto_clean" />
-                  <p class="text-N600">去掉重复多余符号空格、空行、制表符</p>
-                </div>
+              <el-form-item class="mb-0!">
+                <template #label>
+                  <span class="flex-align-center">
+                    <span>自动清洗</span>
+                    <span class="text-N600">（去掉重复多余符号空格、空行、制表符）</span>
+                  </span>
+                </template>
+
+                <el-switch v-model="strategy.split.auto_clean" />
               </el-form-item>
             </div>
           </template>

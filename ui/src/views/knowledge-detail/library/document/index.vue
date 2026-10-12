@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { CascaderOption, TableColumnCtx, TableInstance } from 'element-plus'
+import type { CascaderOption, TableColumnCtx } from 'element-plus'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import MkEditName from '@/components/mk-edit-name/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
+import TagsApi from '@/api/admin/workspace/knowledge/tags'
+import SharedTagsApi from '@/api/admin/workspace/shared/knowledge/tags'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import { DOCUMENT_TASK_TYPE } from '@/api/enums'
@@ -24,7 +24,7 @@ import { MsgSuccess } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
 import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
-import ExecutionRecordDrawer from '@/views/workflow/knowledge/execution-record/ExecutionRecordDrawer.vue'
+import ButtonExecutionRecord from './components/ButtonExecutionRecord.vue'
 import { useKnowledgeDetailContext } from '../../context'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
@@ -59,25 +59,15 @@ const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const knowledgeType = computed(() => String(route.params.type ?? ''))
 const { knowledge } = useKnowledgeDetailContext()
 
-/* 工作流执行记录：复用知识库工作流抽屉，关闭动画结束后卸载。 */
-const executionRecordDrawerMounted = ref(false)
-const executionRecordDrawerRef = useTemplateRef<InstanceType<typeof ExecutionRecordDrawer>>('executionRecordDrawerRef')
-
-function handleOpenExecutionRecords() {
-  if (executionRecordDrawerMounted.value) return
-  executionRecordDrawerMounted.value = true
-  return nextTick(() => executionRecordDrawerRef.value?.open())
-}
-
 /* 文档分段入口：选择列与行内操作继续处理自身交互。 */
-// function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<DocumentItem>) {
-//   if (!isWorkspaceResource() || loading.value || operationLoading.value || column?.type === 'selection') return
-//   void router.push({
-//     name: 'workspace-knowledge-paragraph',
-//     params: { workspaceId: route.params.workspaceId, knowledgeId: knowledgeId.value, type: knowledgeType.value, documentId: document.id },
-//     query: route.query,
-//   })
-// }
+function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<DocumentItem> | null) {
+  if (loading.value || operationLoading.value || column?.type === 'selection') return
+  void router.push({
+    name: 'workspace-knowledge-paragraph',
+    params: { workspaceId: route.params.workspaceId, knowledgeId: knowledgeId.value, type: knowledgeType.value, documentId: document.id },
+    query: route.query,
+  })
+}
 
 /* 快速创建 */
 const showQuickCreate = computed(() => knowledgeType.value === KNOWLEDGE_TYPE_KEY.BASE && !isWorkspaceSharedResource())
@@ -90,6 +80,7 @@ function handleCreateDocument(name: string) {
       // 创建成功即清理草稿，后续刷新失败不恢复为可重复提交的输入。
       quickCreateRef.value?.close()
       MsgSuccess('创建成功')
+      clearDocumentSelection()
       paginationConfig.value.currentPage = 1
       return loadDocuments()
     })
@@ -163,7 +154,7 @@ function loadDocumentTagOptions() {
   // 加载成功后至少有“无标签”选项，无需额外维护 loaded 状态。
   if (documentTagLoading.value || documentTagOptions.value.length) return
   documentTagLoading.value = true
-  const requestApi = isWorkspaceSharedResource() ? SharedKnowledgeApi : KnowledgeApi
+  const requestApi = isWorkspaceSharedResource() ? SharedTagsApi : TagsApi
   return requestApi
     .getKnowledgeTags(knowledgeId.value)
     .then((groups) => {
@@ -225,20 +216,12 @@ function loadDocuments(showLoading = true): Promise<void> {
     })
     .then((page) => {
       if (!pollingActive) return
-      // 静默轮询只恢复当前页仍存在的勾选；分页查询由表格清空选择。
-      const selectedIds = showLoading ? [] : selectedDocumentIds.value
       documentData.value = page.records
-      if (selectedIds.length) {
-        void nextTick(() => {
-          documentData.value.forEach((document) => {
-            if (selectedIds.includes(document.id)) documentTableRef.value?.tableRef?.toggleRowSelection(document, true)
-          })
-        })
-      }
       paginationConfig.value.total = page.total
       // 删除或迁移最后一页文档后，回到仍有数据的最后一页。
       const lastPage = Math.max(1, Math.ceil(page.total / paginationConfig.value.pageSize))
       if (paginationConfig.value.currentPage > lastPage) {
+        clearDocumentSelection()
         paginationConfig.value.currentPage = lastPage
         return loadDocuments(showLoading)
       }
@@ -266,7 +249,7 @@ function handleImportDocumentSuccess() {
 }
 
 /* 批量操作 */
-const documentTableRef = ref<{ clearSelection: () => void; tableRef?: TableInstance }>()
+const documentTableRef = ref<{ clearSelection: () => void }>()
 const selectedDocuments = ref<DocumentItem[]>([])
 const selectedDocumentIds = computed(() => selectedDocuments.value.map(({ id }) => id))
 
@@ -318,25 +301,13 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <ExecutionRecordDrawer
-    v-if="executionRecordDrawerMounted"
-    ref="executionRecordDrawerRef"
-    :api="WorkflowApi"
-    :knowledge-id="knowledgeId"
-    @closed="executionRecordDrawerMounted = false"
-  />
   <Teleport v-if="headerTarget" :to="headerTarget">
     <div class="flex-between w-full gap-4">
       <h4>{{ title }}</h4>
       <div class="flex-align-center gap-3">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
         <!-- 查看工作流执行记录 -->
-        <span>
-          <el-button plain v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW" @click="handleOpenExecutionRecords">
-            <MkIcon name="icon_schedule-report_outlined" />
-            <span>执行记录</span>
-          </el-button>
-        </span>
+        <ButtonExecutionRecord v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW" :api="WorkflowApi" :knowledge-id="knowledgeId" />
 
         <!-- 导入 Web、飞书或工作流文档 -->
         <ButtonImportDocument
@@ -369,6 +340,7 @@ onBeforeUnmount(() => {
     @current-change="loadDocuments()"
     @size-change="loadDocuments()"
     @selection-change="handleSelectionChange"
+    @row-click="handleOpenParagraph"
     row-class-name="cursor-pointer"
     resizable
   >
@@ -377,7 +349,7 @@ onBeforeUnmount(() => {
       <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
     </template>
 
-    <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" />
+    <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" reserve-selection />
 
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip>
       <template #default="{ row }: { row: DocumentItem }">
@@ -620,7 +592,7 @@ onBeforeUnmount(() => {
       />
 
       <!-- // TODO 批量添加标签 -->
-      <!-- <el-button>添加标签</el-button> -->
+      <el-button>添加标签</el-button>
 
       <!-- 更多批量操作 -->
       <MkDropdown class="ml-3" trigger="click" placement="bottom-end" hide-when-empty persistent>
@@ -642,7 +614,7 @@ onBeforeUnmount(() => {
             />
             <!-- 批量迁移文档 -->
             <MigrateDocumentAction
-              label="迁移"
+              label="迁移至"
               :api="DocumentApi"
               :knowledge-id="knowledgeId"
               :document-ids="selectedDocumentIds"

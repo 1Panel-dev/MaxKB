@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action, UploadFile, UploadInstance } from 'element-plus'
@@ -180,19 +180,20 @@ function handlePreviewVersion(version: WorkflowVersion) {
   nextTick(() => workflowRef.value?.fitView())
 }
 
-// 所有退出入口统一通过显隐状态清理预览；恢复版本时提前清空草稿快照。
-watch(historyVisible, (visible) => {
+// 抽屉显隐和页面返回统一处理预览；恢复版本时提前清空草稿快照。
+function handleHistoryVisibleChange(visible: boolean) {
+  historyVisible.value = visible
   if (visible) return
   if (workflowBeforePreview) workflowRef.value?.render(cloneDeep(workflowBeforePreview))
   workflowBeforePreview = undefined
   previewVersion.value = undefined
-})
+}
 
 function handleRestoreVersion(version = previewVersion.value) {
   if (!version || loading.value) return
   workflowRef.value?.render(cloneDeep(version.work_flow))
   workflowBeforePreview = undefined
-  historyVisible.value = false
+  handleHistoryVisibleChange(false)
   nextTick(() => workflowRef.value?.fitView())
 }
 
@@ -330,7 +331,7 @@ function loadKnowledgeWorkflow() {
 function handleBack() {
   if (loading.value) return
   if (historyVisible.value) {
-    historyVisible.value = false
+    handleHistoryVisibleChange(false)
     return
   }
   if (!hasUnsavedChanges()) {
@@ -445,7 +446,8 @@ onBeforeUnmount(stopAutoSave)
             <ButtonExecutionRecord divided :knowledge-id="knowledgeId" />
             <!-- 发布历史 -->
             <ButtonPublishHistory
-              v-model:visible="historyVisible"
+              :visible="historyVisible"
+              @update:visible="handleHistoryVisibleChange"
               :knowledge-id="knowledgeId"
               :selected-id="previewVersion?.id"
               :disabled="loading"

@@ -170,7 +170,7 @@ function handleBatchMove(targetFolderId: string) {
   knowledgeOperationLoading.value = true
   return KnowledgeApi.putBatchMoveKnowledge(knowledgeIds, targetFolderId)
     .then(() => {
-      MsgSuccess('转移成功')
+      MsgSuccess('移动成功')
       batchMoveToDialogRef.value?.close()
       cancelBatchSelection()
       return refreshKnowledge()
@@ -297,10 +297,10 @@ function handleBatchDelete() {
 
                   <!-- 查看关联资源 -->
                   <RelatedResourcesKnowledgeAction label="查看关联资源" :api="RelatedResourcesApi" :knowledge="knowledge" />
-                  <!-- 转移到 -->
+                  <!-- 移动到 -->
                   <MoveKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="转移到"
+                    label="移动到"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                     :current-folder-id="currentFolder.id"
@@ -336,7 +336,7 @@ function handleBatchDelete() {
       >
         <template #footer-batch-actions>
           <el-button type="primary" plain :disabled="knowledgeOperationLoading || !selectedKnowledgeCount" @click="handleOpenBatchMove">
-            转移到
+            移动到
           </el-button>
           <el-button type="danger" plain :disabled="knowledgeOperationLoading || !selectedKnowledgeCount" @click="handleBatchDelete">删除</el-button>
         </template>

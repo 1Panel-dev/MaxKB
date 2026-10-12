@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import SystemHomepageApi from '@/api/admin/system/homepage'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
@@ -22,12 +22,16 @@ function loadWorkspaceOptions() {
   return WorkspaceApi.getSystemWorkspaceList().then((workspaces) => {
     workspaceOptions.value = [{ name: '全部空间', id: ALL_WORKSPACES } as WorkspaceItem, ...workspaces]
     if (!workspaceOptions.value.some(({ id }) => id === selectedWorkspaceId.value)) {
-      selectedWorkspaceId.value = workspaceOptions.value[0]?.id ?? ALL_WORKSPACES
+      handleWorkspaceChange(workspaceOptions.value[0]?.id ?? ALL_WORKSPACES)
     }
   })
 }
-function handleWorkspaceSelect(workspace: WorkspaceItem) {
-  selectedWorkspaceId.value = workspace.id ?? ALL_WORKSPACES
+function handleWorkspaceChange(workspaceId: string) {
+  if (workspaceId === selectedWorkspaceId.value) return
+  selectedWorkspaceId.value = workspaceId
+  applicationId.value = 'all'
+  applications.value = []
+  selectedApplication.value = undefined
 }
 
 /* 监控智能体筛选 */
@@ -39,10 +43,7 @@ async function fetchApplications(query: string) {
   applicationsLoading.value = true
   const workspaceFilter = selectedWorkspaceId.value ? { workspace_ids: JSON.stringify([selectedWorkspaceId.value]) } : {}
   try {
-    const result = await SystemApplicationApi.getApplicationPage(
-      { currentPage: 1, pageSize: 200 },
-      { name: query, ...workspaceFilter },
-    )
+    const result = await SystemApplicationApi.getApplicationPage({ currentPage: 1, pageSize: 200 }, { name: query, ...workspaceFilter })
     applications.value = result.records
   } finally {
     applicationsLoading.value = false
@@ -64,16 +65,6 @@ function handleApplicationChange(value: string) {
   selectedApplication.value = applications.value.find((application) => application.id === value)
 }
 
-watch(
-  selectedWorkspaceId,
-  () => {
-    applicationId.value = 'all'
-    applications.value = []
-    selectedApplication.value = undefined
-  },
-  { immediate: true },
-)
-
 onMounted(() => {
   if (auth.isEE) {
     loadWorkspaceOptions()
@@ -83,7 +74,7 @@ onMounted(() => {
 <template>
   <MkViewLayout title="">
     <template #top>
-      <WorkspaceDropdown v-model="selectedWorkspaceId" :options="workspaceOptions" @select="handleWorkspaceSelect" />
+      <WorkspaceDropdown :model-value="selectedWorkspaceId" :options="workspaceOptions" @update:model-value="handleWorkspaceChange" />
     </template>
     <!-- 资源 -->
     <h4 class="mb-4 mt-4">资源</h4>

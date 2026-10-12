@@ -22,6 +22,9 @@ import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/document`
 
+/** 获取知识库不分页的文档选项。 */
+const getAllDocuments = (knowledgeId: string) => get<DocumentItem[]>(getPrefix(knowledgeId))
+
 /** 获取文档分页列表，支持名称和创建者筛选。 */
 const getDocumentPage = (knowledgeId: string, page: ParamsPage, query?: Dict<unknown>) =>
   get<ResponsePage<DocumentItem>>(`${getPrefix(knowledgeId)}/${page.currentPage}/${page.pageSize}`, query)
@@ -178,6 +181,7 @@ const putUnlinkTagDocuments = (knowledgeId: string, tagId: string, documentIds: 
   put(`/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/tag/${tagId}/docs_delete`, { id_list: documentIds })
 
 export default {
+  getAllDocuments,
   getDocumentDetail,
   getDocumentTags,
   postAddDocumentTags,

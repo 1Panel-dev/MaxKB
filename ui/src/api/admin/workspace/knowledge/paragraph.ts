@@ -1,5 +1,13 @@
-import { get, post } from '../../core/request'
-import type { ParagraphCreatePayload, ParagraphItem, ParagraphQuery } from '@/api/types'
+import { get, post, put } from '../../core/request'
+import type {
+  ParagraphCreatePayload,
+  ParagraphDetail,
+  ParagraphGeneratePayload,
+  ParagraphItem,
+  ParagraphProblem,
+  ParagraphQuery,
+  ParagraphUpdatePayload,
+} from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string, documentId: string) =>
@@ -11,6 +19,49 @@ const getParagraphList = (knowledgeId: string, documentId: string, query?: Parag
 
 /** 在文档首位新增分段，由服务端触发索引。 */
 const postParagraph = (knowledgeId: string, documentId: string, payload: ParagraphCreatePayload) =>
-  post<ParagraphCreatePayload, ParagraphItem>(getPrefix(knowledgeId, documentId), payload)
+  post<ParagraphCreatePayload, ParagraphDetail>(getPrefix(knowledgeId, documentId), payload)
 
-export default { getParagraphList, postParagraph }
+/** 查询分段正文、召回统计及关联问题。 */
+const getParagraphDetail = (knowledgeId: string, documentId: string, paragraphId: string) =>
+  get<ParagraphDetail>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}`)
+
+/** 保存分段标题和内容，提取后端编辑响应中的最新详情。 */
+const putParagraph = (knowledgeId: string, documentId: string, paragraphId: string, payload: ParagraphUpdatePayload) =>
+  put<ParagraphUpdatePayload, [ParagraphDetail, ParagraphUpdatePayload, string]>(
+    `${getPrefix(knowledgeId, documentId)}/${paragraphId}`,
+    payload,
+  ).then(([paragraph]) => paragraph)
+
+/** 新增问题并关联到当前分段。 */
+const postParagraphProblem = (knowledgeId: string, documentId: string, paragraphId: string, content: string) =>
+  post<{ content: string }, ParagraphProblem>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}/problem`, { content })
+
+/** 解除当前分段的问题关联，保留问题及其他分段的关联。 */
+const putUnassociateParagraphProblem = (knowledgeId: string, documentId: string, paragraphId: string, problemId: string) =>
+  put<undefined, boolean>(`${getPrefix(knowledgeId, documentId)}/unassociation`, undefined, { paragraph_id: paragraphId, problem_id: problemId })
+
+/** 批量/单个将所选分段批量迁移至目标知识库的文档。 */
+const putMigrateParagraphs = (knowledgeId: string, documentId: string, targetKnowledgeId: string, targetDocumentId: string, paragraphIds: string[]) =>
+  put<{ id_list: string[] }, boolean>(`${getPrefix(knowledgeId, documentId)}/migrate/knowledge/${targetKnowledgeId}/document/${targetDocumentId}`, {
+    id_list: paragraphIds,
+  })
+
+/** 批量/单个为所选分段提交关联问题生成任务。 */
+const putGenerateParagraphQuestions = (knowledgeId: string, documentId: string, payload: ParagraphGeneratePayload) =>
+  put<ParagraphGeneratePayload, void>(`${getPrefix(knowledgeId, documentId)}/batch_generate_related`, payload)
+
+/** 批量删除当前文档中所选的分段。 */
+const putBatchDeleteParagraphs = (knowledgeId: string, documentId: string, paragraphIds: string[]) =>
+  put<{ id_list: string[] }, boolean>(`${getPrefix(knowledgeId, documentId)}/batch_delete`, { id_list: paragraphIds })
+
+export default {
+  getParagraphList,
+  postParagraph,
+  getParagraphDetail,
+  putParagraph,
+  postParagraphProblem,
+  putUnassociateParagraphProblem,
+  putMigrateParagraphs,
+  putGenerateParagraphQuestions,
+  putBatchDeleteParagraphs,
+}

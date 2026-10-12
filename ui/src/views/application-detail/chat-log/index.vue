@@ -10,6 +10,7 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { beforeDay, datetimeFormat } from '@/utils/time'
 import { useApplicationDetailContext } from '../context'
 import ButtonCleanStrategy from './clean-strategy/ButtonCleanStrategy.vue'
+import ButtonAddKnowledge from './add-knowledge/ButtonAddKnowledge.vue'
 import { CHAT_LOG_SOURCE_LABELS } from './constants'
 import ChatLogDetailDrawer from './ChatLogDetailDrawer.vue'
 
@@ -106,7 +107,7 @@ const nextChatLogDisabled = computed(
     (paginationConfig.value.currentPage - 1) * paginationConfig.value.pageSize + detailChatLogIndex.value + 1 >= paginationConfig.value.total,
 )
 
-async function handleRowClick(chatLog: ChatLog, column?: TableColumnCtx<ChatLog>) {
+async function handleRowClick(chatLog: ChatLog, column?: TableColumnCtx<ChatLog> | null) {
   if (loading.value || column?.type === 'selection') return
   detailChatLog.value = chatLog
   await nextTick()
@@ -136,10 +137,17 @@ function handleDetailClosed() {
 
 // 导出当前筛选结果；勾选时仅导出选中的日志
 const selectedChatLogs = ref<ChatLog[]>([])
+const chatLogTableRef = useTemplateRef<{ clearSelection: () => void }>('chatLogTableRef')
 const exporting = ref(false)
 
 function handleSelectionChange(selection: unknown[]) {
   selectedChatLogs.value = selection as ChatLog[]
+}
+
+// 添加知识库后清空表格勾选，并刷新改进标注数量。
+function handleKnowledgeAdded() {
+  chatLogTableRef.value?.clearSelection()
+  return loadChatLogs().catch(() => {})
 }
 
 function handleExport() {
@@ -168,12 +176,13 @@ onMounted(() => loadChatLogs())
           <span>导出</span>
         </el-button>
         <!-- 设置日志清除策略 -->
-        <ButtonCleanStrategy :application-id="applicationId" />
+        <ButtonCleanStrategy :api="ChatLogApi" :application-id="applicationId" />
       </div>
     </div>
   </Teleport>
 
   <MkTable
+    ref="chatLogTableRef"
     v-loading="loading"
     v-model:pagination-config="paginationConfig"
     :data="chatLogs"
@@ -220,8 +229,14 @@ onMounted(() => loadChatLogs())
       <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
     <template #footer-batch-actions>
-      <!-- TODO 添加到知识库 -->
-      <el-button type="primary" plain>添加到知识库</el-button>
+      <!-- 批量添加对话到知识库 -->
+      <ButtonAddKnowledge
+        :api="ChatLogApi"
+        :application-id="applicationId"
+        :chat-ids="selectedChatLogs.map(({ id }) => id)"
+        :disabled="loading"
+        @refresh="handleKnowledgeAdded"
+      />
     </template>
   </MkTable>
   <ChatLogDetailDrawer

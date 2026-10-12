@@ -107,7 +107,7 @@ function handleCompositionEnd() {
 </script>
 
 <template>
-  <div class="group flex-align-center w-full gap-2">
+  <div class="group flex-align-center w-full gap-2" :data-mk-edit-name-editing="editing ? '' : undefined">
     <template v-if="!editing">
       <span v-if="$slots.prefix" class="flex-center shrink-0"><slot name="prefix" /></span>
       <span class="min-w-0 truncate">{{ name }}</span>

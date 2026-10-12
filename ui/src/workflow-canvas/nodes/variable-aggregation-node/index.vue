@@ -198,8 +198,8 @@ onBeforeUnmount(() => {
         </template>
 
         <el-button @click="openAddOrEditDialog()" type="primary" link>
-          <MkIcon name="icon_add_outlined" class="mr-1" />
-          添加分组
+          <MkIcon name="icon_add_outlined" />
+          <span>添加分组</span>
         </el-button>
       </el-form>
     </div>

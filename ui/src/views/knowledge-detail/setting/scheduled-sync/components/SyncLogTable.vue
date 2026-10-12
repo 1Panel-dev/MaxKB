@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import type SyncApi from '@/api/admin/workspace/knowledge/sync'
 import { KNOWLEDGE_SYNC_STATUS, KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
 import type { KnowledgeSyncLog, KnowledgeSyncStatus } from '@/api/types'
@@ -10,7 +10,7 @@ import { datetimeFormat } from '@/utils/time'
 defineOptions({ name: 'KnowledgeSyncLogTable' })
 const props = defineProps<{ knowledgeId: string; api?: typeof SyncApi }>()
 
-// 进入日志页签、切换知识库和翻页时查询。
+// 进入日志页签时挂载查询，翻页由表格事件重新查询。
 const loading = ref(false)
 const syncLogs = ref<KnowledgeSyncLog[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 10, total: 0 })
@@ -50,14 +50,9 @@ function loadSyncLogs() {
     })
 }
 
-watch(
-  () => props.knowledgeId,
-  () => {
-    paginationConfig.value.currentPage = 1
-    void loadSyncLogs()
-  },
-  { immediate: true },
-)
+onMounted(() => {
+  void loadSyncLogs()
+})
 </script>
 
 <template>
