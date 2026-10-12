@@ -113,7 +113,7 @@ class AppNode extends HtmlResize.view {
     result.push(value)
     return result
   }
-  get_up_node_field_dict(contain_self: boolean, use_cache: boolean) {
+  get_up_node_field_dict(contain_self: boolean, use_cache: boolean): Dict<Array<any>> {
     if (!this.props.model.up_node_field_dict || !use_cache) {
       const up_node_list = this.props.graphModel.getNodeIncomingNode(this.props.model.id)
       this.props.model.up_node_field_dict = up_node_list
