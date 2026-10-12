@@ -463,8 +463,17 @@ class ChatSerializers(serializers.Serializer):
         chat_info.get_application()
         chat_info.get_chat_user(asker=(instance.get('form_data') or {}).get('asker'))
         if instance.get('chat_record_id'):
-            if not QuerySet(ChatRecord).filter(id=instance.get('chat_record_id'),
-                                               chat_id=self.data.get('chat_id')).exists():
+            if self.data.get('debug'):
+                # 调试记录只保存在当前会话缓存中，不会写入数据库。
+                chat_record_exists = any(
+                    str(record.id) == str(instance.get('chat_record_id')) and
+                    str(record.chat_id) == str(self.data.get('chat_id'))
+                    for record in chat_info.chat_record_list
+                )
+            else:
+                chat_record_exists = QuerySet(ChatRecord).filter(id=instance.get('chat_record_id'),
+                                                                chat_id=self.data.get('chat_id')).exists()
+            if not chat_record_exists:
                 raise ChatException(500, _("Conversation does not exist"))
         self.is_valid_chat_id(chat_info)
         if not self.data.get('debug'):
