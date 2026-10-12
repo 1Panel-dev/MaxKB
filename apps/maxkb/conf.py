@@ -47,7 +47,13 @@ class Config(dict):
         "REDIS_MAX_CONNECTIONS": 100,
         # 外置语言包路径
         "EXTERNAL_LOCALE_PATH": "/opt/maxkb/local/locales",
-        "FILE_AUTH": "1"
+        "FILE_AUTH": "1",
+        # 知识库「每个文档最大(MB)」滑杆上限。环境变量 MAXKB_FILE_SIZE_LIMIT_MAX，默认 1000。
+        # 非正整数回退为 1000；超过 32 位有符号整数上界时钳制到该上界。
+        # 调大该值时还需同步调大反向代理 client_max_body_size，以及 Django
+        # DATA_UPLOAD_MAX_MEMORY_SIZE（环境变量 MAXKB_DATA_UPLOAD_MAX_MEMORY_SIZE，单位字节），
+        # 否则上传仍会在代理层或 Django 层被拒绝。
+        "FILE_SIZE_LIMIT_MAX": 1000,
     }
 
     def get_debug(self) -> bool:
@@ -141,6 +147,44 @@ class Config(dict):
 
     def get_session_timeout(self):
         return int(self.get("SESSION_TIMEOUT", 28800))
+
+    def get_file_size_limit_max(self) -> int:
+        """Knowledge-base per-document upload slider cap, in MB.
+
+        Reads FILE_SIZE_LIMIT_MAX (env MAXKB_FILE_SIZE_LIMIT_MAX). Values that are
+        not positive integers fall back to 1000. Values above the signed 32-bit
+        integer ceiling are clamped so they still fit Django's IntegerField.
+        """
+        default = 1000
+        ceiling = 2147483647
+        value = self.get("FILE_SIZE_LIMIT_MAX", default)
+        if isinstance(value, bool):
+            return default
+        if isinstance(value, float):
+            if not value.is_integer():
+                return default
+            number = int(value)
+        elif isinstance(value, int):
+            number = value
+        elif isinstance(value, str):
+            text = value.strip()
+            if text == "" or not text.lstrip("+-").isdigit():
+                return default
+            number = int(text)
+        else:
+            return default
+        if number < 1:
+            return default
+        if number > ceiling:
+            return ceiling
+        return number
+
+    def check_file_size_limit(self, value) -> int:
+        """Return value when it is an int MB in 1..get_file_size_limit_max()."""
+        limit_max = self.get_file_size_limit_max()
+        if isinstance(value, bool) or not isinstance(value, int) or value < 1 or value > limit_max:
+            raise ValueError(limit_max)
+        return value
 
     def __init__(self, *args):
         super().__init__(*args)

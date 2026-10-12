@@ -18,6 +18,7 @@ export interface userStateTypes {
   workspace_id: string
   workspace_list: Array<any>,
   rsaKey: string
+  file_size_limit_max: number
 }
 
 const useUserStore = defineStore('user', {
@@ -29,6 +30,7 @@ const useUserStore = defineStore('user', {
     workspace_id: '',
     workspace_list: [],
     rsaKey: '',
+    file_size_limit_max: 1000,
   }),
   actions: {
     getLanguage() {
@@ -143,6 +145,9 @@ const useUserStore = defineStore('user', {
             this.edition = ok.data.edition
             this.version = ok.data.version
             this.rsaKey = ok.data.rsa
+            const fileSizeLimitMax = Number(ok.data?.file_size_limit_max)
+            this.file_size_limit_max =
+              Number.isInteger(fileSizeLimitMax) && fileSizeLimitMax >= 1 ? fileSizeLimitMax : 1000
             const theme = useThemeStore()
             if (this.isEE() || this.isPE()) {
               await theme.theme()

@@ -184,7 +184,7 @@
                     show-input
                     :show-input-controls="false"
                     :min="1"
-                    :max="1000"
+                    :max="fileSizeLimitMax"
                     class="custom-slider"
                   />
                 </el-form-item>
@@ -212,10 +212,16 @@ import BaseForm from '@/views/knowledge/component/BaseForm.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
 import permissionMap from '@/permission'
+import useStore from '@/stores'
 
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
+const { user } = useStore()
+const fileSizeLimitMax = computed(() => {
+  const value = Number(user.file_size_limit_max)
+  return Number.isInteger(value) && value >= 1 ? value : 1000
+})
 const {
   params: { id, folderId },
 } = route as any

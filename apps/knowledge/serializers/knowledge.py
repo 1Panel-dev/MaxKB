@@ -146,6 +146,14 @@ class KnowledgeEditRequest(serializers.Serializer):
 
     def is_valid(self, *, knowledge: Knowledge = None):
         super().is_valid(raise_exception=True)
+        if "file_size_limit" in self.initial_data and self.initial_data.get("file_size_limit") not in (None, ""):
+            try:
+                CONFIG.check_file_size_limit(self.validated_data.get("file_size_limit"))
+            except ValueError:
+                raise AppApiException(
+                    500,
+                    _("The file size limit must be between 1 and {} MB").format(CONFIG.get_file_size_limit_max()),
+                )
         if "meta" in self.data and self.data.get("meta") is not None:
             knowledge_meta_valid_map = self.get_knowledge_meta_valid_map()
             valid_class = knowledge_meta_valid_map.get(knowledge.type)

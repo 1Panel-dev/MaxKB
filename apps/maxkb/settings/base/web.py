@@ -169,6 +169,8 @@ USE_TZ = True
 # 文件上传配置
 DATA_UPLOAD_MAX_NUMBER_FILES = 1000
 # 分段导入以 JSON 回传全文，默认允许 100 MiB，可通过 MAXKB_DATA_UPLOAD_MAX_MEMORY_SIZE（字节）调整。
+# 知识库单文件滑杆上限是 FILE_SIZE_LIMIT_MAX（MAXKB_FILE_SIZE_LIMIT_MAX，单位 MB，默认 1000）。
+# 调大滑杆时请同步调大本项，并调大反向代理 client_max_body_size。
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(CONFIG.get('DATA_UPLOAD_MAX_MEMORY_SIZE', 100 * 1024 * 1024))
 
 # 支持的语言

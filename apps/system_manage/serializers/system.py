@@ -16,6 +16,7 @@ from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.utils.rsa_util import get_key_pair_by_sql
 from maxkb import settings
+from maxkb.const import CONFIG
 from system_manage.models import SystemSetting
 
 
@@ -32,6 +33,7 @@ class SystemProfileResponseSerializer(serializers.Serializer):
     version = serializers.CharField(required=True, label="version")
     edition = serializers.CharField(required=True, label="edition")
     license_is_valid = serializers.BooleanField(required=True, label="License is valid")
+    file_size_limit_max = serializers.IntegerField(required=True, label="file size limit max")
 
 
 class SystemProfileSerializer(serializers.Serializer):
@@ -41,4 +43,5 @@ class SystemProfileSerializer(serializers.Serializer):
         license_is_valid = DatabaseModelManage.get_model('license_is_valid') or (lambda: False)
         return {'version': version, 'edition': settings.edition,
                 'license_is_valid': license_is_valid() if license_is_valid() is not None else False,
-                'rsa': get_key_pair_by_sql().get('key')}
+                'rsa': get_key_pair_by_sql().get('key'),
+                'file_size_limit_max': CONFIG.get_file_size_limit_max()}
