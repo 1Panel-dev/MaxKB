@@ -630,7 +630,9 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 标签查询暂保留在 `workspace/knowledge/knowledge.ts`，`getKnowledgeTags(knowledgeId)` 返回非分页 `KnowledgeTagGroup[]`；
 标签值中的可选 `doc_count` 表示关联文档数量。`postKnowledgeTags` 直接提交
 `KnowledgeTagPayload[]`（`key`、`value`），用于创建标签和新增标签值；
-`putKnowledgeTag` 向 `/<tagId>` 提交 `KnowledgeTagUpdatePayload`（`id`、`key`、`value`），仅用于已有的单项编辑。
+`putKnowledgeTag` 向 `/<tagId>` 提交完整 `KnowledgeTagUpdatePayload`（`id`、`key`、`value`），
+路径 `tagId` 与载荷 `id` 保持一致。重命名提交新 `key` 与该行原 `value`，服务端更新当前标签所属同名组；
+编辑单个值提交原 `key` 与新 `value`，保留同组重复值校验，不提交其他行的值。
 `deleteKnowledgeTag` 按路径末尾 `key` 删除整个标签、`one` 删除单个标签值；
 `putBatchDeleteKnowledgeTags` 使用 PUT `batch_delete`，请求体直接为标签 ID 数组，不包装为 `id_list`。
 `postImportKnowledgeTags(knowledgeId, file)` POST 到 `import`，使用 FormData 的单个 `file` 字段上传 XLS 或 XLSX，
@@ -638,8 +640,8 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 服务端跳过文件内及知识库已有的重复组合，校验所有工作表后统一写入。空行跳过，标签与值分别限制为 64、128 字。
 `exportKnowledgeTagTemplate(knowledgeId)` GET 到 `template/export`，复用 `getExportFile` 下载“标签模板.xlsx”，
 服务端返回与提供的模板一致的表头和示例数据。两个接口均校验目标知识库的工作空间及标签创建权限。
-标签类型统一维护在 `types/knowledge.ts`。多行编辑等待 V3 新协议，不组合旧接口模拟整组保存，
-也不声明推测的新接口。
+标签类型统一维护在 `types/knowledge.ts`。创建支持多行，编辑仅支持重命名或单个值修改，
+不声明多行编辑接口，也不组合旧接口模拟多行保存。
 
 文档与标签的关联由 `workspace/knowledge/document.ts` 维护，不使用标签删除接口代替取消关联。
 `getDocumentTags` 查询 `document/<documentId>/tags`，返回分组标签；

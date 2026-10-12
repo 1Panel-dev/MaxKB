@@ -8,9 +8,10 @@ import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import type { KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import TagFormDialog from './components/TagFormDialog.vue'
+import CreateTagDialog from './components/CreateTagDialog.vue'
+import EditTagDialog from './components/EditTagDialog.vue'
 import ButtonImportTags from './components/ButtonImportTags.vue'
-import TagDocumentDrawer from './TagDocumentDrawer.vue'
+import TagDocumentDrawer from './AssociatedDocumentDrawer.vue'
 
 defineOptions({ name: 'TagManagementView' })
 defineProps<ResourceDetailPageProps>()
@@ -31,7 +32,6 @@ const tagPage = ref({ currentPage: 1, pageSize: 10 })
 const tagTableRef = ref<{ clearSelection: () => void }>()
 const selectedTags = ref<TagTableRow[]>([])
 const hoveredTagKey = ref<string | null>(null)
-const selectedTagIds = computed(() => new Set(selectedTags.value.map(({ id }) => id)))
 
 /* 保留完整分组进行搜索和分页，避免同一标签跨页拆开。 */
 const filteredTagGroups = computed(() => {
@@ -88,11 +88,6 @@ function spanMethod({ column, row }: { column: TableColumnCtx<TagTableRow>; row:
   if (column.type === 'selection' || column.property === 'key') return row.rowspan ? [row.rowspan, 1] : [0, 0]
 }
 
-function getCellClass({ row }: { row: TagTableRow }) {
-  if (selectedTagIds.value.has(row.id)) return 'bg-primary/10!'
-  return hoveredTagKey.value === row.key ? 'bg-N100!' : ''
-}
-
 function handleCellEnter(row: TagTableRow) {
   hoveredTagKey.value = row.key
 }
@@ -102,24 +97,24 @@ function handleCellLeave() {
 }
 
 /* 共用创建、编辑弹窗和关联文档抽屉。 */
-const tagFormRef = ref<InstanceType<typeof TagFormDialog>>()
+const createTagRef = ref<InstanceType<typeof CreateTagDialog>>()
+const editTagRef = ref<InstanceType<typeof EditTagDialog>>()
 const tagDocumentRef = ref<InstanceType<typeof TagDocumentDrawer>>()
 
 function handleOpenCreateTag() {
-  tagFormRef.value?.open()
+  createTagRef.value?.open()
 }
 
 function handleOpenAddTagValue(row: TagTableRow) {
-  tagFormRef.value?.open({ mode: 'add-value', key: row.key })
+  createTagRef.value?.open(row.key)
 }
 
 function handleOpenEditTag(row: TagTableRow) {
-  const group = tagGroups.value.find(({ key }) => key === row.key)
-  if (group) tagFormRef.value?.open({ mode: 'edit-group', group })
+  editTagRef.value?.open(row, 'key')
 }
 
 function handleOpenEditTagValue(row: TagTableRow) {
-  tagFormRef.value?.open({ mode: 'edit-value', tag: { id: row.id, key: row.key, value: row.value } })
+  editTagRef.value?.open(row, 'value')
 }
 
 function handleOpenTagDocuments(row: TagTableRow) {
@@ -200,10 +195,7 @@ onMounted(() => {
     v-loading="loading || operationLoading"
     :data="tagRows"
     :span-method="spanMethod"
-    :cell-class-name="getCellClass"
     :max-table-height="210"
-    row-key="id"
-    row-class-name="group"
     @selection-change="handleSelectionChange"
     @current-change="clearSelection"
     @size-change="clearSelection"
@@ -216,12 +208,24 @@ onMounted(() => {
         <div class="flex-align-center gap-1">
           <span class="min-w-0 truncate" :title="row.key">{{ row.key }}</span>
           <div class="flex-align-center shrink-0" :class="{ 'group-hover-visible': hoveredTagKey !== row.key }">
-            <!-- 新增标签值 -->
-            <MkAction display="button" label="新增标签值" icon="icon_add_outlined" @click="handleOpenAddTagValue(row)" />
+            <!-- 添加标签值 -->
+            <MkTooltip content="添加标签值" placement="top">
+              <el-button type="primary" text @click="handleOpenAddTagValue(row)">
+                <MkIcon name="icon_add_outlined" />
+              </el-button>
+            </MkTooltip>
             <!-- 编辑标签 -->
-            <MkAction display="button" label="编辑标签" icon="icon_edit_outlined" @click="handleOpenEditTag(row)" />
+            <MkTooltip content="编辑标签" placement="top">
+              <el-button type="primary" text @click="handleOpenEditTag(row)">
+                <MkIcon name="icon_edit_outlined" />
+              </el-button>
+            </MkTooltip>
             <!-- 删除整个标签 -->
-            <MkAction display="button" label="删除标签" icon="icon_delete-trash_outlined" @click="handleDeleteTag(row, 'key')" />
+            <MkTooltip content="删除标签" placement="top">
+              <el-button type="primary" text @click="handleDeleteTag(row, 'key')">
+                <MkIcon name="icon_delete-trash_outlined" />
+              </el-button>
+            </MkTooltip>
           </div>
         </div>
       </template>
@@ -237,9 +241,17 @@ onMounted(() => {
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center">
           <!-- 编辑标签值 -->
-          <MkAction display="button" label="编辑标签值" icon="icon_edit_outlined" @click="handleOpenEditTagValue(row)" />
+          <MkTooltip content="编辑标签值" placement="top">
+            <el-button type="primary" text @click="handleOpenEditTagValue(row)">
+              <MkIcon name="icon_edit_outlined" />
+            </el-button>
+          </MkTooltip>
           <!-- 删除标签值 -->
-          <MkAction display="button" label="删除标签值" icon="icon_delete-trash_outlined" @click="handleDeleteTag(row, 'one')" />
+          <MkTooltip content="删除" placement="top">
+            <el-button type="primary" text @click="handleDeleteTag(row, 'one')">
+              <MkIcon name="icon_delete-trash_outlined" />
+            </el-button>
+          </MkTooltip>
         </div>
       </template>
     </el-table-column>
@@ -248,6 +260,7 @@ onMounted(() => {
       <el-button type="danger" plain :loading="operationLoading" @click="handleBatchDelete">删除</el-button>
     </template>
   </MkTable>
-  <TagFormDialog ref="tagFormRef" :api="TagsApi" :knowledge-id="knowledgeId" @refresh="loadTags" />
+  <CreateTagDialog ref="createTagRef" :api="TagsApi" :knowledge-id="knowledgeId" @refresh="loadTags" />
+  <EditTagDialog ref="editTagRef" :api="TagsApi" :knowledge-id="knowledgeId" @refresh="loadTags" />
   <TagDocumentDrawer ref="tagDocumentRef" :api="DocumentApi" :knowledge-id="knowledgeId" @refresh="loadTags" />
 </template>
