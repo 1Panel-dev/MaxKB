@@ -149,8 +149,7 @@ defineExpose({ open })
           <MkIcon :name="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'" />
           <span>{{ activeTab === 'linked' ? '取消关联' : '关联' }}</span>
         </el-button>
-        <MkSearchInput v-if="activeTab === 'linked'" v-model="searchName" class="w-60!" @change="handleDocumentFilterChange" />
-        <MkComplexSearch v-else :fields="[{ label: '名称', value: 'name' }]" @change="handleComplexSearchChange" />
+        <MkComplexSearch :key="activeTab" :fields="[{ label: '名称', value: 'name' }]" @change="handleComplexSearchChange" />
       </div>
       <MkTable
         ref="documentTableRef"

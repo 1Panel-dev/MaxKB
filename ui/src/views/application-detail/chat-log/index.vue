@@ -25,9 +25,11 @@ const { application } = useApplicationDetailContext()
 const loading = ref(false)
 const chatLogs = ref<ChatLog[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
+const sourceOptions: OptionItem<string>[] = Object.entries(CHAT_LOG_SOURCE_LABELS).map(([value, label]) => ({ value, label }))
 const searchFields: OptionItem<string>[] = [
   { label: '摘要', value: 'abstract' },
   { label: '用户', value: 'username' },
+  { label: '来源', value: 'source', options: sourceOptions },
 ]
 const chatLogSearchQuery = ref<Dict<unknown>>()
 const chatLogDateQuery = ref({ start_time: beforeDay(7), end_time: beforeDay(0) })
@@ -44,9 +46,12 @@ function handleDateFilterChange({ startTime, endTime }: MkDateRangeValue) {
   return loadChatLogs()
 }
 
-// 反馈筛选的草稿、重置和确认由 MkTableFilter 管理
-const feedbackResetValue = { min_star: 0, min_trample: 0 }
-const feedbackFilter = ref({ ...feedbackResetValue })
+// 表头用户反馈筛选，单选复用 min_star/min_trample 参数
+const selectedFeedback = ref<string | null>(null)
+const feedbackOptions: OptionItem<string>[] = [
+  { label: '赞同', value: 'star' },
+  { label: '反对', value: 'trample' },
+]
 
 function handleFeedbackChange() {
   paginationConfig.value.currentPage = 1
@@ -56,7 +61,8 @@ function handleFeedbackChange() {
 const chatLogQuery = computed<Dict<unknown>>(() => ({
   ...chatLogSearchQuery.value,
   ...chatLogDateQuery.value,
-  ...feedbackFilter.value,
+  ...(selectedFeedback.value === 'star' ? { min_star: 1 } : {}),
+  ...(selectedFeedback.value === 'trample' ? { min_trample: 1 } : {}),
   comparer: 'and',
 }))
 
@@ -184,45 +190,7 @@ onMounted(() => loadChatLogs())
     <el-table-column prop="chat_record_count" label="对话次数" width="100" />
     <el-table-column width="140">
       <template #header>
-        <MkTableFilter
-          v-model="feedbackFilter"
-          mode="custom"
-          label="用户反馈"
-          width="180"
-          :reset-value="feedbackResetValue"
-          @change="handleFeedbackChange"
-        >
-          <template #default="{ value }">
-            <div class="space-y-3">
-              <div class="flex-between gap-2">
-                <span>赞同 ≥</span>
-                <el-input-number
-                  v-model="value.min_star"
-                  class="w-25!"
-                  size="small"
-                  controls-position="right"
-                  align="left"
-                  :min="0"
-                  :value-on-clear="0"
-                  step-strictly
-                />
-              </div>
-              <div class="flex-between gap-2">
-                <span>反对 ≥</span>
-                <el-input-number
-                  v-model="value.min_trample"
-                  class="w-25!"
-                  size="small"
-                  controls-position="right"
-                  align="left"
-                  :min="0"
-                  :value-on-clear="0"
-                  step-strictly
-                />
-              </div>
-            </div>
-          </template>
-        </MkTableFilter>
+        <MkTableFilter v-model="selectedFeedback" mode="single" label="用户反馈" :options="feedbackOptions" @change="handleFeedbackChange" />
       </template>
       <template #default="{ row }">
         <span v-if="!row.star_num && !row.trample_num">-</span>

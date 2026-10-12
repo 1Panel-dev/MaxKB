@@ -301,6 +301,7 @@ class KnowledgeView(APIView):
                         "folder_id": request.query_params.get("folder_id"),
                         "name": request.query_params.get("name"),
                         "desc": request.query_params.get("desc"),
+                        "type": request.query_params.get("type"),
                         "scope": KnowledgeScope.WORKSPACE,
                         "user_id": request.user.id,
                         "create_user": request.query_params.get("create_user"),

@@ -547,6 +547,16 @@ class ApplicationQueryRequest(serializers.Serializer):
         label=_("Publish status"),
         choices=[("published", _("Published")), ("unpublished", _("Unpublished"))],
     )
+    status = serializers.ChoiceField(
+        required=False,
+        label=_("Publish status"),
+        choices=[
+            ("published", _("Published")),
+            ("unpublished", _("Unpublished")),
+            ("on_portal", _("On portal")),
+        ],
+    )
+    type = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Application type"))
     user_id = serializers.UUIDField(required=False, label=_("User ID"))
     create_user = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("create user"))
 
@@ -584,6 +594,14 @@ class Query(serializers.Serializer):
         if publish_status is not None:
             is_publish = True if publish_status == "published" else False
             application_query_set = application_query_set.filter(is_publish=is_publish)
+        status = instance.get("status")
+        if status is not None:
+            if status == "unpublished":
+                application_query_set = application_query_set.filter(is_publish=False)
+            elif status == "published":
+                application_query_set = application_query_set.filter(is_publish=True)
+            elif status == "on_portal":
+                application_query_set = application_query_set.filter(is_portal=True)
         if workspace_id is not None:
             folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
             application_query_set = application_query_set.filter(workspace_id=workspace_id)
@@ -599,6 +617,9 @@ class Query(serializers.Serializer):
             application_query_set = application_query_set.filter(desc__contains=desc)
         if create_user is not None:
             application_query_set = application_query_set.filter(user_id=create_user)
+        application_type = instance.get("type")
+        if application_type:
+            application_query_set = application_query_set.filter(type=application_type)
         application_custom_sql_query_set = application_query_set
         application_query_set = application_query_set.order_by("-create_time")
 

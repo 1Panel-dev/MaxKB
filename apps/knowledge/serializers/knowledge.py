@@ -231,6 +231,7 @@ class KnowledgeSerializer(serializers.Serializer):
             max_length=256,
             min_length=1,
         )
+        type = serializers.IntegerField(required=False, label=_("knowledge type"), allow_null=True)
         user_id = serializers.UUIDField(required=False, label=_("user id"), allow_null=True)
         scope = serializers.CharField(required=False, label=_("knowledge scope"), allow_null=True)
         create_user = serializers.UUIDField(required=False, label=_("create user"), allow_null=True)
@@ -250,6 +251,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     {
                         "temp.name": models.CharField(),
                         "temp.desc": models.CharField(),
+                        "temp.type": models.IntegerField(),
                         "document_temp.char_length": models.IntegerField(),
                         "temp.create_time": models.DateTimeField(),
                         "temp.user_id": models.CharField(),
@@ -268,6 +270,8 @@ class KnowledgeSerializer(serializers.Serializer):
             if "name" in self.data and self.data.get("name") is not None:
                 query_set = query_set.filter(**{"temp.name__icontains": self.data.get("name")})
                 folder_query_set = folder_query_set.filter(**{"name__icontains": self.data.get("name")})
+            if "type" in self.data and self.data.get("type") is not None:
+                query_set = query_set.filter(**{"temp.type": self.data.get("type")})
             if "workspace_id" in self.data and self.data.get("workspace_id") is not None:
                 query_set = query_set.filter(**{"temp.workspace_id": self.data.get("workspace_id")})
                 folder_query_set = folder_query_set.filter(**{"workspace_id": self.data.get("workspace_id")})
