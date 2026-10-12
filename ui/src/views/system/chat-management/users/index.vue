@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import ChatUserApi from '@/api/admin/system/chat-management/chat-user.ts'
 import type { ChatUser, Dict, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD, QUOTA_TYPE } from '@/api/enums'
@@ -27,23 +27,28 @@ const chatUsersLoading = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const chatUsersData = ref<ChatUser[]>([])
 const searchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
-  {
-    label: '状态',
-    value: 'is_active',
-    options: [
-      { label: '启用', value: true },
-      { label: '禁用', value: false },
-    ],
-  },
-  {
-    label: '用户来源',
-    value: 'source',
-    options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({ label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label, value })),
-  },
+  { label: '用户名', value: 'username' },
+  { label: '邮箱', value: 'email' },
 ]
-const chatUserQuery = ref<Dict<unknown>>()
+const chatUserSearchQuery = ref<Dict<unknown>>()
+
+/* 表头筛选 */
+const selectedStatus = ref<boolean | null>(null)
+const statusOptions: OptionItem<boolean>[] = [
+  { label: '已启用', value: true },
+  { label: '已禁用', value: false },
+]
+const selectedSource = ref<string | null>(null)
+const sourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
+  label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label,
+  value,
+}))
+const chatUserQuery = computed<Dict<unknown>>(() => ({
+  ...chatUserSearchQuery.value,
+  ...(selectedStatus.value !== null ? { is_active: selectedStatus.value } : {}),
+  ...(selectedSource.value !== null ? { source: selectedSource.value } : {}),
+}))
 
 function formatQuotaUsage(tokenQuota?: ChatUser['token_quota']) {
   if (!tokenQuota) return '-'
@@ -53,7 +58,12 @@ function formatQuotaUsage(tokenQuota?: ChatUser['token_quota']) {
 }
 
 function handleSearchChange(query?: Dict<unknown>) {
-  chatUserQuery.value = query
+  chatUserSearchQuery.value = query
+  paginationConfig.value.currentPage = 1
+  loadChatUsers()
+}
+
+function handleFilterChange() {
   paginationConfig.value.currentPage = 1
   loadChatUsers()
 }
@@ -61,7 +71,7 @@ function handleSearchChange(query?: Dict<unknown>) {
 function loadChatUsers(resetQuery = false) {
   chatUsersLoading.value = true
   if (resetQuery) {
-    chatUserQuery.value = undefined
+    chatUserSearchQuery.value = undefined
     paginationConfig.value.currentPage = 1
   }
   return ChatUserApi.getChatUserPage(paginationConfig.value, chatUserQuery.value)
@@ -159,7 +169,10 @@ onMounted(() => loadChatUsers())
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
         <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
-        <el-table-column width="100" label="启用状态">
+        <el-table-column width="100" label="状态">
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="statusOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }">
             <MkStatusLabel :active="row.is_active" />
           </template>
@@ -183,6 +196,9 @@ onMounted(() => loadChatUsers())
         </el-table-column>
 
         <el-table-column label="用户来源" width="120">
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedSource" label="用户来源" :options="sourceOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }">
             {{ row.source === LOGIN_METHOD.LOCAL ? '本地创建' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
           </template>

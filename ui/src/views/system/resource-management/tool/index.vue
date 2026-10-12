@@ -37,20 +37,23 @@ const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const toolQuery = ref<Dict<unknown>>()
 const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
+const selectedToolType = ref('')
+const selectedSource = ref('')
+const selectedStatus = ref('')
 const selectedWorkspaceIds = ref<string[]>([])
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
-  { label: '类型', value: 'tool_type', options: TOOL_TYPE_OPTIONS.filter(({ value }) => value) },
-  {
-    label: '来源',
-    value: 'source',
-    options: [
-      { label: '工具商店', value: 'TOOL_STORE' },
-      { label: '自定义', value: 'CUSTOM' },
-    ],
-  },
   { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
+const toolTypeOptions = TOOL_TYPE_OPTIONS.filter(({ value }) => value)
+const sourceOptions = [
+  { label: '工具商店', value: 'TOOL_STORE' },
+  { label: '自定义', value: 'CUSTOM' },
+]
+const statusOptions = [
+  { label: '已启用', value: 'enabled' },
+  { label: '已禁用', value: 'disabled' },
+]
 const toolTypeLabels = new Map(TOOL_TYPE_OPTIONS.map(({ value, label }) => [value, label]))
 
 function loadCreatorOptions(keyword: string) {
@@ -63,6 +66,9 @@ function loadTools() {
   loading.value = true
   return SystemToolApi.getToolPage(pagination.value, {
     ...toolQuery.value,
+    ...(selectedToolType.value ? { tool_type: selectedToolType.value } : {}),
+    ...(selectedSource.value ? { source: selectedSource.value } : {}),
+    ...(selectedStatus.value ? { status: selectedStatus.value } : {}),
     ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
   })
     .then((page) => {
@@ -154,12 +160,21 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="tool_type" label="类型" width="120">
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedToolType" label="类型" :options="toolTypeOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }">{{ toolTypeLabels.get(row.tool_type) ?? row.tool_type }}</template>
         </el-table-column>
         <el-table-column label="来源" width="120">
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedSource" label="来源" :options="sourceOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }">{{ row.template_id ? '工具商店' : '自定义' }}</template>
         </el-table-column>
         <el-table-column label="启用状态" width="100">
+          <template #header>
+            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="statusOptions" @change="handleFilterChange" />
+          </template>
           <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
         </el-table-column>
         <el-table-column v-if="auth.isEE" prop="workspace_name" min-width="160" show-overflow-tooltip>

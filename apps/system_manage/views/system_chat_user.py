@@ -247,6 +247,7 @@ class SystemChatUserView(APIView):
                 data={
                     "username": request.query_params.get("username", None),
                     "nick_name": request.query_params.get("nick_name", None),
+                    "email": request.query_params.get("email", None),
                     "source": request.query_params.get("source", None),
                     "is_active": request.query_params.get("is_active", None),
                     "user_id": str(request.user.id),

@@ -66,8 +66,8 @@ const workspaceMembersLoading = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
+  { label: '姓名', value: 'nick_name' },
   { label: '用户名', value: 'username' },
-  { label: '姓名', value: 'name' },
 ]
 const workspaceMembers = ref<WorkspaceMemberItem[]>([])
 const workspaceMemberTableRef = useTemplateRef<{ clearSelection: () => void }>('workspaceMemberTableRef')

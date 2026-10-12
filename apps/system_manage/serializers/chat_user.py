@@ -133,6 +133,7 @@ class ChatUserSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
         username = serializers.CharField(required=False, label=_("Username"), allow_null=True, allow_blank=True)
         nick_name = serializers.CharField(required=False, label=_("Nickname"), allow_null=True, allow_blank=True)
+        email = serializers.CharField(required=False, label=_("Email"), allow_null=True, allow_blank=True)
         source = serializers.CharField(required=False, label=_("Source"), allow_null=True, allow_blank=True)
         is_active = serializers.BooleanField(required=False, label=_("Is active"), allow_null=True)
 
@@ -144,6 +145,9 @@ class ChatUserSerializer(serializers.Serializer):
             nick_name = self.data.get("nick_name")
             if nick_name is not None:
                 query_set = query_set.filter(Q(nick_name__contains=nick_name))
+            email = self.data.get("email")
+            if email is not None:
+                query_set = query_set.filter(Q(email__contains=email))
             source = self.data.get("source")
             if source is not None:
                 query_set = query_set.filter(source=source)
