@@ -461,6 +461,23 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `clearSelection()`。操作栏与 `MkViewLayout` 复用 `LayoutBatchFooter`，统一全选、半选、数量和
 取消行为；它在主内容滚动区域内吸附于页面底部，不随表格内容滚出可视区域。
 
+`selectionGroupKey` 可按需开启同组选择，接受字段路径或返回字符串／数字的函数；不传时保持
+原生逐行选择。点击复选框时，同步当前 `data` 中同组记录的选中或取消状态，遵守选择列的
+`selectable` 禁用规则；分组值为 null、undefined 或非字符串／数字时，该行保持独立选择。
+联动完成后只通过 `selection-change` 通知一次最终结果，底栏仍按实际选中行数统计，不按组计数。
+`rowKey` 仍须唯一，不能用重复的分组字段替代；`span-method` 只控制展示合并，不自动开启联动。
+该能力用于平面分组表格，不与树形／懒加载选择混用，不主动加载或联动未传入的跨页记录。
+原生 `select` 事件仍透传；业务批量操作使用 `selection-change` 的最终结果。
+搜索、分页、切换业务对象后的清理以及提交 ID 的业务去重由页面负责。
+
+```vue
+<MkTable :data="tagRows" selection-group-key="key" :span-method="spanMethod" @selection-change="handleSelectionChange">
+  <el-table-column type="selection" width="40" />
+  <el-table-column prop="key" label="标签" />
+  <el-table-column prop="value" label="标签值" />
+</MkTable>
+```
+
 ### MkAction
 
 `global/mk-table/MkAction.vue` 统一单个操作的两种外观，通过 `display="menu"`（默认）或

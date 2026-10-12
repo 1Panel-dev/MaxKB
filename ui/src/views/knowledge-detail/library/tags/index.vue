@@ -83,7 +83,7 @@ function handleSelectionChange(selection: unknown[]) {
   selectedTags.value = selection as TagTableRow[]
 }
 
-// 与工作空间成员表格一致：仅合并单元格，不另外联动同组勾选。
+// 这里只合并展示单元格，同组选择由 MkTable 的 selectionGroupKey 处理。
 function spanMethod({ column, row }: { column: TableColumnCtx<TagTableRow>; row: TagTableRow }) {
   if (column.type === 'selection' || column.property === 'key') return row.rowspan ? [row.rowspan, 1] : [0, 0]
 }
@@ -150,7 +150,7 @@ function handleBatchDelete() {
   const tagIds = selectedTags.value.map(({ id }) => id)
   const groupCount = new Set(selectedTags.value.map(({ key }) => key)).size
   return MsgConfirm(
-    `是否删除选中的 ${groupCount} 个标签？`,
+    `是否删除选中的 ${tagIds.length} 个标签值（涉及 ${groupCount} 个标签）？`,
     '将删除选中记录所属的标签及其全部标签值，并移除文档上的对应标签；文档本身不会删除，请谨慎操作！',
   ).then(
     () => {
@@ -194,6 +194,7 @@ onMounted(() => {
     v-model:pagination-config="paginationConfig"
     v-loading="loading || operationLoading"
     :data="tagRows"
+    selection-group-key="key"
     :span-method="spanMethod"
     :max-table-height="210"
     @selection-change="handleSelectionChange"

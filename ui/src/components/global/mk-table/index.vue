@@ -1,5 +1,5 @@
-<script setup lang="ts" generic="T">
-import { computed, onBeforeUnmount, onMounted, ref, type VNode } from 'vue'
+<script setup lang="ts" generic="T extends object">
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, type VNode } from 'vue'
 import type { TableInstance } from 'element-plus'
 import LayoutBatchFooter from '../mk-view-layout/LayoutBatchFooter.vue'
 import { useSortable, type SortableChange } from '@/utils/use-sortable'
@@ -24,6 +24,8 @@ const props = withDefaults(
     resizable?: boolean // 非指定表格禁止开启
     size?: 'small'
     rowKey?: string | ((row: T) => string | number)
+    /** 同组记录联动选择；不传时保持逐行选择。 */
+    selectionGroupKey?: string | ((row: T) => string | number | null | undefined)
     sortable?: boolean
   }>(),
   { data: () => [], maxTableHeight: 250, resizable: false, rowKey: 'id', sortable: false },
@@ -82,8 +84,36 @@ function updateTableHeight() {
 /** 选择操作栏 */
 const selectedRows = ref<unknown[]>([])
 const isAllRowsSelected = computed(() => tableRef.value?.store.states.isAllSelected.value ?? false)
+let groupSelectionPending = false
+
+function getSelectionGroupKey(row: T): unknown {
+  const key = props.selectionGroupKey
+  return typeof key === 'function' ? key(row) : key ? get(row, key) : undefined
+}
+
+function handleSelect(selection: T[], row: T) {
+  const groupKey = getSelectionGroupKey(row)
+  if ((typeof groupKey !== 'string' && typeof groupKey !== 'number') || !tableRef.value) return
+
+  // 等整组勾选完成后再更新选择结果，保证已选数量和批量操作包含组内所有记录。
+  if (!groupSelectionPending) {
+    groupSelectionPending = true
+    nextTick(() => {
+      groupSelectionPending = false
+      if (tableRef.value) handleSelectionChange(tableRef.value.getSelectionRows())
+    })
+  }
+
+  const checked = selection.includes(row)
+  props.data.forEach((groupRow) => {
+    if (getSelectionGroupKey(groupRow) === groupKey) {
+      tableRef.value?.toggleRowSelection(groupRow, checked, false)
+    }
+  })
+}
 
 function handleSelectionChange(selection: unknown[]) {
+  if (groupSelectionPending) return
   selectedRows.value = selection
   emit('selection-change', selection)
 }
@@ -142,6 +172,7 @@ defineExpose({ clearSelection, tableRef })
       :row-key="props.rowKey"
       v-bind="$attrs"
       :border="props.resizable"
+      @select="handleSelect"
       @selection-change="handleSelectionChange"
     >
       <slot />

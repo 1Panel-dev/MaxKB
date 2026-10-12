@@ -70,13 +70,20 @@ const memberSearchFields: OptionItem<string>[] = [
   { label: '姓名', value: 'name' },
 ]
 const workspaceMembers = ref<WorkspaceMemberItem[]>([])
+const workspaceMemberTableRef = useTemplateRef<{ clearSelection: () => void }>('workspaceMemberTableRef')
 function handleMemberSearch(query?: Dict<unknown>) {
   memberSearchQuery.value = query
   paginationConfig.value.currentPage = 1
   return loadWorkspaceMembers()
 }
 
+function clearMemberSelection() {
+  workspaceMemberTableRef.value?.clearSelection()
+  batchSelectedMembers.value = []
+}
+
 function loadWorkspaceMembers() {
+  clearMemberSelection()
   const workspaceId = currentWorkspace.value?.id
   if (!workspaceId) {
     workspaceMembers.value = []
@@ -95,7 +102,16 @@ function loadWorkspaceMembers() {
 }
 
 /** 同一用户的选择框、姓名和用户名按连续记录合并。 */
-function objectSpanMethod({ column, row, rowIndex }: { row: WorkspaceMemberItem; column: TableColumnCtx<WorkspaceMemberItem>; rowIndex: number; columnIndex: number }) {
+function objectSpanMethod({
+  column,
+  row,
+  rowIndex,
+}: {
+  row: WorkspaceMemberItem
+  column: TableColumnCtx<WorkspaceMemberItem>
+  rowIndex: number
+  columnIndex: number
+}) {
   const shouldMerge = column.type === 'selection' || column.property === 'nick_name' || column.property === 'username'
   if (!shouldMerge) return
 
@@ -139,17 +155,18 @@ function handleRemoveMember(member: WorkspaceMemberItem) {
 
 /* 批量删除成员 */
 const batchSelectedMembers = ref<WorkspaceMemberItem[]>([])
+
 function handleBatchDelete() {
   const workspaceId = currentWorkspace.value?.id
-  if (!workspaceId) return
+  if (!workspaceId || workspaceLoading.value || workspaceMembersLoading.value || !batchSelectedMembers.value.length) return
 
-  MsgConfirm(`是否删除选中的 ${batchSelectedMembers.value.length} 个成员？`, '')
+  const selectedMembers = [...batchSelectedMembers.value]
+  const userCount = new Set(selectedMembers.map(({ user_id }) => user_id)).size
+  const userRelationIds = [...new Set(selectedMembers.map(({ user_relation_id }) => user_relation_id))]
+  MsgConfirm('是否移除选中记录对应的成员？', `涉及 ${userCount} 位用户，共 ${selectedMembers.length} 条记录。`)
     .then(() => {
       workspaceMembersLoading.value = true
-      return WorkspaceApi.postBatchRemoveWorkspaceMembers(
-        workspaceId,
-        batchSelectedMembers.value.map(({ user_relation_id }) => user_relation_id),
-      ).then(({ success_count, failed_count }) => {
+      return WorkspaceApi.postBatchRemoveWorkspaceMembers(workspaceId, userRelationIds).then(({ success_count, failed_count }) => {
         if (failed_count > 0) {
           MsgSuccess(`移除成功 ${success_count} 个成员，失败 ${failed_count} 个`)
         } else {
@@ -231,8 +248,10 @@ onMounted(() => loadWorkspaceOptions())
         </div>
 
         <MkTable
+          ref="workspaceMemberTableRef"
           v-model:pagination-config="paginationConfig"
           :data="workspaceMembers"
+          selection-group-key="user_id"
           v-loading="workspaceMembersLoading"
           @current-change="loadWorkspaceMembers()"
           @size-change="loadWorkspaceMembers()"

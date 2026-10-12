@@ -442,6 +442,12 @@ src/views/system/identity/users/
 或选中用户 ID 数组。行操作菜单开启 `persistent`，避免菜单关闭时卸载其内部的配额弹窗。
 两套用户页面保留各自业务 API 和导入成功后的查询刷新方式。
 
+`system/identity/workspaces/index.vue` 的成员表按用户合并选择框、姓名和用户名，
+通过 `MkTable.selectionGroupKey="user_id"` 联动当前页同一用户的角色记录；
+行标识仍使用 `user_relation_id:role_id`，底栏按选中记录行数统计，不按用户数统计。
+批量移除确认说明记录数与涉及用户数，请求按 `user_relation_id` 去重，不按用户 ID 丢弃角色记录。
+列表加载前清空选择，覆盖搜索、分页、工作空间切换及操作后的刷新；不新增跨页选择或修改接口协议。
+
 操作日志页面的清除策略入口与弹窗统一放在 `system/operate-logs/clean-strategy/`：
 `ButtonCleanStrategy.vue` 管理打开动作和弹窗 Ref，`CleanStrategyDialog.vue` 负责策略查询与保存，
 `index.vue` 只组合入口组件。
@@ -869,8 +875,9 @@ library 的接口调整已撤回，文档和标签沿用原有调用方式，Sys
 维护搜索、导入入口、创建入口和标签表格，不嵌套页面布局或修改路由。
 通过 `workspace/knowledge/knowledge.ts` 查询全量分组，前端按标签名或值搜索并保留完整命中分组；
 先按标签组分页，再展开各组标签值，分页总数为标签组数。
-`MkTable` 合并选择列和标签名，选择行为与工作空间成员表格一致，不额外联动同组记录；
-批量底栏按实际选中记录数统计，删除确认明确影响所选记录所属标签及其全部值。
+`MkTable` 合并选择列和标签名，通过 `selection-group-key="key"` 联动当前页同组标签值；
+批量底栏按实际选中标签值行数／当前页标签值总行数统计，不按标签组计数。
+删除提交全部选中标签值 ID，确认框同时说明标签值数量、标签组数量及整组删除的影响。
 标签名旁提供新增值、编辑标签、删除标签；行末提供编辑值和删除值，
 数量链接打开同目录 `TagDocumentDrawer.vue`。
 
