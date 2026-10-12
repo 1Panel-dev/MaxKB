@@ -183,8 +183,8 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 `system/shared-resources/knowledge/knowledge.ts` 使用 `/system/shared/knowledge`，维护分页、详情、
 通用 / Web / 飞书 / 工作流创建、导入、删除、重新向量化、Web 同步、关联问题、分词索引、MCP
 配置与三种导出。工作流创建在 Workspace 与 System 共享范围均由同一个 Knowledge API 的
-`postKnowledgeWorkflow` 提交；`workspace/knowledge/workflow.ts` 仅维护已创建知识库的工作流
-画布接口。System 共享范围没有工作空间文件夹、批量接口或独立的知识库工作流 API 文件。复用创建入口
+`postKnowledgeWorkflow` 提交；工作流转换由各范围的 `knowledge.ts` 维护，
+`workspace/knowledge/workflow.ts` 仅维护已创建知识库的画布接口。System 共享范围没有工作空间文件夹、批量接口或独立的知识库工作流 API 文件。复用创建入口
 和卡片 Action 时使用完整 Workspace / System 资源管理 / System 共享知识库 API 的联合类型，由页面显式传入当前范围的 API。
 
 ### 工具代码生成
@@ -461,13 +461,16 @@ System 共享资源分别保留各自路径下的同名接口，不再重复封�
 或提交 `work_flow_template` 由服务端下载并覆盖当前工具工作流。模板覆盖后由 View 重新查询详情，
 同步默认模型设置、保存时间和图快照；确认取消或请求失败不关闭模板中心。
 
-### 知识库工作流模板与导出
+### 知识库工作流模板与导入导出
 
 `admin/store.ts` 的 `getStoreKnowledgeList(query)` 查询 `/workspace/store/knowledge_template`，
 返回 `KnowledgeWorkflowStoreResponse`，其中 `apps` 使用公共 `WorkflowStoreTemplate[]`。
 `putKnowledgeWorkflow` 接受互斥的 `work_flow` 保存载荷或 `work_flow_template` 覆盖载荷，覆盖成功后由 View 重载详情。
 `exportKnowledgeWorkflow(knowledgeId, name)` 通过 GET `/<knowledgeId>/workflow/export` 下载 `.kbwf` 文件，
 只导出工作流，不调用包含文档的知识库包导出接口。
+`importKnowledgeWorkflow(knowledgeId, file)` 沿用 v2 的 POST `/<knowledgeId>/workflow/import`，
+使用 FormData 的 `file` 字段上传 `.kbwf`，由服务端覆盖草稿、处理关联工具与默认模型设置。
+接口结果不作为图数据使用，页面确认覆盖后调用，成功重新查询知识库详情并渲染画布。
 
 ### 工作空间首页
 
@@ -546,7 +549,27 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 两种 System 工具 API 的 `getToolListWithShared` 查询各自 `/tool_list` 并合并 `tools`、`shared_tools`，
 供画布的工具菜单及 MCP 选项使用。系统扩展接口需连接支持相应协议的部署进行联调。
 
+### 知识库工作流转换
+
+Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
+`postTransformWorkflow(knowledgeId, { work_flow })`，沿用 v2 的 POST
+`/<knowledgeId>/transform_workflow`，各自使用对应知识库前缀，返回布尔值；
+转换页通过可管理范围上下文的 `resourceApi.knowledge` 调用，不固定 Workspace API。
+服务端转换知识库类型并创建工作流，
+保留已有文档，已是工作流类型时拒绝重复转换。页面负责确认、loading、成功提示及进入画布。
+默认图复用知识库创建模板，不用保存工作流接口代替转换。
+
 ### 知识库文档
+
+`workspace/knowledge/document.ts` 的 `getDocumentDetail(knowledgeId, documentId)` 通过 GET
+`/<knowledgeId>/document/<documentId>` 查询文档详情，支持分段页刷新和直接访问。
+`workspace/knowledge/paragraph.ts` 维护普通 Workspace 文档分段接口，前缀为
+`/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<documentId>/paragraph`。
+`getParagraphList` 查询完整分段列表，支持 `title`、`content`，服务端按 `position`、创建时间排序；
+`postParagraph` 提交 `title`、`content`、`is_active`，返回新增分段，默认插入首位并触发索引。
+响应及载荷类型维护在 `types/paragraph.ts`，通过 `@/api/types` 导入。
+标题最多 256 字符，内容必填且最多 102400 字符；loading、弹窗和成功后刷新由页面维护。
+本次只接入普通 Workspace，不为其他范围推测接口或回退 Workspace。
 
 文档地址及飞书导入也维护在 `workspace/knowledge/document.ts`：
 `postWebDocument` 向 `/<knowledgeId>/document/web` 提交 `WebDocumentImportPayload`，包含

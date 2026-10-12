@@ -1,4 +1,5 @@
 import { del, get, getExportFile, post, put } from '../../core/request'
+import type LogicFlow from '@logicflow/core'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   Dict,
@@ -125,6 +126,10 @@ const getKnowledgeMcpConfig = (knowledgeId: string): Promise<string> =>
 /** 提交知识库分词索引任务。 */
 const putKnowledgeKeywordIndex = (knowledgeId: string) => put<undefined, void>(`${getPrefix()}/${knowledgeId}/tokenize`)
 
+/** 将现有知识库转换为工作流知识库，保留已有文档。 */
+const postTransformWorkflow = (knowledgeId: string, payload: { work_flow: LogicFlow.GraphConfigData }) =>
+  post<{ work_flow: LogicFlow.GraphConfigData }, boolean>(`${getPrefix()}/${knowledgeId}/transform_workflow`, payload)
+
 /** 获取知识库按标签名称分组的标签选项。 */
 
 // TODO
@@ -153,4 +158,5 @@ export default {
   putBatchDeleteKnowledge,
   putBatchMoveKnowledge,
   postKnowledgeImport,
+  postTransformWorkflow,
 }

@@ -164,7 +164,7 @@ Chat 导航守卫（`chat/index.ts`）：
 | `resourceScope`      | `'workspace' \| 'workspace-shared' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承 |
 | `activeIcon`         | `string`                                              | 菜单激活状态的 iconfont Symbol ID                      |
 | `activeMenu`         | `string`                                              | 进入子页面时需要保持激活的侧栏菜单路径                 |
-| `resourceDetailRoot` | `boolean`                                             | 标记资源详情导航根，仅在详情容器路由自身配置           |
+| `resourceDetailRoot` | `boolean`                                             | 标记资源详情根，详情容器和独立文档分段页配置，用于目录与工作空间切换 |
 | `detailActiveMenu`   | `string`                                              | 更深层详情页面需要保持激活的二级菜单路由名称           |
 | `title`              | `string`                                              | 页面标题，同时作为导航名称                             |
 | `icon`               | `string`                                              | iconfont Symbol ID，子目录通常可以不配置               |
@@ -404,8 +404,18 @@ Web 展示“设置 → 基础设置、文档处理策略、定时同步”；�
 列表设置按钮按知识库类型直接进入通用设置或基础设置。
 `workspace-knowledge-settings` 仅提供菜单分组层级，
 命名访问时重定向到基础设置，保留参数、query 和 hash。`workflow-entry`
-仅作为目录跳转入口，重定向到独立的 `workflow-knowledge` 全屏画布。画布返回知识库详情。
-文档详情路由当前尚未启用；后续接入时通过 `detailActiveMenu` 高亮“文档”。
+（`workspace-knowledge-workflow`）直接挂载 `knowledge-detail/workflow-transform/index.vue`，
+保留“工作流”菜单。路由 `beforeEnter` 按 `type` 参数判断：工作流类型重定向至独立的
+`workflow-knowledge` 全屏画布，其他类型挂载转换页。转换成功后进入画布；直接访问画布时也查询真实
+知识库类型，非工作流类型先返回转换页。画布返回知识库详情。
+普通 Workspace 文档分段页使用 `workspace-knowledge-paragraph`，地址为
+`/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/document/:documentId`，
+在 `knowledge.ts` 中与知识库详情容器同级注册，复用 Workspace AppLayout，保持知识库一级菜单激活。
+页面位于 `views/knowledge-detail/paragraph/index.vue`，使用自身的分段目录，不挂载
+`ResourceDetailLayout`。配置 `hidden` 与 `resourceDetailRoot`，使工作空间切换继续返回知识库列表；
+返回按钮进入 `workspace-knowledge-document-list`，保留知识库类型和 query。
+文档行点击进入分段页，选择列、名称编辑和操作按钮不触发跳转。
+Workspace 共享及 System 文档分段入口暂未注册，等待各范围接口接入，不回退普通 Workspace。
 
 智能体工作流返回通过 `views/workflow/application/navigation.ts` 动态读取详情父路由的 `children`。
 Workspace 父路由为 `workspace-application-detail-layout`；System 详情实现时使用

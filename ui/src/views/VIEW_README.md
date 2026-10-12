@@ -470,45 +470,49 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 ## 页面功能登记
 
-| 页面                                                                   | 功能说明                                                             |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `application/index.vue`                                                | 工作空间智能体目录与智能体卡片页面                                   |
-| `application-detail/index.vue`                                         | 工作空间智能体详情上下文与资源详情布局                               |
-| `application-detail/overview/index.vue`                                | 智能体概览内容                                                       |
-| `application-detail/setting/index.vue`                                 | 简易智能体设置内容                                                   |
-| `workflow/application/index.vue`                                       | 智能体工作流页面头部与全屏画布                                       |
-| `workflow/knowledge/index.vue`                                         | 知识库工作流加载、自动保存、发布历史、模板覆盖、导出、调试与全屏画布 |
-| `workflow/tool/index.vue`                                              | 工具工作流页面头部与全屏画布                                         |
-| `chat/index.vue`                                                       | Chat 入口的对话页面                                                  |
-| `error/index.vue`                                                      | Admin 未匹配路由和全局 404 页面                                      |
-| `home/index.vue`                                                       | Workspace 首页                                                       |
-| `knowledge/index.vue`                                                  | 工作空间知识库目录与知识库卡片页面                                   |
-| `knowledge-detail/index.vue`                                           | 知识库详情页面                                                       |
-| `knowledge-detail/library/tags/index.vue`                             | 标签分组查询、创建、重命名、单值编辑、删除与关联文档管理               |
-| `knowledge-detail/setting/base/index.vue`                             | 知识库基本信息、来源配置与上传限制设置                               |
-| `knowledge-detail/setting/document-strategy/index.vue`                | Web 知识库文档处理策略回填、校验与保存                                       |
-| `knowledge-detail/setting/scheduled-sync/index.vue`                   | Web、飞书与工作流知识库定时同步设置与日志                              |
-| `login/index.vue`                                                      | Admin 登录页面                                                       |
-| `login/forgot-password/index.vue`                                     | 忘记密码页面                                                         |
-| `model/index.vue`                                                      | 工作空间模型目录与模型卡片页面                                       |
-| `system/identity/groups/index.vue`                                    | 用户组列表页面                                                       |
-| `system/identity/resource-authorization/index.vue`                    | 工作空间用户组与用户的分类资源授权页面                               |
-| `system/identity/roles/index.vue`                                     | 角色列表页面                                                         |
-| `system/identity/users/index.vue`                                     | 用户列表页面                                                         |
-| `system/identity/workspaces/index.vue`                                | 工作空间列表页面                                                     |
-| `system/chat-management/user-groups/index.vue`                        | 对话用户组及组成员管理页面                                           |
-| `system/chat-management/users/index.vue`                              | 对话用户列表、配额及用户导入管理页面                                 |
-| `system/chat-management/portal-setting/index.vue`                     | 门户基本信息、访问开关、认证配置、跨域地址编辑与门户预览             |
-| `system/settings/theme/index.vue`                                     | 系统外观设置和登录外观预览页面                                       |
-| `system/settings/authentication/index.vue`                            | 系统登录及认证源配置页面                                             |
-| `system/settings/email/index.vue`                                     | 系统邮件 SMTP 服务配置页面                                           |
-| `system/operate-logs/index.vue`                                       | 系统操作日志查询与清理页面                                           |
-| `system/resource-management/model/index.vue`                          | System 模型分页、筛选、编辑、授权与删除                              |
-| `system/resource-management/tool/index.vue`                           | System 工具分页、筛选、维护与工作流入口                              |
-| `system/shared-resources/model/index.vue`                              | System 共享模型查询与模型卡片页面                                    |
-| `system/shared-resources/tool/index.vue`                               | System 共享工具查询与工具维护页面                                    |
-| `trigger/index.vue`                                                    | 工作空间触发器查询、新建、编辑及单项和批量启停、删除                 |
-| `tool/index.vue`                                                       | 工作空间工具目录与工具卡片页面                                       |
+| 页面                                            | 功能说明                                                             |
+| ----------------------------------------------- | -------------------------------------------------------------------- |
+| `application/index.vue`                         | 工作空间智能体目录与智能体卡片页面                                   |
+| `application-detail/index.vue`                  | 工作空间智能体详情上下文与资源详情布局                               |
+| `application-detail/overview/index.vue`         | 智能体概览内容                                                       |
+| `application-detail/setting/index.vue`          | 简易智能体设置内容                                                   |
+| `workflow/application/index.vue`                | 智能体工作流页面头部与全屏画布                                       |
+| `workflow/knowledge/index.vue`                  | 知识库工作流加载、自动保存、发布历史、模板覆盖、导出、调试与全屏画布 |
+| `workflow/tool/index.vue`                       | 工具工作流页面头部与全屏画布                                         |
+| `chat/index.vue`                                | Chat 入口的对话页面                                                  |
+| `error/index.vue`                               | Admin 未匹配路由和全局 404 页面                                      |
+| `home/index.vue`                                | Workspace 首页                                                       |
+| `knowledge/index.vue`                           | 工作空间知识库目录与知识库卡片页面                                   |
+| `knowledge-detail/index.vue`                    | 知识库详情页面                                                       |
+| `knowledge-detail/library/tags/index.vue`       | 标签分组查询、创建、重命名、单值编辑、删除与关联文档管理             |
+| `knowledge-detail/workflow-transform/index.vue` | 非工作流知识库转换说明、确认与进入画布                               |
+| `knowledge-detail/paragraph/index.vue`          | 普通 Workspace 文档分段查询、目录定位、批量勾选与新增                |
+
+|
+| `knowledge-detail/setting/base/index.vue` | 知识库基本信息、来源配置与上传限制设置 |
+| `knowledge-detail/setting/document-strategy/index.vue` | Web 知识库文档处理策略回填、校验与保存 |
+| `knowledge-detail/setting/scheduled-sync/index.vue` | Web、飞书与工作流知识库定时同步设置与日志 |
+| `login/index.vue` | Admin 登录页面 |
+| `login/forgot-password/index.vue` | 忘记密码页面 |
+| `model/index.vue` | 工作空间模型目录与模型卡片页面 |
+| `system/identity/groups/index.vue` | 用户组列表页面 |
+| `system/identity/resource-authorization/index.vue` | 工作空间用户组与用户的分类资源授权页面 |
+| `system/identity/roles/index.vue` | 角色列表页面 |
+| `system/identity/users/index.vue` | 用户列表页面 |
+| `system/identity/workspaces/index.vue` | 工作空间列表页面 |
+| `system/chat-management/user-groups/index.vue` | 对话用户组及组成员管理页面 |
+| `system/chat-management/users/index.vue` | 对话用户列表、配额及用户导入管理页面 |
+| `system/chat-management/portal-setting/index.vue` | 门户基本信息、访问开关、认证配置、跨域地址编辑与门户预览 |
+| `system/settings/theme/index.vue` | 系统外观设置和登录外观预览页面 |
+| `system/settings/authentication/index.vue` | 系统登录及认证源配置页面 |
+| `system/settings/email/index.vue` | 系统邮件 SMTP 服务配置页面 |
+| `system/operate-logs/index.vue` | 系统操作日志查询与清理页面 |
+| `system/resource-management/model/index.vue` | System 模型分页、筛选、编辑、授权与删除 |
+| `system/resource-management/tool/index.vue` | System 工具分页、筛选、维护与工作流入口 |
+| `system/shared-resources/model/index.vue` | System 共享模型查询与模型卡片页面 |
+| `system/shared-resources/tool/index.vue` | System 共享工具查询与工具维护页面 |
+| `trigger/index.vue` | 工作空间触发器查询、新建、编辑及单项和批量启停、删除 |
+| `tool/index.vue` | 工作空间工具目录与工具卡片页面 |
 
 ## 备注要求
 
@@ -664,7 +668,7 @@ Workspace 与 System 授权均使用该工作空间 ID，不读取路由工作�
 
 ## 触发器维护
 
-`trigger/index.vue` 负责列表查询、跨页选择、单项启停/删除及批量操作，通过
+`trigger/index.vue` 负责列表查询、当前页选择、单项启停/删除及批量操作，通过
 `trigger/trigger-form/TriggerFormDrawer.vue` 共用新建和编辑流程，编辑时查询详情并保留任务 ID、参数、
 启用状态及 meta。定时支持每日、每周、每月、间隔和五段 Cron；事件支持 URL、Token 和请求参数。
 任务选择复用 `SelectApplicationDialog` 与 `SelectToolDialog`，工具限定自定义和工作流类型。
@@ -776,7 +780,7 @@ Action、Drawer、Dialog 继续通过 props 接收完整 API。设置页复用�
 整页加载并返回知识库列表；当前知识库与共享资源入口均从其他页面进入，挂载时初始化筛选和分页。
 普通与共享文档列表沿用 v2 的 6 秒轮询间隔，在请求结束后安排下一次静默刷新，保留当前筛选、
 分页和勾选，不显示列表 loading；操作请求期间推迟轮询，失败后继续重试，卸载时停止且不再重新调度。
-无排序入口。非共享文档显示选择列，按文档 ID 跨页保留选择，搜索或筛选变化时清空；
+无排序入口。非共享文档显示选择列，只支持当前页选择，翻页、切换每页条数、搜索或筛选变化时清空；
 选中后通过 `footer-batch-actions` 展示批量操作。右侧固定操作列提供启停、向量化、分词索引和更多菜单，
 运行或排队中的任务切换为取消入口。Web、飞书提供同步；工作流知识库仅为 `meta.source_type=web`
 的文档提供单项同步，沿原 Web 数据源分支执行提取、分段并只合并所选文档，不抓取链接或清理其他来源。
@@ -859,7 +863,17 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 `MkDropdown` 单选筛选全部、成功、失败、索引中、分词索引中、排队中和生成中；查询组合
 `status` 与可选的 `task_type`，切换选项清除旧任务类型并回到第一页，保留名称和创建者条件。
 
-文档详情路由暂未启用。System 资源管理与共享资源已注册共用知识库详情路由，
+普通 Workspace 文档行点击进入 `knowledge-detail/paragraph/index.vue`，选择列、名称编辑及行操作
+保留自身交互。分段页与知识库详情容器路由同级，复用 `MkViewLayout` 的顶部栏、侧栏和主区滚动；
+顶部展示接口查询的文档名称、标题／内容搜索、批量选择和添加分段，侧栏按服务端位置排列全部
+查询结果，点击定位正文，滚动同步高亮。正文使用 `MdPreview`；空文档展示空态。
+批量选择支持勾选、全选、取消，当前只提供选择状态，不提交批量写操作。
+`CreateParagraphDialog.vue` 在点击时挂载、关闭动画结束后卸载，标题最多 256 字符，
+内容必填且最多 102400 字符；页面负责新增请求，提交使用内容和按钮 loading，失败保留输入。
+成功关闭弹窗并清空搜索，重新查询服务端排序，不因刷新失败恢复已提交草稿。
+Workspace 共享及 System 分段入口暂未接入，不回退 Workspace API。
+
+System 资源管理与共享资源已注册共用知识库详情路由，
 列表导航已接入。System 详情路由在 System 根路由的 children 汇总，通过详情父路由的 `hideSidebar: true` 隐藏系统管理 Sidebar，保留系统 Header 和知识库详情目录；
 容器使用上下文选定的详情 API，并返回各自 System 列表。System 基础设置、策略保存使用对应 Knowledge API，
 基础表单 `KnowledgeBaseForm` 内部根据资源范围选择完整模型 API，不接收外部 `modelApi`；
@@ -982,11 +996,17 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 模板覆盖及重新加载，以及调试前保存、导出前保存均保持完整流程的 loading。
 自动保存同样复用该状态；历史显隐和退出确认属于交互状态，独立维护。抽屉内部请求状态仍由抽屉管理。
 
-### 知识库工作流导航与导出
+### 知识库工作流导航与导入导出
 
 `workflow/knowledge/navigation.ts` 统一返回入口：Workspace 将详情中的 `type` 通过 `KNOWLEDGE_TYPE_MAP` 转为字符串后返回当前知识库详情，详情尚未加载时使用 `WORKFLOW`；System 资源管理和共享资源返回各自知识库列表。
 历史模式下返回只退出预览；普通编辑态返回保留未保存确认。更多菜单的导出工作流先保存未提交改动，
 再调用专用 `.kbwf` 导出接口；保存失败不导出。知识库原有文件上传、数据源表单与任务轮询调试流程保持独立。
+更多菜单在“导出工作流”上方依次提供“导入文档”和“导入工作流”。导入文档要求工作流已发布，
+复用文档页的 `WorkflowImportDocumentDrawer`，按需挂载并在关闭动画结束后卸载；发布成功即时更新
+本页发布状态。导入工作流选择单个 `.kbwf` 文件，确认覆盖后上传，不先保存旧草稿；确认及请求期间
+暂停自动保存，成功重新加载图、默认模型设置、保存时间与保存基准。取消或请求失败保留当前画布，
+文件选择使用 `el-upload`，关闭自动上传与文件列表展示；选择后调用 `clearFiles()`，
+允许再次选择同一个文件。不增加权限判断。
 
 ## 智能体工作流发布
 
@@ -1046,11 +1066,27 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 排行榜 API 由 `HomeView` 传入 `HomeRankings`，再传给 `RankingDrawer`。两者的 `api`
 均使用 `typeof HomepageApi` 约束，查询、汇总和导出统一通过 `props.api` 调用。
 
-## 知识库工作流执行记录
+## 知识库工作流转换与执行记录
+
+### 知识库工作流转换
+
+`knowledge-detail/workflow-transform/index.vue` 承接 Workspace 非工作流知识库的“工作流”入口，
+路由统一使用 `workflow-entry`（`workspace-knowledge-workflow`），不另设转换路由。
+复用详情布局并隐藏标题栏，展示 v2 转换说明与工作流示例图。知识库详情从已有上下文读取，
+路由 `beforeEnter` 将工作流类型直接重定向至全屏画布，页面不监听类型跳转。
+转换需确认不可回退，页面管理 loading 与重复提交保护，
+通过 `useKnowledgeSettingContext()` 的 `resourceApi.knowledge.postTransformWorkflow` 提交
+深拷贝后的 `knowledge/template.ts` 默认模板，按上下文选择 Workspace、System 资源管理或
+System 共享管理 Knowledge API；成功后进入画布，失败保留转换页。
+当前路由与画布跳转仍仅接入 Workspace，不为 Workspace 共享只读资源增加转换接口或回退。
+
+### 执行记录
 
 `workflow/knowledge/ButtonExecutionRecord.vue` 封装更多菜单入口、抽屉挂载与打开逻辑，接收
 `knowledgeId`，菜单属性（如 `divided`）透传到 `MkDropdownItem`，内部提供知识库 Workflow API。
-`workflow/knowledge/execution-record/` 维护记录列表和详情抽屉，由该按钮组件打开，
+`workflow/knowledge/execution-record/` 维护记录列表和详情抽屉，由该按钮组件打开；
+非共享的工作流文档页在“导入文档”左侧提供“执行记录”按钮，直接复用同一个记录抽屉并传入
+当前知识库 ID 与完整知识库 Workflow API。两个入口均在点击时挂载抽屉，
 关闭动画结束后卸载。列表复用 `MkComplexSearch`、`MkTable` 和 `MkStatusLabel`，支持发起人、
 状态筛选及跨页浏览，每 6 秒刷新；关闭或卸载停止轮询。待执行、执行中任务经确认后取消，成功刷新列表。
 抽屉接收完整知识库 Workflow API；详情查询复用调试任务接口，使用 `ExecutionDetailContent` 展示节点结果。
@@ -1194,7 +1230,6 @@ Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `bod
 成功数只累计状态 `2`，失败与取消完成的进度使用危险色。
 时间读取 `state_time[taskType]` 的排队时间，取消完成读取取消完成时间；缺失元数据使用 0/0 并隐藏时间。
 
-
 ## Workspace 共享知识库详情
 
 知识库列表根据当前目录进入普通或 `workspace-shared-knowledge-detail` 共享详情路由。
@@ -1214,7 +1249,7 @@ Workspace `CommonApi`；范围变化同时清空搜索控件、筛选、创建�
 侧栏使用 `w-sidebar-expanded` 和 `MkSearchList`，由列表统一管理搜索、选中态、独立滚动和空态。
 右侧展示组名、成员数和自动授权；下方工具栏左侧保存、右侧 `MkComplexSearch`，
 用户列表复用 `MkTable` 及其高度约束，无用户组时显示空态，不额外添加主区滚动容器。
-通过 `workspace/chat-user.ts` 请求；当前不接入 `perm`。勾选按当前用户组跨页保留，切换组时清空；
+通过 `workspace/chat-user.ts` 请求；当前不接入 `perm`。授权勾选仅维护当前页，保存只提交当前页用户；翻页、筛选或切换组时重新读取服务端授权状态；
 自动授权开启时禁用手动授权，切换成功后清空旧勾选并重新读取用户状态。筛选和用户组切换回到第一页，
 页面通过 `onMounted` 加载用户组；切换工作空间由顶部入口整页加载，不额外监听路由重置状态，
 也不为搜索组件设置工作空间或智能体 key。来源标签复用登录方式枚举与标签，兼容 `OAUTH2` 返回值。
@@ -1287,7 +1322,6 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 抽屉自己管理显隐并暴露 `open()`；门户视图持有抽屉的 ref，通过 `createPortalConversation` 的
 `openApplicationSelector` 传入门户侧栏 Store。Store 的 `newConversation` 有当前智能体时打开其
 `portal-application` 地址，地址中会话 ID 清空后由 chat 装配函数的会话同步新建对话。
-
 
 ### 知识库详情上下文装配
 

@@ -173,7 +173,7 @@ onMounted(() => loadTriggers())
         @size-change="loadTriggers"
         resizable
       >
-        <el-table-column type="selection" width="48" reserve-selection />
+        <el-table-column type="selection" width="40" />
         <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">

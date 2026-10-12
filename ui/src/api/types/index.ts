@@ -30,4 +30,5 @@ export type * from './state'
 export type * from './portal'
 
 export type * from './document'
+export type * from './paragraph'
 export type * from './chat-log'

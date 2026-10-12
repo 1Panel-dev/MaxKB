@@ -60,6 +60,13 @@ const postCancelKnowledgeWorkflowAction = (knowledgeId: string, actionId: string
 /** 导出知识库工作流文件，不包含知识库文档。 */
 const exportKnowledgeWorkflow = (knowledgeId: string, name: string) => getExportFile(`${name}.kbwf`, `${getPrefix()}/${knowledgeId}/workflow/export`)
 
+/** 导入知识库工作流文件，覆盖当前草稿并由服务端处理关联工具。 */
+const importKnowledgeWorkflow = (knowledgeId: string, file: File) => {
+  const payload = new FormData()
+  payload.append('file', file)
+  return post<FormData, boolean | void>(`${getPrefix()}/${knowledgeId}/workflow/import`, payload)
+}
+
 /** 获取知识库发布历史，按发布时间倒序返回完整版本快照。 */
 const getWorkflowVersions = (knowledgeId: string) => get<WorkflowVersion[]>(`${getPrefix()}/${knowledgeId}/knowledge_version`)
 
@@ -72,6 +79,7 @@ const getKnowledgeExecutionRecordPage = (knowledgeId: string, page: ParamsPage, 
   get<ResponsePage<KnowledgeExecutionRecord>>(`${getPrefix()}/${knowledgeId}/action/${page.currentPage}/${page.pageSize}`, query)
 
 export default {
+  importKnowledgeWorkflow,
   getKnowledgeExecutionRecordPage,
   getWorkflowVersions,
   putWorkflowVersion,

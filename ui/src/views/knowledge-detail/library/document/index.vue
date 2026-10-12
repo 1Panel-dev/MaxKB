@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import type { CascaderOption } from 'element-plus'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { CascaderOption, TableColumnCtx, TableInstance } from 'element-plus'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import MkEditName from '@/components/mk-edit-name/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
+import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
 import CommonApi from '@/api/admin/workspace/common'
@@ -23,6 +24,7 @@ import { MsgSuccess } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
 import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
+import ExecutionRecordDrawer from '@/views/workflow/knowledge/execution-record/ExecutionRecordDrawer.vue'
 import { useKnowledgeDetailContext } from '../../context'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
@@ -51,9 +53,30 @@ defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
 const route = useRoute()
+const router = useRouter()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const knowledgeType = computed(() => String(route.params.type ?? ''))
 const { knowledge } = useKnowledgeDetailContext()
+
+/* 工作流执行记录：复用知识库工作流抽屉，关闭动画结束后卸载。 */
+const executionRecordDrawerMounted = ref(false)
+const executionRecordDrawerRef = useTemplateRef<InstanceType<typeof ExecutionRecordDrawer>>('executionRecordDrawerRef')
+
+function handleOpenExecutionRecords() {
+  if (executionRecordDrawerMounted.value) return
+  executionRecordDrawerMounted.value = true
+  return nextTick(() => executionRecordDrawerRef.value?.open())
+}
+
+/* 文档分段入口：选择列与行内操作继续处理自身交互。 */
+// function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<DocumentItem>) {
+//   if (!isWorkspaceResource() || loading.value || operationLoading.value || column?.type === 'selection') return
+//   void router.push({
+//     name: 'workspace-knowledge-paragraph',
+//     params: { workspaceId: route.params.workspaceId, knowledgeId: knowledgeId.value, type: knowledgeType.value, documentId: document.id },
+//     query: route.query,
+//   })
+// }
 
 /* 快速创建 */
 const showQuickCreate = computed(() => knowledgeType.value === KNOWLEDGE_TYPE_KEY.BASE && !isWorkspaceSharedResource())
@@ -201,7 +224,16 @@ function loadDocuments(showLoading = true): Promise<void> {
     })
     .then((page) => {
       if (!pollingActive) return
+      // 静默轮询只恢复当前页仍存在的勾选；分页查询由表格清空选择。
+      const selectedIds = showLoading ? [] : selectedDocumentIds.value
       documentData.value = page.records
+      if (selectedIds.length) {
+        void nextTick(() => {
+          documentData.value.forEach((document) => {
+            if (selectedIds.includes(document.id)) documentTableRef.value?.tableRef?.toggleRowSelection(document, true)
+          })
+        })
+      }
       paginationConfig.value.total = page.total
       // 删除或迁移最后一页文档后，回到仍有数据的最后一页。
       const lastPage = Math.max(1, Math.ceil(page.total / paginationConfig.value.pageSize))
@@ -233,7 +265,7 @@ function handleImportDocumentSuccess() {
 }
 
 /* 批量操作 */
-const documentTableRef = ref<{ clearSelection: () => void }>()
+const documentTableRef = ref<{ clearSelection: () => void; tableRef?: TableInstance }>()
 const selectedDocuments = ref<DocumentItem[]>([])
 const selectedDocumentIds = computed(() => selectedDocuments.value.map(({ id }) => id))
 
@@ -285,11 +317,26 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <ExecutionRecordDrawer
+    v-if="executionRecordDrawerMounted"
+    ref="executionRecordDrawerRef"
+    :api="WorkflowApi"
+    :knowledge-id="knowledgeId"
+    @closed="executionRecordDrawerMounted = false"
+  />
   <Teleport v-if="headerTarget" :to="headerTarget">
     <div class="flex-between w-full gap-4">
       <h4>{{ title }}</h4>
       <div class="flex-align-center gap-3">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+        <!-- 查看工作流执行记录 -->
+        <span>
+          <el-button plain v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW" @click="handleOpenExecutionRecords">
+            <MkIcon name="icon_schedule-report_outlined" />
+            <span>执行记录</span>
+          </el-button>
+        </span>
+
         <!-- 导入 Web、飞书或工作流文档 -->
         <ButtonImportDocument
           v-if="!showQuickCreate && !isWorkspaceSharedResource()"
@@ -321,6 +368,7 @@ onBeforeUnmount(() => {
     @current-change="loadDocuments()"
     @size-change="loadDocuments()"
     @selection-change="handleSelectionChange"
+    row-class-name="cursor-pointer"
     resizable
   >
     <template v-if="showQuickCreate" #body-prepend>
@@ -328,7 +376,7 @@ onBeforeUnmount(() => {
       <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
     </template>
 
-    <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" reserve-selection />
+    <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" />
 
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip>
       <template #default="{ row }: { row: DocumentItem }">
@@ -477,7 +525,11 @@ onBeforeUnmount(() => {
               /> -->
               <!-- 同步 -->
               <SyncDocumentAction
-                v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK || (knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW && row.meta?.source_type === 'web')"
+                v-if="
+                  knowledgeType === KNOWLEDGE_TYPE_KEY.WEB ||
+                  knowledgeType === KNOWLEDGE_TYPE_KEY.LARK ||
+                  (knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW && row.meta?.source_type === 'web')
+                "
                 label="同步"
                 :api="DocumentApi"
                 :knowledge-id="knowledgeId"

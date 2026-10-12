@@ -26,6 +26,9 @@ const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowl
 const getDocumentPage = (knowledgeId: string, page: ParamsPage, query?: Dict<unknown>) =>
   get<ResponsePage<DocumentItem>>(`${getPrefix(knowledgeId)}/${page.currentPage}/${page.pageSize}`, query)
 
+/** 获取单个文档详情，支持直接访问分段页。 */
+const getDocumentDetail = (knowledgeId: string, documentId: string) => get<DocumentItem>(`${getPrefix(knowledgeId)}/${documentId}`)
+
 /** 批量创建空白文档或导入text文档。 */
 const putBatchCreateDocuments = (knowledgeId: string, documents: DocumentQuickCreatePayload[] | DocumentImportPayload[]) =>
   put<DocumentQuickCreatePayload[] | DocumentImportPayload[], DocumentItem[]>(`${getPrefix(knowledgeId)}/batch_create`, documents)
@@ -171,6 +174,7 @@ const putUnlinkTagDocuments = (knowledgeId: string, tagId: string, documentIds: 
   put(`/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/tag/${tagId}/docs_delete`, { id_list: documentIds })
 
 export default {
+  getDocumentDetail,
   getDocumentTags,
   postAddDocumentTags,
   putDeleteDocumentTags,
