@@ -797,7 +797,7 @@ Web 来源地址与选择器仅在单项设置中编辑，批量设置不展示�
 文档任务是否排队或执行中通过其中的 `isDocumentTaskRunning(document, taskType)` 判断，
 页面及 Action 不重复解析状态字符串；文档或任务状态缺失时返回 `false`。
 `EmbeddingDocumentAction` 负责单项向量化与取消向量化，`BatchEmbeddingAction` 负责批量向量化按钮，`GenerateQuestionsAction` 负责单项生成问题与取消生成，`BatchGenerateQuestionsAction` 负责批量生成问题，`SettingDocumentAction` 负责召回及来源设置，
-`MigrateDocumentAction` 选择目标知识库，`DocumentTagsAction` 添加已有标签和移除文档标签关联；
+`MigrateDocumentAction` 选择目标知识库；`setting-tags/DocumentTagsAction.vue` 暂仅提供“标签设置”入口按钮。
 生成问题复用公共配置弹窗，其余 Action 按下文维护各自专属弹窗。组件接收完整 Document API、知识库 ID、文档 ID 或文档数组及禁用状态，
 点击时快照本次操作对象，内部管理弹窗和请求，成功后通过 `refresh` 通知页面刷新，失败保留输入。
 迁移操作集中在 `document/action-dropdown/migrate/`，`MigrateDocumentAction.vue` 负责入口与弹窗按需挂载，
