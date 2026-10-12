@@ -281,7 +281,6 @@ class DocumentView(APIView):
 
     class Import(APIView):
         authentication_classes = [TokenAuth]
-        parser_classes = [MultiPartParser]
 
         @extend_schema(
             methods=["POST"],
@@ -308,14 +307,14 @@ class DocumentView(APIView):
             operate="Import text files and create documents",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                {"name": f"[{','.join(file.name for file in r.FILES.getlist('file'))}]"},
+                {"name": str(r.data.get("file_id_list", [])), "file_id_list": r.data.get("file_id_list", [])},
             ),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
                 DocumentSerializers.Create(
                     data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "user_id": request.user.id}
-                ).save_text(_get_document_split_payload(request))
+                ).save_text(request.data)
             )
 
     class SplitPattern(APIView):

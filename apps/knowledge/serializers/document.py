@@ -4,6 +4,7 @@ import os
 import re
 import traceback
 from collections import defaultdict
+from contextlib import ExitStack
 from functools import partial, reduce
 from tempfile import TemporaryDirectory
 from typing import Dict, List
@@ -246,10 +247,6 @@ class DocumentSplitRequest(serializers.Serializer):
     doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
 
-class DocumentImportRequest(DocumentSplitRequest):
-    file = serializers.ListField(required=True, allow_empty=False, child=serializers.FileField(), label=_("file list"))
-
-
 class DocumentWebInstanceSerializer(serializers.Serializer):
     source_url_list = serializers.ListField(
         required=True,
@@ -294,6 +291,10 @@ class DocumentInstanceFileIdsSerializer(serializers.Serializer):
         if len(value) != len(set(value)):
             raise serializers.ValidationError(_("Duplicate file ids are not allowed"))
         return value
+
+
+class DocumentImportRequest(DocumentInstanceFileIdsSerializer):
+    doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
 
 class DocumentRefreshSerializer(serializers.Serializer):
@@ -1327,9 +1328,19 @@ class DocumentSerializers(serializers.Serializer):
         def save_text(self, instance: Dict):
             request_serializer = DocumentImportRequest(data=instance)
             request_serializer.is_valid(raise_exception=True)
-            # Parse and persist in one transaction; the existing batch flow applies visual/index strategies.
-            with transaction.atomic():
-                documents = DocumentSerializers.Split(data=self.initial_data).parse(request_serializer.validated_data)
+            file_ids = request_serializer.validated_data["file_id_list"]
+            # Reuse uploaded sources and persist the configured documents in the same transaction.
+            with transaction.atomic(), ExitStack() as stack:
+                knowledge, source_files = self._get_uploaded_files(file_ids)
+                files = [
+                    stack.enter_context(ContentFile(source_file.get_bytes(), name=source_file.file_name))
+                    for source_file in source_files
+                ]
+                validate_knowledge_file_size(knowledge, files)
+                documents = DocumentSerializers.Split(data=self.initial_data).parse(
+                    {"file": files, "doc_strategy": request_serializer.validated_data.get("doc_strategy")},
+                    source_file_ids=[source_file.id for source_file in source_files],
+                )
                 if not any(document.get("content") for document in documents):
                     raise AppApiException(500, _("No importable paragraphs found"))
                 document_list = [
@@ -1339,7 +1350,11 @@ class DocumentSerializers(serializers.Serializer):
                     }
                     for document in documents
                 ]
-                return DocumentSerializers.Batch(data=self.initial_data).batch_save(document_list)
+                result = DocumentSerializers.Batch(data=self.initial_data).batch_save(document_list)
+                QuerySet(File).filter(id__in=file_ids).update(
+                    source_type=FileSourceType.KNOWLEDGE, source_id=str(self.data.get("knowledge_id"))
+                )
+                return result
 
         def save_table_by_file_ids(self, instance: Dict):
             return self._save_by_file_ids(instance, self.parse_table_file)
@@ -1350,12 +1365,25 @@ class DocumentSerializers(serializers.Serializer):
         def _save_by_file_ids(self, instance: Dict, parse_file):
             request_serializer = DocumentInstanceFileIdsSerializer(data=instance)
             request_serializer.is_valid(raise_exception=True)
+            file_ids = request_serializer.validated_data["file_id_list"]
+            knowledge, source_files = self._get_uploaded_files(file_ids)
+            document_list = []
+            for source_file in source_files:
+                with ContentFile(source_file.get_bytes(), name=source_file.file_name) as file:
+                    validate_knowledge_file_size(knowledge, [file])
+                    document_list.extend(parse_file(file, source_file_id=source_file.id))
+            # Keep uploaded sources after the temporary-file cleanup window.
+            QuerySet(File).filter(id__in=file_ids).update(
+                source_type=FileSourceType.KNOWLEDGE, source_id=str(self.data.get("knowledge_id"))
+            )
+            return DocumentSerializers.Batch(data=self.data).batch_save(document_list)
+
+        def _get_uploaded_files(self, file_ids):
             self.is_valid(raise_exception=True)
             knowledge_id = self.data.get("knowledge_id")
             knowledge = QuerySet(Knowledge).filter(id=knowledge_id, workspace_id=self.data.get("workspace_id")).first()
             if knowledge is None:
                 raise AppApiException(500, _("Knowledge id does not exist"))
-            file_ids = request_serializer.validated_data["file_id_list"]
             temporary_types = [
                 FileSourceType.TEMPORARY_30_MINUTE,
                 FileSourceType.TEMPORARY_120_MINUTE,
@@ -1373,16 +1401,7 @@ class DocumentSerializers(serializers.Serializer):
                 raise AppApiException(500, _("File does not exist or no permission to access"))
             source_files = [files[file_id] for file_id in file_ids]
             validate_knowledge_file_size(knowledge, source_files)
-            document_list = []
-            for source_file in source_files:
-                with ContentFile(source_file.get_bytes(), name=source_file.file_name) as file:
-                    validate_knowledge_file_size(knowledge, [file])
-                    document_list.extend(parse_file(file, source_file_id=source_file.id))
-            # Keep uploaded sources after the temporary-file cleanup window.
-            QuerySet(File).filter(id__in=file_ids).update(
-                source_type=FileSourceType.KNOWLEDGE, source_id=str(knowledge_id)
-            )
-            return DocumentSerializers.Batch(data=self.data).batch_save(document_list)
+            return knowledge, source_files
 
         def parse_qa_file(self, file, source_file_id=None):
             if source_file_id is None:
@@ -1459,7 +1478,7 @@ class DocumentSerializers(serializers.Serializer):
             files = instance.get("file")
             validate_knowledge_file_size(knowledge, files)
 
-        def parse(self, instance):
+        def parse(self, instance, source_file_ids=None):
             self.is_valid(instance=instance, raise_exception=True)
             request_serializer = DocumentSplitRequest(data=instance)
             request_serializer.is_valid(raise_exception=True)
@@ -1483,8 +1502,9 @@ class DocumentSerializers(serializers.Serializer):
                         strategy["split"].get("patterns"),
                         strategy["split"].get("auto_clean", False),
                         parse_limit,
+                        source_file_id=source_file_ids[index] if source_file_ids is not None else None,
                     )
-                    for f in file_list
+                    for index, f in enumerate(file_list)
                 ],
                 [],
             )
@@ -1508,18 +1528,20 @@ class DocumentSerializers(serializers.Serializer):
                     file.source_id = self.data.get("knowledge_id")
                     file.save(file_bytes)
 
-        def file_to_paragraph(self, file, pattern_list: List, with_filter: bool, limit: int):
-            # 保存源文件
-            file_id = uuid.uuid7()
-            raw_file = File(
-                id=file_id,
-                file_name=file.name,
-                file_size=file.size,
-                source_type=FileSourceType.KNOWLEDGE,
-                source_id=self.data.get("knowledge_id"),
-            )
-            raw_file.save(file.read())
-            file.seek(0)
+        def file_to_paragraph(self, file, pattern_list: List, with_filter: bool, limit: int, source_file_id=None):
+            file_id = source_file_id
+            if file_id is None:
+                # 预览上传保存源文件；直接导入复用已上传的文件 ID。
+                file_id = uuid.uuid7()
+                raw_file = File(
+                    id=file_id,
+                    file_name=file.name,
+                    file_size=file.size,
+                    source_type=FileSourceType.KNOWLEDGE,
+                    source_id=self.data.get("knowledge_id"),
+                )
+                raw_file.save(file.read())
+                file.seek(0)
 
             get_buffer = FileBufferHandle().get_buffer
             for split_handle in split_handles:

@@ -100,13 +100,11 @@ function handlePrevious() {
 function handleSubmit() {
   if (!validateImportFiles()) return
   if (previewVisible.value && !previewRef.value?.validate()) return
-  const files = successfulFiles.value.flatMap((file) => (file.raw ? [file.raw] : []))
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
-  if (props.mode !== 'text' && fileIds.length !== successfulFiles.value.length) {
+  if (!previewVisible.value && fileIds.length !== successfulFiles.value.length) {
     MsgWarning('文件上传结果缺少文件 ID，请重新上传')
     return
   }
-  if (props.mode === 'text' && !files.length) return
   loading.value = true
   let importRequest: Promise<boolean>
   if (props.mode === 'table') {
@@ -131,7 +129,7 @@ function handleSubmit() {
     // 文本校验处理策略，由单次请求在服务端完成解析与入库。
     importRequest = Promise.resolve(strategyRef.value?.validate()).then((valid) => {
       if (!valid || !strategyRef.value) return false
-      return props.api.postImportTextDocuments(props.knowledgeId, files, strategyRef.value.getStrategy()).then(() => true)
+      return props.api.postImportTextDocuments(props.knowledgeId, fileIds, strategyRef.value.getStrategy()).then(() => true)
     })
   }
   return importRequest

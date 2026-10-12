@@ -585,8 +585,9 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 发送多文件 FormData（重复 `file` 字段）与 JSON 字符串 `doc_strategy`，返回 `DocumentSplitResult[]`；
 页面将解析结果的 `content` 转为 `paragraphs`，保留 `source_file_id` 与策略，再通过
 `putBatchCreateDocuments` PUT `document/batch_create` 创建文档，与空白文档创建共用同一接口封装。
-策略页直接导入使用 `postImportTextDocuments` POST `document/import`，提交相同的多文件 FormData
-与 `doc_strategy`，由服务端在同一请求内解析并创建，返回 `DocumentItem[]`；不先请求 `split`。
+策略页直接导入使用 `postImportTextDocuments` POST `document/import`，提交 JSON
+`{ file_id_list, doc_strategy }`，复用上传成功后的文件 ID，由服务端解析并创建，返回 `DocumentItem[]`；
+不再次上传文件，也不先请求 `split`。
 `postImportTableDocumentsByFileIds` 和 `postImportQADocumentsByFileIds` 分别向
 `document/table_by_file_ids` 和 `document/qa_by_file_ids` 发送 `DocumentFileImportPayload`
 （`{ file_id_list: string[] }`），复用上传成功后的文件 ID，由服务端解析并创建，不再次上传文件。

@@ -9,9 +9,10 @@ export interface DocumentQuickCreatePayload {
   name: string
 }
 
-/** 使用已上传文件创建表格或 QA 文档。 */
+/** 使用已上传文件创建文档，可附带文本处理策略。 */
 export interface DocumentFileImportPayload {
   file_id_list: string[]
+  doc_strategy?: DocumentStrategy
 }
 
 /** 文档召回及来源设置。 */
