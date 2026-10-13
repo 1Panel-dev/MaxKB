@@ -20,7 +20,7 @@ import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowMcpNode' })
 const getModel = inject('getModel') as () => BaseNodeModel
-const apiType = (inject('apiType') as string) || 'workspace'
+const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const model = getModel() as WorkflowNodeModel
 const route = useRoute()
@@ -37,7 +37,7 @@ const mcpResource = MCP_RESOURCE[workflowMode] ?? MCP_RESOURCE[WorkflowMode.Appl
 const mcpResourceType = mcpResource.type
 const mcpResourceId = mcpResource.id() || ''
 
-const store = useWorkflowStore(apiType)
+const store = useWorkflowStore(resourceScope)
 
 interface SchemaProperty {
   description?: string

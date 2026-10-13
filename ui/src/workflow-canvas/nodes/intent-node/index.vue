@@ -12,7 +12,7 @@ import { randomId } from '@/utils/common'
 
 defineOptions({ name: 'WorkflowIntentNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
-const apiType = (inject('apiType') as string) || 'workspace'
+const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const model = getModel()
 const flowModel = model as unknown as { refreshBranch?: () => void }
 
@@ -35,7 +35,7 @@ type IntentModelSetting = Pick<IntentNodeForm, 'model_id' | 'model_id_reference'
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 
-const store = useWorkflowStore(apiType)
+const store = useWorkflowStore(resourceScope)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<ModelProviderItem>>([])
 

@@ -16,8 +16,8 @@ import type { SearchDocumentForm } from './types'
 
 defineOptions({ name: 'WorkflowSearchDocumentNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
-const apiType = (inject('apiType') as string) || 'workspace'
-const store = useWorkflowStore(apiType)
+const resourceScope = (inject('resourceScope') as string) || 'workspace'
+const store = useWorkflowStore(resourceScope)
 const model = getModel()
 const formRef = useTemplateRef<FormInstance>('formRef')
 const questionCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('questionCascaderRef')

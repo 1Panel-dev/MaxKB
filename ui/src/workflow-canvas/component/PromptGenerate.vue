@@ -10,9 +10,9 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ replace: [prompt: string] }>()
 
-// 资源范围沿用画布传递的 apiType，循环内节点也使用同一上下文。
-const apiType = inject<string>('apiType', 'workspace')
-const store = useWorkflowStore(apiType)
+// 资源范围沿用画布传递的 resourceScope，循环内节点也使用同一上下文。
+const resourceScope = inject<string>('resourceScope', 'workspace')
+const store = useWorkflowStore(resourceScope)
 
 // 提示词模板：约束生成结果的角色结构与内容范围。
 const PROMPT_TEMPLATE = `请根据用户描述生成一个完整的AI角色人设模板:

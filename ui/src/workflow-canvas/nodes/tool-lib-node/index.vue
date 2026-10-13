@@ -26,7 +26,7 @@ interface ToolLibNodeForm {
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const model = getModel()
-const store = useWorkflowStore(inject<string>('apiType', 'workspace'))
+const store = useWorkflowStore(inject<string>('resourceScope', 'workspace'))
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 

@@ -14,9 +14,9 @@ import type { RerankerSetting } from './types'
 
 defineOptions({ name: 'WorkflowRerankerNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
-const apiType = inject<string>('apiType', 'workspace')
+const resourceScope = inject<string>('resourceScope', 'workspace')
 const model = getModel()
-const store = useWorkflowStore(apiType)
+const store = useWorkflowStore(resourceScope)
 const formRef = useTemplateRef<FormInstance>('formRef')
 
 interface RerankerForm {

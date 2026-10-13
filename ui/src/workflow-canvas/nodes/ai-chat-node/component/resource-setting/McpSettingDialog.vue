@@ -11,8 +11,8 @@ import type { McpSetting, McpSource } from '../../types'
 defineOptions({ name: 'AiChatNodeMcpSettingDialog' })
 
 const emit = defineEmits<{ submit: [setting: McpSetting]; loaded: [tools: ToolItem[]] }>()
-const apiType = inject<string>('apiType', 'workspace')
-const store = useWorkflowStore(apiType)
+const resourceScope = inject<string>('resourceScope', 'workspace')
+const store = useWorkflowStore(resourceScope)
 
 const MCP_SERVER_EXAMPLE = `{
   "math": {

@@ -14,7 +14,7 @@ import type { ParameterField } from './component/parameters-field/types'
 
 defineOptions({ name: 'WorkflowParameterExtractionNode' })
 const getModel = inject('getModel') as () => BaseNodeModel
-const apiType = (inject('apiType') as string) || 'workspace'
+const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const model = getModel() as WorkflowNodeModel
 
 interface ParameterExtractionForm {
@@ -28,7 +28,7 @@ interface ParameterExtractionForm {
 
 const parameterExtractionFormRef = useTemplateRef<FormInstance>('parameterExtractionFormRef')
 
-const store = useWorkflowStore(apiType)
+const store = useWorkflowStore(resourceScope)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<ModelProviderItem>>([])
 

@@ -19,7 +19,7 @@ const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
 
 const parentLoopWorkflowMode = inject<WorkflowMode>('loopWorkflowMode') || WorkflowMode.ApplicationLoop
-const apiType = (inject('apiType') as string) || 'workspace'
+const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const currentResource = inject<unknown>('currentResource')
 const getSelectModelList = inject<(params: { model_type: string }) => Promise<ModelItem[]>>('getSelectModelList')
 const modelParamsForm = inject<(modelId: string) => unknown>('getModelParamsForm')
@@ -133,7 +133,7 @@ const renderGraphData = (data?: LogicFlow.GraphConfigData) => {
     workflowMode: parentLoopWorkflowMode,
     loopWorkflowMode: parentLoopWorkflowMode,
     currentResource,
-    apiType,
+    resourceScope,
     getSelectModelList,
     getModelParamsForm: modelParamsForm,
     startDragNode: nestedStartDrag,

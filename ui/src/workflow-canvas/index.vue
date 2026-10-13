@@ -17,7 +17,7 @@ import NodeControl from './component/NodeControl.vue'
 defineOptions({ name: 'WorkflowCanvas' })
 
 type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void }
-const apiType = inject('resourceScope', 'workspace')
+const resourceScope = inject('resourceScope', 'workspace')
 const props = withDefaults(
   defineProps<{
     data?: LogicFlow.GraphConfigData | null
@@ -83,7 +83,7 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   lf.value.graphModel.get_provide = (model: LogicFlow.NodeData | null, graph: GraphModel | null) => ({
     getModel: () => model,
     getGraph: () => graph,
-    apiType: apiType,
+    resourceScope: resourceScope,
     workflowMode: props.workflowMode,
     loopWorkflowMode: props.loopWorkflowMode,
   })

@@ -207,7 +207,7 @@ Workspace、System 资源管理和 System 共享资源均把 `postPromptGenerate
 路径为 `/workspace/<workspaceId>/model/<modelId>/prompt_generate` 与 `/system/model/<modelId>/prompt_generate`，
 System 接口不依赖工作空间 ID。
 均返回原始 SSE Response，由公共生成组件读取。画布的 `PromptGenerate` 通过
-`useWorkflowStore(apiType).postPromptGenerate` 调用；三个范围的 Store 适配器分别引用对应的
+`useWorkflowStore(resourceScope).postPromptGenerate` 调用；三个范围的 Store 适配器分别引用对应的
 Model API，直接转发生成请求，不使用查询缓存或请求去重。
 
 ### 知识库维护
