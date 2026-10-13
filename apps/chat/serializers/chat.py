@@ -456,13 +456,14 @@ class ChatSerializers(serializers.Serializer):
                 if not is_auth:
                     raise ChatException(500, _("The chat user is not authorized."))
 
-    def chat(self, instance: dict, base_to_response: BaseToResponse = SystemToResponse()):
+    def chat(self, instance: dict, base_to_response: BaseToResponse = SystemToResponse(),
+             check_chat_record: bool = True):
         super().is_valid(raise_exception=True)
         ChatMessageSerializers(data=instance).is_valid(raise_exception=True)
         chat_info = self.get_chat_info()
         chat_info.get_application()
         chat_info.get_chat_user(asker=(instance.get('form_data') or {}).get('asker'))
-        if instance.get('chat_record_id'):
+        if check_chat_record and instance.get('chat_record_id'):
             if self.data.get('debug'):
                 # 调试记录只保存在当前会话缓存中，不会写入数据库。
                 chat_record_exists = any(
@@ -472,7 +473,7 @@ class ChatSerializers(serializers.Serializer):
                 )
             else:
                 chat_record_exists = QuerySet(ChatRecord).filter(id=instance.get('chat_record_id'),
-                                                                chat_id=self.data.get('chat_id')).exists()
+                                                                 chat_id=self.data.get('chat_id')).exists()
             if not chat_record_exists:
                 raise ChatException(500, _("Conversation does not exist"))
         self.is_valid_chat_id(chat_info)
