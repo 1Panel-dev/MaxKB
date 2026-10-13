@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import type { ResponsePage } from '@/api/admin/core/types'
 
 defineOptions({ name: 'MkInfiniteScroll' })
@@ -33,6 +33,7 @@ let infiniteScrollObserver: IntersectionObserver | undefined
 
 function loadPage(currentPage: number) {
   const currentRequestVersion = ++requestVersion
+  let pageLoaded = false
   loading.value = true
 
   return props
@@ -43,13 +44,21 @@ function loadPage(currentPage: number) {
       // 第一页替换旧列表，滚动加载的后续页追加到现有列表。
       dataList.value = currentPage === 1 ? page.records : [...dataList.value, ...page.records]
       pagination.value = { currentPage: page.current, pageSize: page.size, total: page.total }
+      pageLoaded = page.records.length > 0 && page.current === currentPage
     })
     .catch(() => {})
-    .finally(() => {
+    .finally(async () => {
       // 旧请求不能关闭新请求正在显示的 loading。
       if (currentRequestVersion === requestVersion) {
         if (currentPage === 1) firstPageLoaded.value = true
         loading.value = false
+        // 内容不足一屏时哨兵可能一直可见；渲染后重新观察，按最新布局决定是否补页。
+        // 失败或空页不自动续载，避免重复请求。
+        if (!pageLoaded || finished.value) return
+        await nextTick()
+        if (currentRequestVersion !== requestVersion || !triggerRef.value || !infiniteScrollObserver) return
+        infiniteScrollObserver.unobserve(triggerRef.value)
+        infiniteScrollObserver.observe(triggerRef.value)
       }
     })
 }
@@ -71,6 +80,7 @@ function reset() {
 onMounted(() => {
   infiniteScrollObserver = new IntersectionObserver(
     ([entry]) => {
+      if (!infiniteScrollObserver) return
       isTriggerVisible.value = entry?.isIntersecting ?? false
       tryLoadNextPage()
     },
@@ -83,7 +93,9 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  requestVersion += 1
   infiniteScrollObserver?.disconnect()
+  infiniteScrollObserver = undefined
 })
 
 defineExpose({ reset })

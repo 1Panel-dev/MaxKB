@@ -29,7 +29,8 @@
   资源，用于维护跨 Workspace、System 资源管理或 System 共享资源复用的卡片 Action。其他业务
   暂不主动创建这类目录，操作入口和配套流程优先留在所属页面或组件中；出现明确的跨范围共享需求
   后再评估是否采用相同结构。按明确需求，文档页使用 `knowledge-detail/library/document/action-dropdown/`
-  集中维护行操作、批量操作及其专属弹窗；不因此扩展其他普通页面的目录规则。
+  集中维护行操作、批量操作及其专属弹窗；分段页按明确需求使用 `document-detail/action-dropdown/`，
+  按迁移和生成问题分组维护批量按钮与单项菜单 Action，不因此扩展其他普通页面的目录规则。
 - 仅供一个页面使用的代码放在该页面功能目录；同一功能下多个页面复用的代码放在它们最近的
   共同功能目录中。
 - 不要为了复用一个页面内部实现而提前移动到 `src/components`。
@@ -889,22 +890,28 @@ Workspace 普通资源、System 资源管理和 System 共享资源允许打开�
 文档详情页面及其专属组件统一放在 `views/document-detail/`，与 `knowledge/`、`knowledge-detail/` 平级。
 普通 Workspace 文档行点击进入 `document-detail/index.vue`，选择列、名称编辑及行操作
 保留自身交互。分段页与知识库详情容器路由同级，复用 `MkViewLayout` 的顶部栏、侧栏和主区滚动；
-顶部展示接口查询的文档名称、标题／内容搜索、批量选择和添加分段，侧栏按服务端位置排列全部
-查询结果，点击定位正文，滚动同步高亮。正文使用 `MdPreview`；空文档展示空态。
+顶部展示接口查询的文档名称、标题／内容搜索、批量选择和添加分段，主区使用 `MkInfiniteScroll`
+按组件配置的每页数量加载分段，显示接口返回的筛选结果总数。侧栏按服务端位置排列已加载分段，
+点击定位正文，滚动同步高亮；批量全选仅覆盖已加载分段，追加加载不清空已有勾选。
+搜索、新增后通过 `refreshParagraphs()` 重置到第一页，显示首次加载状态并回到顶部；
+编辑、启停局部替换卡片，删除、迁移局部移除，保留其他已加载数据和滚动位置。
+局部移除后，下一次滚动请求按剩余列表长度定位服务端分页，必要时拼接相邻两页，避免漏载。
+正文使用 `MdPreview`；第一页加载完成且无分段时展示空态。
 批量选择支持点击整张卡片或复选框切换勾选、全选、取消、“迁移至”、“生成问题”和“删除”；
-复选框阻止点击冒泡，避免重复切换。`document-detail/migrate/` 集中维护
-`ButtonMigrateParagraph` 和 `ParagraphMigrateDialog`，沿用 chat-log 添加知识库的知识库／文档
+复选框阻止点击冒泡，避免重复切换。`document-detail/action-dropdown/migrate/` 集中维护
+批量按钮 `BatchMigrateParagraphAction`、单项菜单 `MigrateParagraphAction` 和 `ParagraphMigrateDialog`，沿用 chat-log 添加知识库的知识库／文档
 选择样式，保留知识库和文档图标；迁移 API 由分段页传入完整 Paragraph API 对象。
 打开时固定所选分段 ID，选择知识库后查询全部文档并排除当前文档，允许迁移至同知识库其他文档。
 知识库和文档必选，成功关闭动画结束后通过 `success(paragraphIds)` 返回本次迁移的固定 ID，
-页面从本地列表移除对应分段、清空勾选并更新目录定位，不重新查询分段接口，失败保留表单。
-`document-detail/components/ButtonGenerateQuestions.vue` 封装批量生成入口，
+页面局部移除对应分段、扣减总数并移除对应勾选，不重载列表；失败保留表单。
+`document-detail/action-dropdown/generate-questions/` 维护批量按钮 `BatchGenerateQuestionsAction`
+和单项菜单 `GenerateQuestionsAction`，
 接收页面传入的完整 Paragraph API，打开时固定知识库、文档和勾选分段。复用公共
 `GenerateQuestionsDialog` 并传入 `showParagraphScope=false`，仅提交生成配置和所选分段 ID，
-不传 `state_list`；请求成功关闭后重新查询当前筛选结果并清空选择，失败保留配置。
+不传 `state_list`；生成问题属于异步任务，提交成功关闭后仅清空选择，不重载列表；失败保留配置。
 批量删除按钮和请求逻辑直接维护在 `document-detail/index.vue`，不单独拆分组件。
 确认前固定所选分段与所属文档，确认后提交批量删除接口；成功从本地列表移除本次删除的分段、
-清空勾选并更新目录定位，不重新查询分段接口。
+扣减总数并移除对应勾选，保留其他卡片与滚动位置。
 取消或失败保留选择，确认及请求期间阻止重复操作。
 `document-detail/paragraph-dialog/` 维护两个独立弹窗，以本地组件组合左右布局：
 
@@ -935,15 +942,27 @@ Workspace 普通资源、System 资源管理和 System 共享资源允许打开�
 两个 Dialog 均接收完整 Paragraph API 和知识库／文档 ID，打开时固定目标，点击时挂载、关闭动画结束后卸载。
 详情加载失败提供重试；请求失败保留草稿。正文保存不提交 `problem_list`，也不使用保存响应回填问题列表，
 避免覆盖并行的问题操作；取消编辑不撤销即时保存的问题关联。
-新增成功关闭弹窗并通知页面清空搜索、重新查询服务端排序；编辑成功通知页面刷新当前筛选结果。
-分段卡片在非批量模式点击打开详情弹窗，批量模式点击切换勾选；批量生成问题继续使用 `components/ButtonGenerateQuestions.vue`。
+新增成功关闭弹窗并通知页面清空搜索、从第一页重新加载；编辑成功通过 `success(paragraph)`
+返回保存响应，页面通过 `handleReplaceParagraph()` 按 ID 局部替换，标题和内容不再匹配当前搜索时局部移除。
+分段卡片在非批量模式点击打开详情弹窗，批量模式点击切换勾选；批量生成问题使用 `action-dropdown` 导出的 `BatchGenerateQuestionsAction`。
 非批量卡片右上角使用与文档导入预览相同的 sticky 悬浮操作区和白色阴影 Card，
 提供启停、直接编辑及上方插入；更多菜单提供单段生成问题、迁移、移动位置与删除。
-`ButtonGenerateQuestions` 和 `ButtonMigrateParagraph` 的默认插槽暴露 `open`、`disabled`，
-供单段菜单复用既有流程，默认仍渲染批量按钮；更多菜单使用 `persistent` 保留其中的业务弹窗。
-启停仅提交 `is_active`，成功后更新当前卡片；单段删除确认后调用独立 DELETE 接口并从本地移除。
-位置菜单包含置于顶部、上移、下移、置于底部，先查询完整文档分段顺序再调整位置，
-不按搜索结果计算相邻位置；调整成功后刷新当前筛选结果并保留主区滚动位置。
+更多菜单及移动位置子菜单通过 `visible-change` 维护各自展开状态，展开期间对应操作 Card
+保持显示；关闭后恢复悬浮或焦点显隐，刷新、切换批量模式及移除对应分段时清理状态。
+该状态只控制操作区显隐，菜单与业务弹窗的挂载仍由 `MkDropdown` 的 `persistent` 管理。
+`BatchGenerateQuestionsAction` 和 `BatchMigrateParagraphAction` 直接渲染批量按钮；
+`GenerateQuestionsAction` 和 `MigrateParagraphAction` 直接渲染单项 `MkDropdownItem`；
+`GenerateQuestionsAction` 的入口文案由页面通过必填 `label` 传入。
+四个 Action 各自管理目标快照、入口和弹窗，不提供触发插槽，也不通过批量 Action 包装单项操作；
+单项与批量迁移复用 `ParagraphMigrateDialog`，生成问题复用公共 `GenerateQuestionsDialog`。
+页面通过 `action-dropdown/index.ts` 导入并组合，弹窗均点击后挂载、关闭动画结束后卸载；
+更多菜单使用 `persistent` 保留 Action 实例，迁移弹窗关闭后由重新挂载初始化状态。
+启停仅提交 `is_active`，成功后复用局部替换方法；单段删除确认后调用独立 DELETE 接口并局部移除。
+`action-dropdown/MoveParagraphAction.vue` 封装位置菜单及四个方向选项，接收 `label` 和 `disabled`，
+通过 `move(direction)` 通知页面执行移动，通过 `visible-change` 通知页面维护操作 Card 显隐；
+方向类型 `ParagraphMoveDirection` 放在同目录 `types.ts`，由 `index.ts` 类型导出。
+位置菜单包含置于顶部、上移、下移、置于底部，页面先查询完整文档分段顺序再调整位置，
+不按搜索结果计算相邻位置；调整成功后仅查询并替换当前已加载范围，保留分页与滚动位置。
 Workspace 共享及 System 分段路由已注册并保持来源导航；各范围分段 API 接入暂缓。
 
 System 资源管理与共享资源已注册共用知识库详情路由，

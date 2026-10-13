@@ -565,7 +565,10 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 `/<knowledgeId>/document/<documentId>` 查询文档详情，支持分段页刷新和直接访问。
 `workspace/knowledge/paragraph.ts` 维护普通 Workspace 文档分段接口，前缀为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<documentId>/paragraph`。
-`getParagraphList` 查询完整分段列表，支持 `title`、`content`，服务端按 `position`、创建时间排序；
+`getParagraphList` 查询完整分段列表，供位置调整定位相邻分段；
+`getParagraphPage(knowledgeId, documentId, page, query?)` 查询 `/<currentPage>/<pageSize>`，
+返回 `ResponsePage<ParagraphItem>`，供分段详情滚动加载。两者均支持 `title`、`content`，
+服务端按 `position`、创建时间排序；
 `postParagraph` 提交 `title`、`content`、`is_active` 和可选的 `problem_list: [{ content }]`，
 返回新增分段详情，默认插入首位并触发索引。
 新增载荷可传 `position`，在目标位置插入，用于当前分段上方添加。

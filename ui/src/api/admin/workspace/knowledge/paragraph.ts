@@ -1,4 +1,5 @@
 import { del, get, post, put } from '../../core/request'
+import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   ParagraphCreatePayload,
   ParagraphDetail,
@@ -16,6 +17,10 @@ const getPrefix = (knowledgeId: string, documentId: string) =>
 /** 查询文档的全部分段，按位置排序，支持标题和内容筛选。 */
 const getParagraphList = (knowledgeId: string, documentId: string, query?: ParagraphQuery) =>
   get<ParagraphItem[]>(getPrefix(knowledgeId, documentId), { ...query })
+
+/** 分页查询文档分段，供详情页滚动加载。 */
+const getParagraphPage = (knowledgeId: string, documentId: string, page: ParamsPage, query?: ParagraphQuery) =>
+  get<ResponsePage<ParagraphItem>>(`${getPrefix(knowledgeId, documentId)}/${page.currentPage}/${page.pageSize}`, { ...query })
 
 /** 在指定位置新增分段，默认首位，由服务端触发索引。 */
 const postParagraph = (knowledgeId: string, documentId: string, payload: ParagraphCreatePayload) =>
@@ -74,6 +79,7 @@ const putParagraphPosition = (knowledgeId: string, documentId: string, paragraph
 
 export default {
   getParagraphList,
+  getParagraphPage,
   postParagraph,
   getParagraphDetail,
   putParagraph,
