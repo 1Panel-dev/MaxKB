@@ -1488,7 +1488,7 @@ class DocumentSerializers(serializers.Serializer):
             strategy_input = validated_data.get("doc_strategy") or {
                 "split": {
                     "patterns": validated_data.get("patterns"),
-                    "max_length": validated_data.get("limit", 4096),
+                    "limit": validated_data.get("limit", 4096),
                     "auto_clean": validated_data.get("with_filter", False),
                 }
             }
@@ -1500,7 +1500,7 @@ class DocumentSerializers(serializers.Serializer):
                         f,
                         strategy["split"].get("patterns"),
                         strategy["split"].get("auto_clean", False),
-                        strategy["split"]["max_length"],
+                        strategy["split"]["limit"],
                         source_file_id=source_file_ids[index] if source_file_ids is not None else None,
                     )
                     for index, f in enumerate(file_list)

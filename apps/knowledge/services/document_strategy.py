@@ -11,6 +11,7 @@ DEFAULT_DOCUMENT_STRATEGY = {
     "split": {
         "mode": "smart",
         "patterns": None,
+        "limit": 4096,
         "min_length": 0,
         "max_length": 4096,
         "child_length": 256,
@@ -45,7 +46,10 @@ def normalize_document_strategy(strategy: Dict | None) -> Dict:
     if split.get("mode") not in {"smart", "advanced"}:
         split["mode"] = "smart"
     split["min_length"] = max(0, int(split.get("min_length") or 0))
-    split["max_length"] = min(100000, max(50, int(split.get("max_length") or 4096)))
+    limit = provided_split.get("limit", provided_split.get("max_length", 4096))
+    split["limit"] = min(100000, max(50, int(limit or 4096)))
+    # Keep the legacy field in normalized responses for existing clients and stored strategies.
+    split["max_length"] = split["limit"]
     if split["min_length"] > split["max_length"]:
         split["min_length"] = split["max_length"]
     split["child_length"] = min(2048, max(50, int(split.get("child_length") or 256)))
@@ -81,7 +85,7 @@ def parse_web_content(content: str, strategy: Dict | None) -> List[Dict]:
     normalized = normalize_document_strategy(strategy)
     split = normalized["split"]
     patterns = split.get("patterns")
-    parse_limit = 100000 if patterns == [] else split["max_length"]
+    parse_limit = 100000 if patterns == [] else split["limit"]
     if patterns:
         split_model = SplitModel(patterns, with_filter=split["auto_clean"], limit=parse_limit)
     else:
@@ -96,8 +100,10 @@ def stable_hash(value) -> str:
 
 def strategy_hashes(strategy: Dict | None) -> Dict[str, str]:
     normalized = normalize_document_strategy(strategy)
+    split = {key: value for key, value in normalized["split"].items() if key != "limit"}
     return {
-        "split_strategy_hash": stable_hash(normalized["split"]),
+        # The limit alias must not invalidate fingerprints of otherwise unchanged documents.
+        "split_strategy_hash": stable_hash(split),
         "visual_strategy_hash": stable_hash(normalized["visual"]),
         "index_strategy_hash": stable_hash(normalized["index"]),
     }
@@ -118,7 +124,7 @@ def apply_length_strategy(paragraphs: List[Dict], strategy: Dict | None) -> List
             if value.strip():
                 parts.append(value)
         return [{"title": "", "content": "\n".join(parts)}] if parts else []
-    maximum, minimum = split["max_length"], split["min_length"]
+    maximum, minimum = split["limit"], split["min_length"]
     result: List[Dict] = []
     for paragraph in paragraphs:
         content = paragraph.get("content") or ""

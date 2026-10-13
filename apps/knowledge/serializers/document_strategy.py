@@ -25,6 +25,7 @@ class WebSourceURLField(serializers.CharField):
 class DocumentSplitStrategySerializer(serializers.Serializer):
     mode = serializers.ChoiceField(choices=["smart", "advanced"], required=False)
     patterns = serializers.ListField(child=serializers.CharField(allow_blank=False), required=False, allow_null=True)
+    limit = serializers.IntegerField(min_value=50, max_value=100000, required=False)
     min_length = serializers.IntegerField(min_value=0, max_value=100000, required=False)
     max_length = serializers.IntegerField(min_value=50, max_value=100000, required=False)
     child_length = serializers.IntegerField(min_value=50, max_value=2048, required=False)
@@ -44,7 +45,7 @@ class DocumentSplitStrategySerializer(serializers.Serializer):
 
     def validate(self, attrs):
         minimum = attrs.get("min_length", 0)
-        maximum = attrs.get("max_length", 4096)
+        maximum = attrs.get("limit", attrs.get("max_length", 4096))
         if minimum > maximum:
             raise serializers.ValidationError(
                 {"min_length": _("The minimum paragraph length cannot exceed the maximum paragraph length")}

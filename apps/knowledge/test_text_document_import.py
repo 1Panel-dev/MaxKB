@@ -93,6 +93,21 @@ class TextDocumentImportTests(SimpleTestCase):
         self.assertEqual(documents[0]["doc_strategy"]["visual"], normalize_document_strategy(self.strategy)["visual"])
         self.assertEqual(documents[0]["doc_strategy"]["index"], self.strategy["index"])
 
+    def test_import_uses_nested_limit_and_preserves_it_in_the_saved_strategy(self):
+        self.payload["doc_strategy"] = {
+            "split": {"mode": "advanced", "patterns": None, "limit": 49523, "child_length": 256, "auto_clean": True},
+            "visual": {"enabled": False, "strategy": "model", "model_id": None, "tool_id": None},
+            "index": {"title_as_question": False},
+        }
+        self.sources[0].get_bytes.return_value = b"a" * 49623
+
+        self.creator.save_text(self.payload)
+
+        document = self.batch.return_value.batch_save.call_args.args[0][0]
+        self.assertEqual([len(p["content"]) for p in document["paragraphs"]], [49523, 100])
+        self.assertEqual(document["doc_strategy"]["split"]["limit"], 49523)
+        self.assertEqual(document["doc_strategy"]["split"]["child_length"], 256)
+
     def test_empty_identifiers_keep_default_heading_splitting(self):
         self.strategy["split"]["patterns"] = []
         self.sources[0].file_name = "headings.md"
@@ -145,6 +160,7 @@ class TextDocumentImportTests(SimpleTestCase):
             {"file_id_list": [str(self.sources[0].id)] * 2},
             {"file": [ContentFile(b"text", name="text.txt")]},
             {**self.payload, "doc_strategy": {"split": {"max_length": 10}}},
+            {**self.payload, "doc_strategy": {"split": {"limit": 10}}},
             {**self.payload, "doc_strategy": {"split": {"patterns": ["["]}}},
             {**self.payload, "doc_strategy": {"visual": {"enabled": True}}},
         ]
