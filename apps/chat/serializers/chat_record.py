@@ -54,7 +54,7 @@ class VoteSerializer(serializers.Serializer):
         chat_user_id = self.data.get('chat_user_id')
         chat_record_id = self.data.get('chat_record_id')
         chat_id = self.data.get('chat_id')
-        if QuerySet(ChatRecord).filter(chat_id=chat_id, chat_record_id=chat_record_id,
+        if not QuerySet(ChatRecord).filter(chat_id=chat_id, id=chat_record_id,
                                        chat__chat_user_id=chat_user_id).exists():
             raise AppApiException(500, _('Chat is not exist'))
 
