@@ -6,12 +6,15 @@ import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge
 import SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import SyncApi from '@/api/admin/workspace/knowledge/sync'
+import SharedSyncApi from '@/api/admin/workspace/shared/knowledge/sync'
+import SystemResourceSyncApi from '@/api/admin/system/resource-management/knowledge/sync'
+import SystemSharedSyncApi from '@/api/admin/system/shared-resources/knowledge/sync'
 import type { KnowledgeDetail } from '@/api/types'
 import type { ResourceScope } from '@/router/admin/types'
 
 interface KnowledgeResourceApi {
   readonly knowledge: typeof KnowledgeApi | typeof SharedKnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi
-  readonly sync?: typeof SyncApi
+  readonly sync: typeof SyncApi | typeof SharedSyncApi | typeof SystemResourceSyncApi | typeof SystemSharedSyncApi
 }
 
 interface KnowledgeResourceConfig {
@@ -26,15 +29,15 @@ const resourceConfigs = {
     listRouteName: 'workspace-knowledge-list',
   },
   'workspace-shared': {
-    resourceApi: { knowledge: SharedKnowledgeApi },
+    resourceApi: { knowledge: SharedKnowledgeApi, sync: SharedSyncApi },
     listRouteName: 'workspace-knowledge-list',
   },
   'system-resource': {
-    resourceApi: { knowledge: SystemResourceKnowledgeApi },
+    resourceApi: { knowledge: SystemResourceKnowledgeApi, sync: SystemResourceSyncApi },
     listRouteName: 'system-resource-knowledge',
   },
   'system-shared': {
-    resourceApi: { knowledge: SystemSharedKnowledgeApi },
+    resourceApi: { knowledge: SystemSharedKnowledgeApi, sync: SystemSharedSyncApi },
     listRouteName: 'system-shared-knowledge',
   },
 } satisfies Record<ResourceScope, KnowledgeResourceConfig>
@@ -89,6 +92,17 @@ export function useKnowledgeDetailContext() {
   const context = inject(knowledgeDetailContextKey)
   if (!context) throw new Error('Knowledge detail context is unavailable')
   return context
+}
+
+/** 同步查询使用当前范围，保存仅提供给现有 API 支持写入的三个范围。 */
+export function useKnowledgeSyncContext() {
+  const context = useKnowledgeDetailContext()
+  const requestSettingApi = computed(() => {
+    const scope = context.resourceScope.value
+    if (!scope || scope === 'workspace-shared') return undefined
+    return resourceConfigs[scope].resourceApi.sync
+  })
+  return { ...context, requestSettingApi }
 }
 
 /** 设置页只属于可管理范围，在上下文边界排除 Workspace 共享只读资源。 */

@@ -944,7 +944,8 @@ System 资源管理与共享资源已注册共用知识库详情路由，
 基础表单 `KnowledgeBaseForm` 内部根据资源范围选择完整模型 API，不接收外部 `modelApi`；
 Workspace 普通与共享资源均使用 Workspace 模型选项接口，System 资源管理使用 System 模型接口，
 System 共享使用系统共享模型接口。
-System 暂无前端 Sync API 模块，定时同步页仍展示设置及日志布局，不发送 Workspace 请求。
+四种范围的定时同步查询和日志均使用各自现有 Sync API；Workspace 普通和 System 两种范围支持保存，
+Workspace 共享只读，不发送保存请求，不回退 Workspace 接口。
 library 的接口调整已撤回，文档和标签沿用原有调用方式，System library API 适配尚未实施。
 路由结构及来源配置见 `src/router/ROUTE_README.md`。
 
@@ -1411,14 +1412,16 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 上下文只维护共享详情数据、更新能力及多个子页面共用的接口。仅由单个子页面使用的接口，
 在该页面内部按资源范围选择，不为单页接口增加 context 配置或转发 getter。
 定时同步接口属于定时同步页自身职责；未提供对应范围接口时，不回退到 Workspace，
-也不为 Workspace 共享只读资源增加写接口。当前 `sync` 尚保留在详情上下文，后续调整时按此规则收回定时同步页。
+也不为 Workspace 共享只读资源增加写接口。同步接口由 `useKnowledgeSyncContext` 提供给定时同步页，
+按现有四套 Sync API 的真实方法集合装配，不扩展接口。
 
 `provideKnowledgeDetailContext` 在详情入口装配并提供上下文，`useKnowledgeDetailContext` 供子页读取。
 基础设置和文档策略通过 `useKnowledgeSettingContext` 获取可管理范围的完整 Knowledge API 类型，
-该设置上下文的 `resourceApi` 仅提供 `knowledge`；定时同步从普通详情上下文读取 `sync`，不重复暴露。
+该设置上下文的 `resourceApi` 仅提供 `knowledge`；定时同步通过 `useKnowledgeSyncContext` 读取当前
+`resourceApi.sync` 及可保存范围的 `requestSettingApi`。Workspace 共享只查询设置和日志，表单只读且不显示保存。
 不在页面用方法是否存在判断可写能力；上下文边界排除 Workspace 共享只读范围，
 共享设置路由已注册，API 上下文仍保留原有只读边界，写接口接入暂缓。
-上下文按响应式 `resourceScope` 选择完整 Knowledge、Sync API 对象，
+上下文按响应式 `resourceScope` 选择各范围现有完整 Knowledge、Sync API 对象，
 统一通过响应式 `resourceApi.knowledge / sync` 提供接口，脚本调用不需要 `.value`；
 详情查询与保存使用同一个完整 Knowledge API 对象，不存在的设置模块保持 undefined。
 返回列表路由独立提供；不要在 setup 时解构 `resourceApi` 内的具体 API，以免固定为旧范围的对象。
@@ -1429,5 +1432,5 @@ library 下的文档、标签与迁移组件保留原有调用方式，不装配
 System 飞书专用保存方法尚未提供，基础设置沿该范围现有 `putKnowledge` 协议；Workspace 飞书保留专用方法。
 
 四套知识库详情菜单及来源导航已统一，`useKnowledgeNavigationContext` 仅维护路由名称与参数，
-不配置 API。各范围接口存在差异，API 模块和原有详情接口上下文保持原实现；
-后续按每套真实接口分别接入，不将菜单完整度视为接口接入完成。
+不配置 API。各范围接口存在差异，API 模块保持原实现；本轮仅补齐 sync 的范围装配与消费，
+其他模块后续按每套真实接口分别接入，不将菜单完整度视为接口接入完成。
