@@ -229,7 +229,7 @@ class ApplicationTask(BaseTriggerTask):
                     'type': ChatSourceChoices.TRIGGER.value
                 },
                 'debug': False
-            }).chat(instance=parameters))
+            }).chat(instance=parameters, check_chat_record=False))
             chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
             if chat_record:
                 state = get_workflow_state(chat_record.details)
