@@ -222,7 +222,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
         self.assertIn("old", {document.id for document in self.documents})
 
     @patch("knowledge.services.workflow_sync._copy_document_relations")
-    @patch("knowledge.services.workflow_sync.process_visual_assets")
+    @patch("knowledge.services.workflow_sync.defer_visual_assets")
     @patch("knowledge.services.workflow_sync.sync_paragraph_assets")
     @patch("knowledge.services.workflow_sync.transaction.atomic")
     @patch("knowledge.services.workflow_sync.IncrementalDocumentSync")
@@ -314,7 +314,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
     @patch("knowledge.services.workflow_sync.celery_app.send_task")
     @patch("knowledge.services.workflow_sync.transaction.on_commit")
     @patch("knowledge.services.workflow_sync._copy_document_relations")
-    @patch("knowledge.services.workflow_sync.process_visual_assets")
+    @patch("knowledge.services.workflow_sync.defer_visual_assets")
     @patch("knowledge.services.workflow_sync.sync_paragraph_assets")
     @patch("knowledge.services.workflow_sync.transaction.atomic")
     @patch("knowledge.services.workflow_sync.IncrementalDocumentSync")

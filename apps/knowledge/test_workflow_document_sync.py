@@ -310,7 +310,7 @@ class WorkflowDocumentMergeIsolationTests(SimpleTestCase):
         return ids
 
     @patch("knowledge.services.workflow_sync._copy_document_relations")
-    @patch("knowledge.services.workflow_sync.process_visual_assets")
+    @patch("knowledge.services.workflow_sync.defer_visual_assets")
     @patch("knowledge.services.workflow_sync.sync_paragraph_assets")
     @patch("knowledge.services.workflow_sync.transaction.atomic")
     @patch("knowledge.services.workflow_sync.IncrementalDocumentSync")

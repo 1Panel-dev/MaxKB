@@ -2330,7 +2330,7 @@ class IncrementalSyncTests(SimpleTestCase):
         synced_paragraph.save.assert_not_called()
 
     @patch("knowledge.serializers.document.IncrementalDocumentSync")
-    @patch("knowledge.serializers.document.process_visual_assets")
+    @patch("knowledge.serializers.document.defer_visual_assets")
     @patch("knowledge.serializers.document.sync_paragraph_assets", return_value=[])
     @patch("knowledge.serializers.document.internalize_web_images", side_effect=lambda content, _knowledge_id: content)
     @patch("knowledge.serializers.document.parse_web_content")
@@ -2381,7 +2381,7 @@ class IncrementalSyncTests(SimpleTestCase):
         document.save.assert_called_once_with(update_fields=["last_sync_time", "update_time"])
 
     @patch("knowledge.serializers.document.IncrementalDocumentSync")
-    @patch("knowledge.serializers.document.process_visual_assets")
+    @patch("knowledge.serializers.document.defer_visual_assets")
     @patch("knowledge.serializers.document.sync_paragraph_assets")
     @patch("knowledge.serializers.document.internalize_web_images", side_effect=lambda content, _knowledge_id: content)
     @patch("knowledge.serializers.document.parse_web_content")
@@ -2431,7 +2431,7 @@ class IncrementalSyncTests(SimpleTestCase):
         incremental_sync.assert_called_once_with(document, strategy)
         incremental_sync.return_value.merge.assert_called_once_with(paragraphs)
         paragraph_query.filter.assert_any_call(id__in=[paragraph_id])
-        process_assets.assert_called_once_with(assets, strategy)
+        process_assets.assert_called_once_with(assets, strategy, schedule=True)
 
 
 class SyncedParagraphCleanupTests(SimpleTestCase):
@@ -2875,7 +2875,7 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
         self.assertEqual(workflow_document_identity(first), workflow_document_identity(renamed))
 
     @patch("knowledge.services.workflow_sync._delete_workflow_documents")
-    @patch("knowledge.services.workflow_sync.process_visual_assets")
+    @patch("knowledge.services.workflow_sync.defer_visual_assets")
     @patch("knowledge.services.workflow_sync.sync_paragraph_assets", return_value=[])
     @patch("knowledge.services.workflow_sync.IncrementalDocumentSync")
     @patch("knowledge.services.workflow_sync.QuerySet")

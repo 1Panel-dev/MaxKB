@@ -94,7 +94,7 @@ from knowledge.services.document_strategy import (
 )
 from knowledge.services.incremental_sync import IncrementalDocumentSync, prepare_remote_paragraphs
 from knowledge.services.workflow_document_sync import is_workflow_web_document, sync_workflow_web_document
-from knowledge.services.paragraph_assets import process_visual_assets, sync_paragraph_assets
+from knowledge.services.paragraph_assets import defer_visual_assets, sync_paragraph_assets
 from knowledge.task.embedding import (
     delete_embedding_by_paragraph_ids,
     embedding_by_document,
@@ -766,7 +766,7 @@ class DocumentSerializers(serializers.Serializer):
                         else:
                             changed_paragraphs = QuerySet(Paragraph).filter(id__in=merge_result.reembed_ids)
                         assets = sync_paragraph_assets(changed_paragraphs, document.visual_strategy_hash)
-                        process_visual_assets(assets, split_strategy)
+                        defer_visual_assets(assets, split_strategy, schedule=not with_embedding)
                         if merge_result is not None and merge_result.disabled_ids:
                             delete_embedding_by_paragraph_ids(merge_result.disabled_ids)
                         # 只重建新增或有效内容变化的向量，稳定段落 ID 与问题关联都保持不变。
@@ -1191,9 +1191,7 @@ class DocumentSerializers(serializers.Serializer):
             assets = sync_paragraph_assets(
                 QuerySet(Paragraph).filter(document_id=document_model.id), document_model.visual_strategy_hash
             )
-            # General document enhancement runs in the worker after the import commits.
-            if document_model.type != KnowledgeType.BASE or not document_model.doc_strategy["visual"]["enabled"]:
-                process_visual_assets(assets, document_model.doc_strategy)
+            defer_visual_assets(assets, document_model.doc_strategy)
             document_id = str(document_model.id)
             return (
                 DocumentSerializers.Operate(data={"knowledge_id": knowledge_id, "document_id": document_id}).one(
@@ -1708,8 +1706,7 @@ class DocumentSerializers(serializers.Serializer):
                 assets = sync_paragraph_assets(
                     QuerySet(Paragraph).filter(document_id=document.id), document.visual_strategy_hash
                 )
-                if document.type != KnowledgeType.BASE or not document.doc_strategy["visual"]["enabled"]:
-                    process_visual_assets(assets, document.doc_strategy)
+                defer_visual_assets(assets, document.doc_strategy)
             # 查询文档
             query_set = QuerySet(model=Document)
             if len(document_model_list) == 0:

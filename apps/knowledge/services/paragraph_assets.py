@@ -5,6 +5,7 @@ import json
 import mimetypes
 import re
 from collections import defaultdict
+from functools import partial
 from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional
 
@@ -272,6 +273,44 @@ def process_visual_assets(
             ]
         )
         _write_asset_description(asset)
+
+
+def _enqueue_visual_assets(asset_ids: List[str], paragraph_ids: List[str]) -> None:
+    from knowledge.tasks import process_paragraph_visual_assets
+
+    try:
+        process_paragraph_visual_assets.delay(paragraph_ids)
+    except Exception as exc:
+        ParagraphAsset.objects.filter(id__in=asset_ids, process_status=AssetProcessStatus.PENDING).update(
+            process_status=AssetProcessStatus.FAILURE,
+            process_error=str(exc)[:2000],
+        )
+
+
+def defer_visual_assets(assets: Iterable[ParagraphAsset], strategy: Dict | None, *, schedule=False) -> None:
+    """Persist pending recognition; an embedding job normally processes it after commit."""
+    assets = list(assets)
+    if not assets:
+        return
+    normalized = normalize_document_strategy(strategy)
+    if not normalized["visual"]["enabled"]:
+        process_visual_assets(assets, normalized)
+        return
+    visual_hash = strategy_hashes(normalized)["visual_strategy_hash"]
+    for asset in assets:
+        asset.process_status = AssetProcessStatus.PENDING
+        asset.process_error = ""
+        asset.visual_strategy_hash = visual_hash
+        asset.save(update_fields=["process_status", "process_error", "visual_strategy_hash", "update_time"])
+    if schedule:
+        transaction.on_commit(
+            partial(
+                _enqueue_visual_assets,
+                [str(asset.id) for asset in assets],
+                list(dict.fromkeys(str(asset.paragraph_id) for asset in assets)),
+            ),
+            robust=True,
+        )
 
 
 @transaction.atomic

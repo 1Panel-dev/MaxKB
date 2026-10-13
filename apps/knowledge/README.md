@@ -1,6 +1,6 @@
 # Knowledge document processing
 
-General document imports save paragraphs, original inline images, and `ParagraphAsset` records
+Document imports save paragraphs, original inline images, and `ParagraphAsset` records
 in the import transaction. With visual enhancement enabled, image assets remain `pending`;
 the request does not call the vision model or tool.
 
@@ -25,6 +25,14 @@ No external model call holds a preview row lock.
 Run both the web service and the Celery task service. Import completion means the source
 content is saved; the document's embedding status indicates when indexing has finished.
 
-Inline image deferral applies to general documents (`KnowledgeType.BASE`) imported through
-`DocumentSerializers.Create.save` and `DocumentSerializers.Batch.batch_save`. External document
-synchronization retains its own visual processing flow.
+Inline image deferral applies to all documents imported through `DocumentSerializers.Create.save`
+and `DocumentSerializers.Batch.batch_save`, including Web, Lark and workflow output. Web document
+sync, Lark reimport/sync, and workflow snapshot reconciliation use `defer_visual_assets` as well.
+Changed images and visual strategy changes reset assets to `pending`, retaining prior descriptions
+until recognition completes. Unchanged documents keep their completed recognition results.
+
+Synchronization without embedding publishes `celery:process_paragraph_visual_assets` after commit
+to recognize the images independently. Synchronization success means the source snapshot is saved;
+recognition status is available on the paragraph assets, while embedding status tracks indexing.
+Image extraction, file storage and source reconciliation still occur in the import/sync transaction;
+the external vision model or tool runs in the worker.

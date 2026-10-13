@@ -207,7 +207,7 @@ class WebSyncSafetyTests(TestCase):
             patch(
                 "knowledge.serializers.document.parse_web_content", return_value=[{"title": "Title", "content": "new"}]
             ),
-            patch("knowledge.serializers.document.process_visual_assets", side_effect=RuntimeError("asset failed")),
+            patch("knowledge.serializers.document.defer_visual_assets", side_effect=RuntimeError("asset failed")),
             self.captureOnCommitCallbacks(execute=True) as callbacks,
         ):
             self.sync_document()
@@ -220,9 +220,7 @@ class WebSyncSafetyTests(TestCase):
         with patch(
             "knowledge.serializers.document.parse_web_content", return_value=[{"title": "Title", "content": "new"}]
         ):
-            with patch(
-                "knowledge.serializers.document.process_visual_assets", side_effect=RuntimeError("asset failed")
-            ):
+            with patch("knowledge.serializers.document.defer_visual_assets", side_effect=RuntimeError("asset failed")):
                 self.sync_document()
             with self.captureOnCommitCallbacks(execute=True):
                 self.sync_document()

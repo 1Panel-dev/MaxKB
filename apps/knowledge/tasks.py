@@ -12,6 +12,13 @@ def process_image_preview(workspace_id: str, knowledge_id: str, preview_id: str)
     ImageDocumentService(workspace_id, knowledge_id).process_preview(preview_id)
 
 
+@celery_app.task(name="celery:process_paragraph_visual_assets")
+def process_paragraph_visual_assets(paragraph_ids: list[str]):
+    from knowledge.services.paragraph_assets import process_pending_visual_assets
+
+    process_pending_visual_assets(paragraph_ids)
+
+
 @worker_init.connect
 def fail_interrupted_knowledge_synchronizations(sender=None, **kwargs):
     from knowledge.services.sync_status import fail_running_sync_logs_on_startup

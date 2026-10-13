@@ -9,8 +9,8 @@ from rest_framework import serializers
 
 from knowledge.models import AssetProcessStatus, KnowledgeType, ParagraphAsset, SyncState
 from knowledge.serializers.document import DocumentSerializers
-from knowledge.services.document_strategy import normalize_document_strategy
-from knowledge.services.paragraph_assets import embed_paragraph_assets
+from knowledge.services.document_strategy import normalize_document_strategy, strategy_hashes
+from knowledge.services.paragraph_assets import defer_visual_assets, embed_paragraph_assets
 
 
 class AsyncVisualImportTests(SimpleTestCase):
@@ -43,7 +43,7 @@ class AsyncVisualImportTests(SimpleTestCase):
         self.sync_assets = self.enterContext(
             patch("knowledge.serializers.document.sync_paragraph_assets", return_value=[self.asset])
         )
-        self.process = self.enterContext(patch("knowledge.serializers.document.process_visual_assets"))
+        self.process = self.enterContext(patch("knowledge.services.paragraph_assets.process_visual_assets"))
         self.operation = self.enterContext(patch.object(DocumentSerializers, "Operate"))
         self.result = {"id": str(self.document.id)}
         self.operation.return_value.one.return_value = self.result
@@ -82,14 +82,17 @@ class AsyncVisualImportTests(SimpleTestCase):
 
         self.process.assert_called_once_with([self.asset], self.document.doc_strategy)
 
-    def test_external_document_creation_preserves_synchronous_visual_processing(self):
-        self.document.type = KnowledgeType.WEB
-        creator = DocumentSerializers.Create(data=self.scope)
-        serializers.Serializer.is_valid(creator, raise_exception=True)
+    def test_other_document_types_also_defer_visual_processing(self):
+        for knowledge_type in (KnowledgeType.WEB, KnowledgeType.LARK, KnowledgeType.WORKFLOW, KnowledgeType.YUQUE):
+            with self.subTest(knowledge_type=knowledge_type):
+                self.document.type = knowledge_type
+                creator = DocumentSerializers.Create(data=self.scope)
+                serializers.Serializer.is_valid(creator, raise_exception=True)
 
-        creator.save({"name": "guide"}, with_valid=False)
+                creator.save({"name": "guide"}, with_valid=False)
 
-        self.process.assert_called_once_with([self.asset], self.document.doc_strategy)
+                self.process.assert_not_called()
+                self.assertEqual(self.asset.process_status, AssetProcessStatus.PENDING)
 
 
 class VisualImportCommitTests(SimpleTestCase):
@@ -112,6 +115,78 @@ class VisualImportCommitTests(SimpleTestCase):
             on_commit.assert_called_once()
             on_commit.call_args.args[0]()
             self.assertEqual(delay.call_args.args[:2], (document_id, model_id))
+
+
+class VisualAssetDeferralTests(SimpleTestCase):
+    def setUp(self):
+        self.strategy = normalize_document_strategy(
+            {"visual": {"enabled": True, "strategy": "model", "model_id": str(uuid4())}}
+        )
+        self.asset = MagicMock(
+            id=uuid4(),
+            paragraph_id=uuid4(),
+            process_status=AssetProcessStatus.SUCCESS,
+            process_error="old error",
+            description="previous image description",
+        )
+        self.process = self.enterContext(patch("knowledge.services.paragraph_assets.process_visual_assets"))
+        self.on_commit = self.enterContext(patch("knowledge.services.paragraph_assets.transaction.on_commit"))
+        self.delay = self.enterContext(patch("knowledge.tasks.process_paragraph_visual_assets.delay"))
+
+    def test_changed_assets_are_pending_even_if_previously_processed(self):
+        for status in (AssetProcessStatus.SUCCESS, AssetProcessStatus.FAILURE, AssetProcessStatus.SKIPPED):
+            with self.subTest(status=status):
+                self.asset.process_status = status
+
+                defer_visual_assets([self.asset], self.strategy)
+
+                self.assertEqual(self.asset.process_status, AssetProcessStatus.PENDING)
+                self.assertEqual(self.asset.process_error, "")
+                self.assertEqual(self.asset.description, "previous image description")
+                self.assertEqual(
+                    self.asset.visual_strategy_hash, strategy_hashes(self.strategy)["visual_strategy_hash"]
+                )
+                self.process.assert_not_called()
+                self.delay.assert_not_called()
+                self.on_commit.assert_not_called()
+
+    def test_tool_recognition_is_also_deferred(self):
+        strategy = {"visual": {"enabled": True, "strategy": "tool", "tool_id": str(uuid4())}}
+
+        defer_visual_assets([self.asset], strategy)
+
+        self.assertEqual(self.asset.process_status, AssetProcessStatus.PENDING)
+        self.process.assert_not_called()
+
+    def test_sync_without_embedding_recognizes_only_after_commit(self):
+        other = MagicMock(id=uuid4(), paragraph_id=self.asset.paragraph_id)
+
+        defer_visual_assets([self.asset, other], self.strategy, schedule=True)
+
+        self.process.assert_not_called()
+        self.delay.assert_not_called()
+        self.on_commit.assert_called_once()
+        self.assertTrue(self.on_commit.call_args.kwargs["robust"])
+        self.on_commit.call_args.args[0]()
+        self.delay.assert_called_once_with([str(self.asset.paragraph_id)])
+
+    def test_queue_failure_marks_assets_failed_without_losing_the_sync(self):
+        self.delay.side_effect = RuntimeError("broker unavailable")
+        assets = self.enterContext(patch("knowledge.services.paragraph_assets.ParagraphAsset.objects.filter"))
+
+        defer_visual_assets([self.asset], self.strategy, schedule=True)
+        self.on_commit.call_args.args[0]()
+
+        assets.assert_called_once_with(id__in=[str(self.asset.id)], process_status=AssetProcessStatus.PENDING)
+        assets.return_value.update.assert_called_once_with(
+            process_status=AssetProcessStatus.FAILURE, process_error="broker unavailable"
+        )
+
+    def test_empty_snapshot_never_schedules_recognition(self):
+        defer_visual_assets([], self.strategy, schedule=True)
+
+        self.process.assert_not_called()
+        self.on_commit.assert_not_called()
 
 
 class PendingVisualEmbeddingTests(SimpleTestCase):
@@ -170,6 +245,23 @@ class PendingVisualEmbeddingTests(SimpleTestCase):
         self.embed()
 
         self.processor.assert_called_once()
+
+    def test_changed_strategy_reprocesses_an_existing_successful_asset_in_worker(self):
+        asset = self.asset()
+        self.embed()
+        self.processor.reset_mock()
+        strategy = normalize_document_strategy(
+            {"visual": {"enabled": True, "strategy": "model", "model_id": str(uuid4())}}
+        )
+        asset.document.doc_strategy = strategy
+
+        defer_visual_assets([asset], strategy)
+        self.processor.assert_not_called()
+        self.embed()
+
+        self.processor.assert_called_once_with(asset, strategy["visual"])
+        self.assertEqual(asset.process_status, AssetProcessStatus.SUCCESS)
+        self.assertEqual(asset.visual_strategy_hash, strategy_hashes(strategy)["visual_strategy_hash"])
 
     def test_failure_of_one_image_does_not_prevent_remaining_image_indexing(self):
         first, second = self.asset(), self.asset()

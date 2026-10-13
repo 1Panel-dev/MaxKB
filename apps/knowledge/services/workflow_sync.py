@@ -23,7 +23,7 @@ from knowledge.models import (
     ProblemParagraphMapping,
 )
 from knowledge.services.incremental_sync import IncrementalDocumentSync, prepare_remote_paragraphs
-from knowledge.services.paragraph_assets import process_visual_assets, sync_paragraph_assets
+from knowledge.services.paragraph_assets import defer_visual_assets, sync_paragraph_assets
 from knowledge.services.workflow_sync_source import DOCUMENT_IDENTITY_FIELDS
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from ops import celery_app
@@ -258,7 +258,7 @@ def merge_workflow_incremental_snapshot(
                 ).merge(remote_paragraphs)
                 changed_paragraphs = QuerySet(Paragraph).filter(id__in=result.reembed_ids)
                 assets = sync_paragraph_assets(changed_paragraphs, old_document.visual_strategy_hash)
-                process_visual_assets(assets, old_document.doc_strategy)
+                defer_visual_assets(assets, old_document.doc_strategy)
                 if result.disabled_ids:
                     QuerySet(Embedding).filter(paragraph_id__in=result.disabled_ids).delete()
 
