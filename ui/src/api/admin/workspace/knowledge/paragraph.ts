@@ -36,6 +36,14 @@ const putParagraph = (knowledgeId: string, documentId: string, paragraphId: stri
 const postParagraphProblem = (knowledgeId: string, documentId: string, paragraphId: string, content: string) =>
   post<{ content: string }, ParagraphProblem>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}/problem`, { content })
 
+/** 获取当前分段关联的全部问题。 */
+const getParagraphProblems = (knowledgeId: string, documentId: string, paragraphId: string) =>
+  get<ParagraphProblem[]>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}/problem`)
+
+/** 将知识库中的已有问题关联到当前分段。 */
+const putAssociateParagraphProblem = (knowledgeId: string, documentId: string, paragraphId: string, problemId: string) =>
+  put<undefined, boolean>(`${getPrefix(knowledgeId, documentId)}/association`, undefined, { paragraph_id: paragraphId, problem_id: problemId })
+
 /** 解除当前分段的问题关联，保留问题及其他分段的关联。 */
 const putUnassociateParagraphProblem = (knowledgeId: string, documentId: string, paragraphId: string, problemId: string) =>
   put<undefined, boolean>(`${getPrefix(knowledgeId, documentId)}/unassociation`, undefined, { paragraph_id: paragraphId, problem_id: problemId })
@@ -46,7 +54,7 @@ const putMigrateParagraphs = (knowledgeId: string, documentId: string, targetKno
     id_list: paragraphIds,
   })
 
-/** 批量/单个为所选分段提交关联问题生成任务。 */
+/** 批量/单个为生成问题。 */
 const putGenerateParagraphQuestions = (knowledgeId: string, documentId: string, payload: ParagraphGeneratePayload) =>
   put<ParagraphGeneratePayload, void>(`${getPrefix(knowledgeId, documentId)}/batch_generate_related`, payload)
 
@@ -60,6 +68,8 @@ export default {
   getParagraphDetail,
   putParagraph,
   postParagraphProblem,
+  getParagraphProblems,
+  putAssociateParagraphProblem,
   putUnassociateParagraphProblem,
   putMigrateParagraphs,
   putGenerateParagraphQuestions,

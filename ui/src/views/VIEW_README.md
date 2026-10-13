@@ -195,7 +195,7 @@ src/views/knowledge/
 │       ├── GenerateQuestionsAction.vue # 知识库生成关联问题
 │       ├── sync-knowledge-action/       # Web 知识库同步入口与方式选择弹窗
 │       ├── KeywordIndexKnowledgeAction.vue # 分词索引入口
-│       ├── mcp-config-action/           # MCP 配置入口与专属只读弹窗
+│       ├── McpConfigKnowledgeAction.vue # MCP 配置查询、展示与复制
 │       ├── ExportKnowledgeAction.vue    # Excel、文档 ZIP 与知识库包导出
 │       ├── MoveKnowledgeAction.vue
 │       └── DeleteKnowledgeAction.vue
@@ -235,7 +235,8 @@ src/views/knowledge/
 `workspaceId`。点击阻止事件冒泡，避免同时进入卡片详情；Workspace 共享知识库仍不展示操作菜单。
 “设置”之后依次组合 `KeywordIndexKnowledgeAction` 和 `McpConfigKnowledgeAction`，接收完整
 Knowledge API 并复用页面操作 loading。分词索引不增加确认弹窗，调用成功后只提示“操作成功”；
-MCP 配置沿用工具的只读文本与悬浮复制交互，专属弹窗按需挂载、关闭后卸载。
+`McpConfigKnowledgeAction` 内直接查询 MCP 配置字符串，通过 `MkDialog` 只读展示并提供悬浮复制，
+配置为空时禁用复制，关闭动画结束后清理配置；弹窗外壳由 `MkDialog` 按需挂载和卸载。
 两者接口暂为本地占位，MCP 返回空文本，分词索引模拟成功，尚不执行服务端操作。
 `ExportKnowledgeAction` 接收完整 Knowledge API，暂不增加权限判断；悬停“导出”展开右侧
 子菜单，分别导出文档 Excel、文档 ZIP 和可再次导入的知识库包。
@@ -318,9 +319,7 @@ src/views/tool/
 │       ├── InitParamAction.vue
 │       ├── MoveToolAction.vue
 │       ├── ToolWorkflowAction.vue
-│       └── mcp-config-action/
-│           ├── McpConfigAction.vue
-│           └── McpConfigDialog.vue # MCP 工具配置查看弹窗
+│       └── McpConfigAction.vue      # MCP 配置查询、展示与复制
 └── tool-store/                    # 工具商店列表、详情与添加流程
     ├── component/
     │   └── ToolStoreCard.vue      # 商店工具卡片及详情、添加入口
@@ -362,7 +361,9 @@ Workspace 的自定义工具和工作流工具菜单
 
 工具列表页面通过 `ToolCard` 的 `actions` 和 `action-dropdown` 插槽组合
 操作；编辑 Action 负责按 `TOOL_TYPE` 打开对应类型表单，启动参数 Action 获取工具详情后打开
-`InitParamDialog`，MCP 配置 Action 获取 MCP 工具详情后打开 `McpConfigDialog`。工作流 Action 进入
+`InitParamDialog`，`McpConfigAction` 获取 MCP 工具详情后，在 Action 内通过 `MkDialog` 只读展示
+`code ?? ''` 并提供悬浮复制，配置为空时禁用复制，关闭动画结束后清理配置。
+弹窗外壳由 `MkDialog` 按需挂载和卸载。工作流 Action 进入
 独立的工具工作流画布；创建工作流工具后直接进入该画布，其他类型表单创建成功后通过 `refresh`
 事件刷新列表。编辑成功后通过 `update` 事件返回接口响应的完整工具数据，由页面局部更新对应卡片；不要
 把不同工具类型的字段重新合并到一个通用表单中。所有调用 `postTool` 创建工具的流程在接口成功后
@@ -894,18 +895,26 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
   内容必填且最多 100000 字符。正文使用 `MdEditor`，默认关闭预览，提供 Markdown 工具栏及字数统计；
   通过必填的 `knowledgeId` 将图片上传到当前知识库，复用 `FileApi` 和 `FILE_SOURCE_TYPE.KNOWLEDGE`。
   提交由 Dialog 编排。
-- `ParagraphPreview` 只展示标题、Markdown 正文、召回次数和最近召回时间，通过 `edit` 事件通知 Dialog。
-- `ParagraphQuestions` 管理问题草稿、校验、添加和移除，问题必填、去除首尾空格、最多 256 字符且不重复。
-  无 `paragraphId` 时维护本地草稿并随新增分段提交；已有分段通过专属接口即时添加或解除关联，
-  不删除问题本身。通过 `v-model:loading`、`v-model:adding` 与 Dialog 协调操作状态。
+- `ParagraphPreview` 只展示标题、Markdown 正文、召回次数和最近召回时间；Dialog 管理使用 `mk-paragraph-card` 样式的详情卡片容器及绝对定位的编辑按钮。
+- `ParagraphQuestions` 沿用 v2 的添加及移除流程：点击加号显示 `el-select`，使用远程搜索、
+  `allow-create` 和首项默认选择，选择已有问题或输入新问题后立即添加；失焦取消输入。
+  问题去除首尾空格、非空、最多 256 字符且不重复，已关联候选不可重复选择。
+  候选通过 `ProblemApi.getProblemsPage` 查询第一页 100 条；已有分段分别调用创建或关联接口，
+  添加或解除关联成功后重新查询当前分段问题。列表使用卡片，左侧显示问题文字，右侧提供移除按钮；移除只解除关联，
+  不删除问题本身。无 `paragraphId` 时维护 `{ content }` 本地草稿并随新增分段提交。
+  问题输入状态和请求 loading 均在组件内部维护，不向 Dialog 传递 `adding` 或 `loading`，
+  不阻止分段创建、正文保存、取消或关闭。新增分段只提交已加入列表的问题草稿；
+  问题请求失败保留输入与现有问题。
 
-两个 Dialog 和三个组件均提供默认 `false` 的 `disabled`，表示业务只读：表单不可修改、问题操作隐藏，
-详情不展示编辑入口，Dialog 方法同时阻止保存；编辑 Dialog 在只读时强制详情模式，动态切为只读也返回详情。
-提交状态继续使用内容／按钮 loading，不作为表单 `disabled`；问题组件的 `blocked` 仅协调加载与保存期间的操作入口。
+两个 Dialog、`ParagraphForm` 和 `ParagraphQuestions` 均不提供或传递 `disabled` Prop；
+详情模式通过悬浮编辑入口进入表单，问题区始终提供添加与移除入口。
+每个 Dialog 统一使用一个 `loading` 管理自身加载和提交、内容遮罩、按钮状态及重复操作保护；
+问题请求使用子组件内部独立的 `loading`，只覆盖右侧问题区。提交状态不作为表单 `disabled`。
 两个 Dialog 均接收完整 Paragraph API 和知识库／文档 ID，打开时固定目标，点击时挂载、关闭动画结束后卸载。
-详情加载失败提供重试；请求失败保留草稿。正文保存不提交 `problem_list`，取消编辑不撤销即时保存的问题关联。
+详情加载失败提供重试；请求失败保留草稿。正文保存不提交 `problem_list`，也不使用保存响应回填问题列表，
+避免覆盖并行的问题操作；取消编辑不撤销即时保存的问题关联。
 新增成功关闭弹窗并通知页面清空搜索、重新查询服务端排序；编辑成功通知页面刷新当前筛选结果。
-分段卡片在非批量模式提供“详情”入口，批量生成问题继续使用 `components/ButtonGenerateQuestions.vue`。
+分段卡片在非批量模式点击打开详情弹窗，批量模式点击切换勾选；批量生成问题继续使用 `components/ButtonGenerateQuestions.vue`。
 Workspace 共享及 System 分段入口暂未接入，不回退 Workspace API。
 
 System 资源管理与共享资源已注册共用知识库详情路由，
@@ -1199,6 +1208,10 @@ Layout 保留标题栏固定位置和外层间距，页面负责内部布局。
 策略页的“生成预览”按当前策略解析文件，进入 `upload-document/DocumentImportPreview.vue`，
 使用 `MkViewLayout` 的侧栏切换文档、正文展示分段，复用其主区滚动和固定标题；
 支持本地编辑和删除，编辑须保存或取消后再导入。
+分段编辑使用同目录的 `EditParagraphDialog.vue`，复用添加分段的 `ParagraphForm` 与
+`ParagraphQuestions`，提供 Markdown 编辑、知识库图片上传和关联问题草稿；不传入已有分段 ID，
+保存仅更新当前导入草稿，不创建分段或立即写入问题关联，取消不修改预览。
+编辑弹窗按需挂载，关闭动画结束后卸载；关联问题随最终导入的 `problem_list` 提交。
 预览仍属于第二步，返回策略页保留设置，重新生成时以新的解析结果替换预览。
 预览导入直接批量创建编辑后的分段，保留来源文件及处理策略，不再次解析。
 策略页“开始导入”将已上传的 `file_id_list` 与当前 `doc_strategy` 一次提交到 `document/import`，

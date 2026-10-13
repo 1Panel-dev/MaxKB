@@ -163,7 +163,7 @@ defineExpose({ open })
     </template>
 
     <div class="h-full" v-loading="loading">
-      <DocumentImportPreview v-if="previewVisible" ref="previewRef" v-model="previewDocuments" />
+      <DocumentImportPreview v-if="previewVisible" ref="previewRef" v-model="previewDocuments" :knowledge-id="knowledgeId" />
       <div v-show="!previewVisible" class="mx-auto w-full max-w-200">
         <section v-show="activeStep === 0">
           <h4 v-if="mode === 'text'" class="mb-4 mk-title-decoration">上传文档</h4>

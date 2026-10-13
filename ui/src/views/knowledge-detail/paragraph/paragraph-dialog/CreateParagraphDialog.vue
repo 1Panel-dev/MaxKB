@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import type ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
 import type { ParagraphUpdatePayload } from '@/api/types'
 import type { ParagraphQuestionDraft } from './types'
@@ -8,15 +8,11 @@ import ParagraphQuestions from './components/ParagraphQuestions.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CreateParagraphDialog' })
-const props = withDefaults(
-  defineProps<{
-    api: typeof ParagraphApi
-    knowledgeId: string
-    documentId: string
-    disabled?: boolean
-  }>(),
-  { disabled: false },
-)
+const props = defineProps<{
+  api: typeof ParagraphApi
+  knowledgeId: string
+  documentId: string
+}>()
 const emit = defineEmits<{ success: [mode: 'create']; closed: [] }>()
 
 /* 添加弹窗按需挂载，草稿在关闭后随实例释放。 */
@@ -26,10 +22,7 @@ const targetDocumentId = ref('')
 const paragraphFormRef = ref<InstanceType<typeof ParagraphForm>>()
 const paragraphForm = ref<ParagraphUpdatePayload>({ title: '', content: '' })
 const relatedQuestions = ref<ParagraphQuestionDraft[]>([])
-const questionAdding = ref(false)
-const questionLoading = ref(false)
-const saving = ref(false)
-const busy = computed(() => saving.value || questionLoading.value)
+const loading = ref(false)
 
 function open() {
   targetKnowledgeId.value = props.knowledgeId
@@ -38,20 +31,20 @@ function open() {
 }
 
 function close() {
-  if (!busy.value) visible.value = false
+  if (!loading.value) visible.value = false
 }
 
 function handleBeforeClose(done: () => void) {
-  if (!busy.value) done()
+  if (!loading.value) done()
 }
 
 function handleSubmit() {
-  if (props.disabled || busy.value || questionAdding.value) return
+  if (loading.value) return
   void paragraphFormRef.value
     ?.validate()
     .then((valid) => {
-      if (!valid || props.disabled || busy.value || questionAdding.value) return
-      saving.value = true
+      if (!valid || loading.value) return
+      loading.value = true
       return props.api
         .postParagraph(targetKnowledgeId.value, targetDocumentId.value, {
           title: paragraphForm.value.title.trim(),
@@ -65,7 +58,7 @@ function handleSubmit() {
           emit('success', 'create')
         })
         .finally(() => {
-          saving.value = false
+          loading.value = false
         })
     })
     .catch(() => {})
@@ -75,25 +68,25 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="添加分段" width="1000" align-center :before-close="handleBeforeClose" @closed="emit('closed')">
-    <div v-loading="saving" class="flex w-full gap-4">
-      <ParagraphForm ref="paragraphFormRef" v-model="paragraphForm" :knowledge-id="targetKnowledgeId" :disabled="disabled" />
-      <ParagraphQuestions
-        v-model="relatedQuestions"
-        v-model:adding="questionAdding"
-        v-model:loading="questionLoading"
-        :api="api"
-        :knowledge-id="targetKnowledgeId"
-        :document-id="targetDocumentId"
-        :disabled="disabled"
-        :blocked="saving"
-      />
+  <MkDialog
+    v-model="visible"
+    title="添加分段"
+    width="1000"
+    align-center
+    content-class="max-h-[calc(100vh-300px)]!"
+    :before-close="handleBeforeClose"
+    @closed="emit('closed')"
+  >
+    <div v-loading="loading" class="flex w-full gap-4">
+      <ParagraphForm ref="paragraphFormRef" v-model="paragraphForm" :knowledge-id="targetKnowledgeId" />
+      <!-- 关联问题 -->
+      <ParagraphQuestions v-model="relatedQuestions" :api="api" :knowledge-id="targetKnowledgeId" :document-id="targetDocumentId" />
     </div>
     <template #footer>
       <!-- 取消添加分段 -->
-      <el-button plain :disabled="busy" @click="close">取消</el-button>
+      <el-button plain :disabled="loading" @click="close">取消</el-button>
       <!-- 提交新增分段和关联问题 -->
-      <el-button type="primary" :loading="saving" :disabled="disabled || questionAdding" @click="handleSubmit">添加</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">添加</el-button>
     </template>
   </MkDialog>
 </template>

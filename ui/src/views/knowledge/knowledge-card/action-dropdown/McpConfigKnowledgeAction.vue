@@ -1,28 +1,32 @@
 <script setup lang="ts">
-import { nextTick, ref, useTemplateRef } from 'vue'
+import { ref } from 'vue'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
-import KnowledgeMcpConfigDialog from './KnowledgeMcpConfigDialog.vue'
+import { copyText } from '@/utils/clipboard'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 
 defineOptions({ name: 'McpConfigKnowledgeAction' })
 
-const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
+const props = defineProps<{
+  api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi
+  knowledge: KnowledgeItem
+  label: string
+}>()
 const loading = defineModel<boolean>('loading', { default: false })
 
 /* 知识库 MCP 配置详情 */
-const dialogMounted = ref(false)
-const mcpConfigDialogRef = useTemplateRef<InstanceType<typeof KnowledgeMcpConfigDialog>>('mcpConfigDialogRef')
+const visible = ref(false)
+const config = ref('')
 
 function handleOpenMcpConfig() {
   if (loading.value) return
   loading.value = true
   return props.api
     .getKnowledgeMcpConfig(props.knowledge.id)
-    .then((config) => {
-      dialogMounted.value = true
-      return nextTick(() => mcpConfigDialogRef.value?.open(config))
+    .then((mcpConfig) => {
+      config.value = mcpConfig
+      visible.value = true
     })
     .finally(() => {
       loading.value = false
@@ -30,7 +34,7 @@ function handleOpenMcpConfig() {
 }
 
 function handleDialogClosed() {
-  dialogMounted.value = false
+  config.value = ''
 }
 </script>
 
@@ -41,5 +45,13 @@ function handleDialogClosed() {
     <span>{{ label }}</span>
   </MkDropdownItem>
 
-  <KnowledgeMcpConfigDialog v-if="dialogMounted" ref="mcpConfigDialogRef" @closed="handleDialogClosed" />
+  <MkDialog v-model="visible" title="MCP 配置详情" @closed="handleDialogClosed">
+    <div class="group relative">
+      <el-input v-model="config" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
+      <!-- 复制 MCP 配置 -->
+      <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle :disabled="!config" @click="copyText(config)">
+        <MkIcon name="icon_copy_outlined" />
+      </el-button>
+    </div>
+  </MkDialog>
 </template>

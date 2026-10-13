@@ -76,9 +76,12 @@ function handleSelectBatchParagraph(paragraphId: string, selected: boolean) {
   selectedParagraphIds.value = selected ? [...selectedParagraphIds.value, paragraphId] : selectedParagraphIds.value.filter((id) => id !== paragraphId)
 }
 
-function handleClickParagraphCard(paragraphId: string) {
-  if (!batchMode.value) return
-  handleSelectBatchParagraph(paragraphId, !selectedParagraphIds.value.includes(paragraphId))
+function handleClickParagraphCard(paragraph: ParagraphItem) {
+  if (batchMode.value) {
+    handleSelectBatchParagraph(paragraph.id, !selectedParagraphIds.value.includes(paragraph.id))
+    return
+  }
+  return handleOpenParagraphDetail(paragraph)
 }
 
 // 迁移、删除成功后仅移除本次操作的分段，不重新查询接口。
@@ -222,11 +225,10 @@ onMounted(() => {
             shadow="never"
             class="mk-paragraph-card group relative cursor-pointer"
             :class="{ selectable: batchMode, active: batchMode && selectedParagraphIds.includes(paragraph.id) }"
-            @click="handleClickParagraphCard(paragraph.id)"
+            @click="handleClickParagraphCard(paragraph)"
           >
             <h4 class="mb-2">{{ paragraph.title || '-' }}</h4>
-            <!-- 查看分段详情 -->
-            <!-- <el-button v-if="!batchMode" text @click="handleOpenParagraphDetail(paragraph)">详情</el-button> -->
+
             <!-- 选择批量操作的分段 -->
             <el-checkbox
               v-if="batchMode"
