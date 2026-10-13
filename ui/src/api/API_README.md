@@ -572,8 +572,14 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 `hit_num` 和 `last_hit_time`。`putParagraph` 向同一路径提交标题和正文，解包后端三元素编辑响应的
 首项为最新详情；不提交 `problem_list`，关联关系通过专属接口维护。
 `postParagraphProblem` 向 `/<paragraphId>/problem` 提交 `{ content }`，创建或复用问题并关联分段；
+`getParagraphProblems` GET 同一路径，返回当前分段的 `ParagraphProblem[]`，用于关联变更后刷新。
+`putAssociateParagraphProblem` PUT 到 `/association`，通过查询参数传递 `paragraph_id`、`problem_id`，
+不传请求体，用于关联已存在的问题。
 `putUnassociateParagraphProblem` PUT 到 `/unassociation`，以查询参数传递 `paragraph_id`、
 `problem_id`，不传请求体，仅解除当前分段的关联。
+`workspace/knowledge/problem.ts` 的 `getProblemsPage(knowledgeId, page, query?)` 查询知识库问题分页，
+路径为 `/workspace/<workspaceId>/knowledge/<knowledgeId>/problem/<currentPage>/<pageSize>`，
+支持 `content` 搜索，返回 `ResponsePage<ParagraphProblem>`。分段添加问题沿用 v2 查询第一页 100 条候选。
 `putMigrateParagraphs` 向分段前缀下的 `/migrate/knowledge/<targetKnowledgeId>/document/<targetDocumentId>`
 提交 PUT `{ id_list }`，将所选分段迁移到目标文档；目标不能为当前文档。
 `putGenerateParagraphQuestions` 向分段前缀下的 `/batch_generate_related` 提交 PUT

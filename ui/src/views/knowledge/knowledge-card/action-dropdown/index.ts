@@ -3,7 +3,7 @@ export { default as GenerateQuestionsAction } from './GenerateQuestionsAction.vu
 export { default as SyncKnowledgeAction } from './sync-knowledge-action/SyncKnowledgeAction.vue'
 export { default as EmbeddingKnowledgeAction } from './EmbeddingKnowledgeAction.vue'
 export { default as KeywordIndexKnowledgeAction } from './KeywordIndexKnowledgeAction.vue'
-export { default as McpConfigKnowledgeAction } from './mcp-config-action/McpConfigKnowledgeAction.vue'
+export { default as McpConfigKnowledgeAction } from './McpConfigKnowledgeAction.vue'
 export { default as ExportKnowledgeAction } from './ExportKnowledgeAction.vue'
 export { default as MoveKnowledgeAction } from './MoveKnowledgeAction.vue'
 export { default as DeleteKnowledgeAction } from './DeleteKnowledgeAction.vue'

@@ -1262,7 +1262,7 @@
 .el-textarea {
   --el-input-placeholder-color: var(--mk-N500);
   --el-input-text-color: var(--el-text-color-primary);
-  &:has(.el-input__inner[readonly]) {
+  &:has(.el-textarea__inner[readonly]) {
     --el-input-focus-border-color: var(--el-input-border-color);
     --el-input-hover-border-color: var(--el-input-border-color);
   }

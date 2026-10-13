@@ -1,39 +1,45 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { cloneDeep } from 'lodash'
+import { computed, nextTick, ref } from 'vue'
 import type { DocumentImportParagraph, DocumentSplitResult } from '@/api/types'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgWarning } from '@/utils/message'
+import EditParagraphDialog from './EditParagraphDialog.vue'
 
 defineOptions({ name: 'DocumentImportPreview' })
+defineProps<{ knowledgeId: string }>()
 const documents = defineModel<DocumentSplitResult[]>({ required: true })
 const selectedDocumentIndex = ref(0)
 const selectedDocument = computed(() => documents.value[selectedDocumentIndex.value])
 const editingParagraphIndex = ref<number>()
-const paragraphDraft = ref<DocumentImportParagraph>({ title: '', content: '' })
+const editingDocument = ref<DocumentSplitResult>()
+const editDialogMounted = ref(false)
+const editDialogRef = ref<InstanceType<typeof EditParagraphDialog>>()
 
 /* 预览文档选择与分段草稿编辑 */
 function handleSelectDocument(index: number) {
   selectedDocumentIndex.value = index
-  editingParagraphIndex.value = undefined
 }
 
-function handleEditParagraph(index: number) {
+async function handleEditParagraph(index: number) {
   const paragraph = selectedDocument.value?.content[index]
   if (!paragraph) return
-  paragraphDraft.value = cloneDeep(paragraph)
+  editingDocument.value = selectedDocument.value
   editingParagraphIndex.value = index
+  editDialogMounted.value = true
+  await nextTick()
+  editDialogRef.value?.open(paragraph)
 }
 
-function handleSaveParagraph() {
-  if (!paragraphDraft.value.content.trim()) {
-    MsgWarning('分段内容不能为空')
-    return
-  }
+function handleSaveParagraph(paragraph: DocumentImportParagraph) {
   const index = editingParagraphIndex.value
-  if (index === undefined || !selectedDocument.value) return
-  selectedDocument.value.content[index] = cloneDeep(paragraphDraft.value)
+  if (index === undefined || !editingDocument.value) return
+  editingDocument.value.content[index] = paragraph
+}
+
+function handleEditDialogClosed() {
+  editDialogMounted.value = false
   editingParagraphIndex.value = undefined
+  editingDocument.value = undefined
 }
 
 function validate() {
@@ -48,7 +54,6 @@ defineExpose({ validate })
 
 function handleDeleteParagraph(index: number) {
   selectedDocument.value?.content.splice(index, 1)
-  editingParagraphIndex.value = undefined
 }
 </script>
 
@@ -84,33 +89,17 @@ function handleDeleteParagraph(index: number) {
         <div class="space-y-3">
           <template v-for="(paragraph, index) in selectedDocument.content" :key="index">
             <el-card shadow="never" class="group" body-class="relative">
-              <el-form v-if="editingParagraphIndex === index" label-position="top" @submit.prevent>
-                <el-form-item label="标题">
-                  <el-input v-model="paragraphDraft.title" maxlength="256" placeholder="请输入标题" />
-                </el-form-item>
-                <el-form-item label="内容" required>
-                  <el-input v-model="paragraphDraft.content" type="textarea" :rows="6" placeholder="请输入分段内容" />
-                </el-form-item>
-                <div class="flex justify-end gap-2">
-                  <!-- 取消分段编辑 -->
-                  <el-button @click="editingParagraphIndex = undefined">取消</el-button>
-                  <!-- 保存分段编辑 -->
-                  <el-button type="primary" @click="handleSaveParagraph">保存</el-button>
-                </div>
-              </el-form>
-              <template v-else>
-                <div class="group-hover-visible absolute top-3 right-3 flex rounded-lg bg-white shadow-sm">
-                  <!-- 编辑预览分段 -->
-                  <el-button text title="编辑分段" @click="handleEditParagraph(index)"><MkIcon name="icon_edit_outlined" /></el-button>
-                  <!-- 删除预览分段 -->
-                  <el-button class="ml-0!" text title="删除分段" @click="handleDeleteParagraph(index)">
-                    <MkIcon name="icon_delete-trash_outlined" />
-                  </el-button>
-                </div>
-                <h4 v-if="paragraph.title" class="mb-3 pr-20">{{ index + 1 }}、{{ paragraph.title }}</h4>
-                <MdPreview :model-value="paragraph.content" />
-                <p class="mt-3 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
-              </template>
+              <div class="group-hover-visible absolute top-3 right-3 flex rounded-lg bg-white shadow-sm">
+                <!-- 编辑预览分段 -->
+                <el-button text title="编辑分段" @click="handleEditParagraph(index)"><MkIcon name="icon_edit_outlined" /></el-button>
+                <!-- 删除预览分段 -->
+                <el-button class="ml-0!" text title="删除分段" @click="handleDeleteParagraph(index)">
+                  <MkIcon name="icon_delete-trash_outlined" />
+                </el-button>
+              </div>
+              <h4 v-if="paragraph.title" class="mb-3 pr-20">{{ index + 1 }}、{{ paragraph.title }}</h4>
+              <MdPreview :model-value="paragraph.content" />
+              <p class="mt-3 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
             </el-card>
           </template>
         </div>
@@ -119,4 +108,11 @@ function handleDeleteParagraph(index: number) {
       <MkEmpty v-else description="暂无预览文档" />
     </template>
   </MkViewLayout>
+  <EditParagraphDialog
+    v-if="editDialogMounted"
+    ref="editDialogRef"
+    :knowledge-id="knowledgeId"
+    @submit="handleSaveParagraph"
+    @closed="handleEditDialogClosed"
+  />
 </template>
