@@ -19,22 +19,22 @@ class CsvParseTableHandle(BaseParseTableHandle):
     def handle(self, file, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
-            content = buffer.decode(detect(buffer)['encoding'])
+            reader = csv.reader(io.TextIOWrapper(io.BytesIO(buffer), encoding=detect(buffer)['encoding']))
+            paragraphs = []
+            # 第一行为标题
+            title = next(reader, None)
+            if not title:
+                return [{'name': file.name, 'paragraphs': []}]
+            for row in reader:
+                if not row:
+                    continue
+                line = '; '.join([f'{key}:{value}' for key, value in zip(title, row)])
+                paragraphs.append({'title': '', 'content': line})
+
+            return [{'name': file.name, 'paragraphs': paragraphs}]
         except BaseException as e:
             maxkb_logger.error(f"Error processing CSV file {file.name}: {e}, {traceback.format_exc()}")
             return [{'name': file.name, 'paragraphs': []}]
-
-        csv_model = content.split('\n')
-        paragraphs = []
-        # 第一行为标题
-        title = csv_model[0].split(',')
-        for row in csv_model[1:]:
-            if not row:
-                continue
-            line = '; '.join([f'{key}:{value}' for key, value in zip(title, row.split(','))])
-            paragraphs.append({'title': '', 'content': line})
-
-        return [{'name': file.name, 'paragraphs': paragraphs}]
 
     def get_content(self, file, save_image):
         buffer = file.read()
