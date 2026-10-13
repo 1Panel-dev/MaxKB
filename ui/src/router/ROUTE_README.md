@@ -411,7 +411,7 @@ Web 展示“设置 → 基础设置、文档处理策略、定时同步”；�
 普通 Workspace 文档分段页使用 `workspace-knowledge-paragraph`，地址为
 `/admin/workspace/:workspaceId/knowledge/:knowledgeId/:type/document/:documentId`，
 在 `knowledge.ts` 中与知识库详情容器同级注册，复用 Workspace AppLayout，保持知识库一级菜单激活。
-页面位于 `views/knowledge-detail/paragraph/index.vue`，使用自身的分段目录，不挂载
+页面位于 `views/document-detail/index.vue`，使用自身的分段目录，不挂载
 `ResourceDetailLayout`。配置 `hidden` 与 `resourceDetailRoot`，使工作空间切换继续返回知识库列表；
 返回按钮进入 `workspace-knowledge-document-list`，保留知识库类型和 query。
 文档行点击进入分段页，选择列、名称编辑和操作按钮不触发跳转。

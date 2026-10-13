@@ -29,6 +29,9 @@ export interface ParagraphUpdatePayload {
   content: string
 }
 
+/** 保存正文或单独更新分段启用状态。 */
+export type ParagraphEditPayload = Partial<ParagraphUpdatePayload & Pick<ParagraphItem, 'is_active'>>
+
 export interface ParagraphQuery {
   title?: string
   content?: string
@@ -38,6 +41,7 @@ export interface ParagraphCreatePayload {
   title: string
   content: string
   is_active: boolean
+  position?: number
   problem_list?: { content: string }[]
 }
 

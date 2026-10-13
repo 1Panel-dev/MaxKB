@@ -488,7 +488,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `knowledge-detail/index.vue`                    | 知识库详情页面                                                       |
 | `knowledge-detail/library/tags/index.vue`       | 标签分组查询、创建、重命名、单值编辑、删除与关联文档管理             |
 | `knowledge-detail/workflow-transform/index.vue` | 非工作流知识库转换说明、确认与进入画布                               |
-| `knowledge-detail/paragraph/index.vue`          | 普通 Workspace 文档分段查询、目录定位、批量操作、新增、编辑与详情    |
+| `document-detail/index.vue`          | 普通 Workspace 文档分段查询、目录定位、批量操作、新增、编辑与详情    |
 
 |
 | `knowledge-detail/setting/base/index.vue` | 知识库基本信息、来源配置与上传限制设置 |
@@ -886,29 +886,30 @@ Workspace 普通资源、System 资源管理和 System 共享资源允许打开�
 `MkDropdown` 单选筛选全部、成功、失败、索引中、分词索引中、排队中和生成中；查询组合
 `status` 与可选的 `task_type`，切换选项清除旧任务类型并回到第一页，保留名称和创建者条件。
 
-普通 Workspace 文档行点击进入 `knowledge-detail/paragraph/index.vue`，选择列、名称编辑及行操作
+文档详情页面及其专属组件统一放在 `views/document-detail/`，与 `knowledge/`、`knowledge-detail/` 平级。
+普通 Workspace 文档行点击进入 `document-detail/index.vue`，选择列、名称编辑及行操作
 保留自身交互。分段页与知识库详情容器路由同级，复用 `MkViewLayout` 的顶部栏、侧栏和主区滚动；
 顶部展示接口查询的文档名称、标题／内容搜索、批量选择和添加分段，侧栏按服务端位置排列全部
 查询结果，点击定位正文，滚动同步高亮。正文使用 `MdPreview`；空文档展示空态。
 批量选择支持点击整张卡片或复选框切换勾选、全选、取消、“迁移至”、“生成问题”和“删除”；
-复选框阻止点击冒泡，避免重复切换。`paragraph/migrate/` 集中维护
+复选框阻止点击冒泡，避免重复切换。`document-detail/migrate/` 集中维护
 `ButtonMigrateParagraph` 和 `ParagraphMigrateDialog`，沿用 chat-log 添加知识库的知识库／文档
 选择样式，保留知识库和文档图标；迁移 API 由分段页传入完整 Paragraph API 对象。
 打开时固定所选分段 ID，选择知识库后查询全部文档并排除当前文档，允许迁移至同知识库其他文档。
 知识库和文档必选，成功关闭动画结束后通过 `success(paragraphIds)` 返回本次迁移的固定 ID，
 页面从本地列表移除对应分段、清空勾选并更新目录定位，不重新查询分段接口，失败保留表单。
-`paragraph/components/ButtonGenerateQuestions.vue` 封装批量生成入口，
+`document-detail/components/ButtonGenerateQuestions.vue` 封装批量生成入口，
 接收页面传入的完整 Paragraph API，打开时固定知识库、文档和勾选分段。复用公共
 `GenerateQuestionsDialog` 并传入 `showParagraphScope=false`，仅提交生成配置和所选分段 ID，
 不传 `state_list`；请求成功关闭后重新查询当前筛选结果并清空选择，失败保留配置。
-批量删除按钮和请求逻辑直接维护在 `paragraph/index.vue`，不单独拆分组件。
+批量删除按钮和请求逻辑直接维护在 `document-detail/index.vue`，不单独拆分组件。
 确认前固定所选分段与所属文档，确认后提交批量删除接口；成功从本地列表移除本次删除的分段、
 清空勾选并更新目录定位，不重新查询分段接口。
 取消或失败保留选择，确认及请求期间阻止重复操作。
-`paragraph/paragraph-dialog/` 维护两个独立弹窗，以本地组件组合左右布局：
+`document-detail/paragraph-dialog/` 维护两个独立弹窗，以本地组件组合左右布局：
 
 - `CreateParagraphDialog.vue` 组合 `components/ParagraphForm.vue` 与 `components/ParagraphQuestions.vue`，
-  管理添加请求，底部提供取消和添加。
+  管理添加请求，底部提供取消和添加；`open(position?)` 可指定插入位置，默认添加到文档首位。
 - `EditParagraphDialog.vue` 组合 `ParagraphForm`、`ParagraphPreview` 与 `ParagraphQuestions`，
   支持 `open(paragraph, initialMode?)`，初始模式默认为 `detail`，也可传入 `edit`。
   详情点击编辑进入表单；取消编辑回到原详情，保存成功回到更新后的详情。
@@ -936,6 +937,13 @@ Workspace 普通资源、System 资源管理和 System 共享资源允许打开�
 避免覆盖并行的问题操作；取消编辑不撤销即时保存的问题关联。
 新增成功关闭弹窗并通知页面清空搜索、重新查询服务端排序；编辑成功通知页面刷新当前筛选结果。
 分段卡片在非批量模式点击打开详情弹窗，批量模式点击切换勾选；批量生成问题继续使用 `components/ButtonGenerateQuestions.vue`。
+非批量卡片右上角使用与文档导入预览相同的 sticky 悬浮操作区和白色阴影 Card，
+提供启停、直接编辑及上方插入；更多菜单提供单段生成问题、迁移、移动位置与删除。
+`ButtonGenerateQuestions` 和 `ButtonMigrateParagraph` 的默认插槽暴露 `open`、`disabled`，
+供单段菜单复用既有流程，默认仍渲染批量按钮；更多菜单使用 `persistent` 保留其中的业务弹窗。
+启停仅提交 `is_active`，成功后更新当前卡片；单段删除确认后调用独立 DELETE 接口并从本地移除。
+位置菜单包含置于顶部、上移、下移、置于底部，先查询完整文档分段顺序再调整位置，
+不按搜索结果计算相邻位置；调整成功后刷新当前筛选结果并保留主区滚动位置。
 Workspace 共享及 System 分段路由已注册并保持来源导航；各范围分段 API 接入暂缓。
 
 System 资源管理与共享资源已注册共用知识库详情路由，

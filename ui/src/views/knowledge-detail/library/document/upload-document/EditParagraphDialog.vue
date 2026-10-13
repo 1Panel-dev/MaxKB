@@ -3,9 +3,9 @@ import { ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
 import type { DocumentImportParagraph, ParagraphUpdatePayload } from '@/api/types'
-import type { ParagraphQuestionDraft } from '@/views/knowledge-detail/paragraph/paragraph-dialog/types'
-import ParagraphForm from '@/views/knowledge-detail/paragraph/paragraph-dialog/components/ParagraphForm.vue'
-import ParagraphQuestions from '@/views/knowledge-detail/paragraph/paragraph-dialog/components/ParagraphQuestions.vue'
+import type { ParagraphQuestionDraft } from '@/views/document-detail/paragraph-dialog/types'
+import ParagraphForm from '@/views/document-detail/paragraph-dialog/components/ParagraphForm.vue'
+import ParagraphQuestions from '@/views/document-detail/paragraph-dialog/components/ParagraphQuestions.vue'
 
 defineOptions({ name: 'EditImportParagraphDialog' })
 defineProps<{ knowledgeId: string }>()

@@ -75,6 +75,15 @@ Admin 和 Chat 共用。组件不单独恢复焦点 `outline`，包括通过隐�
 
 这类规则会破坏 Element Plus 组件的默认间距。仅设置必要的基础规则，例如统一 `box-sizing`、清除 `body` 默认外边距和定义应用级布局。
 
+## Markdown 表格
+
+`src/components/global/markdown-editor/md-editor.scss` 的预览 table 样式统一维护
+`.mk-markdown-editor .md-editor-preview table`，由同目录 `config.ts` 引入，
+覆盖 `MdPreview` 与 `MdEditor` 的渲染预览。表格使用块级容器和 `overflow-x: auto`，
+宽度限制在正文区域内，宽表格单独横向滚动，不让整段正文横向滚动。
+单元格最小宽度为 120px、最大宽度为 400px，正文正常换行并允许长链接折行；表头不换行，
+避免多列时标题和正文被压缩成逐字纵向排列。滚动条沿用 Markdown 主题已有样式。
+
 ## 默认字号
 
 项目正文和大部分界面文字默认使用 `14px / 22px`（字号/行高），统一由 `variables.scss` 中的 `--mk-font-size-base` 和 `--mk-line-height-base` 提供，`body` 直接使用这两个变量。

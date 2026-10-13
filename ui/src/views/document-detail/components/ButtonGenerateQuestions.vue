@@ -14,6 +14,7 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 const emit = defineEmits<{ refresh: [] }>()
+defineSlots<{ default?(props: { open: () => unknown; disabled: boolean }): unknown }>()
 
 // 打开时固定本次生成问题的分段与所属文档。
 const loading = ref(false)
@@ -69,8 +70,10 @@ function handleClosed() {
 </script>
 
 <template>
-  <!-- 批量生成分段关联问题 -->
-  <el-button type="primary" plain :disabled="disabled || loading || !paragraphIds.length" @click="handleOpenDialog">生成问题</el-button>
+  <slot :open="handleOpenDialog" :disabled="disabled || loading || !paragraphIds.length">
+    <!-- 批量生成分段关联问题 -->
+    <el-button type="primary" plain :disabled="disabled || loading || !paragraphIds.length" @click="handleOpenDialog">生成问题</el-button>
+  </slot>
   <GenerateQuestionsDialog
     v-if="dialogMounted"
     ref="dialogRef"

@@ -160,7 +160,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
       {
         path: ':knowledgeId/:type/document/:documentId',
         name: 'workspace-knowledge-paragraph',
-        component: () => import('@/views/knowledge-detail/paragraph/index.vue'),
+        component: () => import('@/views/document-detail/index.vue'),
         meta: { title: '文档分段', hidden: true, resourceDetailRoot: true },
       },
     ],

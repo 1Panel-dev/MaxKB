@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import type { DocumentStrategy, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
 import ModelApi from '@/api/admin/workspace/model'
@@ -18,7 +18,7 @@ defineOptions({ name: 'DocumentStrategyForm' })
 /* 文档处理策略 */
 const formRef = ref<FormInstance>()
 const strategy = reactive<DocumentStrategy>({
-  split: { mode: 'smart', patterns: null, min_length: 500, max_length: 4096, child_length: 256, auto_clean: true },
+  split: { mode: 'smart', patterns: null, limit: 500, child_length: 256, auto_clean: true },
   visual: { enabled: false, strategy: 'model', model_id: null, tool_id: null },
   index: { title_as_question: false },
 })
@@ -28,15 +28,7 @@ const visualModelId = computed({
     strategy.visual.model_id = value || null
   },
 })
-const strategyRules: FormRules = {
-  'split.min_length': [
-    {
-      validator: (_rule, value: number, callback) =>
-        callback(value > strategy.split.max_length ? new Error('最小分段长度不能超过最大分段长度') : undefined),
-      trigger: 'change',
-    },
-  ],
-}
+
 const splitPatternOptions = ['#', '##', '###', '####', '#####', '######'].map((heading) => ({
   label: heading,
   value: `(?m)^${heading} .*`,
@@ -54,8 +46,7 @@ function setStrategy(value?: DocumentStrategy | null) {
   Object.assign(strategy.split, {
     mode: 'smart',
     patterns: null,
-    min_length: 500,
-    max_length: 4096,
+    limit: 500,
     child_length: 256,
     auto_clean: true,
     ...(value?.split.mode === 'advanced' ? cloneDeep(value.split) : {}),
@@ -69,9 +60,7 @@ function setStrategy(value?: DocumentStrategy | null) {
 function getStrategy(): DocumentStrategy {
   return {
     split: {
-      ...(strategy.split.mode === 'smart'
-        ? { mode: 'smart' as const, min_length: 0, max_length: 4096, child_length: 256, auto_clean: false }
-        : strategy.split),
+      ...(strategy.split.mode === 'smart' ? { mode: 'smart' as const, limit: 500, child_length: 256, auto_clean: false } : strategy.split),
       patterns: strategy.split.mode === 'advanced' && splitPatterns.value.length ? [...splitPatterns.value] : null,
     },
     visual: {
@@ -140,7 +129,7 @@ defineExpose({ validate, getStrategy, setStrategy })
 </script>
 
 <template>
-  <el-form ref="formRef" :model="strategy" :rules="strategyRules" label-position="top" require-asterisk-position="right" @submit.prevent>
+  <el-form ref="formRef" :model="strategy" label-position="top" require-asterisk-position="right" @submit.prevent>
     <p class="mb-2">分段规则</p>
 
     <div class="w-full space-y-2">
@@ -177,32 +166,8 @@ defineExpose({ validate, getStrategy, setStrategy })
                   <el-option v-for="pattern in splitPatternOptions" :key="pattern.value" :label="pattern.label" :value="pattern.value" />
                 </el-select>
               </el-form-item>
-              <el-form-item label="分段长度" prop="split.min_length">
-                <div class="flex-align-center w-full gap-2">
-                  <el-input-number
-                    v-model="strategy.split.min_length"
-                    :min="50"
-                    :max="100000"
-                    :step="1"
-                    step-strictly
-                    :value-on-clear="50"
-                    controls-position="right"
-                    align="left"
-                    class="min-w-0 flex-1"
-                  />
-                  <span>–</span>
-                  <el-input-number
-                    v-model="strategy.split.max_length"
-                    :min="50"
-                    :max="100000"
-                    :step="1"
-                    :value-on-clear="50"
-                    step-strictly
-                    controls-position="right"
-                    align="left"
-                    class="min-w-0 flex-1"
-                  />
-                </div>
+              <el-form-item label="分段长度">
+                <MkSlider v-model="strategy.split.limit" show-input :min="50" :max="100000" />
               </el-form-item>
               <el-form-item>
                 <template #label>
@@ -213,17 +178,8 @@ defineExpose({ validate, getStrategy, setStrategy })
                     </MkTooltip>
                   </span>
                 </template>
-                <el-input-number
-                  v-model="strategy.split.child_length"
-                  :min="64"
-                  :max="1024"
-                  :step="1"
-                  step-strictly
-                  :value-on-clear="64"
-                  controls-position="right"
-                  align="left"
-                  class="w-full!"
-                />
+
+                <MkSlider v-model="strategy.split.child_length" show-input :min="64" :max="1024" />
               </el-form-item>
               <el-form-item class="mb-0!">
                 <template #label>

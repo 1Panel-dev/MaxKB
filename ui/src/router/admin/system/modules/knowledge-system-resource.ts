@@ -148,7 +148,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
   {
     path: '/system/resource/knowledge/:knowledgeId/:type/document/:documentId',
     name: 'system-resource-knowledge-paragraph',
-    component: () => import('@/views/knowledge-detail/paragraph/index.vue'),
+    component: () => import('@/views/document-detail/index.vue'),
     meta: { resourceScope: 'system-resource', scope: 'system', hideSidebar: true, title: '文档分段', hidden: true, resourceDetailRoot: true },
   },
 ]
