@@ -71,6 +71,11 @@ V2 PG 文件继续支持读取、下载和删除兼容；替换历史 PG 文件�
 ## 调度与日志页面
 
 Web、飞书和工作流知识库共用 `GET/PUT sync_setting` 与 `GET sync_log/<页码>/<页大小>`。
+普通工作空间、系统资源管理与系统共享知识库分别使用
+`workspace/<工作空间 ID>/knowledge/<知识库 ID>`、`system/resource/knowledge/<知识库 ID>` 和
+`system/shared/knowledge/<知识库 ID>` 前缀，系统接口按资源归属校验范围。
+工作空间共享资源使用 `system/shared/workspace/<工作空间 ID>/knowledge/<知识库 ID>` 前缀，
+仅支持配置和日志查询，并校验该知识库对当前工作空间的共享授权。日志仅返回定时任务记录。
 设置支持每日、每周、每月、间隔和五段 Cron；至少间隔 5 分钟。保存设置、导入和删除知识库
 均在事务提交后发送 Celery 任务，由 worker 注册或移除调度任务，不立即同步。Web 请求不启动
 调度器；worker 启动时恢复已开启的调度配置。升级时需重启 Web 和 Celery，关闭旧 Web 进程中

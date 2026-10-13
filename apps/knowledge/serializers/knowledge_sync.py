@@ -65,16 +65,15 @@ class KnowledgeSyncSettingOperationSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_("workspace id"))
     knowledge_id = serializers.UUIDField(required=True, label=_("knowledge id"))
 
-    def validate(self, attrs):
-        knowledge = (
-            QuerySet(Knowledge)
-            .filter(
-                id=attrs["knowledge_id"],
-                workspace_id=attrs["workspace_id"],
-                type__in=SCHEDULED_KNOWLEDGE_TYPES,
-            )
-            .first()
+    def get_knowledge_queryset(self, attrs):
+        return QuerySet(Knowledge).filter(
+            id=attrs["knowledge_id"],
+            workspace_id=attrs["workspace_id"],
+            type__in=SCHEDULED_KNOWLEDGE_TYPES,
         )
+
+    def validate(self, attrs):
+        knowledge = self.get_knowledge_queryset(attrs).first()
         if knowledge is None:
             raise AppApiException(404, _("Scheduled synchronization is not supported for this knowledge base"))
         attrs["knowledge"] = knowledge
