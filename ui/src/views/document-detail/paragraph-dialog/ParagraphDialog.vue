@@ -14,7 +14,7 @@ const props = defineProps<{
   knowledgeId: string
   documentId: string
 }>()
-const emit = defineEmits<{ success: [mode: 'edit']; closed: [] }>()
+const emit = defineEmits<{ success: [paragraph: ParagraphItem]; closed: [] }>()
 
 /* 详情加载：打开时固定目标，关闭动画后由页面卸载。 */
 const visible = ref(false)
@@ -96,7 +96,7 @@ function handleSubmit() {
           paragraphDetail.value = paragraph
           mode.value = 'detail'
           MsgSuccess('保存成功')
-          emit('success', 'edit')
+          emit('success', paragraph)
         })
         .finally(() => {
           loading.value = false

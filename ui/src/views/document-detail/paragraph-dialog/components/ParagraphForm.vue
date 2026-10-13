@@ -70,7 +70,15 @@ defineExpose({ validate })
 </script>
 
 <template>
-  <el-form ref="formRef" :model="paragraphForm" :rules="paragraphRules" label-position="top" class="min-w-0 flex-1" @submit.prevent>
+  <el-form
+    ref="formRef"
+    :model="paragraphForm"
+    :rules="paragraphRules"
+    label-position="top"
+    require-asterisk-position="right"
+    class="min-w-0 flex-1"
+    @submit.prevent
+  >
     <el-form-item label="标题" prop="title">
       <el-input v-model="paragraphForm.title" maxlength="256" placeholder="请输入标题" />
     </el-form-item>

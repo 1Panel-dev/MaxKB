@@ -18,7 +18,7 @@ defineOptions({ name: 'DocumentStrategyForm' })
 /* 文档处理策略 */
 const formRef = ref<FormInstance>()
 const strategy = reactive<DocumentStrategy>({
-  split: { mode: 'smart', patterns: null, limit: 500, child_length: 256, auto_clean: true },
+  split: { mode: 'smart', patterns: null, limit: 4096, child_length: 256, auto_clean: true },
   visual: { enabled: false, strategy: 'model', model_id: null, tool_id: null },
   index: { title_as_question: false },
 })
@@ -46,7 +46,7 @@ function setStrategy(value?: DocumentStrategy | null) {
   Object.assign(strategy.split, {
     mode: 'smart',
     patterns: null,
-    limit: 500,
+    limit: 4096,
     child_length: 256,
     auto_clean: true,
     ...(value?.split.mode === 'advanced' ? cloneDeep(value.split) : {}),

@@ -14,7 +14,7 @@ const props = defineProps<{
   knowledgeId: string
   documentId: string
 }>()
-const emit = defineEmits<{ success: [paragraphIds: string[]] }>()
+const emit = defineEmits<{ success: [paragraphIds: string[]]; closed: [] }>()
 
 // 固定本次勾选的分段，查询知识库与联动文档选项。
 const visible = ref(false)
@@ -95,15 +95,9 @@ function handleBeforeClose(done: () => void) {
 
 function handleClosed() {
   const migratedParagraphIds = migrationSucceeded.value ? [...targetParagraphIds.value] : []
-  migrationSucceeded.value = false
-  migrateForm.knowledge_id = ''
-  migrateForm.document_id = ''
-  targetParagraphIds.value = []
-  knowledgeOptions.value = []
-  documentOptions.value = []
-  formRef.value?.clearValidate()
   // 关闭动画结束后通知页面，使用打开时固定的 ID，不读取当前勾选。
   if (migratedParagraphIds.length) emit('success', migratedParagraphIds)
+  emit('closed')
 }
 
 defineExpose({ open })
