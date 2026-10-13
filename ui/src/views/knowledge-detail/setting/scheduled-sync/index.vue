@@ -8,7 +8,7 @@ import { SCHEDULE_OPTION } from '@/constants/schedule'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
-import { useKnowledgeDetailContext } from '../../context'
+import { useKnowledgeSyncContext } from '../../context'
 import SyncLogTable from './components/SyncLogTable.vue'
 
 defineOptions({ name: 'KnowledgeScheduledSyncView' })
@@ -16,7 +16,7 @@ defineOptions({ name: 'KnowledgeScheduledSyncView' })
 defineProps<ResourceDetailPageProps>()
 
 // 回填后台配置，草稿与详情中的配置独立。
-const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
+const { knowledge, replaceKnowledgeDetail, resourceApi, requestSettingApi, resourceScope } = useKnowledgeSyncContext()
 const activeTab = ref('settings')
 const loading = ref(false)
 const saving = ref(false)
@@ -106,7 +106,8 @@ const rules: FormRules<SyncSettingDraft> = {
 }
 
 function handleSave() {
-  if (!resourceApi.sync) return
+  const requestApi = requestSettingApi.value
+  if (!requestApi) return
   const detail = knowledge.value
   const form = formRef.value
   if (saving.value || loading.value || !settingLoaded.value || !detail || !form) return
@@ -116,7 +117,7 @@ function handleSave() {
     .then(() => {
       if (!syncSetting.value.schedule_type) return
       const setting: KnowledgeSyncSetting = { ...cloneDeep(syncSetting.value), schedule_type: syncSetting.value.schedule_type }
-      return resourceApi.sync?.putKnowledgeSyncSetting(detail.id, setting).then((savedSetting) => {
+      return requestApi.putKnowledgeSyncSetting(detail.id, setting).then((savedSetting) => {
         syncSetting.value = cloneDeep(savedSetting)
         replaceKnowledgeDetail({ ...detail, meta: { ...detail.meta, sync_setting: savedSetting } })
         MsgSuccess('保存成功')
@@ -129,8 +130,6 @@ function handleSave() {
 }
 
 function loadSyncSetting(knowledgeId: string) {
-  // TODO 补了接口就可以了
-  if (!resourceApi.sync) return Promise.resolve()
   loading.value = true
   settingLoaded.value = false
   return resourceApi.sync
@@ -147,9 +146,10 @@ function loadSyncSetting(knowledgeId: string) {
 }
 
 watch(
-  () => knowledge.value?.id,
-  (knowledgeId) => {
+  [() => knowledge.value?.id, resourceScope],
+  ([knowledgeId]) => {
     activeTab.value = 'settings'
+    settingLoaded.value = false
     syncSetting.value = createDefaultSyncSetting()
     presetScheduleType.value = undefined
     formRef.value?.clearValidate()
@@ -166,7 +166,15 @@ watch(
       <el-tab-pane label="同步日志" name="logs" />
     </el-tabs>
     <div v-show="activeTab === 'settings'" v-loading="loading || saving" class="min-h-40">
-      <el-form ref="formRef" :model="syncSetting" :rules="rules" class="max-w-200 pb-6" label-position="top" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="syncSetting"
+        :rules="rules"
+        class="max-w-200 pb-6"
+        label-position="top"
+        :disabled="!requestSettingApi"
+        @submit.prevent
+      >
         <el-form-item>
           <template #label>
             <span>
@@ -212,7 +220,9 @@ watch(
           </el-form-item>
         </div>
         <!-- 保存定时同步设置 -->
-        <el-button type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">保存</el-button>
+        <el-button v-if="requestSettingApi" type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">
+          保存
+        </el-button>
       </el-form>
     </div>
     <SyncLogTable v-if="activeTab === 'logs' && knowledge" :api="resourceApi.sync" :knowledge-id="knowledge.id" />

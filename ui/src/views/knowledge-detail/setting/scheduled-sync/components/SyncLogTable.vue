@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref, watch } from 'vue'
 import type SyncApi from '@/api/admin/workspace/knowledge/sync'
+import type SharedSyncApi from '@/api/admin/workspace/shared/knowledge/sync'
+import type SystemResourceSyncApi from '@/api/admin/system/resource-management/knowledge/sync'
+import type SystemSharedSyncApi from '@/api/admin/system/shared-resources/knowledge/sync'
 import { KNOWLEDGE_SYNC_STATUS, KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
 import type { KnowledgeSyncLog, KnowledgeSyncStatus } from '@/api/types'
 import type { StatusLabelOptions } from '@/components/global/mk-status-label/types'
@@ -8,7 +11,10 @@ import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'KnowledgeSyncLogTable' })
-const props = defineProps<{ knowledgeId: string; api?: typeof SyncApi }>()
+const props = defineProps<{
+  knowledgeId: string
+  api: typeof SyncApi | typeof SharedSyncApi | typeof SystemResourceSyncApi | typeof SystemSharedSyncApi
+}>()
 
 // 进入日志页签时挂载查询，翻页由表格事件重新查询。
 const loading = ref(false)
@@ -34,7 +40,6 @@ function getSyncContent(log: KnowledgeSyncLog) {
   return `共${log.total_count}个文档 (${counts.join('，')})`
 }
 function loadSyncLogs() {
-  if (!props.api) return
   if (loading.value) return
   loading.value = true
   return props.api
@@ -50,9 +55,15 @@ function loadSyncLogs() {
     })
 }
 
-onMounted(() => {
-  void loadSyncLogs()
-})
+watch(
+  [() => props.knowledgeId, () => props.api],
+  () => {
+    syncLogs.value = []
+    paginationConfig.value = { currentPage: 1, pageSize: 10, total: 0 }
+    void loadSyncLogs()
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
