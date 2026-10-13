@@ -19,7 +19,7 @@
         v-if="modelSettingEnable"
         :label="$t('views.application.form.aiModel.label')"
         prop="long_term_model_id"
-        :rules="modelIdRules"
+        required
       >
         <div class="w-full">
           <el-radio-group v-model="form.long_term_model_id_type" class="mb-8">
@@ -363,7 +363,16 @@ const scheduled = computed({
 
 const open = (data: any) => {
   dialogVisible.value = true
-  const { trigger_type, trigger_setting, long_term_model_id_type, long_term_model_id, model_params_setting, application_id, workspace_id, model_setting_enable } = data || {}
+  const {
+    trigger_type,
+    trigger_setting,
+    long_term_model_id_type,
+    long_term_model_id,
+    model_params_setting,
+    application_id,
+    workspace_id,
+    model_setting_enable,
+  } = data || {}
   modelSettingEnable.value = model_setting_enable ?? false
   form.value.application_id = application_id
   form.value.workspace_id = workspace_id
