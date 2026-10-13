@@ -9,8 +9,8 @@ import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import FormSettingTable from './component/form-setting/FormSettingTable.vue'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 defineOptions({ name: 'WorkflowFormNode' })
-const apiType = (inject('apiType') as string) || 'workspace'
-const store = useWorkflowStore(apiType)
+const resourceScope = (inject('resourceScope') as string) || 'workspace'
+const store = useWorkflowStore(resourceScope)
 const getModel = inject<() => WorkflowNodeModel>('getModel')!
 const model = getModel()
 // 为画布节点中的 ModelSelect 提供参数表单接口。

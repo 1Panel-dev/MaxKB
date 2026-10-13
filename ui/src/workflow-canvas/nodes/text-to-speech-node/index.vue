@@ -12,7 +12,7 @@ import type { ModelItem, ModelProviderItem } from '@/api/types'
 
 defineOptions({ name: 'WorkflowTextToSpeechNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
-const apiType = (inject('apiType') as string) || 'workspace'
+const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const model = getModel()
 
@@ -27,7 +27,7 @@ interface TextToSpeechNodeForm {
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 
-const store = useWorkflowStore(apiType)
+const store = useWorkflowStore(resourceScope)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<ModelProviderItem>>([])
 

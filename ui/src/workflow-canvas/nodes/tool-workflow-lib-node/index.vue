@@ -31,7 +31,7 @@ interface ToolBaseProperties {
 
 const getModel = inject<() => WorkflowNodeModel>('getModel')!
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
-const store = useWorkflowStore(inject<string>('apiType', 'workspace'))
+const store = useWorkflowStore(inject<string>('resourceScope', 'workspace'))
 const model = getModel()
 const formRef = useTemplateRef<FormInstance>('formRef')
 const anchorGuard = createAnchorGuard(model)

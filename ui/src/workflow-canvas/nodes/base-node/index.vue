@@ -27,10 +27,10 @@ import {
 defineOptions({ name: 'WorkflowBaseNode' })
 
 const getModel = inject('getModel') as () => WorkflowNodeModel
-const apiType = (inject('apiType') as string) || 'workspace'
+const resourceScope = (inject('resourceScope') as string) || 'workspace'
 
 const model = getModel()
-const store = useWorkflowStore(apiType)
+const store = useWorkflowStore(resourceScope)
 
 // 为画布节点中的 ModelSelect 提供参数表单接口。
 provide('getModelParamsForm', store.force.getModelParamsForm)

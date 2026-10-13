@@ -47,18 +47,18 @@ const apiMap = Object.fromEntries(
 const cacheMap = new Map<string, Map<string, unknown>>()
 const pendingMap = new Map<string, Map<string, Promise<unknown>>>()
 
-export function useWorkflowStore(apiType: string): WorkflowStore {
-  const api: ApiModule | undefined = apiMap[apiType]
+export function useWorkflowStore(resourceScope: string): WorkflowStore {
+  const api: ApiModule | undefined = apiMap[resourceScope]
   if (!api) {
-    throw new Error(`[useWorkflowStore] unknown apiType: "${apiType}"`)
+    throw new Error(`[useWorkflowStore] unknown resourceScope: "${resourceScope}"`)
   }
   const requestApi: ApiModule = api
 
-  const cache = cacheMap.get(apiType) ?? new Map<string, unknown>()
-  cacheMap.set(apiType, cache)
+  const cache = cacheMap.get(resourceScope) ?? new Map<string, unknown>()
+  cacheMap.set(resourceScope, cache)
 
-  const pending = pendingMap.get(apiType) ?? new Map<string, Promise<unknown>>()
-  pendingMap.set(apiType, pending)
+  const pending = pendingMap.get(resourceScope) ?? new Map<string, Promise<unknown>>()
+  pendingMap.set(resourceScope, pending)
 
   // 统一的缓存 + 请求去重逻辑。force 时跳过缓存读取并覆盖缓存,但仍复用在途请求以避免重复触发。
   function withCache<T>(key: string, fetcher: () => Promise<T>, force = false): Promise<T> {

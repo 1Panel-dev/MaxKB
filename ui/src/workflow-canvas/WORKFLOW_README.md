@@ -132,7 +132,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 ### 资源查询（`store/`）
 
-`useWorkflowStore(apiType)` 是画布资源接口适配器，不是 Pinia Store。它自动收集 `store/api/*/index.ts`，
+`useWorkflowStore(resourceScope)` 是画布资源接口适配器，不是 Pinia Store。它自动收集 `store/api/*/index.ts`，
 查询方法按范围、方法与查询参数缓存结果并复用在途请求；`store.force.xxx()` 跳过已完成缓存，仍复用同键在途请求。
 `postPromptGenerate` 是流式生成方法，始终直接转发到对应范围的 Model API，不缓存或去重；
 通过普通 Store 或 `force` 调用都会发起新请求，返回独立的 Response 流。
@@ -140,7 +140,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 System 资源管理合并普通与共享模型，System 共享范围仅返回标记 `source: 'shared'` 的共享模型。
 强制刷新使用 `store.force.getModelListWithShared(query)`。动态表单配置器通过
 `getSelectModelList` 注入使用该能力，循环体转发同名注入。
-主画布从 `resourceScope` 注入读取范围（默认 `workspace`），通过节点上下文传递为 `apiType`。
+主画布从 `resourceScope` 注入读取范围（默认 `workspace`），通过节点上下文传递为 `resourceScope`。
 
 当前 `workspace` 适配模型、供应商、模型参数、MCP 工具、共享工具选项、工具详情和标签查询；
 `system-resource` 与 `system-shared` 独立提供系统模型、供应商、参数表单、工具选项与详情、MCP 和标签查询，
@@ -329,7 +329,7 @@ AI 对话节点的提示词、历史记录、视觉理解和输出思考表单�
 自定义模型使用节点配置的模型 ID，引用变量无法在编辑时确定模型，生成入口禁用。
 图片理解和视频理解使用 IMAGE 模型，AI 对话使用 LLM 模型，现有提示词接口支持这两种类型。
 共享组件维护提示词模板和请求上下文，不依赖某个节点，也不接收未使用的模型或供应商选项。
-组件将画布注入的 `apiType` 传给 `useWorkflowStore`，通过 `store.postPromptGenerate` 发起生成；
+组件将画布注入的 `resourceScope` 传给 `useWorkflowStore`，通过 `store.postPromptGenerate` 发起生成；
 Store 适配器统一选择 Workspace、System 资源管理或 System 共享资源的 Model API。
 循环画布已转发同一上下文，组件不再单独判断资源范围。生成方法不使用 Store 的查询缓存或请求去重。
 生成接口不再依赖应用，改用节点自身已保存的模型参数（`model_params_setting`）并随请求体提交，

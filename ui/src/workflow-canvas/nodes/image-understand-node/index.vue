@@ -16,7 +16,7 @@ import { WorkflowMode, type ReasoningSettingData } from '@/workflow-canvas/types
 
 defineOptions({ name: 'WorkflowImageUnderstandNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
-const apiType = (inject('apiType') as string) || 'workspace'
+const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const model = getModel()
 
@@ -36,7 +36,7 @@ interface ImageUnderstandNodeForm {
 
 const formRef = useTemplateRef<FormInstance>('formRef')
 
-const store = useWorkflowStore(apiType)
+const store = useWorkflowStore(resourceScope)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<ModelProviderItem>>([])
 
