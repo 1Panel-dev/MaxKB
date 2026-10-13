@@ -755,6 +755,11 @@ Web 知识库详情及更新响应的顶层 `doc_strategy` 使用 `DocumentStrat
 
 `setting/scheduled-sync/` 页面调用设置查询、保存和日志分页接口；保存返回的规范化配置用于回填。
 
+四个知识库范围分别在自己的 `sync.ts` 中维护接口，由 `views/knowledge-detail/context.ts`
+按资源范围装配为 `resourceApi.sync`。Workspace、System 资源管理、System 共享资源提供查询、保存及日志分页；
+Workspace 共享版本只提供设置查询和日志分页。定时同步设置页通过 `useKnowledgeSettingContext()`
+取得可管理范围的 API，不回退其他范围，也不为只读范围补写接口。
+
 `workspace/knowledge/sync.ts` 提供 `getKnowledgeSyncSetting`、`putKnowledgeSyncSetting`，
 分别通过 GET、PUT `/<knowledgeId>/sync_setting` 查询和保存 Web、飞书及工作流知识库同步设置。
 `KnowledgeSyncSetting` 定义在 `types/knowledge-sync.ts`，包含 `enabled`、`schedule_type`、
