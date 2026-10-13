@@ -30,6 +30,10 @@ and `DocumentSerializers.Batch.batch_save`, including Web, Lark and workflow out
 sync, Lark reimport/sync, and workflow snapshot reconciliation use `defer_visual_assets` as well.
 Changed images and visual strategy changes reset assets to `pending`, retaining prior descriptions
 until recognition completes. Unchanged documents keep their completed recognition results.
+Worker write-back checks the image file/hash, paragraph location and visual strategy under short
+paragraph/asset row locks, acquired in the same order as sync. Results from an older sync or a deleted
+image are discarded instead of overwriting the current image. The model/tool call runs before those
+locks are acquired. Workflow reconciliation uses the incoming document's visual strategy.
 
 Synchronization without embedding publishes `celery:process_paragraph_visual_assets` after commit
 to recognize the images independently. Synchronization success means the source snapshot is saved;

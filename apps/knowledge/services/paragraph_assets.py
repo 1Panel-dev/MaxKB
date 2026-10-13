@@ -219,6 +219,8 @@ def process_visual_assets(
     strategy: Dict | None,
     processor: Optional[Callable[[ParagraphAsset, Dict], Dict]] = None,
     workspace_id: str | None = None,
+    *,
+    guard_snapshot: bool = False,
 ) -> None:
     """Run a model/tool adapter. Errors are isolated per image and never abort document import."""
     assets = list(assets)
@@ -232,6 +234,21 @@ def process_visual_assets(
         except Exception as exc:
             resolver_error = str(exc)[:2000]
     for asset in assets:
+        snapshot = (
+            {
+                field: getattr(asset, field)
+                for field in (
+                    "file_id",
+                    "source_hash",
+                    "visual_strategy_hash",
+                    "document_id",
+                    "paragraph_id",
+                    "position",
+                )
+            }
+            if guard_snapshot
+            else None
+        )
         asset.visual_strategy_hash = visual_hash
         edited_fields = (asset.meta or {}).get("visual_edited_fields", [])
         if not visual["enabled"]:
@@ -260,19 +277,46 @@ def process_visual_assets(
                 asset.process_error = str(exc)[:2000]
                 if "description" not in edited_fields:
                     asset.description = asset.description or asset.caption
-        asset.save(
-            update_fields=[
-                "caption",
-                "ocr_text",
-                "description",
-                "meta",
-                "process_status",
-                "process_error",
-                "visual_strategy_hash",
-                "update_time",
-            ]
-        )
-        _write_asset_description(asset)
+        if snapshot is None:
+            _save_visual_asset(asset)
+        else:
+            # A newer sync may replace/move the image or change the strategy while the
+            # model runs. Lock only the write-back and discard obsolete results.
+            with transaction.atomic():
+                # Sync locks paragraphs before assets; use the same order here.
+                if (
+                    not Paragraph.objects.select_for_update()
+                    .filter(id=asset.paragraph_id, document_id=asset.document_id)
+                    .exists()
+                ):
+                    continue
+                if (
+                    ParagraphAsset.objects.select_for_update()
+                    .filter(
+                        id=asset.id,
+                        process_status=AssetProcessStatus.PENDING,
+                        sync_state=SyncState.ACTIVE,
+                        **snapshot,
+                    )
+                    .exists()
+                ):
+                    _save_visual_asset(asset)
+
+
+def _save_visual_asset(asset: ParagraphAsset) -> None:
+    asset.save(
+        update_fields=[
+            "caption",
+            "ocr_text",
+            "description",
+            "meta",
+            "process_status",
+            "process_error",
+            "visual_strategy_hash",
+            "update_time",
+        ]
+    )
+    _write_asset_description(asset)
 
 
 def _enqueue_visual_assets(asset_ids: List[str], paragraph_ids: List[str]) -> None:
@@ -449,6 +493,7 @@ def _process_pending_assets(assets: Iterable[ParagraphAsset]) -> None:
             document_assets,
             first.document.doc_strategy,
             workspace_id=str(first.knowledge.workspace_id),
+            guard_snapshot=True,
         )
 
 

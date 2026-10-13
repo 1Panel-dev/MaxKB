@@ -319,7 +319,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
     @patch("knowledge.services.workflow_sync.transaction.atomic")
     @patch("knowledge.services.workflow_sync.IncrementalDocumentSync")
     def test_changed_snapshot_embeds_stable_paragraphs_after_commit(
-        self, merger, _atomic, _assets, _process, _copy, on_commit, send_task
+        self, merger, _atomic, assets, defer_assets, _copy, on_commit, send_task
     ):
         merger.return_value.merge.return_value = SimpleNamespace(reembed_ids=["stable-paragraph"], disabled_ids=[])
         self.documents[4].meta["token"] = "old"
@@ -327,6 +327,8 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
             document.doc_strategy = {}
             document.visual_strategy_hash = ""
             document.save = MagicMock()
+        new_strategy = {"visual": {"enabled": True, "strategy": "model", "model_id": "new-vision-model"}}
+        self.documents[4].doc_strategy = new_strategy
         knowledge_query = MagicMock()
         knowledge_query.filter.return_value.values_list.return_value.first.return_value = "model"
         with (
@@ -340,6 +342,7 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
         self.assertEqual(stats["synced_count"], 1)
         self.assertNotIn("new", {document.id for document in self.documents})
         self.assertIn("old", {document.id for document in self.documents})
+        defer_assets.assert_called_once_with(assets.return_value, new_strategy)
         self.schedule_embedding.assert_not_called()
         send_task.assert_not_called()
         on_commit.assert_called_once()

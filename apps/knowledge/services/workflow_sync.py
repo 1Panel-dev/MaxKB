@@ -258,7 +258,7 @@ def merge_workflow_incremental_snapshot(
                 ).merge(remote_paragraphs)
                 changed_paragraphs = QuerySet(Paragraph).filter(id__in=result.reembed_ids)
                 assets = sync_paragraph_assets(changed_paragraphs, old_document.visual_strategy_hash)
-                defer_visual_assets(assets, old_document.doc_strategy)
+                defer_visual_assets(assets, new_document.doc_strategy)
                 if result.disabled_ids:
                     QuerySet(Embedding).filter(paragraph_id__in=result.disabled_ids).delete()
 

@@ -10,7 +10,7 @@ from rest_framework import serializers
 from knowledge.models import AssetProcessStatus, KnowledgeType, ParagraphAsset, SyncState
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.services.document_strategy import normalize_document_strategy, strategy_hashes
-from knowledge.services.paragraph_assets import defer_visual_assets, embed_paragraph_assets
+from knowledge.services.paragraph_assets import defer_visual_assets, embed_paragraph_assets, process_visual_assets
 
 
 class AsyncVisualImportTests(SimpleTestCase):
@@ -191,6 +191,14 @@ class VisualAssetDeferralTests(SimpleTestCase):
 
 class PendingVisualEmbeddingTests(SimpleTestCase):
     def setUp(self):
+        self.enterContext(patch("django.db.transaction.Atomic.__enter__"))
+        self.enterContext(patch("django.db.transaction.Atomic.__exit__", return_value=False))
+        paragraphs = self.enterContext(patch("knowledge.services.paragraph_assets.Paragraph.objects.select_for_update"))
+        paragraphs.return_value.filter.return_value.exists.return_value = True
+        self.current_assets = self.enterContext(
+            patch("knowledge.services.paragraph_assets.ParagraphAsset.objects.select_for_update")
+        )
+        self.current_assets.return_value.filter.return_value.exists.return_value = True
         self.query = self.enterContext(
             patch("knowledge.services.paragraph_assets.ParagraphAsset.objects.select_related")
         )
@@ -262,6 +270,33 @@ class PendingVisualEmbeddingTests(SimpleTestCase):
         self.processor.assert_called_once_with(asset, strategy["visual"])
         self.assertEqual(asset.process_status, AssetProcessStatus.SUCCESS)
         self.assertEqual(asset.visual_strategy_hash, strategy_hashes(strategy)["visual_strategy_hash"])
+
+    def test_replaced_or_deleted_image_discards_the_inflight_recognition_result(self):
+        asset = self.asset()
+        asset.source_hash = "original-image"
+        asset.visual_strategy_hash = "original-strategy"
+        self.current_assets.return_value.filter.return_value.exists.return_value = False
+
+        process_visual_assets([asset], asset.document.doc_strategy, processor=self.processor, guard_snapshot=True)
+
+        asset.save.assert_not_called()
+        self.write_description.assert_not_called()
+        snapshot = self.current_assets.return_value.filter.call_args.kwargs
+        self.assertEqual(snapshot["source_hash"], "original-image")
+        self.assertEqual(snapshot["visual_strategy_hash"], "original-strategy")
+        self.assertEqual(snapshot["paragraph_id"], asset.paragraph_id)
+        self.assertEqual(snapshot["position"], asset.position)
+
+    def test_success_is_saved_with_matching_snapshot_before_writing_paragraph_result(self):
+        asset = self.asset()
+
+        process_visual_assets([asset], asset.document.doc_strategy, processor=self.processor, guard_snapshot=True)
+
+        asset.save.assert_called_once()
+        self.write_description.assert_called_once_with(asset)
+        self.assertEqual(
+            self.current_assets.return_value.filter.call_args.kwargs["process_status"], AssetProcessStatus.PENDING
+        )
 
     def test_failure_of_one_image_does_not_prevent_remaining_image_indexing(self):
         first, second = self.asset(), self.asset()
