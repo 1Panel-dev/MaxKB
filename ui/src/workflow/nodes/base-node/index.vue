@@ -69,7 +69,7 @@
                 <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
               </el-button>
               <el-switch
-                class="ml-8"
+                class="ml-4"
                 size="small"
                 v-model="form_data.long_term_enable"
                 @change="switchLongTerm"
