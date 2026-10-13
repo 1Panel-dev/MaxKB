@@ -5,7 +5,7 @@ import type { TableColumnCtx } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import TagsApi from '@/api/admin/workspace/knowledge/tags'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
-import type { Dict, KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
+import type { KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import CreateTagDialog from './components/CreateTagDialog.vue'
 import EditTagDialog from './components/EditTagDialog.vue'
@@ -32,23 +32,15 @@ const tagTableRef = ref<{ clearSelection: () => void }>()
 const selectedTags = ref<TagTableRow[]>([])
 const hoveredTagKey = ref<string | null>(null)
 
-/* 保留完整分组进行搜索和分页，避免同一标签跨页拆开。 */
-const filteredTagGroups = computed(() => {
-  const keyword = searchText.value.trim().toLocaleLowerCase()
-  return tagGroups.value.filter(
-    (group) =>
-      !keyword || group.key.toLocaleLowerCase().includes(keyword) || group.values.some(({ value }) => value.toLocaleLowerCase().includes(keyword)),
-  )
-})
 const paginationConfig = computed({
-  get: () => ({ ...tagPage.value, total: filteredTagGroups.value.length }),
+  get: () => ({ ...tagPage.value, total: tagGroups.value.length }),
   set: ({ currentPage, pageSize }) => {
     tagPage.value = { currentPage, pageSize }
   },
 })
 const tagRows = computed<TagTableRow[]>(() => {
   const start = (tagPage.value.currentPage - 1) * tagPage.value.pageSize
-  return filteredTagGroups.value
+  return tagGroups.value
     .slice(start, start + tagPage.value.pageSize)
     .flatMap((group) => group.values.map((tag, index) => ({ ...tag, key: group.key, rowspan: index === 0 ? group.values.length : 0 })))
 })
@@ -62,10 +54,10 @@ function clearSelection() {
 function loadTags() {
   clearSelection()
   loading.value = true
-  return TagsApi.getKnowledgeTags(knowledgeId.value)
+  return TagsApi.getKnowledgeTags(knowledgeId.value, { name: searchText.value.trim() || undefined })
     .then((groups) => {
       tagGroups.value = groups
-      const lastPage = Math.max(1, Math.ceil(filteredTagGroups.value.length / tagPage.value.pageSize))
+      const lastPage = Math.max(1, Math.ceil(groups.length / tagPage.value.pageSize))
       tagPage.value.currentPage = Math.min(tagPage.value.currentPage, lastPage)
     })
     .finally(() => {
@@ -73,10 +65,9 @@ function loadTags() {
     })
 }
 
-function handleSearchChange(query?: Dict<unknown>) {
-  searchText.value = typeof query?.name === 'string' ? query.name : ''
+function handleSearchChange() {
   tagPage.value.currentPage = 1
-  clearSelection()
+  return loadTags()
 }
 
 function handleSelectionChange(selection: unknown[]) {
@@ -178,7 +169,7 @@ onMounted(() => {
     <div class="flex-between gap-4">
       <h4>{{ title }}</h4>
       <div class="flex-align-center">
-        <MkComplexSearch :fields="[{ label: '名称', value: 'name' }]" class="mr-3" @change="handleSearchChange" />
+        <MkSearchInput v-model="searchText" class="mr-3 w-60!" @change="handleSearchChange" />
         <!-- 导入标签，成功后刷新列表 -->
         <ButtonImportTags :api="TagsApi" :knowledge-id="knowledgeId" :disabled="loading || operationLoading" @refresh="loadTags" />
         <!-- 创建标签 -->

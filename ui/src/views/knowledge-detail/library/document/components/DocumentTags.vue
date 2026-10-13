@@ -1,14 +1,33 @@
 <script setup lang="ts">
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
-import { computed } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import type { DocumentItem } from '@/api/types'
+import AddTagDialog from '../action-dropdown/setting-tags/AddTagDialog.vue'
 
 defineOptions({ name: 'DocumentTags' })
-const props = defineProps<{ document: DocumentItem }>()
-const emit = defineEmits<{ add: [documentId: string] }>()
+const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; document: DocumentItem; disabled?: boolean }>()
+const loading = defineModel<boolean>('loading', { default: false })
+const emit = defineEmits<{ refresh: [] }>()
 
 // 优先使用接口数量，兼容只返回标签明细的数据。
 const tagCount = computed(() => props.document.tag_count ?? props.document.tags?.length ?? 0)
+
+const dialogMounted = ref(false)
+const addTagRef = useTemplateRef<InstanceType<typeof AddTagDialog>>('addTagRef')
+const targetKnowledgeId = ref('')
+
+function handleOpenDialog() {
+  if (props.disabled || loading.value || dialogMounted.value) return
+  targetKnowledgeId.value = props.knowledgeId
+  const documentId = props.document.id
+  dialogMounted.value = true
+  return nextTick(() => addTagRef.value?.open([documentId]))
+}
+
+function handleDialogClosed() {
+  dialogMounted.value = false
+}
 </script>
 
 <template>
@@ -32,9 +51,18 @@ const tagCount = computed(() => props.document.tag_count ?? props.document.tags?
       </div>
     </el-popover>
     <!-- 添加文档标签 -->
-    <el-button class="mk-add-tag-button" plain @click.stop="emit('add', document.id)">
+    <el-button class="mk-add-tag-button" plain :disabled="disabled || loading" @click.stop="handleOpenDialog">
       <MkIcon name="icon_add_outlined" size="14" />
       <span>标签</span>
     </el-button>
   </div>
+  <AddTagDialog
+    v-if="dialogMounted"
+    ref="addTagRef"
+    v-model:loading="loading"
+    :api="api"
+    :knowledge-id="targetKnowledgeId"
+    @refresh="emit('refresh')"
+    @closed="handleDialogClosed"
+  />
 </template>

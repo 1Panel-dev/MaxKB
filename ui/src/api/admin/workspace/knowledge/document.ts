@@ -166,7 +166,8 @@ const postReplaceDocumentSource = (knowledgeId: string, documentId: string, file
 }
 
 /** 查询文档当前标签。 */
-const getDocumentTags = (knowledgeId: string, documentId: string) => get<KnowledgeTagGroup[]>(`${getPrefix(knowledgeId)}/${documentId}/tags`)
+const getDocumentTags = (knowledgeId: string, documentId: string, query?: Dict<unknown>) =>
+  get<KnowledgeTagGroup[]>(`${getPrefix(knowledgeId)}/${documentId}/tags`, query)
 
 /** 给指定文档批量添加已有标签。 */
 const postAddDocumentTags = (knowledgeId: string, documentIds: string[], tagIds: string[]) =>

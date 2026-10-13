@@ -33,6 +33,7 @@ import {
   BatchCancelTaskAction,
   DeleteDocumentAction,
   DocumentTagsAction,
+  BatchDocumentTagsAction,
   EmbeddingDocumentAction,
   GenerateQuestionsAction,
   BatchGenerateQuestionsAction,
@@ -151,8 +152,7 @@ const documentTagOptions = ref<CascaderOption[]>([])
 const documentTagLoading = ref(false)
 
 function loadDocumentTagOptions() {
-  // 加载成功后至少有“无标签”选项，无需额外维护 loaded 状态。
-  if (documentTagLoading.value || documentTagOptions.value.length) return
+  if (documentTagLoading.value) return
   documentTagLoading.value = true
   const requestApi = isWorkspaceSharedResource() ? SharedTagsApi : TagsApi
   return requestApi
@@ -419,7 +419,14 @@ onBeforeUnmount(() => {
         />
       </template>
       <template #default="{ row }: { row: DocumentItem }">
-        <DocumentTags :document="row" />
+        <DocumentTags
+          :api="DocumentApi"
+          :knowledge-id="knowledgeId"
+          :document="row"
+          :disabled="isWorkspaceSharedResource()"
+          v-model:loading="operationLoading"
+          @refresh="refreshAfterOperation"
+        />
       </template>
     </el-table-column>
 
@@ -487,8 +494,16 @@ onBeforeUnmount(() => {
                 :document="row"
                 @refresh="refreshAfterOperation"
               />
-              <!-- TODO: 设置文档标签 -->
-              <DocumentTagsAction label="标签设置" icon="icon_tag" :disabled="operationLoading" />
+              <!-- 设置当前文档的标签 -->
+              <DocumentTagsAction
+                label="标签设置"
+                icon="icon_tag"
+                :api="DocumentApi"
+                :knowledge-id="knowledgeId"
+                :document="row"
+                v-model:loading="operationLoading"
+                @refresh="refreshAfterOperation"
+              />
               <!-- 同步 -->
               <SyncDocumentAction
                 v-if="
@@ -590,9 +605,15 @@ onBeforeUnmount(() => {
         v-model:loading="operationLoading"
         @refresh="refreshAfterOperation"
       />
-
-      <!-- // TODO 批量添加标签 -->
-      <el-button>添加标签</el-button>
+      <!-- 为选中文档批量添加标签 -->
+      <BatchDocumentTagsAction
+        label="标签设置"
+        :api="DocumentApi"
+        :knowledge-id="knowledgeId"
+        :document-ids="selectedDocumentIds"
+        v-model:loading="operationLoading"
+        @refresh="refreshAfterOperation"
+      />
 
       <!-- 更多批量操作 -->
       <MkDropdown class="ml-3" trigger="click" placement="bottom-end" hide-when-empty persistent>

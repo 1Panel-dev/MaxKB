@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import type { FormInstance, FormItemRule } from 'element-plus'
-import type TagsApi from '@/api/admin/workspace/knowledge/tags'
+import TagsApi from '@/api/admin/workspace/knowledge/tags'
 import type { KnowledgeTagPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CreateTagDialog' })
 
-const props = defineProps<{ knowledgeId: string; api: typeof TagsApi }>()
+const props = withDefaults(defineProps<{ knowledgeId: string; api?: typeof TagsApi }>(), {
+  api: () => TagsApi,
+})
 const emit = defineEmits<{ refresh: [] }>()
 
 const visible = ref(false)

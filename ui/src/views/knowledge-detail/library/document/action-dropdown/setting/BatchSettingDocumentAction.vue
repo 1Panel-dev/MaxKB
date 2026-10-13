@@ -50,6 +50,6 @@ function handleDialogClosed() {
 
 <template>
   <!-- 批量文档设置 -->
-  <el-button plain :disabled="disabled || loading" @click="handleOpenDialog">{{ label }}</el-button>
+  <el-button plain type="primary" :disabled="disabled || loading" @click="handleOpenDialog">{{ label }}</el-button>
   <DocumentSettingDialog v-if="dialogMounted" ref="settingDialogRef" batch :loading="loading" @submit="handleSubmit" @closed="handleDialogClosed" />
 </template>
