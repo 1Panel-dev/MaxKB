@@ -2,6 +2,7 @@ export { default as BatchEmbeddingAction } from './embedding/BatchEmbeddingActio
 export { default as BatchCancelTaskAction } from './BatchCancelTaskAction.vue'
 export { default as DeleteDocumentAction } from './DeleteDocumentAction.vue'
 export { default as DocumentTagsAction } from './setting-tags/DocumentTagsAction.vue'
+export { default as BatchDocumentTagsAction } from './setting-tags/BatchDocumentTagsAction.vue'
 export { default as EmbeddingDocumentAction } from './embedding/EmbeddingDocumentAction.vue'
 export { default as GenerateQuestionsAction } from './generate-questions/GenerateQuestionsAction.vue'
 export { default as BatchGenerateQuestionsAction } from './generate-questions/BatchGenerateQuestionsAction.vue'

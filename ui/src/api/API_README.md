@@ -672,7 +672,8 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 
 `workspace/knowledge/tags.ts` 维护标签查询、创建、编辑和删除，前缀为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/tags`，工作空间由 `getWorkspaceId()` 读取。
-`getKnowledgeTags(knowledgeId)` 返回非分页 `KnowledgeTagGroup[]`；
+`getKnowledgeTags(knowledgeId, query?)` 返回非分页 `KnowledgeTagGroup[]`；
+可选 `query.name` 用于标签管理列表搜索，不传时仍查询全部标签供下拉候选使用。
 标签值中的可选 `doc_count` 表示关联文档数量。`postKnowledgeTags` 直接提交
 `KnowledgeTagPayload[]`（`key`、`value`），用于创建标签和新增标签值；
 `putKnowledgeTag` 向 `/<tagId>` 提交完整 `KnowledgeTagUpdatePayload`（`id`、`key`、`value`），
@@ -689,7 +690,7 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 不声明多行编辑接口，也不组合旧接口模拟多行保存。
 
 文档与标签的关联由 `workspace/knowledge/document.ts` 维护，不使用标签删除接口代替取消关联。
-`getDocumentTags` 查询 `document/<documentId>/tags`，返回分组标签；
+`getDocumentTags(knowledgeId, documentId, query?)` 查询 `document/<documentId>/tags`，返回分组标签，支持 `query.name` 搜索；
 `postAddDocumentTags` POST 到 `document/batch_add_tag`，提交 `{ document_ids, tag_ids }`；
 `putDeleteDocumentTags` PUT 到 `document/<documentId>/tags/batch_delete`，直接提交标签 ID 数组。
 `putUnlinkTagDocuments` PUT 到知识库下的 `tag/<tagId>/docs_delete`，提交 `{ id_list: documentIds }`，

@@ -38,6 +38,6 @@ function handleSubmit(stateList: DocumentTaskState[]) {
 
 <template>
   <!-- 批量向量化 -->
-  <el-button plain :disabled="loading" @click="handleOpen">向量化</el-button>
+  <el-button plain type="primary" :disabled="loading" @click="handleOpen">向量化</el-button>
   <DocumentEmbeddingDialog v-model="visible" :loading="loading" @submit="handleSubmit" />
 </template>

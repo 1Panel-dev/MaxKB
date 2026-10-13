@@ -799,7 +799,7 @@ Web 来源地址与选择器仅在单项设置中编辑，批量设置不展示�
 文档任务是否排队或执行中通过其中的 `isDocumentTaskRunning(document, taskType)` 判断，
 页面及 Action 不重复解析状态字符串；文档或任务状态缺失时返回 `false`。
 `EmbeddingDocumentAction` 负责单项向量化与取消向量化，`BatchEmbeddingAction` 负责批量向量化按钮，`GenerateQuestionsAction` 负责单项生成问题与取消生成，`BatchGenerateQuestionsAction` 负责批量生成问题，`SettingDocumentAction` 负责召回及来源设置，
-`MigrateDocumentAction` 选择目标知识库；`setting-tags/DocumentTagsAction.vue` 暂仅提供“标签设置”入口按钮。
+`MigrateDocumentAction` 选择目标知识库；`setting-tags/DocumentTagsAction.vue` 内部管理标签设置抽屉的挂载、打开和关闭。
 生成问题复用公共配置弹窗，其余 Action 按下文维护各自专属弹窗。组件接收完整 Document API、知识库 ID、文档 ID 或文档数组及禁用状态，
 点击时快照本次操作对象，内部管理弹窗和请求，成功后通过 `refresh` 通知页面刷新，失败保留输入。
 迁移操作集中在 `document/action-dropdown/migrate/`，`MigrateDocumentAction.vue` 负责入口与弹窗按需挂载，
@@ -827,7 +827,28 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 弹窗通过 `batch` 参数区分批量模式，批量入口显式传入；文档地址和选择器仅在 `!batch` 且为 Web 知识库时显示。
 单项保留文档原有 `meta`，批量使用默认配置并将 `allow_download`
 放在顶层。请求与成功关闭由 Action 负责，成功通知页面刷新，失败保留表单。
-标签组件通过 `manageTags` 区分标签管理与批量添加。
+标签操作集中在 `document/action-dropdown/setting-tags/`。`DocumentTagsDrawer.vue` 管理单篇文档的标签关联，
+由 `DocumentTagsAction` 按需挂载、关闭后卸载；仅提供添加、搜索、单值删除及批量删除，不提供编辑和分页。
+抽屉每次打开都查询最新关联；增删后立即刷新自身列表，Action 记录成功变更，关闭后再通过 `refresh` 通知文档页刷新。
+查询使用 `DocumentApi.getDocumentTags`，搜索使用单一 `MkSearchInput`，通过 `change` 将关键词作为 `name` 请求接口，清空时省略该参数；
+查询前清除勾选，直接展示接口返回的分组，不再本地过滤。选择列和标签名单元格合并；
+通过 `MkTable selection-group-key="key"` 联动组内标签值，已选数量按标签值行数统计；标签值列复用 `border-l!` 展示与合并标签列之间的分隔线。
+删除调用 `putDeleteDocumentTags`，仅移除当前文档关联，不调用知识库标签删除接口。
+`AddTagDialog.vue` 为标签列、抽屉与批量操作栏共用的下拉式添加弹窗，接收完整 Document API 和知识库 ID。
+三个入口分别由 `DocumentTags`、`DocumentTagsDrawer`、`BatchDocumentTagsAction` 管理弹窗实例，不通过页面 Ref 打开。
+候选项使用 `tagsApi.getKnowledgeTags`，按返回顺序截取前 100 个标签组，然后由 `el-select filterable` 本地搜索；
+右侧显示所选组的全部标签值，切换标签名清空本行标签值，不增加远程搜索或自动扩展候选范围。
+单篇与批量均允许选择已关联标签值和重复选择，不为禁选查询文档已有标签，也不区分 `batch` 模式。
+表单复用 `MkFormList`，至少一行，保留必填与标签值归属校验；通过 `postAddDocumentTags` 提交所选 ID，由后台去重并追加关联。
+下拉 footer 复用模型选择器的创建入口，先收起下拉，再打开输入式 `tags/components/CreateTagDialog.vue`；
+标签名入口调用 `open()`；标签值下拉始终可展开，未选标签时点击“创建标签值”也调用 `open()` 创建标签，
+已选标签时调用 `open(key)` 新增标签值，不合并两类弹窗的模式。
+弹窗每次打开都查询候选；内部创建成功后重载前 100 组候选，保留当前选择，不自动选中新数据。
+`BatchDocumentTagsAction.vue` 使用普通按钮外放在底部批量操作栏，内部按需挂载 `AddTagDialog`，打开时固定知识库和文档 ID，
+即使只勾选一篇，也按批量添加处理。添加成功关闭动画结束后通知刷新，再卸载弹窗。
+三个外层标签入口只通过 `refresh` 通知页面刷新，沿用文档列表原有轮询，不为标签浮层单独暂停。
+页面不持有标签浮层 Ref 或控制其挂载。标签入口与打开方法只限制 Workspace 共享只读范围，
+Workspace 普通资源、System 资源管理和 System 共享资源允许打开；System library 的文档与标签 API 仍待按范围接入，不能将入口可用视为接口已支持。
 分词索引集中在 `document/action-dropdown/tokenize/`：`TokenizeDocumentAction` 接收单个 `document`，
 按运行状态调用单项分词或取消接口；`BatchTokenizeAction` 接收 `documentIds`，仅调用批量分词接口。
 两个 Action 均处理全部分段状态，通过 `v-model:loading` 共用页面操作状态，成功后通知页面刷新。
@@ -856,11 +877,11 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 启停开关直接使用页面内的 `el-switch`，由页面 `handleChangeActive` 管理请求，
 接口成功后刷新列表回显，不在请求前切换状态，不单独封装 Action。
 页面保留列表、多选、任务状态展示判断与刷新方法，不维护各 Action 的请求流程。
-`DocumentStatus`、`DocumentTags` 等纯展示组件继续留在 `document/components/`。
-页面不再维护这些弹窗 Ref 和打开方法。行内更多菜单使用 `MkTableMoreDropdown`；批量操作栏使用
+`DocumentStatus` 和标签列组件 `DocumentTags` 继续留在 `document/components/`，后者同时管理本入口的添加弹窗。
+弹窗 Ref 和打开方法由对应 Action 或标签列入口组件维护，页面只传参、处理刷新。行内更多菜单使用 `MkTableMoreDropdown`；批量操作栏使用
 `MkDropdown` 搭配非 text 的 More 图标按钮和 `MkDropdownMenu`，点击展开。
 批量 More 开启 `hide-when-empty`，按标准菜单插槽判断空内容，不强制开启 `persistent`；不检查业务 Action 内部的条件渲染。
-不新增前端权限判断；共享文档不展示选择列及操作入口。
+不新增前端权限判断；Workspace 共享文档不展示选择列、操作列及批量操作，标签列保留禁用的添加按钮。
 文档分页接口维护在 `workspace/knowledge/document.ts`，页面管理 loading。文件状态表头使用
 `MkDropdown` 单选筛选全部、成功、失败、索引中、分词索引中、排队中和生成中；查询组合
 `status` 与可选的 `task_type`，切换选项清除旧任务类型并回到第一页，保留名称和创建者条件。
@@ -931,8 +952,9 @@ library 的接口调整已撤回，文档和标签沿用原有调用方式，Sys
 
 `knowledge-detail/library/tags/index.vue` 复用详情布局的 `customHeader` 与 Teleport，
 维护搜索、导入入口、创建入口和标签表格，不嵌套页面布局或修改路由。
-通过 `workspace/knowledge/knowledge.ts` 查询全量分组，前端按标签名或值搜索并保留完整命中分组；
-先按标签组分页，再展开各组标签值，分页总数为标签组数。
+通过 `workspace/knowledge/knowledge.ts` 查询分组，使用单一 `MkSearchInput`，通过 `change` 将关键词作为 `name` 请求接口；
+清空时省略该参数，搜索后回到第一页并清除勾选，不在前端过滤匹配结果。
+对接口返回结果先按标签组分页，再展开各组标签值，分页总数为返回的标签组数。
 `MkTable` 合并选择列和标签名，通过 `selection-group-key="key"` 联动当前页同组标签值；
 批量底栏按实际选中标签值行数／当前页标签值总行数统计，不按标签组计数。
 删除提交全部选中标签值 ID，确认框同时说明标签值数量、标签组数量及整组删除的影响。
@@ -969,7 +991,7 @@ library 的接口调整已撤回，文档和标签沿用原有调用方式，Sys
 文档图标和时间格式沿用文档列表，状态使用 `MkStatusLabel`；批量操作放在顶部，不再显示页面批量底栏。
 搜索、分页和页签切换清空选择，关联变更后重新查询并通知标签页刷新数量，末页为空时回退。
 抽屉在 `closed` 重置标签、筛选、分页和选择，不新增权限判断或共享范围接口。
-文档页原有标签查询继续使用 Knowledge API，共享标签查询保持原接口，不启用尚未接入的文档标签入口。
+文档页标签候选查询继续使用 Knowledge API，共享标签查询保持原接口；普通文档标签入口使用上述独立添加弹窗与抽屉。
 
 `KnowledgeWorkflowView` 复用 `ButtonDefaultModelSetting`，从知识库详情读取默认模型配置，
 随工作流保存提交并将配置传入画布；支持应用到所有节点，保存失败回滚至已保存配置。
@@ -1263,16 +1285,17 @@ Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `bod
 `MkTableFilter mode="single"`，标签使用 `mode="cascader"`。文件状态按 v2 提供成功、失败、
 索引中、分词索引中、排队中、生成中，同时映射 `status` 与可选 `task_type`；切换到非任务状态
 或全部时清除任务类型。启用状态保留布尔 `false`，召回处理复用 `DOCUMENT_HIT_HANDLING_LABELS`。
-标签首次打开时按普通／共享范围查询知识库标签，成功后通过非空选项复用缓存（始终包含“无标签”），
-不额外维护 loaded 标记；普通布尔请求锁防止重复请求，失败释放后下次打开可重试。
+表头标签筛选每次展开时按普通／共享范围重新查询知识库标签，不因已有选项而跳过请求；
+普通布尔请求锁防止重复请求，失败释放后下次打开可重试。
 标签级联沿用 MkTableFilter 默认的父子独立选择和隐藏复选框外观；组件内部保留原始勾选，
 对外将父组转换为叶子值并去重。页面直接将回写的叶子标签 ID 数组用于查询，
 “无标签”使用 `NO_TAG`；页面不维护父组展开或去重逻辑。
 任一筛选确认或重置后回到第一页查询，保留其他筛选和名称／创建者搜索条件。
-标签列使用页面专属 `components/DocumentTags.vue`，接收 `document`，展示标签数量，
+标签列使用页面专属 `components/DocumentTags.vue`，接收 `document`、知识库 ID 和完整 Document API，展示标签数量，
 悬浮时显示标签名与值，长文本省略并保留 title。数量优先读取 `tag_count`，缺省时使用标签数组长度，
-无标签时仅显示添加入口。添加按钮阻止点击冒泡，通过 `add(documentId)` 通知调用方；
-当前文档页尚未接入添加弹窗与保存接口，不新增权限判断。
+添加按钮始终显示，通过 `disabled` 接收页面的 Workspace 共享只读状态，通过 `v-model:loading` 共用操作状态，不隐藏加号和“标签”文案；已有标签的悬浮查看不受影响。
+添加按钮阻止点击冒泡，组件内部按需挂载并打开 `AddTagDialog`；打开方法同时检查只读、操作中和重复打开状态。
+添加成功关闭弹窗后通过 `refresh` 通知页面刷新文档列表与数量；不新增权限判断。
 
 文件状态的解析、聚合与展示统一放在文档页的 `components/DocumentStatus.vue`。组件接收 `status`、`statusMeta`，按从右起的任务位置解析向量化、生成问题、
 同步、分词索引；聚合优先级为取消中、执行中、排队中、失败、取消完成、成功，

@@ -26,5 +26,5 @@ function handleTokenize() {
 
 <template>
   <!-- 批量分词索引 -->
-  <el-button plain :disabled="loading" @click="handleTokenize">分词索引</el-button>
+  <el-button plain type="primary" :disabled="loading" @click="handleTokenize">分词索引</el-button>
 </template>
