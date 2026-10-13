@@ -11,7 +11,7 @@ from functools import reduce
 from typing import Dict
 
 import uuid_utils.compat as uuid
-from application.models import Application, ApplicationAccessToken, ChatRecord
+from application.models import Application, ApplicationAccessToken, ChatRecord, Chat
 from application.serializers.application_chat import ChatCountSerializer
 from application.serializers.common import ChatInfo
 from common.auth.authentication import get_is_permissions
@@ -71,7 +71,7 @@ class ChatRecordOperateSerializer(serializers.Serializer):
         if not query_set.exists():
             raise AppApiException(500, _("Application id does not exist"))
         if not ChatRecord.objects.filter(
-            chat_id=self.data.get("chat_id"), chat__application_id=self.data.get("application_id")
+                chat_id=self.data.get("chat_id"), chat__application_id=self.data.get("application_id")
         ).exists() and not debug:
             raise AppApiException(500, _("Chat records for the application do not exist"))
         application_access_token = (
@@ -126,8 +126,8 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
             query_set = query_set.filter(workspace_id=workspace_id)
         if not query_set.exists():
             raise AppApiException(500, _("Application id does not exist"))
-        if not ChatRecord.objects.filter(
-            chat_id=self.data.get("chat_id"), chat__application_id=self.data.get("application_id")
+        if not Chat.objects.filter(
+                id=self.data.get("chat_id"), application_id=self.data.get("application_id")
         ).exists():
             raise AppApiException(500, _("Chat records for the application do not exist"))
 
@@ -157,8 +157,8 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
         knowledge_list = []
         paragraph_list = []
         if (
-            "search_step" in chat_record.details
-            and chat_record.details.get("search_step").get("paragraph_list") is not None
+                "search_step" in chat_record.details
+                and chat_record.details.get("search_step").get("paragraph_list") is not None
         ):
             paragraph_list = chat_record.details.get("search_step").get("paragraph_list")
 
@@ -316,7 +316,7 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
         if not Document.objects.filter(id=self.data["document_id"], knowledge_id=self.data["knowledge_id"]).exists():
             raise AppApiException(500, gettext("The document id is incorrect"))
         if not ChatRecord.objects.filter(
-            chat_id__in=self.data["chat_ids"], chat__application_id=self.data["application_id"]
+                chat_id__in=self.data["chat_ids"], chat__application_id=self.data["application_id"]
         ).exists():
             raise AppApiException(500, gettext("The chat id is incorrect"))
 
@@ -452,9 +452,9 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
             raise AppApiException(500, _("Knowledge id does not exist"))
 
         if (
-            not QuerySet(Document)
-            .filter(id=self.data.get("document_id"), knowledge_id=self.data.get("knowledge_id"))
-            .exists()
+                not QuerySet(Document)
+                        .filter(id=self.data.get("document_id"), knowledge_id=self.data.get("knowledge_id"))
+                        .exists()
         ):
             raise AppApiException(500, gettext("The document id is incorrect"))
 
@@ -499,8 +499,9 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
         document_id = self.data.get("document_id")
         knowledge_id = self.data.get("knowledge_id")
         max_position = (
-            Paragraph.objects.filter(document_id=document_id).aggregate(max_position=Max("position"))["max_position"]
-            or 0
+                Paragraph.objects.filter(document_id=document_id).aggregate(max_position=Max("position"))[
+                    "max_position"]
+                or 0
         )
         paragraph = Paragraph(
             id=uuid.uuid7(),
