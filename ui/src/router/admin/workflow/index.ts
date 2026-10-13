@@ -34,4 +34,22 @@ export const workflowRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/workflow/knowledge/index.vue'),
     meta: { title: '知识库工作流', resourceScope: 'workspace' },
   },
+  {
+    path: '/workspace/:workspaceId/shared/knowledge/:knowledgeId/workflow',
+    name: 'workspace-shared-workflow-knowledge',
+    component: () => import('@/views/workflow/knowledge/index.vue'),
+    meta: { title: '知识库工作流', resourceScope: 'workspace-shared' },
+  },
+  {
+    path: '/system/resource/knowledge/:knowledgeId/workflow',
+    name: 'system-resource-workflow-knowledge',
+    component: () => import('@/views/workflow/knowledge/index.vue'),
+    meta: { title: '知识库工作流', resourceScope: 'system-resource' },
+  },
+  {
+    path: '/system/shared/knowledge/:knowledgeId/workflow',
+    name: 'system-shared-workflow-knowledge',
+    component: () => import('@/views/workflow/knowledge/index.vue'),
+    meta: { title: '知识库工作流', resourceScope: 'system-shared' },
+  },
 ]

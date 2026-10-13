@@ -46,7 +46,7 @@ Workspace 使用 `AppLayout`，左侧导航根据 `scope: 'workspace'` 对应路
 
 Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当前路由参数为准。应用根
 地址、登录成功和从 System 返回 Workspace 时统一进入 `/admin/workspace/default`。父路由的
- `scope` 会合并到匹配的子路由 `meta` 中。
+`scope` 会合并到匹配的子路由 `meta` 中。
 
 顶部工作空间切换统一由 `layout/header-workspace-dropdown/index.vue` 处理：选择不同工作空间时，
 通过 `router.resolve()` 生成目标地址，再调用 `window.location.assign()` 整页加载，重新初始化
@@ -158,20 +158,20 @@ Chat 导航守卫（`chat/index.ts`）：
 
 路由扩展字段定义在 `admin/types.ts`：
 
-| 字段                 | 类型                                                  | 说明                                                   |
-| -------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
-| `scope`              | `'workspace' \| 'system'`                             | 标记生成哪一套框架导航，只配置在布局根路由上           |
-| `resourceScope`      | `'workspace' \| 'workspace-shared' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承 |
-| `activeIcon`         | `string`                                              | 菜单激活状态的 iconfont Symbol ID                      |
-| `activeMenu`         | `string`                                              | 进入子页面时需要保持激活的侧栏菜单路径                 |
-| `resourceDetailRoot` | `boolean`                                             | 标记资源详情根，详情容器和独立文档分段页配置，用于目录与工作空间切换 |
-| `detailActiveMenu`   | `string`                                              | 更深层详情页面需要保持激活的二级菜单路由名称           |
-| `title`              | `string`                                              | 页面标题，同时作为导航名称                             |
-| `icon`               | `string`                                              | iconfont Symbol ID，子目录通常可以不配置               |
-| `order`              | `number`                                              | 同级导航排序，数字越小越靠前                           |
-| `hidden`             | `boolean`                                             | 设置为 `true` 时不显示在导航中                         |
-| `hideSidebar`        | `boolean`                                             | 隐藏 AppLayout 应用侧栏，保留顶部栏和页面自身导航；子页继承 |
-| `resource`           | `ResourceAuthorizationType`                           | 系统资源授权页面当前管理的后端资源类型                 |
+| 字段                 | 类型                                                                        | 说明                                                                 |
+| -------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `scope`              | `'workspace' \| 'system'`                                                   | 标记生成哪一套框架导航，只配置在布局根路由上                         |
+| `resourceScope`      | `'workspace' \| 'workspace-shared' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承               |
+| `activeIcon`         | `string`                                                                    | 菜单激活状态的 iconfont Symbol ID                                    |
+| `activeMenu`         | `string`                                                                    | 进入子页面时需要保持激活的侧栏菜单路径                               |
+| `resourceDetailRoot` | `boolean`                                                                   | 标记资源详情根，详情容器和独立文档分段页配置，用于目录与工作空间切换 |
+| `detailActiveMenu`   | `string`                                                                    | 更深层详情页面需要保持激活的二级菜单路由名称                         |
+| `title`              | `string`                                                                    | 页面标题，同时作为导航名称                                           |
+| `icon`               | `string`                                                                    | iconfont Symbol ID，子目录通常可以不配置                             |
+| `order`              | `number`                                                                    | 同级导航排序，数字越小越靠前                                         |
+| `hidden`             | `boolean`                                                                   | 设置为 `true` 时不显示在导航中                                       |
+| `hideSidebar`        | `boolean`                                                                   | 隐藏 AppLayout 应用侧栏，保留顶部栏和页面自身导航；子页继承          |
+| `resource`           | `ResourceAuthorizationType`                                                 | 系统资源授权页面当前管理的后端资源类型                               |
 
 ## 导航生成
 
@@ -415,7 +415,8 @@ Web 展示“设置 → 基础设置、文档处理策略、定时同步”；�
 `ResourceDetailLayout`。配置 `hidden` 与 `resourceDetailRoot`，使工作空间切换继续返回知识库列表；
 返回按钮进入 `workspace-knowledge-document-list`，保留知识库类型和 query。
 文档行点击进入分段页，选择列、名称编辑和操作按钮不触发跳转。
-Workspace 共享及 System 文档分段入口暂未注册，等待各范围接口接入，不回退普通 Workspace。
+Workspace 共享及 System 两种来源也注册独立的文档分段路由，路径在各自详情地址后追加 `/document/:documentId`；
+分段页不挂载详情容器，返回各自文档列表；各范围分段 API 接入暂缓。
 
 智能体工作流返回通过 `views/workflow/application/navigation.ts` 动态读取详情父路由的 `children`。
 Workspace 父路由为 `workspace-application-detail-layout`；System 详情实现时使用
@@ -460,9 +461,8 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 `/admin/workspace/:workspaceId/shared/knowledge/:knowledgeId/:type`，默认重定向到
 `workspace-shared-knowledge-document-list`（`document`）。详情父路由配置
 `resourceScope: 'workspace-shared'` 和 `activeMenu: 'workspace-knowledge'`，复用知识库详情容器和文档页，侧栏仍高亮 Workspace 知识库。
-共享详情目前仅注册“资料库 → 文档”，后续页面需接入对应共享接口后再注册，不跳转普通设置或工作流。
+共享详情与其他三种范围维护相同菜单及知识库类型显隐规则；新增页面的共享 API 接入暂缓，不假定各范围接口相同。
 返回列表时使用 `folderId: 'shared'` 恢复共享目录。
-
 
 ### System 知识库详情路由
 
@@ -477,16 +477,17 @@ Workspace 父路由为 `workspace-application-detail-layout`；System 详情实�
 参数 `type` 沿用 Workspace 的字符串知识库类型。
 
 各来源在自己的模块文件中显式维护 children，不使用共用子路由生成函数。
-Workspace 普通和 System 两种管理来源分别配置资料库、检索优化、授权与集成和设置目录，
-共用 View 组件并保持知识库类型显隐规则。Workspace 共享仍仅配置资料库中的文档页。
-System 画布尚未接入对应 API，因此两种 System 详情均不注册工作流入口；
-Workspace 普通来源继续保留 `workflow-knowledge` 入口。
+四种来源均配置资料库、工作流、检索优化、授权与集成和设置目录，共用 View 组件并保持相同的
+菜单顺序与知识库类型显隐规则。工作流入口对 WORKFLOW 类型跳转对应全屏画布，其他类型进入转换页。
+Workspace 普通保留 `workflow-knowledge`；其他三种来源分别使用
+`workspace-shared-workflow-knowledge`、`system-resource-workflow-knowledge`、`system-shared-workflow-knowledge`，
+地址分别为 `/workspace/:workspaceId/shared/knowledge/:knowledgeId/workflow`、
+`/system/resource/knowledge/:knowledgeId/workflow`、`/system/shared/knowledge/:knowledgeId/workflow`。
 
 System 资源管理知识库表格的详情按钮和共享知识库卡片分别进入对应详情父路由，
 携带 `knowledgeId` 和经 `KNOWLEDGE_TYPE_MAP` 转换的 `type`，不携带 `workspaceId`。
 `AppLayout` 响应当前路由 `meta.hideSidebar` 控制应用侧栏；返回普通列表后自动恢复侧栏。
 预览模式继续保留侧栏占位。`hidden` 仅控制菜单项显隐，不代替 `hideSidebar`。
 详情容器使用 System 主区的高度，按来源查询知识库详情，并返回对应 System 列表。
-详情上下文按资源范围集中装配 API，基础设置和文档策略已使用对应管理 API；
-System Sync 模块暂未提供，定时同步页仍展示设置及日志布局，不回退 Workspace 接口。
-library 接口调整暂未实施，文档及标签保持原有请求方式，System library 适配仍待后续处理。
+本轮仅补齐四套菜单与导航，API 及其上下文装配保持原实现，各范围接口差异后续独立接入。
+新增路由不代表对应范围 API 已完成；不复制 Workspace 协议补造其他来源的接口。

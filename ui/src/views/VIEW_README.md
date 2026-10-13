@@ -488,7 +488,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `knowledge-detail/index.vue`                    | 知识库详情页面                                                       |
 | `knowledge-detail/library/tags/index.vue`       | 标签分组查询、创建、重命名、单值编辑、删除与关联文档管理             |
 | `knowledge-detail/workflow-transform/index.vue` | 非工作流知识库转换说明、确认与进入画布                               |
-| `knowledge-detail/paragraph/index.vue`          | 普通 Workspace 文档分段查询、目录定位、批量操作、新增、编辑与详情          |
+| `knowledge-detail/paragraph/index.vue`          | 普通 Workspace 文档分段查询、目录定位、批量操作、新增、编辑与详情    |
 
 |
 | `knowledge-detail/setting/base/index.vue` | 知识库基本信息、来源配置与上传限制设置 |
@@ -936,7 +936,7 @@ Workspace 普通资源、System 资源管理和 System 共享资源允许打开�
 避免覆盖并行的问题操作；取消编辑不撤销即时保存的问题关联。
 新增成功关闭弹窗并通知页面清空搜索、重新查询服务端排序；编辑成功通知页面刷新当前筛选结果。
 分段卡片在非批量模式点击打开详情弹窗，批量模式点击切换勾选；批量生成问题继续使用 `components/ButtonGenerateQuestions.vue`。
-Workspace 共享及 System 分段入口暂未接入，不回退 Workspace API。
+Workspace 共享及 System 分段路由已注册并保持来源导航；各范围分段 API 接入暂缓。
 
 System 资源管理与共享资源已注册共用知识库详情路由，
 列表导航已接入。System 详情路由在 System 根路由的 children 汇总，通过详情父路由的 `hideSidebar: true` 隐藏系统管理 Sidebar，保留系统 Header 和知识库详情目录；
@@ -1064,7 +1064,7 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 
 ### 知识库工作流导航与导入导出
 
-`workflow/knowledge/navigation.ts` 统一返回入口：Workspace 将详情中的 `type` 通过 `KNOWLEDGE_TYPE_MAP` 转为字符串后返回当前知识库详情，详情尚未加载时使用 `WORKFLOW`；System 资源管理和共享资源返回各自知识库列表。
+`workflow/knowledge/navigation.ts` 统一返回入口：Workspace 将详情中的 `type` 通过 `KNOWLEDGE_TYPE_MAP` 转为字符串后返回当前知识库详情，详情尚未加载时使用 `WORKFLOW`；System 资源管理和共享资源返回各自知识库详情；Workspace 共享也返回共享详情。
 历史模式下返回只退出预览；普通编辑态返回保留未保存确认。更多菜单的导出工作流先保存未提交改动，
 再调用专用 `.kbwf` 导出接口；保存失败不导出。知识库原有文件上传、数据源表单与任务轮询调试流程保持独立。
 更多菜单在“导出工作流”上方依次提供“导入文档”和“导入工作流”。导入文档要求工作流已发布，
@@ -1144,7 +1144,7 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 通过 `useKnowledgeSettingContext()` 的 `resourceApi.knowledge.postTransformWorkflow` 提交
 深拷贝后的 `knowledge/template.ts` 默认模板，按上下文选择 Workspace、System 资源管理或
 System 共享管理 Knowledge API；成功后进入画布，失败保留转换页。
-当前路由与画布跳转仍仅接入 Workspace，不为 Workspace 共享只读资源增加转换接口或回退。
+四种范围的路由与画布跳转已配置；API 保留原实现，Workspace 共享和 System 工作流接口接入暂缓。
 
 ### 执行记录
 
@@ -1313,7 +1313,7 @@ Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `bod
 两者复用 `knowledge-detail/index.vue` 和文档页；详情容器通过上下文选择对应详情 API，
 文档页继续自行通过 `isWorkspaceSharedResource()` 选择 `workspace/knowledge/` 或
 `workspace/shared/knowledge/` 的完整 API 对象。
-共享详情目前仅提供资料库中的文档页，设置与工作流尚未接入共享接口，不注册对应共享入口。
+共享详情已补齐与其他三种范围一致的菜单，设置与工作流接口接入暂缓。
 容器监听工作空间、知识库和资源范围变化重新加载；共享详情返回列表携带 `folderId: 'shared'`，
 普通详情继续恢复所属文件夹。文档创建者选项在共享范围使用 System `CommonApi`，普通范围使用
 Workspace `CommonApi`；范围变化同时清空搜索控件、筛选、创建者选项与分页。
@@ -1417,7 +1417,7 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 基础设置和文档策略通过 `useKnowledgeSettingContext` 获取可管理范围的完整 Knowledge API 类型，
 该设置上下文的 `resourceApi` 仅提供 `knowledge`；定时同步从普通详情上下文读取 `sync`，不重复暴露。
 不在页面用方法是否存在判断可写能力；上下文边界排除 Workspace 共享只读范围，
-共享路由不注册设置页，也不增加写接口。
+共享设置路由已注册，API 上下文仍保留原有只读边界，写接口接入暂缓。
 上下文按响应式 `resourceScope` 选择完整 Knowledge、Sync API 对象，
 统一通过响应式 `resourceApi.knowledge / sync` 提供接口，脚本调用不需要 `.value`；
 详情查询与保存使用同一个完整 Knowledge API 对象，不存在的设置模块保持 undefined。
@@ -1427,3 +1427,7 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 library 下的文档、标签与迁移组件保留原有调用方式，不装配到上下文。
 同步日志通过完整 Sync API props 请求。展示组件不接收上下文 API。
 System 飞书专用保存方法尚未提供，基础设置沿该范围现有 `putKnowledge` 协议；Workspace 飞书保留专用方法。
+
+四套知识库详情菜单及来源导航已统一，`useKnowledgeNavigationContext` 仅维护路由名称与参数，
+不配置 API。各范围接口存在差异，API 模块和原有详情接口上下文保持原实现；
+后续按每套真实接口分别接入，不将菜单完整度视为接口接入完成。

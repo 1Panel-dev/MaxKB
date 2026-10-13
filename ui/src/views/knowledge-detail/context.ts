@@ -103,3 +103,28 @@ export function useKnowledgeSettingContext() {
   })
   return { ...context, resourceApi }
 }
+
+/** 四套详情的路由导航，与各范围 API 装配独立。 */
+export function useKnowledgeNavigationContext() {
+  const route = useRoute()
+  const resourceScope = computed(() => route.meta.resourceScope)
+  const routeNames = computed(() => {
+    const scope = resourceScope.value
+    if (!scope) throw new Error('Knowledge resource scope is unavailable')
+    const prefix = `${scope}-knowledge`
+    return {
+      detail: `${prefix}-detail`,
+      document: `${prefix}-document-list`,
+      paragraph: `${prefix}-paragraph`,
+      workflowEntry: `${prefix}-workflow`,
+      workflow: scope === 'workspace' ? 'workflow-knowledge' : `${scope}-workflow-knowledge`,
+    }
+  })
+  const routeParams = computed(() => {
+    const knowledgeId = String(route.params.knowledgeId ?? '')
+    return resourceScope.value === 'workspace' || resourceScope.value === 'workspace-shared'
+      ? { workspaceId: route.params.workspaceId, knowledgeId }
+      : { knowledgeId }
+  })
+  return { routeNames, routeParams }
+}

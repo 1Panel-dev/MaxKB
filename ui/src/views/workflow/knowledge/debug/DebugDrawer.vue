@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
 import { computed, provide, ref, useTemplateRef, type Component } from 'vue'
 import { useRouter } from 'vue-router'
 import type { AxiosProgressEvent } from 'axios'
@@ -8,12 +9,13 @@ import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
-import { getWorkspaceId } from '@/utils/resource-context'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import DataSource from './action/DataSource.vue'
 import KnowledgeBase from './action/KnowledgeBase.vue'
 import Result from './action/Result.vue'
+
+const { routeNames, routeParams } = useKnowledgeNavigationContext()
 
 defineOptions({ name: 'KnowledgeWorkflowDebugDrawer' })
 
@@ -130,8 +132,8 @@ function handleClosed() {
 function handleGoToDocuments() {
   return router
     .push({
-      name: 'workspace-knowledge-document-list',
-      params: { workspaceId: getWorkspaceId(), knowledgeId: props.knowledgeId, type: KNOWLEDGE_TYPE_KEY.WORKFLOW },
+      name: routeNames.value.document,
+      params: { ...routeParams.value, knowledgeId: props.knowledgeId, type: KNOWLEDGE_TYPE_KEY.WORKFLOW },
     })
     .then(close)
 }
