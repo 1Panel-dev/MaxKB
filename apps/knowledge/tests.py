@@ -489,7 +489,7 @@ class ImageDocumentTests(SimpleTestCase):
         image_bytes = image_buffer.getvalue()
         upload = SimpleUploadedFile("scene.png", image_bytes, content_type="image/png")
 
-        previews = service.create_previews([upload])
+        previews = service.create_previews.__wrapped__(service, [upload])
 
         self.assertEqual(previews[0]["name"], "scene.png")
         self.assertEqual(previews[0]["process_status"], "skipped")

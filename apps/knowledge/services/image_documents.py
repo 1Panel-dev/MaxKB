@@ -1,5 +1,6 @@
 """Standalone image resources for general knowledge bases."""
 
+from functools import partial
 from pathlib import Path
 from typing import Dict, Iterable, List
 
@@ -154,22 +155,67 @@ class ImageDocumentService:
             "document_id": preview.get("document_id"),
         }
 
-    def _get_preview_file(self, preview_id) -> File:
-        file = (
-            QuerySet(File)
-            .filter(
-                id=preview_id,
-                source_type=FileSourceType.KNOWLEDGE,
-                source_id=self.knowledge_id,
-            )
-            .first()
+    def _get_preview_file(self, preview_id, *, for_update=False) -> File:
+        files = QuerySet(File).filter(
+            id=preview_id,
+            source_type=FileSourceType.KNOWLEDGE,
+            source_id=self.knowledge_id,
         )
+        file = (files.select_for_update() if for_update else files).first()
         if file is None or not _preview_meta(file):
             raise AppApiException(500, _("Image preview does not exist"))
         if _preview_meta(file).get("imported"):
             raise AppApiException(500, _("Image preview has already been imported"))
         return file
 
+    def _complete_preview(self, preview_id, processed: Dict) -> None:
+        # Lock only the short write-back, never the external vision call. Import/edit/delete
+        # may happen while recognition is running, so reload the current preview first.
+        with transaction.atomic():
+            file = (
+                QuerySet(File)
+                .filter(id=preview_id, source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id)
+                .select_for_update()
+                .first()
+            )
+            if file is None:
+                return
+            preview = _preview_meta(file)
+            if not preview or preview.get("imported") or preview.get("process_status") != AssetProcessStatus.PENDING:
+                return
+            updated = {**preview, **processed}
+            for field in preview.get("edited_fields", []):
+                if field in ("caption", "ocr_text", "description"):
+                    updated[field] = preview.get(field, "")
+            QuerySet(File).filter(id=file.id).update(meta={**(file.meta or {}), "image_preview": updated})
+
+    def process_preview(self, preview_id) -> None:
+        self.get_knowledge()
+        file = (
+            QuerySet(File)
+            .filter(id=preview_id, source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id)
+            .first()
+        )
+        if file is None:
+            return
+        preview = _preview_meta(file)
+        if not preview or preview.get("imported") or preview.get("process_status") != AssetProcessStatus.PENDING:
+            return
+        strategy = normalize_document_strategy(preview.get("doc_strategy"))
+        self._complete_preview(preview_id, self._run_visual_processor(file, strategy, self.workspace_id))
+
+    def _enqueue_preview(self, preview_id) -> None:
+        from knowledge.tasks import process_image_preview
+
+        try:
+            process_image_preview.delay(self.workspace_id, self.knowledge_id, preview_id)
+        except Exception as exc:
+            self._complete_preview(
+                preview_id,
+                {"process_status": AssetProcessStatus.FAILURE, "process_error": str(exc)[:2000]},
+            )
+
+    @transaction.atomic
     def create_previews(self, files: Iterable, strategy: Dict | None = None) -> List[Dict]:
         knowledge = self.get_knowledge()
         file_list = list(files)
@@ -197,7 +243,17 @@ class ImageDocumentService:
                 meta={"knowledge_id": self.knowledge_id, "upload_size": upload.size},
             )
             file.save(content)
-            processed = self._run_visual_processor(file, normalized_strategy, self.workspace_id)
+            if normalized_strategy["visual"]["enabled"]:
+                processed = {
+                    "caption": "",
+                    "ocr_text": "",
+                    "description": "",
+                    "process_status": AssetProcessStatus.PENDING,
+                    "process_error": "",
+                    "meta": {},
+                }
+            else:
+                processed = self._run_visual_processor(file, normalized_strategy, self.workspace_id)
             preview = {
                 **processed,
                 "doc_strategy": normalized_strategy,
@@ -208,31 +264,38 @@ class ImageDocumentService:
             QuerySet(File).filter(id=file.id).update(meta=meta)
             file.meta = meta
             previews.append(self.serialize_preview(file))
+            if normalized_strategy["visual"]["enabled"]:
+                transaction.on_commit(partial(self._enqueue_preview, str(file.id)), robust=True)
         return previews
 
     def get_preview(self, preview_id) -> Dict:
         self.get_knowledge()
         return self.serialize_preview(self._get_preview_file(preview_id))
 
+    @transaction.atomic
     def update_preview(self, preview_id, values: Dict) -> Dict:
         self.get_knowledge()
-        file = self._get_preview_file(preview_id)
+        file = self._get_preview_file(preview_id, for_update=True)
         file_name = values.get("name", file.file_name)
         if Path(file_name).suffix.lower() not in SUPPORTED_IMAGE_EXTENSIONS:
             raise AppApiException(500, _("The image name must retain a supported file extension"))
         preview = {**_preview_meta(file)}
+        edited_fields = set(preview.get("edited_fields", []))
         for field in ("caption", "ocr_text", "description"):
             if field in values:
                 preview[field] = values[field] or ""
+                edited_fields.add(field)
+        preview["edited_fields"] = sorted(edited_fields)
         meta = {**(file.meta or {}), "image_preview": preview}
         QuerySet(File).filter(id=file.id).update(file_name=file_name, meta=meta)
         file.file_name = file_name
         file.meta = meta
         return self.serialize_preview(file)
 
+    @transaction.atomic
     def delete_preview(self, preview_id) -> bool:
         self.get_knowledge()
-        file = self._get_preview_file(preview_id)
+        file = self._get_preview_file(preview_id, for_update=True)
         file.delete()
         return True
 
@@ -319,7 +382,10 @@ class ImageDocumentService:
                 process_status=preview.get("process_status", AssetProcessStatus.PENDING),
                 process_error=preview.get("process_error", ""),
                 visual_strategy_hash=hashes["visual_strategy_hash"],
-                meta=preview.get("meta") if isinstance(preview.get("meta"), dict) else {},
+                meta={
+                    **(preview.get("meta") if isinstance(preview.get("meta"), dict) else {}),
+                    "visual_edited_fields": preview.get("edited_fields", []),
+                },
             )
             IncrementalDocumentSync(document, strategy)._sync_title_questions([paragraph])
             imported_preview = {

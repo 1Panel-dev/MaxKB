@@ -1,8 +1,15 @@
-"""Worker entry points for managing knowledge synchronization schedules."""
+"""Worker entry points for knowledge synchronization schedules and image previews."""
 
 from celery.signals import worker_init
 from common.utils.logger import maxkb_logger
 from ops import celery_app
+
+
+@celery_app.task(name="celery:process_image_preview")
+def process_image_preview(workspace_id: str, knowledge_id: str, preview_id: str):
+    from knowledge.services.image_documents import ImageDocumentService
+
+    ImageDocumentService(workspace_id, knowledge_id).process_preview(preview_id)
 
 
 @worker_init.connect

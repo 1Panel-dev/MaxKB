@@ -4,9 +4,12 @@ import base64
 import json
 import mimetypes
 import re
+from collections import defaultdict
+from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional
 
 import uuid_utils.compat as uuid
+from common.chunk import text_to_chunk
 from common.config.embedding_config import ModelManage
 from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
@@ -25,15 +28,18 @@ from tools.models import Tool
 from knowledge.models import (
     AssetProcessStatus,
     ContentOrigin,
+    Document,
+    DocumentResourceType,
     Embedding,
     File,
     Knowledge,
+    LocalState,
     Paragraph,
     ParagraphAsset,
     SourceType,
     SyncState,
 )
-from knowledge.services.document_strategy import normalize_document_strategy, strategy_hashes
+from knowledge.services.document_strategy import document_source_hash, normalize_document_strategy, strategy_hashes
 from knowledge.services import validate_knowledge_file_size
 
 
@@ -226,19 +232,24 @@ def process_visual_assets(
             resolver_error = str(exc)[:2000]
     for asset in assets:
         asset.visual_strategy_hash = visual_hash
+        edited_fields = (asset.meta or {}).get("visual_edited_fields", [])
         if not visual["enabled"]:
             asset.process_status = AssetProcessStatus.SKIPPED
             asset.process_error = ""
         elif processor is None:
             asset.process_status = AssetProcessStatus.FAILURE
             asset.process_error = resolver_error or "visual processor adapter is unavailable"
-            asset.description = asset.description or asset.caption
+            if "description" not in edited_fields:
+                asset.description = asset.description or asset.caption
         else:
             try:
                 output = processor(asset, visual) or {}
-                asset.caption = str(output.get("caption") or asset.caption)
-                asset.ocr_text = str(output.get("ocr_text") or asset.ocr_text)
-                asset.description = str(output.get("description") or asset.description or asset.caption)
+                if "caption" not in edited_fields:
+                    asset.caption = str(output.get("caption") or asset.caption)
+                if "ocr_text" not in edited_fields:
+                    asset.ocr_text = str(output.get("ocr_text") or asset.ocr_text)
+                if "description" not in edited_fields:
+                    asset.description = str(output.get("description") or asset.description or asset.caption)
                 output_meta = output.get("meta") if isinstance(output.get("meta"), dict) else {}
                 asset.meta = {**(asset.meta or {}), **output_meta}
                 asset.process_status = AssetProcessStatus.SUCCESS
@@ -246,7 +257,8 @@ def process_visual_assets(
             except Exception as exc:  # Image failure must not interrupt the remaining document.
                 asset.process_status = AssetProcessStatus.FAILURE
                 asset.process_error = str(exc)[:2000]
-                asset.description = asset.description or asset.caption
+                if "description" not in edited_fields:
+                    asset.description = asset.description or asset.caption
         asset.save(
             update_fields=[
                 "caption",
@@ -262,8 +274,9 @@ def process_visual_assets(
         _write_asset_description(asset)
 
 
+@transaction.atomic
 def _write_asset_description(asset: ParagraphAsset) -> None:
-    paragraph = Paragraph.objects.filter(id=asset.paragraph_id).first()
+    paragraph = Paragraph.objects.select_for_update().filter(id=asset.paragraph_id).first()
     if paragraph is None:
         return
     schema = paragraph.content_schema or paragraph_content_schema(paragraph.content)
@@ -275,7 +288,23 @@ def _write_asset_description(asset: ParagraphAsset) -> None:
     images[index]["ocr_text"] = asset.ocr_text
     images[index]["description"] = asset.description
     paragraph.content_schema = schema
-    paragraph.save(update_fields=["content_schema", "update_time"])
+    update_fields = ["content_schema", "update_time"]
+    if asset.document.resource_type == DocumentResourceType.IMAGE and paragraph.local_state == LocalState.CLEAN:
+        content = (
+            "\n".join(
+                value.strip() for value in (asset.caption, asset.ocr_text, asset.description) if value and value.strip()
+            )
+            or Path(asset.file.file_name).stem
+        )
+        strategy = normalize_document_strategy(asset.document.doc_strategy)
+        paragraph.content = content
+        paragraph.chunks = text_to_chunk(content, strategy["split"]["child_length"])
+        update_fields.extend(["content", "chunks"])
+        Document.objects.filter(id=asset.document_id).update(
+            char_length=len(content),
+            source_hash=document_source_hash([{"title": paragraph.title, "content": content}]),
+        )
+    paragraph.save(update_fields=update_fields)
 
 
 def _image_data_url(asset: ParagraphAsset) -> str:
@@ -370,15 +399,41 @@ def resolve_visual_processor(
     return None
 
 
+def _process_pending_assets(assets: Iterable[ParagraphAsset]) -> None:
+    pending_assets = defaultdict(list)
+    for asset in assets:
+        if asset.process_status == AssetProcessStatus.PENDING:
+            pending_assets[asset.document_id].append(asset)
+    for document_assets in pending_assets.values():
+        first = document_assets[0]
+        process_visual_assets(
+            document_assets,
+            first.document.doc_strategy,
+            workspace_id=str(first.knowledge.workspace_id),
+        )
+
+
+def process_pending_visual_assets(paragraph_ids: Iterable[str]) -> None:
+    """Complete deferred recognition before querying text for the embedding job."""
+    assets = ParagraphAsset.objects.select_related("file", "paragraph", "document", "knowledge").filter(
+        paragraph_id__in=paragraph_ids,
+        sync_state=SyncState.ACTIVE,
+        process_status=AssetProcessStatus.PENDING,
+    )
+    _process_pending_assets(assets)
+
+
 def embed_paragraph_assets(paragraph_ids: Iterable[str], embedding_model) -> int:
-    """Create text units for image descriptions and image units when the model supports them."""
+    """Enhance pending images in the worker before indexing their descriptions and image units."""
     assets = list(
-        ParagraphAsset.objects.select_related("file", "paragraph")
+        ParagraphAsset.objects.select_related("file", "paragraph", "document", "knowledge")
         .filter(paragraph_id__in=paragraph_ids, sync_state=SyncState.ACTIVE)
         .order_by("paragraph_id", "position")
     )
     if not assets:
         return 0
+    _process_pending_assets(assets)
+
     rows = []
 
     text_assets = []

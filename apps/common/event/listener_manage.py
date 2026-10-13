@@ -31,7 +31,7 @@ from knowledge.models import (
     Termbase,
 )
 from knowledge.serializers.common import create_knowledge_index
-from knowledge.services.paragraph_assets import embed_paragraph_assets
+from knowledge.services.paragraph_assets import embed_paragraph_assets, process_pending_visual_assets
 from maxkb.conf import PROJECT_DIR
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
@@ -96,6 +96,7 @@ class ListenerManagement:
     @staticmethod
     def embedding_by_paragraph_list(paragraph_id_list, embedding_model: MaxKBBaseEmbeddingModel):
         try:
+            process_pending_visual_assets(paragraph_id_list)
             data_list = native_search(
                 {
                     "problem": QuerySet(get_dynamics_model({"paragraph.id": django.db.models.CharField()})).filter(
@@ -160,6 +161,7 @@ class ListenerManagement:
         # 更新到开始状态
         ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.STARTED)
         try:
+            process_pending_visual_assets([paragraph_id])
             data_list = native_search(
                 {
                     "problem": QuerySet(get_dynamics_model({"paragraph.id": django.db.models.CharField()})).filter(

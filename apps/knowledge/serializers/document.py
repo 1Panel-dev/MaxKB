@@ -1191,7 +1191,9 @@ class DocumentSerializers(serializers.Serializer):
             assets = sync_paragraph_assets(
                 QuerySet(Paragraph).filter(document_id=document_model.id), document_model.visual_strategy_hash
             )
-            process_visual_assets(assets, document_model.doc_strategy)
+            # General document enhancement runs in the worker after the import commits.
+            if document_model.type != KnowledgeType.BASE or not document_model.doc_strategy["visual"]["enabled"]:
+                process_visual_assets(assets, document_model.doc_strategy)
             document_id = str(document_model.id)
             return (
                 DocumentSerializers.Operate(data={"knowledge_id": knowledge_id, "document_id": document_id}).one(
@@ -1706,7 +1708,8 @@ class DocumentSerializers(serializers.Serializer):
                 assets = sync_paragraph_assets(
                     QuerySet(Paragraph).filter(document_id=document.id), document.visual_strategy_hash
                 )
-                process_visual_assets(assets, document.doc_strategy)
+                if document.type != KnowledgeType.BASE or not document.doc_strategy["visual"]["enabled"]:
+                    process_visual_assets(assets, document.doc_strategy)
             # 查询文档
             query_set = QuerySet(model=Document)
             if len(document_model_list) == 0:
