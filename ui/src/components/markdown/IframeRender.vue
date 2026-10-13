@@ -58,6 +58,28 @@ const observer = new ResizeObserver(() => {
   timer = setTimeout(sendHeight, 100);
 });
 observer.observe(document.body);
+// 导出 PDF/图片时，父页面无法读取沙箱 iframe 的内容，由 iframe 自身序列化当前 DOM 返回
+window.addEventListener('message', function (e) {
+  if (e.source !== parent || e.data?.type !== 'snapshot') return;
+  let html = '';
+  try {
+    const doc = document.documentElement.cloneNode(true);
+    const srcCanvas = document.querySelectorAll('canvas');
+    doc.querySelectorAll('canvas').forEach(function (c, i) {
+      try {
+        const img = document.createElement('img');
+        img.src = srcCanvas[i].toDataURL();
+        img.style.cssText = srcCanvas[i].style.cssText;
+        img.style.width = srcCanvas[i].offsetWidth + 'px';
+        img.style.height = srcCanvas[i].offsetHeight + 'px';
+        c.replaceWith(img);
+      } catch (err) {}
+    });
+    doc.querySelectorAll('script').forEach(function (s) { s.remove(); });
+    html = '<!DOCTYPE html>' + doc.outerHTML;
+  } catch (err) {}
+  parent.postMessage({ type: 'snapshot:response', requestId: e.data.requestId, html: html }, '*');
+});
 <\/script>
 </body>
 </html>
