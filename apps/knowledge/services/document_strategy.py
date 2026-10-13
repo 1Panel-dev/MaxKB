@@ -67,6 +67,15 @@ def normalize_document_strategy(strategy: Dict | None) -> Dict:
     return result
 
 
+def normalize_file_document_strategy(strategy: Dict | None) -> Dict:
+    """Keep v2 file splitting: one length limit and default rules for empty identifiers."""
+    normalized = normalize_document_strategy(strategy)
+    normalized["split"]["min_length"] = 0
+    if normalized["split"]["patterns"] == []:
+        normalized["split"]["patterns"] = None
+    return normalized
+
+
 def parse_web_content(content: str, strategy: Dict | None) -> List[Dict]:
     """Parse Web content with the exact split strategy captured when the document was imported."""
     normalized = normalize_document_strategy(strategy)

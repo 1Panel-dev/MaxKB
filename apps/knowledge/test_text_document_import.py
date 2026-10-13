@@ -1,5 +1,6 @@
 """Direct text import applies the strategy and creates documents in one request."""
 
+import io
 import json
 from contextlib import ExitStack, nullcontext
 from types import SimpleNamespace
@@ -16,6 +17,7 @@ from knowledge.models import FileSourceType
 from knowledge.serializers.document import DocumentImportRequest, DocumentSerializers
 from knowledge.services.document_strategy import normalize_document_strategy
 from knowledge.views.document import DocumentView
+from openpyxl import Workbook
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -78,6 +80,62 @@ class TextDocumentImportTests(SimpleTestCase):
         condition = self.query.return_value.filter.call_args_list[1].args[0]
         self.assertIn(self.scope["user_id"], str(condition))
         self.assertIn(self.scope["knowledge_id"], str(condition))
+
+    def test_existing_minimum_length_does_not_merge_the_file_tail(self):
+        self.strategy["split"]["min_length"] = 40
+
+        self.creator.save_text(self.payload)
+
+        documents = self.batch.return_value.batch_save.call_args.args[0]
+        self.assertEqual([len(p["content"]) for p in documents[0]["paragraphs"]], [50, 30])
+        self.assertEqual(documents[0]["doc_strategy"]["split"]["min_length"], 0)
+        self.assertEqual(documents[0]["doc_strategy"]["split"]["child_length"], 50)
+        self.assertEqual(documents[0]["doc_strategy"]["visual"], normalize_document_strategy(self.strategy)["visual"])
+        self.assertEqual(documents[0]["doc_strategy"]["index"], self.strategy["index"])
+
+    def test_empty_identifiers_keep_default_heading_splitting(self):
+        self.strategy["split"]["patterns"] = []
+        self.sources[0].file_name = "headings.md"
+        self.sources[0].get_bytes.return_value = b"# First\nfirst paragraph\n# Second\nsecond paragraph"
+
+        self.creator.save_text(self.payload)
+
+        document = self.batch.return_value.batch_save.call_args.args[0][0]
+        self.assertEqual([p["title"] for p in document["paragraphs"]], [" First", " Second"])
+        self.assertEqual(
+            [p["content"].strip() for p in document["paragraphs"]], ["first paragraph", "second paragraph"]
+        )
+        self.assertIsNone(document["doc_strategy"]["split"]["patterns"])
+
+    def test_text_import_preserves_table_rows_exceeding_the_length_limit(self):
+        workbook = Workbook()
+        workbook.active.append(["column"])
+        cell_content = "x" * 80
+        workbook.active.append([cell_content])
+        buffer = io.BytesIO()
+        workbook.save(buffer)
+        self.sources[0].file_name = "rows.xlsx"
+        self.sources[0].get_bytes.return_value = buffer.getvalue()
+
+        self.creator.save_text(self.payload)
+
+        document = self.batch.return_value.batch_save.call_args.args[0][0]
+        self.assertEqual(len(document["paragraphs"]), 1)
+        self.assertIn(f"| {cell_content} |", document["paragraphs"][0]["content"])
+        self.assertGreater(len(document["paragraphs"][0]["content"]), 50)
+
+    def test_preview_accepts_v2_split_parameters(self):
+        splitter = DocumentSerializers.Split(data=self.scope)
+        serializers.Serializer.is_valid(splitter, raise_exception=True)
+        with patch("knowledge.serializers.document.File.save"):
+            document = splitter.parse(
+                {"file": [ContentFile(b"a" * 80, name="legacy.txt")], "limit": 50, "with_filter": True}
+            )[0]
+
+        self.assertEqual([len(p["content"]) for p in document["content"]], [50, 30])
+        self.assertEqual(document["doc_strategy"]["split"]["max_length"], 50)
+        self.assertEqual(document["doc_strategy"]["split"]["min_length"], 0)
+        self.assertTrue(document["doc_strategy"]["split"]["auto_clean"])
 
     def test_invalid_input_fails_before_parsing_or_saving(self):
         payloads = [

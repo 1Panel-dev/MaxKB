@@ -86,9 +86,9 @@ from knowledge.serializers.paragraph import (
 from knowledge.services import validate_knowledge_file_size
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.document_strategy import (
-    apply_length_strategy,
     document_source_hash,
     normalize_document_strategy,
+    normalize_file_document_strategy,
     parse_web_content,
     strategy_hashes,
 )
@@ -1492,8 +1492,7 @@ class DocumentSerializers(serializers.Serializer):
                     "auto_clean": validated_data.get("with_filter", False),
                 }
             }
-            strategy = normalize_document_strategy(strategy_input)
-            parse_limit = 100000 if strategy["split"].get("patterns") == [] else strategy["split"]["max_length"]
+            strategy = normalize_file_document_strategy(strategy_input)
             documents = reduce(
                 lambda x, y: [*x, *y],
                 [
@@ -1501,7 +1500,7 @@ class DocumentSerializers(serializers.Serializer):
                         f,
                         strategy["split"].get("patterns"),
                         strategy["split"].get("auto_clean", False),
-                        parse_limit,
+                        strategy["split"]["max_length"],
                         source_file_id=source_file_ids[index] if source_file_ids is not None else None,
                     )
                     for index, f in enumerate(file_list)
@@ -1509,7 +1508,7 @@ class DocumentSerializers(serializers.Serializer):
                 [],
             )
             for document in documents:
-                document["content"] = apply_length_strategy(document.get("content", []), strategy)
+                # File handlers already apply the v2 split rules; keep their paragraphs intact.
                 document["doc_strategy"] = strategy
             return documents
 
