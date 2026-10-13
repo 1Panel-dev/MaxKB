@@ -37,6 +37,22 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
         ],
       },
       {
+        path: 'workflow-entry',
+        name: 'system-shared-knowledge-workflow',
+        component: () => import('@/views/knowledge-detail/workflow-transform/index.vue'),
+        beforeEnter: (to) => {
+          if (to.params.type === KNOWLEDGE_TYPE_KEY.WORKFLOW) {
+            return {
+              name: 'system-shared-workflow-knowledge',
+              params: { knowledgeId: to.params.knowledgeId },
+              query: to.query,
+              hash: to.hash,
+            }
+          }
+        },
+        meta: { title: '工作流', icon: 'icon_ticket-flow_outlined', order: 20 },
+      },
+      {
         path: 'retrieval',
         name: 'system-shared-knowledge-retrieval',
         redirect: { name: 'system-shared-knowledge-recall-test' },
@@ -128,5 +144,11 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
         ],
       },
     ],
+  },
+  {
+    path: '/system/shared/knowledge/:knowledgeId/:type/document/:documentId',
+    name: 'system-shared-knowledge-paragraph',
+    component: () => import('@/views/knowledge-detail/paragraph/index.vue'),
+    meta: { resourceScope: 'system-shared', scope: 'system', hideSidebar: true, title: '文档分段', hidden: true, resourceDetailRoot: true },
   },
 ]

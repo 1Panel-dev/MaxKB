@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
@@ -7,6 +8,8 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { knowledgeTemplate } from '@/views/knowledge/template'
 import workflowDemo from '@/assets/workflow/workflow-demo.png'
 import { useKnowledgeSettingContext } from '../context'
+
+const { routeNames, routeParams } = useKnowledgeNavigationContext()
 
 defineOptions({ name: 'KnowledgeWorkflowTransformView' })
 defineProps<ResourceDetailPageProps>()
@@ -19,8 +22,8 @@ const { knowledgeId, resourceApi } = useKnowledgeSettingContext()
 /* 转换成功后进入全屏画布。 */
 function enterWorkflow() {
   return router.replace({
-    name: 'workflow-knowledge',
-    params: { workspaceId: route.params.workspaceId, knowledgeId: knowledgeId.value },
+    name: routeNames.value.workflow,
+    params: routeParams.value,
     query: route.query,
   })
 }

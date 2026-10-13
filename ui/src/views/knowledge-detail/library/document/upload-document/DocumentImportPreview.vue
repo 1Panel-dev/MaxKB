@@ -89,7 +89,7 @@ function handleDeleteParagraph(index: number) {
         <div class="space-y-3">
           <template v-for="(paragraph, index) in selectedDocument.content" :key="index">
             <el-card shadow="never" class="group" body-class="relative">
-              <div class="group-hover-visible absolute top-3 right-3 flex rounded-lg bg-white shadow-sm">
+              <div class="group-hover-visible absolute top-3 right-3 z-10 flex rounded-lg bg-white shadow-sm">
                 <!-- 编辑预览分段 -->
                 <el-button text title="编辑分段" @click="handleEditParagraph(index)"><MkIcon name="icon_edit_outlined" /></el-button>
                 <!-- 删除预览分段 -->

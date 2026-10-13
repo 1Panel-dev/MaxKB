@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
 import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
@@ -22,6 +23,8 @@ import ButtonTemplateStore from './ButtonTemplateStore.vue'
 import ButtonPublishHistory from './ButtonPublishHistory.vue'
 import WorkflowImportDocumentDrawer from '@/views/knowledge-detail/library/document/import-document/WorkflowImportDocumentDrawer.vue'
 import { goBack } from './navigation'
+
+const { routeNames, routeParams } = useKnowledgeNavigationContext()
 
 defineOptions({ name: 'KnowledgeWorkflowView' })
 
@@ -306,8 +309,8 @@ function loadKnowledgeWorkflow() {
     // 直接访问画布时也先转换非工作流知识库，不为原类型初始化或保存工作流。
     if (knowledge.type !== KNOWLEDGE_TYPE.WORKFLOW) {
       return router.replace({
-        name: 'workspace-knowledge-workflow',
-        params: { workspaceId: route.params.workspaceId, knowledgeId, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
+        name: routeNames.value.workflowEntry,
+        params: { ...routeParams.value, type: KNOWLEDGE_TYPE_MAP[knowledge.type] },
         query: route.query,
       })
     }

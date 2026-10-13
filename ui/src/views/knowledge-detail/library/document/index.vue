@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { CascaderOption, TableColumnCtx } from 'element-plus'
@@ -50,6 +51,8 @@ import {
   BatchTokenizeAction,
 } from './action-dropdown'
 
+const { routeNames, routeParams } = useKnowledgeNavigationContext()
+
 defineOptions({ name: 'DocumentListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
@@ -64,8 +67,8 @@ const { knowledge } = useKnowledgeDetailContext()
 function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<DocumentItem> | null) {
   if (loading.value || operationLoading.value || column?.type === 'selection') return
   void router.push({
-    name: 'workspace-knowledge-paragraph',
-    params: { workspaceId: route.params.workspaceId, knowledgeId: knowledgeId.value, type: knowledgeType.value, documentId: document.id },
+    name: routeNames.value.paragraph,
+    params: { ...routeParams.value, type: knowledgeType.value, documentId: document.id },
     query: route.query,
   })
 }

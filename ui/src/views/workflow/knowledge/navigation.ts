@@ -3,11 +3,16 @@ import router from '@/router/admin'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { KnowledgeDetail } from '@/api/types'
-import { getWorkspaceId, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { getWorkspaceId, getResourceScope } from '@/utils/resource-context'
 
-/** Workspace 返回知识库详情，System 返回对应资源列表。 */
+/** 返回当前资源范围的知识库详情。 */
 export function goBack(knowledgeId: string, type: KnowledgeDetail['type'] = KNOWLEDGE_TYPE.WORKFLOW) {
-  if (isSystemResource()) return router.push({ name: 'system-resource-knowledge' })
-  if (isSystemSharedResource()) return router.push({ name: 'system-shared-knowledge' })
-  return router.push({ name: 'workspace-knowledge-detail', params: { workspaceId: getWorkspaceId(), knowledgeId, type: KNOWLEDGE_TYPE_MAP[type] } })
+  const scope = getResourceScope()
+  if (!scope) throw new Error('Knowledge resource scope is unavailable')
+  const name = `${scope}-knowledge-detail`
+  const params =
+    scope === 'workspace' || scope === 'workspace-shared'
+      ? { workspaceId: getWorkspaceId(), knowledgeId, type: KNOWLEDGE_TYPE_MAP[type] }
+      : { knowledgeId, type: KNOWLEDGE_TYPE_MAP[type] }
+  return router.push({ name, params, query: router.currentRoute.value.query })
 }

@@ -11,7 +11,7 @@ defineProps<{ paragraph?: ParagraphDetail }>()
   <el-scrollbar height="100%" class="min-h-0 flex-1">
     <MdPreview :model-value="paragraph?.content ?? ''" />
   </el-scrollbar>
-  <div class="mt-4 flex-align-center shrink-0 gap-2 text-sm font-medium text-N600">
+  <div class="mt-4 flex-align-center shrink-0 gap-2 text-sm text-N600">
     <span>召回次数 {{ paragraph?.hit_num ?? 0 }}</span>
     <el-divider direction="vertical" />
     <span>最近一次召回时间 {{ datetimeFormat(paragraph?.last_hit_time) || '-' }}</span>
