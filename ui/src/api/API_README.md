@@ -568,9 +568,14 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 `getParagraphList` 查询完整分段列表，支持 `title`、`content`，服务端按 `position`、创建时间排序；
 `postParagraph` 提交 `title`、`content`、`is_active` 和可选的 `problem_list: [{ content }]`，
 返回新增分段详情，默认插入首位并触发索引。
+新增载荷可传 `position`，在目标位置插入，用于当前分段上方添加。
 `getParagraphDetail` 查询 `/<paragraphId>`，返回 `ParagraphDetail`，包含 `problem_list`、
 `hit_num` 和 `last_hit_time`。`putParagraph` 向同一路径提交标题和正文，解包后端三元素编辑响应的
 首项为最新详情；不提交 `problem_list`，关联关系通过专属接口维护。
+编辑载荷使用 `ParagraphEditPayload`，允许仅传 `is_active` 更新启用状态，正文表单仍使用
+必填标题及正文的 `ParagraphUpdatePayload`。`deleteParagraph` DELETE `/<paragraphId>` 删除单个分段。
+`putParagraphPosition` PUT `/adjust_position`，查询参数为 `paragraph_id`、`new_position`，
+不传请求体，由服务端调整当前分段及受影响分段的位置。
 `postParagraphProblem` 向 `/<paragraphId>/problem` 提交 `{ content }`，创建或复用问题并关联分段；
 `getParagraphProblems` GET 同一路径，返回当前分段的 `ParagraphProblem[]`，用于关联变更后刷新。
 `putAssociateParagraphProblem` PUT 到 `/association`，通过查询参数传递 `paragraph_id`、`problem_id`，

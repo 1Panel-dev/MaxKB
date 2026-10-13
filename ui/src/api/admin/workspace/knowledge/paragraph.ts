@@ -1,12 +1,12 @@
-import { get, post, put } from '../../core/request'
+import { del, get, post, put } from '../../core/request'
 import type {
   ParagraphCreatePayload,
   ParagraphDetail,
+  ParagraphEditPayload,
   ParagraphGeneratePayload,
   ParagraphItem,
   ParagraphProblem,
   ParagraphQuery,
-  ParagraphUpdatePayload,
 } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
@@ -17,7 +17,7 @@ const getPrefix = (knowledgeId: string, documentId: string) =>
 const getParagraphList = (knowledgeId: string, documentId: string, query?: ParagraphQuery) =>
   get<ParagraphItem[]>(getPrefix(knowledgeId, documentId), { ...query })
 
-/** 在文档首位新增分段，由服务端触发索引。 */
+/** 在指定位置新增分段，默认首位，由服务端触发索引。 */
 const postParagraph = (knowledgeId: string, documentId: string, payload: ParagraphCreatePayload) =>
   post<ParagraphCreatePayload, ParagraphDetail>(getPrefix(knowledgeId, documentId), payload)
 
@@ -25,12 +25,11 @@ const postParagraph = (knowledgeId: string, documentId: string, payload: Paragra
 const getParagraphDetail = (knowledgeId: string, documentId: string, paragraphId: string) =>
   get<ParagraphDetail>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}`)
 
-/** 保存分段标题和内容，提取后端编辑响应中的最新详情。 */
-const putParagraph = (knowledgeId: string, documentId: string, paragraphId: string, payload: ParagraphUpdatePayload) =>
-  put<ParagraphUpdatePayload, [ParagraphDetail, ParagraphUpdatePayload, string]>(
-    `${getPrefix(knowledgeId, documentId)}/${paragraphId}`,
-    payload,
-  ).then(([paragraph]) => paragraph)
+/** 更新分段正文或启用状态，提取后端编辑响应中的最新详情。 */
+const putParagraph = (knowledgeId: string, documentId: string, paragraphId: string, payload: ParagraphEditPayload) =>
+  put<ParagraphEditPayload, [ParagraphDetail, ParagraphEditPayload, string]>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}`, payload).then(
+    ([paragraph]) => paragraph,
+  )
 
 /** 新增问题并关联到当前分段。 */
 const postParagraphProblem = (knowledgeId: string, documentId: string, paragraphId: string, content: string) =>
@@ -62,6 +61,17 @@ const putGenerateParagraphQuestions = (knowledgeId: string, documentId: string, 
 const putBatchDeleteParagraphs = (knowledgeId: string, documentId: string, paragraphIds: string[]) =>
   put<{ id_list: string[] }, boolean>(`${getPrefix(knowledgeId, documentId)}/batch_delete`, { id_list: paragraphIds })
 
+/** 删除当前文档的单个分段及其关联数据。 */
+const deleteParagraph = (knowledgeId: string, documentId: string, paragraphId: string) =>
+  del<undefined, boolean>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}`)
+
+/** 调整分段顺序，由服务端同步更新受影响的分段位置。 */
+const putParagraphPosition = (knowledgeId: string, documentId: string, paragraphId: string, position: number) =>
+  put<undefined, void>(`${getPrefix(knowledgeId, documentId)}/adjust_position`, undefined, {
+    paragraph_id: paragraphId,
+    new_position: position,
+  })
+
 export default {
   getParagraphList,
   postParagraph,
@@ -74,4 +84,6 @@ export default {
   putMigrateParagraphs,
   putGenerateParagraphQuestions,
   putBatchDeleteParagraphs,
+  deleteParagraph,
+  putParagraphPosition,
 }

@@ -148,7 +148,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
   {
     path: '/system/shared/knowledge/:knowledgeId/:type/document/:documentId',
     name: 'system-shared-knowledge-paragraph',
-    component: () => import('@/views/knowledge-detail/paragraph/index.vue'),
+    component: () => import('@/views/document-detail/index.vue'),
     meta: { resourceScope: 'system-shared', scope: 'system', hideSidebar: true, title: '文档分段', hidden: true, resourceDetailRoot: true },
   },
 ]

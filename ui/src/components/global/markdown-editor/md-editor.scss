@@ -123,6 +123,29 @@
 
     table {
       display: block;
+      max-width: 100%;
+      overflow-x: auto;
+      width: fit-content;
+
+      td,
+      th {
+        max-width: calc(var(--spacing) * 100);
+        min-width: calc(var(--spacing) * 30);
+        overflow-wrap: break-word;
+        word-break: normal;
+      }
+
+      th {
+        white-space: nowrap;
+      }
+
+      tbody tr:hover {
+        background-color: var(--md-theme-table-tr-bg-color);
+      }
+
+      tbody tr:nth-child(2n):hover {
+        background-color: var(--md-theme-table-stripe-color);
+      }
     }
 
     ul {

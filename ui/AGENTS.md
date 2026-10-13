@@ -102,7 +102,8 @@ ui/
 │   │   ├── application/      # Application list and creation
 │   │   ├── application-detail/ # Application overview and settings
 │   │   ├── knowledge/        # Knowledge base list and cards
-│   │   ├── knowledge-detail/ # Knowledge base and document details
+│   │   ├── knowledge-detail/ # Knowledge base details, document lists, and settings
+│   │   ├── document-detail/  # Document details and paragraph management
 │   │   ├── model/            # Model list, creation, and settings
 │   │   ├── tool/             # Tool list, forms, and tool store
 │   │   ├── trigger/          # Workspace trigger list

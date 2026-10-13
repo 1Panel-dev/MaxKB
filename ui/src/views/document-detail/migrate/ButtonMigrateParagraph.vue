@@ -12,6 +12,7 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 const emit = defineEmits<{ success: [paragraphIds: string[]] }>()
+defineSlots<{ default?(props: { open: () => unknown; disabled: boolean }): unknown }>()
 const dialogRef = useTemplateRef<InstanceType<typeof ParagraphMigrateDialog>>('dialogRef')
 
 function handleOpenDialog() {
@@ -21,8 +22,10 @@ function handleOpenDialog() {
 </script>
 
 <template>
-  <!-- 批量迁移分段 -->
-  <el-button type="primary" plain :disabled="disabled || !paragraphIds.length" @click="handleOpenDialog">迁移至</el-button>
+  <slot :open="handleOpenDialog" :disabled="disabled || !paragraphIds.length">
+    <!-- 批量迁移分段 -->
+    <el-button type="primary" plain :disabled="disabled || !paragraphIds.length" @click="handleOpenDialog">迁移至</el-button>
+  </slot>
   <ParagraphMigrateDialog
     ref="dialogRef"
     :api="api"

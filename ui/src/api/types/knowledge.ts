@@ -123,7 +123,7 @@ export interface KnowledgeWorkflowCreatePayload extends KnowledgeCreatePayload {
 
 /** Web 文档分段、视觉处理和索引策略。 */
 export interface DocumentStrategy {
-  split: { mode: 'smart' | 'advanced'; patterns: string[] | null; min_length: number; max_length: number; child_length: number; auto_clean: boolean }
+  split: { mode: 'smart' | 'advanced'; patterns: string[] | null; limit: number; child_length: number; auto_clean: boolean }
   visual: { enabled: boolean; strategy: 'model' | 'tool'; model_id: string | null; tool_id: string | null }
   index: { title_as_question: boolean }
 }

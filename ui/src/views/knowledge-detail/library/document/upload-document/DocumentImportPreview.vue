@@ -88,18 +88,20 @@ function handleDeleteParagraph(index: number) {
       <template v-if="selectedDocument">
         <div class="space-y-3">
           <template v-for="(paragraph, index) in selectedDocument.content" :key="index">
-            <el-card shadow="never" class="group" body-class="relative">
-              <div class="group-hover-visible absolute top-3 right-3 z-10 flex rounded-lg bg-white shadow-sm">
-                <!-- 编辑预览分段 -->
-                <el-button text title="编辑分段" @click="handleEditParagraph(index)"><MkIcon name="icon_edit_outlined" /></el-button>
-                <!-- 删除预览分段 -->
-                <el-button class="ml-0!" text title="删除分段" @click="handleDeleteParagraph(index)">
-                  <MkIcon name="icon_delete-trash_outlined" />
-                </el-button>
+            <el-card shadow="never" class="mk-paragraph-card group overflow-visible!" body-class="overflow-visible!">
+              <div class="group-hover-visible sticky top-3 z-10 h-0" @click.stop>
+                <el-card class="absolute top-0 right-0" shadow="always" style="--el-card-padding: 4px">
+                  <!-- 编辑预览分段 -->
+                  <el-button text @click="handleEditParagraph(index)"><MkIcon name="icon_edit_outlined" /></el-button>
+                  <!-- 删除预览分段 -->
+                  <el-button text @click="handleDeleteParagraph(index)">
+                    <MkIcon name="icon_delete-trash_outlined" />
+                  </el-button>
+                </el-card>
               </div>
-              <h4 v-if="paragraph.title" class="mb-3 pr-20">{{ index + 1 }}、{{ paragraph.title }}</h4>
+              <h4 v-if="paragraph.title" class="mb-3 pr-20">{{ paragraph.title }}</h4>
               <MdPreview :model-value="paragraph.content" />
-              <p class="mt-3 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
+              <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
             </el-card>
           </template>
         </div>

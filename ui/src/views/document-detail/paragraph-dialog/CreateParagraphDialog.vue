@@ -19,14 +19,16 @@ const emit = defineEmits<{ success: [mode: 'create']; closed: [] }>()
 const visible = ref(false)
 const targetKnowledgeId = ref('')
 const targetDocumentId = ref('')
+const targetPosition = ref<number>()
 const paragraphFormRef = ref<InstanceType<typeof ParagraphForm>>()
 const paragraphForm = ref<ParagraphUpdatePayload>({ title: '', content: '' })
 const relatedQuestions = ref<ParagraphQuestionDraft[]>([])
 const loading = ref(false)
 
-function open() {
+function open(position?: number) {
   targetKnowledgeId.value = props.knowledgeId
   targetDocumentId.value = props.documentId
+  targetPosition.value = position
   visible.value = true
 }
 
@@ -50,6 +52,7 @@ function handleSubmit() {
           title: paragraphForm.value.title.trim(),
           content: paragraphForm.value.content,
           is_active: true,
+          ...(targetPosition.value === undefined ? {} : { position: targetPosition.value }),
           problem_list: relatedQuestions.value.map(({ content }) => ({ content })),
         })
         .then(() => {
