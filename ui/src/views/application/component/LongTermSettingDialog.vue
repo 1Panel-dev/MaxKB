@@ -19,10 +19,18 @@
         v-if="modelSettingEnable"
         :label="$t('views.application.form.aiModel.label')"
         prop="long_term_model_id"
-        required
+        :rules="{
+          message: $t('dynamicsForm.ModelConstructor.modelPlaceholder'),
+          trigger: 'blur',
+          required: true,
+        }"
       >
         <div class="w-full">
-          <el-radio-group v-model="form.long_term_model_id_type" class="mb-8">
+          <el-radio-group
+            v-model="form.long_term_model_id_type"
+            class="mb-8"
+            @change="handleModelTypeChange"
+          >
             <el-radio
               :label="$t('views.application.longTermMemory.defaultModel')"
               value="default"
@@ -219,6 +227,10 @@ const form = ref<any>({
 })
 
 const lastPresetSetting = ref<any>(null)
+
+const handleModelTypeChange = () => {
+  nextTick(() => paramFormRef.value?.clearValidate('long_term_model_id'))
+}
 
 const changeTriggerType = (type: string) => {
   form.value.trigger_type = type

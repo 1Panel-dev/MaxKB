@@ -190,9 +190,6 @@ function handleSave() {
 
 function applyDefaultModelToAll() {
   MsgConfirm(t('workflow.setting.applyToAll'), t('workflow.setting.applyToAllConfirmMsg'), {
-    type: 'warning',
-    customClass: 'apply-to-all-confirm',
-    center: true,
     confirmButtonText: t('workflow.setting.apply'),
   }).then(() => {
     const graph = props.workflowRef?.getGraphData()
