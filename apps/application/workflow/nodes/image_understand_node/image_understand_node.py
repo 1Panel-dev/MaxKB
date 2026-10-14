@@ -17,6 +17,7 @@ from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from application.workflow.tools import Reasoning
 from common.utils.common import guess_image_format
+from common.utils.count_tokens import count_local_tokens
 from common.exception.app_exception import AppApiException
 from knowledge.models import File
 from models_provider.models import Model
@@ -162,14 +163,14 @@ class ImageUnderstandNode(INode):
     async def _stream_response(
         self, response, chat_model, message_list, question, reasoning_content_id, text_content_id, node_info, is_result
     ):
+        answer = ""
+        reasoning_content = ""
         try:
             model_setting = self.get_context("model_setting") or {}
             reasoning = Reasoning(
                 model_setting.get("reasoning_content_start", "<think>"),
                 model_setting.get("reasoning_content_end", "</think>"),
             )
-            answer = ""
-            reasoning_content = ""
             response_reasoning_content = False
 
             async for chunk in response:
@@ -255,15 +256,18 @@ class ImageUnderstandNode(INode):
                         )
                     )
 
-            self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
-
+        # 无论正常结束、抛异常还是被取消中断,都落盘已累积内容并关闭 LLM 流式响应底层连接
         finally:
+            self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
             with contextlib.suppress(Exception):
                 await response.aclose()
 
     def _write_final_context(self, chat_model, message_list, question, answer, reasoning_content):
-        message_tokens = chat_model.get_num_tokens_from_messages(message_list)
-        answer_tokens = chat_model.get_num_tokens(answer)
+        message_tokens, answer_tokens = (
+            count_local_tokens(message_list, answer)
+            if self.async_runner.cancel_event.is_set()
+            else (chat_model.get_num_tokens_from_messages(message_list), chat_model.get_num_tokens(answer))
+        )
         self.write_context("message_tokens", message_tokens)
         self.write_context("answer_tokens", answer_tokens)
         self.write_context("answer", answer)
