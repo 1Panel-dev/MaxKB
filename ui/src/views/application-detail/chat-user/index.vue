@@ -39,6 +39,15 @@ function loadChatUserGroups() {
     })
 }
 
+// 仅刷新用户组列表及已授权人数，保留当前选中的用户组。
+function refreshChatUserGroups() {
+  return ChatUserApi.getUserGroupList(resource.value).then((groups) => {
+    const currentId = currentGroup.value?.id
+    chatUserGroups.value = groups
+    currentGroup.value = groups.find((group) => group.id === currentId) ?? groups[0]
+  })
+}
+
 function handleSelectGroup(group: ChatUserAuthorizationGroup) {
   if (loading.value || currentGroup.value?.id === group.id) return
   currentGroup.value = group
@@ -130,7 +139,7 @@ function handleSave() {
       // 先记住已保存结果，列表刷新失败时不重复提示未保存。
       savedAuthorization.value = Object.fromEntries(payload.map(({ chat_user_id, is_auth }) => [chat_user_id, is_auth]))
       MsgSuccess('保存成功')
-      return loadChatUsers()
+      return loadChatUsers().then(refreshChatUserGroups)
     })
     .finally(() => {
       loading.value = false
@@ -149,7 +158,7 @@ function handleAutoAuthorizationChange(value: string | number | boolean) {
       chatUsers.value = []
       savedAuthorization.value = {}
       MsgSuccess('保存成功')
-      return loadChatUsers()
+      return loadChatUsers().then(refreshChatUserGroups)
     })
     .finally(() => {
       loading.value = false
@@ -170,8 +179,7 @@ onMounted(() => loadChatUserGroups())
         <template #default="{ row }">
           <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
           <span class="shrink-0 font-normal text-N500">
-            <!-- TODO：接入用户组已授权人数，当前接口未返回统计字段。 -->
-            {{ row.is_auth ? '（自动授权）' : '（已授权 —）' }}
+            {{ row.is_auth ? '（自动授权）' : `（已授权 ${row.authorized_count ?? 0}）` }}
           </span>
         </template>
       </MkSearchList>
