@@ -116,26 +116,26 @@ const loadingMembers = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 10, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
+  { label: '用户名', value: 'username' },
 ]
-const userGroupMembers = ref<SystemUserGroupMember[]>([])
-function handleMemberSearch(query?: Dict<unknown>) {
-  memberSearchQuery.value = query
-  paginationConfig.value.currentPage = 1
-  loadUserGroupMembers()
-}
 
-/* 表头用户来源筛选 */
+/* 表头筛选 */
 const selectedMemberSource = ref<string | null>(null)
 const memberSourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
-  label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label,
+  label: value === LOGIN_METHOD.LOCAL ? '系统用户' : label,
   value,
 }))
 const memberListQuery = computed<Dict<unknown>>(() => ({
   ...memberSearchQuery.value,
   ...(selectedMemberSource.value !== null ? { source: selectedMemberSource.value } : {}),
 }))
+const userGroupMembers = ref<SystemUserGroupMember[]>([])
+function handleMemberSearch(query?: Dict<unknown>) {
+  memberSearchQuery.value = query
+  paginationConfig.value.currentPage = 1
+  loadUserGroupMembers()
+}
 
 function handleMemberFilterChange() {
   loadUserGroupMembers(true)
