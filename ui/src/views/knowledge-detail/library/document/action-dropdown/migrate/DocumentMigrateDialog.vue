@@ -2,13 +2,14 @@
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { KnowledgeItem } from '@/api/types'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import { useKnowledgeLibraryContext } from '../../../../context'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DocumentMigrateDialog' })
 const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
+const { requestSettingApi } = useKnowledgeLibraryContext()
 const visible = ref(false)
 const loading = defineModel<boolean>('loading', { default: false })
 const optionLoading = ref(false)
@@ -23,11 +24,13 @@ const targetDocumentIds = ref<string[]>([])
 
 // 打开迁移弹窗，固定本次文档并查询目标知识库。
 function open(documentIds: string[]) {
-  if (loading.value || optionLoading.value || !documentIds.length) return
+  const requestApi = requestSettingApi.value?.knowledge
+  if (!requestApi || loading.value || optionLoading.value || !documentIds.length) return
   targetDocumentIds.value = [...documentIds]
   visible.value = true
   optionLoading.value = true
-  KnowledgeApi.getAllKnowledge()
+  requestApi
+    .getAllKnowledge()
     .then((knowledge) => {
       knowledgeOptions.value = knowledge.filter(({ id }) => id !== props.knowledgeId)
     })

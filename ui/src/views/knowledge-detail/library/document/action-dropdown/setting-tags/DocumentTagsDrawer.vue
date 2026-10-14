@@ -77,7 +77,6 @@ function spanMethod({ column, row }: { column: TableColumnCtx<DocumentTagRow>; r
 }
 
 function handleOpenAddTag() {
-  if (loading.value || operationLoading.value || addTagMounted.value) return
   addTagMounted.value = true
   return nextTick(() => addTagRef.value?.open([targetDocumentId.value]))
 }
@@ -88,11 +87,10 @@ function handleTagsChanged() {
 }
 
 function handleDeleteTags(tags: DocumentTagRow[]) {
-  if (loading.value || operationLoading.value || confirming.value || !tags.length) return
   const tagIds = tags.map(({ id }) => id)
-  const title = tags.length === 1 ? `是否移除标签：${tags[0]!.key}—${tags[0]!.value}？` : `是否移除选中的 ${tagIds.length} 个标签值？`
+  const title = tags.length === 1 ? `是否移除标签：${tags[0]!.key}—${tags[0]!.value}？` : `是否移除选中的 ${tagIds.length} 个标签？`
   confirming.value = true
-  return MsgConfirm(title, '仅移除当前文档与所选标签值的关联，不删除知识库标签，也不影响其他文档。')
+  return MsgConfirm(title, '删除后，使用该标签的资源将会删除该标签，请谨慎操作！')
     .then(
       () => {
         operationLoading.value = true
@@ -113,18 +111,14 @@ function handleDeleteTags(tags: DocumentTagRow[]) {
     })
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!loading.value && !operationLoading.value && !addTagMounted.value && !confirming.value) done()
-}
-
 defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="标签设置" content-class="h-full flex-column gap-4" :before-close="handleBeforeClose" @closed="emit('closed')">
-    <div class="flex-between gap-4">
+  <MkDrawer v-model="visible" title="标签设置" @closed="emit('closed')">
+    <div class="flex-between gap-4 mb-4">
       <!-- 为当前文档添加标签 -->
-      <el-button type="primary" :disabled="loading || operationLoading" @click="handleOpenAddTag">
+      <el-button type="primary" @click="handleOpenAddTag">
         <MkIcon name="icon_add_outlined" />
         <span>添加标签</span>
       </el-button>

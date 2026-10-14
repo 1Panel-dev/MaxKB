@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, watch, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { TableColumnCtx } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import TagsApi from '@/api/admin/workspace/knowledge/tags'
-import DocumentApi from '@/api/admin/workspace/knowledge/document'
+import { useKnowledgeLibraryContext } from '../../context'
 import type { KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import CreateTagDialog from './components/CreateTagDialog.vue'
@@ -21,6 +20,7 @@ interface TagTableRow extends KnowledgeTagUpdatePayload {
   rowspan: number
 }
 
+const { resourceApi, resourceScope, requestSettingApi } = useKnowledgeLibraryContext()
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const loading = ref(false)
@@ -53,11 +53,17 @@ function clearSelection() {
 
 function loadTags() {
   clearSelection()
+  const requestApi = resourceApi.tags
+  if (!requestApi) return Promise.resolve()
   loading.value = true
-  return TagsApi.getKnowledgeTags(knowledgeId.value, { name: searchText.value.trim() || undefined })
+  const keyword = searchText.value.trim()
+  const tagsRequest = requestSettingApi.value?.tags
+    ? requestSettingApi.value?.tags.getKnowledgeTags(knowledgeId.value, { name: keyword || undefined })
+    : requestApi.getKnowledgeTags(knowledgeId.value)
+  return tagsRequest
     .then((groups) => {
-      tagGroups.value = groups
-      const lastPage = Math.max(1, Math.ceil(groups.length / tagPage.value.pageSize))
+      tagGroups.value = keyword ? groups.filter((group) => group.key.includes(keyword)) : groups
+      const lastPage = Math.max(1, Math.ceil(tagGroups.value.length / tagPage.value.pageSize))
       tagPage.value.currentPage = Math.min(tagPage.value.currentPage, lastPage)
     })
     .finally(() => {
@@ -114,16 +120,15 @@ function handleOpenTagDocuments(row: TagTableRow) {
 
 /* 删除只在确认后提交，标签删除与文档取消关联使用不同接口。 */
 function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
-  if (loading.value || operationLoading.value) return
+  const requestApi = requestSettingApi.value?.tags
+  if (!requestApi || loading.value || operationLoading.value) return
   const tagName = type === 'key' ? row.key : `${row.key}—${row.value}`
-  const tip =
-    type === 'key'
-      ? '删除后，使用该标签的文档将移除此标签及其全部标签值，文档本身不会删除，请谨慎操作！'
-      : '删除后，使用该标签值的文档将移除此标签值，文档本身不会删除，请谨慎操作！'
+  const tip = type === 'key' ? '删除后使用该标签的资源将会删除该标签，请谨慎操作!' : '删除后使用该标签的资源将会删除该标签，请谨慎操作!'
   return MsgConfirm(`是否删除标签：${tagName}？`, tip).then(
     () => {
       operationLoading.value = true
-      return TagsApi.deleteKnowledgeTag(knowledgeId.value, row.id, type)
+      return requestApi
+        .deleteKnowledgeTag(knowledgeId.value, row.id, type)
         .then(() => {
           MsgSuccess('删除成功')
           return loadTags()
@@ -137,16 +142,14 @@ function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
 }
 
 function handleBatchDelete() {
-  if (loading.value || operationLoading.value || !selectedTags.value.length) return
+  const requestApi = requestSettingApi.value?.tags
+  if (!requestApi || loading.value || operationLoading.value || !selectedTags.value.length) return
   const tagIds = selectedTags.value.map(({ id }) => id)
-  const groupCount = new Set(selectedTags.value.map(({ key }) => key)).size
-  return MsgConfirm(
-    `是否删除选中的 ${tagIds.length} 个标签值（涉及 ${groupCount} 个标签）？`,
-    '将删除选中记录所属的标签及其全部标签值，并移除文档上的对应标签；文档本身不会删除，请谨慎操作！',
-  ).then(
+  return MsgConfirm(`是否删除选中的 ${tagIds.length} 个标签？`, '删除后，使用该标签的资源将会删除该标签，请谨慎操作！').then(
     () => {
       operationLoading.value = true
-      return TagsApi.putBatchDeleteKnowledgeTags(knowledgeId.value, tagIds)
+      return requestApi
+        .putBatchDeleteKnowledgeTags(knowledgeId.value, tagIds)
         .then(() => {
           MsgSuccess('删除成功')
           return loadTags()
@@ -159,9 +162,17 @@ function handleBatchDelete() {
   )
 }
 
-onMounted(() => {
-  loadTags()
-})
+watch(
+  [() => route.params.workspaceId, knowledgeId, resourceScope],
+  () => {
+    clearSelection()
+    tagGroups.value = []
+    searchText.value = ''
+    tagPage.value = { currentPage: 1, pageSize: 10 }
+    void loadTags().catch(() => {})
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -171,9 +182,15 @@ onMounted(() => {
       <div class="flex-align-center">
         <MkSearchInput v-model="searchText" class="mr-3 w-60!" @change="handleSearchChange" />
         <!-- 导入标签，成功后刷新列表 -->
-        <ButtonImportTags :api="TagsApi" :knowledge-id="knowledgeId" :disabled="loading || operationLoading" @refresh="loadTags" />
+        <ButtonImportTags
+          v-if="requestSettingApi"
+          :api="requestSettingApi.tags"
+          :knowledge-id="knowledgeId"
+          :disabled="loading || operationLoading"
+          @refresh="loadTags"
+        />
         <!-- 创建标签 -->
-        <el-button type="primary" :disabled="loading || operationLoading" @click="handleOpenCreateTag">
+        <el-button v-if="requestSettingApi" type="primary" :disabled="loading || operationLoading" @click="handleOpenCreateTag">
           <MkIcon name="icon_add_outlined" />
           <span>创建</span>
         </el-button>
@@ -194,12 +211,12 @@ onMounted(() => {
     @cell-mouse-enter="handleCellEnter"
     @cell-mouse-leave="handleCellLeave"
   >
-    <el-table-column type="selection" width="40" />
+    <el-table-column v-if="requestSettingApi" type="selection" width="40" />
     <el-table-column prop="key" label="标签" min-width="240">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center gap-1">
           <span class="min-w-0 truncate" :title="row.key">{{ row.key }}</span>
-          <div class="flex-align-center shrink-0" :class="{ 'group-hover-visible': hoveredTagKey !== row.key }">
+          <div v-if="requestSettingApi" class="flex-align-center shrink-0" :class="{ 'group-hover-visible': hoveredTagKey !== row.key }">
             <!-- 添加标签值 -->
             <MkTooltip content="添加标签值" placement="top">
               <el-button type="primary" text @click="handleOpenAddTagValue(row)">
@@ -226,10 +243,13 @@ onMounted(() => {
     <el-table-column prop="doc_count" label="已关联文档" min-width="140">
       <template #default="{ row }: { row: TagTableRow }">
         <!-- 查看标签关联文档 -->
-        <el-button type="primary" link class="mk-link" @click="handleOpenTagDocuments(row)">{{ row.doc_count ?? 0 }}</el-button>
+        <el-button v-if="requestSettingApi" type="primary" link class="mk-link" @click="handleOpenTagDocuments(row)">
+          {{ row.doc_count ?? 0 }}
+        </el-button>
+        <span v-else>{{ row.doc_count ?? 0 }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="操作" width="100" fixed="right">
+    <el-table-column v-if="requestSettingApi" label="操作" width="100" fixed="right">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center">
           <!-- 编辑标签值 -->
@@ -247,12 +267,18 @@ onMounted(() => {
         </div>
       </template>
     </el-table-column>
-    <template #footer-batch-actions>
+    <template v-if="requestSettingApi" #footer-batch-actions>
       <!-- 批量删除标签 -->
       <el-button type="danger" plain :loading="operationLoading" @click="handleBatchDelete">删除</el-button>
     </template>
   </MkTable>
-  <CreateTagDialog ref="createTagRef" :api="TagsApi" :knowledge-id="knowledgeId" @refresh="loadTags" />
-  <EditTagDialog ref="editTagRef" :api="TagsApi" :knowledge-id="knowledgeId" @refresh="loadTags" />
-  <TagDocumentDrawer ref="tagDocumentRef" :api="DocumentApi" :knowledge-id="knowledgeId" @refresh="loadTags" />
+  <CreateTagDialog v-if="requestSettingApi" ref="createTagRef" :api="requestSettingApi.tags" :knowledge-id="knowledgeId" @refresh="loadTags" />
+  <EditTagDialog v-if="requestSettingApi" ref="editTagRef" :api="requestSettingApi.tags" :knowledge-id="knowledgeId" @refresh="loadTags" />
+  <TagDocumentDrawer
+    v-if="requestSettingApi"
+    ref="tagDocumentRef"
+    :api="requestSettingApi.document"
+    :knowledge-id="knowledgeId"
+    @refresh="loadTags"
+  />
 </template>

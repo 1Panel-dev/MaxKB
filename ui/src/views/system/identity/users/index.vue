@@ -135,10 +135,13 @@ onMounted(() => loadSystemUsers())
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <div class="flex-align-center">
+        <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 导入用户 -->
-          <ButtonImportUsers v-if="perm.system.user.import()" @refresh="loadSystemUsers()" />
+          <span>
+            <ButtonImportUsers v-if="perm.system.user.import()" @refresh="loadSystemUsers()" />
+          </span>
+
           <!-- 创建用户 -->
           <el-button v-if="perm.system.user.create()" type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
