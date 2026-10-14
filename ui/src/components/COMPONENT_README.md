@@ -1031,7 +1031,7 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 ### UserGroupMembersDrawer
 
 手动导入 `business/resource-authorization-drawer/user-group/UserGroupMembersDrawer.vue`，通过 `open(userGroup)` 传入
-`SystemUserGroup`，按其 `workspace_id` 查询成员。支持用户名、姓名搜索和分页，角色使用
+`SystemUserGroup`，按其 `workspace_id` 查询成员。支持姓名、用户名搜索，用户来源表头筛选和分页，角色使用
 `MkTagGroup` 展示；供系统资源授权页面和资源授权抽屉共同复用。
 
 ### RelatedResourcesDrawer
