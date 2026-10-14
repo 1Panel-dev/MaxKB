@@ -17,7 +17,14 @@ from typing import Callable, Optional
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage, AIMessageChunk
+from langchain_core.messages import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage,
+    ToolMessage,
+    AIMessageChunk,
+    get_buffer_string,
+)
 from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
@@ -35,7 +42,9 @@ from application.workflow.nodes.ai_chat_node.tools import (
 )
 from application.workflow.status import Status
 from application.workflow.tools import Reasoning
+from common.config.tokenizer_manage_config import TokenizerManage
 from common.utils.common import guess_image_format
+from common.utils.count_tokens import count_local_tokens
 from common.utils.messages_util import to_ai_message_list, to_human_message_list
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
@@ -388,6 +397,8 @@ class AIChatNode(INode):
     async def _stream_response(
         self, response, chat_model, message_list, question, reasoning_content_id, text_content_id
     ):
+        answer = ""
+        reasoning_content = ""
         try:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
             model_setting = self.get_context("model_setting") or {}
@@ -395,8 +406,6 @@ class AIChatNode(INode):
                 model_setting.get("reasoning_content_start", "<think>"),
                 model_setting.get("reasoning_content_end", "</think>"),
             )
-            answer = ""
-            reasoning_content = ""
             response_reasoning_content = False
 
             async for chunk in response:
@@ -462,9 +471,9 @@ class AIChatNode(INode):
                     )
                 )
 
-            self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
-        # 无论正常结束、抛异常还是被取消中断,都关闭 LLM 流式响应底层连接
+        # 无论正常结束、抛异常还是被取消中断,都落盘已累积内容并关闭 LLM 流式响应底层连接
         finally:
+            self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
             with contextlib.suppress(Exception):
                 await response.aclose()
 
@@ -490,8 +499,12 @@ class AIChatNode(INode):
             self.write(TextContent(text_content_id, content, Status.SUCCESS, node_info, Position(self.get_node_id())))
 
     def _write_final_context(self, chat_model, message_list, question, answer, reasoning_content):
-        message_tokens = chat_model.get_num_tokens_from_messages(message_list)
-        answer_tokens = chat_model.get_num_tokens(answer)
+        # 中断时模型已不可用，只能走本地 tokenizer 计算
+        message_tokens, answer_tokens = (
+            count_local_tokens(message_list, answer)
+            if self.async_runner.cancel_event.is_set()
+            else (chat_model.get_num_tokens_from_messages(message_list), chat_model.get_num_tokens(answer))
+        )
         self.data["message_tokens"] = message_tokens
         self.data["answer_tokens"] = answer_tokens
         self.write_context("answer", answer)

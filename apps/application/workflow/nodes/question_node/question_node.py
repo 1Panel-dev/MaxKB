@@ -19,6 +19,7 @@ from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
+from common.utils.count_tokens import count_local_tokens
 from common.exception.app_exception import AppApiException
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id, get_model_credential
@@ -158,8 +159,8 @@ class QuestionNode(INode):
         )
 
     async def _stream_response(self, response, chat_model, message_list, is_result):
+        answer = ""
         try:
-            answer = ""
             async for chunk in response:
                 self._check_cancelled()
                 answer += chunk.content
@@ -170,15 +171,21 @@ class QuestionNode(INode):
                             self.get_node_id(), chunk.content, Status.SUCCESS, node_info, Position(self.get_node_id())
                         )
                     )
-
-            message_tokens = chat_model.get_num_tokens_from_messages(message_list)
-            answer_tokens = chat_model.get_num_tokens(answer)
-            self.write_context("message_tokens", message_tokens)
-            self.write_context("answer_tokens", answer_tokens)
-            self.write_context("answer", answer)
+        # 无论正常结束、抛异常还是被取消中断,都落盘已累积内容并关闭 LLM 流式响应底层连接
         finally:
+            self._write_final_context(chat_model, message_list, answer)
             with contextlib.suppress(Exception):
                 await response.aclose()
+
+    def _write_final_context(self, chat_model, message_list, answer):
+        message_tokens, answer_tokens = (
+            count_local_tokens(message_list, answer)
+            if self.async_runner.cancel_event.is_set()
+            else (chat_model.get_num_tokens_from_messages(message_list), chat_model.get_num_tokens(answer))
+        )
+        self.write_context("message_tokens", message_tokens)
+        self.write_context("answer_tokens", answer_tokens)
+        self.write_context("answer", answer)
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
