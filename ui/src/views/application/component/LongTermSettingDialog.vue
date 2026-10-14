@@ -19,11 +19,7 @@
         v-if="modelSettingEnable"
         :label="$t('views.application.form.aiModel.label')"
         prop="long_term_model_id"
-        :rules="{
-          message: $t('dynamicsForm.ModelConstructor.modelPlaceholder'),
-          trigger: 'blur',
-          required: true,
-        }"
+        :rules="modelIdRules"
       >
         <div class="w-full">
           <el-radio-group
