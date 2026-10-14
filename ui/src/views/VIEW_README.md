@@ -659,6 +659,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 `model/create-model/ButtonAddModel.vue` 和 `CreateModelDrawer.vue` 通过必填的 `api` 接收完整
 模型 API 对象。Workspace 模型页传入 `ModelApi`，System 共享模型页传入 `SystemSharedModelApi`；
+`SelectModel` 在 System 资源管理范围传入 `SystemModelApi`，复用同一创建流程。
 创建抽屉只调用传入的 API，不再自行判断资源范围。
 `ButtonAddModel` 默认渲染主按钮，也支持通过默认作用域插槽的 `open()` 定制触发按钮，
 `SelectModel` 的下拉页脚使用该插槽复用同一创建流程。创建成功后保留基础资料刷新，再触发
@@ -745,7 +746,7 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 对话用户已实现按用户组查询及授权，接口与交互规则见“智能体与知识库对话用户”章节。
 容器通过 `knowledge-detail/context.ts` 装配资源范围、知识库 ID、设置所需的完整业务 API 对象和返回列表路由，
 并提供只读详情与替换能力。详情入口、setting 与 library 的 API 选择集中在该上下文。
-Action、Drawer、Dialog 继续通过 props 接收完整 API。设置页复用已加载详情，保存成功后
+Action、Drawer、Dialog 可通过 props 接收完整 API；关联文档抽屉直接读取详情上下文中的 Document API。设置页复用已加载详情，保存成功后
 更新容器数据，同步名称等展示。基本信息复用创建流程的 `KnowledgeBaseForm`，类型配置和校验留在
 `setting/base/index.vue` 中，通用知识库标题为“设置”，其他类型为“基础设置”。
 通用知识库只有单个设置菜单；Web 的设置分组包含基础设置、文档处理策略、定时同步，
@@ -836,17 +837,17 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 标签操作集中在 `document/action-dropdown/setting-tags/`。`DocumentTagsDrawer.vue` 管理单篇文档的标签关联，
 由 `DocumentTagsAction` 按需挂载、关闭后卸载；仅提供添加、搜索、单值删除及批量删除，不提供编辑和分页。
 抽屉每次打开都查询最新关联；增删后立即刷新自身列表，Action 记录成功变更，关闭后再通过 `refresh` 通知文档页刷新。
-查询使用 `DocumentApi.getDocumentTags`，搜索使用单一 `MkSearchInput`，通过 `change` 将关键词作为 `name` 请求接口，清空时省略该参数；
+查询使用 `TagsApi.getDocumentTags`，搜索使用单一 `MkSearchInput`，通过 `change` 将关键词作为 `name` 请求接口，清空时省略该参数；
 查询前清除勾选，直接展示接口返回的分组，不再本地过滤。选择列和标签名单元格合并；
 通过 `MkTable selection-group-key="key"` 联动组内标签值，已选数量按标签值行数统计；标签值列复用 `border-l!` 展示与合并标签列之间的分隔线。
 单项及批量删除均直接调用 `putDeleteDocumentTags`，不弹二次确认；仅移除当前文档关联，不调用知识库标签删除接口。
-`AddTagDialog.vue` 为标签列、抽屉与批量操作栏共用的下拉式添加弹窗，接收完整 Document API 和知识库 ID。
+`AddTagDialog.vue` 为标签列、抽屉与批量操作栏共用的下拉式添加弹窗，接收完整 Tags API 和知识库 ID。
 三个入口分别由 `DocumentTags`、`DocumentTagsDrawer`、`BatchDocumentTagsAction` 管理弹窗实例，不通过页面 Ref 打开。
 候选项使用 `tagsApi.getKnowledgeTags`，按返回顺序截取前 100 个标签组，然后由 `el-select filterable` 本地搜索；
 右侧显示所选组的全部标签值，切换标签名清空本行标签值，不增加远程搜索或自动扩展候选范围。
 单篇与批量均允许选择已关联标签值和重复选择，不为禁选查询文档已有标签，也不区分 `batch` 模式。
 表单复用 `MkFormList`，至少一行，字段只做必填校验；提交前检查标签值归属，失效时用 `MsgError` 提示“请重新选择标签值”并保留选择。
-通过 `postAddDocumentTags` 提交所选 ID，由后台去重并追加关联。
+通过 `postBatchAddDocumentTags` 提交所选 ID，由后台去重并追加关联。
 下拉 footer 复用模型选择器的创建入口，直接打开输入式 `tags/components/CreateTagDialog.vue`；
 标签名入口调用 `open()`；标签值下拉始终可展开，未选标签时点击“创建标签值”也调用 `open()` 创建标签，
 已选标签时调用 `open(key)` 新增标签值，不合并两类弹窗的模式。
@@ -926,6 +927,8 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 批量按钮 `BatchMigrateParagraphAction`、单项菜单 `MigrateParagraphAction` 和 `ParagraphMigrateDialog`，沿用 chat-log 添加知识库的知识库／文档
 选择样式，保留知识库和文档图标；迁移 API 由分段页传入完整 Paragraph API 对象。
 打开时固定所选分段 ID，选择知识库后查询全部文档并排除当前文档，允许迁移至同知识库其他文档。
+目标知识库和文档查询在 `ParagraphMigrateDialog` 内按 Workspace、System 资源管理、System 共享资源
+选择各自完整 Knowledge、Document API，不接收外部查询 API；迁移提交继续使用页面传入的 Paragraph API。
 知识库和文档必选，成功关闭动画结束后通过 `success(paragraphIds)` 返回本次迁移的固定 ID，
 页面局部移除对应分段、扣减总数并移除对应勾选，不重载列表；失败保留表单。
 `document-detail/action-dropdown/generate-questions/` 维护批量按钮 `BatchGenerateQuestionsAction`
@@ -1012,7 +1015,7 @@ library 通过 `useKnowledgeDetailContext` 装配现有文档、标签 API；Sys
 批量底栏按实际选中标签值行数／当前页标签值总行数统计，不按标签组计数。
 删除提交全部选中标签值 ID，批量确认数量与底栏已选行数一致；标签、标签值及批量删除统一提示关联资源上的标签也会删除。
 标签名旁提供新增值、编辑标签、删除标签；行末提供编辑值和删除值，
-数量链接打开同目录 `TagDocumentDrawer.vue`。
+数量链接打开同目录 `AssociatedDocumentDrawer.vue`。
 
 `library/tags/components/CreateTagDialog.vue` 为顶部创建和标签旁新增值共用的创建弹窗，
 接收知识库 ID 与完整 Tags API，参考添加成员流程复用 `MkDialog`、`el-form` 和 `MkFormList`。
@@ -1038,7 +1041,8 @@ library 通过 `useKnowledgeDetailContext` 装配现有文档、标签 API；Sys
 通过单个 `file` 字段提交原始文件；模板下载调用 `exportKnowledgeTagTemplate`，复用请求层文件下载。
 模板第一行为“标签、标签值”，每行填写一个组合；后端校验整份文件并跳过重复组合，错误包含工作表及行号。
 
-`TagDocumentDrawer.vue` 接收知识库 ID 与完整 Document API，通过 `open(tag)` 固定当前标签，
+`AssociatedDocumentDrawer.vue` 接收知识库 ID 与完整 Tags API，文档查询直接读取
+`useKnowledgeDetailContext().resourceApi.document`，不从标签页传入 Document API；通过 `open(tag)` 固定当前标签，
 以“已关联文档／未关联文档”两页签共用表格，提供搜索、启用状态筛选、分页、单个与批量关联／取消关联；创建时间仅展示，不提供排序入口。
 启用状态复用 `MkTableFilter mode="single"`，支持全部、已启用、已禁用；查询传布尔 `is_active`，全部时省略。
 名称或状态筛选后回到第一页并清空选择，切换页签时重置筛选条件。
@@ -1369,7 +1373,7 @@ Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `bod
 共享详情已补齐与其他三种范围一致的菜单，设置与工作流接口接入暂缓。
 容器监听工作空间、知识库和资源范围变化重新加载；共享详情返回列表携带 `folderId: 'shared'`，
 普通详情继续恢复所属文件夹。文档创建者选项在共享范围使用 System `CommonApi`，普通范围使用
-Workspace `CommonApi`；范围变化同时清空搜索控件、筛选、创建者选项与分页。
+Workspace `CommonApi`；文档页通过 `onMounted` 首次加载，不监听路由参数或资源范围重置状态。
 
 ## 知识库外部检索服务
 
@@ -1496,17 +1500,18 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 `resourceApi.sync`。Workspace 共享只查询设置和日志，表单只读且不显示保存。
 上下文保留各范围完整 API 的真实方法集合；只读范围未提供的写方法不补造，
 调用处进行类型收窄，不将只读 API 当作可写 API。
-上下文按响应式 `resourceScope` 选择各范围现有完整 Knowledge、Sync API 对象，
-统一通过响应式 `resourceApi.knowledge / sync` 提供接口，脚本调用不需要 `.value`；
+上下文内部按响应式资源范围选择各范围现有完整 Knowledge、Sync、Document、Tags API 对象，
+不对外暴露 `resourceScope`；消费方通过 `utils/resource-context.ts` 的现有方法读取和判断资源范围。
+统一通过响应式 `resourceApi.knowledge / sync / document / tags` 提供接口，脚本调用不需要 `.value`；
 详情查询与保存使用同一个完整 Knowledge API 对象，不存在的设置模块保持 undefined。
 返回列表路由独立提供；不要在 setup 时解构 `resourceApi` 内的具体 API，以免固定为旧范围的对象。
 不根据 URL 猜测来源，不为补齐方法集合构造请求，不让缺失模块回退 Workspace。
 目前仅详情入口及 setting 下的基础设置、文档策略、定时同步页面采用上下文 API；
 library 下的文档、标签与迁移入口通过 `useKnowledgeDetailContext` 读取现有 API，
-`resourceApi.document / tags` 是可选的查询模块；System 两种来源未提供时不发送请求。
+`resourceApi.document / tags` 已装配四套现有 API 对象；Workspace 共享保留原有只读方法集合。
 查询和维护均通过 `resourceApi.document / tags / workflow / knowledge` 的现有完整 API 对象进行；
-维护操作沿用 Workspace 普通范围边界，分别传给已有操作组件；不为共享或 System 补造写接口。共享标签页按现有无查询参数接口读取，
-在本地按标签名称筛选，不展示维护入口；关联文档数量仅作文本展示。
+维护操作分别传给已有操作组件；不为只读范围补造写接口。共享标签页按现有无查询参数接口读取，
+在本地按标签名称筛选；缺失的维护方法通过可选调用跳过，不增加方法存在性显隐判断。
 同步日志通过完整 Sync API props 请求。展示组件不接收上下文 API。
 System 飞书专用保存方法尚未提供，基础设置沿该范围现有 `putKnowledge` 协议；Workspace 飞书保留专用方法。
 
@@ -1516,9 +1521,9 @@ System 飞书专用保存方法尚未提供，基础设置沿该范围现有 `pu
 
 ### 资料库上下文与只读范围
 
-`useKnowledgeDetailContext` 复用详情数据、知识库 ID 和响应式资源范围，文档及标签查询通过
-`resourceApi.document / tags` 访问当前范围完整 API。缺失模块保持 undefined，页面展示未接入空态，
-不轮询或发送 Workspace 请求。文档页切换知识库、工作空间或范围时清空筛选、分页和选择。
+`useKnowledgeDetailContext` 复用详情数据和知识库 ID，文档及标签查询通过
+`resourceApi.document / tags` 访问四套当前范围的完整 API，不回退到 Workspace。
+文档页通过 `onMounted` 首次加载并启动轮询，卸载时停止轮询；不监听知识库、工作空间或资源范围来重置筛选、分页和选择。
 标签页通过 `onMounted` 首次加载，不监听路由参数或资源范围来重置状态；搜索和维护操作后显式刷新。
 Workspace 共享文档保留查询和标签展示，标签页保留标签组查询；只支持共享接口现有的方法。
 创建标签弹窗必须由入口传入完整 Tags API，不再默认使用普通 Workspace；文档标签添加及迁移的
@@ -1526,7 +1531,8 @@ Workspace 共享文档保留查询和标签展示，标签页保留标签组查�
 
 资料库和 Sync 所有消费方统一通过 `resourceApi.xx` 的响应式 getter 访问完整 API，
 不增加查询／维护双入口或模块别名。只读范围和缺失模块保留现有业务边界；
-接口对象联合类型在调用处按真实方法集合收窄，不补造方法或跨范围回退。
+Document、Tags 与 Sync 在上下文类型中保留共有方法为必填，将部分范围缺失的方法标记为可选；
+调用处使用 `?.`，不补造方法或跨范围回退。
 未约定的 API 方法、上下文入口或返回结构必须先与用户商议并确认后再实现。
 
 资料库模板不使用“API 对象存在且包含某方法”的组合判断来控制操作显隐；
@@ -1535,3 +1541,29 @@ Workspace 共享文档保留查询和标签展示，标签页保留标签组查�
 知识库详情上下文仅保留两个公开入口：父页面通过 `provideKnowledgeDetailContext` 提供，
 子页面、弹窗和 Action 通过 `useKnowledgeDetailContext` 获取同一对象。接口统一为 `resourceApi.xx`，
 不增加设置、导航、资料库或同步专属 Context hook，也不增加查询／维护接口别名。
+
+`useKnowledgeDetailContext()` 的无参数用法保持不变。仅支持部分资源范围的消费方可声明
+`useKnowledgeDetailContext({ resourceScopes: [...] })`，API 类型从对应范围现有完整对象推导，
+不新增 Context hook 或补造方法。转换页声明 Workspace 普通、System 资源管理、System 共享三种范围；
+共享只读范围由上下文统一提示并返回该来源的文档页，保留知识库类型、query 和 hash。
+范围变化后再次校验；不支持的范围不能通过类型收窄后的入口发送请求。
+
+基础设置和文档处理策略页同样通过 `resourceScopes` 声明现有可管理的三个范围，
+不在页面探测 Knowledge API 是否存在保存方法。飞书专用保存按 Workspace 来源选择，System 沿用通用保存。
+定时同步仍支持共享只读查询，保存保留原有共享只读范围边界，不探测保存方法是否存在。
+
+Sync 的上下文类型保留共有查询方法为必填，只有部分范围提供的保存方法标记为可选，
+调用使用 `resourceApi.sync.putKnowledgeSyncSetting?.(...)`。此处理仅作用于类型，
+运行时仍使用各范围现有完整 API 对象；共享范围不存在的保存方法保持 undefined，不发请求、不显示保存成功。
+
+Tags 沿用 Sync 的可选方法类型规则，四套完整 API 对象由上下文按范围选择。
+`getKnowledgeTags` 为共有方法；创建、编辑、删除、导入、模板下载及文档标签关联按实际方法集合可选调用。
+缺失方法不触发成功提示或刷新，loading 清理覆盖未发出请求的情况。标签操作组件的 API props 类型
+从 `useKnowledgeDetailContext` 的 `resourceApi.tags` 推导，不固定为 Workspace 可写类型。
+
+Document 沿用 Sync、Tags 的可选方法类型规则；四套 API 保持实际对象与方法集合，
+`getDocumentPage` 为共有必填方法，其余仅部分范围提供的方法通过 `?.` 调用。
+文档 Action、上传和导入组件的完整 API props 类型从 `useKnowledgeDetailContext` 的
+`resourceApi.document` 推导，不固定为 Workspace 可写类型，不增加方法存在性判断或接口别名。
+缺失方法不触发成功提示、关闭弹窗、刷新或修改列表，loading 正常清理；名称编辑未发请求时返回原名称。
+工作流文档导入读取已有 `resourceApi.workflow`，缺失模块不回退 Workspace。

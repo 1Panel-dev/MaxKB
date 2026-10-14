@@ -146,7 +146,10 @@ System 资源管理合并普通与共享模型，System 共享范围仅返回标
 `system-resource` 与 `system-shared` 独立提供系统模型、供应商、参数表单、工具选项与详情、MCP 和标签查询，
 不继承 Workspace 适配器，不要求路由工作空间。System MCP 查询要求部署提供对应
 `/system/resource/<resourceType>/<id>/mcp_tools` 或 `/system/shared/<resourceType>/<id>/mcp_tools` 扩展接口，尚未完成运行验证。
-`workspace-shared` 仍为空占位。共享业务选择弹窗（知识库、智能体及 AI 对话内工具选择）仍保留原有 Workspace 接入，尚未适配完整系统范围。
+`workspace-shared` 仍为空占位。知识库及工具选择弹窗按 Workspace、System 资源管理、System 共享资源
+调用对应 API；智能体选择支持 Workspace 和 System 资源管理，System 共享入口不提供智能体选择。
+选择弹窗不增加 Workspace 共享页面来源分支、不调用 Workspace Shared API；仅普通工作空间显示
+文件夹，且不显示共享目录，其他范围不显示或查询文件夹。
 节点资源查询可调用此适配器或既有业务 API；工作流加载、保存与发布仍由 View 编排，核心层不承载请求。
 
 ### 表格文本省略
@@ -316,6 +319,7 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 AI 对话节点的 `component/resource-setting` 仅渲染技能卡片内的 MCP、工具、Skills 和智能体分组，
 各分组直接在入口使用 `MkCollapse`，不再拆分普通列表子组件，仅选择弹窗独立封装。
 工具和 Skills 的添加入口复用 `SelectToolDialog`，智能体入口使用 `SelectApplicationDialog`；
+System 共享资源不展示智能体分组，也不挂载智能体选择弹窗。
 Skills 仅查询 SKILL 类型，选择器排除当前路由对应的智能体或工具。确认后同时更新执行用的
 ID 数组及 `tool_list`、`skill_tool_list`、`application_list` 回显快照；移除时同步清理快照，
 取消不更新节点，旧数据缺少快照时继续显示 ID。

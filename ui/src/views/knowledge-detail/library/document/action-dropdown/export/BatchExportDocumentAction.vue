@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 
 defineOptions({ name: 'BatchExportDocumentAction' })
 
-const props = defineProps<{ api: typeof DocumentApi; documentIds: string[]; label: string }>()
+const props = defineProps<{ api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']; documentIds: string[]; label: string }>()
 const route = useRoute()
 const { knowledge } = useKnowledgeDetailContext()
 const loading = defineModel<boolean>('loading', { default: false })
@@ -19,11 +18,12 @@ const exportOptions = [
 // 固定选中文档 ID，批量只选一个文档时仍按批量导出。
 function handleExportDocuments(method: (typeof exportOptions)[number]['method']) {
   loading.value = true
-  return props.api[method](String(route.params.knowledgeId ?? ''), [...props.documentIds], knowledge.value?.name || '文档')
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api[method]?.(String(route.params.knowledgeId ?? ''), [...props.documentIds], knowledge.value?.name || '文档').catch(() => {}) ??
+    Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 </script>
 

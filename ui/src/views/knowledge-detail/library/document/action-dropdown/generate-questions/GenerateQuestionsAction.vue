@@ -2,14 +2,14 @@
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { DOCUMENT_TASK_TYPE } from '@/api/enums'
 import type { DocumentItem, DocumentTaskState, RelatedQuestionsConfig } from '@/api/types'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import GenerateQuestionsDialog from '@/components/business/generate-questions/GenerateQuestionsDialog.vue'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import GenerateQuestionsDialog from '@/components/business/generate-questions/index.vue'
 import { MsgSuccess } from '@/utils/message'
 import { isDocumentTaskRunning } from '../../status'
 
 defineOptions({ name: 'GenerateQuestionsAction' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
   document: DocumentItem
   display?: 'menu' | 'button'
@@ -39,37 +39,39 @@ function handleOpenDialog() {
 function handleCancelQuestions() {
   if (props.disabled || loading.value) return
   loading.value = true
-  return props.api
-    .putCancelTask(props.knowledgeId, props.document.id, DOCUMENT_TASK_TYPE.GENERATE_PROBLEM)
-    .then(() => {
-      MsgSuccess('操作成功')
-      emit('refresh')
-    })
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putCancelTask?.(props.knowledgeId, props.document.id, DOCUMENT_TASK_TYPE.GENERATE_PROBLEM)
+      .then(() => {
+        MsgSuccess('操作成功')
+        emit('refresh')
+      })
+      .catch(() => {}) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 /* Action 负责提交和成功后的页面刷新，失败保留配置。 */
 function handleSubmit(config: RelatedQuestionsConfig, stateList: DocumentTaskState[]) {
   if (props.disabled || loading.value) return
   loading.value = true
-  return props.api
-    .putGenerateDocumentQuestions(targetKnowledgeId.value, {
-      ...config,
-      document_id_list: [targetDocumentId.value],
-      state_list: stateList,
-    })
-    .then(() => {
-      MsgSuccess('操作成功')
-      dialogRef.value?.close()
-      emit('refresh')
-    })
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putGenerateDocumentQuestions?.(targetKnowledgeId.value, {
+        ...config,
+        document_id_list: [targetDocumentId.value],
+        state_list: stateList,
+      })
+      .then(() => {
+        MsgSuccess('操作成功')
+        dialogRef.value?.close()
+        emit('refresh')
+      })
+      .catch(() => {}) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 function handleClosed() {

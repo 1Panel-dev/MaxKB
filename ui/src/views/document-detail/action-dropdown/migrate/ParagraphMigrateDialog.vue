@@ -4,6 +4,11 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
+import SystemKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import SystemDocumentApi from '@/api/admin/system/resource-management/knowledge/document'
+import SystemSharedDocumentApi from '@/api/admin/system/shared-resources/knowledge/document'
+import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import type { DocumentItem, KnowledgeItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
@@ -39,7 +44,9 @@ function open(paragraphIds: string[]) {
   targetParagraphIds.value = [...paragraphIds]
   visible.value = true
   knowledgeLoading.value = true
-  return KnowledgeApi.getAllKnowledge()
+  const requestApi = isSystemResource() ? SystemKnowledgeApi : isSystemSharedResource() ? SystemSharedKnowledgeApi : KnowledgeApi
+  return requestApi
+    .getAllKnowledge()
     .then((knowledge) => {
       knowledgeOptions.value = knowledge
     })
@@ -57,7 +64,9 @@ function handleKnowledgeChange(knowledgeId: string) {
   formRef.value?.clearValidate('document_id')
   if (!knowledgeId) return
   documentLoading.value = true
-  return DocumentApi.getAllDocuments(knowledgeId)
+  const requestApi = isSystemResource() ? SystemDocumentApi : isSystemSharedResource() ? SystemSharedDocumentApi : DocumentApi
+  return requestApi
+    .getAllDocuments(knowledgeId)
     .then((documents) => {
       documentOptions.value = documents.filter(({ id }) => id !== props.documentId)
     })

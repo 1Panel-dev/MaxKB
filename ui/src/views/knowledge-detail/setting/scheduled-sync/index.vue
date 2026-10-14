@@ -8,6 +8,7 @@ import { SCHEDULE_OPTION } from '@/constants/schedule'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
+import { getResourceScope, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '../../context'
 import SyncLogTable from './components/SyncLogTable.vue'
 
@@ -16,7 +17,7 @@ defineOptions({ name: 'KnowledgeScheduledSyncView' })
 defineProps<ResourceDetailPageProps>()
 
 // 回填后台配置，草稿与详情中的配置独立。
-const { knowledge, replaceKnowledgeDetail, resourceApi, resourceScope } = useKnowledgeDetailContext()
+const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 const activeTab = ref('settings')
 const loading = ref(false)
 const saving = ref(false)
@@ -106,8 +107,6 @@ const rules: FormRules<SyncSettingDraft> = {
 }
 
 function handleSave() {
-  const requestApi = resourceApi.sync
-  if (resourceScope.value === 'workspace-shared' || !('putKnowledgeSyncSetting' in requestApi)) return
   const detail = knowledge.value
   const form = formRef.value
   if (saving.value || loading.value || !settingLoaded.value || !detail || !form) return
@@ -117,7 +116,7 @@ function handleSave() {
     .then(() => {
       if (!syncSetting.value.schedule_type) return
       const setting: KnowledgeSyncSetting = { ...cloneDeep(syncSetting.value), schedule_type: syncSetting.value.schedule_type }
-      return requestApi.putKnowledgeSyncSetting(detail.id, setting).then((savedSetting) => {
+      return resourceApi.sync.putKnowledgeSyncSetting?.(detail.id, setting).then((savedSetting) => {
         syncSetting.value = cloneDeep(savedSetting)
         replaceKnowledgeDetail({ ...detail, meta: { ...detail.meta, sync_setting: savedSetting } })
         MsgSuccess('保存成功')
@@ -146,7 +145,7 @@ function loadSyncSetting(knowledgeId: string) {
 }
 
 watch(
-  [() => knowledge.value?.id, resourceScope],
+  [() => knowledge.value?.id, getResourceScope],
   ([knowledgeId]) => {
     activeTab.value = 'settings'
     settingLoaded.value = false
@@ -172,7 +171,7 @@ watch(
         :rules="rules"
         class="max-w-200 pb-6"
         label-position="top"
-        :disabled="resourceScope === 'workspace-shared'"
+        :disabled="isWorkspaceSharedResource()"
         @submit.prevent
       >
         <el-form-item>
@@ -220,14 +219,7 @@ watch(
           </el-form-item>
         </div>
         <!-- 保存定时同步设置 -->
-        <el-button
-          v-if="resourceScope !== 'workspace-shared'"
-          type="primary"
-          class="mt-4"
-          :loading="saving"
-          :disabled="!settingLoaded"
-          @click="handleSave"
-        >
+        <el-button v-if="!isWorkspaceSharedResource()" type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">
           保存
         </el-button>
       </el-form>

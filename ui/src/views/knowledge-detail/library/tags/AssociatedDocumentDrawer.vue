@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { Dict, DocumentItem, KnowledgeTagUpdatePayload } from '@/api/types'
 import { getFileIconUrl } from '@/utils/icon'
 import { datetimeFormat } from '@/utils/time'
@@ -9,8 +9,9 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'TagDocumentDrawer' })
 
-const props = defineProps<{ knowledgeId: string; api: typeof DocumentApi }>()
+const props = defineProps<{ knowledgeId: string; tagsApi: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags'] }>()
 const emit = defineEmits<{ refresh: [] }>()
+const { resourceApi } = useKnowledgeDetailContext()
 
 const visible = ref(false)
 const loading = ref(false)
@@ -40,7 +41,7 @@ function loadDocuments(): Promise<void> {
     ...(activeTab.value === 'unlinked' ? { tag_exclude: true } : {}),
     ...(searchName.value.trim() ? { name: searchName.value.trim() } : {}),
   }
-  return props.api
+  return resourceApi.document
     .getDocumentPage(props.knowledgeId, paginationConfig.value, query)
     .then((page) => {
       const lastPage = Math.max(1, Math.ceil(page.total / paginationConfig.value.pageSize))
@@ -101,17 +102,17 @@ function handleLinkDocuments(documentIds: string[]) {
   const unlink = activeTab.value === 'linked'
   loading.value = true
   const request = unlink
-    ? props.api.putUnlinkTagDocuments(props.knowledgeId, currentTag.value.id, documentIds)
-    : props.api.postAddDocumentTags(props.knowledgeId, documentIds, [currentTag.value.id])
-  return request
-    .then(() => {
+    ? props.tagsApi.putUnlinkTagDocuments?.(props.knowledgeId, currentTag.value.id, documentIds)
+    : props.tagsApi.postBatchAddDocumentTags?.(props.knowledgeId, documentIds, [currentTag.value.id])
+  return (
+    request?.then(() => {
       MsgSuccess(unlink ? '取消关联成功' : '关联成功')
       emit('refresh')
       return loadDocuments()
-    })
-    .finally(() => {
-      loading.value = false
-    })
+    }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 function handleBatchLinkDocuments() {

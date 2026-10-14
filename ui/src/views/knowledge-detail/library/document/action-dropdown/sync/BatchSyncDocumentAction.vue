@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchSyncDocumentAction' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   label: string
   knowledgeId: string
   documentIds: string[]
@@ -30,15 +30,15 @@ function handleSync() {
     .then(() => {
       if (loading.value) return
       loading.value = true
-      const request = isLark ? props.api.putMulLarkSyncDocument(knowledgeId, documentIds) : props.api.putMulSyncDocument(knowledgeId, documentIds)
-      return request
-        .then(() => {
+      const request = isLark ? props.api.putMulLarkSyncDocument?.(knowledgeId, documentIds) : props.api.putMulSyncDocument?.(knowledgeId, documentIds)
+      return (
+        request?.then(() => {
           MsgSuccess('操作成功')
           emit('refresh')
-        })
-        .finally(() => {
-          loading.value = false
-        })
+        }) ?? Promise.resolve()
+      ).finally(() => {
+        loading.value = false
+      })
     })
     .catch(() => {})
 }

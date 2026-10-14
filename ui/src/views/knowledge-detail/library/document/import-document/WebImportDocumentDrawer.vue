@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'WebImportDocumentDrawer' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string }>()
+const props = defineProps<{ api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']; knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
 /* Web 地址与处理策略 */
@@ -51,7 +51,7 @@ function handleSubmit() {
     .then((valid) => {
       if (!valid || !strategyRef.value) return
       return props.api
-        .postWebDocument(props.knowledgeId, {
+        .postWebDocument?.(props.knowledgeId, {
           source_url_list: sourceUrls.value,
           selector: form.value.selector.trim() || 'body',
           doc_strategy: strategyRef.value.getStrategy(),

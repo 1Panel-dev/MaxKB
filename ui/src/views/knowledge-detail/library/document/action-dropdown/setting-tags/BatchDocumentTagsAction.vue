@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import AddTagDialog from './AddTagDialog.vue'
 
 defineOptions({ name: 'BatchDocumentTagsAction' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']
   knowledgeId: string
   documentIds: string[]
   label: string

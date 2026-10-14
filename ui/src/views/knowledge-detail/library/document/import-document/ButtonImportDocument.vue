@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type LogicFlow from '@logicflow/core'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import WebImportDocumentDrawer from './WebImportDocumentDrawer.vue'
@@ -9,7 +9,7 @@ import WorkflowImportDocumentDrawer from './WorkflowImportDocumentDrawer.vue'
 
 defineOptions({ name: 'ButtonImportDocument' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
   knowledgeType: string
   folderToken?: string

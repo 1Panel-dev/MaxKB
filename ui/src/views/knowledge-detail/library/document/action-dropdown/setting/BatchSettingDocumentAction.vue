@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type { DocumentSettingPayload } from '@/api/types'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { MsgSuccess } from '@/utils/message'
 import DocumentSettingDialog from './DocumentSettingDialog.vue'
 
 defineOptions({ name: 'BatchSettingDocumentAction' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documentIds: string[]; label: string; disabled?: boolean }>()
+const props = defineProps<{
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
+  knowledgeId: string
+  documentIds: string[]
+  label: string
+  disabled?: boolean
+}>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -28,19 +34,20 @@ function handleOpenDialog() {
 function handleSubmit(data: DocumentSettingPayload) {
   if (loading.value) return
   loading.value = true
-  return props.api
-    .putBatchDocumentSetting(targetKnowledgeId.value, targetDocumentIds.value, data)
-    .then(() => {
-      MsgSuccess('设置成功')
-      settingDialogRef.value?.close()
-      emit('refresh')
-    })
-    .catch(() => {
-      // 请求层统一提示错误，保留当前输入。
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putBatchDocumentSetting?.(targetKnowledgeId.value, targetDocumentIds.value, data)
+      .then(() => {
+        MsgSuccess('设置成功')
+        settingDialogRef.value?.close()
+        emit('refresh')
+      })
+      .catch(() => {
+        // 请求层统一提示错误，保留当前输入。
+      }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 function handleDialogClosed() {

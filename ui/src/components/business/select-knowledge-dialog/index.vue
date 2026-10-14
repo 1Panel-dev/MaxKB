@@ -2,11 +2,13 @@
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
+import SystemKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type { FolderItem, KnowledgeItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
+import { FOLDER_ENTRIES } from '@/constants/folder'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 import KnowledgeCard from '@/views/knowledge/knowledge-card/KnowledgeCard.vue'
@@ -23,6 +25,8 @@ const knowledgeOptions = ref<KnowledgeItem[]>([])
 const selectedKnowledge = ref<(Partial<KnowledgeItem> & { id: string })[]>([])
 const knowledgeLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('knowledgeLayoutRef')
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
+
+const isWorkspaceScope = computed(() => isWorkspaceResource())
 
 // 与 v2 一致，以首个已选知识库的 Embedding 模型筛选可选资源。
 const selectedKnowledgeIds = computed(() => selectedKnowledge.value.map(({ id }) => id))
@@ -44,11 +48,10 @@ function refreshKnowledge() {
   loading.value = true
   knowledgeOptions.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
-  const shared = currentFolder.value.id === FOLDER_ENTRY_ID.SHARED
-  const requestApi = shared ? SharedKnowledgeApi : KnowledgeApi
+  const requestApi = isSystemResource() ? SystemKnowledgeApi : isSystemSharedResource() ? SystemSharedKnowledgeApi : KnowledgeApi
   return requestApi
     .getAllKnowledge({
-      ...(shared ? {} : { folder_id: currentFolder.value.id }),
+      ...(isWorkspaceScope.value ? { folder_id: currentFolder.value.id } : {}),
       ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
     })
     .then((knowledge) => {
@@ -115,11 +118,12 @@ defineExpose({ open })
     </template>
 
     <MkViewLayout ref="knowledgeLayoutRef" :loading="loading" title="">
-      <template #aside>
+      <template v-if="isWorkspaceScope" #aside>
         <FolderTree
           ref="folderTreeRef"
           class="pt-4"
           :can-edit="false"
+          :show-shared="false"
           :source="RESOURCE_TYPE.KNOWLEDGE"
           @loaded="selectFolder"
           @select="selectFolder"

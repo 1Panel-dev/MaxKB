@@ -29,6 +29,11 @@ const putKnowledge = (knowledgeId: string, payload: Partial<KnowledgeItem>) => {
   return put<Partial<KnowledgeItem>, KnowledgeItem>(`${prefix}/${knowledgeId}`, payload)
 }
 
+/** 更新飞书知识库信息。 */
+const putLarkKnowledge = (knowledgeId: string, payload: Partial<KnowledgeItem>) => {
+  return put<Partial<KnowledgeItem>, KnowledgeItem>(`${prefix}/lark/${knowledgeId}`, payload)
+}
+
 /** 根据知识库中的分段生成关联问题。 */
 const putGenerateKnowledgeQuestions = (knowledgeId: string, payload: KnowledgeGeneratePayload) => {
   return put(`${prefix}/${knowledgeId}/generate_related`, payload)
@@ -83,6 +88,7 @@ export default {
   getKnowledgeDetail,
   getKnowledgePage,
   putKnowledge,
+  putLarkKnowledge,
   putReEmbeddingKnowledge,
   putGenerateKnowledgeQuestions,
   getKnowledgeMcpConfig,

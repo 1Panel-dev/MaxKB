@@ -1,14 +1,20 @@
 /** 知识库详情的资源范围、API 装配与详情数据共享。 */
-import { computed, inject, provide, reactive, type ComputedRef, type InjectionKey } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, inject, provide, reactive, watch, type ComputedRef, type InjectionKey } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { MsgWarning } from '@/utils/message'
+import { getResourceScope, isWorkspaceResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
 import SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
+import SystemResourceDocumentApi from '@/api/admin/system/resource-management/knowledge/document'
+import SystemSharedDocumentApi from '@/api/admin/system/shared-resources/knowledge/document'
 import TagsApi from '@/api/admin/workspace/knowledge/tags'
 import SharedTagsApi from '@/api/admin/workspace/shared/knowledge/tags'
+import SystemResourceTagsApi from '@/api/admin/system/resource-management/knowledge/tags'
+import SystemSharedTagsApi from '@/api/admin/system/shared-resources/knowledge/tags'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import SyncApi from '@/api/admin/workspace/knowledge/sync'
 import SharedSyncApi from '@/api/admin/workspace/shared/knowledge/sync'
@@ -17,12 +23,20 @@ import SystemSharedSyncApi from '@/api/admin/system/shared-resources/knowledge/s
 import type { KnowledgeDetail } from '@/api/types'
 import type { ResourceScope } from '@/router/admin/types'
 
+/** 共有方法保持必填，仅部分范围提供的方法按真实缺失情况标记为可选。 */
+type ApiKeys<Api> = Api extends unknown ? keyof Api : never
+type OptionalApiMethods<Api> = Pick<Api, keyof Api> & {
+  [Method in Exclude<ApiKeys<Api>, keyof Api>]?: Api extends unknown ? (Method extends keyof Api ? Api[Method] : never) : never
+}
+
 interface KnowledgeResourceApi {
   readonly workflow?: typeof WorkflowApi
-  readonly document?: typeof DocumentApi | typeof SharedDocumentApi
-  readonly tags?: typeof TagsApi | typeof SharedTagsApi
+  readonly document: OptionalApiMethods<
+    typeof DocumentApi | typeof SharedDocumentApi | typeof SystemResourceDocumentApi | typeof SystemSharedDocumentApi
+  >
+  readonly tags: OptionalApiMethods<typeof TagsApi | typeof SharedTagsApi | typeof SystemResourceTagsApi | typeof SystemSharedTagsApi>
   readonly knowledge: typeof KnowledgeApi | typeof SharedKnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi
-  readonly sync: typeof SyncApi | typeof SharedSyncApi | typeof SystemResourceSyncApi | typeof SystemSharedSyncApi
+  readonly sync: OptionalApiMethods<typeof SyncApi | typeof SharedSyncApi | typeof SystemResourceSyncApi | typeof SystemSharedSyncApi>
 }
 
 interface KnowledgeResourceConfig {
@@ -41,11 +55,16 @@ const resourceConfigs = {
     listRouteName: 'workspace-knowledge-list',
   },
   'system-resource': {
-    resourceApi: { knowledge: SystemResourceKnowledgeApi, sync: SystemResourceSyncApi },
+    resourceApi: {
+      knowledge: SystemResourceKnowledgeApi,
+      sync: SystemResourceSyncApi,
+      document: SystemResourceDocumentApi,
+      tags: SystemResourceTagsApi,
+    },
     listRouteName: 'system-resource-knowledge',
   },
   'system-shared': {
-    resourceApi: { knowledge: SystemSharedKnowledgeApi, sync: SystemSharedSyncApi },
+    resourceApi: { knowledge: SystemSharedKnowledgeApi, sync: SystemSharedSyncApi, document: SystemSharedDocumentApi, tags: SystemSharedTagsApi },
     listRouteName: 'system-shared-knowledge',
   },
 } satisfies Record<ResourceScope, KnowledgeResourceConfig>
@@ -57,7 +76,6 @@ interface KnowledgeDetailState {
 
 interface KnowledgeDetailContext extends KnowledgeDetailState {
   knowledgeId: ComputedRef<string>
-  resourceScope: ComputedRef<ResourceScope | undefined>
   resourceApi: KnowledgeResourceApi
   listRouteName: ComputedRef<string>
   routeNames: ComputedRef<{ detail: string; document: string; paragraph: string; workflowEntry: string; workflow: string }>
@@ -99,21 +117,18 @@ function createKnowledgeDetailContext(state: KnowledgeDetailState): KnowledgeDet
       document: `${prefix}-document-list`,
       paragraph: `${prefix}-paragraph`,
       workflowEntry: `${prefix}-workflow`,
-      workflow: scope === 'workspace' ? 'workflow-knowledge' : `${scope}-workflow-knowledge`,
+      workflow: isWorkspaceResource() ? 'workflow-knowledge' : `${scope}-workflow-knowledge`,
     }
   })
   const routeParams = computed(() => {
     const knowledgeId = String(route.params.knowledgeId ?? '')
-    return resourceScope.value === 'workspace' || resourceScope.value === 'workspace-shared'
-      ? { workspaceId: route.params.workspaceId, knowledgeId }
-      : { knowledgeId }
+    return isWorkspaceResource() || isWorkspaceSharedResource() ? { workspaceId: route.params.workspaceId, knowledgeId } : { knowledgeId }
   })
   return {
     ...state,
     routeNames,
     routeParams,
     knowledgeId: computed(() => String(route.params.knowledgeId ?? '')),
-    resourceScope,
     resourceApi,
     listRouteName: computed(() => resourceConfig.value.listRouteName),
   }
@@ -127,8 +142,58 @@ export function provideKnowledgeDetailContext(state: KnowledgeDetailState) {
   return context
 }
 
-export function useKnowledgeDetailContext() {
+/** 根据消费方声明的范围，从现有完整 API 对象推导类型，不补造方法。 */
+type ScopedResourceApi<Scope extends ResourceScope> = {
+  readonly [Module in keyof KnowledgeResourceApi]: Scope extends ResourceScope
+    ? Module extends keyof (typeof resourceConfigs)[Scope]['resourceApi']
+      ? (typeof resourceConfigs)[Scope]['resourceApi'][Module]
+      : undefined
+    : never
+}
+
+type ScopedKnowledgeDetailContext<Scope extends ResourceScope> = Omit<KnowledgeDetailContext, 'resourceApi'> & {
+  resourceApi: Omit<ScopedResourceApi<Scope>, 'sync' | 'tags' | 'document'> & {
+    readonly sync: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['sync']>
+    readonly tags: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['tags']>
+    readonly document: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['document']>
+  }
+}
+
+export function useKnowledgeDetailContext<const Scope extends ResourceScope = ResourceScope>(options?: {
+  resourceScopes: readonly Scope[]
+}): ScopedKnowledgeDetailContext<Scope> {
   const context = inject(knowledgeDetailContextKey)
   if (!context) throw new Error('Knowledge detail context is unavailable')
-  return context
+  if (!options) return context as ScopedKnowledgeDetailContext<Scope>
+  const resourceScopes: readonly ResourceScope[] = options.resourceScopes
+
+  const router = useRouter()
+  const route = useRoute()
+  // 消费方仅声明范围；不支持的来源由上下文提示并返回当前来源的文档页。
+  watch(
+    getResourceScope,
+    (scope) => {
+      if (!scope || resourceScopes.includes(scope)) return
+      MsgWarning('当前资源范围不支持此操作')
+      void router.replace({
+        name: context.routeNames.value.document,
+        params: { ...context.routeParams.value, type: route.params.type },
+        query: route.query,
+        hash: route.hash,
+      })
+    },
+    { immediate: true },
+  )
+
+  // 每次读取仍验证当前范围，防止跳转完成前或切换范围后访问不支持的 API。
+  const resourceApi = new Proxy(context.resourceApi, {
+    get(target, module, receiver) {
+      const scope = getResourceScope()
+      if (!scope || !resourceScopes.includes(scope)) {
+        throw new Error('Knowledge detail resource scope is unsupported for this operation')
+      }
+      return Reflect.get(target, module, receiver)
+    },
+  })
+  return { ...context, resourceApi } as ScopedKnowledgeDetailContext<Scope>
 }

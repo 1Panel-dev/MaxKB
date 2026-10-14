@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type { TableInstance, TreeNode } from 'element-plus'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { LarkDocumentNode } from '@/api/types'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'LarkImportDocumentDrawer' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; folderToken: string }>()
+const props = defineProps<{
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
+  knowledgeId: string
+  folderToken: string
+}>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
 /* 飞书目录与选择：仅展开时加载，文件夹沿用 v2 导入协议。 */
@@ -48,10 +52,12 @@ function loadFolder(token: string): Promise<LarkDocumentRow[]> {
   pendingLoads.value += 1
   const folderDocuments: LarkDocumentRow[] = []
   function loadPage(pageToken?: string): Promise<void> {
-    return props.api.getLarkDocumentList(props.knowledgeId, token, pageToken ? { page_token: pageToken } : {}).then((page) => {
-      folderDocuments.push(...page.files.map((document) => ({ ...document, hasChildren: document.type === 'folder' })))
-      if (page.has_more && page.next_page_token) return loadPage(page.next_page_token)
-    })
+    return (
+      props.api.getLarkDocumentList?.(props.knowledgeId, token, pageToken ? { page_token: pageToken } : {}).then((page) => {
+        folderDocuments.push(...page.files.map((document) => ({ ...document, hasChildren: document.type === 'folder' })))
+        if (page.has_more && page.next_page_token) return loadPage(page.next_page_token)
+      }) ?? Promise.resolve()
+    )
   }
   const request = loadPage()
     .then(() => folderDocuments)
@@ -99,7 +105,7 @@ function handleSubmit() {
       if (!valid || !strategyRef.value) return
       const strategy = strategyRef.value.getStrategy()
       return props.api
-        .postImportLarkDocuments(
+        .postImportLarkDocuments?.(
           props.knowledgeId,
           selectedDocuments.value.map(({ name, token, type }) => ({
             name,

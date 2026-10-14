@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import UploadDocumentDrawer from './UploadDocumentDrawer.vue'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentUploadMode } from './constants'
 
 defineOptions({ name: 'ButtonUploadDocument' })
-defineProps<{ api: typeof DocumentApi; knowledgeId: string; fileCountLimit?: number; fileSizeLimit?: number }>()
+defineProps<{
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
+  knowledgeId: string
+  fileCountLimit?: number
+  fileSizeLimit?: number
+}>()
 const emit = defineEmits<{ refresh: [] }>()
 
 /* 上传入口与抽屉生命周期 */

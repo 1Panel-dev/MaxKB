@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagGroup } from '@/api/types'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import CreateTagDialog from '@/views/knowledge-detail/library/tags/components/CreateTagDialog.vue'
@@ -10,7 +9,7 @@ import CreateTagDialog from '@/views/knowledge-detail/library/tags/components/Cr
 defineOptions({ name: 'AddTagDialog' })
 const props = defineProps<{
   knowledgeId: string
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']
 }>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: []; closed: [] }>()
@@ -20,7 +19,6 @@ interface TagSelection {
   tagId: string
 }
 
-const { resourceApi, resourceScope } = useKnowledgeDetailContext()
 const visible = ref(false)
 const queryLoading = ref(false)
 const targetKnowledgeId = ref('')
@@ -33,10 +31,8 @@ const createTagMounted = ref(false)
 
 // 候选项只保留接口返回的前 100 个标签组，搜索交给 el-select 的 filterable。
 function loadTagOptions() {
-  const requestApi = resourceApi.tags
-  if (resourceScope.value !== 'workspace' || !requestApi) return
   queryLoading.value = true
-  return requestApi
+  return props.api
     .getKnowledgeTags(targetKnowledgeId.value)
     .then((groups) => {
       tagGroups.value = groups.slice(0, 100)
@@ -89,16 +85,15 @@ function handleSubmit() {
     }
     const tagIds = tagForm.tags.map(({ tagId }) => tagId)
     loading.value = true
-    return props.api
-      .postAddDocumentTags(targetKnowledgeId.value, targetDocumentIds.value, tagIds)
-      .then(() => {
+    return (
+      props.api.postBatchAddDocumentTags?.(targetKnowledgeId.value, targetDocumentIds.value, tagIds).then(() => {
         MsgSuccess('添加成功')
         visible.value = false
         emit('refresh')
-      })
-      .finally(() => {
-        loading.value = false
-      })
+      }) ?? Promise.resolve()
+    ).finally(() => {
+      loading.value = false
+    })
   })
 }
 
@@ -158,7 +153,7 @@ defineExpose({ open })
     v-if="createTagMounted"
     ref="createTagRef"
     :knowledge-id="targetKnowledgeId"
-    :api="resourceApi.tags"
+    :api="api"
     @refresh="loadTagOptions"
     @closed="createTagMounted = false"
   />

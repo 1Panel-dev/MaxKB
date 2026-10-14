@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref } from 'vue'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
-import type TagsApi from '@/api/admin/workspace/knowledge/tags'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ButtonImportTags' })
 
-const props = defineProps<{ knowledgeId: string; api: typeof TagsApi; disabled?: boolean }>()
+const props = defineProps<{ knowledgeId: string; api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']; disabled?: boolean }>()
 const emit = defineEmits<{ refresh: [] }>()
 
 interface ImportTagsForm {
@@ -59,7 +59,7 @@ function handleFileRemove() {
 function handleDownloadTemplate() {
   if (loading.value || downloadLoading.value) return
   downloadLoading.value = true
-  return props.api.exportKnowledgeTagTemplate(props.knowledgeId).finally(() => {
+  return (props.api.exportKnowledgeTagTemplate?.(props.knowledgeId) ?? Promise.resolve()).finally(() => {
     downloadLoading.value = false
   })
 }
@@ -75,16 +75,15 @@ function handleImport() {
     }
 
     loading.value = true
-    return props.api
-      .postImportKnowledgeTags(props.knowledgeId, file)
-      .then(() => {
+    return (
+      props.api.postImportKnowledgeTags?.(props.knowledgeId, file).then(() => {
         MsgSuccess('导入成功')
         visible.value = false
         emit('refresh')
-      })
-      .finally(() => {
-        loading.value = false
-      })
+      }) ?? Promise.resolve()
+    ).finally(() => {
+      loading.value = false
+    })
   })
 }
 </script>

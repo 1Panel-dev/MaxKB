@@ -164,6 +164,16 @@ v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明�
 `/system/shared/model` 查询共享模型，为每项标记 `source: 'shared'`；不查询工作空间模型。
 共享工作流、代码生成和默认模型设置统一调用此方法，模型管理继续使用 `getModelList`。
 
+### 资源选择弹窗查询
+
+三个资源选择弹窗按 Workspace、System 资源管理和 System 共享资源选择接口，不配置
+Workspace 共享页面来源分支，不调用 Workspace Shared API。仅普通工作空间显示文件夹，不显示共享目录；其他范围不显示或查询文件夹。
+System 资源管理智能体提供 `getAllApplication`（`/system/resource/application`），System 共享
+不提供智能体选择。System 共享知识库提供 `getAllKnowledge`（`/system/shared/knowledge`），
+与 System 资源管理知识库的同名方法均直接返回全量列表。工具选择统一调用对应范围的
+`getAllTool`：System 资源管理请求 `/system/resource/tool`，System 共享请求 `/system/shared/tool`，
+返回 `ToolItem[]`，不附带工作空间文件夹筛选。`getToolListWithShared` 保留用于其他包含共享工具的选项查询。
+
 ### 工具列表查询
 
 `workspace/tool/tool.ts` 的 `getAllTool(query)` 查询支持 `folder_id` 筛选的工作空间工具
@@ -629,7 +639,7 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 `DocumentItem`。名称上限 128 字符；共享文档仍只提供查询。
 
 `workspace/knowledge/document.ts` 同时维护文档启停、删除、召回设置、向量化、分词索引、
-任务取消、生成问题、迁移、同步、导出、原文件下载/替换及标签关联。
+任务取消、生成问题、迁移、同步、导出、原文件下载/替换。
 批量任务沿用 v2 的 `id_list` / `state_list`；生成问题使用 `document_id_list`，
 添加标签使用 `document_ids` / `tag_ids`，迁移和批量导出直接提交文档 ID 数组。
 文档导出分别提供四个接口，不以单元素批量请求代替单项接口：
@@ -653,6 +663,15 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 `putMulLarkSyncDocument` 请求 `/lark/<knowledgeId>/_batch`。上述路径均相对工作空间的 `knowledge` 前缀，
 全部使用 PUT；单项不传请求体，批量提交 `{ id_list }`。飞书接口需部署环境支持。
 共享文档 API 继续仅提供查询，不增加写入方法。
+
+`system/resource-management/knowledge/document.ts` 与 `system/shared-resources/knowledge/document.ts`
+提供与 `workspace/knowledge/document.ts` 相同的完整文档接口集合，方法名、参数、请求体和返回类型保持一致。
+普通文档前缀分别为 `/system/resource/knowledge/<knowledgeId>/document` 和
+`/system/shared/knowledge/<knowledgeId>/document`，不读取工作空间 ID。
+飞书接口在各自的知识库资源前缀后追加 `/lark/<knowledgeId>`；模板下载使用各自前缀下的
+`/document/table_template/export` 和 `/document/template/export`，不包含知识库 ID。
+系统路径组织沿用 v2，新增的 v3 文件 ID 导入和策略协议需对应部署环境支持，尚未联调。
+文档标签关联接口统一维护在各范围的 `tags.ts`。四套现有 Document API 由知识库详情 context 按范围装配。
 
 `workspace/knowledge/document.ts` 维护文档分页查询，路径为
 `/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<currentPage>/<pageSize>`。
@@ -698,13 +717,16 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 不声明多行编辑接口，也不组合旧接口模拟多行保存。
 
 `system/resource-management/knowledge/tags.ts` 与 `system/shared-resources/knowledge/tags.ts`
-提供与普通 Workspace 相同的七个标签接口，参数、请求体和返回类型保持一致，仅资源前缀分别为
-`/system/resource/knowledge/<knowledgeId>/tags` 和 `/system/shared/knowledge/<knowledgeId>/tags`，不读取工作空间 ID。
-两套系统标签 API 暂未接入知识库详情 context；Workspace 共享标签 API 保持现有只读查询，不补写入方法。
+提供与普通 Workspace 相同的七个标签接口及四个文档标签关联接口，参数、请求体和返回类型保持一致。
+公共前缀分别为 `/system/resource/knowledge/<knowledgeId>` 和 `/system/shared/knowledge/<knowledgeId>`，
+不读取工作空间 ID；各接口追加对应的 `tags`、`document` 或 `tag` 路径。
+具体接口需部署环境支持。四套现有标签 API 由知识库详情 context 按范围装配；
+Workspace 共享标签 API 保持现有只读查询，不补写入方法。
 
-文档与标签的关联由 `workspace/knowledge/document.ts` 维护，不使用标签删除接口代替取消关联。
+文档与标签的关联由 `workspace/knowledge/tags.ts` 维护，不使用标签删除接口代替取消关联。
+该模块公共前缀为知识库路径，各接口按后端协议追加 `tags`、`document` 或 `tag`，不因文件归属改变请求地址。
 `getDocumentTags(knowledgeId, documentId, query?)` 查询 `document/<documentId>/tags`，返回分组标签，支持 `query.name` 搜索；
-`postAddDocumentTags` POST 到 `document/batch_add_tag`，提交 `{ document_ids, tag_ids }`；
+`postBatchAddDocumentTags` POST 到 `document/batch_add_tag`，提交 `{ document_ids, tag_ids }`；
 `putDeleteDocumentTags` PUT 到 `document/<documentId>/tags/batch_delete`，直接提交标签 ID 数组。
 `putUnlinkTagDocuments` PUT 到知识库下的 `tag/<tagId>/docs_delete`，提交 `{ id_list: documentIds }`，
 用于取消同一标签与单个或多个文档的关联。

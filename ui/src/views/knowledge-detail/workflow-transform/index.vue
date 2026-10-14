@@ -14,7 +14,9 @@ defineExpose({ hideHeader: true })
 
 const route = useRoute()
 const router = useRouter()
-const { knowledgeId, resourceApi, routeNames, routeParams } = useKnowledgeDetailContext()
+const { knowledgeId, resourceApi, routeNames, routeParams } = useKnowledgeDetailContext({
+  resourceScopes: ['workspace', 'system-resource', 'system-shared'],
+})
 
 /* 转换成功后进入全屏画布。 */
 function enterWorkflow() {

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DeleteDocumentAction' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
   document?: DocumentItem
   documentIds?: string[]
@@ -25,15 +25,15 @@ function handleDelete() {
   return confirmation
     .then(() => {
       loading.value = true
-      const request = batch ? props.api.putBatchDeleteDocuments(knowledgeId, ids) : props.api.deleteDocument(knowledgeId, document!.id)
-      return request
-        .then(() => {
+      const request = batch ? props.api.putBatchDeleteDocuments?.(knowledgeId, ids) : props.api.deleteDocument?.(knowledgeId, document!.id)
+      return (
+        request?.then(() => {
           MsgSuccess('删除成功')
           emit('refresh')
-        })
-        .finally(() => {
-          loading.value = false
-        })
+        }) ?? Promise.resolve()
+      ).finally(() => {
+        loading.value = false
+      })
     })
     .catch(() => {})
 }

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentItem } from '@/api/types'
 import DocumentTagsDrawer from './DocumentTagsDrawer.vue'
 
 defineOptions({ name: 'DocumentTagsAction' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']
   knowledgeId: string
   document: DocumentItem
   label: string

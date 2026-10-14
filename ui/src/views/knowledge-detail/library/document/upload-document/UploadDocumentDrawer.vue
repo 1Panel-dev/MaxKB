@@ -4,7 +4,7 @@ import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
 import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentSplitResult } from '@/api/types'
 import DocumentImportPreview from './DocumentImportPreview.vue'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
@@ -14,7 +14,7 @@ import { DOCUMENT_UPLOAD_OPTIONS, type DocumentUploadMode } from './constants'
 
 defineOptions({ name: 'UploadDocumentDrawer' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
   mode: DocumentUploadMode
   fileCountLimit?: number
@@ -47,7 +47,7 @@ function open() {
 /* 模板下载与文档导入 */
 function handleDownloadTemplate(type: 'excel' | 'csv') {
   if (props.mode === 'text') return
-  return props.mode === 'table' ? props.api.exportTableDocumentTemplate(type) : props.api.exportQADocumentTemplate(type)
+  return props.mode === 'table' ? props.api.exportTableDocumentTemplate?.(type) : props.api.exportQADocumentTemplate?.(type)
 }
 
 function validateImportFiles() {
@@ -76,7 +76,7 @@ function handleGeneratePreview() {
     .then((valid) => {
       if (!valid || !strategyRef.value) return
       const files = successfulFiles.value.flatMap((file) => (file.raw ? [file.raw] : []))
-      return props.api.postSplitDocuments(props.knowledgeId, files, strategyRef.value.getStrategy()).then((documents) => {
+      return props.api.postSplitDocuments?.(props.knowledgeId, files, strategyRef.value.getStrategy()).then((documents) => {
         previewDocuments.value = documents
         previewVisible.value = true
       })
@@ -106,13 +106,13 @@ function handleSubmit() {
     return
   }
   loading.value = true
-  let importRequest: Promise<boolean>
+  let importRequest: Promise<boolean | undefined> | undefined
   if (props.mode === 'table') {
     // 复用已上传表格，由服务端解析并创建文档。
-    importRequest = props.api.postImportTableDocumentsByFileIds(props.knowledgeId, fileIds).then(() => true)
+    importRequest = props.api.postImportTableDocumentsByFileIds?.(props.knowledgeId, fileIds).then(() => true)
   } else if (props.mode === 'qa') {
     // 复用已上传 QA 文件，由服务端解析并创建文档。
-    importRequest = props.api.postImportQADocumentsByFileIds(props.knowledgeId, fileIds).then(() => true)
+    importRequest = props.api.postImportQADocumentsByFileIds?.(props.knowledgeId, fileIds).then(() => true)
   } else if (previewVisible.value) {
     if (previewDocuments.value.every((document) => !document.content.length)) {
       MsgWarning('没有可导入的分段，请重新生成预览')
@@ -120,7 +120,7 @@ function handleSubmit() {
       return
     }
     importRequest = props.api
-      .putBatchCreateDocuments(
+      .putBatchCreateDocuments?.(
         props.knowledgeId,
         previewDocuments.value.map(({ content, ...document }) => ({ ...document, paragraphs: content })),
       )
@@ -129,10 +129,10 @@ function handleSubmit() {
     // 文本校验处理策略，由单次请求在服务端完成解析与入库。
     importRequest = Promise.resolve(strategyRef.value?.validate()).then((valid) => {
       if (!valid || !strategyRef.value) return false
-      return props.api.postImportTextDocuments(props.knowledgeId, fileIds, strategyRef.value.getStrategy()).then(() => true)
+      return props.api.postImportTextDocuments?.(props.knowledgeId, fileIds, strategyRef.value.getStrategy()).then(() => true)
     })
   }
-  return importRequest
+  return (importRequest ?? Promise.resolve())
     .then((success) => {
       if (!success) return
       MsgSuccess('导入成功')

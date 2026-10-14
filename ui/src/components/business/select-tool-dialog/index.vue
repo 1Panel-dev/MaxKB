@@ -2,11 +2,13 @@
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 import ToolApi from '@/api/admin/workspace/tool/tool'
-import SharedToolApi from '@/api/admin/workspace/shared/tool'
+import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
+import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { FolderItem, ToolItem, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
+import { FOLDER_ENTRIES } from '@/constants/folder'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 
@@ -29,6 +31,8 @@ const selectedTool = ref<(Partial<ToolItem> & { id: string })[]>([])
 const toolLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('toolLayoutRef')
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
 
+const isWorkspaceScope = computed(() => isWorkspaceResource())
+
 const selectedToolIds = computed(() => selectedTool.value.map(({ id }) => id))
 
 function toggleTool(tool: ToolItem) {
@@ -42,14 +46,14 @@ function refreshTool() {
   loading.value = true
   toolOptions.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
-  const shared = currentFolder.value.id === FOLDER_ENTRY_ID.SHARED
-  const requestApi = shared ? SharedToolApi : ToolApi
+  const requestApi = isSystemResource() ? SystemToolApi : isSystemSharedResource() ? SystemSharedToolApi : ToolApi
+  const query = {
+    tool_type_list: props.toolTypes,
+    ...(isWorkspaceScope.value ? { folder_id: currentFolder.value.id } : {}),
+    ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
+  }
   return requestApi
-    .getAllTool({
-      tool_type_list: props.toolTypes,
-      ...(shared ? {} : { folder_id: currentFolder.value.id }),
-      ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
-    })
+    .getAllTool(query)
     .then((tool) => {
       toolOptions.value = tool.filter(
         (resource) => resource.is_active && props.toolTypes.includes(resource.tool_type) && !props.excludedIds.includes(resource.id),
@@ -115,8 +119,16 @@ defineExpose({ open })
     </template>
 
     <MkViewLayout ref="toolLayoutRef" :loading="loading" title="">
-      <template #aside>
-        <FolderTree ref="folderTreeRef" class="pt-4" :can-edit="false" :source="RESOURCE_TYPE.TOOL" @loaded="selectFolder" @select="selectFolder" />
+      <template v-if="isWorkspaceScope" #aside>
+        <FolderTree
+          ref="folderTreeRef"
+          class="pt-4"
+          :can-edit="false"
+          :show-shared="false"
+          :source="RESOURCE_TYPE.TOOL"
+          @loaded="selectFolder"
+          @select="selectFolder"
+        />
       </template>
       <template #default="{ Header }">
         <component :is="Header">

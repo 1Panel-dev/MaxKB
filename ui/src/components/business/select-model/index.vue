@@ -7,8 +7,9 @@ import { groupBy } from 'lodash'
 import ModelParamsDialog from './ModelParamsDialog.vue'
 import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
 import ModelApi from '@/api/admin/workspace/model'
+import SystemModelApi from '@/api/admin/system/resource-management/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
-import { isWorkspaceResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isWorkspaceResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 defineOptions({ name: 'SelectModel', inheritAttrs: false })
 
 interface ModelOptionGroup {
@@ -89,6 +90,7 @@ const selectRef = useTemplateRef<SelectInstance>('selectRef')
 const allModelProvider: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 const requestApi = computed(() => {
   if (isWorkspaceResource()) return ModelApi
+  if (isSystemResource()) return SystemModelApi
   if (isSystemSharedResource()) return SystemSharedModelApi
   return undefined
 })

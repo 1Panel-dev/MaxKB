@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import DocumentMigrateDialog from './DocumentMigrateDialog.vue'
 
 defineOptions({ name: 'MigrateDocumentAction' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documentIds: string[]; label: string; icon?: string; disabled?: boolean }>()
+const props = defineProps<{
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
+  knowledgeId: string
+  documentIds: string[]
+  label: string
+  icon?: string
+  disabled?: boolean
+}>()
 const emit = defineEmits<{ refresh: [] }>()
 const loading = ref(false)
 

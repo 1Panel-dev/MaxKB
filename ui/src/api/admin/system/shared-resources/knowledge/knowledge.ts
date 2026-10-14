@@ -15,6 +15,9 @@ import type {
 
 const prefix = '/system/shared/knowledge'
 
+/** 获取 System 共享不分页的知识库列表。 */
+const getAllKnowledge = (query?: Dict<unknown>) => get<KnowledgeItem[]>(prefix, query)
+
 /** 获取 System 共享知识库分页列表。 */
 const getKnowledgePage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<KnowledgeItem>>(`${prefix}/${page.currentPage}/${page.pageSize}`, query)
@@ -47,6 +50,11 @@ const postKnowledgeImport = (file: File, folderId: string) => {
 /** 更新 System 共享知识库信息。 */
 const putKnowledge = (knowledgeId: string, payload: Partial<KnowledgeItem>) =>
   put<Partial<KnowledgeItem>, KnowledgeItem>(`${prefix}/${knowledgeId}`, payload)
+
+/** 更新飞书知识库信息。 */
+const putLarkKnowledge = (knowledgeId: string, payload: Partial<KnowledgeItem>) => {
+  return put<Partial<KnowledgeItem>, KnowledgeItem>(`${prefix}/lark/${knowledgeId}`, payload)
+}
 
 /** 删除 System 共享知识库。 */
 const deleteKnowledge = (knowledgeId: string) => del<boolean>(`${prefix}/${knowledgeId}`)
@@ -97,6 +105,7 @@ export default {
   getKnowledgeDetail,
   getKnowledgeMcpConfig,
   getKnowledgePage,
+  getAllKnowledge,
   postKnowledge,
   postKnowledgeImport,
   postKnowledgeWorkflow,
@@ -104,6 +113,7 @@ export default {
   postWebKnowledge,
   putGenerateKnowledgeQuestions,
   putKnowledge,
+  putLarkKnowledge,
   putKnowledgeKeywordIndex,
   putReEmbeddingKnowledge,
   putSyncWebKnowledge,
