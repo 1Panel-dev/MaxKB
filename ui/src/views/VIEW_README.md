@@ -839,7 +839,7 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 查询使用 `DocumentApi.getDocumentTags`，搜索使用单一 `MkSearchInput`，通过 `change` 将关键词作为 `name` 请求接口，清空时省略该参数；
 查询前清除勾选，直接展示接口返回的分组，不再本地过滤。选择列和标签名单元格合并；
 通过 `MkTable selection-group-key="key"` 联动组内标签值，已选数量按标签值行数统计；标签值列复用 `border-l!` 展示与合并标签列之间的分隔线。
-删除调用 `putDeleteDocumentTags`，仅移除当前文档关联，不调用知识库标签删除接口。
+单项及批量删除均直接调用 `putDeleteDocumentTags`，不弹二次确认；仅移除当前文档关联，不调用知识库标签删除接口。
 `AddTagDialog.vue` 为标签列、抽屉与批量操作栏共用的下拉式添加弹窗，接收完整 Document API 和知识库 ID。
 三个入口分别由 `DocumentTags`、`DocumentTagsDrawer`、`BatchDocumentTagsAction` 管理弹窗实例，不通过页面 Ref 打开。
 候选项使用 `tagsApi.getKnowledgeTags`，按返回顺序截取前 100 个标签组，然后由 `el-select filterable` 本地搜索；
@@ -1010,7 +1010,7 @@ library 通过 `useKnowledgeLibraryContext` 装配现有文档、标签 API；Sy
 对接口返回结果先按标签组分页，再展开各组标签值，分页总数为返回的标签组数。
 `MkTable` 合并选择列和标签名，通过 `selection-group-key="key"` 联动当前页同组标签值；
 批量底栏按实际选中标签值行数／当前页标签值总行数统计，不按标签组计数。
-删除提交全部选中标签值 ID，确认框同时说明标签值数量、标签组数量及整组删除的影响。
+删除提交全部选中标签值 ID，批量确认数量与底栏已选行数一致；标签、标签值及批量删除统一提示关联资源上的标签也会删除。
 标签名旁提供新增值、编辑标签、删除标签；行末提供编辑值和删除值，
 数量链接打开同目录 `TagDocumentDrawer.vue`。
 

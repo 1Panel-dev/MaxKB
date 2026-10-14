@@ -3,7 +3,7 @@ import { computed, nextTick, ref } from 'vue'
 import type { TableColumnCtx } from 'element-plus'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import type { KnowledgeTagGroup } from '@/api/types'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { MsgSuccess } from '@/utils/message'
 import AddTagDialog from './AddTagDialog.vue'
 
 defineOptions({ name: 'DocumentTagsDrawer' })
@@ -31,7 +31,6 @@ const selectedTags = ref<DocumentTagRow[]>([])
 const tagTableRef = ref<{ clearSelection: () => void }>()
 const addTagRef = ref<InstanceType<typeof AddTagDialog>>()
 const addTagMounted = ref(false)
-const confirming = ref(false)
 
 // 按接口返回的分组展开，勾选与删除始终按标签值 ID 处理。
 const tagRows = computed<DocumentTagRow[]>(() =>
@@ -87,27 +86,17 @@ function handleTagsChanged() {
 }
 
 function handleDeleteTags(tags: DocumentTagRow[]) {
+  if (loading.value || operationLoading.value || !tags.length) return
   const tagIds = tags.map(({ id }) => id)
-  const title = tags.length === 1 ? `是否移除标签：${tags[0]!.key}—${tags[0]!.value}？` : `是否移除选中的 ${tagIds.length} 个标签？`
-  confirming.value = true
-  return MsgConfirm(title, '删除后，使用该标签的资源将会删除该标签，请谨慎操作！')
-    .then(
-      () => {
-        operationLoading.value = true
-        return props.api
-          .putDeleteDocumentTags(targetKnowledgeId.value, targetDocumentId.value, tagIds)
-          .then(() => {
-            MsgSuccess('移除成功')
-            return handleTagsChanged()
-          })
-          .finally(() => {
-            operationLoading.value = false
-          })
-      },
-      () => {},
-    )
+  operationLoading.value = true
+  return props.api
+    .putDeleteDocumentTags(targetKnowledgeId.value, targetDocumentId.value, tagIds)
+    .then(() => {
+      MsgSuccess('移除成功')
+      return handleTagsChanged()
+    })
     .finally(() => {
-      confirming.value = false
+      operationLoading.value = false
     })
 }
 
