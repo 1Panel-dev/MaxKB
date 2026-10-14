@@ -9,7 +9,7 @@ from common.db.search import native_search, native_page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from maxkb.conf import PROJECT_DIR
-from system_manage.models import ResourceChatUserGroupAuthorize, UserGroup
+from system_manage.models import ResourceChatUserAuthorize, ResourceChatUserGroupAuthorize, UserGroup
 
 
 class ResourceChatUserGroupQuerySerializer(serializers.Serializer):
@@ -29,6 +29,9 @@ class ResourceChatUserGroupQuerySerializer(serializers.Serializer):
         resource_chat_user_group_authorize_query_set = QuerySet(ResourceChatUserGroupAuthorize).filter(
             resource_id=resource_id, resource_type=resource_type
         )
+        resource_chat_user_authorize_query_set = QuerySet(ResourceChatUserAuthorize).filter(
+            resource_id=resource_id, resource_type=resource_type
+        )
         query_set = QuerySet(UserGroup)
         if user_group_name is not None:
             query_set = query_set.filter(name__contains=user_group_name)
@@ -36,13 +39,20 @@ class ResourceChatUserGroupQuerySerializer(serializers.Serializer):
             resource_chat_user_group_authorize_query_set = resource_chat_user_group_authorize_query_set.filter(
                 workspace_id=workspace_id
             )
+            resource_chat_user_authorize_query_set = resource_chat_user_authorize_query_set.filter(
+                workspace_id=workspace_id
+            )
         else:
             resource_chat_user_group_authorize_query_set = resource_chat_user_group_authorize_query_set.filter(
+                workspace_id__isnull=True
+            )
+            resource_chat_user_authorize_query_set = resource_chat_user_authorize_query_set.filter(
                 workspace_id__isnull=True
             )
         return {
             "default_query_set": query_set,
             "resource_chat_user_group_authorize_query_set": resource_chat_user_group_authorize_query_set,
+            "resource_chat_user_authorize_query_set": resource_chat_user_authorize_query_set,
         }
 
     def list(self):

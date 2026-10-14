@@ -112,6 +112,8 @@ export interface ChatUserAuthorizationGroup {
   id: string
   name: string
   is_auth: boolean
+  /** 用户组内已授权对话用户数。 */
+  authorized_count: number
 }
 
 /** 用户组内的对话用户资源授权状态。 */

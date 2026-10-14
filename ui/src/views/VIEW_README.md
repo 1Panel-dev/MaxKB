@@ -1389,7 +1389,7 @@ API 地址、调用示例及 MCP 配置只读；后两个展示区参考工具 M
 使用对应路由 ID 及 `RESOURCE_TYPE.APPLICATION / KNOWLEDGE`；授权类型必须大写，与后台授权记录及对话端查询一致。
 两页通过 `hideHeader: true` 隐藏详情标题栏，使用普通 Flex 双栏容器，不嵌套 `MkViewLayout`。
 外层 `ResourceDetailLayout` 统一管理整体滚动；侧栏复用 `w-sidebar-expanded`、`MkSearchList` 的搜索、选中和空态。
-“按用户组”列表通过插槽展示名称及自动授权状态；接口尚未返回组已授权人数，手动授权组显示“已授权 —”，不以当前页勾选数代替。
+“按用户组”列表通过插槽展示名称及自动授权状态；接口返回组已授权人数 `authorized_count`，自动授权组显示“（自动授权）”，手动授权组显示“（已授权 N）”，不以当前页勾选数代替。
 右侧第一行展示组名和用户查询总数；下方工具栏左侧为默认按姓名查询的 `MkComplexSearch` 及自动授权开关，右侧为保存。
 顶部 `MkComplexSearch` 按姓名、用户名排列；用户来源只在表头使用 `MkTableFilter mode="single"` 筛选，向接口传 `source`。
 用户名、姓名搜索与表头来源可组合查询，清空一处条件不影响另一处，不额外重置搜索组件。
