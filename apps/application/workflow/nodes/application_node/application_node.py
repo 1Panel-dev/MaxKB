@@ -51,6 +51,15 @@ class ApplicationNode(INode):
     supported_workflow_type_list = [WorkflowType.APPLICATION]
     type = "application-node"
 
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self._current_sub_manage = None
+
+    def cancel(self):
+        super().cancel()
+        if self._current_sub_manage:
+            self._current_sub_manage.cancel()
+
     def _run(self):
         # 完成时机由子应用 on_complete 回调驱动，这里不自动 complete
         self.execute()
@@ -201,10 +210,15 @@ class ApplicationNode(INode):
             self.write(content)
 
         def on_complete(wf_manage, error):
+            self._current_sub_manage = None
             # 持久化子应用上下文，供后续 resume 的 from_context 读取
             QuerySet(ChatRecord).filter(id=sub_chat_record_id).update(workflow_context=wf_manage.context)
             usage = self._usage_from_context(wf_manage.context)
             self._write_final_context(self._answer, self._reasoning_content, usage)
+            # 子应用被取消：如实以 CANCELLED 结束本节点
+            if wf_manage.signal == Signal.CANCELLED or self.workflow_manage.signal == Signal.CANCELLED:
+                self.complete(Status.CANCELLED)
+                return
             if error:
                 self.complete(Status.FAIL, error=error)
                 return
@@ -243,6 +257,11 @@ class ApplicationNode(INode):
             )
 
         sub_manage.start_node.workflow_manage = sub_manage
+        self._current_sub_manage = sub_manage
+        # 取消发生在构造之后、启动之前：不再启动子应用
+        if self.status == Status.CANCELLED or self.workflow_manage.signal == Signal.CANCELLED:
+            self.complete(Status.CANCELLED)
+            return
         sub_manage.run()
 
     def _resolve_file_list(self, field_list, name):
