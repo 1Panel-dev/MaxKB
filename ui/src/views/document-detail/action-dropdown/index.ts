@@ -2,5 +2,4 @@ export { default as BatchMigrateParagraphAction } from './migrate/BatchMigratePa
 export { default as MigrateParagraphAction } from './migrate/MigrateParagraphAction.vue'
 export { default as BatchGenerateQuestionsAction } from './generate-questions/BatchGenerateQuestionsAction.vue'
 export { default as GenerateQuestionsAction } from './generate-questions/GenerateQuestionsAction.vue'
-export { default as MoveParagraphAction } from './MoveParagraphAction.vue'
-export type { ParagraphMoveDirection } from './types'
+export { default as MoveParagraphAction } from './move/MoveParagraphAction.vue'

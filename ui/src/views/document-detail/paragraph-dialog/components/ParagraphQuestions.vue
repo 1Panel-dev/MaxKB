@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue'
 import type { SelectInstance } from 'element-plus'
-import type ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
+import { useDocumentDetailContext } from '@/views/document-detail/context'
 import ProblemApi from '@/api/admin/workspace/knowledge/problem'
 import type { ParagraphProblem } from '@/api/types'
 import type { ParagraphQuestionDraft } from '../types'
+import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ParagraphQuestions' })
 const props = defineProps<{
-  api: typeof ParagraphApi
   knowledgeId: string
   documentId: string
   paragraphId?: string
 }>()
+const { resourceApi } = useDocumentDetailContext()
 const relatedProblems = defineModel<ParagraphQuestionDraft[]>({ required: true })
 const loading = ref(false)
 const problemAdding = ref(false)
@@ -35,19 +36,21 @@ function loadProblemOptions(query = '') {
 }
 
 onMounted(() => {
-  void loadProblemOptions()
+  if (!isWorkspaceSharedResource()) void loadProblemOptions()
 })
 
 /* 新增分段维护本地草稿；已有分段创建或关联问题后刷新关联列表。 */
 function refreshRelatedProblems() {
   if (!props.paragraphId) return Promise.resolve()
-  return props.api.getParagraphProblems(props.knowledgeId, props.documentId, props.paragraphId).then((problems) => {
-    relatedProblems.value = problems
-  })
+  return (
+    resourceApi.paragraph.getParagraphProblems?.(props.knowledgeId, props.documentId, props.paragraphId).then((problems) => {
+      relatedProblems.value = problems
+    }) ?? Promise.resolve()
+  )
 }
 
 async function handleAddProblem() {
-  if (loading.value) return
+  if (loading.value || isWorkspaceSharedResource()) return
   problemAdding.value = true
   await nextTick()
   problemSelectRef.value?.focus()
@@ -60,7 +63,7 @@ function handleCancelProblem() {
 }
 
 function handleSelectProblem(value: string) {
-  if (loading.value) return
+  if (loading.value || isWorkspaceSharedResource()) return
   const existingProblem = problemOptions.value.find(({ id }) => id === value)
   const content = (existingProblem?.content ?? value).trim()
   if (!content || content.length > 256) {
@@ -80,23 +83,24 @@ function handleSelectProblem(value: string) {
 
   loading.value = true
   const associationRequest = existingProblem
-    ? props.api.putAssociateParagraphProblem(props.knowledgeId, props.documentId, props.paragraphId, existingProblem.id)
-    : props.api.postParagraphProblem(props.knowledgeId, props.documentId, props.paragraphId, content)
-  return associationRequest
-    .then(() => {
-      return refreshRelatedProblems().then(() => {
-        problemAdding.value = false
-        problemValue.value = ''
+    ? resourceApi.paragraph.putAssociateParagraphProblem?.(props.knowledgeId, props.documentId, props.paragraphId, existingProblem.id)
+    : resourceApi.paragraph.postParagraphProblem?.(props.knowledgeId, props.documentId, props.paragraphId, content)
+  return (
+    associationRequest
+      ?.then(() => {
+        return refreshRelatedProblems().then(() => {
+          problemAdding.value = false
+          problemValue.value = ''
+        })
       })
-    })
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+      .catch(() => {}) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 function handleRemoveProblem(index: number) {
-  if (loading.value) return
+  if (loading.value || isWorkspaceSharedResource()) return
   const problem = relatedProblems.value[index]
   if (!problem) return
   if (!props.paragraphId) {
@@ -105,13 +109,14 @@ function handleRemoveProblem(index: number) {
   }
   if (!problem.id) return
   loading.value = true
-  void props.api
-    .putUnassociateParagraphProblem(props.knowledgeId, props.documentId, props.paragraphId, problem.id)
-    .then(() => refreshRelatedProblems())
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  void (
+    resourceApi.paragraph
+      .putUnassociateParagraphProblem?.(props.knowledgeId, props.documentId, props.paragraphId, problem.id)
+      .then(() => refreshRelatedProblems())
+      .catch(() => {}) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 </script>
 
@@ -120,7 +125,7 @@ function handleRemoveProblem(index: number) {
     <div class="mb-4 flex-between shrink-0 gap-3">
       <h4>关联问题</h4>
       <!-- 添加关联问题 -->
-      <el-button text :disabled="loading || problemAdding" @click="handleAddProblem">
+      <el-button v-if="!isWorkspaceSharedResource()" text :disabled="loading || problemAdding" @click="handleAddProblem">
         <MkIcon name="icon_add_outlined" :size="16" />
       </el-button>
     </div>
@@ -152,7 +157,7 @@ function handleRemoveProblem(index: number) {
               <div class="flex-between gap-2">
                 <span class="min-w-0 flex-1 truncate" :title="problem.content">{{ problem.content }}</span>
                 <!-- 解除问题关联 -->
-                <el-button text :disabled="loading" @click="handleRemoveProblem(index)">
+                <el-button v-if="!isWorkspaceSharedResource()" text :disabled="loading" @click="handleRemoveProblem(index)">
                   <MkIcon name="icon_close_outlined" :size="16" />
                 </el-button>
               </div>

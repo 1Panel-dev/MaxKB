@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { knowledgeTemplate } from '@/views/knowledge/template'
 import workflowDemo from '@/assets/workflow/workflow-demo.png'
 import { useKnowledgeDetailContext } from '../context'
@@ -14,9 +15,7 @@ defineExpose({ hideHeader: true })
 
 const route = useRoute()
 const router = useRouter()
-const { knowledgeId, resourceApi, routeNames, routeParams } = useKnowledgeDetailContext({
-  resourceScopes: ['workspace', 'system-resource', 'system-shared'],
-})
+const { knowledgeId, resourceApi, routeNames, routeParams } = useKnowledgeDetailContext()
 
 /* 转换成功后进入全屏画布。 */
 function enterWorkflow() {
@@ -29,13 +28,15 @@ function enterWorkflow() {
 
 const loading = ref(false)
 function handleTransformWorkflow() {
+  const knowledgeApi = resourceApi.knowledge
+  if (loading.value || isWorkspaceSharedResource() || !('postTransformWorkflow' in knowledgeApi)) return
   return MsgConfirm('转换为工作流知识库', '转换后无法回退，请谨慎操作。', {
     confirmButtonText: '转换',
     confirmButtonType: 'primary',
   })
     .then(() => {
       loading.value = true
-      return resourceApi.knowledge.postTransformWorkflow(knowledgeId.value, { work_flow: cloneDeep(knowledgeTemplate.default) }).then(() => {
+      return knowledgeApi.postTransformWorkflow(knowledgeId.value, { work_flow: cloneDeep(knowledgeTemplate.default) }).then(() => {
         MsgSuccess('转换成功')
         return enterWorkflow()
       })
@@ -58,7 +59,7 @@ function handleTransformWorkflow() {
       </div>
       <p class="mt-6 mb-2 text-warning">注意：转换后不可撤回。</p>
       <!-- 转换为工作流知识库 -->
-      <el-button type="primary" :loading="loading" @click="handleTransformWorkflow">转换</el-button>
+      <el-button v-if="!isWorkspaceSharedResource()" type="primary" :loading="loading" @click="handleTransformWorkflow">转换</el-button>
     </div>
     <img :src="workflowDemo" class="w-full min-w-0" />
   </div>

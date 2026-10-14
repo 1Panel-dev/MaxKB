@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import type ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
+import type { DocumentParagraphApi } from '@/views/document-detail/context'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SystemKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
-import SystemDocumentApi from '@/api/admin/system/resource-management/knowledge/document'
-import SystemSharedDocumentApi from '@/api/admin/system/shared-resources/knowledge/document'
+import { useDocumentDetailContext } from '@/views/document-detail/context'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import type { DocumentItem, KnowledgeItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
@@ -15,11 +13,12 @@ import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'ParagraphMigrateDialog' })
 const props = defineProps<{
-  api: typeof ParagraphApi
+  api: DocumentParagraphApi
   knowledgeId: string
   documentId: string
 }>()
 const emit = defineEmits<{ success: [paragraphIds: string[]]; closed: [] }>()
+const { resourceApi } = useDocumentDetailContext()
 
 // 固定本次勾选的分段，查询知识库与联动文档选项。
 const visible = ref(false)
@@ -63,19 +62,20 @@ function handleKnowledgeChange(knowledgeId: string) {
   documentOptions.value = []
   formRef.value?.clearValidate('document_id')
   if (!knowledgeId) return
+
   documentLoading.value = true
-  const requestApi = isSystemResource() ? SystemDocumentApi : isSystemSharedResource() ? SystemSharedDocumentApi : DocumentApi
-  return requestApi
-    .getAllDocuments(knowledgeId)
-    .then((documents) => {
-      documentOptions.value = documents.filter(({ id }) => id !== props.documentId)
-    })
-    .catch(() => {
-      // 请求层统一提示错误，文档保持空选。
-    })
-    .finally(() => {
-      documentLoading.value = false
-    })
+  return (
+    resourceApi.document
+      .getAllDocuments?.(knowledgeId)
+      .then((documents) => {
+        documentOptions.value = documents.filter(({ id }) => id !== props.documentId)
+      })
+      .catch(() => {
+        // 请求层统一提示错误，文档保持空选。
+      }) ?? Promise.resolve()
+  ).finally(() => {
+    documentLoading.value = false
+  })
 }
 
 // 迁移成功后关闭并通知页面移除本次分段，失败保留当前选择以便重试。
@@ -83,19 +83,20 @@ async function handleSubmit() {
   if (loading.value || optionLoading.value || !targetParagraphIds.value.length) return
   if (!(await formRef.value?.validate().catch(() => false)) || loading.value) return
   loading.value = true
-  return props.api
-    .putMigrateParagraphs(props.knowledgeId, props.documentId, migrateForm.knowledge_id, migrateForm.document_id, [...targetParagraphIds.value])
-    .then(() => {
-      MsgSuccess('迁移成功')
-      migrationSucceeded.value = true
-      visible.value = false
-    })
-    .catch(() => {
-      // 请求层统一提示错误，保留表单。
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putMigrateParagraphs?.(props.knowledgeId, props.documentId, migrateForm.knowledge_id, migrateForm.document_id, [...targetParagraphIds.value])
+      .then(() => {
+        MsgSuccess('迁移成功')
+        migrationSucceeded.value = true
+        visible.value = false
+      })
+      .catch(() => {
+        // 请求层统一提示错误，保留表单。
+      }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 function handleBeforeClose(done: () => void) {

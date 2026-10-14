@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
+import { useDocumentDetailContext } from '@/views/document-detail/context'
 import type { ParagraphUpdatePayload } from '@/api/types'
 import type { ParagraphQuestionDraft } from './types'
 import ParagraphForm from './components/ParagraphForm.vue'
@@ -9,10 +9,10 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CreateParagraphDialog' })
 const props = defineProps<{
-  api: typeof ParagraphApi
   knowledgeId: string
   documentId: string
 }>()
+const { resourceApi } = useDocumentDetailContext()
 const emit = defineEmits<{ success: [mode: 'create']; closed: [] }>()
 
 /* 添加弹窗按需挂载，草稿在关闭后随实例释放。 */
@@ -47,22 +47,23 @@ function handleSubmit() {
     .then((valid) => {
       if (!valid || loading.value) return
       loading.value = true
-      return props.api
-        .postParagraph(targetKnowledgeId.value, targetDocumentId.value, {
-          title: paragraphForm.value.title.trim(),
-          content: paragraphForm.value.content,
-          is_active: true,
-          ...(targetPosition.value === undefined ? {} : { position: targetPosition.value }),
-          problem_list: relatedQuestions.value.map(({ content }) => ({ content })),
-        })
-        .then(() => {
-          visible.value = false
-          MsgSuccess('添加成功')
-          emit('success', 'create')
-        })
-        .finally(() => {
-          loading.value = false
-        })
+      return (
+        resourceApi.paragraph
+          .postParagraph?.(targetKnowledgeId.value, targetDocumentId.value, {
+            title: paragraphForm.value.title.trim(),
+            content: paragraphForm.value.content,
+            is_active: true,
+            ...(targetPosition.value === undefined ? {} : { position: targetPosition.value }),
+            problem_list: relatedQuestions.value.map(({ content }) => ({ content })),
+          })
+          .then(() => {
+            visible.value = false
+            MsgSuccess('添加成功')
+            emit('success', 'create')
+          }) ?? Promise.resolve()
+      ).finally(() => {
+        loading.value = false
+      })
     })
     .catch(() => {})
 }
@@ -83,7 +84,7 @@ defineExpose({ open, close })
     <div v-loading="loading" class="flex w-full gap-4">
       <ParagraphForm ref="paragraphFormRef" v-model="paragraphForm" :knowledge-id="targetKnowledgeId" />
       <!-- 关联问题 -->
-      <ParagraphQuestions v-model="relatedQuestions" :api="api" :knowledge-id="targetKnowledgeId" :document-id="targetDocumentId" />
+      <ParagraphQuestions v-model="relatedQuestions" :knowledge-id="targetKnowledgeId" :document-id="targetDocumentId" />
     </div>
     <template #footer>
       <!-- 取消添加分段 -->

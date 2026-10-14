@@ -14,10 +14,6 @@ import { getWorkspaceId } from '@/utils/resource-context'
 const getPrefix = (knowledgeId: string, documentId: string) =>
   `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/document/${documentId}/paragraph`
 
-/** 查询文档的全部分段，按位置排序，支持标题和内容筛选。 */
-const getParagraphList = (knowledgeId: string, documentId: string, query?: ParagraphQuery) =>
-  get<ParagraphItem[]>(getPrefix(knowledgeId, documentId), { ...query })
-
 /** 分页查询文档分段，供详情页滚动加载。 */
 const getParagraphPage = (knowledgeId: string, documentId: string, page: ParamsPage, query?: ParagraphQuery) =>
   get<ResponsePage<ParagraphItem>>(`${getPrefix(knowledgeId, documentId)}/${page.currentPage}/${page.pageSize}`, { ...query })
@@ -76,7 +72,6 @@ const putParagraphPosition = (knowledgeId: string, documentId: string, paragraph
   })
 
 export default {
-  getParagraphList,
   getParagraphPage,
   postParagraph,
   getParagraphDetail,

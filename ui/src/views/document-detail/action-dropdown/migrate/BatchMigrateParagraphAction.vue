@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
+import type { DocumentParagraphApi } from '@/views/document-detail/context'
 import ParagraphMigrateDialog from './ParagraphMigrateDialog.vue'
 
 defineOptions({ name: 'BatchMigrateParagraphAction' })
 const props = defineProps<{
-  api: typeof ParagraphApi
+  api: DocumentParagraphApi
   knowledgeId: string
   documentId: string
   paragraphIds: string[]

@@ -7,14 +7,13 @@ import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { KnowledgeItem } from '@/api/types'
 import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
 import { useKnowledgeDetailContext } from '../../context'
 
 defineOptions({ name: 'KnowledgeBaseSettingView' })
 
-const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext({
-  resourceScopes: ['workspace', 'system-resource', 'system-shared'],
-})
+const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 
 /* 详情与基本信息 */
 
@@ -75,6 +74,8 @@ watch(
 
 /* 保存设置；更换向量模型时先确认，保存完成后重新向量化 */
 function handleSave() {
+  const knowledgeApi = resourceApi.knowledge
+  if (saving.value || isWorkspaceSharedResource() || !('putKnowledge' in knowledgeApi)) return
   saving.value = true
   return Promise.all([baseFormRef.value?.validate(), settingFormRef.value?.validate().catch(() => false)])
     .then(([baseValid, settingValid]) => {
@@ -110,12 +111,10 @@ function handleSave() {
 
       return confirmation.then(() => {
         const request =
-          detail.type === KNOWLEDGE_TYPE.LARK
-            ? resourceApi.knowledge.putLarkKnowledge(detail.id, payload)
-            : resourceApi.knowledge.putKnowledge(detail.id, payload)
+          detail.type === KNOWLEDGE_TYPE.LARK ? knowledgeApi.putLarkKnowledge(detail.id, payload) : knowledgeApi.putKnowledge(detail.id, payload)
         // 返回完整请求链，向量化失败时保留原模型基准，允许再次保存重试。
         return request.then((savedKnowledge) => {
-          const embeddingRequest = embeddingModelChanged ? resourceApi.knowledge.putReEmbeddingKnowledge(detail.id) : Promise.resolve()
+          const embeddingRequest = embeddingModelChanged ? knowledgeApi.putReEmbeddingKnowledge(detail.id) : Promise.resolve()
           return embeddingRequest.then(() => {
             replaceKnowledgeDetail({ ...detail, ...savedKnowledge })
             MsgSuccess('保存成功')
@@ -205,6 +204,6 @@ defineProps<ResourceDetailPageProps>()
     </el-form>
 
     <!-- 保存知识库设置 -->
-    <el-button class="mt-4" type="primary" :loading="saving" @click="handleSave">保存</el-button>
+    <el-button v-if="!isWorkspaceSharedResource()" class="mt-4" type="primary" :loading="saving" @click="handleSave">保存</el-button>
   </div>
 </template>

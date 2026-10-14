@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
 import type { DocumentImportParagraph, ParagraphUpdatePayload } from '@/api/types'
 import type { ParagraphQuestionDraft } from '@/views/document-detail/paragraph-dialog/types'
 import ParagraphForm from '@/views/document-detail/paragraph-dialog/components/ParagraphForm.vue'
@@ -71,7 +70,7 @@ defineExpose({ open, close })
     <div v-loading="loading" class="flex w-full gap-4">
       <ParagraphForm ref="paragraphFormRef" v-model="paragraphForm" :knowledge-id="knowledgeId" />
       <!-- 关联问题仅保存到导入草稿，未创建文档不传入分段 ID -->
-      <ParagraphQuestions v-model="relatedQuestions" :api="ParagraphApi" :knowledge-id="knowledgeId" document-id="" />
+      <ParagraphQuestions v-model="relatedQuestions" :knowledge-id="knowledgeId" document-id="" />
     </div>
     <template #footer>
       <!-- 取消分段编辑 -->

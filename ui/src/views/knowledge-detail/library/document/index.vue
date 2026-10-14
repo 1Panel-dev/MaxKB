@@ -16,7 +16,7 @@ import { datetimeFormat } from '@/utils/time'
 import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
-import { isWorkspaceResource } from '@/utils/resource-context'
+import { isWorkspaceResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
 import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
 import ButtonExecutionRecord from './components/ButtonExecutionRecord.vue'
@@ -305,31 +305,28 @@ onBeforeUnmount(() => {
       <div class="flex-align-center gap-3">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
         <!-- 查看工作流执行记录 -->
-        <ButtonExecutionRecord
-          v-if="resourceApi.workflow && knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW"
-          :api="resourceApi.workflow"
-          :knowledge-id="knowledgeId"
-        />
-
-        <!-- 导入 Web、飞书或工作流文档 -->
-        <ButtonImportDocument
-          v-if="!showQuickCreate"
-          :api="resourceApi.document"
-          :knowledge-id="knowledgeId"
-          :knowledge-type="knowledgeType"
-          :folder-token="String(knowledge?.meta?.folder_token ?? '')"
-          :workflow="knowledge?.work_flow"
-          @refresh="handleImportDocumentSuccess"
-        />
-        <!-- 上传文档 -->
-        <ButtonUploadDocument
-          v-if="showQuickCreate"
-          :api="resourceApi.document"
-          :knowledge-id="knowledgeId"
-          :file-count-limit="knowledge?.file_count_limit"
-          :file-size-limit="knowledge?.file_size_limit"
-          @refresh="handleImportDocumentSuccess"
-        />
+        <ButtonExecutionRecord v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW" :api="resourceApi.workflow" :knowledge-id="knowledgeId" />
+        <template v-if="!isWorkspaceSharedResource()">
+          <!-- 导入 Web、飞书或工作流文档 -->
+          <ButtonImportDocument
+            v-if="!showQuickCreate"
+            :api="resourceApi.document"
+            :knowledge-id="knowledgeId"
+            :knowledge-type="knowledgeType"
+            :folder-token="String(knowledge?.meta?.folder_token ?? '')"
+            :workflow="knowledge?.work_flow"
+            @refresh="handleImportDocumentSuccess"
+          />
+          <!-- 上传文档 -->
+          <ButtonUploadDocument
+            v-if="showQuickCreate"
+            :api="resourceApi.document"
+            :knowledge-id="knowledgeId"
+            :file-count-limit="knowledge?.file_count_limit"
+            :file-size-limit="knowledge?.file_size_limit"
+            @refresh="handleImportDocumentSuccess"
+          />
+        </template>
       </div>
     </div>
   </Teleport>
@@ -346,12 +343,12 @@ onBeforeUnmount(() => {
     row-class-name="cursor-pointer"
     resizable
   >
-    <template v-if="showQuickCreate" #body-prepend>
+    <template v-if="showQuickCreate && !isWorkspaceSharedResource()" #body-prepend>
       <!-- 快速创建空白文档 -->
       <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
     </template>
 
-    <el-table-column type="selection" width="40" reserve-selection />
+    <el-table-column type="selection" width="40" reserve-selection v-if="!isWorkspaceSharedResource()" />
 
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip>
       <template #default="{ row }: { row: DocumentItem }">
@@ -362,6 +359,7 @@ onBeforeUnmount(() => {
           :maxlength="128"
           :validate="validateDocumentName"
           :save="(name) => saveDocumentName(row.id, name)"
+          :disabled="isWorkspaceSharedResource()"
         >
           <template #prefix>
             <img v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB" src="@/assets/file-type/web-link-icon.svg" alt="" class="size-5" />
@@ -426,6 +424,7 @@ onBeforeUnmount(() => {
           :document="row"
           v-model:loading="operationLoading"
           @refresh="refreshAfterOperation"
+          :disabled="isWorkspaceSharedResource()"
         />
       </template>
     </el-table-column>
@@ -459,7 +458,7 @@ onBeforeUnmount(() => {
     <el-table-column label="创建时间" width="180">
       <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
-    <el-table-column label="操作" width="160" fixed="right">
+    <el-table-column label="操作" width="160" fixed="right" v-if="!isWorkspaceSharedResource()">
       <template #default="{ row }: { row: DocumentItem }">
         <div class="flex-align-center" @click.stop>
           <!-- 启用或禁用文档 -->

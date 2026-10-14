@@ -56,7 +56,7 @@ function handleDialogClosed() {
       </div>
     </el-popover>
     <!-- 添加文档标签 -->
-    <el-button class="mk-add-tag-button" plain :disabled="!api || disabled || loading" @click.stop="handleOpenDialog">
+    <el-button class="mk-add-tag-button" plain v-if="!disabled" :disabled="loading" @click.stop="handleOpenDialog">
       <MkIcon name="icon_add_outlined" size="14" />
       <span>标签</span>
     </el-button>

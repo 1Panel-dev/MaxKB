@@ -3,6 +3,7 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { ref, useTemplateRef, watch } from 'vue'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { MsgSuccess } from '@/utils/message'
+import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '../../context'
 
 defineOptions({ name: 'KnowledgeDocumentStrategyView' })
@@ -10,9 +11,7 @@ defineOptions({ name: 'KnowledgeDocumentStrategyView' })
 defineProps<ResourceDetailPageProps>()
 
 /* 复用详情回填策略，草稿由表单维护。 */
-const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext({
-  resourceScopes: ['workspace', 'system-resource', 'system-shared'],
-})
+const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 const strategyFormRef = useTemplateRef<InstanceType<typeof DocumentStrategyForm>>('strategyFormRef')
 const saving = ref(false)
 watch(
@@ -25,6 +24,8 @@ watch(
 
 /* 只保存文档处理策略，不触发同步或修改其他设置。 */
 function handleSave() {
+  const knowledgeApi = resourceApi.knowledge
+  if (isWorkspaceSharedResource() || !('putKnowledge' in knowledgeApi)) return
   const detail = knowledge.value
   const strategyForm = strategyFormRef.value
   if (saving.value || !detail || !strategyForm) return
@@ -33,7 +34,7 @@ function handleSave() {
     .validate()
     .then((valid) => {
       if (!valid) return
-      return resourceApi.knowledge.putKnowledge(detail.id, { doc_strategy: strategyForm.getStrategy() }).then((savedKnowledge) => {
+      return knowledgeApi.putKnowledge(detail.id, { doc_strategy: strategyForm.getStrategy() }).then((savedKnowledge) => {
         replaceKnowledgeDetail({ ...detail, ...savedKnowledge })
         MsgSuccess('保存成功')
       })
@@ -59,6 +60,6 @@ defineExpose({ customHeader: true })
   <div v-loading="saving" class="max-w-200">
     <DocumentStrategyForm ref="strategyFormRef" />
     <!-- 保存文档处理策略 -->
-    <el-button type="primary" class="mt-4" :loading="saving" @click="handleSave">保存</el-button>
+    <el-button v-if="!isWorkspaceSharedResource()" type="primary" class="mt-4" :loading="saving" @click="handleSave">保存</el-button>
   </div>
 </template>

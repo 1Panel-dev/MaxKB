@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
+import type { DocumentParagraphApi } from '@/views/document-detail/context'
 import type { RelatedQuestionsConfig } from '@/api/types'
-import GenerateQuestionsDialog from '@/components/business/generate-questions/GenerateQuestionsDialog.vue'
+import GenerateQuestionsDialog from '@/components/business/generate-questions/index.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchGenerateQuestionsAction' })
 const props = defineProps<{
-  api: typeof ParagraphApi
+  api: DocumentParagraphApi
   knowledgeId: string
   documentId: string
   paragraphIds: string[]
@@ -37,22 +37,23 @@ function handleOpenDialog() {
 function handleSubmit(config: RelatedQuestionsConfig) {
   if (props.disabled || loading.value || !targetParagraphIds.value.length) return
   loading.value = true
-  return props.api
-    .putGenerateParagraphQuestions(targetKnowledgeId.value, targetDocumentId.value, {
-      ...config,
-      paragraph_id_list: [...targetParagraphIds.value],
-    })
-    .then(() => {
-      MsgSuccess('操作成功')
-      refreshOnClosed.value = true
-      dialogRef.value?.close()
-    })
-    .catch(() => {
-      // 请求层统一提示错误，保留生成配置。
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putGenerateParagraphQuestions?.(targetKnowledgeId.value, targetDocumentId.value, {
+        ...config,
+        paragraph_id_list: [...targetParagraphIds.value],
+      })
+      .then(() => {
+        MsgSuccess('操作成功')
+        refreshOnClosed.value = true
+        dialogRef.value?.close()
+      })
+      .catch(() => {
+        // 请求层统一提示错误，保留生成配置。
+      }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 function handleClosed() {

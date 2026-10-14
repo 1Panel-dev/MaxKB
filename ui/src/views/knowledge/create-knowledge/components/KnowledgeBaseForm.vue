@@ -8,7 +8,7 @@ import ModelApi from '@/api/admin/workspace/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import ModelProviderApi from '@/api/admin/model-provider'
 import SelectModel from '@/components/business/select-model/index.vue'
-import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'KnowledgeBaseForm' })
 defineProps<{ disabled?: boolean }>()
@@ -90,7 +90,7 @@ defineExpose({ form, validate, reset })
         :provider-options="providerOptions"
         :disabled="disabled || loading"
         placeholder="请选择向量模型"
-        can-add
+        :can-add="!isWorkspaceSharedResource()"
         @refresh="loadModelOptions"
       />
     </el-form-item>

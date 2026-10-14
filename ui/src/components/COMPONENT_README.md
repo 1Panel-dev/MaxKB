@@ -35,12 +35,6 @@ Element Plus 已在 Admin、Chat 入口注册。使用前先检查原生 API，�
 
 手动组件从具体入口导入；动态表单通过自己的公开入口导入：
 
-```ts
-import SelectModel from '@/components/business/select-model/index.vue'
-import MkSearchList from '@/components/mk-search-list/index.vue'
-import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
-```
-
 ## 通用规则
 
 - 按钮组件统一使用 `Button` 前缀：操作按钮按 `Button + 动作 + 对象` 命名，例如
@@ -78,7 +72,7 @@ import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynam
     只销毁内部内容，不等于销毁外层业务组件，不能据此删除外层状态重置。
   - `close()` 只发起关闭，表单清理放在 `closed`，避免关闭动画中内容跳变；依赖本次参数的默认值、
     编辑快照、动态字段及每次打开必须重新查询的数据仍在 `open()` 初始化。
-  父级负责校验或请求时，子组件提交数据后由父级成功调用 `close()`，失败保持打开。
+    父级负责校验或请求时，子组件提交数据后由父级成功调用 `close()`，失败保持打开。
 - 仅登录表单支持回车提交；其他业务表单使用 `@submit.prevent`，保存、添加由按钮触发。
   自定义 `submit` 事件不等于原生表单提交。
 
@@ -86,44 +80,17 @@ import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynam
 
 ### MkHorizontalScroll
 
-全局横向滚动组件，位于 `global/mk-horizontal-scroll/index.vue`，模板自动注册。
-通过默认插槽传入内容，内部横向 Flex 排列并提供 8px 间距；固定宽度的内容应设置 `shrink-0`。
-左右箭头分别在对应方向可滚动时显示，到达边界即隐藏；按钮绝对定位在容器两侧并垂直居中，
-不占用内容宽度。每次点击平滑滚动可视宽度的 80%。
-底层使用 `el-scrollbar`，隐藏横向滚动条，保留触控板和触屏的原生横向滚动。
-`ResizeObserver` 监听容器和内容尺寸，自动响应内容增删、图片加载及窗口缩放；卸载时清理监听。
-外部间距由使用方通过 `class` 设置，不在组件内绑定附件业务。
-
-```vue
-<MkHorizontalScroll class="mb-3">
-  <template v-for="file in files" :key="file.uid">
-    <el-card class="w-60 shrink-0">{{ file.name }}</el-card>
-  </template>
-</MkHorizontalScroll>
-```
+位于 `global/mk-horizontal-scroll/index.vue`。默认插槽横向排列、间距 8px，固定宽度子项使用 `shrink-0`。
+左右箭头仅在对应方向可滚动时显示，点击滚动可视宽度的 80%；使用 el-scrollbar，保留触控板／触屏滚动。
+内容及容器尺寸变化自动更新，外部间距由调用方设置。
 
 ### MkAudio、MkVideo
 
-位于 `global/mk-media-preview/`，两个全局组件分别提供音频、视频遮罩播放器。
-传入必填 `src`、`name`；通过默认插槽传入触发内容，卡片、图标、文件大小及样式由调用方维护。
-`src` 为空时不打开预览；触发区域支持点击、Enter 和空格打开，遮罩内居中显示原生音频或视频控制条并尝试自动播放；
-自动播放受浏览器策略限制时可手动播放。关闭按钮、点击遮罩或 Esc 关闭预览，立即卸载播放器。
-附件删除或列表清空导致组件卸载时也会清理播放器；地址变化时关闭旧预览。
-预览采用页面遮罩，不主动请求浏览器全屏，视频原生控制条仍可提供全屏功能。
-内部入口 `index.vue`（`MkMediaPreview`） 统一无样式的触发容器与媒体遮罩，不使用 `MkDialog`。
-遮罩通过 Teleport 挂载到 body，使用 `ElOverlay` 与 `useZIndex` 管理遮罩和层级，
-`useLockscreen` 锁定背景滚动，`TrapFocus` 约束键盘焦点；打开时聚焦关闭按钮，关闭后焦点返回触发区。
-预览区处理 Esc 关闭，界面只展示居中的播放器和右上角关闭按钮。业务方使用两个公开组件，
-不直接调用内部组件。组件不创建或释放 Object URL，由调用方维护地址生命周期。
-
-```vue
-<MkAudio :src="audioUrl" name="录音.mp3">
-  <el-card>录音附件卡片</el-card>
-</MkAudio>
-<MkVideo :src="videoUrl" name="演示.mp4">
-  <el-card>视频附件卡片</el-card>
-</MkVideo>
-```
+位于 `global/mk-media-preview/`，公开 `MkAudio`、`MkVideo`，不使用内部 `MkMediaPreview`。
+必填 `src`、`name`，默认插槽放触发内容；空地址不打开。点击、Enter 或空格打开原生播放器遮罩，
+关闭按钮、遮罩和 Esc 关闭；尝试自动播放，浏览器限制时手动播放。
+预览 Teleport 到 body，管理遮罩层级、滚动锁定、焦点约束和返回；地址变化或卸载清理播放器。
+Object URL 由调用方创建和释放，组件不管理其生命周期。
 
 ### MkTooltip
 
@@ -157,8 +124,6 @@ Admin、Chat 入口调用 `configureMarkdownEditor()` 配置本地高亮、KaTeX
 
 `trigger` 默认 `header`，点击标题区域切换；设置为 `indicator` 时，仅点击箭头按钮切换，
 标题文字和空白区域不触发。箭头按钮支持键盘操作。
-
-`v-model:expanded` 可控制展开状态；未绑定时沿用 `defaultExpanded` 的内部状态。
 
 标题折叠区，`title` 或 `label` 插槽提供标题，默认插槽提供内容。
 `defaultExpanded` 默认 `true`，仅设置初始状态；展开状态通过 `v-model:expanded` 同步。
@@ -227,23 +192,6 @@ Drawer 没有 `MkDialog` 的外壳挂载控制；需要按需挂载时，由业�
   用 `v-model:batch-selection` 绑定唯一值数组，`batch-values` 传当前列表全部值。
   插槽提供 `batchSelection`；取消清空选择并触发 `batch-cancel`。
 
-```vue
-<MkViewLayout :loading="loading">
-  <template #default="{ title, Header, Footer }">
-    <component :is="Header"><h4>{{ title }}</h4></component>
-    <ResourceList />
-    <component :is="Footer" v-if="batchMode"
-      v-model:batch-selection="selectedIds" :batch-values="resourceIds"
-      @batch-cancel="batchMode = false">
-      <template #footer-batch-actions="{ batchSelection }">
-        <!-- 删除选中资源 -->
-        <el-button :disabled="!batchSelection.length" @click="removeResources(batchSelection)">删除</el-button>
-      </template>
-    </component>
-  </template>
-</MkViewLayout>
-```
-
 ### MkIcon
 
 `name` 接收完整 SVG Symbol ID，`icon` 接收显式导入的 Element Plus 图标，二选一；
@@ -307,13 +255,7 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 `activeText`、`inactiveText` 可修改文案，`inactiveIcon` 可覆盖未激活图标（默认 `icon_ban_filled`）。
 成功图标固定为 `icon_succeed_colorful`，失败图标为 `icon_close_colorful`，加载类型使用 `LoadingIcon`，
 禁用图标使用灰色样式。`inactiveIcon` 仅影响布尔模式。
-不再接收 `status`；未知业务状态由调用方显示原始文案，不伪装成成功或禁用状态。
-
-```vue
-<MkStatusLabel :active="enabled" />
-<MkStatusLabel type="loading" label="索引中" />
-<MkStatusLabel v-bind="executionStatus" />
-```
+接口使用 type／label，未知业务状态由调用方显示原始文案，不伪装成成功或禁用状态。
 
 ### MkTable
 
@@ -341,16 +283,6 @@ Element Plus `append`，仅在传入该插槽时将直属表体滚动容器设�
 组件不使用 Form 或表单校验；空名称、纯空白及提交期间禁用创建按钮，提交前 trim。
 Esc 或取消清理草稿；`loading` 默认为 false，为 true 时禁止创建和取消。组件不等待 Promise，不自动收起。
 
-```vue
-<MkTable :data="documentData">
-  <template #body-prepend>
-    <!-- 快速创建空白文档 -->
-    <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" :loading="creatingDocument" @create="handleCreateDocument" />
-  </template>
-  <el-table-column prop="name" label="文档名称" />
-</MkTable>
-```
-
 `paginationConfig` 包含 `currentPage`、`pageSize`、`total` 和可选 `pageSizes`；不传则隐藏分页器，
 `pageSizes` 默认 `[10, 20, 50, 100]`。
 
@@ -377,13 +309,8 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 虚拟表格、跨页和跨列表拖拽不属于该接口。排序工具不会深拷贝普通表格的行对象；工作流使用方应在
 数据写回边界自行 `cloneDeep`，保持 LogicFlow 的可观察树约束。
 
-`MkTableFilter` 放在 `global/mk-table/mk-table-filter/`，公共入口为 `index.vue`。
-入口统一选择模式、渲染触发按钮、计算筛选高亮和回写模型；四个内部组件分别维护对应交互：
-`TableFilterSingle.vue` 复用 `MkDropdown`、`MkDropdownMenu` 和 `MkDropdownItem`，
-`TableFilterMultiple.vue` 管理多选草稿及确认，`TableFilterCascader.vue` 管理级联面板及即时提交，
-`TableFilterCustom.vue` 管理对象草稿和自定义内容；多选与自定义模式共用 `TableFilterActions.vue` 的重置、确定按钮。
-内部组件通过默认插槽接收同一个触发按钮，只向入口发送 `select` 和 `open`；页面只使用
-`MkTableFilter`，不直接引用模式组件。多选与级联继续使用 Popover，不强行统一其提交和关闭行为。
+`MkTableFilter` 的公开入口为 `global/mk-table/mk-table-filter/index.vue`，不直接引用内部模式组件。
+页面只维护生效条件、业务选项和查询映射，草稿、显隐、提交及重置由组件负责。
 
 表头筛选使用 `MkTableFilter`，`label` 设置表头文案，必填 `v-model` 保存已生效的条件。
 `mode` 支持以下模式，默认 `multiple`；调用时显式填写 `mode`，便于区分筛选方式：
@@ -393,7 +320,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 | `multiple` | `TableFilterOption[]` / 字符串、数字或布尔值数组          | 打开时复制草稿，确定后提交；重置提交 `[]`；点击外部丢弃草稿 |
 | `single`   | `TableFilterOption[]` / 字符串、数字或布尔值，加 `null`   | 点击立即提交并关闭；“全部”提交 `null`                       |
 | `cascader` | Element Plus `CascaderOption[]` / 由 `cascaderProps` 决定 | 勾选立即提交；多选保持打开，单选提交后关闭                  |
-| `custom` | 不传 options / 自定义对象 | 打开时深拷贝草稿，确定后提交；重置提交 `resetValue` |
+| `custom`   | 不传 options / 自定义对象                                 | 打开时深拷贝草稿，确定后提交；重置提交 `resetValue`         |
 
 `TableFilterOption` 位于 `global/mk-table/mk-table-filter/types.ts`，包含 `label`、`value` 和可选
 `disabled`；扁平选项不使用空字符串作为业务值。`false`、`0` 都是有效筛选条件，正确高亮筛选图标。
@@ -420,36 +347,6 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 组件不请求业务接口、不转换查询参数。文档文件状态用唯一选项值映射为 `status` 和 `task_type`，
 映射和分页重置由页面负责，切换条件时一起更新这两个参数，避免残留任务类型。
 
-```vue
-<!-- 多选：保留确定与重置 -->
-<MkTableFilter mode="multiple" v-model="workspaceIds" label="工作空间" :options="workspaceOptions" @change="reload" />
-<!-- 单选：enabled 声明为 boolean | null -->
-<MkTableFilter
-  v-model="enabled"
-  mode="single"
-  label="启用状态"
-  :options="[
-    { label: '已启用', value: true },
-    { label: '已禁用', value: false },
-  ]"
-  @change="reload"
-/>
-<!-- 级联：tagIds 为标签值数组，选项通过 children 组织 -->
-<MkTableFilter v-model="tagIds" mode="cascader" label="标签" :options="tagOptions" @open="loadTagOptions" @change="reload" />
-```
-
-```vue
-<!-- 自定义反馈筛选；feedback 为 { min_star: 0, min_trample: 0 } -->
-<MkTableFilter v-model="feedback" mode="custom" label="用户反馈" :reset-value="{ min_star: 0, min_trample: 0 }" @change="reload">
-  <template #default="{ value }">
-    <div class="space-y-3">
-      <el-input-number v-model="value.min_star" :min="0" :value-on-clear="0" controls-position="right" align="left" />
-      <el-input-number v-model="value.min_trample" :min="0" :value-on-clear="0" controls-position="right" align="left" />
-    </div>
-  </template>
-</MkTableFilter>
-```
-
 表格操作列需要 More 菜单时使用 `MkTableMoreDropdown`。组件统一提供点击型、右下定位的 More
 按钮以及 `MkDropdownMenu`，默认插槽中直接放置 `MkDropdownItem`；插槽为空，或其中的条件菜单项
 均未渲染时，不显示 More 触发器。其他 Dropdown 属性和事件通过 `$attrs` 传入，菜单容器样式通过
@@ -474,14 +371,6 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 该能力用于平面分组表格，不与树形／懒加载选择混用，不主动加载或联动未传入的跨页记录。
 原生 `select` 事件仍透传；业务批量操作使用 `selection-change` 的最终结果。
 搜索、分页、切换业务对象后的清理以及提交 ID 的业务去重由页面负责。
-
-```vue
-<MkTable :data="tagRows" selection-group-key="key" :span-method="spanMethod" @selection-change="handleSelectionChange">
-  <el-table-column type="selection" width="40" />
-  <el-table-column prop="key" label="标签" />
-  <el-table-column prop="value" label="标签值" />
-</MkTable>
-```
 
 ### MkAction
 
@@ -512,19 +401,6 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `selectable` 开启卡片选择，`selected` Prop 控制选中，`selected` 事件返回新状态。
 点击卡片或复选框切换，`Action` 在选择模式下不渲染；页面负责选择集合、批量操作和特殊内容显隐。
 `disabled` 只控制指针和阴影，不阻止点击或选择；需要禁用交互时由使用方处理。
-
-```vue
-<MkSourceCard title="工作流工具" :selectable="batchMode" :selected="selected" @selected="selected = $event">
-  <template #footer="{ Action, ActionDropdown }">
-    <MkStatusLabel :active="enabled" />
-    <component :is="Action">
-      <component :is="ActionDropdown">
-        <MkDropdownItem @click="editTool">编辑</MkDropdownItem>
-      </component>
-    </component>
-  </template>
-</MkSourceCard>
-```
 
 ### MkFormList
 
@@ -570,30 +446,13 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 编辑期间根节点自动设置内部标记 `data-mk-edit-name-editing`，供 `MkTable` 识别编辑焦点；
 退出编辑时移除，调用方无需传入标记或编辑状态。
 
-```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-import MkEditName from '@/components/mk-edit-name/index.vue'
-
-const documentName = ref('DataEase 快速入门')
-// 示例：真实使用时在这里等待业务 API，返回服务端最终名称。
-async function saveDocumentName(name: string): Promise<string> {
-  return name
-}
-</script>
-
-<template>
-  <MkEditName v-model="documentName" :save="saveDocumentName" />
-</template>
-```
-
 表格通过列默认插槽使用，列表以资源 ID 为 key；该列不再启用 `show-overflow-tooltip`，避免编辑时
 叠加表格提示。单元格可用宽度控制组件宽度，业务图标在编辑态隐藏。
 
 ### MkEditAvatar（修改头像）
 
 手动导入 `@/components/mk-edit-avatar/index.vue`，不参与全局注册。字符串 `v-model` 为当前
-自定义头像 URL，空字符串表示使用默认图标；不再接收 `defaultIcon`。
+自定义头像 URL，空字符串表示使用默认图标；默认图标通过插槽提供。
 `size` 默认为 `32`（px），只设置 `referenceRef` 触发容器的宽高；弹层预览和上传区域固定为 80px。
 `disabled` 默认为 `false`，直接传给 `el-popover` 控制禁用，不额外维护禁用状态监听。
 
@@ -614,23 +473,6 @@ async function saveDocumentName(name: string): Promise<string> {
 `blob:` 地址仅供当前组件存续期间预览，不能提交给后端作为持久图片地址。
 组件只通过 `change(file)` 通知调用方，不请求接口，也不规定文件何时上传。
 调用方按业务流程处理文件，通过 `v-model` 传入用于展示的头像地址。
-
-```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
-
-const avatar = ref('')
-</script>
-
-<template>
-  <MkEditAvatar v-model="avatar">
-    <template #default="{ icon }">
-      <PortalIcon :icon="icon" />
-    </template>
-  </MkEditAvatar>
-</template>
-```
 
 ### MkFilterableDropdown
 
@@ -684,10 +526,6 @@ Logo 数据统一从 Theme Store 获取。
 透明度为 `0.05`；`area: false` 可关闭默认填充，显式 `areaStyle` 可覆盖默认配置。尺寸属性与基础容器一致。
 标题由页面展示；内置图例、坐标轴与提示，两条及以上系列显示图例，单条隐藏。`valueFormatter` 默认使用 `numberFormat`，Tokens 图表传入 `formatTokenNumber`，当前图表颜色直接使用固定颜色值，不跟随主题切换。
 
-```vue
-<MkLineChart :option="{ xData: dates, yData: [{ name: '对话轮次', data: counts, area: true }] }" />
-```
-
 ### MkDateRange
 
 组合日期预设下拉框和自定义日期区间选择器。默认显示“过去 7 天”，仅在用户修改筛选条件时通过
@@ -699,38 +537,19 @@ Logo 数据统一从 Theme Store 获取。
 
 ### MkDragUpload
 
-`mk-drag-upload/index.vue` 为统一入口，根据 `multiple` 选择 `SingleFileUpload.vue` 或
-`MultipleFileUpload.vue`，转发 Props、事件、插槽和公开方法。单文件的卡片、更换及整体清理逻辑
-放在 `SingleFileUpload.vue`，多文件的常驻拖拽区、文件列表及逐项删除逻辑放在
-`MultipleFileUpload.vue`，不在一个实现中混合两种模式的状态分支。
-两种模式均通过 `v-model` 管理兼容 Element Plus `UploadUserFile[]` 的 `DragUploadFile[]`，
-类型定义位于 `mk-drag-upload/types.ts`，可携带 `file_id`、`errMsg` 和 `canRetry`。
-`multiple` 默认为 `false`，单文件模式选择后展示默认卡片和更换入口；传入 `multiple` 后支持
-多文件选择，拖拽区保持显示。`accept`、`limit` 直接传给上传控件，多文件模式内部也校验文件格式、
-空文件和重复文件；超出数量时提示并发出 `exceed`。`sizeLimit` 为多文件的单文件大小上限（MB），
-默认 100；超限保留 `fail` 卡片和大小错误提示，不允许重试。格式不支持、空文件及重复选择移除；
-重复选择保留列表中最先加入的文件，移除时同步清理上传控件内部列表，避免回写未上传的重复项。
-目录中的 `.DS_Store` 格式不支持时静默移除。
-`dragText`、`selectText`、`tipText` 和 `replaceText` 可替换默认文案，格式或限制说明通过
-`tipText` 展示。文件列表由各模式组件直接展示，多文件模式展示
-已选数量或上传完成汇总和两列 `el-card.small` 文件卡片；`download` 作用域插槽为文件卡片提供下载操作。
-多文件列表使用 Element Plus 的 `ready`、`uploading`、`success`、`fail` 状态展示进度和失败原因，
-可重试失败文件、其他失败文件、上传中文件依次置顶。尚未上传的文件显示已选择，不计入完成数。
-多文件组件通过 `inject('upload')` 获取调用方提供的 `DragUploadHandler`：
-`(file, onProgress) => { request: Promise<string>, abort }`。选择文件后先发出 `change`，等待
-调用方列表回写并完成组件校验，再上传保留的 `ready` 文件；进度回调更新 `percentage`，请求成功后
-从响应地址提取 `file_id` 并标记 `success`，网络失败标记 `fail` 并允许重试。100% 表示传输完成，成功状态以请求响应为准。
-单个和全部重试仅对 `fail` 且 `canRetry` 的文件生效，有注入接口时直接重新上传；未注入时
-保持文件选择模式，重试逐文件发出 `retry(file)`。删除、清空和卸载时取消仍在进行的上传。
-使用方可通过 `change` 增加业务校验，通过 `remove` 清理业务数据。具体接口由页面
-`provide<DragUploadHandler>('upload', handler)` 提供，不写入公共组件。
-多文件组件移除 `success` 且具有 `file_id` 的文件时，直接调用 Admin `FileApi.deleteFile(file_id)`
-删除服务端文件；`remove` 事件仍用于通知调用方清理业务数据。
-数量限制使用 `limit`，不通过展示插槽控制行为。
-组件暴露 `clearFiles()` 清空控件状态、`handleRemove(file)` 移除文件和响应式 `uploadingCount` 上传中数量。
-多文件组件的默认选择文案内提供“选择文件夹”，内部维护隐藏的目录选择 input，选择后逐项
-加入上传控件并触发相同的 `change` 流程；等待调用方校验回写后再计算数量限制，超限发出
-`exceed`。多文件通用校验由组件负责，具体请求由业务页面提供。
+入口 `mk-drag-upload/index.vue`，内部按单／多文件分离实现。`v-model` 为 `DragUploadFile[]`，
+兼容 UploadUserFile，支持 file_id、errMsg、canRetry；类型从组件 `types.ts` 导入。
+
+- `multiple` 默认 false；单文件展示卡片和更换入口，多文件保留拖拽区、文件夹选择与列表。
+- `accept`、`limit` 控制格式／数量，多文件 `sizeLimit` 默认 100MB；格式、空文件、重复选择移除，
+  大小超限保留不可重试 fail 卡片，网络失败可重试。超量发出 exceed，DS_Store 格式不支持时静默移除。
+- `dragText`、`selectText`、`tipText`、`replaceText` 覆盖文案；download 作用域插槽提供下载操作。
+- 多文件通过 `inject('upload')` 获取 `DragUploadHandler`，返回 `{ request: Promise<string>, abort }`。
+  change 后等待调用方回写和校验，再上传 ready 文件；响应成功才标记 success 并提取 file_id，100% 仅表示传输完成。
+- 未注入请求时只选择文件，重试发出 retry(file)。删除／清空／卸载取消上传；移除有 file_id 的成功文件会调用
+  Admin FileApi.deleteFile 删除服务端文件，remove 事件通知业务清理。
+- 暴露 clearFiles()、handleRemove(file)、响应式 uploadingCount；公开选择状态 ready／uploading／success／fail。
+  页面提供具体上传请求与业务校验，不通过展示插槽控制数量限制。
 
 ### PythonCodeEditor
 
@@ -774,21 +593,10 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 参数与优先级沿用 `MkListItem`，下拉直接放 `MkDropdownItem`。`click(row, index)` 返回原始行。
 `empty` 可自定义空态；默认空数据使用 `emptyText`（“暂无数据”），有搜索词时显示“没有找到相关内容”。
 
-```vue
-<MkSearchList v-model="keyword" :data="workspaces" :props="{ label: 'displayName', value: 'workspaceId' }" @click="selectWorkspace">
-  <template #default="{ row, active }">
-    <span :class="{ 'font-medium': active }">{{ row.displayName }}</span>
-  </template>
-  <template #action-dropdown="{ row }">
-    <MkDropdownItem @click="editWorkspace(row)">编辑</MkDropdownItem>
-  </template>
-</MkSearchList>
-```
-
 ### MkDynamicsForm、MkDynamicsFormConstructor
 
 表单配置加载、字段联动请求与 Tree 懒加载的 loading 由组件在请求前开启，并在 `finally` 中释放；
-不向 API 请求方法传递 loading，动态请求脚本也不再通过 `extra.loading` 获取状态。
+不向 API 请求方法传递 loading，动态请求脚本不通过 `extra.loading` 获取状态。
 
 动态表单 `Tree` 字段使用 `MkTable` 展示文档与文件夹，复用原生复选列、全选和父子选择联动。
 保留 `text_field`、`value_field`、`childrenField` 映射，选中值仍为原始节点对象数组；
@@ -830,7 +638,7 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 
 启用显隐设置时，配置器将 Tabs 导航与内容分开，只继承容器的最大高度，内容较少时自然撑开。
 `el-scrollbar` 及其内部滚动容器使用可收缩的 Flex 布局，并覆盖默认的百分比高度；达到最大高度后
-仅内容区滚动，Tabs 保持固定。普通 `MkDialog` 已提供内容最大高度，调用方不需要设置固定高度。
+仅内容区滚动，Tabs 保持固定。普通 `MkDialog` 已提供内容最大高度，调用方不设置固定高度。
 两个表单通过 `v-show` 切换并保持挂载，确保未选中的页签也能回填、取值和校验。
 
 字段配置中的动态校验器和表格行表达式属于受信任的服务端协议，只允许加载可信配置；普通业务
@@ -845,7 +653,7 @@ MultiRow、RadioRow 的配置器与运行时复用字段组件，分别使用复
 禁用、键盘和校验行为；仅展示完整选项，输出仍为 `MultiRow`、`RadioRow`。
 
 动态表单的 Model 字段使用 `SelectModel`，将 `attrs.provider_list` 中的模型快照映射为
-扁平 `ModelItem[]`，由选择器统一分组和展示供应商。旧快照未保存状态时保留可选行为，已保存的
+扁平 `ModelItem[]`，由选择器统一分组和展示供应商。已有快照未保存状态时保留可选行为，已保存的
 状态按 `SelectModel` 的可用性规则处理。切换模型一次性回写 `model_id` 和深拷贝后的
 `model_params_setting`；清空时回写空 ID 和空参数，避免修改原配置中的参数对象。
 
@@ -866,14 +674,14 @@ Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选
 
 ### GenerateQuestionsDialog
 
-`business/generate-questions/GenerateQuestionsDialog.vue` 共用关联问题配置，
+`business/generate-questions/index.vue` 共用关联问题配置，
 知识库和文档 Action 显式导入，打开时挂载、`closed` 后卸载，局部状态依赖重新挂载初始化。传入提交
 `loading`，通过 `open()` 打开、`close()` 关闭，不传 `modelApi`。
 弹窗通过 `isSystemResource()`、`isSystemSharedResource()` 选择 System 资源管理、System 共享资源
 或 Workspace Model API，统一查询当前范围的 LLM 选项和模型参数；供应商使用公共 API 查询，
 并为 `SelectModel` 提供模型参数查询；支持创建模型后刷新，
 下拉使用 `teleported`。模型选项与参数查询共用一个 `modelLoading`，通过 `finally` 释放；
-表单禁用状态统一为 `loading || modelLoading`，失败提示由请求层处理。
+内容遮罩使用 `loading || modelLoading`，模型选择与提交入口保留相应禁用条件；失败提示由请求层处理。
 提交请求状态由 Action 传入的 `loading` 管理，表单校验后再次检查状态，避免重复提交。
 
 弹窗只通过资源上下文工具判断范围，不持有知识库/文档/段落 ID，也不调用生成接口。`submit(config, stateList)`
@@ -884,7 +692,7 @@ Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选
 表单状态保留在 Dialog，同目录 `prompt-cache.ts` 负责按用户读取与保存模型、参数、提示词，
 不注册专用 Store；每次打开读取缓存，提交时保留其他用户的最新记录。
 沿用 v2 的 `localStorage.PROMPT_CACHE` 及 `[{ user, formValue }]` 数组结构，直接读取已有配置，
-保存时只替换当前用户记录，同一用户跨工作空间共用配置；不再传入工作空间 ID。
+保存时只替换当前用户记录，同一用户跨工作空间共用配置；不传工作空间 ID。
 不保存目标 ID 或分段范围；缓存用 `cloneDeep` 隔离。模型未选择或已失效时，默认选中接口返回的第一个
 可用模型并清空旧参数；没有可用模型时保持空选。已有可用选择及参数在加载或刷新后保留。
 取消不保存，提交前校验必填与纯空白提示词；提交失败保留表单，缓存不可用不阻止生成。
@@ -940,7 +748,6 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 通过 `open(knowledge)` 传入已选知识库快照，确认后通过 `submit` 返回新的选择；取消不修改调用方
 数据，关闭后统一清理临时状态。选择数据直接基于 `KnowledgeItem` 声明为
 `(Partial<KnowledgeItem> & { id: string })[]`，保留必需的 ID 并兼容缺少详情的旧数据，
-不再维护弹窗专用类型文件。
 组件采用 `MkViewLayout` 左右布局，搜索栏位于内容区右上角，刷新位于弹窗标题栏。
 选项使用紧凑三列布局（窄屏减少列数），左侧图标与省略名称、右侧复选框。点击卡片或复选框
 切换选择，选中后仅展示相同 Embedding 模型的选项，清空后恢复；悬停展示知识库详情。
@@ -1023,9 +830,8 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 根目录隐藏“不授权”，已有该值按“查看”展示；包含子资源时传入完整文件夹子树，
 按资源所属工作空间筛选可管理的文件夹 ID，无可管理目录时禁用该范围。
 
-用户授权按 `isSystemResource()` 选择 System 或 Workspace API；用户组列表当前使用 Workspace API。
-现有提交分支却使用所选的 `authorizationApi` 调用用户组保存，System API 尚无该方法，
-因此不能将 System 用户组保存视为已支持。用户和用户组列表目前也没有请求版本校验。
+用户与用户组查询、保存均由入口按 `isSystemResource()` 选择当前范围完整 requestApi，
+Workspace 使用 Workspace API，System 资源管理使用 System API；不以路由工作空间代替资源 workspaceId。
 
 ### UserGroupMembersDrawer
 
@@ -1045,15 +851,12 @@ Workspace API 内部使用 `getWorkspaceId()`，System 共享 API 不接收工�
 抽屉内部通过 `isSystemSharedResource() && (auth.isEE || auth.isPE)` 判断是否显示工作空间列及筛选，
 不接收 `showWorkspace` Prop。仅条件成立时查询工作空间选项并传递 `workspace_ids`（JSON 字符串）。
 供应商图标由抽屉查询后传给内部 `ResourceIcon`，模型供应商标识来自关系记录的 `icon`。
-当前查询没有请求版本校验，不保证旧响应在切换或关闭后被忽略。
+请求版本控制遵循 [API 文档](../api/API_README.md#请求版本控制)。
 
 工作空间模型、知识库、应用、工具列表已分别通过 `RelatedResourcesModelAction`、
 `RelatedResourcesKnowledgeAction`、`RelatedResourcesApplicationAction`、`RelatedResourcesToolAction` 接入。
 
-## 维护与检查
+## 文档维护
 
-新增或调整公共组件时，先确定目录及公开入口，按本文约定实现类型化接口；仅在接口、目录或使用规则变化时
-同步对应章节，不记录内部函数清单。变更全局注册组件时，通过 Vite 开发或构建刷新声明。
-
-Vue/TypeScript 改动运行定向 ESLint、类型检查及必要的入口构建；仅修改文档时检查引用、
-Prettier 和 `git diff --check`，无需构建。`npm run lint` 尚无对应 `lint:*` 子脚本，使用定向 ESLint。
+仅在目录、公开接口或使用规则变化时更新对应组件章节；不登记内部函数和修复过程。
+验证规则统一见 [AGENTS.md](../../AGENTS.md)。

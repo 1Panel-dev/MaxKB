@@ -3,51 +3,20 @@
 `src/api` 负责前端与服务端之间的通信，按照应用入口隔离 Admin 与 Chat 请求体系。
 Admin 与 Chat 分别维护请求客户端和业务接口。
 
-```text
-src/api/
-├── constants.ts                     # Admin 与 Chat 的 API base 路径常量
-├── admin/
-│   ├── file.ts                       # 通用文件上传、进度与取消
-│   ├── auth/                         # Admin 登录认证与当前用户接口
-│   │   └── types.ts                  # 认证 API 与认证 Store 共用类型
-│   ├── core/                         # Admin 请求基础能力
-│   │   ├── request.ts                # Axios 实例、HTTP 方法与统一响应解包
-│   │   └── types.ts                  # Admin 请求协议类型
-│   ├── system/                       # 系统管理业务接口
-│   │   ├── chat-user/                # 对话用户、用户组及认证接口
-│   │   ├── settings/                 # 登录认证、邮件与外观设置接口
-│   │   ├── resource-management/      # System 资源管理接口
-│   │   ├── shared-resources/         # System 共享资源接口
-│   │   └── <resource>.ts             # 其他 System 单资源接口
-│   ├── workspace/                    # 工作空间业务接口
-│   │   ├── conversation.ts           # 调试对话、历史会话与语音接口
-│   │   ├── application/              # 智能体接口
-│   │   ├── knowledge/                # 知识库接口
-│   │   ├── shared/                   # 工作空间可用的共享模型、工具、知识库查询
-│   │   ├── model.ts                  # 模型接口
-│   │   ├── trigger/                   # 触发器查询及维护接口
-│   │   ├── tool/                     # 工具、工具工作流及工具商店接口
-│   │   └── <resource>.ts             # 工作空间公共资源接口
-│   └── model-provider.ts                   # Workspace 与 System 共用的模型供应商接口
-├── chat/                             # Chat 独立请求体系
-│   ├── core/request.ts               # JSON 与流式请求
-│   ├── core/types.ts                 # Chat 请求协议类型
-│   ├── file.ts                       # Chat 文件上传、进度与取消
-│   ├── auth.ts                       # 门户与单应用的认证前置配置、匿名认证、登录与登出
-│   ├── chat-user.ts                  # 当前对话用户档案
-│   ├── application.ts                # 对话端智能体信息（v3 application/<id>/profile）
-│   ├── portal.ts                     # 门户全部智能体（v3 portal/application）与按智能体分组的历史对话（v3 portal/chat）
-│   ├── conversation.ts               # 正式对话、历史会话与语音接口
-│   └── README.md                     # Chat API 边界说明
-├── enums/                            # 后端固定枚举值
-│   ├── index.ts                      # API 枚举值的唯一导入入口
-│   └── <domain>.ts                   # 按明确业务域拆分的枚举值
-├── types/                            # API 与 View/Component 共用的业务类型
-│   ├── index.ts                      # API 公共类型的唯一导入入口
-│   ├── common.ts                     # 多个 API 业务域共用的基础类型
-│   └── <domain>.ts                   # 按明确业务域拆分的共享类型
-└── API_README.md
-```
+## 目录职责
+
+| 位置                            | 职责                                                             |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `constants.ts`                  | Admin／Chat API base 路径                                        |
+| `admin/core/`、`chat/core/`     | 各入口请求客户端与传输协议                                       |
+| `admin/auth/`                   | Admin 认证及当前账号                                             |
+| `admin/workspace/`              | Workspace 资源及业务接口                                         |
+| `admin/workspace/shared/`       | 工作空间可用的共享资源查询                                       |
+| `admin/system/`                 | 系统管理、资源管理、共享资源及设置                               |
+| `admin/model-provider.ts`       | 公共模型供应商查询                                               |
+| `admin/file.ts`、`chat/file.ts` | 各入口文件请求                                                   |
+| `chat/`                         | 正式对话、门户、认证和对话用户；见 [Chat README](chat/README.md) |
+| `enums/`、`types/`              | 后端枚举／跨 API 与 UI 共用业务类型，各自由 index.ts 对外导出    |
 
 ## 分层职责
 
@@ -66,15 +35,9 @@ src/api/
 
 ## 业务接口组织
 
-`admin/system/chat-management/portal-setting.ts` 通过 Admin `/portal` 读取和局部保存门户配置，
-公共类型维护在 `types/portal.ts`。JSON 用于访问开关和认证、跨域配置，门户名称与 Logo 使用
-FormData；保存返回完整配置，页面以该返回值作为唯一数据来源。
-认证配置保留未编辑字段，仅提交后端读取的 `login_value`、`max_attempts`、`failed_attempts`、
-`lock_time`；跨域地址直接提交后端 `Portal.cross_domain_list` 数组字段，不再维护 `cors_config`。
-
 - 业务 API 先按 Admin 入口下的 `auth`、`workspace`、`system` 等一级业务域归类。Workspace 和
   System 内部可继续按明确的功能域建立子目录，例如 `workspace/application/`、
-  `workspace/tool/`、`system/chat-user/` 和 `system/settings/`；不需要分组的单资源接口直接放在
+  `workspace/tool/`、`system/chat-management/` 和 `system/settings/`；不需要分组的单资源接口直接放在
   所属一级业务域下。
 - 一类资源的增删改查放在同一个最终资源文件中。调用方直接导入该文件，不为业务目录创建聚合
   入口，也不创建汇总所有业务接口的 `api.ts`。
@@ -93,182 +56,10 @@ FormData；保存返回完整配置，页面以该返回值作为唯一数据来
   `import WorkspaceApi from '@/api/admin/system/workspace'`；System 登录设置使用
   `import AuthSettingApi from '@/api/admin/system/settings/auth-setting'`。
 
-### 当前账号密码
-
-`admin/auth/current-user.ts` 的 `postCurrentUserPassword` 向 `/user/current/reset_password`
-提交 RSA 加密的 `{ encryptedData }`。头像菜单的 `layout/avatar-dropdown/ChangePasswordDialog.vue`
-负责新密码与确认密码校验、加密和提交，成功后清除本地登录凭据并跳转登录页。
-
-### 四类特殊资源 API
-
-根据资源范围或业务上下文选择出的 API 对象统一命名为 `requestApi`，包括 `computed` 结果和
-局部变量，不使用 `toolApi`、`authorizationApi` 或 `request` 等名称。同一作用域确需同时使用
-多套 API 时，以 `request` 为前缀加业务名区分，例如 `requestModelApi`、`requestToolApi`。
-知识库详情上下文的多模块接口入口使用 `resourceApi.knowledge / sync`，通过响应式 getter
-读取当前范围，无需 `.value`；方法内选定单个接口对象时仍命名为 `requestApi`。
-直接导入的 API 保持 PascalCase 命名；请求返回的 Promise 不属于此命名规则。
-
-`application`、`knowledge`、`model`、`tool` 是需要同时考虑 Workspace 普通资源、Workspace 共享资源、System 资源管理和
-System 共享资源的四类特殊资源。其接口按真实后端边界分别维护在 `admin/workspace/` 与
-`admin/system/` 下，不把不同范围的 URL 合并为页面侧 API Map，也不让卡片或 Action 根据路由拼接
-System 接口地址。
-
-页面根据路由 `resourceScope` 选择当前范围的完整业务 API 对象；知识库详情由功能本地
-`views/knowledge-detail/context.ts` 集中装配，当前由详情入口与 setting 子页复用该选择，library 暂不迁移。缺失设置 API 模块保持未提供，
-不回退其他资源范围。页面将选定对象传给需要请求的 Card
-Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 API 对象；不要为每组 Action
-额外维护逐方法接口，例如 `ModelActionApi`，也不要使用不断扩展的 `Pick<typeof XxxApi, ...>`。
-完整 API 对象的方法集合不同时，共用组件使用完整对象类型的联合，例如
-`typeof ModelApi | typeof SystemSharedModelApi`，不为凑齐类型添加其他范围不存在的接口。
-仅展示数据的组件不接收 API。
-
-### 工作流发布历史
-
-`workspace/application/workflow.ts` 维护智能体 `application_version` 资源：
-`getWorkflowVersions(applicationId)` 返回按创建时间倒序的完整 `WorkflowVersion[]`；
-`putWorkflowVersion(applicationId, versionId, payload)` 编辑标题与更新说明，返回更新后的版本。
-共用类型 `WorkflowVersion` 和 `WorkflowVersionPayload` 位于 `types/workflow-version.ts`，
-通过 `@/api/types` 导出。`ButtonApplicationPublishHistory` 内部调用智能体版本 API，公共发布历史
-UI 组件只接收数据和事件，不接收 API 或推测其他工作流的接口地址。
-`workspace/tool/workflow.ts` 同时维护工具 `tool_version` 资源，提供
-`getWorkflowVersions(toolId)` 和 `putWorkflowVersion(toolId, versionId, payload)`，
-复用上述版本类型，由 `views/workflow/tool/ButtonPublishHistory.vue` 调用。
-工具版本接口同样尚未支持 `description`，且未返回版本的默认模型配置。
-`workspace/knowledge/workflow.ts` 维护知识库 `knowledge_version` 资源，提供同名查询与编辑方法，
-由知识库 `ButtonPublishHistory.vue` 调用；知识库版本也尚未支持更新说明和默认模型配置。
-
-v3 编辑表单提交 `{ name, description }`，标题上限 64、更新说明上限 1000。
-当前仓库后端的版本编辑序列化器只处理 `name`，列表和详情也未返回 `description`；
-更新说明的持久化与回显需要后端补齐，前端不将智能体自身的 `desc` 当作版本更新说明。
-
-### 智能体模板中心
-
-`admin/store.ts` 的 `getStoreApplicationList(query)` 查询智能体模板，直接返回
-`ApplicationStoreResponse`，不再返回 `unknown`。公共模板元数据为 `api/types/workflow-template.ts` 的 `WorkflowStoreTemplate`，
-智能体 `ApplicationStoreTemplate` 为其类型别名，响应结构仍由 `api/types/application.ts` 维护。
-类型统一经 `@/api/types` 导入；各资源业务入口整理响应字段，公共 UI 不调用接口。
-创建或覆盖工作流时通过已有智能体 API 提交 `work_flow_template`，成功后的刷新与导航由 View 负责。
-
-### 模型选项查询
-
-`model-provider.ts` 的 `getProviderList(query?)` 统一查询 `GET /provider`；不传参数获取全部供应商，
-传入 `{ model_type }` 筛选支持指定模型类型的供应商，不再单独封装按类型查询方法。
-
-`workspace/model.ts` 的 `getModelListWithShared(query)` 请求
-`/workspace/<workspaceId>/model_list`，支持 `name`、`model_type`、`model_name` 筛选。
-将 `shared_model` 与 `model` 按共享在前的顺序合并为 `ModelItem[]`，分别标记
-`source: 'shared'` 与 `source: 'workspace'`。`SelectModel` 的接口选项统一通过此方法查询，
-工作流通过 Store 同名方法使用缓存或强制刷新。模型管理列表继续使用 `getModelList`。
-
-`system/shared-resources/model.ts` 同样提供 `getModelListWithShared(query)`，沿用
-`/system/shared/model` 查询共享模型，为每项标记 `source: 'shared'`；不查询工作空间模型。
-共享工作流、代码生成和默认模型设置统一调用此方法，模型管理继续使用 `getModelList`。
-
-### 资源选择弹窗查询
-
-三个资源选择弹窗按 Workspace、System 资源管理和 System 共享资源选择接口，不配置
-Workspace 共享页面来源分支，不调用 Workspace Shared API。仅普通工作空间显示文件夹，不显示共享目录；其他范围不显示或查询文件夹。
-System 资源管理智能体提供 `getAllApplication`（`/system/resource/application`），System 共享
-不提供智能体选择。System 共享知识库提供 `getAllKnowledge`（`/system/shared/knowledge`），
-与 System 资源管理知识库的同名方法均直接返回全量列表。工具选择统一调用对应范围的
-`getAllTool`：System 资源管理请求 `/system/resource/tool`，System 共享请求 `/system/shared/tool`，
-返回 `ToolItem[]`，不附带工作空间文件夹筛选。`getToolListWithShared` 保留用于其他包含共享工具的选项查询。
-
-### 工具列表查询
-
-`workspace/tool/tool.ts` 的 `getAllTool(query)` 查询支持 `folder_id` 筛选的工作空间工具
-非分页列表，用于文件夹菜单和工具选择弹窗。`getToolListWithShared(query)` 请求 `tool/tool_list`，
-将响应的 `tools` 与 `shared_tools` 合并为 `ToolItem[]`，用于包含已授权共享工具的选项查询；
-按工具类型筛选时使用 `tool_type`。`workspace/shared/tool.ts` 的 `getAllTool(query)` 仅查询共享工具。
-
-### System 共享工具
-
-`system/shared-resources/tool/tool.ts` 使用 `/system/shared/tool`，维护分页、详情、创建、更新、删除、
-导入导出、连接测试、代码检查与调试、Skill 上传下载。路径沿用 v2 System 共享工具协议。
-共享工具 API 不提供工作空间文件夹移动或批量接口；复用卡片、Action 和表单接收完整 Workspace
-与 System 共享 API 的联合类型，不补造接口以匹配 Workspace 方法集合。
-
-### System 共享知识库
-
-`system/shared-resources/knowledge/knowledge.ts` 使用 `/system/shared/knowledge`，维护分页、详情、
-通用 / Web / 飞书 / 工作流创建、导入、删除、重新向量化、Web 同步、关联问题、分词索引、MCP
-配置与三种导出。工作流创建在 Workspace 与 System 共享范围均由同一个 Knowledge API 的
-`postKnowledgeWorkflow` 提交；工作流转换由各范围的 `knowledge.ts` 维护，
-`workspace/knowledge/workflow.ts` 仅维护已创建知识库的画布接口。System 共享范围没有工作空间文件夹、批量接口或独立的知识库工作流 API 文件。复用创建入口
-和卡片 Action 时使用完整 Workspace / System 资源管理 / System 共享知识库 API 的联合类型，由页面显式传入当前范围的 API。
-
-### 工具代码生成
-
-三个范围的 `tool/tool.ts` 均提供 `postToolGenerateCode(payload)`，沿用 v2 的
-`/workspace/<workspaceId>/tool/generate_code`、`/system/resource/tool/generate_code` 和
-`/system/shared/tool/generate_code`。无需工具或智能体 ID，创建中的工具也可生成代码。
-`ToolGenerateCodePayload`、`ToolGenerateMessage` 定义在 `types/tool.ts`；请求包含 `messages`、
-`prompt`、`init_field_list`、`input_field_list`、`model_id` 和 `model_params_setting`。
-返回原始 SSE Response，业务入口通过 `request(messages)` 回调交给 `GenerateContent`，
-公共组件复用 `ConversationStream` 读取数据，处理 `content` 和 `error` 数据块。
-停止生成与 AI 节点一致，通过 `ConversationStream.cancel()` 停止读取并清理流实例。
-工具表单组件 `ToolCodeGenerate` 内部通过资源上下文选择完整 Tool/Model API；
-调用方只传工具表单，不逐层传递 API、工作空间及参数列表。
-
-### 系统提示词生成
-
-Workspace、System 资源管理和 System 共享资源均把 `postPromptGenerate(modelId, payload)` 放在对应范围的
-`model.ts`，请求结构共用 `PromptGeneratePayload`（含 `model_params_setting`）。
-路径为 `/workspace/<workspaceId>/model/<modelId>/prompt_generate` 与 `/system/model/<modelId>/prompt_generate`，
-System 接口不依赖工作空间 ID。
-均返回原始 SSE Response，由公共生成组件读取。画布的 `PromptGenerate` 通过
-`useWorkflowStore(resourceScope).postPromptGenerate` 调用；三个范围的 Store 适配器分别引用对应的
-Model API，直接转发生成请求，不使用查询缓存或请求去重。
-
-### 知识库维护
-
-关联问题生成按资源归属提交：`putGenerateKnowledgeQuestions` PUT 到
-`/<knowledgeId>/generate_related`；`putGenerateDocumentQuestions` PUT 到
-`/<knowledgeId>/document/batch_generate_related`，单项也使用单元素 `document_id_list`。
-`RelatedQuestionsConfig` 共用模型、模型参数及提示词，`KnowledgeGeneratePayload` 增加
-`state_list`，`DocumentGeneratePayload` 再增加 `document_id_list`，类型从 `@/api/types` 导入。
-公共配置弹窗只返回表单与状态，各 Action 调用各自完整业务 API。
-
-`getKnowledgeMcpConfig(knowledgeId)` 与 `postKnowledgeKeywordIndex(knowledgeId)` 为预留接口方法，
-目前不发送 HTTP 请求：前者返回空配置文本，后者模拟成功。后续确认后端协议后替换方法内部实现。
-MCP 入口加载配置后打开只读及复制弹窗；分词索引入口仅调用方法并在成功后提示“操作成功”。
-
-`exportKnowledgeExcel`、`exportKnowledgeZip`、`exportKnowledge` 分别通过 GET 请求知识库
-`/<knowledgeId>/export`、`export_zip`、`export_knowledge`，复用 `getExportFile` 下载。
-三种结果分别为文档 Excel、包含图片的文档 ZIP 和可导入创建的知识库 ZIP；优先使用服务端文件名。
-
-`postKnowledgeImport(file, folderId)` 将文件与 `folder_id` 组装为 FormData，POST 到
-`/workspace/<workspaceId>/knowledge/import_knowledge`，响应为 `{ knowledge_id, type }`。
-后端校验知识库导出包并创建资源；导入成功后的用户权限和列表刷新由调用页面负责。
-
-`workspace/knowledge/knowledge.ts` 与 `workspace/shared/knowledge/knowledge.ts` 的 `getAllKnowledge(query)`
-分别查询工作空间及共享知识库的非分页列表，返回 `KnowledgeItem[]`，用于关联知识库选择等
-需要全量选项的场景。原有 `getKnowledgePage` 继续用于分页列表。
-
-`workspace/knowledge/knowledge.ts` 的 `putKnowledge` 更新普通知识库，`putLarkKnowledge`
-更新飞书知识库；单项转移提交 `folder_id`。`putBatchMoveKnowledge` 将知识库 ID 数组和目标目录
-组装为 `{ id_list, folder_id }`，`putBatchDeleteKnowledge` 将 ID 数组组装为 `{ id_list }`，
-分别使用 PUT 请求 `batch_move` 和 `batch_delete`。页面和 Action 负责类型判断及 loading。
-
-`putReEmbeddingKnowledge` 使用 PUT 请求 `/<knowledgeId>/embedding` 重新向量化。
-设置页更换向量模型时先确认、保存，再调用该接口；Web、飞书配置通过 `meta` 提交，保留未编辑的
-已有配置，文件数量与大小限制仍作为知识库顶层字段提交。
-
-`putSyncWebKnowledge(knowledgeId, syncType)` 使用 PUT 请求 `/<knowledgeId>/sync`，
-Workspace 与 System 资源管理接口的查询参数 `sync_type` 均支持 `incremental`（增量同步）、
-`replace`（替换同步）和 `complete`（整体同步），不传请求体。
-仅用于 Web 知识库；页面负责方式选择、覆盖提示、loading 与任务提交成功提示。
-
-知识库创建通过 `postKnowledge`、`postWebKnowledge` 分别提交到 `/base`、`/web`；
-`postLarkKnowledge` 沿用飞书扩展接口 `/lark/save`，当前开源后端未包含该实现。
-基础创建字段由 `KnowledgeCreatePayload` 统一维护，Web、飞书请求扩展对应类型；工作流创建
-复用基础字段并附加 `work_flow` 及可选的 `KnowledgeWorkflowTemplate` 商店模板。
-成功后的用户资料刷新、列表刷新和路由跳转由创建弹窗负责。
-
 ## 枚举与类型组织
 
 `enums/state.ts` 的 `STATE_TYPES` 维护跨业务复用的任务状态，联合类型 `State` 定义在
-`types/state.ts`。触发器及后续文件等业务直接引用公共状态，新增状态时保持已有接口值不变。
+`types/state.ts`。触发器及工具／知识库执行记录引用公共状态；文档任务使用 DOCUMENT_TASK_STATE，新增状态时保持已有接口值不变。
 
 API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文档统一维护。
 
@@ -298,7 +89,7 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 - API 专用的请求参数、响应包装、请求配置和基础设施类型，放在对应 API 文件、资源目录的
   `types.ts`，或该 API 业务域的 `common.ts`。
 - 字符串键字典统一使用 `@/api/types` 导出的 `Dict<T>`；未收窄值类型的请求查询参数使用
-  `Dict<unknown>`，不再为相同结构声明额外别名。
+  `Dict<unknown>`，不为相同结构声明额外别名。
 - `src/api/types` 只存放 API 与 View 或 Component 跨层共用的业务类型，使用方统一通过
   `import type { ... } from '@/api/types'` 导入，不写 `/index.ts`。
 - `src/api/types/index.ts` 只负责导出各业务域类型，不直接声明类型。
@@ -345,15 +136,151 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 - 业务代码通过 `api.method().then(...)` 处理接口成功后的状态变化；通用接口错误由请求层统一
   提示，不在调用处重复使用 `try/catch` 或 `.catch()` 提示相同错误。只有业务降级、状态恢复等
   非提示类失败处理可以按需保留失败分支。
-- token 和平台公开档案由 `stores/auth.ts` 管理，语言由 `stores/user.ts` 管理；Router、Axios 等业务代码通过
-  `stores/index.ts` 导出的 `useStore()` 按需访问 Store；401 响应统一清除 token 并跳转 Admin
-  登录页。
+- Admin token、公开档案和语言由 `stores/admin/` 管理；请求层使用该入口的 `useStore()`，401 清理凭据并跳转登录。
+  Chat 使用 `stores/chat/`，认证和重新认证见 [Chat README](chat/README.md)。
 - loading 不作为业务 API 或 Admin、Chat 底层请求封装的参数；JSON 请求、文件上传和下载均遵循此规则。
   由调用接口的页面、组件或 Store 在请求前开启 loading，并在 Promise 的 `finally` 中释放，确保成功和失败都恢复状态。
 - 流式 POST 请求使用 `postStream` 返回原始 `Response`，由业务组件按具体协议解析数据块；
   参数顺序为 `postStream(base, path, data?, config?)`，`config.signal` 用于取消请求。
   鉴权、语言请求头和错误状态仍由请求基础设施统一处理。
 - 上传、下载和其他特殊请求在真实需求出现时独立设计，不提前塞入普通 JSON 请求客户端。
+
+## 业务协议与范围差异
+
+以下只登记跨层协议、容易混淆的参数和真实能力差异；逐项函数签名以对应 API 源码及 JSDoc 为准。
+页面流程见 [VIEW_README.md](../views/VIEW_README.md)，共享组件用法见组件文档。
+
+### 门户配置
+
+`admin/system/chat-management/portal-setting.ts` 通过 Admin `/portal` 读取和局部保存门户配置，
+公共类型维护在 `types/portal.ts`。JSON 用于访问开关和认证、跨域配置，门户名称与 Logo 使用
+FormData；保存返回完整配置，页面以该返回值作为唯一数据来源。
+认证配置保留未编辑字段，仅提交后端读取的 `login_value`、`max_attempts`、`failed_attempts`、
+`lock_time`；跨域地址提交 `cross_domain_list` 数组，不另建 `cors_config`。
+
+### 当前账号密码
+
+`admin/auth/current-user.ts` 的 postCurrentUserPassword 向 `/user/current/reset_password`
+提交 RSA 加密的 `{ encryptedData }`；调用方校验与加密，成功清除凭据后进入登录。
+
+### 四类特殊资源 API
+
+根据资源范围或业务上下文选择出的 API 对象统一命名为 `requestApi`，包括 `computed` 结果和
+局部变量，不使用 `toolApi`、`authorizationApi` 或 `request` 等名称。同一作用域确需同时使用
+多套 API 时，以 `request` 为前缀加业务名区分，例如 `requestModelApi`、`requestToolApi`。
+知识库详情上下文的多模块接口入口使用 `resourceApi.knowledge / scheduledSync`，通过响应式 getter
+读取当前范围，无需 `.value`；方法内选定单个接口对象时仍命名为 `requestApi`。
+文档分段详情通过 `views/document-detail/context.ts` 装配四种范围的
+`resourceApi.document / paragraph`，保留完整 API 对象及真实方法差异，不补造共享写入方法。
+直接导入的 API 保持 PascalCase 命名；请求返回的 Promise 不属于此命名规则。
+
+`application`、`knowledge`、`model`、`tool` 是需要同时考虑 Workspace 普通资源、Workspace 共享资源、System 资源管理和
+System 共享资源的四类特殊资源。其接口按真实后端边界分别维护在 `admin/workspace/` 与
+`admin/system/` 下，不把不同范围的 URL 合并为页面侧 API Map，也不让卡片或 Action 根据路由拼接
+System 接口地址。
+
+页面根据路由 `resourceScope` 选择当前范围的完整业务 API 对象；知识库详情由功能本地
+`views/knowledge-detail/context.ts` 集中装配，由详情入口及 setting、library、对话用户子页复用该选择。缺失设置 API 模块保持未提供，
+不回退其他资源范围。页面将选定对象传给需要请求的 Card
+Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 API 对象；不要为每组 Action
+额外维护逐方法接口，例如 `ModelActionApi`，也不要使用不断扩展的 `Pick<typeof XxxApi, ...>`。
+完整 API 对象的方法集合不同时，共用组件使用完整对象类型的联合，例如
+`typeof ModelApi | typeof SystemSharedModelApi`，不为凑齐类型添加其他范围不存在的接口。
+仅展示数据的组件不接收 API。
+
+### 版本与模板
+
+智能体、工具、知识库 Workflow API 分别维护 application_version、tool_version、knowledge_version，
+使用同名 getWorkflowVersions／putWorkflowVersion，类型为 WorkflowVersion／WorkflowVersionPayload。
+前端版本标题上限 64、更新说明上限 1000，提交字段为 name、publish_desc，
+不将资源 desc 当作版本说明。智能体后端已支持 publish_desc；工具和知识库版本当前只处理 name。
+三个版本列表均未返回历史默认模型配置，预览与恢复保留当前配置。
+
+`admin/store.ts` 的 getStoreApplicationList、getStoreToolWorkflowList、getStoreKnowledgeList 查询三类模板，
+共用 WorkflowStoreTemplate 元数据，各响应类型保留本领域结构。工作流保存 work_flow 与覆盖 work_flow_template
+是互斥载荷；覆盖成功后重新查询详情，不把模板响应直接当图数据。知识库创建使用 Knowledge API，画布使用 Workflow API。
+
+### 模型选项查询
+
+`model-provider.ts` 的 `getProviderList(query?)` 统一查询 `GET /provider`；不传参数获取全部供应商，
+传入 `{ model_type }` 筛选支持指定模型类型的供应商，不单独封装按类型查询方法。
+
+`workspace/model.ts` 的 `getModelListWithShared(query)` 请求
+`/workspace/<workspaceId>/model_list`，支持 `name`、`model_type`、`model_name` 筛选。
+将 `shared_model` 与 `model` 按共享在前的顺序合并为 `ModelItem[]`，分别标记
+`source: 'shared'` 与 `source: 'workspace'`。`SelectModel` 的接口选项统一通过此方法查询，
+工作流通过 Store 同名方法使用缓存或强制刷新。模型管理列表继续使用 `getModelList`。
+
+`system/shared-resources/model.ts` 同样提供 `getModelListWithShared(query)`，沿用
+`/system/shared/model` 查询共享模型，为每项标记 `source: 'shared'`；不查询工作空间模型。
+共享工作流、代码生成和默认模型设置统一调用此方法，模型管理继续使用 `getModelList`。
+
+### 资源选择查询
+
+知识库／智能体／工具选择使用各范围的 getAllKnowledge、getAllApplication、getAllTool 全量查询。
+System 不传 Workspace 文件夹条件；System 共享不提供智能体选择。
+弹窗的范围和交互见 [组件文档](../components/COMPONENT_README.md#selectapplicationdialogselecttooldialog)。
+
+### 工具列表查询
+
+`workspace/tool/tool.ts` 的 `getAllTool(query)` 查询支持 `folder_id` 筛选的工作空间工具
+非分页列表，用于文件夹菜单和工具选择弹窗。`getToolListWithShared(query)` 请求 `tool/tool_list`，
+将响应的 `tools` 与 `shared_tools` 合并为 `ToolItem[]`，用于包含已授权共享工具的选项查询；
+按工具类型筛选时使用 `tool_type`。`workspace/shared/tool.ts` 的 `getAllTool(query)` 仅查询共享工具。
+
+### System 共享工具
+
+`system/shared-resources/tool/tool.ts` 使用 `/system/shared/tool`，维护分页、详情、创建、更新、删除、
+导入导出、连接测试、代码检查与调试、Skill 上传下载。路径沿用 v2 System 共享工具协议。
+共享工具 API 不提供工作空间文件夹移动或批量接口；复用卡片、Action 和表单接收完整 Workspace
+与 System 共享 API 的联合类型，不补造接口以匹配 Workspace 方法集合。
+
+### System 共享知识库
+
+`system/shared-resources/knowledge/knowledge.ts` 使用 `/system/shared/knowledge`，维护分页、详情、
+通用 / Web / 飞书 / 工作流创建、导入、删除、重新向量化、Web 同步、关联问题、分词索引、MCP
+配置与三种导出。工作流创建在 Workspace 与 System 共享范围均由同一个 Knowledge API 的
+`postKnowledgeWorkflow` 提交；工作流转换由各范围的 `knowledge.ts` 维护，
+`workspace/knowledge/workflow.ts` 仅维护已创建知识库的画布接口。System 共享范围没有工作空间文件夹、批量接口或独立的知识库工作流 API 文件。复用创建入口
+和卡片 Action 时使用完整 Workspace / System 资源管理 / System 共享知识库 API 的联合类型，由页面显式传入当前范围的 API。
+
+### 工具代码生成
+
+三套 `tool/tool.ts` 的 postToolGenerateCode 向各范围 `/tool/generate_code` 提交
+ToolGenerateCodePayload，无需已创建资源 ID。类型在 types/tool.ts，返回原始 SSE Response。
+流式消费与生成 UI 见 GenerateContent 组件，业务表单负责模型、参数和载荷。
+
+### 系统提示词生成
+
+Workspace、System 资源管理和 System 共享资源均把 `postPromptGenerate(modelId, payload)` 放在对应范围的
+`model.ts`，请求结构共用 `PromptGeneratePayload`（含 `model_params_setting`）。
+路径为 `/workspace/<workspaceId>/model/<modelId>/prompt_generate` 与 `/system/model/<modelId>/prompt_generate`，
+System 接口不依赖工作空间 ID。
+均返回原始 SSE Response，由公共生成组件读取。画布的 `PromptGenerate` 通过
+`useWorkflowStore(resourceScope).postPromptGenerate` 调用；三个范围的 Store 适配器分别引用对应的
+Model API，直接转发生成请求，不使用查询缓存或请求去重。
+
+### 知识库维护
+
+Workspace、System 资源管理、System 共享各自的 knowledge.ts 保留真实能力，Workspace 共享只查询。
+知识库生成问题 PUT `/<id>/generate_related`，配置为 RelatedQuestionsConfig + state_list；文档生成
+PUT `/<id>/document/batch_generate_related`，单项也传 document_id_list，不改成分段协议。
+
+getKnowledgeMcpConfig 查询 external_service 并格式化 mcp_config；putKnowledgeKeywordIndex PUT tokenize 提交索引。
+exportKnowledgeExcel、exportKnowledgeZip、exportKnowledge 下载文档 Excel、带图片文档 ZIP、可导入知识库 ZIP；
+postKnowledgeImport 以 FormData file、folder_id 上传，响应 knowledge_id、type。
+
+putKnowledge 更新通用字段，Workspace 飞书使用 putLarkKnowledge；移动传 folder_id，批量移动／删除传 id_list。
+更换向量模型保存后通过 putReEmbeddingKnowledge 提交 embedding。Web 同步的 sync_type 为 incremental／replace／complete，
+不自行改写协议值。Web doc_strategy 使用 DocumentStrategy，顶层详情可为 null，保存不立即同步。
+
+postTransformWorkflow POST `/<id>/transform_workflow`，提交 `{ work_flow }`，保留已有文档；不能用工作流保存接口代替。
+知识库 Workflow API 通过 getKnowledgeDetail 的 work_flow 加载，putKnowledgeWorkflow 保存，发布接口单独调用。
+默认模型协议使用 DefaultModelSettingPayload，知识库后端已保存 default_model_setting 并在详情回传。
+
+导入／导出工作流专用 `.kbwf`，接口为 workflow/import（FormData file）与 workflow/export，
+不能使用包含文档的知识库包接口。正式文档执行用 upload_document，调试用 debug，复用 KnowledgeWorkflowDebugPayload。
+知识库工作流 View 当前仍直接使用 Workspace Knowledge／Workflow API，其他来源仅有导航入口。
 
 ### 资源用户授权
 
@@ -378,9 +305,9 @@ System 资源管理的用户授权维护在 `admin/system/resource-management/re
 使用 `/system/workspace/<workspaceId>/resource_management/resource/<target>/resource/<resource>`。
 查询与保存方法以必填的 `workspaceId` 为首个参数，由调用方从资源数据的 `workspace_id` 传入，
 不得读取或回退到路由工作空间。其余参数、分页类型、响应类型及提交类型与 Workspace 用户授权一致。
-loading 由组件管理。`ResourceAuthorizationDrawer` 内部通过 `isSystemResource()` 选择完整的用户授权
-API 对象和工作空间上下文，作为该抽屉的范围选择例外；用户组仍使用
-现有 Workspace 接口，不推测 System 用户组路径。
+`ResourceAuthorizationDrawer` 内部通过 `isSystemResource()` 选择完整的用户授权
+API 对象和工作空间上下文，作为该抽屉的范围选择例外。System 用户组查询／保存已提供，路径在同前缀下为
+`user_group_resource/<target>/resource/<resource>`，两种授权均使用当前范围 API。
 
 ### 关联资源
 
@@ -397,90 +324,19 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外；用�
 `/system/shared/mapping_resource`，方法只接收资源类型、资源 ID、分页和查询条件，不接收
 `workspaceId`。工作空间筛选继续通过 `query.workspace_ids` 传入；两类 API 使用相同参数签名，抽屉直接调用页面传入的完整 API。
 
-### 触发器维护
+### 触发器与执行记录
 
-`workspace/trigger/trigger.ts` 维护分页、详情、新建、编辑、删除及批量接口。
-`getTriggerTaskRecordPage` 按触发器查询执行记录，支持名称、状态、资源类型和执行时间排序；
-`getTriggerTaskRecordDetails` 通过触发器、任务、记录 ID 查询执行详情，类型定义在 `api/types/trigger.ts`。
-`putBatchActivateTrigger(ids, isActive)` 提交 `{ id_list, is_active }` 到 `batch_activate`；
-`putBatchDeleteTrigger(ids)` 提交 `{ id_list }` 到 `batch_delete`。单项启停通过 `putTrigger`
-仅提交 `is_active`。`Trigger` 为分页摘要，`TriggerDetail` 为含任务参数的完整详情；
-`TriggerPayload` 用于新建和编辑，ID 在新建前生成以展示事件回调 URL。
-
-### 资源触发器
-
-`workspace/trigger/resource-trigger.ts` 独立维护工具、智能体资源端的触发器列表、详情、新建、编辑和移除。
-接口前缀为 `/workspace/<workspaceId>/<sourceType>/<sourceId>/trigger`，资源类型使用
-`RESOURCE_TYPE.TOOL` / `RESOURCE_TYPE.APPLICATION` 的后端值；工作空间从资源上下文显式传入。
-`ResourceTriggerResource`、`ResourceTrigger`、`ResourceTriggerDetail` 定义在 `types/trigger.ts`。
-详情的 `trigger_task` 是单对象，普通触发器详情是数组，调用表单负责统一结构。
-新建提交含一个固定任务的 `TriggerPayload`；资源编辑只更新当前资源任务的参数和 meta，保留其他任务，
-名称和周期等配置仍属于整个触发器。移除删除当前资源任务，最后一个任务移除后删除触发器。
-列表沿用后端仅返回已启用触发器的行为，loading 由调用组件维护。
-
-### 知识库工作流
-
-`workspace/knowledge/knowledge.ts` 的 `getKnowledgeDetail` 返回 `KnowledgeDetail`，包含知识库
-名称、所属目录，以及工作流类型的 `work_flow` 和发布状态；进入画布只调用此详情接口加载。
-`workspace/knowledge/workflow.ts` 维护保存和发布，保存提交 `work_flow`，响应使用
-`KnowledgeWorkflowDetail`。前端详情与保存协议的 `default_model_setting` 复用
-`DefaultModelSettingPayload`；服务端需支持该字段的持久化与回传（当前仓库知识库后端尚未实现）。
-
-`postKnowledgeWorkflowImport(knowledgeId, payload)` 使用 POST `/<knowledgeId>/upload_document`
-执行已发布版本的文档导入，参数复用 `KnowledgeWorkflowDebugPayload`，结果为
-`KnowledgeWorkflowAction`；调试仍调用独立的 `/debug`。文档页导入 Drawer 复用工作流的
-数据源、知识库输入及结果 Action，执行详情沿用 `getKnowledgeWorkflowAction`。
-
-### 智能体复制
-
-`ApplicationDetail` 复用 `ApplicationFormPayload` 中的配置字段，并保留详情接口的 `model`
-和可空描述。复制通过 `getApplicationDetail` 获取完整配置，将 `model` 映射为 `model_id`，
-再调用 `postApplication` 创建副本；不使用卡片列表摘要作为复制数据。
-
-### 工具执行记录
-
-`workspace/tool/workflow.ts` 的 `getToolExecutionRecordPage` 查询 `/<toolId>/tool_record/<currentPage>/<pageSize>`，
-支持 `source_name`、`source_type`、`state` 筛选，后端固定按创建时间倒序返回。
-`getToolExecutionRecordDetail` 查询 `/<toolId>/tool_record/<recordId>`，返回状态、耗时和 `meta` 中的输入、输出、
-错误及节点详情。共用类型 `ToolExecutionRecord`、`ToolExecutionRecordDetail` 维护在 `types/tool.ts`；
-调用来源使用 `TOOL_RECORD_SOURCE`。抽屉负责 loading 和分页状态，不重复解包响应。
-
-### 知识库执行记录
-
-`workspace/knowledge/workflow.ts` 集中维护工作流、发布版本和执行记录接口。
-`getKnowledgeExecutionRecordPage` 请求 `/<knowledgeId>/action/<currentPage>/<pageSize>`，
-支持 `user_name`、`state` 筛选；详情和取消复用 `getKnowledgeWorkflowAction`、
-`postCancelKnowledgeWorkflowAction`，对应 GET `action/<actionId>` 和 POST `action/<actionId>/cancel`。
-`KnowledgeExecutionRecord` 为分页摘要，`KnowledgeWorkflowAction` 扩展节点详情；均从 `@/api/types` 导入。
-
-### 工具工作流调试
-
-`workspace/tool/workflow.ts` 的 `postToolWorkflowDebug(toolId, parameters)` 使用 Admin `postStream`
-请求 `/<toolId>/debug`，返回原始 SSE Response；输入参数来自工具基础节点，`chat_record_id` 用于识别
-执行记录，表单续跑沿用该 ID 并传入 `position`。调试结果与执行详情统一通过
-`getToolExecutionRecordDetail(toolId, recordId)` 查询 `/<toolId>/tool_record/<recordId>`，
-返回 `ToolExecutionRecordDetail` 的运行状态、输出及节点详情。Workspace、System 资源管理和
-System 共享资源分别保留各自路径下的同名接口，不再重复封装调试专用查询。
-工具调试读取服务端已保存工作流，画布页面在调试前保存未提交改动。
-
-### 工具工作流模板中心
-
-`admin/store.ts` 的 `getStoreToolWorkflowList(query)` 查询 `/workspace/store/tool_workflow_template`，
-返回 `ToolWorkflowStoreResponse`，其中 `apps` 复用 `WorkflowStoreTemplate[]`。
-`workspace/tool/workflow.ts` 的 `putToolWorkflow` 支持两种互斥载荷：保存 `work_flow` 与默认模型设置，
-或提交 `work_flow_template` 由服务端下载并覆盖当前工具工作流。模板覆盖后由 View 重新查询详情，
-同步默认模型设置、保存时间和图快照；确认取消或请求失败不关闭模板中心。
-
-### 知识库工作流模板与导入导出
-
-`admin/store.ts` 的 `getStoreKnowledgeList(query)` 查询 `/workspace/store/knowledge_template`，
-返回 `KnowledgeWorkflowStoreResponse`，其中 `apps` 使用公共 `WorkflowStoreTemplate[]`。
-`putKnowledgeWorkflow` 接受互斥的 `work_flow` 保存载荷或 `work_flow_template` 覆盖载荷，覆盖成功后由 View 重载详情。
-`exportKnowledgeWorkflow(knowledgeId, name)` 通过 GET `/<knowledgeId>/workflow/export` 下载 `.kbwf` 文件，
-只导出工作流，不调用包含文档的知识库包导出接口。
-`importKnowledgeWorkflow(knowledgeId, file)` 沿用 v2 的 POST `/<knowledgeId>/workflow/import`，
-使用 FormData 的 `file` 字段上传 `.kbwf`，由服务端覆盖草稿、处理关联工具与默认模型设置。
-接口结果不作为图数据使用，页面确认覆盖后调用，成功重新查询知识库详情并渲染画布。
+- `workspace/trigger/trigger.ts` 提供普通触发器维护、记录分页与详情，Trigger 为摘要，TriggerDetail 含完整任务，
+  TriggerPayload 新建前生成 ID。批量启停传 `{ id_list, is_active }`，批量删除传 `{ id_list }`，单项启停仅提交 is_active。
+- `workspace/trigger/resource-trigger.ts` 前缀为 `/workspace/<workspaceId>/<sourceType>/<sourceId>/trigger`，
+  workspaceId 从资源显式传入，sourceType 使用 RESOURCE_TYPE。资源详情 trigger_task 是对象，普通详情为数组。
+  资源编辑保留其他任务，移除仅删除当前关联，最后任务移除后删除触发器；列表只返回启用触发器。
+- 工具 Workflow API 记录为 `/<toolId>/tool_record/<page>/<size>` 及 `/<recordId>`，
+  查询 source_name、source_type、state，返回 ToolExecutionRecord／ToolExecutionRecordDetail，按创建时间倒序。
+  调试 POST debug 返回 SSE，chat_record_id 与 position 用于续跑，详情复用记录接口，不重复封装调试查询。
+- 知识库 Workflow API 记录为 `/<id>/action/<page>/<size>`，筛选 user_name、state；
+  详情和取消为 GET action/<actionId>、POST action/<actionId>/cancel。
+- 智能体复制查询完整 ApplicationDetail，model 映射 model_id 后创建，不使用卡片摘要。
 
 ### 工作空间首页
 
@@ -497,20 +353,11 @@ System 首页的智能体选项使用 `system/resource-management/application/ap
 工作空间筛选通过 `query.workspace_ids` 传入所选工作空间 ID 的 JSON 数组字符串；名称筛选使用 `name`。
 Workspace 智能体分页方法只接收分页与查询条件，从当前资源上下文读取工作空间。
 
-### 对话面板接口
+### 对话接口
 
-`admin/workspace/conversation.ts` 集中维护调试对话的打开、发送、取消、续传、历史会话、
-记录分页、删除、修改和语音识别接口，保留可选 `applicationId` 对历史资源范围的选择。
-其中 `postSpeechToText(applicationId, data)` 请求指定智能体的
-`/workspace/<workspaceId>/application/<applicationId>/speech_to_text`，loading 由调用方管理。
-`chat/conversation.ts` 维护正式对话对应的 v3 接口，路径为 `/v3/application/<applicationId>/...`，除取消生成外均以
-`applicationId` 为首个参数；chat 模式的 `createChatConversation(getApplicationId)` 由使用方提供当前智能体 ID。两者使用各自 `core/request.ts` 的请求方法；
-`postStream` 返回原始 `Response`，由 `conversation-panel/stream.ts` 解析。
-
-面板内部的 `conversation-panel/common/get-api.ts` 通过 `ChatType` 选择完整 API 对象，
-仅负责模式判断，不声明 URL 或发送请求；固定模式的 Store 直接导入对应业务 API。
-面板模式值统一维护在 `conversation-panel/common/enums.ts` 的 `CHAT_TYPE`，
-`common/types.ts` 中的 `ChatType` 从该对象派生。
+Admin 调试接口在 `admin/workspace/conversation.ts`，正式 Chat 接口在 `chat/conversation.ts`，
+使用各自请求客户端。面板 `common/get-api.ts` 仅按 ChatType 选择完整 API，不拼 URL。
+Chat 协议及认证接口见 [chat/README.md](chat/README.md)。
 
 ### 通用文件上传
 
@@ -554,10 +401,9 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 
 ### System 共享工具工作流
 
-`system/shared-resources/tool/tool-workflow.ts` 维护共享工具的工作流详情、保存、发布、调试、
-版本和执行记录，前缀为 `/system/shared/tool`，调用只传资源 ID，不读取工作空间。
-两种 System 工具 API 的 `getToolListWithShared` 查询各自 `/tool_list` 并合并 `tools`、`shared_tools`，
-供画布的工具菜单及 MCP 选项使用。系统扩展接口需连接支持相应协议的部署进行联调。
+`system/shared-resources/tool/tool-workflow.ts` 提供详情、保存、发布、调试、版本和执行记录，
+前缀 `/system/shared/tool`，只接收资源 ID。两种 System 工具的 getToolListWithShared 查询各自
+`/tool_list`，合并 tools／shared_tools；需相应部署支持扩展协议。
 
 ### 知识库工作流转换
 
@@ -569,170 +415,86 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 保留已有文档，已是工作流类型时拒绝重复转换。页面负责确认、loading、成功提示及进入画布。
 默认图复用知识库创建模板，不用保存工作流接口代替转换。
 
-### 知识库文档
+### 文档与分段
 
-`workspace/knowledge/document.ts` 的 `getDocumentDetail(knowledgeId, documentId)` 通过 GET
-`/<knowledgeId>/document/<documentId>` 查询文档详情，支持分段页刷新和直接访问。
-`workspace/knowledge/paragraph.ts` 维护普通 Workspace 文档分段接口，前缀为
-`/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<documentId>/paragraph`。
-`getParagraphList` 查询完整分段列表，供位置调整定位相邻分段；
-`getParagraphPage(knowledgeId, documentId, page, query?)` 查询 `/<currentPage>/<pageSize>`，
-返回 `ResponsePage<ParagraphItem>`，供分段详情滚动加载。两者均支持 `title`、`content`，
-服务端按 `position`、创建时间排序；
-`postParagraph` 提交 `title`、`content`、`is_active` 和可选的 `problem_list: [{ content }]`，
-返回新增分段详情，默认插入首位并触发索引。
-新增载荷可传 `position`，在目标位置插入，用于当前分段上方添加。
-`getParagraphDetail` 查询 `/<paragraphId>`，返回 `ParagraphDetail`，包含 `problem_list`、
-`hit_num` 和 `last_hit_time`。`putParagraph` 向同一路径提交标题和正文，直接返回最新详情对象；
-后端内部三元素返回值经后置处理转换为详情对象，不作为数组解析。不提交 `problem_list`，关联关系通过专属接口维护。
-编辑载荷使用 `ParagraphEditPayload`，允许仅传 `is_active` 更新启用状态，正文表单仍使用
-必填标题及正文的 `ParagraphUpdatePayload`。`deleteParagraph` DELETE `/<paragraphId>` 删除单个分段。
-`putParagraphPosition` PUT `/adjust_position`，查询参数为 `paragraph_id`、`new_position`，
-不传请求体，由服务端调整当前分段及受影响分段的位置。
-`postParagraphProblem` 向 `/<paragraphId>/problem` 提交 `{ content }`，创建或复用问题并关联分段；
-`getParagraphProblems` GET 同一路径，返回当前分段的 `ParagraphProblem[]`，用于关联变更后刷新。
-`putAssociateParagraphProblem` PUT 到 `/association`，通过查询参数传递 `paragraph_id`、`problem_id`，
-不传请求体，用于关联已存在的问题。
-`putUnassociateParagraphProblem` PUT 到 `/unassociation`，以查询参数传递 `paragraph_id`、
-`problem_id`，不传请求体，仅解除当前分段的关联。
-`workspace/knowledge/problem.ts` 的 `getProblemsPage(knowledgeId, page, query?)` 查询知识库问题分页，
-路径为 `/workspace/<workspaceId>/knowledge/<knowledgeId>/problem/<currentPage>/<pageSize>`，
-支持 `content` 搜索，返回 `ResponsePage<ParagraphProblem>`。分段添加问题沿用 v2 查询第一页 100 条候选。
-`putMigrateParagraphs` 向分段前缀下的 `/migrate/knowledge/<targetKnowledgeId>/document/<targetDocumentId>`
-提交 PUT `{ id_list }`，将所选分段迁移到目标文档；目标不能为当前文档。
-`putGenerateParagraphQuestions` 向分段前缀下的 `/batch_generate_related` 提交 PUT
-`ParagraphGeneratePayload`，包含生成配置与 `paragraph_id_list`，不包含 `state_list`。
-`putBatchDeleteParagraphs` 向分段前缀下的 `/batch_delete` 提交 PUT `{ id_list }`，
-删除所选分段并由服务端清理关联问题、映射及索引。
-响应及载荷类型维护在 `types/paragraph.ts`，通过 `@/api/types` 导入。
-标题最多 256 字符，内容必填且最多 102400 字符；loading、弹窗和成功后刷新由页面维护。
-本次只接入普通 Workspace，不为其他范围推测接口或回退 Workspace。
+四范围 document.ts、paragraph.ts 的对象由详情上下文装配。Workspace 与 System 两种范围提供完整维护，
+Workspace 共享只提供已有查询，不添加写方法或回退其他来源。
 
-文档地址及飞书导入也维护在 `workspace/knowledge/document.ts`：
-`postWebDocument` 向 `/<knowledgeId>/document/web` 提交 `WebDocumentImportPayload`，包含
-`source_url_list`、`selector` 与 `doc_strategy`。
-`getLarkDocumentList` 沿用 POST `/lark/<knowledgeId>/<folderToken>/doc_list`，支持 `page_token`，
-返回 `LarkDocumentList` 的 `files`、`has_more` 和 `next_page_token`。
-`postImportLarkDocuments` 沿用 POST `/lark/<knowledgeId>/import` 的文档数组协议，
-每项为 `LarkDocumentImportPayload`（名称、token、类型及处理策略）。飞书接口属于扩展端；
-当前仓库未包含 v3 实现，`doc_strategy` 的持久化与执行需要扩展端支持，不能视为已联调。
-上述跨 API 与 UI 的类型统一通过 `@/api/types` 导出。
+| 范围            | 知识库资源前缀                                     |
+| --------------- | -------------------------------------------------- |
+| Workspace       | `/workspace/<workspaceId>/knowledge`               |
+| Workspace 共享  | `/system/shared/workspace/<workspaceId>/knowledge` |
+| System 资源管理 | `/system/resource/knowledge`                       |
+| System 共享     | `/system/shared/knowledge`                         |
 
-文档上传复用 `workspace/knowledge/document.ts`：`postSplitDocuments` 向 `document/split`
-发送多文件 FormData（重复 `file` 字段）与 JSON 字符串 `doc_strategy`，返回 `DocumentSplitResult[]`；
-页面将解析结果的 `content` 转为 `paragraphs`，保留 `source_file_id` 与策略，再通过
-`putBatchCreateDocuments` PUT `document/batch_create` 创建文档，与空白文档创建共用同一接口封装。
-策略页直接导入使用 `postImportTextDocuments` POST `document/import`，提交 JSON
-`{ file_id_list, doc_strategy }`，复用上传成功后的文件 ID，由服务端解析并创建，返回 `DocumentItem[]`；
-不再次上传文件，也不先请求 `split`。
-`postImportTableDocumentsByFileIds` 和 `postImportQADocumentsByFileIds` 分别向
-`document/table_by_file_ids` 和 `document/qa_by_file_ids` 发送 `DocumentFileImportPayload`
-（`{ file_id_list: string[] }`），复用上传成功后的文件 ID，由服务端解析并创建，不再次上传文件。
-`exportTableDocumentTemplate` 和 `exportQADocumentTemplate` 分别使用 GET
-`/workspace/knowledge/document/table_template/export` 和 `/workspace/knowledge/document/template/export`，查询参数 `type` 为
-`excel` / `csv`。上传解析与创建类型维护在 `types/document.ts`，统一通过 `@/api/types` 导入。
-共享文档 API 不提供上传写入方法。
+文档接口在前缀后追加 `/<knowledgeId>/document`，分段再追加 `/<documentId>/paragraph`。
+System 不读取 workspaceId；飞书在知识库前缀追加 lark/<knowledgeId>，模板下载不带知识库 ID。
+System／飞书扩展及文件 ID 导入、策略协议需对应部署支持，不能因前端接口存在认定已联调。
 
-`putDocument(knowledgeId, documentId, data)` 统一通过 PUT `/<documentId>` 更新名称、启用状态和单项设置，
-不按更新字段重复封装同一接口。载荷 `DocumentUpdatePayload` 仅包含可更新字段，按需传入
-`name`、`is_active`、`hit_handling_method`、`directly_return_similarity`、`meta`，返回更新后的
-`DocumentItem`。名称上限 128 字符；共享文档仍只提供查询。
+文档分页使用 ParamsPage／ResponsePage<DocumentItem>，名称／创建者／任务／启用／命中／标签筛选支持组合。
+is_active 为 false 时保留，“全部”省略；tags 传叶子 ID 数组或 NO_TAG，按 tags[] 序列化。
+状态使用 DOCUMENT_TASK_STATE 与 DOCUMENT_TASK_TYPE，不用通用 STATE_TYPES；非任务状态省略 task_type。
+status_meta 可空，aggs 为 `{ status, count }[]`，state_time 按任务和状态索引；null 聚合状态按忽略处理。
 
-`workspace/knowledge/document.ts` 同时维护文档启停、删除、召回设置、向量化、分词索引、
-任务取消、生成问题、迁移、同步、导出、原文件下载/替换。
-批量任务沿用 v2 的 `id_list` / `state_list`；生成问题使用 `document_id_list`，
-添加标签使用 `document_ids` / `tag_ids`，迁移和批量导出直接提交文档 ID 数组。
-文档导出分别提供四个接口，不以单元素批量请求代替单项接口：
-`exportDocument`、`exportDocumentZip` 使用 GET 请求 `/<documentId>/export`、`/<documentId>/export_zip`；
-`exportMulDocument`、`exportMulDocumentZip` 使用 POST 请求 `batch_export`、`batch_export_zip`，请求体直接为 ID 数组。
-单项参数为知识库 ID、文档 ID、文档名称；批量参数为知识库 ID、文档 ID 数组、知识库名称。
-服务端未提供文件名时，分别以文档名称或知识库名称加 `.xlsx` / `.zip` 回退，沿用 v2 下载命名。
-向量化、生成问题默认排除成功分段，也可选择全部分段。任务类型使用 `DOCUMENT_TASK_TYPE`。
-单项向量化使用 `putDocumentRefresh(knowledgeId, documentId, stateList)` 请求 `/<documentId>/refresh`；
-单项取消使用 `putCancelTask(knowledgeId, documentId, taskType)` 请求 `/<documentId>/cancel_task`，提交 `{ type }`。
-批量向量化与取消分别沿用 `batch_refresh` 和 `batch_cancel_task`，不以单元素批量请求代替单项接口。
-单项分词使用 `putDocumentTokenize(knowledgeId, documentId, stateList)` 请求 `/<documentId>/tokenize`，
-提交 `{ state_list }`；批量分词使用 `putBatchTokenizeDocuments` 请求 `batch_tokenize`，
-提交 `{ id_list, state_list }`。两者均包含全部七种分段状态；单项取消分词复用 `putCancelTask`，任务类型为 `TOKENIZE`。
-文档设置的共享载荷为 `DocumentSettingPayload`，生成问题使用 `DocumentGeneratePayload`；
-单项设置通过 `meta` 保留来源数据，批量设置将 `allow_download` 放在顶层。
-文档同步区分单项和批量，不以单元素批量请求代替单项接口：
-`putDocumentSync` 请求 `/<knowledgeId>/document/<documentId>/sync`，
-`putMulSyncDocument` 请求 `/<knowledgeId>/document/batch_sync`；
-`putLarkDocumentSync` 请求 `/lark/<knowledgeId>/document/<documentId>/sync`，
-`putMulLarkSyncDocument` 请求 `/lark/<knowledgeId>/_batch`。上述路径均相对工作空间的 `knowledge` 前缀，
-全部使用 PUT；单项不传请求体，批量提交 `{ id_list }`。飞书接口需部署环境支持。
-共享文档 API 继续仅提供查询，不增加写入方法。
+putDocument 统一更新名称、启停及设置，不按字段重复封装；名称最多 128。
+单项设置 meta 保留来源，批量 allow_download 在顶层。任务载荷通常用 id_list／state_list，
+生成用 document_id_list，标签用 document_ids／tag_ids，迁移及批量导出直接传 ID 数组。
 
-`system/resource-management/knowledge/document.ts` 与 `system/shared-resources/knowledge/document.ts`
-提供与 `workspace/knowledge/document.ts` 相同的完整文档接口集合，方法名、参数、请求体和返回类型保持一致。
-普通文档前缀分别为 `/system/resource/knowledge/<knowledgeId>/document` 和
-`/system/shared/knowledge/<knowledgeId>/document`，不读取工作空间 ID。
-飞书接口在各自的知识库资源前缀后追加 `/lark/<knowledgeId>`；模板下载使用各自前缀下的
-`/document/table_template/export` 和 `/document/template/export`，不包含知识库 ID。
-系统路径组织沿用 v2，新增的 v3 文件 ID 导入和策略协议需对应部署环境支持，尚未联调。
-文档标签关联接口统一维护在各范围的 `tags.ts`。四套现有 Document API 由知识库详情 context 按范围装配。
+| 操作         | 协议差异                                                                                               |
+| ------------ | ------------------------------------------------------------------------------------------------------ |
+| 创建         | PUT batch_create；空白名称与解析后内容使用同一方法，返回 DocumentItem[]                                |
+| 文本预览     | POST split，多文件 FormData 重复 file 字段，doc_strategy 为 JSON 字符串；响应 content 转为 paragraphs  |
+| 文本直接导入 | POST import，JSON `{ file_id_list, doc_strategy }`，服务端解析并创建，不先 split 或再次上传            |
+| 表格／QA     | POST table_by_file_ids／qa_by_file_ids，提交 `{ file_id_list }`，模板 GET 支持 excel／csv              |
+| Web          | POST web，提交 source_url_list、selector、doc_strategy                                                 |
+| 飞书         | POST lark/<id>/<folderToken>/doc_list，读取 files／has_more／next_page_token；import 提交文档数组      |
+| 向量化       | 单项 PUT <documentId>/refresh，批量 batch_refresh；state_list 可选全部或排除成功                       |
+| 分词         | 单项 PUT <documentId>/tokenize，批量 batch_tokenize，全部七种状态                                      |
+| 取消任务     | 单项 PUT <documentId>/cancel_task，提交 `{ type }`；批量 batch_cancel_task                             |
+| 同步         | 单项 <documentId>/sync 不传体，批量 batch_sync 传 `{ id_list }`；飞书批量 lark/<id>/\_batch，均 PUT    |
+| 导出         | 单项 GET <documentId>/export 或 export_zip；批量 POST batch_export 或 batch_export_zip，直接传 ID 数组 |
 
-`workspace/knowledge/document.ts` 维护文档分页查询，路径为
-`/workspace/<workspaceId>/knowledge/<knowledgeId>/document/<currentPage>/<pageSize>`。
-`putBatchCreateDocuments(knowledgeId, documents)` 统一通过 PUT `document/batch_create` 批量创建文档，
-空白创建提交 `DocumentQuickCreatePayload[]`（仅含 `name`），解析后创建提交 `DocumentImportPayload[]`，
-返回 `DocumentItem[]`；名称上限 128 字符。不按创建场景重复封装同一接口。
-共享文档 API 不增加创建接口；文档页监听公共 MkQuickCreate 的 `create` 事件，管理创建请求和提交状态。
-分页使用 `ParamsPage` / `ResponsePage<DocumentItem>`，支持 `name`、`create_user`、`status`、`task_type`、`is_active`、`hit_handling_method` 和 `tags` 筛选；
-文件任务使用 `DOCUMENT_TASK_STATE` 的字符状态及 `DOCUMENT_TASK_TYPE` 的任务位置，
-不使用通用 `STATE_TYPES`；选择全部时省略状态与任务类型，非任务专属状态省略任务类型。
-文件状态响应还包含 `REVOKE: '4'`、`REVOKED: '5'`、`IGNORED: 'n'`。
-`DocumentItem.status_meta` 使用可空的 `DocumentStatusMeta`：`aggs` 为 `{ status, count }[]`，
-`state_time` 按任务编号、状态字符两级索引时间字符串；两项均可缺省。
-无分段时聚合项的 `status` 可为 `null`，按忽略状态解析，不计入成功数量。
-`DocumentTaskState` 和 `DocumentTaskType` 从文档枚举派生，统一从 `@/api/types` 导入。
-启用状态传布尔值，`false` 不省略；单选全部时省略该字段。`tags` 传数组，沿用 Axios 的
-`tags[]` 序列化，内容为标签 ID 或特殊值 `NO_TAG`，不传标签名称或 JSON 字符串。
-`workspace/knowledge/tags.ts` 和 `workspace/shared/knowledge/tags.ts` 的
-`getKnowledgeTags(knowledgeId)` 分别请求对应资源前缀的 `/<knowledgeId>/tags`，返回
-`KnowledgeTagGroup[]`；页面将分组转换为级联选项，MkTableFilter 内部展开父组并去重，页面直接用组件返回的叶子标签 ID 数组查询。
-文档页传 `resource_type: 'document'`，创建者选项复用 Workspace `common.ts` 的 `getAllUsers`。
-类型从 `@/api/types` 导入，命中处理枚举从 `@/api/enums` 导入。API 不接收 loading，不重复包装响应。
+除文档生成问题的批量协议外，不以单元素批量接口代替单项。导出文件名优先服务端，
+缺失时单项使用文档名、批量使用知识库名加 xlsx／zip。
 
-### 知识库标签与文档关联
+分段协议类型在 types/paragraph.ts，分页支持 title、content，后端按 position 和创建时间排列。
 
-`workspace/knowledge/tags.ts` 维护标签查询、创建、编辑和删除，前缀为
-`/workspace/<workspaceId>/knowledge/<knowledgeId>/tags`，工作空间由 `getWorkspaceId()` 读取。
-`getKnowledgeTags(knowledgeId, query?)` 返回非分页 `KnowledgeTagGroup[]`；
-可选 `query.name` 用于标签管理列表搜索，不传时仍查询全部标签供下拉候选使用。
-标签值中的可选 `doc_count` 表示关联文档数量。`postKnowledgeTags` 直接提交
-`KnowledgeTagPayload[]`（`key`、`value`），用于创建标签和新增标签值；
-`putKnowledgeTag` 向 `/<tagId>` 提交完整 `KnowledgeTagUpdatePayload`（`id`、`key`、`value`），
-路径 `tagId` 与载荷 `id` 保持一致。重命名提交新 `key` 与该行原 `value`，服务端更新当前标签所属同名组；
-编辑单个值提交原 `key` 与新 `value`，保留同组重复值校验，不提交其他行的值。
-`deleteKnowledgeTag` 按路径末尾 `key` 删除整个标签、`one` 删除单个标签值；
-`putBatchDeleteKnowledgeTags` 使用 PUT `batch_delete`，请求体直接为标签 ID 数组，不包装为 `id_list`。
-`postImportKnowledgeTags(knowledgeId, file)` POST 到 `import`，使用 FormData 的单个 `file` 字段上传 XLS 或 XLSX，
-响应解包为 `void`。文件第一行为“标签、标签值”，每行对应一个标签与值；同名标签可重复出现，
-服务端跳过文件内及知识库已有的重复组合，校验所有工作表后统一写入。空行跳过，标签与值分别限制为 64、128 字。
-`exportKnowledgeTagTemplate(knowledgeId)` GET 到 `template/export`，复用 `getExportFile` 下载“标签模板.xlsx”，
-服务端返回与提供的模板一致的表头和示例数据。两个接口均校验目标知识库的工作空间及标签创建权限。
-标签类型统一维护在 `types/knowledge.ts`。创建支持多行，编辑仅支持重命名或单个值修改，
-不声明多行编辑接口，也不组合旧接口模拟多行保存。
+| 方法                                                         | 协议                                                                                      |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| postParagraph                                                | title、content、is_active、可选 problem_list；position 指定插入，默认首位                 |
+| getParagraphDetail／putParagraph                             | 返回 ParagraphDetail 对象，不按数组解析；正文更新不提交 problem_list，启停仅传 is_active  |
+| putParagraphPosition                                         | PUT adjust_position，query paragraph_id、new_position，无请求体                           |
+| postParagraphProblem／getParagraphProblems                   | <paragraphId>/problem，提交 content 或读取已关联问题                                      |
+| putAssociateParagraphProblem／putUnassociateParagraphProblem | association／unassociation，query paragraph_id、problem_id，仅改变关联                    |
+| putMigrateParagraphs                                         | PUT migrate/knowledge/<targetId>/document/<targetId>，`{ id_list }`，目标不能是当前文档   |
+| putGenerateParagraphQuestions                                | PUT batch_generate_related，ParagraphGeneratePayload + paragraph_id_list，不传 state_list |
+| putBatchDeleteParagraphs                                     | PUT batch_delete，`{ id_list }`，服务端清理关联与索引                                     |
 
-`system/resource-management/knowledge/tags.ts` 与 `system/shared-resources/knowledge/tags.ts`
-提供与普通 Workspace 相同的七个标签接口及四个文档标签关联接口，参数、请求体和返回类型保持一致。
-公共前缀分别为 `/system/resource/knowledge/<knowledgeId>` 和 `/system/shared/knowledge/<knowledgeId>`，
-不读取工作空间 ID；各接口追加对应的 `tags`、`document` 或 `tag` 路径。
-具体接口需部署环境支持。四套现有标签 API 由知识库详情 context 按范围装配；
-Workspace 共享标签 API 保持现有只读查询，不补写入方法。
+标题最多 256，后端内容上限 102400；界面限制见 View 文档。
+问题候选在 knowledge/problem.ts 的 getProblemsPage，支持 content 搜索，类型 ParagraphProblem。
+Workspace 共享 Paragraph API 仅 getParagraphPage、getParagraphDetail，不补问题查询或维护。
 
-文档与标签的关联由 `workspace/knowledge/tags.ts` 维护，不使用标签删除接口代替取消关联。
-该模块公共前缀为知识库路径，各接口按后端协议追加 `tags`、`document` 或 `tag`，不因文件归属改变请求地址。
-`getDocumentTags(knowledgeId, documentId, query?)` 查询 `document/<documentId>/tags`，返回分组标签，支持 `query.name` 搜索；
-`postBatchAddDocumentTags` POST 到 `document/batch_add_tag`，提交 `{ document_ids, tag_ids }`；
-`putDeleteDocumentTags` PUT 到 `document/<documentId>/tags/batch_delete`，直接提交标签 ID 数组。
-`putUnlinkTagDocuments` PUT 到知识库下的 `tag/<tagId>/docs_delete`，提交 `{ id_list: documentIds }`，
-用于取消同一标签与单个或多个文档的关联。
-关联文档列表复用 `getDocumentPage`，传 `resource_type: 'document'`、`tags: [tagId]`，
-未关联列表另传 `tag_exclude: true`；标签数组沿用请求层的 `tags[]` 序列化。
-名称使用 `name`；关联文档抽屉不传 `order_by`，按接口默认顺序展示。
+### 标签与文档关联
+
+四范围 tags.ts 按上述知识库前缀维护；Workspace 共享只 getKnowledgeTags，其余范围提供维护和关联。
+公共类型为 KnowledgeTagGroup 及 types/knowledge.ts 的载荷，文档关联不混用标签删除。
+
+| 方法                        | 路径／载荷                                                                              |
+| --------------------------- | --------------------------------------------------------------------------------------- |
+| getKnowledgeTags            | GET <id>/tags，非分页分组；可写范围可传 name，共享无查询参数；值可含 doc_count          |
+| postKnowledgeTags           | POST tags，直接提交 `{ key, value }[]`，兼容创建组及新增值                              |
+| putKnowledgeTag             | PUT tags/<tagId>，完整 id、key、value；重命名保留 value，改单值保留 key，不模拟多行编辑 |
+| deleteKnowledgeTag          | key 删除整组，one 删除单值                                                              |
+| putBatchDeleteKnowledgeTags | PUT tags/batch_delete，直接 ID 数组                                                     |
+| postImportKnowledgeTags     | POST tags/import，FormData 单个 file，XLS／XLSX；跳过重复组合，校验整份文件后写入       |
+| exportKnowledgeTagTemplate  | GET tags/template/export，下载标签模板.xlsx                                             |
+| getDocumentTags             | GET document/<documentId>/tags，支持 name                                               |
+| postBatchAddDocumentTags    | POST document/batch_add_tag，`{ document_ids, tag_ids }`                                |
+| putDeleteDocumentTags       | PUT document/<documentId>/tags/batch_delete，直接标签 ID 数组，仅解除关联               |
+| putUnlinkTagDocuments       | PUT tag/<tagId>/docs_delete，`{ id_list }`，取消同一标签的文档关联                      |
+
+标签名称／值上限 64／128；导入第一行“标签、标签值”，空行跳过，所有工作表统一校验。
+关联文档复用 getDocumentPage，resource_type: document、tags: [tagId]；未关联另传 tag_exclude: true。
 
 ### 工作空间共享资源查询
 
@@ -766,7 +528,7 @@ Workspace 共享知识库详情由 `resourceScope: 'workspace-shared'` 选择上
 - `system/resource-management/chat-user.ts`：`/system/resource/knowledge/{resource_type}/{resource_id}`。
 - `system/shared-resources/chat-user.ts`：`/system/shared/knowledge/{resource_type}/{resource_id}`。
 
-后三套沿用 V2 可核对的接口路径并标注 V3 联调 TODO；Workspace 共享在 V2 只核对到 KNOWLEDGE 查询，不能据此认定共享智能体接口已支持。
+后三套接口保留联调 TODO；Workspace 共享在 V2 只核对到 KNOWLEDGE 查询，不能据此认定共享智能体接口已支持。
 System 前缀中的额外 `knowledge` 段暂按 V2 保留，不能依据普通资源接口自行删减。
 资源类型使用 `RESOURCE_TYPE.APPLICATION / KNOWLEDGE` 的大写值；后台按原值读写授权记录，不会将小写转换为大写。
 仓库中的 `system_manage/urls.py` 已注册普通 Workspace 授权路径，其他范围需在提供对应接口的后端环境联调。
@@ -774,10 +536,12 @@ System 前缀中的额外 `knowledge` 段暂按 V2 保留，不能依据普通�
 通过 `user_group` 查询和保存组自动授权，通过 `user_group_id/<groupId>` 保存逐用户授权，
 分页查询在其后追加 `/<currentPage>/<pageSize>`；沿用 `ParamsPage`、`ResponsePage` 和原有数组请求体。
 调用方直接读取已解包数据并管理 loading；共享只读 API 不补写方法以凑齐接口集合。
-公共类型维护在 `types/chat-user.ts`，经 `@/api/types` 导出；用户组当前没有已授权人数统计字段，待后台确定字段后补充，不用分页用户数据推算全组人数。
+公共类型维护在 `types/chat-user.ts`，经 `@/api/types` 导出；用户组已授权人数读取 `authorized_count`，不用分页用户数据推算全组人数。
 
-当前智能体、知识库对话用户页仅直接调用普通 `workspace/chat-user.ts`，分别传自己的资源类型和路由 ID，暂不接入详情 context。
-其他三个范围的 API 文件保留，但页面暂不选择调用；页面不判断资源范围，当前请求统一使用 Workspace API，其他入口的 API 切换尚未接入。
+智能体对话用户页继续直接调用普通 `workspace/chat-user.ts`。知识库对话用户页通过详情 context
+的 `resourceApi.chatUser` 选择四套现有完整 API，传 `RESOURCE_TYPE.KNOWLEDGE` 和上下文知识库 ID。
+共有查询方法为必填，部分范围缺失的保存方法按 ScheduledSync、Tags、Document 同样的规则标记为可选，
+调用使用 `?.`；缺失方法不发请求、不提示保存成功，不回退普通 Workspace，不修改现有接口协议。
 
 ### 智能体对话日志
 
@@ -792,13 +556,6 @@ System 前缀中的额外 `knowledge` 段暂按 V2 保留，不能依据普通�
 （`knowledge_id`、`document_id`、`chat_ids`），将所选对话的问答写入目标文档。
 目标文档选项通过 `workspace/knowledge/document.ts` 的 `getAllDocuments(knowledgeId)`
 请求不分页的文档列表。聊天记录与标注接口保留在同一 API 文件，尚未接入日志详情正文。
-
-Web 知识库创建的 `WebKnowledgeCreatePayload.doc_strategy` 使用公共 `DocumentStrategy` 类型，
-包含 `split`、`visual` 和 `index`，字段与后端文档处理策略协议一致。
-
-Web 知识库详情及更新响应的顶层 `doc_strategy` 使用 `DocumentStrategy | null`，由
-`KnowledgeItem` 声明；非 Web 类型返回 null。文档处理策略设置通过 `putKnowledge` 仅提交
-`{ doc_strategy }`，服务端合并到知识库 meta，保留其他来源配置，保存不立即发起同步。
 
 ### 知识库外部检索服务
 
@@ -818,19 +575,18 @@ Web 知识库详情及更新响应的顶层 `doc_strategy` 使用 `DocumentStrat
 保存只更新 payload 传入的 `enabled` 或 `authentication`，保留未提交字段，并返回包含最新 `api_example` 的完整配置。
 响应与提交类型共用 `types/knowledge-external-retrieval.ts`，通过 `@/api/types` 导入；请求层统一解包 `data`。
 页面已实现加载、开关保存、回显与只读内容复制；接口字段有差异时在各自 API 模块适配，不要求联调人员补写页面交互。
-当前页面仅直接调用普通 `workspace/knowledge/external-retrieval.ts`，暂不接入详情 context；
-其他三个范围的 API 文件保留，页面暂不请求并禁用开关、显示待接入提示，不回退普通 Workspace。
+外部检索页面当前直接使用 Workspace API，尚未选择其他三种范围的接口；页面接入边界见 View 文档。
 
 ### 知识库定时同步
 
 `setting/scheduled-sync/` 页面调用设置查询、保存和日志分页接口；保存返回的规范化配置用于回填。
 
-四个知识库范围分别在自己的 `sync.ts` 中维护接口，由 `views/knowledge-detail/context.ts`
-按资源范围装配为 `resourceApi.sync`。Workspace、System 资源管理、System 共享资源提供查询、保存及日志分页；
+四个知识库范围分别在自己的 `scheduled-sync.ts` 中维护接口，由 `views/knowledge-detail/context.ts`
+按资源范围装配为 `resourceApi.scheduledSync`。Workspace、System 资源管理、System 共享资源提供查询、保存及日志分页；
 Workspace 共享版本只提供设置查询和日志分页。定时同步设置页通过 `useKnowledgeDetailContext()`
 取得当前范围的查询 API 和可管理范围的保存 API，不回退其他范围，也不为只读范围补写接口。
 
-`workspace/knowledge/sync.ts` 提供 `getKnowledgeSyncSetting`、`putKnowledgeSyncSetting`，
+`workspace/knowledge/scheduled-sync.ts` 提供 `getKnowledgeSyncSetting`、`putKnowledgeSyncSetting`，
 分别通过 GET、PUT `/<knowledgeId>/sync_setting` 查询和保存 Web、飞书及工作流知识库同步设置。
 `KnowledgeSyncSetting` 定义在 `types/knowledge-sync.ts`，包含 `enabled`、`schedule_type`、
 `sync_type` 及当前周期的时间、日期、间隔或 Cron 字段；`time` 为 HH:mm 数组，
