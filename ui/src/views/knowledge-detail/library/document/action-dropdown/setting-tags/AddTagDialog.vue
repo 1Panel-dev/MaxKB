@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import type TagsApi from '@/api/admin/workspace/knowledge/tags'
 import { nextTick, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import { useKnowledgeLibraryContext } from '../../../../context'
+import { useKnowledgeLibraryContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagGroup } from '@/api/types'
 import { MsgError, MsgSuccess } from '@/utils/message'
-import CreateTagDialog from '../../../tags/components/CreateTagDialog.vue'
+import CreateTagDialog from '@/views/knowledge-detail/library/tags/components/CreateTagDialog.vue'
+
+type WorkspaceTagsApi = typeof TagsApi
 
 defineOptions({ name: 'AddTagDialog' })
 const props = defineProps<{
@@ -20,7 +23,7 @@ interface TagSelection {
   tagId: string
 }
 
-const { requestSettingApi } = useKnowledgeLibraryContext()
+const { resourceApi, resourceScope } = useKnowledgeLibraryContext()
 const visible = ref(false)
 const queryLoading = ref(false)
 const targetKnowledgeId = ref('')
@@ -33,8 +36,8 @@ const createTagMounted = ref(false)
 
 // 候选项只保留接口返回的前 100 个标签组，搜索交给 el-select 的 filterable。
 function loadTagOptions() {
-  const requestApi = requestSettingApi.value?.tags
-  if (!requestApi) return
+  const requestApi = resourceApi.tags
+  if (resourceScope.value !== 'workspace' || !requestApi) return
   queryLoading.value = true
   return requestApi
     .getKnowledgeTags(targetKnowledgeId.value)
@@ -51,7 +54,7 @@ function loadTagOptions() {
 }
 
 function open(documentIds: string[]) {
-  if (!requestSettingApi.value?.tags || visible.value || loading.value || !documentIds.length) return
+  if (resourceScope.value !== 'workspace' || !resourceApi.tags || visible.value || loading.value || !documentIds.length) return
   targetKnowledgeId.value = props.knowledgeId
   targetDocumentIds.value = [...documentIds]
   visible.value = true
@@ -156,10 +159,10 @@ defineExpose({ open })
     </template>
   </MkDialog>
   <CreateTagDialog
-    v-if="createTagMounted && requestSettingApi"
+    v-if="createTagMounted && resourceScope === 'workspace'"
     ref="createTagRef"
     :knowledge-id="targetKnowledgeId"
-    :api="requestSettingApi.tags"
+    :api="resourceApi.tags as WorkspaceTagsApi"
     @refresh="loadTagOptions"
     @closed="createTagMounted = false"
   />

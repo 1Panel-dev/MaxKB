@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import { useKnowledgeDetailContext } from '../../../../context'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 
 defineOptions({ name: 'BatchExportDocumentAction' })
 
