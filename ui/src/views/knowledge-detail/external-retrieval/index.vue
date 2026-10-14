@@ -5,7 +5,7 @@ import ExternalRetrievalApi from '@/api/admin/workspace/knowledge/external-retri
 import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetting } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { copyText } from '@/utils/clipboard'
-import { MsgInfo, MsgSuccess, MsgWarning } from '@/utils/message'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ExternalRetrievalView' })
 defineProps<ResourceDetailPageProps>()
@@ -37,19 +37,9 @@ function loadExternalRetrieval() {
 
 // 仅保存本次切换的字段，成功后按完整响应更新开关及配置示例。
 function handleSettingChange(field: keyof KnowledgeExternalRetrievalPayload, value: string | number | boolean) {
-  if (loading.value) return
-  if (!setting.value) {
-    if (loadFailed.value) MsgWarning('请先重新加载外部检索服务配置')
-    else MsgInfo('当前范围的外部检索服务接口待接入')
-    return
-  }
   loading.value = true
   return ExternalRetrievalApi.putKnowledgeExternalRetrieval(knowledgeId.value, { [field]: value === true })
     .then((result) => {
-      if (!result) {
-        MsgInfo('当前范围的外部检索服务保存接口待接入')
-        return
-      }
       setting.value = result
       MsgSuccess('保存成功')
     })
@@ -69,23 +59,22 @@ onMounted(() => {
   <Teleport v-if="headerTarget" :to="headerTarget">
     <div class="flex-align-center gap-2">
       <h4>{{ title }}</h4>
-      <MkTooltip content="第三方外部服务可通过 API / MCP 调用来检索当前知识库">
+      <MkTooltip placement="right" content="第三方外部服务可通过 API / MCP 调用来检索当前知识库">
         <MkIcon name="icon_info_outlined" class="text-N600!" />
       </MkTooltip>
     </div>
   </Teleport>
 
   <div v-loading="loading" class="w-full max-w-200 space-y-4">
-    <div>
+    <section>
       <div class="mb-2">
         <span>身份认证</span>
         <span class="text-N600">（开启后仅授权的对话用户可通过 API Key 检索该知识库）</span>
       </div>
       <!-- 切换身份认证 -->
       <el-switch :model-value="setting?.authentication ?? false" @change="handleSettingChange('authentication', $event)" />
-    </div>
-
-    <div>
+    </section>
+    <section>
       <div class="flex-between mb-2 gap-2">
         <span>API 服务地址</span>
         <!-- 切换外部检索服务 -->
@@ -99,9 +88,9 @@ onMounted(() => {
           </el-button>
         </template>
       </el-input>
-    </div>
+    </section>
 
-    <div>
+    <section>
       <div class="mb-2">API 调用示例</div>
       <div class="group relative">
         <el-input :model-value="setting?.api_example ?? ''" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
@@ -115,9 +104,9 @@ onMounted(() => {
           <MkIcon name="icon_copy_outlined" />
         </el-button>
       </div>
-    </div>
+    </section>
 
-    <div>
+    <section>
       <div class="mb-2">MCP 配置详情</div>
       <div class="group relative">
         <el-input :model-value="mcpConfig" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
@@ -126,6 +115,6 @@ onMounted(() => {
           <MkIcon name="icon_copy_outlined" />
         </el-button>
       </div>
-    </div>
+    </section>
   </div>
 </template>

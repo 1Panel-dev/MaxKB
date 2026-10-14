@@ -27,15 +27,13 @@ function enterWorkflow() {
 
 const loading = ref(false)
 function handleTransformWorkflow() {
-  const requestApi = resourceApi.knowledge
-  if (!('postTransformWorkflow' in requestApi)) return
   return MsgConfirm('转换为工作流知识库', '转换后无法回退，请谨慎操作。', {
     confirmButtonText: '转换',
     confirmButtonType: 'primary',
   })
     .then(() => {
       loading.value = true
-      return requestApi.postTransformWorkflow(knowledgeId.value, { work_flow: cloneDeep(knowledgeTemplate.default) }).then(() => {
+      return resourceApi.knowledge.postTransformWorkflow(knowledgeId.value, { work_flow: cloneDeep(knowledgeTemplate.default) }).then(() => {
         MsgSuccess('转换成功')
         return enterWorkflow()
       })
