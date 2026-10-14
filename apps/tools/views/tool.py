@@ -2,7 +2,6 @@ from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import check_batch_permissions, has_permissions
 from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
-from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.log.log import log
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
@@ -28,20 +27,6 @@ from tools.api.tool import (
 )
 from tools.models import Tool, ToolScope
 from tools.serializers.tool import ToolBatchOperateSerializer, ToolSerializer, ToolTreeSerializer
-
-
-def get_shared_tool_read_permission(request, kwargs):
-    get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
-    if get_authorized_tool is None:
-        return None
-    shared_tool_query_set = QuerySet(Tool).filter(id=kwargs.get("tool_id"), scope=ToolScope.SHARED)
-    if get_authorized_tool(shared_tool_query_set, kwargs.get("workspace_id")).exists():
-        return ViewPermission(
-            [RoleConstants.USER.get_workspace_role(), RoleConstants.WORKSPACE_MANAGE.get_workspace_role()],
-            [PermissionConstants.TOOL_READ.get_workspace_permission()],
-            CompareConstants.OR,
-        )
-    return None
 
 
 def get_tool_operation_object(tool_id):
@@ -191,7 +176,6 @@ class ToolView(APIView):
             tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
-            get_shared_tool_read_permission,
             PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
