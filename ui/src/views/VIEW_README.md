@@ -897,6 +897,22 @@ Workspace 普通资源、System 资源管理和 System 共享资源允许打开�
 编辑、启停局部替换卡片，删除、迁移局部移除，保留其他已加载数据和滚动位置。
 局部移除后，下一次滚动请求按剩余列表长度定位服务端分页，必要时拼接相邻两页，避免漏载。
 正文使用 `MdPreview`；第一页加载完成且无分段时展示空态。
+左侧目录和右侧卡片分别通过 `useSortable` 绑定同一份分段数组，拖拽图标使用与 `MkFormList`
+一致的 link 按钮、`text-N600` 和 `h-8!`。左右图标均仅在悬浮所属目录项／卡片或获得焦点时显示，
+绝对定位在所属目录项／卡片右侧并向外露出 8px，不占据布局空间；目录图标垂直居中。
+左右均可按住整条目录项／整张卡片或拖拽图标排序，只允许在已加载分段中排序。
+右侧整体过滤悬浮操作区，并过滤正文链接及拖拽图标以外的按钮，保留原有点击行为；
+普通点击卡片仍打开详情，位置保存期间不打开详情；左侧点击手柄不触发目录定位。
+左侧使用普通 `div.paragraph-directory-row` 作为排序行，手柄与 `ElAnchorLink` 并列。
+页面局部 `v-disable-link-drag` 指令将 `ElAnchorLink` 内部的 a 设为 `draggable=false`，
+不使用 `dragstart.prevent`，避免原生链接拖出浏览器，并让整条目录项正常参与 Sortable 排序。
+拖拽后两侧同步重排，通过目标分段原有的真实 `position` 提交位置接口，搜索不改变位置语义。
+成功后同步移动区间内已加载分段的 `position`，失败恢复原顺序；不重新查询或重置列表。
+批量模式、分段加载、删除确认或提交、弹窗打开、位置保存以及不足两条时禁用拖拽。
+拖拽和保存期间暂停滚动补页，保存时仅在标题栏显示状态，不使用整页 loading 遮挡落位动画；
+保存锁继续禁止再次拖拽和修改操作。与 `MkFormList` 一致，两侧使用普通 DOM 容器，
+右侧以普通 `div.paragraph-sort-row` 承载卡片，由 `useSortable` 统一提供 150ms 位移动画；
+不在可排序元素上叠加 `TransitionGroup`，也不直接对带默认过渡样式的 `ElCard` 做位移动画。
 批量选择支持点击整张卡片或复选框切换勾选、全选、取消、“迁移至”、“生成问题”和“删除”；
 复选框阻止点击冒泡，避免重复切换。`document-detail/action-dropdown/migrate/` 集中维护
 批量按钮 `BatchMigrateParagraphAction`、单项菜单 `MigrateParagraphAction` 和 `ParagraphMigrateDialog`，沿用 chat-log 添加知识库的知识库／文档

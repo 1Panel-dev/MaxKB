@@ -252,6 +252,12 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 段落卡片使用 `app.scss` 中的 `mk-paragraph-card`，普通模式悬停背景为 N100；多选模式添加
 `selectable`，未选中卡片悬停为主题色边框、白色背景。已选卡片添加 `active`，沿用
 `MkSourceCard` 的主题色边框和 10% 主题色背景，选中背景在悬停时保留。
+禁用样式添加 `disabled`，标题、Markdown 正文和辅助文字使用 N400 浅灰色；此类只改变展示，
+悬停时背景和边框不变色，保留选中和操作交互，实际禁用行为由使用方控制。
+
+```html
+<el-card class="mk-paragraph-card disabled" shadow="never">禁用的段落内容</el-card>
+```
 
 ## 阴影
 

@@ -30,11 +30,9 @@ const postParagraph = (knowledgeId: string, documentId: string, payload: Paragra
 const getParagraphDetail = (knowledgeId: string, documentId: string, paragraphId: string) =>
   get<ParagraphDetail>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}`)
 
-/** 更新分段正文或启用状态，提取后端编辑响应中的最新详情。 */
+/** 更新分段正文或启用状态，返回最新详情。 */
 const putParagraph = (knowledgeId: string, documentId: string, paragraphId: string, payload: ParagraphEditPayload) =>
-  put<ParagraphEditPayload, [ParagraphDetail, ParagraphEditPayload, string]>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}`, payload).then(
-    ([paragraph]) => paragraph,
-  )
+  put<ParagraphEditPayload, ParagraphDetail>(`${getPrefix(knowledgeId, documentId)}/${paragraphId}`, payload)
 
 /** 新增问题并关联到当前分段。 */
 const postParagraphProblem = (knowledgeId: string, documentId: string, paragraphId: string, content: string) =>
