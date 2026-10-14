@@ -75,7 +75,7 @@ onMounted(() => {
     </div>
   </Teleport>
 
-  <div v-loading="loading" class="w-full max-w-200 space-y-6 pb-6">
+  <div v-loading="loading" class="w-full max-w-200 space-y-4">
     <div>
       <div class="mb-2">
         <span>身份认证</span>

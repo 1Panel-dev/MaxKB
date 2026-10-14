@@ -123,8 +123,7 @@ function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
   const requestApi = requestSettingApi.value?.tags
   if (!requestApi || loading.value || operationLoading.value) return
   const tagName = type === 'key' ? row.key : `${row.key}—${row.value}`
-  const tip = type === 'key' ? '删除后使用该标签的资源将会删除该标签，请谨慎操作!' : '删除后使用该标签的资源将会删除该标签，请谨慎操作!'
-  return MsgConfirm(`是否删除标签：${tagName}？`, tip).then(
+  return MsgConfirm(`是否删除标签：${tagName}？`, '删除后，使用该标签的资源将会删除该标签，请谨慎操作！').then(
     () => {
       operationLoading.value = true
       return requestApi
