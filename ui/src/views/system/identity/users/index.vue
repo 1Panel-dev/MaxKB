@@ -221,7 +221,7 @@ onMounted(() => loadSystemUsers())
           </template>
         </el-table-column>
 
-        <el-table-column label="用户来源">
+        <el-table-column width="120" label="用户来源">
           <template #header>
             <MkTableFilter
               mode="single"
