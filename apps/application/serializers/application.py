@@ -202,7 +202,7 @@ def get_authorized_tool_ids(user_id: str, workspace_id: str, tool_ids: List[str]
     """
     返回 tool_ids 中当前用户被授权绑定/使用的工具id。
     工作空间管理员默认拥有全部工具权限;其他用户必须在 workspace_user_resource_permission
-    中存在针对工作空间工具的显式授权记录;共享工具按共享工作空间授权校验。
+    中存在针对该工具的显式授权记录(默认拒绝)。
     """
     if not tool_ids:
         return []
@@ -219,12 +219,6 @@ def get_authorized_tool_ids(user_id: str, workspace_id: str, tool_ids: List[str]
         )
         if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
     }
-    get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
-    if get_authorized_tool is not None:
-        shared_tool_query_set = QuerySet(Tool).filter(id__in=tool_ids, scope=ToolScope.SHARED)
-        granted_tool_ids.update(
-            str(tool.id) for tool in get_authorized_tool(shared_tool_query_set, workspace_id)
-        )
     return [tool_id for tool_id in tool_ids if tool_id in granted_tool_ids]
 
 
