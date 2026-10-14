@@ -697,6 +697,11 @@ Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
 标签类型统一维护在 `types/knowledge.ts`。创建支持多行，编辑仅支持重命名或单个值修改，
 不声明多行编辑接口，也不组合旧接口模拟多行保存。
 
+`system/resource-management/knowledge/tags.ts` 与 `system/shared-resources/knowledge/tags.ts`
+提供与普通 Workspace 相同的七个标签接口，参数、请求体和返回类型保持一致，仅资源前缀分别为
+`/system/resource/knowledge/<knowledgeId>/tags` 和 `/system/shared/knowledge/<knowledgeId>/tags`，不读取工作空间 ID。
+两套系统标签 API 暂未接入知识库详情 context；Workspace 共享标签 API 保持现有只读查询，不补写入方法。
+
 文档与标签的关联由 `workspace/knowledge/document.ts` 维护，不使用标签删除接口代替取消关联。
 `getDocumentTags(knowledgeId, documentId, query?)` 查询 `document/<documentId>/tags`，返回分组标签，支持 `query.name` 搜索；
 `postAddDocumentTags` POST 到 `document/batch_add_tag`，提交 `{ document_ids, tag_ids }`；
