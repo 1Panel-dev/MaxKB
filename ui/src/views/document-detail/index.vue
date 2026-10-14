@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, type Directive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ElAnchor } from 'element-plus'
@@ -22,8 +21,6 @@ import {
 } from './action-dropdown'
 
 import type { ParagraphMoveDirection } from './action-dropdown'
-
-const { routeNames, routeParams } = useKnowledgeNavigationContext()
 
 defineOptions({ name: 'KnowledgeParagraphView' })
 
@@ -88,8 +85,14 @@ function handleSearchChange(query?: ParagraphQuery) {
 
 function handleBack() {
   void router.push({
-    name: routeNames.value.document,
-    params: { ...routeParams.value, type: route.params.type },
+    name: `${route.meta.resourceScope}-knowledge-document-list`,
+    params: {
+      ...(route.meta.resourceScope === 'workspace' || route.meta.resourceScope === 'workspace-shared'
+        ? { workspaceId: route.params.workspaceId }
+        : {}),
+      knowledgeId: knowledgeId.value,
+      type: route.params.type,
+    },
     query: route.query,
   })
 }

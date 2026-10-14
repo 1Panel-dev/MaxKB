@@ -3,14 +3,14 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { ref, useTemplateRef, watch } from 'vue'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { MsgSuccess } from '@/utils/message'
-import { useKnowledgeSettingContext } from '../../context'
+import { useKnowledgeDetailContext } from '../../context'
 
 defineOptions({ name: 'KnowledgeDocumentStrategyView' })
 
 defineProps<ResourceDetailPageProps>()
 
 /* 复用详情回填策略，草稿由表单维护。 */
-const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeSettingContext()
+const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 const strategyFormRef = useTemplateRef<InstanceType<typeof DocumentStrategyForm>>('strategyFormRef')
 const saving = ref(false)
 watch(
@@ -23,6 +23,8 @@ watch(
 
 /* 只保存文档处理策略，不触发同步或修改其他设置。 */
 function handleSave() {
+  const requestApi = resourceApi.knowledge
+  if (!('putKnowledge' in requestApi)) return
   const detail = knowledge.value
   const strategyForm = strategyFormRef.value
   if (saving.value || !detail || !strategyForm) return
@@ -31,7 +33,7 @@ function handleSave() {
     .validate()
     .then((valid) => {
       if (!valid) return
-      return resourceApi.knowledge.putKnowledge(detail.id, { doc_strategy: strategyForm.getStrategy() }).then((savedKnowledge) => {
+      return requestApi.putKnowledge(detail.id, { doc_strategy: strategyForm.getStrategy() }).then((savedKnowledge) => {
         replaceKnowledgeDetail({ ...detail, ...savedKnowledge })
         MsgSuccess('保存成功')
       })

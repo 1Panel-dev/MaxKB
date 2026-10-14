@@ -169,7 +169,7 @@ onMounted(() => loadChatUserGroups())
       <MkSearchList :data="chatUserGroups" :default-active="currentGroup?.id" @click="handleSelectGroup">
         <template #default="{ row }">
           <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
-          <span class="ml-1 shrink-0 font-normal text-N500">
+          <span class="shrink-0 font-normal text-N500">
             <!-- TODO：接入用户组已授权人数，当前接口未返回统计字段。 -->
             {{ row.is_auth ? '（自动授权）' : '（已授权 —）' }}
           </span>
@@ -189,7 +189,7 @@ onMounted(() => loadChatUserGroups())
         </div>
 
         <div class="flex-between mb-4 flex-wrap gap-4">
-          <div class="flex-align-center flex-wrap gap-6">
+          <div class="flex-align-center flex-wrap gap-5">
             <!-- 搜索对话用户 -->
             <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
             <!-- 设置用户组自动授权 -->

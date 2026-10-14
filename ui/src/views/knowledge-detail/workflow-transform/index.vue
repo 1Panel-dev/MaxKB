@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
@@ -7,9 +6,7 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { knowledgeTemplate } from '@/views/knowledge/template'
 import workflowDemo from '@/assets/workflow/workflow-demo.png'
-import { useKnowledgeSettingContext } from '../context'
-
-const { routeNames, routeParams } = useKnowledgeNavigationContext()
+import { useKnowledgeDetailContext } from '../context'
 
 defineOptions({ name: 'KnowledgeWorkflowTransformView' })
 defineProps<ResourceDetailPageProps>()
@@ -17,7 +14,7 @@ defineExpose({ hideHeader: true })
 
 const route = useRoute()
 const router = useRouter()
-const { knowledgeId, resourceApi } = useKnowledgeSettingContext()
+const { knowledgeId, resourceApi, routeNames, routeParams } = useKnowledgeDetailContext()
 
 /* 转换成功后进入全屏画布。 */
 function enterWorkflow() {
@@ -30,13 +27,15 @@ function enterWorkflow() {
 
 const loading = ref(false)
 function handleTransformWorkflow() {
+  const requestApi = resourceApi.knowledge
+  if (!('postTransformWorkflow' in requestApi)) return
   return MsgConfirm('转换为工作流知识库', '转换后无法回退，请谨慎操作。', {
     confirmButtonText: '转换',
     confirmButtonType: 'primary',
   })
     .then(() => {
       loading.value = true
-      return resourceApi.knowledge.postTransformWorkflow(knowledgeId.value, { work_flow: cloneDeep(knowledgeTemplate.default) }).then(() => {
+      return requestApi.postTransformWorkflow(knowledgeId.value, { work_flow: cloneDeep(knowledgeTemplate.default) }).then(() => {
         MsgSuccess('转换成功')
         return enterWorkflow()
       })

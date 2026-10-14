@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
 import { computed, provide, ref, useTemplateRef, type Component } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type { AxiosProgressEvent } from 'axios'
 import type LogicFlow from '@logicflow/core'
 import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
@@ -15,12 +14,11 @@ import DataSource from './action/DataSource.vue'
 import KnowledgeBase from './action/KnowledgeBase.vue'
 import Result from './action/Result.vue'
 
-const { routeNames, routeParams } = useKnowledgeNavigationContext()
-
 defineOptions({ name: 'KnowledgeWorkflowDebugDrawer' })
 
 const props = defineProps<{ knowledgeId: string }>()
 const router = useRouter()
+const route = useRoute()
 
 type ActionStep = 'data_source' | 'knowledge_base' | 'result'
 
@@ -132,8 +130,14 @@ function handleClosed() {
 function handleGoToDocuments() {
   return router
     .push({
-      name: routeNames.value.document,
-      params: { ...routeParams.value, knowledgeId: props.knowledgeId, type: KNOWLEDGE_TYPE_KEY.WORKFLOW },
+      name: `${route.meta.resourceScope}-knowledge-document-list`,
+      params: {
+        ...(route.meta.resourceScope === 'workspace' || route.meta.resourceScope === 'workspace-shared'
+          ? { workspaceId: route.params.workspaceId }
+          : {}),
+        knowledgeId: props.knowledgeId,
+        type: KNOWLEDGE_TYPE_KEY.WORKFLOW,
+      },
     })
     .then(close)
 }

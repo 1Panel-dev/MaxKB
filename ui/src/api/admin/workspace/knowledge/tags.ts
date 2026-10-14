@@ -15,6 +15,7 @@ const putKnowledgeTag = (knowledgeId: string, tagId: string, tag: KnowledgeTagUp
   put<KnowledgeTagUpdatePayload, void>(`${getPrefix(knowledgeId)}/${tagId}`, tag)
 
 /** 删除整个标签分组或单个标签值。 */
+// type：key 删除整个标签及其所有值；one 仅删除当前标签值。
 const deleteKnowledgeTag = (knowledgeId: string, tagId: string, type: 'key' | 'one') =>
   del<undefined, void>(`${getPrefix(knowledgeId)}/${tagId}/${type}`)
 

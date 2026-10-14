@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import type TagsApi from '@/api/admin/workspace/knowledge/tags'
 import { nextTick, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import { useKnowledgeLibraryContext } from '@/views/knowledge-detail/context'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagGroup } from '@/api/types'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import CreateTagDialog from '@/views/knowledge-detail/library/tags/components/CreateTagDialog.vue'
-
-type WorkspaceTagsApi = typeof TagsApi
 
 defineOptions({ name: 'AddTagDialog' })
 const props = defineProps<{
@@ -23,7 +20,7 @@ interface TagSelection {
   tagId: string
 }
 
-const { resourceApi, resourceScope } = useKnowledgeLibraryContext()
+const { resourceApi, resourceScope } = useKnowledgeDetailContext()
 const visible = ref(false)
 const queryLoading = ref(false)
 const targetKnowledgeId = ref('')
@@ -54,7 +51,6 @@ function loadTagOptions() {
 }
 
 function open(documentIds: string[]) {
-  if (resourceScope.value !== 'workspace' || !resourceApi.tags || visible.value || loading.value || !documentIds.length) return
   targetKnowledgeId.value = props.knowledgeId
   targetDocumentIds.value = [...documentIds]
   visible.value = true
@@ -111,7 +107,7 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" title="添加标签" @closed="emit('closed')">
-    <el-form ref="formRef" v-loading="loading" :model="tagForm" label-position="top" @submit.prevent>
+    <el-form ref="formRef" v-loading="loading" :model="tagForm" label-position="top" require-asterisk-position="right" @submit.prevent>
       <MkFormList v-model="tagForm.tags" :default-item="{ key: '', tagId: '' }" @update:model-value="handleRowsChange">
         <template #default="{ index, item: tag }">
           <el-form-item
@@ -159,10 +155,10 @@ defineExpose({ open })
     </template>
   </MkDialog>
   <CreateTagDialog
-    v-if="createTagMounted && resourceScope === 'workspace'"
+    v-if="createTagMounted"
     ref="createTagRef"
     :knowledge-id="targetKnowledgeId"
-    :api="resourceApi.tags as WorkspaceTagsApi"
+    :api="resourceApi.tags"
     @refresh="loadTagOptions"
     @closed="createTagMounted = false"
   />

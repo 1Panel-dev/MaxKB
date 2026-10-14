@@ -63,7 +63,15 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" :title="title" :before-close="handleBeforeClose" @closed="resetData">
-    <el-form ref="formRef" v-loading="loading" :model="tagForm" :rules="formRules" label-position="top" @submit.prevent>
+    <el-form
+      ref="formRef"
+      v-loading="loading"
+      :model="tagForm"
+      :rules="formRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <div class="flex gap-4">
         <el-form-item class="min-w-0 flex-1" label="标签" prop="key">
           <el-input v-model="tagForm.key" :disabled="editField === 'value'" :maxlength="64" placeholder="请输入标签" />

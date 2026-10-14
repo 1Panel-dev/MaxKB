@@ -487,7 +487,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `home/index.vue`                                | Workspace 首页                                                       |
 | `knowledge/index.vue`                           | 工作空间知识库目录与知识库卡片页面                                   |
 | `knowledge-detail/index.vue`                    | 知识库详情页面                                                       |
-| `knowledge-detail/external-retrieval/index.vue` | 外部检索服务开关、API 地址与调用示例、MCP 配置的只读展示及复制 |
+| `knowledge-detail/external-retrieval/index.vue` | 外部检索服务开关、API 地址与调用示例、MCP 配置的只读展示及复制       |
 | `knowledge-detail/library/tags/index.vue`       | 标签分组查询、创建、重命名、单值编辑、删除与关联文档管理             |
 | `knowledge-detail/workflow-transform/index.vue` | 非工作流知识库转换说明、确认与进入画布                               |
 | `document-detail/index.vue`                     | 普通 Workspace 文档分段查询、目录定位、批量操作、新增、编辑与详情    |
@@ -997,7 +997,7 @@ Workspace 普通与共享资源均使用 Workspace 模型选项接口，System �
 System 共享使用系统共享模型接口。
 四种范围的定时同步查询和日志均使用各自现有 Sync API；Workspace 普通和 System 两种范围支持保存，
 Workspace 共享只读，不发送保存请求，不回退 Workspace 接口。
-library 通过 `useKnowledgeLibraryContext` 装配现有文档、标签 API；System 两种范围未提供对应模块，
+library 通过 `useKnowledgeDetailContext` 装配现有文档、标签 API；System 两种范围未提供对应模块，
 保持未接入状态，不回退 Workspace。Workspace 共享仅查询，普通 Workspace 提供已有维护接口。
 路由结构及来源配置见 `src/router/ROUTE_README.md`。
 
@@ -1195,7 +1195,7 @@ application、tool、knowledge 的 WorkflowView 统一使用一个 `loading` 控
 复用详情布局并隐藏标题栏，展示 v2 转换说明与工作流示例图。知识库详情从已有上下文读取，
 路由 `beforeEnter` 将工作流类型直接重定向至全屏画布，页面不监听类型跳转。
 转换需确认不可回退，页面管理 loading 与重复提交保护，
-通过 `useKnowledgeSettingContext()` 的 `resourceApi.knowledge.postTransformWorkflow` 提交
+通过 `useKnowledgeDetailContext()` 的 `resourceApi.knowledge.postTransformWorkflow` 提交
 深拷贝后的 `knowledge/template.ts` 默认模板，按上下文选择 Workspace、System 资源管理或
 System 共享管理 Knowledge API；成功后进入画布，失败保留转换页。
 四种范围的路由与画布跳转已配置；API 保留原实现，Workspace 共享和 System 工作流接口接入暂缓。
@@ -1365,7 +1365,7 @@ Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `bod
 
 知识库列表根据当前目录进入普通或 `workspace-shared-knowledge-detail` 共享详情路由。
 两者复用 `knowledge-detail/index.vue` 和文档页；详情容器通过上下文选择对应详情 API，
-文档页与标签页通过 `useKnowledgeLibraryContext` 选择普通或共享的现有完整 API 对象。
+文档页与标签页通过 `useKnowledgeDetailContext` 选择普通或共享的现有完整 API 对象。
 共享详情已补齐与其他三种范围一致的菜单，设置与工作流接口接入暂缓。
 容器监听工作空间、知识库和资源范围变化重新加载；共享详情返回列表携带 `folderId: 'shared'`，
 普通详情继续恢复所属文件夹。文档创建者选项在共享范围使用 System `CommonApi`，普通范围使用
@@ -1487,22 +1487,22 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 上下文只维护共享详情数据、更新能力及多个子页面共用的接口。仅由单个子页面使用的接口，
 在该页面内部按资源范围选择，不为单页接口增加 context 配置或转发 getter。
 定时同步接口属于定时同步页自身职责；未提供对应范围接口时，不回退到 Workspace，
-也不为 Workspace 共享只读资源增加写接口。同步接口由 `useKnowledgeSyncContext` 提供给定时同步页，
+也不为 Workspace 共享只读资源增加写接口。同步接口由 `useKnowledgeDetailContext` 提供给定时同步页，
 按现有四套 Sync API 的真实方法集合装配，不扩展接口。
 
 `provideKnowledgeDetailContext` 在详情入口装配并提供上下文，`useKnowledgeDetailContext` 供子页读取。
-基础设置和文档策略通过 `useKnowledgeSettingContext` 获取可管理范围的完整 Knowledge API 类型，
-该设置上下文的 `resourceApi` 仅提供 `knowledge`；定时同步通过 `useKnowledgeSyncContext` 读取当前
+基础设置、文档策略、定时同步及资料库统一通过 `useKnowledgeDetailContext` 读取同一份上下文；
+不为设置页重建或覆盖 `resourceApi`。定时同步读取当前
 `resourceApi.sync`。Workspace 共享只查询设置和日志，表单只读且不显示保存。
-不在页面用方法是否存在判断可写能力；上下文边界排除 Workspace 共享只读范围，
-共享设置路由已注册，API 上下文仍保留原有只读边界，写接口接入暂缓。
+上下文保留各范围完整 API 的真实方法集合；只读范围未提供的写方法不补造，
+调用处进行类型收窄，不将只读 API 当作可写 API。
 上下文按响应式 `resourceScope` 选择各范围现有完整 Knowledge、Sync API 对象，
 统一通过响应式 `resourceApi.knowledge / sync` 提供接口，脚本调用不需要 `.value`；
 详情查询与保存使用同一个完整 Knowledge API 对象，不存在的设置模块保持 undefined。
 返回列表路由独立提供；不要在 setup 时解构 `resourceApi` 内的具体 API，以免固定为旧范围的对象。
 不根据 URL 猜测来源，不为补齐方法集合构造请求，不让缺失模块回退 Workspace。
 目前仅详情入口及 setting 下的基础设置、文档策略、定时同步页面采用上下文 API；
-library 下的文档、标签与迁移入口通过 `useKnowledgeLibraryContext` 读取现有 API，
+library 下的文档、标签与迁移入口通过 `useKnowledgeDetailContext` 读取现有 API，
 `resourceApi.document / tags` 是可选的查询模块；System 两种来源未提供时不发送请求。
 查询和维护均通过 `resourceApi.document / tags / workflow / knowledge` 的现有完整 API 对象进行；
 维护操作沿用 Workspace 普通范围边界，分别传给已有操作组件；不为共享或 System 补造写接口。共享标签页按现有无查询参数接口读取，
@@ -1510,15 +1510,16 @@ library 下的文档、标签与迁移入口通过 `useKnowledgeLibraryContext` 
 同步日志通过完整 Sync API props 请求。展示组件不接收上下文 API。
 System 飞书专用保存方法尚未提供，基础设置沿该范围现有 `putKnowledge` 协议；Workspace 飞书保留专用方法。
 
-四套知识库详情菜单及来源导航已统一，`useKnowledgeNavigationContext` 仅维护路由名称与参数，
-不配置 API。各范围接口存在差异，API 模块保持原实现；目前已补齐 sync 与 library 的现有接口装配与消费，
+四套知识库详情菜单及来源导航已统一，详情内的 `routeNames / routeParams` 合入同一份详情上下文。
+独立文档详情及全屏工作流没有详情容器父级，直接使用自身路由数据处理导航，不依赖详情注入。各范围接口存在差异，API 模块保持原实现；目前已补齐 sync 与 library 的现有接口装配与消费，
 其他模块后续按每套真实接口分别接入，不将菜单完整度视为接口接入完成。
 
 ### 资料库上下文与只读范围
 
-`useKnowledgeLibraryContext` 复用详情数据、知识库 ID 和响应式资源范围，文档及标签查询通过
+`useKnowledgeDetailContext` 复用详情数据、知识库 ID 和响应式资源范围，文档及标签查询通过
 `resourceApi.document / tags` 访问当前范围完整 API。缺失模块保持 undefined，页面展示未接入空态，
-不轮询或发送 Workspace 请求。文档页切换知识库、工作空间或范围时清空筛选、分页和选择；标签页同时重置标签组。
+不轮询或发送 Workspace 请求。文档页切换知识库、工作空间或范围时清空筛选、分页和选择。
+标签页通过 `onMounted` 首次加载，不监听路由参数或资源范围来重置状态；搜索和维护操作后显式刷新。
 Workspace 共享文档保留查询和标签展示，标签页保留标签组查询；只支持共享接口现有的方法。
 创建标签弹窗必须由入口传入完整 Tags API，不再默认使用普通 Workspace；文档标签添加及迁移的
 候选查询同样通过资料库上下文选择。图片页保持占位，不配置不存在的接口。
@@ -1530,3 +1531,7 @@ Workspace 共享文档保留查询和标签展示，标签页保留标签组查�
 
 资料库模板不使用“API 对象存在且包含某方法”的组合判断来控制操作显隐；
 只保留原有业务资源范围条件，接口联合类型的收窄不增加可见性规则。
+
+知识库详情上下文仅保留两个公开入口：父页面通过 `provideKnowledgeDetailContext` 提供，
+子页面、弹窗和 Action 通过 `useKnowledgeDetailContext` 获取同一对象。接口统一为 `resourceApi.xx`，
+不增加设置、导航、资料库或同步专属 Context hook，也不增加查询／维护接口别名。

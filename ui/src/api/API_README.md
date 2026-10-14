@@ -805,7 +805,7 @@ Web 知识库详情及更新响应的顶层 `doc_strategy` 使用 `DocumentStrat
 
 四个知识库范围分别在自己的 `sync.ts` 中维护接口，由 `views/knowledge-detail/context.ts`
 按资源范围装配为 `resourceApi.sync`。Workspace、System 资源管理、System 共享资源提供查询、保存及日志分页；
-Workspace 共享版本只提供设置查询和日志分页。定时同步设置页通过 `useKnowledgeSyncContext()`
+Workspace 共享版本只提供设置查询和日志分页。定时同步设置页通过 `useKnowledgeDetailContext()`
 取得当前范围的查询 API 和可管理范围的保存 API，不回退其他范围，也不为只读范围补写接口。
 
 `workspace/knowledge/sync.ts` 提供 `getKnowledgeSyncSetting`、`putKnowledgeSyncSetting`，
