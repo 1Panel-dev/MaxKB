@@ -3,6 +3,7 @@
 import os
 
 from celery import Celery
+from celery.signals import worker_init
 from kombu import Exchange, Queue
 from maxkb import settings
 from .heartbeat import *
@@ -14,6 +15,14 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'maxkb.settings')
 register_hmac_signed_serializer()
 
 app = Celery('MaxKB')
+
+
+@worker_init.connect
+def init_database_models(sender=None, **kwargs):
+    from common.database_model_manage.database_model_manage import DatabaseModelManage
+
+    DatabaseModelManage.init()
+
 
 configs = {k: v for k, v in settings.__dict__.items() if k.startswith('CELERY')}
 configs['worker_concurrency'] = 5
