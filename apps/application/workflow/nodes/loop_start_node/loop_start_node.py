@@ -40,8 +40,8 @@ class LoopStartNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "index": self.get_context("index"),
-                "item": self.get_context("item"),
+                "current_index": self.get_context("index"),
+                "current_item": self.get_context("item"),
             }
         )
         return details
