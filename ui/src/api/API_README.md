@@ -732,11 +732,25 @@ Workspace 共享知识库详情由 `resourceScope: 'workspace-shared'` 选择上
 
 ### 资源对话用户授权
 
-`workspace/chat-user.ts` 使用 Admin 请求客户端，通过资源的 `user_group` 查询和保存组自动授权，
-通过 `user_group_id/<groupId>` 查询分页用户及保存逐用户授权，沿用已有接口路径与请求体。
-使用 `ParamsPage`、`ResponsePage`，调用方直接读取已解包数据并管理 loading。
-公共授权类型维护在 `types/chat-user.ts`，经 `@/api/types` 导出。当前由工作空间智能体详情页调用；
-仓库内开源后端尚未注册这组资源授权路径，实际联调依赖提供这些接口的后端环境。
+资源对话用户接口按四种范围维护 `chat-user.ts`，同一范围供智能体、知识库页面选用，不与 System 对话端用户管理接口混用：
+
+- `workspace/chat-user.ts`：`/workspace/{workspaceId}/{resource_type}/{resource_id}`。
+- `workspace/shared/chat-user.ts`：`/system/shared/workspace/{workspaceId}/{resource_type}/{resource_id}`，仅查询。
+- `system/resource-management/chat-user.ts`：`/system/resource/knowledge/{resource_type}/{resource_id}`。
+- `system/shared-resources/chat-user.ts`：`/system/shared/knowledge/{resource_type}/{resource_id}`。
+
+后三套沿用 V2 可核对的接口路径并标注 V3 联调 TODO；Workspace 共享在 V2 只核对到 KNOWLEDGE 查询，不能据此认定共享智能体接口已支持。
+System 前缀中的额外 `knowledge` 段暂按 V2 保留，不能依据普通资源接口自行删减。
+资源类型使用 `RESOURCE_TYPE.APPLICATION / KNOWLEDGE` 的大写值；后台按原值读写授权记录，不会将小写转换为大写。
+仓库中的 `system_manage/urls.py` 已注册普通 Workspace 授权路径，其他范围需在提供对应接口的后端环境联调。
+
+通过 `user_group` 查询和保存组自动授权，通过 `user_group_id/<groupId>` 保存逐用户授权，
+分页查询在其后追加 `/<currentPage>/<pageSize>`；沿用 `ParamsPage`、`ResponsePage` 和原有数组请求体。
+调用方直接读取已解包数据并管理 loading；共享只读 API 不补写方法以凑齐接口集合。
+公共类型维护在 `types/chat-user.ts`，经 `@/api/types` 导出；用户组当前没有已授权人数统计字段，待后台确定字段后补充，不用分页用户数据推算全组人数。
+
+当前智能体、知识库对话用户页仅直接调用普通 `workspace/chat-user.ts`，分别传自己的资源类型和路由 ID，暂不接入详情 context。
+其他三个范围的 API 文件保留，但页面暂不选择调用；页面不判断资源范围，当前请求统一使用 Workspace API，其他入口的 API 切换尚未接入。
 
 ### 智能体对话日志
 
@@ -758,6 +772,27 @@ Web 知识库创建的 `WebKnowledgeCreatePayload.doc_strategy` 使用公共 `Do
 Web 知识库详情及更新响应的顶层 `doc_strategy` 使用 `DocumentStrategy | null`，由
 `KnowledgeItem` 声明；非 Web 类型返回 null。文档处理策略设置通过 `putKnowledge` 仅提交
 `{ doc_strategy }`，服务端合并到知识库 meta，保留其他来源配置，保存不立即发起同步。
+
+### 知识库外部检索服务
+
+四个知识库范围分别在自己的 `external-retrieval.ts` 中维护相同的查询与保存方法，仅资源前缀不同：
+
+- Workspace：`/workspace/<workspaceId>/knowledge/<knowledgeId>`。
+- Workspace 共享：`/system/shared/workspace/<workspaceId>/knowledge/<knowledgeId>`。
+- System 资源管理：`/system/resource/knowledge/<knowledgeId>`。
+- System 共享资源：`/system/shared/knowledge/<knowledgeId>`。
+
+`getKnowledgeExternalRetrieval(knowledgeId)` 通过 GET `<资源前缀>/external_service` 查询配置；
+`putKnowledgeExternalRetrieval(knowledgeId, payload)` 通过 PUT 同一路径保存开关。
+工作空间 ID 在调用时由 API 内读取，四套均使用 Admin 请求封装，不返回占位 null 或回退其他范围。
+
+联调 TODO 统一保留在两个方法处：查询返回 `enabled`、`authentication`、`api_url`、`api_example`、`mcp_url`、`mcp_config`；
+`api_example` 为后台生成的完整 API 调用示例文本（string），前端仅展示和复制，不拼接请求内容。
+保存只更新 payload 传入的 `enabled` 或 `authentication`，保留未提交字段，并返回包含最新 `api_example` 的完整配置。
+响应与提交类型共用 `types/knowledge-external-retrieval.ts`，通过 `@/api/types` 导入；请求层统一解包 `data`。
+页面已实现加载、开关保存、回显与只读内容复制；接口字段有差异时在各自 API 模块适配，不要求联调人员补写页面交互。
+当前页面仅直接调用普通 `workspace/knowledge/external-retrieval.ts`，暂不接入详情 context；
+其他三个范围的 API 文件保留，页面暂不请求并禁用开关、显示待接入提示，不回退普通 Workspace。
 
 ### 知识库定时同步
 
