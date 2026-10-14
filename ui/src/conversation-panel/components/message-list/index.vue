@@ -1,13 +1,11 @@
 <template>
-  <div ref="msgBoxRef" class="message-list" @scroll="onScroll">
-    <div v-if="messages.length === 0" class="welcome">
-      <slot name="welcome">
-        <p class="welcome-title">{{ appName }}</p>
-        <p class="welcome-sub">有什么可以帮你的？</p>
-      </slot>
-    </div>
+  <!-- 接口加载:无消息时(首页)整块遮罩,有消息时(加载更多)顶部小转圈;对话加载:底部小点 -->
+  <div ref="msgBoxRef" v-loading="fullLoading" class="message-list" @scroll="onScroll">
+    <template v-if="messages.length > 0">
+      <div v-if="loading" class="message-list__more">
+        <el-icon class="is-loading" :size="18"><LoadingIcon /></el-icon>
+      </div>
 
-    <template v-else>
       <div
         v-for="(msg, i) in messages"
         :key="msg.id || i"
@@ -18,15 +16,23 @@
         <MessageFooter v-if="msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)" :message="msg" />
       </div>
 
-      <div v-if="loading" class="msg-row assistant">
+      <div v-if="streamLoading" class="msg-row assistant">
         <Loading :size="18" />
       </div>
     </template>
+
+    <div v-else-if="!loading" class="welcome">
+      <slot name="welcome">
+        <p class="welcome-title">{{ appName }}</p>
+        <p class="welcome-sub">有什么可以帮你的？</p>
+      </slot>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import { Loading as LoadingIcon } from '@element-plus/icons-vue'
 import ContentList from '../content-list/index.vue'
 import MessageFooter from '../message-footer/index.vue'
 import Loading from '../../loading/index.vue'
@@ -35,7 +41,10 @@ import { useMessageListStore } from './index'
 
 defineProps<{ appName?: string }>()
 
-const { messages, loading, hasMore, loadMore, onStreamProgress } = useMessageListStore()
+const { messages, loading, streamLoading, hasMore, loadMore, onStreamProgress } = useMessageListStore()
+
+// 整块遮罩:切换会话会先清空消息,故无消息时的接口加载即首页加载
+const fullLoading = computed(() => loading.value && messages.value.length === 0)
 
 const msgBoxRef = ref<HTMLElement | null>(null)
 let scroll: Scroll | null = null
@@ -71,6 +80,13 @@ const onScroll = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.message-list__more {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 10px;
+  color: var(--t3, #909399);
 }
 
 .welcome {

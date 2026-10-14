@@ -5,7 +5,7 @@ import { formatFileSize } from '@/utils/number'
 import { inputShortcut } from '../../core/shortcuts'
 import { useMessageInputStore } from './index'
 
-const { question, fileList, maxFiles, maxSizeMB, acceptList, loading, disabled, placeholder, canSend, imageFiles, addFiles, removeFile, send, stop } =
+const { question, fileList, maxFiles, maxSizeMB, acceptList, streamLoading, disabled, placeholder, canSend, imageFiles, addFiles, removeFile, send, stop } =
   useMessageInputStore()
 
 // 选择和粘贴附件统一交给输入 Store 处理。
@@ -117,13 +117,13 @@ const handleKeydown = (event: KeyboardEvent) => {
           </div>
         </template>
         <!-- 上传文件 -->
-        <el-button text :disabled="disabled || loading || fileList.length >= maxFiles" @click="fileInputRef?.click()">
+        <el-button text :disabled="disabled || streamLoading || fileList.length >= maxFiles" @click="fileInputRef?.click()">
           <MkIcon name="icon_attachment_outlined" :size="18" class="text-N900!" />
         </el-button>
       </MkTooltip>
       <el-divider direction="vertical" class="ml-3! mr-4!" />
       <!-- 停止回复 -->
-      <el-button v-if="loading" circle type="primary" @click="stop">
+      <el-button v-if="streamLoading" circle type="primary" @click="stop">
         <MkIcon name="icon_square_filled" />
       </el-button>
       <!-- 发送 -->

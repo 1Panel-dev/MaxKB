@@ -32,7 +32,8 @@ export interface MessageInputDeps {
   composerResetSignal: Ref<number>
   // 来自 message-list
   messages: Ref<ChatMessage[]>
-  loading: Ref<boolean>
+  /** 对话加载(回答生成中):只读,由 message-list 维护 */
+  streamLoading: Readonly<Ref<boolean>>
   sendMessage: (opts: SendMessageOptions) => void
   uploadFile: (file: File, chatId: string, onProgress?: (percent: number) => void) => Promise<string>
   stop: () => void
@@ -47,7 +48,7 @@ const UPLOAD_PROGRESS_PENDING_MAX = 95
  * message-input 组件 store:本组件独有——输入内容 + 暂存文件 + 发送。
  */
 export function createMessageInputStore(deps: MessageInputDeps) {
-  const { conversations, getChatId, renameChat, composerResetSignal, messages, loading, sendMessage, uploadFile, stop } = deps
+  const { conversations, getChatId, renameChat, composerResetSignal, messages, streamLoading, sendMessage, uploadFile, stop } = deps
   const disabled = computed(() => deps.disabled?.value ?? false)
 
   // 输入状态与附件限制
@@ -62,7 +63,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
 
   const placeholder = computed(() => {
     if (disabled.value) return '暂无可用智能体'
-    return loading.value ? '正在回复中...' : '输入消息...'
+    return streamLoading.value ? '正在回复中...' : '输入消息...'
   })
   // 附件上传完成前不能发送，否则消息中的附件没有地址
   const isUploading = computed(() => fileList.value.some((attachment) => attachment.uploading))
@@ -70,7 +71,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     () =>
       !disabled.value &&
       (question.value.trim().length > 0 || fileList.value.length > 0) &&
-      !loading.value &&
+      !streamLoading.value &&
       !sending.value &&
       !isUploading.value,
   )
@@ -179,7 +180,6 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       clearFiles()
     } catch (e) {
       console.error('send failed:', e)
-      loading.value = false
     } finally {
       sending.value = false
     }
@@ -200,7 +200,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     maxFiles,
     maxSizeMB,
     acceptList,
-    loading,
+    streamLoading,
     disabled,
     placeholder,
     canSend,
