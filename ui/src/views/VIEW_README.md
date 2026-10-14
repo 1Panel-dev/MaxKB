@@ -456,7 +456,7 @@ src/views/system/identity/users/
 `index.vue` 只组合入口组件。
 
 资源授权页面的 `UserGroupAuthorizationList` 通过人数链接打开共享业务组件
-`components/business/resource-authorization-drawer/user-group/UserGroupMembersDrawer.vue`，按用户组所属工作空间查询成员，提供用户名、姓名搜索和分页，
+`components/business/resource-authorization-drawer/user-group/UserGroupMembersDrawer.vue`，按用户组所属工作空间查询成员，提供姓名、用户名搜索、用户来源表头筛选和分页，
 并使用 `MkTagGroup` 折叠展示角色；点击人数不切换当前授权对象。
 
 ## 文件命名
