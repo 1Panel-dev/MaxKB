@@ -2,13 +2,17 @@
 import { computed, ref } from 'vue'
 import { DOCUMENT_TASK_TYPE } from '@/api/enums'
 import type { DocumentItem, DocumentTaskState } from '@/api/types'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { MsgSuccess } from '@/utils/message'
 import DocumentEmbeddingDialog from './DocumentEmbeddingDialog.vue'
 import { isDocumentTaskRunning } from '../../status'
 
 defineOptions({ name: 'EmbeddingDocumentAction' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; document: DocumentItem }>()
+const props = defineProps<{
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
+  knowledgeId: string
+  document: DocumentItem
+}>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 const visible = ref(false)
@@ -29,31 +33,33 @@ function handleOpenDialog() {
 function handleCancelEmbedding() {
   if (loading.value) return
   loading.value = true
-  return props.api
-    .putCancelTask(props.knowledgeId, props.document.id, DOCUMENT_TASK_TYPE.EMBEDDING)
-    .then(() => {
-      MsgSuccess('发送成功')
-      emit('refresh')
-    })
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putCancelTask?.(props.knowledgeId, props.document.id, DOCUMENT_TASK_TYPE.EMBEDDING)
+      .then(() => {
+        MsgSuccess('发送成功')
+        emit('refresh')
+      })
+      .catch(() => {}) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 // 使用打开弹窗时的文档提交单项接口，失败保留弹窗和分段选择。
 function handleEmbedding(stateList: DocumentTaskState[]) {
   loading.value = true
-  return props.api
-    .putDocumentRefresh(targetKnowledgeId.value, targetDocumentId.value, stateList)
-    .then(() => {
-      visible.value = false
-      emit('refresh')
-    })
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putDocumentRefresh?.(targetKnowledgeId.value, targetDocumentId.value, stateList)
+      .then(() => {
+        visible.value = false
+        emit('refresh')
+      })
+      .catch(() => {}) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 </script>
 

@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { TableColumnCtx } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { useKnowledgeDetailContext } from '../../context'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import CreateTagDialog from './components/CreateTagDialog.vue'
@@ -125,15 +125,14 @@ function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
   return MsgConfirm(`是否删除标签：${tagName}？`, '删除后，使用该标签的资源将会删除该标签，请谨慎操作！').then(
     () => {
       operationLoading.value = true
-      return resourceApi.tags
-        .deleteKnowledgeTag(knowledgeId.value, row.id, type)
-        .then(() => {
+      return (
+        resourceApi.tags.deleteKnowledgeTag?.(knowledgeId.value, row.id, type).then(() => {
           MsgSuccess('删除成功')
           return loadTags()
-        })
-        .finally(() => {
-          operationLoading.value = false
-        })
+        }) ?? Promise.resolve()
+      ).finally(() => {
+        operationLoading.value = false
+      })
     },
     () => {},
   )
@@ -144,15 +143,14 @@ function handleBatchDelete() {
   return MsgConfirm(`是否删除选中的 ${tagIds.length} 个标签？`, '删除后，使用该标签的资源将会删除该标签，请谨慎操作！').then(
     () => {
       operationLoading.value = true
-      return resourceApi.tags
-        .putBatchDeleteKnowledgeTags(knowledgeId.value, tagIds)
-        .then(() => {
+      return (
+        resourceApi.tags.putBatchDeleteKnowledgeTags?.(knowledgeId.value, tagIds).then(() => {
           MsgSuccess('删除成功')
           return loadTags()
-        })
-        .finally(() => {
-          operationLoading.value = false
-        })
+        }) ?? Promise.resolve()
+      ).finally(() => {
+        operationLoading.value = false
+      })
     },
     () => {},
   )
@@ -255,5 +253,5 @@ onMounted(() => {
   </MkTable>
   <CreateTagDialog ref="createTagRef" :api="resourceApi.tags" :knowledge-id="knowledgeId" @refresh="loadTags" />
   <EditTagDialog ref="editTagRef" :api="resourceApi.tags" :knowledge-id="knowledgeId" @refresh="loadTags" />
-  <AssociatedDocumentDrawer ref="tagDocumentRef" :api="resourceApi.document" :knowledge-id="knowledgeId" @refresh="loadTags" />
+  <AssociatedDocumentDrawer ref="associatedDocumentRef" :tags-api="resourceApi.tags" :knowledge-id="knowledgeId" @refresh="loadTags" />
 </template>

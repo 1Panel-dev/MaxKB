@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type { DocumentItem, DocumentSettingPayload } from '@/api/types'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { MsgSuccess } from '@/utils/message'
 import DocumentSettingDialog from './DocumentSettingDialog.vue'
 
 defineOptions({ name: 'SettingDocumentAction' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
   document: DocumentItem
   label: string
@@ -36,19 +36,20 @@ function handleOpenDialog() {
 function handleSubmit(data: DocumentSettingPayload) {
   if (loading.value) return
   loading.value = true
-  return props.api
-    .putDocument(targetKnowledgeId.value, targetDocumentId.value, data)
-    .then(() => {
-      MsgSuccess('设置成功')
-      settingDialogRef.value?.close()
-      emit('refresh')
-    })
-    .catch(() => {
-      // 请求层统一提示错误，保留当前输入。
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putDocument?.(targetKnowledgeId.value, targetDocumentId.value, data)
+      .then(() => {
+        MsgSuccess('设置成功')
+        settingDialogRef.value?.close()
+        emit('refresh')
+      })
+      .catch(() => {
+        // 请求层统一提示错误，保留当前输入。
+      }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 function handleDialogClosed() {

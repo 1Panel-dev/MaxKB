@@ -2,7 +2,9 @@
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { isSystemResource, isWorkspaceResource } from '@/utils/resource-context'
 import ApplicationApi from '@/api/admin/workspace/application/application'
+import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { FolderItem, ApplicationDetail } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES } from '@/constants/folder'
@@ -24,6 +26,8 @@ const selectedApplication = ref<(Partial<ApplicationDetail> & { id: string })[]>
 const applicationLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('applicationLayoutRef')
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
 
+const isWorkspaceScope = computed(() => isWorkspaceResource())
+
 const selectedApplicationIds = computed(() => selectedApplication.value.map(({ id }) => id))
 
 function toggleApplication(application: ApplicationDetail) {
@@ -37,11 +41,13 @@ function refreshApplication() {
   loading.value = true
   applicationOptions.value = []
   appliedSearchKeyword.value = searchKeyword.value.trim()
-  return ApplicationApi.getAllApplication({
-    folder_id: currentFolder.value.id,
-    publish_status: 'published',
-    ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
-  })
+  const requestApi = isSystemResource() ? SystemApplicationApi : ApplicationApi
+  return requestApi
+    .getAllApplication({
+      ...(isWorkspaceScope.value ? { folder_id: currentFolder.value.id } : {}),
+      publish_status: 'published',
+      ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
+    })
     .then((application) => {
       applicationOptions.value = application.filter((resource) => resource.is_publish && !props.excludedIds.includes(resource.id))
       // 仅补全已选快照，不因查询结果缺少某个 ID 而删除关联。
@@ -105,7 +111,7 @@ defineExpose({ open })
     </template>
 
     <MkViewLayout ref="applicationLayoutRef" :loading="loading" title="">
-      <template #aside>
+      <template v-if="isWorkspaceScope" #aside>
         <FolderTree
           ref="folderTreeRef"
           class="pt-4"

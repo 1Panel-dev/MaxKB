@@ -3,13 +3,12 @@ import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { KnowledgeItem } from '@/api/types'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DocumentMigrateDialog' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string }>()
+const props = defineProps<{ api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']; knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
-const { resourceApi, resourceScope } = useKnowledgeDetailContext()
+const { resourceApi } = useKnowledgeDetailContext()
 const visible = ref(false)
 const loading = defineModel<boolean>('loading', { default: false })
 const optionLoading = ref(false)
@@ -24,12 +23,11 @@ const targetDocumentIds = ref<string[]>([])
 
 // 打开迁移弹窗，固定本次文档并查询目标知识库。
 function open(documentIds: string[]) {
-  const requestApi = resourceApi.knowledge
-  if (resourceScope.value !== 'workspace' || !('getAllKnowledge' in requestApi) || loading.value || optionLoading.value || !documentIds.length) return
+  if (loading.value || optionLoading.value || !documentIds.length) return
   targetDocumentIds.value = [...documentIds]
   visible.value = true
   optionLoading.value = true
-  requestApi
+  resourceApi.knowledge
     .getAllKnowledge()
     .then((knowledge) => {
       knowledgeOptions.value = knowledge.filter(({ id }) => id !== props.knowledgeId)
@@ -46,19 +44,20 @@ function open(documentIds: string[]) {
 async function handleSubmit() {
   if (loading.value || optionLoading.value || !(await migrateFormRef.value?.validate().catch(() => false))) return
   loading.value = true
-  return props.api
-    .putMigrateDocuments(props.knowledgeId, migrateForm.targetKnowledgeId, targetDocumentIds.value)
-    .then(() => {
-      MsgSuccess('迁移成功')
-      visible.value = false
-      emit('refresh')
-    })
-    .catch(() => {
-      // 请求层统一提示错误，保留当前输入。
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putMigrateDocuments?.(props.knowledgeId, migrateForm.targetKnowledgeId, targetDocumentIds.value)
+      .then(() => {
+        MsgSuccess('迁移成功')
+        visible.value = false
+        emit('refresh')
+      })
+      .catch(() => {
+        // 请求层统一提示错误，保留当前输入。
+      }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 defineExpose({ open })

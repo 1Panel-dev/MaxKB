@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import type SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentItem } from '@/api/types'
 import AddTagDialog from '../action-dropdown/setting-tags/AddTagDialog.vue'
 
-type WorkspaceDocumentApi = typeof DocumentApi
-
 defineOptions({ name: 'DocumentTags' })
-const props = defineProps<{ api?: typeof DocumentApi | typeof SharedDocumentApi; knowledgeId: string; document: DocumentItem; disabled?: boolean }>()
+const props = defineProps<{
+  api?: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']
+  knowledgeId: string
+  document: DocumentItem
+  disabled?: boolean
+}>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -21,7 +23,7 @@ const addTagRef = useTemplateRef<InstanceType<typeof AddTagDialog>>('addTagRef')
 const targetKnowledgeId = ref('')
 
 function handleOpenDialog() {
-  if (!props.api || !('putDocument' in props.api) || props.disabled || loading.value || dialogMounted.value) return
+  if (!props.api || props.disabled || loading.value || dialogMounted.value) return
   targetKnowledgeId.value = props.knowledgeId
   const documentId = props.document.id
   dialogMounted.value = true
@@ -60,10 +62,10 @@ function handleDialogClosed() {
     </el-button>
   </div>
   <AddTagDialog
-    v-if="dialogMounted"
+    v-if="dialogMounted && api"
     ref="addTagRef"
     v-model:loading="loading"
-    :api="api as WorkspaceDocumentApi"
+    :api="api"
     :knowledge-id="targetKnowledgeId"
     @refresh="emit('refresh')"
     @closed="handleDialogClosed"

@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { DOCUMENT_TASK_STATE } from '@/api/enums'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 
 defineOptions({ name: 'BatchTokenizeAction' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; documentIds: string[] }>()
+const props = defineProps<{
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
+  knowledgeId: string
+  documentIds: string[]
+}>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -12,15 +16,16 @@ function handleTokenize() {
   const documentIds = [...props.documentIds]
   if (!documentIds.length || loading.value) return
   loading.value = true
-  return props.api
-    .putBatchTokenizeDocuments(props.knowledgeId, documentIds, Object.values(DOCUMENT_TASK_STATE))
-    .then(() => {
-      emit('refresh')
-    })
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putBatchTokenizeDocuments?.(props.knowledgeId, documentIds, Object.values(DOCUMENT_TASK_STATE))
+      .then(() => {
+        emit('refresh')
+      })
+      .catch(() => {}) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 </script>
 

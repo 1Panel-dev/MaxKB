@@ -440,13 +440,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 ```vue
 <!-- 自定义反馈筛选；feedback 为 { min_star: 0, min_trample: 0 } -->
-<MkTableFilter
-  v-model="feedback"
-  mode="custom"
-  label="用户反馈"
-  :reset-value="{ min_star: 0, min_trample: 0 }"
-  @change="reload"
->
+<MkTableFilter v-model="feedback" mode="custom" label="用户反馈" :reset-value="{ min_star: 0, min_trample: 0 }" @change="reload">
   <template #default="{ value }">
     <div class="space-y-3">
       <el-input-number v-model="value.min_star" :min="0" :value-on-clear="0" controls-position="right" align="left" />
@@ -950,8 +944,10 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 组件采用 `MkViewLayout` 左右布局，搜索栏位于内容区右上角，刷新位于弹窗标题栏。
 选项使用紧凑三列布局（窄屏减少列数），左侧图标与省略名称、右侧复选框。点击卡片或复选框
 切换选择，选中后仅展示相同 Embedding 模型的选项，清空后恢复；悬停展示知识库详情。
-复用只读 `FolderTree`，通过工作空间及共享 API 的 `getAllKnowledge` 一次加载当前查询的全部
-知识库，不使用滚动分页。支持名称搜索和跨目录保留选择，调用方维护最终关联 ID 与快照。
+按工作空间、System 资源管理、System 共享资源选择完整 Knowledge API 的 `getAllKnowledge`，
+一次加载当前查询的全部知识库，不使用滚动分页，不增加 Workspace 共享页面来源分支。
+仅普通工作空间显示只读 `FolderTree`，不显示共享目录、不调用 Workspace Shared API；其他范围不显示或查询文件夹。
+支持名称搜索和跨目录保留选择，调用方维护最终关联 ID 与快照。
 
 ### SelectApplicationDialog、SelectToolDialog
 
@@ -960,8 +956,11 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 `open()` 接收已选资源对象数组，`submit` 返回深拷贝后的资源对象数组，兼容只有 ID 的旧数据。
 打开时回填本次选择并查询资源，临时状态在 `closed` 清理；取消不提交。
 
-智能体通过 `getAllApplication` 全量查询已发布资源，不展示共享目录。工具通过工作空间或共享
-`getAllTool` 全量查询，仅展示启用资源；`toolTypes` 默认包含自定义、工作流和内置工具，
+智能体按工作空间或 System 资源管理选择 `getAllApplication` 全量查询已发布资源，不展示共享目录；
+System 共享资源不提供智能体选择，由调用入口限制，弹窗不增加该来源判断。
+工具在工作空间通过 `getAllTool` 查询，不显示共享目录、不调用 Workspace Shared API；在 System 资源管理、System 共享资源
+通过对应完整 API 的 `getAllTool` 查询，不增加 Workspace 共享页面来源分支。
+仅普通工作空间显示或查询文件夹；仅展示启用资源。`toolTypes` 默认包含自定义、工作流和内置工具，
 Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两者支持 `excludedIds`，
 供调用方排除当前智能体或工具，避免直接自引用。弹窗不使用滚动分页。
 
@@ -987,8 +986,8 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 同次交互连续更新时使用旧 Props 覆盖刚选中的模型。
 
 `canAdd` 默认为 `false`，开启后在下拉列表底部显示“添加模型”，复用 `ButtonAddModel` 的
-供应商选择和模型创建流程。组件通过 `isWorkspaceResource()`、`isSystemSharedResource()` 读取
-`resourceScope`：Workspace 传入 `ModelApi`，System 共享资源传入 `SystemSharedModelApi`；
+供应商选择和模型创建流程。组件通过 `isWorkspaceResource()`、`isSystemResource()`、`isSystemSharedResource()` 读取
+`resourceScope`：Workspace 传入 `ModelApi`，System 资源管理传入 `SystemModelApi`，System 共享资源传入 `SystemSharedModelApi`；
 其他范围暂不展示创建入口。创建成功后触发 `refresh`，使用方重新加载原业务范围的模型选项，
 不自动替换选中模型。`footer` 插槽仅在 `canAdd` 且当前范围允许创建时生效。
 

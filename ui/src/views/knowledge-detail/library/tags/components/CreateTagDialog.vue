@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import type TagsApi from '@/api/admin/workspace/knowledge/tags'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagPayload } from '@/api/types'
 import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CreateTagDialog' })
 
-const props = defineProps<{ knowledgeId: string; api: typeof TagsApi }>()
+const props = defineProps<{ knowledgeId: string; api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags'] }>()
 const emit = defineEmits<{ refresh: [] }>()
 
 const visible = ref(false)
@@ -46,16 +46,15 @@ function handleSubmit() {
     }
 
     loading.value = true
-    return props.api
-      .postKnowledgeTags(props.knowledgeId, tags)
-      .then(() => {
+    return (
+      props.api.postKnowledgeTags?.(props.knowledgeId, tags).then(() => {
         MsgSuccess('创建成功')
         visible.value = false
         emit('refresh')
-      })
-      .finally(() => {
-        loading.value = false
-      })
+      }) ?? Promise.resolve()
+    ).finally(() => {
+      loading.value = false
+    })
   })
 }
 

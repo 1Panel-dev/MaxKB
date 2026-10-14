@@ -110,7 +110,7 @@ function loadTools(folder?: FolderItem) {
 function loadApplications(folder?: FolderItem) {
   // TODO 共享资源和资源管理需要不同的api，后续需要拆分
   const folderQuery = { folder_id: folder?.id || FOLDER_ENTRY_ID.ALL }
-
+  // TODO 接口
   return ApplicationApi.getAllApplication({ ...folderQuery, publish_status: 'published' }).then((res) => {
     resourceItems.value = res
       .filter((application) => application.id !== route.params?.applicationId)

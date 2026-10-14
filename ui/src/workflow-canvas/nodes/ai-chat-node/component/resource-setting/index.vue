@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { isSystemSharedResource } from '@/utils/resource-context'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ApplicationDetail, ToolItem } from '@/api/types'
 import SelectApplicationDialog from '@/components/business/select-application-dialog/index.vue'
@@ -31,6 +32,8 @@ const props = withDefaults(
 const emit = defineEmits<{ update: [setting: Partial<ResourceSetting>] }>()
 
 const mcpDialogRef = useTemplateRef<InstanceType<typeof McpSettingDialog>>('mcpDialogRef')
+
+const canSelectApplications = computed(() => props.showApplications && !isSystemSharedResource())
 
 const route = useRoute()
 const toolDialogRef = useTemplateRef<InstanceType<typeof SelectToolDialog>>('toolDialogRef')
@@ -109,9 +112,10 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
     <MkCollapse>
       <template #label>
         <div class="flex-between min-w-0 flex-1">
-          <span
-            >MCP<span v-if="mcpCount">（{{ mcpCount }}）</span></span
-          >
+          <span>
+            MCP
+            <span v-if="mcpCount">（{{ mcpCount }}）</span>
+          </span>
           <el-button text type="primary" @click.stop="mcpDialogRef?.open(setting)"><MkIcon name="icon_add_outlined" /></el-button>
         </div>
       </template>
@@ -144,8 +148,9 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
     <MkCollapse>
       <template #label>
         <div class="flex-between min-w-0 flex-1">
-          <span
-            >工具<span v-if="selectedTools.length">（{{ selectedTools.length }}）</span>
+          <span>
+            工具
+            <span v-if="selectedTools.length">（{{ selectedTools.length }}）</span>
           </span>
           <el-button text type="primary" title="添加工具" @click.stop="openToolDialog(false)">
             <MkIcon name="icon_add_outlined" />
@@ -171,9 +176,10 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
     <MkCollapse>
       <template #label>
         <div class="flex-between min-w-0 flex-1">
-          <span
-            >Skills<span v-if="selectedSkills.length">（{{ selectedSkills.length }}）</span></span
-          >
+          <span>
+            Skills
+            <span v-if="selectedSkills.length">（{{ selectedSkills.length }}）</span>
+          </span>
           <el-button text type="primary" @click.stop="openToolDialog(true)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
@@ -195,12 +201,13 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       </div>
     </MkCollapse>
     <!-- 智能体 -->
-    <MkCollapse v-if="showApplications">
+    <MkCollapse v-if="canSelectApplications">
       <template #label>
         <div class="flex-between min-w-0 flex-1">
-          <span
-            >智能体<span v-if="selectedApplications.length">（{{ selectedApplications.length }}）</span></span
-          >
+          <span>
+            智能体
+            <span v-if="selectedApplications.length">（{{ selectedApplications.length }}）</span>
+          </span>
           <el-button text type="primary" @click.stop="applicationDialogRef?.open(selectedApplications)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
@@ -230,6 +237,11 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
     :excluded-ids="excludedToolIds"
     @submit="submitToolDialog"
   />
-  <SelectApplicationDialog v-if="showApplications" ref="applicationDialogRef" :excluded-ids="excludedApplicationIds" @submit="submitApplications" />
+  <SelectApplicationDialog
+    v-if="canSelectApplications"
+    ref="applicationDialogRef"
+    :excluded-ids="excludedApplicationIds"
+    @submit="submitApplications"
+  />
   <McpSettingDialog ref="mcpDialogRef" @loaded="loadedMcpOptions = $event" @submit="updateSetting" />
 </template>

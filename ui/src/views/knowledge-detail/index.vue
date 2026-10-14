@@ -5,6 +5,7 @@ import { FOLDER_ENTRY_ID } from '@/constants'
 import type { KnowledgeDetail } from '@/api/types'
 import ResourceDetailLayout from '@/layout/ResourceDetailLayout.vue'
 import { provideKnowledgeDetailContext } from './context'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'KnowledgeDetailView' })
 
@@ -17,7 +18,7 @@ function replaceKnowledgeDetail(detail: KnowledgeDetail) {
   knowledge.value = detail
 }
 
-const { knowledgeId, resourceScope, resourceApi, listRouteName } = provideKnowledgeDetailContext({
+const { knowledgeId, resourceApi, listRouteName } = provideKnowledgeDetailContext({
   knowledge: computed(() => knowledge.value),
   replaceKnowledgeDetail,
 })
@@ -36,11 +37,11 @@ function loadKnowledgeDetail() {
 }
 
 function handleBack() {
-  if (resourceScope.value === 'system-resource' || resourceScope.value === 'system-shared') {
+  if (isSystemResource() || isSystemSharedResource()) {
     void router.push({ name: listRouteName.value })
     return
   }
-  const folderId = resourceScope.value === 'workspace-shared' ? FOLDER_ENTRY_ID.SHARED : knowledge.value?.folder_id
+  const folderId = isWorkspaceSharedResource() ? FOLDER_ENTRY_ID.SHARED : knowledge.value?.folder_id
   void router.push({
     name: listRouteName.value,
     params: { workspaceId: route.params.workspaceId },

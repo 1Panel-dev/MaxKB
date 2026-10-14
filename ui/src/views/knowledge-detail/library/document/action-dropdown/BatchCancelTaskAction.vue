@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { MsgSuccess } from '@/utils/message'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentTaskType } from '@/api/types'
 
 defineOptions({ name: 'BatchCancelTaskAction' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
   documentIds: string[]
   taskType: DocumentTaskType
@@ -21,16 +21,17 @@ function handleCancelTask() {
   const ids = [...props.documentIds]
   if (!ids.length || loading.value) return
   loading.value = true
-  return props.api
-    .putBatchCancelDocumentTask(props.knowledgeId, ids, props.taskType)
-    .then(() => {
-      MsgSuccess('操作成功')
-      emit('refresh')
-    })
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .putBatchCancelDocumentTask?.(props.knowledgeId, ids, props.taskType)
+      .then(() => {
+        MsgSuccess('操作成功')
+        emit('refresh')
+      })
+      .catch(() => {}) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 </script>
 

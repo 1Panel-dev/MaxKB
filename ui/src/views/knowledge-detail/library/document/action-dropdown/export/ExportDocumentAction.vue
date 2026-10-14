@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentItem } from '@/api/types'
 
 defineOptions({ name: 'ExportDocumentAction' })
 
-const props = defineProps<{ api: typeof DocumentApi; document: DocumentItem; label: string }>()
+const props = defineProps<{ api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']; document: DocumentItem; label: string }>()
 const route = useRoute()
 const loading = defineModel<boolean>('loading', { default: false })
 
@@ -18,11 +18,11 @@ const exportOptions = [
 // 导出当前文档，保留列表状态。
 function handleExportDocument(method: (typeof exportOptions)[number]['method']) {
   loading.value = true
-  return props.api[method](String(route.params.knowledgeId ?? ''), props.document.id, props.document.name)
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api[method]?.(String(route.params.knowledgeId ?? ''), props.document.id, props.document.name).catch(() => {}) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 </script>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
 import type { TableColumnCtx } from 'element-plus'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagGroup } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import AddTagDialog from './AddTagDialog.vue'
@@ -9,7 +9,7 @@ import AddTagDialog from './AddTagDialog.vue'
 defineOptions({ name: 'DocumentTagsDrawer' })
 const props = defineProps<{
   knowledgeId: string
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']
 }>()
 const operationLoading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: []; closed: [] }>()
@@ -45,18 +45,19 @@ function clearSelection() {
 function loadTags() {
   clearSelection()
   loading.value = true
-  return props.api
-    .getDocumentTags(targetKnowledgeId.value, targetDocumentId.value, { name: searchText.value.trim() || undefined })
-    .then((groups) => {
-      tagGroups.value = groups
-    })
-    .catch(() => {
-      // 查询失败时清除旧数据，避免继续操作已失效的关联。
-      tagGroups.value = []
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  return (
+    props.api
+      .getDocumentTags?.(targetKnowledgeId.value, targetDocumentId.value, { name: searchText.value.trim() || undefined })
+      .then((groups) => {
+        tagGroups.value = groups
+      })
+      .catch(() => {
+        // 查询失败时清除旧数据，避免继续操作已失效的关联。
+        tagGroups.value = []
+      }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 function open(documentId: string) {
@@ -89,15 +90,14 @@ function handleDeleteTags(tags: DocumentTagRow[]) {
   if (loading.value || operationLoading.value || !tags.length) return
   const tagIds = tags.map(({ id }) => id)
   operationLoading.value = true
-  return props.api
-    .putDeleteDocumentTags(targetKnowledgeId.value, targetDocumentId.value, tagIds)
-    .then(() => {
+  return (
+    props.api.putDeleteDocumentTags?.(targetKnowledgeId.value, targetDocumentId.value, tagIds).then(() => {
       MsgSuccess('移除成功')
       return handleTagsChanged()
-    })
-    .finally(() => {
-      operationLoading.value = false
-    })
+    }) ?? Promise.resolve()
+  ).finally(() => {
+    operationLoading.value = false
+  })
 }
 
 defineExpose({ open })

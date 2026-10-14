@@ -5,6 +5,9 @@ import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
 const prefix = '/system/resource/tool'
 
+/** 获取 System 资源管理不分页的工具列表。 */
+const getAllTool = (query?: Dict<unknown>) => get<ToolItem[]>(prefix, query)
+
 /** 获取当前系统范围可用的工具选项。 */
 const getToolListWithShared = (query?: Dict<unknown>) =>
   get<{ tools: ToolItem[]; shared_tools: ToolItem[] }>(`${prefix}/tool_list`, query).then(({ tools, shared_tools }) => [...tools, ...shared_tools])
@@ -67,6 +70,7 @@ const postToolTestConnection = (payload: ToolPayload) => {
 }
 
 export default {
+  getAllTool,
   getToolListWithShared,
   getToolPage,
   exportTool,

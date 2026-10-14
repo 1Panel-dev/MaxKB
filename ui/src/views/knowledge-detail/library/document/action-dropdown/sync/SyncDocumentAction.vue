@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import type DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import type { DocumentItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'SyncDocumentAction' })
 const props = defineProps<{
-  api: typeof DocumentApi
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   label: string
   knowledgeId: string
   document: DocumentItem
@@ -47,15 +47,15 @@ function handleSync() {
     .then(() => {
       if (loading.value) return
       loading.value = true
-      const request = isLark ? props.api.putLarkDocumentSync(knowledgeId, documentId) : props.api.putDocumentSync(knowledgeId, documentId)
-      return request
-        .then(() => {
+      const request = isLark ? props.api.putLarkDocumentSync?.(knowledgeId, documentId) : props.api.putDocumentSync?.(knowledgeId, documentId)
+      return (
+        request?.then(() => {
           MsgSuccess(isWorkflow ? '同步任务发送成功' : '操作成功')
           emit('refresh')
-        })
-        .finally(() => {
-          loading.value = false
-        })
+        }) ?? Promise.resolve()
+      ).finally(() => {
+        loading.value = false
+      })
     })
     .catch(() => {})
 }
