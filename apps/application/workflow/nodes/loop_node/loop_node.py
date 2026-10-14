@@ -61,6 +61,16 @@ class LoopNode(INode):
     _workflow_params = None
     _iterator = None
 
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self._current_loop_manage = None
+
+    def cancel(self):
+        super().cancel()
+        manage = self._current_loop_manage
+        if manage:
+            manage.cancel()
+
     def _run(self):
         self.execute()
 
@@ -96,6 +106,9 @@ class LoopNode(INode):
         self._run_next()
 
     def _run_next(self):
+        if self.status == Status.CANCELLED or self.workflow_manage.signal == Signal.CANCELLED:
+            self.complete(Status.CANCELLED)
+            return
         try:
             item, index = next(self._iterator)
         except StopIteration:
@@ -112,6 +125,7 @@ class LoopNode(INode):
             self.write(content)
 
         def on_complete(wf_manage, error):
+            self._current_loop_manage = None
             loop_details_list = self.data.setdefault("loop_details_list", [])
             loop_details_list.append(wf_manage.get_details())
             self.data["message_tokens"] = (self.data.get("message_tokens") or 0) + sum(
@@ -127,6 +141,10 @@ class LoopNode(INode):
                 self.write_context("last_context", {**last_context, **wf_manage.context})
             else:
                 self.write_context("last_context", wf_manage.context)
+
+            if wf_manage.signal == Signal.CANCELLED:
+                self.complete(Status.CANCELLED)
+                return
 
             if wf_manage.signal == Signal.BREAK or wf_manage.signal == Signal.FORM:
                 self.data["run_time"] = time.time() - self.data.get("start_time", time.time())
@@ -194,6 +212,12 @@ class LoopNode(INode):
             parent_workflow_manage=self.workflow_manage,
             get_context=get_context,
         )
+        if loop_manage:
+            self._current_loop_manage = loop_manage
+        # 实例已创建但尚未 run():若取消发生在这期间,这一轮不再启动
+        if self.status == Status.CANCELLED or self.workflow_manage.signal == Signal.CANCELLED:
+            self.complete(Status.CANCELLED)
+            return
         loop_manage.run()
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
