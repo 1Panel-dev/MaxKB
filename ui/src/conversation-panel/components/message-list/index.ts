@@ -30,6 +30,7 @@ export function createMessageListStore(deps: MessageListDeps) {
 
   const messages = ref<ChatMessage[]>([])
   const loading = ref(false)
+  const streamLoading = ref(false)
 
   // ── 分页 ─────────────────────────────────────────────
   const pageSize = 20
@@ -103,8 +104,10 @@ export function createMessageListStore(deps: MessageListDeps) {
   let currentStream: ConversationStream | null = null
   const closeStream = () => {
     if (currentStream) {
+      // 主动取消的流不会回调 onComplete,需在此复位对话加载
       currentStream.cancel()
       currentStream = null
+      streamLoading.value = false
       return true
     }
     return false
@@ -131,6 +134,7 @@ export function createMessageListStore(deps: MessageListDeps) {
     onComplete: (e?: any) => void,
   ) => {
     closeStream()
+    streamLoading.value = true
     request()
       .then((response: any) => {
         currentStream = new ConversationStream(
@@ -141,12 +145,16 @@ export function createMessageListStore(deps: MessageListDeps) {
           },
           (e) => {
             currentStream = null
+            streamLoading.value = false
             onComplete(e)
           },
         )
         currentStream.start()
       })
-      .catch((e) => onComplete(e ?? new Error('stream request failed')))
+      .catch((e) => {
+        streamLoading.value = false
+        onComplete(e ?? new Error('stream request failed'))
+      })
   }
 
   // ── 发送 / 续跑 ─────────────────────────────────────
@@ -173,7 +181,6 @@ export function createMessageListStore(deps: MessageListDeps) {
     if (opts.chatRecordId) payload.chat_record_id = opts.chatRecordId
     if (opts.chunkId) payload.chunk_id = opts.chunkId
 
-    loading.value = true
     runStream(
       () => chatMessage(cid, payload),
       (chunk) => {
@@ -183,7 +190,6 @@ export function createMessageListStore(deps: MessageListDeps) {
       },
       (e) => {
         target.write_ed = true
-        loading.value = false
         if (!e) getChatRecord(target, cid)
         opts.onComplete?.(e)
       },
@@ -203,17 +209,15 @@ export function createMessageListStore(deps: MessageListDeps) {
   }
 
   // ── 切换会话:由 conversation-list 主动调用(list 先写好 currentChatId 再调本函数)──
+  // 先清空再拉:无消息时的 loading 即首页加载(整块遮罩),有消息时的 loading 即加载更多
   const load = async () => {
     const cid = getChatId()
     closeStream()
-    if (!cid) {
-      resetMessages()
-      return
-    }
+    resetMessages()
+    if (!cid) return
     await loadMessages(cid, 1)
     const lastMsg = messages.value[messages.value.length - 1]
     if (!lastMsg || (lastMsg.content && lastMsg.content.length > 0)) return
-    loading.value = true
     const recordId = lastMsg.id.replace('_USER', '').replace('_ASSISTANT', '')
     runStream(
       () => resumeMessage(cid, recordId),
@@ -230,7 +234,6 @@ export function createMessageListStore(deps: MessageListDeps) {
             getChatRecord(m, cid)
           }
         }
-        loading.value = false
       },
     )
   }
@@ -238,6 +241,7 @@ export function createMessageListStore(deps: MessageListDeps) {
   return {
     messages,
     loading,
+    streamLoading,
     hasMore,
     load,
     loadMore,

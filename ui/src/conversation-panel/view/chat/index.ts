@@ -84,7 +84,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     renameChat: list.renameChat,
     composerResetSignal: list.composerResetSignal,
     messages: msgs.messages,
-    loading: msgs.loading,
+    streamLoading: msgs.streamLoading,
     sendMessage: msgs.sendMessage,
     uploadFile: msgs.uploadFile,
     stop: msgs.stop,

@@ -1,6 +1,6 @@
 import { del, get, post, postExportExcel, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { ChatLog, ChatLogAddKnowledgePayload, Dict } from '@/api/types'
+import type { ChatLog, ChatLogAddKnowledgePayload, ChatLogRecord, Dict } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => `/workspace/${getWorkspaceId()}/application`
@@ -27,7 +27,7 @@ const postChatLogAddKnowledge = (applicationId: string, data: ChatLogAddKnowledg
 
 /** 分页获取对话中的聊天记录。 */
 const getChatRecordLog = (applicationId: string, chatId: string, page: ParamsPage, orderAsc = true) =>
-  get<ResponsePage<Dict<unknown>>>(`${getPrefix()}/${applicationId}/chat/${chatId}/chat_record/${page.currentPage}/${page.pageSize}`, {
+  get<ResponsePage<ChatLogRecord>>(`${getPrefix()}/${applicationId}/chat/${chatId}/chat_record/${page.currentPage}/${page.pageSize}`, {
     order_asc: orderAsc,
   })
 
