@@ -10,11 +10,17 @@
         @mouseup="openControl"
         :style="{
           'padding-right': showUserAvatar ? 'var(--padding-left)' : '0',
+          width: 'calc(100% - 32px)',
         }"
       >
         <template v-if="type === 'debug-ai-chat' ? true : application.show_exec">
           <el-card
-            v-if="!chatRecord.write_ed && progress && index >= answer_text_list.length - 1 && !chatRecord.is_stop"
+            v-if="
+              !chatRecord.write_ed &&
+              progress &&
+              index >= answer_text_list.length - 1 &&
+              !chatRecord.is_stop
+            "
             shadow="always"
             class="border-r-8 mb-8"
             style="--el-card-padding: 1px 16px; width: fit-content"
