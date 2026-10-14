@@ -8,11 +8,11 @@ import type { KnowledgeItem } from '@/api/types'
 import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
-import { useKnowledgeSettingContext } from '../../context'
+import { useKnowledgeDetailContext } from '../../context'
 
 defineOptions({ name: 'KnowledgeBaseSettingView' })
 
-const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeSettingContext()
+const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 
 /* 详情与基本信息 */
 
@@ -73,7 +73,8 @@ watch(
 
 /* 保存设置；更换向量模型时先确认，保存完成后重新向量化 */
 function handleSave() {
-  if (saving.value) return
+  const requestApi = resourceApi.knowledge
+  if (!('putKnowledge' in requestApi) || saving.value) return
   saving.value = true
   return Promise.all([baseFormRef.value?.validate(), settingFormRef.value?.validate().catch(() => false)])
     .then(([baseValid, settingValid]) => {
@@ -109,12 +110,12 @@ function handleSave() {
 
       return confirmation.then(() => {
         const request =
-          detail.type === KNOWLEDGE_TYPE.LARK && 'putLarkKnowledge' in resourceApi.knowledge
-            ? resourceApi.knowledge.putLarkKnowledge(detail.id, payload)
-            : resourceApi.knowledge.putKnowledge(detail.id, payload)
+          detail.type === KNOWLEDGE_TYPE.LARK && 'putLarkKnowledge' in requestApi
+            ? requestApi.putLarkKnowledge(detail.id, payload)
+            : requestApi.putKnowledge(detail.id, payload)
         // 返回完整请求链，向量化失败时保留原模型基准，允许再次保存重试。
         return request.then((savedKnowledge) => {
-          const embeddingRequest = embeddingModelChanged ? resourceApi.knowledge.putReEmbeddingKnowledge(detail.id) : Promise.resolve()
+          const embeddingRequest = embeddingModelChanged ? requestApi.putReEmbeddingKnowledge(detail.id) : Promise.resolve()
           return embeddingRequest.then(() => {
             replaceKnowledgeDetail({ ...detail, ...savedKnowledge })
             MsgSuccess('保存成功')

@@ -8,7 +8,7 @@ import { SCHEDULE_OPTION } from '@/constants/schedule'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
-import { useKnowledgeSyncContext } from '../../context'
+import { useKnowledgeDetailContext } from '../../context'
 import SyncLogTable from './components/SyncLogTable.vue'
 
 defineOptions({ name: 'KnowledgeScheduledSyncView' })
@@ -16,7 +16,7 @@ defineOptions({ name: 'KnowledgeScheduledSyncView' })
 defineProps<ResourceDetailPageProps>()
 
 // 回填后台配置，草稿与详情中的配置独立。
-const { knowledge, replaceKnowledgeDetail, resourceApi, resourceScope } = useKnowledgeSyncContext()
+const { knowledge, replaceKnowledgeDetail, resourceApi, resourceScope } = useKnowledgeDetailContext()
 const activeTab = ref('settings')
 const loading = ref(false)
 const saving = ref(false)

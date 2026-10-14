@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
-import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
 import { computed, onBeforeUnmount, watch, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { CascaderOption, TableColumnCtx } from 'element-plus'
@@ -21,7 +20,7 @@ import { getFileIconUrl } from '@/utils/icon'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
 import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
 import ButtonExecutionRecord from './components/ButtonExecutionRecord.vue'
-import { useKnowledgeLibraryContext } from '../../context'
+import { useKnowledgeDetailContext } from '../../context'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
 import {
@@ -46,8 +45,6 @@ import {
   BatchTokenizeAction,
 } from './action-dropdown'
 
-const { routeNames, routeParams } = useKnowledgeNavigationContext()
-
 type WorkspaceDocumentApi = typeof DocumentApi
 
 defineOptions({ name: 'DocumentListView' })
@@ -58,7 +55,7 @@ const route = useRoute()
 const router = useRouter()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const knowledgeType = computed(() => String(route.params.type ?? ''))
-const { knowledge, resourceApi, resourceScope } = useKnowledgeLibraryContext()
+const { knowledge, resourceApi, resourceScope, routeNames, routeParams } = useKnowledgeDetailContext()
 
 /* 文档分段入口：选择列与行内操作继续处理自身交互。 */
 function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<DocumentItem> | null) {
@@ -339,7 +336,7 @@ onBeforeUnmount(() => {
 
         <!-- 导入 Web、飞书或工作流文档 -->
         <ButtonImportDocument
-          v-if="!showQuickCreate && resourceScope === 'workspace'"
+          v-if="!showQuickCreate"
           :api="resourceApi.document as WorkspaceDocumentApi"
           :knowledge-id="knowledgeId"
           :knowledge-type="knowledgeType"
@@ -379,7 +376,7 @@ onBeforeUnmount(() => {
       <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
     </template>
 
-    <el-table-column v-if="resourceScope === 'workspace'" type="selection" width="40" reserve-selection />
+    <el-table-column type="selection" width="40" reserve-selection />
 
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip>
       <template #default="{ row }: { row: DocumentItem }">
@@ -489,7 +486,7 @@ onBeforeUnmount(() => {
     <el-table-column label="创建时间" width="180">
       <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
-    <el-table-column v-if="resourceScope === 'workspace'" label="操作" width="160" fixed="right">
+    <el-table-column label="操作" width="160" fixed="right">
       <template #default="{ row }: { row: DocumentItem }">
         <div class="flex-align-center" @click.stop>
           <!-- 启用或禁用文档 -->
@@ -610,7 +607,7 @@ onBeforeUnmount(() => {
         </div>
       </template>
     </el-table-column>
-    <template v-if="resourceScope === 'workspace'" #footer-batch-actions>
+    <template #footer-batch-actions>
       <!-- 批量向量化 -->
       <BatchEmbeddingAction
         :api="resourceApi.document as WorkspaceDocumentApi"

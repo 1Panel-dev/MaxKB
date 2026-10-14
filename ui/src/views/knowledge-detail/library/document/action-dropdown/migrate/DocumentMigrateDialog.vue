@@ -2,14 +2,14 @@
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { KnowledgeItem } from '@/api/types'
-import { useKnowledgeLibraryContext } from '@/views/knowledge-detail/context'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DocumentMigrateDialog' })
 const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
-const { resourceApi, resourceScope } = useKnowledgeLibraryContext()
+const { resourceApi, resourceScope } = useKnowledgeDetailContext()
 const visible = ref(false)
 const loading = defineModel<boolean>('loading', { default: false })
 const optionLoading = ref(false)
