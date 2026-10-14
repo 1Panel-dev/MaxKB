@@ -111,25 +111,14 @@ export function useKnowledgeDetailContext() {
   return context
 }
 
-/** 资料库保留现有查询差异，维护接口仅来自已支持写入的 Workspace 普通范围。 */
+/** 资料库直接复用统一资源接口入口，不增加模块别名或维护接口入口。 */
 export function useKnowledgeLibraryContext() {
-  const context = useKnowledgeDetailContext()
-  const requestSettingApi = computed(() => {
-    if (context.resourceScope.value !== 'workspace') return undefined
-    return resourceConfigs.workspace.resourceApi
-  })
-  return { ...context, requestSettingApi }
+  return useKnowledgeDetailContext()
 }
 
-/** 同步查询使用当前范围，保存仅提供给现有 API 支持写入的三个范围。 */
+/** 定时同步直接复用当前范围的完整 Sync API。 */
 export function useKnowledgeSyncContext() {
-  const context = useKnowledgeDetailContext()
-  const requestSettingApi = computed(() => {
-    const scope = context.resourceScope.value
-    if (!scope || scope === 'workspace-shared') return undefined
-    return resourceConfigs[scope].resourceApi.sync
-  })
-  return { ...context, requestSettingApi }
+  return useKnowledgeDetailContext()
 }
 
 /** 设置页只属于可管理范围，在上下文边界排除 Workspace 共享只读资源。 */
