@@ -55,8 +55,8 @@ const savedAuthorization = ref<Record<string, boolean>>({})
 const chatUserSearchQuery = ref<Dict<unknown>>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
+  { label: '用户名', value: 'username' },
 ]
 
 // 表头用户来源筛选

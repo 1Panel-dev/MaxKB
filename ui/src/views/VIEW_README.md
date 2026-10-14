@@ -1390,8 +1390,8 @@ API 地址、调用示例及 MCP 配置只读；后两个展示区参考工具 M
 两页通过 `hideHeader: true` 隐藏详情标题栏，使用普通 Flex 双栏容器，不嵌套 `MkViewLayout`。
 外层 `ResourceDetailLayout` 统一管理整体滚动；侧栏复用 `w-sidebar-expanded`、`MkSearchList` 的搜索、选中和空态。
 “按用户组”列表通过插槽展示名称及自动授权状态；接口尚未返回组已授权人数，手动授权组显示“已授权 —”，不以当前页勾选数代替。
-右侧第一行展示组名和用户查询总数；下方工具栏左侧为默认按用户名查询的 `MkComplexSearch` 及自动授权开关，右侧为保存。
-顶部 `MkComplexSearch` 仅提供用户名、姓名；用户来源只在表头使用 `MkTableFilter mode="single"` 筛选，向接口传 `source`。
+右侧第一行展示组名和用户查询总数；下方工具栏左侧为默认按姓名查询的 `MkComplexSearch` 及自动授权开关，右侧为保存。
+顶部 `MkComplexSearch` 按姓名、用户名排列；用户来源只在表头使用 `MkTableFilter mode="single"` 筛选，向接口传 `source`。
 用户名、姓名搜索与表头来源可组合查询，清空一处条件不影响另一处，不额外重置搜索组件。
 筛选变更回到第一页，选择“全部”移除来源条件。保留 `MkTable` 分页及高度约束。
 
