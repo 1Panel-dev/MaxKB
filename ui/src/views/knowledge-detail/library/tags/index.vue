@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type TagsApi from '@/api/admin/workspace/knowledge/tags'
+import type DocumentApi from '@/api/admin/workspace/knowledge/document'
 import { computed, watch, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { TableColumnCtx } from 'element-plus'
@@ -11,6 +13,10 @@ import EditTagDialog from './components/EditTagDialog.vue'
 import ButtonImportTags from './components/ButtonImportTags.vue'
 import TagDocumentDrawer from './AssociatedDocumentDrawer.vue'
 
+type WorkspaceDocumentApi = typeof DocumentApi
+
+type WorkspaceTagsApi = typeof TagsApi
+
 defineOptions({ name: 'TagManagementView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
@@ -20,7 +26,7 @@ interface TagTableRow extends KnowledgeTagUpdatePayload {
   rowspan: number
 }
 
-const { resourceApi, resourceScope, requestSettingApi } = useKnowledgeLibraryContext()
+const { resourceApi, resourceScope } = useKnowledgeLibraryContext()
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const loading = ref(false)
@@ -57,9 +63,10 @@ function loadTags() {
   if (!requestApi) return Promise.resolve()
   loading.value = true
   const keyword = searchText.value.trim()
-  const tagsRequest = requestSettingApi.value?.tags
-    ? requestSettingApi.value?.tags.getKnowledgeTags(knowledgeId.value, { name: keyword || undefined })
-    : requestApi.getKnowledgeTags(knowledgeId.value)
+  const tagsRequest =
+    resourceScope.value === 'workspace' && 'postKnowledgeTags' in requestApi
+      ? requestApi.getKnowledgeTags(knowledgeId.value, { name: keyword || undefined })
+      : requestApi.getKnowledgeTags(knowledgeId.value)
   return tagsRequest
     .then((groups) => {
       tagGroups.value = keyword ? groups.filter((group) => group.key.includes(keyword)) : groups
@@ -120,8 +127,8 @@ function handleOpenTagDocuments(row: TagTableRow) {
 
 /* 删除只在确认后提交，标签删除与文档取消关联使用不同接口。 */
 function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
-  const requestApi = requestSettingApi.value?.tags
-  if (!requestApi || loading.value || operationLoading.value) return
+  const requestApi = resourceApi.tags
+  if (resourceScope.value !== 'workspace' || !requestApi || !('deleteKnowledgeTag' in requestApi) || loading.value || operationLoading.value) return
   const tagName = type === 'key' ? row.key : `${row.key}—${row.value}`
   const tip = type === 'key' ? '删除后使用该标签的资源将会删除该标签，请谨慎操作!' : '删除后使用该标签的资源将会删除该标签，请谨慎操作!'
   return MsgConfirm(`是否删除标签：${tagName}？`, tip).then(
@@ -142,8 +149,16 @@ function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
 }
 
 function handleBatchDelete() {
-  const requestApi = requestSettingApi.value?.tags
-  if (!requestApi || loading.value || operationLoading.value || !selectedTags.value.length) return
+  const requestApi = resourceApi.tags
+  if (
+    resourceScope.value !== 'workspace' ||
+    !requestApi ||
+    !('putBatchDeleteKnowledgeTags' in requestApi) ||
+    loading.value ||
+    operationLoading.value ||
+    !selectedTags.value.length
+  )
+    return
   const tagIds = selectedTags.value.map(({ id }) => id)
   return MsgConfirm(`是否删除选中的 ${tagIds.length} 个标签？`, '删除后，使用该标签的资源将会删除该标签，请谨慎操作！').then(
     () => {
@@ -183,14 +198,14 @@ watch(
         <MkSearchInput v-model="searchText" class="mr-3 w-60!" @change="handleSearchChange" />
         <!-- 导入标签，成功后刷新列表 -->
         <ButtonImportTags
-          v-if="requestSettingApi"
-          :api="requestSettingApi.tags"
+          v-if="resourceScope === 'workspace'"
+          :api="resourceApi.tags as WorkspaceTagsApi"
           :knowledge-id="knowledgeId"
           :disabled="loading || operationLoading"
           @refresh="loadTags"
         />
         <!-- 创建标签 -->
-        <el-button v-if="requestSettingApi" type="primary" :disabled="loading || operationLoading" @click="handleOpenCreateTag">
+        <el-button v-if="resourceScope === 'workspace'" type="primary" :disabled="loading || operationLoading" @click="handleOpenCreateTag">
           <MkIcon name="icon_add_outlined" />
           <span>创建</span>
         </el-button>
@@ -211,12 +226,12 @@ watch(
     @cell-mouse-enter="handleCellEnter"
     @cell-mouse-leave="handleCellLeave"
   >
-    <el-table-column v-if="requestSettingApi" type="selection" width="40" />
+    <el-table-column v-if="resourceScope === 'workspace'" type="selection" width="40" />
     <el-table-column prop="key" label="标签" min-width="240">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center gap-1">
           <span class="min-w-0 truncate" :title="row.key">{{ row.key }}</span>
-          <div v-if="requestSettingApi" class="flex-align-center shrink-0" :class="{ 'group-hover-visible': hoveredTagKey !== row.key }">
+          <div v-if="resourceScope === 'workspace'" class="flex-align-center shrink-0" :class="{ 'group-hover-visible': hoveredTagKey !== row.key }">
             <!-- 添加标签值 -->
             <MkTooltip content="添加标签值" placement="top">
               <el-button type="primary" text @click="handleOpenAddTagValue(row)">
@@ -243,13 +258,13 @@ watch(
     <el-table-column prop="doc_count" label="已关联文档" min-width="140">
       <template #default="{ row }: { row: TagTableRow }">
         <!-- 查看标签关联文档 -->
-        <el-button v-if="requestSettingApi" type="primary" link class="mk-link" @click="handleOpenTagDocuments(row)">
+        <el-button v-if="resourceScope === 'workspace'" type="primary" link class="mk-link" @click="handleOpenTagDocuments(row)">
           {{ row.doc_count ?? 0 }}
         </el-button>
         <span v-else>{{ row.doc_count ?? 0 }}</span>
       </template>
     </el-table-column>
-    <el-table-column v-if="requestSettingApi" label="操作" width="100" fixed="right">
+    <el-table-column v-if="resourceScope === 'workspace'" label="操作" width="100" fixed="right">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center">
           <!-- 编辑标签值 -->
@@ -267,17 +282,29 @@ watch(
         </div>
       </template>
     </el-table-column>
-    <template v-if="requestSettingApi" #footer-batch-actions>
+    <template v-if="resourceScope === 'workspace'" #footer-batch-actions>
       <!-- 批量删除标签 -->
       <el-button type="danger" plain :loading="operationLoading" @click="handleBatchDelete">删除</el-button>
     </template>
   </MkTable>
-  <CreateTagDialog v-if="requestSettingApi" ref="createTagRef" :api="requestSettingApi.tags" :knowledge-id="knowledgeId" @refresh="loadTags" />
-  <EditTagDialog v-if="requestSettingApi" ref="editTagRef" :api="requestSettingApi.tags" :knowledge-id="knowledgeId" @refresh="loadTags" />
+  <CreateTagDialog
+    v-if="resourceScope === 'workspace'"
+    ref="createTagRef"
+    :api="resourceApi.tags as WorkspaceTagsApi"
+    :knowledge-id="knowledgeId"
+    @refresh="loadTags"
+  />
+  <EditTagDialog
+    v-if="resourceScope === 'workspace'"
+    ref="editTagRef"
+    :api="resourceApi.tags as WorkspaceTagsApi"
+    :knowledge-id="knowledgeId"
+    @refresh="loadTags"
+  />
   <TagDocumentDrawer
-    v-if="requestSettingApi"
+    v-if="resourceScope === 'workspace'"
     ref="tagDocumentRef"
-    :api="requestSettingApi.document"
+    :api="resourceApi.document as WorkspaceDocumentApi"
     :knowledge-id="knowledgeId"
     @refresh="loadTags"
   />

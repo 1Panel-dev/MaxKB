@@ -5,7 +5,7 @@ import type SystemResourceModelApi from '@/api/admin/system/resource-management/
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { DynamicFormField, ModelItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
-import AdvancedSettingsTable from '../../../advanced-settings-table/AdvancedSettingsTable.vue'
+import AdvancedSettingsTable from '@/views/model/advanced-settings-table/AdvancedSettingsTable.vue'
 
 defineOptions({ name: 'ParamSettingDrawer' })
 

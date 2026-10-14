@@ -16,7 +16,7 @@ defineOptions({ name: 'KnowledgeScheduledSyncView' })
 defineProps<ResourceDetailPageProps>()
 
 // 回填后台配置，草稿与详情中的配置独立。
-const { knowledge, replaceKnowledgeDetail, resourceApi, requestSettingApi, resourceScope } = useKnowledgeSyncContext()
+const { knowledge, replaceKnowledgeDetail, resourceApi, resourceScope } = useKnowledgeSyncContext()
 const activeTab = ref('settings')
 const loading = ref(false)
 const saving = ref(false)
@@ -106,8 +106,8 @@ const rules: FormRules<SyncSettingDraft> = {
 }
 
 function handleSave() {
-  const requestApi = requestSettingApi.value
-  if (!requestApi) return
+  const requestApi = resourceApi.sync
+  if (resourceScope.value === 'workspace-shared' || !('putKnowledgeSyncSetting' in requestApi)) return
   const detail = knowledge.value
   const form = formRef.value
   if (saving.value || loading.value || !settingLoaded.value || !detail || !form) return
@@ -172,7 +172,7 @@ watch(
         :rules="rules"
         class="max-w-200 pb-6"
         label-position="top"
-        :disabled="!requestSettingApi"
+        :disabled="resourceScope === 'workspace-shared'"
         @submit.prevent
       >
         <el-form-item>
@@ -220,7 +220,14 @@ watch(
           </el-form-item>
         </div>
         <!-- 保存定时同步设置 -->
-        <el-button v-if="requestSettingApi" type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">
+        <el-button
+          v-if="resourceScope !== 'workspace-shared'"
+          type="primary"
+          class="mt-4"
+          :loading="saving"
+          :disabled="!settingLoaded"
+          @click="handleSave"
+        >
           保存
         </el-button>
       </el-form>

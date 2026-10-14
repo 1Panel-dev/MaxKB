@@ -1465,7 +1465,7 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 `provideKnowledgeDetailContext` 在详情入口装配并提供上下文，`useKnowledgeDetailContext` 供子页读取。
 基础设置和文档策略通过 `useKnowledgeSettingContext` 获取可管理范围的完整 Knowledge API 类型，
 该设置上下文的 `resourceApi` 仅提供 `knowledge`；定时同步通过 `useKnowledgeSyncContext` 读取当前
-`resourceApi.sync` 及可保存范围的 `requestSettingApi`。Workspace 共享只查询设置和日志，表单只读且不显示保存。
+`resourceApi.sync`。Workspace 共享只查询设置和日志，表单只读且不显示保存。
 不在页面用方法是否存在判断可写能力；上下文边界排除 Workspace 共享只读范围，
 共享设置路由已注册，API 上下文仍保留原有只读边界，写接口接入暂缓。
 上下文按响应式 `resourceScope` 选择各范围现有完整 Knowledge、Sync API 对象，
@@ -1476,8 +1476,8 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 目前仅详情入口及 setting 下的基础设置、文档策略、定时同步页面采用上下文 API；
 library 下的文档、标签与迁移入口通过 `useKnowledgeLibraryContext` 读取现有 API，
 `resourceApi.document / tags` 是可选的查询模块；System 两种来源未提供时不发送请求。
-与 sync 一致，维护接口只通过 `requestSettingApi` 提供，内部使用完整的 `document / tags / workflow / knowledge` API；
-仅 Workspace 普通范围提供该维护入口，分别传给已有操作组件；不为共享或 System 补造写接口。共享标签页按现有无查询参数接口读取，
+查询和维护均通过 `resourceApi.document / tags / workflow / knowledge` 的现有完整 API 对象进行；
+维护操作沿用 Workspace 普通范围边界，分别传给已有操作组件；不为共享或 System 补造写接口。共享标签页按现有无查询参数接口读取，
 在本地按标签名称筛选，不展示维护入口；关联文档数量仅作文本展示。
 同步日志通过完整 Sync API props 请求。展示组件不接收上下文 API。
 System 飞书专用保存方法尚未提供，基础设置沿该范围现有 `putKnowledge` 协议；Workspace 飞书保留专用方法。
@@ -1495,7 +1495,10 @@ Workspace 共享文档保留查询和标签展示，标签页保留标签组查�
 创建标签弹窗必须由入口传入完整 Tags API，不再默认使用普通 Workspace；文档标签添加及迁移的
 候选查询同样通过资料库上下文选择。图片页保持占位，不配置不存在的接口。
 
-资料库所有消费方沿用 Sync 的双入口结构，包括文档页、标签页、文档标签添加弹窗、标签创建入口、
-文档迁移弹窗以及传入 Action / Drawer 的 API：查询模块通过响应式 `resourceApi` getter 读取，
-维护模块通过单个 `requestSettingApi` 读取，不再为各模块暴露独立 computed 入口。
-方法内部选定完整业务 API 时继续使用局部变量 `requestApi`，它不属于新的上下文入口。
+资料库和 Sync 所有消费方统一通过 `resourceApi.xx` 的响应式 getter 访问完整 API，
+不增加查询／维护双入口或模块别名。只读范围和缺失模块保留现有业务边界；
+接口对象联合类型在调用处按真实方法集合收窄，不补造方法或跨范围回退。
+未约定的 API 方法、上下文入口或返回结构必须先与用户商议并确认后再实现。
+
+资料库模板不使用“API 对象存在且包含某方法”的组合判断来控制操作显隐；
+只保留原有业务资源范围条件，接口联合类型的收窄不增加可见性规则。
