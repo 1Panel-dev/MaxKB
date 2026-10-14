@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, type Directive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ElAnchor } from 'element-plus'
 import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
@@ -10,6 +10,7 @@ import type { ParamsPage } from '@/api/admin/core/types'
 import type { DocumentItem, ParagraphItem, ParagraphQuery } from '@/api/types'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { useSortable, type SortableChange } from '@/utils/use-sortable'
 import CreateParagraphDialog from './paragraph-dialog/CreateParagraphDialog.vue'
 import EditParagraphDialog from './paragraph-dialog/ParagraphDialog.vue'
 import {
@@ -43,21 +44,33 @@ const searchFields = [
 ]
 
 async function loadParagraphPage(pagination: ParamsPage) {
-  // 局部删除后按剩余列表长度接续，最多拼接相邻两页，避免分页偏移导致漏载。
-  const loadedCount = pagination.currentPage === 1 ? 0 : paragraphs.value.length
-  const currentPage = Math.floor(loadedCount / pagination.pageSize) + 1
-  const offset = loadedCount % pagination.pageSize
-  const query = paragraphQuery.value
-  const page = await ParagraphApi.getParagraphPage(knowledgeId.value, documentId.value, { ...pagination, currentPage }, query)
-  let records = page.records.slice(offset)
-  if (offset && currentPage * page.size < page.total) {
-    const nextPage = await ParagraphApi.getParagraphPage(knowledgeId.value, documentId.value, { ...pagination, currentPage: currentPage + 1 }, query)
-    records = [...records, ...nextPage.records].slice(0, pagination.pageSize)
+  // 拖拽及位置保存完成后再接续分页，避免补页改变拖拽索引或读取旧顺序。
+  await paragraphSortSettled
+  paragraphPageLoading.value = true
+  try {
+    // 局部删除后按剩余列表长度接续，最多拼接相邻两页，避免分页偏移导致漏载。
+    const loadedCount = pagination.currentPage === 1 ? 0 : paragraphs.value.length
+    const currentPage = Math.floor(loadedCount / pagination.pageSize) + 1
+    const offset = loadedCount % pagination.pageSize
+    const query = paragraphQuery.value
+    const page = await ParagraphApi.getParagraphPage(knowledgeId.value, documentId.value, { ...pagination, currentPage }, query)
+    let records = page.records.slice(offset)
+    if (offset && currentPage * page.size < page.total) {
+      const nextPage = await ParagraphApi.getParagraphPage(
+        knowledgeId.value,
+        documentId.value,
+        { ...pagination, currentPage: currentPage + 1 },
+        query,
+      )
+      records = [...records, ...nextPage.records].slice(0, pagination.pageSize)
+    }
+    paragraphTotal.value = page.total
+    // 组件页码记录已消费页数，补回局部移除的数量以维持正确的结束判断。
+    const removedCount = (pagination.currentPage - 1) * pagination.pageSize - loadedCount
+    return { ...page, records, current: pagination.currentPage, total: page.total + removedCount }
+  } finally {
+    paragraphPageLoading.value = false
   }
-  paragraphTotal.value = page.total
-  // 组件页码记录已消费页数，补回局部移除的数量以维持正确的结束判断。
-  const removedCount = (pagination.currentPage - 1) * pagination.pageSize - loadedCount
-  return { ...page, records, current: pagination.currentPage, total: page.total + removedCount }
 }
 
 function refreshParagraphs() {
@@ -85,6 +98,12 @@ function handleBack() {
 const layoutRef = ref<InstanceType<typeof MkViewLayout>>()
 const paragraphAnchorRef = ref<InstanceType<typeof ElAnchor>>()
 const paragraphScrollContainer = computed(() => layoutRef.value?.getScrollContainer())
+// AnchorLink 的 a 在组件内部渲染，只关闭链接原生拖动，排序行仍由 Sortable 管理。
+const vDisableLinkDrag: Directive<HTMLElement> = {
+  mounted(element) {
+    element.querySelector('a')?.setAttribute('draggable', 'false')
+  },
+}
 
 /* 批量选择已加载的分段 */
 const batchMode = ref(false)
@@ -102,6 +121,7 @@ function handleSelectBatchParagraph(paragraphId: string, selected: boolean) {
 }
 
 function handleClickParagraphCard(paragraph: ParagraphItem) {
+  if (paragraphMoving.value) return
   if (batchMode.value) {
     handleSelectBatchParagraph(paragraph.id, !selectedParagraphIds.value.includes(paragraph.id))
     return
@@ -174,12 +194,14 @@ const editDialogRef = ref<InstanceType<typeof EditParagraphDialog>>()
 const searchKey = ref(0)
 
 async function handleOpenCreateParagraph(position?: number) {
+  if (paragraphMoving.value) return
   createDialogMounted.value = true
   await nextTick()
   createDialogRef.value?.open(position)
 }
 
 async function handleOpenParagraphDetail(paragraph: ParagraphItem, initialMode: 'detail' | 'edit' = 'detail') {
+  if (paragraphMoving.value) return
   editDialogMounted.value = true
   await nextTick()
   editDialogRef.value?.open(paragraph, initialMode)
@@ -195,17 +217,23 @@ function handleParagraphMenuVisibleChange(paragraphId: string, menu: 'more' | 'p
 }
 
 function handleToggleParagraph(paragraph: ParagraphItem) {
-  if (loading.value) return
+  if (loading.value || paragraphMoving.value) return false
+  loading.value = true
   return ParagraphApi.putParagraph(knowledgeId.value, documentId.value, paragraph.id, { is_active: !paragraph.is_active })
     .then((updatedParagraph) => {
       handleReplaceParagraph(updatedParagraph)
       MsgSuccess('操作成功')
+      // 服务端响应已更新受控开关，阻止 before-change 再触发一次切换。
+      return false
     })
-    .catch(() => {})
+    .catch(() => false)
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 function handleDeleteParagraph(paragraph: ParagraphItem) {
-  if (loading.value) return
+  if (loading.value || paragraphMoving.value) return
   const targetKnowledgeId = knowledgeId.value
   const targetDocumentId = documentId.value
   const targetParagraphId = paragraph.id
@@ -220,7 +248,9 @@ function handleDeleteParagraph(paragraph: ParagraphItem) {
 }
 
 function handleMoveParagraph(paragraph: ParagraphItem, direction: ParagraphMoveDirection) {
-  if (loading.value) return
+  if (loading.value || paragraphMoving.value || paragraphPageLoading.value) return
+  handleParagraphSortStart()
+  paragraphMoving.value = true
   const targetKnowledgeId = knowledgeId.value
   const targetDocumentId = documentId.value
   // 搜索只影响展示；移动始终按完整文档的顺序定位相邻分段。
@@ -252,7 +282,106 @@ function handleMoveParagraph(paragraph: ParagraphItem, direction: ParagraphMoveD
       })
     })
     .catch(() => {})
+    .finally(() => {
+      paragraphMoving.value = false
+      finishParagraphSort()
+    })
 }
+
+/* 左侧目录与右侧卡片共用分段数组和位置保存流程。 */
+const paragraphCardsRef = ref<HTMLElement>()
+const paragraphDirectoryRef = ref<HTMLElement>()
+const paragraphPageLoading = ref(false)
+const paragraphMoving = ref(false)
+const paragraphSortDisabled = computed(
+  () =>
+    loading.value ||
+    paragraphPageLoading.value ||
+    paragraphMoving.value ||
+    batchMode.value ||
+    deleting.value ||
+    deleteConfirming.value ||
+    createDialogMounted.value ||
+    editDialogMounted.value ||
+    paragraphs.value.length < 2,
+)
+let paragraphSortSnapshot: ParagraphItem[] = []
+let paragraphSortSettled: Promise<void> = Promise.resolve()
+let resolveParagraphSort: (() => void) | undefined
+
+function handleParagraphSortStart() {
+  paragraphSortSnapshot = [...paragraphs.value]
+  openParagraphMenuIds.value = { more: '', position: '' }
+  paragraphSortSettled = new Promise((resolve) => {
+    resolveParagraphSort = resolve
+  })
+}
+
+function finishParagraphSort() {
+  paragraphSortSnapshot = []
+  resolveParagraphSort?.()
+  resolveParagraphSort = undefined
+  paragraphSortSettled = Promise.resolve()
+}
+
+function handleParagraphSortEnd() {
+  // 无顺序变化时不会触发保存；有变化时等待请求完成后释放分页。
+  if (!paragraphMoving.value) finishParagraphSort()
+}
+
+function handleParagraphSort({ newIndex, data }: SortableChange<ParagraphItem>) {
+  const previousParagraphs = paragraphSortSnapshot
+  const movedParagraph = data[newIndex]
+  const targetParagraph = previousParagraphs[newIndex]
+  if (!movedParagraph || !targetParagraph) {
+    paragraphs.value = previousParagraphs
+    finishParagraphSort()
+    return
+  }
+  const oldPosition = movedParagraph.position
+  const newPosition = targetParagraph.position
+  paragraphMoving.value = true
+  return ParagraphApi.putParagraphPosition(knowledgeId.value, documentId.value, movedParagraph.id, newPosition)
+    .then(() => {
+      // 库已经重排数组，只同步服务端移动区间内的 position，不再次移动数组。
+      paragraphs.value = paragraphs.value.map((paragraph) => {
+        let position = paragraph.position
+        if (paragraph.id === movedParagraph.id) position = newPosition
+        else if (oldPosition < newPosition && position > oldPosition && position <= newPosition) position -= 1
+        else if (oldPosition > newPosition && position >= newPosition && position < oldPosition) position += 1
+        return position === paragraph.position ? paragraph : { ...paragraph, position }
+      })
+      MsgSuccess('移动成功')
+    })
+    .catch(() => {
+      paragraphs.value = previousParagraphs
+    })
+    .finally(() => {
+      paragraphMoving.value = false
+      finishParagraphSort()
+    })
+}
+
+useSortable(paragraphDirectoryRef, paragraphs, () => ({
+  disabled: paragraphSortDisabled.value,
+  filter: 'button:not(.paragraph-directory-drag-handle)',
+  preventOnFilter: false,
+  draggable: '> .paragraph-directory-row',
+  onStart: handleParagraphSortStart,
+  onEnd: handleParagraphSortEnd,
+  onReorder: handleParagraphSort,
+}))
+useSortable(paragraphCardsRef, paragraphs, () => ({
+  disabled: paragraphSortDisabled.value,
+  // 整张卡片可拖拽，操作区和正文链接保持原有点击行为。
+  filter: '.paragraph-card-actions, a, button:not(.paragraph-card-drag__handle)',
+  preventOnFilter: false,
+  draggable: '> .paragraph-sort-row',
+  onStart: handleParagraphSortStart,
+  onEnd: handleParagraphSortEnd,
+  onReorder: handleParagraphSort,
+}))
+onBeforeUnmount(finishParagraphSort)
 
 function handleCreateParagraphSuccess() {
   paragraphQuery.value = {}
@@ -276,7 +405,7 @@ onMounted(() => {
 <template>
   <MkViewLayout ref="layoutRef" title="" :loading="loading" collapsible class="[&_aside+button]:top-4!">
     <template #top>
-      <div class="flex-between gap-4">
+      <div class="flex-between gap-4" :inert="paragraphMoving">
         <div class="flex-align-center min-w-0 gap-2">
           <!-- 返回文档列表 -->
           <el-button text @click="handleBack"><MkIcon name="icon_arrow-left_outlined" :size="20" /></el-button>
@@ -311,126 +440,155 @@ onMounted(() => {
           select-scroll-top
           @click.prevent
         >
-          <!-- 定位文档分段 -->
-          <el-anchor-link v-for="paragraph in paragraphs" :key="paragraph.id" :href="`#paragraph-${paragraph.id}`">
-            <div
-              class="truncate rounded-md px-2 py-1 font-normal text-N600 hover:bg-N900/10 [.is-active_&]:text-primary"
-              :title="paragraph.title || ''"
-            >
-              {{ paragraph.title || '-' }}
-            </div>
-          </el-anchor-link>
+          <div ref="paragraphDirectoryRef">
+            <template v-for="paragraph in paragraphs" :key="paragraph.id">
+              <div class="paragraph-directory-row group relative">
+                <!-- 拖拽排序分段目录；手柄与链接并列，避免触发链接原生拖动 -->
+                <el-button
+                  v-if="!batchMode"
+                  link
+                  class="paragraph-directory-drag-handle group-hover-visible absolute! top-1/2 -left-4 z-10 -translate-y-1/2 text-N600 h-8!"
+                  :disabled="paragraphSortDisabled"
+                  @click.prevent.stop
+                >
+                  <MkIcon name="icon_drag_outlined" />
+                </el-button>
+                <!-- 定位文档分段 -->
+                <el-anchor-link v-disable-link-drag :href="`#paragraph-${paragraph.id}`">
+                  <div
+                    class="flex-align-center gap-2 rounded-md px-2 py-1 font-normal text-N600 hover:bg-N900/10 [.is-active_&]:text-primary"
+                    :title="paragraph.title || ''"
+                  >
+                    <span class="min-w-0 flex-1 truncate">{{ paragraph.title || '-' }}</span>
+                  </div>
+                </el-anchor-link>
+              </div>
+            </template>
+          </div>
         </el-anchor>
       </el-scrollbar>
     </template>
+
     <template #default="{ Header, Footer }">
       <component :is="Header">
         <p class="text-N600">{{ paragraphTotal }} 分段</p>
       </component>
       <MkInfiniteScroll ref="infiniteScrollRef" v-model="paragraphs" :load="loadParagraphPage">
-        <div class="space-y-3">
+        <div ref="paragraphCardsRef" class="space-y-3">
           <template v-for="paragraph in paragraphs" :key="paragraph.id">
-            <el-card
-              :id="`paragraph-${paragraph.id}`"
-              shadow="never"
-              class="mk-paragraph-card group relative cursor-pointer overflow-visible!"
-              body-class="overflow-visible!"
-              :class="{ selectable: batchMode, active: batchMode && selectedParagraphIds.includes(paragraph.id) }"
-              @click="handleClickParagraphCard(paragraph)"
-            >
-              <div
+            <div class="paragraph-sort-row group relative">
+              <!-- 拖拽排序分段卡片 -->
+              <el-button
                 v-if="!batchMode"
-                class="sticky top-3 z-10 h-0"
-                :class="{ 'group-hover-visible': openParagraphMenuIds.more !== paragraph.id && openParagraphMenuIds.position !== paragraph.id }"
+                link
+                class="paragraph-card-drag__handle group-hover-visible absolute! top-4 -left-5 z-10 text-N600 h-8!"
+                :disabled="paragraphSortDisabled"
                 @click.stop
               >
-                <el-card class="absolute top-0 right-0" shadow="always" style="--el-card-padding: 4px">
-                  <div class="flex-align-center">
-                    <!-- 启用或禁用当前分段 -->
-                    <el-switch
-                      :model-value="paragraph.is_active"
-                      :disabled="loading"
-                      size="small"
-                      class="ml-1"
-                      :before-change="() => handleToggleParagraph(paragraph)"
-                    />
-                    <el-divider direction="vertical" class="ml-3! mr-2!" />
-                    <MkTooltip content="编辑">
-                      <!-- 编辑当前分段 -->
-                      <el-button text @click="handleOpenParagraphDetail(paragraph, 'edit')">
-                        <MkIcon name="icon_edit_outlined" />
-                      </el-button>
-                    </MkTooltip>
-                    <MkTooltip content="上方插入分段">
-                      <!-- 在当前分段上方插入 -->
-                      <el-button text @click="handleOpenCreateParagraph(paragraph.position)">
-                        <MkIcon name="icon_add_outlined-1" />
-                      </el-button>
-                    </MkTooltip>
-                    <MkDropdown
-                      trigger="click"
-                      placement="bottom-end"
-                      hide-when-empty
-                      persistent
-                      class="ml-1"
-                      @visible-change="handleParagraphMenuVisibleChange(paragraph.id, 'more', $event)"
-                    >
-                      <!-- 展开分段更多操作 -->
-                      <el-button text><MkIcon name="icon_more_outlined" /></el-button>
-                      <template #dropdown>
-                        <MkDropdownMenu>
-                          <!-- 生成当前分段的问题 -->
-                          <GenerateQuestionsAction
-                            label="生成问题"
-                            :api="ParagraphApi"
-                            :knowledge-id="knowledgeId"
-                            :document-id="documentId"
-                            :paragraph-id="paragraph.id"
-                            :disabled="loading"
-                            @refresh="handleGenerateQuestionsSuccess"
-                          />
-                          <!-- 迁移当前分段 -->
-                          <MigrateParagraphAction
-                            :api="ParagraphApi"
-                            :knowledge-id="knowledgeId"
-                            :document-id="documentId"
-                            :paragraph-id="paragraph.id"
-                            :disabled="loading"
-                            @success="handleRemoveParagraphs"
-                          />
-                          <!-- 展开分段位置菜单 -->
-                          <MoveParagraphAction
-                            label="移动位置"
-                            divided
-                            :disabled="loading"
-                            @move="handleMoveParagraph(paragraph, $event)"
-                            @visible-change="handleParagraphMenuVisibleChange(paragraph.id, 'position', $event)"
-                          />
-                          <!-- 删除当前分段 -->
-                          <MkDropdownItem divided :disabled="loading" @click="handleDeleteParagraph(paragraph)">
-                            <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                            删除
-                          </MkDropdownItem>
-                        </MkDropdownMenu>
-                      </template>
-                    </MkDropdown>
-                  </div>
-                </el-card>
-              </div>
-              <h4 class="mb-2 pr-44">{{ paragraph.title || '-' }}</h4>
+                <MkIcon name="icon_drag_outlined" />
+              </el-button>
+              <el-card
+                :id="`paragraph-${paragraph.id}`"
+                shadow="never"
+                class="mk-paragraph-card relative cursor-pointer overflow-visible!"
+                body-class="overflow-visible!"
+                :class="{ selectable: batchMode, active: batchMode && selectedParagraphIds.includes(paragraph.id), disabled: !paragraph.is_active }"
+                @click="handleClickParagraphCard(paragraph)"
+              >
+                <div
+                  v-if="!batchMode"
+                  class="paragraph-card-actions sticky top-3 z-10 h-0"
+                  :class="{ 'group-hover-visible': openParagraphMenuIds.more !== paragraph.id && openParagraphMenuIds.position !== paragraph.id }"
+                  @click.stop
+                >
+                  <el-card class="absolute top-0 right-0" shadow="always" style="--el-card-padding: 4px">
+                    <div class="flex-align-center">
+                      <!-- 启用或禁用当前分段 -->
+                      <el-switch
+                        :model-value="paragraph.is_active"
+                        :disabled="loading || paragraphMoving"
+                        size="small"
+                        class="ml-1"
+                        :before-change="() => handleToggleParagraph(paragraph)"
+                      />
+                      <el-divider direction="vertical" class="ml-3! mr-2!" />
+                      <MkTooltip content="编辑">
+                        <!-- 编辑当前分段 -->
+                        <el-button text @click="handleOpenParagraphDetail(paragraph, 'edit')">
+                          <MkIcon name="icon_edit_outlined" />
+                        </el-button>
+                      </MkTooltip>
+                      <MkTooltip content="上方插入分段">
+                        <!-- 在当前分段上方插入 -->
+                        <el-button text @click="handleOpenCreateParagraph(paragraph.position)">
+                          <MkIcon name="icon_add_outlined-1" />
+                        </el-button>
+                      </MkTooltip>
+                      <MkDropdown
+                        trigger="click"
+                        placement="bottom-end"
+                        hide-when-empty
+                        persistent
+                        class="ml-1"
+                        @visible-change="handleParagraphMenuVisibleChange(paragraph.id, 'more', $event)"
+                      >
+                        <!-- 展开分段更多操作 -->
+                        <el-button text><MkIcon name="icon_more_outlined" /></el-button>
+                        <template #dropdown>
+                          <MkDropdownMenu>
+                            <!-- 生成当前分段的问题 -->
+                            <GenerateQuestionsAction
+                              label="生成问题"
+                              :api="ParagraphApi"
+                              :knowledge-id="knowledgeId"
+                              :document-id="documentId"
+                              :paragraph-id="paragraph.id"
+                              :disabled="loading || paragraphMoving"
+                              @refresh="handleGenerateQuestionsSuccess"
+                            />
+                            <!-- 迁移当前分段 -->
+                            <MigrateParagraphAction
+                              :api="ParagraphApi"
+                              :knowledge-id="knowledgeId"
+                              :document-id="documentId"
+                              :paragraph-id="paragraph.id"
+                              :disabled="loading || paragraphMoving"
+                              @success="handleRemoveParagraphs"
+                            />
+                            <!-- 展开分段位置菜单 -->
+                            <MoveParagraphAction
+                              label="移动位置"
+                              divided
+                              :disabled="loading || paragraphMoving || paragraphPageLoading"
+                              @move="handleMoveParagraph(paragraph, $event)"
+                              @visible-change="handleParagraphMenuVisibleChange(paragraph.id, 'position', $event)"
+                            />
+                            <!-- 删除当前分段 -->
+                            <MkDropdownItem divided :disabled="loading || paragraphMoving" @click="handleDeleteParagraph(paragraph)">
+                              <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                              删除
+                            </MkDropdownItem>
+                          </MkDropdownMenu>
+                        </template>
+                      </MkDropdown>
+                    </div>
+                  </el-card>
+                </div>
+                <h4 class="mb-2 pr-44">{{ paragraph.title || '-' }}</h4>
 
-              <!-- 选择批量操作的分段 -->
-              <el-checkbox
-                v-if="batchMode"
-                class="absolute! top-4 right-4"
-                :model-value="selectedParagraphIds.includes(paragraph.id)"
-                @click.stop
-                @change="(selected: boolean | string | number) => handleSelectBatchParagraph(paragraph.id, Boolean(selected))"
-              />
+                <!-- 选择批量操作的分段 -->
+                <el-checkbox
+                  v-if="batchMode"
+                  class="absolute! top-4 right-4"
+                  :model-value="selectedParagraphIds.includes(paragraph.id)"
+                  @click.stop
+                  @change="(selected: boolean | string | number) => handleSelectBatchParagraph(paragraph.id, Boolean(selected))"
+                />
 
-              <MdPreview :model-value="paragraph.content" />
-              <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
-            </el-card>
+                <MdPreview :model-value="paragraph.content" />
+                <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
+              </el-card>
+            </div>
           </template>
         </div>
         <template #empty>
@@ -451,7 +609,7 @@ onMounted(() => {
             :knowledge-id="knowledgeId"
             :document-id="documentId"
             :paragraph-ids="selectedParagraphIds"
-            :disabled="loading"
+            :disabled="loading || paragraphMoving"
             @success="handleRemoveParagraphs"
           />
           <!-- 批量生成问题 -->
@@ -460,7 +618,7 @@ onMounted(() => {
             :knowledge-id="knowledgeId"
             :document-id="documentId"
             :paragraph-ids="selectedParagraphIds"
-            :disabled="loading"
+            :disabled="loading || paragraphMoving"
             @refresh="handleGenerateQuestionsSuccess"
           />
           <!-- 批量删除分段 -->

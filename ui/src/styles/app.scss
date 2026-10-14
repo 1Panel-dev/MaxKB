@@ -181,12 +181,22 @@ h6 {
     border-color: var(--mk-primary) !important;
   }
 
-  &.selectable:hover {
+  &.disabled {
+    color: var(--mk-N400);
+
+    .md-editor-preview,
+    .md-editor-preview *,
+    .text-N600 {
+      color: var(--mk-N400) !important;
+    }
+  }
+
+  &.selectable:not(.disabled):hover {
     background-color: white;
     border-color: var(--mk-primary);
   }
 
-  &:hover {
+  &:not(.disabled):hover {
     background-color: var(--mk-N100);
   }
 }

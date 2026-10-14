@@ -68,7 +68,7 @@ const sortableBranches = computed({
 })
 useSortable(branchListRef, sortableBranches, () => ({
   disabled: sortableBranches.value.length < 2,
-  handle: '.condition-branch-handle',
+  handle: '.paragraphcondition-branch__handlecontent__handle',
   draggable: '> .condition-branch',
 }))
 
@@ -157,7 +157,7 @@ onBeforeUnmount(() => {
       <div ref="branchListRef">
         <div v-for="(branch, branchIndex) in sortableBranches" :key="branch.id" class="condition-branch mb-2 flex-align-center gap-1">
           <div v-branch-resize="branch.id" class="mk-gray-card group/branch min-w-0 flex-1">
-            <div class="condition-branch-handle flex-between min-h-6">
+            <div class="paragraphcondition-branch__handlecontent__handle flex-between min-h-6">
               <div class="flex-align-center">
                 <!-- 拖拽排序分支 -->
                 <el-button v-if="sortableBranches.length > 1" link class="hidden! group-hover/branch:inline-flex!">
