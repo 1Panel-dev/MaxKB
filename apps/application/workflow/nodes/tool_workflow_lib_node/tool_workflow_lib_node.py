@@ -74,6 +74,15 @@ class ToolWorkflowLibNode(INode):
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "tool-workflow-lib-node"
 
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self._current_sub_manage = None
+
+    def cancel(self):
+        super().cancel()
+        if self._current_sub_manage:
+            self._current_sub_manage.cancel()
+
     def _run(self):
         # 完成时机由子工作流的 on_complete 回调驱动，这里不自动 complete
         self.execute()
@@ -120,6 +129,7 @@ class ToolWorkflowLibNode(INode):
             self.write(content)
 
         def on_complete(wf_manage, error):
+            self._current_sub_manage = None
             # 收集工具工作流输出（tool-start-node 初始化、变量赋值节点覆写）
             output = dict(wf_manage.context.get("output", {}) or {})
             # 只有需要给下游引用的数据才写 context：各输出字段
@@ -131,6 +141,10 @@ class ToolWorkflowLibNode(INode):
             self.data["message_tokens"] = _sum_tokens(wf_manage.context, "message_tokens")
             self.data["answer_tokens"] = _sum_tokens(wf_manage.context, "answer_tokens")
 
+            # 子工作流被取消：如实以 CANCELLED 结束本节点
+            if wf_manage.signal == Signal.CANCELLED or self.workflow_manage.signal == Signal.CANCELLED:
+                self.complete(Status.CANCELLED)
+                return
             if error:
                 self.complete(Status.FAIL, error=error)
                 return
@@ -167,6 +181,11 @@ class ToolWorkflowLibNode(INode):
             get_start_node=get_start_node_fn,
         )
         sub_manage.start_node.workflow_manage = sub_manage
+        self._current_sub_manage = sub_manage
+        # 取消发生在构造之后、启动之前：不再启动子工作流
+        if self.status == Status.CANCELLED or self.workflow_manage.signal == Signal.CANCELLED:
+            self.complete(Status.CANCELLED)
+            return
         # 子工作流的输出已在 on_next 中逐块转发给父工作流，无需按 is_result 重复输出
         sub_manage.run()
 
