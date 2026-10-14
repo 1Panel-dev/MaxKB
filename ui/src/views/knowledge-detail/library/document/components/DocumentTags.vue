@@ -6,7 +6,7 @@ import type { DocumentItem } from '@/api/types'
 import AddTagDialog from '../action-dropdown/setting-tags/AddTagDialog.vue'
 
 defineOptions({ name: 'DocumentTags' })
-const props = defineProps<{ api: typeof DocumentApi; knowledgeId: string; document: DocumentItem; disabled?: boolean }>()
+const props = defineProps<{ api?: typeof DocumentApi; knowledgeId: string; document: DocumentItem; disabled?: boolean }>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -18,7 +18,7 @@ const addTagRef = useTemplateRef<InstanceType<typeof AddTagDialog>>('addTagRef')
 const targetKnowledgeId = ref('')
 
 function handleOpenDialog() {
-  if (props.disabled || loading.value || dialogMounted.value) return
+  if (!props.api || props.disabled || loading.value || dialogMounted.value) return
   targetKnowledgeId.value = props.knowledgeId
   const documentId = props.document.id
   dialogMounted.value = true
@@ -51,13 +51,13 @@ function handleDialogClosed() {
       </div>
     </el-popover>
     <!-- 添加文档标签 -->
-    <el-button class="mk-add-tag-button" plain :disabled="disabled || loading" @click.stop="handleOpenDialog">
+    <el-button class="mk-add-tag-button" plain :disabled="!api || disabled || loading" @click.stop="handleOpenDialog">
       <MkIcon name="icon_add_outlined" size="14" />
       <span>标签</span>
     </el-button>
   </div>
   <AddTagDialog
-    v-if="dialogMounted"
+    v-if="dialogMounted && api"
     ref="addTagRef"
     v-model:loading="loading"
     :api="api"

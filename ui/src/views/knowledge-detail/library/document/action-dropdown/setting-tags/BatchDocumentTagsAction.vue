@@ -19,7 +19,7 @@ const addTagRef = useTemplateRef<InstanceType<typeof AddTagDialog>>('addTagRef')
 const targetKnowledgeId = ref('')
 
 function handleOpenDialog() {
-  if (props.disabled || loading.value || dialogMounted.value || !props.documentIds.length) return
+  if (props.disabled || loading.value || dialogMounted.value) return
   targetKnowledgeId.value = props.knowledgeId
   const documentIds = [...props.documentIds]
   dialogMounted.value = true

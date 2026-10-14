@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import { useKnowledgeNavigationContext } from '@/views/knowledge-detail/context'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, watch, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { CascaderOption, TableColumnCtx } from 'element-plus'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import MkEditName from '@/components/mk-edit-name/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import DocumentApi from '@/api/admin/workspace/knowledge/document'
-import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
-import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import TagsApi from '@/api/admin/workspace/knowledge/tags'
-import SharedTagsApi from '@/api/admin/workspace/shared/knowledge/tags'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import { DOCUMENT_TASK_TYPE } from '@/api/enums'
@@ -19,14 +14,13 @@ import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
 import { DOCUMENT_STATUS_FILTER_OPTIONS } from './status'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
 import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
 import ButtonExecutionRecord from './components/ButtonExecutionRecord.vue'
-import { useKnowledgeDetailContext } from '../../context'
+import { useKnowledgeLibraryContext } from '../../context'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
 import {
@@ -61,7 +55,7 @@ const route = useRoute()
 const router = useRouter()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const knowledgeType = computed(() => String(route.params.type ?? ''))
-const { knowledge } = useKnowledgeDetailContext()
+const { knowledge, resourceApi, resourceScope, requestSettingApi } = useKnowledgeLibraryContext()
 
 /* 文档分段入口：选择列与行内操作继续处理自身交互。 */
 function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<DocumentItem> | null) {
@@ -74,12 +68,15 @@ function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<Doc
 }
 
 /* 快速创建 */
-const showQuickCreate = computed(() => knowledgeType.value === KNOWLEDGE_TYPE_KEY.BASE && !isWorkspaceSharedResource())
+const showQuickCreate = computed(() => knowledgeType.value === KNOWLEDGE_TYPE_KEY.BASE && !!requestSettingApi.value?.document)
 const quickCreateRef = ref<InstanceType<typeof MkQuickCreate>>()
 
 function handleCreateDocument(name: string) {
+  const requestApi = requestSettingApi.value?.document
+  if (!requestApi) return
   loading.value = true
-  return DocumentApi.putBatchCreateDocuments(knowledgeId.value, [{ name }])
+  return requestApi
+    .putBatchCreateDocuments(knowledgeId.value, [{ name }])
     .then(() => {
       // 创建成功即清理草稿，后续刷新失败不恢复为可重复提交的输入。
       quickCreateRef.value?.close()
@@ -104,7 +101,9 @@ function validateDocumentName(name: string): string | undefined {
 }
 
 function saveDocumentName(documentId: string, name: string): Promise<string> {
-  return DocumentApi.putDocument(knowledgeId.value, documentId, { name }).then((document) => {
+  const requestApi = requestSettingApi.value?.document
+  if (!requestApi) return Promise.resolve(documentData.value.find(({ id }) => id === documentId)?.name ?? '')
+  return requestApi.putDocument(knowledgeId.value, documentId, { name }).then((document) => {
     // 轮询可能已替换行对象，按 ID 更新当前列表中的名称与更新时间。
     const currentDocument = documentData.value.find(({ id }) => id === documentId)
     if (currentDocument) {
@@ -127,7 +126,7 @@ const searchFields = computed(() => [
 ])
 
 function loadCreatorOptions(keyword: string) {
-  const requestCommonApi = isWorkspaceSharedResource() ? CommonSystemApi : CommonApi
+  const requestCommonApi = resourceScope.value === 'workspace' ? CommonApi : CommonSystemApi
   return requestCommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
     creatorOptions.value = users.map(({ id, nick_name }) => ({ label: nick_name, value: id }))
   })
@@ -155,9 +154,9 @@ const documentTagOptions = ref<CascaderOption[]>([])
 const documentTagLoading = ref(false)
 
 function loadDocumentTagOptions() {
-  if (documentTagLoading.value) return
+  const requestApi = resourceApi.tags
+  if (!requestApi || documentTagLoading.value) return
   documentTagLoading.value = true
-  const requestApi = isWorkspaceSharedResource() ? SharedTagsApi : TagsApi
   return requestApi
     .getKnowledgeTags(knowledgeId.value)
     .then((groups) => {
@@ -192,7 +191,7 @@ function stopPolling() {
 
 function schedulePolling() {
   stopPolling()
-  if (!pollingActive) return
+  if (!pollingActive || !resourceApi.document) return
   pollingTimer = setTimeout(() => {
     if (loading.value || operationLoading.value) {
       schedulePolling()
@@ -206,8 +205,9 @@ function schedulePolling() {
 
 function loadDocuments(showLoading = true): Promise<void> {
   stopPolling()
+  const requestApi = resourceApi.document
+  if (!requestApi) return Promise.resolve()
   if (showLoading) loading.value = true
-  const requestApi = isWorkspaceSharedResource() ? SharedDocumentApi : DocumentApi
   return requestApi
     .getDocumentPage(knowledgeId.value, paginationConfig.value, {
       ...documentQuery.value,
@@ -271,9 +271,11 @@ const operationLoading = ref(false)
 
 // 文档启停由服务端结果与列表刷新回显，避免开关提前修改状态。
 function handleChangeActive(document: DocumentItem) {
-  if (operationLoading.value) return false
+  const requestApi = requestSettingApi.value?.document
+  if (!requestApi || operationLoading.value) return false
   operationLoading.value = true
-  return DocumentApi.putDocument(knowledgeId.value, document.id, { is_active: !document.is_active })
+  return requestApi
+    .putDocument(knowledgeId.value, document.id, { is_active: !document.is_active })
     .then(() => {
       MsgSuccess('操作成功')
       return refreshAfterOperation().then(() => false)
@@ -292,10 +294,25 @@ function refreshAfterOperation() {
   return loadDocuments()
 }
 
-onMounted(() => {
-  pollingActive = true
-  loadDocuments()
-})
+watch(
+  [() => route.params.workspaceId, knowledgeId, resourceScope],
+  () => {
+    stopPolling()
+    pollingActive = true
+    clearDocumentSelection()
+    documentData.value = []
+    creatorOptions.value = []
+    documentTagOptions.value = []
+    documentQuery.value = {}
+    selectedDocumentStatus.value = null
+    selectedDocumentActive.value = null
+    selectedDocumentHitHandling.value = null
+    selectedDocumentTags.value = []
+    paginationConfig.value = { currentPage: 1, pageSize: 20, total: 0 }
+    void loadDocuments().catch(() => {})
+  },
+  { immediate: true },
+)
 
 onBeforeUnmount(() => {
   pollingActive = false
@@ -310,12 +327,16 @@ onBeforeUnmount(() => {
       <div class="flex-align-center gap-3">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
         <!-- 查看工作流执行记录 -->
-        <ButtonExecutionRecord v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW" :api="WorkflowApi" :knowledge-id="knowledgeId" />
+        <ButtonExecutionRecord
+          v-if="requestSettingApi && knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW"
+          :api="requestSettingApi.workflow"
+          :knowledge-id="knowledgeId"
+        />
 
         <!-- 导入 Web、飞书或工作流文档 -->
         <ButtonImportDocument
-          v-if="!showQuickCreate && !isWorkspaceSharedResource()"
-          :api="DocumentApi"
+          v-if="!showQuickCreate && requestSettingApi"
+          :api="requestSettingApi.document"
           :knowledge-id="knowledgeId"
           :knowledge-type="knowledgeType"
           :folder-token="String(knowledge?.meta?.folder_token ?? '')"
@@ -324,8 +345,8 @@ onBeforeUnmount(() => {
         />
         <!-- 上传文档 -->
         <ButtonUploadDocument
-          v-if="showQuickCreate"
-          :api="DocumentApi"
+          v-if="showQuickCreate && requestSettingApi"
+          :api="requestSettingApi.document"
           :knowledge-id="knowledgeId"
           :file-count-limit="knowledge?.file_count_limit"
           :file-size-limit="knowledge?.file_size_limit"
@@ -334,7 +355,9 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </Teleport>
+  <MkEmpty v-if="!resourceApi.document" description="暂不支持查看此知识库的文档" />
   <MkTable
+    v-else
     ref="documentTableRef"
     v-loading="loading || operationLoading"
     :data="documentData"
@@ -352,7 +375,7 @@ onBeforeUnmount(() => {
       <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
     </template>
 
-    <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" reserve-selection />
+    <el-table-column v-if="requestSettingApi" type="selection" width="40" reserve-selection />
 
     <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip>
       <template #default="{ row }: { row: DocumentItem }">
@@ -360,7 +383,7 @@ onBeforeUnmount(() => {
         <MkEditName
           :key="row.id"
           v-model="row.name"
-          :disabled="isWorkspaceSharedResource()"
+          :disabled="!requestSettingApi"
           :maxlength="128"
           :validate="validateDocumentName"
           :save="(name) => saveDocumentName(row.id, name)"
@@ -423,10 +446,10 @@ onBeforeUnmount(() => {
       </template>
       <template #default="{ row }: { row: DocumentItem }">
         <DocumentTags
-          :api="DocumentApi"
+          :api="requestSettingApi?.document"
           :knowledge-id="knowledgeId"
           :document="row"
-          :disabled="isWorkspaceSharedResource()"
+          :disabled="!requestSettingApi"
           v-model:loading="operationLoading"
           @refresh="refreshAfterOperation"
         />
@@ -462,7 +485,7 @@ onBeforeUnmount(() => {
     <el-table-column label="创建时间" width="180">
       <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
-    <el-table-column v-if="!isWorkspaceSharedResource()" label="操作" width="160" fixed="right">
+    <el-table-column v-if="requestSettingApi" label="操作" width="160" fixed="right">
       <template #default="{ row }: { row: DocumentItem }">
         <div class="flex-align-center" @click.stop>
           <!-- 启用或禁用文档 -->
@@ -473,7 +496,7 @@ onBeforeUnmount(() => {
           <div class="flex">
             <!-- 向量化或取消向量化 -->
             <EmbeddingDocumentAction
-              :api="DocumentApi"
+              :api="requestSettingApi.document"
               :knowledge-id="knowledgeId"
               :document="row"
               v-model:loading="operationLoading"
@@ -481,7 +504,7 @@ onBeforeUnmount(() => {
             />
             <!-- 分词索引或取消分词索引 -->
             <TokenizeDocumentAction
-              :api="DocumentApi"
+              :api="requestSettingApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
               :document="row"
@@ -491,7 +514,7 @@ onBeforeUnmount(() => {
             <MkTableMoreDropdown>
               <!-- 生成或取消生成问题 -->
               <GenerateQuestionsAction
-                :api="DocumentApi"
+                :api="requestSettingApi.document"
                 v-model:loading="operationLoading"
                 :knowledge-id="knowledgeId"
                 :document="row"
@@ -501,7 +524,7 @@ onBeforeUnmount(() => {
               <DocumentTagsAction
                 label="标签设置"
                 icon="icon_tag"
-                :api="DocumentApi"
+                :api="requestSettingApi.document"
                 :knowledge-id="knowledgeId"
                 :document="row"
                 v-model:loading="operationLoading"
@@ -515,7 +538,7 @@ onBeforeUnmount(() => {
                   (knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW && row.meta?.source_type === 'web')
                 "
                 label="同步"
-                :api="DocumentApi"
+                :api="requestSettingApi.document"
                 :knowledge-id="knowledgeId"
                 :document="row"
                 v-model:loading="operationLoading"
@@ -526,7 +549,7 @@ onBeforeUnmount(() => {
               <SettingDocumentAction
                 label="设置"
                 icon="icon_setting"
-                :api="DocumentApi"
+                :api="requestSettingApi.document"
                 :knowledge-id="knowledgeId"
                 :document="row"
                 v-model:loading="operationLoading"
@@ -537,21 +560,26 @@ onBeforeUnmount(() => {
               <MigrateDocumentAction
                 label="迁移"
                 icon="icon_move2_outlined"
-                :api="DocumentApi"
+                :api="requestSettingApi.document"
                 :knowledge-id="knowledgeId"
                 :document-ids="[row.id]"
                 :disabled="operationLoading"
                 @refresh="refreshAfterOperation"
               />
               <!-- 导出文档 -->
-              <ExportDocumentAction label="导出" :api="DocumentApi" v-model:loading="operationLoading" :document="row" />
+              <ExportDocumentAction label="导出" :api="requestSettingApi.document" v-model:loading="operationLoading" :document="row" />
 
               <template v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.BASE || knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW">
                 <!-- 下载原文档 -->
-                <DownloadDocumentAction :api="DocumentApi" :knowledge-id="knowledgeId" v-model:loading="operationLoading" :document="row" />
+                <DownloadDocumentAction
+                  :api="requestSettingApi.document"
+                  :knowledge-id="knowledgeId"
+                  v-model:loading="operationLoading"
+                  :document="row"
+                />
                 <!-- 替换原文档 -->
                 <ReplaceDocumentAction
-                  :api="DocumentApi"
+                  :api="requestSettingApi.document"
                   :knowledge-id="knowledgeId"
                   v-model:loading="operationLoading"
                   :document="row"
@@ -562,7 +590,7 @@ onBeforeUnmount(() => {
               <DeleteDocumentAction
                 divided
                 icon="icon_delete-trash_outlined"
-                :api="DocumentApi"
+                :api="requestSettingApi.document"
                 :knowledge-id="knowledgeId"
                 v-model:loading="operationLoading"
                 :document="row"
@@ -573,10 +601,10 @@ onBeforeUnmount(() => {
         </div>
       </template>
     </el-table-column>
-    <template v-if="!isWorkspaceSharedResource()" #footer-batch-actions>
+    <template v-if="requestSettingApi" #footer-batch-actions>
       <!-- 批量向量化 -->
       <BatchEmbeddingAction
-        :api="DocumentApi"
+        :api="requestSettingApi.document"
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
         v-model:loading="operationLoading"
@@ -584,7 +612,7 @@ onBeforeUnmount(() => {
       />
       <!-- 批量分词索引 -->
       <BatchTokenizeAction
-        :api="DocumentApi"
+        :api="requestSettingApi.document"
         :knowledge-id="knowledgeId"
         v-model:loading="operationLoading"
         :document-ids="selectedDocumentIds"
@@ -592,7 +620,7 @@ onBeforeUnmount(() => {
       />
       <!-- 批量生成问题 -->
       <BatchGenerateQuestionsAction
-        :api="DocumentApi"
+        :api="requestSettingApi.document"
         v-model:loading="operationLoading"
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
@@ -602,7 +630,7 @@ onBeforeUnmount(() => {
       <!-- 批量文档设置 -->
       <BatchSettingDocumentAction
         label="设置"
-        :api="DocumentApi"
+        :api="requestSettingApi.document"
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
         v-model:loading="operationLoading"
@@ -611,7 +639,7 @@ onBeforeUnmount(() => {
       <!-- 为选中文档批量添加标签 -->
       <BatchDocumentTagsAction
         label="标签设置"
-        :api="DocumentApi"
+        :api="requestSettingApi.document"
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
         v-model:loading="operationLoading"
@@ -630,7 +658,7 @@ onBeforeUnmount(() => {
             <BatchSyncDocumentAction
               v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK"
               label="同步"
-              :api="DocumentApi"
+              :api="requestSettingApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
@@ -639,7 +667,7 @@ onBeforeUnmount(() => {
             <!-- 批量迁移文档 -->
             <MigrateDocumentAction
               label="迁移至"
-              :api="DocumentApi"
+              :api="requestSettingApi.document"
               :knowledge-id="knowledgeId"
               :document-ids="selectedDocumentIds"
               :disabled="operationLoading"
@@ -647,10 +675,15 @@ onBeforeUnmount(() => {
             />
 
             <!-- 批量导出文档 -->
-            <BatchExportDocumentAction label="导出" :api="DocumentApi" v-model:loading="operationLoading" :document-ids="selectedDocumentIds" />
+            <BatchExportDocumentAction
+              label="导出"
+              :api="requestSettingApi.document"
+              v-model:loading="operationLoading"
+              :document-ids="selectedDocumentIds"
+            />
             <!-- 批量取消向量化 -->
             <BatchCancelTaskAction
-              :api="DocumentApi"
+              :api="requestSettingApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
@@ -661,7 +694,7 @@ onBeforeUnmount(() => {
             />
             <!-- 批量取消生成问题 -->
             <BatchCancelTaskAction
-              :api="DocumentApi"
+              :api="requestSettingApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
@@ -671,7 +704,7 @@ onBeforeUnmount(() => {
             />
             <!-- 批量删除文档 -->
             <DeleteDocumentAction
-              :api="DocumentApi"
+              :api="requestSettingApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"

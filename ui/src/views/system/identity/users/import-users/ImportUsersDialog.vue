@@ -261,13 +261,10 @@ defineExpose({ open })
         </el-select>
       </el-form-item>
 
-      <el-form-item v-if="isLocalFileSource" prop="files" :required="false">
+      <el-form-item v-if="isLocalFileSource" prop="files" class="mk-hide-asterisk">
         <template #label>
           <div class="flex-between w-full">
-            <span>
-              上传文件
-              <span class="ml-1 text-danger">*</span>
-            </span>
+            <span class="mk-required">上传文件</span>
             <el-button link type="primary" @click="handleDownloadTemplate">下载模板</el-button>
           </div>
         </template>

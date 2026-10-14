@@ -155,17 +155,28 @@ defineExpose({ validate })
 </script>
 
 <template>
-  <el-form class="space-y-2!" ref="formRef" :model="parameters" :disabled="disabled" label-position="top" hide-required-asterisk @submit.prevent>
+  <el-form
+    class="space-y-2!"
+    ref="formRef"
+    :model="parameters"
+    :disabled="disabled"
+    label-position="top"
+    require-asterisk-position="right"
+    @submit.prevent
+  >
     <el-form-item
       v-for="field in fields"
       :key="JSON.stringify(field.path)"
       :prop="[...field.path, 'value']"
       :label="field.label"
       :rules="getParameterRules(field)"
+      class="mk-hide-asterisk"
     >
       <template #label>
         <div class="flex-between w-full">
-          <span>{{ field.label }}<span v-if="field.required" class="ml-1 text-danger">*</span></span>
+          <span :class="field.required ? 'mk-required' : ''">
+            {{ field.label }}
+          </span>
           <el-select
             v-if="showSource"
             v-model="getTaskParameter(parameters, field).source"

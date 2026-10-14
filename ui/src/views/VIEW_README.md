@@ -489,7 +489,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `knowledge-detail/index.vue`                    | 知识库详情页面                                                       |
 | `knowledge-detail/library/tags/index.vue`       | 标签分组查询、创建、重命名、单值编辑、删除与关联文档管理             |
 | `knowledge-detail/workflow-transform/index.vue` | 非工作流知识库转换说明、确认与进入画布                               |
-| `document-detail/index.vue`          | 普通 Workspace 文档分段查询、目录定位、批量操作、新增、编辑与详情    |
+| `document-detail/index.vue`                     | 普通 Workspace 文档分段查询、目录定位、批量操作、新增、编辑与详情    |
 
 |
 | `knowledge-detail/setting/base/index.vue` | 知识库基本信息、来源配置与上传限制设置 |
@@ -739,7 +739,7 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 `knowledge-detail/` 下的 `recall-test/`、`question/`、`dictionary/`、`chat-user/`、`external-retrieval/`。
 图片及这五个页面暂只展示占位内容。
 容器通过 `knowledge-detail/context.ts` 装配资源范围、知识库 ID、设置所需的完整业务 API 对象和返回列表路由，
-并提供只读详情与替换能力。详情入口与 setting 的 API 选择集中在该上下文；library 保持原有接口调用方式。
+并提供只读详情与替换能力。详情入口、setting 与 library 的 API 选择集中在该上下文。
 Action、Drawer、Dialog 继续通过 props 接收完整 API。设置页复用已加载详情，保存成功后
 更新容器数据，同步名称等展示。基本信息复用创建流程的 `KnowledgeBaseForm`，类型配置和校验留在
 `setting/base/index.vue` 中，通用知识库标题为“设置”，其他类型为“基础设置”。
@@ -840,16 +840,19 @@ Action 仍通过上层 `action-dropdown/index.ts` 导出，弹窗仅在目录内
 候选项使用 `tagsApi.getKnowledgeTags`，按返回顺序截取前 100 个标签组，然后由 `el-select filterable` 本地搜索；
 右侧显示所选组的全部标签值，切换标签名清空本行标签值，不增加远程搜索或自动扩展候选范围。
 单篇与批量均允许选择已关联标签值和重复选择，不为禁选查询文档已有标签，也不区分 `batch` 模式。
-表单复用 `MkFormList`，至少一行，保留必填与标签值归属校验；通过 `postAddDocumentTags` 提交所选 ID，由后台去重并追加关联。
-下拉 footer 复用模型选择器的创建入口，先收起下拉，再打开输入式 `tags/components/CreateTagDialog.vue`；
+表单复用 `MkFormList`，至少一行，字段只做必填校验；提交前检查标签值归属，失效时用 `MsgError` 提示“请重新选择标签值”并保留选择。
+通过 `postAddDocumentTags` 提交所选 ID，由后台去重并追加关联。
+下拉 footer 复用模型选择器的创建入口，直接打开输入式 `tags/components/CreateTagDialog.vue`；
 标签名入口调用 `open()`；标签值下拉始终可展开，未选标签时点击“创建标签值”也调用 `open()` 创建标签，
 已选标签时调用 `open(key)` 新增标签值，不合并两类弹窗的模式。
 弹窗每次打开都查询候选；内部创建成功后重载前 100 组候选，保留当前选择，不自动选中新数据。
+候选查询的 `queryLoading` 仅用于两个 `el-select` 的加载状态及下拉内创建入口禁用；表单遮罩、提交与取消只使用提交 `loading`。
 `BatchDocumentTagsAction.vue` 使用普通按钮外放在底部批量操作栏，内部按需挂载 `AddTagDialog`，打开时固定知识库和文档 ID，
-即使只勾选一篇，也按批量添加处理。添加成功关闭动画结束后通知刷新，再卸载弹窗。
+即使只勾选一篇，也按批量添加处理。添加成功后关闭并立即通知刷新；取消关闭时只通知卸载，不刷新。
 三个外层标签入口只通过 `refresh` 通知页面刷新，沿用文档列表原有轮询，不为标签浮层单独暂停。
-页面不持有标签浮层 Ref 或控制其挂载。标签入口与打开方法只限制 Workspace 共享只读范围，
-Workspace 普通资源、System 资源管理和 System 共享资源允许打开；System library 的文档与标签 API 仍待按范围接入，不能将入口可用视为接口已支持。
+页面不持有标签浮层 Ref 或控制其挂载。标签维护入口通过上下文的完整写接口控制，
+目前仅 Workspace 普通资源提供维护 API；Workspace 共享只读，System library 的文档与标签 API 尚未提供，
+不显示维护入口，也不回退 Workspace 请求。
 分词索引集中在 `document/action-dropdown/tokenize/`：`TokenizeDocumentAction` 接收单个 `document`，
 按运行状态调用单项分词或取消接口；`BatchTokenizeAction` 接收 `documentIds`，仅调用批量分词接口。
 两个 Action 均处理全部分段状态，通过 `v-model:loading` 共用页面操作状态，成功后通知页面刷新。
@@ -989,7 +992,8 @@ Workspace 普通与共享资源均使用 Workspace 模型选项接口，System �
 System 共享使用系统共享模型接口。
 四种范围的定时同步查询和日志均使用各自现有 Sync API；Workspace 普通和 System 两种范围支持保存，
 Workspace 共享只读，不发送保存请求，不回退 Workspace 接口。
-library 的接口调整已撤回，文档和标签沿用原有调用方式，System library API 适配尚未实施。
+library 通过 `useKnowledgeLibraryContext` 装配现有文档、标签 API；System 两种范围未提供对应模块，
+保持未接入状态，不回退 Workspace。Workspace 共享仅查询，普通 Workspace 提供已有维护接口。
 路由结构及来源配置见 `src/router/ROUTE_README.md`。
 
 ### 资料库标签管理
@@ -1009,7 +1013,8 @@ library 的接口调整已撤回，文档和标签沿用原有调用方式，Sys
 接收知识库 ID 与完整 Tags API，参考添加成员流程复用 `MkDialog`、`el-form` 和 `MkFormList`。
 创建允许多行标签名与值；新增值通过 `open(key)` 回填并锁定标签名，新增行沿用该名称。
 顶部创建标题为“创建标签”，传入标签名时标题为“添加标签值”。
-两个入口统一通过 `postKnowledgeTags` 提交标签数组，校验表单内重复组合。
+两个入口统一通过 `postKnowledgeTags` 提交标签数组，提交前检查表单内重复组合，沿用模型参数的 `MsgError` 消息提示并保留输入；
+与知识库已有标签重复的组合由后端跳过，接口错误由请求层统一提示。
 同目录 `EditTagDialog.vue` 共用标签重命名和单值编辑，通过 `open(tag, field)` 回填独立草稿。
 重命名只显示标签名；编辑值只显示一行并锁定标签名。两个入口均提交完整 `id`、`key`、`value`，
 请求路径 ID 与载荷 ID 一致，仅修改当前编辑字段，未编辑字段原样保留。
@@ -1035,7 +1040,7 @@ library 的接口调整已撤回，文档和标签沿用原有调用方式，Sys
 文档图标和时间格式沿用文档列表，状态使用 `MkStatusLabel`；批量操作放在顶部，不再显示页面批量底栏。
 搜索、分页和页签切换清空选择，关联变更后重新查询并通知标签页刷新数量，末页为空时回退。
 抽屉在 `closed` 重置标签、筛选、分页和选择，不新增权限判断或共享范围接口。
-文档页标签候选查询继续使用 Knowledge API，共享标签查询保持原接口；普通文档标签入口使用上述独立添加弹窗与抽屉。
+文档页标签候选查询通过资料库上下文选择当前范围 Tags API，共享标签查询保持原接口；普通文档标签入口使用上述独立添加弹窗与抽屉。
 
 `KnowledgeWorkflowView` 复用 `ButtonDefaultModelSetting`，从知识库详情读取默认模型配置，
 随工作流保存提交并将配置传入画布；支持应用到所有节点，保存失败回滚至已保存配置。
@@ -1355,8 +1360,7 @@ Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `bod
 
 知识库列表根据当前目录进入普通或 `workspace-shared-knowledge-detail` 共享详情路由。
 两者复用 `knowledge-detail/index.vue` 和文档页；详情容器通过上下文选择对应详情 API，
-文档页继续自行通过 `isWorkspaceSharedResource()` 选择 `workspace/knowledge/` 或
-`workspace/shared/knowledge/` 的完整 API 对象。
+文档页与标签页通过 `useKnowledgeLibraryContext` 选择普通或共享的现有完整 API 对象。
 共享详情已补齐与其他三种范围一致的菜单，设置与工作流接口接入暂缓。
 容器监听工作空间、知识库和资源范围变化重新加载；共享详情返回列表携带 `folderId: 'shared'`，
 普通详情继续恢复所属文件夹。文档创建者选项在共享范围使用 System `CommonApi`，普通范围使用
@@ -1470,10 +1474,28 @@ chat 装配函数通过 `disabled` 禁用输入框与附件。
 返回列表路由独立提供；不要在 setup 时解构 `resourceApi` 内的具体 API，以免固定为旧范围的对象。
 不根据 URL 猜测来源，不为补齐方法集合构造请求，不让缺失模块回退 Workspace。
 目前仅详情入口及 setting 下的基础设置、文档策略、定时同步页面采用上下文 API；
-library 下的文档、标签与迁移组件保留原有调用方式，不装配到上下文。
+library 下的文档、标签与迁移入口通过 `useKnowledgeLibraryContext` 读取现有 API，
+`resourceApi.document / tags` 是可选的查询模块；System 两种来源未提供时不发送请求。
+与 sync 一致，维护接口只通过 `requestSettingApi` 提供，内部使用完整的 `document / tags / workflow / knowledge` API；
+仅 Workspace 普通范围提供该维护入口，分别传给已有操作组件；不为共享或 System 补造写接口。共享标签页按现有无查询参数接口读取，
+在本地按标签名称筛选，不展示维护入口；关联文档数量仅作文本展示。
 同步日志通过完整 Sync API props 请求。展示组件不接收上下文 API。
 System 飞书专用保存方法尚未提供，基础设置沿该范围现有 `putKnowledge` 协议；Workspace 飞书保留专用方法。
 
 四套知识库详情菜单及来源导航已统一，`useKnowledgeNavigationContext` 仅维护路由名称与参数，
-不配置 API。各范围接口存在差异，API 模块保持原实现；本轮仅补齐 sync 的范围装配与消费，
+不配置 API。各范围接口存在差异，API 模块保持原实现；目前已补齐 sync 与 library 的现有接口装配与消费，
 其他模块后续按每套真实接口分别接入，不将菜单完整度视为接口接入完成。
+
+### 资料库上下文与只读范围
+
+`useKnowledgeLibraryContext` 复用详情数据、知识库 ID 和响应式资源范围，文档及标签查询通过
+`resourceApi.document / tags` 访问当前范围完整 API。缺失模块保持 undefined，页面展示未接入空态，
+不轮询或发送 Workspace 请求。文档页切换知识库、工作空间或范围时清空筛选、分页和选择；标签页同时重置标签组。
+Workspace 共享文档保留查询和标签展示，标签页保留标签组查询；只支持共享接口现有的方法。
+创建标签弹窗必须由入口传入完整 Tags API，不再默认使用普通 Workspace；文档标签添加及迁移的
+候选查询同样通过资料库上下文选择。图片页保持占位，不配置不存在的接口。
+
+资料库所有消费方沿用 Sync 的双入口结构，包括文档页、标签页、文档标签添加弹窗、标签创建入口、
+文档迁移弹窗以及传入 Action / Drawer 的 API：查询模块通过响应式 `resourceApi` getter 读取，
+维护模块通过单个 `requestSettingApi` 读取，不再为各模块暴露独立 computed 入口。
+方法内部选定完整业务 API 时继续使用局部变量 `requestApi`，它不属于新的上下文入口。

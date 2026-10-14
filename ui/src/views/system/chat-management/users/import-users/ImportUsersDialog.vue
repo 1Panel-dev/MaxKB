@@ -149,7 +149,7 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="导入用户" @closed="resetData">
-    <template #subtitle> 从已配置的用户来源同步对话用户，已存在的用户名或姓名不会重复导入。 </template>
+    <template #subtitle>从已配置的用户来源同步对话用户，已存在的用户名或姓名不会重复导入。</template>
 
     <el-form
       ref="importUsersFormRef"
@@ -170,10 +170,10 @@ defineExpose({ open })
         </el-select>
       </el-form-item>
 
-      <el-form-item v-if="isLocalFileSource" prop="files" :required="false">
+      <el-form-item v-if="isLocalFileSource" prop="files" class="mk-hide-asterisk">
         <template #label>
           <div class="flex-between w-full">
-            <span>上传文件<span class="ml-1 text-danger">*</span></span>
+            <span class="mk-required">上传文件</span>
             <el-button link type="primary" @click="handleDownloadTemplate">下载模板</el-button>
           </div>
         </template>
