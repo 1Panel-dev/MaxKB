@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import type { Dict, OptionItem, WorkspaceItem, SystemUserGroup, SystemUserGroupMember, LoginMethod } from '@/api/types'
@@ -101,7 +101,7 @@ function loadUserGroupMembers(reset = false) {
 
   const { currentPage, pageSize } = paginationConfig.value
   loadingMembers.value = true
-  UserGroupsApi.getSystemUserGroupMembers(selectedWorkspaceId.value, currentGroup.value.id, { currentPage, pageSize }, memberSearchQuery.value)
+  UserGroupsApi.getSystemUserGroupMembers(selectedWorkspaceId.value, currentGroup.value.id, { currentPage, pageSize }, memberListQuery.value)
     .then(({ total, records }) => {
       userGroupMembers.value = records
       paginationConfig.value.total = total
@@ -118,17 +118,27 @@ const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
-  {
-    label: '用户来源',
-    value: 'source',
-    options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({ label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label, value })),
-  },
 ]
 const userGroupMembers = ref<SystemUserGroupMember[]>([])
 function handleMemberSearch(query?: Dict<unknown>) {
   memberSearchQuery.value = query
   paginationConfig.value.currentPage = 1
   loadUserGroupMembers()
+}
+
+/* 表头用户来源筛选 */
+const selectedMemberSource = ref<string | null>(null)
+const memberSourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
+  label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label,
+  value,
+}))
+const memberListQuery = computed<Dict<unknown>>(() => ({
+  ...memberSearchQuery.value,
+  ...(selectedMemberSource.value !== null ? { source: selectedMemberSource.value } : {}),
+}))
+
+function handleMemberFilterChange() {
+  loadUserGroupMembers(true)
 }
 
 const selectedGroupMembers = ref<SystemUserGroupMember[]>([])
@@ -254,6 +264,15 @@ onMounted(() => {
             </template>
           </el-table-column>
           <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip>
+            <template #header>
+              <MkTableFilter
+                mode="single"
+                v-model="selectedMemberSource"
+                label="用户来源"
+                :options="memberSourceOptions"
+                @change="handleMemberFilterChange"
+              />
+            </template>
             <template #default="{ row }">
               {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
             </template>

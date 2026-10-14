@@ -1,6 +1,6 @@
 /** 对话用户 API 与管理页面共用的业务类型。 */
 
-import { PERIOD_TYPE, QUOTA_TYPE } from '@/api/enums'
+import { PERIOD_TYPE, QUOTA_TYPE, RESOURCE_TYPE } from '@/api/enums'
 
 export interface ChatUserBase {
   id: string
@@ -104,7 +104,7 @@ export interface BatchSetChatUserQuotaResult {
 /** 对话用户授权所属的资源。 */
 export interface ChatUserAuthorizationResource {
   resource_id: string
-  resource_type: string
+  resource_type: (typeof RESOURCE_TYPE)['APPLICATION' | 'KNOWLEDGE']
 }
 
 /** 资源内的对话用户组自动授权状态。 */

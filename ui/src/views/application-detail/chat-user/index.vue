@@ -3,19 +3,23 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { CheckboxValueType } from 'element-plus'
 import ChatUserApi from '@/api/admin/workspace/chat-user'
-import { LOGIN_METHOD } from '@/api/enums'
-import type { ChatUserAuthorization, ChatUserAuthorizationGroup, Dict, LoginMethod, OptionItem } from '@/api/types'
+import { LOGIN_METHOD, RESOURCE_TYPE } from '@/api/enums'
+import type { ChatUserAuthorization, ChatUserAuthorizationGroup, ChatUserAuthorizationResource, Dict, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
 
-defineOptions({ name: 'ChatUserListView' })
+defineOptions({ name: 'ApplicationChatUserListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ hideHeader: true })
 
 const route = useRoute()
-const resource = computed(() => ({ resource_id: String(route.params.applicationId ?? ''), resource_type: 'application' }))
+const resource = computed<ChatUserAuthorizationResource>(() => ({
+  resource_id: String(route.params.applicationId ?? ''),
+  resource_type: RESOURCE_TYPE.APPLICATION,
+}))
+
 const loading = ref(false)
 
 // 用户组查询与切换
@@ -39,6 +43,7 @@ function handleSelectGroup(group: ChatUserAuthorizationGroup) {
   if (loading.value || currentGroup.value?.id === group.id) return
   currentGroup.value = group
   chatUsers.value = []
+  savedAuthorization.value = {}
   paginationConfig.value.currentPage = 1
   paginationConfig.value.total = 0
   return refreshChatUsers()
@@ -46,11 +51,12 @@ function handleSelectGroup(group: ChatUserAuthorizationGroup) {
 
 // 用户筛选与分页，仅维护当前页的授权勾选
 const chatUsers = ref<ChatUserAuthorization[]>([])
+const savedAuthorization = ref<Record<string, boolean>>({})
 const chatUserSearchQuery = ref<Dict<unknown>>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchFields: OptionItem<string>[] = [
-  { label: '姓名', value: 'nick_name' },
   { label: '用户名', value: 'username' },
+  { label: '姓名', value: 'nick_name' },
 ]
 
 // 表头用户来源筛选
@@ -74,6 +80,7 @@ function loadChatUsers() {
   if (!currentGroup.value) return Promise.resolve()
   return ChatUserApi.getUserGroupUserList(resource.value, currentGroup.value.id, paginationConfig.value, chatUserQuery.value).then((page) => {
     chatUsers.value = page.records
+    savedAuthorization.value = Object.fromEntries(page.records.map(({ id, is_auth }) => [id, is_auth]))
     paginationConfig.value.total = page.total
   })
 }
@@ -100,8 +107,12 @@ function handleSourceChange() {
 const allChecked = computed(() => chatUsers.value.length > 0 && chatUsers.value.every((chatUser) => chatUser.is_auth))
 const allIndeterminate = computed(() => !allChecked.value && chatUsers.value.some((chatUser) => chatUser.is_auth))
 const authorizationDisabled = computed(() => loading.value || !currentGroup.value || currentGroup.value.is_auth)
+const saveDisabled = computed(
+  () => authorizationDisabled.value || !chatUsers.value.some(({ id, is_auth }) => savedAuthorization.value[id] !== is_auth),
+)
 
 function handleRowChange(value: CheckboxValueType, chatUser: ChatUserAuthorization) {
+  if (authorizationDisabled.value) return
   chatUser.is_auth = value === true
 }
 
@@ -111,13 +122,15 @@ function handleCheckAll(value: CheckboxValueType) {
 
 function handleSave() {
   const group = currentGroup.value
-  if (!group || authorizationDisabled.value) return
-  const userGroupId = group.id
+  if (!group || saveDisabled.value) return
   const payload = chatUsers.value.map(({ id, is_auth }) => ({ chat_user_id: id, is_auth }))
   loading.value = true
-  return ChatUserApi.putUserGroupUser(resource.value, userGroupId, payload)
+  return ChatUserApi.putUserGroupUser(resource.value, group.id, payload)
     .then(() => {
+      // 先记住已保存结果，列表刷新失败时不重复提示未保存。
+      savedAuthorization.value = Object.fromEntries(payload.map(({ chat_user_id, is_auth }) => [chat_user_id, is_auth]))
       MsgSuccess('保存成功')
+      return loadChatUsers()
     })
     .finally(() => {
       loading.value = false
@@ -134,9 +147,9 @@ function handleAutoAuthorizationChange(value: string | number | boolean) {
     .then(() => {
       group.is_auth = isAuth
       chatUsers.value = []
-      return loadChatUsers().then(() => {
-        MsgSuccess('保存成功')
-      })
+      savedAuthorization.value = {}
+      MsgSuccess('保存成功')
+      return loadChatUsers()
     })
     .finally(() => {
       loading.value = false
@@ -147,38 +160,46 @@ onMounted(() => loadChatUserGroups())
 </script>
 
 <template>
-  <div v-loading="loading" class="-mx-6 -mb-6 flex min-h-0 flex-1">
+  <div v-loading="loading" :inert="loading" class="-mx-6 -mb-6 flex min-h-0 flex-1">
     <aside class="flex-column h-layout-content w-sidebar-expanded shrink-0 border-r">
       <div class="shrink-0 p-4">
-        <h4>用户组</h4>
+        <h4>按用户组</h4>
       </div>
       <!-- 搜索并切换用户组 -->
-      <MkSearchList :data="chatUserGroups" :default-active="currentGroup?.id" @click="handleSelectGroup" />
+      <MkSearchList :data="chatUserGroups" :default-active="currentGroup?.id" @click="handleSelectGroup">
+        <template #default="{ row }">
+          <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
+          <span class="ml-1 shrink-0 font-normal text-N500">
+            <!-- TODO：接入用户组已授权人数，当前接口未返回统计字段。 -->
+            {{ row.is_auth ? '（自动授权）' : '（已授权 —）' }}
+          </span>
+        </template>
+      </MkSearchList>
     </aside>
 
     <section class="flex-column min-w-0 flex-1 px-6">
       <template v-if="currentGroup">
-        <div class="flex-between shrink-0 gap-4 py-4">
-          <div class="flex-align-center min-w-0 flex-1 gap-2">
-            <h4 class="min-w-0 truncate" :title="currentGroup.name">{{ currentGroup.name }}</h4>
-            <el-divider direction="vertical" />
-            <span class="flex-align-center shrink-0 text-N500">
-              <MkIcon name="icon_member_filled" class="mr-1" />
-              {{ paginationConfig.total }}
-            </span>
-          </div>
-          <!-- 设置用户组自动授权 -->
-          <div class="flex-align-center shrink-0 gap-2">
-            <span class="text-N600">自动授权</span>
-            <el-switch :model-value="currentGroup.is_auth" size="small" @change="handleAutoAuthorizationChange" />
-          </div>
+        <div class="flex-align-center min-w-0 shrink-0 gap-2 py-4">
+          <h4 class="min-w-0 truncate" :title="currentGroup.name">{{ currentGroup.name }}</h4>
+          <el-divider direction="vertical" />
+          <span class="flex-align-center shrink-0 text-N500">
+            <MkIcon name="icon_member_filled" class="mr-1" />
+            {{ paginationConfig.total }}
+          </span>
         </div>
 
-        <div class="flex-between mb-4 gap-4">
+        <div class="flex-between mb-4 flex-wrap gap-4">
+          <div class="flex-align-center flex-wrap gap-6">
+            <!-- 搜索对话用户 -->
+            <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+            <!-- 设置用户组自动授权 -->
+            <div class="flex-align-center shrink-0 gap-2">
+              <span>自动授权</span>
+              <el-switch :model-value="currentGroup.is_auth" size="small" @change="handleAutoAuthorizationChange" />
+            </div>
+          </div>
           <!-- 保存对话用户授权 -->
-
-          <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button type="primary" :disabled="authorizationDisabled" @click="handleSave">保存</el-button>
+          <el-button type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
         </div>
 
         <MkTable

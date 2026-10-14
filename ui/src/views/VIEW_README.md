@@ -487,6 +487,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `home/index.vue`                                | Workspace 首页                                                       |
 | `knowledge/index.vue`                           | 工作空间知识库目录与知识库卡片页面                                   |
 | `knowledge-detail/index.vue`                    | 知识库详情页面                                                       |
+| `knowledge-detail/external-retrieval/index.vue` | 外部检索服务开关、API 地址与调用示例、MCP 配置的只读展示及复制 |
 | `knowledge-detail/library/tags/index.vue`       | 标签分组查询、创建、重命名、单值编辑、删除与关联文档管理             |
 | `knowledge-detail/workflow-transform/index.vue` | 非工作流知识库转换说明、确认与进入画布                               |
 | `document-detail/index.vue`          | 普通 Workspace 文档分段查询、目录定位、批量操作、新增、编辑与详情    |
@@ -516,6 +517,10 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/shared-resources/tool/index.vue` | System 共享工具查询与工具维护页面 |
 | `trigger/index.vue` | 工作空间触发器查询、新建、编辑及单项和批量启停、删除 |
 | `tool/index.vue` | 工作空间工具目录与工具卡片页面 |
+
+身份与权限用户组页（`system/identity/groups/index.vue`）的成员顶部搜索仅提供用户名、姓名；
+用户来源使用 `MkTableFilter mode="single"` 放在表头，与搜索条件合并后向接口传 `source`。
+筛选变化回到第一页；选择“全部”移除来源条件，保留用户名、姓名搜索。
 
 ## 备注要求
 
@@ -737,7 +742,7 @@ Workspace API 内部通过 `getWorkspaceId()` 读取当前路由工作空间。
 对话用户、外部检索服务。资料库页面统一放在 `knowledge-detail/library/` 下，包含 `document/`、
 `image/`、`tags/`；文档专属组件及 Action 随 `document/` 集中维护。其他页面继续放在
 `knowledge-detail/` 下的 `recall-test/`、`question/`、`dictionary/`、`chat-user/`、`external-retrieval/`。
-图片及这五个页面暂只展示占位内容。
+对话用户已实现按用户组查询及授权，接口与交互规则见“智能体与知识库对话用户”章节。
 容器通过 `knowledge-detail/context.ts` 装配资源范围、知识库 ID、设置所需的完整业务 API 对象和返回列表路由，
 并提供只读详情与替换能力。详情入口与 setting 的 API 选择集中在该上下文；library 保持原有接口调用方式。
 Action、Drawer、Dialog 继续通过 props 接收完整 API。设置页复用已加载详情，保存成功后
@@ -1346,18 +1351,41 @@ Web 地址按行去空白、去重并校验 HTTP/HTTPS；空选择器提交 `bod
 普通详情继续恢复所属文件夹。文档创建者选项在共享范围使用 System `CommonApi`，普通范围使用
 Workspace `CommonApi`；范围变化同时清空搜索控件、筛选、创建者选项与分页。
 
-## 智能体对话用户
+## 知识库外部检索服务
 
-`application-detail/chat-user/index.vue` 通过 `hideHeader: true` 隐藏详情主区标题栏，负责工作空间智能体的用户组查询、
-用户搜索和分页、自动授权及用户授权保存。内部使用普通 Flex 双栏容器，不嵌套 `MkViewLayout`；
-外层 `ResourceDetailLayout` 统一负责标题栏显隐和整体滚动，内部视觉排列与 System 用户组页面对齐。
-侧栏使用 `w-sidebar-expanded` 和 `MkSearchList`，由列表统一管理搜索、选中态、独立滚动和空态。
-右侧展示组名、成员数和自动授权；下方工具栏左侧保存、右侧 `MkComplexSearch`，
-用户列表复用 `MkTable` 及其高度约束，无用户组时显示空态，不额外添加主区滚动容器。
-通过 `workspace/chat-user.ts` 请求；当前不接入 `perm`。授权勾选仅维护当前页，保存只提交当前页用户；翻页、筛选或切换组时重新读取服务端授权状态；
-自动授权开启时禁用手动授权，切换成功后清空旧勾选并重新读取用户状态。筛选和用户组切换回到第一页，
-页面通过 `onMounted` 加载用户组；切换工作空间由顶部入口整页加载，不额外监听路由重置状态，
-也不为搜索组件设置工作空间或智能体 key。来源标签复用登录方式枚举与标签，兼容 `OAUTH2` 返回值。
+`knowledge-detail/external-retrieval/index.vue` 由四个资源范围共用，复用详情布局的自定义标题栏，
+当前仅直接调用普通 `workspace/knowledge/external-retrieval.ts`，不新增 context 配置。
+通过 `isWorkspaceResource()` 限定请求范围；其他三个范围显示待接入提示、禁用开关，不回退普通 Workspace。
+普通 Workspace 提供身份认证及服务启停开关；查询与提交共用内容 loading，
+开关仅在保存成功后按完整响应回显，每次只提交变化字段，失败保留原状态。
+API 地址、调用示例及 MCP 配置只读；后两个展示区参考工具 MCP 详情，使用文本域和悬浮复制按钮。
+地址与调用示例均来自接口；调用示例直接绑定 `api_example` 字符串，不在前端拼接或执行检索；MCP 配置直接格式化接口结果。
+四套 API 文件及联调 TODO 保留，均使用真实请求封装，不返回占位 null；其他范围的页面接入待后续处理。
+查询失败不回填配置，不允许在未知配置上保存；页面不伪造配置或保存成功。
+
+## 智能体与知识库对话用户
+
+`application-detail/chat-user/index.vue` 与 `knowledge-detail/chat-user/index.vue` 分别维护智能体、知识库的用户组和用户授权，
+使用对应路由 ID 及 `RESOURCE_TYPE.APPLICATION / KNOWLEDGE`；授权类型必须大写，与后台授权记录及对话端查询一致。
+两页通过 `hideHeader: true` 隐藏详情标题栏，使用普通 Flex 双栏容器，不嵌套 `MkViewLayout`。
+外层 `ResourceDetailLayout` 统一管理整体滚动；侧栏复用 `w-sidebar-expanded`、`MkSearchList` 的搜索、选中和空态。
+“按用户组”列表通过插槽展示名称及自动授权状态；接口尚未返回组已授权人数，手动授权组显示“已授权 —”，不以当前页勾选数代替。
+右侧第一行展示组名和用户查询总数；下方工具栏左侧为默认按用户名查询的 `MkComplexSearch` 及自动授权开关，右侧为保存。
+顶部 `MkComplexSearch` 仅提供用户名、姓名；用户来源只在表头使用 `MkTableFilter mode="single"` 筛选，向接口传 `source`。
+用户名、姓名搜索与表头来源可组合查询，清空一处条件不影响另一处，不额外重置搜索组件。
+筛选变更回到第一页，选择“全部”移除来源条件。保留 `MkTable` 分页及高度约束。
+
+两页当前仅直接调用普通 `workspace/chat-user.ts`，分别传自己的资源类型和路由 ID，不配置到详情 context。
+页面不判断资源范围，也不显示范围待接入提示；当前请求均使用 Workspace API，其他入口的 API 切换尚未接入。
+其他范围的 API 文件及联调 TODO 保留，页面接入待后续处理。
+当前不接入 `perm`。授权勾选只维护当前页，保存只提交当前页用户；翻页、筛选或切换组时重新读取服务端状态。
+无修改、无用户或自动授权开启时禁用保存；保存失败保留勾选，成功更新已保存快照并刷新当前用户列表，保留当前组与页码。
+自动授权切换立即保存，成功后更新组状态、清空旧用户与勾选快照，再查询用户；开启时禁用手动授权。
+保存与自动授权切换不重新查询用户组，避免用户刷新依赖无关请求。筛选和切换用户组回到第一页。
+用户组查询、用户查询与提交共用页面 loading；由各操作的最外层管理，内部查询不提前关闭遮罩。
+查询和提交期间页面容器通过 inert 防止交叉操作。
+页面通过 `onMounted` 加载用户组；工作空间切换由顶部入口整页加载，不额外监听路由重置。
+来源标签沿用登录方式枚举与现有“本地创建”文案，兼容 `OAUTH2` 返回值。
 
 ## 智能体对话日志
 
