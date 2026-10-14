@@ -13,7 +13,7 @@ from common.database_model_manage.database_model_manage import DatabaseModelMana
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from knowledge.models import Knowledge
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
-from tools.models import Tool
+from tools.models import Tool, ToolScope
 from users.serializers.user import is_workspace_manage
 
 
@@ -33,6 +33,8 @@ def _filter_user_authorized_tool_ids(ids: List[str], workspace_id: str, user_id=
         target__in=ids,
     )
     authorized_ids = {str(permission.target) for permission in permission_list if permission.permission_list}
+    shared_tool_ids = QuerySet(Tool).filter(id__in=ids, scope=ToolScope.SHARED).values_list('id', flat=True)
+    authorized_ids.update(str(tool_id) for tool_id in shared_tool_ids)
     return [str(i) for i in ids if str(i) in authorized_ids]
 
 
