@@ -16,10 +16,14 @@ import SharedTagsApi from '@/api/admin/workspace/shared/knowledge/tags'
 import SystemResourceTagsApi from '@/api/admin/system/resource-management/knowledge/tags'
 import SystemSharedTagsApi from '@/api/admin/system/shared-resources/knowledge/tags'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import SyncApi from '@/api/admin/workspace/knowledge/sync'
-import SharedSyncApi from '@/api/admin/workspace/shared/knowledge/sync'
-import SystemResourceSyncApi from '@/api/admin/system/resource-management/knowledge/sync'
-import SystemSharedSyncApi from '@/api/admin/system/shared-resources/knowledge/sync'
+import ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-sync'
+import SharedScheduledSyncApi from '@/api/admin/workspace/shared/knowledge/scheduled-sync'
+import SystemResourceScheduledSyncApi from '@/api/admin/system/resource-management/knowledge/scheduled-sync'
+import SystemSharedScheduledSyncApi from '@/api/admin/system/shared-resources/knowledge/scheduled-sync'
+import ChatUserApi from '@/api/admin/workspace/chat-user'
+import SharedChatUserApi from '@/api/admin/workspace/shared/chat-user'
+import SystemResourceChatUserApi from '@/api/admin/system/resource-management/chat-user'
+import SystemSharedChatUserApi from '@/api/admin/system/shared-resources/chat-user'
 import type { KnowledgeDetail } from '@/api/types'
 import type { ResourceScope } from '@/router/admin/types'
 
@@ -30,13 +34,18 @@ type OptionalApiMethods<Api> = Pick<Api, keyof Api> & {
 }
 
 interface KnowledgeResourceApi {
+  readonly chatUser: OptionalApiMethods<
+    typeof ChatUserApi | typeof SharedChatUserApi | typeof SystemResourceChatUserApi | typeof SystemSharedChatUserApi
+  >
   readonly workflow?: typeof WorkflowApi
   readonly document: OptionalApiMethods<
     typeof DocumentApi | typeof SharedDocumentApi | typeof SystemResourceDocumentApi | typeof SystemSharedDocumentApi
   >
   readonly tags: OptionalApiMethods<typeof TagsApi | typeof SharedTagsApi | typeof SystemResourceTagsApi | typeof SystemSharedTagsApi>
   readonly knowledge: typeof KnowledgeApi | typeof SharedKnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi
-  readonly sync: OptionalApiMethods<typeof SyncApi | typeof SharedSyncApi | typeof SystemResourceSyncApi | typeof SystemSharedSyncApi>
+  readonly scheduledSync: OptionalApiMethods<
+    typeof ScheduledSyncApi | typeof SharedScheduledSyncApi | typeof SystemResourceScheduledSyncApi | typeof SystemSharedScheduledSyncApi
+  >
 }
 
 interface KnowledgeResourceConfig {
@@ -47,24 +56,44 @@ interface KnowledgeResourceConfig {
 /** 仅配置真实存在的完整 API 对象；缺失模块不回退到 Workspace。 */
 const resourceConfigs = {
   workspace: {
-    resourceApi: { knowledge: KnowledgeApi, sync: SyncApi, document: DocumentApi, tags: TagsApi, workflow: WorkflowApi },
+    resourceApi: {
+      chatUser: ChatUserApi,
+      knowledge: KnowledgeApi,
+      scheduledSync: ScheduledSyncApi,
+      document: DocumentApi,
+      tags: TagsApi,
+      workflow: WorkflowApi,
+    },
     listRouteName: 'workspace-knowledge-list',
   },
   'workspace-shared': {
-    resourceApi: { knowledge: SharedKnowledgeApi, sync: SharedSyncApi, document: SharedDocumentApi, tags: SharedTagsApi },
+    resourceApi: {
+      chatUser: SharedChatUserApi,
+      knowledge: SharedKnowledgeApi,
+      scheduledSync: SharedScheduledSyncApi,
+      document: SharedDocumentApi,
+      tags: SharedTagsApi,
+    },
     listRouteName: 'workspace-knowledge-list',
   },
   'system-resource': {
     resourceApi: {
+      chatUser: SystemResourceChatUserApi,
       knowledge: SystemResourceKnowledgeApi,
-      sync: SystemResourceSyncApi,
+      scheduledSync: SystemResourceScheduledSyncApi,
       document: SystemResourceDocumentApi,
       tags: SystemResourceTagsApi,
     },
     listRouteName: 'system-resource-knowledge',
   },
   'system-shared': {
-    resourceApi: { knowledge: SystemSharedKnowledgeApi, sync: SystemSharedSyncApi, document: SystemSharedDocumentApi, tags: SystemSharedTagsApi },
+    resourceApi: {
+      chatUser: SystemSharedChatUserApi,
+      knowledge: SystemSharedKnowledgeApi,
+      scheduledSync: SystemSharedScheduledSyncApi,
+      document: SystemSharedDocumentApi,
+      tags: SystemSharedTagsApi,
+    },
     listRouteName: 'system-shared-knowledge',
   },
 } satisfies Record<ResourceScope, KnowledgeResourceConfig>
@@ -92,6 +121,9 @@ function createKnowledgeDetailContext(state: KnowledgeDetailState): KnowledgeDet
   })
   // 保持接口入口稳定，通过 getter 在路由范围变化时读取当前配置。
   const resourceApi = reactive({
+    get chatUser() {
+      return resourceConfig.value.resourceApi.chatUser
+    },
     get workflow() {
       return resourceConfig.value.resourceApi.workflow
     },
@@ -104,8 +136,8 @@ function createKnowledgeDetailContext(state: KnowledgeDetailState): KnowledgeDet
     get knowledge() {
       return resourceConfig.value.resourceApi.knowledge
     },
-    get sync() {
-      return resourceConfig.value.resourceApi.sync
+    get scheduledSync() {
+      return resourceConfig.value.resourceApi.scheduledSync
     },
   })
   const routeNames = computed(() => {
@@ -152,8 +184,9 @@ type ScopedResourceApi<Scope extends ResourceScope> = {
 }
 
 type ScopedKnowledgeDetailContext<Scope extends ResourceScope> = Omit<KnowledgeDetailContext, 'resourceApi'> & {
-  resourceApi: Omit<ScopedResourceApi<Scope>, 'sync' | 'tags' | 'document'> & {
-    readonly sync: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['sync']>
+  resourceApi: Omit<ScopedResourceApi<Scope>, 'scheduledSync' | 'tags' | 'document' | 'chatUser'> & {
+    readonly chatUser: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['chatUser']>
+    readonly scheduledSync: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['scheduledSync']>
     readonly tags: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['tags']>
     readonly document: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['document']>
   }

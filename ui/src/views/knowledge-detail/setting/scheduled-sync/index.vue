@@ -116,7 +116,7 @@ function handleSave() {
     .then(() => {
       if (!syncSetting.value.schedule_type) return
       const setting: KnowledgeSyncSetting = { ...cloneDeep(syncSetting.value), schedule_type: syncSetting.value.schedule_type }
-      return resourceApi.sync.putKnowledgeSyncSetting?.(detail.id, setting).then((savedSetting) => {
+      return resourceApi.scheduledSync.putKnowledgeSyncSetting?.(detail.id, setting).then((savedSetting) => {
         syncSetting.value = cloneDeep(savedSetting)
         replaceKnowledgeDetail({ ...detail, meta: { ...detail.meta, sync_setting: savedSetting } })
         MsgSuccess('保存成功')
@@ -131,7 +131,7 @@ function handleSave() {
 function loadSyncSetting(knowledgeId: string) {
   loading.value = true
   settingLoaded.value = false
-  return resourceApi.sync
+  return resourceApi.scheduledSync
     .getKnowledgeSyncSetting(knowledgeId)
     .then((setting) => {
       syncSetting.value = cloneDeep(setting)
@@ -165,15 +165,7 @@ watch(
       <el-tab-pane label="同步日志" name="logs" />
     </el-tabs>
     <div v-show="activeTab === 'settings'" v-loading="loading || saving" class="min-h-40">
-      <el-form
-        ref="formRef"
-        :model="syncSetting"
-        :rules="rules"
-        class="max-w-200 pb-6"
-        label-position="top"
-        :disabled="isWorkspaceSharedResource()"
-        @submit.prevent
-      >
+      <el-form ref="formRef" :model="syncSetting" :rules="rules" class="max-w-200 pb-6" label-position="top" @submit.prevent>
         <el-form-item>
           <template #label>
             <span>
@@ -224,6 +216,6 @@ watch(
         </el-button>
       </el-form>
     </div>
-    <SyncLogTable v-if="activeTab === 'logs' && knowledge" :api="resourceApi.sync" :knowledge-id="knowledge.id" />
+    <SyncLogTable v-if="activeTab === 'logs' && knowledge" :api="resourceApi.scheduledSync" :knowledge-id="knowledge.id" />
   </div>
 </template>

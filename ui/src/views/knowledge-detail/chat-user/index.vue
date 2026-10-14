@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 import type { CheckboxValueType } from 'element-plus'
-import ChatUserApi from '@/api/admin/workspace/chat-user'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { LOGIN_METHOD, RESOURCE_TYPE } from '@/api/enums'
 import type { ChatUserAuthorization, ChatUserAuthorizationGroup, ChatUserAuthorizationResource, Dict, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
+import { isWorkspaceSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'KnowledgeChatUserListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ hideHeader: true })
 
-const route = useRoute()
+const { resourceApi, knowledgeId } = useKnowledgeDetailContext()
 const resource = computed<ChatUserAuthorizationResource>(() => ({
-  resource_id: String(route.params.knowledgeId ?? ''),
+  resource_id: knowledgeId.value,
   resource_type: RESOURCE_TYPE.KNOWLEDGE,
 }))
 
@@ -28,7 +28,8 @@ const currentGroup = ref<ChatUserAuthorizationGroup>()
 
 function loadChatUserGroups() {
   loading.value = true
-  return ChatUserApi.getUserGroupList(resource.value)
+  return resourceApi.chatUser
+    .getUserGroupList(resource.value)
     .then((groups) => {
       chatUserGroups.value = groups
       currentGroup.value = groups[0]
@@ -41,7 +42,7 @@ function loadChatUserGroups() {
 
 // 仅刷新用户组列表及已授权人数，保留当前选中的用户组。
 function refreshChatUserGroups() {
-  return ChatUserApi.getUserGroupList(resource.value).then((groups) => {
+  return resourceApi.chatUser.getUserGroupList(resource.value).then((groups) => {
     const currentId = currentGroup.value?.id
     chatUserGroups.value = groups
     currentGroup.value = groups.find((group) => group.id === currentId) ?? groups[0]
@@ -87,11 +88,13 @@ function formatUserSource(source: string) {
 
 function loadChatUsers() {
   if (!currentGroup.value) return Promise.resolve()
-  return ChatUserApi.getUserGroupUserList(resource.value, currentGroup.value.id, paginationConfig.value, chatUserQuery.value).then((page) => {
-    chatUsers.value = page.records
-    savedAuthorization.value = Object.fromEntries(page.records.map(({ id, is_auth }) => [id, is_auth]))
-    paginationConfig.value.total = page.total
-  })
+  return resourceApi.chatUser
+    .getUserGroupUserList(resource.value, currentGroup.value.id, paginationConfig.value, chatUserQuery.value)
+    .then((page) => {
+      chatUsers.value = page.records
+      savedAuthorization.value = Object.fromEntries(page.records.map(({ id, is_auth }) => [id, is_auth]))
+      paginationConfig.value.total = page.total
+    })
 }
 
 function refreshChatUsers() {
@@ -134,16 +137,16 @@ function handleSave() {
   if (!group || saveDisabled.value) return
   const payload = chatUsers.value.map(({ id, is_auth }) => ({ chat_user_id: id, is_auth }))
   loading.value = true
-  return ChatUserApi.putUserGroupUser(resource.value, group.id, payload)
-    .then(() => {
+  return (
+    resourceApi.chatUser.putUserGroupUser?.(resource.value, group.id, payload).then(() => {
       // 先记住已保存结果，列表刷新失败时不重复提示未保存。
       savedAuthorization.value = Object.fromEntries(payload.map(({ chat_user_id, is_auth }) => [chat_user_id, is_auth]))
       MsgSuccess('保存成功')
       return loadChatUsers().then(refreshChatUserGroups)
-    })
-    .finally(() => {
-      loading.value = false
-    })
+    }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 // 自动授权成功后清空旧勾选，重新读取服务端授权状态
@@ -152,17 +155,17 @@ function handleAutoAuthorizationChange(value: string | number | boolean) {
   if (!group || loading.value) return
   loading.value = true
   const isAuth = value === true
-  return ChatUserApi.putUserGroupAuthorization(resource.value, [{ user_group_id: group.id, is_auth: isAuth }])
-    .then(() => {
+  return (
+    resourceApi.chatUser.putUserGroupAuthorization?.(resource.value, [{ user_group_id: group.id, is_auth: isAuth }]).then(() => {
       group.is_auth = isAuth
       chatUsers.value = []
       savedAuthorization.value = {}
       MsgSuccess('保存成功')
       return loadChatUsers().then(refreshChatUserGroups)
-    })
-    .finally(() => {
-      loading.value = false
-    })
+    }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 onMounted(() => loadChatUserGroups())
@@ -203,11 +206,16 @@ onMounted(() => loadChatUserGroups())
             <!-- 设置用户组自动授权 -->
             <div class="flex-align-center shrink-0 gap-2">
               <span>自动授权</span>
-              <el-switch :model-value="currentGroup.is_auth" size="small" @change="handleAutoAuthorizationChange" />
+              <el-switch
+                :disabled="isWorkspaceSharedResource()"
+                :model-value="currentGroup.is_auth"
+                size="small"
+                @change="handleAutoAuthorizationChange"
+              />
             </div>
           </div>
           <!-- 保存对话用户授权 -->
-          <el-button type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
+          <el-button v-if="!isWorkspaceSharedResource()" type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
         </div>
 
         <MkTable
@@ -228,7 +236,12 @@ onMounted(() => loadChatUserGroups())
           <el-table-column :width="140" align="center">
             <template #header>
               <!-- 批量设置当前页授权 -->
-              <el-checkbox :model-value="allChecked" :indeterminate="allIndeterminate" :disabled="authorizationDisabled" @change="handleCheckAll">
+              <el-checkbox
+                :model-value="allChecked"
+                :indeterminate="allIndeterminate"
+                :disabled="authorizationDisabled || isWorkspaceSharedResource()"
+                @change="handleCheckAll"
+              >
                 授权
               </el-checkbox>
             </template>
@@ -236,7 +249,7 @@ onMounted(() => loadChatUserGroups())
               <!-- 设置对话用户授权 -->
               <el-checkbox
                 :model-value="row.is_auth"
-                :disabled="authorizationDisabled"
+                :disabled="authorizationDisabled || isWorkspaceSharedResource()"
                 @change="(value: CheckboxValueType) => handleRowChange(value, row)"
               />
             </template>

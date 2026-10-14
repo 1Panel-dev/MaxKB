@@ -16,15 +16,9 @@
 `@layer components`、`@utility` 的顺序组织；不存在的部分直接省略。`@theme` 内部按照颜色、
 背景图片、间距、阴影、排版分组，每组通过注释标明职责，不将不同类型的 Token 混合排序。
 
-`src/main.ts` 和 `src/chat.ts` 应按以下顺序加载样式：
-
-```ts
-import 'element-plus/dist/index.css'
-import './styles/tailwind.css'
-import './styles/index.scss'
-```
-
-项目样式必须位于 Element Plus 官方样式之后，确保 `element-plus.scss` 中的 CSS 变量映射可以生效。Tailwind 必须与 Sass 入口分开，不要在 `index.scss` 中引入 Tailwind，避免 Tailwind 经过 Sass 处理而产生构建警告或错误结果。
+Admin 入口先引入 `tailwind.css`，再引入 `index.scss`；后者已按顺序加载第三方 CSS、
+Element Plus 覆盖、主题变量和应用样式。Chat 入口还显式引入 Element Plus 官方 CSS。
+保持项目覆盖位于官方样式之后，Tailwind 与 Sass 入口分开，不在 Sass 中引入 Tailwind。
 
 ## 对话模块公共样式
 
@@ -64,16 +58,7 @@ import './styles/index.scss'
 Admin 和 Chat 共用。组件不单独恢复焦点 `outline`，包括通过隐藏输入框的焦点为相邻可见元素
 绘制轮廓的情况；组件原有的 `border`、`box-shadow` 和焦点行为不受此规则影响。
 
-不要使用会影响所有元素间距的宽泛重置规则，例如：
-
-```scss
-* {
-  margin: 0;
-  padding: 0;
-}
-```
-
-这类规则会破坏 Element Plus 组件的默认间距。仅设置必要的基础规则，例如统一 `box-sizing`、清除 `body` 默认外边距和定义应用级布局。
+不要使用全元素 margin／padding 重置，会破坏 Element Plus 组件的默认间距。仅设置必要的基础规则，例如统一 `box-sizing`、清除 `body` 默认外边距和定义应用级布局。
 
 ## Markdown 表格
 
@@ -97,7 +82,7 @@ Tailwind 在 `tailwind.css` 中显式重写了项目字号及对应行高：
 | `text-lg`   | 16px | 24px | Tailwind 固定值                                 |
 | `text-xl`   | 18px | 26px | Tailwind 固定值                                 |
 
-使用字号工具类时会同时应用表中的字号和行高。例如，`text-lg` 等价于 `font-size: 16px; line-height: 24px`。
+使用字号工具类时会同时应用表中的字号和行高。`text-lg` 等价于 `font-size: 16px; line-height: 24px`。
 
 普通正文直接继承 `body` 的 `14px / 22px`，不需要重复添加 `text-base`。仅在元素需要明确覆盖继承字号或行高时使用以上工具类；如设计稿对行高另有明确要求，再使用 `leading-*` 单独覆盖。
 
@@ -115,12 +100,7 @@ Tailwind 在 `tailwind.css` 中显式重写了项目字号及对应行高：
 | `h5` | 五级标题 | 16px/24px | 400  |
 | `h6` | 辅助标题 | 14px/22px | 500  |
 
-标题默认清除浏览器 margin。布局、颜色、省略等非排版需求仍可通过 class 补充：
-
-```html
-<h1>页面标题</h1>
-<h2 class="truncate text-primary" title="完整的内容标题">完整的内容标题</h2>
-```
+标题默认清除浏览器 margin。布局、颜色、省略等非排版需求仍可通过 class 补充。
 
 设计规范中的特大标题为 `30px/38px/600`，仅用于特殊页面级展示，不占用 `h1` 至 `h6`
 的常规内容层级。
@@ -130,11 +110,6 @@ Tailwind 在 `tailwind.css` 中显式重写了项目字号及对应行高：
 使用 `truncate`、`line-clamp-*` 等工具类省略文本时，必须在同一元素补充原生 `title` 属性，
 使鼠标悬停时可以查看完整内容。动态文本使用 `:title` 绑定，组合文本应复用同一个格式化结果，
 确保页面显示内容与 `title` 完全一致。
-
-```vue
-<span class="truncate" :title="workspace.name">{{ workspace.name }}</span>
-<p class="line-clamp-2" :title="description">{{ description }}</p>
-```
 
 ## 样式实现优先级
 
@@ -154,14 +129,6 @@ CSS、SCSS 先按照 `/* button */`、`/* dropdown */` 等业务注释划分样�
 同一业务分组内部的选择器按名称字母顺序排列；同一声明块内的属性按属性名字母顺序排列，
 CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体查询放在普通属性声明之后。
 
-示例：
-
-```vue
-<div class="flex-align-center gap-2 rounded-md px-3 py-2 text-N900 hover:bg-gray-100">
-  菜单项
-</div>
-```
-
 ## 常用布局工具类
 
 稳定重复使用的布局组合统一定义在 `tailwind.css`。当前提供：
@@ -175,41 +142,6 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 | `flex-col-center`   | 纵向排列，在水平和垂直两个方向居中                |
 | `flex-column`       | Flex 布局，纵向排列，等价于 `flex flex-col`       |
 | `flex-wrap`         | 横向排列，自动换行，行间距为 8px                  |
-
-```vue
-<div class="relative h-40">
-  <div class="absolute-center">居中内容</div>
-</div>
-
-<div class="flex-align-center gap-2">
-  <span>图标</span>
-  <span>文字</span>
-</div>
-
-<div class="flex-between">
-  <span>左侧</span>
-  <span>右侧</span>
-</div>
-
-<div class="flex-center">
-  <span>居中内容</span>
-</div>
-
-<div class="flex-col-center">
-  <MkIcon name="icon_home_filled" />
-  <span>首页</span>
-</div>
-
-<div class="flex-column h-full">
-  <div class="shrink-0">头部</div>
-  <div class="min-h-0 flex-1">内容</div>
-</div>
-
-<div class="flex-wrap">
-  <span>选项一</span>
-  <span>选项二</span>
-</div>
-```
 
 普通布局中的 `flex items-center` 统一使用 `flex-align-center`；间距、尺寸继续组合原子类。
 该工具类仅设置 `display: flex` 和 `align-items: center`，不设置方向、主轴对齐或间距；
@@ -237,12 +169,6 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 | 中（默认） | `mk-gray-card`    | 12px                | 6px  |
 | 小         | `mk-gray-card-sm` | 上下 8px、左右 12px | 12px |
 
-```html
-<div class="mk-gray-card-lg">大号卡片</div>
-<div class="mk-gray-card">中号卡片</div>
-<div class="mk-gray-card-sm">小号卡片</div>
-```
-
 符合以上规格的卡片直接使用对应类名，不再叠加 `p-4!`、`py-2!` 或 `rounded-xl!`。
 自定义工具的输出参数结果展示保留 6px 圆角，使用 `mk-gray-card-sm rounded-md!`。
 
@@ -255,20 +181,11 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 禁用样式添加 `disabled`，标题、Markdown 正文和辅助文字使用 N400 浅灰色；此类只改变展示，
 悬停时背景和边框不变色，保留选中和操作交互，实际禁用行为由使用方控制。
 
-```html
-<el-card class="mk-paragraph-card disabled" shadow="never">禁用的段落内容</el-card>
-```
-
 ## 阴影
 
 大号阴影统一由 `variables.scss` 中的 `--mk-box-shadow-lg` 定义，值为
 `0 6px 24px 0 rgb(var(--mk-N900-rgb) / 8%)`。`tailwind.css` 将其映射为 `shadow-lg`，
-业务模板直接使用该工具类，悬停效果使用 `hover:shadow-lg`：
-
-```html
-<div class="shadow-lg">常驻阴影</div>
-<div class="hover:shadow-lg">悬停阴影</div>
-```
+业务模板直接使用该工具类，悬停效果使用 `hover:shadow-lg`。
 
 普通 CSS/SCSS 使用 `box-shadow: var(--mk-box-shadow-lg)`。Element Plus 卡片的常驻、
 悬停和焦点阴影复用该变量。现有 `shadow-sm`、`shadow-md` 分别保持映射到
@@ -283,46 +200,19 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 该类由 `app.scss` 统一设置整行宽度、自适应高度、文字换行和左右间距；卡片边框与选中状态
 仍由外层卡片控制。
 
-```vue
-<el-card>
-  <el-radio :value="option.value" class="mk-card-radio">
-    <h6>{{ option.label }}</h6>
-    <span class="mt-1 block text-sm text-N600">{{ option.description }}</span>
-  </el-radio>
-</el-card>
-```
-
 `group-hover-visible` 用于列表项、卡片等父级带有 `group` 的悬浮操作区。操作区默认透明且不响应
 鼠标事件；距离操作区最近的 `group` 悬浮或内部获得焦点时显示并恢复交互，外层 `group` 不会越过
 内层 `group` 触发操作区。该工具类只负责显隐，布局继续由使用方组合。
-
-```html
-<div class="group">
-  <div>始终显示的内容</div>
-  <div class="group-hover-visible ml-auto flex-align-center">悬浮操作</div>
-</div>
-```
 
 ## 状态圆点
 
 成功与失败状态的圆点样式统一由 `app.scss` 提供。根据业务状态使用 `mk-dot-success` 或
 `mk-dot-danger`，文字和圆点的布局继续由使用方通过 Tailwind 组合。
 
-```html
-<span class="inline-flex items-center gap-2">
-  <span class="mk-dot-success"></span>
-  <span>成功</span>
-</span>
-```
-
 ## 进行中动态点
 
 进行中状态文案使用全局 `mk-dotting` 类，通过 `::after` 生成循环变化的省略号。类名直接放在
 文案元素上，不额外添加仅用于点号的空节点；伪元素预留固定宽度，避免动画过程中正文位置抖动。
-
-```html
-<span class="mk-dotting">下载中</span>
-```
 
 ## Tailwind 中的 `p`（padding）
 
@@ -333,16 +223,7 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 在 Sass/CSS 中覆盖 Element Plus 等第三方组件时，属性值能够自然对应 Tailwind 4px 基础
 间距刻度时使用 `--spacing` 计算，包括 `padding`、`margin`、`gap` 以及基于间距刻度的
 宽高。设计稿明确给出的 5px、7px、9px、11px、13px、18px、34px 等非 4px 整数倍值直接
-使用 `px`，不要为了使用 `--spacing` 而换算成小数倍数。例如：
-
-```scss
-.example {
-  gap: calc(var(--spacing) * 2);
-  min-width: calc(var(--spacing) * 20);
-  padding: 7px calc(var(--spacing) * 3);
-}
-```
-
+使用 `px`，不要为了使用 `--spacing` 而换算成小数倍数。
 圆角、边框宽度、字体尺寸、阴影偏移等不使用 Tailwind spacing scale 的固定尺寸使用 `px`；
 零值直接写 `0`，不要写 `0px`。
 
@@ -382,13 +263,6 @@ Tailwind 类。
 | `N900`      | `--mk-N900` | `text-N900` | 默认文字、主要内容   |
 | `N600`      | `--mk-N600` | `text-N600` | 提示、说明和描述文字 |
 
-示例：
-
-```html
-<p class="text-N900">默认正文</p>
-<p class="text-N600">提示或描述信息</p>
-```
-
 这里描述的是一般使用原则；如果 Figma 对具体组件给出了明确颜色标注，应以对应原型为准。
 
 ### 主题色
@@ -397,16 +271,7 @@ Tailwind 类。
 颜色配置使用 RGB 通道字符串，模板通过 `rgb()` 设置原色、`rgba()` 设置浅色背景。
 卡片背景由上层半透明渐变和下层白色渐变组成，CSS 背景列表中前面的图层位于上方。
 
-当前主题色为：
-
-```scss
-:root {
-  --mk-primary: #3370ff;
-  --mk-primary-gradient-end: #7f3bf5;
-  --mk-primary-gradient: linear-gradient(180deg, var(--mk-primary) 0%, var(--mk-primary-gradient-end) 100%);
-  --mk-primary-rgb: 51 112 255;
-}
-```
+默认主题色为 `#3370ff`，渐变终点为 `#7f3bf5`。
 
 修改主题色时，修改 `--mk-primary`。如果代码使用了 RGB 通道变量，也要同步修改 `--mk-primary-rgb`：
 `--mk-primary-gradient` 是 CSS 渐变背景入口，`--mk-primary-gradient-end` 是 SVG 渐变终点。
@@ -417,62 +282,27 @@ Tailwind 类。
 不要直接写这些变量，也不要绕过项目变量写入 Element Plus 的 `--el-*` 主题变量。Element Plus
 色阶继续由 `element-plus.scss` 基于 `--mk-primary` 映射生成。
 
-普通 CSS 中直接使用：
-
-```scss
-.link {
-  color: var(--mk-primary);
-}
-```
+普通 CSS 使用 `color: var(--mk-primary)`。
 
 ### Tailwind
 
-`tailwind.css` 通过 Tailwind v4 的 `@theme` 将项目颜色变量注册为 Tailwind 颜色：
-
-```css
-@theme {
-  --color-primary: var(--mk-primary);
-}
-```
+`tailwind.css` 通过 Tailwind v4 的 `@theme` 将项目颜色变量注册为 Tailwind 颜色。
 
 变量名称与工具类名称的对应关系如下：
 
-| Tailwind Token       | 来源变量       | 工具类后缀   |
-| -------------------- | -------------- | ------------ |
-| `--color-mk-primary` | `--mk-primary` | `mk-primary` |
+| Tailwind Token    | 来源变量       | 工具类后缀 |
+| ----------------- | -------------- | ---------- |
+| `--color-primary` | `--mk-primary` | `primary`  |
 
-`--color-*` 注册后可以组合生成文字、背景、边框、轮廓等颜色工具类：
+`--color-*` 注册后生成 `text-primary`、`bg-primary`、`border-primary` 等颜色类。
 
-```html
-<div class="bg-primary text-white">确认</div>
-<a class="text-primary">链接文字</a>
-<div class="border border-primary">主题色边框</div>
-<input class="outline-primary" />
-```
+交互状态使用 `hover:`、`focus:` 等 Tailwind 前缀。
 
-交互状态直接添加 Tailwind 状态前缀：
+在颜色类后添加 `/透明度`，例如 `bg-primary/10`、`border-primary/30`。
 
-```html
-<div class="bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary">确认</div>
-```
+任意透明度使用 `bg-primary/[0.08]` 等写法。
 
-在颜色类后添加 `/透明度`，可以使用主题色叠加透明效果：
-
-```html
-<div class="bg-primary/10">10% 主题色背景</div>
-<div class="border border-primary/30">30% 主题色边框</div>
-<span class="text-primary/70">70% 主题色文字</span>
-```
-
-透明度也可以使用任意值：
-
-```html
-<div class="bg-primary/[0.08]">8% 主题色背景</div>
-```
-
-业务组件优先使用这些语义类，不要直接写颜色值：
-
-````
+业务组件优先使用这些语义类，不要直接写颜色值。
 
 ### 默认边框色
 
@@ -485,29 +315,12 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 
 ### Tailwind 渐变背景
 
-渐变值属于背景图片，不能注册到只接受普通颜色的 `--color-*` 命名空间。需要使用 `--background-image-*`：
+渐变值属于背景图片，不能注册到只接受普通颜色的 `--color-*` 命名空间。需要使用 `--background-image-*`。
 
-例如：
-```css
-@theme {
-  --background-image-layout-gradient: var(--mk-layout-gradient);
-}
-````
-
-注册后通过 `bg-layout-gradient` 使用：
-
-```html
-<div class="bg-layout-gradient">页面布局</div>
-```
+`layout-gradient` 当前映射仅为注释，不能当作可用工具类。
 
 `--mk-primary-gradient` 在默认主题下是渐变、非默认主题下是纯色，不能注册为只生成
-`background-image` 的 Token。项目通过自定义 Utility 使用 `background` 简写同时兼容两种值：
-
-```css
-@utility bg-primary-gradient {
-  background: var(--mk-primary-gradient);
-}
-```
+`background-image` 的 Token。项目通过 `bg-primary-gradient` Utility 的 `background` 简写兼容两种值。
 
 需要主题渐变或主题纯色自动切换的背景统一使用 `bg-primary-gradient`。
 
@@ -548,48 +361,16 @@ Steps 默认使用数字和标题横向排列，并保留 Element Plus 的 `acti
 Drawer 的 `header` 插槽内时，组合 `absolute-center` 和宽度工具类即可相对完整 Header 居中，
 不受左侧标题和右侧关闭按钮影响。
 
-```vue
-<el-steps :active="0" class="absolute-center w-75!">
-  <el-step title="选择供应商" />
-  <el-step title="添加模型" />
-</el-steps>
-```
-
 图片预览遮罩 `.el-image-viewer__mask` 统一使用 `var(--el-overlay-color-lighter)`，
 并将元素 `opacity` 设为 `1`，避免与背景色自身透明度叠加；与媒体预览遮罩保持一致。
 
 ### 普通 CSS 中叠加透明度
 
-使用 `color-mix()`，只依赖一个主题色变量：
+使用 `color-mix(in srgb, var(--mk-primary) 10%, transparent)`。
 
-```scss
-.selected {
-  background: color-mix(in srgb, var(--mk-primary) 10%, transparent);
-  border-color: color-mix(in srgb, var(--mk-primary) 30%, transparent);
-}
-```
+RGB alpha 写法使用 `rgb(var(--mk-N600-rgb) / 10%)`。
 
-需要明确的 RGB alpha 写法时，可以使用 RGB 通道变量：
-
-```scss
-.selected {
-  background: rgb(var(--mk-N600-rgb) / 10%);
-}
-```
-
-### 后续切换主题
-
-主题通过覆盖 `--mk-*` 变量实现，业务组件、Tailwind 和 Element Plus 会同步更新。
-
-## 修改后检查
-
-完成配置或样式修改后运行：
-
-```bash
-npm run type-check
-npm run build-only
-npm run build-only-chat
-```
+主题切换通过上述 Theme Store 统一更新，业务组件不重复维护变量。
 
 ## 排行名次
 

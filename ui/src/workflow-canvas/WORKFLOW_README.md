@@ -26,7 +26,7 @@ src/workflow-canvas/
 │   └── node-container/ # 节点容器、锚点按钮及私有的条件、操作下拉组件
 ├── icons/              # 节点图标及图标解析工具
 ├── node-menu/          # 按模式组织基础组件、数据源、工具与智能体菜单
-├── nodes/              # 已迁入节点的注册文件和 Vue 实现
+├── nodes/              # 节点的注册文件和 Vue 实现
 ├── plugins/            # 仅供画布使用的 LogicFlow 插件
 ├── store/              # 按资源范围适配查询接口，提供缓存及在途请求去重
 ├── index.vue           # 画布入口组件 WorkflowCanvas
@@ -146,10 +146,7 @@ System 资源管理合并普通与共享模型，System 共享范围仅返回标
 `system-resource` 与 `system-shared` 独立提供系统模型、供应商、参数表单、工具选项与详情、MCP 和标签查询，
 不继承 Workspace 适配器，不要求路由工作空间。System MCP 查询要求部署提供对应
 `/system/resource/<resourceType>/<id>/mcp_tools` 或 `/system/shared/<resourceType>/<id>/mcp_tools` 扩展接口，尚未完成运行验证。
-`workspace-shared` 仍为空占位。知识库及工具选择弹窗按 Workspace、System 资源管理、System 共享资源
-调用对应 API；智能体选择支持 Workspace 和 System 资源管理，System 共享入口不提供智能体选择。
-选择弹窗不增加 Workspace 共享页面来源分支、不调用 Workspace Shared API；仅普通工作空间显示
-文件夹，且不显示共享目录，其他范围不显示或查询文件夹。
+`workspace-shared` 仍为空占位。选择弹窗的资源范围和交互以组件文档为准。
 节点资源查询可调用此适配器或既有业务 API；工作流加载、保存与发布仍由 View 编排，核心层不承载请求。
 
 ### 表格文本省略
@@ -157,14 +154,6 @@ System 资源管理合并普通与共享模型，System 共享范围仅返回标
 `workflow-canvas/` 内所有表格及列禁止使用 `show-overflow-tooltip`（包括 `showOverflowTooltip` 写法）。
 需要省略的文本通过列的默认插槽渲染，统一使用 `span.block.truncate` 并绑定原生 `title`；
 标题与展示内容使用同一字段或格式化结果，参考 `nodes/base-node/component/user-input/UserInputTable.vue`。
-
-```vue
-<el-table-column prop="field" label="参数">
-  <template #default="{ row }">
-    <span class="block truncate" :title="row.field">{{ row.field }}</span>
-  </template>
-</el-table-column>
-```
 
 ### `nodes/`
 
@@ -200,8 +189,8 @@ Vue `computed` 的 `set` 和原生 `Map.set()` 按各自 API 正常使用。
 节点入口负责输出字段同步、刷新事件和下游失效引用清理，表格与弹窗不直接读写节点模型。
 非登录表单使用 `@submit.prevent`，保存和添加由按钮触发。
 
-设置弹窗打开时重置并用 `cloneDeep` 生成草稿，校验通过并保存后回写；取消不修改节点，
-关闭动画结束后清理草稿与校验。带开关的设置组件由节点入口按开关挂载。
+设置弹窗 open() 使用 cloneDeep 回填本次草稿，保存后回写，取消不修改节点，closed 清理。
+带开关的设置组件由节点入口按开关挂载；通用生命周期遵循组件文档。
 
 ### 模型选择
 
@@ -270,7 +259,7 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 本地文件与 Web 数据源节点使用统一节点模型和容器，输出分别保留 `file_list` 与 `document_list`。
 本地文件节点在初始化时补齐文件格式、数量和大小限制，保留自定义格式；表单校验必选格式和
 1–1000 范围的整数限制。格式选择器不 Teleport，并接入锚点保护。Web 节点没有可编辑配置，
-不再保留未使用的文档引用表单，也不改写已有 `node_data`。
+仅保留输出协议，不改写已有 `node_data`。
 
 知识库写入节点使用统一 `WorkflowNodeModel`、`NodeContainer` 和 `NodeCascader`，保留
 `node_data.document_list` 引用协议；必填和引用有效性校验统一由表单执行。初始化补齐引用数组，
@@ -280,7 +269,7 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 `UserInputFieldTable` 通过 `v-model` / `v-model:config` 编辑文档设置和标题，使用 `MkTable` 排序。
 字段弹窗复用 `MkDynamicsFormConstructor`，保留原有七种输入类型及旧 input/select/date 字段兼容，
 标题和字段弹窗统一使用 `MkDialog`。增删、编辑及排序后同步 `config.globalFields` 并失效下游缓存，
-输出固定保留 `global.knowledge`，复制引用使用 `copyText`；输出计算不再修改节点数据。
+输出固定保留 `global.knowledge`，复制引用使用 `copyText`；输出计算不修改节点数据。
 
 #### 基本信息设置
 
@@ -317,7 +306,7 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 #### AI 对话与提示词
 
 AI 对话节点的 `component/resource-setting` 仅渲染技能卡片内的 MCP、工具、Skills 和智能体分组，
-各分组直接在入口使用 `MkCollapse`，不再拆分普通列表子组件，仅选择弹窗独立封装。
+各分组直接在入口使用 `MkCollapse`，普通列表区直接维护，仅选择弹窗独立封装。
 工具和 Skills 的添加入口复用 `SelectToolDialog`，智能体入口使用 `SelectApplicationDialog`；
 System 共享资源不展示智能体分组，也不挂载智能体选择弹窗。
 Skills 仅查询 SKILL 类型，选择器排除当前路由对应的智能体或工具。确认后同时更新执行用的
@@ -336,7 +325,7 @@ AI 对话节点的提示词、历史记录、视觉理解和输出思考表单�
 组件将画布注入的 `resourceScope` 传给 `useWorkflowStore`，通过 `store.postPromptGenerate` 发起生成；
 Store 适配器统一选择 Workspace、System 资源管理或 System 共享资源的 Model API。
 循环画布已转发同一上下文，组件不再单独判断资源范围。生成方法不使用 Store 的查询缓存或请求去重。
-生成接口不再依赖应用，改用节点自身已保存的模型参数（`model_params_setting`）并随请求体提交，
+生成接口使用节点自身已保存的模型参数（`model_params_setting`）并随请求体提交，
 因此智能体、工具和知识库工作流均可使用；弹窗不提供独立模型或参数设置。
 公共组件统一维护主题输入、会话消息与 `ConversationStream`；重新生成在历史中追加用户消息
 `Re generate` 后请求，停止通过 `cancel()` 终止读取，关闭动画结束后清理会话。
@@ -421,7 +410,7 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 - `Execution-details/index.vue`（`ExecutionDetailContent`）是顶层分发层：接收 `detail` 数组和 `workflowMode`，
   按 `index` 升序，逐项按节点类型渲染对应节点的详情组件。类型到详情组件的映射来自
   `import.meta.glob('../nodes/*/index.ts')` 收集的默认导出中的 `details` 字段，与画布节点注册同一份
-  清单，不按目录名推断，也不再单独维护映射表。未注册详情的类型当前跳过渲染。
+  清单，不按目录名推断，不单独维护映射表。未注册详情的类型当前跳过渲染。
 - `Execution-details/DetailContainer.vue` 是与节点类型无关的布局容器：提供 `#header` 具名
   插槽、折叠体默认插槽承载节点内容，以及 `showContentOnError` 决定失败时是否仍
   展示内容（默认失败只显示错误日志块）。
@@ -460,8 +449,7 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 
 ## View 接入约定
 
-- 所有画布路由页面均放在 `src/views/workflow/`，并以 `XxxWorkflowView.vue` 命名，例如
-  `ApplicationWorkflowView.vue`、`KnowledgeWorkflowView.vue`。
+- 所有画布路由页面使用 `src/views/workflow/<resource>/index.vue`。
 - View 在 `WorkflowCanvas` 外部组织页面头部的保存、发布、调试等页面级操作；添加组件属于画布操作，
   由 `WorkflowCanvas` 内的 `NodeAdd` 统一提供。
 - 画布页面需要独立全屏展示时，由 `src/router/admin/workflow/` 配置不挂载业务 Layout 的路由；
@@ -469,8 +457,7 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 - View 通过 Props 或实例方法传入图数据，加载、保存及错误处理由 View 或所属业务层编排；
   当前三个页面加载完成后调用 `render()`，等待 Vue 更新后记录图快照并 `fitView()`。
 - View 显式传入成对的 `workflowMode` / `loopWorkflowMode`，分别用于主画布和循环体菜单。
-- 页面共用 `views/workflow/components/WorkflowViewLayout.vue`，由其展示标题、保存时间与返回入口，
-  页面通过 `actions` 插槽提供按钮；智能体与知识库为 Workspace 全屏路由，工具额外支持两种 System 全屏路由。
+- 页面布局、保存／发布／调试及来源导航见 [VIEW_README.md](../views/VIEW_README.md#工作流页面)。
 
 `WorkflowCanvas` 的 Props：
 
@@ -500,14 +487,9 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 当前 `renderGraphData()` 不主动销毁上一实例；普通数据加载使用 `render()`，不要将前者当作
 已封装完整清理的重置方法。画布卸载时销毁当前实例并清理 Teleport。
 
-默认模型入口由 `ButtonDefaultModelSetting` 延迟挂载抽屉；`save` 交由页面持久化配置。
-“应用到所有节点”确认后深拷贝图数据，递归切换循环体及相关节点的模型来源，保留自定义模型和参数，
-基本信息仅处理已启用的语音、长期记忆设置并保留浏览器语音。`apply-to-all` 由页面调用
-`renderGraphData()` 更新画布，本身不保存图数据，也不提交抽屉中的模型草稿。
-
 ## 节点维护流程
 
-新增或迁入节点时，按实际需要检查以下位置：
+新增节点时，按实际需要检查以下位置：
 
 1. 在 `types.ts` 的 `WorkflowNodeType` 中声明稳定的 LogicFlow 节点类型值。
 2. 在 `config/node-data.ts` 中添加节点静态配置。
@@ -521,43 +503,14 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 节点协议值统一使用 `WorkflowNodeType` 等枚举或画布常量，不在判断和映射中重复书写
 `ai-chat-node`、`tool-custom-node` 等字符串字面量。
 
-## 当前接入状态
+## 当前实现边界
 
-以下按当前源码启用的行为记录；节点实现与详情覆盖分别以 `nodes/*/index.ts` 的模型注册和
-`details` 字段为准，不以文件存在或注释中的预留代码判断完成。
+以 `nodes/*/index.ts` 的模型和 details 注册判断节点／执行详情是否支持，不以文件存在推断。
+文档分段、知识库写入、本地／Web 数据源及基本信息类和循环辅助节点未注册独立 details。
+缺少详情的节点由分发层跳过。资源适配器的范围限制见“资源查询”。
 
-| 页面                                      | 已接入                                                                       | 尚未启用                                       |
-| ----------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------- |
-| `application/ApplicationWorkflowView.vue` | 详情加载、默认节点、手动与自动保存、默认模型设置、调试对话、发布历史与版本预览恢复 | 发布按钮目前仅校验，发布请求被注释；更新说明需后端支持 |
-| `tool/ToolWorkflowView.vue`               | 工具与工作流详情加载、默认节点、手动与自动保存、默认模型设置、发布、历史预览与恢复、参数调试与执行详情、模板覆盖 | —                                 |
-| `knowledge/KnowledgeWorkflowView.vue`     | 从知识库详情加载、本地文件默认节点、手动与自动保存、默认模型设置、校验后保存并发布、历史预览恢复、模板覆盖、导出与任务调试 | —                                 |
+知识库页面尚未注入 resourceScope，画布沿默认 workspace 查询，
+其他来源路由已存在，但不能据此认定画布辅助查询已按来源适配。
 
-三个页面的返回按钮均提供“保存并退出 / 直接退出”确认；选择保存时成功后才退出，
-关闭确认框则留在当前页。当前没有路由离开或浏览器关闭守卫。
-智能体调试使用 `Conversation` 的 `DEBUG` 模式，有未保存图改动时先保存，再打开右侧可放大的对话面板。
-知识库默认模型已接入前端详情与保存协议，服务端持久化要求见 `../api/API_README.md` 的“知识库工作流”。
-
-执行详情已包含知识库检索、多路召回、文档标签检索、表单收集和语音节点；文档分段、知识库写入、
-本地/Web 数据源尚无 `details` 注册。基本信息类节点和循环体辅助节点同样未注册独立详情。
-智能体发布历史由 `views/workflow/components/publish-history/` 提供，预览期间禁止保存历史图；
-退出预览恢复原草稿，恢复版本后回到编辑态。工具与知识库均复用该面板并使用各自的版本 API。
-完整国际化尚未接入；资源范围适配的限制见“资源查询”。
-
-## 检查
-
-修改后至少运行与改动范围相符的检查：
-
-```bash
-npm run type-check
-npx eslint <本次修改的Vue或TypeScript文件>
-git diff --check
-```
-
-当前 `npm run lint` 尚未配置对应的 `lint:*` 子脚本，不能替代实际 ESLint 检查。
-仅修改 Markdown 文档时，检查修改文件的 Prettier 格式、路径引用及 `git diff --check` 即可。
-
-若当前迁移中的预留文件仍存在已知类型错误，应在交付说明中明确区分，不要通过改变现有画布业务
-逻辑来绕过。
-
-System 工具节点菜单直接查询当前范围工具选项，不展示 Workspace 文件夹；普通工具节点通过
-Store 强制刷新工具详情，与工作流工具节点保持相同的资源范围。
+页面发布、历史、自动保存、调试和返回确认的当前行为统一见 View 文档，验证规则见
+[AGENTS.md](../../AGENTS.md#验证)。

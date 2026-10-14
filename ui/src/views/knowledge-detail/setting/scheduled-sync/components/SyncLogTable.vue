@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type SyncApi from '@/api/admin/workspace/knowledge/sync'
-import type SharedSyncApi from '@/api/admin/workspace/shared/knowledge/sync'
-import type SystemResourceSyncApi from '@/api/admin/system/resource-management/knowledge/sync'
-import type SystemSharedSyncApi from '@/api/admin/system/shared-resources/knowledge/sync'
+import type ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-sync'
+import type SharedScheduledSyncApi from '@/api/admin/workspace/shared/knowledge/scheduled-sync'
+import type SystemResourceScheduledSyncApi from '@/api/admin/system/resource-management/knowledge/scheduled-sync'
+import type SystemSharedScheduledSyncApi from '@/api/admin/system/shared-resources/knowledge/scheduled-sync'
 import { KNOWLEDGE_SYNC_STATUS, KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
 import type { KnowledgeSyncLog, KnowledgeSyncStatus } from '@/api/types'
 import type { StatusLabelOptions } from '@/components/global/mk-status-label/types'
@@ -13,7 +13,7 @@ import { datetimeFormat } from '@/utils/time'
 defineOptions({ name: 'KnowledgeSyncLogTable' })
 const props = defineProps<{
   knowledgeId: string
-  api: typeof SyncApi | typeof SharedSyncApi | typeof SystemResourceSyncApi | typeof SystemSharedSyncApi
+  api: typeof ScheduledSyncApi | typeof SharedScheduledSyncApi | typeof SystemResourceScheduledSyncApi | typeof SystemSharedScheduledSyncApi
 }>()
 
 // 进入日志页签时挂载查询，翻页由表格事件重新查询。

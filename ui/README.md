@@ -4,7 +4,7 @@ MaxKB 企业级 AI 智能体平台的前端工程，使用 Vue 3.5、TypeScript 
 Tailwind CSS 4、Pinia 3 和 Vue Router 5，工作流画布基于 LogicFlow。
 
 项目采用 Admin 和 Chat 双入口。Admin 包含登录、工作空间资源、系统管理和工作流编辑等功能；
-Chat 已配置独立入口与路由，当前 `ChatView.vue` 仍为空白占位页，`src/api/chat/` 的独立请求体系尚未实现。
+Chat 包含单应用与门户认证、智能体列表及正式对话，使用独立的 Router、Pinia 和请求客户端。
 
 ## 本地开发
 
@@ -65,35 +65,7 @@ ESLint 检查的依据。需要检查代码时，可运行 `npx eslint <待检�
 静态资源使用相对路径（`base: './'`）；部署时仍需为 History 路由配置对应入口回退，
 并由部署服务转发 API 和文件请求。Vite 的开发代理不会随静态构建产物部署。
 
-## 代码目录
+## 开发规则
 
-| 目录或文件                      | 职责                                                 |
-| ------------------------------- | ---------------------------------------------------- |
-| `src/main.ts` / `src/chat.ts`   | Admin / Chat 启动入口                                |
-| `src/api/`                      | 请求基础设施、业务 API、后端枚举与共享类型           |
-| `src/components/`               | 全局 Mk 组件、跨页面业务组件及其他共享组件           |
-| `src/layout/`                   | 应用头部、侧栏与资源详情布局                         |
-| `src/views/`                    | 登录、工作空间、系统管理、资源详情和工作流等路由页面 |
-| `src/workflow-canvas/`          | 画布内核、节点配置、节点实现、执行详情与资源查询缓存 |
-| `src/router/`                   | Admin / Chat 独立路由                                |
-| `src/permission/`               | 权限策略、分业务权限方法与 Admin `$perm` 插件        |
-| `src/stores/`                   | 共享 Pinia 实例及认证、用户、主题状态                |
-| `src/styles/`                   | 主题变量、Tailwind、Element Plus 集成与全局样式      |
-| `src/constants/` / `src/utils/` | 跨功能常量与工具函数                                 |
-| `src/assets/` / `public/`       | 源码导入资源 / 保留原始路径的静态资源                |
-
-## 开发约定与文档
-
-修改前先阅读 [AGENTS.md](AGENTS.md)，再阅读涉及领域的规则文档：
-
-- [样式](src/styles/STYLE_README.md)
-- [组件](src/components/COMPONENT_README.md)
-- [路由](src/router/ROUTE_README.md)
-- [API](src/api/API_README.md)
-- [页面](src/views/VIEW_README.md)
-- [工作流画布](src/workflow-canvas/WORKFLOW_README.md)
-- [常量](src/constants/CONSTANT_README.md)
-- [工具函数](src/utils/UTILS_README.md)
-
-详细规则由各领域 README 维护；目录、公共接口或使用约定变化时同步对应文档。
-`src/components.d.ts` 由组件自动注册插件生成，不手动编辑。
+目录职责、开发约束和专题文档索引统一见 [AGENTS.md](AGENTS.md)。
+修改代码前读取对应专题，文档只维护当前实现和使用规则。

@@ -84,13 +84,10 @@ MkTable、MkFormList 的排序优先使用其公开属性；普通列表再直�
 
 ## 资源上下文
 
-`application`、`knowledge`、`model`、`tool` 是使用资源上下文的四类特殊资源。工作空间 id 和这
-四类资源的当前路由范围统一通过 `resource-context.ts` 读取。Workspace API、权限等非组件代码使用
-`getWorkspaceId()` 获取当前工作空间；页面和组件使用 `isWorkspaceResource()`、
-`isWorkspaceSharedResource()`、`isSystemResource()`、`isSystemSharedResource()` 区分 Workspace
-普通资源、Workspace 共享资源、System 资源管理和 System 共享资源。`isWorkspaceResource()` 仅匹配
-`workspace`，不包含 `workspace-shared`。资源范围只读取路由 `meta.resourceScope`，不要根据 path 或路由名称重复判断，也不要把这些
-判断扩展到普通 System 页面。
+资源范围定义见 [ROUTE_README.md](../router/ROUTE_README.md#资源范围判断)。
+`resource-context.ts` 提供 getWorkspaceId、getResourceScope 和四种 isXxxResource 判断。
+非组件代码通过 getWorkspaceId 获取工作空间；页面／组件通过现有判断读取当前资源范围。
+isWorkspaceResource 仅匹配 workspace，不包含 workspace-shared；未配置范围时不推测来源。
 
 ## VNode 插槽内容判断
 
@@ -106,15 +103,6 @@ MkTable、MkFormList 的排序优先使用其公开属性；普通列表再直�
 调用方无需重复传入。特殊场景通过第二个参数覆盖 Element Plus 消息选项，包括 `grouping: false`。
 确认操作统一按需导入 `MsgConfirm(title, message, options?)`，默认提供确认、取消按钮和
 warning 类型；输入和普通警告弹窗继续直接使用 `ElMessageBox`。
-
-```ts
-/** 提供跨页面复用的数组处理函数。 */
-
-/** 根据指定字段对数组进行去重。 */
-export function uniqueBy() {
-  // ...
-}
-```
 
 ## 文件类型与图标
 

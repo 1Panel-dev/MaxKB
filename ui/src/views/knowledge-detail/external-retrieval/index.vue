@@ -6,6 +6,7 @@ import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetti
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
+import { isWorkspaceSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'ExternalRetrievalView' })
 defineProps<ResourceDetailPageProps>()
@@ -72,13 +73,22 @@ onMounted(() => {
         <span class="text-N600">（开启后仅授权的对话用户可通过 API Key 检索该知识库）</span>
       </div>
       <!-- 切换身份认证 -->
-      <el-switch :model-value="setting?.authentication ?? false" @change="handleSettingChange('authentication', $event)" />
+      <el-switch
+        :disabled="isWorkspaceSharedResource()"
+        :model-value="setting?.authentication ?? false"
+        @change="handleSettingChange('authentication', $event)"
+      />
     </section>
     <section>
       <div class="flex-between mb-2 gap-2">
         <span>API 服务地址</span>
         <!-- 切换外部检索服务 -->
-        <el-switch :model-value="setting?.enabled ?? false" size="small" @change="handleSettingChange('enabled', $event)" />
+        <el-switch
+          :disabled="isWorkspaceSharedResource()"
+          :model-value="setting?.enabled ?? false"
+          size="small"
+          @change="handleSettingChange('enabled', $event)"
+        />
       </div>
       <el-input :model-value="setting?.api_url ?? ''" readonly>
         <template #suffix>

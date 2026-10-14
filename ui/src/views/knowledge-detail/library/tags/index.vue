@@ -10,6 +10,7 @@ import CreateTagDialog from './components/CreateTagDialog.vue'
 import EditTagDialog from './components/EditTagDialog.vue'
 import ButtonImportTags from './components/ButtonImportTags.vue'
 import AssociatedDocumentDrawer from './AssociatedDocumentDrawer.vue'
+import { isWorkspaceSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'TagManagementView' })
 defineProps<ResourceDetailPageProps>()
@@ -191,12 +192,12 @@ onMounted(() => {
     @cell-mouse-enter="handleCellEnter"
     @cell-mouse-leave="handleCellLeave"
   >
-    <el-table-column type="selection" width="40" />
+    <el-table-column type="selection" width="40" v-if="!isWorkspaceSharedResource()" />
     <el-table-column prop="key" label="标签" min-width="240">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center gap-1">
           <span class="min-w-0 truncate" :title="row.key">{{ row.key }}</span>
-          <div class="flex-align-center shrink-0" :class="{ 'group-hover-visible': hoveredTagKey !== row.key }">
+          <div v-if="!isWorkspaceSharedResource()" class="flex-align-center shrink-0" :class="{ 'group-hover-visible': hoveredTagKey !== row.key }">
             <!-- 添加标签值 -->
             <MkTooltip content="添加标签值" placement="top">
               <el-button type="primary" text @click="handleOpenAddTagValue(row)">
@@ -228,7 +229,7 @@ onMounted(() => {
         </el-button>
       </template>
     </el-table-column>
-    <el-table-column label="操作" width="100" fixed="right">
+    <el-table-column label="操作" width="100" fixed="right" v-if="!isWorkspaceSharedResource()">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center">
           <!-- 编辑标签值 -->
