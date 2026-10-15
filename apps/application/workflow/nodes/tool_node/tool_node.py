@@ -17,7 +17,7 @@ from django.utils.translation import gettext
 from rest_framework import serializers
 from rest_framework.utils.formatting import lazy_format
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import CancelledException, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
@@ -26,7 +26,7 @@ from common.exception.app_exception import AppApiException
 from common.field.common import ObjectField
 from common.utils.common import common_convert_value
 from common.utils.logger import maxkb_logger
-from common.utils.tool_code import ToolExecutor
+from common.utils.tool_code import ToolCancelledException, ToolExecution, ToolExecutor
 
 function_executor = ToolExecutor()
 
@@ -131,6 +131,16 @@ class ToolNode(INode):
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "tool-node"
 
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self._execution = ToolExecution()
+
+    def cancel(self):
+        super().cancel()
+        self._execution.cancelled.set()
+        if self._execution.proc:
+            self._execution.proc.terminate()
+
     def execute(self):
         node_params = self.get_parameters()
         input_field_list = node_params.get("input_field_list", [])
@@ -160,9 +170,13 @@ class ToolNode(INode):
                 all_params = init_params_default_value | params
         else:
             all_params = params
+        self.data["params"] = all_params
+        try:
+            result = function_executor.exec_code(code, all_params, execution=self._execution)
+        except ToolCancelledException:
+            # 引擎 run()(i_node.py:96) 捕获 CancelledException 并转 CANCELLED
+            raise CancelledException()
 
-        result = function_executor.exec_code(code, all_params)
-        self.write_context("params", all_params)
         self.write_context("result", result)
 
         if is_result:
@@ -175,7 +189,7 @@ class ToolNode(INode):
         details.update(
             {
                 "result": self.get_context("result"),
-                "params": self.get_context("params"),
+                "params": self.data.get("params"),
                 "enableException": self.node.properties.get("enableException"),
             }
         )

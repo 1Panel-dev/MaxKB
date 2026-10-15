@@ -12,6 +12,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from contextlib import contextmanager, suppress
 from textwrap import dedent
@@ -104,7 +105,7 @@ class ToolExecutor:
     except Exception as e:
         maxkb_logger.error(f"Exception: {e}", exc_info=True)
 
-    def exec_code(self, code_str, keywords, function_name=None):
+    def exec_code(self, code_str, keywords, function_name=None, execution=None):
         _id = str(uuid.uuid7())
         action_function = (
             f"({function_name!a}, locals_v.get({function_name!a}))" if function_name else "locals_v.popitem()"
@@ -146,7 +147,7 @@ sys.stdout.flush()
             f.write(_exec_code)
             f.flush()
             with execution_timer(_id):
-                subprocess_result = self._exec(f.name, _id)
+                subprocess_result = self._exec(f.name, _id, execution=execution)
         if subprocess_result.returncode != 0:
             raise Exception(subprocess_result.stderr or subprocess_result.stdout or "Unknown exception occurred")
         lines = subprocess_result.stdout.splitlines()
@@ -387,7 +388,7 @@ exec({dedent(code)!a})
         maxkb_logger.warning("Chat files are too large to be passed to the nested agent, skipped")
         return None
 
-    def _exec(self, execute_file, _id):
+    def _exec(self, execute_file, _id, execution=None):
         kwargs = {
             "cwd": BASE_DIR,
             "env": {
@@ -404,21 +405,48 @@ exec({dedent(code)!a})
             with suppress(Exception):
                 os.sched_setaffinity(0, set(random.sample(list(os.sched_getaffinity(0)), _process_limit_cpu_cores)))
 
+        proc = subprocess.Popen(
+            [sys.executable, execute_file],
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            **kwargs,
+            preexec_fn=_set_resource_limit,
+        )
+        if execution is not None:
+            execution.proc = proc
         try:
-            subprocess_result = subprocess.run(
-                [sys.executable, execute_file],
-                timeout=_process_limit_timeout_seconds,
-                text=True,
-                capture_output=True,
-                **kwargs,
-                preexec_fn=_set_resource_limit,
-            )
-            return subprocess_result
-        except subprocess.TimeoutExpired:
-            raise Exception(_("Process execution timed out after {} seconds.").format(_process_limit_timeout_seconds))
+            try:
+                stdout, stderr = proc.communicate(timeout=_process_limit_timeout_seconds)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                raise Exception(
+                    _("Process execution timed out after {} seconds.").format(_process_limit_timeout_seconds)
+                )
+            # 取消时外部线程已 terminate/kill 子进程,communicate 随即返回;据此区分取消与正常结束
+            if execution is not None and execution.cancelled.is_set():
+                raise ToolCancelledException("Tool execution cancelled")
+            return subprocess.CompletedProcess(proc.args, proc.returncode, stdout, stderr)
+        finally:
+            if execution is not None:
+                execution.proc = None
 
     def validate_mcp_transport(self, code_str):
         validate_mcp_servers(json.loads(code_str))
+
+
+class ToolCancelledException(Exception):
+    """工具子进程执行被外部取消(工作流中断)时抛出,用于与普通执行失败相区分。
+    取消异常向上传播到节点层,由节点转成 CANCELLED 状态,而非 FAIL。
+    """
+
+
+class ToolExecution:
+    """工具子进程存活句柄。由节点持有:外部线程置 cancelled 并 terminate/kill 子进程以中止执行。"""
+
+    def __init__(self):
+        self.cancelled = threading.Event()
+        self.proc = None
 
 
 @contextmanager
