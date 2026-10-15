@@ -401,7 +401,7 @@ class AIChatNode(INode):
         reasoning_content = ""
         try:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
-            model_setting = self.get_context("model_setting") or {}
+            model_setting = self.data.get("model_setting") or {}
             reasoning = Reasoning(
                 model_setting.get("reasoning_content_start", "<think>"),
                 model_setting.get("reasoning_content_end", "</think>"),
