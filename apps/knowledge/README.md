@@ -40,3 +40,25 @@ to recognize the images independently. Synchronization success means the source 
 recognition status is available on the paragraph assets, while embedding status tracks indexing.
 Image extraction, file storage and source reconciliation still occur in the import/sync transaction;
 the external vision model or tool runs in the worker.
+
+## 图片文档接口
+
+通用知识库支持将图片预览导入为独立图片文档。工作空间接口的知识库路径前缀为
+`/workspace/<workspace_id>/knowledge/<knowledge_id>`，位于 Admin API 路径下
+（默认 `/admin/api`）。
+
+| 方法 | 路径后缀 | 用途 |
+| --- | --- | --- |
+| POST | `/document/image/preview` | 上传图片并生成预览 |
+| GET | `/document/image/preview/<preview_id>` | 查询预览及异步识别状态 |
+| PUT | `/document/image/preview/<preview_id>` | 修改 `name`、`caption`、`ocr_text` 或 `description` |
+| DELETE | `/document/image/preview/<preview_id>` | 删除预览 |
+| PUT | `/document/image/batch_create` | 批量导入图片文档 |
+
+上传使用 multipart，`file` 支持多个文件，`doc_strategy` 为可选 JSON；批量导入提交
+`{"preview_ids": [...]}`。系统资源管理和共享资源管理沿用上述路径后缀、请求及处理流程，
+各自的知识库路径前缀和权限由对应功能模块说明。
+
+文档列表、分页接口通过 `resource_type=image` 查询图片，省略该参数时仍查询普通文档。
+启用视觉增强后，上传先返回 `process_status: pending`，客户端轮询预览详情直到识别完成；
+异步识别依赖 Celery task 服务，状态及导入时序见上文。
