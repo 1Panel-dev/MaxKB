@@ -1,4 +1,4 @@
-import type { DOCUMENT_HIT_HANDLING, DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
+import type { DOCUMENT_HIT_HANDLING, DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, IMAGE_PROCESS_STATUS } from '@/api/enums'
 import type { DocumentStrategy, KnowledgeGeneratePayload, KnowledgeType } from './knowledge'
 export type DocumentHitHandling = (typeof DOCUMENT_HIT_HANDLING)[keyof typeof DOCUMENT_HIT_HANDLING]
 export type DocumentTaskState = (typeof DOCUMENT_TASK_STATE)[keyof typeof DOCUMENT_TASK_STATE]
@@ -101,4 +101,16 @@ export interface LarkDocumentList {
 /** 保留 v2 飞书数组协议，每个文件附带处理策略。 */
 export interface LarkDocumentImportPayload extends Pick<LarkDocumentNode, 'name' | 'token' | 'type'> {
   doc_strategy: DocumentStrategy
+}
+
+/** 独立图片上传后的处理预览。 */
+export interface ImageDocumentPreview extends DocumentSplitResult {
+  preview_id: string
+  name: string
+  url: string
+  caption: string
+  ocr_text: string
+  description: string
+  process_status: (typeof IMAGE_PROCESS_STATUS)[keyof typeof IMAGE_PROCESS_STATUS]
+  process_error: string
 }

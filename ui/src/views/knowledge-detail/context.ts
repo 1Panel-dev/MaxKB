@@ -7,6 +7,8 @@ import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
 import SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import ImageApi from '@/api/admin/workspace/knowledge/image'
+import SystemResourceImageApi from '@/api/admin/system/resource-management/knowledge/image'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
 import SystemResourceDocumentApi from '@/api/admin/system/resource-management/knowledge/document'
@@ -45,6 +47,7 @@ interface KnowledgeResourceApi {
   readonly chatUser: OptionalApiMethods<
     typeof ChatUserApi | typeof SharedChatUserApi | typeof SystemResourceChatUserApi | typeof SystemSharedChatUserApi
   >
+  readonly image?: OptionalApiMethods<typeof ImageApi | typeof SystemResourceImageApi>
   readonly workflow?: typeof WorkflowApi
   readonly document: OptionalApiMethods<
     typeof DocumentApi | typeof SharedDocumentApi | typeof SystemResourceDocumentApi | typeof SystemSharedDocumentApi
@@ -79,6 +82,7 @@ const resourceConfigs = {
       scheduledSync: ScheduledSyncApi,
       externalRetrieval: ExternalRetrievalApi,
       document: DocumentApi,
+      image: ImageApi,
       tags: TagsApi,
       termbase: TermbaseApi,
       workflow: WorkflowApi,
@@ -104,6 +108,7 @@ const resourceConfigs = {
       scheduledSync: SystemResourceScheduledSyncApi,
       externalRetrieval: SystemResourceExternalRetrievalApi,
       document: SystemResourceDocumentApi,
+      image: SystemResourceImageApi,
       tags: SystemResourceTagsApi,
       termbase: SystemResourceTermbaseApi,
     },
@@ -151,6 +156,9 @@ function createKnowledgeDetailContext(state: KnowledgeDetailState): KnowledgeDet
     },
     get workflow() {
       return resourceConfig.value.resourceApi.workflow
+    },
+    get image() {
+      return resourceConfig.value.resourceApi.image
     },
     get document() {
       return resourceConfig.value.resourceApi.document
@@ -215,7 +223,8 @@ type ScopedResourceApi<Scope extends ResourceScope> = {
 }
 
 type ScopedKnowledgeDetailContext<Scope extends ResourceScope> = Omit<KnowledgeDetailContext, 'resourceApi'> & {
-  resourceApi: Omit<ScopedResourceApi<Scope>, 'scheduledSync' | 'tags' | 'termbase' | 'document' | 'chatUser' | 'externalRetrieval'> & {
+  resourceApi: Omit<ScopedResourceApi<Scope>, 'scheduledSync' | 'tags' | 'termbase' | 'document' | 'chatUser' | 'externalRetrieval' | 'image'> & {
+    readonly image: KnowledgeResourceApi['image']
     readonly chatUser: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['chatUser']>
     readonly scheduledSync: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['scheduledSync']>
     readonly tags: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['tags']>

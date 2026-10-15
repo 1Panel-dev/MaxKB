@@ -3,7 +3,7 @@ import { computed, nextTick, ref } from 'vue'
 import type { DocumentImportParagraph, DocumentSplitResult } from '@/api/types'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgWarning } from '@/utils/message'
-import EditParagraphDialog from './EditParagraphDialog.vue'
+import EditParagraphDialog from '../upload-document/EditParagraphDialog.vue'
 
 defineOptions({ name: 'DocumentImportPreview' })
 defineProps<{ knowledgeId: string }>()

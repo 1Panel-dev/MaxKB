@@ -3,7 +3,7 @@ import { computed, useTemplateRef } from 'vue'
 import type { UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
 import SingleFileUpload from './SingleFileUpload.vue'
 import MultipleFileUpload from './MultipleFileUpload.vue'
-import type { DragUploadFile } from './types'
+import type { DragUploadFile, DragUploadMode } from './types'
 
 defineOptions({ name: 'MkDragUpload' })
 
@@ -11,6 +11,7 @@ defineProps<{
   accept?: string
   disabled?: boolean
   multiple?: boolean
+  mode?: DragUploadMode
   limit?: number
   sizeLimit?: number
   dragText?: string
@@ -65,6 +66,7 @@ defineExpose({ clearFiles, handleRemove, uploadingCount })
 <template>
   <component
     :is="multiple ? MultipleFileUpload : SingleFileUpload"
+    v-bind="multiple ? { mode } : {}"
     ref="uploadRef"
     v-model="fileList"
     :accept="accept"

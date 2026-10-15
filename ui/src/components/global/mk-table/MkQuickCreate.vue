@@ -42,6 +42,12 @@ function handleCreate() {
   emit('create', createName.value.trim())
 }
 
+function handleKeydown(event: KeyboardEvent) {
+  if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229) return
+  event.preventDefault()
+  handleCreate()
+}
+
 defineExpose({ close: resetDraft })
 </script>
 
@@ -54,6 +60,7 @@ defineExpose({ close: resetDraft })
         class="mr-3 w-80!"
         :placeholder="props.placeholder"
         :maxlength="props.maxlength"
+        @keydown="handleKeydown"
         show-word-limit
         clearable
       />

@@ -14,7 +14,7 @@ import { DOCUMENT_STATUS_FILTER_OPTIONS } from './status'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { numberFormat } from '@/utils/number'
-import { MsgSuccess } from '@/utils/message'
+import { MsgSuccess, MsgWarning } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
 import { isWorkspaceResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
@@ -65,31 +65,6 @@ function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<Doc
   })
 }
 
-/* 快速创建 */
-const showQuickCreate = computed(() => knowledgeType.value === KNOWLEDGE_TYPE_KEY.BASE)
-const quickCreateRef = ref<InstanceType<typeof MkQuickCreate>>()
-
-function handleCreateDocument(name: string) {
-  loading.value = true
-  return (
-    resourceApi.document
-      .putBatchCreateDocuments?.(knowledgeId.value, [{ name }])
-      .then(() => {
-        // 创建成功即清理草稿，后续刷新失败不恢复为可重复提交的输入。
-        quickCreateRef.value?.close()
-        MsgSuccess('创建成功')
-        clearDocumentSelection()
-        paginationConfig.value.currentPage = 1
-        return loadDocuments()
-      })
-      .catch(() => {
-        // 请求层统一提示错误，创建失败时保留输入。
-      }) ?? Promise.resolve()
-  ).finally(() => {
-    loading.value = false
-  })
-}
-
 /* 文档名称编辑 */
 function validateDocumentName(name: string): string | undefined {
   if (/[:\\/?*\[\]]/.test(name)) {
@@ -109,6 +84,36 @@ function saveDocumentName(documentId: string, name: string): Promise<string> {
       return document.name
     }) ?? Promise.resolve(documentData.value.find(({ id }) => id === documentId)?.name ?? '')
   )
+}
+
+/* 快速创建 */
+const showQuickCreate = computed(() => knowledgeType.value === KNOWLEDGE_TYPE_KEY.BASE)
+const quickCreateRef = ref<InstanceType<typeof MkQuickCreate>>()
+
+function handleCreateDocument(name: string) {
+  const validationMessage = validateDocumentName(name)
+  if (validationMessage) {
+    MsgWarning(validationMessage)
+    return
+  }
+  loading.value = true
+  return (
+    resourceApi.document
+      .putBatchCreateDocuments?.(knowledgeId.value, [{ name }])
+      .then(() => {
+        // 创建成功即清理草稿，后续刷新失败不恢复为可重复提交的输入。
+        quickCreateRef.value?.close()
+        MsgSuccess('创建成功')
+        clearDocumentSelection()
+        paginationConfig.value.currentPage = 1
+        return loadDocuments()
+      })
+      .catch(() => {
+        // 请求层统一提示错误，创建失败时保留输入。
+      }) ?? Promise.resolve()
+  ).finally(() => {
+    loading.value = false
+  })
 }
 
 /* 文档筛选与分页查询 */
@@ -335,7 +340,6 @@ onBeforeUnmount(() => {
     v-loading="loading || operationLoading"
     :data="documentData"
     v-model:pagination-config="paginationConfig"
-    :max-table-height="240"
     @current-change="loadDocuments()"
     @size-change="loadDocuments()"
     @selection-change="handleSelectionChange"

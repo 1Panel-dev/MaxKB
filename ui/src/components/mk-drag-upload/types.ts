@@ -9,3 +9,6 @@ export interface DragUploadFile extends UploadUserFile {
 
 /** 由调用方提供具体上传接口，组件管理进度、完成状态和取消。 */
 export type DragUploadHandler = (file: UploadRawFile, onProgress: (percent: number) => void) => { request: Promise<string>; abort: () => void }
+
+/** 多文件列表的展示模式。 */
+export type DragUploadMode = 'file' | 'image'

@@ -72,7 +72,7 @@ watch(
       v-model:pagination-config="paginationConfig"
       v-loading="loading"
       :data="syncLogs"
-      :max-table-height="260"
+      :max-table-height="200"
       @current-change="loadSyncLogs"
       @size-change="loadSyncLogs"
     >

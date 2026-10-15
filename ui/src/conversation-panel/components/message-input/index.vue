@@ -81,7 +81,7 @@ const handleKeydown = (event: KeyboardEvent) => {
             <div class="h-full bg-primary/15 transition-[width] duration-200" :style="{ width: `${file.progress ?? 0}%` }" />
           </div>
           <!-- 移除附件 -->
-          <div class="group-hover-visible attachment-remove" @click="removeFile(index)">
+          <div class="group-hover-visible mk-remove-button" @click="removeFile(index)">
             <MkIcon name="icon_close_bold_outlined" class="text-white!" :size="6" />
           </div>
         </div>
