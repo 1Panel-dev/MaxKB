@@ -3,7 +3,6 @@ import asyncio
 import base64
 import json
 import pickle
-from functools import reduce
 from typing import Dict, List
 
 import requests
@@ -21,14 +20,18 @@ from application.flow.i_step_node import KnowledgeWorkflowPostHandler
 from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
 from application.flow.step_node import get_node
 from application.flow.tools import save_workflow_mapping
-from application.serializers.application import get_mcp_tools, validate_workflow_default_models
+from application.serializers.application import (
+    get_mcp_tools,
+    resolve_import_tools,
+    validate_workflow_default_models,
+)
 from common.constants.cache_version import Cache_Version
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.result import result
 from common.utils.common import bytes_to_uploaded_file
-from common.utils.common import restricted_loads, generate_uuid
+from common.utils.common import restricted_loads
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
@@ -447,30 +450,8 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 raise AppApiException(1001, _("Unsupported file format"))
             knowledge_workflow = kbwf_instance.knowledge_workflow
             tool_list = kbwf_instance.get_tool_list()
-            update_tool_map = {}
-            if len(tool_list) > 0:
-                tool_id_list = reduce(
-                    lambda x, y: [*x, *y],
-                    [[tool.get("id"), generate_uuid((tool.get("id") + workspace_id or ""))] for tool in tool_list],
-                    [],
-                )
-                # 存在的工具列表
-                exits_tool_id_list = [
-                    str(tool.id) for tool in QuerySet(Tool).filter(id__in=tool_id_list, workspace_id=workspace_id)
-                ]
-                # 需要更新的工具集合
-                update_tool_map = {
-                    tool.get("id"): generate_uuid((tool.get("id") + workspace_id or ""))
-                    for tool in tool_list
-                    if not exits_tool_id_list.__contains__(tool.get("id"))
-                }
-
-                tool_list = [
-                    {**tool, "id": update_tool_map.get(tool.get("id"))}
-                    for tool in tool_list
-                    if not exits_tool_id_list.__contains__(tool.get("id"))
-                    and not exits_tool_id_list.__contains__(generate_uuid((tool.get("id") + workspace_id or "")))
-                ]
+            # 已存在且有权限的工具复用, 无权限或不存在则生成新id新建
+            update_tool_map, tool_list = resolve_import_tools(tool_list, user_id, workspace_id)
 
             work_flow = self.to_knowledge_workflow(
                 knowledge_workflow,
