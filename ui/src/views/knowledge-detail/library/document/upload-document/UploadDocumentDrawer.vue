@@ -70,13 +70,17 @@ function handleNext() {
 /* 文本分段预览：解析结果保留策略与来源关联，编辑后直接用于导入。 */
 function handleGeneratePreview() {
   if (!validateImportFiles() || !strategyRef.value) return
+  const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
+  if (fileIds.length !== successfulFiles.value.length) {
+    MsgWarning('文件上传结果缺少文件 ID，请重新上传')
+    return
+  }
   loading.value = true
   return strategyRef.value
     .validate()
     .then((valid) => {
       if (!valid || !strategyRef.value) return
-      const files = successfulFiles.value.flatMap((file) => (file.raw ? [file.raw] : []))
-      return props.api.postSplitDocuments?.(props.knowledgeId, files, strategyRef.value.getStrategy()).then((documents) => {
+      return props.api.postSplitDocuments?.(props.knowledgeId, fileIds, strategyRef.value.getStrategy()).then((documents) => {
         previewDocuments.value = documents
         previewVisible.value = true
       })

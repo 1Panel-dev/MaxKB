@@ -237,14 +237,17 @@ class DocumentEditInstanceSerializer(serializers.Serializer):
                 valid_class(data=self.data.get("meta")).is_valid(raise_exception=True)
 
 
-class DocumentSplitRequest(serializers.Serializer):
-    file = serializers.ListField(required=True, label=_("file list"))
+class DocumentSplitOptions(serializers.Serializer):
     limit = serializers.IntegerField(required=False, label=_("limit"))
     patterns = serializers.ListField(
         required=False, child=serializers.CharField(required=True, label=_("patterns")), label=_("patterns")
     )
     with_filter = serializers.BooleanField(required=False, label=_("Auto Clean"))
     doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
+
+
+class DocumentSplitRequest(DocumentSplitOptions):
+    file = serializers.ListField(required=True, label=_("file list"))
 
 
 class DocumentWebInstanceSerializer(serializers.Serializer):
@@ -291,6 +294,10 @@ class DocumentInstanceFileIdsSerializer(serializers.Serializer):
         if len(value) != len(set(value)):
             raise serializers.ValidationError(_("Duplicate file ids are not allowed"))
         return value
+
+
+class DocumentSplitByFileRequest(DocumentInstanceFileIdsSerializer, DocumentSplitOptions):
+    """Split uploaded sources using the same options as multipart previews."""
 
 
 class DocumentImportRequest(DocumentInstanceFileIdsSerializer):
@@ -1510,6 +1517,26 @@ class DocumentSerializers(serializers.Serializer):
             for document in documents:
                 # File handlers already apply the v2 split rules; keep their paragraphs intact.
                 document["doc_strategy"] = strategy
+            return documents
+
+        def parse_by_file_ids(self, instance):
+            request_serializer = DocumentSplitByFileRequest(data=instance)
+            request_serializer.is_valid(raise_exception=True)
+            file_ids = request_serializer.validated_data["file_id_list"]
+            _, source_files = DocumentSerializers.Create(data=self.initial_data)._get_uploaded_files(file_ids)
+            with ExitStack() as stack:
+                files = [
+                    stack.enter_context(ContentFile(source_file.get_bytes(), name=source_file.file_name))
+                    for source_file in source_files
+                ]
+                documents = self.parse(
+                    {**request_serializer.validated_data, "file": files},
+                    source_file_ids=[source_file.id for source_file in source_files],
+                )
+            # As with multipart previews, retain sources for subsequent document creation.
+            QuerySet(File).filter(id__in=file_ids).update(
+                source_type=FileSourceType.KNOWLEDGE, source_id=str(self.data.get("knowledge_id"))
+            )
             return documents
 
         def save_image(self, image_list):

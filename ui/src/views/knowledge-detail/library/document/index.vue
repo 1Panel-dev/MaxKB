@@ -310,7 +310,11 @@ onBeforeUnmount(() => {
       <div class="flex-align-center gap-3">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
         <!-- 查看工作流执行记录 -->
-        <ButtonExecutionRecord v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW" :api="resourceApi.workflow" :knowledge-id="knowledgeId" />
+        <ButtonExecutionRecord
+          v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW && resourceApi.workflow"
+          :api="resourceApi.workflow"
+          :knowledge-id="knowledgeId"
+        />
         <template v-if="!isWorkspaceSharedResource()">
           <!-- 导入 Web、飞书或工作流文档 -->
           <ButtonImportDocument

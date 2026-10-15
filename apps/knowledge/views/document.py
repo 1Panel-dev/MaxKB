@@ -29,6 +29,7 @@ from knowledge.api.document import (
     DocumentMigrateAPI,
     DocumentReadAPI,
     DocumentSplitAPI,
+    DocumentSplitByFileAPI,
     DocumentSplitPatternAPI,
     DocumentTagsAPI,
     DocumentTreeReadAPI,
@@ -277,6 +278,40 @@ class DocumentView(APIView):
                         "knowledge_id": knowledge_id,
                     }
                 ).parse(_get_document_split_payload(request))
+            )
+
+    class SplitByFile(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["POST"],
+            description=_("Segmented document by file ids"),
+            summary=_("Segmented document by file ids"),
+            operation_id=_("Segmented document by file ids"),  # type: ignore
+            parameters=DocumentSplitByFileAPI.get_parameters(),
+            request=DocumentSplitByFileAPI.get_request(),
+            responses=DocumentSplitByFileAPI.get_response(),
+            tags=[_("Knowledge Base/Documentation")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                compare=CompareConstants.AND,
+            ),
+        )
+        def post(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(
+                DocumentSerializers.Split(
+                    data={
+                        "workspace_id": workspace_id,
+                        "knowledge_id": knowledge_id,
+                        "user_id": request.user.id,
+                    }
+                ).parse_by_file_ids(request.data)
             )
 
     class Import(APIView):

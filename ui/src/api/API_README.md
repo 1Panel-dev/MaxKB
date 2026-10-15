@@ -466,19 +466,19 @@ putDocument 统一更新名称、启停及设置，不按字段重复封装；�
 单项设置 meta 保留来源，批量 allow_download 在顶层。任务载荷通常用 id_list／state_list，
 生成用 document_id_list，标签用 document_ids／tag_ids，迁移及批量导出直接传 ID 数组。
 
-| 操作         | 协议差异                                                                                               |
-| ------------ | ------------------------------------------------------------------------------------------------------ |
-| 创建         | PUT batch_create；空白名称与解析后内容使用同一方法，返回 DocumentItem[]                                |
-| 文本预览     | POST split，多文件 FormData 重复 file 字段，doc_strategy 为 JSON 字符串；响应 content 转为 paragraphs  |
-| 文本直接导入 | POST import，JSON `{ file_id_list, doc_strategy }`，服务端解析并创建，不先 split 或再次上传            |
-| 表格／QA     | POST table_by_file_ids／qa_by_file_ids，提交 `{ file_id_list }`，模板 GET 支持 excel／csv              |
-| Web          | POST web，提交 source_url_list、selector、doc_strategy                                                 |
-| 飞书         | POST lark/<id>/<folderToken>/doc_list，读取 files／has_more／next_page_token；import 提交文档数组      |
-| 向量化       | 单项 PUT <documentId>/refresh，批量 batch_refresh；state_list 可选全部或排除成功                       |
-| 分词         | 单项 PUT <documentId>/tokenize，批量 batch_tokenize，全部七种状态                                      |
-| 取消任务     | 单项 PUT <documentId>/cancel_task，提交 `{ type }`；批量 batch_cancel_task                             |
-| 同步         | 单项 <documentId>/sync 不传体，批量 batch_sync 传 `{ id_list }`；飞书批量 lark/<id>/\_batch，均 PUT    |
-| 导出         | 单项 GET <documentId>/export 或 export_zip；批量 POST batch_export 或 batch_export_zip，直接传 ID 数组 |
+| 操作         | 协议差异                                                                                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------- |
+| 创建         | PUT batch_create；空白名称与解析后内容使用同一方法，返回 DocumentItem[]                                     |
+| 文本预览     | POST split_by_file_ids，JSON `{ file_id_list, doc_strategy }`，复用已上传文件；响应 content 转为 paragraphs |
+| 文本直接导入 | POST import，JSON `{ file_id_list, doc_strategy }`，服务端解析并创建，不先 split 或再次上传                 |
+| 表格／QA     | POST table_by_file_ids／qa_by_file_ids，提交 `{ file_id_list }`，模板 GET 支持 excel／csv                   |
+| Web          | POST web，提交 source_url_list、selector、doc_strategy                                                      |
+| 飞书         | POST lark/<id>/<folderToken>/doc_list，读取 files／has_more／next_page_token；import 提交文档数组           |
+| 向量化       | 单项 PUT <documentId>/refresh，批量 batch_refresh；state_list 可选全部或排除成功                            |
+| 分词         | 单项 PUT <documentId>/tokenize，批量 batch_tokenize，全部七种状态                                           |
+| 取消任务     | 单项 PUT <documentId>/cancel_task，提交 `{ type }`；批量 batch_cancel_task                                  |
+| 同步         | 单项 <documentId>/sync 不传体，批量 batch_sync 传 `{ id_list }`；飞书批量 lark/<id>/\_batch，均 PUT         |
+| 导出         | 单项 GET <documentId>/export 或 export_zip；批量 POST batch_export 或 batch_export_zip，直接传 ID 数组      |
 
 除文档生成问题的批量协议外，不以单元素批量接口代替单项。导出文件名优先服务端，
 缺失时单项使用文档名、批量使用知识库名加 xlsx／zip。

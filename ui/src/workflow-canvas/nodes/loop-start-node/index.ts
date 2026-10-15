@@ -14,7 +14,7 @@ class LoopStartNodeModel extends WorkflowNodeModel {
   override setAttributes() {
     super.setAttributes()
     // 循环引擎内置的 index/item 作为只读输出参数，始终保留在节点自身配置里，保证输出区一定展示
-    const config = (this.properties.config ?? {}) as { fields?: unknown[]; globalFields?: unknown[] }
+    const config = this.properties.config ?? {}
     this.properties.config = {
       ...config,
       fields: LOOP_BUILTIN_FIELDS.map((item) => ({ label: item.label, value: item.field })),

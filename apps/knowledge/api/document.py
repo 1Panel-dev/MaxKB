@@ -13,6 +13,7 @@ from knowledge.serializers.document import (
     DocumentInstanceSerializer,
     DocumentInstanceFileIdsSerializer,
     DocumentImportRequest,
+    DocumentSplitByFileRequest,
     DocumentMigrateSerializer,
     DocumentRefreshSerializer,
     DocumentWebInstanceSerializer,
@@ -59,6 +60,12 @@ class DocumentSplitAPI(APIMixin):
                 },
             }
         }
+
+
+class DocumentSplitByFileAPI(DocumentSplitAPI):
+    @staticmethod
+    def get_request():
+        return DocumentSplitByFileRequest
 
 
 class DocumentImportAPI(APIMixin):

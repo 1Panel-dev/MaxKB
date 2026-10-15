@@ -168,7 +168,7 @@
 
 通用上传由 `upload-document/` 管理，Web／飞书／工作流导入由 `import-document/` 管理独立 Drawer。
 复用 `MkDragUpload` 和 `DocumentStrategyForm`，传完整 Document API；使用成功文件 ID，不二次上传。
-文本直接导入提交文件 ID 与策略；生成预览才请求 split，预览可本地编辑／删除，最终创建使用编辑后结果。
+文本直接导入提交文件 ID 与策略；生成预览才携带文件 ID 与策略请求 split_by_file_ids，预览可本地编辑／删除，最终创建使用编辑后结果。
 `document/components/DocumentImportPreview.vue` 提供文档与图片导入的左右预览布局；
 组件统一使用 DocumentSplitResult 的文档列表与分段页面，不按图片类型区分展示。
 图片生成结果直接传入预览组件，正文按接口返回的 content 展示，不转换或拼接；图片导入仍提交原始预览 ID，

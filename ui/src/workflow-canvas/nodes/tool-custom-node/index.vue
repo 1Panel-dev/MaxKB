@@ -28,7 +28,7 @@ const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Applicati
 const model = getModel()
 
 const formRef = useTemplateRef<FormInstance>('formRef')
-const inputFieldDialogRef = useTemplateRef<InstanceType<typeof InputFieldDialog>>('inputFieldDialogRef')
+const inputFieldDialogRef = useTemplateRef<InstanceType<typeof FieldSetting>>('inputFieldDialogRef')
 
 // 初始化节点配置，保留旧节点缺少返回内容开关时的兼容逻辑。
 const defaultForm: ToolCustomNodeForm = { code: '', input_field_list: [], is_result: false }

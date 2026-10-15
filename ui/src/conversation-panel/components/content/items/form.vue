@@ -12,13 +12,25 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
+import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
+import type { Dict } from '@/api/types'
 import { useMessageListStoreOptional } from '@/conversation-panel/components/message-list/index'
+
+defineOptions({ name: 'ConversationFormContent' })
 
 // message-list store(由 view provide);拿不到发送能力 → 只读降级
 const mainStore = useMessageListStoreOptional()
 
 const props = defineProps<{
-  content: any
+  content: {
+    form_content_format: string
+    form_field_list?: FormField[]
+    is_submit?: boolean
+    form_data?: Dict<DynamicFormValue>
+    position?: unknown
+    chat_record_id?: string
+    id?: string
+  }
 }>()
 const form_content_format = computed(() => props.content.form_content_format)
 const _submit = ref(false)
@@ -26,7 +38,7 @@ const form_field_list = computed(() => props.content.form_field_list || [])
 const [leadingText, trailingText] = form_content_format.value.split('{{form}}').map((s) => s.trim())
 
 const is_submit = computed(() => _submit.value || !!props.content.is_submit)
-const _form_data = ref<any>({})
+const _form_data = ref<Dict<DynamicFormValue> | undefined>({})
 const form_data = computed({
   get: () => (props.content.is_submit ? props.content.form_data : _form_data.value),
   set: (v) => {

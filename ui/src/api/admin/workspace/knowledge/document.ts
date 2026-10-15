@@ -35,13 +35,12 @@ const getDocumentDetail = (knowledgeId: string, documentId: string) => get<Docum
 const putBatchCreateDocuments = (knowledgeId: string, documents: DocumentQuickCreatePayload[] | DocumentImportPayload[]) =>
   put<DocumentQuickCreatePayload[] | DocumentImportPayload[], DocumentItem[]>(`${getPrefix(knowledgeId)}/batch_create`, documents)
 
-/** 分段预览 */
-const postSplitDocuments = (knowledgeId: string, files: File[], strategy: DocumentStrategy) => {
-  const data = new FormData()
-  files.forEach((file) => data.append('file', file))
-  data.append('doc_strategy', JSON.stringify(strategy))
-  return post<FormData, DocumentSplitResult[]>(`${getPrefix(knowledgeId)}/split`, data)
-}
+/** 复用已上传文件，按处理策略生成分段预览。 */
+const postSplitDocuments = (knowledgeId: string, fileIds: string[], strategy: DocumentStrategy) =>
+  post<DocumentFileImportPayload, DocumentSplitResult[]>(`${getPrefix(knowledgeId)}/split_by_file_ids`, {
+    file_id_list: fileIds,
+    doc_strategy: strategy,
+  })
 
 /** 复用已上传文件，按处理策略直接解析并写入知识库。 */
 const postImportTextDocuments = (knowledgeId: string, fileIds: string[], strategy: DocumentStrategy) =>
