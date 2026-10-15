@@ -209,9 +209,9 @@ class ModelSerializer(serializers.Serializer):
 
         def edit(self, instance: Dict, user_id: str, with_valid=True):
             if with_valid:
-                self.is_valid(raise_exception=True)
+                super().is_valid(raise_exception=True)
             model = QuerySet(Model).filter(
-                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
+                id=self.data.get("id"), workspace_id=self.data.get("workspace_id", "None")
             ).first()
 
             credential, model_credential, provider_handler = ModelSerializer.Edit(data={**instance}).is_valid(
