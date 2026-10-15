@@ -10,7 +10,6 @@ import subprocess
 import sys
 import tempfile
 import zipfile
-from functools import reduce
 from typing import Dict
 
 import requests
@@ -22,7 +21,7 @@ from common.db.search import native_page_search, native_search, page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedImageField
 from common.result import result
-from common.utils.common import bytes_to_uploaded_file, common_convert_value, generate_uuid, get_file_content
+from common.utils.common import bytes_to_uploaded_file, common_convert_value, get_file_content
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
@@ -84,19 +83,6 @@ class ToolInstance:
 
 
 ALLOWED_CLASSES = {("builtins", "dict"), ("uuid", "UUID"), ("tools.serializers.tool", "ToolInstance")}
-
-
-class NewUUID:
-    def __init__(self):
-        self.uuid_dict = {}
-
-    def generate_uuid(self, _id):
-        _id = str(_id)
-        if _id in self.uuid_dict:
-            return self.uuid_dict.get(_id)
-        r = str(uuid.uuid7())
-        self.uuid_dict[_id] = r
-        return r
 
 
 def to_dict(message, file_name):
@@ -983,51 +969,17 @@ class ToolSerializer(serializers.Serializer):
                                           2: 全部创建
             @return:
             """
+            from application.serializers.application import resolve_import_tools
+
             if new_child_policy == 0:
                 tool_list = []
             else:
                 tool_list = tool.get("tool_list") or []
 
-            tool_list = {tool.get("id"): tool for tool in tool_list}.values()
-            update_tool_map = {}
-            if len(tool_list) > 0:
-                new_uuid = NewUUID()
-                tool_id_list = reduce(
-                    lambda x, y: [*x, *y],
-                    [
-                        [
-                            tool.get("id"),
-                            new_uuid.generate_uuid(tool.get("id"))
-                            if new_child_policy == 2
-                            else generate_uuid((tool.get("id") + workspace_id or "")),
-                        ]
-                        for tool in tool_list
-                    ],
-                    [],
-                )
-                # 存在的工具列表
-                exits_tool_id_list = [
-                    str(tool.id) for tool in QuerySet(Tool).filter(id__in=tool_id_list, workspace_id=workspace_id)
-                ]
-                # 需要更新的工具集合
-                update_tool_map = {
-                    tool.get("id"): new_uuid.generate_uuid(tool.get("id"))
-                    if new_child_policy == 2
-                    else generate_uuid((tool.get("id") + workspace_id or ""))
-                    for tool in tool_list
-                    if not exits_tool_id_list.__contains__(tool.get("id"))
-                }
-
-                tool_list = [
-                    {**tool, "id": update_tool_map.get(tool.get("id"))}
-                    for tool in tool_list
-                    if not exits_tool_id_list.__contains__(tool.get("id"))
-                       and not exits_tool_id_list.__contains__(
-                        new_uuid.generate_uuid(tool.get("id"))
-                        if new_child_policy == 2
-                        else generate_uuid((tool.get("id") + workspace_id or ""))
-                    )
-                ]
+            # 已存在且有权限的工具复用, 无权限或不存在则生成新id新建
+            update_tool_map, tool_list = resolve_import_tools(
+                tool_list, user_id, workspace_id, force_new=new_child_policy == 2
+            )
 
             work_flow = self.to_tool_workflow(
                 tool.get("work_flow"),
