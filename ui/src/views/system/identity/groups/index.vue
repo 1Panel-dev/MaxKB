@@ -113,7 +113,7 @@ function loadUserGroupMembers(reset = false) {
 
 /* 成员列表相关 */
 const loadingMembers = ref(false)
-const paginationConfig = ref({ currentPage: 1, pageSize: 10, total: 0 })
+const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '姓名', value: 'nick_name' },

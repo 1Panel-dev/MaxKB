@@ -27,7 +27,7 @@ const searchFields = [{ label: '名称', value: 'name' }]
 const loading = ref(false)
 const permissionGroups = ref<ResourceUserGroupPermission[]>([])
 const selectedGroups = ref<ResourceUserGroupPermission[]>([])
-const paginationConfig = ref({ currentPage: 1, pageSize: 10, total: 0 })
+const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchQuery = ref<Dict<unknown>>()
 const tableRef = useTemplateRef('tableRef')
 

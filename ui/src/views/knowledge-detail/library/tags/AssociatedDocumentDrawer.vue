@@ -25,7 +25,7 @@ const documentActiveOptions = [
 ]
 const selectedDocumentActive = ref<boolean | null>(null)
 const documentData = ref<DocumentItem[]>([])
-const paginationConfig = ref({ currentPage: 1, pageSize: 10, total: 0 })
+const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const documentTableRef = ref<{ clearSelection: () => void }>()
 const selectedDocuments = ref<DocumentItem[]>([])
 
@@ -129,7 +129,7 @@ function resetData() {
   searchName.value = ''
   selectedDocumentActive.value = null
   documentData.value = []
-  paginationConfig.value = { currentPage: 1, pageSize: 10, total: 0 }
+  paginationConfig.value = { currentPage: 1, pageSize: 20, total: 0 }
   clearSelection()
   loading.value = false
 }
