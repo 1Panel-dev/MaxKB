@@ -32,4 +32,5 @@ export type * from './portal'
 
 export type * from './document'
 export type * from './paragraph'
+export type * from './termbase'
 export type * from './chat-log'

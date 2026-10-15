@@ -20,6 +20,24 @@ export interface ParagraphProblem {
   content: string
 }
 
+/** 从问题详情查询到的关联分段，额外携带所属知识库与文档名称。 */
+export interface ProblemParagraph extends ParagraphItem {
+  knowledge_id: string
+  document_name: string
+}
+
+/** 批量将问题关联到文档分段时使用的分段引用。 */
+export interface ProblemParagraphReference {
+  paragraph_id: string
+  document_id: string
+}
+
+/** 批量关联问题与文档分段的请求载荷。 */
+export interface ProblemBatchAssociationPayload {
+  problem_id_list: string[]
+  paragraph_list: ProblemParagraphReference[]
+}
+
 export interface ParagraphDetail extends ParagraphItem {
   problem_list: ParagraphProblem[]
 }
