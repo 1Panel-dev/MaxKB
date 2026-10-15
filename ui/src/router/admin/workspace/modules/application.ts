@@ -65,10 +65,10 @@ export const applicationRoutes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'integration',
-            name: 'workspace-application-integration',
-            component: () => import('@/views/application-detail/integration/index.vue'),
-            meta: { title: '接入第三方', icon: 'icon_dataset_outlined', activeIcon: 'icon_dataset_filled', order: 30 },
+            path: 'access',
+            name: 'workspace-application-access',
+            component: () => import('@/views/application-detail/access/index.vue'),
+            meta: { title: '发布渠道', icon: 'icon_application_outlined', activeIcon: 'icon_application_filled', order: 30 },
           },
           {
             path: 'chat-user',

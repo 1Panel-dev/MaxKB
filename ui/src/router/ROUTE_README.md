@@ -256,7 +256,8 @@ Workspace 共享覆盖 resourceScope，保留 Workspace scope 及知识库 activ
 ### 智能体
 
 Workspace 详情父路由为 workspace-application-detail-layout，详情参数包含 applicationId 与 ApplicationDetail.type。
-菜单为概览、设置、接入第三方、对话用户、对话日志；SIMPLE 的 setting 与高级 workflow-entry 互斥显示。
+菜单为概览、设置、发布渠道、对话用户、对话日志；SIMPLE 的 setting 与高级 workflow-entry 互斥显示。
+发布渠道使用 access 路径、workspace-application-access 路由名，对应 application-detail/access 页面。
 高级设置重定向 workflow-application，保留 workspaceId、applicationId 和 query。
 对话日志保留 operation-log 路径和 workspace-application-operation-log 名称。
 

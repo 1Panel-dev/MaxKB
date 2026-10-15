@@ -3,11 +3,17 @@ import { formatTokenNumber, numberFormat } from '@/utils/number'
 import { computed, ref, watch } from 'vue'
 import type { HomeMonitoringDay } from '@/api/types'
 import type HomepageApi from '@/api/admin/workspace/homepage'
+import type SystemHomepageApi from '@/api/admin/system/homepage'
+import type OverviewApi from '@/api/admin/workspace/application/overview'
 import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
 import MkLineChart from '@/components/mk-echart/LineCharts.vue'
 import { beforeDay } from '@/utils/time'
-const props = defineProps<{ workspaceId: string; applicationId: string; api: typeof HomepageApi }>()
+const props = defineProps<{
+  workspaceId: string
+  applicationId: string
+  api: typeof HomepageApi | typeof SystemHomepageApi | typeof OverviewApi
+}>()
 defineSlots<{ application(props: { loading: boolean }): unknown }>()
 
 /* 日期、智能体筛选与使用统计 */
@@ -47,7 +53,7 @@ const metrics = computed(() =>
 function loadMonitoring() {
   loading.value = true
   return props.api
-    .getMonitoring(props.workspaceId, range.value, props.applicationId === 'all' ? undefined : props.applicationId)
+    .getMonitoring(props.workspaceId, range.value, props.applicationId === 'all' ? '' : props.applicationId)
     .then((result) => {
       monitoring.value = result
     })
@@ -97,9 +103,9 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
                 <h2>
                   {{ metric.id === 'tokens' ? formatTokenNumber(metric.series[0]?.total) : numberFormat(metric.series[0]?.total) }}
                 </h2>
-                <span v-if="metric.id === 'activeUsers'" class="-ml-1 font-medium text-danger" title="新增用户"
-                  >+{{ numberFormat(metric.series[1]?.total) }}</span
-                >
+                <span v-if="metric.id === 'activeUsers'" class="-ml-1 font-medium text-danger" title="新增用户">
+                  +{{ numberFormat(metric.series[1]?.total) }}
+                </span>
               </template>
             </div>
           </el-card>

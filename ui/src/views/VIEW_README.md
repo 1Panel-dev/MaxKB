@@ -40,7 +40,7 @@
 | `application-detail/`                                                                 | 智能体详情上下文与资源详情布局               |
 | `application-detail/overview/`、`setting/`                                            | 概览、简易智能体设置                         |
 | `application-detail/chat-user/`、`chat-log/`                                          | 对话授权、日志与标注                         |
-| `application-detail/integration/`                                                     | 接入第三方占位页                             |
+| `application-detail/access/`                                                          | 发布渠道配置、启停与回调地址                 |
 | `knowledge-detail/`                                                                   | 四范围知识库详情、菜单与上下文               |
 | `knowledge-detail/library/document/`、`tags/`                                         | 文档及标签维护                               |
 | `knowledge-detail/library/image/`                                                     | 图片列表，复用文档操作                       |
@@ -92,6 +92,11 @@
 `workspace_id`；关联资源抽屉的查询与工作空间展示规则见组件和 API 文档。
 
 ## 详情布局与知识库上下文
+
+智能体发布渠道位于 `application-detail/access/`，支持企业微信智能机器人、企业微信应用、钉钉、
+公众号、飞书和 Slack。平台字段与后台指引在功能本地 `platforms.ts` 维护；卡片按配置状态显示
+启停开关，保存状态成功后更新显示。配置抽屉按需挂载并在关闭动画后卸载，每次打开重新查询，
+保存失败保留草稿。公众号提供认证开关，飞书 Verification Token 可选；回调 URL 只读并支持复制。
 
 `layout/ResourceDetailLayout.vue` 提供侧栏和固定标题栏。子页声明 `ResourceDetailPageProps`，
 普通页使用默认标题；`defineExpose({ customHeader: true })` 配合 Teleport 到 `headerTarget`
@@ -244,6 +249,13 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - 首页组件位于 `home/components/`，排行位于 `components/ranking/`。完整 Homepage API 和 workspaceId 由 View 传入。
   智能体筛选只影响趋势；日期复用 MkDateRange，默认过去 7 天；占比使用工作空间同期总量，累计活跃人次为每日人数之和。
   失败不伪装成零。快捷创建复用资源入口，`fitTriggerWidth` 仅显式开启时测量触发器。
+- `HomeStatistics` 接收完整的 Workspace Homepage、System Homepage 或 Overview API。
+  智能体概览通过 `hideHeader: true` 隐藏详情布局标题栏，保留内容内的监控与排行标题。
+  三类场景统一调用 `getMonitoring(workspaceId, range, applicationId)`；全部智能体使用空 ID，
+  两类首页不提交智能体筛选，概览传当前智能体 ID。页面直接传入完整 API，不包装接口。
+  排行由概览本地 `components/ApplicationRanking.vue` 调用 Overview API，展示用户 Tokens 消耗与提问次数两类 TOP5。
+  应用排行复用首页 `RankingCard`，由概览转换展示字段；占比使用当前应用同期完整排行总量。
+  概览内暂时隐藏卡片详情入口，不接入排行抽屉、搜索、分页或导出。
 - 触发器表单共用创建／编辑，保留任务 ID 和参数；资源模式固定单任务，完整输入定义不足时补查详情。
   保存校验全部折叠任务；参数初始化不覆盖已配置值，移除事件引用时恢复自定义默认值。
 - 智能体／知识库对话用户页使用双栏布局和当前页授权；知识库从 context 取四范围 ChatUser API。

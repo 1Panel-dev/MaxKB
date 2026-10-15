@@ -1,11 +1,27 @@
 /** Workspace 智能体列表及其卡片共用的业务类型。 */
 
 import type LogicFlow from '@logicflow/core'
-import { APPLICATION_TYPE } from '@/api/enums'
+import { APPLICATION_ACCESS_PLATFORM, APPLICATION_TYPE } from '@/api/enums'
 import type { DefaultModelSettingPayload } from './model'
 import type { WorkflowStoreTemplate } from './workflow-template'
+import type { Dict } from './common'
 
 export type ApplicationType = (typeof APPLICATION_TYPE)[keyof typeof APPLICATION_TYPE]
+
+export type ApplicationAccessPlatform = (typeof APPLICATION_ACCESS_PLATFORM)[keyof typeof APPLICATION_ACCESS_PLATFORM]
+
+/** 状态数组依次为是否已配置、是否启用；未配置的平台可能不返回。 */
+export type ApplicationAccessStatus = Partial<Record<ApplicationAccessPlatform, [exists: boolean, isActive: boolean]>>
+
+export interface ApplicationAccessConfig extends Dict<string | boolean | undefined> {
+  callback_url?: string
+  is_certification?: boolean
+}
+
+export interface ApplicationAccessStatusPayload {
+  type: ApplicationAccessPlatform
+  status: boolean
+}
 
 export interface ApplicationDetail extends Omit<ApplicationFormPayload, 'desc'> {
   /** 详情接口返回的主模型 ID。 */
@@ -95,4 +111,16 @@ export type ApplicationStoreTemplate = WorkflowStoreTemplate
 export interface ApplicationStoreResponse {
   additionalProperties: { tags: { key: string; name: string }[] }
   apps: ApplicationStoreTemplate[]
+}
+
+/** 智能体概览的用户 Tokens 消耗，接口返回完整排行。 */
+export interface ApplicationTokenUsage {
+  username: string
+  token_usage: number | null
+}
+
+/** 智能体概览的用户提问次数，接口返回完整排行。 */
+export interface ApplicationTopQuestion {
+  username: string
+  chat_record_count: number
 }

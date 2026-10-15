@@ -75,7 +75,6 @@ const putApplicationPublish = (applicationId: string, publishName: string, publi
   })
 }
 
-
 export default {
   getApplicationPage,
   getApplicationDetail,
