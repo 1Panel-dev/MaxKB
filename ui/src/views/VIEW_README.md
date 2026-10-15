@@ -44,7 +44,8 @@
 | `knowledge-detail/`                                                                   | 四范围知识库详情、菜单与上下文               |
 | `knowledge-detail/library/document/`、`tags/`                                         | 文档及标签维护                               |
 | `knowledge-detail/library/image/`                                                     | 图片占位页                                   |
-| `knowledge-detail/recall-test/`、`question/`、`dictionary/`                           | 检索优化占位页                               |
+| `knowledge-detail/recall-test/`、`question/`                                          | 检索优化占位页                               |
+| `knowledge-detail/termbase/`                                                          | 知识库自定义分词维护                         |
 | `knowledge-detail/chat-user/`、`external-retrieval/`                                  | 对话授权与外部检索配置                       |
 | `knowledge-detail/setting/base/`、`document-strategy/`、`scheduled-sync/`             | 基础设置、文档策略、定时同步与日志           |
 | `knowledge-detail/workflow-transform/`                                                | 非工作流知识库转换说明与确认                 |
@@ -99,7 +100,7 @@
 
 `knowledge-detail/context.ts` 仅通过 `provideKnowledgeDetailContext` 和
 `useKnowledgeDetailContext` 公开详情、更新能力、ID、来源导航及完整 API。
-`resourceApi.knowledge / scheduledSync / document / tags / chatUser / externalRetrieval` 按当前范围响应式读取，无需 `.value`，
+`resourceApi.knowledge / scheduledSync / document / tags / termbase / chatUser / externalRetrieval` 按当前范围响应式读取，无需 `.value`，
 不要在 setup 时解构具体 API。`workflow` 当前仅普通 Workspace 提供，其他范围不回退。
 共有查询方法必填，部分范围缺失的方法可选调用；未发请求时不提示成功、不关闭、不刷新或修改快照，loading 正常清理。
 不增加查询／维护双入口、接口别名或专属 Context hook，也不以方法存在性新增操作显隐规则。

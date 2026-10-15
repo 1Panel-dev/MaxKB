@@ -15,6 +15,10 @@ import TagsApi from '@/api/admin/workspace/knowledge/tags'
 import SharedTagsApi from '@/api/admin/workspace/shared/knowledge/tags'
 import SystemResourceTagsApi from '@/api/admin/system/resource-management/knowledge/tags'
 import SystemSharedTagsApi from '@/api/admin/system/shared-resources/knowledge/tags'
+import TermbaseApi from '@/api/admin/workspace/knowledge/termbase'
+import SharedTermbaseApi from '@/api/admin/workspace/shared/knowledge/termbase'
+import SystemResourceTermbaseApi from '@/api/admin/system/resource-management/knowledge/termbase'
+import SystemSharedTermbaseApi from '@/api/admin/system/shared-resources/knowledge/termbase'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-sync'
 import SharedScheduledSyncApi from '@/api/admin/workspace/shared/knowledge/scheduled-sync'
@@ -46,6 +50,9 @@ interface KnowledgeResourceApi {
     typeof DocumentApi | typeof SharedDocumentApi | typeof SystemResourceDocumentApi | typeof SystemSharedDocumentApi
   >
   readonly tags: OptionalApiMethods<typeof TagsApi | typeof SharedTagsApi | typeof SystemResourceTagsApi | typeof SystemSharedTagsApi>
+  readonly termbase: OptionalApiMethods<
+    typeof TermbaseApi | typeof SharedTermbaseApi | typeof SystemResourceTermbaseApi | typeof SystemSharedTermbaseApi
+  >
   readonly knowledge: typeof KnowledgeApi | typeof SharedKnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi
   readonly scheduledSync: OptionalApiMethods<
     typeof ScheduledSyncApi | typeof SharedScheduledSyncApi | typeof SystemResourceScheduledSyncApi | typeof SystemSharedScheduledSyncApi
@@ -73,6 +80,7 @@ const resourceConfigs = {
       externalRetrieval: ExternalRetrievalApi,
       document: DocumentApi,
       tags: TagsApi,
+      termbase: TermbaseApi,
       workflow: WorkflowApi,
     },
     listRouteName: 'workspace-knowledge-list',
@@ -85,6 +93,7 @@ const resourceConfigs = {
       externalRetrieval: SharedExternalRetrievalApi,
       document: SharedDocumentApi,
       tags: SharedTagsApi,
+      termbase: SharedTermbaseApi,
     },
     listRouteName: 'workspace-knowledge-list',
   },
@@ -96,6 +105,7 @@ const resourceConfigs = {
       externalRetrieval: SystemResourceExternalRetrievalApi,
       document: SystemResourceDocumentApi,
       tags: SystemResourceTagsApi,
+      termbase: SystemResourceTermbaseApi,
     },
     listRouteName: 'system-resource-knowledge',
   },
@@ -107,6 +117,7 @@ const resourceConfigs = {
       externalRetrieval: SystemSharedExternalRetrievalApi,
       document: SystemSharedDocumentApi,
       tags: SystemSharedTagsApi,
+      termbase: SystemSharedTermbaseApi,
     },
     listRouteName: 'system-shared-knowledge',
   },
@@ -146,6 +157,9 @@ function createKnowledgeDetailContext(state: KnowledgeDetailState): KnowledgeDet
     },
     get tags() {
       return resourceConfig.value.resourceApi.tags
+    },
+    get termbase() {
+      return resourceConfig.value.resourceApi.termbase
     },
     get knowledge() {
       return resourceConfig.value.resourceApi.knowledge
@@ -201,10 +215,11 @@ type ScopedResourceApi<Scope extends ResourceScope> = {
 }
 
 type ScopedKnowledgeDetailContext<Scope extends ResourceScope> = Omit<KnowledgeDetailContext, 'resourceApi'> & {
-  resourceApi: Omit<ScopedResourceApi<Scope>, 'scheduledSync' | 'tags' | 'document' | 'chatUser' | 'externalRetrieval'> & {
+  resourceApi: Omit<ScopedResourceApi<Scope>, 'scheduledSync' | 'tags' | 'termbase' | 'document' | 'chatUser' | 'externalRetrieval'> & {
     readonly chatUser: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['chatUser']>
     readonly scheduledSync: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['scheduledSync']>
     readonly tags: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['tags']>
+    readonly termbase: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['termbase']>
     readonly document: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['document']>
     readonly externalRetrieval: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['externalRetrieval']>
   }
