@@ -12,7 +12,7 @@ const drawerVisible = ref(false)
 const currentGroup = ref<SystemUserGroup>()
 const loadingMembers = ref(false)
 const userGroupMembers = ref<SystemUserGroupMember[]>([])
-const paginationConfig = ref({ currentPage: 1, pageSize: 10, total: 0 })
+const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '姓名', value: 'nick_name' },
@@ -69,7 +69,7 @@ function resetData() {
   currentGroup.value = undefined
   loadingMembers.value = false
   userGroupMembers.value = []
-  paginationConfig.value = { currentPage: 1, pageSize: 10, total: 0 }
+  paginationConfig.value = { currentPage: 1, pageSize: 20, total: 0 }
   memberSearchQuery.value = undefined
   selectedMemberSource.value = null
 }

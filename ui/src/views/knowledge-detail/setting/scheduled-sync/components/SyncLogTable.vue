@@ -19,7 +19,7 @@ const props = defineProps<{
 // 进入日志页签时挂载查询，翻页由表格事件重新查询。
 const loading = ref(false)
 const syncLogs = ref<KnowledgeSyncLog[]>([])
-const paginationConfig = ref({ currentPage: 1, pageSize: 10, total: 0 })
+const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const syncStatusOptions: Partial<Record<KnowledgeSyncStatus, StatusLabelOptions>> = {
   [KNOWLEDGE_SYNC_STATUS.RUNNING]: { type: 'loading', label: '同步中' },
   [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: '成功' },
@@ -59,7 +59,7 @@ watch(
   [() => props.knowledgeId, () => props.api],
   () => {
     syncLogs.value = []
-    paginationConfig.value = { currentPage: 1, pageSize: 10, total: 0 }
+    paginationConfig.value = { currentPage: 1, pageSize: 20, total: 0 }
     void loadSyncLogs()
   },
   { immediate: true },
