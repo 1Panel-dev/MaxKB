@@ -73,7 +73,7 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
           {
             path: 'dictionary',
             name: 'workspace-shared-knowledge-dictionary',
-            component: () => import('@/views/knowledge-detail/dictionary/index.vue'),
+            component: () => import('@/views/knowledge-detail/termbase/index.vue'),
             meta: { title: '自定义分词', order: 30 },
           },
         ],
