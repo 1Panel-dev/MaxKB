@@ -338,6 +338,21 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外。Syst
   详情和取消为 GET action/<actionId>、POST action/<actionId>/cancel。
 - 智能体复制查询完整 ApplicationDetail，model 映射 model_id 后创建，不使用卡片摘要。
 
+### 智能体概览
+
+`admin/workspace/application/overview.ts` 独立维护概览接口，沿用 v2 的应用统计协议，在
+`/workspace/<workspaceId>/application/<applicationId>` 下提供三个 GET 接口，均传入
+`start_time`、`end_time`，由调用方管理 loading：
+
+- `getMonitoring(workspaceId, range, applicationId)` 请求 `/application_stats`，返回 `HomeMonitoringDay[]`，供概览复用首页监控。
+- `getTokenUsage` 请求 `/application_token_usage`，返回 `ApplicationTokenUsage[]`，字段为
+  `username`、`token_usage`。
+- `getTopQuestions` 请求 `/top_questions`，返回 `ApplicationTopQuestion[]`，字段为
+  `username`、`chat_record_count`。
+
+两类用户排行返回按使用量降序排列的完整数组，不使用首页排行的分页、总量或导出接口。
+业务类型经 `@/api/types` 导出；Tokens 接口不包含用户对话次数，不据此展示每轮平均消耗。
+
 ### 工作空间首页
 
 `admin/workspace/homepage.ts` 维护 `/workspace/<workspaceId>/homepage` 的四类资源汇总、
@@ -567,6 +582,17 @@ System 前缀中的额外 `knowledge` 段暂按 V2 保留，不能依据普通�
 （`knowledge_id`、`document_id`、`chat_ids`），将所选对话的问答写入目标文档。
 目标文档选项通过 `workspace/knowledge/document.ts` 的 `getAllDocuments(knowledgeId)`
 请求不分页的文档列表。聊天记录与标注接口保留在同一 API 文件，尚未接入日志详情正文。
+
+### 智能体发布渠道
+
+`admin/workspace/application/access.ts` 独立维护发布渠道接口，前缀为
+`/workspace/<workspaceId>/application/<applicationId>/platform`，沿用 v2 协议。
+GET `/status` 返回按平台标识索引的 `[是否已配置, 是否启用]`；POST `/status` 提交
+`{ type, status }`。GET、POST `/<type>` 查询与保存对应平台配置，不由通用 application.ts 转发。
+平台标识由 `APPLICATION_ACCESS_PLATFORM` 定义，业务类型在 `types/application.ts` 经公共入口导出。
+公众号配置包含布尔值 `is_certification`，其余表单字段为字符串；配置保存保留未编辑字段。
+回调地址沿用 Admin API base 下的 `/chat/<type>/<applicationId>`，不使用独立 Chat API base。
+这些接口依赖部署端提供对应的平台接入服务。
 
 ### 知识库外部检索服务
 
