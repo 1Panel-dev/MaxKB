@@ -99,7 +99,7 @@
 
 `knowledge-detail/context.ts` 仅通过 `provideKnowledgeDetailContext` 和
 `useKnowledgeDetailContext` 公开详情、更新能力、ID、来源导航及完整 API。
-`resourceApi.knowledge / scheduledSync / document / tags / chatUser` 按当前范围响应式读取，无需 `.value`，
+`resourceApi.knowledge / scheduledSync / document / tags / chatUser / externalRetrieval` 按当前范围响应式读取，无需 `.value`，
 不要在 setup 时解构具体 API。`workflow` 当前仅普通 Workspace 提供，其他范围不回退。
 共有查询方法必填，部分范围缺失的方法可选调用；未发请求时不提示成功、不关闭、不刷新或修改快照，loading 正常清理。
 不增加查询／维护双入口、接口别名或专属 Context hook，也不以方法存在性新增操作显隐规则。
@@ -237,8 +237,9 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - 对话日志筛选、导出使用同组查询；无勾选导出筛选结果，日期清空禁用导出。
   清除策略使用专用接口、弹窗自身 loading；添加知识库固定所选对话 ID。
   `ChatLogDetailDrawer` 目前正文为空，上一条／下一条与跨页由页面管理。
-- 外部检索页当前直接使用 Workspace ExternalRetrieval API，尚未按四范围装配；仅 Workspace 共享开关禁用。
-  其他范围的 API 文件虽存在，页面仍未选择对应 API。示例与地址来自响应，只读展示／复制，不在前端拼接。
+- 外部检索页从 context 读取四范围 ExternalRetrieval API；Workspace 共享只读，禁用开关并阻止提交。
+  查询失败展示重新加载入口，不展示默认开关；保存期间使用 loading 与 inert，失败保留已保存配置。
+  知识库或资源范围变化时重新查询；示例与地址来自响应，只读展示／复制，不在前端拼接。
 - 门户设置已通过 Portal API 持久化，JSON 保存开关、认证及 `cross_domain_list`，FormData 保存名称／Logo。
   成功以完整响应回显，保留现有编辑权限；认证选项来自 LoginSetting，跨域地址按行清理，取消不回写。
 - 用户导入、改密、批量角色／配额流程留在各自业务目录；工作空间成员按用户联动角色行选择，

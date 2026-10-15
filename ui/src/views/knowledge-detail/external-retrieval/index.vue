@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import ExternalRetrievalApi from '@/api/admin/workspace/knowledge/external-retrieval'
+import { computed, ref, watch } from 'vue'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetting } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { copyText } from '@/utils/clipboard'
@@ -12,48 +11,46 @@ defineOptions({ name: 'ExternalRetrievalView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
-const route = useRoute()
-const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
+const { knowledgeId, resourceApi } = useKnowledgeDetailContext()
 
-// 配置查询；未接入与加载失败均不回填虚假的开关或服务地址。
+// 读取当前资源范围的真实配置，查询失败时展示重试入口。
 const setting = ref<KnowledgeExternalRetrievalSetting | null>(null)
 const loading = ref(false)
+const saving = ref(false)
 const loadFailed = ref(false)
 
-function loadExternalRetrieval() {
-  if (loading.value) return
+async function loadExternalRetrieval() {
   loading.value = true
+  setting.value = null
   loadFailed.value = false
-  return ExternalRetrievalApi.getKnowledgeExternalRetrieval(knowledgeId.value)
-    .then((result) => {
-      setting.value = result
-    })
-    .catch(() => {
-      loadFailed.value = true
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  try {
+    setting.value = await resourceApi.externalRetrieval.getKnowledgeExternalRetrieval(knowledgeId.value)
+  } catch {
+    loadFailed.value = true
+  } finally {
+    loading.value = false
+  }
 }
 
 // 仅保存本次切换的字段，成功后按完整响应更新开关及配置示例。
-function handleSettingChange(field: keyof KnowledgeExternalRetrievalPayload, value: string | number | boolean) {
-  loading.value = true
-  return ExternalRetrievalApi.putKnowledgeExternalRetrieval(knowledgeId.value, { [field]: value === true })
-    .then((result) => {
-      setting.value = result
-      MsgSuccess('保存成功')
-    })
-    .finally(() => {
-      loading.value = false
-    })
+async function handleSettingChange(field: keyof KnowledgeExternalRetrievalPayload, value: string | number | boolean) {
+  if (!setting.value || loading.value || saving.value || isWorkspaceSharedResource()) return
+  saving.value = true
+  try {
+    const result = await resourceApi.externalRetrieval.putKnowledgeExternalRetrieval?.(knowledgeId.value, { [field]: value === true })
+    if (!result) return
+    setting.value = result
+    MsgSuccess('保存成功')
+  } catch {
+    // 请求层统一提示错误，保留已保存的开关与示例，允许再次操作。
+  } finally {
+    saving.value = false
+  }
 }
 
 const mcpConfig = computed(() => (setting.value ? JSON.stringify(setting.value.mcp_config, null, 2) : ''))
 
-onMounted(() => {
-  loadExternalRetrieval()
-})
+watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval, { immediate: true })
 </script>
 
 <template>
@@ -66,65 +63,71 @@ onMounted(() => {
     </div>
   </Teleport>
 
-  <div v-loading="loading" class="w-full max-w-200 space-y-4">
-    <section>
-      <div class="mb-2">
-        <span>身份认证</span>
-        <span class="text-N600">（开启后仅授权的对话用户可通过 API Key 检索该知识库）</span>
-      </div>
-      <!-- 切换身份认证 -->
-      <el-switch
-        :disabled="isWorkspaceSharedResource()"
-        :model-value="setting?.authentication ?? false"
-        @change="handleSettingChange('authentication', $event)"
-      />
-    </section>
-    <section>
-      <div class="flex-between mb-2 gap-2">
-        <span>API 服务地址</span>
-        <!-- 切换外部检索服务 -->
+  <div v-loading="loading || saving" :inert="loading || saving" class="min-h-40 w-full max-w-200">
+    <MkEmpty v-if="loadFailed" description="外部检索服务加载失败">
+      <!-- 重新加载外部检索服务配置 -->
+      <el-button type="primary" @click="loadExternalRetrieval">重新加载</el-button>
+    </MkEmpty>
+    <div v-else-if="setting" class="space-y-4">
+      <section>
+        <div class="mb-2">
+          <span>身份认证</span>
+          <span class="text-N600">（开启后仅授权的对话用户可通过 API Key 检索该知识库）</span>
+        </div>
+        <!-- 切换身份认证 -->
         <el-switch
           :disabled="isWorkspaceSharedResource()"
-          :model-value="setting?.enabled ?? false"
-          size="small"
-          @change="handleSettingChange('enabled', $event)"
+          :model-value="setting.authentication"
+          @change="handleSettingChange('authentication', $event)"
         />
-      </div>
-      <el-input :model-value="setting?.api_url ?? ''" readonly>
-        <template #suffix>
-          <!-- 复制 API 服务地址 -->
-          <el-button text class="-mr-1" :disabled="!setting?.api_url" @click="copyText(setting?.api_url)">
+      </section>
+      <section>
+        <div class="flex-between mb-2 gap-2">
+          <span>API 服务地址</span>
+          <!-- 切换外部检索服务 -->
+          <el-switch
+            :disabled="isWorkspaceSharedResource()"
+            :model-value="setting.enabled"
+            size="small"
+            @change="handleSettingChange('enabled', $event)"
+          />
+        </div>
+        <el-input :model-value="setting?.api_url ?? ''" readonly>
+          <template #suffix>
+            <!-- 复制 API 服务地址 -->
+            <el-button text class="-mr-1" :disabled="!setting?.api_url" @click="copyText(setting?.api_url)">
+              <MkIcon name="icon_copy_outlined" />
+            </el-button>
+          </template>
+        </el-input>
+      </section>
+
+      <section>
+        <div class="mb-2">API 调用示例</div>
+        <div class="group relative">
+          <el-input :model-value="setting?.api_example ?? ''" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
+          <!-- 复制 API 调用示例 -->
+          <el-button
+            class="group-hover-visible absolute right-3 top-3 z-10 shadow-md"
+            circle
+            :disabled="!setting?.api_example"
+            @click="copyText(setting?.api_example)"
+          >
             <MkIcon name="icon_copy_outlined" />
           </el-button>
-        </template>
-      </el-input>
-    </section>
+        </div>
+      </section>
 
-    <section>
-      <div class="mb-2">API 调用示例</div>
-      <div class="group relative">
-        <el-input :model-value="setting?.api_example ?? ''" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
-        <!-- 复制 API 调用示例 -->
-        <el-button
-          class="group-hover-visible absolute right-3 top-3 z-10 shadow-md"
-          circle
-          :disabled="!setting?.api_example"
-          @click="copyText(setting?.api_example)"
-        >
-          <MkIcon name="icon_copy_outlined" />
-        </el-button>
-      </div>
-    </section>
-
-    <section>
-      <div class="mb-2">MCP 配置详情</div>
-      <div class="group relative">
-        <el-input :model-value="mcpConfig" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
-        <!-- 复制 MCP 配置 -->
-        <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle :disabled="!mcpConfig" @click="copyText(mcpConfig)">
-          <MkIcon name="icon_copy_outlined" />
-        </el-button>
-      </div>
-    </section>
+      <section>
+        <div class="mb-2">MCP 配置详情</div>
+        <div class="group relative">
+          <el-input :model-value="mcpConfig" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
+          <!-- 复制 MCP 配置 -->
+          <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle :disabled="!mcpConfig" @click="copyText(mcpConfig)">
+            <MkIcon name="icon_copy_outlined" />
+          </el-button>
+        </div>
+      </section>
+    </div>
   </div>
 </template>

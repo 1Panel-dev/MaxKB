@@ -1,5 +1,6 @@
 import importlib
 import json
+import shlex
 from contextlib import ExitStack
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
@@ -74,6 +75,10 @@ class RetrievalSettingsTests(SimpleTestCase):
             self.assertEqual(item.external_service, {"enabled": True, "authentication": True})
             self.assertTrue(settings["enabled"])
             self.assertTrue(settings["authentication"])
+            self.assertIn("Authorization: Bearer <CHAT_USER_API_KEY>", settings["api_example"])
+            settings = update(serializer, {"authentication": False})
+            self.assertNotIn("Authorization", settings["api_example"])
+            self.assertNotIn("headers", settings["mcp_config"][f"knowledge_{KID}"])
         item.save.assert_called_with(update_fields=["external_service"])
 
     @patch("knowledge.serializers.external_retrieval.Knowledge.objects")
@@ -113,6 +118,24 @@ class RetrievalSettingsTests(SimpleTestCase):
         self.assertEqual(connection["transport"], "streamable_http")
         self.assertEqual(connection["headers"]["Authorization"], "Bearer <CHAT_USER_API_KEY>")
         self.assertNotIn("headers", service_settings(knowledge())["mcp_config"][f"knowledge_{KID}"])
+
+    def test_api_example_is_a_complete_curl_request_for_both_authentication_modes(self):
+        request = RequestFactory().get("/", HTTP_HOST="testserver", secure=True)
+        for authentication in (False, True):
+            with (
+                self.subTest(authentication=authentication),
+                patch("knowledge.serializers.external_retrieval.CONFIG.get_chat_path", return_value="/custom/chat"),
+            ):
+                settings = service_settings(knowledge(authentication=authentication), request)
+                arguments = shlex.split(settings["api_example"].replace("\\\n", ""))
+                self.assertEqual(arguments[:4], ["curl", "-X", "POST", settings["api_url"]])
+                self.assertEqual(settings["api_url"], f"https://testserver/custom/chat/api/v3/knowledge/{KID}/retrieve")
+                headers = [arguments[index + 1] for index, value in enumerate(arguments) if value == "-H"]
+                self.assertIn("Content-Type: application/json", headers)
+                self.assertEqual("Authorization: Bearer <CHAT_USER_API_KEY>" in headers, authentication)
+                data = json.loads(arguments[arguments.index("-d") + 1])
+                self.assertTrue(RetrievalRequest(data=data).is_valid())
+                self.assertEqual(data["search_mode"], "embedding")
 
     def test_routes_resolve_to_knowledge_and_preserve_application_mcp(self):
         self.assertIs(resolve(f"/chat/api/v3/knowledge/{KID}/mcp").func, views.knowledge_mcp_view)

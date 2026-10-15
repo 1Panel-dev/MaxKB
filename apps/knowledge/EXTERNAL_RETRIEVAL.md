@@ -1,6 +1,6 @@
 # 知识库外部检索服务
 
-本次仅实现后端配置与检索接口，供「知识库 → 授权与集成 → 外部检索服务」页面接入。
+「知识库 → 授权与集成 → 外部检索服务」页面提供配置查询、开关保存、API 示例与 MCP 配置复制。
 MCP 沿用智能体的 Django HTTP 入口与 ToolHandler 结构，
 支持 Streamable HTTP 的 JSON 响应；不新增服务进程、队列或生产依赖，不改动 ChatUserApiKey。
 
@@ -11,9 +11,19 @@ MCP 沿用智能体的 Django HTTP 入口与 ToolHandler 结构，
 给旧库写入空配置：外部服务关闭，内部检索继续原有规则；管理员显式修改身份认证后采用新开关规则。
 只切换外部服务不会改变旧库内部鉴权。迁移需按项目部署流程执行，开发时不自动应用。
 
-管理接口为 `GET/PUT /admin/api/workspace/{workspace_id}/knowledge/{knowledge_id}/external_service`，
-使用现有管理员 Token 和知识库读/编辑权限。PUT 只提交本次修改的开关，例如 `{"enabled":true}`；
-其他配置保留。响应中的地址使用当前部署前缀，MCP 配置仅包含 Key 占位符。
+管理接口使用现有管理员 Token 和各范围的知识库读/编辑权限：
+
+| 资源范围        | 接口                                                                                          | 方法    |
+| --------------- | --------------------------------------------------------------------------------------------- | ------- |
+| Workspace       | `/admin/api/workspace/{workspace_id}/knowledge/{knowledge_id}/external_service`               | GET/PUT |
+| Workspace 共享  | `/admin/api/system/shared/workspace/{workspace_id}/knowledge/{knowledge_id}/external_service` | GET     |
+| System 资源管理 | `/admin/api/system/resource/knowledge/{knowledge_id}/external_service`                        | GET/PUT |
+| System 共享资源 | `/admin/api/system/shared/knowledge/{knowledge_id}/external_service`                          | GET/PUT |
+
+PUT 只提交本次修改的开关，例如 `{"enabled":true}`，其他配置保留。
+查询与保存均返回 `enabled`、`authentication`、`api_url`、`api_example`、`mcp_url`、`mcp_config`。
+地址与 curl 示例使用当前部署前缀；认证开启时，API 示例和 MCP 配置使用 `<CHAT_USER_API_KEY>` 占位符，
+认证关闭时省略 Authorization。页面按资源范围选择接口，Workspace 共享只读；加载失败可重试，保存失败保留原值。
 
 外部服务关闭时，两种入口都返回 404。身份认证开启时，需要有效且启用的对话用户 API Key、
 启用的用户和现有用户/用户组知识库授权；关闭时允许匿名。显式传入无效 Key 返回 401。
@@ -55,7 +65,7 @@ similarity 为 0–1（默认 0），search_mode 支持 embedding、keywords、b
   "knowledge_example": {
     "url": "https://example.com/chat/api/v3/knowledge/KNOWLEDGE_ID/mcp",
     "transport": "streamable_http",
-    "headers": {"Authorization": "Bearer <CHAT_USER_API_KEY>"}
+    "headers": { "Authorization": "Bearer <CHAT_USER_API_KEY>" }
   }
 }
 ```

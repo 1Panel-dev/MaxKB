@@ -559,7 +559,7 @@ System 前缀中的额外 `knowledge` 段暂按 V2 保留，不能依据普通�
 
 ### 知识库外部检索服务
 
-四个知识库范围分别在自己的 `external-retrieval.ts` 中维护相同的查询与保存方法，仅资源前缀不同：
+四个知识库范围分别在自己的 `external-retrieval.ts` 中维护配置接口，仅资源前缀与写入能力不同：
 
 - Workspace：`/workspace/<workspaceId>/knowledge/<knowledgeId>`。
 - Workspace 共享：`/system/shared/workspace/<workspaceId>/knowledge/<knowledgeId>`。
@@ -567,15 +567,15 @@ System 前缀中的额外 `knowledge` 段暂按 V2 保留，不能依据普通�
 - System 共享资源：`/system/shared/knowledge/<knowledgeId>`。
 
 `getKnowledgeExternalRetrieval(knowledgeId)` 通过 GET `<资源前缀>/external_service` 查询配置；
-`putKnowledgeExternalRetrieval(knowledgeId, payload)` 通过 PUT 同一路径保存开关。
+`putKnowledgeExternalRetrieval(knowledgeId, payload)` 通过 PUT 同一路径保存开关，Workspace 共享只提供查询。
 工作空间 ID 在调用时由 API 内读取，四套均使用 Admin 请求封装，不返回占位 null 或回退其他范围。
 
-联调 TODO 统一保留在两个方法处：查询返回 `enabled`、`authentication`、`api_url`、`api_example`、`mcp_url`、`mcp_config`；
+查询返回 `enabled`、`authentication`、`api_url`、`api_example`、`mcp_url`、`mcp_config`；
 `api_example` 为后台生成的完整 API 调用示例文本（string），前端仅展示和复制，不拼接请求内容。
 保存只更新 payload 传入的 `enabled` 或 `authentication`，保留未提交字段，并返回包含最新 `api_example` 的完整配置。
 响应与提交类型共用 `types/knowledge-external-retrieval.ts`，通过 `@/api/types` 导入；请求层统一解包 `data`。
-页面已实现加载、开关保存、回显与只读内容复制；接口字段有差异时在各自 API 模块适配，不要求联调人员补写页面交互。
-外部检索页面当前直接使用 Workspace API，尚未选择其他三种范围的接口；页面接入边界见 View 文档。
+页面通过 Knowledge Detail Context 的 `resourceApi.externalRetrieval` 按四范围选择完整 API，
+实现加载、开关保存、失败重试、回显与只读内容复制；Workspace 共享不发送保存请求。
 
 ### 知识库定时同步
 

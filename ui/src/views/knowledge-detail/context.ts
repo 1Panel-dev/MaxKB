@@ -20,6 +20,10 @@ import ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-sync'
 import SharedScheduledSyncApi from '@/api/admin/workspace/shared/knowledge/scheduled-sync'
 import SystemResourceScheduledSyncApi from '@/api/admin/system/resource-management/knowledge/scheduled-sync'
 import SystemSharedScheduledSyncApi from '@/api/admin/system/shared-resources/knowledge/scheduled-sync'
+import ExternalRetrievalApi from '@/api/admin/workspace/knowledge/external-retrieval'
+import SharedExternalRetrievalApi from '@/api/admin/workspace/shared/knowledge/external-retrieval'
+import SystemResourceExternalRetrievalApi from '@/api/admin/system/resource-management/knowledge/external-retrieval'
+import SystemSharedExternalRetrievalApi from '@/api/admin/system/shared-resources/knowledge/external-retrieval'
 import ChatUserApi from '@/api/admin/workspace/chat-user'
 import SharedChatUserApi from '@/api/admin/workspace/shared/chat-user'
 import SystemResourceChatUserApi from '@/api/admin/system/resource-management/chat-user'
@@ -46,6 +50,12 @@ interface KnowledgeResourceApi {
   readonly scheduledSync: OptionalApiMethods<
     typeof ScheduledSyncApi | typeof SharedScheduledSyncApi | typeof SystemResourceScheduledSyncApi | typeof SystemSharedScheduledSyncApi
   >
+  readonly externalRetrieval: OptionalApiMethods<
+    | typeof ExternalRetrievalApi
+    | typeof SharedExternalRetrievalApi
+    | typeof SystemResourceExternalRetrievalApi
+    | typeof SystemSharedExternalRetrievalApi
+  >
 }
 
 interface KnowledgeResourceConfig {
@@ -60,6 +70,7 @@ const resourceConfigs = {
       chatUser: ChatUserApi,
       knowledge: KnowledgeApi,
       scheduledSync: ScheduledSyncApi,
+      externalRetrieval: ExternalRetrievalApi,
       document: DocumentApi,
       tags: TagsApi,
       workflow: WorkflowApi,
@@ -71,6 +82,7 @@ const resourceConfigs = {
       chatUser: SharedChatUserApi,
       knowledge: SharedKnowledgeApi,
       scheduledSync: SharedScheduledSyncApi,
+      externalRetrieval: SharedExternalRetrievalApi,
       document: SharedDocumentApi,
       tags: SharedTagsApi,
     },
@@ -81,6 +93,7 @@ const resourceConfigs = {
       chatUser: SystemResourceChatUserApi,
       knowledge: SystemResourceKnowledgeApi,
       scheduledSync: SystemResourceScheduledSyncApi,
+      externalRetrieval: SystemResourceExternalRetrievalApi,
       document: SystemResourceDocumentApi,
       tags: SystemResourceTagsApi,
     },
@@ -91,6 +104,7 @@ const resourceConfigs = {
       chatUser: SystemSharedChatUserApi,
       knowledge: SystemSharedKnowledgeApi,
       scheduledSync: SystemSharedScheduledSyncApi,
+      externalRetrieval: SystemSharedExternalRetrievalApi,
       document: SystemSharedDocumentApi,
       tags: SystemSharedTagsApi,
     },
@@ -139,6 +153,9 @@ function createKnowledgeDetailContext(state: KnowledgeDetailState): KnowledgeDet
     get scheduledSync() {
       return resourceConfig.value.resourceApi.scheduledSync
     },
+    get externalRetrieval() {
+      return resourceConfig.value.resourceApi.externalRetrieval
+    },
   })
   const routeNames = computed(() => {
     const scope = resourceScope.value
@@ -184,11 +201,12 @@ type ScopedResourceApi<Scope extends ResourceScope> = {
 }
 
 type ScopedKnowledgeDetailContext<Scope extends ResourceScope> = Omit<KnowledgeDetailContext, 'resourceApi'> & {
-  resourceApi: Omit<ScopedResourceApi<Scope>, 'scheduledSync' | 'tags' | 'document' | 'chatUser'> & {
+  resourceApi: Omit<ScopedResourceApi<Scope>, 'scheduledSync' | 'tags' | 'document' | 'chatUser' | 'externalRetrieval'> & {
     readonly chatUser: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['chatUser']>
     readonly scheduledSync: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['scheduledSync']>
     readonly tags: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['tags']>
     readonly document: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['document']>
+    readonly externalRetrieval: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['externalRetrieval']>
   }
 }
 

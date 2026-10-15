@@ -1,4 +1,6 @@
+import json
 import math
+import shlex
 
 from django.db import transaction
 from rest_framework import serializers
@@ -45,14 +47,20 @@ def service_settings(knowledge, request=None):
     prefix = f"{CONFIG.get_chat_path()}/api/v3/knowledge/{knowledge.id}"
     absolute = request.build_absolute_uri if request else lambda path: path
     mcp_url = absolute(f"{prefix}/mcp")
+    api_url = absolute(f"{prefix}/retrieve")
     authentication = knowledge.external_service.get("authentication", False)
     connection = {"url": mcp_url, "transport": "streamable_http"}
+    example = [f"curl -X POST {shlex.quote(api_url)}", "-H 'Content-Type: application/json'"]
     if authentication:
         connection["headers"] = {"Authorization": "Bearer <CHAT_USER_API_KEY>"}
+        example.append("-H 'Authorization: Bearer <CHAT_USER_API_KEY>'")
+    payload = {"query_text": "如何使用知识库？", "top_number": 5, "similarity": 0, "search_mode": "embedding"}
+    example.append(f"-d {shlex.quote(json.dumps(payload, ensure_ascii=False))}")
     return {
         "enabled": knowledge.external_service.get("enabled", False),
         "authentication": authentication,
-        "api_url": absolute(f"{prefix}/retrieve"),
+        "api_url": api_url,
+        "api_example": " \\\n  ".join(example),
         "mcp_url": mcp_url,
         "mcp_config": {f"knowledge_{knowledge.id}": connection},
     }
