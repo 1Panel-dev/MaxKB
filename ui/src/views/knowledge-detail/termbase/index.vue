@@ -170,7 +170,6 @@ onMounted(() => {
     v-model:pagination-config="paginationConfig"
     v-loading="loading || operationLoading"
     :data="termbases"
-    :max-table-height="210"
     @current-change="loadTermbases"
     @size-change="loadTermbases"
     @selection-change="handleSelectionChange"

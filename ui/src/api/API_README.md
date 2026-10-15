@@ -432,6 +432,17 @@ System 不读取 workspaceId；飞书在知识库前缀追加 lark/<knowledgeId>
 System／飞书扩展及文件 ID 导入、策略协议需对应部署支持，不能因前端接口存在认定已联调。
 
 文档分页使用 ParamsPage／ResponsePage<DocumentItem>，名称／创建者／任务／启用／命中／标签筛选支持组合。
+图片与文档共用 Document API 的 `getDocumentPage` 列表接口及响应结构，图片列表额外传入查询参数
+`resource_type: 'image'`，不单独封装图片列表接口。
+Workspace 与 System 资源管理的 `knowledge/image.ts` 提供图片专属接口，通过上下文 `resourceApi.image` 读取。
+`postUploadImagePreview` 通过 POST `image/preview` 按策略生成图片预览，
+FormData 重复提交 `file` 并附带 JSON 字符串 `doc_strategy`，返回 ImageDocumentPreview[]；
+图片预览结果沿用 DocumentSplitResult 的分段结构，额外包含 preview_id；页面直接展示 content，不进行结构转换。
+`putBatchCreateImageDocuments` 通过 PUT `image/batch_create` 提交 `{ preview_ids }`，返回 DocumentItem[]。
+未生成预览时，`preview_ids` 直接使用上一步上传成功的图片文件 ID；已预览时使用生成结果的预览 ID。
+图片支持 JPG、JPEG、PNG、WEBP、BMP；共享范围尚未装配图片上传和导入接口，不回退到 Workspace。
+System 资源管理接口前缀为 `/system/resource/knowledge/<knowledgeId>/document/image`；
+生成预览 POST `preview`，批量添加 PUT `batch_create`。
 is_active 为 false 时保留，“全部”省略；tags 传叶子 ID 数组或 NO_TAG，按 tags[] 序列化。
 状态使用 DOCUMENT_TASK_STATE 与 DOCUMENT_TASK_TYPE，不用通用 STATE_TYPES；非任务状态省略 task_type。
 status_meta 可空，aggs 为 `{ status, count }[]`，state_time 按任务和状态索引；null 聚合状态按忽略处理。

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, useTemplateRef } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import type { UploadFile, UploadFiles, UploadInstance, UploadRawFile, UploadUserFile } from 'element-plus'
-import type { DragUploadFile, DragUploadHandler } from './types'
+import type { DragUploadFile, DragUploadHandler, DragUploadMode } from './types'
 import FileApi from '@/api/admin/file'
 import uploadImage from '@/assets/mk_icon_upload.svg'
 import { getFileIconUrl } from '@/utils/icon'
@@ -12,6 +12,7 @@ defineOptions({ name: 'MultipleFileUpload' })
 
 const props = withDefaults(
   defineProps<{
+    mode?: DragUploadMode
     accept?: string
     disabled?: boolean
     limit?: number
@@ -21,6 +22,7 @@ const props = withDefaults(
     tipText?: string
   }>(),
   {
+    mode: 'file',
     accept: '',
     disabled: false,
     sizeLimit: 100,
@@ -44,6 +46,21 @@ const uploadRef = useTemplateRef<UploadInstance>('uploadRef')
 const folderInputRef = useTemplateRef<HTMLInputElement>('folderInputRef')
 
 const uploadRequests = new Map<number, () => void>()
+
+/* 图片缩略图只保留当前文件的本地 URL，移除或卸载时释放。 */
+const imagePreviewUrls = ref(new Map<File, string>())
+watch(
+  () => (props.mode === 'image' ? fileList.value.flatMap((file) => (file.raw ? [file.raw] : [])) : []),
+  (files) => {
+    const nextUrls = new Map<File, string>()
+    for (const file of files) nextUrls.set(file, imagePreviewUrls.value.get(file) ?? URL.createObjectURL(file))
+    for (const [file, url] of imagePreviewUrls.value) {
+      if (!nextUrls.has(file)) URL.revokeObjectURL(url)
+    }
+    imagePreviewUrls.value = nextUrls
+  },
+  { immediate: true },
+)
 
 async function handleFileChange(file: UploadFile, files: UploadFiles) {
   emit('change', file, files)
@@ -146,6 +163,7 @@ function cancelUpload(file: DragUploadFile) {
 
 onBeforeUnmount(() => {
   for (const file of fileList.value) cancelUpload(file)
+  for (const url of imagePreviewUrls.value.values()) URL.revokeObjectURL(url)
 })
 
 function handleExceed(files: File[], selectedFiles: UploadUserFile[]) {
@@ -270,7 +288,7 @@ defineExpose({ clearFiles, handleRemove })
         <p>已完成 {{ uploadSummary.completed }}/{{ fileList.length }}</p>
 
         <div class="flex-align-center gap-4">
-          <MkStatusLabel v-if="uploadSummary.uploading" type="loading" label="上传中" />
+          <MkStatusLabel v-if="mode === 'file' && uploadSummary.uploading" type="loading" label="上传中" />
           <template v-else-if="uploadSummary.error">
             <MkStatusLabel type="failure" :label="`失败 ${uploadSummary.error} 个`" />
             <!-- 重试所有可重试的失败文件 -->
@@ -282,7 +300,34 @@ defineExpose({ clearFiles, handleRemove })
           <MkStatusLabel v-else-if="uploadSummary.success === fileList.length" type="success" label="全部成功" />
         </div>
       </div>
-      <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div v-if="mode === 'image'" class="mt-4 flex flex-wrap gap-3">
+        <template v-for="file in fileList" :key="file.uid ?? file.name">
+          <MkTooltip :content="`${file.name}：${file.errMsg}`" :disabled="file.status !== 'fail' || !file.errMsg" placement="top">
+            <div class="group relative shrink-0 overflow-hidden rounded-md">
+              <el-image
+                :src="(file.raw ? imagePreviewUrls.get(file.raw) : undefined) ?? file.url"
+                fit="cover"
+                class="h-26! w-26!"
+                :class="{ 'border-danger!': file.status === 'fail' }"
+              ></el-image>
+
+              <div v-if="file.status !== 'success'" class="pointer-events-none absolute inset-0 bg-N900/30" />
+              <div v-if="file.status === 'ready' || file.status === 'uploading'" class="absolute-center w-16">
+                <el-progress :percentage="file.status === 'uploading' ? (file.percentage ?? 0) : 0" :stroke-width="4" :show-text="false" />
+              </div>
+              <!-- 重试网络失败的图片 -->
+              <div v-if="file.status === 'fail' && file.canRetry" class="absolute-center cursor-pointer" @click="handleRetry(file)">
+                <MkIcon name="icon_refresh_outlined" class="text-white!" />
+              </div>
+              <!-- 删除已选图片 -->
+              <div class="group-hover-visible mk-remove-button" @click="handleRemove(file)">
+                <MkIcon name="icon_close_bold_outlined" class="text-white!" :size="6" />
+              </div>
+            </div>
+          </MkTooltip>
+        </template>
+      </div>
+      <div v-else class="grid grid-cols-1 gap-3 md:grid-cols-2">
         <template v-for="file in sortedFiles" :key="file.uid ?? file.name">
           <el-card class="small relative" shadow="never" :class="{ 'border-danger!': file.status === 'fail' }">
             <div class="flex-align-center gap-3">

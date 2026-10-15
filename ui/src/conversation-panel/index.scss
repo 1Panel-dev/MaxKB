@@ -108,17 +108,4 @@
   &:focus-within {
     border-color: rgb(var(--mk-primary-rgb) / 60%);
   }
-  /* 移除附件 */
-  .attachment-remove {
-    background: rgb(var(--mk-N900-rgb) / 60%);
-    border-radius: 9999px;
-    padding: var(--spacing);
-    position: absolute;
-    right: var(--spacing);
-    top: var(--spacing);
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    cursor: pointer;
-  }
 }

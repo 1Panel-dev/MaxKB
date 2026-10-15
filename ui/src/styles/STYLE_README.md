@@ -69,6 +69,12 @@ Admin 和 Chat 共用。组件不单独恢复焦点 `outline`，包括通过隐�
 单元格最小宽度为 120px、最大宽度为 400px，正文正常换行并允许长链接折行；表头不换行，
 避免多列时标题和正文被压缩成逐字纵向排列。滚动条沿用 Markdown 主题已有样式。
 
+## 右上角移除按钮
+
+`app.scss` 的 button 分组提供 `.mk-remove-button`，用于图片、附件等内容的右上角移除入口。
+父容器设置 `position: relative`；按钮统一使用 N900 的 60% 透明度背景、圆角、内边距及右上角定位，
+内部图标大小和颜色由调用方指定。悬停显示按需组合 `group-hover-visible`，禁用状态由使用方控制。
+
 ## 默认字号
 
 项目正文和大部分界面文字默认使用 `14px / 22px`（字号/行高），统一由 `variables.scss` 中的 `--mk-font-size-base` 和 `--mk-line-height-base` 提供，`body` 直接使用这两个变量。

@@ -73,7 +73,7 @@ Element Plus 已在 Admin、Chat 入口注册。使用前先检查原生 API，�
   - `close()` 只发起关闭，表单清理放在 `closed`，避免关闭动画中内容跳变；依赖本次参数的默认值、
     编辑快照、动态字段及每次打开必须重新查询的数据仍在 `open()` 初始化。
     父级负责校验或请求时，子组件提交数据后由父级成功调用 `close()`，失败保持打开。
-- 仅登录表单支持回车提交；其他业务表单使用 `@submit.prevent`，保存、添加由按钮触发。
+- 仅登录表单及 `MkQuickCreate` 行内快捷创建支持回车提交；其他业务表单使用 `@submit.prevent`，保存、添加由按钮触发。
   自定义 `submit` 事件不等于原生表单提交。
 
 ## 全局 UI 组件
@@ -281,6 +281,7 @@ Element Plus `append`，仅在传入该插槽时将直属表体滚动容器设�
 由页面管理请求、`loading`、成功提示及列表刷新；成功后通过组件 ref 调用 `close()` 清空并收起，失败保留输入。
 `text` 默认为“快速创建”，`placeholder` 默认为“请输入名称”，`maxlength` 默认为 256。
 组件不使用 Form 或表单校验；空名称、纯空白及提交期间禁用创建按钮，提交前 trim。
+输入框按 Enter 触发同一创建流程，输入法选词时不提交。
 Esc 或取消清理草稿；`loading` 默认为 false，为 true 时禁止创建和取消。组件不等待 Promise，不自动收起。
 
 `paginationConfig` 包含 `currentPage`、`pageSize`、`total` 和可选 `pageSizes`；不传则隐藏分页器，
@@ -541,8 +542,15 @@ Logo 数据统一从 Theme Store 获取。
 兼容 UploadUserFile，支持 file_id、errMsg、canRetry；类型从组件 `types.ts` 导入。
 
 - `multiple` 默认 false；单文件展示卡片和更换入口，多文件保留拖拽区、文件夹选择与列表。
+- 多文件 `mode` 默认 `file`，使用文件图标和上传进度；`mode="image"` 按选择顺序展示 104×104 的
+  `el-image` 方块，不使用 Card，不展示汇总、文件名或状态文案。等待时中央显示空进度条，上传时显示实际进度，
+  成功或失败后隐藏进度条。右上角提供删除，未上传成功时
+  在原图上叠加灰色遮罩，成功后移除；网络失败和大小超限使用红框，仅网络失败在中央提供重试。
+  失败且有错误信息时通过 MkTooltip 展示文件名及失败原因，其他情况禁用提示。内部仍维护上传状态与 uploadingCount，本地缩略图 URL 在文件移除
+  和组件卸载时释放。单文件不使用 mode。
 - `accept`、`limit` 控制格式／数量，多文件 `sizeLimit` 默认 100MB；格式、空文件、重复选择移除，
-  大小超限保留不可重试 fail 卡片，网络失败可重试。超量发出 exceed，DS_Store 格式不支持时静默移除。
+  大小超限保留不可重试 fail 文件，图片模式保留原图和红框；网络失败可重试。
+  超量发出 exceed，DS_Store 格式不支持时静默移除。
 - `dragText`、`selectText`、`tipText`、`replaceText` 覆盖文案；download 作用域插槽提供下载操作。
 - 多文件通过 `inject('upload')` 获取 `DragUploadHandler`，返回 `{ request: Promise<string>, abort }`。
   change 后等待调用方回写和校验，再上传 ready 文件；响应成功才标记 success 并提取 file_id，100% 仅表示传输完成。
@@ -772,6 +780,9 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 供调用方排除当前智能体或工具，避免直接自引用。弹窗不使用滚动分页。
 
 ### SelectModel
+
+`loading` 默认为 `false`，透传给 `el-select` 展示列表加载状态；模型选项加载使用 `loading`，不因此禁用选择器。
+`disabled` 继续表示只读或业务禁用。
 
 `teleported` 默认为 `false`，画布节点内保留此默认值，使下拉浮层跟随画布。
 画布外的表单、Dialog 和 Drawer 显式传入 `teleported`（即 `true`），将下拉浮层挂载到 body，

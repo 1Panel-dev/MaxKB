@@ -224,7 +224,7 @@ defineExpose({ validate, getStrategy, setStrategy })
             v-model="visualModelId"
             :options="modelOptions"
             :provider-options="providerOptions"
-            :disabled="modelOptionsLoading"
+            :loading="modelOptionsLoading"
             placeholder="请选择视觉模型"
             teleported
             can-add

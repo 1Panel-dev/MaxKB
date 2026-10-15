@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="Multiple extends boolean = false">
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 import type { SelectInstance } from 'element-plus'
 import { MODEL_STATUS } from '@/api/enums'
 import type { ModelProviderItem, ModelItem } from '@/api/types'
@@ -29,6 +29,7 @@ const props = withDefaults(
     canEditParams?: boolean
     canAdd?: boolean
     modelParams?: Record<string, unknown>
+    loading?: boolean
     disabled?: boolean
     teleported?: boolean
     multiple?: Multiple
@@ -39,6 +40,7 @@ const props = withDefaults(
     canEditParams: false,
     canAdd: false,
     modelParams: () => ({}),
+    loading: false,
     disabled: false,
     teleported: false,
   },
@@ -69,7 +71,6 @@ const _options = computed(() => {
   return groupBy(props.options, 'provider')
 })
 
-const loading = ref(false)
 const canEditModelParams = computed(() => props.canEditParams && !props.multiple)
 
 const selectedModelValue = computed<SelectModelValue>({

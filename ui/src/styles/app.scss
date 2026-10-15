@@ -92,6 +92,21 @@ h6 {
   color: var(--mk-N500);
 }
 
+// 图片、附件等内容的右上角移除按钮
+.mk-remove-button {
+  align-items: center;
+  background: rgb(var(--mk-N900-rgb) / 60%);
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing);
+  position: absolute;
+  right: var(--spacing);
+  top: var(--spacing);
+  z-index: 1;
+}
+
 /* dot */
 // 状态圆点
 .mk-dot-danger {

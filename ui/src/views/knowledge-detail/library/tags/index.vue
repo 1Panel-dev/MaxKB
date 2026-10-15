@@ -185,7 +185,6 @@ onMounted(() => {
     :data="tagRows"
     selection-group-key="key"
     :span-method="spanMethod"
-    :max-table-height="210"
     @selection-change="handleSelectionChange"
     @current-change="clearSelection"
     @size-change="clearSelection"

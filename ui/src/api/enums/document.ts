@@ -6,3 +6,6 @@ export const DOCUMENT_TASK_STATE = { PENDING: '0', STARTED: '1', SUCCESS: '2', F
 
 /** 文档状态字符串中各任务的位置。 */
 export const DOCUMENT_TASK_TYPE = { EMBEDDING: 1, GENERATE_PROBLEM: 2, SYNC: 3, TOKENIZE: 4 } as const
+
+/** 独立图片视觉增强的处理状态。 */
+export const IMAGE_PROCESS_STATUS = { PENDING: 'pending', SUCCESS: 'success', FAILURE: 'failure', SKIPPED: 'skipped' } as const

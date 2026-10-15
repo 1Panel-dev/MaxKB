@@ -43,7 +43,7 @@
 | `application-detail/integration/`                                                     | 接入第三方占位页                             |
 | `knowledge-detail/`                                                                   | 四范围知识库详情、菜单与上下文               |
 | `knowledge-detail/library/document/`、`tags/`                                         | 文档及标签维护                               |
-| `knowledge-detail/library/image/`                                                     | 图片占位页                                   |
+| `knowledge-detail/library/image/`                                                     | 图片列表，复用文档操作                       |
 | `knowledge-detail/recall-test/`、`question/`                                          | 检索优化占位页                               |
 | `knowledge-detail/termbase/`                                                          | 知识库自定义分词维护                         |
 | `knowledge-detail/chat-user/`、`external-retrieval/`                                  | 对话授权与外部检索配置                       |
@@ -100,7 +100,7 @@
 
 `knowledge-detail/context.ts` 仅通过 `provideKnowledgeDetailContext` 和
 `useKnowledgeDetailContext` 公开详情、更新能力、ID、来源导航及完整 API。
-`resourceApi.knowledge / scheduledSync / document / tags / termbase / chatUser / externalRetrieval` 按当前范围响应式读取，无需 `.value`，
+`resourceApi.knowledge / scheduledSync / document / image / tags / termbase / chatUser / externalRetrieval` 按当前范围响应式读取，无需 `.value`，
 不要在 setup 时解构具体 API。`workflow` 当前仅普通 Workspace 提供，其他范围不回退。
 共有查询方法必填，部分范围缺失的方法可选调用；未发请求时不提示成功、不关闭、不刷新或修改快照，loading 正常清理。
 不增加查询／维护双入口、接口别名或专属 Context hook，也不以方法存在性新增操作显隐规则。
@@ -130,6 +130,16 @@
 ### 文档列表与导入
 
 `library/document/index.vue` 管理查询、分页、选择、启停及刷新；Action 管理各自请求和浮层。
+`library/image/index.vue` 使用独立列表入口，复用 `document/` 的状态、展示组件及 Action，
+查询与操作沿用 Document API；图片列表的查询参数差异见 [API 文档](../api/API_README.md#文档与分段)。
+图片上传独立放在 `image/upload-image/`，`ButtonUploadImage` 管理入口与按需挂载，
+`UploadImageDrawer` 分为上传图片、图片处理两步，复用 `MkDragUpload` 的多文件图片模式暂存文件；
+`ImageProcessingForm` 管理视觉增强策略及模型／工具选项，不展示文档分段与索引设置。
+生成预览时按当前策略提交原图，预览直接展示生成接口返回的数据，不单独查询或轮询。
+开始导入以 `previewVisible` 区分：已预览提交生成结果的预览 ID，未预览校验处理策略后直接提交上传成功的图片 ID，
+不自动请求生成预览；成功通知列表刷新，失败保留文件和策略供重试。
+图片上传入口接收 `resourceApi.image`；Workspace 和 System 资源管理提供生成预览及批量添加，
+共享范围不回退到 Workspace。
 类型统一读取路由 `type`，使用 `KNOWLEDGE_TYPE_KEY`，不逐层传递类型 Prop。
 挂载时查询并启动 6 秒轮询，请求结束后安排下一次；静默刷新保留筛选、页码和当前页选择，
 操作中推迟轮询，卸载后停止。创建者选项打开或远程搜索时加载，不在页面进入时预查。
@@ -154,6 +164,10 @@
 通用上传由 `upload-document/` 管理，Web／飞书／工作流导入由 `import-document/` 管理独立 Drawer。
 复用 `MkDragUpload` 和 `DocumentStrategyForm`，传完整 Document API；使用成功文件 ID，不二次上传。
 文本直接导入提交文件 ID 与策略；生成预览才请求 split，预览可本地编辑／删除，最终创建使用编辑后结果。
+`document/components/DocumentImportPreview.vue` 提供文档与图片导入的左右预览布局；
+组件统一使用 DocumentSplitResult 的文档列表与分段页面，不按图片类型区分展示。
+图片生成结果直接传入预览组件，正文按接口返回的 content 展示，不转换或拼接；图片导入仍提交原始预览 ID，
+预览内本地编辑不会写回图片生成结果。文档分段编辑与删除保留原有行为。
 预览编辑复用 `ParagraphForm`、`ParagraphQuestions`，不传已有分段 ID，不即时写入问题关联。
 表格／QA 支持模板下载；飞书懒加载仅展开时查子目录，已导入项不可取消，不在前端递归展开文件夹。
 工作流导入执行已发布版本，复用知识库调试的 DataSource、KnowledgeBase、Result 三步流程。

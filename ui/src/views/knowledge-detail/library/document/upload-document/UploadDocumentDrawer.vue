@@ -6,7 +6,7 @@ import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upl
 import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentSplitResult } from '@/api/types'
-import DocumentImportPreview from './DocumentImportPreview.vue'
+import DocumentImportPreview from '../components/DocumentImportPreview.vue'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
@@ -97,54 +97,42 @@ function handlePrevious() {
 }
 
 /* 文档导入 */
-function handleSubmit() {
-  if (!validateImportFiles()) return
-  if (previewVisible.value && !previewRef.value?.validate()) return
+async function handleSubmit() {
+  if (!validateImportFiles() || (previewVisible.value && !previewRef.value?.validate())) return
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
   if (!previewVisible.value && fileIds.length !== successfulFiles.value.length) {
-    MsgWarning('文件上传结果缺少文件 ID，请重新上传')
+    MsgWarning('没有上传成功的文件，请重新上传')
     return
   }
+
   loading.value = true
-  let importRequest: Promise<boolean | undefined> | undefined
-  if (props.mode === 'table') {
-    // 复用已上传表格，由服务端解析并创建文档。
-    importRequest = props.api.postImportTableDocumentsByFileIds?.(props.knowledgeId, fileIds).then(() => true)
-  } else if (props.mode === 'qa') {
-    // 复用已上传 QA 文件，由服务端解析并创建文档。
-    importRequest = props.api.postImportQADocumentsByFileIds?.(props.knowledgeId, fileIds).then(() => true)
-  } else if (previewVisible.value) {
-    if (previewDocuments.value.every((document) => !document.content.length)) {
-      MsgWarning('没有可导入的分段，请重新生成预览')
-      loading.value = false
-      return
-    }
-    importRequest = props.api
-      .putBatchCreateDocuments?.(
+  try {
+    let importRequest: Promise<unknown> | undefined
+    if (props.mode === 'table') {
+      importRequest = props.api.postImportTableDocumentsByFileIds?.(props.knowledgeId, fileIds)
+    } else if (props.mode === 'qa') {
+      importRequest = props.api.postImportQADocumentsByFileIds?.(props.knowledgeId, fileIds)
+    } else if (previewVisible.value) {
+      importRequest = props.api.putBatchCreateDocuments?.(
         props.knowledgeId,
         previewDocuments.value.map(({ content, ...document }) => ({ ...document, paragraphs: content })),
       )
-      .then(() => true)
-  } else {
-    // 文本校验处理策略，由单次请求在服务端完成解析与入库。
-    importRequest = Promise.resolve(strategyRef.value?.validate()).then((valid) => {
-      if (!valid || !strategyRef.value) return false
-      return props.api.postImportTextDocuments?.(props.knowledgeId, fileIds, strategyRef.value.getStrategy()).then(() => true)
-    })
+    } else {
+      const valid = await strategyRef.value?.validate()
+      if (!valid || !strategyRef.value) return
+      importRequest = props.api.postImportTextDocuments?.(props.knowledgeId, fileIds, strategyRef.value.getStrategy())
+    }
+    // 当前范围未提供接口时不提示成功，也不关闭或刷新。
+    if (!importRequest) return
+    await importRequest
+    MsgSuccess('导入成功')
+    visible.value = false
+    emit('refresh')
+  } catch {
+    // 请求层统一提示错误，失败保留文件与策略供重试。
+  } finally {
+    loading.value = false
   }
-  return (importRequest ?? Promise.resolve())
-    .then((success) => {
-      if (!success) return
-      MsgSuccess('导入成功')
-      visible.value = false
-      emit('refresh')
-    })
-    .catch(() => {
-      // 请求层统一提示错误，失败保留文件与策略供重试。
-    })
-    .finally(() => {
-      loading.value = false
-    })
 }
 
 defineExpose({ open })

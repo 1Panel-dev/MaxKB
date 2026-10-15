@@ -11,10 +11,6 @@ const postTermbases = (knowledgeId: string, contents: string[]) => post<string[]
 const getTermbasePage = (knowledgeId: string, page: ParamsPage, query?: { content?: string }) =>
   get<ResponsePage<TermbaseItem>>(`${getPrefix(knowledgeId)}/${page.currentPage}/${page.pageSize}`, query)
 
-/** 编辑单个知识库自定义分词条目。 */
-const putTermbase = (knowledgeId: string, termbaseId: string, payload: TermbaseUpdatePayload) =>
-  put<TermbaseUpdatePayload, void>(`${getPrefix(knowledgeId)}/${termbaseId}`, payload)
-
 /** 删除单个知识库自定义分词条目。 */
 const deleteTermbase = (knowledgeId: string, termbaseId: string) => del<undefined, boolean>(`${getPrefix(knowledgeId)}/${termbaseId}`)
 
@@ -29,7 +25,6 @@ const postExportTermbases = (knowledgeId: string, termbaseIds: string[]) =>
 export default {
   postTermbases,
   getTermbasePage,
-  putTermbase,
   deleteTermbase,
   putBatchDeleteTermbases,
   postExportTermbases,
