@@ -33,7 +33,13 @@ template
           v-model="currentPlatform.config[key]"
           :type="isPasswordField(key) ? 'password' : 'text'"
           :show-password="isPasswordField(key)"
+          :disabled="isCallbackUrl(key)"
         >
+          <template v-if="isCallbackUrl(key)" #append>
+            <el-button type="primary" text @click="copyCallbackUrl">
+              <AppIcon iconName="app-copy" />
+            </el-button>
+          </template>
         </el-input>
       </el-form-item>
     </el-form>
@@ -55,6 +61,7 @@ import {ElForm} from 'element-plus'
 import platformApi from '@/api/system-settings/platform-source'
 import {MsgError, MsgSuccess} from '@/utils/message'
 import {t} from '@/locales'
+import {copyClick} from '@/utils/clipboard'
 
 const visible = ref(false)
 const loading = ref(false)
@@ -215,7 +222,14 @@ function validateConnection() {
 const passwordFields = new Set(['app_secret', 'client_secret', 'secret'])
 
 const isPasswordField = (key: any) => passwordFields.has(key)
+const isCallbackUrl = (key: any) => key === 'callback_url'
 const emit = defineEmits(['refresh'])
+
+const copyCallbackUrl = () => {
+  const value = currentPlatform.config.callback_url
+  if (!value) return
+  copyClick(value)
+}
 
 function saveConfig() {
   platformApi.updateConfig(currentPlatform, loading).then((res: any) => {
