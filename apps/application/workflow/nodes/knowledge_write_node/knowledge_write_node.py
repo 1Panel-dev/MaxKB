@@ -11,6 +11,7 @@ from functools import reduce
 from typing import Any, Dict, List
 
 import uuid_utils.compat as uuid
+from django.db import transaction
 from django.db.models import QuerySet
 from django.db.models.aggregates import Max
 from django.utils.translation import gettext_lazy as _
@@ -42,6 +43,7 @@ from knowledge.services.document_strategy import (
     strategy_hashes,
 )
 from knowledge.services.incremental_sync import prepare_remote_paragraphs
+from knowledge.services.paragraph_files import bind_document_images
 from knowledge.services.workflow_sync_source import DOCUMENT_IDENTITY_FIELDS
 
 
@@ -266,6 +268,7 @@ class KnowledgeWriteNode(INode):
     supported_workflow_type_list = [WorkflowType.KNOWLEDGE]
     type = "knowledge-write-node"
 
+    @transaction.atomic
     def save(self, document_list, user_id):
         serializer = KnowledgeWriteParamSerializer(data=document_list, many=True)
         serializer.is_valid(raise_exception=True)
@@ -360,6 +363,9 @@ class KnowledgeWriteNode(INode):
         bulk_create_in_batches(Problem, problem_model_list, batch_size=1000)
 
         bulk_create_in_batches(ProblemParagraphMapping, problem_paragraph_mapping_list, batch_size=1000)
+
+        for document in document_model_list:
+            bind_document_images(document, [p for p in paragraph_model_list if p.document_id == document.id])
 
         return document_model_list, knowledge_id, workspace_id
 

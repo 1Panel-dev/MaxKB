@@ -20,6 +20,10 @@ from knowledge.models import KnowledgeType
 
 
 class WorkflowDocumentSourceTests(SimpleTestCase):
+    def setUp(self):
+        self.enterContext(patch("django.db.transaction.Atomic.__enter__"))
+        self.enterContext(patch("django.db.transaction.Atomic.__exit__", return_value=False))
+
     def split_and_write(self, meta, source_file_id=None):
         node = DocumentSplitNode.__new__(DocumentSplitNode)
         node.get_parameters = MagicMock(return_value={"document_list": ["source", "document_list"]})

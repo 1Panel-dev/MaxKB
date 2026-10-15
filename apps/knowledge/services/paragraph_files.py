@@ -9,7 +9,20 @@ from django.utils.translation import gettext_lazy as _
 
 from knowledge.models import File, FileSourceType, ParagraphAsset
 from knowledge.services import validate_knowledge_file_size
-from knowledge.services.paragraph_assets import FILE_REFERENCE_PATTERN
+from knowledge.services.paragraph_assets import FILE_REFERENCE_PATTERN, IMAGE_PATTERN
+
+
+def bind_document_images(document, paragraphs):
+    """Attach staged inline images to the imported document without changing their URLs."""
+    image_ids = {
+        match.group("file_id") for paragraph in paragraphs for match in IMAGE_PATTERN.finditer(paragraph.content or "")
+    }
+    if image_ids:
+        File.objects.filter(
+            id__in=image_ids,
+            source_type=FileSourceType.KNOWLEDGE,
+            source_id=str(document.knowledge_id),
+        ).update(source_type=FileSourceType.DOCUMENT, source_id=str(document.id))
 
 
 def _replace_file_ids(value, replacements):
