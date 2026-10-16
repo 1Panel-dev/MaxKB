@@ -15,7 +15,7 @@ jobs:
       - uses: fit2cloud/LLM-CodeReview-Action@main
         env:
           GITHUB_TOKEN: ${{ secrets.FIT2CLOUDRD_LLM_CODE_REVIEW_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.ALIYUN_LLM_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.FIT2CLOUD_AI_GATEWAY_API_KEY }}
           LANGUAGE: English
           OPENAI_API_ENDPOINT: https://ai.fit2cloud.cn/gateway/v1
           MODEL: f2c-auto
