@@ -255,7 +255,7 @@ class ImageDocumentService:
             previews.append(self._initialize_preview(file, normalized_strategy))
         return previews
 
-    def _initialize_preview(self, file: File, strategy: Dict) -> Dict:
+    def _initialize_preview(self, file: File, strategy: Dict, *, enqueue=True) -> Dict:
         if strategy["visual"]["enabled"]:
             processed = {
                 "caption": "",
@@ -276,16 +276,11 @@ class ImageDocumentService:
         meta = {**(file.meta or {}), "image_preview": preview}
         QuerySet(File).filter(id=file.id).update(meta=meta)
         file.meta = meta
-        if strategy["visual"]["enabled"]:
+        if enqueue and strategy["visual"]["enabled"]:
             transaction.on_commit(partial(self._enqueue_preview, str(file.id)), robust=True)
         return self.serialize_preview(file)
 
-    @transaction.atomic
-    def create_previews_by_file_ids(self, file_ids: Iterable, strategy: Dict | None = None) -> List[Dict]:
-        knowledge = self.get_knowledge()
-        ordered_ids = [str(file_id) for file_id in file_ids]
-        if not ordered_ids or len(ordered_ids) > min(50, knowledge.file_count_limit):
-            raise AppApiException(500, _("Invalid number of image files"))
+    def _get_uploaded_image_files(self, ordered_ids: List[str]) -> Dict[str, File]:
         temporary_types = [
             FileSourceType.TEMPORARY_30_MINUTE,
             FileSourceType.TEMPORARY_120_MINUTE,
@@ -303,6 +298,15 @@ class ImageDocumentService:
         }
         if len(files) != len(ordered_ids):
             raise AppApiException(500, _("File does not exist or no permission to access"))
+        return files
+
+    @transaction.atomic
+    def create_previews_by_file_ids(self, file_ids: Iterable, strategy: Dict | None = None) -> List[Dict]:
+        knowledge = self.get_knowledge()
+        ordered_ids = [str(file_id) for file_id in file_ids]
+        if not ordered_ids or len(ordered_ids) > min(50, knowledge.file_count_limit):
+            raise AppApiException(500, _("Invalid number of image files"))
+        files = self._get_uploaded_image_files(ordered_ids)
         source_files = [files[file_id] for file_id in ordered_ids]
         normalized_strategy = normalize_document_strategy(strategy)
         # Validate the whole batch before promoting files or scheduling recognition.
@@ -353,30 +357,32 @@ class ImageDocumentService:
         return True
 
     @transaction.atomic
-    def import_previews(self, preview_ids: Iterable) -> List[str]:
+    def import_previews(self, file_ids: Iterable, strategy: Dict | None = None) -> List[str]:
         knowledge = self.get_knowledge()
-        ordered_ids = list(dict.fromkeys(str(preview_id) for preview_id in preview_ids))
+        ordered_ids = list(dict.fromkeys(str(file_id) for file_id in file_ids))
         if not ordered_ids:
             raise AppApiException(500, _("Please select at least one image preview"))
-        preview_files = (
-            QuerySet(File)
-            .filter(
-                id__in=ordered_ids,
-                source_type=FileSourceType.KNOWLEDGE,
-                source_id=self.knowledge_id,
-            )
-            .select_for_update()
-        )
-        files_by_id = {str(file.id): file for file in preview_files}
-        if len(files_by_id) != len(ordered_ids):
-            raise AppApiException(500, _("One or more image previews do not exist"))
+        if len(ordered_ids) > min(50, knowledge.file_count_limit):
+            raise AppApiException(500, _("Invalid number of image files"))
+        files_by_id = self._get_uploaded_image_files(ordered_ids)
+        normalized_strategy = normalize_document_strategy(strategy)
+        # Direct imports use uploaded images; validate the entire batch before creating documents.
+        for file in files_by_id.values():
+            preview = _preview_meta(file)
+            if preview.get("imported"):
+                raise AppApiException(500, _("One or more image previews cannot be imported"))
+            if not preview:
+                with ContentFile(file.get_bytes(), name=file.file_name) as content:
+                    self._validate_image(content, knowledge)
 
         document_ids = []
-        for preview_id in ordered_ids:
-            file = files_by_id[preview_id]
+        for file_id in ordered_ids:
+            file = files_by_id[file_id]
             preview = _preview_meta(file)
-            if not preview or preview.get("imported"):
-                raise AppApiException(500, _("One or more image previews cannot be imported"))
+            if not preview:
+                # The embedding worker processes pending assets after import; no preview job is needed.
+                self._initialize_preview(file, normalized_strategy, enqueue=False)
+                preview = _preview_meta(file)
             strategy = normalize_document_strategy(preview.get("doc_strategy"))
             hashes = strategy_hashes(strategy)
             content = _display_text(file.file_name, preview)

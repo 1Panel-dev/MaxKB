@@ -2,7 +2,7 @@
 import { computed, provide, ref, useTemplateRef } from 'vue'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
-import type { DocumentSplitResult, ImageDocumentPreview } from '@/api/types'
+import type { DocumentSplitResult, ImageDocumentImportPayload, ImageDocumentPreview } from '@/api/types'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
 import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
@@ -89,7 +89,7 @@ function handleGeneratePreview() {
     })
 }
 
-/* 图片导入：预览后提交预览 ID，未预览直接提交上传成功的图片 ID。 */
+/* 图片导入：预览后提交生成结果的文件 ID，未预览直接提交上传成功的图片 ID。 */
 async function handleSubmit() {
   if (!validateFiles() || (previewVisible.value && !previewRef.value?.validate())) return
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
@@ -104,8 +104,11 @@ async function handleSubmit() {
       const valid = await processingRef.value?.validate()
       if (!valid || !processingRef.value) return
     }
-    const previewIds = previewVisible.value ? previewDocuments.value.map((preview) => preview.preview_id) : fileIds
-    const importRequest = props.api?.putBatchCreateImageDocuments(props.knowledgeId, previewIds)
+    const payload: ImageDocumentImportPayload = {
+      file_ids: previewVisible.value ? previewDocuments.value.map((preview) => preview.file_id) : fileIds,
+    }
+    if (!previewVisible.value) payload.doc_strategy = processingRef.value?.getStrategy()
+    const importRequest = props.api?.putBatchCreateImageDocuments(props.knowledgeId, payload)
     if (!importRequest) return
     await importRequest
     MsgSuccess('导入成功')

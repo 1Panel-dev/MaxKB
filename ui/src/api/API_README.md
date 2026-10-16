@@ -453,8 +453,9 @@ Workspace 与 System 资源管理的 `knowledge/image.ts` 提供图片专属接�
 `postUploadImagePreview` 通过 POST `image/preview` 按策略生成图片预览，
 JSON 提交 `{ file_id_list, doc_strategy }`，复用上传成功的文件 ID，不重复上传，返回 ImageDocumentPreview[]；
 图片预览结果沿用 DocumentSplitResult 的分段结构，额外包含 preview_id；页面直接展示 content，不进行结构转换。
-`putBatchCreateImageDocuments` 通过 PUT `image/batch_create` 提交 `{ preview_ids }`，返回 DocumentItem[]。
-未生成预览时，`preview_ids` 直接使用上一步上传成功的图片文件 ID；已预览时使用生成结果的预览 ID。
+`putBatchCreateImageDocuments` 通过 PUT `image/batch_create` 提交 ImageDocumentImportPayload，返回 DocumentItem[]。
+未生成预览时，提交 `{ file_ids, doc_strategy }`，ID 使用上一步上传成功的图片文件 ID，并传当前处理策略；
+已预览时提交 `{ file_ids }`，使用生成结果的 `file_id`，服务端保留已有预览的策略和识别结果。
 图片支持 JPG、JPEG、PNG、WEBP、BMP；共享范围尚未装配图片上传和导入接口，不回退到 Workspace。
 System 资源管理接口前缀为 `/system/resource/knowledge/<knowledgeId>/document/image`；
 生成预览 POST `preview`，批量添加 PUT `batch_create`。

@@ -58,7 +58,11 @@ the external vision model or tool runs in the worker.
 预览使用 JSON：`{"file_id_list": ["<uploaded-file-uuid>"], "doc_strategy": {...}}`，
 文件 ID 必填、不可重复且最多 50 个，同时受知识库文件数量限制。仅接受当前用户的临时文件
 或当前知识库的文件；校验实际图片格式和大小后复用原文件，不重复存储。`doc_strategy` 可选。批量导入提交
-`{"preview_ids": [...]}`。系统资源管理和共享资源管理沿用上述路径后缀、请求及处理流程，
+`{"file_ids": [...], "doc_strategy": {...}}`，其中 `doc_strategy` 可选。
+`file_ids` 支持当前用户上传的临时图片 ID 和当前知识库已生成预览的图片文件 ID，可不经过预览直接导入。
+直接导入校验整批图片的权限、格式、大小和数量后创建图片文档，视觉增强由导入后的向量化任务执行；
+已有预览保留其处理策略、识别结果和编辑，不被请求中的 `doc_strategy` 覆盖。
+系统资源管理和共享资源管理沿用上述路径后缀、请求及处理流程，
 各自的知识库路径前缀和权限由对应功能模块说明。
 
 图片预览与文档分段预览使用相同的文档结构：`name`、`source_file_id`、`doc_strategy`

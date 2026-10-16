@@ -26,9 +26,10 @@ class ImagePreviewUpdateRequest(serializers.Serializer):
 
 
 class ImagePreviewBatchCreateRequest(serializers.Serializer):
-    preview_ids = serializers.ListField(
-        child=serializers.UUIDField(), allow_empty=False, max_length=50, label=_("image preview ids")
+    file_ids = serializers.ListField(
+        child=serializers.UUIDField(), allow_empty=False, max_length=50, label=_("image file ids")
     )
+    doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
 
 class ImageDocumentSerializers:
@@ -68,7 +69,9 @@ class ImageDocumentSerializers:
             request_serializer = ImagePreviewBatchCreateRequest(data=instance)
             request_serializer.is_valid(raise_exception=True)
             service = self._service()
-            document_ids = service.import_previews(request_serializer.validated_data["preview_ids"])
+            document_ids = service.import_previews(
+                request_serializer.validated_data["file_ids"], request_serializer.validated_data.get("doc_strategy")
+            )
             result = []
             for document_id in document_ids:
                 operate = DocumentSerializers.Operate(

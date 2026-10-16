@@ -1,5 +1,5 @@
 import { post, put } from '@/api/admin/core/request'
-import type { DocumentFileImportPayload, DocumentItem, DocumentStrategy, ImageDocumentPreview } from '@/api/types'
+import type { DocumentFileImportPayload, DocumentItem, DocumentStrategy, ImageDocumentImportPayload, ImageDocumentPreview } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/document/image`
@@ -11,9 +11,9 @@ const postUploadImagePreview = (knowledgeId: string, fileIds: string[], strategy
     doc_strategy: strategy,
   })
 
-/** 将已上传的图片预览导入知识库。 */
-const putBatchCreateImageDocuments = (knowledgeId: string, previewIds: string[]) =>
-  put<{ preview_ids: string[] }, DocumentItem[]>(`${getPrefix(knowledgeId)}/batch_create`, { preview_ids: previewIds })
+/** 将已上传图片或已有预览导入知识库。 */
+const putBatchCreateImageDocuments = (knowledgeId: string, payload: ImageDocumentImportPayload) =>
+  put<ImageDocumentImportPayload, DocumentItem[]>(`${getPrefix(knowledgeId)}/batch_create`, payload)
 
 export default {
   postUploadImagePreview,
