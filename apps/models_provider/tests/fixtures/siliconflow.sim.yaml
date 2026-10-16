@@ -1,0 +1,5 @@
+simulation: siliconflow-embeddings
+routing: path
+mocks:
+  - routeKey: siliconflow
+    path: ./siliconflow.js

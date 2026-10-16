@@ -10,7 +10,6 @@
 from typing import Dict
 
 import requests
-from common.utils.logger import maxkb_logger
 
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
@@ -32,7 +31,7 @@ class SiliconCloudEmbeddingModel(MaxKBBaseEmbeddingModel):
 
     @staticmethod
     def _is_multimodal(model_name: str) -> bool:
-        """判断模型是否为多模态向量模型（支持图片/视频独立向量）。"""
+        """判断模型是否为支持图片向量的多模态模型。"""
         model_name = model_name.lower()
         return any(k in model_name for k in ("vl-embedding", "embedding-vision", "multimodal"))
 
@@ -49,19 +48,29 @@ class SiliconCloudEmbeddingModel(MaxKBBaseEmbeddingModel):
             base_url=model_credential.get("api_base"),
         )
 
-    def embed_query(self, text: str) -> list:
-        payload = {"model": self.model_name, "input": text, **self.optional_params}
+    def _embed_input(self, content: str | dict) -> list[float]:
+        payload = {"model": self.model_name, "input": content, **self.optional_params}
         headers = {"Authorization": f"Bearer {self.openai_api_key}", "Content-Type": "application/json"}
 
-        response = requests.post(self.base_url + "/embeddings", json=payload, headers=headers)
+        response = requests.post(
+            self.base_url.rstrip("/") + "/embeddings", json=payload, headers=headers, timeout=(10, 60)
+        )
+        response.raise_for_status()
         data = response.json()
-        if isinstance(data, dict):
-            if data["data"] is None or "code" in data:
-                raise ValueError(f"Embedding API returned no data: {data}")
-            # 假设返回结构中有 'data[0].embedding'
-            return data["data"][0]["embedding"]
-        else:
-            maxkb_logger.error(f"Unexpected response from Embedding API: {data}")
+        if not isinstance(data, dict) or "code" in data or not data.get("data"):
+            raise ValueError("Embedding API returned no data")
+        return data["data"][0]["embedding"]
+
+    def embed_query(self, text: str) -> list:
+        return self._embed_input(text)
 
     def embed_documents(self, texts: list) -> list:
         return [self.embed_query(text) for text in texts]
+
+    def embed_images(self, images: list[str]) -> list[list[float]]:
+        if not self.supports_image_embedding():
+            return super().embed_images(images)
+        # SiliconFlow /embeddings accepts one image content object per input.
+        return [
+            self._embed_input({"image": self.normalize_image_input(image, keep_data_prefix=True)}) for image in images
+        ]
