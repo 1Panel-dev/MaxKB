@@ -1,26 +1,3 @@
-<template>
-  <!-- 只读会话记录:首页加载整块遮罩,上滑加载更多时顶部小转圈 -->
-  <div ref="msgBoxRef" v-loading="fullLoading" class="log-message-list" @scroll="onScroll">
-    <template v-if="messages.length > 0">
-      <div v-if="loading" class="log-message-list__more">
-        <el-icon class="is-loading" :size="18"><LoadingIcon /></el-icon>
-      </div>
-
-      <div
-        v-for="(msg, i) in messages"
-        :key="msg.id || i"
-        :class="['msg-row', msg.role === 'USER' ? 'user' : 'assistant']"
-      >
-        <ContentList :content-list="msg.content" />
-        <!-- 助手消息底部信息栏(知识来源/执行详情/tokens/耗时) -->
-        <MessageFooter v-if="msg.role === 'ASSISTANT' && msg.record" :message="msg" />
-      </div>
-    </template>
-
-    <el-empty v-else-if="!loading" class="flex-1" description="暂无对话记录" :image-size="80" />
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { Loading as LoadingIcon } from '@element-plus/icons-vue'
@@ -59,12 +36,30 @@ const onScroll = async () => {
 }
 </script>
 
+<template>
+  <!-- 只读会话记录:首页加载整块遮罩,上滑加载更多时顶部小转圈 -->
+  <div ref="msgBoxRef" v-loading="fullLoading" class="log-message-list p-6" @scroll="onScroll">
+    <template v-if="messages.length > 0">
+      <div v-if="loading" class="log-message-list__more">
+        <el-icon class="is-loading" :size="18"><LoadingIcon /></el-icon>
+      </div>
+
+      <div v-for="(msg, i) in messages" :key="msg.id || i" :class="['msg-row', msg.role === 'USER' ? 'user' : 'assistant']">
+        <ContentList :content-list="msg.content" />
+        <!-- 助手消息底部信息栏(知识来源/执行详情/tokens/耗时) -->
+        <MessageFooter v-if="msg.role === 'ASSISTANT' && msg.record" :message="msg" />
+      </div>
+    </template>
+
+    <el-empty v-else-if="!loading" class="flex-1" description="暂无对话记录" :image-size="80" />
+  </div>
+</template>
+
 <style scoped lang="scss">
 .log-message-list {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 14px 12px;
   scrollbar-width: thin;
   display: flex;
   flex-direction: column;

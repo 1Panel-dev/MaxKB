@@ -1,20 +1,17 @@
-<template>
-  <div class="content-text">
-    <MdPreview editorId="conversation-text" :modelValue="content.content || ''" />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { MdPreview } from 'md-editor-v3'
-import 'md-editor-v3/lib/preview.css'
+import { useId } from 'vue'
+
+defineOptions({ name: 'ConversationTextContent' })
 
 defineProps<{
-  content: any
+  content: { content?: string | null }
 }>()
+
+const editorId = `conversation-text-${useId()}`
 </script>
 
-<style scoped lang="scss">
-.content-text :deep(.md-editor) {
-  background: transparent;
-}
-</style>
+<template>
+  <div class="mk-conversation-text-content">
+    <MdPreview :editor-id="editorId" :model-value="content.content ?? ''" />
+  </div>
+</template>

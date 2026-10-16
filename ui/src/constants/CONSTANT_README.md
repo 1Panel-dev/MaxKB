@@ -26,6 +26,10 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 `knowledge.ts` 的 `KNOWLEDGE_SEARCH_MODE_OPTIONS` 统一维护向量、全文和混合检索的值、文案及说明，
 召回测试页与工作流知识库检索节点直接复用，选项值引用 `KNOWLEDGE_SEARCH_MODE`。
 
+`knowledge.ts` 的 `KNOWLEDGE_IMAGE_EXTENSIONS` 维护知识库上传和召回测试支持的图片扩展名，
+`KNOWLEDGE_IMAGE_ACCEPT` 和 `KNOWLEDGE_IMAGE_TYPE_LABEL` 由它派生，供文件选择、校验与提示使用。
+此配置独立于聊天、工作流等场景使用的通用文件类型配置。
+
 `schedule.ts` 的 `SCHEDULE_OPTION` 统一提供触发器、长期记忆与知识库定时同步的周期级联选项，
 包含周期文案、执行时间和间隔数值；使用方只读，配置回填与校验仍由各自组件维护。
 周期类型统一使用 `api/enums/schedule.ts` 的 `SCHEDULE_TYPE`，经 `@/api/enums` 导入。

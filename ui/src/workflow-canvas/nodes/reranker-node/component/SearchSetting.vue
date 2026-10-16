@@ -53,15 +53,8 @@ function submit() {
             align="left"
           />
         </el-form-item>
-        <el-form-item label="引用分段数 TOP">
-          <el-input-number
-            v-model="formData.top_n"
-            :min="1"
-            :max="10000"
-            :value-on-clear="1"
-            controls-position="right"
-            align="left"
-          />
+        <el-form-item label="召回分段数 TOP">
+          <el-input-number v-model="formData.top_n" :min="1" :max="10000" :value-on-clear="1" controls-position="right" align="left" />
         </el-form-item>
       </div>
       <el-form-item label="最大引用字符数">

@@ -203,7 +203,7 @@ watch(
                 <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': syncSetting.sync_type === method.value }">
                   <el-radio :value="method.value" class="mk-card-radio">
                     <h6>{{ method.label }}</h6>
-                    <span class="mt-1 block text-sm text-N600">{{ method.description }}</span>
+                    <span class="block text-sm text-N600">{{ method.description }}</span>
                   </el-radio>
                 </el-card>
               </template>

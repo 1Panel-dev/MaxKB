@@ -1,6 +1,11 @@
 import { KNOWLEDGE_TYPE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 import type { KnowledgeType } from '@/api/types'
 
+/** 知识库图片上传与召回测试共用的格式、文件选择范围和展示文案。 */
+export const KNOWLEDGE_IMAGE_EXTENSIONS: readonly string[] = ['JPG', 'JPEG', 'PNG', 'WEBP', 'BMP']
+export const KNOWLEDGE_IMAGE_ACCEPT = KNOWLEDGE_IMAGE_EXTENSIONS.map((extension) => `.${extension.toLowerCase()}`).join(',')
+export const KNOWLEDGE_IMAGE_TYPE_LABEL = KNOWLEDGE_IMAGE_EXTENSIONS.join('、')
+
 /** 前端知识库类型标识。 */
 export const KNOWLEDGE_TYPE_KEY = {
   BASE: 'BASE',

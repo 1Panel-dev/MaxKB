@@ -1,149 +1,85 @@
-<template>
-  <div class="question-content">
-    <div class="question-bubble" :class="bubbleClass">
-      <div v-if="content.document_list?.length" class="q-section">
-        <div v-for="(f, i) in content.document_list" :key="'doc-'+i" class="q-file-card" @click="download(f)">
-          <span class="q-file-icon">📄</span>
-          <span class="q-file-name" :title="f.name">{{ f.name }}</span>
-        </div>
-      </div>
-      <div v-if="content.image_list?.length" class="q-section">
-        <div class="q-images">
-          <template v-for="(img, i) in content.image_list" :key="'img-'+i">
-            <img v-if="img.url" :src="resetUrl(img.url)" class="q-img" />
-          </template>
-        </div>
-      </div>
-      <div v-if="content.audio_list?.length" class="q-section">
-        <div v-for="(a, i) in content.audio_list" :key="'aud-'+i" class="q-audio-wrap">
-          <audio :src="resetUrl(a.url)" controls />
-        </div>
-      </div>
-      <div v-if="content.video_list?.length" class="q-section">
-        <div class="q-videos">
-          <div v-for="(v, i) in content.video_list" :key="'vid-'+i" class="q-video-wrap">
-            <video :src="resetUrl(v.url)" controls />
-          </div>
-        </div>
-      </div>
-      <div v-if="content.other_list?.length" class="q-section">
-        <div v-for="(f, i) in content.other_list" :key="'file-'+i" class="q-file-card" @click="download(f)">
-          <span class="q-file-icon">📎</span>
-          <span class="q-file-name" :title="f.name">{{ f.name }}</span>
-        </div>
-      </div>
-      <span v-if="content.content">{{ content.content }}</span>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
-import { resetUrl } from '@/utils/icon'
+import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
+import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
+import FileUploadCard from '@/components/mk-drag-upload/FileUploadCard.vue'
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import { getFileExtension, resetUrl } from '@/utils/icon'
+import { formatFileSize } from '@/utils/number'
+import { downloadByURL } from '@/utils/common'
 
-const props = defineProps<{ content: any }>()
+defineOptions({ name: 'ConversationQuestionContent' })
 
-const bubbleClass = computed(() => {
-  const c = props.content
-  const count = [c.document_list?.length, c.image_list?.length, c.audio_list?.length, c.video_list?.length, c.other_list?.length]
-    .filter((n: number) => n > 0).length
-  return count >= 2 ? 'multi-media' : ''
-})
+interface QuestionAttachment {
+  file_id?: string
+  name: string
+  url?: string
+  size?: number
+}
 
-const download = (file: any) => {
-  if (file.url) window.open(resetUrl(file.url), '_blank')
+type AttachmentField = 'document_list' | 'image_list' | 'audio_list' | 'video_list' | 'other_list'
+type QuestionContent = { content?: string } & Partial<Record<AttachmentField, QuestionAttachment[]>>
+
+const props = defineProps<{ content: QuestionContent }>()
+
+// 合并各类已发送附件，统一换行排列；不依赖输入区的上传状态。
+const attachmentFields = ['document_list', 'image_list', 'audio_list', 'video_list', 'other_list'] as const
+const attachments = computed(() =>
+  attachmentFields.flatMap((field) =>
+    (props.content[field] ?? []).map((file, index) => ({
+      ...file,
+      status: 'success' as const,
+      key: `${field}-${file.file_id ?? index}`,
+      field,
+      src: file.url ? resetUrl(file.url) : '',
+    })),
+  ),
+)
+const imageSources = computed(() => attachments.value.filter((file) => file.field === 'image_list' && file.src).map((file) => file.src))
+
+function getAttachmentDescription(file: QuestionAttachment) {
+  const extension = getFileExtension(file.name) || '文件'
+  return file.size == null ? extension : `${extension} – ${formatFileSize(file.size)}`
 }
 </script>
 
-<style scoped lang="scss">
-.question-content {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-}
-
-.question-bubble {
-  background: #d6e2ff;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border-bottom-right-radius: 4px;
-  max-width: 70%;
-  word-break: break-word;
-  font-size: 14px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
-
-.q-section {
-  margin-bottom: 8px;
-}
-
-.q-images {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.q-img {
-  width: 170px;
-  height: 170px;
-  border-radius: 6px;
-  object-fit: cover;
-  cursor: pointer;
-  display: block;
-}
-
-.q-audio-wrap audio {
-  width: 350px;
-  height: 43px;
-  border-radius: 6px;
-}
-
-.q-videos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.q-video-wrap video {
-  width: 170px;
-  border-radius: 6px;
-  display: block;
-}
-
-.q-file-card {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  max-width: 100%;
-  transition: background 0.15s;
-}
-
-.q-file-card:hover {
-  background: rgba(255, 255, 255, 0.9);
-}
-
-.q-file-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.q-file-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 200px;
-}
-
-@media only screen and (max-width: 768px) {
-  .question-bubble { max-width: 85%; }
-  .q-img { width: 120px; height: 120px; }
-  .q-audio-wrap audio { width: 100%; }
-}
-</style>
+<template>
+  <div class="mk-conversation-question-content space-y-3">
+    <!-- 查看已发送附件，超出当前宽度时自动换行。 -->
+    <div v-if="attachments.length" class="flex max-w-full flex-wrap items-start justify-end gap-2">
+      <template v-for="file in attachments" :key="file.key">
+        <div :class="file.field === 'image_list' ? 'shrink-0' : 'w-60 max-w-full'">
+          <!-- 查看图片 -->
+          <ImageUploadCard
+            v-if="file.field === 'image_list' && file.src"
+            :file="file"
+            :src="file.src"
+            :size="58"
+            :show-remove="false"
+            :preview-src-list="imageSources"
+            :initial-index="imageSources.indexOf(file.src)"
+            class="cursor-pointer"
+          />
+          <!-- 播放音频 -->
+          <MkAudio v-else-if="file.field === 'audio_list'" :src="file.src" :name="file.name">
+            <FileUploadCard :file="file" :description="getAttachmentDescription(file)" :show-remove="false" class="cursor-pointer rounded-lg!" />
+          </MkAudio>
+          <!-- 播放视频 -->
+          <MkVideo v-else-if="file.field === 'video_list'" :src="file.src" :name="file.name">
+            <FileUploadCard :file="file" :description="getAttachmentDescription(file)" :show-remove="false" class="cursor-pointer rounded-lg!" />
+          </MkVideo>
+          <!-- 下载文件 -->
+          <FileUploadCard
+            v-else-if="file.field !== 'image_list'"
+            :file="file"
+            :description="getAttachmentDescription(file)"
+            :show-remove="false"
+            class="cursor-pointer rounded-lg!"
+            @click="file.src && downloadByURL(file.src, file.name)"
+          />
+        </div>
+      </template>
+    </div>
+    <div v-if="content.content" class="mk-gray-card-lg ml-auto w-fit max-w-full py-3! whitespace-pre-wrap wrap-anywhere">{{ content.content }}</div>
+  </div>
+</template>

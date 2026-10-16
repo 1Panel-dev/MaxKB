@@ -1,73 +1,58 @@
 <script setup lang="ts">
-import { computed, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import { reactive, ref, useTemplateRef } from 'vue'
+import type { FormInstance } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
+import { KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_TYPE } from '@/api/enums'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
-import type { KnowledgeHitTestImage, KnowledgeHitTestPayload, KnowledgeHitTestResult } from '@/api/types'
+import type { KnowledgeHitTestPayload, KnowledgeHitTestResult } from '@/api/types'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import emptyHitTestImage from '@/assets/empty/hit-test.png'
 import HitTestInput from './components/HitTestInput.vue'
-import HitTestResult from './components/HitTestResult.vue'
 
 defineOptions({ name: 'HitTestView' })
 defineProps<ResourceDetailPageProps>()
-defineExpose({ customHeader: true })
+defineExpose({ hideHeader: true })
 
-const { knowledgeId, resourceApi } = useKnowledgeDetailContext({ resourceScopes: ['workspace', 'system-resource', 'system-shared'] })
+const { knowledge, knowledgeId, resourceApi } = useKnowledgeDetailContext({ resourceScopes: ['workspace', 'system-resource', 'system-shared'] })
 
-// 检索参数与待测试内容，图片查询仅支持向量和混合检索。
+// 检索参数与待测试内容，仅通用知识库支持查询图片。
 const searchForm = reactive<Pick<KnowledgeHitTestPayload, 'search_mode' | 'similarity' | 'top_number'>>({
   search_mode: KNOWLEDGE_SEARCH_MODE.EMBEDDING,
   similarity: 0.6,
-  top_number: 6,
+  top_number: 5,
 })
 const searchFormRef = useTemplateRef<FormInstance>('searchFormRef')
-const searchRules: FormRules = {
-  similarity: [{ required: true, type: 'number', message: '请输入相似度', trigger: 'change' }],
-  top_number: [{ required: true, type: 'number', message: '请输入召回数量', trigger: 'change' }],
-}
-const queryText = ref('')
-const queryImages = ref<KnowledgeHitTestImage[]>([])
-const uploading = ref(false)
-const hasFailedImages = ref(false)
+
 const loading = ref(false)
-const hasImages = computed(() => queryImages.value.length > 0)
-const isKeywordSearch = computed(() => searchForm.search_mode === KNOWLEDGE_SEARCH_MODE.KEYWORDS)
-const canTest = computed(() => !loading.value && !uploading.value && !hasFailedImages.value && (!!queryText.value.trim() || hasImages.value))
 
 function changeSearchMode() {
-  searchForm.similarity = isKeywordSearch.value ? 0 : 0.6
+  searchForm.similarity = searchForm.search_mode === KNOWLEDGE_SEARCH_MODE.KEYWORDS ? 0 : 0.6
 }
 
 // 仅展示本次提交的查询快照，失败保留输入和检索参数供重试。
 const resultParagraphs = ref<KnowledgeHitTestResult[]>([])
-const tested = ref(false)
-const testFailed = ref(false)
-const submittedQuery = ref('')
+const hasTestResult = ref(false)
+const submittedQuery = ref<Required<Pick<KnowledgeHitTestPayload, 'query_text' | 'image_list'>>>({ query_text: '', image_list: [] })
 
-function testKnowledge() {
-  if (!canTest.value) return
+function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text' | 'image_list'>>) {
+  if (loading.value) return
   searchFormRef.value?.validate((valid) => {
-    if (!valid || !canTest.value) return
+    if (!valid || loading.value) return
     const payload: KnowledgeHitTestPayload = {
       ...searchForm,
-      query_text: queryText.value.trim(),
-      image_list: queryImages.value.map((queryImage) => ({ ...queryImage })),
+      ...query,
     }
-    const queryTitle = payload.query_text || `图片检索（${queryImages.value.length} 张）`
+
     loading.value = true
-    testFailed.value = false
     return resourceApi.knowledge
       .postKnowledgeHitTest(knowledgeId.value, payload)
       .then((paragraphs) => {
         resultParagraphs.value = paragraphs
-        submittedQuery.value = queryTitle
-        tested.value = true
+        submittedQuery.value = query
+        hasTestResult.value = true
       })
       .catch(() => {
-        // 通用错误由请求层提示；结果区标记失败，避免误认为是本次测试结果。
-        testFailed.value = true
+        // 请求层统一提示错误，保留输入与已有结果供重试。
       })
       .finally(() => {
         loading.value = false
@@ -77,62 +62,37 @@ function testKnowledge() {
 </script>
 
 <template>
-  <Teleport v-if="headerTarget" :to="headerTarget">
-    <div class="flex-align-center gap-2">
-      <h4>{{ title }}</h4>
-      <MkTooltip content="针对用户提问召回匹配的知识内容，保障回答效果" placement="right">
-        <MkIcon name="icon_info_outlined" class="text-N600!" />
-      </MkTooltip>
-    </div>
-  </Teleport>
-  <div class="grid min-h-0 flex-1 grid-cols-2 gap-6 -pr-0!">
-    <section class="min-w-0 space-y-4">
-      <div
-        class="relative rounded-xl border bg-white p-4 after:absolute after:-bottom-1.5 after:left-1/2 after:size-3 after:rotate-45 after:border-r after:border-b after:bg-white"
-      >
-        <h4 class="mb-5">检索参数</h4>
-        <el-form
-          ref="searchFormRef"
-          :model="searchForm"
-          :rules="searchRules"
-          label-position="top"
-          hide-required-asterisk
-          :disabled="loading"
-          @submit.prevent
-        >
-          <el-form-item label="检索模式" class="mb-4!">
+  <div class="-ml-6 -mr-6 -mb-6 grid h-layout-content shrink-0 grid-cols-2 overflow-hidden">
+    <!-- 左侧 -->
+    <el-scrollbar class="min-h-0 min-w-0" view-class="px-6 pb-6">
+      <header class="flex-align-center gap-2 py-4">
+        <h4>{{ title }}</h4>
+        <MkTooltip content="针对用户提问召回匹配的知识内容，保障回答效果" placement="right">
+          <MkIcon name="icon_info_outlined" class="text-N600!" />
+        </MkTooltip>
+      </header>
+      <el-card shadow="never" class="has-bottom-arrow mb-5">
+        <h4 class="mb-4">检索参数</h4>
+        <el-form ref="searchFormRef" :model="searchForm" label-position="top" require-asterisk-position="right" @submit.prevent>
+          <el-form-item label="检索模式">
             <!-- 选择检索模式 -->
-            <el-radio-group v-model="searchForm.search_mode" class="mk-radio-group-vertical" @change="changeSearchMode">
+            <el-radio-group v-model="searchForm.search_mode" @change="changeSearchMode" class="space-y-2">
               <template v-for="searchMode in KNOWLEDGE_SEARCH_MODE_OPTIONS" :key="searchMode.value">
-                <el-card
-                  shadow="never"
-                  class="w-full rounded-xl!"
-                  body-class="p-4!"
-                  :class="{ 'border-primary!': searchForm.search_mode === searchMode.value }"
-                >
-                  <el-radio
-                    :value="searchMode.value"
-                    :disabled="loading || (searchMode.value === KNOWLEDGE_SEARCH_MODE.KEYWORDS && (hasImages || uploading))"
-                    class="mk-card-radio items-center! [&_.el-radio__input]:mt-0!"
-                  >
+                <el-card shadow="never" class="w-full!" :class="{ 'border-primary!': searchForm.search_mode === searchMode.value }">
+                  <el-radio :value="searchMode.value" :disabled="loading" class="mk-card-radio">
                     <h6>{{ searchMode.label }}</h6>
-                    <span class="mt-1 block text-sm text-N600">{{ searchMode.description }}</span>
-                    <span v-if="searchMode.value === KNOWLEDGE_SEARCH_MODE.KEYWORDS && hasImages" class="mt-1 block text-sm text-N500">
-                      图片不支持全文检索，请先移除图片
-                    </span>
+                    <span class="block text-sm text-N600">{{ searchMode.description }}</span>
                   </el-radio>
                 </el-card>
               </template>
             </el-radio-group>
           </el-form-item>
           <div class="grid grid-cols-2 gap-4">
-            <el-form-item prop="similarity" class="mb-0!">
+            <el-form-item class="mb-0!">
               <template #label>
                 <span class="flex-align-center gap-1">
                   相似度高于
-                  <MkTooltip content="仅召回得分高于此值的分段。向量和全文检索范围为 0–1，混合检索范围为 0–2。">
-                    <MkIcon name="icon_info_outlined" :size="16" class="text-N500" />
-                  </MkTooltip>
+                  <MkTooltip content="相似度越高相关性越强。" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip>
                 </span>
               </template>
               <!-- 设置相似度阈值 -->
@@ -148,14 +108,13 @@ function testKnowledge() {
                 align="left"
               />
             </el-form-item>
-            <el-form-item label="召回 TOP K" prop="top_number" class="mb-0!">
+            <el-form-item label="召回分段数 TOP" class="mb-0!">
               <!-- 设置召回数量 -->
               <el-input-number
                 v-model="searchForm.top_number"
                 class="w-full!"
                 :min="1"
                 :max="10000"
-                :precision="0"
                 :value-on-clear="1"
                 controls-position="right"
                 align="left"
@@ -163,44 +122,63 @@ function testKnowledge() {
             </el-form-item>
           </div>
         </el-form>
-      </div>
+      </el-card>
 
       <HitTestInput
-        v-model="queryText"
-        :disabled="loading"
-        :allow-images="!isKeywordSearch"
-        @update:images="queryImages = $event"
-        @update:uploading="uploading = $event"
-        @update:failed="hasFailedImages = $event"
+        :file-count-limit="knowledge?.file_count_limit"
+        :file-size-limit="knowledge?.file_size_limit"
+        :loading="loading"
+        :allow-images="knowledge?.type === KNOWLEDGE_TYPE.BASE"
+        @submit="testKnowledge"
       />
-      <!-- 执行召回测试 -->
-      <el-button type="primary" class="w-full" :loading="loading" :disabled="!canTest" @click="testKnowledge">
-        <MkIcon v-if="!loading" name="icon_play_outlined" class="mr-1" />
-        测试
-      </el-button>
-    </section>
-
-    <section v-loading="loading" class="flex-column min-h-[520px] min-w-0 rounded-xl border bg-N100 p-4">
-      <div v-if="!tested" class="flex-center flex-1">
-        <MkEmpty :image="emptyHitTestImage" description="召回的知识显示在这里" :image-size="125" />
-      </div>
-      <template v-else>
-        <header class="mb-4 space-y-2">
-          <div class="flex-between gap-3">
-            <h4>召回结果</h4>
-            <span class="shrink-0 text-sm text-N500">共 {{ resultParagraphs.length }} 条</span>
+    </el-scrollbar>
+    <!-- 右侧 -->
+    <section v-loading="loading" class="min-h-0 min-w-0 border-l">
+      <el-scrollbar height="100%" view-class="flex-column min-h-full p-4">
+        <div v-if="!hasTestResult" class="flex-center flex-1">
+          <MkEmpty :image="emptyHitTestImage" description="召回的知识显示在这里" :image-size="125" />
+        </div>
+        <template v-else>
+          <section class="mb-6">
+            <h4 class="mb-4">本次查询</h4>
+            <div v-if="submittedQuery.image_list.length" class="flex flex-wrap gap-2">
+              <template v-for="image in submittedQuery.image_list" :key="image.file_id">
+                <!-- 预览本次查询图片 -->
+                <el-image :src="image.url" :alt="image.name" fit="cover" class="size-12" />
+              </template>
+            </div>
+            <p v-if="submittedQuery.query_text" class="mt-3 whitespace-pre-wrap break-words">{{ submittedQuery.query_text }}</p>
+          </section>
+          <h4 class="mb-4">查询结果</h4>
+          <div v-if="!resultParagraphs.length" class="flex-center flex-1">
+            <MkEmpty type="search" description="未召回相关知识，请调整检索参数内容" />
           </div>
-          <p class="break-words text-N600">{{ submittedQuery }}</p>
-        </header>
-        <div v-if="!resultParagraphs.length" class="flex-center flex-1">
-          <MkEmpty type="search" description="未召回相关知识，请调整检索参数或测试内容" />
-        </div>
-        <div v-else class="space-y-3">
-          <template v-for="(paragraph, paragraphIndex) in resultParagraphs" :key="paragraph.id">
-            <HitTestResult :paragraph="paragraph" :index="paragraphIndex + 1" />
-          </template>
-        </div>
-      </template>
+          <div v-else class="space-y-3">
+            <template v-for="(paragraph, paragraphIndex) in resultParagraphs" :key="paragraph.id">
+              <MkSourceCard :title="paragraph.title || '-'">
+                <template #icon>
+                  <span>
+                    <span>{{ `#${paragraphIndex + 1}` }}</span>
+                    <el-divider direction="vertical" />
+                  </span>
+                </template>
+                <template #tag>
+                  <span class="shrink-0 text-primary">{{ paragraph.similarity.toFixed(3) }}</span>
+                </template>
+
+                <el-scrollbar max-height="280">
+                  <MdPreview :model-value="paragraph.content" />
+                </el-scrollbar>
+                <template #footer>
+                  <div class="text-sm text-N600">
+                    <span class="truncate" :title="paragraph.document_name">{{ paragraph.document_name }}</span>
+                  </div>
+                </template>
+              </MkSourceCard>
+            </template>
+          </div>
+        </template>
+      </el-scrollbar>
     </section>
   </div>
 </template>

@@ -539,17 +539,18 @@ Logo 数据统一从 Theme Store 获取。
 ### MkDragUpload
 
 入口 `mk-drag-upload/index.vue`，内部按单／多文件分离实现。`v-model` 为 `DragUploadFile[]`，
-兼容 UploadUserFile，支持 file_id、errMsg、canRetry；类型从组件 `types.ts` 导入。
+兼容 UploadUserFile，支持 file_id、errMsg；类型从组件 `types.ts` 导入。
 
 - `multiple` 默认 false；单文件展示卡片和更换入口，多文件保留拖拽区、文件夹选择与列表。
 - 多文件 `mode` 默认 `file`，使用文件图标和上传进度；`mode="image"` 按选择顺序展示 104×104 的
   `el-image` 方块，不使用 Card，不展示汇总、文件名或状态文案。等待时中央显示空进度条，上传时显示实际进度，
   成功或失败后隐藏进度条。右上角提供删除，未上传成功时
-  在原图上叠加灰色遮罩，成功后移除；网络失败和大小超限使用红框，仅网络失败在中央提供重试。
-  失败且有错误信息时通过 MkTooltip 展示文件名及失败原因，其他情况禁用提示。内部仍维护上传状态与 uploadingCount，本地缩略图 URL 在文件移除
+  在原图上叠加灰色遮罩，成功后移除；网络失败和大小超限使用红框，失败时中央显示警告图标，
+  在其右侧提供重试图标，两个图标整体居中。仅悬停警告图标且有错误信息时通过 MkTooltip
+  展示文件名及失败原因，重试图标单独提示“重试”，两个提示均定位到图片上方，图片其他区域不提示。内部仍维护上传状态与 uploadingCount，本地缩略图 URL 在文件移除
   和组件卸载时释放。单文件不使用 mode。
 - `accept`、`limit` 控制格式／数量，多文件 `sizeLimit` 默认 100MB；格式、空文件、重复选择移除，
-  大小超限保留不可重试 fail 文件，图片模式保留原图和红框；网络失败可重试。
+  大小超限保留 fail 文件，图片模式保留原图和红框；所有失败均提供重试，重试仍执行原有文件校验。
   超量发出 exceed，DS_Store 格式不支持时静默移除。
 - `dragText`、`selectText`、`tipText`、`replaceText` 覆盖文案；download 作用域插槽提供下载操作。
 - 多文件通过 `inject('upload')` 获取 `DragUploadHandler`，返回 `{ request: Promise<string>, abort }`。
@@ -558,6 +559,16 @@ Logo 数据统一从 Theme Store 获取。
   Admin FileApi.deleteFile 删除服务端文件，remove 事件通知业务清理。
 - 暴露 clearFiles()、handleRemove(file)、响应式 uploadingCount；公开选择状态 ready／uploading／success／fail。
   页面提供具体上传请求与业务校验，不通过展示插槽控制数量限制。
+
+同目录的 `FileUploadCard.vue` 和 `ImageUploadCard.vue` 可显式导入，供上传列表、对话输入与已发送附件复用。
+两者接收只读 `UploadCardFile` 展示数据，统一呈现进度和失败红框，通过 `retry`、`remove` 事件通知使用方，
+不请求接口、不管理文件或预览 URL 生命周期。`percentage` 可覆盖文件内的进度，
+失败时均显示重试入口，`showRemove` 控制删除入口，默认显示；`disabled` 统一禁用操作。
+已发送附件传入 success 状态并设置 `showRemove=false`。
+文件卡片通过 `description` 覆盖辅助文案，`name`／`description` 作用域插槽可自定义文字内容；
+图片卡片的 `size` 控制缩略图宽高（默认 104px），`iconSize` 控制状态图标大小（默认 16px），
+`src` 由使用方提供，`showError` 控制失败警告图标，默认显示。
+图片卡片可通过 `previewSrcList` 启用图片预览，`initialIndex` 指定初始索引（默认 0），预览挂载到 body。
 
 ### PythonCodeEditor
 

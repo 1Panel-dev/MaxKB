@@ -11,7 +11,8 @@ export interface FileItem {
   url?: string
   file_id?: string
   previewUrl?: string
-  uploading?: boolean
+  status: 'ready' | 'uploading' | 'success' | 'fail'
+  errMsg?: string
   /** 上传进度 0-100 */
   progress?: number
 }
@@ -66,14 +67,14 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     return streamLoading.value ? '正在回复中...' : '输入消息...'
   })
   // 附件上传完成前不能发送，否则消息中的附件没有地址
-  const isUploading = computed(() => fileList.value.some((attachment) => attachment.uploading))
+  const attachmentsReady = computed(() => fileList.value.every((attachment) => attachment.status === 'success'))
   const canSend = computed(
     () =>
       !disabled.value &&
       (question.value.trim().length > 0 || fileList.value.length > 0) &&
       !streamLoading.value &&
       !sending.value &&
-      !isUploading.value,
+      attachmentsReady.value,
   )
 
   const imageFiles = computed(() => fileList.value.filter((attachment) => isImage(attachment.name)))
@@ -82,34 +83,55 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   const validateFile = (file: File) => fileList.value.length < maxFiles && file.size > 0 && file.size <= maxSizeMB * 1024 * 1024
 
   const addFile = (file: File) => {
-    if (!validateFile(file)) return
+    if (disabled.value || streamLoading.value || sending.value || !validateFile(file)) return
     const attachment: FileItem = reactive({
       uid: Date.now() + Math.random(),
       name: file.name,
       size: file.size,
       raw: file,
-      uploading: true,
+      status: 'ready',
       progress: 0,
     })
     if (isImage(file.name) || isAudio(file.name) || isVideo(file.name)) {
       attachment.previewUrl = URL.createObjectURL(file)
     }
     fileList.value.push(attachment)
+    uploadAttachment(attachment)
+  }
 
-    // 文件发送完后服务端仍在处理，进度停在 95% 直到接口返回
-    uploadFile(file, getChatId(), (percent) => {
-      attachment.progress = Math.min(percent, UPLOAD_PROGRESS_PENDING_MAX)
-    })
+  // 原文件重试复用上传流程；移除或切换会话后忽略旧请求的回调。
+  const uploadAttachment = (attachment: FileItem) => {
+    if (disabled.value || streamLoading.value || sending.value || attachment.status === 'uploading' || !fileList.value.includes(attachment)) return
+    attachment.status = 'uploading'
+    attachment.progress = 0
+    attachment.errMsg = ''
+    void Promise.resolve()
+      .then(() => {
+        if (!fileList.value.includes(attachment)) return
+        return uploadFile(attachment.raw, getChatId(), (percent) => {
+          if (!fileList.value.includes(attachment)) return
+          // 文件传输结束后仍等待服务端处理，成功响应前最多显示 95%。
+          attachment.progress = Number.isFinite(percent) ? Math.min(UPLOAD_PROGRESS_PENDING_MAX, Math.max(0, percent)) : 0
+        })
+      })
       .then((url) => {
+        if (!fileList.value.includes(attachment)) return
+        const fileId = url?.split(/[?#]/)[0]?.split('/').filter(Boolean).pop()
+        if (!url || !fileId) throw new Error('上传未返回文件地址')
         attachment.url = url
-        attachment.file_id = url.split('/').pop()
+        attachment.file_id = fileId
+        attachment.progress = 100
+        attachment.status = 'success'
       })
-      .catch((e) => {
-        console.error('upload failed:', e)
+      .catch(() => {
+        if (!fileList.value.includes(attachment)) return
+        attachment.status = 'fail'
+        attachment.errMsg = '上传失败'
       })
-      .finally(() => {
-        attachment.uploading = false
-      })
+  }
+
+  const retryFile = (attachment: FileItem) => {
+    if (attachment.status === 'fail') uploadAttachment(attachment)
   }
 
   const addFiles = (files: FileList | File[] | null | undefined) => {
@@ -208,6 +230,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     addFile,
     addFiles,
     removeFile,
+    retryFile,
     send,
     stop,
   }

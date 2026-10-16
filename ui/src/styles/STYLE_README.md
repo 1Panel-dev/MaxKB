@@ -38,6 +38,11 @@ Element Plus 覆盖、主题变量和应用样式。Chat 入口还显式引入 E
 当前 `overflow: hidden` 已允许面板在 Flex 主轴上收缩，无需重复设置 `min-width: 0`；
 也不额外设置 `min-height: 0`、`height: 100%` 或 `max-height: 100%`，消息列表负责内部滚动。
 
+用户提问容器使用 `mk-conversation-question-content`，在对话模块公共样式中控制靠右、
+随内容收缩及最大 85% 宽度。文字气泡使用 `mk-gray-card-lg`，换行规则在模板中组合工具类。
+提问附件参考输入区的卡片外观，通过 Flex 按容器宽度自动换行并靠右排列；已发送附件不展示
+删除或重试入口，图片支持预览，音视频复用 `MkAudio`、`MkVideo`；普通文件点击卡片即可下载。
+
 左右侧栏统一使用 `mk-conversation-side-panel`，内容容器使用
 `mk-conversation-side-panel__inner`。`.left` 引用 `--mk-chat-sidebar-width`，`.right`
 引用 `--mk-chat-right-width`，通过侧栏内部变量统一内容固定宽度、push 展开宽度和 drawer
@@ -166,6 +171,8 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 `flex-column gap-*`。条件显隐和第三方组件场景需检查实际渲染结构及间距。
 
 ## 常用卡片样式
+
+`el-card` 添加 `has-bottom-arrow` 时，在底部中央显示与卡片背景、边框同色的箭头。
 
 灰色内容卡片统一使用 N100 背景，按尺寸选择以下独立类名，无需叠加 `mk-gray-card`：
 

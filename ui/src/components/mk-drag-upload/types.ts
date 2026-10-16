@@ -4,8 +4,10 @@ import type { UploadRawFile, UploadUserFile } from 'element-plus'
 export interface DragUploadFile extends UploadUserFile {
   file_id?: string
   errMsg?: string
-  canRetry?: boolean
 }
+
+/** 上传卡片的只读展示数据，不依赖具体上传接口。 */
+export type UploadCardFile = Pick<DragUploadFile, 'name' | 'size' | 'status' | 'percentage' | 'errMsg'>
 
 /** 由调用方提供具体上传接口，组件管理进度、完成状态和取消。 */
 export type DragUploadHandler = (file: UploadRawFile, onProgress: (percent: number) => void) => { request: Promise<string>; abort: () => void }

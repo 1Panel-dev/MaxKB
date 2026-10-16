@@ -270,6 +270,21 @@
   --el-card-border-color: var(--mk-N300);
   --el-card-padding: 16px;
   overflow: visible;
+  &.has-bottom-arrow {
+    position: relative;
+    &::after {
+      background: var(--el-card-bg-color);
+      border-bottom: 1px solid var(--el-card-border-color);
+      border-right: 1px solid var(--el-card-border-color);
+      bottom: calc(var(--spacing) * -1.5);
+      content: '';
+      height: calc(var(--spacing) * 3);
+      left: 50%;
+      position: absolute;
+      transform: rotate(45deg);
+      width: calc(var(--spacing) * 3);
+    }
+  }
   &.small {
     --el-card-border-radius: 6px;
     --el-card-padding: 8px 12px;

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { getFileExtension, getFileIconUrl, isAudio, isVideo } from '@/utils/icon'
+import { getFileExtension, isAudio, isVideo } from '@/utils/icon'
 import { formatFileSize } from '@/utils/number'
-import { inputShortcut } from '../../core/shortcuts'
-import { useMessageInputStore } from './index'
+import { useInputEvents } from '../../core/input-events'
+import { useMessageInputStore, type FileItem } from './index'
+import FileUploadCard from '@/components/mk-drag-upload/FileUploadCard.vue'
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 
 const {
   question,
@@ -18,93 +19,80 @@ const {
   imageFiles,
   addFiles,
   removeFile,
+  retryFile,
   send,
   stop,
 } = useMessageInputStore()
 
-// 选择和粘贴附件统一交给输入 Store 处理。
-const fileInputRef = ref<HTMLInputElement | null>(null)
-
-const handleFileSelect = (event: Event) => {
-  const input = event.target as HTMLInputElement
-  addFiles(input.files)
-  input.value = ''
-}
-
-const handlePaste = (event: ClipboardEvent) => {
-  const files = event.clipboardData?.files
-  if (!files?.length) return
-  event.preventDefault()
-  addFiles(files)
-}
-
-// 移动端保留回车换行，桌面端沿用公共发送快捷键。
-const handleKeydown = (event: KeyboardEvent) => {
-  const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  if (isMobile && event.key === 'Enter') return
-  inputShortcut(event, question, () => {
+// 所有附件入口共用禁用条件，上传和发送仍由输入 Store 处理。
+const { fileInputRef, handleFileSelect, handlePaste, handleDragover, handleDrop, handleKeydown } = useInputEvents({
+  text: question,
+  canUpload: () => !disabled.value && !streamLoading.value && fileList.value.length < maxFiles,
+  addFiles,
+  submit: () => {
     if (canSend.value) send()
-  })
+  },
+})
+// 对话附件保留类型与已上传大小文案，卡片负责统一展示。
+function getAttachmentDescription(file: FileItem) {
+  const uploaded = file.status === 'uploading' ? formatFileSize((file.size * (file.progress ?? 0)) / 100) + ' / ' : ''
+  return (getFileExtension(file.name) || '文件') + ' – ' + uploaded + formatFileSize(file.size)
 }
 </script>
 
 <template>
-  <div class="mk-input-box mk-conversation-message-input w-full shadow-lg">
+  <div class="mk-input-box mk-conversation-message-input w-full shadow-lg" @dragover="handleDragover" @drop="handleDrop" @paste="handlePaste">
     <!-- 附件按上传顺序排列，超出可视范围时显示滚动箭头。 -->
     <MkHorizontalScroll v-if="fileList.length" class="mb-3">
       <template v-for="(file, index) in fileList" :key="file.uid">
         <div class="group relative shrink-0">
           <!-- 图片 -->
-          <el-image
-            class="size-8"
+          <ImageUploadCard
             v-if="imageFiles.includes(file)"
+            :file="file"
             :src="file.url || file.previewUrl"
-            :alt="file.name"
-            :title="file.name"
-            fit="cover"
+            :size="58"
+            :percentage="file.progress"
+            :disabled="disabled || streamLoading"
+            :show-error="false"
+            @retry="retryFile(file)"
+            @remove="removeFile(index)"
           />
           <!-- 音频 -->
           <MkAudio v-else-if="isAudio(file.name)" :src="file.previewUrl || file.url || ''" :name="file.name">
-            <el-card shadow="never" class="small w-60 rounded-lg! cursor-pointer">
-              <div class="flex-align-center gap-2">
-                <img :src="getFileIconUrl(file.name)" alt="" class="w-8 shrink-0" />
-                <div class="min-w-0 flex-1">
-                  <div class="truncate" :title="file.name">{{ file.name }}</div>
-                  <div class="text-sm text-N500">{{ getFileExtension(file.name) || '文件' }} – {{ formatFileSize(file.size) }}</div>
-                </div>
-              </div>
-            </el-card>
+            <FileUploadCard
+              :file="file"
+              :description="getAttachmentDescription(file)"
+              :percentage="file.progress"
+              :disabled="disabled || streamLoading"
+              class="w-60 cursor-pointer rounded-lg!"
+              @retry="retryFile(file)"
+              @remove="removeFile(index)"
+            />
           </MkAudio>
           <!-- 视频 -->
           <MkVideo v-else-if="isVideo(file.name)" :src="file.previewUrl || file.url || ''" :name="file.name">
-            <el-card shadow="never" class="small w-60 rounded-lg! cursor-pointer">
-              <div class="flex-align-center gap-2">
-                <img :src="getFileIconUrl(file.name)" alt="" class="w-8 shrink-0" />
-                <div class="min-w-0 flex-1">
-                  <div class="truncate" :title="file.name">{{ file.name }}</div>
-                  <div class="text-sm text-N500">{{ getFileExtension(file.name) || '文件' }} – {{ formatFileSize(file.size) }}</div>
-                </div>
-              </div>
-            </el-card>
+            <FileUploadCard
+              :file="file"
+              :description="getAttachmentDescription(file)"
+              :percentage="file.progress"
+              :disabled="disabled || streamLoading"
+              class="w-60 cursor-pointer rounded-lg!"
+              @retry="retryFile(file)"
+              @remove="removeFile(index)"
+            />
           </MkVideo>
           <!-- 文档 -->
-          <el-card v-else shadow="never" class="small w-60 rounded-lg!">
-            <div class="flex-align-center gap-2">
-              <img :src="getFileIconUrl(file.name)" alt="" class="w-8 shrink-0" />
-              <div class="min-w-0 flex-1">
-                <div class="truncate" :title="file.name">{{ file.name }}</div>
-                <div class="text-sm text-N500">{{ getFileExtension(file.name) || '文件' }} – {{ formatFileSize(file.size) }}</div>
-              </div>
-            </div>
-          </el-card>
-          <!-- 上传进度：主题色从左到右填充，上传完成后隐藏 -->
-          <div v-if="file.uploading" class="pointer-events-none absolute inset-0 overflow-hidden rounded-lg">
-            <div class="h-full bg-primary/15 transition-[width] duration-200" :style="{ width: `${file.progress ?? 0}%` }" />
-          </div>
-          <!-- 移除附件 -->
-          <div class="group-hover-visible mk-remove-button" @click="removeFile(index)">
-            <MkIcon name="icon_close_bold_outlined" class="text-white!" :size="6" />
-          </div>
+          <FileUploadCard
+            v-else
+            :file="file"
+            :description="getAttachmentDescription(file)"
+            :percentage="file.progress"
+            :disabled="disabled || streamLoading"
+            class="w-60 rounded-lg!"
+            @retry="retryFile(file)"
+            @remove="removeFile(index)"
+          />
         </div>
       </template>
     </MkHorizontalScroll>
@@ -119,7 +107,6 @@ const handleKeydown = (event: KeyboardEvent) => {
       :disabled="disabled"
       :maxlength="100000"
       @keydown.enter="handleKeydown"
-      @paste="handlePaste"
       clearable
     />
 
