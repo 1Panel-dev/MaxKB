@@ -20,6 +20,15 @@ export interface ParagraphProblem {
   content: string
 }
 
+/** 知识库问题列表，包含关联数量和召回统计。 */
+export interface ProblemItem extends ParagraphProblem {
+  paragraph_count: number
+  hit_num: number
+  last_hit_time: string | null
+  create_time: string
+  update_time: string
+}
+
 /** 从问题详情查询到的关联分段，额外携带所属知识库与文档名称。 */
 export interface ProblemParagraph extends ParagraphItem {
   knowledge_id: string

@@ -25,6 +25,10 @@ import TermbaseApi from '@/api/admin/workspace/knowledge/termbase'
 import SharedTermbaseApi from '@/api/admin/workspace/shared/knowledge/termbase'
 import SystemResourceTermbaseApi from '@/api/admin/system/resource-management/knowledge/termbase'
 import SystemSharedTermbaseApi from '@/api/admin/system/shared-resources/knowledge/termbase'
+import ProblemApi from '@/api/admin/workspace/knowledge/problem'
+import SharedProblemApi from '@/api/admin/workspace/shared/knowledge/problem'
+import SystemResourceProblemApi from '@/api/admin/system/resource-management/knowledge/problem'
+import SystemSharedProblemApi from '@/api/admin/system/shared-resources/knowledge/problem'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-sync'
 import SharedScheduledSyncApi from '@/api/admin/workspace/shared/knowledge/scheduled-sync'
@@ -51,6 +55,7 @@ interface KnowledgeResourceApi {
   readonly paragraph: OptionalApiMethods<
     typeof ParagraphApi | typeof SharedParagraphApi | typeof SystemResourceParagraphApi | typeof SystemSharedParagraphApi
   >
+  readonly problem: OptionalApiMethods<typeof ProblemApi | typeof SharedProblemApi | typeof SystemResourceProblemApi | typeof SystemSharedProblemApi>
   readonly chatUser: OptionalApiMethods<
     typeof ChatUserApi | typeof SharedChatUserApi | typeof SystemResourceChatUserApi | typeof SystemSharedChatUserApi
   >
@@ -93,6 +98,7 @@ const resourceConfigs = {
       image: ImageApi,
       tags: TagsApi,
       termbase: TermbaseApi,
+      problem: ProblemApi,
       workflow: WorkflowApi,
     },
     listRouteName: 'workspace-knowledge-list',
@@ -107,6 +113,7 @@ const resourceConfigs = {
       paragraph: SharedParagraphApi,
       tags: SharedTagsApi,
       termbase: SharedTermbaseApi,
+      problem: SharedProblemApi,
     },
     listRouteName: 'workspace-knowledge-list',
   },
@@ -121,6 +128,7 @@ const resourceConfigs = {
       image: SystemResourceImageApi,
       tags: SystemResourceTagsApi,
       termbase: SystemResourceTermbaseApi,
+      problem: SystemResourceProblemApi,
     },
     listRouteName: 'system-resource-knowledge',
   },
@@ -134,6 +142,7 @@ const resourceConfigs = {
       paragraph: SystemSharedParagraphApi,
       tags: SystemSharedTagsApi,
       termbase: SystemSharedTermbaseApi,
+      problem: SystemSharedProblemApi,
     },
     listRouteName: 'system-shared-knowledge',
   },
@@ -182,6 +191,9 @@ function createKnowledgeDetailContext(state: KnowledgeDetailState): KnowledgeDet
     },
     get termbase() {
       return resourceConfig.value.resourceApi.termbase
+    },
+    get problem() {
+      return resourceConfig.value.resourceApi.problem
     },
     get knowledge() {
       return resourceConfig.value.resourceApi.knowledge
@@ -237,7 +249,11 @@ type ScopedResourceApi<Scope extends ResourceScope> = {
 }
 
 type ScopedKnowledgeDetailContext<Scope extends ResourceScope> = Omit<KnowledgeDetailContext, 'resourceApi'> & {
-  resourceApi: Omit<ScopedResourceApi<Scope>, 'scheduledSync' | 'tags' | 'termbase' | 'document' | 'chatUser' | 'externalRetrieval' | 'image'> & {
+  resourceApi: Omit<
+    ScopedResourceApi<Scope>,
+    'scheduledSync' | 'tags' | 'termbase' | 'problem' | 'document' | 'chatUser' | 'externalRetrieval' | 'image'
+  > & {
+    readonly problem: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['problem']>
     readonly image: KnowledgeResourceApi['image']
     readonly chatUser: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['chatUser']>
     readonly scheduledSync: OptionalApiMethods<(typeof resourceConfigs)[Scope]['resourceApi']['scheduledSync']>

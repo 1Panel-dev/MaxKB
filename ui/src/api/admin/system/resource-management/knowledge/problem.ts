@@ -1,15 +1,15 @@
 import { del, get, post, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import type { ParagraphProblem, ProblemBatchAssociationPayload, ProblemParagraph } from '@/api/types'
+import type { ProblemItem, ProblemBatchAssociationPayload, ProblemParagraph } from '@/api/types'
 
 const getPrefix = (knowledgeId: string) => `/system/resource/knowledge/${knowledgeId}/problem`
 
 /** 批量创建知识库问题。 */
 const postProblems = (knowledgeId: string, contents: string[]) => post<string[], void>(getPrefix(knowledgeId), contents)
 
-/** 分页搜索知识库问题，供分段选择已有问题进行关联。 */
+/** 分页搜索知识库问题，供问题列表及分段关联候选使用。 */
 const getProblemsPage = (knowledgeId: string, page: ParamsPage, query?: { content?: string }) =>
-  get<ResponsePage<ParagraphProblem>>(`${getPrefix(knowledgeId)}/${page.currentPage}/${page.pageSize}`, query)
+  get<ResponsePage<ProblemItem>>(`${getPrefix(knowledgeId)}/${page.currentPage}/${page.pageSize}`, query)
 
 /** 编辑单个知识库问题的内容。 */
 const putProblem = (knowledgeId: string, problemId: string, content: string) =>
