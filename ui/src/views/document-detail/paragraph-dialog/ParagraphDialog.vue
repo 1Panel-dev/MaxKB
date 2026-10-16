@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useDocumentDetailContext } from '@/views/document-detail/context'
 import type { ParagraphDetail, ParagraphItem, ParagraphUpdatePayload } from '@/api/types'
 import type { ParagraphQuestionDraft } from './types.ts'
@@ -13,6 +13,8 @@ defineOptions({ name: 'EditParagraphDialog' })
 const props = defineProps<{
   knowledgeId: string
   documentId: string
+  sourceFileId?: string
+  title?: string
 }>()
 const { resourceApi } = useDocumentDetailContext()
 const emit = defineEmits<{ success: [paragraph: ParagraphItem]; closed: [] }>()
@@ -20,7 +22,6 @@ const emit = defineEmits<{ success: [paragraph: ParagraphItem]; closed: [] }>()
 /* 详情加载：打开时固定目标，关闭动画后由页面卸载。 */
 const visible = ref(false)
 const mode = ref<'edit' | 'detail'>('detail')
-const dialogTitle = computed(() => (mode.value === 'edit' ? '编辑' : '分段详情'))
 const paragraphDetail = ref<ParagraphDetail>()
 const targetKnowledgeId = ref('')
 const targetDocumentId = ref('')
@@ -36,7 +37,7 @@ function loadParagraphDetail() {
   return resourceApi.paragraph
     .getParagraphDetail(targetKnowledgeId.value, targetDocumentId.value, targetParagraphId.value)
     .then((paragraph) => {
-      paragraphDetail.value = paragraph
+      paragraphDetail.value = { ...paragraph, source_file_id: props.sourceFileId }
       relatedQuestions.value = paragraph.problem_list
       paragraphForm.value = { title: paragraph.title ?? '', content: paragraph.content }
     })
@@ -95,7 +96,7 @@ function handleSubmit() {
           })
           .then((paragraph) => {
             // 问题由独立接口更新，正文保存响应不回填问题列表，避免覆盖并行操作结果。
-            paragraphDetail.value = paragraph
+            paragraphDetail.value = { ...paragraph, source_file_id: props.sourceFileId }
             mode.value = 'detail'
             MsgSuccess('保存成功')
             emit('success', paragraph)
@@ -111,12 +112,17 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="dialogTitle" width="1000" align-center :before-close="handleBeforeClose" @closed="emit('closed')">
+  <MkDialog v-model="visible" :title="title" width="1000" align-center :before-close="handleBeforeClose" @closed="emit('closed')">
     <div v-loading="loading">
       <div class="flex h-[480px] max-h-[calc(100vh-272px)] w-full gap-4">
         <el-card v-if="mode === 'detail'" shadow="never" class="mk-paragraph-card group relative min-w-0 flex-1" body-class="flex-column h-full">
           <!-- 编辑分段标题和内容 -->
-          <el-button v-if="!isWorkspaceSharedResource()" circle class="group-hover-visible absolute! top-4 right-4 shadow-md" @click="handleEdit">
+          <el-button
+            v-if="!isWorkspaceSharedResource()"
+            circle
+            class="group-hover-visible absolute! top-2 right-2 z-10 shadow-md"
+            @click="handleEdit"
+          >
             <MkIcon name="icon_edit_outlined" />
           </el-button>
           <ParagraphPreview :paragraph="paragraphDetail" />

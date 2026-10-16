@@ -370,6 +370,12 @@ Drawer 的 `header` 插槽内时，组合 `absolute-center` 和宽度工具类�
 图片预览遮罩 `.el-image-viewer__mask` 统一使用 `var(--el-overlay-color-lighter)`，
 并将元素 `opacity` 设为 `1`，避免与背景色自身透明度叠加；与媒体预览遮罩保持一致。
 
+`.el-image` 全局仅提供边框、圆角和块级展示，不设置固定宽高。使用处按场景指定尺寸，
+普通缩略图使用 `size-8`，头像、上传及召回图片保留各自尺寸。按比例展示且限制最大高度时，
+同时约束内部图片的尺寸，避免仅限制外层高度造成裁切；点击放大复用 `preview-src-list` 和 `preview-teleported`。
+启用点击预览时统一设置 `:scale="0.8"`，缩放步长和上下限使用 Element Plus 默认值，
+不重复声明 `zoom-rate="1.2"`、`max-scale="7"` 和 `min-scale="0.2"`。
+
 ### 普通 CSS 中叠加透明度
 
 使用 `color-mix(in srgb, var(--mk-primary) 10%, transparent)`。

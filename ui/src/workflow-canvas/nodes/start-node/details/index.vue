@@ -44,15 +44,14 @@ defineProps<{
           <p class="mb-1 text-N600">图片：</p>
           <div class="flex flex-wrap gap-2">
             <el-image
+              class="size-8"
               v-for="(f, i) in data.image_list"
               :key="i"
               :src="f.url"
               fit="cover"
               :preview-src-list="data.image_list.map((img: any) => img.url)"
+              :scale="0.8"
               :initial-index="i"
-              :zoom-rate="1.2"
-              :max-scale="7"
-              :min-scale="0.2"
             />
           </div>
         </div>

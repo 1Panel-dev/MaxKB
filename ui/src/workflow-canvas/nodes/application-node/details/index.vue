@@ -20,10 +20,14 @@ defineProps<{
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">输入参数</h6>
       <div class="space-y-2">
-        <p><span class="mr-1 text-N600">问题：</span>{{ data.question || '-' }}</p>
+        <p>
+          <span class="mr-1 text-N600">问题：</span>
+          {{ data.question || '-' }}
+        </p>
 
         <p v-for="(f, i) in data.global_fields" :key="i">
-          <span class="mr-1 text-N600">{{ f.label }}：</span>{{ f.value }}
+          <span class="mr-1 text-N600">{{ f.label }}：</span>
+          {{ f.value }}
         </p>
 
         <div v-if="data.document_list?.length > 0">
@@ -40,15 +44,14 @@ defineProps<{
           <p class="mb-1 text-N600">图片：</p>
           <div class="flex flex-wrap gap-2">
             <el-image
+              class="size-8"
               v-for="(f, i) in data.image_list"
               :key="i"
               :src="f.url"
               fit="cover"
               :preview-src-list="data.image_list.map((img: any) => img.url)"
+              :scale="0.8"
               :initial-index="i"
-              :zoom-rate="1.2"
-              :max-scale="7"
-              :min-scale="0.2"
             />
           </div>
         </div>

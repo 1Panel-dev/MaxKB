@@ -153,7 +153,7 @@
   &.is-circle {
     width: 32px;
     height: 32px;
-    --el-button-hover-text-color: var(--el-text-color-primary);
+    --el-button-hover-text-color: var(--el-color-primary);
     --el-button-hover-bg-color: white;
     --el-button-hover-border-color: var(--el-border-color);
     &.el-button--large {
@@ -627,10 +627,8 @@
 
 /* image */
 .el-image {
-  border-radius: var(--el-border-radius-base);
-  width: 60px;
-  height: 60px;
   border: 1px solid var(--mk-N300);
+  border-radius: var(--el-border-radius-base);
   display: block;
 }
 

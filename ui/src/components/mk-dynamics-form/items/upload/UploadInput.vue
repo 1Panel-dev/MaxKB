@@ -142,11 +142,10 @@ const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) 
         <template v-for="(item, index) in images" :key="index">
           <div class="file cursor border-r-6" v-if="item.url">
             <el-image
+              class="size-8"
               :src="item.url"
-              :zoom-rate="1.2"
-              :max-scale="7"
-              :min-scale="0.2"
               :preview-src-list="getAttrsArray(images, 'url')"
+              :scale="0.8"
               :initial-index="index"
               fit="cover"
             />

@@ -29,7 +29,7 @@ defineProps<{
             <span class="mr-1 text-N600">{{ history.role }}：</span>
             <template v-if="Array.isArray(history.content)">
               <span v-for="(h, i) in history.content" :key="i">
-                <el-image v-if="h.type === 'image_url'" :src="h.image_url.url" fit="cover" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" />
+                <el-image class="size-8" v-if="h.type === 'image_url'" :src="h.image_url.url" fit="cover" />
                 <span v-else>
                   {{ h.text }}
                   <br />
@@ -48,15 +48,14 @@ defineProps<{
       <div class="whitespace-pre-wrap space-y-2">
         <div v-if="data.image_list?.length > 0" class="flex flex-wrap gap-2">
           <el-image
+            class="size-8"
             v-for="(f, i) in data.image_list"
             :key="i"
             :src="f.url || (f.file_id ? `./oss/file/${f.file_id}` : '')"
             fit="cover"
             :preview-src-list="data.image_list.map((img: any) => img.url || (img.file_id ? `./oss/file/${img.file_id}` : ''))"
+            :scale="0.8"
             :initial-index="i"
-            :zoom-rate="1.2"
-            :max-scale="7"
-            :min-scale="0.2"
           />
         </div>
         <div>{{ data.question || '-' }}</div>

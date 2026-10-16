@@ -2,6 +2,7 @@
 import { computed, nextTick, ref } from 'vue'
 import type { DocumentImportParagraph, DocumentSplitResult } from '@/api/types'
 import { getFileIconUrl } from '@/utils/icon'
+import { getFileUrl } from '@/utils/common'
 import { MsgWarning } from '@/utils/message'
 import EditParagraphDialog from '../upload-document/EditParagraphDialog.vue'
 
@@ -73,7 +74,14 @@ function handleDeleteParagraph(index: number) {
               @keydown.enter="handleSelectDocument(index)"
             >
               <div class="flex-align-center gap-2">
-                <img :src="getFileIconUrl(document.name)" alt="" class="size-6 shrink-0" />
+                <el-image
+                  v-if="document.source_file_id"
+                  class="size-8 shrink-0"
+                  :src="getFileUrl(document.source_file_id)"
+                  :alt="document.name"
+                  fit="cover"
+                />
+                <img v-else :src="getFileIconUrl(document.name)" alt="" class="size-6 shrink-0" />
                 <span class="truncate" :title="document.name">{{ document.name }}</span>
               </div>
             </el-card>
@@ -99,7 +107,17 @@ function handleDeleteParagraph(index: number) {
                   </el-button>
                 </el-card>
               </div>
-              <h4 v-if="paragraph.title" class="mb-3 pr-20">{{ paragraph.title }}</h4>
+
+              <!-- 图片-->
+              <el-image
+                v-if="selectedDocument.source_file_id"
+                class="w-fit [&_img]:size-auto! [&_img]:max-h-50 mb-2"
+                :src="getFileUrl(selectedDocument.source_file_id)"
+                :alt="selectedDocument.name"
+                fit="contain"
+              />
+
+              <h4 v-if="paragraph.title" class="mb-2 pr-20">{{ paragraph.title }}</h4>
               <MdPreview :model-value="paragraph.content" />
               <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
             </el-card>
