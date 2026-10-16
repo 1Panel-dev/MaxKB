@@ -21,7 +21,7 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import CancelledException, WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
@@ -32,7 +32,7 @@ from common.field.common import ObjectField
 from common.utils.common import common_convert_value
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
-from common.utils.tool_code import ToolExecutor
+from common.utils.tool_code import ToolCancelledException, ToolExecution, ToolExecutor
 from knowledge.models import FileSourceType
 from knowledge.models.knowledge_action import State
 from knowledge.services.workflow_sync_source import tool_document_source_meta
@@ -187,6 +187,16 @@ class ToolLibNode(INode):
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "tool-lib-node"
 
+    def __init__(self, node, workflow_manage, get_node_parameters):
+        super().__init__(node, workflow_manage, get_node_parameters)
+        self._execution = ToolExecution()
+
+    def cancel(self):
+        super().cancel()
+        self._execution.cancelled.set()
+        if self._execution.proc:
+            self._execution.proc.terminate()
+
     def execute(self):
         node_params = self.get_parameters()
         workflow_params = self.get_workflow_parameters()
@@ -221,53 +231,64 @@ class ToolLibNode(INode):
             all_params = init_params_default_value | params
 
         if self.node.properties.get("kind") == "data-source":
-            exist = function_executor.exec_code(
-                f"{tool_lib.code}\ndef function_exist(function_name): return callable(globals().get(function_name))",
-                {"function_name": "get_download_file_list"},
-            )
-            all_params = {**all_params, **(workflow_params.get("data_source") or {})}
-            if exist:
-                download_file_list = []
-                download_list = function_executor.exec_code(
-                    tool_lib.code, all_params, function_name="get_download_file_list"
+            try:
+                self._check_cancelled()
+                exist = function_executor.exec_code(
+                    f"{tool_lib.code}\ndef function_exist(function_name): return callable(globals().get(function_name))",
+                    {"function_name": "get_download_file_list"},
+                    execution=self._execution,
                 )
-                for item in download_list:
+                all_params = {**all_params, **(workflow_params.get("data_source") or {})}
+                if exist:
                     self._check_cancelled()
-                    file_result = function_executor.exec_code(
-                        tool_lib.code, {**all_params, "download_item": item}, function_name="download"
+                    download_file_list = []
+                    download_list = function_executor.exec_code(
+                        tool_lib.code, all_params, function_name="get_download_file_list", execution=self._execution
                     )
-                    file_bytes = file_result.get("file_bytes", [])
-                    chunks = []
-                    for chunk in file_bytes:
-                        chunks.append(base64.b64decode(chunk))
-                    file = bytes_to_uploaded_file(b"".join(chunks), file_result.get("name"))
-                    source_meta = {
-                        **(workflow_params.get("workflow_source") or {}),
-                        **tool_document_source_meta(item, file_result, self.get_node_id(), tool_lib_id, tool_lib.name),
-                    }
-                    file_url = self.upload_knowledge_file(file, source_meta)
-                    download_file_list.append(
-                        {"file_id": file_url.split("/")[-1], "name": file_result.get("name"), "meta": source_meta}
-                    )
-                result = download_file_list
-            else:
-                result = function_executor.exec_code(tool_lib.code, all_params)
-                if isinstance(result, list):
-                    result = [
-                        {
-                            **document,
-                            "meta": {
-                                **(workflow_params.get("workflow_source") or {}),
-                                **(document.get("meta") or {}),
-                                **tool_document_source_meta(
-                                    document, {}, self.get_node_id(), tool_lib_id, tool_lib.name
-                                ),
-                            },
+                    for item in download_list:
+                        self._check_cancelled()
+                        file_result = function_executor.exec_code(
+                            tool_lib.code,
+                            {**all_params, "download_item": item},
+                            function_name="download",
+                            execution=self._execution,
+                        )
+                        file_bytes = file_result.get("file_bytes", [])
+                        chunks = []
+                        for chunk in file_bytes:
+                            chunks.append(base64.b64decode(chunk))
+                        file = bytes_to_uploaded_file(b"".join(chunks), file_result.get("name"))
+                        source_meta = {
+                            **(workflow_params.get("workflow_source") or {}),
+                            **tool_document_source_meta(
+                                item, file_result, self.get_node_id(), tool_lib_id, tool_lib.name
+                            ),
                         }
-                        if isinstance(document, dict)
-                        else document
-                        for document in result
-                    ]
+                        file_url = self.upload_knowledge_file(file, source_meta)
+                        download_file_list.append(
+                            {"file_id": file_url.split("/")[-1], "name": file_result.get("name"), "meta": source_meta}
+                        )
+                    result = download_file_list
+                else:
+                    result = function_executor.exec_code(tool_lib.code, all_params, execution=self._execution)
+                    if isinstance(result, list):
+                        result = [
+                            {
+                                **document,
+                                "meta": {
+                                    **(workflow_params.get("workflow_source") or {}),
+                                    **(document.get("meta") or {}),
+                                    **tool_document_source_meta(
+                                        document, {}, self.get_node_id(), tool_lib_id, tool_lib.name
+                                    ),
+                                },
+                            }
+                            if isinstance(document, dict)
+                            else document
+                            for document in result
+                        ]
+            except ToolCancelledException:
+                raise CancelledException()
         else:
             result = self.tool_exec_record(tool_lib, all_params)
 
@@ -311,7 +332,7 @@ class ToolLibNode(INode):
                 state=State.STARTED,
             ).save()
 
-            result = function_executor.exec_code(tool_lib.code, all_params)
+            result = function_executor.exec_code(tool_lib.code, all_params, execution=self._execution)
             result_dict = _get_result_detail(result)
             QuerySet(ToolRecord).filter(id=task_record_id).update(
                 state=State.SUCCESS,
@@ -320,6 +341,9 @@ class ToolLibNode(INode):
             )
 
             return result
+        except ToolCancelledException:
+            # 工具被工作流取消,非执行失败;不写 FAILURE,交由引擎转 CANCELLED
+            raise CancelledException()
         except Exception as e:
             maxkb_logger.error(f"Tool execution error: {traceback.format_exc()}")
             QuerySet(ToolRecord).filter(id=task_record_id).update(
