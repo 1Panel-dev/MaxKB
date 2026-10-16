@@ -45,7 +45,7 @@ function handleOpen() {
 
     <template #footer="{ Action, ActionDropdown }">
       <span>
-        <span class="mr-1 font-semibold">{{ knowledge.document_count ?? 0 }}</span>
+        <span class="mr-1 font-semibold">{{ (knowledge.document_count ?? 0) + (knowledge.image_count ?? 0) }}</span>
         <span class="text-N600">文档</span>
       </span>
       <el-divider direction="vertical" />

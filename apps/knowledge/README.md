@@ -26,6 +26,14 @@ If a pending preview is imported, its asset is recognized by the embedding worke
 preview worker discards its late result. Results for deleted previews are also discarded.
 No external model call holds a preview row lock.
 
+Saving edited paragraph content synchronizes inline image references into `content_schema`
+and `ParagraphAsset` before returning the paragraph. Standalone image documents retain their
+original image asset and its recognition results. New or replaced images use the document's
+visual strategy; recognition updates their structured metadata while preserving edited paragraph text.
+Removing an inline image also removes its asset record and image embeddings in the same transaction.
+The returned `assets` and `content_schema` reflect the remaining images; underlying files are retained
+because other paragraphs may still reference them.
+
 Run both the web service and the Celery task service. Import completion means the source
 content is saved; the document's embedding status indicates when indexing has finished.
 

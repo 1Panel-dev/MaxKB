@@ -27,7 +27,7 @@ from knowledge.models import (
     TaskType,
 )
 from knowledge.services.document_strategy import stable_hash
-from knowledge.services.paragraph_assets import validate_paragraph_file_references
+from knowledge.services.paragraph_assets import sync_edited_paragraph_assets, validate_paragraph_file_references
 from knowledge.services.paragraph_files import migrate_paragraph_files
 from knowledge.serializers.common import (
     BatchSerializer,
@@ -354,6 +354,8 @@ class ParagraphSerializers(serializers.Serializer):
                 ) if len(update_problem_list) > 0 else None
 
             _paragraph.save()
+            if instance.get("content") is not None:
+                sync_edited_paragraph_assets(_paragraph)
             update_document_char_length(self.data.get("document_id"))
             return self.one(), instance, self.data.get("knowledge_id")
 

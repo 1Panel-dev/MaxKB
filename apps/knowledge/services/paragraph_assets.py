@@ -145,6 +145,17 @@ def sync_paragraph_assets(paragraphs: Iterable[Paragraph], visual_strategy_hash:
     # between changed paragraphs while retaining its ParagraphAsset id and recall history.
     for paragraph in paragraphs:
         schema = paragraph_content_schema(paragraph.content)
+        standalone_blocks = [
+            {
+                "type": "image",
+                "file_id": str(asset.file_id),
+                "caption": asset.caption,
+                "source_asset_key": asset.source_asset_key,
+            }
+            for asset in existing_assets
+            if asset.paragraph_id == paragraph.id and str(asset.source_asset_key).startswith("standalone:")
+        ]
+        schema = standalone_blocks + schema
         schemas[paragraph.id] = schema
         image_position = 0
         for block in schema:
@@ -162,14 +173,17 @@ def sync_paragraph_assets(paragraphs: Iterable[Paragraph], visual_strategy_hash:
             # Original bytes are the safest fallback when a connector cannot expose a native
             # block/image id. The one-to-one claim prevents duplicate images sharing an asset.
             hash_matches = [asset for asset in candidates if file_hash and asset.source_hash == file_hash]
-            asset = hash_matches[0] if len(hash_matches) == 1 else None
+            # Manual edits retain file ids. Prefer them over positions, which shift when
+            # an earlier image is removed, including uploads with identical bytes.
+            asset = (
+                next((item for item in candidates if item.file_id == file.id), None)
+                if origin == ContentOrigin.MANUAL
+                else None
+            )
+            if asset is None and len(hash_matches) == 1:
+                asset = hash_matches[0]
             if asset is None:
                 asset = next((item for item in candidates if item.source_asset_key == desired_key), None)
-            if asset is None and origin == ContentOrigin.MANUAL:
-                asset = next(
-                    (item for item in candidates if item.paragraph_id == paragraph.id and item.file_id == file.id),
-                    None,
-                )
 
             if asset is not None:
                 claimed_ids.add(asset.id)
@@ -212,6 +226,45 @@ def sync_paragraph_assets(paragraphs: Iterable[Paragraph], visual_strategy_hash:
         paragraph.content_schema = schema
         paragraph.save(update_fields=["content_schema", "update_time"])
     return active_assets
+
+
+@transaction.atomic
+def sync_edited_paragraph_assets(paragraph: Paragraph) -> None:
+    document = paragraph.document
+    strategy = normalize_document_strategy(document.doc_strategy)
+    visual_hash = strategy_hashes(strategy)["visual_strategy_hash"]
+    previous_assets = {
+        str(asset["id"]): asset
+        for asset in ParagraphAsset.objects.filter(paragraph_id=paragraph.id).values(
+            "id", "file_id", "source_hash", "visual_strategy_hash"
+        )
+    }
+    if document.resource_type == DocumentResourceType.IMAGE:
+        # Recognition must not replace text or inline images explicitly edited by the user.
+        paragraph.local_state = LocalState.MODIFIED
+        paragraph.save(update_fields=["local_state", "update_time"])
+    assets = sync_paragraph_assets([paragraph], visual_hash)
+    removed_ids = previous_assets.keys() - {str(asset.id) for asset in assets}
+    if removed_ids:
+        Embedding.objects.filter(
+            paragraph_id=paragraph.id, source_type=SourceType.IMAGE, source_id__in=removed_ids
+        ).delete()
+        # Only unlink assets removed by this edit; the files may still be used elsewhere.
+        ParagraphAsset.objects.filter(paragraph_id=paragraph.id, id__in=removed_ids).delete()
+    pending_assets = []
+    for asset in assets:
+        previous = previous_assets.get(str(asset.id))
+        file_changed = previous is not None and (
+            str(previous["file_id"]) != str(asset.file_id) or previous["source_hash"] != asset.source_hash
+        )
+        if file_changed:
+            asset.ocr_text = ""
+            asset.description = ""
+            asset.meta = {key: value for key, value in (asset.meta or {}).items() if key != "visual_edited_fields"}
+            asset.save(update_fields=["ocr_text", "description", "meta", "update_time"])
+        if previous is None or file_changed or previous["visual_strategy_hash"] != visual_hash:
+            pending_assets.append(asset)
+    defer_visual_assets(pending_assets, strategy)
 
 
 def process_visual_assets(
