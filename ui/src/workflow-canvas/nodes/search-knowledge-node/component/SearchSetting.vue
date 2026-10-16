@@ -47,14 +47,20 @@ function resetData() {
             <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': formData.search_mode === option.value }">
               <el-radio :value="option.value" class="mk-card-radio">
                 <h6>{{ option.label }}</h6>
-                <span class="mt-1 block text-sm text-N600">{{ option.description }}</span>
+                <span class="block text-sm text-N600">{{ option.description }}</span>
               </el-radio>
             </el-card>
           </template>
         </el-radio-group>
       </el-form-item>
       <div class="grid grid-cols-2 gap-3">
-        <el-form-item label="相似度高于">
+        <el-form-item>
+          <template #label>
+            <span class="flex-align-center gap-1">
+              相似度高于
+              <MkTooltip content="相似度越高相关性越强。" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip>
+            </span>
+          </template>
           <el-input-number
             v-model="formData.similarity"
             :min="0"
@@ -66,7 +72,7 @@ function resetData() {
             align="left"
           />
         </el-form-item>
-        <el-form-item label="引用分段数 TOP">
+        <el-form-item label="召回分段数 TOP">
           <el-input-number v-model="formData.top_n" :min="1" :max="10000" :precision="0" :value-on-clear="1" controls-position="right" align="left" />
         </el-form-item>
       </div>

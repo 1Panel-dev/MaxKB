@@ -4,9 +4,9 @@ import type { UploadFile, UploadFiles, UploadInstance, UploadRawFile, UploadUser
 import type { DragUploadFile, DragUploadHandler, DragUploadMode } from './types'
 import FileApi from '@/api/admin/file'
 import uploadImage from '@/assets/mk_icon_upload.svg'
-import { getFileIconUrl } from '@/utils/icon'
-import { formatFileSize } from '@/utils/number'
 import { MsgWarning } from '@/utils/message'
+import FileUploadCard from './FileUploadCard.vue'
+import ImageUploadCard from './ImageUploadCard.vue'
 
 defineOptions({ name: 'MultipleFileUpload' })
 
@@ -94,7 +94,6 @@ function validateFile(file: DragUploadFile) {
     file.status = 'fail'
     file.percentage = 0
     file.errMsg = `大小超限`
-    file.canRetry = false
     return false
   }
   const acceptedTypes = props.accept
@@ -127,7 +126,6 @@ function handleUpload(file: DragUploadFile) {
   file.status = 'uploading'
   file.percentage = 0
   file.errMsg = ''
-  file.canRetry = false
   const uid = file.uid
   // Promise 链同时覆盖上传接口同步抛错和异步请求失败。
   void Promise.resolve()
@@ -149,7 +147,6 @@ function handleUpload(file: DragUploadFile) {
       if (file.status !== 'uploading') return
       file.status = 'fail'
       file.errMsg = '网络失败'
-      file.canRetry = true
     })
     .finally(() => uploadRequests.delete(uid))
 }
@@ -204,17 +201,17 @@ const uploadSummary = computed(() => {
   summary.completed = summary.success + summary.error
   return summary
 })
-const retryFiles = computed(() => fileList.value.filter((file) => file.status === 'fail' && file.canRetry))
+const retryFiles = computed(() => fileList.value.filter((file) => file.status === 'fail'))
 const sortedFiles = computed(() => [...fileList.value].sort((first, second) => getFileStatusOrder(first) - getFileStatusOrder(second)))
 
 function getFileStatusOrder(file: DragUploadFile) {
-  if (file.status === 'fail') return file.canRetry ? 0 : 1
+  if (file.status === 'fail') return 0
   if (file.status === 'uploading') return 2
   return 3
 }
 
 function handleRetry(file: DragUploadFile) {
-  if (props.disabled || file.status !== 'fail' || !file.canRetry) return
+  if (props.disabled || file.status !== 'fail' || !validateFile(file)) return
   if (upload) handleUpload(file)
   else emit('retry', file)
 }
@@ -302,67 +299,18 @@ defineExpose({ clearFiles, handleRemove })
       </div>
       <div v-if="mode === 'image'" class="mt-4 flex flex-wrap gap-3">
         <template v-for="file in fileList" :key="file.uid ?? file.name">
-          <MkTooltip :content="`${file.name}：${file.errMsg}`" :disabled="file.status !== 'fail' || !file.errMsg" placement="top">
-            <div class="group relative shrink-0 overflow-hidden rounded-md">
-              <el-image
-                :src="(file.raw ? imagePreviewUrls.get(file.raw) : undefined) ?? file.url"
-                fit="cover"
-                class="size-26"
-                :class="{ 'border-danger!': file.status === 'fail' }"
-              ></el-image>
-
-              <div v-if="file.status !== 'success'" class="pointer-events-none absolute inset-0 bg-N900/30" />
-              <div v-if="file.status === 'ready' || file.status === 'uploading'" class="absolute-center w-16">
-                <el-progress :percentage="file.status === 'uploading' ? (file.percentage ?? 0) : 0" :stroke-width="4" :show-text="false" />
-              </div>
-              <!-- 重试网络失败的图片 -->
-              <div v-if="file.status === 'fail' && file.canRetry" class="absolute-center cursor-pointer" @click="handleRetry(file)">
-                <MkIcon name="icon_refresh_outlined" class="text-white!" />
-              </div>
-              <!-- 删除已选图片 -->
-              <div class="group-hover-visible mk-remove-button" @click="handleRemove(file)">
-                <MkIcon name="icon_close_bold_outlined" class="text-white!" :size="6" />
-              </div>
-            </div>
-          </MkTooltip>
+          <ImageUploadCard
+            :file="file"
+            :src="(file.raw ? imagePreviewUrls.get(file.raw) : undefined) ?? file.url"
+            :disabled="disabled"
+            @retry="handleRetry(file)"
+            @remove="handleRemove(file)"
+          />
         </template>
       </div>
       <div v-else class="grid grid-cols-1 gap-3 md:grid-cols-2">
         <template v-for="file in sortedFiles" :key="file.uid ?? file.name">
-          <el-card class="small relative" shadow="never" :class="{ 'border-danger!': file.status === 'fail' }">
-            <div class="flex-align-center gap-3">
-              <img :src="getFileIconUrl(file.name)" alt="" class="size-8 shrink-0" />
-              <div class="min-w-0 flex-1">
-                <p class="truncate" :title="file.name">{{ file.name }}</p>
-                <div class="flex-align-center gap-2 text-sm">
-                  <span class="shrink-0 text-N500">
-                    <template v-if="file.status === 'uploading'">{{ formatFileSize(((file.size ?? 0) * (file.percentage ?? 0)) / 100) }} /</template>
-                    {{ formatFileSize(file.size) }}
-                  </span>
-                  <span v-if="file.status === 'fail'" class="text-danger">
-                    {{ file.errMsg }}
-                  </span>
-                </div>
-              </div>
-              <div class="flex shrink-0 gap-1">
-                <!-- 重试当前失败文件 -->
-                <el-button v-if="file.status === 'fail' && file.canRetry" :disabled="disabled" text @click="handleRetry(file)">
-                  <MkIcon name="icon_refresh_outlined" />
-                </el-button>
-                <!-- 删除已选文件 -->
-                <el-button :disabled="disabled" text title="删除文件" @click="handleRemove(file)">
-                  <MkIcon name="icon_delete-trash_outlined" />
-                </el-button>
-              </div>
-            </div>
-            <el-progress
-              v-if="file.status === 'uploading'"
-              :percentage="file.percentage ?? 0"
-              :stroke-width="4"
-              :show-text="false"
-              class="absolute inset-x-0 bottom-0"
-            />
-          </el-card>
+          <FileUploadCard :file="file" :disabled="disabled" @retry="handleRetry(file)" @remove="handleRemove(file)" />
         </template>
       </div>
     </template>

@@ -3,6 +3,7 @@ import { computed, provide, ref, useTemplateRef } from 'vue'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { DocumentSplitResult, ImageDocumentImportPayload, ImageDocumentPreview } from '@/api/types'
+import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_TYPE_LABEL } from '@/constants/knowledge'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
 import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
@@ -151,10 +152,10 @@ defineExpose({ open })
             v-model="selectedFiles"
             multiple
             mode="image"
-            accept=".jpg,.jpeg,.png,.webp,.bmp"
+            :accept="KNOWLEDGE_IMAGE_ACCEPT"
             :limit="countLimit"
             :size-limit="sizeLimit"
-            tip-text="支持格式：JPG、JPEG、PNG、WEBP、BMP"
+            :tip-text="`支持格式：${KNOWLEDGE_IMAGE_TYPE_LABEL}`"
           />
         </section>
         <section v-if="processingMounted" v-show="activeStep === 1 && !previewVisible">

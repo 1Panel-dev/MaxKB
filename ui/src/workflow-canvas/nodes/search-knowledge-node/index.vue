@@ -75,7 +75,7 @@ const settingRows = computed(() => [
       formData.value.knowledge_setting.search_mode,
   },
   { label: '相似度高于', value: formData.value.knowledge_setting.similarity.toFixed(3) },
-  { label: '引用分段数 TOP', value: formData.value.knowledge_setting.top_n },
+  { label: '召回分段数 TOP', value: formData.value.knowledge_setting.top_n },
   { label: '最多引用字符数', value: formData.value.knowledge_setting.max_paragraph_char_number },
 ])
 

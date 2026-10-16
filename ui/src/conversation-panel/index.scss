@@ -109,3 +109,10 @@
     border-color: rgb(var(--mk-primary-rgb) / 60%);
   }
 }
+
+/* 用户提问容器：随内容收缩并靠右排列。 */
+.mk-conversation-question-content {
+  margin-left: auto;
+  max-width: 85%;
+  width: fit-content;
+}

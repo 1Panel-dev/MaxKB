@@ -73,7 +73,7 @@ function updateModel(patch: Partial<NodeModelData>) {
 }
 const settingRows = computed(() => [
   { label: 'Score 高于', value: formData.value.reranker_setting.similarity.toFixed(3) },
-  { label: '引用分段数 TOP', value: formData.value.reranker_setting.top_n },
+  { label: '召回分段数 TOP', value: formData.value.reranker_setting.top_n },
   { label: '最大引用字符数', value: formData.value.reranker_setting.max_paragraph_char_number },
 ])
 async function validate() {
