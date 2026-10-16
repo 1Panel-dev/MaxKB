@@ -3,6 +3,8 @@ import type LogicFlow from '@logicflow/core'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type {
   Dict,
+  KnowledgeHitTestPayload,
+  KnowledgeHitTestResult,
   KnowledgeCreatePayload,
   KnowledgeDetail,
   KnowledgeGeneratePayload,
@@ -96,7 +98,12 @@ const putKnowledgeKeywordIndex = (knowledgeId: string) => put<undefined, void>(`
 const postTransformWorkflow = (knowledgeId: string, payload: { work_flow: LogicFlow.GraphConfigData }) =>
   post<{ work_flow: LogicFlow.GraphConfigData }, boolean>(`${prefix}/${knowledgeId}/transform_workflow`, payload)
 
+/** 测试知识库检索并返回命中的分段。 */
+const postKnowledgeHitTest = (knowledgeId: string, payload: KnowledgeHitTestPayload) =>
+  post<KnowledgeHitTestPayload, KnowledgeHitTestResult[]>(`${prefix}/${knowledgeId}/hit_test`, payload)
+
 export default {
+  postKnowledgeHitTest,
   postTransformWorkflow,
   deleteKnowledge,
   exportKnowledge,

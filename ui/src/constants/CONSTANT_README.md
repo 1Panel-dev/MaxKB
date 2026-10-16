@@ -23,6 +23,9 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 `knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS` 统一维护增量同步、替换同步和整体同步的值、文案及说明，
 手动同步弹窗与定时同步设置直接复用，日志同步方式标签也从这些选项读取。
 
+`knowledge.ts` 的 `KNOWLEDGE_SEARCH_MODE_OPTIONS` 统一维护向量、全文和混合检索的值、文案及说明，
+召回测试页与工作流知识库检索节点直接复用，选项值引用 `KNOWLEDGE_SEARCH_MODE`。
+
 `schedule.ts` 的 `SCHEDULE_OPTION` 统一提供触发器、长期记忆与知识库定时同步的周期级联选项，
 包含周期文案、执行时间和间隔数值；使用方只读，配置回填与校验仍由各自组件维护。
 周期类型统一使用 `api/enums/schedule.ts` 的 `SCHEDULE_TYPE`，经 `@/api/enums` 导入。

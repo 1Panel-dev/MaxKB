@@ -513,11 +513,7 @@ onBeforeUnmount(() => {
               />
               <!-- 同步 -->
               <SyncDocumentAction
-                v-if="
-                  knowledgeType === KNOWLEDGE_TYPE_KEY.WEB ||
-                  knowledgeType === KNOWLEDGE_TYPE_KEY.LARK ||
-                  (knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW && row.meta?.source_type === 'web')
-                "
+                v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE"
                 label="同步"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -632,7 +628,7 @@ onBeforeUnmount(() => {
           <MkDropdownMenu>
             <!-- 批量同步 -->
             <BatchSyncDocumentAction
-              v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB || knowledgeType === KNOWLEDGE_TYPE_KEY.LARK"
+              v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE"
               label="同步"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"

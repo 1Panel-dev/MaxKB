@@ -3,7 +3,8 @@ import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
-import { defaultSearchSetting, searchModeOptions } from '../constant'
+import { defaultSearchSetting } from '../constant'
+import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 import type { KnowledgeSearchSetting } from '../types'
 
 defineOptions({ name: 'SearchKnowledgeSetting' })
@@ -42,7 +43,7 @@ function resetData() {
     <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="检索模式">
         <el-radio-group v-model="formData.search_mode" class="space-y-2" @change="changeSearchMode">
-          <template v-for="option in searchModeOptions" :key="option.value">
+          <template v-for="option in KNOWLEDGE_SEARCH_MODE_OPTIONS" :key="option.value">
             <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': formData.search_mode === option.value }">
               <el-radio :value="option.value" class="mk-card-radio">
                 <h6>{{ option.label }}</h6>

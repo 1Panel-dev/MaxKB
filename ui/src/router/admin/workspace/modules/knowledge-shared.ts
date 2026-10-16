@@ -55,13 +55,14 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
       {
         path: 'retrieval',
         name: 'workspace-shared-knowledge-retrieval',
-        redirect: { name: 'workspace-shared-knowledge-recall-test' },
+        redirect: { name: 'workspace-shared-knowledge-hit-test' },
         meta: { title: '检索优化', icon: 'icon_trace_outlined', order: 30 },
         children: [
           {
-            path: 'recall',
-            name: 'workspace-shared-knowledge-recall-test',
-            component: () => import('@/views/knowledge-detail/recall-test/index.vue'),
+            path: 'hit-test',
+            name: 'workspace-shared-knowledge-hit-test',
+            component: () => import('@/views/knowledge-detail/hit-test/index.vue'),
+            props: (route) => ({ key: `${route.meta.resourceScope}:${route.params.knowledgeId}` }),
             meta: { title: '召回测试', order: 10 },
           },
           {

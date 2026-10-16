@@ -44,7 +44,8 @@
 | `knowledge-detail/`                                                                   | 四范围知识库详情、菜单与上下文               |
 | `knowledge-detail/library/document/`、`tags/`                                         | 文档及标签维护                               |
 | `knowledge-detail/library/image/`                                                     | 图片列表，复用文档操作                       |
-| `knowledge-detail/recall-test/`、`question/`                                          | 检索优化占位页                               |
+| `knowledge-detail/hit-test/`                                                          | 召回测试参数、文本／图片查询及结果展示       |
+| `knowledge-detail/question/`                                                          | 问题管理占位页                               |
 | `knowledge-detail/termbase/`                                                          | 知识库自定义分词维护                         |
 | `knowledge-detail/chat-user/`、`external-retrieval/`                                  | 对话授权与外部检索配置                       |
 | `knowledge-detail/setting/base/`、`document-strategy/`、`scheduled-sync/`             | 基础设置、文档策略、定时同步与日志           |
@@ -131,6 +132,18 @@
 定时同步提供设置与日志；查询成功后才允许保存，成功以规范化响应更新草稿和详情。
 复用周期及同步方式常量，支持日、周、月、间隔和 Cron，间隔至少 5 分钟；完整 Cron 由后台校验。
 日志页按需挂载 `SyncLogTable`，传完整 API，仅展示定时任务，不轮询；跳过执行展示原因。
+
+### 召回测试
+
+`hit-test/` 按截图提供参数／输入与结果两栏，复用详情标题栏。通过详情上下文选择 Workspace、
+System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；Workspace 共享缺少对应接口时
+由上下文返回文档页，不回退其他范围。
+默认向量检索、相似度 0.600、TOP K 6；切换全文检索重置相似度为 0，其余模式为 0.6。
+文本和图片至少提供一项，空白文本不可提交；图片存在或上传中时禁选全文检索，全文模式不提供图片入口。
+图片通过 Admin File API 上传为 120 分钟临时文件，最多 10 张、每张 20MB，仅提交上传成功的文件引用；
+上传中或存在失败图片时禁测试，移除失败图片后可重试。移除与卸载释放本地预览并取消未完成上传。
+测试期间冻结参数与输入；结果展示提交时的查询、分段、得分、文档名称及命中图片，Markdown 只读。
+初始、无命中与失败分别展示空态，失败保留输入供重试。切换知识库或资源范围通过路由 key 重建召回测试页，隔离查询与结果状态。
 
 ### 文档列表与导入
 
