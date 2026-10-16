@@ -219,6 +219,12 @@ def get_authorized_tool_ids(user_id: str, workspace_id: str, tool_ids: List[str]
         )
         if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
     }
+    get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
+    if get_authorized_tool is not None:
+        shared_tool_query_set = QuerySet(Tool).filter(id__in=tool_ids, scope=ToolScope.SHARED)
+        granted_tool_ids.update(
+            str(tool.id) for tool in get_authorized_tool(shared_tool_query_set, workspace_id)
+        )
     return [tool_id for tool_id in tool_ids if tool_id in granted_tool_ids]
 
 
