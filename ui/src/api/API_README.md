@@ -459,6 +459,7 @@ System／飞书扩展及文件 ID 导入、策略协议需对应部署支持，�
 `resource_type: 'image'`，不单独封装图片列表接口。
 批量删除提交 `{ id_list, resource_type }`，图片传 `image`，普通文档默认传 `document`；
 服务端按知识库和资源类型校验整批 ID。
+批量向量化提交 `{ id_list, state_list, resource_type }`；图片同样传 `image`，普通文档默认传 `document`。
 Workspace 与 System 资源管理的 `knowledge/image.ts` 提供图片专属接口，通过上下文 `resourceApi.image` 读取。
 `postUploadImagePreview` 通过 POST `image/preview` 按策略生成图片预览，
 JSON 提交 `{ file_id_list, doc_strategy }`，复用上传成功的文件 ID，不重复上传，返回 ImageDocumentPreview[]；

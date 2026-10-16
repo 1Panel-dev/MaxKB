@@ -19,6 +19,7 @@ from knowledge.models import (
 )
 from knowledge.models.knowledge import on_delete_paragraph
 from knowledge.serializers.document import (
+    DocumentBatchRefreshSerializer,
     DocumentSerializers,
 )
 from knowledge.serializers.image_document import ImagePreviewUpdateRequest
@@ -238,6 +239,53 @@ class KnowledgeUploadSizeLimitTests(SimpleTestCase):
 
 
 class ImageDocumentTests(SimpleTestCase):
+    @patch("knowledge.serializers.document.DocumentSerializers.Operate")
+    @patch("knowledge.serializers.document.QuerySet")
+    def test_batch_refresh_accepts_images_and_preserves_the_document_default(self, query_set, operate):
+        knowledge_id = "00000000-0000-0000-0000-000000000037"
+        document_id = "00000000-0000-0000-0000-000000000038"
+        query_set.return_value.filter.return_value.exists.return_value = True
+        query_set.return_value.filter.return_value.values_list.return_value = [document_id]
+        for resource_type in (None, DocumentResourceType.DOCUMENT, DocumentResourceType.IMAGE):
+            with self.subTest(resource_type=resource_type):
+                operate.reset_mock()
+                payload = {"id_list": [document_id], "state_list": ["0", "1"]}
+                if resource_type is not None:
+                    payload["resource_type"] = resource_type
+                request = DocumentBatchRefreshSerializer(data=payload)
+                self.assertTrue(request.is_valid(), request.errors)
+                serializer = DocumentSerializers.Batch(data={"workspace_id": "default", "knowledge_id": knowledge_id})
+
+                serializer.batch_refresh(request.validated_data)
+
+                query_set.return_value.filter.assert_any_call(
+                    id__in=[document_id],
+                    knowledge_id=knowledge_id,
+                    resource_type=resource_type or DocumentResourceType.DOCUMENT,
+                )
+                operate.assert_called_once_with(data={"knowledge_id": knowledge_id, "document_id": document_id})
+                operate.return_value.refresh.assert_called_once_with(payload["state_list"])
+
+    @patch("knowledge.serializers.document.DocumentSerializers.Operate")
+    @patch("knowledge.serializers.document.QuerySet")
+    def test_batch_refresh_rejects_resource_mismatch_before_enqueuing(self, query_set, operate):
+        query_set.return_value.filter.return_value.exists.return_value = True
+        query_set.return_value.filter.return_value.values_list.return_value = []
+        serializer = DocumentSerializers.Batch(
+            data={"workspace_id": "default", "knowledge_id": "00000000-0000-0000-0000-000000000037"}
+        )
+
+        with self.assertRaises(AppApiException):
+            serializer.batch_refresh(
+                {
+                    "id_list": ["00000000-0000-0000-0000-000000000038"],
+                    "state_list": ["0", "1"],
+                    "resource_type": DocumentResourceType.IMAGE,
+                }
+            )
+
+        operate.assert_not_called()
+
     def test_document_list_defaults_to_document_resources(self):
         serializer = DocumentSerializers.Query(
             data={

@@ -91,9 +91,13 @@ const putBatchDeleteDocuments = (knowledgeId: string, documentIds: string[], res
 const putDocumentRefresh = (knowledgeId: string, documentId: string, stateList: DocumentTaskState[]) =>
   put(`${getPrefix(knowledgeId)}/${documentId}/refresh`, { state_list: stateList })
 
-/** 批量文档向量化。 */
-const putBatchRefreshDocuments = (knowledgeId: string, documentIds: string[], stateList: DocumentTaskState[]) =>
-  put(`${getPrefix(knowledgeId)}/batch_refresh`, { id_list: documentIds, state_list: stateList })
+/** 批量向量化指定类型的文档或图片。 */
+const putBatchRefreshDocuments = (
+  knowledgeId: string,
+  documentIds: string[],
+  stateList: DocumentTaskState[],
+  resourceType: DocumentResourceType = DOCUMENT_RESOURCE_TYPE.DOCUMENT,
+) => put(`${getPrefix(knowledgeId)}/batch_refresh`, { id_list: documentIds, state_list: stateList, resource_type: resourceType })
 
 /** 单个文档分词索引。 */
 const putDocumentTokenize = (knowledgeId: string, documentId: string, stateList: DocumentTaskState[]) =>
