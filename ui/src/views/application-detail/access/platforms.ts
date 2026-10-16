@@ -15,12 +15,19 @@ interface AccessField {
   required?: boolean
 }
 
+interface AccessModeOption {
+  value: string
+  label: string
+  tip: string
+}
+
 export interface AccessPlatformDefinition {
   key: ApplicationAccessPlatform
   name: string
   logo: string
   description: string
   fields: AccessField[]
+  modeField?: { key: string; default: string; options: AccessModeOption[]; fields?: Record<string, AccessField[]> }
   consoleUrl?: string
   consoleName?: string
   callbackTip?: string
@@ -36,9 +43,27 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       { key: 'token', label: 'Token' },
       { key: 'encoding_aes_key', label: 'EncodingAESKey' },
     ],
+    modeField: {
+      key: 'mode',
+      default: 'ws',
+      options: [
+        { value: 'ws', label: '使用长连接', tip: '无需域名或 IP 即可接收消息并返回结果' },
+        { value: 'callback', label: '使用 URL 回调', tip: '通过配置回调地址接收消息并返回结果' },
+      ],
+      fields: {
+        ws: [
+          { key: 'bot_id', label: 'Bot ID' },
+          { key: 'secret', label: 'Secret', secret: true },
+        ],
+        callback: [
+          { key: 'token', label: 'Token' },
+          { key: 'encoding_aes_key', label: 'EncodingAESKey' },
+        ],
+      },
+    },
     consoleUrl: 'https://work.weixin.qq.com/wework_admin/frame#/manageTools',
     consoleName: '企业微信后台',
-    callbackTip: '-管理工具-智能机器人-创建机器人-API模式创建的 "URL" 中',
+    callbackTip: '-智能专区-智能机器人-创建机器人-API模式创建的 "URL" 中',
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.WECOM,

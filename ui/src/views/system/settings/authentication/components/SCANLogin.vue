@@ -21,8 +21,6 @@ const platformDefinitions: { configKeys: string[]; key: QrCodeProvider; logo: st
   { key: LOGIN_METHOD.LARK, logo: larkLogo, configKeys: ['app_key', 'app_secret'] },
 ]
 
-const apiBaseUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api`
-
 const loading = ref(false)
 const qrLoginPlatforms = ref<QrLoginPlatformView[]>([])
 
@@ -33,10 +31,7 @@ function createQrLoginPlatforms(settings: QrLoginPlatform[]): QrLoginPlatformVie
     return {
       key,
       logo,
-      config: Object.fromEntries([
-        ...configKeys.map((configKey) => [configKey, setting?.config[configKey] ?? '']),
-        ['callback_url', setting?.config.callback_url || `${apiBaseUrl}/${key}`],
-      ]),
+      config: Object.fromEntries(configKeys.map((configKey) => [configKey, setting?.config[configKey] ?? ''])),
       isActive: setting?.is_active ?? false,
       isValid: setting?.is_valid ?? false,
     }
