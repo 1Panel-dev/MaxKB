@@ -13,6 +13,10 @@ import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
 import SystemResourceDocumentApi from '@/api/admin/system/resource-management/knowledge/document'
 import SystemSharedDocumentApi from '@/api/admin/system/shared-resources/knowledge/document'
+import ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
+import SharedParagraphApi from '@/api/admin/workspace/shared/knowledge/paragraph'
+import SystemResourceParagraphApi from '@/api/admin/system/resource-management/knowledge/paragraph'
+import SystemSharedParagraphApi from '@/api/admin/system/shared-resources/knowledge/paragraph'
 import TagsApi from '@/api/admin/workspace/knowledge/tags'
 import SharedTagsApi from '@/api/admin/workspace/shared/knowledge/tags'
 import SystemResourceTagsApi from '@/api/admin/system/resource-management/knowledge/tags'
@@ -44,6 +48,9 @@ type OptionalApiMethods<Api> = Pick<Api, keyof Api> & {
 }
 
 interface KnowledgeResourceApi {
+  readonly paragraph: OptionalApiMethods<
+    typeof ParagraphApi | typeof SharedParagraphApi | typeof SystemResourceParagraphApi | typeof SystemSharedParagraphApi
+  >
   readonly chatUser: OptionalApiMethods<
     typeof ChatUserApi | typeof SharedChatUserApi | typeof SystemResourceChatUserApi | typeof SystemSharedChatUserApi
   >
@@ -82,6 +89,7 @@ const resourceConfigs = {
       scheduledSync: ScheduledSyncApi,
       externalRetrieval: ExternalRetrievalApi,
       document: DocumentApi,
+      paragraph: ParagraphApi,
       image: ImageApi,
       tags: TagsApi,
       termbase: TermbaseApi,
@@ -96,6 +104,7 @@ const resourceConfigs = {
       scheduledSync: SharedScheduledSyncApi,
       externalRetrieval: SharedExternalRetrievalApi,
       document: SharedDocumentApi,
+      paragraph: SharedParagraphApi,
       tags: SharedTagsApi,
       termbase: SharedTermbaseApi,
     },
@@ -108,6 +117,7 @@ const resourceConfigs = {
       scheduledSync: SystemResourceScheduledSyncApi,
       externalRetrieval: SystemResourceExternalRetrievalApi,
       document: SystemResourceDocumentApi,
+      paragraph: SystemResourceParagraphApi,
       image: SystemResourceImageApi,
       tags: SystemResourceTagsApi,
       termbase: SystemResourceTermbaseApi,
@@ -121,6 +131,7 @@ const resourceConfigs = {
       scheduledSync: SystemSharedScheduledSyncApi,
       externalRetrieval: SystemSharedExternalRetrievalApi,
       document: SystemSharedDocumentApi,
+      paragraph: SystemSharedParagraphApi,
       tags: SystemSharedTagsApi,
       termbase: SystemSharedTermbaseApi,
     },
@@ -162,6 +173,9 @@ function createKnowledgeDetailContext(state: KnowledgeDetailState): KnowledgeDet
     },
     get document() {
       return resourceConfig.value.resourceApi.document
+    },
+    get paragraph() {
+      return resourceConfig.value.resourceApi.paragraph
     },
     get tags() {
       return resourceConfig.value.resourceApi.tags
