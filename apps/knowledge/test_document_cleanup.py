@@ -10,11 +10,44 @@ from django.test import SimpleTestCase, TestCase
 
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_sha256_hash
-from knowledge.models import Document, File, FileSourceType, Knowledge, Paragraph, ParagraphAsset
+from knowledge.models import Document, DocumentResourceType, File, FileSourceType, Knowledge, Paragraph, ParagraphAsset
 from knowledge.serializers.document import DocumentSerializers
 
 
 class BatchDocumentCleanupTests(SimpleTestCase):
+    @patch("knowledge.serializers.document.delete_document_data")
+    @patch("knowledge.serializers.document.BatchSerializer")
+    @patch("knowledge.serializers.document.QuerySet")
+    def test_batch_deletion_validates_the_requested_document_or_image_type(self, query_set, batch_serializer, cleanup):
+        document_ids = [str(uuid4()), str(uuid4())]
+        knowledge_id = str(uuid4())
+        query_set.return_value.filter.return_value.values_list.return_value = document_ids
+        for resource_type in DocumentResourceType.values:
+            with self.subTest(resource_type=resource_type):
+                serializer = DocumentSerializers.Batch(data={"workspace_id": "default", "knowledge_id": knowledge_id})
+                with patch.object(serializer, "is_valid"):
+                    result = DocumentSerializers.Batch.batch_delete.__wrapped__(
+                        serializer, {"id_list": document_ids, "resource_type": resource_type}
+                    )
+                self.assertTrue(result)
+                query_set.return_value.filter.assert_called_with(
+                    id__in=document_ids, knowledge_id=knowledge_id, resource_type=resource_type
+                )
+                cleanup.assert_called_with(document_ids)
+
+    @patch("knowledge.serializers.document.delete_document_data")
+    @patch("knowledge.serializers.document.BatchSerializer")
+    @patch("knowledge.serializers.document.QuerySet")
+    def test_resource_type_mismatch_rejects_the_entire_batch(self, query_set, batch_serializer, cleanup):
+        document_ids = [str(uuid4()), str(uuid4())]
+        query_set.return_value.filter.return_value.values_list.return_value = document_ids[:1]
+        serializer = DocumentSerializers.Batch(data={"workspace_id": "default", "knowledge_id": str(uuid4())})
+        with patch.object(serializer, "is_valid"), self.assertRaises(AppApiException):
+            DocumentSerializers.Batch.batch_delete.__wrapped__(
+                serializer, {"id_list": document_ids, "resource_type": DocumentResourceType.IMAGE}
+            )
+        cleanup.assert_not_called()
+
     @patch("knowledge.serializers.document.delete_document_data")
     @patch("knowledge.serializers.document.BatchSerializer")
     def test_deletes_only_validated_documents_using_the_complete_cleanup(self, batch_serializer, cleanup):

@@ -157,6 +157,7 @@
 - 文档 Action 按 embedding、generate-questions、setting、setting-tags、tokenize、export、sync、migrate 等职责分组，
   通过 `action-dropdown/index.ts` 导出。打开前快照目标，单项和批量使用真实对应接口，共用页面操作 loading。
 - 删除和同步先确认；成功清空选择刷新，导出／下载保留选择。启停成功后才回显，不在请求前改变状态。
+- 图片列表批量删除向 `DeleteDocumentAction` 传入图片资源类型，确认时固定所选 ID 与类型；文档列表使用默认文档类型。
 - 生成问题复用 `GenerateQuestionsDialog`，向量化与生成可选分段状态范围，分词处理全部状态。
 - 单项 Web 设置保留来源 meta，批量隐藏地址／选择器并使用顶层 `allow_download`。
 - Web、飞书提供同步；工作流仅 Web 来源文档支持单项同步，本地上传文档不提供；手动同步不写定时日志。

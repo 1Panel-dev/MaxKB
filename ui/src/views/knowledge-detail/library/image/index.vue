@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import type { CascaderOption, TableColumnCtx } from 'element-plus'
 import MkEditName from '@/components/mk-edit-name/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
-import { DOCUMENT_TASK_TYPE } from '@/api/enums'
+import { DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
 import { DOCUMENT_STATUS_FILTER_OPTIONS } from '../document/status'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
@@ -168,7 +168,7 @@ function loadDocuments(showLoading = true): Promise<void> {
   if (showLoading) loading.value = true
   return resourceApi.document
     .getDocumentPage(knowledgeId.value, paginationConfig.value, {
-      resource_type: 'image',
+      resource_type: DOCUMENT_RESOURCE_TYPE.IMAGE,
       ...documentQuery.value,
       status: documentStatusFilter.value?.status,
       task_type: documentStatusFilter.value?.task_type,
@@ -568,6 +568,7 @@ onBeforeUnmount(() => {
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
+              :resource-type="DOCUMENT_RESOURCE_TYPE.IMAGE"
               batch
               @refresh="refreshAfterOperation"
             />

@@ -1,5 +1,6 @@
 import { del, downloadRequest, get, getExportFile, post, postExportExcel, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
+import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import type {
   Dict,
   DocumentGeneratePayload,
@@ -9,6 +10,7 @@ import type {
   DocumentStrategy,
   DocumentItem,
   DocumentQuickCreatePayload,
+  DocumentResourceType,
   DocumentSettingPayload,
   DocumentTaskState,
   DocumentTaskType,
@@ -82,8 +84,8 @@ const putDocument = (knowledgeId: string, documentId: string, data: DocumentUpda
 const deleteDocument = (knowledgeId: string, documentId: string) => del(`${getPrefix(knowledgeId)}/${documentId}`)
 
 /** 批量删除文档。 */
-const putBatchDeleteDocuments = (knowledgeId: string, documentIds: string[]) =>
-  put(`${getPrefix(knowledgeId)}/batch_delete`, { id_list: documentIds })
+const putBatchDeleteDocuments = (knowledgeId: string, documentIds: string[], resourceType: DocumentResourceType = DOCUMENT_RESOURCE_TYPE.DOCUMENT) =>
+  put(`${getPrefix(knowledgeId)}/batch_delete`, { id_list: documentIds, resource_type: resourceType })
 
 /** 单个文档向量化。 */
 const putDocumentRefresh = (knowledgeId: string, documentId: string, stateList: DocumentTaskState[]) =>
