@@ -2,7 +2,6 @@
 import { nextTick, onMounted, ref } from 'vue'
 import type { SelectInstance } from 'element-plus'
 import { useDocumentDetailContext } from '@/views/document-detail/context'
-import ProblemApi from '@/api/admin/workspace/knowledge/problem'
 import type { ParagraphProblem } from '@/api/types'
 import type { ParagraphQuestionDraft } from '../types'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
@@ -25,7 +24,8 @@ const optionLoading = ref(false)
 
 function loadProblemOptions(query = '') {
   optionLoading.value = true
-  return ProblemApi.getProblemsPage(props.knowledgeId, { currentPage: 1, pageSize: 100 }, query.trim() ? { content: query.trim() } : undefined)
+  return resourceApi.problem
+    .getProblemsPage(props.knowledgeId, { currentPage: 1, pageSize: 100 }, query.trim() ? { content: query.trim() } : undefined)
     .then(({ records }) => {
       problemOptions.value = records
     })

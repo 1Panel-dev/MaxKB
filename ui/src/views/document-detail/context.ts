@@ -9,14 +9,18 @@ import ParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
 import SharedParagraphApi from '@/api/admin/workspace/shared/knowledge/paragraph'
 import SystemResourceParagraphApi from '@/api/admin/system/resource-management/knowledge/paragraph'
 import SystemSharedParagraphApi from '@/api/admin/system/shared-resources/knowledge/paragraph'
+import ProblemApi from '@/api/admin/workspace/knowledge/problem'
+import SharedProblemApi from '@/api/admin/workspace/shared/knowledge/problem'
+import SystemResourceProblemApi from '@/api/admin/system/resource-management/knowledge/problem'
+import SystemSharedProblemApi from '@/api/admin/system/shared-resources/knowledge/problem'
 import type { ResourceScope } from '@/router/admin/types'
 
 const resourceConfigs = {
-  workspace: { document: DocumentApi, paragraph: ParagraphApi },
-  'workspace-shared': { document: SharedDocumentApi, paragraph: SharedParagraphApi },
-  'system-resource': { document: SystemResourceDocumentApi, paragraph: SystemResourceParagraphApi },
-  'system-shared': { document: SystemSharedDocumentApi, paragraph: SystemSharedParagraphApi },
-} satisfies Record<ResourceScope, { document: typeof SharedDocumentApi; paragraph: typeof SharedParagraphApi }>
+  workspace: { document: DocumentApi, paragraph: ParagraphApi, problem: ProblemApi },
+  'workspace-shared': { document: SharedDocumentApi, paragraph: SharedParagraphApi, problem: SharedProblemApi },
+  'system-resource': { document: SystemResourceDocumentApi, paragraph: SystemResourceParagraphApi, problem: SystemResourceProblemApi },
+  'system-shared': { document: SystemSharedDocumentApi, paragraph: SystemSharedParagraphApi, problem: SystemSharedProblemApi },
+} satisfies Record<ResourceScope, { document: typeof SharedDocumentApi; paragraph: typeof SharedParagraphApi; problem: typeof SharedProblemApi }>
 
 /** 共有查询方法保持必填，仅部分范围提供的方法标记为可选。 */
 type ApiKeys<Api> = Api extends unknown ? keyof Api : never
@@ -40,6 +44,9 @@ function createDocumentDetailContext() {
     },
     get paragraph(): DocumentParagraphApi {
       return resourceConfig.value.paragraph
+    },
+    get problem(): OptionalApiMethods<(typeof resourceConfigs)[ResourceScope]['problem']> {
+      return resourceConfig.value.problem
     },
   })
 

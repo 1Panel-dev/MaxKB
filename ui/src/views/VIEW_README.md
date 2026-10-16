@@ -106,7 +106,7 @@
 
 `knowledge-detail/context.ts` 仅通过 `provideKnowledgeDetailContext` 和
 `useKnowledgeDetailContext` 公开详情、更新能力、ID、来源导航及完整 API。
-`resourceApi.knowledge / scheduledSync / document / paragraph / image / tags / termbase / chatUser / externalRetrieval` 按当前范围响应式读取，无需 `.value`，
+`resourceApi.knowledge / scheduledSync / document / paragraph / image / tags / termbase / problem / chatUser / externalRetrieval` 按当前范围响应式读取，无需 `.value`，
 不要在 setup 时解构具体 API。`workflow` 当前仅普通 Workspace 提供，其他范围不回退。
 共有查询方法必填，部分范围缺失的方法可选调用；未发请求时不提示成功、不关闭、不刷新或修改快照，loading 正常清理。
 不增加查询／维护双入口、接口别名或专属 Context hook，也不以方法存在性新增操作显隐规则。
@@ -207,9 +207,21 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 文档 `DocumentTags`、标签 Drawer 和批量 Action 各自维护添加弹窗；添加候选仅取前 100 组并本地搜索，
 不禁选已关联值，后台去重。创建候选成功重载但不自动选择。删除仅解除文档关联，不删除知识库标签。
 
+### 问题管理
+
+`question/` 使用 `resourceApi.problem`，默认每页 20 条，不提供表头排序，搜索将 content 传给后端。
+`ButtonCreateProblem` 内聚创建按钮和多行输入弹窗；快捷创建使用 `MkQuickCreate`，每个问题最多 256 字符。
+单项与批量删除直接提交，删除后末页为空时回退到最后有效页；名称编辑复用 `MkEditName`。
+点击数据行打开 `ProblemDetailDrawer`，勾选、名称编辑和操作按钮不触发行详情。
+详情支持问题名称快捷编辑、关联分段卡片和跨页上一个／下一个；卡片复用 `.mk-paragraph-card` 样式，
+点击打开已有 `ParagraphDialog`，悬浮取消关联按钮仅解除当前关联，成功刷新卡片与列表计数。
+分段详情关闭后重查关联，保持编辑与解除关联后的数据一致。
+单项、批量、详情的“关联分段”入口暂时禁用，待交互确认后接入，不创建关联弹窗或发送关联请求。
+Workspace 共享只展示和搜索问题列表，不显示维护入口，也不打开缺少查询接口的问题详情。
+
 ## 文档分段
 
-`document-detail/context.ts` 装配四范围完整 Document／Paragraph API 和返回导航，
+`document-detail/context.ts` 装配四范围完整 Document／Paragraph／Problem API 和返回导航，
 无注入时按当前路由创建上下文，供导入预览复用。页面提供上下文；Action 接收选定 Paragraph API，
 `paragraph-dialog/` 直接读取上下文，不透传 API。共有查询必填，维护方法按真实差异可选。
 Workspace 共享只读，隐藏创建、编辑、排序、关联修改及批量操作；缺少详情接口保留默认标题，不回退。

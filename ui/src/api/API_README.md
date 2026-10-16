@@ -510,8 +510,23 @@ putDocument 统一更新名称、启停及设置，不按字段重复封装；�
 | putBatchDeleteParagraphs                                     | PUT batch_delete，`{ id_list }`，服务端清理关联与索引                                     |
 
 标题最多 256，后端内容上限 102400；界面限制见 View 文档。
-问题候选在 knowledge/problem.ts 的 getProblemsPage，支持 content 搜索，类型 ParagraphProblem。
+问题候选在 knowledge/problem.ts 的 getProblemsPage，支持 content 搜索，分页记录类型为 ProblemItem。
 Workspace 共享 Paragraph API 仅 getParagraphPage、getParagraphDetail，不补问题查询或维护。
+
+### 知识库问题
+
+四范围 `knowledge/problem.ts` 使用各自知识库前缀追加 `/<knowledgeId>/problem`，
+由知识库及文档详情上下文的 `resourceApi.problem` 选择，不固定 Workspace。
+`getProblemsPage(knowledgeId, page, query)` 返回 `ResponsePage<ProblemItem>`，query 仅传 content。
+`ProblemItem` 包含 id、content、paragraph_count、hit_num、last_hit_time、create_time、update_time；
+分段已有问题仍使用轻量 `ParagraphProblem`，不要求包含列表统计字段。
+
+Workspace、System 资源管理、System 共享提供完整问题 API：
+`postProblems` 直接提交内容字符串数组，`putProblem` 提交 `{ content }`，单项 DELETE 使用问题 ID，
+`putBatchDeleteProblems` 直接提交问题 ID 数组；单个问题内容最多 256 字符。
+`getProblemParagraphs` 返回 `ProblemParagraph[]`，包含分段字段及 knowledge_id、document_name。
+取消关联复用 Paragraph API 的 `putUnassociateParagraphProblem`，不调用问题或分段删除接口。
+Workspace 共享仅有 `getProblemsPage`，不补造详情或写接口，不回退其他范围。
 
 ### 标签与文档关联
 
