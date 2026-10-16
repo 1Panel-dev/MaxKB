@@ -3,13 +3,13 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from knowledge.serializers.document import DocumentSerializers
+from knowledge.serializers.document import DocumentInstanceFileIdsSerializer, DocumentSerializers
 from knowledge.serializers.document_strategy import DocumentStrategySerializer
 from knowledge.services.image_documents import ImageDocumentService
 
 
-class ImagePreviewUploadRequest(serializers.Serializer):
-    file = serializers.ListField(child=serializers.FileField(), allow_empty=False, max_length=50)
+class ImagePreviewUploadRequest(DocumentInstanceFileIdsSerializer):
+    file_id_list = serializers.ListField(child=serializers.UUIDField(), allow_empty=False, max_length=50)
     doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
 
@@ -48,8 +48,8 @@ class ImageDocumentSerializers:
         def upload(self, instance):
             request_serializer = ImagePreviewUploadRequest(data=instance)
             request_serializer.is_valid(raise_exception=True)
-            return self._service().create_previews(
-                request_serializer.validated_data["file"],
+            return self._service().create_previews_by_file_ids(
+                request_serializer.validated_data["file_id_list"],
                 request_serializer.validated_data.get("doc_strategy"),
             )
 

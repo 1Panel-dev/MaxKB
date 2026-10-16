@@ -7,8 +7,9 @@ from typing import Dict, Iterable, List
 import uuid_utils.compat as uuid
 from common.chunk import text_to_chunk
 from common.exception.app_exception import AppApiException
+from django.core.files.base import ContentFile
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from PIL import Image, UnidentifiedImageError
@@ -139,6 +140,7 @@ class ImageDocumentService:
             "id": str(file.id),
             "preview_id": str(file.id),
             "file_id": str(file.id),
+            "source_file_id": str(file.id),
             "name": file.file_name,
             "file_name": file.file_name,
             "file_size": original_size,
@@ -146,7 +148,7 @@ class ImageDocumentService:
             "caption": preview.get("caption", ""),
             "ocr_text": preview.get("ocr_text", ""),
             "description": preview.get("description", ""),
-            "content": content,
+            "content": [{"title": Path(file.file_name).stem, "content": content}],
             "char_length": len(content),
             "process_status": preview.get("process_status", AssetProcessStatus.PENDING),
             "process_error": preview.get("process_error", ""),
@@ -168,7 +170,7 @@ class ImageDocumentService:
             raise AppApiException(500, _("Image preview has already been imported"))
         return file
 
-    def _complete_preview(self, preview_id, processed: Dict) -> None:
+    def _complete_preview(self, preview_id, processed: Dict, *, expected_strategy: Dict | None = None) -> None:
         # Lock only the short write-back, never the external vision call. Import/edit/delete
         # may happen while recognition is running, so reload the current preview first.
         with transaction.atomic():
@@ -182,6 +184,11 @@ class ImageDocumentService:
                 return
             preview = _preview_meta(file)
             if not preview or preview.get("imported") or preview.get("process_status") != AssetProcessStatus.PENDING:
+                return
+            if (
+                expected_strategy is not None
+                and normalize_document_strategy(preview.get("doc_strategy")) != expected_strategy
+            ):
                 return
             updated = {**preview, **processed}
             for field in preview.get("edited_fields", []):
@@ -202,7 +209,9 @@ class ImageDocumentService:
         if not preview or preview.get("imported") or preview.get("process_status") != AssetProcessStatus.PENDING:
             return
         strategy = normalize_document_strategy(preview.get("doc_strategy"))
-        self._complete_preview(preview_id, self._run_visual_processor(file, strategy, self.workspace_id))
+        self._complete_preview(
+            preview_id, self._run_visual_processor(file, strategy, self.workspace_id), expected_strategy=strategy
+        )
 
     def _enqueue_preview(self, preview_id) -> None:
         from knowledge.tasks import process_image_preview
@@ -243,29 +252,73 @@ class ImageDocumentService:
                 meta={"knowledge_id": self.knowledge_id, "upload_size": upload.size},
             )
             file.save(content)
-            if normalized_strategy["visual"]["enabled"]:
-                processed = {
-                    "caption": "",
-                    "ocr_text": "",
-                    "description": "",
-                    "process_status": AssetProcessStatus.PENDING,
-                    "process_error": "",
-                    "meta": {},
-                }
-            else:
-                processed = self._run_visual_processor(file, normalized_strategy, self.workspace_id)
-            preview = {
-                **processed,
-                "doc_strategy": normalized_strategy,
-                "imported": False,
-                "document_id": None,
+            previews.append(self._initialize_preview(file, normalized_strategy))
+        return previews
+
+    def _initialize_preview(self, file: File, strategy: Dict) -> Dict:
+        if strategy["visual"]["enabled"]:
+            processed = {
+                "caption": "",
+                "ocr_text": "",
+                "description": "",
+                "process_status": AssetProcessStatus.PENDING,
+                "process_error": "",
+                "meta": {},
             }
-            meta = {**(file.meta or {}), "image_preview": preview}
-            QuerySet(File).filter(id=file.id).update(meta=meta)
+        else:
+            processed = self._run_visual_processor(file, strategy, self.workspace_id)
+        preview = {
+            **processed,
+            "doc_strategy": strategy,
+            "imported": False,
+            "document_id": None,
+        }
+        meta = {**(file.meta or {}), "image_preview": preview}
+        QuerySet(File).filter(id=file.id).update(meta=meta)
+        file.meta = meta
+        if strategy["visual"]["enabled"]:
+            transaction.on_commit(partial(self._enqueue_preview, str(file.id)), robust=True)
+        return self.serialize_preview(file)
+
+    @transaction.atomic
+    def create_previews_by_file_ids(self, file_ids: Iterable, strategy: Dict | None = None) -> List[Dict]:
+        knowledge = self.get_knowledge()
+        ordered_ids = [str(file_id) for file_id in file_ids]
+        if not ordered_ids or len(ordered_ids) > min(50, knowledge.file_count_limit):
+            raise AppApiException(500, _("Invalid number of image files"))
+        temporary_types = [
+            FileSourceType.TEMPORARY_30_MINUTE,
+            FileSourceType.TEMPORARY_120_MINUTE,
+            FileSourceType.TEMPORARY_1_DAY,
+        ]
+        files = {
+            str(file.id): file
+            for file in QuerySet(File)
+            .filter(
+                Q(source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id)
+                | Q(source_type__in=temporary_types, meta__user_id=str(self.user_id)),
+                id__in=ordered_ids,
+            )
+            .select_for_update()
+        }
+        if len(files) != len(ordered_ids):
+            raise AppApiException(500, _("File does not exist or no permission to access"))
+        source_files = [files[file_id] for file_id in ordered_ids]
+        normalized_strategy = normalize_document_strategy(strategy)
+        # Validate the whole batch before promoting files or scheduling recognition.
+        for file in source_files:
+            if _preview_meta(file).get("imported"):
+                raise AppApiException(500, _("Image preview has already been imported"))
+            with ContentFile(file.get_bytes(), name=file.file_name) as content:
+                self._validate_image(content, knowledge)
+        previews = []
+        for file in source_files:
+            meta = {**(file.meta or {}), "knowledge_id": self.knowledge_id}
+            QuerySet(File).filter(id=file.id).update(
+                source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id, meta=meta
+            )
             file.meta = meta
-            previews.append(self.serialize_preview(file))
-            if normalized_strategy["visual"]["enabled"]:
-                transaction.on_commit(partial(self._enqueue_preview, str(file.id)), robust=True)
+            previews.append(self._initialize_preview(file, normalized_strategy))
         return previews
 
     def get_preview(self, preview_id) -> Dict:

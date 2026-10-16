@@ -1,18 +1,15 @@
 """HTTP endpoints for standalone image documents."""
 
-import json
-
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
 from common.auth.struct.aggregate_permission import ViewPermission
-from common.exception.app_exception import AppApiException
 from common.result import result
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -36,11 +33,11 @@ def _document_permissions(permission):
 class ImageDocumentView:
     class Preview(APIView):
         authentication_classes = [TokenAuth]
-        parser_classes = [MultiPartParser]
+        parser_classes = [JSONParser]
 
         @extend_schema(
             methods=["POST"],
-            description=_("Upload images and generate editable previews"),
+            description=_("Generate editable previews from uploaded image file IDs"),
             summary=_("Generate image previews"),
             operation_id=_("Generate image previews"),  # type: ignore
             parameters=ImagePreviewAPI.get_parameters(),
@@ -50,15 +47,6 @@ class ImageDocumentView:
         )
         @_document_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE)
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
-            payload = {"file": request.FILES.getlist("file")}
-            raw_strategy = request.data.get("doc_strategy")
-            if raw_strategy not in (None, ""):
-                if isinstance(raw_strategy, str):
-                    try:
-                        raw_strategy = json.loads(raw_strategy)
-                    except json.JSONDecodeError as exc:
-                        raise AppApiException(500, _("Invalid document processing strategy")) from exc
-                payload["doc_strategy"] = raw_strategy
             return result.success(
                 ImageDocumentSerializers.Preview(
                     data={
@@ -66,7 +54,7 @@ class ImageDocumentView:
                         "knowledge_id": knowledge_id,
                         "user_id": request.user.id,
                     }
-                ).upload(payload)
+                ).upload(request.data)
             )
 
     class PreviewOperate(APIView):

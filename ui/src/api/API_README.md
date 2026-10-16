@@ -451,7 +451,7 @@ System／飞书扩展及文件 ID 导入、策略协议需对应部署支持，�
 `resource_type: 'image'`，不单独封装图片列表接口。
 Workspace 与 System 资源管理的 `knowledge/image.ts` 提供图片专属接口，通过上下文 `resourceApi.image` 读取。
 `postUploadImagePreview` 通过 POST `image/preview` 按策略生成图片预览，
-FormData 重复提交 `file` 并附带 JSON 字符串 `doc_strategy`，返回 ImageDocumentPreview[]；
+JSON 提交 `{ file_id_list, doc_strategy }`，复用上传成功的文件 ID，不重复上传，返回 ImageDocumentPreview[]；
 图片预览结果沿用 DocumentSplitResult 的分段结构，额外包含 preview_id；页面直接展示 content，不进行结构转换。
 `putBatchCreateImageDocuments` 通过 PUT `image/batch_create` 提交 `{ preview_ids }`，返回 DocumentItem[]。
 未生成预览时，`preview_ids` 直接使用上一步上传成功的图片文件 ID；已预览时使用生成结果的预览 ID。

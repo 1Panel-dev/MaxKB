@@ -66,13 +66,17 @@ function handlePrevious() {
 /* 图片预览：校验处理策略后请求预览，保留返回结果供导入。 */
 function handleGeneratePreview() {
   if (!validateFiles() || !processingRef.value) return
+  const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
+  if (fileIds.length !== successfulFiles.value.length) {
+    MsgWarning('文件上传结果缺少文件 ID，请重新上传')
+    return
+  }
   loading.value = true
   return processingRef.value
     .validate()
     .then((valid) => {
       if (!valid || !processingRef.value) return
-      const files = successfulFiles.value.flatMap((file) => (file.raw ? [file.raw] : []))
-      return props.api?.postUploadImagePreview(props.knowledgeId, files, processingRef.value.getStrategy()).then((results) => {
+      return props.api?.postUploadImagePreview(props.knowledgeId, fileIds, processingRef.value.getStrategy()).then((results) => {
         previewDocuments.value = results
         previewVisible.value = true
       })

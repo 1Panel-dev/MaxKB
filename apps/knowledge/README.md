@@ -49,15 +49,23 @@ the external vision model or tool runs in the worker.
 
 | 方法 | 路径后缀 | 用途 |
 | --- | --- | --- |
-| POST | `/document/image/preview` | 上传图片并生成预览 |
+| POST | `/document/image/preview` | 复用已上传图片生成预览 |
 | GET | `/document/image/preview/<preview_id>` | 查询预览及异步识别状态 |
 | PUT | `/document/image/preview/<preview_id>` | 修改 `name`、`caption`、`ocr_text` 或 `description` |
 | DELETE | `/document/image/preview/<preview_id>` | 删除预览 |
 | PUT | `/document/image/batch_create` | 批量导入图片文档 |
 
-上传使用 multipart，`file` 支持多个文件，`doc_strategy` 为可选 JSON；批量导入提交
+预览使用 JSON：`{"file_id_list": ["<uploaded-file-uuid>"], "doc_strategy": {...}}`，
+文件 ID 必填、不可重复且最多 50 个，同时受知识库文件数量限制。仅接受当前用户的临时文件
+或当前知识库的文件；校验实际图片格式和大小后复用原文件，不重复存储。`doc_strategy` 可选。批量导入提交
 `{"preview_ids": [...]}`。系统资源管理和共享资源管理沿用上述路径后缀、请求及处理流程，
 各自的知识库路径前缀和权限由对应功能模块说明。
+
+图片预览与文档分段预览使用相同的文档结构：`name`、`source_file_id`、`doc_strategy`
+和 `content: [{"title": "<文件名（不含扩展名）>", "content": "<预览正文>"}]`。
+每张图片对应一个分段，正文由图片标题、OCR 文字和描述组成，无识别文字时使用文件名（不含扩展名）。
+图片预览额外保留 `preview_id`、`url`、`caption`、`ocr_text`、`description`、
+`process_status`、`process_error` 等字段；创建预览返回文档数组，查询和修改预览返回单个文档。
 
 文档列表、分页接口通过 `resource_type=image` 查询图片，省略该参数时仍查询普通文档。
 启用视觉增强后，上传先返回 `process_status: pending`，客户端轮询预览详情直到识别完成；

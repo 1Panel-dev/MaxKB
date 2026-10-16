@@ -21,6 +21,7 @@ from knowledge.serializers.document import (
 from knowledge.serializers.document_strategy import DocumentSyncStrategySerializer
 from knowledge.serializers.image_document import (
     ImagePreviewBatchCreateRequest,
+    ImagePreviewUploadRequest,
     ImagePreviewUpdateRequest,
 )
 
@@ -89,20 +90,7 @@ class ImagePreviewAPI(APIMixin):
 
     @staticmethod
     def get_request():
-        return {
-            "multipart/form-data": {
-                "type": "object",
-                "required": ["file"],
-                "properties": {
-                    "file": {
-                        "type": "array",
-                        "items": {"type": "string", "format": "binary"},
-                        "description": "jpg/jpeg/png/webp/bmp, at most 50 files",
-                    },
-                    "doc_strategy": {"type": "object", "description": "document processing strategy"},
-                },
-            }
-        }
+        return ImagePreviewUploadRequest
 
     @staticmethod
     def get_response():

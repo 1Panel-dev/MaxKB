@@ -94,7 +94,7 @@ class AsyncImagePreviewTests(SimpleTestCase):
             previews = self.service.create_previews([self.upload()], self.strategy)
 
             self.assertEqual(previews[0]["process_status"], AssetProcessStatus.PENDING)
-            self.assertEqual(previews[0]["content"], "chart")
+            self.assertEqual(previews[0]["content"], [{"title": "chart", "content": "chart"}])
             self.file.save.assert_called_once()
             self.run_visual.assert_not_called()
             delay.assert_not_called()
@@ -118,7 +118,7 @@ class AsyncImagePreviewTests(SimpleTestCase):
 
         preview = self.service.get_preview(self.file.id)
         self.assertEqual(preview["process_status"], AssetProcessStatus.SUCCESS)
-        self.assertEqual(preview["content"], "chart\nrevenue 100\nupward trend")
+        self.assertEqual(preview["content"], [{"title": "chart", "content": "chart\nrevenue 100\nupward trend"}])
         self.assertEqual(self.file.meta["upload_size"], 5)
         self.run_visual.assert_called_once_with(self.file, self.strategy, "default")
 
@@ -166,6 +166,17 @@ class AsyncImagePreviewTests(SimpleTestCase):
         self.service.process_preview(self.file.id)
 
         self.run_visual.assert_not_called()
+
+    def test_regenerated_preview_does_not_receive_results_from_previous_strategy(self):
+        def recognize(*args):
+            self.file.meta["image_preview"]["doc_strategy"] = normalize_document_strategy(
+                {"visual": {"enabled": True, "strategy": "model", "model_id": str(uuid4())}}
+            )
+            return self.processed
+
+        self.run_visual.side_effect = recognize
+        self.service.process_preview(self.file.id)
+        self.files.update.assert_not_called()
 
     def test_enqueue_failure_is_visible_in_preview_status(self):
         with patch("knowledge.tasks.process_image_preview.delay", side_effect=RuntimeError("broker unavailable")):
