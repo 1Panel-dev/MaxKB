@@ -106,7 +106,7 @@ export interface LarkDocumentImportPayload extends Pick<LarkDocumentNode, 'name'
 
 /** 使用已上传图片或已有预览创建图片文档。 */
 export interface ImageDocumentImportPayload {
-  file_ids: string[]
+  file_id_list: string[]
   doc_strategy?: DocumentStrategy
 }
 

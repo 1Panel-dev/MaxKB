@@ -148,7 +148,7 @@ class ImageDocumentImportTests(SimpleTestCase):
     def test_batch_create_route_imports_uploaded_files_with_strategy_and_returns_document_list(self):
         path = f"/workspace/default/knowledge/{self.service.knowledge_id}/document/image/batch_create"
         strategy = {"visual": {"enabled": False}, "index": {"title_as_question": True}}
-        request = APIRequestFactory().put(path, {"file_ids": self.ids, "doc_strategy": strategy}, format="json")
+        request = APIRequestFactory().put(path, {"file_id_list": self.ids, "doc_strategy": strategy}, format="json")
         force_authenticate(request, user=SimpleNamespace(id=self.user_id, type="TEST"))
         response_document = {"id": str(uuid4()), "resource_type": DocumentResourceType.IMAGE}
         with (
@@ -165,26 +165,27 @@ class ImageDocumentImportTests(SimpleTestCase):
         for call in self.documents.call_args_list:
             self.assertTrue(call.kwargs["doc_strategy"]["index"]["title_as_question"])
 
-    def test_schema_requires_file_ids_and_validates_optional_strategy(self):
+    def test_schema_requires_file_id_list_and_validates_optional_strategy(self):
         self.assertIs(ImageBatchCreateAPI.get_request(), ImagePreviewBatchCreateRequest)
-        self.assertEqual(set(ImagePreviewBatchCreateRequest().fields), {"file_ids", "doc_strategy"})
-        serializer = ImagePreviewBatchCreateRequest(data={"file_ids": self.ids})
+        self.assertEqual(set(ImagePreviewBatchCreateRequest().fields), {"file_id_list", "doc_strategy"})
+        serializer = ImagePreviewBatchCreateRequest(data={"file_id_list": self.ids})
         self.assertTrue(serializer.is_valid(), serializer.errors)
         serializer = ImagePreviewBatchCreateRequest(
-            data={"file_ids": self.ids, "doc_strategy": {"visual": {"enabled": True}}}
+            data={"file_id_list": self.ids, "doc_strategy": {"visual": {"enabled": True}}}
         )
         self.assertFalse(serializer.is_valid())
         self.assertIn("doc_strategy", serializer.errors)
 
-    def test_schema_rejects_missing_empty_invalid_or_excessive_file_ids(self):
+    def test_schema_rejects_missing_empty_invalid_or_excessive_file_id_list(self):
         for payload in (
             {},
             {"preview_ids": self.ids},
-            {"file_ids": []},
-            {"file_ids": ["invalid"]},
-            {"file_ids": [str(uuid4()) for _ in range(51)]},
+            {"file_ids": self.ids},
+            {"file_id_list": []},
+            {"file_id_list": ["invalid"]},
+            {"file_id_list": [str(uuid4()) for _ in range(51)]},
         ):
             with self.subTest(payload=payload):
                 serializer = ImagePreviewBatchCreateRequest(data=payload)
                 self.assertFalse(serializer.is_valid())
-                self.assertIn("file_ids", serializer.errors)
+                self.assertIn("file_id_list", serializer.errors)

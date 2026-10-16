@@ -11,11 +11,15 @@ blocks; standalone images also update their paragraph text and chunks. `embed_pa
 indexes the image descriptions. Completed assets are reused when embeddings are rebuilt.
 A failed image retains its existing description or caption and does not stop the remaining images.
 
-Standalone image uploads save editable previews and return `process_status: pending` immediately
-when visual enhancement is enabled. After commit, `celery:process_image_preview` recognizes
-each image. Clients can query the existing `document/image/preview/<preview_id>` GET endpoint
-until the status becomes `success` or `failure`. Disabled enhancement returns `skipped`.
-An enqueue failure is recorded on the preview instead of leaving it permanently pending.
+The `document/image/preview` POST endpoint saves editable previews in a short transaction,
+then completes visual enhancement before responding. Model and tool strategies return the
+recognized caption, OCR text and description in the initial response with `process_status: success`.
+Each failed image returns `failure` and `process_error` while other images keep their results;
+disabled enhancement returns `skipped`. Recognition runs after releasing the preparation transaction's
+file locks, and preview generation does not require a Celery worker.
+
+The existing `celery:process_image_preview` task remains available for asynchronous preview callers.
+Clients can query saved results through `document/image/preview/<preview_id>`.
 
 Preview edits are retained when recognition finishes, including explicitly cleared fields.
 If a pending preview is imported, its asset is recognized by the embedding worker, and the
@@ -50,7 +54,7 @@ the external vision model or tool runs in the worker.
 | 方法 | 路径后缀 | 用途 |
 | --- | --- | --- |
 | POST | `/document/image/preview` | 复用已上传图片生成预览 |
-| GET | `/document/image/preview/<preview_id>` | 查询预览及异步识别状态 |
+| GET | `/document/image/preview/<preview_id>` | 查询预览及识别状态 |
 | PUT | `/document/image/preview/<preview_id>` | 修改 `name`、`caption`、`ocr_text` 或 `description` |
 | DELETE | `/document/image/preview/<preview_id>` | 删除预览 |
 | PUT | `/document/image/batch_create` | 批量导入图片文档 |
@@ -58,8 +62,8 @@ the external vision model or tool runs in the worker.
 预览使用 JSON：`{"file_id_list": ["<uploaded-file-uuid>"], "doc_strategy": {...}}`，
 文件 ID 必填、不可重复且最多 50 个，同时受知识库文件数量限制。仅接受当前用户的临时文件
 或当前知识库的文件；校验实际图片格式和大小后复用原文件，不重复存储。`doc_strategy` 可选。批量导入提交
-`{"file_ids": [...], "doc_strategy": {...}}`，其中 `doc_strategy` 可选。
-`file_ids` 支持当前用户上传的临时图片 ID 和当前知识库已生成预览的图片文件 ID，可不经过预览直接导入。
+`{"file_id_list": [...], "doc_strategy": {...}}`，其中 `doc_strategy` 可选。
+`file_id_list` 支持当前用户上传的临时图片 ID 和当前知识库已生成预览的图片文件 ID，可不经过预览直接导入。
 直接导入校验整批图片的权限、格式、大小和数量后创建图片文档，视觉增强由导入后的向量化任务执行；
 已有预览保留其处理策略、识别结果和编辑，不被请求中的 `doc_strategy` 覆盖。
 系统资源管理和共享资源管理沿用上述路径后缀、请求及处理流程，
@@ -72,5 +76,6 @@ the external vision model or tool runs in the worker.
 `process_status`、`process_error` 等字段；创建预览返回文档数组，查询和修改预览返回单个文档。
 
 文档列表、分页接口通过 `resource_type=image` 查询图片，省略该参数时仍查询普通文档。
-启用视觉增强后，上传先返回 `process_status: pending`，客户端轮询预览详情直到识别完成；
-异步识别依赖 Celery task 服务，状态及导入时序见上文。
+启用视觉增强后，生成预览会调用所选模型或工具，完成识别后直接返回 `success` 或 `failure`，
+正文分段包含识别结果，客户端无需轮询；关闭视觉增强返回 `skipped`。
+不经过预览直接导入时，图片识别仍由 Celery 向量化任务处理，状态及导入时序见上文。

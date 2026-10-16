@@ -26,7 +26,7 @@ class ImagePreviewUpdateRequest(serializers.Serializer):
 
 
 class ImagePreviewBatchCreateRequest(serializers.Serializer):
-    file_ids = serializers.ListField(
+    file_id_list = serializers.ListField(
         child=serializers.UUIDField(), allow_empty=False, max_length=50, label=_("image file ids")
     )
     doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
@@ -49,7 +49,7 @@ class ImageDocumentSerializers:
         def upload(self, instance):
             request_serializer = ImagePreviewUploadRequest(data=instance)
             request_serializer.is_valid(raise_exception=True)
-            return self._service().create_previews_by_file_ids(
+            return self._service().generate_previews_by_file_ids(
                 request_serializer.validated_data["file_id_list"],
                 request_serializer.validated_data.get("doc_strategy"),
             )
@@ -70,7 +70,7 @@ class ImageDocumentSerializers:
             request_serializer.is_valid(raise_exception=True)
             service = self._service()
             document_ids = service.import_previews(
-                request_serializer.validated_data["file_ids"], request_serializer.validated_data.get("doc_strategy")
+                request_serializer.validated_data["file_id_list"], request_serializer.validated_data.get("doc_strategy")
             )
             result = []
             for document_id in document_ids:

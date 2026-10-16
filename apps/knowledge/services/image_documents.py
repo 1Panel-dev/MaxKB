@@ -301,7 +301,9 @@ class ImageDocumentService:
         return files
 
     @transaction.atomic
-    def create_previews_by_file_ids(self, file_ids: Iterable, strategy: Dict | None = None) -> List[Dict]:
+    def create_previews_by_file_ids(
+        self, file_ids: Iterable, strategy: Dict | None = None, *, enqueue=True
+    ) -> List[Dict]:
         knowledge = self.get_knowledge()
         ordered_ids = [str(file_id) for file_id in file_ids]
         if not ordered_ids or len(ordered_ids) > min(50, knowledge.file_count_limit):
@@ -322,7 +324,16 @@ class ImageDocumentService:
                 source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id, meta=meta
             )
             file.meta = meta
-            previews.append(self._initialize_preview(file, normalized_strategy))
+            previews.append(self._initialize_preview(file, normalized_strategy, enqueue=enqueue))
+        return previews
+
+    def generate_previews_by_file_ids(self, file_ids: Iterable, strategy: Dict | None = None) -> List[Dict]:
+        previews = self.create_previews_by_file_ids(file_ids, strategy, enqueue=False)
+        # Complete recognition after the preparation transaction releases its file locks.
+        for index, preview in enumerate(previews):
+            if preview["process_status"] == AssetProcessStatus.PENDING:
+                self.process_preview(preview["preview_id"])
+                previews[index] = self.get_preview(preview["preview_id"])
         return previews
 
     def get_preview(self, preview_id) -> Dict:

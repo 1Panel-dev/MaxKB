@@ -105,7 +105,7 @@ async function handleSubmit() {
       if (!valid || !processingRef.value) return
     }
     const payload: ImageDocumentImportPayload = {
-      file_ids: previewVisible.value ? previewDocuments.value.map((preview) => preview.file_id) : fileIds,
+      file_id_list: previewVisible.value ? previewDocuments.value.map((preview) => preview.file_id) : fileIds,
     }
     if (!previewVisible.value) payload.doc_strategy = processingRef.value?.getStrategy()
     const importRequest = props.api?.putBatchCreateImageDocuments(props.knowledgeId, payload)

@@ -140,7 +140,7 @@ class ImagePreviewByFileIdsTests(SimpleTestCase):
         )
         with (
             patch.object(serializer, "_service", return_value=self.service),
-            patch.object(self.service, "create_previews_by_file_ids", return_value=[]) as create,
+            patch.object(self.service, "generate_previews_by_file_ids", return_value=[]) as create,
         ):
             self.assertEqual(serializer.upload(payload), [])
         self.assertEqual([str(file_id) for file_id in create.call_args.args[0]], self.ids)
