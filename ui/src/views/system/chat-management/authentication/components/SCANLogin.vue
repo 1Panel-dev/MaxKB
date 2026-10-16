@@ -3,8 +3,8 @@ import { onMounted, ref, useTemplateRef } from 'vue'
 import ChatUserAuthScanApi from '@/api/admin/system/chat-management/chat-user-auth-scan.ts'
 import type { QrCodeProvider, QrLoginPlatform, QrLoginPlatformPayload } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
-import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
-import { MsgSuccess, MsgError } from '@/utils/message'
+import { LOGIN_METHOD_LABELS } from '@/constants'
+import { MsgSuccess } from '@/utils/message'
 import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
 import enterpriseWechatLogo from '@/assets/logo/logo_enterprise-wechat.svg'
 import larkLogo from '@/assets/logo/logo_lark.svg'
@@ -21,8 +21,6 @@ const platformDefinitions: { configKeys: string[]; key: QrCodeProvider; logo: st
   { key: LOGIN_METHOD.LARK, logo: larkLogo, configKeys: ['app_key', 'app_secret'] },
 ]
 
-const apiBaseUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api`
-
 const loading = ref(false)
 const qrLoginPlatforms = ref<QrLoginPlatformView[]>([])
 
@@ -33,10 +31,7 @@ function createQrLoginPlatforms(settings: QrLoginPlatform[]): QrLoginPlatformVie
     return {
       key,
       logo,
-      config: Object.fromEntries([
-        ...configKeys.map((configKey) => [configKey, setting?.config[configKey] ?? '']),
-        ['callback_url', setting?.config.callback_url || `${apiBaseUrl}/${key}`],
-      ]),
+      config: Object.fromEntries(configKeys.map((configKey) => [configKey, setting?.config[configKey] ?? ''])),
       isActive: setting?.is_active ?? false,
       isValid: setting?.is_valid ?? false,
     }
@@ -76,51 +71,32 @@ function handleEditPlatform(platform: QrLoginPlatformView) {
   editScanDrawerRef.value?.open(platform)
 }
 
-/* 校验 */
-function handleValidatePlatform(platform: QrLoginPlatformView) {
-  loading.value = true
-  return ChatUserAuthScanApi.putValidateQrLoginPlatform(platform)
-    .then((res) => {
-      res ? MsgSuccess('校验成功') : MsgError('校验失败')
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
 onMounted(loadQrPlatforms)
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     <template v-for="platform in qrLoginPlatforms" :key="platform.key">
-      <el-card shadow="hover">
-        <div class="flex-between mb-4">
+      <!-- 点击平台卡片配置扫码登录 -->
+      <el-card shadow="hover" @click="handleEditPlatform(platform)">
+        <div class="flex-between">
           <div class="flex-align-center gap-2">
             <img :src="platform.logo" :alt="LOGIN_METHOD_LABELS[platform.key]" class="h-6 w-6" />
             <h4>{{ LOGIN_METHOD_LABELS[platform.key] }}</h4>
             <el-tag v-if="platform.isValid" size="small" type="success">有效</el-tag>
-            <!-- <el-tag v-if="!platform.isValid" size="small" type="danger">无效</el-tag> -->
           </div>
 
-          <div v-if="platform.isValid" class="flex-align-center gap-2">
-            <span>{{ platform.isActive ? '已启用' : '已关闭' }}</span>
-            <el-switch v-model="platform.isActive" @change="handlePlatformStatusChange(platform)" />
+          <div class="flex-align-center gap-4">
+            <!-- 配置扫码登录平台 -->
+            <el-button plain @click.stop="handleEditPlatform(platform)">{{ platform.isValid ? '配置' : '未配置' }}</el-button>
+            <template v-if="platform.isValid">
+              <el-divider direction="vertical" />
+              <!-- 启停扫码登录，阻止点击打开配置 -->
+              <span class="inline-flex" @click.stop>
+                <el-switch v-model="platform.isActive" @change="handlePlatformStatusChange(platform)" />
+              </span>
+            </template>
           </div>
-          <el-button v-else type="primary" @click="handleEditPlatform(platform)">接入</el-button>
-        </div>
-        <div class="border-t" v-if="platform.isValid">
-          <div class="py-4 grid grid-cols-2 gap-x-6 gap-y-4">
-            <div v-for="(value, key) in platform.config" :key="key">
-              <p class="text-N600">{{ SCAN_FIELD_LABELS[key] ?? key }}</p>
-              <p>
-                {{ key === 'app_secret' ? '••••••••••••' : value }}
-              </p>
-            </div>
-          </div>
-
-          <el-button type="primary" @click="handleEditPlatform(platform)">编辑</el-button>
-          <el-button plain @click="handleValidatePlatform(platform)">校验</el-button>
         </div>
       </el-card>
     </template>

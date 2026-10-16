@@ -20,11 +20,19 @@ const isCertification = ref(false)
 let savedConfig: ApplicationAccessConfig = {}
 
 const isWechat = computed(() => props.platform.key === APPLICATION_ACCESS_PLATFORM.WECHAT)
+const modeField = computed(() => props.platform.modeField)
+// 表单字段随连接方式切换：长连接(ws)需要 bot_id/secret，URL 回调(callback)需要 token/encoding_aes_key。
+const activeFields = computed(() => {
+  const mode = form[modeField.value?.key ?? ''] ?? modeField.value?.default
+  return (modeField.value && mode ? modeField.value.fields?.[mode] : undefined) ?? props.platform.fields
+})
+// 智能机器人默认长连接(ws)，无需回调地址；切到 URL 回调时才展示回调地址。
+const showCallback = computed(() => !modeField.value || form[modeField.value.key] === 'callback')
 // 消息回调沿用 Admin API 下的 /chat 路径，不使用独立 Chat 入口的 API base。
 const callbackUrl = computed(() => `${window.location.origin}${ADMIN_API_BASE_PATH}/chat/${props.platform.key}/${props.applicationId}`)
 const rules = computed<FormRules>(() =>
   Object.fromEntries(
-    props.platform.fields
+    activeFields.value
       .filter((field) => field.required !== false)
       .map((field) => [field.key, [{ required: true, whitespace: true, message: `请输入 ${field.label}`, trigger: 'blur' }]]),
   ),
@@ -36,7 +44,8 @@ function loadPlatformConfig() {
   return AccessApi.getPlatformConfig(props.applicationId, props.platform.key)
     .then((config) => {
       savedConfig = config ?? {}
-      props.platform.fields.forEach((field) => {
+      if (modeField.value) form[modeField.value.key] = String(savedConfig[modeField.value.key] ?? modeField.value.default)
+      activeFields.value.forEach((field) => {
         form[field.key] = String(savedConfig[field.key] ?? '')
       })
       isCertification.value = savedConfig.is_certification ?? false
@@ -73,7 +82,29 @@ onMounted(loadPlatformConfig)
   <MkDrawer v-model="visible" :title="`${platform.name}配置`" @closed="emit('closed')">
     <div v-loading="loading" class="min-h-40">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <template v-for="field in platform.fields" :key="field.key">
+        <el-form-item v-if="modeField" label="连接方式" required>
+          <div class="w-full space-y-4">
+            <div
+              v-for="option in modeField.options"
+              :key="option.value"
+              class="flex min-h-[74px] w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3"
+              :class="form[modeField.key] === option.value ? 'border-primary!' : 'border-N200'"
+              @click="form[modeField.key] = option.value"
+            >
+              <div class="flex min-w-0 flex-col">
+                <span class="text-N900">{{ option.label }}</span>
+                <span class="mt-0.5 text-N500">{{ option.tip }}</span>
+              </div>
+              <span
+                class="ml-4 flex size-4 shrink-0 items-center justify-center rounded-full border"
+                :class="form[modeField.key] === option.value ? 'border-primary' : 'border-N300'"
+              >
+                <span v-if="form[modeField.key] === option.value" class="size-2 rounded-full bg-primary" />
+              </span>
+            </div>
+          </div>
+        </el-form-item>
+        <template v-for="field in activeFields" :key="field.key">
           <el-form-item :label="field.label" :prop="field.key">
             <el-input
               v-model="form[field.key]"
@@ -89,7 +120,7 @@ onMounted(loadPlatformConfig)
           <el-switch v-model="isCertification" />
         </el-form-item>
 
-        <el-form-item label="回调地址">
+        <el-form-item v-if="showCallback" label="回调地址">
           <el-input :model-value="callbackUrl" readonly>
             <template #suffix>
               <!-- 复制发布渠道回调地址 -->

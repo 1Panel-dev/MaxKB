@@ -5,6 +5,8 @@ import type { QrLoginPlatformPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
 import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
+import { ADMIN_API_BASE_PATH } from '@/api/constants'
+import { copyText } from '@/utils/clipboard'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import perm from '@/permission'
 
@@ -14,9 +16,13 @@ const loading = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 const form = reactive<QrLoginPlatformPayload>({ key: LOGIN_METHOD.WECOM, isActive: false, config: {} })
 
+// 扫码登录回调地址沿用当前 API base 路径自动生成，与发布渠道回调一致只读展示。
+const callbackUrl = computed(() => `${window.location.origin}${ADMIN_API_BASE_PATH}/${form.key}`)
+const configKeys = computed(() => Object.keys(form.config).filter((key) => key !== 'callback_url'))
+
 const rules = computed<FormRules>(() =>
   Object.fromEntries(
-    Object.keys(form.config).map((key) => [
+    configKeys.value.map((key) => [
       `config.${key}`,
       [{ whitespace: true, required: true, message: `请输入${SCAN_FIELD_LABELS[key] ?? key}`, trigger: 'blur' }],
     ]),
@@ -53,6 +59,7 @@ function handleValidatePlatform() {
 
 function open(platform: QrLoginPlatformPayload) {
   Object.assign(form, platform, { config: { ...platform.config } })
+  form.config.callback_url = callbackUrl.value
   visible.value = true
 }
 
@@ -66,7 +73,7 @@ defineExpose({ open })
 <template>
   <MkDrawer v-model="visible" :title="`${LOGIN_METHOD_LABELS[form.key]}设置`" @closed="resetData">
     <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-position="top" require-asterisk-position="right">
-      <el-form-item v-for="(_, key) in form.config" :key="key" :label="SCAN_FIELD_LABELS[key] ?? key" :prop="`config.${key}`">
+      <el-form-item v-for="key in configKeys" :key="key" :label="SCAN_FIELD_LABELS[key] ?? key" :prop="`config.${key}`">
         <el-input
           v-model="form.config[key]"
           :autocomplete="key === 'app_secret' ? 'new-password' : 'off'"
@@ -74,6 +81,16 @@ defineExpose({ open })
           :type="key === 'app_secret' ? 'password' : 'text'"
           placeholder="请输入"
         />
+      </el-form-item>
+      <el-form-item label="回调地址">
+        <el-input :model-value="callbackUrl" readonly>
+          <template #suffix>
+            <!-- 复制扫码登录回调地址 -->
+            <el-button text class="-mr-1" :disabled="!callbackUrl" @click="copyText(callbackUrl)">
+              <MkIcon name="icon_copy_outlined" />
+            </el-button>
+          </template>
+        </el-input>
       </el-form-item>
     </el-form>
 
