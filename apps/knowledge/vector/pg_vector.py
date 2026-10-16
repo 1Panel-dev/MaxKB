@@ -28,6 +28,19 @@ from knowledge.vector.base_vector import BaseVectorStore, normalize_for_embeddin
 from maxkb.conf import PROJECT_DIR
 
 
+def _normalize_search_results(results: List[Dict]) -> List[Dict]:
+    # Raw SQL cursors return JSONField values as strings, without ORM conversion.
+    for result in results:
+        meta = result.get("meta")
+        if isinstance(meta, str):
+            try:
+                meta = json.loads(meta)
+            except json.JSONDecodeError:
+                meta = {}
+        result["meta"] = meta if isinstance(meta, dict) else {}
+    return results
+
+
 class PGVector(BaseVectorStore):
     def delete_by_source_ids(self, source_ids: List[str], source_type: str):
         if len(source_ids) == 0:
@@ -342,7 +355,7 @@ class EmbeddingSearch(ISearch):
                 top_number,
             ],
         )
-        return embedding_model
+        return _normalize_search_results(embedding_model)
 
     def support(self, search_mode: SearchMode):
         return search_mode.value == SearchMode.embedding.value
@@ -381,7 +394,7 @@ class KeywordsSearch(ISearch):
                 top_number,
             ],
         )
-        return embedding_model
+        return _normalize_search_results(embedding_model)
 
     def support(self, search_mode: SearchMode):
         return search_mode.value == SearchMode.keywords.value
@@ -422,7 +435,7 @@ class BlendSearch(ISearch):
                 top_number,
             ],
         )
-        return embedding_model
+        return _normalize_search_results(embedding_model)
 
     def support(self, search_mode: SearchMode):
         return search_mode.value == SearchMode.blend.value
