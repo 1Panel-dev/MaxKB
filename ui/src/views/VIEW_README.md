@@ -106,7 +106,7 @@
 
 `knowledge-detail/context.ts` 仅通过 `provideKnowledgeDetailContext` 和
 `useKnowledgeDetailContext` 公开详情、更新能力、ID、来源导航及完整 API。
-`resourceApi.knowledge / scheduledSync / document / image / tags / termbase / chatUser / externalRetrieval` 按当前范围响应式读取，无需 `.value`，
+`resourceApi.knowledge / scheduledSync / document / paragraph / image / tags / termbase / chatUser / externalRetrieval` 按当前范围响应式读取，无需 `.value`，
 不要在 setup 时解构具体 API。`workflow` 当前仅普通 Workspace 提供，其他范围不回退。
 共有查询方法必填，部分范围缺失的方法可选调用；未发请求时不提示成功、不关闭、不刷新或修改快照，loading 正常清理。
 不增加查询／维护双入口、接口别名或专属 Context hook，也不以方法存在性新增操作显隐规则。
@@ -150,6 +150,7 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 `library/document/index.vue` 管理查询、分页、选择、启停及刷新；Action 管理各自请求和浮层。
 `library/image/index.vue` 使用独立列表入口，复用 `document/` 的状态、展示组件及 Action，
 查询与操作沿用 Document API；图片列表的查询参数差异见 [API 文档](../api/API_README.md#文档与分段)。
+点击图片行通过 `resourceApi.paragraph.getParagraphPage` 查询首个分段，使用 `ParagraphDialog` 展示详情；弹窗按需挂载，关闭动画结束后卸载。
 图片上传独立放在 `image/upload-image/`，`ButtonUploadImage` 管理入口与按需挂载，
 `UploadImageDrawer` 分为上传图片、图片处理两步，复用 `MkDragUpload` 的多文件图片模式暂存文件；
 `ImageProcessingForm` 管理视觉增强策略及模型／工具选项，不展示文档分段与索引设置。

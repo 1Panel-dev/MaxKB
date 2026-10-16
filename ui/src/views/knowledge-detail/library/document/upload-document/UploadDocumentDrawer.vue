@@ -72,7 +72,7 @@ function handleGeneratePreview() {
   if (!validateImportFiles() || !strategyRef.value) return
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
   if (fileIds.length !== successfulFiles.value.length) {
-    MsgWarning('文件上传结果缺少文件 ID，请重新上传')
+    MsgWarning('没有上传成功的文件，请重新上传')
     return
   }
   loading.value = true

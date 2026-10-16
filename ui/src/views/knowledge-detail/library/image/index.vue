@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { CascaderOption, TableColumnCtx } from 'element-plus'
 import MkEditName from '@/components/mk-edit-name/index.vue'
@@ -9,13 +9,15 @@ import CommonSystemApi from '@/api/admin/system/common'
 import { DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
 import { DOCUMENT_STATUS_FILTER_OPTIONS } from '../document/status'
-import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
+import type { Dict, DocumentHitHandling, DocumentItem, OptionItem, ParagraphItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { numberFormat } from '@/utils/number'
+import { getFileUrl } from '@/utils/common'
 import { MsgSuccess } from '@/utils/message'
 import { isWorkspaceResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import ButtonUploadImage from './upload-image/ButtonUploadImage.vue'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
 import DocumentStatus from '../document/components/DocumentStatus.vue'
 import DocumentTags from '../document/components/DocumentTags.vue'
 import {
@@ -43,14 +45,26 @@ const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const { knowledge, resourceApi } = useKnowledgeDetailContext()
 
-/* 文档分段入口：选择列与行内操作继续处理自身交互。 */
+/* 图片分段详情：取首个分段，弹窗关闭后卸载。 */
+const paragraphDialogRef = ref<InstanceType<typeof ParagraphDialog>>()
+const selectedParagraph = ref<ParagraphItem>()
+
 function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<DocumentItem> | null) {
-  if (loading.value || operationLoading.value || column?.type === 'selection') return
-  // void router.push({
-  //   name: routeNames.value.paragraph,
-  //   params: { ...routeParams.value, type: knowledgeType.value, documentId: document.id },
-  //   query: route.query,
-  // })
+  if (loading.value || operationLoading.value || selectedParagraph.value || column?.type === 'selection') return
+  operationLoading.value = true
+  return resourceApi.paragraph
+    .getParagraphPage(knowledgeId.value, document.id, { currentPage: 1, pageSize: 1 })
+    .then(async (page) => {
+      const paragraph = page.records[0]
+      if (!paragraph) return
+      selectedParagraph.value = paragraph
+      await nextTick()
+      paragraphDialogRef.value?.open(paragraph)
+    })
+    .catch(() => {})
+    .finally(() => {
+      operationLoading.value = false
+    })
 }
 
 /* 文档名称编辑 */
@@ -301,7 +315,7 @@ onBeforeUnmount(() => {
         >
           <template #prefix>
             <!-- 图片 -->
-            <!-- <el-image :src="file.url || file.previewUrl" :alt="file.name" :title="file.name" fit="cover" /> -->
+            <el-image class="h-7.5! w-7.5!" :src="getFileUrl(row.meta?.source_file_id as string | undefined)" :alt="row.name" fit="cover" />
           </template>
         </MkEditName>
       </template>
@@ -577,4 +591,12 @@ onBeforeUnmount(() => {
       </MkDropdown>
     </template>
   </MkTable>
+  <ParagraphDialog
+    v-if="selectedParagraph"
+    ref="paragraphDialogRef"
+    :knowledge-id="knowledgeId"
+    :document-id="selectedParagraph.document_id"
+    @success="refreshAfterOperation"
+    @closed="selectedParagraph = undefined"
+  />
 </template>
