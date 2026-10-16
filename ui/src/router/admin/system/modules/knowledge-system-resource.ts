@@ -55,13 +55,14 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
       {
         path: 'retrieval',
         name: 'system-resource-knowledge-retrieval',
-        redirect: { name: 'system-resource-knowledge-recall-test' },
+        redirect: { name: 'system-resource-knowledge-hit-test' },
         meta: { title: '检索优化', icon: 'icon_trace_outlined', order: 30 },
         children: [
           {
-            path: 'recall',
-            name: 'system-resource-knowledge-recall-test',
-            component: () => import('@/views/knowledge-detail/recall-test/index.vue'),
+            path: 'hit-test',
+            name: 'system-resource-knowledge-hit-test',
+            component: () => import('@/views/knowledge-detail/hit-test/index.vue'),
+            props: (route) => ({ key: `${route.meta.resourceScope}:${route.params.knowledgeId}` }),
             meta: { title: '召回测试', order: 10 },
           },
           {

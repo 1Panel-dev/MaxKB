@@ -235,6 +235,14 @@ System 不传 Workspace 文件夹条件；System 共享不提供智能体选择�
 共享工具 API 不提供工作空间文件夹移动或批量接口；复用卡片、Action 和表单接收完整 Workspace
 与 System 共享 API 的联合类型，不补造接口以匹配 Workspace 方法集合。
 
+### 知识库召回测试
+
+Workspace、System 资源管理和 System 共享资源均在各自 `knowledge/knowledge.ts` 中提供
+`postKnowledgeHitTest(knowledgeId, payload)`，向知识库的 `/hit_test` 提交 POST，直接返回命中分段数组。
+请求使用 `KnowledgeHitTestPayload`，包含 `query_text`、`image_list`、`top_number`、`similarity` 和
+`search_mode`；检索模式复用 `KNOWLEDGE_SEARCH_MODE`。文本和图片至少提供一项，图片仅支持向量或混合检索。
+结果使用 `KnowledgeHitTestResult`，保留分段、得分及图片命中信息。Workspace 共享暂无对应接口，不回退其他范围。
+
 ### System 共享知识库
 
 `system/shared-resources/knowledge/knowledge.ts` 使用 `/system/shared/knowledge`，维护分页、详情、

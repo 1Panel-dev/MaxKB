@@ -1,4 +1,4 @@
-import { KNOWLEDGE_TYPE, KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
+import { KNOWLEDGE_TYPE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 import type { KnowledgeType } from '@/api/types'
 
 /** 前端知识库类型标识。 */
@@ -30,4 +30,23 @@ export const KNOWLEDGE_SYNC_OPTIONS = [
   { value: KNOWLEDGE_SYNC_TYPE.INCREMENTAL, label: '增量同步', description: '跳过未更新的文档，更新有变化的文档，并清理来源中已不存在的文档' },
   { value: KNOWLEDGE_SYNC_TYPE.REPLACE, label: '替换同步', description: '重新获取来源文档并替换匹配的文档，保留未匹配的旧文档' },
   { value: KNOWLEDGE_SYNC_TYPE.COMPLETE, label: '整体同步', description: '重新获取来源文档并重建该来源的文档，保留其他来源的文档' },
+] as const
+
+/** 召回测试与工作流知识库检索共用的模式选项。 */
+export const KNOWLEDGE_SEARCH_MODE_OPTIONS = [
+  {
+    value: KNOWLEDGE_SEARCH_MODE.EMBEDDING,
+    label: '向量检索',
+    description: '向量检索是一种基于向量相似度的检索方式，适用于知识库中的大数据量场景。',
+  },
+  {
+    value: KNOWLEDGE_SEARCH_MODE.KEYWORDS,
+    label: '全文检索',
+    description: '全文检索是一种基于文本相似度的检索方式，适用于知识库中的小数据量场景。',
+  },
+  {
+    value: KNOWLEDGE_SEARCH_MODE.BLEND,
+    label: '混合检索',
+    description: '混合检索是一种基于向量和文本相似度的检索方式，适用于知识库中的中等数据量场景。',
+  },
 ] as const

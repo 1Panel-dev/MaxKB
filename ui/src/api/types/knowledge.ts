@@ -1,9 +1,10 @@
 /** Workspace 知识库列表和知识库卡片共用的业务类型。 */
 
 import type LogicFlow from '@logicflow/core'
-import { KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
+import { KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
 import type { DefaultModelSettingPayload } from './model'
 import type { DocumentTaskState } from './document'
+import type { ParagraphItem } from './paragraph'
 
 /** 生成关联问题共用的模型与提示词配置。 */
 export interface RelatedQuestionsConfig {
@@ -152,4 +153,52 @@ export interface KnowledgeWorkflowTemplate {
 export interface KnowledgeWorkflowStoreResponse {
   additionalProperties: { tags: { key: string; name: string }[] }
   apps: import('./workflow-template').WorkflowStoreTemplate[]
+}
+
+/** 知识库召回测试的检索模式。 */
+export type KnowledgeSearchMode = (typeof KNOWLEDGE_SEARCH_MODE)[keyof typeof KNOWLEDGE_SEARCH_MODE]
+
+/** 召回测试使用的已上传图片。 */
+export interface KnowledgeHitTestImage {
+  file_id: string
+  name?: string
+  url?: string
+}
+
+/** 召回测试的查询内容与检索参数；文本和图片至少提供一项。 */
+export interface KnowledgeHitTestPayload {
+  query_text?: string | null
+  image_list?: KnowledgeHitTestImage[]
+  top_number: number
+  similarity: number
+  search_mode: KnowledgeSearchMode
+}
+
+/** 召回结果命中的图片资产。 */
+export interface KnowledgeHitTestAsset {
+  id: string
+  file_id: string
+  file_name: string
+  url: string
+  position: number
+  caption: string
+  ocr_text: string
+  description: string
+  hit_num: number
+  last_hit_time: string | null
+}
+
+/** 召回测试返回的分段与命中得分。 */
+export interface KnowledgeHitTestResult extends ParagraphItem {
+  knowledge_id: string
+  knowledge_name: string
+  document_name: string
+  similarity: number
+  comprehensive_score: number
+  source_id: string
+  source_type: number
+  hit_unit_type: string
+  query_unit_type: string | null
+  query_unit_index: number | null
+  hit_asset: KnowledgeHitTestAsset | null
 }

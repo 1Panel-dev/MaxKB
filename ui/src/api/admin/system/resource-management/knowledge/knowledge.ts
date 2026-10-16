@@ -1,7 +1,15 @@
 import { del, get, getExportFile, post, put } from '@/api/admin/core/request'
 import type LogicFlow from '@logicflow/core'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import type { Dict, KnowledgeDetail, KnowledgeItem, KnowledgeGeneratePayload, KnowledgeSyncType } from '@/api/types'
+import type {
+  KnowledgeHitTestPayload,
+  KnowledgeHitTestResult,
+  Dict,
+  KnowledgeDetail,
+  KnowledgeItem,
+  KnowledgeGeneratePayload,
+  KnowledgeSyncType,
+} from '@/api/types'
 
 const prefix = '/system/resource/knowledge'
 
@@ -77,7 +85,12 @@ const putKnowledgeKeywordIndex = (knowledgeId: string) => put<undefined, void>(`
 const postTransformWorkflow = (knowledgeId: string, payload: { work_flow: LogicFlow.GraphConfigData }) =>
   post<{ work_flow: LogicFlow.GraphConfigData }, boolean>(`${prefix}/${knowledgeId}/transform_workflow`, payload)
 
+/** 测试知识库检索并返回命中的分段。 */
+const postKnowledgeHitTest = (knowledgeId: string, payload: KnowledgeHitTestPayload) =>
+  post<KnowledgeHitTestPayload, KnowledgeHitTestResult[]>(`${prefix}/${knowledgeId}/hit_test`, payload)
+
 export default {
+  postKnowledgeHitTest,
   postTransformWorkflow,
   putKnowledgeKeywordIndex,
   exportKnowledgeExcel,

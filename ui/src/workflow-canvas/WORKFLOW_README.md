@@ -344,7 +344,8 @@ AI 对话、图片理解和视频理解统一复用 `component/ThinkingSetting.v
 知识库检索在入口维护范围、参数摘要、问题表单和关联数据；`component/SearchSetting.vue`
 封装参数按钮与弹窗，通过 `v-model` 编辑并遵循通用设置弹窗规则。范围引用加入节点表单，
 问题引用保留独立有效性检查；移除关联只清理明确取消的 ID，保留当前用户不可见的知识库。
-检索模式协议复用 `KNOWLEDGE_SEARCH_MODE`。
+检索模式协议复用 `KNOWLEDGE_SEARCH_MODE`；模式选项与说明复用知识库常量 `KNOWLEDGE_SEARCH_MODE_OPTIONS`，
+见 [常量文档](../constants/CONSTANT_README.md)。
 
 文档内容提取、多路召回和文档标签检索节点使用统一的节点标题、`mk-gray-card`、表单必填标记与
 `MkIcon`。多路召回的参数设置按钮与弹窗封装在节点 `component/SearchSetting.vue`，通过

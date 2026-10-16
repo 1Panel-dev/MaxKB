@@ -9,7 +9,8 @@ import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeSearchScope from '@/workflow-canvas/component/node-search-scope/index.vue'
 import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
 import SearchSetting from './component/SearchSetting.vue'
-import { defaultSearchSetting, searchModeOptions } from './constant.ts'
+import { defaultSearchSetting } from './constant.ts'
+import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 import type { SearchKnowledgeNodeForm } from './types'
 
 defineOptions({ name: 'WorkflowSearchKnowledgeNode' })
@@ -70,7 +71,7 @@ const settingRows = computed(() => [
   {
     label: '检索模式',
     value:
-      searchModeOptions.find(({ value }) => value === formData.value.knowledge_setting.search_mode)?.label ??
+      KNOWLEDGE_SEARCH_MODE_OPTIONS.find(({ value }) => value === formData.value.knowledge_setting.search_mode)?.label ??
       formData.value.knowledge_setting.search_mode,
   },
   { label: '相似度高于', value: formData.value.knowledge_setting.similarity.toFixed(3) },

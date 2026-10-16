@@ -241,10 +241,11 @@ Workspace 共享覆盖 resourceScope，保留 Workspace scope 及知识库 activ
 | ---------- | --------------------------------------------------------------------------------------------------------------------- |
 | 资料库     | 空 path 分组；document、image、tag；仅 BASE 显示图片                                                                  |
 | 工作流     | workflow-entry；WORKFLOW 类型 beforeEnter 重定向对应全屏画布，其他类型显示转换页                                      |
-| 检索优化   | retrieval/recall、retrieval/question、retrieval/dictionary                                                            |
+| 检索优化   | retrieval/hit-test、retrieval/question、retrieval/dictionary                                                          |
 | 授权与集成 | integration/chat-user、integration/external-retrieval                                                                 |
 | 设置       | BASE 单独 setting；WEB 分组含 setting/base、document-strategy、scheduled-sync；LARK／WORKFLOW 含 base、scheduled-sync |
 
+召回测试子路由通过 `props` 传入资源范围与知识库 ID 组成的 Vue `key`，切换资源时重建该页。
 分组不挂 View，直接访问重定向首个子页，保留参数、query、hash。
 设置只用 detailMenuVisible 控制菜单类型，不添加类型访问守卫。资料库 View 的目录是 library/tags，URL 仍为 tag。
 
