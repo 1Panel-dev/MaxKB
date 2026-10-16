@@ -5,7 +5,7 @@ import type { QrLoginPlatformPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
 import { LOGIN_METHOD } from '@/api/enums'
-import { ADMIN_API_BASE_PATH } from '@/api/constants'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import perm from '@/permission'
@@ -17,7 +17,7 @@ const formRef = useTemplateRef<FormInstance>('formRef')
 const form = reactive<QrLoginPlatformPayload>({ key: LOGIN_METHOD.WECOM, isActive: false, config: {} })
 
 // 扫码登录回调地址沿用当前 API base 路径自动生成，只读展示。
-const callbackUrl = computed(() => `${window.location.origin}${ADMIN_API_BASE_PATH}/${form.key}`)
+const callbackUrl = computed(() => `${window.location.origin}${CHAT_API_BASE_PATH}/auth/${form.key}`)
 const configKeys = computed(() => Object.keys(form.config).filter((key) => key !== 'callback_url'))
 
 const rules = computed<FormRules>(() =>
