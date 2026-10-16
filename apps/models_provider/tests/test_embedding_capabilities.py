@@ -5,6 +5,8 @@ from django.test import SimpleTestCase
 from common.exception.app_exception import AppApiException
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel, ModelTypeConst
 from models_provider.constants.model_provider_constants import ModelProvideConstants
+from models_provider.impl.aliyun_bai_lian_model_provider.model.embedding import AliyunBaiLianEmbedding
+from models_provider.impl.siliconCloud_model_provider.model.embedding import SiliconCloudEmbeddingModel
 
 
 class MissingImageCapabilityEmbedding(MaxKBBaseEmbeddingModel):
@@ -23,6 +25,19 @@ class TextOnlyEmbedding(MaxKBBaseEmbeddingModel):
 
 
 class EmbeddingCapabilityContractTests(SimpleTestCase):
+    def test_multimodal_model_detection_is_case_insensitive(self):
+        for embedding_class in (AliyunBaiLianEmbedding, SiliconCloudEmbeddingModel):
+            for model_name, expected in (
+                ("qwen3-vl-embedding", True),
+                ("Qwen/Qwen3-VL-Embedding-8B", True),
+                ("EMBEDDING-VISION", True),
+                ("MultiModal-Embedding", True),
+                ("TEXT-EMBEDDING-V4", False),
+                ("", False),
+            ):
+                with self.subTest(provider=embedding_class.__name__, model_name=model_name):
+                    self.assertEqual(embedding_class._is_multimodal(model_name), expected)
+
     def test_capability_declaration_is_abstract(self):
         self.assertTrue(inspect.isabstract(MissingImageCapabilityEmbedding))
 

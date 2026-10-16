@@ -35,6 +35,7 @@ class AliyunBaiLianEmbedding(MaxKBBaseEmbeddingModel):
     @staticmethod
     def _is_multimodal(model_name: str) -> bool:
         """判断模型是否为多模态向量模型（支持图片/视频独立向量）。"""
+        model_name = model_name.lower()
         return any(k in model_name for k in ("vl-embedding", "embedding-vision", "multimodal"))
 
     def supports_image_embedding(self) -> bool:
