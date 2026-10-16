@@ -80,29 +80,20 @@ onMounted(loadPlatformConfig)
 
 <template>
   <MkDrawer v-model="visible" :title="`${platform.name}配置`" @closed="emit('closed')">
-    <div v-loading="loading" class="min-h-40">
+    <div v-loading="loading">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
         <el-form-item v-if="modeField" label="连接方式" required>
-          <div class="w-full space-y-4">
-            <div
-              v-for="option in modeField.options"
-              :key="option.value"
-              class="flex min-h-[74px] w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3"
-              :class="form[modeField.key] === option.value ? 'border-primary!' : 'border-N200'"
-              @click="form[modeField.key] = option.value"
-            >
-              <div class="flex min-w-0 flex-col">
-                <span class="text-N900">{{ option.label }}</span>
-                <span class="mt-0.5 text-N500">{{ option.tip }}</span>
-              </div>
-              <span
-                class="ml-4 flex size-4 shrink-0 items-center justify-center rounded-full border"
-                :class="form[modeField.key] === option.value ? 'border-primary' : 'border-N300'"
-              >
-                <span v-if="form[modeField.key] === option.value" class="size-2 rounded-full bg-primary" />
-              </span>
-            </div>
-          </div>
+          <!-- 选择发布渠道连接方式 -->
+          <el-radio-group v-model="form[modeField.key]" class="w-full space-y-2">
+            <template v-for="option in modeField.options" :key="option.value">
+              <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': form[modeField.key] === option.value }">
+                <el-radio :value="option.value" class="mk-card-radio">
+                  <h6>{{ option.label }}</h6>
+                  <span class="block text-sm text-N600">{{ option.tip }}</span>
+                </el-radio>
+              </el-card>
+            </template>
+          </el-radio-group>
         </el-form-item>
         <template v-for="field in activeFields" :key="field.key">
           <el-form-item :label="field.label" :prop="field.key">
