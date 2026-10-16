@@ -47,7 +47,7 @@ const { knowledge, resourceApi } = useKnowledgeDetailContext()
 
 /* 图片分段详情：取首个分段，弹窗关闭后卸载。 */
 const paragraphDialogRef = ref<InstanceType<typeof ParagraphDialog>>()
-const selectedParagraph = ref<ParagraphItem>()
+const selectedParagraph = ref<ParagraphItem & { source_file_id?: string }>()
 
 function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<DocumentItem> | null) {
   if (loading.value || operationLoading.value || selectedParagraph.value || column?.type === 'selection') return
@@ -57,7 +57,7 @@ function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<Doc
     .then(async (page) => {
       const paragraph = page.records[0]
       if (!paragraph) return
-      selectedParagraph.value = paragraph
+      selectedParagraph.value = { ...paragraph, source_file_id: document.meta?.source_file_id as string | undefined }
       await nextTick()
       paragraphDialogRef.value?.open(paragraph)
     })
@@ -315,7 +315,7 @@ onBeforeUnmount(() => {
         >
           <template #prefix>
             <!-- 图片 -->
-            <el-image class="h-7.5! w-7.5!" :src="getFileUrl(row.meta?.source_file_id as string | undefined)" :alt="row.name" fit="cover" />
+            <el-image class="size-7.5" :src="getFileUrl(row.meta?.source_file_id as string | undefined)" :alt="row.name" fit="cover" />
           </template>
         </MkEditName>
       </template>
@@ -594,8 +594,10 @@ onBeforeUnmount(() => {
   <ParagraphDialog
     v-if="selectedParagraph"
     ref="paragraphDialogRef"
+    title="图片详情"
     :knowledge-id="knowledgeId"
     :document-id="selectedParagraph.document_id"
+    :source-file-id="selectedParagraph.source_file_id"
     @success="refreshAfterOperation"
     @closed="selectedParagraph = undefined"
   />

@@ -307,7 +307,7 @@ defineExpose({ clearFiles, handleRemove })
               <el-image
                 :src="(file.raw ? imagePreviewUrls.get(file.raw) : undefined) ?? file.url"
                 fit="cover"
-                class="h-26! w-26!"
+                class="size-26"
                 :class="{ 'border-danger!': file.status === 'fail' }"
               ></el-image>
 

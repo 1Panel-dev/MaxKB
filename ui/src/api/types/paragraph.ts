@@ -40,6 +40,7 @@ export interface ProblemBatchAssociationPayload {
 
 export interface ParagraphDetail extends ParagraphItem {
   problem_list: ParagraphProblem[]
+  source_file_id?: string | null
 }
 
 export interface ParagraphUpdatePayload {

@@ -230,6 +230,9 @@ Workspace 共享只读，隐藏创建、编辑、排序、关联修改及批量�
 
 `paragraph-dialog/` 使用 `CreateParagraphDialog` 和 `ParagraphDialog`（详情／编辑），组合
 `ParagraphForm`、`ParagraphPreview`、`ParagraphQuestions`。创建可指定插入位置；正文表单支持 Markdown 和知识库图片上传。
+`ParagraphDialog` 的 `title` 可自定义详情标题，默认“分段详情”，图片列表传入“图片详情”；编辑模式标题为“编辑”。
+图片列表将行数据的 `meta.source_file_id` 通过 `ParagraphDialog.sourceFileId` 传入，预览合并为分段的 `source_file_id`；
+仅存在文件 ID 时展示图片，图片与 Markdown 正文共用滚动区域，保存正文后保留图片。
 问题区使用远程候选和即时关联／解除，不删除问题本身；无分段 ID 时保存本地问题草稿，随新增提交。
 正文保存不提交或回填 `problem_list`，避免覆盖并行关联操作；取消编辑不撤销问题修改。
 问题区请求状态独立，不阻止正文保存／关闭；共享模式只展示，不查询可关联候选。

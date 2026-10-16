@@ -5,8 +5,22 @@ import { formatFileSize } from '@/utils/number'
 import { inputShortcut } from '../../core/shortcuts'
 import { useMessageInputStore } from './index'
 
-const { question, fileList, maxFiles, maxSizeMB, acceptList, streamLoading, disabled, placeholder, canSend, imageFiles, addFiles, removeFile, send, stop } =
-  useMessageInputStore()
+const {
+  question,
+  fileList,
+  maxFiles,
+  maxSizeMB,
+  acceptList,
+  streamLoading,
+  disabled,
+  placeholder,
+  canSend,
+  imageFiles,
+  addFiles,
+  removeFile,
+  send,
+  stop,
+} = useMessageInputStore()
 
 // 选择和粘贴附件统一交给输入 Store 处理。
 const fileInputRef = ref<HTMLInputElement | null>(null)
@@ -41,7 +55,14 @@ const handleKeydown = (event: KeyboardEvent) => {
       <template v-for="(file, index) in fileList" :key="file.uid">
         <div class="group relative shrink-0">
           <!-- 图片 -->
-          <el-image v-if="imageFiles.includes(file)" :src="file.url || file.previewUrl" :alt="file.name" :title="file.name" fit="cover" />
+          <el-image
+            class="size-8"
+            v-if="imageFiles.includes(file)"
+            :src="file.url || file.previewUrl"
+            :alt="file.name"
+            :title="file.name"
+            fit="cover"
+          />
           <!-- 音频 -->
           <MkAudio v-else-if="isAudio(file.name)" :src="file.previewUrl || file.url || ''" :name="file.name">
             <el-card shadow="never" class="small w-60 rounded-lg! cursor-pointer">

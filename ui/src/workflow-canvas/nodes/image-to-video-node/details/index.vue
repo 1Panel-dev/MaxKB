@@ -33,25 +33,17 @@ defineProps<{
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">首帧</h6>
       <div class="whitespace-pre-wrap space-y-2">
-        <el-image
-          v-if="typeof data.first_frame_url === 'string'"
-          :src="data.first_frame_url"
-          fit="cover"
-          :zoom-rate="1.2"
-          :max-scale="7"
-          :min-scale="0.2"
-        />
+        <el-image class="size-8" v-if="typeof data.first_frame_url === 'string'" :src="data.first_frame_url" fit="cover" />
         <div v-else-if="Array.isArray(data.first_frame_url)" class="flex flex-wrap gap-2">
           <el-image
+            class="size-8"
             v-for="(f, i) in data.first_frame_url"
             :key="i"
             :src="f.url"
             fit="cover"
             :preview-src-list="data.first_frame_url.map((img: any) => img.url)"
+            :scale="0.8"
             :initial-index="i"
-            :zoom-rate="1.2"
-            :max-scale="7"
-            :min-scale="0.2"
           />
         </div>
         <template v-else>-</template>
@@ -61,25 +53,17 @@ defineProps<{
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">末帧</h6>
       <div class="whitespace-pre-wrap space-y-2">
-        <el-image
-          v-if="typeof data.last_frame_url === 'string'"
-          :src="data.last_frame_url"
-          fit="cover"
-          :zoom-rate="1.2"
-          :max-scale="7"
-          :min-scale="0.2"
-        />
+        <el-image class="size-8" v-if="typeof data.last_frame_url === 'string'" :src="data.last_frame_url" fit="cover" />
         <div v-else-if="Array.isArray(data.last_frame_url)" class="flex flex-wrap gap-2">
           <el-image
+            class="size-8"
             v-for="(f, i) in data.last_frame_url"
             :key="i"
             :src="f.url"
             fit="cover"
             :preview-src-list="data.last_frame_url.map((img: any) => img.url)"
+            :scale="0.8"
             :initial-index="i"
-            :zoom-rate="1.2"
-            :max-scale="7"
-            :min-scale="0.2"
           />
         </div>
         <template v-else>-</template>

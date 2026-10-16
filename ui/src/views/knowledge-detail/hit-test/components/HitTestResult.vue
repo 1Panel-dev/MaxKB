@@ -22,6 +22,7 @@ defineProps<{ paragraph: KnowledgeHitTestResult; index: number }>()
       :src="paragraph.hit_asset.url"
       :alt="paragraph.hit_asset.caption || paragraph.hit_asset.file_name"
       :preview-src-list="[paragraph.hit_asset.url]"
+      :scale="0.8"
       preview-teleported
       fit="contain"
       class="mt-3 h-40 max-w-full rounded-md"

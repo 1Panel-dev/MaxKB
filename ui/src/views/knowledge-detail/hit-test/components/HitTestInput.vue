@@ -128,6 +128,7 @@ onBeforeUnmount(() => {
             :alt="image.name"
             :title="image.name"
             :preview-src-list="[image.previewUrl]"
+            :scale="0.8"
             preview-teleported
             fit="cover"
             class="size-20 rounded-lg border"

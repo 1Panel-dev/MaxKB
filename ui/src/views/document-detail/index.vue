@@ -486,6 +486,7 @@ onMounted(() => {
   <EditParagraphDialog
     v-if="editDialogMounted"
     ref="editDialogRef"
+    title="分段详情"
     :knowledge-id="knowledgeId"
     :document-id="documentId"
     @success="handleReplaceParagraph"

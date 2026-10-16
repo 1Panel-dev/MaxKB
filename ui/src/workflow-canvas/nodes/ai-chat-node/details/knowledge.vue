@@ -28,14 +28,7 @@ defineProps<{
       <div class="whitespace-pre-wrap space-y-2">
         <template v-if="Array.isArray(data.question)">
           <div v-for="(item, qIndex) in data.question" :key="qIndex">
-            <el-image
-              v-if="item.type === 'image_url'"
-              :src="item.image_url?.url || item.image_url"
-              fit="cover"
-              :zoom-rate="1.2"
-              :max-scale="7"
-              :min-scale="0.2"
-            />
+            <el-image class="size-8" v-if="item.type === 'image_url'" :src="item.image_url?.url || item.image_url" fit="cover" />
             <video
               v-else-if="item.type === 'video_url'"
               :src="item.video_url?.url || item.video_url"
