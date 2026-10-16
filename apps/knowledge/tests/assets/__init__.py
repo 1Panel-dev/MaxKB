@@ -1,0 +1,1 @@
+"""Knowledge assets regression tests."""

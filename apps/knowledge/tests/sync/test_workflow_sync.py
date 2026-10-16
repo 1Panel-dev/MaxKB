@@ -2,19 +2,23 @@ from copy import deepcopy
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from django.test import SimpleTestCase
-
 from common.auth.struct.auth import Principal
 from common.constants.authentication_type import UserType
+from django.test import SimpleTestCase
 from knowledge.models import (
     Document,
     DocumentResourceType,
+    Knowledge,
+    KnowledgeSyncLog,
+    KnowledgeSyncStatus,
     KnowledgeSyncType,
     KnowledgeType,
-    Knowledge,
     KnowledgeWorkflow,
     KnowledgeWorkflowVersion,
 )
+from knowledge.models.knowledge_action import State
+from knowledge.serializers.knowledge_sync import KnowledgeSyncLogSerializer
+from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer, finalize_knowledge_action
 from knowledge.services.workflow_sync import (
     _delete_workflow_documents,
     finalize_workflow_complete_snapshot,
@@ -22,11 +26,8 @@ from knowledge.services.workflow_sync import (
     workflow_document_identity,
 )
 from knowledge.services.workflow_sync_source import tool_document_source_meta, workflow_source_meta
-from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer, finalize_knowledge_action
-from knowledge.models import KnowledgeSyncLog, KnowledgeSyncStatus
-from knowledge.models.knowledge_action import State
-from knowledge.serializers.knowledge_sync import KnowledgeSyncLogSerializer
 from knowledge.task.sync import scheduled_sync_workflow_knowledge
+from knowledge.tests.sync.helpers import SnapshotQuery
 from knowledge.views.knowledge_workflow import KnowledgeWorkflowUploadDocumentView
 
 
@@ -83,42 +84,6 @@ class WorkflowSourceMetaTests(SimpleTestCase):
         other = Document(name="old", meta={"source_scope": "scope-b", "token": "token"})
         self.assertEqual(workflow_document_identity(first), workflow_document_identity(renamed))
         self.assertNotEqual(workflow_document_identity(first), workflow_document_identity(other))
-
-
-class SnapshotQuery:
-    """Evaluate the queryset predicates against mixed-source regression fixtures."""
-
-    def __init__(self, documents):
-        self.documents = documents
-
-    def filter(self, **filters):
-        def matches(document):
-            for lookup, expected in filters.items():
-                value = document
-                parts = lookup.split("__")
-                less_than = parts[-1] == "lt"
-                for field in parts[:-1] if less_than else parts:
-                    value = value.get(field) if isinstance(value, dict) else getattr(value, field, None)
-                if less_than:
-                    if not value < expected:
-                        return False
-                elif value != expected:
-                    return False
-            return True
-
-        return SnapshotQuery([document for document in self.documents if matches(document)])
-
-    def none(self):
-        return SnapshotQuery([])
-
-    def values_list(self, field, flat=False):
-        return [getattr(document, field) for document in self.documents]
-
-    def count(self):
-        return len(self.documents)
-
-    def __iter__(self):
-        return iter(self.documents)
 
 
 class WorkflowSnapshotIsolationTests(SimpleTestCase):

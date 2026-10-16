@@ -102,7 +102,16 @@ Settings files:
 
 ```bash
 cd apps && python manage.py test
+cd apps && python manage.py test knowledge.tests.retrieval
+cd apps && python manage.py test knowledge.tests.retrieval.test_vector_metadata
 ```
+
+Keep backend tests in each app's `tests/` package with `test_*.py` modules. Apps with a single
+legacy `tests.py` can be converted when adding more modules. Knowledge tests are grouped into
+`documents/`, `imports/`, `assets/`, `retrieval/`, and `sync/`; knowledge-base creation and editing
+tests live in `tests/test_knowledge.py`. Every test directory needs an `__init__.py`; keep it free
+of test imports to avoid duplicate discovery. Shared test fixtures belong in helper modules,
+not in another test module.
 
 ## Code Style
 

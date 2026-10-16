@@ -78,6 +78,6 @@ GET/DELETE 返回 405。不提供旧 SSE 或 OAuth 自动发现。带 Origin 的
 
 ## 验证
 
-`python apps/manage.py test knowledge.test_external_retrieval` 包含两开关规则、旧库兼容、
+`python apps/manage.py test knowledge.tests.retrieval.test_external_retrieval` 包含两开关规则、旧库兼容、
 原有 Key、授权撤销、跨库过滤、管理员调试、JSON-RPC 和真实 MCP Python SDK 的内存 HTTP 往返测试。
 真实 PostgreSQL/pgvector、模型供应商和外部客户端仍需在配置好的测试环境完成部署验收。

@@ -43,7 +43,7 @@
 
 ## 验证
 
-`python apps/manage.py test knowledge.test_archive` 覆盖真实 ZIP/JSON/XLSX 序列化往返、
+`python apps/manage.py test knowledge.tests.imports.test_archive` 覆盖真实 ZIP/JSON/XLSX 序列化往返、
 旧格式导入、图片二进制与关联恢复、设置/统计/工作流保留、长正文、空文档、原始文件选项、
 跨知识库文件保护以及损坏归档校验。数据库和文件存储写入在这些单元测试中被隔离；真实
 PostgreSQL、对象存储和调度器仍需在配置好的集成环境验收。

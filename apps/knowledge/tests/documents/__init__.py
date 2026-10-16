@@ -1,0 +1,1 @@
+"""Knowledge documents regression tests."""

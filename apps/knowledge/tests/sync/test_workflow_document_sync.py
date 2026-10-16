@@ -2,16 +2,16 @@ from copy import deepcopy
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from django.test import SimpleTestCase
-
 from application.workflow.nodes.data_source_web_node.data_source_web_node import DataSourceWebNode
 from common.auth.struct.auth import Principal
 from common.constants.authentication_type import UserType
 from common.exception.app_exception import AppApiException
 from common.utils.fork import Fork
+from django.test import SimpleTestCase
 from knowledge.models import (
     Document,
     DocumentResourceType,
+    File,
     Knowledge,
     KnowledgeSyncLog,
     KnowledgeSyncStatus,
@@ -19,10 +19,10 @@ from knowledge.models import (
     KnowledgeSyncType,
     KnowledgeType,
     KnowledgeWorkflow,
-    File,
 )
-from knowledge.models.knowledge_action import State
+from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.document import DocumentSerializers
+from knowledge.serializers.knowledge_sync import KnowledgeSyncLogQuerySerializer
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer, finalize_knowledge_action
 from knowledge.services.workflow_document_sync import (
     sync_workflow_web_document,
@@ -33,11 +33,8 @@ from knowledge.services.workflow_sync import (
     finalize_workflow_complete_snapshot,
     merge_workflow_incremental_snapshot,
 )
-from knowledge.serializers.knowledge_sync import KnowledgeSyncLogQuerySerializer
-from knowledge.models.knowledge_action import KnowledgeAction
-from knowledge.test_workflow_sync import SnapshotQuery
+from knowledge.tests.sync.helpers import SnapshotQuery
 from knowledge.views.document import DocumentView
-
 
 KNOWLEDGE_ID = "00000000-0000-0000-0000-000000000021"
 DOCUMENT_ID = "00000000-0000-0000-0000-000000000022"
