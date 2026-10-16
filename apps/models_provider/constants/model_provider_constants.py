@@ -24,6 +24,7 @@ from models_provider.impl.xf_model_provider.xf_model_provider import XunFeiModel
 from models_provider.impl.xinference_model_provider.xinference_model_provider import XinferenceModelProvider
 from models_provider.impl.minimax_model_provider.minimax_model_provider import MiniMaxModelProvider
 from models_provider.impl.zhipu_model_provider.zhipu_model_provider import ZhiPuModelProvider
+from models_provider.impl.webwright_model_provider.webwright_model_provider import WebWrightModelProvider
 
 
 class ModelProvideConstants(Enum):
@@ -48,3 +49,4 @@ class ModelProvideConstants(Enum):
     model_siliconCloud_provider = SiliconCloudModelProvider()
     model_regolo_provider = RegoloModelProvider()
     model_minimax_provider = MiniMaxModelProvider()
+    model_webwright_provider = WebWrightModelProvider()
