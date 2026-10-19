@@ -239,7 +239,7 @@ export function provideKnowledgeDetailContext(state: KnowledgeDetailState) {
   return context
 }
 
-/** 根据消费方声明的范围，从现有完整 API 对象推导类型，不补造方法。 */
+/** 根据声明的范围，从现有完整 API 对象推导类型，不补造方法。 */
 type ScopedResourceApi<Scope extends ResourceScope> = {
   readonly [Module in keyof KnowledgeResourceApi]: Scope extends ResourceScope
     ? Module extends keyof (typeof resourceConfigs)[Scope]['resourceApi']

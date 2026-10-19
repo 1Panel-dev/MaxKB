@@ -60,7 +60,6 @@ const userInputTitle = computed(() => knowledgeBaseNode.value?.properties?.user_
 const showNext = computed(() => hasKnowledgeBaseInput.value && active.value === 'data_source')
 const showPrev = computed(() => hasKnowledgeBaseInput.value && active.value === 'knowledge_base')
 const showImport = computed(() => (hasKnowledgeBaseInput.value ? active.value === 'knowledge_base' : active.value === 'data_source'))
-const busy = computed(() => loading.value || uploadingCount.value > 0)
 function open(workflow?: LogicFlow.GraphConfigData) {
   currentWorkflow.value = workflow ?? null
   visible.value = true
@@ -80,7 +79,7 @@ function getActionData() {
   return data
 }
 function handleNext() {
-  if (busy.value) return
+  if (loading.value || uploadingCount.value > 0) return
   return actionRef.value
     ?.validate()
     .then(() => {
@@ -94,12 +93,12 @@ function handleNext() {
     })
 }
 function handlePrevious() {
-  if (busy.value) return
+  if (loading.value || uploadingCount.value > 0) return
   formPayload.value.knowledge_base = actionRef.value?.getData() ?? {}
   active.value = 'data_source'
 }
 function handleSubmit() {
-  if (busy.value || active.value === 'result' || !actionRef.value) return
+  if (loading.value || uploadingCount.value > 0 || active.value === 'result' || !actionRef.value) return
   const step = active.value
   loading.value = true
   return actionRef.value
@@ -122,7 +121,7 @@ function handleSubmit() {
     })
 }
 function handleContinueImport() {
-  if (busy.value) return
+  if (loading.value || uploadingCount.value > 0) return
   formPayload.value = { data_source: {}, knowledge_base: {} }
   actionId.value = undefined
   actionKey.value += 1
@@ -160,13 +159,13 @@ defineExpose({ open })
     </div>
     <template #footer>
       <!-- 取消导入 -->
-      <el-button v-if="active !== 'result'" plain :disabled="busy" @click="visible = false">取消</el-button>
+      <el-button v-if="active !== 'result'" plain :disabled="loading || uploadingCount > 0" @click="visible = false">取消</el-button>
       <!-- 继续导入 -->
       <el-button v-if="active === 'result'" plain @click="handleContinueImport">继续导入</el-button>
       <!-- 返回数据源 -->
-      <el-button v-if="showPrev" plain :disabled="busy" @click="handlePrevious">上一步</el-button>
+      <el-button v-if="showPrev" plain :disabled="loading || uploadingCount > 0" @click="handlePrevious">上一步</el-button>
       <!-- 进入用户输入 -->
-      <el-button v-if="showNext" type="primary" :disabled="busy" @click="handleNext">下一步</el-button>
+      <el-button v-if="showNext" type="primary" :disabled="loading || uploadingCount > 0" @click="handleNext">下一步</el-button>
       <!-- 执行工作流导入 -->
       <el-button v-if="showImport" type="primary" :loading="loading" :disabled="uploadingCount > 0" @click="handleSubmit">开始导入</el-button>
       <!-- 完成导入 -->

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import type { ProblemItem, ProblemParagraph } from '@/api/types'
 import MkEditName from '@/components/mk-edit-name/index.vue'
 import { MsgSuccess } from '@/utils/message'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { useDocumentDetailContext } from '@/views/document-detail/context'
 import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
-import ProblemParagraphCard from './ProblemParagraphCard.vue'
+import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'ProblemDetailDrawer' })
 const problem = defineModel<ProblemItem>({ required: true })
-const props = defineProps<{ hasPrevious: boolean; hasNext: boolean; listLoading: boolean }>()
+defineProps<{ hasPrevious: boolean; hasNext: boolean }>()
 const emit = defineEmits<{ previous: []; next: []; refresh: []; closed: [] }>()
 const { knowledgeId, resourceApi } = useKnowledgeDetailContext()
 const { resourceApi: documentResourceApi } = useDocumentDetailContext()
@@ -20,7 +20,6 @@ const loadFailed = ref(false)
 const paragraphs = ref<ProblemParagraph[]>([])
 const selectedParagraph = ref<ProblemParagraph>()
 const paragraphDialogRef = ref<InstanceType<typeof ParagraphDialog>>()
-const busy = computed(() => loading.value || props.listLoading)
 
 function loadParagraphs() {
   loadFailed.value = false
@@ -55,7 +54,7 @@ function handleSaveProblem(content: string): Promise<string> {
 }
 
 function handleUnlinkParagraph(paragraph: ProblemParagraph) {
-  if (busy.value) return
+  if (loading.value) return
   loading.value = true
   return (
     documentResourceApi.paragraph
@@ -75,7 +74,7 @@ function handleUnlinkParagraph(paragraph: ProblemParagraph) {
 }
 
 async function handleOpenParagraph(paragraph: ProblemParagraph) {
-  if (busy.value) return
+  if (loading.value) return
   selectedParagraph.value = paragraph
   // 先挂载带有当前文档 ID 的详情弹窗，再调用其已有打开方法。
   await nextTick()
@@ -90,7 +89,7 @@ function handleParagraphClosed() {
 }
 
 function handleBeforeClose(done: () => void) {
-  if (!busy.value) done()
+  if (!loading.value) done()
 }
 
 watch(
@@ -113,7 +112,28 @@ watch(
       <div class="mb-2">关联分段数（{{ problem.paragraph_count }}）</div>
       <div v-if="paragraphs.length" class="flex-column gap-3">
         <template v-for="paragraph in paragraphs" :key="paragraph.id">
-          <ProblemParagraphCard :paragraph="paragraph" :disabled="busy" @open="handleOpenParagraph" @unlink="handleUnlinkParagraph" />
+          <!-- 查看关联分段详情 -->
+          <el-card class="mk-paragraph-card group relative cursor-pointer" shadow="never" @click="handleOpenParagraph(paragraph)">
+            <h4 class="mb-2 truncate pr-8" :title="paragraph.title || '-'">{{ paragraph.title || '-' }}</h4>
+            <p class="mb-3 line-clamp-2 break-words" :title="paragraph.content">{{ paragraph.content }}</p>
+            <div class="flex-align-center gap-2 text-sm text-N500">
+              <span class="shrink-0">{{ paragraph.content.length }} 字符</span>
+              <el-divider direction="vertical" />
+              <img :src="getFileIconUrl(paragraph.document_name)" class="size-4 shrink-0" alt="" />
+              <span class="truncate" :title="paragraph.document_name">{{ paragraph.document_name }}</span>
+            </div>
+            <!-- 取消当前问题与分段的关联，不删除分段 -->
+            <MkTooltip content="取消关联" placement="top">
+              <el-button
+                circle
+                class="group-hover-visible absolute top-3 right-3 shadow-md"
+                :disabled="loading"
+                @click.stop="handleUnlinkParagraph(paragraph)"
+              >
+                <MkIcon name="icon_unlink_outlined" />
+              </el-button>
+            </MkTooltip>
+          </el-card>
         </template>
       </div>
       <MkEmpty v-else-if="!loading" description="暂无关联分段" />
@@ -122,9 +142,9 @@ watch(
       <!-- 关联分段：TODO -->
       <el-button plain>关联分段</el-button>
       <!-- 查看上一个问题 -->
-      <el-button plain :disabled="busy || !hasPrevious" @click="emit('previous')">上一个</el-button>
+      <el-button plain :disabled="loading || !hasPrevious" @click="emit('previous')">上一个</el-button>
       <!-- 查看下一个问题 -->
-      <el-button plain :disabled="busy || !hasNext" @click="emit('next')">下一个</el-button>
+      <el-button plain :disabled="loading || !hasNext" @click="emit('next')">下一个</el-button>
     </template>
   </MkDrawer>
   <ParagraphDialog
