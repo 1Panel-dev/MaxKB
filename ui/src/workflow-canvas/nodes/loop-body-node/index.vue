@@ -100,7 +100,7 @@ const renderGraphData = (data?: LogicFlow.GraphConfigData) => {
     textEdit: false,
     adjustEdge: false,
     adjustEdgeStartAndEnd: false,
-    background: { backgroundColor: '#f5f6f7' },
+    background: { background: '#f5f6f7' },
     grid: { size: 20, type: 'dot', config: { color: '#DEE0E3', thickness: 1 } },
     keyboard: { enabled: true },
     isSilentMode: false,
@@ -166,6 +166,8 @@ onMounted(() => {
   set(model, 'set_loop_body', setLoopBody)
   set(model, 'validate', validate)
   set(model, 'loopLayout', loopLayout)
+  // 供工作流 AI 生成按循环节点 id 定位循环体画布
+  set(model, 'getLoopLogicFlow', () => lf.value)
 })
 
 onUnmounted(() => {

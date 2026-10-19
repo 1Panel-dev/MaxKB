@@ -21,6 +21,7 @@ const getAllTags = (knowledgeIds: string[]) => {
 
 export default {
   postPromptGenerate: modelAPI.postPromptGenerate,
+  postChatCompletion: modelAPI.postChatCompletion,
   getModelListWithShared: modelAPI.getModelListWithShared,
   getProviderList: providerAPI.getProviderList,
   getModelParamsForm: modelAPI.getModelParamsForm,

@@ -105,6 +105,21 @@ export interface PromptGeneratePayload {
   model_params_setting?: Record<string, unknown>
 }
 
+/** 通用流式补全的 OpenAI 格式消息（工作流 AI 生成的 agent 循环使用）。 */
+export interface ChatCompletionMessage {
+  role: 'system' | 'user' | 'assistant' | 'tool'
+  content: string
+  tool_calls?: Array<{ id: string; type: string; function: { name: string; arguments: string } }>
+  tool_call_id?: string
+  reasoning_content?: string
+}
+
+export interface ChatCompletionPayload {
+  messages: ChatCompletionMessage[]
+  tools?: Array<{ type: 'function'; function: { name: string; description: string; parameters: Record<string, unknown> } }>
+  model_params_setting?: Record<string, unknown>
+}
+
 /** 智能体模板复用工作流模板的展示与下载元数据。 */
 export type ApplicationStoreTemplate = WorkflowStoreTemplate
 

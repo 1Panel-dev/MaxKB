@@ -13,6 +13,7 @@ import SystemResourceWorkflowApi from '@/api/admin/system/resource-management/ap
 import type { ApplicationDetail, ApplicationStoreTemplate, DefaultModelSettingPayload, WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
+import AiGeneratePanel from '@/workflow-canvas/ai-generate/panel/AiGeneratePanel.vue'
 import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
@@ -21,6 +22,7 @@ import ButtonPublishHistory from './ButtonPublishHistory.vue'
 import ButtonTemplateStore from './ButtonTemplateStore.vue'
 import DebugPanel from '@/conversation-panel/view/debug/index.vue'
 import EditPublishVersionDialog from '../components/publish-history/EditPublishVersionDialog.vue'
+import { showWorkflowValidateError } from '../components/validate-error'
 import { getResourceScope, isSystemResource } from '@/utils/resource-context.ts'
 import { goBack } from './navigation'
 
@@ -40,6 +42,14 @@ const route = useRoute()
 const applicationId = route.params.applicationId as string
 
 const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflowRef')
+const aiGeneratePanelRef = useTemplateRef<InstanceType<typeof AiGeneratePanel>>('aiGeneratePanelRef')
+
+/* AI 生成：在当前画布上按需求搭建并配置工作流 */
+function handleOpenAiGenerate() {
+  if (loading.value || historyVisible.value) return
+  closeDebug()
+  aiGeneratePanelRef.value?.open()
+}
 
 /* 智能体工作流加载与保存 */
 const applicationDetail = ref<ApplicationDetail>()
@@ -231,9 +241,7 @@ function handleOpenPublish() {
       closeDebug()
       publishDialogRef.value?.open()
     })
-    .catch(() => {
-      // 画布校验失败时保留编辑态，错误由画布提示。
-    })
+    .catch(showWorkflowValidateError)
     .finally(() => {
       loading.value = false
     })
@@ -332,6 +340,12 @@ onBeforeUnmount(() => stopAutoSave())
       <ApplicationIcon :icon="applicationDetail?.icon" :size="32" class="shrink-0" />
     </template>
     <template #actions>
+      <!-- AI 生成工作流 -->
+      <el-button plain :disabled="loading || !!previewVersion" @click="handleOpenAiGenerate">
+        <MkIcon name="icon_star" />
+        <span>AI 生成</span>
+      </el-button>
+
       <!-- 模板中心 -->
       <ButtonTemplateStore ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
 
@@ -400,6 +414,12 @@ onBeforeUnmount(() => stopAutoSave())
         class="h-full"
         :default-model-settings="defaultModelSetting"
         :loop-workflow-mode="WorkflowMode.ApplicationLoop"
+        :workflow-mode="WorkflowMode.Application"
+      />
+      <AiGeneratePanel
+        ref="aiGeneratePanelRef"
+        :get-logic-flow="() => workflowRef?.getLogicFlow()"
+        :default-model-settings="defaultModelSetting"
         :workflow-mode="WorkflowMode.Application"
       />
     </div>

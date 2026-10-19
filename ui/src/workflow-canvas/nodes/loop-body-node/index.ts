@@ -1,11 +1,13 @@
 import LoopBodyNodeVue from './index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import type LogicFlow from '@logicflow/core'
 import type { Model } from '@logicflow/core'
 
 class LoopBodyModel extends WorkflowNodeModel {
   setLoopBody?: () => void
   loopLayout?: () => void
+  getLoopLogicFlow?: () => LogicFlow | null
 
   getDefaultAnchor(): Model.AnchorConfig[] {
     return [{ x: this.x, y: this.y - this.height / 2, id: `${this.id}_children`, type: 'children', edgeAddable: false }]

@@ -192,7 +192,7 @@ export async function downloadRequest(url: string, method: string, data?: unknow
 }
 
 /** 发送 POST 请求并返回可逐块读取的原始响应。 */
-export function postStream(base: string, path: string, data?: unknown): Promise<Response> {
+export function postStream(base: string, path: string, data?: unknown, signal?: AbortSignal): Promise<Response> {
   const { auth, user } = useStore()
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (auth.token) {
@@ -205,6 +205,7 @@ export function postStream(base: string, path: string, data?: unknown): Promise<
     method: 'POST',
     headers,
     body: data === undefined ? undefined : JSON.stringify(data),
+    signal,
   })
 }
 

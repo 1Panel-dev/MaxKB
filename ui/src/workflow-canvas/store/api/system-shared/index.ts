@@ -14,6 +14,7 @@ const getAllTags = (knowledgeIds: string[]) => get<KnowledgeTagGroup[]>('/system
 
 export default {
   postPromptGenerate: ModelApi.postPromptGenerate,
+  postChatCompletion: ModelApi.postChatCompletion,
   getMcpTools,
   getAllTags,
   getModelListWithShared: ModelApi.getModelListWithShared,

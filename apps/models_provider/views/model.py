@@ -20,9 +20,11 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from models_provider.api.model import DefaultModelResponse, GetModelApi, ModelCreateAPI, ModelEditApi, ModelListResponse
+from models_provider.api.chat_completion import ChatCompletionAPI
 from models_provider.api.prompt_generate import PromptGenerateAPI
 from models_provider.api.provide import ProvideApi
 from models_provider.models import Model
+from models_provider.serializers.chat_completion_serializers import ChatCompletionSerializers
 from models_provider.serializers.model_serializer import ModelSerializer, WorkspaceSharedModelSerializer
 from models_provider.serializers.prompt_generate_serializers import PromptGenerateSerializers
 from rest_framework.request import Request
@@ -413,3 +415,29 @@ class ModelPromptGenerateView(APIView):
         return PromptGenerateSerializers(
             data={**request.data, "workspace_id": workspace_id, "model_id": model_id}
         ).generate_prompt()
+
+
+class ModelChatCompletionView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=["POST"],
+        summary=_("Chat completion"),
+        description=_("Stream chat completion with function calling"),
+        operation_id=_("Chat completion"),  # type: ignore
+        parameters=ChatCompletionAPI.get_parameters(),
+        request=ChatCompletionAPI.get_request(),
+        responses=None,
+        tags=[_("Model")],  # type: ignore
+    )
+    @has_permissions(
+        PermissionConstants.MODEL_READ.get_workspace_model_permission(),
+        PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        RoleConstants.USER.get_workspace_role(),
+    )
+    def post(self, request: Request, workspace_id: str, model_id: str):
+        # agent 循环每轮都会调用，不记操作日志
+        return ChatCompletionSerializers(
+            data={**request.data, "workspace_id": workspace_id, "model_id": model_id}
+        ).chat_completion()

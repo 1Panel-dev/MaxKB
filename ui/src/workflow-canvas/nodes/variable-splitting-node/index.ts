@@ -1,5 +1,6 @@
 import VariableSplittingNodeVue from './index.vue'
 import VariableSplittingNodeDetail from './details/index.vue'
+import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -17,4 +18,4 @@ class VariableSplittingNodeModel extends WorkflowNodeModel {
   }
 }
 
-export default { type: WorkflowNodeType.VariableSplittingNode, model: VariableSplittingNodeModel, view: VariableSplittingNodeView, details: VariableSplittingNodeDetail }
+export default { type: WorkflowNodeType.VariableSplittingNode, model: VariableSplittingNodeModel, view: VariableSplittingNodeView, details: VariableSplittingNodeDetail, agent }

@@ -1,5 +1,6 @@
 import ToolCustomNode from './index.vue'
 import ToolCustomNodeDetail from './details/index.vue'
+import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -9,4 +10,4 @@ class ToolCustomNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.ToolLibCustom, model: WorkflowNodeModel, view: ToolCustomNodeView, details: ToolCustomNodeDetail }
+export default { type: WorkflowNodeType.ToolLibCustom, model: WorkflowNodeModel, view: ToolCustomNodeView, details: ToolCustomNodeDetail, agent }

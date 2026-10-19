@@ -1,4 +1,13 @@
-import type { Dict, DynamicFormField, KnowledgeTagGroup, ModelItem, ModelProviderItem, PromptGeneratePayload, ToolItem } from '@/api/types'
+import type {
+  ChatCompletionPayload,
+  Dict,
+  DynamicFormField,
+  KnowledgeTagGroup,
+  ModelItem,
+  ModelProviderItem,
+  PromptGeneratePayload,
+  ToolItem,
+} from '@/api/types'
 
 export interface McpTool {
   args_schema: Record<string, unknown>
@@ -18,6 +27,7 @@ type ApiModule = {
   getToolById?: (toolId: string) => Promise<ToolItem>
   getKnowledgeTags?: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
   postPromptGenerate: (modelId: string, payload: PromptGeneratePayload) => Promise<Response>
+  postChatCompletion?: (modelId: string, payload: ChatCompletionPayload, signal?: AbortSignal) => Promise<Response>
 }
 
 // 查询默认走缓存，通过 store.force.xxx() 强制刷新；生成请求始终直接转发。
@@ -31,6 +41,7 @@ export type WorkflowStoreApi = {
   getToolById: (toolId: string) => Promise<ToolItem>
   getKnowledgeTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
   postPromptGenerate: (modelId: string, payload: PromptGeneratePayload) => Promise<Response>
+  postChatCompletion: (modelId: string, payload: ChatCompletionPayload, signal?: AbortSignal) => Promise<Response>
 }
 
 type WorkflowStore = WorkflowStoreApi & { force: WorkflowStoreApi }
@@ -80,6 +91,10 @@ export function useWorkflowStore(resourceScope: string): WorkflowStore {
     return {
       // 每次生成都需要独立的响应流，不缓存或复用在途请求。
       postPromptGenerate: requestApi.postPromptGenerate,
+      postChatCompletion(modelId: string, payload: ChatCompletionPayload, signal?: AbortSignal): Promise<Response> {
+        if (!requestApi.postChatCompletion) return Promise.reject(new Error(`当前资源范围不支持流式补全: ${resourceScope}`))
+        return requestApi.postChatCompletion(modelId, payload, signal)
+      },
       getAllTags(knowledgeIds: string[]): Promise<KnowledgeTagGroup[]> {
         if (!requestApi.getAllTags) return Promise.resolve([])
         return withCache(`knowledge-tags:${JSON.stringify(knowledgeIds)}`, () => requestApi.getAllTags!(knowledgeIds), force)

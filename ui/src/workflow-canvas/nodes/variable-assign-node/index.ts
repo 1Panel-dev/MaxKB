@@ -1,5 +1,6 @@
 import VariableAssignNodeVue from './index.vue'
 import VariableAssignNodeDetail from './details/index.vue'
+import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -17,4 +18,4 @@ class VariableAssignNodeModel extends WorkflowNodeModel {
   }
 }
 
-export default { type: WorkflowNodeType.VariableAssignNode, model: VariableAssignNodeModel, view: VariableAssignNodeView, details: VariableAssignNodeDetail }
+export default { type: WorkflowNodeType.VariableAssignNode, model: VariableAssignNodeModel, view: VariableAssignNodeView, details: VariableAssignNodeDetail, agent }

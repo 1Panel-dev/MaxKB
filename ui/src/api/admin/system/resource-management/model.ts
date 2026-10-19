@@ -1,6 +1,6 @@
 import { del, get, post, postStream, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { Dict, DynamicFormField, ModelItem, ModelPayload, PromptGeneratePayload } from '@/api/types'
+import type { Dict, DynamicFormField, ModelItem, ModelPayload, ChatCompletionPayload, PromptGeneratePayload } from '@/api/types'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
 const prefix = '/system/resource/model'
@@ -35,10 +35,25 @@ const getModelParamsForm = (modelId: string) => get<DynamicFormField[]>(`${prefi
 const putModelParamsForm = (modelId: string, payload: DynamicFormField[]) =>
   put<DynamicFormField[], boolean>(`${prefix}/${modelId}/model_params_form`, payload)
 
-
 /** 使用指定模型流式生成或优化系统提示词。 */
 const postPromptGenerate = (modelId: string, payload: PromptGeneratePayload) => {
   return postStream(ADMIN_API_BASE_PATH, `/system/resource/model/${modelId}/prompt_generate`, { ...payload })
 }
 
-export default { getModelPage, getModelListWithShared, getModelDetail, postModel, putModel, deleteModel, getModelParamsForm, putModelParamsForm, postPromptGenerate }
+/** 流式补全（支持 function calling），返回原始 SSE Response；signal 用于中止在途请求。 */
+const postChatCompletion = (modelId: string, payload: ChatCompletionPayload, signal?: AbortSignal) => {
+  return postStream(ADMIN_API_BASE_PATH, `/system/resource/model/${modelId}/chat_completion`, { ...payload }, signal)
+}
+
+export default {
+  getModelPage,
+  getModelListWithShared,
+  getModelDetail,
+  postModel,
+  putModel,
+  deleteModel,
+  getModelParamsForm,
+  putModelParamsForm,
+  postPromptGenerate,
+  postChatCompletion,
+}
