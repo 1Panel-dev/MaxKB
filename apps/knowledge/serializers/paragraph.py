@@ -432,6 +432,7 @@ class ParagraphSerializers(serializers.Serializer):
             # 新加的在最上面
             paragraph.position = 1
             paragraph.save()
+            sync_edited_paragraph_assets(paragraph)
             # 调整位置
             if "position" in instance:
                 if type(instance["position"]) is not int:

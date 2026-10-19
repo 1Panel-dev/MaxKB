@@ -1,4 +1,4 @@
-"""Edited paragraph images are reflected in assets without losing the original image."""
+"""Created and edited paragraph images are reflected in assets without losing the original image."""
 
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
@@ -353,3 +353,67 @@ class ParagraphImageEditTests(SimpleTestCase):
         _, sync = self.edit({"title": "renamed"})
         sync.assert_not_called()
         self.assertEqual(len(self.assets), 1)
+
+    def create(self):
+        self.document.resource_type = DocumentResourceType.DOCUMENT
+        self.assets.clear()
+        operation = ParagraphSerializers.Create(
+            data={
+                "workspace_id": "default",
+                "knowledge_id": str(self.knowledge_id),
+                "document_id": str(self.document.id),
+            }
+        )
+        with (
+            patch.object(
+                operation,
+                "get_paragraph_problem_model",
+                return_value={"paragraph": self.paragraph, "problem_paragraph_object_list": []},
+            ),
+            patch.object(ParagraphSerializers.AdjustPosition, "adjust_position"),
+            patch.object(
+                ParagraphSerializers.Operate,
+                "one",
+                side_effect=lambda **kwargs: {
+                    "id": str(self.paragraph.id),
+                    "content": self.paragraph.content,
+                    "content_schema": self.paragraph.content_schema,
+                    "assets": [{"id": str(asset.id), "file_id": str(asset.file_id)} for asset in self.assets],
+                },
+            ),
+            patch("knowledge.serializers.paragraph.QuerySet"),
+            patch("knowledge.serializers.paragraph.validate_paragraph_file_references"),
+            patch("knowledge.serializers.paragraph.update_document_char_length"),
+        ):
+            return operation.save({"content": self.paragraph.content}, with_embedding=False)
+
+    def test_manual_creation_returns_image_assets_without_waiting_for_embedding(self):
+        result = self.create()
+
+        self.assertEqual(len(self.assets), 1)
+        asset = self.assets[0]
+        self.assertEqual(asset.file_id, self.uploaded.id)
+        self.assertEqual(asset.paragraph_id, self.paragraph.id)
+        self.assertEqual(asset.document_id, self.document.id)
+        self.assertEqual(asset.knowledge_id, self.knowledge_id)
+        self.assertEqual(asset.origin, ContentOrigin.MANUAL)
+        self.assertEqual(asset.process_status, AssetProcessStatus.PENDING)
+        self.assertEqual(result["assets"], [{"id": str(asset.id), "file_id": str(self.uploaded.id)}])
+        image = next(block for block in result["content_schema"] if block["type"] == "image")
+        self.assertEqual(image["asset_id"], str(asset.id))
+        self.assertEqual(result["content"], self.content)
+
+    def test_manual_creation_records_images_when_visual_enhancement_is_disabled(self):
+        self.document.doc_strategy = normalize_document_strategy(None)
+        result = self.create()
+
+        self.assertEqual(len(result["assets"]), 1)
+        self.assertEqual(self.assets[0].process_status, AssetProcessStatus.SKIPPED)
+        self.assertEqual(result["content"], self.content)
+
+    def test_manual_text_creation_does_not_create_image_assets(self):
+        self.paragraph.content = "text only"
+        result = self.create()
+
+        self.assertEqual(result["assets"], [])
+        self.assertEqual(result["content_schema"], [{"type": "text", "content": "text only"}])
