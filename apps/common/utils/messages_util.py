@@ -25,7 +25,7 @@ def to_human_message_list(question):
 
 def to_ai_message_list(messages):
     """
-    将 messages 中的 TEXT / TOOL 内容块转换为 LangChain 消息列表。
+    将 messages 中的 TEXT / HTML / TOOL 内容块转换为 LangChain 消息列表。
     REASONING/FORM/FAILURE 不进历史；按顺序保留交错。
     注意：type 用字面量，避免对 application.workflow.ContentType 产生反向依赖。
     """
@@ -34,7 +34,7 @@ def to_ai_message_list(messages):
         if not isinstance(m, dict):
             continue
         m_type = m.get("type")
-        if m_type == "TEXT":
+        if m_type in ("TEXT", "HTML"):
             if m.get("content"):
                 ai_message_list.append(AIMessage(content=m.get("content")))
         elif m_type == "TOOL":

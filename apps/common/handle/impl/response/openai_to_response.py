@@ -44,7 +44,7 @@ class OpenaiToResponse(BaseToResponse):
     def to_stream(self, chat_id, chat_record_id, block: dict):
         block_type = block.get("type")
         delta_kwargs = {"chat_id": chat_id}
-        if block_type == "TEXT":
+        if block_type in ("TEXT", "HTML"):
             delta_kwargs["content"] = block.get("content", "")
         elif block_type == "REASONING":
             delta_kwargs["reasoning_content"] = block.get("content", "")
@@ -82,7 +82,7 @@ class OpenaiToResponse(BaseToResponse):
 
     def to_block(self, chat_id, chat_record_id, contents: list, usage: dict = None, _status=status.HTTP_200_OK):
         usage = usage or {}
-        answer = "".join(c.get("content", "") for c in (contents or []) if c.get("type") == "TEXT")
+        answer = "".join(c.get("content", "") for c in (contents or []) if c.get("type") in ("TEXT", "HTML"))
         tool_calls = []
         for c in contents or []:
             if c.get("type") != "TOOL":

@@ -541,6 +541,12 @@ msgstr ""
 msgid "Response Type"
 msgstr ""
 
+msgid "Content Type"
+msgstr ""
+
+msgid "Tool reply content must be a JSON object or array"
+msgstr ""
+
 #: apps/application/flow/step_node/direct_reply_node/i_reply_node.py:21
 #: apps/application/flow/step_node/variable_assign_node/i_variable_assign_node.py:13
 msgid "Reference Field"

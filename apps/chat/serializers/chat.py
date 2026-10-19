@@ -16,6 +16,7 @@ import time
 import uuid_utils
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
+from django.db.models.expressions import RawSQL
 from django.http import StreamingHttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -42,6 +43,7 @@ from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.failure_content import FailureContent
 from application.workflow.message_queue import get_message_queue
 from application.workflow.nodes import get_start_node
+from application.workflow.nodes.start_node.start_node import get_default_global_variable
 from application.workflow.workflow_manage import WorkflowManage, CallBack
 from application.workflow.workflow_run_registry import WorkflowRunRegistry
 from knowledge.services.retrieval_access import identity_from_server
@@ -62,6 +64,12 @@ def get_work_flow(application):
     if application.type == "WORK_FLOW":
         return application.work_flow
     return build_workflow(application)
+
+
+def init_chat_variable(workflow_manage, workflow, chat_variable):
+    base_node = workflow.get_node("base-node")
+    chat_input_field_list = base_node.properties.get("chat_input_field_list", []) if base_node else []
+    workflow_manage.context["chat"] = {**get_default_global_variable(chat_input_field_list), **chat_variable}
 
 
 class ChatMessageSerializers(serializers.Serializer):
@@ -224,6 +232,24 @@ class ChatSerializers(serializers.Serializer):
         return {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens}
 
     @staticmethod
+    def update_chat_variable(chat_id, initial_chat_variable, chat_variable):
+        """
+        会话变量落库：只把本次运行改过的 key 合并进 Chat.meta（PG jsonb ||），
+        不 SELECT、不整行 save，同一会话并发时也不会互相覆盖未改动的 key。
+        """
+        if not isinstance(chat_variable, dict):
+            return
+        changed = {k: v for k, v in chat_variable.items() if initial_chat_variable.get(k) != v}
+        if not changed:
+            return
+        try:
+            QuerySet(Chat).filter(id=chat_id).update(
+                meta=RawSQL("COALESCE(meta, '{}'::jsonb) || %s::jsonb", [json.dumps(changed, ensure_ascii=False)])
+            )
+        except Exception as e:
+            maxkb_logger.error(f"update chat variable error [{chat_id}]: {e}")
+
+    @staticmethod
     def update_chat_record(chat_user_id, chat_record_id, workflow_context, messages, details, run_time):
         usage = ChatSerializers._usage_from_details(details)
         message_tokens = usage["prompt_tokens"]
@@ -272,7 +298,9 @@ class ChatSerializers(serializers.Serializer):
         workflow = new_instance(work_flow, WorkflowType.APPLICATION)
 
         chat_record_id_str = str(uuid.uuid7()) if chat_record_id is None else str(chat_record_id)
-        self.ensure_chat_row(message, chat_user)
+        chat = self.ensure_chat_row(message, chat_user)
+        # 会话变量：复用归属校验时已查出的 Chat 行，不额外查询
+        chat_variable = dict(chat.meta) if isinstance(chat.meta, dict) else {}
         if chat_record_id is None:
             ChatRecord(id=chat_record_id_str, **self.get_defaults_record(message_dict)).save(force_insert=True)
 
@@ -302,6 +330,7 @@ class ChatSerializers(serializers.Serializer):
             "video_list": video_list or [],
             "other_list": other_list or [],
             "default_model_setting": default_model_setting,
+            "chat_variable": chat_variable,
         }
 
         result_queue = queue.Queue()
@@ -334,6 +363,7 @@ class ChatSerializers(serializers.Serializer):
             details = wf_manage.get_details(position=position, old_details=old_details)
             run_time = time.time() - wf_manage.start_time
             self.update_chat_record(chat_user_id, chat_record_id_str, wf_manage.context, messages, details, run_time)
+            self.update_chat_variable(chat_id, chat_variable, wf_manage.context.get("chat"))
             ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
             # 表单续跑时 message_dict.content 为空;保留原记录里的用户问题,避免 WORKFLOW 历史丢问题
             question = chat_record.question if (chat_record and chat_record.question) else message_dict
@@ -374,6 +404,7 @@ class ChatSerializers(serializers.Serializer):
                 workflow, parameters, WorkflowType.APPLICATION, call_back, get_start_node_fn
             )
 
+        init_chat_variable(work_flow_manage, workflow, chat_variable)
         work_flow_manage.start_node.workflow_manage = work_flow_manage
         WorkflowRunRegistry.register(chat_record_id_str, str(chat_id), work_flow_manage)
 

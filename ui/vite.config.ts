@@ -37,7 +37,12 @@ const renameHtmlPlugin = (outDir: string, entry: string) => {
   }
 }
 
-const devEntryFallbackPlugin = (entry: string, basePath?: string): Plugin => {
+// 与 Vite proxy 的匹配规则一致：以 ^ 开头按正则匹配，否则按前缀匹配。
+const matchesProxy = (url: string, proxyKeys: string[]) => {
+  return proxyKeys.some((key) => (key.startsWith('^') ? new RegExp(key).test(url) : url.startsWith(key)))
+}
+
+const devEntryFallbackPlugin = (entry: string, proxyKeys: string[], basePath?: string): Plugin => {
   return {
     name: 'dev-entry-fallback',
     configureServer(server: ViteDevServer) {
@@ -69,8 +74,9 @@ const devEntryFallbackPlugin = (entry: string, basePath?: string): Plugin => {
           pathname === normalizedBasePath ||
           (Boolean(normalizedBasePath) && pathname.startsWith(normalizedBasePath))
 
-        // History 模式下，刷新任意前端路由都需要返回当前应用的 HTML 入口。
-        if (acceptsHtml && isAppRoute && !path.extname(pathname)) {
+        // History 模式下，刷新任意前端路由都需要返回当前应用的 HTML 入口；
+        // 该中间件先于 proxy 执行，需代理到后端的地址（如浏览器直接打开的 oss/file）不能回退。
+        if (acceptsHtml && isAppRoute && !path.extname(pathname) && !matchesProxy(req.url, proxyKeys)) {
           req.url = `/${entry}`
         }
 
@@ -127,7 +133,7 @@ const createProxyConfig = (env: Record<string, string>) => {
       rewrite: (path) => stripBasePath(path, basePath),
     },
   }
-
+  console.log(basePath)
   if (basePath) {
     proxy[`^${basePath}.+/oss/file/.*$`] = {
       target: backendTarget,
@@ -161,6 +167,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, envDir, '')
   const entry = env.VITE_ENTRY || 'index.html'
   const port = Number(env.VITE_APP_PORT || 5173)
+  const proxy = createProxyConfig(env)
 
   return {
     base: './',
@@ -173,7 +180,7 @@ export default defineConfig(({ mode }) => {
       }),
       vue(),
       vueJsx(),
-      devEntryFallbackPlugin(entry, env.VITE_BASE_PATH),
+      devEntryFallbackPlugin(entry, Object.keys(proxy), env.VITE_BASE_PATH),
       renameHtmlPlugin(createOutDir(env.VITE_BASE_PATH), entry),
     ],
     server: {
@@ -181,7 +188,7 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       port,
       strictPort: true,
-      proxy: createProxyConfig(env),
+      proxy,
     },
     build: {
       outDir: createOutDir(env.VITE_BASE_PATH),

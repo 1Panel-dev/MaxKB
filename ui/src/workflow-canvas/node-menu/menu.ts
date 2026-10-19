@@ -18,6 +18,7 @@ export const knowledgeMenuNodes = [
     label: 'AI 能力',
     list: [
       NodeData.aiChatNode,
+      NodeData.llmNode,
       NodeData.intentNode,
       NodeData.textToSpeechNode,
       NodeData.speechToTextNode,
@@ -41,6 +42,7 @@ export const menuNodes = [
     label: 'AI 能力',
     list: [
       NodeData.aiChatNode,
+      NodeData.llmNode,
       NodeData.intentNode,
       NodeData.textToSpeechNode,
       NodeData.speechToTextNode,
@@ -65,6 +67,7 @@ export const applicationLoopMenuNodes = [
     label: 'AI 能力',
     list: [
       NodeData.aiChatNode,
+      NodeData.llmNode,
       NodeData.intentNode,
       NodeData.textToSpeechNode,
       NodeData.speechToTextNode,
@@ -91,6 +94,7 @@ export const knowledgeLoopMenuNodes = [
     label: 'AI 能力',
     list: [
       NodeData.aiChatNode,
+      NodeData.llmNode,
       NodeData.intentNode,
       NodeData.textToSpeechNode,
       NodeData.speechToTextNode,
@@ -111,11 +115,12 @@ export const knowledgeLoopMenuNodes = [
 ]
 export const toolLoopMenuNodes = [
   { label: '数据源', list: [NodeData.dataSourceLocalNode, NodeData.dataSourceWebNode] },
-  { label: '知识库', list: [NodeData.documentSplitNode, NodeData.knowledgeWriteNode, NodeData.documentExtractNode] },
+  { label: '知识库', list: [NodeData.searchKnowledgeNode,NodeData.documentSplitNode, NodeData.knowledgeWriteNode, NodeData.documentExtractNode] },
   {
     label: 'AI 能力',
     list: [
       NodeData.aiChatNode,
+      NodeData.llmNode,
       NodeData.intentNode,
       NodeData.textToSpeechNode,
       NodeData.speechToTextNode,
@@ -139,6 +144,7 @@ const toolMenuNodes = [
     label: 'AI 能力',
     list: [
       NodeData.aiChatNode,
+      NodeData.llmNode,
       NodeData.intentNode,
       NodeData.textToSpeechNode,
       NodeData.speechToTextNode,

@@ -122,6 +122,27 @@ export const aiChatNode = {
   },
 }
 
+/* LLM 节点配置数据 */
+export const llmNode = {
+  type: WorkflowNodeType.Llm,
+  text: '单次调用大模型，可传入工具定义并输出工具调用',
+  label: 'LLM',
+  properties: {
+    stepName: 'LLM',
+    config: {
+      fields: [
+        { label: '回答内容', value: 'content' },
+        { label: '思考过程', value: 'reasoning_content' },
+        { label: '拒答内容', value: 'refusal' },
+        { label: '是否拒答', value: 'is_refusal' },
+        { label: 'Token 用量', value: 'usage' },
+        { label: '工具调用', value: 'tool_calls' },
+        { label: '结束原因', value: 'finish_reason' },
+      ],
+    },
+  },
+}
+
 /* 意图识别节点配置数据 */
 export const intentNode = {
   type: WorkflowNodeType.IntentNode,

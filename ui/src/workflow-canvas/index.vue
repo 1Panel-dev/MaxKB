@@ -50,7 +50,7 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
     textEdit: false,
     adjustEdge: false,
     adjustEdgeStartAndEnd: false,
-    background: { backgroundColor: '#f5f6f7' },
+    background: { background: '#f5f6f7' },
     grid: { size: 20, type: 'dot', config: { color: '#DEE0E3', thickness: 1 } },
     keyboard: { enabled: true },
     isSilentMode: false,
@@ -183,7 +183,11 @@ onBeforeUnmount(() => {
   disconnectAll()
 })
 
-defineExpose({ onmousedown, validate, getGraphData, addNode, clearGraphData, renderGraphData, render, fitView })
+function getLogicFlow() {
+  return lf.value
+}
+
+defineExpose({ onmousedown, validate, getGraphData, addNode, clearGraphData, renderGraphData, render, fitView, getLogicFlow })
 </script>
 
 <template>

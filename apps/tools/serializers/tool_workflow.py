@@ -150,6 +150,15 @@ class ToolWorkflowInstance:
         return self.tool_list or []
 
 
+class ToolWorkflowPublishSerializer(serializers.Serializer):
+    publish_name = serializers.CharField(
+        required=False, max_length=128, allow_null=True, allow_blank=True, label=_("Publish Name")
+    )
+    publish_desc = serializers.CharField(
+        required=False, max_length=1024, allow_null=True, allow_blank=True, label=_("Publish Desc")
+    )
+
+
 class ToolWorkflowSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("user id"))
@@ -343,10 +352,13 @@ class ToolWorkflowSerializer(serializers.Serializer):
             has_fail = any((d or {}).get("status") == Status.FAIL.value for d in (details or []))
             return State.FAILURE if has_fail else State.SUCCESS
 
-        def publish(self, with_valid=True):
+        def publish(self, instance=None, with_valid=True):
             if with_valid:
                 self.is_valid()
+                ToolWorkflowPublishSerializer(data=instance or {}).is_valid(raise_exception=True)
             user_id = self.data.get("user_id")
+            publish_name = str((instance or {}).get("publish_name") or "").strip()
+            publish_desc = (instance or {}).get("publish_desc") or ""
 
             user = QuerySet(User).filter(id=user_id).first()
             tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
@@ -354,7 +366,8 @@ class ToolWorkflowSerializer(serializers.Serializer):
             work_flow_version = ToolWorkflowVersion(
                 work_flow=tool_workflow.work_flow,
                 tool_id=self.data.get("tool_id"),
-                name=timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S"),
+                name=publish_name or timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S"),
+                publish_desc=publish_desc,
                 publish_user_id=user_id,
                 publish_user_name=user.username,
                 workspace_id=workspace_id,
