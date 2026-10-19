@@ -150,17 +150,17 @@ function handleOpenProblem(problem: ProblemItem, column: TableColumnCtx<ProblemI
   detailProblem.value = { ...problem }
 }
 
-async function handleNavigateProblem(offset: -1 | 1) {
+async function handleNavigateProblem(direction: -1 | 1) {
   if (loading.value || currentIndex.value < 0) return
-  const nextProblem = problems.value[currentIndex.value + offset]
+  const nextProblem = problems.value[currentIndex.value + direction]
   if (nextProblem) {
     detailProblem.value = { ...nextProblem }
     return
   }
-  if (!(offset === -1 ? hasPrevious.value : hasNext.value)) return
+  if (!(direction === -1 ? hasPrevious.value : hasNext.value)) return
   clearSelection()
-  const records = await loadProblems(paginationConfig.value.currentPage + offset)
-  const adjacentProblem = offset === 1 ? records?.[0] : records?.at(-1)
+  const records = await loadProblems(paginationConfig.value.currentPage + direction)
+  const adjacentProblem = direction === 1 ? records?.[0] : records?.at(-1)
   if (detailProblem.value && adjacentProblem) detailProblem.value = { ...adjacentProblem }
 }
 
@@ -249,7 +249,6 @@ onMounted(() => loadProblems())
   <ProblemDetailDrawer
     v-if="detailProblem"
     v-model="detailProblem"
-    :list-loading="loading"
     :has-previous="hasPrevious"
     :has-next="hasNext"
     @previous="handleNavigateProblem(-1)"
