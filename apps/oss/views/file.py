@@ -6,7 +6,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.views import APIView, Request
 
 from application.models import Application
-from common.auth import TokenAuth, AllTokenAuth, ChatTokenAuth
+from common.auth import TokenAuth, AllTokenAuth
 from common.auth.authentication import has_permissions, get_is_permissions
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.constants.compare_constants import CompareConstants
@@ -89,7 +89,14 @@ class FileView(APIView):
             tags=[_("File")],  # type: ignore
         )
         @log(menu="file", operate="Delete file")
-        @has_permissions(RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER)
+        @has_permissions(
+            RoleConstants.ADMIN,
+            RoleConstants.WORKSPACE_MANAGE,
+            RoleConstants.USER,
+            RoleConstants.EXTENDS_WORKSPACE_MANAGE,
+            RoleConstants.EXTENDS_USER,
+            RoleConstants.EXTENDS_ADMIN,
+        )
         def delete(self, request: Request, file_id: str):
             return result.success(
                 FileSerializer.Operate(
