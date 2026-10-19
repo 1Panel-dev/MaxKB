@@ -85,7 +85,8 @@ class FileView(APIView):
             tags=[_("File")],  # type: ignore
         )
         @log(menu="file", operate="Delete file")
-        @has_permissions(RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER)
+        @has_permissions(RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER,
+                         RoleConstants.EXTENDS_USER, RoleConstants.EXTENDS_ADMIN, RoleConstants.EXTENDS_WORKSPACE_MANAGE)
         def delete(self, request: Request, file_id: str):
             return result.success(
                 FileSerializer.Operate(
