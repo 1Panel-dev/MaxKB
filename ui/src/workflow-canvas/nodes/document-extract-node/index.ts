@@ -1,5 +1,6 @@
 import DocumentExtractNode from './index.vue'
 import DocumentExtractNodeDetail from './details/index.vue'
+import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -9,4 +10,4 @@ class DocumentExtractNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.DocumentExtractNode, model: WorkflowNodeModel, view: DocumentExtractNodeView, details: DocumentExtractNodeDetail }
+export default { type: WorkflowNodeType.DocumentExtractNode, model: WorkflowNodeModel, view: DocumentExtractNodeView, details: DocumentExtractNodeDetail, agent }

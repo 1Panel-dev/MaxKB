@@ -1,7 +1,7 @@
 import { del, get, post, postStream, put } from '../core/request'
 import type { Dict, DynamicFormField, ModelPayload, ModelItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
-import type { PromptGeneratePayload } from '@/api/types'
+import type { ChatCompletionPayload, PromptGeneratePayload } from '@/api/types'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
 const getPrefix = () => {
@@ -72,6 +72,11 @@ const postPromptGenerate = (modelId: string, payload: PromptGeneratePayload) => 
   })
 }
 
+/** 流式补全（支持 function calling），返回原始 SSE Response；signal 用于中止在途请求。 */
+const postChatCompletion = (modelId: string, payload: ChatCompletionPayload, signal?: AbortSignal) => {
+  return postStream(ADMIN_API_BASE_PATH, `/workspace/${getWorkspaceId()}/model/${modelId}/chat_completion`, { ...payload }, signal)
+}
+
 export default {
   deleteModel,
   getModelDetail,
@@ -79,6 +84,7 @@ export default {
   getModelListWithShared,
   getModelMeta,
   getModelParamsForm,
+  postChatCompletion,
   postModel,
   postPromptGenerate,
   putModel,

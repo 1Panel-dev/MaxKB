@@ -193,7 +193,8 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 智能体、工具、知识库 Workflow API 分别维护 application_version、tool_version、knowledge_version，
 使用同名 getWorkflowVersions／putWorkflowVersion，类型为 WorkflowVersion／WorkflowVersionPayload。
 前端版本标题上限 64、更新说明上限 1000，提交字段为 name、publish_desc，
-不将资源 desc 当作版本说明。智能体后端已支持 publish_desc；工具和知识库版本当前只处理 name。
+不将资源 desc 当作版本说明。智能体和工具后端已支持 publish_desc；知识库版本当前只处理 name。
+智能体与工具的 putXxxPublish 提交 publish_name、publish_desc，由发布弹框填写。
 三个版本列表均未返回历史默认模型配置，预览与恢复保留当前配置。
 
 `admin/store.ts` 的 getStoreApplicationList、getStoreToolWorkflowList、getStoreKnowledgeList 查询三类模板，
@@ -268,6 +269,16 @@ System 接口不依赖工作空间 ID。
 均返回原始 SSE Response，由公共生成组件读取。画布的 `PromptGenerate` 通过
 `useWorkflowStore(resourceScope).postPromptGenerate` 调用；三个范围的 Store 适配器分别引用对应的
 Model API，直接转发生成请求，不使用查询缓存或请求去重。
+
+### 流式补全
+
+Workspace、System 资源管理和 System 共享资源均在对应范围的 `model.ts` 提供
+`postChatCompletion(modelId, payload, signal)`，请求结构为 `ChatCompletionPayload`（OpenAI 格式的 messages 与 tools）。
+路径为 `/workspace/<workspaceId>/model/<modelId>/chat_completion`、`/system/resource/model/<modelId>/chat_completion` 与
+`/system/shared/model/<modelId>/chat_completion`；当前后端仅实现 Workspace 接口，System 接口需部署提供对应扩展。
+均返回原始 SSE Response，事件为 `delta`、`reasoning`、`tool_call`、`completion` 与 `error`；`signal` 用于中止在途请求，
+`postStream` 的第四个可选参数透传给 `fetch`。工作流 AI 生成通过 `useWorkflowStore(resourceScope).postChatCompletion` 调用，
+Store 直接转发，不缓存或去重。
 
 ### 知识库维护
 

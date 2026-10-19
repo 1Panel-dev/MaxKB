@@ -18,12 +18,25 @@ const props = withDefaults(
   },
 )
 
-// 每一轮循环的子节点执行详情，键为轮次下标。
-const loopKeys = computed(() => Object.keys(props.data?.loop_node_data || {}))
-const currentLoop = ref(loopKeys.value[0] ?? '')
+// 每一轮循环的子节点执行详情：新引擎为 children（按轮次的二维数组），兼容历史数据的 loop_node_data（以轮次下标为键的对象）。
+const loopRounds = computed<ExecutionNodeDetail[][]>(() => {
+  if (Array.isArray(props.data?.children)) return props.data.children
+  return Object.values(props.data?.loop_node_data || {}).map((round) => Object.values(round || {}) as ExecutionNodeDetail[])
+})
+const loopKeys = computed(() => loopRounds.value.map((_, index) => String(index)))
+const currentLoop = ref('0')
+
+// 循环设置：新引擎放在 params 内，历史数据在顶层。
+const loopType = computed(() => props.data?.params?.loop_type ?? props.data?.loop_type)
+const loopSetting = computed(() => {
+  const params = props.data?.params ?? props.data
+  if (loopType.value === 'NUMBER') return params?.number ?? '-'
+  if (loopType.value === 'ARRAY') return Array.isArray(params?.array) ? JSON.stringify(params.array) : '-'
+  return loopKeys.value.length || '-'
+})
 
 // 当前选中轮次的子节点数组，交回顶层 dispatcher 递归渲染（其内部已按 index 排序、按类型分发）。
-const currentLoopDetail = computed<ExecutionNodeDetail[]>(() => Object.values(props.data?.loop_node_data?.[currentLoop.value] || {}))
+const currentLoopDetail = computed<ExecutionNodeDetail[]>(() => loopRounds.value[Number(currentLoop.value)] || [])
 </script>
 
 <template>
@@ -37,10 +50,10 @@ const currentLoopDetail = computed<ExecutionNodeDetail[]>(() => Object.values(pr
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">循环设置</h6>
       <div class="space-y-2">
-        <p><span class="text-N600">循环类型：</span>{{ data.loop_type || '-' }}</p>
+        <p><span class="text-N600">循环类型：</span>{{ loopType || '-' }}</p>
         <p>
           <span class="text-N600">循环数组：</span>
-          {{ data.loop_type === 'NUMBER' ? data.number : loopKeys.join(', ') || '-' }}
+          {{ loopSetting }}
         </p>
       </div>
     </div>

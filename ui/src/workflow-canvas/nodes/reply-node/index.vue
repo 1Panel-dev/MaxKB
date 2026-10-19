@@ -12,6 +12,7 @@ const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
 interface ReplyNodeForm {
   content: string
+  content_type: 'TEXT' | 'HTML' | 'TOOL'
   fields: string[]
   is_result: boolean
   reply_type: 'content' | 'referencing'
@@ -21,6 +22,7 @@ const formRef = useTemplateRef<FormInstance>('formRef')
 
 const defaultForm: ReplyNodeForm = {
   content: '',
+  content_type: 'TEXT',
   fields: [],
   is_result: true,
   reply_type: 'content',
@@ -30,6 +32,7 @@ model.properties.node_data = {
   ...defaultForm,
   ...savedForm,
   content: savedForm?.content ?? defaultForm.content,
+  content_type: savedForm?.content_type ?? defaultForm.content_type,
   fields: Array.isArray(savedForm?.fields) ? savedForm.fields : [],
   is_result: savedForm ? savedForm.is_result : defaultForm.is_result,
   reply_type: savedForm?.reply_type ?? defaultForm.reply_type,
@@ -38,6 +41,12 @@ model.properties.node_data = {
 const formData = computed<ReplyNodeForm>({
   get: () => model.properties.node_data as ReplyNodeForm,
   set: (value) => (model.properties.node_data = value),
+})
+
+const contentPlaceholder = computed(() => {
+  if (formData.value.content_type === 'TOOL') return '[{"id": "call_1", "name": "get_weather", "arguments": "{}", "content": "晴"}]'
+  if (formData.value.content_type === 'HTML') return '<p>HTML 内容，可以引用系统中变量，如 {{开始.question}}</p>'
+  return '回复内容，可以引用系统中变量，如 {{开始.question}}'
 })
 
 async function validate() {
@@ -56,11 +65,29 @@ onMounted(() => {
   <NodeContainer :node-model="model">
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+        <!-- 回复类型 -->
+        <el-form-item>
+          <template #label>
+            <div class="flex-align-center gap-1">
+              <span>回复类型</span>
+              <MkTooltip content="工具类型的回复内容为 JSON 对象或数组，元素字段为 id、name、arguments、content" placement="right">
+                <MkIcon name="icon_info_outlined" class="text-N600!" />
+              </MkTooltip>
+            </div>
+          </template>
+          <el-radio-group v-model="formData.content_type" size="small">
+            <el-radio-button label="文本" value="TEXT" />
+            <el-radio-button label="HTML" value="HTML" />
+            <el-radio-button label="工具" value="TOOL" />
+          </el-radio-group>
+        </el-form-item>
+
         <el-form-item
           label="回复内容"
           class="mk-hide-asterisk"
           :prop="formData.reply_type === 'referencing' ? 'fields' : 'content'"
           :rules="{
+            type: formData.reply_type === 'referencing' ? 'array' : 'string',
             required: true,
             whitespace: formData.reply_type !== 'referencing',
             message: formData.reply_type === 'referencing' ? '请选择变量' : '请输入回复内容',
@@ -85,7 +112,7 @@ onMounted(() => {
             placeholder="请选择变量"
           />
 
-          <MdEditorMagnify v-else @wheel="handleNodeWheel" title="回复内容" v-model="formData.content" />
+          <MdEditorMagnify v-else @wheel="handleNodeWheel" title="回复内容" v-model="formData.content" :placeholder="contentPlaceholder" />
         </el-form-item>
 
         <!-- 返回内容 -->

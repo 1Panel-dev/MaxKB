@@ -33,9 +33,12 @@ const putToolWorkflow = (toolId: string, payload: ToolWorkflowPayload) => {
   return put<ToolWorkflowPayload, ToolWorkflowDetail>(`${getPrefix()}/${toolId}/workflow`, payload)
 }
 
-/** 发布工具工作流。 */
-const putToolWorkflowPublish = (toolId: string) => {
-  return put<undefined, boolean>(`${getPrefix()}/${toolId}/publish`)
+/** 发布工具工作流，并记录版本标题和更新说明。 */
+const putToolWorkflowPublish = (toolId: string, publishName: string, publishDesc?: string) => {
+  return put<Record<string, unknown>, boolean>(`${getPrefix()}/${toolId}/publish`, {
+    publish_name: publishName,
+    publish_desc: publishDesc,
+  })
 }
 
 /** 调试已保存的工具工作流，返回 SSE 响应。 */

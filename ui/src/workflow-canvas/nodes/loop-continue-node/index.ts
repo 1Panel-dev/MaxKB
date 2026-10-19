@@ -1,5 +1,6 @@
 import LoopContinueNodeVue from './index.vue'
 import LoopContinueNodeDetail from './details/index.vue'
+import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -14,4 +15,5 @@ export default {
   model: WorkflowNodeModel,
   view: LoopContinueNodeView,
   details: LoopContinueNodeDetail,
+  agent,
 }

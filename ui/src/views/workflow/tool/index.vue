@@ -15,13 +15,22 @@ import SharedModelApi from '@/api/admin/system/shared-resources/model'
 import SharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import SharedToolWorkflowApi from '@/api/admin/system/shared-resources/tool/tool-workflow'
 import { getResourceScope, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
-import type { DefaultModelSettingPayload, ToolItem, ToolWorkflowDetail, WorkflowVersion, WorkflowStoreTemplate } from '@/api/types'
+import type {
+  DefaultModelSettingPayload,
+  ToolItem,
+  ToolWorkflowDetail,
+  WorkflowVersion,
+  WorkflowVersionPayload,
+  WorkflowStoreTemplate,
+} from '@/api/types'
 import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonDefaultModelSetting from '@/views/workflow/components/default-model-setting/ButtonDefaultModelSetting.vue'
+import EditPublishVersionDialog from '@/views/workflow/components/publish-history/EditPublishVersionDialog.vue'
+import { showWorkflowValidateError } from '@/views/workflow/components/validate-error'
 
 import ButtonPublishHistory from './ButtonPublishHistory.vue'
 import DebugDrawer from './debug/DebugDrawer.vue'
@@ -129,12 +138,19 @@ async function handleDebug() {
   if (loading.value || historyVisible.value) return
   loading.value = true
   try {
-    await workflowRef.value?.validate()
+    const valid = await workflowRef.value?.validate().then(
+      () => true,
+      (error) => {
+        showWorkflowValidateError(error)
+        return false
+      },
+    )
+    if (!valid) return
     if (hasUnsavedChanges()) await saveToolWorkflow()
     const graph = getGraphData()
     if (graph) debugDrawerRef.value?.open(graph)
   } catch {
-    // 校验与请求错误由各自流程提示，失败时不打开调试。
+    // 保存失败已由请求层提示，失败时不打开调试。
   } finally {
     loading.value = false
   }
@@ -221,16 +237,32 @@ function handleSave() {
   })
 }
 
-function handlePublish() {
+/* 发布工作流：先校验画布，再填写发布内容，提交后保存并发布。 */
+const publishDialogRef = useTemplateRef<InstanceType<typeof EditPublishVersionDialog>>('publishDialogRef')
+
+function handleOpenPublish() {
   if (!workflowRef.value || loading.value || historyVisible.value) return
   loading.value = true
   return workflowRef.value
     .validate()
-    .then(() => saveToolWorkflow())
-    .then(() => requestApi.putToolWorkflowPublish(toolId))
-    .then(() => MsgSuccess('发布成功'))
-    .catch(() => {
-      MsgError('发布失败')
+    .then(() => {
+      closeDebug()
+      publishDialogRef.value?.open()
+    })
+    .catch(showWorkflowValidateError)
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+function handlePublish(payload: WorkflowVersionPayload) {
+  if (loading.value || historyVisible.value) return
+  loading.value = true
+  return saveToolWorkflow()
+    .then(() => requestApi.putToolWorkflowPublish(toolId, payload.name, payload.publish_desc))
+    .then(() => {
+      publishDialogRef.value?.close()
+      MsgSuccess('发布成功')
     })
     .finally(() => {
       loading.value = false
@@ -351,7 +383,7 @@ onBeforeUnmount(() => stopAutoSave())
         <span>保存</span>
       </el-button>
       <!-- 发布 -->
-      <el-button type="primary" :disabled="loading" @click="handlePublish">发布</el-button>
+      <el-button type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
       <!-- 更多操作 -->
       <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
         <el-button text class="h-7! w-7! px-0!">
@@ -399,5 +431,7 @@ onBeforeUnmount(() => stopAutoSave())
     </div>
     <!-- 调试抽屉 -->
     <DebugDrawer :api="requestApi" ref="debugDrawerRef" :tool-id="toolId" />
+    <!-- 发布内容 -->
+    <EditPublishVersionDialog ref="publishDialogRef" mode="publish" :saving="loading" @submit="handlePublish" />
   </WorkflowViewLayout>
 </template>

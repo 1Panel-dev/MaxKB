@@ -1,5 +1,6 @@
 import ReplyNode from './index.vue'
 import ReplyNodeDetail from './details/index.vue'
+import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -9,4 +10,4 @@ class ReplyNodeView extends WorkflowNodeView {
   }
 }
 
-export default { type: WorkflowNodeType.Reply, model: WorkflowNodeModel, view: ReplyNodeView, details: ReplyNodeDetail }
+export default { type: WorkflowNodeType.Reply, model: WorkflowNodeModel, view: ReplyNodeView, details: ReplyNodeDetail, agent }

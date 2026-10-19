@@ -21,6 +21,7 @@ src/workflow-canvas/
 ├── component/          # NodeAdd、NodeSearch、节点设置及 NodeControl 画布控制栏
 ├── config/             # 节点数据、映射、常量及预留的本地化配置
 ├── Execution-details/  # 执行详情：顶层分发入口与公共卡壳，节点内容由 nodes/*/details/ 提供
+├── ai-generate/        # 工作流 AI 生成：agent 引擎、画布适配、建图工具、节点配置 agent 与生成面板
 ├── core/               # 稳定的画布内核与所有节点共用的基础能力
 │   ├── edge/           # 普通边、循环边及边删除按钮
 │   └── node-container/ # 节点容器、锚点按钮及私有的条件、操作下拉组件
@@ -134,7 +135,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 `useWorkflowStore(resourceScope)` 是画布资源接口适配器，不是 Pinia Store。它自动收集 `store/api/*/index.ts`，
 查询方法按范围、方法与查询参数缓存结果并复用在途请求；`store.force.xxx()` 跳过已完成缓存，仍复用同键在途请求。
-`postPromptGenerate` 是流式生成方法，始终直接转发到对应范围的 Model API，不缓存或去重；
+`postPromptGenerate` 与 `postChatCompletion` 是流式方法，始终直接转发到对应范围的 Model API，不缓存或去重；
 通过普通 Store 或 `force` 调用都会发起新请求，返回独立的 Response 流。
 模型选项统一调用 `store.getModelListWithShared(query)`，由对应范围 API 查询；Workspace 和
 System 资源管理合并普通与共享模型，System 共享范围仅返回标记 `source: 'shared'` 的共享模型。
@@ -158,7 +159,7 @@ System 资源管理合并普通与共享模型，System 共享范围仅返回标
 ### `nodes/`
 
 每个已实现节点使用一个目录，目录中包含 LogicFlow 注册文件 `index.ts` 和节点视图
-`index.vue`。节点注册由 `index.vue` 中的 `import.meta.glob('./nodes/**/index.ts')` 自动收集，
+`index.vue`。支持 AI 生成的节点另有 `agent.ts`，由 `index.ts` 默认导出的 `agent` 字段注册（见 `ai-generate/`）。节点注册由 `index.vue` 中的 `import.meta.glob('./nodes/**/index.ts')` 自动收集，
 不要再维护一份逐项导入列表。
 
 ### 通用节点规则
@@ -515,3 +516,48 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 
 页面发布、历史、自动保存、调试和返回确认的当前行为统一见 View 文档，验证规则见
 [AGENTS.md](../../AGENTS.md#验证)。
+
+### `ai-generate/`
+
+工作流 AI 生成按用户需求在画布上规划、建节点、连线并配置字段，当前接入应用工作流（含循环体）。
+
+- `create-agent.ts` 运行 agent 循环：每轮经 `useWorkflowStore(resourceScope).postChatCompletion` 流式补全，同轮工具并发执行，
+  工具报错回喂模型自愈，委派工具返回可取消的 Executor，父 agent 停止时级联停止子 agent。
+- `tools/` 放工具与工具函数：`tools/index.ts` 为建图工具，`tools/canvas.ts` 为画布适配层，`tools/result.ts` 为工具结果，
+  `tools/node.ts` 为节点配置 agent 共用的工具与工具函数。
+- `tools/result.ts` 定义两层结果。工具层（agent 继续循环）：`SuccessResult`（回喂模型）、`ErrorResult`（错误回喂模型自愈，工具卡标为失败）；
+  agent 层（立即结束所在 agent）：`AgentSuccessResult`（status=done，data 作为交付上抛）、`AgentErrorResult`
+  （status=error，message 作为失败原因上抛、不再续修，工具卡标为失败）；同轮两者并存时失败优先。
+  普通返回值按 `SuccessResult` 处理，抛出的异常按 `ErrorResult` 处理。
+- `tools/canvas.ts` 是唯一读写 LogicFlow 的适配层：画布以 `lf_id` 标识（主画布 `main`，循环体为循环节点 id，
+  经循环体模型的 `getLoopLogicFlow()` 取得）；节点属性经 `reactive(model)` 写回，保证节点表单同步刷新。
+  可引用字段与 `NodeCascader` 口径一致，提示词变量为 `{{节点名称.字段}}`、全局变量为 `{{global.字段}}`。
+- `tools/index.ts` 提供建图工具；`configure_node(nodeId, args, requirement, returns?)` 相当于调用节点函数：按节点 `params` 校验实参
+  （形参存在、引用在上游、array / object 形参的上游返回类型对得上），带 `x-bind` 的形参由框架直接写入 `node_data`，
+  再起该节点的配置子 agent 按 `requirement` 写入配置。
+- 节点配置 agent 放在各节点目录的 `agent.ts`（如 `nodes/ai-chat-node/agent.ts`），default 导出 `NodeAgentModule`，
+  并由该节点 `index.ts` 默认导出的 `agent` 字段注册，与 `details` 同一份节点配置。每个节点被当作一个函数，
+  `params` / `config` / `returns` 均为 JSON Schema（OpenAI function calling 的 parameters 格式）：
+  - `description`：函数说明（做什么、何时用、与上下游怎么配合）；
+  - `params`：形参，运行时由上游提供，实参为引用 `[节点ID, 字段]`，由父 agent 连线决定。属性上的 `x-bind` 表示实参写入的
+    `node_data` 字段；未声明的（提示词素材、判断条件里的变量）交由配置 agent 使用。带 `items` 且无 `x-bind` 的 array 形参可接收多个引用；
+  - `config`：配置，搭画布时确定的常量，同时作为配置 agent `update` 工具的 parameters；
+  - `returns`：返回，固定字段写在 `properties`（键为节点 `config.fields` 中的字段名）；按配置生成的字段用 `additionalProperties`
+    说明，`x-from` 指向生成它的配置项，无动态返回时为 `false`。
+  - 渲染：父 agent 与规划器的节点目录渲染为函数签名（`x-` 扩展字段不渲染），据此组合节点设计画布，不使用固定范式；
+  - `useAgent(context)`：自建该节点配置 agent 的 prompt 与工具，`context.args` 为已绑定的实参、`context.requirement` 为配置要求、
+    `context.expectedReturns` 为要求产出的动态返回字段。写回遵循节点视图的 `node_data` 协议，经 `createUpdateTool`
+    写入后调用节点视图注册的 `validate()` 并核对要求的返回字段，通过即返回 `AgentSuccessResult` 交付节点的输出字段（`config.fields`），
+    不通过返回 `ErrorResult` 让模型续修；建图连线以交付的输出字段为准；
+  - 分支：判断器与意图识别按分支 id 逐个增、改、删（`get_branches` / `add_branch` / `update_branch` /
+    `delete_branch`），删除分支时清理其出口连线，最后由 `validate` 工具收尾。
+- `tools/index.ts` 经 `import.meta.glob('../../nodes/*/index.ts')` 读取各节点的 `agent` 字段（`nodeAgentFor`），
+  未提供 `agent` 的节点不进入 AI 可选目录；`tools/node.ts` 提供 `useNodeAgent`、Break / Continue 共用的条件 agent、
+  `get_field_options`、`update` / `validate` 工具、写入后校验、模型来源（`modelSlot` 按模型类型与字段前缀适配 LLM / IMAGE / TTI / STT / TTS 等）、
+  `get_models`、知识库查询、条件项与节点函数签名渲染（`renderNodeFunction`）等共用能力。
+- `application.ts` 维护应用工作流父 agent 与规划器；`panel/` 为生成面板，
+  由 `views/workflow/application/` 挂载并通过 `WorkflowCanvas.getLogicFlow()` 取得主画布。
+  面板把用户需求（QUESTION）与 agent 事件（TEXT / REASONING / TOOL / GROUP / FAILURE）转成 conversation-panel 内容项，
+  经 `ContentList` 渲染；委派工具为一个 `GROUP`，子 agent 的执行过程放在其 `children` 中。
+
+生成结果只改画布，不自动保存；调试日志写入 localStorage 的 `workflow-ai-generate-debug-log`。

@@ -19,7 +19,8 @@ withDefaults(
 </script>
 
 <template>
-  <DetailContainer :data="data">
+  <!-- 工具工作流整体失败也需展示已执行的子节点详情。 -->
+  <DetailContainer :data="data" show-content-on-error>
     <template #header>
       <BaseHeader :data="data" />
     </template>
@@ -27,7 +28,7 @@ withDefaults(
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">输入参数</h6>
       <div class="whitespace-pre-wrap space-y-2">
-        <p v-for="(f, i) in data.input" :key="i">
+        <p v-for="(f, i) in data.params ?? data.input" :key="i">
           <span class="text-N600">{{ i }}：</span>{{ f }}
         </p>
       </div>
@@ -45,7 +46,7 @@ withDefaults(
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">执行详情</h6>
       <div>
-        <ExecutionDetailContent :detail="data.details" :workflow-mode="workflowMode" />
+        <ExecutionDetailContent :detail="data.children" :workflow-mode="workflowMode" />
       </div>
     </div>
   </DetailContainer>

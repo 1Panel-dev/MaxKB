@@ -1,5 +1,6 @@
 import ConditionNodeVue from './index.vue'
 import ConditionNodeDetail from './details/index.vue'
+import agent from './agent'
 import { type BaseEdgeModel, type Model } from '@logicflow/core'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
@@ -72,4 +73,4 @@ class ConditionModel extends WorkflowNodeModel {
   }
 }
 
-export default { type: WorkflowNodeType.Condition, model: ConditionModel, view: ConditionNodeView, details: ConditionNodeDetail }
+export default { type: WorkflowNodeType.Condition, model: ConditionModel, view: ConditionNodeView, details: ConditionNodeDetail, agent }

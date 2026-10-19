@@ -1,5 +1,6 @@
 import SearchKnowledgeNodeVue from './index.vue'
 import SearchKnowledgeNodeDetail from './details/index.vue'
+import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -14,4 +15,5 @@ export default {
   model: WorkflowNodeModel,
   view: SearchKnowledgeNodeView,
   details: SearchKnowledgeNodeDetail,
+  agent,
 }

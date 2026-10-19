@@ -1,5 +1,6 @@
 import SpeechToTextNodeVue from './index.vue'
 import SpeechToTextNodeDetail from './details/index.vue'
+import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
 
@@ -14,4 +15,5 @@ export default {
   model: WorkflowNodeModel,
   view: SpeechToTextNodeView,
   details: SpeechToTextNodeDetail,
+  agent,
 }
