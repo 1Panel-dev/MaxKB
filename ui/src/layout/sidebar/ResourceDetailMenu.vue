@@ -35,14 +35,14 @@ watch(
         <template #label>
           <span class="flex-align-center min-w-0 flex-1 gap-2">
             <MkIcon v-if="menuItem.icon" :name="menuItem.icon" :size="18" />
-            <span class="min-w-0 flex-1 truncate" :title="menuItem.label">{{ menuItem.label }}</span>
+            <span class="min-w-0 flex-1 truncate">{{ menuItem.label }}</span>
           </span>
         </template>
         <div class="space-y-1 pt-1">
           <template v-for="child in menuItem.children" :key="child.name">
             <!-- 切换二级菜单页面 -->
             <MkListItem :active="child.name === props.activeName" @click="emit('select', child)">
-              <span class="ml-6 min-w-0 flex-1 truncate" :title="child.label">{{ child.label }}</span>
+              <span class="ml-6 min-w-0 flex-1 truncate">{{ child.label }}</span>
             </MkListItem>
           </template>
         </div>
@@ -51,7 +51,7 @@ watch(
       <MkListItem v-else :active="menuItem.name === props.activeName" @click="emit('select', menuItem)">
         <template #default="{ active }">
           <MkIcon v-if="menuItem.icon" class="mr-2" :name="active ? (menuItem.activeIcon ?? menuItem.icon) : menuItem.icon" :size="18" />
-          <span class="min-w-0 flex-1 truncate" :title="menuItem.label">{{ menuItem.label }}</span>
+          <span class="min-w-0 flex-1 truncate">{{ menuItem.label }}</span>
         </template>
       </MkListItem>
     </template>

@@ -3,7 +3,7 @@
 import type LogicFlow from '@logicflow/core'
 import { KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
 import type { DefaultModelSettingPayload } from './model'
-import type { DocumentTaskState } from './document'
+import type { DocumentResourceType, DocumentTaskState } from './document'
 import type { ParagraphItem } from './paragraph'
 
 /** 生成关联问题共用的模型与提示词配置。 */
@@ -190,6 +190,8 @@ export interface KnowledgeHitTestAsset {
 
 /** 召回测试返回的分段与命中得分。 */
 export interface KnowledgeHitTestResult extends ParagraphItem {
+  document_image_id?: string | null
+  document_resource_type?: DocumentResourceType | null
   knowledge_id: string
   knowledge_name: string
   document_name: string

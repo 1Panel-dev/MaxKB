@@ -70,7 +70,7 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
       <span>新建对话</span>
     </MkListItem>
     <div class="flex-between pl-2 mt-4">
-      <div class="text-N600 font-medium">历史对话</div>
+      <h6 class="text-N600 font-medium">历史对话</h6>
 
       <!-- // TODO: 全部清空对话 -->
       <el-button text>
