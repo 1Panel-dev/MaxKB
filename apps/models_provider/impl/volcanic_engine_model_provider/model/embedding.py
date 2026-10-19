@@ -50,7 +50,7 @@ class VolcanicEngineEmbeddingModel(MaxKBBaseEmbeddingModel):
             return [e.embedding for e in resp.data]
 
     def supports_image_embedding(self) -> bool:
-        return self.model_name.startswith("doubao-embedding-vision-")
+        return self.model_name.startswith("doubao-embedding-vision")
 
     def embed_images(self, images: List[str]) -> List[List[float]]:
         if not self.supports_image_embedding():
