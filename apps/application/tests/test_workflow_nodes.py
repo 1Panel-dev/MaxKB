@@ -8,10 +8,12 @@ from application.workflow.nodes.ai_chat_node.ai_chat_node import AIChatNode, _ge
 from application.workflow.nodes.data_source_web_node.data_source_web_node import DataSourceWebNode
 from application.workflow.nodes.search_knowledge_node.search_knowledge_node import (
     _get_recalled_image_list,
+    _list_paragraph,
     _record_recalled_items,
     _reset_paragraph,
 )
-from knowledge.models import SourceType
+from knowledge.models import Document, DocumentResourceType, Knowledge, KnowledgeType, SourceType
+from application.workflow.nodes.search_document_node.search_document_node import SearchDocumentNode
 from common.utils.fork import ChildLink, Fork
 
 
@@ -26,6 +28,21 @@ class DataSourceWebNodeTests(SimpleTestCase):
 
 
 class SearchKnowledgeNodeTests(SimpleTestCase):
+    @patch("knowledge.services.multimodal_retrieval.QuerySet")
+    @patch("application.workflow.nodes.search_knowledge_node.search_knowledge_node.native_search")
+    def test_workflow_paragraph_query_includes_source_fields(self, native_search, query_set):
+        paragraph_id = "00000000-0000-0000-0000-000000000001"
+        native_search.return_value = [{"id": paragraph_id, "document_id": "image-document"}]
+        query_set.return_value.filter.return_value.values_list.return_value = [
+            ("image-document", KnowledgeType.BASE, DocumentResourceType.IMAGE, "original-image-file")
+        ]
+
+        result = _list_paragraph([{"paragraph_id": paragraph_id}], MagicMock())
+
+        self.assertEqual(result[0]["knowledge_type"], KnowledgeType.BASE)
+        self.assertEqual(result[0]["document_resource_type"], DocumentResourceType.IMAGE)
+        self.assertEqual(result[0]["document_image_id"], "original-image-file")
+
     def test_image_hit_metadata_is_attached_to_recalled_paragraph(self):
         paragraph_id = "00000000-0000-0000-0000-000000000001"
         asset_id = "00000000-0000-0000-0000-000000000002"
@@ -40,6 +57,9 @@ class SearchKnowledgeNodeTests(SimpleTestCase):
             "update_time": created_at,
             "create_time": created_at,
             "meta": {},
+            "knowledge_type": KnowledgeType.BASE,
+            "document_resource_type": DocumentResourceType.IMAGE,
+            "document_image_id": file_id,
         }
         embedding = {
             "paragraph_id": paragraph_id,
@@ -57,6 +77,9 @@ class SearchKnowledgeNodeTests(SimpleTestCase):
         self.assertEqual(result["hit_unit_type"], "image")
         self.assertEqual(result["hit_asset"], asset)
         self.assertEqual(result["comprehensive_score"], 0.93)
+        self.assertEqual(result["knowledge_type"], KnowledgeType.BASE)
+        self.assertEqual(result["document_resource_type"], DocumentResourceType.IMAGE)
+        self.assertEqual(result["document_image_id"], file_id)
         self.assertEqual(_get_recalled_image_list([result, result]), [asset])
 
     def test_image_text_hit_adds_visual_text_to_retrieval_context(self):
@@ -115,6 +138,48 @@ class SearchKnowledgeNodeTests(SimpleTestCase):
         _record_recalled_items([{"paragraph_id": "paragraph-1"}], [{"id": "paragraph-1"}], MagicMock(), True)
 
         record_recall.assert_not_called()
+
+
+class SearchDocumentNodeSourceTests(SimpleTestCase):
+    @patch(
+        "application.workflow.nodes.search_document_node.search_document_node.filter_workflow_knowledge",
+        return_value=["knowledge-1"],
+    )
+    @patch(
+        "application.workflow.nodes.search_document_node.search_document_node.filter_authorized_ids",
+        return_value=["knowledge-1"],
+    )
+    @patch("application.workflow.nodes.search_document_node.search_document_node.QuerySet")
+    def test_document_search_returns_source_fields_using_current_knowledge_type(
+        self, query_set, _authorized, _workflow
+    ):
+        documents = MagicMock()
+        knowledge = MagicMock()
+        query_set.side_effect = {Document: documents, Knowledge: knowledge}.get
+        documents.filter.return_value.values_list.return_value.__iter__.return_value = iter(["document-1"])
+        documents.filter.return_value.values_list.return_value.distinct.return_value = ["knowledge-1"]
+        documents.filter.return_value.values.return_value = [
+            {
+                "id": "document-1",
+                "knowledge_id": "knowledge-1",
+                "type": KnowledgeType.BASE,
+                "resource_type": DocumentResourceType.IMAGE,
+                "meta": {"source_file_id": "original-image-file"},
+            }
+        ]
+        knowledge.filter.return_value.values.return_value = [{"id": "knowledge-1", "type": KnowledgeType.WEB}]
+        node = SearchDocumentNode.__new__(SearchDocumentNode)
+        node.get_parameters = MagicMock(return_value={"knowledge_id_list": ["knowledge-1"], "search_mode": "custom"})
+        node.get_workflow_parameters = MagicMock(return_value={"workspace_id": "default"})
+        node.workflow_manage = MagicMock()
+        node.write_context = MagicMock()
+
+        node.execute()
+
+        output = next(call.args[1] for call in node.write_context.call_args_list if call.args[0] == "document_items")
+        self.assertEqual(output[0]["knowledge_type"], KnowledgeType.WEB)
+        self.assertEqual(output[0]["document_resource_type"], DocumentResourceType.IMAGE)
+        self.assertEqual(output[0]["document_image_id"], "original-image-file")
 
 
 class AIChatKnowledgeImageTests(SimpleTestCase):

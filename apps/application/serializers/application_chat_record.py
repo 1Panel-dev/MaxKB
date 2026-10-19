@@ -25,12 +25,13 @@ from common.exception.app_exception import AppApiException, AppUnauthorizedFaile
 from common.utils.common import post
 from django.db import transaction
 from django.db.models import QuerySet
-from django.db.models.aggregates import Max, Min
+from django.db.models.aggregates import Max
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from knowledge.models import Document, Knowledge, Paragraph, Problem, ProblemParagraphMapping
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id, update_document_char_length
 from knowledge.serializers.paragraph import ParagraphSerializers
+from knowledge.services.multimodal_retrieval import enrich_paragraph_sources
 from knowledge.task.embedding import embedding_by_paragraph, embedding_by_paragraph_list
 from rest_framework import serializers
 from rest_framework.utils.formatting import lazy_format
@@ -188,6 +189,8 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
                     if "document_id" in (rl.get("metadata") or {}) and "knowledge_id" in (rl.get("metadata") or {})
                 ]
         paragraph_list = list({p.get("id"): p for p in paragraph_list}.values())
+        if show_source:
+            paragraph_list = enrich_paragraph_sources(paragraph_list)
         knowledge_list = knowledge_list + [
             {"id": knowledge_id, **knowledge}
             for knowledge_id, knowledge in reduce(

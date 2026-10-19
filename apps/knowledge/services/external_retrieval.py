@@ -6,6 +6,7 @@ from common.config.embedding_config import VectorStore
 from knowledge.models import Document, Paragraph, ParagraphAsset, ProblemParagraphMapping, SearchMode, SourceType
 from knowledge.serializers.common import get_embedding_model_by_knowledge_id
 from knowledge.serializers.external_retrieval import RetrievalRequest
+from knowledge.services.multimodal_retrieval import get_retrieval_source_metadata
 from knowledge.services.retrieval_access import authorize_external, refresh_identity
 from knowledge.services.retrieval_stats import record_recall_safely
 
@@ -64,6 +65,11 @@ def retrieve(knowledge_id, identity, data):
         seen.add(paragraph.id)
         hits.append(
             {
+                **get_retrieval_source_metadata(
+                    knowledge.type,
+                    paragraph.document.resource_type,
+                    (paragraph.document.meta or {}).get("source_file_id"),
+                ),
                 "paragraph_id": str(paragraph.id),
                 "document_id": str(paragraph.document_id),
                 "title": paragraph.title,

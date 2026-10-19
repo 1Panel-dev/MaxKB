@@ -24,7 +24,7 @@ from common.db.search import native_search
 from common.utils.common import flat_map, get_file_content
 from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, Paragraph, Knowledge, SearchMode, SourceType
-from knowledge.services.multimodal_retrieval import get_hit_asset_map
+from knowledge.services.multimodal_retrieval import enrich_paragraph_sources, get_hit_asset_map
 from knowledge.services.retrieval_stats import get_recall_tracker, record_recall_safely
 from knowledge.services.retrieval_access import filter_workflow_knowledge
 from maxkb.conf import PROJECT_DIR
@@ -202,7 +202,7 @@ def _list_paragraph(embedding_list: List, vector, knowledge_ids=None, document_i
         for paragraph_id in paragraph_id_list:
             if paragraph_id not in exist_paragraph_list:
                 vector.delete_by_paragraph_id(paragraph_id)
-    return paragraph_list
+    return enrich_paragraph_sources(paragraph_list)
 
 
 class SearchKnowledgeNode(INode):

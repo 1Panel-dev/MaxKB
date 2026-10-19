@@ -11,7 +11,7 @@ from django.urls import resolve
 from rest_framework.exceptions import ValidationError
 
 from chat.views.v3 import knowledge as views
-from knowledge.models import Knowledge, SourceType
+from knowledge.models import DocumentResourceType, Knowledge, KnowledgeType, SourceType
 from knowledge.serializers.external_retrieval import (
     ExternalServiceSerializer,
     ExternalServiceSettings,
@@ -29,7 +29,9 @@ KEY = "50000000-0000-0000-0000-000000000001"
 
 
 def knowledge(**settings):
-    return SimpleNamespace(id=KID, name="manual", workspace_id="default", external_service=settings)
+    return SimpleNamespace(
+        id=KID, name="manual", workspace_id="default", type=KnowledgeType.BASE, external_service=settings
+    )
 
 
 class RetrievalSettingsTests(SimpleTestCase):
@@ -278,7 +280,7 @@ class RetrievalCoreTests(SimpleTestCase):
                 knowledge_id=KID,
                 title="title",
                 content="answer",
-                document=SimpleNamespace(name="document"),
+                document=SimpleNamespace(name="document", resource_type=DocumentResourceType.DOCUMENT, meta={}),
             )
         ]
         self.match = {"paragraph_id": PID, "source_type": SourceType.PARAGRAPH, "source_id": PID, "similarity": 0.9}
@@ -292,11 +294,26 @@ class RetrievalCoreTests(SimpleTestCase):
         result = self.retrieve(search_mode="keywords")
         self.model.assert_not_called()
         self.assertEqual(result["hits"][0]["citation"]["document_name"], "document")
+        self.assertEqual(result["hits"][0]["knowledge_type"], KnowledgeType.BASE)
+        self.assertEqual(result["hits"][0]["document_resource_type"], DocumentResourceType.DOCUMENT)
+        self.assertIsNone(result["hits"][0]["document_image_id"])
         self.assertEqual(self.vector.return_value.hit_test.call_args.args[1], [KID])
         self.paragraphs.select_related.return_value.filter.assert_called_once_with(
             id__in=[PID], knowledge_id=KID, document__knowledge_id=KID, is_active=True, document__is_active=True
         )
         self.stats.assert_called_once_with([self.match])
+
+    def test_image_document_text_hit_returns_original_image_id(self):
+        paragraph = self.paragraphs.select_related.return_value.filter.return_value[0]
+        paragraph.document.resource_type = DocumentResourceType.IMAGE
+        paragraph.document.meta = {"source_file_id": "original-image-file"}
+        self.authorize.return_value.type = KnowledgeType.WORKFLOW
+
+        result = self.retrieve()
+
+        self.assertEqual(result["hits"][0]["knowledge_type"], KnowledgeType.WORKFLOW)
+        self.assertEqual(result["hits"][0]["document_resource_type"], DocumentResourceType.IMAGE)
+        self.assertEqual(result["hits"][0]["document_image_id"], "original-image-file")
 
     def test_stale_foreign_or_inactive_paragraph_not_returned(self):
         self.paragraphs.select_related.return_value.filter.return_value = []
@@ -326,7 +343,17 @@ class RetrievalTransportTests(SimpleTestCase):
         self.authorize = self.stack.enter_context(
             patch.object(views, "authorize_external", return_value=knowledge(enabled=True))
         )
-        self.output = {"knowledge_id": KID, "hits": [{"content": "answer"}]}
+        self.output = {
+            "knowledge_id": KID,
+            "hits": [
+                {
+                    "content": "answer",
+                    "knowledge_type": KnowledgeType.BASE,
+                    "document_resource_type": DocumentResourceType.IMAGE,
+                    "document_image_id": "original-image-file",
+                }
+            ],
+        }
         self.rest = self.stack.enter_context(patch.object(views, "retrieve", return_value=self.output))
         self.mcp = self.stack.enter_context(patch("chat.mcp.knowledge.retrieve", return_value=self.output))
 

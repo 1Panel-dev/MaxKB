@@ -8,11 +8,50 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from common.exception.app_exception import AppApiException
-from knowledge.models import File, ParagraphAsset, SourceType
+from knowledge.models import Document, DocumentResourceType, File, ParagraphAsset, SourceType
 
 
 MAX_QUERY_IMAGE_COUNT = 10
 MAX_QUERY_IMAGE_SIZE = 20 * 1024 * 1024
+
+
+def get_retrieval_source_metadata(knowledge_type, resource_type, source_file_id=None) -> dict:
+    return {
+        "knowledge_type": knowledge_type,
+        "document_resource_type": resource_type,
+        "document_image_id": source_file_id if resource_type == DocumentResourceType.IMAGE else None,
+    }
+
+
+def enrich_paragraph_sources(paragraphs: Iterable[dict]) -> list[dict]:
+    """Fill source fields in one query, including legacy chat snapshots, without changing the input rows."""
+    paragraphs = list(paragraphs)
+    source_fields = {"knowledge_type", "document_resource_type", "document_image_id"}
+    document_ids = {
+        str(paragraph["document_id"])
+        for paragraph in paragraphs
+        if not source_fields.issubset(paragraph) and paragraph.get("document_id")
+    }
+    document_metadata = {
+        str(document_id): get_retrieval_source_metadata(knowledge_type, resource_type, source_file_id)
+        for document_id, knowledge_type, resource_type, source_file_id in (
+            QuerySet(Document)
+            .filter(id__in=document_ids)
+            .values_list("id", "knowledge__type", "resource_type", "meta__source_file_id")
+            if document_ids
+            else []
+        )
+    }
+    return [
+        paragraph
+        if source_fields.issubset(paragraph)
+        else {
+            **get_retrieval_source_metadata(None, DocumentResourceType.DOCUMENT),
+            **paragraph,
+            **document_metadata.get(str(paragraph.get("document_id")), {}),
+        }
+        for paragraph in paragraphs
+    ]
 
 
 def load_image_query_inputs(image_items: Iterable[dict], user_id=None) -> list[str]:

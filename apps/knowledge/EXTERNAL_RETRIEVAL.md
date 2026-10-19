@@ -48,6 +48,9 @@ curl "$BASE_URL/chat/api/v3/knowledge/$KNOWLEDGE_ID/retrieve" \
 similarity 为 0–1（默认 0），search_mode 支持 embedding、keywords、blend（默认 embedding）。
 检索限定当前知识库，返回 `knowledge_id` 和 `hits`，命中包含段落正文（最多 8000 字符）、
 分数、来源与 `citation`（知识库、文档、段落 ID 和名称）；不生成回答。
+每个命中同时包含 `knowledge_type`（KnowledgeType 数字枚举）、`document_resource_type`（`image` 或 `document`）
+和 `document_image_id`。图片文档的 `document_image_id` 为文档原图文件 ID，普通文档或缺少原图引用时为 `null`；
+这些字段与命中向量类型独立，REST 与 MCP 返回相同结果结构。
 过滤跨库、停用或失效段落，仅对实际返回命中累计原有召回统计。正文中的附件沿用现有文件访问规则。
 
 请求体最大 64 KiB。400 为参数错误、401 为缺少/无效凭据、403 为无权限/不允许的 Origin、

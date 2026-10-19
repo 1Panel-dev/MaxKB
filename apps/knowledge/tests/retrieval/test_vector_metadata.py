@@ -2,8 +2,11 @@ from unittest.mock import MagicMock, patch
 
 from django.test import SimpleTestCase
 
-from knowledge.models import Document, DocumentResourceType, Knowledge, SearchMode, SourceType
+from knowledge.models import DocumentResourceType, KnowledgeType, ProblemParagraphMapping, SearchMode, SourceType
+from knowledge.serializers.common import list_paragraph as query_paragraphs
 from knowledge.serializers.knowledge import KnowledgeSerializer
+from knowledge.serializers.problem import ProblemSerializers
+from knowledge.services.multimodal_retrieval import enrich_paragraph_sources
 from knowledge.vector.pg_vector import BlendSearch, EmbeddingSearch, KeywordsSearch, PGVector
 
 
@@ -77,7 +80,14 @@ class VectorSearchMetadataTests(SimpleTestCase):
         knowledge_id = "00000000-0000-0000-0000-000000000001"
         paragraph_id = "00000000-0000-0000-0000-000000000002"
         asset_id = "00000000-0000-0000-0000-000000000003"
-        paragraph = {"id": paragraph_id, "content": "paragraph text", "meta": {"allow_download": True}}
+        paragraph = {
+            "id": paragraph_id,
+            "content": "paragraph text",
+            "meta": {"allow_download": True},
+            "knowledge_type": KnowledgeType.BASE,
+            "document_resource_type": DocumentResourceType.DOCUMENT,
+            "document_image_id": None,
+        }
         asset = {"id": asset_id, "file_name": "chart.png"}
         query_set.return_value.filter.return_value.exists.return_value = True
         query_set.return_value.filter.return_value.__iter__.return_value = iter([])
@@ -111,6 +121,7 @@ class VectorSearchMetadataTests(SimpleTestCase):
             [
                 {
                     **paragraph,
+                    "knowledge_type": KnowledgeType.BASE,
                     "document_resource_type": DocumentResourceType.DOCUMENT,
                     "document_image_id": None,
                     "similarity": 0.9,
@@ -125,56 +136,23 @@ class VectorSearchMetadataTests(SimpleTestCase):
             ],
         )
 
-    @patch("knowledge.serializers.knowledge.get_hit_asset_map", return_value={})
-    @patch("knowledge.serializers.knowledge.list_paragraph")
-    @patch("knowledge.serializers.knowledge.get_embedding_model_by_knowledge_id")
-    @patch("knowledge.serializers.knowledge.QuerySet")
-    @patch("knowledge.serializers.knowledge.VectorStore.get_embedding_vector")
-    def test_hit_test_reports_document_origin_independently_of_vector_type(
-        self, get_vector, query_set, _get_model, list_paragraph, _get_asset_map
-    ):
-        knowledge_id = "00000000-0000-0000-0000-000000000001"
-        knowledge_query = MagicMock()
-        knowledge_query.filter.return_value.exists.return_value = True
-        document_query = MagicMock()
-        query_set.side_effect = {Knowledge: knowledge_query, Document: document_query}.get
+    @patch("knowledge.services.multimodal_retrieval.QuerySet")
+    def test_paragraph_sources_report_document_origin_independently_of_vector_type(self, query_set):
         image_file_id = "00000000-0000-0000-0000-000000000010"
-        document_query.filter.return_value.values_list.return_value = [
-            ("image-document", DocumentResourceType.IMAGE, image_file_id),
-            ("ordinary-document", DocumentResourceType.DOCUMENT, "00000000-0000-0000-0000-000000000011"),
-            ("image-without-file", DocumentResourceType.IMAGE, None),
+        query_set.return_value.filter.return_value.values_list.return_value = [
+            ("image-document", KnowledgeType.BASE, DocumentResourceType.IMAGE, image_file_id),
+            ("ordinary-document", KnowledgeType.WORKFLOW, DocumentResourceType.DOCUMENT, "ordinary-file"),
+            ("image-without-file", KnowledgeType.BASE, DocumentResourceType.IMAGE, None),
         ]
         paragraphs = [
-            {"id": "image-text", "document_id": "image-document"},
-            {"id": "image-vector", "document_id": "image-document"},
-            {"id": "ordinary-text", "document_id": "ordinary-document"},
-            {"id": "ordinary-image", "document_id": "ordinary-document"},
+            {"id": "image-text", "document_id": "image-document", "hit_unit_type": "text"},
+            {"id": "image-vector", "document_id": "image-document", "hit_unit_type": "image"},
+            {"id": "ordinary-text", "document_id": "ordinary-document", "hit_unit_type": "text"},
+            {"id": "ordinary-image", "document_id": "ordinary-document", "hit_unit_type": "image"},
             {"id": "image-without-file", "document_id": "image-without-file"},
         ]
-        list_paragraph.return_value = paragraphs
-        get_vector.return_value.hit_test.return_value = [
-            {
-                "paragraph_id": paragraph["id"],
-                "source_type": source_type,
-                "meta": {"unit_type": unit_type},
-            }
-            for paragraph, source_type, unit_type in zip(
-                paragraphs,
-                [SourceType.PARAGRAPH, SourceType.IMAGE, SourceType.PARAGRAPH, SourceType.IMAGE, SourceType.PARAGRAPH],
-                ["text", "image", "text", "image", "text"],
-            )
-        ]
 
-        result = KnowledgeSerializer.HitTest(
-            data={
-                "workspace_id": "default",
-                "knowledge_id": knowledge_id,
-                "query_text": "chart",
-                "top_number": 5,
-                "similarity": 0.6,
-                "search_mode": SearchMode.embedding.value,
-            }
-        ).hit_test()
+        result = enrich_paragraph_sources(paragraphs)
 
         self.assertEqual(
             [row["document_resource_type"] for row in result],
@@ -186,9 +164,68 @@ class VectorSearchMetadataTests(SimpleTestCase):
                 DocumentResourceType.IMAGE,
             ],
         )
-        self.assertEqual([row["hit_unit_type"] for row in result], ["text", "image", "text", "image", "text"])
+        self.assertEqual([row.get("hit_unit_type") for row in result], ["text", "image", "text", "image", None])
+        self.assertEqual([row["knowledge_type"] for row in result], [0, 0, 4, 4, 0])
         self.assertEqual([row["document_image_id"] for row in result], [image_file_id, image_file_id, None, None, None])
         self.assertTrue(all("source_file_id" not in row and "image_id" not in row for row in result))
-        document_query.filter.return_value.values_list.assert_called_once_with(
-            "id", "resource_type", "meta__source_file_id"
+        self.assertNotIn("document_resource_type", paragraphs[0])
+        query_set.return_value.filter.return_value.values_list.assert_called_once_with(
+            "id", "knowledge__type", "resource_type", "meta__source_file_id"
         )
+
+    @patch("knowledge.services.multimodal_retrieval.QuerySet")
+    def test_complete_sources_and_empty_results_do_not_query_documents(self, query_set):
+        paragraph = {
+            "document_id": "document-1",
+            "knowledge_type": KnowledgeType.BASE,
+            "document_resource_type": DocumentResourceType.DOCUMENT,
+            "document_image_id": None,
+        }
+
+        self.assertEqual(enrich_paragraph_sources([paragraph]), [paragraph])
+        self.assertEqual(enrich_paragraph_sources([]), [])
+        query_set.assert_not_called()
+
+    @patch("knowledge.services.multimodal_retrieval.QuerySet")
+    def test_deleted_document_preserves_known_source_fields(self, query_set):
+        query_set.return_value.filter.return_value.values_list.return_value = []
+        result = enrich_paragraph_sources([{"document_id": "deleted", "knowledge_type": KnowledgeType.LARK}])
+
+        self.assertEqual(result[0]["knowledge_type"], KnowledgeType.LARK)
+        self.assertIsNone(result[0]["document_image_id"])
+
+    @patch("knowledge.services.multimodal_retrieval.QuerySet")
+    @patch("knowledge.serializers.common.native_search")
+    def test_common_paragraph_query_includes_source_fields(self, native_search, query_set):
+        native_search.return_value = [{"id": "paragraph-1", "document_id": "document-1"}]
+        query_set.return_value.filter.return_value.values_list.return_value = [
+            ("document-1", KnowledgeType.WEB, DocumentResourceType.DOCUMENT, "source-file")
+        ]
+
+        result = query_paragraphs(["00000000-0000-0000-0000-000000000001"])
+
+        self.assertEqual(result[0]["knowledge_type"], KnowledgeType.WEB)
+        self.assertEqual(result[0]["document_resource_type"], DocumentResourceType.DOCUMENT)
+        self.assertIsNone(result[0]["document_image_id"])
+
+    @patch("knowledge.services.multimodal_retrieval.QuerySet")
+    @patch("knowledge.serializers.problem.native_search")
+    @patch("knowledge.serializers.problem.QuerySet")
+    def test_problem_paragraph_query_includes_source_fields(self, problem_query, native_search, query_set):
+        mapping_query = MagicMock()
+        mapping_query.filter.return_value = [MagicMock(paragraph_id="paragraph-1")]
+        problem_query.side_effect = lambda model: mapping_query if model == ProblemParagraphMapping else MagicMock()
+        native_search.return_value = [{"id": "paragraph-1", "document_id": "document-1"}]
+        query_set.return_value.filter.return_value.values_list.return_value = [
+            ("document-1", KnowledgeType.BASE, DocumentResourceType.IMAGE, "image-file")
+        ]
+
+        result = ProblemSerializers.Operate(
+            data={
+                "workspace_id": "default",
+                "knowledge_id": "00000000-0000-0000-0000-000000000001",
+                "problem_id": "00000000-0000-0000-0000-000000000002",
+            }
+        ).list_paragraph()
+
+        self.assertEqual(result[0]["document_image_id"], "image-file")

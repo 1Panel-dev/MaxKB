@@ -15,6 +15,7 @@ from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
 from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, DocumentTag, Knowledge
+from knowledge.services.multimodal_retrieval import get_retrieval_source_metadata
 from knowledge.services.retrieval_access import filter_workflow_knowledge
 
 
@@ -246,6 +247,18 @@ class SearchDocumentNode(INode):
         final_document_ids = [str(doc["id"]) for doc in document_items]
         final_knowledge_ids = list(set(str(doc["knowledge_id"]) for doc in document_items))
         knowledge_items = list(QuerySet(Knowledge).filter(id__in=final_knowledge_ids).values())
+        knowledge_types = {str(knowledge["id"]): knowledge["type"] for knowledge in knowledge_items}
+        document_items = [
+            {
+                **document,
+                **get_retrieval_source_metadata(
+                    knowledge_types.get(str(document["knowledge_id"])),
+                    document["resource_type"],
+                    (document.get("meta") or {}).get("source_file_id"),
+                ),
+            }
+            for document in document_items
+        ]
 
         self.write_context("document_list", final_document_ids)
         self.write_context("document_items", _serialize_items(document_items))

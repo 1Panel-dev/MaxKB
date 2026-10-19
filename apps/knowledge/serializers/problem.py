@@ -13,6 +13,7 @@ from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from knowledge.models import Problem, ProblemParagraphMapping, Paragraph, Knowledge, SourceType
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id
+from knowledge.services.multimodal_retrieval import enrich_paragraph_sources
 from knowledge.task.embedding import delete_embedding_by_source_ids, update_problem_embedding, embedding_by_data_list
 from maxkb.const import PROJECT_DIR
 
@@ -175,14 +176,16 @@ class ProblemSerializers(serializers.Serializer):
             )
             if problem_paragraph_mapping is None or len(problem_paragraph_mapping) == 0:
                 return []
-            return native_search(
-                QuerySet(Paragraph).filter(
-                    knowledge_id=self.data.get("knowledge_id"),
-                    id__in=[row.paragraph_id for row in problem_paragraph_mapping],
-                ),
-                select_string=get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_paragraph.sql")
-                ),
+            return enrich_paragraph_sources(
+                native_search(
+                    QuerySet(Paragraph).filter(
+                        knowledge_id=self.data.get("knowledge_id"),
+                        id__in=[row.paragraph_id for row in problem_paragraph_mapping],
+                    ),
+                    select_string=get_file_content(
+                        os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_paragraph.sql")
+                    ),
+                )
             )
 
         def one(self, with_valid=True):

@@ -46,7 +46,6 @@ from users.serializers.user import is_workspace_manage, is_workspace_manage_perm
 
 from knowledge.models import (
     Document,
-    DocumentResourceType,
     DocumentTag,
     File,
     FileSourceType,
@@ -1448,20 +1447,12 @@ class KnowledgeSerializer(serializers.Serializer):
                 str(paragraph.get("id")): paragraph
                 for paragraph in list_paragraph([hit.get("paragraph_id") for hit in hit_list])
             }
-            document_map = {
-                str(document_id): {"resource_type": resource_type, "source_file_id": source_file_id}
-                for document_id, resource_type, source_file_id in QuerySet(Document)
-                .filter(id__in={paragraph.get("document_id") for paragraph in paragraph_dict.values()})
-                .values_list("id", "resource_type", "meta__source_file_id")
-            }
             hit_asset_map = get_hit_asset_map(hit_list)
             result_list = []
             for hit in hit_list:
                 paragraph = paragraph_dict.get(str(hit.get("paragraph_id")))
                 if paragraph is None:
                     continue
-                document = document_map.get(str(paragraph.get("document_id")), {})
-                document_resource_type = document.get("resource_type", DocumentResourceType.DOCUMENT)
                 current_hit = hit
                 source_id = current_hit.get("source_id")
                 source_type = current_hit.get("source_type")
@@ -1470,10 +1461,6 @@ class KnowledgeSerializer(serializers.Serializer):
                 result_list.append(
                     {
                         **paragraph,
-                        "document_resource_type": document_resource_type,
-                        "document_image_id": document.get("source_file_id")
-                        if document_resource_type == DocumentResourceType.IMAGE
-                        else None,
                         "similarity": current_hit.get("similarity"),
                         "comprehensive_score": current_hit.get("comprehensive_score"),
                         "source_id": source_id,

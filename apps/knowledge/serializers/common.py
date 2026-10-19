@@ -29,12 +29,13 @@ from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
-from knowledge.models import Document, DocumentResourceType, KnowledgeWorkflow, KnowledgeWorkflowVersion, KnowledgeType
+from knowledge.models import Document, DocumentResourceType, KnowledgeWorkflow, KnowledgeType
 from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File
 from knowledge.serializers.document_strategy import DocumentStrategySerializer
+from knowledge.services.multimodal_retrieval import enrich_paragraph_sources
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model, get_model_default_params
-from system_manage.models.resource_mapping import ResourceMapping, ResourceType
+from system_manage.models.resource_mapping import ResourceType
 
 
 class MetaSerializer(serializers.Serializer):
@@ -242,9 +243,11 @@ def update_document_char_length(document_id: str):
 def list_paragraph(paragraph_list: List[str]):
     if paragraph_list is None or len(paragraph_list) == 0:
         return []
-    return native_search(
-        QuerySet(Paragraph).filter(id__in=paragraph_list),
-        get_file_content(os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_paragraph.sql")),
+    return enrich_paragraph_sources(
+        native_search(
+            QuerySet(Paragraph).filter(id__in=paragraph_list),
+            get_file_content(os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_paragraph.sql")),
+        )
     )
 
 
