@@ -103,9 +103,7 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
                 <h2>
                   {{ metric.id === 'tokens' ? formatTokenNumber(metric.series[0]?.total) : numberFormat(metric.series[0]?.total) }}
                 </h2>
-                <span v-if="metric.id === 'activeUsers'" class="-ml-1 font-medium text-danger" title="新增用户">
-                  +{{ numberFormat(metric.series[1]?.total) }}
-                </span>
+                <h6 v-if="metric.id === 'activeUsers'" class="-ml-1 text-danger" title="新增用户">+{{ numberFormat(metric.series[1]?.total) }}</h6>
               </template>
             </div>
           </el-card>

@@ -12,7 +12,7 @@ defineProps<{ name: string; logo: string | null }>()
       </div>
       <div class="flex-align-center gap-2 mk-white-card-sm text-primary">
         <MkIcon name="icon_card_filled" :size="18" />
-        <span class="font-medium">全部智能体</span>
+        <h6>全部智能体</h6>
       </div>
       <div class="flex-align-center gap-2 px-2 py-3">
         <MkIcon name="icon_new-chat_outlined" :size="18" />

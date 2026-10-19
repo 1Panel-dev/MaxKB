@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { reactive, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_TYPE } from '@/api/enums'
+import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
-import type { KnowledgeHitTestPayload, KnowledgeHitTestResult } from '@/api/types'
+import type { KnowledgeHitTestPayload, KnowledgeHitTestResult, ParagraphItem } from '@/api/types'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
 import emptyHitTestImage from '@/assets/empty/hit-test.png'
+import fileImageIcon from '@/assets/file-type/file-image-icon.svg'
 import HitTestInput from './components/HitTestInput.vue'
+import { getFileUrl } from '@/utils/common'
+import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'HitTestView' })
 defineProps<ResourceDetailPageProps>()
@@ -30,9 +34,30 @@ function changeSearchMode() {
 }
 
 // 仅展示本次提交的查询快照，失败保留输入和检索参数供重试。
-const resultParagraphs = ref<KnowledgeHitTestResult[]>([])
+const hitTestResults = ref<KnowledgeHitTestResult[]>([])
+const resultParagraphs = computed(() =>
+  hitTestResults.value.map((paragraph) => ({
+    ...paragraph,
+    isImgaeDoc: Boolean(paragraph.document_image_id) && paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE,
+  })),
+)
 const hasTestResult = ref(false)
 const submittedQuery = ref<Required<Pick<KnowledgeHitTestPayload, 'query_text' | 'image_list'>>>({ query_text: '', image_list: [] })
+
+// 点击召回分段后挂载详情弹窗，保存正文时同步当前结果。
+const selectedParagraph = ref<KnowledgeHitTestResult>()
+const paragraphDialogRef = useTemplateRef<InstanceType<typeof ParagraphDialog>>('paragraphDialogRef')
+
+async function handleOpenParagraph(paragraph: KnowledgeHitTestResult) {
+  if (loading.value || selectedParagraph.value) return
+  selectedParagraph.value = paragraph
+  await nextTick()
+  paragraphDialogRef.value?.open(paragraph)
+}
+
+function handleParagraphSuccess(paragraph: ParagraphItem) {
+  hitTestResults.value = hitTestResults.value.map((result) => (result.id === paragraph.id ? { ...result, ...paragraph } : result))
+}
 
 function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text' | 'image_list'>>) {
   if (loading.value) return
@@ -47,7 +72,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
     return resourceApi.knowledge
       .postKnowledgeHitTest(knowledgeId.value, payload)
       .then((paragraphs) => {
-        resultParagraphs.value = paragraphs
+        hitTestResults.value = paragraphs
         submittedQuery.value = query
         hasTestResult.value = true
       })
@@ -79,7 +104,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
             <el-radio-group v-model="searchForm.search_mode" @change="changeSearchMode" class="space-y-2">
               <template v-for="searchMode in KNOWLEDGE_SEARCH_MODE_OPTIONS" :key="searchMode.value">
                 <el-card shadow="never" class="w-full!" :class="{ 'border-primary!': searchForm.search_mode === searchMode.value }">
-                  <el-radio :value="searchMode.value" :disabled="loading" class="mk-card-radio">
+                  <el-radio :value="searchMode.value" class="mk-card-radio">
                     <h6>{{ searchMode.label }}</h6>
                     <span class="block text-sm text-N600">{{ searchMode.description }}</span>
                   </el-radio>
@@ -128,7 +153,6 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
         :file-count-limit="knowledge?.file_count_limit"
         :file-size-limit="knowledge?.file_size_limit"
         :loading="loading"
-        :allow-images="knowledge?.type === KNOWLEDGE_TYPE.BASE"
         @submit="testKnowledge"
       />
     </el-scrollbar>
@@ -140,37 +164,47 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
         </div>
         <template v-else>
           <section class="mb-6">
-            <h4 class="mb-4">本次查询</h4>
+            <h4 class="mb-2">本次查询</h4>
             <div v-if="submittedQuery.image_list.length" class="flex flex-wrap gap-2">
               <template v-for="image in submittedQuery.image_list" :key="image.file_id">
                 <!-- 预览本次查询图片 -->
                 <el-image :src="image.url" :alt="image.name" fit="cover" class="size-12" />
               </template>
             </div>
-            <p v-if="submittedQuery.query_text" class="mt-3 whitespace-pre-wrap break-words">{{ submittedQuery.query_text }}</p>
+            <p v-if="submittedQuery.query_text" class="mt-2 whitespace-pre-wrap break-words">{{ submittedQuery.query_text }}</p>
           </section>
-          <h4 class="mb-4">查询结果</h4>
+          <h4 class="mb-3">查询结果</h4>
           <div v-if="!resultParagraphs.length" class="flex-center flex-1">
             <MkEmpty type="search" description="未召回相关知识，请调整检索参数内容" />
           </div>
           <div v-else class="space-y-3">
             <template v-for="(paragraph, paragraphIndex) in resultParagraphs" :key="paragraph.id">
-              <MkSourceCard :title="paragraph.title || '-'">
-                <template #icon>
-                  <span>
-                    <span>{{ `#${paragraphIndex + 1}` }}</span>
+              <!-- 查看召回分段详情 -->
+              <MkSourceCard :title="paragraph.title || '-'" class="cursor-pointer" @click="handleOpenParagraph(paragraph)">
+                <template #title="{ title }">
+                  <span class="flex-align-center min-w-0 gap-2">
+                    <h6 class="shrink-0">{{ `#${paragraphIndex + 1}` }}</h6>
                     <el-divider direction="vertical" />
+                    <h6 class="min-w-0 truncate" :title="title">{{ title }}</h6>
                   </span>
                 </template>
                 <template #tag>
-                  <span class="shrink-0 text-primary">{{ paragraph.similarity.toFixed(3) }}</span>
+                  <el-tag size="small" type="info">{{ paragraph.isImgaeDoc ? '图片向量' : '文本向量' }}</el-tag>
+                  <h6 class="shrink-0 text-primary">{{ paragraph.similarity.toFixed(3) }}</h6>
                 </template>
+                <!-- 图片随卡片点击打开分段详情 -->
+                <el-image
+                  v-if="paragraph.isImgaeDoc && paragraph.document_image_id"
+                  :src="getFileUrl(paragraph.document_image_id)"
+                  :alt="paragraph.title || ''"
+                  fit="contain"
+                  class="mb-2"
+                />
+                <MdPreview :model-value="paragraph.content" no-img-zoom-in />
 
-                <el-scrollbar max-height="280">
-                  <MdPreview :model-value="paragraph.content" />
-                </el-scrollbar>
                 <template #footer>
-                  <div class="text-sm text-N600">
+                  <div class="flex-align-center min-w-0 gap-2 text-sm text-N600">
+                    <img :src="paragraph.isImgaeDoc ? fileImageIcon : getFileIconUrl(paragraph.document_name)" alt="" class="size-4 shrink-0" />
                     <span class="truncate" :title="paragraph.document_name">{{ paragraph.document_name }}</span>
                   </div>
                 </template>
@@ -181,4 +215,14 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
       </el-scrollbar>
     </section>
   </div>
+  <ParagraphDialog
+    v-if="selectedParagraph"
+    ref="paragraphDialogRef"
+    title="分段详情"
+    :knowledge-id="selectedParagraph.knowledge_id"
+    :document-id="selectedParagraph.document_id"
+    :source-file-id="selectedParagraph.document_image_id || undefined"
+    @success="handleParagraphSuccess"
+    @closed="selectedParagraph = undefined"
+  />
 </template>

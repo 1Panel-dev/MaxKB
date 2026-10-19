@@ -85,7 +85,7 @@ defineExpose({ open })
             <el-card shadow="hover" @click="handleProviderSelect(provider)">
               <div class="flex">
                 <span class="h-6 w-6 shrink-0" :innerHTML="provider.icon" />
-                <span class="ml-3 font-medium">{{ provider.name }}</span>
+                <h6 class="ml-3">{{ provider.name }}</h6>
               </div>
             </el-card>
           </template>
