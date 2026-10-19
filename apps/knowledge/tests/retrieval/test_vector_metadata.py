@@ -112,6 +112,7 @@ class VectorSearchMetadataTests(SimpleTestCase):
                 {
                     **paragraph,
                     "document_resource_type": DocumentResourceType.DOCUMENT,
+                    "document_image_id": None,
                     "similarity": 0.9,
                     "comprehensive_score": 0.95,
                     "source_id": asset_id,
@@ -137,15 +138,18 @@ class VectorSearchMetadataTests(SimpleTestCase):
         knowledge_query.filter.return_value.exists.return_value = True
         document_query = MagicMock()
         query_set.side_effect = {Knowledge: knowledge_query, Document: document_query}.get
+        image_file_id = "00000000-0000-0000-0000-000000000010"
         document_query.filter.return_value.values_list.return_value = [
-            ("image-document", DocumentResourceType.IMAGE),
-            ("ordinary-document", DocumentResourceType.DOCUMENT),
+            ("image-document", DocumentResourceType.IMAGE, image_file_id),
+            ("ordinary-document", DocumentResourceType.DOCUMENT, "00000000-0000-0000-0000-000000000011"),
+            ("image-without-file", DocumentResourceType.IMAGE, None),
         ]
         paragraphs = [
             {"id": "image-text", "document_id": "image-document"},
             {"id": "image-vector", "document_id": "image-document"},
             {"id": "ordinary-text", "document_id": "ordinary-document"},
             {"id": "ordinary-image", "document_id": "ordinary-document"},
+            {"id": "image-without-file", "document_id": "image-without-file"},
         ]
         list_paragraph.return_value = paragraphs
         get_vector.return_value.hit_test.return_value = [
@@ -156,8 +160,8 @@ class VectorSearchMetadataTests(SimpleTestCase):
             }
             for paragraph, source_type, unit_type in zip(
                 paragraphs,
-                [SourceType.PARAGRAPH, SourceType.IMAGE, SourceType.PARAGRAPH, SourceType.IMAGE],
-                ["text", "image", "text", "image"],
+                [SourceType.PARAGRAPH, SourceType.IMAGE, SourceType.PARAGRAPH, SourceType.IMAGE, SourceType.PARAGRAPH],
+                ["text", "image", "text", "image", "text"],
             )
         ]
 
@@ -179,7 +183,12 @@ class VectorSearchMetadataTests(SimpleTestCase):
                 DocumentResourceType.IMAGE,
                 DocumentResourceType.DOCUMENT,
                 DocumentResourceType.DOCUMENT,
+                DocumentResourceType.IMAGE,
             ],
         )
-        self.assertEqual([row["hit_unit_type"] for row in result], ["text", "image", "text", "image"])
-        document_query.filter.return_value.values_list.assert_called_once_with("id", "resource_type")
+        self.assertEqual([row["hit_unit_type"] for row in result], ["text", "image", "text", "image", "text"])
+        self.assertEqual([row["document_image_id"] for row in result], [image_file_id, image_file_id, None, None, None])
+        self.assertTrue(all("source_file_id" not in row and "image_id" not in row for row in result))
+        document_query.filter.return_value.values_list.assert_called_once_with(
+            "id", "resource_type", "meta__source_file_id"
+        )

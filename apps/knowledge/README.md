@@ -91,3 +91,5 @@ the external vision model or tool runs in the worker.
 召回测试 `/hit_test` 的每条分段结果包含 `document_resource_type`，取自所属文档的 `resource_type`：
 `image` 表示图片文档，`document` 表示普通文档。工作空间、系统资源管理和系统共享资源的召回测试
 使用相同字段；此字段与命中向量类型无关，普通文档中的插图命中仍返回 `document`。
+图片文档的结果额外包含 `document_image_id`，取自文档的 `meta.source_file_id`，用于通过现有文件接口显示原图。
+该字段不依赖命中的是文本还是图片向量；普通文档以及缺少原文件引用的图片文档返回 `null`。
