@@ -121,10 +121,16 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
         workspace_id = self.data.get("workspace_id")
-        query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
-        if workspace_id:
-            query_set = query_set.filter(workspace_id=workspace_id)
-        if not query_set.exists():
+        knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
+        if not knowledge:
+            raise AppApiException(500, _("Knowledge id does not exist"))
+        # 系统触发（workspace_id 为 None）不做空间校验，直接放行；
+        # 否则仅系统资源（workspace_id 为 "None"）或属于当前空间的知识库可见
+        if (
+            workspace_id not in (None, "None")
+            and knowledge.workspace_id != "None"
+            and knowledge.workspace_id != workspace_id
+        ):
             raise AppApiException(500, _("Knowledge id does not exist"))
 
     def get_query_set(self, instance: Dict):

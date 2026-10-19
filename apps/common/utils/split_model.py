@@ -13,20 +13,18 @@ from typing import List, Dict
 import jieba
 
 
-def get_level_block(text, level_content_list, level_content_index, cursor):
+def get_level_block(text, level_content_list, level_content_index):
     """
     从文本中获取块数据
     :param text: 文本
     :param level_content_list: 拆分的title数组
     :param level_content_index: 指定的下标
-    :param cursor: 开始的下标位置
     :return: 拆分后的文本数据
     """
     start_content: str = level_content_list[level_content_index].get('content')
-    next_content = level_content_list[level_content_index + 1].get("content") if level_content_index + 1 < len(
-        level_content_list) else None
-    start_index = text.index(start_content, cursor)
-    end_index = text.index(next_content, start_index + 1) if next_content is not None else len(text)
+    start_index = level_content_list[level_content_index]['start']
+    end_index = level_content_list[level_content_index + 1]['start'] if level_content_index + 1 < len(
+        level_content_list) else len(text)
     return text[start_index + len(start_content):end_index], end_index
 
 
@@ -180,8 +178,20 @@ def parse_level(text, pattern: str):
     :param pattern:  正则
     :return: 符合正则的文本
     """
-    masked_text = mask_code_blocks(text)
-    level_content_list = list(map(to_tree_obj, [r[0:255] for r in re_findall(pattern, masked_text) if r is not None]))
+    if pattern is None or (isinstance(pattern, str) and not pattern.strip()):
+        return []
+    try:
+        matches = re.finditer(pattern, mask_code_blocks(text))
+    except re.error:
+        return []
+    level_content_list = []
+    for match in matches:
+        groups = range(1, match.re.groups + 1) if match.re.groups else [0]
+        for group in groups:
+            content = match.group(group)
+            if content:
+                # 保留正则匹配位置，避免同名标题在其他层级、正文或代码块中被错误定位。
+                level_content_list.append({**to_tree_obj(content[:255]), 'start': match.start(group)})
     # 过滤掉空标题或只包含#和空白字符的标题
     filtered_list = [item for item in level_content_list
                      if item['content'].strip(' ') and item['content'].replace('#', '').strip(' ')]
@@ -387,26 +397,24 @@ class SplitModel:
         level_content_list = parse_title_level(text, self.content_level_pattern, index)
         if len(level_content_list) == 0:
             return [to_tree_obj(row, 'block') for row in smart_split_paragraph(text, limit=self.limit)]
-        if index == 0 and text.lstrip().index(level_content_list[0]["content"].lstrip()) != 0:
-            level_content_list.insert(0, to_tree_obj(""))
+        if index == 0 and text[:level_content_list[0]['start']].strip():
+            level_content_list.insert(0, {**to_tree_obj(""), 'start': 0})
 
         cursor = 0
         level_title_content_list = [item for item in level_content_list if item.get('state') == 'title']
         for i in range(len(level_title_content_list)):
-            start_content: str = level_title_content_list[i].get('content')
-            if cursor < text.index(start_content, cursor):
-                for row in smart_split_paragraph(text[cursor:   text.index(start_content, cursor)], limit=self.limit):
-                    level_content_list.insert(0, to_tree_obj(row, 'block'))
+            start_index = level_title_content_list[i]['start']
+            if cursor < start_index:
+                level_content_list[0:0] = [
+                    to_tree_obj(row, 'block')
+                    for row in smart_split_paragraph(text[cursor:start_index], limit=self.limit)
+                ]
 
-            block, cursor = get_level_block(text, level_title_content_list, i, cursor)
+            block, cursor = get_level_block(text, level_title_content_list, i)
             if len(block) == 0:
                 continue
             children = self.parse_to_tree(text=block, index=index + 1)
             level_title_content_list[i]['children'] = children
-            first_child_idx_in_block = block.lstrip().index(children[0]["content"].lstrip())
-            if first_child_idx_in_block != 0:
-                inner_children = self.parse_to_tree(block[:first_child_idx_in_block], index + 1)
-                level_title_content_list[i]['children'].extend(inner_children)
         return level_content_list
 
     def parse(self, text: str):
