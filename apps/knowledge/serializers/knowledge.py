@@ -46,6 +46,7 @@ from users.serializers.user import is_workspace_manage, is_workspace_manage_perm
 
 from knowledge.models import (
     Document,
+    DocumentResourceType,
     DocumentTag,
     File,
     FileSourceType,
@@ -1447,6 +1448,12 @@ class KnowledgeSerializer(serializers.Serializer):
                 str(paragraph.get("id")): paragraph
                 for paragraph in list_paragraph([hit.get("paragraph_id") for hit in hit_list])
             }
+            document_resource_type_map = {
+                str(document_id): resource_type
+                for document_id, resource_type in QuerySet(Document)
+                .filter(id__in={paragraph.get("document_id") for paragraph in paragraph_dict.values()})
+                .values_list("id", "resource_type")
+            }
             hit_asset_map = get_hit_asset_map(hit_list)
             result_list = []
             for hit in hit_list:
@@ -1461,6 +1468,9 @@ class KnowledgeSerializer(serializers.Serializer):
                 result_list.append(
                     {
                         **paragraph,
+                        "document_resource_type": document_resource_type_map.get(
+                            str(paragraph.get("document_id")), DocumentResourceType.DOCUMENT
+                        ),
                         "similarity": current_hit.get("similarity"),
                         "comprehensive_score": current_hit.get("comprehensive_score"),
                         "source_id": source_id,

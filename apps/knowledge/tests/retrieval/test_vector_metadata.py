@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 from django.test import SimpleTestCase
 
-from knowledge.models import SearchMode, SourceType
+from knowledge.models import Document, DocumentResourceType, Knowledge, SearchMode, SourceType
 from knowledge.serializers.knowledge import KnowledgeSerializer
 from knowledge.vector.pg_vector import BlendSearch, EmbeddingSearch, KeywordsSearch, PGVector
 
@@ -111,6 +111,7 @@ class VectorSearchMetadataTests(SimpleTestCase):
             [
                 {
                     **paragraph,
+                    "document_resource_type": DocumentResourceType.DOCUMENT,
                     "similarity": 0.9,
                     "comprehensive_score": 0.95,
                     "source_id": asset_id,
@@ -122,3 +123,63 @@ class VectorSearchMetadataTests(SimpleTestCase):
                 }
             ],
         )
+
+    @patch("knowledge.serializers.knowledge.get_hit_asset_map", return_value={})
+    @patch("knowledge.serializers.knowledge.list_paragraph")
+    @patch("knowledge.serializers.knowledge.get_embedding_model_by_knowledge_id")
+    @patch("knowledge.serializers.knowledge.QuerySet")
+    @patch("knowledge.serializers.knowledge.VectorStore.get_embedding_vector")
+    def test_hit_test_reports_document_origin_independently_of_vector_type(
+        self, get_vector, query_set, _get_model, list_paragraph, _get_asset_map
+    ):
+        knowledge_id = "00000000-0000-0000-0000-000000000001"
+        knowledge_query = MagicMock()
+        knowledge_query.filter.return_value.exists.return_value = True
+        document_query = MagicMock()
+        query_set.side_effect = {Knowledge: knowledge_query, Document: document_query}.get
+        document_query.filter.return_value.values_list.return_value = [
+            ("image-document", DocumentResourceType.IMAGE),
+            ("ordinary-document", DocumentResourceType.DOCUMENT),
+        ]
+        paragraphs = [
+            {"id": "image-text", "document_id": "image-document"},
+            {"id": "image-vector", "document_id": "image-document"},
+            {"id": "ordinary-text", "document_id": "ordinary-document"},
+            {"id": "ordinary-image", "document_id": "ordinary-document"},
+        ]
+        list_paragraph.return_value = paragraphs
+        get_vector.return_value.hit_test.return_value = [
+            {
+                "paragraph_id": paragraph["id"],
+                "source_type": source_type,
+                "meta": {"unit_type": unit_type},
+            }
+            for paragraph, source_type, unit_type in zip(
+                paragraphs,
+                [SourceType.PARAGRAPH, SourceType.IMAGE, SourceType.PARAGRAPH, SourceType.IMAGE],
+                ["text", "image", "text", "image"],
+            )
+        ]
+
+        result = KnowledgeSerializer.HitTest(
+            data={
+                "workspace_id": "default",
+                "knowledge_id": knowledge_id,
+                "query_text": "chart",
+                "top_number": 5,
+                "similarity": 0.6,
+                "search_mode": SearchMode.embedding.value,
+            }
+        ).hit_test()
+
+        self.assertEqual(
+            [row["document_resource_type"] for row in result],
+            [
+                DocumentResourceType.IMAGE,
+                DocumentResourceType.IMAGE,
+                DocumentResourceType.DOCUMENT,
+                DocumentResourceType.DOCUMENT,
+            ],
+        )
+        self.assertEqual([row["hit_unit_type"] for row in result], ["text", "image", "text", "image"])
+        document_query.filter.return_value.values_list.assert_called_once_with("id", "resource_type")

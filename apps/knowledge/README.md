@@ -87,3 +87,7 @@ the external vision model or tool runs in the worker.
 启用视觉增强后，生成预览会调用所选模型或工具，完成识别后直接返回 `success` 或 `failure`，
 正文分段包含识别结果，客户端无需轮询；关闭视觉增强返回 `skipped`。
 不经过预览直接导入时，图片识别仍由 Celery 向量化任务处理，状态及导入时序见上文。
+
+召回测试 `/hit_test` 的每条分段结果包含 `document_resource_type`，取自所属文档的 `resource_type`：
+`image` 表示图片文档，`document` 表示普通文档。工作空间、系统资源管理和系统共享资源的召回测试
+使用相同字段；此字段与命中向量类型无关，普通文档中的插图命中仍返回 `document`。
