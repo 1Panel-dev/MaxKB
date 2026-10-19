@@ -178,10 +178,24 @@ class FileStorageDatabaseTests(TestCase):
         client.return_value.put_object.assert_called_once()
 
     def create_legacy_pg_files(self):
+        archive = BytesIO()
+        with ZipFile(archive, "w", ZIP_DEFLATED) as zipped:
+            zipped.writestr("original.png", b"legacy bytes")
+        compressed = archive.getvalue()
         with connection.cursor() as cursor:
-            cursor.execute("SELECT lo_from_bytea(0, %s)", [b"legacy bytes"])
+            cursor.execute("SELECT lo_from_bytea(0, %s)", [compressed])
             loid = cursor.fetchone()[0]
-        files = [File(storage_type="pg", loid=loid, meta={"original_size": len(b"legacy bytes")}) for _ in range(2)]
+        files = [
+            File(
+                file_name="original.png",
+                storage_type="pg",
+                loid=loid,
+                file_size=len(compressed),
+                sha256_hash=get_sha256_hash(b"legacy bytes"),
+                meta={"original_size": len(b"legacy bytes")},
+            )
+            for _ in range(2)
+        ]
         File.objects.bulk_create(files)
         # Match an actual replacement, which loads persisted File instances.
         return [File.objects.get(pk=file.pk) for file in files]
@@ -190,6 +204,103 @@ class FileStorageDatabaseTests(TestCase):
         with connection.cursor() as cursor:
             cursor.execute("SELECT EXISTS(SELECT 1 FROM pg_largeobject_metadata WHERE oid=%s)", [loid])
             return cursor.fetchone()[0]
+
+    @patch("knowledge.models.knowledge.is_seaweedfs_enabled", return_value=False)
+    @patch("knowledge.models.knowledge.get_s3_client")
+    def test_v2_pg_files_read_and_download_after_rename_without_oss(self, client, _configured):
+        from oss.serializers.file import FileSerializer
+
+        first, _last = self.create_legacy_pg_files()
+        File.objects.filter(pk=first.pk).update(file_name="renamed.png")
+        first.refresh_from_db()
+
+        self.assertEqual(first.get_bytes(), b"legacy bytes")
+        response = FileSerializer.Operate(data={"id": str(first.id)}).get()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"legacy bytes")
+        self.assertIn("renamed.png", response["Content-Disposition"])
+        client.assert_not_called()
+
+    @patch("knowledge.models.knowledge.get_s3_client")
+    def test_v2_pg_range_reads_use_the_original_large_object(self, client):
+        first, _last = self.create_legacy_pg_files()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT lo_get(%s::oid)", [first.loid])
+            compressed = bytes(cursor.fetchone()[0])
+
+        self.assertEqual(b"".join(first.get_bytes_stream(3, 19, 5)), compressed[3:19])
+        client.assert_not_called()
+
+    @patch("knowledge.models.knowledge.is_seaweedfs_enabled", return_value=False)
+    @patch("knowledge.models.knowledge.get_s3_client")
+    def test_unconfigured_oss_preserves_the_legacy_pg_file(self, client, _configured):
+        first, _last = self.create_legacy_pg_files()
+        loid = first.loid
+
+        with self.assertRaises(AppApiException):
+            first.save(b"replacement")
+
+        first.refresh_from_db()
+        self.assertEqual((first.storage_type, first.loid), ("pg", loid))
+        self.assertEqual(first.get_bytes(), b"legacy bytes")
+        client.assert_not_called()
+
+    @patch("knowledge.models.knowledge.is_seaweedfs_enabled", return_value=True)
+    @patch("knowledge.models.knowledge.get_s3_client")
+    def test_failed_oss_upload_preserves_the_legacy_pg_file_and_bytes(self, client, _configured):
+        first, _last = self.create_legacy_pg_files()
+        loid = first.loid
+        client.return_value.put_object.side_effect = RuntimeError("upload failed")
+
+        with self.assertRaisesRegex(RuntimeError, "upload failed"):
+            first.save(b"replacement")
+
+        first.refresh_from_db()
+        self.assertEqual((first.storage_type, first.loid), ("pg", loid))
+        self.assertEqual(first.sha256_hash, get_sha256_hash(b"legacy bytes"))
+        self.assertEqual(first.get_bytes(), b"legacy bytes")
+        self.assertTrue(self.large_object_exists(loid))
+
+    def test_deleting_shared_v2_file_preserves_bytes_until_the_last_reference(self):
+        first, last = self.create_legacy_pg_files()
+        loid = first.loid
+
+        first.delete()
+
+        last.refresh_from_db()
+        self.assertTrue(self.large_object_exists(loid))
+        self.assertEqual(last.get_bytes(), b"legacy bytes")
+
+        last.delete()
+
+        self.assertFalse(self.large_object_exists(loid))
+
+    def test_bulk_deleting_shared_v2_files_releases_the_large_object(self):
+        first, last = self.create_legacy_pg_files()
+        file_ids = [first.pk, last.pk]
+        loid = first.loid
+
+        File.objects.filter(pk__in=file_ids).delete()
+
+        self.assertFalse(File.objects.filter(pk__in=file_ids).exists())
+        self.assertFalse(self.large_object_exists(loid))
+
+    def test_deletion_rollback_restores_the_v2_file_and_readable_bytes(self):
+        first, last = self.create_legacy_pg_files()
+        loid = first.loid
+        file_id = first.pk
+        last.delete()
+
+        with self.assertRaisesRegex(RuntimeError, "rollback"), transaction.atomic():
+            File.objects.filter(pk=file_id).delete()
+            self.assertFalse(self.large_object_exists(loid))
+            raise RuntimeError("rollback")
+
+        first.refresh_from_db()
+        self.assertEqual((first.storage_type, first.loid), ("pg", loid))
+        self.assertTrue(self.large_object_exists(loid))
+        self.assertEqual(first.get_bytes(), b"legacy bytes")
 
     @patch("knowledge.models.knowledge.is_seaweedfs_enabled", return_value=True)
     @patch("knowledge.models.knowledge.get_s3_client")
@@ -201,6 +312,8 @@ class FileStorageDatabaseTests(TestCase):
         first.save(content)
 
         self.assertTrue(self.large_object_exists(loid))
+        last.refresh_from_db()
+        self.assertEqual(last.get_bytes(), b"legacy bytes")
         last.save(content)
         self.assertFalse(self.large_object_exists(loid))
         for file in (first, last):
@@ -225,3 +338,4 @@ class FileStorageDatabaseTests(TestCase):
         first.refresh_from_db()
         self.assertEqual((first.storage_type, first.loid), ("pg", loid))
         self.assertTrue(self.large_object_exists(loid))
+        self.assertEqual(first.get_bytes(), b"legacy bytes")

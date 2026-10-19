@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from django.db import connection
+from django.db import connection, transaction
 from django.test import SimpleTestCase, TestCase
 
 from common.exception.app_exception import AppApiException
@@ -143,3 +143,35 @@ class BatchDocumentCleanupDatabaseTests(TestCase):
         self.assertFalse(self.large_object_exists(private_image.loid))
         self.assertTrue(self.large_object_exists(retained_image.loid))
         self.assertEqual(retained_image.get_bytes(), b"shared image" + unique_bytes)
+
+    def test_batch_deletion_rollback_restores_document_files_and_pg_bytes(self):
+        knowledge = Knowledge.objects.create(name="rollback test", desc="")
+        document = Document.objects.create(knowledge=knowledge, name="selected", char_length=0)
+        source = self.create_file(document, "guide.txt", b"source bytes")
+        image = self.create_file(document, "image.png", b"image bytes")
+        document.meta = {"source_file_id": str(source.id)}
+        document.save(update_fields=["meta"])
+        paragraph = Paragraph.objects.create(knowledge=knowledge, document=document, content="paragraph")
+        asset = ParagraphAsset.objects.create(knowledge=knowledge, document=document, paragraph=paragraph, file=image)
+        serializer = DocumentSerializers.Batch(data={"knowledge_id": str(knowledge.id)})
+
+        with (
+            patch("knowledge.services.document_cleanup.delete_embedding_by_document_list"),
+            self.assertRaisesRegex(RuntimeError, "rollback"),
+            transaction.atomic(),
+        ):
+            DocumentSerializers.Batch.batch_delete.__wrapped__(
+                serializer, {"id_list": [str(document.id)]}, with_valid=False
+            )
+            self.assertFalse(Document.objects.filter(pk=document.pk).exists())
+            self.assertFalse(self.large_object_exists(source.loid))
+            self.assertFalse(self.large_object_exists(image.loid))
+            raise RuntimeError("rollback")
+
+        self.assertTrue(Document.objects.filter(pk=document.pk).exists())
+        self.assertTrue(Paragraph.objects.filter(pk=paragraph.pk).exists())
+        self.assertTrue(ParagraphAsset.objects.filter(pk=asset.pk).exists())
+        source.refresh_from_db()
+        image.refresh_from_db()
+        self.assertEqual(source.get_bytes(), b"source bytes")
+        self.assertEqual(image.get_bytes(), b"image bytes")
