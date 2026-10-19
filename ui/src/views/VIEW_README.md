@@ -77,6 +77,10 @@
 - 普通 Workspace 详情返回列表时恢复所属 `folderId`；共享知识库返回 `folderId: 'shared'`。
   文件夹地址同步与工作空间切换规则见路由文档。
 - `application-detail/context.ts` 提供只读详情、替换和刷新；完整响应局部替换，部分响应重新查询。
+  通过 `provideApplicationDetailContext`／`useApplicationDetailContext` 统一提供 `applicationId`、
+  `resourceApi`、`listRouteName` 与 `routeParams`，仅支持 Workspace 和 System 资源管理。
+  `resourceApi.application / chatUser / overview / access / chatLog / workflow` 按范围选择完整 API，
+  不包含 Workspace 共享或 System 共享，不将缺失方法回退到 Workspace。
   切换二级菜单不重复挂载详情容器。
 - 创建模型入口接收完整 Model API；创建成功刷新基础资料后通知调用方刷新选项。
 - 工具表单按类型放在 `tool-form/`，共用参数及 Python 设置放在 `tool-form/component/`。
@@ -155,7 +159,7 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 测试期间冻结参数与输入；结果使用 `MkSourceCard` 展示分段、得分、文档名称及命中图片，Markdown 只读。
 点击结果卡片按需挂载 `ParagraphDialog`，按命中分段的知识库和文档 ID 加载详情，关闭动画后卸载；保存正文后同步当前结果，保留检索得分。
 “本次查询”展示成功请求的文本与图片快照，图片位于文本上方，缩略图自动换行并支持预览，不使用横向滚动。
-初始与无命中分别展示空态；请求失败由请求层提示，保留输入与已有结果供重试。切换知识库或资源范围通过路由 key 重建召回测试页，隔离查询与结果状态。
+初始与无命中分别展示空态；请求失败由请求层提示，保留输入与已有结果供重试。
 
 ### 文档列表与导入
 
@@ -279,6 +283,7 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   创建模板由资源创建流程负责，取消／失败保留模板中心。
 - 调试与导出先保存未提交修改，保存失败不继续；打开历史、模板或默认模型时按原流程关闭调试。
 - 智能体复用对话模块 DebugPanel；工具使用 debug Drawer、SSE 和执行详情；知识库保留任务轮询与导入 Action。
+  智能体画布按 Workspace／System 资源管理选择详情、保存、发布、模型和历史 API；DebugPanel 尚未按 System 范围适配。
   客户端停止读取不等于服务端停止任务。
 - 知识库导出仅工作流 `.kbwf`；导入确认覆盖后直接上传，不先保存旧草稿，成功重载；取消／失败保留图。
   正式导入文档要求已发布；转换使用 Knowledge API，保留已有文档，不能用保存代替转换。
@@ -300,12 +305,12 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   概览内暂时隐藏卡片详情入口，不接入排行抽屉、搜索、分页或导出。
 - 触发器表单共用创建／编辑，保留任务 ID 和参数；资源模式固定单任务，完整输入定义不足时补查详情。
   保存校验全部折叠任务；参数初始化不覆盖已配置值，移除事件引用时恢复自定义默认值。
-- 智能体／知识库对话用户页使用双栏布局和当前页授权；知识库从 context 取四范围 ChatUser API。
+- 智能体／知识库对话用户页使用双栏布局和当前页授权；智能体从 context 取 Workspace／System 资源管理 ChatUser API，知识库取四范围 API。
   自动授权立即保存，手动保存只提交当前页；请求共用 loading 与 inert，失败保留勾选。
   授权人数取 `authorized_count`，不以分页勾选推算。
 - 对话日志筛选、导出使用同组查询；无勾选导出筛选结果，日期清空禁用导出。
-  清除策略使用专用接口、弹窗自身 loading；添加知识库固定所选对话 ID。
-  `ChatLogDetailDrawer` 目前正文为空，上一条／下一条与跨页由页面管理。
+  清除策略通过当前范围 ChatLog API 保存、使用弹窗自身 loading；添加知识库固定所选对话 ID，选项使用当前范围 Knowledge／Document API。
+  `ChatLogDetailDrawer` 使用现有 `LogConversation` 展示只读历史对话与执行详情，正文查询仍使用 Workspace API；上一条／下一条与跨页由页面管理。
 - 外部检索页从 context 读取四范围 ExternalRetrieval API；Workspace 共享只读，禁用开关并阻止提交。
   查询失败展示重新加载入口，不展示默认开关；保存期间使用 loading 与 inert，失败保留已保存配置。
   知识库或资源范围变化时重新查询；示例与地址来自响应，只读展示／复制，不在前端拼接。

@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { useApplicationDetailContext } from '../../context'
 import { computed, onMounted, ref } from 'vue'
-import OverviewApi from '@/api/admin/workspace/application/overview'
+
 import type { ApplicationTokenUsage, ApplicationTopQuestion, HomeRankingRecord } from '@/api/types'
 import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
 import { beforeDay } from '@/utils/time'
 import RankingCard from '@/views/home/components/ranking/RankingCard.vue'
+
+const { resourceApi } = useApplicationDetailContext()
 
 defineOptions({ name: 'ApplicationRanking' })
 const props = defineProps<{ applicationId: string }>()
@@ -34,14 +37,16 @@ const totals = computed(() => ({
 function loadRankings() {
   loading.value = true
   return Promise.allSettled([
-    OverviewApi.getTokenUsage(props.applicationId, range.value)
+    resourceApi.overview
+      .getTokenUsage(props.applicationId, range.value)
       .then((records) => {
         tokenUsage.value = records
       })
       .catch(() => {
         tokenUsage.value = undefined
       }),
-    OverviewApi.getTopQuestions(props.applicationId, range.value)
+    resourceApi.overview
+      .getTopQuestions(props.applicationId, range.value)
       .then((records) => {
         topQuestions.value = records
       })

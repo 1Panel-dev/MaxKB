@@ -7,7 +7,7 @@ import { getWorkspaceId, isSystemResource } from '@/utils/resource-context'
 /** 按详情菜单顺序返回首个可访问的子路由，无可用详情时返回对应范围的列表。 */
 export function goBack(applicationId: string) {
   const systemResource = isSystemResource()
-  const detailRouteName = systemResource ? 'system-application-detail-layout' : 'workspace-application-detail-layout'
+  const detailRouteName = systemResource ? 'system-resource-application-detail' : 'workspace-application-detail-layout'
   const listRouteName = systemResource ? 'system-resource-applications' : 'workspace-application-list'
   const workspaceId = getWorkspaceId()
   const params: RouteParamsGeneric = { applicationId, type: APPLICATION_TYPE.WORK_FLOW }

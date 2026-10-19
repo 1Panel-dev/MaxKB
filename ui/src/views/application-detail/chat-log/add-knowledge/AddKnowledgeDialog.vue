@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import DocumentApi from '@/api/admin/workspace/knowledge/document'
+import type { ApplicationChatLogApi } from '../../context'
+import WorkspaceKnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import WorkspaceDocumentApi from '@/api/admin/workspace/knowledge/document'
+import SystemResourceDocumentApi from '@/api/admin/system/resource-management/knowledge/document'
+import { isSystemResource } from '@/utils/resource-context'
 import type { DocumentItem, KnowledgeItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'AddKnowledgeDialog' })
 const props = defineProps<{
-  api: typeof ChatLogApi
+  api: ApplicationChatLogApi
   applicationId: string
 }>()
+
 const emit = defineEmits<{ refresh: [] }>()
 
 // 固定本次勾选的对话，查询知识库与联动文档选项。
@@ -38,7 +42,9 @@ function open(chatIds: string[]) {
   targetChatIds.value = [...chatIds]
   visible.value = true
   knowledgeLoading.value = true
-  return KnowledgeApi.getAllKnowledge()
+  const requestKnowledgeApi = isSystemResource() ? SystemResourceKnowledgeApi : WorkspaceKnowledgeApi
+  return requestKnowledgeApi
+    .getAllKnowledge()
     .then((knowledge) => {
       knowledgeOptions.value = knowledge
     })
@@ -56,7 +62,9 @@ function handleKnowledgeChange(knowledgeId: string) {
   formRef.value?.clearValidate('document_id')
   if (!knowledgeId) return
   documentLoading.value = true
-  return DocumentApi.getAllDocuments(knowledgeId)
+  const requestDocumentApi = isSystemResource() ? SystemResourceDocumentApi : WorkspaceDocumentApi
+  return requestDocumentApi
+    .getAllDocuments(knowledgeId)
     .then((documents) => {
       documentOptions.value = documents
     })

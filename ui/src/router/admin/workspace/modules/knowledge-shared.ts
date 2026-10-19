@@ -62,7 +62,6 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'hit-test',
             name: 'workspace-shared-knowledge-hit-test',
             component: () => import('@/views/knowledge-detail/hit-test/index.vue'),
-            props: (route) => ({ key: `${route.meta.resourceScope}:${route.params.knowledgeId}` }),
             meta: { title: '召回测试', order: 10 },
           },
           {

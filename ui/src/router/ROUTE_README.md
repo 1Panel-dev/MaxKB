@@ -245,7 +245,6 @@ Workspace 共享覆盖 resourceScope，保留 Workspace scope 及知识库 activ
 | 授权与集成 | integration/chat-user、integration/external-retrieval                                                                 |
 | 设置       | BASE 单独 setting；WEB 分组含 setting/base、document-strategy、scheduled-sync；LARK／WORKFLOW 含 base、scheduled-sync |
 
-召回测试子路由通过 `props` 传入资源范围与知识库 ID 组成的 Vue `key`，切换资源时重建该页。
 分组不挂 View，直接访问重定向首个子页，保留参数、query、hash。
 设置只用 detailMenuVisible 控制菜单类型，不添加类型访问守卫。资料库 View 的目录是 library/tags，URL 仍为 tag。
 
@@ -257,15 +256,22 @@ Workspace 共享覆盖 resourceScope，保留 Workspace scope 及知识库 activ
 ### 智能体
 
 Workspace 详情父路由为 workspace-application-detail-layout，详情参数包含 applicationId 与 ApplicationDetail.type。
+System 资源管理详情为 `/system/resource/application/:applicationId/:type`，父路由名为
+`system-resource-application-detail-layout`，默认进入 `system-resource-application-overview`。
+配置集中在 `admin/system/modules/application-system-resource.ts`，由 System 路由汇总接入。
+两种范围独立维护 children，复用 `application-detail` 页面；System 隐藏系统侧栏，不携带 workspaceId，
+不提供 Workspace 共享或 System 共享的智能体详情。System 列表点击名称进入详情。
 菜单为概览、设置、发布渠道、对话用户、对话日志；SIMPLE 的 setting 与高级 workflow-entry 互斥显示。
 发布渠道使用 access 路径、workspace-application-access 路由名，对应 application-detail/access 页面。
 高级设置重定向 workflow-application，保留 workspaceId、applicationId 和 query。
+System 高级设置重定向 `system-resource-workflow-application`，地址为
+`/system/resource/application/:applicationId/workflow`，保留 applicationId 和 query。
 对话日志保留 operation-log 路径和 workspace-application-operation-log 名称。
 
 workflow/application/navigation.ts 按详情子路由 order 查找首个有名称、标题、未隐藏且 canAccess 允许的页面。
 未配置 canAccess 默认允许；它仅用于返回导航，不替代守卫或后端鉴权。
 概览使用 overviewRead，简易设置要求 SIMPLE 与编辑权限，高级设置 canAccess 为 false，避免返回画布。
-无可访问详情或 System 详情父路由未实现时返回对应列表，不在导航函数硬编码子页分支。
+无可访问详情时返回对应列表，不在导航函数硬编码子页分支。
 
 ### 工具
 

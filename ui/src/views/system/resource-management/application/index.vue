@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import SystemCommonApi from '@/api/admin/system/common'
 import SystemWorkspaceApi from '@/api/admin/system/workspace'
@@ -17,6 +18,11 @@ import {
 } from '@/views/application/application-card/action-dropdown'
 
 const { auth } = useStore()
+const router = useRouter()
+
+function handleOpenApplication(application: ApplicationDetail) {
+  void router.push({ name: 'system-resource-application-detail', params: { applicationId: application.id, type: application.type } })
+}
 
 /* 工具分页与筛选 */
 const loading = ref(false)
@@ -106,7 +112,10 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <ApplicationIcon :icon="row.icon" :size="20" class="shrink-0" />
-              <span class="truncate">{{ row.name }}</span>
+              <!-- 查看智能体详情 -->
+              <el-link class="min-w-0" @click="handleOpenApplication(row)">
+                <span class="truncate">{{ row.name }}</span>
+              </el-link>
             </div>
           </template>
         </el-table-column>

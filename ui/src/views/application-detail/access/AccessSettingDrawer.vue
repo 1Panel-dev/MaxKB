@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { useApplicationDetailContext } from '../context'
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import AccessApi from '@/api/admin/workspace/application/access'
+
 import { APPLICATION_ACCESS_PLATFORM } from '@/api/enums'
 import type { ApplicationAccessConfig, Dict } from '@/api/types'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 import type { AccessPlatformDefinition } from './platforms'
+
+const { resourceApi } = useApplicationDetailContext()
 
 defineOptions({ name: 'AccessSettingDrawer' })
 const props = defineProps<{ applicationId: string; platform: AccessPlatformDefinition }>()
@@ -41,7 +44,8 @@ const rules = computed<FormRules>(() =>
 // 抽屉按需挂载，每次打开查询最新配置；未配置时使用空表单。
 function loadPlatformConfig() {
   loading.value = true
-  return AccessApi.getPlatformConfig(props.applicationId, props.platform.key)
+  return resourceApi.access
+    .getPlatformConfig(props.applicationId, props.platform.key)
     .then((config) => {
       savedConfig = config ?? {}
       if (modeField.value) form[modeField.value.key] = String(savedConfig[modeField.value.key] ?? modeField.value.default)
@@ -63,7 +67,8 @@ function handleSave() {
     loading.value = true
     const payload: ApplicationAccessConfig = { ...savedConfig, ...form, callback_url: callbackUrl.value }
     if (isWechat.value) payload.is_certification = isCertification.value
-    AccessApi.postPlatformConfig(props.applicationId, props.platform.key, payload)
+    resourceApi.access
+      .postPlatformConfig(props.applicationId, props.platform.key, payload)
       .then(() => {
         MsgSuccess('保存成功')
         emit('refresh')
