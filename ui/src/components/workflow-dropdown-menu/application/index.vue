@@ -153,6 +153,7 @@ import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
 import { WorkflowMode } from '@/enums/application'
 const workflowModel = inject('workflowMode') as WorkflowMode
+const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 const { user, folder } = useStore()
 
@@ -289,6 +290,9 @@ async function getToolList() {
   }).getToolList({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
     tool_type_list: [baseType, 'WORKFLOW'],
+    ...(apiType.value === 'systemManage'
+      ? { workspace_id: getResourceDetail?.()?.value?.workspace_id }
+      : {}),
   })
   toolList.value = res.data?.tools || res.data || []
   toolList.value = toolList.value?.filter((item: any) => item.is_active)
