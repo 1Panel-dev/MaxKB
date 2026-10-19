@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
-import { useRoute } from 'vue-router'
 import type { TableColumnCtx } from 'element-plus'
-import ChatLogApi from '@/api/admin/workspace/application/chat-log'
+
 import type { ChatLog, ChatLogSource, Dict, OptionItem } from '@/api/types'
 import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
@@ -18,9 +17,7 @@ defineOptions({ name: 'ApplicationChatLogView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
-const route = useRoute()
-const applicationId = computed(() => String(route.params.applicationId ?? ''))
-const { application } = useApplicationDetailContext()
+const { application, applicationId, resourceApi } = useApplicationDetailContext()
 
 // 日志搜索与日期筛选
 const loading = ref(false)
@@ -76,7 +73,8 @@ function loadChatLogs(currentPage = paginationConfig.value.currentPage): Promise
     return Promise.resolve([])
   }
   loading.value = true
-  return ChatLogApi.getChatLog(applicationId.value, { ...paginationConfig.value, currentPage }, chatLogQuery.value)
+  return resourceApi.chatLog
+    .getChatLog(applicationId.value, { ...paginationConfig.value, currentPage }, chatLogQuery.value)
     .then((page) => {
       chatLogs.value = page.records
       paginationConfig.value.currentPage = currentPage
@@ -153,11 +151,13 @@ function handleKnowledgeAdded() {
 function handleExport() {
   if (loading.value || exporting.value || !chatLogDateQuery.value.start_time) return
   exporting.value = true
-  return ChatLogApi.postExportChatLog(applicationId.value, application.value?.name ?? '对话日志', chatLogQuery.value, {
-    select_ids: selectedChatLogs.value.map(({ id }) => id),
-  }).finally(() => {
-    exporting.value = false
-  })
+  return resourceApi.chatLog
+    .postExportChatLog(applicationId.value, application.value?.name ?? '对话日志', chatLogQuery.value, {
+      select_ids: selectedChatLogs.value.map(({ id }) => id),
+    })
+    .finally(() => {
+      exporting.value = false
+    })
 }
 
 onMounted(() => loadChatLogs())
@@ -176,7 +176,7 @@ onMounted(() => loadChatLogs())
           <span>导出</span>
         </el-button>
         <!-- 设置日志清除策略 -->
-        <ButtonCleanStrategy :api="ChatLogApi" :application-id="applicationId" />
+        <ButtonCleanStrategy :api="resourceApi.chatLog" :application-id="applicationId" />
       </div>
     </div>
   </Teleport>
@@ -231,7 +231,7 @@ onMounted(() => loadChatLogs())
     <template #footer-batch-actions>
       <!-- 批量添加对话到知识库 -->
       <ButtonAddKnowledge
-        :api="ChatLogApi"
+        :api="resourceApi.chatLog"
         :application-id="applicationId"
         :chat-ids="selectedChatLogs.map(({ id }) => id)"
         :disabled="loading"

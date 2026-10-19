@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref } from 'vue'
+import { useApplicationDetailContext } from '../context'
 import type { ChatLog } from '@/api/types'
 import LogConversation from '@/conversation-panel/view/log/index.vue'
 
@@ -11,8 +11,7 @@ const props = defineProps<{
   nextDisabled: boolean
 }>()
 
-const route = useRoute()
-const applicationId = computed(() => String(route.params.applicationId ?? ''))
+const { applicationId } = useApplicationDetailContext()
 const emit = defineEmits<{ previous: []; next: []; closed: [] }>()
 
 // 对话详情抽屉的打开与关闭

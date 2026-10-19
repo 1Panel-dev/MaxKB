@@ -1,34 +1,32 @@
 <script setup lang="ts">
-import { computed, provide, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail } from '@/api/types'
 import ResourceDetailLayout from '@/layout/ResourceDetailLayout.vue'
-import { applicationDetailContextKey } from './context'
+import { provideApplicationDetailContext } from './context'
+import { isWorkspaceResource } from '@/utils/resource-context'
 
-defineOptions({ name: 'WorkspaceApplicationDetail' })
+defineOptions({ name: 'ApplicationDetailView' })
 /**
- * Workspace 智能体详情路由容器。
+ * 智能体详情路由容器。
  * 容器随 applicationId 加载并持有共享详情，切换二级子路由时保持挂载；子页面保存后通过上下文
  * 直接替换完整接口响应，或在响应不完整时主动刷新详情。页面框架和二级导航由 ResourceDetailLayout 负责。
  */
-provide(applicationDetailContextKey, {
+const route = useRoute()
+const router = useRouter()
+const application = ref<ApplicationDetail>()
+const loading = ref(false)
+const { applicationId, resourceApi, listRouteName, routeParams } = provideApplicationDetailContext({
   application: computed(() => application.value),
   refreshApplicationDetail,
   replaceApplicationDetail,
 })
 
-const route = useRoute()
-const router = useRouter()
-const application = ref<ApplicationDetail>()
-const loading = ref(false)
-const applicationId = computed(() => String(route.params.applicationId ?? ''))
-
 function navigateToApplicationList() {
   void router.push({
-    name: 'workspace-application-list',
-    params: { workspaceId: route.params.workspaceId },
-    query: application.value?.folder ? { folderId: application.value.folder } : {},
+    name: listRouteName.value,
+    params: isWorkspaceResource() ? { workspaceId: routeParams.value.workspaceId } : {},
+    query: isWorkspaceResource() && application.value?.folder ? { folderId: application.value.folder } : {},
   })
 }
 
@@ -38,10 +36,12 @@ function replaceApplicationDetail(applicationDetail: ApplicationDetail) {
 
 function refreshApplicationDetail(showLoading = true) {
   const currentApplicationId = applicationId.value
-  if (!currentApplicationId) return Promise.resolve()
+  const requestApi = resourceApi.application
+  if (!currentApplicationId || !requestApi.getApplicationDetail) return Promise.resolve()
 
   if (showLoading) loading.value = true
-  return ApplicationApi.getApplicationDetail(currentApplicationId)
+  return requestApi
+    .getApplicationDetail(currentApplicationId)
     .then((applicationDetail) => {
       replaceApplicationDetail(applicationDetail)
     })
@@ -51,9 +51,10 @@ function refreshApplicationDetail(showLoading = true) {
 }
 
 watch(
-  applicationId,
+  [() => route.params.workspaceId, applicationId, () => route.meta.resourceScope],
   () => {
-    void refreshApplicationDetail()
+    application.value = undefined
+    void refreshApplicationDetail().catch(() => {})
   },
   { immediate: true },
 )

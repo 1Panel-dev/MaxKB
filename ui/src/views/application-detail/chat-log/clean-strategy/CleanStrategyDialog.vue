@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
+import type { ApplicationChatLogApi } from '../../context'
 import { MsgSuccess } from '@/utils/message'
 import { useApplicationDetailContext } from '../../context'
 
 defineOptions({ name: 'ChatLogCleanStrategyDialog' })
-const props = defineProps<{ api: typeof ChatLogApi; applicationId: string }>()
+const props = defineProps<{ api: ApplicationChatLogApi; applicationId: string }>()
 const { application, refreshApplicationDetail } = useApplicationDetailContext()
 
 // 读取成功后打开弹窗，查询与保存共用 loading

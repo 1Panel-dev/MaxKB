@@ -9,6 +9,12 @@ export const workflowRoutes: RouteRecordRaw[] = [
     meta: { title: '智能体工作流', resourceScope: 'workspace' },
   },
   {
+    path: '/system/resource/application/:applicationId/workflow',
+    name: 'system-resource-workflow-application',
+    component: () => import('@/views/workflow/application/index.vue'),
+    meta: { title: '智能体工作流', resourceScope: 'system-resource' },
+  },
+  {
     path: '/workspace/:workspaceId/tool/:toolId/workflow',
     name: 'workflow-tool',
     component: () => import('@/views/workflow/tool/index.vue'),

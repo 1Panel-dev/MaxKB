@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
-import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
+import type { ApplicationChatLogApi } from '../../context'
 import AddKnowledgeDialog from './AddKnowledgeDialog.vue'
 
 defineOptions({ name: 'ButtonAddKnowledge' })
 const props = defineProps<{
-  api: typeof ChatLogApi
+  api: ApplicationChatLogApi
   applicationId: string
   chatIds: string[]
   disabled?: boolean

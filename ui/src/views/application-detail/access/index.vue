@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { useApplicationDetailContext } from '../context'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import AccessApi from '@/api/admin/workspace/application/access'
+
 import type { ApplicationAccessStatus } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
 import AccessSettingDrawer from './AccessSettingDrawer.vue'
 import { accessPlatforms, type AccessPlatformDefinition } from './platforms'
+
+const { resourceApi } = useApplicationDetailContext()
 
 defineOptions({ name: 'ApplicationAccessView' })
 defineProps<ResourceDetailPageProps>()
@@ -20,7 +23,8 @@ const editingPlatform = ref<AccessPlatformDefinition>()
 // 加载发布渠道状态。
 function loadPlatformStatus() {
   loading.value = true
-  return AccessApi.getPlatformStatus(applicationId.value)
+  return resourceApi.access
+    .getPlatformStatus(applicationId.value)
     .then((status) => {
       platformStatus.value = status
     })
@@ -39,7 +43,8 @@ function handlePlatformStatusChange(platform: AccessPlatformDefinition, value: s
   const status = platformStatus.value[platform.key]
   if (loading.value || !status?.[0]) return
   loading.value = true
-  return AccessApi.postPlatformStatus(applicationId.value, { type: platform.key, status: value === true })
+  return resourceApi.access
+    .postPlatformStatus(applicationId.value, { type: platform.key, status: value === true })
     .then(() => {
       status[1] = value === true
       MsgSuccess('保存成功')

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import WorkflowApi from '@/api/admin/workspace/application/workflow'
+import type WorkflowApi from '@/api/admin/workspace/application/workflow'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
 
 defineOptions({ name: 'ButtonApplicationPublishHistory' })
 
-const props = defineProps<{ applicationId: string; selectedId?: string; disabled?: boolean }>()
+const props = defineProps<{ api: typeof WorkflowApi; applicationId: string; selectedId?: string; disabled?: boolean }>()
 const visible = defineModel<boolean>('visible', { default: false })
 const emit = defineEmits<{
   open: []
@@ -28,7 +28,8 @@ function handleOpen() {
 
 function loadWorkflowVersions() {
   loading.value = true
-  return WorkflowApi.getWorkflowVersions(props.applicationId)
+  return props.api
+    .getWorkflowVersions(props.applicationId)
     .then((result) => {
       versions.value = result
     })
@@ -44,7 +45,8 @@ const publishHistoryDrawerRef = useTemplateRef<InstanceType<typeof PublishHistor
 function handleSubmit(payload: WorkflowVersionPayload, versionId?: string) {
   saving.value = true
   if (versionId) {
-    return WorkflowApi.putWorkflowVersion(props.applicationId, versionId, payload)
+    return props.api
+      .putWorkflowVersion(props.applicationId, versionId, payload)
       .then(() => {
         publishHistoryDrawerRef.value?.closeEdit()
         MsgSuccess('修改成功')

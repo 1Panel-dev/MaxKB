@@ -4,8 +4,12 @@ import { useRoute } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import { cloneDeep } from 'lodash'
-import ApplicationApi from '@/api/admin/workspace/application/application.ts'
-import ModelApi from '@/api/admin/workspace/model'
+import WorkspaceApplicationApi from '@/api/admin/workspace/application/application'
+import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import WorkspaceModelApi from '@/api/admin/workspace/model'
+import SystemResourceModelApi from '@/api/admin/system/resource-management/model'
+import WorkspaceWorkflowApi from '@/api/admin/workspace/application/workflow'
+import SystemResourceWorkflowApi from '@/api/admin/system/resource-management/application/workflow'
 import type { ApplicationDetail, ApplicationStoreTemplate, DefaultModelSettingPayload, WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
@@ -17,11 +21,15 @@ import ButtonPublishHistory from './ButtonPublishHistory.vue'
 import ButtonTemplateStore from './ButtonTemplateStore.vue'
 import DebugPanel from '@/conversation-panel/view/debug/index.vue'
 import EditPublishVersionDialog from '../components/publish-history/EditPublishVersionDialog.vue'
-import { getResourceScope } from '@/utils/resource-context.ts'
+import { getResourceScope, isSystemResource } from '@/utils/resource-context.ts'
 import { goBack } from './navigation'
 
 defineOptions({ name: 'ApplicationWorkflowView' })
+const requestApi = isSystemResource() ? SystemResourceApplicationApi : WorkspaceApplicationApi
+const requestModelApi = isSystemResource() ? SystemResourceModelApi : WorkspaceModelApi
+const requestWorkflowApi = isSystemResource() ? SystemResourceWorkflowApi : WorkspaceWorkflowApi
 provide('resourceScope', getResourceScope())
+provide('getModelParamsForm', requestModelApi.getModelParamsForm)
 
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
   nodes: cloneDeep(defaultApplicationNodes),
@@ -59,7 +67,8 @@ function saveApplication(graphData = getGraphData(), showMessage = false) {
 
   // 固定本次提交快照，保留请求期间继续编辑产生的未保存状态。
   const workflowSnapshot = cloneDeep(graphData)
-  return ApplicationApi.putApplication(applicationId, { work_flow: workflowSnapshot, default_model_setting: cloneDeep(defaultModelSetting.value) })
+  return requestApi
+    .putApplication(applicationId, { work_flow: workflowSnapshot, default_model_setting: cloneDeep(defaultModelSetting.value) })
     .then((application) => {
       applicationDetail.value = application
       defaultModelSetting.value = cloneDeep(application.default_model_setting ?? {})
@@ -182,7 +191,7 @@ function handleUseTemplate(template: ApplicationStoreTemplate) {
   })
     .then(() => {
       loading.value = true
-      return ApplicationApi.putApplication(applicationId, { work_flow_template: cloneDeep(template) }).then(() => {
+      return requestApi.putApplication(applicationId, { work_flow_template: cloneDeep(template) }).then(() => {
         // 重新加载服务端模板，更新画布和已保存基准。
         return loadApplicationDetail().then(() => {
           templateStoreButtonRef.value?.close()
@@ -234,7 +243,7 @@ function handlePublish(payload: WorkflowVersionPayload) {
   if (loading.value || historyVisible.value || !workflowRef.value) return
   loading.value = true
   return saveApplication()
-    .then(() => ApplicationApi.putApplicationPublish(applicationId, payload.name, payload.publish_desc))
+    .then(() => requestApi.putApplicationPublish(applicationId, payload.name, payload.publish_desc))
     .then((application) => {
       applicationDetail.value = application
       saveTime.value = application.update_time || saveTime.value
@@ -280,7 +289,7 @@ function handleBack() {
 
 // 加载详情
 function loadApplicationDetail() {
-  return ApplicationApi.getApplicationDetail(applicationId).then((application) => {
+  return requestApi.getApplicationDetail(applicationId).then((application) => {
     applicationDetail.value = application
     defaultModelSetting.value = cloneDeep(application.default_model_setting ?? {})
     saveTime.value = application.update_time
@@ -329,7 +338,7 @@ onBeforeUnmount(() => stopAutoSave())
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"
-        :model-api="ModelApi"
+        :model-api="requestModelApi"
         :get-graph-data="getGraphData"
         :disabled="loading"
         @open="closeDebug"
@@ -365,6 +374,7 @@ onBeforeUnmount(() => stopAutoSave())
             </MkDropdownItem>
             <!-- 发布历史 -->
             <ButtonPublishHistory
+              :api="requestWorkflowApi"
               :visible="historyVisible"
               @update:visible="handleHistoryVisibleChange"
               :application-id="applicationId"

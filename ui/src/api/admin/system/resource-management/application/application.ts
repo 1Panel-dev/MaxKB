@@ -1,6 +1,6 @@
-import { del, get, getExportFile } from '@/api/admin/core/request'
+import { del, get, getExportFile, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import type { ApplicationDetail, Dict } from '@/api/types'
+import type { ApplicationDetail, ApplicationFormPayload, Dict } from '@/api/types'
 
 const prefix = '/system/resource/application'
 
@@ -22,7 +22,24 @@ const exportApplication = (applicationId: string, applicationName: string) => {
   return getExportFile(`${applicationName}.mk`, `${prefix}/${applicationId}/export`)
 }
 
+/** 获取 System 资源管理智能体详情。 */
+const getApplicationDetail = (applicationId: string) => get<ApplicationDetail>(`${prefix}/${applicationId}`)
+
+/** 保存 System 资源管理智能体配置。 */
+const putApplication = (applicationId: string, data: ApplicationFormPayload) =>
+  put<ApplicationFormPayload, ApplicationDetail>(`${prefix}/${applicationId}`, data)
+
+/** 发布 System 资源管理智能体。 */
+const putApplicationPublish = (applicationId: string, publishName: string, publishDesc?: string) =>
+  put<Record<string, unknown>, ApplicationDetail>(`${prefix}/${applicationId}/publish`, {
+    publish_name: publishName,
+    publish_desc: publishDesc,
+  })
+
 export default {
+  getApplicationDetail,
+  putApplication,
+  putApplicationPublish,
   getAllApplication,
   getApplicationPage,
   deleteApplication,

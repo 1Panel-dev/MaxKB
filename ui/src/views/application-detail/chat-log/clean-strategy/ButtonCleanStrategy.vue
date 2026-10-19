@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
-import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
+import type { ApplicationChatLogApi } from '../../context'
 import CleanStrategyDialog from './CleanStrategyDialog.vue'
 
 defineOptions({ name: 'ButtonCleanStrategy' })
 
-const props = defineProps<{ api: typeof ChatLogApi; applicationId: string }>()
+const props = defineProps<{ api: ApplicationChatLogApi; applicationId: string }>()
 const dialogRef = useTemplateRef<InstanceType<typeof CleanStrategyDialog>>('dialogRef')
 
 function handleOpenDialog() {

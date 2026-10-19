@@ -594,29 +594,40 @@ System 前缀中的额外 `knowledge` 段暂按 V2 保留，不能依据普通�
 调用方直接读取已解包数据并管理 loading；共享只读 API 不补写方法以凑齐接口集合。
 公共类型维护在 `types/chat-user.ts`，经 `@/api/types` 导出；用户组已授权人数读取 `authorized_count`，不用分页用户数据推算全组人数。
 
-智能体对话用户页继续直接调用普通 `workspace/chat-user.ts`。知识库对话用户页通过详情 context
+智能体对话用户页通过 `application-detail/context.ts` 的 `resourceApi.chatUser` 选择 Workspace 或
+System 资源管理 API，不包含 Workspace 共享和 System 共享。知识库对话用户页通过详情 context
 的 `resourceApi.chatUser` 选择四套现有完整 API，传 `RESOURCE_TYPE.KNOWLEDGE` 和上下文知识库 ID。
 共有查询方法为必填，部分范围缺失的保存方法按 ScheduledSync、Tags、Document 同样的规则标记为可选，
 调用使用 `?.`；缺失方法不发请求、不提示保存成功，不回退普通 Workspace，不修改现有接口协议。
 
 ### 智能体对话日志
 
-`workspace/application/chat-log.ts` 使用 Admin 请求客户端，日志分页请求
+智能体详情 context 仅装配 Workspace 和 System 资源管理的完整 Application、Overview、Access、ChatLog、
+Workflow 与 ChatUser API。System 智能体接口统一使用 `/system/resource/application` 前缀，
+详情 GET、配置 PUT 使用 `/<applicationId>`，发布 PUT 使用 `/<applicationId>/publish`；
+概览统计、Tokens 排行、提问排行分别为 GET `application_stats`、`application_token_usage`、`top_questions`。
+发布历史使用 GET `/<applicationId>/application_version`，版本编辑使用 PUT 追加版本 ID。
+DebugPanel 与日志正文仍使用现有 Workspace conversation／聊天记录实现，尚未按 System 范围适配。
+
+`workspace/application/chat-log.ts` 和 `system/resource-management/application/chat-log.ts` 使用 Admin 请求客户端，
+前缀分别为 `/workspace/<workspaceId>/application` 和 `/system/resource/application`。日志分页请求
 `/<applicationId>/chat/<currentPage>/<pageSize>`，导出使用 `postExportExcel` 请求
 `/<applicationId>/chat/export`，查询包含日期、摘要或用户及点赞、点踩下限；
 导出请求体为 `{ select_ids }`，空数组表示导出当前筛选结果。
 日志业务类型经 `@/api/types` 导出，来源枚举经 `@/api/enums` 导出，loading 由调用方维护。
-清除策略通过 PUT `batch_clean_time` 提交当前智能体的单元素 `id_list`、`clean_time`、
-`file_clean_time`，避免调用通用应用编辑流程；成功后页面刷新应用详情。
+Workspace 清除策略通过 PUT `batch_clean_time` 提交当前智能体的单元素 `id_list`、`clean_time`、
+`file_clean_time`；System 沿用 v2 的单个智能体 PUT `/<applicationId>` 保存两个清除天数字段。
+成功后页面刷新应用详情。
 添加知识库通过 POST `/<applicationId>/add_knowledge` 提交 `ChatLogAddKnowledgePayload`
 （`knowledge_id`、`document_id`、`chat_ids`），将所选对话的问答写入目标文档。
-目标文档选项通过 `workspace/knowledge/document.ts` 的 `getAllDocuments(knowledgeId)`
-请求不分页的文档列表。聊天记录与标注接口保留在同一 API 文件，尚未接入日志详情正文。
+知识库及目标文档选项通过当前范围 Knowledge／Document API 查询，文档使用 `getAllDocuments(knowledgeId)`。
+聊天记录与标注接口保留在同一 API 文件；日志详情使用现有 `LogConversation`，其聊天记录查询仍使用 Workspace API。
 
 ### 智能体发布渠道
 
-`admin/workspace/application/access.ts` 独立维护发布渠道接口，前缀为
-`/workspace/<workspaceId>/application/<applicationId>/platform`，沿用 v2 协议。
+`admin/workspace/application/access.ts` 和 `admin/system/resource-management/application/access.ts`
+独立维护发布渠道接口，前缀分别为 `/workspace/<workspaceId>/application/<applicationId>/platform`
+与 `/system/resource/application/<applicationId>/platform`，沿用 v2 协议。
 GET `/status` 返回按平台标识索引的 `[是否已配置, 是否启用]`；POST `/status` 提交
 `{ type, status }`。GET、POST `/<type>` 查询与保存对应平台配置，不由通用 application.ts 转发。
 平台标识由 `APPLICATION_ACCESS_PLATFORM` 定义，业务类型在 `types/application.ts` 经公共入口导出。

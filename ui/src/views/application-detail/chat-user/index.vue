@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 import type { CheckboxValueType } from 'element-plus'
-import ChatUserApi from '@/api/admin/workspace/chat-user'
+import { useApplicationDetailContext } from '../context'
 import { LOGIN_METHOD, RESOURCE_TYPE } from '@/api/enums'
 import type { ChatUserAuthorization, ChatUserAuthorizationGroup, ChatUserAuthorizationResource, Dict, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD_LABELS } from '@/constants'
@@ -14,9 +13,9 @@ defineOptions({ name: 'ApplicationChatUserListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ hideHeader: true })
 
-const route = useRoute()
+const { applicationId, resourceApi } = useApplicationDetailContext()
 const resource = computed<ChatUserAuthorizationResource>(() => ({
-  resource_id: String(route.params.applicationId ?? ''),
+  resource_id: applicationId.value,
   resource_type: RESOURCE_TYPE.APPLICATION,
 }))
 
@@ -28,7 +27,8 @@ const currentGroup = ref<ChatUserAuthorizationGroup>()
 
 function loadChatUserGroups() {
   loading.value = true
-  return ChatUserApi.getUserGroupList(resource.value)
+  return resourceApi.chatUser
+    .getUserGroupList(resource.value)
     .then((groups) => {
       chatUserGroups.value = groups
       currentGroup.value = groups[0]
@@ -41,7 +41,7 @@ function loadChatUserGroups() {
 
 // 仅刷新用户组列表及已授权人数，保留当前选中的用户组。
 function refreshChatUserGroups() {
-  return ChatUserApi.getUserGroupList(resource.value).then((groups) => {
+  return resourceApi.chatUser.getUserGroupList(resource.value).then((groups) => {
     const currentId = currentGroup.value?.id
     chatUserGroups.value = groups
     currentGroup.value = groups.find((group) => group.id === currentId) ?? groups[0]
@@ -87,11 +87,13 @@ function formatUserSource(source: string) {
 
 function loadChatUsers() {
   if (!currentGroup.value) return Promise.resolve()
-  return ChatUserApi.getUserGroupUserList(resource.value, currentGroup.value.id, paginationConfig.value, chatUserQuery.value).then((page) => {
-    chatUsers.value = page.records
-    savedAuthorization.value = Object.fromEntries(page.records.map(({ id, is_auth }) => [id, is_auth]))
-    paginationConfig.value.total = page.total
-  })
+  return resourceApi.chatUser
+    .getUserGroupUserList(resource.value, currentGroup.value.id, paginationConfig.value, chatUserQuery.value)
+    .then((page) => {
+      chatUsers.value = page.records
+      savedAuthorization.value = Object.fromEntries(page.records.map(({ id, is_auth }) => [id, is_auth]))
+      paginationConfig.value.total = page.total
+    })
 }
 
 function refreshChatUsers() {
@@ -134,7 +136,8 @@ function handleSave() {
   if (!group || saveDisabled.value) return
   const payload = chatUsers.value.map(({ id, is_auth }) => ({ chat_user_id: id, is_auth }))
   loading.value = true
-  return ChatUserApi.putUserGroupUser(resource.value, group.id, payload)
+  return resourceApi.chatUser
+    .putUserGroupUser(resource.value, group.id, payload)
     .then(() => {
       // 先记住已保存结果，列表刷新失败时不重复提示未保存。
       savedAuthorization.value = Object.fromEntries(payload.map(({ chat_user_id, is_auth }) => [chat_user_id, is_auth]))
@@ -152,7 +155,8 @@ function handleAutoAuthorizationChange(value: string | number | boolean) {
   if (!group || loading.value) return
   loading.value = true
   const isAuth = value === true
-  return ChatUserApi.putUserGroupAuthorization(resource.value, [{ user_group_id: group.id, is_auth: isAuth }])
+  return resourceApi.chatUser
+    .putUserGroupAuthorization(resource.value, [{ user_group_id: group.id, is_auth: isAuth }])
     .then(() => {
       group.is_auth = isAuth
       chatUsers.value = []

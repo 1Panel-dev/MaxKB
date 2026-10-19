@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { RESOURCE_TYPE } from '@/api/enums'
-import { systemApplicationRoutes } from './modules/application'
+import { systemResourceApplicationRoutes } from './modules/application-system-resource'
 import { systemResourceKnowledgeRoutes } from './modules/knowledge-system-resource'
 import { systemSharedKnowledgeRoutes } from './modules/knowledge-system-shared'
 import perm from '@/permission/index'
@@ -181,7 +181,7 @@ export const systemRoutes: RouteRecordRaw = {
         },
       ],
     },
-    ...systemApplicationRoutes,
+    ...systemResourceApplicationRoutes,
     {
       path: 'shared',
       name: 'system-shared',
