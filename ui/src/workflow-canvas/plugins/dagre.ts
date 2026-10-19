@@ -53,10 +53,13 @@ export default class Dagre {
       nodes: nodes.map<DagreNodeData>((node) => ({ id: node.id, size: { width: node.width, height: node.height }, model: node })),
       edges: edges.map<DagreEdgeData>((edge) => ({ id: edge.id, source: edge.sourceNodeId, target: edge.targetNodeId, model: edge })),
     })
+    // moveTo 只改节点坐标、不带动连线，需经 graphModel 移动才会同步边的端点
     layoutInstance.forEachNode((node) => {
       const { model } = node._original as DagreNodeData
-      model.moveTo(node.x, node.y)
+      this.lf?.graphModel.moveNode2Coordinate(model.id, node.x, node.y, true)
     })
+    // 按锚点重算连线路径，清掉布局前的折点
+    edges.forEach((edge) => (edge as BaseEdgeModel & { updatePathByAnchor?: () => void }).updatePathByAnchor?.())
     this.lf.fitView()
   }
 }

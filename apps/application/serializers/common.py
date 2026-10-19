@@ -164,8 +164,8 @@ def resolve_chat_user(chat_user_id, chat_user_type, asker=None):
     if asker:
         if isinstance(asker, dict):
             return asker
-        return {"username": asker}
-    return {"username": "游客"}
+        return {"username": asker, "id": str(chat_user_id)}
+    return {"username": "游客", "id": str(chat_user_id)}
 
 
 def resolve_chat_user_group(chat_user):
@@ -390,33 +390,16 @@ class ChatInfo:
         ).save()
 
     def set_chat_variable(self, chat_context):
-        if not self.debug:
-            chat = QuerySet(Chat).filter(id=self.chat_id).first()
-            if chat:
-                chat.meta = {**(chat.meta if isinstance(chat.meta, dict) else {}), **chat_context}
-                chat.save()
-        else:
-            cache.set(
-                Cache_Version.CHAT_VARIABLE.get_key(key=self.chat_id),
-                chat_context,
-                version=Cache_Version.CHAT_VARIABLE.get_version(),
-                timeout=60 * 30,
-            )
+        chat = QuerySet(Chat).filter(id=self.chat_id).first()
+        if chat:
+            chat.meta = {**(chat.meta if isinstance(chat.meta, dict) else {}), **chat_context}
+            chat.save()
 
     def get_chat_variable(self):
-        if not self.debug:
-            chat = QuerySet(Chat).filter(id=self.chat_id).first()
-            if chat:
-                return chat.meta
-            return {}
-        else:
-            return (
-                cache.get(
-                    Cache_Version.CHAT_VARIABLE.get_key(key=self.chat_id),
-                    version=Cache_Version.CHAT_VARIABLE.get_version(),
-                )
-                or {}
-            )
+        chat = QuerySet(Chat).filter(id=self.chat_id).first()
+        if chat:
+            return chat.meta
+        return {}
 
     def append_chat_record(self, chat_record: ChatRecord):
         chat_record.problem_text = chat_record.problem_text[0:10240] if chat_record.problem_text is not None else ""

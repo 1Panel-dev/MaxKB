@@ -17,7 +17,12 @@ from rest_framework.views import APIView
 
 from tools.api.tool import GetInternalToolAPI
 from tools.api.tool_workflow import ToolWorkflowApi
-from tools.serializers.tool_workflow import StoreToolWorkflow, ToolWorkflowMcpSerializer, ToolWorkflowSerializer
+from tools.serializers.tool_workflow import (
+    StoreToolWorkflow,
+    ToolWorkflowMcpSerializer,
+    ToolWorkflowPublishSerializer,
+    ToolWorkflowSerializer,
+)
 from tools.views import get_tool_operation_object
 
 
@@ -33,7 +38,7 @@ class ToolWorkflowView(APIView):
             summary=_("Publishing an tool"),
             operation_id=_("Publishing an tool"),  # type: ignore
             parameters=ToolWorkflowApi.get_parameters(),
-            request=None,
+            request=ToolWorkflowPublishSerializer,
             responses=DefaultResultSerializer,
             tags=[_("Tool")],  # type: ignore
         )
@@ -60,7 +65,7 @@ class ToolWorkflowView(APIView):
                         "user_id": request.user.id,
                         "workspace_id": workspace_id,
                     }
-                ).publish()
+                ).publish(request.data)
             )
 
     class Operate(APIView):

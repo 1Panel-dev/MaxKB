@@ -12,6 +12,7 @@ from enum import Enum
 
 class ContentType(Enum):
     TEXT = "TEXT"
+    HTML = "HTML"
     REASONING = "REASONING"
     FAILURE = "FAILURE"
     TOOL = "TOOL"

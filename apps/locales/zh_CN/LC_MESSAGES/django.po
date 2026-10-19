@@ -553,6 +553,12 @@ msgstr "条件 或|与"
 msgid "Response Type"
 msgstr "响应类型"
 
+msgid "Content Type"
+msgstr "内容类型"
+
+msgid "Tool reply content must be a JSON object or array"
+msgstr "工具回复内容必须是 JSON 对象或数组"
+
 #: apps/application/flow/step_node/direct_reply_node/i_reply_node.py:21
 #: apps/application/flow/step_node/variable_assign_node/i_variable_assign_node.py:13
 msgid "Reference Field"

@@ -34,7 +34,7 @@ class SystemToResponse(BaseToResponse):
 
     def to_block(self, chat_id, chat_record_id, contents: list, usage: dict = None, _status=status.HTTP_200_OK):
         usage = usage or {}
-        answer = "".join(c.get("content", "") for c in (contents or []) if c.get("type") == "TEXT")
+        answer = "".join(c.get("content", "") for c in (contents or []) if c.get("type") in ("TEXT", "HTML"))
         return result.success(
             {
                 "chat_id": str(chat_id),

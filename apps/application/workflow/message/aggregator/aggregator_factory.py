@@ -9,12 +9,13 @@
 from typing import Dict, Type, Optional
 
 from application.workflow.message.aggregator.content_aggregator import ContentAggregator
-from application.workflow.message.aggregator.impl import FormAggregator
+from application.workflow.message.aggregator.impl import FormAggregator, HtmlAggregator
 from application.workflow.message.aggregator.impl.reasoning_aggregator import ReasoningAggregator
 from application.workflow.message.aggregator.impl.text_aggregator import TextAggregator
 from application.workflow.message.aggregator.impl.tool_aggregator import ToolAggregator
 from application.workflow.message.struct.content import Content
 from application.workflow.message.struct.form_content import FormContent
+from application.workflow.message.struct.html_content import HtmlContent
 from application.workflow.message.struct.reasoning_content import ReasoningContent
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.tool_content import ToolContent
@@ -31,6 +32,7 @@ class AggregatorFactory:
         ReasoningContent: ReasoningAggregator(),
         ToolContent: ToolAggregator(),
         FormContent: FormAggregator(),
+        HtmlContent: HtmlAggregator(),
     }
 
     @classmethod

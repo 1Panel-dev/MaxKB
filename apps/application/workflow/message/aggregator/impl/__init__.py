@@ -10,5 +10,6 @@ from application.workflow.message.aggregator.impl.text_aggregator import TextAgg
 from application.workflow.message.aggregator.impl.reasoning_aggregator import ReasoningAggregator
 from application.workflow.message.aggregator.impl.tool_aggregator import ToolAggregator
 from application.workflow.message.aggregator.impl.form_aggregator import FormAggregator
+from application.workflow.message.aggregator.impl.html_aggregator import HtmlAggregator
 
-__all__ = ["TextAggregator", "ReasoningAggregator", "ToolAggregator", "FormAggregator"]
+__all__ = ["TextAggregator", "ReasoningAggregator", "ToolAggregator", "FormAggregator", "HtmlAggregator"]

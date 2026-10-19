@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： KnowledgeVersionSerializer.py
-    @date：2025/11/28 18:00
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： KnowledgeVersionSerializer.py
+@date：2025/11/28 18:00
+@desc:
 """
+
 from typing import Dict
 
 from django.db.models import QuerySet
@@ -18,22 +19,34 @@ from tools.models import ToolWorkflowVersion, Tool
 
 
 class ToolWorkflowVersionEditSerializer(serializers.Serializer):
-    name = serializers.CharField(required=False, max_length=128, allow_null=True, allow_blank=True,
-                                 label=_("Version Name"))
+    name = serializers.CharField(
+        required=False, max_length=128, allow_null=True, allow_blank=True, label=_("Version Name")
+    )
+    publish_desc = serializers.CharField(
+        required=False, max_length=1024, allow_null=True, allow_blank=True, label=_("Publish Desc")
+    )
 
 
 class ToolVersionModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ToolWorkflowVersion
-        fields = ['id', 'name', 'workspace_id', 'tool_id', 'work_flow', 'publish_user_id', 'publish_user_name',
-                  'create_time',
-                  'update_time']
+        fields = [
+            "id",
+            "name",
+            "publish_desc",
+            "workspace_id",
+            "tool_id",
+            "work_flow",
+            "publish_user_id",
+            "publish_user_name",
+            "create_time",
+            "update_time",
+        ]
 
 
 class ToolWorkflowVersionQuerySerializer(serializers.Serializer):
     tool_id = serializers.UUIDField(required=True, label=_("Tool ID"))
-    name = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                 label=_("summary"))
+    name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("summary"))
 
 
 class ToolWorkflowVersionSerializer(serializers.Serializer):
@@ -43,11 +56,11 @@ class ToolWorkflowVersionSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
 
         def get_query_set(self, query):
-            query_set = QuerySet(ToolWorkflowVersion).filter(tool_id=query.get('tool_id'))
-            if 'name' in query and query.get('name') is not None:
-                query_set = query_set.filter(name__contains=query.get('name'))
-            if 'workspace_id' in self.data and self.data.get('workspace_id') is not None:
-                query_set = query_set.filter(workspace_id=self.data.get('workspace_id'))
+            query_set = QuerySet(ToolWorkflowVersion).filter(tool_id=query.get("tool_id"))
+            if "name" in query and query.get("name") is not None:
+                query_set = query_set.filter(name__contains=query.get("name"))
+            if "workspace_id" in self.data and self.data.get("workspace_id") is not None:
+                query_set = query_set.filter(workspace_id=self.data.get("workspace_id"))
             return query_set.order_by("-create_time")
 
         def list(self, query, with_valid=True):
@@ -60,48 +73,57 @@ class ToolWorkflowVersionSerializer(serializers.Serializer):
         def page(self, query, current_page, page_size, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            return page_search(current_page, page_size,
-                               self.get_query_set(query),
-                               post_records_handler=lambda v: ToolVersionModelSerializer(v).data)
+            return page_search(
+                current_page,
+                page_size,
+                self.get_query_set(query),
+                post_records_handler=lambda v: ToolVersionModelSerializer(v).data,
+            )
 
     class Operate(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
         tool_id = serializers.UUIDField(required=True, label=_("Tool ID"))
-        tool_version_id = serializers.UUIDField(required=True,
-                                                label=_("Tool version ID"))
+        tool_version_id = serializers.UUIDField(required=True, label=_("Tool version ID"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            workspace_id = self.data.get('workspace_id')
-            query_set = QuerySet(Tool).filter(id=self.data.get('tool_id'))
+            workspace_id = self.data.get("workspace_id")
+            query_set = QuerySet(Tool).filter(id=self.data.get("tool_id"))
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
-                raise AppApiException(500, _('Tool id does not exist'))
+                raise AppApiException(500, _("Tool id does not exist"))
 
         def one(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            tool_version = QuerySet(ToolWorkflowVersion).filter(tool_id=self.data.get('tool_id'),
-                                                                id=self.data.get(
-                                                                    'tool_version_id')).first()
+            tool_version = (
+                QuerySet(ToolWorkflowVersion)
+                .filter(tool_id=self.data.get("tool_id"), id=self.data.get("tool_version_id"))
+                .first()
+            )
             if tool_version is not None:
                 return ToolVersionModelSerializer(tool_version).data
             else:
-                raise AppApiException(500, _('Workflow version does not exist'))
+                raise AppApiException(500, _("Workflow version does not exist"))
 
         def edit(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 ToolWorkflowVersionEditSerializer(data=instance).is_valid(raise_exception=True)
-            tool_version = QuerySet(ToolWorkflowVersion).filter(tool_id=self.data.get('tool_id'),
-                                                                id=self.data.get(
-                                                                    'tool_version_id')).first()
+            tool_version = (
+                QuerySet(ToolWorkflowVersion)
+                .filter(tool_id=self.data.get("tool_id"), id=self.data.get("tool_version_id"))
+                .first()
+            )
             if tool_version is not None:
-                name = instance.get('name', None)
+                name = instance.get("name", None)
                 if name is not None and len(name) > 0:
                     tool_version.name = name
+                publish_desc = instance.get("publish_desc", None)
+                if publish_desc is not None:
+                    tool_version.publish_desc = publish_desc
                 tool_version.save()
                 return ToolVersionModelSerializer(tool_version).data
             else:
-                raise AppApiException(500, _('Workflow version does not exist'))
+                raise AppApiException(500, _("Workflow version does not exist"))
