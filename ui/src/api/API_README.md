@@ -469,6 +469,8 @@ System／飞书扩展及文件 ID 导入、策略协议需对应部署支持，�
 文档分页使用 ParamsPage／ResponsePage<DocumentItem>，名称／创建者／任务／启用／命中／标签筛选支持组合。
 图片与文档共用 Document API 的 `getDocumentPage` 列表接口及响应结构，图片列表额外传入查询参数
 `resource_type: 'image'`，不单独封装图片列表接口。
+不分页选项复用 `getAllDocuments(knowledgeId, { resource_type })`，类型为 `document` 或 `image`，返回 `DocumentItem[]`；
+工作空间、System 资源管理及 System 共享使用相同参数，关联分段弹窗据此切换左侧资源列表。
 批量删除提交 `{ id_list, resource_type }`，图片传 `image`，普通文档默认传 `document`；
 服务端按知识库和资源类型校验整批 ID。
 批量向量化提交 `{ id_list, state_list, resource_type }`；图片同样传 `image`，普通文档默认传 `document`。

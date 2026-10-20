@@ -10,6 +10,7 @@ import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import AssociateProblemParagraphDialog from './components/AssociateProblemParagraphDialog.vue'
 import ButtonCreateProblem from './components/ButtonCreateProblem.vue'
 import ProblemDetailDrawer from './components/ProblemDetailDrawer.vue'
 
@@ -26,6 +27,7 @@ const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const selectedProblems = ref<ProblemItem[]>([])
 const problemTableRef = ref<{ clearSelection: () => void }>()
 const quickCreateRef = ref<InstanceType<typeof MkQuickCreate>>()
+const associateProblemParagraphDialogRef = ref<InstanceType<typeof AssociateProblemParagraphDialog>>()
 const detailProblem = ref<ProblemItem>()
 const currentIndex = computed(() => problems.value.findIndex(({ id }) => id === detailProblem.value?.id))
 const hasPrevious = computed(() => currentIndex.value > 0 || (currentIndex.value === 0 && paginationConfig.value.currentPage > 1))
@@ -145,6 +147,16 @@ function handleBatchDeleteProblems() {
     })
 }
 
+function handleOpenAssociateParagraphs(problemIds: string[]) {
+  if (operationLoading.value || !problemIds.length) return
+  associateProblemParagraphDialogRef.value?.open(problemIds)
+}
+
+function handleAssociateParagraphsSuccess() {
+  clearSelection()
+  return loadProblems()
+}
+
 function handleOpenProblem(problem: ProblemItem, column: TableColumnCtx<ProblemItem> | null) {
   if (isWorkspaceSharedResource() || loading.value || operationLoading.value || column?.type === 'selection') return
   detailProblem.value = { ...problem }
@@ -226,9 +238,11 @@ onMounted(() => loadProblems())
     <el-table-column v-if="!isWorkspaceSharedResource()" label="操作" width="100" fixed="right">
       <template #default="{ row }: { row: ProblemItem }">
         <div @click.stop>
-          <!-- 关联分段：TODO，交互确认后接入 -->
+          <!-- 关联当前问题的分段 -->
           <MkTooltip content="关联分段" placement="top">
-            <el-button type="primary" text><MkIcon name="icon_link-record_outlined" /></el-button>
+            <el-button type="primary" text :disabled="operationLoading" @click="handleOpenAssociateParagraphs([row.id])">
+              <MkIcon name="icon_link-record_outlined" />
+            </el-button>
           </MkTooltip>
           <!-- 直接删除问题 -->
           <MkTooltip content="删除" placement="top">
@@ -240,8 +254,10 @@ onMounted(() => loadProblems())
       </template>
     </el-table-column>
     <template v-if="!isWorkspaceSharedResource()" #footer-batch-actions>
-      <!-- 批量关联分段：TODO，交互确认后接入 -->
-      <el-button type="primary" plain :disabled="operationLoading">关联分段</el-button>
+      <!-- 批量关联所选问题的分段 -->
+      <el-button type="primary" plain :disabled="operationLoading" @click="handleOpenAssociateParagraphs(selectedProblems.map(({ id }) => id))">
+        关联分段
+      </el-button>
       <!-- 直接批量删除问题 -->
       <el-button type="danger" plain :disabled="operationLoading" @click="handleBatchDeleteProblems">删除</el-button>
     </template>
@@ -254,6 +270,12 @@ onMounted(() => loadProblems())
     @previous="handleNavigateProblem(-1)"
     @next="handleNavigateProblem(1)"
     @refresh="loadProblems()"
+    @associate="handleOpenAssociateParagraphs([detailProblem.id])"
     @closed="detailProblem = undefined"
+  />
+  <AssociateProblemParagraphDialog
+    v-if="!isWorkspaceSharedResource()"
+    ref="associateProblemParagraphDialogRef"
+    @success="handleAssociateParagraphsSuccess"
   />
 </template>

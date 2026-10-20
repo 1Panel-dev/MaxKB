@@ -11,7 +11,7 @@ import { getFileIconUrl } from '@/utils/icon'
 defineOptions({ name: 'ProblemDetailDrawer' })
 const problem = defineModel<ProblemItem>({ required: true })
 defineProps<{ hasPrevious: boolean; hasNext: boolean }>()
-const emit = defineEmits<{ previous: []; next: []; refresh: []; closed: [] }>()
+const emit = defineEmits<{ previous: []; next: []; refresh: []; closed: []; associate: [] }>()
 const { knowledgeId, resourceApi } = useKnowledgeDetailContext()
 const { resourceApi: documentResourceApi } = useDocumentDetailContext()
 const visible = ref(true)
@@ -139,8 +139,8 @@ watch(
       <MkEmpty v-else-if="!loading" description="暂无关联分段" />
     </div>
     <template #footer>
-      <!-- 关联分段：TODO -->
-      <el-button plain>关联分段</el-button>
+      <!-- 关联当前问题的分段 -->
+      <el-button plain :disabled="loading" @click="emit('associate')">关联分段</el-button>
       <!-- 查看上一个问题 -->
       <el-button plain :disabled="loading || !hasPrevious" @click="emit('previous')">上一个</el-button>
       <!-- 查看下一个问题 -->
