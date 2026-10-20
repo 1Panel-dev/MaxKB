@@ -354,6 +354,7 @@ class WorkflowManage:
         self.future_list.append(future)
 
     def run_chain_manage(self, current_node, node_result_future, language='zh'):
+        connection.close()
         translation.activate(language)
         if current_node is None:
             start_node = self.get_start_node()

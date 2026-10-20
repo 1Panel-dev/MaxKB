@@ -5,6 +5,7 @@ from functools import reduce
 from imghdr import what
 from typing import List, Dict
 
+from django.db import connection
 from django.db.models import QuerySet
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
 from django.utils.translation import gettext_lazy as _
@@ -176,6 +177,8 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
         self.context['message_list'] = message_list
         self.generate_context_image(image)
         self.context['dialogue_type'] = dialogue_type
+        # 归还链接到连接池
+        connection.close()
         if stream:
             r = image_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': image_model, 'message_list': message_list,
