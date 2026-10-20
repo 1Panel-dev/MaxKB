@@ -53,14 +53,19 @@ recognition status is available on the paragraph assets, while embedding status 
 Image extraction, file storage and source reconciliation still occur in the import/sync transaction;
 the external vision model or tool runs in the worker.
 
-Web images are staged under the knowledge base while crawling. Once paragraph assets are saved,
-their files use `source_type=PARAGRAPH` and a referencing paragraph's ID as `source_id`.
+Inline images from document imports, Web, Lark and workflow synchronization share the same ownership
+rules. Once paragraph assets are saved, their files use `source_type=PARAGRAPH` and a referencing
+paragraph's ID as `source_id`. Original source documents (`meta.source_file_id`) and standalone image
+documents retain their document ownership.
 `ParagraphAsset` retains every document/paragraph reference; shared images keep the same file ID and
 URL across syncs. Deleting the owning paragraph transfers ownership to another referencing paragraph,
-or deletes the file when no paragraph assets remain. The cache resolves paragraph-owned images
-through their asset records within the same knowledge base. Unchanged Web document syncs also
-transfer legacy knowledge-owned image files without changing paragraph content or recognition results.
-Moving shared Web images to another knowledge base separates their file ownership records while
+or deletes the file when no paragraph assets remain. Rechunking and replacement temporarily stage
+reused images before deleting old paragraphs, then bind them to the saved replacement paragraphs in
+the same transaction. Deleting temporary workflow documents also preserves images referenced by the
+stable document. The Web cache resolves paragraph-owned images through their asset records within the
+same knowledge base. Unchanged Web, Lark and workflow document syncs also transfer legacy image files
+without changing paragraph content or recognition results.
+Moving shared images to another knowledge base separates their file ownership records while
 reusing the stored bytes, so access checks and later paragraph deletion remain independent.
 
 ## 图片文档接口

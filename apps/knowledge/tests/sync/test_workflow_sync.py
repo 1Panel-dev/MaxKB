@@ -1,6 +1,6 @@
 from copy import deepcopy
 from types import SimpleNamespace
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 from common.auth.struct.auth import Principal
 from common.constants.authentication_type import UserType
@@ -287,6 +287,8 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
         self, merger, _atomic, assets, defer_assets, _copy, on_commit, send_task
     ):
         merger.return_value.merge.return_value = SimpleNamespace(reembed_ids=["stable-paragraph"], disabled_ids=[])
+        changed_assets, legacy_assets = [MagicMock()], [MagicMock()]
+        assets.side_effect = [changed_assets, legacy_assets]
         self.documents[4].meta["token"] = "old"
         for document in (self.documents[0], self.documents[4]):
             document.doc_strategy = {}
@@ -307,7 +309,10 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
         self.assertEqual(stats["synced_count"], 1)
         self.assertNotIn("new", {document.id for document in self.documents})
         self.assertIn("old", {document.id for document in self.documents})
-        defer_assets.assert_called_once_with(assets.return_value, new_strategy)
+        self.assertEqual(
+            defer_assets.call_args_list,
+            [call(changed_assets, new_strategy), call(legacy_assets, new_strategy, schedule=True)],
+        )
         self.schedule_embedding.assert_not_called()
         send_task.assert_not_called()
         on_commit.assert_called_once()

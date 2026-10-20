@@ -19,11 +19,13 @@ from knowledge.models import (
     KnowledgeSyncType,
     KnowledgeType,
     Paragraph,
+    ParagraphAsset,
     Problem,
     ProblemParagraphMapping,
 )
 from knowledge.services.incremental_sync import IncrementalDocumentSync, prepare_remote_paragraphs
 from knowledge.services.paragraph_assets import defer_visual_assets, sync_paragraph_assets
+from knowledge.services.paragraph_files import bind_paragraph_image_files
 from knowledge.services.workflow_sync_source import DOCUMENT_IDENTITY_FIELDS
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from ops import celery_app
@@ -267,6 +269,16 @@ def merge_workflow_incremental_snapshot(
                 old_document.meta.pop("workflow_sync_log_id", None)
                 old_document.save(update_fields=["name", "meta", "update_time"])
                 _copy_document_relations(new_document, old_document, source_paragraphs, remote_paragraphs)
+                # Older workflow writes may have document-owned images without asset rows.
+                # Restore their references before removing the temporary output's paragraphs.
+                legacy_assets = sync_paragraph_assets(
+                    QuerySet(Paragraph).filter(
+                        document_id=old_document.id, assets__isnull=True, content__contains="/oss/file/"
+                    ),
+                    old_document.visual_strategy_hash,
+                )
+                defer_visual_assets(legacy_assets, new_document.doc_strategy, schedule=True)
+                bind_paragraph_image_files(QuerySet(ParagraphAsset).filter(document_id=old_document.id))
 
                 # Preserve files transferred to the stable document. The temporary output document
                 # must not delete an input/source file now referenced by the stable document.

@@ -33,8 +33,8 @@ def _delete_problems_and_mappings(paragraph_ids: list[str]) -> None:
 def delete_synced_paragraph_data(document_id, paragraph_ids: Iterable[str]) -> list[str]:
     """Delete missing source paragraphs inside the caller's document-sync transaction.
 
-    Asset rows cascade with paragraphs. Keep the underlying files, which may also
-    be referenced by retained paragraphs or other documents.
+    Asset rows cascade with paragraphs. Paragraph deletion transfers shared image
+    ownership to remaining references; callers stage any incoming image reuse first.
     """
     paragraphs = QuerySet(Paragraph).filter(
         document_id=document_id, id__in=list(paragraph_ids), origin=ContentOrigin.SYNCED

@@ -9,9 +9,9 @@ from knowledge.models import File, FileSourceType, ParagraphAsset
 
 
 def delete_paragraph_files(paragraph_id, using):
-    """Retain shared Web images when their owning paragraph is deleted."""
+    """Retain shared images when their owning paragraph is deleted."""
     files = File.objects.using(using).filter(source_type=FileSourceType.PARAGRAPH, source_id=str(paragraph_id))
-    for file in files.select_for_update().filter(meta__has_key="source_url").order_by("id"):
+    for file in files.select_for_update().order_by("id"):
         remaining_owner = (
             ParagraphAsset.objects.using(using)
             .filter(file_id=file.id)

@@ -5,8 +5,8 @@ from django.test import TestCase
 from django.utils import timezone
 
 from application.workflow.nodes.knowledge_write_node.knowledge_write_node import KnowledgeWriteNode
-from knowledge.models import Document, File, FileSourceType, Knowledge, KnowledgeType, Paragraph
-from knowledge.services.paragraph_files import bind_document_images
+from knowledge.models import Document, File, FileSourceType, Knowledge, KnowledgeType, Paragraph, ParagraphAsset
+from knowledge.services.paragraph_assets import sync_paragraph_assets
 from knowledge.services.workflow_sync import WorkflowDocumentSyncRun, merge_workflow_incremental_snapshot
 
 
@@ -44,8 +44,10 @@ class WorkflowDocumentImageTests(TestCase):
 
         for image, document in zip((first, second), documents):
             image.refresh_from_db()
-            self.assertEqual(image.source_type, FileSourceType.DOCUMENT)
-            self.assertEqual(image.source_id, str(document.id))
+            self.assertEqual(image.source_type, FileSourceType.PARAGRAPH)
+            self.assertTrue(
+                ParagraphAsset.objects.filter(document=document, paragraph_id=image.source_id, file=image).exists()
+            )
             self.assertTrue(
                 Paragraph.objects.filter(document=document, content__contains=f"/oss/file/{image.id}").exists()
             )
@@ -75,7 +77,7 @@ class WorkflowDocumentImageTests(TestCase):
         self.assertEqual(image.source_type, FileSourceType.KNOWLEDGE)
         self.assertEqual(image.source_id, str(self.knowledge.id))
 
-    def test_incremental_sync_transfers_images_to_the_retained_document(self):
+    def test_incremental_sync_transfers_images_to_the_retained_paragraph(self):
         source_meta = {"source_scope": "lark", "token": "remote-document"}
         retained = Document.objects.create(
             knowledge=self.knowledge, name="old", char_length=0, type=KnowledgeType.WORKFLOW, meta=source_meta
@@ -93,22 +95,25 @@ class WorkflowDocumentImageTests(TestCase):
 
         image.refresh_from_db()
         self.assertEqual(result["synced_count"], 1)
-        self.assertEqual(image.source_type, FileSourceType.DOCUMENT)
-        self.assertEqual(image.source_id, str(retained.id))
+        self.assertEqual(image.source_type, FileSourceType.PARAGRAPH)
+        self.assertTrue(
+            ParagraphAsset.objects.filter(document=retained, paragraph_id=image.source_id, file=image).exists()
+        )
         self.assertFalse(Document.objects.filter(id=documents[0].id).exists())
         self.assertTrue(Paragraph.objects.filter(document=retained, content__contains=f"/oss/file/{image.id}").exists())
 
     def test_image_binding_failure_rolls_back_documents_and_prior_bindings(self):
         first, second = self.image(), self.image()
 
-        def bind_then_fail(document, paragraphs):
-            bind_document_images(document, paragraphs)
-            if document.name == "second":
+        def bind_then_fail(paragraphs, visual_strategy_hash):
+            assets = sync_paragraph_assets(paragraphs, visual_strategy_hash)
+            if paragraphs[0].document.name == "second":
                 raise RuntimeError("binding failed")
+            return assets
 
         with (
             patch(
-                "application.workflow.nodes.knowledge_write_node.knowledge_write_node.bind_document_images",
+                "application.workflow.nodes.knowledge_write_node.knowledge_write_node.sync_paragraph_assets",
                 side_effect=bind_then_fail,
             ),
             self.assertRaisesRegex(RuntimeError, "binding failed"),
@@ -117,6 +122,7 @@ class WorkflowDocumentImageTests(TestCase):
 
         self.assertFalse(Document.objects.filter(knowledge=self.knowledge).exists())
         self.assertFalse(Paragraph.objects.filter(knowledge=self.knowledge).exists())
+        self.assertFalse(ParagraphAsset.objects.filter(knowledge=self.knowledge).exists())
         for image in (first, second):
             image.refresh_from_db()
             self.assertEqual(image.source_type, FileSourceType.KNOWLEDGE)

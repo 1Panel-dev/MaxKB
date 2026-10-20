@@ -19,6 +19,7 @@ from knowledge.models import (
     SyncState,
 )
 from knowledge.services.document_cleanup import delete_synced_paragraph_data
+from knowledge.services.paragraph_files import preserve_incoming_image_files
 from knowledge.services.document_strategy import (
     document_source_hash,
     normalize_document_strategy,
@@ -355,6 +356,9 @@ class IncrementalDocumentSync:
                     unmatched.remove(paragraph)
 
         if self.source_authoritative:
+            preserve_incoming_image_files(
+                [paragraph.id for paragraph in unmatched], self.document.knowledge_id, remote_list
+            )
             self._handle_remote_deletes(unmatched, result)
             # Release changing keys together before a heading reorder swaps unique source keys.
             rekey_ids = [

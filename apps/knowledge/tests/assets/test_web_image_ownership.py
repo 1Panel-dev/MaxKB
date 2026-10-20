@@ -12,8 +12,8 @@ from knowledge.serializers.document import DocumentSerializers
 from knowledge.services.document_strategy import document_source_hash, normalize_document_strategy, strategy_hashes
 from knowledge.services.incremental_sync import prepare_remote_paragraphs
 from knowledge.services.paragraph_assets import sync_paragraph_assets
-from knowledge.services.paragraph_files import migrate_paragraph_files
-from knowledge.web_assets import _cached_web_image, bind_web_image_files
+from knowledge.services.paragraph_files import bind_paragraph_image_files, migrate_paragraph_files
+from knowledge.web_assets import _cached_web_image
 
 
 class WebImageOwnershipTests(TestCase):
@@ -67,7 +67,7 @@ class WebImageOwnershipTests(TestCase):
             self.assertEqual(paragraph.content, self.content)
             self.assertEqual(paragraph.source_snapshot["content"], self.content)
             self.assertEqual(paragraph.chunks, [self.content])
-        self.assertEqual(bind_web_image_files(assets), 0)
+        self.assertEqual(bind_paragraph_image_files(assets), 0)
         self.assertEqual(File.objects.count(), 1)
 
     def test_paragraph_owned_image_is_reused_only_in_its_knowledge(self):
@@ -137,19 +137,14 @@ class WebImageOwnershipTests(TestCase):
         self.assertEqual(self.image.source_id, str(self.knowledge.id))
         self.assertFalse(ParagraphAsset.objects.exists())
 
-    def test_regular_upload_and_foreign_knowledge_file_are_not_rebound(self):
+    def test_foreign_knowledge_file_is_not_rebound(self):
         paragraph = self.paragraph()
-        File.objects.filter(id=self.image.id).update(meta={})
-        assets = sync_paragraph_assets([paragraph])
-        self.assertEqual(bind_web_image_files(assets), 0)
-        self.image.refresh_from_db()
-        self.assertEqual(self.image.source_type, FileSourceType.KNOWLEDGE)
-
         other_knowledge = Knowledge.objects.create(name="Other knowledge", desc="")
         File.objects.filter(id=self.image.id).update(
             meta={"source_url": "https://example.com/chart.png"}, source_id=str(other_knowledge.id)
         )
-        self.assertEqual(bind_web_image_files(assets), 0)
+        assets = sync_paragraph_assets([paragraph])
+        self.assertEqual(bind_paragraph_image_files(assets), 0)
         self.image.refresh_from_db()
         self.assertEqual(self.image.source_id, str(other_knowledge.id))
 

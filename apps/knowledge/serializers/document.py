@@ -95,7 +95,7 @@ from knowledge.services.document_strategy import (
 from knowledge.services.incremental_sync import IncrementalDocumentSync, prepare_remote_paragraphs
 from knowledge.services.workflow_document_sync import is_workflow_web_document, sync_workflow_web_document
 from knowledge.services.paragraph_assets import defer_visual_assets, sync_paragraph_assets
-from knowledge.services.paragraph_files import detach_shared_web_images
+from knowledge.services.paragraph_files import bind_paragraph_image_files, detach_shared_paragraph_images
 from knowledge.task.embedding import (
     delete_embedding_by_paragraph_ids,
     embedding_by_document,
@@ -105,7 +105,7 @@ from knowledge.task.embedding import (
     update_embedding_knowledge_id,
 )
 from knowledge.task.generate import generate_related_by_document_id
-from knowledge.web_assets import bind_web_image_files, internalize_web_images
+from knowledge.web_assets import internalize_web_images
 from maxkb.const import PROJECT_DIR
 from models_provider.models import Model
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
@@ -481,7 +481,7 @@ class DocumentSerializers(serializers.Serializer):
             ):
                 raise AppApiException(500, _("Image documents can only be migrated to a general knowledge base"))
             paragraph_list = QuerySet(Paragraph).filter(knowledge_id=knowledge_id, document_id__in=document_id_list)
-            detach_shared_web_images(list(paragraph_list), target_knowledge_id)
+            detach_shared_paragraph_images(list(paragraph_list), target_knowledge_id)
 
             problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(paragraph__in=paragraph_list)
             problem_list = QuerySet(Problem).filter(
@@ -772,7 +772,7 @@ class DocumentSerializers(serializers.Serializer):
                             merge_result = IncrementalDocumentSync(document, split_strategy).merge(paragraphs)
                         if merge_result is None:
                             changed_paragraphs = QuerySet(Paragraph).none()
-                            bind_web_image_files(QuerySet(ParagraphAsset).filter(document_id=document_id))
+                            bind_paragraph_image_files(QuerySet(ParagraphAsset).filter(document_id=document_id))
                         else:
                             changed_paragraphs = QuerySet(Paragraph).filter(id__in=merge_result.reembed_ids)
                         assets = sync_paragraph_assets(changed_paragraphs, document.visual_strategy_hash)

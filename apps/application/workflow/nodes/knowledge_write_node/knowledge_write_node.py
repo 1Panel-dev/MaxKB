@@ -43,7 +43,7 @@ from knowledge.services.document_strategy import (
     strategy_hashes,
 )
 from knowledge.services.incremental_sync import prepare_remote_paragraphs
-from knowledge.services.paragraph_files import bind_document_images
+from knowledge.services.paragraph_assets import defer_visual_assets, sync_paragraph_assets
 from knowledge.services.workflow_sync_source import DOCUMENT_IDENTITY_FIELDS
 
 
@@ -365,7 +365,10 @@ class KnowledgeWriteNode(INode):
         bulk_create_in_batches(ProblemParagraphMapping, problem_paragraph_mapping_list, batch_size=1000)
 
         for document in document_model_list:
-            bind_document_images(document, [p for p in paragraph_model_list if p.document_id == document.id])
+            assets = sync_paragraph_assets(
+                [p for p in paragraph_model_list if p.document_id == document.id], document.visual_strategy_hash
+            )
+            defer_visual_assets(assets, document.doc_strategy)
 
         return document_model_list, knowledge_id, workspace_id
 
