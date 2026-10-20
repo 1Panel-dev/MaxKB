@@ -207,7 +207,7 @@ onMounted(() => {
 
         <!-- 视觉-->
         <div class="flex-between mb-4">
-          <span> 视觉 </span>
+          <span>视觉</span>
           <el-switch v-model="formData.vision" size="small" />
         </div>
         <template v-if="formData.vision">
@@ -254,7 +254,7 @@ onMounted(() => {
 
         <!-- 输出思考 -->
         <div class="flex-between mb-4 mt-4">
-          <span> 输出思考 </span>
+          <span>输出思考</span>
           <div class="flex-align-center gap-2">
             <ThinkingSetting v-model="formData.model_setting" v-if="formData.model_setting.reasoning_content_enable" />
             <el-switch v-model="formData.model_setting.reasoning_content_enable" size="small" />

@@ -5,6 +5,7 @@ import { APPLICATION_ACCESS_PLATFORM, APPLICATION_TYPE } from '@/api/enums'
 import type { DefaultModelSettingPayload } from './model'
 import type { WorkflowStoreTemplate } from './workflow-template'
 import type { Dict } from './common'
+import type { KnowledgeItem } from './knowledge'
 
 export type ApplicationType = (typeof APPLICATION_TYPE)[keyof typeof APPLICATION_TYPE]
 
@@ -26,6 +27,10 @@ export interface ApplicationAccessStatusPayload {
 export interface ApplicationDetail extends Omit<ApplicationFormPayload, 'desc'> {
   /** 详情接口返回的主模型 ID。 */
   model?: string | null
+  stt_model?: string | null
+  tts_model?: string | null
+  long_term_model?: string | null
+  knowledge_list?: KnowledgeItem[]
   default_model_setting?: DefaultModelSettingPayload
   create_time?: string
   desc?: string | null
@@ -67,8 +72,8 @@ export interface ApplicationFormPayload {
   model_params_setting?: Record<string, unknown>
   tts_model_params_setting?: Record<string, unknown>
   stt_model_params_setting?: Record<string, unknown>
-  stt_model_id?: string
-  tts_model_id?: string
+  stt_model_id?: string | null
+  tts_model_id?: string | null
   stt_model_enable?: boolean
   tts_model_enable?: boolean
   tts_type?: string
@@ -88,7 +93,7 @@ export interface ApplicationFormPayload {
   mcp_output_enable?: boolean
   work_flow_template?: Record<string, unknown>
   long_term_enable?: boolean
-  long_term_model_id?: string
+  long_term_model_id?: string | null
   long_term_model_params_setting?: Record<string, unknown>
   long_term_trigger_setting?: Record<string, unknown>
   long_term_trigger_type?: string

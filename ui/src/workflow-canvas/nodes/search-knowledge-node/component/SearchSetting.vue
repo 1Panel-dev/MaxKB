@@ -39,7 +39,7 @@ function resetData() {
 
 <template>
   <el-button text type="primary" title="参数设置" @click="open"><MkIcon name="icon_setting" /></el-button>
-  <MkDialog v-model="visible" title="参数设置" @closed="resetData">
+  <MkDialog v-model="visible" title="参数设置" @closed="resetData" align-center>
     <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="检索模式">
         <el-radio-group v-model="formData.search_mode" class="space-y-2" @change="changeSearchMode">

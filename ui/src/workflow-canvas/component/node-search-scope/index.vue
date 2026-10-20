@@ -69,13 +69,8 @@ onBeforeUnmount(() => anchorGuard.reset())
       <div class="flex-between">
         <span>检索范围</span>
         <div class="flex-align-center gap-2">
-          <el-button
-            v-if="formData.search_scope_type === 'custom'"
-            link
-            type="primary"
-            title="添加关联知识库"
-            @click="selectionDialogRef?.open(selectedKnowledge)"
-          >
+          <!-- 添加关联知识库 -->
+          <el-button v-if="formData.search_scope_type === 'custom'" link type="primary" @click="selectionDialogRef?.open(selectedKnowledge)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
           <el-select
