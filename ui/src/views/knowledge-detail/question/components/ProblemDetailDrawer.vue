@@ -24,7 +24,7 @@ const paragraphDialogRef = ref<InstanceType<typeof ParagraphDialog>>()
 function loadParagraphs() {
   loadFailed.value = false
   return (
-    resourceApi.problem.getProblemParagraphs?.(knowledgeId.value, problem.value.id).then((records) => {
+    resourceApi.problem.getProblemDetail?.(knowledgeId.value, problem.value.id).then((records) => {
       paragraphs.value = records
       problem.value.paragraph_count = records.length
     }) ?? Promise.resolve()
@@ -114,14 +114,6 @@ watch(
         <template v-for="paragraph in paragraphs" :key="paragraph.id">
           <!-- 查看关联分段详情 -->
           <el-card class="mk-paragraph-card group relative cursor-pointer" shadow="never" @click="handleOpenParagraph(paragraph)">
-            <h4 class="mb-2 truncate pr-8" :title="paragraph.title || '-'">{{ paragraph.title || '-' }}</h4>
-            <p class="mb-3 line-clamp-2 break-words" :title="paragraph.content">{{ paragraph.content }}</p>
-            <div class="flex-align-center gap-2 text-sm text-N500">
-              <span class="shrink-0">{{ paragraph.content.length }} 字符</span>
-              <el-divider direction="vertical" />
-              <img :src="getFileIconUrl(paragraph.document_name)" class="size-4 shrink-0" alt="" />
-              <span class="truncate" :title="paragraph.document_name">{{ paragraph.document_name }}</span>
-            </div>
             <!-- 取消当前问题与分段的关联，不删除分段 -->
             <MkTooltip content="取消关联" placement="top">
               <el-button
@@ -133,6 +125,15 @@ watch(
                 <MkIcon name="icon_unlink_outlined" />
               </el-button>
             </MkTooltip>
+
+            <h4 class="mb-2">{{ paragraph.title || '-' }}</h4>
+            <MdPreview :model-value="paragraph.content" />
+            <div class="flex-align-center gap-2 text-sm text-N600">
+              <span class="shrink-0">{{ paragraph.content.length }} 字符</span>
+              <el-divider direction="vertical" />
+              <img :src="getFileIconUrl(paragraph.document_name)" class="size-4 shrink-0" alt="" />
+              <span class="truncate" :title="paragraph.document_name">{{ paragraph.document_name }}</span>
+            </div>
           </el-card>
         </template>
       </div>

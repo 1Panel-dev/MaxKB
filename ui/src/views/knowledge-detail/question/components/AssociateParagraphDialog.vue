@@ -4,14 +4,14 @@ import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ParamsPage } from '@/api/admin/core/types'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import type { DocumentItem, DocumentResourceType, ParagraphItem, ProblemParagraph, ProblemParagraphReference } from '@/api/types'
+import type { DocumentItem, DocumentResourceType, ParagraphItem, ProblemParagraphReference } from '@/api/types'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess } from '@/utils/message'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
 
-defineOptions({ name: 'AssociateProblemParagraphDialog' })
+defineOptions({ name: 'AssociateParagraphDialog' })
 const emit = defineEmits<{ success: [] }>()
 const { knowledgeId, resourceApi } = useKnowledgeDetailContext({ resourceScopes: ['workspace', 'system-resource', 'system-shared'] as const })
 
@@ -19,7 +19,7 @@ const visible = ref(false)
 const documentLoading = ref(false)
 const operationLoading = ref(false)
 const problemIds = ref<string[]>([])
-const documents = ref<DocumentItem[]>([])
+const documentData = ref<DocumentItem[]>([])
 const resourceType = ref<DocumentResourceType>(DOCUMENT_RESOURCE_TYPE.DOCUMENT)
 const documentSearchText = ref('')
 const selectedDocumentId = ref('')
@@ -32,7 +32,7 @@ const paragraphLayoutRef = useTemplateRef<InstanceType<typeof MkViewLayout>>('pa
 const paragraphDialogRef = useTemplateRef<InstanceType<typeof ParagraphDialog>>('paragraphDialogRef')
 
 const isBatchAssociation = computed(() => problemIds.value.length > 1)
-const selectedDocument = computed(() => documents.value.find(({ id }) => id === selectedDocumentId.value))
+const selectedDocument = computed(() => documentData.value.find(({ id }) => id === selectedDocumentId.value))
 const selectedParagraphIds = computed(() => new Set(selectedParagraphs.value.map(({ paragraph_id }) => paragraph_id)))
 
 function getSelectedCount(documentId: string) {
@@ -45,14 +45,14 @@ function isSelected(paragraphId: string) {
 
 function loadDocuments() {
   paragraphLayoutRef.value?.setScrollTop(0)
-  documents.value = []
+  documentData.value = []
   selectedDocumentId.value = ''
   documentSearchText.value = ''
   paragraphSearchText.value = ''
   paragraphs.value = []
-  return resourceApi.document.getAllDocuments(knowledgeId.value, { resource_type: resourceType.value }).then((documentList) => {
-    documents.value = documentList
-    selectedDocumentId.value = documentList[0]?.id ?? ''
+  return resourceApi.document.getAllDocuments(knowledgeId.value, { resource_type: resourceType.value }).then((documentRecords) => {
+    documentData.value = documentRecords
+    selectedDocumentId.value = documentRecords[0]?.id ?? ''
   })
 }
 
@@ -152,34 +152,21 @@ function handleParagraphDialogClosed() {
   const problemId = problemIds.value[0]
   if (isBatchAssociation.value || !problemId) return
   // 分段详情可修改问题关联，关闭后重新读取当前问题的关联状态。
-  void resourceApi.problem.getProblemParagraphs(knowledgeId.value, problemId).then((associatedParagraphs) => {
+  void resourceApi.problem.getProblemDetail(knowledgeId.value, problemId).then((associatedParagraphs) => {
     selectedParagraphs.value = associatedParagraphs.map(({ id, document_id }) => ({ paragraph_id: id, document_id }))
   })
 }
 
-function handleClosed() {
-  problemIds.value = []
-  documents.value = []
-  documentSearchText.value = ''
-  selectedDocumentId.value = ''
-  paragraphSearchText.value = ''
-  paragraphs.value = []
-  selectedParagraphs.value = []
-  detailParagraph.value = undefined
-}
-
 function open(targetProblemIds: string[]) {
-  if (visible.value || operationLoading.value || !targetProblemIds.length) return
-  const problemId = targetProblemIds[0]
-  if (!problemId) return
+  if (visible.value || operationLoading.value || !targetProblemIds[0]) return
   problemIds.value = [...targetProblemIds]
-  resourceType.value = DOCUMENT_RESOURCE_TYPE.DOCUMENT
   visible.value = true
   documentLoading.value = true
-  // TODO(图片联调)：确认已关联分段查询包含图片分段，并返回 id、document_id，供选中态和关联数量回显。
-  const associatedParagraphs =
-    targetProblemIds.length === 1 ? resourceApi.problem.getProblemParagraphs(knowledgeId.value, problemId) : Promise.resolve<ProblemParagraph[]>([])
-  return Promise.all([loadDocuments(), associatedParagraphs])
+  return Promise.all([
+    loadDocuments(),
+    // TODO(图片联调)：确认已关联分段查询包含图片分段，并返回 id、document_id，供选中态和关联数量回显。
+    targetProblemIds.length === 1 ? resourceApi.problem.getProblemDetail(knowledgeId.value, targetProblemIds[0]) : [],
+  ])
     .then(([, problemParagraphs]) => {
       selectedParagraphs.value = problemParagraphs.map(({ id, document_id }) => ({ paragraph_id: id, document_id }))
     })
@@ -189,6 +176,18 @@ function open(targetProblemIds: string[]) {
     .finally(() => {
       documentLoading.value = false
     })
+}
+
+function handleClosed() {
+  problemIds.value = []
+  documentData.value = []
+  documentSearchText.value = ''
+  selectedDocumentId.value = ''
+  paragraphSearchText.value = ''
+  paragraphs.value = []
+  selectedParagraphs.value = []
+  detailParagraph.value = undefined
+  resourceType.value = DOCUMENT_RESOURCE_TYPE.DOCUMENT
 }
 
 defineExpose({ open })
@@ -215,7 +214,7 @@ defineExpose({ open })
           <!-- 搜索并切换候选分段所在资源 -->
           <MkSearchList
             v-model="documentSearchText"
-            :data="documents"
+            :data="documentData"
             :default-active="selectedDocumentId"
             :empty-text="resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE ? '暂无图片' : '暂无文档'"
             @click="handleSelectDocument"
@@ -261,11 +260,8 @@ defineExpose({ open })
                   :class="{ active: isSelected(paragraph.id), disabled: operationLoading }"
                   @click="handleOpenParagraphDetail(paragraph)"
                 >
-                  <h4 class="mb-2 truncate" :title="paragraph.title || '-'">{{ paragraph.title || '-' }}</h4>
-                  <p class="mb-3 line-clamp-2 break-words">{{ paragraph.content }}</p>
-                  <span class="text-sm text-N500">{{ paragraph.content.length }} 字符</span>
+                  <!-- 关联当前问题与分段 -->
                   <MkTooltip v-if="!isSelected(paragraph.id)" content="关联" placement="top">
-                    <!-- 关联当前问题与分段 -->
                     <el-button
                       circle
                       class="group-hover-visible absolute top-2 right-2 shadow-md"
@@ -275,8 +271,8 @@ defineExpose({ open })
                       <MkIcon name="icon_link-record_outlined" />
                     </el-button>
                   </MkTooltip>
+                  <!-- 取消当前问题与分段的关联 -->
                   <MkTooltip v-else-if="!isBatchAssociation" content="取消关联" placement="top">
-                    <!-- 取消当前问题与分段的关联 -->
                     <el-button
                       circle
                       class="group-hover-visible absolute top-2 right-2 shadow-md"
@@ -286,6 +282,10 @@ defineExpose({ open })
                       <MkIcon name="icon_unlink_outlined" />
                     </el-button>
                   </MkTooltip>
+                  <h4 class="mb-2">{{ paragraph.title || '-' }}</h4>
+
+                  <MdPreview :model-value="paragraph.content" />
+                  <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
                 </el-card>
               </template>
             </div>

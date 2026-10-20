@@ -541,7 +541,7 @@ Workspace 共享 Paragraph API 仅 getParagraphPage、getParagraphDetail，不�
 Workspace、System 资源管理、System 共享提供完整问题 API：
 `postProblems` 直接提交内容字符串数组，`putProblem` 提交 `{ content }`，单项 DELETE 使用问题 ID，
 `putBatchDeleteProblems` 直接提交问题 ID 数组；单个问题内容最多 256 字符。
-`getProblemParagraphs` 返回 `ProblemParagraph[]`，包含分段字段及 knowledge_id、document_name。
+`getProblemDetail` 返回 `ProblemParagraph[]`，包含分段字段及 knowledge_id、document_name。
 取消关联复用 Paragraph API 的 `putUnassociateParagraphProblem`，不调用问题或分段删除接口。
 Workspace 共享仅有 `getProblemsPage`，不补造详情或写接口，不回退其他范围。
 
