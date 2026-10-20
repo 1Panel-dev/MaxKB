@@ -212,6 +212,8 @@ class BaseVectorStore(ABC):
         search_mode: SearchMode,
         embedding: MaxKBBaseEmbeddingModel,
         image_list: list[str] | None = None,
+        document_id_list: list[str] | None = None,
+        exclude_paragraph_id_list: list[str] | None = None,
     ):
         pass
 

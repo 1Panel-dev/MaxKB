@@ -21,10 +21,11 @@ from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
 from common.config.embedding_config import VectorStore
 from common.db.search import native_search
+from common.exception.app_exception import AppApiException
 from common.utils.common import flat_map, get_file_content
 from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, Paragraph, Knowledge, SearchMode, SourceType
-from knowledge.services.multimodal_retrieval import enrich_paragraph_sources, get_hit_asset_map
+from knowledge.services.multimodal_retrieval import enrich_paragraph_sources, get_hit_asset_map, load_image_query_inputs
 from knowledge.services.retrieval_stats import get_recall_tracker, record_recall_safely
 from knowledge.services.retrieval_access import filter_workflow_knowledge
 from maxkb.conf import PROJECT_DIR
@@ -56,6 +57,7 @@ class SearchKnowledgeNodeSerializer(serializers.Serializer):
     )
     knowledge_setting = DatasetSettingSerializer(required=True)
     question_reference_address = serializers.ListField(required=True)
+    image_list = serializers.ListField(required=False, child=serializers.CharField(), default=list)
     show_knowledge = serializers.BooleanField(
         required=True, label=_("The results are displayed in the knowledge sources")
     )
@@ -225,6 +227,7 @@ class SearchKnowledgeNode(INode):
         question = str(
             self.workflow_manage.get_reference_field(question_reference_address[0], question_reference_address[1:])
         )
+        image_items = self._get_reference_content(node_params.get("image_list", [])) or []
 
         exclude_paragraph_id_list = []
         if workflow_params.get("re_chat", False):
@@ -269,7 +272,6 @@ class SearchKnowledgeNode(INode):
         model_id = _get_embedding_id(knowledge_id_list)
         self._check_cancelled()
         embedding_model = get_model_instance_by_model_workspace_id(model_id, workspace_id)
-        embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()
 
         exclude_document_id_list = [
@@ -278,18 +280,44 @@ class SearchKnowledgeNode(INode):
         ]
 
         self._check_cancelled()
-        embedding_list = vector.query(
-            question,
-            embedding_value,
-            knowledge_id_list,
-            document_id_list,
-            exclude_document_id_list,
-            exclude_paragraph_id_list,
-            True,
-            knowledge_setting.get("top_n"),
-            knowledge_setting.get("similarity"),
-            SearchMode(knowledge_setting.get("search_mode")),
-        )
+        search_mode = SearchMode(knowledge_setting.get("search_mode"))
+        if image_items:
+            if not isinstance(image_items, list) or any(
+                not isinstance(image, dict) or not image.get("file_id") for image in image_items
+            ):
+                raise AppApiException(500, _("Search images must reference a list of uploaded image files"))
+            if search_mode == SearchMode.keywords:
+                raise AppApiException(500, _("Image queries only support embedding or blend search"))
+            if not embedding_model.supports_image_embedding():
+                raise AppApiException(500, _("The current embedding model does not support image embedding"))
+            image_inputs = load_image_query_inputs(
+                image_items, workflow_params.get("chat_user_id") or workflow_params.get("user_id")
+            )
+            embedding_list = vector.hit_test(
+                question,
+                knowledge_id_list,
+                exclude_document_id_list,
+                knowledge_setting.get("top_n"),
+                knowledge_setting.get("similarity"),
+                search_mode,
+                embedding_model,
+                image_inputs,
+                document_id_list=document_id_list,
+                exclude_paragraph_id_list=exclude_paragraph_id_list,
+            )
+        else:
+            embedding_list = vector.query(
+                question,
+                embedding_model.embed_query(question),
+                knowledge_id_list,
+                document_id_list,
+                exclude_document_id_list,
+                exclude_paragraph_id_list,
+                True,
+                knowledge_setting.get("top_n"),
+                knowledge_setting.get("similarity"),
+                search_mode,
+            )
 
         connection.close()
 

@@ -11,6 +11,7 @@ const params: JsonObjectSchema = {
   type: 'object',
   properties: {
     question: { type: 'string', description: '检索问题，通常为用户问题或问题优化的 answer', 'x-bind': 'question_reference_address' },
+    images: { type: 'array', description: '可选的检索图片，引用上传图片列表；需要支持图片向量化的模型', 'x-bind': 'image_list' },
     scope: { type: 'array', description: '由上游决定检索范围时的知识库 / 文档 id 列表（search_scope_type=referencing 时必传）', 'x-bind': 'search_scope_reference' },
   },
   required: ['question'],
@@ -48,6 +49,7 @@ function useAgent(context: NodeAgentContext) {
       '- 检索范围默认 search_scope_type="custom"，用 knowledge_ids 选定知识库；已绑定入参 scope 时才用 "referencing"，并给 search_scope_source。',
       '- knowledge_ids：先 get_knowledge_list 按需求挑选相关知识库（向量模型需一致）；工作空间没有合适知识库时传空数组并在结论里说明需用户补充。',
       '- 检索问题已由入参 question 绑定，无需配置。',
+      '- 检索图片由可选入参 images 绑定；有图片时使用 embedding 或 blend，不使用 keywords。',
       '- show_knowledge：是否把检索到的分段展示给用户，默认 false。',
       '- 检索参数：top_n（默认 3）、similarity（0-1，默认 0.6）、search_mode（embedding/keywords/blend）、max_paragraph_char_number（默认 5000）。',
     ].join('\n'),

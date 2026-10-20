@@ -25,6 +25,7 @@ const defaultForm: SearchKnowledgeNodeForm = {
   knowledge_list: [],
   knowledge_setting: cloneDeep(defaultSearchSetting),
   question_reference_address: [],
+  image_list: [],
   show_knowledge: false,
   search_scope_type: 'custom',
   search_scope_source: 'knowledge',
@@ -38,6 +39,7 @@ model.properties.node_data = {
   knowledge_list: Array.isArray(savedForm?.knowledge_list) ? savedForm.knowledge_list : [],
   knowledge_setting: { ...defaultForm.knowledge_setting, ...savedForm?.knowledge_setting },
   question_reference_address: Array.isArray(savedForm?.question_reference_address) ? savedForm.question_reference_address : [],
+  image_list: Array.isArray(savedForm?.image_list) ? savedForm.image_list : [],
   show_knowledge: savedForm?.show_knowledge ?? false,
   search_scope_type: savedForm?.search_scope_type ?? defaultForm.search_scope_type,
   search_scope_source: savedForm?.search_scope_source ?? defaultForm.search_scope_source,
@@ -124,6 +126,10 @@ onMounted(() => {
         <!-- 检索问题 -->
         <el-form-item label="检索问题" prop="question_reference_address" :rules="{ required: true, message: '请选择检索问题', trigger: 'change' }">
           <NodeCascader ref="questionReferenceRef" v-model="formData.question_reference_address" :node-model="model" placeholder="请选择检索问题" />
+        </el-form-item>
+        <!-- 检索图片 -->
+        <el-form-item label="检索图片" prop="image_list">
+          <NodeCascader v-model="formData.image_list" :node-model="model" placeholder="请选择检索图片" />
         </el-form-item>
         <div class="flex-between">
           <span>结果显示在知识来源中</span>

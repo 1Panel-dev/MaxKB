@@ -136,8 +136,10 @@ class PGVector(BaseVectorStore):
         search_mode: SearchMode,
         embedding: MaxKBBaseEmbeddingModel,
         image_list: list[str] | None = None,
+        document_id_list: list[str] | None = None,
+        exclude_paragraph_id_list: list[str] | None = None,
     ):
-        if knowledge_id_list is None or len(knowledge_id_list) == 0:
+        if knowledge_id_list is None or len(knowledge_id_list) == 0 or document_id_list == []:
             return []
         image_list = list(image_list or [])
         exclude_dict = {}
@@ -186,6 +188,10 @@ class PGVector(BaseVectorStore):
                 query_set = (
                     QuerySet(Embedding).filter(knowledge_id=knowledge_id, is_active=True).exclude(**exclude_dict)
                 )
+                if document_id_list is not None:
+                    query_set = query_set.filter(document_id__in=document_id_list)
+                if exclude_paragraph_id_list:
+                    query_set = query_set.exclude(paragraph_id__in=exclude_paragraph_id_list)
                 results = search_handle.handle(
                     query_set,
                     query_text,

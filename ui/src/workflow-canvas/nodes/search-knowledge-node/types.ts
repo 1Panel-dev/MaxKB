@@ -15,5 +15,6 @@ export interface SearchKnowledgeNodeForm extends NodeSearchScopeData {
   all_knowledge_id_list?: string[]
   knowledge_setting: KnowledgeSearchSetting
   question_reference_address: string[]
+  image_list: string[]
   show_knowledge: boolean
 }
