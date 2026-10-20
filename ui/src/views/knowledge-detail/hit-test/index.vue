@@ -2,7 +2,7 @@
 import { computed, nextTick, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
+import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_HIT_UNIT_TYPE, KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 import type { KnowledgeHitTestPayload, KnowledgeHitTestResult, ParagraphItem } from '@/api/types'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
@@ -189,7 +189,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
                   </span>
                 </template>
                 <template #tag>
-                  <el-tag size="small" type="info">{{ paragraph.isImgaeDoc ? '图片向量' : '文本向量' }}</el-tag>
+                  <el-tag size="small" type="info">{{ paragraph.hit_unit_type === KNOWLEDGE_HIT_UNIT_TYPE.IMAGE ? '图片向量' : '文本向量' }}</el-tag>
                   <h6 class="shrink-0 text-primary">{{ paragraph.similarity.toFixed(3) }}</h6>
                 </template>
                 <!-- 图片随卡片点击打开分段详情 -->

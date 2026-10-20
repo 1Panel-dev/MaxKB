@@ -9,3 +9,6 @@ export const KNOWLEDGE_SYNC_STATUS = { RUNNING: 'running', SUCCESS: 'success', F
 
 /** 知识库分段检索模式。 */
 export const KNOWLEDGE_SEARCH_MODE = { EMBEDDING: 'embedding', KEYWORDS: 'keywords', BLEND: 'blend' } as const
+
+/** 召回结果实际命中的向量类型，与来源文档类型无关。 */
+export const KNOWLEDGE_HIT_UNIT_TYPE = { TEXT: 'text', IMAGE: 'image' } as const

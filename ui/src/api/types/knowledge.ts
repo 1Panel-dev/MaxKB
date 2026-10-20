@@ -1,7 +1,7 @@
 /** Workspace 知识库列表和知识库卡片共用的业务类型。 */
 
 import type LogicFlow from '@logicflow/core'
-import { KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
+import { KNOWLEDGE_HIT_UNIT_TYPE, KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
 import type { DefaultModelSettingPayload } from './model'
 import type { DocumentResourceType, DocumentTaskState } from './document'
 import type { ParagraphItem } from './paragraph'
@@ -21,6 +21,8 @@ export interface KnowledgeGeneratePayload extends RelatedQuestionsConfig {
 export type KnowledgeType = (typeof KNOWLEDGE_TYPE)[keyof typeof KNOWLEDGE_TYPE]
 
 export type KnowledgeSyncType = (typeof KNOWLEDGE_SYNC_TYPE)[keyof typeof KNOWLEDGE_SYNC_TYPE]
+
+export type KnowledgeHitUnitType = (typeof KNOWLEDGE_HIT_UNIT_TYPE)[keyof typeof KNOWLEDGE_HIT_UNIT_TYPE]
 
 export interface KnowledgeItem {
   application_mapping_count?: number
@@ -199,7 +201,8 @@ export interface KnowledgeHitTestResult extends ParagraphItem {
   comprehensive_score: number
   source_id: string
   source_type: number
-  hit_unit_type: string
+  /** 实际命中的向量类型；图片描述命中仍为 text。 */
+  hit_unit_type: KnowledgeHitUnitType
   query_unit_type: string | null
   query_unit_index: number | null
   hit_asset: KnowledgeHitTestAsset | null

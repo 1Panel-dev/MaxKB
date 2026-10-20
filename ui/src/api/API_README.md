@@ -243,7 +243,9 @@ Workspace、System 资源管理和 System 共享资源均在各自 `knowledge/kn
 请求使用 `KnowledgeHitTestPayload`，包含 `query_text`、`image_list`、`top_number`、`similarity` 和
 `search_mode`；检索模式复用 `KNOWLEDGE_SEARCH_MODE`。文本和图片至少提供一项，图片仅支持向量或混合检索。
 结果使用 `KnowledgeHitTestResult`，保留分段、得分及图片命中信息。Workspace 共享暂无对应接口，不回退其他范围。
-结果的可选字段 `document_image_id` 有值且 `document_resource_type` 为 `DOCUMENT_RESOURCE_TYPE.IMAGE` 时展示图片向量标签，否则展示文本向量标签。
+向量标签依据 `hit_unit_type`（`KNOWLEDGE_HIT_UNIT_TYPE`）：`image` 显示“图片向量”，`text` 显示“文本向量”，图片描述命中也属于文本向量。
+`document_resource_type` 表示来源文档类型，`document_image_id` 用于展示图片文档原图，不用于判断命中向量类型。
+`query_unit_type` 表示产生该命中的查询输入类型，与 `hit_unit_type` 分别描述查询端和命中端。
 
 ### System 共享知识库
 
