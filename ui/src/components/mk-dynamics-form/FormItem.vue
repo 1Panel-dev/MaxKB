@@ -18,14 +18,14 @@ const itemModules = import.meta.glob<{ default: Component }>('./items/**/*.vue',
 const itemComponents: Record<string, Component> = {}
 
 for (const [path, module] of Object.entries(itemModules)) {
-  const componentName = path.split('/').pop()?.replace('.vue', '')
+  const componentName = path.split('/').pop()?.replace('.vue', '').toUpperCase()
   if (componentName) {
     itemComponents[componentName] = module.default
   }
 }
 
 function getFieldComponent(name: string) {
-  return itemComponents[name]
+  return itemComponents[name.toUpperCase()]
 }
 
 const props = defineProps<{
