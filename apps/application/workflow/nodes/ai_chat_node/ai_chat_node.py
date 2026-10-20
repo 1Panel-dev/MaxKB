@@ -543,8 +543,20 @@ class AIChatNode(INode):
         # 工具(workflow/custom) + 智能体(子应用) → LangChain tools；
         # MCP(自定义/库内) → mcp_servers 配置；技能 → 交给引擎侧 init_skills 初始化
         tools = get_tool_tools(
-            source_type, source_id, tool_ids, workspace_id, self.get_workflow_parameters()
-        ) + get_application_tools(source_type, source_id, application_ids, workspace_id, self.get_workflow_parameters())
+            source_type,
+            source_id,
+            tool_ids,
+            workspace_id,
+            self.async_runner.cancel_event,
+            self.get_workflow_parameters(),
+        ) + get_application_tools(
+            source_type,
+            source_id,
+            application_ids,
+            workspace_id,
+            self.get_workflow_parameters(),
+            cancel_event=self.async_runner.cancel_event,
+        )
         mcp_servers_config = get_mcp_servers(mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, self._handle_variables)
         ToolExecutor().validate_mcp_transport(json.dumps(mcp_servers_config))
 
@@ -663,6 +675,7 @@ class AIChatNode(INode):
                 chat_id,
                 skill_tool_ids,
                 tools,
+                async_runner=self.async_runner,
             )
             return True
 
