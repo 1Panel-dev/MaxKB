@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T extends object">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, type VNode } from 'vue'
-import type { TableColumnCtx, TableInstance } from 'element-plus'
+import { cloneVNode, computed, Fragment, h, isVNode, nextTick, onBeforeUnmount, onMounted, ref, type VNode } from 'vue'
+import { ElTableColumn, type TableColumnCtx, type TableInstance } from 'element-plus'
 import LayoutBatchFooter from '../mk-view-layout/LayoutBatchFooter.vue'
 import { useSortable, type SortableChange } from '@/utils/use-sortable'
 import { get } from 'lodash'
@@ -38,10 +38,63 @@ const emit = defineEmits<{
   'size-change': [pageSize: number]
   'update:paginationConfig': [paginationConfig: PaginationConfig]
   'update:data': [data: T[]]
-  'sort-change': [change: SortableChange<T>]
+  'row-sort-change': [change: SortableChange<T>]
 }>()
 
 const tableRef = ref<TableInstance>()
+
+/** 列宽拖拽：按当前表头的单行内容限制拖拽线，保留原生拖拽与事件。 */
+let columnResize: { proxy: HTMLElement; minLeft: number } | undefined
+
+function clampColumnResize() {
+  if (!props.resizable || !columnResize) return
+  const { proxy, minLeft } = columnResize
+  proxy.style.left = `${Math.max(minLeft, Number.parseFloat(proxy.style.left))}px`
+}
+
+function clearColumnResize() {
+  columnResize = undefined
+  document.removeEventListener('mousemove', clampColumnResize)
+  document.removeEventListener('mouseup', finishColumnResize, true)
+}
+
+function finishColumnResize() {
+  // 在 Element Plus 读取拖拽线并发出 header-dragend 前完成最后一次限制。
+  clampColumnResize()
+  clearColumnResize()
+}
+
+function handleColumnResizeStart(event: MouseEvent) {
+  const table = tableRef.value?.$el as HTMLElement | undefined
+  const header = event.target instanceof Element ? event.target.closest<HTMLElement>('th.noclick') : null
+  if (!props.resizable || !table || !header || header.closest('.el-table') !== table) return
+  const cell = header.querySelector<HTMLElement>(':scope > .cell')
+  const proxy = table.querySelector<HTMLElement>(':scope > .el-table__column-resize-proxy')
+  if (!cell || !proxy) return
+
+  // 原位测量保留继承字体、图标、按钮与间距；同步还原，不改变实际表头布局。
+  const previousStyle = cell.style.cssText
+  cell.style.width = 'max-content'
+  cell.style.minWidth = '0'
+  cell.style.maxWidth = 'none'
+  const contentWidth = cell.getBoundingClientRect().width
+  cell.style.cssText = previousStyle
+  const headerStyle = getComputedStyle(header)
+  const outerWidth = ['padding-left', 'padding-right', 'border-left-width', 'border-right-width'].reduce(
+    (width, property) => width + (Number.parseFloat(headerStyle.getPropertyValue(property)) || 0),
+    0,
+  )
+
+  clearColumnResize()
+  columnResize = {
+    proxy,
+    minLeft: Math.ceil(header.getBoundingClientRect().left - table.getBoundingClientRect().left + Math.max(30, Math.ceil(contentWidth + outerWidth))),
+  }
+  clampColumnResize()
+  // 冒泡到表格后注册，确保每次在 Element Plus 更新拖拽线之后执行。
+  document.addEventListener('mousemove', clampColumnResize)
+  document.addEventListener('mouseup', finishColumnResize, true)
+}
 
 /** 行内名称编辑：失焦的这次点击不再触发行点击，下一次点击恢复。 */
 let nameEditingOnPointerDown = false
@@ -58,11 +111,37 @@ function handleRowClick(row: T, column: TableColumnCtx<T> | null, event: Pointer
   emit('row-click', row, column, event)
 }
 
-defineSlots<{
+const slots = defineSlots<{
   default?: () => VNode[]
   'body-prepend'?: () => VNode[]
   'footer-batch-actions'?: () => VNode[]
 }>()
+
+/** 表头排序统一交给调用方；在 Element Plus 排序前转换，避免重排当前页。 */
+function normalizeColumn(column: VNode): VNode {
+  if (column.type === Fragment && Array.isArray(column.children)) {
+    return h(
+      Fragment,
+      column.props,
+      column.children.map((child) => (isVNode(child) ? normalizeColumn(child) : child)),
+    )
+  }
+  if (column.type !== ElTableColumn) return column
+
+  const sortable = column.props?.sortable
+  const normalizedColumn = cloneVNode(column, sortable === true || sortable === '' ? { sortable: 'custom' } : undefined)
+  const columnSlots = column.children
+  if (columnSlots && !Array.isArray(columnSlots) && typeof columnSlots === 'object' && typeof columnSlots.default === 'function') {
+    const defaultSlot = columnSlots.default
+    normalizedColumn.children = {
+      ...columnSlots,
+      default: (...args: unknown[]) => defaultSlot(...args).map(normalizeColumn),
+    }
+  }
+  return normalizedColumn
+}
+
+const TableColumns = () => slots.default?.().map(normalizeColumn)
 
 /** 行排序：只处理当前传入的平面数据，保持显示顺序与数组索引一致。 */
 const sortableRows = computed({
@@ -85,7 +164,7 @@ useSortable(
   () => ({
     disabled: !canSortRows.value,
     draggable: '> tr.el-table__row',
-    onReorder: (change) => emit('sort-change', change),
+    onReorder: (change) => emit('row-sort-change', change),
   }),
 )
 
@@ -170,6 +249,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  clearColumnResize()
   window.removeEventListener('resize', updateTableHeight)
 })
 
@@ -193,9 +273,10 @@ defineExpose({ clearSelection, tableRef })
       @select="handleSelect"
       @selection-change="handleSelectionChange"
       @pointerdown.capture="handlePointerDown"
+      @mousedown="handleColumnResizeStart"
       @row-click="handleRowClick"
     >
-      <slot />
+      <TableColumns />
       <template v-if="$slots['body-prepend']" #append>
         <slot name="body-prepend" />
       </template>
@@ -299,6 +380,10 @@ defineExpose({ clearSelection, tableRef })
 
   thead th {
     border-bottom: none !important;
+
+    > .cell {
+      white-space: nowrap;
+    }
   }
 }
 </style>

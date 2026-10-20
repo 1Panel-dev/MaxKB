@@ -4,6 +4,7 @@ import TriggerApi from '@/api/admin/workspace/trigger/trigger'
 import { RESOURCE_TYPE, STATE_TYPES } from '@/api/enums'
 import type { Dict, TriggerTaskRecord } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
 import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 
@@ -14,6 +15,7 @@ const loading = ref(false)
 const recordData = ref<TriggerTaskRecord[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchQuery = ref<Dict<unknown>>()
+const orderBy = ref<string>()
 const searchFields = [
   { label: '名称', value: 'name' },
   {
@@ -36,7 +38,11 @@ const searchFields = [
 ]
 function loadRecords(page = pagination.value.currentPage): Promise<TriggerTaskRecord[]> {
   loading.value = true
-  return TriggerApi.getTriggerTaskRecordPage(triggerId.value, { currentPage: page, pageSize: pagination.value.pageSize }, searchQuery.value)
+  return TriggerApi.getTriggerTaskRecordPage(
+    triggerId.value,
+    { currentPage: page, pageSize: pagination.value.pageSize },
+    { ...searchQuery.value, order: orderBy.value },
+  )
     .then((result) => {
       recordData.value = result.records
       pagination.value = { currentPage: result.current, pageSize: result.size, total: result.total }
@@ -53,8 +59,16 @@ function searchRecords(query?: Dict<unknown>) {
   loadRecords()
 }
 
+/* 执行时间排序：接口字段使用 ett 表别名，切换排序后回到第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort, (prop) => `ett.${prop}`)
+  pagination.value.currentPage = 1
+  return loadRecords()
+}
+
 function open(id: string) {
   triggerId.value = id
+  orderBy.value = undefined
   recordData.value = []
   pagination.value = { currentPage: 1, pageSize: 20, total: 0 }
   visible.value = true
@@ -112,6 +126,7 @@ defineExpose({ open })
       :max-table-height="230"
       @current-change="loadRecords()"
       @size-change="loadRecords()"
+      @sort-change="handleSortChange"
     >
       <el-table-column label="触发任务" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">
@@ -134,7 +149,7 @@ defineExpose({ open })
       <el-table-column label="耗时" width="90">
         <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
       </el-table-column>
-      <el-table-column label="执行时间" prop="create_time" width="180">
+      <el-table-column label="执行时间" prop="create_time" width="180" sortable>
         <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="70">

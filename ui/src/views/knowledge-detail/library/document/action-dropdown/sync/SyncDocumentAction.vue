@@ -5,6 +5,7 @@ import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import type { DocumentItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { isWorkFlow } from '@/utils/common'
 
 defineOptions({ name: 'SyncDocumentAction' })
 const props = defineProps<{
@@ -23,7 +24,7 @@ function handleSync() {
   if (loading.value) return
   const document = props.document
   if (!document.id) return
-  const isWorkflow = knowledgeType.value === KNOWLEDGE_TYPE_KEY.WORKFLOW
+  const isWorkflow = isWorkFlow(String(knowledgeType.value ?? ''))
   if ((knowledgeType.value === KNOWLEDGE_TYPE_KEY.WEB || isWorkflow) && !document.meta?.source_url) {
     MsgConfirm('提示', '无法同步，请先去设置文档 URL 地址', {
       confirmButtonText: '确认',

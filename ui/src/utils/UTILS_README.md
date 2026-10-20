@@ -32,6 +32,21 @@ src/utils/
 - 依赖 Vue 响应式状态或生命周期的通用组合式函数可以使用 `use-*.ts` 命名。
 - 仅改变样式的响应式需求优先使用 Tailwind；只有需要改变组件状态时才使用响应式工具函数。
 
+## 工作流类型判断
+
+`common.ts` 的 `isWorkFlow(type)` 统一判断智能体的 `APPLICATION_TYPE.WORK_FLOW`、
+知识库接口的 `KNOWLEDGE_TYPE.WORKFLOW` 和前端标识 `KNOWLEDGE_TYPE_KEY.WORKFLOW`。
+接收字符串、数字或空值，使用枚举值严格比较；空值和其他类型值返回 `false`，不转换接口枚举。
+
+## 表头排序参数
+
+`common.ts` 的 `toOrderBy({ prop, order }, mapField?)` 将表头排序转换为后端正负字段：
+升序返回字段名，降序返回 `-字段名`，取消排序或缺少字段时返回 `undefined`。
+可选 `mapField` 在添加正负号前转换字段名，例如 `(prop) => 'ett.' + prop`。
+页面负责将结果写入 `order_by` 或 `order` 等查询字段，并维护分页、选择和刷新行为；
+MkTable 的服务端排序列声明 `sortable` 即可，由组件统一转换为 `custom`；直接使用 Element Plus Table
+时仍需声明 `sortable="custom"`。该函数不处理行拖拽排序。
+
 ## 相对时间
 
 `time.ts` 的 `relativeTimeFormat(timestamp)` 接收日期、毫秒时间戳或日期字符串。

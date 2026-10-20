@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ApplicationDetail } from '@/api/types'
-import { isWorkFlow } from '@/utils/application'
+import { isWorkFlow } from '@/utils/common'
 import { dateFormat } from '@/utils/time'
 
 defineOptions({ name: 'ApplicationCard' })
