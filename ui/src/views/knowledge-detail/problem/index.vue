@@ -14,7 +14,7 @@ import AssociateParagraphDialog from './components/AssociateParagraphDialog.vue'
 import ButtonCreateProblem from './components/ButtonCreateProblem.vue'
 import ProblemDetailDrawer from './components/ProblemDetailDrawer.vue'
 
-defineOptions({ name: 'QuestionListView' })
+defineOptions({ name: 'ProblemListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 

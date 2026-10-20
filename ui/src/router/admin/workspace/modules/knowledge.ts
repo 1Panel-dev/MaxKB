@@ -65,7 +65,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             meta: { title: '工作流', icon: 'icon_ticket-flow_outlined', order: 20 },
           },
           {
-            path: 'retrieval',
+            path: '',
             name: 'workspace-knowledge-retrieval',
             redirect: { name: 'workspace-knowledge-hit-test' },
             meta: { title: '检索优化', icon: 'icon_trace_outlined', order: 30 },
@@ -77,9 +77,9 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: { title: '召回测试', order: 10 },
               },
               {
-                path: 'question',
-                name: 'workspace-knowledge-question',
-                component: () => import('@/views/knowledge-detail/question/index.vue'),
+                path: 'problem',
+                name: 'workspace-knowledge-problem',
+                component: () => import('@/views/knowledge-detail/problem/index.vue'),
                 meta: { title: '问题', order: 20 },
               },
               {
@@ -91,7 +91,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             ],
           },
           {
-            path: 'integration',
+            path: '',
             name: 'workspace-knowledge-integration',
             redirect: { name: 'workspace-knowledge-chat-user' },
             meta: { title: '授权与集成', icon: 'icon_personal-privacy_outlined', order: 40 },
