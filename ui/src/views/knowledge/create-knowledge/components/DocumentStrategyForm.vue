@@ -60,7 +60,7 @@ function setStrategy(value?: DocumentStrategy | null) {
 function getStrategy(): DocumentStrategy {
   return {
     split: {
-      ...(strategy.split.mode === 'smart' ? { mode: 'smart' as const, limit: 500, child_length: 256, auto_clean: false } : strategy.split),
+      ...(strategy.split.mode === 'smart' ? { mode: 'smart' as const, limit: 4096, child_length: 256, auto_clean: false } : strategy.split),
       patterns: strategy.split.mode === 'advanced' && splitPatterns.value.length ? [...splitPatterns.value] : null,
     },
     visual: {
