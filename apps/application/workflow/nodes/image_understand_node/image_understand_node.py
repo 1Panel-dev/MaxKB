@@ -1,4 +1,5 @@
 # coding=utf-8
+import asyncio
 import base64
 import contextlib
 import uuid_utils.compat as uuid
@@ -258,7 +259,9 @@ class ImageUnderstandNode(INode):
 
         # 无论正常结束、抛异常还是被取消中断,都落盘已累积内容并关闭 LLM 流式响应底层连接
         finally:
-            self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
+            await asyncio.to_thread(
+                self._write_final_context, chat_model, message_list, question, answer, reasoning_content
+            )
             with contextlib.suppress(Exception):
                 await response.aclose()
 
