@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ParamsPage } from '@/api/admin/core/types'
@@ -9,6 +9,7 @@ import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess } from '@/utils/message'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
 
 defineOptions({ name: 'AssociateProblemParagraphDialog' })
 const emit = defineEmits<{ success: [] }>()
@@ -25,8 +26,10 @@ const selectedDocumentId = ref('')
 const paragraphSearchText = ref('')
 const paragraphs = ref<ParagraphItem[]>([])
 const selectedParagraphs = ref<ProblemParagraphReference[]>([])
+const detailParagraph = ref<ParagraphItem>()
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const paragraphLayoutRef = useTemplateRef<InstanceType<typeof MkViewLayout>>('paragraphLayoutRef')
+const paragraphDialogRef = useTemplateRef<InstanceType<typeof ParagraphDialog>>('paragraphDialogRef')
 
 const isBatchAssociation = computed(() => problemIds.value.length > 1)
 const selectedDocument = computed(() => documents.value.find(({ id }) => id === selectedDocumentId.value))
@@ -96,16 +99,13 @@ function addSelectedParagraph(paragraph: ParagraphItem) {
   selectedParagraphs.value = [...selectedParagraphs.value, { paragraph_id: paragraph.id, document_id: paragraph.document_id }]
 }
 
-function handleToggleParagraph(paragraph: ParagraphItem) {
+function updateParagraphAssociation(paragraph: ParagraphItem, unlink: boolean) {
   if (operationLoading.value) return
-  // 批量关联提交后不支持在此弹窗批量解除关联，避免只解除首个问题的关联。
-  if (isBatchAssociation.value && isSelected(paragraph.id)) return
   const problemId = problemIds.value[0]
   if (!problemId) return
   operationLoading.value = true
-  const selected = isSelected(paragraph.id)
   // TODO(图片联调)：核对图片分段的关联及取消关联是否复用现有 document_id / paragraph_id 协议，成功后重新打开确认回显。
-  const request = selected
+  const request = unlink
     ? resourceApi.paragraph.putUnassociateParagraphProblem(knowledgeId.value, paragraph.document_id, paragraph.id, problemId)
     : resourceApi.problem.putBatchAssociateProblems(knowledgeId.value, {
         problem_id_list: [...problemIds.value],
@@ -113,12 +113,12 @@ function handleToggleParagraph(paragraph: ParagraphItem) {
       })
   return request
     .then(() => {
-      if (selected) {
+      if (unlink) {
         removeSelectedParagraph(paragraph.id)
       } else {
         addSelectedParagraph(paragraph)
       }
-      MsgSuccess(selected ? '取消关联成功' : '关联成功')
+      MsgSuccess(unlink ? '取消关联成功' : '关联成功')
       emit('success')
     })
     .catch(() => {
@@ -129,6 +129,34 @@ function handleToggleParagraph(paragraph: ParagraphItem) {
     })
 }
 
+function handleAssociateParagraph(paragraph: ParagraphItem) {
+  if (isSelected(paragraph.id)) return
+  return updateParagraphAssociation(paragraph, false)
+}
+
+function handleUnassociateParagraph(paragraph: ParagraphItem) {
+  // 批量关联提交后不支持在此弹窗批量解除关联，避免只解除首个问题的关联。
+  if (isBatchAssociation.value || !isSelected(paragraph.id)) return
+  return updateParagraphAssociation(paragraph, true)
+}
+
+async function handleOpenParagraphDetail(paragraph: ParagraphItem) {
+  if (operationLoading.value || detailParagraph.value) return
+  detailParagraph.value = paragraph
+  await nextTick()
+  paragraphDialogRef.value?.open(paragraph)
+}
+
+function handleParagraphDialogClosed() {
+  detailParagraph.value = undefined
+  const problemId = problemIds.value[0]
+  if (isBatchAssociation.value || !problemId) return
+  // 分段详情可修改问题关联，关闭后重新读取当前问题的关联状态。
+  void resourceApi.problem.getProblemParagraphs(knowledgeId.value, problemId).then((associatedParagraphs) => {
+    selectedParagraphs.value = associatedParagraphs.map(({ id, document_id }) => ({ paragraph_id: id, document_id }))
+  })
+}
+
 function handleClosed() {
   problemIds.value = []
   documents.value = []
@@ -137,6 +165,7 @@ function handleClosed() {
   paragraphSearchText.value = ''
   paragraphs.value = []
   selectedParagraphs.value = []
+  detailParagraph.value = undefined
 }
 
 function open(targetProblemIds: string[]) {
@@ -225,23 +254,34 @@ defineExpose({ open })
           >
             <div class="space-y-2">
               <template v-for="paragraph in paragraphs" :key="paragraph.id">
-                <!-- 选择或取消选择当前分段 -->
+                <!-- 查看当前分段详情及其关联状态 -->
                 <el-card
                   shadow="never"
                   class="mk-paragraph-card group relative cursor-pointer"
                   :class="{ active: isSelected(paragraph.id), disabled: operationLoading }"
-                  @click="handleToggleParagraph(paragraph)"
+                  @click="handleOpenParagraphDetail(paragraph)"
                 >
                   <h4 class="mb-2 truncate" :title="paragraph.title || '-'">{{ paragraph.title || '-' }}</h4>
                   <p class="mb-3 line-clamp-2 break-words">{{ paragraph.content }}</p>
                   <span class="text-sm text-N500">{{ paragraph.content.length }} 字符</span>
-                  <MkTooltip v-if="!isBatchAssociation && isSelected(paragraph.id)" content="取消关联" placement="top">
+                  <MkTooltip v-if="!isSelected(paragraph.id)" content="关联" placement="top">
+                    <!-- 关联当前问题与分段 -->
+                    <el-button
+                      circle
+                      class="group-hover-visible absolute top-2 right-2 shadow-md"
+                      :disabled="operationLoading"
+                      @click.stop="handleAssociateParagraph(paragraph)"
+                    >
+                      <MkIcon name="icon_link-record_outlined" />
+                    </el-button>
+                  </MkTooltip>
+                  <MkTooltip v-else-if="!isBatchAssociation" content="取消关联" placement="top">
                     <!-- 取消当前问题与分段的关联 -->
                     <el-button
                       circle
                       class="group-hover-visible absolute top-2 right-2 shadow-md"
                       :disabled="operationLoading"
-                      @click.stop="handleToggleParagraph(paragraph)"
+                      @click.stop="handleUnassociateParagraph(paragraph)"
                     >
                       <MkIcon name="icon_unlink_outlined" />
                     </el-button>
@@ -260,4 +300,12 @@ defineExpose({ open })
       <div class="text-left text-sm text-N600">已关联 {{ selectedParagraphs.length }}</div>
     </template>
   </MkDialog>
+  <ParagraphDialog
+    v-if="detailParagraph"
+    ref="paragraphDialogRef"
+    title="分段详情"
+    :knowledge-id="knowledgeId"
+    :document-id="detailParagraph.document_id"
+    @closed="handleParagraphDialogClosed"
+  />
 </template>
