@@ -129,10 +129,6 @@ function handleToggleParagraph(paragraph: ParagraphItem) {
     })
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!operationLoading.value) done()
-}
-
 function handleClosed() {
   problemIds.value = []
   documents.value = []
@@ -170,7 +166,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" width="1200" :before-close="handleBeforeClose" @closed="handleClosed">
+  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" width="1200" @closed="handleClosed">
     <template #header="{ titleId }">
       <h4 :id="titleId">关联分段</h4>
     </template>
@@ -200,7 +196,7 @@ defineExpose({ open })
               <el-image
                 v-if="resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE"
                 :src="getFileUrl(row.meta?.source_file_id as string | undefined)"
-                class="mr-2 size-4 shrink-0 rounded"
+                class="mr-2 size-6 shrink-0"
                 :alt="row.name"
                 fit="cover"
               />
@@ -261,7 +257,7 @@ defineExpose({ open })
       </template>
     </MkViewLayout>
     <template #footer>
-      <div class="-mx-6 -mb-6 flex-align-center h-13.5 border-t px-6 py-4 text-sm text-N600">已关联 {{ selectedParagraphs.length }}</div>
+      <div class="text-left text-sm text-N600">已关联 {{ selectedParagraphs.length }}</div>
     </template>
   </MkDialog>
 </template>

@@ -489,6 +489,10 @@
       max-height: none;
       height: calc(100vh - 180px);
     }
+    .el-dialog__footer {
+      border-top: var(--el-border);
+      padding: 16px var(--el-dialog-padding-primary);
+    }
   }
 }
 

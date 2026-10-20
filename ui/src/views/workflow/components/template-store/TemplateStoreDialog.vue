@@ -60,7 +60,9 @@ defineExpose({ open, close })
     </template>
     <div v-loading="loading" class="px-6 py-4">
       <div v-if="hasSearchKeyword" class="mb-4 font-semibold">
-        找到 <span class="text-primary">{{ templates.length }}</span> 个相关模板
+        找到
+        <span class="text-primary">{{ templates.length }}</span>
+        个相关模板
       </div>
       <div class="mk-resource-card-grid-sm">
         <template v-for="template in templates" :key="template.id">

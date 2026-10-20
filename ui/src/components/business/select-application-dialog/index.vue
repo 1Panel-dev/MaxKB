@@ -164,7 +164,7 @@ defineExpose({ open })
       </template>
     </MkViewLayout>
     <template #footer>
-      <div class="flex-between -mx-6 border-t px-6 pt-4">
+      <div class="flex-between">
         <div class="flex-align-center gap-2">
           <span class="text-N600">已选 {{ selectedApplication.length }}</span>
           <el-button v-if="selectedApplication.length" link type="primary" @click="selectedApplication = []">清空</el-button>
