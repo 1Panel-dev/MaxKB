@@ -36,7 +36,7 @@ def get_application_args():
     )
 
 
-def get_application_func(source_type, source_id, application, workflow_params, workspace_id):
+def get_application_func(source_type, source_id, application, workflow_params, workspace_id, cancel_event):
     """
     构建应用（Agent）工具的执行函数。
 
@@ -46,10 +46,11 @@ def get_application_func(source_type, source_id, application, workflow_params, w
 
     def inner(message: str = ""):
         from application.models import Application, ApplicationVersion, Chat, ChatRecord, ChatSourceChoices
-        from application.workflow.common import WorkflowType, new_instance
+        from application.workflow.common import CancelledException, WorkflowType, new_instance
         from application.workflow.content_type import ContentType
         from application.workflow.nodes import get_start_node
         from application.workflow.workflow_manage import CallBack, WorkflowManage
+        from common.utils.thread_pool import await_complete_or_cancel
         from chat.serializers.chat import get_work_flow
         from chat.serializers.chat_history import ChatHistory
 
@@ -158,7 +159,10 @@ def get_application_func(source_type, source_id, application, workflow_params, w
         )
         sub_manage.start_node.workflow_manage = sub_manage
         sub_manage.run()
-        done_event.wait()
+
+        # 并发等子应用完成与取消信号;取消时级联取消子应用工作流,立即中断
+        if await_complete_or_cancel(done_event, cancel_event, sub_manage.cancel):
+            raise CancelledException()
         if result_holder["error"]:
             raise result_holder["error"]
 
@@ -170,7 +174,7 @@ def get_application_func(source_type, source_id, application, workflow_params, w
     return inner
 
 
-def get_application_tools(source_type, source_id, application_ids, workspace_id, workflow_params):
+def get_application_tools(source_type, source_id, application_ids, workspace_id, workflow_params, cancel_event):
     if not application_ids:
         return []
     from application.models import Application
@@ -178,7 +182,7 @@ def get_application_tools(source_type, source_id, application_ids, workspace_id,
     applications = QuerySet(Application).filter(id__in=application_ids, is_publish=True)
     results = []
     for application in applications:
-        func = get_application_func(source_type, source_id, application, workflow_params, workspace_id)
+        func = get_application_func(source_type, source_id, application, workflow_params, workspace_id, cancel_event)
         args = get_application_args()
         structured_tool = StructuredTool.from_function(
             func=func,

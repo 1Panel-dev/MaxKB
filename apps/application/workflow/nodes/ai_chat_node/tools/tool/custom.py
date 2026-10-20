@@ -8,6 +8,7 @@
 """
 
 import json
+import threading
 import time
 
 import uuid_utils.compat as uuid
@@ -63,7 +64,33 @@ def _save_custom_tool_record(tool_id, workspace_id, source_type, source_id, inpu
     ).save()
 
 
-def get_custom_func(source_type, source_id, tool, workspace_id):
+def run_cancellable(fn, cancel_event, on_cancel):
+    """
+    在 worker 线程执行阻塞函数 fn,与取消信号并发;取消先到则调用 on_cancel() 中断并抛CancelledException。
+    """
+    from application.workflow.common import CancelledException
+    from common.utils.thread_pool import await_complete_or_cancel
+
+    done_event = threading.Event()
+    result = {}
+
+    def _run():
+        try:
+            result["value"] = fn()
+        except BaseException as e:
+            result["error"] = e
+        finally:
+            done_event.set()
+
+    threading.Thread(target=_run, daemon=True).start()
+    if await_complete_or_cancel(done_event, cancel_event, on_cancel):
+        raise CancelledException()
+    if result["error"]:
+        raise result["error"]
+    return result["value"]
+
+
+def get_custom_func(source_type, source_id, tool, workspace_id, cancel_event):
     tool_id = tool.id
     code = tool.code
     init_field_list = tool.init_field_list or []
@@ -72,7 +99,7 @@ def get_custom_func(source_type, source_id, tool, workspace_id):
     def inner(**kwargs):
         # 在进程内直接跑沙箱代码（无 MCP 子进程），方式与工具调试执行 ToolExecutor.exec_code 一致。
         from common.utils.rsa_util import rsa_long_decrypt
-        from common.utils.tool_code import ToolExecutor
+        from common.utils.tool_code import ToolExecution, ToolExecutor
 
         start_time = time.time()
         # 合并初始化参数（默认值 → 已保存的启动参数），服务端注入，模型不可见
@@ -83,10 +110,21 @@ def get_custom_func(source_type, source_id, tool, workspace_id):
             init_params = init_params_default_value
         all_params = init_params | kwargs
 
-        error = None
+        # 持子进程句柄：取消时中断并 terminate 子进程，实现工具运行期间硬中断
+        execution = ToolExecution()
+
+        def _interrupt():
+            execution.cancelled.set()
+            execution.proc.terminate()
+
         result = None
+        error = None
         try:
-            result = ToolExecutor().exec_code(code, all_params)
+            result = run_cancellable(
+                lambda: ToolExecutor().exec_code(code, all_params, execution=execution),
+                cancel_event,
+                _interrupt,
+            )
         except Exception as e:
             error = e
         finally:
@@ -98,13 +136,13 @@ def get_custom_func(source_type, source_id, tool, workspace_id):
     return inner
 
 
-def get_custom_tools(source_type, source_id, tool_ids, workspace_id):
+def get_custom_tools(source_type, source_id, tool_ids, workspace_id, cancel_event):
     if not tool_ids:
         return []
     tools = QuerySet(Tool).filter(id__in=tool_ids, is_active=True, tool_type=ToolType.CUSTOM)
     results = []
     for tool in tools:
-        func = get_custom_func(source_type, source_id, tool, workspace_id)
+        func = get_custom_func(source_type, source_id, tool, workspace_id, cancel_event)
         args = get_custom_args(tool)
         structured_tool = StructuredTool.from_function(
             func=func,

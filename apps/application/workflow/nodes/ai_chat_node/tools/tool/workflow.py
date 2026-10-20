@@ -81,16 +81,17 @@ def _save_workflow_tool_record(
     ).save()
 
 
-def get_workflow_func(source_type, source_id, tool, qv, workspace_id, workflow_params=None):
+def get_workflow_func(source_type, source_id, tool, qv, workspace_id, cancel_event, workflow_params=None):
     from knowledge.services.retrieval_access import inherited_retrieval_context
 
     tool_id = tool.id
 
     def inner(**kwargs):
         # 使用新工作流引擎执行工具工作流，方式与 tool_workflow_lib_node 保持一致。
-        from application.workflow.common import WorkflowType, new_instance
+        from application.workflow.common import CancelledException, WorkflowType, new_instance
         from application.workflow.nodes import get_node_class
         from application.workflow.workflow_manage import CallBack, WorkflowManage
+        from common.utils.thread_pool import await_complete_or_cancel
 
         tool_record_id = str(uuid.uuid7())
         sub_workflow = new_instance(qv.work_flow, WorkflowType.TOOL)
@@ -152,7 +153,10 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id, workflow_p
         )
         sub_manage.start_node.workflow_manage = sub_manage
         sub_manage.run()
-        done_event.wait()
+
+        # 并发等子工作流完成与取消信号;取消时级联取消子工作流,立即中断
+        if await_complete_or_cancel(done_event, cancel_event, sub_manage.cancel):
+            raise CancelledException()
         if result_holder["error"]:
             raise result_holder["error"]
         return result_holder["output"]
@@ -160,7 +164,7 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id, workflow_p
     return inner
 
 
-def get_workflow_tools(source_type, source_id, tool_workflow_ids, workspace_id, workflow_params=None):
+def get_workflow_tools(source_type, source_id, tool_workflow_ids, workspace_id, cancel_event, workflow_params=None):
     tools = QuerySet(Tool).filter(
         id__in=tool_workflow_ids, is_active=True, tool_type=ToolType.WORKFLOW, workspace_id=workspace_id
     )
@@ -173,7 +177,7 @@ def get_workflow_tools(source_type, source_id, tool_workflow_ids, workspace_id, 
     results = []
     for tool in tools:
         qv = qd.get(tool.id)
-        func = get_workflow_func(source_type, source_id, tool, qv, workspace_id, workflow_params)
+        func = get_workflow_func(source_type, source_id, tool, qv, workspace_id, cancel_event, workflow_params)
         args = get_workflow_args(tool, qv)
         tool = StructuredTool.from_function(
             func=func,

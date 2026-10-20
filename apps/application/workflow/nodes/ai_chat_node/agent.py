@@ -149,6 +149,7 @@ def create_agent(
     chat_id=None,
     skill_tool_ids=None,
     extra_tools=None,
+    async_runner=None,
 ):
     # 创建临时文件夹
     if chat_id:
@@ -185,9 +186,13 @@ def create_agent(
             stream_mode="messages",
         )
 
-        async for chunk in response:
-            msg = chunk[0]
-            call_back.on_next(msg)
+        async def consume():
+            # runner 取消该 task 会让 CancelledError 注入在途的工具 await,从而打断正在运行的工具。
+            async for chunk in response:
+                msg = chunk[0]
+                call_back.on_next(msg)
+
+        await async_runner.await_or_cancel(consume())
 
     def _classify_error(e):
         # 取消：原样保留（保持节点取消语义）；MCP TaskGroup 的 ExceptionGroup：展开取真实异常并包成 RuntimeError
