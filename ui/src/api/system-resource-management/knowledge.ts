@@ -228,7 +228,7 @@ const getAllTags: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> 
   params,
   loading,
 ) => {
-  return get(`${prefix}/tags`, params, loading)
+  return post(`${prefix}/tags`, params, undefined, loading)
 }
 
 const getTags: (

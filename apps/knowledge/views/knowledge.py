@@ -11,7 +11,7 @@ from common.log.log import log
 from common import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
     KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI, \
-    GetModelAPI, KnowledgeExportAPI, KnowledgeBatchOperateAPI, KnowledgeImportAPI
+    GetModelAPI, KnowledgeExportAPI, KnowledgeBatchOperateAPI, KnowledgeImportAPI, KnowledgeTagsRequest
 from knowledge.models import KnowledgeScope
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeBatchOperateSerializer
@@ -566,11 +566,11 @@ class KnowledgeView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
+            methods=['POST'],
             description=_('Get all tags of knowledge base'),
             summary=_('Get all tags of knowledge base'),
             operation_id=_('Get all tags of knowledge base'),  # type: ignore
-            parameters=KnowledgeReadAPI.get_parameters(),
+            request=KnowledgeTagsRequest,
             responses=KnowledgeReadAPI.get_response(),
             tags=[_('Knowledge Base')]  # type: ignore
         )
@@ -578,11 +578,11 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_READ.get_workspace_permission(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
-        def get(self, request: Request, workspace_id: str):
+        def post(self, request: Request, workspace_id: str):
             return result.success(KnowledgeSerializer.Tags(data={
                 'user_id': request.user.id,
                 'workspace_id': workspace_id,
-                'knowledge_ids': request.query_params.getlist('knowledge_ids[]')
+                'knowledge_ids': request.data.get('knowledge_ids', [])
             }).list())
 
 
