@@ -698,7 +698,9 @@ def _unlink_unreferenced_pg_object(loid, using):
 
 @receiver(post_delete, sender=Paragraph)
 def on_delete_paragraph(sender, instance, using, **kwargs):
-    File.objects.using(using).filter(source_type=FileSourceType.PARAGRAPH, source_id=str(instance.id)).delete()
+    from knowledge.services.file_cleanup import delete_paragraph_files
+
+    delete_paragraph_files(instance.id, using)
 
 
 @receiver(post_delete, sender=File)

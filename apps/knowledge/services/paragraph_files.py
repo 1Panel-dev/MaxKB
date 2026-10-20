@@ -51,7 +51,12 @@ def _referenced_file_ids(value):
 def _belongs_to_migrating_paragraph(file, paragraph, moving_ids, target_document_id, target_knowledge_id):
     owner_id = str(file.source_id)
     if file.source_type == FileSourceType.PARAGRAPH:
-        return owner_id in moving_ids
+        return owner_id in moving_ids or (
+            bool((file.meta or {}).get("source_url"))
+            and ParagraphAsset.objects.filter(
+                file_id=file.id, paragraph_id=paragraph.id, knowledge_id=paragraph.knowledge_id
+            ).exists()
+        )
     if file.source_type == FileSourceType.DOCUMENT:
         return owner_id in {str(paragraph.document_id), str(target_document_id)}
     if file.source_type == FileSourceType.KNOWLEDGE:
@@ -59,10 +64,62 @@ def _belongs_to_migrating_paragraph(file, paragraph, moving_ids, target_document
     return False
 
 
+def detach_shared_web_images(paragraphs, target_knowledge_id):
+    """Keep shared Web images in both knowledge bases when their paragraphs move."""
+    paragraphs = [paragraph for paragraph in paragraphs if str(paragraph.knowledge_id) != str(target_knowledge_id)]
+    if not paragraphs:
+        return
+    paragraph_ids = [paragraph.id for paragraph in paragraphs]
+    asset_files = ParagraphAsset.objects.filter(paragraph_id__in=paragraph_ids).values("file_id")
+    files = (
+        File.objects.select_for_update()
+        .filter(id__in=asset_files, source_type=FileSourceType.PARAGRAPH, meta__has_key="source_url")
+        .order_by("id")
+    )
+    for file in files:
+        retained_owner = (
+            ParagraphAsset.objects.filter(file_id=file.id)
+            .exclude(paragraph_id__in=paragraph_ids)
+            .order_by("paragraph_id")
+            .values_list("paragraph_id", flat=True)
+            .first()
+        )
+        if retained_owner is None:
+            continue
+        moving_assets = ParagraphAsset.objects.filter(file_id=file.id, paragraph_id__in=paragraph_ids)
+        moving_owner = moving_assets.order_by("paragraph_id").values_list("paragraph_id", flat=True).first()
+        if moving_owner is None:
+            continue
+        meta = {**(file.meta or {}), "knowledge_id": str(target_knowledge_id)}
+        if file.storage_type == "seaweedfs":
+            meta["seaweedfs_key"] = meta.get("seaweedfs_key", f"files/{file.id}")
+        copied = File(
+            file_name=file.file_name,
+            file_size=file.file_size,
+            sha256_hash=file.sha256_hash,
+            source_type=FileSourceType.PARAGRAPH,
+            source_id=str(moving_owner),
+            storage_type=file.storage_type,
+            loid=file.loid,
+            meta=meta,
+        )
+        # Only the ownership record changes; both files keep referencing the same stored bytes.
+        File.objects.bulk_create([copied])
+        replacements = {str(file.id): str(copied.id)}
+        for paragraph in paragraphs:
+            for field in ("content", "content_schema", "source_snapshot", "chunks"):
+                setattr(paragraph, field, _replace_file_ids(getattr(paragraph, field), replacements))
+            paragraph.save(update_fields=["content", "content_schema", "source_snapshot", "chunks", "update_time"])
+        moving_assets.update(file_id=copied.id)
+        if file.source_id in {str(paragraph_id) for paragraph_id in paragraph_ids}:
+            File.objects.filter(id=file.id).update(source_id=str(retained_owner))
+
+
 def migrate_paragraph_files(paragraphs, target_document_id, target_knowledge):
     paragraphs = list(paragraphs)
     if not paragraphs:
         return
+    detach_shared_web_images(paragraphs, target_knowledge.id)
     paragraph_ids = {str(paragraph.id) for paragraph in paragraphs}
     asset_rows = list(
         ParagraphAsset.objects.filter(paragraph_id__in=paragraph_ids).values("id", "paragraph_id", "file_id")
@@ -112,7 +169,11 @@ def migrate_paragraph_files(paragraphs, target_document_id, target_knowledge):
                 continue
             if (
                 file.source_type == FileSourceType.PARAGRAPH
-                and str(file.source_id) in paragraph_ids
+                and (
+                    str(file.source_id) in paragraph_ids
+                    or bool((file.meta or {}).get("source_url"))
+                    and str(paragraph.knowledge_id) == str(target_knowledge.id)
+                )
                 or file.source_type == FileSourceType.DOCUMENT
                 and str(file.source_id) == str(target_document_id)
                 or file.source_type == FileSourceType.KNOWLEDGE

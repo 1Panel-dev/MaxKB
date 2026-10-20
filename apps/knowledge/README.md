@@ -53,6 +53,16 @@ recognition status is available on the paragraph assets, while embedding status 
 Image extraction, file storage and source reconciliation still occur in the import/sync transaction;
 the external vision model or tool runs in the worker.
 
+Web images are staged under the knowledge base while crawling. Once paragraph assets are saved,
+their files use `source_type=PARAGRAPH` and a referencing paragraph's ID as `source_id`.
+`ParagraphAsset` retains every document/paragraph reference; shared images keep the same file ID and
+URL across syncs. Deleting the owning paragraph transfers ownership to another referencing paragraph,
+or deletes the file when no paragraph assets remain. The cache resolves paragraph-owned images
+through their asset records within the same knowledge base. Unchanged Web document syncs also
+transfer legacy knowledge-owned image files without changing paragraph content or recognition results.
+Moving shared Web images to another knowledge base separates their file ownership records while
+reusing the stored bytes, so access checks and later paragraph deletion remain independent.
+
 ## 图片文档接口
 
 通用知识库支持将图片预览导入为独立图片文档。工作空间接口的知识库路径前缀为

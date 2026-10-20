@@ -5,12 +5,13 @@ from pathlib import PurePosixPath
 from urllib.parse import unquote, urlsplit
 
 import uuid_utils.compat as uuid
-from django.db.models import QuerySet
+from django.db import transaction
+from django.db.models import Q, QuerySet
 
 from common.utils.common import get_sha256_hash, guess_image_format
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
-from knowledge.models import File, FileSourceType, Knowledge
+from knowledge.models import File, FileSourceType, Knowledge, ParagraphAsset
 
 
 REMOTE_IMAGE_PATTERN = re.compile(
@@ -27,6 +28,20 @@ def _file_name(source_url: str, image_format: str) -> str:
     if not path_name or "." not in path_name:
         path_name = f"web-image.{extension}"
     return path_name[-256:]
+
+
+def _cached_web_image(source_url, knowledge_id, sha256_hash):
+    return (
+        QuerySet(File)
+        .filter(
+            Q(source_type=FileSourceType.KNOWLEDGE, source_id=str(knowledge_id))
+            | Q(source_type=FileSourceType.PARAGRAPH, paragraph_assets__knowledge_id=knowledge_id),
+            sha256_hash=sha256_hash,
+            meta__source_url=source_url,
+            storage_type="seaweedfs",
+        )
+        .first()
+    )
 
 
 def _cache_web_image(source_url: str, knowledge_id) -> str | None:
@@ -47,17 +62,7 @@ def _cache_web_image(source_url: str, knowledge_id) -> str | None:
             return None
         image_format = guess_image_format(response.content, source_url)
         sha256_hash = get_sha256_hash(response.content)
-        existing = (
-            QuerySet(File)
-            .filter(
-                source_type=FileSourceType.KNOWLEDGE,
-                source_id=str(knowledge_id),
-                sha256_hash=sha256_hash,
-                meta__source_url=source_url,
-                storage_type="seaweedfs",
-            )
-            .first()
-        )
+        existing = _cached_web_image(source_url, knowledge_id, sha256_hash)
         if existing is not None:
             return str(existing.id)
         file = File(
@@ -72,6 +77,47 @@ def _cache_web_image(source_url: str, knowledge_id) -> str | None:
     except Exception as exc:
         maxkb_logger.warning(f"Cache web image failed, url={source_url}, error={exc}")
         return None
+
+
+def bind_web_image_files(assets) -> int:
+    """Move staged Web files to a referencing paragraph, retaining shared file IDs."""
+    owners = {}
+    for asset in assets:
+        owners.setdefault(asset.file_id, asset)
+    if not owners:
+        return 0
+    updated = 0
+    with transaction.atomic():
+        files = (
+            File.objects.select_for_update()
+            .filter(
+                id__in=owners,
+                source_type__in=[FileSourceType.KNOWLEDGE, FileSourceType.PARAGRAPH],
+                meta__has_key="source_url",
+            )
+            .order_by("id")
+        )
+        for file in files:
+            asset = owners[file.id]
+            if file.source_type == FileSourceType.KNOWLEDGE and file.source_id != str(asset.knowledge_id):
+                continue
+            if (
+                file.source_type == FileSourceType.PARAGRAPH
+                and ParagraphAsset.objects.filter(file_id=file.id, paragraph_id=file.source_id).exists()
+            ):
+                continue
+            # Recheck persisted references under the file lock before transferring ownership.
+            if not ParagraphAsset.objects.filter(
+                id=asset.id,
+                file_id=file.id,
+                paragraph_id=asset.paragraph_id,
+                knowledge_id=asset.knowledge_id,
+            ).exists():
+                continue
+            updated += File.objects.filter(id=file.id).update(
+                source_type=FileSourceType.PARAGRAPH, source_id=str(asset.paragraph_id)
+            )
+    return updated
 
 
 def internalize_web_images(content: str, knowledge_id) -> str:

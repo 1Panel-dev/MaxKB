@@ -33,6 +33,7 @@ from knowledge.models import (
     DocumentResourceType,
     Embedding,
     File,
+    FileSourceType,
     Knowledge,
     LocalState,
     Paragraph,
@@ -42,6 +43,7 @@ from knowledge.models import (
 )
 from knowledge.services.document_strategy import document_source_hash, normalize_document_strategy, strategy_hashes
 from knowledge.services import validate_knowledge_file_size
+from knowledge.web_assets import bind_web_image_files
 
 
 IMAGE_PATTERN = re.compile(r"!\[(?P<caption>[^\]]*)\]\([^)]*/oss/file/(?P<file_id>[0-9a-fA-F-]{32,36})[^)]*\)")
@@ -193,6 +195,7 @@ def sync_paragraph_assets(paragraphs: Iterable[Paragraph], visual_strategy_hash:
             plans.append((paragraph, block, image_position, file, origin, source_key, asset))
 
     active_assets = []
+    web_assets = []
     for paragraph, block, image_position, file, origin, source_key, asset in plans:
         if asset is None:
             asset = ParagraphAsset(
@@ -216,6 +219,10 @@ def sync_paragraph_assets(paragraphs: Iterable[Paragraph], visual_strategy_hash:
         block["ocr_text"] = asset.ocr_text
         block["description"] = asset.description
         active_assets.append(asset)
+        if file.source_type in (FileSourceType.KNOWLEDGE, FileSourceType.PARAGRAPH) and (file.meta or {}).get(
+            "source_url"
+        ):
+            web_assets.append(asset)
 
     ParagraphAsset.objects.filter(
         paragraph_id__in=touched_paragraph_ids,
@@ -225,6 +232,7 @@ def sync_paragraph_assets(paragraphs: Iterable[Paragraph], visual_strategy_hash:
         schema = schemas[paragraph.id]
         paragraph.content_schema = schema
         paragraph.save(update_fields=["content_schema", "update_time"])
+    bind_web_image_files(web_assets)
     return active_assets
 
 
