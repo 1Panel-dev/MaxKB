@@ -636,6 +636,11 @@ Workspace 清除策略通过 PUT `batch_clean_time` 提交当前智能体的单�
 知识库及目标文档选项通过当前范围 Knowledge／Document API 查询，文档使用 `getAllDocuments(knowledgeId)`。
 聊天记录与标注接口保留在同一 API 文件；日志详情使用现有 `LogConversation`，其聊天记录查询仍使用 Workspace API。
 
+简易智能体详情的 `model`、`stt_model`、`tts_model`、`long_term_model` 为模型 ID 响应别名，
+`knowledge_list` 为已关联知识库快照；保存映射到对应的 `*_model_id` 字段（主模型为 `model_id`）。
+语音及长期记忆模型的空 ID 使用 `null`，不提交空 UUID 字符串；简易设置不将详情的 `work_flow`
+回传，避免触发工作流配置提取。
+
 ### 智能体发布渠道
 
 `admin/workspace/application/access.ts` 和 `admin/system/resource-management/application/access.ts`

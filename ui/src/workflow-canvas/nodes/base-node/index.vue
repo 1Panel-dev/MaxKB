@@ -234,7 +234,7 @@ onMounted(() => {
 
       <!-- 长期记忆 -->
       <el-form-item
-        class="mb-2!"
+        class="mb-2! mk-hide-asterisk"
         prop="long_term_model_id"
         :rules="{
           required: formData.long_term_enable && formData.long_term_model_id_type === 'custom',

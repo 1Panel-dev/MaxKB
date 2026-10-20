@@ -65,9 +65,9 @@ defineExpose({ closeEdit })
     modal-penetrable
     :lock-scroll="false"
   >
-    <div v-loading="loading" class="space-y-4">
+    <div v-loading="loading" class="space-y-2">
       <template v-for="(version, index) in versions" :key="version.id">
-        <MkListItem :active="selectedId === version.id" @click="handlePreview(version)">
+        <MkListItem class="rounded-xl!" :active="selectedId === version.id" @click="handlePreview(version)">
           <div class="min-w-0 flex-1 pl-2">
             <div class="flex-align-center gap-2">
               <h6 class="text-N900! truncate" :title="version.name || datetimeFormat(version.create_time)">
@@ -82,8 +82,9 @@ defineExpose({ closeEdit })
               <span
                 class="truncate text-N600! text-sm font-normal!"
                 :title="`${version.publish_user_name || '-'} 发布于 ${datetimeFormat(version.create_time)}`"
-                >{{ version.publish_user_name || '-' }} 发布于 {{ datetimeFormat(version.create_time) }}</span
               >
+                {{ version.publish_user_name || '-' }} 发布于 {{ datetimeFormat(version.create_time) }}
+              </span>
             </div>
           </div>
           <template #action-dropdown>
