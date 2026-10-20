@@ -157,7 +157,7 @@ const getModelList: (param: any, loading?: Ref<boolean>) => Promise<Result<Array
 const getToolList: (param: any, loading?: Ref<boolean>) => Promise<Result<Array<any>>> = (param, loading) => {
   const { workspace_id, ...params } = param || {}
   const { user } = useStore()
-  return get(`${prefix}/workspace/${workspace_id || user.getWorkspaceId()}/tool`, params, loading)
+  return get(`${prefix}/workspace/${workspace_id || user.getWorkspaceId()}/tool`, params, loading,undefined,{ indexes: null })
 }
 
 const getToolListPage: (
