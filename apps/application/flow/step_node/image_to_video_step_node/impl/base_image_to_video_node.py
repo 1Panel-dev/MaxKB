@@ -4,6 +4,7 @@ from functools import reduce
 from typing import List
 
 import requests
+from django.db import connection
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
@@ -62,6 +63,7 @@ class BaseImageToVideoNode(IImageToVideoNode):
         # 判断是不是 url
         first_frame_url = self.get_file_base64(first_frame_url)
         last_frame_url = self.get_file_base64(last_frame_url)
+        connection.close()
         video_urls = ttv_model.generate_video(question, negative_prompt, first_frame_url, last_frame_url)
         # 保存图片
         if video_urls is None or video_urls == '':
