@@ -65,9 +65,9 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: { title: '召回测试', order: 10 },
           },
           {
-            path: 'question',
-            name: 'workspace-shared-knowledge-question',
-            component: () => import('@/views/knowledge-detail/question/index.vue'),
+            path: 'problem',
+            name: 'workspace-shared-knowledge-problem',
+            component: () => import('@/views/knowledge-detail/problem/index.vue'),
             meta: { title: '问题', order: 20 },
           },
           {

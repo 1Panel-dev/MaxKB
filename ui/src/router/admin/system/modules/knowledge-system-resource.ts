@@ -65,9 +65,9 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: { title: '召回测试', order: 10 },
           },
           {
-            path: 'question',
-            name: 'system-resource-knowledge-question',
-            component: () => import('@/views/knowledge-detail/question/index.vue'),
+            path: 'problem',
+            name: 'system-resource-knowledge-problem',
+            component: () => import('@/views/knowledge-detail/problem/index.vue'),
             meta: { title: '问题', order: 20 },
           },
           {
