@@ -6,7 +6,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail, ApplicationFormPayload } from '@/api/types'
 import { useStore } from '@/stores'
-import { isWorkFlow } from '@/utils/application'
+import { isWorkFlow } from '@/utils/common'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CopyApplicationDialog' })

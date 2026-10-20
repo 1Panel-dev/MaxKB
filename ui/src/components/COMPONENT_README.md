@@ -293,6 +293,8 @@ Esc 或取消清理草稿；`loading` 默认为 false，为 true 时禁止创建
 
 `maxTableHeight` 表示窗口中除表格外需要扣除的高度，默认为 `250`；组件会在窗口尺寸变化时
 重新计算 `max-height`。传入 `resizable` 后启用列宽拖拽，并隐藏为拖拽借用的原生边框视觉。
+仅开启 `resizable` 时，表头保持单行，拖拽下限按当前标题文字、排序／筛选图标、间距及内边距
+计算；拖拽线与最终列宽均不能小于该宽度，原生 `header-dragend` 继续透传。
 `resizable` 采用白名单式启用：只有需求明确指定的页面级表格才能开启；未明确指定的表格，以及
 Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启。
 
@@ -304,7 +306,11 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `row-key` 支持字段路径或函数，默认为 `id`，排序要求每行键值唯一且
 为字符串或数字。
 
-`sort-change` 在实际顺序变化后返回 `{ oldIndex, newIndex, data }`，不要在回调里再次移动数组。
+`row-sort-change` 在实际行顺序变化后返回 `{ oldIndex, newIndex, data }`，不要在回调里再次移动数组。
+`sort-change` 通过 `$attrs` 透传 Element Plus 原生表头排序参数 `{ column, prop, order }`。
+列只需声明 `sortable`，MkTable 在渲染列时统一转换为 `sortable="custom"`，不执行当前页排序；
+支持 Fragment、条件／循环列和原生分组列，保留列的插槽、键与引用。页面通过 `toOrderBy` 转换请求字段。
+该约定独立于列宽拖拽开关 `resizable`，未开启排序的列保持原样。
 分页场景只调整当前传入页的数据，索引从 `0` 开始；跨页位置、接口保存和失败回滚由业务负责。
 有活动列排序、表头筛选、展开行或树形数据时暂停拖拽，避免显示行与数据索引不一致。
 虚拟表格、跨页和跨列表拖拽不属于该接口。排序工具不会深拷贝普通表格的行对象；工作流使用方应在

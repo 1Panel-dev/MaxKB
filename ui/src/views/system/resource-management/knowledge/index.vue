@@ -131,6 +131,7 @@ onMounted(() => {
         :max-table-height="210"
         @current-change="loadKnowledgePage"
         @size-change="loadKnowledgePage"
+        resizable
       >
         <el-table-column prop="name" label="名称" min-width="200" show-overflow-tooltip>
           <template #default="{ row }">

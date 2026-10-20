@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import type { ApplicationDetail } from '@/api/types'
-import { isWorkFlow } from '@/utils/application'
+import { isWorkFlow } from '@/utils/common'
 
 defineOptions({ name: 'SettingApplicationAction' })
 

@@ -6,6 +6,7 @@ import type { Dict, ToolExecutionRecord } from '@/api/types'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
 import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { isSystemSharedResource } from '@/utils/resource-context'
 
 const props = defineProps<{ api: typeof WorkflowApi; toolId: string }>()
@@ -17,6 +18,7 @@ const loading = ref(false)
 const recordData = ref<ToolExecutionRecord[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchInput = ref<Dict<unknown>>({})
+const orderBy = ref<string>()
 const sourceLabels = {
   [TOOL_RECORD_SOURCE.APPLICATION]: '智能体',
   [TOOL_RECORD_SOURCE.KNOWLEDGE]: '知识库',
@@ -37,6 +39,7 @@ const selectedSourceType = ref<string | null>(null)
 const selectedState = ref<string | null>(null)
 const searchQuery = computed<Dict<unknown>>(() => ({
   ...searchInput.value,
+  order: orderBy.value,
   ...(selectedSourceType.value ? { source_type: selectedSourceType.value } : {}),
   ...(selectedState.value ? { state: selectedState.value } : {}),
 }))
@@ -65,7 +68,15 @@ function handleFilterChange() {
   loadRecords()
 }
 
+/* 执行时间排序与触发器记录保持相同的正负字段协议。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort, (prop) => `ett.${prop}`)
+  pagination.value.currentPage = 1
+  return loadRecords()
+}
+
 function open() {
+  orderBy.value = undefined
   searchInput.value = {}
   selectedSourceType.value = null
   selectedState.value = null
@@ -127,6 +138,7 @@ defineExpose({ open })
       :max-table-height="230"
       @current-change="loadRecords()"
       @size-change="loadRecords()"
+      @sort-change="handleSortChange"
     >
       <el-table-column label="触发来源" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">
@@ -145,25 +157,13 @@ defineExpose({ open })
       </el-table-column>
       <el-table-column label="类型" width="90">
         <template #header>
-          <MkTableFilter
-            mode="single"
-            v-model="selectedSourceType"
-            label="类型"
-            :options="sourceTypeOptions"
-            @change="handleFilterChange"
-          />
+          <MkTableFilter mode="single" v-model="selectedSourceType" label="类型" :options="sourceTypeOptions" @change="handleFilterChange" />
         </template>
         <template #default="{ row }">{{ sourceLabels[row.source_type as keyof typeof sourceLabels] || '-' }}</template>
       </el-table-column>
       <el-table-column label="状态" width="100">
         <template #header>
-          <MkTableFilter
-            mode="single"
-            v-model="selectedState"
-            label="状态"
-            :options="stateOptions"
-            @change="handleFilterChange"
-          />
+          <MkTableFilter mode="single" v-model="selectedState" label="状态" :options="stateOptions" @change="handleFilterChange" />
         </template>
         <template #default="{ row }: { row: ToolExecutionRecord }">
           <MkStatusLabel v-if="EXECUTION_STATUS_OPTIONS[row.state]" v-bind="EXECUTION_STATUS_OPTIONS[row.state]" />
@@ -173,7 +173,7 @@ defineExpose({ open })
       <el-table-column label="耗时" width="90">
         <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
       </el-table-column>
-      <el-table-column label="执行时间" prop="create_time" width="180">
+      <el-table-column label="执行时间" prop="create_time" width="180" sortable>
         <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="70">

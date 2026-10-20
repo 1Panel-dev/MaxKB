@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { DynamicFormValue } from '../../type'
 import { computed, inject, ref, useAttrs } from 'vue'
-import { MsgWarning } from '@/utils/message'
 import type { FormField } from '@/components/mk-dynamics-form/type'
+import { MsgWarning } from '@/utils/message'
 import { downloadByURL, getAttrsArray, getFileUrl } from '@/utils/common'
 import { getFileExtension, getFileIconUrl } from '@/utils/icon'
 import { formatFileSize } from '@/utils/number'

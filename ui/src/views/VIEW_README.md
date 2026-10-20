@@ -201,6 +201,8 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 - 名称使用 `MkEditName`，最长 128，禁止 `: \ / ? * [ ]`；成功按 ID 更新名称与时间。
 - 文件状态、启用、命中处理用 `MkTableFilter single`，标签用 `cascader`；改变条件回第一页并清空选择，保留其他条件。
   状态查询同步更新 `status` 与 `task_type`；布尔 false 保留，“全部”省略条件；标签传叶子 ID 或 `NO_TAG`。
+- 字符数使用服务端表头排序，通过 `toOrderBy` 更新独立的 `orderBy`，请求时作为 `order_by` 传入；切换排序回第一页并清空选择，
+  取消排序恢复后端默认顺序。搜索、筛选、分页和轮询保留当前排序，导入成功清空搜索及筛选时也保留排序。
 - 任务解析及筛选统一在 `document/status.ts`，展示由 `DocumentStatus.vue` 负责；不复用执行记录状态。
   汇总优先级为取消中、执行中、排队中、失败、取消完成、成功；忽略未知和 n，保留取消完成显示成功的既有规则。
 - 文档 Action 按 embedding、generate-questions、setting、setting-tags、tokenize、export、sync、migrate 等职责分组，
@@ -309,6 +311,9 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - 返回方法集中在各资源 `navigation.ts`；历史模式先退出预览，编辑态保留保存并退出／直接退出确认。
   当前没有通用路由离开或浏览器关闭守卫。
 - 工具、知识库执行记录抽屉按需挂载，关闭后卸载；知识库记录每 6 秒刷新，关闭停止。
+  执行时间列声明 `sortable`，独立 `orderBy` 通过 `toOrderBy` 添加 `ett.` 前缀，以 `order` 查询参数传入。
+  切换排序回第一页；搜索、筛选、分页与轮询保留排序，重新打开时恢复默认排序。
+  当前本地后端两类接口仍固定按执行时间降序，需支持 `order` 后才能实际响应升序请求。
 
 ## 其他页面约束
 
@@ -322,6 +327,8 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   排行由概览本地 `components/ApplicationRanking.vue` 调用 Overview API，展示用户 Tokens 消耗与提问次数两类 TOP5。
   应用排行复用首页 `RankingCard`，由概览转换展示字段；占比使用当前应用同期完整排行总量。
   概览内暂时隐藏卡片详情入口，不接入排行抽屉、搜索、分页或导出。
+- 触发器执行记录的执行时间列使用服务端排序，独立 `orderBy` 经 `toOrderBy` 添加 `ett.` 前缀，
+  通过查询参数 `order` 传入。切换排序回第一页；搜索、分页和详情跨页保留排序，重新打开抽屉恢复默认排序。
 - 触发器表单共用创建／编辑，保留任务 ID 和参数；资源模式固定单任务，完整输入定义不足时补查详情。
   保存校验全部折叠任务；参数初始化不覆盖已配置值，移除事件引用时恢复自定义默认值。
 - 智能体／知识库对话用户页使用双栏布局和当前页授权；智能体从 context 取 Workspace／System 资源管理 ChatUser API，知识库取四范围 API。

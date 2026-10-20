@@ -1174,6 +1174,21 @@
       }
     }
   }
+
+  // 排序图标
+  .caret-wrapper {
+    width: 16px;
+    height: 16px;
+  }
+  .sort-caret {
+    &.ascending {
+      border-bottom-color: var(--mk-N600);
+      top: -4px;
+    }
+    &.descending {
+      border-top-color: var(--mk-N600);
+    }
+  }
 }
 .el-table--border {
   border: 1px solid var(--el-table-border-color);

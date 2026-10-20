@@ -6,11 +6,11 @@ import type { FolderSource, FolderItem } from '@/api/types'
 import { FOLDER_SORT, type FolderSort } from './types'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { getWorkspaceId } from '@/utils/resource-context'
 import VirtualizedTree from './VirtualizedTree.vue'
 import FolderFormDialog from './FolderFormDialog.vue'
 import ResourceAuthorizationDrawer from '@/components/business/resource-authorization-drawer/index.vue'
 import { useStore } from '@/stores'
-import { getWorkspaceId } from '@/utils/resource-context'
 
 const MoveToDialog = defineAsyncComponent(() => import('./MoveToDialog.vue'))
 

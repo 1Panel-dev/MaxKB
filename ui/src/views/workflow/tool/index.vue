@@ -14,7 +14,6 @@ import SystemToolWorkflowApi from '@/api/admin/system/resource-management/tool/t
 import SharedModelApi from '@/api/admin/system/shared-resources/model'
 import SharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import SharedToolWorkflowApi from '@/api/admin/system/shared-resources/tool/tool-workflow'
-import { getResourceScope, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import type {
   DefaultModelSettingPayload,
   ToolItem,
@@ -23,6 +22,7 @@ import type {
   WorkflowVersionPayload,
   WorkflowStoreTemplate,
 } from '@/api/types'
+import { getResourceScope, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'

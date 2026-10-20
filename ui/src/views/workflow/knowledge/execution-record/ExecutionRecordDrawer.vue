@@ -3,8 +3,9 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import { STATE_TYPES } from '@/api/enums'
 import type { Dict, KnowledgeExecutionRecord } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
+import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { MsgConfirm } from '@/utils/message'
 import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 
@@ -17,6 +18,7 @@ const loading = ref(false)
 const recordData = ref<KnowledgeExecutionRecord[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchQuery = ref<Dict<unknown>>()
+const orderBy = ref<string>()
 const searchFields = [
   { label: '发起人', value: 'user_name' },
   {
@@ -46,7 +48,11 @@ function loadRecords(page = pagination.value.currentPage, showLoading = true): P
   stopPolling()
   if (showLoading) loading.value = true
   return props.api
-    .getKnowledgeExecutionRecordPage(props.knowledgeId, { currentPage: page, pageSize: pagination.value.pageSize }, searchQuery.value)
+    .getKnowledgeExecutionRecordPage(
+      props.knowledgeId,
+      { currentPage: page, pageSize: pagination.value.pageSize },
+      { ...searchQuery.value, order: orderBy.value },
+    )
     .then((result) => {
       recordData.value = result.records
       if (currentRecord.value) currentRecord.value = result.records.find((record) => record.id === currentRecord.value?.id) ?? currentRecord.value
@@ -66,7 +72,15 @@ function searchRecords(query?: Dict<unknown>) {
   loadRecords()
 }
 
+/* 执行时间排序与触发器记录保持相同的正负字段协议。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort, (prop) => `ett.${prop}`)
+  pagination.value.currentPage = 1
+  return loadRecords()
+}
+
 function open() {
+  orderBy.value = undefined
   searchQuery.value = undefined
   closeDetails()
   recordData.value = []
@@ -148,6 +162,7 @@ defineExpose({ open, close })
       :max-table-height="230"
       @current-change="loadRecords()"
       @size-change="loadRecords()"
+      @sort-change="handleSortChange"
     >
       <el-table-column label="发起人" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">{{ row.meta?.user_name || '-' }}</template>
@@ -161,7 +176,7 @@ defineExpose({ open, close })
       <el-table-column label="耗时" width="90">
         <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
       </el-table-column>
-      <el-table-column label="执行时间" prop="create_time" width="180">
+      <el-table-column label="执行时间" prop="create_time" width="180" sortable>
         <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="100">

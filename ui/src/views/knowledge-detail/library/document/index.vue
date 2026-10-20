@@ -14,6 +14,7 @@ import { DOCUMENT_STATUS_FILTER_OPTIONS } from './status'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { numberFormat } from '@/utils/number'
+import { toOrderBy, isWorkFlow } from '@/utils/common'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
 import { isWorkspaceResource, isWorkspaceSharedResource } from '@/utils/resource-context'
@@ -121,6 +122,7 @@ const loading = ref(false)
 const documentData = ref<DocumentItem[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const documentQuery = ref<Dict<unknown>>({})
+const orderBy = ref<string>()
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
@@ -210,6 +212,7 @@ function loadDocuments(showLoading = true): Promise<void> {
   return resourceApi.document
     .getDocumentPage(knowledgeId.value, paginationConfig.value, {
       ...documentQuery.value,
+      order_by: orderBy.value,
       status: documentStatusFilter.value?.status,
       task_type: documentStatusFilter.value?.task_type,
       is_active: selectedDocumentActive.value ?? undefined,
@@ -241,7 +244,13 @@ function handleSearchChange(query?: Dict<unknown>) {
   return loadDocuments()
 }
 
-/* 导入成功后清空查询条件，重新加载第一页。 */
+/* 表头排序：服务端对完整结果排序，切换时清空选择并回到第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort)
+  return handleDocumentFilterChange()
+}
+
+/* 导入成功后清空查询条件，保留表头排序并重新加载第一页。 */
 function handleImportDocumentSuccess() {
   selectedDocumentStatus.value = null
   selectedDocumentActive.value = null
@@ -310,11 +319,7 @@ onBeforeUnmount(() => {
       <div class="flex-align-center gap-3">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
         <!-- 查看工作流执行记录 -->
-        <ButtonExecutionRecord
-          v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW && resourceApi.workflow"
-          :api="resourceApi.workflow"
-          :knowledge-id="knowledgeId"
-        />
+        <ButtonExecutionRecord v-if="isWorkFlow(knowledgeType) && resourceApi.workflow" :api="resourceApi.workflow" :knowledge-id="knowledgeId" />
         <template v-if="!isWorkspaceSharedResource()">
           <!-- 导入 Web、飞书或工作流文档 -->
           <ButtonImportDocument
@@ -347,6 +352,7 @@ onBeforeUnmount(() => {
     @current-change="loadDocuments()"
     @size-change="loadDocuments()"
     @selection-change="handleSelectionChange"
+    @sort-change="handleSortChange"
     @row-click="handleOpenParagraph"
     row-class-name="cursor-pointer"
     resizable
@@ -403,12 +409,12 @@ onBeforeUnmount(() => {
       </template>
       <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
     </el-table-column>
-    <el-table-column prop="char_length" label="字符数">
+    <el-table-column prop="char_length" label="字符数" min-width="90" sortable>
       <template #default="{ row }">
         {{ numberFormat(row.char_length) }}
       </template>
     </el-table-column>
-    <el-table-column prop="paragraph_count" label="分段">
+    <el-table-column prop="paragraph_count" label="分段" sortable>
       <template #default="{ row }">
         {{ numberFormat(row.paragraph_count) }}
       </template>
@@ -546,7 +552,7 @@ onBeforeUnmount(() => {
               <!-- 导出文档 -->
               <ExportDocumentAction label="导出" :api="resourceApi.document" v-model:loading="operationLoading" :document="row" />
 
-              <template v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.BASE || knowledgeType === KNOWLEDGE_TYPE_KEY.WORKFLOW">
+              <template v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.BASE || isWorkFlow(knowledgeType)">
                 <!-- 下载原文档 -->
                 <DownloadDocumentAction :api="resourceApi.document" :knowledge-id="knowledgeId" v-model:loading="operationLoading" :document="row" />
                 <!-- 替换原文档 -->

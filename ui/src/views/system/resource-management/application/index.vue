@@ -6,10 +6,10 @@ import SystemCommonApi from '@/api/admin/system/common'
 import SystemWorkspaceApi from '@/api/admin/system/workspace'
 import SystemResourceTriggerApi from '@/api/admin/system/resource-management/resource-trigger'
 import type { ApplicationDetail, Dict, OptionItem } from '@/api/types'
+import { APPLICATION_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { datetimeFormat } from '@/utils/time'
-import { APPLICATION_TYPE } from '@/api/enums'
-import { isWorkFlow } from '@/utils/application'
+import { isWorkFlow } from '@/utils/common'
 import {
   AuthorizeApplicationAction,
   ExportApplicationAction,
