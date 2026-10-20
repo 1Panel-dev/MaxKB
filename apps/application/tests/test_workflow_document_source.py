@@ -74,16 +74,20 @@ class WorkflowDocumentSourceTests(SimpleTestCase):
                 "meta": {"source_type": "lark"},
             },
         ]
-        node = ToolLibNode.__new__(ToolLibNode)
-        node.node = SimpleNamespace(properties={"kind": "data-source"})
-        node.get_parameters = MagicMock(return_value={"tool_lib_id": "tool-id"})
+        node = ToolLibNode(
+            SimpleNamespace(id="lark-node", properties={"kind": "data-source"}),
+            MagicMock(),
+            lambda _: {"tool_lib_id": "tool-id"},
+        )
         node.get_workflow_parameters = MagicMock(return_value={"workflow_source": {"source_scope": "lark-scope"}})
-        node.get_node_id = MagicMock(return_value="lark-node")
         node._check_cancelled = MagicMock()
         file_id = "00000000-0000-0000-0000-000000000001"
         node.upload_knowledge_file = MagicMock(return_value=file_id)
         node.write_context = MagicMock()
         node.execute()
+        self.assertEqual(executor.exec_code.call_count, 3)
+        for call in executor.exec_code.call_args_list:
+            self.assertIs(call.kwargs["execution"], node._execution)
         downloaded = node.write_context.call_args_list[-1].args[1][0]
         stored = self.split_and_write(downloaded["meta"], file_id)
         self.assertEqual(stored.meta["token"], "remote-document")

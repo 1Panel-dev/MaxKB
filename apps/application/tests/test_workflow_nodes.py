@@ -1,9 +1,10 @@
 from datetime import datetime
 from types import SimpleNamespace
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 from django.test import SimpleTestCase
 
+from application.workflow.common import WorkflowType
 from application.workflow.nodes.ai_chat_node.ai_chat_node import AIChatNode, _get_upstream_knowledge_images
 from application.workflow.nodes.data_source_web_node.data_source_web_node import DataSourceWebNode
 from application.workflow.nodes.search_knowledge_node.search_knowledge_node import (
@@ -204,17 +205,35 @@ class AIChatKnowledgeImageTests(SimpleTestCase):
     def test_collects_deduplicated_images_from_upstream_knowledge_searches(self):
         self.assertEqual(_get_upstream_knowledge_images(self.workflow_manage, "ai"), [self.asset])
 
+    @patch("application.workflow.nodes.ai_chat_node.ai_chat_node.filter_authorized_ids", return_value=[])
+    @patch("application.workflow.nodes.ai_chat_node.ai_chat_node.get_model_instance_by_model_workspace_id")
     @patch("application.workflow.nodes.ai_chat_node.ai_chat_node._process_images")
-    def test_vision_chat_receives_recalled_knowledge_images(self, process_images):
+    def test_vision_chat_receives_recalled_knowledge_images(self, process_images, get_model, _authorized):
         processed_image = {"type": "image_url", "image_url": {"url": "data:image/png;base64,image"}}
         process_images.return_value = [processed_image]
-        self.workflow_manage.generate_prompt.return_value = "answer with the recalled context"
-        node = AIChatNode.__new__(AIChatNode)
-        node.node = SimpleNamespace(id="ai")
-        node.workflow_manage = self.workflow_manage
+        self.workflow_manage.generate_prompt.side_effect = ["answer with the recalled context", "system prompt"]
+        self.workflow_manage.workflow_type = WorkflowType.APPLICATION
+        self.workflow_manage.get_parameters.return_value = {"workspace_id": "workspace"}
+        node = AIChatNode(
+            SimpleNamespace(id="ai"),
+            self.workflow_manage,
+            lambda _: {
+                "model_id": "model",
+                "model_params_setting": {},
+                "prompt": "prompt",
+                "system": "system",
+                "vision": True,
+                "stream": False,
+            },
+        )
+        node._handle_mcp = MagicMock(return_value=False)
+        node._invoke_response = MagicMock()
 
-        question = node._generate_prompt_question("prompt", MagicMock(), True, None, None)
+        node.execute()
 
+        self.assertEqual(self.workflow_manage.generate_prompt.call_args_list, [call("prompt"), call("system")])
+        get_model.return_value.invoke.assert_called_once()
+        question = get_model.return_value.invoke.call_args.args[0][-1]
         process_images.assert_called_once_with([self.asset])
         self.assertEqual(question.content[0], processed_image)
         self.assertEqual(question.content[-1]["text"], "answer with the recalled context")

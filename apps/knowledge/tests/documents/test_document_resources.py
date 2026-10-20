@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase
+from django.utils.translation import override
 from knowledge.models import (
     ContentOrigin,
     Document,
@@ -491,7 +492,7 @@ class SyncedParagraphCleanupTests(SimpleTestCase):
 
 class ParagraphFileMigrationTests(SimpleTestCase):
     @patch("knowledge.serializers.paragraph.QuerySet")
-    def test_target_document_must_belong_to_target_knowledge(self, query_set):
+    def test_documents_must_belong_to_their_knowledge_in_each_language(self, query_set):
         source_knowledge_id = "00000000-0000-0000-0000-000000000001"
         target_knowledge_id = "00000000-0000-0000-0000-000000000002"
         source_document_id = "00000000-0000-0000-0000-000000000003"
@@ -499,10 +500,6 @@ class ParagraphFileMigrationTests(SimpleTestCase):
         knowledge_query = MagicMock()
         knowledge_query.filter.return_value.exists.return_value = True
         document_query = MagicMock()
-        document_query.filter.return_value = [
-            Document(id=source_document_id, knowledge_id=source_knowledge_id),
-            Document(id=target_document_id, knowledge_id=source_knowledge_id),
-        ]
         query_set.side_effect = lambda model: {Knowledge: knowledge_query, Document: document_query}[model]
         serializer = ParagraphSerializers.Migrate(
             data={
@@ -515,8 +512,35 @@ class ParagraphFileMigrationTests(SimpleTestCase):
             }
         )
 
-        with self.assertRaises(AppApiException):
-            serializer.is_valid(raise_exception=True)
+        for language in ("en-us", "zh-cn", "zh-hant"):
+            for invalid_document_id in (source_document_id, target_document_id):
+                with self.subTest(language=language, invalid_document_id=invalid_document_id), override(language):
+                    document_query.filter.return_value = [
+                        Document(
+                            id=source_document_id,
+                            knowledge_id=(
+                                target_knowledge_id
+                                if invalid_document_id == source_document_id
+                                else source_knowledge_id
+                            ),
+                        ),
+                        Document(
+                            id=target_document_id,
+                            knowledge_id=(
+                                source_knowledge_id
+                                if invalid_document_id == target_document_id
+                                else target_knowledge_id
+                            ),
+                        ),
+                    ]
+                    with self.assertRaises(AppApiException) as raised:
+                        serializer.is_valid(raise_exception=True)
+                    self.assertEqual(raised.exception.code, 5000)
+                    self.assertIn(invalid_document_id, str(raised.exception.message))
+                    self.assertIn(
+                        {"en-us": "document id", "zh-cn": "文档ID", "zh-hant": "文檔ID"}[language],
+                        str(raised.exception.message),
+                    )
 
     @patch("knowledge.serializers.paragraph.update_document_char_length")
     @patch("knowledge.serializers.paragraph.update_embedding_document_id")

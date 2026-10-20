@@ -2789,12 +2789,14 @@ msgid "The document to be migrated is consistent with the target document"
 msgstr "迁移的文档与目标文档一致"
 
 #: apps/knowledge/serializers/paragraph.py:455
+#, python-brace-format
 msgid "The document id does not exist [{document_id}]"
-msgstr "以下文档ID不存在: {error_id_list}"
+msgstr "以下文档ID不存在: {document_id}"
 
 #: apps/knowledge/serializers/paragraph.py:459
+#, python-brace-format
 msgid "The target document id does not exist [{document_id}]"
-msgstr "以下目标文档ID不存在: {error_id_list}"
+msgstr "以下目标文档ID不存在: {document_id}"
 
 #: apps/knowledge/serializers/paragraph.py:573
 msgid "new_position must be an integer"

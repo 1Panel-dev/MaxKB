@@ -125,9 +125,10 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
         self.assertEqual(old_document.id, "00000000-0000-0000-0000-000000000082")
         self.assertEqual(stats["skipped_count"], 1)
 
+    @patch("knowledge.services.workflow_sync.schedule_workflow_document_embedding")
     @patch("knowledge.services.workflow_sync._delete_workflow_documents")
     @patch("knowledge.services.workflow_sync.QuerySet")
-    def test_replace_snapshot_keeps_unmatched_old_documents(self, query_set, delete_documents):
+    def test_replace_snapshot_keeps_unmatched_old_documents(self, query_set, delete_documents, schedule_embedding):
         sync_log = MagicMock(
             status=KnowledgeSyncStatus.RUNNING,
             knowledge_id="00000000-0000-0000-0000-000000000091",
@@ -155,6 +156,7 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
         stats = merge_workflow_incremental_snapshot.__wrapped__(sync_log, {"source_scope": "scope"})
 
         delete_documents.assert_not_called()
+        schedule_embedding.assert_called_once_with([new_document.id], sync_log.knowledge_id)
         self.assertEqual(stats["deleted_count"], 0)
         self.assertEqual(stats["synced_count"], 1)
 
