@@ -7,6 +7,7 @@
 @desc:
 """
 
+import asyncio
 import base64
 import contextlib
 import json
@@ -473,7 +474,9 @@ class AIChatNode(INode):
 
         # 无论正常结束、抛异常还是被取消中断,都落盘已累积内容并关闭 LLM 流式响应底层连接
         finally:
-            self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
+            await asyncio.to_thread(
+                self._write_final_context, chat_model, message_list, question, answer, reasoning_content
+            )
             with contextlib.suppress(Exception):
                 await response.aclose()
 
@@ -561,7 +564,6 @@ class AIChatNode(INode):
         ToolExecutor().validate_mcp_transport(json.dumps(mcp_servers_config))
 
         if tools or mcp_servers_config or skill_tool_ids:
-            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
             # 使用可变状态在回调间共享（answer 累积、当前文本 content id、工具 content id 映射）
             state = {"answer": ""}
             tool_stream = ToolCallStreamManagement()

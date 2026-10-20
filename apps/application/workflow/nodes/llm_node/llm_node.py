@@ -7,6 +7,7 @@
 @desc: LLM 节点:单次调用大模型(不执行工具),输出 content/reasoning_content/refusal/is_refusal/usage/tool_calls/finish_reason
 """
 
+import asyncio
 import contextlib
 import json
 
@@ -61,6 +62,9 @@ class LLMNodeSerializer(serializers.Serializer):
 
 def _get_default_model_params_setting(model_id):
     model = QuerySet(Model).filter(id=model_id).first()
+    if model is None:
+        # 模型已删除或不可见(如默认模型/引用变量指向了失效的模型)
+        raise AppApiException(500, _("The model of the node does not exist"))
     credential = get_model_credential(model.provider, model.model_type, model.model_name)
     return credential.get_model_params_setting_form(model.model_name).get_default_form_data()
 
@@ -290,8 +294,14 @@ class LLMNode(INode):
                 )
             )
             # 无论正常结束、抛异常还是被取消中断,都落盘已累积内容并关闭 LLM 流式响应底层连接
-            self._write_final_context(
-                chat_model, message_list, full, reasoning_content, finish_reason, tool_call_accumulator.tool_calls()
+            await asyncio.to_thread(
+                self._write_final_context,
+                chat_model,
+                message_list,
+                full,
+                reasoning_content,
+                finish_reason,
+                tool_call_accumulator.tool_calls(),
             )
             with contextlib.suppress(Exception):
                 await response.aclose()
