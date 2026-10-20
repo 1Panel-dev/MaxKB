@@ -354,7 +354,7 @@ class ImageDocumentTests(SimpleTestCase):
         image_buffer = BytesIO()
         Image.new("RGB", (1, 1)).save(image_buffer, format="PNG")
         image_bytes = image_buffer.getvalue()
-        upload = SimpleUploadedFile("scene.png", image_bytes, content_type="image/png")
+        upload = SimpleUploadedFile("scene.jpg", image_bytes, content_type="image/jpeg")
 
         previews = service.create_previews.__wrapped__(service, [upload])
 
@@ -362,6 +362,7 @@ class ImageDocumentTests(SimpleTestCase):
         self.assertEqual(previews[0]["process_status"], "skipped")
         stored_file.save.assert_called_once_with(image_bytes)
         file_model.assert_called_once()
+        self.assertEqual(file_model.call_args.kwargs["file_name"], "scene.png")
 
     @patch("knowledge.services.image_documents.IncrementalDocumentSync")
     @patch("knowledge.services.image_documents.ParagraphAsset.objects.create")

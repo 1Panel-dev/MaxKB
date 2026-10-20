@@ -80,6 +80,18 @@ class ImagePreviewByFileIdsTests(SimpleTestCase):
         self.assertEqual(self.on_commit.call_count, 2)
         self.assertEqual(self.on_commit.call_args_list[0].args[0].args, (self.ids[0],))
 
+    def test_mislabeled_png_preview_normalizes_name_and_reuses_original_file(self):
+        self.files[0].file_name = "神奇图片.jpg"
+
+        previews = self.service.create_previews_by_file_ids(self.ids)
+
+        self.assertEqual(previews[0]["name"], "神奇图片.png")
+        self.assertEqual(previews[0]["source_file_id"], self.ids[0])
+        self.assertEqual(self.files[0].file_name, "神奇图片.png")
+        updates = [call.kwargs for call in self.query.return_value.filter.return_value.update.call_args_list]
+        self.assertEqual(updates[0]["file_name"], "神奇图片.png")
+        self.files[0].save.assert_not_called()
+
     def test_missing_or_inaccessible_file_fails_before_reading_or_promoting_any_file(self):
         self.query.return_value.filter.return_value.select_for_update.return_value.__iter__.return_value = self.files[
             :1

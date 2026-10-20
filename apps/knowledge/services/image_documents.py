@@ -39,10 +39,10 @@ from knowledge.services.paragraph_assets import resolve_visual_processor
 
 SUPPORTED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 IMAGE_FORMAT_EXTENSIONS = {
-    "JPEG": {".jpg", ".jpeg"},
-    "PNG": {".png"},
-    "WEBP": {".webp"},
-    "BMP": {".bmp"},
+    "JPEG": (".jpg", ".jpeg"),
+    "PNG": (".png",),
+    "WEBP": (".webp",),
+    "BMP": (".bmp",),
 }
 
 
@@ -71,7 +71,8 @@ class ImageDocumentService:
         return knowledge
 
     @staticmethod
-    def _validate_image(file, knowledge: Knowledge) -> None:
+    def _validate_image(file, knowledge: Knowledge) -> str:
+        """Validate the bytes and return a filename matching the detected format."""
         extension = Path(file.name).suffix.lower()
         if extension not in SUPPORTED_IMAGE_EXTENSIONS:
             raise AppApiException(
@@ -84,9 +85,17 @@ class ImageDocumentService:
             image = Image.open(file)
             image_format = image.format
             image.verify()
-            if extension not in IMAGE_FORMAT_EXTENSIONS.get(image_format, set()):
-                raise AppApiException(500, _("The image content does not match its file extension"))
-        except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
+            extensions = IMAGE_FORMAT_EXTENSIONS.get(image_format)
+            if not extensions:
+                raise AppApiException(
+                    500,
+                    _("Unsupported image format. Supported formats: jpg, jpeg, png, webp, bmp"),
+                )
+            # Downloads and vision requests infer MIME from the stored filename.
+            if extension not in extensions:
+                return str(Path(file.name).with_suffix(extensions[0]))
+            return file.name
+        except (UnidentifiedImageError, OSError, SyntaxError, Image.DecompressionBombError) as exc:
             raise AppApiException(500, _("The uploaded file is not a valid image")) from exc
         finally:
             file.seek(position)
@@ -237,15 +246,14 @@ class ImageDocumentService:
                 _("A maximum of {} files can be uploaded at a time").format(count_limit),
             )
         normalized_strategy = normalize_document_strategy(strategy)
-        for upload in file_list:
-            self._validate_image(upload, knowledge)
+        file_names = [self._validate_image(upload, knowledge) for upload in file_list]
         previews = []
-        for upload in file_list:
+        for upload, file_name in zip(file_list, file_names):
             content = upload.read()
             upload.seek(0)
             file = File(
                 id=uuid.uuid7(),
-                file_name=upload.name,
+                file_name=file_name,
                 file_size=upload.size,
                 source_type=FileSourceType.KNOWLEDGE,
                 source_id=self.knowledge_id,
@@ -311,18 +319,23 @@ class ImageDocumentService:
         files = self._get_uploaded_image_files(ordered_ids)
         source_files = [files[file_id] for file_id in ordered_ids]
         normalized_strategy = normalize_document_strategy(strategy)
+        file_names = {}
         # Validate the whole batch before promoting files or scheduling recognition.
         for file in source_files:
             if _preview_meta(file).get("imported"):
                 raise AppApiException(500, _("Image preview has already been imported"))
             with ContentFile(file.get_bytes(), name=file.file_name) as content:
-                self._validate_image(content, knowledge)
+                file_names[file.id] = self._validate_image(content, knowledge)
         previews = []
         for file in source_files:
             meta = {**(file.meta or {}), "knowledge_id": self.knowledge_id}
             QuerySet(File).filter(id=file.id).update(
-                source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id, meta=meta
+                source_type=FileSourceType.KNOWLEDGE,
+                source_id=self.knowledge_id,
+                file_name=file_names[file.id],
+                meta=meta,
             )
+            file.file_name = file_names[file.id]
             file.meta = meta
             previews.append(self._initialize_preview(file, normalized_strategy, enqueue=enqueue))
         return previews
@@ -377,6 +390,7 @@ class ImageDocumentService:
             raise AppApiException(500, _("Invalid number of image files"))
         files_by_id = self._get_uploaded_image_files(ordered_ids)
         normalized_strategy = normalize_document_strategy(strategy)
+        file_names = {}
         # Direct imports use uploaded images; validate the entire batch before creating documents.
         for file in files_by_id.values():
             preview = _preview_meta(file)
@@ -384,13 +398,14 @@ class ImageDocumentService:
                 raise AppApiException(500, _("One or more image previews cannot be imported"))
             if not preview:
                 with ContentFile(file.get_bytes(), name=file.file_name) as content:
-                    self._validate_image(content, knowledge)
+                    file_names[file.id] = self._validate_image(content, knowledge)
 
         document_ids = []
         for file_id in ordered_ids:
             file = files_by_id[file_id]
             preview = _preview_meta(file)
             if not preview:
+                file.file_name = file_names[file.id]
                 # The embedding worker processes pending assets after import; no preview job is needed.
                 self._initialize_preview(file, normalized_strategy, enqueue=False)
                 preview = _preview_meta(file)
@@ -468,6 +483,7 @@ class ImageDocumentService:
             QuerySet(File).filter(id=file.id).update(
                 source_type=FileSourceType.DOCUMENT,
                 source_id=str(document.id),
+                file_name=file.file_name,
                 meta=file_meta,
             )
             document_ids.append(str(document.id))

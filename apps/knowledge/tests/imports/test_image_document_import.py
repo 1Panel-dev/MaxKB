@@ -93,6 +93,22 @@ class ImageDocumentImportTests(SimpleTestCase):
         for call in self.assets.call_args_list:
             self.assertEqual(call.kwargs["process_status"], AssetProcessStatus.PENDING)
 
+    def test_direct_import_normalizes_mislabeled_image_without_rewriting_bytes(self):
+        self.files[0].file_name = "神奇图片.jpg"
+
+        self.service.import_previews(self.ids)
+
+        document = self.documents.call_args_list[0].kwargs
+        self.assertEqual(document["name"], "神奇图片.png")
+        self.assertEqual(document["meta"]["source_file_id"], self.ids[0])
+        moves = [
+            call.kwargs
+            for call in self.query.return_value.filter.return_value.update.call_args_list
+            if "source_type" in call.kwargs
+        ]
+        self.assertEqual(moves[0]["file_name"], "神奇图片.png")
+        self.files[0].save.assert_not_called()
+
     def test_mixed_import_preserves_existing_preview_text_edits_and_strategy(self):
         strategy = normalize_document_strategy({"index": {"title_as_question": True}})
         self.files[0].meta["image_preview"] = {
