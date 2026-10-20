@@ -22,5 +22,5 @@ def get_tool_tools(source_type, source_id, tool_ids, workspace_id, cancel_event,
     if not tool_ids:
         return []
     return get_workflow_tools(
-        source_type, source_id, tool_ids, workspace_id, workflow_params, cancel_event
+        source_type, source_id, tool_ids, workspace_id, cancel_event, workflow_params
     ) + get_custom_tools(source_type, source_id, tool_ids, workspace_id, cancel_event)

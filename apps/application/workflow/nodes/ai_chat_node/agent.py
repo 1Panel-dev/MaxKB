@@ -186,13 +186,11 @@ def create_agent(
             stream_mode="messages",
         )
 
-        async def consume():
-            # runner 取消该 task 会让 CancelledError 注入在途的工具 await,从而打断正在运行的工具。
-            async for chunk in response:
-                msg = chunk[0]
-                call_back.on_next(msg)
-
-        await async_runner.await_or_cancel(consume())
+        # 取消:run_async 的 task.cancel() 会让 CancelledError 注入在途的 chunk await,
+        # 从而打断正在运行的 MCP/工具调用。
+        async for chunk in response:
+            msg = chunk[0]
+            call_back.on_next(msg)
 
     def _classify_error(e):
         # 取消：原样保留（保持节点取消语义）；MCP TaskGroup 的 ExceptionGroup：展开取真实异常并包成 RuntimeError
@@ -205,7 +203,7 @@ def create_agent(
 
     error = None
     try:
-        asyncio.run(_run())
+        async_runner.run_async(_run)
     except Exception as e:
         error = _classify_error(e)
     finally:

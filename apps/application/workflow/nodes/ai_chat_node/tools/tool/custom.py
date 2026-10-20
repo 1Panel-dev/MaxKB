@@ -85,7 +85,7 @@ def run_cancellable(fn, cancel_event, on_cancel):
     threading.Thread(target=_run, daemon=True).start()
     if await_complete_or_cancel(done_event, cancel_event, on_cancel):
         raise CancelledException()
-    if result["error"]:
+    if result.get("error"):
         raise result["error"]
     return result["value"]
 

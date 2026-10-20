@@ -8,8 +8,9 @@
 """
 
 import asyncio
-import contextlib
+import os
 import threading
+from concurrent.futures import CancelledError
 from enum import Enum
 from typing import List, Dict
 
@@ -257,44 +258,82 @@ class CancelledException(Exception):
     pass
 
 
+class _SharedEventLoop:
+    """
+    进程内常驻事件循环(后台守护线程)。
+
+    模型实例按 model_id 缓存,其 httpx 异步连接池随实例复用;连接绑定在创建它的事件循环上。
+    协程内的阻塞调用会卡住所有工作流,需用 asyncio.to_thread 挪出。
+    """
+
+    _loop = None
+    _pid = None
+    _lock = threading.Lock()
+
+    @classmethod
+    def get(cls):
+        loop = cls._loop
+        # gunicorn 等 fork 出的子进程不继承父进程线程,按 pid 判断是否需要重建
+        if loop is not None and cls._pid == os.getpid() and loop.is_running():
+            return loop
+        with cls._lock:
+            if cls._loop is None or cls._pid != os.getpid() or not cls._loop.is_running():
+                loop = asyncio.new_event_loop()
+                ready = threading.Event()
+
+                def run():
+                    asyncio.set_event_loop(loop)
+                    loop.call_soon(ready.set)
+                    loop.run_forever()
+
+                thread = threading.Thread(target=run, name="maxkb-workflow-event-loop", daemon=True)
+                loop._thread = thread
+                thread.start()
+                ready.wait()
+                cls._loop, cls._pid = loop, os.getpid()
+        return cls._loop
+
+
 class AsyncRunner:
     """跨线程取消感知地运行异步协程;cancel() 置位事件使阻塞中的流式中断并抛 CancelledException。"""
 
     def __init__(self):
         self.cancel_event = threading.Event()
+        self._lock = threading.Lock()
+        self._loop = None
+        self._task = None
 
     def cancel(self):
-        """请求取消(任意线程可调);只置旗标,真正中断发生在事件循环内。"""
+        """请求取消(任意线程可调):置位旗标并取消正在运行的协程。"""
         self.cancel_event.set()
+        with self._lock:
+            loop, task = self._loop, self._task
+        if loop is not None and task is not None:
+            loop.call_soon_threadsafe(task.cancel)
 
     def run_async(self, async_factory):
-        """在独立事件循环里运行 async_factory() 的协程;被取消则抛 CancelledException。"""
-        return asyncio.run(self.await_or_cancel(async_factory()))
+        """在进程内常驻事件循环中运行 async_factory() 的协程并阻塞等待结果;被取消则抛 CancelledException。"""
+        if self.cancel_event.is_set():
+            raise CancelledException()
+        loop = _SharedEventLoop.get()
+        if threading.current_thread() is loop._thread:
+            # 在常驻循环线程内同步等待自身会死锁;协程内应直接 await
+            raise RuntimeError("AsyncRunner.run_async cannot be called from the shared event loop thread")
+        future = asyncio.run_coroutine_threadsafe(self._run(async_factory), loop)
+        try:
+            # 取消时任务先在循环内执行完 finally 清理(落盘已累积内容、关闭流),再以 CancelledError 结束
+            return future.result()
+        except CancelledError:
+            raise CancelledException()
 
-    async def _wait_cancel(self):
-        # 轮询取消旗标,置位即结束,充当竞速对手
-        while not self.cancel_event.is_set():
-            await asyncio.sleep(0)
-
-    async def await_or_cancel(self, _async):
-        """竞速等待:流式完成返回其结果;取消先到则抛 CancelledException。"""
-
-        # 真正要跑的流式协程,包成 task 才能与 waiter 一起放进 asyncio.wait
-        stream = asyncio.create_task(_async)
-        # 把"是否已取消"伪装成一个可等待的 task,充当 stream 的竞速对手。
-        waiter = asyncio.create_task(self._wait_cancel())
-        # 同时等两个 task,谁先完成(返回)谁进入 done;FIRST_COMPLETED = 取先到者。
-        done, _ = await asyncio.wait({stream, waiter}, return_when=asyncio.FIRST_COMPLETED)
-        # stream_done 为真 -> 流式自己先跑完;为假 -> 是 waiter 先完成,即取消先到。
-        stream_done = stream in done
-        # 无论谁赢,都把两个 task cancel 并等它们退干净,防止"输掉的那一方"
-        # 还悬在事件循环里。await 吞掉 CancelledError(取消是本意,不算错误)。
-        for task in (stream, waiter):
-            task.cancel()
-            with contextlib.suppress(asyncio.CancelledError):
-                await task
-
-        # 流式正常结束:把它的返回值交给调用方。
-        if stream_done:
-            return stream.result()
-        raise CancelledException()
+    async def _run(self, async_factory):
+        with self._lock:
+            self._loop, self._task = asyncio.get_running_loop(), asyncio.current_task()
+        try:
+            # 登记任务前已请求取消:直接结束,不发起模型请求
+            if self.cancel_event.is_set():
+                raise CancelledException()
+            return await async_factory()
+        finally:
+            with self._lock:
+                self._loop, self._task = None, None
