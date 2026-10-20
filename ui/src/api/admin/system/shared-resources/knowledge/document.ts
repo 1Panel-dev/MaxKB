@@ -22,8 +22,11 @@ import type {
 
 const getPrefix = (knowledgeId: string) => `/system/shared/knowledge/${knowledgeId}/document`
 
-/** 获取知识库不分页的文档选项。 */
-const getAllDocuments = (knowledgeId: string) => get<DocumentItem[]>(getPrefix(knowledgeId))
+/**
+ * 获取知识库不分页的文档或图片选项。
+ * TODO：联调 resource_type=document/image 筛选及图片缩略图字段 meta.source_file_id。
+ */
+const getAllDocuments = (knowledgeId: string, query?: { resource_type: DocumentResourceType }) => get<DocumentItem[]>(getPrefix(knowledgeId), query)
 
 /** 获取文档分页列表，支持名称和创建者筛选。 */
 const getDocumentPage = (knowledgeId: string, page: ParamsPage, query?: Dict<unknown>) =>
