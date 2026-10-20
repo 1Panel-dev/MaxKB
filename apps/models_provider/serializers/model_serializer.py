@@ -454,7 +454,7 @@ class ModelSerializer(serializers.Serializer):
                         queryset = queryset.filter(user_id=value)
                     else:
                         queryset = queryset.filter(**{field: value})
-            queryset = queryset.order_by("-create_time")
+            queryset = queryset.select_related("user").order_by("-create_time")
             return (
                 {
                     "model_query_set": queryset,

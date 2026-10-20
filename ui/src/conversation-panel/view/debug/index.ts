@@ -1,6 +1,8 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import ConversationApi from '@/api/admin/workspace/conversation'
+import WorkspaceConversationApi from '@/api/admin/workspace/conversation'
+import SystemResourceConversationApi from '@/api/admin/system/resource-management/application/conversation'
+import { isSystemResource } from '@/utils/resource-context'
 import { useStore } from '@/stores'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
@@ -14,6 +16,7 @@ import type { ConversationBundle } from '../types'
 /** debug 模式:装配各组件 store。adapter 走 admin(带 applicationId)。 */
 export function createDebugConversation(): ConversationBundle {
   const route = useRoute()
+  const ConversationApi = isSystemResource() ? SystemResourceConversationApi : WorkspaceConversationApi
   const appId = computed(
     () => (route.params.id as string) || (route.params.applicationId as string) || '',
   )
