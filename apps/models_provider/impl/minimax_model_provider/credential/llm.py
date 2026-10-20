@@ -1,4 +1,5 @@
 # coding=utf-8
+from copy import deepcopy
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -69,4 +70,8 @@ class MiniMaxLLMModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField('API Key', required=True)
 
     def get_model_params_setting_form(self, model_name):
-        return MiniMaxLLMModelParams()
+        form = MiniMaxLLMModelParams()
+        if model_name == 'MiniMax-M3.1-Flash':
+            form.max_tokens = deepcopy(form.max_tokens)
+            form.max_tokens.attrs['max'] = 524288
+        return form
