@@ -18,8 +18,8 @@ const putProblem = (knowledgeId: string, problemId: string, content: string) =>
 /** 删除单个知识库问题。 */
 const deleteProblem = (knowledgeId: string, problemId: string) => del<undefined, boolean>(`${getPrefix(knowledgeId)}/${problemId}`)
 
-/** 获取问题当前关联的文档分段。 */
-const getProblemParagraphs = (knowledgeId: string, problemId: string) => get<ProblemParagraph[]>(`${getPrefix(knowledgeId)}/${problemId}/paragraph`)
+/** 获取问题详情，返回当前关联的文档分段。 */
+const getProblemDetail = (knowledgeId: string, problemId: string) => get<ProblemParagraph[]>(`${getPrefix(knowledgeId)}/${problemId}/paragraph`)
 
 /** 批量将问题关联到指定文档分段。 */
 const putBatchAssociateProblems = (knowledgeId: string, payload: ProblemBatchAssociationPayload) =>
@@ -34,7 +34,7 @@ export default {
   getProblemsPage,
   putProblem,
   deleteProblem,
-  getProblemParagraphs,
+  getProblemDetail,
   putBatchAssociateProblems,
   putBatchDeleteProblems,
 }

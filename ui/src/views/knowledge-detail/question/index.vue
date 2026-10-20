@@ -10,7 +10,7 @@ import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import AssociateProblemParagraphDialog from './components/AssociateProblemParagraphDialog.vue'
+import AssociateParagraphDialog from './components/AssociateParagraphDialog.vue'
 import ButtonCreateProblem from './components/ButtonCreateProblem.vue'
 import ProblemDetailDrawer from './components/ProblemDetailDrawer.vue'
 
@@ -27,7 +27,7 @@ const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const selectedProblems = ref<ProblemItem[]>([])
 const problemTableRef = ref<{ clearSelection: () => void }>()
 const quickCreateRef = ref<InstanceType<typeof MkQuickCreate>>()
-const associateProblemParagraphDialogRef = ref<InstanceType<typeof AssociateProblemParagraphDialog>>()
+const associateParagraphDialogRef = ref<InstanceType<typeof AssociateParagraphDialog>>()
 const detailProblem = ref<ProblemItem>()
 const currentIndex = computed(() => problems.value.findIndex(({ id }) => id === detailProblem.value?.id))
 const hasPrevious = computed(() => currentIndex.value > 0 || (currentIndex.value === 0 && paginationConfig.value.currentPage > 1))
@@ -149,7 +149,7 @@ function handleBatchDeleteProblems() {
 
 function handleOpenAssociateParagraphs(problemIds: string[]) {
   if (operationLoading.value || !problemIds.length) return
-  associateProblemParagraphDialogRef.value?.open(problemIds)
+  associateParagraphDialogRef.value?.open(problemIds)
 }
 
 function handleAssociateParagraphsSuccess() {
@@ -273,9 +273,5 @@ onMounted(() => loadProblems())
     @associate="handleOpenAssociateParagraphs([detailProblem.id])"
     @closed="detailProblem = undefined"
   />
-  <AssociateProblemParagraphDialog
-    v-if="!isWorkspaceSharedResource()"
-    ref="associateProblemParagraphDialogRef"
-    @success="handleAssociateParagraphsSuccess"
-  />
+  <AssociateParagraphDialog v-if="!isWorkspaceSharedResource()" ref="associateParagraphDialogRef" @success="handleAssociateParagraphsSuccess" />
 </template>

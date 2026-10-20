@@ -420,8 +420,6 @@ onMounted(() => {
                     </div>
                   </el-card>
                 </div>
-                <h4 class="mb-2 pr-44">{{ paragraph.title || '-' }}</h4>
-
                 <!-- 选择批量操作的分段 -->
                 <el-checkbox
                   v-if="batchMode"
@@ -431,6 +429,7 @@ onMounted(() => {
                   @change="(selected: boolean | string | number) => handleSelectBatchParagraph(paragraph.id, Boolean(selected))"
                 />
 
+                <h4 class="mb-2 pr-44">{{ paragraph.title || '-' }}</h4>
                 <MdPreview :model-value="paragraph.content" />
                 <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
               </el-card>
