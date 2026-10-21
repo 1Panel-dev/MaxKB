@@ -72,6 +72,23 @@ h6 {
   line-height: var(--mk-line-height-base);
 }
 
+/* badge */
+.mk-badge {
+  align-items: center;
+  background-color: var(--mk-primary);
+  border-radius: 9999px;
+  color: white;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 12px;
+  height: 16px;
+  justify-content: center;
+  line-height: 20px;
+  font-weight: 500;
+  min-width: 16px;
+  padding: 0 4px;
+}
+
 /* button */
 // 资源菜单的导入按钮
 .mk-import-button {
