@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ParamsPage } from '@/api/admin/core/types'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import type { DocumentItem, DocumentResourceType, ParagraphItem, ProblemParagraphReference } from '@/api/types'
+import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess } from '@/utils/message'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
 
 defineOptions({ name: 'AssociateParagraphDialog' })
 const emit = defineEmits<{ success: [] }>()
@@ -26,12 +26,9 @@ const selectedDocumentId = ref('')
 const paragraphSearchText = ref('')
 const paragraphs = ref<ParagraphItem[]>([])
 const selectedParagraphs = ref<ProblemParagraphReference[]>([])
-const detailParagraph = ref<ParagraphItem>()
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const paragraphLayoutRef = useTemplateRef<InstanceType<typeof MkViewLayout>>('paragraphLayoutRef')
-const paragraphDialogRef = useTemplateRef<InstanceType<typeof ParagraphDialog>>('paragraphDialogRef')
 
-const isBatchAssociation = computed(() => problemIds.value.length > 1)
 const selectedDocument = computed(() => documentData.value.find(({ id }) => id === selectedDocumentId.value))
 const selectedParagraphIds = computed(() => new Set(selectedParagraphs.value.map(({ paragraph_id }) => paragraph_id)))
 
@@ -91,70 +88,35 @@ function handleParagraphSearch() {
   return refreshParagraphs()
 }
 
-function removeSelectedParagraph(paragraphId: string) {
-  selectedParagraphs.value = selectedParagraphs.value.filter(({ paragraph_id }) => paragraph_id !== paragraphId)
-}
-
-function addSelectedParagraph(paragraph: ParagraphItem) {
-  selectedParagraphs.value = [...selectedParagraphs.value, { paragraph_id: paragraph.id, document_id: paragraph.document_id }]
-}
-
-function updateParagraphAssociation(paragraph: ParagraphItem, unlink: boolean) {
+// 勾选仅维护本次批量关联的选择，确认后统一提交。
+function handleToggleParagraph(paragraph: ParagraphItem) {
   if (operationLoading.value) return
-  const problemId = problemIds.value[0]
-  if (!problemId) return
+  if (isSelected(paragraph.id)) {
+    selectedParagraphs.value = selectedParagraphs.value.filter(({ paragraph_id }) => paragraph_id !== paragraph.id)
+  } else {
+    selectedParagraphs.value.push({ paragraph_id: paragraph.id, document_id: paragraph.document_id })
+  }
+}
+
+function handleSubmit() {
+  if (operationLoading.value || documentLoading.value || !problemIds.value.length || !selectedParagraphs.value.length) return
   operationLoading.value = true
-  // TODO(图片联调)：核对图片分段的关联及取消关联是否复用现有 document_id / paragraph_id 协议，成功后重新打开确认回显。
-  const request = unlink
-    ? resourceApi.paragraph.putUnassociateParagraphProblem(knowledgeId.value, paragraph.document_id, paragraph.id, problemId)
-    : resourceApi.problem.putBatchAssociateProblems(knowledgeId.value, {
-        problem_id_list: [...problemIds.value],
-        paragraph_list: [{ paragraph_id: paragraph.id, document_id: paragraph.document_id }],
-      })
-  return request
+  return resourceApi.problem
+    .putBatchAssociateProblems(knowledgeId.value, {
+      problem_id_list: [...problemIds.value],
+      paragraph_list: [...selectedParagraphs.value],
+    })
     .then(() => {
-      if (unlink) {
-        removeSelectedParagraph(paragraph.id)
-      } else {
-        addSelectedParagraph(paragraph)
-      }
-      MsgSuccess(unlink ? '取消关联成功' : '关联成功')
+      MsgSuccess('关联成功')
+      visible.value = false
       emit('success')
     })
     .catch(() => {
-      // 请求层统一提示错误，失败时保留当前选择。
+      // 请求层统一提示错误，失败时保留本次选择以便重试。
     })
     .finally(() => {
       operationLoading.value = false
     })
-}
-
-function handleAssociateParagraph(paragraph: ParagraphItem) {
-  if (isSelected(paragraph.id)) return
-  return updateParagraphAssociation(paragraph, false)
-}
-
-function handleUnassociateParagraph(paragraph: ParagraphItem) {
-  // 批量关联提交后不支持在此弹窗批量解除关联，避免只解除首个问题的关联。
-  if (isBatchAssociation.value || !isSelected(paragraph.id)) return
-  return updateParagraphAssociation(paragraph, true)
-}
-
-async function handleOpenParagraphDetail(paragraph: ParagraphItem) {
-  if (operationLoading.value || detailParagraph.value) return
-  detailParagraph.value = paragraph
-  await nextTick()
-  paragraphDialogRef.value?.open(paragraph)
-}
-
-function handleParagraphDialogClosed() {
-  detailParagraph.value = undefined
-  const problemId = problemIds.value[0]
-  if (isBatchAssociation.value || !problemId) return
-  // 分段详情可修改问题关联，关闭后重新读取当前问题的关联状态。
-  void resourceApi.problem.getProblemDetail(knowledgeId.value, problemId).then((associatedParagraphs) => {
-    selectedParagraphs.value = associatedParagraphs.map(({ id, document_id }) => ({ paragraph_id: id, document_id }))
-  })
 }
 
 function open(targetProblemIds: string[]) {
@@ -162,14 +124,7 @@ function open(targetProblemIds: string[]) {
   problemIds.value = [...targetProblemIds]
   visible.value = true
   documentLoading.value = true
-  return Promise.all([
-    loadDocuments(),
-    // TODO(图片联调)：确认已关联分段查询包含图片分段，并返回 id、document_id，供选中态和关联数量回显。
-    targetProblemIds.length === 1 ? resourceApi.problem.getProblemDetail(knowledgeId.value, targetProblemIds[0]) : [],
-  ])
-    .then(([, problemParagraphs]) => {
-      selectedParagraphs.value = problemParagraphs.map(({ id, document_id }) => ({ paragraph_id: id, document_id }))
-    })
+  return loadDocuments()
     .catch(() => {
       // 请求层统一提示错误，失败时保持空列表。
     })
@@ -186,7 +141,6 @@ function handleClosed() {
   paragraphSearchText.value = ''
   paragraphs.value = []
   selectedParagraphs.value = []
-  detailParagraph.value = undefined
   resourceType.value = DOCUMENT_RESOURCE_TYPE.DOCUMENT
 }
 
@@ -203,6 +157,7 @@ defineExpose({ open })
         <div v-loading="documentLoading" class="flex-column h-full min-h-0 pt-4" :inert="operationLoading">
           <!-- 切换文档或图片资源 -->
           <el-tabs
+            v-if="resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE"
             v-model="resourceType"
             class="mx-4 mb-4"
             :before-leave="() => !documentLoading && !operationLoading"
@@ -212,13 +167,7 @@ defineExpose({ open })
             <el-tab-pane label="图片" :name="DOCUMENT_RESOURCE_TYPE.IMAGE" />
           </el-tabs>
           <!-- 搜索并切换候选分段所在资源 -->
-          <MkSearchList
-            v-model="documentSearchText"
-            :data="documentData"
-            :default-active="selectedDocumentId"
-            :empty-text="resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE ? '暂无图片' : '暂无文档'"
-            @click="handleSelectDocument"
-          >
+          <MkSearchList v-model="documentSearchText" :data="documentData" :default-active="selectedDocumentId" @click="handleSelectDocument">
             <template #default="{ row }">
               <!-- TODO 图片 -->
               <el-image
@@ -227,6 +176,12 @@ defineExpose({ open })
                 class="mr-2 size-6 shrink-0"
                 :alt="row.name"
                 fit="cover"
+              />
+              <img
+                v-else-if="KNOWLEDGE_TYPE_MAP[row.type] === KNOWLEDGE_TYPE_KEY.WEB"
+                src="@/assets/file-type/web-link-icon.svg"
+                alt=""
+                class="size-4"
               />
               <img v-else :src="getFileIconUrl(row.name)" class="mr-2 size-4 shrink-0" alt="" />
               <span class="min-w-0 flex-1 truncate" :title="row.name">{{ row.name }}</span>
@@ -253,37 +208,29 @@ defineExpose({ open })
           >
             <div class="space-y-2">
               <template v-for="paragraph in paragraphs" :key="paragraph.id">
-                <!-- 查看当前分段详情及其关联状态 -->
+                <!-- 勾选或取消本次批量关联的分段 -->
                 <el-card
                   shadow="never"
                   class="mk-paragraph-card group relative cursor-pointer"
                   :class="{ active: isSelected(paragraph.id), disabled: operationLoading }"
-                  @click="handleOpenParagraphDetail(paragraph)"
+                  @click="handleToggleParagraph(paragraph)"
                 >
-                  <!-- 关联当前问题与分段 -->
-                  <MkTooltip v-if="!isSelected(paragraph.id)" content="关联" placement="top">
-                    <el-button
-                      circle
-                      class="group-hover-visible absolute top-2 right-2 shadow-md"
-                      :disabled="operationLoading"
-                      @click.stop="handleAssociateParagraph(paragraph)"
-                    >
-                      <MkIcon name="icon_link-record_outlined" />
-                    </el-button>
-                  </MkTooltip>
-                  <!-- 取消当前问题与分段的关联 -->
-                  <MkTooltip v-else-if="!isBatchAssociation" content="取消关联" placement="top">
-                    <el-button
-                      circle
-                      class="group-hover-visible absolute top-2 right-2 shadow-md"
-                      :disabled="operationLoading"
-                      @click.stop="handleUnassociateParagraph(paragraph)"
-                    >
-                      <MkIcon name="icon_unlink_outlined" />
-                    </el-button>
-                  </MkTooltip>
-                  <h4 class="mb-2">{{ paragraph.title || '-' }}</h4>
+                  <!-- 勾选当前分段用于批量关联 -->
+                  <el-checkbox
+                    class="absolute! top-4 right-4"
+                    :model-value="isSelected(paragraph.id)"
+                    @click.stop
+                    @change="handleToggleParagraph(paragraph)"
+                  />
 
+                  <el-image
+                    v-if="resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE"
+                    :src="getFileUrl(selectedDocument.meta?.source_file_id as string | undefined)"
+                    class="mr-2 size-6 shrink-0"
+                    :alt="selectedDocument.name"
+                    fit="cover"
+                  />
+                  <h4 class="mb-2">{{ paragraph.title || '-' }}</h4>
                   <MdPreview :model-value="paragraph.content" />
                   <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
                 </el-card>
@@ -297,15 +244,15 @@ defineExpose({ open })
       </template>
     </MkViewLayout>
     <template #footer>
-      <div class="text-left text-sm text-N600">已关联 {{ selectedParagraphs.length }}</div>
+      <div class="flex-between">
+        <div class="text-sm text-N600">已选择 {{ selectedParagraphs.length }}</div>
+        <div>
+          <!-- 取消本次批量关联 -->
+          <el-button plain :disabled="operationLoading || documentLoading" @click="visible = false">取消</el-button>
+          <!-- 确认批量关联所选分段 -->
+          <el-button type="primary" :loading="operationLoading" @click="handleSubmit">确认</el-button>
+        </div>
+      </div>
     </template>
   </MkDialog>
-  <ParagraphDialog
-    v-if="detailParagraph"
-    ref="paragraphDialogRef"
-    title="分段详情"
-    :knowledge-id="knowledgeId"
-    :document-id="detailParagraph.document_id"
-    @closed="handleParagraphDialogClosed"
-  />
 </template>

@@ -45,7 +45,7 @@
 | `knowledge-detail/library/document/`、`tags/`                                         | 文档及标签维护                               |
 | `knowledge-detail/library/image/`                                                     | 图片列表，复用文档操作                       |
 | `knowledge-detail/hit-test/`                                                          | 召回测试参数、文本／图片查询及结果展示       |
-| `knowledge-detail/question/`                                                          | 问题管理占位页                               |
+| `knowledge-detail/problem/`                                                          | 问题查询、维护与分段关联                               |
 | `knowledge-detail/termbase/`                                                          | 知识库自定义分词维护                         |
 | `knowledge-detail/chat-user/`、`external-retrieval/`                                  | 对话授权与外部检索配置                       |
 | `knowledge-detail/setting/base/`、`document-strategy/`、`scheduled-sync/`             | 基础设置、文档策略、定时同步与日志           |
@@ -246,14 +246,17 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 
 ### 问题管理
 
-`question/` 使用 `resourceApi.problem`，默认每页 20 条，不提供表头排序，搜索将 content 传给后端。
+`problem/` 使用 `resourceApi.problem`，默认每页 20 条，不提供表头排序，搜索将 content 传给后端。
 `ButtonCreateProblem` 内聚创建按钮和多行输入弹窗；快捷创建使用 `MkQuickCreate`，每个问题最多 256 字符。
 单项与批量删除直接提交，删除后末页为空时回退到最后有效页；名称编辑复用 `MkEditName`。
 点击数据行打开 `ProblemDetailDrawer`，勾选、名称编辑和操作按钮不触发行详情。
 详情支持问题名称快捷编辑、关联分段卡片和跨页上一个／下一个；卡片复用 `.mk-paragraph-card` 样式，
 点击打开已有 `ParagraphDialog`，悬浮取消关联按钮仅解除当前关联，成功刷新卡片与列表计数。
-分段详情关闭后重查关联，保持编辑与解除关联后的数据一致。
-单项、批量、详情的“关联分段”入口暂时禁用，待交互确认后接入，不创建关联弹窗或发送关联请求。
+分段详情关闭后重查关联，保持编辑与解除关联后的数据一致。关联卡片按接口来源字段显示图片、Web 或文件图标，
+图片原图引用同时传给分段详情；加载失败支持重试。抽屉暴露 `refresh()`，由问题页在批量关联成功后刷新当前关联分段。
+单项、批量、详情的“关联分段”入口统一使用 `AssociateParagraphDialog`，勾选仅维护本次选择，
+跨文档、图片类型及搜索保留选择；确认后通过 `putBatchAssociateProblems` 一次提交问题与分段列表，
+成功关闭并刷新问题列表，失败保留选择，取消不提交。弹窗不回填既有关联或执行解除关联，解除关联仍由问题详情维护。
 Workspace 共享只展示和搜索问题列表，不显示维护入口，也不打开缺少查询接口的问题详情。
 
 ## 文档分段
