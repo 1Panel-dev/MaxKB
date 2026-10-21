@@ -12,6 +12,7 @@ from common.exception.app_exception import AppApiException
 from common.utils.common import get_sha256_hash
 from knowledge.models import Document, DocumentResourceType, File, FileSourceType, Knowledge, Paragraph, ParagraphAsset
 from knowledge.serializers.document import DocumentSerializers
+from knowledge.services.document_cleanup import delete_document_data
 
 
 class BatchDocumentCleanupTests(SimpleTestCase):
@@ -107,6 +108,91 @@ class BatchDocumentCleanupDatabaseTests(TestCase):
         with connection.cursor() as cursor:
             cursor.execute("SELECT EXISTS(SELECT 1 FROM pg_largeobject_metadata WHERE oid=%s)", [loid])
             return cursor.fetchone()[0]
+
+    def test_shared_source_record_moves_to_remaining_document_until_last_deletion(self):
+        knowledge = Knowledge.objects.create(name="shared source", desc="")
+        documents = [
+            Document.objects.create(knowledge=knowledge, name=name, char_length=0)
+            for name in ("first", "second", "retained")
+        ]
+        source = self.create_file(documents[0], "shared.pdf", b"shared PDF bytes")
+        Document.objects.filter(id__in=[document.id for document in documents]).update(
+            meta={"source_file_id": str(source.id)}
+        )
+
+        with patch("knowledge.services.document_cleanup.delete_embedding_by_document_list"):
+            delete_document_data([str(document.id) for document in documents[:2]])
+
+            source.refresh_from_db()
+            self.assertEqual((source.source_type, source.source_id), (FileSourceType.DOCUMENT, str(documents[2].id)))
+            self.assertEqual(source.get_bytes(), b"shared PDF bytes")
+            self.assertEqual(File.objects.count(), 1)
+            delete_document_data([str(documents[2].id)])
+
+        self.assertFalse(File.objects.filter(id=source.id).exists())
+        self.assertFalse(self.large_object_exists(source.loid))
+
+    def test_deleting_non_owner_keeps_shared_source_with_its_existing_document(self):
+        knowledge = Knowledge.objects.create(name="shared source", desc="")
+        owner = Document.objects.create(knowledge=knowledge, name="owner", char_length=0)
+        selected = Document.objects.create(knowledge=knowledge, name="selected", char_length=0)
+        source = self.create_file(owner, "shared.pdf", b"shared PDF bytes")
+        Document.objects.filter(id=selected.id).update(meta={"source_file_id": str(source.id)})
+
+        with patch("knowledge.services.document_cleanup.delete_embedding_by_document_list"):
+            delete_document_data([str(selected.id)])
+
+        source.refresh_from_db()
+        self.assertEqual(source.source_id, str(owner.id))
+        self.assertEqual(source.get_bytes(), b"shared PDF bytes")
+
+    def test_document_file_referenced_by_another_paragraph_is_retained_until_last_deletion(self):
+        knowledge = Knowledge.objects.create(name="shared image", desc="")
+        selected = Document.objects.create(knowledge=knowledge, name="selected", char_length=0)
+        retained = Document.objects.create(knowledge=knowledge, name="retained", char_length=0)
+        image = self.create_file(selected, "shared.png", b"shared image bytes")
+        paragraphs = [
+            Paragraph.objects.create(knowledge=knowledge, document=document, content=f"![image](./oss/file/{image.id})")
+            for document in (selected, retained)
+        ]
+        for paragraph in paragraphs:
+            ParagraphAsset.objects.create(
+                knowledge=knowledge, document_id=paragraph.document_id, paragraph=paragraph, file=image
+            )
+
+        with patch("knowledge.services.document_cleanup.delete_embedding_by_document_list"):
+            delete_document_data([str(selected.id)])
+
+            image.refresh_from_db()
+            self.assertEqual((image.source_type, image.source_id), (FileSourceType.PARAGRAPH, str(paragraphs[1].id)))
+            self.assertEqual(image.get_bytes(), b"shared image bytes")
+            self.assertTrue(ParagraphAsset.objects.filter(document=retained, file=image).exists())
+            delete_document_data([str(retained.id)])
+
+        self.assertFalse(File.objects.filter(id=image.id).exists())
+        self.assertFalse(self.large_object_exists(image.loid))
+
+    def test_rollback_restores_shared_file_ownership(self):
+        knowledge = Knowledge.objects.create(name="shared rollback", desc="")
+        selected = Document.objects.create(knowledge=knowledge, name="selected", char_length=0)
+        retained = Document.objects.create(knowledge=knowledge, name="retained", char_length=0)
+        source = self.create_file(selected, "shared.pdf", b"shared PDF bytes")
+        Document.objects.filter(id__in=[selected.id, retained.id]).update(meta={"source_file_id": str(source.id)})
+
+        with (
+            patch("knowledge.services.document_cleanup.delete_embedding_by_document_list"),
+            self.assertRaisesRegex(RuntimeError, "rollback"),
+            transaction.atomic(),
+        ):
+            delete_document_data([str(selected.id)])
+            source.refresh_from_db()
+            self.assertEqual(source.source_id, str(retained.id))
+            raise RuntimeError("rollback")
+
+        source.refresh_from_db()
+        self.assertEqual(source.source_id, str(selected.id))
+        self.assertEqual(source.get_bytes(), b"shared PDF bytes")
+        self.assertTrue(Document.objects.filter(id=selected.id).exists())
 
     def test_batch_deletion_cleans_images_and_preserves_shared_pg_bytes(self):
         knowledge = Knowledge.objects.create(name="cleanup test", desc="")

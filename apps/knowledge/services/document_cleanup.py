@@ -3,7 +3,7 @@
 from collections.abc import Iterable
 
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 
 from knowledge.models import (
     ContentOrigin,
@@ -12,6 +12,7 @@ from knowledge.models import (
     File,
     FileSourceType,
     Paragraph,
+    ParagraphAsset,
     Problem,
     ProblemParagraphMapping,
 )
@@ -28,6 +29,47 @@ def _delete_problems_and_mappings(paragraph_ids: list[str]) -> None:
         QuerySet(ProblemParagraphMapping).filter(problem_id__in=problem_ids).values_list("problem_id", flat=True)
     )
     QuerySet(Problem).filter(id__in=problem_ids - remaining_problem_ids).delete()
+
+
+def _delete_document_files(document_ids: list[str], source_file_ids: list[str]) -> None:
+    files = list(
+        QuerySet(File)
+        .filter(Q(id__in=source_file_ids) | Q(source_id__in=document_ids, source_type=FileSourceType.DOCUMENT))
+        .select_for_update()
+        .order_by("id")
+    )
+    if not files:
+        return
+    file_ids = [str(file.id) for file in files]
+    remaining_owners = {}
+    for file_id, document_id in (
+        QuerySet(Document)
+        .exclude(id__in=document_ids)
+        .filter(meta__source_file_id__in=file_ids)
+        .order_by("id")
+        .values_list("meta__source_file_id", "id")
+    ):
+        remaining_owners.setdefault(file_id, (FileSourceType.DOCUMENT, str(document_id)))
+    for file_id, paragraph_id in (
+        QuerySet(ParagraphAsset)
+        .exclude(document_id__in=document_ids)
+        .filter(file_id__in=file_ids)
+        .order_by("paragraph_id")
+        .values_list("file_id", "paragraph_id")
+    ):
+        remaining_owners.setdefault(str(file_id), (FileSourceType.PARAGRAPH, str(paragraph_id)))
+
+    deleting_ids = []
+    for file in files:
+        # Legacy metadata can reference a file owned by another document.
+        if file.source_type == FileSourceType.DOCUMENT and file.source_id not in document_ids:
+            continue
+        owner = remaining_owners.get(str(file.id))
+        if owner:
+            QuerySet(File).filter(id=file.id).update(source_type=owner[0], source_id=owner[1])
+        else:
+            deleting_ids.append(file.id)
+    QuerySet(File).filter(id__in=deleting_ids).delete()
 
 
 def delete_synced_paragraph_data(document_id, paragraph_ids: Iterable[str]) -> list[str]:
@@ -85,12 +127,10 @@ def delete_document_data(document_ids: Iterable[str]) -> list[str]:
         for document in documents
         if (document.get("meta") or {}).get("source_file_id")
     ]
-    QuerySet(File).filter(id__in=source_file_ids).delete()
-    QuerySet(File).filter(source_id__in=existing_ids, source_type=FileSourceType.DOCUMENT).delete()
-
     paragraph_ids = list(QuerySet(Paragraph).filter(document_id__in=existing_ids).values_list("id", flat=True))
     _delete_problems_and_mappings(paragraph_ids)
     QuerySet(Paragraph).filter(id__in=paragraph_ids).delete()
+    _delete_document_files(existing_ids, source_file_ids)
     delete_embedding_by_document_list(existing_ids)
     QuerySet(DocumentTag).filter(document_id__in=existing_ids).delete()
     QuerySet(Document).filter(id__in=existing_ids).delete()
