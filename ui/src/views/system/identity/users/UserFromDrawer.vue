@@ -262,7 +262,9 @@ defineExpose({ open })
               class="flex-1"
               :label="index === 0 ? '工作空间' : ''"
               :prop="`role_setting.${index}.workspace_ids`"
-              :rules="{ required: !isAdminRole(roleAssignment.role_id), type: 'array', min: 1, message: '请选择工作空间', trigger: 'change' }"
+              :rules="
+                isAdminRole(roleAssignment.role_id) ? [] : { required: true, type: 'array', min: 1, message: '请选择工作空间', trigger: 'change' }
+              "
             >
               <el-select
                 v-model="roleAssignment.workspace_ids"

@@ -88,8 +88,6 @@ defineExpose({ open })
           remote
           reserve-keyword
           multiple
-          collapse-tags
-          collapse-tags-tooltip
           :remote-method="handleRemoteSearch"
           :loading="optionsLoading"
           placeholder="请选择用户名或姓名"
