@@ -11,7 +11,7 @@ const props = defineProps<{
   nextDisabled: boolean
 }>()
 
-const { applicationId } = useApplicationDetailContext()
+const { applicationId, resourceApi } = useApplicationDetailContext()
 const emit = defineEmits<{ previous: []; next: []; closed: [] }>()
 
 // 对话详情抽屉的打开与关闭
@@ -45,7 +45,7 @@ defineExpose({ open, close })
     </template>
     <div v-loading="props.loading" class="h-full">
       <!-- 只读会话面板:展示该日志的历史对话与执行详情,无输入框 -->
-      <LogConversation :chat-id="props.chatLog.id" :application-id="applicationId" />
+      <LogConversation :chat-id="props.chatLog.id" :application-id="applicationId" :chat-log-api="resourceApi.chatLog" />
     </div>
     <template #footer>
       <!-- 浏览上一个对话日志 -->
