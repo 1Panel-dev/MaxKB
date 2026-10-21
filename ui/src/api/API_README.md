@@ -163,6 +163,13 @@ FormData；保存返回完整配置，页面以该返回值作为唯一数据来
 `admin/auth/current-user.ts` 的 postCurrentUserPassword 向 `/user/current/reset_password`
 提交 RSA 加密的 `{ encryptedData }`；调用方校验与加密，成功清除凭据后进入登录。
 
+### 平台许可证
+
+`admin/system/license.ts` 通过 GET、PUT `/license/profile` 查询和更新授权信息，
+更新使用 FormData 的 `license_file` 字段。`LicenseProfile` 与 `LicenseInfo` 从 `@/api/types`
+导入，查询结果直接读取 `license`。关于弹窗仅商业版本查询授权，更新入口沿用系统许可证权限；
+更新成功后重新查询展示，关闭弹窗时刷新页面以应用授权与权限。
+
 ### 四类特殊资源 API
 
 根据资源范围或业务上下文选择出的 API 对象统一命名为 `requestApi`，包括 `computed` 结果和
