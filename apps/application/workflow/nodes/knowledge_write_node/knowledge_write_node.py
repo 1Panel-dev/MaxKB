@@ -26,8 +26,6 @@ from knowledge.models import (
     Document,
     DocumentResourceType,
     DocumentTag,
-    File,
-    FileSourceType,
     KnowledgeType,
     Paragraph,
     Problem,
@@ -91,26 +89,6 @@ def convert_uuid_to_str(obj):
         return str(obj)
     else:
         return obj
-
-
-def link_file(source_file_id, document_id):
-    if source_file_id is None:
-        return
-    source_file = QuerySet(File).filter(id=source_file_id).first()
-    if source_file:
-        file_content = source_file.get_bytes()
-
-        new_file = File(
-            id=uuid.uuid7(),
-            file_name=source_file.file_name,
-            file_size=source_file.file_size,
-            source_type=FileSourceType.DOCUMENT,
-            source_id=document_id,  # 更新为当前知识库ID
-            meta=source_file.meta.copy() if source_file.meta else {},
-        )
-
-        # 保存文件内容和元数据
-        new_file.save(file_content)
 
 
 def get_paragraph_problem_model(knowledge_id: str, document_id: str, instance: Dict):
@@ -306,7 +284,9 @@ class KnowledgeWriteNode(INode):
             document["user_id"] = user_id
             document_paragraph_dict_model = get_document_paragraph_model(knowledge_id, document)
             document_instance = document_paragraph_dict_model.get("document")
-            link_file(document.get("source_file_id"), document_instance.id)
+            linked_file_id = DocumentSerializers.Batch.link_file(document.get("source_file_id"), document_instance.id)
+            if linked_file_id is not None:
+                document_instance.meta["source_file_id"] = str(linked_file_id)
             document_model_list.append(document_instance)
             # 收集标签
             single_document_tag_list = document.get("tags", [])
