@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useApplicationDetailContext } from '../context'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import HomeStatistics from '@/views/home/components/HomeStatistics.vue'
+import ApplicationBasicInfo from './components/ApplicationBasicInfo.vue'
 import ApplicationRanking from './components/ApplicationRanking.vue'
 
 defineOptions({ name: 'ApplicationOverviewView' })
@@ -17,6 +18,7 @@ const { applicationId, resourceApi } = useApplicationDetailContext()
 </script>
 
 <template>
+  <ApplicationBasicInfo :key="applicationId" />
   <HomeStatistics :key="applicationId" :workspace-id="workspaceId" :application-id="applicationId" :api="resourceApi.overview" />
   <ApplicationRanking :key="applicationId" class="mt-4" :application-id="applicationId" />
 </template>

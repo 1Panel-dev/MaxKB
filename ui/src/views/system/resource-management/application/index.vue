@@ -151,7 +151,9 @@ onMounted(() => {
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
-              <!-- TODO 对话&管理 -->
+              <!-- 进入智能体详情 -->
+              <MkAction display="button" label="管理" icon="icon_admin_outlined" @click="handleOpenApplication(row)" />
+              <!-- TODO：对话 -->
               <MkTableMoreDropdown>
                 <!-- 资源授权 -->
                 <AuthorizeApplicationAction label="资源授权" :application="row" />

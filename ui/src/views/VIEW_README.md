@@ -79,7 +79,7 @@
 - `application-detail/context.ts` 提供只读详情、替换和刷新；完整响应局部替换，部分响应重新查询。
   通过 `provideApplicationDetailContext`／`useApplicationDetailContext` 统一提供 `applicationId`、
   `resourceApi`、`listRouteName` 与 `routeParams`，仅支持 Workspace 和 System 资源管理。
-  `resourceApi.application / chatUser / overview / access / chatLog / workflow` 按范围选择完整 API，
+  `resourceApi.application / apiKey / chatUser / overview / access / chatLog / workflow` 按范围选择完整 API，
   不包含 Workspace 共享或 System 共享，不将缺失方法回退到 Workspace。
   切换二级菜单不重复挂载详情容器。
 - 创建模型入口接收完整 Model API；创建成功刷新基础资料后通知调用方刷新选项。
@@ -321,11 +321,24 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 
 ## 其他页面约束
 
+- 头像菜单的系统 API Key 弹窗位于 `layout/avatar-dropdown/ApiKeyDialog.vue`，与同目录的修改密码弹窗一起由菜单入口打开。
+  顶部 API 文档地址使用 Admin 部署前缀，列表传入完整 System API Key API；与智能体概览分别维护弹窗，
+  仅复用 `business/api-key-list/` 及其内部编辑抽屉。
 - 首页组件位于 `home/components/`，排行位于 `components/ranking/`。完整 Homepage API 和 workspaceId 由 View 传入。
   智能体筛选只影响趋势；日期复用 MkDateRange，默认过去 7 天；占比使用工作空间同期总量，累计活跃人次为每日人数之和。
   失败不伪装成零。快捷创建复用资源入口，`fitTriggerWidth` 仅显式开启时测量触发器。
 - `HomeStatistics` 接收完整的 Workspace Homepage、System Homepage 或 Overview API。
   智能体概览通过 `hideHeader: true` 隐藏详情布局标题栏，保留内容内的监控与排行标题。
+  基本信息由概览本地 `components/ApplicationBasicInfo.vue` 组织 Web 访问与后端 API 访问卡片；
+  Web 链接通过当前范围的 Application API 查询访问凭证，沿用 V2 的工作流 API 参数默认值与编码方式；
+  API 文档地址为 Chat 部署前缀下的 `/api-doc/`。两个地址使用只读输入框展示并支持复制；链接重置先确认，
+  成功后用返回的访问凭证更新链接，保留工作流参数，失败保留原链接。Web 访问开关查询后回填 `is_active`，
+  保存成功后按响应回显、失败保留原状态；开关保存与链接重置互斥，保存期间禁用开关、不显示 loading，链接重置保留按钮 loading。后端 API 访问开关仍待接入。
+  五个按钮流程分别放在 `chat/`、`embed-third-party/`、`access-restriction/`、`display-setting/`、
+  `api-key/`，入口和对应弹窗同目录维护。API Key 弹窗通过 `resourceApi.apiKey` 传入当前范围的完整 API 与智能体 ID，
+  复用 `business/api-key-list/`，Base URL 使用 Chat API 部署前缀加智能体 ID；
+  Workspace 与 System 资源管理共用智能体弹窗，分别使用各自接口，不回退或使用头像菜单的全局系统 API Key。
+  其他访问配置及弹窗业务尚待接入，不模拟保存。
   三类场景统一调用 `getMonitoring(workspaceId, range, applicationId)`；全部智能体使用空 ID，
   两类首页不提交智能体筛选，概览传当前智能体 ID。页面直接传入完整 API，不包装接口。
   排行由概览本地 `components/ApplicationRanking.vue` 调用 Overview API，展示用户 Tokens 消耗与提问次数两类 TOP5。

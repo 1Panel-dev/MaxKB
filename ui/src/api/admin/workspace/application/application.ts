@@ -1,6 +1,6 @@
 import { del, get, getExportFile, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { ApplicationDetail, ApplicationFormPayload, Dict } from '@/api/types'
+import type { ApplicationAccessToken, ApplicationAccessTokenPayload, ApplicationDetail, ApplicationFormPayload, Dict } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
@@ -24,6 +24,13 @@ const getApplicationPage = (page: ParamsPage, query?: Dict<unknown>) => {
 const getApplicationDetail = (applicationId: string) => {
   return get<ApplicationDetail>(`${getPrefix()}/${applicationId}`)
 }
+
+/** 获取智能体公开访问凭证。 */
+const getAccessToken = (applicationId: string) => get<ApplicationAccessToken>(`${getPrefix()}/${applicationId}/access_token`)
+
+/** 修改智能体公开访问状态或重置凭证，返回更新后的配置。 */
+const putAccessToken = (applicationId: string, payload: ApplicationAccessTokenPayload) =>
+  put<ApplicationAccessTokenPayload, ApplicationAccessToken>(`${getPrefix()}/${applicationId}/access_token`, payload)
 
 /** 删除工作空间智能体。 */
 const deleteApplication = (applicationId: string) => {
@@ -78,6 +85,8 @@ const putApplicationPublish = (applicationId: string, publishName: string, publi
 export default {
   getApplicationPage,
   getApplicationDetail,
+  getAccessToken,
+  putAccessToken,
   deleteApplication,
   exportApplication,
   postApplication,

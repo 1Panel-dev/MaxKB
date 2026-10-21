@@ -3,6 +3,8 @@ import { computed, inject, provide, reactive, type ComputedRef, type InjectionKe
 import { useRoute } from 'vue-router'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import ApiKeyApi from '@/api/admin/workspace/application/api-key'
+import SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
 import ChatUserApi from '@/api/admin/workspace/chat-user'
 import SystemResourceChatUserApi from '@/api/admin/system/resource-management/chat-user'
 import OverviewApi from '@/api/admin/workspace/application/overview'
@@ -26,6 +28,7 @@ type OptionalApiMethods<Api> = Pick<Api, keyof Api> & {
 
 interface ApplicationResourceApi {
   readonly application: OptionalApiMethods<typeof ApplicationApi | typeof SystemResourceApplicationApi>
+  readonly apiKey: typeof ApiKeyApi | typeof SystemResourceApiKeyApi
   readonly chatUser: typeof ChatUserApi | typeof SystemResourceChatUserApi
   readonly overview: typeof OverviewApi | typeof SystemResourceOverviewApi
   readonly access: typeof AccessApi | typeof SystemResourceAccessApi
@@ -45,6 +48,7 @@ const resourceConfigs = {
   workspace: {
     resourceApi: {
       application: ApplicationApi,
+      apiKey: ApiKeyApi,
       chatUser: ChatUserApi,
       overview: OverviewApi,
       access: AccessApi,
@@ -56,6 +60,7 @@ const resourceConfigs = {
   'system-resource': {
     resourceApi: {
       application: SystemResourceApplicationApi,
+      apiKey: SystemResourceApiKeyApi,
       chatUser: SystemResourceChatUserApi,
       overview: SystemResourceOverviewApi,
       access: SystemResourceAccessApi,
@@ -91,6 +96,9 @@ function createApplicationDetailContext(state: ApplicationDetailState): Applicat
   const resourceApi = reactive({
     get application() {
       return resourceConfig.value.resourceApi.application
+    },
+    get apiKey() {
+      return resourceConfig.value.resourceApi.apiKey
     },
     get chatUser() {
       return resourceConfig.value.resourceApi.chatUser
