@@ -1360,11 +1360,7 @@ class DocumentSerializers(serializers.Serializer):
                     }
                     for document in documents
                 ]
-                result = DocumentSerializers.Batch(data=self.initial_data).batch_save(document_list)
-                QuerySet(File).filter(id__in=file_ids).update(
-                    source_type=FileSourceType.KNOWLEDGE, source_id=str(self.data.get("knowledge_id"))
-                )
-                return result
+                return DocumentSerializers.Batch(data=self.initial_data).batch_save(document_list)
 
         def save_table_by_file_ids(self, instance: Dict):
             return self._save_by_file_ids(instance, self.parse_table_file)
@@ -1382,10 +1378,6 @@ class DocumentSerializers(serializers.Serializer):
                 with ContentFile(source_file.get_bytes(), name=source_file.file_name) as file:
                     validate_knowledge_file_size(knowledge, [file])
                     document_list.extend(parse_file(file, source_file_id=source_file.id))
-            # Keep uploaded sources after the temporary-file cleanup window.
-            QuerySet(File).filter(id__in=file_ids).update(
-                source_type=FileSourceType.KNOWLEDGE, source_id=str(self.data.get("knowledge_id"))
-            )
             return DocumentSerializers.Batch(data=self.data).batch_save(document_list)
 
         def _get_uploaded_files(self, file_ids):
@@ -1651,23 +1643,39 @@ class DocumentSerializers(serializers.Serializer):
         def link_file(source_file_id, document_id):
             if source_file_id is None:
                 return
-            source_file = QuerySet(File).filter(id=source_file_id).first()
-            if source_file:
-                # 获取原始文件内容
-                file_content = source_file.get_bytes()
-
-                # 创建新文件对象，复制原始文件的重要属性
-                new_file = File(
-                    id=uuid.uuid7(),
-                    file_name=source_file.file_name,
-                    file_size=source_file.file_size,
-                    source_type=FileSourceType.DOCUMENT,
-                    source_id=document_id,  # 更新为当前知识库ID
-                    meta=source_file.meta.copy() if source_file.meta else {},
+            source_file = QuerySet(File).filter(id=source_file_id).select_for_update().first()
+            if source_file is None:
+                return
+            if source_file.source_type in (
+                FileSourceType.KNOWLEDGE,
+                FileSourceType.TEMPORARY_30_MINUTE,
+                FileSourceType.TEMPORARY_120_MINUTE,
+                FileSourceType.TEMPORARY_1_DAY,
+            ):
+                # Transfer the upload within the document transaction; failed saves restore its owner.
+                QuerySet(File).filter(id=source_file.id).update(
+                    source_type=FileSourceType.DOCUMENT, source_id=str(document_id)
                 )
+                return source_file.id
+            if source_file.source_type == FileSourceType.DOCUMENT and source_file.source_id == str(document_id):
+                return source_file.id
 
-                # 保存文件内容和元数据
-                new_file.save(file_content)
+            # One upload may produce several documents, each with its own ownership record.
+            meta = (source_file.meta or {}).copy()
+            if source_file.storage_type == "seaweedfs":
+                meta["seaweedfs_key"] = meta.get("seaweedfs_key", f"files/{source_file.id}")
+            new_file = File(
+                file_name=source_file.file_name,
+                file_size=source_file.file_size,
+                sha256_hash=source_file.sha256_hash,
+                source_type=FileSourceType.DOCUMENT,
+                source_id=str(document_id),
+                storage_type=source_file.storage_type,
+                loid=source_file.loid,
+                meta=meta,
+            )
+            QuerySet(File).bulk_create([new_file])
+            return new_file.id
 
         @staticmethod
         def post_embedding(document_list, knowledge_id, workspace_id):
@@ -1699,7 +1707,9 @@ class DocumentSerializers(serializers.Serializer):
                 )
                 # 保存文档和文件的关系
                 document_instance = document_paragraph_dict_model.get("document")
-                self.link_file(document.get("source_file_id"), document_instance.id)
+                linked_file_id = self.link_file(document.get("source_file_id"), document_instance.id)
+                if linked_file_id is not None:
+                    document_instance.meta["source_file_id"] = str(linked_file_id)
                 document_model_list.append(document_instance)
                 for paragraph in document_paragraph_dict_model.get("paragraph_model_list"):
                     paragraph_model_list.append(paragraph)

@@ -13,7 +13,6 @@ from django.core.files.base import ContentFile
 from django.test import SimpleTestCase
 from django.urls import resolve
 from knowledge.api.document import DocumentImportAPI
-from knowledge.models import FileSourceType
 from knowledge.serializers.document import DocumentImportRequest, DocumentSerializers
 from knowledge.services.document_strategy import normalize_document_strategy
 from knowledge.views.document import DocumentView
@@ -60,7 +59,7 @@ class TextDocumentImportTests(SimpleTestCase):
         source.get_bytes.return_value = content
         return source
 
-    def test_import_parses_all_files_with_strategy_and_preserves_sources(self):
+    def test_import_parses_all_files_without_overwriting_document_file_ownership(self):
         # Use the actual text parser; importing sources must not save another source file.
         with patch("knowledge.serializers.document.File.save") as save_file:
             self.assertEqual(self.creator.save_text(self.payload), [{"id": "created"}])
@@ -74,9 +73,7 @@ class TextDocumentImportTests(SimpleTestCase):
         for document in documents:
             self.assertNotIn("content", document)
             self.assertEqual(document["doc_strategy"], normalize_document_strategy(self.strategy))
-        self.query.return_value.filter.return_value.update.assert_called_once_with(
-            source_type=FileSourceType.KNOWLEDGE, source_id=self.scope["knowledge_id"]
-        )
+        self.query.return_value.filter.return_value.update.assert_not_called()
         condition = self.query.return_value.filter.call_args_list[1].args[0]
         self.assertIn(self.scope["user_id"], str(condition))
         self.assertIn(self.scope["knowledge_id"], str(condition))

@@ -9,7 +9,6 @@ from uuid import uuid4
 from common.exception.app_exception import AppApiException
 from django.core.files.base import ContentFile
 from django.test import SimpleTestCase
-from knowledge.models import FileSourceType
 from knowledge.serializers.document import DocumentInstanceFileIdsSerializer, DocumentSerializers
 from rest_framework import serializers
 
@@ -61,9 +60,7 @@ class UploadedDocumentFileTestsMixin:
             self.assertEqual([call.args[0].name for call in parse.call_args_list], ["first.csv", "second.csv"])
             self.assertEqual([call.kwargs["source_file_id"] for call in parse.call_args_list], [first.id, second.id])
             batch.return_value.batch_save.assert_called_once_with([{"name": "first"}, {"name": "second"}])
-            queryset.return_value.filter.return_value.update.assert_called_once_with(
-                source_type=FileSourceType.KNOWLEDGE, source_id=str(self.knowledge_id)
-            )
+            queryset.return_value.filter.return_value.update.assert_not_called()
             condition = queryset.return_value.filter.call_args_list[1].args[0]
             self.assertIn(str(self.user_id), str(condition))
             self.assertIn(str(self.knowledge_id), str(condition))
