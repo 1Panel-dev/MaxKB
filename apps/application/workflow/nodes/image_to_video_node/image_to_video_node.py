@@ -167,7 +167,6 @@ class ImageToVideoNode(INode):
 
         self.write_context("answer", video_label)
         self.write_context("video", video_list)
-        self.write_context("chat_model", ttv_model)
 
         if is_result:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
