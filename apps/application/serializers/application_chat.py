@@ -176,17 +176,105 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         )
 
     @staticmethod
+    def _detail_nodes(details):
+        """兼容 dict(按节点 id 索引)、list(节点数组)与 v3 execution_details 结构，并展平循环节点内的子节点。"""
+
+        def iter_items(container):
+            if isinstance(container, dict):
+                for key, value in container.items():
+                    if isinstance(value, dict):
+                        yield key, value
+            else:
+                for key, value in enumerate(container):
+                    if isinstance(value, dict):
+                        yield key, value
+
+        def visit(key, node):
+            # v3 处理后结构：节点嵌套在 execution_details 列表中
+            execution = node.get("execution_details")
+            if isinstance(execution, list):
+                for index, child in enumerate(execution):
+                    if isinstance(child, dict):
+                        yield from visit(index, child)
+                return
+            if node.get("type") == "loop-node":
+                for loop_item in node.get("loop_node_data") or []:
+                    for inner_key, inner in iter_items(loop_item):
+                        yield from visit(inner_key, inner)
+                return
+            yield key, node
+
+        for key, node in iter_items(details):
+            yield from visit(key, node)
+
+    @staticmethod
+    def _messages_text(messages):
+        """从 messages 列表(新结构)提取 REASONING 思考与 TEXT 回答。"""
+        thinking_parts, answer_parts = [], []
+        for message in messages or []:
+            if not isinstance(message, dict):
+                continue
+            content = message.get("content")
+            if not isinstance(content, str) or not content:
+                continue
+            # if message.get("type") == "REASONING":
+            #     thinking_parts.append(content)
+            # el
+            if message.get("type") == "TEXT":
+                answer_parts.append(content)
+        return "\n\n".join(thinking_parts), "\n\n".join(answer_parts)
+
+    @staticmethod
+    def _node_answer_text(node):
+        """从节点取值：优先 messages(新结构)的 REASONING/TEXT，回退节点上的 reasoning_content/answer(历史)。"""
+        reasoning, answer = ApplicationChatQuerySerializers._messages_text(node.get("messages"))
+        if not reasoning:
+            reasoning = node.get("reasoning_content") or ""
+        if not answer:
+            answer = node.get("answer") or ""
+        return reasoning, answer
+
+    @staticmethod
     def to_row(row: Dict):
         details = row.get("details") or {}
+        node_items = list(ApplicationChatQuerySerializers._detail_nodes(details))
+
+        # 新结构：详情顶层(或其包装元素)可能携带记录级 messages，作为回答的兜底来源
+        record_messages = None
+        if isinstance(details, dict):
+            record_messages = details.get("messages")
+        elif isinstance(details, list) and details and isinstance(details[0], dict):
+            record_messages = details[0].get("messages")
+
+        # v3 的用户问题/回答记录在节点上，而记录级字段可能为空，这里做兜底填充
+        question_list, answer_blocks = [], []
+        for key, node in node_items:
+            node_type = node.get("type")
+            if node_type in ("start-node", "ai-chat-node", "llm-node", "reply-node", "application-node"):
+                question = node.get("question")
+                if isinstance(question, str) and question:
+                    question_list.append(question)
+                elif isinstance(question, dict) and question.get("content"):
+                    question_list.append(question["content"])
+                reasoning, answer = ApplicationChatQuerySerializers._node_answer_text(node)
+                block = [part for part in (reasoning, answer) if part]
+                if block:
+                    answer_blocks.append("\n\n".join(block))
+        problem_text = row.get("problem_text") or " / ".join(dict.fromkeys(question_list))
+        if not answer_blocks:
+            reasoning, answer = ApplicationChatQuerySerializers._messages_text(record_messages)
+            answer_text = row.get("answer_text") or ("\n\n".join([part for part in (reasoning, answer) if part]))
+        else:
+            answer_text = row.get("answer_text") or answer_blocks[-1]
+
         padding_problem_text = " ".join(
-            (node.get("answer", "") or "") for key, node in details.items() if node.get("type") == "question-node"
+            (node.get("answer", "") or "") for key, node in node_items if node.get("type") == "question-node"
         )
         search_dataset_node_list = [
             (key, node)
-            for key, node in details.items()
-            if node.get("type") == "search-dataset-node"
+            for key, node in node_items
+            if node.get("type") in ("search-dataset-node", "search-knowledge-node", "search-document-node")
             or node.get("step_type") == "search_step"
-            or node.get("type") == "search-knowledge-node"
         ]
         reference_paragraph_len = "\n".join(
             [
@@ -220,9 +308,9 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         return [
             str(row.get("chat_id")),
             row.get("abstract"),
-            row.get("problem_text"),
+            problem_text,
             padding_problem_text,
-            row.get("answer_text"),
+            answer_text,
             vote_status_map.get(row.get("vote_status")),
             vote_reason_map.get(row.get("vote_reason")),
             row.get("vote_other_content"),
