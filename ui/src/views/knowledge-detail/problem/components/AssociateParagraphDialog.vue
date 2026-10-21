@@ -26,6 +26,7 @@ const selectedDocumentId = ref('')
 const paragraphSearchText = ref('')
 const paragraphs = ref<ParagraphItem[]>([])
 const selectedParagraphs = ref<ProblemParagraphReference[]>([])
+const associatedParagraphIds = ref(new Set<string>())
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const paragraphLayoutRef = useTemplateRef<InstanceType<typeof MkViewLayout>>('paragraphLayoutRef')
 
@@ -88,7 +89,7 @@ function handleParagraphSearch() {
   return refreshParagraphs()
 }
 
-// 勾选仅维护本次批量关联的选择，确认后统一提交。
+// 已关联项回显后也可切换勾选，确认时只提交新增关联。
 function handleToggleParagraph(paragraph: ParagraphItem) {
   if (operationLoading.value) return
   if (isSelected(paragraph.id)) {
@@ -99,12 +100,17 @@ function handleToggleParagraph(paragraph: ParagraphItem) {
 }
 
 function handleSubmit() {
-  if (operationLoading.value || documentLoading.value || !problemIds.value.length || !selectedParagraphs.value.length) return
+  if (operationLoading.value || documentLoading.value || !problemIds.value.length) return
+  const paragraphReferences = selectedParagraphs.value.filter(({ paragraph_id }) => !associatedParagraphIds.value.has(paragraph_id))
+  if (!paragraphReferences.length) {
+    visible.value = false
+    return
+  }
   operationLoading.value = true
   return resourceApi.problem
     .putBatchAssociateProblems(knowledgeId.value, {
       problem_id_list: [...problemIds.value],
-      paragraph_list: [...selectedParagraphs.value],
+      paragraph_list: paragraphReferences,
     })
     .then(() => {
       MsgSuccess('关联成功')
@@ -124,7 +130,14 @@ function open(targetProblemIds: string[]) {
   problemIds.value = [...targetProblemIds]
   visible.value = true
   documentLoading.value = true
-  return loadDocuments()
+  return Promise.all([
+    loadDocuments(),
+    targetProblemIds.length === 1 ? resourceApi.problem.getProblemDetail(knowledgeId.value, targetProblemIds[0]) : [],
+  ])
+    .then(([, problemParagraphs]) => {
+      associatedParagraphIds.value = new Set(problemParagraphs.map(({ id }) => id))
+      selectedParagraphs.value = problemParagraphs.map(({ id, document_id }) => ({ paragraph_id: id, document_id }))
+    })
     .catch(() => {
       // 请求层统一提示错误，失败时保持空列表。
     })
@@ -141,6 +154,7 @@ function handleClosed() {
   paragraphSearchText.value = ''
   paragraphs.value = []
   selectedParagraphs.value = []
+  associatedParagraphIds.value.clear()
   resourceType.value = DOCUMENT_RESOURCE_TYPE.DOCUMENT
 }
 
@@ -157,7 +171,6 @@ defineExpose({ open })
         <div v-loading="documentLoading" class="flex-column h-full min-h-0 pt-4" :inert="operationLoading">
           <!-- 切换文档或图片资源 -->
           <el-tabs
-            v-if="resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE"
             v-model="resourceType"
             class="mx-4 mb-4"
             :before-leave="() => !documentLoading && !operationLoading"
@@ -169,25 +182,27 @@ defineExpose({ open })
           <!-- 搜索并切换候选分段所在资源 -->
           <MkSearchList v-model="documentSearchText" :data="documentData" :default-active="selectedDocumentId" @click="handleSelectDocument">
             <template #default="{ row }">
-              <!-- TODO 图片 -->
-              <el-image
-                v-if="resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE"
-                :src="getFileUrl(row.meta?.source_file_id as string | undefined)"
-                class="mr-2 size-6 shrink-0"
-                :alt="row.name"
-                fit="cover"
-              />
-              <img
-                v-else-if="KNOWLEDGE_TYPE_MAP[row.type] === KNOWLEDGE_TYPE_KEY.WEB"
-                src="@/assets/file-type/web-link-icon.svg"
-                alt=""
-                class="size-4"
-              />
-              <img v-else :src="getFileIconUrl(row.name)" class="mr-2 size-4 shrink-0" alt="" />
-              <span class="min-w-0 flex-1 truncate" :title="row.name">{{ row.name }}</span>
-              <span v-if="getSelectedCount(row.id)" class="ml-1 flex-center h-4 min-w-4 shrink-0 rounded-full bg-primary px-1 text-xs text-white">
-                {{ getSelectedCount(row.id) }}
-              </span>
+              <div class="flex-align-center gap-2 min-w-0">
+                <el-image
+                  v-if="resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE"
+                  :src="getFileUrl(row.meta?.source_file_id as string | undefined)"
+                  class="size-6 shrink-0"
+                  :alt="row.name"
+                  fit="cover"
+                />
+                <img
+                  v-else-if="KNOWLEDGE_TYPE_MAP[row.type] === KNOWLEDGE_TYPE_KEY.WEB"
+                  src="@/assets/file-type/web-link-icon.svg"
+                  alt=""
+                  class="size-4"
+                />
+                <img v-else :src="getFileIconUrl(row.name)" class="size-4 shrink-0" alt="" />
+                <span class="min-w-0 flex-1 truncate" :title="row.name">{{ row.name }}</span>
+                <!-- 关联数字 -->
+                <span v-if="getSelectedCount(row.id)" class="mk-badge">
+                  {{ getSelectedCount(row.id) }}
+                </span>
+              </div>
             </template>
           </MkSearchList>
         </div>
@@ -225,11 +240,12 @@ defineExpose({ open })
 
                   <el-image
                     v-if="resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE"
+                    class="w-fit [&_img]:size-auto! [&_img]:max-h-50 mb-2"
                     :src="getFileUrl(selectedDocument.meta?.source_file_id as string | undefined)"
-                    class="mr-2 size-6 shrink-0"
                     :alt="selectedDocument.name"
-                    fit="cover"
+                    fit="contain"
                   />
+
                   <h4 class="mb-2">{{ paragraph.title || '-' }}</h4>
                   <MdPreview :model-value="paragraph.content" />
                   <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>

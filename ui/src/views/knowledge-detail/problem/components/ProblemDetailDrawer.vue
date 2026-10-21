@@ -18,14 +18,12 @@ const emit = defineEmits<{ previous: []; next: []; refresh: []; closed: []; asso
 const { knowledgeId, resourceApi } = useKnowledgeDetailContext({ resourceScopes: ['workspace', 'system-resource', 'system-shared'] as const })
 const visible = ref(true)
 const loading = ref(false)
-const loadFailed = ref(false)
 const paragraphs = ref<ProblemParagraph[]>([])
 const selectedParagraph = ref<ProblemParagraph>()
 const paragraphDialogRef = ref<InstanceType<typeof ParagraphDialog>>()
 
-// 关联分段查询：同步数量，失败时保留当前内容并支持重试。
+// 关联分段查询：同步数量，失败时保留当前内容。
 function loadParagraphs() {
-  loadFailed.value = false
   return resourceApi.problem
     .getProblemDetail(knowledgeId.value, problem.value.id)
     .then((records) => {
@@ -33,7 +31,7 @@ function loadParagraphs() {
       problem.value.paragraph_count = records.length
     })
     .catch(() => {
-      loadFailed.value = true
+      // 请求层统一提示错误，失败时保留当前关联。
     })
 }
 
@@ -121,18 +119,20 @@ defineExpose({ refresh: handleLoadParagraphs })
       <div v-if="paragraphs.length" class="flex-column gap-3">
         <template v-for="paragraph in paragraphs" :key="paragraph.id">
           <!-- 查看关联分段详情 -->
-          <el-card class="mk-paragraph-card group relative cursor-pointer" shadow="never" @click="handleOpenParagraph(paragraph)">
+          <el-card
+            class="mk-paragraph-card group relative cursor-pointer overflow-visible!"
+            body-class="overflow-visible!"
+            shadow="never"
+            @click="handleOpenParagraph(paragraph)"
+          >
             <!-- 取消当前问题与分段的关联，不删除分段 -->
-            <MkTooltip content="取消关联" placement="top">
-              <el-button
-                circle
-                class="group-hover-visible absolute top-3 right-3 shadow-md"
-                :disabled="loading"
-                @click.stop="handleUnlinkParagraph(paragraph)"
-              >
-                <MkIcon name="icon_unlink_outlined" />
-              </el-button>
-            </MkTooltip>
+            <div class="group-hover-visible sticky top-3 z-20 h-0" @click.stop>
+              <MkTooltip content="取消关联" placement="top">
+                <el-button circle class="absolute top-0 right-0 shadow-md" :disabled="loading" @click.stop="handleUnlinkParagraph(paragraph)">
+                  <MkIcon name="icon_unlink_outlined" />
+                </el-button>
+              </MkTooltip>
+            </div>
 
             <!-- 图片文档显示图片 -->
             <el-image
@@ -140,7 +140,7 @@ defineExpose({ refresh: handleLoadParagraphs })
               :src="getFileUrl(paragraph.document_image_id)"
               :alt="paragraph.title || ''"
               fit="contain"
-              class="mb-2"
+              class="w-fit [&_img]:size-auto! [&_img]:max-h-50 mb-2"
             />
 
             <h4 class="mb-2">{{ paragraph.title || '-' }}</h4>
@@ -148,7 +148,7 @@ defineExpose({ refresh: handleLoadParagraphs })
             <div class="flex-align-center gap-2 text-sm text-N600">
               <span class="shrink-0">{{ paragraph.content.length }} 字符</span>
               <el-divider direction="vertical" />
-              <el-image v-if="paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE" :src="fileImageIcon" class="size-4 shrink-0" />
+              <img v-if="paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE" :src="fileImageIcon" class="size-4 shrink-0" />
               <img
                 v-else-if="paragraph.knowledge_type != null && KNOWLEDGE_TYPE_MAP[paragraph.knowledge_type] === KNOWLEDGE_TYPE_KEY.WEB"
                 src="@/assets/file-type/web-link-icon.svg"
@@ -161,11 +161,7 @@ defineExpose({ refresh: handleLoadParagraphs })
           </el-card>
         </template>
       </div>
-      <MkEmpty v-else-if="!loading && !loadFailed" description="暂无关联分段" />
-      <MkEmpty v-if="loadFailed" description="关联分段加载失败">
-        <!-- 重新加载当前问题的关联分段 -->
-        <el-button type="primary" :loading="loading" @click="handleLoadParagraphs">重新加载</el-button>
-      </MkEmpty>
+      <MkEmpty v-else-if="!loading" description="暂无关联分段" />
     </div>
     <template #footer>
       <!-- 关联当前问题的分段 -->
