@@ -16,7 +16,7 @@ function handleOpenEmbedThirdParty() {
 <template>
   <!-- 嵌入第三方 -->
   <el-button plain :disabled="!props.shareUrl || !props.accessToken" @click="handleOpenEmbedThirdParty">
-    <MkIcon name="icon_keyboard_outlined1" />
+    <MkIcon name="icon_embedded_outlined" />
     <span>嵌入第三方</span>
   </el-button>
   <EmbedThirdPartyDialog ref="dialogRef" :share-url="props.shareUrl" :access-token="props.accessToken" />
