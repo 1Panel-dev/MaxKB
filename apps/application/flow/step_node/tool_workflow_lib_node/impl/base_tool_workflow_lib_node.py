@@ -143,6 +143,8 @@ def valid_function(tool_lib, workspace_id, user_id=None):
         raise Exception(_("Tool does not exist"))
     if not tool_lib.is_active:
         raise Exception(_("Tool is not active"))
+    if tool_lib.workspace_id == "None":
+        return
     validate_authorized_tool_ids([str(tool_lib.id)], workspace_id, user_id)
 
 
