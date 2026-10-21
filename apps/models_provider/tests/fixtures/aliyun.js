@@ -22,28 +22,35 @@ http.createServer(async (request, response) => {
     for await (const chunk of request) body += chunk;
     const payload = JSON.parse(body);
     const items = payload.input?.contents;
-    if (payload.model !== "qwen3-vl-embedding" || payload.parameters?.dimension !== 256 || !Array.isArray(items)) {
-      return fail("Expected Qwen3 model, contents and dimension");
+    const qwen3 = payload.model === "qwen3-vl-embedding";
+    if ((!qwen3 && payload.model !== "tongyi-embedding-vision-plus") ||
+        (qwen3 && payload.parameters?.dimension !== 256) || !Array.isArray(items)) {
+      return fail("Expected supported model, contents and dimension");
     }
     if (!items.length || items.length > 20 || items.filter((item) => item.image).length > 10) {
       return fail("Input batch exceeds model limits");
     }
+    const dimensions = [];
     for (const item of items) {
-      if (typeof item.text === "string" && item.text) continue;
+      if (typeof item.text === "string" && item.text) {
+        dimensions.push([0, 0]);
+        continue;
+      }
       if (!item.image?.startsWith("data:image/png;base64,")) return fail("Fixture expects a PNG data URL");
       const png = Buffer.from(item.image.split(",", 2)[1], "base64");
       if (png.length < 24 || png.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a") {
         return fail("Invalid PNG");
       }
       const width = png.readUInt32BE(16), height = png.readUInt32BE(20);
-      if (!width || !height || Math.max(width, height) / Math.min(width, height) > 200) {
+      if (!width || !height || (qwen3 && (Math.min(width, height) < 32 || Math.max(width, height) / Math.min(width, height) > 200))) {
         return fail("<400> InternalError.Algo.InvalidParameter: The input of vl is not valid, processor error.");
       }
+      dimensions.push([width, height]);
     }
     send(200, {
       request_id: "test-request",
       output: { embeddings: items.map((item, index) => ({
-        index, type: item.image ? "image" : "text", embedding: [index, ...Array(255).fill(0)],
+        index, type: item.image ? "image" : "text", embedding: [index, ...dimensions[index], ...Array((qwen3 ? 256 : 1152) - 3).fill(0)],
       })) },
       usage: { input_tokens: items.length, image_tokens: 0 },
     });

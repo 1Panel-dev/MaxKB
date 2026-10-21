@@ -6,6 +6,7 @@ import requests
 
 from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
+from models_provider.embedding_image import prepare_embedding_image
 
 
 class TencentEmbeddingModel(MaxKBBaseEmbeddingModel):
@@ -89,7 +90,9 @@ class TencentEmbeddingModel(MaxKBBaseEmbeddingModel):
         MaxKB 传入的图片是 data:image/...;base64,xxx 形式的 data URL，
         这里剥掉 data: 前缀，转换为纯 base64 内容再交给接口。
         """
-        return MaxKBBaseEmbeddingModel.normalize_image_input(url, keep_data_prefix=False)
+        # TokenHub limits image area rather than declaring a minimum side length.
+        image = prepare_embedding_image(url, min_pixels=4096, max_svg_pixels=1843200)
+        return MaxKBBaseEmbeddingModel.normalize_image_input(image, keep_data_prefix=False)
 
     def _embed_multimodal(self, items: list) -> List[float]:
         payload = {"model": self.model_name, "input": items, "encoding_format": "float", **self.params}

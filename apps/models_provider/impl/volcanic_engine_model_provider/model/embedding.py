@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
+from models_provider.embedding_image import prepare_embedding_image
 from volcenginesdkarkruntime import Ark
 
 
@@ -59,7 +60,7 @@ class VolcanicEngineEmbeddingModel(MaxKBBaseEmbeddingModel):
         for image in images:
             resp = self.client.multimodal_embeddings.create(
                 model=self.model_name,
-                input=[{"type": "image_url", "image_url": {"url": image}}],
+                input=[{"type": "image_url", "image_url": {"url": prepare_embedding_image(image)}}],
                 encoding_format="float",
                 **(self.params or {}),
             )

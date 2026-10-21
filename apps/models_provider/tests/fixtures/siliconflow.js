@@ -25,7 +25,17 @@ http.createServer(async (request, response) => {
       embedding = payload.input === "second text" ? [0.75, 0.25] : [0.25, 0.75];
     } else if (typeof payload.input?.image === "string") {
       if (payload.input.image.startsWith("https://")) embedding = [1.0, 0.0];
-      else if (payload.input.image.startsWith("data:image/")) embedding = [0.0, 1.0];
+      else if (payload.input.image.startsWith("data:image/png;base64,")) {
+        const png = Buffer.from(payload.input.image.split(",", 2)[1], "base64");
+        if (png.length < 24 || png.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a") {
+          return send(400, { message: "Expected rendered PNG" });
+        }
+        const width = png.readUInt32BE(16), height = png.readUInt32BE(20);
+        if (Math.min(width, height) < 32 || Math.max(width, height) / Math.min(width, height) > 200) {
+          return send(400, { message: "Image dimensions outside Qwen3 limits" });
+        }
+        embedding = [width, height];
+      }
     }
     if (!embedding) {
       return send(400, { code: 20012, message: "Expected text or an image content object", data: null });

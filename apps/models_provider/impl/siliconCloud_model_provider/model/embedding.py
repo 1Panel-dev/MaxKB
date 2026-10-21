@@ -12,6 +12,7 @@ from typing import Dict
 import requests
 
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
+from models_provider.embedding_image import prepare_embedding_image
 
 
 class SiliconCloudEmbeddingModel(MaxKBBaseEmbeddingModel):
@@ -71,6 +72,9 @@ class SiliconCloudEmbeddingModel(MaxKBBaseEmbeddingModel):
         if not self.supports_image_embedding():
             return super().embed_images(images)
         # SiliconFlow /embeddings accepts one image content object per input.
-        return [
-            self._embed_input({"image": self.normalize_image_input(image, keep_data_prefix=True)}) for image in images
-        ]
+        return [self._embed_input({"image": self._prepare_image_input(image)}) for image in images]
+
+    def _prepare_image_input(self, image: str) -> str:
+        if "qwen3-vl-embedding" in self.model_name.lower():
+            return prepare_embedding_image(image, min_side=32, max_aspect_ratio=200)
+        return prepare_embedding_image(image)

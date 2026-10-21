@@ -2,7 +2,6 @@
 
 import base64
 import os
-from io import BytesIO
 from unittest import skipUnless
 from unittest.mock import patch
 from urllib.parse import quote
@@ -10,27 +9,10 @@ from urllib.parse import quote
 import dashscope
 import resvg_py
 from django.test import SimpleTestCase
-from PIL import Image, UnidentifiedImageError
+from PIL import UnidentifiedImageError
 
 from models_provider.impl.aliyun_bai_lian_model_provider.model.embedding import AliyunBaiLianEmbedding
-
-
-def image_data_url(size, mode="RGB", color="black", image_format="PNG"):
-    output = BytesIO()
-    Image.new(mode, size, color).save(output, format=image_format)
-    mime = "image/jpeg" if image_format == "JPEG" else "image/png"
-    return f"data:{mime};base64," + base64.b64encode(output.getvalue()).decode("ascii")
-
-
-def decode_image(data_url):
-    return Image.open(BytesIO(base64.b64decode(data_url.split(";base64,", 1)[1])))
-
-
-def svg_data_url(content='<rect width="100%" height="100%" fill="red"/>', size=(88, 20), attributes=None):
-    if attributes is None:
-        attributes = f'width="{size[0]}" height="{size[1]}"'
-    svg = f'<svg xmlns="http://www.w3.org/2000/svg" {attributes}>{content}</svg>'
-    return "data:image/svg+xml;base64," + base64.b64encode(svg.encode()).decode("ascii")
+from models_provider.tests.image_helpers import decode_image, image_data_url, svg_data_url
 
 
 class AliyunImagePreparationTests(SimpleTestCase):

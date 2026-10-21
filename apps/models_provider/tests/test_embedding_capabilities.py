@@ -7,6 +7,7 @@ from django.test import SimpleTestCase
 from common.exception.app_exception import AppApiException
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel, ModelTypeConst
 from models_provider.constants.model_provider_constants import ModelProvideConstants
+from models_provider.tests.image_helpers import image_data_url
 from models_provider.impl.aliyun_bai_lian_model_provider.model.embedding import AliyunBaiLianEmbedding
 from models_provider.impl.siliconCloud_model_provider.model.embedding import SiliconCloudEmbeddingModel
 
@@ -87,9 +88,9 @@ class SiliconCloudEmbeddingHTTPTests(SimpleTestCase):
         )
 
     def test_embeds_each_image_independently_in_input_order(self):
-        images = ["https://example.com/chart.png", "data:image/png;base64,aW1hZ2U="]
+        images = ["https://example.com/chart.png", image_data_url((32, 32))]
 
-        self.assertEqual(self.model.embed_images(images), [[1.0, 0.0], [0.0, 1.0]])
+        self.assertEqual(self.model.embed_images(images), [[1.0, 0.0], [32.0, 32.0]])
 
     def test_preserves_text_query_and_document_embedding(self):
         self.assertEqual(self.model.embed_query("first text"), [0.25, 0.75])

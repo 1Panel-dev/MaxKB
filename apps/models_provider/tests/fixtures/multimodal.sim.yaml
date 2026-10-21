@@ -1,0 +1,9 @@
+simulation: multimodal-embedding-images
+routing: path
+mocks:
+  - routeKey: aliyun
+    path: ./aliyun.js
+  - routeKey: siliconflow
+    path: ./siliconflow.js
+  - routeKey: multimodal
+    path: ./multimodal.js
