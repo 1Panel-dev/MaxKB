@@ -184,7 +184,7 @@
     }
   }
   &.is-plain {
-    --el-button-bg-color: transparent !important;
+    --el-button-bg-color: white !important;
     --el-button-text-color: var(--el-text-color-primary);
     --el-button-hover-bg-color: var(--mk-N100);
     --el-button-hover-border-color: var(--el-border-color);
@@ -192,7 +192,7 @@
     &.is-disabled,
     &.is-disabled:hover {
       color: var(--mk-N400);
-      background: transparent;
+      background: white !important;
       border-color: var(--mk-N350);
     }
   }
