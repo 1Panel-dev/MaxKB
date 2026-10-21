@@ -5,6 +5,7 @@ import LoginApi from '@/api/admin/auth/login'
 import { LOGIN_METHOD } from '@/api/enums'
 import { useStore } from '@/stores'
 import ChangePasswordDialog from './ChangePasswordDialog.vue'
+import AboutDialog from './AboutDialog.vue'
 import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'AvatarDropdown' })
@@ -25,6 +26,13 @@ const changePasswordDialogRef = ref<InstanceType<typeof ChangePasswordDialog>>()
 
 function handleOpenChangePassword() {
   changePasswordDialogRef.value?.open()
+}
+
+// 查看平台版本与授权信息。
+const aboutDialogRef = ref<InstanceType<typeof AboutDialog>>()
+
+function handleOpenAbout() {
+  aboutDialogRef.value?.open()
 }
 
 function handleLogout() {
@@ -113,8 +121,8 @@ function toUrl(url?: string) {
             <template #icon><MkIcon name="icon-maybe_outlined" /></template>
             <span>论坛求助</span>
           </MkDropdownItem>
-          <!-- // TODO 关于 -->
-          <MkDropdownItem v-if="perm.system.other.about()">
+          <!-- 查看版本与授权信息 -->
+          <MkDropdownItem @click="handleOpenAbout">
             <template #icon><MkIcon name="icon_info_outlined" /></template>
             <span>关于</span>
           </MkDropdownItem>
@@ -127,4 +135,5 @@ function toUrl(url?: string) {
     </template>
   </MkDropdown>
   <ChangePasswordDialog ref="changePasswordDialogRef" />
+  <AboutDialog ref="aboutDialogRef" />
 </template>
