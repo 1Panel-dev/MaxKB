@@ -7,11 +7,15 @@
 @desc:
 """
 
+import base64
+import math
 from http import HTTPStatus
+from io import BytesIO
 from typing import Dict, List
 
 import dashscope
 from openai import OpenAI
+from PIL import Image, ImageOps
 
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
@@ -72,9 +76,31 @@ class AliyunBaiLianEmbedding(MaxKBBaseEmbeddingModel):
         """对图片 URL / data URL 做独立向量化（每张图生成一个向量）。"""
         if not self.supports_image_embedding():
             return []
-        return self._call_multimodal(
-            [{"image": self.normalize_image_input(image, keep_data_prefix=True)} for image in images]
-        )
+        return self._call_multimodal([{"image": self._prepare_image_input(image)} for image in images])
+
+    def _prepare_image_input(self, image: str) -> str:
+        image = self.normalize_image_input(image, keep_data_prefix=True)
+        if (
+            "qwen3-vl-embedding" not in self.model_name.lower()
+            or not image.startswith("data:image/")
+            or ";base64," not in image
+        ):
+            return image
+
+        with Image.open(BytesIO(base64.b64decode(image.split(";base64,", 1)[1], validate=True))) as source:
+            # Qwen3 rounds resized sides to multiples of 32 and rejects aspect ratios above 200.
+            # Imported documents can contain 1-2 pixel separator images; pad the request copy
+            # so one such image cannot invalidate the entire paragraph's embedding batch.
+            minimum_side = max(32, math.ceil(max(source.size) / 200))
+            if min(source.size) >= minimum_side:
+                return image
+            source = ImageOps.exif_transpose(source).convert("RGBA")
+            width, height = source.size
+            padded = Image.new("RGB", (max(width, minimum_side), max(height, minimum_side)), "white")
+            padded.paste(source, ((padded.width - width) // 2, (padded.height - height) // 2), source)
+            output = BytesIO()
+            padded.save(output, format="PNG")
+        return "data:image/png;base64," + base64.b64encode(output.getvalue()).decode("ascii")
 
     def _multimodal_base_url(self) -> str:
         """DashScope 原生多模态接口走 /api/v1，与 OpenAI 兼容地址区分开。"""

@@ -1,0 +1,5 @@
+simulation: aliyun-embeddings
+routing: path
+mocks:
+  - routeKey: aliyun
+    path: ./aliyun.js
