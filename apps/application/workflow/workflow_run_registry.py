@@ -1,17 +1,20 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @file： workflow_run_registry.py
-    @desc: 工作流运行注册表，用于管理和取消正在运行的工作流实例
+@project: MaxKB
+@file： workflow_run_registry.py
+@desc: 工作流运行注册表，用于管理和取消正在运行的工作流实例
 """
+
 import threading
 from enum import Enum
 
 from common.utils.logger import maxkb_logger
+from common.bus import on
 
 
 class CancelResult(Enum):
     """取消操作结果"""
+
     CANCELLED = "CANCELLED"
     NOT_FOUND = "NOT_FOUND"
     FAILED = "FAILED"
@@ -166,3 +169,6 @@ class WorkflowRunRegistry:
         """
         with cls._lock:
             return list(cls._running.keys())
+
+
+on("cancel_chat", lambda args: WorkflowRunRegistry.cancel_by_chat_id(args.get("chat_id")))
