@@ -2,7 +2,7 @@
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { ApplicationDetail, ExportError } from '@/api/types'
-import { MsgError } from '@/utils/message'
+import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ExportApplicationAction' })
 
@@ -10,7 +10,22 @@ const props = defineProps<{ api: typeof ApplicationApi | typeof SystemResourceAp
 
 const loading = defineModel<boolean>('loading', { default: false })
 
+function handleExportSkills() {
+  if (loading.value) return
+  loading.value = true
+  return props.api
+    .exportApplicationSkills(props.application.id, props.application.name)
+    .then(() => {
+      MsgSuccess('Skills 导出已模拟完成，暂不生成文件')
+    })
+    .catch(() => {})
+    .finally(() => {
+      loading.value = false
+    })
+}
+
 function handleExportApplication() {
+  if (loading.value) return
   loading.value = true
   return props.api
     .exportApplication(props.application.id, props.application.name)
@@ -28,8 +43,24 @@ function handleExportApplication() {
 </script>
 
 <template>
-  <MkDropdownItem divided @click="handleExportApplication">
-    <template #icon><MkIcon name="icon_export_outlined" /></template>
-    <span>{{ label }}</span>
+  <MkDropdownItem @click.prevent.stop class="p-0!">
+    <MkDropdown class="w-full" trigger="hover" placement="right-start">
+      <!-- 展开智能体导出菜单 -->
+      <div class="flex-between w-full gap-2 p-2">
+        <div class="flex-align-center gap-2">
+          <MkIcon name="icon_export_outlined" class="text-N600!" />
+          <span>{{ label }}</span>
+        </div>
+        <MkIcon name="icon_right_outlined" class="text-N600!" />
+      </div>
+      <template #dropdown>
+        <MkDropdownMenu>
+          <!-- 模拟导出为 Skills -->
+          <MkDropdownItem :disabled="loading" @click="handleExportSkills">导出为 Skills</MkDropdownItem>
+          <!-- 导出智能体文件 -->
+          <MkDropdownItem :disabled="loading" @click="handleExportApplication">导出智能体</MkDropdownItem>
+        </MkDropdownMenu>
+      </template>
+    </MkDropdown>
   </MkDropdownItem>
 </template>

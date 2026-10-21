@@ -24,10 +24,11 @@ const syncStatusOptions: Partial<Record<KnowledgeSyncStatus, StatusLabelOptions>
   [KNOWLEDGE_SYNC_STATUS.RUNNING]: { type: 'loading', label: '同步中' },
   [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: '成功' },
   [KNOWLEDGE_SYNC_STATUS.FAILURE]: { type: 'failure', label: '失败' },
-  [KNOWLEDGE_SYNC_STATUS.SKIPPED]: { type: 'failure', label: '跳过' },
+  [KNOWLEDGE_SYNC_STATUS.SKIPPED]: { type: 'disabled', label: '跳过', icon: 'icon_skip_filled' },
 }
 
 function getSyncContent(log: KnowledgeSyncLog) {
+  if (log.status === KNOWLEDGE_SYNC_STATUS.RUNNING) return '正在同步'
   if (log.status === KNOWLEDGE_SYNC_STATUS.SKIPPED) {
     if (/already running|still running|already queued/.test(log.message)) return '有正在同步的任务，本次跳过'
     if (log.message === 'Scheduled synchronization is disabled') return '已关闭定时同步，本次跳过'

@@ -13,6 +13,7 @@ import { isWorkFlow } from '@/utils/common'
 import {
   AuthorizeApplicationAction,
   ExportApplicationAction,
+  PortalApplicationAction,
   DeleteApplicationAction,
   TriggerApplicationAction,
 } from '@/views/application/application-card/action-dropdown'
@@ -133,7 +134,14 @@ onMounted(() => {
             <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="applicationStatusOptions" @change="handleFilterChange" />
           </template>
           <template #default="{ row }">
-            <MkStatusLabel :active="row.is_publish" active-text="已发布" inactive-text="未发布" inactive-icon="icon_time_filled" />
+            <MkStatusLabel v-if="row.is_portal" type="custom" label="已上架" icon="icon_launch" />
+            <MkStatusLabel
+              v-else
+              :active="row.is_publish"
+              active-text="已发布"
+              inactive-text="未发布"
+              :icon="row.is_publish ? undefined : 'icon_time_filled'"
+            />
           </template>
         </el-table-column>
         <el-table-column v-if="auth.isEE" prop="workspace_name" min-width="160" show-overflow-tooltip>
@@ -159,6 +167,13 @@ onMounted(() => {
                 <AuthorizeApplicationAction label="资源授权" :application="row" />
                 <!-- 智能体触发器 -->
                 <TriggerApplicationAction label="触发器" :api="SystemResourceTriggerApi" :application="row" />
+                <!-- 门户上下架 -->
+                <PortalApplicationAction
+                  v-model:loading="operationLoading"
+                  :api="SystemResourceApplicationApi"
+                  :application="row"
+                  @change="row.is_portal = $event"
+                />
                 <!-- 导出 -->
                 <ExportApplicationAction v-model:loading="operationLoading" label="导出" :api="SystemResourceApplicationApi" :application="row" />
                 <!-- 删除 -->

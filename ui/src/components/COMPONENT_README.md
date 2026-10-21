@@ -246,15 +246,17 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 
 ### MkStatusLabel
 
-提供 `success`、`failure`、`loading`、`disabled` 四种图标类型，通过 `type + label` 展示业务状态。
-组件不依赖 API 状态枚举或业务文案；业务方维护状态与 `{ type, label }` 的映射。
+提供 `success`、`failure`、`loading`、`disabled`、`custom` 五种图标类型，通过 `type + label` 展示业务状态。
+组件不依赖 API 状态枚举或业务文案；业务方维护状态与 `{ type, label, icon? }` 的映射。
 `StatusLabelType`、`StatusLabelOptions` 从 `global/mk-status-label/types.ts` 导入。
 传入 `type` 时使用该类型和外部 `label`，优先于布尔模式，不回退到启用／禁用文案。
 
 未传 `type` 时保留 `active` 便捷模式，默认“已启用 / 已禁用”；
-`activeText`、`inactiveText` 可修改文案，`inactiveIcon` 可覆盖未激活图标（默认 `icon_ban_filled`）。
-成功图标固定为 `icon_succeed_colorful`，失败图标为 `icon_close_colorful`，加载类型使用 `LoadingIcon`，
-禁用图标使用灰色样式。`inactiveIcon` 仅影响布尔模式。
+`activeText`、`inactiveText` 可修改文案。
+`icon` 接收完整 SVG Symbol ID，在两种模式下均优先替换图标，包括加载图标；不改变状态文案及禁用状态的灰色样式。
+未传 `icon` 时，成功使用 `icon_succeed_colorful`，失败使用 `icon_close_colorful`，加载使用 `LoadingIcon`，
+禁用使用 `icon_ban_filled`。仅替换未激活图标时，由调用方按 `active` 条件传入 `icon`。
+`type="custom"` 使用外部 `label` 与 `icon`，不附加状态颜色，保留图标自带颜色或继承文字颜色；未传 `icon` 时仅显示文案。
 接口使用 type／label，未知业务状态由调用方显示原始文案，不伪装成成功或禁用状态。
 
 ### MkTable

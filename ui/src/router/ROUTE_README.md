@@ -36,6 +36,8 @@ Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当
 ### System
 
 System 使用 `AppLayout`，左侧导航根据 `scope: 'system'` 对应路由的 `children` 自动生成。
+系统侧栏在进入资源详情页（`resourceDetailRoot`）时默认收起，其他页面默认展开；小屏默认收起。
+列表和详情页均保留系统侧栏，并支持手动切换；详情子页之间切换保留当前展开状态。
 
 System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。需要复用 Workspace 详情页面时使用独立路由名保留访问来源。System 知识库详情在 `system/index.ts` 的 children 注册，
 继承 System 的 AppLayout，在主区展示详情目录和内容区。
@@ -144,7 +146,6 @@ Chat 导航守卫（`chat/index.ts`）：
 | `icon`               | `string`                                                                    | iconfont Symbol ID，子目录通常可以不配置                                  |
 | `order`              | `number`                                                                    | 同级导航排序，数字越小越靠前                                              |
 | `hidden`             | `boolean`                                                                   | 设置为 `true` 时不显示在导航中                                            |
-| `hideSidebar`        | `boolean`                                                                   | 隐藏 AppLayout 应用侧栏，保留顶部栏和页面自身导航；子页继承               |
 | `detailMenuVisible`  | `(params) => boolean`                                                       | 按业务类型过滤详情菜单，不用于权限                                        |
 | `canAccess`          | `(params) => boolean`                                                       | 工作流返回详情时的访问判断                                                |
 | `resource`           | `ResourceAuthorizationType`                                                 | 系统资源授权页面当前管理的后端资源类型                                    |
@@ -233,8 +234,8 @@ Drawer、Dialog 通常不根据 path、路由名称或 Scope 自行维护 API �
 创建、卡片、设置及返回详情均传 knowledgeId 和字符串类型。全屏工作流不含 type，路径在各来源
 知识库 ID 后追加 `/workflow`。System 地址不携带 workspaceId，shared 使用统一前缀，不保留 share 别名。
 
-详情父页配置 hidden、resourceDetailRoot；System 另加 hideSidebar，在 AppLayout 内隐藏系统侧栏，
-保留头部和详情目录。hidden 仅影响导航，不替代 hideSidebar；普通列表恢复系统侧栏。
+详情父页配置 hidden、resourceDetailRoot；hidden 仅影响导航菜单，详情页仍保留 AppLayout 的
+应用侧栏、头部和详情目录。
 Workspace 共享覆盖 resourceScope，保留 Workspace scope 及知识库 activeMenu。
 
 | 菜单       | 路径与条件                                                                                                            |
@@ -259,7 +260,7 @@ Workspace 详情父路由为 workspace-application-detail-layout，详情参数�
 System 资源管理详情为 `/system/resource/application/:applicationId/:type`，父路由名为
 `system-resource-application-detail-layout`，默认进入 `system-resource-application-overview`。
 配置集中在 `admin/system/modules/application-system-resource.ts`，由 System 路由汇总接入。
-两种范围独立维护 children，复用 `application-detail` 页面；System 隐藏系统侧栏，不携带 workspaceId，
+两种范围独立维护 children，复用 `application-detail` 页面；System 保留系统侧栏，不携带 workspaceId，
 不提供 Workspace 共享或 System 共享的智能体详情。System 列表点击名称进入详情。
 菜单为概览、设置、发布渠道、对话用户、对话日志；SIMPLE 的 setting 与高级 workflow-entry 互斥显示。
 发布渠道使用 access 路径、workspace-application-access 路由名，对应 application-detail/access 页面。

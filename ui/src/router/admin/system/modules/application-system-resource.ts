@@ -8,7 +8,7 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
     name: 'system-resource-application-detail',
     component: () => import('@/views/application-detail/index.vue'),
     redirect: { name: 'system-resource-application-overview' },
-    meta: { title: '智能体详情', hidden: true, hideSidebar: true, resourceDetailRoot: true, scope: 'system', resourceScope: 'system-resource' },
+    meta: { title: '智能体详情', hidden: true, resourceDetailRoot: true, scope: 'system', resourceScope: 'system-resource' },
     children: [
       {
         path: 'overview',

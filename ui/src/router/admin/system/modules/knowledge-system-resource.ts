@@ -8,7 +8,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
     name: 'system-resource-knowledge-detail',
     component: () => import('@/views/knowledge-detail/index.vue'),
     redirect: { name: 'system-resource-knowledge-document-list' },
-    meta: { title: '知识库详情', hidden: true, hideSidebar: true, resourceDetailRoot: true, scope: 'system', resourceScope: 'system-resource' },
+    meta: { title: '知识库详情', hidden: true, resourceDetailRoot: true, scope: 'system', resourceScope: 'system-resource' },
     children: [
       {
         path: '',
@@ -149,6 +149,6 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
     path: '/system/resource/knowledge/:knowledgeId/:type/document/:documentId',
     name: 'system-resource-knowledge-paragraph',
     component: () => import('@/views/document-detail/index.vue'),
-    meta: { resourceScope: 'system-resource', scope: 'system', hideSidebar: true, title: '文档分段', hidden: true, resourceDetailRoot: true },
+    meta: { resourceScope: 'system-resource', scope: 'system', title: '文档分段', hidden: true, resourceDetailRoot: true },
   },
 ]

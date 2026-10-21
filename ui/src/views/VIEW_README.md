@@ -86,6 +86,10 @@
 - 工具表单按类型放在 `tool-form/`，共用参数及 Python 设置放在 `tool-form/component/`。
   创建和编辑复用同一表单，不把不同类型字段合并成通用表单。
 - `ToolCard` 点击工作流进入画布，其他类型调用编辑 Action 的同一表单实例；编辑、启停成功局部更新。
+- 智能体的 Workspace 卡片与 System 资源列表复用门户上下架和导出 Action；门户入口按 `is_portal`
+  显示“上架到门户／从门户下架”，当前通过 mock 接口更新列表局部状态，刷新后恢复服务端状态。
+  导出使用二级菜单，包含“导出为 Skills”和“导出智能体”；Skills 当前调用 mock 接口并明确提示
+  尚未生成文件，智能体沿用现有文件导出。
   商店列表由页面加载，卡片和版本更新按钮不重复查询。
 - 工具头像由 `MkEditAvatar` 暂存文件，校验后先上传再保存；上传成功后清理暂存文件，避免保存失败后重复上传。
 - Python 生成入口由 `CodeGenerate` 选择 Tool／Model API，复用 `GenerateContent`；全屏替换只修改草稿，确认后回写。
@@ -329,13 +333,13 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   失败不伪装成零。快捷创建复用资源入口，`fitTriggerWidth` 仅显式开启时测量触发器。
 - `HomeStatistics` 接收完整的 Workspace Homepage、System Homepage 或 Overview API。
   智能体概览通过 `hideHeader: true` 隐藏详情布局标题栏，保留内容内的监控与排行标题。
-  基本信息由概览本地 `components/ApplicationBasicInfo.vue` 组织 Web 访问与后端 API 访问卡片；
+  基本信息直接在概览页 `application-detail/overview/index.vue` 中组织 Web 访问与后端 API 访问卡片；
   Web 链接通过当前范围的 Application API 查询访问凭证，沿用 V2 的工作流 API 参数默认值与编码方式；
   API 文档地址为 Chat 部署前缀下的 `/api-doc/`。两个地址使用只读输入框展示并支持复制；链接重置先确认，
   成功后用返回的访问凭证更新链接，保留工作流参数，失败保留原链接。Web 访问开关查询后回填 `is_active`，
   保存成功后按响应回显、失败保留原状态；开关保存与链接重置互斥，保存期间禁用开关、不显示 loading，链接重置保留按钮 loading。后端 API 访问开关仍待接入。
-  五个按钮流程分别放在 `chat/`、`embed-third-party/`、`access-restriction/`、`display-setting/`、
-  `api-key/`，入口和对应弹窗同目录维护。API Key 弹窗通过 `resourceApi.apiKey` 传入当前范围的完整 API 与智能体 ID，
+  “去对话”按钮直接在概览页维护；其余四个按钮流程分别放在 `embed-third-party/`、`access-restriction/`、
+  `display-setting/`、`api-key/`，入口和对应弹窗同目录维护。API Key 弹窗通过 `resourceApi.apiKey` 传入当前范围的完整 API 与智能体 ID，
   复用 `business/api-key-list/`，Base URL 使用 Chat API 部署前缀加智能体 ID；
   Workspace 与 System 资源管理共用智能体弹窗，分别使用各自接口，不回退或使用头像菜单的全局系统 API Key。
   嵌入第三方弹窗接收概览已有的 Web 链接与访问凭证，不额外请求接口；按全屏、浮窗、移动端单选切换并复制代码，
