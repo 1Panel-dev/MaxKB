@@ -1,0 +1,7 @@
+simulation: workflow-web-images
+routing: path
+mocks:
+  - routeKey: site
+    path: ./workflow_web_images.js
+  - routeKey: storage
+    path: ./workflow_web_storage.js

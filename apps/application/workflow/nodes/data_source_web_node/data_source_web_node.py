@@ -16,6 +16,7 @@ from application.workflow.common import CancelledException, WorkflowType
 from application.workflow.i_node import INode
 from common.utils.fork import ChildLink, Fork, ForkManage
 from common.utils.logger import maxkb_logger
+from knowledge.web_assets import internalize_web_images
 
 
 class DataSourceWebNodeParamsSerializer(serializers.Serializer):
@@ -49,7 +50,7 @@ class DataSourceWebNode(INode):
             },
         ]
 
-    def _get_collect_handler(self, document_list, source_meta=None, selector="body"):
+    def _get_collect_handler(self, document_list, source_meta=None, selector="body", knowledge_id=None):
         def handler(child_link: ChildLink, response: Fork.Response):
             if response.status != 200:
                 raise ValueError(response.message or f"Failed to fetch Web source: {child_link.url}")
@@ -61,7 +62,9 @@ class DataSourceWebNode(INode):
             document_list.append(
                 {
                     "name": document_name.strip(),
-                    "content": response.content,
+                    "content": internalize_web_images(response.content, knowledge_id)
+                    if knowledge_id is not None
+                    else response.content,
                     "meta": {
                         **(source_meta or {}),
                         "source_type": "web",
@@ -86,7 +89,9 @@ class DataSourceWebNode(INode):
 
         document_list = []
         source_meta = workflow_params.get("workflow_source") or {}
-        collect_handler = self._get_collect_handler(document_list, source_meta, selector)
+        collect_handler = self._get_collect_handler(
+            document_list, source_meta, selector, knowledge_id=workflow_params.get("knowledge_id")
+        )
 
         try:
             sync_document = workflow_params.get("workflow_sync_document")
