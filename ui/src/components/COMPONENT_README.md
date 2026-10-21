@@ -697,6 +697,20 @@ Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选
 
 业务组件显式导入，可调用固定业务 API；页面保留自身的列表查询、路由和保存编排。
 
+### ApiKeyList
+
+手动导入 `business/api-key-list/index.vue`，接收完整的 `api` 对象。Workspace 与 System 资源管理的智能体 API
+必须同时传入 `applicationId`；头像菜单的 System API 不传该参数。API 入参类型直接在各使用组件内声明。
+组件不读取路由或自行选择接口，智能体概览通过详情上下文的 `resourceApi.apiKey` 传入对应 API。
+在弹窗内容中挂载，首次挂载查询，关闭后由外层弹窗销毁，下次打开重新加载。
+列表默认每页 20 条，不提供排序、列宽拖拽或批量操作；创建直接生成密钥，删除前确认，
+启停成功后刷新，失败保留原状态。查询与列表操作共用 loading，编辑抽屉单独管理保存状态。
+密钥默认隐藏，翻页或刷新恢复隐藏，复制始终使用完整值，隐藏状态不通过 Tooltip 暴露明文。
+
+`EditApiKeyDrawer` 是本功能内部抽屉，按永不过期、预设有效期或自定义日期编辑，预设有效期
+从保存时起算；跨域地址逐行去空白后提交数组。保存失败保留草稿，成功刷新列表。
+备注按 `remark` 预留，当前后端尚未持久化。Base URL 或 API 文档地址由调用方在列表外展示。
+
 ### GenerateQuestionsDialog
 
 `business/generate-questions/index.vue` 共用关联问题配置，

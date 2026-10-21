@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import LoginApi from '@/api/admin/auth/login'
 import { LOGIN_METHOD } from '@/api/enums'
 import { useStore } from '@/stores'
 import ChangePasswordDialog from './ChangePasswordDialog.vue'
 import AboutDialog from './AboutDialog.vue'
+import ApiKeyDialog from './ApiKeyDialog.vue'
 import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'AvatarDropdown' })
@@ -33,6 +34,12 @@ const aboutDialogRef = ref<InstanceType<typeof AboutDialog>>()
 
 function handleOpenAbout() {
   aboutDialogRef.value?.open()
+}
+
+const apiKeyDialogRef = useTemplateRef<InstanceType<typeof ApiKeyDialog>>('apiKeyDialogRef')
+
+function handleOpenApiKey() {
+  apiKeyDialogRef.value?.open()
 }
 
 function handleLogout() {
@@ -78,8 +85,8 @@ function toUrl(url?: string) {
             <template #icon><MkIcon name="icon-key_outlined" /></template>
             <span>修改密码</span>
           </MkDropdownItem>
-          <!-- // TODO API Key -->
-          <MkDropdownItem v-if="perm.system.other.systemApiKey()">
+          <!-- 管理系统 API Key -->
+          <MkDropdownItem v-if="perm.system.other.systemApiKey()" @click="handleOpenApiKey">
             <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
             <span>API Key</span>
           </MkDropdownItem>
@@ -136,4 +143,5 @@ function toUrl(url?: string) {
   </MkDropdown>
   <ChangePasswordDialog ref="changePasswordDialogRef" />
   <AboutDialog ref="aboutDialogRef" />
+  <ApiKeyDialog ref="apiKeyDialogRef" />
 </template>

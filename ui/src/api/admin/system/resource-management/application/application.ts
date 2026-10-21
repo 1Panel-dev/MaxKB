@@ -1,6 +1,6 @@
 import { del, get, getExportFile, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import type { ApplicationDetail, ApplicationFormPayload, Dict } from '@/api/types'
+import type { ApplicationAccessToken, ApplicationAccessTokenPayload, ApplicationDetail, ApplicationFormPayload, Dict } from '@/api/types'
 
 const prefix = '/system/resource/application'
 
@@ -25,6 +25,13 @@ const exportApplication = (applicationId: string, applicationName: string) => {
 /** 获取 System 资源管理智能体详情。 */
 const getApplicationDetail = (applicationId: string) => get<ApplicationDetail>(`${prefix}/${applicationId}`)
 
+/** 获取 System 资源管理智能体公开访问凭证。 */
+const getAccessToken = (applicationId: string) => get<ApplicationAccessToken>(`${prefix}/${applicationId}/access_token`)
+
+/** 修改 System 资源管理智能体公开访问状态或重置凭证，返回更新后的配置。 */
+const putAccessToken = (applicationId: string, payload: ApplicationAccessTokenPayload) =>
+  put<ApplicationAccessTokenPayload, ApplicationAccessToken>(`${prefix}/${applicationId}/access_token`, payload)
+
 /** 保存 System 资源管理智能体配置。 */
 const putApplication = (applicationId: string, data: ApplicationFormPayload) =>
   put<ApplicationFormPayload, ApplicationDetail>(`${prefix}/${applicationId}`, data)
@@ -38,6 +45,8 @@ const putApplicationPublish = (applicationId: string, publishName: string, publi
 
 export default {
   getApplicationDetail,
+  getAccessToken,
+  putAccessToken,
   putApplication,
   putApplicationPublish,
   getAllApplication,

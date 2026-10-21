@@ -24,6 +24,19 @@ export interface ApplicationAccessStatusPayload {
   status: boolean
 }
 
+/** 智能体公开访问链接使用的凭证。 */
+export interface ApplicationAccessToken {
+  application_id: string
+  access_token: string
+  is_active: boolean
+}
+
+/** 智能体公开访问状态修改或令牌重置参数。 */
+export interface ApplicationAccessTokenPayload {
+  is_active?: boolean
+  access_token_reset?: boolean
+}
+
 export interface ApplicationDetail extends Omit<ApplicationFormPayload, 'desc'> {
   /** 详情接口返回的主模型 ID。 */
   model?: string | null

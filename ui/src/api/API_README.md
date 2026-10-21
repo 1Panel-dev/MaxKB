@@ -369,6 +369,25 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外。Syst
 
 ### 智能体概览
 
+Workspace 与 System 资源管理的 `application/application.ts` 提供 `getAccessToken(applicationId)`，
+沿用 V2 的 `/<applicationId>/access_token` GET 接口，返回公开访问凭证 `ApplicationAccessToken`。
+概览使用 `access_token` 拼接 Web 链接，不使用智能体 ID 或 API Key 替代；API 文档地址使用 Chat 部署前缀。
+两范围的 `putAccessToken` 向同一路径提交 `{ access_token_reset: true }` 重置链接，或 `{ is_active: boolean }` 修改 Web 访问状态；
+载荷复用 `ApplicationAccessTokenPayload`，使用返回的访问凭证与启用状态回显，不二次查询。
+
+API Key 按三个入口分别维护：
+
+- `admin/workspace/application/api-key.ts`：`/workspace/<workspaceId>/application/<applicationId>/application_key`。
+- `admin/system/resource-management/application/api-key.ts`：`/system/resource/application/<applicationId>/application_key`。
+- `admin/system/api-key.ts`：`/system/api_key`，仅用于头像菜单。
+
+三套均提供 `getApiKeyPage`、`postApiKey`、`putApiKey`、`deleteApiKey`；
+两套智能体方法以 `applicationId` 为首参，仅 Workspace 接口在内部读取工作空间 ID；头像菜单接口不接收资源 ID。
+分页使用 `ParamsPage` 和 `ResponsePage<ApiKeyRecord>`；创建 POST 空对象，由后端生成密钥；
+修改只提交需要更新的配置，启停仅提交 `is_active`。Workspace 智能体删除返回空数据，其他两套沿用 V2 布尔类型；调用方不依赖返回值判断成功。
+共用业务类型在 `types/api-key.ts`，`remark` 字段待后端补充返回与持久化；
+两套系统接口沿用 V2 路径，仍需对应部署联调；头像菜单密钥与系统资源管理智能体密钥不能互相替代。
+
 `admin/workspace/application/overview.ts` 独立维护概览接口，沿用 v2 的应用统计协议，在
 `/workspace/<workspaceId>/application/<applicationId>` 下提供三个 GET 接口，均传入
 `start_time`、`end_time`，由调用方管理 loading：
