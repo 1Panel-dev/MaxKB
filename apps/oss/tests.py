@@ -52,3 +52,47 @@ class OssUrlTestCase(SimpleTestCase):
             'chat_oss_retrieval',
             {'application_id': 'application-id'},
         )
+
+
+class MissingLargeObjectTests(SimpleTestCase):
+    """#7356: metadata exists but Postgres large object is gone → 404, not 500."""
+
+    def test_operate_get_maps_missing_large_object_to_404(self):
+        from unittest.mock import MagicMock, patch
+
+        from django.db import DatabaseError
+
+        from common.exception.app_exception import NotFound404
+        from oss.serializers.file import FileSerializer
+
+        operate = FileSerializer.Operate(data={'id': '00000000-0000-0000-0000-000000000001'})
+        self.assertTrue(operate.is_valid())
+
+        fake_file = MagicMock()
+        fake_file.file_name = 'pic.png'
+        fake_file.get_bytes.side_effect = DatabaseError('large object 90563 does not exist')
+
+        with patch('oss.serializers.file.QuerySet') as qs, patch('oss.serializers.file.auth'):
+            qs.return_value.filter.return_value.first.return_value = fake_file
+            with self.assertRaises(NotFound404) as ctx:
+                operate.get(with_valid=False)
+        self.assertEqual(ctx.exception.status_code, 404)
+
+    def test_operate_get_rethrows_unrelated_database_error(self):
+        from unittest.mock import MagicMock, patch
+
+        from django.db import DatabaseError
+
+        from oss.serializers.file import FileSerializer
+
+        operate = FileSerializer.Operate(data={'id': '00000000-0000-0000-0000-000000000001'})
+        self.assertTrue(operate.is_valid())
+
+        fake_file = MagicMock()
+        fake_file.file_name = 'pic.png'
+        fake_file.get_bytes.side_effect = DatabaseError('connection already closed')
+
+        with patch('oss.serializers.file.QuerySet') as qs, patch('oss.serializers.file.auth'):
+            qs.return_value.filter.return_value.first.return_value = fake_file
+            with self.assertRaises(DatabaseError):
+                operate.get(with_valid=False)

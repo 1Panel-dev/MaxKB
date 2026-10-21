@@ -9,6 +9,7 @@ from common.auth.handle.impl.user_token import get_auth
 from common.constants.authentication_type import AuthenticationType
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed, NotFound404
+from django.db import DatabaseError
 from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.utils.translation import gettext
@@ -299,8 +300,16 @@ class FileSerializer(serializers.Serializer):
             file_type = file.file_name.split(".")[-1].lower()
             content_type = mime_types.get(file_type, 'application/octet-stream')
             encoded_filename = urllib.parse.quote(file.file_name)
-            # 获取文件内容
-            file_bytes = file.get_bytes()
+            # 获取文件内容。元数据还在但 PostgreSQL 大对象已丢失时，
+            # lo_get 会抛 DatabaseError（large object … does not exist），
+            # 不应以 500 把库原始报错透出给前端（#7356）。
+            try:
+                file_bytes = file.get_bytes()
+            except DatabaseError as e:
+                msg = str(e).lower()
+                if 'large object' in msg and 'does not exist' in msg:
+                    raise NotFound404(404, _('File content not found')) from e
+                raise
             file_size = len(file_bytes)
 
             response = None
