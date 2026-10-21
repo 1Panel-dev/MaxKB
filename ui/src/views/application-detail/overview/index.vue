@@ -141,7 +141,6 @@ onMounted(() => {
               <span>去对话</span>
             </el-button>
             <ButtonEmbedThirdParty :share-url="shareUrl" :access-token="accessToken" />
-            />
             <ButtonAccessRestriction />
             <ButtonDisplaySetting />
           </div>

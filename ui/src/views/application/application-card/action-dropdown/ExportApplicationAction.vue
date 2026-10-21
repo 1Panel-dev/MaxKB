@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, useTemplateRef } from 'vue'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { ApplicationDetail, ExportError } from '@/api/types'
@@ -9,6 +10,10 @@ defineOptions({ name: 'ExportApplicationAction' })
 const props = defineProps<{ api: typeof ApplicationApi | typeof SystemResourceApplicationApi; application: ApplicationDetail; label: string }>()
 
 const loading = defineModel<boolean>('loading', { default: false })
+
+// 二级菜单留在所属一级浮层内，避免焦点移入时关闭一级菜单，并避开滚动容器裁剪。
+const exportTriggerRef = useTemplateRef<HTMLDivElement>('exportTriggerRef')
+const exportMenuContainer = computed(() => exportTriggerRef.value?.closest<HTMLElement>('.el-dropdown__popper'))
 
 function handleExportSkills() {
   if (loading.value) return
@@ -44,9 +49,9 @@ function handleExportApplication() {
 
 <template>
   <MkDropdownItem @click.prevent.stop class="p-0!">
-    <MkDropdown class="w-full" trigger="hover" placement="right-start">
+    <MkDropdown class="w-full" trigger="hover" placement="right-start" :append-to="exportMenuContainer">
       <!-- 展开智能体导出菜单 -->
-      <div class="flex-between w-full gap-2 p-2">
+      <div ref="exportTriggerRef" class="flex-between w-full gap-2 p-2">
         <div class="flex-align-center gap-2">
           <MkIcon name="icon_export_outlined" class="text-N600!" />
           <span>{{ label }}</span>
