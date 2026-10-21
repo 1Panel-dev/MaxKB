@@ -338,6 +338,9 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   `api-key/`，入口和对应弹窗同目录维护。API Key 弹窗通过 `resourceApi.apiKey` 传入当前范围的完整 API 与智能体 ID，
   复用 `business/api-key-list/`，Base URL 使用 Chat API 部署前缀加智能体 ID；
   Workspace 与 System 资源管理共用智能体弹窗，分别使用各自接口，不回退或使用头像菜单的全局系统 API Key。
+  嵌入第三方弹窗接收概览已有的 Web 链接与访问凭证，不额外请求接口；按全屏、浮窗、移动端单选切换并复制代码，
+  关闭后恢复全屏模式。iframe 沿用 Web 链接及工作流参数，移动端增加 `mode=mobile`；浮窗使用 Chat API 前缀下的
+  `/embed`，携带协议、主机、访问凭证及工作流参数，生成 HTML 时转义属性值。无访问凭证时禁用入口。
   其他访问配置及弹窗业务尚待接入，不模拟保存。
   三类场景统一调用 `getMonitoring(workspaceId, range, applicationId)`；全部智能体使用空 ID，
   两类首页不提交智能体筛选，概览传当前智能体 ID。页面直接传入完整 API，不包装接口。

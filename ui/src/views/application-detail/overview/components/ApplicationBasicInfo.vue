@@ -125,7 +125,7 @@ onMounted(() => {
           </div>
           <div class="flex-wrap">
             <ButtonChat />
-            <ButtonEmbedThirdParty />
+            <ButtonEmbedThirdParty :share-url="shareUrl" :access-token="accessToken" />
             <ButtonAccessRestriction />
             <ButtonDisplaySetting />
           </div>
