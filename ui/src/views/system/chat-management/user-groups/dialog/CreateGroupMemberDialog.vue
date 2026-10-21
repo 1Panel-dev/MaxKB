@@ -64,7 +64,7 @@ defineExpose({ open })
   <MkDialog v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top">
       <el-form-item label="对话用户" prop="userIds">
-        <el-select v-model="memberForm.userIds" class="w-full" filterable multiple collapse-tags collapse-tags-tooltip :loading="optionsLoading" placeholder="请选择用户名或姓名">
+        <el-select v-model="memberForm.userIds" class="w-full" filterable multiple :loading="optionsLoading" placeholder="请选择用户名或姓名">
           <el-option v-for="user in userOptions" :key="user.id" :label="user.nick_name" :value="user.id" />
         </el-select>
       </el-form-item>

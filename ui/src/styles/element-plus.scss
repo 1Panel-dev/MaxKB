@@ -887,8 +887,14 @@
   &__input {
     height: 22px;
   }
+
+  .el-tag {
+    height: 24px !important;
+    align-items: center !important;
+  }
   &__tags-text {
     color: var(--el-text-color-primary);
+    font-size: 14px;
   }
 }
 

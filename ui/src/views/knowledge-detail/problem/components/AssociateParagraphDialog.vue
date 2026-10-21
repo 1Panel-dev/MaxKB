@@ -66,7 +66,6 @@ function handleResourceTypeChange() {
 }
 
 function loadParagraphPage(pagination: ParamsPage) {
-  // TODO(图片联调)：核对图片资源 id 能否复用 documentId 查询分段，以及分页结果中的 id、document_id、title、content。
   return resourceApi.paragraph.getParagraphPage(knowledgeId.value, selectedDocumentId.value, pagination, {
     title: paragraphSearchText.value.trim() || undefined,
   })
