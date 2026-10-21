@@ -19,7 +19,7 @@ from drf_spectacular.utils import OpenApiParameter
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
-
+from common.bus import emit
 from application.api.application_api import SpeechToTextAPI, TextToSpeechAPI
 from application.models import ChatUserType, ChatSourceChoices, ApplicationAccessToken, ChatRecord
 from chat.api.chat_api import ChatAPI
@@ -285,15 +285,8 @@ class CancelWorkflowView(APIView):
         tags=[_("V3 Chat")],  # type: ignore
     )
     def post(self, request: Request, chat_id: str):
-        from application.workflow.workflow_run_registry import WorkflowRunRegistry, CancelResult
-
-        result_enum = WorkflowRunRegistry.cancel_by_chat_id(chat_id)
-        if result_enum == CancelResult.CANCELLED:
-            return result.success({"status": "cancelled", "chat_id": chat_id})
-        elif result_enum == CancelResult.NOT_FOUND:
-            return result.success({"status": "not_found", "chat_id": chat_id})
-        else:
-            return result.fail(500, _("Failed to cancel workflow"))
+        emit("cancel_chat", {"chat_id": str(chat_id)})
+        return result.success({"status": "cancelled", "chat_id": chat_id})
 
 
 class ResumeStreamView(APIView):
