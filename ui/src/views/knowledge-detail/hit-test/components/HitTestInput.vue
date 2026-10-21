@@ -216,7 +216,7 @@ onBeforeUnmount(() => {
         </template>
         <!-- 上传图片 -->
         <el-button text :disabled="!canSelectImages" @click="fileInputRef?.click()">
-          <MkIcon name="icon_attachment_outlined" :size="18" class="text-N900!" />
+          <MkIcon name="icon_image2_outlined" :size="18" class="text-N900!" />
         </el-button>
       </MkTooltip>
     </div>

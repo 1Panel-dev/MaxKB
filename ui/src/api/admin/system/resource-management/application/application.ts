@@ -22,6 +22,13 @@ const exportApplication = (applicationId: string, applicationName: string) => {
   return getExportFile(`${applicationName}.mk`, `${prefix}/${applicationId}/export`)
 }
 
+/** 模拟 System 资源管理智能体 Skills 导出；TODO：接入真实下载接口。 */
+const exportApplicationSkills = (applicationId: string, applicationName: string) =>
+  Promise.resolve({ application_id: applicationId, name: applicationName })
+
+/** 模拟 System 资源管理智能体门户上下架；TODO：接入真实接口，当前不持久化。 */
+const putApplicationPortal = (applicationId: string, isPortal: boolean) => Promise.resolve({ id: applicationId, is_portal: isPortal })
+
 /** 获取 System 资源管理智能体详情。 */
 const getApplicationDetail = (applicationId: string) => get<ApplicationDetail>(`${prefix}/${applicationId}`)
 
@@ -53,4 +60,6 @@ export default {
   getApplicationPage,
   deleteApplication,
   exportApplication,
+  exportApplicationSkills,
+  putApplicationPortal,
 }

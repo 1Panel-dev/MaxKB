@@ -18,6 +18,7 @@ import {
   RelatedResourcesApplicationAction,
   DeleteApplicationAction,
   ExportApplicationAction,
+  PortalApplicationAction,
   MoveApplicationAction,
   SettingApplicationAction,
   TriggerApplicationAction,
@@ -268,6 +269,13 @@ function handleBatchDelete() {
                     :application="application"
                     :current-folder-id="currentFolder.id"
                     @delete="handleDeleteApplication"
+                  />
+                  <!-- 门户上下架 -->
+                  <PortalApplicationAction
+                    v-model:loading="applicationOperationLoading"
+                    :api="ApplicationApi"
+                    :application="application"
+                    @change="application.is_portal = $event"
                   />
                   <!-- 导出 -->
                   <ExportApplicationAction

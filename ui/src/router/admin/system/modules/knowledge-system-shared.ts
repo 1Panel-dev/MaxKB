@@ -8,7 +8,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
     name: 'system-shared-knowledge-detail',
     component: () => import('@/views/knowledge-detail/index.vue'),
     redirect: { name: 'system-shared-knowledge-document-list' },
-    meta: { title: '共享知识库详情', hidden: true, hideSidebar: true, resourceDetailRoot: true, scope: 'system', resourceScope: 'system-shared' },
+    meta: { title: '共享知识库详情', hidden: true, resourceDetailRoot: true, scope: 'system', resourceScope: 'system-shared' },
     children: [
       {
         path: '',
@@ -149,6 +149,6 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
     path: '/system/shared/knowledge/:knowledgeId/:type/document/:documentId',
     name: 'system-shared-knowledge-paragraph',
     component: () => import('@/views/document-detail/index.vue'),
-    meta: { resourceScope: 'system-shared', scope: 'system', hideSidebar: true, title: '文档分段', hidden: true, resourceDetailRoot: true },
+    meta: { resourceScope: 'system-shared', scope: 'system', title: '文档分段', hidden: true, resourceDetailRoot: true },
   },
 ]

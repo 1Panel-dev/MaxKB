@@ -41,7 +41,14 @@ function handleOpen() {
     </p>
 
     <template #footer="{ Action, ActionDropdown }">
-      <MkStatusLabel :active="application.is_publish" active-text="已发布" inactive-text="未发布" inactive-icon="icon_time_filled" />
+      <MkStatusLabel v-if="application.is_portal" type="custom" label="已上架" icon="icon_launch" />
+      <MkStatusLabel
+        v-else
+        :active="application.is_publish"
+        active-text="已发布"
+        inactive-text="未发布"
+        :icon="application.is_publish ? undefined : 'icon_time_filled'"
+      />
       <template v-if="application.is_publish">
         <el-divider direction="vertical" />
         <span class="flex-align-center gap-2">
