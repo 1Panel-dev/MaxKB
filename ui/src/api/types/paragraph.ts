@@ -1,4 +1,5 @@
-import type { RelatedQuestionsConfig } from './knowledge'
+import type { KnowledgeType, RelatedQuestionsConfig } from './knowledge'
+import type { DocumentResourceType } from './document'
 
 /** 文档分段的查询响应与新增载荷。 */
 export interface ParagraphItem {
@@ -29,10 +30,13 @@ export interface ProblemItem extends ParagraphProblem {
   update_time: string
 }
 
-/** 从问题详情查询到的关联分段，额外携带所属知识库与文档名称。 */
+/** 从问题详情查询到的关联分段，包含所属知识库、文档及图片来源信息。 */
 export interface ProblemParagraph extends ParagraphItem {
   knowledge_id: string
   document_name: string
+  knowledge_type: KnowledgeType | null
+  document_resource_type: DocumentResourceType
+  document_image_id: string | null
 }
 
 /** 批量将问题关联到文档分段时使用的分段引用。 */

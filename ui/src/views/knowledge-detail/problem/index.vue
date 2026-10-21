@@ -28,6 +28,7 @@ const selectedProblems = ref<ProblemItem[]>([])
 const problemTableRef = ref<{ clearSelection: () => void }>()
 const quickCreateRef = ref<InstanceType<typeof MkQuickCreate>>()
 const associateParagraphDialogRef = ref<InstanceType<typeof AssociateParagraphDialog>>()
+const problemDetailDrawerRef = ref<InstanceType<typeof ProblemDetailDrawer>>()
 const detailProblem = ref<ProblemItem>()
 const currentIndex = computed(() => problems.value.findIndex(({ id }) => id === detailProblem.value?.id))
 const hasPrevious = computed(() => currentIndex.value > 0 || (currentIndex.value === 0 && paginationConfig.value.currentPage > 1))
@@ -154,7 +155,7 @@ function handleOpenAssociateParagraphs(problemIds: string[]) {
 
 function handleAssociateParagraphsSuccess() {
   clearSelection()
-  return loadProblems()
+  return Promise.all([loadProblems(), problemDetailDrawerRef.value?.refresh()])
 }
 
 function handleOpenProblem(problem: ProblemItem, column: TableColumnCtx<ProblemItem> | null) {
@@ -264,6 +265,7 @@ onMounted(() => loadProblems())
   </MkTable>
   <ProblemDetailDrawer
     v-if="detailProblem"
+    ref="problemDetailDrawerRef"
     v-model="detailProblem"
     :has-previous="hasPrevious"
     :has-next="hasNext"
