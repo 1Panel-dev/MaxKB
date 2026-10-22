@@ -38,23 +38,25 @@ function submit() {
     .then((validationResults) => {
       if (!validationResults.every(Boolean) || !baseFormRef.value) return
       const baseForm = baseFormRef.value.form
-      return props.api.postKnowledge({
-        name: baseForm.name.trim(),
-        desc: baseForm.desc.trim(),
-        embedding_model_id: baseForm.embedding_model_id,
-        folder_id: props.folderId,
-        type: KNOWLEDGE_TYPE.BASE,
-      }).then((knowledge) => {
-        return auth.loadAuthBaseProfile().then(() => {
-          MsgSuccess('创建成功')
-          dialogVisible.value = false
-          emit('refresh')
-          return router.push({
-            name: 'workspace-knowledge-document-list',
-            params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type], workspaceId: route.params.workspaceId },
+      return props.api
+        .postKnowledge({
+          name: baseForm.name.trim(),
+          desc: baseForm.desc.trim(),
+          embedding_model_id: baseForm.embedding_model_id,
+          folder_id: props.folderId,
+          type: KNOWLEDGE_TYPE.BASE,
+        })
+        .then((knowledge) => {
+          return auth.loadAuthBaseProfile().then(() => {
+            MsgSuccess('创建成功')
+            dialogVisible.value = false
+            emit('refresh')
+            return router.push({
+              name: 'workspace-knowledge-document-list',
+              params: { knowledgeId: knowledge.id, type: KNOWLEDGE_TYPE_MAP[knowledge.type], workspaceId: route.params.workspaceId },
+            })
           })
         })
-      })
     })
     .finally(() => {
       loading.value = false
@@ -65,7 +67,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建通用知识库" align-center @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="创建通用知识库" @closed="resetData">
     <KnowledgeBaseForm ref="baseFormRef" v-loading="loading" />
     <template #footer>
       <!-- 取消创建 -->

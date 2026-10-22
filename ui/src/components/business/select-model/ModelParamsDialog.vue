@@ -65,7 +65,7 @@ defineExpose({ open, resetDefault })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="模型参数设置" width="600" @closed="resetData">
+  <MkDialog v-model="visible" title="模型参数设置" @closed="resetData">
     <div v-loading="loading">
       <MkDynamicsForm ref="formRef" v-model="formData" :render-data="formFields" default-item-width="100%" />
     </div>

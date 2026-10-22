@@ -96,7 +96,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" title="智能体" width="1200" @closed="resetData">
+  <MkDialog v-model="visible" class="mk-aside-content-dialog" title="智能体" width="1200" @closed="resetData">
     <template #header="{ titleId }">
       <div class="flex-between pr-8">
         <div class="flex-align-center gap-2">

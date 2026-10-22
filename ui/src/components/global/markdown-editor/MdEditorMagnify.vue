@@ -58,7 +58,7 @@ async function submitEditorDialog() {
     </template>
   </MdEditor>
 
-  <MkDialog v-model="dialogVisible" :title="title" align-center>
+  <MkDialog v-model="dialogVisible" :title="title">
     <MdEditor
       v-model="dialogContent"
       :preview="false"

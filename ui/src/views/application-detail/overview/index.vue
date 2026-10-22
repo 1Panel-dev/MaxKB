@@ -123,7 +123,9 @@ onMounted(() => {
               <MkIcon name="icon_new-chat_outlined" />
               <span>去对话</span>
             </el-button>
+            <!-- 嵌入第三方 -->
             <ButtonEmbedThirdParty :share-url="shareUrl" :access-token="accessToken" />
+            <!-- 访问限制 -->
             <ButtonAccessRestriction />
             <!-- 显示设置 -->
             <ButtonDisplaySetting />
@@ -146,6 +148,7 @@ onMounted(() => {
               </template>
             </el-input>
           </div>
+          <!-- API Key  -->
           <ButtonApiKey />
         </div>
       </div>

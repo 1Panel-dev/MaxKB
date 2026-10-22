@@ -34,7 +34,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="设置" align-center @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="设置" @closed="resetData">
     <el-form ref="formRef" :model="form" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="标题" prop="title" :rules="[{ whitespace: true, required: true, message: '请输入标题', trigger: 'blur' }]">
         <el-input v-model="form.title" maxlength="64" show-word-limit @blur="form.title = form.title.trim()" />

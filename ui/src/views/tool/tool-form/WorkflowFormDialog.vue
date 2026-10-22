@@ -120,11 +120,6 @@ function open(tool?: ToolItem, asCopy = false) {
     })
 }
 
-function handleBeforeClose(done: () => void) {
-  if (loading.value) return
-  done()
-}
-
 function resetData() {
   Object.assign(workflowForm, { desc: '', icon: '', name: '', work_flow: {} })
   iconFile.value = null
@@ -143,7 +138,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :before-close="handleBeforeClose" :title="title" @closed="handleClosed">
+  <MkDialog v-model="visible" :title="title" @closed="handleClosed">
     <el-form
       ref="formRef"
       v-loading="formLoading || loading"

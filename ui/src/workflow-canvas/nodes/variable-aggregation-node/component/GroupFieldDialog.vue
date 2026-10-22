@@ -59,7 +59,7 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="editing ? '编辑分组' : '添加分组'" @closed="resetData" align-center>
+  <MkDialog v-model="visible" :title="editing ? '编辑分组' : '添加分组'" @closed="resetData">
     <el-form ref="formRef" label-position="top" require-asterisk-position="right" :rules="rules" :model="formData" @submit.prevent>
       <el-form-item label="变量" prop="field">
         <el-input v-model="formData.field" :maxlength="64" placeholder="请输入变量" show-word-limit />

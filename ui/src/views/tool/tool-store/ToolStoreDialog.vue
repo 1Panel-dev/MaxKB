@@ -132,7 +132,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" title="工具商店" width="1200" @closed="handleClosed">
+  <MkDialog v-model="visible" class="mk-aside-content-dialog" title="工具商店" width="1200" @closed="handleClosed">
     <template #header="{ titleId }">
       <div class="relative flex-align-center">
         <h4 :id="titleId">工具商店</h4>
@@ -166,7 +166,9 @@ defineExpose({ open })
         <!-- 搜索之后的 -->
         <template v-if="hasSearchKeyword && !loading">
           <div class="mb-4 font-semibold">
-            找到 <span class="text-primary">{{ storeTools.length }}</span> 个相关工具
+            找到
+            <span class="text-primary">{{ storeTools.length }}</span>
+            个相关工具
           </div>
 
           <div class="mk-resource-card-grid-sm">

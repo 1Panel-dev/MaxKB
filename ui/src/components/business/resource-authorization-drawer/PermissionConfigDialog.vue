@@ -50,16 +50,16 @@ defineExpose({ open, close })
         <p v-if="option.description" class="mt-1 text-N500">{{ option.description }}</p>
       </el-radio>
     </el-radio-group>
-    <template v-if="isFolder">
-      <template v-if="!scopeOnly">
+    <div v-if="isFolder">
+      <div v-if="!scopeOnly">
         <el-divider class="my-4!" />
         <h6 class="mb-2">生效资源</h6>
-      </template>
+      </div>
       <el-radio-group v-model="includeChildren" class="mk-radio-group-vertical" :disabled="loading">
         <el-radio :value="false">仅当前资源</el-radio>
         <el-radio :value="true" :disabled="!canIncludeChildren">包含所有子文件夹</el-radio>
       </el-radio-group>
-    </template>
+    </div>
     <template #footer>
       <el-button plain :disabled="loading" @click="close">取消</el-button>
       <el-button type="primary" :loading="loading" :disabled="!permission" @click="handleSubmit">确认</el-button>

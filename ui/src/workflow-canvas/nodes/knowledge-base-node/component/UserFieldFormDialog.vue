@@ -74,7 +74,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" :title="editingIndex === undefined ? '添加参数' : '编辑参数'" align-center @closed="resetData">
+  <MkDialog v-model="dialogVisible" :title="editingIndex === undefined ? '添加参数' : '编辑参数'" @closed="resetData">
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" :field-type-options="fieldTypeOptions" />
     <template #footer>
       <!-- 取消编辑 -->

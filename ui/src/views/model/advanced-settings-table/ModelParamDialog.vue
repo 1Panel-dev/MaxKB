@@ -42,7 +42,7 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="editing ? '编辑参数' : '添加参数'" @closed="resetData" align-center>
+  <MkDialog v-model="visible" :title="editing ? '编辑参数' : '添加参数'" @closed="resetData">
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" />
 
     <template #footer>

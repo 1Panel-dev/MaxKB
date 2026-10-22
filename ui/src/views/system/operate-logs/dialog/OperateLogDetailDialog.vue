@@ -15,7 +15,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="API详情" width="800" align-center>
+  <MkDialog v-model="visible" title="API详情" width="800">
     <pre class="whitespace-pre-wrap break-words p-4">{{ formattedDetails }}</pre>
 
     <template #footer>

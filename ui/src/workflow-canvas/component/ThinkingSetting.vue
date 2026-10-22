@@ -45,7 +45,7 @@ function resetData() {
     <MkIcon name="icon_setting" />
   </el-button>
   <MkDialog v-model="visible" title="设置" @closed="resetData">
-    <template #subtitle> 请根据模型返回的思考标签设置，标签中间的内容将会认定为思考过程</template>
+    <template #subtitle>请根据模型返回的思考标签设置，标签中间的内容将会认定为思考过程</template>
     <el-form ref="formRef" :model="formData" class="grid grid-cols-2 gap-4" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="开始">
         <el-input v-model="formData.reasoning_content_start" type="textarea" :rows="5" placeholder="<think>" />

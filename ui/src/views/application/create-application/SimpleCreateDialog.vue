@@ -97,7 +97,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建简易智能体" align-center @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="创建简易智能体" @closed="resetData">
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"

@@ -36,10 +36,6 @@ function close() {
   if (!loading.value) visible.value = false
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!loading.value) done()
-}
-
 function handleSubmit() {
   if (loading.value) return
   void paragraphFormRef.value
@@ -72,15 +68,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog
-    v-model="visible"
-    title="添加分段"
-    width="1000"
-    align-center
-    content-class="max-h-[calc(100vh-300px)]!"
-    :before-close="handleBeforeClose"
-    @closed="emit('closed')"
-  >
+  <MkDialog v-model="visible" title="添加分段" width="1000" @closed="emit('closed')">
     <div v-loading="loading" class="flex w-full gap-4">
       <ParagraphForm ref="paragraphFormRef" v-model="paragraphForm" :knowledge-id="targetKnowledgeId" />
       <!-- 关联问题 -->

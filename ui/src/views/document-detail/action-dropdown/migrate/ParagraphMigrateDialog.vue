@@ -99,10 +99,6 @@ async function handleSubmit() {
   })
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!loading.value && !optionLoading.value) done()
-}
-
 function handleClosed() {
   const migratedParagraphIds = migrationSucceeded.value ? [...targetParagraphIds.value] : []
   // 关闭动画结束后通知页面，使用打开时固定的 ID，不读取当前勾选。
@@ -114,7 +110,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="迁移至" :before-close="handleBeforeClose" @closed="handleClosed">
+  <MkDialog v-model="visible" title="迁移至" @closed="handleClosed">
     <el-form
       ref="formRef"
       v-loading="loading || optionLoading"

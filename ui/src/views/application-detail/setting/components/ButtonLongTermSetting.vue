@@ -168,7 +168,7 @@ function submit() {
   <el-button text type="primary" @click="open">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" title="长期记忆设置" align-center @closed="resetData">
+  <MkDialog v-model="visible" title="长期记忆设置" @closed="resetData">
     <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="AI 模型" prop="long_term_model_id" :rules="{ required: true, message: '请选择长期记忆模型', trigger: 'change' }">
         <SelectModel

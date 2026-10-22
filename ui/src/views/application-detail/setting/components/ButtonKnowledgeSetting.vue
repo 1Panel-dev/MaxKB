@@ -56,7 +56,7 @@ function resetData() {
   <el-button text type="primary" @click.stop="open">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" title="参数设置" @closed="resetData" align-center>
+  <MkDialog v-model="visible" title="参数设置" @closed="resetData">
     <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="检索模式">
         <!-- 选择检索模式 -->

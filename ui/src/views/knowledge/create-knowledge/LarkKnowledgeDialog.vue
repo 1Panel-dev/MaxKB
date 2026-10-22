@@ -48,7 +48,8 @@ function submit() {
     .then((validationResults) => {
       if (!validationResults.every(Boolean) || !baseFormRef.value) return
       const baseForm = baseFormRef.value.form
-      return props.api.postLarkKnowledge({
+      return props.api
+        .postLarkKnowledge({
           name: baseForm.name.trim(),
           desc: baseForm.desc.trim(),
           embedding_model_id: baseForm.embedding_model_id,
@@ -57,7 +58,8 @@ function submit() {
           app_id: knowledgeForm.app_id.trim(),
           app_secret: knowledgeForm.app_secret,
           folder_token: knowledgeForm.folder_token.trim(),
-        }).then((knowledge) => {
+        })
+        .then((knowledge) => {
           return auth.loadAuthBaseProfile().then(() => {
             MsgSuccess('创建成功')
             dialogVisible.value = false
@@ -78,7 +80,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建飞书知识库" align-center @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="创建飞书知识库" @closed="resetData">
     <KnowledgeBaseForm ref="baseFormRef" v-loading="loading" />
     <el-form
       class="mt-4"

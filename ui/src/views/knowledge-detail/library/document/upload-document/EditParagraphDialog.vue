@@ -62,7 +62,6 @@ defineExpose({ open, close })
     v-model="visible"
     title="编辑"
     width="1000"
-    align-center
     content-class="max-h-[calc(100vh-300px)]!"
     :before-close="handleBeforeClose"
     @closed="emit('closed')"

@@ -97,6 +97,7 @@ const loadingPermissions = ref(false)
 const resourcePermissions = ref<ResourcePermissionItem[]>([])
 
 function loadResourcePermissions() {
+  loadingPermissions.value = true
   const targetId = targetType.value === 'user-group' ? selectedUserGroupId.value : selectedUserId.value
 
   if (!targetId) {
@@ -104,7 +105,6 @@ function loadResourcePermissions() {
     return Promise.resolve()
   }
 
-  loadingPermissions.value = true
   const permissionRequest =
     targetType.value === 'user-group'
       ? ResourceAuthorizationApi.getUserGroupResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value)
@@ -223,14 +223,14 @@ const canEditResourcePermission = computed(() => resourceEditPermissions[resourc
           </el-tabs>
         </div>
       </component>
-
-      <PermissionTable
-        v-loading="loadingPermissions"
-        :data="resourcePermissions"
-        :resource-type="resourceType"
-        :disabled="!canEditResourcePermission || loadingPermissions"
-        @submit="handlePermissionsSubmit"
-      />
+      <div v-loading="loadingPermissions">
+        <PermissionTable
+          :data="resourcePermissions"
+          :resource-type="resourceType"
+          :disabled="!canEditResourcePermission"
+          @submit="handlePermissionsSubmit"
+        />
+      </div>
     </template>
   </MkViewLayout>
 </template>

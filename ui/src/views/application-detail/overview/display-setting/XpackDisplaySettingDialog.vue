@@ -160,7 +160,6 @@ onBeforeUnmount(releaseImagePreviews)
   <MkDialog
     v-model="visible"
     title="显示设置"
-    align-center
     class="mk-aside-content-dialog"
     body-class="border-t-0!"
     content-class="overflow-hidden"

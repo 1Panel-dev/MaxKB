@@ -38,7 +38,7 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog align-center v-model="visible" class="move-to-dialog" content-class="move-to-dialog__content" title="移动到" @closed="resetData">
+  <MkDialog v-model="visible" class="move-to-dialog" content-class="move-to-dialog__content" title="移动到" @closed="resetData">
     <FolderTree
       v-model="selectedTargetId"
       class="move-to-dialog__folder-tree"
@@ -50,7 +50,7 @@ defineExpose({ close, open })
 
     <template #footer>
       <el-button :disabled="loading" @click="visible = false">取消</el-button>
-      <el-button type="primary" :disabled="!canSubmit" :loading="loading" @click="handleSubmit"> 确定 </el-button>
+      <el-button type="primary" :disabled="!canSubmit" :loading="loading" @click="handleSubmit">确定</el-button>
     </template>
   </MkDialog>
 </template>

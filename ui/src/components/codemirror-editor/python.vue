@@ -90,7 +90,7 @@ function submitEditorDialog() {
     </el-button>
   </div>
 
-  <MkDialog v-model="dialogVisible" :title="title" append-to-body fullscreen>
+  <MkDialog :align-center="false" v-model="dialogVisible" :title="title" append-to-body fullscreen>
     <template #header="{ titleClass, titleId }">
       <div class="flex-between mr-4">
         <span :id="titleId" :class="titleClass">{{ title }}</span>

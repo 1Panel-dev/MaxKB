@@ -65,7 +65,7 @@ function resetData() {
   <el-button text type="primary" @click="open">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" title="文件上传设置" @closed="resetData" align-center>
+  <MkDialog v-model="visible" title="文件上传设置" @closed="resetData">
     <el-form ref="formRef" :model="formData" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="上传方式" prop="local_upload">
         <div class="flex w-full flex-wrap gap-6">

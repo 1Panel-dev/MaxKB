@@ -70,7 +70,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="设置用户组" align-center @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="设置用户组" @closed="resetData">
     <el-form
       ref="batchGroupFormRef"
       :model="batchGroupForm"
@@ -103,7 +103,7 @@ defineExpose({ open })
 
     <template #footer>
       <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserGroups"> 保存 </el-button>
+      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserGroups">保存</el-button>
     </template>
   </MkDialog>
 </template>
