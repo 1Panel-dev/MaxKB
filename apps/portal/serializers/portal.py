@@ -114,11 +114,8 @@ class PortalSerializer(serializers.Serializer):
 
         options = [{"label": _(_type), "value": _type} for _type in all_available_auths]
         options.sort(key=lambda x: (0 if x["value"] == "LOCAL" else 1, x["label"]))
-        auth_types = [{"label": _(_type), "value": _type} for _type in auth_config["login_value"]]
-        auth_types.sort(key=lambda x: (0 if x["value"] == "LOCAL" else 1, x["label"]))
 
         auth_config["system_options"] = options
-        auth_config["auth_types"] = auth_types
         return auth_config
 
     def one(self):

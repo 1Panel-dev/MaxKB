@@ -7,7 +7,6 @@ export interface PortalAuthConfig extends Dict<unknown> {
   failed_attempts?: number
   lock_time?: number
   system_options?: OptionItem<string>[]
-  auth_types?: OptionItem<string>[]
 }
 
 export interface PortalSetting {
