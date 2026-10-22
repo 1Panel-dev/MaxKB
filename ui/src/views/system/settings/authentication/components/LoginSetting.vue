@@ -23,7 +23,7 @@ const loginSettingFields = [
   'lock_time',
   'role_id',
   'workspace_id',
-  'permission',
+  'group_id',
 ] as const
 const form = reactive<Omit<LoginAuthSettingPayload, 'system_options'>>({
   login_methods: [LOGIN_METHOD.LOCAL],
@@ -33,7 +33,7 @@ const form = reactive<Omit<LoginAuthSettingPayload, 'system_options'>>({
   lock_time: 10,
   role_id: ROLE_TYPE.USER,
   workspace_id: 'default',
-  permission: 'NOT_AUTH',
+  group_id: undefined,
 })
 const rules: FormRules<LoginAuthSettingPayload> = {
   default_value: [{ required: true, message: '请选择默认登录方式', trigger: 'change' }],
@@ -52,7 +52,7 @@ function loadSetting() {
   return AuthSettingApi.getLoginSetting()
     .then((setting) => {
       loginMethodOptions.value = setting.system_options ?? []
-      Object.assign(form, pick(setting, [...loginSettingFields, 'group_id']))
+      Object.assign(form, pick(setting, loginSettingFields))
     })
     .finally(() => {
       loading.value = false

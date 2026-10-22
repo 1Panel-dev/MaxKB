@@ -11,14 +11,12 @@ export interface AuthProviderSettingPayload {
 }
 
 export interface LoginAuthSettingPayload {
-  auth_types?: OptionItem[]
   default_value: string
   failed_attempts: number
   group_id?: string
   lock_time: number
   login_methods: string[]
   max_attempts: number
-  permission?: string
   role_id?: string
   system_options?: OptionItem[]
   workspace_id?: string
