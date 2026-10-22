@@ -18,13 +18,13 @@ const props = defineProps<{
 }>()
 const loading = ref(false)
 const apiKeys = ref<ApiKeyRecord[]>([])
-const revealedIds = ref(new Set<string>())
+const createdApiKey = ref('')
+const createdDialogVisible = ref(false)
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const editDrawerRef = useTemplateRef<InstanceType<typeof EditApiKeyDrawer>>('editDrawerRef')
 const apiKeyRows = computed(() => apiKeys.value.map((record) => ({ ...record, expiration: getApiKeyExpiration(record) })))
 
 function fetchApiKeys() {
-  revealedIds.value.clear()
   const request =
     props.applicationId !== undefined
       ? (props.api as typeof ApplicationApiKeyApi | typeof SystemResourceApiKeyApi).getApiKeyPage(props.applicationId, pagination.value)
@@ -51,8 +51,9 @@ function handleCreate() {
       ? (props.api as typeof ApplicationApiKeyApi | typeof SystemResourceApiKeyApi).postApiKey(props.applicationId)
       : (props.api as typeof SystemApiKeyApi).postApiKey()
   return request
-    .then(() => {
-      MsgSuccess('创建成功')
+    .then((record) => {
+      createdApiKey.value = record.secret_key
+      createdDialogVisible.value = true
       pagination.value.currentPage = 1
       return fetchApiKeys()
     })
@@ -108,11 +109,6 @@ function handleOpenEdit(record: ApiKeyRecord) {
   editDrawerRef.value?.open(record)
 }
 
-function handleToggleVisible(id: string) {
-  if (revealedIds.value.has(id)) revealedIds.value.delete(id)
-  else revealedIds.value.add(id)
-}
-
 onMounted(loadApiKeys)
 </script>
 
@@ -130,24 +126,16 @@ onMounted(loadApiKeys)
       @current-change="loadApiKeys"
       @size-change="loadApiKeys"
     >
-      <el-table-column label="API Key" min-width="230">
+      <el-table-column label="API Key" min-width="160">
         <template #default="{ row }">
           <div class="flex-align-center gap-2">
-            <span class="min-w-0 truncate" :title="revealedIds.has(row.id) ? row.secret_key : '********'">
-              {{ revealedIds.has(row.id) ? row.secret_key : '********' }}
+            <span>
+              {{ `******${row.secret_key.slice(-4)}` }}
             </span>
             <!-- 复制完整 API Key -->
-            <MkTooltip content="复制">
-              <el-button link @click="copyText(row.secret_key)">
-                <MkIcon name="icon_copy_outlined" />
-              </el-button>
-            </MkTooltip>
-            <!-- 切换 API Key 显隐 -->
-            <MkTooltip :content="revealedIds.has(row.id) ? '点击隐藏' : '点击显示'">
-              <el-button link @click="handleToggleVisible(row.id)">
-                <MkIcon :name="revealedIds.has(row.id) ? 'icon_visible_outlined' : 'icon_invisible_outlined'" />
-              </el-button>
-            </MkTooltip>
+            <el-button text @click="copyText(row.secret_key)">
+              <MkIcon name="icon_copy_outlined" />
+            </el-button>
           </div>
         </template>
       </el-table-column>
@@ -202,5 +190,20 @@ onMounted(loadApiKeys)
       </el-table-column>
     </MkTable>
   </div>
+  <MkDialog v-model="createdDialogVisible" title="API Key" align-center @closed="createdApiKey = ''">
+    <template #subtitle>请安全保存此密钥，不要泄露。</template>
+    <el-input :model-value="createdApiKey" readonly>
+      <template #suffix>
+        <!-- 复制新建的完整 API Key -->
+        <el-button text @click="copyText(createdApiKey)" class="-mr-1">
+          <MkIcon name="icon_copy_outlined" />
+        </el-button>
+      </template>
+    </el-input>
+    <template #footer>
+      <!-- 关闭创建结果弹窗 -->
+      <el-button plain @click="createdDialogVisible = false">知道了</el-button>
+    </template>
+  </MkDialog>
   <EditApiKeyDrawer v-bind="props" ref="editDrawerRef" @refresh="loadApiKeys" />
 </template>

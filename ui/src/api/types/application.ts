@@ -49,17 +49,39 @@ export interface ApplicationDisplaySetting {
   show_user_avatar: boolean
 }
 
-/** 智能体公开访问链接使用的凭证。 */
+/** 智能体登录认证配置；保留后端返回的其他认证字段。 */
+export interface ApplicationAuthenticationConfig extends Dict<unknown> {
+  type?: 'login' | 'password'
+  login_value?: string[]
+  max_attempts?: number
+  // TODO：默认登录方式、账号锁定字段待后台联调。
+  default_value?: string
+  failed_attempts?: number
+  lock_time?: number
+}
+
+/** 智能体公开访问凭证与访问限制配置。 */
 export interface ApplicationAccessToken extends Partial<ApplicationDisplaySetting> {
   application_id: string
   access_token: string
   is_active: boolean
+  access_num: number
+  white_active: boolean
+  white_list: string[]
+  authentication?: boolean
+  authentication_value?: ApplicationAuthenticationConfig | null
 }
 
-/** 智能体公开访问状态修改或令牌重置参数。 */
+/** 智能体访问配置修改或令牌重置参数。 */
 export interface ApplicationAccessTokenPayload {
   is_active?: boolean
   access_token_reset?: boolean
+  access_num?: number
+  white_active?: boolean
+  white_list?: string[]
+  language?: string | null
+  authentication?: boolean
+  authentication_value?: ApplicationAuthenticationConfig
 }
 
 export interface ApplicationDetail extends Omit<ApplicationFormPayload, 'desc'> {

@@ -26,11 +26,9 @@ defineExpose({ open })
       <el-input :model-value="baseUrl" readonly>
         <template #suffix>
           <!-- 复制 Base URL -->
-          <MkTooltip content="复制">
-            <el-button link @click="copyText(baseUrl)">
-              <MkIcon name="icon_copy_outlined" />
-            </el-button>
-          </MkTooltip>
+          <el-button text @click="copyText(baseUrl)" class="-mr-1">
+            <MkIcon name="icon_copy_outlined" />
+          </el-button>
         </template>
       </el-input>
     </div>

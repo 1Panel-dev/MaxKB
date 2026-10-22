@@ -134,11 +134,9 @@ defineExpose({ open })
         <el-input :model-value="form.secret_key" disabled>
           <template #suffix>
             <!-- 复制 API Key -->
-            <MkTooltip content="复制">
-              <el-button link @click="copyText(form.secret_key)">
-                <MkIcon name="icon_copy_outlined" />
-              </el-button>
-            </MkTooltip>
+            <el-button text @click="copyText(form.secret_key)" class="-mr-1">
+              <MkIcon name="icon_copy_outlined" />
+            </el-button>
           </template>
         </el-input>
       </el-form-item>

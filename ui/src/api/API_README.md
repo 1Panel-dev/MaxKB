@@ -383,6 +383,15 @@ Workspace 与 System 资源管理的 `application/application.ts` 提供 `getAcc
 概览使用 `access_token` 拼接 Web 链接，不使用智能体 ID 或 API Key 替代；API 文档地址使用 Chat 部署前缀。
 两范围的 `putAccessToken` 向同一路径提交 `{ access_token_reset: true }` 重置链接，或 `{ is_active: boolean }` 修改 Web 访问状态；
 载荷复用 `ApplicationAccessTokenPayload`，使用返回的访问凭证与启用状态回显，不二次查询。
+访问限制复用上述 GET／PUT，读取与保存 `access_num`、`white_active`、`white_list`、`authentication` 和
+`authentication_value`。提问次数为 0～10000000 的整数；社区版仅编辑认证开关，保留已有 `authentication_value`，
+不生成登录配置字段，身份认证读写待后台联调。Xpack 版认证配置使用 `type: 'login'`、`login_value`、
+`max_attempts`，保留原配置中的其他字段；已有认证 `type` 不自动转换，缺省为 `login`。
+保存访问限制携带原 `language`，避免后台省略字段时清空语言配置。
+默认登录方式与账号锁定暂按 `authentication_value.default_value / failed_attempts / lock_time` 提交，
+字段及认证配置生效能力待后台联调；前端不因认证字段缺失禁用编辑。System 资源管理的访问限制仍需部署环境联调。
+Xpack 版可用登录方式统一调用 `system/chat-management/chat-user-auth.ts` 的 `getChatUserAuthType`，
+GET `/chat_user/auth/types` 返回 `{ label, value }[]`，两种智能体入口共用。
 
 展示设置共用 `ApplicationDisplaySetting`；`ApplicationAccessToken` 兼容可选展示字段，缺失字段由弹窗补齐默认值。
 两范围的 `putDisplaySetting` 沿用 V2 的 `/<applicationId>/setting` PUT 接口，提交 FormData：
