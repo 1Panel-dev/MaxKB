@@ -24,7 +24,7 @@ const accountLoginMethods = computed(() =>
 const accountLoginConfig = computed<LoginConfig>(() => ({
   ...loginConfig.value,
   default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
-    ? LOGIN_METHOD.LOCAL
+    ? (accountLoginMethods.value[0] ?? LOGIN_METHOD.LOCAL)
     : loginConfig.value.default_value,
   login_methods: accountLoginMethods.value,
 }))
@@ -32,13 +32,13 @@ const qrCodeLoginConfig = computed<LoginConfig>(() => ({
   ...loginConfig.value,
   default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
     ? loginConfig.value.default_value
-    : LOGIN_METHOD.WECOM,
+    : (qrCodeProviders.value[0] ?? LOGIN_METHOD.WECOM),
   login_methods: qrCodeProviders.value,
 }))
 const showLoginModeSwitch = computed(() => accountLoginMethods.value.length > 0 && qrCodeProviders.value.length > 0)
 
 onBeforeMount(() => {
-  // TODO 根据默认跳转
+  // 登录配置加载完成后，按默认登录方式挂载对应模式。
   isLoading.value = true
   auth
     .loadPlatformProfile()
@@ -53,6 +53,9 @@ onBeforeMount(() => {
         })
       }
       loginConfig.value = { max_attempts: 1, default_value: LOGIN_METHOD.LOCAL, login_methods: [LOGIN_METHOD.LOCAL] }
+    })
+    .then(() => {
+      loginMode.value = qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider) ? 'qr-code' : 'account'
     })
     .finally(() => {
       isLoading.value = false
