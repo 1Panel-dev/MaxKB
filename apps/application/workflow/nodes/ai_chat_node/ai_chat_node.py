@@ -704,6 +704,10 @@ class AIChatNode(INode):
         for m in self.data.get("messages") or []:
             aggregation.aggregate(m)
         messages = aggregation.get_contents()
+        if self.status == Status.CANCELLED:
+            for m in messages:
+                if m.get("status") == Status.RUNNING.value:
+                    m["status"] = Status.CANCELLED.value
         details.update(
             {
                 "question": self.data.get("question"),
