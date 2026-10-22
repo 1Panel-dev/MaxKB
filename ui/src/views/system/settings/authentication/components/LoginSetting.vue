@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
+import { pick } from 'lodash'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import type { ListItem, LoginAuthSettingPayload, SystemUserGroup, LoginMethod } from '@/api/types'
+import type { ListItem, LoginAuthSettingPayload, SystemUserGroup } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
-import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 import { useStore } from '@/stores'
 import perm from '@/permission'
@@ -15,7 +15,17 @@ defineOptions({ name: 'AuthenticationSetting' })
 const { auth } = useStore()
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
-const form = reactive<LoginAuthSettingPayload>({
+const loginSettingFields = [
+  'login_methods',
+  'default_value',
+  'max_attempts',
+  'failed_attempts',
+  'lock_time',
+  'role_id',
+  'workspace_id',
+  'permission',
+] as const
+const form = reactive<Omit<LoginAuthSettingPayload, 'system_options'>>({
   login_methods: [LOGIN_METHOD.LOCAL],
   default_value: LOGIN_METHOD.LOCAL,
   max_attempts: 1,
@@ -33,13 +43,16 @@ const rules: FormRules<LoginAuthSettingPayload> = {
 }
 
 /* 登录方式加载与提交 */
-const loginMethodOptions = computed(() => form.login_methods)
-const defaultLoginMethodOptions = computed(() => form.auth_types)
+const loginMethodOptions = ref<NonNullable<LoginAuthSettingPayload['system_options']>>([])
+const defaultLoginMethodOptions = computed(() =>
+  loginMethodOptions.value.filter(({ value }) => form.login_methods.some((loginMethod) => loginMethod === value)),
+)
 function loadSetting() {
   loading.value = true
   return AuthSettingApi.getLoginSetting()
     .then((setting) => {
-      Object.assign(form, setting)
+      loginMethodOptions.value = setting.system_options ?? []
+      Object.assign(form, pick(setting, [...loginSettingFields, 'group_id']))
     })
     .finally(() => {
       loading.value = false
@@ -128,7 +141,7 @@ function submit() {
     if (!valid) return
 
     loading.value = true
-    AuthSettingApi.putLoginSetting(form)
+    AuthSettingApi.putLoginSetting(pick(form, loginSettingFields))
       .then(() => MsgSuccess('保存成功'))
       .finally(() => {
         loading.value = false
@@ -155,8 +168,8 @@ onMounted(() => {
   >
     <el-form-item label="登录方式" prop="login_methods">
       <el-checkbox-group v-model="form.login_methods" @change="handleLoginMethodsChange" class="flex-wrap">
-        <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption" :value="loginMethodOption" class="w-40">
-          {{ LOGIN_METHOD_LABELS[loginMethodOption as LoginMethod] }}
+        <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption.value" :value="loginMethodOption.value" class="w-40">
+          {{ loginMethodOption.label }}
         </el-checkbox>
       </el-checkbox-group>
     </el-form-item>
