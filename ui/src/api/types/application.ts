@@ -24,8 +24,33 @@ export interface ApplicationAccessStatusPayload {
   status: boolean
 }
 
+/** 智能体展示设置；图片响应为 URL，保存时通过 FormData 分别提交文件及原 URL。 */
+export interface ApplicationDisplaySetting {
+  show_source: boolean
+  show_exec: boolean
+  language: string
+  show_history: boolean
+  draggable: boolean
+  show_guide: boolean
+  show_share: boolean
+  icon: string
+  chat_background: string
+  avatar: string
+  float_icon: string
+  user_avatar: string
+  disclaimer: boolean
+  disclaimer_value: string
+  custom_theme: { theme_color: string; header_font_color: string }
+  float_location: {
+    x: { type: 'left' | 'right'; value: number }
+    y: { type: 'top' | 'bottom'; value: number }
+  }
+  show_avatar: boolean
+  show_user_avatar: boolean
+}
+
 /** 智能体公开访问链接使用的凭证。 */
-export interface ApplicationAccessToken {
+export interface ApplicationAccessToken extends Partial<ApplicationDisplaySetting> {
   application_id: string
   access_token: string
   is_active: boolean

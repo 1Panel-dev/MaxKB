@@ -159,9 +159,19 @@ onMounted(() => {
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
-              <!-- 进入智能体详情 -->
-              <MkAction display="button" label="管理" icon="icon_admin_outlined" @click="handleOpenApplication(row)" />
               <!-- TODO：对话 -->
+              <MkTooltip content="去对话">
+                <el-button text type="primary">
+                  <MkIcon name="icon_new-chat_outlined" />
+                </el-button>
+              </MkTooltip>
+              <!-- 进入智能体详情 -->
+              <MkTooltip content="管理">
+                <el-button text type="primary" @click="handleOpenApplication(row)">
+                  <MkIcon name="icon_admin_outlined" />
+                </el-button>
+              </MkTooltip>
+
               <MkTableMoreDropdown>
                 <!-- 资源授权 -->
                 <AuthorizeApplicationAction label="资源授权" :application="row" />

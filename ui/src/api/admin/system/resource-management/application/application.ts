@@ -39,6 +39,9 @@ const getAccessToken = (applicationId: string) => get<ApplicationAccessToken>(`$
 const putAccessToken = (applicationId: string, payload: ApplicationAccessTokenPayload) =>
   put<ApplicationAccessTokenPayload, ApplicationAccessToken>(`${prefix}/${applicationId}/access_token`, payload)
 
+/** 保存智能体展示设置，沿用 V2 图片与配置的 multipart 协议。 */
+const putDisplaySetting = (applicationId: string, payload: FormData) => put<FormData>(`${prefix}/${applicationId}/setting`, payload)
+
 /** 保存 System 资源管理智能体配置。 */
 const putApplication = (applicationId: string, data: ApplicationFormPayload) =>
   put<ApplicationFormPayload, ApplicationDetail>(`${prefix}/${applicationId}`, data)
@@ -54,6 +57,7 @@ export default {
   getApplicationDetail,
   getAccessToken,
   putAccessToken,
+  putDisplaySetting,
   putApplication,
   putApplicationPublish,
   getAllApplication,

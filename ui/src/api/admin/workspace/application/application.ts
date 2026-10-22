@@ -32,6 +32,9 @@ const getAccessToken = (applicationId: string) => get<ApplicationAccessToken>(`$
 const putAccessToken = (applicationId: string, payload: ApplicationAccessTokenPayload) =>
   put<ApplicationAccessTokenPayload, ApplicationAccessToken>(`${getPrefix()}/${applicationId}/access_token`, payload)
 
+/** 保存智能体展示设置，沿用 V2 图片与配置的 multipart 协议。 */
+const putDisplaySetting = (applicationId: string, payload: FormData) => put<FormData>(`${getPrefix()}/${applicationId}/setting`, payload)
+
 /** 删除工作空间智能体。 */
 const deleteApplication = (applicationId: string) => {
   return del<undefined, boolean>(`${getPrefix()}/${applicationId}`)
@@ -94,6 +97,7 @@ export default {
   getApplicationDetail,
   getAccessToken,
   putAccessToken,
+  putDisplaySetting,
   deleteApplication,
   exportApplication,
   exportApplicationSkills,
