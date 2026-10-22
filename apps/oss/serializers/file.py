@@ -6,7 +6,7 @@ import uuid_utils.compat as uuid
 from django.db.models.functions import Cast
 
 from application.models import Application, ApplicationAccessToken, ChatShareLink
-from common.auth.common import parse_token
+from common.auth.common import parse_token, SystemToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.constants.operate_constants import Operate
 from common.auth.handle.impl.user_token import get_auth
@@ -179,6 +179,25 @@ def _knowledge_id_for_file_source(source_type, source_id):
     return None
 
 
+def parse_file_token(mk_file_auth):
+    if str(mk_file_auth).startswith("application-") or str(mk_file_auth).startswith("agent-"):
+        # 如果是应用的key访问的话 那么就是能访问整个应用的文件 暂定
+        _deny()
+        pass
+    if mk_file_auth.startswith("user-"):
+        system_api_key_model = DatabaseModelManage.get_model("system_api_key")
+        system_api_key = QuerySet(system_api_key_model).filter(secret_key=mk_file_auth).first()
+        if system_api_key:
+            return SystemToken(str(system_api_key.user_id), AuthenticationType.SYSTEM_USER)
+        else:
+            _deny()
+    else:
+        try:
+            return parse_token(token=mk_file_auth)
+        except Exception as e:
+            _deny()
+
+
 def auth(file, mk_file_auth):
     if CONFIG.get("FILE_AUTH", "1") != "1":
         return
@@ -194,7 +213,7 @@ def auth(file, mk_file_auth):
     # 非公共文件,直接拒绝
     if mk_file_auth is None:
         _deny()
-    token = parse_token(mk_file_auth)
+    token = parse_file_token(mk_file_auth)
     user_type = AuthenticationType(token.type)
 
     if user_type == AuthenticationType.CHAT_USER:
