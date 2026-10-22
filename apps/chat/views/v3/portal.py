@@ -20,6 +20,7 @@ from common.utils.common import query_params_to_single_dict
 from chat.api.portal_api import PortalAPI
 from chat.serializers.portal import (
     PortalApplicationSerializer,
+    PortalConversationQuerySerializer,
     PortalHistoricalConversationSerializer,
 )
 
@@ -74,5 +75,28 @@ class PortalHistoricalConversationView(APIView):
         return result.success(
             PortalHistoricalConversationSerializer.Query(
                 data={**query_params_to_single_dict(request.query_params)}
+            ).page(current_page, page_size, str(request.user.id))
+        )
+
+
+class PortalConversationQueryView(APIView):
+    authentication_classes = [ChatTokenAuth]
+
+    @extend_schema(
+        methods=["GET"],
+        description=_("Get portal application historical conversation by page"),
+        summary=_("Get portal application historical conversation by page"),
+        operation_id=_("Get portal application historical conversation by page"),  # type: ignore
+        parameters=PortalAPI.ConversationQuery.get_parameters(),
+        responses=PortalAPI.ConversationQuery.get_response(),
+        tags=[_("V3 Chat")],  # type: ignore
+    )
+    def get(self, request: Request, application_id: str, current_page: int, page_size: int):
+        return result.success(
+            PortalConversationQuerySerializer(
+                data={
+                    **query_params_to_single_dict(request.query_params),
+                    "application_id": application_id,
+                }
             ).page(current_page, page_size, str(request.user.id))
         )

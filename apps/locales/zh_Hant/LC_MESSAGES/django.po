@@ -9917,3 +9917,12 @@ msgstr "寬和高必須在 [512, 2048] 之間，且面積不得超過 1024x1024�
 #: apps/models_provider/impl/tencent_model_provider/credential/embedding.py
 msgid "api_key is required"
 msgstr "api_key 必填"
+
+
+#: apps/chat/serializers/portal.py:219
+msgid "Application is not authorized"
+msgstr "應用未授權"
+
+#: apps/chat/serializers/portal.py:221
+msgid "Application historical conversation is not enabled"
+msgstr "應用未開啟歷史記錄"

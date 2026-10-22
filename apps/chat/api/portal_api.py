@@ -130,3 +130,41 @@ class PortalAPI(APIMixin):
         @staticmethod
         def get_response():
             return DefaultResultSerializer
+
+    class ConversationQuery(APIMixin):
+        @staticmethod
+        def get_parameters():
+            return [
+                OpenApiParameter(
+                    name="application_id",
+                    description="会话所属应用ID",
+                    type=OpenApiTypes.STR,
+                    location="path",
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name="current_page",
+                    description="当前页码",
+                    type=OpenApiTypes.INT,
+                    location="path",
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name="page_size",
+                    description="每页数量",
+                    type=OpenApiTypes.INT,
+                    location="path",
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name="abstract",
+                    description="会话摘要模糊搜索",
+                    type=OpenApiTypes.STR,
+                    location="query",
+                    required=False,
+                ),
+            ]
+
+        @staticmethod
+        def get_response():
+            return DefaultResultSerializer

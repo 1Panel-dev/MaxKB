@@ -24,6 +24,13 @@ const postResumeConversationMessage = (applicationId: string, chatId: string, ch
 const getConversationPage = (applicationId: string, page: number, size: number) =>
   get<ResponsePage<PortalConversationSummary>>(`${getApplicationPath(applicationId)}/chat/${page}/${size}`)
 
+/** 获取门户单个智能体的历史会话分页（懒加载），仅返回摘要，支持摘要模糊搜索。 */
+const getPortalConversationPage = (applicationId: string, page: number, size: number, abstract?: string) =>
+  get<ResponsePage<PortalConversationSummary>>(
+    `/v3/portal/chat/${applicationId}/${page}/${size}`,
+    abstract ? { abstract } : undefined,
+  )
+
 /** 获取单条会话记录详情(含执行详情 execution_details、知识来源、tokens、耗时)。 */
 const getConversationRecordDetail = (applicationId: string, chatId: string, chatRecordId: string) =>
   get(`${getApplicationPath(applicationId)}/chat/${chatId}/chat_record/${chatRecordId}`)
@@ -48,6 +55,7 @@ export default {
   postCancelConversationMessage,
   postResumeConversationMessage,
   getConversationPage,
+  getPortalConversationPage,
   getConversationRecordDetail,
   getConversationRecordPage,
   deleteConversation,

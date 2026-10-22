@@ -55,7 +55,7 @@ export function createPortalConversation(options: PortalConversationOptions): Po
   const portalList = createPortalConversationListStore({
     pageApplicationConversations: (page, size) => PortalApi.getPortalConversationPage(page, size),
     pageApplications: (page, size, name) => PortalApi.getPortalApplicationPage(page, size, name),
-    pageGroupConversations: (applicationId, page, size) => ConversationApi.getConversationPage(applicationId, page, size),
+    pageGroupConversations: (applicationId, page, size) => ConversationApi.getPortalConversationPage(applicationId, page, size),
     removeConversation: (applicationId, chatId) => ConversationApi.deleteConversation(applicationId, chatId),
     currentApplicationId,
     isApplicationListActive,
