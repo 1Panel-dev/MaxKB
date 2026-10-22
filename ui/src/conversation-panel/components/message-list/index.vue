@@ -6,11 +6,7 @@
         <el-icon class="is-loading" :size="18"><LoadingIcon /></el-icon>
       </div>
 
-      <div
-        v-for="(msg, i) in messages"
-        :key="msg.id || i"
-        :class="['msg-row', msg.role === 'USER' ? 'user' : 'assistant']"
-      >
+      <div v-for="(msg, i) in messages" :key="msg.id || i" :class="['msg-row', msg.role === 'USER' ? 'user' : 'assistant']">
         <ContentList :content-list="msg.content" />
         <!-- 助手消息结束后显示底部信息栏(知识来源/执行详情/tokens/耗时) -->
         <MessageFooter v-if="msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)" :message="msg" />
@@ -114,7 +110,7 @@ const onScroll = () => {
   flex-direction: column;
   gap: 6px;
   margin-bottom: 10px;
-  max-width: 680px;
+  max-width: 800px;
   width: 100%;
   box-sizing: border-box;
 }

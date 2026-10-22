@@ -78,7 +78,7 @@ const onScroll = async () => {
   flex-direction: column;
   gap: 6px;
   margin-bottom: 10px;
-  max-width: 680px;
+  max-width: 800px;
   width: 100%;
   box-sizing: border-box;
 }

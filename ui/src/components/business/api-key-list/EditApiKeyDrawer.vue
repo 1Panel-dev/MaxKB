@@ -108,10 +108,6 @@ function handleSave() {
   })
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!saving.value) done()
-}
-
 function handleClosed() {
   apiKeyId.value = ''
   form.secret_key = ''
@@ -128,7 +124,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="编辑 API Key" size="600" :before-close="handleBeforeClose" @closed="handleClosed">
+  <MkDrawer v-model="visible" title="编辑 API Key" @closed="handleClosed">
     <el-form ref="formRef" :model="form" :rules="rules" :inert="saving" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="API KEY">
         <el-input :model-value="form.secret_key" disabled>

@@ -297,10 +297,6 @@ function resetData() {
   formRef.value?.clearValidate()
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!saving.value) done()
-}
-
 function handleClosed() {
   resetData()
   emit('closed')
@@ -310,7 +306,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="editingId ? '编辑触发器' : '创建触发器'" @closed="handleClosed" :before-close="handleBeforeClose">
+  <MkDrawer v-model="visible" :title="editingId ? '编辑触发器' : '创建触发器'" @closed="handleClosed">
     <div v-loading="loading || saving">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
         <el-form-item label="触发器名称" prop="name">

@@ -118,7 +118,7 @@ onMounted(loadAccessRestriction)
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="访问限制" size="600" content-class="h-full" @closed="emit('closed')">
+  <MkDrawer v-model="visible" title="访问限制" @closed="emit('closed')">
     <div v-loading="loading" class="h-full" :inert="saving">
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
         <el-form-item label="每个客户端提问限制" prop="access_num">

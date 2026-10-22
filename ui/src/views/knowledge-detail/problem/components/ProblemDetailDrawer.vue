@@ -92,10 +92,6 @@ function handleParagraphClosed() {
   void handleLoadParagraphs()
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!loading.value) done()
-}
-
 watch(
   () => problem.value.id,
   () => {
@@ -109,7 +105,7 @@ defineExpose({ refresh: handleLoadParagraphs })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="问题详情" size="860" :before-close="handleBeforeClose" @closed="emit('closed')">
+  <MkDrawer v-model="visible" title="问题详情" size="840" @closed="emit('closed')">
     <div v-loading="loading">
       <div class="mb-4">
         <div class="mb-2">问题</div>

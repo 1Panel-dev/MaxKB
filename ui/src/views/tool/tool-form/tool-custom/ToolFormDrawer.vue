@@ -185,7 +185,6 @@ defineExpose({ open })
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
-
           <MkEditAvatar v-model="toolForm.icon" @change="handleIconChange">
             <template #default="{ icon }">
               <ToolIcon :icon="icon" />
