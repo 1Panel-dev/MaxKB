@@ -3,7 +3,15 @@
 import math
 
 from common.config.embedding_config import VectorStore
-from knowledge.models import Document, Paragraph, ParagraphAsset, ProblemParagraphMapping, SearchMode, SourceType
+from knowledge.models import (
+    Document,
+    LocalState,
+    Paragraph,
+    ParagraphAsset,
+    ProblemParagraphMapping,
+    SearchMode,
+    SourceType,
+)
 from knowledge.serializers.common import get_embedding_model_by_knowledge_id
 from knowledge.serializers.external_retrieval import RetrievalRequest
 from knowledge.services.multimodal_retrieval import get_retrieval_source_metadata
@@ -49,7 +57,9 @@ def retrieve(knowledge_id, identity, data):
     knowledge = authorize_external(knowledge_id, refresh_identity(identity))
     paragraphs = {
         str(p.id): p
-        for p in Paragraph.objects.select_related("document").filter(
+        for p in Paragraph.objects.select_related("document")
+        .exclude(local_state=LocalState.DELETED)
+        .filter(
             id__in=[row["paragraph_id"] for row in matches],
             knowledge_id=knowledge.id,
             document__knowledge_id=knowledge.id,

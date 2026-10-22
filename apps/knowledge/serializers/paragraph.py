@@ -166,6 +166,7 @@ class ParagraphSerializers(serializers.Serializer):
                     document_id=self.data.get("document_id"),
                     knowledge_id=self.data.get("knowledge_id"),
                 )
+                .exclude(local_state=LocalState.DELETED)
                 .exists()
             ):
                 raise AppApiException(500, _("Paragraph id does not exist"))
@@ -527,7 +528,7 @@ class ParagraphSerializers(serializers.Serializer):
 
         def get_query_set(self):
             self.is_valid()
-            query_set = QuerySet(model=Paragraph)
+            query_set = QuerySet(model=Paragraph).exclude(local_state=LocalState.DELETED)
             query_set = query_set.filter(
                 **{"knowledge_id": self.data.get("knowledge_id"), "document_id": self.data.get("document_id")}
             )
@@ -563,7 +564,12 @@ class ParagraphSerializers(serializers.Serializer):
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
-            if not QuerySet(Paragraph).filter(knowledge_id=knowledge_id, id=paragraph_id).exists():
+            if (
+                not QuerySet(Paragraph)
+                .filter(knowledge_id=knowledge_id, id=paragraph_id)
+                .exclude(local_state=LocalState.DELETED)
+                .exists()
+            ):
                 raise AppApiException(500, _("Paragraph does not exist"))
             if not QuerySet(Problem).filter(knowledge_id=knowledge_id, id=problem_id).exists():
                 raise AppApiException(500, _("Problem does not exist"))
@@ -645,14 +651,12 @@ class ParagraphSerializers(serializers.Serializer):
                 BatchSerializer(data=instance).is_valid(model=Paragraph, raise_exception=True)
                 self.is_valid(raise_exception=True)
             paragraph_id_list = instance.get("id_list")
-            synced_ids = list(
-                QuerySet(Paragraph)
-                .filter(id__in=paragraph_id_list, origin=ContentOrigin.SYNCED)
-                .values_list("id", flat=True)
+            paragraph_query_set = QuerySet(Paragraph).filter(id__in=paragraph_id_list)
+            manual_ids = list(paragraph_query_set.exclude(origin=ContentOrigin.SYNCED).values_list("id", flat=True))
+            paragraph_query_set.filter(origin=ContentOrigin.SYNCED).update(
+                local_state=LocalState.DELETED, is_active=False
             )
-            manual_ids = [paragraph_id for paragraph_id in paragraph_id_list if paragraph_id not in synced_ids]
-            QuerySet(Paragraph).filter(id__in=synced_ids).update(local_state=LocalState.DELETED, is_active=False)
-            QuerySet(Paragraph).filter(id__in=manual_ids).delete()
+            paragraph_query_set.filter(id__in=manual_ids).delete()
             delete_problems_and_mappings(manual_ids)
             update_document_char_length(self.data.get("document_id"))
             # 删除向量库

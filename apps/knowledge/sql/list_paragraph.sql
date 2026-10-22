@@ -3,4 +3,4 @@ SELECT
 	(SELECT "name" FROM "knowledge" WHERE "id"=knowledge_id) as knowledge_name,
 	*
 FROM
-	"paragraph"
+	(SELECT * FROM "paragraph" WHERE "local_state" <> 'deleted') "paragraph"

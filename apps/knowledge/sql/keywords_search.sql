@@ -11,6 +11,8 @@ FROM
 		("paragraph_id") ( similarity ),* ,similarity AS comprehensive_score
 	FROM
 		( SELECT *,ts_rank_cd(embedding.search_vector,websearch_to_tsquery('simple',%s),32) AS similarity  FROM embedding ${keywords_query}
+		AND EXISTS (SELECT 1 FROM paragraph
+		            WHERE paragraph.id = embedding.paragraph_id AND paragraph.local_state <> 'deleted')
 		AND COALESCE(search_vector @@ websearch_to_tsquery('simple',%s), false)) TEMP
 	ORDER BY
 		paragraph_id,

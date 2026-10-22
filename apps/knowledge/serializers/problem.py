@@ -11,7 +11,7 @@ from rest_framework import serializers
 from common.db.search import native_search, native_page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
-from knowledge.models import Problem, ProblemParagraphMapping, Paragraph, Knowledge, SourceType
+from knowledge.models import Problem, ProblemParagraphMapping, Paragraph, Knowledge, LocalState, SourceType
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id
 from knowledge.services.multimodal_retrieval import enrich_paragraph_sources
 from knowledge.task.embedding import delete_embedding_by_source_ids, update_problem_embedding, embedding_by_data_list
@@ -104,9 +104,9 @@ class ProblemSerializers(serializers.Serializer):
             paragraph_id_list = [p.get("paragraph_id") for p in paragraph_list]
 
             # 校验目标段落都属于当前知识库, 防止跨知识库关联并回读他人内容
-            if QuerySet(Paragraph).filter(id__in=paragraph_id_list, knowledge_id=knowledge_id).count() != len(
-                set(paragraph_id_list)
-            ):
+            if QuerySet(Paragraph).filter(id__in=paragraph_id_list, knowledge_id=knowledge_id).exclude(
+                local_state=LocalState.DELETED
+            ).count() != len(set(paragraph_id_list)):
                 raise AppApiException(500, _("Paragraph does not exist"))
             # 仅允许关联当前知识库下的问题
             problem_list = QuerySet(Problem).filter(id__in=problem_id_list, knowledge_id=knowledge_id)

@@ -273,6 +273,7 @@ class RetrievalCoreTests(SimpleTestCase):
         self.vector = self.stack.enter_context(patch.object(core.VectorStore, "get_embedding_vector"))
         self.documents = self.stack.enter_context(patch.object(core.Document, "objects"))
         self.paragraphs = self.stack.enter_context(patch.object(core.Paragraph, "objects"))
+        self.paragraphs.select_related.return_value.exclude.return_value = self.paragraphs.select_related.return_value
         self.paragraphs.select_related.return_value.filter.return_value = [
             SimpleNamespace(
                 id=PID,

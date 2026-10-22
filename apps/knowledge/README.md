@@ -68,6 +68,28 @@ without changing paragraph content or recognition results.
 Moving shared images to another knowledge base separates their file ownership records while
 reusing the stored bytes, so access checks and later paragraph deletion remain independent.
 
+## Paragraph deletion
+
+Single and batch deletion physically remove manually created paragraphs. Source-derived paragraphs
+retain their records and source metadata with `local_state=deleted` and `is_active=false`, so
+incremental synchronization can recognize local deletions and source conflicts. Both paths remove
+the deleted paragraphs' embeddings.
+
+Paragraph lists, pagination totals and document `paragraph_count` exclude `local_state=deleted`.
+Document character-length recalculation also excludes these rows. Disabled paragraphs that have
+not been deleted remain visible and counted; synchronization continues to read retained deleted rows.
+
+Problem association results and their paragraph counts also exclude deleted paragraphs; new single
+or batch associations to them are rejected. Existing mappings are retained for synchronization.
+Document and knowledge Excel exports, including single/batch content ZIPs, omit deleted paragraphs
+and their attachments. Knowledge migration archives omit them from Excel but retain them in
+`knowledge.json` resources, including source snapshots and related files, to preserve deletion state
+after import. Optional original source downloads remain the original uploaded files.
+
+Vector, keyword and hybrid search exclude deleted paragraphs before selecting candidates and applying
+Top N, even if old embeddings remain or a background task recreates them. Paragraph loading for hit
+tests, workflow retrieval and REST/MCP retrieval rechecks deletion state before returning content.
+
 ## 图片文档接口
 
 通用知识库支持将图片预览导入为独立图片文档。工作空间接口的知识库路径前缀为
