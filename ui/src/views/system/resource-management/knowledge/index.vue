@@ -165,7 +165,11 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 进入知识库详情 -->
-              <MkAction display="button" label="管理" icon="icon_admin_outlined" @click="handleOpenKnowledge(row)" />
+              <MkTooltip content="管理">
+                <el-button text type="primary" @click="handleOpenKnowledge(row)">
+                  <MkIcon name="icon_admin_outlined" />
+                </el-button>
+              </MkTooltip>
               <!-- 向量化 -->
               <EmbeddingKnowledgeAction
                 v-model:loading="knowledgeOperationLoading"

@@ -334,18 +334,21 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - `HomeStatistics` 接收完整的 Workspace Homepage、System Homepage 或 Overview API。
   智能体概览通过 `hideHeader: true` 隐藏详情布局标题栏，保留内容内的监控与排行标题。
   基本信息直接在概览页 `application-detail/overview/index.vue` 中组织 Web 访问与后端 API 访问卡片；
-  Web 链接通过当前范围的 Application API 查询访问凭证，沿用 V2 的工作流 API 参数默认值与编码方式；
+  Web 链接通过当前范围的 Application API 查询访问凭证，使用当前域名、Chat 部署前缀与访问凭证生成，不追加工作流输入参数；
   API 文档地址为 Chat 部署前缀下的 `/api-doc/`。两个地址使用只读输入框展示并支持复制；链接重置先确认，
-  成功后用返回的访问凭证更新链接，保留工作流参数，失败保留原链接。Web 访问开关查询后回填 `is_active`，
-  保存成功后按响应回显、失败保留原状态；开关保存与链接重置互斥，保存期间禁用开关、不显示 loading，链接重置保留按钮 loading。后端 API 访问开关仍待接入。
+  成功后用返回的访问凭证更新链接，失败保留原链接。Web 访问开关查询后回填 `is_active`，
+  保存成功后按响应回显、失败保留原状态；开关保存与链接重置共用 loading，操作期间禁用开关，重置按钮显示 loading。后端 API 访问开关仍待接入。
   “去对话”按钮直接在概览页维护；其余四个按钮流程分别放在 `embed-third-party/`、`access-restriction/`、
   `display-setting/`、`api-key/`，入口和对应弹窗同目录维护。API Key 弹窗通过 `resourceApi.apiKey` 传入当前范围的完整 API 与智能体 ID，
   复用 `business/api-key-list/`，Base URL 使用 Chat API 部署前缀加智能体 ID；
   Workspace 与 System 资源管理共用智能体弹窗，分别使用各自接口，不回退或使用头像菜单的全局系统 API Key。
   嵌入第三方弹窗接收概览已有的 Web 链接与访问凭证，不额外请求接口；按全屏、浮窗、移动端单选切换并复制代码，
-  关闭后恢复全屏模式。iframe 沿用 Web 链接及工作流参数，移动端增加 `mode=mobile`；浮窗使用 Chat API 前缀下的
-  `/embed`，携带协议、主机、访问凭证及工作流参数，生成 HTML 时转义属性值。无访问凭证时禁用入口。
-  其他访问配置及弹窗业务尚待接入，不模拟保存。
+  关闭后恢复全屏模式。iframe 沿用 Web 链接，移动端增加 `mode=mobile`；浮窗使用 Chat API 前缀下的
+  `/embed`，携带协议、主机和访问凭证，生成 HTML 时转义属性值。无访问凭证时禁用入口。
+  显示设置每次打开通过当前范围的 Application API 查询访问配置，支持主题色、语言、五类图片、
+  头像与对话展示开关、浮窗位置及免责声明，本地草稿实时预览。恢复默认仅改草稿，保存成功关闭，
+  失败保留输入；图片限 JPG／PNG／GIF、10 MB，替换、恢复默认、关闭及卸载时释放临时 URL。
+  展示配置保存协议及后端支持情况见 API 文档。访问限制弹窗业务尚待接入，不模拟保存。
   三类场景统一调用 `getMonitoring(workspaceId, range, applicationId)`；全部智能体使用空 ID，
   两类首页不提交智能体筛选，概览传当前智能体 ID。页面直接传入完整 API，不包装接口。
   排行由概览本地 `components/ApplicationRanking.vue` 调用 Overview API，展示用户 Tokens 消耗与提问次数两类 TOP5。

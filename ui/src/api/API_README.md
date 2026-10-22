@@ -379,6 +379,11 @@ Workspace 与 System 资源管理的 `application/application.ts` 提供 `getAcc
 两范围的 `putAccessToken` 向同一路径提交 `{ access_token_reset: true }` 重置链接，或 `{ is_active: boolean }` 修改 Web 访问状态；
 载荷复用 `ApplicationAccessTokenPayload`，使用返回的访问凭证与启用状态回显，不二次查询。
 
+展示设置共用 `ApplicationDisplaySetting`；`ApplicationAccessToken` 兼容可选展示字段，缺失字段由弹窗补齐默认值。
+两范围的 `putDisplaySetting` 沿用 V2 的 `/<applicationId>/setting` PUT 接口，提交 FormData：
+`custom_theme`、`float_location` 序列化为 JSON，图片字段提交本次文件，`<field>_url` 保留已有地址；
+恢复默认时图片文件与地址均提交空字符串。当前社区版后端未提供该路由，完整保存依赖支持此接口的部署。
+
 API Key 按三个入口分别维护：
 
 - `admin/workspace/application/api-key.ts`：`/workspace/<workspaceId>/application/<applicationId>/application_key`。
