@@ -45,7 +45,7 @@
 | `knowledge-detail/library/document/`、`tags/`                                         | 文档及标签维护                               |
 | `knowledge-detail/library/image/`                                                     | 图片列表，复用文档操作                       |
 | `knowledge-detail/hit-test/`                                                          | 召回测试参数、文本／图片查询及结果展示       |
-| `knowledge-detail/problem/`                                                          | 问题查询、维护与分段关联                               |
+| `knowledge-detail/problem/`                                                           | 问题查询、维护与分段关联                     |
 | `knowledge-detail/termbase/`                                                          | 知识库自定义分词维护                         |
 | `knowledge-detail/chat-user/`、`external-retrieval/`                                  | 对话授权与外部检索配置                       |
 | `knowledge-detail/setting/base/`、`document-strategy/`、`scheduled-sync/`             | 基础设置、文档策略、定时同步与日志           |
@@ -96,6 +96,9 @@
 - System 模型／工具使用表格，保留既有权限、引用数量删除提示和末页回退；不新增不存在的创建／导入能力。
   工作空间列与选项仅企业版显示，筛选 `workspace_ids` 使用 JSON 数组字符串。
 - Workspace 共享知识库只读；System 共享资源页面按自身 API 维护，不组合 Workspace 文件夹移动等操作。
+- System 共享知识库、模型、工具菜单复用功能本地 `authorized-workspace-action/index.vue`，打开同目录的
+  `AuthorizedWorkspaceDialog` 配置工作空间白名单／黑名单；保留弹窗实例，关闭动画结束后清空本次数据，
+  保存失败保留草稿。
 
 资源授权和关联资源入口按需挂载公共抽屉，关闭动画结束后卸载。授权使用资源数据的
 `workspace_id`；关联资源抽屉的查询与工作空间展示规则见组件和 API 文档。

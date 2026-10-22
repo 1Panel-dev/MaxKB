@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
 import { computed, onMounted, ref } from 'vue'
 import type { Dict, ModelItem, ModelProviderItem, OptionItem } from '@/api/types'
 import { MODEL_TYPE_LABELS } from '@/constants'
@@ -11,6 +12,7 @@ import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
 import ModelProvider from '@/views/model/components/ModelProvider.vue'
 import { DeleteModelAction, EditModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
 import perm from '@/permission'
+import { RESOURCE_TYPE } from '@/api/enums'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 
@@ -88,7 +90,13 @@ onMounted(() => {
         <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 添加模型 -->
-          <ButtonAddModel v-if="perm.model.share.create()" :api="SystemSharedModelApi" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
+          <ButtonAddModel
+            v-if="perm.model.share.create()"
+            :api="SystemSharedModelApi"
+            :current-provider="currentProvider"
+            :providers="modelProviders"
+            @refresh="loadModels"
+          />
         </div>
       </component>
       <div v-loading="loading">
@@ -97,10 +105,23 @@ onMounted(() => {
             <ModelCard :api="SystemSharedModelApi" :model="model" :provider="getModelProvider(model)" :refresh="loadModels" :shared="true">
               <template #action-dropdown>
                 <!-- 编辑 -->
-                <EditModelAction v-if="perm.model.share.modify()" label="编辑" :api="SystemSharedModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
-                <!-- // TODO 授权工作空间 -->
+                <EditModelAction
+                  v-if="perm.model.share.modify()"
+                  label="编辑"
+                  :api="SystemSharedModelApi"
+                  :model="model"
+                  :provider="getModelProvider(model)"
+                  @refresh="loadModels"
+                />
                 <!-- 模型参数设置 -->
-                <ParamSettingAction v-if="model.model_type !== 'RERANKER' && perm.model.share.paramSetting()" label="模型参数设置" :api="SystemSharedModelApi" :model="model" />
+                <ParamSettingAction
+                  v-if="model.model_type !== 'RERANKER' && perm.model.share.paramSetting()"
+                  label="模型参数设置"
+                  :api="SystemSharedModelApi"
+                  :model="model"
+                />
+                <!-- 授权工作空间 -->
+                <AuthorizedWorkspaceAction label="授权工作空间" :resource="model" :resource-type="RESOURCE_TYPE.MODEL" />
 
                 <!-- 查看关联资源 -->
                 <RelatedResourcesModelAction v-if="perm.model.share.relateMap()" label="查看关联资源" :api="RelatedResourcesApi" :model="model" />

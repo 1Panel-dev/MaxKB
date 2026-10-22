@@ -241,6 +241,14 @@ System 不传 Workspace 文件夹条件；System 共享不提供智能体选择�
 将响应的 `tools` 与 `shared_tools` 合并为 `ToolItem[]`，用于包含已授权共享工具的选项查询；
 按工具类型筛选时使用 `tool_type`。`workspace/shared/tool.ts` 的 `getAllTool(query)` 仅查询共享工具。
 
+### System 共享资源工作空间授权
+
+`system/shared-resources/authorization.ts` 通过 GET、POST
+`/system/shared/<knowledge|model|tool>/<resourceId>/authorization` 查询和保存工作空间授权，
+沿用 v2 System 共享授权协议，依赖部署端提供对应接口。配置类型为 `SharedWorkspaceAuthorization`，
+包含 `authentication_type`（`WHITE_LIST`／`BLACK_LIST`）和 `workspace_id_list`；请求层直接解包配置。
+弹窗通过 System Workspace API 查询工作空间，不读取路由中的工作空间 ID。
+
 ### System 共享工具
 
 `system/shared-resources/tool/tool.ts` 使用 `/system/shared/tool`，维护分页、详情、创建、更新、删除、

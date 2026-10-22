@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
@@ -7,7 +8,7 @@ import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowle
 import SystemSharedRelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
 import SystemCommonApi from '@/api/admin/system/common'
 import type { Dict, KnowledgeItem, OptionItem } from '@/api/types'
-import { KNOWLEDGE_TYPE } from '@/api/enums'
+import { RESOURCE_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
 import KnowledgeCard from '@/views/knowledge/knowledge-card/KnowledgeCard.vue'
 import ButtonCreateKnowledge from '@/views/knowledge/components/ButtonCreateKnowledge.vue'
 import ButtonTemplateStore from '@/views/knowledge/components/ButtonTemplateStore.vue'
@@ -140,9 +141,12 @@ function handleSearchChange(query?: Dict<unknown>) {
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                   />
+
+                  <!-- 授权工作空间 -->
+                  <AuthorizedWorkspaceAction label="授权工作空间" :resource="knowledge" :resource-type="RESOURCE_TYPE.KNOWLEDGE" />
+
                   <!-- 查看关联资源 -->
                   <RelatedResourcesKnowledgeAction label="查看关联资源" :api="SystemSharedRelatedResourcesApi" :knowledge="knowledge" />
-                  <!-- TODO 授权工作空间 -->
                   <!-- 导出共享知识库 -->
                   <ExportKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"

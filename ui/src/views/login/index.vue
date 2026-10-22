@@ -38,6 +38,7 @@ const qrCodeLoginConfig = computed<LoginConfig>(() => ({
 const showLoginModeSwitch = computed(() => accountLoginMethods.value.length > 0 && qrCodeProviders.value.length > 0)
 
 onBeforeMount(() => {
+  // TODO 根据默认跳转
   isLoading.value = true
   auth
     .loadPlatformProfile()
