@@ -9,7 +9,6 @@ import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { LoginConfig, LoginMethod } from '@/api/types'
-import { MsgConfirm } from '@/utils/message'
 import { v4 as uuidv4 } from 'uuid'
 
 interface AccountLoginForm {
@@ -100,7 +99,7 @@ const refreshCaptcha = () => {
 const selectLoginMethod = (method: LoginMethod) => {
   if (props.preview) return
   if (method !== LOGIN_METHOD.LOCAL && method !== LOGIN_METHOD.LDAP) {
-    void redirectExternalLogin(method, true)
+    void redirectExternalLogin(method)
     return
   }
   loginMethod.value = method
@@ -109,16 +108,9 @@ const selectLoginMethod = (method: LoginMethod) => {
   accountLoginFormRef.value?.clearValidate()
 }
 
-const redirectExternalLogin = async (method: LoginMethod, needConfirm: boolean) => {
+const redirectExternalLogin = async (method: LoginMethod) => {
   const redirectUrl = await getExternalLoginUrl(method)
   if (!redirectUrl) return
-  if (needConfirm) {
-    return MsgConfirm('跳转提示', '即将跳转至外部认证页面，是否继续？', { confirmButtonText: '跳转', confirmButtonType: 'primary' })
-      .then(() => {
-        window.location.href = redirectUrl
-      })
-      .catch(() => {})
-  }
   window.location.href = redirectUrl
 }
 
@@ -154,11 +146,10 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
 
 onMounted(() => {
   if (props.preview) return
-  const loginMethods = accountLoginMethods.value
   if (route.query.login_mode !== 'manual') {
-    const loginMethod = loginMethods[0]
-    if (loginMethod && [LOGIN_METHOD.CAS, LOGIN_METHOD.OIDC, LOGIN_METHOD.OAUTH2, LOGIN_METHOD.SAML2].some((authType) => authType === loginMethod)) {
-      void redirectExternalLogin(loginMethod, false)
+    const defaultLoginMethod = loginMethod.value
+    if ([LOGIN_METHOD.CAS, LOGIN_METHOD.OIDC, LOGIN_METHOD.OAUTH2, LOGIN_METHOD.SAML2].some((authType) => authType === defaultLoginMethod)) {
+      void redirectExternalLogin(defaultLoginMethod)
     }
   }
 })
@@ -211,7 +202,7 @@ onMounted(() => {
           <el-button :loading="isSubmitting" native-type="submit" type="primary" class="w-full">登录</el-button>
         </el-form-item>
       </el-form>
-      <el-button size="default" class="mt-3" link type="primary" @click="router.push({ name: 'forgot-password' })"> 忘记密码？ </el-button>
+      <el-button size="default" class="mt-3" link type="primary" @click="router.push({ name: 'forgot-password' })">忘记密码？</el-button>
     </div>
     <div v-if="accountLoginMethods.length" class="third-login flex-col-center gap-4">
       <el-divider>其他登录方式</el-divider>
