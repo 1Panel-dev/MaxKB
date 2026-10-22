@@ -42,8 +42,6 @@ v3=[
     path('chat_user/profile', v3_views.ChatUserProfileView.as_view(), name='v3_chat_user_profile'),
     path('chat_user/current/reset_password', v3_views.ResetCurrentUserPasswordView.as_view(), name='v3_reset_password_current'),
     path('api_key', v3_views.ChatUserApiKeyView.as_view()),
-    path('api_key/<int:current_page>/<int:page_size>', v3_views.ChatUserApiKeyView.Page.as_view()),
-    path('api_key/<str:api_key_id>', v3_views.ChatUserApiKeyView.Operate.as_view()),
     path('portal/application/<int:current_page>/<int:page_size>', v3_views.PortalApplicationView.as_view(), name='v3_portal_application'),
     path('portal/chat/<int:current_page>/<int:page_size>', v3_views.PortalHistoricalConversationView.as_view(), name='v3_portal_historical_conversation'),
     path('portal/chat/<str:application_id>/<int:current_page>/<int:page_size>', v3_views.PortalConversationQueryView.as_view(), name='v3_portal_conversation_query'),

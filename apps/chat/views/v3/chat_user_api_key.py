@@ -1,14 +1,15 @@
+from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
+
 from common.auth import ChatTokenAuth
 from common.log.log import log
 from common.result import result
-from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter
 
-from chat.serializers.chat_user_api_key_serializers import ChatUserApiKeySerializer
+from chat.serializers.chat_user_api_key_serializers import ChatUserApiKeyModelSerializer, ChatUserApiKeySerializer
+from system_manage.models import ChatUserApiKey
 
 
 class ChatUserApiKeyView(APIView):
@@ -26,44 +27,19 @@ class ChatUserApiKeyView(APIView):
     def post(self, request: Request):
         return result.success(ChatUserApiKeySerializer(data={"user_id": request.user.id}).generate())
 
-    class Page(APIView):
-        authentication_classes = [ChatTokenAuth]
-
-        @extend_schema(
-            methods=["GET"],
-            description=_("Get ChatUserAPIKey List"),
-            summary=_("Get ChatUserAPIKey List"),
-            operation_id="V3 Get ChatUserAPIKey List",
-            parameters=[
-                OpenApiParameter(name='order_by', type=OpenApiTypes.STR, location=OpenApiParameter.QUERY,
-                                 description=_('order by'), required=False),
-            ],
-            responses=None,
-            tags=[_("V3 Chat User API Key")],  # type: ignore
-        )
-        def get(self, request: Request, current_page, page_size):
-            return result.success(
-                ChatUserApiKeySerializer(
-                    data={"user_id": request.user.id, "order_by": request.query_params.get("order_by")}
-                ).page(current_page, page_size)
-            )
-
-    class Operate(APIView):
-        authentication_classes = [ChatTokenAuth]
-
-        @extend_schema(
-            methods=["DELETE"],
-            description=_("Delete ChatUserAPIKey"),
-            summary=_("Delete ChatUserAPIKey"),
-            operation_id="V3 Delete ChatUserAPIKey",
-            responses=None,
-            parameters=None,
-            tags=[_("V3 Chat User API Key")],  # type: ignore
-        )
-        @log(menu="Chat User API Key", operate="Delete chat user API key")
-        def delete(self, request: Request, api_key_id: str):
-            return result.success(
-                ChatUserApiKeySerializer.Operate(
-                    data={"id": api_key_id, "user_id": request.user.id}
-                ).destroy()
-            )
+    @extend_schema(
+        methods=["GET"],
+        description=_("Get ChatUserAPIKey"),
+        summary=_("Get ChatUserAPIKey"),
+        operation_id="V3 Get ChatUserAPIKey",
+        responses=None,
+        tags=[_("V3 Chat User API Key")],  # type: ignore
+    )
+    @log(menu="Chat User API Key", operate="Get chat user API key")
+    def get(self, request: Request):
+        user_id = request.user.id
+        api_key = QuerySet(ChatUserApiKey).filter(user_id=user_id).first()
+        if api_key is None:
+            # 用户还没有 API Key，直接调用生成逻辑
+            return result.success(ChatUserApiKeySerializer(data={"user_id": user_id}).generate())
+        return result.success(ChatUserApiKeyModelSerializer(api_key).data)

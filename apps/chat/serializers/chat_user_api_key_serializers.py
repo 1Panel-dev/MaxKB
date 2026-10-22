@@ -34,28 +34,3 @@ class ChatUserApiKeySerializer(serializers.Serializer):
         )
         api_key.save()
         return ChatUserApiKeyModelSerializer(api_key).data
-
-    def page(self, current_page: int, page_size: int, with_valid=True):
-        if with_valid:
-            self.is_valid(raise_exception=True)
-        user_id = self.data.get("user_id")
-        query_set = QuerySet(ChatUserApiKey).filter(user_id=user_id)
-        order_by = (
-            "-create_time"
-            if self.data.get("order_by") is None or self.data.get("order_by") == ""
-            else self.data.get("order_by")
-        )
-        query_set = query_set.order_by(order_by)
-        return page_search(
-            current_page, page_size, query_set, post_records_handler=lambda u: ChatUserApiKeyModelSerializer(u).data
-        )
-
-    class Operate(serializers.Serializer):
-        id = serializers.UUIDField(required=True, label=_("api key id"))
-        user_id = serializers.UUIDField(required=True, label=_("user id"))
-
-        def destroy(self, with_valid=True):
-            if with_valid:
-                self.is_valid(raise_exception=True)
-            QuerySet(ChatUserApiKey).filter(id=self.data.get("id"), user_id=self.data.get("user_id")).delete()
-            return True
