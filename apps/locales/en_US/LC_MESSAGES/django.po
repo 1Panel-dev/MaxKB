@@ -9747,3 +9747,12 @@ msgstr "Width and height must be in [512, 2048] and the area must not exceed 102
 
 msgid "api_key is required"
 msgstr "api_key is required"
+
+
+#: apps/chat/serializers/portal.py:219
+msgid "Application is not authorized"
+msgstr "Application is not authorized"
+
+#: apps/chat/serializers/portal.py:221
+msgid "Application historical conversation is not enabled"
+msgstr "Application historical conversation is not enabled"

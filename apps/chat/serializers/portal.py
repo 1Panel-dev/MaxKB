@@ -138,24 +138,28 @@ class PortalApplicationSerializer(serializers.Serializer):
 
 
 def get_recent_chats_map(user_id, application_ids, limit=5):
-    """批量返回 application_id -> 该应用最近的 limit 条历史会话；show_history=false 的应用不在此表里"""
-    chats = Chat.objects.filter(chat_user_id=user_id, is_deleted=False, application_id__in=application_ids).order_by(
-        "application_id", "-update_time", "id"
+    """批量返回 application_id -> 该应用最近的 limit 条历史会话及其总数；show_history=false 的应用不在此表里"""
+    chats = (
+        Chat.objects.filter(chat_user_id=user_id, is_deleted=False, application_id__in=application_ids)
+        .order_by("application_id", "-update_time", "id")
+        .values("application_id", "id", "abstract", "create_time", "update_time")
     )
-    result = {}
+    chat_map = {}
+    count_map = {}
     for chat in chats:
-        key = str(chat.application_id)
-        if len(result.get(key, [])) >= limit:
-            continue
-        result.setdefault(key, []).append(
-            {
-                "id": str(chat.id),
-                "abstract": chat.abstract,
-                "create_time": str(chat.create_time),
-                "update_time": str(chat.update_time),
-            }
-        )
-    return result
+        key = str(chat["application_id"])
+        count_map[key] = count_map.get(key, 0) + 1
+        recent = chat_map.setdefault(key, [])
+        if len(recent) < limit:
+            recent.append(
+                {
+                    "id": str(chat["id"]),
+                    "abstract": chat["abstract"],
+                    "create_time": str(chat["create_time"]),
+                    "update_time": str(chat["update_time"]),
+                }
+            )
+    return chat_map, count_map
 
 
 class PortalHistoricalConversationSerializer(serializers.Serializer):
@@ -192,8 +196,49 @@ class PortalHistoricalConversationSerializer(serializers.Serializer):
             app_ids = [record["id"] for record in result["records"]]
             settings_map = get_application_settings_map(app_ids)
             show_history_ids = [aid for aid in app_ids if settings_map.get(aid, {}).get("show_history")]
-            chat_map = get_recent_chats_map(user_id, show_history_ids) if show_history_ids else {}
+            chat_map, count_map = get_recent_chats_map(user_id, show_history_ids) if show_history_ids else ({}, {})
             for record in result["records"]:
                 record.update(settings_map.get(record["id"], {}))
                 record["conversations"] = chat_map.get(record["id"], [])
+                record["count"] = count_map.get(record["id"], 0)
             return result
+
+
+class PortalConversationQuerySerializer(PortalApplicationAuthMixin, serializers.Serializer):
+    """门户单个智能体的历史会话分页查询（懒加载/滚动加载），仅返回摘要，支持摘要模糊查询。"""
+
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"), help_text=_("Application ID"))
+    abstract = serializers.CharField(
+        required=False, allow_blank=True, label=_("Abstract"), help_text=_("Conversation abstract keyword")
+    )
+
+    def _authorize(self, user_id):
+        application_id = str(self.data.get("application_id"))
+        authorized_ids = {str(item) for item in self.get_authorized_application_ids(user_id)}
+        if application_id not in authorized_ids:
+            raise serializers.ValidationError(_("Application is not authorized"))
+        if not get_application_settings_map([application_id]).get(application_id, {}).get("show_history"):
+            raise serializers.ValidationError(_("Application historical conversation is not enabled"))
+
+    def page(self, current_page, page_size, user_id, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        self._authorize(user_id)
+        application_id = self.data.get("application_id")
+        queryset = Chat.objects.filter(application_id=application_id, chat_user_id=user_id, is_deleted=False).order_by(
+            "-update_time", "id"
+        )
+        abstract = self.data.get("abstract")
+        if abstract:
+            queryset = queryset.filter(abstract__icontains=abstract)
+        return page_search(
+            current_page,
+            page_size,
+            queryset,
+            post_records_handler=lambda chat: {
+                "id": str(chat.id),
+                "abstract": chat.abstract,
+                "create_time": str(chat.create_time),
+                "update_time": str(chat.update_time),
+            },
+        )

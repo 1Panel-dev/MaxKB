@@ -23,4 +23,5 @@ export interface PortalApplicationConversations {
   name: string
   icon: string
   conversations: PortalConversationSummary[]
+  count: number
 }
