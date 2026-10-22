@@ -124,6 +124,25 @@ h6 {
   z-index: 1;
 }
 
+/* checkbox */
+.mk-checkbox-group-vertical {
+  display: flex;
+  flex-direction: column;
+
+  .el-checkbox {
+    margin-right: 0;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .el-checkbox__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 /* dot */
 // 状态圆点
 .mk-dot-danger {

@@ -36,3 +36,5 @@ export type * from './document'
 export type * from './paragraph'
 export type * from './termbase'
 export type * from './chat-log'
+
+export type * from './shared-authorization'

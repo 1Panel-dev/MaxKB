@@ -52,14 +52,8 @@ function handleConfirm() {
         <el-checkbox :indeterminate="selectionIndeterminate" :model-value="allSelected" class="mr-0!" @change="handleSelectAllChange">
           全部
         </el-checkbox>
-        <el-checkbox-group v-model="pendingValues" class="flex-column gap-2">
-          <el-checkbox
-            v-for="option in options"
-            :key="`${typeof option.value}:${option.value}`"
-            :value="option.value"
-            :disabled="option.disabled"
-            class="mk-table-filter__option mr-0! w-full min-w-0"
-          >
+        <el-checkbox-group v-model="pendingValues" class="mk-checkbox-group-vertical gap-2">
+          <el-checkbox v-for="option in options" :key="`${typeof option.value}:${option.value}`" :value="option.value" :disabled="option.disabled">
             <span class="block min-w-0 truncate" :title="option.label">{{ option.label }}</span>
           </el-checkbox>
         </el-checkbox-group>
@@ -68,19 +62,11 @@ function handleConfirm() {
 
     <div class="p-3 text-right">
       <!-- 清除多选筛选 -->
-      <el-button class="min-w-12! w-12!" size="small" @click="handleReset">重置</el-button>
+      <el-button plain class="min-w-12! w-12!" size="small" @click="handleReset">重置</el-button>
       <!-- 确认多选筛选 -->
       <el-button class="min-w-12! w-12!" size="small" type="primary" @click="handleConfirm">确定</el-button>
     </div>
   </el-popover>
 </template>
 
-<style scoped lang="scss">
-/* 多选选项 */
-.mk-table-filter__option {
-  :deep(.el-checkbox__label) {
-    min-width: 0;
-    overflow: hidden;
-  }
-}
-</style>
+<style scoped lang="scss"></style>

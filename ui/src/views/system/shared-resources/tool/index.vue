@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import SystemSharedRelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
@@ -7,7 +8,7 @@ import CommonSystemApi from '@/api/admin/system/common'
 import SystemSharedToolWorkflowApi from '@/api/admin/system/shared-resources/tool/tool-workflow'
 import type { ParamsPage } from '@/api/admin/core/types'
 import type { Dict, OptionItem, ToolItem, ToolType } from '@/api/types'
-import { TOOL_TYPE } from '@/api/enums'
+import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS } from '@/constants'
 import ToolCard from '@/views/tool/tool-card/ToolCard.vue'
 import ToolStatusSwitch from '@/views/tool/tool-card/ToolStatusSwitch.vue'
@@ -129,7 +130,13 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
               >
                 <template #actions>
                   <!-- 修改工具状态 -->
-                  <ToolStatusSwitch v-if="perm.tool.share.switch()" v-model:loading="toolOperationLoading" :api="SystemSharedToolApi" :tool="tool" @update="handleToolUpdate" />
+                  <ToolStatusSwitch
+                    v-if="perm.tool.share.switch()"
+                    v-model:loading="toolOperationLoading"
+                    :api="SystemSharedToolApi"
+                    :tool="tool"
+                    @update="handleToolUpdate"
+                  />
                   <el-divider direction="vertical" class="ml-1!" />
                 </template>
                 <template #action-dropdown>
@@ -178,8 +185,16 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                     :api="SystemSharedToolApi"
                     :tool="tool"
                   />
+                  <!-- 授权工作空间 -->
+                  <AuthorizedWorkspaceAction label="授权工作空间" :resource="tool" :resource-type="RESOURCE_TYPE.TOOL" />
+
                   <!-- 查看关联资源 -->
-                  <RelatedResourcesToolAction v-if="perm.tool.share.relateMap()" label="查看关联资源" :api="SystemSharedRelatedResourcesApi" :tool="tool" />
+                  <RelatedResourcesToolAction
+                    v-if="perm.tool.share.relateMap()"
+                    label="查看关联资源"
+                    :api="SystemSharedRelatedResourcesApi"
+                    :tool="tool"
+                  />
                   <!-- 查看执行记录 -->
                   <ExecutionRecordToolAction
                     v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.share.record()"
@@ -187,7 +202,6 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                     :api="SystemSharedToolWorkflowApi"
                     :tool="tool"
                   />
-                  <!--  TODO 授权工作空间 -->
                   <!-- 导出共享工具 -->
                   <ExportToolAction
                     v-if="!tool.template_id && perm.tool.share.export()"

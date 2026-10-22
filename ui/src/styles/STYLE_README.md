@@ -211,6 +211,9 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 
 ## 常用交互工具类
 
+纵向复选框组在 `el-checkbox-group` 上添加 `mk-checkbox-group-vertical`，由 `app.scss` 统一
+设置纵向排列、8px 间距、选项整行宽度及长标签省略；标签文本需提供原生 `title`。
+
 纵向单选组在 `el-radio-group` 上添加 `mk-radio-group-vertical`，统一整行宽度、8px 间距及
 多行选项的顶部对齐；普通单行和带描述的选项均可使用。
 

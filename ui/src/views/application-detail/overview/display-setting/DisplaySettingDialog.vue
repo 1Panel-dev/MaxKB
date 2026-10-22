@@ -176,30 +176,10 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog
-    v-model="visible"
-    title="显示设置"
-    :width="960"
-    :before-close="
-      (done: () => void) => {
-        if (!loading && !saving) done()
-      }
-    "
-    @closed="handleClosed"
-  >
-    <template #header>
-      <div class="flex-between pr-6">
-        <h3>显示设置</h3>
-        <!-- 恢复默认展示配置 -->
-        <el-button link :disabled="!loaded || loading || saving" @click="handleRestoreDefault">
-          <MkIcon :icon="Refresh" />
-          <span>恢复默认</span>
-        </el-button>
-      </div>
-    </template>
+  <MkDialog v-model="visible" title="显示设置" align-center class="mk-aside-content-dialog" :width="1000" @closed="handleClosed">
     <div v-loading="loading" class="min-h-60">
-      <div v-if="loaded" class="grid gap-6 md:grid-cols-[400px_minmax(0,1fr)]" :inert="saving">
-        <div class="relative h-142 rounded-lg border border-N200 bg-N100 p-5">
+      <div v-if="loaded" class="grid gap-6 grid-cols-2" :inert="saving">
+        <div class="relative">
           <div class="flex-column h-full overflow-hidden rounded-xl border border-N200 bg-white shadow-lg">
             <div class="flex-between gap-3 border-b border-N200 bg-N100 px-4 py-3" :style="previewHeaderStyle">
               <div class="flex-align-center min-w-0 gap-2">
@@ -249,105 +229,104 @@ defineExpose({ open })
             </el-avatar>
           </div>
         </div>
-        <el-scrollbar max-height="568px">
-          <el-form :model="displayForm" label-position="top" class="pr-3" @submit.prevent>
-            <div class="grid grid-cols-2 gap-4">
-              <el-form-item label="自定义主题色">
-                <div class="flex-align-center gap-2">
-                  <el-color-picker v-model="displayForm.custom_theme.theme_color" />
-                  <span v-if="!displayForm.custom_theme.theme_color" class="text-N600">默认</span>
-                </div>
+        <div>
+          <el-scrollbar max-height="568px">
+            <el-form :model="displayForm" label-position="top" class="pr-3" @submit.prevent>
+              <div class="grid grid-cols-2 gap-4">
+                <el-form-item label="自定义主题色">
+                  <div class="flex-align-center gap-2">
+                    <el-color-picker v-model="displayForm.custom_theme.theme_color" />
+                    <span v-if="!displayForm.custom_theme.theme_color" class="text-N600">默认</span>
+                  </div>
+                </el-form-item>
+                <el-form-item label="头部标题字体颜色"><el-color-picker v-model="displayForm.custom_theme.header_font_color" /></el-form-item>
+              </div>
+              <el-form-item label="语言">
+                <el-select v-model="displayForm.language" clearable placeholder="跟随系统">
+                  <el-option v-for="language in languageOptions" :key="language.value" :label="language.label" :value="language.value" />
+                </el-select>
               </el-form-item>
-              <el-form-item label="头部标题字体颜色"><el-color-picker v-model="displayForm.custom_theme.header_font_color" /></el-form-item>
-            </div>
-            <el-form-item label="语言">
-              <el-select v-model="displayForm.language" clearable placeholder="跟随系统">
-                <el-option v-for="language in languageOptions" :key="language.value" :label="language.label" :value="language.value" />
-              </el-select>
-            </el-form-item>
-            <div class="space-y-3">
-              <template v-for="field in imageFields" :key="field.key">
-                <div class="rounded-lg border border-N200 p-3">
-                  <div class="flex-between gap-3">
-                    <h6>{{ field.label }}</h6>
-                    <div class="flex-align-center gap-3">
-                      <el-checkbox v-if="'visibility' in field" v-model="displayForm[field.visibility]">显示</el-checkbox>
-                      <!-- 替换当前展示图片 -->
-                      <el-upload
-                        action="#"
-                        :auto-upload="false"
-                        :show-file-list="false"
-                        accept="image/jpeg,image/png,image/gif"
-                        :on-change="(file: UploadFile) => handleImageChange(file, field.key)"
-                      >
-                        <el-button size="small">替换</el-button>
-                      </el-upload>
-                    </div>
-                  </div>
-                  <p class="mt-2 text-sm text-N600">
-                    {{ field.key === 'chat_background' ? '' : '建议尺寸 32 × 32，' }}支持 JPG、PNG、GIF，大小不超过 10 MB
-                  </p>
-                  <div v-if="field.key === 'float_icon'" class="mt-3 border-t border-N200 pt-3">
-                    <div class="flex-between mb-2">
-                      <span>图标默认位置</span>
-                      <el-checkbox v-model="displayForm.draggable">可拖拽位置</el-checkbox>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                      <div class="flex-align-center gap-1">
-                        <el-select v-model="displayForm.float_location.x.type" class="w-17! shrink-0">
-                          <el-option label="左" value="left" />
-                          <el-option label="右" value="right" />
-                        </el-select>
-                        <el-input-number
-                          v-model="displayForm.float_location.x.value"
-                          class="min-w-0! w-full!"
-                          :min="0"
-                          :precision="0"
-                          :value-on-clear="0"
-                          controls-position="right"
-                          align="left"
-                        />
-                        <span>px</span>
+              <div class="space-y-3">
+                <template v-for="field in imageFields" :key="field.key">
+                  <div class="rounded-lg border border-N200 p-3">
+                    <div class="flex-between gap-3">
+                      <h6>{{ field.label }}</h6>
+                      <div class="flex-align-center gap-3">
+                        <el-checkbox v-if="'visibility' in field" v-model="displayForm[field.visibility]">显示</el-checkbox>
+                        <!-- 替换当前展示图片 -->
+                        <el-upload
+                          action="#"
+                          :auto-upload="false"
+                          :show-file-list="false"
+                          accept="image/jpeg,image/png,image/gif"
+                          :on-change="(file: UploadFile) => handleImageChange(file, field.key)"
+                        >
+                          <el-button size="small">替换</el-button>
+                        </el-upload>
                       </div>
-                      <div class="flex-align-center gap-1">
-                        <el-select v-model="displayForm.float_location.y.type" class="w-17! shrink-0">
-                          <el-option label="上" value="top" />
-                          <el-option label="下" value="bottom" />
-                        </el-select>
-                        <el-input-number
-                          v-model="displayForm.float_location.y.value"
-                          class="min-w-0! w-full!"
-                          :min="0"
-                          :precision="0"
-                          :value-on-clear="0"
-                          controls-position="right"
-                          align="left"
-                        />
-                        <span>px</span>
+                    </div>
+                    <p class="mt-2 text-sm text-N600">
+                      {{ field.key === 'chat_background' ? '' : '建议尺寸 32 × 32，' }}支持 JPG、PNG、GIF，大小不超过 10 MB
+                    </p>
+                    <div v-if="field.key === 'float_icon'" class="mt-3 border-t border-N200 pt-3">
+                      <div class="flex-between mb-2">
+                        <span>图标默认位置</span>
+                        <el-checkbox v-model="displayForm.draggable">可拖拽位置</el-checkbox>
+                      </div>
+                      <div class="grid grid-cols-2 gap-3">
+                        <div class="flex-align-center gap-1">
+                          <el-select v-model="displayForm.float_location.x.type" class="w-17! shrink-0">
+                            <el-option label="左" value="left" />
+                            <el-option label="右" value="right" />
+                          </el-select>
+                          <el-input-number
+                            v-model="displayForm.float_location.x.value"
+                            class="min-w-0! w-full!"
+                            :min="0"
+                            :precision="0"
+                            :value-on-clear="0"
+                            controls-position="right"
+                            align="left"
+                          />
+                          <span>px</span>
+                        </div>
+                        <div class="flex-align-center gap-1">
+                          <el-select v-model="displayForm.float_location.y.type" class="w-17! shrink-0">
+                            <el-option label="上" value="top" />
+                            <el-option label="下" value="bottom" />
+                          </el-select>
+                          <el-input-number
+                            v-model="displayForm.float_location.y.value"
+                            class="min-w-0! w-full!"
+                            :min="0"
+                            :precision="0"
+                            :value-on-clear="0"
+                            controls-position="right"
+                            align="left"
+                          />
+                          <span>px</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </template>
-            </div>
-            <div class="mt-3 flex-column items-start">
-              <el-checkbox v-for="option in displayOptions" :key="option.key" v-model="displayForm[option.key]">{{ option.label }}</el-checkbox>
-              <el-input v-if="displayForm.disclaimer" v-model="displayForm.disclaimer_value" :maxlength="128" placeholder="请输入免责声明" />
-            </div>
-          </el-form>
-        </el-scrollbar>
-      </div>
-      <div v-else-if="!loading" class="flex-col-center min-h-60 gap-3">
-        <span class="text-N600">显示设置加载失败</span>
-        <!-- 重新加载展示配置 -->
-        <el-button @click="loadSetting">重新加载</el-button>
+                </template>
+              </div>
+              <div class="mt-3 flex-column items-start">
+                <el-checkbox v-for="option in displayOptions" :key="option.key" v-model="displayForm[option.key]">{{ option.label }}</el-checkbox>
+                <el-input v-if="displayForm.disclaimer" v-model="displayForm.disclaimer_value" :maxlength="128" placeholder="请输入免责声明" />
+              </div>
+            </el-form>
+          </el-scrollbar>
+          <el-button link :disabled="!loaded || loading || saving" @click="handleRestoreDefault">
+            <MkIcon :icon="Refresh" />
+            <span>恢复默认</span>
+          </el-button>
+          <!-- 取消展示设置 -->
+          <el-button :disabled="loading || saving" @click="visible = false">取消</el-button>
+          <!-- 保存展示设置 -->
+          <el-button type="primary" :loading="saving" :disabled="!loaded || loading" @click="handleSave">保存</el-button>
+        </div>
       </div>
     </div>
-    <template #footer>
-      <!-- 取消展示设置 -->
-      <el-button :disabled="loading || saving" @click="visible = false">取消</el-button>
-      <!-- 保存展示设置 -->
-      <el-button type="primary" :loading="saving" :disabled="!loaded || loading" @click="handleSave">保存</el-button>
-    </template>
   </MkDialog>
 </template>
