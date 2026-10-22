@@ -2,43 +2,36 @@
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
-import type { LoginMethod, OptionItem, PortalSetting, PortalSettingPayload } from '@/api/types'
-import { LOGIN_METHOD_LABELS } from '@/constants/auth'
+import type { PortalAuthConfig, PortalSetting, PortalSettingPayload } from '@/api/types'
 
 const props = defineProps<{ disabled: boolean; setting: PortalSetting; saving: boolean; save: (payload: PortalSettingPayload) => Promise<void> }>()
 
-/* 可用登录方式与默认登录方式均取自后端返回的门户 auth_config */
-const authConfig = computed(() => props.setting.auth_config ?? {})
-
-const loginMethodOptions = computed<string[]>(() => {
-  const values = (authConfig.value.system_options ?? []).map((option) => option.value)
-  return values.length ? values : [LOGIN_METHOD.LOCAL]
-})
-
-const defaultLoginMethodOptions = computed<OptionItem<string>[]>(() => {
-  const authTypes = authConfig.value.auth_types ?? []
-  return authTypes.length ? authTypes : (authConfig.value.system_options ?? [])
-})
+/* 登录方式选项来自 system_options，默认登录方式仅允许选择草稿中已选的 login_value */
+const loginMethodOptions = ref<NonNullable<PortalAuthConfig['system_options']>>([])
+const defaultLoginMethodOptions = computed(() =>
+  loginMethodOptions.value.filter(({ value }) => authForm.login_value.some((loginMethod) => loginMethod === value)),
+)
 
 const authVisible = ref(false)
 const enableAuthAfterSave = ref(false)
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const authForm = reactive({
-  loginMethods: [LOGIN_METHOD.LOCAL] as string[],
-  default_value: LOGIN_METHOD.LOCAL as string,
-  maxAttempts: 1,
-  failedAttempts: 5,
-  lockTime: 10,
+  login_value: [LOGIN_METHOD.LOCAL] as string[],
+  type: LOGIN_METHOD.LOCAL as string,
+  max_attempts: 1,
+  failed_attempts: 5,
+  lock_time: 10,
 })
+
 const authRules: FormRules<typeof authForm> = {
-  loginMethods: [{ type: 'array', required: true, min: 1, message: '请选择至少一种登录方式', trigger: 'change' }],
-  default_value: [{ required: true, message: '请选择默认登录方式', trigger: 'change' }],
+  login_value: [{ type: 'array', required: true, min: 1, message: '请选择至少一种登录方式', trigger: 'change' }],
+  type: [{ required: true, message: '请选择默认登录方式', trigger: 'change' }],
 }
 
 /* 登录方式变化时，确保默认登录方式仍为已启用的方式 */
 function handleLoginMethodsChange(loginMethods: string[]) {
-  if (!loginMethods.includes(authForm.default_value)) {
-    authForm.default_value = loginMethods[0] ?? LOGIN_METHOD.LOCAL
+  if (!loginMethods.includes(authForm.type)) {
+    authForm.type = loginMethods[0] ?? ''
   }
 }
 
@@ -47,16 +40,17 @@ function open(enableAfterSave = false) {
   if (props.disabled || props.saving) return
 
   enableAuthAfterSave.value = enableAfterSave
-  const config = authConfig.value
+  const config = props.setting.auth_config ?? {}
+  loginMethodOptions.value = config.system_options ?? []
   const loginMethods = [...(config.login_value?.length ? config.login_value : [LOGIN_METHOD.LOCAL])]
   const defaultType = config.type ?? LOGIN_METHOD.LOCAL
-  const default_value = loginMethods.includes(defaultType) ? defaultType : loginMethods[0] ?? LOGIN_METHOD.LOCAL
+  const type = loginMethods.includes(defaultType) ? defaultType : (loginMethods[0] ?? LOGIN_METHOD.LOCAL)
   Object.assign(authForm, {
-    loginMethods,
-    default_value,
-    maxAttempts: config.max_attempts ?? 1,
-    failedAttempts: config.failed_attempts ?? 5,
-    lockTime: config.lock_time ?? 10,
+    login_value: loginMethods,
+    type,
+    max_attempts: config.max_attempts ?? 1,
+    failed_attempts: config.failed_attempts ?? 5,
+    lock_time: config.lock_time ?? 10,
   })
   authVisible.value = true
 }
@@ -68,16 +62,16 @@ function handleOpenAuthSetting() {
 function handleClosed() {
   enableAuthAfterSave.value = false
   Object.assign(authForm, {
-    loginMethods: [LOGIN_METHOD.LOCAL],
-    default_value: LOGIN_METHOD.LOCAL,
-    maxAttempts: 1,
-    failedAttempts: 5,
-    lockTime: 10,
+    login_value: [LOGIN_METHOD.LOCAL],
+    type: LOGIN_METHOD.LOCAL,
+    max_attempts: 1,
+    failed_attempts: 5,
+    lock_time: 10,
   })
   authFormRef.value?.clearValidate()
 }
 
-/* 保存认证配置，仅提交后端读取的字段并保留其余配置 */
+/* 保存认证配置，仅提交表单字段 */
 function handleSaveAuthSetting() {
   if (props.disabled || props.saving) return
 
@@ -87,12 +81,11 @@ function handleSaveAuthSetting() {
       .save({
         ...(enableAuthAfterSave.value ? { enable_auth: true } : {}),
         auth_config: {
-          ...props.setting.auth_config,
-          login_value: [...authForm.loginMethods],
-          type: authForm.default_value,
-          max_attempts: authForm.maxAttempts,
-          failed_attempts: authForm.failedAttempts,
-          lock_time: authForm.lockTime,
+          login_value: [...authForm.login_value],
+          type: authForm.type,
+          max_attempts: authForm.max_attempts,
+          failed_attempts: authForm.failed_attempts,
+          lock_time: authForm.lock_time,
         },
       })
       .then(() => {
@@ -119,15 +112,15 @@ defineExpose({ open })
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="登录方式" prop="loginMethods">
-        <el-checkbox-group v-model="authForm.loginMethods" @change="handleLoginMethodsChange" class="flex-wrap">
-          <template v-for="loginMethod in loginMethodOptions" :key="loginMethod">
-            <el-checkbox :value="loginMethod" class="w-32">{{ LOGIN_METHOD_LABELS[loginMethod as LoginMethod] || loginMethod }}</el-checkbox>
-          </template>
+      <el-form-item label="登录方式" prop="login_value">
+        <el-checkbox-group v-model="authForm.login_value" @change="handleLoginMethodsChange" class="flex-wrap">
+          <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption.value" :value="loginMethodOption.value" class="w-32">
+            {{ loginMethodOption.label }}
+          </el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="默认登录方式" prop="default_value">
-        <el-select v-model="authForm.default_value">
+      <el-form-item label="默认登录方式" prop="type">
+        <el-select v-model="authForm.type">
           <el-option
             v-for="loginMethodOption in defaultLoginMethodOptions"
             :key="loginMethodOption.value"
@@ -140,14 +133,14 @@ defineExpose({ open })
         <div class="mk-gray-card-lg w-full space-y-4">
           <div class="flex-align-center gap-2">
             <span class="shrink-0">登录失败</span>
-            <el-input-number v-model="authForm.maxAttempts" class="w-32!" :min="-1" :max="100" :precision="0" :value-on-clear="1" />
+            <el-input-number v-model="authForm.max_attempts" class="w-32!" :min="-1" :max="100" :precision="0" :value-on-clear="1" />
             <span class="shrink-0">次显示验证码</span>
           </div>
           <div class="flex-align-center gap-2">
             <span class="shrink-0">登录失败</span>
-            <el-input-number v-model="authForm.failedAttempts" class="w-32!" :min="1" :max="100" :precision="0" :value-on-clear="5" />
+            <el-input-number v-model="authForm.failed_attempts" class="w-32!" :min="1" :max="100" :precision="0" :value-on-clear="5" />
             <span class="shrink-0">次，锁定账号</span>
-            <el-input-number v-model="authForm.lockTime" class="w-32!" :min="1" :max="1440" :precision="0" :value-on-clear="10" />
+            <el-input-number v-model="authForm.lock_time" class="w-32!" :min="1" :max="1440" :precision="0" :value-on-clear="10" />
             <span class="shrink-0">分钟</span>
           </div>
         </div>

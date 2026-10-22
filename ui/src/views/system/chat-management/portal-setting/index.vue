@@ -72,7 +72,7 @@ function handleAccessChange(field: AccessField, value: string | number | boolean
   return savePortalSetting({ [field]: Boolean(value) })
 }
 
-/* 认证配置保存，payload 已保留未编辑字段 */
+/* 认证配置保存 */
 function savePortalAuthSetting(payload: PortalSettingPayload) {
   return savePortalSetting(payload)
 }

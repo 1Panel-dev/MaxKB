@@ -56,6 +56,10 @@ Admin 与 Chat 分别维护请求客户端和业务接口。
   `import WorkspaceApi from '@/api/admin/system/workspace'`；System 登录设置使用
   `import AuthSettingApi from '@/api/admin/system/settings/auth-setting'`。
 
+系统登录设置的 `system_options` 仅用于登录方式选项，默认登录方式从已选 `login_methods` 中选择。
+保存仅提交 `login_methods`、`default_value`、`max_attempts`、`failed_attempts`、`lock_time`、
+`role_id`、`workspace_id` 和 `permission`，不透传查询响应中的选项或 `group_id`。
+
 ## 枚举与类型组织
 
 `enums/state.ts` 的 `STATE_TYPES` 维护跨业务复用的任务状态，联合类型 `State` 定义在
@@ -155,8 +159,9 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 `admin/system/chat-management/portal-setting.ts` 通过 Admin `/portal` 读取和局部保存门户配置，
 公共类型维护在 `types/portal.ts`。JSON 用于访问开关和认证、跨域配置，门户名称与 Logo 使用
 FormData；保存返回完整配置，页面以该返回值作为唯一数据来源。
-认证配置保留未编辑字段，仅提交后端读取的 `login_value`、`max_attempts`、`failed_attempts`、
-`lock_time`；跨域地址提交 `cross_domain_list` 数组，不另建 `cors_config`。
+认证设置的登录方式选项来自 `auth_config.system_options`，默认登录方式从草稿已选的 `login_value`
+中选择。认证配置仅提交 `login_value`、`type`、`max_attempts`、`failed_attempts`、`lock_time`，
+不透传查询响应中的选项；跨域地址提交 `cross_domain_list` 数组，不另建 `cors_config`。
 
 ### 当前账号密码
 
