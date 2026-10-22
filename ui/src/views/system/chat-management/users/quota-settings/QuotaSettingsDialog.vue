@@ -119,7 +119,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="配额设置" width="480" align-center @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="配额设置" @closed="resetData">
     <el-form
       ref="quotaSettingsFormRef"
       :model="quotaSettingsForm"

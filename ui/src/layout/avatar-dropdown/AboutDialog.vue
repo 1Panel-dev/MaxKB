@@ -93,7 +93,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog align-center v-model="dialogVisible" title="关于" :close-on-click-modal="true" :close-on-press-escape="true" @closed="handleClosed">
+  <MkDialog v-model="dialogVisible" title="关于" :close-on-click-modal="true" :close-on-press-escape="true" @closed="handleClosed">
     <div v-loading="loading" class="overflow-hidden rounded-xl border">
       <div class="flex-center h-35 bg-primary/10">
         <LogoFull :height="60" class="max-w-full!" />

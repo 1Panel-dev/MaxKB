@@ -458,7 +458,11 @@
     padding-top: 0;
   }
   .dialog-content {
-    max-height: calc(100vh - 272px);
+    max-height: calc(100vh - 220px);
+  }
+  // 有底部操作区时，额外扣除 footer 占用的高度
+  &:has(.el-dialog__footer) .dialog-content {
+    max-height: calc(100vh - 280px);
   }
   &.is-fullscreen {
     .dialog-content {
@@ -487,7 +491,11 @@
     .dialog-content {
       padding: 0;
       max-height: none;
-      height: calc(100vh - 180px);
+      height: calc(100vh - 190px);
+    }
+    // 有底部操作区时，额外扣除 footer 占用的高度
+    &:has(.el-dialog__footer) .dialog-content {
+      max-height: calc(100vh - 250px);
     }
     .el-dialog__footer {
       border-top: var(--el-border);
@@ -544,7 +552,7 @@
     padding: calc(var(--spacing) * 4) calc(var(--spacing) * 6);
   }
   &.btt {
-    height: calc(100% - 100px) !important;
+    height: calc(100% - 60px) !important;
   }
 }
 /* dropdown */

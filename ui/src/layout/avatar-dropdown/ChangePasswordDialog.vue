@@ -115,7 +115,7 @@ defineExpose({ open })
       <!-- 取消修改密码 -->
       <el-button :disabled="passwordSubmitting" plain @click="dialogVisible = false">取消</el-button>
       <!-- 保存新密码 -->
-      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword"> 保存 </el-button>
+      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">保存</el-button>
     </template>
   </MkDialog>
 </template>

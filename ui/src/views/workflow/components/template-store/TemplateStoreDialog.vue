@@ -45,7 +45,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" title="模板中心" width="1200" @closed="resetData">
+  <MkDialog v-model="visible" class="mk-aside-content-dialog" title="模板中心" width="1200" @closed="resetData">
     <template #header="{ titleId }">
       <div class="relative flex-align-center">
         <h4 :id="titleId">模板中心</h4>

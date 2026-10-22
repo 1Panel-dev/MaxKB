@@ -7,7 +7,17 @@ defineOptions({ name: 'InitFieldDialog' })
 
 const emit = defineEmits<{ submit: [field: FormField] }>()
 
-const initFieldInputTypes = ['TextInput', 'Slider', 'PasswordInput', 'SingleSelect', 'MultiSelect', 'RadioCard', 'DatePicker', 'SwitchInput', 'JsonInput'] as const
+const initFieldInputTypes = [
+  'TextInput',
+  'Slider',
+  'PasswordInput',
+  'SingleSelect',
+  'MultiSelect',
+  'RadioCard',
+  'DatePicker',
+  'SwitchInput',
+  'JsonInput',
+] as const
 const initFieldTypeOptions: DynamicFormConstructorOption[] = initFieldInputTypes.map((inputType) => ({
   label: dynamicFormTypeOptions.find((option) => option.value === inputType)?.label ?? inputType,
   value: `${inputType}Constructor`,
@@ -49,7 +59,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" align-center :title="editing ? '编辑参数' : '添加参数'" @closed="resetData">
+  <MkDialog v-model="visible" :title="editing ? '编辑参数' : '添加参数'" @closed="resetData">
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" :field-type-options="initFieldTypeOptions" />
 
     <template #footer>

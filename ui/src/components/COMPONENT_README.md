@@ -140,8 +140,9 @@ Admin、Chat 入口调用 `configureMarkdownEditor()` 配置本地高亮、KaTeX
 Dialog 和 Drawer 的 `show-close` 不根据 loading 或提交状态动态判断，默认保留关闭按钮；
 业务需要固定隐藏关闭按钮时，可继续使用 `:show-close="false"`。
 
-布尔 `v-model` 控制显示，默认宽度 `600`、挂载到 body、显示关闭按钮、关闭后销毁，
-禁止点击遮罩和 Escape 关闭。其余 Dialog 属性、事件通过 `$attrs` 透传。
+布尔 `v-model` 控制显示，默认宽度 `600`、水平垂直居中（`align-center`）、挂载到 body、显示关闭按钮、关闭后销毁，
+禁止点击遮罩和 Escape 关闭。调用方可通过 `:align-center="false"` 关闭垂直居中。
+其余 Dialog 属性、事件通过 `$attrs` 透传。
 提供默认、`header`、`subtitle`、`footer` 插槽；`subtitle` 不替代标题，`header` 透出原生关闭与标题参数。
 内容由 `el-scrollbar` 包裹，容器为 `px-6 dialog-content`，通过 `contentClass` 调整；
 最大高度由全局 Dialog 样式控制。

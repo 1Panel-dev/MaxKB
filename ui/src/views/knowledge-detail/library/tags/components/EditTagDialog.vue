@@ -46,10 +46,6 @@ function handleSubmit() {
   })
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!loading.value) done()
-}
-
 function resetData() {
   Object.assign(tagForm, { id: '', key: '', value: '' })
   editField.value = 'key'
@@ -61,7 +57,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="title" :before-close="handleBeforeClose" @closed="resetData">
+  <MkDialog v-model="visible" :title="title" @closed="resetData">
     <el-form
       ref="formRef"
       v-loading="loading"

@@ -56,7 +56,7 @@ function resetData() {
 defineExpose({ close, open })
 </script>
 <template>
-  <MkDialog v-model="visible" :title="editing ? '编辑变量' : '添加变量'" @closed="resetData" align-center>
+  <MkDialog v-model="visible" :title="editing ? '编辑变量' : '添加变量'" @closed="resetData">
     <el-form ref="formRef" label-position="top" require-asterisk-position="right" :rules="rules" :model="formData" @submit.prevent>
       <el-form-item label="变量" prop="field">
         <el-input v-model="formData.field" :maxlength="64" placeholder="请输入变量" show-word-limit />
@@ -76,8 +76,9 @@ defineExpose({ close, open })
                   target="_blank"
                   rel="noopener noreferrer"
                   class="text-primary hover:text-primary/80"
-                  >点击查看详情 ➜ pypi.org</a
                 >
+                  点击查看详情 ➜ pypi.org
+                </a>
               </template>
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>

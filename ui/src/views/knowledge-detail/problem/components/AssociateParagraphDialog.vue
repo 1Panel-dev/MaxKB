@@ -161,7 +161,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" width="1200" @closed="handleClosed">
+  <MkDialog v-model="visible" class="mk-aside-content-dialog" width="1200" @closed="handleClosed">
     <template #header="{ titleId }">
       <h4 :id="titleId">关联分段</h4>
     </template>

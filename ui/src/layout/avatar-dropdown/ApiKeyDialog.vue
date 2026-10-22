@@ -18,7 +18,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="API Key" width="1000" align-center>
+  <MkDialog v-model="visible" title="API Key" width="1000">
     <div class="mk-gray-card-lg mb-4 space-y-2">
       <div>API 文档</div>
       <el-input :model-value="apiDocUrl" readonly>

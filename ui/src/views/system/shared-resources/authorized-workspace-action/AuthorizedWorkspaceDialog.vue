@@ -81,7 +81,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" align-center title="授权工作空间" width="840" content-class="h-120" @closed="handleClosed">
+  <MkDialog v-model="visible" title="授权工作空间" width="840" content-class="h-120" @closed="handleClosed">
     <template #subtitle>被授权的工作空间，可使用当前资源</template>
     <div v-loading="loading" class="flex-column h-full">
       <p class="shrink-0">类型</p>

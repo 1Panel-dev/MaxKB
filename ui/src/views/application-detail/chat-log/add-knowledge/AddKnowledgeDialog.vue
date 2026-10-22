@@ -96,10 +96,6 @@ async function handleSubmit() {
     })
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!loading.value && !optionLoading.value) done()
-}
-
 function handleClosed() {
   knowledgeForm.knowledge_id = ''
   knowledgeForm.document_id = ''
@@ -118,7 +114,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="添加到知识库" :before-close="handleBeforeClose" @closed="handleClosed">
+  <MkDialog v-model="visible" title="添加到知识库" @closed="handleClosed">
     <el-form
       ref="formRef"
       v-loading="loading || optionLoading"

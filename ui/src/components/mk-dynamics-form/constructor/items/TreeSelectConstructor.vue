@@ -289,7 +289,14 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
   </MkDialog>
 
   <!-- 编辑弹窗 -->
-  <MkDialog :close-on-click-modal="true" :close-on-press-escape="true" v-model="editDialog.visible" title="编辑" @closed="handleEditClosed">
+  <MkDialog
+    :align-center="false"
+    :close-on-click-modal="true"
+    :close-on-press-escape="true"
+    v-model="editDialog.visible"
+    title="编辑"
+    @closed="handleEditClosed"
+  >
     <el-form :model="editDialog.form" label-position="top" require-asterisk-position="right" @submit.prevent>
       <div class="flex gap-2">
         <el-form-item label="标签" required class="min-w-0 flex-1 small">

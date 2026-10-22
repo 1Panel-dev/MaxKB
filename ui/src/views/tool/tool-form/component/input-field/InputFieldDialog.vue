@@ -42,7 +42,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="isEdit ? '编辑参数' : '添加参数'" @closed="resetData">
+  <MkDialog :align-center="false" v-model="visible" :title="isEdit ? '编辑参数' : '添加参数'" @closed="resetData">
     <el-form ref="formRef" :model="inputFieldForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="参数名称" prop="name">
         <el-input

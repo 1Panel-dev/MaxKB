@@ -41,10 +41,6 @@ function close() {
   visible.value = false
 }
 
-function handleClose(done: () => void) {
-  if (!props.saving) done()
-}
-
 function resetForm() {
   versionForm.name = ''
   versionForm.description = ''
@@ -55,7 +51,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="mode === 'publish' ? '发布内容' : '编辑'" align-center :before-close="handleClose" @closed="resetForm">
+  <MkDialog v-model="visible" :title="mode === 'publish' ? '发布内容' : '编辑'" @closed="resetForm">
     <el-form
       ref="formRef"
       :model="versionForm"

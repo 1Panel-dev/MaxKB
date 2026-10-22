@@ -88,10 +88,6 @@ function open(template?: ApplicationStoreTemplate) {
   dialogVisible.value = true
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!loading.value) done()
-}
-
 function handleClosed() {
   resetData()
   emit('closed')
@@ -109,7 +105,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建高级智能体" align-center :before-close="handleBeforeClose" @closed="handleClosed">
+  <MkDialog v-model="dialogVisible" title="创建高级智能体" @closed="handleClosed">
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"

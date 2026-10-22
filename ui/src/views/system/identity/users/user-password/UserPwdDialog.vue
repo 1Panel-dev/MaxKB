@@ -117,7 +117,7 @@ defineExpose({ open })
 
     <template #footer>
       <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword"> 保存 </el-button>
+      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">保存</el-button>
     </template>
   </MkDialog>
 </template>

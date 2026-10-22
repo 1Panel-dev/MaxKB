@@ -32,7 +32,7 @@ function submit() {
   <el-button text type="primary" title="参数设置" @click="open">
     <MkIcon name="icon_setting" :size="20" />
   </el-button>
-  <MkDialog v-model="visible" align-center title="参数设置" width="550" @closed="resetData">
+  <MkDialog v-model="visible" title="参数设置" @closed="resetData">
     <el-form ref="formRef" :model="formData" label-position="top" @submit.prevent>
       <div class="grid grid-cols-2 gap-4">
         <el-form-item>

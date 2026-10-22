@@ -58,14 +58,6 @@ function open(paragraph: ParagraphItem, initialMode: 'edit' | 'detail' = 'detail
   void loadParagraphDetail()
 }
 
-function close() {
-  if (!loading.value) visible.value = false
-}
-
-function handleBeforeClose(done: () => void) {
-  if (!loading.value) done()
-}
-
 /* 编辑与详情切换：取消丢弃正文草稿，关联问题保留即时保存结果。 */
 const paragraphFormRef = ref<InstanceType<typeof ParagraphForm>>()
 const paragraphForm = ref<ParagraphUpdatePayload>({ title: '', content: '' })
@@ -108,11 +100,15 @@ function handleSubmit() {
     .catch(() => {})
 }
 
+function close() {
+  if (!loading.value) visible.value = false
+}
+
 defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="title" width="1000" align-center :before-close="handleBeforeClose" @closed="emit('closed')">
+  <MkDialog v-model="visible" :title="title" width="1000" @closed="emit('closed')">
     <div v-loading="loading">
       <div class="flex h-[480px] max-h-[calc(100vh-272px)] w-full gap-4">
         <el-card v-if="mode === 'detail'" shadow="never" class="mk-paragraph-card group relative min-w-0 flex-1" body-class="flex-column h-full">

@@ -122,7 +122,7 @@ onMounted(loadApiKeys)
     <MkTable
       v-model:pagination-config="pagination"
       :data="apiKeyRows"
-      :max-table-height="480"
+      :max-table-height="425"
       @current-change="loadApiKeys"
       @size-change="loadApiKeys"
     >
@@ -190,7 +190,7 @@ onMounted(loadApiKeys)
       </el-table-column>
     </MkTable>
   </div>
-  <MkDialog v-model="createdDialogVisible" title="API Key" align-center @closed="createdApiKey = ''">
+  <MkDialog v-model="createdDialogVisible" title="API Key" @closed="createdApiKey = ''">
     <template #subtitle>请安全保存此密钥，不要泄露。</template>
     <el-input :model-value="createdApiKey" readonly>
       <template #suffix>

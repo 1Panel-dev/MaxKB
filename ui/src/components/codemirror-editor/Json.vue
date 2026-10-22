@@ -121,7 +121,7 @@ defineExpose({ format, validateRules })
     </el-button>
   </div>
 
-  <MkDialog v-model="dialogVisible" :title="props.title" append-to-body fullscreen>
+  <MkDialog :align-center="false" v-model="dialogVisible" :title="props.title" append-to-body fullscreen>
     <div class="mk-codemirror">
       <Codemirror v-model="dialogContent" :extensions="extensions" :tab-size="4" autofocus :style="{ height: 'calc(100dvh - 160px)' }" />
     </div>

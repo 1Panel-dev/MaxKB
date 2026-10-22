@@ -40,10 +40,6 @@ function open(template?: KnowledgeWorkflowTemplate & Partial<Pick<WorkflowStoreT
   })
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!loading.value) done()
-}
-
 function handleClosed() {
   resetData()
   emit('closed')
@@ -57,7 +53,8 @@ function submit() {
     .then((validationResults) => {
       if (!validationResults.every(Boolean) || !baseFormRef.value) return
       const baseForm = baseFormRef.value.form
-      return props.api.postKnowledgeWorkflow({
+      return props.api
+        .postKnowledgeWorkflow({
           name: baseForm.name.trim(),
           desc: baseForm.desc.trim(),
           embedding_model_id: baseForm.embedding_model_id,
@@ -65,7 +62,8 @@ function submit() {
           type: KNOWLEDGE_TYPE.WORKFLOW,
           work_flow: cloneDeep(knowledgeTemplate.default),
           work_flow_template: workflowTemplate.value ? cloneDeep(workflowTemplate.value) : undefined,
-        }).then((knowledge) => {
+        })
+        .then((knowledge) => {
           return auth.loadAuthBaseProfile().then(() => {
             MsgSuccess('创建成功')
             dialogVisible.value = false
@@ -86,7 +84,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建工作流知识库" align-center :before-close="handleBeforeClose" @closed="handleClosed">
+  <MkDialog v-model="dialogVisible" title="创建工作流知识库" @closed="handleClosed">
     <KnowledgeBaseForm ref="baseFormRef" v-loading="loading" />
     <template #footer>
       <!-- 取消创建 -->
