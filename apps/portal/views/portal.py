@@ -18,9 +18,7 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.constants.cache_version import Cache_Version
 from common.log.log import log
-from django.core.cache import cache
 from portal.api.portal import PortalAPI
 from portal.serializers.portal import (
     PortalSerializer,
@@ -59,33 +57,6 @@ class PortalView(APIView):
         return result.success(PortalSerializer(data=request.data).edit(request.data))
 
 
-class PortalLoginView(APIView):
-    @extend_schema(
-        methods=["POST"],
-        description=_("Portal login"),
-        summary=_("Portal login"),
-        operation_id=_("Portal login"),  # type: ignore
-        tags=[_("Portal")],  # type: ignore
-        request=PortalAPI.Login.get_request(),
-        responses=PortalAPI.Login.get_response(),
-    )
-    def post(self, request: Request):
-        token_data = PortalLoginSerializer.login(request.data)
-        response = result.success(token_data)
-        secure = request.is_secure()
-        response.set_cookie(
-            "mk_file_auth",
-            value=token_data.get("token"),
-            max_age=7 * 24 * 3600,
-            path="/portal/",
-            domain=None,
-            secure=secure,
-            httponly=True,
-            samesite="Lax",
-        )
-        return response
-
-
 class PortalInfoView(APIView):
     @extend_schema(
         methods=["GET"],
@@ -96,19 +67,3 @@ class PortalInfoView(APIView):
     )
     def get(self, request: Request):
         return result.success(PortalLoginSerializer.get_login_profile())
-
-
-class PortalLogoutView(APIView):
-    @extend_schema(
-        methods=["POST"],
-        summary=_("Portal logout"),
-        description=_("Portal logout"),
-        operation_id=_("Portal logout"),  # type: ignore
-        tags=[_("Portal")],  # type: ignore
-        responses=PortalAPI.Logout.get_response(),
-    )
-    @log(menu="Portal", operate="Log out")
-    def post(self, request: Request):
-        version, get_key = Cache_Version.TOKEN.value
-        cache.delete(get_key(token=request.META.get("HTTP_AUTHORIZATION")[7:]), version=version)
-        return result.success(True)

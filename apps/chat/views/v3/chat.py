@@ -341,8 +341,10 @@ class CaptchaView(APIView):
     )
     def get(self, request: Request):
         username = request.query_params.get("username", None)
-        application_id = request.query_params.get("application_id", None)
-        return result.success(CaptchaSerializer().chat_generate(username, "chat", application_id))
+        access_token = request.query_params.get("accessToken")
+        if access_token:
+            return result.success(CaptchaSerializer().chat_generate(username, "chat", access_token))
+        return result.success(CaptchaSerializer().portal_generate(username))
 
 
 class SpeechToText(APIView):
@@ -516,9 +518,9 @@ class LocalLoginView(BaseAuthView):
         responses=LoginAPI.get_response(),
     )
     def post(self, request: Request):
-        user = ChatUserAccessTokenV3Serializer.local_login(request.data)
-        user.source = "LOCAL"
         access_token = request.query_params.get("accessToken")
+        user = ChatUserAccessTokenV3Serializer.local_login(request.data, access_token)
+        user.source = "LOCAL"
         token = self.create_token_and_cache(user, access_token, Operate.LOCAL)
         response = result.success({"token": token})
         return self.generate(request, token, response, path=f"/chat/{access_token + '/' if access_token else ''}")
