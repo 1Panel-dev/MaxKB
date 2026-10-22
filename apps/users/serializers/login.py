@@ -11,6 +11,7 @@ import base64
 import json
 
 from application.models import ApplicationAccessToken
+from portal.models import Portal
 from captcha.image import ImageCaptcha
 from common.auth.common import SystemToken
 from common.constants.authentication_type import AuthenticationType
@@ -300,19 +301,35 @@ class CaptchaSerializer(serializers.Serializer):
 
         auth_setting = application_access_token.authentication_value
         max_attempts = auth_setting.get("max_attempts", 1)
-        need_captcha = LoginSerializer._need_captcha_by_key(system_get_key(f"{type}_{username}"), max_attempts)
+        # key 拼上 access_token，与应用登录的失败计数/验证码存储保持一致
+        key = f"{type}_{username}"
+        if access_token:
+            key = f"{type}_{access_token}_{username}"
+        need_captcha = LoginSerializer._need_captcha_by_key(system_get_key(key), max_attempts)
 
-        return CaptchaSerializer._generate_captcha_if_needed(username, type, need_captcha)
+        return CaptchaSerializer._generate_captcha_if_needed(username, type, need_captcha, key)
 
     @staticmethod
-    def _generate_captcha_if_needed(username: str, type: str, need_captcha: bool):
+    def portal_generate(username: str, type: str = "portal"):
+        portal = Portal.objects.first()
+        if portal is None or not portal.enable_auth:
+            return {"captcha": ""}
+        auth_config = portal.auth_config or {}
+        max_attempts = auth_config.get("max_attempts", 1)
+        key = f"{type}_{username}"
+        need_captcha = LoginSerializer._need_captcha_by_key(system_get_key(key), max_attempts)
+
+        return CaptchaSerializer._generate_captcha_if_needed(username, type, need_captcha, key)
+
+    @staticmethod
+    def _generate_captcha_if_needed(username: str, type: str, need_captcha: bool, key: str = ""):
         """提取的公共验证码生成方法"""
         if need_captcha:
             chars = get_random_chars()
             data = ImageCaptcha().generate(chars)
             captcha = base64.b64encode(data.getbuffer())
             cache.set(
-                Cache_Version.CAPTCHA.get_key(captcha=f"{type}_{username}"),
+                Cache_Version.CAPTCHA.get_key(captcha=key or f"{type}_{username}"),
                 chars.lower(),
                 timeout=300,
                 version=Cache_Version.CAPTCHA.get_version(),

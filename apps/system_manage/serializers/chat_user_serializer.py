@@ -109,16 +109,16 @@ class ChatUserAccessTokenSerializer(serializers.Serializer):
         if max_attempts == -1:
             need_captcha = False
         elif max_attempts > 0:
-            fail_count = cache.get(system_get_key(f"chat_{username}"), version=system_version) or 0
+            fail_count = cache.get(system_get_key(f"chat_{access_token}_{username}"), version=system_version) or 0
             need_captcha = fail_count >= max_attempts
 
         if need_captcha:
-            ChatUserAccessTokenSerializer._validate_captcha(username, captcha)
+            ChatUserAccessTokenSerializer._validate_captcha(username, captcha, access_token)
 
         user = ChatUser.objects.filter(username=username).first()
 
         if not user or not password_verify(password, user.password):
-            record_login_fail(username)
+            record_login_fail(access_token, username)
             raise AppApiException(500, _("The username or password is incorrect"))
 
         if needs_password_upgrade(user.password):
@@ -126,32 +126,32 @@ class ChatUserAccessTokenSerializer(serializers.Serializer):
             user.save(update_fields=["password"])
         if not user.is_active:
             raise AppApiException(1005, _("The user has been disabled, please contact the administrator!"))
-        cache.delete(system_get_key(f"chat_{username}"), version=system_version)
+        cache.delete(system_get_key(f"chat_{access_token}_{username}"), version=system_version)
         return user
 
     @staticmethod
-    def _validate_captcha(username: str, captcha: str) -> None:
+    def _validate_captcha(username: str, captcha: str, access_token: str) -> None:
         """验证验证码（一次性消费）"""
         if not captcha:
             raise AppApiException(1005, _("Captcha is required"))
 
-        captcha_key = Cache_Version.CAPTCHA.get_key(captcha=f"chat_{username}")
+        captcha_key = Cache_Version.CAPTCHA.get_key(captcha=f"chat_{access_token}_{username}")
         captcha_cache = cache.get(captcha_key, version=Cache_Version.CAPTCHA.get_version())
 
         if captcha_cache is None or captcha.lower() != captcha_cache:
             # 校验失败也计入失败计数，防止"识别-试错"循环绕过验证码
-            record_login_fail(username)
+            record_login_fail(access_token, username)
             raise AppApiException(1005, _("Captcha code error or expiration"))
 
         # 校验通过即销毁，保证验证码一次性使用
         cache.delete(captcha_key, version=Cache_Version.CAPTCHA.get_version())
 
 
-def record_login_fail(username: str, expire: int = 600):
+def record_login_fail(access_token: str, username: str, expire: int = 600):
     """记录登录失败次数（原子递增）"""
     if not username:
         return
-    fail_key = system_get_key(f"chat_{username}")
+    fail_key = system_get_key(f"chat_{access_token}_{username}")
     try:
         cache.incr(fail_key, 1, version=system_version)
     except ValueError:
