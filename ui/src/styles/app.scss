@@ -264,6 +264,7 @@ h6 {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
 }
 
+/* input */
 /* 对话与内容生成共用的输入容器。 */
 .mk-input-box {
   background: white;
@@ -278,6 +279,56 @@ h6 {
   .el-textarea__clear {
     top: 10px;
     right: 8px;
+  }
+}
+
+// 选择器与文本、选项或数值输入共用的连体组合。
+.mk-input-group {
+  border: 1px solid var(--el-border-color);
+  border-radius: var(--el-border-radius-base);
+  display: flex;
+
+  &__content {
+    &,
+    .el-input {
+      --el-input-inner-height: 28px !important;
+    }
+
+    &.el-input-number.is-controls-right {
+      .el-input-number__decrease,
+      .el-input-number__increase {
+        height: 50%;
+        right: 0;
+      }
+
+      .el-input-number__decrease {
+        bottom: 0;
+      }
+
+      .el-input-number__increase {
+        top: 0;
+      }
+    }
+
+    .el-input__wrapper,
+    .el-select__wrapper {
+      border-radius: 0 var(--el-border-radius-base) var(--el-border-radius-base) 0;
+      box-shadow: none !important;
+    }
+
+    .el-select__wrapper {
+      min-height: 30px !important;
+    }
+  }
+
+  &__prepend {
+    border-right: 1px solid var(--el-border-color);
+
+    .el-select__wrapper {
+      border-radius: var(--el-border-radius-base) 0 0 var(--el-border-radius-base);
+      box-shadow: none !important;
+      min-height: 30px !important;
+    }
   }
 }
 

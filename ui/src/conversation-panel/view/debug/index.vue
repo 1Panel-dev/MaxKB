@@ -53,7 +53,7 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
     <transition name="debug-panel">
       <div
         v-if="debug.visible.value"
-        class="workflow-debug-panel overflow-hidden border border-N300 bg-white shadow-lg"
+        class="workflow-debug-panel overflow-hidden border border-N300 bg-white shadow-lg rounded-xl"
         :class="{ expanded: debug.expanded.value }"
       >
         <ConversationLayout
@@ -81,7 +81,6 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
 
 /* 调试面板定位与展开布局 */
 .workflow-debug-panel {
-  border-radius: 12px;
   bottom: calc(var(--spacing) * 3);
   height: min(calc(var(--spacing) * 170), 90vh);
   max-width: calc(100vw - var(--spacing) * 6);

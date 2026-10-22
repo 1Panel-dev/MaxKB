@@ -57,6 +57,18 @@ Element Plus 覆盖、主题变量和应用样式。Chat 入口还显式引入 E
 模板无需重复添加 `transition-colors` 或 `focus-within:border-primary`。
 生成输入区使用 `mk-input-box`，不叠加对话专属类。
 
+## 连体表单控件
+
+`app.scss` 中的 `mk-input-group` 用于默认尺寸的两段式控件组合，统一横向布局、外边框、
+分隔线和两端圆角。前段 `el-select` 添加 `mk-input-group__prepend`，后段 `el-input`、
+`el-select` 或 `el-input-number` 添加 `mk-input-group__content`；两段直接放在组合容器内，
+中间不添加间距，单位文字放在容器外。
+
+普通单行组合总高度为 32px，多选内容按需撑高。数值输入使用 `controls-position="right"`
+和 `align="left"`，加减按钮随组合内容高度贴合右侧。宽度由调用方通过工具类控制；伸缩场景
+可在组合容器和内容控件上添加 `min-w-0 flex-1`，固定宽度的前段添加 `shrink-0`。
+样式只负责组合外观，不管理值、选项、联动或搜索事件。
+
 ## 基础样式
 
 全局焦点轮廓统一在 `app.scss` 通过 `*:focus-visible { outline: none !important; }` 移除，

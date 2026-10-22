@@ -401,7 +401,8 @@ Workspace 与 System 资源管理的 `application/application.ts` 提供 `getAcc
 Xpack 版可用登录方式统一调用 `system/chat-management/chat-user-auth.ts` 的 `getChatUserAuthType`，
 GET `/chat_user/auth/types` 返回 `{ label, value }[]`，两种智能体入口共用。
 
-展示设置共用 `ApplicationDisplaySetting`；`ApplicationAccessToken` 兼容可选展示字段，缺失字段由弹窗补齐默认值。
+社区版展示设置通过 `putAccessToken` 提交 `language`、`show_source` 与 `show_exec`，不调用 `/setting`。
+Xpack 展示设置共用 `ApplicationDisplaySetting`；`ApplicationAccessToken` 兼容可选展示字段，缺失字段由弹窗补齐默认值。
 两范围的 `putDisplaySetting` 沿用 V2 的 `/<applicationId>/setting` PUT 接口，提交 FormData：
 `custom_theme`、`float_location` 序列化为 JSON，图片字段提交本次文件，`<field>_url` 保留已有地址；
 恢复默认时图片文件与地址均提交空字符串。当前社区版后端未提供该路由，完整保存依赖支持此接口的部署。

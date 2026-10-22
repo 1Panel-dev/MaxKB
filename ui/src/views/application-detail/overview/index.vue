@@ -125,7 +125,8 @@ onMounted(() => {
             </el-button>
             <ButtonEmbedThirdParty :share-url="shareUrl" :access-token="accessToken" />
             <ButtonAccessRestriction />
-            <!-- <ButtonDisplaySetting /> -->
+            <!-- 显示设置 -->
+            <ButtonDisplaySetting />
           </div>
         </div>
         <div class="mk-gray-card-lg space-y-4">
