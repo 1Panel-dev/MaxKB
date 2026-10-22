@@ -1795,7 +1795,8 @@ class ToolTreeSerializer(serializers.Serializer):
 
             is_active = self.data.get("is_active")
             if is_active is not None:
-                tool_query_set = tool_query_set.filter(is_active=is_active)
+                # 作用于外层子查询 temp，避免与 join 的 user.is_active 产生列名歧义
+                default_query_set = default_query_set.filter(is_active=is_active)
 
             tool_type_list = self.data.get("tool_type_list")
             if tool_type_list:
