@@ -39,7 +39,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" size="60%" content-class="h-full !p-0" @close="close" @closed="emit('closed')">
+  <MkDrawer v-model="visible" size="840" content-class="h-full !p-0" @close="close" @closed="emit('closed')">
     <template #header>
       <h4 class="min-w-0 truncate" :title="props.chatLog.abstract">{{ props.chatLog.abstract || '对话详情' }}</h4>
     </template>

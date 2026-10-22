@@ -119,10 +119,6 @@ function handleBatchLinkDocuments() {
   return handleLinkDocuments(selectedDocuments.value.map(({ id }) => id))
 }
 
-function handleBeforeClose(done: () => void) {
-  if (!loading.value) done()
-}
-
 function resetData() {
   currentTag.value = undefined
   activeTab.value = 'linked'
@@ -138,7 +134,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="title" :before-close="handleBeforeClose" size="840" @closed="resetData">
+  <MkDrawer v-model="visible" :title="title" size="840" @closed="resetData">
     <div class="flex-column gap-4" :inert="loading">
       <el-tabs v-model="activeTab" :before-leave="() => !loading" @tab-change="handleTabChange">
         <el-tab-pane label="已关联文档" name="linked" />
