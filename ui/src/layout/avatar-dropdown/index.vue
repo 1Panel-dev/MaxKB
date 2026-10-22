@@ -129,7 +129,7 @@ function toUrl(url?: string) {
             <span>论坛求助</span>
           </MkDropdownItem>
           <!-- 查看版本与授权信息 -->
-          <MkDropdownItem @click="handleOpenAbout">
+          <MkDropdownItem v-if="perm.system.other.about()" @click="handleOpenAbout">
             <template #icon><MkIcon name="icon_info_outlined" /></template>
             <span>关于</span>
           </MkDropdownItem>
