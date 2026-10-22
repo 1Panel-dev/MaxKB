@@ -348,9 +348,13 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   嵌入第三方弹窗接收概览已有的 Web 链接与访问凭证，不额外请求接口；按全屏、浮窗、移动端单选切换并复制代码，
   关闭后恢复全屏模式。iframe 沿用 Web 链接，移动端增加 `mode=mobile`；浮窗使用 Chat API 前缀下的
   `/embed`，携带协议、主机和访问凭证；若传入链接含查询参数则一并保留，生成 HTML 时转义属性值。无访问凭证时禁用入口。
-  显示设置每次打开通过当前范围的 Application API 查询访问配置，支持主题色、语言、五类图片、
+  显示设置入口按 `auth.isCE` 选择社区版 `DisplaySettingDialog.vue`，其他版本使用
+  `XpackDisplaySettingDialog.vue`；每次打开通过当前范围的 Application API 查询访问配置。
+  社区版只编辑语言、知识来源与执行详情，使用 `putAccessToken` 保存；Xpack 版支持主题色、语言、五类图片、
   头像与对话展示开关、浮窗位置及免责声明，本地草稿实时预览。恢复默认仅改草稿，保存成功关闭，
   失败保留输入；图片限 JPG／PNG／GIF、10 MB，替换、恢复默认、关闭及卸载时释放临时 URL。
+  预览组件位于 `display-setting/components/`，通过 Props 接收名称、展示草稿和临时图片地址，
+  在组件内部合并图片地址；临时 URL 的创建和释放由弹窗负责。
   展示配置保存协议及后端支持情况见 API 文档。
   访问限制位于本地 `access-restriction/`，入口按 `auth.isCE` 选择社区版 `AccessRestrictionDrawer.vue`，
   其他版本使用 `XpackAccessRestrictionDrawer.vue`；按需挂载，关闭动画后卸载。

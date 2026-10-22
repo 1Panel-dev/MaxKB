@@ -162,6 +162,8 @@ Drawer 没有 `MkDialog` 的外壳挂载控制；需要按需挂载时，由业�
 `fields` 使用 `OptionItem<string>`，附加 `multiple`、`remoteMethod`。
 有 `options` 时渲染选择器，否则渲染文本输入；`remoteMethod(query)` 由调用方更新选项，组件管理加载状态。
 `change` 返回 `{ [field]: value }`，多选返回数组；清空返回 `undefined`，切换字段仅在原条件非空时通知清空。
+组合外观复用 [连体表单控件样式](../styles/STYLE_README.md#连体表单控件)，字段和条件控件的默认宽度
+分别为 104px、200px；搜索状态、远程加载和切换字段清空逻辑由组件管理。
 
 ### MkDropdown、MkDropdownMenu、MkDropdownItem
 

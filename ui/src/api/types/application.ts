@@ -31,7 +31,6 @@ export interface ApplicationDisplaySetting {
   language: string
   show_history: boolean
   draggable: boolean
-  show_guide: boolean
   show_share: boolean
   icon: string
   chat_background: string
@@ -74,6 +73,8 @@ export interface ApplicationAccessToken extends Partial<ApplicationDisplaySettin
 
 /** 智能体访问配置修改或令牌重置参数。 */
 export interface ApplicationAccessTokenPayload {
+  show_source?: boolean
+  show_exec?: boolean
   is_active?: boolean
   access_token_reset?: boolean
   access_num?: number

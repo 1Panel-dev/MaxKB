@@ -7,7 +7,7 @@ const debug = useDebugHeaderStore()
 </script>
 
 <template>
-  <header class="mk-conversation-header flex-align-center h-header shrink-0 border-b px-3">
+  <header class="mk-conversation-header flex-align-center h-header shrink-0 border-b border-N300 px-3">
     <!-- 左侧收起时才在顶部显示:展开左侧 + 新建对话 -->
     <template v-if="!leftSideOpen">
       <MkTooltip content="展开侧边栏">

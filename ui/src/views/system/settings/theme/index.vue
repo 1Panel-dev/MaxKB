@@ -203,7 +203,13 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
           <LoginPreview :data="themeSetting" />
 
           <div class="space-y-2">
-            <el-card v-for="imageSetting in THEME_IMAGE_SETTINGS" :key="imageSetting.field" class="small" shadow="never">
+            <el-card
+              v-for="imageSetting in THEME_IMAGE_SETTINGS"
+              :key="imageSetting.field"
+              class="small"
+              shadow="never"
+              style="--el-card-padding: 12px"
+            >
               <div class="flex-between mb-2">
                 <span>{{ imageSetting.label }}</span>
                 <el-upload
@@ -213,8 +219,8 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
                   :on-change="handleUploadImage(imageSetting.field)"
                   :show-file-list="false"
                 >
-                  <el-button plain class="shrink-0 min-w-8! w-8!">
-                    <MkIcon name="icon_upload_outlined" />
+                  <el-button plain class="shrink-0 min-w-7.5! w-7.5!">
+                    <MkIcon name="icon_upload_outlined" :size="14" />
                   </el-button>
                 </el-upload>
               </div>
@@ -242,7 +248,7 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
         <div class="grid grid-cols-[2fr_1fr] gap-6">
           <PlatformPreview :data="themeSetting" />
 
-          <div class="flex-column gap-3">
+          <div class="flex-column gap-2">
             <el-checkbox v-model="themeSetting.showUserManual" label="用户手册" />
             <div class="ml-6">
               <el-input
