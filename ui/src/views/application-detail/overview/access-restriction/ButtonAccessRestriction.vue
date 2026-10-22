@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
-import AccessRestrictionDialog from './AccessRestrictionDialog.vue'
+import { ref } from 'vue'
+import { useStore } from '@/stores/admin'
+import AccessRestrictionDrawer from './AccessRestrictionDrawer.vue'
+import XpackAccessRestrictionDrawer from './XpackAccessRestrictionDrawer.vue'
 
 defineOptions({ name: 'ButtonAccessRestriction' })
 
-const dialogRef = useTemplateRef<InstanceType<typeof AccessRestrictionDialog>>('dialogRef')
+const { auth } = useStore()
+const drawerVisible = ref(false)
 
 function handleOpenAccessRestriction() {
-  dialogRef.value?.open()
+  drawerVisible.value = true
 }
 </script>
 
@@ -17,5 +20,8 @@ function handleOpenAccessRestriction() {
     <MkIcon name="icon-lock" />
     <span>访问限制</span>
   </el-button>
-  <AccessRestrictionDialog ref="dialogRef" />
+  <template v-if="drawerVisible">
+    <AccessRestrictionDrawer v-if="auth.isCE" @closed="drawerVisible = false" />
+    <XpackAccessRestrictionDrawer v-else @closed="drawerVisible = false" />
+  </template>
 </template>

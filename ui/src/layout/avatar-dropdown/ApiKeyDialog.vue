@@ -24,11 +24,9 @@ defineExpose({ open })
       <el-input :model-value="apiDocUrl" readonly>
         <template #suffix>
           <!-- 复制 API 文档地址 -->
-          <MkTooltip content="复制">
-            <el-button link @click="copyText(apiDocUrl)">
-              <MkIcon name="icon_copy_outlined" />
-            </el-button>
-          </MkTooltip>
+          <el-button text @click="copyText(apiDocUrl)" class="-mr-1">
+            <MkIcon name="icon_copy_outlined" />
+          </el-button>
         </template>
       </el-input>
     </div>
