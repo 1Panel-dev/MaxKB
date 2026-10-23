@@ -7925,6 +7925,11 @@ msgstr ""
 "This bot_id is already bound to another application ({app}). "
 "Each bot_id can only correspond to one application."
 
+#: apps/xpack/serializers/platform_serializer.py:168
+#, python-brace-format
+msgid "This Bot ID is already in use by the agent named \"{name}\"."
+msgstr "This Bot ID is already in use by the agent named \"{name}\"."
+
 #: apps/xpack/serializers/channel/aibot/bot_manager.py:126
 msgid "Hello! I am an AI assistant. How can I help you?"
 msgstr "Hello! I am an AI assistant. How can I help you?"
