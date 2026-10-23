@@ -174,7 +174,9 @@ Chat 导航守卫（`chat/index.ts`）：
 `MkIcon` 的 `name` 属性渲染。需要在菜单激活后切换图标时，通过 `activeIcon` 配置激活状态
 的 Symbol ID；未配置时继续使用 `icon`。Router 目录禁止导入或传入 Element Plus 图标组件。
 
-System 侧栏默认使用当前页面的 `route.path` 匹配菜单激活项。Workspace 地址包含动态
+System 侧栏优先使用 `route.meta.activeMenu`，未配置时使用当前页面的 `route.path` 匹配菜单激活项。
+资源授权父路由配置 `activeMenu: '/system/identity/authorization'`，各资源类型子页面继承该配置，
+直接访问或刷新时保持“资源授权”菜单激活。Workspace 地址包含动态
 `workspaceId`，其侧栏使用路由名称匹配；详情、创建和编辑等子页面需要继续高亮所属一级菜单
 时，在一级父路由中把该菜单的路由名称配置为 `activeMenu`，由 Vue Router 合并到所有后代
 路由的 `meta`。个别子页面需要激活其他菜单时，可在子路由中覆盖 `activeMenu`。Workspace

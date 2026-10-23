@@ -39,11 +39,11 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" size="840" content-class="h-full !p-0" @close="close" @closed="emit('closed')">
+  <MkDrawer v-model="visible" size="840" @close="close" @closed="emit('closed')">
     <template #header>
       <h4 class="min-w-0 truncate" :title="props.chatLog.abstract">{{ props.chatLog.abstract || '对话详情' }}</h4>
     </template>
-    <div v-loading="props.loading" class="h-full">
+    <div v-loading="props.loading">
       <!-- 只读会话面板:展示该日志的历史对话与执行详情,无输入框 -->
       <LogConversation :chat-id="props.chatLog.id" :application-id="applicationId" :chat-log-api="resourceApi.chatLog" />
     </div>

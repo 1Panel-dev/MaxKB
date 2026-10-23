@@ -199,13 +199,7 @@ onMounted(() => {
         </el-table-column>
         <el-table-column min-width="110">
           <template #header>
-            <MkTableFilter
-              mode="single"
-              v-model="selectedStatus"
-              label="状态"
-              :options="statusOptions"
-              @change="handleStatusChange"
-            />
+            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="statusOptions" @change="handleStatusChange" />
           </template>
           <template #default="{ row }">
             <span class="inline-flex items-center gap-2">
@@ -222,7 +216,7 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="70" fixed="right">
           <template #default="{ row }">
-            <MkTooltip effect="dark" content="API详情" placement="top">
+            <MkTooltip effect="dark" content="API 详情" placement="top">
               <el-button type="primary" text @click.stop="handleOpenDetail(row)">
                 <MkIcon name="icon_describe_outlined" />
               </el-button>

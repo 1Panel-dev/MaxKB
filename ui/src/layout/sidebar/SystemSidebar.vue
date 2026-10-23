@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getChildRouteList } from '@/router/admin/utils'
 import type { LayoutMenuItem } from '../types'
@@ -10,6 +11,7 @@ const emit = defineEmits<{ toggle: [] }>()
 const route = useRoute()
 const router = useRouter()
 const systemMenuItems = getChildRouteList('system')
+const systemActiveMenuPath = computed(() => route.meta.activeMenu ?? route.path)
 
 const isSystemMenuActive = (systemMenuItem: LayoutMenuItem) => route.matched.some((matchedRoute) => matchedRoute.name === systemMenuItem.name)
 
@@ -24,7 +26,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
         :class="props.collapsed ? 'px-3.5!' : 'px-4!'"
         :collapse="props.collapsed"
         :collapse-transition="false"
-        :default-active="route.path"
+        :default-active="systemActiveMenuPath"
         router
         :persistent="false"
       >

@@ -38,13 +38,13 @@ const onScroll = async () => {
 
 <template>
   <!-- 只读会话记录:首页加载整块遮罩,上滑加载更多时顶部小转圈 -->
-  <div ref="msgBoxRef" v-loading="fullLoading" class="log-message-list p-6" @scroll="onScroll">
+  <div ref="msgBoxRef" v-loading="fullLoading" @scroll="onScroll">
     <template v-if="messages.length > 0">
       <div v-if="loading" class="log-message-list__more">
         <el-icon class="is-loading" :size="18"><LoadingIcon /></el-icon>
       </div>
 
-      <div v-for="(msg, i) in messages" :key="msg.id || i" :class="['msg-row', msg.role === 'USER' ? 'user' : 'assistant']">
+      <div v-for="(msg, i) in messages" :key="msg.id || i" :class="[msg.role === 'USER' ? 'user' : 'assistant']">
         <ContentList :content-list="msg.content" />
         <!-- 助手消息底部信息栏(知识来源/执行详情/tokens/耗时) -->
         <MessageFooter v-if="msg.role === 'ASSISTANT' && msg.record" :message="msg" />
@@ -56,37 +56,38 @@ const onScroll = async () => {
 </template>
 
 <style scoped lang="scss">
-.log-message-list {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+// .log-message-list {
+//   flex: 1;
+//   min-height: 0;
+//   overflow-y: auto;
+//   scrollbar-width: thin;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+// }
 
-.log-message-list__more {
-  display: flex;
-  justify-content: center;
-  padding: 4px 0 10px;
-  color: var(--t3, #909399);
-}
+// .log-message-list__more {
+//   display: flex;
+//   justify-content: center;
+//   padding: 4px 0 10px;
+//   color: var(--t3, #909399);
+// }
 
-.msg-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 10px;
-  max-width: 800px;
-  width: 100%;
-  box-sizing: border-box;
-}
-.msg-row.user {
-  align-items: flex-end;
-  flex-direction: row-reverse;
-}
-.msg-row.assistant {
-  align-items: flex-start;
-}
+// .msg-row {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 6px;
+//   margin-bottom: 10px;
+//   max-width: 800px;
+//   width: 100%;
+//   box-sizing: border-box;
+// }
+// .msg-row.user {
+//   align-items: flex-end;
+//   flex-direction: row-reverse;
+//   max-width: 85%;
+// }
+// .msg-row.assistant {
+//   align-items: flex-start;
+// }
 </style>

@@ -102,6 +102,7 @@ function loadResourcePermissions() {
 
   if (!targetId) {
     resourcePermissions.value = []
+    loadingPermissions.value = false
     return Promise.resolve()
   }
 
