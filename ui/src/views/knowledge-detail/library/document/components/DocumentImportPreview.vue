@@ -75,7 +75,7 @@ function handleDeleteParagraph(index: number) {
             >
               <div class="flex-align-center gap-2">
                 <el-image
-                  v-if="document.source_file_id"
+                  v-if="document.source_file_id && document.resource_type === 'image'"
                   class="size-8 shrink-0"
                   :src="getFileUrl(document.source_file_id)"
                   :alt="document.name"
@@ -110,7 +110,7 @@ function handleDeleteParagraph(index: number) {
 
               <!-- 图片-->
               <el-image
-                v-if="selectedDocument.source_file_id"
+                v-if="selectedDocument.source_file_id && selectedDocument.resource_type === 'image'"
                 class="w-fit [&_img]:size-auto! [&_img]:max-h-50 mb-2"
                 :src="getFileUrl(selectedDocument.source_file_id)"
                 :alt="selectedDocument.name"

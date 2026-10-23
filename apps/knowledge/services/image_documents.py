@@ -150,6 +150,7 @@ class ImageDocumentService:
             "preview_id": str(file.id),
             "file_id": str(file.id),
             "source_file_id": str(file.id),
+            "resource_type": DocumentResourceType.IMAGE,
             "name": file.file_name,
             "file_name": file.file_name,
             "file_size": original_size,

@@ -182,7 +182,7 @@ class ImagePreviewByFileIdsTests(SimpleTestCase):
         )
         serializer.return_value.upload.assert_called_once_with(payload)
 
-    def test_preview_endpoints_return_document_paragraphs_and_source_identity(self):
+    def test_preview_endpoints_return_document_paragraphs_source_identity_and_resource_type(self):
         path = f"/workspace/default/knowledge/{self.service.knowledge_id}/document/image/preview"
         requests = APIRequestFactory()
         cases = [
@@ -215,6 +215,7 @@ class ImagePreviewByFileIdsTests(SimpleTestCase):
                     preview = data[0] if request.method == "POST" else data
                     self.assertEqual(preview["name"], f"{title}.png")
                     self.assertEqual(preview["source_file_id"], self.ids[0])
+                    self.assertEqual(preview["resource_type"], "image")
                     self.assertEqual(preview["preview_id"], self.ids[0])
                     self.assertEqual(preview["content"], [{"title": title, "content": content}])
                     self.assertEqual(preview["char_length"], len(content))

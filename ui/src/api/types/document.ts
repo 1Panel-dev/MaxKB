@@ -70,6 +70,7 @@ export interface DocumentImportParagraph {
 export interface DocumentImportPayload {
   name: string
   source_file_id?: string | null
+  resource_type?: DocumentResourceType | null
   doc_strategy: DocumentStrategy
   paragraphs: DocumentImportParagraph[]
 }

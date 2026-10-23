@@ -177,6 +177,7 @@ class ImageVisualPreviewTests(SimpleTestCase):
             response = route.func(request, **route.kwargs)
         payload = json.loads(response.content)
         self.assertEqual(payload["code"], 200)
+        self.assertTrue(all(preview["resource_type"] == "image" for preview in payload["data"]))
         self.assertEqual(payload["data"][0]["process_status"], AssetProcessStatus.SUCCESS)
         self.assertEqual(payload["data"][0]["content"][0]["content"], "订单\nTotal: 128.50\n订单截图")
 
