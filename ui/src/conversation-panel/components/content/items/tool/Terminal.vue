@@ -36,7 +36,7 @@ defineEmits<{ toggle: [] }>()
 const commandText = computed(() => {
   const raw = props.content.arguments
   if (!raw) return ''
-  return extractPartialJsonField(raw, 'command') || extractPartialJsonField(raw, 'cmd') || raw
+  return extractPartialJsonField(raw, 'code') || extractPartialJsonField(raw, 'cmd') || raw
 })
 
 const onAfterEnter = (el: Element) => {
