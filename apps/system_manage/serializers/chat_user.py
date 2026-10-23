@@ -8,7 +8,8 @@ from dateutil.relativedelta import relativedelta
 import uuid_utils.compat as uuid
 from django.core import validators
 from django.db import transaction
-from django.db.models import Q, QuerySet
+from django.db.models import Q, QuerySet, OuterRef, Subquery, CharField
+from django.db.models.functions import Cast
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -136,6 +137,7 @@ class ChatUserSerializer(serializers.Serializer):
         email = serializers.CharField(required=False, label=_("Email"), allow_null=True, allow_blank=True)
         source = serializers.CharField(required=False, label=_("Source"), allow_null=True, allow_blank=True)
         is_active = serializers.BooleanField(required=False, label=_("Is active"), allow_null=True)
+        order_by = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("order by"))
 
         def get_query_set(self):
             username = self.data.get("username")
@@ -154,7 +156,12 @@ class ChatUserSerializer(serializers.Serializer):
             is_active = self.data.get("is_active", None)
             if is_active is not None:
                 query_set = query_set.filter(is_active=is_active)
-            query_set = query_set.order_by("-create_time")
+            quota_sub = ChatUserTokenQuota.objects.filter(user_id=Cast(OuterRef("pk"), output_field=CharField()))
+            query_set = query_set.annotate(
+                total_tokens=Subquery(quota_sub.values("total_tokens")[:1]),
+                used_tokens=Subquery(quota_sub.values("used_tokens")[:1]),
+            )
+            query_set = query_set.order_by(self.data.get("order_by") or "-create_time")
             return query_set
 
         def page(self, current_page: int, page_size: int, with_valid=True):

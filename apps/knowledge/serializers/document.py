@@ -659,6 +659,7 @@ class DocumentSerializers(serializers.Serializer):
                         "paragraph_count": models.IntegerField(),
                         "hit_num": models.IntegerField(),
                         "last_hit_time": models.DateTimeField(),
+                        "nick_name": models.CharField(),
                         "update_time": models.IntegerField(),
                         "create_time": models.DateTimeField(),
                     }

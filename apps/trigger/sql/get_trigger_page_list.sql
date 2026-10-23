@@ -42,4 +42,4 @@ FROM (SELECT t.id,
           ${trigger_query_set}
       ) AS sub
     ${task_query_set}
-ORDER BY sub.create_time DESC
+${order_by_query}

@@ -129,6 +129,7 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     chat_id = serializers.UUIDField(required=True, label=_("Chat ID"))
     order_asc = serializers.BooleanField(required=False, allow_null=True, label=_("Is it in order"))
+    order_by = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("order by"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -146,7 +147,9 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
     def list(self, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-        order_by = "create_time" if self.data.get("order_asc") is None or self.data.get("order_asc") else "-create_time"
+        order_by = self.data.get("order_by") or (
+            "create_time" if self.data.get("order_asc") is None or self.data.get("order_asc") else "-create_time"
+        )
         return [
             ChatRecordSerializerModel(chat_record).data
             for chat_record in QuerySet(ChatRecord)
@@ -249,7 +252,9 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
     def page(self, current_page: int, page_size: int, with_valid=True, show_source=None, show_exec=None):
         if with_valid:
             self.is_valid(raise_exception=True)
-        order_by = "-create_time" if self.data.get("order_asc") is None or self.data.get("order_asc") else "create_time"
+        order_by = self.data.get("order_by") or (
+            "-create_time" if self.data.get("order_asc") is None or self.data.get("order_asc") else "create_time"
+        )
         if show_source is None:
             show_source = True
         if show_exec is None:

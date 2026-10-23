@@ -68,6 +68,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
             validators.RegexValidator(regex=re.compile("^and|or$"), message=_("Only supports and|or"), code=500)
         ],
     )
+    order_by = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("order by"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -101,6 +102,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                     "star_num": models.IntegerField(),
                     "trample_num": models.IntegerField(),
                     "comparer": models.CharField(),
+                    "application_chat.chat_record_count": models.IntegerField(),
                     "application_chat.update_time": models.DateTimeField(),
                     "application_chat.id": models.UUIDField(),
                     "application_chat_record_temp.id": models.UUIDField(),
@@ -144,7 +146,13 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         else:
             condition = base_condition
 
-        return {"default_queryset": query_set.filter(condition).order_by("-application_chat.update_time")}
+        order_by = self.data.get("order_by")
+        if order_by:
+            field = order_by.lstrip("-")
+            order_by = f"{'-' if order_by.startswith('-') else ''}application_chat.{field}"
+        else:
+            order_by = "-application_chat.update_time"
+        return {"default_queryset": query_set.filter(condition).order_by(order_by)}
 
     def list(self, with_valid=True):
         if with_valid:

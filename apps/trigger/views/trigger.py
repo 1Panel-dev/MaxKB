@@ -280,6 +280,7 @@ class TriggerView(APIView):
                         "type": request.query_params.get("type"),
                         "is_active": request.query_params.get("is_active"),
                         "create_user": request.query_params.get("create_user"),
+                        "order_by": request.query_params.get("order_by"),
                     }
                 ).page(current_page, page_size)
             )
