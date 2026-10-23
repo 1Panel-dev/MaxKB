@@ -10,7 +10,6 @@ const props = defineProps<{ api: typeof ApplicationApi | typeof SystemResourceAp
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ change: [isPortal: boolean] }>()
 
-// 模拟请求成功后由列表更新状态，后续替换真实接口时保留此流程。
 function handlePortalApplication() {
   if (loading.value) return
   const isPortal = !props.application.is_portal
@@ -19,7 +18,7 @@ function handlePortalApplication() {
     .putApplicationPortal(props.application.id, isPortal)
     .then((application) => {
       emit('change', application.is_portal)
-      MsgSuccess(isPortal ? '模拟上架成功' : '模拟下架成功')
+      MsgSuccess(isPortal ? '上架成功' : '下架成功')
     })
     .catch(() => {})
     .finally(() => {

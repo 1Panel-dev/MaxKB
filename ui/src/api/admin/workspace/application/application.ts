@@ -51,8 +51,10 @@ const exportApplication = (applicationId: string, applicationName: string) => {
 const exportApplicationSkills = (applicationId: string, applicationName: string) =>
   Promise.resolve({ application_id: applicationId, name: applicationName })
 
-/** 模拟工作空间智能体门户上下架；TODO：接入真实接口，当前不持久化。 */
-const putApplicationPortal = (applicationId: string, isPortal: boolean) => Promise.resolve({ id: applicationId, is_portal: isPortal })
+/** 模拟工作空间智能体门户上下架。 */
+const putApplicationPortal = (applicationId: string, isPortal: boolean) => {
+  return put<{ is_portal: boolean }, ApplicationDetail>(`${getPrefix()}/${applicationId}`, { is_portal: isPortal })
+}
 
 /** 导入智能体文件并创建工作空间智能体。 */
 const postApplicationImport = (file: File, folderId: string) => {
