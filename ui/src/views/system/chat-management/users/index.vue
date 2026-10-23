@@ -5,6 +5,7 @@ import type { ChatUser, Dict, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD, QUOTA_TYPE } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { formatTokenNumber } from '@/utils/number'
 import UserFromDrawer from './UserFromDrawer.vue'
@@ -26,6 +27,7 @@ const userTableRef = useTemplateRef('userTableRef')
 const chatUsersLoading = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const chatUsersData = ref<ChatUser[]>([])
+const orderBy = ref<string>()
 const searchFields: OptionItem<string>[] = [
   { label: '姓名', value: 'nick_name' },
   { label: '用户名', value: 'username' },
@@ -46,6 +48,7 @@ const sourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).
 }))
 const chatUserQuery = computed<Dict<unknown>>(() => ({
   ...chatUserSearchQuery.value,
+  order_by: orderBy.value,
   ...(selectedStatus.value !== null ? { is_active: selectedStatus.value } : {}),
   ...(selectedSource.value !== null ? { source: selectedSource.value } : {}),
 }))
@@ -65,7 +68,14 @@ function handleSearchChange(query?: Dict<unknown>) {
 
 function handleFilterChange() {
   paginationConfig.value.currentPage = 1
-  loadChatUsers()
+  return loadChatUsers()
+}
+
+/* 表头排序：清空选择并重新查询第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort, (prop) => (prop === 'token_quota.used_tokens' ? 'used_tokens' : prop))
+  userTableRef.value?.clearSelection()
+  return handleFilterChange()
 }
 
 function loadChatUsers(resetQuery = false) {
@@ -165,6 +175,7 @@ onMounted(() => loadChatUsers())
         @current-change="loadChatUsers()"
         @size-change="loadChatUsers()"
         @selection-change="handleBatchSelectionChange"
+        @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
@@ -204,7 +215,7 @@ onMounted(() => loadChatUsers())
           </template>
         </el-table-column>
 
-        <el-table-column label="Tokens使用量/总量" min-width="150">
+        <el-table-column prop="token_quota.used_tokens" label="Tokens使用量/总量" width="180" min-width="170" sortable>
           <template #default="{ row }">
             {{ formatQuotaUsage(row.token_quota) }}
           </template>
@@ -216,7 +227,7 @@ onMounted(() => loadChatUsers())
           </template>
         </el-table-column>
 
-        <el-table-column label="创建时间" width="180">
+        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
           <template #default="{ row }">
             {{ datetimeFormat(row.create_time) }}
           </template>

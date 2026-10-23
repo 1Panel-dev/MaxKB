@@ -9,7 +9,7 @@ import type { ApplicationDetail, Dict, OptionItem } from '@/api/types'
 import { APPLICATION_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { datetimeFormat } from '@/utils/time'
-import { isWorkFlow } from '@/utils/common'
+import { isWorkFlow, toOrderBy } from '@/utils/common'
 import {
   AuthorizeApplicationAction,
   ExportApplicationAction,
@@ -31,6 +31,7 @@ const operationLoading = ref(false)
 const applicationData = ref<ApplicationDetail[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const applicationQuery = ref<Dict<unknown>>()
+const orderBy = ref<string>()
 const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedWorkspaceIds = ref<string[]>([])
@@ -60,6 +61,7 @@ function loadApplicationPage() {
   loading.value = true
   return SystemResourceApplicationApi.getApplicationPage(pagination.value, {
     ...applicationQuery.value,
+    order_by: orderBy.value,
     ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
     ...(selectedStatus.value ? { status: selectedStatus.value } : {}),
     ...(selectedType.value ? { type: selectedType.value } : {}),
@@ -81,6 +83,12 @@ function handleSearchChange(query?: Dict<unknown>) {
 function handleFilterChange() {
   pagination.value.currentPage = 1
   return loadApplicationPage()
+}
+
+/* 表头排序：保留筛选并重新查询第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort)
+  return handleFilterChange()
 }
 
 onMounted(() => {
@@ -107,6 +115,7 @@ onMounted(() => {
         :max-table-height="210"
         @current-change="loadApplicationPage"
         @size-change="loadApplicationPage"
+        @sort-change="handleSortChange"
         resizable
       >
         <el-table-column prop="name" label="名称" min-width="200" show-overflow-tooltip>
@@ -150,10 +159,10 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column label="发布时间" width="180">
+        <el-table-column prop="publish_time" label="发布时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.publish_time) || '-' }}</template>
         </el-table-column>
-        <el-table-column label="创建时间" width="180">
+        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">

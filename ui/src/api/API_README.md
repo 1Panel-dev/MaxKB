@@ -168,6 +168,17 @@ FormData；保存返回完整配置，页面以该返回值作为唯一数据来
 `admin/auth/current-user.ts` 的 postCurrentUserPassword 向 `/user/current/reset_password`
 提交 RSA 加密的 `{ encryptedData }`；调用方校验与加密，成功清除凭据后进入登录。
 
+### 系统用户列表排序
+
+系统用户分页排序以 `order_by` 传入 `create_time`；对话用户分页传入 `create_time` 或 `used_tokens`，
+后者从列字段 `token_quota.used_tokens` 映射。升序使用字段原名，降序添加 `-`，取消排序不传值。
+排序由服务端处理，不做前端当前页排序。
+
+### 操作日志排序
+
+操作日志列表与导出共用查询条件，操作时间排序通过 `order_by` 传入 `create_time` 或 `-create_time`，
+取消排序不传值。
+
 ### 平台许可证
 
 `admin/system/license.ts` 通过 GET、PUT `/license/profile` 查询和更新授权信息，
@@ -592,7 +603,8 @@ Workspace 共享 Paragraph API 仅 getParagraphPage、getParagraphDetail，不�
 
 四范围 `knowledge/problem.ts` 使用各自知识库前缀追加 `/<knowledgeId>/problem`，
 由知识库及文档详情上下文的 `resourceApi.problem` 选择，不固定 Workspace。
-`getProblemsPage(knowledgeId, page, query)` 返回 `ResponsePage<ProblemItem>`，query 仅传 content。
+`getProblemsPage(knowledgeId, page, query)` 返回 `ResponsePage<ProblemItem>`，query 支持 content 和 order_by。
+排序字段为 paragraph_count、hit_num、last_hit_time、create_time、update_time，降序在字段名前加 `-`。
 `ProblemItem` 包含 id、content、paragraph_count、hit_num、last_hit_time、create_time、update_time；
 分段已有问题仍使用轻量 `ParagraphProblem`，不要求包含列表统计字段。
 

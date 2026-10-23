@@ -12,6 +12,7 @@ import { TOOL_TYPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS } from '@/constants'
 import { useStore } from '@/stores'
 import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolStatusSwitch from '@/views/tool/tool-card/ToolStatusSwitch.vue'
 import {
@@ -35,6 +36,7 @@ const operationLoading = ref(false)
 const tools = ref<ToolItem[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const toolQuery = ref<Dict<unknown>>()
+const orderBy = ref<string>()
 const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedToolType = ref('')
@@ -66,6 +68,7 @@ function loadTools() {
   loading.value = true
   return SystemToolApi.getToolPage(pagination.value, {
     ...toolQuery.value,
+    order_by: orderBy.value,
     ...(selectedToolType.value ? { tool_type: selectedToolType.value } : {}),
     ...(selectedSource.value ? { source: selectedSource.value } : {}),
     ...(selectedStatus.value ? { status: selectedStatus.value } : {}),
@@ -88,6 +91,12 @@ function handleSearchChange(query?: Dict<unknown>) {
 function handleFilterChange() {
   pagination.value.currentPage = 1
   return loadTools()
+}
+
+/* 表头排序：保留筛选并重新查询第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort)
+  return handleFilterChange()
 }
 
 /* 工具编辑、启停与工作流入口 */
@@ -149,6 +158,7 @@ onMounted(() => {
         :max-table-height="210"
         @current-change="loadTools"
         @size-change="loadTools"
+        @sort-change="handleSortChange"
         resizable
       >
         <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
@@ -183,10 +193,10 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column label="更新时间" width="180">
+        <el-table-column prop="update_time" label="更新时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
         </el-table-column>
-        <el-table-column label="创建时间" width="180">
+        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
         <el-table-column label="操作" width="140" fixed="right">

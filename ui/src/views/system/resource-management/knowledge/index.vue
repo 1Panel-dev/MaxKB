@@ -8,6 +8,7 @@ import SystemWorkspaceApi from '@/api/admin/system/workspace'
 import type { KnowledgeItem, Dict, OptionItem } from '@/api/types'
 import { useStore } from '@/stores'
 import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
 
@@ -47,6 +48,7 @@ const knowledgeOperationLoading = ref(false)
 const knowledgeData = ref<KnowledgeItem[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const KnowledgeQuery = ref<Dict<unknown>>()
+const orderBy = ref<string>()
 const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedWorkspaceIds = ref<string[]>([])
@@ -72,6 +74,7 @@ function loadKnowledgePage() {
   loading.value = true
   return SystemResourceKnowledgeApi.getKnowledgePage(pagination.value, {
     ...KnowledgeQuery.value,
+    order_by: orderBy.value,
     ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
     ...(selectedType.value !== null && selectedType.value !== undefined ? { type: selectedType.value } : {}),
   })
@@ -107,6 +110,12 @@ function handleFilterChange() {
   return loadKnowledgePage()
 }
 
+/* 表头排序：保留筛选并重新查询第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort)
+  return handleFilterChange()
+}
+
 onMounted(() => {
   loadKnowledgePage()
   if (auth.isEE) {
@@ -131,6 +140,7 @@ onMounted(() => {
         :max-table-height="210"
         @current-change="loadKnowledgePage"
         @size-change="loadKnowledgePage"
+        @sort-change="handleSortChange"
         resizable
       >
         <el-table-column prop="name" label="名称" min-width="200" show-overflow-tooltip>
@@ -155,10 +165,10 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column label="更新时间" width="180">
+        <el-table-column prop="update_time" label="更新时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
         </el-table-column>
-        <el-table-column label="创建时间" width="180">
+        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">

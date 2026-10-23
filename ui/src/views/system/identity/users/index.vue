@@ -6,6 +6,7 @@ import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
 import type { Dict, LoginMethod, OptionItem, SystemUser } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 import UserFromDrawer from './UserFromDrawer.vue'
@@ -28,6 +29,7 @@ const userTableRef = useTemplateRef('userTableRef')
 const systemUsersLoading = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const systemUsersData = ref<SystemUser[]>([])
+const orderBy = ref<string>()
 
 const searchFields: OptionItem<string>[] = [
   { label: '姓名', value: 'nick_name' },
@@ -44,6 +46,7 @@ const selectedSource = ref<string | null>(null)
 
 const systemUserQuery = computed<Dict<unknown>>(() => ({
   ...systemUserSearchQuery.value,
+  order_by: orderBy.value,
   ...(selectedStatus.value !== null ? { is_active: selectedStatus.value } : {}),
   ...(selectedSource.value !== null ? { source: selectedSource.value } : {}),
 }))
@@ -56,7 +59,14 @@ function handleSearchChange(query?: Dict<unknown>) {
 
 function handleHeaderFilterChange() {
   paginationConfig.value.currentPage = 1
-  loadSystemUsers()
+  return loadSystemUsers()
+}
+
+/* 表头排序：清空选择并重新查询第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort)
+  userTableRef.value?.clearSelection()
+  return handleHeaderFilterChange()
 }
 
 function loadSystemUsers(resetQuery = false) {
@@ -158,6 +168,7 @@ onMounted(() => loadSystemUsers())
         @current-change="loadSystemUsers()"
         @size-change="loadSystemUsers()"
         @selection-change="handleBatchSelectionChange"
+        @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
@@ -236,7 +247,7 @@ onMounted(() => loadSystemUsers())
           </template>
         </el-table-column>
 
-        <el-table-column label="创建时间" width="180">
+        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
           <template #default="{ row }">
             {{ datetimeFormat(row.create_time) }}
           </template>

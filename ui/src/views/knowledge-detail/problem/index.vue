@@ -6,6 +6,7 @@ import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import MkEditName from '@/components/mk-edit-name/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
@@ -23,6 +24,7 @@ const loading = ref(false)
 const operationLoading = ref(false)
 const problems = ref<ProblemItem[]>([])
 const searchText = ref('')
+const orderBy = ref<string>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const selectedProblems = ref<ProblemItem[]>([])
 const problemTableRef = ref<{ clearSelection: () => void }>()
@@ -47,7 +49,11 @@ function clearSelection() {
 function loadProblems(currentPage = paginationConfig.value.currentPage): Promise<ProblemItem[] | undefined> {
   loading.value = true
   return resourceApi.problem
-    .getProblemsPage(knowledgeId.value, { currentPage, pageSize: paginationConfig.value.pageSize }, { content: searchText.value.trim() || undefined })
+    .getProblemsPage(
+      knowledgeId.value,
+      { currentPage, pageSize: paginationConfig.value.pageSize },
+      { content: searchText.value.trim() || undefined, order_by: orderBy.value },
+    )
     .then(({ records, total }) => {
       const lastPage = Math.max(1, Math.ceil(total / paginationConfig.value.pageSize))
       if (currentPage > lastPage) return loadProblems(lastPage)
@@ -70,6 +76,12 @@ function loadProblems(currentPage = paginationConfig.value.currentPage): Promise
 function handleSearchChange() {
   clearSelection()
   return loadProblems(1)
+}
+
+/* 表头排序：清空选择并重新查询第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort)
+  return handleSearchChange()
 }
 
 function handleSelectionChange(selection: unknown[]) {
@@ -198,6 +210,7 @@ onMounted(() => loadProblems())
     @current-change="loadProblems()"
     @size-change="loadProblems()"
     @selection-change="handleSelectionChange"
+    @sort-change="handleSortChange"
     @row-click="handleOpenProblem"
   >
     <template #body-prepend>
@@ -223,17 +236,17 @@ onMounted(() => loadProblems())
         />
       </template>
     </el-table-column>
-    <el-table-column prop="paragraph_count" label="关联分段数" min-width="120" />
-    <el-table-column prop="hit_num" label="召回次数" min-width="100">
+    <el-table-column prop="paragraph_count" label="关联分段数" min-width="120" sortable />
+    <el-table-column prop="hit_num" label="召回次数" min-width="100" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ numberFormat(row.hit_num) }}</template>
     </el-table-column>
-    <el-table-column prop="last_hit_time" label="最近一次召回时间" min-width="180">
+    <el-table-column prop="last_hit_time" label="最近一次召回时间" min-width="180" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.last_hit_time) || '-' }}</template>
     </el-table-column>
-    <el-table-column prop="create_time" label="创建时间" min-width="180">
+    <el-table-column prop="create_time" label="创建时间" min-width="180" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
-    <el-table-column prop="update_time" label="更新时间" min-width="180">
+    <el-table-column prop="update_time" label="更新时间" min-width="180" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
     <el-table-column v-if="!isWorkspaceSharedResource()" label="操作" width="100" fixed="right">

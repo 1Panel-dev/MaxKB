@@ -8,6 +8,7 @@ import type { MkDateRangeValue } from '@/components/mk-date-range/types'
 import ButtonCleanStrategy from './clean-strategy/ButtonCleanStrategy.vue'
 import OperateLogDetailDialog from './dialog/OperateLogDetailDialog.vue'
 import { beforeDay, datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { useStore } from '@/stores'
 import perm from '@/permission/index.ts'
 
@@ -15,6 +16,7 @@ const { auth } = useStore()
 /* 日志筛选与列表 */
 const loading = ref(false)
 const operateLogs = ref<OperateLog[]>([])
+const orderBy = ref<string>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchFields: OptionItem<string>[] = [
   { label: '操作详情', value: 'operate' },
@@ -89,10 +91,18 @@ function handleStatusChange() {
 const operateLogQuery = computed<Dict<unknown>>(() => ({
   ...operateLogDateQuery.value,
   ...operateLogSearchQuery.value,
+  order_by: orderBy.value,
   ...(selectedOperateMenus.value.length ? { menu: JSON.stringify(selectedOperateMenus.value) } : {}),
   ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
   ...(selectedStatus.value != null ? { status: selectedStatus.value } : {}),
 }))
+
+/* 表头排序：重新查询第一页，保留当前筛选。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort)
+  paginationConfig.value.currentPage = 1
+  return loadOperateLogs()
+}
 
 function loadOperateLogs(resetQuery = false) {
   if (resetQuery) {
@@ -154,6 +164,7 @@ onMounted(() => {
         :data="operateLogs"
         @current-change="loadOperateLogs()"
         @size-change="loadOperateLogs()"
+        @sort-change="handleSortChange"
         :max-table-height="200"
         resizable
       >
@@ -206,7 +217,7 @@ onMounted(() => {
         <el-table-column label="IP 地址" width="140" show-overflow-tooltip>
           <template #default="{ row }">{{ row.ip_address || '-' }}</template>
         </el-table-column>
-        <el-table-column label="操作时间" width="180">
+        <el-table-column prop="create_time" label="操作时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
         <el-table-column label="操作" width="70" fixed="right">
