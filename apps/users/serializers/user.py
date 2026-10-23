@@ -451,9 +451,13 @@ class UserManageSerializer(serializers.Serializer):
                         continue
                     user_role_mapping[user_id].add(relation.role.role_name)
                     user_role_setting_mapping[user_id][role_id].append(workspace_id)
-                    user_role_workspace_mapping[user_id][relation.role.role_name].append(
-                        workspace_mapping.get(workspace_id, workspace_id)
-                    )
+                    if relation.role.type == RoleConstants.ADMIN.name:
+                        # 系统层级角色不关联具体空间，无需空间id
+                        user_role_workspace_mapping[user_id].setdefault(relation.role.role_name, [])
+                    else:
+                        user_role_workspace_mapping[user_id][relation.role.role_name].append(
+                            workspace_mapping.get(workspace_id, workspace_id)
+                        )
 
                     # 将 set 转换为 list 以符合返回格式
                 user_role_mapping = {uid: list(roles) for uid, roles in user_role_mapping.items()}
