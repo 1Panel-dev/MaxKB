@@ -5,17 +5,19 @@ import type { ApiKeyPayload, ApiKeyRecord } from '@/api/types'
 import type ApplicationApiKeyApi from '@/api/admin/workspace/application/api-key'
 import type SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
 import type SystemApiKeyApi from '@/api/admin/system/api-key'
-import { expirationOptions, getApiKeyExpireTime, type ExpirationType } from './expiration'
+import { expirationOptions, getApiKeyExpireTime, type ExpirationType } from '../expiration'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 
-defineOptions({ name: 'EditApiKeyDrawer' })
+defineOptions({ name: 'ButtonEditApiKey' })
 
 const props = defineProps<{
   api: typeof ApplicationApiKeyApi | typeof SystemResourceApiKeyApi | typeof SystemApiKeyApi
   applicationId?: string
+  record: ApiKeyRecord
 }>()
 const emit = defineEmits<{ refresh: [] }>()
+/* 编辑 API Key 与配置抽屉 */
 const visible = ref(false)
 const saving = ref(false)
 const apiKeyId = ref('')
@@ -54,10 +56,10 @@ const rules: FormRules<ApiKeyForm> = {
       trigger: 'change',
     },
   ],
-  remark: [{ max: 256, message: '备注最多 256 个字符', trigger: 'blur' }],
 }
 
-function open(record: ApiKeyRecord) {
+function handleOpenEdit() {
+  const record = props.record
   apiKeyId.value = record.id
   Object.assign(form, {
     secret_key: record.secret_key,
@@ -119,11 +121,15 @@ function handleClosed() {
   form.is_active = true
   formRef.value?.clearValidate()
 }
-
-defineExpose({ open })
 </script>
 
 <template>
+  <!-- 编辑 API Key -->
+  <MkTooltip content="编辑" placement="top">
+    <el-button type="primary" text @click.stop="handleOpenEdit">
+      <MkIcon name="icon_edit_outlined" />
+    </el-button>
+  </MkTooltip>
   <MkDrawer v-model="visible" title="编辑 API Key" @closed="handleClosed">
     <el-form ref="formRef" :model="form" :rules="rules" :inert="saving" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="API KEY">
@@ -158,7 +164,7 @@ defineExpose({ open })
           v-model="form.cross_domain_list"
           type="textarea"
           :rows="8"
-          placeholder="请输入允许的跨域地址，开启后不输入跨域地址则不限制。&#10;跨域地址一行一个，如：&#10;http://127.0.0.1:5678&#10;https://dataease.io"
+          :placeholder="'请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io'"
         />
       </el-form-item>
       <el-form-item label="启用状态">

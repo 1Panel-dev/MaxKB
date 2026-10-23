@@ -712,7 +712,10 @@ Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选
 启停成功后刷新，失败保留原状态。查询与列表操作共用 loading，编辑抽屉单独管理保存状态。
 密钥默认隐藏，翻页或刷新恢复隐藏，复制始终使用完整值，隐藏状态不通过 Tooltip 暴露明文。
 
-`EditApiKeyDrawer` 是本功能内部抽屉，按永不过期、预设有效期或自定义日期编辑，预设有效期
+创建入口与结果 Dialog 封装在内部 `create-api-key/index.vue`（`ButtonCreateApiKey`），接收完整 API、
+可选 `applicationId`、共享 `v-model:loading` 和异步 `refresh` 回调；创建成功展示密钥，并等待列表回到第一页刷新后释放 loading。
+编辑入口与 Drawer 封装在内部 `edit-api-key/index.vue`（`ButtonEditApiKey`），接收完整 API、可选 `applicationId`
+和当前 `record`，保存成功通过 `refresh` 事件通知列表。按永不过期、预设有效期或自定义日期编辑，预设有效期
 从保存时起算；跨域地址逐行去空白后提交数组。保存失败保留草稿，成功刷新列表。
 备注按 `remark` 预留，当前后端尚未持久化。Base URL 或 API 文档地址由调用方在列表外展示。
 

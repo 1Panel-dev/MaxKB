@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { ApiKeyRecord } from '@/api/types'
 import type ApplicationApiKeyApi from '@/api/admin/workspace/application/api-key'
 import type SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
 import type SystemApiKeyApi from '@/api/admin/system/api-key'
-import EditApiKeyDrawer from './EditApiKeyDrawer.vue'
+import ButtonCreateApiKey from './create-api-key/index.vue'
+import ButtonEditApiKey from './edit-api-key/index.vue'
 import { getApiKeyExpiration } from './expiration'
 import { copyText } from '@/utils/clipboard'
 import { datetimeFormat } from '@/utils/time'
@@ -18,10 +19,7 @@ const props = defineProps<{
 }>()
 const loading = ref(false)
 const apiKeys = ref<ApiKeyRecord[]>([])
-const createdApiKey = ref('')
-const createdDialogVisible = ref(false)
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const editDrawerRef = useTemplateRef<InstanceType<typeof EditApiKeyDrawer>>('editDrawerRef')
 const apiKeyRows = computed(() => apiKeys.value.map((record) => ({ ...record, expiration: getApiKeyExpiration(record) })))
 
 function fetchApiKeys() {
@@ -43,23 +41,9 @@ function loadApiKeys() {
   })
 }
 
-function handleCreate() {
-  if (loading.value) return
-  loading.value = true
-  const request =
-    props.applicationId !== undefined
-      ? (props.api as typeof ApplicationApiKeyApi | typeof SystemResourceApiKeyApi).postApiKey(props.applicationId)
-      : (props.api as typeof SystemApiKeyApi).postApiKey()
-  return request
-    .then((record) => {
-      createdApiKey.value = record.secret_key
-      createdDialogVisible.value = true
-      pagination.value.currentPage = 1
-      return fetchApiKeys()
-    })
-    .finally(() => {
-      loading.value = false
-    })
+function handleCreated() {
+  pagination.value.currentPage = 1
+  return fetchApiKeys()
 }
 
 function handleChangeActive(record: ApiKeyRecord) {
@@ -105,20 +89,16 @@ function handleDelete(record: ApiKeyRecord) {
   )
 }
 
-function handleOpenEdit(record: ApiKeyRecord) {
-  editDrawerRef.value?.open(record)
-}
-
 onMounted(loadApiKeys)
 </script>
 
 <template>
   <div v-loading="loading" :inert="loading">
-    <!-- 创建 API Key -->
-    <el-button type="primary" class="mb-4" @click="handleCreate">
-      <MkIcon name="icon_add_outlined" />
-      <span>创建</span>
-    </el-button>
+    <!-- 创建 API Key  -->
+    <div class="mb-4">
+      <ButtonCreateApiKey :api="props.api" :application-id="props.applicationId" v-model:loading="loading" :refresh="handleCreated" />
+    </div>
+
     <MkTable
       v-model:pagination-config="pagination"
       :data="apiKeyRows"
@@ -126,7 +106,7 @@ onMounted(loadApiKeys)
       @current-change="loadApiKeys"
       @size-change="loadApiKeys"
     >
-      <el-table-column label="API Key" min-width="160">
+      <el-table-column label="API Key" width="140">
         <template #default="{ row }">
           <div class="flex-align-center gap-2">
             <span>
@@ -151,7 +131,7 @@ onMounted(loadApiKeys)
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="到期时间" min-width="265">
+      <el-table-column label="到期时间" width="265">
         <template #default="{ row }">
           <span :class="{ 'text-danger': row.expiration.status === 'expired', 'text-warning': row.expiration.status === 'soon' }">
             {{ row.expiration.label }}
@@ -161,10 +141,10 @@ onMounted(loadApiKeys)
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" min-width="120" show-overflow-tooltip>
+      <el-table-column label="备注" show-overflow-tooltip>
         <template #default="{ row }">{{ row.remark || '—' }}</template>
       </el-table-column>
-      <el-table-column prop="create_time" label="创建时间" min-width="180">
+      <el-table-column prop="create_time" label="创建时间" width="180">
         <template #default="{ row }">{{ datetimeFormat(row.create_time) || '—' }}</template>
       </el-table-column>
       <el-table-column label="操作" width="140" fixed="right">
@@ -173,12 +153,8 @@ onMounted(loadApiKeys)
             <!-- 启用或禁用 API Key -->
             <el-switch :model-value="row.is_active" size="small" :before-change="() => handleChangeActive(row)" />
             <el-divider direction="vertical" />
-            <!-- 编辑 API Key -->
-            <MkTooltip content="编辑" placement="top">
-              <el-button type="primary" text @click.stop="handleOpenEdit(row)">
-                <MkIcon name="icon_edit_outlined" />
-              </el-button>
-            </MkTooltip>
+            <!-- 编辑API Key -->
+            <ButtonEditApiKey :api="props.api" :application-id="props.applicationId" :record="row" @refresh="loadApiKeys" />
             <!-- 删除 API Key -->
             <MkTooltip content="删除" placement="top">
               <el-button class="ml-0!" type="primary" text @click.stop="handleDelete(row)">
@@ -190,20 +166,4 @@ onMounted(loadApiKeys)
       </el-table-column>
     </MkTable>
   </div>
-  <MkDialog v-model="createdDialogVisible" title="API Key" @closed="createdApiKey = ''">
-    <template #subtitle>请安全保存此密钥，不要泄露。</template>
-    <el-input :model-value="createdApiKey" readonly>
-      <template #suffix>
-        <!-- 复制新建的完整 API Key -->
-        <el-button text @click="copyText(createdApiKey)" class="-mr-1">
-          <MkIcon name="icon_copy_outlined" />
-        </el-button>
-      </template>
-    </el-input>
-    <template #footer>
-      <!-- 关闭创建结果弹窗 -->
-      <el-button plain @click="createdDialogVisible = false">知道了</el-button>
-    </template>
-  </MkDialog>
-  <EditApiKeyDrawer v-bind="props" ref="editDrawerRef" @refresh="loadApiKeys" />
 </template>

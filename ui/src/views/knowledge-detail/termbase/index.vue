@@ -186,13 +186,13 @@ onMounted(() => {
       />
     </template>
     <el-table-column type="selection" width="40" />
-    <el-table-column prop="content" label="词语" min-width="280" show-overflow-tooltip />
-    <el-table-column prop="create_time" label="创建时间" min-width="180">
+    <el-table-column prop="content" label="词语" show-overflow-tooltip />
+    <el-table-column prop="create_time" label="创建时间" width="180">
       <template #default="{ row }: { row: TermbaseItem }">
         {{ datetimeFormat(row.create_time) }}
       </template>
     </el-table-column>
-    <el-table-column prop="update_time" label="更新时间" min-width="180">
+    <el-table-column prop="update_time" label="更新时间" width="180">
       <template #default="{ row }: { row: TermbaseItem }">
         {{ datetimeFormat(row.update_time) }}
       </template>

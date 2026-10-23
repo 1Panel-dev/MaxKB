@@ -151,7 +151,7 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="200">
+        <el-table-column prop="type" label="类型" width="180">
           <template #header>
             <MkTableFilter mode="single" v-model="selectedType" label="类型" :options="typeOptions" @change="handleFilterChange" />
           </template>
