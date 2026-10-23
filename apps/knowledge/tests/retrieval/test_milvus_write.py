@@ -12,7 +12,7 @@ from django.test import SimpleTestCase
 
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
-from knowledge.models import SourceType, State, Status, TaskType
+from knowledge.models import SearchMode, SourceType, State, Status, TaskType
 from knowledge.vector.milvus_vector import MilvusVector
 from maxkb.const import CONFIG
 
@@ -211,13 +211,35 @@ class MilvusWriteHTTPTests(SimpleTestCase):
         self.assertEqual(operations.count("collections/create"), 2)
         self.assertEqual(operations.count("collections/load"), 2)
 
-    @patch("knowledge.vector.milvus_vector.pg_vector_recall")
-    def test_read_failure_keeps_pg_fallback(self, pg_recall):
-        self.reset({"operation": "collections/has", "status": 503, "body": {"message": "unavailable"}})
-        pg_recall.return_value = [{"paragraph_id": "paragraph", "similarity": 0.9}]
-        result = self.store._search_embedding([1.0, 0.0], [self.knowledge_id], None, [], [], True, 3, 0.5)
-        self.assertEqual([row["paragraph_id"] for row in result], ["paragraph"])
-        pg_recall.assert_called_once()
+    @patch("knowledge.vector.milvus_vector.text_rank_by_ids", return_value={})
+    @patch("knowledge.vector.pg_fulltext.generate_sql_by_query_dict", return_value=("SELECT", []))
+    @patch("knowledge.vector.pg_fulltext.select_list")
+    def test_read_failure_keeps_pg_fallback(self, select_list, _generate_sql, _text_rank):
+        row = {
+            "id": "embedding",
+            "paragraph_id": "paragraph",
+            "source_id": "asset",
+            "source_type": SourceType.IMAGE.value,
+            "meta": '{"unit_type": "text", "content_type": "image_description"}',
+            "similarity": 0.9,
+        }
+        select_list.side_effect = lambda *args: [dict(row)]
+        for mode in (SearchMode.embedding, SearchMode.blend):
+            with self.subTest(mode=mode):
+                self.reset({"operation": "collections/has", "status": 503, "body": {"message": "unavailable"}})
+                result = self.store.query("chart", [1.0, 0.0], [self.knowledge_id], None, [], [], True, 3, 0.5, mode)
+
+                self.assertEqual(
+                    result,
+                    [
+                        {
+                            **row,
+                            "meta": {"unit_type": "text", "content_type": "image_description"},
+                            "comprehensive_score": 0.9,
+                        }
+                    ],
+                )
+                self.assertEqual([call["operation"] for call in self.state()["calls"]], ["collections/has"])
 
     def test_later_upsert_failure_stops_remaining_batches(self):
         self.reset(

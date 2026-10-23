@@ -16,6 +16,7 @@ from common.utils.common import get_file_content
 from common.utils.ts_vecto_util import to_query
 from django.db.models import QuerySet
 from knowledge.models import Embedding, Termbase
+from knowledge.vector.base_vector import normalize_search_results
 from maxkb.conf import PROJECT_DIR
 
 
@@ -96,5 +97,5 @@ def pg_vector_recall(
             "meta": row["meta"],
             "similarity": float(row["similarity"]),
         }
-        for row in rows
+        for row in normalize_search_results(rows)
     ]

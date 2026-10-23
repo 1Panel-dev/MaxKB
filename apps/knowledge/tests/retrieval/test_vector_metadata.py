@@ -7,13 +7,19 @@ from knowledge.serializers.common import list_paragraph as query_paragraphs
 from knowledge.serializers.knowledge import KnowledgeSerializer
 from knowledge.serializers.problem import ProblemSerializers
 from knowledge.services.multimodal_retrieval import enrich_paragraph_sources
+from knowledge.vector.milvus_vector import MilvusVector
+from knowledge.vector.pg_fulltext import pg_vector_recall
 from knowledge.vector.pg_vector import BlendSearch, EmbeddingSearch, KeywordsSearch, PGVector
 
 
 class VectorSearchMetadataTests(SimpleTestCase):
+    @patch("knowledge.vector.pg_fulltext.select_list")
     @patch("knowledge.vector.pg_vector.select_list")
     @patch("knowledge.vector.pg_vector.generate_sql_by_query_dict", return_value=("SELECT", []))
-    def test_all_search_modes_return_object_metadata(self, _generate_sql, select_list):
+    @patch("knowledge.vector.pg_fulltext.generate_sql_by_query_dict", return_value=("SELECT", []))
+    def test_all_search_modes_return_object_metadata(
+        self, _generate_fallback_sql, _generate_sql, select_list, recall_rows
+    ):
         metadata_cases = [
             (
                 {"unit_type": "text", "content_type": "image_description"},
@@ -56,6 +62,22 @@ class VectorSearchMetadataTests(SimpleTestCase):
 
                     self.assertEqual(result, expected_result)
 
+        for meta, expected_meta in metadata_cases:
+            with self.subTest(path="pg_fallback", meta=meta):
+                row = {
+                    "id": "embedding-1",
+                    "paragraph_id": "paragraph-1",
+                    "source_id": "asset-1",
+                    "source_type": SourceType.IMAGE.value,
+                    "similarity": 0.9,
+                    "meta": meta,
+                }
+                recall_rows.return_value = [row]
+
+                result = pg_vector_recall([1.0, 0.0], ["00000000-0000-0000-0000-000000000001"], True, [], [], [], 5)
+
+                self.assertEqual(result, [{**row, "meta": expected_meta}])
+
     @patch("knowledge.vector.pg_vector.select_list", return_value=[])
     @patch("knowledge.vector.pg_vector.generate_sql_by_query_dict", return_value=("SELECT", []))
     def test_search_with_no_hits_still_returns_an_empty_list(self, _generate_sql, _select_list):
@@ -71,11 +93,11 @@ class VectorSearchMetadataTests(SimpleTestCase):
     @patch("knowledge.serializers.knowledge.list_paragraph")
     @patch("knowledge.serializers.knowledge.get_embedding_model_by_knowledge_id")
     @patch("knowledge.serializers.knowledge.QuerySet")
-    @patch("knowledge.serializers.knowledge.VectorStore.get_embedding_vector", return_value=PGVector())
+    @patch("knowledge.serializers.knowledge.VectorStore.get_embedding_vector")
     @patch("knowledge.vector.pg_vector.select_list")
     @patch("knowledge.vector.pg_vector.generate_sql_by_query_dict", return_value=("SELECT", []))
     def test_hit_test_decodes_sql_metadata_and_preserves_image_description_hit_type(
-        self, _generate_sql, select_list, _get_vector, query_set, get_model, list_paragraph, get_asset_map
+        self, _generate_sql, select_list, get_vector, query_set, get_model, list_paragraph, get_asset_map
     ):
         knowledge_id = "00000000-0000-0000-0000-000000000001"
         paragraph_id = "00000000-0000-0000-0000-000000000002"
@@ -94,8 +116,9 @@ class VectorSearchMetadataTests(SimpleTestCase):
         get_model.return_value.embed_query.return_value = [1.0, 0.0]
         list_paragraph.return_value = [paragraph]
         get_asset_map.return_value = {asset_id: asset}
-        select_list.return_value = [
+        sql_rows = [
             {
+                "id": "00000000-0000-0000-0000-000000000004",
                 "paragraph_id": paragraph_id,
                 "source_id": asset_id,
                 "source_type": SourceType.IMAGE.value,
@@ -105,36 +128,78 @@ class VectorSearchMetadataTests(SimpleTestCase):
             }
         ]
 
-        result = KnowledgeSerializer.HitTest(
-            data={
-                "workspace_id": "default",
-                "knowledge_id": knowledge_id,
-                "query_text": "chart",
-                "top_number": 5,
-                "similarity": 0.6,
-                "search_mode": SearchMode.embedding.value,
-            }
-        ).hit_test()
+        for vector in (PGVector(), MilvusVector()):
+            get_vector.return_value = vector
+            for mode in (SearchMode.embedding, SearchMode.blend):
+                with (
+                    self.subTest(vector=type(vector).__name__, mode=mode),
+                    patch("knowledge.vector.pg_vector.QuerySet"),
+                    patch.object(MilvusVector, "_has_collection", return_value=False),
+                    patch("knowledge.vector.pg_fulltext.select_list", side_effect=lambda *args: [dict(sql_rows[0])]),
+                    patch("knowledge.vector.milvus_vector.text_rank_by_ids", return_value={}),
+                ):
+                    select_list.side_effect = lambda *args: [dict(sql_rows[0])]
+                    result = KnowledgeSerializer.HitTest(
+                        data={
+                            "workspace_id": "default",
+                            "knowledge_id": knowledge_id,
+                            "query_text": "chart",
+                            "top_number": 5,
+                            "similarity": 0.6,
+                            "search_mode": mode.value,
+                        }
+                    ).hit_test()
 
-        self.assertEqual(
-            result,
-            [
-                {
-                    **paragraph,
-                    "knowledge_type": KnowledgeType.BASE,
-                    "document_resource_type": DocumentResourceType.DOCUMENT,
-                    "document_image_id": None,
-                    "similarity": 0.9,
-                    "comprehensive_score": 0.95,
-                    "source_id": asset_id,
-                    "source_type": SourceType.IMAGE.value,
-                    "hit_unit_type": "text",
-                    "query_unit_type": "text",
-                    "query_unit_index": 0,
-                    "hit_asset": asset,
-                }
-            ],
-        )
+                    self.assertEqual(
+                        result,
+                        [
+                            {
+                                **paragraph,
+                                "knowledge_type": KnowledgeType.BASE,
+                                "document_resource_type": DocumentResourceType.DOCUMENT,
+                                "document_image_id": None,
+                                "similarity": 0.9,
+                                "comprehensive_score": 0.95 if isinstance(vector, PGVector) else 0.9,
+                                "source_id": asset_id,
+                                "source_type": SourceType.IMAGE.value,
+                                "hit_unit_type": "text",
+                                "query_unit_type": "text",
+                                "query_unit_index": 0,
+                                "hit_asset": asset,
+                            }
+                        ],
+                    )
+
+    @patch.object(MilvusVector, "_has_collection", return_value=False)
+    @patch("knowledge.vector.milvus_vector.text_rank_by_ids", return_value={})
+    @patch("knowledge.vector.pg_fulltext.select_list")
+    @patch("knowledge.vector.pg_fulltext.generate_sql_by_query_dict", return_value=("SELECT", []))
+    def test_workflow_query_decodes_pg_fallback_metadata(self, _generate_sql, select_list, _text_rank, _has_collection):
+        row = {
+            "id": "embedding-1",
+            "paragraph_id": "paragraph-1",
+            "source_id": "asset-1",
+            "source_type": SourceType.IMAGE.value,
+            "similarity": 0.9,
+            "meta": '{"unit_type": "text", "content_type": "image_description"}',
+        }
+        select_list.side_effect = lambda *args: [dict(row)]
+        for mode in (SearchMode.embedding, SearchMode.blend):
+            with self.subTest(mode=mode):
+                result = MilvusVector().query(
+                    "chart", [1.0, 0.0], ["00000000-0000-0000-0000-000000000001"], [], [], [], True, 5, 0.6, mode
+                )
+
+                self.assertEqual(
+                    result,
+                    [
+                        {
+                            **row,
+                            "meta": {"unit_type": "text", "content_type": "image_description"},
+                            "comprehensive_score": 0.9,
+                        }
+                    ],
+                )
 
     @patch("knowledge.services.multimodal_retrieval.QuerySet")
     def test_paragraph_sources_report_document_origin_independently_of_vector_type(self, query_set):

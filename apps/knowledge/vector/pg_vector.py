@@ -25,21 +25,8 @@ from common.utils.common import get_file_content
 from common.utils.logger import maxkb_logger
 from common.utils.ts_vecto_util import to_ts_vector, to_query
 from knowledge.models import Embedding, SearchMode, SourceType, Termbase
-from knowledge.vector.base_vector import BaseVectorStore, normalize_for_embedding
+from knowledge.vector.base_vector import BaseVectorStore, normalize_for_embedding, normalize_search_results
 from maxkb.conf import PROJECT_DIR
-
-
-def _normalize_search_results(results: List[Dict]) -> List[Dict]:
-    # Raw SQL cursors return JSONField values as strings, without ORM conversion.
-    for result in results:
-        meta = result.get("meta")
-        if isinstance(meta, str):
-            try:
-                meta = json.loads(meta)
-            except json.JSONDecodeError:
-                meta = {}
-        result["meta"] = meta if isinstance(meta, dict) else {}
-    return results
 
 
 class PGVector(BaseVectorStore):
@@ -386,7 +373,7 @@ class EmbeddingSearch(ISearch):
                 top_number,
             ],
         )
-        return _normalize_search_results(embedding_model)
+        return normalize_search_results(embedding_model)
 
     def support(self, search_mode: SearchMode):
         return search_mode.value == SearchMode.embedding.value
@@ -425,7 +412,7 @@ class KeywordsSearch(ISearch):
                 top_number,
             ],
         )
-        return _normalize_search_results(embedding_model)
+        return normalize_search_results(embedding_model)
 
     def support(self, search_mode: SearchMode):
         return search_mode.value == SearchMode.keywords.value
@@ -466,7 +453,7 @@ class BlendSearch(ISearch):
                 top_number,
             ],
         )
-        return _normalize_search_results(embedding_model)
+        return normalize_search_results(embedding_model)
 
     def support(self, search_mode: SearchMode):
         return search_mode.value == SearchMode.blend.value

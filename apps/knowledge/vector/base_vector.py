@@ -7,6 +7,7 @@
 @desc:
 """
 
+import json
 import re
 import threading
 from abc import ABC, abstractmethod
@@ -53,6 +54,19 @@ def normalize_for_embedding(text: str) -> str:
     text = RE_EMOJI.sub("", text)
     text = RE_WHITESPACE.sub(" ", text)
     return text.strip()
+
+
+def normalize_search_results(results: List[Dict]) -> List[Dict]:
+    # Raw SQL cursors return JSONField values as strings, without ORM conversion.
+    for result in results:
+        meta = result.get("meta")
+        if isinstance(meta, str):
+            try:
+                meta = json.loads(meta)
+            except json.JSONDecodeError:
+                meta = {}
+        result["meta"] = meta if isinstance(meta, dict) else {}
+    return results
 
 
 class BaseVectorStore(ABC):
