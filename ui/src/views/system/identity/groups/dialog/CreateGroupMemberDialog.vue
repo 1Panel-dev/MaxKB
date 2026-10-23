@@ -79,7 +79,7 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" title="添加成员" @closed="resetData">
-    <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top">
+    <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="用户名/姓名" prop="userIds">
         <el-select
           v-model="memberForm.userIds"

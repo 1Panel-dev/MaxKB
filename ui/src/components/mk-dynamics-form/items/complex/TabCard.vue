@@ -103,8 +103,6 @@ defineExpose({ validate, field: props.field })
               :render-data="getChildFields()"
               v-bind="attr"
               :parent-field="formField.field + '.' + index"
-              label-position="top"
-              require-asterisk-position="right"
             ></DynamicsForm>
           </el-card>
         </template>

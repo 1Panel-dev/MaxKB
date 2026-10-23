@@ -121,7 +121,7 @@ const validateForm = async () => {
             </div>
           </template>
           <el-table :data="formFieldList" row-key="field" v-if="formFieldList.length > 0">
-            <el-table-column prop="field" label="参数" width="120" show-overflow-tooltip> </el-table-column>
+            <el-table-column prop="field" label="参数" width="120" show-overflow-tooltip></el-table-column>
             <el-table-column prop="label" label="显示名称" show-overflow-tooltip>
               <template #default="{ row }">
                 <span>{{ getFieldLabel(row) }}</span>
@@ -159,14 +159,7 @@ const validateForm = async () => {
               <el-button type="primary" @click="validateForm">校验</el-button>
             </div>
           </template>
-          <MkDynamicsForm
-            v-if="formFieldList.length > 0"
-            ref="dynamicsFormRef"
-            v-model="formData"
-            :render-data="formFieldList"
-            label-position="top"
-            require-asterisk-position="right"
-          />
+          <MkDynamicsForm v-if="formFieldList.length > 0" ref="dynamicsFormRef" v-model="formData" :render-data="formFieldList" />
           <el-empty v-else description="请先添加表单字段" />
         </el-card>
       </el-col>

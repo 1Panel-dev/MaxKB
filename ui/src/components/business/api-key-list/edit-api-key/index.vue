@@ -131,7 +131,7 @@ function handleClosed() {
     </el-button>
   </MkTooltip>
   <MkDrawer v-model="visible" title="编辑 API Key" @closed="handleClosed">
-    <el-form ref="formRef" :model="form" :rules="rules" :inert="saving" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="API KEY">
         <el-input :model-value="form.secret_key" disabled>
           <template #suffix>

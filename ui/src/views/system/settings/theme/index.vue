@@ -226,7 +226,14 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
               </div>
               <p class="text-sm text-N500">{{ imageSetting.description }}</p>
             </el-card>
-            <el-form ref="themeFormRef" :model="themeSetting" :rules="formRules" label-position="top" require-asterisk-position="right">
+            <el-form
+              ref="themeFormRef"
+              :model="themeSetting"
+              :rules="formRules"
+              label-position="top"
+              require-asterisk-position="right"
+              @submit.prevent
+            >
               <el-form-item class="mb-2!" label="网站名称" prop="title">
                 <el-input v-model="themeSetting.title" maxlength="128" placeholder="请输入网站名称" show-word-limit />
               </el-form-item>

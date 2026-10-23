@@ -127,7 +127,7 @@ defineExpose({ open })
       label-position="top"
       require-asterisk-position="right"
       v-loading="loading"
-      @submit.prevent="submitQuotaSettings"
+      @submit.prevent
     >
       <el-form-item label="设置方式">
         <el-radio-group v-model="quotaSettingsForm.quotaType">

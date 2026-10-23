@@ -77,7 +77,7 @@ defineExpose({ open })
       :rules="batchGroupFormRules"
       label-position="top"
       require-asterisk-position="right"
-      @submit.prevent="submitBatchSetUserGroups"
+      @submit.prevent
     >
       <el-form-item label="设置方式">
         <el-radio-group v-model="batchGroupForm.is_append">

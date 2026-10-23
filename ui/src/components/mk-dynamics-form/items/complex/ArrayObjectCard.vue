@@ -93,10 +93,8 @@ defineExpose({ validate, field: props.field })
         :render-data="getChildFields()"
         v-bind="attr"
         :parent-field="formField.field + '.' + index"
-        label-position="top"
-        require-asterisk-position="right"
       ></DynamicsForm>
-      <MkTooltip effect="dark" content="删除" placement="top">
+      <MkTooltip content="删除" placement="top">
         <el-button text @click.stop="deleteKnowledge(item)" class="delete-button">
           <MkIcon name="icon_delete-trash_outlined"></MkIcon>
         </el-button>

@@ -104,8 +104,6 @@ defineExpose({ validate, getData })
     v-model="formData"
     :render-data="[]"
     :other-params="{ current_workspace_id: getWorkspaceId(), current_knowledge_id: knowledgeId }"
-    label-position="top"
-    require-asterisk-position="right"
   >
     <template #default>
       <h4 v-if="hasKnowledgeBaseInput" class="mb-4 mk-title-decoration">选择数据源</h4>

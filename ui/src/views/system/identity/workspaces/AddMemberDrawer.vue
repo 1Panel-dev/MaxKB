@@ -92,7 +92,7 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="visible" title="添加成员" @closed="resetData">
-    <el-form ref="formRef" :model="memberForm" label-position="top">
+    <el-form ref="formRef" :model="memberForm" label-position="top" require-asterisk-position="right" @submit.prevent>
       <MkFormList v-model="memberForm.members" add-text="添加成员" :default-item="{ role_ids: [], user_ids: [] }">
         <template #default="{ index, item: memberSetting }">
           <el-form-item
@@ -141,7 +141,13 @@ defineExpose({ open })
               placeholder="请选择角色"
               :reserve-keyword="false"
             >
-              <el-option v-for="roleOption in roleOptions" :key="roleOption.id" :label="roleOption.name" :title="roleOption.name" :value="roleOption.id" />
+              <el-option
+                v-for="roleOption in roleOptions"
+                :key="roleOption.id"
+                :label="roleOption.name"
+                :title="roleOption.name"
+                :value="roleOption.id"
+              />
             </el-select>
           </el-form-item>
         </template>

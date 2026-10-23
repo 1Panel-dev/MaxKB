@@ -67,8 +67,6 @@ defineExpose({ validate })
       :render-data="formField.children ? formField.children : []"
       v-bind="$attrs"
       :parent-field="formField.field"
-      label-position="top"
-      require-asterisk-position="right"
     ></DynamicsForm>
   </el-card>
 </template>
