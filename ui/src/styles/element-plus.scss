@@ -796,6 +796,7 @@
   }
   &.el-tooltip.is-dark {
     max-width: 320px;
+    border: 1px solid var(--el-popper-bg-color-dark) !important;
   }
 }
 
