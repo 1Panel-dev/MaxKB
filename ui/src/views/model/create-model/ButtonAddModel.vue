@@ -30,8 +30,8 @@ function handleOpenCreateModel() {
   selectProviderDrawerRef.value?.open()
 }
 
-function handleCreateProviderSelect(provider: ModelProviderItem) {
-  createModelDrawerRef.value?.open(provider)
+function handleCreateProviderSelect(provider: ModelProviderItem, modelType: string) {
+  createModelDrawerRef.value?.open(provider, modelType)
 }
 
 function handleBackToProviderSelect() {

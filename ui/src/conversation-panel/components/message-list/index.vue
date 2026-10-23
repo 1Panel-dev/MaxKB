@@ -83,25 +83,25 @@ const onScroll = () => {
 //   color: var(--t3, #909399);
 // }
 
-// .welcome {
-//   flex: 1;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   justify-content: center;
-//   text-align: center;
-//   padding: 32px 16px;
-// }
-// .welcome-title {
-//   font-size: 18px;
-//   font-weight: 600;
-//   color: var(--t1, #303133);
-//   margin-bottom: 8px;
-// }
-// .welcome-sub {
-//   font-size: 14px;
-//   color: var(--t3, #909399);
-// }
+.welcome {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 16px;
+}
+.welcome-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--t1, #303133);
+  margin-bottom: 8px;
+}
+.welcome-sub {
+  font-size: 14px;
+  color: var(--t3, #909399);
+}
 
 // .msg-row {
 //   display: flex;

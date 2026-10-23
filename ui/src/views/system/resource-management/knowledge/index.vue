@@ -151,7 +151,7 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="180">
+        <el-table-column prop="type" label="类型" width="150">
           <template #header>
             <MkTableFilter mode="single" v-model="selectedType" label="类型" :options="typeOptions" @change="handleFilterChange" />
           </template>
@@ -171,7 +171,7 @@ onMounted(() => {
         <el-table-column prop="create_time" label="创建时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 进入知识库详情 -->

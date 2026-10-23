@@ -22,7 +22,6 @@ import {
   RelatedResourcesToolAction,
   CopyToolAction,
   DeleteToolAction,
-  EditToolAction,
   ExportToolAction,
   ExecutionRecordToolAction,
   InitParamAction,
@@ -33,6 +32,7 @@ import {
 } from './tool-card/action-dropdown'
 import ButtonCreateTool from './components/ButtonCreateTool.vue'
 import ButtonToolStore from './components/ButtonToolStore.vue'
+import EditToolForm from '@/views/tool/tool-form/EditToolForm.vue'
 import perm from '@/permission/index.ts'
 
 /* 当前文件夹 */
@@ -103,11 +103,16 @@ function loadStoreTools() {
 /* 卡片打开工具 */
 const route = useRoute()
 const router = useRouter()
-const editToolActionRefs: Record<string, InstanceType<typeof EditToolAction> | null> = {}
+const editToolFormRef = useTemplateRef<InstanceType<typeof EditToolForm>>('editToolFormRef')
+
+function handleOpenEditTool(tool: ToolItem) {
+  if (!perm.tool.workspace.edit(tool.id)) return
+  return editToolFormRef.value?.open(tool)
+}
 
 function handleOpenTool(tool: ToolItem, event: MouseEvent) {
   if (isShared.value || batchSelectionMode.value) return
-  if (tool.tool_type !== TOOL_TYPE.WORKFLOW) return editToolActionRefs[tool.id]?.handleOpenToolForm()
+  if (tool.tool_type !== TOOL_TYPE.WORKFLOW) return handleOpenEditTool(tool)
 
   const workflowRoute = {
     name: 'workflow-tool',
@@ -291,19 +296,7 @@ onMounted(() => {
                 </template>
                 <template #action-dropdown>
                   <!-- 编辑工具 -->
-                  <EditToolAction
-                    v-if="perm.tool.workspace.edit(tool.id)"
-                    :ref="
-                      (instance) => {
-                        if (instance) editToolActionRefs[tool.id] = instance as InstanceType<typeof EditToolAction>
-                        else delete editToolActionRefs[tool.id]
-                      }
-                    "
-                    label="编辑"
-                    :api="ToolApi"
-                    :tool="tool"
-                    @update="handleToolUpdate"
-                  />
+                  <MkAction v-if="perm.tool.workspace.edit(tool.id)" label="编辑" icon="icon_edit_outlined" @click="handleOpenEditTool(tool)" />
                   <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" :tool="tool" />
                   <!-- 复制 -->
                   <CopyToolAction
@@ -410,4 +403,5 @@ onMounted(() => {
   </MkViewLayout>
 
   <MoveToDialog ref="batchMoveToDialogRef" :loading="toolOperationLoading" :source="RESOURCE_TYPE.TOOL" @submit="handleBatchMove" />
+  <EditToolForm ref="editToolFormRef" :api="ToolApi" @update="handleToolUpdate" />
 </template>

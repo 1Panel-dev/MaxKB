@@ -5,6 +5,7 @@ import type ModelApi from '@/api/admin/workspace/model'
 import type SystemModelApi from '@/api/admin/system/resource-management/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import ProviderApi from '@/api/admin/model-provider'
+import { MODEL_TYPE_LABELS } from '@/constants/model'
 import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
@@ -25,9 +26,10 @@ const emit = defineEmits<{ back: []; refresh: [] }>()
 const visible = ref(false)
 const loading = ref(false)
 const providersLoading = ref(false)
+const modelType = ref('all')
 const currentProvider = ref<ModelProviderItem>()
 const loadedProviders = ref<ModelProviderItem[]>([])
-const providerOptions = computed(() => (props.providers.length ? props.providers : loadedProviders.value))
+const providerOptions = computed(() => (modelType.value === 'all' && props.providers.length ? props.providers : loadedProviders.value))
 
 const modelForm = reactive<ModelPayload>({ credential: {}, model_name: '', model_type: '', name: '', provider: '' })
 
@@ -65,7 +67,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
 
 function loadModelProviders() {
   providersLoading.value = true
-  return ProviderApi.getProviderList()
+  return ProviderApi.getProviderList(modelType.value === 'all' ? undefined : { model_type: modelType.value })
     .then((providers) => {
       loadedProviders.value = [...providers].sort((left, right) => left.name.localeCompare(right.name))
     })
@@ -147,8 +149,9 @@ function handleSubmit() {
   })
 }
 
-function open(provider: ModelProviderItem) {
-  if (!props.providers.length) loadModelProviders()
+function open(provider: ModelProviderItem, selectedModelType = 'all') {
+  modelType.value = selectedModelType
+  if (modelType.value !== 'all' || !props.providers.length) loadModelProviders()
   loadModelTypes(provider)
   visible.value = true
 }
@@ -165,6 +168,7 @@ function resetModelSelection() {
 }
 
 function resetData() {
+  modelType.value = 'all'
   currentProvider.value = undefined
   loadedProviders.value = []
   modelForm.name = ''
@@ -193,8 +197,10 @@ defineExpose({ open })
     <MkViewLayout :loading="loading || providersLoading" :title="currentProvider?.name ?? ''">
       <template #aside="{ Header }">
         <component :is="Header">
-          <el-select model-value="all" class="w-full">
+          <!-- 选择模型类型 -->
+          <el-select v-model="modelType" class="w-full" @change="loadModelProviders">
             <el-option label="全部模型" value="all" />
+            <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
           </el-select>
         </component>
 

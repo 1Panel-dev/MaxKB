@@ -1,15 +1,10 @@
 <script setup lang="ts">
-import { nextTick, ref, useTemplateRef } from 'vue'
+import { useTemplateRef } from 'vue'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { ToolItem } from '@/api/types'
-import { TOOL_TYPE } from '@/api/enums'
-import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vue'
-import DataSourceFormDrawer from '@/views/tool/tool-form/DataSourceFormDrawer.vue'
-import McpFormDrawer from '@/views/tool/tool-form/McpFormDrawer.vue'
-import SkillToolFormDrawer from '@/views/tool/tool-form/SkillToolFormDrawer.vue'
-import WorkflowFormDialog from '@/views/tool/tool-form/WorkflowFormDialog.vue'
+import EditToolForm from '@/views/tool/tool-form/EditToolForm.vue'
 
 defineOptions({ name: 'EditToolAction' })
 
@@ -21,86 +16,15 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{ update: [tool: ToolItem] }>()
-
-const formMounted = ref(false)
-const toolFormDrawerRef = useTemplateRef<InstanceType<typeof ToolFormDrawer>>('toolFormDrawerRef')
-const dataSourceFormDrawerRef = useTemplateRef<InstanceType<typeof DataSourceFormDrawer>>('dataSourceFormDrawerRef')
-const mcpFormDrawerRef = useTemplateRef<InstanceType<typeof McpFormDrawer>>('mcpFormDrawerRef')
-const skillToolFormDrawerRef = useTemplateRef<InstanceType<typeof SkillToolFormDrawer>>('skillToolFormDrawerRef')
-const workflowFormDialogRef = useTemplateRef<InstanceType<typeof WorkflowFormDialog>>('workflowFormDialogRef')
+const editToolFormRef = useTemplateRef<InstanceType<typeof EditToolForm>>('editToolFormRef')
 
 function handleOpenToolForm() {
-  formMounted.value = true
-  return nextTick(() => {
-    if (props.tool.tool_type === TOOL_TYPE.DATA_SOURCE) {
-      dataSourceFormDrawerRef.value?.open(props.tool)
-    } else if (props.tool.tool_type === TOOL_TYPE.MCP) {
-      mcpFormDrawerRef.value?.open(props.tool)
-    } else if (props.tool.tool_type === TOOL_TYPE.SKILL) {
-      skillToolFormDrawerRef.value?.open(props.tool)
-    } else if (props.tool.tool_type === TOOL_TYPE.WORKFLOW) {
-      workflowFormDialogRef.value?.open(props.tool)
-    } else {
-      toolFormDrawerRef.value?.open(props.tool)
-    }
-  })
+  return editToolFormRef.value?.open(props.tool)
 }
-
-function handleFormClosed() {
-  formMounted.value = false
-}
-defineExpose({ handleOpenToolForm })
 </script>
 
 <template>
   <!-- 编辑工具 -->
   <MkAction :display="display" :label="label" icon="icon_edit_outlined" @click="handleOpenToolForm" />
-
-  <template v-if="formMounted">
-    <DataSourceFormDrawer
-      v-if="tool.tool_type === TOOL_TYPE.DATA_SOURCE"
-      ref="dataSourceFormDrawerRef"
-      title="编辑数据源"
-      :api="api"
-      :folder-id="tool.folder_id ?? ''"
-      @closed="handleFormClosed"
-      @update="emit('update', $event)"
-    />
-    <McpFormDrawer
-      v-else-if="tool.tool_type === TOOL_TYPE.MCP"
-      ref="mcpFormDrawerRef"
-      title="编辑 MCP"
-      :api="api"
-      :folder-id="tool.folder_id ?? ''"
-      @closed="handleFormClosed"
-      @update="emit('update', $event)"
-    />
-    <SkillToolFormDrawer
-      v-else-if="tool.tool_type === TOOL_TYPE.SKILL"
-      ref="skillToolFormDrawerRef"
-      title="编辑 Skill"
-      :api="api"
-      :folder-id="tool.folder_id ?? ''"
-      @closed="handleFormClosed"
-      @update="emit('update', $event)"
-    />
-    <WorkflowFormDialog
-      v-else-if="tool.tool_type === TOOL_TYPE.WORKFLOW"
-      ref="workflowFormDialogRef"
-      title="编辑工作流"
-      :api="api"
-      :folder-id="tool.folder_id ?? ''"
-      @closed="handleFormClosed"
-      @update="emit('update', $event)"
-    />
-    <ToolFormDrawer
-      v-else
-      ref="toolFormDrawerRef"
-      title="编辑工具"
-      :api="api"
-      :folder-id="tool.folder_id ?? ''"
-      @closed="handleFormClosed"
-      @update="emit('update', $event)"
-    />
-  </template>
+  <EditToolForm ref="editToolFormRef" :api="api" @update="emit('update', $event)" />
 </template>

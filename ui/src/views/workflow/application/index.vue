@@ -408,7 +408,7 @@ onBeforeUnmount(() => stopAutoSave())
       </MkDropdown>
     </template>
     <!-- 主画布 -->
-    <div class="relative min-h-0 min-w-0 flex-1" :inert="!!previewVersion">
+    <div class="relative min-h-0 min-w-0 flex-1">
       <WorkflowCanvas
         ref="workflowRef"
         class="h-full"
