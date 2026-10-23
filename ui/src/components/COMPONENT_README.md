@@ -128,6 +128,10 @@ Admin、Chat 入口调用 `configureMarkdownEditor()` 配置本地高亮、KaTeX
 标题折叠区，`title` 或 `label` 插槽提供标题，默认插槽提供内容。
 `defaultExpanded` 默认 `true`，仅设置初始状态；展开状态通过 `v-model:expanded` 同步。
 `indicatorPosition` 默认 `before`，可设为 `after`；`triggerClass`、`triggerStyle` 调整触发区。
+默认前置使用 14px 三角图标，后置使用 16px `icon_down_outlined`，保留各自展开时的旋转方式。
+需要定制时使用 `indicator` 插槽，通过 `{ expanded }` 获取展开状态；图标、尺寸、颜色及旋转由
+调用方设置。插槽仍位于组件的切换按钮内，不需要再绑定点击事件。标题悬停联动可通过
+`triggerClass="group"` 配合图标的 `group-hover:` 类实现，label 可独立设置颜色。
 内容使用 `v-show`，收起时保留内部组件及表单状态。
 
 ### MkEmpty

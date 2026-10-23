@@ -16,7 +16,7 @@ const props = withDefaults(
   { defaultExpanded: true, indicatorPosition: 'before', trigger: 'header' },
 )
 
-defineSlots<{ default?: () => unknown; label?: () => unknown }>()
+defineSlots<{ default?: () => unknown; label?: () => unknown; indicator?: (props: { expanded: boolean }) => unknown }>()
 
 const expandedModel = defineModel<boolean>('expanded')
 const localExpanded = ref(props.defaultExpanded)
@@ -42,14 +42,16 @@ const expanded = computed({
           :aria-expanded="expanded"
           @click.stop="expanded = !expanded"
         >
-          <MkIcon
-            v-if="indicatorPosition === 'before'"
-            :icon="CaretBottom"
-            :size="14"
-            class="transition-transform text-N600!"
-            :class="{ '-rotate-90': !expanded }"
-          />
-          <MkIcon v-else name="icon_down_outlined" class="transition-transform text-N600!" :class="{ '-rotate-180': expanded }" />
+          <slot name="indicator" :expanded="expanded">
+            <MkIcon
+              v-if="indicatorPosition === 'before'"
+              :icon="CaretBottom"
+              :size="14"
+              class="transition-transform text-N600!"
+              :class="{ '-rotate-90': !expanded }"
+            />
+            <MkIcon v-else name="icon_down_outlined" class="transition-transform text-N600!" :class="{ '-rotate-180': expanded }" />
+          </slot>
         </button>
         <slot name="label">
           <span>{{ title }}</span>

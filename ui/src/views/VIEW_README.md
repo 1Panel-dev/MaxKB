@@ -320,7 +320,13 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - 模板中心共享 UI 在 `workflow/components/template-store/`，业务入口查模板，View 确认覆盖、提交并重载详情和保存基准。
   创建模板由资源创建流程负责，取消／失败保留模板中心。
 - 调试与导出先保存未提交修改，保存失败不继续；打开历史、模板或默认模型时按原流程关闭调试。
-- 智能体复用对话模块 DebugPanel；工具使用 debug Drawer、SSE 和执行详情；知识库保留任务轮询与导入 Action。
+- 智能体页面专属按钮组件放在 `workflow/application/components/`。
+  `ButtonDebug` 组合调试按钮与对话模块 DebugPanel，通过页面传入的改动检查、保存方法和共享 loading
+  完成保存后调试流程；公开 `close()` 供页面其他操作关闭调试。
+  `ButtonAiGenerate` 组合 AI 生成按钮与生成面板；生成面板与调试面板一样自行 Teleport 到 body，
+  使用固定定位，顶部避开工作流工具栏。
+  智能体工作流页面通过 `label` 传入 AI 生成、模板中心、默认模型设置、调试和发布历史入口文案。
+  工具使用 debug Drawer、SSE 和执行详情；知识库保留任务轮询与导入 Action。
   智能体画布按 Workspace／System 资源管理选择详情、保存、发布、模型和历史 API；DebugPanel 尚未按 System 范围适配。
   客户端停止读取不等于服务端停止任务。
 - 知识库导出仅工作流 `.kbwf`；导入确认覆盖后直接上传，不先保存旧草稿，成功重载；取消／失败保留图。

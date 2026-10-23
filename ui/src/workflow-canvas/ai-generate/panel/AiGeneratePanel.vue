@@ -147,69 +147,72 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <div
-    v-if="visible"
-    class="absolute top-4 right-4 bottom-4 z-20 flex w-105 flex-col rounded-xl border border-N300 bg-white shadow-lg"
-    @keydown.stop
-    @paste.stop
-  >
-    <div class="flex-between shrink-0 border-b border-N300 px-4 py-3">
-      <h4 class="flex-align-center gap-2">
-        <MkIcon name="icon_star" class="text-primary!" />
-        AI 生成工作流
-      </h4>
-      <div class="flex-align-center gap-1">
-        <!-- 新建生成会话 -->
-        <el-button text :disabled="busy || !started" @click="reset">
-          <MkIcon name="icon_new-chat_outlined" />
-        </el-button>
-        <!-- 关闭生成面板 -->
-        <el-button text :disabled="busy" @click="close">
-          <MkIcon name="icon_close_outlined" />
-        </el-button>
-      </div>
-    </div>
-
-    <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1">
-      <div class="space-y-3 p-4">
-        <p v-if="!started" class="mk-gray-card text-N600">
-          描述你想要的智能体，例如：“做一个产品客服，先查产品知识库回答，查不到时礼貌兜底”。AI
-          会规划流程、添加节点、连线并完成配置，生成后请检查再保存。
-        </p>
-        <ContentList v-else :content-list="activity.activityItems.value" />
-        <div v-if="busy" class="flex-align-center gap-2 text-N600">
-          <LoadingIcon :size="16" />
-          <span class="mk-dotting">{{ activity.lastActivity.value || '生成中' }}</span>
+  <!-- 生成面板挂载到 body，固定定位并避开工作流工具栏。 -->
+  <Teleport to="body">
+    <div
+      v-if="visible"
+      class="fixed top-header mt-4 right-4 bottom-4 z-20 flex w-105 flex-col rounded-xl border border-N300 bg-white shadow-lg"
+      @keydown.stop
+      @paste.stop
+    >
+      <div class="flex-between shrink-0 border-b border-N300 px-4 py-3">
+        <h4 class="flex-align-center gap-2">
+          <MkIcon name="icon_star" class="text-primary!" />
+          AI 生成
+        </h4>
+        <div class="flex-align-center gap-1">
+          <!-- 新建生成会话 -->
+          <el-button text :disabled="busy || !started" @click="reset">
+            <MkIcon name="icon_new-chat_outlined" />
+          </el-button>
+          <!-- 关闭生成面板 -->
+          <el-button text :disabled="busy" @click="close">
+            <MkIcon name="icon_close_outlined" />
+          </el-button>
         </div>
-        <p v-if="status === 'stopped'" class="text-N500">已停止生成</p>
       </div>
-    </el-scrollbar>
 
-    <div class="shrink-0 space-y-2 border-t border-N300 p-4">
-      <el-select v-model="modelId" :disabled="started" placeholder="选择生成用的模型" filterable class="w-full" :teleported="false">
-        <el-option v-for="model in modelOptions" :key="model.id" :label="model.name" :value="model.id" />
-      </el-select>
+      <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1">
+        <div class="space-y-3 p-4">
+          <p v-if="!started" class="mk-gray-card text-N600">
+            描述你想要的智能体，例如：“做一个产品客服，先查产品知识库回答，查不到时礼貌兜底”。AI
+            会规划流程、添加节点、连线并完成配置，生成后请检查再保存。
+          </p>
+          <ContentList v-else :content-list="activity.activityItems.value" />
+          <div v-if="busy" class="flex-align-center gap-2 text-N600">
+            <LoadingIcon :size="16" />
+            <span class="mk-dotting">{{ activity.lastActivity.value || '生成中' }}</span>
+          </div>
+          <p v-if="status === 'stopped'" class="text-N500">已停止生成</p>
+        </div>
+      </el-scrollbar>
+
       <div class="mk-input-box border transition-colors hover:border-primary focus-within:border-primary">
         <el-input
           v-model="requirement"
           type="textarea"
           resize="none"
-          :autosize="{ minRows: 2, maxRows: 8 }"
-          :placeholder="started ? '继续描述要调整的地方' : '描述你想要的智能体工作流'"
+          :autosize="{ minRows: 1, maxRows: 7 }"
+          placeholder="请描述你的需求"
           :maxlength="10000"
           @keydown="handleKeydown"
         />
-        <div class="mt-2 text-right">
-          <!-- 停止生成 -->
-          <el-button v-if="busy" circle type="primary" @click="stop">
-            <MkIcon name="icon_square_filled" />
-          </el-button>
-          <!-- 发送需求开始生成 -->
-          <el-button v-else circle type="primary" :disabled="!requirement.trim() || !modelId" @click="submit">
-            <MkIcon name="icon_arrow-up_outlined" />
-          </el-button>
+        <div class="mt-2 flex-between">
+          <el-select class="w-37!" v-model="modelId" :disabled="started" placeholder="请选择模型" filterable :teleported="false">
+            <el-option v-for="model in modelOptions" :key="model.id" :label="model.name" :value="model.id" />
+          </el-select>
+          <div>
+            <!-- 停止生成 -->
+            <el-button v-if="busy" circle type="primary" @click="stop">
+              <MkIcon name="icon_square_filled" />
+            </el-button>
+            <!-- 发送需求开始生成 -->
+            <el-button v-else circle type="primary" :disabled="!requirement.trim() || !modelId" @click="submit">
+              <MkIcon name="icon_arrow-up_outlined" />
+            </el-button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>

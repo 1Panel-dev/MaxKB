@@ -12,14 +12,14 @@ import WorkspaceWorkflowApi from '@/api/admin/workspace/application/workflow'
 import SystemResourceWorkflowApi from '@/api/admin/system/resource-management/application/workflow'
 import type { ApplicationDetail, ApplicationStoreTemplate, DefaultModelSettingPayload, WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
-import AiGeneratePanel from '@/workflow-canvas/ai-generate/panel/AiGeneratePanel.vue'
+import ButtonAiGenerate from './components/ButtonAiGenerate.vue'
+import ButtonDebug from './components/ButtonDebug.vue'
 import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
-import ButtonPublishHistory from './ButtonPublishHistory.vue'
-import ButtonTemplateStore from './ButtonTemplateStore.vue'
-import DebugPanel from '@/conversation-panel/view/debug/index.vue'
+import ButtonPublishHistory from './components/ButtonPublishHistory.vue'
+import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
 import EditPublishVersionDialog from '../components/publish-history/EditPublishVersionDialog.vue'
 import { showWorkflowValidateError } from '../components/validate-error'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
@@ -42,14 +42,6 @@ const route = useRoute()
 const applicationId = route.params.applicationId as string
 
 const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflowRef')
-const aiGeneratePanelRef = useTemplateRef<InstanceType<typeof AiGeneratePanel>>('aiGeneratePanelRef')
-
-/* AI 生成：在当前画布上按需求搭建并配置工作流 */
-function handleOpenAiGenerate() {
-  if (loading.value || historyVisible.value) return
-  closeDebug()
-  aiGeneratePanelRef.value?.open()
-}
 
 /* 智能体工作流加载与保存 */
 const applicationDetail = ref<ApplicationDetail>()
@@ -140,23 +132,10 @@ function handleAutoSaveChange() {
 }
 
 /* 调试入口 */
-const debugPanelRef = useTemplateRef<InstanceType<typeof DebugPanel>>('debugPanelRef')
-
-async function handleDebug() {
-  if (loading.value || historyVisible.value) return
-  loading.value = true
-  try {
-    if (hasUnsavedChanges()) await saveApplication()
-    debugPanelRef.value?.open()
-  } catch {
-    // 保存失败已由保存流程提示。
-  } finally {
-    loading.value = false
-  }
-}
+const debugButtonRef = useTemplateRef<InstanceType<typeof ButtonDebug>>('debugButtonRef')
 
 function closeDebug() {
-  debugPanelRef.value?.close()
+  debugButtonRef.value?.close()
 }
 
 /* 发布历史：预览保留原草稿，恢复后交由页面保存流程持久化。 */
@@ -341,16 +320,20 @@ onBeforeUnmount(() => stopAutoSave())
     </template>
     <template #actions>
       <!-- AI 生成工作流 -->
-      <el-button plain :disabled="loading || !!previewVersion" @click="handleOpenAiGenerate">
-        <MkIcon name="icon_star" />
-        <span>AI 生成</span>
-      </el-button>
+      <ButtonAiGenerate
+        label="AI 生成"
+        :disabled="loading || historyVisible"
+        :get-logic-flow="() => workflowRef?.getLogicFlow()"
+        :default-model-settings="defaultModelSetting"
+        @open="closeDebug"
+      />
 
       <!-- 模板中心 -->
-      <ButtonTemplateStore ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
+      <ButtonTemplateStore label="模板中心" ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
 
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
+        label="默认模型设置"
         :model-value="defaultModelSetting"
         :model-api="requestModelApi"
         :get-graph-data="getGraphData"
@@ -361,16 +344,21 @@ onBeforeUnmount(() => stopAutoSave())
       />
 
       <!-- 调试 -->
-      <el-button plain :disabled="loading" @click="handleDebug">
-        <MkIcon name="icon_play_outlined" />
-        <span>调试</span>
-      </el-button>
+      <ButtonDebug
+        ref="debugButtonRef"
+        v-model:loading="loading"
+        label="调试"
+        :disabled="historyVisible"
+        :has-unsaved-changes="hasUnsavedChanges"
+        :save-workflow="saveApplication"
+      />
 
       <!-- 保存 -->
-      <el-button plain :disabled="loading" @click="handleSave()">
-        <MkIcon name="icon_save_outlined" />
-        <span>保存</span>
-      </el-button>
+      <MkTooltip content="保存" placement="bottom">
+        <el-button plain :disabled="loading" @click="handleSave()" class="w-8! min-w-8!">
+          <MkIcon name="icon_save_outlined" />
+        </el-button>
+      </MkTooltip>
 
       <!-- 发布 -->
       <el-button type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
@@ -388,6 +376,7 @@ onBeforeUnmount(() => stopAutoSave())
             </MkDropdownItem>
             <!-- 发布历史 -->
             <ButtonPublishHistory
+              label="发布历史"
               :api="requestWorkflowApi"
               :visible="historyVisible"
               @update:visible="handleHistoryVisibleChange"
@@ -416,16 +405,8 @@ onBeforeUnmount(() => stopAutoSave())
         :loop-workflow-mode="WorkflowMode.ApplicationLoop"
         :workflow-mode="WorkflowMode.Application"
       />
-      <AiGeneratePanel
-        ref="aiGeneratePanelRef"
-        :get-logic-flow="() => workflowRef?.getLogicFlow()"
-        :default-model-settings="defaultModelSetting"
-        :workflow-mode="WorkflowMode.Application"
-      />
     </div>
 
-    <!-- 调试框 -->
-    <DebugPanel ref="debugPanelRef" />
     <!-- 发布内容 -->
     <EditPublishVersionDialog ref="publishDialogRef" mode="publish" :saving="loading" @submit="handlePublish" />
   </WorkflowViewLayout>
