@@ -28,6 +28,7 @@ from application.workflow.nodes.llm_node.message_converter import to_messages
 from application.workflow.status import Status
 from common.exception.app_exception import AppApiException
 from common.utils.count_tokens import count_local_tokens
+from common.utils.partial_json import complete_json
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 
@@ -83,6 +84,7 @@ class ToolCallAccumulator:
 
     def append(self, index, original_id, name, args):
         """累积一个分片,返回该调用的 uuid7;无法归属时返回 None"""
+        original_id = original_id or None
         key = index if index is not None else original_id
         if key is None:
             tool_call_id = self._last_id
@@ -112,10 +114,20 @@ class ToolCallAccumulator:
                 "original_id": call["original_id"],
                 "type": "function",
                 "name": call["name"],
-                "arguments": call["arguments"] or "{}",
+                "arguments": _complete_arguments(call["arguments"]),
             }
             for index, (tool_call_id, call) in enumerate(self._calls.items())
         ]
+
+
+def _complete_arguments(arguments):
+    """输出被截断(达到最大 token)或含非法转义时补全为合法 JSON,无法补全时原样返回"""
+    if not arguments:
+        return "{}"
+    try:
+        return complete_json(arguments)
+    except ValueError:
+        return arguments
 
 
 def _message_to_dict(message):
