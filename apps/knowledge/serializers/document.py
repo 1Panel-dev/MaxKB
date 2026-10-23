@@ -1468,6 +1468,7 @@ class DocumentSerializers(serializers.Serializer):
     class Split(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_("workspace id"), allow_null=True)
         knowledge_id = serializers.UUIDField(required=True, label=_("knowledge id"))
+        user_id = serializers.UUIDField(required=False, label=_("user id"), allow_null=True)
 
         def is_valid(self, *, instance=None, raise_exception=True):
             super().is_valid(raise_exception=True)
@@ -1529,10 +1530,6 @@ class DocumentSerializers(serializers.Serializer):
                     {**request_serializer.validated_data, "file": files},
                     source_file_ids=[source_file.id for source_file in source_files],
                 )
-            # As with multipart previews, retain sources for subsequent document creation.
-            QuerySet(File).filter(id__in=file_ids).update(
-                source_type=FileSourceType.KNOWLEDGE, source_id=str(self.data.get("knowledge_id"))
-            )
             return documents
 
         def save_image(self, image_list):
@@ -1545,9 +1542,10 @@ class DocumentSerializers(serializers.Serializer):
                 # save image
                 for file in save_image_list:
                     file_bytes = file.meta.pop("content")
-                    file.meta["knowledge_id"] = self.data.get("knowledge_id")
-                    file.source_type = FileSourceType.KNOWLEDGE
-                    file.source_id = self.data.get("knowledge_id")
+                    file.meta["preview_knowledge_id"] = str(self.data.get("knowledge_id"))
+                    file.meta["user_id"] = str(self.data.get("user_id"))
+                    file.source_type = FileSourceType.TEMPORARY_120_MINUTE
+                    file.source_id = FileSourceType.TEMPORARY_120_MINUTE
                     file.save(file_bytes)
 
         def file_to_paragraph(self, file, pattern_list: List, with_filter: bool, limit: int, source_file_id=None):
@@ -1559,8 +1557,9 @@ class DocumentSerializers(serializers.Serializer):
                     id=file_id,
                     file_name=file.name,
                     file_size=file.size,
-                    source_type=FileSourceType.KNOWLEDGE,
-                    source_id=self.data.get("knowledge_id"),
+                    source_type=FileSourceType.TEMPORARY_120_MINUTE,
+                    source_id=FileSourceType.TEMPORARY_120_MINUTE,
+                    meta={"user_id": str(self.data.get("user_id"))},
                 )
                 raw_file.save(file.read())
                 file.seek(0)

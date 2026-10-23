@@ -10,7 +10,6 @@ from common.exception.app_exception import AppApiException, AppUnauthorizedFaile
 from django.test import SimpleTestCase
 from django.urls import resolve
 from knowledge.api.document import DocumentSplitByFileAPI
-from knowledge.models import FileSourceType
 from knowledge.serializers.document import DocumentSerializers, DocumentSplitByFileRequest
 from knowledge.views.document import DocumentView
 from rest_framework.exceptions import ValidationError
@@ -44,9 +43,7 @@ class SplitByFileIdsTests(SimpleTestCase):
         self.assertEqual([d["source_file_id"] for d in documents], [s.id for s in self.sources])
         self.assertEqual([len(p["content"]) for p in documents[0]["content"]], [50, 30])
         self.batch.assert_not_called()
-        self.query.return_value.filter.return_value.update.assert_called_once_with(
-            source_type=FileSourceType.KNOWLEDGE, source_id=self.scope["knowledge_id"]
-        )
+        self.query.return_value.filter.return_value.update.assert_not_called()
         condition = next(call.args[0] for call in self.query.return_value.filter.call_args_list if call.args)
         self.assertIn(self.scope["user_id"], str(condition))
         self.assertIn(self.scope["knowledge_id"], str(condition))

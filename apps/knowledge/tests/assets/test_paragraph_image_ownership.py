@@ -6,6 +6,7 @@ import uuid_utils.compat as uuid
 from django.db import transaction
 from django.test import TestCase
 from django.utils import timezone
+from users.models import User
 
 from knowledge.models import (
     ContentOrigin,
@@ -110,6 +111,44 @@ class ParagraphImageOwnershipTests(TestCase):
         self.assertEqual(bind_paragraph_image_files([asset]), 0)
         self.file.refresh_from_db()
         self.assertEqual(self.file.source_type, FileSourceType.DOCUMENT)
+
+    def test_saved_paragraph_promotes_its_uploaders_preview_image(self):
+        user = User.objects.create(username="preview-owner", password="unused")
+        self.document.user = user
+        self.document.save(update_fields=["user"])
+        File.objects.filter(id=self.file.id).update(
+            source_type=FileSourceType.TEMPORARY_120_MINUTE,
+            source_id=FileSourceType.TEMPORARY_120_MINUTE,
+            meta={"preview_knowledge_id": str(self.knowledge.id), "user_id": str(user.id)},
+        )
+        paragraph = self.create_paragraph()
+
+        sync_paragraph_assets([paragraph])
+
+        self.file.refresh_from_db()
+        self.assertEqual(self.file.source_type, FileSourceType.PARAGRAPH)
+        self.assertEqual(self.file.source_id, str(paragraph.id))
+
+    def test_unrelated_temporary_images_are_not_promoted(self):
+        user = User.objects.create(username="preview-owner", password="unused")
+        self.document.user = user
+        self.document.save(update_fields=["user"])
+        for knowledge_id, user_id in (
+            (str(uuid.uuid7()), str(user.id)),
+            (str(self.knowledge.id), str(uuid.uuid7())),
+            (None, str(user.id)),
+        ):
+            with self.subTest(knowledge_id=knowledge_id, user_id=user_id):
+                File.objects.filter(id=self.file.id).update(
+                    source_type=FileSourceType.TEMPORARY_120_MINUTE,
+                    source_id=FileSourceType.TEMPORARY_120_MINUTE,
+                    meta={"preview_knowledge_id": knowledge_id, "user_id": user_id},
+                )
+
+                sync_paragraph_assets([self.create_paragraph()])
+
+                self.file.refresh_from_db()
+                self.assertEqual(self.file.source_type, FileSourceType.TEMPORARY_120_MINUTE)
 
     def test_source_authoritative_rechunk_preserves_reused_image(self):
         service = IncrementalDocumentSync(self.document, source_authoritative=True)

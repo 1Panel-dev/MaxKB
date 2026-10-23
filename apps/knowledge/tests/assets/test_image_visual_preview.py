@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 from common.exception.app_exception import AppApiException
+from django.db.models import Q
 from django.test import SimpleTestCase
 from django.urls import resolve
 from PIL import Image
@@ -67,16 +68,20 @@ class ImageVisualPreviewTests(SimpleTestCase):
         return False
 
     def filter_files(self, *conditions, **filters):
-        files = [
-            file
-            for file in self.files[::-1]
-            if all(
-                str(file.id) in {str(value) for value in expected}
-                if field == "id__in"
-                else str(getattr(file, field)) == str(expected)
-                for field, expected in filters.items()
-            )
-        ]
+        def matches(file, condition):
+            if isinstance(condition, Q):
+                checks = [matches(file, child) for child in condition.children]
+                matched = any(checks) if condition.connector == Q.OR else all(checks)
+                return not matched if condition.negated else matched
+            field, expected = condition
+            parts = field.split("__")
+            is_in = parts[-1] == "in"
+            value = file
+            for part in parts[:-1] if is_in else parts:
+                value = value.get(part) if isinstance(value, dict) else getattr(value, part, None)
+            return str(value) in {str(item) for item in expected} if is_in else str(value) == str(expected)
+
+        files = [file for file in self.files[::-1] if matches(file, Q(*conditions, **filters))]
         query = MagicMock()
         query.__iter__.return_value = files
         query.first.return_value = files[0] if files else None
@@ -110,6 +115,7 @@ class ImageVisualPreviewTests(SimpleTestCase):
         self.model_loader.assert_called_with(self.strategy["visual"]["model_id"], "default")
         self.assertEqual(self.model.invoke.call_count, 2)
         self.on_commit.assert_not_called()
+        self.assert_temporary_files()
 
     def test_generate_runs_the_selected_tool_and_returns_its_recognition(self):
         tool_id = str(uuid4())
@@ -147,6 +153,7 @@ class ImageVisualPreviewTests(SimpleTestCase):
         self.assertEqual(previews[0]["content"], [{"title": "first", "content": "first"}])
         self.assertEqual(previews[1]["process_status"], AssetProcessStatus.SUCCESS)
         self.assertEqual(previews[1]["description"], "recognized image")
+        self.assert_temporary_files()
 
     def test_disabled_enhancement_returns_skipped_without_calling_a_model(self):
         previews = self.service.generate_previews_by_file_ids(self.ids)
@@ -154,6 +161,71 @@ class ImageVisualPreviewTests(SimpleTestCase):
         self.assertTrue(all(preview["process_status"] == AssetProcessStatus.SKIPPED for preview in previews))
         self.model_loader.assert_not_called()
         self.on_commit.assert_not_called()
+        self.assert_temporary_files()
+
+    def assert_temporary_files(self, source_type=FileSourceType.TEMPORARY_120_MINUTE):
+        for file in self.files:
+            self.assertEqual((file.source_type, file.source_id), (source_type, source_type))
+            self.assertNotIn("knowledge_id", file.meta)
+            self.assertEqual(file.meta["user_id"], self.user_id)
+
+    def test_preview_preserves_every_temporary_file_lifetime(self):
+        for source_type in (
+            FileSourceType.TEMPORARY_30_MINUTE,
+            FileSourceType.TEMPORARY_120_MINUTE,
+            FileSourceType.TEMPORARY_1_DAY,
+        ):
+            with self.subTest(source_type=source_type):
+                for file in self.files:
+                    file.source_type = file.source_id = source_type
+                self.service.generate_previews_by_file_ids(self.ids)
+                self.assert_temporary_files(source_type)
+
+    def test_temporary_preview_access_requires_its_owner_and_knowledge(self):
+        self.service.generate_previews_by_file_ids(self.ids)
+        for knowledge_id, user_id in (
+            (self.service.knowledge_id, str(uuid4())),
+            (str(uuid4()), self.user_id),
+            (self.service.knowledge_id, None),
+        ):
+            service = ImageDocumentService("default", knowledge_id, user_id)
+            service.get_knowledge = self.service.get_knowledge
+            for method, args in (
+                (service.get_preview, (self.ids[0],)),
+                (service.update_preview, (self.ids[0], {"caption": "changed"})),
+                (service.delete_preview, (self.ids[0],)),
+                (service.import_previews, (self.ids,)),
+            ):
+                with self.subTest(method=method.__name__, knowledge_id=knowledge_id, user_id=user_id):
+                    with self.assertRaises(AppApiException):
+                        method(*args)
+            service.process_preview(self.ids[0])
+        self.assert_temporary_files()
+        self.model_loader.assert_not_called()
+
+    def test_legacy_knowledge_bound_previews_remain_readable(self):
+        self.service.generate_previews_by_file_ids(self.ids)
+        file = self.files[0]
+        file.source_type = FileSourceType.KNOWLEDGE
+        file.source_id = self.service.knowledge_id
+        file.meta["image_preview"].pop("knowledge_id")
+        self.service.user_id = None
+
+        preview = self.service.get_preview(file.id)
+
+        self.assertEqual(preview["source_file_id"], str(file.id))
+
+    def test_switching_knowledge_discards_late_recognition_for_the_previous_preview(self):
+        def recognize(messages):
+            self.files[0].meta["image_preview"]["knowledge_id"] = str(uuid4())
+            return SimpleNamespace(content=json.dumps(self.output))
+
+        self.model.invoke.side_effect = recognize
+        self.service.create_previews_by_file_ids(self.ids[:1], self.strategy, enqueue=False)
+        self.service.process_preview(self.ids[0])
+
+        self.assertEqual(self.files[0].meta["image_preview"]["process_status"], AssetProcessStatus.PENDING)
+        self.assertEqual(self.files[0].meta["image_preview"]["caption"], "")
 
     def test_invalid_image_rejects_the_batch_before_any_visual_processing(self):
         self.files[1].get_bytes.return_value = b"invalid image"
@@ -186,15 +258,20 @@ class ImageVisualPreviewTests(SimpleTestCase):
 
     def test_import_reuses_completed_preview_results_without_recognizing_them_again(self):
         self.service.generate_previews_by_file_ids(self.ids, self.strategy)
+        self.assert_temporary_files()
         with (
-            patch("knowledge.services.image_documents.Document"),
+            patch("knowledge.services.image_documents.Document", side_effect=lambda **values: MagicMock(**values)),
             patch("knowledge.services.image_documents.Paragraph"),
             patch("knowledge.services.image_documents.ParagraphAsset.objects.create") as assets,
             patch("knowledge.services.image_documents.IncrementalDocumentSync"),
         ):
-            self.service.import_previews(self.ids)
+            document_ids = self.service.import_previews(self.ids)
         self.assertEqual(self.model.invoke.call_count, 2)
         self.assertTrue(
             all(call.kwargs["process_status"] == AssetProcessStatus.SUCCESS for call in assets.call_args_list)
         )
         self.assertEqual(assets.call_args_list[0].kwargs["description"], self.output["description"])
+        self.assertEqual([file.source_id for file in self.files], document_ids)
+        for file in self.files:
+            self.assertEqual(file.source_type, FileSourceType.DOCUMENT)
+            self.assertEqual(file.meta["knowledge_id"], self.service.knowledge_id)

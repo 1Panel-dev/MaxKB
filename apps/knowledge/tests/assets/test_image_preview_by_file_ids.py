@@ -13,7 +13,7 @@ from PIL import Image
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from knowledge.api.document import ImagePreviewAPI
-from knowledge.models import AssetProcessStatus, FileSourceType, Knowledge, KnowledgeType
+from knowledge.models import AssetProcessStatus, Knowledge, KnowledgeType
 from knowledge.serializers.image_document import ImageDocumentSerializers, ImagePreviewUploadRequest
 from knowledge.services.image_documents import ImageDocumentService
 
@@ -53,7 +53,7 @@ class ImagePreviewByFileIdsTests(SimpleTestCase):
         ]
         self.on_commit = self.enterContext(patch("knowledge.services.image_documents.transaction.on_commit"))
 
-    def test_reuses_original_ids_preserves_order_and_promotes_sources_without_saving_bytes(self):
+    def test_reuses_original_ids_and_preserves_temporary_ownership_without_saving_bytes(self):
         previews = self.service.create_previews_by_file_ids(self.ids)
         self.assertEqual([preview["preview_id"] for preview in previews], self.ids)
         self.assertEqual([preview["name"] for preview in previews], ["first.png", "second.png"])
@@ -65,8 +65,8 @@ class ImagePreviewByFileIdsTests(SimpleTestCase):
             file.save.assert_not_called()
         self.on_commit.assert_not_called()
         updates = [call.kwargs for call in self.query.return_value.filter.return_value.update.call_args_list]
-        self.assertEqual(updates[0]["source_type"], FileSourceType.KNOWLEDGE)
-        self.assertEqual(updates[0]["source_id"], self.service.knowledge_id)
+        self.assertTrue(all("source_type" not in update and "source_id" not in update for update in updates))
+        self.assertTrue(all("knowledge_id" not in file.meta for file in self.files))
         condition = self.query.return_value.filter.call_args_list[0].args[0]
         self.assertIn(("meta__user_id", self.user_id), condition.children[1].children)
         self.assertIn(("source_id", self.service.knowledge_id), condition.children[0].children)

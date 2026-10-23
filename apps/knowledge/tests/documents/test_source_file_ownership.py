@@ -1,13 +1,16 @@
 """Imported source files belong to documents once the save transaction succeeds."""
 
+from io import BytesIO
 from unittest.mock import patch
 from uuid import uuid4
 
 from django.test import TestCase
+from PIL import Image
 
 from knowledge.models import Document, File, FileSourceType, Knowledge
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.services.document_cleanup import delete_document_data
+from knowledge.services.image_documents import ImageDocumentService
 
 
 class DocumentSourceFileOwnershipTests(TestCase):
@@ -80,6 +83,22 @@ class DocumentSourceFileOwnershipTests(TestCase):
                 self.assert_document_owns_file(document, source)
                 self.assertEqual(File.objects.filter(sha256_hash=source.sha256_hash).count(), 1)
 
+    def test_text_preview_remains_temporary_until_document_save(self):
+        source = self.source(FileSourceType.TEMPORARY_120_MINUTE)
+        File.objects.filter(id=source.id).update(file_name="guide.txt")
+        splitter = DocumentSerializers.Split(data=self.scope)
+        with patch.object(File, "get_bytes", return_value=b"preview text"):
+            previews = splitter.parse_by_file_ids({"file_id_list": [str(source.id)]})
+
+        source.refresh_from_db()
+        self.assertEqual(source.source_type, FileSourceType.TEMPORARY_120_MINUTE)
+        self.assertEqual(source.source_id, FileSourceType.TEMPORARY_120_MINUTE)
+        self.assertFalse(Document.objects.filter(knowledge_id=self.knowledge.id).exists())
+
+        preview = previews[0]
+        result = self.batch.batch_save([{**preview, "paragraphs": preview["content"]}])
+        self.assert_document_owns_file(Document.objects.get(id=result[0]["id"]), source)
+
     def test_table_and_qa_import_transfer_the_uploaded_file_to_the_document(self):
         for method, content in (
             ("save_table_by_file_ids", b"name,value\nexample,1\n"),
@@ -92,6 +111,38 @@ class DocumentSourceFileOwnershipTests(TestCase):
                     result = getattr(self.creator, method)({"file_id_list": [str(source.id)]})
                 document = Document.objects.get(id=result[0]["id"])
                 self.assert_document_owns_file(document, source)
+
+    def test_image_preview_binds_only_after_successful_import(self):
+        source = self.source(FileSourceType.TEMPORARY_120_MINUTE)
+        File.objects.filter(id=source.id).update(file_name="preview.png")
+        image = BytesIO()
+        Image.new("RGB", (1, 1)).save(image, format="PNG")
+        service = ImageDocumentService("default", str(self.knowledge.id), self.scope["user_id"])
+        with patch.object(File, "get_bytes", return_value=image.getvalue()):
+            previews = service.generate_previews_by_file_ids([source.id])
+
+        source.refresh_from_db()
+        self.assertEqual(source.source_type, FileSourceType.TEMPORARY_120_MINUTE)
+        self.assertEqual(source.source_id, FileSourceType.TEMPORARY_120_MINUTE)
+        self.assertNotIn("knowledge_id", source.meta)
+        self.assertFalse(Document.objects.filter(knowledge_id=self.knowledge.id).exists())
+
+        with (
+            patch(
+                "knowledge.services.image_documents.ParagraphAsset.objects.create",
+                side_effect=RuntimeError("save failed"),
+            ),
+            self.assertRaisesRegex(RuntimeError, "save failed"),
+        ):
+            service.import_previews([previews[0]["source_file_id"]])
+
+        source.refresh_from_db()
+        self.assertEqual(source.source_type, FileSourceType.TEMPORARY_120_MINUTE)
+        self.assertFalse(source.meta["image_preview"]["imported"])
+        self.assertFalse(Document.objects.filter(knowledge_id=self.knowledge.id).exists())
+
+        document_ids = service.import_previews([previews[0]["source_file_id"]])
+        self.assert_document_owns_file(Document.objects.get(id=document_ids[0]), source)
 
     def test_shared_upload_gives_each_document_its_own_source_reference(self):
         source = self.source(meta={"user_id": self.scope["user_id"]})

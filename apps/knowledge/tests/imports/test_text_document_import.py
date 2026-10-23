@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 from django.test import SimpleTestCase
 from django.urls import resolve
 from knowledge.api.document import DocumentImportAPI
+from knowledge.models import File, FileSourceType
 from knowledge.serializers.document import DocumentImportRequest, DocumentSerializers
 from knowledge.services.document_strategy import normalize_document_strategy
 from knowledge.views.document import DocumentView
@@ -236,6 +237,25 @@ class TextDocumentImportTests(SimpleTestCase):
             documents = splitter.file_to_paragraph(ContentFile(b"preview text", name="preview.txt"), None, False, 4096)
             file_model.return_value.save.assert_called_once_with(b"preview text")
             self.assertEqual(documents[0]["source_file_id"], file_model.call_args.kwargs["id"])
+            self.assertEqual(file_model.call_args.kwargs["source_type"], FileSourceType.TEMPORARY_120_MINUTE)
+            self.assertEqual(file_model.call_args.kwargs["source_id"], FileSourceType.TEMPORARY_120_MINUTE)
+            self.assertEqual(file_model.call_args.kwargs["meta"], {"user_id": self.scope["user_id"]})
+
+    def test_extracted_preview_images_remain_temporary_with_uploader_context(self):
+        splitter = DocumentSerializers.Split(data=self.scope)
+        serializers.Serializer.is_valid(splitter, raise_exception=True)
+        image = File(file_name="inline.png", meta={"content": b"image", "debug": False})
+        image.save = MagicMock()
+        self.query.return_value.filter.return_value.values.return_value = []
+
+        splitter.save_image([image])
+
+        image.save.assert_called_once_with(b"image")
+        self.assertEqual(image.source_type, FileSourceType.TEMPORARY_120_MINUTE)
+        self.assertEqual(image.source_id, FileSourceType.TEMPORARY_120_MINUTE)
+        self.assertEqual(image.meta["preview_knowledge_id"], self.scope["knowledge_id"])
+        self.assertEqual(image.meta["user_id"], self.scope["user_id"])
+        self.assertNotIn("knowledge_id", image.meta)
 
 
 class TextDocumentImportViewTests(SimpleTestCase):

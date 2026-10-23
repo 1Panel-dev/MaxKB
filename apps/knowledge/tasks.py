@@ -6,10 +6,10 @@ from ops import celery_app
 
 
 @celery_app.task(name="celery:process_image_preview")
-def process_image_preview(workspace_id: str, knowledge_id: str, preview_id: str):
+def process_image_preview(workspace_id: str, knowledge_id: str, preview_id: str, user_id=None):
     from knowledge.services.image_documents import ImageDocumentService
 
-    ImageDocumentService(workspace_id, knowledge_id).process_preview(preview_id)
+    ImageDocumentService(workspace_id, knowledge_id, user_id).process_preview(preview_id)
 
 
 @celery_app.task(name="celery:process_paragraph_visual_assets")

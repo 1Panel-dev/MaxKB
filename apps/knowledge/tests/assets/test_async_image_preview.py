@@ -13,6 +13,7 @@ from common.event.listener_manage import ListenerManagement
 from knowledge.models import (
     AssetProcessStatus,
     DocumentResourceType,
+    FileSourceType,
     Knowledge,
     KnowledgeType,
     LocalState,
@@ -25,7 +26,7 @@ from knowledge.services.paragraph_assets import _write_asset_description, proces
 
 class AsyncImagePreviewTests(SimpleTestCase):
     def setUp(self):
-        self.service = ImageDocumentService("default", str(uuid4()))
+        self.service = ImageDocumentService("default", str(uuid4()), str(uuid4()))
         self.knowledge = Knowledge(
             id=self.service.knowledge_id,
             workspace_id="default",
@@ -87,7 +88,7 @@ class AsyncImagePreviewTests(SimpleTestCase):
 
     def test_upload_returns_pending_without_vision_call_and_queues_only_after_commit(self):
         with (
-            patch("knowledge.services.image_documents.File", return_value=self.file),
+            patch("knowledge.services.image_documents.File", return_value=self.file) as file_model,
             patch("knowledge.services.image_documents.transaction.on_commit") as on_commit,
             patch("knowledge.tasks.process_image_preview.delay") as delay,
         ):
@@ -96,11 +97,28 @@ class AsyncImagePreviewTests(SimpleTestCase):
             self.assertEqual(previews[0]["process_status"], AssetProcessStatus.PENDING)
             self.assertEqual(previews[0]["content"], [{"title": "chart", "content": "chart"}])
             self.file.save.assert_called_once()
+            self.assertEqual(file_model.call_args.kwargs["source_type"], FileSourceType.TEMPORARY_120_MINUTE)
+            self.assertEqual(file_model.call_args.kwargs["source_id"], FileSourceType.TEMPORARY_120_MINUTE)
+            self.assertEqual(file_model.call_args.kwargs["meta"]["user_id"], self.service.user_id)
+            self.assertNotIn("knowledge_id", file_model.call_args.kwargs["meta"])
             self.run_visual.assert_not_called()
             delay.assert_not_called()
             on_commit.assert_called_once()
             on_commit.call_args.args[0]()
-            delay.assert_called_once_with("default", self.service.knowledge_id, str(self.file.id))
+            delay.assert_called_once_with("default", self.service.knowledge_id, str(self.file.id), self.service.user_id)
+
+    def test_worker_forwards_preview_owner_and_accepts_legacy_tasks(self):
+        from knowledge.tasks import process_image_preview
+
+        for user_id in (self.service.user_id, None):
+            with (
+                self.subTest(user_id=user_id),
+                patch("knowledge.services.image_documents.ImageDocumentService") as service,
+            ):
+                args = ("default", self.service.knowledge_id, str(self.file.id))
+                process_image_preview(*args, *([user_id] if user_id is not None else []))
+                service.assert_called_once_with("default", self.service.knowledge_id, user_id)
+                service.return_value.process_preview.assert_called_once_with(str(self.file.id))
 
     def test_disabled_enhancement_never_queues_a_task(self):
         self.run_visual.return_value = {**self.processed, "process_status": AssetProcessStatus.SKIPPED}

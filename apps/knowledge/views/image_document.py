@@ -72,9 +72,9 @@ class ImageDocumentView:
         @_document_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_READ)
         def get(self, request: Request, workspace_id: str, knowledge_id: str, preview_id: str):
             return result.success(
-                ImageDocumentSerializers.Preview(data={"workspace_id": workspace_id, "knowledge_id": knowledge_id}).one(
-                    preview_id
-                )
+                ImageDocumentSerializers.Preview(
+                    data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "user_id": request.user.id}
+                ).one(preview_id)
             )
 
         @extend_schema(
@@ -91,7 +91,7 @@ class ImageDocumentView:
         def put(self, request: Request, workspace_id: str, knowledge_id: str, preview_id: str):
             return result.success(
                 ImageDocumentSerializers.Preview(
-                    data={"workspace_id": workspace_id, "knowledge_id": knowledge_id}
+                    data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "user_id": request.user.id}
                 ).edit(preview_id, request.data)
             )
 
@@ -108,7 +108,7 @@ class ImageDocumentView:
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, preview_id: str):
             return result.success(
                 ImageDocumentSerializers.Preview(
-                    data={"workspace_id": workspace_id, "knowledge_id": knowledge_id}
+                    data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "user_id": request.user.id}
                 ).delete(preview_id)
             )
 

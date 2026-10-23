@@ -276,6 +276,7 @@ class DocumentView(APIView):
                     data={
                         "workspace_id": workspace_id,
                         "knowledge_id": knowledge_id,
+                        "user_id": request.user.id,
                     }
                 ).parse(_get_document_split_payload(request))
             )

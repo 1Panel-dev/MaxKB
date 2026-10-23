@@ -167,12 +167,24 @@ class ImageDocumentService:
             "document_id": preview.get("document_id"),
         }
 
+    def _file_access_filter(self, *, preview=False) -> Q:
+        scope = Q(source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id)
+        if self.user_id is not None:
+            temporary = Q(
+                source_type__in=[
+                    FileSourceType.TEMPORARY_30_MINUTE,
+                    FileSourceType.TEMPORARY_120_MINUTE,
+                    FileSourceType.TEMPORARY_1_DAY,
+                ],
+                meta__user_id=str(self.user_id),
+            )
+            if preview:
+                temporary &= Q(meta__image_preview__knowledge_id=self.knowledge_id)
+            scope |= temporary
+        return scope
+
     def _get_preview_file(self, preview_id, *, for_update=False) -> File:
-        files = QuerySet(File).filter(
-            id=preview_id,
-            source_type=FileSourceType.KNOWLEDGE,
-            source_id=self.knowledge_id,
-        )
+        files = QuerySet(File).filter(self._file_access_filter(preview=True), id=preview_id)
         file = (files.select_for_update() if for_update else files).first()
         if file is None or not _preview_meta(file):
             raise AppApiException(500, _("Image preview does not exist"))
@@ -185,10 +197,7 @@ class ImageDocumentService:
         # may happen while recognition is running, so reload the current preview first.
         with transaction.atomic():
             file = (
-                QuerySet(File)
-                .filter(id=preview_id, source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id)
-                .select_for_update()
-                .first()
+                QuerySet(File).filter(self._file_access_filter(preview=True), id=preview_id).select_for_update().first()
             )
             if file is None:
                 return
@@ -208,11 +217,7 @@ class ImageDocumentService:
 
     def process_preview(self, preview_id) -> None:
         self.get_knowledge()
-        file = (
-            QuerySet(File)
-            .filter(id=preview_id, source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id)
-            .first()
-        )
+        file = QuerySet(File).filter(self._file_access_filter(preview=True), id=preview_id).first()
         if file is None:
             return
         preview = _preview_meta(file)
@@ -227,7 +232,12 @@ class ImageDocumentService:
         from knowledge.tasks import process_image_preview
 
         try:
-            process_image_preview.delay(self.workspace_id, self.knowledge_id, preview_id)
+            process_image_preview.delay(
+                self.workspace_id,
+                self.knowledge_id,
+                preview_id,
+                str(self.user_id) if self.user_id is not None else None,
+            )
         except Exception as exc:
             self._complete_preview(
                 preview_id,
@@ -256,9 +266,9 @@ class ImageDocumentService:
                 id=uuid.uuid7(),
                 file_name=file_name,
                 file_size=upload.size,
-                source_type=FileSourceType.KNOWLEDGE,
-                source_id=self.knowledge_id,
-                meta={"knowledge_id": self.knowledge_id, "upload_size": upload.size},
+                source_type=FileSourceType.TEMPORARY_120_MINUTE,
+                source_id=FileSourceType.TEMPORARY_120_MINUTE,
+                meta={"user_id": str(self.user_id), "upload_size": upload.size},
             )
             file.save(content)
             previews.append(self._initialize_preview(file, normalized_strategy))
@@ -278,6 +288,7 @@ class ImageDocumentService:
             processed = self._run_visual_processor(file, strategy, self.workspace_id)
         preview = {
             **processed,
+            "knowledge_id": self.knowledge_id,
             "doc_strategy": strategy,
             "imported": False,
             "document_id": None,
@@ -290,20 +301,9 @@ class ImageDocumentService:
         return self.serialize_preview(file)
 
     def _get_uploaded_image_files(self, ordered_ids: List[str]) -> Dict[str, File]:
-        temporary_types = [
-            FileSourceType.TEMPORARY_30_MINUTE,
-            FileSourceType.TEMPORARY_120_MINUTE,
-            FileSourceType.TEMPORARY_1_DAY,
-        ]
         files = {
             str(file.id): file
-            for file in QuerySet(File)
-            .filter(
-                Q(source_type=FileSourceType.KNOWLEDGE, source_id=self.knowledge_id)
-                | Q(source_type__in=temporary_types, meta__user_id=str(self.user_id)),
-                id__in=ordered_ids,
-            )
-            .select_for_update()
+            for file in QuerySet(File).filter(self._file_access_filter(), id__in=ordered_ids).select_for_update()
         }
         if len(files) != len(ordered_ids):
             raise AppApiException(500, _("File does not exist or no permission to access"))
@@ -321,7 +321,7 @@ class ImageDocumentService:
         source_files = [files[file_id] for file_id in ordered_ids]
         normalized_strategy = normalize_document_strategy(strategy)
         file_names = {}
-        # Validate the whole batch before promoting files or scheduling recognition.
+        # Validate the whole batch before updating previews or scheduling recognition.
         for file in source_files:
             if _preview_meta(file).get("imported"):
                 raise AppApiException(500, _("Image preview has already been imported"))
@@ -329,15 +329,9 @@ class ImageDocumentService:
                 file_names[file.id] = self._validate_image(content, knowledge)
         previews = []
         for file in source_files:
-            meta = {**(file.meta or {}), "knowledge_id": self.knowledge_id}
-            QuerySet(File).filter(id=file.id).update(
-                source_type=FileSourceType.KNOWLEDGE,
-                source_id=self.knowledge_id,
-                file_name=file_names[file.id],
-                meta=meta,
-            )
+            # Previewing does not transfer ownership or exempt temporary uploads from cleanup.
+            QuerySet(File).filter(id=file.id).update(file_name=file_names[file.id])
             file.file_name = file_names[file.id]
-            file.meta = meta
             previews.append(self._initialize_preview(file, normalized_strategy, enqueue=enqueue))
         return previews
 
@@ -397,6 +391,8 @@ class ImageDocumentService:
             preview = _preview_meta(file)
             if preview.get("imported"):
                 raise AppApiException(500, _("One or more image previews cannot be imported"))
+            if preview.get("knowledge_id", self.knowledge_id) != self.knowledge_id:
+                raise AppApiException(500, _("File does not exist or no permission to access"))
             if not preview:
                 with ContentFile(file.get_bytes(), name=file.file_name) as content:
                     file_names[file.id] = self._validate_image(content, knowledge)
@@ -480,7 +476,7 @@ class ImageDocumentService:
                 "document_id": str(document.id),
                 "imported_at": timezone.now().isoformat(),
             }
-            file_meta = {**(file.meta or {}), "image_preview": imported_preview}
+            file_meta = {**(file.meta or {}), "knowledge_id": self.knowledge_id, "image_preview": imported_preview}
             QuerySet(File).filter(id=file.id).update(
                 source_type=FileSourceType.DOCUMENT,
                 source_id=str(document.id),

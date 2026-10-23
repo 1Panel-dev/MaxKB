@@ -57,6 +57,10 @@ Inline images from document imports, Web, Lark and workflow synchronization shar
 rules. Once paragraph assets are saved, their files use `source_type=PARAGRAPH` and a referencing
 paragraph's ID as `source_id`. Original source documents (`meta.source_file_id`) and standalone image
 documents retain their document ownership.
+Document previews (`split` and `split_by_file_ids`) keep source uploads temporary. Images extracted
+during preview are also temporary, with uploader and preview knowledge context in metadata; only
+images referenced by saved paragraphs from that uploader and knowledge base acquire paragraph
+ownership. Abandoned previews remain eligible for the normal temporary-file cleanup job.
 `ParagraphAsset` retains every document/paragraph reference; shared images keep the same file ID and
 URL across syncs. Deleting the owning paragraph transfers ownership to another referencing paragraph,
 or deletes the file when no paragraph assets remain. Rechunking and replacement temporarily stage
@@ -111,6 +115,10 @@ tests, workflow retrieval and REST/MCP retrieval rechecks deletion state before 
 `file_id_list` 支持当前用户上传的临时图片 ID 和当前知识库已生成预览的图片文件 ID，可不经过预览直接导入。
 直接导入校验整批图片的权限、格式、大小和数量后创建图片文档，视觉增强由导入后的向量化任务执行；
 已有预览保留其处理策略、识别结果和编辑，不被请求中的 `doc_strategy` 覆盖。
+生成预览保留上传文件的临时 `source_type` 和 `source_id`，不提前绑定知识库；图片识别结果及
+本次预览的知识库上下文暂存在 `meta.image_preview`。查询、编辑、删除和识别任务校验上传用户
+及预览上下文；正式导入成功后才将文件绑定到新文档。未保存的预览仍按原临时文件期限清理。
+已有的知识库归属预览继续兼容读取和导入，本次变更不自动调整历史文件归属。
 
 图片扩展名和实际内容均须属于 JPG/JPEG、PNG、WEBP、BMP 支持范围。有效图片的扩展名与实际格式
 不一致时，预览和直接导入会按实际格式纠正保存的文件名（例如 PNG 内容的 `神奇图片.jpg` 保存为

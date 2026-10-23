@@ -219,7 +219,14 @@ def sync_paragraph_assets(paragraphs: Iterable[Paragraph], visual_strategy_hash:
         block["ocr_text"] = asset.ocr_text
         block["description"] = asset.description
         active_assets.append(asset)
-        if file.source_type in (FileSourceType.KNOWLEDGE, FileSourceType.DOCUMENT, FileSourceType.PARAGRAPH):
+        if file.source_type in (
+            FileSourceType.KNOWLEDGE,
+            FileSourceType.DOCUMENT,
+            FileSourceType.PARAGRAPH,
+            FileSourceType.TEMPORARY_30_MINUTE,
+            FileSourceType.TEMPORARY_120_MINUTE,
+            FileSourceType.TEMPORARY_1_DAY,
+        ):
             inline_assets.append(asset)
 
     ParagraphAsset.objects.filter(

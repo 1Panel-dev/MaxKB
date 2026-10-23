@@ -14,6 +14,11 @@ from knowledge.services import validate_knowledge_file_size
 
 def bind_paragraph_image_files(assets) -> int:
     """Bind inline image files from any importer, preserving source documents and shared IDs."""
+    temporary_types = (
+        FileSourceType.TEMPORARY_30_MINUTE,
+        FileSourceType.TEMPORARY_120_MINUTE,
+        FileSourceType.TEMPORARY_1_DAY,
+    )
     owners = {}
     for asset in assets:
         if not str(asset.source_asset_key).startswith("standalone:"):
@@ -32,12 +37,25 @@ def bind_paragraph_image_files(assets) -> int:
             File.objects.select_for_update()
             .filter(
                 id__in=owners.keys() - source_file_ids,
-                source_type__in=[FileSourceType.KNOWLEDGE, FileSourceType.DOCUMENT, FileSourceType.PARAGRAPH],
+                source_type__in=[
+                    FileSourceType.KNOWLEDGE,
+                    FileSourceType.DOCUMENT,
+                    FileSourceType.PARAGRAPH,
+                    *temporary_types,
+                ],
             )
             .order_by("id")
         )
         for file in files:
             asset = owners[str(file.id)]
+            if file.source_type in temporary_types:
+                meta = file.meta or {}
+                if (
+                    meta.get("preview_knowledge_id") != str(asset.knowledge_id)
+                    or not asset.document.user_id
+                    or meta.get("user_id") != str(asset.document.user_id)
+                ):
+                    continue
             if file.source_type == FileSourceType.KNOWLEDGE and file.source_id != str(asset.knowledge_id):
                 continue
             if (
