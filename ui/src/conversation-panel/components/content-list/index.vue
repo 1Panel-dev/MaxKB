@@ -1,60 +1,60 @@
-<template>
-  <div class="content-list">
-    <div v-for="(content, index) in contents" :key="`${content.type}:${content.id ?? index}`" class="content-item">
-      <Content :type="content.type" :content="content" />
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
 import Content from '@/conversation-panel/components/content/index.vue'
 
-const props = defineProps<{ contentList: Array<any> }>()
+defineOptions({ name: 'ConversationContentList' })
 
-const contents = computed(() => {
+interface ContentItem {
+  type: string
+  id?: string
+  content?: unknown
+  children?: ContentItem[]
+  [key: string]: unknown
+}
+
+const props = defineProps<{ contentList: ContentItem[] }>()
+
+// 隐藏审批和空正文；sort 为稳定排序，相同 id 的内容保留原始顺序。
+const displayContents = computed(() => {
   const sortedContents = props.contentList
-    .filter((item) => item.type !== 'APPROVAL')
-    .map((item, index) => ({ item, index }))
-    .sort((a, b) => {
-      const idA = a.item.id || ''
-      const idB = b.item.id || ''
-      if (idA !== idB) {
-        return idA.localeCompare(idB)
-      }
-      return a.index - b.index
+    .filter((content) => {
+      if (content.type === 'APPROVAL') return false
+      return !((content.type === 'TEXT' || content.type === 'HTML') && !content.content)
     })
-    .map(({ item }) => item)
-    .filter((item) => !((item.type === 'TEXT' || item.type === 'HTML') && !item.content))
+    .sort((leftContent, rightContent) => (leftContent.id || '').localeCompare(rightContent.id || ''))
+
   return foldToolGroups(sortedContents)
 })
 
 // 排序后相邻的 TOOL（2 个起）折叠为 GROUP_TOOL；仅为展示结构，不写回数据。
 // 分组 id 取首个工具 id，流式追加时保持不变，组件得以复用
-function foldToolGroups(contentItems: any[]) {
-  const foldedContents: any[] = []
-  for (const item of contentItems) {
-    const last = foldedContents[foldedContents.length - 1]
-    if (item.type === 'TOOL' && last?.type === 'GROUP_TOOL') {
-      last.children.push(item)
-    } else if (item.type === 'TOOL' && last?.type === 'TOOL') {
-      foldedContents[foldedContents.length - 1] = { type: 'GROUP_TOOL', id: `${last.id}_group`, children: [last, item] }
+function foldToolGroups(contentItems: ContentItem[]): ContentItem[] {
+  const foldedContents: ContentItem[] = []
+
+  for (const content of contentItems) {
+    const lastContent = foldedContents[foldedContents.length - 1]
+
+    if (content.type === 'TOOL' && lastContent?.type === 'GROUP_TOOL') {
+      lastContent.children!.push(content)
+    } else if (content.type === 'TOOL' && lastContent?.type === 'TOOL') {
+      foldedContents[foldedContents.length - 1] = {
+        type: 'GROUP_TOOL',
+        id: `${lastContent.id}_group`,
+        children: [lastContent, content],
+      }
     } else {
-      foldedContents.push(item)
+      foldedContents.push(content)
     }
   }
+
   return foldedContents
 }
 </script>
 
-<style scoped lang="scss">
-.content-list {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.content-item {
-  width: 100%;
-}
-</style>
+<template>
+  <div class="w-full">
+    <template v-for="(content, index) in displayContents" :key="`${content.type}:${content.id ?? index}`">
+      <Content :content="content" />
+    </template>
+  </div>
+</template>
