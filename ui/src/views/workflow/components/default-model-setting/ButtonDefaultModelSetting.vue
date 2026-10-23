@@ -11,12 +11,13 @@ defineOptions({ name: 'ButtonDefaultModelSetting' })
 
 const props = withDefaults(
   defineProps<{
+    label?: string
     modelValue?: DefaultModelSettingPayload
     modelApi: typeof ModelApi | typeof SystemModelApi | typeof SharedModelApi
     getGraphData: () => LogicFlow.GraphData | undefined
     disabled?: boolean
   }>(),
-  { modelValue: () => ({}), disabled: false },
+  { label: '默认模型设置', modelValue: () => ({}), disabled: false },
 )
 const emit = defineEmits<{
   open: []
@@ -40,10 +41,11 @@ function handleDrawerClosed() {
 </script>
 
 <template>
-  <el-button plain :disabled="disabled" @click="handleOpen">
-    <MkIcon name="icon_admin_outlined" />
-    <span> 默认模型设置 </span>
-  </el-button>
+  <MkTooltip :content="label" placement="bottom">
+    <el-button plain :disabled="disabled" @click="handleOpen" class="w-8! min-w-8!">
+      <MkIcon name="icon_admin_outlined" />
+    </el-button>
+  </MkTooltip>
 
   <DefaultModelSettingDrawer
     v-if="drawerMounted"

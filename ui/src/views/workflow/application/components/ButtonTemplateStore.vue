@@ -5,6 +5,7 @@ import type { ApplicationStoreTemplate } from '@/api/types'
 import TemplateStoreDialog from '@/views/workflow/components/template-store/TemplateStoreDialog.vue'
 
 defineOptions({ name: 'ButtonApplicationTemplateStore' })
+defineProps<{ label: string }>()
 const emit = defineEmits<{ open: []; use: [template: ApplicationStoreTemplate] }>()
 const templateStoreDialogRef = useTemplateRef<InstanceType<typeof TemplateStoreDialog>>('templateStoreDialogRef')
 
@@ -41,7 +42,7 @@ defineExpose({ close })
   <!-- 打开模板中心 -->
   <el-button plain :disabled="loading" @click="handleOpen">
     <MkIcon name="icon_template_outlined" />
-    <span>模板中心</span>
+    <span>{{ label }}</span>
   </el-button>
   <TemplateStoreDialog
     ref="templateStoreDialogRef"
