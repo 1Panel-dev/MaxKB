@@ -6,6 +6,7 @@ import CommonApi from '@/api/admin/workspace/common'
 import { TRIGGER_TYPE } from '@/api/enums'
 import type { Dict, OptionItem, Trigger, TriggerType } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import TriggerFormDrawer from './trigger-form/TriggerFormDrawer.vue'
 import TriggerTaskPopover from './components/TriggerTaskPopover.vue'
@@ -16,6 +17,7 @@ const loading = ref(false)
 const triggerData = ref<Trigger[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const triggerSearchQuery = ref<Dict<unknown>>({})
+const orderBy = ref<string>()
 const triggerTypeLabels: Record<TriggerType, string> = {
   [TRIGGER_TYPE.SCHEDULED]: '定时触发',
   [TRIGGER_TYPE.EVENT]: '事件触发',
@@ -35,6 +37,7 @@ const selectedTriggerType = ref<string | null>(null)
 const selectedStatus = ref<boolean | null>(null)
 const triggerQuery = computed<Dict<unknown>>(() => ({
   ...triggerSearchQuery.value,
+  order_by: orderBy.value,
   ...(selectedTriggerType.value ? { type: selectedTriggerType.value } : {}),
   ...(selectedStatus.value !== null ? { is_active: selectedStatus.value } : {}),
 }))
@@ -68,6 +71,12 @@ function handleFilterChange() {
   tableRef.value?.clearSelection()
   paginationConfig.value.currentPage = 1
   loadTriggers()
+}
+
+/* 表头排序：清空选择并重新查询第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort)
+  handleFilterChange()
 }
 
 /* 新建、编辑 */
@@ -176,6 +185,7 @@ onMounted(() => loadTriggers())
         :max-table-height="200"
         @current-change="loadTriggers"
         @size-change="loadTriggers"
+        @sort-change="handleSortChange"
         resizable
       >
         <el-table-column type="selection" width="40" />
@@ -212,14 +222,14 @@ onMounted(() => loadTriggers())
           <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
         </el-table-column>
         <el-table-column prop="desc" label="描述" min-width="170" show-overflow-tooltip />
-        <el-table-column prop="next_run_time" label="下次执行时间" width="180">
+        <el-table-column prop="next_run_time" label="下次执行时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.next_run_time) || '-' }}</template>
         </el-table-column>
         <el-table-column label="任务" min-width="180">
           <template #default="{ row }"><TriggerTaskPopover :tasks="row.trigger_task" /></template>
         </el-table-column>
         <el-table-column prop="create_user" label="创建者" width="130" show-overflow-tooltip />
-        <el-table-column prop="create_time" label="创建时间" width="180">
+        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">

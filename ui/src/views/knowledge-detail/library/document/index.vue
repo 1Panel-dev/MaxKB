@@ -457,19 +457,19 @@ onBeforeUnmount(() => {
         {{ DOCUMENT_HIT_HANDLING_LABELS[row.hit_handling_method] }}
       </template>
     </el-table-column>
-    <el-table-column prop="hit_num" label="召回次数">
+    <el-table-column prop="hit_num" width="120" label="召回次数" sortable>
       <template #default="{ row }">
         {{ numberFormat(row.hit_num) }}
       </template>
     </el-table-column>
-    <el-table-column label="最后一次召回时间" width="180">
+    <el-table-column prop="last_hit_time" label="最后一次召回时间" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.last_hit_time) }}</template>
     </el-table-column>
-    <el-table-column prop="nick_name" label="创建者" show-overflow-tooltip />
-    <el-table-column label="更新时间" width="180">
+    <el-table-column prop="nick_name" width="120" label="创建者" show-overflow-tooltip sortable />
+    <el-table-column prop="update_time" label="更新时间" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
-    <el-table-column label="创建时间" width="180">
+    <el-table-column prop="create_time" label="创建时间" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
     <el-table-column label="操作" width="160" fixed="right" v-if="!isWorkspaceSharedResource()">

@@ -1,6 +1,6 @@
 import { del, get, post, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import type { ProblemItem, ProblemBatchAssociationPayload, ProblemParagraph } from '@/api/types'
+import type { Dict, ProblemItem, ProblemBatchAssociationPayload, ProblemParagraph } from '@/api/types'
 
 const getPrefix = (knowledgeId: string) => `/system/shared/knowledge/${knowledgeId}/problem`
 
@@ -8,7 +8,7 @@ const getPrefix = (knowledgeId: string) => `/system/shared/knowledge/${knowledge
 const postProblems = (knowledgeId: string, contents: string[]) => post<string[], void>(getPrefix(knowledgeId), contents)
 
 /** 分页搜索知识库问题，供问题列表及分段关联候选使用。 */
-const getProblemsPage = (knowledgeId: string, page: ParamsPage, query?: { content?: string }) =>
+const getProblemsPage = (knowledgeId: string, page: ParamsPage, query?: Dict<unknown>) =>
   get<ResponsePage<ProblemItem>>(`${getPrefix(knowledgeId)}/${page.currentPage}/${page.pageSize}`, query)
 
 /** 编辑单个知识库问题的内容。 */

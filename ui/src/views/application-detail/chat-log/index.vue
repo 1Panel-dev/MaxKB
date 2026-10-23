@@ -7,6 +7,7 @@ import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { beforeDay, datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { useApplicationDetailContext } from '../context'
 import ButtonCleanStrategy from './clean-strategy/ButtonCleanStrategy.vue'
 import ButtonAddKnowledge from './add-knowledge/ButtonAddKnowledge.vue'
@@ -22,6 +23,7 @@ const { application, applicationId, resourceApi } = useApplicationDetailContext(
 // 日志搜索与日期筛选
 const loading = ref(false)
 const chatLogs = ref<ChatLog[]>([])
+const orderBy = ref<string>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const sourceOptions: OptionItem<string>[] = Object.entries(CHAT_LOG_SOURCE_LABELS).map(([value, label]) => ({ value, label }))
 const searchFields: OptionItem<string>[] = [
@@ -59,10 +61,19 @@ function handleFeedbackChange() {
 const chatLogQuery = computed<Dict<unknown>>(() => ({
   ...chatLogSearchQuery.value,
   ...chatLogDateQuery.value,
+  order_by: orderBy.value,
   ...(selectedFeedback.value === 'star' ? { min_star: 1 } : {}),
   ...(selectedFeedback.value === 'trample' ? { min_trample: 1 } : {}),
   comparer: 'and',
 }))
+
+/* 表头排序：清空选择并重新查询第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort, (prop) => (prop === 'asker.username' ? 'username' : prop))
+  chatLogTableRef.value?.clearSelection()
+  paginationConfig.value.currentPage = 1
+  return loadChatLogs()
+}
 
 function loadChatLogs(currentPage = paginationConfig.value.currentPage): Promise<ChatLog[]> {
   // 自定义日期清空后等待重新选择，避免提交后端不接受的空日期。
@@ -190,13 +201,14 @@ onMounted(() => loadChatLogs())
     @current-change="loadChatLogs()"
     @size-change="loadChatLogs()"
     @selection-change="handleSelectionChange"
+    @sort-change="handleSortChange"
     @row-click="handleRowClick"
     row-class-name="cursor-pointer"
     resizable
   >
     <el-table-column type="selection" width="40" />
     <el-table-column prop="abstract" label="摘要" min-width="220" show-overflow-tooltip />
-    <el-table-column prop="chat_record_count" label="对话次数" width="100" />
+    <el-table-column prop="chat_record_count" label="对话次数" width="100" sortable />
     <el-table-column width="140">
       <template #header>
         <MkTableFilter v-model="selectedFeedback" mode="single" label="用户反馈" :options="feedbackOptions" @change="handleFeedbackChange" />
@@ -216,7 +228,7 @@ onMounted(() => loadChatLogs())
       </template>
     </el-table-column>
     <el-table-column prop="mark_sum" label="改进标注" width="100" />
-    <el-table-column label="用户" min-width="130" show-overflow-tooltip>
+    <el-table-column prop="asker.username" label="用户" min-width="130" show-overflow-tooltip sortable>
       <template #default="{ row }">{{ row.asker?.username || '-' }}</template>
     </el-table-column>
     <el-table-column label="IP 地址" width="140" show-overflow-tooltip>
@@ -225,7 +237,7 @@ onMounted(() => loadChatLogs())
     <el-table-column label="来源" min-width="140" show-overflow-tooltip>
       <template #default="{ row }">{{ formatSource(row.source?.type) }}</template>
     </el-table-column>
-    <el-table-column label="最近对话时间" width="180">
+    <el-table-column prop="update_time" label="最近对话时间" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
     <template #footer-batch-actions>

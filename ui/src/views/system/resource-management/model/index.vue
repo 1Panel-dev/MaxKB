@@ -9,6 +9,7 @@ import type { Dict, ModelItem, ModelProviderItem, OptionItem } from '@/api/types
 import { MODEL_TYPE_LABELS } from '@/constants'
 import { useStore } from '@/stores'
 import { datetimeFormat } from '@/utils/time'
+import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { EditModelAction, AuthorizeModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
 import perm from '@/permission'
@@ -20,6 +21,7 @@ const loading = ref(false)
 const modelsData = ref<ModelItem[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const modelQuery = ref<Dict<unknown>>()
+const orderBy = ref<string>()
 const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedModelType = ref('')
@@ -41,6 +43,7 @@ function loadModels() {
   loading.value = true
   return SystemModelApi.getModelPage(pagination.value, {
     ...modelQuery.value,
+    order_by: orderBy.value,
     ...(selectedModelType.value ? { model_type: selectedModelType.value } : {}),
     ...(selectedProvider.value ? { provider: selectedProvider.value } : {}),
     ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
@@ -62,6 +65,12 @@ function handleSearchChange(query?: Dict<unknown>) {
 function handleFilterChange() {
   pagination.value.currentPage = 1
   return loadModels()
+}
+
+/* 表头排序：保留筛选并重新查询第一页。 */
+function handleSortChange(sort: Parameters<typeof toOrderBy>[0]) {
+  orderBy.value = toOrderBy(sort)
+  return handleFilterChange()
 }
 
 /* 供应商展示 */
@@ -120,6 +129,7 @@ onMounted(() => {
         :max-table-height="210"
         @current-change="loadModels"
         @size-change="loadModels"
+        @sort-change="handleSortChange"
         resizable
       >
         <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
@@ -154,10 +164,10 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column label="更新时间" width="180">
+        <el-table-column prop="update_time" label="更新时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
         </el-table-column>
-        <el-table-column label="创建时间" width="180">
+        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">
