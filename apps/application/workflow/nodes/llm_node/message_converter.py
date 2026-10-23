@@ -32,6 +32,7 @@ from langchain_core.messages import (
 )
 
 from application.workflow.nodes.ai_chat_node.ai_chat_node import _process_images
+from common.utils.partial_json import parse_partial_json
 
 CONTENT_TYPES = {"SYSTEM", "USER", "ASSISTANT", "TOOL"}
 # OpenAI 消息中需要透传给 LangChain 的字段
@@ -69,7 +70,7 @@ def _parse_arguments(arguments) -> dict:
     if isinstance(arguments, dict):
         return arguments
     try:
-        parsed = json.loads(arguments or "{}")
+        parsed = parse_partial_json(arguments or "{}")
         return parsed if isinstance(parsed, dict) else {}
     except (TypeError, ValueError):
         return {}
