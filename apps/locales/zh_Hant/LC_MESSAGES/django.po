@@ -8047,6 +8047,11 @@ msgstr ""
 "該 bot_id 已綁定到另一個應用 ({app})，"
 "每個 bot_id 只能對應一個應用。"
 
+#: apps/xpack/serializers/platform_serializer.py:168
+#, python-brace-format
+msgid "This Bot ID is already in use by the agent named \"{name}\"."
+msgstr "該 Bot ID 已被智能體「{name}」使用。"
+
 #: apps/xpack/serializers/channel/aibot/bot_manager.py:126
 msgid "Hello! I am an AI assistant. How can I help you?"
 msgstr "您好！我是智能助手，有什麼可以幫您的嗎？"
