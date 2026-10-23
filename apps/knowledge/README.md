@@ -120,15 +120,16 @@ tests, workflow retrieval and REST/MCP retrieval rechecks deletion state before 
 系统资源管理和共享资源管理沿用上述路径后缀、请求及处理流程，
 各自的知识库路径前缀和权限由对应功能模块说明。
 
-图片预览与文档分段预览使用相同的文档结构：`name`、`source_file_id`、`doc_strategy`
+生成图片预览的响应仅包含 `name`、`source_file_id`、`resource_type: "image"`、`doc_strategy`
 和 `content: [{"title": "<文件名（不含扩展名）>", "content": "<预览正文>"}]`。
 每张图片对应一个分段，正文由图片标题、OCR 文字和描述组成，无识别文字时使用文件名（不含扩展名）。
-图片预览额外保留 `preview_id`、`url`、`caption`、`ocr_text`、`description`、
-`process_status`、`process_error` 等字段；创建预览返回文档数组，查询和修改预览返回单个文档。
+创建预览返回文档数组，导入时使用 `source_file_id` 填充 `file_id_list`。
+查询和修改单个预览时，路径中的 `preview_id` 使用 `source_file_id`，响应继续包含
+`caption`、`ocr_text`、`description`、`process_status`、`process_error` 等识别详情。
 
 文档列表、分页接口通过 `resource_type=image` 查询图片，省略该参数时仍查询普通文档。
-启用视觉增强后，生成预览会调用所选模型或工具，完成识别后直接返回 `success` 或 `failure`，
-正文分段包含识别结果，客户端无需轮询；关闭视觉增强返回 `skipped`。
+启用视觉增强后，生成预览会调用所选模型或工具，完成识别后返回正文分段，客户端无需轮询；
+关闭视觉增强或识别失败时，正文回退到文件名（不含扩展名）。识别状态保存在预览元数据中。
 不经过预览直接导入时，图片识别仍由 Celery 向量化任务处理，状态及导入时序见上文。
 
 召回测试 `/hit_test` 的每条分段结果包含 `document_resource_type`，取自所属文档的 `resource_type`：

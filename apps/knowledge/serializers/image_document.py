@@ -3,14 +3,24 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from knowledge.models import DocumentResourceType
 from knowledge.serializers.document import DocumentInstanceFileIdsSerializer, DocumentSerializers
 from knowledge.serializers.document_strategy import DocumentStrategySerializer
+from knowledge.serializers.paragraph import ParagraphInstanceSerializer
 from knowledge.services.image_documents import ImageDocumentService
 
 
 class ImagePreviewUploadRequest(DocumentInstanceFileIdsSerializer):
     file_id_list = serializers.ListField(child=serializers.UUIDField(), allow_empty=False, max_length=50)
     doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
+
+
+class ImagePreviewResultSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    source_file_id = serializers.UUIDField()
+    resource_type = serializers.ChoiceField(choices=[DocumentResourceType.IMAGE])
+    content = ParagraphInstanceSerializer(many=True)
+    doc_strategy = DocumentStrategySerializer()
 
 
 class ImagePreviewUpdateRequest(serializers.Serializer):
@@ -49,10 +59,11 @@ class ImageDocumentSerializers:
         def upload(self, instance):
             request_serializer = ImagePreviewUploadRequest(data=instance)
             request_serializer.is_valid(raise_exception=True)
-            return self._service().generate_previews_by_file_ids(
+            previews = self._service().generate_previews_by_file_ids(
                 request_serializer.validated_data["file_id_list"],
                 request_serializer.validated_data.get("doc_strategy"),
             )
+            return ImagePreviewResultSerializer(previews, many=True).data
 
         def one(self, preview_id):
             return self._service().get_preview(preview_id)

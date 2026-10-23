@@ -1,5 +1,5 @@
 from common.mixins.api_mixin import APIMixin
-from common.result import DefaultResultSerializer
+from common.result import DefaultResultSerializer, ResultSerializer
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 from knowledge.serializers.common import BatchSerializer
@@ -21,6 +21,7 @@ from knowledge.serializers.document import (
 from knowledge.serializers.document_strategy import DocumentSyncStrategySerializer
 from knowledge.serializers.image_document import (
     ImagePreviewBatchCreateRequest,
+    ImagePreviewResultSerializer,
     ImagePreviewUploadRequest,
     ImagePreviewUpdateRequest,
 )
@@ -83,6 +84,12 @@ class DocumentImportAPI(APIMixin):
         return DefaultResultSerializer
 
 
+class ImagePreviewResponse(ResultSerializer):
+    @staticmethod
+    def get_data():
+        return ImagePreviewResultSerializer(many=True)
+
+
 class ImagePreviewAPI(APIMixin):
     @staticmethod
     def get_parameters():
@@ -94,7 +101,7 @@ class ImagePreviewAPI(APIMixin):
 
     @staticmethod
     def get_response():
-        return DefaultResultSerializer
+        return ImagePreviewResponse
 
 
 class ImagePreviewOperateAPI(APIMixin):

@@ -216,7 +216,20 @@ class ImagePreviewByFileIdsTests(SimpleTestCase):
                     self.assertEqual(preview["name"], f"{title}.png")
                     self.assertEqual(preview["source_file_id"], self.ids[0])
                     self.assertEqual(preview["resource_type"], "image")
-                    self.assertEqual(preview["preview_id"], self.ids[0])
                     self.assertEqual(preview["content"], [{"title": title, "content": content}])
-                    self.assertEqual(preview["char_length"], len(content))
                     self.assertFalse(preview["doc_strategy"]["visual"]["enabled"])
+                    if request.method == "POST":
+                        self.assertEqual(len(data), len(self.ids))
+                        self.assertEqual(
+                            set(preview), {"name", "source_file_id", "resource_type", "content", "doc_strategy"}
+                        )
+                    else:
+                        self.assertEqual(preview["preview_id"], self.ids[0])
+                        self.assertEqual(preview["char_length"], len(content))
+
+    def test_preview_schema_describes_only_the_document_preview_fields(self):
+        response = ImagePreviewAPI.get_response()()
+        self.assertEqual(
+            set(response.fields["data"].child.fields),
+            {"name", "source_file_id", "resource_type", "content", "doc_strategy"},
+        )

@@ -1,4 +1,4 @@
-import type { DOCUMENT_HIT_HANDLING, DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, IMAGE_PROCESS_STATUS } from '@/api/enums'
+import type { DOCUMENT_HIT_HANDLING, DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import type { DocumentStrategy, KnowledgeGeneratePayload, KnowledgeType } from './knowledge'
 export type DocumentHitHandling = (typeof DOCUMENT_HIT_HANDLING)[keyof typeof DOCUMENT_HIT_HANDLING]
 export type DocumentResourceType = (typeof DOCUMENT_RESOURCE_TYPE)[keyof typeof DOCUMENT_RESOURCE_TYPE]
@@ -113,13 +113,6 @@ export interface ImageDocumentImportPayload {
 
 /** 独立图片上传后的处理预览。 */
 export interface ImageDocumentPreview extends DocumentSplitResult {
-  preview_id: string
-  file_id: string
-  name: string
-  url: string
-  caption: string
-  ocr_text: string
-  description: string
-  process_status: (typeof IMAGE_PROCESS_STATUS)[keyof typeof IMAGE_PROCESS_STATUS]
-  process_error: string
+  source_file_id: string
+  resource_type: typeof DOCUMENT_RESOURCE_TYPE.IMAGE
 }

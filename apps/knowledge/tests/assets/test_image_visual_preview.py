@@ -178,7 +178,10 @@ class ImageVisualPreviewTests(SimpleTestCase):
         payload = json.loads(response.content)
         self.assertEqual(payload["code"], 200)
         self.assertTrue(all(preview["resource_type"] == "image" for preview in payload["data"]))
-        self.assertEqual(payload["data"][0]["process_status"], AssetProcessStatus.SUCCESS)
+        self.assertEqual([preview["source_file_id"] for preview in payload["data"]], self.ids)
+        for preview in payload["data"]:
+            self.assertEqual(set(preview), {"name", "source_file_id", "resource_type", "content", "doc_strategy"})
+            self.assertEqual(preview["doc_strategy"]["visual"]["model_id"], self.strategy["visual"]["model_id"])
         self.assertEqual(payload["data"][0]["content"][0]["content"], "订单\nTotal: 128.50\n订单截图")
 
     def test_import_reuses_completed_preview_results_without_recognizing_them_again(self):
