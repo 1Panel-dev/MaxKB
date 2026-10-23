@@ -15,7 +15,6 @@ import traceback
 
 import uuid_utils.compat as uuid
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db import connection
 from django.db.models import QuerySet
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -55,8 +54,6 @@ class ToolLibNodeSerializer(serializers.Serializer):
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
         f_lib = QuerySet(Tool).filter(id=self.data.get("tool_lib_id")).first()
-        # 归还链接到连接池
-        connection.close()
         if f_lib is None:
             raise AppApiException(500, _("Tool has been deleted"))
         if not f_lib.is_active:
