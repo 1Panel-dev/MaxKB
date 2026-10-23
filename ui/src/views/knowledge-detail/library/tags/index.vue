@@ -192,7 +192,7 @@ onMounted(() => {
     @cell-mouse-leave="handleCellLeave"
   >
     <el-table-column type="selection" width="40" v-if="!isWorkspaceSharedResource()" />
-    <el-table-column prop="key" label="标签" min-width="240">
+    <el-table-column prop="key" label="标签">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center gap-1">
           <span class="min-w-0 truncate" :title="row.key">{{ row.key }}</span>
@@ -219,7 +219,7 @@ onMounted(() => {
         </div>
       </template>
     </el-table-column>
-    <el-table-column prop="value" label="标签值" min-width="180" class-name="border-l!" show-overflow-tooltip />
+    <el-table-column prop="value" label="标签值" class-name="border-l!" show-overflow-tooltip />
     <el-table-column prop="doc_count" label="已关联文档" min-width="140">
       <template #default="{ row }: { row: TagTableRow }">
         <!-- 查看标签关联文档 -->

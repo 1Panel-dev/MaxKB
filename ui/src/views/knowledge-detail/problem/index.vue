@@ -240,13 +240,13 @@ onMounted(() => loadProblems())
     <el-table-column prop="hit_num" label="召回次数" min-width="100" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ numberFormat(row.hit_num) }}</template>
     </el-table-column>
-    <el-table-column prop="last_hit_time" label="最近一次召回时间" min-width="180" sortable>
+    <el-table-column prop="last_hit_time" label="最近一次召回时间" width="200" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.last_hit_time) || '-' }}</template>
     </el-table-column>
-    <el-table-column prop="create_time" label="创建时间" min-width="180" sortable>
+    <el-table-column prop="create_time" label="创建时间" width="180" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
-    <el-table-column prop="update_time" label="更新时间" min-width="180" sortable>
+    <el-table-column prop="update_time" label="更新时间" width="180" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
     <el-table-column v-if="!isWorkspaceSharedResource()" label="操作" width="100" fixed="right">

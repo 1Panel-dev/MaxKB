@@ -199,25 +199,13 @@ onMounted(() => loadTriggers())
         </el-table-column>
         <el-table-column prop="trigger_type" label="类型" width="120">
           <template #header>
-            <MkTableFilter
-              mode="single"
-              v-model="selectedTriggerType"
-              label="类型"
-              :options="triggerTypeOptions"
-              @change="handleFilterChange"
-            />
+            <MkTableFilter mode="single" v-model="selectedTriggerType" label="类型" :options="triggerTypeOptions" @change="handleFilterChange" />
           </template>
           <template #default="{ row }">{{ triggerTypeLabels[row.trigger_type as TriggerType] || row.trigger_type }}</template>
         </el-table-column>
         <el-table-column prop="is_active" label="启用状态" width="120">
           <template #header>
-            <MkTableFilter
-              mode="single"
-              v-model="selectedStatus"
-              label="状态"
-              :options="triggerStatusOptions"
-              @change="handleFilterChange"
-            />
+            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="triggerStatusOptions" @change="handleFilterChange" />
           </template>
           <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
         </el-table-column>

@@ -4,7 +4,7 @@ import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 
 import { APPLICATION_ACCESS_PLATFORM } from '@/api/enums'
-import type { ApplicationAccessConfig, Dict } from '@/api/types'
+import type { ApplicationAccessConfig } from '@/api/types'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
@@ -18,15 +18,13 @@ const emit = defineEmits<{ refresh: []; closed: [] }>()
 const visible = ref(true)
 const loading = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
-const form = reactive<Dict<string>>({})
-const isCertification = ref(false)
-let savedConfig: ApplicationAccessConfig = {}
+const form = reactive<ApplicationAccessConfig>({})
 
 const isWechat = computed(() => props.platform.key === APPLICATION_ACCESS_PLATFORM.WECHAT)
 const modeField = computed(() => props.platform.modeField)
 // 表单字段随连接方式切换：长连接(ws)需要 bot_id/secret，URL 回调(callback)需要 token/encoding_aes_key。
 const activeFields = computed(() => {
-  const mode = form[modeField.value?.key ?? ''] ?? modeField.value?.default
+  const mode = String(form[modeField.value?.key ?? ''] ?? modeField.value?.default ?? '')
   return (modeField.value && mode ? modeField.value.fields?.[mode] : undefined) ?? props.platform.fields
 })
 // 智能机器人默认长连接(ws)，无需回调地址；切到 URL 回调时才展示回调地址。
@@ -47,12 +45,12 @@ function loadPlatformConfig() {
   return resourceApi.access
     .getPlatformConfig(props.applicationId, props.platform.key)
     .then((config) => {
-      savedConfig = config ?? {}
-      if (modeField.value) form[modeField.value.key] = String(savedConfig[modeField.value.key] ?? modeField.value.default)
+      Object.assign(form, config ?? {})
+      if (modeField.value) form[modeField.value.key] = String(form[modeField.value.key] ?? modeField.value.default)
       activeFields.value.forEach((field) => {
-        form[field.key] = String(savedConfig[field.key] ?? '')
+        form[field.key] = String(form[field.key] ?? '')
       })
-      isCertification.value = savedConfig.is_certification ?? false
+      if (isWechat.value) form.is_certification ??= false
     })
     .finally(() => {
       loading.value = false
@@ -65,8 +63,7 @@ function handleSave() {
   formRef.value?.validate((valid) => {
     if (!valid || loading.value) return
     loading.value = true
-    const payload: ApplicationAccessConfig = { ...savedConfig, ...form, callback_url: callbackUrl.value }
-    if (isWechat.value) payload.is_certification = isCertification.value
+    const payload: ApplicationAccessConfig = { ...form, callback_url: callbackUrl.value }
     resourceApi.access
       .postPlatformConfig(props.applicationId, props.platform.key, payload)
       .then(() => {
@@ -103,7 +100,7 @@ onMounted(loadPlatformConfig)
         <template v-for="field in activeFields" :key="field.key">
           <el-form-item :label="field.label" :prop="field.key">
             <el-input
-              v-model="form[field.key]"
+              v-model="form[field.key] as string"
               :type="field.secret ? 'password' : 'text'"
               :show-password="field.secret"
               :autocomplete="field.secret ? 'new-password' : 'off'"
@@ -113,7 +110,7 @@ onMounted(loadPlatformConfig)
         </template>
         <el-form-item v-if="isWechat" label="认证成功">
           <!-- 设置公众号认证状态 -->
-          <el-switch v-model="isCertification" />
+          <el-switch v-model="form.is_certification" />
         </el-form-item>
 
         <el-form-item v-if="showCallback" label="回调地址">

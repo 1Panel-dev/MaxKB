@@ -129,7 +129,7 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="150">
+        <el-table-column prop="type" label="类型" width="100">
           <template #header>
             <MkTableFilter mode="single" v-model="selectedType" label="类型" :options="typeOptions" @change="handleFilterChange" />
           </template>
@@ -138,7 +138,7 @@ onMounted(() => {
             <el-tag v-else type="primary" class="default" size="small">简易</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="150">
+        <el-table-column label="状态" width="100">
           <template #header>
             <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="applicationStatusOptions" @change="handleFilterChange" />
           </template>

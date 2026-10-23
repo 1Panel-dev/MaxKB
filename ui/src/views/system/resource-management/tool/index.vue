@@ -203,10 +203,23 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 启用或禁用工具 -->
-              <ToolStatusSwitch v-model:loading="operationLoading" :api="SystemToolApi" :tool="row" :disabled="!perm.tool.system.switch() || operationLoading" @update="handleToolUpdate" />
+              <ToolStatusSwitch
+                v-model:loading="operationLoading"
+                :api="SystemToolApi"
+                :tool="row"
+                :disabled="!perm.tool.system.switch() || operationLoading"
+                @update="handleToolUpdate"
+              />
               <el-divider direction="vertical" class="ml-3! mr-2!" />
               <!-- 编辑工具配置 -->
-              <EditToolAction v-if="perm.tool.system.edit()" display="button" label="编辑" :api="SystemToolApi" :tool="row" @update="handleToolUpdate" />
+              <EditToolAction
+                v-if="perm.tool.system.edit()"
+                display="button"
+                label="编辑"
+                :api="SystemToolApi"
+                :tool="row"
+                @update="handleToolUpdate"
+              />
               <!-- 更多工具操作 -->
               <MkTableMoreDropdown>
                 <!-- 打开工具工作流 -->
@@ -253,7 +266,13 @@ onMounted(() => {
                   :tool="row"
                 />
                 <!-- 导出工具 -->
-                <ExportToolAction v-if="!row.template_id && perm.tool.system.export()" v-model:loading="operationLoading" label="导出" :api="SystemToolApi" :tool="row" />
+                <ExportToolAction
+                  v-if="!row.template_id && perm.tool.system.export()"
+                  v-model:loading="operationLoading"
+                  label="导出"
+                  :api="SystemToolApi"
+                  :tool="row"
+                />
                 <!-- 删除工具 -->
                 <MkDropdownItem divided @click="handleDeleteTool(row)" v-if="perm.tool.system.delete()">
                   <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
