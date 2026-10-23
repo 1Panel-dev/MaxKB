@@ -139,7 +139,7 @@ onMounted(loadAccessRestriction)
           <template #label>
             <span class="flex-align-center gap-1">
               身份认证
-              <MkTooltip content="开启身份认证后，智能体和关联的知识库均需要对话用户授权配置，否则用户无权限登录和知识库检索">
+              <MkTooltip placement="right" content="开启身份认证后，智能体和关联的知识库均需要对话用户授权配置，否则用户无权限登录和知识库检索">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>

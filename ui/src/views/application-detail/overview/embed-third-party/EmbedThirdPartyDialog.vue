@@ -61,25 +61,21 @@ defineExpose({ open })
         <template v-for="mode in embedModes" :key="mode.value">
           <!-- 切换嵌入模式 -->
           <el-card
-            shadow="never"
-            class="cursor-pointer text-center"
+            shadow="hover"
             :class="{ 'border-primary! bg-primary/10!': selectedMode === mode.value }"
-            role="button"
-            tabindex="0"
-            :aria-pressed="selectedMode === mode.value"
             @click="selectedMode = mode.value"
             @keydown.enter.prevent="selectedMode = mode.value"
             @keydown.space.prevent="selectedMode = mode.value"
           >
             <div class="space-y-2">
-              <div>{{ mode.label }}</div>
-              <img :src="mode.image" alt="" class="mx-auto h-28 object-contain" />
+              <div class="text-center">{{ mode.label }}</div>
+              <img :src="mode.image" alt="" class="mx-auto h-30 object-contain" />
             </div>
           </el-card>
         </template>
       </div>
-      <div class="mk-gray-card-lg space-y-2">
-        <div class="flex-between">
+      <div class="mk-gray-card-lg">
+        <div class="flex-between mb-2">
           <h6>复制以下代码进行嵌入</h6>
           <!-- 复制当前模式的嵌入代码 -->
           <MkTooltip content="复制">
