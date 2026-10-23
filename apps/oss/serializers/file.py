@@ -186,6 +186,8 @@ def parse_file_token(mk_file_auth):
         pass
     if mk_file_auth.startswith("user-"):
         system_api_key_model = DatabaseModelManage.get_model("system_api_key")
+        if not system_api_key_model:
+            _deny()
         system_api_key = QuerySet(system_api_key_model).filter(secret_key=mk_file_auth).first()
         if system_api_key:
             return SystemToken(str(system_api_key.user_id), AuthenticationType.SYSTEM_USER)
