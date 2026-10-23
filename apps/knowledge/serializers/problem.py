@@ -4,11 +4,12 @@ from typing import Dict, List
 
 import uuid_utils.compat as uuid
 from django.db import transaction
+from django.db import models
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.db.search import native_search, native_page_search
+from common.db.search import native_search, native_page_search, get_dynamics_model
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from knowledge.models import Problem, ProblemParagraphMapping, Paragraph, Knowledge, LocalState, SourceType
@@ -264,6 +265,7 @@ class ProblemSerializers(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         knowledge_id = serializers.UUIDField(required=True, label=_("knowledge id"))
         content = serializers.CharField(required=False, label=_("content"))
+        order_by = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("order by"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -276,12 +278,30 @@ class ProblemSerializers(serializers.Serializer):
 
         def get_query_set(self):
             self.is_valid()
-            query_set = QuerySet(model=Problem)
+            query_set = QuerySet(
+                model=get_dynamics_model(
+                    {
+                        "knowledge_id": models.CharField(),
+                        "content": models.CharField(),
+                    }
+                )
+            )
             query_set = query_set.filter(**{"knowledge_id": self.data.get("knowledge_id")})
             if "content" in self.data:
                 query_set = query_set.filter(**{"content__icontains": self.data.get("content")})
-            query_set = query_set.order_by("-create_time")
-            return query_set
+            order_by_query_set = QuerySet(
+                model=get_dynamics_model(
+                    {
+                        "paragraph_count": models.IntegerField(),
+                        "hit_num": models.IntegerField(),
+                        "last_hit_time": models.DateTimeField(),
+                        "create_time": models.DateTimeField(),
+                        "update_time": models.DateTimeField(),
+                    }
+                )
+            )
+            order_by_query_set = order_by_query_set.order_by(self.data.get("order_by") or "-create_time")
+            return {"problem_query_set": query_set, "order_by_query": order_by_query_set}
 
         def list(self):
             query_set = self.get_query_set()

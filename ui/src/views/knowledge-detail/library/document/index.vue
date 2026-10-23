@@ -465,7 +465,7 @@ onBeforeUnmount(() => {
     <el-table-column prop="last_hit_time" label="最后一次召回时间" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.last_hit_time) }}</template>
     </el-table-column>
-    <el-table-column prop="nick_name" width="120" label="创建者" show-overflow-tooltip sortable />
+    <el-table-column prop="nick_name" width="120" label="创建者" show-overflow-tooltip />
     <el-table-column prop="update_time" label="更新时间" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>

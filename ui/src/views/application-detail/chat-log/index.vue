@@ -228,7 +228,7 @@ onMounted(() => loadChatLogs())
       </template>
     </el-table-column>
     <el-table-column prop="mark_sum" label="改进标注" width="100" />
-    <el-table-column prop="asker.username" label="用户" min-width="130" show-overflow-tooltip sortable>
+    <el-table-column prop="asker.username" label="用户" min-width="130" show-overflow-tooltip>
       <template #default="{ row }">{{ row.asker?.username || '-' }}</template>
     </el-table-column>
     <el-table-column label="IP 地址" width="140" show-overflow-tooltip>

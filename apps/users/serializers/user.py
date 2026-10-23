@@ -365,6 +365,7 @@ class UserManageSerializer(serializers.Serializer):
             label=_("Source"),
             allow_blank=True,
         )
+        order_by = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("order by"))
 
         def get_query_set(self):
             username = self.data.get("username")
@@ -383,7 +384,7 @@ class UserManageSerializer(serializers.Serializer):
                 query_set = query_set.filter(is_active=is_active)
             if source is not None:
                 query_set = query_set.filter(source=source)
-            query_set = query_set.order_by("-create_time")
+            query_set = query_set.order_by(self.data.get("order_by") or "-create_time")
             return query_set
 
         def list(self, with_valid=True):

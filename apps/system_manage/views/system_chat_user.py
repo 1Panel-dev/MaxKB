@@ -250,6 +250,7 @@ class SystemChatUserView(APIView):
                     "email": request.query_params.get("email", None),
                     "source": request.query_params.get("source", None),
                     "is_active": request.query_params.get("is_active", None),
+                    "order_by": request.query_params.get("order_by", None),
                     "user_id": str(request.user.id),
                 }
             )
