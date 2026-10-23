@@ -54,7 +54,7 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" :title="roleForm.role_id ? '重命名角色' : '创建角色'" @closed="resetData">
-    <el-form ref="formRef" :model="roleForm" :rules="rules" label-position="top">
+    <el-form ref="formRef" :model="roleForm" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="角色名称" prop="role_name">
         <el-input v-model="roleForm.role_name" maxlength="64" show-word-limit placeholder="请输入角色名称" />
       </el-form-item>

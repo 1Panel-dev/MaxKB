@@ -165,6 +165,7 @@ onMounted(() => {
     :rules="rules"
     label-position="top"
     require-asterisk-position="right"
+    @submit.prevent
   >
     <el-form-item label="登录方式" prop="login_methods">
       <el-checkbox-group v-model="form.login_methods" @change="handleLoginMethodsChange" class="flex-wrap">

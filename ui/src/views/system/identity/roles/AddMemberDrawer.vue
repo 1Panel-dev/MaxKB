@@ -96,7 +96,7 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="visible" title="添加成员" @closed="resetData">
-    <el-form ref="formRef" :model="memberForm" label-position="top">
+    <el-form ref="formRef" :model="memberForm" label-position="top" require-asterisk-position="right" @submit.prevent>
       <MkFormList v-model="memberForm.members" add-text="添加成员" :default-item="{ user_ids: [], workspace_ids: [] }">
         <template #default="{ index, item: memberSetting }">
           <el-form-item

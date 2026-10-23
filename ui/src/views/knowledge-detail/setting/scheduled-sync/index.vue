@@ -165,7 +165,15 @@ watch(
       <el-tab-pane label="同步日志" name="logs" />
     </el-tabs>
     <div v-show="activeTab === 'settings'" v-loading="loading || saving" class="min-h-40">
-      <el-form ref="formRef" :model="syncSetting" :rules="rules" class="max-w-200 pb-6" label-position="top" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="syncSetting"
+        :rules="rules"
+        class="max-w-200 pb-6"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <el-form-item>
           <template #label>
             <span>

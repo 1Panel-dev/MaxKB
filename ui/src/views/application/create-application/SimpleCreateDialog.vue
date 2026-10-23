@@ -104,7 +104,7 @@ defineExpose({ open })
       :rules="applicationFormRules"
       label-position="top"
       require-asterisk-position="right"
-      @submit.prevent="submit"
+      @submit.prevent
     >
       <el-form-item label="名称" prop="name">
         <el-input

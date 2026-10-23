@@ -59,16 +59,25 @@ onMounted(() => loadSetting)
 </script>
 
 <template>
-  <el-form ref="authFormRef" v-loading="loading" class="max-w-200" :model="form" :rules="rules" label-position="top">
+  <el-form
+    ref="authFormRef"
+    v-loading="loading"
+    class="max-w-200"
+    :model="form"
+    :rules="rules"
+    label-position="top"
+    require-asterisk-position="right"
+    @submit.prevent
+  >
     <el-form-item label="ldpUri" prop="config.ldpUri"><el-input v-model="form.config.ldpUri" placeholder="请输入 ldpUri" /></el-form-item>
-    <el-form-item label="验证地址" prop="config.validateUrl"
-      ><el-input v-model="form.config.validateUrl" placeholder="请输入验证地址"
-    /></el-form-item>
-    <el-form-item label="回调地址" prop="config.redirectUrl"
-      ><el-input v-model="form.config.redirectUrl" placeholder="请输入回调地址"
-    /></el-form-item>
-    <el-form-item
-      ><div class="flex-column">
+    <el-form-item label="验证地址" prop="config.validateUrl">
+      <el-input v-model="form.config.validateUrl" placeholder="请输入验证地址" />
+    </el-form-item>
+    <el-form-item label="回调地址" prop="config.redirectUrl">
+      <el-input v-model="form.config.redirectUrl" placeholder="请输入回调地址" />
+    </el-form-item>
+    <el-form-item>
+      <div class="flex-column">
         <span>启用 CAS 认证</span>
         <el-switch v-model="form.is_active" class="self-start" />
       </div>

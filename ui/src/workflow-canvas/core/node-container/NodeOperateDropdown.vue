@@ -151,8 +151,8 @@ function deleteNode() {
     </template>
   </MkDropdown>
 
-  <MkDialog v-model="nodeNameDialogVisible" title="节点名称" append-to-body @submit.prevent>
-    <el-form ref="titleFormRef" :model="nodeNameForm" label-position="top">
+  <MkDialog v-model="nodeNameDialogVisible" title="节点名称" append-to-body>
+    <el-form ref="titleFormRef" :model="nodeNameForm" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item prop="title" :rules="[{ whitespace: true, required: true, message: '请输入', trigger: 'blur' }]">
         <el-input v-model="nodeNameForm.title" @blur="nodeNameForm.title = nodeNameForm.title.trim()" />
       </el-form-item>

@@ -32,7 +32,7 @@ watch(
         <span v-if="!data.is_submit" class="text-danger">(未提交)</span>
       </h6>
       <div>
-        <MkDynamicsForm v-model="formData" :render-data="data.form_field_list" :view="true" label-position="top" />
+        <MkDynamicsForm v-model="formData" :render-data="data.form_field_list" :view="true" />
       </div>
     </div>
   </DetailContainer>

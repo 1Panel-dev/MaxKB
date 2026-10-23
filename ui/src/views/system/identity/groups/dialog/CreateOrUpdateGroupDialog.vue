@@ -51,7 +51,7 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" :title="groupForm.id ? '重命名用户组' : '创建用户组'" @closed="resetData">
-    <el-form ref="formRef" :model="groupForm" :rules="formRules" label-position="top">
+    <el-form ref="formRef" :model="groupForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="用户组名称" prop="name">
         <el-input v-model="groupForm.name" maxlength="128" placeholder="请输入用户组名称" show-word-limit @keyup.enter="submit" />
       </el-form-item>

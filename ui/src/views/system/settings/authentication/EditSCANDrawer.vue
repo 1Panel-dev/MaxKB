@@ -72,7 +72,7 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="visible" :title="`${LOGIN_METHOD_LABELS[form.key]}设置`" @closed="resetData">
-    <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-position="top" require-asterisk-position="right">
+    <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item v-for="key in configKeys" :key="key" :label="SCAN_FIELD_LABELS[key] ?? key" :prop="`config.${key}`">
         <el-input
           v-model="form.config[key]"

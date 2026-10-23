@@ -157,7 +157,7 @@ defineExpose({ open })
       :rules="importUsersFormRules"
       label-position="top"
       require-asterisk-position="right"
-      @submit.prevent="submitImportUsers"
+      @submit.prevent
     >
       <el-form-item label="用户来源" prop="syncType">
         <el-select v-model="importUsersForm.syncType" class="w-full" :loading="syncTypesLoading" placeholder="请选择用户来源">

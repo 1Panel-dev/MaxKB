@@ -137,14 +137,7 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="drawerVisible" :title="drawerTitle" @closed="resetData">
-    <el-form
-      ref="userFormRef"
-      :model="userForm"
-      :rules="userFormRules"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent="submitUser"
-    >
+    <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <section>
         <h4 class="mk-title-decoration mb-4">基本信息</h4>
         <el-form-item label="用户名" prop="username">

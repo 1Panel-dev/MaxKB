@@ -57,7 +57,15 @@ onMounted(() => loadEmailSetting())
 
 <template>
   <MkViewLayout class="system-settings-email" :loading="loading">
-    <el-form class="max-w-200" ref="emailFormRef" :model="emailSetting" :rules="rules" label-position="top" require-asterisk-position="right">
+    <el-form
+      class="max-w-200"
+      ref="emailFormRef"
+      :model="emailSetting"
+      :rules="rules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <el-form-item label="SMTP Host" prop="email_host">
         <el-input v-model="emailSetting.email_host" placeholder="请输入 SMTP Host" />
       </el-form-item>

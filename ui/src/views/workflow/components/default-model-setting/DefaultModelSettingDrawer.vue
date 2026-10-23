@@ -230,7 +230,7 @@ defineExpose({ open })
       </div>
     </template>
 
-    <el-form v-loading="loading" label-position="top" @submit.prevent>
+    <el-form v-loading="loading" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item v-for="modelType in defaultModelTypes" :key="modelType" :label="MODEL_TYPE_LABELS[modelType]">
         <SelectModel
           teleported

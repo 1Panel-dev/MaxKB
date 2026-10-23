@@ -86,7 +86,7 @@ onBeforeUnmount(() => anchorGuard.reset())
   <NodeContainer :node-model="model">
     <h6 class="mk-title-decoration mb-2">节点设置</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" @submit.prevent :model="formData" label-position="top" require-asterisk-position="right" label-width="auto">
+      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
         <!-- 选择文档 -->
         <el-form-item label="选择文档" prop="document_list" :rules="{ type: 'array', required: true, message: '请选择文档', trigger: 'change' }">
           <NodeCascader :node-model="model" class="w-full!" placeholder="请选择文档" v-model="formData.document_list" />
@@ -110,8 +110,10 @@ onBeforeUnmount(() => anchorGuard.reset())
                 <span>子分块长度</span>
                 <MkTooltip effect="dark" placement="right">
                   <template #content>
-                    核心目标是平衡检索精度与召回效率<br />
-                    避免过短拆分：单块＜50 字易导致语义碎片化，检索时可能因缺少上下文无法匹配查询意图<br />
+                    核心目标是平衡检索精度与召回效率
+                    <br />
+                    避免过短拆分：单块＜50 字易导致语义碎片化，检索时可能因缺少上下文无法匹配查询意图
+                    <br />
                     避免过长拆分：单块＞500 字会增加冗余信息，降低检索精准度，且占用更多存储和计算资源
                   </template>
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
@@ -154,7 +156,7 @@ onBeforeUnmount(() => anchorGuard.reset())
           <template #label>
             <div class="flex-between w-full gap-2">
               <div class="flex-align-center gap-1">
-                <span> 分段标识 </span>
+                <span>分段标识</span>
                 <MkTooltip effect="dark" content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
@@ -184,7 +186,7 @@ onBeforeUnmount(() => anchorGuard.reset())
             placeholder="请选择分段标识"
             @visible-change="anchorGuard.setOverlayVisible('patterns', $event)"
           >
-            <el-option v-for="pattern in splitPatternOptions" :key="pattern.value" :label="pattern.label" :value="pattern.value"> </el-option>
+            <el-option v-for="pattern in splitPatternOptions" :key="pattern.value" :label="pattern.label" :value="pattern.value"></el-option>
           </el-select>
           <NodeCascader v-else :node-model="model" class="w-full!" placeholder="请选择引用变量" v-model="formData.patterns_reference" />
         </el-form-item>
@@ -197,7 +199,7 @@ onBeforeUnmount(() => anchorGuard.reset())
         >
           <template #label>
             <div class="flex-between w-full gap-2">
-              <span> 分段长度 </span>
+              <span>分段长度</span>
               <el-select
                 v-model="formData.limit_type"
                 size="small"
@@ -235,7 +237,7 @@ onBeforeUnmount(() => anchorGuard.reset())
           <template #label>
             <div class="flex-between w-full gap-2">
               <div class="flex-align-center gap-1">
-                <span> 自动清洗 </span>
+                <span>自动清洗</span>
                 <MkTooltip effect="dark" content="去掉重复多余符号空格、空行、制表符" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
@@ -274,7 +276,7 @@ onBeforeUnmount(() => anchorGuard.reset())
         >
           <template #label>
             <div class="flex-between w-full gap-2">
-              <span class="mk-required"> 分段标题设置为分段的关联问题</span>
+              <span class="mk-required">分段标题设置为分段的关联问题</span>
               <el-select
                 v-model="formData.paragraph_title_relate_problem_type"
                 size="small"
