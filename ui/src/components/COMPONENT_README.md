@@ -865,7 +865,7 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 `prop`（字段名）和 `label`（列名），列宽由表格自动分配。组件不转换接口数据结构，
 旧对象映射由调用页面转换为行数组。用户组直接传入 `user_group_workspace` 数组，
 使用 `workspace`、`user_group_names` 两列；角色映射由用户列表页面转换。
-数组单元格以“、”连接，空数组、空字符串、null 和 undefined 显示 `-`，长文本使用溢出提示。
+数组单元格以“、”连接，空数组、空字符串、null、undefined 及字符串 `"None"`（含单元素数组）显示 `-`，长文本使用溢出提示。
 `data` 为空时禁用关联浮层，保留标签展示；内部 `MkTagGroup` 的标签浮层保持禁用。
 
 ### ResourceAuthorizationDrawer

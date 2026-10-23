@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, type CSSProperties } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, type CSSProperties } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
+import type { ToolType } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import ToolFormDrawer from '../tool-form/tool-custom/ToolFormDrawer.vue'
@@ -51,6 +52,7 @@ function handleVisibleChange(visible: boolean) {
 }
 
 /* 工具创建表单 */
+const activeFormType = ref<ToolType | null>(null)
 const toolFormDrawerRef = useTemplateRef<InstanceType<typeof ToolFormDrawer>>('toolFormDrawerRef')
 const workflowFormDialogRef = useTemplateRef<InstanceType<typeof WorkflowFormDialog>>('workflowFormDialogRef')
 const skillToolFormDrawerRef = useTemplateRef<InstanceType<typeof SkillToolFormDrawer>>('skillToolFormDrawerRef')
@@ -58,23 +60,32 @@ const mcpFormDrawerRef = useTemplateRef<InstanceType<typeof McpFormDrawer>>('mcp
 const dataSourceFormDrawerRef = useTemplateRef<InstanceType<typeof DataSourceFormDrawer>>('dataSourceFormDrawerRef')
 
 function handleOpenToolForm() {
-  toolFormDrawerRef.value?.open()
+  activeFormType.value = TOOL_TYPE.CUSTOM
+  return nextTick(() => toolFormDrawerRef.value?.open())
 }
 
 function handleOpenWorkflowForm() {
-  workflowFormDialogRef.value?.open()
+  activeFormType.value = TOOL_TYPE.WORKFLOW
+  return nextTick(() => workflowFormDialogRef.value?.open())
 }
 
 function handleOpenSkillForm() {
-  skillToolFormDrawerRef.value?.open()
+  activeFormType.value = TOOL_TYPE.SKILL
+  return nextTick(() => skillToolFormDrawerRef.value?.open())
 }
 
 function handleOpenMcpForm() {
-  mcpFormDrawerRef.value?.open()
+  activeFormType.value = TOOL_TYPE.MCP
+  return nextTick(() => mcpFormDrawerRef.value?.open())
 }
 
 function handleOpenDataSourceForm() {
-  dataSourceFormDrawerRef.value?.open()
+  activeFormType.value = TOOL_TYPE.DATA_SOURCE
+  return nextTick(() => dataSourceFormDrawerRef.value?.open())
+}
+
+function handleFormClosed() {
+  activeFormType.value = null
 }
 
 /* 导入创建 */
@@ -168,9 +179,49 @@ function handleRefresh() {
       </MkDropdownMenu>
     </template>
   </MkDropdown>
-  <ToolFormDrawer ref="toolFormDrawerRef" title="创建工具" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
-  <WorkflowFormDialog ref="workflowFormDialogRef" title="创建工作流" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
-  <SkillToolFormDrawer ref="skillToolFormDrawerRef" title="创建 Skill" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
-  <McpFormDrawer ref="mcpFormDrawerRef" title="创建 MCP" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
-  <DataSourceFormDrawer ref="dataSourceFormDrawerRef" title="创建数据源" :api="api" :folder-id="folderId" @refresh="handleRefresh" />
+  <ToolFormDrawer
+    v-if="activeFormType === TOOL_TYPE.CUSTOM"
+    ref="toolFormDrawerRef"
+    title="创建工具"
+    :api="api"
+    :folder-id="folderId"
+    @refresh="handleRefresh"
+    @closed="handleFormClosed"
+  />
+  <WorkflowFormDialog
+    v-if="activeFormType === TOOL_TYPE.WORKFLOW"
+    ref="workflowFormDialogRef"
+    title="创建工作流"
+    :api="api"
+    :folder-id="folderId"
+    @refresh="handleRefresh"
+    @closed="handleFormClosed"
+  />
+  <SkillToolFormDrawer
+    v-if="activeFormType === TOOL_TYPE.SKILL"
+    ref="skillToolFormDrawerRef"
+    title="创建 Skill"
+    :api="api"
+    :folder-id="folderId"
+    @refresh="handleRefresh"
+    @closed="handleFormClosed"
+  />
+  <McpFormDrawer
+    v-if="activeFormType === TOOL_TYPE.MCP"
+    ref="mcpFormDrawerRef"
+    title="创建 MCP"
+    :api="api"
+    :folder-id="folderId"
+    @refresh="handleRefresh"
+    @closed="handleFormClosed"
+  />
+  <DataSourceFormDrawer
+    v-if="activeFormType === TOOL_TYPE.DATA_SOURCE"
+    ref="dataSourceFormDrawerRef"
+    title="创建数据源"
+    :api="api"
+    :folder-id="folderId"
+    @refresh="handleRefresh"
+    @closed="handleFormClosed"
+  />
 </template>

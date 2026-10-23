@@ -16,7 +16,10 @@ const handleDrop = (e: DragEvent) => input.addFiles(e.dataTransfer?.files)
   <main class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 头部可被替换(如 debug 用 debug header);默认普通 chat header -->
     <slot name="header"><ChatHeader /></slot>
-    <MessageList :app-name="list.appInfo.value?.name || 'AI 助手'" />
+    <div class="min-h-0 flex-1 overflow-y-auto">
+      <MessageList :app-name="list.appInfo.value?.name || 'AI 助手'" />
+    </div>
+
     <footer class="flex-center shrink-0 p-4"><MessageInput /></footer>
   </main>
 </template>

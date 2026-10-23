@@ -6,7 +6,7 @@ import { MODEL_TYPE_LABELS } from '@/constants'
 
 defineOptions({ name: 'SelectProviderDrawer' })
 
-const emit = defineEmits<{ select: [provider: ModelProviderItem] }>()
+const emit = defineEmits<{ select: [provider: ModelProviderItem, modelType: string] }>()
 
 const visible = ref(false)
 const modelType = ref('all')
@@ -38,7 +38,7 @@ function loadModelProviders() {
 
 function handleProviderSelect(provider: ModelProviderItem) {
   visible.value = false
-  emit('select', provider)
+  emit('select', provider, modelType.value)
 }
 
 function handleModelTypeChange(value: string) {

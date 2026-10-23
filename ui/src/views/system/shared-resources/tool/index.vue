@@ -16,7 +16,6 @@ import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
 import {
   RelatedResourcesToolAction,
   DeleteToolAction,
-  EditToolAction,
   ExportToolAction,
   ExecutionRecordToolAction,
   InitParamAction,
@@ -24,6 +23,7 @@ import {
   CopyToolAction,
 } from '@/views/tool/tool-card/action-dropdown'
 import ButtonToolStore from '@/views/tool/components/ButtonToolStore.vue'
+import EditToolForm from '@/views/tool/tool-form/EditToolForm.vue'
 import perm from '@/permission'
 
 const router = useRouter()
@@ -68,7 +68,12 @@ function handleSearchChange(query?: Dict<unknown>) {
 
 /* 共享工具维护 */
 const toolOperationLoading = ref(false)
-const editToolActionRefs: Record<string, InstanceType<typeof EditToolAction> | null> = {}
+const editToolFormRef = useTemplateRef<InstanceType<typeof EditToolForm>>('editToolFormRef')
+
+function handleOpenEditTool(tool: ToolItem) {
+  if (!perm.tool.share.edit()) return
+  return editToolFormRef.value?.open(tool)
+}
 
 function handleOpenTool(tool: ToolItem, event: MouseEvent) {
   if (tool.tool_type === TOOL_TYPE.WORKFLOW) {
@@ -79,7 +84,7 @@ function handleOpenTool(tool: ToolItem, event: MouseEvent) {
     }
     return router.push(target)
   }
-  editToolActionRefs[tool.id]?.handleOpenToolForm()
+  handleOpenEditTool(tool)
 }
 
 function handleToolUpdate(tool: ToolItem) {
@@ -141,19 +146,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                 </template>
                 <template #action-dropdown>
                   <!-- 编辑共享工具 -->
-                  <EditToolAction
-                    v-if="perm.tool.share.edit()"
-                    :ref="
-                      (instance) => {
-                        if (instance) editToolActionRefs[tool.id] = instance as InstanceType<typeof EditToolAction>
-                        else delete editToolActionRefs[tool.id]
-                      }
-                    "
-                    label="编辑"
-                    :api="SystemSharedToolApi"
-                    :tool="tool"
-                    @update="handleToolUpdate"
-                  />
+                  <MkAction v-if="perm.tool.share.edit()" label="编辑" icon="icon_edit_outlined" @click="handleOpenEditTool(tool)" />
                   <!-- 复制 -->
                   <CopyToolAction
                     v-if="perm.tool.share.copy()"
@@ -228,4 +221,5 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
       </div>
     </template>
   </MkViewLayout>
+  <EditToolForm ref="editToolFormRef" :api="SystemSharedToolApi" @update="handleToolUpdate" />
 </template>

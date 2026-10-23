@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
+import { nextTick, ref, useTemplateRef } from 'vue'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
@@ -16,6 +16,7 @@ const loading = defineModel<boolean>('loading', { default: false })
 
 const emit = defineEmits<{ update: [tool: ToolItem] }>()
 
+const initParamMounted = ref(false)
 const initParamDrawerRef = useTemplateRef<InstanceType<typeof InitParamDrawer>>('initParamDrawerRef')
 
 function handleToolStatusChange() {
@@ -36,8 +37,11 @@ function handleToolStatusChange() {
       }
 
       if (hasMissingInitParams(toolDetail)) {
-        initParamDrawerRef.value?.open(toolDetail, true, true)
-        return false
+        initParamMounted.value = true
+        return nextTick(() => {
+          initParamDrawerRef.value?.open(toolDetail, true, true)
+          return false
+        })
       }
 
       return updateToolStatus(true)
@@ -46,6 +50,10 @@ function handleToolStatusChange() {
     .finally(() => {
       loading.value = false
     })
+}
+
+function handleInitParamClosed() {
+  initParamMounted.value = false
 }
 
 function hasMissingInitParams(tool: ToolItem) {
@@ -75,5 +83,5 @@ function updateToolStatus(active: boolean) {
 <template>
   <el-switch :disabled="loading" :model-value="tool.is_active" size="small" :before-change="handleToolStatusChange" v-bind="$attrs" />
 
-  <InitParamDrawer ref="initParamDrawerRef" :api="api" @update="emit('update', $event)" />
+  <InitParamDrawer v-if="initParamMounted" ref="initParamDrawerRef" :api="api" @closed="handleInitParamClosed" @update="emit('update', $event)" />
 </template>
