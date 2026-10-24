@@ -58,10 +58,10 @@ class PdfSplitHandle(BaseSplitHandle):
         get_buffer,
         save_image,
     ):
+        buffer = get_buffer(file)
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             # 将上传的文件保存到临时文件中
-            for chunk in file.chunks():
-                temp_file.write(chunk)
+            temp_file.write(buffer)
             # 获取临时文件的路径
             temp_file_path = temp_file.name
 

@@ -28,6 +28,7 @@ from common.handle.impl.text.text_split_handle import TextSplitHandle
 from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.utils.common import parse_md_file_link, parse_md_image
+from common.utils.logger import maxkb_logger
 
 
 class FileBufferHandle:
@@ -170,8 +171,8 @@ class ZipSplitHandle(BaseSplitHandle):
                             result = [*result, *value]
                         else:
                             result.append(value)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        maxkb_logger.warning(f"Zip member: {file}, split error: {e}")
             image_list = get_image_list(result, files)
             result = filter_image_file(result, image_list)
             image_mode_list = []
