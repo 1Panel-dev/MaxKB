@@ -1,19 +1,22 @@
+import type { StreamChunk } from './types'
+
 // SSE 流解析:逐段 data: {...} 回调 onNext，遇 [DONE]/结束/异常回调 onComplete(e?)。
-export class ConversationStream {
-  private response: any
-  private onNext: (chunk: any) => void
-  private onComplete: (e?: any) => void
+export class ConversationStream<Chunk = StreamChunk> {
+  private response: Response
+  private onNext: (chunk: unknown) => void
+  private onComplete: (e?: unknown) => void
   private cancelled = false
   private completed = false
-  private reader: ReadableStreamDefaultReader<any> | null = null
+  private reader: ReadableStreamDefaultReader<Uint8Array> | null = null
 
-  constructor(response: any, onNext: (chunk: any) => void, onComplete: (e?: any) => void) {
+  constructor(response: Response, onNext: (chunk: Chunk) => void, onComplete: (e?: unknown) => void) {
     this.response = response
     this.onComplete = onComplete
-    this.onNext = onNext
+    // JSON 在解析边界是 unknown，由调用方的分片协议约束回调类型。
+    this.onNext = (chunk) => onNext(chunk as Chunk)
   }
 
-  private complete(e?: any) {
+  private complete(e?: unknown) {
     if (this.completed || this.cancelled) return
     this.completed = true
     this.onComplete(e)
@@ -21,7 +24,7 @@ export class ConversationStream {
 
   async start() {
     try {
-      this.reader = this.response.body?.getReader()
+      this.reader = this.response.body?.getReader() ?? null
       if (!this.reader) {
         this.complete()
         return
@@ -57,9 +60,9 @@ export class ConversationStream {
             }
 
             try {
-              const chunk = JSON.parse(data)
+              const chunk: unknown = JSON.parse(data)
               this.onNext(chunk)
-            } catch (e) {
+            } catch {
               // Skip invalid JSON
             }
           }
@@ -73,9 +76,9 @@ export class ConversationStream {
           const data = trimmed.slice(5).trim()
           if (data !== '[DONE]') {
             try {
-              const chunk = JSON.parse(data)
+              const chunk: unknown = JSON.parse(data)
               this.onNext(chunk)
-            } catch (e) {
+            } catch {
               // Skip invalid JSON
             }
           }
@@ -101,52 +104,5 @@ export class ConversationStream {
       this.reader.cancel().catch(() => {})
       this.reader = null
     }
-  }
-}
-
-// 消息容器“贴底吸附”滚动:用户上滑离底后不再自动吸底，回到底部附近恢复吸附。
-export class Scroll {
-  private bottomSuction: boolean
-  private isProgrammaticScroll?: boolean
-  private element: HTMLElement
-
-  constructor(element: HTMLElement) {
-    this.bottomSuction = true
-    this.isProgrammaticScroll = false
-    this.element = element
-    this.initEventListener()
-  }
-
-  private initEventListener() {
-    this.element.addEventListener('scroll', () => {
-      if (this.isProgrammaticScroll) {
-        this.isProgrammaticScroll = undefined
-      } else {
-        if (this.element.scrollHeight - this.element.scrollTop <= this.element.clientHeight + 15) {
-          this.bottomSuction = true
-          this.isProgrammaticScroll = true
-        } else {
-          this.isProgrammaticScroll = undefined
-          this.bottomSuction = false
-        }
-      }
-    })
-  }
-
-  scrollBottom() {
-    if (this.bottomSuction) {
-      this.element.scrollTop = this.element.scrollHeight
-      this.isProgrammaticScroll = true
-    }
-  }
-
-  forceBottom() {
-    this.bottomSuction = true
-    this.isProgrammaticScroll = true
-    this.element.scrollTop = this.element.scrollHeight
-    requestAnimationFrame(() => {
-      this.element.scrollTop = this.element.scrollHeight
-      this.isProgrammaticScroll = true
-    })
   }
 }

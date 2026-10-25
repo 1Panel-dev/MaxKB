@@ -465,6 +465,13 @@ Admin 调试接口在 `admin/workspace/conversation.ts`，正式 Chat 接口在 
 使用各自请求客户端。面板 `common/get-api.ts` 仅按 ChatType 选择完整 API，不拼 URL。
 Chat 协议及认证接口见 [chat/README.md](chat/README.md)。
 
+历史消息和流式聚合复用 `@/api/types` 的 `ChatContent`，定义在 `types/chat-log.ts`；
+`ChatLogRecord.question` 与 `messages` 使用该内容项类型，扩展字段保留为 `unknown`。
+Chat、Workspace 调试和 System 调试的记录分页及详情均声明 `ChatLogRecord` 返回类型，
+消息列表依赖从 `ConversationApiAdapter` 选取对应接口约定。
+`conversation-panel/core/stream.ts` 的 `ConversationStream<Chunk>` 通过回调推断分片类型，
+兼容对话内容项、工具调试和纯文本生成；流读取器使用原生 `Response` 与字节流类型。
+
 ### 通用文件上传
 
 `admin/file.ts` 与 `chat/file.ts` 分别提供 `postUploadFile(file, sourceId, sourceType, onProgress?)`，

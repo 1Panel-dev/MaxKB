@@ -68,13 +68,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch, nextTick, onMounted } from 'vue'
+import { computed, reactive, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import Loading from '@/conversation-panel/loading/index.vue'
 import ScrollDiff from './components/ScrollDiff.vue'
 import { parsePatch } from './patch/parsePatch'
 import type { PatchFileStatus } from './patch/patchTypes'
 import { extractPartialJsonField } from './extract-partial-json'
-import { Scroll } from '@/conversation-panel/core/stream'
+import { Scroll } from '@/conversation-panel/core/scroll'
 
 const props = defineProps<{ content: any; loading: boolean; expanded: boolean }>()
 
@@ -82,6 +82,7 @@ const multiScrollRef = ref<HTMLElement>()
 let multiScroll: Scroll | null = null
 
 function initScroll() {
+  multiScroll?.destroy()
   if (multiScrollRef.value) {
     multiScroll = new Scroll(multiScrollRef.value)
     multiScroll.forceBottom()
@@ -99,10 +100,13 @@ watch(
       await nextTick()
       initScroll()
     } else {
+      multiScroll?.destroy()
       multiScroll = null
     }
   },
 )
+
+onBeforeUnmount(() => multiScroll?.destroy())
 
 const patchDiff = computed(() => {
   const raw = props.content.arguments

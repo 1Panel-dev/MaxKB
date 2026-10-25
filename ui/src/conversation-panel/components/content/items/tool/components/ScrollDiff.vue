@@ -5,10 +5,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import FileDiff from '../patch/FileDiff.vue'
 import type { PatchFileInfo } from '../patch/patchTypes'
-import { Scroll } from '@/conversation-panel/core/stream'
+import { Scroll } from '@/conversation-panel/core/scroll'
 
 const props = defineProps<{ file: PatchFileInfo }>()
 
@@ -21,6 +21,8 @@ onMounted(() => {
     scroll.forceBottom()
   }
 })
+
+onBeforeUnmount(() => scroll?.destroy())
 
 watch(
   () => props.file.additions,

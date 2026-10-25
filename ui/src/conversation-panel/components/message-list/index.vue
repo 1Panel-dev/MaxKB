@@ -1,69 +1,45 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
-import { Loading as LoadingIcon } from '@element-plus/icons-vue'
+import { ref, onBeforeUnmount } from 'vue'
 import ContentList from '../content-list/index.vue'
 import MessageFooter from '../message-footer/index.vue'
-import Loading from '../../loading/index.vue'
-import { Scroll } from '../../core/stream'
+import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import { useMessageListStore } from './index'
 
 defineProps<{ appName?: string }>()
 
 const { messages, loading, streamLoading, hasMore, loadMore, onStreamProgress } = useMessageListStore()
+const scrollRef = ref<InstanceType<typeof ReverseInfiniteScroll>>()
 
-// 整块遮罩:切换会话会先清空消息,故无消息时的接口加载即首页加载
-const fullLoading = computed(() => loading.value && messages.value.length === 0)
-
-const msgBoxRef = ref<HTMLElement | null>(null)
-let scroll: Scroll | null = null
-let offProgress: (() => void) | null = null
-
-onMounted(() => {
-  if (msgBoxRef.value) scroll = new Scroll(msgBoxRef.value)
-  // 流式分片(on_next)→ 吸底。适配所有流来源(发送 / 续传),不依赖 message-input。
-  offProgress = onStreamProgress(() => nextTick(() => scroll?.scrollBottom()))
-})
-onBeforeUnmount(() => offProgress?.())
-
-// 新增气泡(提问 / 新回答)→ 吸底
-watch(
-  () => messages.value.length,
-  () => nextTick(() => scroll?.scrollBottom()),
-)
-
-// 上滑到顶 → 加载更多
-const onScroll = () => {
-  const el = msgBoxRef.value
-  if (el && el.scrollTop <= 60 && hasMore.value) loadMore()
-}
+// 流式分片只在用户仍位于底部时跟随，新增气泡由滚动容器监听 count。
+const offProgress = onStreamProgress(() => void scrollRef.value?.followBottom())
+onBeforeUnmount(offProgress)
 </script>
-<template>
-  <!-- 接口加载:无消息时(首页)整块遮罩,有消息时(加载更多)顶部小转圈;对话加载:底部小点 -->
-  <div ref="msgBoxRef" v-loading="fullLoading" @scroll="onScroll">
-    <template v-if="messages.length > 0">
-      <div v-if="loading" class="message-list__more">
-        <el-icon class="is-loading" :size="18"><LoadingIcon /></el-icon>
-      </div>
 
-      <div v-for="(msg, i) in messages" :key="msg.id || i" :class="[msg.role === 'USER' ? 'user' : 'assistant']">
+<template>
+  <ReverseInfiniteScroll ref="scrollRef" class="p-4" :loading="loading" :has-more="hasMore" :count="messages.length" :load-more="loadMore">
+    <template v-for="(msg, i) in messages" :key="msg.id || i">
+      <div :class="[msg.role === 'USER' ? 'user' : 'assistant']">
         <ContentList :content-list="msg.content" />
         <!-- 助手消息结束后显示底部信息栏(知识来源/执行详情/tokens/耗时) -->
         <MessageFooter v-if="msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)" :message="msg" />
       </div>
-
-      <div v-if="streamLoading" class="msg-row assistant">
-        <Loading :size="18" />
-      </div>
     </template>
 
-    <div v-else-if="!loading" class="welcome">
-      <slot name="welcome">
-        <p class="welcome-title">{{ appName }}</p>
-        <p class="welcome-sub">有什么可以帮你的？</p>
-      </slot>
+    <div v-if="streamLoading" class="msg-row assistant">
+      <span class="mk-conversation-loading" />
     </div>
-  </div>
+
+    <template #empty>
+      <div class="welcome">
+        <slot name="welcome">
+          <p class="welcome-title">{{ appName }}</p>
+          <p class="welcome-sub">有什么可以帮你的？</p>
+        </slot>
+      </div>
+    </template>
+  </ReverseInfiniteScroll>
 </template>
+
 <style scoped lang="scss">
 // .message-list {
 //   flex: 1;

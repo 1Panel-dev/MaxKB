@@ -393,6 +393,8 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   对话次数、对话用户、最近对话时间使用 `order_by` 表头排序，用户列映射为 `username`；切换时清空选择并回到第一页，筛选、分页和导出保留排序。
   清除策略通过当前范围 ChatLog API 保存、使用弹窗自身 loading；添加知识库固定所选对话 ID，选项使用当前范围 Knowledge／Document API。
   `ChatLogDetailDrawer` 使用现有 `LogConversation` 展示只读历史对话与执行详情，正文查询仍使用 Workspace API；上一条／下一条与跨页由页面管理。
+  抽屉通过 `content-class` 提供全高内容区，消息列表内部滚动；切换日志时以日志 ID 重建
+  `LogConversation`，隔离分页状态和未结束的请求，重置阅读位置与执行详情。
 - 外部检索页从 context 读取四范围 ExternalRetrieval API；Workspace 共享只读，禁用开关并阻止提交。
   查询失败展示重新加载入口，不展示默认开关；保存期间使用 loading 与 inert，失败保留已保存配置。
   知识库或资源范围变化时重新查询；示例与地址来自响应，只读展示／复制，不在前端拼接。

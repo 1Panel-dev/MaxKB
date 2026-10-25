@@ -1,3 +1,4 @@
+import type { ChatLogRecord, PortalConversationSummary } from '@/api/types'
 import { get, post, put, del, postStream } from '@/api/admin/core/request'
 import { ADMIN_API_BASE_PATH as adminApiBase } from '@/api/constants'
 
@@ -16,34 +17,29 @@ const postCancelConversationMessage = (chatId: string, applicationId: string) =>
 
 /** 恢复对话消息流。 */
 const postResumeConversationMessage = (chatId: string, chatRecordId: string, applicationId: string) =>
-  postStream(
-    adminApiBase,
-    `${getPrefix(applicationId)}/chat/${chatId}/chat_record/${chatRecordId}/resume_chat_message`,
-  )
+  postStream(adminApiBase, `${getPrefix(applicationId)}/chat/${chatId}/chat_record/${chatRecordId}/resume_chat_message`)
 
 /** 获取历史会话分页。 */
 const getConversationPage = (page: number, size: number, applicationId: string) =>
-  get(`${getPrefix(applicationId)}/historical_conversation/${page}/${size}`)
+  get<{ records: PortalConversationSummary[] }>(`${getPrefix(applicationId)}/historical_conversation/${page}/${size}`)
 
 /** 获取会话记录详情。 */
 const getConversationRecordDetail = (chatId: string, chatRecordId: string, applicationId: string) =>
-  get(`${getPrefix(applicationId)}/chat/${chatId}/chat_record/${chatRecordId}`)
+  get<ChatLogRecord>(`${getPrefix(applicationId)}/chat/${chatId}/chat_record/${chatRecordId}`)
 
 /** 获取会话记录分页。 */
 const getConversationRecordPage = (chatId: string, page: number, size: number, applicationId: string) =>
-  get(`${getPrefix(applicationId)}/historical_conversation_record/${chatId}/${page}/${size}`)
+  get<{ records: ChatLogRecord[] }>(`${getPrefix(applicationId)}/historical_conversation_record/${chatId}/${page}/${size}`)
 
 /** 删除会话。 */
-const deleteConversation = (chatId: string, applicationId: string) =>
-  del(`${getPrefix(applicationId)}/historical_conversation/${chatId}`)
+const deleteConversation = (chatId: string, applicationId: string) => del(`${getPrefix(applicationId)}/historical_conversation/${chatId}`)
 
 /** 修改会话信息。 */
 const putConversation = (chatId: string, data: unknown, applicationId: string) =>
   put(`${getPrefix(applicationId)}/historical_conversation/${chatId}`, data)
 
 /** 使用指定智能体将语音转换为文字。 */
-const postSpeechToText = (applicationId: string, data: unknown) =>
-  post(`${getPrefix(applicationId)}/speech_to_text`, data)
+const postSpeechToText = (applicationId: string, data: unknown) => post(`${getPrefix(applicationId)}/speech_to_text`, data)
 
 export default {
   getConversationOpen,

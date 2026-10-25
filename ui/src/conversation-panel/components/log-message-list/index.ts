@@ -24,9 +24,9 @@ export function createLogMessageListStore(deps: LogMessageListDeps) {
   const messages = ref<ChatMessage[]>([])
   const loading = ref(false)
 
-  const pageSize = 20
+  const pageSize = 30
   const currentPage = ref(1)
-  const hasMore = ref(true)
+  const hasMore = ref(false)
 
   // 接口按最新在前分页:页内 reverse 成正序,更旧的页拼到前面
   const loadMessages = async (cid: string, page = 1) => {
@@ -47,8 +47,10 @@ export function createLogMessageListStore(deps: LogMessageListDeps) {
       messages.value = page === 1 ? result : [...result, ...messages.value]
       currentPage.value = page
       hasMore.value = records.length >= pageSize
+      return records.length > 0
     } catch {
       // 静默处理
+      return false
     } finally {
       loading.value = false
     }
@@ -59,15 +61,15 @@ export function createLogMessageListStore(deps: LogMessageListDeps) {
     const cid = getChatId()
     messages.value = []
     currentPage.value = 1
-    hasMore.value = true
+    hasMore.value = false
     if (!cid) return
     await loadMessages(cid, 1)
   }
 
-  const loadMore = async () => {
+  const loadMore = async (): Promise<boolean> => {
     const cid = getChatId()
-    if (!hasMore.value || loading.value || !cid) return
-    await loadMessages(cid, currentPage.value + 1)
+    if (!hasMore.value || loading.value || !cid) return false
+    return loadMessages(cid, currentPage.value + 1)
   }
 
   return { messages, loading, hasMore, load, loadMore }

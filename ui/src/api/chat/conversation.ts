@@ -1,7 +1,7 @@
 import { get, post, put, del, postStream } from './core/request'
 import type { ResponsePage } from './core/types'
 import { CHAT_API_BASE_PATH as chatApiBase } from '@/api/constants'
-import type { PortalConversationSummary } from '@/api/types'
+import type { ChatLogRecord, PortalConversationSummary } from '@/api/types'
 
 /** v3 对话接口均按智能体划分资源路径。 */
 const getApplicationPath = (applicationId: string) => `/v3/application/${applicationId}`
@@ -26,25 +26,21 @@ const getConversationPage = (applicationId: string, page: number, size: number) 
 
 /** 获取门户单个智能体的历史会话分页（懒加载），仅返回摘要，支持摘要模糊搜索。 */
 const getPortalConversationPage = (applicationId: string, page: number, size: number, abstract?: string) =>
-  get<ResponsePage<PortalConversationSummary>>(
-    `/v3/portal/chat/${applicationId}/${page}/${size}`,
-    abstract ? { abstract } : undefined,
-  )
+  get<ResponsePage<PortalConversationSummary>>(`/v3/portal/chat/${applicationId}/${page}/${size}`, abstract ? { abstract } : undefined)
 
 /** 获取单条会话记录详情(含执行详情 execution_details、知识来源、tokens、耗时)。 */
 const getConversationRecordDetail = (applicationId: string, chatId: string, chatRecordId: string) =>
-  get(`${getApplicationPath(applicationId)}/chat/${chatId}/chat_record/${chatRecordId}`)
+  get<ChatLogRecord>(`${getApplicationPath(applicationId)}/chat/${chatId}/chat_record/${chatRecordId}`)
 
 /** 获取会话记录分页。 */
 const getConversationRecordPage = (applicationId: string, chatId: string, page: number, size: number) =>
-  get(`${getApplicationPath(applicationId)}/chat/${chatId}/chat_record/${page}/${size}`)
+  get<{ records: ChatLogRecord[] }>(`${getApplicationPath(applicationId)}/chat/${chatId}/chat_record/${page}/${size}`)
 
 /** 删除会话。 */
 const deleteConversation = (applicationId: string, chatId: string) => del(`${getApplicationPath(applicationId)}/chat/${chatId}`)
 
 /** 修改会话信息。 */
-const putConversation = (applicationId: string, chatId: string, data: unknown) =>
-  put(`${getApplicationPath(applicationId)}/chat/${chatId}`, data)
+const putConversation = (applicationId: string, chatId: string, data: unknown) => put(`${getApplicationPath(applicationId)}/chat/${chatId}`, data)
 
 /** 将语音转换为文字。 */
 const postSpeechToText = (applicationId: string, data: unknown) => post(`${getApplicationPath(applicationId)}/speech_to_text`, data)

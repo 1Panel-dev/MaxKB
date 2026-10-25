@@ -1,18 +1,3 @@
-<template>
-  <!-- chat 视图自组装:provide 各组件 store + 布局壳 + 左/主/右三区。窄屏抽屉、宽屏挤压 -->
-  <ConversationLayout
-    :left-open="bundle.list.leftSideOpen.value"
-    :right-open="bundle.detail.rightSideOpen.value"
-    :left-mode="leftMode"
-    :right-mode="rightMode"
-    @mask-click="closeDrawers"
-  >
-    <template #left><ConversationList /></template>
-    <template #main><ChatPanel /></template>
-    <template #right><ExecutionDetail /></template>
-  </ConversationLayout>
-</template>
-
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue'
 import ConversationLayout from '../../core/layout/index.vue'
@@ -61,6 +46,21 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
   if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
 })
 </script>
+
+<template>
+  <!-- chat 视图自组装:provide 各组件 store + 布局壳 + 左/主/右三区。窄屏抽屉、宽屏挤压 -->
+  <ConversationLayout
+    :left-open="bundle.list.leftSideOpen.value"
+    :right-open="bundle.detail.rightSideOpen.value"
+    :left-mode="leftMode"
+    :right-mode="rightMode"
+    @mask-click="closeDrawers"
+  >
+    <template #left><ConversationList /></template>
+    <template #main><ChatPanel /></template>
+    <template #right><ExecutionDetail /></template>
+  </ConversationLayout>
+</template>
 
 <style lang="scss">
 @use '../../index.scss';
