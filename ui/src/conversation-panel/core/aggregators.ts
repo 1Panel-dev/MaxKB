@@ -1,6 +1,14 @@
+import type { ChatContent } from '@/api/types'
+
+interface ContentAggregator {
+  // 分片提供 id 时，所有聚合器均优先保留该 id，供调用方继续使用稳定消息键。
+  (previous: Partial<ChatContent> | undefined, chunk: Partial<ChatContent> & { id: string }): ChatContent & { id: string }
+  (previous: Partial<ChatContent> | undefined, chunk: Partial<ChatContent>): ChatContent
+}
+
 // 流式分片聚合:按 id+type 把分片累积成一条内容项(TEXT/REASONING/FAILURE/TOOL/FORM/PROGRESS/GROUP)。
 // GROUP 为通用分组容器,分片以嵌套 children 携带组内内容,组内同样按 id+type 合并(可再嵌套 GROUP)。
-const TEXT = (prev: any = {}, chunk: any) => {
+const TEXT = (prev: Partial<ChatContent> = {}, chunk: Partial<ChatContent>) => {
   return {
     type: 'TEXT',
     id: chunk.id ?? prev.id,
@@ -10,7 +18,7 @@ const TEXT = (prev: any = {}, chunk: any) => {
   }
 }
 
-const REASONING = (prev: any, chunk: any) => {
+const REASONING = (prev: Partial<ChatContent> = {}, chunk: Partial<ChatContent>) => {
   return {
     type: 'REASONING',
     id: chunk.id ?? prev.id,
@@ -21,7 +29,7 @@ const REASONING = (prev: any, chunk: any) => {
   }
 }
 
-const FAILURE = (prev: any, chunk: any) => {
+const FAILURE = (prev: Partial<ChatContent> = {}, chunk: Partial<ChatContent>) => {
   return {
     type: 'FAILURE',
     id: chunk.id ?? prev.id,
@@ -31,7 +39,7 @@ const FAILURE = (prev: any, chunk: any) => {
   }
 }
 
-const TOOL = (prev: any, chunk: any) => {
+const TOOL = (prev: Partial<ChatContent> = {}, chunk: Partial<ChatContent>) => {
   return {
     type: 'TOOL',
     id: chunk.id ?? prev.id,
@@ -44,7 +52,7 @@ const TOOL = (prev: any, chunk: any) => {
   }
 }
 
-const FORM = (prev: any, chunk: any) => {
+const FORM = (prev: Partial<ChatContent> = {}, chunk: Partial<ChatContent>) => {
   return {
     type: 'FORM',
     id: chunk.id ?? prev.id,
@@ -60,7 +68,7 @@ const FORM = (prev: any, chunk: any) => {
   }
 }
 
-const PROGRESS = (prev: any = {}, chunk: any) => {
+const PROGRESS = (prev: Partial<ChatContent> = {}, chunk: Partial<ChatContent>) => {
   return {
     type: 'PROGRESS',
     id: chunk.id ?? prev.id,
@@ -71,19 +79,19 @@ const PROGRESS = (prev: any = {}, chunk: any) => {
 }
 
 // 组内子项:按 id+type 合并分片,规则与顶层一致,嵌套 GROUP 由其聚合函数递归处理
-const mergeChildren = (children: any[] = [], chunkChildren: any[] = []) => {
+const mergeChildren = (children: ChatContent[] = [], chunkChildren: ChatContent[] = []): ChatContent[] => {
   const mergedChildren = [...children]
-  chunkChildren.forEach((item: any) => {
+  chunkChildren.forEach((item) => {
     const aggregator = aggregators[item?.type]
     if (!aggregator) return
-    const index = mergedChildren.findIndex((c: any) => c.id === item.id && c.type === item.type)
-    if (index >= 0) mergedChildren[index] = aggregator(mergedChildren[index], item)
+    const index = mergedChildren.findIndex((content) => content.id === item.id && content.type === item.type)
+    if (index >= 0) mergedChildren[index] = aggregator(mergedChildren[index] ?? {}, item)
     else mergedChildren.push(aggregator({}, item))
   })
   return mergedChildren
 }
 
-const GROUP = (prev: any = {}, chunk: any) => {
+const GROUP = (prev: Partial<ChatContent> = {}, chunk: Partial<ChatContent>) => {
   return {
     type: 'GROUP',
     id: chunk.id ?? prev.id,
@@ -95,7 +103,7 @@ const GROUP = (prev: any = {}, chunk: any) => {
   }
 }
 
-export const aggregators: Record<string, (prev: any, chunk: any) => any> = {
+export const aggregators = {
   TEXT,
   REASONING,
   FAILURE,
@@ -103,4 +111,4 @@ export const aggregators: Record<string, (prev: any, chunk: any) => any> = {
   FORM,
   PROGRESS,
   GROUP,
-}
+} as Record<string, ContentAggregator>

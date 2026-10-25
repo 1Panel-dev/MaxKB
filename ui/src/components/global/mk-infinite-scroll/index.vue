@@ -105,9 +105,9 @@ defineExpose({ reset })
   <div v-loading="loading && !dataList.length" class="min-h-full">
     <slot v-if="dataList.length" />
     <slot v-else-if="firstPageLoaded" name="empty" />
-    <div ref="triggerRef" aria-live="polite" class="flex-center py-4 shrink-0 text-sm text-N600">
-      <span v-if="loading && dataList.length">加载中...</span>
-      <span v-else-if="showFinishedText">没有更多了</span>
+    <div ref="triggerRef" aria-live="polite" class="flex-center py-4 shrink-0">
+      <span v-if="loading && dataList.length"><span class="mk-conversation-loading" /></span>
+      <span v-else-if="showFinishedText" class="text-sm text-N600">没有更多了</span>
     </div>
   </div>
 </template>

@@ -144,6 +144,59 @@ h6 {
 }
 
 /* dot */
+// 对话加载圆点，单个空元素即可使用
+.mk-conversation-loading {
+  display: inline-block;
+  flex-shrink: 0;
+  height: 18px;
+  position: relative;
+  vertical-align: middle;
+  width: 26px;
+
+  &::before {
+    animation: mk-conversation-loading 1.4s infinite both;
+    border-radius: 50%;
+    content: '';
+    height: 6px;
+    left: -10px;
+    position: absolute;
+    top: 6px;
+    width: 6px;
+  }
+}
+
+@keyframes mk-conversation-loading {
+  0%,
+  80%,
+  100% {
+    box-shadow:
+      10px 0 0 -0.6px rgb(var(--mk-N600-rgb) / 30%),
+      20px 0 0 -0.6px rgb(var(--mk-N600-rgb) / 30%),
+      30px 0 0 -0.6px rgb(var(--mk-N600-rgb) / 30%);
+  }
+
+  20% {
+    box-shadow:
+      10px 0 0 var(--mk-N600),
+      20px 0 0 -0.6px rgb(var(--mk-N600-rgb) / 30%),
+      30px 0 0 -0.6px rgb(var(--mk-N600-rgb) / 30%);
+  }
+
+  40% {
+    box-shadow:
+      10px 0 0 -0.6px rgb(var(--mk-N600-rgb) / 30%),
+      20px 0 0 var(--mk-N600),
+      30px 0 0 -0.6px rgb(var(--mk-N600-rgb) / 30%);
+  }
+
+  60% {
+    box-shadow:
+      10px 0 0 -0.6px rgb(var(--mk-N600-rgb) / 30%),
+      20px 0 0 -0.6px rgb(var(--mk-N600-rgb) / 30%),
+      30px 0 0 var(--mk-N600);
+  }
+}
+
 // 状态圆点
 .mk-dot-danger {
   border-radius: 50%;

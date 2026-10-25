@@ -24,13 +24,33 @@ export interface ChatLog {
   update_time: string
 }
 
+/** 历史消息与流式分片共用的内容项，未约定的扩展字段保留为 unknown。 */
+export interface ChatContent {
+  type: string
+  id?: string
+  content?: string
+  name?: string
+  status?: string
+  arguments?: string
+  children?: ChatContent[]
+  workflowRunId?: string
+  extra?: unknown
+  form_field_list?: Dict<unknown>[]
+  form_content_format?: string
+  form_data?: Dict<unknown>
+  is_submit?: boolean
+  position?: unknown
+  chat_record_id?: string
+  [key: string]: unknown
+}
+
 /** 对话日志中的单条问答记录，仅列出前端使用的字段。 */
 export interface ChatLogRecord {
   id: string
   /** 提问内容项 */
-  question: Dict<unknown>
+  question: ChatContent
   /** 回答内容项列表 */
-  messages: Dict<unknown>[]
+  messages: ChatContent[]
   message_tokens?: number
   answer_tokens?: number
   run_time?: number

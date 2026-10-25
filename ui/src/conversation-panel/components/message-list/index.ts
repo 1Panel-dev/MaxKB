@@ -1,23 +1,21 @@
 import { ref, inject, type InjectionKey } from 'vue'
 import { nanoid } from 'nanoid'
+import type { ChatLogRecord, Dict } from '@/api/types'
 import { aggregators } from '../../core/aggregators'
 import { ConversationStream } from '../../core/stream'
-import type { ChatMessage, ChatRecordMeta, SendMessageOptions } from '../../core/types'
+import type { ChatMessage, ChatRecordMeta, ConversationApiAdapter, SendMessageOptions, StreamChunk } from '../../core/types'
 
-export interface MessageListDeps {
-  pageRecords: (chatId: string, page: number, size: number) => Promise<any>
-  recordDetail: (chatId: string, chatRecordId: string) => Promise<any>
-  chatMessage: (chatId: string, data: any) => Promise<Response>
-  resumeMessage: (chatId: string, chatRecordId: string) => Promise<Response>
-  cancel: (chatId: string) => Promise<any>
-  uploadFile: (file: File, chatId: string, onProgress?: (percent: number) => void) => Promise<string>
+export interface MessageListDeps extends Pick<
+  ConversationApiAdapter,
+  'pageRecords' | 'recordDetail' | 'chatMessage' | 'resumeMessage' | 'cancel' | 'uploadFile'
+> {
   // 只读获取当前会话 id(单一数据源在 conversation-list)。必须无副作用:不可惰性创建,
   // 否则无会话时的 stop/cancel/loadMore 会凭空生成 id 并误请求后端。
   getChatId: () => string
 }
 
 // 从后端 chat_record(分页项或详情接口,均为 reset_chat_record 结构)提取底部信息栏数据
-const buildRecordMeta = (raw: any): ChatRecordMeta => ({
+const buildRecordMeta = (raw?: ChatLogRecord | null): ChatRecordMeta => ({
   messageTokens: raw?.message_tokens || 0,
   answerTokens: raw?.answer_tokens || 0,
   runTime: raw?.run_time || 0,
@@ -33,16 +31,16 @@ export function createMessageListStore(deps: MessageListDeps) {
   const streamLoading = ref(false)
 
   // ── 分页 ─────────────────────────────────────────────
-  const pageSize = 20
+  const pageSize = 30
   const currentPage = ref(1)
-  const hasMore = ref(true)
+  const hasMore = ref(false)
 
   const loadMessages = async (cid: string, page = 1) => {
     loading.value = true
     try {
       const res = await pageRecords(cid, page, pageSize)
       const records = (res?.records || []).reverse()
-      const result = records.flatMap((record: any) => [
+      const result = records.flatMap((record): ChatMessage[] => [
         { role: 'USER', content: [record.question], id: record.id + '_USER' },
         {
           role: 'ASSISTANT',
@@ -55,27 +53,29 @@ export function createMessageListStore(deps: MessageListDeps) {
       messages.value = page === 1 ? result : [...result, ...messages.value]
       currentPage.value = page
       hasMore.value = records.length >= pageSize
-    } catch (e) {
+      return records.length > 0
+    } catch {
       // 静默处理
+      return false
     } finally {
       loading.value = false
     }
   }
 
-  const loadMore = async () => {
+  const loadMore = async (): Promise<boolean> => {
     const cid = getChatId()
-    if (!hasMore.value || loading.value || !cid) return
-    await loadMessages(cid, currentPage.value + 1)
+    if (!hasMore.value || loading.value || !cid) return false
+    return loadMessages(cid, currentPage.value + 1)
   }
 
   const resetMessages = () => {
     messages.value = []
     currentPage.value = 1
-    hasMore.value = true
+    hasMore.value = false
   }
 
   // 对话结束后拉取该条记录详情,填充底部信息栏(tokens/耗时/知识来源/执行详情)
-  const getChatRecord = async (target: any, cid: string) => {
+  const getChatRecord = async (target: ChatMessage, cid: string) => {
     const rid = target?.recordId
     if (!cid || !rid) return
     try {
@@ -86,15 +86,15 @@ export function createMessageListStore(deps: MessageListDeps) {
   }
 
   // ── 流式聚合 ─────────────────────────────────────────
-  const appendChunk = (message: ChatMessage, chunk: any) => {
+  const appendChunk = (message: ChatMessage, chunk: StreamChunk) => {
     if (!chunk) return
     const contentArray = Array.isArray(chunk.content) ? chunk.content : chunk.type ? [chunk] : null
     if (!contentArray) return
-    contentArray.forEach((item: any) => {
+    contentArray.forEach((item) => {
       if (!item?.type) return
       const aggregator = aggregators[item.type]
       if (!aggregator) return
-      const index = message.content.findIndex((c: any) => c.id === item.id && c.type === item.type)
+      const index = message.content.findIndex((content) => content.id === item.id && content.type === item.type)
       if (index >= 0) message.content[index] = aggregator(message.content[index], item)
       else message.content.push(aggregator({}, item))
     })
@@ -128,18 +128,14 @@ export function createMessageListStore(deps: MessageListDeps) {
     })
 
   // onNext 逐段回调,onComplete(e?) 结束回调:e 为空表示正常结束,有值表示失败
-  const runStream = (
-    request: () => Promise<Response>,
-    onNext: (chunk: any) => void,
-    onComplete: (e?: any) => void,
-  ) => {
+  const runStream = (request: () => Promise<Response>, onNext: (chunk: StreamChunk) => void, onComplete: (e?: unknown) => void) => {
     closeStream()
     streamLoading.value = true
     request()
-      .then((response: any) => {
+      .then((response) => {
         currentStream = new ConversationStream(
           response,
-          (chunk: any) => {
+          (chunk: StreamChunk) => {
             onNext(chunk)
             emitProgress()
           },
@@ -163,19 +159,16 @@ export function createMessageListStore(deps: MessageListDeps) {
     const cid = opts.chatId || getChatId()
     if (!cid) return
 
-    let target: any
     if (opts.newQuestion) {
       messages.value.push({ role: 'USER', content: [opts.questionContent ?? opts.message], id: nanoid() })
       messages.value.push({ role: 'ASSISTANT', content: [], id: '' })
-      target = messages.value[messages.value.length - 1]
-    } else {
-      target =
-        messages.value.find((m: any) => m.id === `${opts.chatRecordId}_ASSISTANT`) ||
-        messages.value[messages.value.length - 1]
     }
+    const target = opts.newQuestion
+      ? messages.value[messages.value.length - 1]
+      : messages.value.find((message) => message.id === `${opts.chatRecordId}_ASSISTANT`) || messages.value[messages.value.length - 1]
     if (!target) return
 
-    const payload: any = { message: opts.message, stream: true, re_chat: opts.reChat ?? false }
+    const payload: Dict<unknown> = { message: opts.message, stream: true, re_chat: opts.reChat ?? false }
     if (opts.formData) payload.form_data = opts.formData
     if (opts.position !== undefined) payload.position = opts.position
     if (opts.chatRecordId) payload.chat_record_id = opts.chatRecordId
@@ -200,12 +193,12 @@ export function createMessageListStore(deps: MessageListDeps) {
   const stop = () => {
     const cid = getChatId()
     if (!currentStream || !cid) return
-    cancelApi(cid).catch(() => { })
+    cancelApi(cid).catch(() => {})
   }
   // 硬取消:卸载/离开时断开本地流并通知后端
   const cancel = () => {
     const cid = getChatId()
-    if (closeStream() && cid) cancelApi(cid).catch(() => { })
+    if (closeStream() && cid) cancelApi(cid).catch(() => {})
   }
 
   // ── 切换会话:由 conversation-list 主动调用(list 先写好 currentChatId 再调本函数)──

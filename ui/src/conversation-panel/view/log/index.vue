@@ -28,8 +28,7 @@ const props = withDefaults(defineProps<{ chatId: string; applicationId?: string;
 // 不注入 MESSAGE_LIST_KEY,表单等内容项拿不到发送能力即自动只读。
 const msgs = createLogMessageListStore({
   // 降序取(最新在前),store 页内 reverse 成正序、上滑加载更旧
-  pageRecords: (cid, p, s) =>
-    props.chatLogApi.getChatRecordLog(props.applicationId || '', cid, { currentPage: p, pageSize: s }, false),
+  pageRecords: (cid, p, s) => props.chatLogApi.getChatRecordLog(props.applicationId || '', cid, { currentPage: p, pageSize: s }, false),
   getChatId: () => props.chatId,
 })
 const detail = createExecutionDetailStore()
@@ -49,15 +48,10 @@ watch(
 </script>
 
 <template>
-  <ConversationLayout
-    :left-open="false"
-    :right-open="detail.rightSideOpen.value"
-    right-mode="drawer"
-    @mask-click="detail.closeRightSide()"
-  >
+  <ConversationLayout :left-open="false" :right-open="detail.rightSideOpen.value" right-mode="drawer" @mask-click="detail.closeRightSide()">
     <template #main>
       <main class="mk-conversation-main">
-        <LogMessageList />
+        <LogMessageList :key="props.chatId" />
       </main>
     </template>
     <template #right><ExecutionDetail /></template>

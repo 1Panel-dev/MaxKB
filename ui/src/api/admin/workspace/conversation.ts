@@ -1,3 +1,4 @@
+import type { ChatLogRecord, PortalConversationSummary } from '@/api/types'
 import { get, post, put, del, postStream } from '../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 import { ADMIN_API_BASE_PATH as adminApiBase } from '@/api/constants'
@@ -24,22 +25,23 @@ const postResumeConversationMessage = (chatId: string, chatRecordId: string, app
 const getConversationPage = (page: number, size: number, applicationId?: string) => {
   const wsId = getWorkspaceId()
   if (applicationId) {
-    return get(`/workspace/${wsId}/application/${applicationId}/historical_conversation/${page}/${size}`)
+    return get<{ records: PortalConversationSummary[] }>(`/workspace/${wsId}/application/${applicationId}/historical_conversation/${page}/${size}`)
   }
-  return get(`/workspace/${wsId}/historical_conversation/${page}/${size}`)
+  return get<{ records: PortalConversationSummary[] }>(`/workspace/${wsId}/historical_conversation/${page}/${size}`)
 }
 
- 
 const getConversationRecordDetail = (chatId: string, chatRecordId: string, applicationId?: string) =>
-  get(`/workspace/${getWorkspaceId()}/application/${applicationId}/chat/${chatId}/chat_record/${chatRecordId}`)
+  get<ChatLogRecord>(`/workspace/${getWorkspaceId()}/application/${applicationId}/chat/${chatId}/chat_record/${chatRecordId}`)
 
 /** 获取会话记录分页。 */
 const getConversationRecordPage = (chatId: string, page: number, size: number, applicationId?: string) => {
   const wsId = getWorkspaceId()
   if (applicationId) {
-    return get(`/workspace/${wsId}/application/${applicationId}/historical_conversation_record/${chatId}/${page}/${size}`)
+    return get<{ records: ChatLogRecord[] }>(
+      `/workspace/${wsId}/application/${applicationId}/historical_conversation_record/${chatId}/${page}/${size}`,
+    )
   }
-  return get(`/workspace/${wsId}/historical_conversation_record/${chatId}/${page}/${size}`)
+  return get<{ records: ChatLogRecord[] }>(`/workspace/${wsId}/historical_conversation_record/${chatId}/${page}/${size}`)
 }
 
 /** 删除会话。 */
