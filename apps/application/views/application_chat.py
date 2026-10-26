@@ -32,6 +32,7 @@ from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import _get_ip_address
 from common.result import result
 from common.utils.common import query_params_to_single_dict
+from common.bus import emit
 
 
 def get_application_operation_object(application_id):
@@ -240,15 +241,8 @@ class CancelWorkflowView(APIView):
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
-        from application.workflow.workflow_run_registry import WorkflowRunRegistry, CancelResult
-
-        result_enum = WorkflowRunRegistry.cancel_by_chat_id(chat_id)
-        if result_enum == CancelResult.CANCELLED:
-            return result.success({"status": "cancelled", "chat_id": chat_id})
-        elif result_enum == CancelResult.NOT_FOUND:
-            return result.success({"status": "not_found", "chat_id": chat_id})
-        else:
-            return result.error(_("Failed to cancel workflow"))
+        emit("cancel_chat", {"chat_id": str(chat_id)})
+        return result.success({"status": "cancelled", "chat_id": chat_id})
 
 
 class ResumeStreamView(APIView):
