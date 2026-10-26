@@ -33,7 +33,8 @@ function createMenuItems(routes: readonly MenuRouteRecord[], detailParams?: Rout
         children: route.children?.length ? children : undefined,
       }
     })
-    .filter((menuItem) => !menuItem.children || menuItem.children.length > 0)
+    // 一级业务入口的列表和详情子路由通常全部隐藏；仅详情目录需要移除空分组。
+    .filter((menuItem) => !detailParams || !menuItem.children || menuItem.children.length > 0)
 }
 
 /** 根据 Workspace 或 System 路由树生成一级侧栏目录。 */

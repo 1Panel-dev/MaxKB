@@ -166,6 +166,8 @@ Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权�
 4. 递归读取 `children` 生成子目录。
 5. 排除没有名称、没有标题或设置了 `hidden: true` 的路由。
 
+一级业务入口即使只有隐藏的列表、详情子路由也保留；隐藏空分组仅适用于详情目录，避免移除知识库、智能体等入口。
+
 `WorkspaceSidebar` 和 `SystemSidebar` 分别调用该方法，不需要在页面组件中维护菜单数组。
 
 资源详情页面统一使用 `ResourceDetailLayout`。`admin/utils.ts` 中的
