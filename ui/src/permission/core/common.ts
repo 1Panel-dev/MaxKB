@@ -202,7 +202,7 @@ export class Role {
 
   /** 对应后端 `Role.__str__`。 */
   toString(): string {
-    return this.workspaceId ? `${this.name}:${this.workspaceId}` : `${this.name}`
+    return this.workspaceId ? `${this.name}:w:${this.workspaceId}` : `${this.name}`
   }
 
   /** 工作空间维度角色工厂，对应后端 `RoleConstants.get_workspace_role`。 */
