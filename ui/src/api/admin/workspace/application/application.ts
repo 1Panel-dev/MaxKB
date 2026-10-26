@@ -51,7 +51,7 @@ const exportApplication = (applicationId: string, applicationName: string) => {
 const exportApplicationSkills = (applicationId: string, applicationName: string) =>
   Promise.resolve({ application_id: applicationId, name: applicationName })
 
-/** 模拟工作空间智能体门户上下架。 */
+/** 修改工作空间智能体门户上下架状态。 */
 const putApplicationPortal = (applicationId: string, isPortal: boolean) => {
   return put<{ is_portal: boolean }, ApplicationDetail>(`${getPrefix()}/${applicationId}`, { is_portal: isPortal })
 }
