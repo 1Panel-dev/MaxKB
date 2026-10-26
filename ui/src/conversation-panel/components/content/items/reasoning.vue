@@ -31,7 +31,9 @@ watch(
     </template>
     <template #label>
       <MkIcon name="icon_two-ellipses_outlined" />
-      <span class="-mx-1">思考中</span>
+      <span class="-mx-1" :class="{ 'mk-dotting': content.status === 'RUNNING' }">
+        {{ content.status === 'RUNNING' ? '思考中' : '思考完成' }}
+      </span>
     </template>
     <div class="text-N500! whitespace-pre-wrap break-words">
       {{ content.content }}

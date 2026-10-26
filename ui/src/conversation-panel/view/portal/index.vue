@@ -1,24 +1,3 @@
-<template>
-  <!-- portal 视图:在 chat 视图基础上把左侧换成按智能体分组的门户历史对话 -->
-  <ConversationLayout
-    :left-open="bundle.list.leftSideOpen.value"
-    :right-open="bundle.detail.rightSideOpen.value"
-    :left-mode="leftMode"
-    :right-mode="rightMode"
-    @mask-click="closeDrawers"
-  >
-    <template #left><PortalConversationList /></template>
-    <template #main>
-      <!-- 全部智能体页显示智能体卡片，其余显示对话面板 -->
-      <PortalApplicationPanel v-if="bundle.portalList.isApplicationListActive.value" />
-      <PortalChatPanel v-else />
-    </template>
-    <template #right><ExecutionDetail /></template>
-  </ConversationLayout>
-  <!-- 没有当前智能体时新建对话，选择智能体 -->
-  <SelectApplicationDrawer ref="applicationSelectorRef" />
-</template>
-
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue'
 import ConversationLayout from '../../core/layout/index.vue'
@@ -73,6 +52,27 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
   if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
 })
 </script>
+
+<template>
+  <!-- portal 视图:在 chat 视图基础上把左侧换成按智能体分组的门户历史对话 -->
+  <ConversationLayout
+    :left-open="bundle.list.leftSideOpen.value"
+    :right-open="bundle.detail.rightSideOpen.value"
+    :left-mode="leftMode"
+    :right-mode="rightMode"
+    @mask-click="closeDrawers"
+  >
+    <template #left><PortalConversationList /></template>
+    <template #main>
+      <!-- 全部智能体页显示智能体卡片，其余显示对话面板 -->
+      <PortalApplicationPanel v-if="bundle.portalList.isApplicationListActive.value" />
+      <PortalChatPanel v-else />
+    </template>
+    <template #right><ExecutionDetail /></template>
+  </ConversationLayout>
+  <!-- 没有当前智能体时新建对话，选择智能体 -->
+  <SelectApplicationDrawer ref="applicationSelectorRef" />
+</template>
 
 <style lang="scss">
 @use '../../index.scss';
