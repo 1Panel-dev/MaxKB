@@ -234,6 +234,9 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 不属于全局组件。内部使用 `el-scrollbar`，父级需要提供受限高度或纵向 Flex 剩余空间，
 外层不再额外包裹消息滚动容器。
 
+内容留白通过 `contentClass` 设置，例如 `content-class="p-4"`；该类作用于滚动区域内的内容层，
+同时覆盖消息和空状态，使滚动条保持贴近容器边缘。`class` 仍用于组件外壳布局。
+
 传入 `loading`、`hasMore`、`count` 和 `loadMore: () => Promise<boolean>`。页码、请求和
 历史数据前插由调用方维护；`loadMore` 在历史数据更新后返回 `true`，失败或没有新增数据返回
 `false`。组件不请求首页；首页由调用方加载，首次出现数据时自动定位到底部，距顶部 60px 时

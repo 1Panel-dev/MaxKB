@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ChatHeader from '../../components/header/chat/index.vue'
+import PortalHeader from '../../components/header/portal/index.vue'
 import MessageList from '../../components/message-list/index.vue'
 import MessageInput from '../../components/message-input/index.vue'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
@@ -19,7 +19,7 @@ const handleDrop = (e: DragEvent) => input.addFiles(e.dataTransfer?.files)
   <!-- 门户对话主面板:header + message-list + message-input -->
   <main class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 收起侧栏时标题栏的新建对话与侧栏一致：没有当前智能体时选择智能体 -->
-    <ChatHeader :new-conversation="portalList.newConversation" />
+    <PortalHeader :new-conversation="portalList.newConversation" />
     <MessageList :key="list.currentChatId.value" v-if="portalList.currentApplicationId.value" :app-name="list.appInfo.value?.name || 'AI 助手'" />
     <!-- 未确定智能体时不显示欢迎语：分组加载完成且没有可用智能体时显示空状态 -->
     <div v-else class="flex-center min-h-0 flex-1">

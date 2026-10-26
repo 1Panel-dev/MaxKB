@@ -8,9 +8,10 @@ const { messages, loading, hasMore, loadMore } = useLogMessageListStore()
 </script>
 
 <template>
-  <ReverseInfiniteScroll class="p-6" :loading="loading" :has-more="hasMore" :count="messages.length" :load-more="loadMore">
+  <ReverseInfiniteScroll content-class="p-4" :loading="loading" :has-more="hasMore" :count="messages.length" :load-more="loadMore">
     <template v-for="(msg, i) in messages" :key="msg.id || i">
-      <div :class="[msg.role === 'USER' ? 'user' : 'assistant']">
+      <!-- msg.role === 'USER' -->
+      <div>
         <ContentList :content-list="msg.content" />
         <!-- 助手消息底部信息栏(知识来源/执行详情/tokens/耗时) -->
         <MessageFooter v-if="msg.role === 'ASSISTANT' && msg.record" :message="msg" />

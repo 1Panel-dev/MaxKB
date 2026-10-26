@@ -3,6 +3,7 @@ import type { ScrollbarInstance } from 'element-plus'
 import { Scroll } from '../scroll'
 
 export interface ReverseInfiniteScrollProps {
+  contentClass?: string
   loading: boolean
   hasMore: boolean
   count: number

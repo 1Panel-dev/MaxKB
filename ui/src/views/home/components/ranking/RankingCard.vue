@@ -47,7 +47,7 @@ function getRecordPercentage(record: HomeRankingRecord) {
           </div>
           <div class="w-25 shrink-0">
             <el-progress :percentage="getRecordPercentage(record)" :show-text="false" :stroke-width="8" />
-            <p class="color-secondary mt-4">
+            <p class="mt-1 font-medium text-sm text-right">
               {{ kind === 'questions' ? numberFormat(record.chat_record_count) : formatTokenNumber(record.total_tokens ?? 0) }}
             </p>
           </div>
