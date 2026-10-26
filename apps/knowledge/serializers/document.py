@@ -971,7 +971,7 @@ class DocumentSerializers(serializers.Serializer):
             delete_document_data([self.data.get("document_id")])
             return True
 
-        def refresh(self, state_list=None, with_valid=True, raise_on_enqueue_failure=True):
+        def refresh(self, state_list=None, with_valid=True, raise_on_enqueue_failure=True, ignore_queued=False):
             if state_list is None:
                 state_list = [
                     State.PENDING.value,
@@ -990,31 +990,40 @@ class DocumentSerializers(serializers.Serializer):
             if embedding_model is None:
                 raise AppApiException(500, _("Model does not exist"))
             document_id = self.data.get("document_id")
-            ListenerManagement.update_status(
-                QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.PENDING
-            )
-            ListenerManagement.update_status(
-                QuerySet(Paragraph)
-                .annotate(
-                    reversed_status=Reverse("status"),
-                    task_type_status=Substr("reversed_status", TaskType.EMBEDDING.value, 1),
+
+            def prepare_embedding():
+                ListenerManagement.update_status(
+                    QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.PENDING
                 )
-                .filter(task_type_status__in=state_list, document_id=document_id)
-                .values("id"),
-                TaskType.EMBEDDING,
-                State.PENDING,
-            )
-            ListenerManagement.get_aggregation_document_status(document_id)()
+                ListenerManagement.update_status(
+                    QuerySet(Paragraph)
+                    .annotate(
+                        reversed_status=Reverse("status"),
+                        task_type_status=Substr("reversed_status", TaskType.EMBEDDING.value, 1),
+                    )
+                    .filter(task_type_status__in=state_list, document_id=document_id)
+                    .values("id"),
+                    TaskType.EMBEDDING,
+                    State.PENDING,
+                )
+                ListenerManagement.get_aggregation_document_status(document_id)()
 
             def enqueue_embedding():
                 try:
-                    embedding_by_document.delay(document_id, embedding_model_id, state_list)
+                    with transaction.atomic():
+                        if not QuerySet(Document).select_for_update().filter(id=document_id).exists():
+                            return
+                        prepare_embedding()
+                        embedding_by_document.delay(document_id, embedding_model_id, state_list)
                 except AlreadyQueued:
+                    if ignore_queued:
+                        return
                     raise AppApiException(500, _("The task is being executed, please do not send it repeatedly."))
 
             if raise_on_enqueue_failure:
                 transaction.on_commit(enqueue_embedding)
             else:
+                prepare_embedding()
                 transaction.on_commit(
                     partial(
                         _enqueue_sync_embedding,
@@ -1871,12 +1880,9 @@ class DocumentSerializers(serializers.Serializer):
             state_list = instance.get("state_list")
             knowledge_id = self.data.get("knowledge_id")
             for document_id in document_id_list:
-                try:
-                    DocumentSerializers.Operate(
-                        data={"knowledge_id": knowledge_id, "document_id": document_id}
-                    ).refresh(state_list)
-                except AlreadyQueued as e:
-                    pass
+                DocumentSerializers.Operate(data={"knowledge_id": knowledge_id, "document_id": document_id}).refresh(
+                    state_list, ignore_queued=True
+                )
 
         def batch_tokenize(self, instance: Dict, with_valid=True):
             if with_valid:

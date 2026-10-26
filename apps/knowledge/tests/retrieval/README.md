@@ -6,6 +6,22 @@
 python apps/manage.py test knowledge.tests.retrieval
 ```
 
+## 向量化重启恢复
+
+```bash
+python apps/manage.py test knowledge.tests.retrieval.test_embedding_restart
+```
+
+worker 启动时，将中断的文档及未完成分段标为失败，刷新分段统计，并释放对应文档的
+QueueOnce 锁和执行锁；保留已成功分段。仅重启 Web 服务不重置向量化状态；检测到其他
+消费 `celery` 队列的 worker 时跳过恢复。恢复不会自动重新向量化，可在页面选择
+“仅执行未成功部分”重试。文档元数据中的恢复标记使重启前延迟重投的消息失效，旧消息
+也不能释放新任务的锁。部署时需要同时更新 Web 与 worker 代码。
+
+回归使用独立 PostgreSQL/pgvector 测试库，模拟任务发布和锁后端，不调用实际向量模型。
+覆盖文档与分段恢复、历史版本残留、旧消息忽略、Web 单独重启、重复请求状态回滚、
+批量跳过活跃任务及提交失败。多节点网络分区和同时启动多个 worker 不在这些测试的验证范围内。
+
 ## Milvus 写入 HTTP 回归
 
 使用 Postman CLI 启动仅本机的模拟接口（本次验证版本为 1.74.0）：

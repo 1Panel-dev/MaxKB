@@ -20,6 +20,23 @@ def process_paragraph_visual_assets(paragraph_ids: list[str]):
 
 
 @worker_init.connect
+def recover_interrupted_document_embeddings(sender=None, **kwargs):
+    from knowledge.services.embedding_recovery import recover_interrupted_embeddings
+
+    # A second worker joining the cluster must not invalidate another worker's tasks.
+    try:
+        queues = celery_app.control.inspect(timeout=2).active_queues() or {}
+    except Exception:
+        maxkb_logger.exception("Unable to inspect workers; skipping embedding recovery")
+        return
+    if any(queue.get("name") == "celery" for worker_queues in queues.values() for queue in worker_queues):
+        return
+    recovered = recover_interrupted_embeddings()
+    if recovered:
+        maxkb_logger.info(f"Recovered {recovered} interrupted document embeddings on worker startup")
+
+
+@worker_init.connect
 def fail_interrupted_knowledge_synchronizations(sender=None, **kwargs):
     from knowledge.services.sync_status import fail_running_sync_logs_on_startup
 

@@ -3,6 +3,8 @@
 import traceback
 from typing import List
 
+from celery import current_task
+from celery.exceptions import Ignore
 from celery_once import AlreadyQueued, QueueOnce
 from common.config.embedding_config import ModelManage
 from common.event.listener_manage import (
@@ -21,6 +23,27 @@ from ops import celery_app
 
 from knowledge.models import Document, Paragraph, State, TaskType
 from knowledge.serializers.common import drop_knowledge_index
+from knowledge.services.embedding_recovery import EMBEDDING_GENERATION
+
+
+class DocumentEmbeddingTask(QueueOnce):
+    abstract = True
+
+    def apply_async(self, args=None, kwargs=None, **options):
+        document_id = self._get_call_args(args or (), kwargs or {})["document_id"]
+        meta = Document.objects.filter(id=document_id).values_list("meta", flat=True).first() or {}
+        options["headers"] = {**(options.get("headers") or {}), EMBEDDING_GENERATION: meta.get(EMBEDDING_GENERATION)}
+        return super().apply_async(args, kwargs, **options)
+
+
+def _check_embedding_generation(document_id):
+    # A refresh publishes while holding this row lock, so a fast worker waits for its states to commit.
+    with transaction.atomic():
+        document = Document.objects.select_for_update().filter(id=document_id).first()
+        headers = (current_task.request.headers or {}) if current_task else {}
+        if document is None or headers.get(EMBEDDING_GENERATION) != document.meta.get(EMBEDDING_GENERATION):
+            # Ignore does not call QueueOnce.after_return, which could unlock a newer task.
+            raise Ignore()
 
 
 def get_embedding_model(
@@ -59,7 +82,7 @@ def embedding_by_paragraph_list(paragraph_id_list, model_id):
     ListenerManagement.embedding_by_paragraph_list(paragraph_id_list, embedding_model)
 
 
-@celery_app.task(base=QueueOnce, once={"keys": ["document_id"]}, name="celery:embedding_by_document")
+@celery_app.task(base=DocumentEmbeddingTask, once={"keys": ["document_id"]}, name="celery:embedding_by_document")
 def embedding_by_document(document_id, model_id, state_list=None):
     """
     向量化文档
@@ -69,6 +92,7 @@ def embedding_by_document(document_id, model_id, state_list=None):
     :return: None
     """
 
+    _check_embedding_generation(document_id)
     if state_list is None:
         state_list = [
             State.PENDING.value,
