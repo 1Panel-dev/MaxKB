@@ -19,8 +19,10 @@
 Workspace 使用 `AppLayout`，左侧导航根据 `scope: 'workspace'` 对应路由的 `children` 自动生成。
 
 Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当前路由参数为准。应用根
-地址、登录成功和从 System 返回 Workspace 时统一进入 `/admin/workspace/default`。父路由的
-`scope` 会合并到匹配的子路由 `meta` 中。
+地址、登录成功和从 System 返回 Workspace 时统一进入 `/admin/workspace/default`；若当前用户
+只属于 `workspace_list` 中的部分工作空间且目标 `workspaceId` 不在其中，路由守卫会自动重定向到
+其首个可访问工作空间（仅对携带 `workspaceId` 参数的工作空间路由生效）。父路由的 `scope`
+会合并到匹配的子路由 `meta` 中。
 
 顶部工作空间切换统一由 `layout/header-workspace-dropdown/index.vue` 处理：选择不同工作空间时，
 通过 `router.resolve()` 生成目标地址，再调用 `window.location.assign()` 整页加载，重新初始化
