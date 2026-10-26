@@ -9,6 +9,7 @@
 
 import os
 import re
+import shutil
 import tempfile
 import time
 import traceback
@@ -60,8 +61,11 @@ class PdfSplitHandle(BaseSplitHandle):
     ):
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             # 将上传的文件保存到临时文件中
-            for chunk in file.chunks():
-                temp_file.write(chunk)
+            if hasattr(file, "chunks"):
+                for chunk in file.chunks():
+                    temp_file.write(chunk)
+            else:
+                shutil.copyfileobj(file, temp_file)
             # 获取临时文件的路径
             temp_file_path = temp_file.name
 
