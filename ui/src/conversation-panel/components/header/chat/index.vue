@@ -21,20 +21,35 @@
         <span class="header-title">{{ list.currentConversation.value?.abstract || '新对话' }}</span>
       </div>
     </div>
+    <!-- 进入分享模式，勾选要分享的对话 -->
+    <button v-if="shareable" class="header-btn" :disabled="!canShare" @click="emit('share')">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M9.5 3l4 4-4 4M13.5 7H7.5a5 5 0 0 0-5 5v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
     <slot />
   </header>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { useConversationListStore } from '../../../left-sidebar/conversation-list/index'
+import { useMessageListStore } from '../../message-list/index'
 
 const props = defineProps<{
   /** 新建对话；不传时在当前应用中新建（门户在没有当前智能体时改为选择智能体） */
   newConversation?: () => void
+  /** 显示分享入口；仅对话端传入 */
+  shareable?: boolean
 }>()
 
+const emit = defineEmits<{ share: [] }>()
+
 const list = useConversationListStore()
+const msgs = useMessageListStore()
+// 回答生成中或没有消息时不可分享
+const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
 
 const handleNewConversation = () => (props.newConversation ? props.newConversation() : list.newConversation())
 </script>
@@ -64,6 +79,11 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
 }
 .header-btn:hover {
   background: rgba(0, 0, 0, 0.05);
+}
+.header-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+  background: transparent;
 }
 .header-info {
   display: flex;

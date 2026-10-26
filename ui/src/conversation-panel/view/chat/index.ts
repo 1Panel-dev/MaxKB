@@ -5,12 +5,20 @@ import ConversationApi from '@/api/chat/conversation'
 import { useStore } from '@/stores/chat'
 import FileApi from '@/api/chat/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
+import { copyText } from '@/utils/clipboard'
 import type { ConversationApiAdapter } from '../../core/types'
 import { createConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { createMessageListStore } from '../../components/message-list/index'
 import { createMessageInputStore } from '../../components/message-input/index'
 import { createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
+import { createSharePanelStore, type SharePanelStore } from '../../main/share-panel/index'
 import type { ConversationBundle } from '../types'
+
+/** chat 模式在通用组件 store 之外提供分享;debug 模式无分享。 */
+export interface ChatConversationBundle extends ConversationBundle {
+  share: SharePanelStore
+}
 
 /** chat 模式的智能体与会话地址来源；单应用与门户的路由不同，由使用方提供。 */
 export interface ChatConversationRouting {
@@ -42,13 +50,14 @@ function useApplicationChatRouting(): ChatConversationRouting {
  * chat 模式:装配各组件 store。模式差异只在这里的 adapter。
  * 当前会话与地址双向同步，切换智能体时重新加载智能体信息与会话。
  */
-export function createChatConversation(routing: ChatConversationRouting = useApplicationChatRouting()): ConversationBundle {
+export function createChatConversation(routing: ChatConversationRouting = useApplicationChatRouting()): ChatConversationBundle {
   const { getApplicationId, getRouteChatId, replaceChatId } = routing
   const { user } = useStore()
 
   const api: ConversationApiAdapter = {
     // 门户首页尚未确定智能体时没有会话可加载
-    pageConversations: (p, s) => (getApplicationId() ? ConversationApi.getConversationPage(getApplicationId(), p, s) : Promise.resolve({ records: [] })),
+    pageConversations: (p, s) =>
+      getApplicationId() ? ConversationApi.getConversationPage(getApplicationId(), p, s) : Promise.resolve({ records: [] }),
     pageRecords: (cid, p, s) => ConversationApi.getConversationRecordPage(getApplicationId(), cid, p, s),
     recordDetail: (cid, rid) => ConversationApi.getConversationRecordDetail(getApplicationId(), cid, rid),
     remove: (id) => ConversationApi.deleteConversation(getApplicationId(), id),
@@ -58,7 +67,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     uploadFile: (file, cid, onProgress) => FileApi.postUploadFile(file, cid, FILE_SOURCE_TYPE.CHAT, onProgress).request,
     cancel: (cid) => ConversationApi.postCancelConversationMessage(cid),
   }
-  
+
   const list = createConversationListStore({
     pageConversations: api.pageConversations,
     remove: api.remove,
@@ -75,7 +84,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     resumeMessage: api.resumeMessage,
     cancel: api.cancel,
     uploadFile: api.uploadFile,
-    getChatId: () => list.currentChatId.value,  
+    getChatId: () => list.currentChatId.value,
   })
   list.bindLoader(msgs.load)
   const input = createMessageInputStore({
@@ -92,6 +101,13 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     disabled: computed(() => !getApplicationId()),
   })
   const detail = createExecutionDetailStore()
+  // 生成分享链接后复制分享页地址(与 v2 一致为 {chat 部署路径}/share/{link})
+  const share = createSharePanelStore({
+    share: (chatRecordIds) =>
+      ConversationApi.postShareConversation(getApplicationId(), list.currentChatId.value, { chat_record_ids: chatRecordIds }).then(({ link }) =>
+        copyText(`${window.location.origin}${CHAT_API_BASE_PATH.replace(/\/api$/, '')}/share/${link}`, '分享链接已复制'),
+      ),
+  })
 
   // 智能体名称与图标展示在侧栏与消息列表
   const loadApplicationProfile = () => {
@@ -131,5 +147,5 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
   // 地址中带会话 ID 时打开该会话
   if (getRouteChatId()) list.selectConversation(getRouteChatId())
 
-  return { list, msgs, input, detail }
+  return { list, msgs, input, detail, share }
 }
