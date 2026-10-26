@@ -1,8 +1,3 @@
-<template>
-  <!-- eslint-disable-next-line vue/no-v-html -- 内容已经 DOMPurify 净化 -->
-  <div class="content-html" v-html="sanitizedHtml" />
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
 import DOMPurify from 'dompurify'
@@ -17,9 +12,7 @@ const props = defineProps<{
 const sanitizedHtml = computed(() => DOMPurify.sanitize(props.content.content || ''))
 </script>
 
-<style scoped lang="scss">
-.content-html {
-  overflow-x: auto;
-  word-break: break-word;
-}
-</style>
+<template>
+  <!-- eslint-disable-next-line vue/no-v-html -- 内容已经 DOMPurify 净化 -->
+  <div class="overflow-x-auto [word-break:break-word]" v-html="sanitizedHtml" />
+</template>

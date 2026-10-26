@@ -22,7 +22,7 @@ import CreateFile from './CreateFile.vue'
 import ListSkills from './ListSkills.vue'
 import DownloadSkills from './DownloadSkills.vue'
 import RunSkill from './RunSkill.vue'
-import DefaultTool from '../tool.vue'
+import DefaultTool from './tool.vue'
 
 /** TOOL 内容项按工具名分发到专用渲染器，未匹配的工具沿用原有 tool.vue 展示。 */
 const props = defineProps<{ content: any }>()

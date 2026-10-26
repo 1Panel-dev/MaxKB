@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, Teleport as SidePanelTeleport, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import type { SidePanelMode } from './types'
 
 const props = withDefaults(
@@ -42,7 +42,7 @@ const showMask = computed(() => (props.leftMode === 'drawer' && props.leftOpen) 
 
     <slot name="main" />
 
-    <SidePanelTeleport :to="props.rightDrawerTarget || 'body'" :disabled="!teleportRightDrawer">
+    <Teleport :to="props.rightDrawerTarget || 'body'" :disabled="!teleportRightDrawer">
       <aside
         v-if="hasRight"
         class="mk-conversation-side-panel right shrink-0 overflow-hidden"
@@ -54,6 +54,6 @@ const showMask = computed(() => (props.leftMode === 'drawer' && props.leftOpen) 
 
       <!-- 点击遮罩收起抽屉侧栏 -->
       <div v-if="showMask" class="mk-conversation-mask" @click="$emit('mask-click')" />
-    </SidePanelTeleport>
+    </Teleport>
   </div>
 </template>

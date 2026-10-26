@@ -1,14 +1,3 @@
-<template>
-  <div class="content-form">
-    <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="leadingText || ''"></MdPreview>
-    <MkDynamicsForm ref="dynamicsFormRef" :view="is_submit" :render-data="form_field_list" v-model="form_data" />
-    <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="trailingText || ''"></MdPreview>
-    <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit || !mainStore" @click="submit">
-      {{ is_submit ? '已提交' : '提交' }}
-    </el-button>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
@@ -68,5 +57,16 @@ const submit = async () => {
   }
 }
 </script>
+
+<template>
+  <div class="content-form">
+    <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="leadingText || ''"></MdPreview>
+    <MkDynamicsForm ref="dynamicsFormRef" :view="is_submit" :render-data="form_field_list" v-model="form_data" />
+    <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="trailingText || ''"></MdPreview>
+    <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit || !mainStore" @click="submit">
+      {{ is_submit ? '已提交' : '提交' }}
+    </el-button>
+  </div>
+</template>
 
 <style scoped lang="scss"></style>
