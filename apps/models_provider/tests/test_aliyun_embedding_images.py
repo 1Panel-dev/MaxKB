@@ -177,6 +177,70 @@ class AliyunImagePreparationTests(SimpleTestCase):
         self.assertEqual(self.model._prepare_image_input(original), original)
 
 
+class AliyunImageRequestTests(SimpleTestCase):
+    def setUp(self):
+        self.model = AliyunBaiLianEmbedding("test-key", "qwen3-vl-embedding", "http://127.0.0.1:0/api/v1", {})
+
+    @patch.object(AliyunBaiLianEmbedding, "_call_multimodal")
+    def test_images_are_requested_individually_in_order(self, call):
+        for count in (0, 1, 10, 11, 15, 20, 21):
+            with self.subTest(count=count):
+                call.reset_mock()
+                call.side_effect = lambda items: [[float(item["image"].rsplit("/", 1)[1])] for item in items]
+                images = [f"https://example.com/{index}" for index in range(count)]
+
+                vectors = self.model.embed_images(images)
+
+                self.assertEqual(vectors, [[float(index)] for index in range(count)])
+                batches = [invocation.args[0] for invocation in call.call_args_list]
+                self.assertEqual([len(batch) for batch in batches], [1] * count)
+                self.assertEqual([item["image"] for batch in batches for item in batch], images)
+
+    @patch.object(AliyunBaiLianEmbedding, "_call_multimodal")
+    def test_later_image_failure_propagates_without_returning_partial_vectors(self, call):
+        error = RuntimeError("second image failed")
+        call.side_effect = [[[0.1]], error]
+
+        with self.assertRaises(RuntimeError) as caught:
+            self.model.embed_images(["https://example.com/image.png"] * 21)
+
+        self.assertIs(caught.exception, error)
+        self.assertEqual(call.call_count, 2)
+
+    @patch.object(AliyunBaiLianEmbedding, "_call_multimodal")
+    def test_response_must_contain_exactly_one_vector(self, call):
+        for vectors in ([], [[0.1], [0.2]]):
+            with self.subTest(vectors=vectors):
+                call.reset_mock()
+                call.return_value = vectors
+
+                with self.assertRaisesRegex(ValueError, "unexpected number of image embeddings"):
+                    self.model.embed_images(["https://example.com/image.png"] * 15)
+
+                call.assert_called_once()
+
+    @patch.object(AliyunBaiLianEmbedding, "_call_multimodal")
+    def test_other_multimodal_models_also_request_each_image_individually(self, call):
+        for model_name in ("tongyi-embedding-vision-plus", "qwen2.5-vl-embedding", "multimodal-embedding-v1"):
+            with self.subTest(model_name=model_name):
+                self.model.model_name = model_name
+                call.reset_mock()
+                call.return_value = [[0.1]]
+
+                self.assertEqual(len(self.model.embed_images(["https://example.com/image.png"] * 15)), 15)
+
+                self.assertEqual(call.call_count, 15)
+                self.assertTrue(all(len(invocation.args[0]) == 1 for invocation in call.call_args_list))
+
+    @patch.object(AliyunBaiLianEmbedding, "_call_multimodal")
+    def test_non_image_model_does_not_send_images(self, call):
+        self.model.model_name = "text-embedding-v4"
+
+        self.assertEqual(self.model.embed_images(["https://example.com/image.png"]), [])
+
+        call.assert_not_called()
+
+
 @skipUnless(os.environ.get("ALIYUN_EMBEDDING_TEST_URL"), "Start the local Aliyun Postman simulation")
 class AliyunImageHTTPTests(SimpleTestCase):
     def setUp(self):
@@ -191,17 +255,31 @@ class AliyunImageHTTPTests(SimpleTestCase):
         with self.assertRaisesRegex(Exception, "status=400.*processor error"):
             self.model._call_multimodal([{"image": image_data_url((756, 2))}])
 
-    def test_document_image_batch_passes_through_real_sdk_after_padding(self):
+    def test_document_images_pass_through_real_sdk_individually_after_padding(self):
         sizes = ((756, 2), (2, 197), (537, 2), (9, 192), (831, 82), (561, 75), (153, 1), (827, 2), (711, 2), (897, 4))
         vectors = self.model.embed_images([image_data_url(size) for size in sizes])
-        self.assertEqual([vector[0] for vector in vectors], list(range(len(sizes))))
+        self.assertEqual([vector[0] for vector in vectors], [0] * len(sizes))
+        self.assertEqual([vector[1:3] for vector in vectors], [[max(32, w), max(32, h)] for w, h in sizes])
         self.assertTrue(all(len(vector) == 256 for vector in vectors))
 
-    def test_svg_and_raster_batch_passes_through_real_sdk_in_order(self):
+    def test_large_image_lists_preserve_count_and_order_through_real_sdk(self):
+        for count in (11, 15, 20, 21):
+            with self.subTest(count=count):
+                sizes = [(40 + index, 32) for index in range(count)]
+
+                vectors = self.model.embed_images([image_data_url(size) for size in sizes])
+
+                self.assertEqual(len(vectors), count)
+                self.assertEqual([vector[0] for vector in vectors], [0] * count)
+                self.assertEqual([vector[1:3] for vector in vectors], [list(size) for size in sizes])
+                self.assertTrue(all(len(vector) == 256 for vector in vectors))
+
+    def test_svg_and_raster_images_pass_through_real_sdk_individually_in_order(self):
         logo = svg_data_url(size=(20, 20))
         badge = svg_data_url(f'<image href="{logo}" width="20" height="20"/>')
         vectors = self.model.embed_images([image_data_url((32, 32)), badge, image_data_url((756, 2))])
-        self.assertEqual([vector[0] for vector in vectors], [0, 1, 2])
+        self.assertEqual([vector[0] for vector in vectors], [0, 0, 0])
+        self.assertEqual([vector[1:3] for vector in vectors], [[32, 32], [88, 32], [756, 32]])
         self.assertTrue(all(len(vector) == 256 for vector in vectors))
 
     def test_text_embeddings_keep_the_existing_request_contract(self):

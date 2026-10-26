@@ -71,9 +71,16 @@ class AliyunBaiLianEmbedding(MaxKBBaseEmbeddingModel):
 
     def embed_images(self, images: List[str]) -> List[List[float]]:
         """对图片 URL / data URL 做独立向量化（每张图生成一个向量）。"""
-        if not self.supports_image_embedding():
+        if not images or not self.supports_image_embedding():
             return []
-        return self._call_multimodal([{"image": self._prepare_image_input(image)} for image in images])
+        items = [{"image": self._prepare_image_input(image)} for image in images]
+        embeddings = []
+        for item in items:
+            vectors = self._call_multimodal([item])
+            if len(vectors) != 1:
+                raise ValueError("MultiModalEmbedding returned an unexpected number of image embeddings")
+            embeddings.extend(vectors)
+        return embeddings
 
     def _prepare_image_input(self, image: str) -> str:
         if "qwen3-vl-embedding" in self.model_name.lower():
