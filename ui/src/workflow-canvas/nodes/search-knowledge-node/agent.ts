@@ -1,7 +1,8 @@
 import { cloneDeep } from 'lodash'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums/knowledge'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { argReference, createUpdateTool, getKnowledgeListTool, loadKnowledge, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { argReference, finishWithValidate, getKnowledgeListTool, loadKnowledge, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { defaultSearchSetting } from './constant'
 
@@ -54,40 +55,56 @@ function useAgent(context: NodeAgentContext) {
       '- 检索参数：top_n（默认 3）、similarity（0-1，默认 0.6）、search_mode（embedding/keywords/blend）、max_paragraph_char_number（默认 5000）。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, async (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const nodeData = readNodeData<Record<string, unknown> & { knowledge_setting?: Record<string, unknown> }>(node)
-        const referencing = args.search_scope_type === 'referencing'
-        const scope = argReference(context, 'scope')
-        if (referencing && !scope) return 'search_scope_type=referencing 需要父节点传入入参 scope，请改用 custom 或说明缺少该入参'
-        const ids = !referencing && Array.isArray(args.knowledge_ids) ? args.knowledge_ids.map(String) : []
-        const knowledgeList = await loadKnowledge()
-        const selected = ids.map((id) => knowledgeList.find((knowledge) => knowledge.id === id))
-        if (selected.some((knowledge) => !knowledge)) return `知识库不存在：${ids.filter((_, index) => !selected[index]).join(', ')}`
-        if (new Set(selected.map((knowledge) => knowledge!.embedding_model_id)).size > 1) {
-          return '所选知识库的向量模型不一致，只能选择向量模型相同的知识库'
-        }
-        writeNodeProperties(node, {
-          node_data: {
-            ...nodeData,
-            knowledge_id_list: ids,
-            knowledge_list: cloneDeep(selected),
-            search_scope_type: referencing ? 'referencing' : 'custom',
-            search_scope_source: referencing && args.search_scope_source === 'document' ? 'document' : 'knowledge',
-            search_scope_reference: referencing && scope ? [...scope] : [],
-            show_knowledge: typeof args.show_knowledge === 'boolean' ? args.show_knowledge : (nodeData.show_knowledge ?? false),
-            knowledge_setting: {
-              ...defaultSearchSetting,
-              ...nodeData.knowledge_setting,
-              ...(args.top_n !== undefined ? { top_n: Number(args.top_n) } : {}),
-              ...(args.similarity !== undefined ? { similarity: Number(args.similarity) } : {}),
-              ...(args.search_mode ? { search_mode: String(args.search_mode) } : {}),
-              ...(args.max_paragraph_char_number !== undefined ? { max_paragraph_char_number: Number(args.max_paragraph_char_number) } : {}),
+      {
+        name: 'update',
+        description:
+          '配置当前知识库检索节点：检索范围、检索参数、是否展示结果等。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const nodeData = readNodeData<Record<string, unknown> & { knowledge_setting?: Record<string, unknown> }>(node)
+          const referencing =
+            args.search_scope_type === 'referencing' ||
+            (args.search_scope_type === undefined && nodeData.search_scope_type === 'referencing')
+          const scope = argReference(context, 'scope')
+          const ids = !referencing && Array.isArray(args.knowledge_ids) ? args.knowledge_ids.map(String) : []
+          const knowledgeList = await loadKnowledge()
+          const selected = ids.map((id) => knowledgeList.find((knowledge) => knowledge.id === id))
+          if (selected.some((knowledge) => !knowledge)) {
+            return new ErrorResult(`知识库不存在：${ids.filter((_, index) => !selected[index]).join(', ')}`)
+          }
+          if (new Set(selected.map((knowledge) => knowledge!.embedding_model_id)).size > 1) {
+            return new ErrorResult('所选知识库的向量模型不一致，只能选择向量模型相同的知识库')
+          }
+          writeNodeProperties(node, {
+            node_data: {
+              ...nodeData,
+              knowledge_id_list: ids,
+              knowledge_list: cloneDeep(selected),
+              search_scope_type: referencing ? 'referencing' : 'custom',
+              search_scope_source: referencing && args.search_scope_source === 'document' ? 'document' : 'knowledge',
+              search_scope_reference: referencing && scope ? [...scope] : [],
+              show_knowledge: typeof args.show_knowledge === 'boolean' ? args.show_knowledge : (nodeData.show_knowledge ?? false),
+              knowledge_setting: {
+                ...defaultSearchSetting,
+                ...nodeData.knowledge_setting,
+                ...(args.top_n !== undefined ? { top_n: Number(args.top_n) } : {}),
+                ...(args.similarity !== undefined ? { similarity: Number(args.similarity) } : {}),
+                ...(args.search_mode ? { search_mode: String(args.search_mode) } : {}),
+                ...(args.max_paragraph_char_number !== undefined ? { max_paragraph_char_number: Number(args.max_paragraph_char_number) } : {}),
+              },
             },
-          },
-        })
-        return null
-      }),
+          })
+          if (referencing && !scope) {
+            return new ErrorResult(
+              '已将检索范围设为“引用”，但缺少可引用的入参 scope：需要父 agent 把 scope 绑定到一个上游知识库 id 列表或文档 id 列表，否则该节点校验不通过（页面已显示为“引用”，请补充引用变量）',
+            )
+          }
+          return finishWithValidate(context)
+        },
+      },
       getKnowledgeListTool,
     ],
   })

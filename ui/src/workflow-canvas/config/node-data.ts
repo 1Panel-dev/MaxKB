@@ -278,7 +278,8 @@ export const variableAggregationNode = {
   type: WorkflowNodeType.VariableAggregationNode,
   text: '按聚合策略聚合每组的变量',
   label: '变量聚合',
-  properties: { stepName: '变量聚合', config: { fields: [] } },
+  // 分支汇合：各分支互斥执行，需“任一”前置完成即执行，否则会一直等待未执行的分支
+  properties: { stepName: '变量聚合', condition: 'OR', config: { fields: [] } },
 }
 
 /* 变量拆分 */

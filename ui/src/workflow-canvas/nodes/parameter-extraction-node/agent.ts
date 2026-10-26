@@ -1,6 +1,7 @@
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
-import { createUpdateTool, getModelsTool, MODEL_FIELD_SCHEMA, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { finishWithValidate, getModelsTool, MODEL_FIELD_SCHEMA, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 
 const PARAMETER_TYPES = ['string', 'int', 'number', 'boolean', 'array', 'object']
 
@@ -56,36 +57,44 @@ function useAgent(context: NodeAgentContext) {
       '- parameters：要提取的参数，field 英文名，label 中文名，parameter_type 取 string/int/number/boolean/array/object，desc 写清提取规则。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const modelFields = resolveModelFields(context, args.model)
-        if (typeof modelFields === 'string') return modelFields
-        const parameters = (Array.isArray(args.parameters) ? args.parameters : []) as Array<Record<string, string>>
-        if (!parameters.length) return 'parameters 至少一个参数'
-        for (const parameter of parameters) {
-          if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(String(parameter.field))) return `参数名不合法：${parameter.field}`
-          if (!PARAMETER_TYPES.includes(parameter.parameter_type ?? '')) return `参数类型不合法：${parameter.parameter_type}`
-        }
-        const variableList = parameters.map((parameter) => ({
-          field: parameter.field,
-          label: parameter.label,
-          parameter_type: parameter.parameter_type,
-          desc: parameter.desc ?? '',
-        }))
-        writeNodeProperties(node, {
-          node_data: {
-            ...readNodeData<Record<string, unknown>>(node),
-            ...modelFields,
-            variable_list: variableList,
-          },
-          config: {
-            ...(node.properties.config as Record<string, unknown>),
-            fields: [{ label: '结果', value: 'result' }, ...variableList.map((parameter) => ({ label: parameter.label, value: parameter.field }))],
-          },
-        })
-        node.clearNextNodeField(true)
-        return null
-      }),
+      {
+        name: 'update',
+        description:
+          '配置当前参数提取节点：模型与要提取的参数列表。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const modelFields = resolveModelFields(context, args.model)
+          if (typeof modelFields === 'string') return new ErrorResult(modelFields)
+          const parameters = (Array.isArray(args.parameters) ? args.parameters : []) as Array<Record<string, string>>
+          if (!parameters.length) return new ErrorResult('parameters 至少一个参数')
+          for (const parameter of parameters) {
+            if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(String(parameter.field))) return new ErrorResult(`参数名不合法：${parameter.field}`)
+            if (!PARAMETER_TYPES.includes(parameter.parameter_type ?? '')) return new ErrorResult(`参数类型不合法：${parameter.parameter_type}`)
+          }
+          const variableList = parameters.map((parameter) => ({
+            field: parameter.field,
+            label: parameter.label,
+            parameter_type: parameter.parameter_type,
+            desc: parameter.desc ?? '',
+          }))
+          writeNodeProperties(node, {
+            node_data: {
+              ...readNodeData<Record<string, unknown>>(node),
+              ...modelFields,
+              variable_list: variableList,
+            },
+            config: {
+              ...(node.properties.config as Record<string, unknown>),
+              fields: [{ label: '结果', value: 'result' }, ...variableList.map((parameter) => ({ label: parameter.label, value: parameter.field }))],
+            },
+          })
+          node.clearNextNodeField(true)
+          return finishWithValidate(context)
+        },
+      },
       getModelsTool(context),
     ],
   })

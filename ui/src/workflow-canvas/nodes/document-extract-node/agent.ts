@@ -1,7 +1,9 @@
-import { createUpdateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
+import { argReference, finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
-/** document-extract-node（文档内容提取）的 AI 生成配置：只有入参，无需额外配置 */
+/** document-extract-node（文档内容提取）的 AI 生成配置：只有入参文档（documents），无其他可配置项 */
 
 const params: JsonObjectSchema = {
   type: 'object',
@@ -24,8 +26,28 @@ const returns: JsonObjectSchema = {
 
 function useAgent(context: NodeAgentContext) {
   return useNodeAgent(context, {
-    prompt: ['document-extract-node（文档内容提取）配置要点：', '- 文档已由入参 documents 绑定，无需其他配置，直接调用 update 完成校验。'].join('\n'),
-    tools: [createUpdateTool(context, config, () => null)],
+    prompt: [
+      'document-extract-node（文档内容提取）配置要点：',
+      '- 文档来自入参 documents（引用上游的文档列表），确认它能解析出要提取的文档；无需其他配置，直接调用 update 完成校验。',
+    ].join('\n'),
+    tools: [
+      {
+        name: 'update',
+        description:
+          '配置当前文档内容提取节点：把入参 documents 绑定为待提取文档（document_list），其余字段无需配置。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段 content 与 document_list；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async () => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const reference = argReference(context, 'documents')
+          if (!reference) return new ErrorResult('缺少入参 documents：需要上游传入选中的文档列表，请先把 documents 绑定到文档来源节点')
+          const nodeData = readNodeData<Record<string, unknown>>(node)
+          writeNodeProperties(node, { node_data: { ...nodeData, document_list: [...reference] } })
+          return finishWithValidate(context)
+        },
+      },
+    ],
   })
 }
 

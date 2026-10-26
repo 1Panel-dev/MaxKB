@@ -1,5 +1,6 @@
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { createUpdateTool, getModelsTool, MODEL_FIELD_SCHEMA, modelSlot, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { finishWithValidate, getModelsTool, MODEL_FIELD_SCHEMA, modelSlot, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 /** text-to-speech-node（文本转语音）的 AI 生成配置；node_data 协议以节点视图 index.vue 的 defaultForm 为准 */
@@ -40,20 +41,28 @@ function useAgent(context: NodeAgentContext) {
       '- is_result：结果直接给用户时为 true，作为中间步骤时为 false。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const modelFields = resolveModelFields(context, args.model, MODEL)
-        if (typeof modelFields === 'string') return modelFields
-        const nodeData = readNodeData<Record<string, unknown>>(node)
-        writeNodeProperties(node, {
-          node_data: {
-            ...nodeData,
-            ...modelFields,
-            is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? true),
-          },
-        })
-        return null
-      }),
+      {
+        name: 'update',
+        description:
+          '配置当前文本转语音节点：模型与是否输出给用户。要朗读的文本已由入参 text 绑定。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const modelFields = resolveModelFields(context, args.model, MODEL)
+          if (typeof modelFields === 'string') return new ErrorResult(modelFields)
+          const nodeData = readNodeData<Record<string, unknown>>(node)
+          writeNodeProperties(node, {
+            node_data: {
+              ...nodeData,
+              ...modelFields,
+              is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? true),
+            },
+          })
+          return finishWithValidate(context)
+        },
+      },
       getModelsTool(context, MODEL),
     ],
   })

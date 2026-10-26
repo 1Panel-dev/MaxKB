@@ -1,5 +1,6 @@
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { argReference, createUpdateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { argReference, finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 /** tool-custom-node（自定义工具）的 AI 生成配置：生成 Python 代码与输入参数 */
@@ -57,41 +58,49 @@ function useAgent(context: NodeAgentContext) {
       '- 示例：def main(text: str, limit: int):\\n    return text[:limit]',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const code = typeof args.code === 'string' ? args.code : ''
-        if (!/^\s*def\s+\w+\s*\(/m.test(code)) return 'code 需要定义一个 Python 函数'
-        const inputs = (Array.isArray(args.inputs) ? args.inputs : []) as Array<Record<string, unknown>>
-        const names = new Set<string>()
-        const inputFieldList = []
-        for (const input of inputs) {
-          const name = String(input.name ?? '')
-          if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) return `参数名不合法：${name}`
-          if (names.has(name)) return `参数名重复：${name}`
-          names.add(name)
-          const type = FIELD_TYPES.includes(String(input.type)) ? String(input.type) : 'string'
-          const isRequired = input.is_required !== false
-          const field = { name, type, is_required: isRequired, desc: String(input.desc ?? '') }
-          if (input.source === 'reference') {
-            const reference = argReference(context, name)
-            if (!reference && isRequired) return `参数 ${name} 为引用来源，需要父节点传入同名入参`
-            inputFieldList.push({ ...field, source: 'reference', value: reference ? [...reference] : [] })
-          } else {
-            const value = input.value
-            inputFieldList.push({ ...field, source: 'custom', value: value === undefined ? '' : typeof value === 'string' ? value : JSON.stringify(value) })
+      {
+        name: 'update',
+        description:
+          '配置当前自定义工具节点：Python 代码与输入参数、是否输出给用户。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const code = typeof args.code === 'string' ? args.code : ''
+          if (!/^\s*def\s+\w+\s*\(/m.test(code)) return new ErrorResult('code 需要定义一个 Python 函数')
+          const inputs = (Array.isArray(args.inputs) ? args.inputs : []) as Array<Record<string, unknown>>
+          const names = new Set<string>()
+          const inputFieldList = []
+          for (const input of inputs) {
+            const name = String(input.name ?? '')
+            if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) return new ErrorResult(`参数名不合法：${name}`)
+            if (names.has(name)) return new ErrorResult(`参数名重复：${name}`)
+            names.add(name)
+            const type = FIELD_TYPES.includes(String(input.type)) ? String(input.type) : 'string'
+            const isRequired = input.is_required !== false
+            const field = { name, type, is_required: isRequired, desc: String(input.desc ?? '') }
+            if (input.source === 'reference') {
+              const reference = argReference(context, name)
+              if (!reference && isRequired) return new ErrorResult(`参数 ${name} 为引用来源，需要父节点传入同名入参`)
+              inputFieldList.push({ ...field, source: 'reference', value: reference ? [...reference] : [] })
+            } else {
+              const value = input.value
+              inputFieldList.push({ ...field, source: 'custom', value: value === undefined ? '' : typeof value === 'string' ? value : JSON.stringify(value) })
+            }
           }
-        }
-        const nodeData = readNodeData<Record<string, unknown>>(node)
-        writeNodeProperties(node, {
-          node_data: {
-            ...nodeData,
-            code,
-            input_field_list: inputFieldList,
-            is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? false),
-          },
-        })
-        return null
-      }),
+          const nodeData = readNodeData<Record<string, unknown>>(node)
+          writeNodeProperties(node, {
+            node_data: {
+              ...nodeData,
+              code,
+              input_field_list: inputFieldList,
+              is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? false),
+            },
+          })
+          return finishWithValidate(context)
+        },
+      },
     ],
   })
 }

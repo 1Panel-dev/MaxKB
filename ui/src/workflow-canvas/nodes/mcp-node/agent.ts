@@ -1,6 +1,7 @@
 import { TOOL_TYPE } from '@/api/enums'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { argReference, createUpdateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { argReference, finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { useWorkflowStore, type McpTool } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
@@ -117,48 +118,58 @@ function useAgent(context: NodeAgentContext) {
       '- 引用上游数据的参数由同名入参绑定；其余参数在 values 里给常量值，必填参数都要有值。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, async (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const mcpToolId = String(args.mcp_tool_id ?? '')
-        const loaded = await loadMcpTools(mcpToolId)
-        if (typeof loaded === 'string') return loaded
-        const tool = loaded.tools.find((item) => item.name === args.mcp_tool)
-        if (!tool) return `MCP 工具不存在：${String(args.mcp_tool)}，可选：${loaded.tools.map((item) => item.name).join('、')}`
-        const { nested, fields } = paramFieldsOf(tool)
-        const values = (args.values ?? {}) as Record<string, unknown>
-        const toolParams: Record<string, unknown> = {}
-        const toolFormField = []
-        for (const field of fields) {
-          const reference = argReference(context, field.name)
-          const value = reference ? [...reference] : values[field.name]
-          if (value === undefined && field.required) return `必填参数 ${field.name} 未赋值（引用上游请让父节点传入同名入参，常量写在 values）`
-          if (value !== undefined) toolParams[field.name] = value
-          toolFormField.push({
-            field: field.name,
-            label: { input_type: 'TooltipLabel', label: field.name, attrs: { tooltip: field.description } },
-            input_type: inputTypeOf(field.type),
-            source: reference ? 'referencing' : 'custom',
-            required: field.required,
+      {
+        name: 'update',
+        description:
+          '配置当前 MCP 调用节点：选择要调用的 MCP 工具并为参数赋值。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const mcpToolId = String(args.mcp_tool_id ?? '')
+          const loaded = await loadMcpTools(mcpToolId)
+          if (typeof loaded === 'string') return new ErrorResult(loaded)
+          const tool = loaded.tools.find((item) => item.name === args.mcp_tool)
+          if (!tool) return new ErrorResult(`MCP 工具不存在：${String(args.mcp_tool)}，可选：${loaded.tools.map((item) => item.name).join('、')}`)
+          const { nested, fields } = paramFieldsOf(tool)
+          const values = (args.values ?? {}) as Record<string, unknown>
+          const toolParams: Record<string, unknown> = {}
+          const toolFormField = []
+          for (const field of fields) {
+            const reference = argReference(context, field.name)
+            const value = reference ? [...reference] : values[field.name]
+            if (value === undefined && field.required) {
+              return new ErrorResult(`必填参数 ${field.name} 未赋值（引用上游请让父节点传入同名入参，常量写在 values）`)
+            }
+            if (value !== undefined) toolParams[field.name] = value
+            toolFormField.push({
+              field: field.name,
+              label: { input_type: 'TooltipLabel', label: field.name, attrs: { tooltip: field.description } },
+              input_type: inputTypeOf(field.type),
+              source: reference ? 'referencing' : 'custom',
+              required: field.required,
+            })
+          }
+          const nodeData = readNodeData<Record<string, unknown>>(node)
+          writeNodeProperties(node, {
+            node_data: {
+              ...nodeData,
+              mcp_source: 'referencing',
+              mcp_tool_id: mcpToolId,
+              mcp_servers: loaded.servers,
+              mcp_tools: loaded.tools,
+              mcp_tool: tool.name,
+              mcp_server: tool.server,
+              params_nested: nested,
+              tool_form_field: toolFormField,
+              tool_params: nested ? { [nested]: toolParams } : toolParams,
+              is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? false),
+            },
           })
-        }
-        const nodeData = readNodeData<Record<string, unknown>>(node)
-        writeNodeProperties(node, {
-          node_data: {
-            ...nodeData,
-            mcp_source: 'referencing',
-            mcp_tool_id: mcpToolId,
-            mcp_servers: loaded.servers,
-            mcp_tools: loaded.tools,
-            mcp_tool: tool.name,
-            mcp_server: tool.server,
-            params_nested: nested,
-            tool_form_field: toolFormField,
-            tool_params: nested ? { [nested]: toolParams } : toolParams,
-            is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? false),
-          },
-        })
-        return null
-      }),
+          return finishWithValidate(context)
+        },
+      },
       mcpListTool,
       mcpToolsTool,
     ],

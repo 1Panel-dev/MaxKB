@@ -1,5 +1,6 @@
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { argReference, createUpdateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { argReference, finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 interface ToolNodeInputField {
@@ -43,35 +44,43 @@ function useAgent(context: NodeAgentContext) {
       '- 必填参数都要有值；is_result 表示是否把工具结果输出给用户（默认 false）。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const nodeData = readNodeData<Record<string, unknown> & { input_field_list?: ToolNodeInputField[] }>(node)
-        const values = (args.values ?? {}) as Record<string, unknown>
-        const inputFields: ToolNodeInputField[] = []
-        for (const field of nodeData.input_field_list ?? []) {
-          if (field.source === 'reference') {
-            const reference = argReference(context, field.name)
-            if (!reference && field.is_required) return `必填参数 ${field.name} 需要父节点传入同名入参`
-            inputFields.push(reference ? { ...field, value: [...reference] } : field)
-            continue
+      {
+        name: 'update',
+        description:
+          '配置当前工具节点：为工具的每个输入参数赋值、是否输出给用户。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const nodeData = readNodeData<Record<string, unknown> & { input_field_list?: ToolNodeInputField[] }>(node)
+          const values = (args.values ?? {}) as Record<string, unknown>
+          const inputFields: ToolNodeInputField[] = []
+          for (const field of nodeData.input_field_list ?? []) {
+            if (field.source === 'reference') {
+              const reference = argReference(context, field.name)
+              if (!reference && field.is_required) return new ErrorResult(`必填参数 ${field.name} 需要父节点传入同名入参`)
+              inputFields.push(reference ? { ...field, value: [...reference] } : field)
+              continue
+            }
+            const value = values[field.name]
+            if (value === undefined) {
+              if (field.is_required) return new ErrorResult(`必填参数 ${field.name} 未赋值`)
+              inputFields.push(field)
+              continue
+            }
+            inputFields.push({ ...field, value: typeof value === 'string' ? value : JSON.stringify(value) })
           }
-          const value = values[field.name]
-          if (value === undefined) {
-            if (field.is_required) return `必填参数 ${field.name} 未赋值`
-            inputFields.push(field)
-            continue
-          }
-          inputFields.push({ ...field, value: typeof value === 'string' ? value : JSON.stringify(value) })
-        }
-        writeNodeProperties(node, {
-          node_data: {
-            ...nodeData,
-            input_field_list: inputFields,
-            is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? false),
-          },
-        })
-        return null
-      }),
+          writeNodeProperties(node, {
+            node_data: {
+              ...nodeData,
+              input_field_list: inputFields,
+              is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? false),
+            },
+          })
+          return finishWithValidate(context)
+        },
+      },
     ],
   })
 }
