@@ -1,13 +1,14 @@
 import { getNode, readNodeData, validatePromptVariables, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import {
   argReference,
-  createUpdateTool,
+  finishWithValidate,
   getModelsTool,
   MODEL_FIELD_SCHEMA,
   promptVariableOf,
   resolveModelFields,
   useNodeAgent,
 } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 /** question-node（问题优化）的 AI 生成配置 */
@@ -54,26 +55,34 @@ function useAgent(context: NodeAgentContext) {
       '- 优化结果一般作为中间结果，is_result=false。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const modelFields = resolveModelFields(context, args.model)
-        if (typeof modelFields === 'string') return modelFields
-        const error = validatePromptVariables(context.lf, context.nodeId, args.prompt, 'prompt')
-        if (error) return error
-        const nodeData = readNodeData<Record<string, unknown>>(node)
-        writeNodeProperties(node, {
-          node_data: {
-            ...nodeData,
-            ...modelFields,
-            ...(typeof args.system === 'string' && args.system ? { system: args.system } : {}),
-            prompt: typeof args.prompt === 'string' && args.prompt ? args.prompt : defaultPrompt,
-            dialogue_number: Number(args.dialogue_number ?? nodeData.dialogue_number ?? 1),
-            dialogue_type: args.dialogue_type === 'NODE' || args.dialogue_type === 'WORKFLOW' ? args.dialogue_type : (nodeData.dialogue_type ?? 'NODE'),
-            is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? false),
-          },
-        })
-        return null
-      }),
+      {
+        name: 'update',
+        description:
+          '配置当前问题优化节点：模型、系统/用户提示词、历史对话、是否输出给用户等。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const modelFields = resolveModelFields(context, args.model)
+          if (typeof modelFields === 'string') return new ErrorResult(modelFields)
+          const error = validatePromptVariables(context.lf, context.nodeId, args.prompt, 'prompt')
+          if (error) return new ErrorResult(error)
+          const nodeData = readNodeData<Record<string, unknown>>(node)
+          writeNodeProperties(node, {
+            node_data: {
+              ...nodeData,
+              ...modelFields,
+              ...(typeof args.system === 'string' && args.system ? { system: args.system } : {}),
+              prompt: typeof args.prompt === 'string' && args.prompt ? args.prompt : defaultPrompt,
+              dialogue_number: Number(args.dialogue_number ?? nodeData.dialogue_number ?? 1),
+              dialogue_type: args.dialogue_type === 'NODE' || args.dialogue_type === 'WORKFLOW' ? args.dialogue_type : (nodeData.dialogue_type ?? 'NODE'),
+              is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? false),
+            },
+          })
+          return finishWithValidate(context)
+        },
+      },
       getModelsTool(context),
     ],
   })

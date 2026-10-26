@@ -1,6 +1,7 @@
 import { cloneDeep } from 'lodash'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { argReference, createUpdateTool, getKnowledgeListTool, loadKnowledge, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { argReference, finishWithValidate, getKnowledgeListTool, loadKnowledge, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { compareOptions } from './constant'
@@ -71,44 +72,63 @@ function useAgent(context: NodeAgentContext) {
   return useNodeAgent(context, {
     prompt: [
       'search-document-node（文档标签检索）配置要点：',
-      '- 检索范围默认 search_scope_type="custom"，先 get_knowledge_list 选 knowledge_ids；已绑定入参 scope 时才用 "referencing"，并给 search_scope_source。',
+      '- 检索范围默认 search_scope_type="custom"，先 get_knowledge_list 选 knowledge_ids。',
+      '- 用户要求按上游变量确定检索范围时，用 search_scope_type="referencing"，并让父 agent 把入参 scope 绑定到一个上游数组（知识库 id 或文档 id 列表，配 search_scope_source=knowledge/document）；绑定成功前引用范围无法生效。',
       '- search_mode="auto" 按已绑定入参 question 自动匹配文档标签；需求明确给出标签过滤条件时用 "custom"，先 get_knowledge_tags 查标签，再写 conditions。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, async (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const nodeData = readNodeData<Record<string, unknown>>(node)
-        const referencing = args.search_scope_type === 'referencing'
-        const scope = argReference(context, 'scope')
-        if (referencing && !scope) return 'search_scope_type=referencing 需要父节点传入入参 scope，请改用 custom 或说明缺少该入参'
-        const searchMode = args.search_mode === 'custom' && !referencing ? 'custom' : 'auto'
-        if (searchMode === 'auto' && !argReference(context, 'question')) return 'search_mode=auto 需要父节点传入入参 question，请改用 custom 或说明缺少该入参'
-        const ids = !referencing && Array.isArray(args.knowledge_ids) ? args.knowledge_ids.map(String) : []
-        const knowledgeList = await loadKnowledge()
-        const selected = ids.map((id) => knowledgeList.find((knowledge) => knowledge.id === id))
-        if (selected.some((knowledge) => !knowledge)) return `知识库不存在：${ids.filter((_, index) => !selected[index]).join(', ')}`
-        const conditions = (Array.isArray(args.conditions) ? args.conditions : []) as Array<Record<string, string>>
-        if (searchMode === 'custom') {
-          if (!conditions.length) return 'search_mode=custom 至少一条 conditions'
-          const invalid = conditions.find((condition) => !condition.key || !COMPARES.includes(condition.compare as never))
-          if (invalid) return `条件不合法：${JSON.stringify(invalid)}`
-        }
-        writeNodeProperties(node, {
-          node_data: {
-            ...nodeData,
-            knowledge_id_list: ids,
-            knowledge_list: cloneDeep(selected),
-            search_scope_type: referencing ? 'referencing' : 'custom',
-            search_scope_source: referencing && args.search_scope_source === 'document' ? 'document' : 'knowledge',
-            search_scope_reference: referencing && scope ? [...scope] : [],
-            search_mode: searchMode,
-            search_condition_type: args.condition_type === 'OR' ? 'OR' : 'AND',
-            search_condition_list:
-              searchMode === 'custom' ? conditions.map((condition) => ({ key: condition.key, compare: condition.compare, value: String(condition.value ?? '') })) : [],
-          },
-        })
-        return null
-      }),
+      {
+        name: 'update',
+        description:
+          '配置当前文档标签检索节点：检索范围、标签过滤条件等。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const nodeData = readNodeData<Record<string, unknown>>(node)
+          const referencing =
+            args.search_scope_type === 'referencing' ||
+            (args.search_scope_type === undefined && nodeData.search_scope_type === 'referencing')
+          const scope = argReference(context, 'scope')
+          const searchMode = args.search_mode === 'custom' && !referencing ? 'custom' : 'auto'
+          if (searchMode === 'auto' && !argReference(context, 'question')) {
+            return new ErrorResult('search_mode=auto 需要父节点传入入参 question，请改用 custom 或说明缺少该入参')
+          }
+          const ids = !referencing && Array.isArray(args.knowledge_ids) ? args.knowledge_ids.map(String) : []
+          const knowledgeList = await loadKnowledge()
+          const selected = ids.map((id) => knowledgeList.find((knowledge) => knowledge.id === id))
+          if (selected.some((knowledge) => !knowledge)) {
+            return new ErrorResult(`知识库不存在：${ids.filter((_, index) => !selected[index]).join(', ')}`)
+          }
+          const conditions = (Array.isArray(args.conditions) ? args.conditions : []) as Array<Record<string, string>>
+          if (searchMode === 'custom') {
+            if (!conditions.length) return new ErrorResult('search_mode=custom 至少一条 conditions')
+            const invalid = conditions.find((condition) => !condition.key || !COMPARES.includes(condition.compare as never))
+            if (invalid) return new ErrorResult(`条件不合法：${JSON.stringify(invalid)}`)
+          }
+          writeNodeProperties(node, {
+            node_data: {
+              ...nodeData,
+              knowledge_id_list: ids,
+              knowledge_list: cloneDeep(selected),
+              search_scope_type: referencing ? 'referencing' : 'custom',
+              search_scope_source: referencing && args.search_scope_source === 'document' ? 'document' : 'knowledge',
+              search_scope_reference: referencing && scope ? [...scope] : [],
+              search_mode: searchMode,
+              search_condition_type: args.condition_type === 'OR' ? 'OR' : 'AND',
+              search_condition_list:
+                searchMode === 'custom' ? conditions.map((condition) => ({ key: condition.key, compare: condition.compare, value: String(condition.value ?? '') })) : [],
+            },
+          })
+          if (referencing && !scope) {
+            return new ErrorResult(
+              '已将检索范围设为“引用”，但缺少可引用的入参 scope：需要父 agent 把 scope 绑定到一个上游的文档 id 列表或知识库 id 列表，否则该节点校验不通过（页面已显示为“引用”，请补充引用变量）',
+            )
+          }
+          return finishWithValidate(context)
+        },
+      },
       getKnowledgeListTool,
       knowledgeTagsTool(context),
     ],

@@ -1,6 +1,7 @@
 import { randomId } from '@/utils/common'
 import { getFieldOptions, getNode, readNodeData, validateReference, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { createUpdateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 const VALUE_TYPES = ['string', 'num', 'json', 'bool']
@@ -47,40 +48,48 @@ function useAgent(context: NodeAgentContext) {
       '- type：string / num / json / bool。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const variables = Array.isArray(args.variables) ? (args.variables as Array<Record<string, unknown>>) : []
-        if (!variables.length) return 'variables 至少一项'
-        const groups = getFieldOptions(context.lf, context.nodeId)
-        const variableList = []
-        for (const [index, variable] of variables.entries()) {
-          const target = Array.isArray(variable.target) ? variable.target.map(String) : []
-          if (!['global', 'chat', 'loop', 'output'].includes(target[0] ?? '')) return `variables[${index}].target 只能是 global/chat/loop 变量`
-          const error = validateReference(context.lf, context.nodeId, target, `variables[${index}].target`)
-          if (error) return error
-          const referencing = variable.source === 'referencing'
-          if (referencing) {
-            const referenceError = validateReference(context.lf, context.nodeId, variable.reference, `variables[${index}].reference`)
-            if (referenceError) return referenceError
+      {
+        name: 'update',
+        description:
+          '配置当前变量赋值节点：给全局 / 会话 / 循环变量赋值。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const variables = Array.isArray(args.variables) ? (args.variables as Array<Record<string, unknown>>) : []
+          if (!variables.length) return new ErrorResult('variables 至少一项')
+          const groups = getFieldOptions(context.lf, context.nodeId)
+          const variableList = []
+          for (const [index, variable] of variables.entries()) {
+            const target = Array.isArray(variable.target) ? variable.target.map(String) : []
+            if (!['global', 'chat', 'loop', 'output'].includes(target[0] ?? '')) return new ErrorResult(`variables[${index}].target 只能是 global/chat/loop 变量`)
+            const error = validateReference(context.lf, context.nodeId, target, `variables[${index}].target`)
+            if (error) return new ErrorResult(error)
+            const referencing = variable.source === 'referencing'
+            if (referencing) {
+              const referenceError = validateReference(context.lf, context.nodeId, variable.reference, `variables[${index}].reference`)
+              if (referenceError) return new ErrorResult(referenceError)
+            }
+            const type = VALUE_TYPES.includes(String(variable.type)) ? String(variable.type) : 'string'
+            variableList.push({
+              id: randomId(),
+              fields: target,
+              name: groups.find((group) => group.nodeId === target[0])?.fields.find((field) => field.value === target[1])?.label ?? target[1],
+              source: referencing ? 'referencing' : 'custom',
+              type,
+              value: referencing
+                ? null
+                : type === 'json' && typeof variable.value !== 'string'
+                  ? JSON.stringify(variable.value)
+                  : (variable.value ?? ''),
+              reference: referencing ? (variable.reference as unknown[]).map(String) : [],
+            })
           }
-          const type = VALUE_TYPES.includes(String(variable.type)) ? String(variable.type) : 'string'
-          variableList.push({
-            id: randomId(),
-            fields: target,
-            name: groups.find((group) => group.nodeId === target[0])?.fields.find((field) => field.value === target[1])?.label ?? target[1],
-            source: referencing ? 'referencing' : 'custom',
-            type,
-            value: referencing
-              ? null
-              : type === 'json' && typeof variable.value !== 'string'
-                ? JSON.stringify(variable.value)
-                : (variable.value ?? ''),
-            reference: referencing ? (variable.reference as unknown[]).map(String) : [],
-          })
-        }
-        writeNodeProperties(node, { node_data: { ...readNodeData<Record<string, unknown>>(node), variable_list: variableList } })
-        return null
-      }),
+          writeNodeProperties(node, { node_data: { ...readNodeData<Record<string, unknown>>(node), variable_list: variableList } })
+          return finishWithValidate(context)
+        },
+      },
     ],
   })
 }

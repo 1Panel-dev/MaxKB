@@ -1,5 +1,6 @@
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { argReference, createUpdateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { argReference, finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 /** loop-node（循环）的 AI 生成配置 */
@@ -29,22 +30,30 @@ function useAgent(context: NodeAgentContext) {
       '- loop_type：ARRAY 遍历已绑定入参 array；NUMBER 循环 number 次；LOOP 无限循环（循环体内必须放 Break）。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const loopType = String(args.loop_type)
-        if (!['ARRAY', 'NUMBER', 'LOOP'].includes(loopType)) return `loop_type 不合法：${loopType}`
-        const array = argReference(context, 'array')
-        if (loopType === 'ARRAY' && !array) return 'ARRAY 模式需要父节点传入入参 array，请改用 NUMBER / LOOP 或说明缺少该入参'
-        writeNodeProperties(node, {
-          node_data: {
-            ...readNodeData<Record<string, unknown>>(node),
-            loop_type: loopType,
-            array: loopType === 'ARRAY' && array ? [...array] : [],
-            number: loopType === 'NUMBER' ? Math.max(1, Number(args.number ?? 1)) : 1,
-          },
-        })
-        return null
-      }),
+      {
+        name: 'update',
+        description:
+          '配置当前循环节点：循环类型 loop_type 与次数 number。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const loopType = String(args.loop_type)
+          if (!['ARRAY', 'NUMBER', 'LOOP'].includes(loopType)) return new ErrorResult(`loop_type 不合法：${loopType}`)
+          const array = argReference(context, 'array')
+          if (loopType === 'ARRAY' && !array) return new ErrorResult('ARRAY 模式需要父节点传入入参 array，请改用 NUMBER / LOOP 或说明缺少该入参')
+          writeNodeProperties(node, {
+            node_data: {
+              ...readNodeData<Record<string, unknown>>(node),
+              loop_type: loopType,
+              array: loopType === 'ARRAY' && array ? [...array] : [],
+              number: loopType === 'NUMBER' ? Math.max(1, Number(args.number ?? 1)) : 1,
+            },
+          })
+          return finishWithValidate(context)
+        },
+      },
     ],
   })
 }

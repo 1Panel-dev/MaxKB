@@ -1,5 +1,13 @@
 import { getNode, readNodeData, validatePromptVariables, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { createUpdateTool, getModelsTool, MODEL_FIELD_SCHEMA, modelSlot, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import {
+  finishWithValidate,
+  getModelsTool,
+  MODEL_FIELD_SCHEMA,
+  modelSlot,
+  resolveModelFields,
+  useNodeAgent,
+} from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 /** video-understand-node（视频理解）的 AI 生成配置；node_data 协议以节点视图 index.vue 的 defaultForm 为准 */
@@ -46,37 +54,46 @@ function useAgent(context: NodeAgentContext) {
       '- is_result：作为最终回答时为 true，作为中间加工步骤时为 false。',
     ].join('\n'),
     tools: [
-      createUpdateTool(context, config, (args) => {
-        const node = getNode(context.lf, context.nodeId)!
-        const modelFields = resolveModelFields(context, args.model, MODEL)
-        if (typeof modelFields === 'string') return modelFields
-        const error =
-          validatePromptVariables(context.lf, context.nodeId, args.prompt, 'prompt') ??
-          validatePromptVariables(context.lf, context.nodeId, args.system, 'system')
-        if (error) return error
-        const nodeData = readNodeData<Record<string, unknown> & { model_setting?: Record<string, unknown> }>(node)
-        writeNodeProperties(node, {
-          node_data: {
-            ...nodeData,
-            ...modelFields,
-            system: typeof args.system === 'string' ? args.system : (nodeData.system ?? ''),
-            prompt: String(args.prompt ?? nodeData.prompt ?? ''),
-            dialogue_number: Number(args.dialogue_number ?? nodeData.dialogue_number ?? 0),
-            dialogue_type: args.dialogue_type === 'NODE' || args.dialogue_type === 'WORKFLOW' ? args.dialogue_type : (nodeData.dialogue_type ?? 'NODE'),
-            is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? true),
-            model_setting: {
-              reasoning_content_start: '<think>',
-              reasoning_content_end: '</think>',
-              ...nodeData.model_setting,
-              reasoning_content_enable:
-                typeof args.reasoning_content_enable === 'boolean'
-                  ? args.reasoning_content_enable
-                  : !!nodeData.model_setting?.reasoning_content_enable,
+      {
+        name: 'update',
+        description:
+          '配置当前视频理解节点：模型、系统/用户提示词、是否输出给用户、是否输出思考过程等。视频已由入参 videos 绑定。只传要设置的字段，其余保持不变。' +
+          '写入后自动校验，通过即配置完成并交付本节点的输出字段；不通过返回 error 继续修。',
+        parameters: config,
+        apply: async (args) => {
+          const node = getNode(context.lf, context.nodeId)
+          if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
+          const modelFields = resolveModelFields(context, args.model, MODEL)
+          if (typeof modelFields === 'string') return new ErrorResult(modelFields)
+          const error =
+            validatePromptVariables(context.lf, context.nodeId, args.prompt, 'prompt') ??
+            validatePromptVariables(context.lf, context.nodeId, args.system, 'system')
+          if (error) return new ErrorResult(error)
+          const nodeData = readNodeData<Record<string, unknown> & { model_setting?: Record<string, unknown> }>(node)
+          writeNodeProperties(node, {
+            node_data: {
+              ...nodeData,
+              ...modelFields,
+              system: typeof args.system === 'string' ? args.system : (nodeData.system ?? ''),
+              prompt: String(args.prompt ?? nodeData.prompt ?? ''),
+              dialogue_number: Number(args.dialogue_number ?? nodeData.dialogue_number ?? 0),
+              dialogue_type:
+                args.dialogue_type === 'NODE' || args.dialogue_type === 'WORKFLOW' ? args.dialogue_type : (nodeData.dialogue_type ?? 'NODE'),
+              is_result: typeof args.is_result === 'boolean' ? args.is_result : (nodeData.is_result ?? true),
+              model_setting: {
+                reasoning_content_start: '<think>',
+                reasoning_content_end: '</think>',
+                ...nodeData.model_setting,
+                reasoning_content_enable:
+                  typeof args.reasoning_content_enable === 'boolean'
+                    ? args.reasoning_content_enable
+                    : !!nodeData.model_setting?.reasoning_content_enable,
+              },
             },
-          },
-        })
-        return null
-      }),
+          })
+          return finishWithValidate(context)
+        },
+      },
       getModelsTool(context, MODEL),
     ],
   })
