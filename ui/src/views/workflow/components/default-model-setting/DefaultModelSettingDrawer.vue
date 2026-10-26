@@ -248,9 +248,9 @@ defineExpose({ open })
 
     <template #footer>
       <div class="flex-between gap-3">
-        <el-button :disabled="disabled" :loading="applying" @click="handleApplyToAll">应用到所有节点</el-button>
+        <el-button plain :disabled="disabled" :loading="applying" @click="handleApplyToAll">应用到所有节点</el-button>
         <div class="flex-align-center">
-          <el-button :disabled="applying" @click="visible = false">取消</el-button>
+          <el-button plain :disabled="applying" @click="visible = false">取消</el-button>
           <el-button type="primary" :disabled="disabled || !hasChanges || applying" @click="handleSave">保存</el-button>
         </div>
       </div>
