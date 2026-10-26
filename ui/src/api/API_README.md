@@ -433,18 +433,24 @@ API Key 按三个入口分别维护：
 共用业务类型在 `types/api-key.ts`，`remark` 字段待后端补充返回与持久化；
 两套系统接口沿用 V2 路径，仍需对应部署联调；头像菜单密钥与系统资源管理智能体密钥不能互相替代。
 
-`admin/workspace/application/overview.ts` 独立维护概览接口，沿用 v2 的应用统计协议，在
-`/workspace/<workspaceId>/application/<applicationId>` 下提供三个 GET 接口，均传入
-`start_time`、`end_time`，由调用方管理 loading：
+Workspace 与 System 资源管理的 `application/overview.ts` 独立维护概览接口，资源前缀分别为
+`/workspace/<workspaceId>/application/<applicationId>` 与 `/system/resource/application/<applicationId>`。
+`getMonitoring(workspaceId, range, applicationId)` 继续请求 `/application_stats`，返回 `HomeMonitoringDay[]`。
 
-- `getMonitoring(workspaceId, range, applicationId)` 请求 `/application_stats`，返回 `HomeMonitoringDay[]`，供概览复用首页监控。
-- `getTokenUsage` 请求 `/application_token_usage`，返回 `ApplicationTokenUsage[]`，字段为
-  `username`、`token_usage`。
-- `getTopQuestions` 请求 `/top_questions`，返回 `ApplicationTopQuestion[]`，字段为
-  `username`、`chat_record_count`。
+用户排行按首页协议预接入，以下分页、汇总及导出约定待后台实现，两套 API 均保留 TODO：
 
-两类用户排行返回按使用量降序排列的完整数组，不使用首页排行的分页、总量或导出接口。
-业务类型经 `@/api/types` 导出；Tokens 接口不包含用户对话次数，不据此展示每轮平均消耗。
+| 方法 | GET 路径（相对资源前缀） | 返回 |
+| ---- | ----------------------- | ---- |
+| `getRanking` | `/application_token_usage/<currentPage>/<pageSize>` 或 `/top_questions/<currentPage>/<pageSize>` | `ResponsePage<HomeRankingRecord>` |
+| `getTokensAggregation` | `/tokens/aggregation` | 数值 |
+| `getChatRecordAggregation` | `/chat_record/aggregation` | 数值 |
+| `exportRanking` | `/application_token_usage/export` 或 `/top_questions/export` | Excel 文件 |
+
+排行类型 `ApplicationRankingKind` 为 `userTokens`／`questions`，两者均按用户统计，分别按 Tokens／对话次数降序。
+分页返回 `records`、`total`、`current`、`size`；记录沿用首页字段，需提供唯一 `chat_user_id`、
+`asker.username`、`total_tokens`、`chat_record_count`。均 Tokens/次由前端计算，不按用户名拼接两个接口。
+所有查询传入 `start_time`、`end_time`，分页和导出额外支持 `name`；汇总返回当前智能体同期总量，不受用户名搜索影响。
+导出不传分页参数，返回全部匹配记录。TOP5 请求第一页 5 条，详情默认每页 20 条；不使用旧全量数组做前端分页。
 
 ### 工作空间首页
 
@@ -701,7 +707,7 @@ System 资源管理 API，不包含 Workspace 共享和 System 共享。知识�
 智能体详情 context 仅装配 Workspace 和 System 资源管理的完整 Application、Overview、Access、ChatLog、
 Workflow 与 ChatUser API。System 智能体接口统一使用 `/system/resource/application` 前缀，
 详情 GET、配置 PUT 使用 `/<applicationId>`，发布 PUT 使用 `/<applicationId>/publish`；
-概览统计、Tokens 排行、提问排行分别为 GET `application_stats`、`application_token_usage`、`top_questions`。
+概览统计使用 GET `application_stats`；用户排行分页、汇总与导出约定见上文“智能体概览”，待后台对齐。
 发布历史使用 GET `/<applicationId>/application_version`，版本编辑使用 PUT 追加版本 ID。
 DebugPanel 与日志正文仍使用现有 Workspace conversation／聊天记录实现，尚未按 System 范围适配。
 

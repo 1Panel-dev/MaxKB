@@ -194,14 +194,5 @@ export interface ApplicationStoreResponse {
   apps: ApplicationStoreTemplate[]
 }
 
-/** 智能体概览的用户 Tokens 消耗，接口返回完整排行。 */
-export interface ApplicationTokenUsage {
-  username: string
-  token_usage: number | null
-}
-
-/** 智能体概览的用户提问次数，接口返回完整排行。 */
-export interface ApplicationTopQuestion {
-  username: string
-  chat_record_count: number
-}
+/** 智能体概览的两类用户排行。 */
+export type ApplicationRankingKind = 'userTokens' | 'questions'
