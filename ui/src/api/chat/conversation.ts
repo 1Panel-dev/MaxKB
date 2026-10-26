@@ -42,6 +42,10 @@ const deleteConversation = (applicationId: string, chatId: string) => del(`${get
 /** 修改会话信息。 */
 const putConversation = (applicationId: string, chatId: string, data: unknown) => put(`${getApplicationPath(applicationId)}/chat/${chatId}`, data)
 
+/** 生成会话记录分享链接，返回编码后的链接标识。 */
+const postShareConversation = (applicationId: string, chatId: string, data: { chat_record_ids: string[] }) =>
+  post<{ chat_record_ids: string[] }, { link: string }>(`${getApplicationPath(applicationId)}/chat/${chatId}/share_chat`, data)
+
 /** 将语音转换为文字。 */
 const postSpeechToText = (applicationId: string, data: unknown) => post(`${getApplicationPath(applicationId)}/speech_to_text`, data)
 
@@ -56,5 +60,6 @@ export default {
   getConversationRecordPage,
   deleteConversation,
   putConversation,
+  postShareConversation,
   postSpeechToText,
 }

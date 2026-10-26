@@ -5,6 +5,13 @@ import MessageInput from '../../components/message-input/index.vue'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { useMessageInputStore } from '../../components/message-input/index'
 
+defineProps<{
+  /** 标题栏显示分享入口；仅对话端传入 */
+  shareable?: boolean
+}>()
+
+const emit = defineEmits<{ share: [] }>()
+
 const list = useConversationListStore()
 const input = useMessageInputStore()
 
@@ -15,7 +22,7 @@ const handleDrop = (e: DragEvent) => input.addFiles(e.dataTransfer?.files)
   <!-- 带输入框的主面板:header + message-list + message-input -->
   <main class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 头部可被替换(如 debug 用 debug header);默认普通 chat header -->
-    <slot name="header"><ChatHeader /></slot>
+    <slot name="header"><ChatHeader :shareable="shareable" @share="emit('share')" /></slot>
     <MessageList :key="list.currentChatId.value" :app-name="list.appInfo.value?.name || 'AI 助手'" />
 
     <footer class="flex-center shrink-0 p-4"><MessageInput /></footer>

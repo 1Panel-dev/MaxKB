@@ -4,10 +4,12 @@ import ConversationLayout from '../../core/layout/index.vue'
 import ConversationList from '../../left-sidebar/conversation-list/index.vue'
 import ChatPanel from '../../main/chat-panel/index.vue'
 import ExecutionDetail from '../../right-sidebar/execution-detail/index.vue'
+import SharePanel from '../../main/share-panel/index.vue'
 import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
 import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
 import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
+import { SHARE_PANEL_KEY } from '../../main/share-panel/index'
 import { createChatConversation } from './index'
 
 const bundle = createChatConversation()
@@ -17,6 +19,7 @@ provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
 provide(EXECUTION_DETAIL_KEY, bundle.detail)
+provide(SHARE_PANEL_KEY, bundle.share)
 
 // 响应式:窄屏 drawer,宽屏 push
 const BREAKPOINT = 768
@@ -44,6 +47,8 @@ watch(isMobile, (m) => (bundle.list.leftSideOpen.value = !m))
 // 新建或重新选择会话时，即使会话 ID 不变也收起左侧抽屉。
 watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSignal.value], () => {
   if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
+  // 切换或新建会话时退出分享模式
+  bundle.share.close()
 })
 </script>
 
@@ -57,7 +62,11 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
     @mask-click="closeDrawers"
   >
     <template #left><ConversationList /></template>
-    <template #main><ChatPanel /></template>
+    <template #main>
+      <!-- 分享模式下主区域切换为分享面板 -->
+      <SharePanel v-if="bundle.share.active.value" />
+      <ChatPanel v-else shareable @share="bundle.share.open()" />
+    </template>
     <template #right><ExecutionDetail /></template>
   </ConversationLayout>
 </template>
