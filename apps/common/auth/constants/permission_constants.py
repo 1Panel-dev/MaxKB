@@ -1441,6 +1441,26 @@ class PermissionConstants(Enum):
         ),
     )
 
+    APPLICATION_PORTAL_UP = (
+        Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.PORTAL_UP, bit_index=17),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
+        ),
+    )
+
+    APPLICATION_PORTAL_DOWN = (
+        Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.PORTAL_DOWN, bit_index=18),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
+        ),
+    )
+
     # ==================== 应用文件夹 ====================
     APPLICATION_FOLDER_READ = (
         Permission(group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.READ, bit_index=0),
@@ -2687,6 +2707,36 @@ class PermissionConstants(Enum):
             sub_group=Group.SYSTEM_RES_APPLICATION,
             operate=Operate.RELATE_VIEW,
             bit_index=11,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_APPLICATION_PORTAL_UP = (
+        Permission(
+            group=Group.SYSTEM_RES_APPLICATION,
+            sub_group=Group.SYSTEM_RES_APPLICATION,
+            operate=Operate.PORTAL_UP,
+            bit_index=12,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_APPLICATION_PORTAL_DOWN = (
+        Permission(
+            group=Group.SYSTEM_RES_APPLICATION,
+            sub_group=Group.SYSTEM_RES_APPLICATION,
+            operate=Operate.PORTAL_DOWN,
+            bit_index=13,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],

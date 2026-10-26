@@ -51,10 +51,12 @@ const exportApplication = (applicationId: string, applicationName: string) => {
 const exportApplicationSkills = (applicationId: string, applicationName: string) =>
   Promise.resolve({ application_id: applicationId, name: applicationName })
 
-/** 修改工作空间智能体门户上下架状态。 */
-const putApplicationPortal = (applicationId: string, isPortal: boolean) => {
-  return put<{ is_portal: boolean }, ApplicationDetail>(`${getPrefix()}/${applicationId}`, { is_portal: isPortal })
-}
+/** 工作空间智能体上架到门户（仅已发布可上架）。 */
+const putApplicationPortalUp = (applicationId: string) => put<Record<string, never>, ApplicationDetail>(`${getPrefix()}/${applicationId}/portal_up`)
+
+/** 工作空间智能体从门户下架。 */
+const putApplicationPortalDown = (applicationId: string) =>
+  put<Record<string, never>, ApplicationDetail>(`${getPrefix()}/${applicationId}/portal_down`)
 
 /** 导入智能体文件并创建工作空间智能体。 */
 const postApplicationImport = (file: File, folderId: string) => {
@@ -105,7 +107,8 @@ export default {
   deleteApplication,
   exportApplication,
   exportApplicationSkills,
-  putApplicationPortal,
+  putApplicationPortalUp,
+  putApplicationPortalDown,
   postApplication,
   postApplicationImport,
   putApplication,

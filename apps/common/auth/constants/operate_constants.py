@@ -76,8 +76,10 @@ class Operate(Enum):
     CHANGE_PASSWORD = ("READ+CREATE", _("Change Password"))
     SYSTEM_API_KEY = ("READ+DELETE", _("System API Key"))
     PORTAL = ("READ+PORTAL", _("Portal"))
+    PORTAL_UP = ("READ+PORTAL_UP", _("Publish to Portal"))
+    PORTAL_DOWN = ("READ+PORTAL_DOWN", _("Unpublish from Portal"))
 
-    ANNOTATION_AUTH = ('ANNOTATION', _("Annotation"))
+    ANNOTATION_AUTH = ("ANNOTATION", _("Annotation"))
     PASSWORD = ("PASSWORD", _("Password verification"))
     LOCAL = ("LOCAL", _("Account login"))
     CAS = ("CAS", _("CAS"))

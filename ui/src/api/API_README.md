@@ -390,8 +390,10 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外。Syst
 - 知识库 Workflow API 记录为 `/<id>/action/<page>/<size>`，筛选 user_name、state；
   详情和取消为 GET action/<actionId>、POST action/<actionId>/cancel。
 - 智能体复制查询完整 ApplicationDetail，model 映射 model_id 后创建，不使用卡片摘要。
-- Workspace 与 System 资源管理的 Application API 通过 `putApplicationPortal(applicationId, isPortal)`
-  向各自范围的 `application/<applicationId>` 发送 PUT 请求，仅提交 `{ is_portal }`，返回 `ApplicationDetail`。
+- Workspace 与 System 资源管理的 Application API 通过 `putApplicationPortalUp(applicationId)` 与
+  `putApplicationPortalDown(applicationId)` 分别向各自范围的 `application/<applicationId>/portal_up`、
+  `application/<applicationId>/portal_down` 发送 PUT 请求（上下架接口与通用编辑接口分离），返回 `ApplicationDetail`。
+  上架仅允许已发布（`is_publish`）的智能体；上下架分别受门户上架/下架权限控制。
   `exportApplicationSkills(applicationId, applicationName)` 仍为本地 mock，返回 `{ application_id, name }`，
   不发送请求或生成 Skills 文件，真实下载接口待接入。
 

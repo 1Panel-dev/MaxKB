@@ -26,9 +26,11 @@ const exportApplication = (applicationId: string, applicationName: string) => {
 const exportApplicationSkills = (applicationId: string, applicationName: string) =>
   Promise.resolve({ application_id: applicationId, name: applicationName })
 
-/** 修改 System 资源管理智能体门户上下架状态。 */
-const putApplicationPortal = (applicationId: string, isPortal: boolean) =>
-  put<{ is_portal: boolean }, ApplicationDetail>(`${prefix}/${applicationId}`, { is_portal: isPortal })
+/** System 资源管理智能体上架到门户（仅已发布可上架）。 */
+const putApplicationPortalUp = (applicationId: string) => put<Record<string, never>, ApplicationDetail>(`${prefix}/${applicationId}/portal_up`)
+
+/** System 资源管理智能体从门户下架。 */
+const putApplicationPortalDown = (applicationId: string) => put<Record<string, never>, ApplicationDetail>(`${prefix}/${applicationId}/portal_down`)
 
 /** 获取 System 资源管理智能体详情。 */
 const getApplicationDetail = (applicationId: string) => get<ApplicationDetail>(`${prefix}/${applicationId}`)
@@ -69,5 +71,6 @@ export default {
   deleteApplication,
   exportApplication,
   exportApplicationSkills,
-  putApplicationPortal,
+  putApplicationPortalUp,
+  putApplicationPortalDown,
 }
