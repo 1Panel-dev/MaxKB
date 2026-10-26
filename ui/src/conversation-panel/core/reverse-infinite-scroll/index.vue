@@ -19,8 +19,8 @@ defineExpose({ scrollToBottom, followBottom })
       <div class="min-h-full flex-1 flex-column">
         <template v-if="count > 0">
           <!-- 固定预留状态行，加载提示切换时不改变消息位置。 -->
-          <div class="flex-center py-4 shrink-0">
-            <span v-if="loadingMore" class="mk-conversation-loading" />
+          <div v-if="loadingMore" class="flex-center py-4 shrink-0">
+            <span class="mk-conversation-loading" />
           </div>
           <slot />
         </template>

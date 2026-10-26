@@ -20,7 +20,7 @@ type ChatRecordApi = {
   ) => Promise<{ records: ChatLogRecord[] }>
 }
 
-const props = withDefaults(defineProps<{ chatId: string; applicationId?: string; chatLogApi?: ChatRecordApi }>(), {
+const props = withDefaults(defineProps<{ chatId: string; applicationId?: string; chatLogApi?: ChatRecordApi; rightDrawerTarget?: HTMLElement }>(), {
   chatLogApi: () => ChatLogApi,
 })
 
@@ -48,7 +48,13 @@ watch(
 </script>
 
 <template>
-  <ConversationLayout :left-open="false" :right-open="detail.rightSideOpen.value" right-mode="drawer" @mask-click="detail.closeRightSide()">
+  <ConversationLayout
+    :left-open="false"
+    :right-open="detail.rightSideOpen.value"
+    right-mode="drawer"
+    :right-drawer-target="props.rightDrawerTarget"
+    @mask-click="detail.closeRightSide()"
+  >
     <template #main>
       <main class="mk-conversation-main">
         <LogMessageList :key="props.chatId" />

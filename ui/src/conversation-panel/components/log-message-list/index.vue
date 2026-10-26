@@ -8,7 +8,7 @@ const { messages, loading, hasMore, loadMore } = useLogMessageListStore()
 </script>
 
 <template>
-  <ReverseInfiniteScroll :loading="loading" :has-more="hasMore" :count="messages.length" :load-more="loadMore">
+  <ReverseInfiniteScroll class="p-6" :loading="loading" :has-more="hasMore" :count="messages.length" :load-more="loadMore">
     <template v-for="(msg, i) in messages" :key="msg.id || i">
       <div :class="[msg.role === 'USER' ? 'user' : 'assistant']">
         <ContentList :content-list="msg.content" />

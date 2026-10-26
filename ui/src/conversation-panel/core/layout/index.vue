@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useSlots } from 'vue'
+import { computed, Teleport as SidePanelTeleport, useSlots } from 'vue'
 import type { SidePanelMode } from './types'
 
 const props = withDefaults(
@@ -10,6 +10,7 @@ const props = withDefaults(
     rightMode?: SidePanelMode
     leftWidth?: number
     rightWidth?: number
+    rightDrawerTarget?: HTMLElement
   }>(),
   {
     leftMode: 'push',
@@ -23,6 +24,7 @@ defineEmits<{ 'mask-click': [] }>()
 
 const slots = useSlots()
 const hasRight = computed(() => !!slots.right)
+const teleportRightDrawer = computed(() => props.rightMode === 'drawer' && !!props.rightDrawerTarget)
 
 const showMask = computed(() => (props.leftMode === 'drawer' && props.leftOpen) || (props.rightMode === 'drawer' && props.rightOpen))
 </script>
@@ -40,16 +42,18 @@ const showMask = computed(() => (props.leftMode === 'drawer' && props.leftOpen) 
 
     <slot name="main" />
 
-    <aside
-      v-if="hasRight"
-      class="mk-conversation-side-panel right shrink-0 overflow-hidden"
-      :class="[rightMode, { open: rightOpen }]"
-      :style="{ '--mk-chat-right-width': rightWidth + 'px' }"
-    >
-      <div class="mk-conversation-side-panel__inner"><slot name="right" /></div>
-    </aside>
+    <SidePanelTeleport :to="props.rightDrawerTarget || 'body'" :disabled="!teleportRightDrawer">
+      <aside
+        v-if="hasRight"
+        class="mk-conversation-side-panel right shrink-0 overflow-hidden"
+        :class="[rightMode, { open: rightOpen }]"
+        :style="{ '--mk-chat-right-width': rightWidth + 'px' }"
+      >
+        <div class="mk-conversation-side-panel__inner"><slot name="right" /></div>
+      </aside>
 
-    <!-- 点击遮罩收起抽屉侧栏 -->
-    <div v-if="showMask" class="mk-conversation-mask" @click="$emit('mask-click')" />
+      <!-- 点击遮罩收起抽屉侧栏 -->
+      <div v-if="showMask" class="mk-conversation-mask" @click="$emit('mask-click')" />
+    </SidePanelTeleport>
   </div>
 </template>

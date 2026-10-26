@@ -47,6 +47,9 @@ Element Plus 覆盖、主题变量和应用样式。Chat 入口还显式引入 E
 `mk-conversation-side-panel__inner`。`.left` 引用 `--mk-chat-sidebar-width`，`.right`
 引用 `--mk-chat-right-width`，通过侧栏内部变量统一内容固定宽度、push 展开宽度和 drawer
 宽度。push 收起时外层宽度为零，drawer 通过位移收起；内容宽度不随开合动画变化。
+`ConversationLayout` 可通过 `rightDrawerTarget` 传入 HTMLElement，仅在右侧为 drawer 模式时，
+将右侧面板和遮罩一起 Teleport 到该定位容器；不传时保留布局内定位。目标容器需负责定位、
+尺寸和溢出裁剪，并与会话共用生命周期。
 
 ## 共享输入容器
 

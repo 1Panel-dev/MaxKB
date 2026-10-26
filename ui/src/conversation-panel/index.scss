@@ -58,6 +58,8 @@
 
     &.right {
       right: 0;
+      --mk-conversation-side-panel-width: 100%;
+      border-left: none !important;
 
       &:not(.open) {
         transform: translateX(100%);

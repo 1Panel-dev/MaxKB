@@ -121,17 +121,6 @@ function handleRefresh() {
             <p class="text-sm text-N500 whitespace-normal">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
           </div>
         </MkDropdownItem>
-        <MkDropdownItem class="py-2!" @click="handleOpenAdvancedApplicationCreate">
-          <template #icon>
-            <el-avatar class="ai-avatar-gradient" shape="square" :size="24">
-              <img src="@/assets/workflow/icon_ai_chat.svg" style="width: 75%" alt="" />
-            </el-avatar>
-          </template>
-          <div class="min-w-0">
-            <p class="leading-5">AI 创建</p>
-            <p class="text-sm text-N500 whitespace-normal">根据描述，AI 自动生成工作流</p>
-          </div>
-        </MkDropdownItem>
 
         <el-upload
           ref="elUploadRef"
