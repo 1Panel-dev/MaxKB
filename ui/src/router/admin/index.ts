@@ -45,6 +45,20 @@ router.beforeEach(async (to, from) => {
     if (!user.userInfo) {
       await auth.loadAuthBaseProfile()
     }
+
+    // 用户只属于部分工作空间时，自动落到其首个可访问工作空间；
+    // 避免登录/根路径/返回等入口硬编码进入 default 而出现选中为空、无权限。
+    const workspaceId = to.params?.workspaceId as string | undefined
+    const workspace_list = user.userInfo?.workspace_list
+    if (to.name && workspaceId && workspace_list?.length) {
+      const accessibleIds = new Set(workspace_list.map((ws) => ws.id).filter((id): id is string => Boolean(id)))
+      if (!accessibleIds.has(workspaceId)) {
+        const fallbackId = workspace_list.find((ws) => ws.id)?.id ?? 'default'
+        if (fallbackId !== workspaceId) {
+          return { name: to.name, params: { ...to.params, workspaceId: fallbackId }, replace: true }
+        }
+      }
+    }
   }
 
   // 当前路由有权限，放行
