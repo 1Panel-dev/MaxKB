@@ -1,5 +1,14 @@
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw, RouteParamsGeneric } from 'vue-router'
+import { canWorkspaceKnowledge } from '@/permission/modules/knowledge/workspace'
+import { PermissionConstants as P } from '@/permission/core'
+import type { Permission } from '@/permission/core/common'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
+
+function knowledgeAccess(permission: Permission, typeAllowed: (type: string) => boolean = () => true) {
+  return (route: { params: RouteParamsGeneric }) => typeAllowed(String(route.params.type)) && canWorkspaceKnowledge(
+    permission, String(route.params.knowledgeId), String(route.params.workspaceId),
+  )
+}
 
 export const knowledgeRoutes: RouteRecordRaw[] = [
   {
@@ -32,19 +41,19 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 path: 'document',
                 name: 'workspace-knowledge-document-list',
                 component: () => import('@/views/knowledge-detail/library/document/index.vue'),
-                meta: { title: '文档', order: 10 },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_DOCUMENT_READ), next: 'workspace-knowledge-image-list', title: '文档', order: 10 },
               },
               {
                 path: 'image',
                 name: 'workspace-knowledge-image-list',
                 component: () => import('@/views/knowledge-detail/library/image/index.vue'),
-                meta: { title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_IMAGE_READ, (type) => type === KNOWLEDGE_TYPE_KEY.BASE), next: 'workspace-knowledge-hit-test', title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE },
               },
               {
                 path: 'tag',
                 name: 'workspace-knowledge-tag',
                 component: () => import('@/views/knowledge-detail/library/tags/index.vue'),
-                meta: { title: '标签管理', order: 30 },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_TAG_READ), next: 'workspace-knowledge-dictionary', title: '标签管理', order: 30 },
               },
             ],
           },
@@ -62,7 +71,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 }
               }
             },
-            meta: { title: '工作流', icon: 'icon_ticket-flow_outlined', order: 20 },
+            meta: { permission: knowledgeAccess(P.KNOWLEDGE_WORKFLOW_READ), next: 'workspace-knowledge-list', title: '工作流', icon: 'icon_ticket-flow_outlined', order: 20 },
           },
           {
             path: '',
@@ -74,19 +83,19 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 path: 'hit-test',
                 name: 'workspace-knowledge-hit-test',
                 component: () => import('@/views/knowledge-detail/hit-test/index.vue'),
-                meta: { title: '召回测试', order: 10 },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_HIT_TEST), next: 'workspace-knowledge-problem', title: '召回测试', order: 10 },
               },
               {
                 path: 'problem',
                 name: 'workspace-knowledge-problem',
                 component: () => import('@/views/knowledge-detail/problem/index.vue'),
-                meta: { title: '问题', order: 20 },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_PROBLEM_READ), next: 'workspace-knowledge-tag', title: '问题', order: 20 },
               },
               {
                 path: 'dictionary',
                 name: 'workspace-knowledge-dictionary',
                 component: () => import('@/views/knowledge-detail/termbase/index.vue'),
-                meta: { title: '自定义分词', order: 30 },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_TERMBASE_READ), next: 'workspace-knowledge-chat-user', title: '自定义分词', order: 30 },
               },
             ],
           },
@@ -100,13 +109,13 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 path: 'chat-user',
                 name: 'workspace-knowledge-chat-user',
                 component: () => import('@/views/knowledge-detail/chat-user/index.vue'),
-                meta: { title: '对话用户', order: 10 },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_CHAT_USER_READ), next: 'workspace-knowledge-external-retrieval', title: '对话用户', order: 10 },
               },
               {
                 path: 'external-retrieval',
                 name: 'workspace-knowledge-external-retrieval',
                 component: () => import('@/views/knowledge-detail/external-retrieval/index.vue'),
-                meta: { title: '外部检索服务', order: 20 },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_EXTERNAL_SERVICE_READ), next: 'workspace-knowledge-setting', title: '外部检索服务', order: 20 },
               },
             ],
           },
@@ -114,7 +123,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             path: 'setting',
             name: 'workspace-knowledge-setting',
             component: () => import('@/views/knowledge-detail/setting/base/index.vue'),
-            meta: {
+            meta: { permission: knowledgeAccess(P.KNOWLEDGE_SETTING_READ, (type) => type === KNOWLEDGE_TYPE_KEY.BASE), next: 'workspace-knowledge-base-setting',
               title: '设置',
               icon: 'icon_setting',
               activeIcon: 'icon_setting_filled',
@@ -139,19 +148,19 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 path: 'setting/base',
                 name: 'workspace-knowledge-base-setting',
                 component: () => import('@/views/knowledge-detail/setting/base/index.vue'),
-                meta: { title: '基础设置', order: 10 },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_SETTING_READ, (type) => type !== KNOWLEDGE_TYPE_KEY.BASE), next: 'workspace-knowledge-document-strategy', title: '基础设置', order: 10 },
               },
               {
                 path: 'setting/document-strategy',
                 name: 'workspace-knowledge-document-strategy',
                 component: () => import('@/views/knowledge-detail/setting/document-strategy/index.vue'),
-                meta: { title: '文档处理策略', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.WEB },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_DOCUMENT_STRATEGY_READ, (type) => type === KNOWLEDGE_TYPE_KEY.WEB), next: 'workspace-knowledge-scheduled-sync', title: '文档处理策略', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.WEB },
               },
               {
                 path: 'setting/scheduled-sync',
                 name: 'workspace-knowledge-scheduled-sync',
                 component: () => import('@/views/knowledge-detail/setting/scheduled-sync/index.vue'),
-                meta: { title: '定时同步', order: 30 },
+                meta: { permission: knowledgeAccess(P.KNOWLEDGE_SCHEDULED_SYNC_READ, (type) => type !== KNOWLEDGE_TYPE_KEY.BASE), next: 'workspace-knowledge-workflow', title: '定时同步', order: 30 },
               },
             ],
           },

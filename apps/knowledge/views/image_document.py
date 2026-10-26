@@ -2,10 +2,7 @@
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
-from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
 from common.result import result
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
@@ -13,21 +10,9 @@ from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from knowledge.permissions import knowledge_permission
 from knowledge.api.document import ImageBatchCreateAPI, ImagePreviewAPI, ImagePreviewOperateAPI
 from knowledge.serializers.image_document import ImageDocumentSerializers
-
-
-def _document_permissions(permission):
-    return has_permissions(
-        permission.get_workspace_knowledge_permission(),
-        permission.get_workspace_permission_workspace_manage_role(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
-    )
 
 
 class ImageDocumentView:
@@ -45,7 +30,7 @@ class ImageDocumentView:
             responses=ImagePreviewAPI.get_response(),
             tags=[_("Knowledge Base/Images")],  # type: ignore
         )
-        @_document_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE)
+        @has_permissions(knowledge_permission(PermissionConstants.KNOWLEDGE_IMAGE_CREATE))
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
                 ImageDocumentSerializers.Preview(
@@ -69,7 +54,7 @@ class ImageDocumentView:
             responses=ImagePreviewOperateAPI.get_response(),
             tags=[_("Knowledge Base/Images")],  # type: ignore
         )
-        @_document_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_READ)
+        @has_permissions(knowledge_permission(PermissionConstants.KNOWLEDGE_IMAGE_READ))
         def get(self, request: Request, workspace_id: str, knowledge_id: str, preview_id: str):
             return result.success(
                 ImageDocumentSerializers.Preview(
@@ -87,7 +72,7 @@ class ImageDocumentView:
             responses=ImagePreviewOperateAPI.get_response(),
             tags=[_("Knowledge Base/Images")],  # type: ignore
         )
-        @_document_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT)
+        @has_permissions(knowledge_permission(PermissionConstants.KNOWLEDGE_IMAGE_EDIT))
         def put(self, request: Request, workspace_id: str, knowledge_id: str, preview_id: str):
             return result.success(
                 ImageDocumentSerializers.Preview(
@@ -104,7 +89,7 @@ class ImageDocumentView:
             responses=ImagePreviewOperateAPI.get_response(),
             tags=[_("Knowledge Base/Images")],  # type: ignore
         )
-        @_document_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT)
+        @has_permissions(knowledge_permission(PermissionConstants.KNOWLEDGE_IMAGE_EDIT))
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, preview_id: str):
             return result.success(
                 ImageDocumentSerializers.Preview(
@@ -125,7 +110,7 @@ class ImageDocumentView:
             responses=ImageBatchCreateAPI.get_response(),
             tags=[_("Knowledge Base/Images")],  # type: ignore
         )
-        @_document_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE)
+        @has_permissions(knowledge_permission(PermissionConstants.KNOWLEDGE_IMAGE_CREATE))
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
                 ImageDocumentSerializers.Preview(

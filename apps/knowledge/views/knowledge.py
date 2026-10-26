@@ -1,3 +1,10 @@
+from knowledge.permissions import (
+    knowledge_permission,
+    check_knowledge_edit_permission,
+    check_knowledge_detail_permission,
+    filter_knowledge_detail,
+)
+from knowledge.serializers.knowledge import preserve_knowledge_metadata
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
@@ -99,14 +106,9 @@ class KnowledgeView(APIView):
             tags=[_("Knowledge Base")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_EDIT),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_SETTING_EDIT),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_STRATEGY_EDIT),
         )
         @log(
             menu="Knowledge Base",
@@ -114,11 +116,11 @@ class KnowledgeView(APIView):
             get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get("knowledge_id")),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
-            return result.success(
-                KnowledgeSerializer.Operate(
-                    data={"user_id": request.user.id, "workspace_id": workspace_id, "knowledge_id": knowledge_id}
-                ).edit(request.data)
-            )
+            check_knowledge_edit_permission(request, workspace_id, knowledge_id)
+            detail = KnowledgeSerializer.Operate(
+                data={"user_id": request.user.id, "workspace_id": workspace_id, "knowledge_id": knowledge_id}
+            ).edit(preserve_knowledge_metadata(workspace_id, knowledge_id, request.data))
+            return result.success(filter_knowledge_detail(request, workspace_id, knowledge_id, detail))
 
         @extend_schema(
             methods=["DELETE"],
@@ -162,21 +164,26 @@ class KnowledgeView(APIView):
             tags=[_("Knowledge Base")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_IMAGE_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_WORKFLOW_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_PROBLEM_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_TAG_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_TERMBASE_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_CHAT_USER_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_HIT_TEST),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_SETTING_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_STRATEGY_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_SCHEDULED_SYNC_READ),
+            knowledge_permission(PermissionConstants.KNOWLEDGE_EXTERNAL_SERVICE_READ),
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
-            return result.success(
-                KnowledgeSerializer.Operate(
-                    data={"user_id": request.user.id, "workspace_id": workspace_id, "knowledge_id": knowledge_id}
-                ).one()
-            )
+            check_knowledge_detail_permission(request, workspace_id, knowledge_id)
+            detail = KnowledgeSerializer.Operate(
+                data={"user_id": request.user.id, "workspace_id": workspace_id, "knowledge_id": knowledge_id}
+            ).one()
+            return result.success(filter_knowledge_detail(request, workspace_id, knowledge_id, detail))
 
     class BatchDelete(APIView):
         authentication_classes = [TokenAuth]
@@ -361,16 +368,7 @@ class KnowledgeView(APIView):
             responses=KnowledgeSyncSettingAPI.get_response(),
             tags=[_("Knowledge Base")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(knowledge_permission(PermissionConstants.KNOWLEDGE_SCHEDULED_SYNC_READ))
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
                 KnowledgeSyncSettingOperationSerializer(
@@ -388,16 +386,7 @@ class KnowledgeView(APIView):
             responses=KnowledgeSyncSettingAPI.get_response(),
             tags=[_("Knowledge Base")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_SYNC.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_SYNC.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(knowledge_permission(PermissionConstants.KNOWLEDGE_SCHEDULED_SYNC_EDIT))
         @log(
             menu="Knowledge Base",
             operate="Update knowledge scheduled synchronization setting",
@@ -422,16 +411,7 @@ class KnowledgeView(APIView):
             responses=KnowledgeSyncLogAPI.get_response(),
             tags=[_("Knowledge Base")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(knowledge_permission(PermissionConstants.KNOWLEDGE_SCHEDULED_SYNC_READ))
         def get(
             self,
             request: Request,

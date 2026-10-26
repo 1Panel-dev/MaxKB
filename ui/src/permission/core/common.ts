@@ -10,8 +10,8 @@
  * `permissions` 位图对不上）：
  *  - 每个「组(group)」用一个整数位图存放该组内所有操作(operate)的授权位，
  *    某个操作是否被授权 = `bitmap & (1 << bitIndex)`。
- *  - 非资源权限的 key = Permission.toString()（如 `KNOWLEDGE_DOCUMENT_READ`）。
- *  - 资源级权限的 key = `${group}:w:${workspaceId}:r:${resourceId}`。
+ *  - 知识库（Workspace／System 资源管理）按 group + subGroup 隔离位图，其余组沿用 group。
+ *  - 资源级权限在上述 key 后追加 `:w:${workspaceId}:r:${resourceId}`。
  */
 
 /** 权限组：一个组通常对应前端一个菜单。枚举值需与后端 `Group` 的 value 一致。 */
@@ -23,6 +23,11 @@ export enum Group {
   TOOL = 'TOOL',
   TRIGGER = 'TRIGGER',
   FOLDER = 'FOLDER',
+  IMAGE = 'IMAGE',
+  SCHEDULED_SYNC = 'SCHEDULED_SYNC',
+  DOCUMENT_STRATEGY = 'DOCUMENT_STRATEGY',
+  EXTERNAL_SERVICE = 'EXTERNAL_SERVICE',
+  KNOWLEDGE_SETTING = 'KNOWLEDGE_SETTING',
   DOCUMENT = 'DOCUMENT',
   WORKFLOW = 'WORKFLOW',
   TAG = 'TAG',
@@ -255,7 +260,7 @@ export class Permission {
   getResourcePermissionKey(): string {
     const workspace = this.workspaceId ? `:w:${this.workspaceId}` : ''
     const resource = this.resourceId ? `:r:${this.resourceId}` : ''
-    const group = this.group === Group.SYSTEM_RES_KNOWLEDGE && this.subGroup !== this.group ? `${this.group}_${this.subGroup}` : this.group
+    const group = (this.group === Group.SYSTEM_RES_KNOWLEDGE || this.group === Group.KNOWLEDGE) && this.subGroup !== this.group ? `${this.group}_${this.subGroup}` : this.group
     return `${group}${workspace}${resource}`
   }
 

@@ -5,7 +5,7 @@ import { FOLDER_ENTRY_ID } from '@/constants'
 import type { KnowledgeDetail } from '@/api/types'
 import ResourceDetailLayout from '@/layout/ResourceDetailLayout.vue'
 import { provideKnowledgeDetailContext } from './context'
-import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { isWorkspaceResource, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'KnowledgeDetailView' })
 
@@ -24,7 +24,7 @@ const { knowledgeId, resourceApi, listRouteName } = provideKnowledgeDetailContex
 })
 
 const detailSection = computed(() => {
-  if (!isSystemResource()) return undefined
+  if (!isSystemResource() && !isWorkspaceResource()) return undefined
   if (String(route.name).endsWith('document-strategy')) return 'document_strategy' as const
   if (String(route.name).endsWith('setting')) return 'setting' as const
   return undefined

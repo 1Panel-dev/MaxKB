@@ -171,7 +171,7 @@ class BatchCancelInstanceSerializer(serializers.Serializer):
         _type = self.data.get("type")
         try:
             TaskType(_type)
-        except Exception as e:
+        except Exception:
             raise AppApiException(500, _("task type not support"))
 
 
@@ -194,7 +194,7 @@ class CancelInstanceSerializer(serializers.Serializer):
         _type = self.data.get("type")
         try:
             TaskType(_type)
-        except Exception as e:
+        except Exception:
             raise AppApiException(500, _("task type not support"))
 
 
@@ -355,6 +355,19 @@ class BatchEditHitHandlingSerializer(serializers.Serializer):
         super().is_valid(raise_exception=True)
         if self.data.get("hit_handling_method") not in ["optimization", "directly_return"]:
             raise AppApiException(500, _("The type only supports optimization|directly_return"))
+
+
+def normalize_document_resource_type(knowledge_id, instance, field_name="id_list"):
+    """Legacy batch callers omit resource_type; resolve it from their persisted documents."""
+    if instance.get("resource_type") or not instance.get(field_name):
+        return instance
+    document_ids = serializers.ListField(child=serializers.UUIDField()).run_validation(instance[field_name])
+    resource_types = set(
+        Document.objects.filter(knowledge_id=knowledge_id, id__in=document_ids).values_list("resource_type", flat=True)
+    )
+    if len(resource_types) > 1:
+        raise serializers.ValidationError("Select documents of the same resource type")
+    return {**instance, "resource_type": next(iter(resource_types), DocumentResourceType.DOCUMENT)}
 
 
 class DocumentSerializers(serializers.Serializer):
@@ -845,7 +858,7 @@ class DocumentSerializers(serializers.Serializer):
             data_dict, document_dict = self.merge_problem(paragraph_list, problem_mapping_list, [document])
             workbook = self.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
+            response["Content-Disposition"] = 'attachment; filename="data.xlsx"'
             workbook.save(response)
             return response
 
@@ -1069,7 +1082,7 @@ class DocumentSerializers(serializers.Serializer):
 
             try:
                 tokenize_by_document.delay(document_id, state_list)
-            except AlreadyQueued as e:
+            except AlreadyQueued:
                 raise AppApiException(500, _("The task is being executed, please do not send it repeatedly."))
 
         @staticmethod
@@ -1897,7 +1910,7 @@ class DocumentSerializers(serializers.Serializer):
                     DocumentSerializers.Operate(
                         data={"knowledge_id": knowledge_id, "document_id": document_id}
                     ).tokenize(state_list)
-                except AlreadyQueued as e:
+                except AlreadyQueued:
                     pass
 
         def batch_add_tag(self, instance: Dict, with_valid=True):
@@ -2061,7 +2074,7 @@ class DocumentSerializers(serializers.Serializer):
                     generate_related_by_document_id.delay(
                         document_id, model_id, model_params_setting, prompt, state_list
                     )
-            except AlreadyQueued as e:
+            except AlreadyQueued:
                 pass
 
     class Tags(serializers.Serializer):

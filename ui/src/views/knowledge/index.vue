@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { perm } from '@/permission'
 import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { computed, ref, useTemplateRef } from 'vue'
@@ -274,7 +275,7 @@ function handleBatchDelete() {
                   <GenerateQuestionsAction v-model:loading="knowledgeOperationLoading" label="生成问题" :api="KnowledgeApi" :knowledge="knowledge" />
 
                   <!-- 设置 -->
-                  <MkDropdownItem @click.stop="handleOpenKnowledgeSetting(knowledge)">
+                  <MkDropdownItem v-if="perm.knowledge.workspace.settingRead(knowledge.id)" @click.stop="handleOpenKnowledgeSetting(knowledge)">
                     <template #icon><MkIcon name="icon_setting" /></template>
                     设置
                   </MkDropdownItem>

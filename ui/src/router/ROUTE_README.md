@@ -152,7 +152,8 @@ Chat 导航守卫（`chat/index.ts`）：
 | `canAccess`          | `(params) => boolean`                                                       | 工作流返回详情时的访问判断                                                |
 | `resource`           | `ResourceAuthorizationType`                                                 | 系统资源授权页面当前管理的后端资源类型                                    |
 
-System 资源知识库的详情子路由使用现有 `meta.permission` 访问判断；二级菜单应用相同判断并隐藏空分组。
+Workspace 和 System 资源知识库的详情子路由使用现有 `meta.permission` 访问判断；二级菜单应用相同判断并隐藏空分组。
+Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权限回退保留目标参数、query 和 hash。
 `detailMenuVisible` 继续只处理知识库类型。进入详情时优先选择有查看权限的子页，缺少文档权限时不会固定落到文档页。
 
 ## 导航生成
@@ -228,7 +229,7 @@ Drawer、Dialog 通常不根据 path、路由名称或 Scope 自行维护 API �
 ### 知识库
 
 四种来源独立维护 children，不使用共享子路由生成函数；复用相同 View，菜单顺序和类型条件一致。
-以下路径相对 Admin base，详情后默认进入 `/document`。
+以下路径相对 Admin base，普通 Workspace 和 System 资源管理详情优先进入有查看权限的页面，共享详情默认进入 `/document`。
 
 | 来源            | 详情路径                                                      | 详情父路由名                        | 全屏工作流名                          |
 | --------------- | ------------------------------------------------------------- | ----------------------------------- | ------------------------------------- |

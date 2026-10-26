@@ -1,3 +1,9 @@
+from knowledge.permissions import (
+    batch_document_permission,
+    cancel_document_task_permission,
+    document_list_permission,
+    document_permission,
+)
 import json
 
 from common.auth import TokenAuth
@@ -44,7 +50,7 @@ from knowledge.api.document import (
 )
 from knowledge.api.tag import DocsTagDeleteAPI
 from knowledge.serializers.common import get_knowledge_operation_object
-from knowledge.serializers.document import DocumentSerializers
+from knowledge.serializers.document import DocumentSerializers, normalize_document_resource_type
 from knowledge.views.common import (
     get_document_operation_object,
     get_document_operation_object_batch,
@@ -121,16 +127,7 @@ class DocumentView(APIView):
         responses=DocumentTreeReadAPI.get_response(),
         tags=[_("Knowledge Base/Documentation")],  # type: ignore
     )
-    @has_permissions(
-        PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
-        PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_permission_workspace_manage_role(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
-    )
+    @has_permissions(document_list_permission)
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
         raw_tags = request.query_params.getlist("tags[]")
         return result.success(
@@ -163,14 +160,7 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_READ, PermissionConstants.KNOWLEDGE_IMAGE_READ)
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             operate = DocumentSerializers.Operate(
@@ -189,14 +179,7 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT, PermissionConstants.KNOWLEDGE_IMAGE_EDIT)
         )
         @log(
             menu="document",
@@ -222,14 +205,10 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE,
+                PermissionConstants.KNOWLEDGE_IMAGE_DELETE,
+            )
         )
         @log(
             menu="document",
@@ -385,14 +364,9 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            batch_document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT, PermissionConstants.KNOWLEDGE_IMAGE_EDIT
+            )
         )
         @log(
             menu="document",
@@ -406,7 +380,7 @@ class DocumentView(APIView):
             return result.success(
                 DocumentSerializers.Batch(
                     data={"knowledge_id": knowledge_id, "workspace_id": workspace_id}
-                ).batch_edit_hit_handling(request.data)
+                ).batch_edit_hit_handling(normalize_document_resource_type(knowledge_id, request.data, "id_list"))
             )
 
     class SyncWeb(APIView):
@@ -422,16 +396,7 @@ class DocumentView(APIView):
             responses=SyncWebAPI.get_response(),
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC, None))
         @log(
             menu="document",
             operate="Synchronize web site types",
@@ -466,14 +431,10 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR,
+                PermissionConstants.KNOWLEDGE_IMAGE_VECTOR,
+            )
         )
         @log(
             menu="document",
@@ -504,14 +465,10 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_TOKEN,
+                PermissionConstants.KNOWLEDGE_IMAGE_TOKEN,
+            )
         )
         @log(
             menu="document",
@@ -540,16 +497,7 @@ class DocumentView(APIView):
             responses=CancelTaskAPI.get_response(),
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(cancel_document_task_permission(batch=False))
         @log(
             menu="document",
             operate="Cancel task",
@@ -577,16 +525,7 @@ class DocumentView(APIView):
             responses=BatchCancelTaskAPI.get_response(),
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(cancel_document_task_permission(batch=True))
         @log(
             menu="document",
             operate="Cancel tasks in batches",
@@ -599,7 +538,7 @@ class DocumentView(APIView):
             return result.success(
                 DocumentSerializers.Batch(
                     data={"knowledge_id": knowledge_id, "workspace_id": workspace_id}
-                ).batch_cancel(request.data)
+                ).batch_cancel(normalize_document_resource_type(knowledge_id, request.data, "id_list"))
             )
 
     class BatchCreate(APIView):
@@ -655,18 +594,7 @@ class DocumentView(APIView):
             responses=DocumentBatchAPI.get_response(),
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC.get_workspace_permission_workspace_manage_role(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(batch_document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_SYNC, None))
         @log(
             menu="document",
             operate="Batch sync documents",
@@ -696,16 +624,10 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE.get_workspace_permission_workspace_manage_role(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            batch_document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE,
+                PermissionConstants.KNOWLEDGE_IMAGE_DELETE,
+            )
         )
         @log(
             menu="document",
@@ -735,16 +657,10 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_permission_workspace_manage_role(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            batch_document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR,
+                PermissionConstants.KNOWLEDGE_IMAGE_VECTOR,
+            )
         )
         @log(
             menu="document",
@@ -774,14 +690,10 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TOKEN.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TOKEN.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            batch_document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_TOKEN,
+                PermissionConstants.KNOWLEDGE_IMAGE_TOKEN,
+            )
         )
         @log(
             menu="document",
@@ -795,7 +707,7 @@ class DocumentView(APIView):
             return result.success(
                 DocumentSerializers.Batch(
                     data={"workspace_id": workspace_id, "knowledge_id": knowledge_id}
-                ).batch_tokenize(request.data)
+                ).batch_tokenize(normalize_document_resource_type(knowledge_id, request.data, "id_list"))
             )
 
     class BatchAddTag(APIView):
@@ -811,14 +723,11 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            batch_document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_TAG,
+                PermissionConstants.KNOWLEDGE_IMAGE_TAG,
+                id_field="document_ids",
+            )
         )
         @log(
             menu="document",
@@ -832,7 +741,7 @@ class DocumentView(APIView):
             return result.success(
                 DocumentSerializers.Batch(
                     data={"workspace_id": workspace_id, "knowledge_id": knowledge_id}
-                ).batch_add_tag(request.data)
+                ).batch_add_tag(normalize_document_resource_type(knowledge_id, request.data, "document_ids"))
             )
 
     class BatchGenerateRelated(APIView):
@@ -849,16 +758,11 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_GENERATE.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_GENERATE.get_workspace_permission_workspace_manage_role(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            batch_document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_GENERATE,
+                PermissionConstants.KNOWLEDGE_IMAGE_GENERATE,
+                id_field="document_id_list",
+            )
         )
         @log(
             menu="document",
@@ -872,22 +776,15 @@ class DocumentView(APIView):
             return result.success(
                 DocumentSerializers.BatchGenerateRelated(
                     data={"workspace_id": workspace_id, "knowledge_id": knowledge_id}
-                ).batch_generate_related(request.data)
+                ).batch_generate_related(
+                    normalize_document_resource_type(knowledge_id, request.data, "document_id_list")
+                )
             )
 
     class BatchExport(APIView):
         authentication_classes = [TokenAuth]
 
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(batch_document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT, None, id_field=None))
         @log(
             menu="document",
             operate="Export multiple document",
@@ -904,16 +801,7 @@ class DocumentView(APIView):
     class BatchExportZip(APIView):
         authentication_classes = [TokenAuth]
 
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(batch_document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT, None, id_field=None))
         @log(
             menu="document",
             operate="Export multiple document",
@@ -939,16 +827,7 @@ class DocumentView(APIView):
             responses=DocumentTreeReadAPI.get_response(),
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(document_list_permission)
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page: int, page_size: int):
             raw_tags = request.query_params.getlist("tags[]")
 
@@ -985,16 +864,7 @@ class DocumentView(APIView):
             responses=DocumentExportAPI.get_response(),
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT, None))
         @log(
             menu="document",
             operate="Export document",
@@ -1018,16 +888,7 @@ class DocumentView(APIView):
             responses=DocumentExportAPI.get_response(),
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
-        @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
-        )
+        @has_permissions(document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_EXPORT, None))
         @log(
             menu="document",
             operate="Export Zip document",
@@ -1052,14 +913,10 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE,
+                PermissionConstants.KNOWLEDGE_IMAGE_DOWNLOAD_SOURCE_FILE,
+            )
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return DocumentSerializers.Operate(
@@ -1077,14 +934,10 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_REPLACE.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_REPLACE.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_REPLACE,
+                PermissionConstants.KNOWLEDGE_IMAGE_REPLACE,
+            )
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(
@@ -1110,14 +963,7 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_TAG, PermissionConstants.KNOWLEDGE_IMAGE_TAG)
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(
@@ -1140,14 +986,7 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            document_permission(PermissionConstants.KNOWLEDGE_DOCUMENT_TAG, PermissionConstants.KNOWLEDGE_IMAGE_TAG)
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(
@@ -1174,14 +1013,10 @@ class DocumentView(APIView):
                 tags=[_("Knowledge Base/Documentation")],  # type: ignore
             )
             @has_permissions(
-                PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
-                PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
-                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-                ViewPermission(
-                    [RoleConstants.USER.get_workspace_role()],
-                    [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                    compare=CompareConstants.AND,
-                ),
+                document_permission(
+                    PermissionConstants.KNOWLEDGE_DOCUMENT_TAG,
+                    PermissionConstants.KNOWLEDGE_IMAGE_TAG,
+                )
             )
             @log(
                 menu="document",
@@ -1215,14 +1050,10 @@ class DocumentView(APIView):
                 tags=[_("Knowledge Base/Tag")],  # type: ignore
             )
             @has_permissions(
-                PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
-                PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
-                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-                ViewPermission(
-                    [RoleConstants.USER.get_workspace_role()],
-                    [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                    compare=CompareConstants.AND,
-                ),
+                batch_document_permission(
+                    PermissionConstants.KNOWLEDGE_DOCUMENT_TAG,
+                    PermissionConstants.KNOWLEDGE_IMAGE_TAG,
+                )
             )
             @log(
                 menu="tag",
@@ -1255,14 +1086,11 @@ class DocumentView(APIView):
             tags=[_("Knowledge Base/Documentation")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_MIGRATE.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_MIGRATE.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
+            batch_document_permission(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_MIGRATE,
+                PermissionConstants.KNOWLEDGE_IMAGE_MIGRATE,
+                id_field=None,
+            )
         )
         @log(
             menu="document",

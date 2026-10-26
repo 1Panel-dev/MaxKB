@@ -1,7 +1,7 @@
 from django.urls import path
 
 from . import views
-from knowledge.views.external_service import ExternalServiceView
+from knowledge.views.external_service import ExternalServiceView, KnowledgeMcpConfigView
 from knowledge.views.tag_import import KnowledgeTagImportView, KnowledgeTagTemplateView
 
 app_name = "knowledge"
@@ -31,6 +31,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/generate_related', views.KnowledgeView.GenerateRelated.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/embedding', views.KnowledgeView.Embedding.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/external_service', ExternalServiceView.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/mcp_config', KnowledgeMcpConfigView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tokenize', views.KnowledgeView.Tokenize.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/hit_test', views.KnowledgeView.HitTest.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/export', views.KnowledgeView.Export.as_view()),

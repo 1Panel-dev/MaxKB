@@ -20,7 +20,7 @@ class Cache_Version(Enum):
     # 当前用户所有的角色
     ROLE_LIST = "ROLE:LIST", lambda user_id: user_id
     # 当前用户所有权限
-    PERMISSION_LIST = "PERMISSION:LIST:V2", lambda user_id: user_id
+    PERMISSION_LIST = "PERMISSION:LIST:V3", lambda user_id: user_id
     # 验证码
     CAPTCHA = "CAPTCHA", lambda captcha: captcha
     # 系统

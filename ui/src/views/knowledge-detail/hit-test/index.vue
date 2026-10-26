@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { perm } from '@/permission'
-import { isSystemResource } from '@/utils/resource-context'
+import { isSystemResource, isWorkspaceResource } from '@/utils/resource-context'
 import { computed, nextTick, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
@@ -51,7 +51,15 @@ const selectedParagraph = ref<KnowledgeHitTestResult>()
 const paragraphDialogRef = useTemplateRef<InstanceType<typeof ParagraphDialog>>('paragraphDialogRef')
 
 function canReadParagraph(paragraph: KnowledgeHitTestResult) {
-  return !isSystemResource() || (paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE ? perm.knowledge.system.image.read() : perm.knowledge.system.docRead())
+  const isImage = paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE
+  if (isSystemResource()) return isImage ? perm.knowledge.system.image.read() : perm.knowledge.system.docRead()
+  return !isWorkspaceResource() || (isImage ? perm.knowledge.workspace.image.read(knowledgeId.value) : perm.knowledge.workspace.docRead(knowledgeId.value))
+}
+
+function canEditParagraph(paragraph: KnowledgeHitTestResult) {
+  const isImage = paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE
+  if (isSystemResource()) return isImage ? perm.knowledge.system.image.edit() : perm.knowledge.system.docEdit()
+  return !isWorkspaceResource() || (isImage ? perm.knowledge.workspace.image.edit(knowledgeId.value) : perm.knowledge.workspace.docEdit(knowledgeId.value))
 }
 
 async function handleOpenParagraph(paragraph: KnowledgeHitTestResult) {
@@ -225,7 +233,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
   <ParagraphDialog
     v-if="selectedParagraph"
     ref="paragraphDialogRef"
-    :readonly="isSystemResource() && (selectedParagraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE ? !perm.knowledge.system.image.edit() : !perm.knowledge.system.docEdit())"
+    :readonly="!canEditParagraph(selectedParagraph)"
     title="分段详情"
     :knowledge-id="selectedParagraph.knowledge_id"
     :document-id="selectedParagraph.document_id"

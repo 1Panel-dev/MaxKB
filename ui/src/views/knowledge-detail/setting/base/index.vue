@@ -8,15 +8,15 @@ import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { KnowledgeItem } from '@/api/types'
 import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
+import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
 import { useKnowledgeDetailContext } from '../../context'
 
-const canEdit = () => !isWorkspaceSharedResource() && (!isSystemResource() || perm.knowledge.system.settingEdit())
+const canEdit = () => !isWorkspaceSharedResource() && (isSystemResource() ? perm.knowledge.system.settingEdit() : !isWorkspaceResource() || perm.knowledge.workspace.settingEdit(knowledgeId.value))
 
 defineOptions({ name: 'KnowledgeBaseSettingView' })
 
-const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
+const { knowledge, knowledgeId, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 
 /* 详情与基本信息 */
 

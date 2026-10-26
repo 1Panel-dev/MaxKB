@@ -4,17 +4,17 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { ref, useTemplateRef, watch } from 'vue'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
+import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '../../context'
 
-const canEdit = () => !isWorkspaceSharedResource() && (!isSystemResource() || perm.knowledge.system.documentStrategyEdit())
+const canEdit = () => !isWorkspaceSharedResource() && (isSystemResource() ? perm.knowledge.system.documentStrategyEdit() : !isWorkspaceResource() || perm.knowledge.workspace.documentStrategyEdit(knowledgeId.value))
 
 defineOptions({ name: 'KnowledgeDocumentStrategyView' })
 
 defineProps<ResourceDetailPageProps>()
 
 /* 复用详情回填策略，草稿由表单维护。 */
-const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
+const { knowledge, knowledgeId, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 const strategyFormRef = useTemplateRef<InstanceType<typeof DocumentStrategyForm>>('strategyFormRef')
 const saving = ref(false)
 watch(

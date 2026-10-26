@@ -98,7 +98,7 @@ def get_permissions(
                     )
                     all_permissions = [_permission for _permission in all_permissions if _permission is not None]
                     for group, permissions in group_by(
-                        all_permissions, lambda _permission: _permission.value.group
+                        all_permissions, lambda _permission: _permission.value.get_resource_permission_key(None)
                     ).items():
                         k = f"{group}:w:{_.workspace_id}:r:{_.target}"
                         bits = reduce(lambda x, y: x | y, [_permission.value.bit() for _permission in permissions], 0)
@@ -113,7 +113,7 @@ def get_permissions(
                             if p is not None and PermissionScopeConstants.WORKSPACE_RESOURCE in p.meta.scope:
                                 permissions.append(p)
 
-                    for group, ps in group_by(permissions, lambda p: p.value.group).items():
+                    for group, ps in group_by(permissions, lambda p: p.value.get_resource_permission_key(None)).items():
                         k = f"{group}:w:{_.workspace_id}:r:{_.target}"
                         bits = reduce(lambda x, y: x | y, [p.value.bit() for p in ps], 0)
                         permission_map[k] = permission_map.get(k, 0) | bits
@@ -131,7 +131,7 @@ def get_permissions(
                     for _permission in permissions
                     if _permission is not None and PermissionScopeConstants.WORKSPACE in _permission.meta.scope
                 ]
-                for group, ps in group_by(permissions, lambda p: p.value.group).items():
+                for group, ps in group_by(permissions, lambda p: p.value.get_resource_permission_key(None)).items():
                     k = f"{group}:w:{_.workspace_id}"
                     bits = reduce(lambda x, y: x | y, [p.value.bit() for p in ps], 0)
                     permission_map[k] = permission_map.get(k, 0) | bits
@@ -174,7 +174,7 @@ def get_permissions(
                         ]
                     )
                     for group, permissions in group_by(
-                        all_permissions, lambda _permission: _permission.value.group
+                        all_permissions, lambda _permission: _permission.value.get_resource_permission_key(None)
                     ).items():
                         permission_map[f"{group}:w:{_.workspace_id}:r:{_.target}"] = reduce(
                             lambda x, y: x | y, [_permission.value.bit() for _permission in permissions], 0

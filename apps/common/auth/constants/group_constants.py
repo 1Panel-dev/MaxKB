@@ -34,6 +34,11 @@ class Group(Enum):
     FOLDER = ("FOLDER", _("Folder"))
 
     # 子分组 - 知识库
+    IMAGE = ("IMAGE", _("Image"))
+    SCHEDULED_SYNC = ("SCHEDULED_SYNC", _("Scheduled synchronization"))
+    DOCUMENT_STRATEGY = ("DOCUMENT_STRATEGY", _("Document processing strategy"))
+    EXTERNAL_SERVICE = ("EXTERNAL_SERVICE", _("External service"))
+    KNOWLEDGE_SETTING = ("KNOWLEDGE_SETTING", _("Knowledge settings"))
     DOCUMENT = ("DOCUMENT", _("Document"))
     WORKFLOW = ("WORKFLOW", _("Workflow"))
     TAG = ("TAG", _("Tag"))

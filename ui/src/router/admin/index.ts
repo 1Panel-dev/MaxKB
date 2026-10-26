@@ -76,20 +76,20 @@ router.beforeEach(async (to, from) => {
     }
     visited.add(currentName)
 
-    const currentRoute = router.resolve({ name: currentName })
+    const currentRoute = router.resolve({ name: currentName, params: to.params })
     const nextName = currentRoute?.meta?.next as string
 
     if (!nextName) {
       return { name: 'no-permission', replace: true }
     }
 
-    const nextRoute = router.resolve({ name: nextName })
+    const nextRoute = router.resolve({ name: nextName, params: to.params })
     if (nextRoute?.name) {
       const nextPermission = nextRoute.meta?.permission as (
         route?: RouteLocationNormalized | RouteLocationResolvedGeneric | RouteLocationNormalizedLoaded,
       ) => boolean
       if (!nextPermission || nextPermission(nextRoute)) {
-        return { name: nextName, replace: true }
+        return { name: nextName, params: to.params, query: to.query, hash: to.hash, replace: true }
       }
     }
 

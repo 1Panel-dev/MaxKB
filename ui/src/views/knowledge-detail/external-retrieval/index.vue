@@ -6,9 +6,9 @@ import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetti
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
+import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
 
-const canEdit = () => !isWorkspaceSharedResource() && (!isSystemResource() || perm.knowledge.system.externalServiceEdit())
+const canEdit = () => !isWorkspaceSharedResource() && (isSystemResource() ? perm.knowledge.system.externalServiceEdit() : !isWorkspaceResource() || perm.knowledge.workspace.externalServiceEdit(knowledgeId.value))
 
 defineOptions({ name: 'ExternalRetrievalView' })
 defineProps<ResourceDetailPageProps>()

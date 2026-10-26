@@ -216,6 +216,17 @@ class HitTestSerializer(serializers.Serializer):
         return attrs
 
 
+def preserve_knowledge_metadata(workspace_id, knowledge_id, instance):
+    """Preserve configuration omitted from a permission-filtered settings form."""
+    if not isinstance(instance.get("meta"), dict):
+        return instance
+    stored = (
+        Knowledge.objects.filter(id=knowledge_id, workspace_id=workspace_id).values_list("meta", flat=True).first()
+        or {}
+    )
+    return {**instance, "meta": {**stored, **instance["meta"]}}
+
+
 class KnowledgeSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
         workspace_id = serializers.CharField(required=True)

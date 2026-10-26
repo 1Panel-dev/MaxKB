@@ -16,7 +16,7 @@ const scopedRoutes: RouteRecordRaw[] = [workspaceRoutes, systemRoutes]
 function createMenuItems(routes: readonly MenuRouteRecord[], detailParams?: RouteParamsGeneric): LayoutMenuItem[] {
   return routes
     .filter((route) => route.name && route.meta?.title && route.meta.hidden !== true)
-    .filter((route) => !detailParams || ((route.meta?.detailMenuVisible?.(detailParams) ?? true) && (!route.meta?.permission || (route.meta.permission as () => boolean)())))
+    .filter((route) => !detailParams || ((route.meta?.detailMenuVisible?.(detailParams) ?? true) && (!route.meta?.permission || (route.meta.permission as (route: { params: RouteParamsGeneric }) => boolean)({ params: detailParams }))))
     .sort((a, b) => (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER))
     .map((route) => {
       const children = route.children ? createMenuItems(route.children, detailParams) : []
@@ -27,7 +27,9 @@ function createMenuItems(routes: readonly MenuRouteRecord[], detailParams?: Rout
         activeIcon: route.meta?.activeIcon,
         icon: route.meta?.icon,
         route: { name: route.name! },
-        permission: route.meta?.permission as LayoutMenuItem['permission'],
+        permission: detailParams && route.meta?.permission
+          ? () => (route.meta!.permission as (route: { params: RouteParamsGeneric }) => boolean)({ params: detailParams })
+          : route.meta?.permission as LayoutMenuItem['permission'],
         children: route.children?.length ? children : undefined,
       }
     })

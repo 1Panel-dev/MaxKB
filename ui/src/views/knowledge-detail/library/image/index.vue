@@ -47,7 +47,7 @@ const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const { knowledge, resourceApi } = useKnowledgeDetailContext()
 
-const canImage = (action: keyof typeof perm.knowledge.system.image) => !isWorkspaceSharedResource() && (!isSystemResource() || perm.knowledge.system.image[action]())
+const canImage = (action: keyof typeof perm.knowledge.system.image) => !isWorkspaceSharedResource() && (isSystemResource() ? perm.knowledge.system.image[action]() : !isWorkspaceResource() || perm.knowledge.workspace.image[action](knowledgeId.value))
 
 /* 图片分段详情：取首个分段，弹窗关闭后卸载。 */
 const paragraphDialogRef = ref<InstanceType<typeof ParagraphDialog>>()

@@ -9,18 +9,18 @@ import { SCHEDULE_OPTION } from '@/constants/schedule'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
-import { getResourceScope, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
+import { getResourceScope, isWorkspaceResource, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '../../context'
 import SyncLogTable from './components/SyncLogTable.vue'
 
-const canEdit = () => !isWorkspaceSharedResource() && (!isSystemResource() || perm.knowledge.system.scheduledSyncEdit())
+const canEdit = () => !isWorkspaceSharedResource() && (isSystemResource() ? perm.knowledge.system.scheduledSyncEdit() : !isWorkspaceResource() || perm.knowledge.workspace.scheduledSyncEdit(knowledgeId.value))
 
 defineOptions({ name: 'KnowledgeScheduledSyncView' })
 
 defineProps<ResourceDetailPageProps>()
 
 // 回填后台配置，草稿与详情中的配置独立。
-const { knowledge, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
+const { knowledge, knowledgeId, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 const activeTab = ref('settings')
 const loading = ref(false)
 const saving = ref(false)
