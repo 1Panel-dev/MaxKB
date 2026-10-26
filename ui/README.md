@@ -61,7 +61,7 @@ OSS 文件接口。前端业务接口需要可用的后端服务。
 `npm run lint` 当前仅配置了 `run-s "lint:*"`，但尚未定义任何 `lint:*` 子脚本，不能作为已执行
 ESLint 检查的依据。需要检查代码时，可运行 `npx eslint <待检查的文件或目录>`。
 
-路由菜单回归测试使用 Node 内置测试运行器：`node --test tests/router-menu.test.mjs`。
+路由菜单与知识库角色权限回归测试使用 Node 内置测试运行器：`node --test tests/*.test.mjs`。
 
 默认构建分别输出 `dist/admin/index.html` 和 `dist/chat/index.html`，HTML 由构建插件统一重命名。
 静态资源使用相对路径（`base: './'`）；部署时仍需为 History 路由配置对应入口回退，

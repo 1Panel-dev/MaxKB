@@ -200,7 +200,7 @@ export class Role {
     this.workspaceId = workspaceId
   }
 
-  /** 对应后端 `Role.__str__`。 */
+  /** 对应后端 `Role.__str__`，空间角色使用 NAME:w:workspaceId。 */
   toString(): string {
     return this.workspaceId ? `${this.name}:w:${this.workspaceId}` : `${this.name}`
   }
