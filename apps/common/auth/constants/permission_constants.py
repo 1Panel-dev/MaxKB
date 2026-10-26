@@ -7,6 +7,8 @@
 @desc: 权限枚举常量（新格式）
 """
 
+from maxkb import settings
+
 from enum import Enum
 from typing import List, Dict
 
@@ -60,8 +62,6 @@ class ResourcePermissionConst:
     MODEL_VIEW = ResourcePermissionGroup(Group.MODEL, "VIEW")
     MODEL_MANAGE = ResourcePermissionGroup(Group.MODEL, "MANAGE")
 
-
-from maxkb import settings
 
 is_ee: bool = settings.edition == "EE"
 
@@ -3469,6 +3469,263 @@ class PermissionConstants(Enum):
         ),
     )
 
+    # 系统知识库独立功能权限；已有权限 ID 和位序保持不变。
+    RESOURCE_KNOWLEDGE_MCP_CONFIG = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE,
+            sub_group=Group.SYSTEM_RES_KNOWLEDGE,
+            operate=Operate.MCP_CONFIG,
+            bit_index=10,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_EXPORT_SKILLS = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE,
+            sub_group=Group.SYSTEM_RES_KNOWLEDGE,
+            operate=Operate.EXPORT_SKILLS,
+            bit_index=11,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_READ = (
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.READ, bit_index=0),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_CREATE = (
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.CREATE, bit_index=1),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_EDIT = (
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.EDIT, bit_index=2),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_DELETE = (
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.DELETE, bit_index=3),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_DOWNLOAD_SOURCE_FILE = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.DOWNLOAD, bit_index=4
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_GENERATE = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.GENERATE, bit_index=5
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_VECTOR = (
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.VECTOR, bit_index=6),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_MIGRATE = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.MIGRATE, bit_index=7
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_TAG = (
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.TAG, bit_index=8),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_REPLACE = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.REPLACE, bit_index=9
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_IMAGE_TOKEN = (
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.TOKEN, bit_index=10),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_SCHEDULED_SYNC_READ = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_SCHEDULED_SYNC, operate=Operate.READ, bit_index=0
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_SCHEDULED_SYNC_EDIT = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_SCHEDULED_SYNC, operate=Operate.EDIT, bit_index=1
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_DOCUMENT_STRATEGY_READ = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE,
+            sub_group=Group.SYSTEM_DOCUMENT_STRATEGY,
+            operate=Operate.READ,
+            bit_index=0,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_DOCUMENT_STRATEGY_EDIT = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE,
+            sub_group=Group.SYSTEM_DOCUMENT_STRATEGY,
+            operate=Operate.EDIT,
+            bit_index=1,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_EXTERNAL_SERVICE_READ = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_EXTERNAL_SERVICE, operate=Operate.READ, bit_index=0
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_EXTERNAL_SERVICE_EDIT = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_EXTERNAL_SERVICE, operate=Operate.EDIT, bit_index=1
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_SETTING_READ = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE,
+            sub_group=Group.SYSTEM_KNOWLEDGE_SETTING,
+            operate=Operate.READ,
+            bit_index=0,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_KNOWLEDGE_SETTING_EDIT = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE,
+            sub_group=Group.SYSTEM_KNOWLEDGE_SETTING,
+            operate=Operate.EDIT,
+            bit_index=1,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
     # ==================== 资源管理 - 工具 ====================
     RESOURCE_TOOL_READ = (
         Permission(group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.READ, bit_index=0),
@@ -3743,7 +4000,6 @@ def group_permissions_by_scope() -> Dict[str, List[Permission]]:
     grouped = {}
 
     for _permission in PermissionConstants:
-        permission = _permission.value
         meta = _permission.meta
         if meta.scope:
             for scope_item in meta.scope:

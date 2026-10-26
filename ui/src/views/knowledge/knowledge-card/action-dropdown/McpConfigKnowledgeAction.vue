@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { perm } from '@/permission'
+import { isSystemResource } from '@/utils/resource-context'
 import { ref } from 'vue'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
@@ -20,7 +22,7 @@ const visible = ref(false)
 const config = ref('')
 
 function handleOpenMcpConfig() {
-  if (loading.value) return
+  if ((isSystemResource() && !perm.knowledge.system.mcpConfig()) || loading.value) return
   loading.value = true
   return props.api
     .getKnowledgeMcpConfig(props.knowledge.id)
@@ -40,7 +42,7 @@ function handleDialogClosed() {
 
 <template>
   <!-- 查看 MCP 配置详情 -->
-  <MkDropdownItem :disabled="loading" @click.stop="handleOpenMcpConfig">
+  <MkDropdownItem v-if="!isSystemResource() || perm.knowledge.system.mcpConfig()" :disabled="loading" @click.stop="handleOpenMcpConfig">
     <template #icon><MkIcon name="icon_describe_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>

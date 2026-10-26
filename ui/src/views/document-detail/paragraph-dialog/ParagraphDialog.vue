@@ -15,6 +15,7 @@ const props = defineProps<{
   documentId: string
   sourceFileId?: string
   title?: string
+  readonly?: boolean
 }>()
 const { resourceApi } = useDocumentDetailContext()
 const emit = defineEmits<{ success: [paragraph: ParagraphItem]; closed: [] }>()
@@ -53,7 +54,7 @@ function open(paragraph: ParagraphItem, initialMode: 'edit' | 'detail' = 'detail
   targetKnowledgeId.value = props.knowledgeId
   targetDocumentId.value = props.documentId
   targetParagraphId.value = paragraph.id
-  mode.value = isWorkspaceSharedResource() ? 'detail' : initialMode
+  mode.value = props.readonly || isWorkspaceSharedResource() ? 'detail' : initialMode
   visible.value = true
   void loadParagraphDetail()
 }
@@ -63,7 +64,7 @@ const paragraphFormRef = ref<InstanceType<typeof ParagraphForm>>()
 const paragraphForm = ref<ParagraphUpdatePayload>({ title: '', content: '' })
 
 function handleEdit() {
-  if (loading.value || !paragraphDetail.value) return
+  if (props.readonly || loading.value || !paragraphDetail.value) return
   paragraphForm.value = { title: paragraphDetail.value.title ?? '', content: paragraphDetail.value.content }
   mode.value = 'edit'
 }
@@ -73,7 +74,7 @@ function handleCancelEdit() {
 }
 
 function handleSubmit() {
-  if (loading.value) return
+  if (props.readonly || loading.value) return
   void paragraphFormRef.value
     ?.validate()
     .then((valid) => {
@@ -114,7 +115,7 @@ defineExpose({ open, close })
         <el-card v-if="mode === 'detail'" shadow="never" class="mk-paragraph-card group relative min-w-0 flex-1" body-class="flex-column h-full">
           <!-- 编辑分段标题和内容 -->
           <el-button
-            v-if="!isWorkspaceSharedResource()"
+            v-if="!readonly && !isWorkspaceSharedResource()"
             circle
             class="group-hover-visible absolute! top-2 right-2 z-10 shadow-md"
             @click="handleEdit"
@@ -137,6 +138,7 @@ defineExpose({ open, close })
         <!-- 关联问题 -->
         <ParagraphQuestions
           v-model="relatedQuestions"
+          :readonly="readonly"
           :knowledge-id="targetKnowledgeId"
           :document-id="targetDocumentId"
           :paragraph-id="targetParagraphId"

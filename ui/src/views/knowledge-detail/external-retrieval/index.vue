@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { perm } from '@/permission'
 import { computed, ref, watch } from 'vue'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetting } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
+
+const canEdit = () => !isWorkspaceSharedResource() && (!isSystemResource() || perm.knowledge.system.externalServiceEdit())
 
 defineOptions({ name: 'ExternalRetrievalView' })
 defineProps<ResourceDetailPageProps>()
@@ -34,7 +37,7 @@ async function loadExternalRetrieval() {
 
 // 仅保存本次切换的字段，成功后按完整响应更新开关及配置示例。
 async function handleSettingChange(field: keyof KnowledgeExternalRetrievalPayload, value: string | number | boolean) {
-  if (!setting.value || loading.value || saving.value || isWorkspaceSharedResource()) return
+  if (!setting.value || loading.value || saving.value || !canEdit()) return
   saving.value = true
   try {
     const result = await resourceApi.externalRetrieval.putKnowledgeExternalRetrieval?.(knowledgeId.value, { [field]: value === true })
@@ -76,7 +79,7 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
         </div>
         <!-- 切换身份认证 -->
         <el-switch
-          :disabled="isWorkspaceSharedResource()"
+          :disabled="!canEdit()"
           :model-value="setting.authentication"
           @change="handleSettingChange('authentication', $event)"
         />
@@ -86,7 +89,7 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
           <span>API 服务地址</span>
           <!-- 切换外部检索服务 -->
           <el-switch
-            :disabled="isWorkspaceSharedResource()"
+            :disabled="!canEdit()"
             :model-value="setting.enabled"
             size="small"
             @change="handleSettingChange('enabled', $event)"

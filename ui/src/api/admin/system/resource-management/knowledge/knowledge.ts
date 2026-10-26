@@ -23,8 +23,8 @@ const getKnowledgePage = (page: ParamsPage, query?: Dict<unknown>) => {
 }
 
 /** 获取系统资源管理知识库详情。 */
-const getKnowledgeDetail = (knowledgeId: string) => {
-  return get<KnowledgeDetail>(`${prefix}/${knowledgeId}`)
+const getKnowledgeDetail = (knowledgeId: string, section?: 'setting' | 'document_strategy') => {
+  return get<KnowledgeDetail>(`${prefix}/${knowledgeId}`, { section })
 }
 
 /** 删除工作空间知识库。 */
@@ -74,7 +74,7 @@ const exportKnowledge = (knowledgeId: string, knowledgeName: string) => {
 
 /** 获取知识库外部检索服务生成的 MCP 连接配置。 */
 const getKnowledgeMcpConfig = (knowledgeId: string): Promise<string> =>
-  get<{ mcp_config: Record<string, unknown> }>(`${prefix}/${knowledgeId}/external_service`).then(({ mcp_config }) =>
+  get<{ mcp_config: Record<string, unknown> }>(`${prefix}/${knowledgeId}/mcp_config`).then(({ mcp_config }) =>
     JSON.stringify(mcp_config, null, 2),
   )
 

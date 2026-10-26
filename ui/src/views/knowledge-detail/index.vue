@@ -23,11 +23,18 @@ const { knowledgeId, resourceApi, listRouteName } = provideKnowledgeDetailContex
   replaceKnowledgeDetail,
 })
 
+const detailSection = computed(() => {
+  if (!isSystemResource()) return undefined
+  if (String(route.name).endsWith('document-strategy')) return 'document_strategy' as const
+  if (String(route.name).endsWith('setting')) return 'setting' as const
+  return undefined
+})
+
 function loadKnowledgeDetail() {
   knowledge.value = undefined
   loading.value = true
   return resourceApi.knowledge
-    .getKnowledgeDetail(knowledgeId.value)
+    .getKnowledgeDetail(knowledgeId.value, detailSection.value)
     .then((detail) => {
       knowledge.value = detail
     })
@@ -50,7 +57,7 @@ function handleBack() {
 }
 
 watch(
-  [() => route.params.workspaceId, knowledgeId, () => route.meta.resourceScope],
+  [() => route.params.workspaceId, knowledgeId, () => route.meta.resourceScope, detailSection],
   () => {
     void loadKnowledgeDetail().catch(() => {})
   },

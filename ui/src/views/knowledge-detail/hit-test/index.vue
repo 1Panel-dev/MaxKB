@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { perm } from '@/permission'
+import { isSystemResource } from '@/utils/resource-context'
 import { computed, nextTick, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
@@ -48,7 +50,12 @@ const submittedQuery = ref<Required<Pick<KnowledgeHitTestPayload, 'query_text' |
 const selectedParagraph = ref<KnowledgeHitTestResult>()
 const paragraphDialogRef = useTemplateRef<InstanceType<typeof ParagraphDialog>>('paragraphDialogRef')
 
+function canReadParagraph(paragraph: KnowledgeHitTestResult) {
+  return !isSystemResource() || (paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE ? perm.knowledge.system.image.read() : perm.knowledge.system.docRead())
+}
+
 async function handleOpenParagraph(paragraph: KnowledgeHitTestResult) {
+  if (!canReadParagraph(paragraph)) return
   if (loading.value || selectedParagraph.value) return
   selectedParagraph.value = paragraph
   await nextTick()
@@ -218,6 +225,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
   <ParagraphDialog
     v-if="selectedParagraph"
     ref="paragraphDialogRef"
+    :readonly="isSystemResource() && (selectedParagraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE ? !perm.knowledge.system.image.edit() : !perm.knowledge.system.docEdit())"
     title="分段详情"
     :knowledge-id="selectedParagraph.knowledge_id"
     :document-id="selectedParagraph.document_id"

@@ -9948,3 +9948,24 @@ msgstr "应用未授权"
 #: apps/chat/serializers/portal.py:221
 msgid "Application historical conversation is not enabled"
 msgstr "应用未开启历史记录"
+
+msgid "Image"
+msgstr "图片"
+
+msgid "Scheduled synchronization"
+msgstr "定时同步"
+
+msgid "Document processing strategy"
+msgstr "文档处理策略"
+
+msgid "External service"
+msgstr "外部服务"
+
+msgid "Knowledge settings"
+msgstr "设置"
+
+msgid "MCP service configuration"
+msgstr "MCP 服务配置"
+
+msgid "Export skills"
+msgstr "导出 skills"

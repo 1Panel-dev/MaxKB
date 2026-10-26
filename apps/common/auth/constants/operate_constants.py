@@ -68,6 +68,8 @@ class Operate(Enum):
     TOKEN = ("READ+TOKEN", _("Token Index"))
     TO_WORKSPACE = ("READ+TO_WORKSPACE", _("Authorize to Workspace"))
     SET_ROLE = ("READ+SET_ROLE", _("Set Role"))
+    MCP_CONFIG = ("READ+MCP_CONFIG", _("MCP service configuration"))
+    EXPORT_SKILLS = ("READ+EXPORT_SKILLS", _("Export skills"))
     QUOTA_SETTING = ("READ+QUOTA_SETTING", _("Quota Setting"))
 
     ABOUT = ("READ", _("About"))

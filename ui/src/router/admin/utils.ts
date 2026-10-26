@@ -16,7 +16,7 @@ const scopedRoutes: RouteRecordRaw[] = [workspaceRoutes, systemRoutes]
 function createMenuItems(routes: readonly MenuRouteRecord[], detailParams?: RouteParamsGeneric): LayoutMenuItem[] {
   return routes
     .filter((route) => route.name && route.meta?.title && route.meta.hidden !== true)
-    .filter((route) => !detailParams || (route.meta?.detailMenuVisible?.(detailParams) ?? true))
+    .filter((route) => !detailParams || ((route.meta?.detailMenuVisible?.(detailParams) ?? true) && (!route.meta?.permission || (route.meta.permission as () => boolean)())))
     .sort((a, b) => (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER))
     .map((route) => {
       const children = route.children ? createMenuItems(route.children, detailParams) : []
@@ -28,9 +28,10 @@ function createMenuItems(routes: readonly MenuRouteRecord[], detailParams?: Rout
         icon: route.meta?.icon,
         route: { name: route.name! },
         permission: route.meta?.permission as LayoutMenuItem['permission'],
-        children: children.length ? children : undefined,
+        children: route.children?.length ? children : undefined,
       }
     })
+    .filter((menuItem) => !menuItem.children || menuItem.children.length > 0)
 }
 
 /** 根据 Workspace 或 System 路由树生成一级侧栏目录。 */

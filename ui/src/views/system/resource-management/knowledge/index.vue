@@ -205,7 +205,7 @@ onMounted(() => {
                   :knowledge="row"
                 />
                 <!-- 设置 -->
-                <MkDropdownItem @click.stop="handleOpenKnowledgeSetting(row)">
+                <MkDropdownItem v-if="$perm.knowledge.system.settingRead()" @click.stop="handleOpenKnowledgeSetting(row)">
                   <template #icon><MkIcon name="icon_setting" /></template>
                   设置
                 </MkDropdownItem>

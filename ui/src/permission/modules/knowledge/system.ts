@@ -32,8 +32,32 @@ const system = {
   relateMap: () => canSys(P.RESOURCE_KNOWLEDGE_RELATE_RESOURCE_VIEW),
   hitTest: () => canSys(P.RESOURCE_KNOWLEDGE_HIT_TEST),
 
+  mcpConfig: () => canSys(P.RESOURCE_KNOWLEDGE_MCP_CONFIG),
+  exportSkills: () => canSys(P.RESOURCE_KNOWLEDGE_EXPORT_SKILLS),
+  scheduledSyncRead: () => canSys(P.RESOURCE_KNOWLEDGE_SCHEDULED_SYNC_READ),
+  scheduledSyncEdit: () => canSys(P.RESOURCE_KNOWLEDGE_SCHEDULED_SYNC_EDIT),
+  documentStrategyRead: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_STRATEGY_READ),
+  documentStrategyEdit: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_STRATEGY_EDIT),
+  externalServiceRead: () => canSys(P.RESOURCE_KNOWLEDGE_EXTERNAL_SERVICE_READ),
+  externalServiceEdit: () => canSys(P.RESOURCE_KNOWLEDGE_EXTERNAL_SERVICE_EDIT),
+  settingRead: () => canSys(P.RESOURCE_KNOWLEDGE_SETTING_READ),
+  settingEdit: () => canSys(P.RESOURCE_KNOWLEDGE_SETTING_EDIT),
+  image: {
+    read: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_READ),
+    create: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_CREATE),
+    edit: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_EDIT),
+    delete: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_DELETE),
+    download: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_DOWNLOAD_SOURCE_FILE),
+    generate: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_GENERATE),
+    vector: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_VECTOR),
+    migrate: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_MIGRATE),
+    tag: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_TAG),
+    replace: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_REPLACE),
+    token: () => canSys(P.RESOURCE_KNOWLEDGE_IMAGE_TOKEN),
+  },
+
   // —— 文档 ——
-  docRead: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ) || canSys(P.RESOURCE_KNOWLEDGE_WORKFLOW_READ),
+  docRead: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ),
   docCreate: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_CREATE),
   docEdit: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_EDIT),
   docDelete: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_DELETE),
@@ -79,7 +103,7 @@ const system = {
   /**
    * 系统「知识库资源管理」（系统 > 资源管理 > 知识库）只读权限
    * */
-  read: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ) && hasEdition(Edition.EE),
+  read: () => canSys(P.RESOURCE_KNOWLEDGE_READ) && hasEdition(Edition.EE),
 }
 
 export default system

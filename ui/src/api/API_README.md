@@ -775,3 +775,10 @@ Workspace 共享版本只提供设置查询和日志分页。定时同步设置�
 仅包含定时任务。周期类型统一复用 `enums/schedule.ts` 的 `SCHEDULE_TYPE`，
 触发器、长期记忆及知识库同步共享同一协议值；日志状态使用 `enums/knowledge.ts` 的 `KNOWLEDGE_SYNC_STATUS`，为 `running`、`success`、
 `failure`、`skipped` 字符串；`KnowledgeSyncStatus` 与 `KnowledgeSyncLog` 经 `@/api/types` 导入。
+
+### 系统知识库权限与详情范围
+
+System 资源管理的 `getKnowledgeDetail(knowledgeId, section?)` 可传 `setting` 或 `document_strategy`，
+对应后台独立的设置／策略查看权限；普通详情会去除未授权的配置元数据。
+`getKnowledgeMcpConfig` 使用 `/<knowledgeId>/mcp_config`，仅获取 MCP 配置，独立于外部服务设置权限。
+文档和图片复用的操作接口按持久化资源类型鉴权；批量图片操作未传 `resource_type` 时由服务端解析实际类型。

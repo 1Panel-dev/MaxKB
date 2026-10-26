@@ -152,6 +152,9 @@ Chat 导航守卫（`chat/index.ts`）：
 | `canAccess`          | `(params) => boolean`                                                       | 工作流返回详情时的访问判断                                                |
 | `resource`           | `ResourceAuthorizationType`                                                 | 系统资源授权页面当前管理的后端资源类型                                    |
 
+System 资源知识库的详情子路由使用现有 `meta.permission` 访问判断；二级菜单应用相同判断并隐藏空分组。
+`detailMenuVisible` 继续只处理知识库类型。进入详情时优先选择有查看权限的子页，缺少文档权限时不会固定落到文档页。
+
 ## 导航生成
 
 `admin/utils.ts` 中的 `getChildRouteList(scope)` 会：

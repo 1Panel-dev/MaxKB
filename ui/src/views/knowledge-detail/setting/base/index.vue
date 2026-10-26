@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { perm } from '@/permission'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { computed, reactive, ref, useTemplateRef, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -7,9 +8,11 @@ import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { KnowledgeItem } from '@/api/types'
 import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
 import { useKnowledgeDetailContext } from '../../context'
+
+const canEdit = () => !isWorkspaceSharedResource() && (!isSystemResource() || perm.knowledge.system.settingEdit())
 
 defineOptions({ name: 'KnowledgeBaseSettingView' })
 
@@ -75,7 +78,7 @@ watch(
 /* 保存设置；更换向量模型时先确认，保存完成后重新向量化 */
 function handleSave() {
   const knowledgeApi = resourceApi.knowledge
-  if (saving.value || isWorkspaceSharedResource() || !('putKnowledge' in knowledgeApi)) return
+  if (saving.value || !canEdit() || !('putKnowledge' in knowledgeApi)) return
   saving.value = true
   return Promise.all([baseFormRef.value?.validate(), settingFormRef.value?.validate().catch(() => false)])
     .then(([baseValid, settingValid]) => {
@@ -204,6 +207,6 @@ defineProps<ResourceDetailPageProps>()
     </el-form>
 
     <!-- 保存知识库设置 -->
-    <el-button v-if="!isWorkspaceSharedResource()" class="mt-4" type="primary" :loading="saving" @click="handleSave">保存</el-button>
+    <el-button v-if="canEdit()" class="mt-4" type="primary" :loading="saving" @click="handleSave">保存</el-button>
   </div>
 </template>

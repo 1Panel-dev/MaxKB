@@ -145,7 +145,9 @@ def get_permissions(
                 for _permission in system_permissions
                 if _permission is not None and PermissionScopeConstants.SYSTEM in _permission.meta.scope
             ]
-            for group, permissions in group_by(system_permissions, lambda _permission: _permission.value.group).items():
+            for group, permissions in group_by(
+                system_permissions, lambda p: p.value.get_resource_permission_key(None)
+            ).items():
                 permission_map[f"{group}"] = reduce(
                     lambda x, y: x | y, [_permission.value.bit() for _permission in permissions], 0
                 )

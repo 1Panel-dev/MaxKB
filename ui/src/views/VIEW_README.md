@@ -153,6 +153,15 @@ Workspace／System 资源管理范围保存、发布，发布前先保存当前�
 弹窗确认只更新页面草稿。模型使用当前范围的共享模型查询和参数接口。系统提示词生成复用
 工作流的 `PromptGenerate`，由页面注入 `resourceScope`，使用当前模型与参数生成后回填草稿。
 
+### 系统知识库权限
+
+System 资源管理的图片操作使用 `$perm.knowledge.system.image`，与文档权限分别授权；
+上传、编辑、生成问题、向量化、迁移、标签、下载、替换、分词和删除入口分别校验对应权限。
+图片详情通过 `ParagraphDialog.readonly` 控制正文和关联问题的编辑入口；召回结果详情同样按资源类型检查。
+基础设置、文档策略、定时同步及外部服务按各自查看／编辑权限显示菜单、保存按钮或开关。
+System 详情根据页面发送 `section=setting/document_strategy` 获取被授权的设置；其他范围保持原接口行为。
+MCP 配置入口使用独立权限。导出 Skills 权限已定义，知识库未提供对应功能入口。
+
 ### 创建与设置
 
 四类知识库创建入口集中在 `knowledge/create-knowledge/`：`BaseKnowledgeDialog`、

@@ -12,6 +12,7 @@ const props = defineProps<{
   knowledgeId: string
   documentId: string
   paragraphId?: string
+  readonly?: boolean
 }>()
 const { resourceApi } = useDocumentDetailContext()
 const relatedProblems = defineModel<ParagraphQuestionDraft[]>({ required: true })
@@ -36,7 +37,7 @@ function loadProblemOptions(query = '') {
 }
 
 onMounted(() => {
-  if (!isWorkspaceSharedResource()) void loadProblemOptions()
+  if (!props.readonly && !isWorkspaceSharedResource()) void loadProblemOptions()
 })
 
 /* 新增分段维护本地草稿；已有分段创建或关联问题后刷新关联列表。 */
@@ -50,7 +51,7 @@ function refreshRelatedProblems() {
 }
 
 async function handleAddProblem() {
-  if (loading.value || isWorkspaceSharedResource()) return
+  if (props.readonly || loading.value || isWorkspaceSharedResource()) return
   problemAdding.value = true
   await nextTick()
   problemSelectRef.value?.focus()
@@ -63,7 +64,7 @@ function handleCancelProblem() {
 }
 
 function handleSelectProblem(value: string) {
-  if (loading.value || isWorkspaceSharedResource()) return
+  if (props.readonly || loading.value || isWorkspaceSharedResource()) return
   const existingProblem = problemOptions.value.find(({ id }) => id === value)
   const content = (existingProblem?.content ?? value).trim()
   if (!content || content.length > 256) {
@@ -100,7 +101,7 @@ function handleSelectProblem(value: string) {
 }
 
 function handleRemoveProblem(index: number) {
-  if (loading.value || isWorkspaceSharedResource()) return
+  if (props.readonly || loading.value || isWorkspaceSharedResource()) return
   const problem = relatedProblems.value[index]
   if (!problem) return
   if (!props.paragraphId) {
@@ -125,7 +126,7 @@ function handleRemoveProblem(index: number) {
     <div class="mb-4 flex-between shrink-0 gap-3">
       <h4>关联问题</h4>
       <!-- 添加关联问题 -->
-      <el-button v-if="!isWorkspaceSharedResource()" text :disabled="loading || problemAdding" @click="handleAddProblem">
+      <el-button v-if="!props.readonly && !isWorkspaceSharedResource()" text :disabled="loading || problemAdding" @click="handleAddProblem">
         <MkIcon name="icon_add_outlined" :size="16" />
       </el-button>
     </div>
@@ -157,7 +158,7 @@ function handleRemoveProblem(index: number) {
               <div class="flex-between gap-2">
                 <span class="min-w-0 flex-1 truncate" :title="problem.content">{{ problem.content }}</span>
                 <!-- 解除问题关联 -->
-                <el-button v-if="!isWorkspaceSharedResource()" text :disabled="loading" @click="handleRemoveProblem(index)">
+                <el-button v-if="!props.readonly && !isWorkspaceSharedResource()" text :disabled="loading" @click="handleRemoveProblem(index)">
                   <MkIcon name="icon_close_outlined" :size="16" />
                 </el-button>
               </div>

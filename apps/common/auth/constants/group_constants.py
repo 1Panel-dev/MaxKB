@@ -106,6 +106,11 @@ class Group(Enum):
     SYSTEM_RES_MODEL = ("SYSTEM_RESOURCE_MODEL", _("Model"))
 
     # 系统资源子分组
+    SYSTEM_IMAGE = ("SYSTEM_IMAGE", _("Image"))
+    SYSTEM_SCHEDULED_SYNC = ("SYSTEM_SCHEDULED_SYNC", _("Scheduled synchronization"))
+    SYSTEM_DOCUMENT_STRATEGY = ("SYSTEM_DOCUMENT_STRATEGY", _("Document processing strategy"))
+    SYSTEM_EXTERNAL_SERVICE = ("SYSTEM_EXTERNAL_SERVICE", _("External service"))
+    SYSTEM_KNOWLEDGE_SETTING = ("SYSTEM_KNOWLEDGE_SETTING", _("Knowledge settings"))
     SYSTEM_DOCUMENT = ("SYSTEM_DOCUMENT", _("Document"))
     SYSTEM_WORKFLOW = ("SYSTEM_WORKFLOW", _("Workflow"))
     SYSTEM_TAG = ("SYSTEM_TAG", _("Tag"))

@@ -71,6 +71,11 @@ export enum Group {
   SYSTEM_RES_KNOWLEDGE = 'SYSTEM_RESOURCE_KNOWLEDGE',
   SYSTEM_RES_TOOL = 'SYSTEM_RESOURCE_TOOL',
   SYSTEM_RES_MODEL = 'SYSTEM_RESOURCE_MODEL',
+  SYSTEM_IMAGE = 'SYSTEM_IMAGE',
+  SYSTEM_SCHEDULED_SYNC = 'SYSTEM_SCHEDULED_SYNC',
+  SYSTEM_DOCUMENT_STRATEGY = 'SYSTEM_DOCUMENT_STRATEGY',
+  SYSTEM_EXTERNAL_SERVICE = 'SYSTEM_EXTERNAL_SERVICE',
+  SYSTEM_KNOWLEDGE_SETTING = 'SYSTEM_KNOWLEDGE_SETTING',
   SYSTEM_DOCUMENT = 'SYSTEM_DOCUMENT',
   SYSTEM_WORKFLOW = 'SYSTEM_WORKFLOW',
   SYSTEM_TAG = 'SYSTEM_TAG',
@@ -138,6 +143,8 @@ export enum Operate {
   TOKEN = 'READ+TOKEN',
   TO_WORKSPACE = 'READ+TO_WORKSPACE',
   SET_ROLE = 'READ+SET_ROLE',
+  MCP_CONFIG = 'READ+MCP_CONFIG',
+  EXPORT_SKILLS = 'READ+EXPORT_SKILLS',
   QUOTA_SETTING = 'READ+QUOTA_SETTING',
   ABOUT = 'READ',
   LICENSE = 'READ+UPDATE',
@@ -248,12 +255,13 @@ export class Permission {
   getResourcePermissionKey(): string {
     const workspace = this.workspaceId ? `:w:${this.workspaceId}` : ''
     const resource = this.resourceId ? `:r:${this.resourceId}` : ''
-    return `${this.group}${workspace}${resource}`
+    const group = this.group === Group.SYSTEM_RES_KNOWLEDGE && this.subGroup !== this.group ? `${this.group}_${this.subGroup}` : this.group
+    return `${group}${workspace}${resource}`
   }
 
   /** 判定时使用的最终 key，对应后端 `AggregatePermission._match_permission`。 */
   toPermissionKey(): string {
-    return this.resourceId||this.workspaceId ? this.getResourcePermissionKey() : this.group
+    return this.getResourcePermissionKey()
   }
 
   /** 基于上下文派生出带 workspace / resource 的权限副本。 */

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { perm } from '@/permission'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
@@ -8,9 +9,11 @@ import { SCHEDULE_OPTION } from '@/constants/schedule'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
-import { getResourceScope, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { getResourceScope, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '../../context'
 import SyncLogTable from './components/SyncLogTable.vue'
+
+const canEdit = () => !isWorkspaceSharedResource() && (!isSystemResource() || perm.knowledge.system.scheduledSyncEdit())
 
 defineOptions({ name: 'KnowledgeScheduledSyncView' })
 
@@ -109,7 +112,7 @@ const rules: FormRules<SyncSettingDraft> = {
 function handleSave() {
   const detail = knowledge.value
   const form = formRef.value
-  if (saving.value || loading.value || !settingLoaded.value || !detail || !form) return
+  if (!canEdit() || saving.value || loading.value || !settingLoaded.value || !detail || !form) return
   saving.value = true
   return form
     .validate()
@@ -219,7 +222,7 @@ watch(
           </el-form-item>
         </div>
         <!-- 保存定时同步设置 -->
-        <el-button v-if="!isWorkspaceSharedResource()" type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">
+        <el-button v-if="canEdit()" type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">
           保存
         </el-button>
       </el-form>
