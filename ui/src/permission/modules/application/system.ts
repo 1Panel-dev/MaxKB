@@ -4,7 +4,7 @@
  */
 
 import { canSys } from '../../policy'
-import { PermissionConstants as P,hasEdition} from '../../core'
+import { PermissionConstants as P, hasEdition } from '../../core'
 import { Edition } from '@/permission/core/common'
 
 const system = {
@@ -26,6 +26,8 @@ const system = {
   copy: () => canSys(P.RESOURCE_APPLICATION_COPY),
   export: () => canSys(P.RESOURCE_APPLICATION_EXPORT),
   publish: () => canSys(P.RESOURCE_APPLICATION_PUBLISH),
+  portalUp: () => canSys(P.RESOURCE_APPLICATION_PORTAL_UP),
+  portalDown: () => canSys(P.RESOURCE_APPLICATION_PORTAL_DOWN),
   auth: () => canSys(P.RESOURCE_APPLICATION_AUTH),
   relateMap: () => canSys(P.RESOURCE_APPLICATION_RELATE_RESOURCE_VIEW),
   debug: () => canSys(P.RESOURCE_APPLICATION_EDIT),

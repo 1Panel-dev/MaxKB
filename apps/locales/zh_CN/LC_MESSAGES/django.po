@@ -9431,6 +9431,21 @@ msgstr "model_params_form 中的第 {index} 项的 label 字段是必填项"
 msgid "Publish"
 msgstr "发布"
 
+msgid "Publish to Portal"
+msgstr "上架到门户"
+
+msgid "Unpublish from Portal"
+msgstr "从门户下架"
+
+msgid "Only published applications can be published to Portal"
+msgstr "仅已发布的应用可以上架到门户"
+
+msgid "Publishing an application to Portal"
+msgstr "将应用上架到门户"
+
+msgid "Unpublishing an application from Portal"
+msgstr "将应用从门户下架"
+
 msgid "token is required for EVENT triggers"
 msgstr "事件触发器必须设置 token"
 

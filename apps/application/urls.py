@@ -15,6 +15,8 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/batch_clean_time', views.ApplicationAPI.BatchCleanTime.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>', views.ApplicationAPI.Operate.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/publish', views.ApplicationAPI.Publish.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/portal_up', views.ApplicationAPI.PortalUp.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/portal_down', views.ApplicationAPI.PortalDown.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/move/<str:folder_id>', views.ApplicationAPI.Move.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_key', views.ApplicationKey.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_stats', views.ApplicationStats.as_view()),

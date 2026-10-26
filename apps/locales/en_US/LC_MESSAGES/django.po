@@ -9306,6 +9306,21 @@ msgstr ""
 msgid "Publish"
 msgstr ""
 
+msgid "Publish to Portal"
+msgstr ""
+
+msgid "Unpublish from Portal"
+msgstr ""
+
+msgid "Only published applications can be published to Portal"
+msgstr ""
+
+msgid "Publishing an application to Portal"
+msgstr ""
+
+msgid "Unpublishing an application from Portal"
+msgstr ""
+
 msgid "token is required for EVENT triggers"
 msgstr ""
 

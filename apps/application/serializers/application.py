@@ -719,7 +719,6 @@ class ApplicationImportRequest(serializers.Serializer):
 
 class ApplicationEditSerializer(serializers.Serializer):
     name = serializers.CharField(required=False, max_length=64, min_length=1, label=_("Application Name"))
-    is_portal = serializers.BooleanField(required=False, label=_("Whether to publish on portal"))
     desc = serializers.CharField(
         required=False,
         max_length=256,
@@ -1349,6 +1348,38 @@ class ApplicationOperateSerializer(serializers.Serializer):
         )
         return self.one(with_valid=False)
 
+    @transaction.atomic
+    def portal_up(self, with_valid=True):
+        """上架到门户：仅已发布的应用可上架，调用方需具备门户上架权限。"""
+        if with_valid:
+            self.is_valid()
+        workspace_id = self.data.get("workspace_id")
+        application = (
+            QuerySet(Application).filter(id=self.data.get("application_id"), workspace_id=workspace_id).first()
+        )
+        if not application:
+            raise AppApiException(500, _("Application id does not exist"))
+        if not application.is_publish:
+            raise AppApiException(500, _("Only published applications can be published to Portal"))
+        application.is_portal = True
+        application.save()
+        return self.one(with_valid=False)
+
+    @transaction.atomic
+    def portal_down(self, with_valid=True):
+        """从门户下架，调用方需具备门户下架权限。"""
+        if with_valid:
+            self.is_valid()
+        workspace_id = self.data.get("workspace_id")
+        application = (
+            QuerySet(Application).filter(id=self.data.get("application_id"), workspace_id=workspace_id).first()
+        )
+        if not application:
+            raise AppApiException(500, _("Application id does not exist"))
+        application.is_portal = False
+        application.save()
+        return self.one(with_valid=False)
+
     @staticmethod
     def update_work_flow_model(instance):
         if "nodes" not in instance.get("work_flow"):
@@ -1465,7 +1496,6 @@ class ApplicationOperateSerializer(serializers.Serializer):
             ToolExecutor().validate_mcp_transport(json.dumps(instance.get("mcp_servers")))
         update_keys = [
             "name",
-            "is_portal",
             "desc",
             "model_id",
             "multiple_rounds_dialogue",
