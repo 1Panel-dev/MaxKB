@@ -3,12 +3,20 @@
 import workspace from './workspace'
 import system from './system'
 import share from './share'
+import workspaceShared from './workspace-shared'
 
-export default { workspace,
+export default {
+  /**工作空间「工具」权限
+   * */
+  workspace,
   /**
    * 系统「工具」权限
    * */
   system,
   /**系统「共享工具」权限
    * */
-  share }
+  share,
+  /**工作空间「共享工具」权限
+   * */
+  workspaceShared
+}

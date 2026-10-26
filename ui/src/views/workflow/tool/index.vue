@@ -22,7 +22,7 @@ import type {
   WorkflowVersionPayload,
   WorkflowStoreTemplate,
 } from '@/api/types'
-import { getResourceScope, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource} from '@/utils/resource-context'
 import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
@@ -36,6 +36,7 @@ import ButtonPublishHistory from './ButtonPublishHistory.vue'
 import DebugDrawer from './debug/DebugDrawer.vue'
 import ButtonTemplateStore from './ButtonTemplateStore.vue'
 import { goBack } from './navigation'
+import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'ToolWorkflowView' })
 
@@ -63,6 +64,14 @@ const toolDetail = ref<ToolItem>()
 const loading = ref(false)
 const savedWorkflow = ref<LogicFlow.GraphData>()
 const saveTime = ref<Date | string>()
+
+function toolWorkflowPermission(method: 'read' | 'edit' | 'publish' | 'export' | 'record' ):boolean {
+  if (isSystemResource()) return Boolean(perm.tool.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.tool.share[method]())
+  if (isWorkspaceSharedResource()) return Boolean(perm.tool.workspaceShared[method]())
+  if (method === 'read') return Boolean(perm.tool.workspace.read())
+  return perm.tool.workspace[method](toolId)
+}
 
 function getGraphData() {
   return workflowRef.value?.getGraphData()
@@ -360,7 +369,7 @@ onBeforeUnmount(() => stopAutoSave())
     </template>
     <template #actions>
       <!-- 模板中心 -->
-      <ButtonTemplateStore ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
+      <ButtonTemplateStore v-if="toolWorkflowPermission('read')" ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"
@@ -370,29 +379,30 @@ onBeforeUnmount(() => stopAutoSave())
         @open="closeDebug"
         @save="handleSaveDefaultModelSetting"
         @apply-to-all="handleApplyDefaultModelToAll"
+        v-if="toolWorkflowPermission('read')"
       />
 
       <!-- 调试工具工作流 -->
-      <el-button plain :disabled="loading" @click="handleDebug">
+      <el-button v-if="toolWorkflowPermission('read')" plain :disabled="loading" @click="handleDebug">
         <MkIcon name="icon_play_outlined" />
         <span>调试</span>
       </el-button>
       <!-- 保存 -->
-      <el-button plain :disabled="loading" @click="handleSave">
+      <el-button v-if="toolWorkflowPermission('edit')" plain :disabled="loading" @click="handleSave">
         <MkIcon name="icon_save_outlined" />
         <span>保存</span>
       </el-button>
       <!-- 发布 -->
-      <el-button type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
+      <el-button v-if="toolWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
       <!-- 更多操作 -->
-      <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
+      <MkDropdown hide-when-empty trigger="click" placement="bottom-end" class="ml-2" persistent>
         <el-button text class="h-7! w-7! px-0!">
           <MkIcon name="icon_more_outlined" class="rotate-90" :size="20" />
         </el-button>
         <template #dropdown>
           <MkDropdownMenu class="w-37">
             <!-- 导出工作流 -->
-            <MkDropdownItem @click="handleExportWorkflow">
+            <MkDropdownItem v-if="toolWorkflowPermission('export')" @click="handleExportWorkflow">
               <template #icon><MkIcon name="icon_export_outlined" /></template>
               <span>导出工作流</span>
             </MkDropdownItem>
@@ -407,9 +417,10 @@ onBeforeUnmount(() => stopAutoSave())
               @open="closeDebug"
               @preview="handlePreviewVersion"
               @restore="handleRestoreVersion"
+              v-if="toolWorkflowPermission('record')"
             />
             <!-- 自动保存 -->
-            <MkDropdownItem @click.stop>
+            <MkDropdownItem v-if="toolWorkflowPermission('edit')" @click.stop>
               <template #icon><MkIcon name="icon_save_outlined" /></template>
               <span>自动保存</span>
               <el-switch v-model="autoSaveEnabled" class="ml-auto" size="small" @click.stop @change="handleAutoSaveChange" />
