@@ -5,7 +5,7 @@ import urllib
 import uuid_utils.compat as uuid
 from django.db.models.functions import Cast
 
-from application.models import Application, ApplicationAccessToken, ChatShareLink
+from application.models import Application, ApplicationAccessToken, ChatShareLink, Chat
 from common.auth.common import parse_token, SystemToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.constants.operate_constants import Operate
@@ -247,14 +247,18 @@ def _auth_chat(file, token):
             ):
                 _deny()
     if file.source_type == FileSourceType.CHAT:
+        # 如果是当前用户的资源就有权限
         if file.meta.get("user_id") == user_id:
+            return
+        # 匿名用户还需满足应用的登录要求
+        if token.login_type.upper() == str(Operate.ANNOTATION_AUTH):
+            _check_anonymous_login(file.source_id)
+        ## 如果当前用户能访问到这个对话,那么就有资源的访问权限
+        if QuerySet(Chat).filter(user_id=user_id, id=file.source_id, is_deleted=False).exists():
             return
         # 非本人:存在分享链接才允许
         if not QuerySet(ChatShareLink).filter(chat_id=file.source_id).exists():
             _deny()
-        # 匿名用户还需满足应用的登录要求
-        if token.login_type.upper() == str(Operate.ANNOTATION_AUTH):
-            _check_anonymous_login(file.source_id)
         return
 
     knowledge_id = _knowledge_id_for_file_source(file.source_type, file.source_id)
