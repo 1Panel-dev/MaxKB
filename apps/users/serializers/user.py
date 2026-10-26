@@ -8,6 +8,7 @@
 """
 
 import datetime
+import hashlib
 import json
 import os
 import re
@@ -61,6 +62,7 @@ MAX_VERIFY_CODE_ATTEMPTS = 5
 VERIFY_CODE_EXPIRE_SECONDS = 10 * 60
 # 达到错误上限后的锁定冷却时长
 VERIFY_CODE_LOCKOUT_SECONDS = 10 * 60
+DEFAULT_PASSWORD_CHECK_CACHE_TIMEOUT = 7 * 24 * 60 * 60
 
 
 def _raise_verify_code_limit():
@@ -228,6 +230,17 @@ def get_workspace_list_by_user(user_id):
     return [{"id": "default", "name": "default"}]
 
 
+def _is_default_password(default_password: str, hashed_password: str):
+    cache_version = Cache_Version.USER.get_version()
+    digest = hashlib.sha256(f"{default_password}\0{hashed_password}".encode()).hexdigest()
+    cache_key = Cache_Version.USER.get_key(user_id=f"default-password:{digest}")
+    is_default = cache.get(cache_key, version=cache_version)
+    if is_default is None:
+        is_default = password_verify(default_password, hashed_password)
+        cache.set(cache_key, is_default, timeout=DEFAULT_PASSWORD_CHECK_CACHE_TIMEOUT, version=cache_version)
+    return is_default
+
+
 class UserProfileSerializer(serializers.Serializer):
     @staticmethod
     def profile(user: User, auth: Auth):
@@ -261,7 +274,7 @@ class UserProfileSerializer(serializers.Serializer):
             "source": user.source,
             "role": list(auth.roles),
             "permissions": auth.permissions,
-            "is_edit_password": password_verify(CONFIG.get("DEFAULT_PASSWORD", "MaxKB@123.."), user.password)
+            "is_edit_password": _is_default_password(CONFIG.get("DEFAULT_PASSWORD", "MaxKB@123.."), user.password)
             if user.source == "LOCAL"
             else False,
             "language": user.language,
