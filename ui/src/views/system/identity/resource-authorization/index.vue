@@ -97,7 +97,6 @@ const loadingPermissions = ref(false)
 const resourcePermissions = ref<ResourcePermissionItem[]>([])
 
 function loadResourcePermissions() {
-  loadingPermissions.value = true
   const targetId = targetType.value === 'user-group' ? selectedUserGroupId.value : selectedUserId.value
 
   if (!targetId) {
@@ -106,6 +105,7 @@ function loadResourcePermissions() {
     return Promise.resolve()
   }
 
+  loadingPermissions.value = true
   const permissionRequest =
     targetType.value === 'user-group'
       ? ResourceAuthorizationApi.getUserGroupResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value)
