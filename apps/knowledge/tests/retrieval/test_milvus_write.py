@@ -254,6 +254,45 @@ class MilvusWriteHTTPTests(SimpleTestCase):
         self.assertEqual([len(call["body"]["data"]) for call in batches], [500, 500])
         self.assertEqual(len(state["collections"][self.name]["records"]), 500)
 
+    def test_other_worker_drop_invalidates_caches_after_failed_write(self):
+        self.store._upsert_records(self.knowledge_id, self.records())
+        # Drop through HTTP so this worker retains both process-local cache entries.
+        self.store._post_required("/v2/vectordb/collections/drop", {"collectionName": self.name})
+        with self.assertRaises(AppApiException):
+            self.store._upsert_records(self.knowledge_id, self.records())
+        self.assertNotIn(self.knowledge_id, MilvusVector._existing)
+        self.assertNotIn(self.knowledge_id, MilvusVector._loaded)
+        self.store._upsert_records(self.knowledge_id, self.records())
+        self.assertEqual(self.state()["collections"][self.name]["records"]["0"], self.records()[0])
+
+    def test_lookup_and_delete_failures_are_not_successful_empty_results(self):
+        for operation in ("collections/has", "entities/query", "entities/delete"):
+            with self.subTest(operation=operation):
+                self.reset({"operation": operation, "body": {"code": 65535, "message": "unavailable"}}, existing=True)
+                with self.assertRaises(AppApiException):
+                    if operation == "entities/delete":
+                        self.store._delete_ids(self.knowledge_id, ["0"])
+                    else:
+                        self.store._query_records(self.knowledge_id, ["0"], ["embedding"])
+
+    def test_partial_lookup_cannot_delete_uncopied_source_vectors(self):
+        self.reset({"operation": "entities/query", "body": {"code": 0, "data": []}}, existing=True)
+        self.store._upsert_records(self.knowledge_id, self.records())
+        rows = [{**self.records()[0], "knowledge_id": self.knowledge_id, "embedding": None}]
+        with self.assertRaises(AppApiException):
+            self.store._sync_update(rows, {"knowledge_id": "target"})
+        state = self.state()
+        self.assertIn("0", state["collections"][self.name]["records"])
+        self.assertFalse(any(call["operation"] == "entities/delete" for call in state["calls"]))
+
+    def test_query_reads_all_batches_and_requests_primary_keys(self):
+        self.store._upsert_records(self.knowledge_id, self.records(1001))
+        rows = self.store._query_records(self.knowledge_id, [str(i) for i in range(1001)], ["embedding"])
+        self.assertEqual(len(rows), 1001)
+        calls = [call for call in self.state()["calls"] if call["operation"] == "entities/query"]
+        self.assertTrue(all(call["body"]["limit"] <= 1000 for call in calls))
+        self.assertTrue(all("id" in call["body"]["outputFields"] for call in calls))
+
     def test_paragraph_embedding_failure_is_not_reported_as_success(self):
         self.reset(
             {"operation": "entities/upsert", "body": {"code": 65535, "message": "write rejected"}}, existing=True

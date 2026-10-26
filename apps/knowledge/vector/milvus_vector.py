@@ -10,6 +10,7 @@
 """
 
 from collections import defaultdict
+from functools import partial
 from typing import Dict, List
 
 import requests
@@ -18,9 +19,10 @@ from common.exception.app_exception import AppApiException
 from common.utils.logger import maxkb_logger
 from common.utils.ts_vecto_util import to_ts_vector
 from django.contrib.postgres.search import SearchVector
-from django.db.models import QuerySet, Value
+from django.db import transaction
+from django.db.models import F, QuerySet, Value
 from django.utils.translation import gettext_lazy as _
-from knowledge.models import Embedding, SearchMode, Termbase
+from knowledge.models import Embedding, LocalState, SearchMode, Termbase
 from knowledge.vector.base_vector import BaseVectorStore, normalize_for_embedding
 from knowledge.vector.pg_fulltext import text_rank_by_ids, pg_vector_recall
 from knowledge.vector.pg_vector import KeywordsSearch
@@ -90,6 +92,11 @@ class MilvusVector(BaseVectorStore):
         """写入依赖的请求必须成功，异常交由调用方更新向量化失败状态。"""
         ok, data = cls._post(path, body)
         if not ok:
+            # A different worker can drop a collection behind either process-local cache.
+            for knowledge_id in cls._existing | cls._loaded:
+                if cls._collection_name(knowledge_id) == body.get("collectionName"):
+                    cls._existing.discard(knowledge_id)
+                    cls._loaded.discard(knowledge_id)
             message = (
                 f"Milvus request failed ({path}, collection={body.get('collectionName')}, "
                 f"code={data.get('code')}): {data.get('message', 'Unknown error')}"
@@ -277,14 +284,12 @@ class MilvusVector(BaseVectorStore):
     # 删除
     # ------------------------------------------------------------------ #
     def _delete_ids(self, knowledge_id: str, ids: List[str]):
-        if not ids or not self._has_collection(knowledge_id):
+        if not ids or not self._has_collection(knowledge_id, raise_on_error=True):
             return
         name = self._collection_name(knowledge_id)
         for i in range(0, len(ids), 1000):
             batch = ids[i : i + 1000]
-            ok, data = self._post(_PATH_DELETE, {"collectionName": name, "filter": f"id in {self._str_list(batch)}"})
-            if not ok:
-                maxkb_logger.error(f"Milvus delete failed (kid={knowledge_id}): {data}")
+            self._post_required(_PATH_DELETE, {"collectionName": name, "filter": f"id in {self._str_list(batch)}"})
 
     def _delete_by_filter(self, filter_kwargs: Dict):
         matched = list(QuerySet(Embedding).filter(**filter_kwargs).values("id", "knowledge_id"))
@@ -332,38 +337,68 @@ class MilvusVector(BaseVectorStore):
     # ------------------------------------------------------------------ #
     def _query_records(self, knowledge_id: str, ids: List[str], output_fields: List[str]) -> List[Dict]:
         """按 id 从 Milvus 取记录（含向量），用于更新时回取向量。"""
-        if not ids or not self._has_collection(knowledge_id):
+        if not ids or not self._has_collection(knowledge_id, raise_on_error=True):
             return []
-        ok, data = self._post(
-            _PATH_QUERY,
-            {
-                "collectionName": self._collection_name(knowledge_id),
-                "filter": f"id in {self._str_list(ids)}",
-                "outputFields": output_fields,
-                "limit": len(ids),
-            },
-        )
-        if not ok:
-            return []
-        return data.get("data") or []
+        records = []
+        for i in range(0, len(ids), 1000):
+            batch = ids[i : i + 1000]
+            data = self._post_required(
+                _PATH_QUERY,
+                {
+                    "collectionName": self._collection_name(knowledge_id),
+                    "filter": f"id in {self._str_list(batch)}",
+                    "outputFields": list(dict.fromkeys(["id", *output_fields])),
+                    "limit": len(batch),
+                    "consistencyLevel": "Strong",
+                },
+            )
+            if not isinstance(data.get("data"), list):
+                raise AppApiException(500, "Invalid Milvus query response: expected a record list")
+            records.extend(data["data"])
+        return records
 
+    @transaction.atomic
     def _update_by_filter(self, filter_kwargs: Dict, instance: Dict):
         matched = list(
             QuerySet(Embedding)
+            .select_for_update()
             .filter(**filter_kwargs)
-            .values("id", "knowledge_id", "document_id", "paragraph_id", "is_active", "source_id", "source_type")
+            .values(
+                "id",
+                "knowledge_id",
+                "document_id",
+                "paragraph_id",
+                "is_active",
+                "source_id",
+                "source_type",
+                "embedding",
+            )
         )
         if not matched:
             return
-        # 向量列在 Milvus 模式下不写 PG，从 PG 更新中剔除
+        # Copy first; failed queries or writes must leave PG ownership and source vectors intact.
+        by_source = self._sync_update(matched, instance)
         pg_instance = {k: v for k, v in instance.items() if k != "embedding"}
+        if "embedding" in instance:
+            # A successfully replaced vector must no longer compete with its historical PG value.
+            pg_instance["embedding"] = None
         if pg_instance:
-            QuerySet(Embedding).filter(**filter_kwargs).update(**pg_instance)
-        self._sync_update(matched, instance)
+            QuerySet(Embedding).filter(id__in=[row["id"] for row in matched]).update(**pg_instance)
+        for source_kid, ids in by_source.items():
+            # Document/paragraph moves wrap this in a larger transaction, which may still roll back.
+            transaction.on_commit(partial(self._delete_moved_ids, source_kid, ids))
+
+    @transaction.atomic
+    def _delete_moved_ids(self, source_kid: str, ids: List[str]):
+        # A subsequent move back may commit before this callback acquires the row locks.
+        rows = QuerySet(Embedding).select_for_update().filter(id__in=ids).values("id", "knowledge_id")
+        moved_ids = [str(row["id"]) for row in rows if str(row["knowledge_id"]) != source_kid]
+        if moved_ids:
+            self._delete_ids(source_kid, moved_ids)
 
     def _sync_update(self, matched_rows: List[Dict], instance: Dict):
         if not matched_rows:
-            return
+            return {}
         has_embedding = "embedding" in instance
         new_embedding = instance.get("embedding")
         knowledge_changed = "knowledge_id" in instance
@@ -379,12 +414,15 @@ class MilvusVector(BaseVectorStore):
                     emb_map[str(rec.get("id"))] = rec.get("embedding")
         # 按目标 collection 分组 upsert
         by_target = defaultdict(list)
+        by_source = defaultdict(list)
         for r in matched_rows:
             target_kid = str(instance["knowledge_id"]) if knowledge_changed else str(r["knowledge_id"])
             emb = new_embedding if has_embedding else emb_map.get(str(r["id"]))
             if not emb:
-                # Milvus 中尚无该记录（未向量化），跳过镜像
-                continue
+                if not has_embedding and r.get("embedding") is not None:
+                    # Historical PG-only vectors remain available through PG fallback after a move.
+                    continue
+                raise AppApiException(500, f"Milvus vector missing for embedding {r['id']}; update aborted")
             by_target[target_kid].append(
                 {
                     "id": str(r["id"]),
@@ -396,17 +434,11 @@ class MilvusVector(BaseVectorStore):
                     "source_type": int(instance.get("source_type", r["source_type"])),
                 }
             )
+            if str(r["knowledge_id"]) != target_kid:
+                by_source[str(r["knowledge_id"])].append(str(r["id"]))
         for target_kid, recs in by_target.items():
             self._upsert_records(target_kid, recs)
-        # 跨知识库迁移时，从旧 collection 删除
-        if knowledge_changed:
-            new_kid = str(instance["knowledge_id"])
-            by_source = defaultdict(list)
-            for r in matched_rows:
-                if str(r["knowledge_id"]) != new_kid:
-                    by_source[str(r["knowledge_id"])].append(str(r["id"]))
-            for source_kid, ids in by_source.items():
-                self._delete_ids(source_kid, ids)
+        return by_source
 
     def update_by_paragraph_id(self, paragraph_id: str, instance: Dict):
         self._update_by_filter({"paragraph_id": paragraph_id}, instance)
@@ -461,30 +493,59 @@ class MilvusVector(BaseVectorStore):
             "outputFields": ["paragraph_id"],
             "searchParams": {"metricType": "COSINE", "params": {"ef": max(64, top_n * 10)}},
         }
-        ok, data = self._post(_PATH_SEARCH, body)
-        if not ok:
-            return []
-        hits = data.get("data") or []
-        metadata_by_id = {
-            str(row["id"]): row
-            for row in QuerySet(Embedding)
-            .filter(id__in=[str(hit.get("id") or "") for hit in hits])
-            .values("id", "paragraph_id", "source_id", "source_type", "meta")
-        }
-        out = []
-        for h in hits:
-            metadata = metadata_by_id.get(str(h.get("id") or ""))
-            if metadata is None:
-                continue
-            # COSINE 度量下 distance 即余弦相似度，与 PG 的 (1 - cosine_distance) 口径一致
-            out.append(
-                {
-                    **metadata,
-                    "id": str(h.get("id") or ""),
-                    "paragraph_id": str(metadata["paragraph_id"]),
-                    "similarity": float(h.get("distance", 0)),
-                }
+        # Milvus metadata may lag a move, disable or deletion. PG is authoritative.
+        scope = (
+            QuerySet(Embedding)
+            .filter(
+                knowledge_id=knowledge_id,
+                is_active=is_active,
+                paragraph__knowledge_id=knowledge_id,
+                paragraph__document_id=F("document_id"),
+                paragraph__is_active=is_active,
             )
+            .exclude(paragraph__local_state=LocalState.DELETED)
+        )
+        if document_id_list:
+            scope = scope.filter(document_id__in=document_id_list)
+        if exclude_document_id_list:
+            scope = scope.exclude(document_id__in=exclude_document_id_list)
+        if exclude_paragraph_list:
+            scope = scope.exclude(paragraph_id__in=exclude_paragraph_list)
+        candidate_limit = body["limit"]
+        search_filter = body["filter"]
+        seen = set()
+        out = []
+        while len(out) < candidate_limit:
+            body["limit"] = candidate_limit - len(out)
+            if seen:
+                body["filter"] = f"{search_filter} and id not in {self._str_list(sorted(seen))}"
+            ok, data = self._post(_PATH_SEARCH, body)
+            if not ok:
+                break
+            hits = data.get("data") or []
+            ids = {str(hit.get("id") or "") for hit in hits} - seen
+            if not ids:
+                break
+            seen.update(ids)
+            metadata_by_id = {
+                str(row["id"]): row
+                for row in scope.filter(id__in=ids).values("id", "paragraph_id", "source_id", "source_type", "meta")
+            }
+            for hit in hits:
+                metadata = metadata_by_id.pop(str(hit.get("id") or ""), None)
+                if metadata is None:
+                    continue
+                # COSINE distance is similarity, matching PG's (1 - cosine_distance).
+                out.append(
+                    {
+                        **metadata,
+                        "id": str(metadata["id"]),
+                        "paragraph_id": str(metadata["paragraph_id"]),
+                        "similarity": float(hit.get("distance", 0)),
+                    }
+                )
+            if len(hits) < body["limit"]:
+                break
         return out
 
     def _dispatch_search(

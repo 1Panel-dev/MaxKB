@@ -22,6 +22,7 @@ from knowledge.serializers.common import list_paragraph
 from knowledge.serializers.knowledge import KnowledgeSerializer
 from knowledge.services import external_retrieval
 from knowledge.services.retrieval_access import RetrievalIdentity
+from knowledge.vector.milvus_vector import MilvusVector
 from knowledge.vector.pg_vector import PGVector
 
 
@@ -58,7 +59,7 @@ class DeletedParagraphRetrievalTests(TestCase):
         )
 
     def create_embedding(self, paragraph, vector, *, weight, source_type=SourceType.PARAGRAPH):
-        Embedding.objects.create(
+        return Embedding.objects.create(
             id=str(uuid4()),
             knowledge=self.knowledge,
             document=self.document,
@@ -80,6 +81,19 @@ class DeletedParagraphRetrievalTests(TestCase):
             with self.subTest(mode=mode):
                 hits = PGVector().query("needle", [1.0, 0.0], [str(self.knowledge.id)], [], [], [], True, 1, 0, mode)
                 self.assert_visible_hit(hits)
+
+    @patch.object(MilvusVector, "_has_collection", return_value=False)
+    def test_milvus_pg_fallback_filters_deleted_and_missing_before_limit(self, _has_collection):
+        orphan = self.create_embedding(self.visible, "[1, 0]", weight="A")
+        Embedding.objects.filter(id=orphan.id).update(paragraph_id=uuid4())
+        # Keep a lower-scoring live vector after the orphan and deleted candidates.
+        Embedding.objects.filter(paragraph=self.visible).update(embedding="[0.8, 0.6]")
+        for mode in (SearchMode.embedding, SearchMode.blend):
+            with self.subTest(mode=mode):
+                hits = MilvusVector().query(
+                    "needle", [1.0, 0.0], [str(self.knowledge.id)], None, [], [], True, 1, 0, mode
+                )
+                self.assertEqual([hit["paragraph_id"] for hit in hits], [str(self.visible.id)])
 
     def test_text_and_image_hit_tests_filter_stale_vectors(self):
         for mode in SearchMode:

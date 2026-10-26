@@ -63,6 +63,14 @@ http.createServer(async (request, response) => {
       return send(200, { code: 0, data: { upsertCount: body.data.length, upsertIds: body.data.map(record => record.id) } });
     } else if (operation === "collections/drop") {
       delete state.collections[body.collectionName];
+    } else if (operation === "entities/query" || operation === "entities/delete") {
+      if (!collection) return fail("Collection not found");
+      const ids = JSON.parse(body.filter.replace(/^id in /, ""));
+      if (operation === "entities/query") {
+        const records = ids.map(id => collection.records[id]).filter(Boolean);
+        return send(200, { code: 0, data: records });
+      }
+      for (const id of ids) delete collection.records[id];
     } else {
       return send(501, { message: "Endpoint not modeled" });
     }
