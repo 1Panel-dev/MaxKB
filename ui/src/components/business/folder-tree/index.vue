@@ -209,7 +209,7 @@ const formTitle = ref('')
 
 function handleOpenCreateFolder() {
   formTitle.value = '创建文件夹'
-  folderFormDialogRef.value?.open(folderEntries.value.all.id)
+  folderFormDialogRef.value?.open(workspaceId ?? folderEntries.value.all.id)
 }
 
 function handleOpenCreateChildFolder(folder: FolderItem) {
