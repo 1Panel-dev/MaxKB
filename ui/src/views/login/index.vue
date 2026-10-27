@@ -1,41 +1,18 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import BaseInfoApi from '@/api/admin/auth/base-info.ts'
 import { useStore } from '@/stores'
 import { LOGIN_METHOD } from '@/api/enums'
-import type { LoginConfig, QrCodeProvider } from '@/api/types'
+import type { LoginConfig } from '@/api/types'
 import LoginLayout from './components/LoginLayout.vue'
-import AccountLogin from './modes/AccountLogin.vue'
-import QrCodeLogin from './modes/QrCodeLogin.vue'
-import { qrCodeLoginMethods } from './constants'
+import LoginModePanel from './components/LoginModePanel.vue'
+import { useAdminLoginService } from './admin-login-service'
 
 const { auth } = useStore()
+const loginService = useAdminLoginService()
 
 const isLoading = ref(true)
 const loginConfig = ref<LoginConfig>({ default_value: LOGIN_METHOD.LOCAL, login_methods: [LOGIN_METHOD.LOCAL], max_attempts: 1 })
-const loginMode = ref<'account' | 'qr-code'>('account')
-
-const qrCodeProviders = computed(() =>
-  (loginConfig.value.login_methods ?? []).filter((method): method is QrCodeProvider => qrCodeLoginMethods.includes(method as QrCodeProvider)),
-)
-const accountLoginMethods = computed(() =>
-  (loginConfig.value.login_methods ?? []).filter((method) => !qrCodeLoginMethods.includes(method as QrCodeProvider)),
-)
-const accountLoginConfig = computed<LoginConfig>(() => ({
-  ...loginConfig.value,
-  default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
-    ? (accountLoginMethods.value[0] ?? LOGIN_METHOD.LOCAL)
-    : loginConfig.value.default_value,
-  login_methods: accountLoginMethods.value,
-}))
-const qrCodeLoginConfig = computed<LoginConfig>(() => ({
-  ...loginConfig.value,
-  default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
-    ? loginConfig.value.default_value
-    : (qrCodeProviders.value[0] ?? LOGIN_METHOD.WECOM),
-  login_methods: qrCodeProviders.value,
-}))
-const showLoginModeSwitch = computed(() => accountLoginMethods.value.length > 0 && qrCodeProviders.value.length > 0)
 
 onBeforeMount(() => {
   // 登录配置加载完成后，按默认登录方式挂载对应模式。
@@ -54,9 +31,6 @@ onBeforeMount(() => {
       }
       loginConfig.value = { max_attempts: 1, default_value: LOGIN_METHOD.LOCAL, login_methods: [LOGIN_METHOD.LOCAL] }
     })
-    .then(() => {
-      loginMode.value = qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider) ? 'qr-code' : 'account'
-    })
     .finally(() => {
       isLoading.value = false
     })
@@ -65,47 +39,6 @@ onBeforeMount(() => {
 
 <template>
   <LoginLayout v-if="!isLoading">
-    <!-- 切换扫码登录或账号登录 -->
-    <el-button
-      v-if="showLoginModeSwitch"
-      type="primary"
-      text
-      class="login-mode-switch"
-      @click="loginMode = loginMode === 'account' ? 'qr-code' : 'account'"
-    >
-      <MkIcon :name="loginMode === 'account' ? 'icon_qr_outlined' : 'icon_pc_outlined'" :size="48" />
-    </el-button>
-
-    <AccountLogin v-if="loginMode === 'account'" :login-config="accountLoginConfig" />
-    <QrCodeLogin v-else :login-config="qrCodeLoginConfig" />
+    <LoginModePanel :login-config="loginConfig" :login-service="loginService" />
   </LoginLayout>
 </template>
-
-<style scoped lang="scss">
-.login-mode-switch {
-  border-radius: 0 12px 0 0;
-  height: 70px;
-  margin: 0;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 70px;
-  z-index: 1;
-  .el-icon {
-    top: -6px;
-    right: -6px;
-  }
-
-  &::after {
-    background: var(--el-color-white);
-    clip-path: polygon(0 0, 0 100%, 100% 100%);
-    content: '';
-    inset: 0;
-    opacity: 1;
-    position: absolute;
-    transition: opacity 0.2s;
-  }
-}
-</style>

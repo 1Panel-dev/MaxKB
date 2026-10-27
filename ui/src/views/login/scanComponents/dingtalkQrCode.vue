@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import { nextTick, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { useStore } from '@/stores'
 import type { QrCodeConfig } from '@/api/types'
+import type { LoginService } from '../types'
 import { MsgError } from '@/utils/message'
 import { loadLoginScript } from '@/utils/script-loader'
 
 defineOptions({ name: 'DingTalkQrCode' })
 
-const props = defineProps<{ config: QrCodeConfig }>()
-const router = useRouter()
-const { auth } = useStore()
+const props = defineProps<{ config: QrCodeConfig; loginService: LoginService }>()
 
 const initialize = async () => {
   if (!props.config.app_key || !props.config.corp_id) return
@@ -29,8 +26,8 @@ const initialize = async () => {
       state: 'fit2cloud-ding-qr',
     },
     async ({ authCode }) => {
-      await auth.asyncLoginWithDingTalk(authCode)
-      await router.push({ name: 'workspace-home', params: { workspaceId: 'default' } })
+      await props.loginService.loginWithDingTalk(authCode)
+      await props.loginService.onLoginSuccess()
     },
     MsgError,
   )

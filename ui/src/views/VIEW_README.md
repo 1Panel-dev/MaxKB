@@ -428,6 +428,8 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - 系统操作日志的操作时间使用服务端表头排序，切换后回到第一页，保留搜索及筛选条件。
   分页和导出沿用当前排序条件，取消排序不传排序值。
 - 登录页使用 `formEl.validate` 回调和清晰的 LDAP／本地分支，不额外抽象或改写提交控制流程。
+  Admin 与 Chat 登录页共用 `login/components/LoginModePanel.vue` 及其账号／扫码登录组件，
+  组件不直接引用某个入口的 Store 或 API；接口、回调地址与登录后跳转由页面传入的 `LoginService` 提供。
 - Chat／Portal 页面以 auth token 为面板 key，token 变化重建并加载用户档案；路由认证见路由文档。
   会话装配在 conversation-panel，列表 Store 不感知 Router；门户复用 chat 装配，保留各智能体最近会话分组。
   没有当前智能体时不查询其信息／会话、禁用输入，分组加载后选首个；无可用智能体显示空态。

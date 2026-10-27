@@ -31,6 +31,25 @@ function getSavedToken(scope: string) {
   return localStorage.getItem(getTokenStorageKey(scope)) || undefined
 }
 
+/** 匿名认证颁发的 token 的登录方式。 */
+const ANONYMOUS_LOGIN_TYPE = 'ANNOTATION'
+
+/**
+ * 判断是否为匿名认证颁发的 token。token 为 Django signing 格式「base64url(JSON):时间戳:签名」，
+ * 前端只读取载荷中的 `login_type`，不校验签名；无法解析时视为非匿名，交由后端校验。
+ */
+export function isAnonymousToken(token: string) {
+  const [payload] = token.split(':')
+  // 以 . 开头的载荷经过压缩，后端未使用
+  if (!payload || payload.startsWith('.')) return false
+  try {
+    const tokenDetails = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))) as { login_type?: string }
+    return tokenDetails.login_type === ANONYMOUS_LOGIN_TYPE
+  } catch {
+    return false
+  }
+}
+
 interface ChatAuthState {
   /** 当前认证场景，只在守卫放行前切换。 */
   scope: string
@@ -88,6 +107,22 @@ export const useChatAuthStore = defineStore('chat-auth', {
     /** 使用账号登录当前场景，携带本地保存的 token。 */
     login(loginRequest: ChatLoginRequest) {
       return ChatAuthApi.postLogin(loginRequest, getAccessToken(this.scope), getSavedToken(this.scope)).then(({ token }) => {
+        this.setToken(token, this.scope)
+        return token
+      })
+    },
+
+    /** 使用 LDAP 账号登录当前场景，携带本地保存的 token。 */
+    ldapLogin(loginRequest: ChatLoginRequest) {
+      return ChatAuthApi.postLdapLogin(loginRequest, getAccessToken(this.scope), getSavedToken(this.scope)).then(({ token }) => {
+        this.setToken(token, this.scope)
+        return token
+      })
+    },
+
+    /** 使用钉钉扫码授权码登录当前场景。 */
+    loginWithDingTalk(code: string) {
+      return ChatAuthApi.getDingTalkCallback(code, getAccessToken(this.scope)).then(({ token }) => {
         this.setToken(token, this.scope)
         return token
       })

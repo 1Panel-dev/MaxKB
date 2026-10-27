@@ -7,6 +7,7 @@ import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
 import { getThemeImg } from '@/constants/theme'
 import LoginLayout from '@/views/login/components/LoginLayout.vue'
 import AccountLogin from '@/views/login/modes/AccountLogin.vue'
+import { useAdminLoginService } from '@/views/login/admin-login-service'
 
 type ThemeImageValue = File | string
 type ThemePreviewData = Omit<ThemeInfo, 'icon' | 'loginImage' | 'loginLogo'> & {
@@ -18,6 +19,7 @@ type ThemePreviewData = Omit<ThemeInfo, 'icon' | 'loginImage' | 'loginLogo'> & {
 defineOptions({ name: 'ThemeLoginPreview' })
 
 const props = defineProps<{ data: ThemePreviewData }>()
+const loginService = useAdminLoginService()
 const previewLoginConfig: LoginConfig = {
   default_value: LOGIN_METHOD.LOCAL,
   login_methods: [LOGIN_METHOD.LOCAL, LOGIN_METHOD.LDAP, LOGIN_METHOD.CAS, LOGIN_METHOD.OAUTH2, LOGIN_METHOD.OIDC],
@@ -83,7 +85,7 @@ const previewThemeInfo = computed<ThemeInfo>(() => ({
     <div class="preview-page relative overflow-hidden">
       <div class="preview-scale" inert>
         <LoginLayout preview :theme-info="previewThemeInfo">
-          <AccountLogin preview :login-config="previewLoginConfig" />
+          <AccountLogin preview :login-config="previewLoginConfig" :login-service="loginService" />
         </LoginLayout>
       </div>
       <div class="preview-mask absolute inset-0" aria-hidden="true"></div>

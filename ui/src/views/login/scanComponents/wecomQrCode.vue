@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { QrCodeConfig } from '@/api/types'
+import type { LoginService } from '../types'
 
 defineOptions({ name: 'WecomQrCode' })
 
-const props = defineProps<{ config: QrCodeConfig }>()
+const props = defineProps<{ config: QrCodeConfig; loginService: LoginService }>()
 
 const iframeUrl = computed(() => {
   if (!props.config.qr_url || !props.config.callback_url) return ''
@@ -15,7 +16,7 @@ const iframeUrl = computed(() => {
     login_type: 'CorpApp',
     panel_size: 'small',
     redirect_uri: props.config.callback_url,
-    state: 'fit2cloud-wecom-qr',
+    state: props.loginService.wecomState,
   })
   return `${props.config.qr_url}?${params}`
 })

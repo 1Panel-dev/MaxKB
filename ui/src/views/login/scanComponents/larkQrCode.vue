@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, watch } from 'vue'
 import type { QrCodeConfig } from '@/api/types'
+import type { LoginService } from '../types'
 import { MsgError } from '@/utils/message'
 import { loadLoginScript } from '@/utils/script-loader'
 
 defineOptions({ name: 'LarkQrCode' })
 
-const props = defineProps<{ config: QrCodeConfig }>()
+const props = defineProps<{ config: QrCodeConfig; loginService: LoginService }>()
 let messageHandler: ((event: MessageEvent) => void) | undefined
 
 const initialize = async () => {
@@ -15,11 +16,10 @@ const initialize = async () => {
   await nextTick()
   if (!window.QRLogin) throw new Error('飞书扫码 SDK 加载失败')
 
-  const adminPrefix = window.MaxKB?.prefix ?? import.meta.env.VITE_BASE_PATH ?? '/admin/'
   const authorizeUrl = new URL('https://passport.feishu.cn/suite/passport/oauth/authorize')
   authorizeUrl.search = new URLSearchParams({
     client_id: props.config.app_key,
-    redirect_uri: `${window.location.origin}${adminPrefix.replace(/\/$/, '')}/api/lark`,
+    redirect_uri: props.loginService.larkRedirectUri,
     response_type: 'code',
     state: 'fit2cloud-lark-qr',
   }).toString()

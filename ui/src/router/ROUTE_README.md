@@ -121,11 +121,15 @@ Chat 导航守卫（`chat/index.ts`）：
 2. 获取目标场景的认证前置配置（`AuthProfile`），与当前场景相同时复用。accessToken 无效、应用已停用或门户
    未开放导致获取失败时，进入 `chat-not-found` 并保留原地址；匿名认证失败时同样处理。
 3. 判断时只读取目标场景在本地存储中的 token，不切换 Store 的当前场景。
-4. 进入登录页或已有 token 时，调用 `auth.activate()` 切换当前场景后放行。
-5. `enable_auth` 为 false 时获取匿名 token，切换当前场景后放行。匿名认证与登录都携带该场景本地保存的
+4. `enable_auth` 为 false 时登录页无用：进入登录页会被重定向到 `redirect` 记录的原地址，没有时进入
+   当前场景首页（`portal-home` 或 `chat-home`），再按下一条匿名认证。
+5. 进入登录页或已有可用 token 时，调用 `auth.activate()` 切换当前场景后放行。`enable_auth` 为 true 时，
+   匿名认证颁发的 token（载荷 `login_type` 为 `ANNOTATION`，由 `isAnonymousToken` 判断）不可用，
+   即使本地已保存也跳转登录页；该 token 保留在本地存储，登录时携带。
+6. `enable_auth` 为 false 时获取匿名 token，切换当前场景后放行。匿名认证与登录都携带该场景本地保存的
    token，后端据此沿用同一对话用户。401 时 token 只在 Store 中清除并标记为失效，本地存储保留以便
    重新认证时携带；退出登录才从本地存储删除。
-6. 否则跳转到对应登录页（`portal-login` 或 `chat-login`），并通过 `redirect` 查询参数保留原地址。
+7. 否则跳转到对应登录页（`portal-login` 或 `chat-login`），并通过 `redirect` 查询参数保留原地址。
 
 当前场景只在放行前切换，请求层直接读取 `auth.token`，导航未完成时不会带上目标场景的 token。
 
