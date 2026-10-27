@@ -83,7 +83,7 @@ onMounted(() => loadRanking())
   <MkDrawer v-model="visible" title="排行榜详情" size="1000">
     <el-tabs v-model="activeKind" @tab-change="handleTabChange">
       <el-tab-pane name="tokens" label="Tokens 消耗 · Top 智能体" />
-      <el-tab-pane name="questions" label="提问次数 · Top 智能体" />
+      <el-tab-pane name="questions" label="对话次数 · Top 智能体" />
       <el-tab-pane name="userTokens" label="Tokens 消耗 · Top 用户" />
     </el-tabs>
     <div class="my-4 flex-between">
@@ -108,8 +108,9 @@ onMounted(() => loadRanking())
                 ? `mk-rank-${(pagination.currentPage - 1) * pagination.pageSize + $index + 1}`
                 : 'text-N600'
             "
-            >{{ (pagination.currentPage - 1) * pagination.pageSize + $index + 1 }}</span
           >
+            {{ (pagination.currentPage - 1) * pagination.pageSize + $index + 1 }}
+          </span>
         </template>
       </el-table-column>
       <el-table-column v-if="activeKind === 'userTokens'" label="用户" min-width="140" show-overflow-tooltip>

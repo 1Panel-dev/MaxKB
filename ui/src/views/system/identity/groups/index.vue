@@ -78,7 +78,7 @@ function handleGroupSaved(group: SystemUserGroup) {
 
 /* 删除用户组 */
 function deleteGroup(group: SystemUserGroup) {
-  MsgConfirm(`确定删除用户组"${group.name}"吗？`, '删除后，组内成员不会被删除。')
+  MsgConfirm(`是否删除用户组：${group.name}？`, '删除后，成员将被移除该用户组，通过该用户组继承的资源权限将被回收，请谨慎操作！')
     .then(() => {
       return UserGroupsApi.deleteSystemUserGroup(selectedWorkspaceId.value, group.id).then(() => {
         MsgSuccess('删除成功')

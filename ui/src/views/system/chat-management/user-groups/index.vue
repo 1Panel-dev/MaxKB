@@ -45,7 +45,7 @@ function handleGroupSelect(group: ListItem) {
 
 /* 删除用户组 */
 function deleteGroup(group: ListItem) {
-  MsgConfirm(`确定删除用户组“${group.name}”吗？`, '删除后，组内成员不会被删除。')
+  MsgConfirm(`是否删除用户组：${group.name}？`, '删除后，成员将被移除该用户组，请谨慎操作。')
     .then(() => {
       groupsLoading.value = true
       return ChatGroupsApi.deleteChatUserGroup(group.id).then(() => {
