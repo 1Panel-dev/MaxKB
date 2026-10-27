@@ -15,11 +15,12 @@ class ApplicationApiKey(AppModelMixin):
     application = models.ForeignKey(Application, on_delete=models.CASCADE, verbose_name="应用id")
     is_active = models.BooleanField(default=True, verbose_name="是否开启")
     allow_cross_domain = models.BooleanField(default=False, verbose_name="是否允许跨域")
-    cross_domain_list = ArrayField(verbose_name="跨域列表",
-                                   base_field=models.CharField(max_length=128, blank=True)
-                                   , default=list)
+    cross_domain_list = ArrayField(
+        verbose_name="跨域列表", base_field=models.CharField(max_length=128, blank=True), default=list
+    )
     expire_time = models.DateTimeField(verbose_name="过期时间", default=timezone.now)
     is_permanent = models.BooleanField(default=True, verbose_name="是否永久")
+    remark = models.CharField(max_length=256, verbose_name="备注", blank=True, default="")
 
     class Meta:
         db_table = "application_api_key"

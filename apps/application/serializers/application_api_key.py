@@ -22,39 +22,38 @@ class ApplicationKeySerializerModel(serializers.ModelSerializer):
 class EditApplicationKeySerializer(serializers.Serializer):
     is_active = serializers.BooleanField(required=False, label=_("Availability"))
 
-    allow_cross_domain = serializers.BooleanField(required=False,
-                                                  label=_("Is cross-domain allowed"))
+    allow_cross_domain = serializers.BooleanField(required=False, label=_("Is cross-domain allowed"))
 
-    cross_domain_list = serializers.ListSerializer(required=False,
-                                                   child=serializers.CharField(required=True,
-                                                                               label=_("Cross-domain address")),
-                                                   label=_("Cross-domain list"))
+    cross_domain_list = serializers.ListSerializer(
+        required=False,
+        child=serializers.CharField(required=True, label=_("Cross-domain address")),
+        label=_("Cross-domain list"),
+    )
     is_permanent = serializers.BooleanField(required=False, label=_("Is permanent"))
     expire_time = serializers.DateTimeField(required=False, allow_null=True, label=_("Expiration time"))
+    remark = serializers.CharField(required=False, label=_("Remark"))
 
 
 class ApplicationKeySerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
-    application_id = serializers.UUIDField(required=True, label=_('application id'))
-    order_by = serializers.CharField(required=False, label=_('order by'), allow_null=True, allow_blank=True)
+    application_id = serializers.UUIDField(required=True, label=_("application id"))
+    order_by = serializers.CharField(required=False, label=_("order by"), allow_null=True, allow_blank=True)
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
-        workspace_id = self.data.get('workspace_id')
-        query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+        workspace_id = self.data.get("workspace_id")
+        query_set = QuerySet(Application).filter(id=self.data.get("application_id"))
         if workspace_id:
             query_set = query_set.filter(workspace_id=workspace_id)
         if not query_set.exists():
-            raise AppApiException(500, _('Application id does not exist'))
+            raise AppApiException(500, _("Application id does not exist"))
 
     def generate(self, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
         application_id = self.data.get("application_id")
-        secret_key = 'agent-' + hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()
-        application_api_key = ApplicationApiKey(id=uuid.uuid7(),
-                                                secret_key=secret_key,
-                                                application_id=application_id)
+        secret_key = "agent-" + hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()
+        application_api_key = ApplicationApiKey(id=uuid.uuid7(), secret_key=secret_key, application_id=application_id)
         application_api_key.save()
         return ApplicationKeySerializerModel(application_api_key).data
 
@@ -63,34 +62,38 @@ class ApplicationKeySerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
         application_id = self.data.get("application_id")
         query_set = QuerySet(ApplicationApiKey).filter(application_id=application_id)
-        order_by = '-create_time' if self.data.get('order_by') is None or self.data.get(
-            'order_by') == '' else self.data.get('order_by')
+        order_by = (
+            "-create_time"
+            if self.data.get("order_by") is None or self.data.get("order_by") == ""
+            else self.data.get("order_by")
+        )
         query_set = query_set.order_by(order_by)
-        return page_search(current_page, page_size,
-                           query_set,
-                           post_records_handler=lambda u: ApplicationKeySerializerModel(u).data)
+        return page_search(
+            current_page, page_size, query_set, post_records_handler=lambda u: ApplicationKeySerializerModel(u).data
+        )
 
     class Operate(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
-        application_id = serializers.UUIDField(required=True, label=_('application id'))
-        api_key_id = serializers.UUIDField(required=True, label=_('ApiKeyId'))
+        application_id = serializers.UUIDField(required=True, label=_("application id"))
+        api_key_id = serializers.UUIDField(required=True, label=_("ApiKeyId"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            workspace_id = self.data.get('workspace_id')
-            query_set = QuerySet(Application).filter(id=self.data.get('application_id'))
+            workspace_id = self.data.get("workspace_id")
+            query_set = QuerySet(Application).filter(id=self.data.get("application_id"))
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
-                raise AppApiException(500, _('Application id does not exist'))
+                raise AppApiException(500, _("Application id does not exist"))
 
         def delete(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             api_key_id = self.data.get("api_key_id")
-            application_id = self.data.get('application_id')
-            application_api_key = QuerySet(ApplicationApiKey).filter(id=api_key_id,
-                                                                     application_id=application_id).first()
+            application_id = self.data.get("application_id")
+            application_api_key = (
+                QuerySet(ApplicationApiKey).filter(id=api_key_id, application_id=application_id).first()
+            )
             del_application_api_key(application_api_key.secret_key)
             application_api_key.delete()
 
@@ -99,24 +102,27 @@ class ApplicationKeySerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 EditApplicationKeySerializer(data=instance).is_valid(raise_exception=True)
             api_key_id = self.data.get("api_key_id")
-            application_id = self.data.get('application_id')
-            application_api_key = QuerySet(ApplicationApiKey).filter(id=api_key_id,
-                                                                     application_id=application_id).first()
+            application_id = self.data.get("application_id")
+            application_api_key = (
+                QuerySet(ApplicationApiKey).filter(id=api_key_id, application_id=application_id).first()
+            )
             if application_api_key is None:
-                raise AppApiException(500, _('APIKey does not exist'))
-            if 'is_active' in instance and instance.get('is_active') is not None:
-                application_api_key.is_active = instance.get('is_active')
-            if 'allow_cross_domain' in instance and instance.get('allow_cross_domain') is not None:
-                application_api_key.allow_cross_domain = instance.get('allow_cross_domain')
-            if 'cross_domain_list' in instance and instance.get('cross_domain_list') is not None:
-                application_api_key.cross_domain_list = instance.get('cross_domain_list')
-            if 'is_permanent' in instance and instance.get('is_permanent') is not None:
-                application_api_key.is_permanent = instance.get('is_permanent')
+                raise AppApiException(500, _("APIKey does not exist"))
+            if "is_active" in instance and instance.get("is_active") is not None:
+                application_api_key.is_active = instance.get("is_active")
+            if "allow_cross_domain" in instance and instance.get("allow_cross_domain") is not None:
+                application_api_key.allow_cross_domain = instance.get("allow_cross_domain")
+            if "cross_domain_list" in instance and instance.get("cross_domain_list") is not None:
+                application_api_key.cross_domain_list = instance.get("cross_domain_list")
+            if "is_permanent" in instance and instance.get("is_permanent") is not None:
+                application_api_key.is_permanent = instance.get("is_permanent")
                 if not application_api_key.is_permanent:
-                    application_api_key.expire_time = instance.get('expire_time')
+                    application_api_key.expire_time = instance.get("expire_time")
                 else:
                     application_api_key.expire_time = timezone.now()
+            if "remark" in instance and instance.get("remark") is not None:
+                application_api_key.remark = instance.get("remark")
             application_api_key.save()
             # 写入缓存
-            get_application_api_key('Bearer ' + application_api_key.secret_key, False)
+            get_application_api_key("Bearer " + application_api_key.secret_key, False)
             return True
