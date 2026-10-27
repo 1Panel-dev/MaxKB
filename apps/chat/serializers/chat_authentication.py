@@ -69,7 +69,8 @@ class ChatAuthProfileSerializer(serializers.Serializer):
         if chat_platform is not None:
             types = QuerySet(chat_platform).filter(is_active=True, is_valid=True).values_list("auth_type", flat=True)
             login_value = list(set(login_value) & set(types))
-            if "LOCAL" in application_access_token.authentication_value.get("login_value", []):
+        if application_access_token.authentication:
+            if "LOCAL" not in login_value:
                 login_value.insert(0, "LOCAL")
         return {
             "max_attempts": application_access_token.authentication_value.get("max_attempts", 1),

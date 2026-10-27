@@ -45,7 +45,7 @@ class ChatUserAccessTokenV3Serializer(serializers.Serializer):
         if portal is None or not portal.enable_auth:
             raise AppApiException(500, _("Portal authentication is not enabled"))
         auth_config = portal.auth_config or {}
-        if "LOCAL" not in auth_config.get("login_value", []):
+        if "LOCAL" not in auth_config.get("login_value", ["LOCAL"]):
             raise AppApiException(500, _("Portal local login is not enabled"))
         return (
             "portal",
