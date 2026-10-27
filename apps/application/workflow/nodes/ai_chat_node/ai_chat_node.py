@@ -398,6 +398,8 @@ class AIChatNode(INode):
     async def _stream_response(
         self, response, chat_model, message_list, question, reasoning_content_id, text_content_id
     ):
+
+        reasoning_setting = {"reasoning_end": False, "is_reasoning": False}
         answer = ""
         reasoning_content = ""
         try:
@@ -422,9 +424,9 @@ class AIChatNode(INode):
                 if reasoning_content_chunk is None:
                     reasoning_content_chunk = ""
                 reasoning_content += reasoning_content_chunk
-                reasoning_end = False
+
                 if content_chunk:
-                    if not reasoning_end:
+                    if not reasoning_setting.get("reasoning_end") and reasoning_setting.get("is_reasoning"):
                         self.write(
                             ReasoningContent(
                                 reasoning_content_id, "", Status.SUCCESS, node_info, Position(self.get_node_id())
@@ -436,6 +438,7 @@ class AIChatNode(INode):
                         )
                     )
                 if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
+                    reasoning_setting["is_reasoning"] = True
                     self.write(
                         ReasoningContent(
                             reasoning_content_id,
@@ -446,16 +449,18 @@ class AIChatNode(INode):
                         )
                     )
 
-            reasoning_end = reasoning.get_end_reasoning_content()
-            answer += reasoning_end.get("content")
+            reasoning_content_end = reasoning.get_end_reasoning_content()
+            answer += reasoning_content_end.get("content")
             reasoning_content_chunk = ""
             if not response_reasoning_content:
-                reasoning_content_chunk = reasoning_end.get("reasoning_content")
-            if reasoning_end.get("content"):
+                reasoning_content_chunk = reasoning_content_end.get("reasoning_content")
+            if reasoning_content_end.get("content"):
+                if not reasoning_setting["reasoning_end"]:
+                    reasoning_setting["reasoning_end"] = True
                 self.write(
                     TextContent(
                         text_content_id,
-                        reasoning_end.get("content"),
+                        reasoning_content_end.get("content"),
                         Status.RUNNING,
                         node_info,
                         Position(self.get_node_id()),
