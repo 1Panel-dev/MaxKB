@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, shallowRef, useTemplateRef } from 'vue'
 import StoreApi from '@/api/admin/store.ts'
 import { TOOL_TYPE } from '@/api/enums'
+import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import type { ToolStoreItem, ToolStoreTag, ToolType } from '@/api/types'
 import ToolStoreCard from './component/ToolStoreCard.vue'
 import ApplyStoreToolDialog from './ApplyStoreToolDialog.vue'
@@ -24,7 +25,7 @@ const visible = ref(false)
 const loading = ref(false)
 const activeCategoryId = ref('')
 const appliedSearchKeyword = ref('')
-const folderId = ref('default')
+const folderId = ref(FOLDER_ENTRY_ID.ALL)
 const searchKeyword = ref('')
 const storeTools = ref<ToolStoreItem[]>([])
 const storeTags = ref<ToolStoreTag[]>([])
@@ -85,7 +86,7 @@ function loadStoreTools() {
 }
 
 function open(targetFolderId: string) {
-  folderId.value = targetFolderId || 'default'
+  folderId.value = targetFolderId || FOLDER_ENTRY_ID.ALL
   visible.value = true
   loadStoreTools()
 }

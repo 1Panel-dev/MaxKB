@@ -817,6 +817,7 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 后可调用 `refresh()` 重新加载文件夹树。
 `VirtualizedTree.vue` 基于 `@he-tree/vue` 的 `Draggable` 实现虚拟渲染和拖拽交互，只负责树 UI，
 不调用 API；不要替换为 Element Plus `el-tree-v2`。
+“全部”入口 ID 使用当前工作空间 ID；未传入 `v-model` 时，在实例创建时读取该 ID 作为默认选择。
 
 ### MoveToDialog
 
