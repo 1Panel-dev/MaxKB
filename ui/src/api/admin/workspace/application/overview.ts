@@ -10,7 +10,6 @@ const getPrefix = (workspaceId = getWorkspaceId()) => `/workspace/${workspaceId}
 const getMonitoring = (workspaceId: string, range: HomeDateRange, applicationId: string) =>
   get<HomeMonitoringDay[]>(`${getPrefix(workspaceId)}/${applicationId}/application_stats`, { ...range })
 
-// TODO：后台按首页协议补齐用户排行分页、name 搜索、汇总和导出。
 const rankingPaths = { userTokens: 'application_token_usage', questions: 'top_questions' }
 
 /** 分页查询当前智能体的用户排行。 */

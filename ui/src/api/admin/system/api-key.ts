@@ -1,4 +1,3 @@
-/** 系统 API Key 接口。TODO：联调 /system/api_key 及 remark 字段。 */
 import { del, get, post, put } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type { ApiKeyPayload, ApiKeyRecord, Dict } from '@/api/types'

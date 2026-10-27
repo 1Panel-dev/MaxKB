@@ -6,6 +6,7 @@ import type { ApplicationRankingKind, HomeRankingRecord } from '@/api/types'
 import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
 import { beforeDay } from '@/utils/time'
+import { formatTokenNumber, numberFormat } from '@/utils/number'
 import RankingCard from '@/views/home/components/ranking/RankingCard.vue'
 import ApplicationRankingDrawer from './ApplicationRankingDrawer.vue'
 
@@ -101,7 +102,12 @@ onMounted(loadRankings)
         :loading="loading"
         :total="totals[option.kind]"
         @detail="handleOpenRankingDetail(option.kind)"
-      />
+      >
+        <template #description="{ record }">
+          <span v-if="option.kind === 'userTokens'">对话 {{ numberFormat(record.chat_record_count) }} 次</span>
+          <span v-else>{{ formatTokenNumber(record.total_tokens ?? 0) }}</span>
+        </template>
+      </RankingCard>
     </div>
     <ApplicationRankingDrawer
       v-if="detailKind"

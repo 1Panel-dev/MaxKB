@@ -24,7 +24,6 @@ const getPrefix = (knowledgeId: string) => `/system/resource/knowledge/${knowled
 
 /**
  * 获取知识库不分页的文档或图片选项。
- * TODO：联调 resource_type=document/image 筛选及图片缩略图字段 meta.source_file_id。
  */
 const getAllDocuments = (knowledgeId: string, query?: { resource_type: DocumentResourceType }) => get<DocumentItem[]>(getPrefix(knowledgeId), query)
 

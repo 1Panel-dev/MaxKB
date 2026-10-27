@@ -153,7 +153,6 @@ function handleClosed() {
         <el-date-picker v-model="form.expire_time" class="w-full!" type="datetime" value-format="YYYY-MM-DDTHH:mm:ssZ" placeholder="请选择到期时间" />
       </el-form-item>
       <el-form-item label="备注" prop="remark">
-        <!-- TODO：后端支持 remark 后移除联调提示。 -->
         <el-input v-model="form.remark" type="textarea" :rows="3" maxlength="256" show-word-limit placeholder="请输入" />
       </el-form-item>
       <el-form-item label="跨域设置">

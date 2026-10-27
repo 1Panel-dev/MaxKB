@@ -255,6 +255,7 @@ defineExpose({ open })
               <MkEmpty :type="paragraphSearchText ? 'search' : 'default'" description="暂无分段" />
             </template>
           </MkInfiniteScroll>
+          <el-empty v-else-if="!documentLoading" class="flex-1" description="暂无数据" />
         </div>
       </template>
     </MkViewLayout>

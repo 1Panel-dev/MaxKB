@@ -8,7 +8,6 @@ export interface ApiKeyRecord {
   is_permanent: boolean
   expire_time: string | null
   create_time?: string
-  // TODO：后端补充 remark 的返回与持久化。
   remark?: string | null
 }
 
