@@ -254,7 +254,7 @@ def _auth_chat(file, token):
         if token.login_type.upper() == str(Operate.ANNOTATION_AUTH):
             _check_anonymous_login(file.source_id)
         ## 如果当前用户能访问到这个对话,那么就有资源的访问权限
-        if QuerySet(Chat).filter(user_id=user_id, id=file.source_id, is_deleted=False).exists():
+        if QuerySet(Chat).filter(chat_user_id=user_id, id=file.source_id, is_deleted=False).exists():
             return
         # 非本人:存在分享链接才允许
         if not QuerySet(ChatShareLink).filter(chat_id=file.source_id).exists():
