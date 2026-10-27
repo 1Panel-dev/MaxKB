@@ -157,7 +157,7 @@ defineExpose({ open, close })
     >
       <div class="flex-between shrink-0 border-b border-N300 px-4 py-3">
         <h4 class="flex-align-center gap-2">
-          <MkIcon name="icon_star" class="text-primary!" />
+          <MkIcon name="icon_star_colorful" />
           AI 生成
         </h4>
         <div class="flex-align-center gap-1">

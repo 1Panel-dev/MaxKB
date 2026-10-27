@@ -1,3 +1,4 @@
+import ApplicationApi from '@/api/admin/system/resource-management/application/application'
 import { get, post } from '@/api/admin/core/request'
 import type { KnowledgeTagGroup } from '@/api/types'
 import type { McpTool } from '@/workflow-canvas/store'
@@ -13,6 +14,7 @@ const getMcpTools = (resourceType: string, resourceId: string, mcpServers: strin
 const getAllTags = (knowledgeIds: string[]) => get<KnowledgeTagGroup[]>('/system/resource/knowledge/tags', { 'knowledge_ids[]': knowledgeIds })
 
 export default {
+  getAllApplication: ApplicationApi.getAllApplication,
   postPromptGenerate: ModelApi.postPromptGenerate,
   postChatCompletion: ModelApi.postChatCompletion,
   getMcpTools,

@@ -135,13 +135,7 @@ const activeText = computed(() => {
       <div class="title">{{ title }}</div>
 
       <!-- 搜索表格选项 -->
-      <MkSearchInput
-        v-model="filterText"
-        :validate-event="false"
-        placeholder="请输入关键词搜索"
-        class="input-with-select"
-        style="--el-color-danger: #c0c4cc"
-      />
+      <MkSearchInput v-model="filterText" :validate-event="false" />
     </div>
 
     <el-table
@@ -183,9 +177,6 @@ const activeText = computed(() => {
       font-weight: 400;
       font-size: 14px;
       line-height: 22px;
-    }
-    .input-with-select {
-      width: 45%;
     }
   }
   .msg {

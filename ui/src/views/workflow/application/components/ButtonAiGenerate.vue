@@ -27,7 +27,7 @@ function handleOpenAiGenerate() {
   <!-- AI 生成智能体工作流 -->
   <el-button plain :disabled="disabled" @click="handleOpenAiGenerate">
     <!-- // TODO 图标 -->
-    <MkIcon name="icon_star" />
+    <MkIcon name="icon_star_colorful" />
     <span>{{ label }}</span>
   </el-button>
   <AiGeneratePanel

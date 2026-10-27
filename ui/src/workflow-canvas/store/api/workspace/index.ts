@@ -1,3 +1,4 @@
+import ApplicationApi from '@/api/admin/workspace/application/application'
 import { get, post } from '@/api/admin/core/request'
 import type { KnowledgeTagGroup } from '@/api/types'
 import modelAPI from '@/api/admin/workspace/model'
@@ -20,6 +21,7 @@ const getAllTags = (knowledgeIds: string[]) => {
 }
 
 export default {
+  getAllApplication: ApplicationApi.getAllApplication,
   postPromptGenerate: modelAPI.postPromptGenerate,
   postChatCompletion: modelAPI.postChatCompletion,
   getModelListWithShared: modelAPI.getModelListWithShared,
