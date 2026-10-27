@@ -75,24 +75,22 @@ class AccessTokenSerializer(serializers.Serializer):
             application_access_token.language = None
         if "authentication" in instance and instance.get("authentication") is not None:
             application_access_token.authentication = instance.get("authentication")
-            if instance.get("authentication_value") is None:
-                application_access_token.authentication_value = {
-                    "type": "login",
-                    "lock_time": 10,
-                    "login_value": ["LOCAL"],
-                    "max_attempts": 1,
-                    "default_value": "LOCAL",
-                    "failed_attempts": 5,
-                }
+            application_access_token.authentication_value = {
+                "type": "login",
+                "lock_time": 10,
+                "login_value": ["LOCAL"],
+                "max_attempts": 1,
+                "default_value": "LOCAL",
+                "failed_attempts": 5,
+            }
 
-        application_access_token.save()
         license_is_valid = cache.get(
             Cache_Version.SYSTEM.get_key(key="license_is_valid"), version=Cache_Version.SYSTEM.get_version()
         )
         if license_is_valid:
             if instance.get("authentication") is not None and instance.get("authentication_value") is not None:
                 application_access_token.authentication_value = instance.get("authentication_value")
-                application_access_token.save()
+        application_access_token.save()
         return self.one(with_valid=False)
 
     def one(self, with_valid=True):
@@ -110,7 +108,10 @@ class AccessTokenSerializer(serializers.Serializer):
         license_is_valid = cache.get(
             Cache_Version.SYSTEM.get_key(key="license_is_valid"), version=Cache_Version.SYSTEM.get_version()
         )
-        other = {"authentication": application_access_token.authentication}
+        other = {
+            "authentication": application_access_token.authentication,
+            "authentication_value": application_access_token.authentication_value,
+        }
         if license_is_valid:
             other = {
                 "authentication": application_access_token.authentication,
