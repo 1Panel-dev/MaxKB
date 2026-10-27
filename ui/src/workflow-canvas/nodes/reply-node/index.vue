@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, useTemplateRef } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
+import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { BaseNodeModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowReplyNode' })
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
+const anchorGuard = createAnchorGuard(model)
+onBeforeUnmount(() => anchorGuard.reset())
 interface ReplyNodeForm {
   content: string
   content_type: 'TEXT' | 'HTML' | 'TOOL'
@@ -66,20 +68,24 @@ onMounted(() => {
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
         <!-- 回复类型 -->
-        <el-form-item>
-          <template #label>
-            <div class="flex-align-center gap-1">
-              <span>回复类型</span>
-              <MkTooltip content="工具类型的回复内容为 JSON 对象或数组，元素字段为 id、name、arguments、content" placement="right">
-                <MkIcon name="icon_info_outlined" class="text-N600!" />
-              </MkTooltip>
-            </div>
-          </template>
-          <el-radio-group v-model="formData.content_type" size="small">
-            <el-radio-button label="文本" value="TEXT" />
-            <el-radio-button label="HTML" value="HTML" />
-            <el-radio-button label="工具" value="TOOL" />
-          </el-radio-group>
+        <el-form-item label="回复类型">
+          <el-select
+            v-model="formData.content_type"
+            :teleported="false"
+            @visible-change="anchorGuard.setOverlayVisible('content-type', $event)"
+            @wheel="handleNodeWheel"
+          >
+            <el-option label="文本" value="TEXT" />
+            <el-option label="HTML" value="HTML" />
+            <el-option label="工具" value="TOOL">
+              <div class="flex-align-center gap-1">
+                <span>工具</span>
+                <MkTooltip content="回复内容为 JSON 对象或数组，元素字段为 id、name、arguments、content" placement="right">
+                  <MkIcon name="icon_info_outlined" class="text-N600!" />
+                </MkTooltip>
+              </div>
+            </el-option>
+          </el-select>
         </el-form-item>
 
         <el-form-item
