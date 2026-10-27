@@ -9,25 +9,82 @@
       </svg>
     </button>
 
-    <!-- 组内工具：每个工具一行，可单独展开参数与结果 -->
+    <!-- 组内工具：每个工具一行，有专用渲染器的按工具名展示，其余可单独展开参数与结果 -->
     <div v-show="isExpanded && toolItems.length" class="group-body">
-      <ToolItem v-for="(toolItem, index) in toolItems" :key="toolItem.id ?? index" :tool-item="toolItem" class="group-row" />
+      <template v-for="(toolItem, index) in toolItems" :key="toolItem.id ?? index">
+        <div v-if="resolveToolRenderer(toolItem.name)" class="group-row group-row-custom">
+          <component
+            :is="resolveToolRenderer(toolItem.name)"
+            :content="toolItem"
+            :loading="toolItem.status === 'RUNNING'"
+            :expanded="isToolExpanded(toolItem, index)"
+            @toggle="toggleTool(toolItem, index)"
+          />
+        </div>
+        <ToolItem v-else :tool-item="toolItem" class="group-row" />
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, type Component } from 'vue'
 import ToolItem from './components/ToolItem.vue'
+import Terminal from '../tool/Terminal.vue'
+import Patch from '../tool/Patch.vue'
+import ReadFile from '../tool/ReadFile.vue'
+import ListDir from '../tool/ListDir.vue'
+import Grep from '../tool/Grep.vue'
+import Glob from '../tool/Glob.vue'
+import CreateFile from '../tool/CreateFile.vue'
+import ListSkills from '../tool/ListSkills.vue'
+import DownloadSkills from '../tool/DownloadSkills.vue'
+import RunSkill from '../tool/RunSkill.vue'
 
 /**
  * 分组工具卡：由 content-list 把相邻 TOOL 折叠而成，content.children 为组内 TOOL 内容项。
+ * 组内工具按工具名使用专用渲染器（与单个 TOOL 的 tool/index.vue 一致），未匹配的工具以参数/结果行展示。
  * 状态由组内工具汇总：有执行中为执行中，否则有失败为失败，否则成功。
  * 执行中默认展开，结束后默认收起，手动切换后以手动为准。
  */
 const props = defineProps<{ content: any }>()
 
 const toolItems = computed<any[]>(() => props.content.children ?? [])
+
+// 工具名（小写）→ 专用渲染器；新增工具时与 tool/index.vue 同步
+const toolRenderers: Record<string, Component> = {
+  run_command: Terminal,
+  apply_patch: Patch,
+  read_file: ReadFile,
+  list_dir: ListDir,
+  grep: Grep,
+  glob: Glob,
+  create_file: CreateFile,
+  list_skills: ListSkills,
+  download_skills: DownloadSkills,
+  run_skill: RunSkill,
+}
+
+function resolveToolRenderer(toolName: unknown): Component | undefined {
+  return toolRenderers[String(toolName || '').toLowerCase()]
+}
+
+type GroupToolItem = { id?: string; status?: string }
+
+// 组内专用渲染器的展开状态：执行中默认展开，结束后默认收起，手动切换后以手动为准
+const manualToolExpanded = ref<Record<string, boolean>>({})
+
+function toolKey(toolItem: GroupToolItem, index: number) {
+  return String(toolItem.id ?? index)
+}
+
+function isToolExpanded(toolItem: GroupToolItem, index: number) {
+  return manualToolExpanded.value[toolKey(toolItem, index)] ?? toolItem.status === 'RUNNING'
+}
+
+function toggleTool(toolItem: GroupToolItem, index: number) {
+  manualToolExpanded.value[toolKey(toolItem, index)] = !isToolExpanded(toolItem, index)
+}
 
 const groupStatus = computed(() => {
   const childStatuses = toolItems.value.map((toolItem) => toolItem.status)
@@ -114,6 +171,10 @@ const isExpanded = computed({
   border: 1px solid var(--bd, #dcdfe6);
   border-radius: 8px;
   overflow: hidden;
+}
+
+.group-row-custom {
+  padding: 5px 12px;
 }
 
 .group-row + .group-row {
