@@ -60,7 +60,7 @@ export const buildBasePermission = (permission: Permission, workspaceId: string 
   AggregatePermission.builder()
     .addPermission(permission.newWorkspacePermission(workspaceId))
     .addRole(new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId))
-    .addRole(RoleConstants.ADMIN)
+    .addRole(new Role(RoleConstants.USER.name, workspaceId))
     .compare(Compare.OR)
     .build()
 
