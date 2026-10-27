@@ -66,7 +66,7 @@ class BaseTextToVideoNode(ITextToVideoNode):
         file_url = self.upload_file(file)
         video_label = f'<video src="{file_url}" controls style="max-width: 100%; width: 100%; height: auto;"></video>'
         video_list = [{'file_id': file_url.split('/')[-1], 'file_name': file_name, 'url': file_url}]
-        return NodeResult({'answer': video_label, 'chat_model': ttv_model, 'message_list': message_list,
+        return NodeResult({'answer': video_label, 'message_list': message_list,
                            'video': video_list,
                            'history_message': history_message, 'question': question}, {})
 
