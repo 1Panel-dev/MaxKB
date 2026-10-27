@@ -1,12 +1,14 @@
-import { ref, inject, type InjectionKey } from 'vue'
+import { ref, inject, type InjectionKey, type Ref } from 'vue'
 import type { ChatLogRecord } from '@/api/types'
-import type { ChatMessage, ChatRecordMeta } from '../../core/types'
+import type { ChatMessage, ChatRecordMeta, ConversationAppInfo } from '../../core/types'
 
 // 只读会话记录(如对话日志):只分页拉取历史记录,不发送、不续跑、不流式。
 // 与 message-list 刻意不共用 store 约定,也不注入 MESSAGE_LIST_KEY,表单等内容项因此自动只读。
 export interface LogMessageListDeps {
   pageRecords: (chatId: string, page: number, size: number) => Promise<{ records: ChatLogRecord[] }>
   getChatId: () => string
+  /** 当前智能体信息：只读，由 view 加载维护。 */
+  appInfo: Readonly<Ref<ConversationAppInfo | null>>
 }
 
 // 从后端 chat_record(reset_chat_record 结构)提取底部信息栏数据
@@ -19,7 +21,7 @@ const buildRecordMeta = (raw: ChatLogRecord): ChatRecordMeta => ({
 })
 
 export function createLogMessageListStore(deps: LogMessageListDeps) {
-  const { pageRecords, getChatId } = deps
+  const { pageRecords, getChatId, appInfo } = deps
 
   const messages = ref<ChatMessage[]>([])
   const loading = ref(false)
@@ -72,7 +74,7 @@ export function createLogMessageListStore(deps: LogMessageListDeps) {
     return loadMessages(cid, currentPage.value + 1)
   }
 
-  return { messages, loading, hasMore, load, loadMore }
+  return { appInfo, messages, loading, hasMore, load, loadMore }
 }
 
 export type LogMessageListStore = ReturnType<typeof createLogMessageListStore>

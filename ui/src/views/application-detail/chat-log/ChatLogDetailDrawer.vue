@@ -11,7 +11,7 @@ const props = defineProps<{
   nextDisabled: boolean
 }>()
 
-const { applicationId, resourceApi } = useApplicationDetailContext()
+const { application, applicationId, resourceApi } = useApplicationDetailContext()
 const emit = defineEmits<{ previous: []; next: []; closed: [] }>()
 
 // 对话详情抽屉的打开与关闭
@@ -52,6 +52,7 @@ defineExpose({ open, close })
         :key="props.chatLog.id"
         :chat-id="props.chatLog.id"
         :application-id="applicationId"
+        :application="application"
         :chat-log-api="resourceApi.chatLog"
         :right-drawer-target="rightDrawerTarget"
       />
