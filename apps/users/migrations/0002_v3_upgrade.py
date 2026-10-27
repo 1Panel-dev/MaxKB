@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                         verbose_name="主键id",
                     ),
                 ),
-                ("name", models.CharField(db_index=True, max_length=150, unique=True, verbose_name="名称")),
+                ("name", models.CharField(db_index=True, max_length=150, verbose_name="名称")),
                 (
                     "workspace_id",
                     models.CharField(db_index=True, default="default", max_length=64, verbose_name="工作空间id"),
