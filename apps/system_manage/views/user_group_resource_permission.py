@@ -173,7 +173,7 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
     )
     def get(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(
-            UserGroupResourcePermissionSerializer(
+            ResourceUserGroupPermissionSerializer(
                 data={
                     "workspace_id": workspace_id,
                     "target": target,
