@@ -1,21 +1,19 @@
-import { computed, ref, watch, type Ref } from 'vue'
+import { computed, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import WorkspaceConversationApi from '@/api/admin/workspace/conversation'
 import SystemResourceConversationApi from '@/api/admin/system/resource-management/application/conversation'
-import WorkspaceApplicationApi from '@/api/admin/workspace/application/application'
-import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import { isSystemResource } from '@/utils/resource-context'
 import { useStore } from '@/stores'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
-import type { ApplicationDetail, ApplicationDisplaySetting } from '@/api/types'
+import type { ApplicationDetail } from '@/api/types'
 import type { ConversationApiAdapter } from '../../core/types'
 import { createConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { createMessageListStore } from '../../components/message-list/index'
 import { createMessageInputStore } from '../../components/message-input/index'
 import { createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 import type { ConversationBundle } from '../types'
-import { toDebugAppInfo } from './app-info'
+import { useAdminAppInfo } from './app-info'
 
 /**
  * debug 模式:装配各组件 store。adapter 走 admin(带 applicationId)。
@@ -24,7 +22,6 @@ import { toDebugAppInfo } from './app-info'
 export function createDebugConversation(application: Readonly<Ref<ApplicationDetail | null | undefined>>): ConversationBundle {
   const route = useRoute()
   const ConversationApi = isSystemResource() ? SystemResourceConversationApi : WorkspaceConversationApi
-  const ApplicationApi = isSystemResource() ? SystemResourceApplicationApi : WorkspaceApplicationApi
   const appId = computed(
     () => (route.params.id as string) || (route.params.applicationId as string) || '',
   )
@@ -39,25 +36,9 @@ export function createDebugConversation(application: Readonly<Ref<ApplicationDet
     uploadFile: (file, cid, onProgress) => FileApi.postUploadFile(file, cid, FILE_SOURCE_TYPE.CHAT, onProgress).request,
     cancel: (cid) => ConversationApi.postCancelConversationMessage(cid, appId.value),
   }
-  // 显示设置只有许可证有效的专业版、企业版提供；社区版或加载失败时使用默认值。
-  // 知识来源、执行详情在调试中固定显示，不需要访问配置。显示设置不在工作流页编辑，加载一次即可。
-  const { auth, user } = useStore()
-  const displaySetting = ref<Partial<ApplicationDisplaySetting> | null>(null)
-  watch(
-    () => auth.isPE || auth.isEE,
-    (licensed) => {
-      if (!licensed || displaySetting.value || !appId.value) return
-      ApplicationApi.getDisplaySetting(appId.value)
-        .then((setting) => (displaySetting.value = setting))
-        .catch(() => {})
-    },
-    { immediate: true },
-  )
-
-  // 智能体信息随工作流页保存同步，转为 profile 结构后注入各组件 store
-  const appInfo = computed(() =>
-    application.value ? toDebugAppInfo(application.value, displaySetting.value) : null,
-  )
+  const { user } = useStore()
+  // 智能体信息随工作流页保存同步，转为 profile 结构后注入各组件 store；知识来源、执行详情在调试中固定显示
+  const appInfo = useAdminAppInfo(application, appId)
 
   // currentChatId 单一数据源在 list;msgs 只读借用,list 通过 bindLoader 主动驱动加载
   const list = createConversationListStore({

@@ -1,8 +1,13 @@
-/** debug 模式的智能体信息：由 Admin 智能体详情与显示设置转为对话端 profile 结构。 */
+/** Admin 端（调试、对话日志）的智能体信息：由 Admin 智能体详情与显示设置转为对话端 profile 结构。 */
 
+import { computed, ref, watch, type ComputedRef, type Ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import WorkspaceApplicationApi from '@/api/admin/workspace/application/application'
+import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { ApplicationDetail, ApplicationDisplaySetting, Dict } from '@/api/types'
 import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
+import { useStore } from '@/stores'
+import { isSystemResource } from '@/utils/resource-context'
 import type { ConversationAppInfo } from '../../core/types'
 
 const BASE_NODE_ID = 'base-node'
@@ -70,4 +75,28 @@ export function toDebugAppInfo(detail: ApplicationDetail, displayConfig?: Partia
     float_location: display.float_location,
     chat_background: display.chat_background,
   }
+}
+
+/**
+ * Admin 端智能体信息：随传入的详情更新；显示设置只有许可证有效的专业版、企业版提供，加载一次，
+ * 社区版或加载失败时使用默认值。显示设置不在调试、日志页编辑，无需重新加载。
+ */
+export function useAdminAppInfo(
+  application: Readonly<Ref<ApplicationDetail | null | undefined>>,
+  applicationId: Readonly<Ref<string>>,
+): ComputedRef<ConversationAppInfo | null> {
+  const ApplicationApi = isSystemResource() ? SystemResourceApplicationApi : WorkspaceApplicationApi
+  const { auth } = useStore()
+  const displaySetting = ref<Partial<ApplicationDisplaySetting> | null>(null)
+  watch(
+    () => auth.isPE || auth.isEE,
+    (licensed) => {
+      if (!licensed || displaySetting.value || !applicationId.value) return
+      ApplicationApi.getDisplaySetting(applicationId.value)
+        .then((setting) => (displaySetting.value = setting))
+        .catch(() => {})
+    },
+    { immediate: true },
+  )
+  return computed(() => (application.value ? toDebugAppInfo(application.value, displaySetting.value) : null))
 }
