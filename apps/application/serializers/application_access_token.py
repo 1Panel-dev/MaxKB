@@ -75,6 +75,15 @@ class AccessTokenSerializer(serializers.Serializer):
             application_access_token.language = None
         if "authentication" in instance and instance.get("authentication") is not None:
             application_access_token.authentication = instance.get("authentication")
+            if instance.get("authentication_value") is None:
+                application_access_token.authentication_value = {
+                    "type": "login",
+                    "lock_time": 10,
+                    "login_value": ["LOCAL"],
+                    "max_attempts": 1,
+                    "default_value": "LOCAL",
+                    "failed_attempts": 5,
+                }
 
         application_access_token.save()
         license_is_valid = cache.get(
