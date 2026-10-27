@@ -29,7 +29,7 @@ from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
 from system_manage.models import WorkspaceUserGroupResourcePermission
 from tools.models import Tool
-from users.models.user_group import SystemUserGroupRelation
+from users.models.user_group import SystemUserGroup, SystemUserGroupRelation
 
 
 class PermissionSerializer(serializers.Serializer):
@@ -170,8 +170,6 @@ class UserGroupResourcePermissionSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
             UserResourcePermissionUserListRequest(data=instance).is_valid(raise_exception=True)
-        workspace_id = self.data.get("workspace_id")
-        user_group_id = self.data.get("user_group_id")
         # 用户权限列表
         user_resource_permission_list = native_search(
             self.get_queryset(instance),
@@ -188,8 +186,6 @@ class UserGroupResourcePermissionSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
             UserResourcePermissionUserListRequest(data=instance).is_valid(raise_exception=True)
-        workspace_id = self.data.get("workspace_id")
-        user_group_id = self.data.get("user_group_id")
         # 用户组对应的资源权限分页列表
         user_resource_permission_page_list = native_page_search(
             current_page,
@@ -308,18 +304,22 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
                     "name": models.CharField(),
                     "permission": models.CharField(),
                     "u.id": models.UUIDField(),
+                    "u.workspace_id": models.CharField(),
                 }
             )
         )
         name = instance.get("name")
         permission = instance.get("permission")
+        workspace_id = self.data.get("workspace_id")
         query_p_list = [None if p == "NOT_AUTH" else p for p in permission]
 
         workspace_user_group_resource_permission_query_set = QuerySet(WorkspaceUserGroupResourcePermission).filter(
-            workspace_id=self.data.get("workspace_id"),
+            workspace_id=workspace_id,
             auth_target_type=self.data.get("auth_target_type"),
             target=self.data.get("target"),
         )
+        if workspace_id:
+            user_query_set = user_query_set.filter(**{"u.workspace_id": workspace_id})
         if name:
             user_query_set = user_query_set.filter(name__contains=name)
         if permission:
@@ -413,6 +413,13 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
         users_permission = instance
 
         user_group_ids = [item["user_group_id"] for item in users_permission]
+        valid_user_group_ids = set(
+            QuerySet(SystemUserGroup)
+            .filter(workspace_id=workspace_id, id__in=user_group_ids)
+            .values_list("id", flat=True)
+        )
+        if len(valid_user_group_ids) != len(set(user_group_ids)):
+            raise AppApiException(500, _("User group does not exist"))
         include_children = users_permission[0].get("include_children")
         folder_ids = users_permission[0].get("folder_ids")
         # 删除已存在的对应的用户在该资源下的权限
