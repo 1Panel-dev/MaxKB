@@ -26,12 +26,13 @@ const selectedDocumentId = ref('')
 const paragraphSearchText = ref('')
 const paragraphs = ref<ParagraphItem[]>([])
 const selectedParagraphs = ref<ProblemParagraphReference[]>([])
-const associatedParagraphIds = ref(new Set<string>())
+const associatedParagraphs = ref<ProblemParagraphReference[]>([])
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const paragraphLayoutRef = useTemplateRef<InstanceType<typeof MkViewLayout>>('paragraphLayoutRef')
 
 const selectedDocument = computed(() => documentData.value.find(({ id }) => id === selectedDocumentId.value))
 const selectedParagraphIds = computed(() => new Set(selectedParagraphs.value.map(({ paragraph_id }) => paragraph_id)))
+const associatedParagraphIds = computed(() => new Set(associatedParagraphs.value.map(({ paragraph_id }) => paragraph_id)))
 
 function getSelectedCount(documentId: string) {
   return selectedParagraphs.value.filter(({ document_id }) => document_id === documentId).length
@@ -88,7 +89,7 @@ function handleParagraphSearch() {
   return refreshParagraphs()
 }
 
-// 已关联项回显后也可切换勾选，确认时只提交新增关联。
+// 勾选仅修改草稿，确认时保存与已有关系的差异。
 function handleToggleParagraph(paragraph: ParagraphItem) {
   if (operationLoading.value) return
   if (isSelected(paragraph.id)) {
@@ -99,20 +100,33 @@ function handleToggleParagraph(paragraph: ParagraphItem) {
 }
 
 function handleSubmit() {
-  if (operationLoading.value || documentLoading.value || !problemIds.value.length) return
+  const problemId = problemIds.value[0]
+  if (operationLoading.value || documentLoading.value || !problemId) return
   const paragraphReferences = selectedParagraphs.value.filter(({ paragraph_id }) => !associatedParagraphIds.value.has(paragraph_id))
-  if (!paragraphReferences.length) {
+  const unassociatedParagraphs = associatedParagraphs.value.filter(({ paragraph_id }) => !selectedParagraphIds.value.has(paragraph_id))
+  if (!paragraphReferences.length && !unassociatedParagraphs.length) {
     visible.value = false
     return
   }
   operationLoading.value = true
-  return resourceApi.problem
-    .putBatchAssociateProblems(knowledgeId.value, {
-      problem_id_list: [...problemIds.value],
-      paragraph_list: paragraphReferences,
+  const associationRequest = paragraphReferences.length
+    ? resourceApi.problem.putBatchAssociateProblems(knowledgeId.value, {
+        problem_id_list: [...problemIds.value],
+        paragraph_list: paragraphReferences,
+      })
+    : Promise.resolve()
+  return associationRequest
+    .then(async () => {
+      // 每次成功后更新关系快照，部分失败重试时不重复提交已完成的操作。
+      associatedParagraphs.value.push(...paragraphReferences)
+      for (const { document_id, paragraph_id } of unassociatedParagraphs) {
+        await resourceApi.paragraph.putUnassociateParagraphProblem(knowledgeId.value, document_id, paragraph_id, problemId).then(() => {
+          associatedParagraphs.value = associatedParagraphs.value.filter((paragraph) => paragraph.paragraph_id !== paragraph_id)
+        })
+      }
     })
     .then(() => {
-      MsgSuccess('关联成功')
+      MsgSuccess('保存成功')
       visible.value = false
       emit('success')
     })
@@ -134,8 +148,8 @@ function open(targetProblemIds: string[]) {
     targetProblemIds.length === 1 ? resourceApi.problem.getProblemDetail(knowledgeId.value, targetProblemIds[0]) : [],
   ])
     .then(([, problemParagraphs]) => {
-      associatedParagraphIds.value = new Set(problemParagraphs.map(({ id }) => id))
-      selectedParagraphs.value = problemParagraphs.map(({ id, document_id }) => ({ paragraph_id: id, document_id }))
+      associatedParagraphs.value = problemParagraphs.map(({ id, document_id }) => ({ paragraph_id: id, document_id }))
+      selectedParagraphs.value = [...associatedParagraphs.value]
     })
     .catch(() => {
       // 请求层统一提示错误，失败时保持空列表。
@@ -153,7 +167,7 @@ function handleClosed() {
   paragraphSearchText.value = ''
   paragraphs.value = []
   selectedParagraphs.value = []
-  associatedParagraphIds.value.clear()
+  associatedParagraphs.value = []
   resourceType.value = DOCUMENT_RESOURCE_TYPE.DOCUMENT
 }
 
