@@ -170,7 +170,7 @@ const validateForm = async () => {
   <MkDialog :align-center="false" v-model="dialogVisible" :title="isEdit ? '编辑字段' : '添加字段'" width="600px" append-to-body destroy-on-close>
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" :enable-visibility="true" :left-options="visibilityFieldOptions" />
     <template #footer>
-      <el-button @click="dialogVisible = false">取消</el-button>
+      <el-button plain @click="dialogVisible = false">取消</el-button>
       <el-button type="primary" @click="submitField">确定</el-button>
     </template>
   </MkDialog>

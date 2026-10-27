@@ -127,7 +127,7 @@ defineExpose({ format, validateRules })
     </div>
 
     <template #footer>
-      <el-button @click="closeEditorDialog">取消</el-button>
+      <el-button plain @click="closeEditorDialog">取消</el-button>
       <el-button type="primary" @click="submitEditorDialog">确定</el-button>
     </template>
   </MkDialog>

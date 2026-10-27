@@ -52,7 +52,7 @@ defineExpose({ open })
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false">取消</el-button>
+        <el-button plain @click.prevent="dialogVisible = false">取消</el-button>
         <el-button type="primary" :loading="loading" @click="submit(formRef)">保存</el-button>
       </span>
     </template>

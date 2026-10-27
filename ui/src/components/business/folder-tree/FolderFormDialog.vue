@@ -96,7 +96,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="loading" @click="handleSubmit">
         {{ editId ? '保存' : '创建' }}
       </el-button>

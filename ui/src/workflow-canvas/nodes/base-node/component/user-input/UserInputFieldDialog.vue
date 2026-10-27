@@ -73,7 +73,7 @@ defineExpose({ open, close })
   <MkDialog v-model="fieldDialogVisible" :title="editingIndex === undefined ? '添加参数' : '编辑参数'" @closed="resetData">
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" enable-visibility :left-options="visibilityOptions" />
     <template #footer>
-      <el-button @click="fieldDialogVisible = false">取消</el-button>
+      <el-button plain @click="fieldDialogVisible = false">取消</el-button>
       <el-button type="primary" @click="submitField">{{ editingIndex === undefined ? '添加' : '保存' }}</el-button>
     </template>
   </MkDialog>

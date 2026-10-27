@@ -2,7 +2,6 @@
 import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { computed, ref, watch } from 'vue'
-import { Search } from '@element-plus/icons-vue'
 import type { TableInstance } from 'element-plus'
 
 import _ from 'lodash'
@@ -135,24 +134,33 @@ const activeText = computed(() => {
     <div class="header">
       <div class="title">{{ title }}</div>
 
-      <el-input v-model="filterText" :validate-event="false" placeholder="请输入关键词搜索" class="input-with-select" style="--el-color-danger: #c0c4cc" clearable>
-        <template #prepend>
-          <el-button :icon="Search" />
-        </template>
-      </el-input>
+      <!-- 搜索表格选项 -->
+      <MkSearchInput
+        v-model="filterText"
+        :validate-event="false"
+        placeholder="请输入关键词搜索"
+        class="input-with-select"
+        style="--el-color-danger: #c0c4cc"
+      />
     </div>
 
-    <el-table ref="multipleTableRef" :data="tableData" highlight-current-row style="width: 100%; height: 100%; --el-bg-color: #f5f6f7" @selection-change="handleSelectionChange">
+    <el-table
+      ref="multipleTableRef"
+      :data="tableData"
+      highlight-current-row
+      style="width: 100%; height: 100%; --el-bg-color: #f5f6f7"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="55" />
       <el-table-column v-for="(column, index) in tableColumns" :key="index" v-bind="column" :label="column.label">
         <template #default="scope">
           <template v-if="column.type === 'component'">
             <TableColumn :column="column" :row="scope.row"></TableColumn>
           </template>
-          <template v-else-if="column.type === 'eval'"> <span v-html="evalF(column.property, scope.row)"></span></template>
+          <template v-else-if="column.type === 'eval'"><span v-html="evalF(column.property, scope.row)"></span></template>
           <template v-else>
-            <span>{{ scope.row[column.property] }}</span></template
-          >
+            <span>{{ scope.row[column.property] }}</span>
+          </template>
         </template>
       </el-table-column>
     </el-table>

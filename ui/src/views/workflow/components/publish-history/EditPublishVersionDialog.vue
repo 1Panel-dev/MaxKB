@@ -77,7 +77,7 @@ defineExpose({ open, close })
     </el-form>
     <template #footer>
       <!-- 取消 -->
-      <el-button :disabled="saving" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="visible = false">取消</el-button>
       <!-- 提交版本内容 -->
       <el-button type="primary" :loading="saving" @click="handleSubmit">发布</el-button>
     </template>

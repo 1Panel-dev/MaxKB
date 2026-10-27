@@ -158,7 +158,7 @@ function deleteNode() {
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click.prevent="nodeNameDialogVisible = false">取消</el-button>
+      <el-button plain @click.prevent="nodeNameDialogVisible = false">取消</el-button>
       <el-button type="primary" @click="saveNodeName(titleFormRef)">保存</el-button>
     </template>
   </MkDialog>

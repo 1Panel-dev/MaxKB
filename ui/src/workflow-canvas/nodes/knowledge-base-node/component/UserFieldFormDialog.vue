@@ -78,7 +78,7 @@ defineExpose({ open, close })
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" :field-type-options="fieldTypeOptions" />
     <template #footer>
       <!-- 取消编辑 -->
-      <el-button @click="close">取消</el-button>
+      <el-button plain @click="close">取消</el-button>
       <!-- 提交参数 -->
       <el-button type="primary" @click="submitField">{{ editingIndex === undefined ? '添加' : '保存' }}</el-button>
     </template>

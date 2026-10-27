@@ -57,7 +57,7 @@ defineExpose({ open })
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="settingDialogVisible = false">取消</el-button>
+      <el-button plain @click="settingDialogVisible = false">取消</el-button>
       <el-button type="primary" @click="submitSetting">保存</el-button>
     </template>
   </MkDialog>
