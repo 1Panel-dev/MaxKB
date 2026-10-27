@@ -67,14 +67,22 @@ def generate_related_by_knowledge_id(knowledge_id, model_id, model_params_settin
     document_list = QuerySet(Document).filter(knowledge_id=knowledge_id)
     for document in document_list:
         try:
-            generate_related_by_document_id.delay(document.id, model_id, model_params_setting, prompt, state_list)
+            generate_related_by_document_id.delay(
+                document.id, model_id, model_params_setting, prompt, state_list, knowledge_id=knowledge_id
+            )
         except Exception as e:
             pass
 
 
 @celery_app.task(base=QueueOnce, once={'keys': ['document_id']},
                  name='celery:generate_related_by_document')
-def generate_related_by_document_id(document_id, model_id, model_params_setting, prompt, state_list=None):
+def generate_related_by_document_id(document_id, model_id, model_params_setting, prompt, state_list=None,
+                                    knowledge_id=None):
+    # Reject legacy unscoped tasks and documents moved after the request was validated.
+    document_queryset = QuerySet(Document).filter(id=document_id, knowledge_id=knowledge_id)
+    if knowledge_id is None or not document_queryset.exists():
+        maxkb_logger.warning('Skipping problem generation: document is outside the requested knowledge base.')
+        return
     if state_list is None:
         state_list = [State.PENDING.value, State.STARTED.value, State.SUCCESS.value, State.FAILURE.value,
                       State.REVOKE.value,
@@ -83,7 +91,7 @@ def generate_related_by_document_id(document_id, model_id, model_params_setting,
         is_the_task_interrupted = get_is_the_task_interrupted(document_id)
         if is_the_task_interrupted():
             return
-        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+        ListenerManagement.update_status(document_queryset,
                                          TaskType.GENERATE_PROBLEM,
                                          State.STARTED)
         llm_model = get_llm_model(model_id, model_params_setting)
@@ -96,7 +104,7 @@ def generate_related_by_document_id(document_id, model_id, model_params_setting,
             reversed_status=Reverse('status'),
             task_type_status=Substr('reversed_status', TaskType.GENERATE_PROBLEM.value,
                                     1),
-        ).filter(task_type_status__in=state_list, document_id=document_id)
+        ).filter(task_type_status__in=state_list, document_id=document_id, knowledge_id=knowledge_id)
         page_desc(query_set, 10, generate_problem, is_the_task_interrupted)
     except Exception as e:
         maxkb_logger.error(f'根据文档生成问题:{document_id}出现错误{str(e)}{traceback.format_exc()}')
@@ -109,15 +117,26 @@ def generate_related_by_document_id(document_id, model_id, model_params_setting,
 
 @celery_app.task(base=QueueOnce, once={'keys': ['paragraph_id_list']},
                  name='celery:generate_related_by_paragraph_list')
-def generate_related_by_paragraph_id_list(document_id, paragraph_id_list, model_id, model_params_setting, prompt):
+def generate_related_by_paragraph_id_list(document_id, paragraph_id_list, model_id, model_params_setting, prompt,
+                                         knowledge_id=None):
+    document_queryset = QuerySet(Document).filter(id=document_id, knowledge_id=knowledge_id)
+    paragraph_queryset = QuerySet(Paragraph).filter(
+        id__in=paragraph_id_list, document_id=document_id, knowledge_id=knowledge_id
+    )
+    if (knowledge_id is None or not document_queryset.exists()
+            or paragraph_queryset.count() != len(set(paragraph_id_list))):
+        maxkb_logger.warning('Skipping problem generation: document or paragraphs are outside the requested scope.')
+        return
+    if not paragraph_id_list:
+        return
     try:
         is_the_task_interrupted = get_is_the_task_interrupted(document_id)
         if is_the_task_interrupted():
-            ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+            ListenerManagement.update_status(document_queryset,
                                              TaskType.GENERATE_PROBLEM,
                                              State.REVOKED)
             return
-        ListenerManagement.update_status(QuerySet(Document).filter(id=document_id),
+        ListenerManagement.update_status(document_queryset,
                                          TaskType.GENERATE_PROBLEM,
                                          State.STARTED)
         llm_model = get_llm_model(model_id, model_params_setting)
@@ -131,6 +150,6 @@ def generate_related_by_paragraph_id_list(document_id, paragraph_id_list, model_
                 return True
             return False
 
-        page(QuerySet(Paragraph).filter(id__in=paragraph_id_list), 10, generate_problem, is_the_task_interrupted)
+        page(paragraph_queryset, 10, generate_problem, is_the_task_interrupted)
     finally:
         ListenerManagement.post_update_document_status(document_id, TaskType.GENERATE_PROBLEM)
