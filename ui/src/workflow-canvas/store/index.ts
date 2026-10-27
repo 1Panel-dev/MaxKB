@@ -1,4 +1,5 @@
 import type {
+  ApplicationDetail,
   ChatCompletionPayload,
   Dict,
   DynamicFormField,
@@ -18,6 +19,7 @@ export interface McpTool {
 
 // 底层 api/*/index.ts 提供的原始接口实现,不含缓存层能力。
 type ApiModule = {
+  getAllApplication?: (query?: Dict<unknown>) => Promise<ApplicationDetail[]>
   getAllTags?: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
   getModelListWithShared: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
@@ -32,6 +34,7 @@ type ApiModule = {
 
 // 查询默认走缓存，通过 store.force.xxx() 强制刷新；生成请求始终直接转发。
 export type WorkflowStoreApi = {
+  getAllApplication: (query?: Dict<unknown>) => Promise<ApplicationDetail[]>
   getAllTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
   getModelListWithShared: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
@@ -94,6 +97,10 @@ export function useWorkflowStore(resourceScope: string): WorkflowStore {
       postChatCompletion(modelId: string, payload: ChatCompletionPayload, signal?: AbortSignal): Promise<Response> {
         if (!requestApi.postChatCompletion) return Promise.reject(new Error(`当前资源范围不支持流式补全: ${resourceScope}`))
         return requestApi.postChatCompletion(modelId, payload, signal)
+      },
+      getAllApplication(query?: Dict<unknown>): Promise<ApplicationDetail[]> {
+        if (!requestApi.getAllApplication) return Promise.resolve([])
+        return withCache(`application-list:${JSON.stringify(query ?? {})}`, () => requestApi.getAllApplication!(query), force)
       },
       getAllTags(knowledgeIds: string[]): Promise<KnowledgeTagGroup[]> {
         if (!requestApi.getAllTags) return Promise.resolve([])

@@ -2,7 +2,6 @@
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, inject, onMounted, ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import ApplicationApi from '@/api/admin/workspace/application/application'
 import SharedToolApi from '@/api/admin/workspace/shared/tool'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
@@ -108,10 +107,8 @@ function loadTools(folder?: FolderItem) {
 }
 
 function loadApplications(folder?: FolderItem) {
-  // TODO 共享资源和资源管理需要不同的api，后续需要拆分
   const folderQuery = { folder_id: folder?.id || FOLDER_ENTRY_ID.ALL }
-  // TODO 接口
-  return ApplicationApi.getAllApplication({ ...folderQuery, publish_status: 'published' }).then((res) => {
+  return store.force.getAllApplication({ ...folderQuery, publish_status: 'published' }).then((res) => {
     resourceItems.value = res
       .filter((application) => application.id !== route.params?.applicationId)
       .map((application) => ({

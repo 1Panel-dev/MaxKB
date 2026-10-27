@@ -97,7 +97,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 工作流 Store 的 `getToolListWithShared` 用于包含已授权共享工具的选项查询，MCP 节点使用
 `tool_type: 'MCP'` 筛选；AI 对话的 `McpSettingDialog` 每次打开通过
 `store.force.getToolListWithShared` 刷新同类选项，通过 `loaded`
-将工具详情提供给资源区回显；取消不修改已选配置。文件夹菜单继续使用 `getAllTool`，不复用这一路查询。
+将工具详情提供给资源区回显；取消不修改已选配置。Workspace 文件夹菜单继续使用 `getAllTool`；系统范围的工具菜单通过 `store.force.getToolListWithShared` 查询。
 
 知识库及知识库循环模式的“数据源”页签复用工具资源菜单和工具文件夹，通过 `dataSource`
 区分查询：数据源传 `tool_type: TOOL_TYPE.DATA_SOURCE`，普通工具传
@@ -117,6 +117,10 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 不要从页签是否存在推断节点能否粘贴；粘贴还使用 `config/node-mapping.ts` 的
 `workflowModelDict` 过滤资源节点。
+
+智能体菜单通过 `store.force.getAllApplication(query)` 刷新列表，由 Store 按 `resourceScope`
+选择 Workspace 或 System 资源管理的 Application API；保留文件夹条件、已发布筛选与排除当前智能体。
+未适配智能体查询的范围返回空列表，不回退 Workspace 接口。
 
 ### 画布工具与快捷键
 
@@ -143,9 +147,9 @@ System 资源管理合并普通与共享模型，System 共享范围仅返回标
 `getSelectModelList` 注入使用该能力，循环体转发同名注入。
 主画布从 `resourceScope` 注入读取范围（默认 `workspace`），通过节点上下文传递为 `resourceScope`。
 
-当前 `workspace` 适配模型、供应商、模型参数、MCP 工具、共享工具选项、工具详情和标签查询；
+当前 `workspace` 适配智能体列表、模型、供应商、模型参数、MCP 工具、共享工具选项、工具详情和标签查询；
 `system-resource` 与 `system-shared` 独立提供系统模型、供应商、参数表单、工具选项与详情、MCP 和标签查询，
-不继承 Workspace 适配器，不要求路由工作空间。System MCP 查询要求部署提供对应
+`system-resource` 另提供智能体列表查询；两者不继承 Workspace 适配器，不要求路由工作空间。System MCP 查询要求部署提供对应
 `/system/resource/<resourceType>/<id>/mcp_tools` 或 `/system/shared/<resourceType>/<id>/mcp_tools` 扩展接口，尚未完成运行验证。
 `workspace-shared` 仍为空占位。选择弹窗的资源范围和交互以组件文档为准。
 节点资源查询可调用此适配器或既有业务 API；工作流加载、保存与发布仍由 View 编排，核心层不承载请求。
