@@ -60,7 +60,10 @@ class ChatUserAccessTokenSerializer(serializers.Serializer):
             if not is_authorized:
                 raise AppApiException(1005, _("The user does not have permission to access the application"))
             token = ChatToken(
-                user.id, AuthenticationType.CHAT_USER, str(Operate.LOCAL).lower(), application_id=application_id
+                str(user.id),
+                AuthenticationType.CHAT_USER,
+                str(Operate.LOCAL).lower(),
+                application_id=str(application_id),
             ).to_token()
             status = 200
             return token

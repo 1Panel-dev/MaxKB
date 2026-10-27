@@ -7,6 +7,7 @@ import { MsgError, MsgSuccess } from '@/utils/message'
 import { useApplicationDetailContext } from '../../context'
 import DisplaySettingPreview from './components/DisplaySettingPreview.vue'
 import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
+import ApplicationApi from '@/api/admin/workspace/application/application'
 
 defineOptions({ name: 'XpackDisplaySettingDialog' })
 
@@ -46,8 +47,7 @@ const languageOptions = [
 function loadSetting() {
   if (loading.value) return
   loading.value = true
-  return resourceApi.application
-    .getAccessToken(applicationId.value)
+  return ApplicationApi.getDisplaySetting(applicationId.value)
     .then((config) => {
       // 旧版接口可能省略展示字段，嵌套配置分别补齐默认值。
       const setting: ApplicationDisplaySetting = cloneDeep(APPLICATION_DISPLAY_SETTING_DEFAULT)
