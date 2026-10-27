@@ -1,5 +1,11 @@
 import type { CHAT_TYPE } from './enums'
-import type { ChatContent, ChatLogRecord, Dict } from '@/api/types'
+import type { ChatApplicationProfile, ChatContent, ChatLogRecord, Dict } from '@/api/types'
+
+/**
+ * 当前对话的智能体信息，由 view 加载并注入各组件 store，chat 与 debug 结构一致。
+ * chat / portal 直接使用对话端 profile（已发布版本与访问设置）；debug 由 toDebugAppInfo 从 Admin 详情转换（当前草稿）。
+ */
+export type ConversationAppInfo = ChatApplicationProfile
 
 /** 侧栏账户入口展示的当前用户，由 Chat / Debug 入口按各自的用户 Store 提供。 */
 export interface ConversationAccount {

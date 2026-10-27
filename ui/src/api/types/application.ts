@@ -140,6 +140,8 @@ export interface ApplicationFormPayload {
   tts_type?: string
   tts_autoplay?: boolean
   stt_autosend?: boolean
+  file_upload_enable?: boolean
+  file_upload_setting?: Record<string, unknown>
   folder_id?: string
   workspace_id?: string
   mcp_enable?: boolean

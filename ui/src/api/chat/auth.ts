@@ -1,8 +1,8 @@
-/** 提供单应用对话与门户的认证前置配置、匿名认证、登录和登出接口。 */
+/** 提供单应用对话与门户的认证前置配置、匿名认证、账号／第三方／扫码登录和登出接口。 */
 
 import { get, post, promise, request } from './core/request'
 import type { ApiResponse } from './core/types'
-import type { ApplicationAuthProfile, ChatLoginRequest, ChatLoginResponse, PortalAuthProfile } from '@/api/types'
+import type { ApplicationAuthProfile, ChatLoginRequest, ChatLoginResponse, ExternalAuthSetting, PortalAuthProfile, QrCodeSource } from '@/api/types'
 
 interface ChatCaptchaResponse {
   captcha: string
@@ -43,6 +43,30 @@ const postLogin = (loginRequest: ChatLoginRequest, accessToken?: string, savedTo
   )
 }
 
+/** 使用 LDAP 账号登录；传入 accessToken 时登录到对应应用，否则登录门户。携带本地保存的 token。 */
+const postLdapLogin = (loginRequest: ChatLoginRequest, accessToken?: string, savedToken?: string) => {
+  return promise<ChatLoginResponse>(
+    request.post<ApiResponse<ChatLoginResponse>>(accessToken ? `/auth/ldap/login/${accessToken}` : '/auth/ldap/login', loginRequest, {
+      headers: getSavedTokenHeaders(savedToken),
+    }),
+  )
+}
+
+/** 获取 CAS、OIDC、OAuth2 等对话用户第三方认证的跳转配置。 */
+const getExternalAuthSetting = (authType: string) => {
+  return get<ExternalAuthSetting>(`/chat_user/${authType}/detail`)
+}
+
+/** 获取对话用户扫码登录提供商配置。 */
+const getQrCodeSources = () => {
+  return get<QrCodeSource[]>('/auth/qr_type/source')
+}
+
+/** 使用钉钉扫码授权码登录；传入 accessToken 时登录到对应应用。 */
+const getDingTalkCallback = (code: string, accessToken?: string) => {
+  return get<ChatLoginResponse>('/auth/dingtalk', accessToken ? { code, accessToken } : { code })
+}
+
 /**
  * 获取应用登录验证码；无需验证码时返回空字符串。
  * 后端当前以 `application_id` 查询参数接收 accessToken，且仅支持应用场景。
@@ -56,4 +80,15 @@ const postLogout = () => {
   return post<undefined, boolean>('/v3/auth/logout')
 }
 
-export default { getApplicationAuthProfile, getPortalAuthProfile, postAnonymousAuth, postLogin, getCaptcha, postLogout }
+export default {
+  getApplicationAuthProfile,
+  getPortalAuthProfile,
+  postAnonymousAuth,
+  postLogin,
+  postLdapLogin,
+  getExternalAuthSetting,
+  getQrCodeSources,
+  getDingTalkCallback,
+  getCaptcha,
+  postLogout,
+}

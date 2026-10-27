@@ -351,6 +351,7 @@ onBeforeUnmount(() => stopAutoSave())
         :disabled="historyVisible"
         :has-unsaved-changes="hasUnsavedChanges"
         :save-workflow="saveApplication"
+        :application="applicationDetail"
       />
 
       <!-- 保存 -->

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import DebugPanel from '@/conversation-panel/view/debug/index.vue'
+import type { ApplicationDetail } from '@/api/types'
 
 defineOptions({ name: 'ButtonDebug' })
 const props = defineProps<{
@@ -8,6 +9,8 @@ const props = defineProps<{
   disabled?: boolean
   hasUnsavedChanges: () => boolean
   saveWorkflow: () => Promise<unknown>
+  /** 当前智能体详情，保存后由工作流页更新，调试面板据此展示开场白等配置。 */
+  application?: ApplicationDetail | null
 }>()
 const loading = defineModel<boolean>('loading', { default: false })
 const debugPanelRef = useTemplateRef<InstanceType<typeof DebugPanel>>('debugPanelRef')
@@ -43,5 +46,5 @@ defineExpose({ close })
       <MkIcon name="icon_play_outlined" />
     </el-button>
   </MkTooltip>
-  <DebugPanel ref="debugPanelRef" />
+  <DebugPanel ref="debugPanelRef" :application="application" />
 </template>

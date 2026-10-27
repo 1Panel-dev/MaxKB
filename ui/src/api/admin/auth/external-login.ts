@@ -1,7 +1,8 @@
 /** 提供 Admin 第三方认证、扫码登录及客户端授权回调接口。 */
 
 import { get } from '../core/request'
-import type { ExternalAuthSetting, LoginResponse, QrCodeSource } from './types'
+import type { ExternalAuthSetting, QrCodeSource } from '@/api/types'
+import type { LoginResponse } from './types'
 
 /** 获取外部认证方式的跳转配置。 */
 const getExternalAuthSetting = (authType: string) => {

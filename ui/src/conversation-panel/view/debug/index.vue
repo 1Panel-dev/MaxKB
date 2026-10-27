@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, onBeforeUnmount, provide, watch } from 'vue'
+import { computed, onMounted, onBeforeUnmount, provide, toRef, watch } from 'vue'
+import type { ApplicationDetail } from '@/api/types'
 import ConversationLayout from '../../core/layout/index.vue'
 import ConversationList from '../../left-sidebar/conversation-list/index.vue'
 import ChatPanel from '../../main/chat-panel/index.vue'
@@ -14,7 +15,12 @@ import { createDebugConversation } from './index'
 
 defineOptions({ name: 'DebugConversation' })
 
-const bundle = createDebugConversation()
+const props = defineProps<{
+  /** 当前智能体详情，由工作流页在加载与每次保存后更新。 */
+  application?: ApplicationDetail | null
+}>()
+
+const bundle = createDebugConversation(toRef(props, 'application'))
 
 // 会话各组件 store + debug 面板状态,都由本视图 provide
 provide(CONVERSATION_LIST_KEY, bundle.list)

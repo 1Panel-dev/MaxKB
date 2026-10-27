@@ -1,6 +1,6 @@
 /** Admin 认证 API 及其 Store 消费方共同使用的类型。 */
 
-import type { LoginMethod, QrCodeConfig, WorkspaceItem } from '@/api/types'
+import type { WorkspaceItem } from '@/api/types'
 
 export interface CurrentUserInfo {
   email: string
@@ -30,24 +30,6 @@ export interface LoginResponse {
 
 export interface CaptchaResponse {
   captcha: string
-}
-
-export interface ExternalAuthConfig {
-  authEndpoint?: string
-  clientId?: string
-  ldpUri?: string
-  redirectUrl: string
-  scope?: string
-  state?: string
-}
-
-export interface ExternalAuthSetting {
-  config?: ExternalAuthConfig
-}
-
-export interface QrCodeSource {
-  auth_type: Extract<LoginMethod, 'dingtalk' | 'lark' | 'wecom'>
-  config: QrCodeConfig
 }
 
 export interface BaseProfile {

@@ -21,6 +21,25 @@ export interface QrCodeConfig {
   qr_url?: string
 }
 
+export interface QrCodeSource {
+  auth_type: QrCodeProvider
+  config: QrCodeConfig
+}
+
+/** CAS、OIDC、OAuth2 等第三方认证的跳转配置。 */
+export interface ExternalAuthConfig {
+  authEndpoint?: string
+  clientId?: string
+  ldpUri?: string
+  redirectUrl: string
+  scope?: string
+  state?: string
+}
+
+export interface ExternalAuthSetting {
+  config?: ExternalAuthConfig
+}
+
 export interface UpdatePasswordForm {
   password: string
   re_password: string

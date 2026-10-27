@@ -1,4 +1,4 @@
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ApplicationApi from '@/api/chat/application'
 import ConversationApi from '@/api/chat/conversation'
@@ -7,14 +7,14 @@ import FileApi from '@/api/chat/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { copyText } from '@/utils/clipboard'
-import type { ConversationApiAdapter } from '../../core/types'
+import type { ConversationApiAdapter, ConversationAppInfo } from '../../core/types'
 import { createConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { createMessageListStore } from '../../components/message-list/index'
 import { createMessageInputStore } from '../../components/message-input/index'
 import { createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 import { createSharePanelStore, type SharePanelStore } from '../../main/share-panel/index'
 import type { ConversationBundle } from '../types'
-
+import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
 /** chat 模式在通用组件 store 之外提供分享;debug 模式无分享。 */
 export interface ChatConversationBundle extends ConversationBundle {
   share: SharePanelStore
@@ -68,6 +68,9 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     cancel: (cid) => ConversationApi.postCancelConversationMessage(cid),
   }
 
+  // 智能体完整信息，由 loadApplicationProfile 加载，注入各组件 store
+  const appInfo = ref<ConversationAppInfo | null>(null)
+
   const list = createConversationListStore({
     pageConversations: api.pageConversations,
     remove: api.remove,
@@ -76,6 +79,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
       const profile = user.chatUserProfile
       return profile?.username ? { nickName: profile.nick_name, username: profile.username } : null
     }),
+    appInfo,
   })
   const msgs = createMessageListStore({
     pageRecords: api.pageRecords,
@@ -85,6 +89,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     cancel: api.cancel,
     uploadFile: api.uploadFile,
     getChatId: () => list.currentChatId.value,
+    appInfo,
   })
   list.bindLoader(msgs.load)
   const input = createMessageInputStore({
@@ -97,6 +102,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     sendMessage: msgs.sendMessage,
     uploadFile: msgs.uploadFile,
     stop: msgs.stop,
+    appInfo,
     // 门户首页、全部智能体页尚未确定智能体时禁止发送
     disabled: computed(() => !getApplicationId()),
   })
@@ -109,11 +115,12 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
       ),
   })
 
-  // 智能体名称与图标展示在侧栏与消息列表
+  // 加载智能体完整信息；切换智能体后旧请求晚到时丢弃
   const loadApplicationProfile = () => {
-    if (!getApplicationId()) return
-    ApplicationApi.getApplicationProfile(getApplicationId()).then(({ name, icon }) => {
-      list.appInfo.value = { name, icon }
+    const applicationId = getApplicationId()
+    if (!applicationId) return
+    ApplicationApi.getApplicationProfile(applicationId).then((profile) => {
+      if (applicationId === getApplicationId()) appInfo.value = {...APPLICATION_DISPLAY_SETTING_DEFAULT,...profile}
     })
   }
   loadApplicationProfile()
@@ -122,7 +129,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
   // 必须先于会话 ID 监听创建：这里先打开新地址的会话，会话 ID 监听随后比较时即可跳过。
   watch(getApplicationId, () => {
     msgs.cancel()
-    list.appInfo.value = null
+    appInfo.value = null
     loadApplicationProfile()
     list.loadConversations()
     const chatId = getRouteChatId()
@@ -147,5 +154,5 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
   // 地址中带会话 ID 时打开该会话
   if (getRouteChatId()) list.selectConversation(getRouteChatId())
 
-  return { list, msgs, input, detail, share }
+  return { appInfo, list, msgs, input, detail, share }
 }
