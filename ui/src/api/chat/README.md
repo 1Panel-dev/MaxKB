@@ -22,5 +22,5 @@ Chat 业务接口统一调用后端 v3 路由（`/chat/api/v3/...`）；文件�
 `auth.ts` 维护门户与单应用的认证：`getApplicationAuthProfile(accessToken)` 请求 `/profile`，
 `getPortalAuthProfile()` 请求 `/portal/profile`，两者返回结构相同的 `AuthProfile`，差异字段在 `meta`。
 `postAnonymousAuth(accessToken?)` 与 `postLogin(loginRequest, accessToken?)` 传入 accessToken 时为应用认证，
-否则为门户认证。`getCaptcha(username, accessToken)` 获取应用登录验证码，后端目前以 `application_id`
-查询参数接收 accessToken，暂不支持门户。`chat-user.ts` 的 `getChatUserProfile()` 获取当前对话用户。
+否则为门户认证。`getCaptcha(username, accessToken)` 获取应用登录验证码，后端以 `accessToken`
+查询参数接收应用令牌，暂不支持门户。`chat-user.ts` 的 `getChatUserProfile()` 获取当前对话用户。
