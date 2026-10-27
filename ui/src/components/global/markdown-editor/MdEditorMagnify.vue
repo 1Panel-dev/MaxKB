@@ -74,12 +74,4 @@ async function submitEditorDialog() {
   </MkDialog>
 </template>
 
-<style scoped lang="scss">
-/* 可编辑区域铺满输入区，让空白位置也能按点击位置落光标。 */
-.magnify-dialog-editor,
-.magnify-md-editor {
-  :deep(.cm-content) {
-    min-height: 100% !important;
-  }
-}
-</style>
+<style scoped lang="scss"></style>
