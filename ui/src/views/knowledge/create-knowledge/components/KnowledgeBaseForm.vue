@@ -11,7 +11,9 @@ import SelectModel from '@/components/business/select-model/index.vue'
 import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'KnowledgeBaseForm' })
-defineProps<{ disabled?: boolean }>()
+const props = withDefaults(defineProps<{ mode?: 'create' | 'setting'; disabled?: boolean }>(), {
+  mode: 'create',
+})
 
 type KnowledgeBaseDraft = Pick<KnowledgeCreatePayload, 'name' | 'desc' | 'embedding_model_id'>
 
@@ -32,7 +34,7 @@ function reset() {
   Object.assign(form, {
     name: '',
     desc: '',
-    embedding_model_id: modelOptions.value.find((model) => model.status === MODEL_STATUS.SUCCESS)?.id ?? '',
+    embedding_model_id: props.mode === 'create' ? (modelOptions.value.find((model) => model.status === MODEL_STATUS.SUCCESS)?.id ?? '') : '',
   })
   formRef.value?.clearValidate()
 }
@@ -52,8 +54,8 @@ function loadModelOptions() {
     .then(([models, providers]) => {
       modelOptions.value = models
       providerOptions.value = providers
-      // 新建时默认选择首个可用模型，刷新选项时保留已有选择和详情回填值。
-      if (!form.embedding_model_id) {
+      // 仅新建时默认选择首个可用模型；设置时保留详情回填值，包括空值。
+      if (props.mode === 'create' && !form.embedding_model_id) {
         form.embedding_model_id = models.find((model) => model.status === MODEL_STATUS.SUCCESS)?.id ?? ''
       }
     })

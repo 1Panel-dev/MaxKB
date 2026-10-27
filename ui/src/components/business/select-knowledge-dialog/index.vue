@@ -32,9 +32,9 @@ const isWorkspaceScope = computed(() => isWorkspaceResource())
 const selectedKnowledgeIds = computed(() => selectedKnowledge.value.map(({ id }) => id))
 const embeddingModelId = computed(() => selectedKnowledge.value.find((knowledge) => knowledge.embedding_model_id)?.embedding_model_id)
 const filteredKnowledge = computed(() =>
-  embeddingModelId.value
-    ? knowledgeOptions.value.filter((knowledge) => knowledge.embedding_model_id === embeddingModelId.value)
-    : knowledgeOptions.value,
+  knowledgeOptions.value.filter(
+    (knowledge) => knowledge.embedding_model_id && (!embeddingModelId.value || knowledge.embedding_model_id === embeddingModelId.value),
+  ),
 )
 
 function toggleKnowledge(knowledge: KnowledgeItem) {

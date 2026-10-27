@@ -68,8 +68,8 @@ const exportKnowledgeZip = (knowledgeId: string, knowledgeName: string) => {
 }
 
 /** 导出可用于导入创建的知识库压缩包。 */
-const exportKnowledge = (knowledgeId: string, knowledgeName: string) => {
-  return getExportFile(`${knowledgeName}.zip`, `${prefix}/${knowledgeId}/export_knowledge`)
+const exportKnowledge = (knowledgeId: string, knowledgeName: string, withSourceFile: boolean) => {
+  return getExportFile(`${knowledgeName}.zip`, `${prefix}/${knowledgeId}/export_knowledge`, { with_source_file: withSourceFile })
 }
 
 /** 获取知识库外部检索服务生成的 MCP 连接配置。 */

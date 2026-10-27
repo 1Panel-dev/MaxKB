@@ -12,7 +12,9 @@ import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource } from
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
 import { useKnowledgeDetailContext } from '../../context'
 
-const canEdit = () => !isWorkspaceSharedResource() && (isSystemResource() ? perm.knowledge.system.settingEdit() : !isWorkspaceResource() || perm.knowledge.workspace.settingEdit(knowledgeId.value))
+const canEdit = () =>
+  !isWorkspaceSharedResource() &&
+  (isSystemResource() ? perm.knowledge.system.settingEdit() : !isWorkspaceResource() || perm.knowledge.workspace.settingEdit(knowledgeId.value))
 
 defineOptions({ name: 'KnowledgeBaseSettingView' })
 
@@ -136,7 +138,7 @@ defineProps<ResourceDetailPageProps>()
 
 <template>
   <div v-loading="saving" class="max-w-200 pb-6">
-    <KnowledgeBaseForm ref="baseFormRef" />
+    <KnowledgeBaseForm ref="baseFormRef" mode="setting" />
     <el-form
       v-if="knowledge"
       class="mt-4"

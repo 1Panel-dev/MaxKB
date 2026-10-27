@@ -106,8 +106,8 @@ const exportKnowledgeZip = (knowledgeId: string, knowledgeName: string) => {
 }
 
 /** 导出可用于导入创建的知识库压缩包。 */
-const exportKnowledge = (knowledgeId: string, knowledgeName: string) => {
-  return getExportFile(`${knowledgeName}.zip`, `${getPrefix()}/${knowledgeId}/export_knowledge`)
+const exportKnowledge = (knowledgeId: string, knowledgeName: string, withSourceFile: boolean) => {
+  return getExportFile(`${knowledgeName}.zip`, `${getPrefix()}/${knowledgeId}/export_knowledge`, { with_source_file: withSourceFile })
 }
 
 /** 导入知识库文件并在指定文件夹创建知识库。 */

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, type CSSProperties } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { useStore } from '@/stores'
-import { MsgSuccess } from '@/utils/message'
+import { MsgConfirm } from '@/utils/message'
+import { isSystemSharedResource } from '@/utils/resource-context'
 import CreateBaseKnowledgeDialog from '../create-knowledge/BaseKnowledgeDialog.vue'
 import CreateWebKnowledgeDrawer from '../create-knowledge/WebKnowledgeDrawer.vue'
 import CreateLarkKnowledgeDialog from '../create-knowledge/LarkKnowledgeDialog.vue'
@@ -25,6 +28,8 @@ const props = withDefaults(
   { api: () => KnowledgeApi, trigger: 'click', fitTriggerWidth: false },
 )
 const { auth } = useStore()
+const route = useRoute()
+const router = useRouter()
 
 defineSlots<{
   /** 创建菜单触发器，只能渲染一个有效根节点 */
@@ -78,14 +83,30 @@ const importing = ref(false)
 function handleImportCreate(file: UploadFile) {
   if (!file.raw || importing.value) return
   importing.value = true
-  return props.api.postKnowledgeImport(file.raw, props.folderId)
-    .then(() => {
+  return props.api
+    .postKnowledgeImport(file.raw, props.folderId)
+    .then((knowledge) => {
       // 先刷新新资源权限，再通知列表加载导入的知识库。
       return auth.loadAuthBaseProfile().then(() => {
-        MsgSuccess('导入成功')
         emit('refresh')
+        return MsgConfirm('提示', '导入创建知识库成功，文档数据未向量化，请先设置知识库的向量模型，并对文档进行向量化操作', {
+          showCancelButton: false,
+          confirmButtonText: '确定',
+          confirmButtonType: 'primary',
+        }).then(() => {
+          const routePrefix = isSystemSharedResource() ? 'system-shared-knowledge' : 'workspace-knowledge'
+          return router.push({
+            name: `${routePrefix}-${knowledge.type === KNOWLEDGE_TYPE.BASE ? 'setting' : 'base-setting'}`,
+            params: {
+              ...(isSystemSharedResource() ? {} : { workspaceId: route.params.workspaceId }),
+              knowledgeId: knowledge.knowledge_id,
+              type: KNOWLEDGE_TYPE_MAP[knowledge.type],
+            },
+          })
+        })
       })
     })
+    .catch(() => {})
     .finally(() => {
       importing.value = false
       importUploadRef.value?.clearFiles()
