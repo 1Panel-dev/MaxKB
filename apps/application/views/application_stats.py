@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： application_stats.py
-    @date：2025/6/9 20:30
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： application_stats.py
+@date：2025/6/9 20:30
+@desc:
 """
+
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -27,80 +28,312 @@ class ApplicationStats(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(
-        methods=['GET'],
-        description=_('Dialogue-related statistical trends'),
-        summary=_('Dialogue-related statistical trends'),
-        operation_id=_('Dialogue-related statistical trends'),  # type: ignore
+        methods=["GET"],
+        description=_("Dialogue-related statistical trends"),
+        summary=_("Dialogue-related statistical trends"),
+        operation_id=_("Dialogue-related statistical trends"),  # type: ignore
         parameters=ApplicationStatsAPI.get_parameters(),
         responses=ApplicationStatsAPI.get_response(),
-        tags=[_('Application')]  # type: ignore
+        tags=[_("Application")],  # type: ignore
     )
-    @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
-                     PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-                     ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                     compare=CompareConstants.AND),
-                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    @has_permissions(
+        PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+        PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+        ViewPermission(
+            [RoleConstants.USER.get_workspace_role()],
+            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+            compare=CompareConstants.AND,
+        ),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+    )
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
-            ApplicationStatisticsSerializer(data={'application_id': application_id, 'workspace_id': workspace_id,
-                                                  'start_time': request.query_params.get(
-                                                      'start_time'),
-                                                  'end_time': request.query_params.get(
-                                                      'end_time')
-                                                  }).get_chat_record_aggregate_trend())
+            ApplicationStatisticsSerializer(
+                data={
+                    "application_id": application_id,
+                    "workspace_id": workspace_id,
+                    "start_time": request.query_params.get("start_time"),
+                    "end_time": request.query_params.get("end_time"),
+                }
+            ).get_chat_record_aggregate_trend()
+        )
 
     class TokenUsageStatistics(APIView):
         authentication_classes = [TokenAuth]
 
         # 应用的token使用统计 根据人的使用数排序
         @extend_schema(
-            methods=['GET'],
-            description=_('Application token usage statistics'),
-            summary=_('Application token usage statistics'),
-            operation_id=_('Application token usage statistics'),  # type: ignore
+            methods=["GET"],
+            description=_("Application token usage statistics"),
+            summary=_("Application token usage statistics"),
+            operation_id=_("Application token usage statistics"),  # type: ignore
             parameters=ApplicationStatsAPI.get_parameters(),
             responses=ApplicationStatsAPI.get_response(),
-            tags=[_('Application')]  # type: ignore
+            tags=[_("Application")],  # type: ignore
         )
-        @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
-                         PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-                         ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                         compare=CompareConstants.AND),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+        @has_permissions(
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
         def get(self, request: Request, workspace_id: str, application_id: str):
             return result.success(
-                ApplicationStatisticsSerializer(data={'application_id': application_id, 'workspace_id': workspace_id,
-                                                      'start_time': request.query_params.get(
-                                                          'start_time'),
-                                                      'end_time': request.query_params.get(
-                                                          'end_time')
-                                                      }).get_token_usage_statistics())
+                ApplicationStatisticsSerializer(
+                    data={
+                        "application_id": application_id,
+                        "workspace_id": workspace_id,
+                        "start_time": request.query_params.get("start_time"),
+                        "end_time": request.query_params.get("end_time"),
+                    }
+                ).get_token_usage_statistics()
+            )
 
     class TopQuestionsStatistics(APIView):
         authentication_classes = [TokenAuth]
+
         # 应用的top问题统计
         @extend_schema(
-            methods=['GET'],
-            description=_('Application top question statistics'),
-            summary=_('Application top question statistics'),
-            operation_id=_('Application top question statistics'),  # type: ignore
+            methods=["GET"],
+            description=_("Application top question statistics"),
+            summary=_("Application top question statistics"),
+            operation_id=_("Application top question statistics"),  # type: ignore
             parameters=ApplicationStatsAPI.get_parameters(),
             responses=ApplicationStatsAPI.get_response(),
-            tags=[_('Application')]  # type: ignore
+            tags=[_("Application")],  # type: ignore
         )
-        @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
-                         PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-                         ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                         compare=CompareConstants.AND),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+        @has_permissions(
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
         def get(self, request: Request, workspace_id: str, application_id: str):
             return result.success(
-                ApplicationStatisticsSerializer(data={'application_id': application_id, 'workspace_id': workspace_id,
-                                                      'start_time': request.query_params.get(
-                                                          'start_time'),
-                                                      'end_time': request.query_params.get(
-                                                          'end_time')
-                                                      }).get_top_questions_statistics())
+                ApplicationStatisticsSerializer(
+                    data={
+                        "application_id": application_id,
+                        "workspace_id": workspace_id,
+                        "start_time": request.query_params.get("start_time"),
+                        "end_time": request.query_params.get("end_time"),
+                    }
+                ).get_top_questions_statistics()
+            )
+
+    class TokenUsageRanking(APIView):
+        authentication_classes = [TokenAuth]
+
+        # 应用的token使用分页排行 按用户Tokens降序
+        @extend_schema(
+            methods=["GET"],
+            description=_("Application token usage ranking"),
+            summary=_("Application token usage ranking"),
+            operation_id=_("Application token usage ranking"),  # type: ignore
+            parameters=ApplicationStatsAPI.get_parameters(),
+            responses=ApplicationStatsAPI.get_response(),
+            tags=[_("Application")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
+            return result.success(
+                ApplicationStatisticsSerializer(
+                    data={
+                        "application_id": application_id,
+                        "workspace_id": workspace_id,
+                        "start_time": request.query_params.get("start_time"),
+                        "end_time": request.query_params.get("end_time"),
+                        "name": request.query_params.get("name"),
+                    }
+                ).get_ranking_statistics("userTokens", current_page, page_size)
+            )
+
+    class TopQuestionsRanking(APIView):
+        authentication_classes = [TokenAuth]
+
+        # 应用的top问题分页排行 按用户对话次数降序
+        @extend_schema(
+            methods=["GET"],
+            description=_("Application top question ranking"),
+            summary=_("Application top question ranking"),
+            operation_id=_("Application top question ranking"),  # type: ignore
+            parameters=ApplicationStatsAPI.get_parameters(),
+            responses=ApplicationStatsAPI.get_response(),
+            tags=[_("Application")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
+            return result.success(
+                ApplicationStatisticsSerializer(
+                    data={
+                        "application_id": application_id,
+                        "workspace_id": workspace_id,
+                        "start_time": request.query_params.get("start_time"),
+                        "end_time": request.query_params.get("end_time"),
+                        "name": request.query_params.get("name"),
+                    }
+                ).get_ranking_statistics("questions", current_page, page_size)
+            )
+
+    class TokensAggregation(APIView):
+        authentication_classes = [TokenAuth]
+
+        # 应用的token总量
+        @extend_schema(
+            methods=["GET"],
+            description=_("Application tokens aggregation"),
+            summary=_("Application tokens aggregation"),
+            operation_id=_("Application tokens aggregation"),  # type: ignore
+            parameters=ApplicationStatsAPI.get_parameters(),
+            responses=ApplicationStatsAPI.get_response(),
+            tags=[_("Application")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        def get(self, request: Request, workspace_id: str, application_id: str):
+            return result.success(
+                ApplicationStatisticsSerializer(
+                    data={
+                        "application_id": application_id,
+                        "workspace_id": workspace_id,
+                        "start_time": request.query_params.get("start_time"),
+                        "end_time": request.query_params.get("end_time"),
+                    }
+                ).get_tokens_aggregation()
+            )
+
+    class ChatRecordAggregation(APIView):
+        authentication_classes = [TokenAuth]
+
+        # 应用的对话次数总量
+        @extend_schema(
+            methods=["GET"],
+            description=_("Application chat record aggregation"),
+            summary=_("Application chat record aggregation"),
+            operation_id=_("Application chat record aggregation"),  # type: ignore
+            parameters=ApplicationStatsAPI.get_parameters(),
+            responses=ApplicationStatsAPI.get_response(),
+            tags=[_("Application")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        def get(self, request: Request, workspace_id: str, application_id: str):
+            return result.success(
+                ApplicationStatisticsSerializer(
+                    data={
+                        "application_id": application_id,
+                        "workspace_id": workspace_id,
+                        "start_time": request.query_params.get("start_time"),
+                        "end_time": request.query_params.get("end_time"),
+                    }
+                ).get_chat_record_aggregation()
+            )
+
+    class TokenUsageExport(APIView):
+        authentication_classes = [TokenAuth]
+
+        # 应用的token使用排行导出
+        @extend_schema(
+            methods=["GET"],
+            description=_("Application token usage ranking export"),
+            summary=_("Application token usage ranking export"),
+            operation_id=_("Application token usage ranking export"),  # type: ignore
+            parameters=ApplicationStatsAPI.get_parameters(),
+            responses=ApplicationStatsAPI.get_response(),
+            tags=[_("Application")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_EXPORT.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        def get(self, request: Request, workspace_id: str, application_id: str):
+            return ApplicationStatisticsSerializer(
+                data={
+                    "application_id": application_id,
+                    "workspace_id": workspace_id,
+                    "start_time": request.query_params.get("start_time"),
+                    "end_time": request.query_params.get("end_time"),
+                    "name": request.query_params.get("name"),
+                }
+            ).export_ranking_statistics("userTokens")
+
+    class TopQuestionsExport(APIView):
+        authentication_classes = [TokenAuth]
+
+        # 应用的top问题排行导出
+        @extend_schema(
+            methods=["GET"],
+            description=_("Application top question ranking export"),
+            summary=_("Application top question ranking export"),
+            operation_id=_("Application top question ranking export"),  # type: ignore
+            parameters=ApplicationStatsAPI.get_parameters(),
+            responses=ApplicationStatsAPI.get_response(),
+            tags=[_("Application")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_EXPORT.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        def get(self, request: Request, workspace_id: str, application_id: str):
+            return ApplicationStatisticsSerializer(
+                data={
+                    "application_id": application_id,
+                    "workspace_id": workspace_id,
+                    "start_time": request.query_params.get("start_time"),
+                    "end_time": request.query_params.get("end_time"),
+                    "name": request.query_params.get("name"),
+                }
+            ).export_ranking_statistics("questions")
