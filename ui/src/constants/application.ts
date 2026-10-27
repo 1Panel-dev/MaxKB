@@ -19,6 +19,6 @@ export const APPLICATION_DISPLAY_SETTING_DEFAULT: Readonly<ApplicationDisplaySet
   disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
   custom_theme: { theme_color: '', header_font_color: '#1f2329' },
   float_location: { x: { type: 'right', value: 0 }, y: { type: 'bottom', value: 30 } },
-  show_avatar: true,
-  show_user_avatar: true,
+  show_avatar: false,
+  show_user_avatar: false,
 }

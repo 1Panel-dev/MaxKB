@@ -6,6 +6,7 @@ import type { ApplicationDisplaySetting } from '@/api/types'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { useApplicationDetailContext } from '../../context'
 import DisplaySettingPreview from './components/DisplaySettingPreview.vue'
+import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
 
 defineOptions({ name: 'XpackDisplaySettingDialog' })
 
@@ -13,27 +14,7 @@ const { application, applicationId, resourceApi } = useApplicationDetailContext(
 const visible = ref(false)
 const loading = ref(false)
 
-// 展示草稿与恢复默认；只在保存时提交，取消不回写配置。
-const defaultSetting: ApplicationDisplaySetting = {
-  show_source: false,
-  show_exec: false,
-  language: '',
-  show_history: true,
-  draggable: true,
-  show_share: true,
-  icon: '',
-  chat_background: '',
-  avatar: '',
-  float_icon: '',
-  user_avatar: '',
-  disclaimer: false,
-  disclaimer_value: '「以上内容均由 AI 生成，仅供参考和借鉴」',
-  custom_theme: { theme_color: '', header_font_color: '#1f2329' },
-  float_location: { x: { type: 'right', value: 0 }, y: { type: 'bottom', value: 30 } },
-  show_avatar: true,
-  show_user_avatar: false,
-}
-const displayForm = ref<ApplicationDisplaySetting>(cloneDeep(defaultSetting))
+const displayForm = ref<ApplicationDisplaySetting>(cloneDeep(APPLICATION_DISPLAY_SETTING_DEFAULT))
 type ImageField = 'icon' | 'chat_background' | 'avatar' | 'user_avatar' | 'float_icon'
 const imageFields: {
   key: ImageField
@@ -69,14 +50,14 @@ function loadSetting() {
     .getAccessToken(applicationId.value)
     .then((config) => {
       // 旧版接口可能省略展示字段，嵌套配置分别补齐默认值。
-      const setting = cloneDeep(defaultSetting)
+      const setting: ApplicationDisplaySetting = cloneDeep(APPLICATION_DISPLAY_SETTING_DEFAULT)
       for (const key of Object.keys(setting) as (keyof ApplicationDisplaySetting)[]) {
         if (config[key] != null) Object.assign(setting, { [key]: cloneDeep(config[key]) })
       }
-      setting.custom_theme = { ...defaultSetting.custom_theme, ...config.custom_theme }
+      setting.custom_theme = { ...APPLICATION_DISPLAY_SETTING_DEFAULT.custom_theme, ...config.custom_theme }
       setting.float_location = {
-        x: { ...defaultSetting.float_location.x, ...config.float_location?.x },
-        y: { ...defaultSetting.float_location.y, ...config.float_location?.y },
+        x: { ...APPLICATION_DISPLAY_SETTING_DEFAULT.float_location.x, ...config.float_location?.x },
+        y: { ...APPLICATION_DISPLAY_SETTING_DEFAULT.float_location.y, ...config.float_location?.y },
       }
       displayForm.value = setting
     })
@@ -118,12 +99,12 @@ function handleImageChange(file: UploadFile, field: ImageField) {
 function handleRestoreDefault() {
   if (loading.value) return
   releaseImagePreviews()
-  displayForm.value = cloneDeep(defaultSetting)
+  displayForm.value = cloneDeep(APPLICATION_DISPLAY_SETTING_DEFAULT)
 }
 
 function handleClosed() {
   releaseImagePreviews()
-  displayForm.value = cloneDeep(defaultSetting)
+  displayForm.value = cloneDeep(APPLICATION_DISPLAY_SETTING_DEFAULT)
 }
 
 // 对照 V2 协议提交文件、已有图片 URL 和嵌套 JSON，失败保留当前草稿。

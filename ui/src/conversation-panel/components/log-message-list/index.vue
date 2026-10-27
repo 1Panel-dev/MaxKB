@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import ContentList from '../content-list/index.vue'
 import MessageFooter from '../message-footer/index.vue'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
-import { computed } from 'vue'
 import { useLogMessageListStore } from './index'
 
 const { appInfo, messages, loading, hasMore, loadMore } = useLogMessageListStore()
@@ -17,11 +17,18 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
     <template v-for="(msg, i) in messages" :key="msg.id || i">
       <!-- 用户提问靠右：头像独占一行在上，提问容器在下方靠右收缩 -->
       <div v-if="msg.role === 'USER'" class="flex flex-col items-end">
-        <ApplicationIcon v-if="showUserAvatar" :icon="userAvatar" :size="24" class="mb-2" />
+        <div v-if="showUserAvatar">
+          <el-avatar v-if="userAvatar" class="bg-transparent!" shape="square" :size="24">
+            <img :src="userAvatar" alt="" />
+          </el-avatar>
+          <el-avatar v-else :size="24" :style="{ background: appInfo?.custom_theme?.theme_color || 'var(--mk-primary-gradient)' }">
+            <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 50%" />
+          </el-avatar>
+        </div>
         <ContentList :content-list="msg.content" />
       </div>
       <div v-else>
-        <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0 mr-2" />
+        <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
         <ContentList :content-list="msg.content" />
         <!-- 助手消息底部信息栏(知识来源/执行详情/tokens/耗时) -->
         <MessageFooter v-if="msg.role === 'ASSISTANT' && msg.record" :message="msg" />
