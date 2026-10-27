@@ -33,17 +33,29 @@ const tagTableRef = ref<{ clearSelection: () => void }>()
 const selectedTags = ref<TagTableRow[]>([])
 const hoveredTagKey = ref<string | null>(null)
 
+const tagValueCount = computed(() => tagGroups.value.reduce((count, group) => count + group.values.length, 0))
 const paginationConfig = computed({
-  get: () => ({ ...tagPage.value, total: tagGroups.value.length }),
+  get: () => ({ ...tagPage.value, total: tagValueCount.value }),
   set: ({ currentPage, pageSize }) => {
     tagPage.value = { currentPage, pageSize }
   },
 })
 const tagRows = computed<TagTableRow[]>(() => {
   const start = (tagPage.value.currentPage - 1) * tagPage.value.pageSize
-  return tagGroups.value
+  const pageRows = tagGroups.value
+    .flatMap((group) => group.values.map((tag) => ({ ...tag, key: group.key, rowspan: 0 })))
     .slice(start, start + tagPage.value.pageSize)
-    .flatMap((group) => group.values.map((tag, index) => ({ ...tag, key: group.key, rowspan: index === 0 ? group.values.length : 0 })))
+
+  let rowIndex = 0
+  while (rowIndex < pageRows.length) {
+    const currentRow = pageRows[rowIndex]
+    if (!currentRow) break
+    let groupEndIndex = rowIndex + 1
+    while (pageRows[groupEndIndex]?.key === currentRow.key) groupEndIndex += 1
+    currentRow.rowspan = groupEndIndex - rowIndex
+    rowIndex = groupEndIndex
+  }
+  return pageRows
 })
 
 function clearSelection() {
@@ -64,7 +76,7 @@ function loadTags() {
     .getKnowledgeTags(knowledgeId.value, params)
     .then((groups) => {
       tagGroups.value = keyword ? groups.filter((group) => group.key.includes(keyword)) : groups
-      const lastPage = Math.max(1, Math.ceil(tagGroups.value.length / tagPage.value.pageSize))
+      const lastPage = Math.max(1, Math.ceil(tagValueCount.value / tagPage.value.pageSize))
       tagPage.value.currentPage = Math.min(tagPage.value.currentPage, lastPage)
     })
     .finally(() => {
