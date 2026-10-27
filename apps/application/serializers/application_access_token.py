@@ -73,6 +73,8 @@ class AccessTokenSerializer(serializers.Serializer):
             application_access_token.language = instance.get("language")
         if "language" not in instance or instance.get("language") is None:
             application_access_token.language = None
+        if "authentication" in instance and instance.get("authentication") is not None:
+            application_access_token.authentication = instance.get("authentication")
 
         application_access_token.save()
         license_is_valid = cache.get(
@@ -80,7 +82,6 @@ class AccessTokenSerializer(serializers.Serializer):
         )
         if license_is_valid:
             if instance.get("authentication") is not None and instance.get("authentication_value") is not None:
-                application_access_token.authentication = instance.get("authentication")
                 application_access_token.authentication_value = instance.get("authentication_value")
                 application_access_token.save()
         return self.one(with_valid=False)
@@ -97,17 +98,15 @@ class AccessTokenSerializer(serializers.Serializer):
                 is_active=True,
             )
             application_access_token.save()
-        other = {}
         license_is_valid = cache.get(
             Cache_Version.SYSTEM.get_key(key="license_is_valid"), version=Cache_Version.SYSTEM.get_version()
         )
+        other = {"authentication": application_access_token.authentication}
         if license_is_valid:
             other = {
                 "authentication": application_access_token.authentication,
                 "authentication_value": application_access_token.authentication_value,
             }
-        else:
-            other = {"authentication": application_access_token.authentication}
 
         return {
             "application_id": application_access_token.application_id,
