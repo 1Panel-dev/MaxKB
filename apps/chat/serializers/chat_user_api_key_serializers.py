@@ -29,7 +29,7 @@ class ChatUserApiKeySerializer(serializers.Serializer):
         QuerySet(ChatUserApiKey).filter(user_id=user_id).delete()
         api_key = ChatUserApiKey(
             id=uuid.uuid7(),
-            secret_key=hashlib.md5(uuid.uuid7().bytes).hexdigest(),
+            secret_key=f"chat-{hashlib.md5(uuid.uuid7().bytes).hexdigest()}",
             user_id=user_id,
         )
         api_key.save()
