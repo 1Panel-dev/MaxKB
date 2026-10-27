@@ -258,8 +258,8 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 
 ### 标签管理
 
-`library/tags/` 按标签组前端分页，再展开标签值；`MkTable.selectionGroupKey="key"`
-联动组内选择，统计与删除按实际标签值数量。普通查询将名称传后端，共享无参数查询后本地筛选。
+`library/tags/` 按标签值前端分页，当前页内按标签组展开并合并展示；`MkTable.selectionGroupKey="key"`
+联动当前页内同组选择，统计与删除按实际标签值数量。普通查询将名称传后端，共享无参数查询后本地筛选。
 `CreateTagDialog` 创建多行组合或为 `open(key)` 添加值；`EditTagDialog` 只重命名或编辑单值，
 保留完整 id、key、value，不模拟多行保存。名称／值上限 64／128，提交清理可编辑文本并检查重复。
 `ButtonImportTags` 内聚 XLS／XLSX 导入及模板下载，失败保留文件。
