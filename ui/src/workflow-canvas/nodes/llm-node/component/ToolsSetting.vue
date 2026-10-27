@@ -5,7 +5,7 @@ import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { createAnchorGuard } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { downloadByURL } from '@/utils/common'
-import ToolFunctionDialog from './ToolFunctionDialog.vue'
+import ToolFunctionDrawer from './ToolFunctionDrawer.vue'
 import { normalizeTool, type LlmTool, type LlmToolsSetting } from '../types'
 
 defineOptions({ name: 'WorkflowLlmToolsSetting' })
@@ -13,7 +13,7 @@ defineOptions({ name: 'WorkflowLlmToolsSetting' })
 const props = defineProps<{ nodeModel: WorkflowNodeModel }>()
 const setting = defineModel<LlmToolsSetting>({ required: true })
 
-const toolDialogRef = useTemplateRef<InstanceType<typeof ToolFunctionDialog>>('toolDialogRef')
+const toolDrawerRef = useTemplateRef<InstanceType<typeof ToolFunctionDrawer>>('toolDrawerRef')
 const anchorGuard = createAnchorGuard(props.nodeModel)
 const existingNames = computed(() => setting.value.tools.map((tool) => tool.function.name))
 
@@ -21,12 +21,16 @@ function updateSetting(value: Partial<LlmToolsSetting>) {
   setting.value = { ...setting.value, ...value }
 }
 
+function handleOpenToolDrawer(tool?: LlmTool, index?: number) {
+  toolDrawerRef.value?.open(tool, index)
+}
+
 function handleToolSubmit(tool: LlmTool, index?: number) {
   const tools = cloneDeep(setting.value.tools)
   if (index === undefined) tools.push(tool)
   else tools[index] = tool
   updateSetting({ tools })
-  toolDialogRef.value?.close()
+  toolDrawerRef.value?.close()
 }
 
 function handleDeleteTool(index: number) {
@@ -37,6 +41,10 @@ function handleDeleteTool(index: number) {
 const importVisible = ref(false)
 const importJson = ref('')
 const importError = ref('')
+
+function handleOpenImport() {
+  importVisible.value = true
+}
 
 function handleImport() {
   importError.value = ''
@@ -74,29 +82,40 @@ onBeforeUnmount(() => anchorGuard.reset())
 <template>
   <div class="flex-between mb-2">
     <span class="flex-align-center gap-1">
-      工具
-      <MkTooltip content="OpenAI function 格式的工具定义，只交给模型决策，调用结果从 tool_calls 输出" placement="right">
+      工具声明
+      <MkTooltip
+        content="按 OpenAI 标准 Function Calling 格式声明工具能力，仅用于模型决策，不在此处执行；调用请求（工具名 + 参数）经参数 tool_calls 返回"
+        placement="right"
+      >
         <MkIcon name="icon_info_outlined" class="text-N600!" />
       </MkTooltip>
     </span>
     <div class="flex-align-center">
       <template v-if="setting.location === 'customize'">
-        <!-- 批量导入工具 -->
-        <MkTooltip content="批量导入" placement="top">
-          <el-button text type="primary" @click="importVisible = true">
-            <MkIcon name="icon_import_outlined" />
-          </el-button>
-        </MkTooltip>
-        <!-- 导出工具 -->
-        <MkTooltip content="导出" placement="top">
-          <el-button text type="primary" :disabled="!setting.tools.length" @click="handleExport">
-            <MkIcon name="icon_export_outlined" />
-          </el-button>
-        </MkTooltip>
-        <!-- 添加函数 -->
-        <el-button text type="primary" @click="toolDialogRef?.open()">
+        <!-- 添加工具 -->
+        <el-button text type="primary" @click="handleOpenToolDrawer()">
           <MkIcon name="icon_add_outlined" />
         </el-button>
+        <!-- 工具声明更多操作 -->
+        <MkDropdown class="ml-2" :teleported="false" trigger="click" placement="bottom-end" @visible-change="anchorGuard.setOverlayVisible('tools-more', $event)">
+          <el-button text type="primary">
+            <MkIcon name="icon_more_outlined" />
+          </el-button>
+          <template #dropdown>
+            <MkDropdownMenu>
+              <!-- 批量导入工具 -->
+              <MkDropdownItem @click="handleOpenImport">
+                <template #icon><MkIcon name="icon_import_outlined" /></template>
+                导入
+              </MkDropdownItem>
+              <!-- 导出工具 -->
+              <MkDropdownItem :disabled="!setting.tools.length" @click="handleExport">
+                <template #icon><MkIcon name="icon_export_outlined" /></template>
+                导出
+              </MkDropdownItem>
+            </MkDropdownMenu>
+          </template>
+        </MkDropdown>
       </template>
       <el-select
         :model-value="setting.location"
@@ -120,35 +139,42 @@ onBeforeUnmount(() => anchorGuard.reset())
     placeholder="请选择工具变量"
     @update:model-value="updateSetting({ reference: $event })"
   />
-  <div v-else-if="setting.tools.length" class="mk-white-card space-y-1">
-    <div v-for="(tool, index) in setting.tools" :key="tool.function.name" class="flex-between gap-2">
-      <div class="flex-align-center min-w-0 gap-1">
-        <span class="truncate" :title="tool.function.name">{{ tool.function.name }}</span>
-        <MkTooltip v-if="tool.function.description" :content="tool.function.description" effect="dark" placement="right">
-          <MkIcon name="icon_info_outlined" class="text-N600!" />
-        </MkTooltip>
-        <el-tag size="small" type="info">{{ Object.keys(tool.function.parameters?.properties ?? {}).length }} 个参数</el-tag>
-      </div>
-      <div class="flex-align-center shrink-0">
-        <!-- 编辑函数 -->
-        <el-button text type="primary" @click="toolDialogRef?.open(tool, index)">
+  <MkTable v-else-if="setting.tools.length" :data="setting.tools" size="small" row-key="function.name" :max-height="undefined">
+    <el-table-column label="工具名称">
+      <template #default="{ row }">
+        <span class="block truncate" :title="row.function.name">{{ row.function.name }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column label="工具描述">
+      <template #default="{ row }">
+        <span class="block truncate" :title="row.function.description || '-'">{{ row.function.description || '-' }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column label="参数" width="55">
+      <template #default="{ row }">{{ Object.keys(row.function.parameters?.properties ?? {}).length }}</template>
+    </el-table-column>
+    <el-table-column label="操作" width="80">
+      <template #default="{ row, $index }">
+        <!-- 编辑工具 -->
+        <el-button text type="primary" @click="handleOpenToolDrawer(row, $index)">
           <MkIcon name="icon_edit_outlined" />
         </el-button>
-        <!-- 删除函数 -->
-        <el-button text type="primary" @click="handleDeleteTool(index)">
+        <!-- 删除工具 -->
+        <el-button text type="primary" @click="handleDeleteTool($index)">
           <MkIcon name="icon_delete-trash_outlined" />
         </el-button>
-      </div>
-    </div>
-  </div>
+      </template>
+    </el-table-column>
+  </MkTable>
 
-  <ToolFunctionDialog ref="toolDialogRef" :existing-names="existingNames" @submit="handleToolSubmit" />
+  <ToolFunctionDrawer ref="toolDrawerRef" :existing-names="existingNames" @submit="handleToolSubmit" />
 
   <MkDialog v-model="importVisible" title="批量导入工具" @closed="resetImport">
     <el-input
       v-model="importJson"
       type="textarea"
       :rows="12"
+      @paste.stop
       placeholder='粘贴 OpenAI tools 格式 JSON，例如：
 [
   {
@@ -165,7 +191,7 @@ onBeforeUnmount(() => anchorGuard.reset())
   }
 ]'
     />
-    <div v-if="importError" class="mt-2 text-sm text-[var(--el-color-danger)]">{{ importError }}</div>
+    <div v-if="importError" class="mt-2 text-sm text-danger">{{ importError }}</div>
     <template #footer>
       <el-button plain @click="importVisible = false">取消</el-button>
       <el-button type="primary" @click="handleImport">导入</el-button>
