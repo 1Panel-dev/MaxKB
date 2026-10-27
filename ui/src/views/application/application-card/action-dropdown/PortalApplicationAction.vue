@@ -14,17 +14,17 @@ const emit = defineEmits<{ change: [isPortal: boolean] }>()
 
 /** 依据 api 是否含工作空间独有方法区分工作空间/系统资源管理场景，用于选择对应权限。 */
 const isSystem = computed(() => !('putMoveApplication' in props.api))
-const id = computed(() => props.application.id)
+
 
 /** 上下架权限：未授权时隐藏对应入口。 */
-const canPortalUp = computed(() => (isSystem.value ? perm.application.system.portalUp() : perm.application.workspace.portalUp(id.value)))
-const canPortalDown = computed(() => (isSystem.value ? perm.application.system.portalDown() : perm.application.workspace.portalDown(id.value)))
+const canPortalUp = computed(() => (isSystem.value ? perm.application.system.portalUp() : perm.application.workspace.portalUp(props.application.id)))
+const canPortalDown = computed(() => (isSystem.value ? perm.application.system.portalDown() : perm.application.workspace.portalDown(props.application.id)))
 
 /** 上架到门户：仅已发布可上架。 */
 const canUp = computed(() => canPortalUp.value && Boolean(props.application.is_publish))
 
 function handlePortalUp() {
-  if (loading.value) return
+  if (loading.value || props.application.is_portal || !canUp.value) return
   loading.value = true
   return props.api
     .putApplicationPortalUp(props.application.id)
@@ -39,7 +39,7 @@ function handlePortalUp() {
 }
 
 function handlePortalDown() {
-  if (loading.value) return
+  if (loading.value || !props.application.is_portal || !canPortalDown.value) return
   loading.value = true
   return props.api
     .putApplicationPortalDown(props.application.id)
@@ -55,13 +55,8 @@ function handlePortalDown() {
 </script>
 
 <template>
-  <!-- 上架到门户：仅已发布且有权限时可用 -->
-  <MkDropdownItem
-    v-if="!application.is_portal && canPortalUp"
-    :disabled="loading || !canUp"
-    :title="!canUp ? '请先发布后再上架' : ''"
-    @click="handlePortalUp"
-  >
+  <!-- 上架到门户：仅已发布、未上架且有权限时展示 -->
+  <MkDropdownItem v-if="!application.is_portal && canUp" :disabled="loading" @click="handlePortalUp">
     <template #icon>
       <MkIcon name="icon_launch_outlined1" />
     </template>
