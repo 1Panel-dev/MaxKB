@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import JSEncrypt from 'jsencrypt'
 import CommonSystemApi from '@/api/admin/system/common'
 import CurrentUserApi from '@/api/admin/auth/current-user'
@@ -62,6 +62,10 @@ function isAdminRole(roleId: string) {
   return roleOptions.value.find(({ id }) => id === roleId)?.type === ROLE_TYPE.ADMIN
 }
 
+function isUserRole(roleId: string) {
+  return roleOptions.value.find(({ id }) => id === roleId)?.type === ROLE_TYPE.USER
+}
+
 function handleRoleChange(roleAssignment: SystemUserRoleAssignment, index: number) {
   if (isAdminRole(roleAssignment.role_id)) {
     roleAssignment.workspace_ids = []
@@ -97,6 +101,16 @@ const selectedWorkspaceIds = computed(() => {
     return ['default']
   }
   return [...new Set(userForm.role_setting.flatMap(({ workspace_ids }) => workspace_ids))]
+})
+
+// 用户组仅在选择包含普通用户角色时展示。
+const showUserGroup = computed(() => userForm.role_setting.some(({ role_id }) => isUserRole(role_id)))
+
+// 移除普通用户角色后清空已选用户组，避免随角色变更残留提交。
+watch(showUserGroup, (visible) => {
+  if (!visible) {
+    userForm.user_group_ids = []
+  }
 })
 
 // 默认密码
@@ -292,7 +306,7 @@ defineExpose({ open })
           </template>
         </MkFormList>
       </section>
-      <section v-if="selectedWorkspaceIds.length">
+      <section v-if="showUserGroup">
         <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
         <UserGroupSetting v-model="userForm.user_group_ids" :workspace-ids="selectedWorkspaceIds" :workspace-options="workspaceOptions" />
       </section>

@@ -347,9 +347,10 @@ class UserManageSerializer(serializers.Serializer):
         )
         source = serializers.CharField(required=False, label=_("Source"), max_length=20, default="LOCAL")
 
-        def is_valid(self, *, raise_exception=True):
-            super().is_valid(raise_exception=True)
-            self._check_unique_username_and_email()
+        def is_valid(self, *, raise_exception=True, check_unique=True):
+            super().is_valid(raise_exception=raise_exception)
+            if check_unique:
+                self._check_unique_username_and_email()
 
         def _check_unique_username_and_email(self):
             username = self.data.get("username")
