@@ -23,6 +23,20 @@ multi_select_list = [
     'MultiSelect',
     'MultiRow'
 ]
+FORM_CONTEXT_KEYS = {
+    'result', 'form_content_format', 'form_field_list', 'form_data', 'is_submit',
+    'exception_message', 'start_time', 'run_time',
+}
+
+
+def filter_form_data(form_data, field_names):
+    if form_data is None:
+        return None
+    if not isinstance(form_data, dict):
+        return {}
+    # Only declared values may enter the context; internal state is never a form field.
+    allowed_fields = {name for name in field_names if isinstance(name, str)} - FORM_CONTEXT_KEYS
+    return {key: value for key, value in form_data.items() if key in allowed_fields}
 
 
 def get_default_option(option_list, _type, value_field):
@@ -63,7 +77,9 @@ def generate_prompt(workflow_manage, _value):
 
 class BaseFormNode(IFormNode):
     def save_context(self, details, workflow_manage):
-        form_data = details.get('form_data', None)
+        form_data = filter_form_data(
+            details.get('form_data'), (field.get('field') for field in (details.get('form_field_list') or []))
+        )
         self.context['result'] = details.get('result')
         self.context['form_content_format'] = details.get('form_content_format')
         self.context['form_field_list'] = details.get('form_field_list')
@@ -166,6 +182,9 @@ class BaseFormNode(IFormNode):
             return value
 
     def execute(self, form_field_list, form_content_format, form_data, **kwargs) -> NodeResult:
+        form_data = filter_form_data(
+            form_data, (generate_prompt(self.workflow_manage, field.get('field')) for field in form_field_list)
+        )
         if form_data is not None:
             self.context['is_submit'] = True
             self.context['form_data'] = form_data
