@@ -227,7 +227,7 @@ def get_workspace_list_by_user(user_id):
     license_is_valid = DatabaseModelManage.get_model("license_is_valid") or (lambda: False)
     if get_workspace_list is not None and license_is_valid():
         return get_workspace_list(user_id)
-    return [{"id": "default", "name": "default"}]
+    return [{"id": "default", "name": "默认工作空间"}]
 
 
 def _is_default_password(default_password: str, hashed_password: str):
