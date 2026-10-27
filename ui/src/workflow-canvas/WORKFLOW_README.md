@@ -310,6 +310,11 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 
 #### AI 对话与提示词
 
+LLM 节点的工具声明由 `llm-node/component/ToolsSetting.vue` 维护，导入、导出收在更多菜单。
+`ToolFunctionDrawer.vue` 编辑工具草稿，支持 JSON 解析和参数表格；参数通过
+`ToolParameterDialog.vue` 编辑，抽屉检查重名后更新草稿，工具提交后才写回节点。
+工具参数沿用 OpenAI 类型名称，不复用工具输入参数的 `int` / `dict` 协议；取消不修改原配置。
+
 AI 对话节点的 `component/resource-setting` 仅渲染技能卡片内的 MCP、工具、Skills 和智能体分组，
 各分组直接在入口使用 `MkCollapse`，普通列表区直接维护，仅选择弹窗独立封装。
 工具和 Skills 的添加入口复用 `SelectToolDialog`，智能体入口使用 `SelectApplicationDialog`；

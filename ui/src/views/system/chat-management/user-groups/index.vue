@@ -124,8 +124,9 @@ function handleBatchSelectionChange(selection: unknown[]) {
 }
 
 function handleRemoveMembers(member?: ChatUserGroupMember) {
-  const title = member ? `是否移除成员：${member?.nick_name}？` : `是否移除选中的 ${batchSelectedMembers.value.length} 个成员？`
-  MsgConfirm(title, '', { confirmButtonText: '移除' })
+  const targetName = member ? member.nick_name || member.username : ''
+  const title = member ? `是否移除用户：${targetName}？` : `是否移除选中的 ${batchSelectedMembers.value.length} 个用户？`
+  MsgConfirm(title, '成员移除后，通过该用户组继承的资源权限将被回收，请谨慎操作。', { confirmButtonText: '移除' })
     .then(() => {
       membersLoading.value = true
       const relationIds = batchSelectedMembers.value.map(({ user_group_relation_id }) => user_group_relation_id)

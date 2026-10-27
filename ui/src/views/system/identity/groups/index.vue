@@ -159,8 +159,8 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
   if (!group || !members.length) return
 
   const targetName = member ? member.nick_name || member.username : ''
-  const title = member ? `是否移除成员：${targetName}？` : `是否移除选中的 ${members.length} 个成员？`
-  MsgConfirm(title, '', { confirmButtonText: '移除' })
+  const title = member ? `是否移除用户：${targetName}？` : `是否移除选中的 ${members.length} 个用户？`
+  MsgConfirm(title, '成员移除后，通过该用户组继承的资源权限将被回收，请谨慎操作。', { confirmButtonText: '移除' })
     .then(() => {
       return UserGroupsApi.postRemoveSystemUserGroupMembers(
         selectedWorkspaceId.value,
