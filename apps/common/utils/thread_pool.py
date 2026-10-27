@@ -9,6 +9,8 @@
 
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
+from django.db import close_old_connections
+
 
 def await_complete_or_cancel(done_event, cancel_event, on_cancel):
     """
@@ -30,3 +32,11 @@ def await_complete_or_cancel(done_event, cancel_event, on_cancel):
         on_cancel()
         return True
     return False
+
+
+def run_db_task(fn, *args, **kwargs):
+    """在单线程写入器上执行 DB 任务;结束后归还该线程的 DB 连接,避免常驻连接老化/锁残留。"""
+    try:
+        return fn(*args, **kwargs)
+    finally:
+        close_old_connections()

@@ -4,6 +4,7 @@ import base64
 import json
 import pickle
 import time
+from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from functools import reduce
 from typing import Dict, List
@@ -34,6 +35,7 @@ from common.utils.common import restricted_loads, generate_uuid
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
+from common.utils.thread_pool import run_db_task
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
 from knowledge.models import (
     KnowledgeScope,
@@ -70,6 +72,9 @@ from tools.serializers.tool import ToolExportModelSerializer
 from users.models import User
 
 tool_executor = ToolExecutor()
+
+# 串行执行知识库工作流回调里的 DB 写:单 worker 保证 on_next/on_complete 的刷新顺序一致。
+_knowledge_action_writer = ThreadPoolExecutor(max_workers=1, thread_name_prefix="knowledge-action-writer")
 
 
 def hand_node(node, update_tool_map):
@@ -418,9 +423,14 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 raise AppApiException(500, _("The start node does not exist"))
             return get_node_class(node.type, WorkflowType.KNOWLEDGE)(node, wm, get_node_parameters)
 
+        def _update_knowledge_action_details(knowledge_action_id, details):
+            QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(details=details)
+
         def on_next(wf_manage, content):
-            # 实时刷新节点详情,供前端轮询 KnowledgeAction 展示进度
-            QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(details=wf_manage.get_details())
+            # 实时刷新节点详情,供前端轮询 KnowledgeAction 展示进度。
+            _knowledge_action_writer.submit(
+                run_db_task, _update_knowledge_action_details, knowledge_action_id, wf_manage.get_details()
+            )
 
         def on_complete(wf_manage, error):
             stop_heartbeat()
@@ -429,8 +439,14 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             cancelled = wf_manage.signal == Signal.CANCELLED
             state = self.compute_knowledge_state(details, error, cancelled)
             run_time = time.time() - start_time
-            QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(details=details)
-            finalize_knowledge_action(
+
+            # 在同一串行 writer 上阻塞,排到所有 on_next 刷新之后,确保最终详情/状态最后落库
+            _knowledge_action_writer.submit(
+                run_db_task, _update_knowledge_action_details, knowledge_action_id, details
+            ).result()
+            _knowledge_action_writer.submit(
+                run_db_task,
+                finalize_knowledge_action,
                 knowledge_action_id,
                 state,
                 run_time,
@@ -438,7 +454,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 delete_document_data,
                 parameters["workflow_source"],
                 (parameters.get("workflow_sync_document") or {}).get("id"),
-            )
+            ).result()
 
         call_back = CallBack(on_next, on_complete)
         work_flow_manage = WorkflowManage(workflow, parameters, WorkflowType.KNOWLEDGE, call_back, get_start_node_fn)
