@@ -44,7 +44,8 @@ const chartOption = computed<LineOption>(() => ({
     itemHeight: 8,
     textStyle: { color: '#646A73' },
   },
-  grid: { left: 12, right: 16, top: 56, bottom: 0, containLabel: true },
+  // 为居中显示的日期预留两端空间，避免裁切或挤掉相邻标签。
+  grid: { left: 0, right: 0, top: 56, bottom: 0, outerBoundsMode: 'same', outerBoundsContain: 'axisLabel' },
   xAxis: {
     type: 'category',
     data: props.option.xData,

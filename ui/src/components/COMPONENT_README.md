@@ -833,7 +833,7 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 `(Partial<KnowledgeItem> & { id: string })[]`，保留必需的 ID 并兼容缺少详情的旧数据，
 组件采用 `MkViewLayout` 左右布局，搜索栏位于内容区右上角，刷新位于弹窗标题栏。
 选项使用紧凑三列布局（窄屏减少列数），左侧图标与省略名称、右侧复选框。点击卡片或复选框
-切换选择，选中后仅展示相同 Embedding 模型的选项，清空后恢复；悬停展示知识库详情。
+切换选择，始终过滤掉 `embedding_model_id` 为空的知识库；选中后仅展示相同 Embedding 模型的选项，清空后恢复可选范围；悬停展示知识库详情。
 按工作空间、System 资源管理、System 共享资源选择完整 Knowledge API 的 `getAllKnowledge`，
 一次加载当前查询的全部知识库，不使用滚动分页，不增加 Workspace 共享页面来源分支。
 仅普通工作空间显示只读 `FolderTree`，不显示共享目录、不调用 Workspace Shared API；其他范围不显示或查询文件夹。

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
@@ -25,14 +25,40 @@ const exportOptions = [
   { label: '导出知识库', method: 'exportKnowledge' },
 ] as const
 
+const exportDialogVisible = ref(false)
+const withSourceFile = ref(false)
+
 function handleExportKnowledge(method: (typeof exportOptions)[number]['method']) {
   if (loading.value) return
+  if (method === 'exportKnowledge') {
+    exportDialogVisible.value = true
+    return
+  }
   loading.value = true
   return props.api[method](props.knowledge.id, props.knowledge.name)
     .catch(() => {})
     .finally(() => {
       loading.value = false
     })
+}
+
+/* 确认知识库压缩包是否包含源文件 */
+function handleConfirmExport() {
+  if (loading.value) return
+  loading.value = true
+  return props.api
+    .exportKnowledge(props.knowledge.id, props.knowledge.name, withSourceFile.value)
+    .then((success) => {
+      if (success) exportDialogVisible.value = false
+    })
+    .catch(() => {})
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+function handleExportDialogClosed() {
+  withSourceFile.value = false
 }
 </script>
 
@@ -63,4 +89,18 @@ function handleExportKnowledge(method: (typeof exportOptions)[number]['method'])
       </template>
     </MkDropdown>
   </MkDropdownItem>
+
+  <MkDialog v-model="exportDialogVisible" title="导出知识库" width="420" @closed="handleExportDialogClosed">
+    <div v-loading="loading">
+      <!-- 选择是否同时导出源文件 -->
+      <el-checkbox v-model="withSourceFile">同时导出源文件</el-checkbox>
+      <p class="ml-6 text-N600">勾选后将原始文件一并打包至 ZIP，导入时可自动恢复文件关联；不勾选，则仅导出文本内容。</p>
+    </div>
+    <template #footer>
+      <!-- 取消导出知识库 -->
+      <el-button plain :disabled="loading" @click="exportDialogVisible = false">取消</el-button>
+      <!-- 确认导出知识库 -->
+      <el-button type="primary" :loading="loading" @click="handleConfirmExport">导出</el-button>
+    </template>
+  </MkDialog>
 </template>

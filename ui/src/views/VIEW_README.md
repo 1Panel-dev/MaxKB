@@ -166,8 +166,11 @@ MCP 配置入口使用独立权限。导出 Skills 权限已定义，知识库�
 
 四类知识库创建入口集中在 `knowledge/create-knowledge/`：`BaseKnowledgeDialog`、
 `WebKnowledgeDrawer`、`LarkKnowledgeDialog`、`WorkflowKnowledgeDialog`。
-`KnowledgeBaseForm` 负责名称、描述及 Embedding 选择，内部按范围查询模型；未选择时默认首个可用模型，
-刷新不覆盖用户选择。创建浮层接收完整 Knowledge API，工作流创建使用其 `postKnowledgeWorkflow`。
+`KnowledgeBaseForm` 负责名称、描述及 Embedding 选择，内部按范围查询模型；`mode` 默认为 `create`，
+未选择时默认首个可用模型，刷新不覆盖用户选择；基础设置传入 `mode="setting"`，不自动选择模型，保留详情空值。
+创建浮层接收完整 Knowledge API，工作流创建使用其 `postKnowledgeWorkflow`。
+导入创建成功后先刷新基础资料权限与列表，再提示设置向量模型并向量化文档；确认后按知识库类型进入当前范围的基础设置页，关闭提示保留在当前页。
+“导出知识库”先弹窗确认是否同时导出源文件，默认不勾选；确认后通过当前范围 API 导出，成功关闭、失败保留选项，关闭后清理选择。文档 Excel、ZIP 仍直接导出。
 
 `DocumentStrategyForm` 由 Web 创建、文档上传及策略设置复用；视觉增强仅在启用、切换策略或回填启用配置时
 查询对应模型／工具，刷新模型不请求工具。Web 创建两步，策略设置回填独立草稿并单独保存 `doc_strategy`，下次同步生效。

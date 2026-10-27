@@ -321,6 +321,7 @@ PUT `/<id>/document/batch_generate_related`，单项也传 document_id_list，�
 
 getKnowledgeMcpConfig 查询 external_service 并格式化 mcp_config；putKnowledgeKeywordIndex PUT tokenize 提交索引。
 exportKnowledgeExcel、exportKnowledgeZip、exportKnowledge 下载文档 Excel、带图片文档 ZIP、可导入知识库 ZIP；
+exportKnowledge 第三个参数为 withSourceFile，通过查询参数 with_source_file 传入是否包含源文件。
 postKnowledgeImport 以 FormData file、folder_id 上传，响应 knowledge_id、type。
 
 putKnowledge 更新通用字段，Workspace 飞书使用 putLarkKnowledge；移动传 folder_id，批量移动／删除传 id_list。
