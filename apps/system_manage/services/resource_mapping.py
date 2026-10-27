@@ -106,6 +106,12 @@ application_instance_field_call_dict = {
         lambda instance: [instance.long_term_model_id] if instance.long_term_model_id else [],
         lambda instance: [instance.tts_model_id] if instance.tts_model_id else [],
         lambda instance: [instance.stt_model_id] if instance.stt_model_id else [],
+        # 智能体/工作流各节点的默认模型（default_model_setting 中的 model_id）
+        lambda instance: [
+            item.get("model_id")
+            for item in (instance.default_model_setting or {}).values()
+            if item and isinstance(item, dict) and item.get("model_id")
+        ],
     ],
 }
 knowledge_instance_field_call_dict = {
