@@ -88,12 +88,16 @@ function handleFileRemove() {
   nextTick(() => importUsersFormRef.value?.validateField('files'))
 }
 
+function conflictTypeLabel(type: string) {
+  if (type === 'username') return '用户名已存在'
+  if (type === 'email') return '邮箱已存在'
+  if (type === 'nick_name') return '姓名已存在'
+  return `${type} 冲突`
+}
+
 function formatConflictMessage(conflicts: ChatUserSyncConflict[]) {
   return conflicts
-    .map((conflict) => {
-      const conflictLabel = conflict.type === 'username' ? '用户名已存在' : conflict.type === 'nick_name' ? '姓名已存在' : `${conflict.type} 冲突`
-      return `${conflictLabel}：${conflict.users.join('、')}`
-    })
+    .map((conflict) => `${conflictTypeLabel(conflict.type)}：${conflict.users.join('、')}`)
     .join('；')
 }
 
@@ -116,8 +120,11 @@ function submitImportUsers() {
       syncFile,
     )
       .then((result) => {
-        const conflictMessage = formatConflictMessage(result.conflict_users ?? [])
-        MsgSuccess(`成功导入 ${result.success_count} 个用户${conflictMessage ? `，${conflictMessage}` : ''}`)
+        const conflictUsers = result.conflict_users ?? []
+        const skippedCount = conflictUsers.reduce((sum, conflict) => sum + conflict.users.length, 0)
+        const conflictMessage = formatConflictMessage(conflictUsers)
+        const skipText = skippedCount > 0 ? `，跳过 ${skippedCount} 个用户` : ''
+        MsgSuccess(`成功导入 ${result.success_count} 个用户${skipText}${conflictMessage ? `，${conflictMessage}` : ''}`)
         emit('refresh')
         dialogVisible.value = false
       })
