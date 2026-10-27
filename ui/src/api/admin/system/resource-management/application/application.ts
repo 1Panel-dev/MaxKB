@@ -1,6 +1,13 @@
 import { del, get, getExportFile, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import type { ApplicationAccessToken, ApplicationAccessTokenPayload, ApplicationDetail, ApplicationFormPayload, Dict } from '@/api/types'
+import type {
+  ApplicationAccessToken,
+  ApplicationAccessTokenPayload,
+  ApplicationDetail,
+  ApplicationDisplaySetting,
+  ApplicationFormPayload,
+  Dict,
+} from '@/api/types'
 
 const prefix = '/system/resource/application'
 
@@ -43,6 +50,9 @@ const getAccessToken = (applicationId: string) => get<ApplicationAccessToken>(`$
 const putAccessToken = (applicationId: string, payload: ApplicationAccessTokenPayload) =>
   put<ApplicationAccessTokenPayload, ApplicationAccessToken>(`${prefix}/${applicationId}/access_token`, payload)
 
+/** 获取智能体展示设置，仅许可证有效的专业版、企业版提供；未保存过的字段可能缺失。 */
+const getDisplaySetting = (applicationId: string) => get<Partial<ApplicationDisplaySetting>>(`${prefix}/${applicationId}/setting`)
+
 /** 保存智能体展示设置，沿用 V2 图片与配置的 multipart 协议。 */
 const putDisplaySetting = (applicationId: string, payload: FormData) => put<FormData>(`${prefix}/${applicationId}/setting`, payload)
 
@@ -61,6 +71,7 @@ export default {
   getApplicationDetail,
   getAccessToken,
   putAccessToken,
+  getDisplaySetting,
   putDisplaySetting,
   putApplication,
   putApplicationPublish,

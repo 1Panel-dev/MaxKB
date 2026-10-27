@@ -1,7 +1,8 @@
 import { ref, computed, reactive, watch, inject, type Ref, type InjectionKey } from 'vue'
 import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants/file-type'
 import { isImage, isDocument, isAudio, isVideo } from '@/utils/icon'
-import type { ChatMessage, Conversation, SendMessageOptions } from '../../core/types'
+import type { Dict } from '@/api/types'
+import type { ChatMessage, Conversation, ConversationAppInfo, SendMessageOptions } from '../../core/types'
 
 export interface FileItem {
   uid: number
@@ -19,10 +20,17 @@ export interface FileItem {
 
 type MessageAttachmentKey = 'image_list' | 'document_list' | 'audio_list' | 'video_list' | 'other_list'
 type MessageAttachment = Pick<FileItem, 'url' | 'file_id' | 'name'>
+type QuestionAttachments = Partial<Record<MessageAttachmentKey, MessageAttachment[]>>
 type QuestionMessage = {
   type: 'QUESTION'
   content: string
-} & Partial<Record<MessageAttachmentKey, MessageAttachment[]>>
+} & QuestionAttachments
+
+/** 非输入框发起的提问可附带的附件与表单数据（对应 v2 的 other_params_data）。 */
+export interface QuestionOptions {
+  attachments?: QuestionAttachments
+  formData?: Dict<unknown>
+}
 
 // 仅注入消息输入所需的会话、上传和发送能力。
 export interface MessageInputDeps {
@@ -38,6 +46,8 @@ export interface MessageInputDeps {
   sendMessage: (opts: SendMessageOptions) => void
   uploadFile: (file: File, chatId: string, onProgress?: (percent: number) => void) => Promise<string>
   stop: () => void
+  /** 当前智能体信息：只读，由 view 加载维护。 */
+  appInfo: Readonly<Ref<ConversationAppInfo | null>>
   /** 禁用输入与发送，如门户没有可用智能体时；不传时始终可用。 */
   disabled?: Readonly<Ref<boolean>>
 }
@@ -49,7 +59,7 @@ const UPLOAD_PROGRESS_PENDING_MAX = 95
  * message-input 组件 store:本组件独有——输入内容 + 暂存文件 + 发送。
  */
 export function createMessageInputStore(deps: MessageInputDeps) {
-  const { conversations, getChatId, renameChat, composerResetSignal, messages, streamLoading, sendMessage, uploadFile, stop } = deps
+  const { conversations, getChatId, renameChat, composerResetSignal, messages, streamLoading, sendMessage, uploadFile, stop, appInfo } = deps
   const disabled = computed(() => deps.disabled?.value ?? false)
 
   // 输入状态与附件限制
@@ -153,30 +163,44 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     fileList.value = []
   }
 
-  // 发送消息，首条消息同步会话标题。附件上传中时 canSend 为 false。
+  // 提交一条新问题；首条消息先在会话列表显示标题，流结束后再保存标题
+  const submitQuestion = (message: QuestionMessage, formData?: Dict<unknown>) => {
+    const questionText = message.content
+    const chatId = getChatId()
+
+    const isFirstMessage = messages.value.length === 0
+    const abstract = questionText.substring(0, 256)
+    if (isFirstMessage && !conversations.value.some((conversation) => conversation.id === chatId)) {
+      // 本地新会话尚未由历史接口返回，使用首次发送时间展示相对时间。
+      const createTime = new Date().toISOString()
+      conversations.value.unshift({
+        id: chatId,
+        abstract: questionText ? abstract : '新对话',
+        create_time: createTime,
+        update_time: createTime,
+      })
+    }
+
+    sendMessage({
+      chatId,
+      message,
+      newQuestion: true,
+      questionContent: { ...message },
+      reChat: false,
+      formData,
+      onComplete: (e) => {
+        if (!e && isFirstMessage && questionText) renameChat(chatId, abstract).catch(() => {})
+      },
+    })
+  }
+
+  // 发送输入框内容与暂存附件。附件上传中时 canSend 为 false。
   const send = async () => {
     if (!canSend.value) return
     sending.value = true
     try {
-      const questionText = question.value.trim()
-      const chatId = getChatId()
-
-      // 首条消息先显示会话标题，流结束后再保存标题。
-      const isFirstMessage = messages.value.length === 0
-      const abstract = questionText.substring(0, 256)
-      if (isFirstMessage && !conversations.value.some((conversation) => conversation.id === chatId)) {
-        // 本地新会话尚未由历史接口返回，使用首次发送时间展示相对时间。
-        const createTime = new Date().toISOString()
-        conversations.value.unshift({
-          id: chatId,
-          abstract: questionText ? abstract : '新对话',
-          create_time: createTime,
-          update_time: createTime,
-        })
-      }
-
       // 一次遍历完成附件分类，仅提交有附件的字段。
-      const message: QuestionMessage = { type: 'QUESTION', content: questionText }
+      const message: QuestionMessage = { type: 'QUESTION', content: question.value.trim() }
       for (const attachment of fileList.value) {
         let attachmentKey: MessageAttachmentKey = 'other_list'
         if (isImage(attachment.name)) attachmentKey = 'image_list'
@@ -188,16 +212,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
         attachments.push({ url: attachment.url, file_id: attachment.file_id, name: attachment.name })
       }
 
-      sendMessage({
-        chatId,
-        message,
-        newQuestion: true,
-        questionContent: { ...message },
-        reChat: false,
-        onComplete: (e) => {
-          if (!e && isFirstMessage && questionText) renameChat(chatId, abstract).catch(() => {})
-        },
-      })
+      submitQuestion(message)
       question.value = ''
       clearFiles()
     } catch (e) {
@@ -205,6 +220,12 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     } finally {
       sending.value = false
     }
+  }
+
+  /** 由开场白、回答中的快捷问题或 HTML 渲染发起提问；不读取也不清空输入框与暂存附件。 */
+  const sendQuestion = (content: string, options: QuestionOptions = {}) => {
+    if (disabled.value || streamLoading.value || sending.value || !content.trim()) return
+    submitQuestion({ ...options.attachments, type: 'QUESTION', content: content.trim() }, options.formData)
   }
 
   // 新建/切换会话时清空暂存文件与输入
@@ -217,6 +238,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   )
 
   return {
+    appInfo,
     question,
     fileList,
     maxFiles,
@@ -232,6 +254,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     removeFile,
     retryFile,
     send,
+    sendQuestion,
     stop,
   }
 }
@@ -244,4 +267,9 @@ export function useMessageInputStore(): MessageInputStore {
   const store = inject(MESSAGE_INPUT_KEY)
   if (!store) throw new Error('useMessageInputStore 必须在 ConversationView 内使用')
   return store
+}
+
+// 供只读场景可选注入：日志等视图不提供输入框，拿不到返回 null
+export function useMessageInputStoreOptional(): MessageInputStore | null {
+  return inject(MESSAGE_INPUT_KEY, null)
 }

@@ -1,6 +1,13 @@
 import { del, get, getExportFile, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { ApplicationAccessToken, ApplicationAccessTokenPayload, ApplicationDetail, ApplicationFormPayload, Dict } from '@/api/types'
+import type {
+  ApplicationAccessToken,
+  ApplicationAccessTokenPayload,
+  ApplicationDetail,
+  ApplicationDisplaySetting,
+  ApplicationFormPayload,
+  Dict,
+} from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
@@ -31,6 +38,9 @@ const getAccessToken = (applicationId: string) => get<ApplicationAccessToken>(`$
 /** 修改智能体访问配置或重置凭证，返回更新后的配置。 */
 const putAccessToken = (applicationId: string, payload: ApplicationAccessTokenPayload) =>
   put<ApplicationAccessTokenPayload, ApplicationAccessToken>(`${getPrefix()}/${applicationId}/access_token`, payload)
+
+/** 获取智能体展示设置，仅许可证有效的专业版、企业版提供；未保存过的字段可能缺失。 */
+const getDisplaySetting = (applicationId: string) => get<Partial<ApplicationDisplaySetting>>(`${getPrefix()}/${applicationId}/setting`)
 
 /** 保存智能体展示设置，沿用 V2 图片与配置的 multipart 协议。 */
 const putDisplaySetting = (applicationId: string, payload: FormData) => put<FormData>(`${getPrefix()}/${applicationId}/setting`, payload)
@@ -101,6 +111,7 @@ export default {
   getApplicationDetail,
   getAccessToken,
   putAccessToken,
+  getDisplaySetting,
   putDisplaySetting,
   deleteApplication,
   exportApplication,

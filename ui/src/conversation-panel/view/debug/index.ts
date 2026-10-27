@@ -1,22 +1,30 @@
-import { computed } from 'vue'
+import { computed, ref, watch, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import WorkspaceConversationApi from '@/api/admin/workspace/conversation'
 import SystemResourceConversationApi from '@/api/admin/system/resource-management/application/conversation'
+import WorkspaceApplicationApi from '@/api/admin/workspace/application/application'
+import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import { isSystemResource } from '@/utils/resource-context'
 import { useStore } from '@/stores'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
+import type { ApplicationDetail, ApplicationDisplaySetting } from '@/api/types'
 import type { ConversationApiAdapter } from '../../core/types'
 import { createConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { createMessageListStore } from '../../components/message-list/index'
 import { createMessageInputStore } from '../../components/message-input/index'
 import { createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 import type { ConversationBundle } from '../types'
+import { toDebugAppInfo } from './app-info'
 
-/** debug 模式:装配各组件 store。adapter 走 admin(带 applicationId)。 */
-export function createDebugConversation(): ConversationBundle {
+/**
+ * debug 模式:装配各组件 store。adapter 走 admin(带 applicationId)。
+ * application 由工作流页提供：每次保存后写回最新详情（当前草稿，含完整工作流），与后端调试执行的工作流一致。
+ */
+export function createDebugConversation(application: Readonly<Ref<ApplicationDetail | null | undefined>>): ConversationBundle {
   const route = useRoute()
   const ConversationApi = isSystemResource() ? SystemResourceConversationApi : WorkspaceConversationApi
+  const ApplicationApi = isSystemResource() ? SystemResourceApplicationApi : WorkspaceApplicationApi
   const appId = computed(
     () => (route.params.id as string) || (route.params.applicationId as string) || '',
   )
@@ -31,13 +39,33 @@ export function createDebugConversation(): ConversationBundle {
     uploadFile: (file, cid, onProgress) => FileApi.postUploadFile(file, cid, FILE_SOURCE_TYPE.CHAT, onProgress).request,
     cancel: (cid) => ConversationApi.postCancelConversationMessage(cid, appId.value),
   }
+  // 显示设置只有许可证有效的专业版、企业版提供；社区版或加载失败时使用默认值。
+  // 知识来源、执行详情在调试中固定显示，不需要访问配置。显示设置不在工作流页编辑，加载一次即可。
+  const { auth, user } = useStore()
+  const displaySetting = ref<Partial<ApplicationDisplaySetting> | null>(null)
+  watch(
+    () => auth.isPE || auth.isEE,
+    (licensed) => {
+      if (!licensed || displaySetting.value || !appId.value) return
+      ApplicationApi.getDisplaySetting(appId.value)
+        .then((setting) => (displaySetting.value = setting))
+        .catch(() => {})
+    },
+    { immediate: true },
+  )
+
+  // 智能体信息随工作流页保存同步，转为 profile 结构后注入各组件 store
+  const appInfo = computed(() =>
+    application.value ? toDebugAppInfo(application.value, displaySetting.value) : null,
+  )
+
   // currentChatId 单一数据源在 list;msgs 只读借用,list 通过 bindLoader 主动驱动加载
-  const { user } = useStore()
   const list = createConversationListStore({
     pageConversations: api.pageConversations,
     remove: api.remove,
     rename: api.rename,
     account: computed(() => (user.userInfo ? { nickName: user.userInfo.nick_name, username: user.userInfo.username } : null)),
+    appInfo,
   })
   const msgs = createMessageListStore({
     pageRecords: api.pageRecords,
@@ -47,6 +75,7 @@ export function createDebugConversation(): ConversationBundle {
     cancel: api.cancel,
     uploadFile: api.uploadFile,
     getChatId: () => list.currentChatId.value, // 只读 getter,无副作用
+    appInfo,
   })
   list.bindLoader(msgs.load)
   const input = createMessageInputStore({
@@ -59,7 +88,8 @@ export function createDebugConversation(): ConversationBundle {
     sendMessage: msgs.sendMessage,
     uploadFile: msgs.uploadFile,
     stop: msgs.stop,
+    appInfo,
   })
   const detail = createExecutionDetailStore()
-  return { list, msgs, input, detail }
+  return { appInfo, list, msgs, input, detail }
 }

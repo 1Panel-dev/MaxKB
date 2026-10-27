@@ -1,6 +1,6 @@
 import { computed, inject, ref, type InjectionKey, type Ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
-import type { Conversation, ConversationAccount } from '../../core/types'
+import type { Conversation, ConversationAccount, ConversationAppInfo } from '../../core/types'
 
 // 由 Chat / Debug 入口注入本组件需要的会话接口。
 export interface ConversationListDeps {
@@ -9,14 +9,15 @@ export interface ConversationListDeps {
   rename: (id: string, data: { abstract: string }) => Promise<unknown>
   /** 侧栏账户入口展示的当前用户。 */
   account: Readonly<Ref<ConversationAccount | null>>
+  /** 当前智能体信息：只读，由 view 加载维护。 */
+  appInfo: Readonly<Ref<ConversationAppInfo | null>>
 }
 
 /** 管理左侧会话列表、当前会话和侧栏展示状态。 */
 export function createConversationListStore(deps: ConversationListDeps) {
-  const { pageConversations, remove, rename, account } = deps
+  const { pageConversations, remove, rename, account, appInfo } = deps
 
-  // 应用信息与侧栏开合
-  const appInfo = ref<{ name: string; icon: string } | null>(null)
+  // 侧栏开合
   const leftSideOpen = ref(true)
 
   const toggleLeftSide = () => (leftSideOpen.value = !leftSideOpen.value)

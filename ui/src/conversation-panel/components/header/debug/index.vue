@@ -18,7 +18,6 @@ const debug = useDebugHeaderStore()
       </MkTooltip>
     </template>
     <ApplicationIcon :icon="appInfo?.icon" :size="24" class="shrink-0 mr-2" />
-    <!-- // TODO 没拿到appInfo -->
     <h4 class="min-w-0 flex-1 truncate font-semibold" :title="appInfo?.name">
       {{ appInfo?.name }}
     </h4>
