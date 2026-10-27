@@ -9,7 +9,6 @@ import type {
   Dict,
 } from '@/api/types'
 
-// TODO：V3 联调确认授权前缀；当前沿用 V2 的 /system/shared/knowledge/{resource_type}。
 const getPrefix = (resource: ChatUserAuthorizationResource) => `/system/shared/knowledge/${resource.resource_type}/${resource.resource_id}`
 
 /** 获取资源的对话用户组及自动授权状态。 */

@@ -1,4 +1,3 @@
-/** System 资源管理智能体 API Key 接口。TODO：接口待联调。 */
 import { del, get, post, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type { ApiKeyPayload, ApiKeyRecord, Dict } from '@/api/types'

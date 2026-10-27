@@ -3,7 +3,6 @@ import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { ChatUserAuthorization, ChatUserAuthorizationGroup, ChatUserAuthorizationResource, Dict } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
-// TODO：V3 联调确认共享授权路径；当前沿用 V2 的大写资源类型，已核对 KNOWLEDGE 查询。
 const getPrefix = (resource: ChatUserAuthorizationResource) =>
   `/system/shared/workspace/${getWorkspaceId()}/${resource.resource_type}/${resource.resource_id}`
 

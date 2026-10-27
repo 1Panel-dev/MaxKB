@@ -26,11 +26,9 @@ const getApplicationDetail = (applicationId: string) => {
 }
 
 /** 获取智能体公开访问凭证与访问限制。 */
-// TODO：社区版身份认证读写待后台联调。
 const getAccessToken = (applicationId: string) => get<ApplicationAccessToken>(`${getPrefix()}/${applicationId}/access_token`)
 
 /** 修改智能体访问配置或重置凭证，返回更新后的配置。 */
-// TODO：身份认证、默认登录方式及账号锁定配置待后台联调。
 const putAccessToken = (applicationId: string, payload: ApplicationAccessTokenPayload) =>
   put<ApplicationAccessTokenPayload, ApplicationAccessToken>(`${getPrefix()}/${applicationId}/access_token`, payload)
 
