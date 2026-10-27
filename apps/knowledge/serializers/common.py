@@ -316,6 +316,21 @@ def update_resource_mapping_by_knowledge(knowledge_id: str):
             QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).order_by("-create_time")[0:1].first()
         )
         if knowledge_workflow:
+            # 知识库工作流的默认模型（default_model_setting 中的 model_id），与智能体一致
+            instance_mapping += get_instance_resource(
+                knowledge_workflow,
+                ResourceType.KNOWLEDGE,
+                str(knowledge_id),
+                {
+                    "MODEL": [
+                        lambda instance: [
+                            item.get("model_id")
+                            for item in (instance.default_model_setting or {}).values()
+                            if item and isinstance(item, dict) and item.get("model_id")
+                        ]
+                    ]
+                },
+            )
             save_workflow_mapping(
                 knowledge_workflow.work_flow, ResourceType.KNOWLEDGE, str(knowledge_id), instance_mapping
             )

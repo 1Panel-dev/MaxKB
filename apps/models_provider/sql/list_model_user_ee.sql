@@ -60,5 +60,5 @@ FROM (SELECT model."id"::text, model."name",
                                                                           and user_role_relation.workspace_id =
                                                                               workspace_user_group_resource_permission.workspace_id)
                                            )
-                                       ) ) temp ${model_query_set}
+                                       ) ) ) temp ${model_query_set}
 

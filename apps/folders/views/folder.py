@@ -9,7 +9,7 @@ from common.auth.authentication import has_permissions
 from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission, PermissionFunc
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.auth.struct.permission import Permission
 from common.log.log import log
 from common.result import result
@@ -57,6 +57,7 @@ class FolderView(APIView):
             ],
             compare=CompareConstants.AND,
         ),
+        RoleConstants.USER.get_workspace_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     @log(
@@ -83,6 +84,7 @@ class FolderView(APIView):
     @has_permissions(
         lambda r, kwargs: PermissionConstants[f"{kwargs.get('source')}_FOLDER_READ"].get_workspace_permission(),
         lambda r, kwargs: PermissionConstants[f"{kwargs.get('source')}_READ"].get_workspace_permission(),
+        RoleConstants.USER.get_workspace_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id: str, source: str):
@@ -121,6 +123,7 @@ class FolderView(APIView):
                 ],
                 compare=CompareConstants.AND,
             ),
+            RoleConstants.USER.get_workspace_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -146,6 +149,7 @@ class FolderView(APIView):
         )
         @has_permissions(
             lambda r, kwargs: PermissionConstants[f"{kwargs.get('source')}_READ"].get_workspace_permission(),
+            RoleConstants.USER.get_workspace_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             RoleConstants.EXTENDS_ADMIN,
         )
@@ -181,6 +185,7 @@ class FolderView(APIView):
                 ],
                 compare=CompareConstants.AND,
             ),
+            RoleConstants.USER.get_workspace_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(

@@ -3054,7 +3054,7 @@ msgstr "同步网站知识库"
 #: apps/knowledge/views/knowledge.py:182 apps/knowledge/views/knowledge.py:183
 #: apps/knowledge/views/knowledge.py:184
 msgid "Hit test list"
-msgstr "命中测试列表"
+msgstr "召回测试列表"
 
 #: apps/knowledge/views/knowledge.py:212 apps/knowledge/views/knowledge.py:213
 #: apps/knowledge/views/knowledge.py:214
@@ -5396,7 +5396,7 @@ msgstr "同步网站知识库"
 #: apps/resource_manage/views/knowledge.py:142
 #: apps/resource_manage/views/knowledge.py:143
 msgid "System Hit test list"
-msgstr "命中测试列表"
+msgstr "召回测试列表"
 
 #: apps/resource_manage/views/knowledge.py:168
 #: apps/resource_manage/views/knowledge.py:169
@@ -6225,7 +6225,7 @@ msgstr "同步共享知识库网站"
 #: apps/shared/views/shared_knowledge.py:146
 #: apps/shared/views/shared_knowledge.py:147
 msgid "Shared Hit test list"
-msgstr "命中测试列表"
+msgstr "召回测试列表"
 
 #: apps/shared/views/shared_knowledge.py:172
 #: apps/shared/views/shared_knowledge.py:173
@@ -8667,7 +8667,7 @@ msgid "System Application"
 msgstr "系统智能体"
 
 msgid "Hit-Test"
-msgstr "命中测试"
+msgstr "召回测试"
 
 msgid "Export Application"
 msgstr "导出智能体"
