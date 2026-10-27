@@ -428,7 +428,7 @@ defineExpose({ open })
     </div>
     <template #footer>
       <!-- 取消触发器编辑 -->
-      <el-button :disabled="saving" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="visible = false">取消</el-button>
       <!-- 保存触发器配置 -->
       <el-button type="primary" :loading="saving" :disabled="loading || detailFailed" @click="handleSave">
         {{ editingId ? '保存' : '创建' }}

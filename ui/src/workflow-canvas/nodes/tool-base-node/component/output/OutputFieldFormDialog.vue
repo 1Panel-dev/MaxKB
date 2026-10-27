@@ -58,7 +58,7 @@ defineExpose({ open, close })
     <template #footer>
       <span>
         <!-- 取消编辑 -->
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button plain @click="dialogVisible = false">取消</el-button>
         <!-- 提交参数 -->
         <el-button type="primary" @click="submitField">
           {{ editingIndex === undefined ? '添加' : '保存' }}

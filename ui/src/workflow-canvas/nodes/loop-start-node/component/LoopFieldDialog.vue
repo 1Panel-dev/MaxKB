@@ -72,7 +72,7 @@ defineExpose({ open, close })
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button plain @click="close">取消</el-button>
       <el-button type="primary" @click="submit">{{ isEdit ? '保存' : '添加' }}</el-button>
     </template>
   </MkDialog>

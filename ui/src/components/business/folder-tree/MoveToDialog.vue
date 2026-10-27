@@ -49,7 +49,7 @@ defineExpose({ close, open })
     />
 
     <template #footer>
-      <el-button :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
       <el-button type="primary" :disabled="!canSubmit" :loading="loading" @click="handleSubmit">确定</el-button>
     </template>
   </MkDialog>

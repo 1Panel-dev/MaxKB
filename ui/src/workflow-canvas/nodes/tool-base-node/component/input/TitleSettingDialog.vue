@@ -42,7 +42,7 @@ defineExpose({ open, close })
     </el-form>
     <template #footer>
       <!-- 取消设置 -->
-      <el-button @click="dialogVisible = false">取消</el-button>
+      <el-button plain @click="dialogVisible = false">取消</el-button>
       <!-- 保存标题 -->
       <el-button type="primary" @click="submitTitle">保存</el-button>
     </template>

@@ -55,7 +55,7 @@ const handleShare = () => {
       </el-checkbox>
       <span class="min-w-0 flex-1 truncate text-N600">已选择 {{ selectedCount }} 条对话</span>
       <!-- 退出分享模式 -->
-      <el-button @click="share.close()">取消</el-button>
+      <el-button plain @click="share.close()">取消</el-button>
       <!-- 分享已选对话 -->
       <el-button type="primary" class="ml-0!" :disabled="!selectedCount" :loading="share.sharing.value" @click="handleShare">分享</el-button>
     </header>
