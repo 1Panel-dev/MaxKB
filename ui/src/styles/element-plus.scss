@@ -119,6 +119,10 @@
   &--small {
     padding: 5px 11px;
   }
+  &--large {
+    font-size: 14px !important;
+    padding: 10px 11px !important;
+  }
   &:not(.is-link, .is-text, .is-circle) {
     min-width: 80px;
   }
