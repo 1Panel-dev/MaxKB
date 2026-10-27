@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, type RouteLocationNormalized } from 'vue-router'
 import { useStore } from '@/stores/chat'
-import { PORTAL_AUTH_SCOPE } from '@/stores/chat/auth'
+import { PORTAL_AUTH_SCOPE, isAnonymousToken } from '@/stores/chat/auth'
 import type { AuthProfile } from '@/api/types'
 import { chatRoutes } from './routes'
 
@@ -25,9 +25,14 @@ function isUnknownPortalPath(to: RouteLocationNormalized) {
 
 function getLoginRoute(scope: string, to: RouteLocationNormalized) {
   const query = { redirect: to.fullPath }
-  return scope === PORTAL_AUTH_SCOPE
-    ? { name: 'portal-login', query }
-    : { name: 'chat-login', params: { accessToken: scope }, query }
+  return scope === PORTAL_AUTH_SCOPE ? { name: 'portal-login', query } : { name: 'chat-login', params: { accessToken: scope }, query }
+}
+
+/** 未开启认证时登录页无用，回到 `redirect` 记录的原地址，没有时进入当前场景首页。 */
+function getLoginRedirectRoute(scope: string, to: RouteLocationNormalized) {
+  const { redirect } = to.query
+  if (typeof redirect === 'string' && redirect.startsWith('/')) return { path: redirect, replace: true }
+  return scope === PORTAL_AUTH_SCOPE ? { name: 'portal-home', replace: true } : { name: 'chat-home', params: { accessToken: scope }, replace: true }
 }
 
 /** 渲染 404 页面并保留原地址，刷新时可重新尝试。 */
@@ -51,8 +56,14 @@ chatRouter.beforeEach(async (to) => {
     return getNotFoundRoute(to)
   }
 
+  const isLoginRoute = LOGIN_ROUTE_NAMES.has(String(to.name))
+  if (isLoginRoute && !authProfile.enable_auth) return getLoginRedirectRoute(scope, to)
+
   // 判断时只读取目标场景已保存的 token，放行前再切换当前场景，避免导航未完成时请求带上目标场景的 token
-  if (LOGIN_ROUTE_NAMES.has(String(to.name)) || auth.getStoredToken(scope)) {
+  // 开启认证后，此前保存的匿名 token 不再放行，需要登录；本地存储保留，登录时携带以沿用同一对话用户
+  const storedToken = auth.getStoredToken(scope)
+  const canUseStoredToken = Boolean(storedToken) && !(authProfile.enable_auth && isAnonymousToken(storedToken))
+  if (isLoginRoute || canUseStoredToken) {
     auth.activate(scope, authProfile)
     return true
   }

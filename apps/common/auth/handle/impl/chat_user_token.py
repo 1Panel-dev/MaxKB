@@ -92,7 +92,7 @@ def get_auth(login_type, user_id, application_id):
             if authentication_value.get("type") == "login":
                 login_value = authentication_value.get("login_value") or []
                 for _value in login_value:
-                    permission_str = f"{Group.CHAT_USER}_{_value.upper()}"
+                    permission_str = f"{Group.CHAT_USER}:{_value.upper()}"
                     permission = CHAT_PERMISSION_STR_MAP.get(permission_str)
                     if permission:
                         permission_list.append(permission.value)

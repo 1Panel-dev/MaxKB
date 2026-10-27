@@ -1,29 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import ExternalLoginApi from '@/api/admin/auth/external-login'
-import LoginApi from '@/api/admin/auth/login'
 import { LOGIN_METHOD_LABELS } from '@/constants'
-import { useStore } from '@/stores'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { LoginConfig, LoginMethod } from '@/api/types'
-import { v4 as uuidv4 } from 'uuid'
-
-interface AccountLoginForm {
-  captcha: string
-  password: string
-  username: string
-}
+import type { AccountLoginForm, LoginService } from '../types'
 
 defineOptions({ name: 'AccountLogin' })
 
-const props = withDefaults(defineProps<{ loginConfig?: LoginConfig; preview?: boolean }>(), { preview: false })
+const props = withDefaults(defineProps<{ loginConfig?: LoginConfig; loginService: LoginService; preview?: boolean }>(), { preview: false })
 
 const route = useRoute()
-const router = useRouter()
-const { auth } = useStore()
 const isSubmitting = ref(false)
 const identifyCode = ref('')
 const loginMethod = ref<LoginMethod>(props.loginConfig?.default_value ?? LOGIN_METHOD.LOCAL)
@@ -57,28 +46,24 @@ const handleLogin = async () => {
     if (valid) {
       isSubmitting.value = true
       if (loginMethod.value === LOGIN_METHOD.LDAP) {
-        auth
-          .asyncLdapLogin(accountLoginForm)
-          .then(() => {
-            router.push({ name: 'workspace-home', params: { workspaceId: 'default' } })
-          })
+        props.loginService
+          .ldapLogin(accountLoginForm)
+          .then(() => props.loginService.onLoginSuccess())
           .catch(() => {
             isSubmitting.value = false
           })
       } else {
         const encryptor = new JSEncrypt()
-        encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
+        encryptor.setPublicKey(props.loginService.rsaKey)
         const encryptedData = encryptor.encrypt(JSON.stringify(accountLoginForm))
         if (!encryptedData) {
           isSubmitting.value = false
           return
         }
 
-        auth
-          .asyncLogin({ encryptedData, username: accountLoginForm.username })
-          .then(() => {
-            router.push({ name: 'workspace-home', params: { workspaceId: 'default' } })
-          })
+        props.loginService
+          .login({ encryptedData, username: accountLoginForm.username })
+          .then(() => props.loginService.onLoginSuccess())
           .catch(() => {
             isSubmitting.value = false
             refreshCaptcha()
@@ -91,8 +76,8 @@ const handleLogin = async () => {
 const refreshCaptcha = () => {
   if (props.preview) return
   if (loginMethod.value === LOGIN_METHOD.LDAP) return
-  LoginApi.getCaptcha(accountLoginForm.username).then((res) => {
-    identifyCode.value = res.captcha
+  props.loginService.getCaptcha(accountLoginForm.username).then((captcha) => {
+    identifyCode.value = captcha
   })
 }
 
@@ -109,39 +94,9 @@ const selectLoginMethod = (method: LoginMethod) => {
 }
 
 const redirectExternalLogin = async (method: LoginMethod) => {
-  const redirectUrl = await getExternalLoginUrl(method)
+  const redirectUrl = await props.loginService.getExternalLoginUrl(method)
   if (!redirectUrl) return
   window.location.href = redirectUrl
-}
-
-const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
-  if (authType === LOGIN_METHOD.SAML2) return ExternalLoginApi.getSamlLoginUrl()
-
-  return ExternalLoginApi.getExternalAuthSetting(authType).then(({ config }) => {
-    if (!config) return ''
-
-    const redirectUrl = `${config.redirectUrl}`
-    if (authType === LOGIN_METHOD.CAS) {
-      if (!config.ldpUri) return ''
-      const separator = config.ldpUri.includes('?') ? '&' : '?'
-      return `${config.ldpUri}${separator}service=${encodeURIComponent(redirectUrl)}`
-    }
-    if (authType === LOGIN_METHOD.OIDC) {
-      if (!config.authEndpoint || !config.clientId) return ''
-      const scope = config.scope || 'openid+profile+email'
-      let url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=${scope}`
-      if (config.state) url += `&state=${config.state}`
-      return url
-    }
-    if (authType === LOGIN_METHOD.OAUTH2) {
-      if (!config.authEndpoint || !config.clientId) return ''
-      let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${uuidv4()}`
-      if (config.scope) url += `&scope=${config.scope}`
-      return url
-    }
-
-    return ''
-  })
 }
 
 onMounted(() => {
@@ -202,7 +157,10 @@ onMounted(() => {
           <el-button :loading="isSubmitting" native-type="submit" type="primary" class="w-full">登录</el-button>
         </el-form-item>
       </el-form>
-      <el-button size="default" class="mt-3" link type="primary" @click="router.push({ name: 'forgot-password' })">忘记密码？</el-button>
+      <!-- 忘记密码 -->
+      <el-button v-if="loginService.forgotPassword" size="default" class="mt-3" link type="primary" @click="loginService.forgotPassword()">
+        忘记密码？
+      </el-button>
     </div>
     <div v-if="accountLoginMethods.length" class="third-login flex-col-center gap-4">
       <el-divider>其他登录方式</el-divider>
