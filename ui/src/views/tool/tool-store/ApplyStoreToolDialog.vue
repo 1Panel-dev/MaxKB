@@ -6,6 +6,7 @@ import WorkspaceToolStoreApi from '@/api/admin/workspace/tool/store'
 import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import SystemSharedToolStoreApi from '@/api/admin/system/shared-resources/tool/store'
 import { TOOL_TYPE } from '@/api/enums'
+import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import type { ToolItem, ToolStoreItem } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
@@ -17,7 +18,7 @@ const props = withDefaults(
   defineProps<{
     folderId: string
   }>(),
-  { folderId: 'default' },
+  { folderId: () => FOLDER_ENTRY_ID.ALL },
 )
 
 const { auth } = useStore()
@@ -43,7 +44,7 @@ function handleSubmit() {
     const name = storeToolForm.name
     loading.value = true
 
-    const commonPayload = { folder_id: props.folderId || 'default', name }
+    const commonPayload = { folder_id: props.folderId || FOLDER_ENTRY_ID.ALL, name }
     const isSharedResource = isSystemSharedResource()
     let request: Promise<ToolItem>
 

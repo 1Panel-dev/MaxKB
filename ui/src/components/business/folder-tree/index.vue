@@ -29,7 +29,7 @@ const props = withDefaults(
   { canEdit: true, disabledFolderIds: () => [], draggable: false, rootLabel: '', showAll: true, showShared: true },
 )
 
-const currentNodeKey = defineModel<string>({ default: FOLDER_ENTRY_ID.ALL })
+const currentNodeKey = defineModel<string>({ default: () => FOLDER_ENTRY_ID.ALL })
 const route = useRoute()
 const router = useRouter()
 const routeFolderId = route.query.folderId
