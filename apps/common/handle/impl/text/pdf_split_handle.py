@@ -15,6 +15,7 @@ import traceback
 from typing import List
 
 import uuid_utils.compat as uuid
+from django.core.files.base import File as DjangoFile
 from django.utils.translation import gettext_lazy as _
 from pypdf import PdfReader
 from pypdf.generic import Destination
@@ -59,8 +60,8 @@ class PdfSplitHandle(BaseSplitHandle):
         save_image,
     ):
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            # 将上传的文件保存到临时文件中
-            for chunk in file.chunks():
+            # Wrap ZIP members to reuse bounded reads without caching the entire PDF.
+            for chunk in DjangoFile(file).chunks():
                 temp_file.write(chunk)
             # 获取临时文件的路径
             temp_file_path = temp_file.name
