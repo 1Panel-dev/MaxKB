@@ -1,42 +1,35 @@
-<template>
-  <div ref="scrollRef" class="tc-scroll">
-    <FileDiff :file="file" />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { Scroll } from '@/conversation-panel/core/scroll'
 import FileDiff from '../patch/FileDiff.vue'
 import type { PatchFileInfo } from '../patch/patchTypes'
-import { Scroll } from '@/conversation-panel/core/scroll'
+
+defineOptions({ name: 'ConversationScrollDiff' })
 
 const props = defineProps<{ file: PatchFileInfo }>()
 
-const scrollRef = ref<HTMLElement>()
-let scroll: Scroll | null = null
+// 初始化差异滚动容器，并在卸载时释放监听和动画帧。
+const diffScrollRef = ref<HTMLElement>()
+let diffScroll: Scroll | null = null
 
 onMounted(() => {
-  if (scrollRef.value) {
-    scroll = new Scroll(scrollRef.value)
-    scroll.forceBottom()
-  }
+  if (!diffScrollRef.value) return
+  diffScroll = new Scroll(diffScrollRef.value)
+  diffScroll.forceBottom()
 })
 
-onBeforeUnmount(() => scroll?.destroy())
+onBeforeUnmount(() => diffScroll?.destroy())
 
+// 新增代码渲染后，仅在用户仍位于底部时跟随滚动。
 watch(
   () => props.file.additions,
-  () => {
-    nextTick(() => scroll?.scrollBottom())
-  },
+  () => diffScroll?.scrollBottom(),
+  { flush: 'post' },
 )
 </script>
 
-<style scoped>
-.tc-scroll {
-  max-height: 400px;
-  overflow-y: auto;
-  border-radius: 6px;
-  border: 1px solid var(--mk-N300);
-}
-</style>
+<template>
+  <div ref="diffScrollRef" class="max-h-[400px] overflow-y-auto rounded-md border border-N300">
+    <FileDiff :file="file" />
+  </div>
+</template>

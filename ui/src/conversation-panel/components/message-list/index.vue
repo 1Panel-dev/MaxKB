@@ -25,7 +25,14 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
 </script>
 
 <template>
-  <ReverseInfiniteScroll ref="scrollRef" content-class="p-4" :loading="loading" :has-more="hasMore" :count="messages.length" :load-more="loadMore">
+  <ReverseInfiniteScroll
+    ref="scrollRef"
+    content-class="mk-conversation-content p-4"
+    :loading="loading"
+    :has-more="hasMore"
+    :count="messages.length"
+    :load-more="loadMore"
+  >
     <template #prepend>
       <!-- 开场白在空会话或历史全部加载后显示，固定在会话最前 -->
       <div v-if="prologue && (!messages.length || !hasMore)">
@@ -52,7 +59,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
           <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
           <ContentList :content-list="msg.content" />
           <!-- 助手消息结束后显示底部信息栏(知识来源/执行详情/tokens/耗时) -->
-          <MessageFooter v-if="msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)" :message="msg" />
+          <MessageFooter class="mt-3" v-if="msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)" :message="msg" />
         </template>
       </div>
     </template>

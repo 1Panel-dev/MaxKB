@@ -25,21 +25,24 @@ const openExecutionDetail = () => {
 <style scoped lang="scss"></style>
 
 <template>
-  <!-- 助手消息底部信息栏:知识来源 / 执行详情 / Tokens · 耗时  -->
-  <div class="msg-footer flex-align-center gap-1">
-    <el-button v-if="meta.knowledgeCount" text class="-ml-1">
-      <MkIcon name=" icon_reference_outlined" />
-      <span>知识来源 ({{ meta.knowledgeCount }})</span>
-    </el-button>
+  <div class="mk-conversation-message-footer gap-3">
+    <!-- 助手消息底部信息栏:知识来源 / 执行详情 / Tokens · 耗时  -->
+    <div class="flex-align-center gap-1">
+      <el-button v-if="meta.knowledgeCount" text class="-ml-1">
+        <MkIcon name="icon_reference_outlined" />
+        <span>知识来源 ({{ meta.knowledgeCount }})</span>
+      </el-button>
 
-    <!-- 执行详情:对话结束时已拉取并缓存,点击直接在右侧展示 -->
-    <el-button text @click="openExecutionDetail" class="-ml-1">
-      <MkIcon name="icon_logs_outlined" />
-      <span>执行详情</span>
-    </el-button>
-    <template v-if="meta.runTime || tokens">
-      <el-divider direction="vertical" class="ml-2! mr-3!" />
-      <span class="text-N600">Tokens {{ tokens }} · 耗时 {{ meta.runTime.toFixed(2) }}s</span>
-    </template>
+      <!-- 执行详情:对话结束时已拉取并缓存,点击直接在右侧展示 -->
+      <el-button text @click="openExecutionDetail" class="-ml-1">
+        <MkIcon name="icon_logs_outlined" />
+        <span>执行详情</span>
+      </el-button>
+      <template v-if="meta.runTime || tokens">
+        <el-divider direction="vertical" class="ml-2! mr-3!" />
+        <span class="text-N600">Tokens {{ tokens }} · 耗时 {{ meta.runTime.toFixed(2) }}s</span>
+      </template>
+    </div>
+    <!-- // TODO 点赞一行 -->
   </div>
 </template>

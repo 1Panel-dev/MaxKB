@@ -21,7 +21,7 @@ const conversationTime = (conversation: Conversation) => relativeTimeFormat(conv
         <h4 class="truncate" :title="appInfo?.name || 'AI 助手'">{{ appInfo?.name || 'AI 助手' }}</h4>
       </div>
       <!-- 收起左侧 -->
-      <el-button text @click="toggleLeftSide()">
+      <el-button text @click="toggleLeftSide()" class="-mr-1">
         <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
       </el-button>
     </div>
