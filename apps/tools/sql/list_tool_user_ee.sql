@@ -1,6 +1,5 @@
 SELECT *
-FROM (SELECT tool."id"::text,
-             tool."name",
+FROM (SELECT tool."id"::text, tool."name",
              tool."desc",
              tool."tool_type",
              tool."scope",
@@ -11,8 +10,7 @@ FROM (SELECT tool."id"::text,
              "user".nick_name AS "nick_name",
              tool."icon",
              tool.label,
-             tool."template_id"::text,
-             tool."create_time",
+             tool."template_id"::text, tool."create_time",
              tool."update_time",
              tool.init_field_list,
              tool.input_field_list,
@@ -34,7 +32,24 @@ FROM (SELECT tool."id"::text,
                 ELSE
                 'VIEW' = ANY (permission_list)
                 END
+                UNION
+                SELECT DISTINCT target
+                FROM workspace_user_group_resource_permission
+                INNER JOIN system_user_group_relation
+                ON system_user_group_relation.group_id = workspace_user_group_resource_permission.user_group_id
+                ${workspace_user_group_resource_permission_query_set}
+                AND (
+                'VIEW' = ANY (permission_list)
+                OR (
+                auth_type = 'ROLE'
+                AND 'ROLE' = ANY (permission_list)
+                AND 'TOOL:READ' IN (SELECT (CASE WHEN user_role_relation.role_id = ANY (ARRAY ['USER']) THEN 'TOOL:READ' ELSE role_permission.permission_id END)
+                FROM role_permission role_permission
+                RIGHT JOIN user_role_relation user_role_relation ON user_role_relation.role_id=role_permission.role_id
+                WHERE user_role_relation.user_id=system_user_group_relation.user_id
+                AND user_role_relation.workspace_id=workspace_user_group_resource_permission.workspace_id)
+                )
+                )
                 )) AS tool
-               LEFT JOIN "user" ON "user".id = user_id
-      ) temp
-       ${default_query_set}
+               LEFT JOIN "user" ON "user".id = user_id) temp
+    ${default_query_set}

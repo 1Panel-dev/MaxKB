@@ -38,7 +38,7 @@ from maxkb.const import CONFIG
 from models_provider.models import Model
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
-from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
+from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission, WorkspaceUserGroupResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
@@ -312,6 +312,13 @@ class KnowledgeSerializer(serializers.Serializer):
                 query_set_dict["workspace_user_resource_permission_query_set"] = QuerySet(
                     WorkspaceUserResourcePermission
                 ).filter(auth_target_type="KNOWLEDGE", workspace_id=workspace_id, user_id=self.data.get("user_id"))
+                query_set_dict["workspace_user_group_resource_permission_query_set"] = QuerySet(
+                    WorkspaceUserGroupResourcePermission
+                ).filter(
+                    auth_target_type="KNOWLEDGE",
+                    workspace_id=workspace_id,
+                    user_group__user_relations__user_id=self.data.get("user_id"),
+                )
             return query_set_dict
 
         def page(self, current_page: int, page_size: int):
@@ -495,6 +502,13 @@ class KnowledgeSerializer(serializers.Serializer):
                     auth_target_type="KNOWLEDGE",
                     workspace_id=self.data.get("workspace_id"),
                     user_id=self.data.get("user_id"),
+                )
+                query_set_dict["workspace_user_group_resource_permission_query_set"] = QuerySet(
+                    WorkspaceUserGroupResourcePermission
+                ).filter(
+                    auth_target_type="KNOWLEDGE",
+                    workspace_id=self.data.get("workspace_id"),
+                    user_group__user_relations__user_id=self.data.get("user_id"),
                 )
             all_application_list = [str(adm.get("id")) for adm in self.list_application(with_valid=False)]
             knowledge_dict = native_search(
