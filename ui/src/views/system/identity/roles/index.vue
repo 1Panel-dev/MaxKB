@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import RoleApi from '@/api/admin/system/role'
-import type { RoleItem, RoleType } from '@/api/types'
+import type { RoleItem, RoleType, RoleTypeGroup } from '@/api/types'
 import { ROLE_TYPE_LABELS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import RoleMemberList from './components/RoleMemberList.vue'
@@ -15,26 +15,30 @@ const currentTab = ref<RoleDetailTab>('permission')
 /* 角色列表 */
 const loadingRoles = ref(false)
 const filterText = ref('')
-const AllRoles = ref<RoleItem[]>([])
+const roleGroups = ref<RoleTypeGroup[]>([])
 const currentRole = ref<RoleItem>()
 const expandedRoleTypes = ref<Partial<Record<RoleType, boolean>>>({})
 
-const roleGroups = computed(() => {
+const allRoles = computed(() => roleGroups.value.flatMap(({ role_list }) => role_list))
+
+const filteredRoleGroups = computed(() => {
   const keyword = filterText.value.trim().toLowerCase()
-  return (Object.keys(ROLE_TYPE_LABELS) as RoleType[]).map((type) => ({
-    label: ROLE_TYPE_LABELS[type],
-    roles: AllRoles.value.filter((role) => role.type === type && (!keyword || role.role_name.toLowerCase().includes(keyword))),
-    type,
-  }))
+  if (!keyword) return roleGroups.value
+  return roleGroups.value
+    .map((group) => ({
+      ...group,
+      role_list: group.role_list.filter((role) => role.role_name.toLowerCase().includes(keyword)),
+    }))
+    .filter((group) => group.role_list.length > 0)
 })
 
 function loadRoles(selectedRoleId?: string) {
   loadingRoles.value = true
   return RoleApi.getRoleList()
-    .then((roles) => {
-      AllRoles.value = roles
+    .then((groups) => {
+      roleGroups.value = groups
       currentRole.value =
-        AllRoles.value.find(({ id }) => id === selectedRoleId) ?? AllRoles.value.find(({ id }) => id === currentRole.value?.id) ?? AllRoles.value[0]
+        allRoles.value.find(({ id }) => id === selectedRoleId) ?? allRoles.value.find(({ id }) => id === currentRole.value?.id) ?? allRoles.value[0]
       if (currentRole.value) {
         expandedRoleTypes.value[currentRole.value.type] = true
       }
@@ -97,16 +101,16 @@ onMounted(() => loadRoles())
       <el-scrollbar class="min-h-0 flex-1">
         <div class="px-4 pb-4 pt-2">
           <MkCollapse
-            v-for="roleGroup in roleGroups"
-            :key="roleGroup.type"
-            v-model:expanded="expandedRoleTypes[roleGroup.type]"
+            v-for="roleGroup in filteredRoleGroups"
+            :key="roleGroup.role_type"
+            v-model:expanded="expandedRoleTypes[roleGroup.role_type]"
             :default-expanded="false"
-            :title="roleGroup.label"
+            :title="ROLE_TYPE_LABELS[roleGroup.role_type]"
             trigger-class="text-N500 py-2!"
           >
             <div class="space-y-1">
               <MkListItem
-                v-for="(role, roleIndex) in roleGroup.roles"
+                v-for="(role, roleIndex) in roleGroup.role_list"
                 :key="role.id"
                 :active="currentRole?.id === role.id"
                 :index="roleIndex"
@@ -121,11 +125,13 @@ onMounted(() => loadRoles())
                 <template v-if="!role.internal" #action-dropdown>
                   <!-- 重命名 -->
                   <MkDropdownItem v-if="perm.system.role.edit()" @click="handleOpenRoleDialog(role)">
-                    <template #icon><MkIcon name="icon_rename_outlined" /></template>重命名
+                    <template #icon><MkIcon name="icon_rename_outlined" /></template>
+                    重命名
                   </MkDropdownItem>
                   <!-- 删除 -->
                   <MkDropdownItem v-if="perm.system.role.delete()" divided @click="handleDeleteRole(role)">
-                    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>删除
+                    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                    删除
                   </MkDropdownItem>
                 </template>
               </MkListItem>
@@ -142,10 +148,11 @@ onMounted(() => loadRoles())
             <h4 class="min-w-0 truncate" :title="currentRole.role_name">
               {{ currentRole.role_name }}
             </h4>
-            <el-tag type="info" size="small" class="shrink-0"> {{ currentRole.internal ? '系' : ROLE_TYPE_LABELS[currentRole.type] }}</el-tag>
+            <el-tag type="info" size="small" class="shrink-0">{{ currentRole.internal ? '系' : ROLE_TYPE_LABELS[currentRole.type] }}</el-tag>
             <el-divider class="shrink-0" direction="vertical" />
             <span class="flex-align-center shrink-0 text-N500">
-              <MkIcon name="icon_member_filled" class="mr-1" />{{ currentRole.user_count ?? 0 }}
+              <MkIcon name="icon_member_filled" class="mr-1" />
+              {{ currentRole.user_count ?? 0 }}
             </span>
           </div>
           <el-radio-group v-model="currentTab">
