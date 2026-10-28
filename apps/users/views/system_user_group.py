@@ -13,15 +13,19 @@ from common.auth.constants.role_constants import RoleConstants
 from common.log.log import log
 from models_provider.api.model import DefaultModelResponse
 from users.api.user_group import (
-    AddMemberApi, CreateUserGroupApi, DeleteUserGroupApi,
-    RemoveMemberApi, UserGroupListApi, UserGroupListPageApi
+    AddMemberApi,
+    CreateUserGroupApi,
+    DeleteUserGroupApi,
+    RemoveMemberApi,
+    UserGroupListApi,
+    UserGroupListPageApi,
 )
 from users.models.user_group import SystemUserGroup
 from users.serializers.user_group import (
     SystemUserGroupCreateSerializer,
     UserGroupAddMemberSerializer,
     UserGroupRemoveMemberSerializer,
-    UserGroupListPageSerializer
+    UserGroupListPageSerializer,
 )
 
 
@@ -52,9 +56,9 @@ class SystemUserGroupView(APIView):
         responses=CreateUserGroupApi.get_response(),
         tags=["IAM/System User Group"],
     )
-    @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_CREATE,
-                     PermissionConstants.SYSTEM_USER_GROUP_EDIT,
-                     RoleConstants.ADMIN)
+    @has_permissions(
+        PermissionConstants.SYSTEM_USER_GROUP_CREATE, PermissionConstants.SYSTEM_USER_GROUP_EDIT, RoleConstants.ADMIN
+    )
     @log(
         menu="IAM/System User Group",
         operate="Create or update System User Group",
@@ -79,11 +83,9 @@ class SystemUserGroupView(APIView):
         responses=UserGroupListApi.get_response(),
         tags=["IAM/System User Group"],
     )
-    @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_READ, RoleConstants.ADMIN)
+    @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
     def get(self, request: Request, workspace_id: str):
-        return result.success(SystemUserGroupCreateSerializer.Query(
-            data={'workspace_id': workspace_id}
-        ).list())
+        return result.success(SystemUserGroupCreateSerializer.Query(data={"workspace_id": workspace_id}).list())
 
     class Delete(APIView):
         authentication_classes = [TokenAuth]
@@ -106,7 +108,8 @@ class SystemUserGroupView(APIView):
         def delete(self, request: Request, workspace_id, user_group_id: str):
             return result.success(
                 SystemUserGroupCreateSerializer.UserGroupDeleteSerializer(
-                    data={"id": user_group_id, "workspace_id": workspace_id}).delete()
+                    data={"id": user_group_id, "workspace_id": workspace_id}
+                ).delete()
             )
 
     class AddMember(APIView):
@@ -130,8 +133,11 @@ class SystemUserGroupView(APIView):
         def post(self, request: Request, workspace_id: str, user_group_id: str):
             return result.success(
                 UserGroupAddMemberSerializer(
-                    data={"id": user_group_id, "workspace_id": workspace_id,
-                          "user_ids": request.data.get("user_ids", [])}
+                    data={
+                        "id": user_group_id,
+                        "workspace_id": workspace_id,
+                        "user_ids": request.data.get("user_ids", []),
+                    }
                 ).add_member()
             )
 
@@ -156,8 +162,11 @@ class SystemUserGroupView(APIView):
         def delete(self, request: Request, workspace_id: str, user_group_id: str):
             return result.success(
                 UserGroupRemoveMemberSerializer(
-                    data={"id": user_group_id, "workspace_id": workspace_id,
-                          "group_relation_ids": request.data.get("group_relation_ids", [])}
+                    data={
+                        "id": user_group_id,
+                        "workspace_id": workspace_id,
+                        "group_relation_ids": request.data.get("group_relation_ids", []),
+                    }
                 ).remove_member()
             )
 
@@ -173,7 +182,9 @@ class SystemUserGroupView(APIView):
             parameters=UserGroupListPageApi.get_parameters(),
             responses=UserGroupListPageApi.get_response(),
         )
-        @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_READ, RoleConstants.ADMIN)
+        @has_permissions(
+            PermissionConstants.SYSTEM_USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE
+        )
         def get(self, request: Request, workspace_id: str, user_group_id: str, current_page: int, page_size: int):
             d = UserGroupListPageSerializer.Query(
                 data={
