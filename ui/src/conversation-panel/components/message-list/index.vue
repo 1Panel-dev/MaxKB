@@ -37,7 +37,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
       <div>
         <!-- 用户提问靠右：头像独占一行在上，提问容器在下方靠右收缩 -->
         <div v-if="msg.role === 'USER'">
-          <div v-if="showUserAvatar">
+          <div v-if="showUserAvatar" class="text-right">
             <el-avatar v-if="userAvatar" class="bg-transparent!" shape="square" :size="24">
               <img :src="userAvatar" alt="" />
             </el-avatar>

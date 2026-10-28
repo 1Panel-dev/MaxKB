@@ -16,8 +16,8 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
   <ReverseInfiniteScroll content-class="p-4" :loading="loading" :has-more="hasMore" :count="messages.length" :load-more="loadMore">
     <template v-for="(msg, i) in messages" :key="msg.id || i">
       <!-- 用户提问靠右：头像独占一行在上，提问容器在下方靠右收缩 -->
-      <div v-if="msg.role === 'USER'" class="flex flex-col items-end">
-        <div v-if="showUserAvatar">
+      <div v-if="msg.role === 'USER'">
+        <div v-if="showUserAvatar" class="text-right">
           <el-avatar v-if="userAvatar" class="bg-transparent!" shape="square" :size="24">
             <img :src="userAvatar" alt="" />
           </el-avatar>

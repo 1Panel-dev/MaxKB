@@ -1,32 +1,38 @@
 <template>
-  <div class="tool-call">
-    <button class="tc-head" @click="$emit('toggle')">
+  <!-- 展开或收起终端输出 -->
+  <MkCollapse
+    class="w-full"
+    :expanded="expanded"
+    trigger-class="group w-fit max-w-full overflow-hidden py-[3px] text-N500 hover:text-N900 transition-colors"
+    @update:expanded="$emit('toggle')"
+  >
+    <template #indicator="{ expanded }">
       <svg class="tc-chevron" :class="{ open: expanded }" viewBox="0 0 16 16" fill="none">
         <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
+    </template>
+    <template #label>
       <span class="tc-icon" :class="{ spin: loading }">
         <Loading v-if="loading" :size="14" />
         <svg v-else viewBox="0 0 16 16" fill="none">
           <path d="M11.5 2.5a1 1 0 0 1 1.4 0l.6.6a1 1 0 0 1 0 1.4l-7.1 7.1-2-2L11.5 2.5ZM4.2 10.2l2 2L3 15l-.7-.7 1.9-4.1Z" fill="currentColor" />
         </svg>
       </span>
-      <span class="tc-name">{{ commandText || 'terminal' }}</span>
-    </button>
+      <span class="tc-name" :title="commandText || 'terminal'">{{ commandText || 'terminal' }}</span>
+    </template>
 
-    <Transition enter-active-class="tc-expand-enter" leave-active-class="tc-expand-leave" @after-enter="onAfterEnter">
-      <div v-if="expanded" class="tc-body">
-        <div class="tc-term-block">
-          <div class="tc-term-line cmd">$ {{ commandText }}</div>
-          <pre class="tc-term-line out" v-if="content.content">{{ content.content }}</pre>
-          <span v-if="loading" class="tc-cursor">▋</span>
-        </div>
+    <div class="tc-body">
+      <div ref="terminalBlock" class="tc-term-block">
+        <div class="tc-term-line cmd">$ {{ commandText }}</div>
+        <pre class="tc-term-line out" v-if="content.content">{{ content.content }}</pre>
+        <span v-if="loading" class="tc-cursor">▋</span>
       </div>
-    </Transition>
-  </div>
+    </div>
+  </MkCollapse>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Loading from '@/conversation-panel/loading/index.vue'
 import { extractPartialJsonField } from './extract-partial-json'
 
@@ -39,35 +45,20 @@ const commandText = computed(() => {
   return extractPartialJsonField(raw, 'code') || extractPartialJsonField(raw, 'cmd') || raw
 })
 
-const onAfterEnter = (el: Element) => {
-  const termBlock = (el as HTMLElement).querySelector('.tc-term-block')
-  if (termBlock) termBlock.scrollTop = termBlock.scrollHeight
-}
+// 展开后定位到终端输出底部。
+const terminalBlock = ref<HTMLElement>()
+watch(
+  () => props.expanded,
+  (expanded) => {
+    if (expanded && terminalBlock.value) {
+      terminalBlock.value.scrollTop = terminalBlock.value.scrollHeight
+    }
+  },
+  { flush: 'post' },
+)
 </script>
 
 <style scoped>
-.tool-call {
-  width: 100%;
-}
-
-.tc-head {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--mk-N500);
-  transition: color 0.15s;
-  max-width: 100%;
-  overflow: hidden;
-}
-.tc-head:hover {
-  color: var(--mk-N900);
-}
-
 .tc-chevron {
   width: 14px;
   height: 14px;
@@ -99,35 +90,6 @@ const onAfterEnter = (el: Element) => {
   text-overflow: ellipsis;
   min-width: 0;
   max-width: 400px;
-}
-
-.tc-expand-enter {
-  animation: tc-open 0.2s ease-out;
-  overflow: hidden;
-}
-.tc-expand-leave {
-  animation: tc-close 0.15s ease-in forwards;
-  overflow: hidden;
-}
-@keyframes tc-open {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 600px;
-  }
-}
-@keyframes tc-close {
-  from {
-    opacity: 1;
-    max-height: 600px;
-  }
-  to {
-    opacity: 0;
-    max-height: 0;
-  }
 }
 
 .tc-body {

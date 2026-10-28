@@ -3,7 +3,7 @@
     <!-- 分组头部：标题 + 状态，收起时附当前进展，点击展开/收起组内内容 -->
     <button type="button" class="group-header" @click="isExpanded = !isExpanded">
       <svg class="group-chevron" :class="{ open: isExpanded }" viewBox="0 0 16 16" fill="none">
-        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       <span class="group-name">{{ content.name }}</span>
       <span v-if="!isExpanded && currentActivity" class="group-activity">{{ currentActivity }}</span>
