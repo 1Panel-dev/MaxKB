@@ -23,7 +23,7 @@ const loginSettingFields = [
   'lock_time',
   'role_id',
   'workspace_id',
-  'group_id',
+  'group_ids',
 ] as const
 const form = reactive<Omit<LoginAuthSettingPayload, 'system_options'>>({
   login_methods: [LOGIN_METHOD.LOCAL],
@@ -33,7 +33,7 @@ const form = reactive<Omit<LoginAuthSettingPayload, 'system_options'>>({
   lock_time: 10,
   role_id: ROLE_TYPE.USER,
   workspace_id: 'default',
-  group_id: undefined,
+  group_ids: [],
 })
 const rules: FormRules<LoginAuthSettingPayload> = {
   default_value: [{ required: true, message: '请选择默认登录方式', trigger: 'change' }],
@@ -102,13 +102,13 @@ function loadRoleSettingOptions() {
 function handleRoleChange() {
   if (!showWorkspaceSelector.value) {
     form.workspace_id = undefined
-    form.group_id = undefined
+    form.group_ids = []
     userGroups.value = []
   }
 }
 
 function handleWorkspaceChange() {
-  form.group_id = undefined
+  form.group_ids = []
   loadUserGroups()
 }
 
@@ -119,7 +119,7 @@ const userGroups = ref<SystemUserGroup[]>([])
 function loadUserGroups() {
   if (!form.workspace_id || !showWorkspaceSelector.value) {
     userGroups.value = []
-    form.group_id = undefined
+    form.group_ids = []
     return Promise.resolve()
   }
 
@@ -127,8 +127,9 @@ function loadUserGroups() {
   return UserGroupsApi.getSystemUserGroups(form.workspace_id)
     .then((groups) => {
       userGroups.value = groups
-      if (!groups.some(({ id }) => id === form.group_id)) {
-        form.group_id = undefined
+      form.group_ids = (form.group_ids ?? []).filter((id) => groups.some(({ id: groupId }) => groupId === id))
+      if (!form.group_ids.length) {
+        form.group_ids = []
       }
     })
     .finally(() => {
@@ -254,7 +255,7 @@ onMounted(() => {
         </el-select>
       </el-form-item>
       <el-form-item label="用户组" v-if="form.workspace_id">
-        <el-select filterable clearable v-model="form.group_id" :loading="loadingGroups" placeholder="请选择用户组" class="w-240">
+        <el-select filterable clearable multiple v-model="form.group_ids" :loading="loadingGroups" placeholder="请选择用户组" class="w-240">
           <el-option v-for="userGroup in userGroups" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
         </el-select>
       </el-form-item>
