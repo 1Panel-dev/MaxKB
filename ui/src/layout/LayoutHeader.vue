@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AvatarDropdown from './avatar-dropdown/index.vue'
@@ -6,8 +7,46 @@ import HeaderWorkspaceDropdown from './header-workspace-dropdown/index.vue'
 import { isSystem, isWorkspace } from './utils'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import type { LayoutMode } from './types'
+import { Compare, hasPermission, Role, RoleConstants } from '@/permission/core'
+import { getWorkspaceId } from '@/utils/resource-context'
+
 const router = useRouter()
 const props = withDefaults(defineProps<{ mode?: LayoutMode; preview?: boolean }>(), { mode: 'workspace', preview: false })
+
+// 系统管理员：内置 ADMIN 或自定义 ADMIN 类型（EXTENDS_ADMIN 无 :w: 后缀）
+const canManageSystem = computed(() =>
+  hasPermission([RoleConstants.ADMIN, RoleConstants.EXTENDS_ADMIN], Compare.OR),
+)
+
+// 工作空间管理员：内置 WORKSPACE_MANAGE 或自定义 EXTENDS_WORKSPACE_MANAGE
+const isWorkspaceManager = computed(() => {
+  const workspaceId = getWorkspaceId()
+  return hasPermission(
+    [
+      RoleConstants.WORKSPACE_MANAGE,
+      new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId),
+      new Role(RoleConstants.EXTENDS_WORKSPACE_MANAGE.name, workspaceId),
+    ],
+    Compare.OR,
+  )
+})
+
+// 普通用户：内置 USER 或自定义 EXTENDS_USER
+const isOrdinaryUser = computed(() => {
+  const workspaceId = getWorkspaceId()
+  return hasPermission(
+    [
+      RoleConstants.USER,
+      new Role(RoleConstants.USER.name, workspaceId),
+      new Role(RoleConstants.EXTENDS_USER.name, workspaceId),
+    ],
+    Compare.OR,
+  )
+})
+
+// 「返回工作空间」：工作空间管理员或普通用户
+const canReturnWorkspace = computed(() => isWorkspaceManager.value || isOrdinaryUser.value)
+
 function switchMode() {
   router.push(isWorkspace(props.mode) ? { name: 'system-home' } : { name: 'workspace-home', params: { workspaceId: 'default' } })
 }
@@ -31,12 +70,12 @@ function switchMode() {
         <span>升级</span>
       </el-button>
       <el-divider direction="vertical" />
-      <el-button v-if="isWorkspace(mode)" class="-mx-1" text @click="switchMode">
+      <el-button v-if="isWorkspace(mode) && (isWorkspaceManager || canManageSystem )" class="-mx-1" text @click="switchMode">
         <MkIcon name="icon_admin_outlined" />
         <span>系统管理</span>
       </el-button>
       <!--  TODO 只有系统管理员权限没有返回工作空间 -->
-      <el-button v-if="isSystem(mode)" class="-mx-1" text @click="switchMode">
+      <el-button v-if="isSystem(mode) && canReturnWorkspace" class="-mx-1" text @click="switchMode">
         <MkIcon name="icon_left_outlined" />
         <span>返回工作空间</span>
       </el-button>
