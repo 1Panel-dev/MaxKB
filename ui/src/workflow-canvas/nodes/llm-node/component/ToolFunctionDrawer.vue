@@ -194,7 +194,7 @@ defineExpose({ open, close })
           <MkIcon name="icon_add_outlined" />
         </el-button>
       </div>
-      <MkTable :data="functionForm.parameters" size="small" row-key="name" :max-height="undefined" empty-text="暂无参数">
+      <MkTable class="border" :data="functionForm.parameters" size="small" row-key="name" :max-height="undefined" empty-text="暂无参数">
         <el-table-column label="参数">
           <template #default="{ row }">
             <span class="block truncate" :title="row.name">{{ row.name }}</span>

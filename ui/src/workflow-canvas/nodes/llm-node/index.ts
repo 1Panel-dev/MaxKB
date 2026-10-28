@@ -9,9 +9,17 @@ class LlmNodeView extends WorkflowNodeView {
   }
 }
 
+class LlmNodeModel extends WorkflowNodeModel {
+  override setAttributes() {
+    super.setAttributes()
+    this.width = 600
+    this.properties.width = 600
+  }
+}
+
 export default {
   type: WorkflowNodeType.Llm,
-  model: WorkflowNodeModel,
+  model: LlmNodeModel,
   view: LlmNodeView,
   details: LlmNodeDetail,
 }

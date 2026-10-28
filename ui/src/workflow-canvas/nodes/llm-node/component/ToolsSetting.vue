@@ -97,7 +97,13 @@ onBeforeUnmount(() => anchorGuard.reset())
           <MkIcon name="icon_add_outlined" />
         </el-button>
         <!-- 工具声明更多操作 -->
-        <MkDropdown class="ml-2" :teleported="false" trigger="click" placement="bottom-end" @visible-change="anchorGuard.setOverlayVisible('tools-more', $event)">
+        <MkDropdown
+          class="ml-2"
+          :teleported="false"
+          trigger="click"
+          placement="bottom-end"
+          @visible-change="anchorGuard.setOverlayVisible('tools-more', $event)"
+        >
           <el-button text type="primary">
             <MkIcon name="icon_more_outlined" />
           </el-button>
@@ -139,7 +145,7 @@ onBeforeUnmount(() => anchorGuard.reset())
     placeholder="请选择工具变量"
     @update:model-value="updateSetting({ reference: $event })"
   />
-  <MkTable v-else-if="setting.tools.length" :data="setting.tools" size="small" row-key="function.name" :max-height="undefined">
+  <MkTable class="border" v-else-if="setting.tools.length" :data="setting.tools" size="small" row-key="function.name" :max-height="undefined">
     <el-table-column label="工具名称">
       <template #default="{ row }">
         <span class="block truncate" :title="row.function.name">{{ row.function.name }}</span>
@@ -150,7 +156,7 @@ onBeforeUnmount(() => anchorGuard.reset())
         <span class="block truncate" :title="row.function.description || '-'">{{ row.function.description || '-' }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="参数" width="55">
+    <el-table-column label="参数">
       <template #default="{ row }">{{ Object.keys(row.function.parameters?.properties ?? {}).length }}</template>
     </el-table-column>
     <el-table-column label="操作" width="80">
