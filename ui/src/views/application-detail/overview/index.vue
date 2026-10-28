@@ -12,6 +12,8 @@ import ButtonEmbedThirdParty from './embed-third-party/ButtonEmbedThirdParty.vue
 import ButtonAccessRestriction from './access-restriction/ButtonAccessRestriction.vue'
 import ButtonDisplaySetting from './display-setting/ButtonDisplaySetting.vue'
 import ButtonApiKey from './api-key/ButtonApiKey.vue'
+import perm from '@/permission/index.ts'
+import { isSystemResource } from '@/utils/resource-context.ts'
 
 defineOptions({ name: 'ApplicationOverviewView' })
 defineProps<ResourceDetailPageProps>()
@@ -21,6 +23,17 @@ defineExpose({ hideHeader: true })
 const route = useRoute()
 const workspaceId = computed(() => String(route.params.workspaceId ?? ''))
 const { application, applicationId, resourceApi } = useApplicationDetailContext()
+
+type ApplicationOverviewPermissionMethod =
+    | 'overviewRead'
+    | 'overviewEmbed'
+    | 'overviewAccess'
+    | 'overviewDisplay'
+    | 'overviewApiKey'
+function applicationOverviewPermission(method: ApplicationOverviewPermissionMethod): boolean{
+  if (isSystemResource()) return Boolean(perm.application.system[method]())
+  return Boolean(perm.application.workspace[method](applicationId.value))
+}
 
 /* 基本信息：Web 访问链接与开关 */
 const accessToken = ref('')
@@ -124,11 +137,11 @@ onMounted(() => {
               <span>去对话</span>
             </el-button>
             <!-- 嵌入第三方 -->
-            <ButtonEmbedThirdParty :share-url="shareUrl" :access-token="accessToken" />
+            <ButtonEmbedThirdParty v-if="applicationOverviewPermission('overviewEmbed')" :share-url="shareUrl" :access-token="accessToken" />
             <!-- 访问限制 -->
-            <ButtonAccessRestriction />
+            <ButtonAccessRestriction v-if="applicationOverviewPermission('overviewAccess')" />
             <!-- 显示设置 -->
-            <ButtonDisplaySetting />
+            <ButtonDisplaySetting v-if="applicationOverviewPermission('overviewDisplay')" />
           </div>
         </div>
         <div class="mk-gray-card-lg space-y-4">
@@ -149,7 +162,7 @@ onMounted(() => {
             </el-input>
           </div>
           <!-- API Key  -->
-          <ButtonApiKey />
+          <ButtonApiKey v-if="applicationOverviewPermission('overviewApiKey')" />
         </div>
       </div>
     </el-card>

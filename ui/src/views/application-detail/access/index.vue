@@ -8,6 +8,15 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
 import AccessSettingDrawer from './AccessSettingDrawer.vue'
 import { accessPlatforms, type AccessPlatformDefinition } from './platforms'
+import { isSystemResource } from '@/utils/resource-context.ts'
+import perm from '@/permission/index.ts'
+
+type ApplicationAccessPermissionMethod =
+    | 'accessEdit'
+function applicationAccessPermission(method: ApplicationAccessPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.application.system[method]())
+  return Boolean(perm.application.workspace[method](applicationId.value))
+}
 
 const { resourceApi } = useApplicationDetailContext()
 
@@ -81,11 +90,11 @@ watch(
             </div>
             <div class="flex-align-center shrink-0 gap-4">
               <!-- 配置发布渠道 -->
-              <el-button plain @click.stop="handleOpenPlatform(platform)">{{ platformStatus[platform.key]?.[0] ? '配置' : '未配置' }}</el-button>
+              <el-button v-if="applicationAccessPermission('accessEdit')" plain @click.stop="handleOpenPlatform(platform)">{{ platformStatus[platform.key]?.[0] ? '配置' : '未配置' }}</el-button>
               <template v-if="platformStatus[platform.key]?.[0]">
                 <el-divider direction="vertical" />
                 <!-- 启停发布渠道，阻止点击打开配置 -->
-                <span @click.stop>
+                <span v-if="applicationAccessPermission('accessEdit')" @click.stop>
                   <el-switch
                     :model-value="platformStatus[platform.key]?.[1] ?? false"
                     @change="(value: string | number | boolean) => handlePlatformStatusChange(platform, value)"

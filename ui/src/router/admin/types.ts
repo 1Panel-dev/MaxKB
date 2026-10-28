@@ -32,3 +32,11 @@ declare module 'vue-router' {
     title?: string
   }
 }
+
+declare module 'vue-router' {
+  interface RouteMeta {
+    // ...
+    /** 路由菜单/守卫的权限判断（菜单构建与守卫共用）。 */
+    permission?: (route: { params: RouteParamsGeneric }) => boolean
+  }
+}

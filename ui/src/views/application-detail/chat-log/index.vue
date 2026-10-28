@@ -13,10 +13,21 @@ import ButtonCleanStrategy from './clean-strategy/ButtonCleanStrategy.vue'
 import ButtonAddKnowledge from './add-knowledge/ButtonAddKnowledge.vue'
 import { CHAT_LOG_SOURCE_LABELS } from './constants'
 import ChatLogDetailDrawer from './ChatLogDetailDrawer.vue'
+import { isSystemResource } from '@/utils/resource-context.ts'
+import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'ApplicationChatLogView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
+
+type ApplicationChatLogPermissionMethod =
+    | 'chatLogClear'
+    | 'chatLogExport'
+    | 'chatLogAddKnowledge'
+function applicationChatLogPermission(method: ApplicationChatLogPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.application.system[method]())
+  return Boolean(perm.application.workspace[method](applicationId.value))
+}
 
 const { application, applicationId, resourceApi } = useApplicationDetailContext()
 
@@ -182,12 +193,12 @@ onMounted(() => loadChatLogs())
         <MkDateRange class="mr-3" @change="handleDateFilterChange" />
         <MkComplexSearch :fields="searchFields" class="mr-3" @change="handleSearchChange" />
         <!-- 导出对话日志 -->
-        <el-button plain :loading="exporting" @click="handleExport">
+        <el-button v-if="applicationChatLogPermission('chatLogExport')" plain :loading="exporting" @click="handleExport">
           <MkIcon name="icon_export_outlined" />
           <span>导出</span>
         </el-button>
         <!-- 设置日志清除策略 -->
-        <ButtonCleanStrategy :api="resourceApi.chatLog" :application-id="applicationId" />
+        <ButtonCleanStrategy v-if="applicationChatLogPermission('chatLogClear')" :api="resourceApi.chatLog" :application-id="applicationId" />
       </div>
     </div>
   </Teleport>
@@ -248,6 +259,7 @@ onMounted(() => loadChatLogs())
         :chat-ids="selectedChatLogs.map(({ id }) => id)"
         :disabled="loading"
         @refresh="handleKnowledgeAdded"
+        v-if="applicationChatLogPermission('chatLogAddKnowledge')"
       />
     </template>
   </MkTable>
