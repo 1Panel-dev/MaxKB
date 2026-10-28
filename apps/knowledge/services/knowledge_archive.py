@@ -10,6 +10,7 @@ from uuid import UUID
 import uuid_utils.compat as uuid
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import QuerySet
+from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 
 from knowledge.models import (
@@ -161,7 +162,7 @@ def export_resources(knowledge, documents, source_files, directory, source_entri
     required_ids = _file_ids(resources) | _file_ids(portable_knowledge_meta(knowledge)) | source_ids
     files = list(QuerySet(File).filter(id__in=required_ids))
     if {str(item.id) for item in files} != required_ids:
-        raise ValidationError("A referenced knowledge file is missing; the archive cannot be exported completely.")
+        raise ValidationError(_("A referenced knowledge file is missing; the archive cannot be exported completely."))
     source_paths = {str(item["id"]): item["zip_path"] for item in source_entries}
     document_ids = {str(item.id) for item in documents}
     paragraph_ids = {str(row["id"]) for row in resources["paragraphs"]}
@@ -175,7 +176,7 @@ def export_resources(knowledge, documents, source_files, directory, source_entri
             or file.source_type == FileSourceType.PARAGRAPH
             and str(file.source_id) in paragraph_ids
         ):
-            raise ValidationError("A referenced file does not belong to this knowledge base.")
+            raise ValidationError(_("A referenced file does not belong to this knowledge base."))
         file_id = str(file.id)
         zip_path = source_paths.get(file_id, f"oss/file/{file_id}")
         if file_id not in source_paths:
@@ -203,17 +204,17 @@ def export_resources(knowledge, documents, source_files, directory, source_entri
 def _ids(rows):
     result = {}
     if not isinstance(rows, list):
-        raise ValidationError("Invalid archive resource list.")
+        raise ValidationError(_("Invalid archive resource list."))
     for row in rows:
         if not isinstance(row, dict) or not isinstance(row.get("id"), str):
-            raise ValidationError("Invalid archive resource ID.")
+            raise ValidationError(_("Invalid archive resource ID."))
         try:
             if str(UUID(row["id"])) != row["id"]:
                 raise ValueError("Non-canonical UUID")
         except (ValueError, TypeError) as exc:
-            raise ValidationError("Invalid archive resource ID.") from exc
+            raise ValidationError(_("Invalid archive resource ID.")) from exc
         if row["id"] in result:
-            raise ValidationError("Duplicate archive resource ID.")
+            raise ValidationError(_("Duplicate archive resource ID."))
         result[row["id"]] = row
     return result
 
@@ -221,98 +222,98 @@ def _ids(rows):
 def validate_archive(data, archive):
     """Validate all cross-resource references before creating any destination records."""
     if not isinstance(data, dict):
-        raise ValidationError("Invalid knowledge archive metadata.")
+        raise ValidationError(_("Invalid knowledge archive metadata."))
     setting = data.get("external_service", {})
     if not isinstance(setting, dict) or any(type(value) is not bool for value in setting.values()):
-        raise ValidationError("Invalid external service settings.")
+        raise ValidationError(_("Invalid external service settings."))
     if setting:
         ExternalServiceSettings(data=setting).is_valid(raise_exception=True)
     version = data.get("archive_version")
     if version is None:
         return None
     if type(version) is not int or version != ARCHIVE_VERSION:
-        raise ValidationError("Unsupported knowledge archive version.")
+        raise ValidationError(_("Unsupported knowledge archive version."))
     resources = data.get("resources")
     if not isinstance(resources, dict):
-        raise ValidationError("Knowledge archive resources are missing.")
+        raise ValidationError(_("Knowledge archive resources are missing."))
     indexes = {key: _ids(resources.get(key)) for key in (*RESOURCE_MODELS, "files")}
     all_ids = [key for index in indexes.values() for key in index]
     if len(all_ids) != len(set(all_ids)) or data.get("source_knowledge_id") in all_ids:
-        raise ValidationError("Duplicate archive resource ID.")
+        raise ValidationError(_("Duplicate archive resource ID."))
     documents, paragraphs = indexes["documents"], indexes["paragraphs"]
     for row in paragraphs.values():
         if row.get("document_id") not in documents:
-            raise ValidationError("Paragraph refers to an unknown document.")
+            raise ValidationError(_("Paragraph refers to an unknown document."))
         anchor = row.get("anchor_paragraph_id")
         if anchor and (anchor not in paragraphs or paragraphs[anchor]["document_id"] != row["document_id"]):
-            raise ValidationError("Invalid paragraph anchor.")
+            raise ValidationError(_("Invalid paragraph anchor."))
     for kind, target in (("assets", "files"), ("problem_mappings", "problems")):
         field = "file_id" if kind == "assets" else "problem_id"
         for row in indexes[kind].values():
             paragraph = paragraphs.get(row.get("paragraph_id"))
             if paragraph is None or paragraph["document_id"] != row.get("document_id"):
-                raise ValidationError("Invalid document/paragraph relationship.")
+                raise ValidationError(_("Invalid document/paragraph relationship."))
             if row.get(field) not in indexes[target]:
-                raise ValidationError("Unknown related archive resource.")
+                raise ValidationError(_("Unknown related archive resource."))
     if not isinstance(resources.get("document_tags"), list):
-        raise ValidationError("Invalid document tags.")
+        raise ValidationError(_("Invalid document tags."))
     for row in resources["document_tags"]:
         if (
             not isinstance(row, dict)
             or row.get("document_id") not in documents
             or row.get("tag_id") not in indexes["tags"]
         ):
-            raise ValidationError("Invalid document tag relationship.")
+            raise ValidationError(_("Invalid document tag relationship."))
     for row in documents.values():
         if row.get("resource_type") not in DocumentResourceType.values or not isinstance(row.get("meta"), dict):
-            raise ValidationError("Invalid document resource type or metadata.")
+            raise ValidationError(_("Invalid document resource type or metadata."))
         if (
             row["resource_type"] == DocumentResourceType.IMAGE
             and row["meta"].get("image_file_id") not in indexes["files"]
         ):
-            raise ValidationError("Image document has no image file.")
+            raise ValidationError(_("Image document has no image file."))
     for row in indexes["files"].values():
         if not isinstance(row.get("file_name"), str) or not isinstance(row.get("meta", {}), dict):
-            raise ValidationError("Invalid file metadata.")
+            raise ValidationError(_("Invalid file metadata."))
         if row.get("document_id") and row["document_id"] not in documents:
-            raise ValidationError("File refers to an unknown document.")
+            raise ValidationError(_("File refers to an unknown document."))
         if row.get("paragraph_id") and row["paragraph_id"] not in paragraphs:
-            raise ValidationError("File refers to an unknown paragraph.")
+            raise ValidationError(_("File refers to an unknown paragraph."))
         if row.get("document_id") and row.get("paragraph_id"):
-            raise ValidationError("File has multiple archive owners.")
+            raise ValidationError(_("File has multiple archive owners."))
         path = row.get("zip_path")
         if not isinstance(path, str) or path not in archive.namelist() or archive.getinfo(path).is_dir():
-            raise ValidationError("An archive file is missing.")
+            raise ValidationError(_("An archive file is missing."))
     if not _file_ids({key: value for key, value in resources.items() if key != "files"}).issubset(indexes["files"]):
-        raise ValidationError("Unknown file reference in knowledge content.")
+        raise ValidationError(_("Unknown file reference in knowledge content."))
     meta = data.get("meta", {})
     if not isinstance(meta, dict):
-        raise ValidationError("Invalid knowledge metadata.")
+        raise ValidationError(_("Invalid knowledge metadata."))
     if not _file_ids(meta).issubset(indexes["files"]):
-        raise ValidationError("Unknown file reference in knowledge settings.")
+        raise ValidationError(_("Unknown file reference in knowledge settings."))
     for kind, (model, fields) in RESOURCE_MODELS.items():
         for row in resources[kind]:
             for field in fields:
                 if field not in row:
-                    raise ValidationError("Missing archive resource field.")
+                    raise ValidationError(_("Missing archive resource field."))
                 value = row[field]
                 if field in {"meta", "doc_strategy", "source_snapshot"} and not isinstance(value, dict):
-                    raise ValidationError("Invalid archive resource metadata.")
+                    raise ValidationError(_("Invalid archive resource metadata."))
                 if field in {"chunks", "content_schema"} and not isinstance(value, list):
-                    raise ValidationError("Invalid paragraph content structure.")
+                    raise ValidationError(_("Invalid paragraph content structure."))
                 if model._meta.get_field(field).get_internal_type() == "DateTimeField":
                     try:
                         model._meta.get_field(field).to_python(value)
                     except Exception as exc:
-                        raise ValidationError("Invalid archive timestamp.") from exc
+                        raise ValidationError(_("Invalid archive timestamp.")) from exc
     if "sync_setting" in meta:
         setting = meta["sync_setting"]
         if setting is not None and (not isinstance(setting, dict) or type(setting.get("enabled", False)) is not bool):
-            raise ValidationError("Invalid synchronization settings.")
+            raise ValidationError(_("Invalid synchronization settings."))
         try:
             normalize_knowledge_sync_setting(setting)
         except (ValueError, TypeError, AttributeError) as exc:
-            raise ValidationError("Invalid synchronization settings.") from exc
+            raise ValidationError(_("Invalid synchronization settings.")) from exc
     return resources
 
 

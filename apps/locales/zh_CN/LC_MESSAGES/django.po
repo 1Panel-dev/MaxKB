@@ -9969,3 +9969,1091 @@ msgstr "MCP 服务配置"
 
 msgid "Export skills"
 msgstr "导出 skills"
+
+#: apps/knowledge/serializers/knowledge.py:385
+#, python-format
+msgid "%s must be a boolean"
+msgstr "%s 必须为布尔值"
+
+#: apps/knowledge/services/multimodal_retrieval.py:65
+#, python-brace-format
+msgid "A maximum of {count} images can be queried at a time"
+msgstr "每次最多可查询 {count} 张图片"
+
+#: apps/knowledge/services/image_documents.py:257
+#, python-brace-format
+msgid "A maximum of {} files can be uploaded at a time"
+msgstr "每次最多可上传 {} 个文件"
+
+#: apps/knowledge/services/knowledge_archive.py:180
+msgid "A referenced file does not belong to this knowledge base."
+msgstr "引用的文件不属于当前知识库。"
+
+#: apps/knowledge/services/knowledge_archive.py:166
+msgid ""
+"A referenced knowledge file is missing; the archive cannot be exported "
+"completely."
+msgstr "引用的知识库文件缺失，无法完整导出归档。"
+
+#: apps/knowledge/views/document.py:981 apps/knowledge/views/document.py:982
+#: apps/knowledge/views/document.py:983
+msgid "Add document tags"
+msgstr "添加文档标签"
+
+#: apps/knowledge/services/knowledge_archive.py:287
+msgid "An archive file is missing."
+msgstr "归档文件缺失。"
+
+#: apps/knowledge/serializers/knowledge_sync.py:55
+msgid "An interval unit and value are required"
+msgstr "请填写间隔单位和间隔值"
+
+#: apps/knowledge/serializers/image_document.py:34
+msgid "At least one field must be provided"
+msgstr "请至少填写一个字段"
+
+#: apps/knowledge/serializers/external_retrieval.py:27
+msgid "At least one setting is required."
+msgstr "请至少提供一项设置。"
+
+#: apps/knowledge/views/document.py:1045 apps/knowledge/views/document.py:1046
+msgid "Batch Delete Documents Tag"
+msgstr "批量删除文档标签"
+
+#: apps/knowledge/views/tag.py:130
+msgid "Batch Delete Knowledge Tag"
+msgstr "批量删除知识库标签"
+
+#: apps/knowledge/views/tag.py:131
+msgid "Batch Delete a knowledge tag"
+msgstr "批量删除知识库标签"
+
+#: apps/knowledge/views/document.py:718 apps/knowledge/views/document.py:719
+msgid "Batch add tags to documents"
+msgstr "批量添加文档标签"
+
+#: apps/knowledge/views/termbase.py:131 apps/knowledge/views/termbase.py:132
+#: apps/knowledge/views/termbase.py:133
+msgid "Batch export termbase"
+msgstr "批量导出术语库"
+
+#: apps/knowledge/views/document.py:685 apps/knowledge/views/document.py:686
+msgid "Batch tokenize document library"
+msgstr "批量对文档库分词"
+
+#: apps/knowledge/views/knowledge_workflow.py:202
+#: apps/knowledge/views/knowledge_workflow.py:203
+#: apps/knowledge/views/knowledge_workflow.py:204
+msgid "Cancel knowledge workflow action"
+msgstr "取消知识库工作流任务"
+
+#: apps/knowledge/views/tag.py:23
+msgid "Create Knowledge Tag"
+msgstr "创建知识库标签"
+
+#: apps/knowledge/views/document.py:1204 apps/knowledge/views/document.py:1205
+#: apps/knowledge/views/document.py:1206
+msgid "Create QA documents from uploaded files"
+msgstr "从上传文件创建问答文档"
+
+#: apps/knowledge/views/tag.py:24
+msgid "Create a new knowledge tag"
+msgstr "创建知识库标签"
+
+#: apps/knowledge/views/knowledge_workflow.py:232
+#: apps/knowledge/views/knowledge_workflow.py:233
+#: apps/knowledge/views/knowledge_workflow.py:234
+msgid "Create knowledge workflow"
+msgstr "创建知识库工作流"
+
+#: apps/knowledge/views/document.py:1287 apps/knowledge/views/document.py:1288
+#: apps/knowledge/views/document.py:1289
+msgid "Create table documents from uploaded files"
+msgstr "从上传文件创建表格文档"
+
+#: apps/knowledge/views/termbase.py:61 apps/knowledge/views/termbase.py:62
+#: apps/knowledge/views/termbase.py:63
+msgid "Create termbase"
+msgstr "创建术语库"
+
+#: apps/knowledge/serializers/knowledge_sync.py:41
+msgid "Cron expression"
+msgstr "Cron 表达式"
+
+#: apps/knowledge/views/tag.py:103
+msgid "Delete Knowledge Tag"
+msgstr "删除知识库标签"
+
+#: apps/knowledge/views/tag.py:104
+msgid "Delete a knowledge tag"
+msgstr "删除知识库标签"
+
+#: apps/knowledge/views/image_document.py:85
+#: apps/knowledge/views/image_document.py:86
+#: apps/knowledge/views/image_document.py:87
+msgid "Delete an image preview"
+msgstr "删除图片预览"
+
+#: apps/knowledge/views/document.py:1007 apps/knowledge/views/document.py:1008
+#: apps/knowledge/views/document.py:1009
+msgid "Delete document tags"
+msgstr "删除文档标签"
+
+#: apps/knowledge/views/termbase.py:166 apps/knowledge/views/termbase.py:167
+#: apps/knowledge/views/termbase.py:168
+msgid "Delete termbase"
+msgstr "删除术语库"
+
+#: apps/knowledge/serializers/document.py:1652
+#: apps/knowledge/serializers/document.py:2050
+msgid "Document does not belong to the requested resource type"
+msgstr "文档不属于请求的资源类型"
+
+#: apps/knowledge/serializers/document.py:2255
+msgid "Document id does not belong to current knowledge"
+msgstr "文档 ID 不属于当前知识库"
+
+#: apps/knowledge/serializers/document.py:2099
+#: apps/knowledge/serializers/document.py:2176
+#: apps/knowledge/serializers/document.py:2217
+#: apps/knowledge/serializers/document.py:2282
+#: apps/oss/serializers/file.py:407
+msgid "Document id does not exist"
+msgstr "文档 ID 不存在"
+
+#: apps/knowledge/serializers/document.py:1637
+msgid "Document id list cannot be empty"
+msgstr "文档 ID 列表不能为空"
+
+#: apps/knowledge/views/tag_import.py:59
+msgid "Download Knowledge Tag Template"
+msgstr "下载知识库标签模板"
+
+#: apps/knowledge/services/knowledge_archive.py:218
+#: apps/knowledge/services/knowledge_archive.py:243
+msgid "Duplicate archive resource ID."
+msgstr "归档资源 ID 重复。"
+
+#: apps/knowledge/serializers/document.py:296
+msgid "Duplicate file ids are not allowed"
+msgstr "文件 ID 不能重复"
+
+#: apps/knowledge/views/image_document.py:67
+#: apps/knowledge/views/image_document.py:68
+#: apps/knowledge/views/image_document.py:69
+msgid "Edit an image preview"
+msgstr "编辑图片预览"
+
+#: apps/knowledge/views/knowledge_workflow.py:369
+#: apps/knowledge/views/knowledge_workflow.py:370
+#: apps/knowledge/views/knowledge_workflow.py:371
+msgid "Edit knowledge workflow"
+msgstr "编辑知识库工作流"
+
+#: apps/knowledge/serializers/knowledge_sync.py:31
+msgid "Enable scheduled synchronization"
+msgstr "启用定时同步"
+
+#: apps/knowledge/serializers/document_strategy.py:15
+msgid "Enter a valid HTTP or HTTPS URL"
+msgstr "请输入有效的 HTTP 或 HTTPS 地址"
+
+#: apps/knowledge/permissions.py:122
+msgid "Expected an object"
+msgstr "请提供一个对象"
+
+#: apps/knowledge/services/paragraph_files.py:230
+msgid "File does not belong to the migrated paragraph"
+msgstr "文件不属于待迁移的分段"
+
+#: apps/knowledge/serializers/document.py:1426
+#: apps/knowledge/services/image_documents.py:309
+#: apps/knowledge/services/image_documents.py:395
+msgid "File does not exist or no permission to access"
+msgstr "文件不存在或无权访问"
+
+#: apps/knowledge/services/knowledge_archive.py:284
+msgid "File has multiple archive owners."
+msgstr "文件存在多个归档归属。"
+
+#: apps/knowledge/services/knowledge_archive.py:280
+msgid "File refers to an unknown document."
+msgstr "文件引用了未知文档。"
+
+#: apps/knowledge/services/knowledge_archive.py:282
+msgid "File refers to an unknown paragraph."
+msgstr "文件引用了未知分段。"
+
+#: apps/knowledge/views/image_document.py:25
+msgid "Generate editable previews from uploaded image file IDs"
+msgstr "根据已上传的图片文件 ID 生成可编辑预览"
+
+#: apps/knowledge/views/image_document.py:26
+#: apps/knowledge/views/image_document.py:27
+msgid "Generate image previews"
+msgstr "生成图片预览"
+
+#: apps/knowledge/views/knowledge.py:473 apps/knowledge/views/knowledge.py:474
+#: apps/knowledge/views/knowledge.py:475 apps/tools/views/tool.py:601
+#: apps/tools/views/tool.py:602 apps/tools/views/tool.py:603
+#: apps/tools/views/tool_workflow.py:202 apps/tools/views/tool_workflow.py:203
+#: apps/tools/views/tool_workflow.py:204
+msgid "Get Appstore tools"
+msgstr "获取应用商店工具"
+
+#: apps/knowledge/views/tag.py:47
+msgid "Get Knowledge Tag"
+msgstr "获取知识库标签"
+
+#: apps/knowledge/views/knowledge.py:795 apps/knowledge/views/knowledge.py:796
+#: apps/knowledge/views/knowledge.py:797
+msgid "Get all tags of knowledge base"
+msgstr "获取知识库的全部标签"
+
+#: apps/knowledge/views/image_document.py:50
+#: apps/knowledge/views/image_document.py:51
+#: apps/knowledge/views/image_document.py:52
+msgid "Get an image preview"
+msgstr "获取图片预览"
+
+#: apps/knowledge/views/document.py:958 apps/knowledge/views/document.py:959
+#: apps/knowledge/views/document.py:960
+msgid "Get document tags"
+msgstr "获取文档标签"
+
+#: apps/knowledge/views/knowledge.py:364 apps/knowledge/views/knowledge.py:365
+#: apps/knowledge/views/knowledge.py:366
+msgid "Get knowledge scheduled synchronization setting"
+msgstr "获取知识库定时同步设置"
+
+#: apps/knowledge/views/knowledge.py:407 apps/knowledge/views/knowledge.py:408
+#: apps/knowledge/views/knowledge.py:409
+msgid "Get knowledge synchronization logs"
+msgstr "获取知识库同步日志"
+
+#: apps/knowledge/views/tag.py:48
+msgid "Get knowledge tag"
+msgstr "获取知识库标签"
+
+#: apps/knowledge/views/knowledge_workflow_version.py:92
+#: apps/knowledge/views/knowledge_workflow_version.py:93
+#: apps/knowledge/views/knowledge_workflow_version.py:94
+msgid "Get knowledge version details"
+msgstr "获取知识库版本详情"
+
+#: apps/knowledge/views/knowledge_workflow.py:401
+#: apps/knowledge/views/knowledge_workflow.py:402
+#: apps/knowledge/views/knowledge_workflow.py:403
+msgid "Get knowledge workflow"
+msgstr "获取知识库工作流"
+
+#: apps/knowledge/views/knowledge_workflow.py:173
+#: apps/knowledge/views/knowledge_workflow.py:174
+#: apps/knowledge/views/knowledge_workflow.py:175
+msgid "Get knowledge workflow action"
+msgstr "获取知识库工作流任务"
+
+#: apps/knowledge/views/knowledge_workflow.py:431
+#: apps/knowledge/views/knowledge_workflow.py:432
+#: apps/knowledge/views/knowledge_workflow.py:433
+msgid "Get knowledge workflow version list"
+msgstr "获取知识库工作流版本列表"
+
+#: apps/knowledge/views/knowledge_workflow_version.py:43
+#: apps/knowledge/views/knowledge_workflow_version.py:44
+#: apps/knowledge/views/knowledge_workflow_version.py:45
+msgid "Get the knowledge version list"
+msgstr "获取知识库版本列表"
+
+#: apps/knowledge/views/knowledge_workflow_version.py:67
+#: apps/knowledge/views/knowledge_workflow_version.py:68
+#: apps/knowledge/views/knowledge_workflow_version.py:69
+msgid "Get the list of knowledge versions by page"
+msgstr "分页获取知识库版本列表"
+
+#: apps/knowledge/views/termbase.py:241 apps/knowledge/views/termbase.py:242
+#: apps/knowledge/views/termbase.py:243
+msgid "Get the list of termbase by page"
+msgstr "分页获取术语库列表"
+
+#: apps/application/serializers/application.py:1643
+#: apps/application/serializers/application.py:822
+#: apps/knowledge/serializers/knowledge_workflow.py:668
+#: apps/knowledge/serializers/knowledge_workflow.py:927
+#: apps/tools/serializers/tool.py:1392 apps/tools/serializers/tool.py:1453
+#: apps/tools/serializers/tool.py:497
+#: apps/tools/serializers/tool_workflow.py:532
+msgid "Illegal download callback url"
+msgstr "下载回调地址不合法"
+
+#: apps/application/serializers/application.py:1584
+#: apps/application/serializers/application.py:798
+#: apps/knowledge/serializers/knowledge_workflow.py:654
+#: apps/knowledge/serializers/knowledge_workflow.py:913
+#: apps/tools/serializers/tool.py:1341 apps/tools/serializers/tool.py:1412
+#: apps/tools/serializers/tool.py:482 apps/tools/serializers/tool_icon.py:22
+#: apps/tools/serializers/tool_workflow.py:516
+msgid "Illegal download url"
+msgstr "下载地址不合法"
+
+#: apps/knowledge/services/knowledge_archive.py:275
+msgid "Image document has no image file."
+msgstr "图片文档缺少图片文件。"
+
+#: apps/knowledge/serializers/document.py:495
+msgid "Image documents can only be migrated to a general knowledge base"
+msgstr "图片文档只能迁移到通用知识库"
+
+#: apps/knowledge/services/image_documents.py:70
+msgid "Image files are only supported by general knowledge bases"
+msgstr "只有通用知识库支持图片文件"
+
+#: apps/knowledge/services/image_documents.py:190
+msgid "Image preview does not exist"
+msgstr "图片预览不存在"
+
+#: apps/knowledge/services/image_documents.py:192
+#: apps/knowledge/services/image_documents.py:327
+msgid "Image preview has already been imported"
+msgstr "图片预览已导入"
+
+#: apps/application/workflow/nodes/search_knowledge_node/search_knowledge_node.py:290
+#: apps/knowledge/serializers/knowledge.py:214
+msgid "Image queries only support embedding or blend search"
+msgstr "图片查询仅支持向量检索或混合检索"
+
+#: apps/knowledge/views/tag_import.py:25
+msgid "Import Knowledge Tags"
+msgstr "导入知识库标签"
+
+#: apps/knowledge/views/image_document.py:106
+#: apps/knowledge/views/image_document.py:107
+msgid "Import image documents"
+msgstr "导入图片文档"
+
+#: apps/knowledge/views/image_document.py:105
+msgid "Import image previews as standalone image documents"
+msgstr "将图片预览导入为独立图片文档"
+
+#: apps/knowledge/views/document.py:302 apps/knowledge/views/document.py:303
+#: apps/knowledge/views/document.py:304
+msgid "Import text files and create documents"
+msgstr "导入文本文件并创建文档"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:89
+msgid "Invalid Cron expression"
+msgstr "Cron 表达式无效"
+
+#: apps/knowledge/vector/milvus_vector.py:136
+msgid "Invalid Milvus vector dimension"
+msgstr "Milvus 向量维度无效"
+
+#: apps/knowledge/services/knowledge_archive.py:211
+#: apps/knowledge/services/knowledge_archive.py:216
+msgid "Invalid archive resource ID."
+msgstr "归档资源 ID 无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:208
+msgid "Invalid archive resource list."
+msgstr "归档资源列表无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:302
+msgid "Invalid archive resource metadata."
+msgstr "归档资源元数据无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:309
+msgid "Invalid archive timestamp."
+msgstr "归档时间戳无效。"
+
+#: apps/knowledge/views/document.py:79
+msgid "Invalid document processing strategy"
+msgstr "文档处理策略无效"
+
+#: apps/knowledge/services/knowledge_archive.py:270
+msgid "Invalid document resource type or metadata."
+msgstr "文档资源类型或元数据无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:267
+msgid "Invalid document tag relationship."
+msgstr "文档标签关联无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:260
+msgid "Invalid document tags."
+msgstr "文档标签无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:256
+msgid "Invalid document/paragraph relationship."
+msgstr "文档与分段的关联无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:229
+msgid "Invalid external service settings."
+msgstr "外部服务设置无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:278
+msgid "Invalid file metadata."
+msgstr "文件元数据无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:226
+msgid "Invalid knowledge archive metadata."
+msgstr "知识库归档元数据无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:292
+msgid "Invalid knowledge metadata."
+msgstr "知识库元数据无效。"
+
+#: apps/knowledge/services/image_documents.py:319
+#: apps/knowledge/services/image_documents.py:385
+msgid "Invalid number of image files"
+msgstr "图片文件数量无效"
+
+#: apps/knowledge/serializers/external_retrieval.py:17
+msgid "Invalid or unknown fields."
+msgstr "存在无效或未知字段。"
+
+#: apps/knowledge/services/knowledge_archive.py:250
+msgid "Invalid paragraph anchor."
+msgstr "分段锚点无效。"
+
+#: apps/knowledge/services/knowledge_archive.py:304
+msgid "Invalid paragraph content structure."
+msgstr "分段内容结构无效。"
+
+#: apps/knowledge/serializers/document_strategy.py:42
+#, python-brace-format
+msgid "Invalid paragraph identifier: {error}"
+msgstr "分段标识无效：{error}"
+
+#: apps/knowledge/services/knowledge_archive.py:313
+#: apps/knowledge/services/knowledge_archive.py:317
+msgid "Invalid synchronization settings."
+msgstr "同步设置无效。"
+
+#: apps/knowledge/views/termbase.py:102 apps/knowledge/views/termbase.py:137
+#: apps/knowledge/views/termbase.py:171 apps/knowledge/views/termbase.py:208
+#: apps/knowledge/views/termbase.py:246 apps/knowledge/views/termbase.py:36
+#: apps/knowledge/views/termbase.py:67
+msgid "Knowledge Base/Documentation/Termbase"
+msgstr "知识库/文档/术语库"
+
+#: apps/knowledge/views/image_document.py:111
+#: apps/knowledge/views/image_document.py:31
+#: apps/knowledge/views/image_document.py:55
+#: apps/knowledge/views/image_document.py:73
+#: apps/knowledge/views/image_document.py:90
+msgid "Knowledge Base/Images"
+msgstr "知识库/图片"
+
+#: apps/knowledge/views/document.py:1050 apps/knowledge/views/tag.py:108
+#: apps/knowledge/views/tag.py:135 apps/knowledge/views/tag.py:28
+#: apps/knowledge/views/tag.py:52 apps/knowledge/views/tag.py:81
+#: apps/knowledge/views/tag_import.py:30 apps/knowledge/views/tag_import.py:62
+msgid "Knowledge Base/Tag"
+msgstr "知识库/标签"
+
+#: apps/knowledge/serializers/common.py:289
+#: apps/knowledge/serializers/common.py:301
+msgid "Knowledge ID or Document ID must be provided"
+msgstr "请提供知识库 ID 或文档 ID"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:550
+msgid "Knowledge action does not exist"
+msgstr "知识库任务不存在"
+
+#: apps/knowledge/services/knowledge_archive.py:239
+msgid "Knowledge archive resources are missing."
+msgstr "知识库归档资源缺失。"
+
+#: apps/knowledge/serializers/external_retrieval.py:85
+msgid "Knowledge does not exist."
+msgstr "知识库不存在。"
+
+#: apps/application/serializers/application_chat_record.py:480
+#: apps/knowledge/serializers/document.py:1411
+#: apps/knowledge/serializers/document.py:1503
+#: apps/knowledge/serializers/document.py:1662
+#: apps/knowledge/serializers/document.py:2032
+#: apps/knowledge/serializers/document.py:2093
+#: apps/knowledge/serializers/document.py:2170
+#: apps/knowledge/serializers/document.py:2211
+#: apps/knowledge/serializers/document.py:2237
+#: apps/knowledge/serializers/document.py:2275
+#: apps/knowledge/serializers/document.py:474
+#: apps/knowledge/serializers/document.py:479
+#: apps/knowledge/serializers/document.py:731
+#: apps/knowledge/serializers/document.py:834
+#: apps/knowledge/serializers/knowledge.py:1375
+#: apps/knowledge/serializers/knowledge.py:1430
+#: apps/knowledge/serializers/knowledge.py:394
+#: apps/knowledge/serializers/knowledge_version.py:92
+#: apps/knowledge/serializers/knowledge_workflow.py:248
+#: apps/knowledge/serializers/knowledge_workflow.py:544
+#: apps/knowledge/serializers/knowledge_workflow.py:956
+#: apps/knowledge/serializers/paragraph.py:161
+#: apps/knowledge/serializers/paragraph.py:262
+#: apps/knowledge/serializers/paragraph.py:527
+#: apps/knowledge/serializers/paragraph.py:566
+#: apps/knowledge/serializers/paragraph.py:646
+#: apps/knowledge/serializers/paragraph.py:707
+#: apps/knowledge/serializers/paragraph.py:747
+#: apps/knowledge/serializers/paragraph.py:881
+#: apps/knowledge/serializers/problem.py:170
+#: apps/knowledge/serializers/problem.py:239
+#: apps/knowledge/serializers/problem.py:277
+#: apps/knowledge/serializers/problem.py:83
+#: apps/knowledge/serializers/tag.py:104 apps/knowledge/serializers/tag.py:180
+#: apps/knowledge/serializers/tag.py:214 apps/knowledge/serializers/tag.py:57
+#: apps/knowledge/serializers/tag_import.py:119
+#: apps/knowledge/serializers/termbase.py:116
+#: apps/knowledge/serializers/termbase.py:153
+#: apps/knowledge/serializers/termbase.py:45
+#: apps/knowledge/serializers/termbase.py:76
+#: apps/knowledge/services/image_documents.py:68
+#: apps/knowledge/services/paragraph_assets.py:64
+#: apps/oss/serializers/file.py:411
+msgid "Knowledge id does not exist"
+msgstr "知识库 ID 不存在"
+
+#: apps/knowledge/serializers/knowledge.py:1556
+msgid "Knowledge is already a workflow"
+msgstr "知识库已是工作流类型"
+
+#: apps/knowledge/serializers/knowledge.py:1554
+msgid "Knowledge not found"
+msgstr "知识库不存在"
+
+#: apps/knowledge/serializers/knowledge_version.py:83
+msgid "Knowledge version ID"
+msgstr "知识库版本 ID"
+
+#: apps/knowledge/views/knowledge_workflow.py:113
+#: apps/knowledge/views/knowledge_workflow.py:114
+#: apps/knowledge/views/knowledge_workflow.py:115
+msgid "Knowledge workflow debug"
+msgstr "调试知识库工作流"
+
+#: apps/knowledge/services/workflow_document_sync.py:68
+msgid "Knowledge workflow does not exist"
+msgstr "知识库工作流不存在"
+
+#: apps/knowledge/views/knowledge_workflow.py:79
+#: apps/knowledge/views/knowledge_workflow.py:80
+#: apps/knowledge/views/knowledge_workflow.py:81
+msgid "Knowledge workflow upload document"
+msgstr "上传知识库工作流文档"
+
+#: apps/knowledge/serializers/knowledge.py:166
+msgid ""
+"Knowledge-base-level default document processing strategies are only "
+"supported for Web knowledge bases. Configure document-level strategies "
+"through the document import or synchronization API."
+msgstr "仅 Web 知识库支持知识库级默认文档处理策略。请通过文档导入或同步接口配置文档级策略。"
+
+#: apps/knowledge/views/knowledge_workflow_version.py:119
+#: apps/knowledge/views/knowledge_workflow_version.py:48
+#: apps/knowledge/views/knowledge_workflow_version.py:72
+#: apps/knowledge/views/knowledge_workflow_version.py:97
+msgid "Knowledge/Version"
+msgstr "知识库/版本"
+
+#: apps/knowledge/services/workflow_sync_source.py:83
+msgid "Local file data sources cannot be synchronized on a schedule"
+msgstr "本地文件数据源不支持定时同步"
+
+#: apps/knowledge/services/knowledge_archive.py:299
+msgid "Missing archive resource field."
+msgstr "归档资源缺少必要字段。"
+
+#: apps/knowledge/views/knowledge_workflow_version.py:113
+#: apps/knowledge/views/knowledge_workflow_version.py:114
+#: apps/knowledge/views/knowledge_workflow_version.py:115
+msgid "Modify knowledge version information"
+msgstr "修改知识库版本信息"
+
+#: apps/knowledge/views/termbase.py:202 apps/knowledge/views/termbase.py:203
+#: apps/knowledge/views/termbase.py:204
+msgid "Modify termbase"
+msgstr "修改术语库"
+
+#: apps/knowledge/serializers/document.py:1378
+msgid "No importable paragraphs found"
+msgstr "未找到可导入的分段"
+
+#: apps/knowledge/services/multimodal_retrieval.py:78
+msgid "No permission to access the query image"
+msgstr "无权访问查询图片"
+
+#: apps/knowledge/models/knowledge.py:596
+msgid "OSS storage is not configured"
+msgstr "未配置 OSS 存储"
+
+#: apps/knowledge/services/image_documents.py:393
+msgid "One or more image previews cannot be imported"
+msgstr "一个或多个图片预览无法导入"
+
+#: apps/knowledge/services/multimodal_retrieval.py:82
+msgid "Only image files can be used for image queries"
+msgstr "图片查询仅支持图片文件"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:965
+msgid "Only support transport=sse or transport=streamable_http"
+msgstr "仅支持 transport=sse 或 transport=streamable_http"
+
+#: apps/knowledge/views/knowledge_workflow.py:143
+#: apps/knowledge/views/knowledge_workflow.py:144
+#: apps/knowledge/views/knowledge_workflow.py:145
+msgid "Page Knowledge workflow action"
+msgstr "分页获取知识库工作流任务"
+
+#: apps/knowledge/serializers/document_strategy.py:57
+msgid "Paragraph identifiers are only supported in advanced split mode"
+msgstr "仅高级分段模式支持分段标识"
+
+#: apps/knowledge/services/knowledge_archive.py:247
+msgid "Paragraph refers to an unknown document."
+msgstr "分段引用了未知文档。"
+
+#: apps/knowledge/services/image_documents.py:383
+msgid "Please select at least one image preview"
+msgstr "请至少选择一个图片预览"
+
+#: apps/knowledge/services/image_documents.py:252
+msgid "Please upload at least one image"
+msgstr "请至少上传一张图片"
+
+#: apps/knowledge/views/knowledge_workflow.py:256
+#: apps/knowledge/views/knowledge_workflow.py:257
+#: apps/knowledge/views/knowledge_workflow.py:258
+msgid "Publishing an knowledge"
+msgstr "发布知识库"
+
+#: apps/knowledge/services/multimodal_retrieval.py:74
+#, python-brace-format
+msgid "Query image does not exist: {file_id}"
+msgstr "查询图片不存在：{file_id}"
+
+#: apps/knowledge/serializers/knowledge.py:211
+msgid "Query text and query images cannot both be empty"
+msgstr "查询文本和查询图片不能同时为空"
+
+#: apps/knowledge/views/document.py:930 apps/knowledge/views/document.py:931
+msgid "Replace source file"
+msgstr "替换源文件"
+
+#: apps/knowledge/services/workflow_sync_source.py:74
+msgid "Run the workflow once before enabling scheduled synchronization"
+msgstr "启用定时同步前，请先运行一次工作流"
+
+#: apps/knowledge/serializers/knowledge_sync.py:35
+msgid "Schedule type"
+msgstr "调度类型"
+
+#: apps/knowledge/serializers/knowledge_sync.py:78
+msgid "Scheduled synchronization is not supported for this knowledge base"
+msgstr "当前知识库不支持定时同步"
+
+#: apps/knowledge/views/document.py:268 apps/knowledge/views/document.py:269
+#: apps/knowledge/views/document.py:270
+msgid "Segmented document by file ids"
+msgstr "根据文件 ID 对文档分段"
+
+#: apps/knowledge/serializers/document.py:369
+msgid "Select documents of the same resource type"
+msgstr "请选择相同资源类型的文档"
+
+#: apps/knowledge/task/sync.py:153
+#, python-brace-format
+msgid ""
+"Start--->Start synchronization web knowledge base:{knowledge_id}, "
+"type:{sync_type}"
+msgstr "开始--->开始同步 Web 知识库：{knowledge_id}，类型：{sync_type}"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:223
+#: apps/tools/serializers/tool_workflow.py:140
+msgid "State"
+msgstr "状态"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:119
+msgid "Synchronization interval must be at least 5 minutes"
+msgstr "同步间隔不能少于 5 分钟"
+
+#: apps/knowledge/services/workflow_document_sync.py:77
+msgid "Synchronization is already running"
+msgstr "同步任务正在执行"
+
+#: apps/knowledge/serializers/knowledge_sync.py:37
+msgid "Synchronization time"
+msgstr "同步时间"
+
+#: apps/knowledge/serializers/knowledge_sync.py:45
+msgid "Synchronization type"
+msgstr "同步类型"
+
+#: apps/knowledge/task/sync.py:456
+#, python-brace-format
+msgid "Synchronize web document:{source_url} error{error}{traceback}"
+msgstr "同步 Web 文档：{source_url}，错误：{error}{traceback}"
+
+#: apps/knowledge/serializers/tag.py:95
+msgid "Tag ID"
+msgstr "标签 ID"
+
+#: apps/knowledge/serializers/tag.py:171
+msgid "Tag IDs"
+msgstr "标签 ID 列表"
+
+#: apps/knowledge/views/termbase.py:31 apps/knowledge/views/termbase.py:32
+#: apps/knowledge/views/termbase.py:33
+msgid "Termbase list"
+msgstr "术语库列表"
+
+#: apps/application/workflow/nodes/search_knowledge_node/search_knowledge_node.py:292
+#: apps/knowledge/serializers/knowledge.py:1444
+#: apps/knowledge/vector/milvus_vector.py:779
+#: apps/knowledge/vector/pg_vector.py:163
+#: apps/models_provider/base_model_provider.py:135
+msgid "The current embedding model does not support image embedding"
+msgstr "当前向量模型不支持图片向量化"
+
+#: apps/knowledge/vector/pg_vector.py:110
+msgid "The embedding model returned an incomplete result"
+msgstr "向量模型返回的结果不完整"
+
+#: apps/knowledge/services/paragraph_assets.py:601
+msgid "The image description embedding model returned an incomplete result"
+msgstr "图片描述向量模型返回的结果不完整"
+
+#: apps/knowledge/services/paragraph_assets.py:627
+#: apps/knowledge/vector/milvus_vector.py:792
+#: apps/knowledge/vector/pg_vector.py:176
+msgid "The image embedding model returned an incomplete result"
+msgstr "图片向量模型返回的结果不完整"
+
+#: apps/knowledge/services/image_documents.py:357
+msgid "The image name must retain a supported file extension"
+msgstr "图片名称必须保留受支持的文件扩展名"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:489
+msgid "The knowledge base workflow has not been published"
+msgstr "知识库工作流尚未发布"
+
+#: apps/knowledge/services/multimodal_retrieval.py:88
+#, python-brace-format
+msgid "The maximum size of a query image cannot exceed {size}MB"
+msgstr "查询图片大小不能超过 {size}MB"
+
+#: apps/knowledge/serializers/document_strategy.py:51
+msgid ""
+"The minimum paragraph length cannot exceed the maximum paragraph length"
+msgstr "最小分段长度不能大于最大分段长度"
+
+#: apps/knowledge/services/workflow_document_sync.py:41
+msgid ""
+"The original Web data source no longer exists in the knowledge workflow"
+msgstr "知识库工作流中的原 Web 数据源已不存在"
+
+#: apps/knowledge/services/workflow_sync_source.py:77
+msgid "The saved workflow data source no longer exists"
+msgstr "已保存的工作流数据源已不存在"
+
+#: apps/knowledge/services/paragraph_assets.py:478
+msgid "The selected model is not a vision model"
+msgstr "所选模型不是视觉模型"
+
+#: apps/knowledge/services/paragraph_assets.py:522
+msgid "The selected visual tool does not exist or is not authorized"
+msgstr "所选视觉工具不存在或未授权"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:423
+#: apps/tools/serializers/tool_workflow.py:242
+msgid "The start node does not exist"
+msgstr "开始节点不存在"
+
+#: apps/knowledge/services/image_documents.py:99
+msgid "The uploaded file is not a valid image"
+msgstr "上传的文件不是有效图片"
+
+#: apps/knowledge/serializers/knowledge_sync.py:57
+msgid "This field is required for a Cron schedule"
+msgstr "Cron 调度必须填写此字段"
+
+#: apps/knowledge/serializers/knowledge_sync.py:51
+msgid "This field is required for a scheduled time"
+msgstr "定时同步必须填写此字段"
+
+#: apps/knowledge/serializers/knowledge_sync.py:53
+msgid "This field is required for a weekly or monthly schedule"
+msgstr "每周或每月调度必须填写此字段"
+
+#: apps/knowledge/serializers/document_strategy.py:102
+msgid "This field is required when the custom document strategy is selected"
+msgstr "选择自定义文档策略时必须填写此字段"
+
+#: apps/knowledge/serializers/document_strategy.py:75
+msgid "This field is required when visual enhancement is enabled"
+msgstr "启用视觉增强时必须填写此字段"
+
+#: apps/knowledge/views/document.py:459 apps/knowledge/views/document.py:460
+#: apps/knowledge/views/document.py:461
+msgid "Tokenize document vector library"
+msgstr "对文档向量库分词"
+
+#: apps/knowledge/views/knowledge.py:529 apps/knowledge/views/knowledge.py:530
+#: apps/knowledge/views/knowledge.py:531
+msgid "Tokenize knowledge base"
+msgstr "对知识库分词"
+
+#: apps/knowledge/services/knowledge_archive.py:289
+msgid "Unknown file reference in knowledge content."
+msgstr "知识库内容中存在未知文件引用。"
+
+#: apps/knowledge/services/knowledge_archive.py:294
+msgid "Unknown file reference in knowledge settings."
+msgstr "知识库设置中存在未知文件引用。"
+
+#: apps/knowledge/services/knowledge_archive.py:258
+msgid "Unknown related archive resource."
+msgstr "关联的归档资源未知。"
+
+#: apps/knowledge/serializers/document.py:1640
+msgid "Unsupported document resource type"
+msgstr "不支持的文档资源类型"
+
+#: apps/knowledge/services/image_documents.py:80
+#: apps/knowledge/services/image_documents.py:92
+msgid "Unsupported image format. Supported formats: jpg, jpeg, png, webp, bmp"
+msgstr "不支持该图片格式。支持的格式：jpg、jpeg、png、webp、bmp"
+
+#: apps/knowledge/services/knowledge_archive.py:236
+msgid "Unsupported knowledge archive version."
+msgstr "不支持该知识库归档版本。"
+
+#: apps/knowledge/views/tag.py:76
+msgid "Update Knowledge Tag"
+msgstr "更新知识库标签"
+
+#: apps/knowledge/views/tag.py:77
+msgid "Update a knowledge tag"
+msgstr "更新知识库标签"
+
+#: apps/knowledge/views/knowledge.py:381 apps/knowledge/views/knowledge.py:382
+#: apps/knowledge/views/knowledge.py:383
+msgid "Update knowledge scheduled synchronization setting"
+msgstr "更新知识库定时同步设置"
+
+#: apps/knowledge/views/tag_import.py:26
+msgid ""
+"Upload an XLS or XLSX file with 标签 and 标签值 columns. Duplicate tags are "
+"skipped."
+msgstr "上传包含“标签”和“标签值”列的 XLS 或 XLSX 文件，重复标签将被跳过。"
+
+#: apps/knowledge/services/workflow_sync_source.py:85
+msgid "Web data source has no saved source URL"
+msgstr "Web 数据源未保存源地址"
+
+#: apps/knowledge/services/workflow_document_sync.py:39
+msgid "Workflow Web document is missing its source information"
+msgstr "工作流 Web 文档缺少源信息"
+
+#: apps/knowledge/services/workflow_document_sync.py:72
+msgid "Workflow knowledge has no owner available for synchronization"
+msgstr "工作流知识库没有可用于同步的所有者"
+
+#: apps/knowledge/services/paragraph_assets.py:475
+msgid "Workspace id is required for visual model validation"
+msgstr "校验视觉模型时必须提供工作空间 ID"
+
+#: apps/knowledge/services/paragraph_assets.py:518
+msgid "Workspace id is required for visual tool validation"
+msgstr "校验视觉工具时必须提供工作空间 ID"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:85
+msgid "cron_expression is required"
+msgstr "请填写 Cron 表达式"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:213
+msgid "datasource data"
+msgstr "数据源数据"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:73
+#, python-brace-format
+msgid "days must contain values from 1 to {max_day}"
+msgstr "日期必须介于 1 和 {max_day} 之间"
+
+#: apps/knowledge/serializers/document.py:714
+msgid "document strategy mode"
+msgstr "文档策略模式"
+
+#: apps/knowledge/serializers/knowledge.py:183
+msgid "file id"
+msgstr "文件 ID"
+
+#: apps/knowledge/serializers/document.py:291
+msgid "file id list"
+msgstr "文件 ID 列表"
+
+#: apps/knowledge/serializers/knowledge.py:184
+msgid "file name"
+msgstr "文件名称"
+
+#: apps/knowledge/serializers/knowledge.py:185
+msgid "file url"
+msgstr "文件地址"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:588
+msgid "function_name"
+msgstr "函数名称"
+
+#: apps/knowledge/serializers/image_document.py:40
+msgid "image file ids"
+msgstr "图片文件 ID 列表"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:79
+msgid "interval requires an integer value in minutes or hours"
+msgstr "同步间隔必须为整数，单位为分钟或小时"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:535
+msgid "knowledge action id"
+msgstr "知识库任务 ID"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:214
+msgid "knowledge base data"
+msgstr "知识库数据"
+
+#: apps/knowledge/serializers/knowledge.py:1575
+msgid "knowledge ids"
+msgstr "知识库 ID 列表"
+
+#: apps/knowledge/serializers/knowledge.py:245
+msgid "knowledge type"
+msgstr "知识库类型"
+
+#: apps/knowledge/serializers/problem.py:33
+msgid "last recall time"
+msgstr "最近召回时间"
+
+#: apps/knowledge/serializers/knowledge.py:201
+msgid "query image list"
+msgstr "查询图片列表"
+
+#: apps/knowledge/serializers/external_retrieval.py:39
+msgid "query_text must be a string."
+msgstr "查询文本必须是字符串。"
+
+#: apps/knowledge/serializers/problem.py:32
+msgid "recall count"
+msgstr "召回次数"
+
+#: apps/knowledge/serializers/common.py:73
+msgid "resource type"
+msgstr "资源类型"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:47
+msgid "schedule_type must be daily, weekly, monthly, interval or cron"
+msgstr "调度类型必须为 daily、weekly、monthly、interval 或 cron"
+
+#: apps/knowledge/serializers/document.py:2084
+#: apps/knowledge/serializers/tag.py:205
+msgid "search value"
+msgstr "搜索内容"
+
+#: apps/knowledge/serializers/external_retrieval.py:44
+msgid "similarity must be finite."
+msgstr "相似度必须是有限数值。"
+
+#: apps/application/views/application.py:649
+#: apps/application/views/application.py:650
+#: apps/application/views/application.py:651
+#: apps/application/views/application.py:685
+#: apps/application/views/application.py:686
+#: apps/application/views/application.py:687 apps/chat/views/v2/chat.py:316
+#: apps/chat/views/v2/chat.py:317 apps/chat/views/v2/chat.py:318
+#: apps/chat/views/v3/chat.py:355 apps/chat/views/v3/chat.py:356
+#: apps/knowledge/views/knowledge_workflow.py:461
+#: apps/knowledge/views/knowledge_workflow.py:462
+#: apps/knowledge/views/knowledge_workflow.py:463
+msgid "speech to text"
+msgstr "语音转文字"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:49
+msgid "sync_type must be incremental, replace or complete"
+msgstr "同步类型必须为 incremental、replace 或 complete"
+
+#: apps/knowledge/serializers/document.py:597
+msgid "tag"
+msgstr "标签"
+
+#: apps/knowledge/serializers/document.py:2160
+#: apps/knowledge/serializers/document.py:2201
+#: apps/knowledge/serializers/document.py:2228
+msgid "tag id"
+msgstr "标签 ID"
+
+#: apps/knowledge/serializers/document.py:334
+msgid "tag id list"
+msgstr "标签 ID 列表"
+
+#: apps/knowledge/serializers/document.py:2160
+#: apps/knowledge/serializers/document.py:2201
+msgid "tag ids"
+msgstr "标签 ID 列表"
+
+#: apps/knowledge/serializers/termbase.py:21
+#: apps/knowledge/serializers/termbase.py:67
+msgid "termbase id"
+msgstr "术语库 ID"
+
+#: apps/knowledge/serializers/termbase.py:28
+msgid "termbase list"
+msgstr "术语库列表"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:63
+msgid "time must be a non-empty list of HH:MM values"
+msgstr "同步时间必须为非空列表，格式为 HH:MM"
+
+#: apps/knowledge/services/document_strategy.py:69
+msgid "visual enhancement requires the selected model or tool"
+msgstr "视觉增强需要选择模型或工具"
+
+#: apps/knowledge/services/image_documents.py:118
+#: apps/knowledge/services/paragraph_assets.py:325
+msgid "visual processor adapter is unavailable"
+msgstr "视觉处理适配器不可用"
+
+#: apps/knowledge/serializers/tag_import.py:75
+msgid "仅支持上传 XLS、XLSX 格式的文件"
+msgstr "仅支持上传 XLS、XLSX 格式的文件"
+
+#: apps/knowledge/serializers/tag_import.py:43
+#, python-format
+msgid "工作表“%(sheet)s”的表头必须为“标签、标签值”，请使用标签模板"
+msgstr "工作表“%(sheet)s”的表头必须为“标签、标签值”，请使用标签模板"
+
+#: apps/knowledge/serializers/tag_import.py:54
+#, python-format
+msgid "工作表“%(sheet)s”第 %(row)s 行只能包含标签和标签值"
+msgstr "工作表“%(sheet)s”第 %(row)s 行只能包含标签和标签值"
+
+#: apps/knowledge/serializers/tag_import.py:65
+#, python-format
+msgid "工作表“%(sheet)s”第 %(row)s 行：%(message)s"
+msgstr "工作表“%(sheet)s”第 %(row)s 行：%(message)s"
+
+#: apps/knowledge/serializers/tag_import.py:23
+msgid "文件"
+msgstr "文件"
+
+#: apps/knowledge/serializers/tag_import.py:103
+msgid "文件中没有可导入的标签"
+msgstr "文件中没有可导入的标签"
+
+#: apps/knowledge/serializers/tag_import.py:94
+msgid "文件无法读取，请上传有效的 XLS 或 XLSX 文件"
+msgstr "文件无法读取，请上传有效的 XLS 或 XLSX 文件"
+
+#: apps/knowledge/serializers/tag_import.py:59
+msgid "标签"
+msgstr "标签"
+
+#: apps/knowledge/serializers/tag_import.py:59
+msgid "标签值"
+msgstr "标签值"

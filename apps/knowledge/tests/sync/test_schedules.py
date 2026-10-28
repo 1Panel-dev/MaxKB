@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 
 from django.test import SimpleTestCase
 from django.utils import timezone
+from django.utils.translation import override
 from knowledge.models import (
     Knowledge,
     KnowledgeSyncLog,
@@ -325,6 +326,7 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
         delete_documents.assert_called_with(["new-id"])
         schedule_embedding.assert_called_once()
 
+    @override("en-us")
     def test_schedule_accepts_web_and_tool_sources_but_rejects_local_source(self):
         for node_type in ("data-source-web-node", "tool-lib-node"):
             with self.subTest(node_type=node_type):
@@ -345,6 +347,7 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
                 {"data_source": {"node_id": "source"}},
             )
 
+    @override("en-us")
     def test_schedule_accepts_remote_tool_folder_but_rejects_uploaded_files(self):
         tool_flow = {"nodes": [{"id": "source", "type": "tool-lib-node", "properties": {"kind": "data-source"}}]}
         validate_workflow_sync_source(

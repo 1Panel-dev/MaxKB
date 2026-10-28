@@ -119,7 +119,7 @@ def cancel_document_task_permission(*, batch=False):
 def check_knowledge_edit_permission(request, workspace_id, knowledge_id):
     """Mixed settings updates must satisfy every submitted field's permission."""
     if not isinstance(request.data, dict):
-        raise serializers.ValidationError("Expected an object")
+        raise serializers.ValidationError(_("Expected an object"))
     allowed = partial(has_knowledge_permission, request, workspace_id, knowledge_id)
     if "doc_strategy" in request.data and not allowed(PermissionConstants.KNOWLEDGE_DOCUMENT_STRATEGY_EDIT):
         raise AppUnauthorizedFailed(403, _("No permission to access"))

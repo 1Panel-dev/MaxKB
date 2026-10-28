@@ -322,7 +322,7 @@ def process_visual_assets(
             asset.process_error = ""
         elif processor is None:
             asset.process_status = AssetProcessStatus.FAILURE
-            asset.process_error = resolver_error or "visual processor adapter is unavailable"
+            asset.process_error = resolver_error or str(_("visual processor adapter is unavailable"))
             if "description" not in edited_fields:
                 asset.description = asset.description or asset.caption
         else:

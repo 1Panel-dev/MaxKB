@@ -9776,3 +9776,1107 @@ msgstr "Application is not authorized"
 #: apps/chat/serializers/portal.py:221
 msgid "Application historical conversation is not enabled"
 msgstr "Application historical conversation is not enabled"
+
+#: apps/knowledge/serializers/knowledge.py:385
+#, python-format
+msgid "%s must be a boolean"
+msgstr "%s must be a boolean"
+
+#: apps/knowledge/services/multimodal_retrieval.py:65
+#, python-brace-format
+msgid "A maximum of {count} images can be queried at a time"
+msgstr "A maximum of {count} images can be queried at a time"
+
+#: apps/knowledge/services/image_documents.py:257
+#, python-brace-format
+msgid "A maximum of {} files can be uploaded at a time"
+msgstr "A maximum of {} files can be uploaded at a time"
+
+#: apps/knowledge/services/knowledge_archive.py:180
+msgid "A referenced file does not belong to this knowledge base."
+msgstr "A referenced file does not belong to this knowledge base."
+
+#: apps/knowledge/services/knowledge_archive.py:166
+msgid ""
+"A referenced knowledge file is missing; the archive cannot be exported "
+"completely."
+msgstr ""
+"A referenced knowledge file is missing; the archive cannot be exported "
+"completely."
+
+#: apps/knowledge/views/document.py:981 apps/knowledge/views/document.py:982
+#: apps/knowledge/views/document.py:983
+msgid "Add document tags"
+msgstr "Add document tags"
+
+#: apps/knowledge/services/knowledge_archive.py:287
+msgid "An archive file is missing."
+msgstr "An archive file is missing."
+
+#: apps/knowledge/serializers/knowledge_sync.py:55
+msgid "An interval unit and value are required"
+msgstr "An interval unit and value are required"
+
+#: apps/knowledge/serializers/image_document.py:34
+msgid "At least one field must be provided"
+msgstr "At least one field must be provided"
+
+#: apps/knowledge/serializers/external_retrieval.py:27
+msgid "At least one setting is required."
+msgstr "At least one setting is required."
+
+#: apps/knowledge/views/document.py:1045 apps/knowledge/views/document.py:1046
+msgid "Batch Delete Documents Tag"
+msgstr "Batch Delete Documents Tag"
+
+#: apps/knowledge/views/tag.py:130
+msgid "Batch Delete Knowledge Tag"
+msgstr "Batch Delete Knowledge Tag"
+
+#: apps/knowledge/views/tag.py:131
+msgid "Batch Delete a knowledge tag"
+msgstr "Batch Delete a knowledge tag"
+
+#: apps/knowledge/views/document.py:718 apps/knowledge/views/document.py:719
+msgid "Batch add tags to documents"
+msgstr "Batch add tags to documents"
+
+#: apps/knowledge/views/termbase.py:131 apps/knowledge/views/termbase.py:132
+#: apps/knowledge/views/termbase.py:133
+msgid "Batch export termbase"
+msgstr "Batch export termbase"
+
+#: apps/knowledge/views/document.py:685 apps/knowledge/views/document.py:686
+msgid "Batch tokenize document library"
+msgstr "Batch tokenize document library"
+
+#: apps/knowledge/views/knowledge_workflow.py:202
+#: apps/knowledge/views/knowledge_workflow.py:203
+#: apps/knowledge/views/knowledge_workflow.py:204
+msgid "Cancel knowledge workflow action"
+msgstr "Cancel knowledge workflow action"
+
+#: apps/knowledge/views/tag.py:23
+msgid "Create Knowledge Tag"
+msgstr "Create Knowledge Tag"
+
+#: apps/knowledge/views/document.py:1204 apps/knowledge/views/document.py:1205
+#: apps/knowledge/views/document.py:1206
+msgid "Create QA documents from uploaded files"
+msgstr "Create QA documents from uploaded files"
+
+#: apps/knowledge/views/tag.py:24
+msgid "Create a new knowledge tag"
+msgstr "Create a new knowledge tag"
+
+#: apps/knowledge/views/knowledge_workflow.py:232
+#: apps/knowledge/views/knowledge_workflow.py:233
+#: apps/knowledge/views/knowledge_workflow.py:234
+msgid "Create knowledge workflow"
+msgstr "Create knowledge workflow"
+
+#: apps/knowledge/views/document.py:1287 apps/knowledge/views/document.py:1288
+#: apps/knowledge/views/document.py:1289
+msgid "Create table documents from uploaded files"
+msgstr "Create table documents from uploaded files"
+
+#: apps/knowledge/views/termbase.py:61 apps/knowledge/views/termbase.py:62
+#: apps/knowledge/views/termbase.py:63
+msgid "Create termbase"
+msgstr "Create termbase"
+
+#: apps/knowledge/serializers/knowledge_sync.py:41
+msgid "Cron expression"
+msgstr "Cron expression"
+
+#: apps/knowledge/views/tag.py:103
+msgid "Delete Knowledge Tag"
+msgstr "Delete Knowledge Tag"
+
+#: apps/knowledge/views/tag.py:104
+msgid "Delete a knowledge tag"
+msgstr "Delete a knowledge tag"
+
+#: apps/knowledge/views/image_document.py:85
+#: apps/knowledge/views/image_document.py:86
+#: apps/knowledge/views/image_document.py:87
+msgid "Delete an image preview"
+msgstr "Delete an image preview"
+
+#: apps/knowledge/views/document.py:1007 apps/knowledge/views/document.py:1008
+#: apps/knowledge/views/document.py:1009
+msgid "Delete document tags"
+msgstr "Delete document tags"
+
+#: apps/knowledge/views/termbase.py:166 apps/knowledge/views/termbase.py:167
+#: apps/knowledge/views/termbase.py:168
+msgid "Delete termbase"
+msgstr "Delete termbase"
+
+#: apps/knowledge/serializers/document.py:1652
+#: apps/knowledge/serializers/document.py:2050
+msgid "Document does not belong to the requested resource type"
+msgstr "Document does not belong to the requested resource type"
+
+#: apps/knowledge/serializers/document.py:2255
+msgid "Document id does not belong to current knowledge"
+msgstr "Document id does not belong to current knowledge"
+
+#: apps/knowledge/serializers/document.py:2099
+#: apps/knowledge/serializers/document.py:2176
+#: apps/knowledge/serializers/document.py:2217
+#: apps/knowledge/serializers/document.py:2282
+#: apps/oss/serializers/file.py:407
+msgid "Document id does not exist"
+msgstr "Document id does not exist"
+
+#: apps/knowledge/serializers/document.py:1637
+msgid "Document id list cannot be empty"
+msgstr "Document id list cannot be empty"
+
+#: apps/knowledge/views/tag_import.py:59
+msgid "Download Knowledge Tag Template"
+msgstr "Download Knowledge Tag Template"
+
+#: apps/knowledge/services/knowledge_archive.py:218
+#: apps/knowledge/services/knowledge_archive.py:243
+msgid "Duplicate archive resource ID."
+msgstr "Duplicate archive resource ID."
+
+#: apps/knowledge/serializers/document.py:296
+msgid "Duplicate file ids are not allowed"
+msgstr "Duplicate file ids are not allowed"
+
+#: apps/knowledge/views/image_document.py:67
+#: apps/knowledge/views/image_document.py:68
+#: apps/knowledge/views/image_document.py:69
+msgid "Edit an image preview"
+msgstr "Edit an image preview"
+
+#: apps/knowledge/views/knowledge_workflow.py:369
+#: apps/knowledge/views/knowledge_workflow.py:370
+#: apps/knowledge/views/knowledge_workflow.py:371
+msgid "Edit knowledge workflow"
+msgstr "Edit knowledge workflow"
+
+#: apps/knowledge/serializers/knowledge_sync.py:31
+msgid "Enable scheduled synchronization"
+msgstr "Enable scheduled synchronization"
+
+#: apps/knowledge/serializers/document_strategy.py:15
+msgid "Enter a valid HTTP or HTTPS URL"
+msgstr "Enter a valid HTTP or HTTPS URL"
+
+#: apps/knowledge/permissions.py:122
+msgid "Expected an object"
+msgstr "Expected an object"
+
+#: apps/knowledge/services/paragraph_files.py:230
+msgid "File does not belong to the migrated paragraph"
+msgstr "File does not belong to the migrated paragraph"
+
+#: apps/knowledge/serializers/document.py:1426
+#: apps/knowledge/services/image_documents.py:309
+#: apps/knowledge/services/image_documents.py:395
+msgid "File does not exist or no permission to access"
+msgstr "File does not exist or no permission to access"
+
+#: apps/knowledge/services/knowledge_archive.py:284
+msgid "File has multiple archive owners."
+msgstr "File has multiple archive owners."
+
+#: apps/knowledge/services/knowledge_archive.py:280
+msgid "File refers to an unknown document."
+msgstr "File refers to an unknown document."
+
+#: apps/knowledge/services/knowledge_archive.py:282
+msgid "File refers to an unknown paragraph."
+msgstr "File refers to an unknown paragraph."
+
+#: apps/knowledge/views/image_document.py:25
+msgid "Generate editable previews from uploaded image file IDs"
+msgstr "Generate editable previews from uploaded image file IDs"
+
+#: apps/knowledge/views/image_document.py:26
+#: apps/knowledge/views/image_document.py:27
+msgid "Generate image previews"
+msgstr "Generate image previews"
+
+#: apps/knowledge/views/knowledge.py:473 apps/knowledge/views/knowledge.py:474
+#: apps/knowledge/views/knowledge.py:475 apps/tools/views/tool.py:601
+#: apps/tools/views/tool.py:602 apps/tools/views/tool.py:603
+#: apps/tools/views/tool_workflow.py:202 apps/tools/views/tool_workflow.py:203
+#: apps/tools/views/tool_workflow.py:204
+msgid "Get Appstore tools"
+msgstr "Get Appstore tools"
+
+#: apps/knowledge/views/tag.py:47
+msgid "Get Knowledge Tag"
+msgstr "Get Knowledge Tag"
+
+#: apps/knowledge/views/knowledge.py:795 apps/knowledge/views/knowledge.py:796
+#: apps/knowledge/views/knowledge.py:797
+msgid "Get all tags of knowledge base"
+msgstr "Get all tags of knowledge base"
+
+#: apps/knowledge/views/image_document.py:50
+#: apps/knowledge/views/image_document.py:51
+#: apps/knowledge/views/image_document.py:52
+msgid "Get an image preview"
+msgstr "Get an image preview"
+
+#: apps/knowledge/views/document.py:958 apps/knowledge/views/document.py:959
+#: apps/knowledge/views/document.py:960
+msgid "Get document tags"
+msgstr "Get document tags"
+
+#: apps/knowledge/views/knowledge.py:364 apps/knowledge/views/knowledge.py:365
+#: apps/knowledge/views/knowledge.py:366
+msgid "Get knowledge scheduled synchronization setting"
+msgstr "Get knowledge scheduled synchronization setting"
+
+#: apps/knowledge/views/knowledge.py:407 apps/knowledge/views/knowledge.py:408
+#: apps/knowledge/views/knowledge.py:409
+msgid "Get knowledge synchronization logs"
+msgstr "Get knowledge synchronization logs"
+
+#: apps/knowledge/views/tag.py:48
+msgid "Get knowledge tag"
+msgstr "Get knowledge tag"
+
+#: apps/knowledge/views/knowledge_workflow_version.py:92
+#: apps/knowledge/views/knowledge_workflow_version.py:93
+#: apps/knowledge/views/knowledge_workflow_version.py:94
+msgid "Get knowledge version details"
+msgstr "Get knowledge version details"
+
+#: apps/knowledge/views/knowledge_workflow.py:401
+#: apps/knowledge/views/knowledge_workflow.py:402
+#: apps/knowledge/views/knowledge_workflow.py:403
+msgid "Get knowledge workflow"
+msgstr "Get knowledge workflow"
+
+#: apps/knowledge/views/knowledge_workflow.py:173
+#: apps/knowledge/views/knowledge_workflow.py:174
+#: apps/knowledge/views/knowledge_workflow.py:175
+msgid "Get knowledge workflow action"
+msgstr "Get knowledge workflow action"
+
+#: apps/knowledge/views/knowledge_workflow.py:431
+#: apps/knowledge/views/knowledge_workflow.py:432
+#: apps/knowledge/views/knowledge_workflow.py:433
+msgid "Get knowledge workflow version list"
+msgstr "Get knowledge workflow version list"
+
+#: apps/knowledge/views/knowledge_workflow_version.py:43
+#: apps/knowledge/views/knowledge_workflow_version.py:44
+#: apps/knowledge/views/knowledge_workflow_version.py:45
+msgid "Get the knowledge version list"
+msgstr "Get the knowledge version list"
+
+#: apps/knowledge/views/knowledge_workflow_version.py:67
+#: apps/knowledge/views/knowledge_workflow_version.py:68
+#: apps/knowledge/views/knowledge_workflow_version.py:69
+msgid "Get the list of knowledge versions by page"
+msgstr "Get the list of knowledge versions by page"
+
+#: apps/knowledge/views/termbase.py:241 apps/knowledge/views/termbase.py:242
+#: apps/knowledge/views/termbase.py:243
+msgid "Get the list of termbase by page"
+msgstr "Get the list of termbase by page"
+
+#: apps/application/serializers/application.py:1643
+#: apps/application/serializers/application.py:822
+#: apps/knowledge/serializers/knowledge_workflow.py:668
+#: apps/knowledge/serializers/knowledge_workflow.py:927
+#: apps/tools/serializers/tool.py:1392 apps/tools/serializers/tool.py:1453
+#: apps/tools/serializers/tool.py:497
+#: apps/tools/serializers/tool_workflow.py:532
+msgid "Illegal download callback url"
+msgstr "Illegal download callback url"
+
+#: apps/application/serializers/application.py:1584
+#: apps/application/serializers/application.py:798
+#: apps/knowledge/serializers/knowledge_workflow.py:654
+#: apps/knowledge/serializers/knowledge_workflow.py:913
+#: apps/tools/serializers/tool.py:1341 apps/tools/serializers/tool.py:1412
+#: apps/tools/serializers/tool.py:482 apps/tools/serializers/tool_icon.py:22
+#: apps/tools/serializers/tool_workflow.py:516
+msgid "Illegal download url"
+msgstr "Illegal download url"
+
+#: apps/knowledge/services/knowledge_archive.py:275
+msgid "Image document has no image file."
+msgstr "Image document has no image file."
+
+#: apps/knowledge/serializers/document.py:495
+msgid "Image documents can only be migrated to a general knowledge base"
+msgstr "Image documents can only be migrated to a general knowledge base"
+
+#: apps/knowledge/services/image_documents.py:70
+msgid "Image files are only supported by general knowledge bases"
+msgstr "Image files are only supported by general knowledge bases"
+
+#: apps/knowledge/services/image_documents.py:190
+msgid "Image preview does not exist"
+msgstr "Image preview does not exist"
+
+#: apps/knowledge/services/image_documents.py:192
+#: apps/knowledge/services/image_documents.py:327
+msgid "Image preview has already been imported"
+msgstr "Image preview has already been imported"
+
+#: apps/application/workflow/nodes/search_knowledge_node/search_knowledge_node.py:290
+#: apps/knowledge/serializers/knowledge.py:214
+msgid "Image queries only support embedding or blend search"
+msgstr "Image queries only support embedding or blend search"
+
+#: apps/knowledge/views/tag_import.py:25
+msgid "Import Knowledge Tags"
+msgstr "Import Knowledge Tags"
+
+#: apps/knowledge/views/image_document.py:106
+#: apps/knowledge/views/image_document.py:107
+msgid "Import image documents"
+msgstr "Import image documents"
+
+#: apps/knowledge/views/image_document.py:105
+msgid "Import image previews as standalone image documents"
+msgstr "Import image previews as standalone image documents"
+
+#: apps/knowledge/views/document.py:302 apps/knowledge/views/document.py:303
+#: apps/knowledge/views/document.py:304
+msgid "Import text files and create documents"
+msgstr "Import text files and create documents"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:89
+msgid "Invalid Cron expression"
+msgstr "Invalid Cron expression"
+
+#: apps/knowledge/vector/milvus_vector.py:136
+msgid "Invalid Milvus vector dimension"
+msgstr "Invalid Milvus vector dimension"
+
+#: apps/knowledge/services/knowledge_archive.py:211
+#: apps/knowledge/services/knowledge_archive.py:216
+msgid "Invalid archive resource ID."
+msgstr "Invalid archive resource ID."
+
+#: apps/knowledge/services/knowledge_archive.py:208
+msgid "Invalid archive resource list."
+msgstr "Invalid archive resource list."
+
+#: apps/knowledge/services/knowledge_archive.py:302
+msgid "Invalid archive resource metadata."
+msgstr "Invalid archive resource metadata."
+
+#: apps/knowledge/services/knowledge_archive.py:309
+msgid "Invalid archive timestamp."
+msgstr "Invalid archive timestamp."
+
+#: apps/knowledge/views/document.py:79
+msgid "Invalid document processing strategy"
+msgstr "Invalid document processing strategy"
+
+#: apps/knowledge/services/knowledge_archive.py:270
+msgid "Invalid document resource type or metadata."
+msgstr "Invalid document resource type or metadata."
+
+#: apps/knowledge/services/knowledge_archive.py:267
+msgid "Invalid document tag relationship."
+msgstr "Invalid document tag relationship."
+
+#: apps/knowledge/services/knowledge_archive.py:260
+msgid "Invalid document tags."
+msgstr "Invalid document tags."
+
+#: apps/knowledge/services/knowledge_archive.py:256
+msgid "Invalid document/paragraph relationship."
+msgstr "Invalid document/paragraph relationship."
+
+#: apps/knowledge/services/knowledge_archive.py:229
+msgid "Invalid external service settings."
+msgstr "Invalid external service settings."
+
+#: apps/knowledge/services/knowledge_archive.py:278
+msgid "Invalid file metadata."
+msgstr "Invalid file metadata."
+
+#: apps/knowledge/services/knowledge_archive.py:226
+msgid "Invalid knowledge archive metadata."
+msgstr "Invalid knowledge archive metadata."
+
+#: apps/knowledge/services/knowledge_archive.py:292
+msgid "Invalid knowledge metadata."
+msgstr "Invalid knowledge metadata."
+
+#: apps/knowledge/services/image_documents.py:319
+#: apps/knowledge/services/image_documents.py:385
+msgid "Invalid number of image files"
+msgstr "Invalid number of image files"
+
+#: apps/knowledge/serializers/external_retrieval.py:17
+msgid "Invalid or unknown fields."
+msgstr "Invalid or unknown fields."
+
+#: apps/knowledge/services/knowledge_archive.py:250
+msgid "Invalid paragraph anchor."
+msgstr "Invalid paragraph anchor."
+
+#: apps/knowledge/services/knowledge_archive.py:304
+msgid "Invalid paragraph content structure."
+msgstr "Invalid paragraph content structure."
+
+#: apps/knowledge/serializers/document_strategy.py:42
+#, python-brace-format
+msgid "Invalid paragraph identifier: {error}"
+msgstr "Invalid paragraph identifier: {error}"
+
+#: apps/knowledge/services/knowledge_archive.py:313
+#: apps/knowledge/services/knowledge_archive.py:317
+msgid "Invalid synchronization settings."
+msgstr "Invalid synchronization settings."
+
+#: apps/knowledge/views/termbase.py:102 apps/knowledge/views/termbase.py:137
+#: apps/knowledge/views/termbase.py:171 apps/knowledge/views/termbase.py:208
+#: apps/knowledge/views/termbase.py:246 apps/knowledge/views/termbase.py:36
+#: apps/knowledge/views/termbase.py:67
+msgid "Knowledge Base/Documentation/Termbase"
+msgstr "Knowledge Base/Documentation/Termbase"
+
+#: apps/knowledge/views/image_document.py:111
+#: apps/knowledge/views/image_document.py:31
+#: apps/knowledge/views/image_document.py:55
+#: apps/knowledge/views/image_document.py:73
+#: apps/knowledge/views/image_document.py:90
+msgid "Knowledge Base/Images"
+msgstr "Knowledge Base/Images"
+
+#: apps/knowledge/views/document.py:1050 apps/knowledge/views/tag.py:108
+#: apps/knowledge/views/tag.py:135 apps/knowledge/views/tag.py:28
+#: apps/knowledge/views/tag.py:52 apps/knowledge/views/tag.py:81
+#: apps/knowledge/views/tag_import.py:30 apps/knowledge/views/tag_import.py:62
+msgid "Knowledge Base/Tag"
+msgstr "Knowledge Base/Tag"
+
+#: apps/knowledge/serializers/common.py:289
+#: apps/knowledge/serializers/common.py:301
+msgid "Knowledge ID or Document ID must be provided"
+msgstr "Knowledge ID or Document ID must be provided"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:550
+msgid "Knowledge action does not exist"
+msgstr "Knowledge action does not exist"
+
+#: apps/knowledge/services/knowledge_archive.py:239
+msgid "Knowledge archive resources are missing."
+msgstr "Knowledge archive resources are missing."
+
+#: apps/knowledge/serializers/external_retrieval.py:85
+msgid "Knowledge does not exist."
+msgstr "Knowledge does not exist."
+
+#: apps/application/serializers/application_chat_record.py:480
+#: apps/knowledge/serializers/document.py:1411
+#: apps/knowledge/serializers/document.py:1503
+#: apps/knowledge/serializers/document.py:1662
+#: apps/knowledge/serializers/document.py:2032
+#: apps/knowledge/serializers/document.py:2093
+#: apps/knowledge/serializers/document.py:2170
+#: apps/knowledge/serializers/document.py:2211
+#: apps/knowledge/serializers/document.py:2237
+#: apps/knowledge/serializers/document.py:2275
+#: apps/knowledge/serializers/document.py:474
+#: apps/knowledge/serializers/document.py:479
+#: apps/knowledge/serializers/document.py:731
+#: apps/knowledge/serializers/document.py:834
+#: apps/knowledge/serializers/knowledge.py:1375
+#: apps/knowledge/serializers/knowledge.py:1430
+#: apps/knowledge/serializers/knowledge.py:394
+#: apps/knowledge/serializers/knowledge_version.py:92
+#: apps/knowledge/serializers/knowledge_workflow.py:248
+#: apps/knowledge/serializers/knowledge_workflow.py:544
+#: apps/knowledge/serializers/knowledge_workflow.py:956
+#: apps/knowledge/serializers/paragraph.py:161
+#: apps/knowledge/serializers/paragraph.py:262
+#: apps/knowledge/serializers/paragraph.py:527
+#: apps/knowledge/serializers/paragraph.py:566
+#: apps/knowledge/serializers/paragraph.py:646
+#: apps/knowledge/serializers/paragraph.py:707
+#: apps/knowledge/serializers/paragraph.py:747
+#: apps/knowledge/serializers/paragraph.py:881
+#: apps/knowledge/serializers/problem.py:170
+#: apps/knowledge/serializers/problem.py:239
+#: apps/knowledge/serializers/problem.py:277
+#: apps/knowledge/serializers/problem.py:83
+#: apps/knowledge/serializers/tag.py:104 apps/knowledge/serializers/tag.py:180
+#: apps/knowledge/serializers/tag.py:214 apps/knowledge/serializers/tag.py:57
+#: apps/knowledge/serializers/tag_import.py:119
+#: apps/knowledge/serializers/termbase.py:116
+#: apps/knowledge/serializers/termbase.py:153
+#: apps/knowledge/serializers/termbase.py:45
+#: apps/knowledge/serializers/termbase.py:76
+#: apps/knowledge/services/image_documents.py:68
+#: apps/knowledge/services/paragraph_assets.py:64
+#: apps/oss/serializers/file.py:411
+msgid "Knowledge id does not exist"
+msgstr "Knowledge id does not exist"
+
+#: apps/knowledge/serializers/knowledge.py:1556
+msgid "Knowledge is already a workflow"
+msgstr "Knowledge is already a workflow"
+
+#: apps/knowledge/serializers/knowledge.py:1554
+msgid "Knowledge not found"
+msgstr "Knowledge not found"
+
+#: apps/knowledge/serializers/knowledge_version.py:83
+msgid "Knowledge version ID"
+msgstr "Knowledge version ID"
+
+#: apps/knowledge/views/knowledge_workflow.py:113
+#: apps/knowledge/views/knowledge_workflow.py:114
+#: apps/knowledge/views/knowledge_workflow.py:115
+msgid "Knowledge workflow debug"
+msgstr "Knowledge workflow debug"
+
+#: apps/knowledge/services/workflow_document_sync.py:68
+msgid "Knowledge workflow does not exist"
+msgstr "Knowledge workflow does not exist"
+
+#: apps/knowledge/views/knowledge_workflow.py:79
+#: apps/knowledge/views/knowledge_workflow.py:80
+#: apps/knowledge/views/knowledge_workflow.py:81
+msgid "Knowledge workflow upload document"
+msgstr "Knowledge workflow upload document"
+
+#: apps/knowledge/serializers/knowledge.py:166
+msgid ""
+"Knowledge-base-level default document processing strategies are only "
+"supported for Web knowledge bases. Configure document-level strategies "
+"through the document import or synchronization API."
+msgstr ""
+"Knowledge-base-level default document processing strategies are only "
+"supported for Web knowledge bases. Configure document-level strategies "
+"through the document import or synchronization API."
+
+#: apps/knowledge/views/knowledge_workflow_version.py:119
+#: apps/knowledge/views/knowledge_workflow_version.py:48
+#: apps/knowledge/views/knowledge_workflow_version.py:72
+#: apps/knowledge/views/knowledge_workflow_version.py:97
+msgid "Knowledge/Version"
+msgstr "Knowledge/Version"
+
+#: apps/knowledge/services/workflow_sync_source.py:83
+msgid "Local file data sources cannot be synchronized on a schedule"
+msgstr "Local file data sources cannot be synchronized on a schedule"
+
+#: apps/knowledge/services/knowledge_archive.py:299
+msgid "Missing archive resource field."
+msgstr "Missing archive resource field."
+
+#: apps/knowledge/views/knowledge_workflow_version.py:113
+#: apps/knowledge/views/knowledge_workflow_version.py:114
+#: apps/knowledge/views/knowledge_workflow_version.py:115
+msgid "Modify knowledge version information"
+msgstr "Modify knowledge version information"
+
+#: apps/knowledge/views/termbase.py:202 apps/knowledge/views/termbase.py:203
+#: apps/knowledge/views/termbase.py:204
+msgid "Modify termbase"
+msgstr "Modify termbase"
+
+#: apps/knowledge/serializers/document.py:1378
+msgid "No importable paragraphs found"
+msgstr "No importable paragraphs found"
+
+#: apps/knowledge/services/multimodal_retrieval.py:78
+msgid "No permission to access the query image"
+msgstr "No permission to access the query image"
+
+#: apps/knowledge/models/knowledge.py:596
+msgid "OSS storage is not configured"
+msgstr "OSS storage is not configured"
+
+#: apps/knowledge/services/image_documents.py:393
+msgid "One or more image previews cannot be imported"
+msgstr "One or more image previews cannot be imported"
+
+#: apps/knowledge/services/multimodal_retrieval.py:82
+msgid "Only image files can be used for image queries"
+msgstr "Only image files can be used for image queries"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:965
+msgid "Only support transport=sse or transport=streamable_http"
+msgstr "Only support transport=sse or transport=streamable_http"
+
+#: apps/knowledge/views/knowledge_workflow.py:143
+#: apps/knowledge/views/knowledge_workflow.py:144
+#: apps/knowledge/views/knowledge_workflow.py:145
+msgid "Page Knowledge workflow action"
+msgstr "Page Knowledge workflow action"
+
+#: apps/knowledge/serializers/document_strategy.py:57
+msgid "Paragraph identifiers are only supported in advanced split mode"
+msgstr "Paragraph identifiers are only supported in advanced split mode"
+
+#: apps/knowledge/services/knowledge_archive.py:247
+msgid "Paragraph refers to an unknown document."
+msgstr "Paragraph refers to an unknown document."
+
+#: apps/knowledge/services/image_documents.py:383
+msgid "Please select at least one image preview"
+msgstr "Please select at least one image preview"
+
+#: apps/knowledge/services/image_documents.py:252
+msgid "Please upload at least one image"
+msgstr "Please upload at least one image"
+
+#: apps/knowledge/views/knowledge_workflow.py:256
+#: apps/knowledge/views/knowledge_workflow.py:257
+#: apps/knowledge/views/knowledge_workflow.py:258
+msgid "Publishing an knowledge"
+msgstr "Publishing an knowledge"
+
+#: apps/knowledge/services/multimodal_retrieval.py:74
+#, python-brace-format
+msgid "Query image does not exist: {file_id}"
+msgstr "Query image does not exist: {file_id}"
+
+#: apps/knowledge/serializers/knowledge.py:211
+msgid "Query text and query images cannot both be empty"
+msgstr "Query text and query images cannot both be empty"
+
+#: apps/knowledge/views/document.py:930 apps/knowledge/views/document.py:931
+msgid "Replace source file"
+msgstr "Replace source file"
+
+#: apps/knowledge/services/workflow_sync_source.py:74
+msgid "Run the workflow once before enabling scheduled synchronization"
+msgstr "Run the workflow once before enabling scheduled synchronization"
+
+#: apps/knowledge/serializers/knowledge_sync.py:35
+msgid "Schedule type"
+msgstr "Schedule type"
+
+#: apps/knowledge/serializers/knowledge_sync.py:78
+msgid "Scheduled synchronization is not supported for this knowledge base"
+msgstr "Scheduled synchronization is not supported for this knowledge base"
+
+#: apps/knowledge/views/document.py:268 apps/knowledge/views/document.py:269
+#: apps/knowledge/views/document.py:270
+msgid "Segmented document by file ids"
+msgstr "Segmented document by file ids"
+
+#: apps/knowledge/serializers/document.py:369
+msgid "Select documents of the same resource type"
+msgstr "Select documents of the same resource type"
+
+#: apps/knowledge/task/sync.py:153
+#, python-brace-format
+msgid ""
+"Start--->Start synchronization web knowledge base:{knowledge_id}, "
+"type:{sync_type}"
+msgstr ""
+"Start--->Start synchronization web knowledge base:{knowledge_id}, "
+"type:{sync_type}"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:223
+#: apps/tools/serializers/tool_workflow.py:140
+msgid "State"
+msgstr "State"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:119
+msgid "Synchronization interval must be at least 5 minutes"
+msgstr "Synchronization interval must be at least 5 minutes"
+
+#: apps/knowledge/services/workflow_document_sync.py:77
+msgid "Synchronization is already running"
+msgstr "Synchronization is already running"
+
+#: apps/knowledge/serializers/knowledge_sync.py:37
+msgid "Synchronization time"
+msgstr "Synchronization time"
+
+#: apps/knowledge/serializers/knowledge_sync.py:45
+msgid "Synchronization type"
+msgstr "Synchronization type"
+
+#: apps/knowledge/task/sync.py:456
+#, python-brace-format
+msgid "Synchronize web document:{source_url} error{error}{traceback}"
+msgstr "Synchronize web document:{source_url} error{error}{traceback}"
+
+#: apps/knowledge/serializers/tag.py:95
+msgid "Tag ID"
+msgstr "Tag ID"
+
+#: apps/knowledge/serializers/tag.py:171
+msgid "Tag IDs"
+msgstr "Tag IDs"
+
+#: apps/knowledge/views/termbase.py:31 apps/knowledge/views/termbase.py:32
+#: apps/knowledge/views/termbase.py:33
+msgid "Termbase list"
+msgstr "Termbase list"
+
+#: apps/application/workflow/nodes/search_knowledge_node/search_knowledge_node.py:292
+#: apps/knowledge/serializers/knowledge.py:1444
+#: apps/knowledge/vector/milvus_vector.py:779
+#: apps/knowledge/vector/pg_vector.py:163
+#: apps/models_provider/base_model_provider.py:135
+msgid "The current embedding model does not support image embedding"
+msgstr "The current embedding model does not support image embedding"
+
+#: apps/knowledge/vector/pg_vector.py:110
+msgid "The embedding model returned an incomplete result"
+msgstr "The embedding model returned an incomplete result"
+
+#: apps/knowledge/services/paragraph_assets.py:601
+msgid "The image description embedding model returned an incomplete result"
+msgstr "The image description embedding model returned an incomplete result"
+
+#: apps/knowledge/services/paragraph_assets.py:627
+#: apps/knowledge/vector/milvus_vector.py:792
+#: apps/knowledge/vector/pg_vector.py:176
+msgid "The image embedding model returned an incomplete result"
+msgstr "The image embedding model returned an incomplete result"
+
+#: apps/knowledge/services/image_documents.py:357
+msgid "The image name must retain a supported file extension"
+msgstr "The image name must retain a supported file extension"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:489
+msgid "The knowledge base workflow has not been published"
+msgstr "The knowledge base workflow has not been published"
+
+#: apps/knowledge/services/multimodal_retrieval.py:88
+#, python-brace-format
+msgid "The maximum size of a query image cannot exceed {size}MB"
+msgstr "The maximum size of a query image cannot exceed {size}MB"
+
+#: apps/knowledge/serializers/document_strategy.py:51
+msgid ""
+"The minimum paragraph length cannot exceed the maximum paragraph length"
+msgstr ""
+"The minimum paragraph length cannot exceed the maximum paragraph length"
+
+#: apps/knowledge/services/workflow_document_sync.py:41
+msgid ""
+"The original Web data source no longer exists in the knowledge workflow"
+msgstr ""
+"The original Web data source no longer exists in the knowledge workflow"
+
+#: apps/knowledge/services/workflow_sync_source.py:77
+msgid "The saved workflow data source no longer exists"
+msgstr "The saved workflow data source no longer exists"
+
+#: apps/knowledge/services/paragraph_assets.py:478
+msgid "The selected model is not a vision model"
+msgstr "The selected model is not a vision model"
+
+#: apps/knowledge/services/paragraph_assets.py:522
+msgid "The selected visual tool does not exist or is not authorized"
+msgstr "The selected visual tool does not exist or is not authorized"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:423
+#: apps/tools/serializers/tool_workflow.py:242
+msgid "The start node does not exist"
+msgstr "The start node does not exist"
+
+#: apps/knowledge/services/image_documents.py:99
+msgid "The uploaded file is not a valid image"
+msgstr "The uploaded file is not a valid image"
+
+#: apps/knowledge/serializers/knowledge_sync.py:57
+msgid "This field is required for a Cron schedule"
+msgstr "This field is required for a Cron schedule"
+
+#: apps/knowledge/serializers/knowledge_sync.py:51
+msgid "This field is required for a scheduled time"
+msgstr "This field is required for a scheduled time"
+
+#: apps/knowledge/serializers/knowledge_sync.py:53
+msgid "This field is required for a weekly or monthly schedule"
+msgstr "This field is required for a weekly or monthly schedule"
+
+#: apps/knowledge/serializers/document_strategy.py:102
+msgid "This field is required when the custom document strategy is selected"
+msgstr "This field is required when the custom document strategy is selected"
+
+#: apps/knowledge/serializers/document_strategy.py:75
+msgid "This field is required when visual enhancement is enabled"
+msgstr "This field is required when visual enhancement is enabled"
+
+#: apps/knowledge/views/document.py:459 apps/knowledge/views/document.py:460
+#: apps/knowledge/views/document.py:461
+msgid "Tokenize document vector library"
+msgstr "Tokenize document vector library"
+
+#: apps/knowledge/views/knowledge.py:529 apps/knowledge/views/knowledge.py:530
+#: apps/knowledge/views/knowledge.py:531
+msgid "Tokenize knowledge base"
+msgstr "Tokenize knowledge base"
+
+#: apps/knowledge/services/knowledge_archive.py:289
+msgid "Unknown file reference in knowledge content."
+msgstr "Unknown file reference in knowledge content."
+
+#: apps/knowledge/services/knowledge_archive.py:294
+msgid "Unknown file reference in knowledge settings."
+msgstr "Unknown file reference in knowledge settings."
+
+#: apps/knowledge/services/knowledge_archive.py:258
+msgid "Unknown related archive resource."
+msgstr "Unknown related archive resource."
+
+#: apps/knowledge/serializers/document.py:1640
+msgid "Unsupported document resource type"
+msgstr "Unsupported document resource type"
+
+#: apps/knowledge/services/image_documents.py:80
+#: apps/knowledge/services/image_documents.py:92
+msgid "Unsupported image format. Supported formats: jpg, jpeg, png, webp, bmp"
+msgstr ""
+"Unsupported image format. Supported formats: jpg, jpeg, png, webp, bmp"
+
+#: apps/knowledge/services/knowledge_archive.py:236
+msgid "Unsupported knowledge archive version."
+msgstr "Unsupported knowledge archive version."
+
+#: apps/knowledge/views/tag.py:76
+msgid "Update Knowledge Tag"
+msgstr "Update Knowledge Tag"
+
+#: apps/knowledge/views/tag.py:77
+msgid "Update a knowledge tag"
+msgstr "Update a knowledge tag"
+
+#: apps/knowledge/views/knowledge.py:381 apps/knowledge/views/knowledge.py:382
+#: apps/knowledge/views/knowledge.py:383
+msgid "Update knowledge scheduled synchronization setting"
+msgstr "Update knowledge scheduled synchronization setting"
+
+#: apps/knowledge/views/tag_import.py:26
+msgid ""
+"Upload an XLS or XLSX file with 标签 and 标签值 columns. Duplicate tags are "
+"skipped."
+msgstr ""
+"Upload an XLS or XLSX file with 标签 and 标签值 columns. Duplicate tags are "
+"skipped."
+
+#: apps/knowledge/services/workflow_sync_source.py:85
+msgid "Web data source has no saved source URL"
+msgstr "Web data source has no saved source URL"
+
+#: apps/knowledge/services/workflow_document_sync.py:39
+msgid "Workflow Web document is missing its source information"
+msgstr "Workflow Web document is missing its source information"
+
+#: apps/knowledge/services/workflow_document_sync.py:72
+msgid "Workflow knowledge has no owner available for synchronization"
+msgstr "Workflow knowledge has no owner available for synchronization"
+
+#: apps/knowledge/services/paragraph_assets.py:475
+msgid "Workspace id is required for visual model validation"
+msgstr "Workspace id is required for visual model validation"
+
+#: apps/knowledge/services/paragraph_assets.py:518
+msgid "Workspace id is required for visual tool validation"
+msgstr "Workspace id is required for visual tool validation"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:85
+msgid "cron_expression is required"
+msgstr "cron_expression is required"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:213
+msgid "datasource data"
+msgstr "datasource data"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:73
+#, python-brace-format
+msgid "days must contain values from 1 to {max_day}"
+msgstr "days must contain values from 1 to {max_day}"
+
+#: apps/knowledge/serializers/document.py:714
+msgid "document strategy mode"
+msgstr "document strategy mode"
+
+#: apps/knowledge/serializers/knowledge.py:183
+msgid "file id"
+msgstr "file id"
+
+#: apps/knowledge/serializers/document.py:291
+msgid "file id list"
+msgstr "file id list"
+
+#: apps/knowledge/serializers/knowledge.py:184
+msgid "file name"
+msgstr "file name"
+
+#: apps/knowledge/serializers/knowledge.py:185
+msgid "file url"
+msgstr "file url"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:588
+msgid "function_name"
+msgstr "function_name"
+
+#: apps/knowledge/serializers/image_document.py:40
+msgid "image file ids"
+msgstr "image file ids"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:79
+msgid "interval requires an integer value in minutes or hours"
+msgstr "interval requires an integer value in minutes or hours"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:535
+msgid "knowledge action id"
+msgstr "knowledge action id"
+
+#: apps/knowledge/serializers/knowledge_workflow.py:214
+msgid "knowledge base data"
+msgstr "knowledge base data"
+
+#: apps/knowledge/serializers/knowledge.py:1575
+msgid "knowledge ids"
+msgstr "knowledge ids"
+
+#: apps/knowledge/serializers/knowledge.py:245
+msgid "knowledge type"
+msgstr "knowledge type"
+
+#: apps/knowledge/serializers/problem.py:33
+msgid "last recall time"
+msgstr "last recall time"
+
+#: apps/knowledge/serializers/knowledge.py:201
+msgid "query image list"
+msgstr "query image list"
+
+#: apps/knowledge/serializers/external_retrieval.py:39
+msgid "query_text must be a string."
+msgstr "query_text must be a string."
+
+#: apps/knowledge/serializers/problem.py:32
+msgid "recall count"
+msgstr "recall count"
+
+#: apps/knowledge/serializers/common.py:73
+msgid "resource type"
+msgstr "resource type"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:47
+msgid "schedule_type must be daily, weekly, monthly, interval or cron"
+msgstr "schedule_type must be daily, weekly, monthly, interval or cron"
+
+#: apps/knowledge/serializers/document.py:2084
+#: apps/knowledge/serializers/tag.py:205
+msgid "search value"
+msgstr "search value"
+
+#: apps/knowledge/serializers/external_retrieval.py:44
+msgid "similarity must be finite."
+msgstr "similarity must be finite."
+
+#: apps/application/views/application.py:649
+#: apps/application/views/application.py:650
+#: apps/application/views/application.py:651
+#: apps/application/views/application.py:685
+#: apps/application/views/application.py:686
+#: apps/application/views/application.py:687 apps/chat/views/v2/chat.py:316
+#: apps/chat/views/v2/chat.py:317 apps/chat/views/v2/chat.py:318
+#: apps/chat/views/v3/chat.py:355 apps/chat/views/v3/chat.py:356
+#: apps/knowledge/views/knowledge_workflow.py:461
+#: apps/knowledge/views/knowledge_workflow.py:462
+#: apps/knowledge/views/knowledge_workflow.py:463
+msgid "speech to text"
+msgstr "speech to text"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:49
+msgid "sync_type must be incremental, replace or complete"
+msgstr "sync_type must be incremental, replace or complete"
+
+#: apps/knowledge/serializers/document.py:597
+msgid "tag"
+msgstr "tag"
+
+#: apps/knowledge/serializers/document.py:2160
+#: apps/knowledge/serializers/document.py:2201
+#: apps/knowledge/serializers/document.py:2228
+msgid "tag id"
+msgstr "tag id"
+
+#: apps/knowledge/serializers/document.py:334
+msgid "tag id list"
+msgstr "tag id list"
+
+#: apps/knowledge/serializers/document.py:2160
+#: apps/knowledge/serializers/document.py:2201
+msgid "tag ids"
+msgstr "tag ids"
+
+#: apps/knowledge/serializers/termbase.py:21
+#: apps/knowledge/serializers/termbase.py:67
+msgid "termbase id"
+msgstr "termbase id"
+
+#: apps/knowledge/serializers/termbase.py:28
+msgid "termbase list"
+msgstr "termbase list"
+
+#: apps/knowledge/services/knowledge_sync_schedule.py:63
+msgid "time must be a non-empty list of HH:MM values"
+msgstr "time must be a non-empty list of HH:MM values"
+
+#: apps/knowledge/services/document_strategy.py:69
+msgid "visual enhancement requires the selected model or tool"
+msgstr "visual enhancement requires the selected model or tool"
+
+#: apps/knowledge/services/image_documents.py:118
+#: apps/knowledge/services/paragraph_assets.py:325
+msgid "visual processor adapter is unavailable"
+msgstr "visual processor adapter is unavailable"
+
+#: apps/knowledge/serializers/tag_import.py:75
+msgid "仅支持上传 XLS、XLSX 格式的文件"
+msgstr "Only XLS and XLSX files are supported"
+
+#: apps/knowledge/serializers/tag_import.py:43
+#, python-format
+msgid "工作表“%(sheet)s”的表头必须为“标签、标签值”，请使用标签模板"
+msgstr ""
+"The headers in worksheet \"%(sheet)s\" must be \"标签, 标签值\". Please use the "
+"tag template"
+
+#: apps/knowledge/serializers/tag_import.py:54
+#, python-format
+msgid "工作表“%(sheet)s”第 %(row)s 行只能包含标签和标签值"
+msgstr ""
+"Row %(row)s in worksheet \"%(sheet)s\" must contain only a tag and a tag "
+"value"
+
+#: apps/knowledge/serializers/tag_import.py:65
+#, python-format
+msgid "工作表“%(sheet)s”第 %(row)s 行：%(message)s"
+msgstr "Worksheet \"%(sheet)s\", row %(row)s: %(message)s"
+
+#: apps/knowledge/serializers/tag_import.py:23
+msgid "文件"
+msgstr "File"
+
+#: apps/knowledge/serializers/tag_import.py:103
+msgid "文件中没有可导入的标签"
+msgstr "No importable tags were found in the file"
+
+#: apps/knowledge/serializers/tag_import.py:94
+msgid "文件无法读取，请上传有效的 XLS 或 XLSX 文件"
+msgstr "The file could not be read. Please upload a valid XLS or XLSX file"
+
+#: apps/knowledge/serializers/tag_import.py:59
+msgid "标签"
+msgstr "Tag"
+
+#: apps/knowledge/serializers/tag_import.py:59
+msgid "标签值"
+msgstr "Tag value"

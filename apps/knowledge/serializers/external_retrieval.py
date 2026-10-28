@@ -3,6 +3,7 @@ import math
 import shlex
 
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from knowledge.models import Knowledge
@@ -12,7 +13,7 @@ from maxkb.const import CONFIG
 class StrictSerializer(serializers.Serializer):
     def to_internal_value(self, data):
         if not isinstance(data, dict) or set(data) - set(self.fields):
-            raise serializers.ValidationError({"non_field_errors": ["Invalid or unknown fields."]})
+            raise serializers.ValidationError({"non_field_errors": [_("Invalid or unknown fields.")]})
         return super().to_internal_value(data)
 
 
@@ -22,7 +23,7 @@ class ExternalServiceSettings(StrictSerializer):
 
     def validate(self, attrs):
         if not attrs:
-            raise serializers.ValidationError("At least one setting is required.")
+            raise serializers.ValidationError(_("At least one setting is required."))
         return attrs
 
 
@@ -34,12 +35,12 @@ class RetrievalRequest(StrictSerializer):
 
     def to_internal_value(self, data):
         if isinstance(data, dict) and not isinstance(data.get("query_text"), str):
-            raise serializers.ValidationError({"query_text": ["query_text must be a string."]})
+            raise serializers.ValidationError({"query_text": [_("query_text must be a string.")]})
         return super().to_internal_value(data)
 
     def validate_similarity(self, value):
         if not math.isfinite(value):
-            raise serializers.ValidationError("similarity must be finite.")
+            raise serializers.ValidationError(_("similarity must be finite."))
         return value
 
 
@@ -80,7 +81,7 @@ class ExternalServiceSerializer(serializers.Serializer):
         if knowledge is None:
             from common.exception.app_exception import NotFound404
 
-            raise NotFound404(404, "Knowledge does not exist.")
+            raise NotFound404(404, _("Knowledge does not exist."))
         return knowledge
 
     def get_settings(self):

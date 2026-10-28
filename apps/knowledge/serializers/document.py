@@ -366,7 +366,7 @@ def normalize_document_resource_type(knowledge_id, instance, field_name="id_list
         Document.objects.filter(knowledge_id=knowledge_id, id__in=document_ids).values_list("resource_type", flat=True)
     )
     if len(resource_types) > 1:
-        raise serializers.ValidationError("Select documents of the same resource type")
+        raise serializers.ValidationError(_("Select documents of the same resource type"))
     return {**instance, "resource_type": next(iter(resource_types), DocumentResourceType.DOCUMENT)}
 
 

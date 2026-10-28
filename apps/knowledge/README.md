@@ -1,5 +1,17 @@
 # Knowledge document processing
 
+## Backend translations
+
+User-facing validation errors must use Django translation functions with literal message IDs.
+Keep the `zh_CN`, `zh_Hant`, and `en_US` catalogs in `apps/locales/` in sync, including format
+placeholders. Translate service errors at their source before converting them to serializer errors.
+Run `uv run python apps/manage.py test knowledge.tests.test_i18n` to check catalog coverage and
+language-dependent validation messages. The tests compile catalogs in a temporary directory.
+After changing catalogs, run `uv run python apps/manage.py compilemessages` from the repository root
+and restart the web and task services to reload translations.
+
+## Document processing
+
 Document imports save paragraphs, original inline images, and `ParagraphAsset` records
 in the import transaction. With visual enhancement enabled, image assets remain `pending`;
 the request does not call the vision model or tool.

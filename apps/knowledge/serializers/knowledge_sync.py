@@ -99,7 +99,7 @@ class KnowledgeSyncSettingOperationSerializer(serializers.Serializer):
             try:
                 validate_workflow_sync_source(work_flow, workflow_input)
             except ValueError as exc:
-                raise serializers.ValidationError(_(str(exc))) from exc
+                raise serializers.ValidationError(str(exc)) from exc
         knowledge_id = selected_knowledge.id
         with transaction.atomic():
             knowledge = QuerySet(Knowledge).select_for_update().get(id=knowledge_id)

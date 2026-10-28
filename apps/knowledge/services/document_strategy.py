@@ -5,6 +5,8 @@ import json
 from copy import deepcopy
 from typing import Dict, Iterable, List
 
+from django.utils.translation import gettext as _
+
 from common.utils.split_model import SplitModel, get_split_model
 
 DEFAULT_DOCUMENT_STRATEGY = {
@@ -64,7 +66,7 @@ def normalize_document_strategy(strategy: Dict | None) -> Dict:
     if visual["enabled"]:
         selected = visual.get("model_id") if visual["strategy"] == "model" else visual.get("tool_id")
         if not selected:
-            raise ValueError("visual enhancement requires the selected model or tool")
+            raise ValueError(_("visual enhancement requires the selected model or tool"))
     visual["model_id"] = str(visual["model_id"]) if visual.get("model_id") else None
     visual["tool_id"] = str(visual["tool_id"]) if visual.get("tool_id") else None
     result["index"]["title_as_question"] = bool(result["index"].get("title_as_question", False))

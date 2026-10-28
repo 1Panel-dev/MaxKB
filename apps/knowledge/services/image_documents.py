@@ -115,7 +115,7 @@ class ImageDocumentService:
         try:
             processor = resolve_visual_processor(visual, workspace_id)
             if processor is None:
-                raise ValueError("visual processor adapter is unavailable")
+                raise ValueError(_("visual processor adapter is unavailable"))
             asset = ParagraphAsset(file=file, file_id=file.id, position=1)
             output = processor(asset, visual) or {}
             caption = str(output.get("caption") or "")

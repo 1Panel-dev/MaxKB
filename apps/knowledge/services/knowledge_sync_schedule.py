@@ -8,6 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from django.db.models import QuerySet
 from django.utils import timezone
+from django.utils.translation import gettext
 
 from common.utils.logger import maxkb_logger
 from knowledge.models import Knowledge, KnowledgeType
@@ -42,9 +43,9 @@ def normalize_knowledge_sync_setting(setting=None) -> dict:
     value = setting or DEFAULT_KNOWLEDGE_SYNC_SETTING
     schedule_type = value.get("schedule_type")
     if schedule_type not in {"daily", "weekly", "monthly", "interval", "cron"}:
-        raise ValueError("schedule_type must be daily, weekly, monthly, interval or cron")
+        raise ValueError(gettext("schedule_type must be daily, weekly, monthly, interval or cron"))
     if value.get("sync_type") not in KNOWLEDGE_SYNC_TYPES:
-        raise ValueError("sync_type must be incremental, replace or complete")
+        raise ValueError(gettext("sync_type must be incremental, replace or complete"))
     normalized = {
         "enabled": bool(value.get("enabled", False)),
         "schedule_type": schedule_type,
@@ -58,7 +59,7 @@ def normalize_knowledge_sync_setting(setting=None) -> dict:
             or not times
             or any(not isinstance(t, str) or not TIME_PATTERN.fullmatch(t) for t in times)
         ):
-            raise ValueError("time must be a non-empty list of HH:MM values")
+            raise ValueError(gettext("time must be a non-empty list of HH:MM values"))
         normalized["time"] = times
         if schedule_type in {"weekly", "monthly"}:
             days = value.get("days")
@@ -68,20 +69,23 @@ def normalize_knowledge_sync_setting(setting=None) -> dict:
                 or not days
                 or any(isinstance(day, bool) or not str(day).isdigit() or not 1 <= int(day) <= max_day for day in days)
             ):
-                raise ValueError(f"days must contain values from 1 to {max_day}")
+                raise ValueError(gettext("days must contain values from 1 to {max_day}").format(max_day=max_day))
             normalized["days"] = [int(day) for day in days]
     elif schedule_type == "interval":
         unit = value.get("interval_unit")
         interval = value.get("interval_value")
         if unit not in {"minutes", "hours"} or isinstance(interval, bool) or not isinstance(interval, int):
-            raise ValueError("interval requires an integer value in minutes or hours")
+            raise ValueError(gettext("interval requires an integer value in minutes or hours"))
         normalized["interval_unit"] = unit
         normalized["interval_value"] = interval
     else:
         expression = str(value.get("cron_expression") or "").strip()
         if not expression:
-            raise ValueError("cron_expression is required")
-        CronTrigger.from_crontab(expression)
+            raise ValueError(gettext("cron_expression is required"))
+        try:
+            CronTrigger.from_crontab(expression)
+        except ValueError as exc:
+            raise ValueError(gettext("Invalid Cron expression")) from exc
         normalized["cron_expression"] = expression
     _validate_min_frequency(knowledge_sync_triggers(normalized))
     return normalized
@@ -111,7 +115,7 @@ def _validate_min_frequency(triggers: list) -> None:
             break
         fire, index = min(pending)
         if previous_fire is not None and fire - previous_fire < MIN_SYNC_INTERVAL:
-            raise ValueError("Synchronization interval must be at least 5 minutes")
+            raise ValueError(gettext("Synchronization interval must be at least 5 minutes"))
         previous_fire = fire
         next_fires[index] = triggers[index].get_next_fire_time(fire, fire + timedelta(microseconds=1))
 
