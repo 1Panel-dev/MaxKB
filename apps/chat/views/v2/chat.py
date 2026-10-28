@@ -24,7 +24,6 @@ from application.api.application_api import SpeechToTextAPI, TextToSpeechAPI
 from application.models import ChatUserType, ChatSourceChoices
 from chat.api.chat_api import ChatAPI
 from chat.api.chat_authentication_api import (
-    ChatAuthenticationAPI,
     ChatAuthenticationProfileAPIV2,
     ChatOpenAPI,
     OpenAIAPI,
@@ -44,7 +43,6 @@ from chat.serializers.chat_authentication import (
 from common.auth import ChatTokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
-from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.exception.app_exception import AppAuthenticationFailed, AppApiException
 from common.log.log import _get_ip_address, log
@@ -55,8 +53,7 @@ from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
 from oss.serializers.file import FileSerializer
 from system_manage.serializers.chat_user import RePasswordSerializer, ChatUserProfileSerializer
-from system_manage.serializers.chat_user_serializer import ChatUserAccessTokenSerializer
-from users.api import CaptchaAPI, LoginAPI
+from users.api import CaptchaAPI
 from users.api.user import ResetPasswordAPI, UserProfileAPI
 from users.serializers.login import CaptchaSerializer
 from users.views import get_re_password_details
@@ -409,7 +406,7 @@ class ResetCurrentUserPasswordView(APIView):
                 decrypted_data = json.loads(decrypted_raw) if decrypted_raw else {}
                 if isinstance(decrypted_data, dict):
                     request_data = decrypted_data
-            except Exception as e:
+            except Exception:
                 raise AppApiException(500, _("Invalid encrypted data"))
         serializer_obj = RePasswordSerializer(data=request_data)
         if serializer_obj.reset_password(request.user.id):
@@ -433,48 +430,6 @@ class ChatUserProfileView(APIView):
     )
     def get(self, request: Request):
         return result.success(ChatUserProfileSerializer().profile(request.user))
-
-
-class BaseAuthView(APIView):
-    @staticmethod
-    def create_token_and_cache(access_token, user, request):
-        token = ChatUserAccessTokenSerializer.create_token_and_cache(access_token, user, request)
-        version, get_key = Cache_Version.CHAT_USER_TOKEN.value
-        cache.set(get_key(token), user, timeout=60 * 60 * 2, version=version)
-        return token
-
-    @classmethod
-    def generate(self, request, f_token: str, response: HttpResponse, path: str = "/chat"):
-        secure = request.is_secure()
-        response.set_cookie(
-            "mk_file_auth",
-            value=f_token,
-            max_age=7 * 24 * 3600,
-            path=path,
-            domain=None,
-            secure=secure,
-            httponly=True,
-            samesite="Lax",
-        )
-        return response
-
-
-class LocalLoginView(BaseAuthView):
-    @extend_schema(
-        methods=["POST"],
-        description=_("Log in"),
-        summary=_("Log in"),
-        operation_id=_("Log in"),  # type: ignore
-        tags=[_("Chat User/login")],  # type: ignore
-        request=LoginAPI.get_request(),
-        responses=LoginAPI.get_response(),
-    )
-    def post(self, request: Request, access_token: str = None):
-        user = ChatUserAccessTokenSerializer.local_login(request.data, access_token)
-        user.source = "LOCAL"
-        token = self.create_token_and_cache(access_token, user, request)
-        response = result.success({"token": token})
-        return self.generate(request, token, response, path=f"/chat/{access_token}/")
 
 
 class Logout(APIView):
