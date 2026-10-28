@@ -1,7 +1,9 @@
 import asyncio
 import json
 from copy import deepcopy
-from unittest.mock import MagicMock, patch
+from tempfile import TemporaryDirectory
+from types import SimpleNamespace
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from django.test import SimpleTestCase
 from langchain_core.messages import AIMessageChunk, HumanMessage, SystemMessage, ToolMessage
@@ -9,8 +11,10 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 
 from application.workflow.common import WorkflowType
+from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.tool_content import ToolContent
+from application.workflow.nodes.ai_chat_node import agent as agent_module
 from application.workflow.nodes.ai_chat_node.ai_chat_node import AIChatNode
 from application.workflow.status import Status
 
@@ -195,6 +199,110 @@ class AIChatToolOutputTests(SimpleTestCase):
 
     def test_result_without_call_chunk_uses_message_name(self):
         self.assertEqual(self._display("result").name, "tool")
+
+    def test_internal_summary_events_never_reach_answer_or_tool_cards(self):
+        ordinary = AIMessageChunk(content="summary is an ordinary word")
+        events = [
+            (AIMessageChunk(content="internal summary"), {"lc_source": "summarization", "langgraph_node": "model"}),
+            (
+                AIMessageChunk(
+                    content="",
+                    tool_call_chunks=[{"name": "hidden", "args": "{}", "id": "call_hidden", "index": 0}],
+                ),
+                {"lc_source": "summarization", "langgraph_node": "model"},
+            ),
+            (ordinary, {"langgraph_node": "model"}),
+            (AIMessageChunk(content="; done"), {}),
+        ]
+
+        def emit(on_next):
+            async def stream(*args, **kwargs):
+                for event in events:
+                    yield event
+
+            def on_complete(error):
+                if error:
+                    raise error
+
+            with (
+                TemporaryDirectory(prefix="maxkb-summary-test-") as directory,
+                patch.object(agent_module, "init_skills", new=AsyncMock()),
+                patch.object(
+                    agent_module,
+                    "MultiServerMCPClient",
+                    return_value=SimpleNamespace(get_tools=AsyncMock(return_value=[])),
+                ),
+                patch.object(agent_module, "SandboxShellBackend"),
+                patch.object(agent_module, "create_deep_agent", return_value=SimpleNamespace(astream=stream)),
+            ):
+                agent_module.create_agent(
+                    MagicMock(),
+                    "system",
+                    [],
+                    "{}",
+                    SimpleNamespace(on_next=on_next, on_complete=on_complete),
+                    chat_id=directory,
+                    async_runner=SimpleNamespace(run_async=lambda fn: asyncio.run(fn())),
+                )
+
+        for enabled in (True, False):
+            with self.subTest(enabled=enabled):
+                node, output = self._run_messages(enabled=enabled, emit=emit)
+                self.assertEqual(node._write_final_context.call_args.args[3], ordinary.content + "; done")
+                self.assertEqual("".join(item.content for item in output), ordinary.content + "; done")
+                self.assertFalse(any(isinstance(item, ToolContent) for item in output))
+
+    def test_fallback_tool_calls_preserve_arguments_names_and_original_messages(self):
+        sources = [
+            {"tool_calls": [{"name": "fallback", "args": {"q": "你好"}, "id": "call_tool"}]},
+            {"invalid_tool_calls": [{"name": "fallback", "args": '{"q": "你好"}', "id": "call_tool"}]},
+            {
+                "additional_kwargs": {
+                    "tool_calls": [{"id": "call_tool", "function": {"name": "fallback", "arguments": '{"q": "你好"}'}}]
+                }
+            },
+        ]
+        for source in sources:
+            with self.subTest(source=source):
+                # Exercise providers that supply complete calls without incremental chunks.
+                call = AIMessageChunk(content="").model_copy(update={**source, "tool_call_chunks": []})
+                before = deepcopy(call.model_dump())
+                result = ToolMessage(content="ok", tool_call_id="call_tool")
+                _, output = self._run_messages([call, call, result])
+                cards = [item for item in output if isinstance(item, ToolContent)]
+                self.assertEqual(len(cards), 2)
+                self.assertEqual(cards[0].status, Status.RUNNING)
+                self.assertEqual(cards[0].name, "fallback")
+                self.assertIsInstance(cards[0].arguments, str)
+                self.assertEqual(json.loads(cards[0].arguments), {"q": "你好"})
+                self.assertEqual(cards[-1].name, "fallback")
+                aggregation = AggregationManager()
+                for card in cards:
+                    aggregation.aggregate(card)
+                self.assertEqual(json.loads(aggregation.get_contents()[0]["arguments"]), {"q": "你好"})
+                self.assertEqual(call.model_dump(), before)
+                self.assertIsNone(result.name)
+
+    def test_fallback_without_arguments_is_an_empty_object(self):
+        call = AIMessageChunk(content="").model_copy(
+            update={"tool_calls": [{"name": "tool", "args": None, "id": "call_tool"}], "tool_call_chunks": []}
+        )
+        _, output = self._run_messages([call])
+        cards = [item for item in output if isinstance(item, ToolContent)]
+        self.assertEqual(len(cards), 1)
+        self.assertEqual(json.loads(cards[0].arguments), {})
+
+    def test_fallback_does_not_repeat_previously_streamed_arguments(self):
+        streamed = AIMessageChunk(
+            content="", tool_call_chunks=[{"name": "tool", "args": '{"q":1}', "id": "call_tool", "index": 0}]
+        )
+        fallback = AIMessageChunk(content="").model_copy(
+            update={"tool_calls": [{"name": "tool", "args": {"q": 1}, "id": "call_tool"}], "tool_call_chunks": []}
+        )
+        _, output = self._run_messages([streamed, fallback, ToolMessage(content="ok", tool_call_id="call_tool")])
+        cards = [item for item in output if isinstance(item, ToolContent)]
+        self.assertEqual(len(cards), 2)
+        self.assertEqual("".join(card.arguments for card in cards), '{"q":1}')
 
     def test_disabled_display_ignores_tool_results_and_preserves_model_answer(self):
         for content in [

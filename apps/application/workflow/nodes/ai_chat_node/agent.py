@@ -10,7 +10,6 @@
 避免新引擎反向依赖旧引擎的 flow.tools 模块。
 """
 
-import asyncio
 import json
 import os
 import re
@@ -189,7 +188,10 @@ def create_agent(
         # 取消:run_async 的 task.cancel() 会让 CancelledError 注入在途的 chunk await,
         # 从而打断正在运行的 MCP/工具调用。
         async for chunk in response:
-            msg = chunk[0]
+            msg, metadata = chunk
+            # Internal summaries share the model node; filter by source before forwarding any content or tool calls.
+            if metadata.get("lc_source") == "summarization":
+                continue
             call_back.on_next(msg)
 
     def _classify_error(e):

@@ -95,3 +95,25 @@ SILICONFLOW_EMBEDDING_TEST_URL=http://127.0.0.1:49643/siliconflow/v1 \
 补充腾讯、火山协议。HTTP 回归运行真实 DashScope / Ark SDK 和 requests 客户端，
 验证 SVG/PNG 顺序、最终图片尺寸、Base64 格式、文本请求及外部 SVG 资源拒绝。
 所有请求使用合成图片和虚拟密钥，仅验证本地预处理和接口协议，不调用真实模型或验证检索质量。
+
+## DeepSeek 适配器的工具图片
+
+工具返回的图片在请求中转入紧随该批工具响应的 user 消息，保留图片顺序、调用 ID 和
+assistant 的 `reasoning_content`；原始 ToolMessage、执行记录和用户已有图片不改写。
+此路径用于通过 DeepSeek 适配器接入支持视觉的兼容网关，不代表所有 DeepSeek 模型支持图片。
+
+```bash
+postman simulation run apps/models_provider/tests/fixtures/deepseek-tool-images.sim.yaml --port 49644 --no-history --output ndjson
+```
+
+另一个终端运行：
+
+```bash
+DEEPSEEK_TOOL_IMAGE_TEST_URL=http://127.0.0.1:49644/deepseek/v1 \
+  uv run python apps/manage.py test models_provider.tests.test_deepseek_tool_images \
+  application.tests.test_ai_chat_tool_output
+```
+
+模拟契约来自 v2 的工具图片适配和当前 OpenAI SDK 消息格式，返回收到的消息结构，
+用于验证同步调用、异步流式请求及并行工具响应顺序，不验证真实模型的视觉推理结果。
+未设置该环境变量时只跳过两项 HTTP 测试，其余请求构造和消息流测试照常运行。

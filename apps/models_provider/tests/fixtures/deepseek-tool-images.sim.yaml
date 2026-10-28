@@ -1,0 +1,5 @@
+simulation: deepseek-tool-images
+routing: path
+mocks:
+  - routeKey: deepseek
+    path: ./deepseek-tool-images.js

@@ -17,6 +17,40 @@ from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
+def _move_tool_images_to_user_messages(messages):
+    """Keep tool outputs textual while delivering images as vision input."""
+    result = []
+    pending_images = []
+    for message in messages:
+        # All responses to parallel tool calls must precede the extra user message.
+        if message["role"] != "tool" and pending_images:
+            result.append({"role": "user", "content": pending_images})
+            pending_images = []
+        content = message.get("content")
+        if message["role"] == "tool" and isinstance(content, list):
+            images = [block for block in content if isinstance(block, dict) and block.get("type") == "image_url"]
+            if images:
+                reference = f"Images returned by tool call {message['tool_call_id']} (in original order):"
+                pending_images.extend([{"type": "text", "text": reference}, *images])
+                text_content = [
+                    block for block in content if not (isinstance(block, dict) and block.get("type") == "image_url")
+                ]
+                message = {
+                    **message,
+                    "content": [
+                        *text_content,
+                        {
+                            "type": "text",
+                            "text": f"{len(images)} tool image(s) are attached in the following user message.",
+                        },
+                    ],
+                }
+        result.append(message)
+    if pending_images:
+        result.append({"role": "user", "content": pending_images})
+    return result
+
+
 class DeepSeekChatModel(MaxKBBaseModel, BaseChatOpenAI):
     @staticmethod
     def is_cache_model():
@@ -64,6 +98,9 @@ class DeepSeekChatModel(MaxKBBaseModel, BaseChatOpenAI):
             for i, message in enumerate(payload["messages"]):
                 if i in reasoning_content_map and message.get("role") == "assistant" and message.get("tool_calls"):
                     message["reasoning_content"] = reasoning_content_map[i]
+
+        # Only adapt the request: retain original images in agent state and execution records.
+        payload["messages"] = _move_tool_images_to_user_messages(payload["messages"])
 
         # Apply DeepSeek-specific message formatting
         for message in payload["messages"]:

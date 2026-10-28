@@ -653,13 +653,22 @@ class AIChatNode(INode):
                     else:
                         for index, raw_id, name, args in tool_stream.get_fallback_tool_calls(chunk):
                             tool_id = tool_stream.get_tool_id(index, raw_id)
-                            if not tool_id or not tool_stream.add_tool_id(tool_id):
+                            if not tool_id or tool_stream.tool_id_is_used(tool_id):
                                 continue
+                            tool_stream.add_tool_id(tool_id)
+                            if name:
+                                tool_stream.set_tool_id_name(tool_id, name)
+                            # Complete tool_calls carry dict arguments; the card protocol aggregates strings.
+                            arguments = (
+                                args
+                                if isinstance(args, str)
+                                else json.dumps({} if args is None else args, ensure_ascii=False)
+                            )
                             self.write(
                                 ToolContent(
                                     tool_stream.get_tool_uuid(tool_id),
                                     name,
-                                    args,
+                                    arguments,
                                     "",
                                     Status.RUNNING,
                                     node_info,
