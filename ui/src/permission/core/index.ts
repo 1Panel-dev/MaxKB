@@ -1,4 +1,14 @@
-import { Role, RoleConstants, Compare, Permission,Edition, AggregatePermission, type PermissionContext, type PermissionFactory, type RoleFactory } from './common'
+import {
+  Role,
+  RoleConstants,
+  Compare,
+  Permission,
+  Edition,
+  AggregatePermission,
+  type PermissionContext,
+  type PermissionFactory,
+  type RoleFactory,
+} from './common'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/resource-context'
 
@@ -47,7 +57,9 @@ const hasPermissionChild = (permission: PermissionInput, ctx?: PermissionContext
  */
 export const hasPermission = (permission: PermissionInput | PermissionInput[], compare: Compare = Compare.OR, ctx?: PermissionContext): boolean => {
   if (Array.isArray(permission)) {
-    return compare === Compare.OR ? permission.some((item) => hasPermissionChild(item, ctx)) : permission.every((item) => hasPermissionChild(item, ctx))
+    return compare === Compare.OR
+      ? permission.some((item) => hasPermissionChild(item, ctx))
+      : permission.every((item) => hasPermissionChild(item, ctx))
   }
   return hasPermissionChild(permission, ctx)
 }
@@ -70,7 +82,11 @@ export const buildBasePermission = (permission: Permission, workspaceId: string 
  * resourceId 为 'root' 时退化为工作空间维度。
  * @param workspaceId 默认取当前路由的 workspaceId。
  */
-export const buildBaseResourcePermission = (permission: Permission, resourceId: string, workspaceId: string | undefined = getWorkspaceId()): AggregatePermission =>
+export const buildBaseResourcePermission = (
+  permission: Permission,
+  resourceId: string,
+  workspaceId: string | undefined = getWorkspaceId(),
+): AggregatePermission =>
   resourceId === 'root'
     ? buildBasePermission(permission, workspaceId)
     : AggregatePermission.builder()
@@ -84,10 +100,10 @@ export const buildBaseResourcePermission = (permission: Permission, resourceId: 
  * @param edition
  * @returns
  */
-export const hasEdition=(edition:Edition)=>{
-    const { auth } = useStore()
-  if(edition==Edition.PE||edition==Edition.EE){
-    return auth.baseProfile?.license_is_valid && edition==auth.baseProfile?.edition
+export const hasEdition = (edition: Edition): boolean => {
+  const { auth } = useStore()
+  if (edition == Edition.PE || edition == Edition.EE) {
+    return (auth.baseProfile?.license_is_valid && edition == auth.baseProfile.edition) as boolean
   }
   return true
 }
