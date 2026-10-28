@@ -13,7 +13,7 @@ export interface AuthProviderSettingPayload {
 export interface LoginAuthSettingPayload {
   default_value: string
   failed_attempts: number
-  group_id?: string
+  group_ids?: string[]
   lock_time: number
   login_methods: string[]
   max_attempts: number
