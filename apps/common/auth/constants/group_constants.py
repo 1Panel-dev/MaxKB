@@ -71,6 +71,7 @@ class Group(Enum):
     # 其他
     OTHER = ("OTHER", _("Other"))
     HOMEPAGE = ("HOMEPAGE", _("Home page"))
+    SYSTEM_HOMEPAGE = ("SYSTEM_HOMEPAGE", _("Home page"))
     OPERATION_LOG = ("OPERATION_LOG", _("Operation Log"))
 
     # 资源授权分组

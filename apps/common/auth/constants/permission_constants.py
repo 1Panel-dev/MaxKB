@@ -91,12 +91,12 @@ class PermissionConstants(Enum):
     )
 
     SYSTEM_HOMEPAGE_READ = (
-        Permission(group=Group.HOMEPAGE, sub_group=Group.HOMEPAGE, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.SYSTEM_HOMEPAGE, sub_group=Group.SYSTEM_HOMEPAGE, operate=Operate.READ, bit_index=0),
         PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, scope=[PermissionScopeConstants.SYSTEM]),
     )
 
     SYSTEM_HOMEPAGE_EXPORT = (
-        Permission(group=Group.HOMEPAGE, sub_group=Group.HOMEPAGE, operate=Operate.EXPORT, bit_index=1),
+        Permission(group=Group.SYSTEM_HOMEPAGE, sub_group=Group.SYSTEM_HOMEPAGE, operate=Operate.EXPORT, bit_index=1),
         PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, scope=[PermissionScopeConstants.SYSTEM]),
     )
 
