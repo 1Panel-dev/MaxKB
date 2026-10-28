@@ -18,12 +18,15 @@ const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
 /* 成员选项 */
 const optionsLoading = ref(false)
 const userOptions = ref<CommonUserOption[]>([])
+const allUserOptions = ref<CommonUserOption[]>([])
 let searchTimer: ReturnType<typeof setTimeout> | null = null
-function loadUserOptions(query?: string) {
+function loadUserOptions(query = '') {
+  const keyword = query.trim()
   optionsLoading.value = true
-  CommonSystemApi.getWorkspaceMembers(props.workspaceId, query ? { nick_name: query } : undefined)
+  CommonSystemApi.getWorkspaceMembers(props.workspaceId, keyword ? { nick_name: keyword } : undefined)
     .then((users) => {
       userOptions.value = users
+      if (!keyword) allUserOptions.value = users
     })
     .finally(() => {
       optionsLoading.value = false
@@ -31,9 +34,19 @@ function loadUserOptions(query?: string) {
 }
 
 function handleRemoteSearch(query: string) {
-  if (searchTimer) clearTimeout(searchTimer)
+  if (searchTimer) {
+    clearTimeout(searchTimer)
+    searchTimer = null
+  }
+  const keyword = query.trim()
+  if (!keyword) {
+    // Select 聚焦会触发空关键词搜索，复用首次列表以避免加载态导致下拉浮层重绘。
+    userOptions.value = allUserOptions.value
+    return
+  }
   searchTimer = setTimeout(() => {
-    loadUserOptions(query)
+    searchTimer = null
+    loadUserOptions(keyword)
   }, 300)
 }
 
@@ -67,6 +80,7 @@ function resetData() {
   loading.value = false
   optionsLoading.value = false
   userOptions.value = []
+  allUserOptions.value = []
   formRef.value?.clearValidate()
   if (searchTimer) {
     clearTimeout(searchTimer)
