@@ -15,6 +15,10 @@ import { MODEL_TYPE_LABELS } from '@/constants/model'
 defineOptions({ name: 'DefaultModelSettingDrawer' })
 
 const defaultModelTypes = ['LLM', 'TTS', 'STT', 'IMAGE', 'TTI', 'TTV', 'ITV', 'RERANKER'] as const
+const defaultModelTypeLabels: Record<string, string> = {
+  ...MODEL_TYPE_LABELS,
+  LLM: 'AI 模型',
+}
 
 const props = defineProps<{
   modelValue?: DefaultModelSettingPayload
@@ -231,7 +235,7 @@ defineExpose({ open })
     </template>
 
     <el-form v-loading="loading" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item v-for="modelType in defaultModelTypes" :key="modelType" :label="MODEL_TYPE_LABELS[modelType]">
+      <el-form-item v-for="modelType in defaultModelTypes" :key="modelType" :label="defaultModelTypeLabels[modelType]">
         <SelectModel
           teleported
           v-model="modelSettings[modelType].model_id"
