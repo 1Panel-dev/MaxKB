@@ -5,12 +5,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import ApplicationAccessToken
-from common.auth.common import ChatToken
-from common.auth.constants.operate_constants import Operate
-from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.exception.app_exception import AppApiException
-from common.log.log import record_log
 from common.utils.common import password_encrypt
 from common.utils.common import password_verify, needs_password_upgrade
 from common.utils.rsa_util import decrypt
@@ -28,55 +24,33 @@ system_version, system_get_key = Cache_Version.SYSTEM.value
 
 class ChatUserAccessTokenSerializer(serializers.Serializer):
     @staticmethod
-    def create_token_and_cache(access_token, user, request):
-        status = 500  # 默认失败状态
-        workspace_id = "default"
-        try:
-            application_access_token = ApplicationAccessToken.objects.filter(access_token=access_token).first()
+    def create_token_and_cache(access_token, user):
+        application_access_token = ApplicationAccessToken.objects.filter(access_token=access_token).first()
 
-            if not application_access_token:
-                raise AppApiException(1005, _("Invalid access token"))
+        if not application_access_token:
+            raise AppApiException(1005, _("Invalid access token"))
 
-            application_id = application_access_token.application_id
-            workspace_id = application_access_token.application.workspace_id
-            # 检查用户是否有权限访问该应用
-            is_authorized = ResourceChatUserAuthorize.objects.filter(
-                resource_id=application_id, resource_type=ResourceType.APPLICATION.value, is_auth=True, user_id=user.id
-            ).exists()
-            if not is_authorized:
-                # 获取资源组授权的用户组ID
-                resource_group_ids = ResourceChatUserGroupAuthorize.objects.filter(
-                    resource_id=application_id,
-                    resource_type=ResourceType.APPLICATION.value,
-                    is_auth=True,
-                ).values_list("user_group_id", flat=True)
+        application_id = application_access_token.application_id
+        # 检查用户是否有权限访问该应用
+        is_authorized = ResourceChatUserAuthorize.objects.filter(
+            resource_id=application_id, resource_type=ResourceType.APPLICATION.value, is_auth=True, user_id=user.id
+        ).exists()
+        if not is_authorized:
+            # 获取资源组授权的用户组ID
+            resource_group_ids = ResourceChatUserGroupAuthorize.objects.filter(
+                resource_id=application_id,
+                resource_type=ResourceType.APPLICATION.value,
+                is_auth=True,
+            ).values_list("user_group_id", flat=True)
 
-                # 如果有资源组授权，则检查用户是否属于这些用户组
-                if resource_group_ids.exists():
-                    is_authorized = UserGroupRelation.objects.filter(
-                        user_id=user.id, group_id__in=resource_group_ids
-                    ).exists()
+            # 如果有资源组授权，则检查用户是否属于这些用户组
+            if resource_group_ids.exists():
+                is_authorized = UserGroupRelation.objects.filter(
+                    user_id=user.id, group_id__in=resource_group_ids
+                ).exists()
 
-            if not is_authorized:
-                raise AppApiException(1005, _("The user does not have permission to access the application"))
-            token = ChatToken(
-                str(user.id),
-                AuthenticationType.CHAT_USER,
-                str(Operate.LOCAL).lower(),
-                application_id=str(application_id),
-            ).to_token()
-            status = 200
-            return token
-        finally:
-            record_log(
-                menu="Chat User/login",
-                operate="Log in",
-                request=request,
-                user={"username": user.username},
-                status=status,
-                operation_object={"name": user.username},
-                workspace_id=workspace_id,
-            )
+        if not is_authorized:
+            raise AppApiException(1005, _("The user does not have permission to access the application"))
 
     @staticmethod
     def get_auth_setting(access_token):

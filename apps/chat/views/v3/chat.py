@@ -45,7 +45,7 @@ from common.auth.constants.operate_constants import Operate
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.exception.app_exception import AppApiException
-from common.log.log import _get_ip_address, log
+from common.log.log import _get_ip_address, log, record_log
 from common.result import result
 from common.utils.rsa_util import decrypt
 from knowledge.models import FileSourceType
@@ -54,6 +54,7 @@ from models_provider.api.model import DefaultModelResponse
 from oss.serializers.file import FileSerializer
 from system_manage.serializers.chat_user import RePasswordSerializer, ChatUserProfileSerializer
 from chat.serializers.chat_user_serializer import ChatUserAccessTokenV3Serializer
+from system_manage.serializers.chat_user_serializer import ChatUserAccessTokenSerializer
 from users.api import CaptchaAPI, LoginAPI
 from users.api.user import ResetPasswordAPI, UserProfileAPI
 from users.serializers.login import CaptchaSerializer
@@ -475,21 +476,38 @@ class ChatUserProfileView(APIView):
 
 
 class BaseAuthView(APIView):
-    @staticmethod
-    def create_token_and_cache(user, access_token, operate):
+    def create_token_and_cache(self, user, access_token, operate):
         application_id = None
-        if access_token:
-            application_id = (
-                ApplicationAccessToken.objects.filter(access_token=access_token, is_active=True)
-                .values_list("application_id", flat=True)
-                .first()
+        workspace_id = "default"
+        status = 500
+        try:
+            if access_token:
+                ChatUserAccessTokenSerializer.create_token_and_cache(access_token, user)
+                application_access_token = (
+                    ApplicationAccessToken.objects.filter(access_token=access_token, is_active=True)
+                    .select_related("application")
+                    .first()
+                )
+                if application_access_token:
+                    application_id = application_access_token.application_id
+                    workspace_id = application_access_token.application.workspace_id
+            token = ChatToken(
+                str(user.id), AuthenticationType.CHAT_USER, str(operate), application_id=str(application_id)
+            ).to_token()
+            version, get_key = Cache_Version.CHAT_USER_TOKEN.value
+            cache.set(get_key(token), user, timeout=60 * 60 * 2, version=version)
+            status = 200
+            return token
+        finally:
+            record_log(
+                menu="Chat User/login",
+                operate="Log in",
+                request=self.request,
+                user={"username": user.username},
+                status=status,
+                operation_object={"name": user.username},
+                workspace_id=workspace_id,
             )
-        token = ChatToken(
-            str(user.id), AuthenticationType.CHAT_USER, str(operate), application_id=str(application_id)
-        ).to_token()
-        version, get_key = Cache_Version.CHAT_USER_TOKEN.value
-        cache.set(get_key(token), user, timeout=60 * 60 * 2, version=version)
-        return token
 
     @classmethod
     def generate(self, request, token: str, response: HttpResponse, path: str = "/chat"):
