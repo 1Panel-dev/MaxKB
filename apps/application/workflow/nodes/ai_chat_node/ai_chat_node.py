@@ -24,7 +24,6 @@ from langchain_core.messages import (
     SystemMessage,
     ToolMessage,
     AIMessageChunk,
-    get_buffer_string,
 )
 from rest_framework import serializers
 
@@ -43,7 +42,6 @@ from application.workflow.nodes.ai_chat_node.tools import (
 )
 from application.workflow.status import Status
 from application.workflow.tools import Reasoning
-from common.config.tokenizer_manage_config import TokenizerManage
 from common.utils.common import guess_image_format
 from common.utils.count_tokens import count_local_tokens
 from common.utils.messages_util import to_ai_message_list, to_human_message_list
@@ -63,6 +61,62 @@ class AgentCallBack:
     ):
         self.on_next = on_next
         self.on_complete = on_complete
+
+
+def _parse_tool_result(content):
+    """Parse every tool result block for display without modifying the agent message.
+
+    V3 saves execution records in the tool executors, so retain business fields
+    (including tool_id) instead of extracting record metadata as in V2.
+    """
+    if isinstance(content, list):
+        parts = [_parse_tool_result(part) for part in content]
+        return parts[0] if len(parts) == 1 else parts
+
+    if isinstance(content, str):
+        try:
+            content = json.loads(content)
+        except (TypeError, ValueError):
+            return content
+
+    if not isinstance(content, dict):
+        return content
+
+    text = content.get("text")
+    if isinstance(text, str) and content.get("type") in (None, "text"):
+        try:
+            return json.loads(text)
+        except (TypeError, ValueError):
+            return text
+    return content
+
+
+def _tool_result_for_display(content, media=False):
+    """Keep media metadata in text cards; leave original/record payloads intact."""
+    if isinstance(content, list):
+        return [_tool_result_for_display(part, media) for part in content]
+    if isinstance(content, dict):
+        media = media or content.get("type") in (
+            "image",
+            "image_url",
+            "audio",
+            "input_audio",
+            "video",
+            "file",
+            "resource",
+            "base64",
+        )
+        return {
+            key: (
+                "[base64 omitted]"
+                if media and key in {"data", "base64", "blob"} and isinstance(value, str)
+                else _tool_result_for_display(value, media)
+            )
+            for key, value in content.items()
+        }
+    if isinstance(content, str) and content.startswith("data:") and ";base64," in content:
+        return content.split(";base64,", 1)[0] + ";base64,[omitted]"
+    return content
 
 
 class ChatNodeSerializer(serializers.Serializer):
@@ -613,32 +667,20 @@ class AIChatNode(INode):
                                 )
                             )
 
-                if mcp_output_enable and isinstance(chunk, ToolMessage):
+                if isinstance(chunk, ToolMessage):
+                    # Tool results belong to the agent context, never to the model's answer text.
+                    if not mcp_output_enable:
+                        return
                     tool_id = _get_tool_call_id(chunk.tool_call_id) or chunk.tool_call_id
-                    chunk.name = tool_stream.get_tool_name(tool_id, chunk.name)
-                    try:
-                        if isinstance(chunk.content, str):
-                            tool_result = json.loads(chunk.content)
-                        elif isinstance(chunk.content, dict):
-                            tool_result = chunk.content
-                        elif isinstance(chunk.content, list):
-                            tool_result = chunk.content[0] if len(chunk.content) > 0 else {}
-                        else:
-                            tool_result = {}
-                        text = tool_result.get("text") if "text" in tool_result else None
-                        text_result = json.loads(text) if text else tool_result
-                        tool_result = (
-                            text_result if isinstance(text_result, str) else json.dumps(text_result, ensure_ascii=False)
-                        )
-                    except Exception:
-                        tool_result = chunk.content
+                    tool_name = tool_stream.get_tool_name(tool_id) or chunk.name or ""
+                    tool_result = _tool_result_for_display(_parse_tool_result(chunk.content))
                     result = (
                         tool_result if isinstance(tool_result, str) else json.dumps(tool_result, ensure_ascii=False)
                     )
                     self.write(
                         ToolContent(
                             tool_stream.get_tool_uuid(tool_id),
-                            "",
+                            tool_name,
                             "",
                             result,
                             Status.SUCCESS,
