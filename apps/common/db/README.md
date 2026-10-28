@@ -25,6 +25,14 @@ v3 增量迁移按 Django app 合并，统一执行 `python apps/manage.py migra
 
 知识库在 v2 的 `0011` 后执行 `0012_v3_upgrade`；
 应用在 v2 的 `0015` 后执行 `0016_v3_upgrade`。
+应用 API Key 的 `remark` 字段也包含在 `0016_v3_upgrade` 中，
+不再单独保留 `0017_applicationapikey_remark`。
+
+对于已经执行过该 `0017` 的开发数据库，先备份，再核对 `application_api_key.remark`
+已存在且为非空的 `varchar(256)`、`0016_v3_upgrade` 已有执行记录，最后只删除
+`django_migrations` 中 `application.0017_applicationapikey_remark` 这一条记录。
+保留备注值，不回退或重跑 `0016_v3_upgrade`。只执行过旧版 `0016` 的开发数据库则需先补齐
+备注列及已有行的空字符串值；直接运行 `migrate` 不会重新执行已记录的合并迁移。
 
 已有 v2 数据库由 Django 根据原迁移记录自然跳过已执行的操作；较早 v2 先补齐剩余 v2
 迁移，再执行 v3 增量。无需自定义迁移兼容类、手动改写记录或 `--fake`。

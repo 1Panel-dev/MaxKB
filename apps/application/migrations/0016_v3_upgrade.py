@@ -122,4 +122,9 @@ class Migration(migrations.Migration):
             name="publish_desc",
             field=models.CharField(default="", max_length=1024, verbose_name="更新说明"),
         ),
+        migrations.AddField(
+            model_name="applicationapikey",
+            name="remark",
+            field=models.CharField(blank=True, default="", max_length=256, verbose_name="备注"),
+        ),
     ]

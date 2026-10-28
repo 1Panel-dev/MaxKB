@@ -40,6 +40,44 @@ class V2MigrationUpgradeTests(TransactionTestCase):
     def restore_latest(self):
         MigrationExecutor(connection).migrate(self.latest)
 
+    def test_application_v3_entry_adds_api_key_remark_and_preserves_existing_key(self):
+        apps = self.v2_state.apps
+        folder = apps.get_model("application", "ApplicationFolder").objects.create(
+            id="api-key-upgrade", name="v2 folder", lft=1, rght=2, tree_id=1, level=0
+        )
+        application = apps.get_model("application", "Application").objects.create(folder=folder)
+        key = apps.get_model("application", "ApplicationApiKey").objects.create(
+            application=application,
+            secret_key="migration-test-key",
+            is_active=False,
+            allow_cross_domain=True,
+            cross_domain_list=["example.test"],
+            is_permanent=False,
+        )
+        target = [("application", "0016_v3_upgrade")]
+        executor = MigrationExecutor(connection)
+        executor.migrate(target)
+        current = executor.loader.project_state(target).apps
+        upgraded = current.get_model("application", "ApplicationApiKey").objects.get(pk=key.pk)
+        self.assertEqual(upgraded.remark, "")
+        for field in (
+            "application_id",
+            "secret_key",
+            "is_active",
+            "allow_cross_domain",
+            "cross_domain_list",
+            "is_permanent",
+            "expire_time",
+        ):
+            self.assertEqual(getattr(upgraded, field), getattr(key, field))
+        upgraded.remark = "saved after upgrade"
+        upgraded.save(update_fields=["remark"])
+        executor = MigrationExecutor(connection)
+        self.assertEqual(executor.migration_plan(target), [])
+        executor.migrate(target)
+        upgraded.refresh_from_db()
+        self.assertEqual(upgraded.remark, "saved after upgrade")
+
     def test_upgrade_preserves_public_access_and_all_default_model_settings(self):
         apps = self.v2_state.apps
         access = apps.get_model("knowledge", "PublicFileAccess").objects.create(
