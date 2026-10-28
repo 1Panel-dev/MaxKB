@@ -1,17 +1,6 @@
-<template>
-  <component
-    v-if="toolRenderers[toolName]"
-    :is="toolRenderers[toolName]"
-    :content="content"
-    :loading="loading"
-    :expanded="isExpanded"
-    @toggle="isExpanded = !isExpanded"
-  />
-  <DefaultTool v-else :content="content" />
-</template>
-
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, type Component } from 'vue'
+import type { ChatContent, Dict } from '@/api/types'
 import Terminal from './Terminal.vue'
 import Patch from './Patch.vue'
 import ReadFile from './ReadFile.vue'
@@ -24,11 +13,12 @@ import DownloadSkills from './DownloadSkills.vue'
 import RunSkill from './RunSkill.vue'
 import DefaultTool from './tool.vue'
 
-/** TOOL 内容项按工具名分发到专用渲染器，未匹配的工具沿用原有 tool.vue 展示。 */
-const props = defineProps<{ content: any }>()
+defineOptions({ name: 'ConversationToolContent' })
 
+const props = defineProps<{ content: ChatContent }>()
+
+// 工具执行状态与展开状态。
 const loading = computed(() => props.content.status === 'RUNNING')
-const toolName = computed(() => (props.content.name || '').toLowerCase())
 const isExpanded = ref(props.content.status === 'RUNNING')
 
 // 工具执行完成自动收起
@@ -36,7 +26,8 @@ watch(loading, (current, previous) => {
   if (previous && !current) isExpanded.value = false
 })
 
-const toolRenderers: Record<string, any> = {
+// 按工具名选择渲染组件，未匹配时使用默认展示。
+const toolRenderers: Dict<Component> = {
   run_command: Terminal,
   apply_patch: Patch,
   read_file: ReadFile,
@@ -48,4 +39,17 @@ const toolRenderers: Record<string, any> = {
   download_skills: DownloadSkills,
   run_skill: RunSkill,
 }
+const toolRenderer = computed(() => toolRenderers[(props.content.name || '').toLowerCase()])
 </script>
+
+<template>
+  <component
+    v-if="toolRenderer"
+    :is="toolRenderer"
+    :content="content"
+    :loading="loading"
+    v-model:expanded="isExpanded"
+    @toggle="isExpanded = !isExpanded"
+  />
+  <DefaultTool v-else :content="content" />
+</template>
