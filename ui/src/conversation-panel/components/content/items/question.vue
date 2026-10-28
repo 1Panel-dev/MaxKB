@@ -46,7 +46,7 @@ function getAttachmentDescription(file: QuestionAttachment) {
 <template>
   <div class="mk-conversation-question-content space-y-3">
     <!-- 查看已发送附件，超出当前宽度时自动换行。 -->
-    <div v-if="attachments.length" class="flex max-w-full gap-2">
+    <div v-if="attachments.length" class="flex-wrap max-w-full justify-end gap-2">
       <template v-for="file in attachments" :key="file.key">
         <div :class="file.field === 'image_list' ? 'shrink-0' : 'w-60 max-w-full'">
           <!-- 查看图片 -->

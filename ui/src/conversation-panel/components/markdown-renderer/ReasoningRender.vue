@@ -15,7 +15,7 @@ const showThink = ref(true)
     <!-- 展开或收起思考过程 -->
     <div class="flex-between cursor-pointer" @click="showThink = !showThink">
       <div class="flex-align-center" style="line-height: 20px">
-        <MkIcon name="icon_two-ellipses_outlined" />
+        <!-- <MkIcon name="icon_two-ellipses_outlined" /> -->
         <span class="ml-1">思考过程</span>
       </div>
       <el-icon class="transition-transform" :class="{ 'rotate-180': showThink }">

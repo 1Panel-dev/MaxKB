@@ -4,6 +4,7 @@ import DOMPurify from 'dompurify'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import { REPLY_CONTENT_TYPE_LABELS } from '../constant'
 
 defineOptions({ name: 'ReplyNodeDetail' })
 
@@ -22,6 +23,12 @@ const toolAnswer = computed(() => (contentType.value === 'TOOL' ? JSON.stringify
       <BaseHeader :data="data" />
     </template>
 
+    <div class="mk-gray-card-sm">
+      <h6 class="mb-2">回复格式</h6>
+      <div>
+        {{ REPLY_CONTENT_TYPE_LABELS[contentType] ?? contentType }}
+      </div>
+    </div>
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">回复内容</h6>
       <div>

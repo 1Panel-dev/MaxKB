@@ -19,15 +19,21 @@ defineProps<{
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">输入参数</h6>
       <div class="space-y-2">
-        <p><span class="mr-1 text-N600">选择器：</span>{{ data.selector }}</p>
-        <p><span class="mr-1 text-N600">文档地址：</span>{{ data.source_url }}</p>
+        <p>
+          <span class="mr-1 text-N600">选择器：</span>
+          {{ data.selector }}
+        </p>
+        <p>
+          <span class="mr-1 text-N600">文档地址：</span>
+          {{ data.source_url }}
+        </p>
       </div>
     </div>
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出参数</h6>
-
-      <el-scrollbar max-height="200">
+      <!-- // TODO：输出参数 高度问题-->
+      <el-scrollbar max-height="400">
         <div class="space-y-2">
           <template v-for="(file_content, index) in data.document_list" :key="index">
             <el-card shadow="never">

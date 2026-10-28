@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { CaretBottom } from '@element-plus/icons-vue'
 import Content from './content/index.vue'
 import { type ToolCalls } from './index'
 
@@ -28,7 +28,7 @@ const showContent = ref(false)
         <span class="ml-1">{{ toolCallsContent.title || '-' }}</span>
       </div>
       <el-icon class="transition-transform" :class="{ 'rotate-180': showContent }">
-        <ArrowDown />
+        <CaretBottom />
       </el-icon>
     </div>
     <el-collapse-transition>

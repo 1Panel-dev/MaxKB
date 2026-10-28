@@ -6,6 +6,7 @@ import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { BaseNodeModel } from '@logicflow/core'
+import { REPLY_CONTENT_TYPE_LABELS } from './constant'
 
 defineOptions({ name: 'WorkflowReplyNode' })
 const getModel = inject('getModel') as () => BaseNodeModel
@@ -75,11 +76,11 @@ onMounted(() => {
             @visible-change="anchorGuard.setOverlayVisible('content-type', $event)"
             @wheel="handleNodeWheel"
           >
-            <el-option label="文本" value="TEXT" />
-            <el-option label="HTML" value="HTML" />
-            <el-option label="工具" value="TOOL">
+            <el-option :label="REPLY_CONTENT_TYPE_LABELS.TEXT" value="TEXT" />
+            <el-option :label="REPLY_CONTENT_TYPE_LABELS.HTML" value="HTML" />
+            <el-option :label="REPLY_CONTENT_TYPE_LABELS.TOOL" value="TOOL">
               <div class="flex-align-center gap-1">
-                <span>工具</span>
+                <span>{{ REPLY_CONTENT_TYPE_LABELS.TOOL }}</span>
                 <MkTooltip content="回复内容为 JSON 对象或数组，元素字段为 id、name、arguments、content" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
