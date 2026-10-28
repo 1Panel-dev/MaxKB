@@ -40,7 +40,7 @@ from application.workflow.backend.sandbox_mcp import SandboxMCPBackend
 from maxkb.const import CONFIG, PROJECT_DIR
 from models_provider.models import Model
 from rest_framework import serializers, status
-from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
+from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission, WorkspaceUserGroupResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
@@ -392,6 +392,13 @@ class ToolSerializer(serializers.Serializer):
                 query_set_dict["workspace_user_resource_permission_query_set"] = QuerySet(
                     WorkspaceUserResourcePermission
                 ).filter(auth_target_type="TOOL", workspace_id=workspace_id, user_id=user_id)
+                query_set_dict["workspace_user_group_resource_permission_query_set"] = QuerySet(
+                    WorkspaceUserGroupResourcePermission
+                ).filter(
+                    auth_target_type="TOOL",
+                    workspace_id=workspace_id,
+                    user_group__user_relations__user_id=user_id,
+                )
             return query_set_dict
 
         def get_authorized_query_set(self):
@@ -1812,6 +1819,13 @@ class ToolTreeSerializer(serializers.Serializer):
                 query_set_dict["workspace_user_resource_permission_query_set"] = QuerySet(
                     WorkspaceUserResourcePermission
                 ).filter(auth_target_type="TOOL", workspace_id=workspace_id, user_id=user_id)
+                query_set_dict["workspace_user_group_resource_permission_query_set"] = QuerySet(
+                    WorkspaceUserGroupResourcePermission
+                ).filter(
+                    auth_target_type="TOOL",
+                    workspace_id=workspace_id,
+                    user_group__user_relations__user_id=user_id,
+                )
             return query_set_dict
 
         @staticmethod
