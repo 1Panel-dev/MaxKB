@@ -38,6 +38,9 @@ Element Plus 覆盖、主题变量和应用样式。Chat 入口还显式引入 E
 当前 `overflow: hidden` 已允许面板在 Flex 主轴上收缩，无需重复设置 `min-width: 0`；
 也不额外设置 `min-height: 0`、`height: 100%` 或 `max-height: 100%`，消息列表负责内部滚动。
 
+消息列表与底部输入区可共用 `mk-conversation-content`，在对话模块公共样式中统一设置
+宽度 100%、最大宽度 800px 和水平居中。
+
 用户提问容器使用 `mk-conversation-question-content`，在对话模块公共样式中控制靠右、
 随内容收缩及最大 85% 宽度。文字气泡使用 `mk-gray-card-lg`，换行规则在模板中组合工具类。
 提问附件参考输入区的卡片外观，通过 Flex 按容器宽度自动换行并靠右排列；已发送附件不展示

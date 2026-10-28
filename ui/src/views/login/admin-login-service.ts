@@ -1,7 +1,7 @@
 /** Admin 登录页与外观设置登录预览使用的登录服务，对接 Admin 认证接口与 Store。 */
 
 import { useRouter } from 'vue-router'
-import { v4 as uuidv4 } from 'uuid'
+import { v7 as uuidv7 } from 'uuid'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
@@ -31,7 +31,7 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
     }
     if (authType === LOGIN_METHOD.OAUTH2) {
       if (!config.authEndpoint || !config.clientId) return ''
-      let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${uuidv4()}`
+      let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${uuidv7()}`
       if (config.scope) url += `&scope=${config.scope}`
       return url
     }

@@ -1,5 +1,5 @@
 import { computed, inject, ref, type InjectionKey, type Ref } from 'vue'
-import { v4 as uuidv4 } from 'uuid'
+import { v7 as uuidv7 } from 'uuid'
 import type { Conversation, ConversationAccount, ConversationAppInfo } from '../../core/types'
 
 // 由 Chat / Debug 入口注入本组件需要的会话接口。
@@ -62,7 +62,7 @@ export function createConversationListStore(deps: ConversationListDeps) {
   // 仅在需要时生成会话 ID，保证上传文件的 source_id 与发送消息使用同一 ID。
   const getChatId = () => {
     if (currentChatId.value) return currentChatId.value
-    currentChatId.value = uuidv4()
+    currentChatId.value = uuidv7()
     return currentChatId.value
   }
 

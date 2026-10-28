@@ -22,12 +22,8 @@ const handleDrop = (e: DragEvent) => input.addFiles(e.dataTransfer?.files)
   <main class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 头部可被替换(如 debug 用 debug header);默认普通 chat header -->
     <slot name="header"><ChatHeader :shareable="shareable" @share="emit('share')" /></slot>
-    <MessageList :key="list.currentChatId.value" :app-name="list.appInfo.value?.name || 'AI 助手'" >
-      <template #welcome>
+    <MessageList :key="list.currentChatId.value" :app-name="list.appInfo.value?.name || 'AI 助手'" class="mk-conversation-content"></MessageList>
 
-      </template>
-    </MessageList>
-
-    <footer class="flex-center shrink-0 p-4"><MessageInput /></footer>
+    <footer class="mk-conversation-content flex-center shrink-0 p-4"><MessageInput /></footer>
   </main>
 </template>
