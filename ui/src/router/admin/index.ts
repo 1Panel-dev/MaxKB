@@ -20,7 +20,7 @@ const router = createRouter({
   history: createWebHistory(ADMIN_BASE_PATH),
   routes: [
     { path: '/', redirect: { name: 'workspace-home', params: { workspaceId: 'default' } } },
-    // TODO(demo): 执行详情样式预览，验收后删除
+    // (demo): 执行详情样式预览，不涉及权限，不加入权限路由
     { path: '/details-demo', name: 'details-demo', component: () => import('@/views/details-demo/index.vue'), meta: { title: '执行详情 Demo' } },
     ...loginRoutes,
     ...workflowRoutes,

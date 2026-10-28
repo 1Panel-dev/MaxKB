@@ -24,11 +24,12 @@ defineProps<{
         </MkTooltip>
       </h6>
 
+      <!-- // TODO 内容 -->
       <el-scrollbar max-height="200">
         <div class="space-y-2">
           <template v-for="(file_content, index) in data.content" :key="index">
             <el-card shadow="never">
-              <p class="mb-2 text-N600 text-sm">{{ file_content.name || '-' }}</p>
+              <p class="mb-2 text-N600 text-sm">{{ file_content || '-' }}</p>
               <MdPreview v-if="file_content.content" :model-value="file_content.content" no-img-zoom-in />
               <template v-else>-</template>
             </el-card>

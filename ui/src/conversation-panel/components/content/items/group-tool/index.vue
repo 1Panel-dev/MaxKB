@@ -89,7 +89,6 @@ const isExpanded = computed({
     </template>
     <template #label>
       <span v-if="groupStatus === 'running'" class="mk-conversation-loading" />
-      <MkIcon name="icon_busy_outlined" />
       <span>调用了 {{ toolItems.length }} 个工具</span>
     </template>
 

@@ -28,22 +28,26 @@ const fileList = computed<SourceFile[]>(() => (props.data?.file_list as SourceFi
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">文件列表</h6>
-      <div class="space-y-2">
-        <template v-if="fileList.length > 0">
-          <div
-            v-for="(file, index) in fileList"
-            :key="file.file_id || index"
-            class="mb-2 flex-align-center gap-1 overflow-hidden rounded-md bg-white p-2 last:mb-0"
+      <div v-if="fileList.length > 0" class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <template v-for="(file, index) in fileList" :key="file.file_id || index">
+          <!-- 在新标签页打开或下载文件 -->
+          <a
+            :href="file.file_id ? getFileUrl(file.file_id) : undefined"
+            target="_blank"
+            rel="noopener noreferrer"
+            :download="file.name"
+            class="block min-w-0"
           >
-            <img :src="getFileIconUrl(file.name || '')" alt="" width="20" />
-            <a v-if="file.file_id" :href="getFileUrl(file.file_id)" target="_blank" class="truncate" :title="file.name">
-              {{ file.name }}
-            </a>
-            <span v-else class="truncate" :title="file.name">{{ file.name || '-' }}</span>
-          </div>
+            <el-card shadow="never" class="small" :class="{ 'cursor-pointer': file.file_id }">
+              <div class="flex-align-center gap-2">
+                <img :src="getFileIconUrl(file.name || '')" alt="" width="24" />
+                <span class="min-w-0 truncate" :title="file.name">{{ file.name || '-' }}</span>
+              </div>
+            </el-card>
+          </a>
         </template>
-        <template v-else>-</template>
       </div>
+      <template v-else>-</template>
     </div>
   </DetailContainer>
 </template>
