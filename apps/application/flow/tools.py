@@ -537,6 +537,10 @@ async def _yield_mcp_response(
         _tool_fragments = {}
 
         def _merge_arguments(entry, part_args):
+            # A header-only tool delta may omit arguments or send null. It adds
+            # no JSON fragment; serializing None would prepend "null" to the args.
+            if part_args is None:
+                return
             if not isinstance(part_args, str):
                 try:
                     part_args = json.dumps(part_args, ensure_ascii=False)
@@ -664,8 +668,12 @@ async def _yield_mcp_response(
                             maxkb_logger.debug(f"Skipping fragment {idx}: missing id. Fragment: {entry}")
                             continue
                         if not entry.get("arguments"):
-                            maxkb_logger.debug(f"Skipping fragment {idx}: missing arguments. Fragment: {entry}")
-                            continue
+                            # LangChain treats an empty argument stream as {}. An
+                            # empty ID alias must not overwrite the indexed result.
+                            if entry["id"] in tool_calls_info:
+                                entry["completed"] = True
+                                continue
+                            entry["arguments"] = "{}"
 
                         if not entry.get("completed") and entry.get("id") and entry.get("arguments"):
                             try:
