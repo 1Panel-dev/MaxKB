@@ -31,7 +31,7 @@ class EditApplicationKeySerializer(serializers.Serializer):
     )
     is_permanent = serializers.BooleanField(required=False, label=_("Is permanent"))
     expire_time = serializers.DateTimeField(required=False, allow_null=True, label=_("Expiration time"))
-    remark = serializers.CharField(required=False, label=_("Remark"))
+    remark = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Remark"))
 
 
 class ApplicationKeySerializer(serializers.Serializer):
