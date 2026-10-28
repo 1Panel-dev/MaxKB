@@ -37,10 +37,11 @@ class Permission:
     def get_resource_permission_key(self, resource_id):
         workspace = f":w:{self.workspace_id}" if self.workspace_id else ""
         resource = f":r:{self.resource_id}" if self.resource_id else ""
+        flag = f"_{self.flag}" if self.flag else ""
         group = str(self.group)
         if self.group in (Group.SYSTEM_RES_KNOWLEDGE, Group.KNOWLEDGE) and self.sub_group != self.group:
             group = f"{group}_{self.sub_group}"
-        return f"{group}{workspace}{resource}"
+        return f"{group}{flag}{workspace}{resource}"
 
     def __str__(self):
         sub = f"_{self.sub_group}" if self.sub_group != self.group else ""
