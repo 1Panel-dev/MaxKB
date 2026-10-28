@@ -20,7 +20,7 @@ import {
 } from './model-card/action-dropdown'
 import perm from '@/permission/index.ts'
 
-const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
+const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部资源', provider: 'all' }
 
 const loading = ref(false)
 const currentProvider = ref<ModelProviderItem>(DEFAULT_MODEL_PROVIDER)
