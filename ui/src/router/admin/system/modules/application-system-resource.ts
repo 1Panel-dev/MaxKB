@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { APPLICATION_TYPE } from '@/api/enums'
+import { perm } from '@/permission'
 
 /** System 资源管理智能体详情，与 Workspace 复用页面，不提供共享详情。 */
 export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
@@ -19,6 +20,7 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
           icon: 'icon_screen_outlined',
           activeIcon: 'icon_screen_filled',
           order: 10,
+          permission: perm.application.system.overviewRead,
         },
       },
       {
@@ -31,6 +33,7 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
           activeIcon: 'icon_setting_filled',
           order: 20,
           detailMenuVisible: (params) => params.type === APPLICATION_TYPE.SIMPLE,
+          permission: perm.application.system.edit,
         },
       },
       {
@@ -55,19 +58,19 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
         path: 'access',
         name: 'system-resource-application-access',
         component: () => import('@/views/application-detail/access/index.vue'),
-        meta: { title: '发布渠道', icon: 'icon_application_outlined', activeIcon: 'icon_application_filled', order: 30 },
+        meta: { title: '发布渠道', icon: 'icon_application_outlined', activeIcon: 'icon_application_filled', order: 30, permission: perm.application.system.accessRead},
       },
       {
         path: 'chat-user',
         name: 'system-resource-application-chat-user',
         component: () => import('@/views/application-detail/chat-user/index.vue'),
-        meta: { title: '对话用户', icon: 'icon_contacts_outlined', activeIcon: 'icon_contacts_filled', order: 40 },
+        meta: { title: '对话用户', icon: 'icon_contacts_outlined', activeIcon: 'icon_contacts_filled', order: 40, permission: perm.application.system.chatUserRead},
       },
       {
         path: 'operation-log',
         name: 'system-resource-application-operation-log',
         component: () => import('@/views/application-detail/chat-log/index.vue'),
-        meta: { title: '对话日志', icon: 'icon_logs_outlined', activeIcon: 'icon_logs_filled', order: 50 },
+        meta: { title: '对话日志', icon: 'icon_logs_outlined', activeIcon: 'icon_logs_filled', order: 50, permission: perm.application.system.chatLogRead},
       },
     ],
   },

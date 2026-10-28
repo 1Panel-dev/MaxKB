@@ -31,6 +31,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
               activeIcon: 'icon_screen_filled',
               order: 10,
               canAccess: (params) => perm.application.workspace.overviewRead(String(params.applicationId)),
+              permission: (route) => perm.application.workspace.overviewRead(String(route.params.applicationId)),
             },
           },
           {
@@ -44,6 +45,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
               order: 20,
               detailMenuVisible: (params) => params.type === APPLICATION_TYPE.SIMPLE,
               canAccess: (params) => params.type === APPLICATION_TYPE.SIMPLE && perm.application.workspace.edit(String(params.applicationId)),
+              permission: (route) => perm.application.workspace.edit(String(route.params.applicationId)),
             },
           },
           {
@@ -68,19 +70,19 @@ export const applicationRoutes: RouteRecordRaw[] = [
             path: 'access',
             name: 'workspace-application-access',
             component: () => import('@/views/application-detail/access/index.vue'),
-            meta: { title: '发布渠道', icon: 'icon_application_outlined', activeIcon: 'icon_application_filled', order: 30 },
+            meta: { title: '发布渠道', icon: 'icon_application_outlined', activeIcon: 'icon_application_filled', order: 30, permission: (route) => perm.application.workspace.accessRead(String(route.params.applicationId))},
           },
           {
             path: 'chat-user',
             name: 'workspace-application-chat-user',
             component: () => import('@/views/application-detail/chat-user/index.vue'),
-            meta: { title: '对话用户', icon: 'icon_contacts_outlined', activeIcon: 'icon_contacts_filled', order: 40 },
+            meta: { title: '对话用户', icon: 'icon_contacts_outlined', activeIcon: 'icon_contacts_filled', order: 40, permission: (route) => perm.application.workspace.chatUserRead(String(route.params.applicationId))},
           },
           {
             path: 'operation-log',
             name: 'workspace-application-operation-log',
             component: () => import('@/views/application-detail/chat-log/index.vue'),
-            meta: { title: '对话日志', icon: 'icon_logs_outlined', activeIcon: 'icon_logs_filled', order: 50 },
+            meta: { title: '对话日志', icon: 'icon_logs_outlined', activeIcon: 'icon_logs_filled', order: 50, permission: (route) => perm.application.workspace.chatLogRead(String(route.params.applicationId)),},
           },
         ],
       },

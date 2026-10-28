@@ -2,6 +2,10 @@
 import { can } from '../policy'
 import { PermissionConstants as P } from '../core'
 export default {
+    /**
+   * 工作空间「触发器」只读权限
+   */
+  read: () => can(P.TRIGGER_READ),
   /**
    * 工作空间「触发器」创建权限
    */

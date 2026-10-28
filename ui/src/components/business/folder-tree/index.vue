@@ -11,6 +11,19 @@ import VirtualizedTree from './VirtualizedTree.vue'
 import FolderFormDialog from './FolderFormDialog.vue'
 import ResourceAuthorizationDrawer from '@/components/business/resource-authorization-drawer/index.vue'
 import { useStore } from '@/stores'
+import { perm } from '@/permission'
+import { RESOURCE_TYPE } from '@/api/enums'
+
+const folderPermission = computed(() => {
+  switch (props.source) {
+    case RESOURCE_TYPE.APPLICATION:
+      return perm.application.workspace
+    case RESOURCE_TYPE.KNOWLEDGE:
+      return perm.knowledge.workspace
+    default:
+      return perm.tool.workspace
+  }
+})
 
 const MoveToDialog = defineAsyncComponent(() => import('./MoveToDialog.vue'))
 
@@ -416,23 +429,23 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
         </template>
 
         <template v-if="canEdit" #action-dropdown="{ row }">
-          <MkDropdownItem @click="handleOpenCreateChildFolder(row)">
+          <MkDropdownItem v-if="folderPermission.folderCreate(row.id)" @click="handleOpenCreateChildFolder(row)">
             <template #icon><MkIcon name="icon_add-folder_outlined" /></template>
             <span>创建子文件夹</span>
           </MkDropdownItem>
-          <MkDropdownItem @click="handleOpenEditFolder(row)">
+          <MkDropdownItem v-if="folderPermission.folderEdit(row.id)" @click="handleOpenEditFolder(row)">
             <template #icon><MkIcon name="icon_edit_outlined" /></template>
             <span>编辑</span>
           </MkDropdownItem>
-          <MkDropdownItem @click="handleOpenMoveFolder(row)">
+          <MkDropdownItem v-if="folderPermission.folderEdit(row.id)" @click="handleOpenMoveFolder(row)">
             <template #icon><MkIcon name="icon_move2_outlined" /></template>
             <span>移动到</span>
           </MkDropdownItem>
-          <MkDropdownItem @click="handleOpenResourceAuthorization(row)">
+          <MkDropdownItem v-if="folderPermission.folderAuth(row.id)" @click="handleOpenResourceAuthorization(row)">
             <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
             <span>资源授权</span>
           </MkDropdownItem>
-          <MkDropdownItem divided @click="handleDeleteFolder(row)">
+          <MkDropdownItem v-if="folderPermission.folderDelete(row.id)" divided @click="handleDeleteFolder(row)">
             <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
             <span>删除</span>
           </MkDropdownItem>

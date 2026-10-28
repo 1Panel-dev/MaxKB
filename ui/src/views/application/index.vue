@@ -25,6 +25,8 @@ import {
 } from './application-card/action-dropdown'
 import ButtonCreateApplication from './components/ButtonCreateApplication.vue'
 import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
+import perm from '@/permission/index.ts'
+import { getWorkspaceId } from '@/utils/resource-context.ts'
 
 const route = useRoute()
 const router = useRouter()
@@ -192,7 +194,7 @@ function handleBatchDelete() {
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip content="创建文件夹" placement="top">
+        <MkTooltip v-if="perm.application.workspace.folderCreate(getWorkspaceId()||'')" content="创建文件夹" placement="top">
           <el-button @click="handleCreateFolder" text type="primary" class="-mr-1">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
@@ -216,7 +218,7 @@ function handleBatchDelete() {
         <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 批量选择 -->
-          <span>
+          <span v-if="perm.application.workspace.batchMove() || perm.application.workspace.batchDelete()">
             <el-button :disabled="!applicationData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
               <MkIcon name="icon_Batch_outlined" />
               <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
@@ -225,9 +227,9 @@ function handleBatchDelete() {
 
           <template v-if="!batchSelectionMode">
             <!-- 模板中心 -->
-            <ButtonTemplateStore :folder-id="currentFolder.id" />
+            <ButtonTemplateStore v-if="perm.application.workspace.create()" :folder-id="currentFolder.id" />
             <!-- 创建智能体 -->
-            <ButtonCreateApplication :folder-id="currentFolder.id" @refresh="refreshApplications" />
+            <ButtonCreateApplication v-if="perm.application.workspace.create()" :folder-id="currentFolder.id" @refresh="refreshApplications" />
           </template>
         </div>
       </component>
@@ -245,13 +247,13 @@ function handleBatchDelete() {
               >
                 <template #action-dropdown>
                   <!-- 设置 -->
-                  <SettingApplicationAction label="设置" :application="application" />
+                  <SettingApplicationAction v-if="perm.application.workspace.edit(application.id)" label="设置" :application="application" />
                   <!-- 智能体触发器 -->
-                  <TriggerApplicationAction label="触发器" :api="ResourceTriggerApi" :application="application" />
+                  <TriggerApplicationAction v-if="perm.application.workspace.triggerRead(application.id)" label="触发器" :api="ResourceTriggerApi" :application="application" />
                   <!-- 资源授权 -->
-                  <AuthorizeApplicationAction label="资源授权" :application="application" />
+                  <AuthorizeApplicationAction v-if="perm.application.workspace.auth(application.id)" label="资源授权" :application="application" />
                   <!-- 查看关联资源 -->
-                  <RelatedResourcesApplicationAction label="查看关联资源" :api="RelatedResourcesApi" :application="application" />
+                  <RelatedResourcesApplicationAction v-if="perm.application.workspace.relateMap(application.id)" label="查看关联资源" :api="RelatedResourcesApi" :application="application" />
                   <!-- 复制 -->
                   <CopyApplicationAction
                     v-model:loading="applicationOperationLoading"
@@ -260,6 +262,7 @@ function handleBatchDelete() {
                     :application="application"
                     :folder-id="currentFolder.id"
                     @refresh="refreshApplications"
+                    v-if="perm.application.workspace.copy(application.id)"
                   />
                   <!-- 移动到 -->
                   <MoveApplicationAction
@@ -276,6 +279,7 @@ function handleBatchDelete() {
                     :api="ApplicationApi"
                     :application="application"
                     @change="application.is_portal = $event"
+                    v-if="perm.application.workspace.portalUp(application.id)"
                   />
                   <!-- 导出 -->
                   <ExportApplicationAction
@@ -283,6 +287,7 @@ function handleBatchDelete() {
                     label="导出"
                     :api="ApplicationApi"
                     :application="application"
+                    v-if="perm.application.workspace.export(application.id)"
                   />
                   <!-- 删除 -->
                   <DeleteApplicationAction
@@ -291,6 +296,7 @@ function handleBatchDelete() {
                     :api="ApplicationApi"
                     :application="application"
                     @delete="handleDeleteApplication"
+                    v-if="perm.application.workspace.delete(application.id)"
                   />
                 </template>
               </ApplicationCard>
@@ -310,8 +316,8 @@ function handleBatchDelete() {
         @batch-cancel="cancelBatchSelection"
       >
         <template #footer-batch-actions>
-          <el-button type="primary" plain :disabled="!selectedApplicationCount" @click="handleOpenBatchMove">移动到</el-button>
-          <el-button type="danger" plain :disabled="!selectedApplicationCount" @click="handleBatchDelete">删除</el-button>
+          <el-button v-if="perm.application.workspace.batchMove()" type="primary" plain :disabled="!selectedApplicationCount" @click="handleOpenBatchMove">移动到</el-button>
+          <el-button v-if="perm.application.workspace.batchDelete()" type="danger" plain :disabled="!selectedApplicationCount" @click="handleBatchDelete">删除</el-button>
         </template>
       </component>
     </template>

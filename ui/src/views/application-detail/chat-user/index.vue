@@ -8,10 +8,19 @@ import { LOGIN_METHOD_LABELS } from '@/constants'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
+import { isSystemResource } from '@/utils/resource-context'
+import perm from '@/permission'
 
 defineOptions({ name: 'ApplicationChatUserListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ hideHeader: true })
+
+type ApplicationChatUserPermissionMethod =
+    | 'chatUserEdit'
+function applicationchatUserPermission(method: ApplicationChatUserPermissionMethod): boolean{
+  if (isSystemResource()) return Boolean(perm.application.system[method]())
+  return Boolean(perm.application.workspace[method](applicationId.value))
+}
 
 const { applicationId, resourceApi } = useApplicationDetailContext()
 const resource = computed<ChatUserAuthorizationResource>(() => ({
@@ -205,13 +214,13 @@ onMounted(() => loadChatUserGroups())
             <!-- 搜索对话用户 -->
             <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
             <!-- 设置用户组自动授权 -->
-            <div class="flex-align-center shrink-0 gap-2">
+            <div v-if="applicationchatUserPermission('chatUserEdit')" class="flex-align-center shrink-0 gap-2">
               <span>自动授权</span>
               <el-switch :model-value="currentGroup.is_auth" size="small" @change="handleAutoAuthorizationChange" />
             </div>
           </div>
           <!-- 保存对话用户授权 -->
-          <el-button type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
+          <el-button v-if="applicationchatUserPermission('chatUserEdit')" type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
         </div>
 
         <MkTable
@@ -232,7 +241,7 @@ onMounted(() => loadChatUserGroups())
           <el-table-column :width="140" align="center">
             <template #header>
               <!-- 批量设置当前页授权 -->
-              <el-checkbox :model-value="allChecked" :indeterminate="allIndeterminate" :disabled="authorizationDisabled" @change="handleCheckAll">
+              <el-checkbox v-if="applicationchatUserPermission('chatUserEdit')" :model-value="allChecked" :indeterminate="allIndeterminate" :disabled="authorizationDisabled" @change="handleCheckAll">
                 授权
               </el-checkbox>
             </template>
@@ -242,6 +251,7 @@ onMounted(() => loadChatUserGroups())
                 :model-value="row.is_auth"
                 :disabled="authorizationDisabled"
                 @change="(value: CheckboxValueType) => handleRowChange(value, row)"
+                v-if="applicationchatUserPermission('chatUserEdit')"
               />
             </template>
           </el-table-column>

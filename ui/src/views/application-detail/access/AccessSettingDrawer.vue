@@ -9,6 +9,8 @@ import { ADMIN_API_BASE_PATH } from '@/api/constants'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 import type { AccessPlatformDefinition } from './platforms'
+import { isSystemResource } from '@/utils/resource-context.ts'
+import perm from '@/permission/index.ts'
 
 const { resourceApi } = useApplicationDetailContext()
 
@@ -19,6 +21,13 @@ const visible = ref(true)
 const loading = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 const form = reactive<ApplicationAccessConfig>({})
+
+type ApplicationAccessPermissionMethod =
+    | 'accessEdit'
+function applicationAccessPermission(method: ApplicationAccessPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.application.system[method]())
+  return Boolean(perm.application.workspace[method](props.applicationId))
+}
 
 const isWechat = computed(() => props.platform.key === APPLICATION_ACCESS_PLATFORM.WECHAT)
 const modeField = computed(() => props.platform.modeField)
@@ -139,7 +148,7 @@ onMounted(loadPlatformConfig)
       <!-- 取消发布渠道配置 -->
       <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
       <!-- 保存发布渠道配置 -->
-      <el-button type="primary" :loading="loading" @click="handleSave">保存</el-button>
+      <el-button v-if="applicationAccessPermission('accessEdit')" type="primary" :loading="loading" @click="handleSave">保存</el-button>
     </template>
   </MkDrawer>
 </template>

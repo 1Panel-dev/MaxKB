@@ -17,6 +17,7 @@ import {
   DeleteApplicationAction,
   TriggerApplicationAction,
 } from '@/views/application/application-card/action-dropdown'
+import perm from '@/permission'
 
 const { auth } = useStore()
 const router = useRouter()
@@ -175,7 +176,7 @@ onMounted(() => {
                 </el-button>
               </MkTooltip>
               <!-- 进入智能体详情 -->
-              <MkTooltip content="管理">
+              <MkTooltip v-if="perm.application.system.edit()" content="管理">
                 <el-button text type="primary" @click="handleOpenApplication(row)">
                   <MkIcon name="icon_admin_outlined" />
                 </el-button>
@@ -183,18 +184,19 @@ onMounted(() => {
 
               <MkTableMoreDropdown>
                 <!-- 资源授权 -->
-                <AuthorizeApplicationAction label="资源授权" :application="row" />
+                <AuthorizeApplicationAction v-if="perm.application.system.auth()" label="资源授权" :application="row" />
                 <!-- 智能体触发器 -->
-                <TriggerApplicationAction label="触发器" :api="SystemResourceTriggerApi" :application="row" />
+                <TriggerApplicationAction v-if="perm.application.system.triggerRead()" label="触发器" :api="SystemResourceTriggerApi" :application="row" />
                 <!-- 门户上下架 -->
                 <PortalApplicationAction
                   v-model:loading="operationLoading"
                   :api="SystemResourceApplicationApi"
                   :application="row"
                   @change="row.is_portal = $event"
+                  v-if="perm.application.system.portalUp() && row.is_publish"
                 />
                 <!-- 导出 -->
-                <ExportApplicationAction v-model:loading="operationLoading" label="导出" :api="SystemResourceApplicationApi" :application="row" />
+                <ExportApplicationAction v-if="perm.application.system.export()" v-model:loading="operationLoading" label="导出" :api="SystemResourceApplicationApi" :application="row" />
                 <!-- 删除 -->
                 <DeleteApplicationAction
                   v-model:loading="operationLoading"
@@ -202,6 +204,7 @@ onMounted(() => {
                   :api="SystemResourceApplicationApi"
                   :application="row"
                   @delete="loadApplicationPage"
+                  v-if="perm.application.system.delete()"
                 />
               </MkTableMoreDropdown>
             </div>

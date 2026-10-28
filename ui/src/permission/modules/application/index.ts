@@ -3,8 +3,12 @@
 import workspace from './workspace'
 import system from './system'
 
-export default { workspace,
+export default {
+ /**
+ * 工作空间「智能体」权限
+ */
+  workspace,
   /**
-   * 系统「应用」权限
+   * 系统「智能体」权限
    * */
   system }
