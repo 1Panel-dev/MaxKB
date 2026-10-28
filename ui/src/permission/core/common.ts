@@ -260,8 +260,9 @@ export class Permission {
   getResourcePermissionKey(): string {
     const workspace = this.workspaceId ? `:w:${this.workspaceId}` : ''
     const resource = this.resourceId ? `:r:${this.resourceId}` : ''
+    const flag = this.flag ? `_${this.flag}` : ''
     const group = (this.group === Group.SYSTEM_RES_KNOWLEDGE || this.group === Group.KNOWLEDGE) && this.subGroup !== this.group ? `${this.group}_${this.subGroup}` : this.group
-    return `${group}${workspace}${resource}`
+    return `${group}${flag}${workspace}${resource}`
   }
 
   /** 判定时使用的最终 key，对应后端 `AggregatePermission._match_permission`。 */

@@ -121,6 +121,7 @@ def get_permissions(
             "----------------------处理工作空间权限--------------------------------------------------"
             for _ in workspace_user_role_mapping_list:
                 _role_permission_mapping_list = role_permission_mapping_dict.get(str(_.role_id)) or []
+                role = role_model_dict.get(str(_.role_id))
                 permissions = [
                     PERMISSION_STR_MAP.get(_role_permission_mapping.permission_id)
                     for _role_permission_mapping in _role_permission_mapping_list
@@ -135,6 +136,9 @@ def get_permissions(
                     k = f"{group}:w:{_.workspace_id}"
                     bits = reduce(lambda x, y: x | y, [p.value.bit() for p in ps], 0)
                     permission_map[k] = permission_map.get(k, 0) | bits
+                    if role and role.type == str(RoleConstants.WORKSPACE_MANAGE.value) and not role.internal:
+                        workspace_manage_k = f"{group}_{RoleConstants.WORKSPACE_MANAGE.value}:w:{_.workspace_id}"
+                        permission_map[workspace_manage_k] = permission_map.get(workspace_manage_k, 0) | bits
             "----------------------处理系统权限--------------------------------------------------"
             system_permissions = [
                 PERMISSION_STR_MAP.get(_role_permission_mapping.permission_id)

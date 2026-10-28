@@ -53,7 +53,7 @@ TOKEN_EXPR = F("chatrecord__message_tokens") + F("chatrecord__answer_tokens")
 def hasPermission(auth, permission):
     if "USER" in auth.roles:
         return True
-    key = permission.get_resource_permission_key(permission.resource_id) if permission.resource_id else str(permission)
+    key = permission.get_resource_permission_key(permission.resource_id)
     return (auth.permissions.get(key, 0) & permission.bit()) > 0
 
 
