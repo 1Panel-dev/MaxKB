@@ -1,33 +1,13 @@
 <template>
-  <el-form
-    @submit.prevent
-    ref="ruleFormRef"
-    label-width="130px"
-    label-suffix=":"
-    v-loading="loading"
-    v-bind="$attrs"
-    label-position="top"
-    require-asterisk-position="right"
-  >
+  <el-form @submit.prevent ref="ruleFormRef" label-width="130px" label-suffix=":" v-loading="loading" v-bind="$attrs"
+    label-position="top" require-asterisk-position="right">
     <slot :form_value="formValue"></slot>
     <template v-for="item in formFieldList" :key="item.field">
-      <FormItem
-        ref="formFieldRef"
-        :key="item.field"
-        v-if="show(item)"
-        @change="change(item, $event)"
-        @changeLabel="changeLabel(item, $event)"
-        v-bind:modelValue="formValue[item.field]"
-        :formfield="item"
-        :trigger="trigger"
-        :view="view"
-        :initDefaultData="initDefaultData"
-        :defaultItemWidth="defaultItemWidth"
-        :other-params="otherParams"
-        :form-value="formValue"
-        :formfield-list="formFieldList"
-        :parent_field="parent_field"
-      >
+      <FormItem ref="formFieldRef" :key="item.field" v-if="show(item)" @change="change(item, $event)"
+        @changeLabel="changeLabel(item, $event)" v-bind:modelValue="formValue[item.field]" :formfield="item"
+        :trigger="trigger" :view="view" :initDefaultData="initDefaultData" :defaultItemWidth="defaultItemWidth"
+        :other-params="otherParams" :form-value="formValue" :formfield-list="formFieldList"
+        :parent_field="parent_field">
       </FormItem>
     </template>
   </el-form>
@@ -54,10 +34,10 @@ const props = withDefaults(
   defineProps<{
     // 页面渲染数据
     render_data:
-      | Promise<Result<Array<FormField>>>
-      | string
-      | Array<FormField>
-      | (() => Promise<Result<Array<FormField>>>)
+    | Promise<Result<Array<FormField>>>
+    | string
+    | Array<FormField>
+    | (() => Promise<Result<Array<FormField>>>)
     // 调用接口所需要的其他参数
     otherParams?: any
     // 是否只读
@@ -69,7 +49,7 @@ const props = withDefaults(
 
     modelValue?: Dict<any>
   }>(),
-  { view: false, defaultItemWidth: '75%', otherParams: () => {} },
+  { view: false, defaultItemWidth: '75%', otherParams: () => { } },
 )
 
 const formValue = ref<Dict<any>>({})
@@ -169,43 +149,7 @@ const trigger = (
   self: any,
   loading: Ref<boolean>,
 ) => {
-  const request_call = new Function(
-    'self',
-    'trigger_setting',
-    'request',
-    'extra',
-    trigger_setting.request
-      ? trigger_setting.request
-      : 'return  request.get(extra.renderTemplate(trigger_setting.url));',
-  )(self, trigger_setting, request, {
-    renderTemplate: (url: string) =>
-      renderTemplate(url, {
-        trigger_value: trigger_value,
-        ...props.otherParams,
-      }),
-  })
-
-  if (!trigger_setting.change && !trigger_setting.change_field) {
-    return
-  }
-  request_call.then((ok: any) => {
-    new Function(
-      'self',
-      'trigger_setting',
-      'response',
-      'extra',
-      trigger_setting.change
-        ? trigger_setting.change
-        : `self[trigger_setting.change_field]=[
-        ...response.data.shared_model.map((m) => {
-          return { ...m, type: 'share' }
-        }),
-        ...response.data.model.map((m) => {
-          return { ...m, type: 'workspace' }
-        })
-      ];`,
-    )(self, trigger_setting, ok, { form_data: formValue, getDefault: getFormDefaultValue })
-  })
+  return
 }
 /**
  * 初始化默认数据

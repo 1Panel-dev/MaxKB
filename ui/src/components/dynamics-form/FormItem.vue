@@ -127,16 +127,21 @@ const errMsg = computed(() => {
       ? props.formfield.label + ' ' + t('dynamicsForm.tip.requiredMessage')
       : props.formfield.label.label + ' ' + t('dynamicsForm.tip.requiredMessage')
 })
+
+const component_validator = (rule: any, value: any, callback: any) => {
+  if (componentFormRef.value?.validate_rules) {
+    return componentFormRef.value.validate_rules(rule, value, callback)
+  }
+  callback()
+}
+
 /**
  * 反序列化
  * @param rule
  */
 const to_rule = (rule: any) => {
-  if (rule.validator) {
-    // eslint-disable-next-line prefer-const, @typescript-eslint/no-unused-vars
-    let validator = (rule: any, value: string, callback: any) => {}
-    eval(rule.validator)
-    return { ...rule, validator }
+  if (typeof rule.validator === 'string' || rule.validator === 'component') {
+    return { ...rule, validator: component_validator }
   }
   return rule
 }
