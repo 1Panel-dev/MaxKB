@@ -141,7 +141,7 @@ onMounted(loadApiKeys)
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" show-overflow-tooltip>
+      <el-table-column label="备注" width="180" show-overflow-tooltip>
         <template #default="{ row }">{{ row.remark || '—' }}</template>
       </el-table-column>
       <el-table-column prop="create_time" label="创建时间" width="180">
