@@ -13,6 +13,13 @@
   width: 50px;
 }
 
+/* 对话正文：消息列表与底部输入区共用宽度和居中布局。 */
+.mk-conversation-content {
+  margin-inline: auto;
+  max-width: 800px;
+  width: 100%;
+}
+
 /* 对话左右两侧 */
 .mk-conversation-side-panel {
   /* 固定侧栏内容宽度，避免展开和收起时内容变形。 */

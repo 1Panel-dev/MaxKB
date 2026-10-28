@@ -18,7 +18,7 @@ import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import RequestParameters from './request-parameters/RequestParametersTable.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import { v4 as uuidv4 } from 'uuid'
+import { v7 as uuidv7 } from 'uuid'
 
 const props = withDefaults(
   defineProps<{
@@ -43,7 +43,7 @@ const resources = ref<Record<string, Partial<ApplicationDetail & ToolItem>>>({})
 
 function createDefaultForm(): TriggerPayload {
   return {
-    id: uuidv4(),
+    id: uuidv7(),
     name: '',
     desc: '',
     trigger_type: TRIGGER_TYPE.SCHEDULED,
@@ -54,7 +54,7 @@ function createDefaultForm(): TriggerPayload {
       days: [1],
       interval_unit: 'minutes',
       interval_value: 1,
-      token: uuidv4().replaceAll('-', ''),
+      token: uuidv7().replaceAll('-', ''),
       body: [],
     },
   }
@@ -200,7 +200,7 @@ function handleSelectTriggerType(type: TriggerPayload['trigger_type']) {
   formRef.value?.clearValidate('trigger_setting')
 }
 function handleRefreshToken() {
-  form.value.trigger_setting.token = uuidv4().replaceAll('-', '')
+  form.value.trigger_setting.token = uuidv7().replaceAll('-', '')
 }
 
 const rules: FormRules<TriggerPayload> = {

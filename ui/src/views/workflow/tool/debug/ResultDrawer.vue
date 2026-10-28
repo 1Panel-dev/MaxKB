@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, provide, ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import { v4 as uuidv4 } from 'uuid'
+import { v7 as uuidv7 } from 'uuid'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type { ToolExecutionRecordDetail } from '@/api/types'
 import { MsgError } from '@/utils/message'
@@ -101,7 +101,7 @@ function open(parameters: Record<string, unknown>) {
   blocks.value = []
   record.value = undefined
   inputParameters = cloneDeep(parameters)
-  recordId = uuidv4()
+  recordId = uuidv7()
   activeTab.value = 'output'
   visible.value = true
   return execute()

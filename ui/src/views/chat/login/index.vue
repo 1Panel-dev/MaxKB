@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
-import { v4 as uuidv4 } from 'uuid'
+import { v7 as uuidv7 } from 'uuid'
 import ChatAuthApi from '@/api/chat/auth'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { LOGIN_METHOD } from '@/api/enums'
@@ -65,7 +65,7 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
     // OAuth2 通过 state 透传 accessToken
     if (!config.authEndpoint || !config.clientId) return ''
     const redirectUrl = `${config.redirectUrl}${queryString ? `&${queryString}` : ''}`
-    const state = accessToken ? `${uuidv4()}_${accessToken}` : uuidv4()
+    const state = accessToken ? `${uuidv7()}_${accessToken}` : uuidv7()
     let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${state}`
     if (config.scope) url += `&scope=${config.scope}`
     return url
