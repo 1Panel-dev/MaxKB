@@ -11,6 +11,11 @@ export interface RoleItem {
   user_count?: number
 }
 
+export interface RoleTypeGroup {
+  role_type: RoleType
+  role_list: RoleItem[]
+}
+
 export interface RolePermission {
   id: string
   name: string

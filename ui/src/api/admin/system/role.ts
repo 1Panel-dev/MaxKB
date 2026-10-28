@@ -1,17 +1,29 @@
 import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
-import type { CreateRoleMembersRequest, Dict, RoleItem, RoleMember, RolePermissionModule, RolePayload, RoleType, SaveRolePermissionRequest } from '@/api/types'
+import type {
+  CreateRoleMembersRequest,
+  Dict,
+  RoleItem,
+  RoleMember,
+  RolePayload,
+  RolePermissionModule,
+  RoleTypeGroup,
+  SaveRolePermissionRequest,
+} from '@/api/types'
 
 const prefix = '/system/role'
 
-/** 获取内置角色与自定义角色列表。 */
+/** 获取按角色类型分组的角色列表。 */
 const getRoleList = () => {
-  return get<{ internal_role: RoleItem[]; custom_role: RoleItem[] } | Array<{ role_type: RoleType; role_list: RoleItem[] }>>(prefix).then((data) => {
+  return get<{ internal_role: RoleItem[]; custom_role: RoleItem[] } | RoleTypeGroup[]>(prefix).then((data) => {
     if (Array.isArray(data)) {
-      // 后端按角色类型分组返回 { role_type, role_list }，展平为扁平角色数组
-      return data.flatMap((group) => group.role_list ?? [])
+      return data
     }
-    return [...(data.internal_role ?? []), ...(data.custom_role ?? [])]
+    const roles = [...(data.internal_role ?? []), ...(data.custom_role ?? [])]
+    return [...new Set(roles.map((role) => role.type))].map((roleType) => ({
+      role_type: roleType,
+      role_list: roles.filter((role) => role.type === roleType),
+    }))
   })
 }
 
@@ -55,4 +67,14 @@ const deleteRoleMembers = (roleId: string, userRelationIds: string[]) => {
   return del<{ member_ids: string[] }, boolean>(`${prefix}/${roleId}/remove_member/batch`, undefined, { member_ids: userRelationIds })
 }
 
-export default { deleteRole, deleteRoleMember, deleteRoleMembers, getRoleList, getRoleMemberList, getRolePermissionList, postRole, postRoleMembers, postRolePermissions }
+export default {
+  deleteRole,
+  deleteRoleMember,
+  deleteRoleMembers,
+  getRoleList,
+  getRoleMemberList,
+  getRolePermissionList,
+  postRole,
+  postRoleMembers,
+  postRolePermissions,
+}
