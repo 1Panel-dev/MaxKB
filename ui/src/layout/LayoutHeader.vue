@@ -9,9 +9,20 @@ import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import type { LayoutMode } from './types'
 import { Compare, hasPermission, Role, RoleConstants } from '@/permission/core'
 import { getWorkspaceId } from '@/utils/resource-context'
+import { useStore } from '@/stores'
 
 const router = useRouter()
 const props = withDefaults(defineProps<{ mode?: LayoutMode; preview?: boolean }>(), { mode: 'workspace', preview: false })
+
+const { user } = useStore()
+
+// 命中 "X" / "X:..." / "X:w:..."（系统模式下没有 workspaceId，仍能匹配 EXTENDS_*）
+function hasRolePrefix(name: string) {
+  for (const role of user.roleSet) {
+    if (role === name || role.startsWith(`${name}:`)) return true
+  }
+  return false
+}
 
 // 系统管理员：内置 ADMIN 或自定义 ADMIN 类型（EXTENDS_ADMIN 无 :w: 后缀）
 const canManageSystem = computed(() =>
@@ -21,26 +32,20 @@ const canManageSystem = computed(() =>
 // 工作空间管理员：内置 WORKSPACE_MANAGE 或自定义 EXTENDS_WORKSPACE_MANAGE
 const isWorkspaceManager = computed(() => {
   const workspaceId = getWorkspaceId()
-  return hasPermission(
-    [
-      RoleConstants.WORKSPACE_MANAGE,
-      new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId),
-      new Role(RoleConstants.EXTENDS_WORKSPACE_MANAGE.name, workspaceId),
-    ],
-    Compare.OR,
+  return (
+    hasPermission(
+      [RoleConstants.WORKSPACE_MANAGE, new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId)],
+      Compare.OR,
+    ) || hasRolePrefix(RoleConstants.EXTENDS_WORKSPACE_MANAGE.name)
   )
 })
 
 // 普通用户：内置 USER 或自定义 EXTENDS_USER
 const isOrdinaryUser = computed(() => {
   const workspaceId = getWorkspaceId()
-  return hasPermission(
-    [
-      RoleConstants.USER,
-      new Role(RoleConstants.USER.name, workspaceId),
-      new Role(RoleConstants.EXTENDS_USER.name, workspaceId),
-    ],
-    Compare.OR,
+  return (
+    hasPermission([RoleConstants.USER, new Role(RoleConstants.USER.name, workspaceId)], Compare.OR) ||
+    hasRolePrefix(RoleConstants.EXTENDS_USER.name)
   )
 })
 
@@ -48,7 +53,12 @@ const isOrdinaryUser = computed(() => {
 const canReturnWorkspace = computed(() => isWorkspaceManager.value || isOrdinaryUser.value)
 
 function switchMode() {
-  router.push(isWorkspace(props.mode) ? { name: 'system-home' } : { name: 'workspace-home', params: { workspaceId: 'default' } })
+  if (isWorkspace(props.mode)) {
+    router.push({ name: 'system-home' })
+    return
+  }
+  const workspaceId = user.userInfo?.workspace_list?.[0]?.id || 'default'
+  router.push({ name: 'workspace-home', params: { workspaceId } })
 }
 </script>
 
