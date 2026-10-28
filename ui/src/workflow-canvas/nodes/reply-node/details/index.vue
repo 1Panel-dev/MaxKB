@@ -29,7 +29,7 @@ const toolAnswer = computed(() => (contentType.value === 'TOOL' ? JSON.stringify
           <template v-if="!data.answer || (contentType === 'TOOL' && !data.answer.length)">-</template>
           <!-- eslint-disable-next-line vue/no-v-html -- 内容已经 DOMPurify 净化 -->
           <div v-else-if="contentType === 'HTML'" v-html="sanitizedHtml" />
-          <pre v-else-if="contentType === 'TOOL'" class="whitespace-pre-wrap break-all">{{ toolAnswer }}</pre>
+          <div v-else-if="contentType === 'TOOL'" class="whitespace-pre-wrap break-all">{{ toolAnswer }}</div>
           <MdPreview v-else :model-value="data.answer" noImgZoomIn />
         </el-scrollbar>
       </div>

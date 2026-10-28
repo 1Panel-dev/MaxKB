@@ -1,60 +1,37 @@
-<template>
-  <div class="content-tool">
-    <!-- 工具调用头部：函数名 + 状态，点击展开/收起 -->
-    <button type="button" class="tool-header" @click="isExpanded = !isExpanded">
-      <svg class="tool-chevron" :class="{ open: isExpanded }" viewBox="0 0 16 16" fill="none">
-        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <svg class="tool-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <path d="M10.5 2.5h-7a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.2"/>
-        <path d="M5.5 5.5h3M5.5 8h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-      <span class="tool-name">{{ content.name || 'Tool' }}</span>
-      <span v-if="content.status" class="tool-status" :class="statusClass">{{ statusText }}</span>
-    </button>
-
-    <div v-show="isExpanded" class="tool-body">
-      <!-- 请求参数 -->
-      <div v-if="content.arguments" class="tool-section">
-        <div class="tool-section-title">参数</div>
-        <pre class="tool-code">{{ formattedArguments }}</pre>
-      </div>
-      <!-- 返回结果 -->
-      <div v-if="content.content" class="tool-section">
-        <div class="tool-section-title">结果</div>
-        <pre class="tool-code">{{ formattedResult }}</pre>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import type { ChatContent, Dict } from '@/api/types'
 
-const props = defineProps<{ content: any }>()
+defineOptions({ name: 'ConversationDefaultToolContent' })
 
+const props = defineProps<{ content: ChatContent }>()
+
+// 默认工具独立管理展开状态，初始收起。
 const isExpanded = ref(false)
+const loading = computed(() => props.content.status === 'RUNNING')
+const toolTitle = computed(() => props.content.name || 'Tool')
 
 // 状态文案与配色
-const statusText = computed(() => {
-  const map: Record<string, string> = {
-    RUNNING: '执行中',
-    SUCCESS: '成功',
-    FAIL: '失败',
-    FAILURE: '失败',
-  }
-  return map[props.content.status] ?? props.content.status
-})
+// const statusText = computed(() => {
+//   const map: Dict<string> = {
+//     RUNNING: '执行中',
+//     SUCCESS: '成功',
+//     FAIL: '失败',
+//     FAILURE: '失败',
+//   }
+//   const status = props.content.status ?? ''
+//   return map[status] ?? status
+// })
 
-const statusClass = computed(() => {
-  const status = props.content.status
-  if (status === 'SUCCESS') return 'success'
-  if (status === 'FAIL' || status === 'FAILURE') return 'error'
-  return 'running'
-})
+// const statusClass = computed(() => {
+//   const status = props.content.status
+//   if (status === 'SUCCESS') return 'text-success'
+//   if (status === 'FAIL' || status === 'FAILURE') return 'text-danger'
+//   return 'text-N600'
+// })
 
 // 参数为 JSON 字符串，尝试格式化展示，失败则原样展示
-function tryFormatJson(value: any): string {
+function tryFormatJson(value: unknown): string {
   if (value == null) return ''
   if (typeof value !== 'string') {
     try {
@@ -76,107 +53,34 @@ const formattedArguments = computed(() => tryFormatJson(props.content.arguments 
 const formattedResult = computed(() => tryFormatJson(props.content.content))
 </script>
 
-<style scoped lang="scss">
-.content-tool {
-  background: var(--bg2, #fafafa);
-  border: 1px solid var(--bd, #dcdfe6);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
+<template>
+  <!-- 展开或收起工具调用内容 -->
+  <MkCollapse class="w-full" v-model:expanded="isExpanded" indicator-position="after" trigger-class="group text-N500! mb-2 w-fit hover:text-N900!">
+    <template #indicator="{ expanded }">
+      <MkIcon
+        name="icon_right_outlined"
+        :size="12"
+        class="transition-transform text-N500! group-hover:text-N900!"
+        :class="{ 'rotate-90': expanded }"
+      />
+    </template>
+    <template #label>
+      <span v-if="loading" class="mk-conversation-loading" />
+      <MkIcon name="icon_busy_outlined" />
+      <span class="min-w-0 max-w-[300px] truncate" :title="toolTitle">{{ toolTitle }}</span>
+    </template>
 
-.tool-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  padding: 8px 12px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 12px;
-  color: var(--t2, #606266);
-  transition: color 0.15s;
-}
-
-.tool-header:hover {
-  color: var(--t1, #303133);
-}
-
-.tool-chevron {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-  color: var(--t3, #909399);
-  transition: transform 0.15s;
-}
-
-.tool-chevron.open {
-  transform: rotate(90deg);
-}
-
-.tool-icon {
-  flex-shrink: 0;
-}
-
-.tool-name {
-  font-weight: 500;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tool-status {
-  margin-left: auto;
-  flex-shrink: 0;
-  font-size: 11px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--hv, #f5f7fa);
-}
-
-.tool-status.success {
-  color: #67c23a;
-}
-
-.tool-status.error {
-  color: #f56c6c;
-}
-
-.tool-status.running {
-  color: var(--t3, #909399);
-}
-
-.tool-body {
-  padding: 0 12px 10px;
-}
-
-.tool-section + .tool-section {
-  margin-top: 8px;
-}
-
-.tool-section-title {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--t3, #909399);
-  margin-bottom: 4px;
-}
-
-.tool-code {
-  margin: 0;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: var(--hv, #f5f7fa);
-  border: 1px solid var(--bd, #ebeef5);
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--t1, #303133);
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 320px;
-  overflow: auto;
-}
-</style>
+    <div class="space-y-2">
+      <!-- 请求参数 -->
+      <div v-if="content.arguments" class="mk-gray-card-lg py-3!">
+        <h6 class="mb-2">输入参数</h6>
+        <div class="whitespace-pre-wrap break-words">{{ formattedArguments }}</div>
+      </div>
+      <!-- 返回结果 -->
+      <div v-if="content.content" class="mk-gray-card-lg py-3!">
+        <h6 class="mb-2">输出参数</h6>
+        <div class="whitespace-pre-wrap break-words">{{ formattedResult }}</div>
+      </div>
+    </div>
+  </MkCollapse>
+</template>

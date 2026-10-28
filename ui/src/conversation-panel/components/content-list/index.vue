@@ -52,7 +52,7 @@ function foldToolGroups(contentItems: ContentItem[]): ContentItem[] {
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full space-y-3">
     <template v-for="(content, index) in displayContents" :key="`${content.type}:${content.id ?? index}`">
       <Content :content="content" />
     </template>
