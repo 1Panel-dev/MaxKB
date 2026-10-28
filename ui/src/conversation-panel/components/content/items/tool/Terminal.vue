@@ -2,9 +2,8 @@
   <!-- 展开或收起终端输出 -->
   <MkCollapse
     class="w-full"
-    :expanded="expanded"
+    v-model:expanded="expanded"
     trigger-class="group w-fit max-w-full overflow-hidden py-[3px] text-N500 hover:text-N900 transition-colors"
-    @update:expanded="$emit('toggle')"
   >
     <template #indicator="{ expanded }">
       <svg class="tc-chevron" :class="{ open: expanded }" viewBox="0 0 16 16" fill="none">
@@ -33,11 +32,14 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import type { ChatContent } from '@/api/types'
 import Loading from '@/conversation-panel/loading/index.vue'
 import { extractPartialJsonField } from './extract-partial-json'
 
-const props = defineProps<{ content: any; loading: boolean; expanded: boolean }>()
-defineEmits<{ toggle: [] }>()
+defineOptions({ name: 'ConversationTerminalContent' })
+
+const props = defineProps<{ content: ChatContent; loading: boolean }>()
+const expanded = defineModel<boolean>('expanded', { required: true })
 
 const commandText = computed(() => {
   const raw = props.content.arguments
@@ -48,7 +50,7 @@ const commandText = computed(() => {
 // 展开后定位到终端输出底部。
 const terminalBlock = ref<HTMLElement>()
 watch(
-  () => props.expanded,
+  expanded,
   (expanded) => {
     if (expanded && terminalBlock.value) {
       terminalBlock.value.scrollTop = terminalBlock.value.scrollHeight
