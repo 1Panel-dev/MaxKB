@@ -265,7 +265,7 @@ class ImageDocumentTests(SimpleTestCase):
                     resource_type=resource_type or DocumentResourceType.DOCUMENT,
                 )
                 operate.assert_called_once_with(data={"knowledge_id": knowledge_id, "document_id": document_id})
-                operate.return_value.refresh.assert_called_once_with(payload["state_list"])
+                operate.return_value.refresh.assert_called_once_with(payload["state_list"], ignore_queued=True)
 
     @patch("knowledge.serializers.document.DocumentSerializers.Operate")
     @patch("knowledge.serializers.document.QuerySet")

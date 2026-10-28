@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 from uuid import UUID
 
+from django.db import migrations
 from django.test import RequestFactory, SimpleTestCase
 from django.urls import resolve
 from rest_framework.exceptions import ValidationError
@@ -37,9 +38,17 @@ def knowledge(**settings):
 class RetrievalSettingsTests(SimpleTestCase):
     def test_new_default_and_existing_migration_default_differ(self):
         self.assertEqual(Knowledge().external_service, {"enabled": False, "authentication": False})
-        migration = importlib.import_module("knowledge.migrations.0015_knowledge_external_service").Migration
-        self.assertEqual(migration.operations[0].field.get_default(), {})
-        self.assertEqual(migration.operations[1].field.get_default(), Knowledge().external_service)
+        migration = importlib.import_module("knowledge.migrations.0012_v3_upgrade").Migration
+        operations = [
+            operation
+            for operation in migration.operations
+            if isinstance(operation, (migrations.AddField, migrations.AlterField))
+            and operation.model_name == "knowledge"
+            and operation.name == "external_service"
+        ]
+        self.assertEqual([type(operation) for operation in operations], [migrations.AddField, migrations.AlterField])
+        self.assertEqual(operations[0].field.get_default(), {})
+        self.assertEqual(operations[1].field.get_default(), Knowledge().external_service)
         self.assertFalse(service_settings(knowledge())["enabled"])
         self.assertFalse(service_settings(Knowledge())["authentication"])
 

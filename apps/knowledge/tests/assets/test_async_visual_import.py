@@ -1,5 +1,6 @@
 """Document import defers inline image enhancement to the committed embedding job."""
 
+from contextlib import nullcontext
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
@@ -98,23 +99,32 @@ class AsyncVisualImportTests(SimpleTestCase):
 class VisualImportCommitTests(SimpleTestCase):
     def test_embedding_job_is_published_only_after_commit(self):
         document_id, knowledge_id, model_id = (str(uuid4()) for _ in range(3))
+        state_list = ["0", "3"]
         operation = DocumentSerializers.Operate(data={"knowledge_id": knowledge_id, "document_id": document_id})
         serializers.Serializer.is_valid(operation, raise_exception=True)
         with (
             patch.object(operation, "is_valid"),
             patch("knowledge.serializers.document.QuerySet") as query,
-            patch("knowledge.serializers.document.ListenerManagement"),
+            patch("knowledge.serializers.document.ListenerManagement") as listener,
+            patch("knowledge.serializers.document.transaction.atomic", return_value=nullcontext()) as atomic,
             patch("knowledge.serializers.document.transaction.on_commit") as on_commit,
             patch("knowledge.serializers.document.embedding_by_document.delay") as delay,
         ):
             query.return_value.filter.return_value.first.return_value = SimpleNamespace(embedding_model_id=model_id)
+            query.return_value.select_for_update.return_value.filter.return_value.exists.return_value = True
 
-            operation.refresh()
+            operation.refresh(state_list)
 
             delay.assert_not_called()
+            atomic.assert_not_called()
+            listener.update_status.assert_not_called()
+            query.return_value.select_for_update.assert_not_called()
             on_commit.assert_called_once()
             on_commit.call_args.args[0]()
-            self.assertEqual(delay.call_args.args[:2], (document_id, model_id))
+            atomic.assert_called_once_with()
+            query.return_value.select_for_update.return_value.filter.assert_called_once_with(id=document_id)
+            listener.update_status.assert_called()
+            delay.assert_called_once_with(document_id, model_id, state_list)
 
 
 class VisualAssetDeferralTests(SimpleTestCase):
