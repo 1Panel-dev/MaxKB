@@ -591,7 +591,11 @@ async def _yield_mcp_response(
             _merge_arguments(entry, part_args)
 
         async for chunk in response:
-            # print(chunk)
+            # DeepAgents' internal summary call streams from the same model node.
+            # Filter its source metadata before collecting tool fragments or yielding
+            # content/reasoning; matching answer text or node names is not reliable.
+            if chunk[1].get("lc_source") == "summarization":
+                continue
             if isinstance(chunk[0], AIMessageChunk):
                 # ----------------------------------------------------------------
                 # 1. 从 tool_call_chunks 中聚合工具调用片段
