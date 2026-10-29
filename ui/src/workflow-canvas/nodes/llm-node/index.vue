@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, inject, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 
 import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
@@ -77,6 +77,10 @@ const showSettings = computed(() =>
 
 function updateNodeData(setting: Partial<LlmNodeForm>) {
   model.properties.node_data = { ...formData.value, ...setting }
+}
+
+function handleContextEnabledChange(enabled: boolean) {
+  if (!enabled) void nextTick(() => formRef.value?.clearValidate('context_variable'))
 }
 
 async function validate() {
@@ -164,7 +168,7 @@ onMounted(() => {
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </span>
-              <el-switch v-model="formData.enable_context" size="small" />
+              <el-switch v-model="formData.enable_context" size="small" @change="handleContextEnabledChange" />
             </div>
           </template>
           <NodeCascader
