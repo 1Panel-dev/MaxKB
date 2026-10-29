@@ -4,7 +4,7 @@ import type ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-syn
 import type SharedScheduledSyncApi from '@/api/admin/workspace/shared/knowledge/scheduled-sync'
 import type SystemResourceScheduledSyncApi from '@/api/admin/system/resource-management/knowledge/scheduled-sync'
 import type SystemSharedScheduledSyncApi from '@/api/admin/system/shared-resources/knowledge/scheduled-sync'
-import { KNOWLEDGE_SYNC_STATUS, KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
+import { KNOWLEDGE_SYNC_STATUS } from '@/api/enums'
 import type { KnowledgeSyncLog, KnowledgeSyncStatus } from '@/api/types'
 import type { StatusLabelOptions } from '@/components/global/mk-status-label/types'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
@@ -89,11 +89,7 @@ watch(
       </el-table-column>
       <el-table-column label="同步方式" width="140">
         <template #default="{ row }">
-          {{
-            row.sync_type === KNOWLEDGE_SYNC_TYPE.COMPLETE
-              ? '完整同步'
-              : (KNOWLEDGE_SYNC_OPTIONS.find((option) => option.value === row.sync_type)?.label ?? row.sync_type)
-          }}
+          {{ KNOWLEDGE_SYNC_OPTIONS.find((option) => option.value === row.sync_type)?.label ?? row.sync_type }}
         </template>
       </el-table-column>
       <el-table-column label="同步状态" width="120">

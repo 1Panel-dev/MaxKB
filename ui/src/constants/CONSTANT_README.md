@@ -23,7 +23,7 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 `resource-authorization.ts` 的 `RESOURCE_PERMISSION_OPTIONS` 统一维护权限标签和说明；
 资源授权页面与资源用户授权抽屉按版本和根目录约束筛选选项。
 
-`knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS` 统一维护增量同步、替换同步和整体同步的值、文案及说明，
+`knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS` 统一维护增量同步、替换同步和完整同步的值、文案及说明，
 手动同步弹窗与定时同步设置直接复用，日志同步方式标签也从这些选项读取。
 
 `knowledge.ts` 的 `KNOWLEDGE_SEARCH_MODE_OPTIONS` 统一维护向量、全文和混合检索的值、文案及说明，
