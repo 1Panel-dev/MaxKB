@@ -39,7 +39,7 @@ from django.utils.translation import gettext as _
 
 from models_provider.impl.xf_model_provider.model.zh_en_stt import XFZhEnSparkSpeechToText
 
-ssl._create_default_https_context = ssl.create_default_context()
+ssl._create_default_https_context = ssl.create_default_context
 
 xunfei_model_credential = XunFeiLLMModelCredential()
 stt_model_credential = XunFeiSTTModelCredential()
