@@ -20,10 +20,19 @@ FROM (SELECT tool."id"::text,
              tool."is_active"
       FROM (SELECT tool.*
             FROM tool tool ${tool_query_set}
-             AND tool.id::text IN (SELECT target
-                          FROM workspace_user_resource_permission
-                          ${workspace_user_resource_permission_query_set}
-                            AND 'VIEW' = ANY (permission_list))) AS tool
+             AND tool.id::text IN (
+                 SELECT target
+                 FROM workspace_user_resource_permission
+                 ${workspace_user_resource_permission_query_set}
+                 AND 'VIEW' = ANY (permission_list)
+                 UNION
+                 SELECT DISTINCT target
+                 FROM workspace_user_group_resource_permission
+                 INNER JOIN system_user_group_relation
+                         ON system_user_group_relation.group_id = workspace_user_group_resource_permission.user_group_id
+                 ${workspace_user_group_resource_permission_query_set}
+                 AND 'VIEW' = ANY (permission_list)
+             )) AS tool
                LEFT JOIN "user" ON "user".id = user_id
 ) temp
       ${default_query_set}
