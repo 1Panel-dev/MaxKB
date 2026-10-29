@@ -23,7 +23,7 @@ from django.db import connection
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 from knowledge.models import File
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, AIMessageChunk, BaseMessage, HumanMessage, SystemMessage, ToolMessage
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 from tools.models import Tool, ToolType
@@ -33,6 +33,25 @@ from application.flow.i_step_node import INode, NodeResult
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning, get_tools, mcp_response_generator
 from application.models import Application, ApplicationAccessToken, ApplicationApiKey
+
+
+def _is_tool_workflow(workflow) -> bool:
+    """True when this AI node runs inside a workflow-as-tool (not an application chat)."""
+    mode = getattr(getattr(workflow, "flow", None), "workflow_mode", None)
+    return mode in (WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP)
+
+
+def _is_tool_process_chunk(chunk) -> bool:
+    """Tool cards or AI chunks that open tool calls — process output, not final answer text."""
+    if isinstance(chunk, ToolMessage):
+        return True
+    if isinstance(chunk, (AIMessage, AIMessageChunk)):
+        if getattr(chunk, "tool_call_chunks", None) or getattr(chunk, "tool_calls", None):
+            return True
+        legacy = (getattr(chunk, "additional_kwargs", None) or {}).get("tool_calls") or []
+        if legacy:
+            return True
+    return False
 
 
 def _write_context(
@@ -70,20 +89,44 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         model_setting.get("reasoning_content_start", "<think>"), model_setting.get("reasoning_content_end", "</think>")
     )
     response_reasoning_content = False
+    # When this AI node is inside a workflow tool, "输出执行过程" must not pollute the
+    # node's answer (copied to tool outputs / outer agent). Keep streaming process
+    # chunks for tool-debug UI, but only retain final post-tool model text in answer.
+    is_tool_workflow = _is_tool_workflow(workflow)
 
     for chunk in response:
         if workflow.is_the_task_interrupted():
             break
         reasoning_chunk = reasoning.get_reasoning_content(chunk)
         content_chunk = reasoning_chunk.get("content")
-        if "reasoning_content" in chunk.additional_kwargs:
+        if content_chunk is None:
+            content_chunk = ""
+        additional_kwargs = getattr(chunk, "additional_kwargs", None) or {}
+        if "reasoning_content" in additional_kwargs:
             response_reasoning_content = True
-            reasoning_content_chunk = chunk.additional_kwargs.get("reasoning_content", "")
+            reasoning_content_chunk = additional_kwargs.get("reasoning_content", "")
         else:
             reasoning_content_chunk = reasoning_chunk.get("reasoning_content")
-        answer += content_chunk
         if reasoning_content_chunk is None:
             reasoning_content_chunk = ""
+
+        is_process = _is_tool_process_chunk(chunk)
+        if is_process:
+            if is_tool_workflow:
+                # Drop preamble / retry text from prior tool rounds so out_context
+                # only carries the final assistant reply after the last tool call.
+                answer = ""
+            # Never fold tool-call cards into answer (Fixes #7559 leak into outer chat).
+            if isinstance(chunk, ToolMessage) or is_tool_workflow:
+                yield {
+                    "content": content_chunk,
+                    "reasoning_content": reasoning_content_chunk
+                    if model_setting.get("reasoning_content_enable", False)
+                    else "",
+                }
+                continue
+
+        answer += content_chunk
         reasoning_content += reasoning_content_chunk
         yield {
             "content": content_chunk,
