@@ -3,6 +3,8 @@ import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   ApplicationAccessToken,
   ApplicationAccessTokenPayload,
+  ApplicationApiKeyEnable,
+  ApplicationApiKeyEnablePayload,
   ApplicationDetail,
   ApplicationDisplaySetting,
   ApplicationFormPayload,
@@ -38,6 +40,10 @@ const getAccessToken = (applicationId: string) => get<ApplicationAccessToken>(`$
 /** 修改智能体访问配置或重置凭证，返回更新后的配置。 */
 const putAccessToken = (applicationId: string, payload: ApplicationAccessTokenPayload) =>
   put<ApplicationAccessTokenPayload, ApplicationAccessToken>(`${getPrefix()}/${applicationId}/access_token`, payload)
+
+/** 启用或禁用智能体后端 API 访问，返回保存后的状态。 */
+const putEnableApiKey = (applicationId: string, payload: ApplicationApiKeyEnablePayload) =>
+  put<ApplicationApiKeyEnablePayload, ApplicationApiKeyEnable>(`${getPrefix()}/${applicationId}/enable_api_key`, payload)
 
 /** 获取智能体展示设置，仅许可证有效的专业版、企业版提供；未保存过的字段可能缺失。 */
 const getDisplaySetting = (applicationId: string) => get<Partial<ApplicationDisplaySetting>>(`${getPrefix()}/${applicationId}/setting`)
@@ -111,6 +117,7 @@ export default {
   getApplicationDetail,
   getAccessToken,
   putAccessToken,
+  putEnableApiKey,
   getDisplaySetting,
   putDisplaySetting,
   deleteApplication,

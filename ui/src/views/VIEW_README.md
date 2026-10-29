@@ -365,7 +365,9 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   Web 链接通过当前范围的 Application API 查询访问凭证，使用当前域名、Chat 部署前缀与访问凭证生成，不追加工作流输入参数；
   API 文档地址为 Chat 部署前缀下的 `/api-doc/`。两个地址使用只读输入框展示并支持复制；链接重置先确认，
   成功后用返回的访问凭证更新链接，失败保留原链接。Web 访问开关查询后回填 `is_active`，
-  保存成功后按响应回显、失败保留原状态；开关保存与链接重置共用 loading，操作期间禁用开关，重置按钮显示 loading。后端 API 访问开关仍待接入。
+  保存成功后按响应回显、失败保留原状态；开关保存与链接重置共用 loading，操作期间禁用开关，重置按钮显示 loading。
+  后端 API 访问开关从同次查询的 `enable_api_key` 回填，通过当前范围的 `putEnableApiKey` 独立保存；
+  保存期间仅禁用右侧开关，成功按响应回显，失败保留原状态，不影响 Web 访问与链接重置。
   “去对话”按钮直接在概览页维护；其余四个按钮流程分别放在 `embed-third-party/`、`access-restriction/`、
   `display-setting/`、`api-key/`，入口和对应弹窗同目录维护。API Key 弹窗通过 `resourceApi.apiKey` 传入当前范围的完整 API 与智能体 ID，
   复用 `business/api-key-list/`，Base URL 使用 Chat API 部署前缀加智能体 ID；

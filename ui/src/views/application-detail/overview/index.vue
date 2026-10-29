@@ -35,10 +35,12 @@ function applicationOverviewPermission(method: ApplicationOverviewPermissionMeth
   return Boolean(perm.application.workspace[method](applicationId.value))
 }
 
-/* 基本信息：Web 访问链接与开关 */
+/* 基本信息：Web 访问链接与访问开关 */
 const accessToken = ref('')
 const webAccessActive = ref(false)
 const loading = ref(false)
+const apiKeyEnabled = ref(false)
+const apiKeySaving = ref(false)
 
 const chatBasePath = CHAT_API_BASE_PATH.replace(/\/api$/, '')
 
@@ -87,14 +89,28 @@ function handleResetAccessToken() {
   )
 }
 
+function handleChangeApiKeyAccess() {
+  if (apiKeySaving.value) return false
+  apiKeySaving.value = true
+  return resourceApi.application
+    .putEnableApiKey(applicationId.value, { enable_api_key: !apiKeyEnabled.value })
+    .then((config) => {
+      apiKeyEnabled.value = config.enable_api_key
+      MsgSuccess(config.enable_api_key ? '已启用' : '已禁用')
+      return true
+    })
+    .finally(() => {
+      apiKeySaving.value = false
+    })
+}
+
 onMounted(() => {
   return resourceApi.application.getAccessToken(applicationId.value).then((config) => {
     accessToken.value = config.access_token
     webAccessActive.value = config.is_active
+    apiKeyEnabled.value = config.enable_api_key ?? false
   })
 })
-
-// TODO：接入后端 API 访问开关；接入前保留禁用态。
 </script>
 
 <template>
@@ -147,8 +163,8 @@ onMounted(() => {
         <div class="mk-gray-card-lg space-y-4">
           <div class="flex-between">
             <h6>后端 API 访问</h6>
-            <!-- TODO：接入后端 API 访问开关 -->
-            <el-switch size="small" disabled />
+            <!-- 后端 API 访问开关 -->
+            <el-switch :model-value="apiKeyEnabled" size="small" :disabled="apiKeySaving" :before-change="handleChangeApiKeyAccess" />
           </div>
           <div class="space-y-2">
             <div>API 文档</div>

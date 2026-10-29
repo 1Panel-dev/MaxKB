@@ -64,6 +64,7 @@ export interface ApplicationAccessToken extends Partial<ApplicationDisplaySettin
   application_id: string
   access_token: string
   is_active: boolean
+  enable_api_key: boolean
   access_num: number
   white_active: boolean
   white_list: string[]
@@ -83,6 +84,17 @@ export interface ApplicationAccessTokenPayload {
   language?: string | null
   authentication?: boolean
   authentication_value?: ApplicationAuthenticationConfig
+}
+
+/** 智能体后端 API 访问开关。 */
+export interface ApplicationApiKeyEnablePayload {
+  enable_api_key: boolean
+}
+
+/** 保存智能体后端 API 访问开关后的状态。 */
+export interface ApplicationApiKeyEnable extends ApplicationApiKeyEnablePayload {
+  workspace_id?: string | null
+  application_id: string
 }
 
 export interface ApplicationDetail extends Omit<ApplicationFormPayload, 'desc'> {
