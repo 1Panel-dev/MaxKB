@@ -33,7 +33,7 @@ function submit() {
     if (!valid) return
 
     loading.value = true
-    AuthScanApi.putQrLoginPlatform(form)
+    AuthScanApi.saveQrLoginPlatform(form)
       .then(() => {
         MsgSuccess('保存成功')
         emit('refresh')
@@ -48,7 +48,7 @@ function submit() {
 /* 校验 */
 function handleValidatePlatform() {
   loading.value = true
-  return AuthScanApi.postValidateQrLoginPlatform(form)
+  return AuthScanApi.validateQrLoginPlatform(form)
     .then((res) => {
       res ? MsgSuccess('校验成功') : MsgError('校验失败')
     })
