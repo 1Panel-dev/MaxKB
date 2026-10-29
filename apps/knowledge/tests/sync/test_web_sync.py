@@ -530,7 +530,7 @@ class IncrementalSyncTests(SimpleTestCase):
         )
 
         incremental_sync.assert_not_called()
-        document.save.assert_called_once_with(update_fields=["last_sync_time", "update_time"])
+        document.save.assert_called_once_with(update_fields=["last_sync_time"])
 
     @patch("knowledge.serializers.document.IncrementalDocumentSync")
     @patch("knowledge.serializers.document.defer_visual_assets")

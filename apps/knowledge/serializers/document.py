@@ -780,7 +780,7 @@ class DocumentSerializers(serializers.Serializer):
                         )
                         if document.source_hash == incoming_source_hash and strategy_unchanged:
                             document.last_sync_time = timezone.now()
-                            document.save(update_fields=["last_sync_time", "update_time"])
+                            document.save(update_fields=["last_sync_time"])
                             merge_result = None
                         else:
                             merge_result = IncrementalDocumentSync(document, split_strategy).merge(paragraphs)

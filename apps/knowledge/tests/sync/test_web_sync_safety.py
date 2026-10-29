@@ -1,11 +1,13 @@
 """Web synchronization publishes complete content and preserves unrelated sources."""
 
 from contextlib import ExitStack
+from datetime import timedelta
 from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.db import transaction
 from django.test import SimpleTestCase, TestCase
+from django.utils import timezone
 
 from common.utils.fork import ChildLink, Fork
 from knowledge.models import (
@@ -18,6 +20,7 @@ from knowledge.models import (
     Knowledge,
     KnowledgeSyncLog,
     KnowledgeSyncStatus,
+    KnowledgeSyncTrigger,
     KnowledgeType,
     Paragraph,
     ParagraphAsset,
@@ -38,7 +41,7 @@ from knowledge.task.handler import (
     get_sync_web_document_handler,
     is_web_sync_document,
 )
-from knowledge.task.sync import sync_replace_web_knowledge
+from knowledge.task.sync import scheduled_sync_web_knowledge, sync_replace_web_knowledge
 from models_provider.models import Model
 
 
@@ -217,6 +220,8 @@ class WebSyncSafetyTests(TestCase):
         self.paragraph_delay.assert_not_called()
 
     def test_failed_incremental_can_retry_and_queue_embedding_after_commit(self):
+        previous_update_time = timezone.now() - timedelta(days=1)
+        Document.objects.filter(pk=self.document.pk).update(update_time=previous_update_time)
         with patch(
             "knowledge.serializers.document.parse_web_content", return_value=[{"title": "Title", "content": "new"}]
         ):
@@ -228,7 +233,40 @@ class WebSyncSafetyTests(TestCase):
         self.document.refresh_from_db()
         self.paragraph.refresh_from_db()
         self.assertEqual((self.document.sync_version, self.paragraph.content), (1, "new"))
+        self.assertGreater(self.document.update_time, previous_update_time)
         self.paragraph_delay.assert_called_once()
+
+    def test_scheduled_incremental_skip_preserves_document_update_time(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            initial_result = self.run_crawl("incremental", self.successful_crawl)
+        self.assertEqual(initial_result["synced_count"], 1)
+        self.document.refresh_from_db()
+        previous_version = self.document.sync_version
+        previous_time = timezone.now() - timedelta(days=1)
+        Document.objects.filter(pk=self.document.pk).update(update_time=previous_time, last_sync_time=previous_time)
+        self.paragraph_delay.reset_mock()
+        self.knowledge.meta["sync_setting"] = {"enabled": True, "sync_type": "incremental"}
+        self.knowledge.save(update_fields=["meta"])
+
+        with (
+            patch("knowledge.task.sync.ForkManage") as crawler,
+            patch("knowledge.task.sync.sync_replace_web_knowledge.delay", side_effect=sync_replace_web_knowledge.run),
+            self.captureOnCommitCallbacks(execute=True) as callbacks,
+        ):
+            crawler.return_value.fork.side_effect = self.successful_crawl
+            self.assertTrue(scheduled_sync_web_knowledge.run(str(self.knowledge.id)))
+
+        self.document.refresh_from_db()
+        self.assertEqual(self.document.update_time, previous_time)
+        self.assertGreater(self.document.last_sync_time, previous_time)
+        self.assertEqual(self.document.sync_version, previous_version)
+        self.assertEqual(Status.of(self.document.status)[TaskType.SYNC], State.SUCCESS)
+        sync_log = KnowledgeSyncLog.objects.get(knowledge=self.knowledge)
+        self.assertEqual(sync_log.trigger_type, KnowledgeSyncTrigger.SCHEDULED)
+        self.assertEqual(sync_log.status, KnowledgeSyncStatus.SUCCESS)
+        self.assertEqual((sync_log.total_count, sync_log.synced_count, sync_log.skipped_count), (1, 0, 1))
+        self.assertEqual(callbacks, [])
+        self.paragraph_delay.assert_not_called()
 
     def test_replace_post_save_failure_rolls_back_new_document(self):
         stats = {"failed_count": 0, "synced_count": 0, "deleted_count": 0}
