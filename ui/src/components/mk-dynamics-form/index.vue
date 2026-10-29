@@ -329,6 +329,7 @@ defineExpose({ initDefaultData: initializeFieldDefault, render, ruleFormRef, val
     :model="formValue"
     label-position="top"
     require-asterisk-position="right"
+    :disabled="view"
     v-bind="$attrs"
     @submit.prevent
   >
