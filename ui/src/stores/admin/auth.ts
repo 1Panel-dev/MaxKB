@@ -90,6 +90,7 @@ export const useAuthStore = defineStore('auth', {
     clearToken() {
       this.token = ''
       localStorage.removeItem(TOKEN_STORAGE_KEY)
+      localStorage.removeItem('workspaceId')
       useUserStore().clearCurrentUser()
     },
   },

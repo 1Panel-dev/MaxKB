@@ -52,10 +52,13 @@ const canReturnWorkspace = computed(() => isWorkspaceManager.value || isOrdinary
 
 function switchMode() {
   if (isWorkspace(props.mode)) {
+    const workspaceId = getWorkspaceId()
+    if (workspaceId) localStorage.setItem('workspaceId', workspaceId)
     router.push({ name: 'system-home' })
     return
   }
-  const workspaceId = user.userInfo?.workspace_list?.[0]?.id || 'default'
+  // 缓存的工作空间仅用于从系统管理返回工作空间。
+  const workspaceId = localStorage.getItem('workspaceId') || user.userInfo?.workspace_list?.[0]?.id || 'default'
   router.push({ name: 'workspace-home', params: { workspaceId } })
 }
 </script>
@@ -78,11 +81,12 @@ function switchMode() {
         <span>升级</span>
       </el-button>
       <el-divider direction="vertical" />
+      <!-- 保存当前工作空间并进入系统管理 -->
       <el-button v-if="isWorkspace(mode) && (isWorkspaceManager || canManageSystem)" class="-mx-1" text @click="switchMode">
         <MkIcon name="icon_admin_outlined" />
         <span>系统管理</span>
       </el-button>
-      <!--  TODO 只有系统管理员权限没有返回工作空间 -->
+      <!-- 返回进入系统管理前的工作空间 -->
       <el-button v-if="isSystem(mode) && canReturnWorkspace" class="-mx-1" text @click="switchMode">
         <MkIcon name="icon_left_outlined" />
         <span>返回工作空间</span>

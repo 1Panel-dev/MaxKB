@@ -19,7 +19,10 @@
 Workspace 使用 `AppLayout`，左侧导航根据 `scope: 'workspace'` 对应路由的 `children` 自动生成。
 
 Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当前路由参数为准。应用根
-地址、登录成功和从 System 返回 Workspace 时统一进入 `/admin/workspace/default`；若当前用户
+地址和登录成功时进入 `/admin/workspace/default`。顶部 `LayoutHeader` 切换到 System 时将当前
+工作空间 ID 保存到 localStorage 的 `workspaceId`；仅在该组件返回 Workspace 时读取缓存，
+无缓存时使用用户首个工作空间或 `default`。退出登录时由 Admin `clearToken()` 清除缓存。
+其他位置不得读取该缓存，工作空间上下文仍以路由参数为准。若当前用户
 只属于 `workspace_list` 中的部分工作空间且目标 `workspaceId` 不在其中，路由守卫会自动重定向到
 其首个可访问工作空间（仅对携带 `workspaceId` 参数的工作空间路由生效）。父路由的 `scope`
 会合并到匹配的子路由 `meta` 中。
