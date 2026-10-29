@@ -1,0 +1,79 @@
+purpose:
+  stands_in_for: Ark text/multimodal embeddings, image generation and video-task creation, polling and deletion.
+  unblocks: Validation of the Volcengine SDK 5.0.53 to 5.0.54 packaging transition using real application adapters
+    and SDK clients, including installation of only the required Ark packages.
+assumptions:
+- id: wire-contract
+  status: supported
+  claim: The application adapters preserve the tested parameters, output order and parsed results with the split
+    Ark Runtime SDK.
+  reason: The real SDK serialized HTTP requests; fixture validation and adapter output assertions checked the modeled
+    contract.
+  verification: '2026-10-29: all 6 Ark tests passed in the 142-test combined regression, with no skipped tests.
+    Text/PNG embeddings and image URL/Base64 responses were covered. Simulation request logs confirmed the expected
+    routes.'
+  source: ../test_volcengine_sdk.py; volcengine-sdk/default.js; multimodal.js; https://github.com/volcengine/volcengine-python-sdk/releases/tag/5.0.54
+  updated_at: '2026-10-29'
+- id: video-lifecycle
+  status: supported
+  claim: A successful modeled video task is created, polled through running to succeeded, and deleted before returning
+    its output URL.
+  reason: Task state is stored in pm.state and read/written with await. A subsequent real SDK lookup asserts 404
+    after deletion.
+  verification: The SDK sent POST, two GET requests, DELETE and a final GET returning 404. Integer duration/seed,
+    camera_fixed and the first frame were checked. Only the application polling sleep was replaced.
+  source: ../test_volcengine_sdk.py; volcengine-sdk/default.js; volcenginesdkarkruntime.resources.content_generation.tasks;
+    volcenginesdkarkruntime.types.content_generation.content_generation_task
+  updated_at: '2026-10-29'
+- id: status-errors
+  status: supported
+  claim: Modeled 400, 401, 429 and 500 responses raise ArkAPIStatusError subclasses with their original status codes.
+  reason: Tests used real SDK requests with retries disabled and asserted no vector result was returned.
+  verification: All four status cases and invalid API-key authentication rejection passed. This does not establish
+    default retry timing.
+  source: ../test_volcengine_sdk.py; volcenginesdkarkruntime._exceptions
+  updated_at: '2026-10-29'
+- id: split-install
+  status: supported
+  claim: The initial 5.0.54 upgrade installation contained the meta-package and 139 split dependencies, with the
+    application import paths intact; this is historical evidence before the Ark-only reduction below.
+  reason: The old monolithic distribution was removed before uv sync, preventing old RECORD entries from removing
+    newly installed shared paths.
+  verification: Imported volcenginesdkcore, volcenginesdkcore.rest, volcenginesdkark and volcenginesdkarkruntime;
+    checked all 140 distribution file lists and found zero missing files. All three lock checks and uv pip check
+    passed.
+  source: ../../../../../README.md; https://github.com/volcengine/volcengine-python-sdk/releases/tag/5.0.54
+  updated_at: '2026-10-29'
+- id: ark-only-install
+  status: supported
+  claim: The modeled embedding, image and video paths run with only volcengine-ark-runtime, volcenginesdk-ark and
+    volcenginesdk-core 5.0.54 installed from the Volcengine product family.
+  reason: Exact uv sync removed the meta-package and 136 unused product packages before running the real application
+    adapters and SDK. Other dependency versions were unchanged.
+  verification: '2026-10-29, ark-only fingerprint: all 6 compatibility tests passed with no skips and exit code 0.
+    The simulation recorded 17 HTTP requests covering text/image embeddings, image URL/Base64, video creation,
+    polling and deletion, and expected 400/401/429/500 errors. All three lock checks, uv pip check and the three
+    retained SDK distributions file-integrity checks passed. No real cloud service or Docker image was tested.'
+  source: ../test_volcengine_sdk.py; ../README.md; ../../../../../pyproject.toml;
+    volcengine-ark-runtime 5.0.54 METADATA; volcenginesdk-ark 5.0.54 METADATA
+  updated_at: '2026-10-29'
+- id: provenance-and-limits
+  status: unknown
+  claim: The real provider accepts every modeled request and produces usable media and production-quality embeddings.
+  reason: The local fixtures use synthetic outputs. Existing multimodal contracts and official installed SDK resources/types
+    supplied the shapes. Owner mock search was skipped using the prior unauthenticated CLI evidence. Orbit search
+    returned incomplete third-party video descriptions and integrate returned HTTP 403, so its suggested base URLs
+    were not used.
+  verification: No real cloud request, permissions check or model-quality evaluation was performed. Network retry
+    timing and failed/cancelled video task behavior were not exercised.
+  source: ../README.md; multimodal.js; volcengine-sdk/default.js; https://github.com/volcengine/volcengine-python-sdk
+  updated_at: '2026-10-29'
+fingerprints:
+- id: five-dependency-upgrade
+  date: '2026-10-29'
+  commit: c7f31700ad6eb4042dd054344594bf0d123ba9f0 plus uncommitted task changes
+  cli: Postman 1.74.0; Python 3.13.18; volcengine-python-sdk/volcengine-ark-runtime 5.0.54; 142 combined tests passed
+- id: ark-only
+  date: '2026-10-29'
+  commit: 1b0bcdc9cbb1b00220ec890bdd44106a8c2816a5 plus uncommitted validation documentation
+  cli: Postman 1.74.0; Python 3.13.18; volcengine-ark-runtime/volcenginesdk-ark/volcenginesdk-core 5.0.54; 6 tests passed

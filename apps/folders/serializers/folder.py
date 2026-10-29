@@ -15,7 +15,7 @@ from common.auth.constants.role_constants import RoleConstants
 from common.constants.resource_permission_constants import ResourcePermissionConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
-from folders.api.folder import FolderCreateRequest
+from folders.models.folder import FolderCreateRequest
 from knowledge.models import KnowledgeFolder, Knowledge
 from knowledge.serializers.knowledge import KnowledgeSerializer
 from knowledge.serializers.knowledge_folder import KnowledgeFolderTreeSerializer

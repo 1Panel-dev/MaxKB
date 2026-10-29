@@ -1,0 +1,9 @@
+version: 1
+name: volcengine-sdk
+slug: volcengine-sdk
+protocol: http
+interceptRequests: true
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

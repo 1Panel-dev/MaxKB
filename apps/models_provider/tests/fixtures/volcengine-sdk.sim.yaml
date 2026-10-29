@@ -1,0 +1,7 @@
+simulation: volcengine-sdk-compatibility
+routing: path
+mocks:
+  - routeKey: ark
+    path: ./volcengine-sdk/config.yaml
+  - routeKey: multimodal
+    path: ./multimodal.js

@@ -14,7 +14,7 @@ dependencies = [
     # Django ecosystem
     "django-apscheduler==0.7.0",
     "django-db-connection-pool==1.2.6",
-    "django-mptt==0.18.0",
+    "django-mptt==0.21.0",
     "django-redis==7.0.0",
 
     # AI orchestration & model frameworks
@@ -30,7 +30,7 @@ dependencies = [
     "langchain-openai==1.7.3",
     "langgraph==1.2.18",
     "torch==2.14.1",
-    "sentence-transformers==6.1.0",
+    "sentence-transformers==6.2.0",
     "xinference-client==3.5.0",
 
     # Model providers & cloud SDKs
@@ -41,7 +41,7 @@ dependencies = [
     "tencentcloud-sdk-python-common==3.1.197",
     "tencentcloud-sdk-python-hunyuan==3.1.180",
     "tencentcloud-sdk-python-asr==3.1.197",
-    "volcengine-python-sdk[ark]==5.0.53",
+    "volcengine-ark-runtime==5.0.54",
     "zai-sdk==0.2.3",
 
     # Database, cache & async task queue

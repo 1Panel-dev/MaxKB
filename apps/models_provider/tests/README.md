@@ -140,3 +140,52 @@ v1/v2 请求、响应及异常类型。7 个测试覆盖中文查询、`top_n`�
 2026-10-29 在 cohere 7.2.0 和 7.3.0 上均通过，升级后模拟日志记录 12 次重排请求。
 所有请求使用虚拟密钥和本机地址；未设置环境变量时跳过这些 HTTP 测试。
 固定分数仅用于检验映射，不验证实际 vLLM 部署是否提供相同路由或模型的重排质量。
+
+## Sentence Transformers 与火山引擎 SDK 兼容回归
+
+`test_local_embedding` 使用本地生成的微型 BERT 模型，经实际 `LocalEmbedding`、
+`HuggingFaceEmbeddings` 和 Sentence Transformers 执行 CPU 推理，无需下载模型。
+覆盖中文、批量顺序、重复输入、单位向量归一化、空输入、长文本截断和模型重新加载。
+
+```bash
+HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
+  uv run python apps/manage.py test models_provider.tests.test_local_embedding --noinput
+```
+
+2026-10-29 使用同一份保存的模型、相同 Torch/Transformers 版本，比较 Sentence Transformers
+6.1.0 与 6.2.0 的 6 组 12 维向量，最大绝对差为 0。该结果仅覆盖此 CPU 测试模型，
+不代表生产模型、GPU 或所有精度设置的检索质量完全相同。
+
+火山引擎 5.0.54 拆包后的 HTTP 回归运行真实 Ark SDK 及应用适配器：
+
+```bash
+postman simulation run community/apps/models_provider/tests/fixtures/volcengine-sdk.sim.yaml --port 49649 --no-history --output ndjson
+```
+
+```bash
+VOLCENGINE_SDK_TEST_URL=http://127.0.0.1:49649 \
+  uv run python apps/manage.py test models_provider.tests.test_volcengine_sdk --noinput
+```
+
+6 个测试覆盖文本/图片向量、图片 URL/Base64、视频创建→运行中→成功→删除，
+以及 400/401/429/500 异常状态。模拟复用已有多模态契约，其他路由依据官方 SDK
+`resources` 和 `types`；视频任务状态保存在 `pm.state`，读写需要 `await`。
+固定图片、视频地址和向量仅用于验证协议。测试关闭错误场景的 SDK 重试，并替换视频轮询的等待，
+不调用真实云服务，不验证真实模型效果、账号权限或重试等待时间。
+
+2026-10-29：三个仓库改为直接依赖 `volcengine-ark-runtime==5.0.54`，仅自动安装同版本
+`volcenginesdk-ark`、`volcenginesdk-core` 两个火山组件。精确同步移除全量元包和 136 个无关产品包，
+其他依赖版本未变；上述 6 项回归全部通过、无跳过，模拟日志记录 17 次 HTTP 请求。
+三个锁文件检查、已安装依赖兼容性和保留 SDK 文件完整性检查均通过。
+
+目录树的数据库回归位于 `folders.tests.test_mptt_compatibility`，覆盖应用、知识库、工具三个
+真实目录模型的排序、移动、过期实例、工作空间重建隔离与子树删除，同时验证左右边界和父子关系。
+运行需要独立 PostgreSQL 测试库具备 pgvector 扩展；测试初始化也会执行集成项目的其他迁移。
+
+```bash
+uv run python apps/manage.py test folders.tests.test_mptt_compatibility --noinput
+```
+
+2026-10-29：本次依赖升级的合并回归共 142 项，全部通过、无跳过；Ruff、三个锁文件、
+已安装依赖兼容性及迁移差异检查均通过。数据库回归使用独立 PostgreSQL 测试库，
+在迁移前安装 pgvector，并使用原生 PostgreSQL 测试连接，结束后删除测试库。
