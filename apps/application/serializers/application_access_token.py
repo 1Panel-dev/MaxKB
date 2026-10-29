@@ -86,8 +86,7 @@ class AccessTokenSerializer(serializers.Serializer):
 
         authentication_value = validated_data.get("authentication_value")
         if (
-            authentication
-            and authentication_value is not None
+            authentication_value is not None
             and authentication_value != {}
             and cache.get(
                 Cache_Version.SYSTEM.get_key(key="license_is_valid"), version=Cache_Version.SYSTEM.get_version()
