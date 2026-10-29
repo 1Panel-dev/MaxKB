@@ -25,10 +25,11 @@ class AccessTokenEditSerializer(serializers.Serializer):
     is_active = serializers.BooleanField(required=False, label=_("Is it enabled"))
     access_num = serializers.IntegerField(required=False, max_value=10000000, min_value=0, label=_("Number of visits"))
     white_active = serializers.BooleanField(required=False, label=_("Whether to enable whitelist"))
-    white_list = (
-        serializers.ListSerializer(
-            required=False, child=serializers.CharField(required=True, label=_("Whitelist")), label=_("Whitelist")
-        ),
+    white_list = serializers.ListField(
+        required=False,
+        allow_null=True,
+        child=serializers.CharField(required=True, label=_("Whitelist")),
+        label=_("Whitelist"),
     )
     show_source = serializers.BooleanField(required=False, label=_("Whether to display knowledge sources"))
     show_exec = serializers.BooleanField(required=False, label=_("Display execution details"))
@@ -54,45 +55,45 @@ class AccessTokenSerializer(serializers.Serializer):
 
     def edit(self, instance):
         self.is_valid(raise_exception=True)
-        AccessTokenEditSerializer(data=instance).is_valid(raise_exception=True)
+        edit_serializer = AccessTokenEditSerializer(data=instance, partial=True)
+        edit_serializer.is_valid(raise_exception=True)
+        validated_data = edit_serializer.validated_data
         application_access_token = QuerySet(ApplicationAccessToken).get(application_id=self.data.get("application_id"))
-        if "is_active" in instance:
-            application_access_token.is_active = instance.get("is_active")
-        if "access_token_reset" in instance and instance.get("access_token_reset"):
+        if "is_active" in validated_data:
+            application_access_token.is_active = validated_data["is_active"]
+        if validated_data.get("access_token_reset"):
             application_access_token.access_token = hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24]
-        if "access_num" in instance and instance.get("access_num") is not None:
-            application_access_token.access_num = instance.get("access_num")
-        if "white_active" in instance and instance.get("white_active") is not None:
-            application_access_token.white_active = instance.get("white_active")
-        if "white_list" in instance and instance.get("white_list") is not None:
-            application_access_token.white_list = instance.get("white_list")
-        if "show_source" in instance and instance.get("show_source") is not None:
-            application_access_token.show_source = instance.get("show_source")
-        if "show_exec" in instance and instance.get("show_exec") is not None:
-            application_access_token.show_exec = instance.get("show_exec")
-        if "language" in instance and instance.get("language") is not None:
-            application_access_token.language = instance.get("language")
-        if "language" not in instance or instance.get("language") is None:
-            application_access_token.language = None
-        if "enable_api_key" in instance and instance.get("enable_api_key") is not None:
-            application_access_token.enable_api_key = instance.get("enable_api_key")
-        if "authentication" in instance and instance.get("authentication") is not None:
-            application_access_token.authentication = instance.get("authentication")
-            application_access_token.authentication_value = {
-                "type": "login",
-                "lock_time": 10,
-                "login_value": ["LOCAL"],
-                "max_attempts": 1,
-                "default_value": "LOCAL",
-                "failed_attempts": 5,
-            }
 
-        license_is_valid = cache.get(
-            Cache_Version.SYSTEM.get_key(key="license_is_valid"), version=Cache_Version.SYSTEM.get_version()
-        )
-        if license_is_valid:
-            if instance.get("authentication") is not None and instance.get("authentication_value") is not None:
-                application_access_token.authentication_value = instance.get("authentication_value")
+        for field in ("access_num", "white_active", "white_list", "show_source", "show_exec", "enable_api_key"):
+            value = validated_data.get(field)
+            if value is not None:
+                setattr(application_access_token, field, value)
+
+        application_access_token.language = validated_data.get("language")
+
+        authentication = validated_data.get("authentication")
+        if authentication is not None:
+            application_access_token.authentication = authentication
+            if authentication:
+                application_access_token.authentication_value = {
+                    "type": "login",
+                    "lock_time": 10,
+                    "login_value": ["LOCAL"],
+                    "max_attempts": 1,
+                    "default_value": "LOCAL",
+                    "failed_attempts": 5,
+                }
+
+        authentication_value = validated_data.get("authentication_value")
+        if (
+            authentication
+            and authentication_value is not None
+            and authentication_value != {}
+            and cache.get(
+                Cache_Version.SYSTEM.get_key(key="license_is_valid"), version=Cache_Version.SYSTEM.get_version()
+            )
+        ):
+            application_access_token.authentication_value = authentication_value
         application_access_token.save()
         return self.one(with_valid=False)
 
