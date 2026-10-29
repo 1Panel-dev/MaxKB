@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
+import { getFileIconUrl } from '@/utils/icon'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
@@ -24,8 +26,16 @@ defineProps<{
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">用户提示词</h6>
       <div class="whitespace-pre-wrap space-y-2">
-        <div v-if="data.video_list?.length > 0" class="flex flex-wrap gap-2">
-          <video v-for="(f, i) in data.video_list" :key="i" :src="f.url" controls autoplay class="block rounded-md" style="width: 100px" />
+        <div v-if="data.video_list?.length > 0">
+          <!-- 点击卡片播放本次对话视频 -->
+          <MkVideo v-for="(file, index) in data.video_list" :key="index" :src="file.url" :name="file.name || '视频'" class="w-full">
+            <el-card shadow="never" class="small cursor-pointer">
+              <div class="flex-align-center gap-2">
+                <img :src="getFileIconUrl(file.name || 'video.mp4')" alt="" width="24" class="shrink-0" />
+                <span class="min-w-0 truncate" :title="file.name || '视频'">{{ file.name || '视频' }}</span>
+              </div>
+            </el-card>
+          </MkVideo>
         </div>
         <div>{{ data.question || '-' }}</div>
       </div>

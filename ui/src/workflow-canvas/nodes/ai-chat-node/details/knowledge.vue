@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
+import { getFileIconUrl } from '@/utils/icon'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
@@ -28,14 +31,24 @@ defineProps<{
       <div class="whitespace-pre-wrap space-y-2">
         <template v-if="Array.isArray(data.question)">
           <div v-for="(item, qIndex) in data.question" :key="qIndex">
-            <el-image class="size-8" v-if="item.type === 'image_url'" :src="item.image_url?.url || item.image_url" fit="cover" />
-            <video
-              v-else-if="item.type === 'video_url'"
-              :src="item.video_url?.url || item.video_url"
-              class="block w-14 rounded-md"
-              autoplay
-              controls
+            <!-- 查看本次对话图片 -->
+            <ImageUploadCard
+              v-if="item.type === 'image_url'"
+              :file="{ name: '图片', status: 'success' }"
+              :src="item.image_url?.url || item.image_url"
+              :size="32"
+              :show-remove="false"
+              :preview-src-list="[item.image_url?.url || item.image_url]"
             />
+            <!-- 点击卡片播放本次对话视频 -->
+            <MkVideo v-else-if="item.type === 'video_url'" :src="item.video_url?.url || item.video_url" name="视频" class="w-full">
+              <el-card shadow="never" class="small cursor-pointer">
+                <div class="flex-align-center gap-2">
+                  <img :src="getFileIconUrl('video.mp4')" alt="" width="24" class="shrink-0" />
+                  <span class="min-w-0 truncate">视频</span>
+                </div>
+              </el-card>
+            </MkVideo>
             <div v-else-if="item.type === 'text'">{{ item.text }}</div>
             <div v-else>{{ item }}</div>
           </div>

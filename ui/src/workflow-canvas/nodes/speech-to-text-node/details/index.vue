@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
+import { getFileIconUrl } from '@/utils/icon'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
@@ -21,8 +23,16 @@ defineProps<{
       <div>
         <div v-if="data.audio_list?.length > 0">
           <p class="mb-2 text-N600">音频文件：</p>
-          <div class="flex flex-wrap gap-2">
-            <audio v-for="(f, i) in data.audio_list" :key="i" :src="f.url" controls class="rounded-md" style="width: 300px; height: 43px" />
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <!-- 点击卡片播放输入音频 -->
+            <MkAudio v-for="(file, index) in data.audio_list" :key="index" :src="file.url" :name="file.name || '音频'" class="min-w-0">
+              <el-card shadow="never" class="small cursor-pointer">
+                <div class="flex-align-center gap-2">
+                  <img :src="getFileIconUrl(file.name || 'audio.mp3')" alt="" width="24" class="shrink-0" />
+                  <span class="min-w-0 truncate" :title="file.name || '音频'">{{ file.name || '音频' }}</span>
+                </div>
+              </el-card>
+            </MkAudio>
           </div>
         </div>
       </div>

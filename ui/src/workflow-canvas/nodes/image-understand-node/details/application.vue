@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
@@ -25,19 +26,27 @@ defineProps<{
       <h6 class="mb-2">历史记录</h6>
       <div class="space-y-2">
         <template v-if="data.history_message?.length > 0">
-          <p v-for="(history, historyIndex) in data.history_message" :key="historyIndex" class="mb-2 last:mb-0">
+          <div v-for="(history, historyIndex) in data.history_message" :key="historyIndex" class="mb-2 last:mb-0">
             <span class="mr-1 text-N600">{{ history.role }}：</span>
             <template v-if="Array.isArray(history.content)">
-              <span v-for="(h, i) in history.content" :key="i">
-                <el-image class="size-8" v-if="h.type === 'image_url'" :src="h.image_url.url" fit="cover" />
+              <div v-for="(h, i) in history.content" :key="i">
+                <!-- 查看历史对话图片 -->
+                <ImageUploadCard
+                  v-if="h.type === 'image_url'"
+                  :file="{ name: '图片', status: 'success' }"
+                  :src="h.image_url.url"
+                  :size="104"
+                  :show-remove="false"
+                  :preview-src-list="[h.image_url.url]"
+                />
                 <span v-else>
                   {{ h.text }}
                   <br />
                 </span>
-              </span>
+              </div>
             </template>
             <span v-else>{{ history.content }}</span>
-          </p>
+          </div>
         </template>
         <template v-else>-</template>
       </div>
@@ -47,15 +56,16 @@ defineProps<{
       <h6 class="mb-2">本次对话</h6>
       <div class="whitespace-pre-wrap space-y-2">
         <div v-if="data.image_list?.length > 0" class="flex flex-wrap gap-2">
-          <el-image
-            class="size-8"
+          <!-- 查看本次对话图片 -->
+          <ImageUploadCard
             v-for="(f, i) in data.image_list"
             :key="i"
+            :file="{ ...f, name: f.name || '图片', status: 'success' }"
             :src="f.url || (f.file_id ? `./oss/file/${f.file_id}` : '')"
-            fit="cover"
+            :size="104"
+            :show-remove="false"
             :preview-src-list="data.image_list.map((img: any) => img.url || (img.file_id ? `./oss/file/${img.file_id}` : ''))"
-            :scale="0.8"
-            :initial-index="i"
+            :initial-index="Number(i)"
           />
         </div>
         <div>{{ data.question || '-' }}</div>

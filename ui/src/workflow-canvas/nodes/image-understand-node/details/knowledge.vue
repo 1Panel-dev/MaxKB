@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
@@ -25,15 +26,16 @@ defineProps<{
       <h6 class="mb-2">用户提示词</h6>
       <div class="whitespace-pre-wrap space-y-2">
         <div v-if="data.image_list?.length > 0" class="flex flex-wrap gap-2">
-          <el-image
-            class="size-8"
+          <!-- 查看本次对话图片 -->
+          <ImageUploadCard
             v-for="(f, i) in data.image_list"
             :key="i"
+            :file="{ ...f, name: f.name || '图片', status: 'success' }"
             :src="f.url || (f.file_id ? `./oss/file/${f.file_id}` : '')"
-            fit="cover"
+            :size="104"
+            :show-remove="false"
             :preview-src-list="data.image_list.map((img: any) => img.url || (img.file_id ? `./oss/file/${img.file_id}` : ''))"
-            :scale="0.8"
-            :initial-index="i"
+            :initial-index="Number(i)"
           />
         </div>
         <div>{{ data.question || '-' }}</div>
