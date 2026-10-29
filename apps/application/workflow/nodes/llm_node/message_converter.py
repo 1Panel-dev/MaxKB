@@ -138,9 +138,9 @@ class _Converter:
         additional_kwargs = {}
         # 同一次模型回复共享 reasoning,只要声明了 reasoning_key 就保留(空字符串也保留)
         for item in self.tool_group:
-            reasoning_key = _first(item, "reasoning_key", "reasoningKey")
+            reasoning_key = _first(item, "reasoning_key", "reasoningKey", default="reasoning")
             if reasoning_key:
-                additional_kwargs[reasoning_key] = item.get("reasoning") or ""
+                additional_kwargs[reasoning_key] = item.get(reasoning_key) or ""
                 break
         self.result.append(AIMessage(content="", tool_calls=tool_calls, additional_kwargs=additional_kwargs))
         for item, tool_call in zip(self.tool_group, tool_calls):
