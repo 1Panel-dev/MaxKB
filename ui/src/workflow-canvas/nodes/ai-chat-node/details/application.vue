@@ -28,8 +28,8 @@ defineProps<{
       <div class="space-y-2">
         <template v-if="data.history_message?.length > 0">
           <p v-for="(history, historyIndex) in data.history_message" :key="historyIndex">
-            <span class="text-N600">{{ history.role }}1111：</span>
-            <span>{{ history.content }}11</span>
+            <span class="text-N600">{{ history.role }}：</span>
+            <span>{{ history.content }}</span>
           </p>
         </template>
         <template v-else>-</template>

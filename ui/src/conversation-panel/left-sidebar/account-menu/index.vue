@@ -19,7 +19,9 @@ const displayName = computed(() => account.value?.nickName || account.value?.use
 
 // 配额尚未接入时保留空值展示，不将缺失数据表示为零用量。
 const tokenPercentage = computed(() => {
-  return Math.min(100, Math.max(0, (account.value?.token_quota?.used_tokens / account.value?.token_quota?.total_tokens) * 100))
+  const quota = account.value?.token_quota
+  if (!quota) return 0
+  return Math.min(100, Math.max(0, (quota.used_tokens / quota.total_tokens) * 100))
 })
 
 const userPwdDialogRef = useTemplateRef<InstanceType<typeof UserPwdDialog>>('userPwdDialogRef')

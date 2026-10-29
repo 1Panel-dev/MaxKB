@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue'
+import type { AxiosProgressEvent } from 'axios'
+import FileApi from '@/api/chat/file'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
 import ConversationLayout from '../../core/layout/index.vue'
 import PortalConversationList from '../../left-sidebar/portal-conversation-list/index.vue'
 import SelectApplicationDrawer from '../../left-sidebar/portal-conversation-list/SelectApplicationDrawer.vue'
@@ -15,6 +18,20 @@ import { createPortalConversation } from './index'
 
 const applicationSelectorRef = ref<InstanceType<typeof SelectApplicationDrawer>>()
 const bundle = createPortalConversation({ openApplicationSelector: () => applicationSelectorRef.value?.open() })
+
+// 动态表单上传使用当前会话，兼容文件字段的地址包装与取消操作。
+provide('upload', (file: File, onProgress?: (percent: number, event: AxiosProgressEvent) => void) => {
+  const upload = FileApi.postUploadFile(
+    file,
+    bundle.list.currentChatId.value,
+    FILE_SOURCE_TYPE.CHAT,
+    typeof onProgress === 'function' ? onProgress : undefined,
+  )
+  return Object.assign(
+    upload.request.then((url) => ({ data: url })),
+    { abort: upload.abort },
+  )
+})
 
 // 各组件 store 由本视图 provide(视图是左/主/右的共同祖先)
 provide(CONVERSATION_LIST_KEY, bundle.list)
