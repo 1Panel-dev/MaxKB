@@ -24,3 +24,8 @@ Chat 业务接口统一调用后端 v3 路由（`/chat/api/v3/...`）；文件�
 `postAnonymousAuth(accessToken?)` 与 `postLogin(loginRequest, accessToken?)` 传入 accessToken 时为应用认证，
 否则为门户认证。`getCaptcha(username, accessToken)` 获取应用登录验证码，后端以 `accessToken`
 查询参数接收应用令牌，暂不支持门户。`chat-user.ts` 的 `getChatUserProfile()` 获取当前对话用户。
+
+`chat-user.ts` 的 `postResetPassword({ encryptedData })` 提交 RSA 加密的 `{ password, re_password }`，
+公钥取当前认证配置的 `rsa_key`；成功后当前 token 失效，调用方清理认证状态并重新导航。
+`getApiKey()` 与 `postApiKey()` 分别读取、重新生成 `/v3/api_key`，返回 `ChatUserApiKey`。
+首次读取由后端创建密钥；每个用户仅保留一个，重新生成后旧密钥立即失效。

@@ -11,6 +11,7 @@ export type ConversationAppInfo = ChatApplicationProfile
 export interface ConversationAccount {
   nickName?: string
   username?: string
+  token_quota?: any
 }
 
 export interface Conversation {
