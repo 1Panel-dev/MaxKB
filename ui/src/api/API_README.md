@@ -405,6 +405,10 @@ Workspace 与 System 资源管理的 `application/application.ts` 提供 `getAcc
 概览使用 `access_token` 拼接 Web 链接，不使用智能体 ID 或 API Key 替代；API 文档地址使用 Chat 部署前缀。
 两范围的 `putAccessToken` 向同一路径提交 `{ access_token_reset: true }` 重置链接，或 `{ is_active: boolean }` 修改 Web 访问状态；
 载荷复用 `ApplicationAccessTokenPayload`，使用返回的访问凭证与启用状态回显，不二次查询。
+后端 API 访问状态读取同次 GET 返回的 `enable_api_key`，两范围通过 `putEnableApiKey` 向各自
+`/<applicationId>/enable_api_key` 发送 PUT，仅提交 `{ enable_api_key: boolean }`，ID 由 URL 传递。
+返回 `workspace_id`、`application_id` 与 `enable_api_key`，用于保存后回显；该开关独立于 Web 访问和单个密钥启停。
+Workspace 后台已提供此接口；System 路径按资源管理前缀接入，当前仓库无对应后台路由，需部署环境联调确认。
 访问限制复用上述 GET／PUT，读取与保存 `access_num`、`white_active`、`white_list`、`authentication` 和
 `authentication_value`。提问次数为 0～10000000 的整数；社区版仅编辑认证开关，保留已有 `authentication_value`，
 不生成登录配置字段，身份认证读写待后台联调。Xpack 版认证配置使用 `type: 'login'`、`login_value`、

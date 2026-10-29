@@ -3,6 +3,8 @@ import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type {
   ApplicationAccessToken,
   ApplicationAccessTokenPayload,
+  ApplicationApiKeyEnable,
+  ApplicationApiKeyEnablePayload,
   ApplicationDetail,
   ApplicationDisplaySetting,
   ApplicationFormPayload,
@@ -50,6 +52,11 @@ const getAccessToken = (applicationId: string) => get<ApplicationAccessToken>(`$
 const putAccessToken = (applicationId: string, payload: ApplicationAccessTokenPayload) =>
   put<ApplicationAccessTokenPayload, ApplicationAccessToken>(`${prefix}/${applicationId}/access_token`, payload)
 
+/** 启用或禁用 System 资源管理智能体后端 API 访问，返回保存后的状态。 */
+// TODO：当前仓库未提供 System 路由，需在部署环境确认 enable_api_key 路径及响应协议。
+const putEnableApiKey = (applicationId: string, payload: ApplicationApiKeyEnablePayload) =>
+  put<ApplicationApiKeyEnablePayload, ApplicationApiKeyEnable>(`${prefix}/${applicationId}/enable_api_key`, payload)
+
 /** 获取智能体展示设置，仅许可证有效的专业版、企业版提供；未保存过的字段可能缺失。 */
 const getDisplaySetting = (applicationId: string) => get<Partial<ApplicationDisplaySetting>>(`${prefix}/${applicationId}/setting`)
 
@@ -71,6 +78,7 @@ export default {
   getApplicationDetail,
   getAccessToken,
   putAccessToken,
+  putEnableApiKey,
   getDisplaySetting,
   putDisplaySetting,
   putApplication,
