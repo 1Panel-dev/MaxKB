@@ -1,5 +1,5 @@
 import type { CHAT_TYPE } from './enums'
-import type { ChatApplicationProfile, ChatContent, ChatLogRecord, Dict } from '@/api/types'
+import type { ChatApplicationProfile, ChatContent, ChatLogRecord, ChatUserProfile, Dict } from '@/api/types'
 
 /**
  * 当前对话的智能体信息，由 view 加载并注入各组件 store，chat 与 debug 结构一致。
@@ -11,7 +11,7 @@ export type ConversationAppInfo = ChatApplicationProfile
 export interface ConversationAccount {
   nickName?: string
   username?: string
-  token_quota?: any
+  token_quota?: ChatUserProfile['token_quota']
 }
 
 export interface Conversation {

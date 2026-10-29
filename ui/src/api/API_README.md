@@ -500,6 +500,8 @@ Admin 上传尚未创建的资源文件时，`sourceId` 可传 `undefined`，省
 资源类型使用 `@/api/enums` 的 `FILE_SOURCE_TYPE` 与 `@/api/types` 的 `FileSourceType`，
 包括知识库、智能体、工具、文档、对话及三种临时文件有效期。对话 Store 使用
 `FILE_SOURCE_TYPE.CHAT` 调用对应 File API，对话 API 不再维护上传接口。
+chat、debug、portal 视图还通过 `upload` 注入为动态表单提供上传能力，使用当前会话 ID 与
+`FILE_SOURCE_TYPE.CHAT`，返回带 `abort` 的 Promise，响应适配为 `{ data: url }`。
 知识库工作流调试上传复用 Admin `FileApi.postUploadFile`，传知识库 ID 与 `FILE_SOURCE_TYPE.KNOWLEDGE`，
 通过返回的 `request` 获取文件地址，再适配动态表单的 `{ data: url }` 返回协议；工作流 API 不重复封装上传。
 

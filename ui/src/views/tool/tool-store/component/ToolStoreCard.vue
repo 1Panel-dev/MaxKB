@@ -65,7 +65,7 @@ function handleApply(tool = props.tool) {
           <!-- 查看工具详情 -->
           <el-button class="flex-1!" plain @click="openDetailDrawer()">详情</el-button>
           <!-- 应用工具 -->
-          <el-button class="flex-1!" type="primary" @click="handleApply()"> 应用 </el-button>
+          <el-button class="flex-1!" type="primary" @click="handleApply()">应用</el-button>
         </div>
       </component>
     </template>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onBeforeUnmount, provide, toRef, watch } from 'vue'
 import type { ApplicationDetail } from '@/api/types'
+import type { AxiosProgressEvent } from 'axios'
+import FileApi from '@/api/admin/file'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
 import ConversationLayout from '../../core/layout/index.vue'
 import ConversationList from '../../left-sidebar/conversation-list/index.vue'
 import ChatPanel from '../../main/chat-panel/index.vue'
@@ -21,6 +24,20 @@ const props = defineProps<{
 }>()
 
 const bundle = createDebugConversation(toRef(props, 'application'))
+
+// 动态表单上传使用当前会话，兼容文件字段的地址包装与取消操作。
+provide('upload', (file: File, onProgress?: (percent: number, event: AxiosProgressEvent) => void) => {
+  const upload = FileApi.postUploadFile(
+    file,
+    bundle.list.currentChatId.value,
+    FILE_SOURCE_TYPE.CHAT,
+    typeof onProgress === 'function' ? onProgress : undefined,
+  )
+  return Object.assign(
+    upload.request.then((url) => ({ data: url })),
+    { abort: upload.abort },
+  )
+})
 
 // 会话各组件 store + debug 面板状态,都由本视图 provide
 provide(CONVERSATION_LIST_KEY, bundle.list)

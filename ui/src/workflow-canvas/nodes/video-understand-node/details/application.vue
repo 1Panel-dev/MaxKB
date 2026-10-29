@@ -30,7 +30,10 @@ defineProps<{
             <template v-if="Array.isArray(history.content)">
               <span v-for="(h, i) in history.content" :key="i">
                 <video v-if="h.type === 'video_url'" :src="h.video_url.url" class="mr-2 inline-block rounded-md" style="width: 40px; height: 40px" />
-                <span v-else>{{ h.text }}<br /></span>
+                <span v-else>
+                  {{ h.text }}
+                  <br />
+                </span>
               </span>
             </template>
             <span v-else>{{ history.content }}</span>

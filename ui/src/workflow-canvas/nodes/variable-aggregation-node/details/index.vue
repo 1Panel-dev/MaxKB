@@ -31,24 +31,22 @@ const strategyLabel = (strategy?: string) => {
 
     <div v-for="(group, groupI) in data.group_list" :key="groupI" class="mk-gray-card-sm">
       <h6 class="mb-2">{{ group.label }}输入参数</h6>
-      <el-scrollbar max-height="200">
-        <div class="space-y-2">
-          <p v-for="(f, i) in group.variable_list" :key="i">
-            <span class="text-N600">{{ `${f.node_name}.${f.field}` }}：</span>{{ f.value }}
-          </p>
-        </div>
-      </el-scrollbar>
+      <div class="space-y-2">
+        <p v-for="(f, i) in group.variable_list" :key="i">
+          <span class="text-N600">{{ `${f.node_name}.${f.field}` }}：</span>
+          {{ f.value }}
+        </p>
+      </div>
     </div>
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">输出参数</h6>
-      <el-scrollbar max-height="200">
-        <div class="space-y-2">
-          <p v-for="(f, i) in data.result" :key="i">
-            <span class="text-N600">{{ i }}：</span>{{ f }}
-          </p>
-        </div>
-      </el-scrollbar>
+      <div class="space-y-2">
+        <p v-for="(f, i) in data.result" :key="i">
+          <span class="text-N600">{{ i }}：</span>
+          {{ f }}
+        </p>
+      </div>
     </div>
   </DetailContainer>
 </template>

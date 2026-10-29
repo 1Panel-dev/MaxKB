@@ -671,6 +671,11 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 已导入节点自动选中且不可取消，`disabled` 节点不可选择。懒加载先查询根目录，展开时通过
 原有工具数据源接口提交 `current_node` 查询子节点；非懒加载使用 `option_list`。
 
+动态表单 `UploadInput` 按附件原顺序使用 Flex 换行展示，不按类型分组。
+文件及音视频使用图标和文件名紧凑卡片，文件链接在新标签页打开或下载。
+图片使用 `ImageUploadCard`，音视频通过 `MkAudio`、`MkVideo` 打开预览。`inputDisabled` 为真时隐藏
+上传和删除入口，保留下载、图片预览和音视频播放；可编辑时允许上传和删除附件。
+
 动态表单 `LocalFileUpload` 字段复用 `MkDragUpload` 的多文件模式，将
 `file_type_list`、`file_size_limit`、`file_count_limit` 映射为格式、大小和数量限制。
 上传适配兼容上层返回的 Promise 或 `{ request, abort }`，响应支持地址字符串或 `{ data: 地址 }`；
