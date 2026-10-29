@@ -139,11 +139,8 @@ function buildResourceTree(resourceItems: ResourcePermissionItem[]) {
     }
   })
 
-  const workspaceRoot = resourceMap.get(selectedWorkspaceId.value)
-  if (workspaceRoot?.resource_type === 'folder' && !workspaceRoot.folder_id) {
-    workspaceRoot.name = '全部资源'
-    return [workspaceRoot]
-  }
+  const defaultRoot = resourceMap.get('default')
+  if (defaultRoot && !defaultRoot.folder_id) return defaultRoot.children
 
   return resources.filter(({ folder_id }) => !folder_id)
 }

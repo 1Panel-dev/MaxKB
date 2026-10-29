@@ -11,15 +11,15 @@ export const FOLDER_ENTRY_ID = {
   SHARED: 'shared',
 } as const
 
-function createFolderEntries(sharedResourceName: string) {
+function createFolderEntries(resourceName: string) {
   return {
     all: {
       get id() {
         return FOLDER_ENTRY_ID.ALL
       },
-      name: '全部资源',
+      name: `全部${resourceName}`,
     },
-    shared: { id: FOLDER_ENTRY_ID.SHARED, name: `共享${sharedResourceName}` },
+    shared: { id: FOLDER_ENTRY_ID.SHARED, name: `共享${resourceName}` },
   }
 }
 
