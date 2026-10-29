@@ -1,7 +1,7 @@
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
-from application.serializers.application_access_token import ApiKeyEnableEditSerializer
+from application.serializers.application_access_token import ApiKeyEnableSerializer
 from application.serializers.application_api_key import EditApplicationKeySerializer, ApplicationKeySerializerModel
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer
@@ -19,7 +19,7 @@ class ApplicationKeyResult(ResultSerializer):
 
 class ApiKeyEnableResult(ResultSerializer):
     def get_data(self):
-        return ApiKeyEnableEditSerializer()
+        return ApiKeyEnableSerializer()
 
 
 class ApplicationKeyAPI(APIMixin):
@@ -72,20 +72,11 @@ class ApplicationKeyAPI(APIMixin):
     class Enable(APIMixin):
         @staticmethod
         def get_parameters():
-            return [
-                *ApplicationKeyAPI.get_parameters(),
-                OpenApiParameter(
-                    name="enable_api_key",
-                    description="是否启用 api key 访问应用",
-                    type=OpenApiTypes.BOOL,
-                    location="query",
-                    required=True,
-                ),
-            ]
+            return []
 
         @staticmethod
         def get_request():
-            return None
+            return ApiKeyEnableSerializer
 
         @staticmethod
         def get_response():

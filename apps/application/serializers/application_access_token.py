@@ -136,14 +136,10 @@ class AccessTokenSerializer(serializers.Serializer):
         }
 
 
-class ApiKeyEnableEditSerializer(serializers.Serializer):
-    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
-    enable_api_key = serializers.BooleanField(required=True, label=_("Enable API key"))
-
-
 class ApiKeyEnableSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    enable_api_key = serializers.BooleanField(required=True, label=_("Enable API key"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -154,12 +150,8 @@ class ApiKeyEnableSerializer(serializers.Serializer):
         if not query_set.exists():
             raise AppApiException(500, _("Application id does not exist"))
 
-    def edit(self, instance):
+    def edit(self):
         self.is_valid(raise_exception=True)
-        enable_api_key_serializer = ApiKeyEnableEditSerializer(
-            data={**instance, "application_id": self.data.get("application_id")}
-        )
-        enable_api_key_serializer.is_valid(raise_exception=True)
         application_access_token = (
             QuerySet(ApplicationAccessToken).filter(application_id=self.data.get("application_id")).first()
         )
@@ -169,9 +161,10 @@ class ApiKeyEnableSerializer(serializers.Serializer):
                 access_token=hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24],
                 is_active=True,
             )
-        application_access_token.enable_api_key = enable_api_key_serializer.validated_data.get("enable_api_key")
+        application_access_token.enable_api_key = self.validated_data.get("enable_api_key")
         application_access_token.save()
         return {
+            "workspace_id": self.validated_data.get("workspace_id"),
             "application_id": application_access_token.application_id,
             "enable_api_key": application_access_token.enable_api_key,
         }

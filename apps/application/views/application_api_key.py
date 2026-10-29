@@ -169,7 +169,7 @@ class ApplicationApiKeyEnable(APIView):
         summary=_("Enable or disable application API key access"),
         operation_id=_("Enable or disable application API key access"),  # type: ignore
         parameters=ApplicationKeyAPI.Enable.get_parameters(),
-        request=None,
+        request=ApplicationKeyAPI.Enable.get_request(),
         responses=ApplicationKeyAPI.Enable.get_response(),
         tags=[_("Application Api Key")],  # type: ignore
     )
@@ -190,7 +190,7 @@ class ApplicationApiKeyEnable(APIView):
     )
     def put(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
-            ApiKeyEnableSerializer(data={"workspace_id": workspace_id, "application_id": application_id}).edit(
-                request.query_params.dict()
-            )
+            ApiKeyEnableSerializer(
+                data={**request.data, "workspace_id": workspace_id, "application_id": application_id}
+            ).edit()
         )
