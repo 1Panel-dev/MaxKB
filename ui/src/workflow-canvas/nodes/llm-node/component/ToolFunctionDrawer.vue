@@ -167,7 +167,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="currentIndex !== undefined ? '编辑工具' : '添加工具'" size="600" @closed="resetData">
+  <MkDrawer v-model="visible" :title="currentIndex !== undefined ? '编辑工具' : '添加工具'" @closed="resetData">
     <el-form ref="formRef" :model="functionForm" label-position="top" require-asterisk-position="right" @submit.prevent @paste.stop>
       <el-form-item label="JSON 解析" :error="parseError">
         <el-input v-model="parseJson" type="textarea" :rows="8" placeholder="请输入 JSON 格式文本进行解析" />
@@ -194,7 +194,7 @@ defineExpose({ open, close })
           <MkIcon name="icon_add_outlined" />
         </el-button>
       </div>
-      <MkTable class="border" :data="functionForm.parameters" size="small" row-key="name" :max-height="undefined" empty-text="暂无参数">
+      <MkTable :data="functionForm.parameters" size="small" row-key="name" :max-height="undefined" empty-text="暂无参数">
         <el-table-column label="参数">
           <template #default="{ row }">
             <span class="block truncate" :title="row.name">{{ row.name }}</span>

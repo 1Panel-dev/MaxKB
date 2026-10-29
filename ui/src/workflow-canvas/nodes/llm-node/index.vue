@@ -154,8 +154,9 @@ onMounted(() => {
         >
           <template #label>
             <div class="flex-between">
-              <span class="flex-align-center gap-1" :class="{ 'mk-required': formData.enable_context }">
-                上下文
+              <span class="flex-align-center gap-1">
+                <span :class="{ 'mk-required': formData.enable_context }">上下文</span>
+
                 <MkTooltip
                   content="开启后引用变量中的消息列表作为上下文，支持 SYSTEM、USER、ASSISTANT、TOOL 内容项或 OpenAI 消息格式"
                   placement="right"

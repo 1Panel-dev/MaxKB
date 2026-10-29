@@ -98,7 +98,7 @@ onBeforeUnmount(() => anchorGuard.reset())
         </el-button>
         <!-- 工具声明更多操作 -->
         <MkDropdown
-          class="ml-2"
+          class="ml-1"
           :teleported="false"
           trigger="click"
           placement="bottom-end"
@@ -175,7 +175,7 @@ onBeforeUnmount(() => anchorGuard.reset())
 
   <ToolFunctionDrawer ref="toolDrawerRef" :existing-names="existingNames" @submit="handleToolSubmit" />
 
-  <MkDialog v-model="importVisible" title="批量导入工具" @closed="resetImport">
+  <MkDialog v-model="importVisible" title="导入工具" @closed="resetImport">
     <el-input
       v-model="importJson"
       type="textarea"
