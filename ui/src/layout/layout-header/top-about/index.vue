@@ -2,7 +2,7 @@
   <div class="flex align-center top-about">
     <el-button
       round
-      @click="toUrl('https://maxkb.cn/pricing.html')"
+      @click="toUrl('https://maxkb.cn/price')"
       class="pricing-button mr-8"
       v-hasPermission="EditionConst.IS_CE"
     >
