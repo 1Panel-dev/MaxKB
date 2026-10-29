@@ -1,3 +1,4 @@
+from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -5,7 +6,7 @@ from django.test import SimpleTestCase
 
 from application.workflow.nodes.search_knowledge_node import search_knowledge_node as search_module
 from common.exception.app_exception import AppApiException
-from knowledge.models import SearchMode
+from knowledge.models import DocumentResourceType, SearchMode, SourceType
 
 
 class SearchKnowledgeImageTests(SimpleTestCase):
@@ -174,3 +175,36 @@ class SearchKnowledgeImageTests(SimpleTestCase):
             self.node.execute()
 
         self.vector.hit_test.assert_not_called()
+
+    def test_image_query_returns_image_markdown_to_reply_node(self):
+        self.params["image_list"] = ["start-node", "image"]
+        now = datetime(2026, 10, 29)
+        paragraph = {
+            "id": "image-paragraph",
+            "title": "google",
+            "content": "google",
+            "knowledge_id": self.params["knowledge_id_list"][0],
+            "document_id": "image-document",
+            "document_resource_type": DocumentResourceType.IMAGE,
+            "document_image_id": "original-image-file",
+            "meta": {"allow_download": False},
+            "hit_handling_method": "directly_return",
+            "directly_return_similarity": 0.8,
+            "create_time": now,
+            "update_time": now,
+        }
+        self.vector.hit_test.return_value = [
+            {"paragraph_id": "image-paragraph", "similarity": 0.95, "source_type": SourceType.PARAGRAPH.value}
+        ]
+        self.enterContext(patch.object(search_module, "_list_paragraph", return_value=[paragraph]))
+        self.enterContext(patch.object(search_module, "get_hit_asset_map", return_value={}))
+        self.enterContext(patch.object(search_module, "_record_recalled_items"))
+
+        self.node.execute()
+
+        context = {call.args[1]: call.args[2] for call in self.workflow.write_context.call_args_list}
+        image_content = "![](./oss/file/original-image-file)\n\ngoogle"
+        self.assertEqual(context["data"], f"#### google\n{image_content}")
+        self.assertEqual(context["directly_return"], image_content)
+        self.assertEqual(context["paragraph_list"][0]["content"], "google")
+        self.assertEqual(context["paragraph_list"][0]["meta"], {"allow_download": False})

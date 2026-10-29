@@ -22,9 +22,9 @@ from application.workflow.i_node import INode
 from common.config.embedding_config import VectorStore
 from common.db.search import native_search
 from common.exception.app_exception import AppApiException
-from common.utils.common import flat_map, get_file_content
+from common.utils.common import flat_map, get_file_content, parse_md_image
 from common.utils.shared_resource_auth import filter_authorized_ids
-from knowledge.models import Document, Paragraph, Knowledge, SearchMode, SourceType
+from knowledge.models import Document, DocumentResourceType, Paragraph, Knowledge, SearchMode, SourceType
 from knowledge.services.multimodal_retrieval import enrich_paragraph_sources, get_hit_asset_map, load_image_query_inputs
 from knowledge.services.retrieval_stats import get_recall_tracker, record_recall_safely
 from knowledge.services.retrieval_access import filter_workflow_knowledge
@@ -167,6 +167,19 @@ def _get_recalled_image_list(paragraph_list: List[Dict]) -> List[Dict]:
         seen_file_ids.add(file_id)
         image_list.append(hit_asset)
     return image_list
+
+
+def _get_result_content(paragraph: Dict) -> str:
+    """Keep recalled images in Markdown outputs consumed by reply and prompt nodes."""
+    content = paragraph.get("retrieval_content", paragraph.get("content")) or ""
+    file_id = (
+        paragraph.get("document_image_id")
+        if paragraph.get("document_resource_type") == DocumentResourceType.IMAGE
+        else None
+    ) or (paragraph.get("hit_asset") or {}).get("file_id")
+    if not file_id or any(str(file_id) in image for image in parse_md_image(content)):
+        return content
+    return f"![](./oss/file/{file_id})\n\n{content}"
 
 
 def _record_recalled_items(embedding_list: List[Dict], paragraph_list: List[Dict], workflow_manage, debug=False):
@@ -344,21 +357,13 @@ class SearchKnowledgeNode(INode):
         self.write_context(
             "data",
             "\n".join(
-                [
-                    f"{_reset_title(paragraph.get('title', ''))}"
-                    f"{paragraph.get('retrieval_content', paragraph.get('content'))}"
-                    for paragraph in result
-                ]
+                [f"{_reset_title(paragraph.get('title', ''))}{_get_result_content(paragraph)}" for paragraph in result]
             )[0 : knowledge_setting.get("max_paragraph_char_number", 5000)],
         )
         self.write_context(
             "directly_return",
             "\n".join(
-                [
-                    paragraph.get("retrieval_content", paragraph.get("content"))
-                    for paragraph in result
-                    if paragraph.get("is_hit_handling_method")
-                ]
+                [_get_result_content(paragraph) for paragraph in result if paragraph.get("is_hit_handling_method")]
             ),
         )
 

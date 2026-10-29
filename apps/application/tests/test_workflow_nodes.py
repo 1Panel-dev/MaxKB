@@ -9,6 +9,7 @@ from application.workflow.nodes.ai_chat_node.ai_chat_node import AIChatNode, _ge
 from application.workflow.nodes.data_source_web_node.data_source_web_node import DataSourceWebNode
 from application.workflow.nodes.search_knowledge_node.search_knowledge_node import (
     _get_recalled_image_list,
+    _get_result_content,
     _list_paragraph,
     _record_recalled_items,
     _reset_paragraph,
@@ -29,6 +30,43 @@ class DataSourceWebNodeTests(SimpleTestCase):
 
 
 class SearchKnowledgeNodeTests(SimpleTestCase):
+    def test_image_document_text_hit_includes_original_image_in_reply_content(self):
+        paragraph = {
+            "document_resource_type": DocumentResourceType.IMAGE,
+            "document_image_id": "original-image-file",
+            "hit_asset": None,
+            "retrieval_content": "google",
+        }
+
+        self.assertEqual(_get_result_content(paragraph), "![](./oss/file/original-image-file)\n\ngoogle")
+        self.assertEqual(paragraph["retrieval_content"], "google")
+
+    def test_inline_image_hit_includes_asset_and_visual_text(self):
+        paragraph = {
+            "document_resource_type": DocumentResourceType.DOCUMENT,
+            "hit_asset": {"file_id": "chart-file"},
+            "retrieval_content": "paragraph\nchart description",
+        }
+
+        self.assertEqual(_get_result_content(paragraph), "![](./oss/file/chart-file)\n\nparagraph\nchart description")
+
+    def test_reply_content_preserves_existing_image_markdown(self):
+        for image_path in ("./oss/file/chart-file", "/admin/oss/file/chart-file"):
+            with self.subTest(image_path=image_path):
+                content = f"chart\n![original caption]({image_path})"
+                self.assertEqual(
+                    _get_result_content({"content": content, "hit_asset": {"file_id": "chart-file"}}), content
+                )
+
+    def test_text_and_missing_image_results_keep_original_content(self):
+        for paragraph in (
+            {"content": "plain text"},
+            {"content": "plain text", "document_resource_type": DocumentResourceType.IMAGE},
+            {"content": "plain text", "hit_asset": {}},
+        ):
+            with self.subTest(paragraph=paragraph):
+                self.assertEqual(_get_result_content(paragraph), "plain text")
+
     @patch("knowledge.services.multimodal_retrieval.QuerySet")
     @patch("application.workflow.nodes.search_knowledge_node.search_knowledge_node.native_search")
     def test_workflow_paragraph_query_includes_source_fields(self, native_search, query_set):
