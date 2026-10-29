@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -192,6 +193,8 @@ class SearchKnowledgeImageTests(SimpleTestCase):
             "directly_return_similarity": 0.8,
             "create_time": now,
             "update_time": now,
+            "last_hit_time": now,
+            "source_updated_at": now,
         }
         self.vector.hit_test.return_value = [
             {"paragraph_id": "image-paragraph", "similarity": 0.95, "source_type": SourceType.PARAGRAPH.value}
@@ -202,9 +205,13 @@ class SearchKnowledgeImageTests(SimpleTestCase):
 
         self.node.execute()
 
-        context = {call.args[1]: call.args[2] for call in self.workflow.write_context.call_args_list}
+        context = json.loads(
+            json.dumps({call.args[1]: call.args[2] for call in self.workflow.write_context.call_args_list})
+        )
         image_content = "![](./oss/file/original-image-file)\n\ngoogle"
         self.assertEqual(context["data"], f"#### google\n{image_content}")
         self.assertEqual(context["directly_return"], image_content)
         self.assertEqual(context["paragraph_list"][0]["content"], "google")
         self.assertEqual(context["paragraph_list"][0]["meta"], {"allow_download": False})
+        self.assertEqual(context["paragraph_list"][0]["last_hit_time"], "2026-10-29 00:00:00")
+        self.assertEqual(context["is_hit_handling_method_list"][0]["source_updated_at"], "2026-10-29 00:00:00")

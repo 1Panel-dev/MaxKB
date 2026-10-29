@@ -1,9 +1,14 @@
-from datetime import datetime
+import json
+from datetime import datetime, timezone
+from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import MagicMock, call, patch
+from uuid import UUID
 
+from django.db import connection
 from django.test import SimpleTestCase
 
+from application.models import ChatRecord
 from application.workflow.common import WorkflowType
 from application.workflow.nodes.ai_chat_node.ai_chat_node import AIChatNode, _get_upstream_knowledge_images
 from application.workflow.nodes.data_source_web_node.data_source_web_node import DataSourceWebNode
@@ -30,6 +35,79 @@ class DataSourceWebNodeTests(SimpleTestCase):
 
 
 class SearchKnowledgeNodeTests(SimpleTestCase):
+    def test_recall_and_sync_timestamps_can_be_saved_in_workflow_context(self):
+        timestamp = datetime(2026, 10, 29, 10, 20, 30, tzinfo=timezone.utc)
+        paragraph = {
+            "id": UUID("00000000-0000-0000-0000-000000000001"),
+            "knowledge_id": UUID("00000000-0000-0000-0000-000000000002"),
+            "document_id": UUID("00000000-0000-0000-0000-000000000003"),
+            "content": "recalled paragraph",
+            "create_time": timestamp,
+            "update_time": timestamp,
+            "meta": {},
+            "directly_return_similarity": 0.8,
+            "hit_handling_method": "directly_return",
+        }
+        embedding = {"paragraph_id": str(paragraph["id"]), "similarity": 0.95}
+        field = ChatRecord._meta.get_field("workflow_context")
+
+        for last_hit_time, source_updated_at in (
+            (None, None),
+            (timestamp, None),
+            (None, timestamp),
+            (timestamp, timestamp),
+        ):
+            with self.subTest(last_hit_time=last_hit_time, source_updated_at=source_updated_at):
+                row = {**paragraph, "last_hit_time": last_hit_time, "source_updated_at": source_updated_at}
+                result = _reset_paragraph(row, [embedding])
+                context = {"search": {"paragraph_list": [result], "is_hit_handling_method_list": [result]}}
+                # Exercise the JSON encoder selected by the actual PostgreSQL field adapter.
+                prepared = field.get_db_prep_value(context, connection)
+                saved = json.loads(prepared.dumps(prepared.obj))["search"]["paragraph_list"][0]
+
+                self.assertEqual(saved["create_time"], "2026-10-29 10:20:30")
+                self.assertEqual(saved["update_time"], "2026-10-29 10:20:30")
+                self.assertEqual(saved["last_hit_time"], "2026-10-29 10:20:30" if last_hit_time else None)
+                self.assertEqual(saved["source_updated_at"], "2026-10-29 10:20:30" if source_updated_at else None)
+                self.assertEqual(saved["id"], str(paragraph["id"]))
+                self.assertTrue(saved["is_hit_handling_method"])
+                self.assertIs(row["last_hit_time"], last_hit_time)
+
+    def test_recalled_metadata_and_source_ids_are_json_serializable(self):
+        timestamp = datetime(2026, 10, 29, 10, 20, 30)
+        source_id = UUID("00000000-0000-0000-0000-000000000001")
+        paragraph = {
+            "id": "paragraph",
+            "knowledge_id": "knowledge",
+            "document_id": "document",
+            "anchor_paragraph_id": source_id,
+            "content": "recalled paragraph",
+            "create_time": timestamp,
+            "update_time": timestamp,
+            "meta": {"allow_download": True, "entries": [{"timestamp": timestamp, "id": source_id}]},
+            "directly_return_similarity": 0.8,
+            "hit_handling_method": "normal",
+        }
+        embedding = {
+            "paragraph_id": "paragraph",
+            "source_id": source_id,
+            "source_type": SourceType.IMAGE.value,
+            "similarity": Decimal("0.95"),
+        }
+        asset = {"file_id": str(source_id), "caption": "chart", "last_hit_time": timestamp}
+
+        result = _reset_paragraph(paragraph, [embedding], {str(source_id): asset})
+        saved = json.loads(json.dumps(result))
+
+        self.assertEqual(saved["source_id"], str(source_id))
+        self.assertEqual(saved["anchor_paragraph_id"], str(source_id))
+        self.assertEqual(saved["similarity"], 0.95)
+        self.assertEqual(saved["meta"]["entries"], [{"timestamp": "2026-10-29 10:20:30", "id": str(source_id)}])
+        self.assertEqual(saved["hit_asset"]["last_hit_time"], "2026-10-29 10:20:30")
+        self.assertEqual(saved["retrieval_content"], "recalled paragraph\nchart")
+        self.assertIs(paragraph["meta"]["entries"][0]["timestamp"], timestamp)
+        self.assertIs(asset["last_hit_time"], timestamp)
+
     def test_image_document_text_hit_includes_original_image_in_reply_content(self):
         paragraph = {
             "document_resource_type": DocumentResourceType.IMAGE,

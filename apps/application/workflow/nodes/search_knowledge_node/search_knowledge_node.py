@@ -7,6 +7,7 @@
 @desc:
 """
 
+import json
 import os
 import re
 from typing import List, Dict
@@ -21,6 +22,7 @@ from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
 from common.config.embedding_config import VectorStore
 from common.db.search import native_search
+from common.encoder.encoder import SystemEncoder
 from common.exception.app_exception import AppApiException
 from common.utils.common import flat_map, get_file_content, parse_md_image
 from common.utils.shared_resource_auth import filter_authorized_ids
@@ -132,7 +134,7 @@ def _reset_paragraph(paragraph: Dict, embedding_list: List, hit_asset_map: Dict 
         hit_asset = (hit_asset_map or {}).get(str(source_id)) if is_image_hit else None
         asset_text = _asset_retrieval_text(hit_asset)
         retrieval_content = "\n".join(value for value in (paragraph.get("content") or "", asset_text) if value)
-        return {
+        result = {
             **paragraph,
             "similarity": find_embedding.get("similarity"),
             "comprehensive_score": find_embedding.get("comprehensive_score"),
@@ -145,13 +147,13 @@ def _reset_paragraph(paragraph: Dict, embedding_list: List, hit_asset_map: Dict 
             "retrieval_content": retrieval_content,
             "is_hit_handling_method": find_embedding.get("similarity") > paragraph.get("directly_return_similarity")
             and paragraph.get("hit_handling_method") == "directly_return",
-            "update_time": paragraph.get("update_time").strftime("%Y-%m-%d %H:%M:%S"),
-            "create_time": paragraph.get("create_time").strftime("%Y-%m-%d %H:%M:%S"),
             "id": str(paragraph.get("id")),
             "knowledge_id": str(paragraph.get("knowledge_id")),
             "document_id": str(paragraph.get("document_id")),
             "meta": _reset_meta(paragraph.get("meta")),
         }
+        # Normalize all ORM fields and nested metadata before storing the workflow context.
+        return json.loads(json.dumps(result, cls=SystemEncoder))
 
 
 def _get_recalled_image_list(paragraph_list: List[Dict]) -> List[Dict]:
