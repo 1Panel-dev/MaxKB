@@ -5,7 +5,7 @@ import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { createAnchorGuard } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import { splitPatternOptions } from './constant'
+import { DOCUMENT_SPLIT_STRATEGY_LABELS, splitPatternOptions } from './constant'
 
 defineOptions({ name: 'WorkflowDocumentSplitNode' })
 
@@ -94,20 +94,21 @@ onBeforeUnmount(() => anchorGuard.reset())
         <!-- 分段策略 -->
         <el-form-item label="分段策略" prop="split_strategy" :rules="{ required: true, message: '请选择分段策略', trigger: 'change' }">
           <el-select v-model="formData.split_strategy" placeholder="请选择分段策略" :teleported="false" @change="clearHiddenValidation">
-            <el-option label="智能分段（推荐）" value="auto" />
-            <el-option label="高级分段" value="custom" />
-            <el-option label="QA 问答对" value="qa" />
+            <el-option :label="DOCUMENT_SPLIT_STRATEGY_LABELS.auto" value="auto" />
+            <el-option :label="DOCUMENT_SPLIT_STRATEGY_LABELS.custom" value="custom" />
+            <el-option :label="DOCUMENT_SPLIT_STRATEGY_LABELS.qa" value="qa" />
           </el-select>
         </el-form-item>
         <!-- 子分块长度 -->
         <el-form-item
+          class="mk-hide-asterisk"
           :prop="formData.chunk_size_type === 'referencing' ? 'chunk_size_reference' : 'chunk_size'"
           :rules="formData.chunk_size_type === 'referencing' ? [{ type: 'array', required: true, message: '请选择引用变量', trigger: 'change' }] : []"
         >
           <template #label>
             <div class="flex-between w-full gap-2">
               <span class="flex-align-center gap-1">
-                <span>子分块长度</span>
+                <span :class="formData.chunk_size_type === 'referencing' ? 'mk-required' : ''">子分块长度</span>
                 <MkTooltip effect="dark" placement="right">
                   <template #content>
                     核心目标是平衡检索精度与召回效率
@@ -149,6 +150,7 @@ onBeforeUnmount(() => anchorGuard.reset())
 
         <!-- 分段标识 -->
         <el-form-item
+          class="mk-hide-asterisk"
           v-if="formData.split_strategy === 'custom'"
           :prop="formData.patterns_type === 'referencing' ? 'patterns_reference' : 'patterns'"
           :rules="formData.patterns_type === 'referencing' ? [{ type: 'array', required: true, message: '请选择引用变量', trigger: 'change' }] : []"
@@ -156,7 +158,7 @@ onBeforeUnmount(() => anchorGuard.reset())
           <template #label>
             <div class="flex-between w-full gap-2">
               <div class="flex-align-center gap-1">
-                <span>分段标识</span>
+                <span :class="formData.patterns_type === 'referencing' ? 'mk-required' : ''">分段标识</span>
                 <MkTooltip effect="dark" content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
@@ -193,13 +195,14 @@ onBeforeUnmount(() => anchorGuard.reset())
 
         <!-- 分段长度 -->
         <el-form-item
+          class="mk-hide-asterisk"
           v-if="formData.split_strategy === 'custom'"
           :prop="formData.limit_type === 'referencing' ? 'limit_reference' : 'limit'"
           :rules="formData.limit_type === 'referencing' ? [{ type: 'array', required: true, message: '请选择引用变量', trigger: 'change' }] : []"
         >
           <template #label>
             <div class="flex-between w-full gap-2">
-              <span>分段长度</span>
+              <span :class="formData.limit_type === 'referencing' ? 'mk-required' : ''">分段长度</span>
               <el-select
                 v-model="formData.limit_type"
                 size="small"
@@ -220,6 +223,7 @@ onBeforeUnmount(() => anchorGuard.reset())
             :max="100000"
             :value-on-clear="0"
             controls-position="right"
+            align="left"
             class="w-full!"
             :step="1"
             :step-strictly="true"
