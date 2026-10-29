@@ -260,7 +260,8 @@ onMounted(() => {
           <el-table-column prop="username" label="用户名" min-width="198" show-overflow-tooltip />
           <el-table-column label="角色" min-width="198">
             <template #default="{ row }">
-              <MkTagGroup :tags="row.roles" />
+              <MkTagGroup v-if="row.roles?.length" :tags="row.roles" />
+              <span v-else>-</span>
             </template>
           </el-table-column>
           <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip>
