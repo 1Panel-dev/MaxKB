@@ -770,6 +770,9 @@ class AIChatNode(INode):
             {
                 "question": self.data.get("question"),
                 "answer": self.get_context("answer"),
+                "video_list": self.data.get("video_list"),
+                "image_list": self.data.get("image_list"),
+                "vision": self.data.get("vision"),
                 "reasoning_content": self.data.get("reasoning_content"),
                 "message_tokens": self.data.get("message_tokens"),
                 "answer_tokens": self.data.get("answer_tokens"),
