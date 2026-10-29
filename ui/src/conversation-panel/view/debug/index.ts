@@ -70,6 +70,7 @@ export function createDebugConversation(application: Readonly<Ref<ApplicationDet
     uploadFile: msgs.uploadFile,
     stop: msgs.stop,
     appInfo,
+    apiInputEditable: true,
   })
   const detail = createExecutionDetailStore()
   return { appInfo, list, msgs, input, detail }

@@ -5,6 +5,7 @@ import { useInputEvents } from '../../core/input-events'
 import { useMessageInputStore, type FileItem } from './index'
 import FileUploadCard from '@/components/mk-drag-upload/FileUploadCard.vue'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import UserForm from './user-form/index.vue'
 
 const {
   question,
@@ -111,7 +112,8 @@ function getAttachmentDescription(file: FileItem) {
     />
 
     <!-- 操作栏 -->
-    <div class="text-right mt-3">
+    <div class="mt-3 flex items-center">
+      <UserForm class="mr-3" />
       <input ref="fileInputRef" type="file" multiple :accept="acceptList" class="hidden" @change="handleFileSelect" />
       <MkTooltip placement="top">
         <template #content>
