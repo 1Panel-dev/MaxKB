@@ -492,7 +492,10 @@ class BaseAuthView(APIView):
                     application_id = application_access_token.application_id
                     workspace_id = application_access_token.application.workspace_id
             token = ChatToken(
-                str(user.id), AuthenticationType.CHAT_USER, str(operate), application_id=str(application_id)
+                str(user.id),
+                AuthenticationType.CHAT_USER,
+                str(operate),
+                application_id=str(application_id) if application_id else None,
             ).to_token()
             version, get_key = Cache_Version.CHAT_USER_TOKEN.value
             cache.set(get_key(token), user, timeout=60 * 60 * 2, version=version)
