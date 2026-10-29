@@ -130,3 +130,12 @@ export interface ChatUserAuthorizationPayload {
   chat_user_id: string
   is_auth: boolean
 }
+
+/** 当前对话用户的唯一 API Key。 */
+export interface ChatUserApiKey {
+  id: string
+  secret_key: string
+  is_active: boolean
+  create_time: string
+  user_id: string
+}

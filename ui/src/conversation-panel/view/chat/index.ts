@@ -77,7 +77,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     rename: api.rename,
     account: computed(() => {
       const profile = user.chatUserProfile
-      return profile?.username ? { nickName: profile.nick_name, username: profile.username } : null
+      return profile?.username ? { nickName: profile.nick_name, username: profile.username, token_quota: profile.token_quota } : null
     }),
     appInfo,
   })
@@ -120,7 +120,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     const applicationId = getApplicationId()
     if (!applicationId) return
     ApplicationApi.getApplicationProfile(applicationId).then((profile) => {
-      if (applicationId === getApplicationId()) appInfo.value = {...APPLICATION_DISPLAY_SETTING_DEFAULT,...profile}
+      if (applicationId === getApplicationId()) appInfo.value = { ...APPLICATION_DISPLAY_SETTING_DEFAULT, ...profile }
     })
   }
   loadApplicationProfile()

@@ -2,7 +2,7 @@
 import { relativeTimeFormat } from '@/utils/time'
 import type { Conversation } from '../../core/types'
 import { useConversationListStore } from './index'
-import AccountMenu from './AccountMenu.vue'
+import AccountMenu from '../account-menu/index.vue'
 
 defineOptions({ name: 'ConversationList' })
 

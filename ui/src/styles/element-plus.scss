@@ -805,8 +805,15 @@
 }
 
 /* progress */
-.el-progress-bar__inner {
-  background: linear-gradient(90deg, rgb(var(--mk-primary-rgb) / 20%) 0%, var(--el-color-primary) 100%);
+.el-progress {
+  .el-progress-bar__inner {
+    background: linear-gradient(90deg, rgb(var(--mk-primary-rgb) / 20%) 0%, var(--el-color-primary) 100%);
+  }
+  &.is-warning {
+    .el-progress-bar__inner {
+      background: linear-gradient(90deg, rgb(var(--mk-warning-rgb) / 20%) 0%, var(--el-color-warning) 100%);
+    }
+  }
 }
 
 /* radio */

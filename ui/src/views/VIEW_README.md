@@ -435,5 +435,7 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   组件不直接引用某个入口的 Store 或 API；接口、回调地址与登录后跳转由页面传入的 `LoginService` 提供。
 - Chat／Portal 页面以 auth token 为面板 key，token 变化重建并加载用户档案；路由认证见路由文档。
   会话装配在 conversation-panel，列表 Store 不感知 Router；门户复用 chat 装配，保留各智能体最近会话分组。
+  账户菜单位于 `conversation-panel/left-sidebar/account-menu/index.vue`，单应用与门户共用；直接调用 Chat API 的 `postLogout()`，成功后清理当前认证场景并重新导航，由守卫处理后续认证。
+  同目录的 `UserPwdDialog.vue` 修改当前对话用户密码，`ApiKeyDialog.vue` 展示门户地址及用户唯一 API Key，支持复制完整密钥和重新生成；密钥在界面中仅显示末四位。
   没有当前智能体时不查询其信息／会话、禁用输入，分组加载后选首个；无可用智能体显示空态。
   全部智能体与选择抽屉复用卡片，抽屉每次打开重新查询，搜索状态独立。
