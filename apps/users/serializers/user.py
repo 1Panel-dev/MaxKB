@@ -120,7 +120,7 @@ def check_verify_code_attempts(email: str, type_code: str, submitted_code: str) 
 
 class UserProfileResponse(serializers.ModelSerializer):
     is_edit_password = serializers.BooleanField(required=True, label=_("Is Edit Password"))
-    permissions = serializers.ListField(required=True, label=_("permissions"))
+    permissions = serializers.DictField(child=serializers.CharField(), required=True, label=_("permissions"))
 
     class Meta:
         model = User
@@ -273,7 +273,7 @@ class UserProfileSerializer(serializers.Serializer):
             "email": user.email,
             "source": user.source,
             "role": list(auth.roles),
-            "permissions": auth.permissions,
+            "permissions": {k: format(v, "x") for k, v in auth.permissions.items()},
             "is_edit_password": _is_default_password(CONFIG.get("DEFAULT_PASSWORD", "MaxKB@123.."), user.password)
             if user.source == "LOCAL"
             else False,

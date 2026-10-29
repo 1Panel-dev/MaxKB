@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', {
       const source = state.userInfo?.permissions ?? {}
       const result = new Map<string, bigint>()
       for (const [key, value] of Object.entries(source)) {
-        result.set(key, BigInt(value ?? 0))
+        result.set(key, value ? BigInt(`0x${value}`) : 0n)
       }
       return result
     },
