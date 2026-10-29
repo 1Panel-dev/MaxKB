@@ -142,7 +142,7 @@ defineExpose({ validate, getStrategy })
           :rules="{ required: true, message: '请选择增强工具', trigger: 'change' }"
           class="mb-0! mt-4"
         >
-          <el-select v-model="strategy.visual.tool_id" :loading="toolOptionsLoading" placeholder="请选择增强工具" filterable class="w-full">
+          <el-select v-model="strategy.visual.tool_id" :loading="toolOptionsLoading" placeholder="请选择增强工具" filterable clearable class="w-full">
             <template #label="{ label }">
               <div class="flex-align-center gap-2">
                 <ToolIcon

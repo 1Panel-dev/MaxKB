@@ -22,11 +22,11 @@ const statusText = computed(() => {
   return STATUS_TEXT[status] ?? status
 })
 
-const statusClass = computed(() => {
+const statusType = computed(() => {
   const status = props.toolItem.status
-  if (status === 'SUCCESS') return 'text-success'
-  if (status === 'FAIL' || status === 'FAILURE') return 'text-danger'
-  return 'text-N600'
+  if (status === 'SUCCESS') return 'success'
+  if (status === 'FAIL' || status === 'FAILURE') return 'danger'
+  return 'info'
 })
 
 // 参数为 JSON 字符串，尝试格式化展示，失败则原样展示
@@ -65,10 +65,10 @@ const formattedResult = computed(() => tryFormatJson(props.toolItem.content))
       <span v-if="loading" class="mk-conversation-loading" />
       <MkIcon name="icon_busy_outlined" />
       <span class="min-w-0 max-w-[300px] truncate" :title="toolTitle">{{ toolTitle }}</span>
-      <span v-if="toolItem.status" class="shrink-0 rounded bg-N100 px-[6px] py-px text-[11px]" :class="statusClass">{{ statusText }}</span>
+      <el-tag v-if="toolItem.status" size="small" :type="statusType">{{ statusText }}</el-tag>
     </template>
 
-    <div class="space-y-2">
+    <div class="space-y-2 pb-2">
       <!-- 请求参数 -->
       <div v-if="toolItem.arguments" class="mk-gray-card-lg py-3!">
         <h6 class="mb-2">输入参数</h6>
