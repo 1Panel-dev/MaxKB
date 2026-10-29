@@ -5,7 +5,7 @@ import { isWorkspaceResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'ModelProvider' })
 
-const ALL_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部资源', provider: 'all' }
+const ALL_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 const SHARED_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '共享模型', provider: 'shared' }
 
 const LOCAL_PROVIDER_IDS = new Set([
@@ -44,7 +44,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
 
     <MkListItem :active="modelValue.provider === ALL_MODEL_PROVIDER.provider" @click="handleProviderSelect(ALL_MODEL_PROVIDER)">
       <MkIcon :name="modelValue.provider === ALL_MODEL_PROVIDER.provider ? 'icon_card_filled' : 'icon_card_outlined'" :size="18" class="mr-2" />
-      <span>{{ ALL_MODEL_PROVIDER.name }}</span>
+      <span>全部模型</span>
     </MkListItem>
   </div>
 
