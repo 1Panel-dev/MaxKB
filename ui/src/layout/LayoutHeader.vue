@@ -25,18 +25,15 @@ function hasRolePrefix(name: string) {
 }
 
 // 系统管理员：内置 ADMIN 或自定义 ADMIN 类型（EXTENDS_ADMIN 无 :w: 后缀）
-const canManageSystem = computed(() =>
-  hasPermission([RoleConstants.ADMIN, RoleConstants.EXTENDS_ADMIN], Compare.OR),
-)
+const canManageSystem = computed(() => hasPermission([RoleConstants.ADMIN, RoleConstants.EXTENDS_ADMIN], Compare.OR))
 
 // 工作空间管理员：内置 WORKSPACE_MANAGE 或自定义 EXTENDS_WORKSPACE_MANAGE
 const isWorkspaceManager = computed(() => {
   const workspaceId = getWorkspaceId()
   return (
-    hasPermission(
-      [RoleConstants.WORKSPACE_MANAGE, new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId)],
-      Compare.OR,
-    ) || hasRolePrefix(RoleConstants.EXTENDS_WORKSPACE_MANAGE.name)
+    hasPermission([RoleConstants.WORKSPACE_MANAGE, new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId)], Compare.OR) ||
+    hasRolePrefix(RoleConstants.EXTENDS_WORKSPACE_MANAGE.name) ||
+    hasRolePrefix(RoleConstants.WORKSPACE_MANAGE.name)
   )
 })
 
@@ -45,7 +42,8 @@ const isOrdinaryUser = computed(() => {
   const workspaceId = getWorkspaceId()
   return (
     hasPermission([RoleConstants.USER, new Role(RoleConstants.USER.name, workspaceId)], Compare.OR) ||
-    hasRolePrefix(RoleConstants.EXTENDS_USER.name)
+    hasRolePrefix(RoleConstants.EXTENDS_USER.name) ||
+    hasRolePrefix(RoleConstants.USER.name)
   )
 })
 
@@ -80,7 +78,7 @@ function switchMode() {
         <span>升级</span>
       </el-button>
       <el-divider direction="vertical" />
-      <el-button v-if="isWorkspace(mode) && (isWorkspaceManager || canManageSystem )" class="-mx-1" text @click="switchMode">
+      <el-button v-if="isWorkspace(mode) && (isWorkspaceManager || canManageSystem)" class="-mx-1" text @click="switchMode">
         <MkIcon name="icon_admin_outlined" />
         <span>系统管理</span>
       </el-button>
@@ -89,7 +87,7 @@ function switchMode() {
         <MkIcon name="icon_left_outlined" />
         <span>返回工作空间</span>
       </el-button>
-      <AvatarDropdown> <!-- 头像  --> </AvatarDropdown>
+      <AvatarDropdown><!-- 头像  --></AvatarDropdown>
     </div>
   </header>
 </template>
