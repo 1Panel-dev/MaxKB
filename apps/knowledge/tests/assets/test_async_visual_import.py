@@ -247,11 +247,11 @@ class PendingVisualEmbeddingTests(SimpleTestCase):
     def test_pending_image_is_recognized_before_its_description_is_embedded(self):
         asset = self.asset()
 
-        self.assertEqual(self.embed(), 1)
+        self.assertEqual(self.embed(), 2)
 
         self.resolve.assert_called_once_with(asset.document.doc_strategy["visual"], "workspace-1")
         self.processor.assert_called_once_with(asset, asset.document.doc_strategy["visual"])
-        self.embedding_model.embed_documents.assert_called_once_with(["chart\nrevenue 100\nrecognized chart"])
+        self.embedding_model.embed_documents.assert_called_once_with(["chart\nrevenue 100\nrecognized chart", "chart"])
         self.assertEqual(asset.process_status, AssetProcessStatus.SUCCESS)
         self.write_description.assert_called_once_with(asset)
         self.assertEqual(self.bulk_create.call_args.args[0][0].source_id, str(asset.id))
@@ -313,13 +313,13 @@ class PendingVisualEmbeddingTests(SimpleTestCase):
         second.document_id, second.document = first.document_id, first.document
         self.processor.side_effect = [RuntimeError("vision unavailable"), {"description": "second chart"}]
 
-        self.assertEqual(self.embed(), 2)
+        self.assertEqual(self.embed(), 3)
 
         self.assertEqual(first.process_status, AssetProcessStatus.FAILURE)
         self.assertEqual(first.description, "chart")
         self.assertEqual(first.process_error, "vision unavailable")
         self.assertEqual(second.process_status, AssetProcessStatus.SUCCESS)
-        self.embedding_model.embed_documents.assert_called_once_with(["chart\nchart", "chart\nsecond chart"])
+        self.embedding_model.embed_documents.assert_called_once_with(["chart\nchart", "chart\nsecond chart", "chart"])
 
     def test_each_document_uses_its_own_strategy_and_workspace(self):
         first, second = self.asset(), self.asset()

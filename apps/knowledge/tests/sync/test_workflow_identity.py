@@ -218,12 +218,12 @@ class WorkflowDocumentIdentityTests(SimpleTestCase):
         select_related.return_value.filter.return_value.order_by.return_value = [asset]
         embedding_model = MagicMock()
         embedding_model.supports_image_embedding.return_value = False
-        embedding_model.embed_documents.return_value = [[0.1, 0.2]]
+        embedding_model.embed_documents.return_value = [[0.1, 0.2], [0.3, 0.4]]
 
         count = embed_paragraph_assets([asset.paragraph_id], embedding_model)
 
-        self.assertEqual(count, 1)
-        embedding_model.embed_documents.assert_called_once_with(["chart\nrevenue 100\nan upward trend"])
+        self.assertEqual(count, 2)
+        embedding_model.embed_documents.assert_called_once_with(["chart\nrevenue 100\nan upward trend", "chart"])
         embedding_model.embed_images.assert_not_called()
         row = bulk_create.call_args.args[0][0]
         self.assertEqual(row.meta["unit_type"], "text")

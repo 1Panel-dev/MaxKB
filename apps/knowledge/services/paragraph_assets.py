@@ -13,6 +13,7 @@ import uuid_utils.compat as uuid
 from common.chunk import text_to_chunk
 from common.config.embedding_config import ModelManage
 from common.exception.app_exception import AppApiException
+from common.utils.common import sub_array
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
@@ -603,7 +604,7 @@ def process_pending_visual_assets(paragraph_ids: Iterable[str]) -> None:
 
 
 def embed_paragraph_assets(paragraph_ids: Iterable[str], embedding_model) -> int:
-    """Enhance pending images in the worker before indexing their descriptions and image units."""
+    """Enhance pending images before indexing captions, descriptions and image units."""
     assets = list(
         ParagraphAsset.objects.select_related("file", "paragraph", "document", "knowledge")
         .filter(paragraph_id__in=paragraph_ids, sync_state=SyncState.ACTIVE)
@@ -615,20 +616,32 @@ def embed_paragraph_assets(paragraph_ids: Iterable[str], embedding_model) -> int
 
     rows = []
 
-    text_assets = []
-    text_inputs = []
+    text_units = []
     for asset in assets:
-        text = "\n".join(
+        parts = [
             value.strip() for value in (asset.caption, asset.ocr_text, asset.description) if value and value.strip()
-        )
-        if text:
-            text_assets.append(asset)
-            text_inputs.append(text)
-    if text_inputs:
+        ]
+        if parts:
+            text_units.append((asset, "\n".join(parts), "image_description"))
+        caption = (asset.caption or "").strip()
+        caption_mime_type = mimetypes.guess_type(caption)[0] or ""
+        if (
+            caption
+            and len(set(parts)) > 1
+            and caption != asset.file.file_name
+            and not caption_mime_type.startswith("image/")
+        ):
+            # A long visual description can dilute the image's subject for short
+            # queries. Keep the caption independently searchable without losing details.
+            text_units.append((asset, caption, "image_caption"))
+
+    # Captions add another unit per image; use the same bounded batches as paragraph text.
+    for batch in sub_array(text_units):
+        text_inputs = [text for _, text, _ in batch]
         text_vectors = embedding_model.embed_documents(text_inputs)
         if len(text_vectors) != len(text_inputs):
             raise AppApiException(500, _("The image description embedding model returned an incomplete result"))
-        for asset, text, vector in zip(text_assets, text_inputs, text_vectors):
+        for (asset, text, content_type), vector in zip(batch, text_vectors):
             rows.append(
                 Embedding(
                     id=uuid.uuid7(),
@@ -642,7 +655,7 @@ def embed_paragraph_assets(paragraph_ids: Iterable[str], embedding_model) -> int
                     search_vector=SearchVector(Value(to_ts_vector(text)), config="simple"),
                     meta={
                         "unit_type": "text",
-                        "content_type": "image_description",
+                        "content_type": content_type,
                         "asset_id": str(asset.id),
                         "position": asset.position,
                     },

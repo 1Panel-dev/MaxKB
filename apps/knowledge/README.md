@@ -35,6 +35,15 @@ links are not reused. Stored Markdown and original images remain available for d
 After upgrading, rebuild embeddings for affected documents to replace existing link-based
 text vectors. Image vectors and image-description vectors are still indexed separately.
 
+Image assets also index a meaningful caption as a separate text vector when OCR or a description
+adds more information. This keeps short subject queries from depending only on a long visual
+description, whose similarity can be lower than an unrelated short paragraph. Filename-only captions
+and captions with no additional text do not create extra units. The combined description and original
+image vectors remain available; all units retain the same asset/paragraph identity, and retrieval
+keeps the highest-scoring unit per paragraph. Text units use the same ten-item batches as paragraph
+embeddings. Deploy the worker change and rebuild affected document embeddings to add caption vectors;
+no visual recognition rerun or database migration is needed for completed assets.
+
 The `document/image/preview` POST endpoint saves editable previews in a short transaction,
 then completes visual enhancement before responding. Model and tool strategies return the
 recognized caption, OCR text and description in the initial response with `process_status: success`.

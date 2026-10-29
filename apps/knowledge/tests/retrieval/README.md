@@ -6,6 +6,21 @@
 python apps/manage.py test knowledge.tests.retrieval
 ```
 
+## 图片标题向量
+
+`test_image_caption_embedding` 覆盖图片标题与完整描述分别入库、文件名及重复标题不增加向量、
+图片/段落归属、每批最多十条文本，以及后续批次不完整时不写入部分结果。
+它复用模型供应商的阿里云 Postman 模拟服务验证真实 SDK 请求：
+
+```bash
+postman simulation run apps/models_provider/tests/fixtures/aliyun.sim.yaml --port 49642 --no-history
+ALIYUN_EMBEDDING_TEST_URL=http://127.0.0.1:49642/aliyun/api/v1 \
+  python apps/manage.py test knowledge.tests.retrieval.test_image_caption_embedding
+```
+
+未设置地址时跳过 HTTP 用例，其余用例不依赖数据库或模型服务。模拟服务只验证请求契约和
+批次对应关系；语义排序需使用实际向量模型验证，不能由固定的模拟向量证明。
+
 ## 向量化重启恢复
 
 ```bash
