@@ -19,7 +19,7 @@ from common.utils.tool_code import ToolExecutor
 from common.utils.ts_vecto_util import to_ts_vector
 from django.contrib.postgres.search import SearchVector
 from django.db import transaction
-from django.db.models import Value
+from django.db.models import F, Value
 from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage
 from models_provider.base_model_provider import ModelTypeConst
@@ -35,6 +35,7 @@ from knowledge.models import (
     File,
     FileSourceType,
     Knowledge,
+    KnowledgeType,
     LocalState,
     Paragraph,
     ParagraphAsset,
@@ -46,7 +47,9 @@ from knowledge.services import validate_knowledge_file_size
 from knowledge.services.paragraph_files import bind_paragraph_image_files
 
 
-IMAGE_PATTERN = re.compile(r"!\[(?P<caption>[^\]]*)\]\([^)]*/oss/file/(?P<file_id>[0-9a-fA-F-]{32,36})[^)]*\)")
+IMAGE_PATTERN = re.compile(
+    r"!\[(?P<caption>(?:\\.|[^\]\\])*)\]\([^)]*/oss/file/(?P<file_id>[0-9a-fA-F-]{32,36})[^)]*\)"
+)
 FILE_REFERENCE_PATTERN = re.compile(r"/oss/(?:file|image)/(?P<file_id>[0-9a-fA-F-]{32,36})(?![0-9a-fA-F-])")
 
 
@@ -453,6 +456,32 @@ def _write_asset_description(asset: ParagraphAsset) -> None:
             char_length=len(content),
             source_hash=document_source_hash([{"title": paragraph.title, "content": content}]),
         )
+    elif (
+        asset.document.resource_type == DocumentResourceType.DOCUMENT
+        and asset.process_status == AssetProcessStatus.SUCCESS
+        and asset.document.type == KnowledgeType.BASE
+        and asset.description.strip()
+        and paragraph.local_state != LocalState.DELETED
+    ):
+        # Use the locked, current Markdown so processing one image cannot undo another
+        # image's description or text edited while recognition was running.
+        matches = list(IMAGE_PATTERN.finditer(paragraph.content))
+        if index < len(matches) and matches[index].group("file_id") == str(asset.file_id):
+            match = matches[index]
+            description = " ".join(asset.description.strip().splitlines())
+            description = re.sub(r"([\\\[\]])", r"\\\1", description)
+            start, end = match.span("caption")
+            content = paragraph.content[:start] + description + paragraph.content[end:]
+            images[index]["raw"] = (
+                paragraph.content[match.start() : start] + description + paragraph.content[end : match.end()]
+            )
+            if content != paragraph.content:
+                length_delta = len(content) - len(paragraph.content)
+                strategy = normalize_document_strategy(asset.document.doc_strategy)
+                paragraph.content = content
+                paragraph.chunks = text_to_chunk(content, strategy["split"]["child_length"])
+                update_fields.extend(["content", "chunks"])
+                Document.objects.filter(id=asset.document_id).update(char_length=F("char_length") + length_delta)
     paragraph.save(update_fields=update_fields)
 
 

@@ -18,8 +18,13 @@ the request does not call the vision model or tool.
 
 The existing embedding job is published with `transaction.on_commit`. In the worker,
 `process_pending_visual_assets` enhances pending images using the document strategy and knowledge
-workspace before reading the paragraph text for indexing. Results update the paragraph image
-blocks; standalone images also update their paragraph text and chunks. `embed_paragraph_assets`
+workspace before reading the paragraph text for indexing. For ordinary documents in general knowledge
+bases, successful inline image recognition also writes the description into the Markdown alt text:
+`![description](./oss/file/<file_id>)`.
+The image URL and surrounding text are preserved; description line breaks become spaces and
+brackets/backslashes are escaped. The image blocks, paragraph chunks and document character count
+are updated together without changing source fingerprints. Failed or skipped recognition leaves
+the original Markdown intact. Standalone images update their paragraph text and chunks. `embed_paragraph_assets`
 indexes the image descriptions. Completed assets are reused when embeddings are rebuilt.
 A failed image retains its existing description or caption and does not stop the remaining images.
 
@@ -41,7 +46,9 @@ No external model call holds a preview row lock.
 Saving edited paragraph content synchronizes inline image references into `content_schema`
 and `ParagraphAsset` before returning the paragraph. Standalone image documents retain their
 original image asset and its recognition results. New or replaced images use the document's
-visual strategy; recognition updates their structured metadata while preserving edited paragraph text.
+visual strategy; inline recognition in general knowledge base documents updates their descriptions
+while preserving surrounding edited text.
+For standalone image documents, recognition updates structured metadata without replacing edited paragraph text.
 Removing an inline image also removes its asset record and image embeddings in the same transaction.
 The returned `assets` and `content_schema` reflect the remaining images; underlying files are retained
 because other paragraphs may still reference them.
