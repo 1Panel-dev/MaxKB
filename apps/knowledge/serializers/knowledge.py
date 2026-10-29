@@ -574,7 +574,8 @@ class KnowledgeSerializer(serializers.Serializer):
             if "desc" in instance:
                 knowledge.desc = instance.get("desc")
             if "meta" in instance:
-                knowledge.meta = validated_data.get("meta")
+                # Basic settings validation excludes metadata owned by features such as scheduled sync.
+                knowledge.meta = {**(knowledge.meta or {}), **validated_data["meta"]}
             if "doc_strategy" in validated_data:
                 knowledge.meta = {
                     **(knowledge.meta or {}),

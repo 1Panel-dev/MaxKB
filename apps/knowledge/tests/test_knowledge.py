@@ -1,3 +1,4 @@
+from copy import deepcopy
 from unittest.mock import MagicMock, patch
 
 from django.test import SimpleTestCase
@@ -7,6 +8,7 @@ from knowledge.models import (
 from knowledge.serializers.knowledge import (
     KnowledgeSerializer,
 )
+from knowledge.serializers.knowledge_sync import KnowledgeSyncSettingOperationSerializer
 from knowledge.services.document_strategy import (
     normalize_document_strategy,
 )
@@ -74,6 +76,92 @@ class WebKnowledgeCreationTests(SimpleTestCase):
         self.assertEqual(second.meta["sync_setting"]["time"], ["01:00"])
         self.assertFalse(DEFAULT_KNOWLEDGE_SYNC_SETTING["enabled"])
         self.assertEqual(DEFAULT_KNOWLEDGE_SYNC_SETTING["time"], ["01:00"])
+
+
+class WebKnowledgeSettingsTests(SimpleTestCase):
+    def setUp(self):
+        self.knowledge = MagicMock(
+            id="00000000-0000-0000-0000-000000000011",
+            type=KnowledgeType.WEB,
+            meta={
+                "source_url": "https://example.com",
+                "selector": "body",
+                "doc_strategy": normalize_document_strategy({"split": {"max_length": 1024}}),
+                "sync_setting": {
+                    "enabled": True,
+                    "schedule_type": "weekly",
+                    "time": ["02:30", "16:00"],
+                    "days": [1, 3, 5],
+                    "sync_type": "replace",
+                },
+            },
+        )
+        query_set = self.enterContext(patch("knowledge.serializers.knowledge.QuerySet"))
+        query_set.return_value.get.return_value = self.knowledge
+        self.enterContext(patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge"))
+        crawler = self.enterContext(patch("knowledge.serializers.common.Fork"))
+        crawler.return_value.fork.return_value.status = 200
+        self.operation = KnowledgeSerializer.Operate(
+            data={
+                "user_id": "00000000-0000-0000-0000-000000000012",
+                "workspace_id": "default",
+                "knowledge_id": self.knowledge.id,
+            }
+        )
+
+    def edit(self, payload):
+        KnowledgeSerializer.Operate.edit.__wrapped__(self.operation, payload, select_one=False)
+
+    def test_basic_settings_preserve_sync_configuration_even_with_stale_form_metadata(self):
+        stored_meta = deepcopy(self.knowledge.meta)
+        for enabled in (True, False):
+            for include_stale_setting in (True, False):
+                with self.subTest(enabled=enabled, include_stale_setting=include_stale_setting):
+                    self.knowledge.meta = deepcopy(stored_meta)
+                    self.knowledge.meta["sync_setting"]["enabled"] = enabled
+                    original_meta = deepcopy(self.knowledge.meta)
+                    meta = {"source_url": "https://example.com/docs", "selector": ".content"}
+                    if include_stale_setting:
+                        meta["sync_setting"] = deepcopy(DEFAULT_KNOWLEDGE_SYNC_SETTING)
+
+                    self.edit({"name": "Updated docs", "desc": "Updated description", "meta": meta})
+
+                    self.assertEqual(self.knowledge.name, "Updated docs")
+                    self.assertEqual(self.knowledge.desc, "Updated description")
+                    expected_meta = {**original_meta, "source_url": "https://example.com/docs", "selector": ".content"}
+                    self.assertEqual(self.knowledge.meta, expected_meta)
+                    with patch("knowledge.serializers.knowledge_sync.QuerySet") as sync_query:
+                        sync_query.return_value.filter.return_value.first.return_value = self.knowledge
+                        setting = KnowledgeSyncSettingOperationSerializer(data=self.operation.data).get_setting()
+                    self.assertEqual(setting, original_meta["sync_setting"])
+
+    def test_basic_settings_and_explicit_document_strategy_can_be_updated_together(self):
+        sync_setting = deepcopy(self.knowledge.meta["sync_setting"])
+        strategy = normalize_document_strategy({"split": {"max_length": 2048}})
+
+        self.edit({"meta": {"source_url": "https://example.com/docs", "selector": "main"}, "doc_strategy": strategy})
+
+        self.assertEqual(self.knowledge.meta["source_url"], "https://example.com/docs")
+        self.assertEqual(self.knowledge.meta["selector"], "main")
+        self.assertEqual(self.knowledge.meta["doc_strategy"], strategy)
+        self.assertEqual(self.knowledge.meta["sync_setting"], sync_setting)
+        self.knowledge.save.assert_called_once_with()
+
+    def test_settings_edit_still_filters_unrecognized_metadata(self):
+        self.edit({"meta": {"source_url": "https://example.com/docs", "unknown_setting": True}})
+
+        self.assertNotIn("unknown_setting", self.knowledge.meta)
+        self.assertEqual(self.knowledge.meta["selector"], "body")
+
+    def test_settings_edit_initializes_missing_metadata(self):
+        for stored_meta in (None, {}):
+            with self.subTest(stored_meta=stored_meta):
+                self.knowledge.meta = stored_meta
+                meta = {"source_url": "https://example.com/docs", "selector": ""}
+
+                self.edit({"meta": meta})
+
+                self.assertEqual(self.knowledge.meta, meta)
 
 
 class KnowledgeModelUpdateTests(SimpleTestCase):
