@@ -14,7 +14,7 @@ import json
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, CancelledException, WorkflowType
@@ -139,6 +139,7 @@ def _message_to_dict(message):
                 "id": tc.get("id"),
                 "name": tc.get("name"),
                 "arguments": json.dumps(tc.get("args") or {}, ensure_ascii=False),
+                "reasoning_content": tc.get("reasoning_content") or "",
             }
             for tc in message.tool_calls
         ]
@@ -261,10 +262,6 @@ class LLMNode(INode):
         try:
             async for chunk in response:
                 self._check_cancelled()
-                # astream() falls back to a complete message when streaming is disabled.
-                # Normalize a copy so tool arguments follow the same accumulation path.
-                if isinstance(chunk, AIMessage) and not isinstance(chunk, AIMessageChunk):
-                    chunk = AIMessageChunk(**chunk.model_dump(exclude={"type"}))
                 full = chunk if full is None else full + chunk
                 reasoning_chunk = chunk.additional_kwargs.get("reasoning_content")
                 if reasoning_chunk and not reasoning_end:
@@ -272,17 +269,20 @@ class LLMNode(INode):
                     self._output(
                         ReasoningContent(reasoning_content_id, reasoning_chunk, Status.RUNNING, node_info, position)
                     )
-                if text := chunk.text:
+                if isinstance(chunk.content, str) and chunk.content:
                     if reasoning_content and not reasoning_end:
                         reasoning_end = True
                         self._output(ReasoningContent(reasoning_content_id, "", Status.SUCCESS, node_info, position))
-                    self._output(TextContent(text_content_id, text, Status.RUNNING, node_info, position))
+                    self._output(TextContent(text_content_id, chunk.content, Status.RUNNING, node_info, position))
                 for tc in chunk.tool_call_chunks or []:
                     tool_call_id = tool_call_accumulator.append(
                         tc.get("index"), tc.get("id"), tc.get("name"), tc.get("args")
                     )
                     if not tool_call_id:
                         continue
+                    if reasoning_content and not reasoning_end:
+                        reasoning_end = True
+                        self._output(ReasoningContent(reasoning_content_id, "", Status.SUCCESS, node_info, position))
                     if tc.get("name") or tc.get("args"):
                         self._output(
                             ToolContent(
@@ -300,6 +300,7 @@ class LLMNode(INode):
             finish_reason = "cancelled"
             raise
         finally:
+            self._output(ReasoningContent(reasoning_content_id, "", Status.SUCCESS, node_info, position))
             self._output(
                 TextContent(
                     text_content_id,
@@ -323,7 +324,7 @@ class LLMNode(INode):
                 await response.aclose()
 
     def _write_final_context(self, chat_model, message_list, message, reasoning_content, finish_reason, tool_calls):
-        content = str(message.text) if message is not None else ""
+        content = message.content if message is not None and isinstance(message.content, str) else ""
         additional_kwargs = message.additional_kwargs if message is not None else {}
         response_metadata = message.response_metadata if message is not None else {}
         refusal = additional_kwargs.get("refusal")
