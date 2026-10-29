@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useStore } from '@/stores/admin'
 import AccessRestrictionDrawer from './AccessRestrictionDrawer.vue'
 import XpackAccessRestrictionDrawer from './XpackAccessRestrictionDrawer.vue'
@@ -7,6 +7,7 @@ import XpackAccessRestrictionDrawer from './XpackAccessRestrictionDrawer.vue'
 defineOptions({ name: 'ButtonAccessRestriction' })
 
 const { auth } = useStore()
+const accessRestrictionDrawer = computed(() => (auth.isCE ? AccessRestrictionDrawer : XpackAccessRestrictionDrawer))
 const drawerVisible = ref(false)
 
 function handleOpenAccessRestriction() {
@@ -20,8 +21,5 @@ function handleOpenAccessRestriction() {
     <MkIcon name="icon-lock" />
     <span>访问限制</span>
   </el-button>
-  <template v-if="drawerVisible">
-    <AccessRestrictionDrawer v-if="auth.isCE" @closed="drawerVisible = false" />
-    <XpackAccessRestrictionDrawer v-else @closed="drawerVisible = false" />
-  </template>
+  <component v-if="drawerVisible" :is="accessRestrictionDrawer" @closed="drawerVisible = false" />
 </template>
