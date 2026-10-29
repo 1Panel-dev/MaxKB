@@ -18,29 +18,29 @@ dependencies = [
     "django-redis==7.0.0",
 
     # AI orchestration & model frameworks
-    "deepagents==0.7.28",
-    "langchain==1.4.6",
-    "langchain-anthropic==1.7.6",
-    "langchain-aws==1.7.9",
-    "langchain-core==1.6.12",
+    "deepagents==0.7.32",
+    "langchain==1.4.7",
+    "langchain-anthropic==1.7.7",
+    "langchain-aws==1.9.1",
+    "langchain-core==1.7.1",
     "langchain-google-genai==4.4.2",
     "langchain-huggingface==1.2.3",
     "langchain-mcp-adapters==0.3.2",
     "langchain-ollama==1.1.0",
-    "langchain-openai==1.6.7",
-    "langgraph==1.2.16",
+    "langchain-openai==1.7.3",
+    "langgraph==1.2.18",
     "torch==2.14.1",
     "sentence-transformers==6.1.0",
     "xinference-client==3.5.0",
 
     # Model providers & cloud SDKs
-    "boto3==1.43.115",
-    "cohere==7.2.0",
+    "boto3==1.43.121",
+    "cohere==7.3.0",
     "dashscope==1.27.8",
     "qianfan==0.4.12.3",
-    "tencentcloud-sdk-python-common==3.1.190",
+    "tencentcloud-sdk-python-common==3.1.197",
     "tencentcloud-sdk-python-hunyuan==3.1.180",
-    "tencentcloud-sdk-python-asr==3.1.189",
+    "tencentcloud-sdk-python-asr==3.1.197",
     "volcengine-python-sdk[ark]==5.0.53",
     "zai-sdk==0.2.3",
 
@@ -56,7 +56,7 @@ dependencies = [
     "markdownify==1.2.3",
     "openpyxl==3.1.5",
     "pydub==0.25.1",
-    "pypdf==6.19.0",
+    "pypdf==6.21.4",
     "pysilk==0.0.1",
     "python-docx==1.2.0",
     "resvg-py==0.5.0",
@@ -75,7 +75,7 @@ dependencies = [
 
     # Server & development tools
     "gunicorn==26.2.0",
-    "ruff==0.15.21",
+    "ruff==0.15.22",
 ]
 
 [dependency-groups]

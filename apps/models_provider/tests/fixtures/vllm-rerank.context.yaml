@@ -1,0 +1,42 @@
+purpose:
+  stands_in_for: The Cohere-compatible v1 and v2 rerank endpoints used by VllmBgeReranker.
+  unblocks: Real SDK regression checks for upgrading cohere from 7.2.0 to 7.3.0.
+assumptions:
+  - id: rerank-response-mapping
+    status: supported
+    claim: In the modeled responses, the real adapter preserves returned rank order, scores, source metadata and original input documents.
+    reason: Both SDK versions parsed local HTTP responses and produced the expected application Document objects.
+    verification: >-
+      2026-10-29, fingerprint sdk-upgrade: all 7 tests passed before and after the upgrade.
+      Assertions included Chinese text, top_n, empty inputs/results and rejection of negative or oversized indices.
+      The upgraded run logged 12 rerank requests in total across success and failure scenarios.
+    source: ../test_vllm_reranker.py; vllm-rerank/default.js; ../../impl/vllm_model_provider/model/reranker.py
+    updated_at: "2026-10-29"
+  - id: fallback-decision
+    status: supported
+    claim: In the modeled scenarios, only HTTP 404 from v2 causes one v1 request with the same model, query, documents and top_n.
+    reason: The real Cohere exception types reached the application's existing NotFoundError handler.
+    verification: >-
+      2026-10-29, fingerprint sdk-upgrade: 404 then 200 succeeded; v2 400, 401, 429 and 500 raised without calling v1;
+      v1 404 propagated without another fallback. SDK retries were disabled to isolate version fallback from retry timing.
+    source: ../test_vllm_reranker.py; https://docs.cohere.com/reference/rerank; cohere Client and ClientV2 in 7.2.0 and 7.3.0
+    updated_at: "2026-10-29"
+  - id: deployed-vllm-capabilities
+    status: unknown
+    claim: Every deployed vLLM-compatible endpoint implements the modeled routes and response shapes.
+    reason: No real model server was called; API and gateway versions can differ.
+    verification: Only caller behavior against synthetic responses was verified; deployed route availability and ranking quality remain untested.
+    source: vllm-rerank/default.js; ../../impl/vllm_model_provider/model/reranker.py
+    updated_at: "2026-10-29"
+  - id: fixture-provenance
+    status: supported
+    claim: The fixture uses public Cohere documentation and installed SDK schemas, not an owner's published Postman mock.
+    reason: Postman was unauthenticated and the public Orbit search returned HTTP 403, so discovery fell back to official documentation and SDK source.
+    verification: 2026-10-29; reviewed POST /v2/rerank and SDK v1/v2 clients; only synthetic credentials and documents were used.
+    source: https://docs.cohere.com/reference/rerank; vllm-rerank/config.yaml; vllm-rerank/default.js
+    updated_at: "2026-10-29"
+fingerprints:
+  - id: sdk-upgrade
+    date: "2026-10-29"
+    commit: "29904aeb74e27b30074f9926b9db8386f9f1194d (community checkout with uncommitted tests and fixtures)"
+    cli: "Postman 1.74.0; Python 3.13.18; baseline cohere 7.2.0; upgraded cohere 7.3.0"

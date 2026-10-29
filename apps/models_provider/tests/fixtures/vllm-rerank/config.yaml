@@ -1,0 +1,9 @@
+version: 1
+name: vllm-rerank
+slug: vllm-rerank
+protocol: http
+interceptRequests: true
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

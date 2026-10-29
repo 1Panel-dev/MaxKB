@@ -117,3 +117,26 @@ DEEPSEEK_TOOL_IMAGE_TEST_URL=http://127.0.0.1:49644/deepseek/v1 \
 模拟契约来自 v2 的工具图片适配和当前 OpenAI SDK 消息格式，返回收到的消息结构，
 用于验证同步调用、异步流式请求及并行工具响应顺序，不验证真实模型的视觉推理结果。
 未设置该环境变量时只跳过两项 HTTP 测试，其余请求构造和消息流测试照常运行。
+
+## vLLM 重排与 Cohere SDK
+
+启动本地模拟服务，再在另一个终端运行真实适配器和 Cohere SDK 的 HTTP 回归：
+
+```bash
+postman simulation run community/apps/models_provider/tests/fixtures/vllm-rerank.sim.yaml --port 49646 --no-history --output ndjson
+```
+
+```bash
+VLLM_RERANK_TEST_URL=http://127.0.0.1:49646/vllm \
+  uv run python apps/manage.py test models_provider.tests.test_vllm_reranker --noinput
+```
+
+协议依据为 [Cohere Rerank API](https://docs.cohere.com/reference/rerank) 和已安装 SDK 的
+v1/v2 请求、响应及异常类型。7 个测试覆盖中文查询、`top_n`、返回索引顺序、分数、
+原始文档元数据不变、空输入/结果、非法索引，以及仅在 v2 返回 404 时以相同参数回退一次 v1。
+400、401、429、500 不触发回退；v1 自身失败继续抛出异常。
+测试关闭 SDK 重试以单独验证应用的回退决策，不验证默认重试等待时间。
+
+2026-10-29 在 cohere 7.2.0 和 7.3.0 上均通过，升级后模拟日志记录 12 次重排请求。
+所有请求使用虚拟密钥和本机地址；未设置环境变量时跳过这些 HTTP 测试。
+固定分数仅用于检验映射，不验证实际 vLLM 部署是否提供相同路由或模型的重排质量。

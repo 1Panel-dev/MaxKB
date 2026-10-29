@@ -1,5 +1,22 @@
 # Knowledge document processing
 
+## PDF parser regression checks
+
+From the integration repository root, run:
+
+```bash
+uv run python apps/manage.py test knowledge.tests.imports.test_pdf_document_import \
+  knowledge.tests.imports.test_zip_document_import --noinput
+```
+
+These 14 tests passed with pypdf 6.19.0 and 6.21.4 on 2026-10-29. They exercise the real
+PDF parser with synthetic compressed Unicode text, font-size headings, positioned bookmarks,
+internal links, embedded image pixels, AES-encrypted files, blank/malformed documents and ZIP imports.
+The existing behavior for password-protected files remains an empty import result; password input
+is not supported by this parser. Temporary-file cleanup and bounded ZIP reads are also checked.
+The tests require no database or external service. They do not cover every customer PDF, font,
+image encoding or malformed-file variant; representative production documents remain useful for acceptance.
+
 ## Backend translations
 
 User-facing validation errors must use Django translation functions with literal message IDs.

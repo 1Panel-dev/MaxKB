@@ -1,0 +1,7 @@
+simulation: langchain-compatibility
+routing: path
+mocks:
+  - routeKey: provider
+    path: ./langchain-provider/config.yaml
+  - routeKey: deepseek
+    path: ../../../models_provider/tests/fixtures/deepseek-tool-images.js

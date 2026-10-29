@@ -1,0 +1,131 @@
+purpose:
+  stands_in_for: OpenAI-compatible chat completions, Anthropic Messages streaming, Bedrock Claude InvokeModel and binary streaming, and the existing DeepSeek vision gateway fixture.
+  unblocks: Regression checks for the integration repository's conservative and subsequent full LangChain dependency upgrades.
+assumptions:
+  - id: interleaved-tool-stream
+    status: supported
+    claim: In the modeled Qwen-style stream, empty continuation IDs and interleaved arguments produce two valid calls executed once each by the real Agent.
+    reason: The application adapter and message-merging patch ran with real OpenAI SDK, deepagents and LangGraph code against local HTTP responses.
+    verification: >-
+      2026-10-29, fingerprint conservative-upgrade: all 33 targeted tests passed.
+      The final run produced 10 request events, nine 200 responses and the expected 429.
+      The Agent's second request carried call_sh and call_bj with their matching Chinese arguments and tool results.
+      This verifies caller behavior against the synthetic stream, not the behavior of every Qwen gateway.
+    source: >-
+      ../test_langchain_compatibility.py; langchain-provider/default.js;
+      ../../workflow/nodes/ai_chat_node/agent.py; ../../workflow/nodes/llm_node/llm_node.py
+    updated_at: "2026-10-29"
+  - id: streaming-usage-accounting
+    status: supported
+    claim: For the modeled complete usage payloads, the LLM node preserves provider totals and avoids counting cached or reasoning tokens twice.
+    reason: Assertions checked both adapter messages and application context using real OpenAI and Anthropic response parsing.
+    verification: >-
+      2026-10-29, fingerprint conservative-upgrade: OpenAI text usage stayed 12 input plus 3 output;
+      parallel tools stayed 12 plus 6; Anthropic stayed 10 non-cached input plus 2 cache-write plus 3 cache-read,
+      with 4 output tokens, totaling 19. Cancellation preserved partial text and used local fallback counting.
+      The real Agent retained its existing last-round accounting of 20 input and 4 output tokens.
+    source: >-
+      ../test_langchain_compatibility.py; langchain-provider/default.js;
+      ../../../models_provider/impl/base_chat_open_ai.py;
+      langchain_anthropic.chat_models._create_usage_metadata in langchain-anthropic 1.7.7
+    updated_at: "2026-10-29"
+  - id: anthropic-final-usage-completeness
+    status: unknown
+    claim: Every configured Anthropic-compatible endpoint returns cumulative input and cache token counts in the final message_delta.
+    reason: >-
+      No live provider was called. Both langchain-anthropic 1.7.6 and 1.7.7 ignore message_start usage and read
+      message_delta usage. A fixture containing input usage only at message_start yielded zero input tokens;
+      the successful fixture models the complete final usage supported by the installed SDK schema.
+    verification: >-
+      2026-10-29: inspected the prior release source and installed Anthropic MessageDeltaUsage schema;
+      validated complete final usage locally. Confirm final usage fields on each deployed compatible gateway
+      before interpreting these tests as evidence about its billing counters.
+    source: >-
+      https://github.com/langchain-ai/langchain/blob/langchain-anthropic%3D%3D1.7.6/libs/partners/anthropic/langchain_anthropic/chat_models.py;
+      anthropic.types.message_delta_usage.MessageDeltaUsage in anthropic 0.121.0;
+      langchain-provider/default.js
+    updated_at: "2026-10-29"
+  - id: mock-provenance
+    status: supported
+    claim: The new provider fixture is derived from local caller behavior and installed SDK message schemas rather than an owner's published mock.
+    reason: Postman CLI reported an unauthenticated session, so owner-workspace mock discovery was skipped.
+    verification: >-
+      2026-10-29: reused the existing DeepSeek tool-image fixture and authored only the missing stream/tool/usage cases.
+      Tests use synthetic credentials, explicit loopback URLs and per-test client lifecycles.
+      Remote MCP transport, sandbox command execution and live model inference remain unverified.
+    source: >-
+      langchain-compatibility.sim.yaml; langchain-provider/config.yaml; langchain-provider/default.js;
+      ../../../models_provider/tests/fixtures/deepseek-tool-images.context.md
+    updated_at: "2026-10-29"
+  - id: full-upgrade-compatibility
+    status: supported
+    claim: The upgraded dependency set preserves the modeled streaming, tool execution, token accounting, cancellation and error propagation paths after the application compatibility fixes.
+    reason: Real SDKs and workflow nodes ran against loopback HTTP fixtures, with assertions on outputs and request logs confirming that the provider paths were exercised.
+    verification: >-
+      2026-10-29, fingerprint full-upgrade: the original 33 tests passed before and after the dependency upgrade.
+      Expanded coverage initially exposed the existing LLM node's assumption that every astream result has
+      tool_call_chunks. After fixing complete-message fallback and content-block handling, all 45 targeted
+      tests and all 117 extended workflow/model-provider tests passed, with no skipped tests.
+      Existing interleaved OpenAI calls, Anthropic final usage and last-round Agent accounting remained unchanged.
+    source: >-
+      ../test_langchain_compatibility.py; ../test_ai_chat_tool_output.py; ../README.md;
+      ../../workflow/nodes/llm_node/llm_node.py; ../../workflow/nodes/ai_chat_node/ai_chat_node.py
+    updated_at: "2026-10-29"
+  - id: bedrock-wire-and-cache-usage
+    status: supported
+    claim: For the modeled Bedrock Claude responses, boto3 and langchain-aws parse JSON and CRC-checked binary streams, preserve tool IDs and count cached input tokens exactly once.
+    reason: Tests exercise the real runtime client, text/vision adapters and LLM node; the response fields follow the installed AWS service model and official cache documentation.
+    verification: >-
+      2026-10-29, fingerprint full-upgrade: sync invocation, async streaming, streaming tool arguments,
+      tool-result round trip, complete-message fallback, inline PNG and throttling passed.
+      Usage is 10 ordinary input + 3 cache read + 2 cache write + 4 output = 19.
+      The mock checks the synthetic SigV4 credential prefix but does not validate the signature or AWS IAM permissions.
+      Retries are disabled to test exception propagation; live cache eligibility and billing remain unverified.
+      Orbit discovered both invoke endpoints, but its integration brief lacked modern Claude tools/cache details;
+      those were checked against AWS documentation and botocore/langchain-aws source instead.
+      The earlier unauthenticated owner-mock discovery result was reused; no remote owner mock was downloaded.
+    source: >-
+      langchain-provider/default.js; ../test_langchain_compatibility.py;
+      https://docs.aws.amazon.com/bedrock/latest/APIReference/API_InvokeModelWithResponseStream.html;
+      https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages.html;
+      https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html;
+      botocore 1.43.121 bedrock-runtime service model; langchain-aws 1.9.1 llms/bedrock.py;
+      https://github.com/langchain-ai/langchain-aws/releases/tag/langchain-aws%3D%3D1.9.0
+    updated_at: "2026-10-29"
+  - id: full-message-and-content-blocks
+    status: supported
+    claim: In the covered LLM and Agent display paths, full AIMessage responses and list content blocks retain text, tool arguments and usage without changing the input messages.
+    reason: The LLM node normalizes complete messages on a copy, and both nodes use LangChain's text accessor instead of treating list content as a string.
+    verification: >-
+      2026-10-29, fingerprint full-upgrade: streaming=False Bedrock text/tool calls reached final context
+      without AttributeError. Synthetic AIMessage and AIMessageChunk content-block cases preserved text
+      and exactly one tool call/result pair. Original message dumps stayed equal; thinking and image blocks
+      were not appended to the answer text. These adapter gaps predated this upgrade.
+    source: >-
+      ../test_langchain_compatibility.py; ../test_ai_chat_tool_output.py;
+      ../../workflow/nodes/llm_node/llm_node.py; ../../workflow/nodes/ai_chat_node/ai_chat_node.py;
+      langchain-core 1.6.13 and 1.7.1 language_models/chat_models.py:_streaming_disabled
+    updated_at: "2026-10-29"
+  - id: agent-runtime-boundaries
+    status: supported
+    claim: The covered local Agent recursion limit and Shell backend boundary cases retain application error and output contracts with deepagents 0.7.32 and langgraph 1.2.18.
+    reason: The real Agent hit its configured recursion limit, and the real Shell backend executed synthetic local commands.
+    verification: >-
+      2026-10-29, fingerprint full-upgrade: recursion failure reached the completion callback once, no tool
+      ran beyond the limit, and the Agent workspace was removed. Shell output truncated an 8-byte UTF-8
+      budget without a replacement character; virtual skill paths and exit code 7 were preserved.
+      Linux sandbox wrapping was patched off only in the Shell tests, so isolation, gosu and preload behavior
+      remain unverified. Remote MCP transport and database-backed checkpoint persistence were not exercised.
+    source: >-
+      ../test_langchain_compatibility.py; ../../workflow/backend/sandbox_shell.py;
+      ../../workflow/nodes/ai_chat_node/agent.py
+    updated_at: "2026-10-29"
+fingerprints:
+  - id: conservative-upgrade
+    date: "2026-10-29"
+    commit: "29904aeb74e27b30074f9926b9db8386f9f1194d (community checkout with uncommitted regression fixtures/tests)"
+    cli: "Postman 1.74.0; Python 3.13.18; deepagents 0.7.29; langchain 1.4.7; langchain-core 1.6.13; langchain-anthropic 1.7.7; langgraph 1.2.17"
+  - id: full-upgrade
+    date: "2026-10-29"
+    commit: "e5a852818b187b5ff45a3182b70e654b467c3312 (community checkout with uncommitted dependency, compatibility and regression changes)"
+    cli: "Postman 1.74.0; Python 3.13.18; deepagents 0.7.32; langchain 1.4.7; langchain-core 1.7.1; langchain-openai 1.7.3; langchain-aws 1.9.1; langchain-anthropic 1.7.7; langgraph 1.2.18; langchain-protocol 0.0.20; langsmith 0.14.14"

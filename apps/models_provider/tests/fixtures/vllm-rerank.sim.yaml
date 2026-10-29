@@ -1,0 +1,5 @@
+simulation: vllm-rerank
+routing: path
+mocks:
+  - routeKey: vllm
+    path: ./vllm-rerank/config.yaml

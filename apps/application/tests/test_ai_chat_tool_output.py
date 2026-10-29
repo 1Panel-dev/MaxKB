@@ -6,7 +6,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from django.test import SimpleTestCase
-from langchain_core.messages import AIMessageChunk, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, SystemMessage, ToolMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 
@@ -20,6 +20,29 @@ from application.workflow.status import Status
 
 
 class AIChatToolOutputTests(SimpleTestCase):
+    def test_model_content_blocks_and_complete_tool_calls_preserve_answer_and_history(self):
+        for message_type in (AIMessage, AIMessageChunk):
+            with self.subTest(message_type=message_type):
+                message = message_type(
+                    content=[
+                        {"type": "thinking", "thinking": "internal reasoning"},
+                        {"type": "text", "text": "你好"},
+                        {"type": "tool_use", "id": "call_city", "name": "lookup", "input": {"city": "上海"}},
+                    ],
+                    tool_calls=[{"id": "call_city", "name": "lookup", "args": {"city": "上海"}}],
+                )
+                before = deepcopy(message.model_dump())
+                node, output = self._run_messages(
+                    [message, ToolMessage(content="晴", tool_call_id="call_city", name="lookup")]
+                )
+                self.assertEqual("".join(item.content for item in output if isinstance(item, TextContent)), "你好")
+                self.assertEqual(node._write_final_context.call_args.args[3], "你好")
+                cards = [item for item in output if isinstance(item, ToolContent)]
+                self.assertEqual(len(cards), 2)
+                self.assertEqual(json.loads(cards[0].arguments), {"city": "上海"})
+                self.assertEqual(cards[1].content, "晴")
+                self.assertEqual(message.model_dump(), before)
+
     def _run_messages(self, messages=(), *, enabled=True, emit=None):
         node = AIChatNode.__new__(AIChatNode)
         node.async_runner = MagicMock()

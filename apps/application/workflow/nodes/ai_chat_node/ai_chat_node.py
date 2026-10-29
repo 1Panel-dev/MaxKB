@@ -23,7 +23,6 @@ from langchain_core.messages import (
     HumanMessage,
     SystemMessage,
     ToolMessage,
-    AIMessageChunk,
 )
 from rest_framework import serializers
 
@@ -630,9 +629,9 @@ class AIChatNode(INode):
 
             def on_next(chunk):
                 self._check_cancelled()
-                if mcp_output_enable and isinstance(chunk, AIMessageChunk):
-                    if chunk.tool_call_chunks:
-                        for tc in chunk.tool_call_chunks:
+                if mcp_output_enable and isinstance(chunk, AIMessage):
+                    if tool_chunks := getattr(chunk, "tool_call_chunks", None):
+                        for tc in tool_chunks:
                             tool_id = tool_stream.get_tool_id(tc.get("index"), tc.get("id"))
                             if not tool_id:
                                 continue
@@ -698,12 +697,15 @@ class AIChatNode(INode):
                         )
                     )
                 else:
-                    state["answer"] = state["answer"] + chunk.content
-                    if is_result and chunk.content:
+                    # Provider-native tool/thinking blocks remain in the agent history;
+                    # only text blocks belong in the displayed answer.
+                    text = chunk.text
+                    state["answer"] = state["answer"] + text
+                    if is_result and text:
                         self.write(
                             TextContent(
                                 tool_stream.get_tool_uuid(chunk.id),
-                                chunk.content,
+                                text,
                                 Status.RUNNING,
                                 node_info,
                                 Position(self.get_node_id()),
