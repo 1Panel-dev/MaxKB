@@ -3,6 +3,7 @@ import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIO
 import { isImage, isDocument, isAudio, isVideo } from '@/utils/icon'
 import type { Dict } from '@/api/types'
 import type { ChatMessage, Conversation, ConversationAppInfo, SendMessageOptions } from '../../core/types'
+import { createUserFormStore } from './user-form/index'
 
 export interface FileItem {
   uid: number
@@ -50,6 +51,8 @@ export interface MessageInputDeps {
   appInfo: Readonly<Ref<ConversationAppInfo | null>>
   /** 禁用输入与发送，如门户没有可用智能体时；不传时始终可用。 */
   disabled?: Readonly<Ref<boolean>>
+  /** 是否在用户输入表单中编辑接口传参，仅调试对话开启。 */
+  apiInputEditable?: boolean
 }
 
 // 上传请求返回前进度条的最大值
@@ -61,6 +64,7 @@ const UPLOAD_PROGRESS_PENDING_MAX = 95
 export function createMessageInputStore(deps: MessageInputDeps) {
   const { conversations, getChatId, renameChat, composerResetSignal, messages, streamLoading, sendMessage, uploadFile, stop, appInfo } = deps
   const disabled = computed(() => deps.disabled?.value ?? false)
+  const userForm = createUserFormStore({ appInfo, apiInputEditable: deps.apiInputEditable ?? false })
 
   // 输入状态与附件限制
   const question = ref('')
@@ -187,7 +191,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       newQuestion: true,
       questionContent: { ...message },
       reChat: false,
-      formData,
+      formData: { ...userForm.getFormData(), ...formData },
       onComplete: (e) => {
         if (!e && isFirstMessage && questionText) renameChat(chatId, abstract).catch(() => {})
       },
@@ -199,6 +203,12 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     if (!canSend.value) return
     sending.value = true
     try {
+      // 用户输入参数校验失败时由表单提示，保留输入内容与附件
+      const formValid = await userForm.validate().then(
+        () => true,
+        () => false,
+      )
+      if (!formValid) return
       // 一次遍历完成附件分类，仅提交有附件的字段。
       const message: QuestionMessage = { type: 'QUESTION', content: question.value.trim() }
       for (const attachment of fileList.value) {
@@ -225,7 +235,10 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   /** 由开场白、回答中的快捷问题或 HTML 渲染发起提问；不读取也不清空输入框与暂存附件。 */
   const sendQuestion = (content: string, options: QuestionOptions = {}) => {
     if (disabled.value || streamLoading.value || sending.value || !content.trim()) return
-    submitQuestion({ ...options.attachments, type: 'QUESTION', content: content.trim() }, options.formData)
+    userForm
+      .validate()
+      .then(() => submitQuestion({ ...options.attachments, type: 'QUESTION', content: content.trim() }, options.formData))
+      .catch(() => {})
   }
 
   // 新建/切换会话时清空暂存文件与输入
@@ -239,6 +252,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
 
   return {
     appInfo,
+    userForm,
     question,
     fileList,
     maxFiles,

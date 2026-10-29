@@ -1,1 +1,1 @@
-export const exposedInputTypes = ['TextInput', 'TextareaInput', 'PasswordInput', 'SingleSelect', 'MultiSelect', 'DatePicker', 'SwitchInput']
+export const exposedInputTypes = ['TextInput', 'TextareaInput', 'PasswordInput', 'SingleSelect', 'MultiSelect', 'DatePicker', 'SwitchInput','Model',"Knowledge"]

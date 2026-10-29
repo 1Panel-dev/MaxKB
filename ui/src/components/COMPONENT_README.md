@@ -724,6 +724,8 @@ MultiRow、RadioRow 的配置器与运行时复用字段组件，分别使用复
 扁平 `ModelItem[]`，由选择器统一分组和展示供应商。已有快照未保存状态时保留可选行为，已保存的
 状态按 `SelectModel` 的可用性规则处理。切换模型一次性回写 `model_id` 和深拷贝后的
 `model_params_setting`；清空时回写空 ID 和空参数，避免修改原配置中的参数对象。
+配置器为每个可选模型保存 `model_form_field` 参数表单快照；运行时快照非空时开启 `SelectModel`
+参数入口，参数表单与默认值取自快照中的 `model_form_field` 和 `model_params_setting`，不请求接口。
 
 Knowledge 配置器复用 `SelectKnowledgeDialog` 选择可选知识库，沿用文件夹、共享资源查询及
 相同 Embedding 模型约束。打开时传入已选快照，确认后回写可选知识库并清理已取消 ID 对应的
@@ -733,8 +735,10 @@ Model 配置器通过 `getSelectModelList(query)` 注入加载可选模型，返
 上层提供 `ModelApi.getModelListWithShared` 或工作流的 `store.force.getModelListWithShared`；
 循环体转发同名注入。该名称用于数据加载能力，与业务 API 方法名区分。
 
-Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选模型，不开启参数设置入口。
-选择时将模型 ID 转换为包含已配置参数的 `default_value` 对象，清空时重置为空对象。
+Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选模型，并开启参数设置入口。
+选择时将模型 ID 转换为包含已配置参数的 `default_value` 对象，清空时重置为空对象；参数弹窗以该模型
+快照中的参数为默认值，确认后同时回写 `default_value` 和对应可选模型的 `model_params_setting`。
+编辑已有字段时为缺少 `model_form_field` 的可选模型补齐参数表单快照。
 
 ## 跨页面业务组件
 

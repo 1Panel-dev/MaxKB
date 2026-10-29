@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, provide, ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import { MODEL_STATUS } from '@/api/enums'
 import type { Dict, ModelConfig, ModelItem } from '@/api/types'
@@ -14,6 +14,8 @@ interface ConfiguredModelOption {
   model_name: string
   provider: string
   model_params_setting?: Dict<unknown>
+  /** 配置字段时保存的模型参数表单，运行时据此编辑参数，不再请求接口。 */
+  model_form_field?: FormField[]
   status?: ModelItem['status']
   source?: ModelItem['source']
 }
@@ -41,7 +43,37 @@ const modelOptions = computed<ModelItem[]>(() =>
   })),
 )
 
+// 模型参数：参数表单取自配置快照，默认值使用配置时保存的参数。
+const canEditParams = computed(() => configuredModels.value.some((model) => model.model_form_field?.length))
+
+function getModelParamsForm(modelId: string) {
+  const selectedModel = configuredModels.value.find((model) => model.model_id === modelId)
+  const settings = selectedModel?.model_params_setting ?? {}
+  return Promise.resolve(
+    (selectedModel?.model_form_field ?? []).map((field) =>
+      Object.prototype.hasOwnProperty.call(settings, field.field) ? { ...field, default_value: cloneDeep(settings[field.field]) } : field,
+    ),
+  )
+}
+provide('getModelParamsForm', getModelParamsForm)
+
+// SelectModel 切换模型后同步回写参数，此时 Props 尚未更新，记录当前选中的模型
+const currentModelId = ref(props.modelValue?.model_id ?? '')
+watch(
+  () => props.modelValue?.model_id,
+  (modelId) => {
+    currentModelId.value = modelId ?? ''
+  },
+)
+
+function handleModelParamsChange(settings: Dict<unknown>) {
+  if (!currentModelId.value) return
+  emit('update:modelValue', { model_id: currentModelId.value, model_params_setting: settings })
+  emit('change', props.formField)
+}
+
 function handleModelChange(modelId: string) {
+  currentModelId.value = modelId
   const selectedModel = configuredModels.value.find((model) => model.model_id === modelId)
   emit('update:modelValue', {
     model_id: modelId,
@@ -55,8 +87,11 @@ function handleModelChange(modelId: string) {
   <SelectModel
     v-bind="$attrs"
     :model-value="props.modelValue?.model_id ?? ''"
+    :model-params="props.modelValue?.model_params_setting ?? {}"
+    :can-edit-params="canEditParams"
     :options="modelOptions"
     :provider-options="providerList"
     @update:model-value="handleModelChange"
+    @update:model-params="handleModelParamsChange"
   />
 </template>

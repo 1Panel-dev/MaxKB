@@ -38,13 +38,13 @@ defineExpose({ open })
       <el-form-item>
         <template #label>
           <span class="flex-align-center gap-1">
-            <span>外置参数设置（最多可显示3个）</span>
+            <span>外置参数设置</span>
             <MkTooltip placement="right" content="仅支持模型、知识库、开关、日期、树形选项卡、单选框、多选框组件类型">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>
         </template>
-        <el-select v-model="currentSetting.exposed_fields" multiple :multiple-limit="3" placeholder="请选择">
+        <el-select v-model="currentSetting.exposed_fields" multiple placeholder="请选择">
           <el-option v-for="field in exposedFieldOptions" :key="field.field" :label="formatLabel(field.label, field.field)" :value="field.field" />
         </el-select>
       </el-form-item>

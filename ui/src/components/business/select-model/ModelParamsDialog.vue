@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref, useTemplateRef } from 'vue'
+import { inject, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { DynamicFormField } from '@/api/types'
 import { MkDynamicsForm, type FormField } from '@/components/mk-dynamics-form'
@@ -41,6 +41,8 @@ function open(modelId: string, settings?: Record<string, unknown>) {
     const validFields = new Set(formFields.value.map(({ field }) => field))
     const savedSettings = Object.fromEntries(Object.entries(settings ?? {}).filter(([field]) => validFields.has(field)))
     formData.value = { ...defaults, ...cloneDeep(savedSettings) }
+    // 弹窗内容打开即挂载，表单只在挂载时读取字段；字段异步返回后重新渲染
+    return nextTick(() => formRef.value?.render(formFields.value, formData.value))
   })
 }
 
