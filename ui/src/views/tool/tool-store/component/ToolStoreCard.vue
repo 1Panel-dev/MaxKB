@@ -10,7 +10,18 @@ const props = defineProps<{ categoryTitle: string; tool: ToolStoreItem }>()
 
 const emit = defineEmits<{ apply: [tool: ToolStoreItem] }>()
 
-const toolTypeLabel = computed(() => (props.tool.label === 'data_source' ? '数据源' : '工具'))
+const toolTypeLabel = computed(() => {
+  switch (props.tool.label) {
+    case 'data_source':
+      return '数据源'
+    case 'skill':
+      return 'Skills'
+    case 'workflow_template':
+      return '工作流'
+    default:
+      return '工具'
+  }
+})
 
 /* 商店详情 */
 const detailDrawerMounted = ref(false)
