@@ -23,9 +23,19 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
              "document_temp".image_count
       FROM (SELECT knowledge.*
             FROM knowledge knowledge ${knowledge_custom_sql}
-            AND id::text in (select target
-                   from workspace_user_resource_permission ${workspace_user_resource_permission_query_set}
-                and 'VIEW' = any (permission_list))) temp_knowledge
+            AND id::text IN (
+                SELECT target
+                FROM workspace_user_resource_permission
+                ${workspace_user_resource_permission_query_set}
+                AND 'VIEW' = ANY (permission_list)
+                UNION
+                SELECT DISTINCT target
+                FROM workspace_user_group_resource_permission
+                INNER JOIN system_user_group_relation
+                        ON system_user_group_relation.group_id = workspace_user_group_resource_permission.user_group_id
+                ${workspace_user_group_resource_permission_query_set}
+                AND 'VIEW' = ANY (permission_list)
+            )) temp_knowledge
                LEFT JOIN (SELECT "count"("id") FILTER (WHERE "resource_type" = 'document') AS document_count,
                                  "count"("id") FILTER (WHERE "resource_type" = 'image')    AS image_count,
                                  "sum"("char_length")                                      "char_length",
