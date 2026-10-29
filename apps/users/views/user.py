@@ -399,8 +399,13 @@ class RePasswordView(APIView):
     def post(self, request: Request):
         request_data = request.data
         if request_data.get("encrypted", False):
-            request_data["password"] = decrypt(request_data.get("password"))
-            request_data["re_password"] = decrypt(request_data.get("re_password"))
+            # 前端对 password/re_password 先做 JSON.stringify 再 RSA 加密，解密后需反序列化
+            # 还原真实明文；否则会把带引号的 JSON 字符串当成密码存库，导致登录校验失败。
+            try:
+                request_data["password"] = json.loads(decrypt(request_data.get("password")))
+                request_data["re_password"] = json.loads(decrypt(request_data.get("re_password")))
+            except Exception:
+                raise AppApiException(500, _("Invalid encrypted data"))
         serializer_obj = RePasswordSerializer(data=request_data)
         return result.success(serializer_obj.reset_password())
 
