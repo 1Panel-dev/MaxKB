@@ -33,6 +33,7 @@ class AccessTokenEditSerializer(serializers.Serializer):
     show_source = serializers.BooleanField(required=False, label=_("Whether to display knowledge sources"))
     show_exec = serializers.BooleanField(required=False, label=_("Display execution details"))
     language = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("language"))
+    enable_api_key = serializers.BooleanField(required=False, label=_("Enable API key"))
     authentication = serializers.BooleanField(default=False, label="Do you need authentication")
 
     authentication_value = serializers.JSONField(required=False, label="Certified value", default=dict)
@@ -73,6 +74,8 @@ class AccessTokenSerializer(serializers.Serializer):
             application_access_token.language = instance.get("language")
         if "language" not in instance or instance.get("language") is None:
             application_access_token.language = None
+        if "enable_api_key" in instance and instance.get("enable_api_key") is not None:
+            application_access_token.enable_api_key = instance.get("enable_api_key")
         if "authentication" in instance and instance.get("authentication") is not None:
             application_access_token.authentication = instance.get("authentication")
             application_access_token.authentication_value = {
@@ -128,5 +131,47 @@ class AccessTokenSerializer(serializers.Serializer):
             "show_source": application_access_token.show_source,
             "show_exec": application_access_token.show_exec,
             "language": application_access_token.language,
+            "enable_api_key": application_access_token.enable_api_key,
             **other,
+        }
+
+
+class ApiKeyEnableEditSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+    enable_api_key = serializers.BooleanField(required=True, label=_("Enable API key"))
+
+
+class ApiKeyEnableSerializer(serializers.Serializer):
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get("workspace_id")
+        query_set = QuerySet(Application).filter(id=self.data.get("application_id"))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _("Application id does not exist"))
+
+    def edit(self, instance):
+        self.is_valid(raise_exception=True)
+        enable_api_key_serializer = ApiKeyEnableEditSerializer(
+            data={**instance, "application_id": self.data.get("application_id")}
+        )
+        enable_api_key_serializer.is_valid(raise_exception=True)
+        application_access_token = (
+            QuerySet(ApplicationAccessToken).filter(application_id=self.data.get("application_id")).first()
+        )
+        if application_access_token is None:
+            application_access_token = ApplicationAccessToken(
+                application_id=self.data.get("application_id"),
+                access_token=hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24],
+                is_active=True,
+            )
+        application_access_token.enable_api_key = enable_api_key_serializer.validated_data.get("enable_api_key")
+        application_access_token.save()
+        return {
+            "application_id": application_access_token.application_id,
+            "enable_api_key": application_access_token.enable_api_key,
         }

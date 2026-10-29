@@ -30,6 +30,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat_record/aggregation', views.ApplicationStats.ChatRecordAggregation.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_key/<str:api_key_id>', views.ApplicationKey.Operate.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_key/<int:current_page>/<int:page_size>', views.ApplicationKey.Page.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/enable_api_key', views.ApplicationApiKeyEnable.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/export', views.ApplicationAPI.Export.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_version', views.ApplicationVersionView.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/access_token', views.AccessToken.as_view()),
