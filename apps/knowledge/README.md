@@ -28,6 +28,13 @@ the original Markdown intact. Standalone images update their paragraph text and 
 indexes the image descriptions. Completed assets are reused when embeddings are rebuilt.
 A failed image retains its existing description or caption and does not stop the remaining images.
 
+Before paragraph text is embedded, inline image Markdown is replaced with its description;
+image URLs, file IDs and filename-only alt text are excluded. Image-containing text is split
+again using the document strategy's child length, so old chunks containing partial image
+links are not reused. Stored Markdown and original images remain available for display.
+After upgrading, rebuild embeddings for affected documents to replace existing link-based
+text vectors. Image vectors and image-description vectors are still indexed separately.
+
 The `document/image/preview` POST endpoint saves editable previews in a short transaction,
 then completes visual enhancement before responding. Model and tool strategies return the
 recognized caption, OCR text and description in the initial response with `process_status: success`.

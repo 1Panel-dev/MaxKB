@@ -6,7 +6,9 @@ SELECT
 	0 AS source_type,
 	problem."content" AS "text",
 	paragraph.is_active AS is_active,
-	paragraph.chunks AS chunks
+	paragraph.chunks AS chunks,
+	NULL::text AS paragraph_content,
+	256 AS child_length
 FROM
 	problem problem
 	LEFT JOIN problem_paragraph_mapping problem_paragraph_mapping ON problem_paragraph_mapping.problem_id=problem."id"
@@ -31,7 +33,13 @@ SELECT
 		)
 	) AS "text",
 	paragraph.is_active AS is_active,
-	paragraph.chunks AS chunks
+	paragraph.chunks AS chunks,
+	paragraph.content AS paragraph_content,
+	COALESCE(
+		(SELECT (document.doc_strategy #>> '{split,child_length}')::integer
+		 FROM document WHERE document.id = paragraph.document_id),
+		256
+	) AS child_length
 FROM
 	paragraph paragraph
 

@@ -22,11 +22,26 @@ from knowledge.models import SearchMode, SourceType
 
 lock = threading.Lock()
 
+RE_MARKDOWN_IMAGE = re.compile(r"!\[(?P<caption>(?:\\.|[^\]\\])*)\]\((?:\\.|[^()\\]|\([^()]*\))*\)")
+RE_IMAGE_FILENAME = re.compile(r"\S+\.(?:png|jpe?g|gif|webp|svg|bmp|tiff?|ico)", re.IGNORECASE)
+
+
+def _image_retrieval_text(match):
+    caption = re.sub(r"\\([\\\[\]])", r"\1", match.group("caption")).strip()
+    return "\n" if RE_IMAGE_FILENAME.fullmatch(caption) else f"\n{caption}\n"
+
 
 def chunk_data(data: Dict):
     if str(data.get("source_type")) == str(SourceType.PARAGRAPH.value):
         text = data.get("text")
-        chunk_list = data.get("chunks") if data.get("chunks") else text_to_chunk(text)
+        paragraph_text = data.get("paragraph_content", text)
+        retrieval_text, image_count = RE_MARKDOWN_IMAGE.subn(_image_retrieval_text, paragraph_text or "")
+        if image_count:
+            # Stored chunks may already split image markup and file IDs in half.
+            # Clean the complete text before splitting, including when rebuilding old embeddings.
+            chunk_list = text_to_chunk(retrieval_text, data.get("child_length") or 256)
+        else:
+            chunk_list = data.get("chunks") if data.get("chunks") else text_to_chunk(text)
         return [{**data, "text": chunk} for chunk in chunk_list]
     return [data]
 
