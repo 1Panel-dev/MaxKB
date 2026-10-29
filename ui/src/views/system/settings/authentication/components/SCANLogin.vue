@@ -53,7 +53,7 @@ function loadQrPlatforms() {
 /* 改变状态 */
 function handlePlatformStatusChange(platform: QrLoginPlatformView) {
   loading.value = true
-  return AuthScanApi.putQrLoginPlatform({ key: platform.key, config: platform.config, isActive: platform.isActive })
+  return AuthScanApi.saveQrLoginPlatform({ key: platform.key, config: platform.config, isActive: platform.isActive })
     .then(() => MsgSuccess('保存成功'))
     .catch((error) => {
       platform.isActive = !platform.isActive

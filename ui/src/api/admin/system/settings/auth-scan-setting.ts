@@ -9,13 +9,13 @@ const getQrLoginPlatforms = () => {
 }
 
 /** 保存扫码登录平台配置。 */
-const putQrLoginPlatform = (payload: QrLoginPlatformPayload) => {
-  return put<QrLoginPlatformPayload, boolean>(prefix, payload)
+const saveQrLoginPlatform = (payload: QrLoginPlatformPayload) => {
+  return post<QrLoginPlatformPayload, boolean>(prefix, payload)
 }
 
 /** 校验扫码登录平台配置是否可用。 */
-const postValidateQrLoginPlatform = (payload: QrLoginPlatformPayload) => {
-  return post<QrLoginPlatformPayload, boolean>(`${prefix}`, payload)
+const validateQrLoginPlatform = (payload: QrLoginPlatformPayload) => {
+  return put<QrLoginPlatformPayload, boolean>(prefix, payload)
 }
 
-export default { getQrLoginPlatforms, postValidateQrLoginPlatform, putQrLoginPlatform }
+export default { getQrLoginPlatforms, validateQrLoginPlatform, saveQrLoginPlatform }
