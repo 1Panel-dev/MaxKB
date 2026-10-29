@@ -25,6 +25,7 @@ defineProps<{
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">重排内容</h6>
+      <!-- TODO -->
       <div class="space-y-2">
         <template v-if="data.document_list?.length > 0">
           <template v-for="(paragraph, paragraphIndex) in data.document_list" :key="paragraphIndex">
