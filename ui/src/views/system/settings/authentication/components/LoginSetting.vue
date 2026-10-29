@@ -212,7 +212,7 @@ onMounted(() => {
             :min="-1"
             :step="1"
             :value-on-clear="-1"
-            @change="form.max_attempts = normalizeNonZeroNumber($event)"
+            @change="form.failed_attempts = normalizeNonZeroNumber($event)"
           />
           <span>次，</span>
           <span>锁定账号</span>
@@ -222,7 +222,7 @@ onMounted(() => {
             :min="1"
             :step="1"
             :value-on-clear="1"
-            @change="form.max_attempts = normalizeNonZeroNumber($event)"
+            @change="form.lock_time = normalizeNonZeroNumber($event)"
           />
           <span>分钟</span>
         </div>
