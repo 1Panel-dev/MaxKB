@@ -311,6 +311,8 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 #### AI 对话与提示词
 
 LLM 节点的工具声明由 `llm-node/component/ToolsSetting.vue` 维护，导入、导出收在更多菜单。
+`ToolImportDialog.vue` 负责批量导入的 JSON 解析，通过 `submit` 返回工具数组；
+`ToolsSetting.vue` 按同名覆盖规则合并并写回配置后关闭弹窗，取消不修改配置。
 `ToolFunctionDrawer.vue` 编辑工具草稿，支持 JSON 解析和参数表格；参数通过
 `ToolParameterDialog.vue` 编辑，抽屉检查重名后更新草稿，工具提交后才写回节点。
 工具参数沿用 OpenAI 类型名称，不复用工具输入参数的 `int` / `dict` 协议；取消不修改原配置。

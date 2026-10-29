@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, useTemplateRef } from 'vue'
+import { computed, onBeforeUnmount, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { createAnchorGuard } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { downloadByURL } from '@/utils/common'
 import ToolFunctionDrawer from './ToolFunctionDrawer.vue'
-import { normalizeTool, type LlmTool, type LlmToolsSetting } from '../types'
+import ToolImportDialog from './ToolImportDialog.vue'
+import type { LlmTool, LlmToolsSetting } from '../types'
 
 defineOptions({ name: 'WorkflowLlmToolsSetting' })
 
@@ -14,6 +15,7 @@ const props = defineProps<{ nodeModel: WorkflowNodeModel }>()
 const setting = defineModel<LlmToolsSetting>({ required: true })
 
 const toolDrawerRef = useTemplateRef<InstanceType<typeof ToolFunctionDrawer>>('toolDrawerRef')
+const toolImportDialogRef = useTemplateRef<InstanceType<typeof ToolImportDialog>>('toolImportDialogRef')
 const anchorGuard = createAnchorGuard(props.nodeModel)
 const existingNames = computed(() => setting.value.tools.map((tool) => tool.function.name))
 
@@ -37,36 +39,15 @@ function handleDeleteTool(index: number) {
   updateSetting({ tools: setting.value.tools.filter((_tool, i) => i !== index) })
 }
 
-// 批量导入
-const importVisible = ref(false)
-const importJson = ref('')
-const importError = ref('')
-
 function handleOpenImport() {
-  importVisible.value = true
+  toolImportDialogRef.value?.open()
 }
 
-function handleImport() {
-  importError.value = ''
-  try {
-    const parsed = JSON.parse(importJson.value) as unknown
-    const imported = (Array.isArray(parsed) ? parsed : [parsed]).map(normalizeTool).filter((tool) => tool !== null)
-    if (!imported.length) {
-      importError.value = '未找到有效的工具定义'
-      return
-    }
-    // 同名函数以导入内容覆盖
-    const importedNames = new Set(imported.map((tool) => tool.function.name))
-    updateSetting({ tools: [...setting.value.tools.filter((tool) => !importedNames.has(tool.function.name)), ...imported] })
-    importVisible.value = false
-  } catch {
-    importError.value = 'JSON 解析失败，请检查格式'
-  }
-}
-
-function resetImport() {
-  importJson.value = ''
-  importError.value = ''
+function handleImport(imported: LlmTool[]) {
+  // 同名函数以导入内容覆盖
+  const importedNames = new Set(imported.map((tool) => tool.function.name))
+  updateSetting({ tools: [...setting.value.tools.filter((tool) => !importedNames.has(tool.function.name)), ...imported] })
+  toolImportDialogRef.value?.close()
 }
 
 function handleExport() {
@@ -175,32 +156,5 @@ onBeforeUnmount(() => anchorGuard.reset())
 
   <ToolFunctionDrawer ref="toolDrawerRef" :existing-names="existingNames" @submit="handleToolSubmit" />
 
-  <MkDialog v-model="importVisible" title="导入工具" @closed="resetImport">
-    <el-input
-      v-model="importJson"
-      type="textarea"
-      :rows="12"
-      @paste.stop
-      placeholder='粘贴 OpenAI tools 格式 JSON，例如：
-[
-  {
-    "type": "function",
-    "function": {
-      "name": "get_weather",
-      "description": "获取天气",
-      "parameters": {
-        "type": "object",
-        "properties": { "location": { "type": "string", "description": "城市" } },
-        "required": ["location"]
-      }
-    }
-  }
-]'
-    />
-    <div v-if="importError" class="mt-2 text-sm text-danger">{{ importError }}</div>
-    <template #footer>
-      <el-button plain @click="importVisible = false">取消</el-button>
-      <el-button type="primary" @click="handleImport">导入</el-button>
-    </template>
-  </MkDialog>
+  <ToolImportDialog ref="toolImportDialogRef" @submit="handleImport" />
 </template>
