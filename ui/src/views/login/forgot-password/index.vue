@@ -94,12 +94,16 @@ const handleResetPassword = async () => {
       const encryptor = new JSEncrypt()
       encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
       const { confirmPassword: re_password, email, password, verificationCode: code } = forgotPasswordForm
-      const encryptedData = encryptor.encrypt(JSON.stringify({ password, re_password }))
+      const encryptedData = encryptor.encrypt(JSON.stringify(password))
       if (!encryptedData) {
         return
       }
+      const encryptedRePassword = encryptor.encrypt(JSON.stringify(re_password))
+      if (!encryptedRePassword) {
+        return
+      }
 
-      await ForgotPasswordApi.postResetPassword({ code, email, password: encryptedData, re_password: encryptedData, encrypted: true })
+      await ForgotPasswordApi.postResetPassword({ code, email, password: encryptedData, re_password: encryptedRePassword, encrypted: true })
       MsgSuccess('密码修改成功，请使用新密码登录')
       router.push({ name: 'login' })
     } finally {
