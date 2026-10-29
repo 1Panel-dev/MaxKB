@@ -1,6 +1,6 @@
 <template>
   <el-avatar class="bg-purple!" shape="square">
-    <img src="@/assets/workflow/icon_llm.svg" style="width: 74%" alt=""/>
+    <img src="@/assets/workflow/icon_llm.svg" style="width: 66%" alt="" />
   </el-avatar>
 </template>
 <script setup lang="ts"></script>
