@@ -61,9 +61,6 @@ const groupStatus = computed(() => {
   return childStatuses.length ? 'success' : ''
 })
 
-// const STATUS_TEXT: Dict<string> = { running: '执行中', success: '成功', error: '失败' }
-// const statusText = computed(() => STATUS_TEXT[groupStatus.value] ?? '')
-
 const manualExpanded = ref<boolean>()
 const isExpanded = computed({
   get: () => manualExpanded.value ?? groupStatus.value === 'running',
@@ -92,19 +89,21 @@ const isExpanded = computed({
       <span>调用了 {{ toolItems.length }} 个工具</span>
     </template>
 
-    <div v-show="toolItems.length">
+    <div v-show="toolItems.length" class="bg-white border rounded-xl">
       <template v-for="(toolItem, index) in toolItems" :key="toolItem.id ?? index">
-        <div v-if="resolveToolRenderer(toolItem.name)">
-          <component
-            :is="resolveToolRenderer(toolItem.name)"
-            :content="toolItem"
-            :loading="toolItem.status === 'RUNNING'"
-            :expanded="isToolExpanded(toolItem, index)"
-            @update:expanded="manualToolExpanded[toolKey(toolItem, index)] = $event"
-            @toggle="toggleTool(toolItem, index)"
-          />
+        <div class="px-4 pt-3 pb-1" :class="index !== 0 ? 'border-t' : ''">
+          <div v-if="resolveToolRenderer(toolItem.name)" :class="{ 'pb-2': isToolExpanded(toolItem, index) }">
+            <component
+              :is="resolveToolRenderer(toolItem.name)"
+              :content="toolItem"
+              :loading="toolItem.status === 'RUNNING'"
+              :expanded="isToolExpanded(toolItem, index)"
+              @update:expanded="manualToolExpanded[toolKey(toolItem, index)] = $event"
+              @toggle="toggleTool(toolItem, index)"
+            />
+          </div>
+          <ToolItem v-else :tool-item="toolItem" />
         </div>
-        <ToolItem v-else :tool-item="toolItem" />
       </template>
     </div>
   </MkCollapse>
