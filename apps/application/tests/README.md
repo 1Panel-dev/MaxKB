@@ -1,5 +1,20 @@
 # 工作流测试
 
+## Excel 文档分段
+
+从集成仓库根目录运行：
+
+```bash
+uv run python apps/manage.py test application.tests.test_workflow_excel_split \
+  application.tests.test_workflow_document_source
+```
+
+Excel 的智能、自定义和 QA 分段均按 sheet 输出独立文档。测试使用内存中的 XLSX、XLS
+文件经过真实提取、分段节点，覆盖 sheet 命名、原文件及来源元数据、分段长度、QA 问题
+和非 Excel 文档兼容性。文件查询使用替身，不验证数据库入库或前端显示。
+
+## 工作流 Web 图片导入
+
 工作流 Web 图片导入的 HTTP 回归使用 Postman CLI 1.70 或更高版本：
 
 ```bash
