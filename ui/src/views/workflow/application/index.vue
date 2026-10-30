@@ -134,6 +134,11 @@ function handleAutoSaveChange() {
 /* 调试入口 */
 const debugButtonRef = useTemplateRef<InstanceType<typeof ButtonDebug>>('debugButtonRef')
 
+function validateWorkflow() {
+  if (!workflowRef.value) return Promise.reject(new Error('工作流画布尚未加载'))
+  return workflowRef.value.validate()
+}
+
 function closeDebug() {
   debugButtonRef.value?.close()
 }
@@ -350,6 +355,7 @@ onBeforeUnmount(() => stopAutoSave())
         label="调试"
         :disabled="historyVisible"
         :has-unsaved-changes="hasUnsavedChanges"
+        :validate-workflow="validateWorkflow"
         :save-workflow="saveApplication"
         :application="applicationDetail"
       />

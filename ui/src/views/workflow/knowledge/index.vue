@@ -31,6 +31,7 @@ import ButtonTemplateStore from './ButtonTemplateStore.vue'
 import ButtonPublishHistory from './ButtonPublishHistory.vue'
 import WorkflowImportDocumentDrawer from '@/views/knowledge-detail/library/document/import-document/WorkflowImportDocumentDrawer.vue'
 import { goBack } from './navigation'
+import { showWorkflowValidateError } from '../components/validate-error'
 
 defineOptions({ name: 'KnowledgeWorkflowView' })
 
@@ -239,13 +240,17 @@ function openDebug() {
 }
 
 async function handleDebug() {
-  if (loading.value || historyVisible.value) return
+  if (loading.value || historyVisible.value || !workflowRef.value) return
   loading.value = true
   try {
+    await workflowRef.value.validate().catch((error: unknown) => {
+      showWorkflowValidateError(error)
+      throw error
+    })
     if (hasUnsavedChanges()) await saveKnowledgeWorkflow()
     openDebug()
   } catch {
-    // 请求失败时保留当前页面，错误由请求层提示。
+    // 校验或保存失败已由对应流程提示，不打开调试。
   } finally {
     loading.value = false
   }
