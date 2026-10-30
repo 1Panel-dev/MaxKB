@@ -228,40 +228,6 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 首次加载或 `reset()` 请求第一页时，组件只显示加载状态；第一页完成且列表为空后才渲染 `empty`
 插槽，避免请求过程中短暂显示空状态。已有数据时继续渲染默认插槽，并在触底请求期间保留列表。
 
-### ReverseInfiniteScroll（对话模块）
-
-位于 `conversation-panel/core/reverse-infinite-scroll/index.vue`，由对话模块显式导入，
-不属于全局组件。内部使用 `el-scrollbar`，父级需要提供受限高度或纵向 Flex 剩余空间，
-外层不再额外包裹消息滚动容器。
-
-内容留白通过 `contentClass` 设置，例如 `content-class="p-4"`；该类作用于滚动区域内的内容层，
-同时覆盖消息和空状态，使滚动条保持贴近容器边缘。`class` 仍用于组件外壳布局。
-
-传入 `loading`、`hasMore`、`count` 和 `loadMore: () => Promise<boolean>`。页码、请求和
-历史数据前插由调用方维护；`loadMore` 在历史数据更新后返回 `true`，失败或没有新增数据返回
-`false`。组件不请求首页；首页由调用方加载，首次出现数据时自动定位到底部，距顶部 60px 时
-串行加载历史。内容不足一屏时继续补页，失败或未新增数据时停止自动补页。
-
-默认插槽放消息，`empty` 插槽放欢迎语或空状态，加载期间不显示空状态。
-`prepend` 插槽放消息与空状态共用的前置内容，位于顶部加载提示之后，首次加载期间隐藏；
-是否等待历史全部加载后展示由调用方控制。
-首次加载使用整块遮罩；有消息时顶部预留状态行，加载期间使用 `mk-conversation-loading`
-展示加载动画。失败后可再次主动上滑重试，流式回复状态由消息列表自行渲染。
-历史消息前插后按滚动高度差补偿阅读位置，不要求消息设置额外的 DOM 属性。
-`count` 清零会重置定位状态，切换会话时应通过
-组件 `key` 重建实例，以隔离未结束的补页与定位操作。
-
-底部定位与跟随复用 `conversation-panel/core/scroll.ts` 的 `Scroll`；其他消息容器也从此文件导入，
-容器卸载或替换时调用 `destroy()` 清理监听和动画帧。
-公开 `scrollToBottom()` 强制定位到底部、`followBottom()` 仅在用户位于底部附近时跟随。
-聊天列表订阅流式进度后调用 `followBottom()`；只读日志无需订阅。
-`message-list` 和 `log-message-list` 使用该容器，保留各自的消息正文与底部信息；聊天列表
-自行展示流式圆点，开场白放入 `prepend` 插槽，日志空状态放入 `empty` 插槽。日志列表不注入发送能力。
-消息 Store 的 `loadMore()` 在新增历史记录时返回 `true`，空页、失败或未执行时返回 `false`，
-直接传给滚动容器。新会话及重置时 `hasMore` 为 `false`；已有会话主动加载首页，成功后再更新
-`hasMore`。首页失败后通过重新加载首页重试，不从下一页继续。
-Chat、Portal 和 Display 面板直接放置消息列表，并以当前会话 ID 为 `key`，不再包裹额外滚动层。
-
 ### MkListItem
 
 统一列表行、选中态及悬浮操作区。仅自定义内容时传 `active` 并监听 `click` 即可。
@@ -953,6 +919,42 @@ Workspace API 内部使用 `getWorkspaceId()`，System 共享 API 不接收工�
 
 工作空间模型、知识库、应用、工具列表已分别通过 `RelatedResourcesModelAction`、
 `RelatedResourcesKnowledgeAction`、`RelatedResourcesApplicationAction`、`RelatedResourcesToolAction` 接入。
+
+## 对话模块组件
+
+### ReverseInfiniteScroll（对话模块）
+
+位于 `conversation-panel/core/reverse-infinite-scroll/index.vue`，由对话模块显式导入，
+不属于全局组件。内部使用 `el-scrollbar`，父级需要提供受限高度或纵向 Flex 剩余空间，
+外层不再额外包裹消息滚动容器。
+
+内容留白通过 `contentClass` 设置，例如 `content-class="p-4"`；该类作用于滚动区域内的内容层，
+同时覆盖消息和空状态，使滚动条保持贴近容器边缘。`class` 仍用于组件外壳布局。
+
+传入 `loading`、`hasMore`、`count` 和 `loadMore: () => Promise<boolean>`。页码、请求和
+历史数据前插由调用方维护；`loadMore` 在历史数据更新后返回 `true`，失败或没有新增数据返回
+`false`。组件不请求首页；首页由调用方加载，首次出现数据时自动定位到底部，距顶部 60px 时
+串行加载历史。内容不足一屏时继续补页，失败或未新增数据时停止自动补页。
+
+默认插槽放消息，`empty` 插槽放欢迎语或空状态，加载期间不显示空状态。
+`prepend` 插槽放消息与空状态共用的前置内容，位于顶部加载提示之后，首次加载期间隐藏；
+是否等待历史全部加载后展示由调用方控制。
+首次加载使用整块遮罩；有消息时顶部预留状态行，加载期间使用 `mk-conversation-loading`
+展示加载动画。失败后可再次主动上滑重试，流式回复状态由消息列表自行渲染。
+历史消息前插后按滚动高度差补偿阅读位置，不要求消息设置额外的 DOM 属性。
+`count` 清零会重置定位状态，切换会话时应通过
+组件 `key` 重建实例，以隔离未结束的补页与定位操作。
+
+底部定位与跟随复用 `conversation-panel/core/scroll.ts` 的 `Scroll`；其他消息容器也从此文件导入，
+容器卸载或替换时调用 `destroy()` 清理监听和动画帧。
+公开 `scrollToBottom()` 强制定位到底部、`followBottom()` 仅在用户位于底部附近时跟随。
+聊天列表订阅流式进度后调用 `followBottom()`；只读日志无需订阅。
+`message-list` 和 `log-message-list` 使用该容器，保留各自的消息正文与底部信息；聊天列表
+自行展示流式圆点，开场白放入 `prepend` 插槽，日志空状态放入 `empty` 插槽。日志列表不注入发送能力。
+消息 Store 的 `loadMore()` 在新增历史记录时返回 `true`，空页、失败或未执行时返回 `false`，
+直接传给滚动容器。新会话及重置时 `hasMore` 为 `false`；已有会话主动加载首页，成功后再更新
+`hasMore`。首页失败后通过重新加载首页重试，不从下一页继续。
+Chat、Portal 和 Display 面板直接放置消息列表，并以当前会话 ID 为 `key`，不再包裹额外滚动层。
 
 ## 文档维护
 
