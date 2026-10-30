@@ -80,7 +80,7 @@
     "unplugin-vue-components": "^32.1.0",
     "vite": "^8.0.16",
     "vue-eslint-parser": "^10.4.1",
-    "vue-tsc": "^3.3.5"
+    "vue-tsc": "3.3.9"
   },
   "engines": {
     "node": "^22.18.0 || >=24.12.0"
