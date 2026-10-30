@@ -216,7 +216,8 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 智能体、工具、知识库 Workflow API 分别维护 application_version、tool_version、knowledge_version，
 使用同名 getWorkflowVersions／putWorkflowVersion，类型为 WorkflowVersion／WorkflowVersionPayload。
 前端版本标题上限 64、更新说明上限 1000，提交字段为 name、publish_desc，
-不将资源 desc 当作版本说明。智能体和工具后端已支持 publish_desc；知识库版本当前只处理 name。
+不将资源 desc 当作版本说明。三类版本接口均保存并返回 publish_desc。
+知识库版本编辑省略 publish_desc 或传 null 时保留原说明，传空字符串时清空；服务端上限 1024 字符。
 智能体与工具的 putXxxPublish 提交 publish_name、publish_desc，由发布弹框填写。
 三个版本列表均未返回历史默认模型配置，预览与恢复保留当前配置。
 
