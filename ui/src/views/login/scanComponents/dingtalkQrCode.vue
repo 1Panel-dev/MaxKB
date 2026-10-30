@@ -20,7 +20,7 @@ const initialize = async () => {
       client_id: props.config.app_key,
       corpId: props.config.corp_id,
       prompt: 'consent',
-      redirect_uri: window.location.origin,
+      redirect_uri: encodeURIComponent(window.location.origin),
       response_type: 'code',
       scope: 'openid corpid',
       state: 'fit2cloud-ding-qr',
