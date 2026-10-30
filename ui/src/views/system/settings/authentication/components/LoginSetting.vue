@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
+import { computed, onActivated, reactive, ref, useTemplateRef } from 'vue'
 import { pick } from 'lodash'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
@@ -150,7 +150,7 @@ function submit() {
   })
 }
 
-onMounted(() => {
+onActivated(() => {
   Promise.all([loadSetting(), loadRoleSettingOptions()]).then(() => {
     return loadUserGroups()
   })
