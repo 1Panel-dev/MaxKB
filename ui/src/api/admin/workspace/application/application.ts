@@ -61,9 +61,10 @@ const exportApplication = (applicationId: string, applicationName: string) => {
   return getExportFile(`${applicationName}.mk`, `${getPrefix()}/${applicationId}/export`)
 }
 
-/** 模拟导出工作空间智能体为 Skills；TODO：接入真实下载接口。 */
-const exportApplicationSkills = (applicationId: string, applicationName: string) =>
-  Promise.resolve({ application_id: applicationId, name: applicationName })
+/** 导出工作空间智能体为 Skills 压缩包；baseUrl 为写入技能的 MaxKB 访问地址，缺省由后端按请求地址生成。 */
+const exportApplicationSkills = (applicationId: string, applicationName: string, baseUrl?: string) => {
+  return getExportFile(`${applicationName}.zip`, `${getPrefix()}/${applicationId}/export_skills`, baseUrl ? { base_url: baseUrl } : undefined)
+}
 
 /** 工作空间智能体上架到门户（仅已发布可上架）。 */
 const putApplicationPortalUp = (applicationId: string) => put<Record<string, never>, ApplicationDetail>(`${getPrefix()}/${applicationId}/portal_up`)

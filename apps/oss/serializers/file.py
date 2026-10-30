@@ -6,7 +6,7 @@ import uuid_utils.compat as uuid
 from django.db.models.functions import Cast
 
 from application.models import Application, ApplicationAccessToken, ChatShareLink, Chat
-from common.auth.common import parse_token, SystemToken
+from common.auth.common import parse_token, SystemToken, ChatToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.constants.operate_constants import Operate
 from common.auth.handle.impl.user_token import get_auth
@@ -28,7 +28,7 @@ from knowledge.models import Document, File, FileSourceType, Knowledge, Paragrap
 from knowledge.services import validate_knowledge_file_size
 from maxkb.const import CONFIG
 from rest_framework import serializers
-from system_manage.models import WorkspaceUserResourcePermission
+from system_manage.models import ChatUserApiKey, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping, ResourceType
 from tools.serializers.tool import UploadedFileField
 from users.models import User
@@ -193,6 +193,13 @@ def parse_file_token(mk_file_auth):
             return SystemToken(str(system_api_key.user_id), AuthenticationType.SYSTEM_USER)
         else:
             _deny()
+    elif mk_file_auth.startswith("chat-"):
+        # 对话用户 API Key（如导出的 Skills 下载对话文件），按该对话用户鉴权
+        chat_user_api_key = QuerySet(ChatUserApiKey).filter(secret_key=mk_file_auth, is_active=True).first()
+        chat_user = chat_user_api_key.user if chat_user_api_key else None
+        if chat_user is None or not chat_user.is_active:
+            _deny()
+        return ChatToken(str(chat_user.id), AuthenticationType.CHAT_USER, chat_user.source)
     else:
         try:
             return parse_token(token=mk_file_auth)
