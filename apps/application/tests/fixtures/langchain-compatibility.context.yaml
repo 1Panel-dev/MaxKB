@@ -120,6 +120,35 @@ assumptions:
       ../test_langchain_compatibility.py; ../../workflow/backend/sandbox_shell.py;
       ../../workflow/nodes/ai_chat_node/agent.py
     updated_at: "2026-10-29"
+  - id: current-checkout-bedrock-suite
+    status: supported
+    claim: The current community checkout passes all seven Bedrock HTTP compatibility tests.
+    reason: After restoring complete-message normalization and text-block extraction, and updating test calls for reasoning_key, all seven Bedrock cases passed within the 46-test related regression.
+    verification: >-
+      2026-10-30, fingerprint low-risk-boto-upgrade: the upgraded integrated run passed 19 of 21 tests
+      (6 Ark, 8 Slack and 5 Bedrock), with no skips. The Bedrock invocation/context test calls
+      _write_final_context without the required tool_calls argument. Both nonstream-fallback subcases
+      fail because _stream_response accesses tool_call_chunks on a complete AIMessage.
+      Re-ran the same seven Bedrock tests using boto3/botocore 1.43.121 from a temporary import directory:
+      the same five passed and the same two methods produced three errors. Each SDK version generated
+      nine local HTTP requests (eight 200 responses and one expected 429), identified by SDK User-Agent.
+      At that stage the application/test mismatches remained unresolved and production code was unchanged;
+      the other LangChain tests had not been rerun.
+      Later on 2026-10-30, fingerprint bedrock-message-fix: first reproduced complete-message AttributeError
+      and missing content-block text with two local regression methods. Normalized full AIMessage responses
+      into copied AIMessageChunk objects, used the text accessor for display/context, and supplied reasoning_key
+      explicitly in four outdated test calls. All 46 related tests then passed without skips, including all
+      seven Bedrock cases, OpenAI/Anthropic streams, Agent output and DeepSeek tool-image paths.
+      A new test checked string and list content, two distinct tool calls and display IDs, reasoning_key,
+      usage, finish reason, unchanged source messages and stream closure. The simulation recorded 19 requests:
+      17 successful responses and two expected 429 responses; nine requests exercised Bedrock.
+      Ruff lint and format checks passed. No live AWS request, IAM validation or database persistence was tested.
+    source: >-
+      ../test_langchain_compatibility.py:BedrockHTTPCompatibilityTests;
+      ../../workflow/nodes/llm_node/llm_node.py:_write_final_context;
+      ../../workflow/nodes/llm_node/llm_node.py:_stream_response;
+      langchain-provider/default.js; https://github.com/boto/boto3/blob/1.43.122/CHANGELOG.rst
+    updated_at: "2026-10-30"
 fingerprints:
   - id: conservative-upgrade
     date: "2026-10-29"
@@ -129,3 +158,11 @@ fingerprints:
     date: "2026-10-29"
     commit: "e5a852818b187b5ff45a3182b70e654b467c3312 (community checkout with uncommitted dependency, compatibility and regression changes)"
     cli: "Postman 1.74.0; Python 3.13.18; deepagents 0.7.32; langchain 1.4.7; langchain-core 1.7.1; langchain-openai 1.7.3; langchain-aws 1.9.1; langchain-anthropic 1.7.7; langgraph 1.2.18; langchain-protocol 0.0.20; langsmith 0.14.14"
+  - id: low-risk-boto-upgrade
+    date: "2026-10-30"
+    commit: "community 1f2fbaf668c1f3931b4e92cbffb2f73aaa46745a; integration 2a161a30607c92e1c41eb413dd4e8d73f8ccb098; uncommitted dependency and validation documentation changes"
+    cli: "Postman 1.74.0; Python 3.13.18; boto3/botocore 1.43.122; comparison 1.43.121; langchain-core 1.7.1; langchain-aws 1.9.1"
+  - id: bedrock-message-fix
+    date: "2026-10-30"
+    commit: "community 1f2fbaf668c1f3931b4e92cbffb2f73aaa46745a; integration 2a161a30607c92e1c41eb413dd4e8d73f8ccb098; uncommitted dependency, LLM node, regression test and documentation changes"
+    cli: "Postman 1.74.0; Python 3.13.18; boto3/botocore 1.43.122; langchain-core 1.7.1; langchain-aws 1.9.1; 46 tests passed"

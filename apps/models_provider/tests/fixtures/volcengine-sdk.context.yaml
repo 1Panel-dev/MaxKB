@@ -68,6 +68,19 @@ assumptions:
     timing and failed/cancelled video task behavior were not exercised.
   source: ../README.md; multimodal.js; volcengine-sdk/default.js; https://github.com/volcengine/volcengine-python-sdk
   updated_at: '2026-10-29'
+- id: ark-5-0-55-compatibility
+  status: supported
+  claim: Ark Runtime 5.0.55 preserves the application's covered embedding, image, video and error-handling behavior
+    against the existing local HTTP fixtures.
+  reason: The real upgraded SDK and application adapters passed all six existing tests; simulation logs confirmed
+    that every modeled path was exercised.
+  verification: '2026-10-30, fingerprint low-risk-sdk-upgrade: 6 tests passed without skips and 17 HTTP requests
+    were recorded. The requests included the video create/poll/delete lifecycle and expected 400/401/429/500/404
+    responses. Root, community and xpack lock checks passed; the integrated environment passed uv pip check.
+    No real cloud service, model quality or retry timing was tested.'
+  source: ../test_volcengine_sdk.py; volcengine-sdk/default.js; multimodal.js;
+    https://github.com/volcengine/volcengine-python-sdk/compare/5.0.54...5.0.55
+  updated_at: '2026-10-30'
 fingerprints:
 - id: five-dependency-upgrade
   date: '2026-10-29'
@@ -77,3 +90,8 @@ fingerprints:
   date: '2026-10-29'
   commit: 1b0bcdc9cbb1b00220ec890bdd44106a8c2816a5 plus uncommitted validation documentation
   cli: Postman 1.74.0; Python 3.13.18; volcengine-ark-runtime/volcenginesdk-ark/volcenginesdk-core 5.0.54; 6 tests passed
+- id: low-risk-sdk-upgrade
+  date: '2026-10-30'
+  commit: 'community 1f2fbaf668c1f3931b4e92cbffb2f73aaa46745a; integration 2a161a30607c92e1c41eb413dd4e8d73f8ccb098;
+    uncommitted dependency and validation documentation changes'
+  cli: Postman 1.74.0; Python 3.13.18; volcengine-ark-runtime/volcenginesdk-ark/volcenginesdk-core 5.0.55; 6 tests passed

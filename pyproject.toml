@@ -34,14 +34,14 @@ dependencies = [
     "xinference-client==3.5.0",
 
     # Model providers & cloud SDKs
-    "boto3==1.43.121",
+    "boto3==1.43.122",
     "cohere==7.3.0",
     "dashscope==1.27.8",
     "qianfan==0.4.12.3",
-    "tencentcloud-sdk-python-common==3.1.197",
+    "tencentcloud-sdk-python-common==3.1.198",
     "tencentcloud-sdk-python-hunyuan==3.1.180",
-    "tencentcloud-sdk-python-asr==3.1.197",
-    "volcengine-ark-runtime==5.0.54",
+    "tencentcloud-sdk-python-asr==3.1.198",
+    "volcengine-ark-runtime==5.0.55",
     "zai-sdk==0.2.3",
 
     # Database, cache & async task queue
@@ -71,7 +71,7 @@ dependencies = [
     "psutil==7.2.2",
     "python-daemon==3.1.2",
     "python-dotenv==1.2.4",
-    "pytz==2026.5",
+    "pytz==2026.6",
 
     # Server & development tools
     "gunicorn==26.2.0",

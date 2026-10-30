@@ -15,13 +15,14 @@ import httpx
 from botocore.config import Config
 from botocore.exceptions import ClientError
 from django.test import SimpleTestCase
-from langchain_core.messages import AIMessageChunk, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, SystemMessage, ToolMessage
 from openai import RateLimitError
 
 from application.workflow.backend import sandbox_shell
 from application.workflow.common import CancelledException
 from application.workflow.message.struct.reasoning_content import ReasoningContent
 from application.workflow.message.struct.text_content import TextContent
+from application.workflow.message.struct.tool_content import ToolContent
 from application.workflow.nodes.ai_chat_node import agent as agent_module
 from application.workflow.nodes.llm_node.llm_node import LLMNode
 from models_provider.impl.anthropic_model_provider.model.llm import AnthropicChatModel
@@ -60,6 +61,62 @@ def llm_node():
 
 
 class LangChainMessageCompatibilityTests(SimpleTestCase):
+    async def test_complete_messages_preserve_text_tools_metadata_and_input(self):
+        contents = [
+            "你好",
+            [
+                {"type": "thinking", "thinking": "private"},
+                {"type": "text", "text": "你"},
+                {"type": "image", "base64": "not-answer"},
+                {"type": "text", "text": "好"},
+            ],
+        ]
+        for content in contents:
+            with self.subTest(content=content):
+                message = AIMessage(
+                    content=content,
+                    tool_calls=[
+                        {"id": "call_sh", "name": "lookup", "args": {"city": "上海"}},
+                        {"id": "call_bj", "name": "lookup", "args": {"city": "北京"}},
+                    ],
+                    additional_kwargs={"reasoning": "思考"},
+                    response_metadata={"stop_reason": "tool_use"},
+                    usage_metadata={"input_tokens": 12, "output_tokens": 3, "total_tokens": 15},
+                )
+                before = message.model_dump()
+                closed = Event()
+
+                async def stream(_messages):
+                    try:
+                        yield message
+                    finally:
+                        closed.set()
+
+                model = MagicMock()
+                model.astream.side_effect = stream
+                node, context = llm_node()
+                await node._stream_response(model, model, [])
+
+                output = [call.args[0] for call in node.write.call_args_list]
+                self.assertEqual("".join(item.content for item in output if isinstance(item, TextContent)), "你好")
+                self.assertEqual(context["content"], "你好")
+                self.assertEqual(context["reasoning_content"], "思考")
+                self.assertEqual(context["reasoning_key"], "reasoning")
+                self.assertEqual(context["finish_reason"], "tool_use")
+                self.assertEqual(context["usage"], {"prompt_tokens": 12, "completion_tokens": 3, "total_tokens": 15})
+                calls = context["tool_calls"]
+                self.assertEqual(
+                    [(call["original_id"], call["name"], json.loads(call["arguments"])) for call in calls],
+                    [("call_sh", "lookup", {"city": "上海"}), ("call_bj", "lookup", {"city": "北京"})],
+                )
+                cards = [item for item in output if isinstance(item, ToolContent)]
+                self.assertEqual([item.id for item in cards], [call["id"] for call in calls])
+                self.assertEqual(len({call["id"] for call in calls}), 2)
+                self.assertEqual(message.model_dump(), before)
+                self.assertTrue(closed.is_set())
+                model.get_num_tokens_from_messages.assert_not_called()
+                model.get_num_tokens.assert_not_called()
+
     async def test_text_blocks_reach_stream_and_saved_context_without_tool_payloads(self):
         node, context = llm_node()
         chunks = [
@@ -150,8 +207,11 @@ class LangChainMessageCompatibilityTests(SimpleTestCase):
         message = AIMessageChunk(
             content="你好", usage_metadata={"input_tokens": 12, "output_tokens": 3, "total_tokens": 15}
         )
-        node._write_final_context(model, [], message, "思考", None, [])
+        node._write_final_context(
+            model, [], message, reasoning_content="思考", reasoning_key="reasoning", finish_reason=None, tool_calls=[]
+        )
         self.assertEqual(context["usage"], {"prompt_tokens": 12, "completion_tokens": 3, "total_tokens": 15})
+        self.assertEqual(context["reasoning_key"], "reasoning")
         self.assertEqual((node.data["message_tokens"], node.data["answer_tokens"]), (12, 3))
         model.get_num_tokens_from_messages.assert_not_called()
         model.get_num_tokens.assert_not_called()
@@ -161,7 +221,15 @@ class LangChainMessageCompatibilityTests(SimpleTestCase):
         model = MagicMock()
         model.get_num_tokens_from_messages.return_value = 7
         model.get_num_tokens.return_value = 2
-        node._write_final_context(model, [], AIMessageChunk(content="你好"), "", None, [])
+        node._write_final_context(
+            model,
+            [],
+            AIMessageChunk(content="你好"),
+            reasoning_content="",
+            reasoning_key="",
+            finish_reason=None,
+            tool_calls=[],
+        )
         self.assertEqual(context["usage"], {"prompt_tokens": 7, "completion_tokens": 2, "total_tokens": 9})
 
     async def test_cancellation_keeps_partial_text_and_closes_stream(self):
@@ -356,7 +424,9 @@ class LangChainHTTPCompatibilityTests(SimpleTestCase):
         self.assertEqual(full.usage_metadata["total_tokens"], 19)
         self.assertEqual(full.usage_metadata["input_token_details"], {"cache_creation": 2, "cache_read": 3})
         node, context = llm_node()
-        node._write_final_context(model, [], full, "", None, [])
+        node._write_final_context(
+            model, [], full, reasoning_content="", reasoning_key="", finish_reason=None, tool_calls=[]
+        )
         self.assertEqual(context["usage"], {"prompt_tokens": 15, "completion_tokens": 4, "total_tokens": 19})
 
     def test_provider_error_reaches_caller_and_records_failed_finish(self):
@@ -413,7 +483,9 @@ class BedrockHTTPCompatibilityTests(SimpleTestCase):
         self.assertEqual(message.content, "你好")
         self.assert_usage(message)
         node, context = llm_node()
-        node._write_final_context(model, [], message, "", None, [])
+        node._write_final_context(
+            model, [], message, reasoning_content="", reasoning_key="", finish_reason=None, tool_calls=[]
+        )
         self.assertEqual(context["usage"], {"prompt_tokens": 15, "completion_tokens": 4, "total_tokens": 19})
 
     def test_binary_stream_reaches_async_llm_node_with_complete_usage(self):

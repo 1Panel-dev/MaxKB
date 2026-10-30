@@ -80,7 +80,7 @@ Agent 用例运行真实 deepagents / LangGraph 和两个本地工具调用，�
 
 根、community、xpack 三份依赖配置同步使用 deepagents 0.7.32、langchain-core 1.7.1、
 langchain-openai 1.7.3、langchain-aws 1.9.1 和 langgraph 1.2.18。
-上面的命令现在运行 45 项定向测试；原有 33 项在升级前后都通过。
+当时上述命令运行 45 项定向测试；原有 33 项在升级前后都通过。
 
 新增 Bedrock 用例使用真实 boto3 客户端和适配器，覆盖 InvokeModel、带 CRC 的二进制
 InvokeModelWithResponseStream、中文工具参数与结果回传、视觉图片请求和 429 错误传播。
@@ -110,3 +110,17 @@ VLLM_RERANK_TEST_URL=http://127.0.0.1:49646/vllm \
 ```
 
 本次 117 项扩展回归全部通过，无跳过；这些 SimpleTestCase 不验证数据库持久化。
+
+### Bedrock 完整消息兼容修复（2026-10-30）
+
+低风险依赖升级后的检查发现当前代码有两项已有失败：测试调用 `_write_final_context`
+未传新增的 `reasoning_key`；LLM 节点把非流式回退的完整 `AIMessage` 当作分片，访问
+`tool_call_chunks` 时抛错。boto3/botocore 1.43.121 和 1.43.122 均复现相同失败。
+
+现已补齐四处测试调用的关键字参数，并恢复完整消息的副本转换及文本块提取，保留当前
+`reasoning_key` 和思考结束事件处理。新增回归覆盖字符串/列表内容、两个工具调用及显示 ID、
+思考字段、usage、结束原因、原始消息不变和流关闭。
+
+使用上面的 LangChain 模拟与三模块定向测试命令，共 46 项全部通过，无跳过，包含全部
+7 项 Bedrock 测试。模拟记录 19 次请求（17 次成功、2 次预期 429），其中 Bedrock 9 次。
+Ruff lint/格式检查通过；未调用真实云服务，未验证 IAM 权限、真实账单或数据库持久化。
