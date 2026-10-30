@@ -21,16 +21,20 @@ const conversationTime = (conversation: Conversation) => relativeTimeFormat(conv
         <h4 class="truncate" :title="appInfo?.name || 'AI 助手'">{{ appInfo?.name || 'AI 助手' }}</h4>
       </div>
       <!-- 收起左侧 -->
-      <el-button text @click="toggleLeftSide()" class="-mr-1">
-        <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
-      </el-button>
+      <MkTooltip content="收起侧边栏">
+        <el-button text @click="toggleLeftSide()" class="-mr-1">
+          <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
+        </el-button>
+      </MkTooltip>
     </div>
 
     <!-- 新建对话 -->
-    <MkListItem @click="newConversation()">
-      <MkIcon name="icon_new-chat_outlined" :size="18" class="mr-2" />
-      <span>新建对话</span>
-    </MkListItem>
+    <MkTooltip content="新建对话">
+      <MkListItem @click="newConversation()">
+        <MkIcon name="icon_new-chat_outlined" :size="18" class="mr-2" />
+        <span>新建对话</span>
+      </MkListItem>
+    </MkTooltip>
     <div class="flex-between pl-2 mt-4">
       <h6 class="text-N600">历史对话</h6>
 

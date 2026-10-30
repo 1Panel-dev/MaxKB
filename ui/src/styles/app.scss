@@ -268,8 +268,14 @@ h6 {
   border-radius: 6px;
   padding: calc(var(--spacing) * 3);
   &,
+  &-lg,
   &-sm {
     background-color: white !important;
+  }
+
+  &-lg {
+    border-radius: 12px;
+    padding: calc(var(--spacing) * 4);
   }
 
   &-sm {

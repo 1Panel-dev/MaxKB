@@ -54,9 +54,11 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
         <h4 class="truncate">智能体门户</h4>
       </div>
       <!-- 收起左侧 -->
-      <el-button text @click="toggleLeftSide()">
-        <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
-      </el-button>
+      <MkTooltip content="收起侧边栏">
+        <el-button text @click="toggleLeftSide()">
+          <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
+        </el-button>
+      </MkTooltip>
     </div>
 
     <!-- 全部智能体 -->
@@ -65,10 +67,12 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
       <span>全部智能体</span>
     </MkListItem>
     <!-- 新建对话 -->
-    <MkListItem @click="portalList.newConversation()">
-      <MkIcon name="icon_new-chat_outlined" :size="18" class="mr-2" />
-      <span>新建对话</span>
-    </MkListItem>
+    <MkTooltip content="新建对话">
+      <MkListItem @click="portalList.newConversation()">
+        <MkIcon name="icon_new-chat_outlined" :size="18" class="mr-2" />
+        <span>新建对话</span>
+      </MkListItem>
+    </MkTooltip>
     <div class="flex-between pl-2 mt-4">
       <h6 class="text-N600 font-medium">历史对话</h6>
 
