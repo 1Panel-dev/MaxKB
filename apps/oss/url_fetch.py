@@ -4,7 +4,7 @@
 # the resolver is temporarily wrapped for this download. Keep the source here
 # so execution does not depend on inspect.getsource in packaged releases.
 FETCH_URL_CODE = r'''
-def fetch_url(url, file_limit):
+def fetch_url(url, file_limit, binary=False):
     import base64
     import ipaddress
     import socket
@@ -69,7 +69,7 @@ def fetch_url(url, file_limit):
                         raise ValueError("File size exceeds limit")
                     body.extend(chunk)
                 content_type = response.headers.get("Content-Type", "")
-                if "text" in content_type.lower() or "json" in content_type.lower():
+                if not binary and ("text" in content_type.lower() or "json" in content_type.lower()):
                     response._content = bytes(body)
                     content = response.text
                 else:

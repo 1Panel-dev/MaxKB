@@ -1,7 +1,6 @@
 import base64
 import time
 from typing import Dict
-import requests
 
 from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
@@ -123,10 +122,19 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
             mime_type = header.split(";")[0].split(":")[1]
             image_bytes = base64.b64decode(encoded)
         else:
-            response = requests.get(image_url, timeout=15)
-            response.raise_for_status()
-            mime_type = response.headers.get("Content-Type", "image/jpeg")
-            image_bytes = response.content
+            from common.utils.tool_code import ToolExecutor
+            from oss.url_fetch import FETCH_URL_CODE
+
+            # Resolve and download in an isolated process using the public-address policy.
+            response = ToolExecutor().exec_code(
+                FETCH_URL_CODE,
+                {"url": image_url, "file_limit": 50 * 1024 * 1024, "binary": True},
+                function_name="fetch_url",
+            )
+            if not 200 <= response["status_code"] < 300:
+                raise ValueError(f"Failed to download image: HTTP {response['status_code']}")
+            mime_type = response["Content-Type"] or "image/jpeg"
+            image_bytes = base64.b64decode(response["content"])
 
         # 注意：新 SDK 允许你不显式传 mime_type，但传入会更稳妥
         return types.Image(image_bytes=image_bytes, mime_type=mime_type)
