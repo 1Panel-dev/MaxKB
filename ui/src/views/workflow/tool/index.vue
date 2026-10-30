@@ -22,7 +22,7 @@ import type {
   WorkflowVersionPayload,
   WorkflowStoreTemplate,
 } from '@/api/types'
-import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource} from '@/utils/resource-context'
+import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
@@ -49,6 +49,15 @@ provide('resourceScope', getResourceScope())
 // 为画布节点中的 SelectModel 提供参数表单接口。
 provide('getModelParamsForm', requestModelApi.getModelParamsForm)
 
+// 权限控制
+function toolWorkflowPermission(method: 'read' | 'edit' | 'publish' | 'export' | 'record'): boolean {
+  if (isSystemResource()) return Boolean(perm.tool.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.tool.share[method]())
+  if (isWorkspaceSharedResource()) return Boolean(perm.tool.workspaceShared[method]())
+  if (method === 'read') return Boolean(perm.tool.workspace.read())
+  return perm.tool.workspace[method](toolId)
+}
+
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
   nodes: cloneDeep(defaultToolNodes),
   edges: [],
@@ -64,14 +73,6 @@ const toolDetail = ref<ToolItem>()
 const loading = ref(false)
 const savedWorkflow = ref<LogicFlow.GraphData>()
 const saveTime = ref<Date | string>()
-
-function toolWorkflowPermission(method: 'read' | 'edit' | 'publish' | 'export' | 'record' ):boolean {
-  if (isSystemResource()) return Boolean(perm.tool.system[method]())
-  if (isSystemSharedResource()) return Boolean(perm.tool.share[method]())
-  if (isWorkspaceSharedResource()) return Boolean(perm.tool.workspaceShared[method]())
-  if (method === 'read') return Boolean(perm.tool.workspace.read())
-  return perm.tool.workspace[method](toolId)
-}
 
 function getGraphData() {
   return workflowRef.value?.getGraphData()
@@ -369,7 +370,13 @@ onBeforeUnmount(() => stopAutoSave())
     </template>
     <template #actions>
       <!-- 模板中心 -->
-      <ButtonTemplateStore v-if="toolWorkflowPermission('read')" ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
+      <ButtonTemplateStore
+        v-if="toolWorkflowPermission('read')"
+        ref="templateStoreButtonRef"
+        v-model:loading="loading"
+        @open="closeDebug"
+        @use="handleUseTemplate"
+      />
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"

@@ -36,9 +36,17 @@ export const useAuthStore = defineStore('auth', {
       return LoginApi.postLdapLogin(loginRequest).then((response) => this.setToken(response.token))
     },
 
-    asyncLoginWithDingTalk(code: string, fromClient = false) {
-      const loginRequest = fromClient ? ExternalLoginApi.getDingTalkOauthCallback(code) : ExternalLoginApi.getDingTalkCallback(code)
-      return loginRequest.then((response) => this.setToken(response.token))
+    /** 使用钉钉扫码授权码登录。 */
+    asyncLoginWithDingTalk(code: string) {
+      return ExternalLoginApi.getDingTalkCallback(code).then((response) => this.setToken(response.token))
+    },
+
+    /** 使用钉钉客户端授权码登录。 */
+    loginWithDingTalkClient(code: string) {
+      return ExternalLoginApi.getDingTalkOauthCallback(code).then(({ token }) => {
+        this.setToken(token)
+        return token
+      })
     },
 
     asyncLoginWithLark(code: string) {

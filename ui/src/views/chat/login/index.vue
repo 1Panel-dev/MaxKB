@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
+import { getDingTalkClientAuthCode } from '@/views/login/dingtalk-client-login'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 import { v7 as uuidv7 } from 'uuid'
 import ChatAuthApi from '@/api/chat/auth'
@@ -16,6 +17,7 @@ defineOptions({ name: 'ChatLogin' })
 const route = useRoute()
 const router = useRouter()
 const { auth } = useStore()
+const isClientLoggingIn = ref(false)
 
 const loginTitle = computed(() => {
   if (auth.isPortal) return '门户登录'
@@ -110,6 +112,20 @@ const loginService: LoginService = {
   },
   onLoginSuccess: () => router.replace(getRedirectRoute()),
 }
+// 客户端授权期间暂停普通登录，失败后恢复原登录方式。
+onBeforeMount(async () => {
+  isClientLoggingIn.value = true
+  try {
+    const code = await getDingTalkClientAuthCode(route.query)
+    if (!code) return
+    await auth.loginWithDingTalkClient(code)
+    await loginService.onLoginSuccess()
+  } catch {
+    // 接口错误由请求层提示，保留普通登录入口。
+  } finally {
+    isClientLoggingIn.value = false
+  }
+})
 </script>
 
 <template>
@@ -119,7 +135,7 @@ const loginService: LoginService = {
       <h2 class="max-w-full truncate" :title="loginTitle">{{ loginTitle }}</h2>
     </div>
     <el-card class="chat-login__card w-100">
-      <LoginModePanel :login-config="loginConfig" :login-service="loginService" />
+      <LoginModePanel v-if="!isClientLoggingIn" :login-config="loginConfig" :login-service="loginService" />
     </el-card>
   </div>
 </template>

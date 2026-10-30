@@ -285,7 +285,7 @@ Workspace、System 资源管理和 System 共享资源均在各自 `knowledge/kn
 通用 / Web / 飞书 / 工作流创建、导入、删除、重新向量化、Web 同步、关联问题、分词索引、MCP
 配置与三种导出。工作流创建在 Workspace 与 System 共享范围均由同一个 Knowledge API 的
 `postKnowledgeWorkflow` 提交；工作流转换由各范围的 `knowledge.ts` 维护，
-`workspace/knowledge/workflow.ts` 仅维护已创建知识库的画布接口。System 共享范围没有工作空间文件夹、批量接口或独立的知识库工作流 API 文件。复用创建入口
+`workspace/knowledge/workflow.ts` 仅维护已创建知识库的画布接口。System 共享范围没有工作空间文件夹或批量接口。复用创建入口
 和卡片 Action 时使用完整 Workspace / System 资源管理 / System 共享知识库 API 的联合类型，由页面显式传入当前范围的 API。
 
 ### 工具代码生成
@@ -336,7 +336,11 @@ postTransformWorkflow POST `/<id>/transform_workflow`，提交 `{ work_flow }`�
 
 导入／导出工作流专用 `.kbwf`，接口为 workflow/import（FormData file）与 workflow/export，
 不能使用包含文档的知识库包接口。正式文档执行用 upload_document，调试用 debug，复用 KnowledgeWorkflowDebugPayload。
-知识库工作流 View 当前仍直接使用 Workspace Knowledge／Workflow API，其他来源仅有导航入口。
+四个范围各自维护 `knowledge/workflow.ts`，协议保持一致，前缀分别为 `/workspace/<workspaceId>/knowledge`、
+`/system/shared/workspace/<workspaceId>/knowledge`、`/system/resource/knowledge`、`/system/shared/knowledge`。
+工作流页面按路由 `resourceScope` 选择接口，通过 Props 传给调试、历史和执行记录组件。
+文档页正式导入链路保持原有接口装配。
+新增范围接口仍需部署端提供对应服务，尚未完成联调。
 
 ### 资源用户授权
 

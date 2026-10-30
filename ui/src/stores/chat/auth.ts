@@ -128,6 +128,15 @@ export const useChatAuthStore = defineStore('chat-auth', {
       })
     },
 
+    /** 使用钉钉客户端授权码进行免密登录。 */
+    loginWithDingTalkClient(code: string) {
+      const scope = this.scope
+      return ChatAuthApi.getDingTalkOauthCallback(code, getAccessToken(scope)).then(({ token }) => {
+        this.setToken(token, scope)
+        return token
+      })
+    },
+
     /** 退出当前场景的登录状态。 */
     logout() {
       return ChatAuthApi.postLogout().then(() => this.clearToken())

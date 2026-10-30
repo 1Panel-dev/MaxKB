@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import ExecutionRecordDrawer from './execution-record/ExecutionRecordDrawer.vue'
 
 defineOptions({ name: 'ButtonKnowledgeExecutionRecord', inheritAttrs: false })
 
-defineProps<{ knowledgeId: string }>()
+defineProps<{ api: typeof WorkflowApi; knowledgeId: string }>()
 
 /* 执行记录抽屉按需挂载，关闭动画结束后卸载。 */
 const drawerMounted = ref(false)
@@ -23,11 +23,5 @@ function handleOpenExecutionRecords() {
     <template #icon><MkIcon name="icon_schedule-report_outlined" /></template>
     <span>执行记录</span>
   </MkDropdownItem>
-  <ExecutionRecordDrawer
-    v-if="drawerMounted"
-    ref="executionRecordDrawerRef"
-    :api="WorkflowApi"
-    :knowledge-id="knowledgeId"
-    @closed="drawerMounted = false"
-  />
+  <ExecutionRecordDrawer v-if="drawerMounted" ref="executionRecordDrawerRef" :api="api" :knowledge-id="knowledgeId" @closed="drawerMounted = false" />
 </template>
