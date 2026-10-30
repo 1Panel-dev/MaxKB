@@ -261,9 +261,9 @@ function handleBatchDelete() {
                 @selected="handleKnowledgeSelect(knowledge.id, $event)"
               >
                 <template v-if="!isShared" #action-dropdown>
-                  <!-- 同步 -->
+                  <!-- 同步 Web 知识库 -->
                   <SyncKnowledgeAction
-                    v-if="knowledge.type !== KNOWLEDGE_TYPE.BASE"
+                    v-if="knowledge.type === KNOWLEDGE_TYPE.WEB"
                     v-model:loading="knowledgeOperationLoading"
                     label="同步"
                     :api="KnowledgeApi"

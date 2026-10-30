@@ -102,7 +102,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                 <template #action-dropdown>
                   <!-- 同步 Web 知识库 -->
                   <SyncKnowledgeAction
-                    v-if="knowledge.type !== KNOWLEDGE_TYPE.BASE"
+                    v-if="knowledge.type === KNOWLEDGE_TYPE.WEB"
                     v-model:loading="knowledgeOperationLoading"
                     label="同步"
                     :api="SystemSharedKnowledgeApi"
