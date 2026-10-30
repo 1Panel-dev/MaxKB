@@ -107,7 +107,6 @@ from knowledge.task.embedding import (
 from knowledge.task.generate import generate_related_by_document_id
 from knowledge.web_assets import internalize_web_images
 from maxkb.const import PROJECT_DIR
-from models_provider.models import Model
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from ops import celery_app
 from oss.serializers.file import FileSerializer
@@ -999,9 +998,7 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
             embedding_model_id = knowledge.embedding_model_id
-            embedding_model = QuerySet(Model).filter(id=embedding_model_id).first()
-            if embedding_model is None:
-                raise AppApiException(500, _("Model does not exist"))
+            # Resolve the model in the worker so a missing model cannot reject imported content.
             document_id = self.data.get("document_id")
 
             def prepare_embedding():
