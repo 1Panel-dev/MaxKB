@@ -133,6 +133,7 @@ export const llmNode = {
       fields: [
         { label: '回答内容', value: 'content' },
         { label: '思考过程', value: 'reasoning_content' },
+        { label: '思考标识', value: 'reasoning_key' },
         { label: '拒答内容', value: 'refusal' },
         { label: '是否拒答', value: 'is_refusal' },
         { label: 'Token 用量', value: 'usage' },
