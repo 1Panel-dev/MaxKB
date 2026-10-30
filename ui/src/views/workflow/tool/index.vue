@@ -142,25 +142,21 @@ function handleAutoSaveChange() {
   }
 }
 
-/* 调试前保存当前画布，运行参数由基础节点声明。 */
+/* 每次打开调试前校验画布，通过后保存未提交修改；运行参数由基础节点声明。 */
 const debugDrawerRef = useTemplateRef<InstanceType<typeof DebugDrawer>>('debugDrawerRef')
 async function handleDebug() {
-  if (loading.value || historyVisible.value) return
+  if (loading.value || historyVisible.value || !workflowRef.value) return
   loading.value = true
   try {
-    const valid = await workflowRef.value?.validate().then(
-      () => true,
-      (error) => {
-        showWorkflowValidateError(error)
-        return false
-      },
-    )
-    if (!valid) return
+    await workflowRef.value.validate().catch((error: unknown) => {
+      showWorkflowValidateError(error)
+      throw error
+    })
     if (hasUnsavedChanges()) await saveToolWorkflow()
     const graph = getGraphData()
     if (graph) debugDrawerRef.value?.open(graph)
   } catch {
-    // 保存失败已由请求层提示，失败时不打开调试。
+    // 校验或保存失败已由对应流程提示，不打开调试。
   } finally {
     loading.value = false
   }
