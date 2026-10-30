@@ -106,7 +106,7 @@ function deserializeRule(rule: SerializedFormRule): FormItemRule {
 
   let validator: FormItemRule['validator']
   // 动态校验器来自受信任的服务端字段协议。
-  eval(rule.validator)
+  //eval(rule.validator)
   return { ...rule, validator } as FormItemRule
 }
 

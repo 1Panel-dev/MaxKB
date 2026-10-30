@@ -22,7 +22,7 @@ import type {
   WorkflowVersionPayload,
   WorkflowStoreTemplate,
 } from '@/api/types'
-import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource} from '@/utils/resource-context'
+import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
@@ -49,6 +49,15 @@ provide('resourceScope', getResourceScope())
 // 为画布节点中的 SelectModel 提供参数表单接口。
 provide('getModelParamsForm', requestModelApi.getModelParamsForm)
 
+// 权限控制
+function toolWorkflowPermission(method: 'read' | 'edit' | 'publish' | 'export' | 'record'): boolean {
+  if (isSystemResource()) return Boolean(perm.tool.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.tool.share[method]())
+  if (isWorkspaceSharedResource()) return Boolean(perm.tool.workspaceShared[method]())
+  if (method === 'read') return Boolean(perm.tool.workspace.read())
+  return perm.tool.workspace[method](toolId)
+}
+
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
   nodes: cloneDeep(defaultToolNodes),
   edges: [],
@@ -64,14 +73,6 @@ const toolDetail = ref<ToolItem>()
 const loading = ref(false)
 const savedWorkflow = ref<LogicFlow.GraphData>()
 const saveTime = ref<Date | string>()
-
-function toolWorkflowPermission(method: 'read' | 'edit' | 'publish' | 'export' | 'record' ):boolean {
-  if (isSystemResource()) return Boolean(perm.tool.system[method]())
-  if (isSystemSharedResource()) return Boolean(perm.tool.share[method]())
-  if (isWorkspaceSharedResource()) return Boolean(perm.tool.workspaceShared[method]())
-  if (method === 'read') return Boolean(perm.tool.workspace.read())
-  return perm.tool.workspace[method](toolId)
-}
 
 function getGraphData() {
   return workflowRef.value?.getGraphData()
@@ -141,25 +142,21 @@ function handleAutoSaveChange() {
   }
 }
 
-/* 调试前保存当前画布，运行参数由基础节点声明。 */
+/* 每次打开调试前校验画布，通过后保存未提交修改；运行参数由基础节点声明。 */
 const debugDrawerRef = useTemplateRef<InstanceType<typeof DebugDrawer>>('debugDrawerRef')
 async function handleDebug() {
-  if (loading.value || historyVisible.value) return
+  if (loading.value || historyVisible.value || !workflowRef.value) return
   loading.value = true
   try {
-    const valid = await workflowRef.value?.validate().then(
-      () => true,
-      (error) => {
-        showWorkflowValidateError(error)
-        return false
-      },
-    )
-    if (!valid) return
+    await workflowRef.value.validate().catch((error: unknown) => {
+      showWorkflowValidateError(error)
+      throw error
+    })
     if (hasUnsavedChanges()) await saveToolWorkflow()
     const graph = getGraphData()
     if (graph) debugDrawerRef.value?.open(graph)
   } catch {
-    // 保存失败已由请求层提示，失败时不打开调试。
+    // 校验或保存失败已由对应流程提示，不打开调试。
   } finally {
     loading.value = false
   }
@@ -369,7 +366,13 @@ onBeforeUnmount(() => stopAutoSave())
     </template>
     <template #actions>
       <!-- 模板中心 -->
-      <ButtonTemplateStore v-if="toolWorkflowPermission('read')" ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
+      <ButtonTemplateStore
+        v-if="toolWorkflowPermission('read')"
+        ref="templateStoreButtonRef"
+        v-model:loading="loading"
+        @open="closeDebug"
+        @use="handleUseTemplate"
+      />
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"

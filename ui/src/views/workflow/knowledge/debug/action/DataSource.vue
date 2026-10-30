@@ -2,7 +2,7 @@
 import { computed, provide, ref, watch } from 'vue'
 import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
 import type { Dict } from '@/api/types'
-import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import { getWorkspaceId } from '@/utils/resource-context'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
@@ -20,6 +20,7 @@ interface WorkflowNode {
 }
 
 const props = defineProps<{
+  api?: typeof WorkflowApi
   workflow: { nodes?: WorkflowNode[] } | null
   knowledgeId: string
 }>()
@@ -62,7 +63,8 @@ function handleSourceChange(nodeId: string) {
   const sourceType = localSource ? 'local' : 'tool'
   const sourceId = localSource ? node.type : (node.properties.node_data?.tool_lib_id ?? node.type)
   loading.value = true
-  return KnowledgeWorkflowApi.getKnowledgeWorkflowFormList(props.knowledgeId, sourceType, sourceId, node as unknown as Dict<unknown>)
+  return (props.api ?? WorkflowApi)
+    .getKnowledgeWorkflowFormList(props.knowledgeId, sourceType, sourceId, node as unknown as Dict<unknown>)
     .then((fields) => dynamicsFormRef.value?.render(fields as unknown as FormField[]))
     .finally(() => {
       loading.value = false

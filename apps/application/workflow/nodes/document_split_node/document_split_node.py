@@ -162,15 +162,12 @@ class DocumentSplitNode(INode):
 
         paragraph_list = []
         for doc in file_list:
-            get_buffer = FileBufferHandle().get_buffer
-
-            file_mem = bytes_to_uploaded_file(doc["content"].encode("utf-8"), doc["name"])
             if split_strategy == "qa":
+                get_buffer = FileBufferHandle().get_buffer
+                file_mem = bytes_to_uploaded_file(doc["content"].encode("utf-8"), doc["name"])
                 result = md_qa_split_handle.handle(file_mem, get_buffer, self._save_image)
             else:
-                result = default_split_handle.handle(
-                    file_mem, patterns, with_filter, limit, get_buffer, self._save_image
-                )
+                result = self._split_text_document(doc, patterns, with_filter, limit)
             # 统一处理结果为列表
             results = result if isinstance(result, list) else [result]
 
@@ -200,6 +197,27 @@ class DocumentSplitNode(INode):
         self.write_context("with_filter", with_filter)
         self.write_context("patterns", patterns)
         self.write_context("split_strategy", split_strategy)
+
+    def _split_text_document(self, doc, patterns, with_filter, limit):
+        sections = [(None, doc["content"])]
+        if doc["name"].lower().endswith((".xlsx", ".xls")) and any(
+            line.strip().startswith("## ") for line in doc["content"].splitlines()
+        ):
+            # Excel 提取结果中的二级标题是 sheet 边界，与 QA 分段保持一致。
+            # 保留标题，让每个 sheet 内的分段标题和关联问题继续沿用现有规则。
+            sections = [
+                (name, f"## {name}\n{content}") for name, content in md_qa_split_handle.split_by_sheets(doc["content"])
+            ]
+
+        results = []
+        for sheet_name, content in sections:
+            file_mem = bytes_to_uploaded_file(content.encode("utf-8"), doc["name"])
+            get_buffer = FileBufferHandle().get_buffer
+            result = default_split_handle.handle(file_mem, patterns, with_filter, limit, get_buffer, self._save_image)
+            if sheet_name is not None:
+                result["name"] = sheet_name
+            results.append(result)
+        return results
 
     def _save_image(self, image_list):
         pass

@@ -4,7 +4,7 @@
 @Author：虎虎虎
 @file： llm_node.py
 @date：2026/10/16
-@desc: LLM 节点:单次调用大模型(不执行工具),输出 content/reasoning_content/refusal/is_refusal/usage/tool_calls/finish_reason
+@desc: LLM 节点:单次调用大模型(不执行工具),输出 content/reasoning_content/reasoning_key/refusal/is_refusal/usage/tool_calls/finish_reason
 """
 
 import asyncio
@@ -24,7 +24,7 @@ from application.workflow.message.struct.content import Content, NodeInfo, Posit
 from application.workflow.message.struct.reasoning_content import ReasoningContent
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.tool_content import ToolContent
-from application.workflow.nodes.llm_node.message_converter import to_messages
+from application.workflow.nodes.llm_node.message_converter import to_messages, to_reasoning_chunk
 from application.workflow.status import Status
 from common.exception.app_exception import AppApiException
 from common.utils.count_tokens import count_local_tokens
@@ -255,6 +255,7 @@ class LLMNode(INode):
         text_content_id = str(uuid.uuid7())
         tool_call_accumulator = ToolCallAccumulator()
         reasoning_content = ""
+        reasoning_key = ""
         reasoning_end = False
         full = None
         finish_reason = "error"
@@ -263,8 +264,9 @@ class LLMNode(INode):
             async for chunk in response:
                 self._check_cancelled()
                 full = chunk if full is None else full + chunk
-                reasoning_chunk = chunk.additional_kwargs.get("reasoning_content")
+                key, reasoning_chunk = to_reasoning_chunk(chunk)
                 if reasoning_chunk and not reasoning_end:
+                    reasoning_key = reasoning_key or key
                     reasoning_content += reasoning_chunk
                     self._output(
                         ReasoningContent(reasoning_content_id, reasoning_chunk, Status.RUNNING, node_info, position)
@@ -317,13 +319,16 @@ class LLMNode(INode):
                 message_list,
                 full,
                 reasoning_content,
+                reasoning_key,
                 finish_reason,
                 tool_call_accumulator.tool_calls(),
             )
             with contextlib.suppress(Exception):
                 await response.aclose()
 
-    def _write_final_context(self, chat_model, message_list, message, reasoning_content, finish_reason, tool_calls):
+    def _write_final_context(
+        self, chat_model, message_list, message, reasoning_content, reasoning_key, finish_reason, tool_calls
+    ):
         content = message.content if message is not None and isinstance(message.content, str) else ""
         additional_kwargs = message.additional_kwargs if message is not None else {}
         response_metadata = message.response_metadata if message is not None else {}
@@ -346,6 +351,7 @@ class LLMNode(INode):
                 finish_reason = "tool_calls" if tool_calls else "stop"
         self.write_context("content", content)
         self.write_context("reasoning_content", reasoning_content)
+        self.write_context("reasoning_key", reasoning_key)
         self.write_context("refusal", refusal)
         self.write_context("is_refusal", bool(refusal))
         self.write_context(
@@ -371,6 +377,7 @@ class LLMNode(INode):
                 "message_list": self.get_context("message_list"),
                 "content": self.get_context("content"),
                 "reasoning_content": self.get_context("reasoning_content"),
+                "reasoning_key": self.get_context("reasoning_key"),
                 "refusal": self.get_context("refusal"),
                 "is_refusal": self.get_context("is_refusal"),
                 "usage": self.get_context("usage"),

@@ -13,6 +13,7 @@ from common.event.listener_manage import (
     UpdateEmbeddingKnowledgeIdArgs,
     UpdateProblemArgs,
 )
+from common.exception.app_exception import AppApiException
 from common.utils.logger import maxkb_logger
 from django.db import transaction
 from django.db.models import QuerySet
@@ -54,6 +55,8 @@ def get_embedding_model(
 ):
     try:
         model = QuerySet(Model).filter(id=model_id).first()
+        if model is None:
+            raise AppApiException(500, _("Model does not exist"))
 
         default_params = get_model_default_params(model)
 
@@ -150,7 +153,7 @@ def embedding_by_knowledge(knowledge_id, model_id):
         for document in document_list:
             try:
                 embedding_by_document.delay(document.id, model_id)
-            except Exception as e:
+            except Exception:
                 pass
     except Exception as e:
         maxkb_logger.error(

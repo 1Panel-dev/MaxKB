@@ -1,6 +1,6 @@
 /** Admin 登录页与外观设置登录预览使用的登录服务，对接 Admin 认证接口与 Store。 */
 
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 import { v7 as uuidv7 } from 'uuid'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
@@ -41,8 +41,16 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
 }
 
 export function useAdminLoginService(): LoginService {
+  const route = useRoute()
   const router = useRouter()
   const { auth } = useStore()
+
+  // 与 Chat 一致：登录成功优先返回原地址，没有时进入默认工作空间首页。
+  const getRedirectRoute = (): RouteLocationRaw => {
+    const { redirect } = route.query
+    if (typeof redirect === 'string' && redirect.startsWith('/')) return redirect
+    return { name: 'workspace-home', params: { workspaceId: 'default' } }
+  }
 
   return {
     get rsaKey() {
@@ -56,7 +64,7 @@ export function useAdminLoginService(): LoginService {
     loginWithDingTalk: (authCode) => auth.asyncLoginWithDingTalk(authCode),
     larkRedirectUri: `${window.location.origin}${ADMIN_API_BASE_PATH}/lark`,
     wecomState: 'fit2cloud-wecom-qr',
-    onLoginSuccess: () => router.push({ name: 'workspace-home', params: { workspaceId: 'default' } }),
+    onLoginSuccess: () => router.replace(getRedirectRoute()),
     forgotPassword: () => void router.push({ name: 'forgot-password' }),
   }
 }

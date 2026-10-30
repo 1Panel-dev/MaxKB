@@ -216,7 +216,8 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 智能体、工具、知识库 Workflow API 分别维护 application_version、tool_version、knowledge_version，
 使用同名 getWorkflowVersions／putWorkflowVersion，类型为 WorkflowVersion／WorkflowVersionPayload。
 前端版本标题上限 64、更新说明上限 1000，提交字段为 name、publish_desc，
-不将资源 desc 当作版本说明。智能体和工具后端已支持 publish_desc；知识库版本当前只处理 name。
+不将资源 desc 当作版本说明。三类版本接口均保存并返回 publish_desc。
+知识库版本编辑省略 publish_desc 或传 null 时保留原说明，传空字符串时清空；服务端上限 1024 字符。
 智能体与工具的 putXxxPublish 提交 publish_name、publish_desc，由发布弹框填写。
 三个版本列表均未返回历史默认模型配置，预览与恢复保留当前配置。
 
@@ -284,7 +285,7 @@ Workspace、System 资源管理和 System 共享资源均在各自 `knowledge/kn
 通用 / Web / 飞书 / 工作流创建、导入、删除、重新向量化、Web 同步、关联问题、分词索引、MCP
 配置与三种导出。工作流创建在 Workspace 与 System 共享范围均由同一个 Knowledge API 的
 `postKnowledgeWorkflow` 提交；工作流转换由各范围的 `knowledge.ts` 维护，
-`workspace/knowledge/workflow.ts` 仅维护已创建知识库的画布接口。System 共享范围没有工作空间文件夹、批量接口或独立的知识库工作流 API 文件。复用创建入口
+`workspace/knowledge/workflow.ts` 仅维护已创建知识库的画布接口。System 共享范围没有工作空间文件夹或批量接口。复用创建入口
 和卡片 Action 时使用完整 Workspace / System 资源管理 / System 共享知识库 API 的联合类型，由页面显式传入当前范围的 API。
 
 ### 工具代码生成
@@ -328,13 +329,18 @@ putKnowledge 更新通用字段，Workspace 飞书使用 putLarkKnowledge；移�
 更换向量模型保存后通过 putReEmbeddingKnowledge 提交 embedding。Web 同步的 sync_type 为 incremental／replace／complete，
 不自行改写协议值。Web doc_strategy 使用 DocumentStrategy，顶层详情可为 null，保存不立即同步。
 
-postTransformWorkflow POST `/<id>/transform_workflow`，提交 `{ work_flow }`，保留已有文档；不能用工作流保存接口代替。
+postTransformWorkflow POST `/<id>/transform_workflow`，提交 `{ work_flow }`，返回布尔值，保留已有文档；
+已是工作流类型时拒绝重复转换，默认图复用知识库创建模板，不能用工作流保存接口代替。
 知识库 Workflow API 通过 getKnowledgeDetail 的 work_flow 加载，putKnowledgeWorkflow 保存，发布接口单独调用。
 默认模型协议使用 DefaultModelSettingPayload，知识库后端已保存 default_model_setting 并在详情回传。
 
 导入／导出工作流专用 `.kbwf`，接口为 workflow/import（FormData file）与 workflow/export，
 不能使用包含文档的知识库包接口。正式文档执行用 upload_document，调试用 debug，复用 KnowledgeWorkflowDebugPayload。
-知识库工作流 View 当前仍直接使用 Workspace Knowledge／Workflow API，其他来源仅有导航入口。
+四个范围各自维护 `knowledge/workflow.ts`，协议保持一致，前缀分别为 `/workspace/<workspaceId>/knowledge`、
+`/system/shared/workspace/<workspaceId>/knowledge`、`/system/resource/knowledge`、`/system/shared/knowledge`。
+工作流页面按路由 `resourceScope` 选择接口，通过 Props 传给调试、历史和执行记录组件。
+文档页正式导入链路保持原有接口装配。
+新增范围接口仍需部署端提供对应服务，尚未完成联调。
 
 ### 资源用户授权
 
@@ -412,6 +418,9 @@ Workspace 与 System 资源管理的 `application/application.ts` 提供 `getAcc
 `/<applicationId>/enable_api_key` 发送 PUT，仅提交 `{ enable_api_key: boolean }`，ID 由 URL 传递。
 返回 `workspace_id`、`application_id` 与 `enable_api_key`，用于保存后回显；该开关独立于 Web 访问和单个密钥启停。
 Workspace 后台已提供此接口；System 路径按资源管理前缀接入，当前仓库无对应后台路由，需部署环境联调确认。
+
+#### 访问限制
+
 访问限制复用上述 GET／PUT，读取与保存 `access_num`、`white_active`、`white_list`、`authentication` 和
 `authentication_value`。提问次数为 0～10000000 的整数；社区版仅编辑认证开关，保留已有 `authentication_value`，
 不生成登录配置字段，身份认证读写待后台联调。Xpack 版认证配置使用 `type: 'login'`、`login_value`、
@@ -422,11 +431,15 @@ Workspace 后台已提供此接口；System 路径按资源管理前缀接入，
 Xpack 版可用登录方式统一调用 `system/chat-management/chat-user-auth.ts` 的 `getChatUserAuthType`，
 GET `/chat_user/auth/types` 返回 `{ label, value }[]`，两种智能体入口共用。
 
+#### 展示设置
+
 社区版展示设置通过 `putAccessToken` 提交 `language`、`show_source` 与 `show_exec`，不调用 `/setting`。
 Xpack 展示设置共用 `ApplicationDisplaySetting`；`ApplicationAccessToken` 兼容可选展示字段，缺失字段由弹窗补齐默认值。
 两范围的 `putDisplaySetting` 沿用 V2 的 `/<applicationId>/setting` PUT 接口，提交 FormData：
 `custom_theme`、`float_location` 序列化为 JSON，图片字段提交本次文件，`<field>_url` 保留已有地址；
 恢复默认时图片文件与地址均提交空字符串。当前社区版后端未提供该路由，完整保存依赖支持此接口的部署。
+
+#### API Key
 
 API Key 按三个入口分别维护：
 
@@ -447,12 +460,12 @@ Workspace 与 System 资源管理的 `application/overview.ts` 独立维护概�
 
 用户排行按首页协议预接入，以下分页、汇总及导出约定待后台实现，两套 API 均保留 TODO：
 
-| 方法 | GET 路径（相对资源前缀） | 返回 |
-| ---- | ----------------------- | ---- |
-| `getRanking` | `/application_token_usage/<currentPage>/<pageSize>` 或 `/top_questions/<currentPage>/<pageSize>` | `ResponsePage<HomeRankingRecord>` |
-| `getTokensAggregation` | `/tokens/aggregation` | 数值 |
-| `getChatRecordAggregation` | `/chat_record/aggregation` | 数值 |
-| `exportRanking` | `/application_token_usage/export` 或 `/top_questions/export` | Excel 文件 |
+| 方法                       | GET 路径（相对资源前缀）                                                                         | 返回                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------- |
+| `getRanking`               | `/application_token_usage/<currentPage>/<pageSize>` 或 `/top_questions/<currentPage>/<pageSize>` | `ResponsePage<HomeRankingRecord>` |
+| `getTokensAggregation`     | `/tokens/aggregation`                                                                            | 数值                              |
+| `getChatRecordAggregation` | `/chat_record/aggregation`                                                                       | 数值                              |
+| `exportRanking`            | `/application_token_usage/export` 或 `/top_questions/export`                                     | Excel 文件                        |
 
 排行类型 `ApplicationRankingKind` 为 `userTokens`／`questions`，两者均按用户统计，分别按 Tokens／对话次数降序。
 分页返回 `records`、`total`、`current`、`size`；记录沿用首页字段，需提供唯一 `chat_user_id`、
@@ -535,16 +548,6 @@ System 接口由资源管理服务提供；本地开源后端没有对应扩展�
 `system/shared-resources/tool/tool-workflow.ts` 提供详情、保存、发布、调试、版本和执行记录，
 前缀 `/system/shared/tool`，只接收资源 ID。两种 System 工具的 getToolListWithShared 查询各自
 `/tool_list`，合并 tools／shared_tools；需相应部署支持扩展协议。
-
-### 知识库工作流转换
-
-Workspace、System 资源管理及 System 共享资源的 `knowledge.ts` 提供
-`postTransformWorkflow(knowledgeId, { work_flow })`，沿用 v2 的 POST
-`/<knowledgeId>/transform_workflow`，各自使用对应知识库前缀，返回布尔值；
-转换页通过可管理范围上下文的 `resourceApi.knowledge` 调用，不固定 Workspace API。
-服务端转换知识库类型并创建工作流，
-保留已有文档，已是工作流类型时拒绝重复转换。页面负责确认、loading、成功提示及进入画布。
-默认图复用知识库创建模板，不用保存工作流接口代替转换。
 
 ### 文档与分段
 

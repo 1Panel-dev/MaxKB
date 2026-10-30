@@ -19,7 +19,8 @@
 Workspace 使用 `AppLayout`，左侧导航根据 `scope: 'workspace'` 对应路由的 `children` 自动生成。
 
 Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当前路由参数为准。应用根
-地址和登录成功时进入 `/admin/workspace/default`。顶部 `LayoutHeader` 切换到 System 时将当前
+地址进入 `/admin/workspace/default`。登录成功使用替换导航返回 `redirect` 记录的站内原地址，
+没有时进入 `/admin/workspace/default`。顶部 `LayoutHeader` 切换到 System 时将当前
 工作空间 ID 保存到 localStorage 的 `workspaceId`；仅在该组件返回 Workspace 时读取缓存，
 无缓存时使用用户首个工作空间或 `default`。退出登录时由 Admin `clearToken()` 清除缓存。
 其他位置不得读取该缓存，工作空间上下文仍以路由参数为准。若当前用户
@@ -89,7 +90,7 @@ Admin Router 在 `admin/index.ts` 中统一处理导航初始化：
 2. `login`、`forgot-password`、`not-found` 为公开路由，不校验登录状态。
 3. URL 查询参数包含 `token` 时，先写入 Admin 认证 Store，用于外部认证回跳，然后使用替换
    导航清理地址栏中的 token。
-4. 访问非公开路由且没有 token 时跳转到 `login`，并通过 `redirect` 查询参数保留原地址。
+4. 访问非公开路由且没有 token 时跳转到 `login`，并通过 `redirect` 查询参数保留原地址，同时透传钉钉客户端入口参数 `client`、`corpId`。
 5. token 有效但当前用户尚未加载时，统一加载平台基础档案和当前用户；专业版或
    企业版同时加载服务端外观主题，其他版本恢复默认主题，使刷新页面也能恢复版本、用户和
    外观状态。
@@ -132,7 +133,7 @@ Chat 导航守卫（`chat/index.ts`）：
 6. `enable_auth` 为 false 时获取匿名 token，切换当前场景后放行。匿名认证与登录都携带该场景本地保存的
    token，后端据此沿用同一对话用户。401 时 token 只在 Store 中清除并标记为失效，本地存储保留以便
    重新认证时携带；退出登录才从本地存储删除。
-7. 否则跳转到对应登录页（`portal-login` 或 `chat-login`），并通过 `redirect` 查询参数保留原地址。
+7. 否则跳转到对应登录页（`portal-login` 或 `chat-login`），并通过 `redirect` 查询参数保留原地址，同时透传钉钉客户端入口参数 `client`、`corpId`。
 
 当前场景只在放行前切换，请求层直接读取 `auth.token`，导航未完成时不会带上目标场景的 token。
 
@@ -157,6 +158,7 @@ Chat 导航守卫（`chat/index.ts`）：
 | `hidden`             | `boolean`                                                                   | 设置为 `true` 时不显示在导航中                                            |
 | `detailMenuVisible`  | `(params) => boolean`                                                       | 按业务类型过滤详情菜单，不用于权限                                        |
 | `canAccess`          | `(params) => boolean`                                                       | 工作流返回详情时的访问判断                                                |
+| `permission`         | `(route: { params }) => boolean`                                            | 菜单与导航守卫共用的访问判断                                              |
 | `resource`           | `ResourceAuthorizationType`                                                 | 系统资源授权页面当前管理的后端资源类型                                    |
 
 Workspace 和 System 资源知识库的详情子路由使用现有 `meta.permission` 访问判断；二级菜单应用相同判断并隐藏空分组。
@@ -199,13 +201,13 @@ System 侧栏优先使用 `route.meta.activeMenu`，未配置时使用当前页�
 
 ## Scope 来源判断
 
-Layout 对 Workspace、System 模式的判断统一维护在 `src/layout/utils.ts`：
+Layout 对 Workspace、System 模式的判断统一维护在 `src/layout/utils.ts`。
 
 `scope` 来自 Vue Router 合并后的路由 `meta`。Workspace、System 子页面会分别继承根路由的 `workspace`、`system`。
 
 `getChildRouteList` 属于公共路由工具，继续维护在 `admin/utils.ts`；仅供 Layout 使用的模式判断不要放入 Router。
 
-路由对象是响应式的，不要在 setup 顶层解构 `route.meta.scope`，否则切换路由后 Scope 不会更新。需要响应路由变化时，应在 `computed` 中读取：
+路由对象是响应式的，不要在 setup 顶层解构 `route.meta.scope`，否则切换路由后 Scope 不会更新。需要响应路由变化时，在 `computed` 中读取 `route.meta.scope`。
 
 ## 资源范围判断
 

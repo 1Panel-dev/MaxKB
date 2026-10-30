@@ -9,6 +9,7 @@ from uuid import UUID
 from zipfile import ZIP_DEFLATED, ZipFile
 
 import openpyxl
+from botocore.exceptions import ClientError
 from django.test import SimpleTestCase
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
@@ -181,13 +182,10 @@ class KnowledgeArchiveTests(SimpleTestCase):
                 "document_name": self.document.name,
             }
         ]
-        with (
-            patch.object(
-                serializers,
-                "native_search",
-                side_effect=[paragraph_rows, [{"content": self.problem.content, "paragraph_id": self.paragraph.id}]],
-            ),
-            patch.object(serializers, "write_image"),
+        with patch.object(
+            serializers,
+            "native_search",
+            side_effect=[paragraph_rows, [{"content": self.problem.content, "paragraph_id": self.paragraph.id}]],
         ):
             serializer = serializers.KnowledgeSerializer.Operate(
                 data={"knowledge_id": str(self.knowledge.id), "user_id": str(uid(2)), "workspace_id": "source"}
@@ -367,15 +365,91 @@ class KnowledgeArchiveTests(SimpleTestCase):
             data = json.loads(archive.read("knowledge.json"))
         self.assertNotIn("source_file_id", data["resources"]["documents"][0]["meta"])
 
-    def test_missing_file_prevents_incomplete_export(self):
+    def test_missing_image_preserves_text_and_exports_an_importable_archive(self):
         self.rows[File].clear()
-        with self.assertRaises(ValidationError):
+        self.paragraph.content = f"Before ![image](./oss/file/{self.file.id}) after"
+        payload = self.export()
+        with ZipFile(io.BytesIO(payload)) as archive:
+            data = json.loads(archive.read("knowledge.json"))
+            report = json.loads(archive.read("missing_files.json"))
+            archive_service.validate_archive(data, archive)
+            self.assertEqual(report[0]["id"], str(self.file.id))
+            self.assertEqual(report[0]["reason"], "missing")
+            self.assertTrue(any(row["document_name"] == self.document.name for row in report[0]["references"]))
+            self.assertEqual(data["resources"]["files"], [])
+            self.assertEqual(data["resources"]["assets"], [])
+            self.assertEqual(data["resources"]["documents"][0]["resource_type"], "document")
+
+        self.import_archive(payload)
+        self.assertEqual(self.file_writes, [])
+        self.assertEqual(self.created[Paragraph][0].content, f"Before ![image](missing-file:{self.file.id}) after")
+        self.assertEqual(self.created[Paragraph][0].content_schema[0]["type"], "text")
+        self.assertIn("visual description", self.created[Paragraph][0].content_schema[0]["content"])
+        self.assertNotIn("image_file_id", self.created[Document][0].meta)
+        # Export only changes the archive snapshot, not the source knowledge.
+        self.assertEqual(self.document.resource_type, DocumentResourceType.IMAGE)
+        self.assertEqual(self.document.meta["image_file_id"], str(self.file.id))
+        self.assertEqual(self.paragraph.content, f"Before ![image](./oss/file/{self.file.id}) after")
+
+    def test_missing_inline_links_keep_available_images_and_optional_source_files(self):
+        missing_id = str(uid(99))
+        self.paragraph.content += f" [attachment](https://old.example/admin/oss/file/{missing_id})"
+        self.paragraph.source_snapshot["content"] += f'<img src="/admin/oss/image/{missing_id}">'
+        self.knowledge.meta["workflow_sync_input"] = {"data_source": {"file_id": missing_id, "query": "keep"}}
+        original_meta = copy.deepcopy(self.knowledge.meta)
+        for with_source in (False, True):
+            with self.subTest(with_source=with_source):
+                payload = self.export(with_source_file=with_source)
+                with ZipFile(io.BytesIO(payload)) as archive:
+                    data = json.loads(archive.read("knowledge.json"))
+                    archive_service.validate_archive(data, archive)
+                    report = json.loads(archive.read("missing_files.json"))
+                    self.assertEqual([row["id"] for row in report], [missing_id])
+                    self.assertIn({"resource": "knowledge_meta"}, report[0]["references"])
+                    self.assertEqual(archive.read(data["resources"]["files"][0]["zip_path"]), self.file_bytes)
+                    self.assertEqual(len(data["source_file_list"]), int(with_source))
+                    self.assertEqual(data["meta"]["workflow_sync_input"]["data_source"], {"query": "keep"})
+                    self.assertEqual(archive_service._file_ids(data["resources"]), {str(self.file.id)})
+                    self.assertEqual(self.knowledge.meta, original_meta)
+
+    def test_missing_stored_bytes_are_reported_and_removed_from_original_file_manifest(self):
+        for error in (
+            FileNotFoundError("missing"),
+            ClientError({"Error": {"Code": "NoSuchKey"}}, "GetObject"),
+        ):
+            with self.subTest(error=type(error).__name__), patch.object(self.file, "get_bytes", side_effect=error):
+                payload = self.export(with_source_file=True)
+                with ZipFile(io.BytesIO(payload)) as archive:
+                    data = json.loads(archive.read("knowledge.json"))
+                    archive_service.validate_archive(data, archive)
+                    self.assertEqual(data["source_file_list"], [])
+                    self.assertEqual(json.loads(archive.read("missing_files.json"))[0]["reason"], "missing_content")
+                    self.assertFalse(any(path.startswith(("source_file/", "oss/file/")) for path in archive.namelist()))
+
+    def test_storage_access_errors_still_fail_instead_of_claiming_files_are_missing(self):
+        error = ClientError({"Error": {"Code": "AccessDenied"}}, "GetObject")
+        with patch.object(self.file, "get_bytes", side_effect=error), self.assertRaises(ClientError):
             self.export()
 
     def test_foreign_file_reference_cannot_export_another_knowledge_file(self):
         self.file.source_id = str(uid(99))
-        with self.assertRaises(ValidationError):
-            self.export()
+        with patch.object(self.file, "get_bytes") as read, patch.object(serializers, "write_image") as legacy_write:
+            payload = self.export()
+        read.assert_not_called()
+        legacy_write.assert_not_called()
+        with ZipFile(io.BytesIO(payload)) as archive:
+            data = json.loads(archive.read("knowledge.json"))
+            archive_service.validate_archive(data, archive)
+            self.assertEqual(data["resources"]["files"], [])
+            self.assertNotIn(f"oss/file/{self.file.id}", archive.namelist())
+            self.assertEqual(json.loads(archive.read("missing_files.json"))[0]["reason"], "not_owned")
+
+    def test_complete_archive_has_no_missing_file_report_and_reads_each_file_once(self):
+        with patch.object(self.file, "get_bytes", return_value=self.file_bytes) as read:
+            payload = self.export(with_source_file=True)
+        read.assert_called_once_with()
+        with ZipFile(io.BytesIO(payload)) as archive:
+            self.assertNotIn("missing_files.json", archive.namelist())
 
     def test_legacy_auth_marker_and_disabled_schedule_are_preserved(self):
         self.knowledge.external_service = {}

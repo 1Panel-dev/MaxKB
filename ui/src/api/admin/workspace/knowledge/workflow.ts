@@ -70,7 +70,7 @@ const importKnowledgeWorkflow = (knowledgeId: string, file: File) => {
 /** 获取知识库发布历史，按发布时间倒序返回完整版本快照。 */
 const getWorkflowVersions = (knowledgeId: string) => get<WorkflowVersion[]>(`${getPrefix()}/${knowledgeId}/knowledge_version`)
 
-/** 修改知识库历史版本标题和更新说明，更新说明需要服务端支持 description 字段。 */
+/** 修改知识库历史版本标题和更新说明。 */
 const putWorkflowVersion = (knowledgeId: string, versionId: string, data: WorkflowVersionPayload) =>
   put<WorkflowVersionPayload, WorkflowVersion>(`${getPrefix()}/${knowledgeId}/knowledge_version/${versionId}`, data)
 

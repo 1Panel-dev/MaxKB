@@ -80,7 +80,7 @@ request.interceptors.response.use(
     // token 失效时重新认证；认证接口自身的 401（如登录失败）仍按普通错误提示
     const requestUrl = error.config?.url ?? ''
     const status = error.response?.status
-    if (status === 401 && !requestUrl.startsWith('/v3/auth/')) {
+    if (status === 401 && !requestUrl.startsWith('/v3/auth/') && !requestUrl.startsWith('/auth/')) {
       reauthenticate()
       return Promise.reject(error)
     }

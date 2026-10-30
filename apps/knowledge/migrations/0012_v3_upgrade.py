@@ -13,6 +13,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
+            model_name="knowledgeworkflowversion",
+            name="publish_desc",
+            field=models.CharField(default="", max_length=1024, verbose_name="更新说明"),
+        ),
+        migrations.AddField(
             model_name="file",
             name="storage_type",
             field=models.CharField(db_index=True, default="pg", max_length=16),

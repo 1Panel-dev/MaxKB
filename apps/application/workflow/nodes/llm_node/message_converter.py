@@ -39,6 +39,8 @@ CONTENT_TYPES = {"SYSTEM", "USER", "ASSISTANT", "TOOL"}
 OPENAI_MESSAGE_KEYS = ("role", "content", "name", "tool_calls", "tool_call_id")
 TOOL_NAME_KEYS = ("name", "tool_name", "toolName", "function_name")
 TOOL_ARGUMENT_KEYS = ("arguments", "function_arguments", "functionArguments")
+# 各家模型输出思考内容的字段名不同,按优先级识别;reasoning_key 输出实际命中的字段,便于下游按原字段回传
+REASONING_KEYS = ("reasoning_content", "reasoning", "reasoning_text", "thinking")
 
 
 def _content_type(item: dict):
@@ -208,3 +210,12 @@ def to_messages(value) -> list[BaseMessage]:
     if not isinstance(value, list):
         return []
     return _Converter().convert(value)
+
+
+def to_reasoning_chunk(chunk):
+    """从分片中取思考内容,返回 (实际使用的字段名, 内容);无思考内容时返回 (None, None)"""
+    for key in REASONING_KEYS:
+        value = chunk.additional_kwargs.get(key)
+        if value:
+            return key, value
+    return None, None

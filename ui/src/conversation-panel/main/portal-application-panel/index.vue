@@ -26,13 +26,17 @@ onMounted(() => {
       <!-- 左侧收起时才在顶部显示:展开左侧 + 新建对话(展开时它们在侧栏内) -->
       <template v-if="!leftSideOpen">
         <!-- 展开左侧 -->
-        <el-button text @click="toggleLeftSide()">
-          <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
-        </el-button>
+        <MkTooltip content="展开侧边栏">
+          <el-button text @click="toggleLeftSide()">
+            <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
+          </el-button>
+        </MkTooltip>
         <!-- 新建对话 -->
-        <el-button text class="ml-0!" @click="newConversation()">
-          <MkIcon name="icon_new-chat_outlined" :size="18" class="text-N900!" />
-        </el-button>
+        <MkTooltip content="新建对话">
+          <el-button text class="ml-0!" @click="newConversation()">
+            <MkIcon name="icon_new-chat_outlined" :size="18" class="text-N900!" />
+          </el-button>
+        </MkTooltip>
         <el-divider direction="vertical" />
       </template>
       <h4 class="min-w-0 flex-1 truncate">全部智能体</h4>

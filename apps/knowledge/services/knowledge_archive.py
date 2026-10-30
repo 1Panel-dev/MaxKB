@@ -8,6 +8,7 @@ from pathlib import Path
 from uuid import UUID
 
 import uuid_utils.compat as uuid
+from botocore.exceptions import ClientError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
@@ -144,8 +145,63 @@ def _file_ids(value):
     return result
 
 
-def export_resources(knowledge, documents, source_files, directory, source_entries):
+def _omit_unavailable_files(value, unavailable_ids):
+    """Keep text, but never restore a file association that the archive cannot supply."""
+    if isinstance(value, dict):
+        if value.get("type") == "image" and str(value.get("file_id")) in unavailable_ids:
+            return {
+                "type": "text",
+                "content": _omit_unavailable_files(
+                    "\n".join(
+                        str(value[key]) for key in ("raw", "caption", "ocr_text", "description") if value.get(key)
+                    ),
+                    unavailable_ids,
+                ),
+            }
+        return {
+            key: _omit_unavailable_files(item, unavailable_ids)
+            for key, item in value.items()
+            if not (key in FILE_KEYS and str(item) in unavailable_ids)
+        }
+    if isinstance(value, list):
+        return [_omit_unavailable_files(item, unavailable_ids) for item in value]
+    if isinstance(value, str):
+        return FILE_LINK_PATTERN.sub(
+            lambda match: f"missing-file:{match.group(1)}" if match.group(1) in unavailable_ids else match.group(),
+            value,
+        )
+    return value
+
+
+def _unavailable_file_report(resources, knowledge_meta, unavailable):
+    documents = {str(row["id"]): row for row in resources["documents"]}
+    references = {file_id: [] for file_id in unavailable}
+    for kind in RESOURCE_MODELS:
+        for row in resources[kind]:
+            for file_id in _file_ids(row) & unavailable.keys():
+                document_id = str(row["id"] if kind == "documents" else row.get("document_id") or "")
+                references[file_id].append(
+                    {
+                        "resource": kind,
+                        "resource_id": str(row["id"]),
+                        "document_id": document_id or None,
+                        "document_name": documents.get(document_id, {}).get("name"),
+                        "paragraph_id": str(row["id"] if kind == "paragraphs" else row.get("paragraph_id") or "")
+                        or None,
+                    }
+                )
+    for file_id in _file_ids(knowledge_meta) & unavailable.keys():
+        references[file_id].append({"resource": "knowledge_meta"})
+    return [
+        {"id": file_id, "reason": unavailable[file_id], "references": references[file_id]}
+        for file_id in sorted(unavailable)
+    ]
+
+
+def export_resources(knowledge, documents, source_files, directory, source_entries, knowledge_meta=None):
     """Include image bytes even when optional original document files are not requested."""
+    if knowledge_meta is None:
+        knowledge_meta = portable_knowledge_meta(knowledge)
     resources = {"documents": [_record(item, DOCUMENT_FIELDS) for item in documents]}
     for key, (model, fields) in RESOURCE_MODELS.items():
         if key != "documents":
@@ -159,15 +215,15 @@ def export_resources(knowledge, documents, source_files, directory, source_entri
             meta = document["meta"]
             if str(meta.get("source_file_id")) not in source_ids:
                 meta.pop("source_file_id", None)
-    required_ids = _file_ids(resources) | _file_ids(portable_knowledge_meta(knowledge)) | source_ids
+    required_ids = _file_ids(resources) | _file_ids(knowledge_meta) | source_ids
     files = list(QuerySet(File).filter(id__in=required_ids))
-    if {str(item.id) for item in files} != required_ids:
-        raise ValidationError(_("A referenced knowledge file is missing; the archive cannot be exported completely."))
+    unavailable = {file_id: "missing" for file_id in required_ids - {str(item.id) for item in files}}
     source_paths = {str(item["id"]): item["zip_path"] for item in source_entries}
     document_ids = {str(item.id) for item in documents}
     paragraph_ids = {str(row["id"]) for row in resources["paragraphs"]}
     resources["files"] = []
     for file in files:
+        file_id = str(file.id)
         if not (
             file.source_type == FileSourceType.KNOWLEDGE
             and str(file.source_id) == str(knowledge.id)
@@ -176,13 +232,23 @@ def export_resources(knowledge, documents, source_files, directory, source_entri
             or file.source_type == FileSourceType.PARAGRAPH
             and str(file.source_id) in paragraph_ids
         ):
-            raise ValidationError(_("A referenced file does not belong to this knowledge base."))
-        file_id = str(file.id)
+            # Keep the knowledge text exportable without reading another resource's bytes.
+            unavailable[file_id] = "not_owned"
+            continue
         zip_path = source_paths.get(file_id, f"oss/file/{file_id}")
-        if file_id not in source_paths:
-            target = Path(directory) / zip_path
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(file.get_bytes())
+        try:
+            content = file.get_bytes()
+        except FileNotFoundError:
+            unavailable[file_id] = "missing_content"
+            continue
+        except ClientError as exc:
+            if exc.response.get("Error", {}).get("Code") not in {"NoSuchKey", "NotFound", "404"}:
+                raise
+            unavailable[file_id] = "missing_content"
+            continue
+        target = Path(directory) / zip_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
         resources["files"].append(
             {
                 "id": file_id,
@@ -198,6 +264,23 @@ def export_resources(knowledge, documents, source_files, directory, source_entri
                 },
             }
         )
+    if unavailable:
+        report = _unavailable_file_report(resources, knowledge_meta, unavailable)
+        (Path(directory) / "missing_files.json").write_text(
+            json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        resources["assets"] = [row for row in resources["assets"] if str(row["file_id"]) not in unavailable]
+        for document in resources["documents"]:
+            if (
+                document["resource_type"] == DocumentResourceType.IMAGE
+                and str(document["meta"].get("image_file_id")) in unavailable
+            ):
+                document["resource_type"] = DocumentResourceType.DOCUMENT
+        resources = _omit_unavailable_files(resources, unavailable)
+        cleaned_meta = _omit_unavailable_files(knowledge_meta, unavailable)
+        knowledge_meta.clear()
+        knowledge_meta.update(cleaned_meta)
+        source_entries[:] = [entry for entry in source_entries if str(entry["id"]) not in unavailable]
     return json.loads(json.dumps(resources, cls=ArchiveJSONEncoder, ensure_ascii=False))
 
 

@@ -23,6 +23,14 @@ class KnowledgeWorkflowVersionEditSerializer(serializers.Serializer):
     name = serializers.CharField(
         required=False, max_length=128, allow_null=True, allow_blank=True, label=_("Version Name")
     )
+    publish_desc = serializers.CharField(
+        required=False,
+        max_length=1024,
+        allow_null=True,
+        allow_blank=True,
+        trim_whitespace=False,
+        label=_("Publish Description"),
+    )
 
 
 class KnowledgeVersionModelSerializer(serializers.ModelSerializer):
@@ -31,6 +39,7 @@ class KnowledgeVersionModelSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "publish_desc",
             "workspace_id",
             "knowledge_id",
             "work_flow",
@@ -117,6 +126,9 @@ class KnowledgeWorkflowVersionSerializer(serializers.Serializer):
                 name = instance.get("name", None)
                 if name is not None and len(name) > 0:
                     knowledge_version.name = name
+                publish_desc = instance.get("publish_desc")
+                if publish_desc is not None:
+                    knowledge_version.publish_desc = publish_desc
                 knowledge_version.save()
                 return KnowledgeVersionModelSerializer(knowledge_version).data
             else:

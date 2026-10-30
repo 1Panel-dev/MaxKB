@@ -89,12 +89,12 @@
 - `ToolCard` 点击工作流进入画布，其他类型与编辑菜单共用页面级 `EditToolForm` 实例，
   不依赖下拉菜单挂载或维护逐卡片 Action Ref；`EditToolAction` 复用相同表单调度组件。
   表单按类型打开，关闭动画后卸载具体表单；编辑、启停成功局部更新。
+  工具商店列表由页面加载，卡片和版本更新按钮不重复查询。
 - 智能体的 Workspace 卡片与 System 资源列表复用门户上下架和导出 Action；门户入口按 `is_portal`
   显示“上架到门户／从门户下架”，通过当前范围 API 保存，成功后按响应更新列表局部状态，失败保留原状态。
   未上架时仅 `is_publish` 为 true 才显示并允许上架；已上架时保留下架入口，下架不修改发布状态。
-  导出使用二级菜单，包含“导出为 Skills”和“导出智能体”；Skills 下载压缩包，智能体沿用现有文件导出。
-  Skills 默认以当前页面 `origin` 作为访问地址；取不到或后端返回 400 时弹窗让用户填写后再导出，取消则结束。
-  商店列表由页面加载，卡片和版本更新按钮不重复查询。
+  导出使用二级菜单，包含“导出为 Skills”和“导出智能体”；Skills 当前调用 mock 接口并明确提示
+  尚未生成文件，智能体沿用现有文件导出。
 - 工具头像由 `MkEditAvatar` 暂存文件，校验后先上传再保存；上传成功后清理暂存文件，避免保存失败后重复上传。
 - Python 生成入口由 `CodeGenerate` 选择 Tool／Model API，复用 `GenerateContent`；全屏替换只修改草稿，确认后回写。
 - System 模型／工具使用表格，保留既有权限、引用数量删除提示和末页回退；不新增不存在的创建／导入能力。
@@ -110,11 +110,6 @@
 `workspace_id`；关联资源抽屉的查询与工作空间展示规则见组件和 API 文档。
 
 ## 详情布局与知识库上下文
-
-智能体发布渠道位于 `application-detail/access/`，支持企业微信智能机器人、企业微信应用、钉钉、
-公众号、飞书和 Slack。平台字段与后台指引在功能本地 `platforms.ts` 维护；卡片按配置状态显示
-启停开关，保存状态成功后更新显示。配置抽屉按需挂载并在关闭动画后卸载，每次打开重新查询，
-保存失败保留草稿。公众号提供认证开关，飞书 Verification Token 可选；回调 URL 只读并支持复制。
 
 `layout/ResourceDetailLayout.vue` 提供侧栏和固定标题栏。子页声明 `ResourceDetailPageProps`，
 普通页使用默认标题；`defineExpose({ customHeader: true })` 配合 Teleport 到 `headerTarget`
@@ -133,6 +128,13 @@
 基础设置、文档策略、定时同步及转换说明允许 Workspace 共享访问；本地设置可编辑，仅隐藏保存／转换按钮，
 提交入口同时阻止共享写入。System 文档、标签与分段 API 已装配，具体服务能力仍需对应部署支持。
 知识库全屏 WorkflowView 的加载、保存、模型查询仍直接使用 Workspace API，其他来源仅完成导航，不能视为范围接入完成。
+
+### 智能体发布渠道
+
+智能体发布渠道位于 `application-detail/access/`，支持企业微信智能机器人、企业微信应用、钉钉、
+公众号、飞书和 Slack。平台字段与后台指引在功能本地 `platforms.ts` 维护；卡片按配置状态显示
+启停开关，保存状态成功后更新显示。配置抽屉按需挂载并在关闭动画后卸载，每次打开重新查询，
+保存失败保留草稿。公众号提供认证开关，飞书 Verification Token 可选；回调 URL 只读并支持复制。
 
 ### 简易智能体设置
 
@@ -171,6 +173,7 @@ MCP 配置入口使用独立权限。导出 Skills 权限已定义，知识库�
 创建浮层接收完整 Knowledge API，工作流创建使用其 `postKnowledgeWorkflow`。
 导入创建成功后先刷新基础资料权限与列表，再提示设置向量模型并向量化文档；确认后按知识库类型进入当前范围的基础设置页，关闭提示保留在当前页。
 “导出知识库”先弹窗确认是否同时导出源文件，默认不勾选；确认后通过当前范围 API 导出，成功关闭、失败保留选项，关闭后清理选择。文档 Excel、ZIP 仍直接导出。
+工作空间、System 资源管理与 System 共享知识库的整库同步菜单仅 Web 类型显示；文档级同步规则见下文。
 
 `DocumentStrategyForm` 由 Web 创建、文档上传及策略设置复用；视觉增强仅在启用、切换策略或回填启用配置时
 查询对应模型／工具，刷新模型不请求工具。Web 创建两步，策略设置回填独立草稿并单独保存 `doc_strategy`，下次同步生效。
@@ -333,16 +336,19 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - 智能体发布先校验，再打开发布内容表单，提交先保存再发布；失败保留表单。
 - 模板中心共享 UI 在 `workflow/components/template-store/`，业务入口查模板，View 确认覆盖、提交并重载详情和保存基准。
   创建模板由资源创建流程负责，取消／失败保留模板中心。
-- 调试与导出先保存未提交修改，保存失败不继续；打开历史、模板或默认模型时按原流程关闭调试。
+- 智能体、工具和知识库工作流每次打开调试都先校验画布，通过后按需保存未提交修改；校验或保存失败不打开调试。
+  导出先保存未提交修改，保存失败不继续；打开历史、模板或默认模型时按原流程关闭调试。
 - 智能体页面专属按钮组件放在 `workflow/application/components/`。
-  `ButtonDebug` 组合调试按钮与对话模块 DebugPanel，通过页面传入的改动检查、保存方法和共享 loading
-  完成保存后调试流程；公开 `close()` 供页面其他操作关闭调试。
+  `ButtonDebug` 组合调试按钮与对话模块 DebugPanel，通过页面传入的改动检查、画布校验、保存方法和共享 loading
+  完成校验、保存后调试流程；每次打开调试都先校验画布，通过后仅保存未提交修改，校验失败提示原因且不保存、不打开调试；公开 `close()` 供页面其他操作关闭调试。
   `ButtonAiGenerate` 组合 AI 生成按钮与生成面板；生成面板与调试面板一样自行 Teleport 到 body，
   使用固定定位，顶部避开工作流工具栏。
   智能体工作流页面通过 `label` 传入 AI 生成、模板中心、默认模型设置、调试和发布历史入口文案。
   工具使用 debug Drawer、SSE 和执行详情；知识库保留任务轮询与导入 Action。
   智能体画布按 Workspace／System 资源管理选择详情、保存、发布、模型和历史 API；DebugPanel 尚未按 System 范围适配。
   客户端停止读取不等于服务端停止任务。
+- 知识库工作流入口页按四种资源范围选择工作流 API，通过 `api` Props 向调试、历史与执行记录组件逐层传递；详情查询与画布范围同步路由，
+  System 模型使用对应范围接口，Workspace 共享暂沿用 Workspace 模型设置接口，画布辅助资源查询尚未适配。
 - 知识库导出仅工作流 `.kbwf`；导入确认覆盖后直接上传，不先保存旧草稿，成功重载；取消／失败保留图。
   正式导入文档要求已发布；转换使用 Knowledge API，保留已有文档，不能用保存代替转换。
 - 返回方法集中在各资源 `navigation.ts`；历史模式先退出预览，编辑态保留保存并退出／直接退出确认。
@@ -353,12 +359,20 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 
 ## 其他页面约束
 
+### 账户入口
+
 - 头像菜单的系统 API Key 弹窗位于 `layout/avatar-dropdown/ApiKeyDialog.vue`，与同目录的修改密码弹窗一起由菜单入口打开。
   顶部 API 文档地址使用 Admin 部署前缀，列表传入完整 System API Key API；与智能体概览分别维护弹窗，
   仅复用 `business/api-key-list/` 及其内部编辑抽屉。
+
+### 首页统计
+
 - 首页组件位于 `home/components/`，排行位于 `components/ranking/`。完整 Homepage API 和 workspaceId 由 View 传入。
   智能体筛选只影响趋势；日期复用 MkDateRange，默认过去 7 天；占比使用工作空间同期总量，累计活跃人次为每日人数之和。
   失败不伪装成零。快捷创建复用资源入口，`fitTriggerWidth` 仅显式开启时测量触发器。
+
+### 智能体概览
+
 - `HomeStatistics` 接收完整的 Workspace Homepage、System Homepage 或 Overview API。
   智能体概览通过 `hideHeader: true` 隐藏详情布局标题栏，保留内容内的监控与排行标题。
   基本信息直接在概览页 `application-detail/overview/index.vue` 中组织 Web 访问与后端 API 访问卡片；
@@ -383,8 +397,8 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   预览组件位于 `display-setting/components/`，通过 Props 接收名称、展示草稿和临时图片地址，
   在组件内部合并图片地址；临时 URL 的创建和释放由弹窗负责。
   展示配置保存协议及后端支持情况见 API 文档。
-  访问限制位于本地 `access-restriction/`，入口按 `auth.isCE` 选择社区版 `AccessRestrictionDrawer.vue`，
-  其他版本使用 `XpackAccessRestrictionDrawer.vue`；按需挂载，关闭动画后卸载。
+  访问限制位于本地 `access-restriction/AccessRestrictionDrawer.vue`，抽屉内部按 `auth.isPE || auth.isEE` 判断商业版，
+  商业版开启身份认证时展示登录配置；按需挂载，关闭动画后卸载。
   每次打开通过当前范围 Application API 查询配置；支持提问次数、登录认证及嵌入白名单，开关只修改草稿，保存时统一提交。
   社区版身份认证只有开关，不查询登录方式、不生成登录配置字段，保存时保留已有认证配置。
   Xpack 版可用登录方式查询 `/chat_user/auth/types`，开启认证时至少选一种；账号登录的验证码阈值沿用 -1～10。
@@ -401,14 +415,23 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   搜索与日期变更回第一页，切换页签保留日期、清空搜索并回第一页；导出当前筛选下的全部记录。
   表格展示排名、用户、当前指标、占比、另一指标及均 Tokens/次，排名跨页连续；搜索不改变同期占比分母。
   两类排行均需返回用户 Tokens 和对话次数，不按用户名合并数据；新接口约定待后台对齐，见 API 文档。
+
+### 触发器
+
 - 触发器执行记录的执行时间列使用服务端排序，独立 `orderBy` 经 `toOrderBy` 添加 `ett.` 前缀，
   通过查询参数 `order` 传入。切换排序回第一页；搜索、分页和详情跨页保留排序，重新打开抽屉恢复默认排序。
 - 触发器列表的下次执行时间、创建时间使用 `order_by` 表头排序，切换时清空选择并回到第一页；搜索、筛选和分页保留排序。
 - 触发器表单共用创建／编辑，保留任务 ID 和参数；资源模式固定单任务，完整输入定义不足时补查详情。
   保存校验全部折叠任务；参数初始化不覆盖已配置值，移除事件引用时恢复自定义默认值。
+
+### 对话用户授权
+
 - 智能体／知识库对话用户页使用双栏布局和当前页授权；智能体从 context 取 Workspace／System 资源管理 ChatUser API，知识库取四范围 API。
   自动授权立即保存，手动保存只提交当前页；请求共用 loading 与 inert，失败保留勾选。
   授权人数取 `authorized_count`，不以分页勾选推算。
+
+### 智能体对话日志
+
 - 对话日志筛选、导出使用同组查询；无勾选导出筛选结果，日期清空禁用导出。
   对话次数、对话用户、最近对话时间使用 `order_by` 表头排序，用户列映射为 `username`；切换时清空选择并回到第一页，筛选、分页和导出保留排序。
   清除策略通过当前范围 ChatLog API 保存、使用弹窗自身 loading；添加知识库固定所选对话 ID，选项使用当前范围 Knowledge／Document API。
@@ -417,12 +440,21 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   `LogConversation`，隔离分页状态和未结束的请求，重置阅读位置与执行详情。
   日志通过 `LogConversation.rightDrawerTarget` 将当前抽屉外壳传给会话布局，执行详情及遮罩
   覆盖整个抽屉，包括标题与翻页区；关闭执行详情后返回原日志，详情内容独立滚动。
+
+### 外部检索服务
+
 - 外部检索页从 context 读取四范围 ExternalRetrieval API；Workspace 共享只读，禁用开关并阻止提交。
   查询失败展示重新加载入口，不展示默认开关；保存期间使用 loading 与 inert，失败保留已保存配置。
   知识库或资源范围变化时重新查询；示例与地址来自响应，只读展示／复制，不在前端拼接。
+
+### 门户设置
+
 - 门户设置已通过 Portal API 持久化，JSON 保存开关、认证及 `cross_domain_list`，FormData 保存名称／Logo。
   成功以完整响应回显，保留现有编辑权限；认证选项来自门户配置的 `auth_config.system_options`，
   默认登录方式仅展示草稿中已选的 `login_value`；跨域地址按行清理，取消不回写。
+
+### 系统管理
+
 - 用户导入、改密、批量角色／配额流程留在各自业务目录；工作空间成员按用户联动角色行选择，
   删除按 `user_relation_id` 去重，不按用户 ID 丢弃角色记录。
 - 系统用户列表的创建时间、对话用户列表的 Tokens 使用量和创建时间使用服务端表头排序。
@@ -430,9 +462,17 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   排序参数见 API 文档。
 - 系统操作日志的操作时间使用服务端表头排序，切换后回到第一页，保留搜索及筛选条件。
   分页和导出沿用当前排序条件，取消排序不传排序值。
+
+### 登录与正式对话
+
 - 登录页使用 `formEl.validate` 回调和清晰的 LDAP／本地分支，不额外抽象或改写提交控制流程。
   Admin 与 Chat 登录页共用 `login/components/LoginModePanel.vue` 及其账号／扫码登录组件，
   组件不直接引用某个入口的 Store 或 API；接口、回调地址与登录后跳转由页面传入的 `LoginService` 提供。
+- Admin 与 Chat 登录页通过 `login/dingtalk-client-login.ts` 处理 `client=dingtalk&corpId=...`
+  的钉钉客户端免密入口，按需加载 SDK 获取授权码，再调用各入口认证 Store 的
+  `loginWithDingTalkClient(code)`；页面统一使用 async／await 完成授权、登录和成功跳转，失败恢复普通登录。
+  客户端免登不在登录服务或扫码组件中触发，避免外观预览发起授权。
+  Admin 与 Chat 登录成功统一使用替换导航，优先返回 `redirect` 记录的站内原地址，没有时进入各自场景首页。
 - Chat／Portal 页面以 auth token 为面板 key，token 变化重建并加载用户档案；路由认证见路由文档。
   会话装配在 conversation-panel，列表 Store 不感知 Router；门户复用 chat 装配，保留各智能体最近会话分组。
   账户菜单位于 `conversation-panel/left-sidebar/account-menu/index.vue`，单应用与门户共用；直接调用 Chat API 的 `postLogout()`，成功后清理当前认证场景并重新导航，由守卫处理后续认证。
