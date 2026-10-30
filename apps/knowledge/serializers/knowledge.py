@@ -751,7 +751,6 @@ class KnowledgeSerializer(serializers.Serializer):
                     paragraph_active_map[doc_id] = []
                 paragraph_active_map[doc_id].append("1" if p.get("is_active") else "0")
 
-            res = [parse_image(paragraph.get("content")) for paragraph in paragraph_list]
             # 新增字段
             workbook = self._get_knowledge_workbook(
                 data_dict, document_dict, doc_tag_map, doc_obj_map, paragraph_active_map
@@ -763,9 +762,6 @@ class KnowledgeSerializer(serializers.Serializer):
             with TemporaryDirectory() as tempdir:
                 knowledge_file_path = os.path.join(tempdir, "knowledge.xlsx")
                 workbook.save(knowledge_file_path)
-
-                for r in res:
-                    write_image(tempdir, r)
 
                 source_file_path_set = set()
                 source_file_export_list = []
@@ -783,27 +779,24 @@ class KnowledgeSerializer(serializers.Serializer):
                             "zip_path": source_file_zip_path,
                         }
                     )
-                    source_file_path = os.path.join(tempdir, source_file_zip_path)
-                    os.makedirs(os.path.dirname(source_file_path), exist_ok=True)
-                    with open(source_file_path, "wb") as f:
-                        f.write(source_file.get_bytes())
-
+                knowledge_meta = portable_knowledge_meta(knowledge)
+                resources = export_resources(
+                    knowledge, document_list, source_file_list, tempdir, source_file_export_list, knowledge_meta
+                )
                 knowledge_json = {
                     "archive_version": ARCHIVE_VERSION,
                     "source_knowledge_id": str(knowledge.id),
                     "name": knowledge.name,
                     "desc": knowledge.desc,
                     "type": knowledge.type,
-                    "meta": portable_knowledge_meta(knowledge),
+                    "meta": knowledge_meta,
                     "external_service": knowledge.external_service,
                     "file_size_limit": knowledge.file_size_limit,
                     "file_count_limit": knowledge.file_count_limit,
                     "tags": [{"key": t["key"], "value": t["value"]} for t in tag_list],
                     "termbase": terms,
                     "source_file_list": source_file_export_list,
-                    "resources": export_resources(
-                        knowledge, document_list, source_file_list, tempdir, source_file_export_list
-                    ),
+                    "resources": resources,
                 }
 
                 with open(os.path.join(tempdir, "knowledge.json"), "w", encoding="utf-8") as f:
