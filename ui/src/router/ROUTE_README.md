@@ -157,6 +157,7 @@ Chat 导航守卫（`chat/index.ts`）：
 | `hidden`             | `boolean`                                                                   | 设置为 `true` 时不显示在导航中                                            |
 | `detailMenuVisible`  | `(params) => boolean`                                                       | 按业务类型过滤详情菜单，不用于权限                                        |
 | `canAccess`          | `(params) => boolean`                                                       | 工作流返回详情时的访问判断                                                |
+| `permission`         | `(route: { params }) => boolean`                                            | 菜单与导航守卫共用的访问判断                                              |
 | `resource`           | `ResourceAuthorizationType`                                                 | 系统资源授权页面当前管理的后端资源类型                                    |
 
 Workspace 和 System 资源知识库的详情子路由使用现有 `meta.permission` 访问判断；二级菜单应用相同判断并隐藏空分组。
@@ -199,13 +200,13 @@ System 侧栏优先使用 `route.meta.activeMenu`，未配置时使用当前页�
 
 ## Scope 来源判断
 
-Layout 对 Workspace、System 模式的判断统一维护在 `src/layout/utils.ts`：
+Layout 对 Workspace、System 模式的判断统一维护在 `src/layout/utils.ts`。
 
 `scope` 来自 Vue Router 合并后的路由 `meta`。Workspace、System 子页面会分别继承根路由的 `workspace`、`system`。
 
 `getChildRouteList` 属于公共路由工具，继续维护在 `admin/utils.ts`；仅供 Layout 使用的模式判断不要放入 Router。
 
-路由对象是响应式的，不要在 setup 顶层解构 `route.meta.scope`，否则切换路由后 Scope 不会更新。需要响应路由变化时，应在 `computed` 中读取：
+路由对象是响应式的，不要在 setup 顶层解构 `route.meta.scope`，否则切换路由后 Scope 不会更新。需要响应路由变化时，在 `computed` 中读取 `route.meta.scope`。
 
 ## 资源范围判断
 
