@@ -383,8 +383,8 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   预览组件位于 `display-setting/components/`，通过 Props 接收名称、展示草稿和临时图片地址，
   在组件内部合并图片地址；临时 URL 的创建和释放由弹窗负责。
   展示配置保存协议及后端支持情况见 API 文档。
-  访问限制位于本地 `access-restriction/`，入口按 `auth.isCE` 选择社区版 `AccessRestrictionDrawer.vue`，
-  其他版本使用 `XpackAccessRestrictionDrawer.vue`；按需挂载，关闭动画后卸载。
+  访问限制位于本地 `access-restriction/AccessRestrictionDrawer.vue`，抽屉内部按 `auth.isPE || auth.isEE` 判断商业版，
+  商业版开启身份认证时展示登录配置；按需挂载，关闭动画后卸载。
   每次打开通过当前范围 Application API 查询配置；支持提问次数、登录认证及嵌入白名单，开关只修改草稿，保存时统一提交。
   社区版身份认证只有开关，不查询登录方式、不生成登录配置字段，保存时保留已有认证配置。
   Xpack 版可用登录方式查询 `/chat_user/auth/types`，开启认证时至少选一种；账号登录的验证码阈值沿用 -1～10。
