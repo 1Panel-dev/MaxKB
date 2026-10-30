@@ -66,7 +66,7 @@ const handleShare = () => {
       </div>
     </header>
     <ReverseInfiniteScroll
-      content-class="mk-conversation-content p-4"
+      content-class="mk-conversation-content p-4 space-y-2"
       :loading="loading"
       :has-more="hasMore"
       :count="shareRounds.length"
@@ -78,7 +78,7 @@ const handleShare = () => {
           <el-checkbox :model-value="share.isSelected(round.key)" class="pointer-events-none shrink-0" />
           <!-- 分享模式下内容只读，不响应内部交互 -->
           <div
-            class="px-4 py-3 rounder-xl pointer-events-none min-w-0 flex-1 select-none group-hover:bg-N900/8"
+            class="px-4 py-3 rounded-xl pointer-events-none min-w-0 flex-1 select-none group-hover:bg-N900/8"
             :class="{ 'bg-N900/8': share.isSelected(round.key) }"
           >
             <ContentList v-for="message in round.messages" :key="message.id" :content-list="message.content" />

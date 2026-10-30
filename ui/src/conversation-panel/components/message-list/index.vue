@@ -53,7 +53,6 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
             </el-avatar>
           </div>
           <ContentList :content-list="msg.content" />
-          <!-- TODO 这块写用户的操作 -->
         </div>
         <template v-else>
           <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
