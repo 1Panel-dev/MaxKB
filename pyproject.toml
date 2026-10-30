@@ -22,7 +22,7 @@ dependencies = [
     "langchain==1.4.7",
     "langchain-anthropic==1.7.7",
     "langchain-aws==1.9.1",
-    "langchain-core==1.7.1",
+    "langchain-core==1.7.3",
     "langchain-google-genai==4.4.2",
     "langchain-huggingface==1.2.3",
     "langchain-mcp-adapters==0.3.2",

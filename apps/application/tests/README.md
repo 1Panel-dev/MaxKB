@@ -124,3 +124,24 @@ VLLM_RERANK_TEST_URL=http://127.0.0.1:49646/vllm \
 使用上面的 LangChain 模拟与三模块定向测试命令，共 46 项全部通过，无跳过，包含全部
 7 项 Bedrock 测试。模拟记录 19 次请求（17 次成功、2 次预期 429），其中 Bedrock 9 次。
 Ruff lint/格式检查通过；未调用真实云服务，未验证 IAM 权限、真实账单或数据库持久化。
+
+### LangChain Core 1.7.3 升级（2026-10-30）
+
+三个仓库同步升级 `langchain-core 1.7.1 → 1.7.3`，仅连带更新 `certifi → 2026.10.23`。
+新增的混合内容分片回归在 1.7.1 上复现原始消息被修改的问题，升级后通过；
+验证列表内容块后接字符串分片时，原消息、文本输出及 usage 均保持正确。
+
+启动上述 `langchain-compatibility.sim.yaml` 本地模拟后，从集成仓库根目录运行：
+
+```bash
+LANGCHAIN_COMPAT_TEST_URL=http://127.0.0.1:49645/provider \
+DEEPSEEK_TOOL_IMAGE_TEST_URL=http://127.0.0.1:49645/deepseek/v1 \
+  uv run python apps/manage.py test application.tests.test_langchain_compatibility \
+  application.tests.test_ai_chat_tool_output models_provider.tests.test_deepseek_tool_images \
+  xpack.tests.test_aibot_events --noinput
+```
+
+51 项全部通过、无跳过：社区模块 47 项（含全部 7 项 Bedrock），企业微信事件 4 项。
+模拟记录 19 次请求（17 次成功、2 次预期 429），其中 Bedrock 9 次。Ruff、三份锁文件和
+已安装依赖检查通过。另以新旧 certifi 对 9 个默认公共端点执行匿名 TLS 握手，18 次均通过；
+真实模型业务调用、IAM、生产容器、自定义网关及企业代理仍不在验证范围内。

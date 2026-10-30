@@ -140,6 +140,29 @@ class LangChainMessageCompatibilityTests(SimpleTestCase):
         self.assertEqual("".join(call.args[0].content for call in node.write.call_args_list), "你好")
         self.assertEqual([chunk.model_dump() for chunk in chunks], before)
 
+    async def test_mixed_content_chunks_do_not_mutate_source_messages(self):
+        node, context = llm_node()
+        chunks = [
+            AIMessageChunk(content=[{"type": "thinking", "thinking": "private"}]),
+            AIMessageChunk(content="你"),
+            AIMessageChunk(content="好", usage_metadata={"input_tokens": 3, "output_tokens": 2, "total_tokens": 5}),
+        ]
+        before = [chunk.model_dump() for chunk in chunks]
+
+        async def stream(_messages):
+            for chunk in chunks:
+                yield chunk
+
+        model = MagicMock()
+        model.astream.side_effect = stream
+        await node._stream_response(model, model, [])
+
+        self.assertEqual(context["content"], "你好")
+        self.assertEqual(context["usage"], {"prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5})
+        output = [call.args[0] for call in node.write.call_args_list]
+        self.assertEqual("".join(item.content for item in output if isinstance(item, TextContent)), "你好")
+        self.assertEqual([chunk.model_dump() for chunk in chunks], before)
+
     def test_shell_output_truncates_by_utf8_bytes_without_broken_characters(self):
         with TemporaryDirectory(prefix="maxkb-shell-compat-") as directory:
             backend = sandbox_shell.SandboxShellBackend(root_dir=directory, max_output_bytes=8)
