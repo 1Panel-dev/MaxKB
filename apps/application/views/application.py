@@ -20,6 +20,7 @@ from application.api.application_api import (
     ApplicationQueryAPI,
     ApplicationImportAPI,
     ApplicationExportAPI,
+    ApplicationExportSkillsAPI,
     ApplicationOperateAPI,
     ApplicationEditAPI,
     TextToSpeechAPI,
@@ -204,6 +205,39 @@ class ApplicationAPI(APIView):
             return ApplicationOperateSerializer(
                 data={"application_id": application_id, "workspace_id": workspace_id, "user_id": request.user.id}
             ).export()
+
+    class ExportSkills(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["GET"],
+            description=_("Export application as skills"),
+            summary=_("Export application as skills"),
+            operation_id=_("Export application as skills"),  # type: ignore
+            parameters=ApplicationExportSkillsAPI.get_parameters(),
+            request=None,
+            responses=ApplicationExportSkillsAPI.get_response(),
+            tags=[_("Application")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_EXPORT.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        @log(
+            menu="Application",
+            operate="Export application as skills",
+            get_operation_object=lambda r, k: get_application_operation_object(k.get("application_id")),
+        )
+        def get(self, request: Request, workspace_id: str, application_id: str):
+            return ApplicationOperateSerializer(
+                data={"application_id": application_id, "workspace_id": workspace_id, "user_id": request.user.id}
+            ).export_skills(request.query_params.get("base_url") or request.build_absolute_uri("/"))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

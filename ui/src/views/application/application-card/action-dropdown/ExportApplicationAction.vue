@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
+import { ElMessageBox } from 'element-plus'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { ApplicationDetail, ExportError } from '@/api/types'
-import { MsgError, MsgSuccess } from '@/utils/message'
+import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'ExportApplicationAction' })
 
@@ -15,18 +16,45 @@ const loading = defineModel<boolean>('loading', { default: false })
 const exportTriggerRef = useTemplateRef<HTMLDivElement>('exportTriggerRef')
 const exportMenuContainer = computed(() => exportTriggerRef.value?.closest<HTMLElement>('.el-dropdown__popper'))
 
+/** 让用户填写写入 Skills 的 MaxKB 访问地址。 */
+function promptSkillsBaseUrl(baseUrl: string) {
+  return ElMessageBox.prompt('请填写 Agent 访问 MaxKB 使用的地址，例如 http://192.168.1.10:8080', '填写访问地址', {
+    inputValue: baseUrl,
+    inputPattern: /^https?:\/\/\S+$/,
+    inputErrorMessage: '请填写以 http:// 或 https:// 开头的地址',
+    confirmButtonText: '导出',
+    cancelButtonText: '取消',
+  }).then(({ value }) => value.trim())
+}
+
+/** 按访问地址导出 Skills；后端判定地址无效（400）时让用户重新填写后再导出。 */
+function exportSkills(baseUrl: string): Promise<unknown> {
+  return props.api.exportApplicationSkills(props.application.id, props.application.name, baseUrl).catch((error: ExportError) => {
+    const status = error.response?.status
+    if (status === 400) return promptSkillsBaseUrl(baseUrl).then(exportSkills)
+    if (status && status !== 403) {
+      return error.response.data.text().then((response: string) => {
+        MsgError(`导出失败：${JSON.parse(response).message}`)
+      })
+    }
+  })
+}
+
 function handleExportSkills() {
   if (loading.value) return
   loading.value = true
-  return props.api
-    .exportApplicationSkills(props.application.id, props.application.name)
-    .then(() => {
-      MsgSuccess('Skills 导出已模拟完成，暂不生成文件')
-    })
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+  // 默认使用当前页面地址，取不到时先让用户填写
+  const origin = window.location.origin
+  const baseUrl = origin && origin !== 'null' ? Promise.resolve(origin) : promptSkillsBaseUrl('')
+  return (
+    baseUrl
+      .then(exportSkills)
+      // 用户取消填写时静默结束
+      .catch(() => {})
+      .finally(() => {
+        loading.value = false
+      })
+  )
 }
 
 function handleExportApplication() {
@@ -60,7 +88,7 @@ function handleExportApplication() {
       </div>
       <template #dropdown>
         <MkDropdownMenu>
-          <!-- 模拟导出为 Skills -->
+          <!-- 导出为 Skills 压缩包 -->
           <MkDropdownItem :disabled="loading" @click="handleExportSkills">导出为 Skills</MkDropdownItem>
           <!-- 导出智能体文件 -->
           <MkDropdownItem :disabled="loading" @click="handleExportApplication">导出智能体</MkDropdownItem>

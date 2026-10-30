@@ -1,19 +1,27 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： application.py
-    @date：2025/5/26 16:59
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： application.py
+@date：2025/5/26 16:59
+@desc:
 """
+
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework import serializers
 
-from application.serializers.application import ApplicationCreateSerializer, ApplicationListResponse, \
-    ApplicationImportRequest, ApplicationEditSerializer, TextToSpeechRequest, SpeechToTextRequest, PlayDemoTextRequest, \
-    BatchCleanTimeSerializer
+from application.serializers.application import (
+    ApplicationCreateSerializer,
+    ApplicationListResponse,
+    ApplicationImportRequest,
+    ApplicationEditSerializer,
+    TextToSpeechRequest,
+    SpeechToTextRequest,
+    PlayDemoTextRequest,
+    BatchCleanTimeSerializer,
+)
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, ResultPageSerializer, DefaultResultSerializer
 from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
@@ -46,58 +54,58 @@ class ApplicationQueryAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="current_page",
                 description=_("Current page"),
                 type=OpenApiTypes.INT,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="page_size",
                 description=_("Page size"),
                 type=OpenApiTypes.INT,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="folder_id",
                 description=_("folder id"),
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="name",
                 description=_("Application Name"),
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="desc",
                 description=_("Application Description"),
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="user_id",
                 description=_("User ID"),
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="publish_status",
-                description=_("Publish status") + '(published|unpublished)',
+                description=_("Publish status") + "(published|unpublished)",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
-            )
+            ),
         ]
 
     @staticmethod
@@ -117,7 +125,7 @@ class ApplicationCreateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             )
         ]
@@ -149,16 +157,16 @@ class ApplicationOperateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="application_id",
                 description="应用id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
-            )
+            ),
         ]
 
 
@@ -170,10 +178,11 @@ class ApplicationBatchOperateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             )
         ]
+
     @staticmethod
     def get_request():
         return BatchSerializer
@@ -201,6 +210,25 @@ class ApplicationEditAPI(APIMixin):
     @staticmethod
     def get_request():
         return ApplicationEditSerializer
+
+
+class ApplicationExportSkillsAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            *ApplicationOperateAPI.get_parameters(),
+            OpenApiParameter(
+                name="base_url",
+                description="MaxKB 访问地址（协议、主机、端口，可带路径前缀），缺省使用当前请求地址",
+                type=OpenApiTypes.STR,
+                location="query",
+                required=False,
+            ),
+        ]
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
 
 
 class TextToSpeechAPI(APIMixin):

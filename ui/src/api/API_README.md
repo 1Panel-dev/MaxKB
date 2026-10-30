@@ -395,8 +395,11 @@ API 对象和工作空间上下文，作为该抽屉的范围选择例外。Syst
   `putApplicationPortalDown(applicationId)` 分别向各自范围的 `application/<applicationId>/portal_up`、
   `application/<applicationId>/portal_down` 发送 PUT 请求（上下架接口与通用编辑接口分离），返回 `ApplicationDetail`。
   上架仅允许已发布（`is_publish`）的智能体；上下架分别受门户上架/下架权限控制。
-  `exportApplicationSkills(applicationId, applicationName)` 仍为本地 mock，返回 `{ application_id, name }`，
-  不发送请求或生成 Skills 文件，真实下载接口待接入。
+  `exportApplicationSkills(applicationId, applicationName, baseUrl?)` 通过 `getExportFile` GET 各自范围的
+  `application/<applicationId>/export_skills` 下载 Skills 压缩包，文件名优先取响应头，缺省为 `<applicationName>.zip`。
+  可选 `baseUrl` 以查询参数 `base_url` 传递 MaxKB 访问地址（协议、主机、端口，可带路径前缀），后端拼接对话路径后写入技能配置；
+  缺省按请求地址生成，地址无效时返回 400。
+  Workspace 后台已提供此接口；System 路径按资源管理前缀接入，当前仓库无对应后台路由，需部署环境联调确认。
 
 ### 智能体概览
 
