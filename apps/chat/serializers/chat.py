@@ -479,6 +479,9 @@ class ChatSerializers(serializers.Serializer):
         self.is_valid_chat_id(chat_info)
         if not self.data.get('debug'):
             self.is_valid_chat_user()
+        from application.serializers.application import validate_application_resource_permissions
+        # 按实际执行版本的所属用户校验每层依赖,避免聊天身份或子应用切换绕过资源授权。
+        validate_application_resource_permissions(chat_info.application.user_id, chat_info.application)
         if chat_info.application.type == ApplicationTypeChoices.SIMPLE:
             self.is_valid_application_simple(raise_exception=True, chat_info=chat_info)
             return self.chat_simple(chat_info, instance, base_to_response)

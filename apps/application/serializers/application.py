@@ -191,6 +191,8 @@ def get_bound_application_ids(instance: Dict) -> List[str]:
         application_ids.add(str(app_id))
 
     def collect(node_data):
+        if node_data.get("application_id"):
+            application_ids.add(str(node_data.get("application_id")))
         for app_id in node_data.get("application_ids") or []:
             application_ids.add(str(app_id))
 
@@ -273,18 +275,23 @@ def get_authorized_application_ids(user_id: str, workspace_id: str, application_
     工作空间管理员默认拥有全部应用权限;其他用户必须在 workspace_user_resource_permission
     中存在针对该应用的显式授权记录(默认拒绝)。
     """
-    if not application_ids:
+    if not application_ids or not user_id:
         return []
     application_ids = list({str(a) for a in application_ids})
+    workspace_application_ids = {
+        str(app_id) for app_id in QuerySet(Application).filter(
+            id__in=application_ids, workspace_id=workspace_id
+        ).values_list("id", flat=True)
+    }
     if is_workspace_manage(user_id, workspace_id):
-        return application_ids
+        return [app_id for app_id in application_ids if app_id in workspace_application_ids]
     granted_application_ids = {
         str(permission.target)
         for permission in QuerySet(WorkspaceUserResourcePermission).filter(
             workspace_id=workspace_id,
             user_id=user_id,
             auth_target_type=AuthTargetType.APPLICATION.value,
-            target__in=application_ids,
+            target__in=workspace_application_ids,
         )
         if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
     }
@@ -306,6 +313,10 @@ def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: D
             )
             raise AppApiException(403, str(message))
 
+    validate_bound_application_permissions(user_id, workspace_id, instance)
+
+
+def validate_bound_application_permissions(user_id: str, workspace_id: str, instance: Dict):
     application_ids = get_bound_application_ids(instance)
     if application_ids:
         authorized_application_ids = set(get_authorized_application_ids(user_id, workspace_id, application_ids))
@@ -318,6 +329,15 @@ def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: D
                 application_ids=", ".join(unauthorized_application_ids),
             )
             raise AppApiException(403, str(message))
+
+
+def validate_application_resource_permissions(user_id, application):
+    """校验实际保存或执行的应用配置;发布后的聊天使用应用所属用户的资源授权。"""
+    validate_bound_tool_permissions(user_id, application.workspace_id, {
+        key: getattr(application, key) for key in (
+            "work_flow", "tool_ids", "skill_tool_ids", "mcp_tool_ids", "application_ids"
+        )
+    })
 
 
 def get_base_node_work_flow(work_flow):
@@ -936,6 +956,7 @@ class ApplicationSerializer(serializers.Serializer):
         user_id = self.data.get("user_id")
         workspace_id = self.data.get("workspace_id")
         ApplicationCreateSerializer.SimplateRequest(data=instance).is_valid(user_id=user_id, raise_exception=True)
+        validate_bound_tool_permissions(user_id, workspace_id, instance)
         application_model = ApplicationCreateSerializer.SimplateRequest.to_application_model(
             user_id, workspace_id, instance
         )
@@ -968,6 +989,7 @@ class ApplicationSerializer(serializers.Serializer):
         except Exception as e:
             raise AppApiException(1001, _("Unsupported file format"))
         application = mk_instance.application
+        validate_bound_application_permissions(user_id, workspace_id, application)
         tool_list = mk_instance.get_tool_list()
         # 已存在且有权限的工具复用, 无权限或不存在则生成新id新建
         update_tool_map, tool_list = resolve_import_tools(tool_list, user_id, workspace_id)
@@ -1333,6 +1355,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         application = (
             QuerySet(Application).filter(id=self.data.get("application_id"), workspace_id=workspace_id).first()
         )
+        validate_application_resource_permissions(user_id, application)
         if application.type == ApplicationTypeChoices.WORK_FLOW:
             work_flow = application.work_flow
             if work_flow is None:
@@ -1592,6 +1615,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         except Exception as e:
             raise AppApiException(1001, _("Unsupported file format"))
         application = mk_instance.application
+        validate_bound_application_permissions(self.data.get("user_id"), app.workspace_id, application)
         tool_list = mk_instance.get_tool_list()
         # 已存在且有权限的工具复用, 无权限或不存在则生成新id新建
         update_tool_map, tool_list = resolve_import_tools(tool_list, self.data.get("user_id"), app.workspace_id)
