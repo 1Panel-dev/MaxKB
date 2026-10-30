@@ -6,9 +6,18 @@ import type { Action, UploadFile, UploadInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
-import ModelApi from '@/api/admin/workspace/model'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import WorkspaceModelApi from '@/api/admin/workspace/model'
+import SystemModelApi from '@/api/admin/system/resource-management/model'
+import SharedModelApi from '@/api/admin/system/shared-resources/model'
+import SystemKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import SharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import WorkspaceSharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
+import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import WorkspaceKnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import WorkspaceWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import WorkspaceSharedWorkflowApi from '@/api/admin/workspace/shared/knowledge/workflow'
+import SystemWorkflowApi from '@/api/admin/system/resource-management/knowledge/workflow'
+import SystemSharedWorkflowApi from '@/api/admin/system/shared-resources/knowledge/workflow'
 import type { DefaultModelSettingPayload, KnowledgeDetail, KnowledgeWorkflowDetail, WorkflowVersion, WorkflowStoreTemplate } from '@/api/types'
 import { MsgConfirm, MsgSuccess, MsgError, MsgWarning } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
@@ -24,6 +33,25 @@ import WorkflowImportDocumentDrawer from '@/views/knowledge-detail/library/docum
 import { goBack } from './navigation'
 
 defineOptions({ name: 'KnowledgeWorkflowView' })
+
+const requestApi = isSystemResource()
+  ? SystemWorkflowApi
+  : isSystemSharedResource()
+    ? SystemSharedWorkflowApi
+    : isWorkspaceSharedResource()
+      ? WorkspaceSharedWorkflowApi
+      : WorkspaceWorkflowApi
+
+// 页面请求和画布辅助查询保持当前路由的资源范围。
+const KnowledgeApi = isSystemResource()
+  ? SystemKnowledgeApi
+  : isSystemSharedResource()
+    ? SharedKnowledgeApi
+    : isWorkspaceSharedResource()
+      ? WorkspaceSharedKnowledgeApi
+      : WorkspaceKnowledgeApi
+const ModelApi = isSystemResource() ? SystemModelApi : isSystemSharedResource() ? SharedModelApi : WorkspaceModelApi
+provide('resourceScope', getResourceScope())
 
 // 为画布节点中的 SelectModel 提供参数表单接口。
 provide('getModelParamsForm', ModelApi.getModelParamsForm)
@@ -78,10 +106,11 @@ function saveKnowledgeWorkflow(graphData = getGraphData(), showMessage = false) 
 
   const workflowSnapshot = cloneDeep(graphData)
 
-  return KnowledgeWorkflowApi.putKnowledgeWorkflow(knowledgeId, {
-    work_flow: workflowSnapshot,
-    default_model_setting: cloneDeep(defaultModelSetting.value),
-  })
+  return requestApi
+    .putKnowledgeWorkflow(knowledgeId, {
+      work_flow: workflowSnapshot,
+      default_model_setting: cloneDeep(defaultModelSetting.value),
+    })
     .then((knowledgeWorkflow) => {
       defaultModelSetting.value = cloneDeep(knowledgeWorkflow.default_model_setting ?? {})
       savedDefaultModelSetting.value = cloneDeep(defaultModelSetting.value)
@@ -152,7 +181,7 @@ function handleUseTemplate(template: WorkflowStoreTemplate) {
   })
     .then(() => {
       loading.value = true
-      return KnowledgeWorkflowApi.putKnowledgeWorkflow(knowledgeId, { work_flow_template: cloneDeep(template) }).then(() => {
+      return requestApi.putKnowledgeWorkflow(knowledgeId, { work_flow_template: cloneDeep(template) }).then(() => {
         return loadKnowledgeWorkflow().then(() => {
           templateStoreButtonRef.value?.close()
           MsgSuccess('应用成功')
@@ -228,7 +257,7 @@ function handlePublish() {
   return workflowRef.value
     .validate()
     .then(() => saveKnowledgeWorkflow())
-    .then(() => KnowledgeWorkflowApi.putKnowledgeWorkflowPublish(knowledgeId))
+    .then(() => requestApi.putKnowledgeWorkflowPublish(knowledgeId))
     .then(() => {
       if (knowledgeDetail.value) knowledgeDetail.value.is_publish = true
       MsgSuccess('发布成功')
@@ -275,7 +304,7 @@ function handleImportWorkflow(uploadFile: UploadFile) {
     confirmButtonType: 'primary',
   })
     .then(() => {
-      return KnowledgeWorkflowApi.importKnowledgeWorkflow(knowledgeId, file).then(() => {
+      return requestApi.importKnowledgeWorkflow(knowledgeId, file).then(() => {
         return loadKnowledgeWorkflow().then(() => MsgSuccess('导入成功'))
       })
     })
@@ -293,7 +322,7 @@ async function handleExportWorkflow() {
   loading.value = true
   try {
     if (hasUnsavedChanges()) await saveKnowledgeWorkflow()
-    await KnowledgeWorkflowApi.exportKnowledgeWorkflow(knowledgeId, knowledgeDetail.value.name)
+    await requestApi.exportKnowledgeWorkflow(knowledgeId, knowledgeDetail.value.name)
   } catch {
     MsgError('导出工作流失败')
   } finally {
@@ -449,9 +478,10 @@ onBeforeUnmount(stopAutoSave)
               <span>导出工作流</span>
             </MkDropdownItem>
             <!-- 查看执行记录 -->
-            <ButtonExecutionRecord divided :knowledge-id="knowledgeId" />
+            <ButtonExecutionRecord :api="requestApi" divided :knowledge-id="knowledgeId" />
             <!-- 发布历史 -->
             <ButtonPublishHistory
+              :api="requestApi"
               :visible="historyVisible"
               @update:visible="handleHistoryVisibleChange"
               :knowledge-id="knowledgeId"
@@ -492,6 +522,6 @@ onBeforeUnmount(stopAutoSave)
       @closed="importDocumentDrawerMounted = false"
     />
     <!-- 调试抽屉 -->
-    <DebugDrawer ref="debugDrawerRef" :knowledge-id="knowledgeId" />
+    <DebugDrawer :api="requestApi" ref="debugDrawerRef" :knowledge-id="knowledgeId" />
   </WorkflowViewLayout>
 </template>

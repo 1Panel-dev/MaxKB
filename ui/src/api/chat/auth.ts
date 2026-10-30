@@ -67,6 +67,11 @@ const getDingTalkCallback = (code: string, accessToken?: string) => {
   return get<ChatLoginResponse>('/auth/dingtalk', accessToken ? { code, accessToken } : { code })
 }
 
+/** 使用钉钉客户端授权码登录；传入 accessToken 时登录到对应应用。 */
+const getDingTalkOauthCallback = (code: string, accessToken?: string) => {
+  return get<ChatLoginResponse>('/auth/dingtalk/oauth2', accessToken ? { code, accessToken } : { code })
+}
+
 /**
  * 获取应用登录验证码；无需验证码时返回空字符串。
  * 后端以 `accessToken` 查询参数接收应用令牌，且仅支持应用场景。
@@ -89,6 +94,7 @@ export default {
   getExternalAuthSetting,
   getQrCodeSources,
   getDingTalkCallback,
+  getDingTalkOauthCallback,
   getCaptcha,
   postLogout,
 }

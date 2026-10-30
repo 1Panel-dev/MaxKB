@@ -41,7 +41,7 @@ router.beforeEach(async (to, from) => {
     }
     if (!auth.isAuthenticated) {
       auth.clearToken()
-      return { name: 'login', query: { redirect: to.fullPath } }
+      return { name: 'login', query: { redirect: to.fullPath, client: to.query.client, corpId: to.query.corpId } }
     }
     if (!user.userInfo) {
       await auth.loadAuthBaseProfile()

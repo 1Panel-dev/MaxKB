@@ -29,3 +29,8 @@ Chat 业务接口统一调用后端 v3 路由（`/chat/api/v3/...`）；文件�
 公钥取当前认证配置的 `rsa_key`；成功后当前 token 失效，调用方清理认证状态并重新导航。
 `getApiKey()` 与 `postApiKey()` 分别读取、重新生成 `/v3/api_key`，返回 `ChatUserApiKey`。
 首次读取由后端创建密钥；每个用户仅保留一个，重新生成后旧密钥立即失效。
+
+钉钉扫码登录 `getDingTalkCallback` 使用 `/auth/dingtalk`；客户端免密登录
+`getDingTalkOauthCallback` 使用 `/auth/dingtalk/oauth2`，传入 `code` 和可选的 `accessToken`。
+两者返回 `ChatLoginResponse`，由认证 Store 按场景保存 token；接口需部署端提供对应认证能力。
+`/auth/` 与 `/v3/auth/` 下的认证请求返回 401 时直接提示错误，不触发自动重新认证。

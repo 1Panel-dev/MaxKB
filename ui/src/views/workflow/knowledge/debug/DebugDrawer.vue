@@ -3,7 +3,7 @@ import { computed, provide, ref, useTemplateRef, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { AxiosProgressEvent } from 'axios'
 import type LogicFlow from '@logicflow/core'
-import KnowledgeWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
@@ -16,7 +16,7 @@ import Result from './action/Result.vue'
 
 defineOptions({ name: 'KnowledgeWorkflowDebugDrawer' })
 
-const props = defineProps<{ knowledgeId: string }>()
+const props = defineProps<{ api: typeof WorkflowApi; knowledgeId: string }>()
 const router = useRouter()
 const route = useRoute()
 
@@ -88,7 +88,7 @@ function submit() {
     .validate()
     .then(() => {
       formPayload.value[step] = actionRef.value?.getData() ?? {}
-      return KnowledgeWorkflowApi.postKnowledgeWorkflowDebug(props.knowledgeId, formPayload.value).then((action) => {
+      return props.api.postKnowledgeWorkflowDebug(props.knowledgeId, formPayload.value).then((action) => {
         actionId.value = action.id
         active.value = 'result'
       })
@@ -160,6 +160,7 @@ defineExpose({ open, close })
       <keep-alive :key="actionKey" :include="['DataSource', 'KnowledgeBase']">
         <component
           :is="actionComponents[active]"
+          :api="api"
           ref="actionRef"
           v-model:loading="loading"
           :workflow="currentWorkflow"

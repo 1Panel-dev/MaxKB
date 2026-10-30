@@ -346,6 +346,8 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   工具使用 debug Drawer、SSE 和执行详情；知识库保留任务轮询与导入 Action。
   智能体画布按 Workspace／System 资源管理选择详情、保存、发布、模型和历史 API；DebugPanel 尚未按 System 范围适配。
   客户端停止读取不等于服务端停止任务。
+- 知识库工作流入口页按四种资源范围选择工作流 API，通过 `api` Props 向调试、历史与执行记录组件逐层传递；详情查询与画布范围同步路由，
+  System 模型使用对应范围接口，Workspace 共享暂沿用 Workspace 模型设置接口，画布辅助资源查询尚未适配。
 - 知识库导出仅工作流 `.kbwf`；导入确认覆盖后直接上传，不先保存旧草稿，成功重载；取消／失败保留图。
   正式导入文档要求已发布；转换使用 Knowledge API，保留已有文档，不能用保存代替转换。
 - 返回方法集中在各资源 `navigation.ts`；历史模式先退出预览，编辑态保留保存并退出／直接退出确认。
@@ -465,6 +467,11 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - 登录页使用 `formEl.validate` 回调和清晰的 LDAP／本地分支，不额外抽象或改写提交控制流程。
   Admin 与 Chat 登录页共用 `login/components/LoginModePanel.vue` 及其账号／扫码登录组件，
   组件不直接引用某个入口的 Store 或 API；接口、回调地址与登录后跳转由页面传入的 `LoginService` 提供。
+- Admin 与 Chat 登录页通过 `login/dingtalk-client-login.ts` 处理 `client=dingtalk&corpId=...`
+  的钉钉客户端免密入口，按需加载 SDK 获取授权码，再调用各入口认证 Store 的
+  `loginWithDingTalkClient(code)`；页面统一使用 async／await 完成授权、登录和成功跳转，失败恢复普通登录。
+  客户端免登不在登录服务或扫码组件中触发，避免外观预览发起授权。
+  Admin 与 Chat 登录成功统一使用替换导航，优先返回 `redirect` 记录的站内原地址，没有时进入各自场景首页。
 - Chat／Portal 页面以 auth token 为面板 key，token 变化重建并加载用户档案；路由认证见路由文档。
   会话装配在 conversation-panel，列表 Store 不感知 Router；门户复用 chat 装配，保留各智能体最近会话分组。
   账户菜单位于 `conversation-panel/left-sidebar/account-menu/index.vue`，单应用与门户共用；直接调用 Chat API 的 `postLogout()`，成功后清理当前认证场景并重新导航，由守卫处理后续认证。

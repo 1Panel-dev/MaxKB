@@ -24,7 +24,7 @@ function isUnknownPortalPath(to: RouteLocationNormalized) {
 }
 
 function getLoginRoute(scope: string, to: RouteLocationNormalized) {
-  const query = { redirect: to.fullPath }
+  const query = { redirect: to.fullPath, client: to.query.client, corpId: to.query.corpId }
   return scope === PORTAL_AUTH_SCOPE ? { name: 'portal-login', query } : { name: 'chat-login', params: { accessToken: scope }, query }
 }
 
