@@ -1337,6 +1337,12 @@ msgstr ""
 msgid "Export application"
 msgstr ""
 
+msgid "Export application as skills"
+msgstr ""
+
+msgid "Invalid MaxKB address"
+msgstr ""
+
 #: apps/application/views/application.py:140
 #: apps/application/views/application.py:141
 #: apps/application/views/application.py:142

@@ -1344,6 +1344,12 @@ msgstr "導入智能體"
 msgid "Export application"
 msgstr "導出智能體"
 
+msgid "Export application as skills"
+msgstr "導出為 Skills"
+
+msgid "Invalid MaxKB address"
+msgstr "MaxKB 訪問地址無效"
+
 #: apps/application/views/application.py:140
 #: apps/application/views/application.py:141
 #: apps/application/views/application.py:142

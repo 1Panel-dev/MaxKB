@@ -31,9 +31,11 @@ const exportApplication = (applicationId: string, applicationName: string) => {
   return getExportFile(`${applicationName}.mk`, `${prefix}/${applicationId}/export`)
 }
 
-/** 模拟 System 资源管理智能体 Skills 导出；TODO：接入真实下载接口。 */
-const exportApplicationSkills = (applicationId: string, applicationName: string) =>
-  Promise.resolve({ application_id: applicationId, name: applicationName })
+/** 导出系统资源管理智能体为 Skills 压缩包；文件名优先使用后端返回的技能名称。 */
+// TODO：当前仓库未提供 System 路由，需在部署环境确认 export_skills 路径。
+const exportApplicationSkills = (applicationId: string, applicationName: string, baseUrl?: string) => {
+  return getExportFile(`${applicationName}.zip`, `${prefix}/${applicationId}/export_skills`, baseUrl ? { base_url: baseUrl } : undefined)
+}
 
 /** System 资源管理智能体上架到门户（仅已发布可上架）。 */
 const putApplicationPortalUp = (applicationId: string) => put<Record<string, never>, ApplicationDetail>(`${prefix}/${applicationId}/portal_up`)

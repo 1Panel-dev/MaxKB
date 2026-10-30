@@ -1233,6 +1233,18 @@ class ApplicationOperateSerializer(serializers.Serializer):
         except Exception as e:
             return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def export_skills(self, site_url, with_valid=True):
+        if with_valid:
+            self.is_valid()
+        from application.serializers.application_skill import build_application_skill_zip, get_chat_base_url
+
+        base_url = get_chat_base_url(site_url)
+        application = QuerySet(Application).filter(id=self.data.get("application_id")).first()
+        skill_name, content = build_application_skill_zip(application, base_url)
+        response = HttpResponse(content_type="application/zip", content=content)
+        response["Content-Disposition"] = f'attachment; filename="{skill_name}.zip"'
+        return response
+
     @staticmethod
     def to_tool_dict(tool, tool_workflow_dict):
         if tool.tool_type == ToolType.WORKFLOW:
