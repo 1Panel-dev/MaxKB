@@ -123,10 +123,7 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <ApplicationIcon :icon="row.icon" :size="20" class="shrink-0" />
-              <!-- 查看智能体详情 -->
-              <el-link class="min-w-0" @click="handleOpenApplication(row)">
-                <span class="truncate">{{ row.name }}</span>
-              </el-link>
+              <span class="truncate">{{ row.name }}</span>
             </div>
           </template>
         </el-table-column>
