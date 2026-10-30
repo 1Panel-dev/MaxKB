@@ -7,6 +7,7 @@ import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import { getFileExtension, resetUrl } from '@/utils/icon'
 import { formatFileSize } from '@/utils/number'
 import { downloadByURL } from '@/utils/common'
+import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'ConversationQuestionContent' })
 
@@ -44,7 +45,7 @@ function getAttachmentDescription(file: QuestionAttachment) {
 </script>
 
 <template>
-  <div class="mk-conversation-question-content space-y-3">
+  <div class="mk-conversation-question-content group/question space-y-3 cursor-pointer">
     <!-- 查看已发送附件，超出当前宽度时自动换行。 -->
     <div v-if="attachments.length" class="flex-wrap max-w-full justify-end gap-2">
       <template v-for="file in attachments" :key="file.key">
@@ -81,5 +82,12 @@ function getAttachmentDescription(file: QuestionAttachment) {
       </template>
     </div>
     <div v-if="content.content" class="mk-gray-card-lg max-w-full py-3! whitespace-pre-wrap wrap-anywhere">{{ content.content }}</div>
+    <!-- TODO 用户的操作 -->
+    <div class="h-8 -mt-3 flex items-center justify-end invisible group-hover/question:visible">
+      <!-- 复制提问 -->
+      <el-button text @click="copyText(content.content)">
+        <MkIcon name="icon_copy_outlined" />
+      </el-button>
+    </div>
   </div>
 </template>

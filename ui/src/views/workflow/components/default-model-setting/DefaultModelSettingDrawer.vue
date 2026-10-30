@@ -151,7 +151,6 @@ function handleApplyToAll() {
   if (props.disabled || applying.value) return
   applying.value = true
   return MsgConfirm('应用到所有节点', '将把所有节点的模型来源统一改为「默认模型」，会覆盖它们当前的「自定义 / 引用变量」，请谨慎操作。', {
-    type: 'warning',
     confirmButtonText: '应用',
     confirmButtonType: 'primary',
   })
