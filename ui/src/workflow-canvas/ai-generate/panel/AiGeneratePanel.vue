@@ -3,7 +3,8 @@ import { computed, inject, nextTick, onBeforeUnmount, ref, useTemplateRef } from
 import { useRoute } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { ScrollbarInstance } from 'element-plus'
-import type { DefaultModelSettingPayload, ModelItem } from '@/api/types'
+import type { DefaultModelSettingPayload, ModelItem, ModelProviderItem } from '@/api/types'
+import SelectModel from '@/components/business/select-model/index.vue'
 import ContentList from '@/conversation-panel/components/content-list/index.vue'
 import { inputShortcut } from '@/conversation-panel/core/shortcuts'
 import { MsgError, MsgSuccess } from '@/utils/message'
@@ -38,6 +39,7 @@ const status = ref<GenerateStatus>('idle')
 const requirement = ref('')
 const modelId = ref('')
 const modelOptions = ref<ModelItem[]>([])
+const providerOptions = ref<ModelProviderItem[]>([])
 const scrollbarRef = useTemplateRef<ScrollbarInstance>('scrollbarRef')
 const activity = createActivity()
 const busy = computed(() => status.value === 'running')
@@ -46,9 +48,9 @@ const started = computed(() => status.value !== 'idle')
 let agent: AgentHandle | null = null
 
 function loadModels() {
-  store
-    .getModelListWithShared({ model_type: 'LLM' })
-    .then((models) => {
+  Promise.all([store.getModelListWithShared({ model_type: 'LLM' }), store.getProviderList()])
+    .then(([models, providers]) => {
+      providerOptions.value = providers
       modelOptions.value = models
       if (!modelId.value) {
         const defaultModelId = props.defaultModelSettings?.LLM?.model_id
@@ -147,47 +149,44 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <!-- 生成面板挂载到 body，固定定位并避开工作流工具栏。 -->
-  <Teleport to="body">
-    <div
-      v-if="visible"
-      class="fixed top-header mt-4 right-4 bottom-4 z-20 flex w-105 flex-col rounded-xl border border-N300 bg-white shadow-lg"
-      @keydown.stop
-      @paste.stop
-    >
-      <div class="flex-between shrink-0 border-b border-N300 px-4 py-3">
+  <MkDrawer
+    v-model="visible"
+    title="AI 生成"
+    size="480"
+    class="top-header! h-layout-content! max-w-full rounded-tl-xl!"
+    content-class="h-full p-0!"
+    :modal="false"
+    modal-penetrable
+    :lock-scroll="false"
+  >
+    <template #header>
+      <div class="flex-between flex-1">
         <h4 class="flex-align-center gap-2">
           <MkIcon name="icon_star_colorful" />
           AI 生成
         </h4>
-        <div class="flex-align-center gap-1">
-          <!-- 新建生成会话 -->
-          <el-button text :disabled="busy || !started" @click="reset">
-            <MkIcon name="icon_new-chat_outlined" />
-          </el-button>
-          <!-- 关闭生成面板 -->
-          <el-button text :disabled="busy" @click="close">
-            <MkIcon name="icon_close_outlined" />
-          </el-button>
-        </div>
+        <!-- 新建生成会话 -->
+        <el-button text :disabled="busy || !started" @click="reset" class="mr-2">
+          <MkIcon name="icon_new-chat_outlined" size="18" />
+        </el-button>
       </div>
-
-      <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1">
-        <div class="space-y-3 p-4">
+    </template>
+    <div class="flex h-full flex-col" @keydown.stop @paste.stop>
+      <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1 p-4">
+        <div class="space-y-3">
           <p v-if="!started" class="mk-gray-card text-N600">
             描述你想要的智能体，例如：“做一个产品客服，先查产品知识库回答，查不到时礼貌兜底”。AI
             会规划流程、添加节点、连线并完成配置，生成后请检查再保存。
           </p>
           <ContentList v-else :content-list="activity.activityItems.value" />
           <div v-if="busy" class="flex-align-center gap-2 text-N600">
-            <LoadingIcon :size="16" />
             <span class="mk-dotting">{{ activity.lastActivity.value || '生成中' }}</span>
           </div>
           <p v-if="status === 'stopped'" class="text-N500">已停止生成</p>
         </div>
       </el-scrollbar>
 
-      <div class="mk-input-box border transition-colors hover:border-primary focus-within:border-primary">
+      <div class="mk-input-box m-4 mt-0 border border-N350/60 shadow-lg transition-colors focus-within:border-primary/60">
         <el-input
           v-model="requirement"
           type="textarea"
@@ -197,10 +196,16 @@ defineExpose({ open, close })
           :maxlength="10000"
           @keydown="handleKeydown"
         />
-        <div class="mt-2 flex-between">
-          <el-select class="w-37!" v-model="modelId" :disabled="started" placeholder="请选择模型" filterable :teleported="false">
-            <el-option v-for="model in modelOptions" :key="model.id" :label="model.name" :value="model.id" />
-          </el-select>
+        <div class="mt-4 flex-between">
+          <SelectModel
+            class="w-50!"
+            v-model="modelId"
+            :options="modelOptions"
+            :provider-options="providerOptions"
+            :disabled="started"
+            placeholder="请选择模型"
+            teleported
+          />
           <div>
             <!-- 停止生成 -->
             <el-button v-if="busy" circle type="primary" @click="stop">
@@ -214,5 +219,5 @@ defineExpose({ open, close })
         </div>
       </div>
     </div>
-  </Teleport>
+  </MkDrawer>
 </template>

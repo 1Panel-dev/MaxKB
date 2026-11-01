@@ -23,7 +23,7 @@ type QuestionContent = { content?: string } & Partial<Record<AttachmentField, Qu
 
 const props = defineProps<{ content: QuestionContent }>()
 
-// 合并各类已发送附件，统一换行排列；不依赖输入区的上传状态。
+// 非图片附件统一排列在上方，图片单独放在下方。
 const attachmentFields = ['document_list', 'image_list', 'audio_list', 'video_list', 'other_list'] as const
 const attachments = computed(() =>
   attachmentFields.flatMap((field) =>
@@ -36,6 +36,12 @@ const attachments = computed(() =>
     })),
   ),
 )
+const attachmentGroups = computed(() =>
+  [
+    { type: 'file', files: attachments.value.filter((file) => file.field !== 'image_list') },
+    { type: 'image', files: attachments.value.filter((file) => file.field === 'image_list') },
+  ].filter((group) => group.files.length > 0),
+)
 const imageSources = computed(() => attachments.value.filter((file) => file.field === 'image_list' && file.src).map((file) => file.src))
 
 function getAttachmentDescription(file: QuestionAttachment) {
@@ -46,42 +52,46 @@ function getAttachmentDescription(file: QuestionAttachment) {
 
 <template>
   <div class="mk-conversation-question-content group/question space-y-3 cursor-pointer">
-    <!-- 查看已发送附件，超出当前宽度时自动换行。 -->
-    <div v-if="attachments.length" class="flex-wrap max-w-full justify-end gap-2">
-      <template v-for="file in attachments" :key="file.key">
-        <div :class="file.field === 'image_list' ? 'shrink-0' : 'w-60 max-w-full'">
-          <!-- 查看图片 -->
-          <ImageUploadCard
-            v-if="file.field === 'image_list' && file.src"
-            :file="file"
-            :src="file.src"
-            :size="58"
-            :show-remove="false"
-            :preview-src-list="imageSources"
-            :initial-index="imageSources.indexOf(file.src)"
-            class="cursor-pointer"
-          />
-          <!-- 播放音频 -->
-          <MkAudio v-else-if="file.field === 'audio_list'" :src="file.src" :name="file.name">
-            <FileUploadCard :file="file" :description="getAttachmentDescription(file)" :show-remove="false" class="cursor-pointer rounded-lg!" />
-          </MkAudio>
-          <!-- 播放视频 -->
-          <MkVideo v-else-if="file.field === 'video_list'" :src="file.src" :name="file.name">
-            <FileUploadCard :file="file" :description="getAttachmentDescription(file)" :show-remove="false" class="cursor-pointer rounded-lg!" />
-          </MkVideo>
-          <!-- 下载文件 -->
-          <FileUploadCard
-            v-else-if="file.field !== 'image_list'"
-            :file="file"
-            :description="getAttachmentDescription(file)"
-            :show-remove="false"
-            class="cursor-pointer rounded-lg!"
-            @click="file.src && downloadByURL(file.src, file.name)"
-          />
+    <!-- 视频、音频和文档共用一行，图片在下方；超出当前宽度时自动换行。 -->
+    <div v-if="attachments.length" class="max-w-full space-y-2">
+      <template v-for="attachmentGroup in attachmentGroups" :key="attachmentGroup.type">
+        <div class="flex max-w-full flex-wrap justify-end gap-2">
+          <template v-for="file in attachmentGroup.files" :key="file.key">
+            <div :class="file.field === 'image_list' ? 'shrink-0' : 'w-60 max-w-full'">
+              <!-- 查看图片 -->
+              <ImageUploadCard
+                v-if="file.field === 'image_list' && file.src"
+                :file="file"
+                :src="file.src"
+                :size="58"
+                :show-remove="false"
+                :preview-src-list="imageSources"
+                :initial-index="imageSources.indexOf(file.src)"
+                class="cursor-pointer"
+              />
+              <!-- 播放音频 -->
+              <MkAudio v-else-if="file.field === 'audio_list'" :src="file.src" :name="file.name">
+                <FileUploadCard :file="file" :description="getAttachmentDescription(file)" :show-remove="false" class="cursor-pointer rounded-lg!" />
+              </MkAudio>
+              <!-- 播放视频 -->
+              <MkVideo v-else-if="file.field === 'video_list'" :src="file.src" :name="file.name">
+                <FileUploadCard :file="file" :description="getAttachmentDescription(file)" :show-remove="false" class="cursor-pointer rounded-lg!" />
+              </MkVideo>
+              <!-- 下载文件 -->
+              <FileUploadCard
+                v-else-if="file.field !== 'image_list'"
+                :file="file"
+                :description="getAttachmentDescription(file)"
+                :show-remove="false"
+                class="cursor-pointer rounded-lg!"
+                @click="file.src && downloadByURL(file.src, file.name)"
+              />
+            </div>
+          </template>
         </div>
       </template>
     </div>
-    <div v-if="content.content" class="mk-gray-card-lg max-w-full py-3! whitespace-pre-wrap wrap-anywhere">{{ content.content }}</div>
+    <div v-if="content.content" class="mk-gray-card-lg ml-auto w-fit max-w-full py-3! whitespace-pre-wrap wrap-anywhere">{{ content.content }}</div>
     <!-- TODO 用户的操作 -->
     <div class="h-8 -mt-3 flex items-center justify-end invisible group-hover/question:visible">
       <!-- 复制提问 -->

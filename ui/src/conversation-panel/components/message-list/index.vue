@@ -37,7 +37,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
       <!-- 开场白在空会话或历史全部加载后显示，固定在会话最前 -->
       <div v-if="prologue && (!messages.length || !hasMore)">
         <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
-        <PrologueContent :prologue="prologue" :app-info="appInfo" />
+        <PrologueContent :prologue="prologue" :app-info="appInfo" class="mb-3" />
       </div>
     </template>
     <template v-for="(msg, i) in messages" :key="msg.id || i">

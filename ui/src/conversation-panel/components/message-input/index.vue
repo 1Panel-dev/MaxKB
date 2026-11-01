@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { getFileExtension, isAudio, isVideo } from '@/utils/icon'
-import { formatFileSize } from '@/utils/number'
+import { isAudio, isVideo } from '@/utils/icon'
 import { useInputEvents } from '../../core/input-events'
-import { useMessageInputStore, type FileItem } from './index'
-import FileUploadCard from '@/components/mk-drag-upload/FileUploadCard.vue'
+import { useMessageInputStore } from './index'
+import FileCard from './file-card/index.vue'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import UserForm from './user-form/index.vue'
 
@@ -20,7 +19,6 @@ const {
   imageFiles,
   addFiles,
   removeFile,
-  retryFile,
   send,
   stop,
 } = useMessageInputStore()
@@ -34,11 +32,6 @@ const { fileInputRef, handleFileSelect, handlePaste, handleDragover, handleDrop,
     if (canSend.value) send()
   },
 })
-// 对话附件保留类型与已上传大小文案，卡片负责统一展示。
-function getAttachmentDescription(file: FileItem) {
-  const uploaded = file.status === 'uploading' ? formatFileSize((file.size * (file.progress ?? 0)) / 100) + ' / ' : ''
-  return (getFileExtension(file.name) || '文件') + ' – ' + uploaded + formatFileSize(file.size)
-}
 </script>
 
 <template>
@@ -54,44 +47,24 @@ function getAttachmentDescription(file: FileItem) {
             :src="file.url || file.previewUrl"
             :size="58"
             :percentage="file.progress"
-            :disabled="disabled || streamLoading"
             :show-error="false"
-            @retry="retryFile(file)"
             @remove="removeFile(index)"
           />
           <!-- 音频 -->
           <MkAudio v-else-if="isAudio(file.name)" :src="file.previewUrl || file.url || ''" :name="file.name">
-            <FileUploadCard
-              :file="file"
-              :description="getAttachmentDescription(file)"
-              :percentage="file.progress"
-              :disabled="disabled || streamLoading"
-              class="w-60 cursor-pointer rounded-lg!"
-              @retry="retryFile(file)"
-              @remove="removeFile(index)"
-            />
+            <FileCard :file="file" :percentage="file.progress" class="w-60 cursor-pointer rounded-lg!" @remove="removeFile(index)" />
           </MkAudio>
           <!-- 视频 -->
           <MkVideo v-else-if="isVideo(file.name)" :src="file.previewUrl || file.url || ''" :name="file.name">
-            <FileUploadCard
-              :file="file"
-              :description="getAttachmentDescription(file)"
-              :percentage="file.progress"
-              :disabled="disabled || streamLoading"
-              class="w-60 cursor-pointer rounded-lg!"
-              @retry="retryFile(file)"
-              @remove="removeFile(index)"
-            />
+            <FileCard :file="file" :percentage="file.progress" class="w-60 cursor-pointer rounded-lg!" @remove="removeFile(index)" />
           </MkVideo>
           <!-- 文档 -->
-          <FileUploadCard
+          <FileCard
             v-else
             :file="file"
-            :description="getAttachmentDescription(file)"
             :percentage="file.progress"
             :disabled="disabled || streamLoading"
-            class="w-60 rounded-lg!"
-            @retry="retryFile(file)"
+            class="w-60 cursor-pointer rounded-lg!"
             @remove="removeFile(index)"
           />
         </div>

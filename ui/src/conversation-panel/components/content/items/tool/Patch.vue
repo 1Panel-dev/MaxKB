@@ -1,82 +1,16 @@
-<template>
-  <div class="tool-call">
-    <!-- 单文件 -->
-    <template v-if="files.length <= 1">
-      <button class="tc-head" @click="expanded = !expanded">
-        <svg class="tc-chevron" :class="{ open: expanded }" viewBox="0 0 16 16" fill="none">
-          <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span class="tc-icon" :class="{ spin: loading }">
-          <Loading v-if="loading" :size="14" />
-          <svg v-else viewBox="0 0 16 16" width="16" height="16" fill="none">
-            <path d="M2 3.5h12M2 8h12M2 12.5h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-          </svg>
-        </span>
-        <span class="tc-name">{{ singleTitle }}</span>
-        <template v-if="singleFile">
-          <span class="tc-stat add" v-if="singleFile.additions">+{{ singleFile.additions }}</span>
-          <span class="tc-stat del" v-if="singleFile.deletions">-{{ singleFile.deletions }}</span>
-        </template>
-      </button>
-      <Transition enter-active-class="tc-expand-enter" leave-active-class="tc-expand-leave">
-        <div v-if="expanded && singleFile" class="tc-body">
-          <ScrollDiff :file="singleFile" />
-        </div>
-      </Transition>
-    </template>
-
-    <!-- 多文件：汇总 + 每个文件独立展开 -->
-    <template v-else>
-      <button class="tc-head" @click="expanded = !expanded">
-        <svg class="tc-chevron" :class="{ open: expanded }" viewBox="0 0 16 16" fill="none">
-          <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span class="tc-icon" :class="{ spin: loading }">
-          <Loading v-if="loading" :size="14" />
-          <svg v-else viewBox="0 0 16 16" width="16" height="16" fill="none">
-            <path d="M2 3.5h12M2 8h12M2 12.5h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-          </svg>
-        </span>
-        <span class="tc-name">Edit {{ files.length }} files</span>
-        <span class="tc-stat add" v-if="summary.additions">+{{ summary.additions }}</span>
-        <span class="tc-stat del" v-if="summary.deletions">-{{ summary.deletions }}</span>
-      </button>
-      <Transition enter-active-class="tc-expand-enter" leave-active-class="tc-expand-leave">
-        <div v-if="expanded" class="tc-body">
-          <div ref="multiScrollRef" class="tc-files tc-scroll-files">
-            <div v-for="(file, i) in files" :key="`${file.status}:${file.newPath}:${i}`" class="tc-file-item">
-              <button class="tc-file-head" @click="toggleFile(i)">
-                <svg class="tc-chevron sm" :class="{ open: fileExpanded[i] }" viewBox="0 0 16 16" fill="none">
-                  <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <span class="tc-file-verb">{{ verb(file.status) }}</span>
-                <span class="tc-file-path">{{ file.newPath || file.oldPath }}</span>
-                <span class="tc-stat add" v-if="file.additions">+{{ file.additions }}</span>
-                <span class="tc-stat del" v-if="file.deletions">-{{ file.deletions }}</span>
-              </button>
-              <Transition enter-active-class="tc-expand-enter" leave-active-class="tc-expand-leave">
-                <div v-if="fileExpanded[i]" class="tc-file-body">
-                  <ScrollDiff :file="file" />
-                </div>
-              </Transition>
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </template>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, reactive, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import Loading from '@/conversation-panel/loading/index.vue'
+import type { ChatContent } from '@/api/types'
 import ScrollDiff from './components/ScrollDiff.vue'
 import { parsePatch } from './patch/parsePatch'
 import type { PatchFileStatus } from './patch/patchTypes'
 import { extractPartialJsonField } from './extract-partial-json'
 import { Scroll } from '@/conversation-panel/core/scroll'
 
-const props = defineProps<{ content: any; loading: boolean; expanded: boolean }>()
+defineOptions({ name: 'ConversationPatchContent' })
+
+const props = defineProps<{ content: ChatContent; loading: boolean }>()
+const expanded = defineModel<boolean>('expanded', { required: true })
 
 const multiScrollRef = ref<HTMLElement>()
 let multiScroll: Scroll | null = null
@@ -90,20 +24,20 @@ function initScroll() {
 }
 
 onMounted(() => {
-  if (props.expanded) initScroll()
+  if (expanded.value) initScroll()
 })
 
 watch(
-  () => props.expanded,
-  async (val) => {
-    if (val) {
-      await nextTick()
+  [expanded, multiScrollRef],
+  () => {
+    if (expanded.value && multiScrollRef.value) {
       initScroll()
     } else {
       multiScroll?.destroy()
       multiScroll = null
     }
   },
+  { flush: 'post' },
 )
 
 onBeforeUnmount(() => multiScroll?.destroy())
@@ -141,18 +75,10 @@ const summary = computed(() =>
   ),
 )
 
-const expanded = ref(props.expanded)
-watch(
-  () => props.expanded,
-  (val) => {
-    expanded.value = val
-  },
-)
+// 多文件分别保留展开状态，默认收起。
 const fileExpanded = reactive<Record<number, boolean>>({})
-
-function toggleFile(i: number) {
-  fileExpanded[i] = !fileExpanded[i]
-}
+const patchTitle = computed(() => (files.value.length > 1 ? `Edit ${files.value.length} files` : singleTitle.value))
+const patchStats = computed(() => singleFile.value ?? summary.value)
 
 function verb(status: PatchFileStatus) {
   const map: Record<PatchFileStatus, string> = {
@@ -169,162 +95,79 @@ function verb(status: PatchFileStatus) {
 }
 </script>
 
+<template>
+  <!-- 展开或收起文件差异 -->
+  <MkCollapse class="w-full" v-model:expanded="expanded" indicator-position="after" trigger-class="group text-N500! mb-2 w-fit hover:text-N900!">
+    <template #indicator="{ expanded }">
+      <MkIcon
+        name="icon_right_outlined"
+        :size="12"
+        class="transition-transform text-N500! group-hover:text-N900!"
+        :class="{ 'rotate-90': expanded }"
+      />
+    </template>
+    <template #label>
+      <span v-if="loading" class="mk-conversation-loading" />
+      <svg class="shrink-0" viewBox="0 0 16 16" width="16" height="16" fill="none">
+        <path d="M2 3.5h12M2 8h12M2 12.5h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+      </svg>
+      <span class="min-w-0 max-w-[300px] truncate" :title="patchTitle">{{ patchTitle }}</span>
+      <span v-if="patchStats.additions" class="tc-stat add">+{{ patchStats.additions }}</span>
+      <span v-if="patchStats.deletions" class="tc-stat del">-{{ patchStats.deletions }}</span>
+    </template>
+    <ScrollDiff v-if="expanded && singleFile" :file="singleFile" />
+    <div v-else-if="expanded && files.length > 1" ref="multiScrollRef" class="tc-files tc-scroll-files">
+      <template v-for="(file, index) in files" :key="`${file.status}:${file.newPath}:${index}`">
+        <!-- 展开或收起单个文件差异 -->
+        <MkCollapse
+          v-model:expanded="fileExpanded[index]"
+          :default-expanded="false"
+          class="py-0.5"
+          indicator-position="after"
+          trigger-class="group text-N500! mb-2 w-fit max-w-full hover:text-N900!"
+        >
+          <template #indicator="{ expanded }">
+            <MkIcon
+              name="icon_right_outlined"
+              :size="12"
+              class="transition-transform text-N500! group-hover:text-N900!"
+              :class="{ 'rotate-90': expanded }"
+            />
+          </template>
+          <template #label>
+            <span class="shrink-0 text-xs font-semibold">{{ verb(file.status) }}</span>
+            <span class="min-w-0 max-w-[300px] truncate font-mono text-xs text-N600" :title="file.newPath || file.oldPath">
+              {{ file.newPath || file.oldPath }}
+            </span>
+            <span v-if="file.additions" class="tc-stat add">+{{ file.additions }}</span>
+            <span v-if="file.deletions" class="tc-stat del">-{{ file.deletions }}</span>
+          </template>
+          <ScrollDiff v-if="fileExpanded[index]" :file="file" />
+        </MkCollapse>
+      </template>
+    </div>
+  </MkCollapse>
+</template>
+
 <style scoped>
-.tool-call {
-  width: 100%;
-}
-
-.tc-head {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--mk-N500);
-  transition: color 0.15s;
-  max-width: 100%;
-  overflow: hidden;
-}
-.tc-head:hover {
-  color: var(--mk-N900);
-}
-
-.tc-chevron {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  transition: transform 0.15s;
-}
-.tc-chevron.open {
-  transform: rotate(90deg);
-}
-.tc-chevron.sm {
-  width: 12px;
-  height: 12px;
-}
-
-.tc-icon {
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.tc-icon.spin {
-  color: var(--mk-N600);
-}
-
-.tc-name {
-  font-size: 13px;
-  font-weight: 500;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .tc-stat {
-  font-size: 11px;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   flex-shrink: 0;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 11px;
 }
 .tc-stat.add {
-  color: #16a34a;
+  color: var(--el-color-success-dark-2);
 }
 .tc-stat.del {
   color: var(--mk-danger);
-}
-
-.tc-expand-enter {
-  animation: tc-open 0.2s ease-out;
-  overflow: hidden;
-}
-.tc-expand-leave {
-  animation: tc-close 0.15s ease-in forwards;
-  overflow: hidden;
-}
-@keyframes tc-open {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 800px;
-  }
-}
-@keyframes tc-close {
-  from {
-    opacity: 1;
-    max-height: 800px;
-  }
-  to {
-    opacity: 0;
-    max-height: 0;
-  }
-}
-
-.tc-body {
-  padding: 6px 0 4px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 .tc-scroll-files {
   max-height: 400px;
   overflow-y: auto;
 }
-
 .tc-files {
   background: var(--mk-N100);
   border-radius: 6px;
-  overflow: hidden;
   padding: 6px 10px;
-}
-
-.tc-file-item {
-  padding: 2px 0;
-}
-
-.tc-file-head {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--mk-N500);
-  transition: color 0.15s;
-  max-width: 100%;
-  overflow: hidden;
-}
-.tc-file-head:hover {
-  color: var(--mk-N900);
-}
-
-.tc-file-verb {
-  font-size: 12px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.tc-file-path {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  font-size: 12px;
-  color: var(--mk-N600);
-}
-
-.tc-file-body {
 }
 </style>
