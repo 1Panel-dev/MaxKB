@@ -22,7 +22,7 @@ function navigateToWorkspaceMenu(workspaceMenuItem: LayoutMenuItem) {
     <div
       v-for="workspaceMenuItem in workspaceMenuItems"
       :key="workspaceMenuItem.name"
-      class="flex-col-center w-full cursor-pointer rounded-md py-2 text-xs font-semibold text-N600"
+      class="flex-col-center w-full cursor-pointer rounded-md py-2 text-xs font-semibold text-N600 hover:bg-N900/10"
       :class="isWorkspaceMenuActive(workspaceMenuItem) && 'bg-white text-N900'"
       @click="navigateToWorkspaceMenu(workspaceMenuItem)"
     >

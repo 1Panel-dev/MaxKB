@@ -43,13 +43,6 @@ const toolRenderer = computed(() => toolRenderers[(props.content.name || '').toL
 </script>
 
 <template>
-  <component
-    v-if="toolRenderer"
-    :is="toolRenderer"
-    :content="content"
-    :loading="loading"
-    v-model:expanded="isExpanded"
-    @toggle="isExpanded = !isExpanded"
-  />
+  <component v-if="toolRenderer" :is="toolRenderer" :content="content" :loading="loading" v-model:expanded="isExpanded" />
   <DefaultTool v-else :content="content" />
 </template>

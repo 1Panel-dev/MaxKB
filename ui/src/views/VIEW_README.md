@@ -341,8 +341,8 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - 智能体页面专属按钮组件放在 `workflow/application/components/`。
   `ButtonDebug` 组合调试按钮与对话模块 DebugPanel，通过页面传入的改动检查、画布校验、保存方法和共享 loading
   完成校验、保存后调试流程；每次打开调试都先校验画布，通过后仅保存未提交修改，校验失败提示原因且不保存、不打开调试；公开 `close()` 供页面其他操作关闭调试。
-  `ButtonAiGenerate` 组合 AI 生成按钮与生成面板；生成面板与调试面板一样自行 Teleport 到 body，
-  使用固定定位，顶部避开工作流工具栏。
+  `ButtonAiGenerate` 组合 AI 生成按钮与生成面板；生成面板复用 `MkDrawer`，与默认模型设置、发布历史一致，
+  右侧贴边并在顶部避开工作流工具栏；关闭保留会话记录，生成中禁止关闭。
   智能体工作流页面通过 `label` 传入 AI 生成、模板中心、默认模型设置、调试和发布历史入口文案。
   工具使用 debug Drawer、SSE 和执行详情；知识库保留任务轮询与导入 Action。
   智能体画布按 Workspace／System 资源管理选择详情、保存、发布、模型和历史 API；DebugPanel 尚未按 System 范围适配。

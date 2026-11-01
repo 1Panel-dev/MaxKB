@@ -19,6 +19,7 @@ const props = defineProps<{ content: ChatContent }>()
 
 // 相邻工具由 content-list 聚合，分组内按工具名选择专用展示。
 const toolItems = computed(() => props.content.children ?? [])
+const failedToolCount = computed(() => toolItems.value.filter((toolItem) => toolItem.status === 'FAIL' || toolItem.status === 'FAILURE').length)
 
 // 工具名（小写）→ 专用渲染器；新增工具时与 tool/index.vue 同步
 const toolRenderers: Dict<Component> = {
@@ -87,6 +88,11 @@ const isExpanded = computed({
     <template #label>
       <span v-if="groupStatus === 'running'" class="mk-conversation-loading" />
       <span>调用了 {{ toolItems.length }} 个工具</span>
+      <span v-if="failedToolCount">
+        （{{ failedToolCount }} 个
+        <span class="text-danger">失败</span>
+        ）
+      </span>
     </template>
 
     <div v-show="toolItems.length" class="bg-white border rounded-xl">

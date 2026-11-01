@@ -1,6 +1,7 @@
 import { ref, computed, reactive, watch, inject, type Ref, type InjectionKey } from 'vue'
 import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants/file-type'
 import { isImage, isDocument, isAudio, isVideo } from '@/utils/icon'
+import { MsgError } from '@/utils/message'
 import type { Dict } from '@/api/types'
 import type { ChatMessage, Conversation, ConversationAppInfo, SendMessageOptions } from '../../core/types'
 import { createUserFormStore } from './user-form/index'
@@ -113,7 +114,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     uploadAttachment(attachment)
   }
 
-  // 原文件重试复用上传流程；移除或切换会话后忽略旧请求的回调。
+  // 移除或切换会话后忽略旧请求的回调。
   const uploadAttachment = (attachment: FileItem) => {
     if (disabled.value || streamLoading.value || sending.value || attachment.status === 'uploading' || !fileList.value.includes(attachment)) return
     attachment.status = 'uploading'
@@ -137,15 +138,12 @@ export function createMessageInputStore(deps: MessageInputDeps) {
         attachment.progress = 100
         attachment.status = 'success'
       })
-      .catch(() => {
-        if (!fileList.value.includes(attachment)) return
-        attachment.status = 'fail'
-        attachment.errMsg = '上传失败'
+      .catch((error: unknown) => {
+        const index = fileList.value.indexOf(attachment)
+        if (index < 0) return
+        removeFile(index)
+        MsgError('上传失败')
       })
-  }
-
-  const retryFile = (attachment: FileItem) => {
-    if (attachment.status === 'fail') uploadAttachment(attachment)
   }
 
   const addFiles = (files: FileList | File[] | null | undefined) => {
@@ -266,7 +264,6 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     addFile,
     addFiles,
     removeFile,
-    retryFile,
     send,
     sendQuestion,
     stop,

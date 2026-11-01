@@ -1,42 +1,12 @@
-<template>
-  <div class="tool-call">
-    <button class="tc-head" @click="$emit('toggle')">
-      <svg class="tc-chevron" :class="{ open: expanded }" viewBox="0 0 16 16" fill="none">
-        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-      <span class="tc-icon" :class="{ spin: loading }">
-        <Loading v-if="loading" :size="14" />
-        <svg v-else viewBox="0 0 16 16" width="16" height="16" fill="none">
-          <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3" />
-          <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
-          <path d="M7 5v4M5 7h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" />
-        </svg>
-      </span>
-      <span class="tc-name">{{ pattern || 'glob' }}</span>
-      <span class="tc-param" v-if="dirPath">
-        <span class="tc-param-short">{{ dirPath }}/</span>
-        <span class="tc-param-full">{{ (args.path || '') + '/' }}</span>
-      </span>
-      <span class="tc-lines" v-if="summary">{{ summary }}</span>
-    </button>
-
-    <Transition enter-active-class="tc-expand-enter" leave-active-class="tc-expand-leave">
-      <div v-if="expanded && content.content" class="tc-body">
-        <div class="rf-block">
-          <pre class="rf-content">{{ content.content }}</pre>
-        </div>
-      </div>
-    </Transition>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
-import Loading from '@/conversation-panel/loading/index.vue'
+import type { ChatContent } from '@/api/types'
 import { extractPartialJsonFields } from './extract-partial-json'
 
-const props = defineProps<{ content: any; loading: boolean; expanded: boolean }>()
-defineEmits<{ toggle: [] }>()
+defineOptions({ name: 'ConversationGlobContent' })
+
+const props = defineProps<{ content: ChatContent; loading: boolean }>()
+const expanded = defineModel<boolean>('expanded', { required: true })
 
 const args = computed(() => {
   const raw = props.content.arguments
@@ -55,60 +25,40 @@ const dirPath = computed(() => {
 const summary = computed(() => props.content.summary || '')
 </script>
 
+<template>
+  <!-- 展开或收起文件搜索结果 -->
+  <MkCollapse class="w-full" v-model:expanded="expanded" indicator-position="after" trigger-class="group text-N500! mb-2 w-fit hover:text-N900!">
+    <template #indicator="{ expanded }">
+      <MkIcon
+        name="icon_right_outlined"
+        :size="12"
+        class="transition-transform text-N500! group-hover:text-N900!"
+        :class="{ 'rotate-90': expanded }"
+      />
+    </template>
+    <template #label>
+      <span v-if="loading" class="mk-conversation-loading" />
+      <svg class="shrink-0" viewBox="0 0 16 16" width="16" height="16" fill="none">
+        <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3" />
+        <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+        <path d="M7 5v4M5 7h4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" />
+      </svg>
+      <span class="min-w-0 max-w-[300px] truncate" :title="pattern || 'glob'">{{ pattern || 'glob' }}</span>
+      <span class="tc-param" v-if="dirPath">
+        <span class="tc-param-short">{{ dirPath }}/</span>
+        <span class="tc-param-full">{{ (args.path || '') + '/' }}</span>
+      </span>
+      <span class="shrink-0 font-mono text-xs text-N500" v-if="summary">{{ summary }}</span>
+    </template>
+    <div v-if="content.content" class="py-1">
+      <div class="rf-block">
+        <pre class="rf-content">{{ content.content }}</pre>
+      </div>
+    </div>
+  </MkCollapse>
+</template>
+
 <style scoped>
-.tool-call {
-  width: 100%;
-}
-
-.tc-head {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--mk-N500);
-  transition: color 0.15s;
-  max-width: 100%;
-  overflow: hidden;
-}
-.tc-head:hover {
-  color: var(--mk-N900);
-}
-
-.tc-chevron {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  transition: transform 0.15s;
-}
-.tc-chevron.open {
-  transform: rotate(90deg);
-}
-
-.tc-icon {
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.tc-icon.spin {
-  color: var(--mk-N600);
-}
-
-.tc-name {
-  font-size: 13px;
-  font-weight: 500;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .tc-param {
   font-size: 11px;
   color: var(--mk-N500);
@@ -129,46 +79,6 @@ const summary = computed(() => props.content.summary || '')
 
 .tc-param:hover .tc-param-full {
   display: inline;
-}
-
-.tc-lines {
-  font-size: 11px;
-  color: var(--mk-N500);
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  flex-shrink: 0;
-}
-
-.tc-expand-enter {
-  animation: tc-open 0.2s ease-out;
-  overflow: hidden;
-}
-.tc-expand-leave {
-  animation: tc-close 0.15s ease-in forwards;
-  overflow: hidden;
-}
-@keyframes tc-open {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 600px;
-  }
-}
-@keyframes tc-close {
-  from {
-    opacity: 1;
-    max-height: 600px;
-  }
-  to {
-    opacity: 0;
-    max-height: 0;
-  }
-}
-
-.tc-body {
-  padding: 4px 0;
 }
 
 .rf-block {

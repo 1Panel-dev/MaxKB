@@ -30,6 +30,8 @@ const statusType = computed(() => {
   return 'info'
 })
 
+const isFailed = computed(() => props.content.status === 'FAIL' || props.content.status === 'FAILURE')
+
 // 参数为 JSON 字符串，尝试格式化展示，失败则原样展示
 function tryFormatJson(value: unknown): string {
   if (value == null) return ''
@@ -68,7 +70,7 @@ const formattedResult = computed(() => tryFormatJson(props.content.content))
       <span v-if="loading" class="mk-conversation-loading" />
       <MkIcon name="icon_busy_outlined" />
       <span class="min-w-0 max-w-[300px] truncate" :title="toolTitle">{{ toolTitle }}</span>
-      <el-tag v-if="content.status" size="small" :type="statusType">{{ statusText }}</el-tag>
+      <el-tag v-if="isFailed" size="small" :type="statusType">{{ statusText }}</el-tag>
     </template>
 
     <div class="space-y-2">

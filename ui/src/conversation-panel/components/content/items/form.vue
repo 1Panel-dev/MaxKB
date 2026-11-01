@@ -59,8 +59,8 @@ const submit = async () => {
 </script>
 
 <template>
-  <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="leadingText || ''"></MdPreview>
   <div class="mk-gray-card-lg space-y-4 border border-N300">
+    <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="leadingText || ''"></MdPreview>
     <MkDynamicsForm ref="dynamicsFormRef" :view="is_submit || !mainStore" :render-data="form_field_list" v-model="form_data" />
     <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="trailingText || ''"></MdPreview>
     <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit || !mainStore" @click="submit">
