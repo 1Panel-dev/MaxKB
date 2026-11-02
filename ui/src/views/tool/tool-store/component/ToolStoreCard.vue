@@ -39,7 +39,7 @@ function handleApply(tool = props.tool) {
 </script>
 
 <template>
-  <MkSourceCard :title="tool.name">
+  <MkResourceCard :title="tool.name">
     <template #icon>
       <ToolIcon :icon="tool.icon" :size="24" :type="tool.tool_type" />
     </template>
@@ -69,7 +69,7 @@ function handleApply(tool = props.tool) {
         </div>
       </component>
     </template>
-  </MkSourceCard>
+  </MkResourceCard>
 
   <ToolStoreDetailDrawer v-if="detailDrawerMounted" ref="detailDrawerRef" @add="handleApply" @closed="detailDrawerMounted = false" />
 </template>

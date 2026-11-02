@@ -23,7 +23,15 @@ const detail = ref<TriggerTaskRecordDetail>()
 const isTool = computed(() => props.record.source_type === RESOURCE_TYPE.TOOL)
 const triggerFailed = computed(() => detail.value?.state === STATE_TYPES.TRIGGER_ERROR)
 const runTime = computed(() => detail.value?.run_time ?? props.record.run_time)
-const nodeDetails = computed<ExecutionNodeDetail[]>(() => Object.values((isTool.value ? detail.value?.meta?.details : detail.value?.details) ?? {}))
+const nodeDetails = computed<ExecutionNodeDetail[]>(() => {
+  const executionDetails = Object.fromEntries(Object.entries(detail.value?.details ?? {}))
+  if (!isTool.value) return Object.values(executionDetails)
+
+  return Object.values({
+    ...executionDetails,
+    tool_call: { ...executionDetails.tool_call, name: 'ssss' },
+  })
+})
 
 function loadDetail() {
   loading.value = true

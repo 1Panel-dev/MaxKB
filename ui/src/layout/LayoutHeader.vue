@@ -10,11 +10,12 @@ import type { LayoutMode } from './types'
 import { Compare, hasPermission, Role, RoleConstants } from '@/permission/core'
 import { getWorkspaceId } from '@/utils/resource-context'
 import { useStore } from '@/stores'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
 
 const router = useRouter()
 const props = withDefaults(defineProps<{ mode?: LayoutMode; preview?: boolean }>(), { mode: 'workspace', preview: false })
 
-const { user } = useStore()
+const { user, auth } = useStore()
 
 // 命中 "X" / "X:..." / "X:w:..."（系统模式下没有 workspaceId，仍能匹配 EXTENDS_*）
 function hasRolePrefix(name: string) {
@@ -61,6 +62,13 @@ function switchMode() {
   const workspaceId = localStorage.getItem('workspaceId') || user.userInfo?.workspace_list?.[0]?.id || 'default'
   router.push({ name: 'workspace-home', params: { workspaceId } })
 }
+
+const portalAccessUrl = new URL(`${CHAT_API_BASE_PATH.replace(/\/api$/, '')}/portal`, window.location.origin).href
+
+function toUrl(url?: string) {
+  if (!url) return
+  window.open(url, '_blank')
+}
 </script>
 
 <template>
@@ -76,7 +84,16 @@ function switchMode() {
     </div>
 
     <div class="flex-align-center gap-5">
-      <el-button v-if="!preview" class="bg-primary-gradient" round>
+      <span class="-mr-1">
+        <!-- 访问智能体门户 -->
+        <el-button text @click="toUrl(portalAccessUrl)">
+          <MkIcon name="icon_chat_outlined" />
+          <span>门户</span>
+        </el-button>
+      </span>
+
+      <!-- 社区版访问升级价格页 -->
+      <el-button v-if="!preview && auth.isCE" class="bg-primary-gradient" round @click="toUrl('https://maxkb.cn/price')">
         <MkIcon name="icon_launch_outlined" />
         <span>升级</span>
       </el-button>

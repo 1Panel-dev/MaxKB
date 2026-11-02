@@ -194,7 +194,7 @@ function submit() {
       <el-form-item label="触发方式" prop="long_term_trigger_type" :rules="{ required: true, message: '请选择触发方式', trigger: 'change' }">
         <div class="w-full space-y-2">
           <template v-for="trigger in triggerOptions" :key="trigger.value">
-            <MkSourceCard
+            <MkResourceCard
               :title="trigger.label"
               class="min-h-0!"
               :class="{ 'border-primary!': formData.long_term_trigger_type === trigger.value }"
@@ -265,7 +265,7 @@ function submit() {
                   </el-form-item>
                 </div>
               </template>
-            </MkSourceCard>
+            </MkResourceCard>
           </template>
         </div>
       </el-form-item>

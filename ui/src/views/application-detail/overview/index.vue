@@ -41,8 +41,13 @@ const chatBasePath = CHAT_API_BASE_PATH.replace(/\/api$/, '')
 
 const apiDocUrl = new URL(`${CHAT_API_BASE_PATH}-doc/`, window.location.origin).href
 
-// TODO：分享链接还有问题
-const shareUrl = computed(() => (accessToken.value ? `${window.location.origin}${chatBasePath}/${accessToken.value}` : ''))
+// TODO：访问链接还有问题
+const accessUrl = computed(() => (accessToken.value ? `${window.location.origin}${chatBasePath}/${accessToken.value}` : ''))
+
+function toUrl(url?: string) {
+  if (!url) return
+  window.open(url, '_blank')
+}
 
 function handleChangeWebAccess() {
   if (loading.value) return false
@@ -126,11 +131,11 @@ onMounted(() => {
           </div>
           <div class="space-y-2">
             <div>链接</div>
-            <el-input :model-value="shareUrl" readonly>
+            <el-input :model-value="accessUrl" readonly>
               <template #suffix>
                 <div class="-mr-1">
                   <!-- 复制访问链接 -->
-                  <el-button text :disabled="!shareUrl" @click="copyText(shareUrl)">
+                  <el-button text :disabled="!accessUrl" @click="copyText(accessUrl)">
                     <MkIcon name="icon_copy_outlined" />
                   </el-button>
                   <!-- 重置访问链接 -->
@@ -142,13 +147,13 @@ onMounted(() => {
             </el-input>
           </div>
           <div class="flex-wrap">
-            <!-- 打开智能体对话；TODO：接入真实访问链接后启用跳转 -->
-            <el-button plain>
+            <!-- 打开智能体对话 -->
+            <el-button :disabled="!accessUrl" plain @click="toUrl(accessUrl)">
               <MkIcon name="icon_new-chat_outlined" />
               <span>去对话</span>
             </el-button>
             <!-- 嵌入第三方 -->
-            <ButtonEmbedThirdParty v-if="applicationOverviewPermission('overviewEmbed')" :share-url="shareUrl" :access-token="accessToken" />
+            <ButtonEmbedThirdParty v-if="applicationOverviewPermission('overviewEmbed')" :share-url="accessUrl" :access-token="accessToken" />
             <!-- 访问限制 -->
             <ButtonAccessRestriction v-if="applicationOverviewPermission('overviewAccess')" />
             <!-- 显示设置 -->

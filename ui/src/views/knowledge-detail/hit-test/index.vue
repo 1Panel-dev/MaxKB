@@ -199,7 +199,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
           <div v-else class="space-y-3">
             <template v-for="(paragraph, paragraphIndex) in resultParagraphs" :key="paragraph.id">
               <!-- 查看召回分段详情 -->
-              <MkSourceCard :title="paragraph.title || '-'" class="cursor-pointer" @click="handleOpenParagraph(paragraph)">
+              <MkResourceCard :title="paragraph.title || '-'" class="cursor-pointer" @click="handleOpenParagraph(paragraph)">
                 <template #title="{ title }">
                   <span class="flex-align-center min-w-0 gap-2">
                     <h4 class="shrink-0">{{ `#${paragraphIndex + 1}` }}</h4>
@@ -231,7 +231,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
                     <span class="truncate" :title="paragraph.document_name">{{ paragraph.document_name }}</span>
                   </div>
                 </template>
-              </MkSourceCard>
+              </MkResourceCard>
             </template>
           </div>
         </template>

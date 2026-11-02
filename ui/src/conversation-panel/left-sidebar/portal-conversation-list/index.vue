@@ -50,7 +50,7 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
     <!-- 门户名称与收起侧栏 -->
     <div class="mb-4 flex-between shrink-0 gap-2">
       <div class="min-w-0 flex-align-center gap-2">
-        <MkIcon name="icon_application-shop_filled" :size="20" class="shrink-0 text-primary" />
+        <PortalIcon />
         <h4 class="truncate">智能体门户</h4>
       </div>
       <!-- 收起左侧 -->
@@ -63,8 +63,8 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
 
     <!-- 全部智能体 -->
     <MkListItem :active="isApplicationListActive" @click="portalList.openApplicationList()">
-      <MkIcon name="icon_all_outlined" :size="18" class="mr-2" />
-      <span>全部智能体</span>
+      <MkIcon :name="isApplicationListActive ? 'icon_card_filled' : 'icon_card_outlined'" :size="18" class="mr-2" />
+      <span>智能体</span>
     </MkListItem>
     <!-- 新建对话 -->
     <MkTooltip content="新建对话">
@@ -87,48 +87,77 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
       <div v-if="applicationGroups.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
       <div v-else class="space-y-1">
         <template v-for="group in applicationGroups" :key="group.id">
-          <!-- 选中智能体，进入其新建对话 -->
-          <MkListItem
-            :active="isActiveApplication(group)"
-            :class="{ 'bg-white! text-N900! hover:bg-white!': isActiveApplication(group) }"
-            @click="handleSelectApplication(group)"
+          <MkCollapse
+            :expanded="group.expanded"
+            trigger="header"
+            trigger-class="group rounded-md p-2 hover:bg-N900/10"
+            indicator-position="after"
+            @update:expanded="toggleGroup(group.id)"
           >
-            <ApplicationIcon :icon="group.icon" :size="18" class="mr-2 shrink-0" />
-            <span class="min-w-0 truncate" :title="group.name">{{ group.name }}</span>
-            <!-- 展开或收起智能体的会话 -->
-            <span class="ml-1 flex-center shrink-0 cursor-pointer" @click.stop="toggleGroup(group.id)">
-              <MkIcon :name="group.expanded ? 'icon_down_outlined' : 'icon_right_outlined'" :size="14" class="text-N500" />
-            </span>
-          </MkListItem>
+            <template #indicator="{ expanded }">
+              <MkIcon
+                name="icon_right_outlined"
+                :size="12"
+                class="transition-transform text-N600! group-hover:text-N900!"
+                :class="{ 'rotate-90': expanded }"
+              />
+            </template>
+            <template #label>
+              <!-- 选中智能体，进入其新建对话 -->
+              <div class="min-w-0 flex-align-center gap-2">
+                <ApplicationIcon :icon="group.icon" :size="18" class="shrink-0" />
+                <span class="min-w-0 truncate" :title="group.name">{{ group.name }}</span>
+              </div>
+              <!-- 智能体分组操作，与单条会话的操作独立 -->
+              <div class="order-last ml-auto shrink-0 font-normal text-N900" @click.stop @keydown.stop>
+                <MkDropdown trigger="click" :teleported="false">
+                  <el-button text>
+                    <MkIcon name="icon_more_outlined" />
+                  </el-button>
+                  <template #dropdown>
+                    <MkDropdownMenu>
+                      <!-- 删除智能体历史分组，待接入对应接口 -->
+                      <MkDropdownItem divided disabled>
+                        <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                        <span>删除</span>
+                      </MkDropdownItem>
+                    </MkDropdownMenu>
+                  </template>
+                </MkDropdown>
+              </div>
+            </template>
 
-          <template v-if="group.expanded">
-            <MkListItem
-              v-for="conversation in groupConversations(group)"
-              :key="conversation.id"
-              :active="isActiveConversation(group, conversation)"
-              class="pl-8!"
-              :class="{ 'bg-white! text-N900! hover:bg-white!': isActiveConversation(group, conversation) }"
-              @click="handleSelectConversation(group, conversation)"
-            >
-              <template #default>
-                <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || '新对话'">
-                  {{ conversation.abstract || '新对话' }}
-                </span>
+            <template v-if="group.expanded">
+              <MkListItem
+                v-for="conversation in groupConversations(group)"
+                :key="conversation.id"
+                :active="isActiveConversation(group, conversation)"
+                class="pl-8!"
+                @click="handleSelectConversation(group, conversation)"
+              >
+                <template #default="{ active }">
+                  <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || '新对话'">
+                    {{ conversation.abstract || '新对话' }}
+                  </span>
 
-                <!-- 悬停或聚焦列表行时隐藏时间，显示内置更多操作。 -->
-                <span class="-mr-6 shrink-0 text-sm font-normal text-N500 group-hover:invisible group-focus-within:invisible">
-                  {{ conversationTime(conversation) }}
-                </span>
-              </template>
-              <template #action-dropdown>
-                <!-- 删除 -->
-                <MkDropdownItem divided @click="handleDeleteConversation(group, conversation)">
-                  <template #icon><MkIcon name="icon_info_outlined" /></template>
-                  <span>删除</span>
-                </MkDropdownItem>
-              </template>
-            </MkListItem>
-          </template>
+                  <!-- 选中、悬停或聚焦列表行时隐藏时间，显示内置更多操作。 -->
+                  <span
+                    class="-mr-6 shrink-0 text-sm font-normal text-N500 group-hover:invisible group-focus-within:invisible"
+                    :class="{ invisible: active }"
+                  >
+                    {{ conversationTime(conversation) }}
+                  </span>
+                </template>
+                <template #action-dropdown>
+                  <!-- 删除 -->
+                  <MkDropdownItem divided @click="handleDeleteConversation(group, conversation)">
+                    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                    <span>删除</span>
+                  </MkDropdownItem>
+                </template>
+              </MkListItem>
+            </template>
+          </MkCollapse>
         </template>
       </div>
     </el-scrollbar>

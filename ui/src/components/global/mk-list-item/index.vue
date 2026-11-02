@@ -36,10 +36,11 @@ const hasActionDropdown = computed(() => hasRenderableSlotContent(slots['action-
         {{ itemLabel }}
       </span>
     </slot>
-    <!-- 操作区保留布局宽度，hover/focus 时显示，并阻止触发行点击。 -->
+    <!-- 操作区保留布局宽度，选中或 hover/focus 时显示，并阻止触发行点击。 -->
     <div
       v-if="$slots.action || hasActionDropdown"
-      class="group-hover-visible ml-auto flex-align-center shrink-0 font-normal text-N900"
+      class="ml-auto flex-align-center shrink-0 font-normal text-N900"
+      :class="{ 'group-hover-visible': !active }"
       @click.stop
       @keydown.stop
     >

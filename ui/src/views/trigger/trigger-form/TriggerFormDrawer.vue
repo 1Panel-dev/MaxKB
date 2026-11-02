@@ -317,7 +317,7 @@ defineExpose({ open })
         </el-form-item>
         <el-form-item label="类型" required>
           <div class="w-full space-y-2">
-            <MkSourceCard
+            <MkResourceCard
               v-for="option in triggerTypeOptions"
               :key="option.value"
               :title="option.label"
@@ -390,7 +390,7 @@ defineExpose({ open })
                   </div>
                 </el-form-item>
               </template>
-            </MkSourceCard>
+            </MkResourceCard>
           </div>
         </el-form-item>
         <!-- 任务执行 -->

@@ -28,7 +28,7 @@ defineProps<{
       <h6 class="mb-2">重排内容</h6>
       <div v-if="data.document_list?.length > 0" class="space-y-2">
         <template v-for="(paragraph, paragraphIndex) in data.document_list" :key="paragraphIndex">
-          <MkSourceCard :title="paragraph.metadata?.title || '-'" disabled>
+          <MkResourceCard :title="paragraph.metadata?.title || '-'" disabled>
             <template #title="{ title }">
               <span class="flex-align-center min-w-0 gap-2">
                 <h4 class="shrink-0">{{ `#${Number(paragraphIndex) + 1}` }}</h4>
@@ -72,7 +72,7 @@ defineProps<{
                 <span class="truncate">{{ paragraph.metadata?.knowledge_name || '-' }}</span>
               </div>
             </template>
-          </MkSourceCard>
+          </MkResourceCard>
         </template>
       </div>
       <template v-else>-</template>
@@ -82,7 +82,7 @@ defineProps<{
       <h6 class="mb-2">重排结果</h6>
       <div v-if="data.result_list?.length > 0" class="space-y-2">
         <template v-for="(paragraph, paragraphIndex) in data.result_list" :key="paragraphIndex">
-          <MkSourceCard :title="paragraph.metadata?.title || '-'" disabled>
+          <MkResourceCard :title="paragraph.metadata?.title || '-'" disabled>
             <template #title="{ title }">
               <span class="flex-align-center min-w-0 gap-2">
                 <h4 class="shrink-0">{{ `#${Number(paragraphIndex) + 1}` }}</h4>
@@ -126,7 +126,7 @@ defineProps<{
                 <span class="truncate">{{ paragraph.metadata?.knowledge_name || '-' }}</span>
               </div>
             </template>
-          </MkSourceCard>
+          </MkResourceCard>
         </template>
       </div>
       <template v-else>-</template>

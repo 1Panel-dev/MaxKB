@@ -10,11 +10,11 @@ defineProps<{ name: string; logo: string | null }>()
         <h4 class="min-w-0 flex-1 truncate" :title="name">{{ name }}</h4>
         <MkIcon name="icon_sidebar_outlined" class="shrink-0" />
       </div>
-      <div class="flex-align-center gap-2 mk-white-card-sm text-primary">
+      <div class="flex-align-center gap-2 text-primary p-2 py-[9px] bg-primary/10 rounded-md">
         <MkIcon name="icon_card_filled" :size="18" />
-        <h6>全部智能体</h6>
+        <h6>智能体</h6>
       </div>
-      <div class="flex-align-center gap-2 px-2 py-3">
+      <div class="flex-align-center gap-2 px-2 py-[9px]">
         <MkIcon name="icon_new-chat_outlined" :size="18" />
         <span>新建对话</span>
       </div>

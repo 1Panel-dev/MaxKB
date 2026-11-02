@@ -135,7 +135,7 @@ defineExpose({ validate, getStrategy, setStrategy })
     <div class="w-full space-y-2">
       <template v-for="option in splitOptions" :key="option.value">
         <!-- 选择分段规则 -->
-        <MkSourceCard
+        <MkResourceCard
           :title="option.title"
           class="min-h-0!"
           :class="{ 'border-primary!': strategy.split.mode === option.value }"
@@ -193,7 +193,7 @@ defineExpose({ validate, getStrategy, setStrategy })
               </el-form-item>
             </div>
           </template>
-        </MkSourceCard>
+        </MkResourceCard>
       </template>
     </div>
     <p class="mt-4 mb-2">图片处理</p>

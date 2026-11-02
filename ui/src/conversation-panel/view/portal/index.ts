@@ -25,9 +25,7 @@ function usePortalChatRouting(): ChatConversationRouting {
       // 门户首页与全部智能体页没有智能体，不同步会话地址
       if (!applicationId) return
       void router.replace(
-        chatId
-          ? { name: 'portal-application-chat', params: { applicationId, chatId } }
-          : { name: 'portal-application', params: { applicationId } },
+        chatId ? { name: 'portal-application-chat', params: { applicationId, chatId } } : { name: 'portal-application', params: { applicationId } },
       )
     },
   }
@@ -72,14 +70,6 @@ export function createPortalConversation(options: PortalConversationOptions): Po
     const previousGroup = findGroup(previousApplicationId)
     if (previousGroup) previousGroup.conversations = [...bundle.list.conversations.value]
     bundle.list.conversations.value = [...(findGroup(applicationId)?.conversations ?? [])]
-  })
-
-  // 门户首页（/portal）未指定智能体：分组加载后进入第一个智能体的新建对话；没有可用智能体时保持空状态
-  watch(portalList.applicationGroups, (applicationGroups) => {
-    const firstApplication = applicationGroups[0]
-    if (route.name === 'portal-home' && firstApplication) {
-      void router.replace({ name: 'portal-application', params: { applicationId: firstApplication.id } })
-    }
   })
 
   return { ...bundle, portalList }

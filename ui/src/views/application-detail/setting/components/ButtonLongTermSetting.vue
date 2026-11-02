@@ -186,7 +186,7 @@ function submit() {
         <div class="w-full space-y-2">
           <!-- 选择长期记忆触发方式 -->
           <template v-for="trigger in triggerOptions" :key="trigger.value">
-            <MkSourceCard
+            <MkResourceCard
               :title="trigger.label"
               class="min-h-0!"
               :class="{ 'border-primary!': formData.long_term_trigger_type === trigger.value }"
@@ -257,7 +257,7 @@ function submit() {
                   </el-form-item>
                 </div>
               </template>
-            </MkSourceCard>
+            </MkResourceCard>
           </template>
         </div>
       </el-form-item>

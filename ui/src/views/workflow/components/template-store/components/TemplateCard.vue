@@ -30,7 +30,7 @@ function handleUseTemplate() {
 </script>
 
 <template>
-  <MkSourceCard :title="template.name">
+  <MkResourceCard :title="template.name">
     <template #icon>
       <el-avatar class="bg-transparent!" shape="square" :size="24">
         <img :src="resetUrl(template.icon, true)" alt="" />
@@ -53,7 +53,7 @@ function handleUseTemplate() {
         </div>
       </component>
     </template>
-  </MkSourceCard>
+  </MkResourceCard>
   <TemplateStoreDetailDrawer
     v-if="detailDrawerMounted"
     ref="detailDrawerRef"

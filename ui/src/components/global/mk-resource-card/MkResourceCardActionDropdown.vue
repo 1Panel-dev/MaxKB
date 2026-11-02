@@ -2,7 +2,7 @@
 import { computed, useSlots } from 'vue'
 import { hasRenderableSlotContent } from '@/utils/vnode'
 
-defineOptions({ name: 'MkSourceCardActionDropdown' })
+defineOptions({ name: 'MkResourceCardActionDropdown' })
 
 defineSlots<{ default: () => unknown }>()
 

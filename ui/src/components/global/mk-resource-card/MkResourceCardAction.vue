@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineOptions({ name: 'MkSourceCardAction' })
+defineOptions({ name: 'MkResourceCardAction' })
 
 defineSlots<{ default: () => unknown }>()
 </script>

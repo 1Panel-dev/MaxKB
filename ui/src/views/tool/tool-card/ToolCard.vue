@@ -24,7 +24,7 @@ function handleClick(event: MouseEvent) {
 </script>
 
 <template>
-  <MkSourceCard
+  <MkResourceCard
     :create_time="tool.create_time"
     :disabled="disabled"
     :nick_name="tool.nick_name || '-'"
@@ -68,5 +68,5 @@ function handleClick(event: MouseEvent) {
         </component>
       </component>
     </template>
-  </MkSourceCard>
+  </MkResourceCard>
 </template>

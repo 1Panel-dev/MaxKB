@@ -78,6 +78,7 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
     :left-mode="leftMode"
     :right-mode="rightMode"
     @mask-click="closeDrawers"
+    class="portal"
   >
     <template #left><PortalConversationList /></template>
     <template #main>
