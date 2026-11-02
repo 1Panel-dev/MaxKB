@@ -21,7 +21,7 @@ function handleOpen() {
 </script>
 
 <template>
-  <MkSourceCard
+  <MkResourceCard
     :create_time="knowledge.create_time"
     :nick_name="knowledge.nick_name || '-'"
     :title="knowledge.name"
@@ -60,5 +60,5 @@ function handleOpen() {
         </component>
       </component>
     </template>
-  </MkSourceCard>
+  </MkResourceCard>
 </template>

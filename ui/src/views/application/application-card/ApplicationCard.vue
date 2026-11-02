@@ -17,7 +17,7 @@ function handleOpen() {
 </script>
 
 <template>
-  <MkSourceCard
+  <MkResourceCard
     :create_time="application.create_time"
     :nick_name="application.nick_name || '-'"
     :selectable="selectable"
@@ -67,5 +67,5 @@ function handleOpen() {
         </component>
       </component>
     </template>
-  </MkSourceCard>
+  </MkResourceCard>
 </template>

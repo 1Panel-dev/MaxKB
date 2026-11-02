@@ -106,8 +106,9 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 `portal-login`（`/portal/login`）、`portal-application-list`（`/portal/applications`，全部智能体）、
 `portal-application`（`/portal/a/:applicationId`，新建对话）、
 `portal-application-chat`（`/portal/a/:applicationId/c/:chatId`），
-`portal-home`、`portal-application-list`、`portal-application`、`portal-application-chat` 共用门户对话页 `views/portal/index.vue`，
-访问 `portal-home` 时由页面在分组加载后进入第一个智能体的新建对话。`portal-login` 与 `chat-login` 共用 `views/chat/login/index.vue`，页面按 Store
+`portal-home` 重定向到 `portal-application-list`（`/portal/applications`），默认展示全部智能体。
+`portal-application-list`、`portal-application`、`portal-application-chat` 共用门户对话页 `views/portal/index.vue`。
+`portal-login` 与 `chat-login` 共用 `views/chat/login/index.vue`，页面按 Store
 当前认证场景显示门户或应用名称，并使用对应场景登录。不要把门户页面放到 `/login` 等一级路径，否则会与 `/:accessToken/` 冲突。
 
 单应用对话路由以 `/:accessToken/` 开头，兼容 v2 对话地址：`chat-home`（`/:accessToken/`）、

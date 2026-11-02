@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import PortalApi from '@/api/admin/system/chat-management/portal-setting.ts'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
 import type { PortalSetting, PortalSettingPayload } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
@@ -34,8 +35,8 @@ const portalSetting = reactive<PortalSetting>({
 const loading = ref(false)
 const saving = ref(false)
 const { auth } = useStore()
-const portalAccessUrl = new URL('/portal', window.location.origin).href
-const portalApiUrl = new URL('/api/portal', window.location.origin).href
+const portalAccessUrl = new URL(`${CHAT_API_BASE_PATH.replace(/\/api$/, '')}/portal`, window.location.origin).href
+const portalApiUrl = new URL(`${CHAT_API_BASE_PATH}/portal`, window.location.origin).href
 
 /* 进入页面加载门户配置，失败时保留默认配置 */
 function loadPortalSetting() {

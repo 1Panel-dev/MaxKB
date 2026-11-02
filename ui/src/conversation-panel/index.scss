@@ -127,5 +127,11 @@
   width: fit-content;
 }
 
-.mk-conversation-message-footer {
+/* 门户 */
+.portal {
+  .mk-conversation-side-panel {
+    &.left {
+      background: var(--mk-N100);
+    }
+  }
 }

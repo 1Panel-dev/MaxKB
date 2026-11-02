@@ -49,18 +49,17 @@ const conversationTime = (conversation: Conversation) => relativeTimeFormat(conv
       <div v-if="conversations.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
       <div v-else class="space-y-1">
         <template v-for="conversation in conversations" :key="conversation.id">
-          <MkListItem
-            :active="currentChatId === conversation.id"
-            :class="{ 'bg-white! text-N900! hover:bg-white!': currentChatId === conversation.id }"
-            @click="selectConversation(conversation.id)"
-          >
-            <template #default>
+          <MkListItem :active="currentChatId === conversation.id" @click="selectConversation(conversation.id)">
+            <template #default="{ active }">
               <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || '新对话'">
                 {{ conversation.abstract || '新对话' }}
               </span>
 
-              <!-- 悬停或聚焦列表行时隐藏时间，显示内置更多操作。 -->
-              <span class="-mr-6 shrink-0 text-sm font-normal text-N500 group-hover:invisible group-focus-within:invisible">
+              <!-- 选中、悬停或聚焦列表行时隐藏时间，显示内置更多操作。 -->
+              <span
+                class="-mr-6 shrink-0 text-sm font-normal text-N500 group-hover:invisible group-focus-within:invisible"
+                :class="{ invisible: active }"
+              >
                 {{ conversationTime(conversation) }}
               </span>
             </template>

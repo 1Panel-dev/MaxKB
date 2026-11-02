@@ -2,8 +2,8 @@
 import { computed, h, type FunctionalComponent } from 'vue'
 import { dateFormat } from '@/utils/time'
 import { hasRenderableSlotContent } from '@/utils/vnode'
-import MkSourceCardAction from './MkSourceCardAction.vue'
-import MkSourceCardActionDropdown from './MkSourceCardActionDropdown.vue'
+import MkResourceCardAction from './MkResourceCardAction.vue'
+import MkResourceCardActionDropdown from './MkResourceCardActionDropdown.vue'
 
 /**
 
@@ -27,7 +27,7 @@ import MkSourceCardActionDropdown from './MkSourceCardActionDropdown.vue'
  *   </component>
  * </template>
  */
-defineOptions({ name: 'MkSourceCard' })
+defineOptions({ name: 'MkResourceCard' })
 
 const props = withDefaults(
   defineProps<{
@@ -45,15 +45,17 @@ const emit = defineEmits<{ selected: [selected: boolean] }>()
 
 const slots = defineSlots<{
   default?: () => unknown
-  footer?: (props: { Action: FunctionalComponent; ActionDropdown: typeof MkSourceCardActionDropdown }) => unknown
+  footer?: (props: { Action: FunctionalComponent; ActionDropdown: typeof MkResourceCardActionDropdown }) => unknown
   icon?: () => unknown
   subtitle?: () => unknown
   tag?: () => unknown
   title?: (props: { title: string }) => unknown
 }>()
 
-const SourceCardAction: FunctionalComponent = (_, { slots }) => (props.selectable ? null : h(MkSourceCardAction, null, slots))
-const hasFooter = computed(() => hasRenderableSlotContent(slots.footer?.({ Action: SourceCardAction, ActionDropdown: MkSourceCardActionDropdown })))
+const ResourceCardAction: FunctionalComponent = (_, { slots }) => (props.selectable ? null : h(MkResourceCardAction, null, slots))
+const hasFooter = computed(() =>
+  hasRenderableSlotContent(slots.footer?.({ Action: ResourceCardAction, ActionDropdown: MkResourceCardActionDropdown })),
+)
 
 function handleSelect() {
   if (props.selectable) emit('selected', !props.selected)
@@ -70,7 +72,7 @@ function handleSelectedChange(selected: boolean | string | number) {
     :role="props.selectable ? 'checkbox' : undefined"
     :tabindex="props.selectable ? 0 : undefined"
     :shadow="props.disabled ? 'never' : 'hover'"
-    class="mk-source-card group relative"
+    class="mk-resource-card group relative"
     body-class="flex-column h-full"
     @click="handleSelect"
   >
@@ -108,13 +110,13 @@ function handleSelectedChange(selected: boolean | string | number) {
     </div>
 
     <footer v-if="hasFooter" class="flex-align-center gap-2">
-      <slot name="footer" :Action="SourceCardAction" :ActionDropdown="MkSourceCardActionDropdown" />
+      <slot name="footer" :Action="ResourceCardAction" :ActionDropdown="MkResourceCardActionDropdown" />
     </footer>
   </el-card>
 </template>
 
 <style lang="scss" scoped>
-.mk-source-card {
+.mk-resource-card {
   min-width: 250px;
   min-height: 172px;
 

@@ -155,10 +155,10 @@ defineExpose({ open })
                   </MkCardCheckbox>
                 </template>
                 <template #default>
-                  <MkSourceCard :title="tool.name" :nick_name="tool.nick_name || '-'" :create_time="tool.create_time">
+                  <MkResourceCard :title="tool.name" :nick_name="tool.nick_name || '-'" :create_time="tool.create_time">
                     <template #icon><ToolIcon :icon="tool.icon" :type="tool.tool_type" /></template>
                     <p class="line-clamp-2" :title="tool.desc || '-'">{{ tool.desc || '-' }}</p>
-                  </MkSourceCard>
+                  </MkResourceCard>
                 </template>
               </el-popover>
             </template>

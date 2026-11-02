@@ -22,7 +22,7 @@ onMounted(() => {
 <template>
   <!-- 全部智能体主面板:头部 + 智能体卡片列表 -->
   <main class="mk-conversation-main">
-    <header class="flex-align-center h-11 shrink-0 gap-2 px-3">
+    <header class="flex-align-center shrink-0 gap-2 px-4 py-3">
       <!-- 左侧收起时才在顶部显示:展开左侧 + 新建对话(展开时它们在侧栏内) -->
       <template v-if="!leftSideOpen">
         <!-- 展开左侧 -->
@@ -31,26 +31,21 @@ onMounted(() => {
             <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
           </el-button>
         </MkTooltip>
-        <!-- 新建对话 -->
-        <MkTooltip content="新建对话">
-          <el-button text class="ml-0!" @click="newConversation()">
-            <MkIcon name="icon_new-chat_outlined" :size="18" class="text-N900!" />
-          </el-button>
-        </MkTooltip>
+
         <el-divider direction="vertical" />
       </template>
-      <h4 class="min-w-0 flex-1 truncate">全部智能体</h4>
+      <h4 class="min-w-0 flex-1 truncate">智能体</h4>
       <MkSearchInput v-model="applicationKeyword" class="w-50!" placeholder="搜索" @input="handleKeywordInput" />
     </header>
 
-    <el-scrollbar v-loading="isApplicationsLoading" class="min-h-0 flex-1">
+    <el-scrollbar v-loading="isApplicationsLoading" class="min-h-0 flex-1 p-4 pt-0!">
       <MkEmpty
         v-if="!isApplicationsLoading && applications.length === 0"
         :type="applicationKeyword ? 'search' : 'default'"
         :description="applicationKeyword ? '没有匹配的智能体' : '暂无可用智能体'"
         class="mt-20"
       />
-      <PortalApplicationCards v-else :applications="applications" class="p-4" @select="openApplication" />
+      <PortalApplicationCards v-else :applications="applications" @select="openApplication" />
     </el-scrollbar>
   </main>
 </template>

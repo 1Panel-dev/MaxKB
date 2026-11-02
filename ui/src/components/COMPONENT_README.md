@@ -234,6 +234,7 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 数据驱动时传 `row`，`labelField` 默认 `name`，`index` 默认 0；默认插槽提供 `{ row, index, active }`。
 `action`、`action-dropdown` 提供 `{ row, index }`，有可渲染下拉项时优先下拉，否则显示普通操作。
 下拉插槽直接放 `MkDropdownItem`，组件提供 More 触发器并隔离行点击；空菜单不显示入口。
+操作区在选中时常显，未选中时悬停或内部聚焦显示。
 
 ### MkSearchInput
 
@@ -404,7 +405,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `size` 沿用 Element Plus Tag 的尺寸类型，统一作用于首个标签、`+N` 和浮层内标签；
 传入 `size="small"` 显示小尺寸标签，不传时沿用 Element Plus 的默认尺寸继承行为。
 
-### MkSourceCard
+### MkResourceCard
 
 等高资源卡片，`title` 必填，`nick_name`、`create_time` 提供创建信息；
 `icon`、`title`（透出 `{ title }`）、`subtitle`、`tag` 插槽可覆盖头部，默认插槽放详情。

@@ -57,7 +57,7 @@ function getParagraphImageUrl(paragraph: SearchParagraph) {
       <h6 class="mb-2">检索结果</h6>
       <div class="space-y-2" v-if="sortedParagraphs.length > 0">
         <template v-for="(paragraph, paragraphIndex) in sortedParagraphs" :key="paragraphIndex">
-          <MkSourceCard :title="`${paragraph.title || '-'}`" disabled>
+          <MkResourceCard :title="`${paragraph.title || '-'}`" disabled>
             <template #title="{ title }">
               <span class="flex-align-center min-w-0 gap-2">
                 <h4 class="shrink-0">{{ `#${paragraphIndex + 1}` }}</h4>
@@ -111,7 +111,7 @@ function getParagraphImageUrl(paragraph: SearchParagraph) {
                 <span class="truncate">{{ paragraph.knowledge_name || '-' }}</span>
               </div>
             </template>
-          </MkSourceCard>
+          </MkResourceCard>
         </template>
       </div>
       <template v-else>-</template>

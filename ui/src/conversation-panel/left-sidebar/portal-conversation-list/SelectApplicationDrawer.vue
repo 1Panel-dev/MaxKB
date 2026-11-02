@@ -45,23 +45,17 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer
-    v-model="visible"
-    direction="btt"
-    size="88%"
-    :close-on-click-modal="true"
-    :close-on-press-escape="true"
-    content-class="p-4"
-  >
+  <MkDrawer v-model="visible" direction="btt" :close-on-click-modal="true" :close-on-press-escape="true">
     <template #header>
-      <div class="flex-align-center gap-4">
-        <h4 class="flex-1">选择智能体</h4>
-        <MkSearchInput v-model="applicationKeyword" class="w-60!" placeholder="搜索" @input="handleKeywordInput" />
-        <div class="flex-1" />
+      <div class="flex w-full">
+        <h4>选择智能体</h4>
+        <div class="absolute-center w-85">
+          <MkSearchInput v-model="applicationKeyword" @input="handleKeywordInput" />
+        </div>
       </div>
     </template>
 
-    <div v-loading="isLoading" class="min-h-40">
+    <div v-loading="isLoading">
       <MkEmpty
         v-if="!isLoading && applications.length === 0"
         :type="applicationKeyword ? 'search' : 'default'"

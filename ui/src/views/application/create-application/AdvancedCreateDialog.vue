@@ -150,7 +150,7 @@ defineExpose({ open })
             </div>
           </el-card>
 
-          <MkSourceCard
+          <MkResourceCard
             class="min-h-0!"
             :class="selectedTemplate === 'assistant' ? 'active' : ''"
             title="知识库问答助手"
@@ -160,7 +160,7 @@ defineExpose({ open })
               <ApplicationIcon />
             </template>
             <p>将从知识库中检索到的知识作为已知信息，回答用户提出的问题。</p>
-          </MkSourceCard>
+          </MkResourceCard>
         </div>
       </el-form-item>
     </el-form>
