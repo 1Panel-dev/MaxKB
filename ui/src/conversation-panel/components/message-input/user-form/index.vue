@@ -230,8 +230,8 @@ onBeforeUnmount(() => {
       />
 
       <!-- 打开更多参数 -->
-      <el-button v-if="showMoreButton" ref="moreButtonRef" class="size-8! min-w-0! px-0!" @click="popoverVisible = !popoverVisible">
-        <MkIcon name="icon_setting" :size="16" />
+      <el-button plain v-if="showMoreButton" ref="moreButtonRef" class="w-8! min-w-8!" @click="popoverVisible = !popoverVisible">
+        <MkIcon name="icon_card_outlined" />
       </el-button>
 
       <el-popover
@@ -241,26 +241,27 @@ onBeforeUnmount(() => {
         virtual-triggering
         trigger="manual"
         placement="top-start"
-        :width="400"
-        :popper-style="{ padding: '16px 8px' }"
+        :width="420"
         @show="userForm.saveSnapshot"
       >
-        <div class="mb-4 truncate break-all font-medium" :title="menuTitle">{{ menuTitle }}</div>
-        <el-scrollbar max-height="450px">
-          <MkDynamicsForm :key="`popover-${formRefreshKey}`" ref="popoverFormRef" v-model="formData" :render-data="popoverFields" />
-          <MkDynamicsForm
-            v-if="apiInputEditable"
-            :key="`api-${formRefreshKey}`"
-            ref="apiFormRef"
-            v-model="apiFormData"
-            :render-data="apiInputFields"
-          />
-        </el-scrollbar>
-        <div class="mt-2 text-right">
-          <!-- 取消修改 -->
-          <el-button @click="cancelHandle">取消</el-button>
-          <!-- 确认参数 -->
-          <el-button type="primary" @click="confirmHandle">确认</el-button>
+        <div class="p-4">
+          <h4 class="mb-4 truncate break-all" :title="menuTitle">{{ menuTitle }}</h4>
+          <el-scrollbar max-height="360px" class="-mr-4" view-class="pr-4">
+            <MkDynamicsForm :key="`popover-${formRefreshKey}`" ref="popoverFormRef" v-model="formData" :render-data="popoverFields" />
+            <MkDynamicsForm
+              v-if="apiInputEditable"
+              :key="`api-${formRefreshKey}`"
+              ref="apiFormRef"
+              v-model="apiFormData"
+              :render-data="apiInputFields"
+            />
+          </el-scrollbar>
+          <div class="mt-4">
+            <!-- 确认参数 -->
+            <el-button type="primary" @click="confirmHandle">确认</el-button>
+            <!-- 取消修改 -->
+            <el-button plain @click="cancelHandle">取消</el-button>
+          </div>
         </div>
       </el-popover>
     </template>
@@ -271,7 +272,7 @@ onBeforeUnmount(() => {
 /* 行内开关与下拉框同高同边框（主题将开关高度改为 22px），标签固定为常规文字色，不随开关状态高亮。 */
 :deep(.mk-conversation-user-form__switch) {
   box-sizing: border-box;
-  height: var(--el-component-size);
+  height: 32px;
   justify-content: space-between;
   padding: 0 12px;
   border: 1px solid var(--el-border-color);
@@ -281,7 +282,7 @@ onBeforeUnmount(() => {
     min-width: 0;
     max-width: 56px;
     margin-right: 8px;
-    color: var(--el-text-color-regular);
+    color: var(--mk-N900);
 
     span {
       display: block;

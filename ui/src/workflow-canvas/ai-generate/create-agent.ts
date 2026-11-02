@@ -42,7 +42,7 @@ function toExecutor(value: unknown): Executor {
  * 某工具返回 AgentSuccessResult / AgentErrorResult 结束、被停止或超过轮次。工具返回 ErrorResult 或抛错时把错误回喂模型自愈。
  */
 export function createAgent(agent: RunnableAgent): AgentHandle {
-  const { tools, modelId, resourceScope, call, position, maxIterations } = agent
+  const { tools, modelId, modelParams, resourceScope, call, position, maxIterations } = agent
   const controller = new AbortController()
   const stopCallbacks: Array<() => void> = []
   const messages: AgentMessage[] = agent.messages
@@ -72,7 +72,7 @@ export function createAgent(agent: RunnableAgent): AgentHandle {
         if (controller.signal.aborted) return finish({ status: 'stopped' })
         if (iteration > maxIterations) return finish({ status: 'error', data: `超过最大轮次 ${maxIterations}` })
 
-        const response = await runTurn(resourceScope, modelId, messages, tools, emit, controller.signal)
+        const response = await runTurn(resourceScope, modelId, modelParams, messages, tools, emit, controller.signal)
         const toolCalls = response.toolCalls ?? []
         const assistantMessage: AgentMessage = { role: 'assistant', content: response.content || '' }
         // thinking 模型要求思考内容按原字段名回传，否则下一轮请求会被拒绝
@@ -124,6 +124,7 @@ export function createAgent(agent: RunnableAgent): AgentHandle {
 function runTurn(
   resourceScope: string,
   modelId: string,
+  modelParams: Record<string, unknown> | undefined,
   messages: AgentMessage[],
   tools: AgentTool[],
   emit: (payload: AgentPayload) => void,
@@ -154,7 +155,7 @@ function runTurn(
         else reject(new Error('本轮结束但未收到完整结果'))
       },
     }
-    chatCompletion(resourceScope, modelId, { messages, tools: toToolSchemas(tools) }, sink, signal)
+    chatCompletion(resourceScope, modelId, { messages, tools: toToolSchemas(tools), model_params_setting: modelParams }, sink, signal)
   })
 }
 

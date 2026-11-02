@@ -104,6 +104,8 @@ export interface AgentBindings {
   rootLf: LogicFlow
   /** 模型 id（委派的子 agent 复用同一模型） */
   modelId: string
+  /** 生成及委派补全共用的模型参数 */
+  modelParams?: Record<string, unknown>
   /** 对外事件出口 */
   call: Call<AgentEvent>
   /** 主画布模式 */
@@ -134,6 +136,8 @@ export interface RunnableAgent {
   messages: AgentMessage[]
   tools: AgentTool[]
   modelId: string
+  /** 生成及委派补全共用的模型参数 */
+  modelParams?: Record<string, unknown>
   /** 画布资源范围，补全请求经 useWorkflowStore(resourceScope) 发起 */
   resourceScope: string
   call: Call<AgentEvent>

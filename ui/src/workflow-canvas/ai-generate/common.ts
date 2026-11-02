@@ -31,6 +31,7 @@ export function useAgentConfig(config: AgentConfig, bindings: AgentBindings): Ru
     messages,
     tools: config.tools,
     modelId: bindings.modelId,
+    modelParams: bindings.modelParams,
     resourceScope: bindings.resourceScope,
     call: bindings.call,
     position: bindings.position ?? [],
