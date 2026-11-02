@@ -18,20 +18,29 @@ import WorkspaceWorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import WorkspaceSharedWorkflowApi from '@/api/admin/workspace/shared/knowledge/workflow'
 import SystemWorkflowApi from '@/api/admin/system/resource-management/knowledge/workflow'
 import SystemSharedWorkflowApi from '@/api/admin/system/shared-resources/knowledge/workflow'
-import type { DefaultModelSettingPayload, KnowledgeDetail, KnowledgeWorkflowDetail, WorkflowVersion, WorkflowStoreTemplate } from '@/api/types'
+import type {
+  DefaultModelSettingPayload,
+  KnowledgeDetail,
+  KnowledgeWorkflowDetail,
+  WorkflowVersion,
+  WorkflowVersionPayload,
+  WorkflowStoreTemplate,
+} from '@/api/types'
 import { MsgConfirm, MsgSuccess, MsgError, MsgWarning } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultKnowledgeNodes } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
-import ButtonExecutionRecord from './ButtonExecutionRecord.vue'
-import DebugDrawer from './debug/DebugDrawer.vue'
-import ButtonTemplateStore from './ButtonTemplateStore.vue'
-import ButtonPublishHistory from './ButtonPublishHistory.vue'
+import EditPublishVersionDialog from '../components/publish-history/EditPublishVersionDialog.vue'
+import { showWorkflowValidateError } from '../components/validate-error'
+import ButtonExecutionRecord from './execution-record/ButtonExecutionRecord.vue'
+import ButtonDebug from './components/ButtonDebug.vue'
+import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
+import ButtonPublishHistory from './components/ButtonPublishHistory.vue'
 import WorkflowImportDocumentDrawer from '@/views/knowledge-detail/library/document/import-document/WorkflowImportDocumentDrawer.vue'
 import { goBack } from './navigation'
-import { showWorkflowValidateError } from '../components/validate-error'
+import ButtonAiGenerate from './components/ButtonAiGenerate.vue'
 
 defineOptions({ name: 'KnowledgeWorkflowView' })
 
@@ -227,48 +236,46 @@ function handleRestoreVersion(version = previewVersion.value) {
   nextTick(() => workflowRef.value?.fitView())
 }
 
-/* 调试：先落库未保存的画布改动，保证调试命中最新工作流 */
-const debugDrawerRef = useTemplateRef<InstanceType<typeof DebugDrawer>>('debugDrawerRef')
+/* 调试入口 */
+const debugButtonRef = useTemplateRef<InstanceType<typeof ButtonDebug>>('debugButtonRef')
+
+function validateWorkflow() {
+  return workflowRef.value?.validate()
+}
 
 function closeDebug() {
-  debugDrawerRef.value?.close()
+  debugButtonRef.value?.close()
 }
 
-function openDebug() {
-  const graphData = getGraphData()
-  if (graphData) debugDrawerRef.value?.open(graphData)
-}
+/* 发布工作流：先校验画布，再填写发布内容，提交后保存并发布。 */
+const publishDialogRef = useTemplateRef<InstanceType<typeof EditPublishVersionDialog>>('publishDialogRef')
 
-async function handleDebug() {
-  if (loading.value || historyVisible.value || !workflowRef.value) return
-  loading.value = true
-  try {
-    await workflowRef.value.validate().catch((error: unknown) => {
-      showWorkflowValidateError(error)
-      throw error
-    })
-    if (hasUnsavedChanges()) await saveKnowledgeWorkflow()
-    openDebug()
-  } catch {
-    // 校验或保存失败已由对应流程提示，不打开调试。
-  } finally {
-    loading.value = false
-  }
-}
-
-function handlePublish() {
+function handleOpenPublish() {
   if (!workflowRef.value || loading.value || historyVisible.value) return
   loading.value = true
   return workflowRef.value
     .validate()
-    .then(() => saveKnowledgeWorkflow())
-    .then(() => requestApi.putKnowledgeWorkflowPublish(knowledgeId))
     .then(() => {
-      if (knowledgeDetail.value) knowledgeDetail.value.is_publish = true
-      MsgSuccess('发布成功')
+      closeDebug()
+      publishDialogRef.value?.open()
     })
-    .catch(() => {
-      // 校验与接口错误由各自流程提示。
+    .catch(showWorkflowValidateError)
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+function handlePublish(payload: WorkflowVersionPayload) {
+  if (!workflowRef.value || loading.value || historyVisible.value) return
+  loading.value = true
+  return saveKnowledgeWorkflow()
+    .then(() => requestApi.putKnowledgeWorkflowPublish(knowledgeId, payload.name, payload.publish_desc))
+    .then(() => KnowledgeApi.getKnowledgeDetail(knowledgeId))
+    .then((knowledge) => {
+      knowledgeDetail.value = knowledge
+      saveTime.value = knowledge.update_time || saveTime.value
+      publishDialogRef.value?.close()
+      MsgSuccess('发布成功')
     })
     .finally(() => {
       loading.value = false
@@ -424,8 +431,16 @@ onBeforeUnmount(stopAutoSave)
       <KnowledgeIcon :type="knowledgeDetail?.type ?? KNOWLEDGE_TYPE.WORKFLOW" :size="24" class="shrink-0" />
     </template>
     <template #actions>
+      <!-- AI 生成工作流 -->
+      <ButtonAiGenerate
+        label="AI 生成"
+        :disabled="loading || historyVisible"
+        :get-logic-flow="() => workflowRef?.getLogicFlow()"
+        :default-model-settings="defaultModelSetting"
+        @open="closeDebug"
+      />
       <!-- 模板中心 -->
-      <ButtonTemplateStore ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
+      <ButtonTemplateStore label="模板中心" ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"
@@ -438,17 +453,27 @@ onBeforeUnmount(stopAutoSave)
       />
 
       <!-- 调试知识库工作流 -->
-      <el-button plain :disabled="loading" @click="handleDebug">
-        <MkIcon name="icon_play_outlined" />
-        <span>调试</span>
-      </el-button>
+      <ButtonDebug
+        ref="debugButtonRef"
+        v-model:loading="loading"
+        label="调试"
+        :api="requestApi"
+        :knowledge-id="knowledgeId"
+        :disabled="historyVisible"
+        :has-unsaved-changes="hasUnsavedChanges"
+        :validate-workflow="validateWorkflow"
+        :save-workflow="saveKnowledgeWorkflow"
+        :get-graph-data="getGraphData"
+      />
+
       <!-- 保存 -->
-      <el-button plain :disabled="loading" @click="handleSave">
-        <MkIcon name="icon_save_outlined" />
-        <span>保存</span>
-      </el-button>
+      <MkTooltip content="保存" placement="bottom">
+        <el-button plain :disabled="loading" @click="handleSave" class="w-8! min-w-8!">
+          <MkIcon name="icon_save_outlined" />
+        </el-button>
+      </MkTooltip>
       <!-- 发布 -->
-      <el-button type="primary" :disabled="loading" @click="handlePublish">发布</el-button>
+      <el-button type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
       <!-- 更多操作 -->
       <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
         <el-button text class="h-7! w-7! px-0!">
@@ -483,9 +508,10 @@ onBeforeUnmount(stopAutoSave)
               <span>导出工作流</span>
             </MkDropdownItem>
             <!-- 查看执行记录 -->
-            <ButtonExecutionRecord :api="requestApi" divided :knowledge-id="knowledgeId" />
+            <ButtonExecutionRecord label="执行记录" :api="requestApi" divided :knowledge-id="knowledgeId" />
             <!-- 发布历史 -->
             <ButtonPublishHistory
+              label="发布历史"
               :api="requestApi"
               :visible="historyVisible"
               @update:visible="handleHistoryVisibleChange"
@@ -519,6 +545,9 @@ onBeforeUnmount(stopAutoSave)
       />
     </div>
 
+    <!-- 发布内容 -->
+    <EditPublishVersionDialog ref="publishDialogRef" mode="publish" :saving="loading" @submit="handlePublish" />
+
     <!-- 文档导入抽屉 -->
     <WorkflowImportDocumentDrawer
       v-if="importDocumentDrawerMounted"
@@ -526,7 +555,5 @@ onBeforeUnmount(stopAutoSave)
       :knowledge-id="knowledgeId"
       @closed="importDocumentDrawerMounted = false"
     />
-    <!-- 调试抽屉 -->
-    <DebugDrawer :api="requestApi" ref="debugDrawerRef" :knowledge-id="knowledgeId" />
   </WorkflowViewLayout>
 </template>

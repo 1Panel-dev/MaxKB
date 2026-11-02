@@ -26,8 +26,11 @@ const putKnowledgeWorkflow = (knowledgeId: string, payload: KnowledgeWorkflowPay
 }
 
 /** 发布知识库工作流。 */
-const putKnowledgeWorkflowPublish = (knowledgeId: string) => {
-  return put<undefined, boolean>(`${getPrefix()}/${knowledgeId}/publish`)
+const putKnowledgeWorkflowPublish = (knowledgeId: string, publishName: string, publishDesc?: string) => {
+  return put<Record<string, unknown>, boolean>(`${getPrefix()}/${knowledgeId}/publish`, {
+    publish_name: publishName,
+    publish_desc: publishDesc,
+  })
 }
 
 /** 获取数据源节点的动态表单配置。 */
