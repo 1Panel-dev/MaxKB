@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
+import { cloneDeep } from 'lodash'
 import type LogicFlow from '@logicflow/core'
 import type { ScrollbarInstance } from 'element-plus'
 import type { DefaultModelSettingPayload, ModelItem, ModelProviderItem } from '@/api/types'
@@ -38,6 +39,7 @@ const visible = ref(false)
 const status = ref<GenerateStatus>('idle')
 const requirement = ref('')
 const modelId = ref('')
+const modelParams = ref<Record<string, unknown>>({})
 const modelOptions = ref<ModelItem[]>([])
 const providerOptions = ref<ModelProviderItem[]>([])
 const scrollbarRef = useTemplateRef<ScrollbarInstance>('scrollbarRef')
@@ -55,6 +57,7 @@ function loadModels() {
       if (!modelId.value) {
         const defaultModelId = props.defaultModelSettings?.LLM?.model_id
         modelId.value = models.find((model) => model.id === defaultModelId)?.id ?? models[0]?.id ?? ''
+        modelParams.value = modelId.value === defaultModelId ? cloneDeep(props.defaultModelSettings?.LLM?.model_params_setting ?? {}) : {}
       }
     })
     .catch(() => MsgError('获取模型列表失败'))
@@ -89,6 +92,7 @@ async function run(text: string) {
       useApplicationAgent({
         rootLf: lf,
         modelId: modelId.value,
+        modelParams: cloneDeep(modelParams.value),
         call: { onNext: onEvent },
         workflowMode: props.workflowMode,
         resourceScope,
@@ -200,6 +204,9 @@ defineExpose({ open, close })
           <SelectModel
             class="w-50!"
             v-model="modelId"
+            v-model:model-params="modelParams"
+            can-edit-params
+            :can-add="false"
             :options="modelOptions"
             :provider-options="providerOptions"
             :disabled="started"
