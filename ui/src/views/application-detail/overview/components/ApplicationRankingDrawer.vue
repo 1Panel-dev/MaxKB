@@ -93,68 +93,66 @@ onMounted(loadRanking)
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="排行榜详情" size="1000" @closed="emit('closed')">
-    <div :inert="loading">
-      <el-tabs v-model="activeKind" @tab-change="handleTabChange">
-        <el-tab-pane name="userTokens" label="Tokens 消耗 · Top 用户" />
-        <el-tab-pane name="questions" label="对话次数 · Top 用户" />
-      </el-tabs>
-      <div class="my-4 flex-between">
-        <div class="flex gap-3">
-          <MkSearchInput v-model="searchName" class="w-55!" @change="handleSearch" />
-          <MkDateRange :default-value="{ startTime: initialRange.start_time, endTime: initialRange.end_time }" @change="handleRangeChange" />
-        </div>
-        <!-- 导出当前筛选下的完整用户排行 -->
-        <el-button plain :loading="exporting" :disabled="loading" @click="handleExport">
-          <MkIcon name="icon_export_outlined" />
-          <span>导出</span>
-        </el-button>
+  <MkDrawer v-model="visible" title="排行榜详情" class="mk-drawer-with-tabs" contentClass="pt-0" size="1000" @closed="emit('closed')">
+    <el-tabs v-model="activeKind" @tab-change="handleTabChange">
+      <el-tab-pane name="userTokens" label="Tokens 消耗 · Top 用户" />
+      <el-tab-pane name="questions" label="对话次数 · Top 用户" />
+    </el-tabs>
+    <div class="mt-6 mb-4 flex-between">
+      <div class="flex gap-3">
+        <MkDateRange :default-value="{ startTime: initialRange.start_time, endTime: initialRange.end_time }" @change="handleRangeChange" />
+        <MkSearchInput v-model="searchName" class="w-55!" @change="handleSearch" />
       </div>
-      <MkTable
-        v-loading="loading"
-        v-model:pagination-config="pagination"
-        :data="records"
-        row-key="chat_user_id"
-        @current-change="loadRanking"
-        @size-change="loadRanking"
-      >
-        <el-table-column label="排名" width="60">
-          <template #default="{ $index }">
-            <span
-              class="mk-rank"
-              :class="
-                (pagination.currentPage - 1) * pagination.pageSize + $index < 3
-                  ? `mk-rank-${(pagination.currentPage - 1) * pagination.pageSize + $index + 1}`
-                  : 'text-N600'
-              "
-            >
-              {{ (pagination.currentPage - 1) * pagination.pageSize + $index + 1 }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="用户" min-width="140" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.asker?.username || '-' }}</template>
-        </el-table-column>
-        <el-table-column :label="activeKind === 'userTokens' ? 'Tokens 消耗' : '对话次数'" min-width="125">
-          <template #default="{ row }">
-            {{ formatRankingValue(row) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="占比" min-width="150">
-          <template #default="{ row }">
-            <el-progress v-if="aggregateTotal != null && getRankingValue(row) != null" :percentage="getRankingRatio(row)" />
-            <span v-else>—</span>
-          </template>
-        </el-table-column>
-        <el-table-column :label="activeKind === 'userTokens' ? '对话次数' : 'Tokens 消耗'" min-width="125">
-          <template #default="{ row }">
-            {{ formatRankingValue(row, activeKind === 'userTokens' ? 'questions' : 'userTokens') }}
-          </template>
-        </el-table-column>
-        <el-table-column label="均 Tokens/次" min-width="125">
-          <template #default="{ row }">{{ formatTokenNumber(getRankingAverage(row)) }}</template>
-        </el-table-column>
-      </MkTable>
+      <!-- 导出当前筛选下的完整用户排行 -->
+      <el-button plain :loading="exporting" :disabled="loading" @click="handleExport">
+        <MkIcon name="icon_export_outlined" />
+        <span>导出</span>
+      </el-button>
     </div>
+    <MkTable
+      v-loading="loading"
+      v-model:pagination-config="pagination"
+      :data="records"
+      row-key="chat_user_id"
+      @current-change="loadRanking"
+      @size-change="loadRanking"
+    >
+      <el-table-column label="排名" width="60">
+        <template #default="{ $index }">
+          <span
+            class="mk-rank"
+            :class="
+              (pagination.currentPage - 1) * pagination.pageSize + $index < 3
+                ? `mk-rank-${(pagination.currentPage - 1) * pagination.pageSize + $index + 1}`
+                : 'text-N600'
+            "
+          >
+            {{ (pagination.currentPage - 1) * pagination.pageSize + $index + 1 }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column label="用户" min-width="140" show-overflow-tooltip>
+        <template #default="{ row }">{{ row.asker?.username || '-' }}</template>
+      </el-table-column>
+      <el-table-column :label="activeKind === 'userTokens' ? 'Tokens 消耗' : '对话次数'" min-width="125">
+        <template #default="{ row }">
+          {{ formatRankingValue(row) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="占比" min-width="150">
+        <template #default="{ row }">
+          <el-progress v-if="aggregateTotal != null && getRankingValue(row) != null" :percentage="getRankingRatio(row)" />
+          <span v-else>—</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="activeKind === 'userTokens' ? '对话次数' : 'Tokens 消耗'" min-width="125">
+        <template #default="{ row }">
+          {{ formatRankingValue(row, activeKind === 'userTokens' ? 'questions' : 'userTokens') }}
+        </template>
+      </el-table-column>
+      <el-table-column label="均 Tokens/次" min-width="125">
+        <template #default="{ row }">{{ formatTokenNumber(getRankingAverage(row)) }}</template>
+      </el-table-column>
+    </MkTable>
   </MkDrawer>
 </template>
