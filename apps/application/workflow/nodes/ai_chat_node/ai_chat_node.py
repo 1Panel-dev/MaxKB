@@ -216,13 +216,18 @@ def _get_history_message(history_chat_record, dialogue_number, dialogue_type, ru
 
 def _process_images(image):
     images = []
+    image_list = []
     if isinstance(image, str) and image.startswith("http"):
         images.append({"type": "image_url", "image_url": {"url": image}})
+        image_list.append({"url": image})
     elif image is not None and len(image) > 0:
         for img in image:
             if "file_id" in img:
                 file_id = img["file_id"]
                 file = QuerySet(File).filter(id=file_id).first()
+                if file is None:
+                    continue
+                image_list.append({"url": f"./oss/file/{file.id}"})
                 image_bytes = file.get_bytes()
                 base64_image = base64.b64encode(image_bytes).decode("utf-8")
                 image_format = guess_image_format(image_bytes)
@@ -231,7 +236,8 @@ def _process_images(image):
                 )
             elif "url" in img and img["url"].startswith("http"):
                 images.append({"type": "image_url", "image_url": {"url": img["url"]}})
-    return images
+                image_list.append({"url": img["url"]})
+    return images, image_list
 
 
 def _get_upstream_knowledge_images(workflow_manage, node_id):
@@ -263,18 +269,24 @@ def _get_upstream_knowledge_images(workflow_manage, node_id):
 
 def _process_videos(video, video_model):
     videos = []
+    video_list = []
     if isinstance(video, str) and video.startswith("http"):
         videos.append({"type": "video_url", "video_url": {"url": video}})
+        video_list.append({"url": video})
     elif video is not None and len(video) > 0:
         for v in video:
             if "file_id" in v:
                 file_id = v["file_id"]
                 file = QuerySet(File).filter(id=file_id).first()
+                if file is None:
+                    continue
+                video_list.append({"url": f"./oss/file/{file.id}"})
                 url = video_model.upload_file_and_get_url(file.get_bytes(), file.file_name)
                 videos.append({"type": "video_url", "video_url": {"url": url}})
             elif "url" in v and v["url"].startswith("http"):
                 videos.append({"type": "video_url", "video_url": {"url": v["url"]}})
-    return videos
+                video_list.append({"url": v["url"]})
+    return videos, video_list
 
 
 class AIChatNode(INode):
@@ -435,17 +447,23 @@ class AIChatNode(INode):
 
     def _generate_prompt_question(self, question_str, model, vision, image_list, video_list):
         images = []
+        _image_list = []
+        _video_list = []
         videos = []
         if vision:
             if image_list:
                 image = self.workflow_manage.get_reference_field(image_list[0], image_list[1:])
-                images = _process_images(image)
+                images, _image_list = _process_images(image)
             recalled_images = _get_upstream_knowledge_images(self.workflow_manage, self.get_node_id())
             if recalled_images:
-                images.extend(_process_images(recalled_images))
+                _recalled_images, _recalled_image_list = _process_images(recalled_images)
+                images.extend(_recalled_images)
+                _image_list.extend(_recalled_image_list)
             if video_list:
                 video = self.workflow_manage.get_reference_field(video_list[0], video_list[1:])
-                videos = _process_videos(video, model)
+                videos, _video_list = _process_videos(video, model)
+        self.data["image_list"] = _image_list
+        self.data["video_list"] = _video_list
         return HumanMessage(content=[*videos, *images, {"type": "text", "text": question_str}])
 
     async def _stream_response(
