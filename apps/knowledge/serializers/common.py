@@ -269,9 +269,12 @@ def create_knowledge_index(knowledge_id=None, document_id=None):
         dims = result[0]['dims']
         # 超过2000维度不创建索引，pgvector hnsw索引不支持超过2000维度
         if dims < 2000:
-            sql = f"""CREATE INDEX "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_cosine_ops) WHERE knowledge_id = '{k_id}'"""
+            # IF NOT EXISTS: parallel document embedding tasks for the same
+            # knowledge base can all pass the pg_indexes check above, then race
+            # on CREATE INDEX (DuplicateTable). Treat a concurrent create as OK.
+            sql = f"""CREATE INDEX IF NOT EXISTS "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_cosine_ops) WHERE knowledge_id = '{k_id}'"""
             update_execute(sql, [])
-            maxkb_logger.info(f'Created index for knowledge ID: {k_id}')
+            maxkb_logger.info(f'Ensured index for knowledge ID: {k_id}')
 
 
 def drop_knowledge_index(knowledge_id=None, document_id=None):
