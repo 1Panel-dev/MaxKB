@@ -428,6 +428,7 @@
 .el-dialog {
   --el-dialog-padding-primary: 24px;
   --el-dialog-title-font-size: 16px;
+  --el-dialog-border-radius: 12px;
   padding: 0;
   &__header {
     padding: var(--el-dialog-padding-primary);

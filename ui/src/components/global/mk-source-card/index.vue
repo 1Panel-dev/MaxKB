@@ -69,7 +69,7 @@ function handleSelectedChange(selected: boolean | string | number) {
     :class="{ 'cursor-pointer': props.selectable && !props.disabled, active: props.selectable && props.selected }"
     :role="props.selectable ? 'checkbox' : undefined"
     :tabindex="props.selectable ? 0 : undefined"
-    :shadow="props.disabled ? 'always' : 'hover'"
+    :shadow="props.disabled ? 'never' : 'hover'"
     class="mk-source-card group relative"
     body-class="flex-column h-full"
     @click="handleSelect"

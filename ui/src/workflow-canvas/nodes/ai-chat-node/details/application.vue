@@ -43,33 +43,35 @@ defineProps<{
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">本次对话</h6>
       <div class="whitespace-pre-wrap space-y-2">
-        <template v-if="Array.isArray(data.question)">
-          <div v-for="(item, qIndex) in data.question" :key="qIndex">
-            <!-- 查看本次对话图片 -->
+        <p class="mb-1 text-N600">图片：</p>
+        <!-- 查看本次对话图片 -->
+        <div v-if="data?.image_list?.length > 0" class="flex flex-wrap gap-2">
+          <template v-for="(imageItem, qIndex) in data?.image_list" :key="qIndex">
             <ImageUploadCard
-              v-if="item.type === 'image_url'"
               :file="{ name: '图片', status: 'success' }"
-              :src="item.image_url?.url || item.image_url"
-              :size="32"
+              :src="imageItem.url || imageItem"
+              :size="58"
               :show-remove="false"
-              :preview-src-list="[item.image_url?.url || item.image_url]"
+              :preview-src-list="[imageItem.url || imageItem]"
             />
-            <!-- 点击卡片播放本次对话视频 -->
-            <MkVideo v-else-if="item.type === 'video_url'" :src="item.video_url?.url || item.video_url" name="视频" class="w-60 max-w-full">
+          </template>
+        </div>
+        <p class="mb-1 text-N600">视频：</p>
+        <!-- 查看本次对话视频 -->
+        <div v-if="data?.video_list?.length > 0" class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <template v-for="(videoItem, qIndex) in data?.video_list" :key="qIndex">
+            <MkVideo :src="videoItem.url || videoItem" :name="videoItem.url" class="w-60 max-w-full">
               <el-card shadow="never" class="small cursor-pointer">
                 <div class="flex-align-center gap-2">
                   <img :src="getFileIconUrl('video.mp4')" alt="" width="24" class="shrink-0" />
-                  <span class="min-w-0 truncate">视频</span>
+                  <span class="min-w-0 truncate">{{ videoItem.url || videoItem }}</span>
                 </div>
               </el-card>
             </MkVideo>
-            <div v-else-if="item.type === 'text'">{{ item.text }}</div>
-            <div v-else>{{ item }}</div>
-          </div>
-        </template>
-        <template v-else>
-          {{ data.question || '-' }}
-        </template>
+          </template>
+        </div>
+
+        <MdPreview v-if="data.question?.content" :model-value="data.question?.content" noImgZoomIn />
       </div>
     </div>
 

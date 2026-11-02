@@ -50,16 +50,15 @@ defineProps<{
         <div v-if="data.image_list?.length > 0">
           <p class="mb-1 text-N600">图片：</p>
           <div class="flex flex-wrap gap-2">
-            <el-image
-              class="size-8"
-              v-for="(f, i) in data.image_list"
-              :key="i"
-              :src="f.url"
-              fit="cover"
-              :preview-src-list="data.image_list.map((img: any) => img.url)"
-              :scale="0.8"
-              :initial-index="i"
-            />
+            <template v-for="(imageItem, qIndex) in data?.image_list" :key="qIndex">
+              <ImageUploadCard
+                :file="{ name: '图片', status: 'success' }"
+                :src="imageItem.url || imageItem"
+                :size="58"
+                :show-remove="false"
+                :preview-src-list="[imageItem.url || imageItem]"
+              />
+            </template>
           </div>
         </div>
 
