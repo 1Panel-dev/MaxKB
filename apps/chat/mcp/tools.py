@@ -38,6 +38,11 @@ AGENT_TOOL_PREFIX = "agent_"
 
 UPLOAD_FILE_TOOL = "upload_file"
 
+# 全局 MCP 地址（不带应用 id）使用：先列出可访问的智能体，再按 application_id 调用
+LIST_AGENTS_TOOL = "list_agents"
+
+CALL_AGENT_TOOL = "call_agent"
+
 
 class InvalidParamsError(Exception):
     """工具参数不合法，对应 JSON-RPC -32602"""
@@ -211,9 +216,11 @@ class MCPToolHandler:
 
 class ChatUserMCPToolHandler:
     """
-    对话用户 API Key（chat-xxx）的 MCP 接口：Key 不绑定应用，
-    以对话用户身份暴露其有权限访问的所有已发布应用，每个应用一个工具，另加一个上传文件工具。
-    传入上一次返回的 chat_id 即可续聊；上传的文件挂在 chat_id 下，调用应用时通过 file_ids 携带。
+    对话用户 API Key（chat-xxx）的 MCP 接口，以对话用户身份调用其有权限访问的已发布应用：
+    - 单应用地址：暴露该应用的 agent_<id> 工具和上传文件工具；
+    - 全局地址：暴露 list_agents（列出可访问的应用）、call_agent（按 application_id 调用）和上传文件工具，
+      应用再多工具数量也固定。
+    传入上一次返回的 chat_id 即可续聊；上传的文件挂在 chat_id 下，调用应用时通过 image_list 等附件字段携带。
     """
 
     def __init__(self, chat_user, auth, application_id=None):
@@ -241,40 +248,91 @@ class ChatUserMCPToolHandler:
     def get_applications(self):
         return QuerySet(Application).filter(id__in=self.get_application_ids(), is_publish=True).order_by("name")
 
+    def is_accessible_application(self, application_id):
+        try:
+            application_id = str(std_uuid.UUID(str(application_id)))
+        except ValueError:
+            return False
+        return self.get_applications().filter(id=application_id).exists()
+
     @staticmethod
-    def build_agent_tool(application):
+    def build_agent_input_schema(with_application_id=False):
+        application_id = (
+            {
+                "application_id": {
+                    "type": "string",
+                    "description": f"Id of the agent to call, from {LIST_AGENTS_TOOL}.",
+                }
+            }
+            if with_application_id
+            else {}
+        )
+        return {
+            "type": "object",
+            "properties": {
+                **application_id,
+                "message": {"type": "string", "description": "The message to send to the AI."},
+                "chat_id": {
+                    "type": "string",
+                    "description": "Conversation id returned by a previous call or by upload_file. "
+                    "Pass it to continue the same conversation with history; omit it to start a new one.",
+                },
+                **{
+                    field: {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {"file_id": {"type": "string"}},
+                            "required": ["file_id"],
+                        },
+                        "description": f"{CHAT_FILE_TYPE_LABELS[field].capitalize()} files uploaded with "
+                        'upload_file to attach to this message, e.g. [{"file_id": "..."}].',
+                    }
+                    for field in CHAT_FILE_LIST_FIELDS
+                },
+                "form_data": {
+                    "type": "object",
+                    "description": "Values for the application's input parameters.",
+                },
+            },
+            "required": [*application_id, "message"],
+        }
+
+    @classmethod
+    def build_agent_tool(cls, application):
+        # 应用描述可能为空，补充通用说明，调用方模型才知道把用户的任务交给该智能体
+        description = f"{application.name} {application.desc or ''}".strip()
         return {
             "name": f"{AGENT_TOOL_PREFIX}{str(application.id)}",
-            "description": f"{application.name} {application.desc or ''}".strip(),
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                    "message": {"type": "string", "description": "The message to send to the AI."},
-                    "chat_id": {
-                        "type": "string",
-                        "description": "Conversation id returned by a previous call or by upload_file. "
-                        "Pass it to continue the same conversation with history; omit it to start a new one.",
-                    },
-                    "file_ids": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "Ids of files uploaded with upload_file to attach to this message.",
-                    },
-                    "form_data": {
-                        "type": "object",
-                        "description": "Values for the application's input parameters.",
-                    },
-                },
-                "required": ["message"],
-            },
+            "description": f"{description}\nAn AI agent. Send the user's request as message; "
+            "the agent completes the task and returns its answer.",
+            "inputSchema": cls.build_agent_input_schema(),
         }
+
+    @classmethod
+    def build_global_tools(cls):
+        return [
+            {
+                "name": LIST_AGENTS_TOOL,
+                "description": "List the AI agents you can call, with their id, name and description. "
+                f"Pick the agent that fits the user's request and call it with {CALL_AGENT_TOOL}.",
+                "inputSchema": {"type": "object", "properties": {}},
+            },
+            {
+                "name": CALL_AGENT_TOOL,
+                "description": f"Call an AI agent from {LIST_AGENTS_TOOL} by application_id. "
+                "Send the user's request as message; the agent completes the task and returns its answer.",
+                "inputSchema": cls.build_agent_input_schema(with_application_id=True),
+            },
+        ]
 
     @staticmethod
     def build_upload_tool():
         return {
             "name": UPLOAD_FILE_TOOL,
-            "description": "Upload a file to attach to a conversation. Returns file_id and chat_id; "
-            "pass both to an agent tool (file_ids, chat_id) so the AI can read the file.",
+            "description": "Upload a file to attach to a conversation. Returns file_id, field and chat_id; "
+            'pass {"file_id": ...} in the returned field (e.g. document_list) together with chat_id '
+            "to an agent tool so the AI can read the file.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -290,11 +348,21 @@ class ChatUserMCPToolHandler:
         }
 
     def list_tools(self):
+        agent_tools = (
+            [self.build_agent_tool(application) for application in self.get_applications()]
+            if self.application_id
+            else self.build_global_tools()
+        )
+        return {"tools": [*agent_tools, self.build_upload_tool()]}
+
+    def list_agents(self):
+        agents = [
+            {"application_id": str(application.id), "name": application.name, "desc": application.desc or ""}
+            for application in self.get_applications()
+        ]
         return {
-            "tools": [
-                *[self.build_agent_tool(application) for application in self.get_applications()],
-                self.build_upload_tool(),
-            ]
+            "content": [{"type": "text", "text": json.dumps(agents, ensure_ascii=False)}],
+            "structuredContent": {"agents": agents},
         }
 
     def check_chat_id(self, chat_id, application_id=None):
@@ -315,29 +383,42 @@ class ChatUserMCPToolHandler:
             raise InvalidParamsError(f"Invalid chat_id: {chat_id}")
         return chat_id
 
-    def get_chat_files(self, chat_id, file_ids):
+    def get_chat_files(self, chat_id, args):
         """
-        根据 file_ids 查出当前用户上传到该会话的文件，按类型组装成消息附件；未传 chat_id 时取文件所在会话。
+        与 MaxKB 对话接口一致，按 image_list / document_list 等字段接收附件 [{"file_id": ...}]，
+        校验为当前用户上传到同一会话的文件后补全 name、url；未传 chat_id 时取文件所在会话。
         """
-        if not file_ids:
+        field_file_ids = {}
+        for field in CHAT_FILE_LIST_FIELDS:
+            attachments = args.get(field)
+            if not attachments:
+                continue
+            if not isinstance(attachments, list) or not all(
+                isinstance(item, dict) and item.get("file_id") for item in attachments
+            ):
+                raise InvalidParamsError(f'{field} must be an array of {{"file_id": ...}}')
+            field_file_ids[field] = [str(item["file_id"]) for item in attachments]
+        if not field_file_ids:
             return chat_id, {}
-        if not isinstance(file_ids, list):
-            raise InvalidParamsError("file_ids must be an array")
-        files = list(
-            QuerySet(File).filter(
-                id__in=[str(file_id) for file_id in file_ids],
+        file_ids = {file_id for ids in field_file_ids.values() for file_id in ids}
+        files = {
+            str(file.id): file
+            for file in QuerySet(File).filter(
+                id__in=file_ids,
                 source_type=FileSourceType.CHAT,
                 meta__user_id=str(self.chat_user.id),
             )
-        )
-        source_ids = {str(file.source_id) for file in files}
-        if len(files) != len(set(map(str, file_ids))) or len(source_ids) != 1 or chat_id not in (None, *source_ids):
-            raise InvalidParamsError("file_ids must be files uploaded to the same chat_id")
-        chat_files = {}
-        for file in files:
-            chat_files.setdefault(get_chat_file_field(file.file_name), []).append(
-                {"name": file.file_name, "url": f"./oss/file/{file.id}", "file_id": str(file.id)}
-            )
+        }
+        source_ids = {str(file.source_id) for file in files.values()}
+        if len(files) != len(file_ids) or len(source_ids) != 1 or chat_id not in (None, *source_ids):
+            raise InvalidParamsError("Attached files must be uploaded with upload_file to the same chat_id")
+        chat_files = {
+            field: [
+                {"name": files[file_id].file_name, "url": f"./oss/file/{file_id}", "file_id": file_id}
+                for file_id in ids
+            ]
+            for field, ids in field_file_ids.items()
+        }
         return source_ids.pop(), chat_files
 
     def upload_file(self, args):
@@ -360,7 +441,14 @@ class ChatUserMCPToolHandler:
                 "source_type": FileSourceType.CHAT,
             }
         ).upload(user_id=str(self.chat_user.id))
-        result = {"file_id": file_url.split("/")[-1], "name": file_name, "url": file_url, "chat_id": chat_id}
+        result = {
+            "file_id": file_url.split("/")[-1],
+            "name": file_name,
+            "url": file_url,
+            # 按后缀给出建议的附件字段，调用方可据此放入对应的 *_list
+            "field": get_chat_file_field(file_name),
+            "chat_id": chat_id,
+        }
         return {
             "content": [{"type": "text", "text": json.dumps(result, ensure_ascii=False)}],
             "structuredContent": result,
@@ -371,15 +459,23 @@ class ChatUserMCPToolHandler:
         args = params.get("arguments") or {}
         if name == UPLOAD_FILE_TOOL:
             return self.upload_file(args)
+        if not self.application_id and name == LIST_AGENTS_TOOL:
+            return self.list_agents()
+        if not self.application_id and name == CALL_AGENT_TOOL:
+            application_id = str(args.get("application_id") or "")
+            if not self.is_accessible_application(application_id):
+                raise InvalidParamsError(f"Unknown application_id: {application_id}")
+            return self.call_agent(application_id, args)
         application_id = name[len(AGENT_TOOL_PREFIX) :] if name.startswith(AGENT_TOOL_PREFIX) else ""
-        if not application_id or not self.get_applications().filter(id=application_id).exists():
+        if not self.application_id or not self.is_accessible_application(application_id):
             raise InvalidParamsError(f"Unknown tool: {name}")
+        return self.call_agent(application_id, args)
+
+    def call_agent(self, application_id, args):
         form_data = args.get("form_data") or {}
         if not isinstance(form_data, dict):
             raise InvalidParamsError("form_data must be an object")
-        chat_id, chat_files = self.get_chat_files(
-            self.check_chat_id(args.get("chat_id"), application_id), args.get("file_ids")
-        )
+        chat_id, chat_files = self.get_chat_files(self.check_chat_id(args.get("chat_id"), application_id), args)
         # 文件可能先上传到别的应用的会话，这里再按当前应用校验一次
         chat_id = self.check_chat_id(chat_id, application_id)
         answer, chat_id = chat_application(

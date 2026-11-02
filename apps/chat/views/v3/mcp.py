@@ -1,6 +1,9 @@
 import json
+import queue
+import threading
 
-from django.http import JsonResponse, HttpResponse
+from django.db import connection
+from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -15,6 +18,74 @@ def rpc_response(request_id, result=None, code=None, message=None, status=200):
     response = JsonResponse(data, status=status)
     if status == 401:
         response["WWW-Authenticate"] = "Bearer"
+    return response
+
+
+# 智能体执行期间推送进度/心跳的间隔（秒），保证客户端读超时不会在长任务中触发
+SSE_HEARTBEAT_SECONDS = 15
+
+
+def rpc_error(error):
+    if isinstance(error, InvalidParamsError):
+        return -32602, str(error)
+    return -32603, f"Internal error: {str(error)}"
+
+
+def sse_event(data):
+    return f"event: message\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+def stream_tool_call(handler, params, request_id):
+    """
+    tools/call 以 SSE 返回：后台线程执行智能体，期间定时推送进度通知（客户端带 progressToken 时）或心跳注释，
+    结束后推送 JSON-RPC 结果。长任务不会因为长时间收不到数据而触发客户端 ReadTimeout。
+    """
+    result_queue = queue.Queue()
+
+    def run():
+        try:
+            result_queue.put(("result", handler.call_tool(params)))
+        except Exception as e:
+            result_queue.put(("error", e))
+        finally:
+            connection.close()
+
+    threading.Thread(target=run, daemon=True).start()
+    progress_token = (params.get("_meta") or {}).get("progressToken")
+    progress = 0
+    while True:
+        try:
+            kind, value = result_queue.get(timeout=SSE_HEARTBEAT_SECONDS)
+        except queue.Empty:
+            progress += 1
+            if progress_token is None:
+                yield ": ping\n\n"
+            else:
+                yield sse_event(
+                    {
+                        "jsonrpc": "2.0",
+                        "method": "notifications/progress",
+                        "params": {
+                            "progressToken": progress_token,
+                            "progress": progress,
+                            "message": "Agent is working",
+                        },
+                    }
+                )
+            continue
+        if kind == "result":
+            yield sse_event({"jsonrpc": "2.0", "id": request_id, "result": value})
+        else:
+            code, message = rpc_error(value)
+            yield sse_event({"jsonrpc": "2.0", "id": request_id, "error": {"code": code, "message": message}})
+        return
+
+
+def sse_response(stream):
+    response = StreamingHttpResponse(stream, content_type="text/event-stream; charset=utf-8")
+    response["Cache-Control"] = "no-cache"
+    # 关闭 Nginx 等反向代理的缓冲，心跳才能及时到达客户端
+    response["X-Accel-Buffering"] = "no"
     return response
 
 
@@ -59,6 +130,9 @@ def mcp_view(request, application_id=None):
             result = handler.list_tools()
 
         elif method == "tools/call":
+            # 智能体执行可能长达数分钟，客户端支持 SSE 时流式返回
+            if "text/event-stream" in request.headers.get("Accept", ""):
+                return sse_response(stream_tool_call(handler, params, request_id))
             result = handler.call_tool(params)
 
         else:
@@ -69,9 +143,8 @@ def mcp_view(request, application_id=None):
 
     except AppAuthenticationFailed as e:
         return rpc_response(request_id, code=-32001, message=str(e.message), status=401)
-    except InvalidParamsError as e:
-        return rpc_response(request_id, code=-32602, message=str(e))
     except (json.JSONDecodeError, UnicodeDecodeError):
         return rpc_response(None, code=-32700, message="Parse error", status=400)
     except Exception as e:
-        return rpc_response(request_id, code=-32603, message=f"Internal error: {str(e)}")
+        code, message = rpc_error(e)
+        return rpc_response(request_id, code=code, message=message)
