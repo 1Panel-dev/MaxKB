@@ -7,6 +7,7 @@ import type { ScrollbarInstance } from 'element-plus'
 import type { DefaultModelSettingPayload, ModelItem, ModelProviderItem } from '@/api/types'
 import SelectModel from '@/components/business/select-model/index.vue'
 import ContentList from '@/conversation-panel/components/content-list/index.vue'
+import QuickQuestion from '@/conversation-panel/components/markdown-renderer/QuickQuestion.vue'
 import { inputShortcut } from '@/conversation-panel/core/shortcuts'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { useWorkflowStore } from '@/workflow-canvas/store'
@@ -46,6 +47,18 @@ const scrollbarRef = useTemplateRef<ScrollbarInstance>('scrollbarRef')
 const activity = createActivity()
 const busy = computed(() => status.value === 'running')
 const started = computed(() => status.value !== 'idle')
+
+const suggestedRequirements = [
+  '做一个产品客服，先查产品知识库回答，查不到时礼貌兜底。',
+  '做一个可以查询产品收费信息的智能体。',
+  '做一个需要时可以转人工服务的客服智能体。',
+]
+
+function sendSuggestedRequirement(question: string) {
+  if (!modelId.value || busy.value) return
+  requirement.value = question
+  submit()
+}
 
 let agent: AgentHandle | null = null
 
@@ -178,10 +191,15 @@ defineExpose({ open, close })
     <div class="flex h-full flex-col" @keydown.stop @paste.stop>
       <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1 p-4">
         <div class="space-y-3">
-          <p v-if="!started" class="mk-gray-card text-N600">
-            描述你想要的智能体，例如：“做一个产品客服，先查产品知识库回答，查不到时礼貌兜底”。AI
-            会规划流程、添加节点、连线并完成配置，生成后请检查再保存。
-          </p>
+          <div v-if="!started">
+            <p>请描述你的需求，如下</p>
+            <div class="flex flex-col items-start">
+              <template v-for="question in suggestedRequirements" :key="question">
+                <!-- 发送示例需求生成工作流 -->
+                <QuickQuestion class="ml-0!" :question="question" :send-message="sendSuggestedRequirement" />
+              </template>
+            </div>
+          </div>
           <ContentList v-else :content-list="activity.activityItems.value" />
           <div v-if="busy" class="flex-align-center gap-2 text-N600">
             <span class="mk-dotting">{{ activity.lastActivity.value || '生成中' }}</span>

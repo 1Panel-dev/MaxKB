@@ -45,15 +45,28 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" direction="btt" :close-on-click-modal="true" :close-on-press-escape="true">
+  <MkDrawer
+    v-model="visible"
+    direction="btt"
+    class="select-application-drawer"
+    content-class="max-md:pt-0"
+    :close-on-click-modal="true"
+    :close-on-press-escape="true"
+  >
     <template #header>
       <div class="flex w-full">
         <h4>选择智能体</h4>
-        <div class="absolute-center w-85">
+        <div class="absolute-center hidden w-85 md:block">
+          <!-- 搜索智能体 -->
           <MkSearchInput v-model="applicationKeyword" @input="handleKeywordInput" />
         </div>
       </div>
     </template>
+
+    <div class="mb-4 md:hidden">
+      <!-- 移动端搜索智能体 -->
+      <MkSearchInput v-model="applicationKeyword" @input="handleKeywordInput" />
+    </div>
 
     <div v-loading="isLoading">
       <MkEmpty
@@ -66,3 +79,12 @@ defineExpose({ open })
     </div>
   </MkDrawer>
 </template>
+
+<style lang="scss" scoped>
+/* 移动端选择智能体标题栏 */
+@media (width < 768px) {
+  :global(.select-application-drawer .el-drawer__header) {
+    border-bottom: none;
+  }
+}
+</style>
