@@ -317,6 +317,10 @@ def _auth_system(file, user_id):
     user_auth = get_auth(user)
 
     if file.source_type == FileSourceType.CHAT:
+        # 调试等场景可能使用前端生成的会话 ID,首条消息发送前 Chat 记录尚未创建;
+        # 文件归属者为当前用户时直接放行。
+        if file.meta.get("user_id") == user_id:
+            return
         application = QuerySet(Application).filter(chat__id=file.source_id).first()
         if application is None:
             _deny()
