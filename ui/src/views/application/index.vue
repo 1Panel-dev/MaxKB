@@ -195,7 +195,7 @@ function handleBatchDelete() {
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip v-if="perm.application.workspace.folderCreate(getWorkspaceId()||'')" content="创建文件夹" placement="top">
+        <MkTooltip v-if="perm.application.workspace.folderCreate(getWorkspaceId() || '')" content="创建文件夹" placement="top">
           <el-button @click="handleCreateFolder" text type="primary" class="-mr-1">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
@@ -250,13 +250,23 @@ function handleBatchDelete() {
                   <!-- 设置 -->
                   <SettingApplicationAction v-if="perm.application.workspace.edit(application.id)" label="设置" :application="application" />
                   <!-- 智能体触发器 -->
-                  <TriggerApplicationAction v-if="perm.application.workspace.triggerRead(application.id)" label="触发器" :api="ResourceTriggerApi" :application="application" />
+                  <TriggerApplicationAction
+                    v-if="perm.application.workspace.triggerRead(application.id)"
+                    label="触发器"
+                    :api="ResourceTriggerApi"
+                    :application="application"
+                  />
                   <!-- MCP 服务配置 -->
                   <McpConfigApplicationAction label="MCP 服务配置" :application="application" />
                   <!-- 资源授权 -->
                   <AuthorizeApplicationAction v-if="perm.application.workspace.auth(application.id)" label="资源授权" :application="application" />
                   <!-- 查看关联资源 -->
-                  <RelatedResourcesApplicationAction v-if="perm.application.workspace.relateMap(application.id)" label="查看关联资源" :api="RelatedResourcesApi" :application="application" />
+                  <RelatedResourcesApplicationAction
+                    v-if="perm.application.workspace.relateMap(application.id)"
+                    label="查看关联资源"
+                    :api="RelatedResourcesApi"
+                    :application="application"
+                  />
                   <!-- 复制 -->
                   <CopyApplicationAction
                     v-model:loading="applicationOperationLoading"
@@ -319,8 +329,24 @@ function handleBatchDelete() {
         @batch-cancel="cancelBatchSelection"
       >
         <template #footer-batch-actions>
-          <el-button v-if="perm.application.workspace.batchMove()" type="primary" plain :disabled="!selectedApplicationCount" @click="handleOpenBatchMove">移动到</el-button>
-          <el-button v-if="perm.application.workspace.batchDelete()" type="danger" plain :disabled="!selectedApplicationCount" @click="handleBatchDelete">删除</el-button>
+          <el-button
+            v-if="perm.application.workspace.batchMove()"
+            type="primary"
+            plain
+            :disabled="!selectedApplicationCount"
+            @click="handleOpenBatchMove"
+          >
+            移动到
+          </el-button>
+          <el-button
+            v-if="perm.application.workspace.batchDelete()"
+            type="danger"
+            plain
+            :disabled="!selectedApplicationCount"
+            @click="handleBatchDelete"
+          >
+            删除
+          </el-button>
         </template>
       </component>
     </template>
