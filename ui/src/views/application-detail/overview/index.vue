@@ -24,13 +24,8 @@ const route = useRoute()
 const workspaceId = computed(() => String(route.params.workspaceId ?? ''))
 const { application, applicationId, resourceApi } = useApplicationDetailContext()
 
-type ApplicationOverviewPermissionMethod =
-    | 'overviewRead'
-    | 'overviewEmbed'
-    | 'overviewAccess'
-    | 'overviewDisplay'
-    | 'overviewApiKey'
-function applicationOverviewPermission(method: ApplicationOverviewPermissionMethod): boolean{
+type ApplicationOverviewPermissionMethod = 'overviewRead' | 'overviewEmbed' | 'overviewAccess' | 'overviewDisplay' | 'overviewApiKey'
+function applicationOverviewPermission(method: ApplicationOverviewPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.application.system[method]())
   return Boolean(perm.application.workspace[method](applicationId.value))
 }
