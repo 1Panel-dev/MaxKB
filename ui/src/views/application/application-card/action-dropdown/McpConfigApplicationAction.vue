@@ -38,7 +38,7 @@ function handleOpenMcpConfig() {
   </MkDropdownItem>
 
   <MkDialog v-model="visible" title="MCP 服务配置">
-    <div class="group relative pb-5">
+    <div class="group relative">
       <el-input :model-value="mcpConfig" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
       <!-- 复制 MCP 配置 -->
       <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle @click="copyText(mcpConfig)">
