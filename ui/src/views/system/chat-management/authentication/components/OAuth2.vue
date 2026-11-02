@@ -6,15 +6,25 @@ import { LOGIN_METHOD } from '@/api/enums'
 import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
+import { CHAT_API_BASE_PATH } from '@/api/constants.ts'
 
 defineOptions({ name: 'OidcAuthenticationSetting' })
-const defaultRedirectUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api/oauth2`
+const defaultRedirectUrl = `${window.location.origin}${CHAT_API_BASE_PATH}/auth/oauth2`
 
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
 const form = reactive<AuthProviderSettingPayload>({
   auth_type: LOGIN_METHOD.OAUTH2,
-  config: { authEndpoint: '', tokenEndpoint: '', userInfoEndpoint: '', scope: '', clientId: '', clientSecret: '', redirectUrl: '', fieldMapping: '' },
+  config: {
+    authEndpoint: '',
+    tokenEndpoint: '',
+    userInfoEndpoint: '',
+    scope: '',
+    clientId: '',
+    clientSecret: '',
+    redirectUrl: defaultRedirectUrl,
+    fieldMapping: '',
+  },
   is_active: false,
 })
 const rules = reactive<FormRules<AuthProviderSettingPayload>>({

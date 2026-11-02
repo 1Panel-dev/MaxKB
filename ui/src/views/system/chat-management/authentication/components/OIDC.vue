@@ -6,10 +6,11 @@ import { LOGIN_METHOD } from '@/api/enums'
 import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
+import { CHAT_API_BASE_PATH } from '@/api/constants.ts'
 
 defineOptions({ name: 'OidcAuthenticationSetting' })
 const defaultFieldMapping = '{"username":"preferred_username","email":"email"}'
-const defaultRedirectUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api/oidc`
+const defaultRedirectUrl = `${window.location.origin}${CHAT_API_BASE_PATH}/auth/oidc`
 
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
