@@ -27,6 +27,7 @@ v3=[
         path('chat/<str:chat_id>/chat_record/<str:chat_record_id>/resume_chat_message',v3_views.ResumeStreamView.as_view(), name='v3_resume_chat_message'),
         path('chat/<str:chat_id>/share_chat',ChatRecordLinkView.as_view(),name='v3_share_chat'),
         path('chat/<str:chat_id>',v3_views.HistoricalConversationView.Operate.as_view(), name='v3_historical_conversation_operate'),
+        path('mcp', v3_views.mcp_view),
     ])),
     # ---- 全局（非 application 作用域）----
     path('embed', v3_views.ChatEmbedView.as_view()),

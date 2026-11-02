@@ -326,7 +326,7 @@ class AIChatKnowledgeImageTests(SimpleTestCase):
     @patch("application.workflow.nodes.ai_chat_node.ai_chat_node._process_images")
     def test_vision_chat_receives_recalled_knowledge_images(self, process_images, get_model, _authorized):
         processed_image = {"type": "image_url", "image_url": {"url": "data:image/png;base64,image"}}
-        process_images.return_value = [processed_image]
+        process_images.return_value = ([processed_image], [{"url": "./oss/file/image"}])
         self.workflow_manage.generate_prompt.side_effect = ["answer with the recalled context", "system prompt"]
         self.workflow_manage.workflow_type = WorkflowType.APPLICATION
         self.workflow_manage.get_parameters.return_value = {"workspace_id": "workspace"}

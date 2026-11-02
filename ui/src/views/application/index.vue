@@ -19,6 +19,7 @@ import {
   DeleteApplicationAction,
   ExportApplicationAction,
   PortalApplicationAction,
+  McpConfigApplicationAction,
   MoveApplicationAction,
   SettingApplicationAction,
   TriggerApplicationAction,
@@ -250,6 +251,8 @@ function handleBatchDelete() {
                   <SettingApplicationAction v-if="perm.application.workspace.edit(application.id)" label="设置" :application="application" />
                   <!-- 智能体触发器 -->
                   <TriggerApplicationAction v-if="perm.application.workspace.triggerRead(application.id)" label="触发器" :api="ResourceTriggerApi" :application="application" />
+                  <!-- MCP 服务配置 -->
+                  <McpConfigApplicationAction label="MCP 服务配置" :application="application" />
                   <!-- 资源授权 -->
                   <AuthorizeApplicationAction v-if="perm.application.workspace.auth(application.id)" label="资源授权" :application="application" />
                   <!-- 查看关联资源 -->
