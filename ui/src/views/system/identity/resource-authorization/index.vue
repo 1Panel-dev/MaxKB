@@ -5,7 +5,7 @@ import WorkspaceApi from '@/api/admin/system/workspace'
 import CommonSystemApi from '@/api/admin/system/common'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import ResourceAuthorizationApi from '@/api/admin/system/resource-authorization'
-import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
+import { RESOURCE_TYPE } from '@/api/enums'
 import type {
   ResourceAuthorizationType,
   ResourcePermissionItem,
@@ -126,7 +126,6 @@ function buildResourceTree(resourceItems: ResourcePermissionItem[]) {
   const resources = resourceItems.map((resource) => ({
     ...resource,
     children: [] as ResourcePermissionItem[],
-    permission: !resource.folder_id && resource.permission === RESOURCE_PERMISSION.NOT_AUTH ? RESOURCE_PERMISSION.VIEW : resource.permission,
   }))
   const resourceMap = new Map(resources.map((resource) => [resource.id, resource]))
 
@@ -139,10 +138,8 @@ function buildResourceTree(resourceItems: ResourcePermissionItem[]) {
     }
   })
 
-  const defaultRoot = resourceMap.get('default')
-  if (defaultRoot && !defaultRoot.folder_id) return defaultRoot.children
-
-  return resources.filter(({ folder_id }) => !folder_id)
+  // 根目录仅作为资源容器，授权列表直接展示其子目录和资源。
+  return resources.filter(({ folder_id }) => !folder_id).flatMap((resource) => (resource.resource_type === 'folder' ? resource.children : [resource]))
 }
 
 /* 保存权限 */
