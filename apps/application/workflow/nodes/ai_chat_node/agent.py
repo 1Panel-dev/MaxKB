@@ -18,6 +18,7 @@ import shutil
 import langchain_core.messages.ai as _lc_ai_module
 import uuid_utils.compat as uuid
 from deepagents import create_deep_agent
+from langchain.agents.middleware import AgentMiddleware
 from langchain_core.utils._merge import merge_lists as _original_merge_lists
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.checkpoint.memory import MemorySaver
@@ -139,6 +140,33 @@ class ToolCallStreamManagement:
         self.id_name_map[tool_id] = name
 
 
+# deepagents 内置的文件与 Shell 工具
+_FILESYSTEM_TOOL_NAMES = frozenset({"ls", "read_file", "write_file", "edit_file", "delete", "glob", "grep", "execute"})
+
+
+class HideFilesystemToolsMiddleware(AgentMiddleware):
+    """
+    未启用技能时隐藏 deepagents 内置的文件与 Shell 工具，模型只能使用节点配置的工具与 MCP，
+    避免绕过 MCP 自己写文件或在服务器上执行命令。
+    """
+
+    @staticmethod
+    def _filter(request):
+        tools = [
+            tool
+            for tool in request.tools
+            if (tool.get("name") if isinstance(tool, dict) else getattr(tool, "name", None))
+            not in _FILESYSTEM_TOOL_NAMES
+        ]
+        return request.override(tools=tools) if len(tools) != len(request.tools) else request
+
+    def wrap_model_call(self, request, handler):
+        return handler(self._filter(request))
+
+    async def awrap_model_call(self, request, handler):
+        return await handler(self._filter(request))
+
+
 def create_agent(
     chat_model,
     system_prompt,
@@ -169,10 +197,13 @@ def create_agent(
             for tool in extra_tools:
                 tools.append(tool)
 
+        # 只有技能需要读写技能文件并执行脚本，才挂载本机 Shell 后端与内置文件工具；
+        # 仅 MCP/工具时使用默认的内存后端并隐藏内置文件工具，模型只能通过配置的工具完成任务
         agent = create_deep_agent(
             model=chat_model,
-            backend=SandboxShellBackend(root_dir=temp_dir, virtual_mode=True),
-            skills=["/skills"],
+            backend=SandboxShellBackend(root_dir=temp_dir, virtual_mode=True) if skill_tool_ids else None,
+            skills=["/skills"] if skill_tool_ids else None,
+            middleware=() if skill_tool_ids else (HideFilesystemToolsMiddleware(),),
             tools=tools,
             system_prompt=system_prompt,
             interrupt_on={"write_file": False, "read_file": False, "edit_file": False},

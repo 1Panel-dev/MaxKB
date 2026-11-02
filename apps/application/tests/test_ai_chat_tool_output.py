@@ -403,3 +403,56 @@ class AIChatToolOutputTests(SimpleTestCase):
         self.assertEqual(cards[-1].status, Status.SUCCESS)
         self.assertEqual(cards[-1].name, "display-tool")
         self.assertNotIn("image-payload", cards[-1].content)
+
+
+class AIChatAgentBackendTests(SimpleTestCase):
+    def _create_deep_agent_kwargs(self, skill_tool_ids):
+        async def stream(*args, **kwargs):
+            return
+            yield
+
+        with (
+            TemporaryDirectory(prefix="maxkb-backend-test-") as directory,
+            patch.object(agent_module, "init_skills", new=AsyncMock()),
+            patch.object(
+                agent_module, "MultiServerMCPClient", return_value=SimpleNamespace(get_tools=AsyncMock(return_value=[]))
+            ),
+            patch.object(agent_module, "SandboxShellBackend", return_value="shell-backend"),
+            patch.object(
+                agent_module, "create_deep_agent", return_value=SimpleNamespace(astream=stream)
+            ) as create_deep_agent,
+        ):
+            agent_module.create_agent(
+                MagicMock(),
+                "system",
+                [],
+                "{}",
+                SimpleNamespace(on_next=lambda chunk: None, on_complete=lambda error: None),
+                chat_id=directory,
+                skill_tool_ids=skill_tool_ids,
+                async_runner=SimpleNamespace(run_async=lambda fn: asyncio.run(fn())),
+            )
+        return create_deep_agent.call_args.kwargs
+
+    def test_mcp_or_tools_only_do_not_expose_server_shell(self):
+        for skill_tool_ids in (None, []):
+            with self.subTest(skill_tool_ids=skill_tool_ids):
+                kwargs = self._create_deep_agent_kwargs(skill_tool_ids)
+                self.assertIsNone(kwargs["backend"])
+                self.assertIsNone(kwargs["skills"])
+                self.assertIsInstance(kwargs["middleware"][0], agent_module.HideFilesystemToolsMiddleware)
+
+    def test_skills_keep_shell_backend(self):
+        kwargs = self._create_deep_agent_kwargs(["skill-id"])
+
+        self.assertEqual(kwargs["backend"], "shell-backend")
+        self.assertEqual(kwargs["skills"], ["/skills"])
+        self.assertEqual(kwargs["middleware"], ())
+
+    def test_hide_filesystem_tools_keeps_configured_tools(self):
+        request = MagicMock(tools=[SimpleNamespace(name="ls"), {"name": "execute"}, SimpleNamespace(name="agent_x")])
+
+        agent_module.HideFilesystemToolsMiddleware().wrap_model_call(request, lambda req: req)
+
+        request.override.assert_called_once()
+        self.assertEqual([getattr(t, "name", None) for t in request.override.call_args.kwargs["tools"]], ["agent_x"])

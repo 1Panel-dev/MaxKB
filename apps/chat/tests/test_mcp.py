@@ -12,6 +12,20 @@ from common.auth.struct.auth import Auth
 from common.exception.app_exception import AppAuthenticationFailed
 
 
+APP_ID = "01a17d06-3bd0-7661-91dc-9d990282d863"
+
+AGENT_PARAMS = {
+    "message",
+    "chat_id",
+    "form_data",
+    "image_list",
+    "document_list",
+    "audio_list",
+    "video_list",
+    "other_list",
+}
+
+
 class ChatApplicationTest(SimpleTestCase):
     @patch("common.init.init_template.run")
     @patch("chat.mcp.tools.ChatSerializers")
@@ -71,36 +85,75 @@ class ChatUserMCPToolHandlerTest(SimpleTestCase):
         )
         self.assertEqual(ChatUserMCPToolHandler(SimpleNamespace(id="u"), auth, "app-9").get_application_ids(), [])
 
+    def scoped_handler(self):
+        return ChatUserMCPToolHandler(SimpleNamespace(id="user-id"), Auth(set(), {f"CHAT_USER:r:{APP_ID}": 1}), APP_ID)
+
     @patch("chat.mcp.tools.QuerySet")
-    def test_list_tools_exposes_one_tool_per_application_and_upload(self, query_set):
+    def test_scoped_list_tools_exposes_the_agent_and_upload(self, query_set):
         query_set.return_value.filter.return_value.order_by.return_value = [
-            SimpleNamespace(id="app-1", name="Agent", desc="desc")
+            SimpleNamespace(id=APP_ID, name="Agent", desc="desc")
         ]
 
+        tools = self.scoped_handler().list_tools()["tools"]
+
+        self.assertEqual([tool["name"] for tool in tools], [f"agent_{APP_ID}", "upload_file"])
+        self.assertTrue(tools[0]["description"].startswith("Agent desc\nAn AI agent."))
+        self.assertEqual(set(tools[0]["inputSchema"]["properties"]), AGENT_PARAMS)
+        self.assertEqual(tools[0]["inputSchema"]["required"], ["message"])
+
+    def test_global_list_tools_exposes_list_and_call_agent(self):
         tools = self.handler.list_tools()["tools"]
 
-        self.assertEqual([tool["name"] for tool in tools], ["agent_app-1", "upload_file"])
-        self.assertEqual(tools[0]["description"], "Agent desc")
-        self.assertEqual(set(tools[0]["inputSchema"]["properties"]), {"message", "chat_id", "file_ids", "form_data"})
+        self.assertEqual([tool["name"] for tool in tools], ["list_agents", "call_agent", "upload_file"])
+        self.assertEqual(set(tools[1]["inputSchema"]["properties"]), {"application_id", *AGENT_PARAMS})
+        self.assertEqual(tools[1]["inputSchema"]["required"], ["application_id", "message"])
+
+    @patch.object(ChatUserMCPToolHandler, "get_applications")
+    def test_list_agents_returns_accessible_applications(self, get_applications):
+        get_applications.return_value = [SimpleNamespace(id=APP_ID, name="Agent", desc=None)]
+
+        result = self.handler.call_tool({"name": "list_agents", "arguments": {}})
+
+        self.assertEqual(
+            result["structuredContent"], {"agents": [{"application_id": APP_ID, "name": "Agent", "desc": ""}]}
+        )
+        self.assertEqual(json.loads(result["content"][0]["text"]), result["structuredContent"]["agents"])
 
     @patch("chat.mcp.tools.chat_application", return_value=("answer", "chat-id"))
     @patch.object(ChatUserMCPToolHandler, "get_applications")
-    def test_call_tool_chats_as_chat_user_and_returns_chat_id(self, get_applications, chat_app):
+    def test_call_agent_tool_chats_as_chat_user_and_returns_chat_id(self, get_applications, chat_app):
         get_applications.return_value.filter.return_value.exists.return_value = True
 
-        result = self.handler.call_tool({"name": "agent_app-1", "arguments": {"message": "hi"}})
+        result = self.scoped_handler().call_tool({"name": f"agent_{APP_ID}", "arguments": {"message": "hi"}})
 
-        get_applications.return_value.filter.assert_called_once_with(id="app-1")
-        chat_app.assert_called_once_with("app-1", "user-id", ChatUserType.CHAT_USER.value, "hi", {}, {}, None)
+        get_applications.return_value.filter.assert_called_once_with(id=APP_ID)
+        chat_app.assert_called_once_with(APP_ID, "user-id", ChatUserType.CHAT_USER.value, "hi", {}, {}, None)
         self.assertEqual(result["content"][0], {"type": "text", "text": "answer"})
         self.assertEqual(result["structuredContent"], {"answer": "answer", "chat_id": "chat-id"})
 
+    @patch("chat.mcp.tools.chat_application", return_value=("answer", "chat-id"))
     @patch.object(ChatUserMCPToolHandler, "get_applications")
-    def test_call_tool_rejects_unpermitted_application(self, get_applications):
-        get_applications.return_value.filter.return_value.exists.return_value = False
+    def test_global_call_agent_uses_application_id(self, get_applications, chat_app):
+        get_applications.return_value.filter.return_value.exists.return_value = True
 
-        with self.assertRaises(InvalidParamsError):
-            self.handler.call_tool({"name": "agent_app-9", "arguments": {"message": "hi"}})
+        self.handler.call_tool({"name": "call_agent", "arguments": {"application_id": APP_ID, "message": "hi"}})
+
+        chat_app.assert_called_once_with(APP_ID, "user-id", ChatUserType.CHAT_USER.value, "hi", {}, {}, None)
+
+    @patch.object(ChatUserMCPToolHandler, "get_applications")
+    def test_call_tool_rejects_unknown_tools_and_applications(self, get_applications):
+        get_applications.return_value.filter.return_value.exists.return_value = False
+        cases = [
+            (self.handler, "call_agent", {"application_id": APP_ID, "message": "hi"}),
+            (self.handler, "call_agent", {"application_id": "not-a-uuid", "message": "hi"}),
+            (self.handler, f"agent_{APP_ID}", {"message": "hi"}),
+            (self.scoped_handler(), "list_agents", {}),
+            (self.scoped_handler(), "call_agent", {"application_id": APP_ID, "message": "hi"}),
+            (self.scoped_handler(), "agent_not-a-uuid", {"message": "hi"}),
+        ]
+        for handler, name, arguments in cases:
+            with self.subTest(name=name, scoped=bool(handler.application_id)), self.assertRaises(InvalidParamsError):
+                handler.call_tool({"name": name, "arguments": arguments})
 
     @patch("chat.mcp.tools.QuerySet")
     def test_check_chat_id(self, query_set):
@@ -125,31 +178,41 @@ class ChatUserMCPToolHandlerTest(SimpleTestCase):
             self.handler.check_chat_id("not-a-uuid")
 
     @patch("chat.mcp.tools.QuerySet")
-    def test_chat_files_are_grouped_and_infer_chat_id(self, query_set):
+    def test_chat_files_keep_caller_fields_and_infer_chat_id(self, query_set):
         query_set.return_value.filter.return_value = [
             SimpleNamespace(id="f1", file_name="a.png", source_id="chat-1"),
             SimpleNamespace(id="f2", file_name="b.pdf", source_id="chat-1"),
         ]
 
-        chat_id, chat_files = self.handler.get_chat_files(None, ["f1", "f2"])
+        chat_id, chat_files = self.handler.get_chat_files(
+            None, {"image_list": [{"file_id": "f1"}], "other_list": [{"file_id": "f2", "name": "ignored"}]}
+        )
 
         self.assertEqual(chat_id, "chat-1")
         self.assertEqual(
             chat_files,
             {
                 "image_list": [{"name": "a.png", "url": "./oss/file/f1", "file_id": "f1"}],
-                "document_list": [{"name": "b.pdf", "url": "./oss/file/f2", "file_id": "f2"}],
+                "other_list": [{"name": "b.pdf", "url": "./oss/file/f2", "file_id": "f2"}],
             },
         )
+
+    def test_chat_files_without_attachments(self):
+        self.assertEqual(self.handler.get_chat_files("chat-1", {"message": "hi"}), ("chat-1", {}))
 
     @patch("chat.mcp.tools.QuerySet")
     def test_chat_files_must_belong_to_the_chat(self, query_set):
         query_set.return_value.filter.return_value = [SimpleNamespace(id="f1", file_name="a.png", source_id="chat-1")]
 
         with self.assertRaises(InvalidParamsError):
-            self.handler.get_chat_files("chat-2", ["f1"])
+            self.handler.get_chat_files("chat-2", {"image_list": [{"file_id": "f1"}]})
         with self.assertRaises(InvalidParamsError):
-            self.handler.get_chat_files(None, ["f1", "missing"])
+            self.handler.get_chat_files(None, {"image_list": [{"file_id": "f1"}, {"file_id": "missing"}]})
+
+    def test_chat_files_reject_invalid_format(self):
+        for attachments in (["f1"], {"file_id": "f1"}, [{"name": "a.png"}]):
+            with self.subTest(attachments=attachments), self.assertRaises(InvalidParamsError):
+                self.handler.get_chat_files(None, {"image_list": attachments})
 
     @patch("oss.serializers.file.FileSerializer")
     def test_upload_file_returns_file_and_new_chat_id(self, file_serializer):
@@ -162,6 +225,7 @@ class ChatUserMCPToolHandlerTest(SimpleTestCase):
         self.assertEqual(data["source_id"], result["chat_id"])
         file_serializer.return_value.upload.assert_called_once_with(user_id="user-id")
         self.assertEqual(result["file_id"], "file-1")
+        self.assertEqual(result["field"], "document_list")
 
     def test_upload_file_rejects_invalid_content(self):
         with self.assertRaises(InvalidParamsError):
@@ -219,3 +283,66 @@ class MCPViewTest(SimpleTestCase):
 
         self.assertIs(match.func, mcp_view)
         self.assertEqual(match.kwargs, {"application_id": "app-1"})
+
+    def post_sse(self, body):
+        request = self.factory.post(
+            "/chat/api/v3/mcp",
+            data=json.dumps(body),
+            content_type="application/json",
+            HTTP_AUTHORIZATION="Bearer chat-key",
+            HTTP_ACCEPT="application/json, text/event-stream",
+        )
+        return mcp_view(request)
+
+    @staticmethod
+    def read_sse(response):
+        return b"".join(response.streaming_content).decode()
+
+    @patch("chat.views.v3.mcp.SSE_HEARTBEAT_SECONDS", 0.01)
+    @patch("chat.views.v3.mcp.ChatUserMCPToolHandler")
+    @patch("chat.views.v3.mcp.ChatUserKey.handle", return_value=(SimpleNamespace(profile=None), MagicMock()))
+    def test_tool_call_streams_progress_then_result(self, _handle, handler_class):
+        import time
+
+        def slow_call(params):
+            time.sleep(0.05)
+            return {"content": [{"type": "text", "text": "done"}]}
+
+        handler_class.return_value.call_tool.side_effect = slow_call
+
+        response = self.post_sse(
+            {
+                "jsonrpc": "2.0",
+                "id": 7,
+                "method": "tools/call",
+                "params": {"name": "agent_x", "arguments": {}, "_meta": {"progressToken": "p1"}},
+            }
+        )
+
+        self.assertEqual(response["Content-Type"], "text/event-stream; charset=utf-8")
+        events = [json.loads(line[6:]) for line in self.read_sse(response).splitlines() if line.startswith("data: ")]
+        self.assertEqual(events[0]["method"], "notifications/progress")
+        self.assertEqual(events[0]["params"]["progressToken"], "p1")
+        self.assertEqual(
+            events[-1], {"jsonrpc": "2.0", "id": 7, "result": {"content": [{"type": "text", "text": "done"}]}}
+        )
+
+    @patch("chat.views.v3.mcp.SSE_HEARTBEAT_SECONDS", 0.01)
+    @patch("chat.views.v3.mcp.ChatUserMCPToolHandler")
+    @patch("chat.views.v3.mcp.ChatUserKey.handle", return_value=(SimpleNamespace(profile=None), MagicMock()))
+    def test_tool_call_stream_sends_ping_without_progress_token_and_maps_errors(self, _handle, handler_class):
+        import time
+
+        def failing_call(params):
+            time.sleep(0.05)
+            raise InvalidParamsError("Unknown tool: x")
+
+        handler_class.return_value.call_tool.side_effect = failing_call
+
+        body = self.read_sse(
+            self.post_sse({"jsonrpc": "2.0", "id": 8, "method": "tools/call", "params": {"name": "x"}})
+        )
+
+        self.assertIn(": ping", body)
+        last = json.loads([line for line in body.splitlines() if line.startswith("data: ")][-1][6:])
+        self.assertEqual(last["error"], {"code": -32602, "message": "Unknown tool: x"})
