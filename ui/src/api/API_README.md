@@ -218,7 +218,7 @@ Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 
 前端版本标题上限 64、更新说明上限 1000，提交字段为 name、publish_desc，
 不将资源 desc 当作版本说明。三类版本接口均保存并返回 publish_desc。
 知识库版本编辑省略 publish_desc 或传 null 时保留原说明，传空字符串时清空；服务端上限 1024 字符。
-智能体与工具的 putXxxPublish 提交 publish_name、publish_desc，由发布弹框填写。
+智能体、工具与知识库的 putXxxPublish 提交 publish_name、publish_desc，由发布弹框填写；弹框的 name 映射为 publish_name。
 三个版本列表均未返回历史默认模型配置，预览与恢复保留当前配置。
 
 `admin/store.ts` 的 getStoreApplicationList、getStoreToolWorkflowList、getStoreKnowledgeList 查询三类模板，

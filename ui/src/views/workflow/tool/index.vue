@@ -31,10 +31,10 @@ import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonDefaultModelSetting from '@/views/workflow/components/default-model-setting/ButtonDefaultModelSetting.vue'
 import EditPublishVersionDialog from '@/views/workflow/components/publish-history/EditPublishVersionDialog.vue'
 import { showWorkflowValidateError } from '@/views/workflow/components/validate-error'
-
-import ButtonPublishHistory from './ButtonPublishHistory.vue'
-import DebugDrawer from './debug/DebugDrawer.vue'
-import ButtonTemplateStore from './ButtonTemplateStore.vue'
+import ButtonAiGenerate from './components/ButtonAiGenerate.vue'
+import ButtonPublishHistory from './components/ButtonPublishHistory.vue'
+import ButtonDebug from './components/ButtonDebug.vue'
+import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
 import { goBack } from './navigation'
 import perm from '@/permission/index.ts'
 
@@ -142,28 +142,14 @@ function handleAutoSaveChange() {
   }
 }
 
-/* 每次打开调试前校验画布，通过后保存未提交修改；运行参数由基础节点声明。 */
-const debugDrawerRef = useTemplateRef<InstanceType<typeof DebugDrawer>>('debugDrawerRef')
-async function handleDebug() {
-  if (loading.value || historyVisible.value || !workflowRef.value) return
-  loading.value = true
-  try {
-    await workflowRef.value.validate().catch((error: unknown) => {
-      showWorkflowValidateError(error)
-      throw error
-    })
-    if (hasUnsavedChanges()) await saveToolWorkflow()
-    const graph = getGraphData()
-    if (graph) debugDrawerRef.value?.open(graph)
-  } catch {
-    // 校验或保存失败已由对应流程提示，不打开调试。
-  } finally {
-    loading.value = false
-  }
+/* 调试入口共用页面 loading，并保留其他操作关闭调试的联动。 */
+const debugButtonRef = useTemplateRef<InstanceType<typeof ButtonDebug>>('debugButtonRef')
+function validateWorkflow() {
+  return workflowRef.value?.validate()
 }
 
 function closeDebug() {
-  debugDrawerRef.value?.close()
+  debugButtonRef.value?.close()
 }
 
 /* 模板中心：确认后由服务端替换工作流，再刷新画布与保存基准。 */
@@ -365,8 +351,17 @@ onBeforeUnmount(() => stopAutoSave())
       <ToolIcon :icon="toolDetail?.icon" :type="toolDetail?.tool_type ?? TOOL_TYPE.WORKFLOW" :size="24" class="shrink-0" />
     </template>
     <template #actions>
+      <!-- AI 生成工作流 -->
+      <ButtonAiGenerate
+        label="AI 生成"
+        :disabled="loading || historyVisible"
+        :get-logic-flow="() => workflowRef?.getLogicFlow()"
+        :default-model-settings="defaultModelSetting"
+        @open="closeDebug"
+      />
       <!-- 模板中心 -->
       <ButtonTemplateStore
+        label="模板中心"
         v-if="toolWorkflowPermission('read')"
         ref="templateStoreButtonRef"
         v-model:loading="loading"
@@ -386,15 +381,25 @@ onBeforeUnmount(() => stopAutoSave())
       />
 
       <!-- 调试工具工作流 -->
-      <el-button v-if="toolWorkflowPermission('read')" plain :disabled="loading" @click="handleDebug">
-        <MkIcon name="icon_play_outlined" />
-        <span>调试</span>
-      </el-button>
+      <ButtonDebug
+        v-if="toolWorkflowPermission('read')"
+        ref="debugButtonRef"
+        v-model:loading="loading"
+        label="调试"
+        :api="requestApi"
+        :tool-id="toolId"
+        :disabled="historyVisible"
+        :has-unsaved-changes="hasUnsavedChanges"
+        :validate-workflow="validateWorkflow"
+        :save-workflow="saveToolWorkflow"
+        :get-graph-data="getGraphData"
+      />
       <!-- 保存 -->
-      <el-button v-if="toolWorkflowPermission('edit')" plain :disabled="loading" @click="handleSave">
-        <MkIcon name="icon_save_outlined" />
-        <span>保存</span>
-      </el-button>
+      <MkTooltip content="保存" placement="bottom">
+        <el-button v-if="toolWorkflowPermission('edit')" plain :disabled="loading" @click="handleSave" class="w-8! min-w-8!">
+          <MkIcon name="icon_save_outlined" />
+        </el-button>
+      </MkTooltip>
       <!-- 发布 -->
       <el-button v-if="toolWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
       <!-- 更多操作 -->
@@ -411,6 +416,7 @@ onBeforeUnmount(() => stopAutoSave())
             </MkDropdownItem>
             <!-- 发布历史 -->
             <ButtonPublishHistory
+              label="发布历史"
               :api="requestApi"
               :visible="historyVisible"
               @update:visible="handleHistoryVisibleChange"
@@ -443,8 +449,6 @@ onBeforeUnmount(() => stopAutoSave())
         :workflow-mode="WorkflowMode.Tool"
       />
     </div>
-    <!-- 调试抽屉 -->
-    <DebugDrawer :api="requestApi" ref="debugDrawerRef" :tool-id="toolId" />
     <!-- 发布内容 -->
     <EditPublishVersionDialog ref="publishDialogRef" mode="publish" :saving="loading" @submit="handlePublish" />
   </WorkflowViewLayout>

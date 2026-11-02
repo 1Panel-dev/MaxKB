@@ -7,7 +7,7 @@ import PublishHistoryDrawer from '@/views/workflow/components/publish-history/Pu
 
 defineOptions({ name: 'ButtonKnowledgePublishHistory' })
 
-const props = defineProps<{ api: typeof WorkflowApi; knowledgeId: string; selectedId?: string; disabled?: boolean }>()
+const props = defineProps<{ label: string; api: typeof WorkflowApi; knowledgeId: string; selectedId?: string; disabled?: boolean }>()
 const visible = defineModel<boolean>('visible', { default: false })
 const emit = defineEmits<{
   open: []
@@ -59,7 +59,7 @@ function handleSubmit(payload: WorkflowVersionPayload, versionId: string) {
   <!-- 打开知识库发布历史 -->
   <MkDropdownItem @click="handleOpen">
     <template #icon><MkIcon name="icon_history_outlined" /></template>
-    <span>发布历史</span>
+    <span>{{ label }}</span>
   </MkDropdownItem>
   <!-- 发布历史抽屉：由 MkDrawer 按需渲染内容。 -->
   <PublishHistoryDrawer

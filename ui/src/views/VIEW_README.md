@@ -333,7 +333,7 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 - 默认模型抽屉接收完整 Model API；“应用到所有节点”递归修改图，保留自定义配置及禁用功能，不自动提交模型草稿。
 - 发布历史入口各自查询版本，共用纯 UI `publish-history/`；第一次预览保存草稿，关闭恢复，恢复版本只回编辑态，后续保存。
   版本缺少默认模型时保留当前配置；更新说明后端支持情况见 API 文档。
-- 智能体发布先校验，再打开发布内容表单，提交先保存再发布；失败保留表单。
+- 智能体、工具和知识库发布先校验，再关闭调试并打开共用发布内容表单，提交先保存再发布；失败保留表单。
 - 模板中心共享 UI 在 `workflow/components/template-store/`，业务入口查模板，View 确认覆盖、提交并重载详情和保存基准。
   创建模板由资源创建流程负责，取消／失败保留模板中心。
 - 智能体、工具和知识库工作流每次打开调试都先校验画布，通过后按需保存未提交修改；校验或保存失败不打开调试。
@@ -347,8 +347,17 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   工具使用 debug Drawer、SSE 和执行详情；知识库保留任务轮询与导入 Action。
   智能体画布按 Workspace／System 资源管理选择详情、保存、发布、模型和历史 API；DebugPanel 尚未按 System 范围适配。
   客户端停止读取不等于服务端停止任务。
+- 工具工作流的 `workflow/tool/components/ButtonDebug.vue` 组合调试按钮与 `debug/DebugDrawer.vue`，接收页面的校验、改动检查、保存及图数据获取方法，
+  共用页面 loading，通过 `close()` 保留其他操作关闭调试的联动；页面保留入口权限与 API 范围选择，抽屉内部参数表单和运行结果独立管理。
+  `workflow/tool/components/ButtonTemplateStore.vue` 组合模板中心按钮与共用模板弹窗，负责模板查询和搜索，使用模板由页面确认、保存并刷新画布。
+  同目录的 `ButtonPublishHistory.vue` 组合发布历史入口与共用历史抽屉，负责版本查询、编辑提交及预览／恢复事件转发。
 - 知识库工作流入口页按四种资源范围选择工作流 API，通过 `api` Props 向调试、历史与执行记录组件逐层传递；详情查询与画布范围同步路由，
   System 模型使用对应范围接口，Workspace 共享暂沿用 Workspace 模型设置接口，画布辅助资源查询尚未适配。
+  `workflow/knowledge/components/ButtonDebug.vue` 组合调试按钮与 `debug/DebugDrawer.vue`，接收页面的校验、改动检查、保存及图数据获取方法，
+  共用页面 loading，画布未就绪时直接返回；通过 `close()` 保留页面其他操作关闭调试的联动，抽屉内部执行步骤与轮询独立管理。
+  `workflow/knowledge/components/ButtonPublishHistory.vue` 组合发布历史入口与共用历史抽屉，负责版本查询、编辑提交及预览／恢复事件转发。
+  同目录的 `ButtonTemplateStore.vue` 组合模板中心按钮与共用模板弹窗，负责模板查询和搜索，使用模板仍由页面确认、保存并刷新画布。
+  `workflow/knowledge/execution-record/ButtonExecutionRecord.vue` 组合执行记录菜单入口与同目录的 `ExecutionRecordDrawer.vue`，透传当前范围 API 和知识库 ID，管理抽屉按需挂载及关闭后卸载。
 - 知识库导出仅工作流 `.kbwf`；导入确认覆盖后直接上传，不先保存旧草稿，成功重载；取消／失败保留图。
   正式导入文档要求已发布；转换使用 Knowledge API，保留已有文档，不能用保存代替转换。
 - 返回方法集中在各资源 `navigation.ts`；历史模式先退出预览，编辑态保留保存并退出／直接退出确认。
