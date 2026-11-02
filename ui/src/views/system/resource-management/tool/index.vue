@@ -243,7 +243,7 @@ onMounted(() => {
                 <McpConfigAction
                   v-if="row.tool_type === TOOL_TYPE.MCP"
                   v-model:loading="operationLoading"
-                  label="MCP 配置详情"
+                  label="MCP 服务配置"
                   :api="SystemToolApi"
                   :tool="row"
                 />

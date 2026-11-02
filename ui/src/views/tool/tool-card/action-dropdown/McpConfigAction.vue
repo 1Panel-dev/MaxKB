@@ -41,7 +41,7 @@ function handleDialogClosed() {
     <span>{{ label }}</span>
   </MkDropdownItem>
 
-  <MkDialog v-model="visible" title="MCP 配置详情" @closed="handleDialogClosed">
+  <MkDialog v-model="visible" title="MCP 服务配置" @closed="handleDialogClosed">
     <div class="group relative">
       <el-input v-model="config" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
       <!-- 复制 MCP 配置 -->
