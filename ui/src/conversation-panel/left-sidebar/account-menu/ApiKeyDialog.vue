@@ -42,33 +42,35 @@ defineExpose({ open })
 <template>
   <MkDialog v-model="dialogVisible" title="API Key" @closed="resetData">
     <template #subtitle>每个用户仅一个 API Key，绑定当前对话用户、与其同权。重置后旧 Key 立即失效</template>
-    <div class="pb-5">
-      <div class="mb-4">
-        <div class="mb-2">API URL</div>
-        <el-input :model-value="apiUrl" readonly>
-          <template #suffix>
-            <!-- 复制 API URL -->
-            <el-button text class="-mr-1" @click="copyText(apiUrl)">
-              <MkIcon name="icon_copy_outlined" />
-            </el-button>
-          </template>
-        </el-input>
-      </div>
-      <div class="mb-2">API Key</div>
-      <el-input :model-value="maskedApiKey" readonly>
-        <template #suffix>
-          <!-- 复制完整 API Key -->
-          <el-button text :disabled="loading || !apiKey" @click="copyText(apiKey)">
-            <MkIcon name="icon_copy_outlined" />
+
+    <div class="mb-2">我的 API Key</div>
+    <el-input :model-value="maskedApiKey" readonly class="mb-4">
+      <template #suffix>
+        <!-- 复制 API URL -->
+        <el-button text @click="copyText(maskedApiKey)">
+          <MkIcon name="icon_copy_outlined" />
+        </el-button>
+        <MkTooltip content="重新生成" placement="top">
+          <!-- 重新生成 API Key -->
+          <el-button text class="-mr-1" :loading="loading" @click="loadApiKey(true)">
+            <MkIcon name="icon_refresh_outlined" />
           </el-button>
-          <MkTooltip content="重新生成">
-            <!-- 重新生成 API Key -->
-            <el-button text class="-mr-1" :loading="loading" @click="loadApiKey(true)">
-              <MkIcon name="icon_refresh_outlined" />
-            </el-button>
-          </MkTooltip>
-        </template>
-      </el-input>
+        </MkTooltip>
+      </template>
+    </el-input>
+
+    <div class="mb-2">
+      <span class="mk-required mr-2">MCP 服务配置</span>
+      <!-- // TODO: 门户有 对话没有 -->
+      <span class="text-N600">连接后由 tools/list 动态返回可调用的工具</span>
+    </div>
+
+    <div class="group relative pb-5">
+      <el-input :model-value="maskedApiKey" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
+      <!-- 复制 MCP 配置 -->
+      <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle @click="copyText(maskedApiKey)">
+        <MkIcon name="icon_copy_outlined" />
+      </el-button>
     </div>
   </MkDialog>
 </template>
