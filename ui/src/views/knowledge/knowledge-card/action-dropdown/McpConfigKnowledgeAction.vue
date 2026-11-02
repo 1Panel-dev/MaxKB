@@ -17,7 +17,7 @@ const props = defineProps<{
 }>()
 const loading = defineModel<boolean>('loading', { default: false })
 
-/* 知识库 MCP 配置详情 */
+/* 知识库 MCP 服务配置 */
 const visible = ref(false)
 const config = ref('')
 const canRead = () => isSystemResource() ? perm.knowledge.system.mcpConfig() : !isWorkspaceResource() || perm.knowledge.workspace.mcpConfig(props.knowledge.id)
@@ -42,13 +42,13 @@ function handleDialogClosed() {
 </script>
 
 <template>
-  <!-- 查看 MCP 配置详情 -->
+  <!-- 查看 MCP 服务配置 -->
   <MkDropdownItem v-if="canRead()" :disabled="loading" @click.stop="handleOpenMcpConfig">
     <template #icon><MkIcon name="icon_describe_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>
 
-  <MkDialog v-model="visible" title="MCP 配置详情" @closed="handleDialogClosed">
+  <MkDialog v-model="visible" title="MCP 服务配置" @closed="handleDialogClosed">
     <div class="group relative">
       <el-input v-model="config" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
       <!-- 复制 MCP 配置 -->

@@ -174,7 +174,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <McpConfigAction
                     v-if="tool.tool_type === TOOL_TYPE.MCP"
                     v-model:loading="toolOperationLoading"
-                    label="MCP 配置详情"
+                    label="MCP 服务配置"
                     :api="SystemSharedToolApi"
                     :tool="tool"
                   />

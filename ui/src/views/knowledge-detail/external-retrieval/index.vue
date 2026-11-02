@@ -122,7 +122,7 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
       </section>
 
       <section>
-        <div class="mb-2">MCP 配置详情</div>
+        <div class="mb-2">MCP 服务配置</div>
         <div class="group relative">
           <el-input :model-value="mcpConfig" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
           <!-- 复制 MCP 配置 -->

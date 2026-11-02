@@ -286,10 +286,10 @@ function handleBatchDelete() {
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                   />
-                  <!-- MCP 配置详情 -->
+                  <!-- MCP 服务配置 -->
                   <McpConfigKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="MCP 配置详情"
+                    label="MCP 服务配置"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                   />

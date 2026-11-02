@@ -16,6 +16,7 @@ import {
   PortalApplicationAction,
   DeleteApplicationAction,
   TriggerApplicationAction,
+  McpConfigApplicationAction,
 } from '@/views/application/application-card/action-dropdown'
 import perm from '@/permission'
 
@@ -184,6 +185,8 @@ onMounted(() => {
                 <AuthorizeApplicationAction v-if="perm.application.system.auth()" label="资源授权" :application="row" />
                 <!-- 智能体触发器 -->
                 <TriggerApplicationAction v-if="perm.application.system.triggerRead()" label="触发器" :api="SystemResourceTriggerApi" :application="row" />
+                <!-- MCP 服务配置 -->
+                <McpConfigApplicationAction label="MCP 服务配置" :application="row" />
                 <!-- 门户上下架 -->
                 <PortalApplicationAction
                   v-model:loading="operationLoading"
