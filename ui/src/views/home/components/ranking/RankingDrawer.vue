@@ -80,16 +80,16 @@ function handleExport() {
 onMounted(() => loadRanking())
 </script>
 <template>
-  <MkDrawer v-model="visible" title="排行榜详情" size="1000">
+  <MkDrawer v-model="visible" title="排行榜详情" class="mk-drawer-with-tabs" contentClass="pt-0" size="1000">
     <el-tabs v-model="activeKind" @tab-change="handleTabChange">
       <el-tab-pane name="tokens" label="Tokens 消耗 · Top 智能体" />
       <el-tab-pane name="questions" label="对话次数 · Top 智能体" />
       <el-tab-pane name="userTokens" label="Tokens 消耗 · Top 用户" />
     </el-tabs>
-    <div class="my-4 flex-between">
+    <div class="mt-6 mb-4 flex-between">
       <div class="flex gap-3">
-        <MkSearchInput v-model="searchName" class="w-55!" @change="handleSearch" />
         <MkDateRange :default-value="{ startTime: initialRange.start_time, endTime: initialRange.end_time }" @change="handleRangeChange" />
+        <MkSearchInput v-model="searchName" class="w-55!" @change="handleSearch" />
       </div>
       <!-- 导出当前筛选下的完整排行榜 -->
       <el-button plain :loading="exporting" :disabled="loading" @click="handleExport">

@@ -117,7 +117,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="调试结果" :modal="false" @close="close">
+  <MkDrawer v-model="visible" title="调试结果" class="mk-drawer-with-tabs" contentClass="pt-0" :modal="false" @close="close">
     <template #header>
       <div class="-ml-2 flex-align-center">
         <!-- 返回输入参数 -->
@@ -129,9 +129,8 @@ defineExpose({ open, close })
     </template>
     <el-tabs v-model="activeTab">
       <el-tab-pane label="输出" name="output">
-        <h4 class="mk-title-decoration mb-4 mt-4">回复内容</h4>
+        <h4 class="mk-title-decoration mb-4 mt-6">回复内容</h4>
 
-        <!-- // TODO: 回复内容 调样式-->
         <el-card class="small" shadow="never">
           <ContentList :content-list="blocks" />
           <div v-if="running">回答中...</div>

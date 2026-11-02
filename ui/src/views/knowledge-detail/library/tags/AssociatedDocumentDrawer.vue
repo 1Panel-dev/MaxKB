@@ -134,68 +134,66 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="title" size="840" @closed="resetData">
-    <div class="flex-column gap-4" :inert="loading">
-      <el-tabs v-model="activeTab" :before-leave="() => !loading" @tab-change="handleTabChange">
-        <el-tab-pane label="已关联文档" name="linked" />
-        <el-tab-pane label="未关联文档" name="unlinked" />
-      </el-tabs>
-      <div class="flex-between gap-3">
-        <!-- 批量关联或取消关联文档 -->
-        <el-button plain :disabled="!selectedDocuments.length || loading" @click="handleBatchLinkDocuments">
-          <MkIcon :name="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'" />
-          <span>{{ activeTab === 'linked' ? '取消关联' : '关联' }}</span>
-        </el-button>
-        <MkComplexSearch :key="activeTab" :fields="[{ label: '名称', value: 'name' }]" @change="handleComplexSearchChange" />
-      </div>
-      <MkTable
-        ref="documentTableRef"
-        v-model:pagination-config="paginationConfig"
-        v-loading="loading"
-        :data="documentData"
-        @current-change="loadDocuments"
-        @size-change="loadDocuments"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column type="selection" width="40" />
-        <el-table-column prop="name" label="文档名称" min-width="200">
-          <template #default="{ row }: { row: DocumentItem }">
-            <div class="flex-align-center gap-2">
-              <img :src="getFileIconUrl(row.name)" alt="" class="size-5 shrink-0" />
-              <span class="truncate" :title="row.name">{{ row.name }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="is_active" label="启用状态" width="120">
-          <template #header>
-            <MkTableFilter
-              v-model="selectedDocumentActive"
-              mode="single"
-              label="启用状态"
-              :options="documentActiveOptions"
-              @change="handleDocumentFilterChange"
-            />
-          </template>
-          <template #default="{ row }: { row: DocumentItem }">
-            <MkStatusLabel :active="row.is_active" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" width="180">
-          <template #default="{ row }: { row: DocumentItem }">{{ datetimeFormat(row.create_time) }}</template>
-        </el-table-column>
-        <el-table-column label="操作" width="70" fixed="right">
-          <template #default="{ row }: { row: DocumentItem }">
-            <!-- 关联或取消关联当前文档 -->
-            <MkAction
-              display="button"
-              :label="activeTab === 'linked' ? '取消关联' : '关联'"
-              :icon="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'"
-              :disabled="loading"
-              @click="handleLinkDocuments([row.id])"
-            />
-          </template>
-        </el-table-column>
-      </MkTable>
+  <MkDrawer v-model="visible" :title="title" class="mk-drawer-with-tabs" contentClass="pt-0" size="840" @closed="resetData">
+    <el-tabs v-model="activeTab" :before-leave="() => !loading" @tab-change="handleTabChange">
+      <el-tab-pane label="已关联文档" name="linked" />
+      <el-tab-pane label="未关联文档" name="unlinked" />
+    </el-tabs>
+    <div class="flex-between gap-3 mt-6 mb-4">
+      <!-- 批量关联或取消关联文档 -->
+      <el-button plain :disabled="!selectedDocuments.length || loading" @click="handleBatchLinkDocuments">
+        <MkIcon :name="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'" />
+        <span>{{ activeTab === 'linked' ? '取消关联' : '关联' }}</span>
+      </el-button>
+      <MkComplexSearch :key="activeTab" :fields="[{ label: '名称', value: 'name' }]" @change="handleComplexSearchChange" />
     </div>
+    <MkTable
+      ref="documentTableRef"
+      v-model:pagination-config="paginationConfig"
+      v-loading="loading"
+      :data="documentData"
+      @current-change="loadDocuments"
+      @size-change="loadDocuments"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="40" />
+      <el-table-column prop="name" label="文档名称" min-width="200">
+        <template #default="{ row }: { row: DocumentItem }">
+          <div class="flex-align-center gap-2">
+            <img :src="getFileIconUrl(row.name)" alt="" class="size-5 shrink-0" />
+            <span class="truncate" :title="row.name">{{ row.name }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="is_active" label="启用状态" width="120">
+        <template #header>
+          <MkTableFilter
+            v-model="selectedDocumentActive"
+            mode="single"
+            label="启用状态"
+            :options="documentActiveOptions"
+            @change="handleDocumentFilterChange"
+          />
+        </template>
+        <template #default="{ row }: { row: DocumentItem }">
+          <MkStatusLabel :active="row.is_active" />
+        </template>
+      </el-table-column>
+      <el-table-column prop="create_time" label="创建时间" width="180">
+        <template #default="{ row }: { row: DocumentItem }">{{ datetimeFormat(row.create_time) }}</template>
+      </el-table-column>
+      <el-table-column label="操作" width="70" fixed="right">
+        <template #default="{ row }: { row: DocumentItem }">
+          <!-- 关联或取消关联当前文档 -->
+          <MkAction
+            display="button"
+            :label="activeTab === 'linked' ? '取消关联' : '关联'"
+            :icon="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'"
+            :disabled="loading"
+            @click="handleLinkDocuments([row.id])"
+          />
+        </template>
+      </el-table-column>
+    </MkTable>
   </MkDrawer>
 </template>

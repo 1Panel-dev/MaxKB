@@ -535,6 +535,7 @@
     margin: 0;
     padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5) calc(var(--spacing) * 4) calc(var(--spacing) * 6);
   }
+
   &__title {
     font-weight: 500;
   }
@@ -558,6 +559,12 @@
   }
   &.btt {
     height: calc(100% - 60px) !important;
+  }
+  // 带有tabs的drawer，header不显示border-bottom
+  &.mk-drawer-with-tabs {
+    .el-drawer__header {
+      border-bottom: none;
+    }
   }
 }
 /* dropdown */

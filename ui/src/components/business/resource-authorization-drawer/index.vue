@@ -153,12 +153,12 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="drawerVisible" title="资源授权" :size="920" @closed="handleClosed">
+  <MkDrawer v-model="drawerVisible" title="资源授权" class="mk-drawer-with-tabs" contentClass="pt-0" :size="920" @closed="handleClosed">
     <el-tabs v-model="targetType" :before-leave="() => !submitting">
       <el-tab-pane label="按用户组" name="user-group" />
       <el-tab-pane label="按用户" name="user" />
     </el-tabs>
-    <div class="mt-4">
+    <div class="mt-6">
       <UserGroupAuthorization
         ref="userGroupAuthorizationRef"
         v-if="targetType === 'user-group' && targetId && workspaceId"
