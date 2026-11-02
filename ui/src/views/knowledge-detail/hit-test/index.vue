@@ -53,13 +53,17 @@ const paragraphDialogRef = useTemplateRef<InstanceType<typeof ParagraphDialog>>(
 function canReadParagraph(paragraph: KnowledgeHitTestResult) {
   const isImage = paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE
   if (isSystemResource()) return isImage ? perm.knowledge.system.image.read() : perm.knowledge.system.docRead()
-  return !isWorkspaceResource() || (isImage ? perm.knowledge.workspace.image.read(knowledgeId.value) : perm.knowledge.workspace.docRead(knowledgeId.value))
+  return (
+    !isWorkspaceResource() || (isImage ? perm.knowledge.workspace.image.read(knowledgeId.value) : perm.knowledge.workspace.docRead(knowledgeId.value))
+  )
 }
 
 function canEditParagraph(paragraph: KnowledgeHitTestResult) {
   const isImage = paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE
   if (isSystemResource()) return isImage ? perm.knowledge.system.image.edit() : perm.knowledge.system.docEdit()
-  return !isWorkspaceResource() || (isImage ? perm.knowledge.workspace.image.edit(knowledgeId.value) : perm.knowledge.workspace.docEdit(knowledgeId.value))
+  return (
+    !isWorkspaceResource() || (isImage ? perm.knowledge.workspace.image.edit(knowledgeId.value) : perm.knowledge.workspace.docEdit(knowledgeId.value))
+  )
 }
 
 async function handleOpenParagraph(paragraph: KnowledgeHitTestResult) {
@@ -198,14 +202,18 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
               <MkSourceCard :title="paragraph.title || '-'" class="cursor-pointer" @click="handleOpenParagraph(paragraph)">
                 <template #title="{ title }">
                   <span class="flex-align-center min-w-0 gap-2">
-                    <h6 class="shrink-0">{{ `#${paragraphIndex + 1}` }}</h6>
+                    <h4 class="shrink-0">{{ `#${paragraphIndex + 1}` }}</h4>
                     <el-divider direction="vertical" />
-                    <h6 class="min-w-0 truncate" :title="title">{{ title }}</h6>
+                    <h4 class="min-w-0 truncate" :title="title">{{ title }}</h4>
                   </span>
                 </template>
                 <template #tag>
-                  <el-tag size="small" type="info">{{ paragraph.hit_unit_type === KNOWLEDGE_HIT_UNIT_TYPE.IMAGE ? '图片向量' : '文本向量' }}</el-tag>
-                  <h6 class="shrink-0 text-primary">{{ paragraph.similarity.toFixed(3) }}</h6>
+                  <div class="flex-align-center gap-2">
+                    <el-tag size="small" type="info">
+                      {{ paragraph.hit_unit_type === KNOWLEDGE_HIT_UNIT_TYPE.IMAGE ? '图片向量' : '文本向量' }}
+                    </el-tag>
+                    <h6 class="shrink-0 text-primary">{{ paragraph.similarity.toFixed(3) }}</h6>
+                  </div>
                 </template>
                 <!-- 图片随卡片点击打开分段详情 -->
                 <el-image

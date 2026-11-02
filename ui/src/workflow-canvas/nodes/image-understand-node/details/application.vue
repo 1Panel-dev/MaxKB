@@ -35,7 +35,7 @@ defineProps<{
                   v-if="h.type === 'image_url'"
                   :file="{ name: '图片', status: 'success' }"
                   :src="h.image_url.url"
-                  :size="104"
+                  :size="58"
                   :show-remove="false"
                   :preview-src-list="[h.image_url.url]"
                 />
@@ -62,10 +62,9 @@ defineProps<{
             :key="i"
             :file="{ ...f, name: f.name || '图片', status: 'success' }"
             :src="f.url || (f.file_id ? `./oss/file/${f.file_id}` : '')"
-            :size="104"
+            :size="58"
             :show-remove="false"
             :preview-src-list="data.image_list.map((img: any) => img.url || (img.file_id ? `./oss/file/${img.file_id}` : ''))"
-            :initial-index="Number(i)"
           />
         </div>
         <div>{{ data.question || '-' }}</div>

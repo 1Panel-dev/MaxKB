@@ -39,22 +39,21 @@ defineProps<{
           v-if="typeof data.first_frame_url === 'string'"
           :file="{ name: '首帧', status: 'success' }"
           :src="data.first_frame_url"
-          :size="32"
+          :size="58"
           :show-remove="false"
           :preview-src-list="[data.first_frame_url]"
         />
         <div v-else-if="Array.isArray(data.first_frame_url)" class="flex flex-wrap gap-2">
           <!-- 查看首帧图片列表 -->
-          <ImageUploadCard
-            v-for="(file, index) in data.first_frame_url"
-            :key="index"
-            :file="{ ...file, name: file.name || '首帧', status: 'success' }"
-            :src="file.url"
-            :size="32"
-            :show-remove="false"
-            :preview-src-list="data.first_frame_url.map((image: { url: string }) => image.url)"
-            :initial-index="index"
-          />
+          <template v-for="(file, index) in data.first_frame_url" :key="index">
+            <ImageUploadCard
+              :file="{ ...file, name: file.name || '首帧', status: 'success' }"
+              :src="file.url"
+              :size="58"
+              :show-remove="false"
+              :preview-src-list="data.first_frame_url.map((image: { url: string }) => image.url)"
+            />
+          </template>
         </div>
         <template v-else>-</template>
       </div>
@@ -68,22 +67,21 @@ defineProps<{
           v-if="typeof data.last_frame_url === 'string'"
           :file="{ name: '末帧', status: 'success' }"
           :src="data.last_frame_url"
-          :size="32"
+          :size="58"
           :show-remove="false"
           :preview-src-list="[data.last_frame_url]"
         />
         <div v-else-if="Array.isArray(data.last_frame_url)" class="flex flex-wrap gap-2">
           <!-- 查看末帧图片列表 -->
-          <ImageUploadCard
-            v-for="(file, index) in data.last_frame_url"
-            :key="index"
-            :file="{ ...file, name: file.name || '末帧', status: 'success' }"
-            :src="file.url"
-            :size="32"
-            :show-remove="false"
-            :preview-src-list="data.last_frame_url.map((image: { url: string }) => image.url)"
-            :initial-index="index"
-          />
+          <template v-for="(file, index) in data.last_frame_url" :key="index">
+            <ImageUploadCard
+              :file="{ ...file, name: file.name || '末帧', status: 'success' }"
+              :src="file.url"
+              :size="58"
+              :show-remove="false"
+              :preview-src-list="data.last_frame_url.map((image: { url: string }) => image.url)"
+            />
+          </template>
         </div>
         <template v-else>-</template>
       </div>

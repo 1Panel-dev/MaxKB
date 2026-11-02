@@ -23,7 +23,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">用户提示词</h6>
+      <h6 class="mb-2">本次对话</h6>
       <div class="whitespace-pre-wrap space-y-2">
         <div v-if="data.image_list?.length > 0" class="flex flex-wrap gap-2">
           <!-- 查看本次对话图片 -->
@@ -32,10 +32,9 @@ defineProps<{
             :key="i"
             :file="{ ...f, name: f.name || '图片', status: 'success' }"
             :src="f.url || (f.file_id ? `./oss/file/${f.file_id}` : '')"
-            :size="104"
+            :size="58"
             :show-remove="false"
             :preview-src-list="data.image_list.map((img: any) => img.url || (img.file_id ? `./oss/file/${img.file_id}` : ''))"
-            :initial-index="Number(i)"
           />
         </div>
         <div>{{ data.question || '-' }}</div>
