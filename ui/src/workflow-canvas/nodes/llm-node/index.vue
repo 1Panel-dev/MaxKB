@@ -133,10 +133,14 @@ onMounted(() => {
         </el-form-item>
 
         <!-- 用户提示词 -->
-        <el-form-item>
+        <el-form-item
+          class="mk-hide-asterisk"
+          prop="prompt"
+          :rules="{ whitespace: true, required: true, message: '请输入用户提示词', trigger: 'blur' }"
+        >
           <template #label>
             <div class="flex-align-center gap-1">
-              <span>用户提示词</span>
+              <span class="mk-required">用户提示词</span>
               <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
@@ -161,10 +165,7 @@ onMounted(() => {
               <span class="flex-align-center gap-1">
                 <span :class="{ 'mk-required': formData.enable_context }">上下文</span>
 
-                <MkTooltip
-                  content="开启后引用变量中的消息列表作为上下文，支持 SYSTEM、USER、ASSISTANT、TOOL 内容项或 OpenAI 消息格式"
-                  placement="right"
-                >
+                <MkTooltip content="开启后，本次调用会带上所选变量作为上下文；关闭则仅根据本条输入回复" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </span>
