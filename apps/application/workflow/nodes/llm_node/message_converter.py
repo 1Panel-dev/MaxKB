@@ -81,7 +81,8 @@ def _parse_arguments(arguments) -> dict:
 def _user_parts(item: dict) -> list:
     parts = []
     images = item.get("images") or []
-    parts.extend(_process_images([{"url": i} if isinstance(i, str) else i for i in images]))
+    image_parts, _ = _process_images([{"url": i} if isinstance(i, str) else i for i in images])
+    parts.extend(image_parts)
     for video in item.get("videos") or []:
         url = video if isinstance(video, str) else (video or {}).get("url")
         if url:
