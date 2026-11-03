@@ -11,6 +11,7 @@ from django.test import RequestFactory, SimpleTestCase
 from django.urls import resolve
 from rest_framework.exceptions import ValidationError
 
+from chat.mcp import knowledge as knowledge_mcp
 from chat.views.v3 import knowledge as views
 from knowledge.models import DocumentResourceType, Knowledge, KnowledgeType, SourceType
 from knowledge.serializers.external_retrieval import (
@@ -31,7 +32,7 @@ KEY = "50000000-0000-0000-0000-000000000001"
 
 def knowledge(**settings):
     return SimpleNamespace(
-        id=KID, name="manual", workspace_id="default", type=KnowledgeType.BASE, external_service=settings
+        id=KID, name="manual", desc="", workspace_id="default", type=KnowledgeType.BASE, external_service=settings
     )
 
 
@@ -155,11 +156,14 @@ class RetrievalSettingsTests(SimpleTestCase):
             resolve(f"/admin/api/workspace/default/knowledge/{KID}/external_service").kwargs["workspace_id"], "default"
         )
         self.assertEqual(resolve("/chat/api/v3/mcp").func.__module__, "chat.views.v3.mcp")
+        self.assertIs(resolve("/chat/api/v3/knowledge_mcp").func, views.knowledge_global_mcp_view)
 
 
 class RetrievalAccessTests(SimpleTestCase):
     def setUp(self):
         self.key = SimpleNamespace(id=KEY, user_id=UID, is_active=True, user=SimpleNamespace(is_active=True))
+        self.portal = patch.object(access, "get_portal_setting", return_value=True).start()
+        self.addCleanup(patch.stopall)
 
     @patch.object(access, "QuerySet")
     def test_existing_api_key_uses_original_secret_without_writes(self, queryset):
@@ -208,6 +212,15 @@ class RetrievalAccessTests(SimpleTestCase):
         with self.assertRaises(access.RetrievalError) as error:
             access.authorize_external(KID, access.RetrievalIdentity(UID))
         self.assertEqual(error.exception.status, 403)
+
+    @patch.object(access, "QuerySet")
+    def test_portal_switch_disables_external_retrieval(self, queryset):
+        self.portal.return_value = False
+        with self.assertRaises(access.RetrievalError) as error:
+            access.authorize_external(KID, access.RetrievalIdentity(UID, KEY))
+        self.assertEqual((error.exception.code, error.exception.status), ("api_disabled", 403))
+        self.portal.assert_called_once_with("enable_knowledge_base_api")
+        queryset.assert_not_called()
 
     @patch.object(access.DatabaseModelManage, "get_model", return_value=None)
     @patch.object(access, "QuerySet")
@@ -458,3 +471,118 @@ class RetrievalTransportTests(SimpleTestCase):
                     self.assertEqual(tools.tools[0].name, f"knowledge_{KID}")
                     result = await session.call_tool(tools.tools[0].name, {"query_text": "hello"})
                     self.assertEqual(json.loads(result.content[0].text), self.output)
+
+
+class KnowledgeMCPToolResultTests(SimpleTestCase):
+    def call(self, side_effect):
+        handler = knowledge_mcp.KnowledgeMCPToolHandler(knowledge(enabled=True), access.RetrievalIdentity())
+        with patch.object(knowledge_mcp, "retrieve", side_effect=side_effect):
+            return handler.call_tool({"name": f"knowledge_{KID}", "arguments": {"query": "x"}})
+
+    def test_invalid_arguments_and_revoked_access_are_tool_errors_with_reason(self):
+        result = self.call(ValidationError({"query_text": ["This field is required."]}))
+        self.assertTrue(result["isError"])
+        self.assertIn("query_text", result["content"][0]["text"])
+        result = self.call(access.RetrievalError("access_denied", "Knowledge access denied.", 403))
+        self.assertEqual(result, {"isError": True, "content": [{"type": "text", "text": "Knowledge access denied."}]})
+
+    def test_description_includes_knowledge_desc(self):
+        item = SimpleNamespace(**{**vars(knowledge(enabled=True)), "desc": "产品手册"})
+        handler = knowledge_mcp.KnowledgeMCPToolHandler(item, access.RetrievalIdentity())
+        self.assertEqual(handler.list_tools()["tools"][0]["description"], "检索知识库：manual\n产品手册")
+
+
+class GlobalKnowledgeMCPTests(SimpleTestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.identity = access.RetrievalIdentity(user_id=UID, api_key_id=KEY)
+        self.handler = knowledge_mcp.ChatUserKnowledgeMCPToolHandler(self.identity)
+        self.portal = patch.object(access, "get_portal_setting", return_value=True).start()
+        self.addCleanup(patch.stopall)
+
+    def rpc(self, data, **headers):
+        request = self.factory.post(
+            "/knowledge_mcp",
+            json.dumps(data),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json, text/event-stream",
+            **headers,
+        )
+        return views.knowledge_global_mcp_view(request)
+
+    def test_requires_chat_user_api_key(self):
+        with patch.object(views, "authenticate_key", return_value=access.RetrievalIdentity()):
+            response = self.rpc({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response["WWW-Authenticate"], "Bearer")
+
+    def test_lists_tools_with_api_key(self):
+        with patch.object(views, "authenticate_key", return_value=self.identity) as authenticate:
+            response = self.rpc({"jsonrpc": "2.0", "id": 1, "method": "tools/list"}, HTTP_AUTHORIZATION="Bearer k")
+        authenticate.assert_called_once_with("Bearer k")
+        tools = json.loads(response.content)["result"]["tools"]
+        self.assertEqual([tool["name"] for tool in tools], ["list_knowledge", "search_knowledge"])
+        self.assertEqual(tools[1]["inputSchema"]["required"], ["knowledge_id", "query_text"])
+
+    def test_rejects_foreign_origin(self):
+        response = self.rpc({"jsonrpc": "2.0", "id": 1, "method": "ping"}, HTTP_ORIGIN="https://foreign.example")
+        self.assertEqual(response.status_code, 403)
+
+    def test_portal_switch_disables_global_mcp(self):
+        self.portal.return_value = False
+        with patch.object(views, "authenticate_key", return_value=self.identity) as authenticate:
+            response = self.rpc({"jsonrpc": "2.0", "id": 1, "method": "tools/list"}, HTTP_AUTHORIZATION="Bearer k")
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(json.loads(response.content)["error"]["code"], "api_disabled")
+        authenticate.assert_not_called()
+
+    def test_list_knowledge_includes_public_and_authorized(self):
+        items = [
+            SimpleNamespace(id="k-public", name="a", desc=None, external_service={"enabled": True}),
+            SimpleNamespace(
+                id="k-granted", name="b", desc="d", external_service={"enabled": True, "authentication": True}
+            ),
+            SimpleNamespace(
+                id="k-denied", name="c", desc="", external_service={"enabled": True, "authentication": True}
+            ),
+        ]
+        with (
+            patch.object(knowledge_mcp, "QuerySet") as query_set,
+            patch.object(knowledge_mcp, "authorized_ids", return_value={"k-granted"}) as authorized,
+        ):
+            query_set.return_value.filter.return_value.order_by.return_value = items
+            result = self.handler.call_tool({"name": "list_knowledge"})
+
+        query_set.return_value.filter.assert_called_once_with(external_service__enabled=True)
+        authorized.assert_called_once_with(UID, ["k-granted", "k-denied"])
+        self.assertEqual(
+            result["structuredContent"]["knowledge"],
+            [
+                {"knowledge_id": "k-public", "name": "a", "desc": ""},
+                {"knowledge_id": "k-granted", "name": "b", "desc": "d"},
+            ],
+        )
+
+    def test_search_knowledge_retrieves_with_full_identity(self):
+        output = {"knowledge_id": KID, "hits": []}
+        with patch.object(knowledge_mcp, "retrieve", return_value=output) as retrieve:
+            result = self.handler.call_tool(
+                {"name": "search_knowledge", "arguments": {"knowledge_id": KID, "query_text": "hello"}}
+            )
+        retrieve.assert_called_once_with(KID, self.identity, {"query_text": "hello"})
+        self.assertEqual(result["structuredContent"], output)
+
+    def test_search_knowledge_errors_are_tool_errors(self):
+        result = self.handler.call_tool({"name": "search_knowledge", "arguments": {"knowledge_id": "bad"}})
+        self.assertTrue(result["isError"])
+        with patch.object(
+            knowledge_mcp,
+            "retrieve",
+            side_effect=access.RetrievalError("access_denied", "Knowledge access denied.", 403),
+        ):
+            result = self.handler.call_tool(
+                {"name": "search_knowledge", "arguments": {"knowledge_id": KID, "query_text": "x"}}
+            )
+        self.assertEqual(result["content"][0]["text"], "Knowledge access denied.")
+        with self.assertRaises(ValidationError):
+            self.handler.call_tool({"name": "agent_x"})

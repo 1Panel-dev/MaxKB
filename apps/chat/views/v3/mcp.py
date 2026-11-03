@@ -7,7 +7,7 @@ from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from chat.mcp.tools import ChatUserMCPToolHandler, InvalidParamsError
+from chat.mcp.application import ChatUserMCPToolHandler, InvalidParamsError
 from common.auth.handle.impl.chat_user_key import ChatUserKey
 from common.exception.app_exception import AppAuthenticationFailed
 
@@ -121,7 +121,7 @@ def mcp_view(request, application_id=None):
 
         # 路由方法
         if method == "initialize":
-            result = handler.initialize()
+            result = handler.initialize(params)
 
         elif method == "ping":
             result = {}

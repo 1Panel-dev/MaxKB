@@ -39,3 +39,11 @@ class Portal(AppModelMixin):
 
     class Meta:
         db_table = "portal"
+
+
+def get_portal_setting(field):
+    """
+    读取门户开关；门户未初始化时取字段默认值
+    """
+    value = Portal.objects.values_list(field, flat=True).first()
+    return Portal._meta.get_field(field).default if value is None else value

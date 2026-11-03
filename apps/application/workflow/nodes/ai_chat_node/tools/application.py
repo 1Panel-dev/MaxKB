@@ -26,7 +26,7 @@ def get_application_args():
     """
     应用（Agent）工具对模型暴露的入参：固定单个必填 message。
 
-    与 chat.mcp.tools.MCPToolHandler.list_tools 的 inputSchema 保持一致，
+    与 chat.mcp.application.MCPToolHandler.list_tools 的 inputSchema 保持一致，
     这样从远端 MCP 代理切换为进程内直调时，模型侧契约不变。
     """
     return build_schema(
