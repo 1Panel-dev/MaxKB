@@ -146,7 +146,7 @@ defineExpose({ openSetting: () => (bundle.list.leftSideOpen.value = true) })
 /* 设置表单使用白底；两侧抽屉沿用挤压宽度并限制占比，避免把对话区完全覆盖。 */
 .mk-simple-debug .mk-conversation-side-panel {
   &.left {
-    background: var(--color-white);
+    background: white;
   }
 
   &.drawer {
