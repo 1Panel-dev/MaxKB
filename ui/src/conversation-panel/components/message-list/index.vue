@@ -6,10 +6,15 @@ import PrologueContent from '../prologue-content/index.vue'
 import { formatPrologue } from '../prologue-content/index'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import { useMessageListStore } from './index'
-
+import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 defineProps<{ appName?: string }>()
 
 const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamProgress } = useMessageListStore()
+const { 
+  // 是否分享
+  isShared,
+  // 切换分享
+  switchShared } = useConversationListStore()
 const scrollRef = ref<InstanceType<typeof ReverseInfiniteScroll>>()
 
 // 开场白随智能体信息变化（debug 保存后为最新草稿）
@@ -25,14 +30,8 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
 </script>
 
 <template>
-  <ReverseInfiniteScroll
-    ref="scrollRef"
-    content-class="mk-conversation-content p-4"
-    :loading="loading"
-    :has-more="hasMore"
-    :count="messages.length"
-    :load-more="loadMore"
-  >
+  <ReverseInfiniteScroll ref="scrollRef" content-class="mk-conversation-content p-4" :loading="loading"
+    :has-more="hasMore" :count="messages.length" :load-more="loadMore">
     <template #prepend>
       <!-- 开场白在空会话或历史全部加载后显示，固定在会话最前 -->
       <div v-if="prologue && (!messages.length || !hasMore)">
@@ -48,7 +47,8 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
             <el-avatar v-if="userAvatar" class="bg-transparent!" shape="square" :size="24">
               <img :src="userAvatar" alt="" />
             </el-avatar>
-            <el-avatar v-else :size="24" :style="{ background: appInfo?.custom_theme?.theme_color || 'var(--mk-primary-gradient)' }">
+            <el-avatar v-else :size="24"
+              :style="{ background: appInfo?.custom_theme?.theme_color || 'var(--mk-primary-gradient)' }">
               <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 50%" />
             </el-avatar>
           </div>
