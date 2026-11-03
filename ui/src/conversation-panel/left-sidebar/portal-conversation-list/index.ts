@@ -8,6 +8,7 @@ export interface PortalApplicationGroup {
   name: string
   icon: string
   conversations: Conversation[]
+  count: number
   expanded: boolean
 }
 
@@ -78,12 +79,14 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
   const deleteGroupConversation = async (applicationId: string, chatId: string) => {
     await removeConversation(applicationId, chatId)
     const group = applicationGroups.value.find((applicationGroup) => applicationGroup.id === applicationId)
-    if (group) group.conversations = group.conversations.filter((conversation) => conversation.id !== chatId)
+    if (group) {
+      group.conversations = group.conversations.filter((conversation) => conversation.id !== chatId)
+      group.count = Math.max(0, group.count - 1)
+    }
   }
 
   // 按名称查询可访问的智能体，全部智能体页与选择智能体抽屉各自维护搜索条件与结果
-  const fetchApplications = (keyword: string) =>
-    pageApplications(1, APPLICATION_PAGE_SIZE, keyword.trim()).then((response) => response.records ?? [])
+  const fetchApplications = (keyword: string) => pageApplications(1, APPLICATION_PAGE_SIZE, keyword.trim()).then((response) => response.records ?? [])
 
   // 全部智能体页
   const applications = ref<ChatApplicationProfile[]>([])

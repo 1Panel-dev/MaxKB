@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { relativeTimeFormat } from '@/utils/time'
 import type { Conversation } from '../../core/types'
 import { useConversationListStore } from '../conversation-list/index'
+import HistoryConversationDrawer from './HistoryConversationDrawer.vue'
 import AccountMenu from '../account-menu/index.vue'
 import { usePortalConversationListStore, type PortalApplicationGroup } from './index'
 
@@ -10,6 +12,13 @@ defineOptions({ name: 'PortalConversationList' })
 const portalList = usePortalConversationListStore()
 const { applicationGroups, currentApplicationId, isApplicationListActive, toggleGroup } = portalList
 const { conversations, currentChatId, selectConversation, deleteChat, toggleLeftSide } = useConversationListStore()
+
+const historyApplicationId = ref('')
+const historyVisible = ref(false)
+const handleOpenHistory = (group: PortalApplicationGroup) => {
+  historyApplicationId.value = group.id
+  historyVisible.value = true
+}
 
 // 每个智能体最多展示最近 5 条会话
 const RECENT_CONVERSATION_LIMIT = 5
@@ -20,14 +29,11 @@ const isCurrentApplication = (group: PortalApplicationGroup) => group.id === cur
 const groupConversations = (group: PortalApplicationGroup) =>
   (isCurrentApplication(group) ? conversations.value : group.conversations).slice(0, RECENT_CONVERSATION_LIMIT)
 
-// 当前智能体的新建对话（没有选中会话）时，选中智能体本身
-const isActiveApplication = (group: PortalApplicationGroup) => isCurrentApplication(group) && !currentChatId.value
+const groupConversationCount = (group: PortalApplicationGroup) =>
+  Math.max(group.count, isCurrentApplication(group) ? conversations.value.length : group.conversations.length)
 
-// 选中智能体进入其新建对话，并展开其会话；进入后会话以会话列表 Store 为准，无需查询分组会话
-const handleSelectApplication = (group: PortalApplicationGroup) => {
-  group.expanded = true
-  portalList.openApplication(group.id)
-}
+// 仅展示有历史记录的智能体，随当前会话的新建、删除同步更新。
+const historyApplicationGroups = computed(() => applicationGroups.value.filter((group) => groupConversations(group).length > 0))
 
 const isActiveConversation = (group: PortalApplicationGroup, conversation: Conversation) =>
   isCurrentApplication(group) && currentChatId.value === conversation.id
@@ -40,7 +46,7 @@ const handleSelectConversation = (group: PortalApplicationGroup, conversation: C
 }
 
 const handleDeleteConversation = (group: PortalApplicationGroup, conversation: Conversation) => {
-  if (isCurrentApplication(group)) deleteChat(conversation.id)
+  if (isCurrentApplication(group)) return deleteChat(conversation.id).then(() => portalList.loadApplicationGroups())
   else portalList.deleteGroupConversation(group.id, conversation.id)
 }
 </script>
@@ -83,14 +89,14 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
     </div>
 
     <!-- 历史列表独立滚动，门户入口和新建入口保持固定。 -->
-    <el-scrollbar class="min-h-0 flex-1 mt-1">
-      <div v-if="applicationGroups.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
+    <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
+      <div v-if="historyApplicationGroups.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
       <div v-else class="space-y-1">
-        <template v-for="group in applicationGroups" :key="group.id">
+        <template v-for="group in historyApplicationGroups" :key="group.id">
           <MkCollapse
             :expanded="group.expanded"
             trigger="header"
-            trigger-class="group rounded-md p-2 hover:bg-N900/10"
+            trigger-class="group rounded-md p-2 hover:bg-N900/10 mb-1"
             indicator-position="after"
             @update:expanded="toggleGroup(group.id)"
           >
@@ -127,7 +133,7 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
               </div>
             </template>
 
-            <template v-if="group.expanded">
+            <div class="space-y-1" v-if="group.expanded">
               <MkListItem
                 v-for="conversation in groupConversations(group)"
                 :key="conversation.id"
@@ -156,11 +162,30 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
                   </MkDropdownItem>
                 </template>
               </MkListItem>
-            </template>
+              <!-- 超过5条 查看更多 -->
+              <MkListItem class="pl-8!" v-if="groupConversationCount(group) > RECENT_CONVERSATION_LIMIT" @click="handleOpenHistory(group)">
+                <template #default>
+                  <span>查看更多</span>
+                  <span>
+                    ({{
+                      groupConversationCount(group) - RECENT_CONVERSATION_LIMIT > 99
+                        ? '99+'
+                        : groupConversationCount(group) - RECENT_CONVERSATION_LIMIT
+                    }})
+                  </span>
+                </template>
+              </MkListItem>
+            </div>
           </MkCollapse>
         </template>
       </div>
     </el-scrollbar>
+    <HistoryConversationDrawer
+      v-if="historyApplicationId"
+      v-model="historyVisible"
+      :application-id="historyApplicationId"
+      @closed="historyApplicationId = ''"
+    />
     <!-- 账户入口固定在侧栏底部，不随历史列表滚动。 -->
     <div class="mt-3 shrink-0">
       <AccountMenu />

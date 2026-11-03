@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { debounce } from 'lodash'
 import type { ChatApplicationProfile } from '@/api/types'
 import PortalApplicationCards from '../../components/portal-application-cards/index.vue'
 import { usePortalConversationListStore } from './index'
@@ -25,9 +24,6 @@ const loadApplications = () => {
       isLoading.value = false
     })
 }
-
-// 输入名称时延迟搜索，避免每个字符都发起请求
-const handleKeywordInput = debounce(loadApplications, 300)
 
 // 每次打开清空搜索条件并重新查询
 const open = () => {
@@ -54,19 +50,14 @@ defineExpose({ open })
     :close-on-press-escape="true"
   >
     <template #header>
-      <div class="flex w-full">
+      <div class="flex w-full flex-col gap-4 md:flex-row">
         <h4>选择智能体</h4>
-        <div class="absolute-center hidden w-85 md:block">
+        <div class="w-full md:absolute-center md:w-85">
           <!-- 搜索智能体 -->
-          <MkSearchInput v-model="applicationKeyword" @input="handleKeywordInput" />
+          <MkSearchInput v-model="applicationKeyword" @change="loadApplications" />
         </div>
       </div>
     </template>
-
-    <div class="mb-4 md:hidden">
-      <!-- 移动端搜索智能体 -->
-      <MkSearchInput v-model="applicationKeyword" @input="handleKeywordInput" />
-    </div>
 
     <div v-loading="isLoading">
       <MkEmpty
@@ -84,6 +75,7 @@ defineExpose({ open })
 /* 移动端选择智能体标题栏 */
 @media (width < 768px) {
   :global(.select-application-drawer .el-drawer__header) {
+    align-items: flex-start;
     border-bottom: none;
   }
 }
