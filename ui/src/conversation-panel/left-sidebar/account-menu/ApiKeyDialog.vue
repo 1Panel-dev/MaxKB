@@ -10,6 +10,7 @@ const router = useRouter()
 const dialogVisible = ref(false)
 const apiKey = ref('')
 const loading = ref(false)
+const mcpServiceType = ref<'agent' | 'knowledge'>('agent')
 const apiUrl = computed(() => new URL(router.resolve({ name: 'portal-home' }).href, window.location.origin).href)
 const maskedApiKey = computed(() => (apiKey.value ? `******${apiKey.value.slice(-4)}` : ''))
 
@@ -34,6 +35,7 @@ function open() {
 
 function resetData() {
   apiKey.value = ''
+  mcpServiceType.value = 'agent'
 }
 
 defineExpose({ open })
@@ -41,6 +43,8 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="API Key" @closed="resetData">
+    <template #subtitle>每个用户仅一个 API Key，绑定当前对话用户、与其同权。重置后旧 Key 立即失效</template>
+
     <div class="mb-2">我的 API Key</div>
     <el-input :model-value="maskedApiKey" readonly class="mb-4">
       <template #suffix>
@@ -58,6 +62,11 @@ defineExpose({ open })
     </el-input>
 
     <div class="mb-2">MCP 服务配置</div>
+    <!-- 切换 MCP 服务类型 -->
+    <el-radio-group v-model="mcpServiceType" class="mb-2">
+      <el-radio-button value="agent">智能体对话</el-radio-button>
+      <el-radio-button value="knowledge">知识库检索</el-radio-button>
+    </el-radio-group>
 
     <div class="group relative">
       <el-input :model-value="maskedApiKey" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
