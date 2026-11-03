@@ -16,6 +16,9 @@ const list = useConversationListStore()
 const input = useMessageInputStore()
 // 拖拽到面板任意处 → 交给 message-input 接收文件
 const handleDrop = (e: DragEvent) => input.addFiles(e.dataTransfer?.files)
+
+
+
 </script>
 <template>
   <!-- 带输入框的主面板:header + message-list + message-input -->

@@ -27,7 +27,10 @@ export function createConversationListStore(deps: ConversationListDeps) {
   const pageSize = 50
   const currentPage = ref(1)
   const hasMore = ref(true)
-
+  const isShared = ref<boolean>(false)
+  const switchShared=(share:boolean)=>{
+    isShared.value=share
+  }
   const loadConversations = async (page = 1) => {
     try {
       const response = await pageConversations(page, pageSize)
@@ -98,6 +101,8 @@ export function createConversationListStore(deps: ConversationListDeps) {
   }
 
   return {
+    isShared,
+    switchShared,
     conversations,
     currentChatId,
     currentConversation,

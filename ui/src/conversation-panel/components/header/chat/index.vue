@@ -9,10 +9,8 @@ const props = defineProps<{
   /** 显示分享入口；仅对话端传入 */
   shareable?: boolean
 }>()
-
-const emit = defineEmits<{ share: [] }>()
-
 const list = useConversationListStore()
+
 const msgs = useMessageListStore()
 // 回答生成中或没有消息时不可分享
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
@@ -43,7 +41,7 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
     </MkTooltip>
     <!-- 进入分享模式，勾选要分享的对话 -->
     <MkTooltip v-if="shareable" content="分享">
-      <el-button text :disabled="!canShare" @click="emit('share')">
+      <el-button text :disabled="!canShare" @click="list.switchShared(true)">
         <MkIcon name="icon_share_outlined" :size="18" :class="canShare ? 'text-N900!' : 'text-N400!'" />
       </el-button>
     </MkTooltip>
