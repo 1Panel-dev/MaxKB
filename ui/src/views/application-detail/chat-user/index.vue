@@ -15,9 +15,8 @@ defineOptions({ name: 'ApplicationChatUserListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ hideHeader: true })
 
-type ApplicationChatUserPermissionMethod =
-    | 'chatUserEdit'
-function applicationchatUserPermission(method: ApplicationChatUserPermissionMethod): boolean{
+type ApplicationChatUserPermissionMethod = 'chatUserEdit'
+function applicationchatUserPermission(method: ApplicationChatUserPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.application.system[method]())
   return Boolean(perm.application.workspace[method](applicationId.value))
 }
@@ -226,7 +225,7 @@ onMounted(() => loadChatUserGroups())
         <MkTable
           v-model:pagination-config="paginationConfig"
           :data="chatUsers"
-          :max-table-height="350"
+          :max-table-height="230"
           @size-change="refreshChatUsers"
           @current-change="refreshChatUsers"
         >
@@ -241,7 +240,13 @@ onMounted(() => loadChatUserGroups())
           <el-table-column :width="140" align="center">
             <template #header>
               <!-- 批量设置当前页授权 -->
-              <el-checkbox v-if="applicationchatUserPermission('chatUserEdit')" :model-value="allChecked" :indeterminate="allIndeterminate" :disabled="authorizationDisabled" @change="handleCheckAll">
+              <el-checkbox
+                v-if="applicationchatUserPermission('chatUserEdit')"
+                :model-value="allChecked"
+                :indeterminate="allIndeterminate"
+                :disabled="authorizationDisabled"
+                @change="handleCheckAll"
+              >
                 授权
               </el-checkbox>
             </template>
