@@ -2,8 +2,8 @@
 import { computed, nextTick, reactive, ref } from 'vue'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
-import type { ChatUserSyncConflict, ListItem, LoginMethod, RoleType, SystemUserGroup } from '@/api/types'
-import { LOGIN_METHOD_LABELS, ROLE_TYPE_LABELS } from '@/constants'
+import type { ChatUserSyncConflict, ListItem, LoginMethod, SystemUserGroup } from '@/api/types'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
@@ -29,7 +29,7 @@ type ImportUserSource =
 
 interface ImportUsersForm {
   files: UploadUserFile[]
-  role: RoleType | ''
+  role: string
   source: ImportUserSource | ''
   userGroupIds: string[]
   workspaceId: string
@@ -41,8 +41,11 @@ const importUsersFormRef = ref<FormInstance>()
 const dragUploadRef = ref<InstanceType<typeof MkDragUpload>>()
 const importUsersForm = reactive<ImportUsersForm>({ files: [], role: '', source: '', userGroupIds: [], workspaceId: '' })
 const isLocalFileSource = computed(() => importUsersForm.source === LOCAL_FILE_SOURCE)
-const showWorkspace = computed(() => Boolean(importUsersForm.role) && importUsersForm.role !== ROLE_TYPE.ADMIN)
-const showUserGroups = computed(() => importUsersForm.role === ROLE_TYPE.USER)
+const selectedRoleType = computed(
+  () => assignableRoles.value.find((role) => role.id === importUsersForm.role)?.type,
+)
+const showWorkspace = computed(() => Boolean(importUsersForm.role) && selectedRoleType.value !== ROLE_TYPE.ADMIN)
+const showUserGroups = computed(() => selectedRoleType.value === ROLE_TYPE.USER)
 const canImport = computed(
   () =>
     Boolean(importUsersForm.source) &&
@@ -57,8 +60,6 @@ const importUsersFormRules: FormRules<ImportUsersForm> = {
   source: [{ required: true, message: '请选择用户来源', trigger: 'change' }],
   workspaceId: [{ required: true, message: '请选择工作空间', trigger: 'change' }],
 }
-
-const roleOptions: RoleType[] = [ROLE_TYPE.USER, ROLE_TYPE.WORKSPACE_MANAGE, ROLE_TYPE.ADMIN]
 
 /* 可导入来源、角色、工作空间与用户组选项 */
 const sourcesLoading = ref(false)
@@ -90,6 +91,9 @@ function loadRoleOptions() {
   return CurrentUserApi.getCurrentUserRoleList()
     .then((roles) => {
       assignableRoles.value = roles
+      if (!importUsersForm.role) {
+        importUsersForm.role = roles.find((role) => role.type === ROLE_TYPE.USER)?.id || ''
+      }
     })
     .finally(() => {
       rolesLoading.value = false
@@ -150,13 +154,16 @@ function handleSourceChange(source: ImportUserSource | '') {
   nextTick(() => importUsersFormRef.value?.clearValidate())
 }
 
-function handleRoleChange(role: RoleType | '') {
-  if (role === ROLE_TYPE.ADMIN) {
+function handleRoleChange(role: string) {
+  if (role === '') {
+    importUsersForm.workspaceId = ''
+    importUsersForm.userGroupIds = []
+  } else if (selectedRoleType.value === ROLE_TYPE.ADMIN) {
     handleWorkspaceChange('')
     importUsersForm.userGroupIds = []
-  } else if (role) {
+  } else {
     handleWorkspaceChange(importUsersForm.workspaceId || workspaceOptions.value[0]?.id || DEFAULT_WORKSPACE_ID)
-    if (role !== ROLE_TYPE.USER) importUsersForm.userGroupIds = []
+    if (selectedRoleType.value !== ROLE_TYPE.USER) importUsersForm.userGroupIds = []
   }
   nextTick(() => importUsersFormRef.value?.clearValidate(['role', 'workspaceId']))
 }
@@ -209,7 +216,7 @@ function submitImportUsers() {
       isLocalFileSource.value ? 'file' : importUsersForm.source,
       syncFile,
       importUsersForm.workspaceId || undefined,
-      roleId,
+      importUsersForm.role,
       importUsersForm.userGroupIds[0],
     )
       .then((result) => {
@@ -287,7 +294,13 @@ defineExpose({ open })
 
       <el-form-item label="角色" prop="role">
         <el-select v-model="importUsersForm.role" placeholder="请选择角色" :loading="rolesLoading" @change="handleRoleChange">
-          <el-option v-for="roleOption in roleOptions" :key="roleOption" :label="ROLE_TYPE_LABELS[roleOption]" :value="roleOption" />
+          <el-option
+            v-for="roleOption in assignableRoles"
+            :key="roleOption.id"
+            :label="roleOption.name"
+            :title="roleOption.name"
+            :value="roleOption.id"
+          />
         </el-select>
       </el-form-item>
 
