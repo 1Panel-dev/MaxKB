@@ -14,7 +14,7 @@ const { appInfo, leftSideOpen, toggleLeftSide, newConversation } = useConversati
         <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
       </el-button>
     </MkTooltip>
-    <el-divider direction="vertical" class="mx-1!" />
+    <el-divider direction="vertical" class="ml-2! mr-3!" />
     <ApplicationIcon :icon="appInfo?.icon" :size="24" class="shrink-0" />
     <h4 class="ml-1 min-w-0 flex-1 truncate" :title="appInfo?.name">{{ appInfo?.name }}</h4>
     <MkTooltip content="新建对话">
@@ -23,6 +23,9 @@ const { appInfo, leftSideOpen, toggleLeftSide, newConversation } = useConversati
         <MkIcon name="icon_new-chat_outlined" :size="18" />
       </el-button>
     </MkTooltip>
-    <HistoryPopover />
+    <!-- 历史记录 -->
+    <span class="ml-1">
+      <HistoryPopover></HistoryPopover>
+    </span>
   </header>
 </template>
