@@ -9459,7 +9459,7 @@ msgid "token is required for EVENT triggers"
 msgstr "事件触发器必须设置 token"
 
 msgid "Home page"
-msgstr "首页"
+msgstr "概览"
 
 msgid "Response code"
 msgstr "响应码"

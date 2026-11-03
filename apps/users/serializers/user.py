@@ -464,7 +464,11 @@ class UserManageSerializer(serializers.Serializer):
                     if not is_admin and relation.role.type == RoleConstants.ADMIN.name:
                         continue
                     user_role_mapping[user_id].add(relation.role.role_name)
-                    user_role_setting_mapping[user_id][role_id].append(workspace_id)
+                    if relation.role.type == RoleConstants.ADMIN.name:
+                        # 系统管理员不关联工作空间，编辑页不显示空间（保持空列表）
+                        user_role_setting_mapping[user_id][role_id]
+                    else:
+                        user_role_setting_mapping[user_id][role_id].append(workspace_id)
                     if relation.role.type == RoleConstants.ADMIN.name:
                         # 系统层级角色不关联具体空间，无需空间id
                         user_role_workspace_mapping[user_id].setdefault(relation.role.role_name, [])

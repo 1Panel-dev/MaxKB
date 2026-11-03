@@ -155,7 +155,7 @@ class LoginSerializer(serializers.Serializer):
             )
         if LoginSerializer._need_captcha(username, max_attempts):
             # 验证验证码
-            LoginSerializer._validate_captcha(username, captcha, failed_attempts, lock_time)
+            LoginSerializer._validate_captcha(username, captcha)
 
         # 验证用户凭据：先按用户名查找，再用 password_verify 验证密码
         user = LoginSerializer._authenticate(username, password)
@@ -197,7 +197,7 @@ class LoginSerializer(serializers.Serializer):
         return True
 
     @staticmethod
-    def _validate_captcha(username: str, captcha: str, failed_attempts: int = 5, lock_time: int = 10) -> None:
+    def _validate_captcha(username: str, captcha: str) -> None:
         """验证验证码（一次性消费）"""
         if not captcha:
             raise AppApiException(1005, _("Captcha is required"))
@@ -206,12 +206,7 @@ class LoginSerializer(serializers.Serializer):
         captcha_cache = cache.get(captcha_key, version=Cache_Version.CAPTCHA.get_version())
 
         if captcha_cache is None or captcha.lower() != captcha_cache:
-            # 校验失败与口令失败共用同一失败计数与锁定机制，防止"识别-试错"循环绕过验证码
-            LoginSerializer._record_login_failure(username, failed_attempts, lock_time)
-            if LoginSerializer._is_account_locked(username, failed_attempts):
-                raise AppApiException(
-                    1005, _("This account has been locked for %s minutes, please try again later") % lock_time
-                )
+            # 验证码失败不计入失败次数统计 只提示
             raise AppApiException(1005, _("Captcha code error or expiration"))
 
         # 校验通过即销毁，保证验证码一次性使用
@@ -219,14 +214,14 @@ class LoginSerializer(serializers.Serializer):
 
     @staticmethod
     def _record_login_failure(username: str, failed_attempts: int, lock_time: int) -> int:
-        """记录一次认证失败（口令或验证码），累计失败/锁定计数，达到阈值时创建锁键。
+        """记录一次口令认证失败，累计失败/锁定计数，达到阈值时创建锁键。
 
         修复要点：
         - 使用 record_login_fail / record_login_fail_lock 两个原子 incr 来记录失败；
         - 不再依赖精确等于 0 的比较来触发锁，而是基于原子计数 >= 阈值来决定进入锁定分支；
         - 使用 cache.add 原子创建锁键，cache.add 保证只有第一个成功创建者可写入该键；
           其他并发到达的请求若发现计数已到达阈值也应当返回"已锁定"响应，避免出现绕过。
-        - 不抛异常，返回当前锁定计数，供口令校验与验证码校验共用。
+        - 不抛异常，返回当前锁定计数，供口令校验使用。
         """
         # 记录普通失败计数（供验证码触发使用）
         try:
