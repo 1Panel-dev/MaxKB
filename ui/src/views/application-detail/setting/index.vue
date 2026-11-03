@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isEqual } from 'lodash'
 import type { FormInstance, FormItemRule } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { ApplicationDetail, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
@@ -11,6 +11,7 @@ import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
 import ProviderApi from '@/api/admin/model-provider'
 import SelectModel from '@/components/business/select-model/index.vue'
 import SelectKnowledgeDialog from '@/components/business/select-knowledge-dialog/index.vue'
+import SimpleDebugConversation from '@/conversation-panel/view/simple-debug/index.vue'
 import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
 import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
 import type { ReasoningSettingData } from '@/workflow-canvas/types'
@@ -96,6 +97,11 @@ watch(
   { immediate: true },
 )
 
+/* 调试执行已保存的配置；草稿与详情回填结果不同时提示先保存。 */
+const debugConversationRef = useTemplateRef<InstanceType<typeof SimpleDebugConversation>>('debugConversationRef')
+const savedSettingsPayload = computed(() => createSettingsPayload(createSettings(application.value)))
+const hasUnsavedSettings = computed(() => !!application.value && !isEqual(createSettingsPayload(settings.value), savedSettingsPayload.value))
+
 /* 长期记忆配置确认后合并到表单草稿。 */
 // 固定校验规则，避免启用开关时因规则变化提前校验；保存、发布时仍检查模型。
 const longTermModelRule: FormItemRule = {
@@ -166,7 +172,10 @@ function submit() {
   saving.value = true
   return formRef.value
     .validate((valid) => {
-      if (!valid) MsgWarning('请检查表单填写内容')
+      if (valid) return
+      // 设置表单收起时展开，显示校验错误。
+      debugConversationRef.value?.openSetting()
+      MsgWarning('请检查表单填写内容')
     })
     .then((valid) => {
       if (!valid) return
@@ -189,7 +198,10 @@ function publish() {
   saving.value = true
   return formRef.value
     .validate((valid) => {
-      if (!valid) MsgWarning('请检查表单填写内容')
+      if (valid) return
+      // 设置表单收起时展开，显示校验错误。
+      debugConversationRef.value?.openSetting()
+      MsgWarning('请检查表单填写内容')
     })
     .then((valid) => {
       if (!valid) return
@@ -233,312 +245,319 @@ onMounted(() => {
       </div>
     </div>
   </Teleport>
-  <div class="application-settings -mx-6 -mb-6 grid min-h-0 shrink-0 grid-cols-2 overflow-hidden border-t">
-    <!-- 左侧设置 -->
-    <el-scrollbar class="min-h-0" view-class="p-4">
-      <el-form
-        v-loading="saving"
-        ref="formRef"
-        :model="settings"
-        label-position="top"
-        require-asterisk-position="right"
-        @submit.prevent
-        class="space-y-2"
-      >
-        <!-- 基本信息 -->
-        <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
-          <template #label>
-            <h6>基本信息</h6>
-          </template>
-          <div class="p-2">
-            <el-form-item label="智能体名称" prop="name" :rules="{ required: true, whitespace: true, message: '请输入智能体名称', trigger: 'blur' }">
-              <el-input v-model="settings.name" maxlength="64" placeholder="请输入智能体名称" @blur="settings.name = settings.name.trim()" />
-            </el-form-item>
-            <el-form-item label="描述">
-              <el-input
-                v-model="settings.desc"
-                type="textarea"
-                :rows="3"
-                maxlength="256"
-                show-word-limit
-                placeholder="描述该智能体的应用场景及用途"
-              />
-            </el-form-item>
-          </div>
-        </MkCollapse>
-        <!-- 模型设置 -->
-        <MkCollapse :expanded="true" trigger-class="mk-gray-card-sm px-2! py-[9px]!">
-          <template #label>
-            <h6>模型设置</h6>
-          </template>
-          <div class="p-2">
-            <el-form-item label="AI 模型">
-              <SelectModel
-                v-model="settings.model_id"
-                v-model:model-params="settings.model_params_setting"
-                :options="llmModels"
-                :provider-options="providerOptions"
-                :loading="modelLoading"
-                can-edit-params
-                can-add
-                teleported
-                placeholder="请选择 AI 模型"
-                @refresh="loadModels"
-              />
-            </el-form-item>
-            <!-- 系统提示词 -->
-            <el-form-item>
+  <div class="application-settings -mx-6 -mb-6 min-h-0 shrink-0 overflow-hidden border-t">
+    <!-- 调试对话，左侧放设置表单 -->
+    <SimpleDebugConversation ref="debugConversationRef" :application="application">
+      <template #setting>
+        <!-- 左侧设置；收起时保留表单实例，保存、发布仍可校验 -->
+        <el-scrollbar class="h-full" view-class="p-4">
+          <el-form
+            v-loading="saving"
+            ref="formRef"
+            :model="settings"
+            label-position="top"
+            require-asterisk-position="right"
+            @submit.prevent
+            class="space-y-2"
+          >
+            <!-- 基本信息 -->
+            <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
+              <template #label>
+                <h6>基本信息</h6>
+              </template>
+              <div class="p-2">
+                <el-form-item
+                  label="智能体名称"
+                  prop="name"
+                  :rules="{ required: true, whitespace: true, message: '请输入智能体名称', trigger: 'blur' }"
+                >
+                  <el-input v-model="settings.name" maxlength="64" placeholder="请输入智能体名称" @blur="settings.name = settings.name.trim()" />
+                </el-form-item>
+                <el-form-item label="描述">
+                  <el-input
+                    v-model="settings.desc"
+                    type="textarea"
+                    :rows="3"
+                    maxlength="256"
+                    show-word-limit
+                    placeholder="描述该智能体的应用场景及用途"
+                  />
+                </el-form-item>
+              </div>
+            </MkCollapse>
+            <!-- 模型设置 -->
+            <MkCollapse :expanded="true" trigger-class="mk-gray-card-sm px-2! py-[9px]!">
+              <template #label>
+                <h6>模型设置</h6>
+              </template>
+              <div class="p-2">
+                <el-form-item label="AI 模型">
+                  <SelectModel
+                    v-model="settings.model_id"
+                    v-model:model-params="settings.model_params_setting"
+                    :options="llmModels"
+                    :provider-options="providerOptions"
+                    :loading="modelLoading"
+                    can-edit-params
+                    can-add
+                    teleported
+                    placeholder="请选择 AI 模型"
+                    @refresh="loadModels"
+                  />
+                </el-form-item>
+                <!-- 系统提示词 -->
+                <el-form-item>
+                  <template #label>
+                    <div class="flex-between w-full">
+                      <div class="flex-align-center gap-1">
+                        <span>系统提示词</span>
+                        <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
+                          <MkIcon name="icon_info_outlined" class="text-N600!" />
+                        </MkTooltip>
+                      </div>
+                      <!-- 生成系统提示词 -->
+                      <PromptGenerate
+                        :model-id="settings.model_id"
+                        :model-params-setting="settings.model_params_setting"
+                        @replace="settings.model_setting.system = $event"
+                      />
+                    </div>
+                  </template>
+                  <MdEditorMagnify
+                    v-model="settings.model_setting.system"
+                    placeholder="系统提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题，{memory}开启长期记忆后的用户记忆。"
+                    title="系统提示词"
+                  />
+                </el-form-item>
+                <!-- 用户提示词 -->
+                <el-form-item
+                  class="mk-hide-asterisk"
+                  :prop="promptMode === 'references' ? 'model_setting.prompt' : 'model_setting.no_references_prompt'"
+                  :rules="{ required: !!settings.model_id, whitespace: true, message: '请输入用户提示词', trigger: 'blur' }"
+                >
+                  <template #label>
+                    <span class="flex-align-center gap-1">
+                      <span class="mk-required">用户提示词</span>
+                      <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
+                        <MkIcon name="icon_info_outlined" class="text-N600!" />
+                      </MkTooltip>
+                    </span>
+                  </template>
+                  <!-- 切换有无引用知识库的提示词 -->
+                  <el-radio-group v-model="promptMode" size="small" class="mb-2">
+                    <el-radio-button value="references">引用知识库</el-radio-button>
+                    <el-radio-button value="none">无引用知识库</el-radio-button>
+                  </el-radio-group>
+                  <MdEditorMagnify
+                    v-if="promptMode === 'references'"
+                    v-model="settings.model_setting.prompt"
+                    placeholder="用户提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。"
+                    title="用户提示词（引用知识库）"
+                  />
+                  <MdEditorMagnify
+                    v-if="promptMode === 'none'"
+                    v-model="settings.model_setting.no_references_prompt"
+                    placeholder="用户提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。"
+                    title="用户提示词 （无引用知识库）"
+                  />
+                </el-form-item>
+
+                <el-form-item label="历史聊天记录">
+                  <el-input-number
+                    v-model="settings.dialogue_number"
+                    :min="0"
+                    :value-on-clear="0"
+                    controls-position="right"
+                    align="left"
+                    :step="1"
+                    :step-strictly="true"
+                  />
+                </el-form-item>
+              </div>
+            </MkCollapse>
+            <!-- 知识库 -->
+            <MkCollapse :expanded="true" trigger-class="mk-gray-card-sm px-2! py-[9px]!">
               <template #label>
                 <div class="flex-between w-full">
-                  <div class="flex-align-center gap-1">
-                    <span>系统提示词</span>
-                    <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
-                      <MkIcon name="icon_info_outlined" class="text-N600!" />
-                    </MkTooltip>
+                  <h6>知识库</h6>
+                  <div>
+                    <!-- 参数设置 -->
+                    <ButtonKnowledgeSetting :setting="settings" @submit="handleKnowledgeSettingSubmit" />
+                    <!-- 选择关联知识库 -->
+                    <el-button text type="primary" @click.stop="handleOpenKnowledge"><MkIcon name="icon_add_outlined" /></el-button>
                   </div>
-                  <!-- 生成系统提示词 -->
-                  <PromptGenerate
-                    :model-id="settings.model_id"
-                    :model-params-setting="settings.model_params_setting"
-                    @replace="settings.model_setting.system = $event"
-                  />
                 </div>
               </template>
-              <MdEditorMagnify
-                v-model="settings.model_setting.system"
-                placeholder="系统提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题，{memory}开启长期记忆后的用户记忆。"
-                title="系统提示词"
-              />
-            </el-form-item>
-            <!-- 用户提示词 -->
-            <el-form-item
-              class="mk-hide-asterisk"
-              :prop="promptMode === 'references' ? 'model_setting.prompt' : 'model_setting.no_references_prompt'"
-              :rules="{ required: !!settings.model_id, whitespace: true, message: '请输入用户提示词', trigger: 'blur' }"
-            >
-              <template #label>
-                <span class="flex-align-center gap-1">
-                  <span class="mk-required">用户提示词</span>
-                  <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
-                    <MkIcon name="icon_info_outlined" class="text-N600!" />
-                  </MkTooltip>
-                </span>
-              </template>
-              <!-- 切换有无引用知识库的提示词 -->
-              <el-radio-group v-model="promptMode" size="small" class="mb-2">
-                <el-radio-button value="references">引用知识库</el-radio-button>
-                <el-radio-button value="none">无引用知识库</el-radio-button>
-              </el-radio-group>
-              <MdEditorMagnify
-                v-if="promptMode === 'references'"
-                v-model="settings.model_setting.prompt"
-                placeholder="用户提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。"
-                title="用户提示词（引用知识库）"
-              />
-              <MdEditorMagnify
-                v-if="promptMode === 'none'"
-                v-model="settings.model_setting.no_references_prompt"
-                placeholder="用户提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。"
-                title="用户提示词 （无引用知识库）"
-              />
-            </el-form-item>
-
-            <el-form-item label="历史聊天记录">
-              <el-input-number
-                v-model="settings.dialogue_number"
-                :min="0"
-                :value-on-clear="0"
-                controls-position="right"
-                align="left"
-                :step="1"
-                :step-strictly="true"
-              />
-            </el-form-item>
-          </div>
-        </MkCollapse>
-        <!-- 知识库 -->
-        <MkCollapse :expanded="true" trigger-class="mk-gray-card-sm px-2! py-[9px]!">
-          <template #label>
-            <div class="flex-between w-full">
-              <h6>知识库</h6>
-              <div>
-                <!-- 参数设置 -->
-                <ButtonKnowledgeSetting :setting="settings" @submit="handleKnowledgeSettingSubmit" />
-                <!-- 选择关联知识库 -->
-                <el-button text type="primary" @click.stop="handleOpenKnowledge"><MkIcon name="icon_add_outlined" /></el-button>
+              <div class="p-2">
+                <div v-if="!selectedKnowledge.length" class="text-center text-N600">关联的知识库显示在这里</div>
+                <div v-else class="space-y-2">
+                  <template v-for="knowledge in selectedKnowledge" :key="knowledge.id">
+                    <el-card class="small" shadow="never">
+                      <div class="flex-between">
+                        <span class="flex-align-center min-w-0 gap-2">
+                          <KnowledgeIcon :type="knowledge.type" :size="20" class="shrink-0 small" />
+                          <span class="truncate" :title="knowledge.name || knowledge.id">{{ knowledge.name || knowledge.id }}</span>
+                        </span>
+                        <!-- 移除知识库 -->
+                        <el-button text title="移除知识库" @click="removeKnowledge(knowledge.id)"><MkIcon name="icon_close_outlined" /></el-button>
+                      </div>
+                    </el-card>
+                  </template>
+                </div>
               </div>
-            </div>
-          </template>
-          <div class="p-2">
-            <div v-if="!selectedKnowledge.length" class="text-center text-N600">关联的知识库显示在这里</div>
-            <div v-else class="space-y-2">
-              <template v-for="knowledge in selectedKnowledge" :key="knowledge.id">
-                <el-card class="small" shadow="never">
-                  <div class="flex-between">
-                    <span class="flex-align-center min-w-0 gap-2">
-                      <KnowledgeIcon :type="knowledge.type" :size="20" class="shrink-0 small" />
-                      <span class="truncate" :title="knowledge.name || knowledge.id">{{ knowledge.name || knowledge.id }}</span>
-                    </span>
-                    <!-- 移除知识库 -->
-                    <el-button text title="移除知识库" @click="removeKnowledge(knowledge.id)"><MkIcon name="icon_close_outlined" /></el-button>
-                  </div>
-                </el-card>
-              </template>
-            </div>
-          </div>
-        </MkCollapse>
-        <!-- 开场白 -->
-        <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
-          <template #label>
-            <h6>开场白</h6>
-          </template>
-          <div class="p-2">
-            <el-form-item label="开场白">
-              <MdEditorMagnify v-model="settings.prologue" title="开场白" />
-            </el-form-item>
-          </div>
-        </MkCollapse>
-        <!-- 技能 -->
-        <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
-          <template #label>
-            <div class="flex-between w-full">
-              <h6>技能</h6>
-              <!-- 控制是否展示技能执行过程 -->
-              <el-checkbox v-model="settings.mcp_output_enable" @click.stop>输出执行过程</el-checkbox>
-            </div>
-          </template>
-          <div class="p-2">
-            <ResourceSetting
-              :setting="settings"
-              :application-options="applicationOptions"
-              :tool-options="toolOptions"
-              :skill-options="toolOptions"
-              :mcp-options="toolOptions"
-              @update="updateResources"
-            />
-          </div>
-        </MkCollapse>
-        <!-- 高级设置 -->
-        <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
-          <template #label>
-            <h6>高级设置</h6>
-          </template>
-          <div class="p-2">
-            <!-- 长期记忆 -->
-            <el-form-item class="mk-hide-asterisk mb-2!" prop="long_term_model_id" :rules="longTermModelRule">
+            </MkCollapse>
+            <!-- 开场白 -->
+            <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
               <template #label>
+                <h6>开场白</h6>
+              </template>
+              <div class="p-2">
+                <el-form-item label="开场白">
+                  <MdEditorMagnify v-model="settings.prologue" title="开场白" />
+                </el-form-item>
+              </div>
+            </MkCollapse>
+            <!-- 技能 -->
+            <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
+              <template #label>
+                <div class="flex-between w-full">
+                  <h6>技能</h6>
+                  <!-- 控制是否展示技能执行过程 -->
+                  <el-checkbox v-model="settings.mcp_output_enable" @click.stop>输出执行过程</el-checkbox>
+                </div>
+              </template>
+              <div class="p-2">
+                <ResourceSetting
+                  :setting="settings"
+                  :application-options="applicationOptions"
+                  :tool-options="toolOptions"
+                  :skill-options="toolOptions"
+                  :mcp-options="toolOptions"
+                  @update="updateResources"
+                />
+              </div>
+            </MkCollapse>
+            <!-- 高级设置 -->
+            <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
+              <template #label>
+                <h6>高级设置</h6>
+              </template>
+              <div class="p-2">
+                <!-- 长期记忆 -->
+                <el-form-item class="mk-hide-asterisk mb-2!" prop="long_term_model_id" :rules="longTermModelRule">
+                  <template #label>
+                    <div class="flex-between">
+                      <span class="flex-align-center gap-1">
+                        <span :class="settings.long_term_enable ? 'mk-required' : ''">长期记忆</span>
+                        <MkTooltip
+                          content="开启后，从开启时间记录新对话并按周期生成记忆，可通过 {memory} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。"
+                          placement="right"
+                        >
+                          <MkIcon name="icon_info_outlined" class="text-N600!" />
+                        </MkTooltip>
+                      </span>
+                      <span class="flex-align-center gap-2">
+                        <!-- 长期记忆设置 -->
+                        <ButtonLongTermSetting
+                          v-if="settings.long_term_enable"
+                          v-model="longTermSetting"
+                          :model-options="llmModels"
+                          :provider-options="providerOptions"
+                        />
+                        <el-switch
+                          v-model="settings.long_term_enable"
+                          size="small"
+                          :validate-event="false"
+                          @change="formRef?.clearValidate('long_term_model_id')"
+                        />
+                      </span>
+                    </div>
+                  </template>
+                </el-form-item>
+                <!-- 输出思考 -->
+                <div class="flex-between mb-4">
+                  <span>输出思考</span>
+                  <div class="flex-align-center gap-2">
+                    <!-- 输出思考设置 -->
+                    <ThinkingSetting v-if="settings.model_setting.reasoning_content_enable" v-model="thinkingSetting" />
+                    <el-switch v-model="settings.model_setting.reasoning_content_enable" size="small" />
+                  </div>
+                </div>
+                <!-- 语音输入 -->
                 <div class="flex-between">
-                  <span class="flex-align-center gap-1">
-                    <span :class="settings.long_term_enable ? 'mk-required' : ''">长期记忆</span>
-                    <MkTooltip
-                      content="开启后，从开启时间记录新对话并按周期生成记忆，可通过 {memory} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。"
-                      placement="right"
-                    >
-                      <MkIcon name="icon_info_outlined" class="text-N600!" />
-                    </MkTooltip>
-                  </span>
-                  <span class="flex-align-center gap-2">
-                    <!-- 长期记忆设置 -->
-                    <ButtonLongTermSetting
-                      v-if="settings.long_term_enable"
-                      v-model="longTermSetting"
-                      :model-options="llmModels"
-                      :provider-options="providerOptions"
-                    />
-                    <el-switch
-                      v-model="settings.long_term_enable"
-                      size="small"
-                      :validate-event="false"
-                      @change="formRef?.clearValidate('long_term_model_id')"
-                    />
+                  <span :class="settings.stt_model_enable ? 'mk-required' : ''">语音输入</span>
+                  <span class="flex-align-center gap-3">
+                    <el-checkbox v-if="settings.stt_model_enable" v-model="settings.stt_autosend">自动发送</el-checkbox>
+                    <el-switch v-model="settings.stt_model_enable" size="small" @change="changeSpeechInputEnabled" />
                   </span>
                 </div>
-              </template>
-            </el-form-item>
-            <!-- 输出思考 -->
-            <div class="flex-between mb-4">
-              <span>输出思考</span>
-              <div class="flex-align-center gap-2">
-                <!-- 输出思考设置 -->
-                <ThinkingSetting v-if="settings.model_setting.reasoning_content_enable" v-model="thinkingSetting" />
-                <el-switch v-model="settings.model_setting.reasoning_content_enable" size="small" />
-              </div>
-            </div>
-            <!-- 语音输入 -->
-            <div class="flex-between">
-              <span :class="settings.stt_model_enable ? 'mk-required' : ''">语音输入</span>
-              <span class="flex-align-center gap-3">
-                <el-checkbox v-if="settings.stt_model_enable" v-model="settings.stt_autosend">自动发送</el-checkbox>
-                <el-switch v-model="settings.stt_model_enable" size="small" @change="changeSpeechInputEnabled" />
-              </span>
-            </div>
-            <el-form-item
-              v-if="settings.stt_model_enable"
-              class="mt-2"
-              prop="stt_model_id"
-              :rules="{ required: true, message: '请选择语音输入模型', trigger: 'change' }"
-            >
-              <SelectModel
-                v-model="settings.stt_model_id"
-                v-model:model-params="settings.stt_model_params_setting"
-                :options="sttModels"
-                :provider-options="providerOptions"
-                can-edit-params
-                can-add
-                teleported
-                placeholder="请选择语音输入模型"
-                @refresh="loadModels"
-              />
-            </el-form-item>
+                <el-form-item
+                  v-if="settings.stt_model_enable"
+                  class="mt-2"
+                  prop="stt_model_id"
+                  :rules="{ required: true, message: '请选择语音输入模型', trigger: 'change' }"
+                >
+                  <SelectModel
+                    v-model="settings.stt_model_id"
+                    v-model:model-params="settings.stt_model_params_setting"
+                    :options="sttModels"
+                    :provider-options="providerOptions"
+                    can-edit-params
+                    can-add
+                    teleported
+                    placeholder="请选择语音输入模型"
+                    @refresh="loadModels"
+                  />
+                </el-form-item>
 
-            <!-- 语音播放 -->
-            <div class="flex-between mt-4">
-              <span :class="settings.tts_model_enable && settings.tts_type !== 'BROWSER' ? 'mk-required' : ''">语音播放</span>
-              <span class="flex-align-center gap-3">
-                <el-checkbox v-if="settings.tts_model_enable" v-model="settings.tts_autoplay">自动播放</el-checkbox>
-                <el-switch v-model="settings.tts_model_enable" size="small" @change="changeSpeechPlaybackEnabled" />
-              </span>
-            </div>
-            <el-form-item
-              v-if="settings.tts_model_enable"
-              class="mt-2"
-              prop="tts_model_id"
-              :rules="{ required: settings.tts_type === 'TTS', message: '请选择语音播放模型', trigger: 'change' }"
-            >
-              <el-radio-group v-model="settings.tts_type" class="mb-2">
-                <el-radio value="BROWSER">浏览器播放（免费）</el-radio>
-                <el-radio value="TTS">自定义</el-radio>
-              </el-radio-group>
-              <SelectModel
-                v-if="settings.tts_type === 'TTS'"
-                v-model="settings.tts_model_id"
-                v-model:model-params="settings.tts_model_params_setting"
-                :options="ttsModels"
-                :provider-options="providerOptions"
-                can-edit-params
-                can-add
-                teleported
-                placeholder="请选择语音播放模型"
-                @refresh="loadModels"
-              />
-            </el-form-item>
-          </div>
-        </MkCollapse>
-      </el-form>
-    </el-scrollbar>
-    <!-- 右侧预览设置 -->
-    <section class="min-h-0 min-w-0 border-l">
-      <el-scrollbar height="100%" view-class="p-4">
-        <!-- // TODO: 预览智能体调试对话 -->
-        <div>简易对话调试</div>
-      </el-scrollbar>
-    </section>
+                <!-- 语音播放 -->
+                <div class="flex-between mt-4">
+                  <span :class="settings.tts_model_enable && settings.tts_type !== 'BROWSER' ? 'mk-required' : ''">语音播放</span>
+                  <span class="flex-align-center gap-3">
+                    <el-checkbox v-if="settings.tts_model_enable" v-model="settings.tts_autoplay">自动播放</el-checkbox>
+                    <el-switch v-model="settings.tts_model_enable" size="small" @change="changeSpeechPlaybackEnabled" />
+                  </span>
+                </div>
+                <el-form-item
+                  v-if="settings.tts_model_enable"
+                  class="mt-2"
+                  prop="tts_model_id"
+                  :rules="{ required: settings.tts_type === 'TTS', message: '请选择语音播放模型', trigger: 'change' }"
+                >
+                  <el-radio-group v-model="settings.tts_type" class="mb-2">
+                    <el-radio value="BROWSER">浏览器播放（免费）</el-radio>
+                    <el-radio value="TTS">自定义</el-radio>
+                  </el-radio-group>
+                  <SelectModel
+                    v-if="settings.tts_type === 'TTS'"
+                    v-model="settings.tts_model_id"
+                    v-model:model-params="settings.tts_model_params_setting"
+                    :options="ttsModels"
+                    :provider-options="providerOptions"
+                    can-edit-params
+                    can-add
+                    teleported
+                    placeholder="请选择语音播放模型"
+                    @refresh="loadModels"
+                  />
+                </el-form-item>
+              </div>
+            </MkCollapse>
+          </el-form>
+        </el-scrollbar>
+      </template>
+      <template v-if="hasUnsavedSettings" #notice>
+        <div class="shrink-0 px-3 pb-2">
+          <el-alert type="warning" :closable="false" show-icon title="设置有未保存的修改，保存后调试生效" />
+        </div>
+      </template>
+    </SimpleDebugConversation>
   </div>
   <SelectKnowledgeDialog ref="knowledgeDialogRef" @submit="selectKnowledge" />
 </template>
 
 <style scoped lang="scss">
-/* 扣除应用顶栏和当前页面标题栏，两栏在剩余高度内独立滚动。 */
+/* 扣除应用顶栏和当前页面标题栏，设置与对话在剩余高度内独立滚动。 */
 .application-settings {
   height: calc(100dvh - var(--mk-header-height) - var(--spacing) * 16);
 }
