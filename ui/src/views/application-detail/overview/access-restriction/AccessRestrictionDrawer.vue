@@ -9,9 +9,11 @@ import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { useStore } from '@/stores/admin'
 import { MsgSuccess } from '@/utils/message'
 import { useApplicationDetailContext } from '../../context'
+import type { ApplicationAccessToken } from '@/api/types'
 
 defineOptions({ name: 'AccessRestrictionDrawer' })
 
+const props = defineProps<{ initialConfig?: ApplicationAccessToken }>()
 const emit = defineEmits<{ closed: [] }>()
 const { auth } = useStore()
 const { applicationId, resourceApi } = useApplicationDetailContext()
@@ -49,8 +51,10 @@ function handleLoginMethodsChange() {
 function loadAccessRestriction() {
   if (loading.value) return
   loading.value = true
-  return resourceApi.application
-    .getAccessToken(applicationId.value)
+  // 优先复用概览页已获取的配置，避免重复请求 access_token 接口。
+  const fetchConfig = () =>
+    props.initialConfig ? Promise.resolve(props.initialConfig) : resourceApi.application.getAccessToken(applicationId.value)
+  return fetchConfig()
     .then((config) => {
       Object.assign(form, {
         language: config.language,
