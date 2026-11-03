@@ -929,6 +929,14 @@ Workspace API 内部使用 `getWorkspaceId()`，System 共享 API 不接收工�
 
 ## 对话模块组件
 
+### RenameConversation（对话模块）
+
+位于 `conversation-panel/components/rename/index.vue`，显式导入并传入
+`conversation`。入口维护重命名菜单项，同目录 `RenameDialog.vue` 维护弹窗、标题校验及保存调用，
+点击菜单时才挂载弹窗，`closed` 后卸载；放入 Dropdown 菜单时，
+调用方开启 `persistent`，确保菜单收起后保留弹窗实例。门户调用方额外传入 `applicationId`，
+按所属智能体保存并同步分组及当前会话列表；`renamed(title)` 事件供历史抽屉同步标题。
+
 ### ReverseInfiniteScroll（对话模块）
 
 位于 `conversation-panel/core/reverse-infinite-scroll/index.vue`，由对话模块显式导入，
