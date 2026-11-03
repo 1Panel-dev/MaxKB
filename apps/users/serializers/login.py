@@ -169,6 +169,7 @@ class LoginSerializer(serializers.Serializer):
         # 清除失败计数并生成令牌
         cache.delete(system_get_key(f"system_{username}"), version=system_version)
         cache.delete(system_get_key(f"system_{username}_lock"), version=system_version)
+        cache.delete(system_get_key(f"system_{username}_lock_count"), version=system_version)
         token = LoginSerializer._issue_token(user)
 
         return {"token": token}
