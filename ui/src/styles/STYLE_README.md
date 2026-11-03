@@ -22,8 +22,8 @@ Element Plus 覆盖、主题变量和应用样式。Chat 入口还显式引入 E
 
 ## 对话模块公共样式
 
-`src/conversation-panel/index.scss` 是对话模块公共样式入口，由模块内的
-`view/chat/index.vue` 和 `view/debug/index.vue` 在 `<style lang="scss">` 中通过
+`src/conversation-panel/index.scss` 是对话模块公共样式入口，由模块内各
+`view/*/index.vue` 在 `<style lang="scss">` 中通过
 `@use '../../index.scss';` 引入，不在脚本或应用入口重复引入。
 仅放置对话模块内复用的样式，公共类名使用 `conversation-panel-` 前缀，标题栏、主面板、侧栏和遮罩
 使用 `mk-conversation-` 前缀；其他组件专属布局、定位和交互样式继续保留在所属组件的 scoped
