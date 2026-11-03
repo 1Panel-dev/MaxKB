@@ -15,7 +15,7 @@ from rest_framework import serializers
 def knowledge_permission(permission):
     """Preserve workspace administrators, explicit ownership and scoped grants."""
     return AggregatePermission(
-        roles=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role()],
+        roles=[RoleConstants.WORKSPACE_MANAGE.get_workspace_role()],
         permissions=[
             permission.get_workspace_knowledge_permission(),
             permission.get_workspace_permission_workspace_manage_role(),
