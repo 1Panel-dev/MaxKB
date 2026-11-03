@@ -209,15 +209,13 @@ function submitImportUsers() {
     if (!valid) return
 
     const syncFile = isLocalFileSource.value ? ((importUsersForm.files[0]?.raw ?? undefined) as File | undefined) : undefined
-    const roleId = assignableRoles.value.find((role) => role.type === importUsersForm.role)?.id
-
     importing.value = true
     return UserManageApi.postSyncSystemUsers(
       isLocalFileSource.value ? 'file' : importUsersForm.source,
       syncFile,
       importUsersForm.workspaceId || undefined,
       importUsersForm.role,
-      importUsersForm.userGroupIds[0],
+      importUsersForm.userGroupIds,
     )
       .then((result) => {
         const conflictUsers = result.conflict_users ?? []

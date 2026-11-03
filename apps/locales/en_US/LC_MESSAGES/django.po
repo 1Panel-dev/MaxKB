@@ -9334,7 +9334,7 @@ msgid "token is required for EVENT triggers"
 msgstr ""
 
 msgid "Home page"
-msgstr ""
+msgstr "Overview"
 
 msgid "Response code"
 msgstr ""

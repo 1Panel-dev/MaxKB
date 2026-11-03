@@ -45,8 +45,6 @@ class ChatUserAccessTokenV3Serializer(serializers.Serializer):
         if portal is None or not portal.enable_auth:
             return ("portal", 1, 5, 10)
         auth_config = portal.auth_config or {}
-        if "LOCAL" not in auth_config.get("login_value", ["LOCAL"]):
-            raise AppApiException(500, _("Portal local login is not enabled"))
         return (
             "portal",
             auth_config.get("max_attempts", 1),
@@ -70,21 +68,20 @@ class ChatUserAccessTokenV3Serializer(serializers.Serializer):
         return True
 
     @classmethod
-    def _validate_captcha(cls, scope, username, captcha, failed_attempts=5, lock_time=10):
+    def _validate_captcha(cls, scope, username, captcha):
         if not captcha:
             raise AppApiException(1005, _("Captcha is required"))
         captcha_key = Cache_Version.CAPTCHA.get_key(captcha=f"{scope}_{username}")
         captcha_cache = cache.get(captcha_key, version=Cache_Version.CAPTCHA.get_version())
         if captcha_cache is None or captcha.lower() != captcha_cache:
-            # 校验失败与口令失败共用同一失败计数与锁定机制，防止"识别-试错"循环绕过验证码
-            cls._record_login_failure(scope, username, failed_attempts, lock_time)
+            # 验证码失败不计入失败次数统计 只提示
             raise AppApiException(1005, _("Captcha code error or expiration"))
         # 校验通过即销毁，保证验证码一次性使用
         cache.delete(captcha_key, version=Cache_Version.CAPTCHA.get_version())
 
     @classmethod
     def _record_login_failure(cls, scope, username, failed_attempts, lock_time):
-        """记录一次认证失败（口令或验证码），累计计数并在达到阈值时创建锁键；不抛异常。"""
+        """记录一次口令认证失败，累计计数并在达到阈值时创建锁键；不抛异常。"""
         try:
             _record_login_fail(scope, username)
         except Exception:
@@ -137,7 +134,7 @@ class ChatUserAccessTokenV3Serializer(serializers.Serializer):
         password = instance.get("password")
         captcha = instance.get("captcha", "")
         if cls._need_captcha(scope, username, max_attempts):
-            cls._validate_captcha(scope, username, captcha, failed_attempts, lock_time)
+            cls._validate_captcha(scope, username, captcha)
 
         user = ChatUser.objects.filter(username=username).first()
 

@@ -56,11 +56,11 @@ const getUserManageSyncTypes = () => {
 }
 
 /** 从指定来源同步系统用户（file 来源需携带 xlsx 文件）。 */
-const postSyncSystemUsers = (syncType: string, syncFile?: File, workspaceId?: string, roleId?: string, defaultGroupId?: string) => {
+const postSyncSystemUsers = (syncType: string, syncFile?: File, workspaceId?: string, roleId?: string, defaultGroupIds: string[] = []) => {
   const payload = new FormData()
   if (workspaceId) payload.append('workspace_id', workspaceId)
   if (roleId) payload.append('role_id', roleId)
-  if (defaultGroupId) payload.append('default_group_id', defaultGroupId)
+  for (const defaultGroupId of defaultGroupIds) payload.append('default_group_ids', defaultGroupId)
   if (syncFile) payload.append('xlsx_file', syncFile)
   return post<FormData, ChatUserSyncResult>(`${prefix}/sync/${syncType}`, payload)
 }
