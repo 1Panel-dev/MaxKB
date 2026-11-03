@@ -26,7 +26,7 @@ urlpatterns = [
     path('system/chat_user/list', views.SystemChatUserView.List.as_view()),
     path('system/chat_user/batch_delete', views.SystemChatUserView.BatchDelete.as_view()),
     path("system/chat_user/batch_add_group", views.SystemChatUserView.BatchAddGroup.as_view()),
-    path("system/chat_user/<str:user_id>", views.SystemChatUserView.Operate.as_view()),
+    path("system/chat_user/<uuid:user_id>", views.SystemChatUserView.Operate.as_view()),
     path("system/chat_user/<str:user_id>/re_password", views.SystemChatUserView.RePassword.as_view()),
     path("system/chat_user/user_manage/<int:current_page>/<int:page_size>", views.SystemChatUserView.Page.as_view()),
     path('system/chat_user/group/<str:user_group_id>', views.SystemChatUserView.GetUserListByGroup.as_view()),
