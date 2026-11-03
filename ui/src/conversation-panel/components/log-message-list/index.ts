@@ -13,6 +13,7 @@ export interface LogMessageListDeps {
 
 // 从后端 chat_record(reset_chat_record 结构)提取底部信息栏数据
 const buildRecordMeta = (raw: ChatLogRecord): ChatRecordMeta => ({
+  createTime: raw.create_time,
   messageTokens: raw.message_tokens || 0,
   answerTokens: raw.answer_tokens || 0,
   runTime: raw.run_time || 0,

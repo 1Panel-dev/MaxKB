@@ -18,6 +18,7 @@ export interface MessageListDeps extends Pick<
 
 // 从后端 chat_record(分页项或详情接口,均为 reset_chat_record 结构)提取底部信息栏数据
 const buildRecordMeta = (raw?: ChatLogRecord | null): ChatRecordMeta => ({
+  createTime: raw?.create_time,
   messageTokens: raw?.message_tokens || 0,
   answerTokens: raw?.answer_tokens || 0,
   runTime: raw?.run_time || 0,

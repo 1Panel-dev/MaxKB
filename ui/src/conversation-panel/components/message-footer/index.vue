@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { ChatContent } from '@/api/types'
+import { copyText } from '@/utils/clipboard'
+import { datetimeFormat } from '@/utils/time'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
 import { useExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 
@@ -17,6 +20,19 @@ const EMPTY: ChatRecordMeta = {
 const meta = computed<ChatRecordMeta>(() => props.message.record || EMPTY)
 const tokens = computed(() => meta.value.messageTokens + meta.value.answerTokens)
 
+// 仅复制回答正文，按展示顺序收集分组内的文本，不包含思考与工具参数。
+function collectAnswerText(contents: ChatContent[]): string {
+  return [...contents]
+    .sort((left, right) => (left.id || '').localeCompare(right.id || ''))
+    .flatMap((content) => {
+      if (content.type === 'GROUP') return collectAnswerText(content.children ?? [])
+      return content.type === 'TEXT' ? content.content || '' : []
+    })
+    .filter(Boolean)
+    .join('\n\n')
+}
+const answerText = computed(() => collectAnswerText(props.message.content))
+
 const openExecutionDetail = () => {
   detail.showExecutionDetail(meta.value.executionDetails || [])
 }
@@ -25,7 +41,7 @@ const openExecutionDetail = () => {
 <style scoped lang="scss"></style>
 
 <template>
-  <div class="mk-conversation-message-footer gap-3">
+  <div class="mk-conversation-message-footer space-y-2">
     <!-- 助手消息底部信息栏:知识来源 / 执行详情 / Tokens · 耗时  -->
     <div class="flex-align-center gap-1">
       <el-button v-if="meta.knowledgeCount" text class="-ml-1">
@@ -43,6 +59,16 @@ const openExecutionDetail = () => {
         <span class="text-N600">Tokens {{ tokens }} · 耗时 {{ meta.runTime.toFixed(2) }}s</span>
       </template>
     </div>
-    <!-- // TODO 点赞一行 -->
+    <!-- 其他操作 -->
+    <div class="flex-align-center gap-2">
+      <!-- 复制回答正文 -->
+      <MkTooltip content="复制">
+        <el-button text class="-ml-1" :disabled="!answerText" @click="copyText(answerText)">
+          <MkIcon name="icon_copy_outlined" />
+        </el-button>
+      </MkTooltip>
+      <span v-if="meta.createTime" class="text-N600">{{ datetimeFormat(meta.createTime) }}</span>
+    </div>
+    <div></div>
   </div>
 </template>

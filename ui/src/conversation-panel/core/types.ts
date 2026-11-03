@@ -24,6 +24,7 @@ export interface Conversation {
 
 // 助手消息底部展示数据(对话结束后 / 历史加载时填充):知识来源数、tokens、耗时、执行详情
 export interface ChatRecordMeta {
+  createTime?: string
   messageTokens: number
   answerTokens: number
   runTime: number
