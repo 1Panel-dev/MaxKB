@@ -47,6 +47,7 @@ export interface ChatContent {
 /** 对话日志中的单条问答记录，仅列出前端使用的字段。 */
 export interface ChatLogRecord {
   id: string
+  create_time?: string
   /** 提问内容项 */
   question: ChatContent
   /** 回答内容项列表 */
