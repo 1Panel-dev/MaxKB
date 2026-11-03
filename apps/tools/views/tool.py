@@ -719,6 +719,7 @@ class ToolView(APIView):
                         "source_name": request.query_params.get("source_name"),
                         "source_type": request.query_params.get("source_type"),
                         "state": request.query_params.get("state"),
+                        "order": request.query_params.get("order"),
                     }
                 ).get_tool_records(current_page, page_size)
             )
