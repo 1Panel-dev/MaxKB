@@ -12,8 +12,11 @@ const emit = defineEmits<{ submit: [targetFolderId: string] }>()
 
 const visible = ref(false)
 const selectedTargetId = ref<string>(FOLDER_ENTRY_ID.ALL)
+const initialFolderId = ref<string>(FOLDER_ENTRY_ID.ALL)
 
-const canSubmit = computed(() => Boolean(selectedTargetId.value) && selectedTargetId.value !== FOLDER_ENTRY_ID.ALL)
+const canSubmit = computed(
+  () => Boolean(selectedTargetId.value) && selectedTargetId.value !== FOLDER_ENTRY_ID.ALL && selectedTargetId.value !== initialFolderId.value,
+)
 
 /* 移动提交 */
 function handleSubmit() {
@@ -22,11 +25,13 @@ function handleSubmit() {
 }
 
 function open(currentFolderId = FOLDER_ENTRY_ID.ALL) {
+  initialFolderId.value = currentFolderId
   selectedTargetId.value = currentFolderId
   visible.value = true
 }
 
 function resetData() {
+  initialFolderId.value = FOLDER_ENTRY_ID.ALL
   selectedTargetId.value = FOLDER_ENTRY_ID.ALL
 }
 

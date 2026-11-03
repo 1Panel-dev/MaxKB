@@ -331,7 +331,7 @@ const movingFolder = ref<FolderItem>()
 
 function handleOpenMoveFolder(folder: FolderItem) {
   movingFolder.value = folder
-  moveToDialogRef.value?.open(folder.parent_id ?? FOLDER_ENTRY_ID.ALL)
+  moveToDialogRef.value?.open(folder.id ?? FOLDER_ENTRY_ID.ALL)
 }
 
 function handleMoveFolder(targetFolderId: string) {

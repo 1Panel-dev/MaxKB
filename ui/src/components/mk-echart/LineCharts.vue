@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { use, type ComposeOption } from 'echarts/core'
 import { LineChart, type LineSeriesOption } from 'echarts/charts'
+import { LegacyGridContainLabel } from 'echarts/features'
 import {
   GridComponent,
   LegendComponent,
@@ -14,7 +15,7 @@ import { numberFormat } from '@/utils/number'
 import MkEchart from './index.vue'
 import type { MkLineChartOption } from './types'
 
-use([LineChart, GridComponent, LegendComponent, TooltipComponent])
+use([LineChart, GridComponent, LegendComponent, TooltipComponent, LegacyGridContainLabel])
 defineOptions({ name: 'MkLineChart' })
 const props = withDefaults(
   defineProps<{
@@ -44,15 +45,15 @@ const chartOption = computed<LineOption>(() => ({
     itemHeight: 8,
     textStyle: { color: '#646A73' },
   },
-  // 为居中显示的日期预留两端空间，避免裁切或挤掉相邻标签。
-  grid: { left: 0, right: 0, top: 56, bottom: 0, outerBoundsMode: 'same', outerBoundsContain: 'axisLabel' },
+  // 保留纵轴和底部标签空间，右端日期超出画布时直接裁切。
+  grid: { left: 0, right: 0, top: 56, bottom: 0, containLabel: true },
   xAxis: {
     type: 'category',
     data: props.option.xData,
     boundaryGap: false,
     axisLine: { lineStyle: { color: '#EFF0F1' } },
     axisTick: { show: false },
-    axisLabel: { color: '#646A73', margin: 16 },
+    axisLabel: { color: '#646A73', margin: 16, align: 'left' },
   },
   yAxis: {
     type: 'value',
