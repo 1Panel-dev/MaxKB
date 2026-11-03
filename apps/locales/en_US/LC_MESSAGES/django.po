@@ -8991,6 +8991,9 @@ msgstr ""
 msgid "Secret key is expired"
 msgstr ""
 
+msgid "API service is disabled"
+msgstr ""
+
 msgid "Online Usage"
 msgstr ""
 

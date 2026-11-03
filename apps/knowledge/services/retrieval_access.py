@@ -6,6 +6,7 @@ from django.db.models import QuerySet
 
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from knowledge.models import Knowledge
+from portal.models import get_portal_setting
 from system_manage.models import ChatUser, ChatUserApiKey
 
 
@@ -50,7 +51,14 @@ def authorized_ids(user_id, ids):
     return set(map(str, handler(user_id, ids))) if handler else set()
 
 
+def check_knowledge_api_enabled():
+    """门户「知识库后端 API 检索」开关，控制对外的知识库检索与 MCP 接口，不影响工作流内部检索"""
+    if not get_portal_setting("enable_knowledge_base_api"):
+        raise RetrievalError("api_disabled", "Knowledge retrieval API is disabled.", 403)
+
+
 def authorize_external(knowledge_id, identity):
+    check_knowledge_api_enabled()
     knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
     if knowledge is None or knowledge.external_service.get("enabled") is not True:
         raise RetrievalError("service_unavailable", "Retrieval service is unavailable.", 404)

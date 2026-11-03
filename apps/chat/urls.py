@@ -2,7 +2,7 @@ from django.urls import path, include
 
 from application.views import ChatRecordDetailView, ChatRecordLinkView
 from chat.views import v2 as v2_views, v3 as v3_views
-from chat.views.v3.knowledge import knowledge_mcp_view, retrieve_view
+from chat.views.v3.knowledge import knowledge_global_mcp_view, knowledge_mcp_view, retrieve_view
 
 app_name = "chat"
 # @formatter:off
@@ -31,7 +31,9 @@ v3=[
     ])),
     # ---- 全局（非 application 作用域）----
     path('embed', v3_views.ChatEmbedView.as_view()),
+    # 这块是application的MCP 因为knowledge和application时分开控制的所以mcp也是分开的所以就按照接口分开
     path('mcp', v3_views.mcp_view),
+    path('knowledge_mcp', knowledge_global_mcp_view),
     path('auth/anonymous', v3_views.AnonymousAuthentication.as_view()),
     path('auth/login', v3_views.LocalLoginView.as_view()),
     path('auth/logout', v3_views.Logout.as_view(), name='v3_logout'),
