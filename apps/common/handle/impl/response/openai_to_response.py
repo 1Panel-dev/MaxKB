@@ -29,7 +29,7 @@ class OpenaiToResponse(BaseToResponse):
             BlockChoice(finish_reason='stop', index=0, chat_id=chat_id,
                         answer_list=other_params.get('answer_list', ""),
                         message=ChatCompletionMessage(role='assistant', content=content))],
-                              created=timezone.now().second, model='', object='chat.completion',
+                              created=int(timezone.now().timestamp()), model='', object='chat.completion',
                               usage=CompletionUsage(completion_tokens=completion_tokens,
                                                     prompt_tokens=prompt_tokens,
                                                     total_tokens=completion_tokens + prompt_tokens)
@@ -42,7 +42,7 @@ class OpenaiToResponse(BaseToResponse):
         if other_params is None:
             other_params = {}
         chunk = ChatCompletionChunk(id=chat_record_id, model='', object='chat.completion.chunk',
-                                    created=timezone.now().second, choices=[
+                                    created=int(timezone.now().timestamp()), choices=[
                 Choice(delta=ChoiceDelta(content=content, reasoning_content=other_params.get('reasoning_content', ""),
                                          chat_id=chat_id),
                        finish_reason='stop' if is_end else None,
