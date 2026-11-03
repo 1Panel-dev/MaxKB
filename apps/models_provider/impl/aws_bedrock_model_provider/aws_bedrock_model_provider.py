@@ -4,6 +4,7 @@
 import os
 from common.utils.common import get_file_content
 from models_provider.base_model_provider import (
+    _model_type_name,
     IModelProvider,
     ModelProvideInfo,
     ModelInfo,
@@ -218,6 +219,49 @@ def _initialize_model_info():
 
 
 class BedrockModelProvider(IModelProvider):
+    def get_dynamic_model_info_list(self, api_key, api_base, credential=None):
+        """Bedrock 专有实现：boto3 list_foundation_models，凭证含 Access Key/Secret/Region。"""
+        cred = credential if isinstance(credential, dict) else {}
+        access_key_id = cred.get("access_key_id")
+        secret_access_key = api_key or cred.get("secret_access_key")
+        region_name = cred.get("region_name")
+        if not (access_key_id and secret_access_key and region_name):
+            return None
+        try:
+            import boto3
+
+            client = boto3.client(
+                "bedrock",
+                aws_access_key_id=access_key_id,
+                aws_secret_access_key=secret_access_key,
+                region_name=region_name,
+            )
+            summaries = client.list_foundation_models().get("modelSummaries") or []
+        except Exception:
+            return None
+        builtin_manage = self.get_model_info_manage()
+        impl_map = {}
+        for info in builtin_manage.model_list:
+            impl_map.setdefault(info.model_type, (info.model_credential, info.model_class))
+        builtin_by_name = {info.name: info for info in builtin_manage.model_list}
+        info_list = []
+        for item in summaries:
+            model_id = item.get("modelId") or item.get("modelArn")
+            if not model_id:
+                continue
+            builtin = builtin_by_name.get(model_id)
+            if builtin is not None:
+                info_list.append(
+                    ModelInfo(model_id, builtin.desc, builtin.model_type, builtin.model_credential, builtin.model_class)
+                )
+                continue
+            model_type = self.classify_dynamic_model(model_id)
+            impl = impl_map.get(_model_type_name(model_type))
+            if impl is None:
+                continue
+            info_list.append(ModelInfo(model_id, _(""), model_type, impl[0], impl[1]))
+        return info_list or None
+
     def __init__(self):
         self._model_info_manage = _initialize_model_info()
 

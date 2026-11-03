@@ -9,6 +9,8 @@
 
 import os
 
+import requests
+
 from common.utils.common import get_file_content
 from models_provider.base_model_provider import (
     IModelProvider,
@@ -50,6 +52,28 @@ model_info_manage = (
 
 
 class AnthropicModelProvider(IModelProvider):
+    # Anthropic 凭证表单无 api_base 字段，实时查询使用官方默认地址。
+    dynamic_default_api_base = "https://api.anthropic.com/v1"
+
+    def fetch_dynamic_model_items(self, api_key, api_base, credential=None):
+        """Anthropic 专有协议：GET {base}/v1/models，鉴权用 x-api-key 头。"""
+        api_base = (api_base or self.get_dynamic_default_api_base() or "").strip().rstrip("/")
+        if not api_base:
+            return []
+        url = api_base + ("/models" if api_base.endswith("/v1") else "/v1/models")
+        try:
+            response = requests.get(
+                url,
+                headers={"x-api-key": api_key, "anthropic-version": "2023-06-01"},
+                timeout=15,
+            )
+            if response.status_code != 200:
+                return []
+            data = response.json().get("data") or []
+            return [item for item in data if item.get("id")]
+        except Exception:
+            return []
+
     def get_model_info_manage(self):
         return model_info_manage
 
