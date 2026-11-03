@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/stores/chat'
 import { formatTokenNumber } from '@/utils/number'
 import { QUOTA_TYPE } from '@/api/enums'
@@ -13,6 +13,7 @@ defineOptions({ name: 'ConversationAccountMenu' })
 const { account } = useConversationListStore()
 const { auth } = useStore()
 const router = useRouter()
+const route = useRoute()
 
 const menuVisible = ref(false)
 const displayName = computed(() => account.value?.nickName || account.value?.username || '用户')
@@ -33,6 +34,14 @@ const handleLogout = () => {
     .logout()
     .then(() => router.replace({ path: router.currentRoute.value.fullPath, force: true }))
     .catch(() => {})
+}
+
+// 匿名用户主动登录，登录成功后回到当前地址；透传钉钉客户端入口参数
+const goLogin = () => {
+  const query = { redirect: route.fullPath, client: route.query.client, corpId: route.query.corpId }
+  return router.push(
+    route.meta.portal ? { name: 'portal-login', query } : { name: 'chat-login', params: { accessToken: route.params.accessToken }, query },
+  )
 }
 </script>
 
@@ -101,7 +110,7 @@ const handleLogout = () => {
     </template>
   </MkDropdown>
   <!-- 匿名登陆 -->
-  <el-button v-else type="primary" class="w-full">立即登录</el-button>
+  <el-button v-else type="primary" class="w-full" @click="goLogin">立即登录</el-button>
   <UserPwdDialog ref="userPwdDialogRef" />
   <ApiKeyDialog ref="apiKeyDialogRef" />
 </template>
