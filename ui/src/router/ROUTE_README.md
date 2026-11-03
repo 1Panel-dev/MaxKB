@@ -126,8 +126,8 @@ Chat 导航守卫（`chat/index.ts`）：
 2. 获取目标场景的认证前置配置（`AuthProfile`），与当前场景相同时复用。accessToken 无效、应用已停用或门户
    未开放导致获取失败时，进入 `chat-not-found` 并保留原地址；匿名认证失败时同样处理。
 3. 判断时只读取目标场景在本地存储中的 token，不切换 Store 的当前场景。
-4. `enable_auth` 为 false 时登录页无用：进入登录页会被重定向到 `redirect` 记录的原地址，没有时进入
-   当前场景首页（`portal-home` 或 `chat-home`），再按下一条匿名认证。
+4. 登录页始终放行：`enable_auth` 为 true 时必须登录；为 false 时匿名用户也可从账户菜单主动登录，
+   登录成功后回到 `redirect` 记录的原地址。
 5. 进入登录页或已有可用 token 时，调用 `auth.activate()` 切换当前场景后放行。`enable_auth` 为 true 时，
    匿名认证颁发的 token（载荷 `login_type` 为 `ANNOTATION`，由 `isAnonymousToken` 判断）不可用，
    即使本地已保存也跳转登录页；该 token 保留在本地存储，登录时携带。
