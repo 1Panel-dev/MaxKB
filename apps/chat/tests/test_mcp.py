@@ -6,7 +6,7 @@ from django.test import RequestFactory, SimpleTestCase
 from django.urls import resolve
 
 from application.models import ChatSourceChoices, ChatUserType
-from chat.mcp.tools import ChatUserMCPToolHandler, InvalidParamsError, chat_application, get_chat_file_field
+from chat.mcp.application import ChatUserMCPToolHandler, InvalidParamsError, chat_application, get_chat_file_field
 from chat.views.v3.mcp import mcp_view
 from common.auth.struct.auth import Auth
 from common.exception.app_exception import AppAuthenticationFailed
@@ -28,7 +28,7 @@ AGENT_PARAMS = {
 
 class ChatApplicationTest(SimpleTestCase):
     @patch("common.init.init_template.run")
-    @patch("chat.mcp.tools.ChatSerializers")
+    @patch("chat.mcp.application.ChatSerializers")
     def test_chats_as_given_chat_user_in_a_new_chat(self, chat_serializers, _init):
         chat_serializers.return_value.chat.return_value = SimpleNamespace(
             content=json.dumps({"data": {"content": "answer<tool_calls_render>tool</tool_calls_render>"}}).encode()
@@ -50,7 +50,7 @@ class ChatApplicationTest(SimpleTestCase):
         self.assertEqual(result, ("answer", chat_info["chat_id"]))
 
     @patch("common.init.init_template.run")
-    @patch("chat.mcp.tools.ChatSerializers")
+    @patch("chat.mcp.application.ChatSerializers")
     def test_continues_given_chat(self, chat_serializers, _init):
         chat_serializers.return_value.chat.return_value = SimpleNamespace(content=b'{"data": {"content": "a"}}')
 
@@ -88,7 +88,7 @@ class ChatUserMCPToolHandlerTest(SimpleTestCase):
     def scoped_handler(self):
         return ChatUserMCPToolHandler(SimpleNamespace(id="user-id"), Auth(set(), {f"CHAT_USER:r:{APP_ID}": 1}), APP_ID)
 
-    @patch("chat.mcp.tools.QuerySet")
+    @patch("chat.mcp.application.QuerySet")
     def test_scoped_list_tools_exposes_the_agent_and_upload(self, query_set):
         query_set.return_value.filter.return_value.order_by.return_value = [
             SimpleNamespace(id=APP_ID, name="Agent", desc="desc")
@@ -119,7 +119,7 @@ class ChatUserMCPToolHandlerTest(SimpleTestCase):
         )
         self.assertEqual(json.loads(result["content"][0]["text"]), result["structuredContent"]["agents"])
 
-    @patch("chat.mcp.tools.chat_application", return_value=("answer", "chat-id"))
+    @patch("chat.mcp.application.chat_application", return_value=("answer", "chat-id"))
     @patch.object(ChatUserMCPToolHandler, "get_applications")
     def test_call_agent_tool_chats_as_chat_user_and_returns_chat_id(self, get_applications, chat_app):
         get_applications.return_value.filter.return_value.exists.return_value = True
@@ -131,7 +131,7 @@ class ChatUserMCPToolHandlerTest(SimpleTestCase):
         self.assertEqual(result["content"][0], {"type": "text", "text": "answer"})
         self.assertEqual(result["structuredContent"], {"answer": "answer", "chat_id": "chat-id"})
 
-    @patch("chat.mcp.tools.chat_application", return_value=("answer", "chat-id"))
+    @patch("chat.mcp.application.chat_application", return_value=("answer", "chat-id"))
     @patch.object(ChatUserMCPToolHandler, "get_applications")
     def test_global_call_agent_uses_application_id(self, get_applications, chat_app):
         get_applications.return_value.filter.return_value.exists.return_value = True
@@ -155,7 +155,7 @@ class ChatUserMCPToolHandlerTest(SimpleTestCase):
             with self.subTest(name=name, scoped=bool(handler.application_id)), self.assertRaises(InvalidParamsError):
                 handler.call_tool({"name": name, "arguments": arguments})
 
-    @patch("chat.mcp.tools.QuerySet")
+    @patch("chat.mcp.application.QuerySet")
     def test_check_chat_id(self, query_set):
         chat_id = "01a17d06-3bd0-7661-91dc-9d990282d863"
         query_set.return_value.filter.return_value.first.return_value = None
@@ -177,7 +177,7 @@ class ChatUserMCPToolHandlerTest(SimpleTestCase):
         with self.assertRaises(InvalidParamsError):
             self.handler.check_chat_id("not-a-uuid")
 
-    @patch("chat.mcp.tools.QuerySet")
+    @patch("chat.mcp.application.QuerySet")
     def test_chat_files_keep_caller_fields_and_infer_chat_id(self, query_set):
         query_set.return_value.filter.return_value = [
             SimpleNamespace(id="f1", file_name="a.png", source_id="chat-1"),
@@ -200,7 +200,7 @@ class ChatUserMCPToolHandlerTest(SimpleTestCase):
     def test_chat_files_without_attachments(self):
         self.assertEqual(self.handler.get_chat_files("chat-1", {"message": "hi"}), ("chat-1", {}))
 
-    @patch("chat.mcp.tools.QuerySet")
+    @patch("chat.mcp.application.QuerySet")
     def test_chat_files_must_belong_to_the_chat(self, query_set):
         query_set.return_value.filter.return_value = [SimpleNamespace(id="f1", file_name="a.png", source_id="chat-1")]
 

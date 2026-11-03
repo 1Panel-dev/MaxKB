@@ -15,6 +15,7 @@ from common.auth.handle.auth_base_handle import AuthBaseHandle
 from common.auth.handle.impl.chat_user_token import get_auth
 from common.auth.struct.auth import Principal
 from common.exception.app_exception import AppAuthenticationFailed
+from portal.models import get_portal_setting
 from system_manage.models import ChatUser, ChatUserApiKey
 
 
@@ -28,6 +29,9 @@ class ChatUserKey(AuthBaseHandle):
         chat_user = QuerySet(ChatUser).filter(id=chat_user_api_key.user_id).first()
         if chat_user is None or not chat_user.is_active:
             raise AppAuthenticationFailed(500, _("Secret key is invalid"))
+        # 门户「智能体后端 API 访问」开关控制对话用户 API Key 的全部对话接口（含应用 MCP），知识库检索由独立开关控制
+        if not get_portal_setting("enable_api"):
+            raise AppAuthenticationFailed(500, _("API service is disabled"))
         auth = get_auth(chat_user.source, chat_user.id, None)
         return Principal(str(chat_user.id), ChatUserType.CHAT_USER, profile=chat_user), auth
 

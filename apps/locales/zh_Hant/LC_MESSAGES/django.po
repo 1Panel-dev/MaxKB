@@ -9116,6 +9116,9 @@ msgstr "密鑰無效"
 msgid "Secret key is expired"
 msgstr "密鑰已過期"
 
+msgid "API service is disabled"
+msgstr "API 服務未開啟"
+
 msgid "Online Usage"
 msgstr "線上使用"
 
