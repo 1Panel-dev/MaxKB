@@ -13,7 +13,7 @@ from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
-from common.auth.constants.permission_constants import RESOURCE_PERMISSION_MAP, PERMISSION_STR_MAP
+from common.auth.constants.permission_constants import RESOURCE_PERMISSION_MAP, PERMISSION_STR_MAP, ROLE_PERMISSION_MAP
 from common.auth.constants.permission_scope_constants import PermissionScopeConstants
 from common.constants.resource_permission_constants import ResourceAuthType
 from common.auth.constants.role_constants import RoleConstants
@@ -29,6 +29,8 @@ from maxkb.const import CONFIG
 from system_manage.models.workspace_user_group_permission import WorkspaceUserGroupResourcePermission
 from system_manage.models.workspace_user_permission import WorkspaceUserResourcePermission
 from users.models import User
+
+INNER_ROLE = [str(RoleConstants.USER), str(RoleConstants.WORKSPACE_MANAGE)]
 
 
 def get_permissions(
@@ -108,10 +110,16 @@ def get_permissions(
 
                     permissions = []
                     for role_id in role_ids:
-                        for m in role_permission_mapping_dict.get(str(role_id)) or []:
-                            p = PERMISSION_STR_MAP.get(m.permission_id)
-                            if p is not None and PermissionScopeConstants.WORKSPACE_RESOURCE in p.meta.scope:
-                                permissions.append(p)
+                        if INNER_ROLE.__contains__(role_id):
+                            permission_list = ROLE_PERMISSION_MAP.get(role_id)
+                            for p in permission_list:
+                                if p is not None and PermissionScopeConstants.WORKSPACE_RESOURCE in p.meta.scope:
+                                    permissions.append(p)
+                        else:
+                            for m in role_permission_mapping_dict.get(str(role_id)) or []:
+                                p = PERMISSION_STR_MAP.get(m.permission_id)
+                                if p is not None and PermissionScopeConstants.WORKSPACE_RESOURCE in p.meta.scope:
+                                    permissions.append(p)
 
                     for group, ps in group_by(permissions, lambda p: p.value.get_resource_permission_key(None)).items():
                         k = f"{group}:w:{_.workspace_id}:r:{_.target}"

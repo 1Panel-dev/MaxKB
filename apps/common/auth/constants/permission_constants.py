@@ -4257,6 +4257,20 @@ def group_permissions_by_scope() -> Dict[str, List[Permission]]:
     return dict(grouped)
 
 
+def group_permissions_by_role() -> Dict[str, List[Permission]]:
+    grouped = {}
+
+    for _permission in PermissionConstants:
+        meta = _permission.meta
+        if meta.role_list:
+            for role_item in meta.role_list:
+                role_item = str(role_item)
+                _array = grouped.get(role_item) or []
+                _array.append(_permission)
+                grouped[role_item] = _array
+    return dict(grouped)
+
+
 # 权限字符串与权限对象的Map
 PERMISSION_STR_MAP = {_permission.value.__str__(): _permission for _permission in PermissionConstants}
 
@@ -4265,3 +4279,6 @@ RESOURCE_PERMISSION_MAP = group_by_all_resource_permissions()
 
 # 权限 SCOPE Map
 SCOPE_PERMISSION_MAP = group_permissions_by_scope()
+
+# 角色 Map
+ROLE_PERMISSION_MAP = group_permissions_by_role()
