@@ -1,3 +1,5 @@
+"""Application MCP tools: application API key (v2) and chat user API key (v3) handlers."""
+
 import base64
 import binascii
 import json
@@ -10,6 +12,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import QuerySet
 from django.utils import timezone
 
+from chat.mcp.common import initialize_result, json_result
 from chat.serializers.chat import ChatSerializers
 from common.auth.constants.group_constants import Group
 from knowledge.models import File, FileSourceType
@@ -31,8 +34,6 @@ CHAT_FILE_EXTENSIONS = {
     "audio_list": ("MP3", "WAV", "OGG", "AAC", "M4A"),
     "video_list": ("MP4", "AVI", "MKV", "MOV", "FLV", "WMV"),
 }
-
-MCP_PROTOCOL_VERSION = "2025-06-18"
 
 AGENT_TOOL_PREFIX = "agent_"
 
@@ -167,12 +168,8 @@ class MCPToolHandler:
             return {}
         return form_data
 
-    def initialize(self):
-        return {
-            "protocolVersion": MCP_PROTOCOL_VERSION,
-            "serverInfo": {"name": "maxkb-mcp", "version": "1.0.0"},
-            "capabilities": {"tools": {}},
-        }
+    def initialize(self, params=None):
+        return initialize_result(params, "maxkb-mcp")
 
     def build_description(self):
         """
@@ -229,12 +226,8 @@ class ChatUserMCPToolHandler:
         # 单应用 MCP 地址只暴露该应用
         self.application_id = application_id
 
-    def initialize(self):
-        return {
-            "protocolVersion": MCP_PROTOCOL_VERSION,
-            "serverInfo": {"name": "maxkb-mcp", "version": "1.0.0"},
-            "capabilities": {"tools": {}},
-        }
+    def initialize(self, params=None):
+        return initialize_result(params, "maxkb-mcp")
 
     def get_application_ids(self):
         prefix = f"{Group.CHAT_USER}:r:"
@@ -360,10 +353,7 @@ class ChatUserMCPToolHandler:
             {"application_id": str(application.id), "name": application.name, "desc": application.desc or ""}
             for application in self.get_applications()
         ]
-        return {
-            "content": [{"type": "text", "text": json.dumps(agents, ensure_ascii=False)}],
-            "structuredContent": {"agents": agents},
-        }
+        return json_result(agents, {"agents": agents})
 
     def check_chat_id(self, chat_id, application_id=None):
         """
@@ -449,10 +439,7 @@ class ChatUserMCPToolHandler:
             "field": get_chat_file_field(file_name),
             "chat_id": chat_id,
         }
-        return {
-            "content": [{"type": "text", "text": json.dumps(result, ensure_ascii=False)}],
-            "structuredContent": result,
-        }
+        return json_result(result)
 
     def call_tool(self, params):
         name = str(params.get("name") or "")

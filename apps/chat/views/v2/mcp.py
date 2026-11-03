@@ -3,7 +3,7 @@ import json
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from chat.mcp.tools import MCPToolHandler
+from chat.mcp.application import MCPToolHandler
 
 
 @csrf_exempt
@@ -27,7 +27,7 @@ def mcp_view(request):
 
         # 路由方法
         if method == "initialize":
-            result = handler.initialize()
+            result = handler.initialize(params)
 
         elif method == "tools/list":
             result = handler.list_tools()
