@@ -763,10 +763,16 @@ Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选
 `business/generate-content/index.vue` 封装生成入口按钮和弹窗，供提示词与 Python
 代码生成复用，不通过 `mode` 判断业务。`title`、`placeholder`、`emptyText` 提供文案，
 `disabled` 统一控制入口、发送和重新生成，生成期间由内部 `loading` 阻止重复提交。
-工具侧在弹窗关闭时允许打开选模型，打开后根据模型及参数加载状态设置 `disabled`。
+工具侧通过 `generateDisabled` 在模型未就绪时禁止提交，入口仍允许打开选模型。
 `request(messages)` 接收 `PromptGenerateMessage[]` 并返回原始 `Promise<Response>`，调用方负责
 选择 API、模板和请求参数。公共组件统一使用 `ConversationStream` 处理流式结果、错误、停止、
 重新生成和会话清理，不感知工具表单、资源范围或模型接口。
+
+可选 `modelOptions` 启用输入框底部的 `SelectModel`，通过 `v-model:model-id`、
+`v-model:model-params` 回写生成模型及参数；`providerOptions` 提供供应商，`modelLoading`、
+`modelParamsLoading` 表示模型列表和参数加载状态。调用方提供参数表单查询注入。
+`canAddModel` 开启添加模型入口，创建后通过 `refreshModels` 事件通知调用方刷新选项。
+`generateDisabled` 只禁用发送和重新生成，允许先打开弹窗选择模型。
 
 `header-extra` 插槽提供 `{ loading }`，用于放置模型选择等业务设置；`open` 事件初始化业务上下文，
 `closed` 在关闭动画结束后清理业务状态，`replace(content)` 交由调用方处理结果并回写。

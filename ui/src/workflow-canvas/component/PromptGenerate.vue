@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { inject, ref } from 'vue'
+import { inject, provide, ref } from 'vue'
 import { useWorkflowStore } from '@/workflow-canvas/store'
-import type { PromptGenerateMessage } from '@/api/types'
+import { cloneDeep, groupBy } from 'lodash'
+import { MODEL_STATUS } from '@/api/enums'
+import type { ModelItem, ModelProviderItem, PromptGenerateMessage } from '@/api/types'
 import GenerateContent from '@/components/business/generate-content/index.vue'
 defineOptions({ name: 'PromptGenerate' })
 const props = defineProps<{
-  modelId: string
+  modelId?: string
   modelParamsSetting?: Record<string, unknown>
 }>()
 const emit = defineEmits<{ replace: [prompt: string] }>()
@@ -78,33 +80,80 @@ const PROMPT_TEMPLATE = `请根据用户描述生成一个完整的AI角色人�
 
 输出时不得包含任何解释或附加说明，只能返回符合以上格式的内容。`
 
-// 生成上下文：沿用节点模型和节点自身已保存的模型参数。
+// 生成上下文：复制节点模型配置，弹窗内独立选择生成模型和参数。
 const activeModelId = ref('')
+const modelParams = ref<Record<string, unknown>>({})
+const modelOptions = ref<ModelItem[]>([])
+const providerOptions = ref<ModelProviderItem[]>([])
+const modelLoading = ref(false)
+const modelParamsLoading = ref(false)
+
+provide('getModelParamsForm', (modelId: string) => {
+  modelParamsLoading.value = true
+  return store.getModelParamsForm(modelId).finally(() => {
+    modelParamsLoading.value = false
+  })
+})
+
+function loadModels() {
+  modelLoading.value = true
+  return Promise.all([store.getModelListWithShared(), store.getProviderList()])
+    .then(([models, providers]) => {
+      modelOptions.value = models.filter(({ model_type }) => model_type === 'LLM' || model_type === 'IMAGE')
+      providerOptions.value = providers
+      if (activeModelId.value) return
+      // 未指定模型时，按下拉分组顺序选中首个可用模型并加载默认参数。
+      const firstModel = Object.values(groupBy(modelOptions.value, 'provider'))
+        .flat()
+        .find(({ status }) => status === MODEL_STATUS.SUCCESS)
+      if (!firstModel) return
+      activeModelId.value = firstModel.id
+      return store.getModelParamsForm(firstModel.id).then((fields) => {
+        if (activeModelId.value !== firstModel.id) return
+        modelParams.value = fields.reduce<Record<string, unknown>>((settings, field) => {
+          if (field.show_default_value !== false) settings[field.field] = cloneDeep(field.default_value)
+          return settings
+        }, {})
+      })
+    })
+    .finally(() => {
+      modelLoading.value = false
+    })
+}
 
 function initGenerate() {
-  activeModelId.value = props.modelId
+  activeModelId.value = props.modelId ?? ''
+  modelParams.value = cloneDeep(props.modelParamsSetting ?? {})
+  loadModels()
 }
 
 function resetData() {
   activeModelId.value = ''
+  modelParams.value = {}
 }
 
 function requestGeneratePrompt(messages: PromptGenerateMessage[]) {
   return store.postPromptGenerate(activeModelId.value, {
     messages,
     prompt: PROMPT_TEMPLATE,
-    model_params_setting: props.modelParamsSetting,
+    model_params_setting: modelParams.value,
   })
 }
 </script>
 
 <template>
   <GenerateContent
+    v-model:model-id="activeModelId"
+    v-model:model-params="modelParams"
     title="生成提示词"
-    placeholder="请输入提示词"
+    placeholder="请输入提示词主题"
     empty-text="提示词显示在这里"
-    :disabled="!modelId"
     :request="requestGeneratePrompt"
+    :model-options="modelOptions"
+    :provider-options="providerOptions"
+    :model-loading="modelLoading"
+    :model-params-loading="modelParamsLoading"
+    :generate-disabled="!activeModelId || modelLoading || modelParamsLoading"
     @open="initGenerate"
     @closed="resetData"
     @replace="emit('replace', $event)"

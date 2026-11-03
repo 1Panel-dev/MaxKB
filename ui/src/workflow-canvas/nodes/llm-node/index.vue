@@ -5,6 +5,7 @@ import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
+import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -71,6 +72,12 @@ const formData = computed<LlmNodeForm>({
   set: (value) => (model.properties.node_data = value),
 })
 
+// 提示词生成使用当前生效的模型；引用变量时在生成弹窗中选择模型。
+const promptModelId = computed(() => {
+  if (formData.value.model_id_type === 'reference') return ''
+  return formData.value.model_id_type === 'default' ? (model.getDefaultModelConfig('LLM')?.model_id ?? '') : formData.value.model_id
+})
+
 const showSettings = computed(() =>
   [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
 )
@@ -117,11 +124,15 @@ onMounted(() => {
         <!-- 系统提示词 -->
         <el-form-item>
           <template #label>
-            <div class="flex-align-center gap-1">
-              <span>系统提示词</span>
-              <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
-                <MkIcon name="icon_info_outlined" class="text-N600!" />
-              </MkTooltip>
+            <div class="flex-between">
+              <div class="flex-align-center gap-1">
+                <span>系统提示词</span>
+                <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
+                  <MkIcon name="icon_info_outlined" class="text-N600!" />
+                </MkTooltip>
+              </div>
+              <!-- 生成系统提示词 -->
+              <PromptGenerate :model-id="promptModelId" :model-params-setting="formData.model_params_setting" @replace="formData.system = $event" />
             </div>
           </template>
           <MdEditorMagnify

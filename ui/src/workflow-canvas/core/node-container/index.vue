@@ -24,6 +24,7 @@ type NodeContainerProperties = {
 withDefaults(defineProps<{ exceptionNodeList?: string[] }>(), {
   exceptionNodeList: () => [
     WorkflowNodeType.AiChat,
+    WorkflowNodeType.Llm,
     WorkflowNodeType.VideoUnderstandNode,
     WorkflowNodeType.ImageGenerateNode,
     WorkflowNodeType.ImageUnderstandNode,
@@ -282,7 +283,7 @@ onBeforeUnmount(() => {
 
           <div class="flex-align-center shrink-0 gap-1" @pointerdown.stop @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode">
-              <MkIcon name="icon_down_outlined" :size="20"/>
+              <MkIcon name="icon_down_outlined" :size="20" />
             </el-button>
             <NodeConditionDropdown
               :model="model"

@@ -49,10 +49,10 @@ const getData = () => {
 }
 const render = (formData: DynamicFormValue) => {
   const attrs = formData.attrs || {}
-  formValue.value.minlength = attrs.minlength
-  formValue.value.maxlength = attrs.maxlength
-  formValue.value.default_value = formData.default_value
-  formValue.value.show_default_value = formData.show_default_value
+  formValue.value.minlength = attrs.minlength ?? 0
+  formValue.value.maxlength = attrs.maxlength ?? 200
+  formValue.value.default_value = formData.default_value ?? ''
+  formValue.value.show_default_value = formData.show_default_value ?? true
 }
 const rules = computed(() => [
   {
