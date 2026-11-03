@@ -2146,12 +2146,16 @@ class PermissionConstants(Enum):
 
     PORTAL_READ = (
         Permission(group=Group.PORTAL, sub_group=Group.PORTAL, operate=Operate.READ, bit_index=0),
-        PermissionMeta(role_list=[RoleConstants.ADMIN], scope=[PermissionScopeConstants.SYSTEM]),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN], category=Category.CHAT_CLIENT, scope=[PermissionScopeConstants.SYSTEM]
+        ),
     )
 
     PORTAL_EDIT = (
-        Permission(group=Group.PORTAL, sub_group=Group.PORTAL, operate=Operate.EDIT, bit_index=0),
-        PermissionMeta(role_list=[RoleConstants.ADMIN], scope=[PermissionScopeConstants.SYSTEM]),
+        Permission(group=Group.PORTAL, sub_group=Group.PORTAL, operate=Operate.EDIT, bit_index=1),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN], category=Category.CHAT_CLIENT, scope=[PermissionScopeConstants.SYSTEM]
+        ),
     )
 
     # ==================== 共享工具 ====================
