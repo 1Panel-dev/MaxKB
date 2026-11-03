@@ -14,6 +14,7 @@ import ButtonDisplaySetting from './display-setting/ButtonDisplaySetting.vue'
 import ButtonApiKey from './api-key/ButtonApiKey.vue'
 import perm from '@/permission/index.ts'
 import { isSystemResource } from '@/utils/resource-context.ts'
+import type { ApplicationAccessToken } from '@/api/types'
 
 defineOptions({ name: 'ApplicationOverviewView' })
 defineProps<ResourceDetailPageProps>()
@@ -31,6 +32,7 @@ function applicationOverviewPermission(method: ApplicationOverviewPermissionMeth
 }
 
 /* 基本信息：Web 访问链接与访问开关 */
+const accessTokenConfig = ref<ApplicationAccessToken>()
 const accessToken = ref('')
 const webAccessActive = ref(false)
 const loading = ref(false)
@@ -57,6 +59,7 @@ function handleChangeWebAccess() {
     .then((config) => {
       webAccessActive.value = config.is_active
       accessToken.value = config.access_token
+      accessTokenConfig.value = config
       MsgSuccess(config.is_active ? '已启用' : '已禁用')
       return true
     })
@@ -79,6 +82,7 @@ function handleResetAccessToken() {
         .then((config) => {
           accessToken.value = config.access_token
           webAccessActive.value = config.is_active
+          accessTokenConfig.value = config
           MsgSuccess('刷新成功')
         })
         .finally(() => {
@@ -106,6 +110,7 @@ function handleChangeApiKeyAccess() {
 
 onMounted(() => {
   return resourceApi.application.getAccessToken(applicationId.value).then((config) => {
+    accessTokenConfig.value = config
     accessToken.value = config.access_token
     webAccessActive.value = config.is_active
     apiKeyEnabled.value = config.enable_api_key ?? false
@@ -155,7 +160,7 @@ onMounted(() => {
             <!-- 嵌入第三方 -->
             <ButtonEmbedThirdParty v-if="applicationOverviewPermission('overviewEmbed')" :share-url="accessUrl" :access-token="accessToken" />
             <!-- 访问限制 -->
-            <ButtonAccessRestriction v-if="applicationOverviewPermission('overviewAccess')" />
+            <ButtonAccessRestriction v-if="applicationOverviewPermission('overviewAccess')" :access-token-config="accessTokenConfig" />
             <!-- 显示设置 -->
             <ButtonDisplaySetting v-if="applicationOverviewPermission('overviewDisplay')" />
           </div>

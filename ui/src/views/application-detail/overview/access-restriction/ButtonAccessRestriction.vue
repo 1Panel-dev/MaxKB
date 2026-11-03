@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import AccessRestrictionDrawer from './AccessRestrictionDrawer.vue'
+import type { ApplicationAccessToken } from '@/api/types'
+
+defineProps<{ accessTokenConfig?: ApplicationAccessToken }>()
 
 defineOptions({ name: 'ButtonAccessRestriction' })
 
@@ -17,5 +20,5 @@ function handleOpenAccessRestriction() {
     <MkIcon name="icon-lock" />
     <span>访问限制</span>
   </el-button>
-  <AccessRestrictionDrawer v-if="drawerVisible" @closed="drawerVisible = false" />
+  <AccessRestrictionDrawer v-if="drawerVisible" :initial-config="accessTokenConfig" @closed="drawerVisible = false" />
 </template>

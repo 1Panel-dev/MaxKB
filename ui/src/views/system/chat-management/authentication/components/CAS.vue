@@ -56,7 +56,7 @@ function submit() {
   })
 }
 
-onMounted(() => loadSetting)
+onMounted(() => loadSetting())
 </script>
 
 <template>

@@ -49,8 +49,14 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
     if (!config) return ''
 
     const { accessToken } = auth
-    const queryString = getRouteQueryString()
-    const callbackUrl = `${config.redirectUrl}${accessToken ? `/${accessToken}` : ''}${queryString ? `?${queryString}` : ''}`
+    // accessToken 统一放到回调地址的 query 参数中，不再拼接路径段
+    const params = new URLSearchParams()
+    if (accessToken) params.set('accessToken', accessToken)
+    new URLSearchParams(getRouteQueryString()).forEach((value, key) => {
+      if (key !== 'accessToken') params.append(key, value)
+    })
+    const queryString = params.toString()
+    const callbackUrl = `${config.redirectUrl}${queryString ? `?${queryString}` : ''}`
     if (authType === LOGIN_METHOD.CAS) {
       if (!config.ldpUri) return ''
       const separator = config.ldpUri.includes('?') ? '&' : '?'
@@ -66,7 +72,7 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
 
     // OAuth2 通过 state 透传 accessToken
     if (!config.authEndpoint || !config.clientId) return ''
-    const redirectUrl = `${config.redirectUrl}${queryString ? `&${queryString}` : ''}`
+    const redirectUrl = `${config.redirectUrl}${queryString ? `?${queryString}` : ''}`
     const state = accessToken ? `${uuidv7()}_${accessToken}` : uuidv7()
     let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${state}`
     if (config.scope) url += `&scope=${config.scope}`

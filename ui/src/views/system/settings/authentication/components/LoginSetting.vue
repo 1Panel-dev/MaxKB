@@ -254,7 +254,7 @@ onActivated(() => {
           <el-option v-for="workspace in workspaceOptions" :key="workspace.id" :label="workspace.name" :value="workspace.id" />
         </el-select>
       </el-form-item>
-      <el-form-item label="用户组" v-if="form.workspace_id">
+      <el-form-item label="用户组" v-if="form.workspace_id && selectedRoleType === ROLE_TYPE.USER">
         <el-select filterable clearable multiple v-model="form.group_ids" :loading="loadingGroups" placeholder="请选择用户组" class="w-240">
           <el-option v-for="userGroup in userGroups" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
         </el-select>
