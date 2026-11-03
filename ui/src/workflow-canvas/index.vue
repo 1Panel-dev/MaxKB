@@ -198,7 +198,7 @@ defineExpose({ onmousedown, validate, getGraphData, addNode, clearGraphData, ren
     <NodeControl v-if="lf" :logic-flow="lf" />
     <div class="absolute left-4 top-4 z-10">
       <el-card shadow="always" style="--el-card-padding: 8px">
-        <NodeAdd v-if="lf" :workflow-mode="workflowMode" @dragstart="onmousedown" @select="addNode" class="mb-1" />
+        <NodeAdd v-if="lf" :workflow-mode="workflowMode" @dragstart="onmousedown" @select="addNode" class="mb-2" />
         <NodeSearch v-if="lf" :logic-flow="lf" />
       </el-card>
     </div>
