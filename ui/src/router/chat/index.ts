@@ -48,6 +48,17 @@ chatRouter.beforeEach(async (to) => {
 
   const { auth } = useStore()
 
+  // 三方登录回调：后端重定向回本地址时通过 query 携带会话 token，这里保存后去掉 query 并跳回原地址
+  const callbackToken = typeof to.query.token === 'string' ? to.query.token : ''
+  if (callbackToken) {
+    const { token, redirect, ...query } = to.query
+    auth.setToken(callbackToken, scope)
+    if (typeof redirect === 'string' && redirect.startsWith('/')) return { path: redirect, query, replace: true }
+    return scope === PORTAL_AUTH_SCOPE
+      ? { name: 'portal-home', query, replace: true }
+      : { name: 'chat-home', params: { accessToken: scope }, query, replace: true }
+  }
+
   // accessToken 无效、应用已停用或门户未开放时，认证前置配置与匿名认证会失败，统一进入 404 页面
   let authProfile: AuthProfile<unknown>
   try {
