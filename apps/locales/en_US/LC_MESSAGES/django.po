@@ -9522,6 +9522,9 @@ msgstr ""
 msgid "Portal"
 msgstr ""
 
+msgid "Portal Setting"
+msgstr "Portal Setting"
+
 msgid "Portal configuration does not exist"
 msgstr ""
 

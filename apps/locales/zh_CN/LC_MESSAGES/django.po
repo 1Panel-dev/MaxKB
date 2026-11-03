@@ -9662,6 +9662,9 @@ msgstr "保存门户配置"
 msgid "Portal"
 msgstr "门户"
 
+msgid "Portal Setting"
+msgstr "门户设置"
+
 msgid "Portal configuration does not exist"
 msgstr "门户配置不存在"
 
