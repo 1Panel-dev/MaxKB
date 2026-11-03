@@ -1470,6 +1470,7 @@ class ToolSerializer(serializers.Serializer):
         source_name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("source name"))
         source_type = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("source type"))
         state = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("state"))
+        order = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Order field"))
 
         class Operate(serializers.Serializer):
             id = serializers.UUIDField(required=False, allow_null=True, label=_("record id"))
@@ -1557,7 +1558,12 @@ class ToolSerializer(serializers.Serializer):
                 query_set = query_set.filter(Q(id=self.data.get("record_id")))
             if self.data.get("workspace_id"):
                 query_set = query_set.filter(Q(workspace_id=self.data.get("workspace_id")))
-            query_set = query_set.order_by("-create_time")
+            order = str(self.data.get("order") or "").strip()
+            # 前端执行时间排序沿用触发器记录的 ett 别名协议，工具记录表无别名，需去掉前缀。
+            if order in ("ett.create_time", "-ett.create_time"):
+                query_set = query_set.order_by(order.replace("ett.", ""))
+            else:
+                query_set = query_set.order_by("-create_time")
 
             return page_search(
                 current_page,
