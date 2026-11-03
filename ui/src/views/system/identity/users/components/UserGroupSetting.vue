@@ -63,6 +63,15 @@ watch([() => props.workspaceIds, () => props.workspaceOptions], refreshUserGroup
 
 <template>
   <el-form-item>
-    <el-cascader v-model="userGroupIds" class="w-full" :options="userGroupOptions" :props="cascaderProps" :show-all-levels="false" clearable placeholder="请选择用户组" />
+    <el-cascader
+      v-model="userGroupIds"
+      class="w-full"
+      :options="userGroupOptions"
+      :props="cascaderProps"
+      :show-all-levels="false"
+      clearable
+      filterable
+      placeholder="请选择用户组"
+    />
   </el-form-item>
 </template>

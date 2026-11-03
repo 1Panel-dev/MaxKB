@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, reactive, ref, useTemplateRef, watch } from 'vue'
 import type { ScrollbarInstance } from 'element-plus'
-import type { PromptGenerateMessage } from '@/api/types'
+import SelectModel from '@/components/business/select-model/index.vue'
+import type { ModelItem, ModelProviderItem, PromptGenerateMessage } from '@/api/types'
 import { ConversationStream } from '@/conversation-panel/core/stream'
 import { inputShortcut } from '@/conversation-panel/core/shortcuts'
 import { MsgError } from '@/utils/message'
@@ -14,18 +15,28 @@ const props = withDefaults(
     placeholder: string
     emptyText: string
     disabled?: boolean
+    generateDisabled?: boolean
+    canAddModel?: boolean
+    modelOptions?: ModelItem[]
+    providerOptions?: ModelProviderItem[]
+    modelLoading?: boolean
+    modelParamsLoading?: boolean
     request: (messages: PromptGenerateMessage[]) => Promise<Response>
   }>(),
-  { disabled: false },
+  { disabled: false, generateDisabled: false },
 )
 const emit = defineEmits<{
   open: []
   closed: []
   replace: [content: string]
+  refreshModels: []
 }>()
 defineSlots<{
   'header-extra'(props: { loading: boolean }): unknown
 }>()
+
+const modelId = defineModel<string>('modelId', { default: '' })
+const modelParams = defineModel<Record<string, unknown>>('modelParams', { default: () => ({}) })
 
 // 生成会话：业务方提供请求上下文，组件统一维护输入、消息和弹窗。
 const visible = ref(false)
@@ -53,7 +64,7 @@ function resetData() {
 // 流式生成：重新生成追加用户消息，停止后保留已生成的内容。
 function generateContent(regenerate = false) {
   const content = inputValue.value.trim()
-  if (loading.value || props.disabled || (!regenerate && !content)) return
+  if (loading.value || props.disabled || props.generateDisabled || (!regenerate && !content)) return
   messages.value.push({ content: regenerate ? 'Re generate' : content, role: 'user' })
   const requestMessages = [...messages.value]
   inputValue.value = ''
@@ -148,7 +159,7 @@ onBeforeUnmount(stopGenerate)
         <!-- 替换当前内容 -->
         <el-button type="primary" @click="replaceContent">替换</el-button>
         <!-- 重新生成内容 -->
-        <el-button plain :disabled="disabled" @click="generateContent(true)">重新生成</el-button>
+        <el-button plain :disabled="disabled || generateDisabled" @click="generateContent(true)">重新生成</el-button>
       </div>
       <div class="mk-input-box border transition-colors hover:border-primary focus-within:border-primary">
         <el-input
@@ -161,13 +172,30 @@ onBeforeUnmount(stopGenerate)
           @keydown.stop="handleKeydown"
           @paste.stop
         />
-        <div class="text-right mt-3">
+        <div class="flex-between gap-3 mt-3">
+          <div class="min-w-0">
+            <!-- 选择生成内容使用的模型及参数 -->
+            <SelectModel
+              v-if="modelOptions"
+              v-model="modelId"
+              v-model:model-params="modelParams"
+              class="w-60!"
+              :options="modelOptions"
+              :provider-options="providerOptions ?? []"
+              :loading="modelLoading"
+              :disabled="loading || modelParamsLoading"
+              :can-add="canAddModel"
+              can-edit-params
+              teleported
+              @refresh="emit('refreshModels')"
+            />
+          </div>
           <!-- 停止生成内容 -->
           <el-button v-if="loading" circle type="primary" @click="stopGenerate">
             <MkIcon name="icon_square_filled" />
           </el-button>
           <!-- 发送需求并生成内容 -->
-          <el-button v-else circle type="primary" :disabled="!inputValue.trim() || disabled" @click="generateContent()">
+          <el-button v-else circle type="primary" :disabled="!inputValue.trim() || disabled || generateDisabled" @click="generateContent()">
             <MkIcon name="icon_arrow-up_outlined" />
           </el-button>
         </div>

@@ -10,7 +10,6 @@ import ModelApi from '@/api/admin/workspace/model'
 import SystemResourceModelApi from '@/api/admin/system/resource-management/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import ModelProviderApi from '@/api/admin/model-provider'
-import SelectModel from '@/components/business/select-model/index.vue'
 import GenerateContent from '@/components/business/generate-content/index.vue'
 import { MODEL_STATUS } from '@/api/enums'
 import type {
@@ -113,19 +112,16 @@ function loadModels() {
 // 生成上下文：打开时复制当前参数定义，关闭后清理模型配置。
 const initFieldList = ref<DynamicFormField[]>([])
 const inputFieldList = ref<ToolInputField[]>([])
-const generateVisible = ref(false)
-// 允许先打开弹窗选模型，打开后统一通过 disabled 控制提交。
-const generateDisabled = computed(() => generateVisible.value && (!activeModelId.value || modelLoading.value || modelParamsLoading.value))
+// 模型和参数就绪后允许提交，入口始终可打开。
+const generateDisabled = computed(() => !activeModelId.value || modelLoading.value || modelParamsLoading.value)
 
 function initGenerate() {
-  generateVisible.value = true
   initFieldList.value = cloneDeep(props.toolForm?.init_field_list ?? [])
   inputFieldList.value = cloneDeep(props.toolForm?.input_field_list ?? [])
   return loadModels()
 }
 
 function resetData() {
-  generateVisible.value = false
   initFieldList.value = []
   inputFieldList.value = []
   activeModelId.value = ''
@@ -171,29 +167,20 @@ function handleReplaceCode(value: string, replaceCode?: (value: string) => void)
         title="生成 Python 代码"
         placeholder="请描述这个工具的功能"
         empty-text="Python 代码显示在这里"
-        :disabled="generateDisabled"
+        :generate-disabled="generateDisabled"
+        v-model:model-id="activeModelId"
+        v-model:model-params="modelParams"
+        :model-options="modelOptions"
+        :provider-options="providerOptions"
+        :model-loading="modelLoading"
+        :model-params-loading="modelParamsLoading"
+        can-add-model
+        @refresh-models="loadModels"
         :request="requestGenerateCode"
         @open="initGenerate"
         @closed="resetData"
         @replace="handleReplaceCode"
-      >
-        <template #header-extra="{ loading }">
-          <div class="flex-align-center gap-4 w-70!">
-            <SelectModel
-              v-model="activeModelId"
-              v-model:model-params="modelParams"
-              :options="modelOptions"
-              :provider-options="providerOptions"
-              :disabled="loading || modelLoading || modelParamsLoading"
-              can-edit-params
-              can-add
-              teleported
-              @refresh="loadModels"
-            />
-            <el-divider direction="vertical" />
-          </div>
-        </template>
-      </GenerateContent>
+      />
     </div>
 
     <el-form-item prop="code">
@@ -204,29 +191,20 @@ function handleReplaceCode(value: string, replaceCode?: (value: string) => void)
             title="生成 Python 代码"
             placeholder="请描述这个工具的功能"
             empty-text="Python 代码显示在这里"
-            :disabled="generateDisabled"
+            :generate-disabled="generateDisabled"
+            v-model:model-id="activeModelId"
+            v-model:model-params="modelParams"
+            :model-options="modelOptions"
+            :provider-options="providerOptions"
+            :model-loading="modelLoading"
+            :model-params-loading="modelParamsLoading"
+            can-add-model
+            @refresh-models="loadModels"
             :request="requestGenerateCode"
             @open="initGenerate"
             @closed="resetData"
             @replace="handleReplaceCode($event, replaceCode)"
-          >
-            <template #header-extra="{ loading }">
-              <div class="flex-align-center gap-4 w-70!">
-                <SelectModel
-                  v-model="activeModelId"
-                  v-model:model-params="modelParams"
-                  :options="modelOptions"
-                  :provider-options="providerOptions"
-                  :disabled="loading || modelLoading || modelParamsLoading"
-                  can-edit-params
-                  can-add
-                  teleported
-                  @refresh="loadModels"
-                />
-                <el-divider direction="vertical" />
-              </div>
-            </template>
-          </GenerateContent>
+          />
         </template>
       </PythonCodeEditor>
     </el-form-item>

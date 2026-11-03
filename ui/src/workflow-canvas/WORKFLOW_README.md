@@ -328,17 +328,19 @@ ID 数组及 `tool_list`、`skill_tool_list`、`application_list` 回显快照�
 读取资源配置、通过 `update` 提交局部变更；资源选项由 Props 传入，未接入数据源时默认为空数组。
 
 AI 对话节点的提示词、历史记录、视觉理解和输出思考表单直接在节点入口维护，统一使用全局
-`MdEditorMagnify` 和节点表单样式。AI 对话、图片理解和视频理解的系统提示词生成统一使用
+`MdEditorMagnify` 和节点表单样式。AI 对话、LLM、图片理解和视频理解的系统提示词生成统一使用
 `workflow-canvas/component/PromptGenerate.vue`，内部复用公共业务组件 `GenerateContent`。
 节点只传 `modelId` 并监听 `replace` 回写自己的 `system`；默认模型从当前工作流配置读取，
-自定义模型使用节点配置的模型 ID，引用变量无法在编辑时确定模型，生成入口禁用。
+自定义模型使用节点配置的模型 ID；引用变量无法在编辑时确定模型时，可在生成弹窗中选择。
 图片理解和视频理解使用 IMAGE 模型，AI 对话使用 LLM 模型，现有提示词接口支持这两种类型。
 共享组件维护提示词模板和请求上下文，不依赖某个节点，也不接收未使用的模型或供应商选项。
 组件将画布注入的 `resourceScope` 传给 `useWorkflowStore`，通过 `store.postPromptGenerate` 发起生成；
 Store 适配器统一选择 Workspace、System 资源管理或 System 共享资源的 Model API。
 循环画布已转发同一上下文，组件不再单独判断资源范围。生成方法不使用 Store 的查询缓存或请求去重。
-生成接口使用节点自身已保存的模型参数（`model_params_setting`）并随请求体提交，
-因此智能体、工具和知识库工作流均可使用；弹窗不提供独立模型或参数设置。
+打开弹窗时优先选中传入的节点模型并复制参数；未传模型 ID 时，按下拉分组顺序选中第一个可用模型并加载默认参数。
+输入框底部复用 `SelectModel`，可独立调整本次生成使用的模型和参数，
+不回写节点配置。选项通过当前范围 Store 查询 LLM 和 IMAGE 模型，生成请求提交弹窗当前的
+`model_params_setting`；未选模型或选项、参数加载期间禁止发送。
 公共组件统一维护主题输入、会话消息与 `ConversationStream`；重新生成在历史中追加用户消息
 `Re generate` 后请求，停止通过 `cancel()` 终止读取，关闭动画结束后清理会话。
 点击替换后通过 `replace` 交由节点回写系统提示词。
