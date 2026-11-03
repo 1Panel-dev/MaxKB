@@ -221,7 +221,7 @@ onMounted(() => loadChatUserGroups())
         <MkTable
           v-model:pagination-config="paginationConfig"
           :data="chatUsers"
-          :max-table-height="350"
+          :max-table-height="230"
           @size-change="refreshChatUsers"
           @current-change="refreshChatUsers"
         >
