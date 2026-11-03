@@ -6,6 +6,7 @@ import { useConversationListStore } from '../conversation-list/index'
 import HistoryConversationDrawer from './HistoryConversationDrawer.vue'
 import AccountMenu from '../account-menu/index.vue'
 import { usePortalConversationListStore, type PortalApplicationGroup } from './index'
+import RenameConversation from '../../components/rename/index.vue'
 
 defineOptions({ name: 'PortalConversationList' })
 
@@ -122,6 +123,11 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
                   </el-button>
                   <template #dropdown>
                     <MkDropdownMenu>
+                      <!-- 新建当前分组智能体的对话 -->
+                      <MkDropdownItem @click="portalList.openApplication(group.id)">
+                        <template #icon><MkIcon name="icon_new-chat_outlined" /></template>
+                        <span>新建对话</span>
+                      </MkDropdownItem>
                       <!-- 删除智能体历史分组，待接入对应接口 -->
                       <MkDropdownItem divided disabled>
                         <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
@@ -154,12 +160,21 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
                     {{ conversationTime(conversation) }}
                   </span>
                 </template>
-                <template #action-dropdown>
-                  <!-- 删除 -->
-                  <MkDropdownItem divided @click="handleDeleteConversation(group, conversation)">
-                    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                    <span>删除</span>
-                  </MkDropdownItem>
+                <template #action>
+                  <MkDropdown trigger="click" persistent :teleported="false">
+                    <!-- 打开历史对话操作菜单 -->
+                    <el-button text><MkIcon name="icon_more_outlined" /></el-button>
+                    <template #dropdown>
+                      <MkDropdownMenu>
+                        <RenameConversation :conversation="conversation" :application-id="group.id" @renamed="conversation.abstract = $event" />
+                        <!-- 删除历史对话 -->
+                        <MkDropdownItem divided @click="handleDeleteConversation(group, conversation)">
+                          <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                          <span>删除</span>
+                        </MkDropdownItem>
+                      </MkDropdownMenu>
+                    </template>
+                  </MkDropdown>
                 </template>
               </MkListItem>
               <!-- 超过5条 查看更多 -->

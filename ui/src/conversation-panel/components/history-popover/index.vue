@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElMessageBox, type ScrollbarDirection } from 'element-plus'
+import type { ScrollbarDirection } from 'element-plus'
 import type { Conversation } from '../../core/types'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
+import RenameConversation from '../rename/index.vue'
 import { relativeTimeFormat } from '@/utils/time'
 import { MsgConfirm } from '@/utils/message'
 
@@ -25,19 +26,6 @@ const conversationTime = (conversation: Conversation) => relativeTimeFormat(conv
 function handleSelectConversation(conversation: Conversation) {
   conversationList.selectConversation(conversation.id)
   visible.value = false
-}
-
-/* 重命名：去除首尾空格后提交，取消或请求失败保留原名称。 */
-function handleRenameConversation(conversation: Conversation) {
-  ElMessageBox.prompt('', '重命名', {
-    inputValue: conversation.abstract || '',
-    inputPattern: /\S/,
-    inputErrorMessage: '请输入对话名称',
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-  })
-    .then(({ value }) => conversationList.renameChat(conversation.id, value.trim()))
-    .catch(() => {})
 }
 
 function handleDeleteConversation(conversation: Conversation) {
@@ -117,17 +105,21 @@ function handleClearConversations() {
               {{ conversationTime(conversation) }}
             </span>
           </template>
-          <template #action-dropdown>
-            <!-- 重命名历史对话 -->
-            <MkDropdownItem @click="handleRenameConversation(conversation)">
-              <template #icon><MkIcon name="icon_edit_outlined" /></template>
-              <span>重命名</span>
-            </MkDropdownItem>
-            <!-- 删除历史对话 -->
-            <MkDropdownItem @click="handleDeleteConversation(conversation)">
-              <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-              <span>删除</span>
-            </MkDropdownItem>
+          <template #action>
+            <MkDropdown trigger="click" persistent :teleported="false">
+              <!-- 打开历史对话操作菜单 -->
+              <el-button text><MkIcon name="icon_more_outlined" /></el-button>
+              <template #dropdown>
+                <MkDropdownMenu>
+                  <RenameConversation :conversation="conversation" />
+                  <!-- 删除历史对话 -->
+                  <MkDropdownItem @click="handleDeleteConversation(conversation)">
+                    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                    <span>删除</span>
+                  </MkDropdownItem>
+                </MkDropdownMenu>
+              </template>
+            </MkDropdown>
           </template>
         </MkListItem>
       </div>

@@ -5,6 +5,7 @@ import type { PortalConversationSummary } from '@/api/types'
 import { relativeTimeFormat } from '@/utils/time'
 import { useConversationListStore } from '../conversation-list/index'
 import { usePortalConversationListStore } from './index'
+import RenameConversation from '../../components/rename/index.vue'
 
 defineOptions({ name: 'HistoryConversationDrawer' })
 const props = defineProps<{ applicationId: string }>()
@@ -82,12 +83,25 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
               {{ relativeTimeFormat(conversation.update_time || conversation.create_time) }}
             </span>
           </template>
-          <template #action-dropdown>
-            <!-- 删除历史对话 -->
-            <MkDropdownItem divided @click="handleDeleteConversation(conversation)">
-              <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-              <span>删除</span>
-            </MkDropdownItem>
+          <template #action>
+            <MkDropdown trigger="click" persistent :teleported="false">
+              <!-- 打开历史对话操作菜单 -->
+              <el-button text><MkIcon name="icon_more_outlined" /></el-button>
+              <template #dropdown>
+                <MkDropdownMenu>
+                  <RenameConversation
+                    :conversation="conversation"
+                    :application-id="selectedApplicationId"
+                    @renamed="conversation.abstract = $event"
+                  />
+                  <!-- 删除历史对话 -->
+                  <MkDropdownItem divided @click="handleDeleteConversation(conversation)">
+                    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                    <span>删除</span>
+                  </MkDropdownItem>
+                </MkDropdownMenu>
+              </template>
+            </MkDropdown>
           </template>
         </MkListItem>
       </div>
