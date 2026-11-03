@@ -126,7 +126,9 @@ const canEditPortal = computed(() => perm.system.portal.edit())
             <!-- 门户公开访问链接 -->
             <div>
               <div class="flex-between mb-2 gap-2">
-                <span>门户公开访问链接</span>
+                <MkTooltip placement="right" content="控制门户页面链接是否可访问">
+                  <span>Web 访问</span>
+                </MkTooltip>
                 <el-switch
                   :disabled="!canEditPortal || saving"
                   :model-value="portalSetting.enable_public_access"
@@ -146,7 +148,12 @@ const canEditPortal = computed(() => perm.system.portal.edit())
             <!-- 智能体后端 API 访问 -->
             <div>
               <div class="flex-between mb-2 gap-2">
-                <span>智能体后端 API 访问</span>
+                <span class="flex-align-center gap-1">
+                  智能体对话 API
+                  <MkTooltip placement="right" content="控制是否允许通过对话用户的 API Key 调用 API 进行智能体对话">
+                    <MkIcon name="icon_info_outlined" class="text-N600!" />
+                  </MkTooltip>
+                </span>
                 <el-switch
                   :disabled="!canEditPortal || saving"
                   :model-value="portalSetting.enable_api"
@@ -154,19 +161,16 @@ const canEditPortal = computed(() => perm.system.portal.edit())
                   @change="handleAccessChange('enable_api', $event)"
                 />
               </div>
-              <el-input :model-value="portalApiUrl" readonly>
-                <template #suffix>
-                  <!-- 复制智能体后端 API 访问 -->
-                  <el-button text :disabled="!canEditPortal" @click="copyText(portalApiUrl)" class="-mr-1">
-                    <MkIcon name="icon_copy_outlined" />
-                  </el-button>
-                </template>
-              </el-input>
             </div>
-            <!-- 知识库后端 API 检索 -->
+            <!-- 智能体 MCP 服务 -->
             <div>
               <div class="flex-between mb-2 gap-2">
-                <span>知识库后端 API 检索</span>
+                <span class="flex-align-center gap-1">
+                  智能体 MCP 服务
+                  <MkTooltip placement="right" content="控制是否允许通过对话用户的 API Key 调用智能体的 MCP 服务">
+                    <MkIcon name="icon_info_outlined" class="text-N600!" />
+                  </MkTooltip>
+                </span>
                 <el-switch
                   :disabled="!canEditPortal || saving"
                   :model-value="portalSetting.enable_knowledge_base_api"
@@ -174,19 +178,28 @@ const canEditPortal = computed(() => perm.system.portal.edit())
                   @change="handleAccessChange('enable_knowledge_base_api', $event)"
                 />
               </div>
-              <el-input :model-value="portalApiUrl" readonly>
-                <template #suffix>
-                  <!-- 复制知识库后端 API 检索 -->
-                  <el-button text :disabled="!canEditPortal" @click="copyText(portalApiUrl)" class="-mr-1">
-                    <MkIcon name="icon_copy_outlined" />
-                  </el-button>
-                </template>
-              </el-input>
+            </div>
+            <!-- 知识库 MCP 服务 -->
+            <div>
+              <div class="flex-between mb-2 gap-2">
+                <span class="flex-align-center gap-1">
+                  知识库 MCP 服务
+                  <MkTooltip placement="right" content="控制是否允许通过对话用户的 API Key 调用知识库检索的 MCP 服务">
+                    <MkIcon name="icon_info_outlined" class="text-N600!" />
+                  </MkTooltip>
+                </span>
+                <el-switch
+                  :disabled="!canEditPortal || saving"
+                  :model-value="portalSetting.enable_knowledge_base_api"
+                  size="small"
+                  @change="handleAccessChange('enable_knowledge_base_api', $event)"
+                />
+              </div>
             </div>
             <div class="flex-between gap-2">
-              <span>身份认证</span>
+              <span>登录设置</span>
               <div class="flex-align-center gap-2">
-                <!-- 配置身份认证 -->
+                <!-- 配置登录设置 -->
                 <ButtonPortalAuthSetting
                   v-if="auth.isPE || auth.isEE"
                   ref="authSettingButtonRef"
@@ -194,12 +207,6 @@ const canEditPortal = computed(() => perm.system.portal.edit())
                   :saving="saving"
                   :disabled="!canEditPortal"
                   :save="savePortalAuthSetting"
-                />
-                <el-switch
-                  :disabled="!canEditPortal || saving"
-                  :model-value="portalSetting.enable_auth"
-                  size="small"
-                  @change="handleAccessChange('enable_auth', $event)"
                 />
               </div>
             </div>

@@ -99,10 +99,10 @@ defineExpose({ open })
 
 <template>
   <!-- 配置身份认证 -->
-  <el-button text type="primary" title="身份认证设置" :disabled="disabled || saving" @click="handleOpenAuthSetting">
+  <el-button text type="primary" title="登录设置" :disabled="disabled || saving" @click="handleOpenAuthSetting">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDrawer v-model="authVisible" title="身份认证设置" @closed="handleClosed">
+  <MkDrawer v-model="authVisible" title="登录设置" @closed="handleClosed">
     <el-form
       v-loading="saving"
       ref="authFormRef"
