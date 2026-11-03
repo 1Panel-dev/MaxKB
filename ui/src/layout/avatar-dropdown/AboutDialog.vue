@@ -95,10 +95,10 @@ defineExpose({ open })
 <template>
   <MkDialog v-model="dialogVisible" title="关于" :close-on-click-modal="true" :close-on-press-escape="true" @closed="handleClosed">
     <div v-loading="loading" class="overflow-hidden rounded-xl border">
-      <div class="flex-center h-35 bg-primary/10">
-        <LogoFull :height="60" class="max-w-full!" />
+      <div class="flex-center h-30 bg-primary/10">
+        <LogoFull :height="40" class="max-w-full!" />
       </div>
-      <div class="px-8 py-6">
+      <div class="p-6">
         <dl class="space-y-4">
           <template v-for="field in licenseFields" :key="field.key">
             <div class="grid grid-cols-[100px_minmax(0,1fr)] gap-x-4">
