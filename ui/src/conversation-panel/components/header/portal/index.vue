@@ -34,10 +34,10 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
 
     <div class="flex-1 flex-align-center gap-2">
       <h4 class="truncate">{{ list.currentConversation.value?.abstract || '新建对话' }}</h4>
-      <el-tag type="info">
+      <el-tag type="info" class="max-md:hidden!">
         <div class="flex-align-center gap-1">
           <ApplicationIcon :icon="list.appInfo.value?.icon" :size="18" class="shrink-0" />
-          <span v-if="list.appInfo.value?.name" class="text-sm">{{ list.appInfo.value.name }}</span>
+          <span v-if="list.appInfo.value?.name" :title="list.appInfo.value.name" class="truncate text-sm">{{ list.appInfo.value.name }}</span>
         </div>
       </el-tag>
     </div>

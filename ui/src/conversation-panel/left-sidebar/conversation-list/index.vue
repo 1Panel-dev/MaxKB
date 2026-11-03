@@ -45,7 +45,7 @@ const conversationTime = (conversation: Conversation) => relativeTimeFormat(conv
     </div>
 
     <!-- 历史列表独立滚动，应用信息和新建入口保持固定。 -->
-    <el-scrollbar class="min-h-0 flex-1 mt-1">
+    <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
       <div v-if="conversations.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
       <div v-else class="space-y-1">
         <template v-for="conversation in conversations" :key="conversation.id">
