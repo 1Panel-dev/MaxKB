@@ -158,6 +158,8 @@ watch(enable_exception, () => {
 })
 
 const openNodeMenu = (anchorValue: Model.AnchorConfig) => {
+  // 将所属节点置顶，避免添加菜单被其他节点遮挡。
+  model.graphModel.toFront(model.id)
   nodeMenuDragClosing.value = false
   showAnchor.value = true
   anchorData.value = anchorValue

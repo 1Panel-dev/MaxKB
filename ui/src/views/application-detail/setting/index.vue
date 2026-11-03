@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
+import type { FormInstance, FormItemRule } from 'element-plus'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { ApplicationDetail, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
 import ModelApi from '@/api/admin/workspace/model'
@@ -97,6 +97,12 @@ watch(
 )
 
 /* 长期记忆配置确认后合并到表单草稿。 */
+// 固定校验规则，避免启用开关时因规则变化提前校验；保存、发布时仍检查模型。
+const longTermModelRule: FormItemRule = {
+  validator: (_rule, value, callback) => {
+    callback(settings.value.long_term_enable && !value ? new Error('请选择长期记忆模型') : undefined)
+  },
+}
 const longTermSetting = computed<LongTermSettingData>({
   get: (): LongTermSettingData => ({
     long_term_model_id: settings.value.long_term_model_id,
@@ -419,11 +425,7 @@ onMounted(() => {
           </template>
           <div class="p-2">
             <!-- 长期记忆 -->
-            <el-form-item
-              class="mk-hide-asterisk mb-2!"
-              prop="long_term_model_id"
-              :rules="{ required: settings.long_term_enable, message: '请选择长期记忆模型', trigger: 'change' }"
-            >
+            <el-form-item class="mk-hide-asterisk mb-2!" prop="long_term_model_id" :rules="longTermModelRule">
               <template #label>
                 <div class="flex-between">
                   <span class="flex-align-center gap-1">
@@ -443,7 +445,12 @@ onMounted(() => {
                       :model-options="llmModels"
                       :provider-options="providerOptions"
                     />
-                    <el-switch v-model="settings.long_term_enable" size="small" />
+                    <el-switch
+                      v-model="settings.long_term_enable"
+                      size="small"
+                      :validate-event="false"
+                      @change="formRef?.clearValidate('long_term_model_id')"
+                    />
                   </span>
                 </div>
               </template>
