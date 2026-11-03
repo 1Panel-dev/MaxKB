@@ -100,10 +100,22 @@ class Group(Enum):
     USER_TOOL = ("USER_TOOL", _("Tool"))
     USER_OTHER = ("USER_OTHER", _("Other"))
 
-    # 共享资源分组
-    SYSTEM_KNOWLEDGE = ("SYSTEM_KNOWLEDGE", _("Knowledge"))
-    SYSTEM_MODEL = ("SYSTEM_MODEL", _("Model"))
-    SYSTEM_TOOL = ("SYSTEM_TOOL", _("Tool"))
+    # # 共享资源分组
+    # SYSTEM_KNOWLEDGE = ("SYSTEM_KNOWLEDGE", _("Knowledge"))
+    # SYSTEM_MODEL = ("SYSTEM_MODEL", _("Model"))
+    # SYSTEM_TOOL = ("SYSTEM_TOOL", _("Tool"))
+
+    # 共享资源分组（SYSTEM_SHARED 前缀）
+    SYSTEM_SHARED_KNOWLEDGE = ("SYSTEM_SHARED_KNOWLEDGE", _("Knowledge"))
+    SYSTEM_SHARED_MODEL = ("SYSTEM_SHARED_MODEL", _("Model"))
+    SYSTEM_SHARED_TOOL = ("SYSTEM_SHARED_TOOL", _("Tool"))
+    SYSTEM_SHARED_WORKFLOW = ("SYSTEM_SHARED_WORKFLOW", _("Workflow"))
+    SYSTEM_SHARED_DOCUMENT = ("SYSTEM_SHARED_DOCUMENT", _("Document"))
+    SYSTEM_SHARED_TAG = ("SYSTEM_SHARED_TAG", _("Tag"))
+    SYSTEM_SHARED_PROBLEM = ("SYSTEM_SHARED_PROBLEM", _("Problem"))
+    SYSTEM_SHARED_TERMBASE = ("SYSTEM_SHARED_TERMBASE", _("Termbase"))
+    SYSTEM_SHARED_HIT_TEST = ("SYSTEM_SHARED_HIT_TEST", _("Hit-Test"))
+    SYSTEM_SHARED_CHAT_USER = ("SYSTEM_SHARED_CHAT_USER", _("Dialogue users"))
 
     # 资源管理分组
     SYSTEM_RES_APPLICATION = ("SYSTEM_RESOURCE_APPLICATION", _("Application"))

@@ -2160,7 +2160,9 @@ class PermissionConstants(Enum):
 
     # ==================== 共享工具 ====================
     SHARED_TOOL_READ = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL, sub_group=Group.SYSTEM_SHARED_TOOL, operate=Operate.READ, bit_index=0
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2170,7 +2172,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_TOOL_CREATE = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.CREATE, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL, sub_group=Group.SYSTEM_SHARED_TOOL, operate=Operate.CREATE, bit_index=1
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2180,7 +2184,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_TOOL_EDIT = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.EDIT, bit_index=2),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL, sub_group=Group.SYSTEM_SHARED_TOOL, operate=Operate.EDIT, bit_index=2
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2190,7 +2196,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_TOOL_DELETE = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.DELETE, bit_index=3),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL, sub_group=Group.SYSTEM_SHARED_TOOL, operate=Operate.DELETE, bit_index=3
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2200,7 +2208,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_TOOL_IMPORT = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.IMPORT, bit_index=4),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL, sub_group=Group.SYSTEM_SHARED_TOOL, operate=Operate.IMPORT, bit_index=4
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2210,7 +2220,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_TOOL_EXPORT = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.EXPORT, bit_index=5),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL, sub_group=Group.SYSTEM_SHARED_TOOL, operate=Operate.EXPORT, bit_index=5
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2220,7 +2232,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_TOOL_PUBLISH = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.PUBLISH, bit_index=6),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL, sub_group=Group.SYSTEM_SHARED_TOOL, operate=Operate.PUBLISH, bit_index=6
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2230,7 +2244,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_TOOL_RELATE_RESOURCE_VIEW = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.RELATE_VIEW, bit_index=7),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL, sub_group=Group.SYSTEM_SHARED_TOOL, operate=Operate.RELATE_VIEW, bit_index=7
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2240,7 +2256,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_TOOL_EXECUTE_RECORD = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.RECORD, bit_index=8),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL, sub_group=Group.SYSTEM_SHARED_TOOL, operate=Operate.RECORD, bit_index=8
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2250,7 +2268,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_TOOL_TO_WORKSPACE = (
-        Permission(group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.TO_WORKSPACE, bit_index=9),
+        Permission(
+            group=Group.SYSTEM_SHARED_TOOL,
+            sub_group=Group.SYSTEM_SHARED_TOOL,
+            operate=Operate.TO_WORKSPACE,
+            bit_index=9,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2261,7 +2284,12 @@ class PermissionConstants(Enum):
 
     # ==================== 共享知识库 ====================
     SHARED_KNOWLEDGE_READ = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.READ,
+            bit_index=0,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2271,7 +2299,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_CREATE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.CREATE, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.CREATE,
+            bit_index=1,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2281,7 +2314,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_EDIT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.EDIT, bit_index=2),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.EDIT,
+            bit_index=2,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2291,7 +2329,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_SYNC = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.SYNC, bit_index=3),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.SYNC,
+            bit_index=3,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2301,7 +2344,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_VECTOR = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.VECTOR, bit_index=4),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.VECTOR,
+            bit_index=4,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2311,7 +2359,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_EXPORT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.EXPORT, bit_index=5),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.EXPORT,
+            bit_index=5,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2322,7 +2375,10 @@ class PermissionConstants(Enum):
 
     SHARED_KNOWLEDGE_GENERATE = (
         Permission(
-            group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.GENERATE, bit_index=6
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.GENERATE,
+            bit_index=6,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2333,7 +2389,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DELETE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.DELETE, bit_index=7),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.DELETE,
+            bit_index=7,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2344,7 +2405,10 @@ class PermissionConstants(Enum):
 
     SHARED_KNOWLEDGE_RELATE_RESOURCE_VIEW = (
         Permission(
-            group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.RELATE_VIEW, bit_index=8
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.RELATE_VIEW,
+            bit_index=8,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2356,7 +2420,10 @@ class PermissionConstants(Enum):
 
     SHARED_KNOWLEDGE_TO_WORKSPACE = (
         Permission(
-            group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.TO_WORKSPACE, bit_index=9
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.TO_WORKSPACE,
+            bit_index=9,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2368,7 +2435,12 @@ class PermissionConstants(Enum):
 
     # 共享知识库工作流
     SHARED_KNOWLEDGE_WORKFLOW_READ = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_WORKFLOW,
+            operate=Operate.READ,
+            bit_index=0,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2378,7 +2450,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_WORKFLOW_EDIT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EDIT, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_WORKFLOW,
+            operate=Operate.EDIT,
+            bit_index=1,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2388,7 +2465,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_WORKFLOW_EXPORT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EXPORT, bit_index=2),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_WORKFLOW,
+            operate=Operate.EXPORT,
+            bit_index=2,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2398,7 +2480,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_WORKFLOW_PUBLISH = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.PUBLISH, bit_index=3),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_WORKFLOW,
+            operate=Operate.PUBLISH,
+            bit_index=3,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2409,7 +2496,12 @@ class PermissionConstants(Enum):
 
     # 共享知识库文档
     SHARED_KNOWLEDGE_DOCUMENT_READ = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.READ,
+            bit_index=0,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2419,7 +2511,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DOCUMENT_CREATE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.CREATE, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.CREATE,
+            bit_index=1,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2429,7 +2526,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DOCUMENT_EDIT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EDIT, bit_index=2),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.EDIT,
+            bit_index=2,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2439,7 +2541,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DOCUMENT_DELETE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DELETE, bit_index=3),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.DELETE,
+            bit_index=3,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2449,7 +2556,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DOCUMENT_SYNC = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.SYNC, bit_index=4),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.SYNC,
+            bit_index=4,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2459,7 +2571,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DOCUMENT_EXPORT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EXPORT, bit_index=5),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.EXPORT,
+            bit_index=5,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2470,7 +2587,10 @@ class PermissionConstants(Enum):
 
     SHARED_KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = (
         Permission(
-            group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DOWNLOAD, bit_index=6
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.DOWNLOAD,
+            bit_index=6,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2482,7 +2602,10 @@ class PermissionConstants(Enum):
 
     SHARED_KNOWLEDGE_DOCUMENT_GENERATE = (
         Permission(
-            group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.GENERATE, bit_index=7
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.GENERATE,
+            bit_index=7,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2493,7 +2616,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DOCUMENT_VECTOR = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.VECTOR, bit_index=8),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.VECTOR,
+            bit_index=8,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2503,7 +2631,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DOCUMENT_MIGRATE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.MIGRATE, bit_index=9),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.MIGRATE,
+            bit_index=9,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2513,7 +2646,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DOCUMENT_TAG = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TAG, bit_index=10),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.TAG,
+            bit_index=10,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2524,7 +2662,10 @@ class PermissionConstants(Enum):
 
     SHARED_KNOWLEDGE_DOCUMENT_REPLACE = (
         Permission(
-            group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.REPLACE, bit_index=11
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.REPLACE,
+            bit_index=11,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2535,7 +2676,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_DOCUMENT_TOKEN = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TOKEN, bit_index=12),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT,
+            operate=Operate.TOKEN,
+            bit_index=12,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2546,7 +2692,9 @@ class PermissionConstants(Enum):
 
     # 共享知识库标签
     SHARED_KNOWLEDGE_TAG_READ = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.READ, bit_index=0
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2556,7 +2704,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_TAG_CREATE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.CREATE, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.CREATE, bit_index=1
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2566,7 +2716,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_TAG_EDIT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.EDIT, bit_index=2),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.EDIT, bit_index=2
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2576,7 +2728,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_TAG_DELETE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.DELETE, bit_index=3),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.DELETE, bit_index=3
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2587,7 +2741,12 @@ class PermissionConstants(Enum):
 
     # 共享知识库问题
     SHARED_KNOWLEDGE_PROBLEM_READ = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_PROBLEM,
+            operate=Operate.READ,
+            bit_index=0,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2597,7 +2756,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_PROBLEM_CREATE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.CREATE, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_PROBLEM,
+            operate=Operate.CREATE,
+            bit_index=1,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2607,7 +2771,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_PROBLEM_EDIT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.EDIT, bit_index=2),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_PROBLEM,
+            operate=Operate.EDIT,
+            bit_index=2,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2617,7 +2786,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_PROBLEM_DELETE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.DELETE, bit_index=3),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_PROBLEM,
+            operate=Operate.DELETE,
+            bit_index=3,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2627,7 +2801,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_PROBLEM_RELATE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.RELATE, bit_index=4),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_PROBLEM,
+            operate=Operate.RELATE,
+            bit_index=4,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2638,7 +2817,12 @@ class PermissionConstants(Enum):
 
     # 共享知识库术语库
     SHARED_KNOWLEDGE_TERMBASE_READ = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_TERMBASE,
+            operate=Operate.READ,
+            bit_index=0,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2648,7 +2832,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_TERMBASE_CREATE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.CREATE, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_TERMBASE,
+            operate=Operate.CREATE,
+            bit_index=1,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2658,7 +2847,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_TERMBASE_EDIT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EDIT, bit_index=2),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_TERMBASE,
+            operate=Operate.EDIT,
+            bit_index=2,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2668,7 +2862,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_TERMBASE_DELETE = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.DELETE, bit_index=3),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_TERMBASE,
+            operate=Operate.DELETE,
+            bit_index=3,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2678,7 +2877,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_TERMBASE_EXPORT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EXPORT, bit_index=4),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_TERMBASE,
+            operate=Operate.EXPORT,
+            bit_index=4,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2689,7 +2893,12 @@ class PermissionConstants(Enum):
 
     # 共享知识库命中测试
     SHARED_KNOWLEDGE_HIT_TEST = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_HIT_TEST, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_HIT_TEST,
+            operate=Operate.READ,
+            bit_index=0,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2700,7 +2909,12 @@ class PermissionConstants(Enum):
 
     # 共享知识库对话用户
     SHARED_KNOWLEDGE_CHAT_USER_READ = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_CHAT_USER,
+            operate=Operate.READ,
+            bit_index=0,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2710,7 +2924,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_KNOWLEDGE_CHAT_USER_EDIT = (
-        Permission(group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.EDIT, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_CHAT_USER,
+            operate=Operate.EDIT,
+            bit_index=1,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2721,7 +2940,9 @@ class PermissionConstants(Enum):
 
     # ==================== 共享模型 ====================
     SHARED_MODEL_READ = (
-        Permission(group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_SHARED_MODEL, sub_group=Group.SYSTEM_SHARED_MODEL, operate=Operate.READ, bit_index=0
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2731,7 +2952,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_MODEL_CREATE = (
-        Permission(group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.CREATE, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_SHARED_MODEL, sub_group=Group.SYSTEM_SHARED_MODEL, operate=Operate.CREATE, bit_index=1
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2741,7 +2964,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_MODEL_EDIT = (
-        Permission(group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.EDIT, bit_index=2),
+        Permission(
+            group=Group.SYSTEM_SHARED_MODEL, sub_group=Group.SYSTEM_SHARED_MODEL, operate=Operate.EDIT, bit_index=2
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2751,7 +2976,9 @@ class PermissionConstants(Enum):
     )
 
     SHARED_MODEL_DELETE = (
-        Permission(group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.DELETE, bit_index=3),
+        Permission(
+            group=Group.SYSTEM_SHARED_MODEL, sub_group=Group.SYSTEM_SHARED_MODEL, operate=Operate.DELETE, bit_index=3
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2761,7 +2988,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_MODEL_RELATE_RESOURCE_VIEW = (
-        Permission(group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.RELATE_VIEW, bit_index=4),
+        Permission(
+            group=Group.SYSTEM_SHARED_MODEL,
+            sub_group=Group.SYSTEM_SHARED_MODEL,
+            operate=Operate.RELATE_VIEW,
+            bit_index=4,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
@@ -2771,7 +3003,12 @@ class PermissionConstants(Enum):
     )
 
     SHARED_MODEL_TO_WORKSPACE = (
-        Permission(group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.TO_WORKSPACE, bit_index=5),
+        Permission(
+            group=Group.SYSTEM_SHARED_MODEL,
+            sub_group=Group.SYSTEM_SHARED_MODEL,
+            operate=Operate.TO_WORKSPACE,
+            bit_index=5,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.SHARED,
