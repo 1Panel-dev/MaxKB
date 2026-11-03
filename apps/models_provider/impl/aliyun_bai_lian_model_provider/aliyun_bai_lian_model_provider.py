@@ -9,6 +9,7 @@
 
 import os
 
+
 from common.utils.common import get_file_content
 from models_provider.base_model_provider import (
     ModelProvideInfo,
@@ -230,9 +231,105 @@ model_info_manage = (
 )
 
 
+def _type_impl_map():
+    """各 MaxKB 模型类型对应的凭证实例与实现类（取自内置映射，非按模型名单写死）。"""
+    return {
+        ModelTypeConst.LLM: (
+            aliyun_bai_lian_llm_model_credential,
+            BaiLianChatModel,
+            _("Alibaba Cloud Bailian LLM model"),
+        ),
+        ModelTypeConst.EMBEDDING: (
+            aliyun_bai_lian_embedding_model_credential,
+            AliyunBaiLianEmbedding,
+            _("Alibaba Cloud Bailian embedding model"),
+        ),
+        ModelTypeConst.STT: (
+            aliyun_bai_lian_stt_model_credential,
+            AliyunBaiLianSpeechToText,
+            _("Alibaba Cloud Bailian speech-to-text model"),
+        ),
+        ModelTypeConst.TTS: (
+            aliyun_bai_lian_tts_model_credential,
+            AliyunBaiLianTextToSpeech,
+            _("Alibaba Cloud Bailian TTS model"),
+        ),
+        ModelTypeConst.IMAGE: (qwenvl_model_credential, QwenVLChatModel, _("Alibaba Cloud Bailian vision model")),
+        ModelTypeConst.TTI: (
+            qwentti_model_credential,
+            QwenTextToImageModel,
+            _("Alibaba Cloud Bailian image generation model"),
+        ),
+        ModelTypeConst.RERANKER: (
+            aliyun_bai_lian_model_credential,
+            AliyunBaiLianReranker,
+            _("Alibaba Cloud Bailian rerank model"),
+        ),
+        ModelTypeConst.TTV: (
+            aliyun_bai_lian_ttv_model_credential,
+            GenerationVideoModel,
+            _("Alibaba Cloud Bailian text-to-video model"),
+        ),
+        ModelTypeConst.ITV: (
+            aliyun_bai_lian_itv_model_credential,
+            GenerationVideoModel,
+            _("Alibaba Cloud Bailian image-to-video model"),
+        ),
+    }
+
+
 class AliyunBaiLianModelProvider(IModelProvider):
+    @staticmethod
+    def _query_base_for(api_base: str):
+        """把凭证里的 api_base 转成 /models 列表接口可用的 base 地址。"""
+        api_base = (api_base or "").strip()
+        if not api_base:
+            return "https://dashscope.aliyuncs.com/api/v1"
+        base = api_base.rstrip("/")
+        # OpenAI 兼容地址（.../compatible-mode/v1）回到原生 /api/v1
+        if "/compatible-mode/" in base:
+            return base.split("/compatible-mode/")[0] + "/api/v1"
+        return base
+
     def get_model_info_manage(self):
+        # 未提供 api_key 时返回内置常用模型；提供了 key 的实时查询见 get_model_list。
         return model_info_manage
+
+    def get_dynamic_model_info_list(self, api_key, api_base, credential=None):
+        """DashScope 专有实现：按 capabilities/inference_metadata 精确映射模型类型。"""
+        # 模型列表始终走官方 DashScope 接口；compatible-mode 地址归一化回原生 /api/v1。
+        items = []
+        for base in dict.fromkeys([self._query_base_for(api_base), "https://dashscope.aliyuncs.com/api/v1"]):
+            try:
+                items = self.get_base_model_list(api_key, base)
+            except Exception:
+                items = []
+            if items:
+                break
+        if not items:
+            return None
+        builtin_by_name = {info.name: info for info in self.get_model_info_manage().model_list}
+        info_list = []
+        seen = set()
+        for item in items:
+            model_id = item.get("model") or item.get("model_id") or item.get("id") or item.get("name")
+            if not model_id or model_id in seen:
+                continue
+            seen.add(model_id)
+            # 内置列表已有的模型直接沿用原有类型与实现，其余按官方 capabilities 判型。
+            builtin = builtin_by_name.get(model_id)
+            if builtin is not None:
+                info_list.append(
+                    ModelInfo(model_id, builtin.desc, builtin.model_type, builtin.model_credential, builtin.model_class)
+                )
+                continue
+            model_type = self._model_type_from_item(item)
+            impl = _type_impl_map().get(model_type)
+            if impl is None:
+                continue
+            credential_obj, model_class, desc = impl
+            info_list.append(ModelInfo(model_id, desc, model_type, credential_obj, model_class))
+        return info_list or None
 
     def get_model_provide_info(self):
         return ModelProvideInfo(
@@ -250,3 +347,108 @@ class AliyunBaiLianModelProvider(IModelProvider):
                 )
             ),
         )
+
+    @staticmethod
+    def get_base_model_list(api_key: str, api_base: str = None):
+        """调用阿里云百炼（DashScope）官方 /models 列表接口实时获取可用模型。
+
+        兼容两种返回结构：
+        - DashScope：{"output": {"models": [...]}}
+        - 网关/OpenAI 风格：{"data": [...]}（如 ai.fit2cloud.cn 网关）
+        传入 api_base 时会作为 SDK 的 base_address，否则使用 SDK 默认的
+        https://dashscope.aliyuncs.com/api/v1。
+        """
+        import dashscope
+
+        models = []
+        seen = set()
+        page_no = 1
+        page_size = 100
+        while True:
+            kwargs = {"page": page_no, "page_size": page_size, "api_key": api_key}
+            if api_base:
+                kwargs["base_address"] = api_base
+            response = dashscope.Models.list(**kwargs)
+            if getattr(response, "status_code", None) != 200:
+                if models:
+                    return models
+                return []
+            output = response.output or {}
+            if isinstance(output, dict):
+                page_models = output.get("models") or output.get("data") or []
+            elif isinstance(output, list):
+                page_models = output
+            else:
+                page_models = []
+            if not page_models:
+                break
+            new_count = 0
+            for item in page_models:
+                model_id = item.get("model") or item.get("id") or item.get("model_id") or item.get("name")
+                if not model_id or model_id in seen:
+                    continue
+                seen.add(model_id)
+                models.append(item)
+                new_count += 1
+            if len(page_models) < page_size or new_count == 0:
+                break
+            page_no += 1
+        return models
+
+    @staticmethod
+    def _model_type_from_item(item):
+        """根据官方 /models 接口返回的 capabilities 与 inference_metadata 判别 MaxKB 模型类型，缺省按 LLM 处理。"""
+        caps = {str(c).lower() for c in (item.get("capabilities") or [])}
+        meta = item.get("inference_metadata") or {}
+        request_modality = meta.get("request_modality") or []
+        response_modality = meta.get("response_modality") or []
+        if not isinstance(request_modality, (list, tuple)):
+            request_modality = [request_modality]
+        if not isinstance(response_modality, (list, tuple)):
+            response_modality = [response_modality]
+        req = {str(x).lower() for x in request_modality}
+        model_id = str(item.get("model") or item.get("model_id") or item.get("id") or "").lower()
+
+        # 官方 capabilities 是权威判别字段，优先级最高
+        if "tts" in caps:
+            return ModelTypeConst.TTS
+        if caps & {"asr", "realtime-asr", "realtime-audio-translate"}:
+            return ModelTypeConst.STT
+        if "ig" in caps:
+            return ModelTypeConst.TTI
+        if "vg" in caps:
+            return ModelTypeConst.ITV if "image" in req else ModelTypeConst.TTV
+        if "me" in caps:
+            return ModelTypeConst.EMBEDDING
+        if "tr" in caps:
+            return ModelTypeConst.RERANKER if "rerank" in model_id else ModelTypeConst.EMBEDDING
+        if "vu" in caps and not (caps & {"tg", "reasoning"}):
+            return ModelTypeConst.IMAGE
+        if caps & {"tg", "reasoning"}:
+            return ModelTypeConst.LLM
+        if caps:
+            return ModelTypeConst.LLM
+
+        # 网关/OpenAI 风格返回 type 字段（无 capabilities），按其映射类型
+        item_type = str(item.get("type") or "").lower()
+        type_map = {
+            "embedding": ModelTypeConst.EMBEDDING,
+            "text": ModelTypeConst.LLM,
+            "image": ModelTypeConst.IMAGE,
+            "audio": ModelTypeConst.STT,
+            "tts": ModelTypeConst.TTS,
+            "rerank": ModelTypeConst.RERANKER,
+            "video": ModelTypeConst.TTV,
+        }
+        if item_type in type_map:
+            return type_map[item_type]
+
+        # 兜底：仅当 capabilities 缺失时按输入/输出模态推断
+        resp = {str(x).lower() for x in response_modality}
+        if any(k in resp for k in ("video",)):
+            return ModelTypeConst.ITV if "image" in req else ModelTypeConst.TTV
+        if "image" in resp:
+            return ModelTypeConst.TTI
+        if "audio" in req and "text" in resp:
+            return ModelTypeConst.STT
+        return ModelTypeConst.LLM

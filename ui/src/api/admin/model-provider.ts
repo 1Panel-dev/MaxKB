@@ -1,4 +1,4 @@
-import { get } from './core/request'
+import { get, post } from './core/request'
 import type { BaseModelOption, DynamicFormField, ModelProviderItem, ModelTypeOption } from '@/api/types'
 
 const prefix = '/provider'
@@ -23,9 +23,19 @@ const getModelTypeList = (provider: string) => {
   return get<ModelTypeOption[]>(`${prefix}/model_type_list`, { provider })
 }
 
-/** 获取供应商指定类型下的基础模型。 */
-const getBaseModelList = (provider: string, modelType: string) => {
-  return get<BaseModelOption[]>(`${prefix}/model_list`, { model_type: modelType, provider })
+/** 获取供应商指定类型下的基础模型，可携带 search 远程筛选；提供凭证时后端实时查询官方模型列表。 */
+const getBaseModelList = (provider: string, modelType: string, search?: string, credential?: Record<string, unknown>) => {
+  // 携带凭证时走 POST body，避免 api_key 泄露到 URL/访问日志。
+  if (credential && Object.keys(credential).length > 0) {
+    return post<Record<string, unknown>, BaseModelOption[]>(`${prefix}/model_list`, {
+      model_type: modelType,
+      provider,
+      search,
+      ...credential,
+      credential,
+    })
+  }
+  return get<BaseModelOption[]>(`${prefix}/model_list`, { model_type: modelType, provider, search })
 }
 
 export default { getBaseModelList, getBaseModelParamsForm, getModelCreateForm, getModelTypeList, getProviderList }

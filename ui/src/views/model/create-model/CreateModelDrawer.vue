@@ -8,7 +8,7 @@ import ProviderApi from '@/api/admin/model-provider'
 import { MODEL_TYPE_LABELS } from '@/constants/model'
 import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
 import { useStore } from '@/stores'
-import { MsgSuccess } from '@/utils/message'
+import { MsgSuccess, MsgWarning } from '@/utils/message'
 import ModelAdvancedSettings from '@/views/model/advanced-settings-table/AdvancedSettingsTable.vue'
 
 defineOptions({ name: 'CreateModelDrawer' })
@@ -80,8 +80,31 @@ function loadModelProviders() {
 const dynamicsFormRef = ref<InstanceType<typeof MkDynamicsForm>>()
 const dynamicsLoading = ref(false)
 const baseModelOptions = ref<BaseModelOption[]>([])
+const baseModelLoading = ref(false)
 const credentialFields = ref<FormField[]>([])
 const modelParamsForm = ref<DynamicFormField[]>([])
+function fetchBaseModelOptions() {
+  if (!modelForm.provider || !modelForm.model_type) return
+  baseModelLoading.value = true
+  const loadBuiltin = () =>
+    ProviderApi.getBaseModelList(modelForm.provider, modelForm.model_type).then((options) => {
+      baseModelOptions.value = options
+      MsgWarning('未获取到官方模型列表，已展示内置常用模型')
+    })
+  ProviderApi.getBaseModelList(modelForm.provider, modelForm.model_type, undefined, modelForm.credential as Record<string, unknown>)
+    .then((options) => {
+      if (options?.length) {
+        baseModelOptions.value = options
+      } else {
+        return loadBuiltin()
+      }
+    })
+    .catch(() => loadBuiltin())
+    .finally(() => {
+      baseModelLoading.value = false
+    })
+}
+
 function handleModelTypeChange() {
   modelForm.model_name = ''
   modelForm.credential = {}
@@ -91,10 +114,12 @@ function handleModelTypeChange() {
   void dynamicsFormRef.value?.render([], modelFormData.value)
   if (!modelForm.model_type) return
 
+  // 选择模型类型后立即展示 API URL / API Key 等凭证表单（取该类型默认凭证）。
   dynamicsLoading.value = true
-  ProviderApi.getBaseModelList(modelForm.provider, modelForm.model_type)
-    .then((options) => {
-      baseModelOptions.value = options
+  ProviderApi.getModelCreateForm(modelForm.provider, modelForm.model_type, '')
+    .then((fields) => {
+      credentialFields.value = fields
+      return dynamicsFormRef.value?.render(fields, modelFormData.value)
     })
     .finally(() => {
       dynamicsLoading.value = false
@@ -102,7 +127,7 @@ function handleModelTypeChange() {
 }
 
 function handleBaseModelChange() {
-  modelForm.credential = {}
+  // 切换基础模型时保留已填写的凭证参数（同供应商/类型下字段一致，直接沿用）。
   credentialFields.value = []
   modelParamsForm.value = []
   void dynamicsFormRef.value?.render([], modelFormData.value)
@@ -273,6 +298,15 @@ defineExpose({ open })
                   <el-option v-for="option in modelTypeOptions" :key="option.value" :label="option.key" :value="option.value" />
                 </el-select>
               </el-form-item>
+            </template>
+
+            <template #after>
+              <el-alert type="info" :closable="false" class="mb-3">
+                <template #title>
+                  先填写上方 API URL / API
+                  Key，再点击「获取模型」同步官方全部模型；未获取时展示内置常用模型。列表中未列出的模型，直接输入模型名称，回车即可添加。
+                </template>
+              </el-alert>
 
               <el-form-item
                 class="mk-hide-asterisk"
@@ -280,9 +314,22 @@ defineExpose({ open })
                 :rules="{ required: true, message: '请选择基础模型，自定义输入基础模型后回车即可', trigger: 'change' }"
               >
                 <template #label>
-                  <span class="inline-flex items-center gap-2">
-                    <span class="mk-required">基础模型</span>
-                    <span class="text-warning">列表中未列出的模型，直接输入模型名称，回车即可添加</span>
+                  <span class="inline-flex w-full items-center gap-2">
+                    <span class="inline-flex items-center gap-2">
+                      <span class="mk-required">基础模型</span>
+                      <span class="text-warning">列表中未列出的模型，直接输入模型名称，回车即可添加</span>
+                    </span>
+                    <el-button
+                      class="ml-auto"
+                      link
+                      type="primary"
+                      :disabled="!modelForm.provider || !modelForm.model_type"
+                      :loading="baseModelLoading"
+                      @click="fetchBaseModelOptions()"
+                    >
+                      <MkIcon name="icon_refresh_outlined" class="mr-1"></MkIcon>
+                      获取模型
+                    </el-button>
                   </span>
                 </template>
                 <el-select
@@ -291,7 +338,8 @@ defineExpose({ open })
                   class="w-full"
                   default-first-option
                   filterable
-                  placeholder="请选择基础模型，自定义输入基础模型后回车即可"
+                  :loading="baseModelLoading"
+                  placeholder="请先点击「获取模型」加载列表，或直接输入模型名称后回车"
                   @change="handleBaseModelChange"
                 >
                   <el-option v-for="option in baseModelOptions" :key="option.name" :label="option.name" :value="option.name">

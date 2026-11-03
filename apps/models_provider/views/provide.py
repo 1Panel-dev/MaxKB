@@ -1,9 +1,8 @@
 # coding=utf-8
 
+
 from common import result
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
-from common.auth.constants.permission_constants import PermissionConstants
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from models_provider.api.provide import ProvideApi
@@ -73,11 +72,49 @@ class Provide(APIView):
             responses=ProvideApi.ModelList.get_response(),
             tags=[_("Model")],  # type: ignore
         )
-        def get(self, request: Request):
-            provider = request.query_params.get("provider")
-            model_type = request.query_params.get("model_type")
+        @staticmethod
+        def _get_model_list(provider, model_type, api_key, api_base, credential, search):
+            model_list = ModelProvideConstants[provider].get_model_list(
+                model_type,
+                api_key=api_key,
+                api_base=api_base,
+                credential=credential,
+            )
+            if search:
+                search = str(search).strip().lower()
+                model_list = [
+                    model
+                    for model in model_list
+                    if search in str(model.get("name", "")).lower() or search in str(model.get("desc", "")).lower()
+                ]
+            return model_list
 
-            return result.success(ModelProvideConstants[provider].get_model_list(model_type))
+        def get(self, request: Request):
+            """内置列表查询；带凭证的查询必须走 POST，避免 api_key 出现在 URL/访问日志中。"""
+            return result.success(
+                self._get_model_list(
+                    request.query_params.get("provider"),
+                    request.query_params.get("model_type"),
+                    None,
+                    None,
+                    None,
+                    request.query_params.get("search"),
+                )
+            )
+
+        def post(self, request: Request):
+            """携带凭证的查询走 POST，避免 api_key 出现在 URL/访问日志中。"""
+            data = request.data or {}
+            return result.success(
+                self._get_model_list(
+                    data.get("provider"),
+                    data.get("model_type"),
+                    data.get("api_key"),
+                    data.get("api_base"),
+                    data.get("credential"),
+                    data.get("search"),
+                )
+            )
 
     class ModelParamsForm(APIView):
         authentication_classes = [TokenAuth]

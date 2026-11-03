@@ -352,5 +352,6 @@ defineExpose({ initDefaultData: initializeFieldDefault, render, ruleFormRef, val
         @change-label="changeFieldLabel(field, $event)"
       />
     </template>
+    <slot name="after" />
   </el-form>
 </template>

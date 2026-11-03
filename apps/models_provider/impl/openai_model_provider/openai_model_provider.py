@@ -195,6 +195,8 @@ model_info_manage = (
 
 
 class OpenAIModelProvider(IModelProvider):
+    dynamic_default_api_base = "https://api.openai.com/v1"
+
     def get_model_info_manage(self):
         return model_info_manage
 
