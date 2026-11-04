@@ -541,7 +541,7 @@ class PermissionConstants(Enum):
 
     # ==================== 知识库 ====================
     KNOWLEDGE_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.READ, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.READ, bit_index=0),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
@@ -551,7 +551,7 @@ class PermissionConstants(Enum):
     )
 
     KNOWLEDGE_CREATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.CREATE, bit_index=2),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
@@ -561,101 +561,101 @@ class PermissionConstants(Enum):
     )
 
     KNOWLEDGE_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.EDIT, bit_index=3),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.EDIT, bit_index=2),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_DELETE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.DELETE, bit_index=4),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.DELETE, bit_index=3),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_SYNC = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.SYNC, bit_index=5),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.SYNC, bit_index=4),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_EXPORT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.EXPORT, bit_index=6),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.EXPORT, bit_index=5),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_VECTOR = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.VECTOR, bit_index=7),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.VECTOR, bit_index=6),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_GENERATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.GENERATE, bit_index=8),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.GENERATE, bit_index=7),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_BATCH_DELETE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.BATCH_DELETE, bit_index=9),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.BATCH_DELETE, bit_index=8),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_BATCH_MOVE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.BATCH_MOVE, bit_index=10),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.BATCH_MOVE, bit_index=9),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_RESOURCE_AUTHORIZATION = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.AUTH, bit_index=11),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.AUTH, bit_index=10),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_RELATE_RESOURCE_VIEW = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.RELATE_VIEW, bit_index=12),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.RELATE_VIEW, bit_index=11),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
@@ -666,12 +666,12 @@ class PermissionConstants(Enum):
             group=Group.KNOWLEDGE,
             sub_group=Group.KNOWLEDGE,
             operate=Operate.MCP_CONFIG,
-            bit_index=13,
+            bit_index=12,
         ),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         ),
     )
@@ -681,142 +681,142 @@ class PermissionConstants(Enum):
             group=Group.KNOWLEDGE,
             sub_group=Group.KNOWLEDGE,
             operate=Operate.EXPORT_SKILLS,
-            bit_index=14,
+            bit_index=13,
         ),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.READ, bit_index=14),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         ),
     )
 
     KNOWLEDGE_IMAGE_CREATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.CREATE, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.CREATE, bit_index=15),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.EDIT, bit_index=2),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.EDIT, bit_index=16),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_DELETE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.DELETE, bit_index=3),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.DELETE, bit_index=17),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_DOWNLOAD_SOURCE_FILE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.DOWNLOAD, bit_index=4),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.DOWNLOAD, bit_index=18),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_GENERATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.GENERATE, bit_index=5),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.GENERATE, bit_index=19),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_VECTOR = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.VECTOR, bit_index=6),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.VECTOR, bit_index=20),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_MIGRATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.MIGRATE, bit_index=7),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.MIGRATE, bit_index=21),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_TAG = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.TAG, bit_index=8),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.TAG, bit_index=22),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_REPLACE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.REPLACE, bit_index=9),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.REPLACE, bit_index=23),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_IMAGE_TOKEN = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.TOKEN, bit_index=10),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.TOKEN, bit_index=24),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_SCHEDULED_SYNC_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.SCHEDULED_SYNC, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.SCHEDULED_SYNC, operate=Operate.READ, bit_index=25),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         ),
     )
 
     KNOWLEDGE_SCHEDULED_SYNC_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.SCHEDULED_SYNC, operate=Operate.EDIT, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.SCHEDULED_SYNC, operate=Operate.EDIT, bit_index=26),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
@@ -826,12 +826,12 @@ class PermissionConstants(Enum):
             group=Group.KNOWLEDGE,
             sub_group=Group.DOCUMENT_STRATEGY,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=27,
         ),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         ),
     )
@@ -841,32 +841,32 @@ class PermissionConstants(Enum):
             group=Group.KNOWLEDGE,
             sub_group=Group.DOCUMENT_STRATEGY,
             operate=Operate.EDIT,
-            bit_index=1,
+            bit_index=28,
         ),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_EXTERNAL_SERVICE_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.EXTERNAL_SERVICE, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.EXTERNAL_SERVICE, operate=Operate.READ, bit_index=29),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         ),
     )
 
     KNOWLEDGE_EXTERNAL_SERVICE_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.EXTERNAL_SERVICE, operate=Operate.EDIT, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.EXTERNAL_SERVICE, operate=Operate.EDIT, bit_index=30),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
@@ -876,12 +876,12 @@ class PermissionConstants(Enum):
             group=Group.KNOWLEDGE,
             sub_group=Group.KNOWLEDGE_SETTING,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=31,
         ),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         ),
     )
@@ -891,401 +891,410 @@ class PermissionConstants(Enum):
             group=Group.KNOWLEDGE,
             sub_group=Group.KNOWLEDGE_SETTING,
             operate=Operate.EDIT,
-            bit_index=1,
+            bit_index=32,
         ),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     # ==================== 知识库文件夹 ====================
     KNOWLEDGE_FOLDER_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.READ, bit_index=33),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         ),
     )
 
     KNOWLEDGE_FOLDER_CREATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.CREATE, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.CREATE, bit_index=34),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_FOLDER_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.EDIT, bit_index=2),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.EDIT, bit_index=35),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_FOLDER_DELETE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.DELETE, bit_index=3),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.DELETE, bit_index=36),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_FOLDER_AUTH = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.AUTH, bit_index=4),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.AUTH, bit_index=37),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     # ==================== 知识库工作流 ====================
     KNOWLEDGE_WORKFLOW_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.READ, bit_index=38),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         ),
     )
 
     KNOWLEDGE_WORKFLOW_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.EDIT, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.EDIT, bit_index=39),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_WORKFLOW_EXPORT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.EXPORT, bit_index=2),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.EXPORT, bit_index=40),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     KNOWLEDGE_WORKFLOW_PUBLISH = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.PUBLISH, bit_index=3),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.PUBLISH, bit_index=41),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
         ),
     )
 
     # ==================== 知识库文档 ====================
     KNOWLEDGE_DOCUMENT_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.READ, bit_index=42),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_CREATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.CREATE, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.CREATE, bit_index=43),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.EDIT, bit_index=2),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.EDIT, bit_index=44),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_DELETE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.DELETE, bit_index=3),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.DELETE, bit_index=45),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_SYNC = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.SYNC, bit_index=4),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.SYNC, bit_index=46),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_EXPORT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.EXPORT, bit_index=5),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.EXPORT, bit_index=47),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.DOWNLOAD, bit_index=6),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.DOWNLOAD, bit_index=48),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_GENERATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.GENERATE, bit_index=7),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.GENERATE, bit_index=49),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_VECTOR = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.VECTOR, bit_index=8),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.VECTOR, bit_index=50),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_MIGRATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.MIGRATE, bit_index=9),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.MIGRATE, bit_index=51),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_TAG = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.TAG, bit_index=10),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.TAG, bit_index=52),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_REPLACE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.REPLACE, bit_index=11),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.REPLACE, bit_index=53),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_DOCUMENT_TOKEN = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.TOKEN, bit_index=12),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.TOKEN, bit_index=54),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     # ==================== 知识库命中测试 ====================
     KNOWLEDGE_HIT_TEST = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.HIT_TEST, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.HIT_TEST, operate=Operate.READ, bit_index=55),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     # ==================== 知识库问题 ====================
     KNOWLEDGE_PROBLEM_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.READ, bit_index=56),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_PROBLEM_CREATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.CREATE, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.CREATE, bit_index=57),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE],
         ),
     )
 
     KNOWLEDGE_PROBLEM_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.EDIT, bit_index=2),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.EDIT, bit_index=58),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_PROBLEM_DELETE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.DELETE, bit_index=3),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.DELETE, bit_index=59),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_PROBLEM_RELATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.RELATE, bit_index=4),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.RELATE, bit_index=60),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     # ==================== 知识库术语库 ====================
     KNOWLEDGE_TERMBASE_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.READ, bit_index=61),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_TERMBASE_CREATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.CREATE, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.CREATE, bit_index=62),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE],
         ),
     )
 
     KNOWLEDGE_TERMBASE_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.EDIT, bit_index=2),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.EDIT, bit_index=63),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_TERMBASE_DELETE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.DELETE, bit_index=3),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.DELETE, bit_index=64),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
+        ),
+    )
+    KNOWLEDGE_TERMBASE_EXPORT = (
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.EXPORT, bit_index=65),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     # ==================== 知识库标签 ====================
     KNOWLEDGE_TAG_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.READ, bit_index=66),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_TAG_CREATE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.CREATE, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.CREATE, bit_index=67),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE],
         ),
     )
 
     KNOWLEDGE_TAG_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.EDIT, bit_index=2),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.EDIT, bit_index=68),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_TAG_DELETE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.DELETE, bit_index=3),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.DELETE, bit_index=69),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     # ==================== 知识库对话用户 ====================
     KNOWLEDGE_CHAT_USER_READ = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.CHAT_USER, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.CHAT_USER, operate=Operate.READ, bit_index=70),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
     KNOWLEDGE_CHAT_USER_EDIT = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.CHAT_USER, operate=Operate.EDIT, bit_index=1),
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.CHAT_USER, operate=Operate.EDIT, bit_index=71),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
@@ -2439,7 +2448,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_WORKFLOW,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=10,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2454,7 +2463,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_WORKFLOW,
             operate=Operate.EDIT,
-            bit_index=1,
+            bit_index=11,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2469,7 +2478,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_WORKFLOW,
             operate=Operate.EXPORT,
-            bit_index=2,
+            bit_index=12,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2484,7 +2493,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_WORKFLOW,
             operate=Operate.PUBLISH,
-            bit_index=3,
+            bit_index=13,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2500,7 +2509,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=14,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2515,7 +2524,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.CREATE,
-            bit_index=1,
+            bit_index=15,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2530,7 +2539,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.EDIT,
-            bit_index=2,
+            bit_index=16,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2545,7 +2554,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.DELETE,
-            bit_index=3,
+            bit_index=17,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2560,7 +2569,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.SYNC,
-            bit_index=4,
+            bit_index=18,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2575,7 +2584,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.EXPORT,
-            bit_index=5,
+            bit_index=19,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2590,7 +2599,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.DOWNLOAD,
-            bit_index=6,
+            bit_index=20,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2605,7 +2614,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.GENERATE,
-            bit_index=7,
+            bit_index=21,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2620,7 +2629,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.VECTOR,
-            bit_index=8,
+            bit_index=22,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2635,7 +2644,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.MIGRATE,
-            bit_index=9,
+            bit_index=23,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2650,7 +2659,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.TAG,
-            bit_index=10,
+            bit_index=24,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2665,7 +2674,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.REPLACE,
-            bit_index=11,
+            bit_index=25,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2680,7 +2689,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_DOCUMENT,
             operate=Operate.TOKEN,
-            bit_index=12,
+            bit_index=26,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2693,7 +2702,7 @@ class PermissionConstants(Enum):
     # 共享知识库标签
     SHARED_KNOWLEDGE_TAG_READ = (
         Permission(
-            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.READ, bit_index=0
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.READ, bit_index=27
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2705,7 +2714,7 @@ class PermissionConstants(Enum):
 
     SHARED_KNOWLEDGE_TAG_CREATE = (
         Permission(
-            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.CREATE, bit_index=1
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.CREATE, bit_index=28
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2717,7 +2726,7 @@ class PermissionConstants(Enum):
 
     SHARED_KNOWLEDGE_TAG_EDIT = (
         Permission(
-            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.EDIT, bit_index=2
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.EDIT, bit_index=29
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2729,7 +2738,7 @@ class PermissionConstants(Enum):
 
     SHARED_KNOWLEDGE_TAG_DELETE = (
         Permission(
-            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.DELETE, bit_index=3
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_TAG, operate=Operate.DELETE, bit_index=30
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2745,7 +2754,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_PROBLEM,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=31,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2760,7 +2769,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_PROBLEM,
             operate=Operate.CREATE,
-            bit_index=1,
+            bit_index=32,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2775,7 +2784,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_PROBLEM,
             operate=Operate.EDIT,
-            bit_index=2,
+            bit_index=33,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2790,7 +2799,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_PROBLEM,
             operate=Operate.DELETE,
-            bit_index=3,
+            bit_index=34,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2805,7 +2814,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_PROBLEM,
             operate=Operate.RELATE,
-            bit_index=4,
+            bit_index=35,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2821,7 +2830,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_TERMBASE,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=36,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2836,7 +2845,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_TERMBASE,
             operate=Operate.CREATE,
-            bit_index=1,
+            bit_index=37,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2851,7 +2860,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_TERMBASE,
             operate=Operate.EDIT,
-            bit_index=2,
+            bit_index=38,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2866,7 +2875,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_TERMBASE,
             operate=Operate.DELETE,
-            bit_index=3,
+            bit_index=39,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2881,7 +2890,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_TERMBASE,
             operate=Operate.EXPORT,
-            bit_index=4,
+            bit_index=40,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2897,7 +2906,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_HIT_TEST,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=41,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2913,7 +2922,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_CHAT_USER,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=42,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -2928,7 +2937,286 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_SHARED_KNOWLEDGE,
             sub_group=Group.SYSTEM_SHARED_CHAT_USER,
             operate=Operate.EDIT,
-            bit_index=1,
+            bit_index=43,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_READ = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_IMAGE, operate=Operate.READ, bit_index=44
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_CREATE = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_IMAGE,
+            operate=Operate.CREATE,
+            bit_index=45,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_EDIT = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_IMAGE, operate=Operate.EDIT, bit_index=46
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_DELETE = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_IMAGE,
+            operate=Operate.DELETE,
+            bit_index=47,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_DOWNLOAD_SOURCE_FILE = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_IMAGE,
+            operate=Operate.DOWNLOAD,
+            bit_index=48,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_GENERATE = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_IMAGE,
+            operate=Operate.GENERATE,
+            bit_index=49,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_VECTOR = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_IMAGE,
+            operate=Operate.VECTOR,
+            bit_index=50,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_MIGRATE = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_IMAGE,
+            operate=Operate.MIGRATE,
+            bit_index=51,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_TAG = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE, sub_group=Group.SYSTEM_SHARED_IMAGE, operate=Operate.TAG, bit_index=52
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_REPLACE = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_IMAGE,
+            operate=Operate.REPLACE,
+            bit_index=53,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_IMAGE_TOKEN = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_IMAGE,
+            operate=Operate.TOKEN,
+            bit_index=54,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    # 共享知识库外部检索服务
+    SHARED_KNOWLEDGE_EXTERNAL_SERVICE_READ = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_EXTERNAL_SERVICE,
+            operate=Operate.READ,
+            bit_index=55,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_EXTERNAL_SERVICE_EDIT = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_EXTERNAL_SERVICE,
+            operate=Operate.EDIT,
+            bit_index=56,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    # 共享知识库设置
+    SHARED_KNOWLEDGE_SETTING_READ = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE_SETTING,
+            operate=Operate.READ,
+            bit_index=57,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+    SHARED_KNOWLEDGE_SETTING_EDIT = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE_SETTING,
+            operate=Operate.EDIT,
+            bit_index=58,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    # 共享知识库文档处理策略
+    SHARED_KNOWLEDGE_DOCUMENT_STRATEGY_READ = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT_STRATEGY,
+            operate=Operate.READ,
+            bit_index=59,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_DOCUMENT_STRATEGY_EDIT = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_DOCUMENT_STRATEGY,
+            operate=Operate.EDIT,
+            bit_index=60,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    # 共享知识库定时同步
+    SHARED_KNOWLEDGE_SCHEDULED_SYNC_READ = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_SCHEDULED_SYNC,
+            operate=Operate.READ,
+            bit_index=61,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_SCHEDULED_SYNC_EDIT = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_SCHEDULED_SYNC,
+            operate=Operate.EDIT,
+            bit_index=62,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3554,7 +3842,7 @@ class PermissionConstants(Enum):
     # 资源管理 - 知识库工作流
     RESOURCE_KNOWLEDGE_WORKFLOW_READ = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.READ, bit_index=0
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.READ, bit_index=10
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3566,7 +3854,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_WORKFLOW_EDIT = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EDIT, bit_index=1
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EDIT, bit_index=11
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3578,7 +3866,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_WORKFLOW_EXPORT = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EXPORT, bit_index=2
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EXPORT, bit_index=12
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3590,7 +3878,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_WORKFLOW_PUBLISH = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.PUBLISH, bit_index=3
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.PUBLISH, bit_index=13
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3603,7 +3891,7 @@ class PermissionConstants(Enum):
     # 资源管理 - 知识库文档
     RESOURCE_KNOWLEDGE_DOCUMENT_READ = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.READ, bit_index=0
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.READ, bit_index=14
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3615,7 +3903,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_CREATE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.CREATE, bit_index=1
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.CREATE, bit_index=15
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3627,7 +3915,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_EDIT = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EDIT, bit_index=2
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EDIT, bit_index=16
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3639,7 +3927,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_DELETE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DELETE, bit_index=3
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DELETE, bit_index=17
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3651,7 +3939,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_SYNC = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.SYNC, bit_index=4
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.SYNC, bit_index=18
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3663,7 +3951,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_EXPORT = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EXPORT, bit_index=5
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EXPORT, bit_index=19
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3675,7 +3963,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DOWNLOAD, bit_index=6
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DOWNLOAD, bit_index=20
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3687,7 +3975,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_GENERATE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.GENERATE, bit_index=7
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.GENERATE, bit_index=21
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3699,7 +3987,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_VECTOR = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.VECTOR, bit_index=8
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.VECTOR, bit_index=22
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3711,7 +3999,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_MIGRATE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.MIGRATE, bit_index=9
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.MIGRATE, bit_index=23
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3723,7 +4011,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_TAG = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TAG, bit_index=10
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TAG, bit_index=24
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3735,7 +4023,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_REPLACE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.REPLACE, bit_index=11
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.REPLACE, bit_index=25
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3747,7 +4035,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_DOCUMENT_TOKEN = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TOKEN, bit_index=12
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TOKEN, bit_index=26
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3760,7 +4048,7 @@ class PermissionConstants(Enum):
     # 资源管理 - 知识库命中测试
     RESOURCE_KNOWLEDGE_HIT_TEST = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_HIT_TEST, operate=Operate.READ, bit_index=0
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_HIT_TEST, operate=Operate.READ, bit_index=27
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3772,7 +4060,9 @@ class PermissionConstants(Enum):
 
     # 资源管理 - 知识库问题
     RESOURCE_KNOWLEDGE_PROBLEM_READ = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.READ, bit_index=0),
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.READ, bit_index=28
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -3783,7 +4073,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_PROBLEM_CREATE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.CREATE, bit_index=1
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.CREATE, bit_index=29
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3794,7 +4084,9 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_PROBLEM_EDIT = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.EDIT, bit_index=2),
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.EDIT, bit_index=30
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -3805,7 +4097,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_PROBLEM_DELETE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.DELETE, bit_index=3
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.DELETE, bit_index=31
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3817,7 +4109,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_PROBLEM_RELATE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.RELATE, bit_index=4
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.RELATE, bit_index=32
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3830,7 +4122,7 @@ class PermissionConstants(Enum):
     # 资源管理 - 知识库术语库
     RESOURCE_KNOWLEDGE_TERMBASE_READ = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.READ, bit_index=0
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.READ, bit_index=33
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3842,7 +4134,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_TERMBASE_CREATE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.CREATE, bit_index=1
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.CREATE, bit_index=34
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3854,7 +4146,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_TERMBASE_EDIT = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EDIT, bit_index=2
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EDIT, bit_index=35
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3866,7 +4158,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_TERMBASE_DELETE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.DELETE, bit_index=3
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.DELETE, bit_index=36
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3878,7 +4170,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_TERMBASE_EXPORT = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EXPORT, bit_index=4
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EXPORT, bit_index=37
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3890,7 +4182,7 @@ class PermissionConstants(Enum):
 
     # 资源管理 - 知识库标签
     RESOURCE_KNOWLEDGE_TAG_READ = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.READ, bit_index=38),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -3900,7 +4192,7 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_TAG_CREATE = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.CREATE, bit_index=1),
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.CREATE, bit_index=39),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -3910,7 +4202,7 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_TAG_EDIT = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.EDIT, bit_index=2),
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.EDIT, bit_index=40),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -3920,7 +4212,7 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_TAG_DELETE = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.DELETE, bit_index=3),
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.DELETE, bit_index=41),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -3932,7 +4224,7 @@ class PermissionConstants(Enum):
     # 资源管理 - 知识库对话用户
     RESOURCE_KNOWLEDGE_CHAT_USER_READ = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.READ, bit_index=0
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.READ, bit_index=42
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3944,7 +4236,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_CHAT_USER_EDIT = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.EDIT, bit_index=1
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.EDIT, bit_index=43
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3960,7 +4252,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_RES_KNOWLEDGE,
             sub_group=Group.SYSTEM_RES_KNOWLEDGE,
             operate=Operate.MCP_CONFIG,
-            bit_index=10,
+            bit_index=44,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3975,7 +4267,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_RES_KNOWLEDGE,
             sub_group=Group.SYSTEM_RES_KNOWLEDGE,
             operate=Operate.EXPORT_SKILLS,
-            bit_index=11,
+            bit_index=45,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3986,7 +4278,7 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_IMAGE_READ = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.READ, bit_index=0),
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.READ, bit_index=46),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -3996,7 +4288,9 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_IMAGE_CREATE = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.CREATE, bit_index=1),
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.CREATE, bit_index=47
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -4006,7 +4300,7 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_IMAGE_EDIT = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.EDIT, bit_index=2),
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.EDIT, bit_index=48),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -4016,7 +4310,9 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_IMAGE_DELETE = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.DELETE, bit_index=3),
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.DELETE, bit_index=49
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -4027,7 +4323,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_IMAGE_DOWNLOAD_SOURCE_FILE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.DOWNLOAD, bit_index=4
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.DOWNLOAD, bit_index=50
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4039,7 +4335,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_IMAGE_GENERATE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.GENERATE, bit_index=5
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.GENERATE, bit_index=51
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4050,7 +4346,9 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_IMAGE_VECTOR = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.VECTOR, bit_index=6),
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.VECTOR, bit_index=52
+        ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -4061,7 +4359,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_IMAGE_MIGRATE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.MIGRATE, bit_index=7
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.MIGRATE, bit_index=53
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4072,7 +4370,7 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_IMAGE_TAG = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.TAG, bit_index=8),
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.TAG, bit_index=54),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -4083,7 +4381,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_IMAGE_REPLACE = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.REPLACE, bit_index=9
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.REPLACE, bit_index=55
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4094,7 +4392,7 @@ class PermissionConstants(Enum):
     )
 
     RESOURCE_KNOWLEDGE_IMAGE_TOKEN = (
-        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.TOKEN, bit_index=10),
+        Permission(group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_IMAGE, operate=Operate.TOKEN, bit_index=56),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
             category=Category.RESOURCE,
@@ -4105,7 +4403,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_SCHEDULED_SYNC_READ = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_SCHEDULED_SYNC, operate=Operate.READ, bit_index=0
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_SCHEDULED_SYNC, operate=Operate.READ, bit_index=57
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4117,7 +4415,7 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_SCHEDULED_SYNC_EDIT = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_SCHEDULED_SYNC, operate=Operate.EDIT, bit_index=1
+            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_SCHEDULED_SYNC, operate=Operate.EDIT, bit_index=58
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4132,7 +4430,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_RES_KNOWLEDGE,
             sub_group=Group.SYSTEM_DOCUMENT_STRATEGY,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=59,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4147,7 +4445,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_RES_KNOWLEDGE,
             sub_group=Group.SYSTEM_DOCUMENT_STRATEGY,
             operate=Operate.EDIT,
-            bit_index=1,
+            bit_index=60,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4159,7 +4457,10 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_EXTERNAL_SERVICE_READ = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_EXTERNAL_SERVICE, operate=Operate.READ, bit_index=0
+            group=Group.SYSTEM_RES_KNOWLEDGE,
+            sub_group=Group.SYSTEM_EXTERNAL_SERVICE,
+            operate=Operate.READ,
+            bit_index=61,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4171,7 +4472,10 @@ class PermissionConstants(Enum):
 
     RESOURCE_KNOWLEDGE_EXTERNAL_SERVICE_EDIT = (
         Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_EXTERNAL_SERVICE, operate=Operate.EDIT, bit_index=1
+            group=Group.SYSTEM_RES_KNOWLEDGE,
+            sub_group=Group.SYSTEM_EXTERNAL_SERVICE,
+            operate=Operate.EDIT,
+            bit_index=62,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4186,7 +4490,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_RES_KNOWLEDGE,
             sub_group=Group.SYSTEM_KNOWLEDGE_SETTING,
             operate=Operate.READ,
-            bit_index=0,
+            bit_index=63,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4201,7 +4505,7 @@ class PermissionConstants(Enum):
             group=Group.SYSTEM_RES_KNOWLEDGE,
             sub_group=Group.SYSTEM_KNOWLEDGE_SETTING,
             operate=Operate.EDIT,
-            bit_index=1,
+            bit_index=64,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
