@@ -173,7 +173,6 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
         :file-count-limit="knowledge?.file_count_limit"
         :file-size-limit="knowledge?.file_size_limit"
         :loading="loading"
-        :knowledge-id="knowledgeId"
         @submit="testKnowledge"
       />
     </el-scrollbar>
