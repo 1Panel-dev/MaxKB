@@ -798,3 +798,11 @@ Workspace 和 System 资源管理的 `getKnowledgeDetail(knowledgeId, section?)`
 对应后台独立的设置／策略查看权限；普通详情会去除未授权的配置元数据。
 `getKnowledgeMcpConfig` 使用 `/<knowledgeId>/mcp_config`，仅获取 MCP 配置，独立于外部服务设置权限。
 文档和图片复用的操作接口按持久化资源类型鉴权；批量图片操作未传 `resource_type` 时由服务端解析实际类型。
+
+### 公开对话分享
+
+`chat/conversation.ts` 的 `getShareConversation(shareId)` 请求 Chat API 下的 `GET /share/<shareId>`，
+不需要 accessToken 或 applicationId。响应类型 `ChatShareDetail` 经 `@/api/types` 导出，包含
+`abstract` 和按时间正序排列的 `chat_record_list`。当前后端返回旧版 `problem_text`、
+`answer_text`、`answer_text_list` 及仅含上传附件的 `execution_details`，不返回 V3 `question`、`messages`。
+分享页适配旧版字段，不通过原会话接口补查内容。

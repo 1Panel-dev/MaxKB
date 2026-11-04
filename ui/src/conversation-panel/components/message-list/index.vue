@@ -6,15 +6,19 @@ import PrologueContent from '../prologue-content/index.vue'
 import { formatPrologue } from '../prologue-content/index'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import { useMessageListStore } from './index'
+import ShareMessageRow from './share/ShareMessageRow.vue'
+import ShareFooter from './share/ShareFooter.vue'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 defineProps<{ appName?: string }>()
 
 const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamProgress } = useMessageListStore()
-const { 
-  // 是否分享
-  isShared,
-  // 切换分享
-  switchShared } = useConversationListStore()
+const { isShared } = useConversationListStore()
+// 分享按完整问答轮次提交，提问与回答共用记录 ID。
+const selectedRecordIds = ref<string[]>([])
+const messageRecordIds = computed(() =>
+  messages.value.map((message, index) => (message.role === 'ASSISTANT' ? message.recordId : messages.value[index + 1]?.recordId)),
+)
+const availableRecordIds = computed(() => [...new Set(messageRecordIds.value.filter((id): id is string => Boolean(id)))])
 const scrollRef = ref<InstanceType<typeof ReverseInfiniteScroll>>()
 
 // 开场白随智能体信息变化（debug 保存后为最新草稿）
@@ -30,25 +34,30 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
 </script>
 
 <template>
-  <ReverseInfiniteScroll ref="scrollRef" content-class="mk-conversation-content p-4" :loading="loading"
-    :has-more="hasMore" :count="messages.length" :load-more="loadMore">
+  <ReverseInfiniteScroll
+    ref="scrollRef"
+    :content-class="`mk-conversation-content p-4 ${isShared ? 'space-y-2' : ''}`"
+    :loading="loading"
+    :has-more="hasMore"
+    :count="messages.length"
+    :load-more="loadMore"
+  >
     <template #prepend>
       <!-- 开场白在空会话或历史全部加载后显示，固定在会话最前 -->
-      <div v-if="prologue && (!messages.length || !hasMore)">
+      <div v-if="!isShared && prologue && (!messages.length || !hasMore)">
         <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
         <PrologueContent :prologue="prologue" :app-info="appInfo" class="mb-3" />
       </div>
     </template>
     <template v-for="(msg, i) in messages" :key="msg.id || i">
-      <div>
+      <ShareMessageRow :active="isShared" v-model="selectedRecordIds" :record-id="messageRecordIds[i]">
         <!-- 用户提问靠右：头像独占一行在上，提问容器在下方靠右收缩 -->
         <div v-if="msg.role === 'USER'">
           <div v-if="showUserAvatar" class="text-right">
             <el-avatar v-if="userAvatar" class="bg-transparent!" shape="square" :size="24">
               <img :src="userAvatar" alt="" />
             </el-avatar>
-            <el-avatar v-else :size="24"
-              :style="{ background: appInfo?.custom_theme?.theme_color || 'var(--mk-primary-gradient)' }">
+            <el-avatar v-else :size="24" :style="{ background: appInfo?.custom_theme?.theme_color || 'var(--mk-primary-gradient)' }">
               <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 50%" />
             </el-avatar>
           </div>
@@ -58,15 +67,16 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
           <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
           <ContentList :content-list="msg.content" />
           <!-- 助手消息结束后显示底部信息栏(知识来源/执行详情/tokens/耗时) -->
-          <MessageFooter class="mt-3" v-if="msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)" :message="msg" />
+          <MessageFooter class="mt-3" v-if="!isShared && msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)" :message="msg" />
         </template>
-      </div>
+      </ShareMessageRow>
     </template>
 
     <div v-if="streamLoading">
       <span class="mk-conversation-loading" />
     </div>
   </ReverseInfiniteScroll>
+  <ShareFooter v-if="isShared" v-model="selectedRecordIds" :record-ids="availableRecordIds" />
 </template>
 
 <style scoped lang="scss"></style>

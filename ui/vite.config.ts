@@ -9,7 +9,7 @@ import tailwindcss from '@tailwindcss/vite'
 import Components from 'unplugin-vue-components/vite'
 
 const envDir = './env'
-const defaultBackendTarget = 'http://47.120.55.164:38080/'
+const defaultBackendTarget = 'https://mkv3-ee.fit2cloud.cn/'
 const projectRoot = fileURLToPath(new URL('.', import.meta.url))
 
 const renameHtmlPlugin = (outDir: string, entry: string) => {
@@ -70,9 +70,7 @@ const devEntryFallbackPlugin = (entry: string, proxyKeys: string[], basePath?: s
 
         const acceptsHtml = req.headers.accept?.includes('text/html')
         const isAppRoute =
-          pathname === '/' ||
-          pathname === normalizedBasePath ||
-          (Boolean(normalizedBasePath) && pathname.startsWith(normalizedBasePath))
+          pathname === '/' || pathname === normalizedBasePath || (Boolean(normalizedBasePath) && pathname.startsWith(normalizedBasePath))
 
         // History 模式下，刷新任意前端路由都需要返回当前应用的 HTML 入口；
         // 该中间件先于 proxy 执行，需代理到后端的地址（如浏览器直接打开的 oss/file）不能回退。

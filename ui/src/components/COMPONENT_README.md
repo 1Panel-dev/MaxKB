@@ -966,10 +966,25 @@ Workspace API 内部使用 `getWorkspaceId()`，System 共享 API 不接收工�
 聊天列表订阅流式进度后调用 `followBottom()`；只读日志无需订阅。
 `message-list` 和 `log-message-list` 使用该容器，保留各自的消息正文与底部信息；聊天列表
 自行展示流式圆点，开场白放入 `prepend` 插槽，日志空状态放入 `empty` 插槽。日志列表不注入发送能力。
+正式对话的 `message-list` 根据会话 Store 的 `isShared` 展示分享选择态，同轮提问与回答同步选择，
+内容只读且选中时显示背景；无记录 ID 的问答不可选。列表底部提供当前已加载轮次的全选、已选数量、
+取消及创建链接，创建时按消息顺序提交记录 ID；成功退出分享，失败保留选择。分享期间主面板隐藏输入框，
+消息列表卸载时退出分享态；调试入口不提供分享服务。
+分享组件放在 `message-list/share/`：`ShareMessageRow` 通过插槽承载消息，按记录 ID 切换整轮选择；
+`ShareFooter` 负责全选、数量、取消、创建链接及退出清理。两者通过 `v-model` 共享已选记录 ID，
+各自在组件内获取分享服务与提交状态；`message-list/index.vue` 仅准备记录 ID、保存已选 ID 并组合组件。
+
 消息 Store 的 `loadMore()` 在新增历史记录时返回 `true`，空页、失败或未执行时返回 `false`，
 直接传给滚动容器。新会话及重置时 `hasMore` 为 `false`；已有会话主动加载首页，成功后再更新
 `hasMore`。首页失败后通过重新加载首页重试，不从下一页继续。
 Chat、Portal 和 Display 面板直接放置消息列表，并以当前会话 ID 为 `key`，不再包裹额外滚动层。
+
+### SharePanel（对话模块）
+
+`conversation-panel/main/share-panel/index.vue` 展示只读问答，通过 `useSharePanelContentStore()`
+读取所属视图提供的 `SHARE_PANEL_CONTENT_KEY`。正式对话视图接入当前会话数据，独立分享页
+提供公开接口返回的标题、消息及加载状态，不加载原会话历史。
+回答复制提取内容项正文，不传递内容数组给剪贴板。
 
 ## 文档维护
 

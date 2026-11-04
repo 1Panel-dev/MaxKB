@@ -34,6 +34,7 @@ const portalRoutes: RouteRecordRaw[] = [
 ]
 
 const applicationRoutes: RouteRecordRaw[] = [
+  { path: '/share/:shareId', name: 'chat-share', component: () => import('@/views/chat/share/index.vue'), meta: { title: '分享' } },
   {
     path: '/:accessToken/login',
     name: 'chat-login',
