@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { ScrollbarDirection } from 'element-plus'
-import type { Conversation } from '../../core/types'
-import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
-import RenameConversation from '../rename/index.vue'
+import type { Conversation } from '../../../../core/types'
+import { useConversationListStore } from '../../../../left-sidebar/conversation-list/index'
+import RenameConversation from '../../../rename/index.vue'
 import { relativeTimeFormat } from '@/utils/time'
 import { MsgConfirm } from '@/utils/message'
 

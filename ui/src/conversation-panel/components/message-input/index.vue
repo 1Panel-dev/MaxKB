@@ -119,13 +119,13 @@ const { recording, seconds: recordSeconds, waveLevels, start: startRecording, st
       <el-button
         v-if="speechEnabled"
         text
-        class="ml-1!"
+        class="ml-2!"
         :loading="transcribing"
         :disabled="disabled || streamLoading || transcribing"
         @click="startRecording"
       >
         <!-- todo 这块icon记得换 先用饿了么的了 -->
-        <MkIcon v-if="!transcribing"  :icon="Phone" :size="18" class="text-N900!" />
+        <MkIcon v-if="!transcribing" :icon="Phone" :size="18" class="text-N900!" />
       </el-button>
       <el-divider direction="vertical" class="ml-3! mr-4!" />
       <!-- 停止回复 -->
