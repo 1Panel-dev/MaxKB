@@ -77,11 +77,11 @@ export const PermissionConstants = {
   TOOL_TRIGGER_CREATE: p(Group.TOOL, Group.TOOL, Operate.TRIGGER_CREATE, 14),
   TOOL_TRIGGER_EDIT: p(Group.TOOL, Group.TOOL, Operate.TRIGGER_EDIT, 15),
   TOOL_TRIGGER_DELETE: p(Group.TOOL, Group.TOOL, Operate.TRIGGER_DELETE, 16),
-  TOOL_FOLDER_READ: p(Group.TOOL, Group.FOLDER, Operate.READ, 0),
-  TOOL_FOLDER_CREATE: p(Group.TOOL, Group.FOLDER, Operate.CREATE, 1),
-  TOOL_FOLDER_EDIT: p(Group.TOOL, Group.FOLDER, Operate.EDIT, 2),
-  TOOL_FOLDER_DELETE: p(Group.TOOL, Group.FOLDER, Operate.DELETE, 3),
-  TOOL_FOLDER_AUTH: p(Group.TOOL, Group.FOLDER, Operate.AUTH, 4),
+  TOOL_FOLDER_READ: p(Group.TOOL, Group.FOLDER, Operate.READ, 17),
+  TOOL_FOLDER_CREATE: p(Group.TOOL, Group.FOLDER, Operate.CREATE, 18),
+  TOOL_FOLDER_EDIT: p(Group.TOOL, Group.FOLDER, Operate.EDIT, 19),
+  TOOL_FOLDER_DELETE: p(Group.TOOL, Group.FOLDER, Operate.DELETE, 20),
+  TOOL_FOLDER_AUTH: p(Group.TOOL, Group.FOLDER, Operate.AUTH, 21),
 
   // ==================== KNOWLEDGE ====================
   KNOWLEDGE_READ: p(Group.KNOWLEDGE, Group.KNOWLEDGE, Operate.READ, 0),
