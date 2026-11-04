@@ -114,6 +114,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     sendMessage: msgs.sendMessage,
     uploadFile: msgs.uploadFile,
     stop: msgs.stop,
+    speechToText: (data) => ConversationApi.postSpeechToText(getApplicationId(), data),
     appInfo,
     // 门户首页、全部智能体页尚未确定智能体时禁止发送
     disabled: computed(() => !getApplicationId()),

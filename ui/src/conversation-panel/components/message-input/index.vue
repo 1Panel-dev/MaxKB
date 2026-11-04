@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { Phone } from '@element-plus/icons-vue'
 import { isAudio, isVideo } from '@/utils/icon'
 import { useInputEvents } from '../../core/input-events'
 import { useMessageInputStore } from './index'
 import FileCard from './file-card/index.vue'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import UserForm from './user-form/index.vue'
+import VoiceRecorder from './voice-recorder/index.vue'
+import { useVoiceRecorder } from './voice-recorder/index'
 
 const {
   question,
@@ -16,6 +19,9 @@ const {
   disabled,
   placeholder,
   canSend,
+  speechEnabled,
+  transcribing,
+  transcribe,
   imageFiles,
   addFiles,
   removeFile,
@@ -32,10 +38,15 @@ const { fileInputRef, handleFileSelect, handlePaste, handleDragover, handleDrop,
     if (canSend.value) send()
   },
 })
+
+// 语音输入：点击麦克风开始录音，点击停止后转写到输入框
+const { recording, seconds: recordSeconds, waveLevels, start: startRecording, stop: stopRecording } = useVoiceRecorder(transcribe)
 </script>
 
 <template>
-  <div class="mk-input-box mk-conversation-message-input w-full shadow-lg" @dragover="handleDragover" @drop="handleDrop" @paste="handlePaste">
+  <!-- 录音中 -->
+  <VoiceRecorder v-if="recording" :seconds="recordSeconds" :wave-levels="waveLevels" @stop="stopRecording" />
+  <div v-else class="mk-input-box mk-conversation-message-input w-full shadow-lg" @dragover="handleDragover" @drop="handleDrop" @paste="handlePaste">
     <!-- 附件按上传顺序排列，超出可视范围时显示滚动箭头。 -->
     <MkHorizontalScroll v-if="fileList.length" class="mb-3">
       <template v-for="(file, index) in fileList" :key="file.uid">
@@ -104,6 +115,18 @@ const { fileInputRef, handleFileSelect, handlePaste, handleDragover, handleDrop,
           <MkIcon name="icon_attachment_outlined" :size="18" class="text-N900!" />
         </el-button>
       </MkTooltip>
+      <!-- 语音输入：点击开始录音 -->
+      <el-button
+        v-if="speechEnabled"
+        text
+        class="ml-1!"
+        :loading="transcribing"
+        :disabled="disabled || streamLoading || transcribing"
+        @click="startRecording"
+      >
+        <!-- todo 这块icon记得换 先用饿了么的了 -->
+        <MkIcon v-if="!transcribing"  :icon="Phone" :size="18" class="text-N900!" />
+      </el-button>
       <el-divider direction="vertical" class="ml-3! mr-4!" />
       <!-- 停止回复 -->
       <el-button v-if="streamLoading" circle type="primary" @click="stop">

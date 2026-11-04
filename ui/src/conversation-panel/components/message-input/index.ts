@@ -49,6 +49,8 @@ export interface MessageInputDeps {
   sendMessage: (opts: SendMessageOptions) => void
   uploadFile: (file: File, chatId: string, onProgress?: (percent: number) => void) => Promise<string>
   stop: () => void
+  /** 语音转文字，表单字段 file 为录音文件；不传时不显示语音输入。 */
+  speechToText?: (data: FormData) => Promise<unknown>
   /** 当前智能体信息：只读，由 view 加载维护。 */
   appInfo: Readonly<Ref<ConversationAppInfo | null>>
   /** 禁用输入与发送，如门户没有可用智能体时；不传时始终可用。 */
@@ -78,8 +80,13 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   // TODO 格式 不行
   const acceptList = [...IMAGE_EXTENSIONS, ...DOCUMENT_EXTENSIONS, ...VIDEO_EXTENSIONS, ...AUDIO_EXTENSIONS].map((e) => `.${e}`).join(',')
 
+  // 语音输入：智能体开启语音转文字且当前模式提供接口时可用
+  const transcribing = ref(false)
+  const speechEnabled = computed(() => !!deps.speechToText && !!appInfo.value?.stt_model_enable)
+
   const placeholder = computed(() => {
     if (disabled.value) return '暂无可用智能体'
+    if (transcribing.value) return '语音转文字中...'
     return streamLoading.value ? '正在回复中...' : '输入消息...'
   })
   // 附件上传完成前不能发送，否则消息中的附件没有地址
@@ -90,6 +97,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       (question.value.trim().length > 0 || fileList.value.length > 0) &&
       !streamLoading.value &&
       !sending.value &&
+      !transcribing.value &&
       attachmentsReady.value,
   )
 
@@ -231,6 +239,29 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     }
   }
 
+  /** 录音转写后追加到输入框；智能体开启自动发送时直接发送。切换会话后丢弃旧结果。 */
+  const transcribe = (audio: Blob) => {
+    if (!deps.speechToText || transcribing.value) return
+    const resetSignal = composerResetSignal.value
+    const formData = new FormData()
+    formData.append('file', audio, 'recording.mp3')
+    transcribing.value = true
+    deps
+      .speechToText(formData)
+      .then((result) => {
+        if (resetSignal !== composerResetSignal.value) return
+        const text = typeof result === 'string' ? result.trim() : ''
+        if (!text) return MsgError('未识别到语音内容')
+        question.value = question.value ? `${question.value} ${text}` : text
+        transcribing.value = false
+        if (appInfo.value?.stt_autosend) void send()
+      })
+      .catch(() => {})
+      .finally(() => {
+        transcribing.value = false
+      })
+  }
+
   /** 由开场白、回答中的快捷问题或 HTML 渲染发起提问；不读取也不清空输入框与暂存附件。 */
   const sendQuestion = (content: string, options: QuestionOptions = {}) => {
     if (disabled.value || streamLoading.value || sending.value || !content.trim()) return
@@ -261,6 +292,9 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     disabled,
     placeholder,
     canSend,
+    speechEnabled,
+    transcribing,
+    transcribe,
     imageFiles,
     addFile,
     addFiles,
