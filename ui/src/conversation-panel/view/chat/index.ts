@@ -55,6 +55,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
   const { user } = useStore()
 
   const api: ConversationApiAdapter = {
+    feedback: (cid, rid, data) => ConversationApi.putConversationFeedback(getApplicationId(), cid, rid, data),
     // 门户首页尚未确定智能体时没有会话可加载
     pageConversations: (p, s) =>
       getApplicationId() ? ConversationApi.getConversationPage(getApplicationId(), p, s) : Promise.resolve({ records: [] }),
@@ -82,6 +83,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     appInfo,
   })
   const msgs = createMessageListStore({
+    feedback: api.feedback,
     pageRecords: api.pageRecords,
     recordDetail: api.recordDetail,
     chatMessage: api.chatMessage,

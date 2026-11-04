@@ -45,7 +45,7 @@ export interface ChatContent {
 }
 
 /** 对话日志中的单条问答记录，仅列出前端使用的字段。 */
-export interface ChatLogRecord {
+export interface ChatLogRecord extends Partial<ChatFeedback> {
   id: string
   create_time?: string
   /** 提问内容项 */
@@ -57,4 +57,11 @@ export interface ChatLogRecord {
   run_time?: number
   paragraph_list?: Dict<unknown>[]
   execution_details?: Dict<unknown>[]
+}
+
+/** 对话反馈：-1 未评价，0 满意，1 不满意。 */
+export interface ChatFeedback {
+  vote_status: '-1' | '0' | '1'
+  vote_reason?: 'accurate' | 'complete' | 'inaccurate' | 'incomplete' | 'other' | null
+  vote_other_content?: string
 }

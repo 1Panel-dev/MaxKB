@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+// import Feedback from './feedback/index.vue'
 import type { ChatContent } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
 import { datetimeFormat } from '@/utils/time'
@@ -60,15 +61,15 @@ const openExecutionDetail = () => {
       </template>
     </div>
     <!-- 其他操作 -->
-    <div class="flex-align-center gap-2">
+    <div class="flex-align-center flex-wrap gap-2">
       <!-- 复制回答正文 -->
       <MkTooltip content="复制">
         <el-button text class="-ml-1" :disabled="!answerText" @click="copyText(answerText)">
           <MkIcon name="icon_copy_outlined" />
         </el-button>
       </MkTooltip>
+      <!-- <Feedback :message="message" /> -->
       <span v-if="meta.createTime" class="text-N600">{{ datetimeFormat(meta.createTime) }}</span>
     </div>
-    <div></div>
   </div>
 </template>
