@@ -7,13 +7,13 @@ import { KNOWLEDGE_IMAGE_EXTENSIONS, KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_TYP
 import { MsgWarning } from '@/utils/message'
 import { useInputEvents } from '@/conversation-panel/core/input-events'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
-import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 /**
  * 知识库「召回测试」权限判断
  */
-type KnowledgeHitTestPermissionMethod = | 'hitTest'
+type KnowledgeHitTestPermissionMethod = 'hitTest'
 
 function knowledgeHitTestPermission(method: KnowledgeHitTestPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
