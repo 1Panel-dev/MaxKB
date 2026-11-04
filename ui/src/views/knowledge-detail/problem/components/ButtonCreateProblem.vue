@@ -2,6 +2,20 @@
 import { computed, ref } from 'vue'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「问题」权限判断
+ */
+type KnowledgeProblemPermissionMethod = 'problemCreate'
+
+function knowledgeProblemPermission(method: KnowledgeProblemPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'ButtonCreateProblem' })
 const emit = defineEmits<{ refresh: [] }>()
@@ -49,7 +63,7 @@ function handleBeforeClose(done: () => void) {
 
 <template>
   <!-- 创建问题 -->
-  <el-button type="primary" @click="handleOpenCreateProblem">
+  <el-button v-if="knowledgeProblemPermission('problemCreate')" type="primary" @click="handleOpenCreateProblem">
     <MkIcon name="icon_add_outlined" />
     <span>创建问题</span>
   </el-button>

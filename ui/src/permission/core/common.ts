@@ -92,6 +92,21 @@ export enum Group {
   SYSTEM_ACCESS = 'SYSTEM_ACCESS',
   SYSTEM_CHAT_LOG = 'SYSTEM_CHAT_LOG',
   CHAT = 'CHAT',
+  SYSTEM_SHARED_TOOL = 'SYSTEM_SHARED_TOOL',
+  SYSTEM_SHARED_KNOWLEDGE = 'SYSTEM_SHARED_KNOWLEDGE',
+  SYSTEM_SHARED_WORKFLOW = 'SYSTEM_SHARED_WORKFLOW',
+  SYSTEM_SHARED_DOCUMENT = 'SYSTEM_SHARED_DOCUMENT',
+  SYSTEM_SHARED_TAG = 'SYSTEM_SHARED_TAG',
+  SYSTEM_SHARED_PROBLEM = 'SYSTEM_SHARED_PROBLEM',
+  SYSTEM_SHARED_TERMBASE = 'SYSTEM_SHARED_TERMBASE',
+  SYSTEM_SHARED_HIT_TEST = 'SYSTEM_SHARED_HIT_TEST',
+  SYSTEM_SHARED_CHAT_USER= 'SYSTEM_SHARED_CHAT_USER',
+  SYSTEM_SHARED_IMAGE = 'SYSTEM_SHARED_IMAGE',
+  SYSTEM_SHARED_EXTERNAL_SERVICE = 'SYSTEM_SHARED_EXTERNAL_SERVICE',
+  SYSTEM_SHARED_KNOWLEDGE_SETTING = 'SYSTEM_SHARED_KNOWLEDGE_SETTING',
+  SYSTEM_SHARED_DOCUMENT_STRATEGY = 'SYSTEM_SHARED_DOCUMENT_STRATEGY',
+  SYSTEM_SHARED_SCHEDULED_SYNC = 'SYSTEM_SHARED_SCHEDULED_SYNC',
+  SYSTEM_SHARED_MODEL = 'SYSTEM_SHARED_MODEL',
 }
 
 /**
@@ -261,7 +276,7 @@ export class Permission {
     const workspace = this.workspaceId ? `:w:${this.workspaceId}` : ''
     const resource = this.resourceId ? `:r:${this.resourceId}` : ''
     const flag = this.flag ? `_${this.flag}` : ''
-    const group = (this.group === Group.SYSTEM_RES_KNOWLEDGE || this.group === Group.KNOWLEDGE) && this.subGroup !== this.group ? `${this.group}_${this.subGroup}` : this.group
+    const group =  this.group
     return `${group}${flag}${workspace}${resource}`
   }
 

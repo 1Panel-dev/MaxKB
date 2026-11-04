@@ -4,8 +4,21 @@ import type { SelectInstance } from 'element-plus'
 import { useDocumentDetailContext } from '@/views/document-detail/context'
 import type { ParagraphProblem } from '@/api/types'
 import type { ParagraphQuestionDraft } from '../types'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { MsgWarning } from '@/utils/message'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「问题」权限判断
+ */
+type KnowledgeQuestionPermissionMethod =| 'problemRead' | 'problemEdit'
+
+function knowledgeQuestionPermission(method: KnowledgeQuestionPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](props.knowledgeId))
+}
 
 defineOptions({ name: 'ParagraphQuestions' })
 const props = defineProps<{
@@ -37,7 +50,7 @@ function loadProblemOptions(query = '') {
 }
 
 onMounted(() => {
-  if (!props.readonly && !isWorkspaceSharedResource()) void loadProblemOptions()
+  if ( knowledgeQuestionPermission('problemRead') && !props.readonly && !isWorkspaceSharedResource()) void loadProblemOptions()
 })
 
 /* 新增分段维护本地草稿；已有分段创建或关联问题后刷新关联列表。 */
@@ -122,11 +135,11 @@ function handleRemoveProblem(index: number) {
 </script>
 
 <template>
-  <aside v-loading="loading" class="mk-gray-card-lg flex-column w-60 shrink-0">
+  <aside v-if="knowledgeQuestionPermission('problemRead')" v-loading="loading" class="mk-gray-card-lg flex-column w-60 shrink-0">
     <div class="mb-4 flex-between shrink-0 gap-3">
       <h4>关联问题</h4>
       <!-- 添加关联问题 -->
-      <el-button v-if="!props.readonly && !isWorkspaceSharedResource()" text :disabled="loading || problemAdding" @click="handleAddProblem">
+      <el-button v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemEdit')" text :disabled="loading || problemAdding" @click="handleAddProblem">
         <MkIcon name="icon_add_outlined" :size="16" />
       </el-button>
     </div>
@@ -158,7 +171,7 @@ function handleRemoveProblem(index: number) {
               <div class="flex-between gap-2">
                 <span class="min-w-0 flex-1 truncate" :title="problem.content">{{ problem.content }}</span>
                 <!-- 解除问题关联 -->
-                <el-button v-if="!props.readonly && !isWorkspaceSharedResource()" text :disabled="loading" @click="handleRemoveProblem(index)">
+                <el-button v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemEdit')" text :disabled="loading" @click="handleRemoveProblem(index)">
                   <MkIcon name="icon_close_outlined" :size="16" />
                 </el-button>
               </div>

@@ -6,9 +6,23 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { TermbaseItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import ButtonCreateTermbase from './components/ButtonCreateTermbase.vue'
+import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「词库」权限判断
+ */
+type KnowledgeTermbasePermissionMethod =
+    'termbaseCreate' | 'termbaseEdit' | 'termbaseDelete' | 'termbaseExport'
+
+function knowledgeTermbasePermission(method: KnowledgeTermbasePermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'TermbaseView' })
 defineProps<ResourceDetailPageProps>()
@@ -177,7 +191,7 @@ onMounted(() => {
     <template #body-prepend>
       <!-- 快速创建词语 -->
       <MkQuickCreate
-        v-if="!isWorkspaceSharedResource()"
+        v-if="!isWorkspaceSharedResource() && knowledgeTermbasePermission('termbaseCreate')"
         ref="quickCreateRef"
         text="快速创建词语"
         placeholder="请输入词语"
@@ -200,7 +214,7 @@ onMounted(() => {
     <el-table-column label="操作" width="64">
       <template #default="{ row }: { row: TermbaseItem }">
         <!-- 删除词语 -->
-        <MkTooltip content="删除" placement="top">
+        <MkTooltip v-if="knowledgeTermbasePermission('termbaseDelete')" content="删除" placement="top">
           <el-button type="primary" text :disabled="operationLoading" @click="handleDeleteTermbase(row)">
             <MkIcon name="icon_delete-trash_outlined" />
           </el-button>
@@ -209,9 +223,9 @@ onMounted(() => {
     </el-table-column>
     <template #footer-batch-actions>
       <!-- 批量导出词语 -->
-      <el-button type="primary" plain :disabled="operationLoading" @click="handleExportTermbases">导出</el-button>
+      <el-button v-if="knowledgeTermbasePermission('termbaseExport')" type="primary" plain :disabled="operationLoading" @click="handleExportTermbases">导出</el-button>
       <!-- 批量删除词语 -->
-      <el-button v-if="!isWorkspaceSharedResource()" type="danger" plain :loading="operationLoading" @click="handleBatchDeleteTermbases">
+      <el-button v-if="!isWorkspaceSharedResource() && knowledgeTermbasePermission('termbaseDelete')" type="danger" plain :loading="operationLoading" @click="handleBatchDeleteTermbases">
         删除
       </el-button>
     </template>

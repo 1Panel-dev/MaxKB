@@ -8,13 +8,20 @@ import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { KnowledgeItem } from '@/api/types'
 import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
 import { useKnowledgeDetailContext } from '../../context'
+import {isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+/**
+ * 知识库「设置」权限判断
+ */
+type KnowledgeSettingPermissionMethod = 'settingRead' | 'settingEdit'
 
-const canEdit = () =>
-  !isWorkspaceSharedResource() &&
-  (isSystemResource() ? perm.knowledge.system.settingEdit() : !isWorkspaceResource() || perm.knowledge.workspace.settingEdit(knowledgeId.value))
+function knowledgeSettingPermission(method: KnowledgeSettingPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'KnowledgeBaseSettingView' })
 
@@ -80,7 +87,7 @@ watch(
 /* 保存设置；更换向量模型时先确认，保存完成后重新向量化 */
 function handleSave() {
   const knowledgeApi = resourceApi.knowledge
-  if (saving.value || !canEdit() || !('putKnowledge' in knowledgeApi)) return
+  if (saving.value || !knowledgeSettingPermission('settingEdit') || !('putKnowledge' in knowledgeApi)) return
   saving.value = true
   return Promise.all([baseFormRef.value?.validate(), settingFormRef.value?.validate().catch(() => false)])
     .then(([baseValid, settingValid]) => {
@@ -209,6 +216,6 @@ defineProps<ResourceDetailPageProps>()
     </el-form>
 
     <!-- 保存知识库设置 -->
-    <el-button v-if="canEdit()" class="mt-4" type="primary" :loading="saving" @click="handleSave">保存</el-button>
+    <el-button v-if="knowledgeSettingPermission('settingEdit')" class="mt-4" type="primary" :loading="saving" @click="handleSave">保存</el-button>
   </div>
 </template>

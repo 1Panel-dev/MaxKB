@@ -17,7 +17,7 @@ import { numberFormat } from '@/utils/number'
 import { toOrderBy, isWorkFlow } from '@/utils/common'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
-import { isWorkspaceResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { isWorkspaceResource, isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
 import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
 import ButtonExecutionRecord from './components/ButtonExecutionRecord.vue'
@@ -45,6 +45,22 @@ import {
   TokenizeDocumentAction,
   BatchTokenizeAction,
 } from './action-dropdown'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「文档」权限判断
+ */
+type KnowledgeDocPermissionMethod =
+  | 'docCreate' | 'docEdit' | 'docDelete' | 'docSync'
+  | 'docExport' | 'docDownload' | 'docVector' | 'docToken'
+  | 'docGenerate' | 'docMigrate' | 'docTag' | 'docReplace'
+
+function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'DocumentListView' })
 defineProps<ResourceDetailPageProps>()
@@ -333,7 +349,7 @@ onBeforeUnmount(() => {
           />
           <!-- 上传文档 -->
           <ButtonUploadDocument
-            v-if="showQuickCreate"
+            v-if="showQuickCreate && knowledgeDocPermission('docCreate')"
             :api="resourceApi.document"
             :knowledge-id="knowledgeId"
             :file-count-limit="knowledge?.file_count_limit"
@@ -373,7 +389,7 @@ onBeforeUnmount(() => {
           :maxlength="128"
           :validate="validateDocumentName"
           :save="(name) => saveDocumentName(row.id, name)"
-          :disabled="isWorkspaceSharedResource()"
+          :disabled="isWorkspaceSharedResource() || !knowledgeDocPermission('docEdit')"
         >
           <template #prefix>
             <img v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB" src="@/assets/file-type/web-link-icon.svg" alt="" class="size-5" />
@@ -438,7 +454,7 @@ onBeforeUnmount(() => {
           :document="row"
           v-model:loading="operationLoading"
           @refresh="refreshAfterOperation"
-          :disabled="isWorkspaceSharedResource()"
+          :disabled="!knowledgeDocPermission('docTag')"
         />
       </template>
     </el-table-column>
@@ -476,7 +492,7 @@ onBeforeUnmount(() => {
       <template #default="{ row }: { row: DocumentItem }">
         <div class="flex-align-center" @click.stop>
           <!-- 启用或禁用文档 -->
-          <el-switch :model-value="row.is_active" size="small" :disabled="operationLoading" :before-change="() => handleChangeActive(row)" />
+          <el-switch :model-value="row.is_active" size="small" :disabled="operationLoading || !knowledgeDocPermission('docEdit')" :before-change="() => handleChangeActive(row)" />
 
           <el-divider direction="vertical" class="ml-3! mr-2!" />
 
@@ -488,6 +504,7 @@ onBeforeUnmount(() => {
               :document="row"
               v-model:loading="operationLoading"
               @refresh="refreshAfterOperation"
+              v-if="knowledgeDocPermission('docVector')"
             />
             <!-- 分词索引或取消分词索引 -->
             <TokenizeDocumentAction
@@ -496,6 +513,7 @@ onBeforeUnmount(() => {
               v-model:loading="operationLoading"
               :document="row"
               @refresh="refreshAfterOperation"
+              v-if="knowledgeDocPermission('docToken')"
             />
             <!-- 更多文档操作 -->
             <MkTableMoreDropdown>
@@ -506,6 +524,7 @@ onBeforeUnmount(() => {
                 :knowledge-id="knowledgeId"
                 :document="row"
                 @refresh="refreshAfterOperation"
+                v-if="knowledgeDocPermission('docGenerate')"
               />
               <!-- 设置当前文档的标签 -->
               <DocumentTagsAction
@@ -516,10 +535,11 @@ onBeforeUnmount(() => {
                 :document="row"
                 v-model:loading="operationLoading"
                 @refresh="refreshAfterOperation"
+                v-if="knowledgeDocPermission('docTag')"
               />
               <!-- 同步 -->
               <SyncDocumentAction
-                v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE"
+                v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE && knowledgeDocPermission('docSync')"
                 label="同步"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -537,6 +557,7 @@ onBeforeUnmount(() => {
                 :document="row"
                 v-model:loading="operationLoading"
                 @refresh="refreshAfterOperation"
+                v-if="knowledgeDocPermission('docEdit')"
               />
 
               <!-- 迁移文档 -->
@@ -548,13 +569,14 @@ onBeforeUnmount(() => {
                 :document-ids="[row.id]"
                 :disabled="operationLoading"
                 @refresh="refreshAfterOperation"
+                v-if="knowledgeDocPermission('docMigrate')"
               />
               <!-- 导出文档 -->
-              <ExportDocumentAction label="导出" :api="resourceApi.document" v-model:loading="operationLoading" :document="row" />
+              <ExportDocumentAction v-if="knowledgeDocPermission('docExport')" label="导出" :api="resourceApi.document" v-model:loading="operationLoading" :document="row" />
 
               <template v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.BASE || isWorkFlow(knowledgeType)">
                 <!-- 下载原文档 -->
-                <DownloadDocumentAction :api="resourceApi.document" :knowledge-id="knowledgeId" v-model:loading="operationLoading" :document="row" />
+                <DownloadDocumentAction v-if="knowledgeDocPermission('docDownload')" :api="resourceApi.document" :knowledge-id="knowledgeId" v-model:loading="operationLoading" :document="row" />
                 <!-- 替换原文档 -->
                 <ReplaceDocumentAction
                   :api="resourceApi.document"
@@ -562,6 +584,7 @@ onBeforeUnmount(() => {
                   v-model:loading="operationLoading"
                   :document="row"
                   @refresh="refreshAfterOperation"
+                  v-if="knowledgeDocPermission('docReplace')"
                 />
               </template>
               <!-- 删除文档 -->
@@ -573,6 +596,7 @@ onBeforeUnmount(() => {
                 v-model:loading="operationLoading"
                 :document="row"
                 @refresh="refreshAfterOperation"
+                v-if="knowledgeDocPermission('docDelete')"
               />
             </MkTableMoreDropdown>
           </div>
@@ -587,6 +611,7 @@ onBeforeUnmount(() => {
         :document-ids="selectedDocumentIds"
         v-model:loading="operationLoading"
         @refresh="refreshAfterOperation"
+        v-if="knowledgeDocPermission('docVector')"
       />
       <!-- 批量分词索引 -->
       <BatchTokenizeAction
@@ -595,6 +620,7 @@ onBeforeUnmount(() => {
         v-model:loading="operationLoading"
         :document-ids="selectedDocumentIds"
         @refresh="refreshAfterOperation"
+        v-if="knowledgeDocPermission('docToken')"
       />
       <!-- 批量生成问题 -->
       <BatchGenerateQuestionsAction
@@ -604,6 +630,7 @@ onBeforeUnmount(() => {
         :document-ids="selectedDocumentIds"
         :disabled="operationLoading"
         @refresh="refreshAfterOperation"
+        v-if="knowledgeDocPermission('docGenerate')"
       />
       <!-- 批量文档设置 -->
       <BatchSettingDocumentAction
@@ -622,6 +649,7 @@ onBeforeUnmount(() => {
         :document-ids="selectedDocumentIds"
         v-model:loading="operationLoading"
         @refresh="refreshAfterOperation"
+        v-if="knowledgeDocPermission('docTag')"
       />
 
       <!-- 更多批量操作 -->
@@ -634,7 +662,7 @@ onBeforeUnmount(() => {
           <MkDropdownMenu>
             <!-- 批量同步 -->
             <BatchSyncDocumentAction
-              v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE"
+              v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE && knowledgeDocPermission('docSync')"
               label="同步"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
@@ -650,6 +678,7 @@ onBeforeUnmount(() => {
               :document-ids="selectedDocumentIds"
               :disabled="operationLoading"
               @refresh="refreshAfterOperation"
+              v-if="knowledgeDocPermission('docMigrate')"
             />
 
             <!-- 批量导出文档 -->
@@ -658,6 +687,7 @@ onBeforeUnmount(() => {
               :api="resourceApi.document"
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
+              v-if="knowledgeDocPermission('docExport')"
             />
             <!-- 批量取消向量化 -->
             <BatchCancelTaskAction
@@ -688,6 +718,7 @@ onBeforeUnmount(() => {
               :document-ids="selectedDocumentIds"
               batch
               @refresh="refreshAfterOperation"
+              v-if="knowledgeDocPermission('docDelete')"
             />
           </MkDropdownMenu>
         </template>

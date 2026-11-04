@@ -18,7 +18,21 @@ import {
   GenerateQuestionsAction,
   MoveParagraphAction,
 } from './action-dropdown'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「文档」权限判断
+ */
+type KnowledgeDocPermissionMethod =
+  | 'docCreate' | 'docEdit' | 'docDelete' | 'docGenerate' | 'docMigrate'
+
+function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'KnowledgeParagraphView' })
 
@@ -213,6 +227,7 @@ const paragraphSortDisabled = computed(
     createDialogMounted.value ||
     editDialogMounted.value ||
     paragraphs.value.length < 2,
+    !knowledgeDocPermission('docEdit')
 )
 const { handleMoveParagraph } = useParagraphSort({
   paragraphs,
@@ -272,7 +287,7 @@ onMounted(() => {
             </el-button>
           </span>
           <!-- 添加文档分段 -->
-          <el-button v-if="!isWorkspaceSharedResource() && !batchMode" type="primary" @click="handleOpenCreateParagraph()">
+          <el-button v-if="!isWorkspaceSharedResource() && !batchMode && knowledgeDocPermission('docEdit')" type="primary" @click="handleOpenCreateParagraph()">
             <MkIcon name="icon_add_outlined" />
             <span>添加分段</span>
           </el-button>
@@ -356,19 +371,19 @@ onMounted(() => {
                       <!-- 启用或禁用当前分段 -->
                       <el-switch
                         :model-value="paragraph.is_active"
-                        :disabled="loading"
+                        :disabled="loading || !knowledgeDocPermission('docEdit')"
                         size="small"
                         class="ml-1"
                         :before-change="() => handleToggleParagraph(paragraph)"
                       />
                       <el-divider direction="vertical" class="ml-3! mr-2!" />
-                      <MkTooltip content="编辑">
+                      <MkTooltip v-if="knowledgeDocPermission('docEdit')" content="编辑">
                         <!-- 编辑当前分段 -->
                         <el-button text @click="handleOpenParagraphDetail(paragraph, 'edit')">
                           <MkIcon name="icon_edit_outlined" />
                         </el-button>
                       </MkTooltip>
-                      <MkTooltip content="上方插入分段">
+                      <MkTooltip v-if="knowledgeDocPermission('docEdit')" content="上方插入分段">
                         <!-- 在当前分段上方插入 -->
                         <el-button text @click="handleOpenCreateParagraph(paragraph.position)">
                           <MkIcon name="icon_add_outlined-1" />
@@ -395,6 +410,7 @@ onMounted(() => {
                               :paragraph-id="paragraph.id"
                               :disabled="loading"
                               @refresh="handleGenerateQuestionsSuccess"
+                              v-if="knowledgeDocPermission('docGenerate')"
                             />
                             <!-- 迁移当前分段 -->
                             <MigrateParagraphAction
@@ -404,6 +420,7 @@ onMounted(() => {
                               :paragraph-id="paragraph.id"
                               :disabled="loading"
                               @success="refreshParagraphs"
+                              v-if="knowledgeDocPermission('docMigrate')"
                             />
                             <!-- 展开分段位置菜单 -->
                             <MoveParagraphAction
@@ -412,9 +429,10 @@ onMounted(() => {
                               :disabled="loading"
                               @move="handleMoveParagraph(paragraph, $event)"
                               @visible-change="handleParagraphMenuVisibleChange(paragraph.id, 'position', $event)"
+                              v-if="knowledgeDocPermission('docEdit')"
                             />
                             <!-- 删除当前分段 -->
-                            <MkDropdownItem divided :disabled="loading" @click="handleDeleteParagraph(paragraph)">
+                            <MkDropdownItem v-if="knowledgeDocPermission('docDelete')" divided :disabled="loading" @click="handleDeleteParagraph(paragraph)">
                               <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                               删除
                             </MkDropdownItem>
@@ -460,6 +478,7 @@ onMounted(() => {
             :paragraph-ids="selectedParagraphIds"
             :disabled="loading"
             @success="refreshParagraphs"
+            v-if="knowledgeDocPermission('docMigrate')"
           />
           <!-- 批量生成问题 -->
           <BatchGenerateQuestionsAction
@@ -469,9 +488,10 @@ onMounted(() => {
             :paragraph-ids="selectedParagraphIds"
             :disabled="loading"
             @refresh="handleGenerateQuestionsSuccess"
+            v-if="knowledgeDocPermission('docGenerate')"
           />
           <!-- 批量删除分段 -->
-          <el-button type="danger" plain :loading="loading" :disabled="loading || !selectedParagraphIds.length" @click="handleBatchDeleteParagraphs">
+          <el-button v-if="knowledgeDocPermission('docDelete')" type="danger" plain :loading="loading" :disabled="loading || !selectedParagraphIds.length" @click="handleBatchDeleteParagraphs">
             删除
           </el-button>
         </template>

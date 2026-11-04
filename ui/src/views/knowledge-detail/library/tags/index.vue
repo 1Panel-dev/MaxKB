@@ -10,11 +10,25 @@ import CreateTagDialog from './components/CreateTagDialog.vue'
 import EditTagDialog from './components/EditTagDialog.vue'
 import ButtonImportTags from './components/ButtonImportTags.vue'
 import AssociatedDocumentDrawer from './AssociatedDocumentDrawer.vue'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
 
 defineOptions({ name: 'TagManagementView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
+
+/**
+ * 知识库「标签管理」权限判断
+ */
+type KnowledgeTagPermissionMethod =
+  | 'tagRead' | 'tagCreate' | 'tagEdit' | 'tagDelete'
+
+function knowledgeTagPermission(method: KnowledgeTagPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 interface TagTableRow extends KnowledgeTagUpdatePayload {
   doc_count?: number
@@ -183,7 +197,7 @@ onMounted(() => {
         <!-- 导入标签，成功后刷新列表 -->
         <ButtonImportTags :api="resourceApi.tags" :knowledge-id="knowledgeId" :disabled="loading || operationLoading" @refresh="loadTags" />
         <!-- 创建标签 -->
-        <el-button type="primary" :disabled="loading || operationLoading" @click="handleOpenCreateTag">
+        <el-button v-if="knowledgeTagPermission('tagCreate')" type="primary" :disabled="loading || operationLoading" @click="handleOpenCreateTag">
           <MkIcon name="icon_add_outlined" />
           <span>创建</span>
         </el-button>
@@ -210,19 +224,19 @@ onMounted(() => {
           <span class="min-w-0 truncate" :title="row.key">{{ row.key }}</span>
           <div v-if="!isWorkspaceSharedResource()" class="flex-align-center shrink-0" :class="{ 'group-hover-visible': hoveredTagKey !== row.key }">
             <!-- 添加标签值 -->
-            <MkTooltip content="添加标签值" placement="top">
+            <MkTooltip v-if="knowledgeTagPermission('tagEdit')" content="添加标签值" placement="top">
               <el-button type="primary" text @click="handleOpenAddTagValue(row)">
                 <MkIcon name="icon_add_outlined" />
               </el-button>
             </MkTooltip>
             <!-- 编辑标签 -->
-            <MkTooltip content="编辑标签" placement="top">
+            <MkTooltip v-if="knowledgeTagPermission('tagEdit')" content="编辑标签" placement="top">
               <el-button type="primary" text @click="handleOpenEditTag(row)">
                 <MkIcon name="icon_edit_outlined" />
               </el-button>
             </MkTooltip>
             <!-- 删除整个标签 -->
-            <MkTooltip content="删除" placement="top">
+            <MkTooltip v-if="knowledgeTagPermission('tagDelete')" content="删除" placement="top">
               <el-button type="primary" text @click="handleDeleteTag(row, 'key')">
                 <MkIcon name="icon_delete-trash_outlined" />
               </el-button>
@@ -244,13 +258,13 @@ onMounted(() => {
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center">
           <!-- 编辑标签值 -->
-          <MkTooltip content="编辑标签值" placement="top">
+          <MkTooltip v-if="knowledgeTagPermission('tagEdit')" content="编辑标签值" placement="top">
             <el-button type="primary" text @click="handleOpenEditTagValue(row)">
               <MkIcon name="icon_edit_outlined" />
             </el-button>
           </MkTooltip>
           <!-- 删除标签值 -->
-          <MkTooltip content="删除" placement="top">
+          <MkTooltip v-if="knowledgeTagPermission('tagDelete')" content="删除" placement="top">
             <el-button type="primary" text @click="handleDeleteTag(row, 'one')">
               <MkIcon name="icon_delete-trash_outlined" />
             </el-button>
@@ -260,7 +274,7 @@ onMounted(() => {
     </el-table-column>
     <template #footer-batch-actions>
       <!-- 批量删除标签 -->
-      <el-button type="danger" plain :loading="operationLoading" @click="handleBatchDelete">删除</el-button>
+      <el-button v-if="knowledgeTagPermission('tagDelete')" type="danger" plain :loading="operationLoading" @click="handleBatchDelete">删除</el-button>
     </template>
   </MkTable>
   <CreateTagDialog ref="createTagRef" :api="resourceApi.tags" :knowledge-id="knowledgeId" @refresh="loadTags" />

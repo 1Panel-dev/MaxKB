@@ -6,8 +6,22 @@ import type { ParagraphQuestionDraft } from './types.ts'
 import ParagraphForm from './components/ParagraphForm.vue'
 import ParagraphQuestions from './components/ParagraphQuestions.vue'
 import ParagraphPreview from './components/ParagraphPreview.vue'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { MsgSuccess } from '@/utils/message'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「文档」权限判断
+ */
+type KnowledgeDocPermissionMethod =
+  | 'docCreate' | 'docEdit' | 'docDelete' | 'docGenerate' | 'docMigrate'
+
+function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](props.knowledgeId))
+}
 
 defineOptions({ name: 'EditParagraphDialog' })
 const props = defineProps<{
@@ -115,7 +129,7 @@ defineExpose({ open, close })
         <el-card v-if="mode === 'detail'" shadow="never" class="mk-paragraph-card group relative min-w-0 flex-1" body-class="flex-column h-full">
           <!-- 编辑分段标题和内容 -->
           <el-button
-            v-if="!readonly && !isWorkspaceSharedResource()"
+            v-if="!readonly && !isWorkspaceSharedResource() && knowledgeDocPermission('docEdit')"
             circle
             class="group-hover-visible absolute! top-2 right-2 z-10 shadow-md"
             @click="handleEdit"

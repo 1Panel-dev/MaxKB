@@ -9,11 +9,20 @@ import { SCHEDULE_OPTION } from '@/constants/schedule'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
-import { getResourceScope, isWorkspaceResource, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
+import { getResourceScope, isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '../../context'
 import SyncLogTable from './components/SyncLogTable.vue'
+/**
+ * 知识库「定时同步」权限判断
+ */
+type KnowledgeScheduledSyncPermissionMethod = 'scheduledSyncRead' | 'scheduledSyncEdit'
 
-const canEdit = () => !isWorkspaceSharedResource() && (isSystemResource() ? perm.knowledge.system.scheduledSyncEdit() : !isWorkspaceResource() || perm.knowledge.workspace.scheduledSyncEdit(knowledgeId.value))
+function knowledgeScheduledSyncPermission(method: KnowledgeScheduledSyncPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'KnowledgeScheduledSyncView' })
 
@@ -112,7 +121,7 @@ const rules: FormRules<SyncSettingDraft> = {
 function handleSave() {
   const detail = knowledge.value
   const form = formRef.value
-  if (!canEdit() || saving.value || loading.value || !settingLoaded.value || !detail || !form) return
+  if (!knowledgeScheduledSyncPermission('scheduledSyncEdit') || saving.value || loading.value || !settingLoaded.value || !detail || !form) return
   saving.value = true
   return form
     .validate()
@@ -184,7 +193,7 @@ watch(
               <span class="ml-2 text-N600">（开启后，系统将按设定周期自动同步知识库中文档）</span>
             </span>
           </template>
-          <el-switch v-model="syncSetting.enabled" />
+          <el-switch :disabled="!knowledgeScheduledSyncPermission('scheduledSyncEdit')" v-model="syncSetting.enabled" />
         </el-form-item>
         <div>
           <el-form-item prop="schedule_type">
@@ -222,7 +231,7 @@ watch(
           </el-form-item>
         </div>
         <!-- 保存定时同步设置 -->
-        <el-button v-if="canEdit()" type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">
+        <el-button v-if="knowledgeScheduledSyncPermission('scheduledSyncEdit')" type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">
           保存
         </el-button>
       </el-form>
