@@ -14,8 +14,8 @@ export const PermissionConstants = {
   // ==================== HOMEPAGE ====================
   HOMEPAGE_READ: p(Group.HOMEPAGE, Group.HOMEPAGE, Operate.READ, 0),
   HOMEPAGE_EXPORT: p(Group.HOMEPAGE, Group.HOMEPAGE, Operate.EXPORT, 1),
-  SYSTEM_HOMEPAGE_READ: p(Group.HOMEPAGE, Group.HOMEPAGE, Operate.READ, 0),
-  SYSTEM_HOMEPAGE_EXPORT: p(Group.HOMEPAGE, Group.HOMEPAGE, Operate.EXPORT, 1),
+  SYSTEM_HOMEPAGE_READ: p(Group.SYSTEM_HOMEPAGE, Group.SYSTEM_HOMEPAGE, Operate.READ, 0),
+  SYSTEM_HOMEPAGE_EXPORT: p(Group.SYSTEM_HOMEPAGE, Group.SYSTEM_HOMEPAGE, Operate.EXPORT, 1),
 
   // ==================== KNOWLEDGE ====================
   KNOWLEDGE: p(Group.KNOWLEDGE, Group.KNOWLEDGE, Operate.SELF, 0),
