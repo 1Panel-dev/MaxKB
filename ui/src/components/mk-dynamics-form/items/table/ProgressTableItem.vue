@@ -40,28 +40,14 @@ const viewCards = computed(() => {
 <template>
   <div class="progress-table-item">
     <el-popover placement="top-start" :title="row[textField]" :width="200" trigger="hover" :persistent="false">
-      <template #reference> <el-progress v-bind="$attrs" :percentage="row[valueField]"></el-progress></template>
+      <template #reference><el-progress v-bind="$attrs" :percentage="row[valueField]"></el-progress></template>
       <div>
         <el-row v-for="(item, index) in viewCards" :key="index">
           <el-col :span="6">{{ item.title }}</el-col>
-          <el-col :span="18"> <span class="value" :innerHTML="getCardValue(item)"> </span></el-col>
+          <el-col :span="18"><span class="value" :innerHTML="getCardValue(item)"></span></el-col>
         </el-row>
       </div>
     </el-popover>
   </div>
 </template>
-<style lang="scss" scoped>
-@mixin valueScss() {
-  color: var(--el-text-color-primary);
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 22px;
-  height: 22px;
-}
-.progress-table-item {
-  .value {
-    float: right;
-    @include valueScss;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

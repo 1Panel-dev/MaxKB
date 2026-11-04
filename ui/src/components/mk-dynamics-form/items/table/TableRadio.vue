@@ -156,26 +156,4 @@ const activeText = computed(() => {
     </div>
   </div>
 </template>
-<style lang="scss" scoped>
-.table-radio {
-  .header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    .title {
-      color: var(--el-text-color-primary);
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 22px;
-    }
-  }
-  .msg {
-    margin-top: 12px;
-    color: rgba(100, 106, 115, 1);
-    .active {
-      margin-left: 3px;
-      color: var(--el-color-primary);
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

@@ -7,7 +7,7 @@
   --md-scrollbar-thumb-hover-color: var(--el-scrollbar-hover-bg-color, var(--el-text-color-secondary));
   border-radius: var(--el-border-radius-base);
   font-weight: 400;
-  line-height: 22px;
+  line-height: var(--mk-line-height-base);
   font-family: var(--mk-font-family) !important;
   height: 130px;
 
@@ -98,7 +98,7 @@
     p {
       padding: 0 !important;
       margin: 0 !important;
-      line-height: 22px !important;
+      line-height: var(--mk-line-height-base) !important;
     }
 
     sup[data-title] {

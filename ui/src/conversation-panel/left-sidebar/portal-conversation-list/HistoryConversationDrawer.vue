@@ -89,6 +89,7 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
               <el-button text><MkIcon name="icon_more_outlined" /></el-button>
               <template #dropdown>
                 <MkDropdownMenu>
+                  <!-- 重命名 -->
                   <RenameConversation
                     :conversation="conversation"
                     :application-id="selectedApplicationId"

@@ -376,7 +376,7 @@
   margin: 0;
   height: unset;
   &__label {
-    line-height: 22px;
+    line-height: var(--mk-line-height-base);
     font-weight: 400;
   }
   &__inner {
@@ -577,6 +577,7 @@
 /* dropdown */
 .el-dropdown {
   color: currentColor;
+  line-height: var(--mk-line-height-base);
 }
 
 .el-dropdown-menu {
@@ -628,7 +629,7 @@
     color: var(--el-text-color-primary);
   }
   &__content {
-    line-height: 22px;
+    line-height: var(--mk-line-height-base);
   }
 }
 
@@ -911,7 +912,7 @@
   }
   &__wrapper {
     padding: 4px 12px;
-    line-height: 22px;
+    line-height: var(--mk-line-height-base);
     &.is-disabled {
       background-color: var(--mk-N200);
       .el-select__caret {
@@ -1310,7 +1311,7 @@
       font-weight: 400;
     }
     height: auto;
-    line-height: 22px;
+    line-height: var(--mk-line-height-base);
     align-items: inherit;
   }
 
@@ -1421,7 +1422,7 @@
   --el-upload-dragger-padding-horizontal: 40px;
   --el-upload-dragger-padding-vertical: 32px;
   &__text {
-    line-height: 22px;
+    line-height: var(--mk-line-height-base);
     color: var(--el-text-color-primary) !important;
     em:hover {
       color: var(--el-color-primary-light-5);

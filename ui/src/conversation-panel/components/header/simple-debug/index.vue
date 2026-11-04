@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useConversationListStore } from '../../../left-sidebar/conversation-list/index'
-import HistoryPopover from '../../history-popover/index.vue'
+import HistoryPopover from './history-popover/index.vue'
 
 // 左栏放外部设置表单，开合沿用会话列表 store 的侧栏状态。
 const { appInfo, leftSideOpen, toggleLeftSide, newConversation } = useConversationListStore()
@@ -25,7 +25,7 @@ const { appInfo, leftSideOpen, toggleLeftSide, newConversation } = useConversati
     </MkTooltip>
     <!-- 历史记录 -->
     <span class="ml-1">
-      <HistoryPopover></HistoryPopover>
+      <HistoryPopover />
     </span>
   </header>
 </template>
