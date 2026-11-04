@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { computed, useId, type Component } from 'vue'
-import { pick } from 'lodash'
 import type { Dict } from '@/api/types'
 import loadErrorImage from '@/assets/conversation/load_error.png'
-import { useMessageInputStoreOptional, type QuestionOptions } from '../message-input/index'
+import { useSendQuestionOptional } from '../message-input/index'
 import { parseRenderNodes, type RenderTag } from './parse-tags'
 import QuickQuestion from './QuickQuestion.vue'
-import HtmlRender from './HtmlRender.vue'
 import IframeRender from './IframeRender.vue'
-import EchartsRender from './EchartsRender.vue'
 import FormRender from './FormRender.vue'
 import ReasoningRender from './ReasoningRender.vue'
 import ToolCallsRender from './tool-calls-render/index.vue'
+import HtmlItem from '../content/items/html.vue'
+import EchartsItem from '../content/items/echarts.vue'
 
 defineOptions({ name: 'MarkdownRenderer' })
 
@@ -26,18 +25,8 @@ const props = withDefaults(
 const editorIdPrefix = `markdown-renderer-${useId()}`
 const renderNodes = computed(() => parseRenderNodes(props.source))
 
-// 发送走 message-input：新对话时由它生成会话并同步标题。日志等只读视图不注入，标签内的发送入口随之禁用
-const messageInputStore = useMessageInputStoreOptional()
-const ATTACHMENT_FIELDS = ['image_list', 'document_list', 'audio_list', 'video_list', 'other_list']
-
-// otherParams 为 v2 的 other_params_data：附件列表与 form_data
-function sendQuestion(question: string, otherParams?: Dict<unknown>) {
-  messageInputStore?.sendQuestion(question, {
-    attachments: pick(otherParams, ATTACHMENT_FIELDS) as QuestionOptions['attachments'],
-    formData: otherParams?.form_data as Dict<unknown> | undefined,
-  })
-}
-const sendMessage = messageInputStore ? sendQuestion : undefined
+// 日志等只读视图拿不到发送能力，标签内的发送入口随之禁用
+const sendMessage = useSendQuestionOptional() ?? undefined
 
 interface TagRenderer {
   component: Component
@@ -46,9 +35,10 @@ interface TagRenderer {
 
 const tagRenderers: Record<RenderTag, TagRenderer> = {
   quick_question: { component: QuickQuestion, props: (question) => ({ question, sendMessage }) },
-  html_rander: { component: HtmlRender, props: (source) => ({ source, sendMessage }) },
+  // HTML、图表标签与同类型内容项共用渲染
+  html_rander: { component: HtmlItem, props: (source) => ({ content: { content: source } }) },
   iframe_render: { component: IframeRender, props: (source) => ({ source, sendMessage }) },
-  echarts_rander: { component: EchartsRender, props: (option) => ({ option }) },
+  echarts_rander: { component: EchartsItem, props: (option) => ({ content: { content: option } }) },
   tool_calls_render: { component: ToolCallsRender, props: (content) => ({ content }) },
   form_rander: { component: FormRender, props: (formSetting) => ({ formSetting }) },
 }

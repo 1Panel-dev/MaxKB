@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { computed, ref, onBeforeUnmount } from 'vue'
+import { computed, ref, onBeforeUnmount, provide } from 'vue'
 import ContentList from '../content-list/index.vue'
 import MessageFooter from '../message-footer/index.vue'
 import PrologueContent from '../prologue-content/index.vue'
 import { formatPrologue } from '../prologue-content/index'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
-import { useMessageListStore } from './index'
+import { useMessageListStore, SEND_MESSAGE_KEY } from './index'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 defineProps<{ appName?: string }>()
 
-const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamProgress } = useMessageListStore()
+const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamProgress, sendMessage } = useMessageListStore()
+// 消息内容项（如表单）经此发起续跑
+provide(SEND_MESSAGE_KEY, sendMessage)
 const { 
   // 是否分享
   isShared,

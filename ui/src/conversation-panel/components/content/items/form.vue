@@ -3,12 +3,12 @@ import { computed, ref } from 'vue'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import type { Dict } from '@/api/types'
-import { useMessageListStoreOptional } from '@/conversation-panel/components/message-list/index'
-
+import { useSendMessageOptional } from '@/conversation-panel/components/message-list/index'
+import { useViewType, VIEW_TYPE, type ViewType } from "@/conversation-panel/view/index"
 defineOptions({ name: 'ConversationFormContent' })
-
-// message-list store(由 view provide);拿不到发送能力 → 只读降级
-const mainStore = useMessageListStoreOptional()
+const viewType = useViewType()
+// 发送能力由消息列表或外部宿主 provide;拿不到 → 只读降级
+const sendMessage = useSendMessageOptional()
 
 const props = defineProps<{
   content: {
@@ -42,7 +42,7 @@ const submit = async () => {
   try {
     await dynamicsFormRef.value?.validate()
     _submit.value = true
-    mainStore?.sendMessage({
+    sendMessage?.({
       message: { content: '', type: 'QUESTION' },
       newQuestion: false,
       reChat: true,
@@ -56,14 +56,18 @@ const submit = async () => {
     _submit.value = false
   }
 }
+const READONLY_VIEWS: readonly ViewType[] = [VIEW_TYPE.LOG]
+
 </script>
 
 <template>
   <div class="mk-gray-card-lg space-y-4 border border-N300">
     <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="leadingText || ''"></MdPreview>
-    <MkDynamicsForm ref="dynamicsFormRef" :view="is_submit || !mainStore" :render-data="form_field_list" v-model="form_data" />
+    <MkDynamicsForm ref="dynamicsFormRef" :view="is_submit || READONLY_VIEWS.includes(viewType)"
+      :render-data="form_field_list" v-model="form_data" />
     <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="trailingText || ''"></MdPreview>
-    <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit || !mainStore" @click="submit">
+    <el-button :type="is_submit ? 'info' : 'primary'"
+      :disabled="is_submit || READONLY_VIEWS.includes(viewType) || !sendMessage" @click="submit">
       {{ is_submit ? '已提交' : '提交' }}
     </el-button>
   </div>
