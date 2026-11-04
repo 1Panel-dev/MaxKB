@@ -266,7 +266,7 @@ export const PermissionConstants = {
 
   // ==================== PORTAL ====================
   PORTAL_READ: p(Group.PORTAL, Group.PORTAL, Operate.READ, 0),
-  PORTAL_EDIT: p(Group.PORTAL, Group.PORTAL, Operate.EDIT, 0),
+  PORTAL_EDIT: p(Group.PORTAL, Group.PORTAL, Operate.EDIT, 1),
 
   // ==================== SYSTEM_TOOL ====================
   SHARED_TOOL_READ: p(Group.SYSTEM_SHARED_TOOL, Group.SYSTEM_SHARED_TOOL, Operate.READ, 0),
