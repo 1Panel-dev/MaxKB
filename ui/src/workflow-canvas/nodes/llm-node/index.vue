@@ -93,7 +93,9 @@ function handleContextEnabledChange(enabled: boolean) {
 async function validate() {
   return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
-
+const userPromptRequired=computed(()=>{
+  return formData.value.enable_context?false:true
+})
 onMounted(() => {
   if (formData.value.is_result === undefined && isLastNode(model)) formData.value.is_result = true
   model.validate = validate
@@ -147,7 +149,7 @@ onMounted(() => {
         <el-form-item
           class="mk-hide-asterisk"
           prop="prompt"
-          :rules="{ whitespace: true, required: true, message: '请输入用户提示词', trigger: 'blur' }"
+          :rules="{ whitespace: true, required: userPromptRequired, message: '请输入用户提示词', trigger: 'blur' }"
         >
           <template #label>
             <div class="flex-align-center gap-1">

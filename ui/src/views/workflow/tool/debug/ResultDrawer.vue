@@ -10,6 +10,9 @@ import { aggregators } from '@/conversation-panel/core/aggregators'
 import ContentList from '@/conversation-panel/components/content-list/index.vue'
 import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
+import { VIEW_KEY, VIEW_TYPE } from '@/conversation-panel/view'
+import { SEND_MESSAGE_KEY } from '@/conversation-panel/components/message-list/index'
+import type { SendMessageOptions } from '@/conversation-panel/core/types'
 
 defineOptions({ name: 'ToolWorkflowDebugResultDrawer' })
 interface DebugBlock {
@@ -21,12 +24,6 @@ interface DebugBlock {
 interface DebugChunk {
   chat_record_id?: string
   content?: DebugBlock[]
-}
-interface ResumeParameters {
-  formData?: Record<string, unknown>
-  position?: unknown
-  chunkId?: string
-  chatRecordId?: string
 }
 const props = defineProps<{ toolId: string; api?: typeof WorkflowApi }>()
 const running = defineModel<boolean>('running', { default: false })
@@ -90,11 +87,13 @@ async function execute(extra: Record<string, unknown> = {}) {
   }
 }
 
-// 表单节点沿用同一条执行记录续跑，复用现有回复组件的 sendMessage 协议。
-provide('sendMessage', (options: ResumeParameters) => {
-  if (running.value || !visible.value) return
+// 表单节点沿用同一条执行记录续跑，复用对话面板的 sendMessage 协议；工具调试不支持发起新问题。
+function resume(options: SendMessageOptions) {
+  if (options.newQuestion) return
   return execute({ form_data: options.formData, chat_record_id: options.chatRecordId, chunk_id: options.chunkId, position: options.position })
-})
+}
+// 执行中或抽屉已关闭时不可续跑，表单随之禁用。
+provide(SEND_MESSAGE_KEY, computed(() => (running.value || !visible.value ? null : resume)))
 
 function open(parameters: Record<string, unknown>) {
   if (running.value) return
@@ -111,7 +110,7 @@ function close() {
   visible.value = false
   stream?.cancel()
 }
-
+provide(VIEW_KEY,VIEW_TYPE.CHAT)
 onBeforeUnmount(close)
 defineExpose({ open, close })
 </script>

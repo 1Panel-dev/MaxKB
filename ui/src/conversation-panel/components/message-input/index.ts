@@ -1,4 +1,5 @@
 import { ref, computed, reactive, watch, inject, type Ref, type InjectionKey } from 'vue'
+import { pick } from 'lodash'
 import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants/file-type'
 import { isImage, isDocument, isAudio, isVideo } from '@/utils/icon'
 import { MsgError } from '@/utils/message'
@@ -283,4 +284,20 @@ export function useMessageInputStore(): MessageInputStore {
 // 供只读场景可选注入：日志等视图不提供输入框，拿不到返回 null
 export function useMessageInputStoreOptional(): MessageInputStore | null {
   return inject(MESSAGE_INPUT_KEY, null)
+}
+
+const ATTACHMENT_FIELDS = ['image_list', 'document_list', 'audio_list', 'video_list', 'other_list']
+
+/**
+ * 回复内容（快捷问题、HTML、iframe）内的提问入口：otherParams 为 v2 的 other_params_data（附件列表与 form_data）。
+ * 发送走 message-input，新对话时由它生成会话并同步标题；日志等只读视图拿不到 store，返回 null。
+ */
+export function useSendQuestionOptional(): ((question: string, otherParams?: Dict<unknown>) => void) | null {
+  const store = useMessageInputStoreOptional()
+  if (!store) return null
+  return (question, otherParams) =>
+    store.sendQuestion(question, {
+      attachments: pick(otherParams, ATTACHMENT_FIELDS) as QuestionOptions['attachments'],
+      formData: otherParams?.form_data as Dict<unknown> | undefined,
+    })
 }

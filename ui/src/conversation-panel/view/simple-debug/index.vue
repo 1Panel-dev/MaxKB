@@ -13,6 +13,7 @@ import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
 import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
 import { createDebugConversation } from '../debug/index'
+import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
 
 defineOptions({ name: 'SimpleDebugConversation' })
 
@@ -49,7 +50,7 @@ provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
 provide(EXECUTION_DETAIL_KEY, bundle.detail)
-
+provide(VIEW_KEY,VIEW_TYPE.SIMPLE_DEBUG)
 // 左栏放设置表单而非会话列表，开合复用会话列表 store 的 leftSideOpen；历史对话由标题栏浮层切换。
 // 响应式按面板自身宽度判断（嵌在 Admin 页面内，窗口宽度不代表可用宽度）：窄时 drawer，宽时 push。
 const SETTING_WIDTH = 520
@@ -61,6 +62,8 @@ const panelRef = useTemplateRef<HTMLElement>('panelRef')
 const panelWidth = ref(BREAKPOINT)
 const narrow = computed(() => panelWidth.value < BREAKPOINT)
 const sideMode = computed(() => (narrow.value ? 'drawer' : 'push'))
+// 左栏为抽屉即手机端
+provide(DEVICE_KEY, createDeviceType(sideMode))
 const canPushBoth = computed(() => panelWidth.value >= SETTING_WIDTH + DETAIL_WIDTH + MIN_CHAT_WIDTH)
 
 // 宽窄切换时同步开合：宽屏展开设置，窄屏收起设置和执行详情。
