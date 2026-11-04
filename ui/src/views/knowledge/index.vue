@@ -29,6 +29,7 @@ import {
 } from './knowledge-card/action-dropdown'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { getWorkspaceId } from '@/utils/resource-context.ts'
 
 /* 知识库详情入口 */
 const route = useRoute()
@@ -207,7 +208,7 @@ function handleBatchDelete() {
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip content="创建文件夹" placement="top">
+        <MkTooltip v-if="perm.knowledge.workspace.folderCreate(getWorkspaceId() || '')" content="创建文件夹" placement="top">
           <el-button text type="primary" class="-mr-1" @click="handleCreateFolder">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
