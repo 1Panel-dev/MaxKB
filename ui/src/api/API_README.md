@@ -806,3 +806,12 @@ Workspace 和 System 资源管理的 `getKnowledgeDetail(knowledgeId, section?)`
 `abstract` 和按时间正序排列的 `chat_record_list`。当前后端返回旧版 `problem_text`、
 `answer_text`、`answer_text_list` 及仅含上传附件的 `execution_details`，不返回 V3 `question`、`messages`。
 分享页适配旧版字段，不通过原会话接口补查内容。
+
+### 对话回答反馈
+
+`chat/conversation.ts` 的 `putConversationFeedback(applicationId, chatId, recordId, data)` 使用
+PUT `/v3/application/<applicationId>/chat/<chatId>/chat_record/<recordId>/vote`。
+提交类型 `ChatFeedback` 经 `@/api/types` 导出；`vote_status` 为 `-1`（撤销）、`0`（满意）、
+`1`（不满意）字符串，`vote_reason` 为单选原因，`vote_other_content` 为补充说明。
+满意原因支持 `accurate`、`complete`、`other`，不满意支持 `inaccurate`、`incomplete`、`other`。
+已评价记录须先撤销才能再次评价；历史记录通过同名字段回显。
