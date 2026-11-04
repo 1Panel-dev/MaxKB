@@ -75,6 +75,59 @@ class AliyunBaiLianQwenTTSModelGeneralParams(BaseForm):
     )
 
 
+def _qwen_audio_speech_rate_field():
+    return SliderField(
+        TooltipLabel(_("Speaking speed"), _("[0.5, 2], the default is 1, usually one decimal place is enough")),
+        required=True,
+        default_value=1,
+        _min=0.5,
+        _max=2,
+        _step=0.1,
+        precision=1,
+    )
+
+
+class AliyunBaiLianQwenAudioTTSNextParams(BaseForm):
+    """Parameters for Qwen-Audio audio generation; voice is described in the prompt."""
+
+    speech_rate = _qwen_audio_speech_rate_field()
+
+
+class AliyunBaiLianQwenAudio31TTSModelParams(BaseForm):
+    voice = SingleSelect(
+        TooltipLabel(_("Timbre"), _("Please select a system voice supported by Qwen-TTS")),
+        required=True,
+        default_value="longanhuan_v3.1",
+        text_field="value",
+        value_field="value",
+        option_list=[
+            {"label": "longanhuan_v3.1", "value": "longanhuan_v3.1"},
+            {"label": "longanlingxin_v3.1", "value": "longanlingxin_v3.1"},
+            {"label": "longanfengyue_v3.1", "value": "longanfengyue_v3.1"},
+            {"label": "xunanchuan_v3.1", "value": "xunanchuan_v3.1"},
+        ],
+    )
+
+    speech_rate = _qwen_audio_speech_rate_field()
+
+
+class AliyunBaiLianQwenAudio30TTSModelParams(BaseForm):
+    voice = SingleSelect(
+        TooltipLabel(_("Timbre"), _("Please select a system voice supported by Qwen-TTS")),
+        required=True,
+        default_value="longanlingxin",
+        text_field="value",
+        value_field="value",
+        option_list=[
+            {"label": "longanlingxin", "value": "longanlingxin"},
+            {"label": "longanlufeng", "value": "longanlufeng"},
+            {"label": "longanfengyue", "value": "longanfengyue"},
+        ],
+    )
+
+    speech_rate = _qwen_audio_speech_rate_field()
+
+
 class AliyunBaiLianTTSModelCredential(BaseForm, BaseModelCredential):
     """
     Credential class for the Aliyun BaiLian TTS (Text-to-Speech) model.
@@ -153,6 +206,12 @@ class AliyunBaiLianTTSModelCredential(BaseForm, BaseModelCredential):
         :param model_name: Name of the model.
         :return: Parameter setting form.
         """
+        if "qwen-audio" in model_name and "tts-next" in model_name:
+            return AliyunBaiLianQwenAudioTTSNextParams()
+        if "qwen-audio-3.0" in model_name:
+            return AliyunBaiLianQwenAudio30TTSModelParams()
+        if "qwen-audio-3.1" in model_name:
+            return AliyunBaiLianQwenAudio31TTSModelParams()
         if "qwen" in model_name and "tts" in model_name:
             return AliyunBaiLianQwenTTSModelGeneralParams()
         return AliyunBaiLianTTSModelGeneralParams()
