@@ -48,16 +48,12 @@ const goLogin = () => {
 <template>
   <MkDropdown v-if="account" class="w-full" trigger="click" placement="top-start" @visible-change="menuVisible = $event">
     <!-- 展开账户菜单 -->
-    <button
-      type="button"
-      class="flex-align-center w-full cursor-pointer gap-2 rounded-md py-1 px-2 hover:bg-N900/10"
-      :class="{ 'bg-N900/10': menuVisible }"
-    >
+    <div class="flex-align-center w-full cursor-pointer gap-2 rounded-md py-1 px-2 hover:bg-N900/10" :class="{ 'bg-N900/10': menuVisible }">
       <el-avatar :size="32" class="bg-primary-gradient!">
         <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 54%" />
       </el-avatar>
       <span class="truncate" :title="displayName">{{ displayName }}</span>
-    </button>
+    </div>
     <template #dropdown>
       <div class="w-60">
         <div class="p-3">

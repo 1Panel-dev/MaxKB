@@ -12,6 +12,8 @@ defineOptions({ name: 'HistoryPopover' })
 const conversationList = useConversationListStore()
 const visible = ref(false)
 const clearing = ref(false)
+// 菜单挂在历史浮层内、滚动区外，避免裁切并保留外层点击判断。
+const historyMenuTarget = ref<HTMLDivElement>()
 
 // 每次打开重新加载第一页，滚动到底部时续载。
 const handleShow = () => conversationList.loadConversations()
@@ -55,15 +57,7 @@ function handleClearConversations() {
 </script>
 
 <template>
-  <el-popover
-    v-model:visible="visible"
-    trigger="click"
-    placement="bottom-end"
-    :width="280"
-    popper-class="p-2!"
-    :popper-style="{ '--el-bg-color-overlay': 'var(--mk-N100)' }"
-    @show="handleShow"
-  >
+  <el-popover v-model:visible="visible" trigger="click" placement="bottom-end" :width="280" popper-class="p-2! bg-N100!" @show="handleShow">
     <template #reference>
       <span class="inline-flex">
         <MkTooltip content="历史对话">
@@ -106,14 +100,14 @@ function handleClearConversations() {
             </span>
           </template>
           <template #action>
-            <MkDropdown trigger="click" persistent :teleported="false">
+            <MkDropdown trigger="click" persistent :append-to="historyMenuTarget">
               <!-- 打开历史对话操作菜单 -->
               <el-button text><MkIcon name="icon_more_outlined" /></el-button>
               <template #dropdown>
                 <MkDropdownMenu>
                   <RenameConversation :conversation="conversation" />
                   <!-- 删除历史对话 -->
-                  <MkDropdownItem @click="handleDeleteConversation(conversation)">
+                  <MkDropdownItem divided @click="handleDeleteConversation(conversation)">
                     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                     <span>删除</span>
                   </MkDropdownItem>
@@ -124,5 +118,6 @@ function handleClearConversations() {
         </MkListItem>
       </div>
     </el-scrollbar>
+    <div ref="historyMenuTarget" />
   </el-popover>
 </template>
