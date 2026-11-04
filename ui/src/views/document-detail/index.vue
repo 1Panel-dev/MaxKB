@@ -24,8 +24,7 @@ import { perm } from '@/permission'
 /**
  * 知识库「文档」权限判断
  */
-type KnowledgeDocPermissionMethod =
-  | 'docCreate' | 'docEdit' | 'docDelete' | 'docGenerate' | 'docMigrate'
+type KnowledgeDocPermissionMethod = 'docCreate' | 'docEdit' | 'docDelete' | 'docGenerate' | 'docMigrate'
 
 function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -287,7 +286,11 @@ onMounted(() => {
             </el-button>
           </span>
           <!-- 添加文档分段 -->
-          <el-button v-if="!isWorkspaceSharedResource() && !batchMode && knowledgeDocPermission('docEdit')" type="primary" @click="handleOpenCreateParagraph()">
+          <el-button
+            v-if="!isWorkspaceSharedResource() && !batchMode && knowledgeDocPermission('docEdit')"
+            type="primary"
+            @click="handleOpenCreateParagraph()"
+          >
             <MkIcon name="icon_add_outlined" />
             <span>添加分段</span>
           </el-button>
@@ -432,7 +435,12 @@ onMounted(() => {
                               v-if="knowledgeDocPermission('docEdit')"
                             />
                             <!-- 删除当前分段 -->
-                            <MkDropdownItem v-if="knowledgeDocPermission('docDelete')" divided :disabled="loading" @click="handleDeleteParagraph(paragraph)">
+                            <MkDropdownItem
+                              v-if="knowledgeDocPermission('docDelete')"
+                              divided
+                              :disabled="loading"
+                              @click="handleDeleteParagraph(paragraph)"
+                            >
                               <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                               删除
                             </MkDropdownItem>
@@ -491,7 +499,14 @@ onMounted(() => {
             v-if="knowledgeDocPermission('docGenerate')"
           />
           <!-- 批量删除分段 -->
-          <el-button v-if="knowledgeDocPermission('docDelete')" type="danger" plain :loading="loading" :disabled="loading || !selectedParagraphIds.length" @click="handleBatchDeleteParagraphs">
+          <el-button
+            v-if="knowledgeDocPermission('docDelete')"
+            type="danger"
+            plain
+            :loading="loading"
+            :disabled="loading || !selectedParagraphIds.length"
+            @click="handleBatchDeleteParagraphs"
+          >
             删除
           </el-button>
         </template>

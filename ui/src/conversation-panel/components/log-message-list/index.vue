@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import ContentList from '../content-list/index.vue'
-import MessageFooter from '../message-footer/index.vue'
+import LogMessageFooter from '../log-message-footer/index.vue'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import { useLogMessageListStore } from './index'
 
@@ -31,7 +31,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
         <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
         <ContentList :content-list="msg.content" />
         <!-- 助手消息底部信息栏(知识来源/执行详情/tokens/耗时) -->
-        <MessageFooter class="mt-3" v-if="msg.role === 'ASSISTANT' && msg.record" :message="msg" />
+        <LogMessageFooter class="mt-3" v-if="msg.role === 'ASSISTANT' && msg.record" :message="msg" />
       </div>
     </template>
 

@@ -1,7 +1,7 @@
 import { get, post, put, del, postStream } from './core/request'
 import type { ResponsePage } from './core/types'
 import { CHAT_API_BASE_PATH as chatApiBase } from '@/api/constants'
-import type { ChatLogRecord, ChatShareDetail, PortalConversationSummary } from '@/api/types'
+import type { ChatFeedback, ChatLogRecord, ChatShareDetail, PortalConversationSummary } from '@/api/types'
 
 /** v3 对话接口均按智能体划分资源路径。 */
 const getApplicationPath = (applicationId: string) => `/v3/application/${applicationId}`
@@ -46,6 +46,10 @@ const putConversation = (applicationId: string, chatId: string, data: unknown) =
 const postShareConversation = (applicationId: string, chatId: string, data: { chat_record_ids: string[] }) =>
   post<{ chat_record_ids: string[] }, { link: string }>(`${getApplicationPath(applicationId)}/chat/${chatId}/share_chat`, data)
 
+/** 保存或撤销当前回答的反馈。 */
+const putConversationFeedback = (applicationId: string, chatId: string, recordId: string, data: ChatFeedback) =>
+  put(`${getApplicationPath(applicationId)}/chat/${chatId}/chat_record/${recordId}/vote`, data)
+
 /** 获取公开分享的对话记录，无需智能体访问凭证。 */
 const getShareConversation = (shareId: string) => get<ChatShareDetail>(`/share/${encodeURIComponent(shareId)}`)
 
@@ -53,6 +57,7 @@ const getShareConversation = (shareId: string) => get<ChatShareDetail>(`/share/$
 const postSpeechToText = (applicationId: string, data: unknown) => post(`${getApplicationPath(applicationId)}/speech_to_text`, data)
 
 export default {
+  putConversationFeedback,
   getConversationOpen,
   postConversationMessage,
   postCancelConversationMessage,

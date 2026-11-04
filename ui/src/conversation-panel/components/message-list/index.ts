@@ -1,13 +1,13 @@
 import { ref, inject, type InjectionKey, type Ref } from 'vue'
 import { nanoid } from 'nanoid'
-import type { ChatLogRecord, Dict } from '@/api/types'
+import type { ChatFeedback, ChatLogRecord, Dict } from '@/api/types'
 import { aggregators } from '../../core/aggregators'
 import { ConversationStream } from '../../core/stream'
 import type { ChatMessage, ChatRecordMeta, ConversationApiAdapter, ConversationAppInfo, SendMessageOptions, StreamChunk } from '../../core/types'
 
 export interface MessageListDeps extends Pick<
   ConversationApiAdapter,
-  'pageRecords' | 'recordDetail' | 'chatMessage' | 'resumeMessage' | 'cancel' | 'uploadFile'
+  'feedback' | 'pageRecords' | 'recordDetail' | 'chatMessage' | 'resumeMessage' | 'cancel' | 'uploadFile'
 > {
   // 只读获取当前会话 id(单一数据源在 conversation-list)。必须无副作用:不可惰性创建,
   // 否则无会话时的 stop/cancel/loadMore 会凭空生成 id 并误请求后端。
@@ -18,6 +18,7 @@ export interface MessageListDeps extends Pick<
 
 // 从后端 chat_record(分页项或详情接口,均为 reset_chat_record 结构)提取底部信息栏数据
 const buildRecordMeta = (raw?: ChatLogRecord | null): ChatRecordMeta => ({
+  feedback: { vote_status: raw?.vote_status ?? '-1', vote_reason: raw?.vote_reason, vote_other_content: raw?.vote_other_content },
   createTime: raw?.create_time,
   messageTokens: raw?.message_tokens || 0,
   answerTokens: raw?.answer_tokens || 0,
@@ -235,6 +236,7 @@ export function createMessageListStore(deps: MessageListDeps) {
   }
 
   return {
+    feedback: deps.feedback ? (recordId: string, data: ChatFeedback) => deps.feedback!(getChatId(), recordId, data) : undefined,
     appInfo,
     messages,
     loading,

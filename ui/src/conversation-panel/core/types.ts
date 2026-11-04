@@ -1,5 +1,5 @@
 import type { CHAT_TYPE } from './enums'
-import type { ChatApplicationProfile, ChatContent, ChatLogRecord, ChatUserProfile, Dict } from '@/api/types'
+import type { ChatFeedback, ChatApplicationProfile, ChatContent, ChatLogRecord, ChatUserProfile, Dict } from '@/api/types'
 
 /**
  * 当前对话的智能体信息，由 view 加载并注入各组件 store，chat 与 debug 结构一致。
@@ -24,6 +24,7 @@ export interface Conversation {
 
 // 助手消息底部展示数据(对话结束后 / 历史加载时填充):知识来源数、tokens、耗时、执行详情
 export interface ChatRecordMeta {
+  feedback?: ChatFeedback
   createTime?: string
   messageTokens: number
   answerTokens: number
@@ -71,6 +72,7 @@ export interface SendMessageOptions {
 
 // 模式适配:chat / debug 只在这些 API 上有差异,由 view/{mode} 组装时注入。
 export interface ConversationApiAdapter {
+  feedback?: (chatId: string, recordId: string, data: ChatFeedback) => Promise<unknown>
   pageConversations: (page: number, size: number) => Promise<{ records?: Conversation[] } | null | undefined>
   pageRecords: (chatId: string, page: number, size: number) => Promise<{ records?: ChatLogRecord[] } | null | undefined>
   recordDetail: (chatId: string, chatRecordId: string) => Promise<ChatLogRecord | null | undefined>
