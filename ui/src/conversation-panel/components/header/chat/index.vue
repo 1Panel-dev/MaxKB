@@ -30,22 +30,25 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
       </MkTooltip>
     </template>
 
-    <div class="flex-1 flex-align-center gap-2">
+    <div class="min-w-0 flex-1">
       <h4 class="truncate">{{ list.currentConversation.value?.abstract || '新建对话' }}</h4>
     </div>
-    <!-- 新建对话 -->
-    <MkTooltip content="新建对话">
-      <el-button text @click="handleNewConversation">
-        <MkIcon name="icon_new-chat_outlined" :size="18" class="text-N900!" />
-      </el-button>
-    </MkTooltip>
-    <!-- 进入分享模式，勾选要分享的对话 -->
-    <MkTooltip v-if="shareable" content="分享">
-      <el-button text :disabled="!canShare" @click="list.switchShared(true)">
-        <MkIcon name="icon_share_outlined" :size="18" :class="canShare ? 'text-N900!' : 'text-N400!'" />
-      </el-button>
-    </MkTooltip>
-    <slot />
+    <template v-if="!list.isShared.value">
+      <!-- 新建对话 -->
+      <MkTooltip content="新建对话">
+        <el-button text @click="handleNewConversation">
+          <MkIcon name="icon_new-chat_outlined" :size="18" class="text-N900!" />
+        </el-button>
+      </MkTooltip>
+      <!-- 进入分享模式，勾选要分享的对话 -->
+      <MkTooltip v-if="shareable" content="分享">
+        <el-button text :disabled="!canShare" @click="list.switchShared(true)">
+          <MkIcon name="icon_share_outlined" :size="18" :class="canShare ? 'text-N900!' : 'text-N400!'" />
+        </el-button>
+      </MkTooltip>
+
+      <slot />
+    </template>
   </header>
 </template>
 

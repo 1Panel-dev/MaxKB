@@ -62,6 +62,7 @@
 | `system/operate-logs/`                                                                | 操作日志与清除策略                           |
 | `login/`、`login/forgot-password/`                                                    | Admin 登录与找回密码                         |
 | `chat/`、`portal/`                                                                    | 单应用与门户对话                             |
+| `chat/share/`                                                                         | 公开分享链接的只读问答展示与失败重试         |
 | `chat/login/`、`chat/error/`、`error/`                                                | Chat 登录、Chat／Admin 错误页                |
 | `details-demo/`                                                                       | 临时执行详情预览                             |
 

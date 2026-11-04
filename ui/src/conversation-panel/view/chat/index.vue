@@ -12,7 +12,7 @@ import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/inde
 import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
 import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
-import { SHARE_PANEL_KEY } from '../../main/share-panel/index'
+import { SHARE_PANEL_KEY, SHARE_PANEL_CONTENT_KEY } from '../../main/share-panel/index'
 import { createChatConversation } from './index'
 
 const bundle = createChatConversation()
@@ -37,6 +37,10 @@ provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
 provide(EXECUTION_DETAIL_KEY, bundle.detail)
 provide(SHARE_PANEL_KEY, bundle.share)
+provide(SHARE_PANEL_CONTENT_KEY, {
+  ...bundle.msgs,
+  title: computed(() => bundle.list.currentConversation.value?.abstract || '新建对话'),
+})
 
 // 响应式:窄屏 drawer,宽屏 push
 const BREAKPOINT = 768

@@ -38,3 +38,5 @@ export type * from './termbase'
 export type * from './chat-log'
 
 export type * from './shared-authorization'
+
+export type * from './chat-share'

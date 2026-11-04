@@ -1,4 +1,6 @@
-import { ref, inject, type InjectionKey } from 'vue'
+import { ref, inject, type Ref, type InjectionKey } from 'vue'
+
+import type { MessageListStore } from '../../components/message-list/index'
 
 export interface SharePanelDeps {
   /** 提交分享:参数为按消息顺序排列的已选 chat_record id */
@@ -53,5 +55,18 @@ export const SHARE_PANEL_KEY: InjectionKey<SharePanelStore> = Symbol('share-pane
 export function useSharePanelStore(): SharePanelStore {
   const store = inject(SHARE_PANEL_KEY)
   if (!store) throw new Error('useSharePanelStore 必须在提供 SHARE_PANEL_KEY 的视图内使用')
+  return store
+}
+
+/** 分享面板只读展示所需的数据，由所属视图注入。 */
+export type SharePanelContentStore = Pick<MessageListStore, 'appInfo' | 'messages' | 'loading' | 'hasMore' | 'loadMore'> & {
+  title: Readonly<Ref<string>>
+}
+
+export const SHARE_PANEL_CONTENT_KEY: InjectionKey<SharePanelContentStore> = Symbol('share-panel-content')
+
+export function useSharePanelContentStore(): SharePanelContentStore {
+  const store = inject(SHARE_PANEL_CONTENT_KEY)
+  if (!store) throw new Error('useSharePanelContentStore 必须在提供 SHARE_PANEL_CONTENT_KEY 的视图内使用')
   return store
 }
