@@ -3950,7 +3950,7 @@ msgstr "問題"
 #: apps/common/auth/constants/group_constants.py:116
 #: apps/common/auth/constants/group_constants.py:136
 msgid "Termbase"
-msgstr "詞庫"
+msgstr "自定義分詞"
 
 #: apps/common/auth/constants/group_constants.py:47
 #: apps/common/auth/constants/group_constants.py:117
@@ -3966,7 +3966,7 @@ msgstr "概覽"
 #: apps/common/auth/constants/group_constants.py:51
 #: apps/common/auth/constants/group_constants.py:140
 msgid "Application Access"
-msgstr "智慧體接入"
+msgstr "發布管道"
 
 #: apps/common/auth/constants/group_constants.py:52
 #: apps/common/auth/constants/group_constants.py:141
@@ -3997,7 +3997,7 @@ msgstr "郵箱設定"
 
 #: apps/common/auth/constants/group_constants.py:63
 msgid "Login Auth"
-msgstr "登入認證"
+msgstr "系統用戶認證"
 
 #: apps/common/auth/constants/group_constants.py:64
 #: apps/xpack/views/system_params.py:24 apps/xpack/views/system_params.py:40
@@ -4020,7 +4020,7 @@ msgstr "對話使用者認證"
 
 #: apps/common/auth/constants/group_constants.py:70
 msgid "Portal Setting"
-msgstr "門戶設定"
+msgstr "門戶訪問設定"
 
 #: apps/common/auth/constants/group_constants.py:78
 #: apps/common/auth/constants/group_constants.py:91
@@ -4101,11 +4101,31 @@ msgstr "訪問限制"
 
 #: apps/common/auth/constants/operate_constants.py:44
 msgid "API KEY"
-msgstr "API KEY"
+msgstr "API Key"
 
 #: apps/common/auth/constants/operate_constants.py:45
 msgid "Public access link"
 msgstr "公共訪問連結"
+
+#: apps/common/auth/constants/operate_constants.py:46
+msgid "Backend API access"
+msgstr "後端API訪問"
+
+#: apps/role_setting/constants/permission_display.py
+msgid "Web access"
+msgstr "Web 訪問"
+
+#: apps/role_setting/constants/permission_display.py
+msgid "MCP configuration details"
+msgstr "MCP配置詳情"
+
+#: apps/role_setting/constants/permission_display.py
+msgid "View settings"
+msgstr "檢視設定"
+
+#: apps/role_setting/constants/permission_display.py
+msgid "Edit settings"
+msgstr "編輯設定"
 
 #: apps/common/auth/constants/operate_constants.py:46
 msgid "Enterprise WeiXin"
@@ -4202,11 +4222,11 @@ msgstr "設定角色"
 
 #: apps/common/auth/constants/operate_constants.py:71
 msgid "MCP service configuration"
-msgstr "MCP 服務配置"
+msgstr "MCP服務配置"
 
 #: apps/common/auth/constants/operate_constants.py:72
 msgid "Export skills"
-msgstr "匯出 skills"
+msgstr "匯出skills"
 
 #: apps/common/auth/constants/operate_constants.py:73
 msgid "Quota Setting"

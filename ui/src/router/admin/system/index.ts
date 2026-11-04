@@ -50,19 +50,19 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'users',
           name: 'system-users',
           component: () => import('@/views/system/identity/users/index.vue'),
-          meta: { title: '用户管理', order: 10, permission: perm.system.user.read, next: 'system-workspace' },
+          meta: { title: '用户管理', order: 10, permission: perm.system.user.read, next: 'system-roles' },
         },
         {
           path: 'workspace',
           name: 'system-workspace',
           component: () => import('@/views/system/identity/workspaces/index.vue'),
-          meta: { title: '工作空间', order: 20, permission: perm.system.workspace.read, next: 'system-roles' },
+          meta: { title: '工作空间', order: 30, permission: perm.system.workspace.read, next: 'system-groups' },
         },
         {
           path: 'roles',
           name: 'system-roles',
           component: () => import('@/views/system/identity/roles/index.vue'),
-          meta: { title: '角色管理', order: 30, permission: perm.system.role.read, next: 'system-groups' },
+          meta: { title: '角色管理', order: 20, permission: perm.system.role.read, next: 'system-workspace' },
         },
         {
           path: 'groups',

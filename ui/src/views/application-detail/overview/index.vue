@@ -25,7 +25,13 @@ const route = useRoute()
 const workspaceId = computed(() => String(route.params.workspaceId ?? ''))
 const { application, applicationId, resourceApi } = useApplicationDetailContext()
 
-type ApplicationOverviewPermissionMethod = 'overviewRead' | 'overviewEmbed' | 'overviewAccess' | 'overviewDisplay' | 'overviewApiKey'
+type ApplicationOverviewPermissionMethod =
+  | 'overviewRead'
+  | 'overviewEmbed'
+  | 'overviewAccess'
+  | 'overviewDisplay'
+  | 'overviewApiKey'
+  | 'overviewBackendApiAccess'
 function applicationOverviewPermission(method: ApplicationOverviewPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.application.system[method]())
   return Boolean(perm.application.workspace[method](applicationId.value))
@@ -169,7 +175,12 @@ onMounted(() => {
           <div class="flex-between">
             <h6>后端 API 访问</h6>
             <!-- 后端 API 访问开关 -->
-            <el-switch :model-value="apiKeyEnabled" size="small" :disabled="apiKeySaving" :before-change="handleChangeApiKeyAccess" />
+            <el-switch
+              :model-value="apiKeyEnabled"
+              size="small"
+              :disabled="apiKeySaving || !applicationOverviewPermission('overviewBackendApiAccess')"
+              :before-change="handleChangeApiKeyAccess"
+            />
           </div>
           <div class="space-y-2">
             <div>API 文档</div>

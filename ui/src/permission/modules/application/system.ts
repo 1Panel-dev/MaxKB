@@ -57,6 +57,14 @@ const system = {
  * 系统「智能体」查看关联资源权限
  */
   relateMap: () => canSys(P.RESOURCE_APPLICATION_RELATE_RESOURCE_VIEW),
+/**
+ * 系统「智能体」MCP 配置详情权限
+ */
+  mcpConfig: () => canSys(P.RESOURCE_APPLICATION_MCP_CONFIG),
+/**
+ * 系统「智能体」导出 skills 权限
+ */
+  exportSkills: () => canSys(P.RESOURCE_APPLICATION_EXPORT_SKILLS),
   debug: () => canSys(P.RESOURCE_APPLICATION_EDIT),
 
   // —— 触发器 ——
@@ -98,6 +106,10 @@ const system = {
  * 系统「智能体」「概览」API KEY权限
  */
   overviewApiKey: () => canSys(P.RESOURCE_APPLICATION_OVERVIEW_API_KEY),
+/**
+ * 系统「智能体」「概览」后端 API 访问权限
+ */
+  overviewBackendApiAccess: () => canSys(P.RESOURCE_APPLICATION_OVERVIEW_BACKEND_API_ACCESS),
 
   // —— 访问 / 访客 / 对话日志 ——
 /**
