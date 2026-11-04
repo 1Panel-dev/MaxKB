@@ -23,6 +23,7 @@ import {
   RelatedResourcesKnowledgeAction,
   SyncKnowledgeAction,
 } from '@/views/knowledge/knowledge-card/action-dropdown/index.ts'
+import perm from '@/permission'
 
 const { auth } = useStore()
 const router = useRouter()
@@ -175,7 +176,7 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 进入知识库详情 -->
-              <MkTooltip content="管理">
+              <MkTooltip v-if="perm.knowledge.system.edit()" content="管理">
                 <el-button text type="primary" @click="handleOpenKnowledge(row)">
                   <MkIcon name="icon_admin_outlined" />
                 </el-button>
@@ -187,11 +188,12 @@ onMounted(() => {
                 label="向量化"
                 :api="SystemResourceKnowledgeApi"
                 :knowledge="row"
+                v-if="perm.knowledge.system.vector()"
               />
               <MkTableMoreDropdown>
                 <!-- 同步 Web 知识库 -->
                 <SyncKnowledgeAction
-                  v-if="row.type === KNOWLEDGE_TYPE.WEB"
+                  v-if="row.type !== KNOWLEDGE_TYPE.BASE && perm.knowledge.system.sync()"
                   v-model:loading="knowledgeOperationLoading"
                   label="同步"
                   :api="SystemResourceKnowledgeApi"
@@ -203,9 +205,10 @@ onMounted(() => {
                   label="生成问题"
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
+                  v-if="perm.knowledge.system.generate()"
                 />
                 <!-- 设置 -->
-                <MkDropdownItem v-if="$perm.knowledge.system.settingRead()" @click.stop="handleOpenKnowledgeSetting(row)">
+                <MkDropdownItem v-if="perm.knowledge.system.settingRead()" @click.stop="handleOpenKnowledgeSetting(row)">
                   <template #icon><MkIcon name="icon_setting" /></template>
                   设置
                 </MkDropdownItem>
@@ -222,13 +225,14 @@ onMounted(() => {
                   label="MCP 服务配置"
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
+                  v-if="perm.knowledge.system.mcpConfig()"
                 />
                 <!-- 资源授权 -->
-                <AuthorizeKnowledgeAction label="资源授权" :knowledge="row" />
+                <AuthorizeKnowledgeAction v-if="perm.knowledge.system.auth()" label="资源授权" :knowledge="row" />
                 <!-- 查看关联资源 -->
-                <RelatedResourcesKnowledgeAction label="查看关联资源" :api="SystemRelatedResourcesApi" :knowledge="row" />
+                <RelatedResourcesKnowledgeAction v-if="perm.knowledge.system.relateMap()" label="查看关联资源" :api="SystemRelatedResourcesApi" :knowledge="row" />
                 <!-- 导出 -->
-                <ExportKnowledgeAction v-model:loading="knowledgeOperationLoading" label="导出" :api="SystemResourceKnowledgeApi" :knowledge="row" />
+                <ExportKnowledgeAction v-if="perm.knowledge.system.export()" v-model:loading="knowledgeOperationLoading" label="导出" :api="SystemResourceKnowledgeApi" :knowledge="row" />
                 <!-- 删除 -->
                 <DeleteKnowledgeAction
                   v-model:loading="knowledgeOperationLoading"
@@ -236,6 +240,7 @@ onMounted(() => {
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
                   @delete="loadKnowledgePage"
+                  v-if="perm.knowledge.system.delete()"
                 />
               </MkTableMoreDropdown>
             </div>

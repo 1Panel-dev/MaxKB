@@ -22,6 +22,7 @@ import {
   RelatedResourcesKnowledgeAction,
   SyncKnowledgeAction,
 } from '@/views/knowledge/knowledge-card/action-dropdown'
+import perm from '@/permission/index.ts'
 
 /* 共享知识库详情入口 */
 const router = useRouter()
@@ -90,7 +91,7 @@ function handleSearchChange(query?: Dict<unknown>) {
           <!-- 模板中心 -->
           <ButtonTemplateStore folder-id="default" :api="SystemSharedKnowledgeApi" @refresh="refreshKnowledge" />
           <!-- 创建共享知识库 -->
-          <ButtonCreateKnowledge folder-id="default" :api="SystemSharedKnowledgeApi" @refresh="refreshKnowledge" />
+          <ButtonCreateKnowledge v-if="perm.knowledge.share.create()" folder-id="default" :api="SystemSharedKnowledgeApi" @refresh="refreshKnowledge" />
         </div>
       </component>
 
@@ -102,7 +103,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                 <template #action-dropdown>
                   <!-- 同步 Web 知识库 -->
                   <SyncKnowledgeAction
-                    v-if="knowledge.type === KNOWLEDGE_TYPE.WEB"
+                    v-if="knowledge.type !== KNOWLEDGE_TYPE.BASE && perm.knowledge.share.sync()"
                     v-model:loading="knowledgeOperationLoading"
                     label="同步"
                     :api="SystemSharedKnowledgeApi"
@@ -114,6 +115,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                     label="向量化"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
+                    v-if="perm.knowledge.share.vector()"
                   />
                   <!-- 生成问题 -->
                   <GenerateQuestionsAction
@@ -121,9 +123,10 @@ function handleSearchChange(query?: Dict<unknown>) {
                     label="生成问题"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
+                    v-if="perm.knowledge.share.generate()"
                   />
                   <!-- 设置 -->
-                  <MkDropdownItem @click.stop="handleOpenKnowledgeSetting(knowledge)">
+                  <MkDropdownItem v-if="perm.knowledge.share.edit()" @click.stop="handleOpenKnowledgeSetting(knowledge)">
                     <template #icon><MkIcon name="icon_setting" /></template>
                     设置
                   </MkDropdownItem>
@@ -143,16 +146,17 @@ function handleSearchChange(query?: Dict<unknown>) {
                   />
 
                   <!-- 授权工作空间 -->
-                  <AuthorizedWorkspaceAction label="授权工作空间" :resource="knowledge" :resource-type="RESOURCE_TYPE.KNOWLEDGE" />
+                  <AuthorizedWorkspaceAction v-if="perm.knowledge.share.authToWorkspace()" label="授权工作空间" :resource="knowledge" :resource-type="RESOURCE_TYPE.KNOWLEDGE" />
 
                   <!-- 查看关联资源 -->
-                  <RelatedResourcesKnowledgeAction label="查看关联资源" :api="SystemSharedRelatedResourcesApi" :knowledge="knowledge" />
+                  <RelatedResourcesKnowledgeAction v-if="perm.knowledge.share.relateMap()" label="查看关联资源" :api="SystemSharedRelatedResourcesApi" :knowledge="knowledge" />
                   <!-- 导出共享知识库 -->
                   <ExportKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
                     label="导出"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
+                    v-if="perm.knowledge.share.export()"
                   />
                   <!-- 删除共享知识库 -->
                   <DeleteKnowledgeAction
@@ -161,6 +165,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                     @delete="refreshKnowledge"
+                    v-if="perm.knowledge.share.delete()"
                   />
                 </template>
               </KnowledgeCard>

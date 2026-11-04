@@ -8,7 +8,20 @@ import { LOGIN_METHOD_LABELS } from '@/constants'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「对话用户」权限判断
+ */
+type KnowledgeChatUserPermissionMethod = 'knowledgeChatUserRead' | 'knowledgeChatUserEdit'
+
+function knowledgeChatUserPermission(method: KnowledgeChatUserPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'KnowledgeChatUserListView' })
 defineProps<ResourceDetailPageProps>()
@@ -205,17 +218,18 @@ onMounted(() => loadChatUserGroups())
             <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
             <!-- 设置用户组自动授权 -->
             <div class="flex-align-center shrink-0 gap-2">
-              <span>自动授权</span>
+              <span v-if="knowledgeChatUserPermission('knowledgeChatUserEdit')">自动授权</span>
               <el-switch
                 :disabled="isWorkspaceSharedResource()"
                 :model-value="currentGroup.is_auth"
                 size="small"
                 @change="handleAutoAuthorizationChange"
+                v-if="knowledgeChatUserPermission('knowledgeChatUserEdit')"
               />
             </div>
           </div>
           <!-- 保存对话用户授权 -->
-          <el-button v-if="!isWorkspaceSharedResource()" type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
+          <el-button v-if="!isWorkspaceSharedResource() && knowledgeChatUserPermission('knowledgeChatUserEdit')" type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
         </div>
 
         <MkTable
@@ -239,7 +253,7 @@ onMounted(() => loadChatUserGroups())
               <el-checkbox
                 :model-value="allChecked"
                 :indeterminate="allIndeterminate"
-                :disabled="authorizationDisabled || isWorkspaceSharedResource()"
+                :disabled="!knowledgeChatUserPermission('knowledgeChatUserEdit')"
                 @change="handleCheckAll"
               >
                 授权
@@ -249,7 +263,7 @@ onMounted(() => loadChatUserGroups())
               <!-- 设置对话用户授权 -->
               <el-checkbox
                 :model-value="row.is_auth"
-                :disabled="authorizationDisabled || isWorkspaceSharedResource()"
+                :disabled="!knowledgeChatUserPermission('knowledgeChatUserEdit')"
                 @change="(value: CheckboxValueType) => handleRowChange(value, row)"
               />
             </template>

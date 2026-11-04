@@ -4,10 +4,20 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { ref, useTemplateRef, watch } from 'vue'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '../../context'
 
-const canEdit = () => !isWorkspaceSharedResource() && (isSystemResource() ? perm.knowledge.system.documentStrategyEdit() : !isWorkspaceResource() || perm.knowledge.workspace.documentStrategyEdit(knowledgeId.value))
+/**
+ * 知识库「文档处理策略」权限判断
+ */
+type KnowledgeExternalServicePermissionMethod = 'knowledgeExternalServiceRead' | 'knowledgeExternalServiceEdit'
+
+function knowledgeExternalServicePermission(method: KnowledgeExternalServicePermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'KnowledgeDocumentStrategyView' })
 
@@ -28,7 +38,7 @@ watch(
 /* 只保存文档处理策略，不触发同步或修改其他设置。 */
 function handleSave() {
   const knowledgeApi = resourceApi.knowledge
-  if (!canEdit() || !('putKnowledge' in knowledgeApi)) return
+  if (!knowledgeExternalServicePermission('knowledgeExternalServiceEdit') || !('putKnowledge' in knowledgeApi)) return
   const detail = knowledge.value
   const strategyForm = strategyFormRef.value
   if (saving.value || !detail || !strategyForm) return
@@ -63,6 +73,6 @@ defineExpose({ customHeader: true })
   <div v-loading="saving" class="max-w-200">
     <DocumentStrategyForm ref="strategyFormRef" />
     <!-- 保存文档处理策略 -->
-    <el-button v-if="canEdit()" type="primary" class="mt-4" :loading="saving" @click="handleSave">保存</el-button>
+    <el-button v-if="knowledgeExternalServicePermission('knowledgeExternalServiceEdit')" type="primary" class="mt-4" :loading="saving" @click="handleSave">保存</el-button>
   </div>
 </template>

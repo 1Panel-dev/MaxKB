@@ -4,7 +4,11 @@ import workspace from './workspace'
 import system from './system'
 import share from './share'
 
-export default { workspace,
+export default {
+  /**
+   * 工作空间「知识库」权限
+   */
+  workspace,
   /**
    * 系统「知识库」权限
    * */

@@ -2,6 +2,20 @@
 import { computed, ref } from 'vue'
 import { MsgSuccess } from '@/utils/message'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「词库」权限判断
+ */
+type KnowledgeTermbasePermissionMethod = 'termbaseCreate'
+
+function knowledgeTermbasePermission(method: KnowledgeTermbasePermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](props.knowledgeId))
+}
 
 defineOptions({ name: 'ButtonCreateTermbase' })
 
@@ -49,7 +63,7 @@ function resetData() {
 
 <template>
   <!-- 创建词语 -->
-  <el-button type="primary" @click="handleOpenCreateTermbase">
+  <el-button v-if="knowledgeTermbasePermission('termbaseCreate')" type="primary" @click="handleOpenCreateTermbase">
     <MkIcon name="icon_add_outlined" />
     <span>创建词语</span>
   </el-button>

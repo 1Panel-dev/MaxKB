@@ -6,9 +6,18 @@ import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetti
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource } from '@/utils/resource-context'
+import {isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+/**
+ * 知识库「外部检索服务」权限判断
+ */
+type KnowledgeExternalServicePermissionMethod = 'knowledgeExternalServiceRead' | 'knowledgeExternalServiceEdit'
 
-const canEdit = () => !isWorkspaceSharedResource() && (isSystemResource() ? perm.knowledge.system.externalServiceEdit() : !isWorkspaceResource() || perm.knowledge.workspace.externalServiceEdit(knowledgeId.value))
+function knowledgeExternalServicePermission(method: KnowledgeExternalServicePermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'ExternalRetrievalView' })
 defineProps<ResourceDetailPageProps>()
@@ -37,7 +46,7 @@ async function loadExternalRetrieval() {
 
 // 仅保存本次切换的字段，成功后按完整响应更新开关及配置示例。
 async function handleSettingChange(field: keyof KnowledgeExternalRetrievalPayload, value: string | number | boolean) {
-  if (!setting.value || loading.value || saving.value || !canEdit()) return
+  if (!setting.value || loading.value || saving.value || !knowledgeExternalServicePermission('knowledgeExternalServiceEdit')) return
   saving.value = true
   try {
     const result = await resourceApi.externalRetrieval.putKnowledgeExternalRetrieval?.(knowledgeId.value, { [field]: value === true })
@@ -79,7 +88,7 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
         </div>
         <!-- 切换身份认证 -->
         <el-switch
-          :disabled="!canEdit()"
+          :disabled="!knowledgeExternalServicePermission('knowledgeExternalServiceEdit')"
           :model-value="setting.authentication"
           @change="handleSettingChange('authentication', $event)"
         />
@@ -89,7 +98,7 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
           <span>API 服务地址</span>
           <!-- 切换外部检索服务 -->
           <el-switch
-            :disabled="!canEdit()"
+            :disabled="!knowledgeExternalServicePermission('knowledgeExternalServiceEdit')"
             :model-value="setting.enabled"
             size="small"
             @change="handleSettingChange('enabled', $event)"

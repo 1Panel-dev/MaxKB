@@ -7,11 +7,26 @@ import { KNOWLEDGE_IMAGE_EXTENSIONS, KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_TYP
 import { MsgWarning } from '@/utils/message'
 import { useInputEvents } from '@/conversation-panel/core/input-events'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「召回测试」权限判断
+ */
+type KnowledgeHitTestPermissionMethod = | 'hitTest'
+
+function knowledgeHitTestPermission(method: KnowledgeHitTestPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](props.knowledgeId))
+}
 
 defineOptions({ name: 'KnowledgeHitTestInput' })
 
 const props = withDefaults(
   defineProps<{
+    knowledgeId: string
     loading?: boolean
     allowImages?: boolean
     fileCountLimit?: number
@@ -223,7 +238,7 @@ onBeforeUnmount(() => {
   </div>
   <!-- 执行召回测试 -->
   <el-button type="primary" class="mt-4 w-full" :loading="loading" :disabled="!canSubmit" @click="submitTest">
-    <MkIcon name="icon_play_outlined" />
+    <MkIcon v-if="knowledgeHitTestPermission('hitTest')" name="icon_play_outlined" />
     <span>测试</span>
   </el-button>
 </template>

@@ -9,11 +9,25 @@ import { datetimeFormat } from '@/utils/time'
 import { toOrderBy } from '@/utils/common'
 import { numberFormat } from '@/utils/number'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import AssociateParagraphDialog from './components/AssociateParagraphDialog.vue'
 import ButtonCreateProblem from './components/ButtonCreateProblem.vue'
 import ProblemDetailDrawer from './components/ProblemDetailDrawer.vue'
+import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「问题」权限判断
+ */
+type KnowledgeProblemPermissionMethod =
+     'problemCreate' | 'problemEdit' | 'problemDelete' | 'problemRelate'
+
+function knowledgeProblemPermission(method: KnowledgeProblemPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'ProblemListView' })
 defineProps<ResourceDetailPageProps>()
@@ -216,7 +230,7 @@ onMounted(() => loadProblems())
     <template #body-prepend>
       <!-- 快速创建问题 -->
       <MkQuickCreate
-        v-if="!isWorkspaceSharedResource()"
+        v-if="!isWorkspaceSharedResource() && knowledgeProblemPermission('problemCreate')"
         ref="quickCreateRef"
         text="快速创建问题"
         placeholder="请输入问题"
@@ -229,7 +243,7 @@ onMounted(() => loadProblems())
       <template #default="{ row }: { row: ProblemItem }">
         <MkEditName
           v-model="row.content"
-          :disabled="isWorkspaceSharedResource()"
+          :disabled="!knowledgeProblemPermission('problemEdit')"
           :maxlength="256"
           :save="(content) => handleSaveProblem(row, content)"
           :title="row.content"
@@ -253,13 +267,13 @@ onMounted(() => loadProblems())
       <template #default="{ row }: { row: ProblemItem }">
         <div @click.stop>
           <!-- 关联当前问题的分段 -->
-          <MkTooltip content="关联分段" placement="top">
+          <MkTooltip v-if="knowledgeProblemPermission('problemRelate')" content="关联分段" placement="top">
             <el-button type="primary" text :disabled="operationLoading" @click="handleOpenAssociateParagraphs([row.id])">
               <MkIcon name="icon_link-record_outlined" />
             </el-button>
           </MkTooltip>
           <!-- 直接删除问题 -->
-          <MkTooltip content="删除" placement="top">
+          <MkTooltip v-if="knowledgeProblemPermission('problemDelete')" content="删除" placement="top">
             <el-button type="primary" text :disabled="operationLoading" @click="handleDeleteProblem(row)">
               <MkIcon name="icon_delete-trash_outlined" />
             </el-button>
@@ -269,15 +283,15 @@ onMounted(() => loadProblems())
     </el-table-column>
     <template v-if="!isWorkspaceSharedResource()" #footer-batch-actions>
       <!-- 批量关联所选问题的分段 -->
-      <el-button type="primary" plain :disabled="operationLoading" @click="handleOpenAssociateParagraphs(selectedProblems.map(({ id }) => id))">
+      <el-button v-if="knowledgeProblemPermission('problemRelate')" type="primary" plain :disabled="operationLoading" @click="handleOpenAssociateParagraphs(selectedProblems.map(({ id }) => id))">
         关联分段
       </el-button>
       <!-- 直接批量删除问题 -->
-      <el-button type="danger" plain :disabled="operationLoading" @click="handleBatchDeleteProblems">删除</el-button>
+      <el-button v-if="knowledgeProblemPermission('problemDelete')" type="danger" plain :disabled="operationLoading" @click="handleBatchDeleteProblems">删除</el-button>
     </template>
   </MkTable>
   <ProblemDetailDrawer
-    v-if="detailProblem"
+    v-if="detailProblem && knowledgeProblemPermission('problemRelate')"
     ref="problemDetailDrawerRef"
     v-model="detailProblem"
     :has-previous="hasPrevious"

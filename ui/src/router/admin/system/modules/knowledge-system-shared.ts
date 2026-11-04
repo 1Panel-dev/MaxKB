@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
+import { perm } from '@/permission'
 
 /** System 知识库详情路由，由 System 汇总并继承系统布局。 */
 export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
@@ -20,19 +21,19 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'document',
             name: 'system-shared-knowledge-document-list',
             component: () => import('@/views/knowledge-detail/library/document/index.vue'),
-            meta: { title: '文档', order: 10 },
+            meta: { permission: () => perm.knowledge.share.docRead(), next: 'system-shared-knowledge-image-list', title: '文档', order: 10,  },
           },
           {
             path: 'image',
             name: 'system-shared-knowledge-image-list',
             component: () => import('@/views/knowledge-detail/library/image/index.vue'),
-            meta: { title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE },
+            meta: { permission: () => perm.knowledge.share.image.read(), next: 'system-shared-knowledge-tag', title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE },
           },
           {
             path: 'tag',
             name: 'system-shared-knowledge-tag',
             component: () => import('@/views/knowledge-detail/library/tags/index.vue'),
-            meta: { title: '标签管理', order: 30 },
+            meta: { permission: () => perm.knowledge.share.tagRead(), next: 'system-shared-knowledge-workflow', title: '标签管理', order: 30 },
           },
         ],
       },
@@ -62,19 +63,19 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'hit-test',
             name: 'system-shared-knowledge-hit-test',
             component: () => import('@/views/knowledge-detail/hit-test/index.vue'),
-            meta: { title: '召回测试', order: 10 },
+            meta: {permission: () => perm.knowledge.share.hitTest(), next: 'system-shared-knowledge-problem',title: '召回测试', order: 10 },
           },
           {
             path: 'problem',
             name: 'system-shared-knowledge-problem',
             component: () => import('@/views/knowledge-detail/problem/index.vue'),
-            meta: { title: '问题', order: 20 },
+            meta: { permission: () => perm.knowledge.share.problemRead(), next: 'system-shared-knowledge-dictionary', title: '问题', order: 20 },
           },
           {
             path: 'dictionary',
             name: 'system-shared-knowledge-dictionary',
             component: () => import('@/views/knowledge-detail/termbase/index.vue'),
-            meta: { title: '自定义分词', order: 30 },
+            meta: { permission: () => perm.knowledge.share.termbaseRead(), next: 'system-shared-knowledge-integration', title: '自定义分词', order: 30 },
           },
         ],
       },
@@ -88,13 +89,13 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'chat-user',
             name: 'system-shared-knowledge-chat-user',
             component: () => import('@/views/knowledge-detail/chat-user/index.vue'),
-            meta: { title: '对话用户', order: 10 },
+            meta: { permission: () => perm.knowledge.share.knowledgeChatUserRead(), next: 'system-shared-knowledge-external-retrieval', title: '对话用户', order: 10 },
           },
           {
             path: 'external-retrieval',
             name: 'system-shared-knowledge-external-retrieval',
             component: () => import('@/views/knowledge-detail/external-retrieval/index.vue'),
-            meta: { title: '外部检索服务', order: 20 },
+            meta: { permission: () => perm.knowledge.share.knowledgeExternalServiceRead(), next: 'system-shared-knowledge-setting', title: '外部检索服务', order: 20 },
           },
         ],
       },
@@ -127,19 +128,19 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'setting/base',
             name: 'system-shared-knowledge-base-setting',
             component: () => import('@/views/knowledge-detail/setting/base/index.vue'),
-            meta: { title: '基础设置', order: 10 },
+            meta: { permission: () => perm.knowledge.share.settingRead(), next: 'system-shared-knowledge-document-strategy', title: '基础设置', order: 10 },
           },
           {
             path: 'setting/document-strategy',
             name: 'system-shared-knowledge-document-strategy',
             component: () => import('@/views/knowledge-detail/setting/document-strategy/index.vue'),
-            meta: { title: '文档处理策略', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.WEB },
+            meta: { permission: () => perm.knowledge.share.documentStrategyRead(), next: 'system-shared-knowledge-scheduled-sync', title: '文档处理策略', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.WEB },
           },
           {
             path: 'setting/scheduled-sync',
             name: 'system-shared-knowledge-scheduled-sync',
             component: () => import('@/views/knowledge-detail/setting/scheduled-sync/index.vue'),
-            meta: { title: '定时同步', order: 30 },
+            meta: { permission: () => perm.knowledge.share.scheduledSyncRead(), next: 'system-shared-knowledge-library', title: '定时同步', order: 30 },
           },
         ],
       },
