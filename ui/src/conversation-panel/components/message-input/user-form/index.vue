@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
-import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
+import type { FormField } from '@/components/mk-dynamics-form'
 import type { Dict } from '@/api/types'
 import { MsgWarning } from '@/utils/message'
 import { useMessageInputStore } from '../index'
@@ -104,42 +104,11 @@ const showMoreButton = computed(() => popoverFields.value.length > 0 || (apiInpu
 const formRefreshKey = ref(0)
 watch([inlineFields, popoverFields, apiInputFields], () => formRefreshKey.value++)
 
-// ===== 地址栏参数 =====
-function decodeQuery(query: string) {
-  try {
-    return decodeURIComponent(query)
-  } catch {
-    return query
-  }
-}
-
-function getRouteQueryValue(field: string) {
-  const queryValue = route.query[field]
-  if (queryValue == null) return null
-  if (Array.isArray(queryValue)) {
-    return queryValue.filter((value): value is string => value != null).map(decodeQuery)
-  }
-  return decodeQuery(queryValue)
-}
-
-/** 接口传参未赋值时，从地址栏同名参数回填；同时回填提问人 asker。 */
-function initRouteQueryValue() {
-  const queryValues: Dict<DynamicFormValue> = {}
-  for (const field of [...apiInputFields.value.map((apiField) => apiField.field), 'asker']) {
-    if (apiFormData.value[field]) continue
-    const queryValue = getRouteQueryValue(field)
-    if (queryValue) queryValues[field] = queryValue
-  }
-  if (Object.keys(queryValues).length) {
-    apiFormData.value = { ...apiFormData.value, ...queryValues }
-  }
-}
-
 // ===== 校验 =====
-/** 非调试场景接口传参只能来自地址栏，缺少必填参数时提示补充。 */
+/** 非调试场景接口传参来自地址栏或默认值，均缺少的必填参数提示在地址栏补充。 */
 function validateApiQuery() {
   if (apiInputEditable) return Promise.resolve()
-  const missingFields = apiInputFields.value.filter((field) => field.required && !apiFormData.value[field.field]).map((field) => field.field)
+  const missingFields = userForm.getMissingApiFields()
   if (missingFields.length) {
     MsgWarning(`请在URL中填写参数 ${missingFields.join('、')}的值`)
     return Promise.reject(false)
@@ -198,7 +167,6 @@ onMounted(() => {
       formData.value = {}
     }
   }
-  initRouteQueryValue()
   unbindValidator = userForm.bindValidator(validate)
 
   if (containerRef.value) {

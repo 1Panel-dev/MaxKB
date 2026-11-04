@@ -1,4 +1,5 @@
 import { ref, computed, reactive, watch, inject, type Ref, type InjectionKey } from 'vue'
+import type { LocationQuery } from 'vue-router'
 import { pick } from 'lodash'
 import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants/file-type'
 import { isImage, isDocument, isAudio, isVideo } from '@/utils/icon'
@@ -57,6 +58,8 @@ export interface MessageInputDeps {
   disabled?: Readonly<Ref<boolean>>
   /** 是否在用户输入表单中编辑接口传参，仅调试对话开启。 */
   apiInputEditable?: boolean
+  /** 地址栏参数，接口传参不可编辑时优先使用，缺省时用默认值。 */
+  getRouteQuery?: () => LocationQuery
 }
 
 // 上传请求返回前进度条的最大值
@@ -68,7 +71,7 @@ const UPLOAD_PROGRESS_PENDING_MAX = 95
 export function createMessageInputStore(deps: MessageInputDeps) {
   const { conversations, getChatId, renameChat, composerResetSignal, messages, streamLoading, sendMessage, uploadFile, stop, appInfo } = deps
   const disabled = computed(() => deps.disabled?.value ?? false)
-  const userForm = createUserFormStore({ appInfo, apiInputEditable: deps.apiInputEditable ?? false })
+  const userForm = createUserFormStore({ appInfo, apiInputEditable: deps.apiInputEditable ?? false, getRouteQuery: deps.getRouteQuery })
 
   // 输入状态与附件限制
   const question = ref('')

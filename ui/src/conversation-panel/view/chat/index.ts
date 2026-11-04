@@ -1,5 +1,5 @@
 import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, type LocationQuery } from 'vue-router'
 import ApplicationApi from '@/api/chat/application'
 import ConversationApi from '@/api/chat/conversation'
 import { useStore } from '@/stores/chat'
@@ -27,8 +27,10 @@ export interface ChatConversationRouting {
   getApplicationId: () => string
   /** 地址中的会话 ID，没有时为空字符串。 */
   getRouteChatId: () => string
-  /** 将当前会话写入地址；会话 ID 为空表示新建对话。 */
+  /** 将当前会话写入地址；会话 ID 为空表示新建对话。需保留地址栏参数（接口传参）。 */
   replaceChatId: (chatId: string) => void
+  /** 地址栏参数，作为接口传参来源。 */
+  getRouteQuery: () => LocationQuery
 }
 
 /** 单应用对话：智能体 ID 取自守卫写入的应用认证前置配置，会话地址为 /:accessToken/c/:chatId。 */
@@ -42,8 +44,12 @@ function useApplicationChatRouting(): ChatConversationRouting {
     getRouteChatId: () => (typeof route.params.chatId === 'string' ? route.params.chatId : ''),
     replaceChatId: (chatId) => {
       const { accessToken } = route.params
-      void router.replace(chatId ? { name: 'chat-home-detail', params: { accessToken, chatId } } : { name: 'chat-home', params: { accessToken } })
+      const { query } = route
+      void router.replace(
+        chatId ? { name: 'chat-home-detail', params: { accessToken, chatId }, query } : { name: 'chat-home', params: { accessToken }, query },
+      )
     },
+    getRouteQuery: () => route.query,
   }
 }
 
@@ -61,7 +67,7 @@ export function createChatUserProfileGetter(): GetChatUserProfile {
  * 当前会话与地址双向同步，切换智能体时重新加载智能体信息与会话。
  */
 export function createChatConversation(routing: ChatConversationRouting = useApplicationChatRouting()): ChatConversationBundle {
-  const { getApplicationId, getRouteChatId, replaceChatId } = routing
+  const { getApplicationId, getRouteChatId, replaceChatId, getRouteQuery } = routing
   const { user } = useStore()
 
   const api: ConversationApiAdapter = {
@@ -116,6 +122,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     stop: msgs.stop,
     speechToText: (data) => ConversationApi.postSpeechToText(getApplicationId(), data),
     appInfo,
+    getRouteQuery,
     // 门户首页、全部智能体页尚未确定智能体时禁止发送
     disabled: computed(() => !getApplicationId()),
   })

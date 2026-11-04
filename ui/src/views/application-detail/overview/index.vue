@@ -48,9 +48,13 @@ const apiKeySaving = ref(false)
 const chatBasePath = CHAT_API_BASE_PATH.replace(/\/api$/, '')
 
 const apiDocUrl = new URL(`${CHAT_API_BASE_PATH}-doc/`, window.location.origin).href
-
+const apiQuery=computed(()=>{
+return  application.value?.work_flow?.nodes?.find(n=>n.id==='base-node')?.properties?.api_input_field_list.map((f:any)=>{
+  return `${f.variable}=${f.default_value}`
+}).join('&')
+})
 // TODO：访问链接还有问题
-const accessUrl = computed(() => (accessToken.value ? `${window.location.origin}${chatBasePath}/${accessToken.value}` : ''))
+const accessUrl = computed(() => (accessToken.value ? `${window.location.origin}${chatBasePath}/${accessToken.value}?${apiQuery.value}` : ''))
 
 function toUrl(url?: string) {
   if (!url) return
