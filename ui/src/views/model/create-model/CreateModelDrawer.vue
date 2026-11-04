@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import type { BaseModelOption, Dict, DynamicFormField, ModelPayload, ModelProviderItem, ModelTypeOption } from '@/api/types'
 import type ModelApi from '@/api/admin/workspace/model'
 import type SystemModelApi from '@/api/admin/system/resource-management/model'
@@ -10,6 +10,7 @@ import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/compone
 import { useStore } from '@/stores'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 import ModelAdvancedSettings from '@/views/model/advanced-settings-table/AdvancedSettingsTable.vue'
+import { loadCachedBaseModelOptions, loadCachedOrBuiltinBaseModelOptions } from '@/views/model/base-model-options'
 
 defineOptions({ name: 'CreateModelDrawer' })
 
@@ -80,21 +81,35 @@ function loadModelProviders() {
 const dynamicsFormRef = ref<InstanceType<typeof MkDynamicsForm>>()
 const dynamicsLoading = ref(false)
 const baseModelOptions = ref<BaseModelOption[]>([])
+// 仅当响应与当前「供应商 + 类型 + 凭证」一致时才应用，避免过期响应覆盖新列表
+function applyBaseModelOptions(provider: string, modelType: string, credentialSnapshot: string, options?: BaseModelOption[]) {
+  if (
+    options?.length &&
+    provider === modelForm.provider &&
+    modelType === modelForm.model_type &&
+    JSON.stringify(modelForm.credential) === credentialSnapshot
+  ) {
+    baseModelOptions.value = options
+  }
+}
 const baseModelLoading = ref(false)
 const credentialFields = ref<FormField[]>([])
 const modelParamsForm = ref<DynamicFormField[]>([])
 function fetchBaseModelOptions() {
   if (!modelForm.provider || !modelForm.model_type) return
   baseModelLoading.value = true
+  const requestProvider = modelForm.provider
+  const requestModelType = modelForm.model_type
+  const credentialSnapshot = JSON.stringify(modelForm.credential)
   const loadBuiltin = () =>
-    ProviderApi.getBaseModelList(modelForm.provider, modelForm.model_type).then((options) => {
-      baseModelOptions.value = options
+    ProviderApi.getBaseModelList(requestProvider, requestModelType).then((options) => {
+      applyBaseModelOptions(requestProvider, requestModelType, credentialSnapshot, options)
       MsgWarning('未获取到官方模型列表，已展示内置常用模型')
     })
-  ProviderApi.getBaseModelList(modelForm.provider, modelForm.model_type, undefined, modelForm.credential as Record<string, unknown>)
+  ProviderApi.getBaseModelList(requestProvider, requestModelType, undefined, modelForm.credential as Record<string, unknown>)
     .then((options) => {
       if (options?.length) {
-        baseModelOptions.value = options
+        applyBaseModelOptions(requestProvider, requestModelType, credentialSnapshot, options)
       } else {
         return loadBuiltin()
       }
@@ -105,6 +120,24 @@ function fetchBaseModelOptions() {
     })
 }
 
+// 凭证（url/key）变化时尝试命中缓存，命中才刷新列表，避免每次手动获取。
+let credentialCacheTimer: ReturnType<typeof setTimeout> | undefined
+watch(
+  () => JSON.stringify(modelForm.credential),
+  () => {
+    if (!modelForm.provider || !modelForm.model_type) return
+    clearTimeout(credentialCacheTimer)
+    credentialCacheTimer = setTimeout(() => {
+      const credentialSnapshot = JSON.stringify(modelForm.credential)
+      void loadCachedBaseModelOptions(
+        modelForm.provider,
+        modelForm.model_type,
+        modelForm.credential as Record<string, unknown>,
+      ).then((options) => applyBaseModelOptions(modelForm.provider, modelForm.model_type, credentialSnapshot, options))
+    }, 500)
+  },
+)
+
 function handleModelTypeChange() {
   modelForm.model_name = ''
   modelForm.credential = {}
@@ -113,6 +146,14 @@ function handleModelTypeChange() {
   modelParamsForm.value = []
   void dynamicsFormRef.value?.render([], modelFormData.value)
   if (!modelForm.model_type) return
+
+  // 优先使用后端缓存的模型列表，未命中回落内置默认列表，无需每次手动获取。
+  const requestProvider = modelForm.provider
+  const requestModelType = modelForm.model_type
+  const credentialSnapshot = JSON.stringify(modelForm.credential)
+  void loadCachedOrBuiltinBaseModelOptions(requestProvider, requestModelType).then((options) =>
+    applyBaseModelOptions(requestProvider, requestModelType, credentialSnapshot, options),
+  )
 
   // 选择模型类型后立即展示 API URL / API Key 等凭证表单（取该类型默认凭证）。
   dynamicsLoading.value = true
@@ -301,12 +342,6 @@ defineExpose({ open })
             </template>
 
             <template #after>
-              <el-alert type="info" :closable="false" class="mb-3">
-                <template #title>
-                  先填写上方 API URL / API
-                  Key，再点击「获取模型」同步官方全部模型；未获取时展示内置常用模型。列表中未列出的模型，直接输入模型名称，回车即可添加。
-                </template>
-              </el-alert>
 
               <el-form-item
                 class="mk-hide-asterisk"

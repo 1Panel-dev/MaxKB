@@ -17,7 +17,7 @@ import re
 import secrets
 import shutil
 import uuid
-from functools import reduce
+from functools import lru_cache, reduce
 from typing import Dict, List
 
 import pytz
@@ -197,10 +197,14 @@ def markdown_to_plain_text(md: str) -> str:
     return text
 
 
-def get_file_content(path):
+@lru_cache(maxsize=None)
+def get_file_content(path: str) -> str:
+    """
+    Read static resource files (SQL templates, prompts, forms).
+    Results are cached because these files do not change at runtime.
+    """
     with open(path, "r", encoding="utf-8") as file:
-        content = file.read()
-    return content
+        return file.read()
 
 
 def sub_array(array: List, item_num=10):

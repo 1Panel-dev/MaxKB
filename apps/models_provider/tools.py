@@ -7,9 +7,13 @@
 @desc:
 """
 
+import hashlib
+import json
 from typing import Dict
 
 from common.config.embedding_config import ModelManage
+from common.utils.rsa_util import rsa_long_decrypt
+from django.core.cache import cache
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from django.db import connection
 from django.db.models import QuerySet
@@ -161,3 +165,45 @@ def get_model_instance_by_model_workspace_id(model_id, workspace_id, **kwargs):
         default_model_params.setdefault("top_n", 3)
     model_params = reset_model_params(default_model_params, **kwargs)
     return ModelManage.get_model(model_id, lambda _id: get_model(model, **model_params))
+
+
+def _resolve_base_model_credential_parts(api_key, api_base, credential):
+    # url/key 的取值口径在「写缓存」和「读缓存」必须完全一致
+    credential = credential or {}
+    url = api_base or credential.get("api_base") or credential.get("base_url") or ""
+    key = api_key or credential.get("api_key") or ""
+    return url, key
+
+
+def get_base_model_list_cache_key(provider, model_type, api_key, api_base, credential):
+    # 按「供应商 + 模型类型 + url + key」缓存，同一凭证只拉取一次官方模型列表
+    url, key = _resolve_base_model_credential_parts(api_key, api_base, credential)
+    digest = hashlib.md5(f"{provider}:{model_type}:{url}:{key}".encode()).hexdigest()
+    return f"base_model_list:{digest}"
+
+
+def cache_base_model_list(provider, model_type, api_key, api_base, credential, model_list):
+    if model_list:
+        cache.set(
+            get_base_model_list_cache_key(provider, model_type, api_key, api_base, credential),
+            model_list,
+            timeout=None,
+        )
+
+
+def get_cached_base_model_list(provider, model_type, model_id=None, credential=None):
+    """按 url+key 读取缓存的官方模型列表，未命中返回空列表。
+
+    编辑场景传 model_id 时，用模型存储的真实凭证计算 key，
+    避免接口返回的加密 api_key 导致 key 不一致；解密失败时回退请求中的凭证。
+    """
+    if model_id:
+        try:
+            model = QuerySet(Model).filter(id=model_id).first()
+            if model:
+                credential = json.loads(rsa_long_decrypt(model.credential))
+                provider, model_type = model.provider, model.model_type
+        except Exception:
+            pass
+    cached = cache.get(get_base_model_list_cache_key(provider, model_type, None, None, credential))
+    return cached or []

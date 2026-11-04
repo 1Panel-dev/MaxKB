@@ -440,16 +440,19 @@ class UserManageSerializer(serializers.Serializer):
                 if not (role_model and user_role_relation_model and workspace_model):
                     return {}
 
-                workspace_mapping = {
-                    str(workspace_model.id): workspace_model.name for workspace_model in workspace_model.objects.all()
-                }
-
                 # 获取所有相关角色关系，并预加载角色信息
                 user_role_relations = (
                     user_role_relation_model.objects.filter(user_id__in=user_ids)
                     .select_related("role")
                     .distinct("user_id", "role_id", "workspace_id")  # 确保组合唯一性
                 )
+
+                # 仅加载角色关系中实际出现的工作空间，避免全表加载
+                relation_workspace_ids = {relation.workspace_id for relation in user_role_relations}
+                workspace_mapping = {
+                    str(workspace.id): workspace.name
+                    for workspace in workspace_model.objects.filter(id__in=relation_workspace_ids)
+                }
 
                 # 构建用户ID到角色名称列表的映射
                 user_role_mapping = defaultdict(set)  # 使用 set 去重
@@ -500,7 +503,7 @@ class UserManageSerializer(serializers.Serializer):
             if role_model and user_role_relation_model:
                 # 获取当前用户的所有角色 判断是不是内置的系统管理员
                 is_admin = user_role_relation_model.objects.filter(
-                    user_id=user_id, role_id=RoleConstants.ADMIN.name
+                    user_id=user_id, role__type=RoleConstants.ADMIN.name
                 ).exists()
                 user_ids = [user["id"] for user in result["records"]]
                 user_role_mapping, user_role_setting_mapping, user_role_workspace_mapping = _get_user_roles(
