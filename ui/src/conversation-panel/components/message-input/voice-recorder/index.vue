@@ -24,7 +24,7 @@ const recordTime = computed(() => {
 </script>
 
 <template>
-  <div class="mk-input-box mk-conversation-message-input border-primary! bg-primary/[0.06] w-full shadow-lg">
+  <div class="mk-input-box mk-conversation-message-input border-primary/60! bg-primary/10 w-full shadow-lg">
     <div class="flex h-8 items-center justify-center gap-0.5">
       <span
         v-for="(level, index) in waveLevels"
@@ -34,7 +34,7 @@ const recordTime = computed(() => {
       />
     </div>
     <div class="mt-3 flex items-center justify-end">
-      <span class="text-N600 mr-3 text-xs">{{ recordTime }}</span>
+      <span class="text-N400 mr-4">{{ recordTime }}</span>
       <!-- 结束录音并转文字 -->
       <el-button circle type="primary" @click="emit('stop')">
         <MkIcon name="icon_square_filled" />
