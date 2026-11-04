@@ -24,10 +24,14 @@ function usePortalChatRouting(): ChatConversationRouting {
       const applicationId = getApplicationId()
       // 门户首页与全部智能体页没有智能体，不同步会话地址
       if (!applicationId) return
+      const { query } = route
       void router.replace(
-        chatId ? { name: 'portal-application-chat', params: { applicationId, chatId } } : { name: 'portal-application', params: { applicationId } },
+        chatId
+          ? { name: 'portal-application-chat', params: { applicationId, chatId }, query }
+          : { name: 'portal-application', params: { applicationId }, query },
       )
     },
+    getRouteQuery: () => route.query,
   }
 }
 
@@ -48,7 +52,8 @@ export function createPortalConversation(options: PortalConversationOptions): Po
   const currentApplicationId = computed(routing.getApplicationId)
   const isApplicationListActive = computed(() => route.name === 'portal-application-list')
 
-  const openApplication = (applicationId: string) => void router.push({ name: 'portal-application', params: { applicationId } })
+  // 门户内跳转保留地址栏参数，接口传参对后续打开的智能体同样生效
+  const openApplication = (applicationId: string) => void router.push({ name: 'portal-application', params: { applicationId }, query: route.query })
 
   const portalList = createPortalConversationListStore({
     pageApplicationConversations: (page, size) => PortalApi.getPortalConversationPage(page, size),
@@ -58,8 +63,9 @@ export function createPortalConversation(options: PortalConversationOptions): Po
     currentApplicationId,
     isApplicationListActive,
     openApplication,
-    openConversation: (applicationId, chatId) => void router.push({ name: 'portal-application-chat', params: { applicationId, chatId } }),
-    openApplicationList: () => void router.push({ name: 'portal-application-list' }),
+    openConversation: (applicationId, chatId) =>
+      void router.push({ name: 'portal-application-chat', params: { applicationId, chatId }, query: route.query }),
+    openApplicationList: () => void router.push({ name: 'portal-application-list', query: route.query }),
     openApplicationSelector: options.openApplicationSelector,
   })
 

@@ -1,4 +1,5 @@
 import { computed, ref, watch, type Ref } from 'vue'
+import type { LocationQuery } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import type { Dict } from '@/api/types'
@@ -78,10 +79,30 @@ function getApiInputFields(properties: BaseNodeProperties): FormField[] {
     .filter(isFormField)
 }
 
+// ===== 地址栏参数 =====
+/** 提问人：不在开始节点配置中，同样由地址栏传入。 */
+const ASKER_FIELD = 'asker'
+
+/** 地址栏参数值：无值参数（?a）视为未传；vue-router 已解码，无需再次解码。 */
+function getQueryValue(query: LocationQuery, field: string): DynamicFormValue | undefined {
+  const value = query[field]
+  if (Array.isArray(value)) {
+    const values = value.filter((item): item is string => item != null)
+    return values.length ? values : undefined
+  }
+  return value ?? undefined
+}
+
+function hasValue(value: DynamicFormValue | undefined) {
+  return value != null && value !== ''
+}
+
 export interface UserFormDeps {
   appInfo: Readonly<Ref<ConversationAppInfo | null>>
   /** 是否在表单中编辑接口传参；仅调试对话开启，其他场景接口传参来自地址栏。 */
   apiInputEditable: boolean
+  /** 地址栏参数，接口传参不可编辑时使用；不传时只使用默认值。 */
+  getRouteQuery?: () => LocationQuery
 }
 
 /**
@@ -89,7 +110,7 @@ export interface UserFormDeps {
  * 表单校验依赖已渲染的表单实例，由 user-form 组件挂载时绑定。
  */
 export function createUserFormStore(deps: UserFormDeps) {
-  const { appInfo, apiInputEditable } = deps
+  const { appInfo, apiInputEditable, getRouteQuery } = deps
 
   const formData = ref<Dict<DynamicFormValue>>({})
   const apiFormData = ref<Dict<DynamicFormValue>>({})
@@ -139,8 +160,33 @@ export function createUserFormStore(deps: UserFormDeps) {
     snapshot = null
   }
 
+  /**
+   * 不可编辑时的接口传参：地址栏有值用地址栏，没有用默认值。
+   * 发送时按当前字段与地址计算，不受智能体信息加载时机、切换智能体清空的影响。
+   */
+  const routeApiFormData = computed(() => {
+    const query = getRouteQuery?.() ?? {}
+    const values: Dict<DynamicFormValue> = {}
+    for (const field of apiInputFields.value) {
+      const value = getQueryValue(query, field.field) ?? field.default_value
+      if (hasValue(value)) values[field.field] = value as DynamicFormValue
+    }
+    const asker = getQueryValue(query, ASKER_FIELD)
+    if (hasValue(asker)) values[ASKER_FIELD] = asker as DynamicFormValue
+    return values
+  })
+
+  /** 实际发送的接口传参：调试对话取表单编辑值，其他场景取地址栏或默认值。 */
+  const getApiFormData = (): Dict<DynamicFormValue> => (apiInputEditable ? apiFormData.value : routeApiFormData.value)
+
+  /** 缺少值的必填接口传参。 */
+  const getMissingApiFields = () => {
+    const values = getApiFormData()
+    return apiInputFields.value.filter((field) => field.required && !hasValue(values[field.field])).map((field) => field.field)
+  }
+
   /** 随消息发送的表单数据，接口传参同名时覆盖用户输入。 */
-  const getFormData = (): Dict<DynamicFormValue> => ({ ...formData.value, ...apiFormData.value })
+  const getFormData = (): Dict<DynamicFormValue> => ({ ...formData.value, ...getApiFormData() })
 
   return {
     formData,
@@ -155,6 +201,7 @@ export function createUserFormStore(deps: UserFormDeps) {
     validate,
     saveSnapshot,
     restoreSnapshot,
+    getMissingApiFields,
     getFormData,
   }
 }

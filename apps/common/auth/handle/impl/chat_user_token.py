@@ -42,14 +42,10 @@ login_type_list = [
 
 def get_auth(login_type, user_id, application_id):
     application_access_token_list = QuerySet(ApplicationAccessToken).filter(is_active=True)
-    if login_type.upper() == str(Operate.ANNOTATION_AUTH):
-        application_access_token_list = application_access_token_list.filter(authentication=False)
-    elif login_type.upper() == str(Operate.PASSWORD):
-        application_access_token_list = application_access_token_list.filter(
-            authentication=True, authentication_value__type="password"
-        )
+    # 匿名应用所有人都可以访问；登录用户额外可以访问已授权的登录认证应用（匿名 OR 登录授权）
+    access_condition = Q(authentication=False)
 
-    elif login_type_list.__contains__(login_type.upper()):
+    if login_type_list.__contains__(login_type.upper()):
         user_group_ids = (
             QuerySet(UserGroupRelation)
             .filter(
@@ -77,11 +73,13 @@ def get_auth(login_type, user_id, application_id):
             )
             .values_list("resource_id", flat=True)
         )
-        application_access_token_list = application_access_token_list.filter(
-            Q(authentication_value__type="login"),
-            Q(authentication_value__login_value__contains=login_type),
-            Q(application_id__in=group_qs) | Q(application_id__in=user_qs),
+        access_condition |= (
+            Q(authentication=True)
+            & Q(authentication_value__type="login")
+            & Q(authentication_value__login_value__contains=login_type)
+            & (Q(application_id__in=group_qs) | Q(application_id__in=user_qs))
         )
+    application_access_token_list = application_access_token_list.filter(access_condition)
     if application_id:
         application_access_token_list = application_access_token_list.filter(application_id=application_id)
     permissions = {}
