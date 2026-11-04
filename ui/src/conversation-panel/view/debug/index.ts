@@ -69,6 +69,7 @@ export function createDebugConversation(application: Readonly<Ref<ApplicationDet
     sendMessage: msgs.sendMessage,
     uploadFile: msgs.uploadFile,
     stop: msgs.stop,
+    speechToText: (data) => ConversationApi.postSpeechToText(appId.value, data),
     appInfo,
     apiInputEditable: true,
   })
