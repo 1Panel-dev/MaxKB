@@ -133,7 +133,12 @@ class KnowledgeEditRequest(serializers.Serializer):
         child=serializers.UUIDField(required=True, label=_("application id")),
         label=_("application id list"),
     )
-    file_size_limit = serializers.IntegerField(required=False, label=_("file size limit"))
+    file_size_limit = serializers.IntegerField(
+        required=False,
+        min_value=1,
+        max_value=int(CONFIG.get('FILE_SIZE_LIMIT_MAX') or 1000),
+        label=_("file size limit"),
+    )
     file_count_limit = serializers.IntegerField(required=False, label=_("file count limit"))
 
     @staticmethod
