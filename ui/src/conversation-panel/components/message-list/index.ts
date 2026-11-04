@@ -260,7 +260,13 @@ export function useMessageListStore(): MessageListStore {
   return store
 }
 
-// 供“只显示”等场景可选注入:拿不到返回 null(如 form 在无发送能力时降级只读)
-export function useMessageListStoreOptional(): MessageListStore | null {
-  return inject(MESSAGE_LIST_KEY, null)
+// 通用发送能力，由消息列表或外部宿主（如工具调试结果抽屉）提供；内容项按自身场景组装参数。
+export type SendMessage = (opts: SendMessageOptions) => void
+
+// 值为 null 表示当前不可发送（分享、执行中等），由提供方按自身状态决定
+export const SEND_MESSAGE_KEY: InjectionKey<Readonly<Ref<SendMessage | null>>> = Symbol('send-message')
+
+// 未提供时恒为 null，内容项降级只读
+export function useSendMessageOptional(): Readonly<Ref<SendMessage | null>> {
+  return inject(SEND_MESSAGE_KEY, ref(null))
 }

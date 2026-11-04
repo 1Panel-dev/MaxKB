@@ -8,6 +8,7 @@ import ExecutionDetail from '../../right-sidebar/execution-detail/index.vue'
 import { LOG_MESSAGE_LIST_KEY, createLogMessageListStore } from '../../components/log-message-list/index'
 import { EXECUTION_DETAIL_KEY, createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 import { toLogAppInfo } from './app-info'
+import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
 
 defineOptions({ name: 'LogConversation' })
 
@@ -48,7 +49,9 @@ const detail = createExecutionDetailStore()
 
 provide(LOG_MESSAGE_LIST_KEY, msgs)
 provide(EXECUTION_DETAIL_KEY, detail)
-
+provide(VIEW_KEY,VIEW_TYPE.LOG)
+// 日志无左栏，按 PC 端渲染
+provide(DEVICE_KEY, createDeviceType('push'))
 // 切换日志(抽屉内上一个/下一个)时收起执行详情并重新加载
 watch(
   () => props.chatId,

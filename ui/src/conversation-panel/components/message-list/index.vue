@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, onBeforeUnmount } from 'vue'
+import { computed, ref, onBeforeUnmount, provide } from 'vue'
 import ContentList from '../content-list/index.vue'
 import MessageFooter from '../message-footer/index.vue'
 import PrologueContent from '../prologue-content/index.vue'
 import { formatPrologue } from '../prologue-content/index'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
-import { useMessageListStore } from './index'
+import { useMessageListStore, SEND_MESSAGE_KEY } from './index'
 import ShareMessageRow from './share/ShareMessageRow.vue'
 import ShareFooter from './share/ShareFooter.vue'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 defineProps<{ appName?: string }>()
 
-const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamProgress } = useMessageListStore()
+const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamProgress, sendMessage } = useMessageListStore()
 const { isShared } = useConversationListStore()
+// 消息内容项（如表单）经此发起续跑；分享时收回发送能力，内容项只读
+provide(SEND_MESSAGE_KEY, computed(() => (isShared.value ? null : sendMessage)))
 // 分享按完整问答轮次提交，提问与回答共用记录 ID。
 const selectedRecordIds = ref<string[]>([])
 const messageRecordIds = computed(() =>

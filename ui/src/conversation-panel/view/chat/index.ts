@@ -14,6 +14,7 @@ import { createMessageInputStore } from '../../components/message-input/index'
 import { createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 import { createSharePanelStore, type SharePanelStore } from '../../main/share-panel/index'
 import type { ConversationBundle } from '../types'
+import type { GetChatUserProfile } from '../index'
 import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
 /** chat 模式在通用组件 store 之外提供分享;debug 模式无分享。 */
 export interface ChatConversationBundle extends ConversationBundle {
@@ -43,6 +44,15 @@ function useApplicationChatRouting(): ChatConversationRouting {
       const { accessToken } = route.params
       void router.replace(chatId ? { name: 'chat-home-detail', params: { accessToken, chatId } } : { name: 'chat-home', params: { accessToken } })
     },
+  }
+}
+
+/** 当前对话用户档案：未加载时按需加载；无用户名（非登录认证）或加载失败返回 null。 */
+export function createChatUserProfileGetter(): GetChatUserProfile {
+  const { user } = useStore()
+  return async () => {
+    const profile = user.chatUserProfile ?? (await user.loadCurrentUser().catch(() => null))
+    return profile?.username ? profile : null
   }
 }
 

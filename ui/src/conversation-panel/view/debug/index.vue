@@ -15,6 +15,7 @@ import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
 import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
 import { createDebugHeaderStore, DEBUG_HEADER_KEY } from '../../components/header/debug/index'
 import { createDebugConversation } from './index'
+import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
 
 defineOptions({ name: 'DebugConversation' })
 
@@ -44,7 +45,7 @@ provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
 provide(EXECUTION_DETAIL_KEY, bundle.detail)
-
+provide(VIEW_KEY,VIEW_TYPE.DEBUG)
 const debug = createDebugHeaderStore()
 provide(DEBUG_HEADER_KEY, debug)
 // open/close 暴露给工作流页通过 ref 调用
@@ -53,6 +54,8 @@ defineExpose({ open: debug.open, close: debug.close })
 // 缩小(窄面板)用抽屉,放大(宽面板)用挤压——与窗口宽度无关,只看放大态
 const leftMode = computed(() => (debug.expanded.value ? 'push' : 'drawer'))
 const rightMode = computed(() => (debug.expanded.value ? 'push' : 'drawer'))
+// 左栏为抽屉即手机端
+provide(DEVICE_KEY, createDeviceType(leftMode))
 
 // 抽屉态:遮罩点击 / 切换会话 → 收起
 const closeDrawers = () => {

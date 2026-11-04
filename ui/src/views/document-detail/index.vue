@@ -226,7 +226,7 @@ const paragraphSortDisabled = computed(
     batchMode.value ||
     createDialogMounted.value ||
     editDialogMounted.value ||
-    paragraphs.value.length < 2,
+    paragraphs.value.length < 2||
     !knowledgeDocPermission('docEdit')
 )
 const { handleMoveParagraph } = useParagraphSort({

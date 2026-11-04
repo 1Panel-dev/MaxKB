@@ -2,6 +2,7 @@
 import { computed, type Component } from 'vue'
 import TextItem from './items/text.vue'
 import HtmlItem from './items/html.vue'
+import EchartsItem from './items/echarts.vue'
 import ReasoningItem from './items/reasoning.vue'
 import ToolItem from './items/tool/index.vue'
 import GroupToolItem from './items/group-tool/index.vue'
@@ -19,6 +20,7 @@ const props = defineProps<{
 const typeRenderers: Partial<Record<string, Component>> = {
   TEXT: TextItem,
   HTML: HtmlItem,
+  ECHARTS: EchartsItem,
   REASONING: ReasoningItem,
   TOOL: ToolItem,
   GROUP_TOOL: GroupToolItem,

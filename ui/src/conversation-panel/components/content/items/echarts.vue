@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
 import { randomId } from '@/utils/common'
 
-defineOptions({ name: 'MarkdownEchartsRender' })
+defineOptions({ name: 'ContentEchartsItem' })
 
-const props = defineProps<{ option: string }>()
+const props = defineProps<{
+  // content 为图表配置 JSON 字符串
+  content: { content?: string | null }
+}>()
+const optionSource = computed(() => props.content.content ?? '')
 
 // 后端下发的图表配置：actionType 为 EVAL 时 option 是一段脚本，需在沙箱 iframe 中执行得到真实 option
 type ChartStyle = Record<string, string>
@@ -114,9 +118,9 @@ function applyOption(payload: ChartOptionPayload & echarts.EChartsOption) {
 }
 
 function initChart() {
-  if (!chartsRef.value || !props.option) return
+  if (!chartsRef.value || !optionSource.value) return
   try {
-    applyOption(JSON.parse(props.option))
+    applyOption(JSON.parse(optionSource.value))
   } catch (e) {
     console.error('[ECharts] invalid option JSON', e)
   }
@@ -132,12 +136,9 @@ function onResize() {
   }, 100)
 }
 
-watch(
-  () => props.option,
-  (option) => {
-    if (option) nextTick(initChart)
-  },
-)
+watch(optionSource, (value) => {
+  if (value) nextTick(initChart)
+})
 
 onMounted(() => {
   nextTick(initChart)
