@@ -38,4 +38,20 @@ const getBaseModelList = (provider: string, modelType: string, search?: string, 
   return get<BaseModelOption[]>(`${prefix}/model_list`, { model_type: modelType, provider, search })
 }
 
-export default { getBaseModelList, getBaseModelParamsForm, getModelCreateForm, getModelTypeList, getProviderList }
+/** 按「url + key」读取后端缓存的基础模型列表，未命中返回空数组；编辑时传 modelId，由后端用真实凭证取缓存。 */
+const getBaseModelListCache = (
+  provider: string,
+  modelType: string,
+  credential: Record<string, unknown>,
+  modelId?: string,
+) => {
+  return post<Record<string, unknown>, BaseModelOption[]>(`${prefix}/model_list_cache`, {
+    model_type: modelType,
+    model_id: modelId,
+    provider,
+    ...credential,
+    credential,
+  })
+}
+
+export default { getBaseModelList, getBaseModelListCache, getBaseModelParamsForm, getModelCreateForm, getModelTypeList, getProviderList }

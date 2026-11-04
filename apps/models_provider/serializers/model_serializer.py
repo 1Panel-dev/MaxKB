@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 import os
 import threading
 import time
@@ -26,6 +27,8 @@ from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from users.serializers.user import is_workspace_manage_permission_read
+
+logger = logging.getLogger(__name__)
 
 
 def get_default_model_params_setting(provider, model_type, model_name):
@@ -72,17 +75,19 @@ class ModelPullManage:
             response = ModelProvideConstants[model.provider].down_model(model.model_type, model.model_name, credential)
             down_model_chunk = {}
             last_update_time = time.time()
+            last_snapshot = None
 
             for chunk in response:
                 down_model_chunk[chunk.digest] = chunk.to_dict()
-                if time.time() - last_update_time > 5:
+                # chunk.digest 不变时 progress 仍会更新，需按内容判断是否有变化
+                current_snapshot = list(down_model_chunk.values())
+                if time.time() - last_update_time > 5 and current_snapshot != last_snapshot:
                     current_model = QuerySet(Model).filter(id=model.id).first()
                     if current_model and current_model.status == Status.PAUSE_DOWNLOAD:
                         return
-                    QuerySet(Model).filter(id=model.id).update(
-                        meta={"down_model_chunk": list(down_model_chunk.values())}
-                    )
+                    QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": current_snapshot})
                     last_update_time = time.time()
+                    last_snapshot = current_snapshot
 
             status = Status.ERROR
             message = ""
@@ -94,6 +99,7 @@ class ModelPullManage:
 
             QuerySet(Model).filter(id=model.id).update(meta={"down_model_chunk": [], "message": message}, status=status)
         except Exception as e:
+            logger.exception("Model pull failed: model=%s model_name=%s", model.id, model.model_name)
             QuerySet(Model).filter(id=model.id).update(
                 meta={"down_model_chunk": [], "message": str(e)}, status=Status.ERROR
             )

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import type ModelApi from '@/api/admin/workspace/model'
 import type SystemResourceModelApi from '@/api/admin/system/resource-management/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
@@ -7,7 +7,8 @@ import type { BaseModelOption, Dict, ModelItem, ModelPayload, ModelProviderItem 
 import ProviderApi from '@/api/admin/model-provider'
 import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
 import { MODEL_TYPE_LABELS } from '@/constants'
-import { MsgSuccess } from '@/utils/message'
+import { loadCachedBaseModelOptions, loadCachedOrBuiltinBaseModelOptions } from '@/views/model/base-model-options'
+import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'EditModelDrawer' })
 
@@ -24,9 +25,22 @@ const formLoading = ref(false)
 const selectedProvider = ref<ModelProviderItem>()
 const currentModelId = ref('')
 const baseModelOptions = ref<BaseModelOption[]>([])
+// 仅当响应与当前「供应商 + 类型 + 凭证」一致时才应用，避免过期响应覆盖新列表
+function applyBaseModelOptions(provider: string, modelType: string, credentialSnapshot: string, options?: BaseModelOption[]) {
+  if (
+    options?.length &&
+    provider === modelForm.provider &&
+    modelType === modelForm.model_type &&
+    JSON.stringify(modelForm.credential) === credentialSnapshot
+  ) {
+    baseModelOptions.value = options
+  }
+}
+const baseModelLoading = ref(false)
 const credentialFields = ref<FormField[]>([])
 
 const modelForm = reactive<ModelPayload>({ credential: {}, model_name: '', model_type: '', name: '', provider: '' })
+let credentialSnapshot = '{}'
 
 const drawerTitle = computed(() => `编辑 ${selectedProvider.value?.name ?? ''}`)
 
@@ -57,14 +71,20 @@ function open(provider: ModelProviderItem, model: ModelItem) {
       modelForm.model_type = detail.model_type
       modelForm.name = detail.name
       modelForm.provider = detail.provider
+      credentialSnapshot = JSON.stringify(modelForm.credential)
 
       return Promise.all([
-        ProviderApi.getBaseModelList(detail.provider, detail.model_type),
+        loadCachedOrBuiltinBaseModelOptions(
+          detail.provider,
+          detail.model_type,
+          detail.credential as Record<string, unknown>,
+          model.id,
+        ),
         ProviderApi.getModelCreateForm(detail.provider, detail.model_type, detail.model_name),
       ])
     })
     .then(([baseModels, fields]) => {
-      baseModelOptions.value = baseModels
+      applyBaseModelOptions(modelForm.provider, modelForm.model_type, credentialSnapshot, baseModels)
       credentialFields.value = fields
       return nextTick(() => dynamicsFormRef.value?.render(fields, modelFormData.value))
     })
@@ -72,6 +92,50 @@ function open(provider: ModelProviderItem, model: ModelItem) {
       formLoading.value = false
     })
 }
+
+function fetchBaseModelOptions() {
+  if (!modelForm.provider || !modelForm.model_type) return
+  baseModelLoading.value = true
+  const requestProvider = modelForm.provider
+  const requestModelType = modelForm.model_type
+  const requestCredentialSnapshot = JSON.stringify(modelForm.credential)
+  const loadBuiltin = () =>
+    ProviderApi.getBaseModelList(requestProvider, requestModelType).then((options) => {
+      applyBaseModelOptions(requestProvider, requestModelType, requestCredentialSnapshot, options)
+      MsgWarning('未获取到官方模型列表，已展示内置常用模型')
+    })
+  ProviderApi.getBaseModelList(requestProvider, requestModelType, undefined, modelForm.credential as Record<string, unknown>)
+    .then((options) => {
+      if (options?.length) {
+        applyBaseModelOptions(requestProvider, requestModelType, requestCredentialSnapshot, options)
+      } else {
+        return loadBuiltin()
+      }
+    })
+    .catch(() => loadBuiltin())
+    .finally(() => {
+      baseModelLoading.value = false
+    })
+}
+
+// 打开抽屉时优先使用后端缓存的基础模型列表，未命中回落内置默认列表。
+// 凭证（url/key）变化时尝试命中缓存，命中才刷新列表，避免每次手动获取。
+let credentialCacheTimer: ReturnType<typeof setTimeout> | undefined
+watch(
+  () => JSON.stringify(modelForm.credential),
+  () => {
+    if (!modelForm.provider || !modelForm.model_type) return
+    clearTimeout(credentialCacheTimer)
+    credentialCacheTimer = setTimeout(() => {
+      const snapshot = JSON.stringify(modelForm.credential)
+      void loadCachedBaseModelOptions(
+        modelForm.provider,
+        modelForm.model_type,
+        modelForm.credential as Record<string, unknown>,
+      ).then((options) => applyBaseModelOptions(modelForm.provider, modelForm.model_type, snapshot, options))
+    }, 500)
+  },
+)
 
 function handleBaseModelChange() {
   modelForm.credential = {}
@@ -161,6 +225,17 @@ defineExpose({ open })
               <span class="inline-flex items-center gap-2">
                 <span class="mk-required"> 基础模型</span>
                 <span class="text-warning"> 列表中未列出的模型，直接输入模型名称，回车即可添加 </span>
+                <el-button
+                  class="ml-auto"
+                  link
+                  type="primary"
+                  :disabled="!modelForm.provider || !modelForm.model_type"
+                  :loading="baseModelLoading"
+                  @click="fetchBaseModelOptions()"
+                >
+                  <MkIcon name="icon_refresh_outlined" class="mr-1"></MkIcon>
+                  获取模型
+                </el-button>
               </span>
             </template>
             <el-select
@@ -169,7 +244,7 @@ defineExpose({ open })
               class="w-full"
               default-first-option
               filterable
-              placeholder="请选择基础模型，自定义输入基础模型后回车即可"
+              placeholder="请先点击「获取模型」加载列表，或直接输入模型名称后回车"
               @change="handleBaseModelChange"
             >
               <el-option v-for="option in baseModelOptions" :key="option.name" :label="option.name" :value="option.name">

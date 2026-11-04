@@ -11,6 +11,7 @@ urlpatterns = [
     path('provider', views.Provide.as_view()),
     path('provider/model_type_list', views.Provide.ModelTypeList.as_view()),
     path('provider/model_list', views.Provide.ModelList.as_view()),
+    path('provider/model_list_cache', views.Provide.ModelListCache.as_view()),
     path('provider/model_params_form', views.Provide.ModelParamsForm.as_view()),
     path('provider/model_form', views.Provide.ModelForm.as_view()),
     path('workspace/<str:workspace_id>/model', views.ModelSetting.as_view()),

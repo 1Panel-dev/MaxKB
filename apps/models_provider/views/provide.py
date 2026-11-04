@@ -8,6 +8,7 @@ from drf_spectacular.utils import extend_schema
 from models_provider.api.provide import ProvideApi
 from models_provider.constants.model_provider_constants import ModelProvideConstants
 from models_provider.serializers.model_serializer import get_default_model_params_setting
+from models_provider.tools import cache_base_model_list, get_cached_base_model_list
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -103,16 +104,49 @@ class Provide(APIView):
             )
 
         def post(self, request: Request):
-            """携带凭证的查询走 POST，避免 api_key 出现在 URL/访问日志中。"""
+            """携带凭证的查询走 POST，避免 api_key 出现在 URL/访问日志中；成功后按 url+key 写入缓存。"""
             data = request.data or {}
-            return result.success(
-                self._get_model_list(
+            model_list = self._get_model_list(
+                data.get("provider"),
+                data.get("model_type"),
+                data.get("api_key"),
+                data.get("api_base"),
+                data.get("credential"),
+                data.get("search"),
+            )
+            if model_list and not data.get("search"):
+                # search 结果是过滤子集，不写入缓存，避免覆盖全量列表
+                cache_base_model_list(
                     data.get("provider"),
                     data.get("model_type"),
                     data.get("api_key"),
                     data.get("api_base"),
                     data.get("credential"),
-                    data.get("search"),
+                    model_list,
+                )
+            return result.success(model_list)
+
+    class ModelListCache(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["POST"],
+            summary=_("Get cached model list"),
+            description=_("Get cached model list by provider, model type and credential"),
+            operation_id=_("Get cached model list"),
+            responses=ProvideApi.ModelList.get_response(),
+            tags=[_("Model")],  # type: ignore
+        )
+        def post(self, request: Request):
+            """按 url+key 读取已缓存的官方模型列表，未命中返回空数组。
+
+            编辑场景传入 model_id 时，使用模型存储的真实凭证计算缓存 key，
+            避免接口返回的加密 api_key 导致 key 不一致。
+            """
+            data = request.data or {}
+            return result.success(
+                get_cached_base_model_list(
+                    data.get("provider"), data.get("model_type"), data.get("model_id"), data.get("credential")
                 )
             )
 
