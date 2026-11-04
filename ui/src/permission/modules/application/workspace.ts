@@ -59,6 +59,14 @@ const workspace = {
  * 工作空间「智能体」查看关联资源权限
  */
   relateMap: (id: string) => canRes(P.APPLICATION_RELATE_RESOURCE_VIEW, id),
+/**
+ * 工作空间「智能体」MCP 配置详情权限
+ */
+  mcpConfig: (id: string) => canRes(P.APPLICATION_MCP_CONFIG, id),
+/**
+ * 工作空间「智能体」导出 skills 权限
+ */
+  exportSkills: (id: string) => canRes(P.APPLICATION_EXPORT_SKILLS, id),
   debug: (id: string) => canRes(P.APPLICATION_READ, id),
 
   // —— 文件夹 ——
@@ -123,6 +131,10 @@ const workspace = {
  * 工作空间「智能体」「概览」API KEY权限
  */
   overviewApiKey: (id: string) => canRes(P.APPLICATION_OVERVIEW_API_KEY, id),
+/**
+ * 工作空间「智能体」「概览」后端 API 访问权限
+ */
+  overviewBackendApiAccess: (id: string) => canRes(P.APPLICATION_OVERVIEW_BACKEND_API_ACCESS, id),
 
   // —— 访问 / 访客 / 对话日志 ——
 /**

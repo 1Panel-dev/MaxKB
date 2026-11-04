@@ -43,6 +43,7 @@ class Operate(Enum):
     DISPLAY = ("READ+DISPLAY", _("Display Settings"))
     API_KEY = ("READ+API_KEY", _("API KEY"))
     PUBLIC_ACCESS = ("READ+PUBLIC_ACCESS", _("Public access link"))
+    BACKEND_API_ACCESS = ("READ+BACKEND_API_ACCESS", _("Backend API access"))
     Q_WEIXIN = ("READ+Q_WEIXIN", _("Enterprise WeiXin"))
     FEISHU = ("READ+FEISHU", _("Feishu"))
     DD = ("READ+DD", _("Dingding"))

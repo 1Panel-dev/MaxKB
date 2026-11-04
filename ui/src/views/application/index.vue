@@ -257,7 +257,11 @@ function handleBatchDelete() {
                     :application="application"
                   />
                   <!-- MCP 服务配置 -->
-                  <McpConfigApplicationAction label="MCP 服务配置" :application="application" />
+                  <McpConfigApplicationAction
+                    v-if="perm.application.workspace.mcpConfig(application.id)"
+                    label="MCP 服务配置"
+                    :application="application"
+                  />
                   <!-- 资源授权 -->
                   <AuthorizeApplicationAction v-if="perm.application.workspace.auth(application.id)" label="资源授权" :application="application" />
                   <!-- 查看关联资源 -->
@@ -300,7 +304,7 @@ function handleBatchDelete() {
                     label="导出"
                     :api="ApplicationApi"
                     :application="application"
-                    v-if="perm.application.workspace.export(application.id)"
+                    v-if="perm.application.workspace.export(application.id) || perm.application.workspace.exportSkills(application.id)"
                   />
                   <!-- 删除 -->
                   <DeleteApplicationAction

@@ -5,12 +5,22 @@ import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { ApplicationDetail, ExportError } from '@/api/types'
 import { MsgError } from '@/utils/message'
+import perm from '@/permission'
 
 defineOptions({ name: 'ExportApplicationAction' })
 
 const props = defineProps<{ api: typeof ApplicationApi | typeof SystemResourceApplicationApi; application: ApplicationDetail; label: string }>()
 
 const loading = defineModel<boolean>('loading', { default: false })
+
+/** 依据 api 是否含工作空间独有方法区分工作空间/系统资源管理场景，用于选择对应权限。 */
+const isSystem = computed(() => !('putMoveApplication' in props.api))
+const canExportApplication = computed(() =>
+  isSystem.value ? perm.application.system.export() : perm.application.workspace.export(props.application.id),
+)
+const canExportSkills = computed(() =>
+  isSystem.value ? perm.application.system.exportSkills() : perm.application.workspace.exportSkills(props.application.id),
+)
 
 // 二级菜单留在所属一级浮层内，避免焦点移入时关闭一级菜单，并避开滚动容器裁剪。
 const exportTriggerRef = useTemplateRef<HTMLDivElement>('exportTriggerRef')
@@ -89,9 +99,9 @@ function handleExportApplication() {
       <template #dropdown>
         <MkDropdownMenu>
           <!-- 导出为 Skills 压缩包 -->
-          <MkDropdownItem :disabled="loading" @click="handleExportSkills">导出为 Skills</MkDropdownItem>
+          <MkDropdownItem v-if="canExportSkills" :disabled="loading" @click="handleExportSkills">导出为 Skills</MkDropdownItem>
           <!-- 导出智能体文件 -->
-          <MkDropdownItem :disabled="loading" @click="handleExportApplication">导出智能体</MkDropdownItem>
+          <MkDropdownItem v-if="canExportApplication" :disabled="loading" @click="handleExportApplication">导出智能体</MkDropdownItem>
         </MkDropdownMenu>
       </template>
     </MkDropdown>

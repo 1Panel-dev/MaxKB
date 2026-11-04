@@ -1608,6 +1608,26 @@ class PermissionConstants(Enum):
         ),
     )
 
+    APPLICATION_MCP_CONFIG = (
+        Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.MCP_CONFIG, bit_index=39),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
+        ),
+    )
+
+    APPLICATION_EXPORT_SKILLS = (
+        Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.EXPORT_SKILLS, bit_index=40),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
+        ),
+    )
+
     APPLICATION_PUBLISH = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.PUBLISH, bit_index=7),
         PermissionMeta(
@@ -1819,6 +1839,21 @@ class PermissionConstants(Enum):
 
     APPLICATION_OVERVIEW_PUBLIC = (
         Permission(group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.PUBLIC_ACCESS, bit_index=28),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
+        ),
+    )
+
+    APPLICATION_OVERVIEW_BACKEND_API_ACCESS = (
+        Permission(
+            group=Group.APPLICATION,
+            sub_group=Group.OVERVIEW,
+            operate=Operate.BACKEND_API_ACCESS,
+            bit_index=38,
+        ),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
@@ -2437,6 +2472,36 @@ class PermissionConstants(Enum):
             sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
             operate=Operate.TO_WORKSPACE,
             bit_index=9,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_MCP_CONFIG = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.MCP_CONFIG,
+            bit_index=63,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_EXPORT_SKILLS = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.EXPORT_SKILLS,
+            bit_index=64,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -3370,6 +3435,36 @@ class PermissionConstants(Enum):
         ),
     )
 
+    RESOURCE_APPLICATION_MCP_CONFIG = (
+        Permission(
+            group=Group.SYSTEM_RES_APPLICATION,
+            sub_group=Group.SYSTEM_RES_APPLICATION,
+            operate=Operate.MCP_CONFIG,
+            bit_index=30,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_APPLICATION_EXPORT_SKILLS = (
+        Permission(
+            group=Group.SYSTEM_RES_APPLICATION,
+            sub_group=Group.SYSTEM_RES_APPLICATION,
+            operate=Operate.EXPORT_SKILLS,
+            bit_index=31,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
     RESOURCE_APPLICATION_COPY = (
         Permission(
             group=Group.SYSTEM_RES_APPLICATION,
@@ -3587,6 +3682,21 @@ class PermissionConstants(Enum):
             sub_group=Group.SYSTEM_OVERVIEW,
             operate=Operate.PUBLIC_ACCESS,
             bit_index=19,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_APPLICATION_OVERVIEW_BACKEND_API_ACCESS = (
+        Permission(
+            group=Group.SYSTEM_RES_APPLICATION,
+            sub_group=Group.SYSTEM_OVERVIEW,
+            operate=Operate.BACKEND_API_ACCESS,
+            bit_index=29,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],

@@ -179,8 +179,8 @@ class ApplicationApiKeyEnable(APIView):
         get_operation_object=lambda r, k: get_application_operation_object(k.get("application_id")),
     )
     @has_permissions(
-        PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission(),
-        PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_permission_workspace_manage_role(),
+        PermissionConstants.APPLICATION_OVERVIEW_BACKEND_API_ACCESS.get_workspace_application_permission(),
+        PermissionConstants.APPLICATION_OVERVIEW_BACKEND_API_ACCESS.get_workspace_permission_workspace_manage_role(),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.APPLICATION.get_workspace_application_permission()],

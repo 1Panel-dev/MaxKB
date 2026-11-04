@@ -3978,7 +3978,7 @@ msgstr "Overview"
 #: apps/common/auth/constants/group_constants.py:51
 #: apps/common/auth/constants/group_constants.py:140
 msgid "Application Access"
-msgstr "Application Access"
+msgstr "Distribution Channels"
 
 #: apps/common/auth/constants/group_constants.py:52
 #: apps/common/auth/constants/group_constants.py:141
