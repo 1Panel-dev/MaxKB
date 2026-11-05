@@ -307,5 +307,8 @@ class SandboxShellBackend(LocalShellBackend):
                 return ExecuteResponse(output=f"Invalid command: {e}", exit_code=1)
             # command = f"runuser -u {_run_user} -- env -i PATH=${{PATH}} {command}"
 
+        # Recreate cwd if a sibling run cleaned up a shared directory, or if
+        # the path was removed mid-turn (#7625).
+        os.makedirs(self.cwd, exist_ok=True)
         maxkb_logger.debug(f"Executing command in sandbox: {command}")
         return super().execute(command=command, timeout=timeout)

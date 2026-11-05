@@ -53,6 +53,7 @@ from tools.models import Tool, ToolRecord, ToolScope, ToolType, ToolWorkflowVers
 
 from application.flow.backend.sandbox_mcp import SandboxMCPBackend
 from application.flow.backend.sandbox_shell import SandboxShellBackend
+from application.flow.agent_temp_dir import agent_run_temp_dir
 from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import ToolWorkflowPostHandler, WorkFlowPostHandler
 from application.serializers.common import ToolExecute
@@ -811,6 +812,7 @@ async def save_tool_record(tool_id, tool_info, tool_result, source_id, source_ty
     await sync_to_async(tool_record.save)()
 
 
+
 def mcp_response_generator(
     chat_model,
     system_prompt,
@@ -826,11 +828,10 @@ def mcp_response_generator(
     """使用全局事件循环，不创建新实例"""
     result_queue = queue.Queue()
     loop = get_global_loop()  # 使用共享循环
-    # 创建临时文件夹
-    if chat_id:
-        temp_dir = os.path.join("/tmp", chat_id)
-    else:
-        temp_dir = os.path.join("/tmp", str(uuid.uuid7()))
+    # Each run gets a unique temp directory. Sharing `/tmp/<chat_id>` across
+    # concurrent runs (workflow nodes / duplicate requests) lets the first
+    # finish delete the cwd out from under siblings (#7625).
+    temp_dir = agent_run_temp_dir(chat_id)
     skills_dir = os.path.join(temp_dir, "skills")
     os.makedirs(skills_dir, exist_ok=True)
 
