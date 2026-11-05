@@ -6,6 +6,7 @@ import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import AdvancedCreateDialog from '@/views/application/create-application/AdvancedCreateDialog.vue'
 import SimpleCreateDialog from '@/views/application/create-application/SimpleCreateDialog.vue'
+import perm from '@/permission'
 
 defineOptions({ name: 'CreateApplicationDropdown' })
 
@@ -132,7 +133,7 @@ function handleRefresh() {
           :on-change="handleImportCreate"
           :show-file-list="false"
         >
-          <MkDropdownItem class="w-full py-2!">
+          <MkDropdownItem v-if="perm.application.workspace.import()" class="w-full py-2!">
             <template #icon>
               <img class="size-7" src="@/assets/mk_icon_import.svg" alt="" />
             </template>
