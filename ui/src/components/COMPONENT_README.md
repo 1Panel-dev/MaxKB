@@ -979,6 +979,12 @@ Workspace API 内部使用 `getWorkspaceId()`，System 共享 API 不接收工�
 `hasMore`。首页失败后通过重新加载首页重试，不从下一页继续。
 Chat、Portal 和 Display 面板直接放置消息列表，并以当前会话 ID 为 `key`，不再包裹额外滚动层。
 
+### Question（对话模块）
+
+`conversation-panel/components/content/items/question/index.vue` 负责提问展示、附件和操作入口。
+同目录 `QuestionEditor.vue` 接收 `content`、`disabled`，维护本次编辑草稿，通过 `cancel` 和
+`send(question)` 通知入口组件；进入时挂载并聚焦，退出时卸载。入口组件负责发送能力与附件传递。
+
 ### SharePanel（对话模块）
 
 `conversation-panel/main/share-panel/index.vue` 展示只读问答，通过 `useSharePanelContentStore()`

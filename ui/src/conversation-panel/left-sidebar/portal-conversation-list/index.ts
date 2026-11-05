@@ -85,6 +85,35 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
     }
   }
 
+  // 先查询全部分组和会话，再删除，避免边删除边翻页造成记录遗漏。
+  const clearConversations = async (onRemoved: (applicationId: string, chatId: string) => void) => {
+    const applicationIds = new Set<string>()
+    for (let page = 1; ; page++) {
+      const response = await pageApplicationConversations(page, APPLICATION_PAGE_SIZE)
+      const records = response.records ?? []
+      records.forEach((application) => applicationIds.add(application.id))
+      if (records.length < APPLICATION_PAGE_SIZE) break
+    }
+
+    const pendingConversations: { applicationId: string; chatId: string }[] = []
+    for (const applicationId of applicationIds) {
+      for (let page = 1; ; page++) {
+        const response = await pageGroupConversations(applicationId, page, APPLICATION_PAGE_SIZE)
+        // 查询失败不得当作空页继续删除。
+        if (!response) throw new Error('获取历史对话失败')
+        const records = response.records ?? []
+        records.forEach((conversation) => pendingConversations.push({ applicationId, chatId: conversation.id }))
+        if (records.length < APPLICATION_PAGE_SIZE) break
+      }
+    }
+
+    for (const { applicationId, chatId } of pendingConversations) {
+      await deleteGroupConversation(applicationId, chatId)
+      onRemoved(applicationId, chatId)
+    }
+    await loadApplicationGroups()
+  }
+
   // 按名称查询可访问的智能体，全部智能体页与选择智能体抽屉各自维护搜索条件与结果
   const fetchApplications = (keyword: string) => pageApplications(1, APPLICATION_PAGE_SIZE, keyword.trim()).then((response) => response.records ?? [])
 
@@ -116,6 +145,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
     loadApplicationGroups,
     toggleGroup,
     deleteGroupConversation,
+    clearConversations,
     applications,
     applicationKeyword,
     isApplicationsLoading,

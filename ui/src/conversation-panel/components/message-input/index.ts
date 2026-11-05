@@ -80,7 +80,6 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   const maxFiles = 10
   const maxSizeMB = 50
 
-  // TODO 格式 不行
   const acceptList = [...IMAGE_EXTENSIONS, ...DOCUMENT_EXTENSIONS, ...VIDEO_EXTENSIONS, ...AUDIO_EXTENSIONS].map((e) => `.${e}`).join(',')
 
   // 语音输入：智能体开启语音转文字且当前模式提供接口时可用
