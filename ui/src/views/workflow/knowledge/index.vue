@@ -552,6 +552,7 @@ onBeforeUnmount(stopAutoSave)
     <WorkflowImportDocumentDrawer
       v-if="importDocumentDrawerMounted"
       ref="importDocumentDrawerRef"
+      :api="requestApi"
       :knowledge-id="knowledgeId"
       @closed="importDocumentDrawerMounted = false"
     />

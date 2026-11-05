@@ -264,6 +264,8 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 预览编辑复用 `ParagraphForm`、`ParagraphQuestions`，不传已有分段 ID，不即时写入问题关联。
 表格／QA 支持模板下载；飞书懒加载仅展开时查子目录，已导入项不可取消，不在前端递归展开文件夹。
 工作流导入执行已发布版本，复用知识库调试的 DataSource、KnowledgeBase、Result 三步流程。
+导入抽屉由调用方显式传入当前范围的工作流 API，数据源表单、导入及结果轮询共用该 API；
+不依赖详情页上下文，以支持详情文档页与全屏工作流页复用。
 本地文件校验上传成功及 `file_id`，远程工具数据源保留其文件／目录协议。
 导入成功清空搜索、筛选并回第一页，失败保留文件、选择与策略。
 

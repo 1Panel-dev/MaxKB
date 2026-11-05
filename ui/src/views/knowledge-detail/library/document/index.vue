@@ -354,6 +354,7 @@ onBeforeUnmount(() => {
             :knowledge-type="knowledgeType"
             :folder-token="String(knowledge?.meta?.folder_token ?? '')"
             :workflow="knowledge?.work_flow"
+            :workflow-api="resourceApi.workflow"
             @refresh="handleImportDocumentSuccess"
           />
           <!-- 上传文档 -->

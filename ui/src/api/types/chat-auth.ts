@@ -9,6 +9,7 @@ export interface AuthProfile<Meta = Record<string, never>> {
   enable_auth: boolean
   login_value: LoginMethod[]
   rsa_key: string
+  logo: string
   meta: Meta
 }
 
