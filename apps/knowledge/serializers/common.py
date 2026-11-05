@@ -261,17 +261,23 @@ def create_knowledge_index(knowledge_id=None, document_id=None):
 
     sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{k_id}'"
     index = sql_execute(sql, [])
-    if not index:
-        sql = f"SELECT vector_dims(embedding) AS dims FROM embedding WHERE knowledge_id = '{k_id}' LIMIT 1"
-        result = sql_execute(sql, [])
-        if len(result) == 0:
-            return
-        dims = result[0]['dims']
-        # 超过2000维度不创建索引，pgvector hnsw索引不支持超过2000维度
-        if dims < 2000:
-            sql = f"""CREATE INDEX "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_cosine_ops) WHERE knowledge_id = '{k_id}'"""
-            update_execute(sql, [])
-            maxkb_logger.info(f'Created index for knowledge ID: {k_id}')
+    if index:
+        # Incremental inserts leave HNSW recall degraded; rebuild so scores stay stable
+        # without requiring a full knowledge re-vectorize (see #7597).
+        sql = f'REINDEX INDEX "embedding_hnsw_idx_{k_id}"'
+        update_execute(sql, [])
+        maxkb_logger.info(f'Reindexed index for knowledge ID: {k_id}')
+        return
+    sql = f"SELECT vector_dims(embedding) AS dims FROM embedding WHERE knowledge_id = '{k_id}' LIMIT 1"
+    result = sql_execute(sql, [])
+    if len(result) == 0:
+        return
+    dims = result[0]['dims']
+    # 超过2000维度不创建索引，pgvector hnsw索引不支持超过2000维度
+    if dims < 2000:
+        sql = f"""CREATE INDEX "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_cosine_ops) WHERE knowledge_id = '{k_id}'"""
+        update_execute(sql, [])
+        maxkb_logger.info(f'Created index for knowledge ID: {k_id}')
 
 
 def drop_knowledge_index(knowledge_id=None, document_id=None):

@@ -11,6 +11,7 @@ from common.event.listener_manage import ListenerManagement
 from common.utils.logger import maxkb_logger
 from common.utils.page_utils import page, page_desc
 from knowledge.models import Paragraph, Document, Status, TaskType, State
+from knowledge.serializers.common import create_knowledge_index
 from knowledge.task.handler import save_problem
 from models_provider.models import Model
 from models_provider.tools import get_model
@@ -112,6 +113,13 @@ def generate_related_by_document_id(document_id, model_id, model_params_setting,
             document_id=document_id, error=str(e), traceback=traceback.format_exc()))
     finally:
         ListenerManagement.post_update_document_status(document_id, TaskType.GENERATE_PROBLEM)
+        if knowledge_id is not None:
+            try:
+                create_knowledge_index(knowledge_id=knowledge_id)
+            except Exception as e:
+                maxkb_logger.warning(
+                    f'Failed to refresh HNSW index after problem generation for knowledge {knowledge_id}: {e}'
+                )
         maxkb_logger.info(_('End--->Generate problem: {document_id}').format(document_id=document_id))
 
 
@@ -153,3 +161,11 @@ def generate_related_by_paragraph_id_list(document_id, paragraph_id_list, model_
         page(paragraph_queryset, 10, generate_problem, is_the_task_interrupted)
     finally:
         ListenerManagement.post_update_document_status(document_id, TaskType.GENERATE_PROBLEM)
+        # FAQ/problem vectors are incremental HNSW inserts; rebuild so recall stays stable (#7597).
+        if knowledge_id is not None:
+            try:
+                create_knowledge_index(knowledge_id=knowledge_id)
+            except Exception as e:
+                maxkb_logger.warning(
+                    f'Failed to refresh HNSW index after problem generation for knowledge {knowledge_id}: {e}'
+                )
