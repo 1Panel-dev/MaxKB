@@ -30,6 +30,10 @@ function validate() {
   return formRef.value?.validate().catch(() => false) ?? Promise.resolve(false)
 }
 
+function validateEmbeddingModel() {
+  return formRef.value?.validateField('embedding_model_id').catch(() => false) ?? Promise.resolve(false)
+}
+
 function reset() {
   Object.assign(form, {
     name: '',
@@ -65,7 +69,7 @@ function loadModelOptions() {
 }
 
 onMounted(() => loadModelOptions())
-defineExpose({ form, validate, reset })
+defineExpose({ form, validate, validateEmbeddingModel, reset })
 </script>
 
 <template>

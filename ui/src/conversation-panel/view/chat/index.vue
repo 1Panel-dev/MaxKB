@@ -41,7 +41,7 @@ provide(SHARE_PANEL_CONTENT_KEY, {
   ...bundle.msgs,
   title: computed(() => bundle.list.currentConversation.value?.abstract || '新建对话'),
 })
-provide(VIEW_KEY,VIEW_TYPE.CHAT)
+provide(VIEW_KEY, VIEW_TYPE.CHAT)
 // HTML 内容 iframe 内 chatUserProfile() 取当前对话用户
 provide(CHAT_USER_PROFILE_KEY, createChatUserProfileGetter())
 
@@ -50,6 +50,7 @@ const BREAKPOINT = 768
 const isMobile = ref(window.innerWidth < BREAKPOINT)
 const onResize = () => (isMobile.value = window.innerWidth < BREAKPOINT)
 const leftMode = computed(() => (isMobile.value ? 'drawer' : 'push'))
+bundle.list.bindLeftSideMode(leftMode)
 const rightMode = computed(() => (isMobile.value ? 'drawer' : 'push'))
 // 左栏为抽屉即手机端
 provide(DEVICE_KEY, createDeviceType(leftMode))

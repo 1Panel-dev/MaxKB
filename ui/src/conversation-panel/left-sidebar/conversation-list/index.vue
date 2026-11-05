@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { MsgConfirm } from '@/utils/message'
 import RenameConversation from '../../components/rename/index.vue'
 import { relativeTimeFormat } from '@/utils/time'
@@ -7,9 +7,16 @@ import type { Conversation } from '../../core/types'
 import { useConversationListStore } from './index'
 import AccountMenu from '../account-menu/index.vue'
 
+import { useMessageListStore } from '../../components/message-list/index'
+import { useViewType, VIEW_TYPE } from '../../view/index'
+
 defineOptions({ name: 'ConversationList' })
 
-const { appInfo, conversations, currentChatId, selectConversation, newConversation, deleteChat, toggleLeftSide, hasMore, loadMore } =
+const viewType = useViewType()
+const msgs = useMessageListStore()
+const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
+
+const { appInfo, conversations, currentChatId, switchShared, selectConversation, newConversation, deleteChat, toggleLeftSide, hasMore, loadMore } =
   useConversationListStore()
 
 // 历史时间优先使用更新时间，缺少时间的记录不显示占位文案。
@@ -99,10 +106,20 @@ function handleClearConversations() {
                 <el-button text><MkIcon name="icon_more_outlined" /></el-button>
                 <template #dropdown>
                   <MkDropdownMenu>
+                    <!-- 分享当前激活对话 -->
+                    <MkDropdownItem
+                      v-if="viewType === VIEW_TYPE.CHAT && currentChatId === conversation.id"
+                      :disabled="!canShare"
+                      @click="switchShared(true)"
+                    >
+                      <template #icon><MkIcon name="icon_share_outlined" /></template>
+                      <span>分享</span>
+                    </MkDropdownItem>
                     <!-- 重命名 -->
                     <RenameConversation :conversation="conversation" />
+
                     <!-- 删除历史对话 -->
-                    <MkDropdownItem divided @click="handleDeleteConversation(conversation)">
+                    <MkDropdownItem @click="handleDeleteConversation(conversation)">
                       <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                       <span>删除</span>
                     </MkDropdownItem>
