@@ -12,7 +12,7 @@ defineOptions({ name: 'AddWorkspaceMemberDrawer' })
 
 const props = defineProps<{ currentWorkspace?: WorkspaceItem }>()
 
-const emit = defineEmits<{ refresh: [] }>()
+const emit = defineEmits<{ refresh: [workspaceId: string] }>()
 
 const visible = ref(false)
 const loading = ref(false)
@@ -69,7 +69,7 @@ function submit() {
     )
       .then(() => {
         MsgSuccess('添加成功')
-        emit('refresh')
+        emit('refresh', workspaceId)
         visible.value = false
       })
       .finally(() => {
