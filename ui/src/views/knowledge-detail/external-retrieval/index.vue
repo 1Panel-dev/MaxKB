@@ -6,7 +6,7 @@ import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetti
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import {isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 /**
  * 知识库「外部检索服务」权限判断
  */
@@ -81,12 +81,25 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
       <el-button type="primary" @click="loadExternalRetrieval">重新加载</el-button>
     </MkEmpty>
     <div v-else-if="setting" class="space-y-4">
+      <!-- TODO 两个开关等调试 -->
       <section>
         <div class="mb-2">
-          <span>身份认证</span>
-          <span class="text-N600">（开启后仅授权的对话用户可通过 API Key 检索该知识库）</span>
+          <span>API 服务</span>
+          <span class="text-N600"> (开启后，允许对话用户通过 APIKey 调用 API 检索当前知识库)</span>
         </div>
-        <!-- 切换身份认证 -->
+        <!-- 切换外部检索服务 -->
+        <el-switch
+          :disabled="!knowledgeExternalServicePermission('knowledgeExternalServiceEdit')"
+          :model-value="setting.enabled"
+          @change="handleSettingChange('enabled', $event)"
+        />
+      </section>
+      <section>
+        <div class="mb-2">
+          <span>对话用户授权</span>
+          <span class="text-N600"> (开启后，仅允许授权的对话用户通过 APIKey 检索当前知识库)</span>
+        </div>
+        <!-- 切换对话用户授权 -->
         <el-switch
           :disabled="!knowledgeExternalServicePermission('knowledgeExternalServiceEdit')"
           :model-value="setting.authentication"
@@ -94,16 +107,7 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
         />
       </section>
       <section>
-        <div class="flex-between mb-2 gap-2">
-          <span>API 服务地址</span>
-          <!-- 切换外部检索服务 -->
-          <el-switch
-            :disabled="!knowledgeExternalServicePermission('knowledgeExternalServiceEdit')"
-            :model-value="setting.enabled"
-            size="small"
-            @change="handleSettingChange('enabled', $event)"
-          />
-        </div>
+        <div class="mb-2">API 服务地址</div>
         <el-input :model-value="setting?.api_url ?? ''" readonly>
           <template #suffix>
             <!-- 复制 API 服务地址 -->
