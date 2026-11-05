@@ -1331,7 +1331,22 @@
     font-size: 14px;
   }
 }
-
+.el-check-tag {
+  font-weight: 400;
+  color: var(--el-text-color-primary);
+  background-color: var(--mk-N900-transparent-10);
+  &--primary {
+    &.is-checked,
+    &.is-checked.is-disabled {
+      background-color: rgba(var(--mk-primary-rgb) / 20%) !important;
+      color: var(--el-color-primary-dark-2) !important;
+    }
+    &.is-disabled {
+      background-color: var(--mk-N900-transparent-10) !important;
+      color: var(--mk-N500) !important;
+    }
+  }
+}
 /* textarea */
 .el-textarea {
   --el-input-placeholder-color: var(--mk-N500);

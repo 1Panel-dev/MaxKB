@@ -508,7 +508,14 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 
 ### 对话消息反馈
 
-`conversation-panel/components/message-footer/feedback/` 维护满意／不满意入口与内联原因面板。
+`conversation-panel/components/message-footer/feedback/` 内的 `ButtonFeedback.vue` 和 `FeedbackCard.vue`
+分别维护满意／不满意按钮与内联原因面板，由消息 Footer 管理草稿、提交状态和保存请求，
+将按钮组合到操作栏、面板组合到操作栏下方；时间保持在操作栏内。
 正式单应用、门户对话通过可选的 `ConversationApiAdapter.feedback` 接入保存，调试端未装配时
 不展示入口。反馈提交成功后更新消息记录，失败保留草稿；已评价按钮支持撤销，再评价需先撤销。
-日志消息继续使用独立日志 Footer。
+未评价时展示两个反馈入口，提交成功后仅展示对应的彩色撤销按钮，撤销成功后恢复两个入口。
+反馈面板高度变化时由 Footer 通知消息列表复用底部跟随；用户在底部附近时随展开动画滚动，
+已上滑离开底部时保留阅读位置。
+日志消息继续使用独立日志 Footer，`log-message-footer/feedback/` 根据记录的反馈状态只读展示
+对应的彩色禁用按钮，并在操作栏下方通过本地 `FeedbackCard.vue` 展示已保存原因与补充内容。
+原因、输入框和操作按钮全部禁用；未评价时不展示反馈区域，不发起提交或撤销请求。

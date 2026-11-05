@@ -15,7 +15,10 @@ defineProps<{ appName?: string }>()
 const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamProgress, sendMessage } = useMessageListStore()
 const { isShared } = useConversationListStore()
 // 消息内容项（如表单）经此发起续跑；分享时收回发送能力，内容项只读
-provide(SEND_MESSAGE_KEY, computed(() => (isShared.value ? null : sendMessage)))
+provide(
+  SEND_MESSAGE_KEY,
+  computed(() => (isShared.value ? null : sendMessage)),
+)
 // 分享选择的记录 ID、勾选与提交由分享链接 Store 维护；未提供时（调试等）不进入分享选择。
 const shareLink = useShareLinkStoreOptional()
 const scrollRef = ref<InstanceType<typeof ReverseInfiniteScroll>>()
@@ -66,7 +69,12 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
           <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
           <ContentList :content-list="msg.content" />
           <!-- 助手消息结束后显示底部信息栏(知识来源/执行详情/tokens/耗时) -->
-          <MessageFooter class="mt-3" v-if="!isShared && msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)" :message="msg" />
+          <MessageFooter
+            class="mt-3"
+            v-if="!isShared && msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)"
+            :message="msg"
+            @resize="scrollRef?.followBottom()"
+          />
         </template>
       </ShareMessageRow>
     </template>

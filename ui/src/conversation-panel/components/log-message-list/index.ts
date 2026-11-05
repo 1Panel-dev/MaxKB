@@ -19,6 +19,7 @@ const buildRecordMeta = (raw: ChatLogRecord): ChatRecordMeta => ({
   runTime: raw.run_time || 0,
   knowledgeCount: (raw.paragraph_list || []).length,
   executionDetails: raw.execution_details || [],
+  feedback: { vote_status: raw.vote_status ?? '-1', vote_reason: raw.vote_reason, vote_other_content: raw.vote_other_content },
 })
 
 export function createLogMessageListStore(deps: LogMessageListDeps) {
