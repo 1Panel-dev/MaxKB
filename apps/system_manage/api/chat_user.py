@@ -104,12 +104,6 @@ class ChatUserListResponse(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True, label=_("Email"))
     phone = serializers.CharField(required=False, allow_blank=True, label=_("Phone"))
     is_active = serializers.BooleanField(required=False, default=True, label=_("Is Active"))
-    user_group_ids = serializers.ListField(
-        child=serializers.CharField(required=True), required=True, label=_("User Group IDs")
-    )
-    user_group_names = serializers.ListField(
-        child=serializers.CharField(required=True), required=True, label=_("User Group Names")
-    )
 
 
 class ChatUsersListResponse(ResultSerializer):

@@ -303,6 +303,14 @@ class CaptchaView(APIView):
         description=_("Get Chat captcha"),
         operation_id=_("Get Chat captcha"),  # type: ignore
         tags=[_("Chat")],  # type: ignore
+        parameters=[
+            OpenApiParameter(
+                name="accessToken",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            )
+        ],
         responses=CaptchaAPI.get_response(),
     )
     def get(self, request: Request):
