@@ -12,13 +12,13 @@ import { createConversationListStore } from '../../left-sidebar/conversation-lis
 import { createMessageListStore } from '../../components/message-list/index'
 import { createMessageInputStore } from '../../components/message-input/index'
 import { createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
-import { createSharePanelStore, type SharePanelStore } from '../../main/share-panel/index'
+import { createShareLinkStore, type ShareLinkStore } from '../../components/message-list/share/index'
 import type { ConversationBundle } from '../types'
 import type { GetChatUserProfile } from '../index'
 import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
 /** chat 模式在通用组件 store 之外提供分享;debug 模式无分享。 */
 export interface ChatConversationBundle extends ConversationBundle {
-  share: SharePanelStore
+  share: ShareLinkStore
 }
 
 /** chat 模式的智能体与会话地址来源；单应用与门户的路由不同，由使用方提供。 */
@@ -128,7 +128,9 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
   })
   const detail = createExecutionDetailStore()
   // 生成分享链接后复制分享页地址(与 v2 一致为 {chat 部署路径}/share/{link})
-  const share = createSharePanelStore({
+  const share = createShareLinkStore({
+    messages: msgs.messages,
+    setShared: list.switchShared,
     share: (chatRecordIds) =>
       ConversationApi.postShareConversation(getApplicationId(), list.currentChatId.value, { chat_record_ids: chatRecordIds }).then(({ link }) =>
         copyText(`${window.location.origin}${CHAT_API_BASE_PATH.replace(/\/api$/, '')}/share/${link}`, '分享链接已复制'),

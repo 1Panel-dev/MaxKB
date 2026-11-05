@@ -8,12 +8,15 @@ import type { ChatMessage, ChatRecordMeta } from '../../core/types'
 import { useExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 
 import { MESSAGE_LIST_KEY } from '../message-list/index'
-import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
+import { SHAREABLE_VIEWS, useShareLinkStoreOptional } from '../message-list/share/index'
+import { useViewType } from '../../view/index'
 
 const props = defineProps<{ message: ChatMessage }>()
 
-// 复用对话的分享选择入口，回答生成中禁用。
-const conversationList = inject(CONVERSATION_LIST_KEY, null)
+// 仅提供分享服务的视图（对话、门户）显示分享入口；进入分享时预先勾选当前回答所属轮次。
+const showShare = SHAREABLE_VIEWS.includes(useViewType())
+const shareLink = useShareLinkStoreOptional()
+// 回答生成中禁用分享。
 const messageList = inject(MESSAGE_LIST_KEY, null)
 const canShare = computed(() => Boolean(messageList?.messages.value.length && !messageList.streamLoading.value))
 
@@ -77,9 +80,9 @@ const openExecutionDetail = () => {
         </el-button>
       </MkTooltip>
       <!-- 进入分享模式 -->
-      <span>
+      <span v-if="showShare">
         <MkTooltip content="分享">
-          <el-button text :disabled="!canShare" @click="conversationList?.switchShared(true)">
+          <el-button text :disabled="!canShare" @click="shareLink?.enterShare([message.recordId])">
             <MkIcon name="icon_share_outlined" />
           </el-button>
         </MkTooltip>

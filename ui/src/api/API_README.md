@@ -806,9 +806,9 @@ Workspace 和 System 资源管理的 `getKnowledgeDetail(knowledgeId, section?)`
 
 `chat/conversation.ts` 的 `getShareConversation(shareId)` 请求 Chat API 下的 `GET /share/<shareId>`，
 不需要 accessToken 或 applicationId。响应类型 `ChatShareDetail` 经 `@/api/types` 导出，包含
-`abstract` 和按时间正序排列的 `chat_record_list`。当前后端返回旧版 `problem_text`、
-`answer_text`、`answer_text_list` 及仅含上传附件的 `execution_details`，不返回 V3 `question`、`messages`。
-分享页适配旧版字段，不通过原会话接口补查内容。
+`abstract` 和按时间正序排列的 `chat_record_list`。记录包含 V3 `question`、`messages`，
+同时保留旧版 `problem_text`、`answer_text`、`answer_text_list`；分享页使用 `question`、`messages`，
+不通过原会话接口补查内容。
 
 ### 对话回答反馈
 

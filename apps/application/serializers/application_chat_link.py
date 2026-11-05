@@ -1,10 +1,11 @@
 """
-    @project: MaxKB
-    @Author: niu
-    @file: application_chat_link.py
-    @date: 2026/2/9 10:50
-    @desc:
+@project: MaxKB
+@Author: niu
+@file: application_chat_link.py
+@date: 2026/2/9 10:50
+@desc:
 """
+
 import re
 
 from django.utils.translation import gettext_lazy as _
@@ -18,42 +19,20 @@ import uuid_utils.compat as uuid
 
 
 class ShareChatRecordModelSerializer(serializers.ModelSerializer):
-    execution_details = serializers.SerializerMethodField()
-
     class Meta:
         model = ChatRecord
-        fields = ['id', 'problem_text', 'answer_text', 'answer_text_list',
-                  'create_time', 'execution_details']
-
-    @staticmethod
-    def get_execution_details(chat_record):
-        details = chat_record.details or {}
-        # 分享是公开链接，只挑 start-node 的上传文件列表，避免泄露其它执行详情
-        return [
-            {
-                'type': 'start-node',
-                'image_list': v.get('image_list', []),
-                'document_list': v.get('document_list', []),
-                'audio_list': v.get('audio_list', []),
-                'video_list': v.get('video_list', []),
-                'other_list': v.get('other_list', []),
-            }
-            for v in details.values() if v.get('type') == 'start-node'
-        ]
+        fields = ["id", "problem_text", "answer_text", "answer_text_list", "create_time", "question", "messages"]
 
 
 class ChatRecordShareLinkRequestSerializer(serializers.Serializer):
     chat_record_ids = serializers.ListSerializer(
-        child=serializers.UUIDField(),
-        required=False,
-        allow_empty=False,
-        label=_("Chat record IDs")
+        child=serializers.UUIDField(), required=False, allow_empty=False, label=_("Chat record IDs")
     )
     is_current_all = serializers.BooleanField(required=False, default=False)
 
     def validate(self, attrs):
-        if not attrs.get('is_current_all') and not attrs.get('chat_record_ids'):
-            raise serializers.ValidationError(_('Chat record ids can not be empty'))
+        if not attrs.get("is_current_all") and not attrs.get("chat_record_ids"):
+            raise serializers.ValidationError(_("Chat record ids can not be empty"))
         return attrs
 
 
@@ -64,8 +43,8 @@ def extract_oss_file_urls(answer_text_list):
         if not isinstance(answer_group, list):
             answer_group = [answer_group]
         for item in answer_group:
-            content = item.get('content', '')
-            urls = re.findall(r'\./oss/file/[\w-]+', content)
+            content = item.get("content", "")
+            urls = re.findall(r"\./oss/file/[\w-]+", content)
             file_urls.extend(urls)
     return file_urls
 
@@ -76,7 +55,7 @@ def save_public_file_access(chat_record_list):
     for chat_record in chat_record_list:
         urls = extract_oss_file_urls(chat_record.answer_text_list)
         for url in urls:
-            file_id = url.replace('./oss/file/', '')
+            file_id = url.replace("./oss/file/", "")
             if file_id:
                 file_ids.add(file_id)
 
@@ -84,19 +63,15 @@ def save_public_file_access(chat_record_list):
         return
 
     existing = set(
-        PublicFileAccess.objects.filter(
-            source_type='FILE',
-            source_id__in=list(file_ids)
-        ).values_list('source_id', flat=True)
+        PublicFileAccess.objects.filter(source_type="FILE", source_id__in=list(file_ids)).values_list(
+            "source_id", flat=True
+        )
     )
 
     new_records = [
-        PublicFileAccess(
-            id=uuid.uuid7(),
-            source_type='FILE',
-            source_id=file_id
-        )
-        for file_id in file_ids if file_id not in existing
+        PublicFileAccess(id=uuid.uuid7(), source_type="FILE", source_id=file_id)
+        for file_id in file_ids
+        if file_id not in existing
     ]
 
     if new_records:
@@ -110,50 +85,54 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
-        chat_id = self.data.get('chat_id')
-        application_id = self.data.get('application_id')
-        user_id = self.data.get('user_id')
+        chat_id = self.data.get("chat_id")
+        application_id = self.data.get("application_id")
+        user_id = self.data.get("user_id")
 
         chat_query_set = Chat.objects.filter(
             id=chat_id, application_id=application_id, chat_user_id=user_id, is_deleted=False
         )
         if not chat_query_set.exists():
-            raise AppApiException(500, _('Chat id does not exist'))
+            raise AppApiException(500, _("Chat id does not exist"))
 
     def generate_link(self, instance, with_valid=True):
         if with_valid:
             request_serializer = ChatRecordShareLinkRequestSerializer(data=instance)
             request_serializer.is_valid(raise_exception=True)
             self.is_valid(raise_exception=True)
-            if not instance.get('is_current_all', False):
-                chat_record_ids: list[str] = instance.get('chat_record_ids')
+            if not instance.get("is_current_all", False):
+                chat_record_ids: list[str] = instance.get("chat_record_ids")
 
-                record_count = ChatRecord.objects.filter(id__in=chat_record_ids,
-                                                         chat_id=self.data.get('chat_id')).count()
+                record_count = ChatRecord.objects.filter(
+                    id__in=chat_record_ids, chat_id=self.data.get("chat_id")
+                ).count()
                 if record_count != len(chat_record_ids):
-                    raise AppApiException(500, _('Invalid chat record ids'))
-        chat_id = self.data.get('chat_id')
-        application_id = self.data.get('application_id')
-        user_id = self.data.get('user_id')
+                    raise AppApiException(500, _("Invalid chat record ids"))
+        chat_id = self.data.get("chat_id")
+        application_id = self.data.get("application_id")
+        user_id = self.data.get("user_id")
 
-        is_current_all = instance.get('is_current_all', False)
+        is_current_all = instance.get("is_current_all", False)
         if is_current_all:
             sorted_ids = list(
-                ChatRecord.objects.filter(chat_id=chat_id).order_by('create_time').values_list('id',flat=True)
+                ChatRecord.objects.filter(chat_id=chat_id).order_by("create_time").values_list("id", flat=True)
             )
         else:
-            chat_record_ids: list[str] = instance.get('chat_record_ids')
-            sorted_ids = list(ChatRecord.objects.filter(id__in=chat_record_ids).order_by('create_time').values_list('id',flat=True))
+            chat_record_ids: list[str] = instance.get("chat_record_ids")
+            sorted_ids = list(
+                ChatRecord.objects.filter(id__in=chat_record_ids).order_by("create_time").values_list("id", flat=True)
+            )
 
         existing = ChatShareLink.objects.filter(
-            chat_id=chat_id, application_id=application_id,
+            chat_id=chat_id,
+            application_id=application_id,
             share_type=ShareLinkType.PUBLIC,
             user_id=user_id,
-            chat_record_ids=sorted_ids
+            chat_record_ids=sorted_ids,
         ).first()
 
         if existing:
-            return {'link': UUIDEncoder.encode(existing.id)}
+            return {"link": UUIDEncoder.encode(existing.id)}
         chat_record_list = ChatRecord.objects.filter(id__in=sorted_ids)
         save_public_file_access(chat_record_list)
         chat_share_link_model = ChatShareLink(
@@ -162,13 +141,13 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
             application_id=application_id,
             share_type=ShareLinkType.PUBLIC,
             user_id=user_id,
-            chat_record_ids=sorted_ids
+            chat_record_ids=sorted_ids,
         )
         chat_share_link_model.save()
 
         link = UUIDEncoder.encode(chat_share_link_model.id)
 
-        return {'link': link}
+        return {"link": link}
 
 
 class ChatShareLinkDetailSerializer(serializers.Serializer):
@@ -177,29 +156,25 @@ class ChatShareLinkDetailSerializer(serializers.Serializer):
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
 
-        link = self.data.get('link')
+        link = self.data.get("link")
         share_link_id = UUIDEncoder.decode_to_str(link)
 
         share_link_query_set = ChatShareLink.objects.filter(id=share_link_id).first()
         if not share_link_query_set:
-            raise AppApiException(500, _('Share link does not exist'))
+            raise AppApiException(500, _("Share link does not exist"))
         if share_link_query_set.chat.is_deleted:
-            raise AppApiException(500, _('Chat has been deleted'))
+            raise AppApiException(500, _("Chat has been deleted"))
 
         return share_link_query_set
 
     def get_record_list(self):
         share_link_model = self.is_valid(raise_exception=True)
 
-        chat_record_model_list = ChatRecord.objects.filter(id__in=share_link_model.chat_record_ids,
-                                                           chat_id=share_link_model.chat_id).order_by('create_time')
+        chat_record_model_list = ChatRecord.objects.filter(
+            id__in=share_link_model.chat_record_ids, chat_id=share_link_model.chat_id
+        ).order_by("create_time")
 
-        abstract = Chat.objects.filter(
-            id=share_link_model.chat_id
-        ).values_list('abstract', flat=True).first()
+        abstract = Chat.objects.filter(id=share_link_model.chat_id).values_list("abstract", flat=True).first()
         chat_record_list = ShareChatRecordModelSerializer(chat_record_model_list, many=True).data
 
-        return {
-            'abstract': abstract,
-            'chat_record_list': chat_record_list
-        }
+        return {"abstract": abstract, "chat_record_list": chat_record_list}

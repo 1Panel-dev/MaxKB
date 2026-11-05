@@ -13,8 +13,15 @@ import { copyText } from '@/utils/clipboard'
 
 import { MESSAGE_LIST_KEY } from '../../../message-list/index'
 import { CONVERSATION_LIST_KEY } from '../../../../left-sidebar/conversation-list/index'
+import { useViewType } from '../../../../view/index'
+import { SHAREABLE_VIEWS, useShareLinkStoreOptional, useShareRecordId } from '../../../message-list/share/index'
 
 defineOptions({ name: 'ConversationQuestionContent' })
+
+// 仅提供分享服务的视图（对话、门户）显示分享入口；进入分享时预先勾选所属轮次。
+const showShare = SHAREABLE_VIEWS.includes(useViewType())
+const shareLink = useShareLinkStoreOptional()
+const shareRecordId = useShareRecordId()
 
 // 复用对话的分享选择入口，回答生成中禁用。
 const conversationList = inject(CONVERSATION_LIST_KEY, null)
@@ -143,8 +150,8 @@ function getAttachmentDescription(file: QuestionAttachment) {
         <MkIcon name="icon_copy_outlined" />
       </el-button>
       <!-- 进入分享模式 -->
-      <MkTooltip content="分享">
-        <el-button text :disabled="!canShare" @click="conversationList?.switchShared(true)">
+      <MkTooltip v-if="showShare" content="分享">
+        <el-button text :disabled="!canShare" @click="shareLink?.enterShare([shareRecordId])">
           <MkIcon name="icon_share_outlined" />
         </el-button>
       </MkTooltip>

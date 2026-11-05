@@ -969,10 +969,16 @@ Workspace API 内部使用 `getWorkspaceId()`，System 共享 API 不接收工�
 正式对话的 `message-list` 根据会话 Store 的 `isShared` 展示分享选择态，同轮提问与回答同步选择，
 内容只读且选中时显示背景；无记录 ID 的问答不可选。列表底部提供当前已加载轮次的全选、已选数量、
 取消及创建链接，创建时按消息顺序提交记录 ID；成功退出分享，失败保留选择。分享期间主面板隐藏输入框，
-消息列表卸载时退出分享态；调试入口不提供分享服务。
-分享组件放在 `message-list/share/`：`ShareMessageRow` 通过插槽承载消息，按记录 ID 切换整轮选择；
-`ShareFooter` 负责全选、数量、取消、创建链接及退出清理。两者通过 `v-model` 共享已选记录 ID，
-各自在组件内获取分享服务与提交状态；`message-list/index.vue` 仅准备记录 ID、保存已选 ID 并组合组件。
+消息列表卸载时退出分享态。分享入口仅在 `SHAREABLE_VIEWS`（Chat、Portal）显示，调试、日志等视图不提供分享服务。
+分享选择放在 `message-list/share/`：`index.ts` 的 `createShareLinkStore({ messages, share, setShared })` 维护
+每条消息的记录 ID、已选记录、数量与全选状态、单条切换、全选、进入（`enterShare`）、提交（`copyShareLink`）
+及退出（`exitShare`）；提交成功后退出，失败保留选择。分享模式开关仍由会话 Store 的 `isShared` 维护，
+Store 经 `setShared` 开关。所有分享入口调用 `enterShare(recordIds?)` 进入：提问与回答的入口传入所属轮次记录 ID
+以预先勾选，标题栏、会话菜单与门户历史入口不传；传入的 ID 只保留当前可分享记录。`ShareMessageRow` 通过
+`SHARE_RECORD_ID_KEY` 向消息内容提供所属轮次记录 ID，内容项以 `useShareRecordId()` 读取。
+Chat、Portal 视图创建并 provide `SHARE_LINK_KEY`，组件通过 `useShareLinkStoreOptional()` 获取，未提供时不进入选择态。
+`ShareMessageRow` 通过插槽承载消息，`ShareFooter` 展示全选、数量、取消与创建链接并在卸载时退出分享态；
+两者只绑定 Store 状态与方法，不维护逻辑。`message-list/index.vue` 只组合组件并传入 Store 提供的记录 ID。
 
 消息 Store 的 `loadMore()` 在新增历史记录时返回 `true`，空页、失败或未执行时返回 `false`，
 直接传给滚动容器。新会话及重置时 `hasMore` 为 `false`；已有会话主动加载首页，成功后再更新
@@ -987,10 +993,18 @@ Chat、Portal 和 Display 面板直接放置消息列表，并以当前会话 ID
 
 ### SharePanel（对话模块）
 
-`conversation-panel/main/share-panel/index.vue` 展示只读问答，通过 `useSharePanelContentStore()`
-读取所属视图提供的 `SHARE_PANEL_CONTENT_KEY`。正式对话视图接入当前会话数据，独立分享页
-提供公开接口返回的标题、消息及加载状态，不加载原会话历史。
-回答复制提取内容项正文，不传递内容数组给剪贴板。
+`conversation-panel/main/share-panel/index.vue` 是公开分享页的主面板，展示标题栏并组合
+`ShareMessageList`。`conversation-panel/view/share/index.vue` 接收 `shareId`，以
+`createSharePanelStore({ shareId })` 创建并 provide `SHARE_PANEL_KEY`，提供 `VIEW_TYPE.SHARE` 与设备类型，
+在挂载及分享 ID 变化时调用 `load()`；面板把内部的消息列表 Store 提供给 `ShareMessageList`。
+分享视图不注入发送能力，表单内容项按只读视图展示。路由页 `views/chat/share/` 只读取地址中的分享 ID 并渲染该视图。
+
+### ShareMessageList（对话模块）
+
+`conversation-panel/components/share-message-list/` 负责请求公开分享接口并只读展示问答。
+`createShareMessageListStore({ shareId })` 提供标题、消息、加载及失败状态，按记录的 `question`、`messages`
+转换消息，不加载原会话历史、不分页；切换分享 ID 后丢弃旧请求结果。组件通过 `SHARE_MESSAGE_LIST_KEY`
+注入 Store，失败时在空状态提供重试；回答复制提取内容项正文，不传递内容数组给剪贴板。
 
 ## 文档维护
 

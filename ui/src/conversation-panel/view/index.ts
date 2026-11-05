@@ -8,6 +8,7 @@ export const VIEW_TYPE = {
   SIMPLE_DEBUG: 'SIMPLE_DEBUG',
   PORTAL: 'PORTAL',
   LOG: 'LOG',
+  SHARE: 'SHARE',
 } as const
 export type ViewType = (typeof VIEW_TYPE)[keyof typeof VIEW_TYPE]
 
