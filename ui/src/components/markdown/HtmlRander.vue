@@ -136,7 +136,7 @@ window.addEventListener('message', function (e) {
 const fSource = computed(() => createIframeHtml(props.source))
 
 function onMessage(e: MessageEvent) {
-  if (e.data?.instanceId !== instanceId) return
+  if (!htmlRef.value || e.source !== htmlRef.value.contentWindow || e.data?.instanceId !== instanceId) return
 
   if (e.data.type === 'resize') {
     const iframe = htmlRef.value
@@ -144,7 +144,14 @@ function onMessage(e: MessageEvent) {
     iframe.style.height = e.data.height + 'px'
   }
   if (e.data.type === 'jump') {
-    window.open(e.data.url, '_blank')
+    if (typeof e.data.url !== 'string' || !e.data.url.trim()) return
+    try {
+      const url = new URL(e.data.url, window.location.href)
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') return
+      window.open(url.href, '_blank', 'noopener,noreferrer')
+    } catch {
+      return
+    }
   }
   if (e.data.type === 'chatMessage') {
     props.sendMessage?.(e.data.message, 'new', e.data.other_params_data)
