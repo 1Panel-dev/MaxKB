@@ -15,7 +15,6 @@ import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index
 import { SHARE_PANEL_KEY, SHARE_PANEL_CONTENT_KEY } from '../../main/share-panel/index'
 import { createChatConversation, createChatUserProfileGetter } from './index'
 import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, createDeviceType } from '../index.ts'
-
 const bundle = createChatConversation()
 
 // 动态表单上传使用当前会话，兼容文件字段的地址包装与取消操作。
