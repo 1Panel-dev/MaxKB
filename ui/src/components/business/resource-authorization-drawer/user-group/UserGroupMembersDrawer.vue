@@ -3,21 +3,24 @@ import { computed, ref } from 'vue'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import { LOGIN_METHOD } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
+import { useStore } from '@/stores'
 import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 
 defineOptions({ name: 'UserGroupMembersDrawer' })
 
 /* 成员查询与分页 */
+const { auth } = useStore()
 const drawerVisible = ref(false)
 const currentGroup = ref<SystemUserGroup>()
 const loadingMembers = ref(false)
 const userGroupMembers = ref<SystemUserGroupMember[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
-const memberSearchFields: OptionItem<string>[] = [
+const memberSearchFields = computed<OptionItem<string>[]>(() => [
   { label: '姓名', value: 'nick_name' },
   { label: '用户名', value: 'username' },
-]
+  ...(auth.isEE || auth.isPE ? [{ label: '角色', value: 'role' }] : []),
+])
 
 /* 表头筛选 */
 const selectedMemberSource = ref<string | null>(null)
@@ -115,7 +118,7 @@ defineExpose({ open })
           {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
         </template>
       </el-table-column>
-      <el-table-column label="角色">
+      <el-table-column v-if="auth.isEE || auth.isPE" label="角色">
         <template #default="{ row }">
           <MkTagGroup v-if="row.roles?.length" :tags="row.roles" />
           <span v-else>-</span>
