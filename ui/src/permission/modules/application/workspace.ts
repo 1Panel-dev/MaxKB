@@ -135,6 +135,10 @@ const workspace = {
  * 工作空间「智能体」「概览」后端 API 访问权限
  */
   overviewBackendApiAccess: (id: string) => canRes(P.APPLICATION_OVERVIEW_BACKEND_API_ACCESS, id),
+/**
+ * 工作空间「智能体」「概览」公众访问链接权限
+ */
+  overviewPublic: (id: string) => canRes(P.APPLICATION_OVERVIEW_PUBLIC,id),
 
   // —— 访问 / 访客 / 对话日志 ——
 /**

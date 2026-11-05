@@ -110,6 +110,10 @@ const system = {
  * 系统「智能体」「概览」后端 API 访问权限
  */
   overviewBackendApiAccess: () => canSys(P.RESOURCE_APPLICATION_OVERVIEW_BACKEND_API_ACCESS),
+/**
+ * 系统「智能体」「概览」公众访问链接权限
+ */
+  overviewPublic: () => canSys(P.RESOURCE_APPLICATION_OVERVIEW_PUBLIC),
 
   // —— 访问 / 访客 / 对话日志 ——
 /**

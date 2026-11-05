@@ -32,6 +32,7 @@ type ApplicationOverviewPermissionMethod =
   | 'overviewDisplay'
   | 'overviewApiKey'
   | 'overviewBackendApiAccess'
+  | 'overviewPublic'
 function applicationOverviewPermission(method: ApplicationOverviewPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.application.system[method]())
   return Boolean(perm.application.workspace[method](applicationId.value))
@@ -142,7 +143,7 @@ onMounted(() => {
           <div class="flex-between">
             <h6>Web 访问</h6>
             <!-- Web 访问开关 -->
-            <el-switch :model-value="webAccessActive" size="small" :disabled="loading" :before-change="handleChangeWebAccess" />
+            <el-switch :model-value="webAccessActive" size="small" :disabled="loading || !applicationOverviewPermission('overviewPublic')" :before-change="handleChangeWebAccess" />
           </div>
           <div class="space-y-2">
             <div>链接</div>
