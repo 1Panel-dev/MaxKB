@@ -56,9 +56,7 @@ const inputFieldList = ref<any[]>([])
 const outputFieldConfig = ref({ title: t('aiChat.userOutput', '输出参数') })
 
 function openAddDialog(data?: any, index?: any) {
-  if (index !== undefined) {
-    currentIndex.value = index
-  }
+  currentIndex.value = index !== undefined ? index : null
   inputFieldFormDialogRef.value?.open(data)
 }
 

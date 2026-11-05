@@ -332,9 +332,7 @@ function openEditAvatar() {
 }
 
 function openAddInitDialog(data?: any, index?: any) {
-  if (typeof index !== 'undefined') {
-    currentIndex.value = index
-  }
+  currentIndex.value = typeof index !== 'undefined' ? index : null
 
   UserFieldFormDialogRef.value.open(data)
 }
