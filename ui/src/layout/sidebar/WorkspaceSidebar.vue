@@ -19,19 +19,20 @@ function navigateToWorkspaceMenu(workspaceMenuItem: LayoutMenuItem) {
 
 <template>
   <div class="space-y-1 p-1">
-    <div
-      v-for="workspaceMenuItem in workspaceMenuItems"
-      :key="workspaceMenuItem.name"
-      class="flex-col-center w-full cursor-pointer rounded-md py-2 text-xs font-semibold text-N600 hover:bg-N900/10"
-      :class="isWorkspaceMenuActive(workspaceMenuItem) && 'bg-white text-N900'"
-      @click="navigateToWorkspaceMenu(workspaceMenuItem)"
-    >
-      <MkIcon
-        v-if="workspaceMenuItem.icon"
-        :name="isWorkspaceMenuActive(workspaceMenuItem) ? (workspaceMenuItem.activeIcon ?? workspaceMenuItem.icon) : workspaceMenuItem.icon"
-        :gradient="isWorkspaceMenuActive(workspaceMenuItem)"
-      />
-      <span class="mt-[2px]">{{ workspaceMenuItem.label }}</span>
-    </div>
+    <template v-for="workspaceMenuItem in workspaceMenuItems" :key="workspaceMenuItem.name">
+      <div
+        v-if="workspaceMenuItem.permission ? workspaceMenuItem.permission(route) : true"
+        class="flex-col-center w-full cursor-pointer rounded-md py-2 text-xs font-semibold text-N600 hover:bg-N900/10"
+        :class="isWorkspaceMenuActive(workspaceMenuItem) && 'bg-white text-N900'"
+        @click="navigateToWorkspaceMenu(workspaceMenuItem)"
+      >
+        <MkIcon
+          v-if="workspaceMenuItem.icon"
+          :name="isWorkspaceMenuActive(workspaceMenuItem) ? (workspaceMenuItem.activeIcon ?? workspaceMenuItem.icon) : workspaceMenuItem.icon"
+          :gradient="isWorkspaceMenuActive(workspaceMenuItem)"
+        />
+        <span class="mt-[2px]">{{ workspaceMenuItem.label }}</span>
+      </div>
+    </template>
   </div>
 </template>

@@ -6,6 +6,10 @@ import { PermissionConstants as P } from '../../core'
 const workspace = {
   // —— 工作空间级（无资源 id）——
 /**
+ * 工作空间「智能体」只读权限
+ */
+  isShare: () => can(P.APPLICATION_READ),
+/**
  * 工作空间「智能体」创建权限
  */
   create: () => can(P.APPLICATION_CREATE),
