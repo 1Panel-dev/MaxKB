@@ -45,7 +45,7 @@ function open(paragraphIds: string[]) {
   knowledgeLoading.value = true
   const requestApi = isSystemResource() ? SystemKnowledgeApi : isSystemSharedResource() ? SystemSharedKnowledgeApi : KnowledgeApi
   return requestApi
-    .getAllKnowledge()
+    .getAllKnowledge({ knowledge_id: props.knowledgeId })
     .then((knowledge) => {
       knowledgeOptions.value = knowledge
     })

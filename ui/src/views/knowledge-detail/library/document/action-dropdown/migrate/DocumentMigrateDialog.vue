@@ -28,7 +28,7 @@ function open(documentIds: string[]) {
   visible.value = true
   optionLoading.value = true
   resourceApi.knowledge
-    .getAllKnowledge()
+    .getAllKnowledge({ knowledge_id: props.knowledgeId })
     .then((knowledge) => {
       knowledgeOptions.value = knowledge.filter(({ id }) => id !== props.knowledgeId)
     })
