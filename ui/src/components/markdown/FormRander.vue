@@ -21,6 +21,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
+import { safeChatFormFields } from '@/components/dynamics-form/safe-fields'
 const props = withDefaults(
   defineProps<{
     form_setting: string
@@ -47,7 +48,7 @@ const _submit = ref<boolean>(false)
  */
 const form_field_list = computed(() => {
   if (form_setting_data.value.form_field_list) {
-    return form_setting_data.value.form_field_list
+    return safeChatFormFields(form_setting_data.value.form_field_list)
   }
   return []
 })

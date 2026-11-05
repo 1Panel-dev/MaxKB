@@ -237,9 +237,9 @@ const damo_data: Array<FormField> = [
       active_msg: '当前选中',
       table_columns: [
         {
-          property: '`${row.key}${row.number}`',
+          property: 'key',
           label: '名称',
-          type: 'eval',
+          type: 'default',
         },
         {
           property: 'ProgressTableItem',
@@ -258,15 +258,14 @@ const damo_data: Array<FormField> = [
           props_info: {
             view_card: [
               {
-                type: 'eval',
+                type: 'default',
                 title: '测试',
-                value_field:
-                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`',
+                value_field: 'number',
               },
               {
-                type: 'eval',
+                type: 'default',
                 title: '名称',
-                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`',
+                value_field: 'key',
               },
             ],
           },
@@ -297,9 +296,9 @@ const damo_data: Array<FormField> = [
       active_msg: '当前选中',
       table_columns: [
         {
-          property: '`${row.key}${row.number}`',
+          property: 'key',
           label: '名称',
-          type: 'eval',
+          type: 'default',
         },
         {
           property: 'ProgressTableItem',
@@ -318,15 +317,14 @@ const damo_data: Array<FormField> = [
           props_info: {
             view_card: [
               {
-                type: 'eval',
+                type: 'default',
                 title: '测试',
-                value_field:
-                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`',
+                value_field: 'number',
               },
               {
-                type: 'eval',
+                type: 'default',
                 title: '名称',
-                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`',
+                value_field: 'key',
               },
             ],
           },

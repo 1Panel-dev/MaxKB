@@ -31,7 +31,11 @@
       </el-table-column>
       <el-table-column
         v-for="(column, index) in tableColumns"
-        v-bind="column"
+        :prop="column.property"
+        :width="column.width"
+        :min-width="column.minWidth"
+        :align="column.align"
+        :sortable="column.sortable === true"
         :label="column.label"
         :key="index"
       >
@@ -39,9 +43,6 @@
           <template v-if="column.type === 'component'">
             <TableColumn :column="column" :row="scope.row"></TableColumn>
           </template>
-          <template v-else-if="column.type === 'eval'">
-            <span v-html="evalF(column.property, scope.row)"></span
-          ></template>
           <template v-else>
             <span>{{ scope.row[column.property] }}</span></template
           >
@@ -75,11 +76,6 @@ const props = defineProps<{
   // 选中的值
   modelValue?: any
 }>()
-const rowTemp = ref<any>()
-const evalF = (text: string, row: any) => {
-  rowTemp.value = row
-  return eval(text)
-}
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const singleTableRef = ref<TableInstance>()
@@ -125,14 +121,8 @@ const tableData = computed(() => {
     if (filterText.value) {
       return option_list.value.filter((item: any) =>
         tableColumns.value.some((c: any) => {
-          let v = ''
-          if (c.type === 'eval') {
-            v = evalF(c.property, item)
-          } else if (c.type === 'component') {
-            return false
-          } else {
-            v = item[c.property]
-          }
+          if (c.type === 'component') return false
+          const v = item[c.property]
           return typeof v == 'string' ? v.indexOf(filterText.value) >= 0 : false
         })
       )
