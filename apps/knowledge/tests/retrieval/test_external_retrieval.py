@@ -89,8 +89,10 @@ class RetrievalSettingsTests(SimpleTestCase):
             self.assertTrue(settings["authentication"])
             self.assertIn("Authorization: Bearer <CHAT_USER_API_KEY>", settings["api_example"])
             settings = update(serializer, {"authentication": False})
-            self.assertNotIn("Authorization", settings["api_example"])
-            self.assertNotIn("headers", settings["mcp_config"][f"knowledge_{KID}"])
+            self.assertIn("Authorization: Bearer <CHAT_USER_API_KEY>", settings["api_example"])
+            self.assertEqual(
+                settings["mcp_config"][f"knowledge_{KID}"]["headers"]["Authorization"], "Bearer <CHAT_USER_API_KEY>"
+            )
         item.save.assert_called_with(update_fields=["external_service"])
 
     @patch("knowledge.serializers.external_retrieval.Knowledge.objects")
@@ -129,7 +131,10 @@ class RetrievalSettingsTests(SimpleTestCase):
         connection = settings["mcp_config"][f"knowledge_{KID}"]
         self.assertEqual(connection["transport"], "streamable_http")
         self.assertEqual(connection["headers"]["Authorization"], "Bearer <CHAT_USER_API_KEY>")
-        self.assertNotIn("headers", service_settings(knowledge())["mcp_config"][f"knowledge_{KID}"])
+        self.assertEqual(
+            service_settings(knowledge())["mcp_config"][f"knowledge_{KID}"]["headers"]["Authorization"],
+            "Bearer <CHAT_USER_API_KEY>",
+        )
 
     def test_api_example_is_a_complete_curl_request_for_both_authentication_modes(self):
         request = RequestFactory().get("/", HTTP_HOST="testserver", secure=True)
@@ -144,7 +149,11 @@ class RetrievalSettingsTests(SimpleTestCase):
                 self.assertEqual(settings["api_url"], f"https://testserver/custom/chat/api/v3/knowledge/{KID}/retrieve")
                 headers = [arguments[index + 1] for index, value in enumerate(arguments) if value == "-H"]
                 self.assertIn("Content-Type: application/json", headers)
-                self.assertEqual("Authorization: Bearer <CHAT_USER_API_KEY>" in headers, authentication)
+                self.assertIn("Authorization: Bearer <CHAT_USER_API_KEY>", headers)
+                self.assertEqual(
+                    settings["mcp_config"][f"knowledge_{KID}"]["headers"]["Authorization"],
+                    "Bearer <CHAT_USER_API_KEY>",
+                )
                 data = json.loads(arguments[arguments.index("-d") + 1])
                 self.assertTrue(RetrievalRequest(data=data).is_valid())
                 self.assertEqual(data["search_mode"], "embedding")
@@ -200,17 +209,30 @@ class RetrievalAccessTests(SimpleTestCase):
             queryset.return_value.filter.return_value.first.return_value = knowledge(
                 enabled=enabled, authentication=authentication
             )
-            for identity in (access.RetrievalIdentity(), access.RetrievalIdentity(UID, KEY)):
-                denied = not enabled or (authentication and not identity.user_id)
-                if denied:
-                    with self.assertRaises(access.RetrievalError) as error:
-                        access.authorize_external(KID, identity)
-                    self.assertEqual(error.exception.status, 404 if not enabled else 401)
-                else:
-                    self.assertEqual(access.authorize_external(KID, identity).id, KID)
+            for identity in (
+                access.RetrievalIdentity(),
+                access.RetrievalIdentity(UID),
+                access.RetrievalIdentity(api_key_id=KEY),
+                access.RetrievalIdentity(admin_user_id=UID),
+                access.RetrievalIdentity(UID, KEY),
+            ):
+                with self.subTest(enabled=enabled, authentication=authentication, identity=identity):
+                    authorized.reset_mock()
+                    denied = not enabled or not (identity.user_id and identity.api_key_id)
+                    if denied:
+                        with self.assertRaises(access.RetrievalError) as error:
+                            access.authorize_external(KID, identity)
+                        self.assertEqual(error.exception.status, 404 if not enabled else 401)
+                        authorized.assert_not_called()
+                    else:
+                        self.assertEqual(access.authorize_external(KID, identity).id, KID)
+                        if authentication:
+                            authorized.assert_called_once_with(UID, [KID])
+                        else:
+                            authorized.assert_not_called()
         authorized.return_value = set()
         with self.assertRaises(access.RetrievalError) as error:
-            access.authorize_external(KID, access.RetrievalIdentity(UID))
+            access.authorize_external(KID, access.RetrievalIdentity(UID, KEY))
         self.assertEqual(error.exception.status, 403)
 
     @patch.object(access, "QuerySet")
@@ -355,13 +377,114 @@ class RetrievalCoreTests(SimpleTestCase):
         self.stats.assert_not_called()
 
 
+class RetrievalAuthenticationTests(SimpleTestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.stack = ExitStack()
+        self.addCleanup(self.stack.close)
+        self.stack.enter_context(patch.object(access, "get_portal_setting", return_value=True))
+        queryset = self.stack.enter_context(patch.object(access, "QuerySet"))
+        self.item = knowledge(enabled=True)
+        queryset.return_value.filter.return_value.first.return_value = self.item
+        self.key_query = queryset.return_value.select_related.return_value.filter.return_value
+        self.key_query.first.return_value = SimpleNamespace(
+            id=KEY, user_id=UID, is_active=True, user=SimpleNamespace(is_active=True)
+        )
+        self.authorized = self.stack.enter_context(patch.object(access, "authorized_ids", return_value=set()))
+        output = {"knowledge_id": KID, "hits": []}
+        self.rest = self.stack.enter_context(patch.object(views, "retrieve", return_value=output))
+        self.mcp = self.stack.enter_context(patch.object(knowledge_mcp, "retrieve", return_value=output))
+
+    def responses(self, authorization=None):
+        headers = {"HTTP_AUTHORIZATION": authorization} if authorization is not None else {}
+        request = self.factory.post("/retrieve", {"query_text": "hello"}, content_type="application/json", **headers)
+        yield views.retrieve_view(request, KID)
+        for method, params in (
+            (
+                "initialize",
+                {"protocolVersion": "2025-03-26", "capabilities": {}, "clientInfo": {"name": "test", "version": "1"}},
+            ),
+            ("ping", {}),
+            ("tools/list", {}),
+            ("tools/call", {"name": f"knowledge_{KID}", "arguments": {"query_text": "hello"}}),
+        ):
+            request = self.factory.post(
+                "/mcp",
+                {"jsonrpc": "2.0", "id": 1, "method": method, "params": params},
+                content_type="application/json",
+                HTTP_ACCEPT="application/json, text/event-stream",
+                **headers,
+            )
+            yield views.knowledge_mcp_view(request, KID)
+
+    def test_missing_or_malformed_key_is_rejected_in_all_authorization_modes(self):
+        for settings in ({}, {"authentication": False}, {"authentication": True}):
+            self.item.external_service = {"enabled": True, **settings}
+            for header in (None, "", "Basic invalid", "Bearer short"):
+                with self.subTest(settings=settings, header=header):
+                    for response in self.responses(header):
+                        self.assertEqual(response.status_code, 401)
+                        self.assertEqual(response["WWW-Authenticate"], "Bearer")
+                        self.assertEqual(response["Cache-Control"], "no-store")
+                        expected = "authentication_required" if header is None else "invalid_api_key"
+                        self.assertEqual(json.loads(response.content)["error"]["code"], expected)
+        self.authorized.assert_not_called()
+        self.rest.assert_not_called()
+        self.mcp.assert_not_called()
+
+    def test_unknown_disabled_keys_and_disabled_users_are_always_rejected(self):
+        key = self.key_query.first.return_value
+        for authentication in (False, True):
+            self.item.external_service["authentication"] = authentication
+            for invalid_key in (
+                None,
+                SimpleNamespace(**{**vars(key), "is_active": False}),
+                SimpleNamespace(**{**vars(key), "user": SimpleNamespace(is_active=False)}),
+            ):
+                with self.subTest(authentication=authentication, key=invalid_key):
+                    self.key_query.first.return_value = invalid_key
+                    for response in self.responses("Bearer " + KEY):
+                        self.assertEqual(response.status_code, 401)
+                        self.assertEqual(json.loads(response.content)["error"]["code"], "invalid_api_key")
+        self.authorized.assert_not_called()
+        self.rest.assert_not_called()
+        self.mcp.assert_not_called()
+
+    def test_valid_key_requires_knowledge_permission_only_when_authorization_is_enabled(self):
+        for settings in ({}, {"authentication": False}, {"authentication": True}):
+            self.item.external_service = {"enabled": True, **settings}
+            for granted in (False, True):
+                with self.subTest(settings=settings, granted=granted):
+                    self.authorized.return_value = {KID} if granted else set()
+                    self.authorized.reset_mock()
+                    self.rest.reset_mock()
+                    self.mcp.reset_mock()
+                    denied = settings.get("authentication", False) and not granted
+                    for response in self.responses("Bearer " + KEY):
+                        self.assertEqual(response.status_code, 403 if denied else 200)
+                        if denied:
+                            self.assertEqual(json.loads(response.content)["error"]["code"], "access_denied")
+                    if denied:
+                        self.rest.assert_not_called()
+                        self.mcp.assert_not_called()
+                    else:
+                        self.rest.assert_called_once_with(
+                            KID, access.RetrievalIdentity(UID, KEY), {"query_text": "hello"}
+                        )
+                        self.mcp.assert_called_once_with(
+                            KID, access.RetrievalIdentity(UID, KEY), {"query_text": "hello"}
+                        )
+                    if not settings.get("authentication", False):
+                        self.authorized.assert_not_called()
+
+
 class RetrievalTransportTests(SimpleTestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.stack = ExitStack()
         self.addCleanup(self.stack.close)
         self.auth = self.stack.enter_context(
-            patch.object(views, "authenticate_key", return_value=access.RetrievalIdentity())
+            patch.object(views, "authenticate_key", return_value=access.RetrievalIdentity(UID, KEY))
         )
         self.authorize = self.stack.enter_context(
             patch.object(views, "authorize_external", return_value=knowledge(enabled=True))

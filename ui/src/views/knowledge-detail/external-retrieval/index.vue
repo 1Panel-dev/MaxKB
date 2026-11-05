@@ -107,18 +107,6 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
         />
       </section>
       <section>
-        <div class="mb-2">API 服务地址</div>
-        <el-input :model-value="setting?.api_url ?? ''" readonly>
-          <template #suffix>
-            <!-- 复制 API 服务地址 -->
-            <el-button text class="-mr-1" :disabled="!setting?.api_url" @click="copyText(setting?.api_url)">
-              <MkIcon name="icon_copy_outlined" />
-            </el-button>
-          </template>
-        </el-input>
-      </section>
-
-      <section>
         <div class="mb-2">API 调用示例</div>
         <div class="group relative">
           <el-input :model-value="setting?.api_example ?? ''" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />

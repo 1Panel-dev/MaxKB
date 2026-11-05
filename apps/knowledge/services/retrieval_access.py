@@ -62,9 +62,9 @@ def authorize_external(knowledge_id, identity):
     knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
     if knowledge is None or knowledge.external_service.get("enabled") is not True:
         raise RetrievalError("service_unavailable", "Retrieval service is unavailable.", 404)
+    if not identity.user_id or not identity.api_key_id:
+        raise RetrievalError("authentication_required", "A chat user API key is required.", 401)
     if knowledge.external_service.get("authentication", False):
-        if not identity.user_id:
-            raise RetrievalError("authentication_required", "A chat user API key is required.", 401)
         if str(knowledge.id) not in authorized_ids(identity.user_id, [str(knowledge.id)]):
             raise RetrievalError("access_denied", "Knowledge access denied.", 403)
     return knowledge
