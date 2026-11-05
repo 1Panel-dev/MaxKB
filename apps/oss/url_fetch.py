@@ -83,3 +83,19 @@ def fetch_url(url, file_limit, binary=False):
     finally:
         socket.getaddrinfo = resolve
 '''
+
+
+def fetch_public_bytes(url, file_limit=50 * 1024 * 1024):
+    """Download provider media using the isolated, bounded public-address fetcher."""
+    import base64
+
+    from common.utils.tool_code import ToolExecutor
+
+    response = ToolExecutor().exec_code(
+        FETCH_URL_CODE,
+        {"url": url, "file_limit": file_limit, "binary": True},
+        function_name="fetch_url",
+    )
+    if not 200 <= response["status_code"] < 300:
+        raise ValueError(f"Failed to download media: HTTP {response['status_code']}")
+    return base64.b64decode(response["content"], validate=True)

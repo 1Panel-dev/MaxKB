@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 from common.utils.common import _remove_empty_lines
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tts import BaseTextToSpeech
+from oss.url_fetch import fetch_public_bytes
 
 
 class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
@@ -52,7 +53,6 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             from dashscope.audio.tts import SpeechSynthesizer
             audio = SpeechSynthesizer.call(model=self.model, text=text, **self.params).get_audio_data()
         elif 'qwen' in self.model:
-            import requests
             response = dashscope.MultiModalConversation.call(
                 # 如需使用指令控制功能，请将model替换为qwen3-tts-instruct-flash
                 model=self.model,
@@ -62,8 +62,7 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             )
             # 这个的接口返回格式和上面两个不太一样，直接返回了一个url地址，下载后就是音频文件
             audio_url = response.output.audio.url
-            res = requests.get(audio_url)
-            audio = res.content
+            audio = fetch_public_bytes(audio_url)
         elif 'MiniMax' in self.model:
             import requests
 

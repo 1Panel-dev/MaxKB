@@ -2,7 +2,6 @@
 from functools import reduce
 from typing import List
 
-import requests
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from django.utils.translation import gettext_lazy as _
 from application.flow.common import WorkflowMode
@@ -12,6 +11,7 @@ from common.utils.common import bytes_to_uploaded_file
 from knowledge.models import FileSourceType
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from oss.serializers.file import FileSerializer
+from oss.url_fetch import fetch_public_bytes
 
 
 class BaseImageGenerateNode(IImageGenerateNode):
@@ -63,7 +63,7 @@ class BaseImageGenerateNode(IImageGenerateNode):
             if isinstance(image_url, str):
                 if image_url.startswith('http'):
                     # HTTP URL 情况
-                    image_url = requests.get(image_url).content
+                    image_url = fetch_public_bytes(image_url)
                 elif image_url.startswith('data:image'):
                     # Data URL 格式 (data:image/png;base64,...)
                     import base64
