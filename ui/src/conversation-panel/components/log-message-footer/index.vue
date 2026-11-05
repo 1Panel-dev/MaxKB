@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
+import ButtonImprove from './improve/ButtonImprove.vue'
 import { computed } from 'vue'
 import type { ChatContent } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
@@ -6,7 +8,12 @@ import { datetimeFormat } from '@/utils/time'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
 import { useExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 
-const props = defineProps<{ message: ChatMessage }>()
+const props = defineProps<{
+  api: Pick<typeof ChatLogApi, 'putChatRecordLog' | 'getMarkChatRecord' | 'deleteMarkChatRecord'>
+  applicationId: string
+  chatId: string
+  message: ChatMessage
+}>()
 
 const detail = useExecutionDetailStore()
 
@@ -67,7 +74,19 @@ const openExecutionDetail = () => {
           <MkIcon name="icon_copy_outlined" />
         </el-button>
       </MkTooltip>
-      <span v-if="meta.createTime" class="text-N600">{{ datetimeFormat(meta.createTime) }}</span>
+      <!-- 修正当前回答并保存到知识库 -->
+      <span>
+        <ButtonImprove
+          v-if="message.recordId"
+          :api="api"
+          :application-id="applicationId"
+          :chat-id="chatId"
+          :record-id="message.recordId"
+          :answer="answerText"
+        />
+      </span>
+      <!-- 时间 -->
+      <span v-if="meta.createTime" class="text-N600 ml-1">{{ datetimeFormat(meta.createTime) }}</span>
     </div>
     <div></div>
   </div>

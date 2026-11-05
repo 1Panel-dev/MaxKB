@@ -13,7 +13,7 @@ import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
 defineOptions({ name: 'LogConversation' })
 
 /** 对话日志分页接口入参，与各资源范围 chat-log API 的 getChatRecordLog 保持结构一致。 */
-type ChatRecordApi = {
+type ChatRecordApi = Pick<typeof ChatLogApi, 'putChatRecordLog' | 'getMarkChatRecord' | 'deleteMarkChatRecord'> & {
   getChatRecordLog: (
     applicationId: string,
     chatId: string,
@@ -49,7 +49,7 @@ const detail = createExecutionDetailStore()
 
 provide(LOG_MESSAGE_LIST_KEY, msgs)
 provide(EXECUTION_DETAIL_KEY, detail)
-provide(VIEW_KEY,VIEW_TYPE.LOG)
+provide(VIEW_KEY, VIEW_TYPE.LOG)
 // 日志无左栏，按 PC 端渲染
 provide(DEVICE_KEY, createDeviceType('push'))
 // 切换日志(抽屉内上一个/下一个)时收起执行详情并重新加载
@@ -73,7 +73,7 @@ watch(
   >
     <template #main>
       <main class="mk-conversation-main">
-        <LogMessageList :key="props.chatId" />
+        <LogMessageList :key="props.chatId" :api="props.chatLogApi" :application-id="props.applicationId || ''" :chat-id="props.chatId" />
       </main>
     </template>
     <template #right><ExecutionDetail /></template>

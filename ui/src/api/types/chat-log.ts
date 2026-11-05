@@ -55,6 +55,7 @@ export interface ChatLogRecord extends Partial<ChatFeedback> {
   message_tokens?: number
   answer_tokens?: number
   run_time?: number
+  improve_paragraph_id_list?: string[]
   paragraph_list?: Dict<unknown>[]
   execution_details?: Dict<unknown>[]
 }

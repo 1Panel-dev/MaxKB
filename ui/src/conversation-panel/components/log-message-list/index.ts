@@ -25,6 +25,8 @@ export function createLogMessageListStore(deps: LogMessageListDeps) {
   const { pageRecords, getChatId, appInfo } = deps
 
   const messages = ref<ChatMessage[]>([])
+  // 保留原始记录，供日志修正功能按 ID 读取问题与标注状态。
+  const recordsById = ref<Record<string, ChatLogRecord>>({})
   const loading = ref(false)
 
   const pageSize = 30
@@ -37,6 +39,7 @@ export function createLogMessageListStore(deps: LogMessageListDeps) {
     try {
       const res = await pageRecords(cid, page, pageSize)
       const records = [...(res?.records || [])].reverse()
+      for (const record of records) recordsById.value[record.id] = record
       const result = records.flatMap((record): ChatMessage[] => [
         { role: 'USER', content: [record.question], id: record.id + '_USER' },
         {
@@ -63,6 +66,7 @@ export function createLogMessageListStore(deps: LogMessageListDeps) {
   const load = async () => {
     const cid = getChatId()
     messages.value = []
+    recordsById.value = {}
     currentPage.value = 1
     hasMore.value = false
     if (!cid) return
@@ -75,7 +79,7 @@ export function createLogMessageListStore(deps: LogMessageListDeps) {
     return loadMessages(cid, currentPage.value + 1)
   }
 
-  return { appInfo, messages, loading, hasMore, load, loadMore }
+  return { appInfo, messages, recordsById, loading, hasMore, load, loadMore }
 }
 
 export type LogMessageListStore = ReturnType<typeof createLogMessageListStore>
