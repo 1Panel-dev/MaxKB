@@ -18,6 +18,7 @@ FROM
 	FROM
 		vector_top vc
 	JOIN embedding e ON e.id = vc.id
+	WHERE (SELECT count(*) FROM json_array_elements_text(%s::json) AS t(w) WHERE t.w = ANY(tsvector_to_array(e.search_vector))) >= %s
 	ORDER BY
 		vc.paragraph_id,
 		comprehensive_score DESC
