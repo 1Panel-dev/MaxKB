@@ -15486,3 +15486,18 @@ msgstr "查看外观设置"
 #: apps/xpack/views/system_params.py:39
 msgid "Update appearance settings"
 msgstr "更新外观设置"
+
+msgid "Move"
+msgstr "移动"
+
+msgid "Move tool"
+msgstr "移动工具"
+
+msgid "Move knowledge"
+msgstr "移动知识库"
+
+msgid "Folder does not exist in this workspace"
+msgstr "文件夹不在当前工作空间或不存在"
+
+msgid "Use the move API to change the folder"
+msgstr "请使用移动接口修改文件夹"

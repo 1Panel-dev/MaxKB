@@ -27,7 +27,7 @@ function handleMoveTool(targetFolderId: string) {
   if (loading.value) return
   loading.value = true
   return props.api
-    .putTool(props.tool.id, { folder_id: targetFolderId })
+    .putMoveTool(props.tool.id, targetFolderId)
     .finally(() => {
       loading.value = false
     })

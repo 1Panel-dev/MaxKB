@@ -271,3 +271,13 @@ class PlayDemoTextAPI(APIMixin):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
+
+
+class ApplicationMoveAPI(ApplicationOperateAPI):
+    @staticmethod
+    def get_parameters():
+        return ApplicationOperateAPI.get_parameters() + [
+            OpenApiParameter(
+                name="folder_id", description="目标文件夹id", type=OpenApiTypes.STR, location="path", required=True
+            )
+        ]

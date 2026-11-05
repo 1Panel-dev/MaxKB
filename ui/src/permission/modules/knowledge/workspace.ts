@@ -43,6 +43,8 @@ const workspace = {
  * 工作空间「知识库」编辑权限
  */
   edit: (id: string) => canWorkspaceKnowledge(P.KNOWLEDGE_EDIT, id),
+  /** 工作空间「知识库」移动权限。 */
+  move: (id: string) => canRes(P.KNOWLEDGE_MOVE, id),
 /**
  * 工作空间「知识库」删除权限
  */

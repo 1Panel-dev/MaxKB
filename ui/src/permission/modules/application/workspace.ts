@@ -27,6 +27,8 @@ const workspace = {
  * 工作空间「智能体」编辑权限
  */
   edit: (id: string) => canRes(P.APPLICATION_EDIT, id),
+  /** 工作空间「智能体」移动权限。 */
+  move: (id: string) => canRes(P.APPLICATION_MOVE, id),
 /**
  * 工作空间「智能体」删除权限
  */

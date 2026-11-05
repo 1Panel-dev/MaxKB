@@ -302,6 +302,7 @@ function handleBatchDelete() {
                   <RelatedResourcesKnowledgeAction v-if="perm.knowledge.workspace.relateMap(knowledge.id)" label="查看关联资源" :api="RelatedResourcesApi" :knowledge="knowledge" />
                   <!-- 移动到 -->
                   <MoveKnowledgeAction
+                    v-if="perm.knowledge.workspace.move(knowledge.id)"
                     v-model:loading="knowledgeOperationLoading"
                     label="移动到"
                     :api="KnowledgeApi"

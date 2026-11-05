@@ -16,6 +16,7 @@ from typing import Dict
 import requests
 import uuid_utils.compat as uuid
 from application.models import Application
+from folders.serializers.resource_move import validate_edit_folder, validate_move_folder
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_page_search, native_search, page_search
@@ -663,6 +664,13 @@ class ToolSerializer(serializers.Serializer):
             if not query_set.exists():
                 raise AppApiException(500, _("Tool id does not exist"))
 
+        def move(self, folder_id: str):
+            self.is_valid(raise_exception=True)
+            workspace_id = self.data.get("workspace_id")
+            folder_id = validate_move_folder(ToolFolder, workspace_id, folder_id)
+            QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=workspace_id).update(folder_id=folder_id)
+            return True
+
         @transaction.atomic
         def edit(self, instance, with_valid=True):
             if with_valid:
@@ -675,6 +683,9 @@ class ToolSerializer(serializers.Serializer):
             if not QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).exists():
                 raise serializers.ValidationError(_("Tool not found"))
 
+            tool = QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).first()
+            validate_edit_folder(instance, tool)
+
             edit_field_list = [
                 "name",
                 "desc",
@@ -684,7 +695,6 @@ class ToolSerializer(serializers.Serializer):
                 "init_field_list",
                 "init_params",
                 "is_active",
-                "folder_id",
             ]
             edit_dict = {
                 field: instance.get(field)
@@ -692,7 +702,6 @@ class ToolSerializer(serializers.Serializer):
                 if (field in instance and instance.get(field) is not None)
             }
 
-            tool = QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).first()
             if "init_params" in edit_dict:
                 if edit_dict.get("init_field_list") is not None:
                     rm_key = []
@@ -1727,6 +1736,7 @@ class ToolBatchOperateSerializer(serializers.Serializer):
         id_list = instance.get("id_list")
         folder_id = instance.get("folder_id")
         workspace_id = self.data.get("workspace_id")
+        folder_id = validate_move_folder(ToolFolder, workspace_id, folder_id)
 
         QuerySet(Tool).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
         return True

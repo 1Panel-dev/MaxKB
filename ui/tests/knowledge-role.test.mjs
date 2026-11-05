@@ -17,8 +17,8 @@ function loadModule(path, dependencies = {}) {
   return exports
 }
 
-// 使用实际权限引擎和知识库策略，只替换浏览器 Store 与当前路由上下文。
-function createPermissionContext(roles, permissions = {}) {
+// 使用实际权限引擎和资源策略，只替换浏览器 Store 与当前路由上下文。
+function createPermissionContext(roles, permissions = {}, domain = 'knowledge') {
   const user = { roleSet: new Set(roles), permissionMap: new Map(Object.entries(permissions)) }
   const common = loadModule('core/common')
   const data = loadModule('core/data', { './common': common })
@@ -30,13 +30,13 @@ function createPermissionContext(roles, permissions = {}) {
     '@/utils/resource-context': resourceContext,
   })
   const policy = loadModule('policy', { './core': core, '@/utils/resource-context': resourceContext })
-  const knowledge = loadModule('modules/knowledge/workspace', {
+  const resourcePolicy = loadModule(`modules/${domain}/workspace`, {
     '../../policy': policy,
     '../../core': core,
     '../../core/common': common,
     '@/utils/resource-context': resourceContext,
   })
-  return { ...common, ...data, ...knowledge }
+  return { ...common, ...data, ...resourcePolicy }
 }
 
 test('工作空间角色序列化与后端角色键一致，系统角色保持全局键', () => {
@@ -85,3 +85,24 @@ test('显式授予文档查看权限不会放开图片及其他空间', () => {
   assert.equal(canWorkspaceKnowledge(P.KNOWLEDGE_IMAGE_READ, 'knowledge-a', 'default'), false)
   assert.equal(canWorkspaceKnowledge(P.KNOWLEDGE_DOCUMENT_READ, 'knowledge-a', 'other'), false)
 })
+
+for (const domain of ['application', 'knowledge', 'tool']) {
+  test(`${domain} 的移动权限与编辑权限独立，且限制到授权资源`, () => {
+    const { PermissionConstants: P } = createPermissionContext([], {}, domain)
+    const key = `${domain.toUpperCase()}:w:default:r:resource-a`
+    const move = P[`${domain.toUpperCase()}_MOVE`]
+    const edit = P[`${domain.toUpperCase()}_EDIT`]
+    const moveOnly = createPermissionContext([], { [key]: move.bit() }, domain).default
+    assert.equal(moveOnly.move('resource-a'), true)
+    assert.equal(moveOnly.move('resource-b'), false)
+    assert.equal(moveOnly.edit('resource-a'), false)
+    const editOnly = createPermissionContext([], { [key]: edit.bit() }, domain).default
+    assert.equal(editOnly.edit('resource-a'), true)
+    assert.equal(editOnly.move('resource-a'), false)
+    assert.equal(createPermissionContext([], {}, domain).default.move('resource-a'), false)
+    for (const permission of [P[`${domain.toUpperCase()}_READ`], edit]) {
+      const user = createPermissionContext(['USER:w:default'], { [key]: permission.bit() }, domain).default
+      assert.equal(user.move('resource-a'), false)
+    }
+  })
+}

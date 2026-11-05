@@ -349,6 +349,7 @@ onMounted(() => {
                   />
                   <!-- 移动到 -->
                   <MoveToolAction
+                    v-if="perm.tool.workspace.move(tool.id)"
                     v-model:loading="toolOperationLoading"
                     label="移动到"
                     :api="ToolApi"

@@ -25,6 +25,7 @@ from knowledge.api.knowledge import (
     KnowledgeTreeReadAPI,
     KnowledgeEditAPI,
     KnowledgeReadAPI,
+    KnowledgeMoveAPI,
     KnowledgePageAPI,
     SyncWebAPI,
     KnowledgeSyncLogAPI,
@@ -234,6 +235,40 @@ class KnowledgeView(APIView):
 
             return result.success(inner(self, request, workspace_id=workspace_id))
 
+    class Move(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["PUT"],
+            description=_("Move knowledge"),
+            summary=_("Move knowledge"),
+            operation_id=_("Move knowledge"),  # type: ignore
+            parameters=KnowledgeMoveAPI.get_parameters(),
+            request=None,
+            responses=result.DefaultResultSerializer,
+            tags=[_("Knowledge Base")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_MOVE.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_MOVE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        @log(
+            menu="Knowledge Base",
+            operate="Move knowledge",
+            get_operation_object=lambda r, k: get_knowledge_operation_object(k.get("knowledge_id")),
+        )
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, folder_id: str):
+            return result.success(
+                KnowledgeSerializer.Operate(
+                    data={
+                        "knowledge_id": knowledge_id,
+                        "user_id": request.user.id,
+                        "workspace_id": workspace_id,
+                    }
+                ).move(folder_id)
+            )
+
     class BatchMove(APIView):
         authentication_classes = [TokenAuth]
 
@@ -259,13 +294,8 @@ class KnowledgeView(APIView):
                 id_list,
                 "knowledge_id",
                 (
-                    PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission(),
-                    PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission_workspace_manage_role(),
-                    ViewPermission(
-                        [RoleConstants.USER.get_workspace_role()],
-                        [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                        CompareConstants.AND,
-                    ),
+                    PermissionConstants.KNOWLEDGE_MOVE.get_workspace_knowledge_permission(),
+                    PermissionConstants.KNOWLEDGE_MOVE.get_workspace_permission_workspace_manage_role(),
                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
                 ),
                 workspace_id=workspace_id,

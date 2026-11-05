@@ -26,6 +26,7 @@ from tools.api.tool import (
     ToolImportAPI,
     ToolPageAPI,
     ToolReadAPI,
+    ToolMoveAPI,
     ToolTreeReadAPI,
 )
 from tools.models import Tool, ToolScope
@@ -269,6 +270,39 @@ class ToolView(APIView):
 
             return result.success(inner(self, request, workspace_id=workspace_id))
 
+    class Move(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["PUT"],
+            description=_("Move tool"),
+            summary=_("Move tool"),
+            operation_id=_("Move tool"),  # type: ignore
+            parameters=ToolMoveAPI.get_parameters(),
+            request=None,
+            responses=result.DefaultResultSerializer,
+            tags=[_("Tool")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.TOOL_MOVE.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_MOVE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        @log(
+            menu="Tool",
+            operate="Move tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get("tool_id")),
+        )
+        def put(self, request: Request, workspace_id: str, tool_id: str, folder_id: str):
+            return result.success(
+                ToolSerializer.Operate(
+                    data={
+                        "id": tool_id,
+                        "workspace_id": workspace_id,
+                    }
+                ).move(folder_id)
+            )
+
     class BatchMove(APIView):
         authentication_classes = [TokenAuth]
 
@@ -294,13 +328,8 @@ class ToolView(APIView):
                 id_list,
                 "tool_id",
                 (
-                    PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
-                    PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
-                    ViewPermission(
-                        [RoleConstants.USER.get_workspace_role()],
-                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                        compare=CompareConstants.AND,
-                    ),
+                    PermissionConstants.TOOL_MOVE.get_workspace_tool_permission(),
+                    PermissionConstants.TOOL_MOVE.get_workspace_permission_workspace_manage_role(),
                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
                 ),
                 workspace_id=workspace_id,

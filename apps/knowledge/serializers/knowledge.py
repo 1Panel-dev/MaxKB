@@ -16,6 +16,7 @@ import requests
 import uuid_utils.compat as uuid
 import openpyxl
 from celery_once import AlreadyQueued
+from folders.serializers.resource_move import validate_edit_folder, validate_move_folder
 from common.chunk import text_to_chunk
 from common.config.embedding_config import VectorStore
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -400,6 +401,15 @@ class KnowledgeSerializer(serializers.Serializer):
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
 
+        def move(self, folder_id: str):
+            self.is_valid(raise_exception=True)
+            workspace_id = self.data.get("workspace_id")
+            folder_id = validate_move_folder(KnowledgeFolder, workspace_id, folder_id)
+            QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"), workspace_id=workspace_id).update(
+                folder_id=folder_id
+            )
+            return True
+
         @transaction.atomic
         def embedding(self, with_valid=True):
             if with_valid:
@@ -564,6 +574,7 @@ class KnowledgeSerializer(serializers.Serializer):
         def edit(self, instance: Dict, select_one=True):
             self.is_valid()
             knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
+            validate_edit_folder(instance, knowledge)
             request_serializer = KnowledgeEditRequest(data=instance)
             request_serializer.is_valid(knowledge=knowledge)
             validated_data = request_serializer.validated_data
@@ -581,8 +592,6 @@ class KnowledgeSerializer(serializers.Serializer):
                     **(knowledge.meta or {}),
                     "doc_strategy": normalize_document_strategy(validated_data.get("doc_strategy")),
                 }
-            if "folder_id" in instance:
-                knowledge.folder_id = instance.get("folder_id")
             if "file_size_limit" in instance:
                 knowledge.file_size_limit = instance.get("file_size_limit")
             if "file_count_limit" in instance:
@@ -1673,6 +1682,7 @@ class KnowledgeBatchOperateSerializer(serializers.Serializer):
         id_list = instance.get("id_list")
         folder_id = instance.get("folder_id")
         workspace_id = self.data.get("workspace_id")
+        folder_id = validate_move_folder(KnowledgeFolder, workspace_id, folder_id)
 
         QuerySet(Knowledge).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
         return True

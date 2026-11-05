@@ -283,6 +283,7 @@ function handleBatchDelete() {
                   />
                   <!-- 移动到 -->
                   <MoveApplicationAction
+                    v-if="perm.application.workspace.move(application.id)"
                     v-model:loading="applicationOperationLoading"
                     label="移动到"
                     :api="ApplicationApi"

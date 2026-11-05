@@ -102,7 +102,13 @@ const putBatchMoveTools = (toolIds: string[], folderId: string) => {
   return put<{ folder_id: string; id_list: string[] }, boolean>(`${getPrefix()}/batch_move`, { folder_id: folderId, id_list: toolIds })
 }
 
+/** 移动工作空间工具。 */
+const putMoveTool = (toolId: string, folderId: string) => {
+  return put<Record<string, never>, boolean>(`${getPrefix()}/${toolId}/move/${folderId}`, {})
+}
+
 export default {
+  putMoveTool,
   getToolPage,
   exportTool,
   deleteTool,

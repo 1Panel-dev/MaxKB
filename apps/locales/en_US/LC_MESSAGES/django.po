@@ -15714,3 +15714,18 @@ msgstr "View appearance settings"
 #: apps/xpack/views/system_params.py:39
 msgid "Update appearance settings"
 msgstr "Update appearance settings"
+
+msgid "Move"
+msgstr "Move"
+
+msgid "Move tool"
+msgstr "Move tool"
+
+msgid "Move knowledge"
+msgstr "Move knowledge"
+
+msgid "Folder does not exist in this workspace"
+msgstr "Folder does not exist in this workspace"
+
+msgid "Use the move API to change the folder"
+msgstr "Use the move API to change the folder"

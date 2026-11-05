@@ -135,7 +135,13 @@ const postTransformWorkflow = (knowledgeId: string, payload: { work_flow: LogicF
 const postKnowledgeHitTest = (knowledgeId: string, payload: KnowledgeHitTestPayload) =>
   post<KnowledgeHitTestPayload, KnowledgeHitTestResult[]>(`${getPrefix()}/${knowledgeId}/hit_test`, payload)
 
+/** 移动工作空间知识库。 */
+const putMoveKnowledge = (knowledgeId: string, folderId: string) => {
+  return put<Record<string, never>, boolean>(`${getPrefix()}/${knowledgeId}/move/${folderId}`, {})
+}
+
 export default {
+  putMoveKnowledge,
   postKnowledgeHitTest,
   getKnowledgeMcpConfig,
   putKnowledgeKeywordIndex,

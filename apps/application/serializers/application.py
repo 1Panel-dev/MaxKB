@@ -27,6 +27,7 @@ from application.models.application import Application, ApplicationFolder, Appli
 from application.models.application_access_token import ApplicationAccessToken
 from application.serializers.common import update_resource_mapping_by_application
 from common import result
+from folders.serializers.resource_move import validate_edit_folder, validate_move_folder
 from common.cache_data.application_access_token_cache import del_application_access_token
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_page_search, native_search
@@ -1457,10 +1458,11 @@ class ApplicationOperateSerializer(serializers.Serializer):
 
     def move(self, folder_id: str):
         self.is_valid(raise_exception=True)
-        application_id = self.data.get("application_id")
-        application = QuerySet(Application).get(id=application_id)
-        application.folder_id = folder_id
-        application.save()
+        workspace_id = self.data.get("workspace_id")
+        folder_id = validate_move_folder(ApplicationFolder, workspace_id, folder_id)
+        QuerySet(Application).filter(id=self.data.get("application_id"), workspace_id=workspace_id).update(
+            folder_id=folder_id
+        )
         return True
 
     @transaction.atomic
@@ -1471,6 +1473,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         application_id = self.data.get("application_id")
 
         application = QuerySet(Application).get(id=application_id)
+        validate_edit_folder(instance, application)
         #  处理工作流模板逻辑
         if "work_flow_template" in instance:
             return self.update_template_workflow(instance, application)
@@ -1550,7 +1553,6 @@ class ApplicationOperateSerializer(serializers.Serializer):
             "problem_optimization_prompt",
             "clean_time",
             "file_clean_time",
-            "folder_id",
             "default_model_setting",
         ]
         for update_key in update_keys:
@@ -1923,6 +1925,7 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
         id_list = instance.get("id_list")
         folder_id = instance.get("folder_id")
         workspace_id = self.data.get("workspace_id")
+        folder_id = validate_move_folder(ApplicationFolder, workspace_id, folder_id)
 
         QuerySet(Application).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
         return True

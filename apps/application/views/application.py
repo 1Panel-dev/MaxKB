@@ -22,6 +22,7 @@ from application.api.application_api import (
     ApplicationExportAPI,
     ApplicationExportSkillsAPI,
     ApplicationOperateAPI,
+    ApplicationMoveAPI,
     ApplicationEditAPI,
     TextToSpeechAPI,
     SpeechToTextAPI,
@@ -352,19 +353,14 @@ class ApplicationAPI(APIView):
             description=_("Move an application"),
             summary=_("Move an application"),
             operation_id=_("Move an application"),  # type: ignore
-            parameters=ApplicationOperateAPI.get_parameters(),
+            parameters=ApplicationMoveAPI.get_parameters(),
             request=None,
             responses=result.DefaultResultSerializer,
             tags=[_("Application")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
-            PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
+            PermissionConstants.APPLICATION_MOVE.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_MOVE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -595,13 +591,8 @@ class ApplicationAPI(APIView):
                 id_list,
                 "application_id",
                 (
-                    PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
-                    PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-                    ViewPermission(
-                        [RoleConstants.USER.get_workspace_role()],
-                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                        compare=CompareConstants.AND,
-                    ),
+                    PermissionConstants.APPLICATION_MOVE.get_workspace_application_permission(),
+                    PermissionConstants.APPLICATION_MOVE.get_workspace_permission_workspace_manage_role(),
                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
                 ),
                 workspace_id=workspace_id,

@@ -65,6 +65,7 @@ class Operate(Enum):
     TRIGGER_CREATE = ("READ+TRIGGER_CREATE", _("Create Trigger"))
     TRIGGER_DELETE = ("READ+TRIGGER_DELETE", _("Delete Trigger"))
     BATCH_DELETE = ("READ+BATCH_DELETE", _("Batch delete"))
+    MOVE = ("READ+MOVE", _("Move"))
     BATCH_MOVE = ("READ+BATCH_MOVE", _("Batch move"))
     TOKEN = ("READ+TOKEN", _("Token Index"))
     TO_WORKSPACE = ("READ+TO_WORKSPACE", _("Authorize to Workspace"))

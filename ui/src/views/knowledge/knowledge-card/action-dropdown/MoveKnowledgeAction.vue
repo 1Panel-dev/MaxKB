@@ -5,7 +5,6 @@ import type { KnowledgeItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRY_ID } from '@/constants'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
-import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'MoveKnowledgeAction' })
@@ -27,8 +26,7 @@ function handleOpenMoveKnowledge() {
 function handleMoveKnowledge(targetFolderId: string) {
   if (loading.value) return
   loading.value = true
-  const updateKnowledge = KNOWLEDGE_TYPE_MAP[props.knowledge.type] === KNOWLEDGE_TYPE_KEY.LARK ? props.api.putLarkKnowledge : props.api.putKnowledge
-  return updateKnowledge(props.knowledge.id, { folder_id: targetFolderId })
+  return props.api.putMoveKnowledge(props.knowledge.id, targetFolderId)
     .finally(() => {
       // 转出当前文件夹会卸载卡片，先释放页面操作状态。
       loading.value = false
@@ -47,6 +45,7 @@ function handleDialogClosed() {
 </script>
 
 <template>
+  <!-- 移动知识库 -->
   <MkDropdownItem @click="handleOpenMoveKnowledge">
     <template #icon><MkIcon name="icon_move2_outlined" /></template>
     <span>{{ label }}</span>

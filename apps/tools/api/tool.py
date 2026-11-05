@@ -5,8 +5,14 @@ from drf_spectacular.utils import OpenApiParameter
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
 from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
-from tools.serializers.tool import ToolModelSerializer, ToolCreateRequest, ToolDebugRequest, ToolEditRequest, \
-    PylintInstance, AddInternalToolRequest
+from tools.serializers.tool import (
+    ToolModelSerializer,
+    ToolCreateRequest,
+    ToolDebugRequest,
+    ToolEditRequest,
+    PylintInstance,
+    AddInternalToolRequest,
+)
 
 
 class ToolCreateResponse(ResultSerializer):
@@ -22,7 +28,7 @@ class ToolCreateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             )
         ]
@@ -44,16 +50,16 @@ class ToolReadAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="tool_id",
                 description="工具id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
-            )
+            ),
         ]
 
     @staticmethod
@@ -62,7 +68,6 @@ class ToolReadAPI(APIMixin):
 
 
 class ToolEditAPI(ToolReadAPI):
-
     @staticmethod
     def get_request():
         return ToolEditRequest
@@ -82,16 +87,16 @@ class ToolTreeReadAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="folder_id",
                 description="文件夹id",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
-            )
+            ),
         ]
 
 
@@ -113,16 +118,16 @@ class ToolExportAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="tool_id",
                 description="工具id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
-            )
+            ),
         ]
 
     @staticmethod
@@ -138,23 +143,22 @@ class ToolImportAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
-
         ]
 
     @staticmethod
     def get_request():
         return {
-            'multipart/form-data': {
-                'type': 'object',
-                'properties': {
-                    'file': {
-                        'type': 'string',
-                        'format': 'binary'  # Tells Swagger it's a file
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary",  # Tells Swagger it's a file
                     }
-                }
+                },
             }
         }
 
@@ -171,35 +175,35 @@ class ToolPageAPI(ToolReadAPI):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="current_page",
                 description="当前页码",
                 type=OpenApiTypes.INT,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="page_size",
                 description="每页大小",
                 type=OpenApiTypes.INT,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="folder_id",
                 description="文件夹id",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=True,
             ),
             OpenApiParameter(
                 name="user_id",
                 description="创建者id",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
@@ -207,14 +211,14 @@ class ToolPageAPI(ToolReadAPI):
                 description="工具类型",
                 type=OpenApiTypes.STR,
                 enum=["SHARED", "WORKSPACE"],
-                location='query',
+                location="query",
                 required=True,
             ),
             OpenApiParameter(
                 name="name",
                 description="工具名称",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
         ]
@@ -228,10 +232,9 @@ class PylintAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
-
         ]
 
     @staticmethod
@@ -247,14 +250,14 @@ class EditIconAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="tool_id",
                 description="工具id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -262,14 +265,14 @@ class EditIconAPI(APIMixin):
     @staticmethod
     def get_request():
         return {
-            'multipart/form-data': {
-                'type': 'object',
-                'properties': {
-                    'icon': {
-                        'type': 'string',
-                        'format': 'binary'  # Tells Swagger it's a file
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "icon": {
+                        "type": "string",
+                        "format": "binary",  # Tells Swagger it's a file
                     }
-                }
+                },
             }
         }
 
@@ -286,7 +289,7 @@ class GetInternalToolAPI(APIMixin):
                 name="name",
                 description="工具名称",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             )
         ]
@@ -312,17 +315,18 @@ class AddInternalToolAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="tool_id",
                 description="工具id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
+
 
 class ToolBatchOperateAPI(APIMixin):
     @staticmethod
@@ -332,7 +336,7 @@ class ToolBatchOperateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             )
         ]
@@ -346,3 +350,11 @@ class ToolBatchOperateAPI(APIMixin):
         return BatchMoveSerializer
 
 
+class ToolMoveAPI(ToolReadAPI):
+    @staticmethod
+    def get_parameters():
+        return ToolReadAPI.get_parameters() + [
+            OpenApiParameter(
+                name="folder_id", description="目标文件夹id", type=OpenApiTypes.STR, location="path", required=True
+            )
+        ]

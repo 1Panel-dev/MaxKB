@@ -325,7 +325,10 @@ exportKnowledgeExcel、exportKnowledgeZip、exportKnowledge 下载文档 Excel�
 exportKnowledge 第三个参数为 withSourceFile，通过查询参数 with_source_file 传入是否包含源文件。
 postKnowledgeImport 以 FormData file、folder_id 上传，响应 knowledge_id、type。
 
-putKnowledge 更新通用字段，Workspace 飞书使用 putLarkKnowledge；移动传 folder_id，批量移动／删除传 id_list。
+putKnowledge 更新通用字段，Workspace 飞书使用 putLarkKnowledge；编辑接口不允许修改文件夹。
+Workspace 智能体、工具和所有类型的知识库统一使用 PUT `/<id>/move/<folderId>` 移动，返回布尔值，
+分别校验 APPLICATION_MOVE、TOOL_MOVE、KNOWLEDGE_MOVE；目标文件夹必须属于同一工作空间。
+批量移动／删除传 id_list；批量移动保留 BATCH_MOVE 入口权限，并逐项校验 MOVE 权限。
 更换向量模型保存后通过 putReEmbeddingKnowledge 提交 embedding。Web 同步的 sync_type 为 incremental／replace／complete，
 不自行改写协议值。Web doc_strategy 使用 DocumentStrategy，顶层详情可为 null，保存不立即同步。
 

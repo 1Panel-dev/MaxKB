@@ -381,6 +381,16 @@ class PermissionConstants(Enum):
         ),
     )
 
+    TOOL_MOVE = (
+        Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.MOVE, bit_index=22),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
+        ),
+    )
+
     TOOL_DELETE = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.DELETE, bit_index=6),
         PermissionMeta(
@@ -566,6 +576,16 @@ class PermissionConstants(Enum):
 
     KNOWLEDGE_EDIT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.EDIT, bit_index=2),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
+            resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
+        ),
+    )
+
+    KNOWLEDGE_MOVE = (
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.MOVE, bit_index=72),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
@@ -1570,6 +1590,16 @@ class PermissionConstants(Enum):
 
     APPLICATION_EDIT = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.EDIT, bit_index=3),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
+        ),
+    )
+
+    APPLICATION_MOVE = (
+        Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.MOVE, bit_index=41),
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
