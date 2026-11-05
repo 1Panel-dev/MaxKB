@@ -20,6 +20,7 @@ from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
 from common.auth.struct.aggregate_permission import ViewPermission
 from common.auth.struct.permission import Permission
+from common.exception.app_exception import AppUnauthorizedFailed
 
 from system_manage.api.resource_chat_user import (
     WorkspaceResourceChatUserListAPI,
@@ -27,6 +28,16 @@ from system_manage.api.resource_chat_user import (
     ResourceChatUserPageAPI,
 )
 from system_manage.serializers.resource_chat_user import ResourceChatUserQuerySerializer, ResourceChatUserSerializer
+
+
+_CHAT_USER_RESOURCE_TYPES = {"APPLICATION", "KNOWLEDGE"}
+
+
+def get_chat_user_permission_constant(resource_type, operate):
+    normalized = str(resource_type or "").upper()
+    if normalized not in _CHAT_USER_RESOURCE_TYPES:
+        raise AppUnauthorizedFailed(403, _("No permission to access"))
+    return PermissionConstants[f"{normalized}_CHAT_USER_{operate}"]
 
 
 class ResourceChatUser(APIView):
@@ -42,20 +53,20 @@ class ResourceChatUser(APIView):
         tags=[_("Chat user")],  # type: ignore
     )
     @has_permissions(
-        lambda r, kwargs: PermissionConstants[
-            f"{kwargs.get('resource_type').upper()}_CHAT_USER_READ"
-        ].get_workspace_permission(),
-        lambda r, kwargs: PermissionConstants[
-            f"{kwargs.get('resource_type').upper()}_CHAT_USER_READ"
-        ].get_workspace_permission_workspace_manage_role(),
+        lambda r, kwargs: get_chat_user_permission_constant(
+            kwargs.get("resource_type"), "READ"
+        ).get_workspace_permission(),
+        lambda r, kwargs: get_chat_user_permission_constant(
+            kwargs.get("resource_type"), "READ"
+        ).get_workspace_permission_workspace_manage_role(),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [
                 lambda r, kwargs: Permission(
-                    group=PermissionConstants[kwargs.get("resource_type").upper()].value.group,
-                    sub_group=PermissionConstants[kwargs.get("resource_type").upper()].value.sub_group,
-                    operate=PermissionConstants[kwargs.get("resource_type").upper()].value.operate,
-                    bit_index=PermissionConstants[kwargs.get("resource_type").upper()].value.bit_index,
+                    group=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.group,
+                    sub_group=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.sub_group,
+                    operate=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.operate,
+                    bit_index=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.bit_index,
                     workspace_id=kwargs.get("workspace_id"),
                     resource_id=kwargs.get("resource_id"),
                 )
@@ -90,20 +101,20 @@ class ResourceChatUser(APIView):
         tags=[_("Chat user")],  # type: ignore
     )
     @has_permissions(
-        lambda r, kwargs: PermissionConstants[
-            f"{kwargs.get('resource_type').upper()}_CHAT_USER_EDIT"
-        ].get_workspace_permission(),
-        lambda r, kwargs: PermissionConstants[
-            f"{kwargs.get('resource_type').upper()}_CHAT_USER_EDIT"
-        ].get_workspace_permission_workspace_manage_role(),
+        lambda r, kwargs: get_chat_user_permission_constant(
+            kwargs.get("resource_type"), "EDIT"
+        ).get_workspace_permission(),
+        lambda r, kwargs: get_chat_user_permission_constant(
+            kwargs.get("resource_type"), "EDIT"
+        ).get_workspace_permission_workspace_manage_role(),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [
                 lambda r, kwargs: Permission(
-                    group=PermissionConstants[kwargs.get("resource_type").upper()].value.group,
-                    sub_group=PermissionConstants[kwargs.get("resource_type").upper()].value.sub_group,
-                    operate=PermissionConstants[kwargs.get("resource_type").upper()].value.operate,
-                    bit_index=PermissionConstants[kwargs.get("resource_type").upper()].value.bit_index,
+                    group=get_chat_user_permission_constant(kwargs.get("resource_type"), "EDIT").value.group,
+                    sub_group=get_chat_user_permission_constant(kwargs.get("resource_type"), "EDIT").value.sub_group,
+                    operate=get_chat_user_permission_constant(kwargs.get("resource_type"), "EDIT").value.operate,
+                    bit_index=get_chat_user_permission_constant(kwargs.get("resource_type"), "EDIT").value.bit_index,
                     workspace_id=kwargs.get("workspace_id"),
                     resource_id=kwargs.get("resource_id"),
                 )
@@ -137,20 +148,24 @@ class ResourceChatUser(APIView):
             tags=[_("Chat user")],  # type: ignore
         )
         @has_permissions(
-            lambda r, kwargs: PermissionConstants[
-                f"{kwargs.get('resource_type').upper()}_CHAT_USER_READ"
-            ].get_workspace_permission(),
-            lambda r, kwargs: PermissionConstants[
-                f"{kwargs.get('resource_type').upper()}_CHAT_USER_READ"
-            ].get_workspace_permission_workspace_manage_role(),
+            lambda r, kwargs: get_chat_user_permission_constant(
+                kwargs.get("resource_type"), "READ"
+            ).get_workspace_permission(),
+            lambda r, kwargs: get_chat_user_permission_constant(
+                kwargs.get("resource_type"), "READ"
+            ).get_workspace_permission_workspace_manage_role(),
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [
                     lambda r, kwargs: Permission(
-                        group=PermissionConstants[kwargs.get("resource_type").upper()].value.group,
-                        sub_group=PermissionConstants[kwargs.get("resource_type").upper()].value.sub_group,
-                        operate=PermissionConstants[kwargs.get("resource_type").upper()].value.operate,
-                        bit_index=PermissionConstants[kwargs.get("resource_type").upper()].value.bit_index,
+                        group=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.group,
+                        sub_group=get_chat_user_permission_constant(
+                            kwargs.get("resource_type"), "READ"
+                        ).value.sub_group,
+                        operate=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.operate,
+                        bit_index=get_chat_user_permission_constant(
+                            kwargs.get("resource_type"), "READ"
+                        ).value.bit_index,
                         workspace_id=kwargs.get("workspace_id"),
                         resource_id=kwargs.get("resource_id"),
                     )

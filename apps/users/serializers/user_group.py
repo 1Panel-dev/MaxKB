@@ -10,7 +10,7 @@ from rest_framework import serializers
 from common.auth.constants.role_constants import RoleConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, NotFound404
 from system_manage.models import UserGroup, UserGroupRelation
 from users.models.user_group import SystemUserGroup, SystemUserGroupRelation
 
@@ -227,7 +227,7 @@ class UserGroupListPageSerializer(serializers.Serializer):
             group_id = self.data.get("group_id")
             workspace_id = self.data.get("workspace_id")
             if not SystemUserGroup.objects.filter(id=group_id, workspace_id=workspace_id).exists():
-                raise AppApiException(500, _("User group does not exist"))
+                raise NotFound404(404, _("User group does not exist"))
 
         def page(self, current_page, page_size):
             self.is_valid()

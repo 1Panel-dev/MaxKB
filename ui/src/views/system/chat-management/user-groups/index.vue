@@ -124,13 +124,17 @@ function handleBatchSelectionChange(selection: unknown[]) {
 }
 
 function handleRemoveMembers(member?: ChatUserGroupMember) {
+  const group = currentGroup.value
+  const members = member ? [member] : batchSelectedMembers.value
+  if (!group || !members.length) return
+
   const targetName = member ? member.nick_name || member.username : ''
-  const title = member ? `是否移除用户：${targetName}？` : `是否移除选中的 ${batchSelectedMembers.value.length} 个用户？`
+  const title = member ? `是否移除用户：${targetName}？` : `是否移除选中的 ${members.length} 个用户？`
   MsgConfirm(title, '成员移除后，通过该用户组继承的资源权限将被回收，请谨慎操作。', { confirmButtonText: '移除' })
     .then(() => {
       membersLoading.value = true
-      const relationIds = batchSelectedMembers.value.map(({ user_group_relation_id }) => user_group_relation_id)
-      return ChatGroupsApi.postRemoveChatUserGroupMembers(currentGroup.value!.id, relationIds).then(async () => {
+      const relationIds = members.map(({ user_group_relation_id }) => user_group_relation_id)
+      return ChatGroupsApi.postRemoveChatUserGroupMembers(group.id, relationIds).then(async () => {
         MsgSuccess('移除成功')
         await loadGroupMembers()
         memberTableRef.value?.clearSelection()
