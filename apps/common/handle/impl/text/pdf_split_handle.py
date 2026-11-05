@@ -59,14 +59,11 @@ class PdfSplitHandle(BaseSplitHandle):
         get_buffer,
         save_image,
     ):
+        # Prefer get_buffer so ZipExtFile / already-read members stay consistent with
+        # Doc/HTML/XLSX handlers (UploadedFile.chunks is not available on zip members).
+        buffer = get_buffer(file)
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            # 将上传的文件保存到临时文件中
-            if hasattr(file, "chunks"):
-                for chunk in file.chunks():
-                    temp_file.write(chunk)
-            else:
-                shutil.copyfileobj(file, temp_file)
-            # 获取临时文件的路径
+            temp_file.write(buffer)
             temp_file_path = temp_file.name
 
         try:
