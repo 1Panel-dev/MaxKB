@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-ROOT = Path(__file__).resolve().parents[0] if False else Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[0] if False else Path(__file__).resolve().parents[2]
 APPS = ROOT / 'apps'
 
 
