@@ -13,7 +13,7 @@ function handleOpenDialog() {
 </script>
 
 <template>
-  <el-button plain class="ml-3" @click="handleOpenDialog">
+  <el-button plain @click="handleOpenDialog">
     <MkIcon name="icon_import_outlined" />
     <span>导入用户</span>
   </el-button>

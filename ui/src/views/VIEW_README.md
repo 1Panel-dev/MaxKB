@@ -457,6 +457,10 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
   日志通过 `LogConversation.rightDrawerTarget` 将当前抽屉外壳传给会话布局，执行详情及遮罩
   覆盖整个抽屉，包括标题与翻页区；关闭执行详情后返回原日志，详情内容独立滚动。
 
+日志回答的修正入口与弹窗位于 `conversation-panel/components/log-message-footer/improve/`，
+未标注时回填当前问答，选择知识库及文档后保存；已有标注时展示标注图标，支持查看、编辑及删除首条标注。
+保存与删除后同步当前记录的标注状态；接口由 `LogConversation.chatLogApi` 按当前资源范围提供。
+
 ### 外部检索服务
 
 - 外部检索页从 context 读取四范围 ExternalRetrieval API；Workspace 共享只读，禁用开关并阻止提交。

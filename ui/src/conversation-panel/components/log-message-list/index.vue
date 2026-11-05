@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import { computed } from 'vue'
 import ContentList from '../content-list/index.vue'
 import LogMessageFooter from '../log-message-footer/index.vue'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import { useLogMessageListStore } from './index'
+
+defineProps<{
+  api: Pick<typeof ChatLogApi, 'putChatRecordLog' | 'getMarkChatRecord' | 'deleteMarkChatRecord'>
+  applicationId: string
+  chatId: string
+}>()
 
 const { appInfo, messages, loading, hasMore, loadMore } = useLogMessageListStore()
 const avatar = computed(() => appInfo.value?.avatar)
@@ -31,7 +38,14 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
         <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
         <ContentList :content-list="msg.content" />
         <!-- 助手消息底部信息栏(知识来源/执行详情/tokens/耗时) -->
-        <LogMessageFooter class="mt-3" v-if="msg.role === 'ASSISTANT' && msg.record" :message="msg" />
+        <LogMessageFooter
+          class="mt-3"
+          v-if="msg.role === 'ASSISTANT' && msg.record"
+          :message="msg"
+          :api="api"
+          :application-id="applicationId"
+          :chat-id="chatId"
+        />
       </div>
     </template>
 

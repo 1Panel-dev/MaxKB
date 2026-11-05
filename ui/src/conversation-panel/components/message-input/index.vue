@@ -125,7 +125,7 @@ const { recording, seconds: recordSeconds, waveLevels, start: startRecording, st
         @click="startRecording"
       >
         <!-- todo 这块icon记得换 先用饿了么的了 -->
-        <MkIcon v-if="!transcribing" :icon="Phone" :size="18" class="text-N900!" />
+        <MkIcon v-if="!transcribing" name="icon_mic_outlined" :size="18" class="text-N900!" />
       </el-button>
       <el-divider direction="vertical" class="ml-3! mr-4!" />
       <!-- 停止回复 -->

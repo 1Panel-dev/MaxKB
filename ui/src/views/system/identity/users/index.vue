@@ -148,8 +148,8 @@ onMounted(() => loadSystemUsers())
         <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 导入用户 -->
-          <span>
-            <ButtonImportUsers v-if="perm.system.user.import()" @refresh="loadSystemUsers()" />
+          <span v-if="perm.system.user.import()">
+            <ButtonImportUsers @refresh="loadSystemUsers()" />
           </span>
 
           <!-- 创建用户 -->
