@@ -14,6 +14,10 @@ const workspace = {
  */
   create: () => can(P.APPLICATION_CREATE),
 /**
+ * 工作空间「智能体」导入权限
+ */
+  import: () => can(P.APPLICATION_IMPORT),
+/**
  * 工作空间「智能体」批量删除权限
  */
   batchDelete: () => can(P.APPLICATION_BATCH_DELETE),
