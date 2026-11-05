@@ -220,6 +220,7 @@ class UserGroupListPageSerializer(serializers.Serializer):
         group_id = serializers.CharField(required=True, label=_("Group ID"))
         username = serializers.CharField(required=False, label=_("Username"), allow_null=True)
         nick_name = serializers.CharField(required=False, label=_("Nick Name"), allow_null=True)
+        role = serializers.CharField(required=False, label=_("Role"), allow_null=True)
         source = serializers.CharField(required=False, label=_("Source"), allow_null=True)
 
         def is_valid(self, *, raise_exception=False):
@@ -272,6 +273,7 @@ class UserGroupListPageSerializer(serializers.Serializer):
             group_id = self.data.get("group_id")
             username = self.data.get("username")
             nick_name = self.data.get("nick_name")
+            role = self.data.get("role")
             source = self.data.get("source")
             query_set = SystemUserGroupRelation.objects.filter(group_id=group_id).select_related("user")
 
@@ -279,6 +281,16 @@ class UserGroupListPageSerializer(serializers.Serializer):
                 query_set = query_set.filter(user__username__contains=username)
             if nick_name is not None:
                 query_set = query_set.filter(user__nick_name__contains=nick_name)
+            if role is not None:
+                user_role_relation_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+                if user_role_relation_model is None:
+                    return query_set.none()
+                role_user_ids = user_role_relation_model.objects.filter(
+                    workspace_id=self.data.get("workspace_id"),
+                    role__type=RoleConstants.USER.name,
+                    role__role_name__icontains=role,
+                ).values("user_id")
+                query_set = query_set.filter(user_id__in=role_user_ids)
             if source is not None:
                 query_set = query_set.filter(user__source=source)
             return query_set.order_by("-user__create_time")

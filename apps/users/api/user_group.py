@@ -26,20 +26,22 @@ class CreateUserGroupApi(APIMixin):
 class DeleteUserGroupApi(APIMixin):
     @staticmethod
     def get_parameters():
-        return [OpenApiParameter(
-            name='workspace_id',
-            type=OpenApiTypes.STR,
-            description=_('Workspace ID'),
-            required=True,
-            location=OpenApiParameter.PATH,  # type: ignore
-        ),
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                type=OpenApiTypes.STR,
+                description=_("Workspace ID"),
+                required=True,
+                location=OpenApiParameter.PATH,  # type: ignore
+            ),
             OpenApiParameter(
                 name="user_group_id",
                 description=_("User Group ID"),
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.PATH,  # type: ignore
                 required=True,
-            )]
+            ),
+        ]
 
     @staticmethod
     def get_response():
@@ -60,12 +62,13 @@ class UserGroupListApi(APIMixin):
     def get_parameters():
         return [
             OpenApiParameter(
-                name='workspace_id',
+                name="workspace_id",
                 type=OpenApiTypes.STR,
-                description=_('Workspace ID'),
+                description=_("Workspace ID"),
                 required=True,
                 location=OpenApiParameter.PATH,  # type: ignore
-            )]
+            )
+        ]
 
 
 class UserGroupListPageResponse(ResultSerializer):
@@ -78,44 +81,51 @@ class UserGroupListPageApi(APIMixin):
     def get_parameters():
         return [
             OpenApiParameter(
-                name='workspace_id',
+                name="workspace_id",
                 type=OpenApiTypes.STR,
-                description=_('Workspace ID'),
+                description=_("Workspace ID"),
                 required=True,
                 location=OpenApiParameter.PATH,  # type: ignore
             ),
             OpenApiParameter(
-                name='user_group_id',
+                name="user_group_id",
                 type=OpenApiTypes.STR,
-                description=_('Group ID'),
+                description=_("Group ID"),
                 required=True,
                 location=OpenApiParameter.PATH,  # type: ignore
             ),
             OpenApiParameter(
-                name='current_page',
+                name="current_page",
                 type=OpenApiTypes.INT,
-                description=_('Current page'),
+                description=_("Current page"),
                 required=True,
                 location=OpenApiParameter.PATH,  # type: ignore
             ),
             OpenApiParameter(
-                name='page_size',
+                name="page_size",
                 type=OpenApiTypes.INT,
-                description=_('Page size'),
+                description=_("Page size"),
                 required=True,
                 location=OpenApiParameter.PATH,  # type: ignore
             ),
             OpenApiParameter(
-                name='username',
+                name="username",
                 type=OpenApiTypes.STR,
-                description=_('Username'),
+                description=_("Username"),
                 required=False,
                 location=OpenApiParameter.QUERY,  # type: ignore
             ),
             OpenApiParameter(
-                name='nick_name',
+                name="nick_name",
                 type=OpenApiTypes.STR,
-                description=_('Nickname'),
+                description=_("Nickname"),
+                required=False,
+                location=OpenApiParameter.QUERY,  # type: ignore
+            ),
+            OpenApiParameter(
+                name="role",
+                type=OpenApiTypes.STR,
+                description=_("Role"),
                 required=False,
                 location=OpenApiParameter.QUERY,  # type: ignore
             ),
@@ -127,11 +137,7 @@ class UserGroupListPageApi(APIMixin):
 
 
 class AddMemberRequest(serializers.Serializer):
-    user_ids = serializers.ListField(
-        child=serializers.CharField(required=True),
-        required=True,
-        label=_('User IDs')
-    )
+    user_ids = serializers.ListField(child=serializers.CharField(required=True), required=True, label=_("User IDs"))
 
 
 class AddMemberApi(APIMixin):
@@ -139,9 +145,9 @@ class AddMemberApi(APIMixin):
     def get_parameters():
         return [
             OpenApiParameter(
-                name='workspace_id',
+                name="workspace_id",
                 type=OpenApiTypes.STR,
-                description=_('Workspace ID'),
+                description=_("Workspace ID"),
                 required=True,
                 location=OpenApiParameter.PATH,  # type: ignore
             ),
@@ -151,7 +157,8 @@ class AddMemberApi(APIMixin):
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.PATH,  # type: ignore
                 required=True,
-            )]
+            ),
+        ]
 
     @staticmethod
     def get_request():
@@ -164,9 +171,7 @@ class AddMemberApi(APIMixin):
 
 class RemoveMemberRequest(serializers.Serializer):
     group_relation_ids = serializers.ListField(
-        child=serializers.CharField(required=True),
-        required=True,
-        label=_('User group relation IDs')
+        child=serializers.CharField(required=True), required=True, label=_("User group relation IDs")
     )
 
 
@@ -175,9 +180,9 @@ class RemoveMemberApi(APIMixin):
     def get_parameters():
         return [
             OpenApiParameter(
-                name='workspace_id',
+                name="workspace_id",
                 type=OpenApiTypes.STR,
-                description=_('Workspace ID'),
+                description=_("Workspace ID"),
                 required=True,
                 location=OpenApiParameter.PATH,  # type: ignore
             ),
@@ -187,7 +192,8 @@ class RemoveMemberApi(APIMixin):
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.PATH,  # type: ignore
                 required=True,
-            )]
+            ),
+        ]
 
     @staticmethod
     def get_request():

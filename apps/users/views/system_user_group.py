@@ -190,6 +190,7 @@ class SystemUserGroupView(APIView):
                 data={
                     "username": request.query_params.get("username", None),
                     "nick_name": request.query_params.get("nick_name", None),
+                    "role": request.query_params.get("role", None),
                     "source": request.query_params.get("source", None),
                     "group_id": user_group_id,
                     "workspace_id": workspace_id,
