@@ -138,7 +138,7 @@ watch(
 )
 
 function handleBaseModelChange() {
-  modelForm.credential = {}
+  // 切换基础模型时保留已填写的凭证参数（同供应商/类型下字段一致，直接沿用）。
   credentialFields.value = []
   void dynamicsFormRef.value?.render([], modelFormData.value)
   if (!modelForm.model_name) return
@@ -214,17 +214,44 @@ defineExpose({ open })
             <el-input v-model="modelForm.name" maxlength="64" placeholder="请给基础模型设置一个名称" @blur="modelForm.name = modelForm.name.trim()" />
           </el-form-item>
 
-          <el-form-item prop="model_type" label="模型类型" required>
-            <el-select v-model="modelForm.model_type" class="w-full" disabled>
+          <el-form-item class="mk-hide-asterisk" prop="model_type" :rules="{ required: true, message: '请选择模型类型', trigger: 'change' }">
+            <template #label>
+              <span class="inline-flex items-center gap-2">
+                <span class="mk-required">模型类型</span>
+                <MkTooltip placement="right">
+                  <template #content>
+                    <p>大语言模型：在智能体中与AI对话的推理模型。</p>
+                    <p>向量模型：在知识库中对文档内容进行向量化的模型。</p>
+                    <p>语音识别：在智能体中开启语音识别后用于语音转文字的模型。</p>
+                    <p>语音合成：在智能体中开启语音播放后用于文字转语音的模型。</p>
+                    <p>重排模型：在高级智能体中使用多路召回时，对候选分段进行重新排序的模型。</p>
+                    <p>视觉模型：在高级智能体中用于图片理解的视觉模型。</p>
+                    <p>图片生成：在高级智能体中用于图片生成的视觉模型。</p>
+                    <p>文生视频：在高级智能体中用于文生视频的模型。</p>
+                    <p>图生视频：在高级智能体中用于图生视频的模型。</p>
+                  </template>
+                  <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
+                </MkTooltip>
+              </span>
+            </template>
+            <el-select v-model="modelForm.model_type" class="w-full" disabled placeholder="请选择模型类型">
               <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
             </el-select>
           </el-form-item>
+        </template>
 
-          <el-form-item class="mk-hide-asterisk" prop="model_name" :rules="{ required: true, message: '请选择模型类型', trigger: 'change' }">
+        <template #after>
+          <el-form-item
+            class="mk-hide-asterisk"
+            prop="model_name"
+            :rules="{ required: true, message: '请选择基础模型，自定义输入基础模型后回车即可', trigger: 'change' }"
+          >
             <template #label>
-              <span class="inline-flex items-center gap-2">
-                <span class="mk-required"> 基础模型</span>
-                <span class="text-warning"> 列表中未列出的模型，直接输入模型名称，回车即可添加 </span>
+              <span class="inline-flex w-full items-center gap-2">
+                <span class="inline-flex items-center gap-2">
+                  <span class="mk-required">基础模型</span>
+                  <span class="text-warning">列表中未列出的模型，直接输入模型名称，回车即可添加</span>
+                </span>
                 <el-button
                   class="ml-auto"
                   link
@@ -244,13 +271,14 @@ defineExpose({ open })
               class="w-full"
               default-first-option
               filterable
+              :loading="baseModelLoading"
               placeholder="请先点击「获取模型」加载列表，或直接输入模型名称后回车"
               @change="handleBaseModelChange"
             >
               <el-option v-for="option in baseModelOptions" :key="option.name" :label="option.name" :value="option.name">
                 <template #default>
                   <div class="flex-align-center gap-2">
-                    <span>{{ option.name }} </span>
+                    <span>{{ option.name }}</span>
                     <MkTooltip v-if="option.desc" :content="option.desc" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
                     </MkTooltip>
