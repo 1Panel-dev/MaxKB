@@ -7,6 +7,7 @@
     @desc:
 """
 import io
+import logging
 import os
 import re
 import uuid
@@ -28,6 +29,8 @@ from common.handle.impl.xlsx_split_handle import XlsxSplitHandle
 from common.util.common import parse_md_image
 from dataset.models import Image
 from django.utils.translation import gettext_lazy as _
+
+max_kb = logging.getLogger("max_kb")
 
 
 class FileBufferHandle:
@@ -138,8 +141,8 @@ class ZipSplitHandle(BaseSplitHandle):
                             result = [*result, *value]
                         else:
                             result.append(value)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        max_kb.warning(f"Zip member: {file}, split error: {e}")
             image_list = get_image_list(result, files)
             result = filter_image_file(result, image_list)
             image_mode_list = []
