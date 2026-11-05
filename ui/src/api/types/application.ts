@@ -125,6 +125,13 @@ export interface ApplicationDetail extends Omit<ApplicationFormPayload, 'desc'> 
   work_flow?: LogicFlow.GraphConfigData
 }
 
+/** 智能体对话日志与附件清除策略保存参数。 */
+export interface ApplicationCleanTimePayload {
+  id_list: string[]
+  clean_time: number
+  file_clean_time: number
+}
+
 export interface ApplicationFormPayload {
   clean_time?: number
   file_clean_time?: number
