@@ -4,6 +4,7 @@ import type { FormInstance } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import CommonSystemApi from '@/api/admin/system/common'
 import WorkspaceApi from '@/api/admin/system/workspace'
+import { ROLE_TYPE } from '@/api/enums'
 import type { CreateWorkspaceMemberPayload, ListItem, SystemUserOption, WorkspaceItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
@@ -41,7 +42,7 @@ function loadRoleOptions() {
   roleOptionsLoading.value = true
   return CurrentUserApi.getCurrentUserRoleList()
     .then((roles) => {
-      roleOptions.value = roles
+      roleOptions.value = roles.filter((role) => role.type !== ROLE_TYPE.ADMIN)
     })
     .finally(() => {
       roleOptionsLoading.value = false
