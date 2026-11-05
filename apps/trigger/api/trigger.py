@@ -18,18 +18,34 @@ from trigger.serializers.task_source_trigger import TaskSourceTriggerEditRequest
 from trigger.serializers.trigger import TriggerCreateRequest, TriggerResponse, BatchActiveSerializer
 
 
+class TriggerTaskResponseSerializer(serializers.Serializer):
+    type = serializers.CharField(required=True, help_text="任务类型", label="任务类型")
+    name = serializers.CharField(required=True, help_text="任务名称", label="任务名称")
+    icon = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, help_text="任务图标", label="任务图标"
+    )
+
+
 class TriggerQueryResponseSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=True, help_text="触发器id", label="触发器id")
     workspace_id = serializers.CharField(required=True, help_text="触发器工作空间", label="触发器工作空间")
     name = serializers.CharField(required=True, help_text="触发器名称", label="触发器名称")
-    desc = serializers.CharField(required=True, help_text="触发器描述", label="触发器描述")
+    desc = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, help_text="触发器描述", label="触发器描述"
+    )
     trigger_type = serializers.CharField(required=True, help_text="触发器类型", label="触发器类型")
-    type = serializers.CharField(required=True, help_text="资源类型", label="资源类型")
+    trigger_setting = serializers.DictField(required=True, help_text="触发器配置", label="触发器配置")
+    meta = serializers.DictField(required=False, allow_null=True, help_text="触发器元数据", label="触发器元数据")
     is_active = serializers.BooleanField(required=True, help_text="是否激活", label="是否激活")
-    source_name = serializers.CharField(required=True, help_text="资源类型", label="资源类型")
-    source_icon = serializers.CharField(required=True, help_text="资源图标", label="资源图标")
-    create_time = serializers.CharField(required=True, help_text="创建时间", label="创建时间")
-    update_time = serializers.CharField(required=True, help_text="修改时间", label="修改时间")
+    create_time = serializers.DateTimeField(required=True, help_text="创建时间", label="创建时间")
+    update_time = serializers.DateTimeField(required=True, help_text="修改时间", label="修改时间")
+    user_id = serializers.UUIDField(required=True, help_text="创建人id", label="创建人id")
+    create_user = serializers.CharField(required=False, allow_null=True, help_text="创建人", label="创建人")
+    next_run_time = serializers.DateTimeField(
+        required=False, allow_null=True, help_text="下次执行时间", label="下次执行时间"
+    )
+    trigger_task = TriggerTaskResponseSerializer(many=True, required=True, help_text="任务列表", label="任务列表")
+    trigger_task_str = serializers.CharField(required=False, allow_null=True, help_text="任务名称", label="任务名称")
 
 
 class TriggerListResponse(ResultSerializer):

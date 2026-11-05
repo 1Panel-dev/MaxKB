@@ -5,6 +5,7 @@ from drf_spectacular.utils import OpenApiParameter
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
 from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
+from rest_framework import serializers
 from tools.serializers.tool import (
     ToolModelSerializer,
     ToolCreateRequest,
@@ -15,9 +16,13 @@ from tools.serializers.tool import (
 )
 
 
+class ToolModelResponseSerializer(ToolModelSerializer):
+    init_params = serializers.DictField(required=False, allow_null=True, label="初始化参数")
+
+
 class ToolCreateResponse(ResultSerializer):
     def get_data(self):
-        return ToolModelSerializer()
+        return ToolModelResponseSerializer()
 
 
 class ToolCreateAPI(APIMixin):
