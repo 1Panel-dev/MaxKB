@@ -14,7 +14,7 @@ import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
 import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
 import { PORTAL_CONVERSATION_LIST_KEY } from '../../left-sidebar/portal-conversation-list/index'
-import { SHARE_PANEL_KEY } from '../../main/share-panel/index'
+import { SHARE_LINK_KEY } from '../../components/message-list/share/index'
 import { createPortalConversation } from './index'
 import { createChatUserProfileGetter } from '../chat/index'
 import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, createDeviceType } from '../index.ts'
@@ -41,7 +41,7 @@ provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
 provide(EXECUTION_DETAIL_KEY, bundle.detail)
-provide(SHARE_PANEL_KEY, bundle.share)
+provide(SHARE_LINK_KEY, bundle.share)
 provide(PORTAL_CONVERSATION_LIST_KEY, bundle.portalList)
 provide(VIEW_KEY, VIEW_TYPE.PORTAL)
 // HTML 内容 iframe 内 chatUserProfile() 取当前对话用户

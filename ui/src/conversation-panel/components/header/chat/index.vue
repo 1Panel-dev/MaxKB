@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useConversationListStore } from '../../../left-sidebar/conversation-list/index'
 import { useMessageListStore } from '../../message-list/index'
+import { useShareLinkStoreOptional } from '../../message-list/share/index'
 
 const props = defineProps<{
   /** 新建对话；不传时在当前应用中新建（门户在没有当前智能体时改为选择智能体） */
@@ -12,6 +13,8 @@ const props = defineProps<{
 const list = useConversationListStore()
 
 const msgs = useMessageListStore()
+// 标题栏分享不针对某一轮，进入后不预先勾选
+const shareLink = useShareLinkStoreOptional()
 // 回答生成中或没有消息时不可分享
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
 
@@ -42,7 +45,7 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
       </MkTooltip>
       <!-- 进入分享模式，勾选要分享的对话 -->
       <MkTooltip v-if="shareable" content="分享">
-        <el-button text :disabled="!canShare" @click="list.switchShared(true)">
+        <el-button text :disabled="!canShare" @click="shareLink?.enterShare()">
           <MkIcon name="icon_share_outlined" :size="18" :class="canShare ? 'text-N900!' : 'text-N400!'" />
         </el-button>
       </MkTooltip>

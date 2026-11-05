@@ -7,14 +7,14 @@ import ConversationLayout from '../../core/layout/index.vue'
 import ConversationList from '../../left-sidebar/conversation-list/index.vue'
 import ChatPanel from '../../main/chat-panel/index.vue'
 import ExecutionDetail from '../../right-sidebar/execution-detail/index.vue'
-import SharePanel from '../../main/share-panel/index.vue'
 import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
 import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
 import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
-import { SHARE_PANEL_KEY, SHARE_PANEL_CONTENT_KEY } from '../../main/share-panel/index'
+import { SHARE_LINK_KEY } from '../../components/message-list/share/index'
 import { createChatConversation, createChatUserProfileGetter } from './index'
 import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, createDeviceType } from '../index.ts'
+
 const bundle = createChatConversation()
 
 // 动态表单上传使用当前会话，兼容文件字段的地址包装与取消操作。
@@ -36,11 +36,7 @@ provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
 provide(EXECUTION_DETAIL_KEY, bundle.detail)
-provide(SHARE_PANEL_KEY, bundle.share)
-provide(SHARE_PANEL_CONTENT_KEY, {
-  ...bundle.msgs,
-  title: computed(() => bundle.list.currentConversation.value?.abstract || '新建对话'),
-})
+provide(SHARE_LINK_KEY, bundle.share)
 provide(VIEW_KEY, VIEW_TYPE.CHAT)
 // HTML 内容 iframe 内 chatUserProfile() 取当前对话用户
 provide(CHAT_USER_PROFILE_KEY, createChatUserProfileGetter())
@@ -74,8 +70,6 @@ watch(isMobile, (m) => (bundle.list.leftSideOpen.value = !m))
 // 新建或重新选择会话时，即使会话 ID 不变也收起左侧抽屉。
 watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSignal.value], () => {
   if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
-  // 切换或新建会话时退出分享模式
-  bundle.share.close()
 })
 </script>
 
@@ -89,11 +83,7 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
     @mask-click="closeDrawers"
   >
     <template #left><ConversationList /></template>
-    <template #main>
-      <!-- 分享模式下主区域切换为分享面板 -->
-      <SharePanel v-if="bundle.share.active.value" />
-      <ChatPanel v-else shareable @share="bundle.share.open()" />
-    </template>
+    <template #main><ChatPanel shareable /></template>
     <template #right><ExecutionDetail /></template>
   </ConversationLayout>
 </template>

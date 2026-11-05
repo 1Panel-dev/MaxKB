@@ -8,6 +8,7 @@ import { usePortalConversationListStore } from './index'
 import RenameConversation from '../../components/rename/index.vue'
 
 import { useMessageListStore } from '../../components/message-list/index'
+import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
 
 defineOptions({ name: 'HistoryConversationDrawer' })
 const props = defineProps<{ applicationId: string }>()
@@ -16,11 +17,12 @@ const portalList = usePortalConversationListStore()
 const conversationList = useConversationListStore()
 const msgs = useMessageListStore()
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
+const shareLink = useShareLinkStoreOptional()
 
-// 开启当前对话的分享选择，并关闭历史抽屉。
+// 开启当前对话的分享选择（不预先勾选），并关闭历史抽屉。
 const handleShareConversation = () => {
   if (!canShare.value) return
-  conversationList.switchShared(true)
+  shareLink?.enterShare()
   visible.value = false
 }
 const selectedApplicationId = ref(props.applicationId)

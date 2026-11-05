@@ -8,15 +8,18 @@ import { useConversationListStore } from './index'
 import AccountMenu from '../account-menu/index.vue'
 
 import { useMessageListStore } from '../../components/message-list/index'
+import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
 import { useViewType, VIEW_TYPE } from '../../view/index'
 
 defineOptions({ name: 'ConversationList' })
 
 const viewType = useViewType()
 const msgs = useMessageListStore()
+// 会话菜单分享不针对某一轮，进入后不预先勾选
+const shareLink = useShareLinkStoreOptional()
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
 
-const { appInfo, conversations, currentChatId, switchShared, selectConversation, newConversation, deleteChat, toggleLeftSide, hasMore, loadMore } =
+const { appInfo, conversations, currentChatId, selectConversation, newConversation, deleteChat, toggleLeftSide, hasMore, loadMore } =
   useConversationListStore()
 
 // 历史时间优先使用更新时间，缺少时间的记录不显示占位文案。
@@ -110,7 +113,7 @@ function handleClearConversations() {
                     <MkDropdownItem
                       v-if="viewType === VIEW_TYPE.CHAT && currentChatId === conversation.id"
                       :disabled="!canShare"
-                      @click="switchShared(true)"
+                      @click="shareLink?.enterShare()"
                     >
                       <template #icon><MkIcon name="icon_share_outlined" /></template>
                       <span>分享</span>

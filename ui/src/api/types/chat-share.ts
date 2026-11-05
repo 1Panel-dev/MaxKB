@@ -1,13 +1,16 @@
 import type { ChatContent } from './chat-log'
-import type { Dict } from './common'
 
-/** 公开分享接口返回的旧版问答记录。 */
+/** 公开分享接口返回的问答记录。 */
 export interface ChatShareRecord {
   id: string
+  create_time?: string
   problem_text: string
   answer_text: string
   answer_text_list: (ChatContent | ChatContent[])[]
-  execution_details?: Dict<unknown>[]
+  /** 提问内容项 */
+  question: ChatContent
+  /** 回答内容项列表 */
+  messages: ChatContent[]
 }
 
 export interface ChatShareDetail {

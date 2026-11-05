@@ -8,6 +8,7 @@ import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import { useMessageListStore, SEND_MESSAGE_KEY } from './index'
 import ShareMessageRow from './share/ShareMessageRow.vue'
 import ShareFooter from './share/ShareFooter.vue'
+import { useShareLinkStoreOptional } from './share/index'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 defineProps<{ appName?: string }>()
 
@@ -15,12 +16,8 @@ const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamPr
 const { isShared } = useConversationListStore()
 // 消息内容项（如表单）经此发起续跑；分享时收回发送能力，内容项只读
 provide(SEND_MESSAGE_KEY, computed(() => (isShared.value ? null : sendMessage)))
-// 分享按完整问答轮次提交，提问与回答共用记录 ID。
-const selectedRecordIds = ref<string[]>([])
-const messageRecordIds = computed(() =>
-  messages.value.map((message, index) => (message.role === 'ASSISTANT' ? message.recordId : messages.value[index + 1]?.recordId)),
-)
-const availableRecordIds = computed(() => [...new Set(messageRecordIds.value.filter((id): id is string => Boolean(id)))])
+// 分享选择的记录 ID、勾选与提交由分享链接 Store 维护；未提供时（调试等）不进入分享选择。
+const shareLink = useShareLinkStoreOptional()
 const scrollRef = ref<InstanceType<typeof ReverseInfiniteScroll>>()
 
 // 开场白随智能体信息变化（debug 保存后为最新草稿）
@@ -52,7 +49,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
       </div>
     </template>
     <template v-for="(msg, i) in messages" :key="msg.id || i">
-      <ShareMessageRow :active="isShared" v-model="selectedRecordIds" :record-id="messageRecordIds[i]">
+      <ShareMessageRow :active="isShared" :record-id="shareLink?.messageRecordIds.value[i]">
         <!-- 用户提问靠右：头像独占一行在上，提问容器在下方靠右收缩 -->
         <div v-if="msg.role === 'USER'">
           <div v-if="showUserAvatar" class="text-right">
@@ -78,7 +75,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
       <span class="mk-conversation-loading" />
     </div>
   </ReverseInfiniteScroll>
-  <ShareFooter v-if="isShared" v-model="selectedRecordIds" :record-ids="availableRecordIds" />
+  <ShareFooter v-if="isShared" />
 </template>
 
 <style scoped lang="scss"></style>

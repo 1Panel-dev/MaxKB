@@ -56,7 +56,7 @@ const submit = async () => {
     _submit.value = false
   }
 }
-const READONLY_VIEWS: readonly ViewType[] = [VIEW_TYPE.LOG]
+const READONLY_VIEWS: readonly ViewType[] = [VIEW_TYPE.LOG, VIEW_TYPE.SHARE]
 
 </script>
 
