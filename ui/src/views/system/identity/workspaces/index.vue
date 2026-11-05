@@ -210,7 +210,7 @@ onMounted(() => loadWorkspaceOptions())
             <span>重命名</span>
           </MkDropdownItem>
           <!-- 删除工作空间 -->
-          <MkDropdownItem v-if="perm.system.workspace.delete()" divided @click="handleWorkspaceDelete(workspace)">
+          <MkDropdownItem v-if="perm.system.workspace.delete()" @click="handleWorkspaceDelete(workspace)">
             <template #icon>
               <MkIcon name="icon_delete-trash_outlined" />
             </template>

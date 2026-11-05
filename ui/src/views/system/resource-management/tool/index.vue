@@ -274,7 +274,7 @@ onMounted(() => {
                   :tool="row"
                 />
                 <!-- 删除工具 -->
-                <MkDropdownItem divided @click="handleDeleteTool(row)" v-if="perm.tool.system.delete()">
+                <MkDropdownItem @click="handleDeleteTool(row)" v-if="perm.tool.system.delete()">
                   <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                   删除
                 </MkDropdownItem>

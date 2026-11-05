@@ -30,7 +30,7 @@ function handleDeleteTool() {
 
 <template>
   <!-- 删除工具 -->
-  <MkDropdownItem divided @click="handleDeleteTool">
+  <MkDropdownItem @click="handleDeleteTool">
     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>

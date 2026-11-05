@@ -15,7 +15,7 @@ import { datetimeFormat } from '@/utils/time'
 import { numberFormat } from '@/utils/number'
 import { getFileUrl } from '@/utils/common'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceResource, isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import ButtonUploadImage from './upload-image/ButtonUploadImage.vue'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
@@ -47,8 +47,17 @@ defineExpose({ customHeader: true })
  * 知识库「图片」权限判断
  */
 type KnowledgeImagePermissionMethod =
-  | 'read' | 'create' | 'edit' | 'delete' | 'download'
-  | 'generate' | 'vector' | 'migrate' | 'tag' | 'replace' | 'token'
+  | 'read'
+  | 'create'
+  | 'edit'
+  | 'delete'
+  | 'download'
+  | 'generate'
+  | 'vector'
+  | 'migrate'
+  | 'tag'
+  | 'replace'
+  | 'token'
 
 function canImage(method: KnowledgeImagePermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system.image[method]())
@@ -428,14 +437,19 @@ onBeforeUnmount(() => {
       <template #default="{ row }: { row: DocumentItem }">
         <div class="flex-align-center" @click.stop>
           <!-- 启用或禁用文档 -->
-          <el-switch :model-value="row.is_active" size="small" :disabled="operationLoading && !canImage('edit')" :before-change="() => handleChangeActive(row)" />
+          <el-switch
+            :model-value="row.is_active"
+            size="small"
+            :disabled="operationLoading && !canImage('edit')"
+            :before-change="() => handleChangeActive(row)"
+          />
 
           <el-divider direction="vertical" class="ml-3! mr-2!" />
 
           <div class="flex">
             <!-- 向量化或取消向量化 -->
             <EmbeddingDocumentAction
-               v-if="canImage('vector')"
+              v-if="canImage('vector')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               :document="row"
@@ -444,7 +458,7 @@ onBeforeUnmount(() => {
             />
             <!-- 分词索引或取消分词索引 -->
             <TokenizeDocumentAction
-               v-if="canImage('token')"
+              v-if="canImage('token')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
@@ -455,7 +469,7 @@ onBeforeUnmount(() => {
             <MkTableMoreDropdown>
               <!-- 生成或取消生成问题 -->
               <GenerateQuestionsAction
-                 v-if="canImage('generate')"
+                v-if="canImage('generate')"
                 :api="resourceApi.document"
                 v-model:loading="operationLoading"
                 :knowledge-id="knowledgeId"
@@ -487,7 +501,14 @@ onBeforeUnmount(() => {
               />
 
               <!-- 替换图片原文件 -->
-              <ReplaceDocumentAction v-if="canImage('replace')" :api="resourceApi.document" :knowledge-id="knowledgeId" :document="row" v-model:loading="operationLoading" @refresh="refreshAfterOperation" />
+              <ReplaceDocumentAction
+                v-if="canImage('replace')"
+                :api="resourceApi.document"
+                :knowledge-id="knowledgeId"
+                :document="row"
+                v-model:loading="operationLoading"
+                @refresh="refreshAfterOperation"
+              />
               <!-- 迁移文档 -->
               <MigrateDocumentAction
                 v-if="canImage('migrate')"
@@ -501,12 +522,17 @@ onBeforeUnmount(() => {
               />
 
               <!-- 下载原文档 -->
-              <DownloadDocumentAction v-if="canImage('download')" :api="resourceApi.document" :knowledge-id="knowledgeId" v-model:loading="operationLoading" :document="row" />
+              <DownloadDocumentAction
+                v-if="canImage('download')"
+                :api="resourceApi.document"
+                :knowledge-id="knowledgeId"
+                v-model:loading="operationLoading"
+                :document="row"
+              />
 
               <!-- 删除文档 -->
               <DeleteDocumentAction
                 v-if="canImage('delete')"
-                divided
                 icon="icon_delete-trash_outlined"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -590,18 +616,19 @@ onBeforeUnmount(() => {
             />
 
             <!-- 批量取消向量化 -->
-            <BatchCancelTaskAction v-if="canImage('vector')"
+            <BatchCancelTaskAction
+              v-if="canImage('vector')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
               :task-type="DOCUMENT_TASK_TYPE.EMBEDDING"
               label="取消向量化"
-              divided
               @refresh="refreshAfterOperation"
             />
             <!-- 批量取消生成问题 -->
-            <BatchCancelTaskAction v-if="canImage('generate')"
+            <BatchCancelTaskAction
+              v-if="canImage('generate')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"

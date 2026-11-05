@@ -197,9 +197,14 @@ onMounted(() => {
                   :model="row"
                 />
                 <!-- 查看关联资源 -->
-                <RelatedResourcesModelAction v-if="perm.model.system.relateMap()" label="查看关联资源" :api="SystemRelatedResourcesApi" :model="row" />
+                <RelatedResourcesModelAction
+                  v-if="perm.model.system.relateMap()"
+                  label="查看关联资源"
+                  :api="SystemRelatedResourcesApi"
+                  :model="row"
+                />
                 <!-- 删除模型 -->
-                <MkDropdownItem v-if="perm.model.system.delete()" divided :disabled="loading" @click="handleDeleteModel(row)">
+                <MkDropdownItem v-if="perm.model.system.delete()" :disabled="loading" @click="handleDeleteModel(row)">
                   <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                   删除
                 </MkDropdownItem>

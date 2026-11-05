@@ -63,7 +63,7 @@ function handleExportDialogClosed() {
 </script>
 
 <template>
-  <MkDropdownItem divided @click.prevent.stop class="p-0!">
+  <MkDropdownItem @click.prevent.stop class="p-0!">
     <MkDropdown class="w-full" trigger="hover" placement="right-start" :append-to="exportMenuContainer">
       <!-- 展开知识库导出菜单 -->
       <div ref="exportTriggerRef" class="flex-between w-full gap-2 p-2">

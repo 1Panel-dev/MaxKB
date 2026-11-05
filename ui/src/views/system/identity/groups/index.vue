@@ -213,7 +213,7 @@ onMounted(() => {
             <span>重命名</span>
           </MkDropdownItem>
           <!-- 删除用户组 -->
-          <MkDropdownItem v-if="perm.system.userGroup.delete()" divided @click="deleteGroup(row)">
+          <MkDropdownItem v-if="perm.system.userGroup.delete()" @click="deleteGroup(row)">
             <template #icon>
               <MkIcon name="icon_delete-trash_outlined" />
             </template>

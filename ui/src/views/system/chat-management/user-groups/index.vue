@@ -169,7 +169,7 @@ onMounted(() => loadChatUserGroups())
             <span>重命名</span>
           </MkDropdownItem>
           <!-- 删除用户组 -->
-          <MkDropdownItem v-if="perm.system.chatUserGroup.delete()" divided @click="deleteGroup(row)">
+          <MkDropdownItem v-if="perm.system.chatUserGroup.delete()" @click="deleteGroup(row)">
             <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
             <span>删除</span>
           </MkDropdownItem>
@@ -216,7 +216,13 @@ onMounted(() => loadChatUserGroups())
           <el-table-column prop="username" label="用户名" show-overflow-tooltip />
           <el-table-column prop="source" label="用户来源">
             <template #header>
-              <MkTableFilter mode="single" v-model="selectedMemberSource" label="用户来源" :options="memberSourceOptions" @change="handleMemberFilterChange" />
+              <MkTableFilter
+                mode="single"
+                v-model="selectedMemberSource"
+                label="用户来源"
+                :options="memberSourceOptions"
+                @change="handleMemberFilterChange"
+              />
             </template>
             <template #default="{ row }">
               {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}

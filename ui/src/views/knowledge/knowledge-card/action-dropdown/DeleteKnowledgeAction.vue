@@ -7,7 +7,11 @@ import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/k
 
 defineOptions({ name: 'DeleteKnowledgeAction' })
 
-const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
+const props = defineProps<{
+  api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi
+  knowledge: KnowledgeItem
+  label: string
+}>()
 
 const loading = defineModel<boolean>('loading', { default: false })
 
@@ -32,7 +36,7 @@ function handleDeleteKnowledge() {
 </script>
 
 <template>
-  <MkDropdownItem divided @click="handleDeleteKnowledge">
+  <MkDropdownItem @click="handleDeleteKnowledge">
     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>

@@ -508,7 +508,7 @@ onBeforeUnmount(stopAutoSave)
               <span>导出工作流</span>
             </MkDropdownItem>
             <!-- 查看执行记录 -->
-            <ButtonExecutionRecord label="执行记录" :api="requestApi" divided :knowledge-id="knowledgeId" />
+            <ButtonExecutionRecord label="执行记录" :api="requestApi" :knowledge-id="knowledgeId" />
             <!-- 发布历史 -->
             <ButtonPublishHistory
               label="发布历史"

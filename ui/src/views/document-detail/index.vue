@@ -225,8 +225,8 @@ const paragraphSortDisabled = computed(
     batchMode.value ||
     createDialogMounted.value ||
     editDialogMounted.value ||
-    paragraphs.value.length < 2||
-    !knowledgeDocPermission('docEdit')
+    paragraphs.value.length < 2 ||
+    !knowledgeDocPermission('docEdit'),
 )
 const { handleMoveParagraph } = useParagraphSort({
   paragraphs,
@@ -428,19 +428,13 @@ onMounted(() => {
                             <!-- 展开分段位置菜单 -->
                             <MoveParagraphAction
                               label="移动位置"
-                              divided
                               :disabled="loading"
                               @move="handleMoveParagraph(paragraph, $event)"
                               @visible-change="handleParagraphMenuVisibleChange(paragraph.id, 'position', $event)"
                               v-if="knowledgeDocPermission('docEdit')"
                             />
                             <!-- 删除当前分段 -->
-                            <MkDropdownItem
-                              v-if="knowledgeDocPermission('docDelete')"
-                              divided
-                              :disabled="loading"
-                              @click="handleDeleteParagraph(paragraph)"
-                            >
+                            <MkDropdownItem v-if="knowledgeDocPermission('docDelete')" :disabled="loading" @click="handleDeleteParagraph(paragraph)">
                               <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                               删除
                             </MkDropdownItem>
