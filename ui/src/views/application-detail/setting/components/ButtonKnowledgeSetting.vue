@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
-import { createSettings, DEFAULT_DESIGNATED_ANSWER, DEFAULT_PROBLEM_OPTIMIZATION_PROMPT, type ApplicationSettings } from '../settings'
+import { createSettings, DEFAULT_DESIGNATED_ANSWER, type ApplicationSettings } from '../settings'
 
 defineOptions({ name: 'ButtonKnowledgeSetting' })
 
@@ -131,13 +131,11 @@ function resetData() {
         />
       </el-form-item>
       <el-form-item label="问题优化"><el-switch v-model="formData.problem_optimization" size="small" /></el-form-item>
-      <el-form-item v-if="formData.problem_optimization" label="提示词">
-        <el-input
+      <el-form-item v-if="formData.problem_optimization" label="用户提示词" prop="problem_optimization_prompt">
+        <MdEditorMagnify
+          placeholder="用户提示词，可以引用系统中变量，如{{开始.question}}"
           v-model="formData.problem_optimization_prompt"
-          type="textarea"
-          maxlength="2048"
-          :rows="5"
-          :placeholder="DEFAULT_PROBLEM_OPTIMIZATION_PROMPT"
+          title="用户提示词"
         />
       </el-form-item>
     </el-form>
