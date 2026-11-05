@@ -580,6 +580,20 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             return True
 
 
+class KnowledgeWorkflowPublishSerializer(serializers.Serializer):
+    publish_name = serializers.CharField(
+        required=False, max_length=128, allow_null=True, allow_blank=True, label=_("Publish Name")
+    )
+    publish_desc = serializers.CharField(
+        required=False,
+        max_length=1024,
+        allow_null=True,
+        allow_blank=True,
+        trim_whitespace=False,
+        label=_("Publish Desc"),
+    )
+
+
 class KnowledgeWorkflowSerializer(serializers.Serializer):
     class Datasource(serializers.Serializer):
         type = serializers.CharField(required=True, label=_("type"))
@@ -861,11 +875,14 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         knowledge_id = serializers.UUIDField(required=True, label=_("knowledge id"))
 
-        def publish(self, with_valid=True):
+        def publish(self, instance=None, with_valid=True):
             if with_valid:
                 self.is_valid()
+                KnowledgeWorkflowPublishSerializer(data=instance or {}).is_valid(raise_exception=True)
             user_id = self.data.get("user_id")
             workspace_id = self.data.get("workspace_id")
+            publish_name = str((instance or {}).get("publish_name") or "").strip()
+            publish_desc = (instance or {}).get("publish_desc") or ""
             user = QuerySet(User).filter(id=user_id).first()
             knowledge_workflow = (
                 QuerySet(KnowledgeWorkflow)
@@ -875,7 +892,8 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             work_flow_version = KnowledgeWorkflowVersion(
                 work_flow=knowledge_workflow.work_flow,
                 knowledge_id=self.data.get("knowledge_id"),
-                name=timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S"),
+                name=publish_name or timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S"),
+                publish_desc=publish_desc,
                 publish_user_id=user_id,
                 publish_user_name=user.username,
                 workspace_id=workspace_id,

@@ -25,6 +25,7 @@ from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge_workflow import (
     KnowledgeWorkflowActionSerializer,
     KnowledgeWorkflowMcpSerializer,
+    KnowledgeWorkflowPublishSerializer,
     KnowledgeWorkflowSerializer,
 )
 
@@ -257,7 +258,7 @@ class KnowledgeWorkflowView(APIView):
             summary=_("Publishing an knowledge"),
             operation_id=_("Publishing an knowledge"),  # type: ignore
             parameters=KnowledgeWorkflowApi.get_parameters(),
-            request=None,
+            request=KnowledgeWorkflowPublishSerializer,
             responses=DefaultResultSerializer,
             tags=[_("Knowledge")],  # type: ignore
         )
@@ -284,7 +285,7 @@ class KnowledgeWorkflowView(APIView):
                         "user_id": request.user.id,
                         "workspace_id": workspace_id,
                     }
-                ).publish()
+                ).publish(request.data)
             )
 
     class Export(APIView):
