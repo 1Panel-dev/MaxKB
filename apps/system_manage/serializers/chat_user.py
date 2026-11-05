@@ -393,7 +393,8 @@ class ChatUserSerializer(serializers.Serializer):
             user = ChatUser.objects.filter(id=self.data.get("id")).first()
             self._update_user_fields(user, instance)
             user.save()
-            add_or_edit_user_group_relation(user, instance.get("user_group_ids", []))
+            if "user_group_ids" in instance:
+                add_or_edit_user_group_relation(user, instance.get("user_group_ids", []))
             return ChatUserInstanceSerializer(user).data
 
         @staticmethod

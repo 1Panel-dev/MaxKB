@@ -10,7 +10,7 @@ import uuid_utils.compat as uuid
 from common.config.embedding_config import ModelManage
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, BadRequest400, NotFound404
 from common.utils.common import get_file_content
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from django.db import transaction
@@ -138,27 +138,38 @@ class ModelSerializer(serializers.Serializer):
                 model_query = model_query.filter(workspace_id=workspace_id)
             model = model_query.first()
             if model is None:
-                raise AppApiException(500, _("Model does not exist"))
+                raise NotFound404(404, _("Model does not exist"))
             if model.workspace_id == "None":
                 raise AppApiException(500, _("Shared models cannot be deleted or modified"))
 
         def one(self, with_valid=False):
             if with_valid:
-                super().is_valid(raise_exception=True)
-            model = QuerySet(Model).get(id=self.data.get("id"), workspace_id=self.data.get("workspace_id", "None"))
+                self.is_valid(raise_exception=True)
+            model = (
+                QuerySet(Model)
+                .filter(
+                    id=self.initial_data.get("id"),
+                    workspace_id=self.initial_data.get("workspace_id", "None"),
+                )
+                .first()
+            )
+            if model is None:
+                raise NotFound404(404, _("Model does not exist"))
             return ModelSerializer.model_to_dict(model)
 
         def one_meta(self, with_valid=False):
-            model = None
             if with_valid:
-                super().is_valid(raise_exception=True)
-                model = (
-                    QuerySet(Model)
-                    .filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id", "None"))
-                    .first()
+                self.is_valid(raise_exception=True)
+            model = (
+                QuerySet(Model)
+                .filter(
+                    id=self.initial_data.get("id"),
+                    workspace_id=self.initial_data.get("workspace_id", "None"),
                 )
+                .first()
+            )
             if model is None:
-                raise AppApiException(500, _("Model does not exist"))
+                raise NotFound404(404, _("Model does not exist"))
             return {
                 "id": str(model.id),
                 "provider": model.provider,
@@ -210,7 +221,7 @@ class ModelSerializer(serializers.Serializer):
 
         def edit(self, instance: Dict, user_id: str, with_valid=True):
             if with_valid:
-                super().is_valid(raise_exception=True)
+                self.is_valid(raise_exception=True)
             model = (
                 QuerySet(Model)
                 .filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id", "None"))
@@ -219,19 +230,20 @@ class ModelSerializer(serializers.Serializer):
             credential, model_credential, provider_handler = ModelSerializer.Edit(data={**instance}).is_valid(
                 model=model
             )
-            try:
-                model.status = Status.SUCCESS
-                default_params = {item["field"]: item["default_value"] for item in model.model_params_form}
-                # 校验模型认证数据
-                provider_handler.is_valid_credential(
-                    model.model_type, instance.get("model_name"), credential, default_params, raise_exception=True
-                )
+            if any(instance.get(key) is not None for key in ("credential", "model_type", "model_name")):
+                try:
+                    model.status = Status.SUCCESS
+                    default_params = {item["field"]: item["default_value"] for item in model.model_params_form}
+                    # 仅连接凭据或基础模型变化时校验供应商连接，纯名称修改不应依赖外部服务可用性。
+                    provider_handler.is_valid_credential(
+                        model.model_type, instance.get("model_name"), credential, default_params, raise_exception=True
+                    )
 
-            except AppApiException as e:
-                if e.code == ValidCode.model_not_fount:
-                    model.status = Status.DOWNLOAD
-                else:
-                    raise e
+                except AppApiException as e:
+                    if e.code == ValidCode.model_not_fount:
+                        model.status = Status.DOWNLOAD
+                    else:
+                        raise e
             update_keys = ["credential", "name", "model_type", "model_name"]
             for update_key in update_keys:
                 if update_key in instance and instance.get(update_key) is not None:
@@ -273,13 +285,15 @@ class ModelSerializer(serializers.Serializer):
             ModelSerializer.model_to_dict(model)
 
             provider = model.provider
-            model_type = self.data.get("model_type")
-            model_name = self.data.get("model_name")
+            model_type = self.data.get("model_type") or model.model_type
+            model_name = self.data.get("model_name") or model.model_name
             credential = self.data.get("credential")
             provider_handler = ModelProvideConstants[provider]
             model_credential = ModelProvideConstants[provider].get_model_credential(model_type, model_name)
             source_model_credential = json.loads(rsa_long_decrypt(model.credential))
             source_encryption_model_credential = model_credential.encryption_dict(source_model_credential)
+            if credential is None:
+                credential = source_model_credential
             if credential is not None:
                 for k in source_encryption_model_credential.keys():
                     if k in credential and credential[k] == source_encryption_model_credential[k]:
@@ -297,7 +311,27 @@ class ModelSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_("workspace id"), max_length=128)
 
         def is_valid(self, *, raise_exception=False):
-            super().is_valid(raise_exception=True)
+            if not super().is_valid(raise_exception=raise_exception):
+                return False
+            provider = self.data.get("provider")
+            try:
+                provider_handler = ModelProvideConstants[provider]
+            except KeyError as error:
+                raise BadRequest400(400, _("provider is invalid")) from error
+            model_params_form = self.data.get("model_params_form")
+            if not isinstance(model_params_form, list):
+                raise BadRequest400(400, _("model_params_form must be a list"))
+            for index, item in enumerate(model_params_form):
+                if not isinstance(item, dict):
+                    raise BadRequest400(
+                        400,
+                        _("The {index}th item in model_params_form must be a dictionary").format(index=index),
+                    )
+                if "field" not in item or "default_value" not in item:
+                    raise BadRequest400(
+                        400,
+                        _("The field and default_value fields are required for the {index}th item").format(index=index),
+                    )
             if (
                 QuerySet(Model)
                 .filter(name=self.data.get("name"), workspace_id=self.data.get("workspace_id", "None"))
@@ -306,14 +340,15 @@ class ModelSerializer(serializers.Serializer):
                 raise AppApiException(
                     500, _("base model【{model_name}】already exists").format(model_name=self.data.get("name"))
                 )
-            default_params = {item["field"]: item["default_value"] for item in self.data.get("model_params_form")}
-            ModelProvideConstants[self.data.get("provider")].is_valid_credential(
+            default_params = {item["field"]: item["default_value"] for item in model_params_form}
+            provider_handler.is_valid_credential(
                 self.data.get("model_type"),
                 self.data.get("model_name"),
                 self.data.get("credential"),
                 default_params,
                 raise_exception=True,
             )
+            return True
 
         def insert(self, workspace_id, with_valid=True):
             status = Status.SUCCESS
@@ -511,13 +546,10 @@ class ModelSerializer(serializers.Serializer):
             )
 
             if model is None:
-                raise AppApiException(500, _("Model does not exist"))
+                raise NotFound404(404, _("Model does not exist"))
 
-            if model.workspace_id == "None":
-                return model
-
-            if model.workspace_id != validated_data["workspace_id"]:
-                raise AppApiException(500, _("Model does not exist"))
+            if model.workspace_id != validated_data.get("workspace_id"):
+                raise NotFound404(404, _("Model does not exist"))
 
             return model
 

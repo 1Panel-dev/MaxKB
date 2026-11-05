@@ -645,7 +645,8 @@ class UserManageSerializer(serializers.Serializer):
             self._check_admin_modification(user, instance)
             self._update_user_fields(user, instance)
             update_user_role(instance, user, user_id)
-            set_user_groups(user.id, instance)
+            if "user_group_ids" in instance:
+                set_user_groups(user.id, instance)
             user.save()
             return UserInstanceSerializer(user).data
 

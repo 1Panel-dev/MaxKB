@@ -12,6 +12,22 @@ from models_provider.tools import cache_base_model_list, get_cached_base_model_l
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from common.exception.app_exception import BadRequest400
+
+
+def _require_query_params(query_params, names):
+    for name in names:
+        if not query_params.get(name):
+            raise BadRequest400(400, _("%(key)s is required") % {"key": name})
+
+
+def _get_provider(provider):
+    if not provider:
+        raise BadRequest400(400, _("provider is required"))
+    if provider not in ModelProvideConstants:
+        raise BadRequest400(400, _("provider is invalid"))
+    return ModelProvideConstants[provider]
+
 
 class Provide(APIView):
     authentication_classes = [TokenAuth]
@@ -59,7 +75,7 @@ class Provide(APIView):
         )
         def get(self, request: Request):
             provider = request.query_params.get("provider")
-            return result.success(ModelProvideConstants[provider].get_model_type_list())
+            return result.success(_get_provider(provider).get_model_type_list())
 
     class ModelList(APIView):
         authentication_classes = [TokenAuth]
@@ -75,7 +91,13 @@ class Provide(APIView):
         )
         @staticmethod
         def _get_model_list(provider, model_type, api_key, api_base, credential, search):
-            model_list = ModelProvideConstants[provider].get_model_list(
+            provider_handler = _get_provider(provider)
+            if not model_type:
+                raise BadRequest400(400, _("model_type is required"))
+            model_type_list = [item.get("value") for item in provider_handler.get_model_type_list()]
+            if model_type not in model_type_list:
+                raise BadRequest400(400, _("model_type is invalid"))
+            model_list = provider_handler.get_model_list(
                 model_type,
                 api_key=api_key,
                 api_base=api_base,
@@ -163,9 +185,11 @@ class Provide(APIView):
             tags=[_("Model")],  # type: ignore
         )
         def get(self, request: Request):
+            _require_query_params(request.query_params, ("provider", "model_type", "model_name"))
             provider = request.query_params.get("provider")
             model_type = request.query_params.get("model_type")
             model_name = request.query_params.get("model_name")
+            _get_provider(provider)
 
             return result.success(get_default_model_params_setting(provider, model_type, model_name))
 
@@ -182,9 +206,8 @@ class Provide(APIView):
             tags=[_("Model")],  # type: ignore
         )
         def get(self, request: Request):
+            _require_query_params(request.query_params, ("provider", "model_type"))
             provider = request.query_params.get("provider")
             model_type = request.query_params.get("model_type")
             model_name = request.query_params.get("model_name")
-            return result.success(
-                ModelProvideConstants[provider].get_model_credential(model_type, model_name).to_form_list()
-            )
+            return result.success(_get_provider(provider).get_model_credential(model_type, model_name).to_form_list())

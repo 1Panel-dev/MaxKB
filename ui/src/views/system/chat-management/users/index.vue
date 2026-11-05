@@ -200,7 +200,7 @@ onMounted(() => loadChatUsers())
           </template>
         </el-table-column>
 
-        <el-table-column prop="user_group_names" width="180" label="用户组">
+        <el-table-column prop="user_group_names" width="180" label="对话用户组">
           <template #default="{ row }">
             <MkTagGroup v-if="row.user_group_names?.length" :tags="row.user_group_names" />
             <span v-else>-</span>

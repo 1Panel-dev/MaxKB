@@ -237,43 +237,43 @@ def _type_impl_map():
         ModelTypeConst.LLM: (
             aliyun_bai_lian_llm_model_credential,
             BaiLianChatModel,
-            _("Alibaba Cloud Bailian LLM model"),
+            _(""),
         ),
         ModelTypeConst.EMBEDDING: (
             aliyun_bai_lian_embedding_model_credential,
             AliyunBaiLianEmbedding,
-            _("Alibaba Cloud Bailian embedding model"),
+            _(""),
         ),
         ModelTypeConst.STT: (
             aliyun_bai_lian_stt_model_credential,
             AliyunBaiLianSpeechToText,
-            _("Alibaba Cloud Bailian speech-to-text model"),
+            _(""),
         ),
         ModelTypeConst.TTS: (
             aliyun_bai_lian_tts_model_credential,
             AliyunBaiLianTextToSpeech,
-            _("Alibaba Cloud Bailian TTS model"),
+            _(""),
         ),
-        ModelTypeConst.IMAGE: (qwenvl_model_credential, QwenVLChatModel, _("Alibaba Cloud Bailian vision model")),
+        ModelTypeConst.IMAGE: (qwenvl_model_credential, QwenVLChatModel, _("")),
         ModelTypeConst.TTI: (
             qwentti_model_credential,
             QwenTextToImageModel,
-            _("Alibaba Cloud Bailian image generation model"),
+            _(""),
         ),
         ModelTypeConst.RERANKER: (
             aliyun_bai_lian_model_credential,
             AliyunBaiLianReranker,
-            _("Alibaba Cloud Bailian rerank model"),
+            _(""),
         ),
         ModelTypeConst.TTV: (
             aliyun_bai_lian_ttv_model_credential,
             GenerationVideoModel,
-            _("Alibaba Cloud Bailian text-to-video model"),
+            _(""),
         ),
         ModelTypeConst.ITV: (
             aliyun_bai_lian_itv_model_credential,
             GenerationVideoModel,
-            _("Alibaba Cloud Bailian image-to-video model"),
+            _(""),
         ),
     }
 
