@@ -29,8 +29,17 @@ const formData = ref<McpSetting>({ mcp_servers: '', mcp_source: 'referencing', m
 const mcpOptions = ref<ToolItem[]>([])
 const loading = ref(false)
 
+// 接口可能返回对象配置；空对象表示未配置，非空对象转为 JSON 文本供输入框编辑。
+function normalizeMcpServers(value: unknown): string {
+  if (value == null) return ''
+  if (typeof value === 'string') return value
+  if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) return ''
+  return JSON.stringify(value, null, 2) ?? ''
+}
+
 function open(setting: McpSetting) {
   formData.value = cloneDeep(setting)
+  formData.value.mcp_servers = normalizeMcpServers(setting.mcp_servers)
   if (formData.value.mcp_servers) formData.value.mcp_source = 'custom'
   visible.value = true
 
@@ -107,10 +116,14 @@ defineExpose({ open })
 
       <el-form-item
         v-else
-        label="MCP 服务配置"
+        class="mk-hide-asterisk"
         prop="mcp_servers"
         :rules="{ whitespace: true, required: true, message: '请输入 MCP 服务配置', trigger: 'blur' }"
       >
+        <template #label>
+          <span class="mk-required">MCP 服务配置</span>
+          <span class="text-N600">（仅支持 SSE、Streamable HTTP 调用方式）</span>
+        </template>
         <el-input v-model="formData.mcp_servers" :placeholder="MCP_SERVER_EXAMPLE" :rows="10" type="textarea" />
       </el-form-item>
     </el-form>
