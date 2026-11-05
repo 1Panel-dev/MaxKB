@@ -29,6 +29,7 @@ from tools.api.tool import (
     ToolTreeReadAPI,
 )
 from tools.models import Tool, ToolScope
+from tools.permissions import get_tool_read_permission
 from tools.serializers.tool import ToolBatchOperateSerializer, ToolSerializer, ToolTreeSerializer
 
 
@@ -179,7 +180,7 @@ class ToolView(APIView):
             tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
+            get_tool_read_permission,
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission(
