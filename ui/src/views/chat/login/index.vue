@@ -136,8 +136,8 @@ onBeforeMount(async () => {
 
 <template>
   <div class="chat-login flex-center flex-col">
-    <div class="mb-6 flex-col-center w-100 max-w-full gap-4">
-      <img src="@/assets/mk-logo/MaxKB-logo.svg" alt="MaxKB" class="h-9" />
+    <div class="mb-6 flex-align-center gap-4 max-w-full">
+      <ApplicationIcon :icon="auth.authProfile?.logo" :size="32" class="shrink-0" />
       <h2 class="max-w-full truncate" :title="loginTitle">{{ loginTitle }}</h2>
     </div>
     <el-card class="chat-login__card w-100">

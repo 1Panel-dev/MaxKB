@@ -2,7 +2,7 @@
 import { computed, provide, ref, useTemplateRef, type Component } from 'vue'
 import type { AxiosProgressEvent } from 'axios'
 import type LogicFlow from '@logicflow/core'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
@@ -14,9 +14,8 @@ import Result from '@/views/workflow/knowledge/debug/action/Result.vue'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowImportDocumentDrawer' })
-const props = defineProps<{ knowledgeId: string }>()
+const props = defineProps<{ api: typeof WorkflowApi; knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
-const { resourceApi } = useKnowledgeDetailContext()
 
 /* 复用工作流 Action，上传适配保留进度、取消和上传中保护。 */
 const uploadingCount = ref(0)
@@ -107,7 +106,7 @@ function handleSubmit() {
       const data = getActionData()
       if (!data) return
       formPayload.value[step] = data
-      return resourceApi.workflow?.postKnowledgeWorkflowImport(props.knowledgeId, formPayload.value).then((action) => {
+      return props.api.postKnowledgeWorkflowImport(props.knowledgeId, formPayload.value).then((action) => {
         actionId.value = action.id
         active.value = 'result'
         emit('refresh')
@@ -149,6 +148,7 @@ defineExpose({ open })
       <keep-alive :key="actionKey" :include="['DataSource', 'KnowledgeBase']">
         <component
           :is="actionComponents[active]"
+          :api="api"
           ref="actionRef"
           v-model:loading="loading"
           :workflow="currentWorkflow"

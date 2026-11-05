@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import type LogicFlow from '@logicflow/core'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import WebImportDocumentDrawer from './WebImportDocumentDrawer.vue'
@@ -10,6 +11,7 @@ import WorkflowImportDocumentDrawer from './WorkflowImportDocumentDrawer.vue'
 defineOptions({ name: 'ButtonImportDocument' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
+  workflowApi?: typeof WorkflowApi
   knowledgeId: string
   knowledgeType: string
   folderToken?: string
@@ -35,6 +37,7 @@ function handleOpenImport() {
       larkDrawerMounted.value = true
       return nextTick(() => larkDrawerRef.value?.open())
     case KNOWLEDGE_TYPE_KEY.WORKFLOW:
+      if (!props.workflowApi) return
       workflowDrawerMounted.value = true
       return nextTick(() => workflowDrawerRef.value?.open(props.workflow))
   }
@@ -65,8 +68,9 @@ function handleOpenImport() {
     @closed="larkDrawerMounted = false"
   />
   <WorkflowImportDocumentDrawer
-    v-if="workflowDrawerMounted"
+    v-if="workflowDrawerMounted && workflowApi"
     ref="workflowDrawerRef"
+    :api="workflowApi"
     :knowledge-id="knowledgeId"
     @refresh="emit('refresh')"
     @closed="workflowDrawerMounted = false"
