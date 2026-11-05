@@ -72,11 +72,23 @@ class ChatAuthProfileSerializer(serializers.Serializer):
         if application_access_token.authentication:
             if "LOCAL" not in login_value:
                 login_value.insert(0, "LOCAL")
+        application_setting_model = DatabaseModelManage.get_model("application_setting")
+        application_setting = None
+        if application_setting_model is not None:
+            application_setting = (
+                QuerySet(application_setting_model)
+                .filter(application_id=application_access_token.application_id)
+                .first()
+            )
         return {
             "max_attempts": application_access_token.authentication_value.get("max_attempts", 1),
             "enable_auth": application_access_token.authentication,
             "login_value": login_value,
             "rsa_key": get_key_pair_by_sql().get("key"),
+            "custom_theme": application_setting.custom_theme
+            if application_setting
+            else {"theme_color": "", "header_font_color": ""},
+            "logo": application_setting.avatar if application_setting else "./favicon.ico",
             "meta": {
                 "application_name": application_access_token.application.name,
                 "application_id": str(application_access_token.application_id),
@@ -84,27 +96,45 @@ class ChatAuthProfileSerializer(serializers.Serializer):
         }
 
 
+keys_mapping = {"theme": "theme_color"}
+
+
 class PortalAuthProfileSerializer(serializers.Serializer):
     @staticmethod
     def profile():
         portal = Portal.objects.first()
+        auth_setting = DatabaseModelManage.get_model("auth_setting")
+        result = {}
+        if auth_setting is not None:
+            system_params = QuerySet(auth_setting).filter(param_key__in=keys_mapping.keys())
+            result["custom_theme"] = {keys_mapping[sp.param_key]: sp.param_value for sp in system_params}
+        else:
+            result["custom_theme"] = {"theme_color": ""}
         if portal is None:
             return {
-                "max_attempts": 1,
-                "enable_auth": False,
-                "login_value": ["LOCAL"],
-                "rsa_key": get_key_pair_by_sql().get("key"),
-                "meta": {},
+                **{
+                    "max_attempts": 1,
+                    "enable_auth": False,
+                    "login_value": ["LOCAL"],
+                    "rsa_key": get_key_pair_by_sql().get("key"),
+                    "meta": {},
+                    "logo": "./favicon.ico",
+                },
+                **result,
             }
         if not portal.enable_public_access:
             raise NotFound404(404, _("Invalid access_token"))
         auth_config = portal.auth_config
         return {
-            "max_attempts": auth_config.get("max_attempts", 1),
-            "enable_auth": portal.enable_auth,
-            "login_value": auth_config.get("login_value", []),
-            "rsa_key": get_key_pair_by_sql().get("key"),
-            "meta": {},
+            **{
+                "max_attempts": auth_config.get("max_attempts", 1),
+                "enable_auth": portal.enable_auth,
+                "login_value": auth_config.get("login_value", []),
+                "rsa_key": get_key_pair_by_sql().get("key"),
+                "meta": {},
+                "logo": portal.logo or "./favicon.ico",
+            },
+            **result,
         }
 
 
