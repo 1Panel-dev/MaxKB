@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import ButtonImprove from './improve/ButtonImprove.vue'
+import LogMessageFeedback from './feedback/index.vue'
+import FeedbackCard from './feedback/FeedbackCard.vue'
 import { computed } from 'vue'
 import type { ChatContent } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
@@ -85,9 +87,11 @@ const openExecutionDetail = () => {
           :answer="answerText"
         />
       </span>
+      <!-- 反馈 -->
+      <LogMessageFeedback :status="meta.feedback?.vote_status" />
       <!-- 时间 -->
       <span v-if="meta.createTime" class="text-N600 ml-1">{{ datetimeFormat(meta.createTime) }}</span>
     </div>
-    <div></div>
+    <FeedbackCard v-if="meta.feedback && (meta.feedback.vote_status === '0' || meta.feedback.vote_status === '1')" :feedback="meta.feedback" />
   </div>
 </template>

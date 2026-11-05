@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, inject } from 'vue'
-// import Feedback from './feedback/index.vue'
-import type { ChatContent } from '@/api/types'
+import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
+import ButtonFeedback from './feedback/ButtonFeedback.vue'
+import FeedbackCard from './feedback/FeedbackCard.vue'
+import { MsgSuccess } from '@/utils/message'
+import type { ChatContent, ChatFeedback } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
 import { datetimeFormat } from '@/utils/time'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
@@ -12,6 +14,16 @@ import { SHAREABLE_VIEWS, useShareLinkStoreOptional } from '../message-list/shar
 import { useViewType } from '../../view/index'
 
 const props = defineProps<{ message: ChatMessage }>()
+const emit = defineEmits<{ resize: [] }>()
+const footerRef = ref<HTMLElement>()
+
+// 反馈展开动画逐帧改变高度，由消息列表决定是否继续跟随底部。
+let footerObserver: ResizeObserver | undefined
+onMounted(() => {
+  footerObserver = new ResizeObserver(() => emit('resize'))
+  if (footerRef.value) footerObserver.observe(footerRef.value)
+})
+onBeforeUnmount(() => footerObserver?.disconnect())
 
 // 仅提供分享服务的视图（对话、门户）显示分享入口；进入分享时预先勾选当前回答所属轮次。
 const showShare = SHAREABLE_VIEWS.includes(useViewType())
@@ -48,12 +60,46 @@ const answerText = computed(() => collectAnswerText(props.message.content))
 const openExecutionDetail = () => {
   detail.showExecutionDetail(meta.value.executionDetails || [])
 }
+// 消息反馈：Footer 协调按钮、草稿面板与提交状态。
+const canFeedback = computed(() => Boolean(messageList?.feedback && props.message.recordId && props.message.record))
+const draftStatus = ref<'0' | '1'>()
+const reason = ref<ChatFeedback['vote_reason']>(null)
+const content = ref('')
+const submitting = ref(false)
+const currentStatus = computed(() => props.message.record?.feedback?.vote_status ?? '-1')
+
+// 已提交反馈先撤销再重新评价，避免后端重复投票；请求失败保留草稿。
+async function saveFeedback(data: ChatFeedback) {
+  if (!messageList?.feedback || !props.message.recordId || submitting.value) return
+  const message = props.message
+  submitting.value = true
+  try {
+    await messageList.feedback(message.recordId!, data)
+    if (message.record) message.record.feedback = data
+    draftStatus.value = undefined
+    MsgSuccess(data.vote_status === '-1' ? '已取消反馈' : '感谢你的反馈')
+  } catch {
+    // 请求层统一提示错误，保留当前填写内容供重试。
+  } finally {
+    submitting.value = false
+  }
+}
+
+function openFeedback(status: '0' | '1') {
+  if (currentStatus.value === status) {
+    void saveFeedback({ vote_status: '-1' })
+    return
+  }
+  draftStatus.value = draftStatus.value === status ? undefined : status
+  reason.value = null
+  content.value = ''
+}
 </script>
 
 <style scoped lang="scss"></style>
 
 <template>
-  <div class="mk-conversation-message-footer space-y-2">
+  <div ref="footerRef" class="mk-conversation-message-footer space-y-2">
     <!-- 助手消息底部信息栏:知识来源 / 执行详情 / Tokens · 耗时  -->
     <div class="flex-align-center gap-1">
       <el-button v-if="meta.knowledgeCount" text class="-ml-1">
@@ -87,9 +133,19 @@ const openExecutionDetail = () => {
           </el-button>
         </MkTooltip>
       </span>
-
-      <!-- <Feedback :message="message" /> -->
-      <span v-if="meta.createTime" class="text-N600 ml-2">{{ datetimeFormat(meta.createTime) }}</span>
+      <ButtonFeedback v-if="canFeedback" :current-status="currentStatus" :submitting="submitting" @select="openFeedback" />
+      <span v-if="meta.createTime" class="text-N600 ml-1">{{ datetimeFormat(meta.createTime) }}</span>
     </div>
+    <el-collapse-transition>
+      <FeedbackCard
+        v-if="draftStatus"
+        v-model:reason="reason"
+        v-model:content="content"
+        :status="draftStatus"
+        :submitting="submitting"
+        @cancel="draftStatus = undefined"
+        @submit="saveFeedback({ vote_status: draftStatus, vote_reason: reason, vote_other_content: reason === 'other' ? content.trim() : '' })"
+      />
+    </el-collapse-transition>
   </div>
 </template>
