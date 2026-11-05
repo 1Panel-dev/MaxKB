@@ -13,6 +13,82 @@ class ModelCreateResponse(ResultSerializer):
         return ModelModelSerializer()
 
 
+class ModelDetailSerializer(serializers.Serializer):
+    id = serializers.UUIDField(required=True, label=_("model id"))
+    provider = serializers.CharField(required=True, label=_("provider"))
+    name = serializers.CharField(required=True, label=_("model name"))
+    model_type = serializers.CharField(required=True, label=_("model type"))
+    model_name = serializers.CharField(required=True, label=_("base model"))
+    status = serializers.CharField(required=True, label=_("status"))
+    meta = serializers.DictField(required=False, allow_null=True, label=_("model meta"))
+    credential = serializers.DictField(required=False, label=_("certification information"))
+    workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+    nick_name = serializers.CharField(required=False, allow_blank=True, label=_("nick name"))
+    username = serializers.CharField(required=False, allow_blank=True, label=_("username"))
+
+
+class ModelMetaSerializer(serializers.Serializer):
+    id = serializers.UUIDField(required=True, label=_("model id"))
+    provider = serializers.CharField(required=True, label=_("provider"))
+    name = serializers.CharField(required=True, label=_("model name"))
+    model_type = serializers.CharField(required=True, label=_("model type"))
+    model_name = serializers.CharField(required=True, label=_("base model"))
+    status = serializers.CharField(required=True, label=_("status"))
+    meta = serializers.DictField(required=False, allow_null=True, label=_("model meta"))
+    workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+
+
+class ModelSummarySerializer(serializers.Serializer):
+    id = serializers.UUIDField(required=True, label=_("model id"))
+    provider = serializers.CharField(required=True, label=_("provider"))
+    name = serializers.CharField(required=True, label=_("model name"))
+    model_type = serializers.CharField(required=True, label=_("model type"))
+    model_name = serializers.CharField(required=True, label=_("base model"))
+    status = serializers.CharField(required=True, label=_("status"))
+    meta = serializers.DictField(required=False, allow_null=True, label=_("model meta"))
+    user = serializers.UUIDField(required=False, label=_("user id"))
+    user_id = serializers.UUIDField(required=False, label=_("user id"))
+    username = serializers.CharField(required=False, allow_blank=True, label=_("username"))
+    nick_name = serializers.CharField(required=False, allow_blank=True, label=_("nick name"))
+    credential = serializers.CharField(required=False, label=_("certification information"))
+    model_params_form = serializers.JSONField(required=False, label=_("parameter configuration"))
+    workspace_id = serializers.CharField(required=False, label=_("workspace id"))
+    workspace_name = serializers.CharField(required=False, allow_blank=True, label=_("workspace name"))
+    create_time = serializers.DateTimeField(required=False, label=_("create time"))
+    update_time = serializers.DateTimeField(required=False, label=_("update time"))
+    resource_count = serializers.IntegerField(required=False, label=_("resource count"))
+
+
+class ModelGroupedListSerializer(serializers.Serializer):
+    shared_model = ModelSummarySerializer(many=True)
+    model = ModelSummarySerializer(many=True)
+
+
+class ModelDetailResponse(ResultSerializer):
+    def get_data(self):
+        return ModelDetailSerializer()
+
+
+class ModelMetaResponse(ResultSerializer):
+    def get_data(self):
+        return ModelMetaSerializer()
+
+
+class ModelGroupedListResponse(APIMixin):
+    @staticmethod
+    def get_response():
+        class ModelGroupedListResult(ResultSerializer):
+            def get_data(self):
+                return ModelGroupedListSerializer()
+
+        return ModelGroupedListResult
+
+
+class ModelSummaryListResponse(ResultSerializer):
+    def get_data(self):
+        return ModelSummarySerializer(many=True)
+
+
 class ModelListResponse(APIMixin):
     @staticmethod
     def get_response():
@@ -118,7 +194,7 @@ class GetModelApi(APIMixin):
 
     @staticmethod
     def get_response():
-        return ModelCreateResponse
+        return ModelDetailResponse
 
 
 class ModelEditApi(APIMixin):
@@ -128,10 +204,10 @@ class ModelEditApi(APIMixin):
 
     @staticmethod
     def get_response():
-        return ModelCreateResponse
+        return ModelDetailResponse
 
 
 class DefaultModelResponse(APIMixin):
     @staticmethod
     def get_response():
-        return DefaultResultSerializer()
+        return DefaultResultSerializer

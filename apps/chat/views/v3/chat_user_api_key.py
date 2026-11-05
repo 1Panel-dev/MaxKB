@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from common.auth import ChatTokenAuth
 from common.log.log import log
-from common.result import result
-from drf_spectacular.utils import extend_schema
+from common.result import DefaultResultSerializer, result
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -20,7 +20,13 @@ class ChatUserApiKeyView(APIView):
         description=_("Create ChatUserAPIKey"),
         summary=_("Create ChatUserAPIKey"),
         operation_id="V3 Create ChatUserAPIKey",
-        responses=None,
+        responses={
+            200: None,
+            401: OpenApiResponse(
+                response=DefaultResultSerializer,
+                description=_("Authentication required"),
+            ),
+        },
         tags=[_("V3 Chat User API Key")],  # type: ignore
     )
     @log(menu="Chat User API Key", operate="Add chat user API key")
@@ -32,7 +38,13 @@ class ChatUserApiKeyView(APIView):
         description=_("Get ChatUserAPIKey"),
         summary=_("Get ChatUserAPIKey"),
         operation_id="V3 Get ChatUserAPIKey",
-        responses=None,
+        responses={
+            200: None,
+            401: OpenApiResponse(
+                response=DefaultResultSerializer,
+                description=_("Authentication required"),
+            ),
+        },
         tags=[_("V3 Chat User API Key")],  # type: ignore
     )
     @log(menu="Chat User API Key", operate="Get chat user API key")
