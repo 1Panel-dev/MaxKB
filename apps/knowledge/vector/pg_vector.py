@@ -8,6 +8,7 @@
 """
 
 import json
+import math
 import os
 from abc import ABC, abstractmethod
 from typing import Dict, List
@@ -20,11 +21,29 @@ from langchain_core.embeddings import Embeddings
 from common.db.search import generate_sql_by_query_dict
 from common.db.sql_execute import select_list
 from common.utils.common import get_file_content
-from common.utils.ts_vecto_util import to_ts_vector, to_query
+from common.utils.ts_vecto_util import to_ts_vector, to_query, get_query_words
 from knowledge.models import Embedding, SearchMode, SourceType, Termbase
 from knowledge.vector.base_vector import BaseVectorStore, normalize_for_embedding
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
+
+KEYWORD_MIN_MATCH_FLOOR = 0.1
+
+
+def _keyword_query_parts(query_text, terms):
+    """计算关键词检索共享的：去重词数组、OR 查询串、软 AND 门槛比例。"""
+    or_query = to_query(query_text, user_words=terms)
+    words = list(dict.fromkeys(get_query_words(query_text, user_words=terms)))
+    min_match = float(CONFIG.get("SEARCH_KEYWORD_MIN_MATCH") or 0.3)
+    return words, or_query, min_match
+
+
+def _keyword_search_with_fallback(min_match, run):
+    """软 AND 门槛：先按 min_match 跑，空结果且未到下限时降到 0.1 重试一次。"""
+    result = run(min_match)
+    if not result and min_match > KEYWORD_MIN_MATCH_FLOOR:
+        result = run(KEYWORD_MIN_MATCH_FLOOR)
+    return result
 
 
 class PGVector(BaseVectorStore):
@@ -297,10 +316,15 @@ class KeywordsSearch(ISearch):
             if knowledge_id_list
             else None
         )
-        embedding_model = select_list(
-            exec_sql, [to_query(query_text, user_words=terms), *exec_params, to_query(query_text, user_words=terms), similarity, top_number]
-        )
-        return embedding_model
+        words, or_query, min_match = _keyword_query_parts(query_text, terms)
+
+        def run(match: float):
+            min_match_n = math.ceil(len(words) * match)
+            return select_list(
+                exec_sql, [or_query, *exec_params, or_query, json.dumps(words), min_match_n, similarity, top_number]
+            )
+
+        return _keyword_search_with_fallback(min_match, run)
 
     def support(self, search_mode: SearchMode):
         return search_mode.value == SearchMode.keywords.value
@@ -329,23 +353,30 @@ class BlendSearch(ISearch):
         )
         vector_weight = float(CONFIG.get("SEARCH_VECTOR_WEIGHT") or 0.5)
         keyword_weight = 1 - vector_weight
-        embedding_model = select_list(
-            exec_sql,
-            [
-                len(query_embedding),
-                json.dumps(query_embedding),
-                *exec_params,
-                len(query_embedding),
-                json.dumps(query_embedding),
-                top_number,
-                vector_weight,
-                keyword_weight,
-                to_query(query_text, user_words=terms),
-                similarity,
-                top_number,
-            ],
-        )
-        return embedding_model
+        words, or_query, min_match = _keyword_query_parts(query_text, terms)
+
+        def run(match: float):
+            min_match_n = math.ceil(len(words) * match)
+            return select_list(
+                exec_sql,
+                [
+                    len(query_embedding),
+                    json.dumps(query_embedding),
+                    *exec_params,
+                    len(query_embedding),
+                    json.dumps(query_embedding),
+                    top_number,
+                    vector_weight,
+                    keyword_weight,
+                    or_query,
+                    json.dumps(words),
+                    min_match_n,
+                    similarity,
+                    top_number,
+                ],
+            )
+
+        return _keyword_search_with_fallback(min_match, run)
 
     def support(self, search_mode: SearchMode):
         return search_mode.value == SearchMode.blend.value
