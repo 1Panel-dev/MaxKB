@@ -26,6 +26,7 @@ import {
 } from './application-card/action-dropdown'
 import ButtonCreateApplication from './components/ButtonCreateApplication.vue'
 import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
+import ButtonBatchCleanStrategy from './components/ButtonBatchCleanStrategy.vue'
 import perm from '@/permission/index.ts'
 import { getWorkspaceId } from '@/utils/resource-context.ts'
 
@@ -137,6 +138,11 @@ function cancelBatchSelection() {
   selectedApplicationIds.value = []
 }
 
+function handleBatchCleanStrategySuccess() {
+  cancelBatchSelection()
+  return refreshApplications()
+}
+
 function handleApplicationSelect(applicationId: string, selected: boolean) {
   if (selected) {
     if (!selectedApplicationIds.value.includes(applicationId)) selectedApplicationIds.value.push(applicationId)
@@ -219,7 +225,11 @@ function handleBatchDelete() {
         <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 批量选择 -->
-          <span v-if="perm.application.workspace.batchMove() || perm.application.workspace.batchDelete()">
+          <span
+            v-if="
+              perm.application.workspace.batchMove() || perm.application.workspace.batchCleanStrategy() || perm.application.workspace.batchDelete()
+            "
+          >
             <el-button :disabled="!applicationData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
               <MkIcon name="icon_Batch_outlined" />
               <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
@@ -343,6 +353,12 @@ function handleBatchDelete() {
           >
             移动到
           </el-button>
+          <!-- 批量设置清除策略 -->
+          <ButtonBatchCleanStrategy
+            v-if="perm.application.workspace.batchCleanStrategy()"
+            :application-ids="selectedApplicationIds"
+            @refresh="handleBatchCleanStrategySuccess"
+          />
           <el-button
             v-if="perm.application.workspace.batchDelete()"
             type="danger"

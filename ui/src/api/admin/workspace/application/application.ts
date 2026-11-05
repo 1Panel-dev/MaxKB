@@ -5,6 +5,7 @@ import type {
   ApplicationAccessTokenPayload,
   ApplicationApiKeyEnable,
   ApplicationApiKeyEnablePayload,
+  ApplicationCleanTimePayload,
   ApplicationDetail,
   ApplicationDisplaySetting,
   ApplicationFormPayload,
@@ -105,6 +106,15 @@ const putBatchMoveApplications = (applicationIds: string[], folderId: string) =>
   return put<{ folder_id: string; id_list: string[] }, boolean>(`${getPrefix()}/batch_move`, { folder_id: folderId, id_list: applicationIds })
 }
 
+/** 批量设置工作空间智能体对话日志清除策略。 */
+const putBatchApplicationCleanTime = (applicationIds: string[], cleanTime: number, fileCleanTime: number) => {
+  return put<ApplicationCleanTimePayload, boolean>(`${getPrefix()}/batch_clean_time`, {
+    id_list: applicationIds,
+    clean_time: cleanTime,
+    file_clean_time: fileCleanTime,
+  })
+}
+
 /** 发布工作空间智能体。 */
 const putApplicationPublish = (applicationId: string, publishName: string, publishDesc?: string) => {
   return put<Record<string, unknown>, ApplicationDetail>(`${getPrefix()}/${applicationId}/publish`, {
@@ -132,6 +142,7 @@ export default {
   putMoveApplication,
   putBatchDeleteApplications,
   putBatchMoveApplications,
+  putBatchApplicationCleanTime,
   putApplicationPublish,
   getAllApplication,
 }

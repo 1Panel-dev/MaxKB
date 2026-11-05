@@ -1,6 +1,6 @@
 import { del, get, post, postExportExcel, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { ChatLog, ChatLogAddKnowledgePayload, ChatLogRecord, Dict } from '@/api/types'
+import type { ApplicationCleanTimePayload, ChatLog, ChatLogAddKnowledgePayload, ChatLogRecord, Dict } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => `/workspace/${getWorkspaceId()}/application`
@@ -15,7 +15,7 @@ const postExportChatLog = (applicationId: string, applicationName: string, query
 
 /** 保存当前智能体的日志与文件清除策略。 */
 const putChatLogCleanTime = (applicationId: string, cleanTime: number, fileCleanTime: number) =>
-  put<{ id_list: string[]; clean_time: number; file_clean_time: number }, boolean>(`${getPrefix()}/batch_clean_time`, {
+  put<ApplicationCleanTimePayload, boolean>(`${getPrefix()}/batch_clean_time`, {
     id_list: [applicationId],
     clean_time: cleanTime,
     file_clean_time: fileCleanTime,
