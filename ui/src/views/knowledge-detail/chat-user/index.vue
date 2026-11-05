@@ -253,7 +253,7 @@ onMounted(() => loadChatUserGroups())
               <el-checkbox
                 :model-value="allChecked"
                 :indeterminate="allIndeterminate"
-                :disabled="!knowledgeChatUserPermission('knowledgeChatUserEdit')"
+                :disabled="authorizationDisabled || !knowledgeChatUserPermission('knowledgeChatUserEdit')"
                 @change="handleCheckAll"
               >
                 授权
@@ -263,7 +263,7 @@ onMounted(() => loadChatUserGroups())
               <!-- 设置对话用户授权 -->
               <el-checkbox
                 :model-value="row.is_auth"
-                :disabled="!knowledgeChatUserPermission('knowledgeChatUserEdit')"
+                :disabled="authorizationDisabled || !knowledgeChatUserPermission('knowledgeChatUserEdit')"
                 @change="(value: CheckboxValueType) => handleRowChange(value, row)"
               />
             </template>
