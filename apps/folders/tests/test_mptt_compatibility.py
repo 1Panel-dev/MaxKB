@@ -76,6 +76,18 @@ class FolderTreeCompatibilityTests(TestCase):
                 self.assertEqual(list(leaf.get_ancestors().values_list("id", flat=True)), [root.id, right.id, left.id])
                 self.assert_valid_tree(model, root.workspace_id)
 
+    @patch("folders.serializers.folder.is_workspace_manage", return_value=False)
+    @patch("folders.serializers.folder.has_target_permission", return_value=False)
+    def test_regular_user_can_move_subfolder_to_workspace_root(self, _target_permission, _workspace_manage):
+        for source, model in self.folder_types:
+            with self.subTest(source=source):
+                root, _, _, leaf = self.make_tree(model)
+                result = self.operation(source, leaf).edit({"parent_id": root.id})
+                self.assertEqual(result["parent_id"], root.id)
+                leaf.refresh_from_db()
+                self.assertEqual(leaf.parent_id, root.id)
+                self.assert_valid_tree(model, root.workspace_id)
+
     def test_move_to_refreshes_instances_loaded_before_another_move(self):
         for source, model in self.folder_types:
             with self.subTest(source=source):

@@ -245,9 +245,13 @@ class FolderSerializer(serializers.Serializer):
                 and current_node.parent_id != parent_id
             ):
                 source_type = self.data.get("source")
-                if has_target_permission(
-                    current_node.workspace_id, source_type, self.data.get("user_id"), parent_id
-                ) or is_workspace_manage(self.data.get("user_id"), current_node.workspace_id):
+                if (
+                    parent_id == current_node.workspace_id
+                    or has_target_permission(
+                        current_node.workspace_id, source_type, self.data.get("user_id"), parent_id
+                    )
+                    or is_workspace_manage(self.data.get("user_id"), current_node.workspace_id)
+                ):
                     current_depth = get_max_depth(current_node)
                     check_depth(self.data.get("source"), parent_id, current_node.workspace_id, current_depth)
                     parent = Folder.objects.get(id=parent_id)
