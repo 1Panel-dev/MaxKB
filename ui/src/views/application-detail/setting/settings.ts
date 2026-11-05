@@ -30,6 +30,7 @@ export interface ApplicationSettings extends ApplicationFormPayload {
   prologue: string
   model_setting: ModelSetting
   knowledge_setting: KnowledgeSetting
+  problem_optimization_prompt: string
   knowledge_id_list: string[]
   application_ids: string[]
   tool_ids: string[]

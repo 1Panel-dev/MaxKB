@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
 import RoleApi from '@/api/admin/system/role'
 import type { RoleItem, RoleType, RoleTypeGroup } from '@/api/types'
 import { ROLE_TYPE_LABELS } from '@/constants'
@@ -30,6 +30,15 @@ const filteredRoleGroups = computed(() => {
       role_list: group.role_list.filter((role) => role.role_name.toLowerCase().includes(keyword)),
     }))
     .filter((group) => group.role_list.length > 0)
+})
+
+// 搜索或列表刷新后展开命中分组，避免匹配角色被折叠隐藏。
+watch(filteredRoleGroups, (groups) => {
+  if (!filterText.value.trim()) return
+
+  groups.forEach(({ role_type }) => {
+    expandedRoleTypes.value[role_type] = true
+  })
 })
 
 function loadRoles(selectedRoleId?: string) {
