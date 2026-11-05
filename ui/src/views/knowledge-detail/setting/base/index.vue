@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { perm } from '@/permission'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { computed, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
@@ -10,7 +10,7 @@ import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
 import { useKnowledgeDetailContext } from '../../context'
-import {isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 /**
  * 知识库「设置」权限判断
  */
@@ -61,7 +61,7 @@ const knowledgeTypeDescriptions = {
 // 等待异步详情与基本信息表单挂载完成后回填，不直接修改详情中的配置。
 watch(
   [knowledge, baseFormRef],
-  ([detail, baseForm]) => {
+  async ([detail, baseForm]) => {
     if (!detail || !baseForm) return
     Object.assign(baseForm.form, {
       name: detail.name,
@@ -80,6 +80,9 @@ watch(
       file_size_limit: detail.file_size_limit ?? 100,
     })
     settingFormRef.value?.clearValidate()
+    // 回填后校验向量模型，进入设置时即提示尚未配置的模型。
+    await nextTick()
+    await baseForm.validateEmbeddingModel()
   },
   { immediate: true, flush: 'post' },
 )

@@ -1,5 +1,6 @@
 import { computed, inject, ref, type InjectionKey, type Ref } from 'vue'
 import { v7 as uuidv7 } from 'uuid'
+import type { SidePanelMode } from '../../core/layout/types'
 import type { Conversation, ConversationAccount, ConversationAppInfo } from '../../core/types'
 
 // 由 Chat / Debug 入口注入本组件需要的会话接口。
@@ -27,9 +28,13 @@ export function createConversationListStore(deps: ConversationListDeps) {
   const pageSize = 50
   const currentPage = ref(1)
   const hasMore = ref(true)
+  // 布局模式由 View 创建后绑定，分享入口统一在抽屉模式下收起左栏。
+  let leftSideMode: Readonly<Ref<SidePanelMode>> | undefined
+  const bindLeftSideMode = (mode: Readonly<Ref<SidePanelMode>>) => (leftSideMode = mode)
   const isShared = ref<boolean>(false)
-  const switchShared=(share:boolean)=>{
-    isShared.value=share
+  const switchShared = (share: boolean) => {
+    isShared.value = share
+    if (share && leftSideMode?.value === 'drawer') leftSideOpen.value = false
   }
   const loadConversations = async (page = 1) => {
     try {
@@ -103,6 +108,7 @@ export function createConversationListStore(deps: ConversationListDeps) {
   return {
     isShared,
     switchShared,
+    bindLeftSideMode,
     conversations,
     currentChatId,
     currentConversation,

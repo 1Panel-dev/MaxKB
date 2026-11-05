@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
 import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
 import FileUploadCard from '@/components/mk-drag-upload/FileUploadCard.vue'
@@ -9,7 +9,15 @@ import { formatFileSize } from '@/utils/number'
 import { downloadByURL } from '@/utils/common'
 import { copyText } from '@/utils/clipboard'
 
+import { MESSAGE_LIST_KEY } from '../../message-list/index'
+import { CONVERSATION_LIST_KEY } from '../../../left-sidebar/conversation-list/index'
+
 defineOptions({ name: 'ConversationQuestionContent' })
+
+// 复用对话的分享选择入口，回答生成中禁用。
+const conversationList = inject(CONVERSATION_LIST_KEY, null)
+const messageList = inject(MESSAGE_LIST_KEY, null)
+const canShare = computed(() => Boolean(messageList?.messages.value.length && !messageList.streamLoading.value))
 
 interface QuestionAttachment {
   file_id?: string
@@ -93,11 +101,17 @@ function getAttachmentDescription(file: QuestionAttachment) {
     </div>
     <div v-if="content.content" class="mk-gray-card-lg ml-auto w-fit max-w-full py-3! whitespace-pre-wrap wrap-anywhere">{{ content.content }}</div>
     <!-- TODO 用户的操作 -->
-    <div class="h-8 -mt-3 flex items-center justify-end invisible group-hover/question:visible">
+    <div class="h-8 -mt-3 flex items-center justify-end gap-1 invisible group-hover/question:visible">
       <!-- 复制提问 -->
       <el-button text @click="copyText(content.content)">
         <MkIcon name="icon_copy_outlined" />
       </el-button>
+      <!-- 进入分享模式 -->
+      <MkTooltip content="分享">
+        <el-button text :disabled="!canShare" @click="conversationList?.switchShared(true)">
+          <MkIcon name="icon_share_outlined" />
+        </el-button>
+      </MkTooltip>
     </div>
   </div>
 </template>

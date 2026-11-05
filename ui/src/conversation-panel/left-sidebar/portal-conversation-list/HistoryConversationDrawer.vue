@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import ConversationApi from '@/api/chat/conversation'
 import type { PortalConversationSummary } from '@/api/types'
 import { relativeTimeFormat } from '@/utils/time'
@@ -7,11 +7,22 @@ import { useConversationListStore } from '../conversation-list/index'
 import { usePortalConversationListStore } from './index'
 import RenameConversation from '../../components/rename/index.vue'
 
+import { useMessageListStore } from '../../components/message-list/index'
+
 defineOptions({ name: 'HistoryConversationDrawer' })
 const props = defineProps<{ applicationId: string }>()
 const visible = defineModel<boolean>({ required: true })
 const portalList = usePortalConversationListStore()
 const conversationList = useConversationListStore()
+const msgs = useMessageListStore()
+const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
+
+// 开启当前对话的分享选择，并关闭历史抽屉。
+const handleShareConversation = () => {
+  if (!canShare.value) return
+  conversationList.switchShared(true)
+  visible.value = false
+}
 const selectedApplicationId = ref(props.applicationId)
 const keyword = ref('')
 const conversations = ref<PortalConversationSummary[]>([])
@@ -89,14 +100,20 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
               <el-button text><MkIcon name="icon_more_outlined" /></el-button>
               <template #dropdown>
                 <MkDropdownMenu>
+                  <!-- 分享当前激活对话 -->
+                  <MkDropdownItem v-if="isActiveConversation(conversation)" :disabled="!canShare" @click="handleShareConversation">
+                    <template #icon><MkIcon name="icon_share_outlined" /></template>
+                    <span>分享</span>
+                  </MkDropdownItem>
                   <!-- 重命名 -->
                   <RenameConversation
                     :conversation="conversation"
                     :application-id="selectedApplicationId"
                     @renamed="conversation.abstract = $event"
                   />
+
                   <!-- 删除历史对话 -->
-                  <MkDropdownItem divided @click="handleDeleteConversation(conversation)">
+                  <MkDropdownItem @click="handleDeleteConversation(conversation)">
                     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                     <span>删除</span>
                   </MkDropdownItem>

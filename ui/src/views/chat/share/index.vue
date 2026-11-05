@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, provide, ref, watch } from 'vue'
+import { computed, onMounted, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ConversationApi from '@/api/chat/conversation'
 import type { ChatShareDetail } from '@/api/types'
@@ -13,7 +13,6 @@ const route = useRoute()
 const shareId = computed(() => String(route.params.shareId || ''))
 const detail = ref<ChatShareDetail | null>(null)
 const loading = ref(false)
-const failed = ref(false)
 
 // 公开接口按时间正序返回全部记录，不请求原会话或加载更多历史。
 const messages = computed<ChatMessage[]>(() =>
@@ -40,24 +39,12 @@ provide(SHARE_PANEL_CONTENT_KEY, {
   loadMore: async () => false,
 })
 
-// 请求序号隔离切换链接及卸载后的响应，防止旧记录覆盖当前页面。
-let requestVersion = 0
 const loadShare = async () => {
-  const version = ++requestVersion
   detail.value = null
   loading.value = true
-  failed.value = false
-  try {
-    const response = await ConversationApi.getShareConversation(shareId.value)
-    if (version === requestVersion) detail.value = response
-  } catch {
-    if (version === requestVersion) failed.value = true
-  } finally {
-    if (version === requestVersion) loading.value = false
-  }
+  await ConversationApi.getShareConversation(shareId.value)
 }
-watch(shareId, loadShare, { immediate: true })
-onBeforeUnmount(() => requestVersion++)
+onMounted(loadShare)
 </script>
 
 <template>

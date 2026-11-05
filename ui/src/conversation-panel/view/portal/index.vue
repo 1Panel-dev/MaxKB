@@ -14,6 +14,7 @@ import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
 import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
 import { PORTAL_CONVERSATION_LIST_KEY } from '../../left-sidebar/portal-conversation-list/index'
+import { SHARE_PANEL_KEY } from '../../main/share-panel/index'
 import { createPortalConversation } from './index'
 import { createChatUserProfileGetter } from '../chat/index'
 import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, createDeviceType } from '../index.ts'
@@ -40,8 +41,9 @@ provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
 provide(EXECUTION_DETAIL_KEY, bundle.detail)
+provide(SHARE_PANEL_KEY, bundle.share)
 provide(PORTAL_CONVERSATION_LIST_KEY, bundle.portalList)
-provide(VIEW_KEY,VIEW_TYPE.PORTAL)
+provide(VIEW_KEY, VIEW_TYPE.PORTAL)
 // HTML 内容 iframe 内 chatUserProfile() 取当前对话用户
 provide(CHAT_USER_PROFILE_KEY, createChatUserProfileGetter())
 // 响应式:窄屏 drawer,宽屏 push
@@ -49,6 +51,7 @@ const BREAKPOINT = 768
 const isMobile = ref(window.innerWidth < BREAKPOINT)
 const onResize = () => (isMobile.value = window.innerWidth < BREAKPOINT)
 const leftMode = computed(() => (isMobile.value ? 'drawer' : 'push'))
+bundle.list.bindLeftSideMode(leftMode)
 const rightMode = computed(() => (isMobile.value ? 'drawer' : 'push'))
 // 左栏为抽屉即手机端
 provide(DEVICE_KEY, createDeviceType(leftMode))

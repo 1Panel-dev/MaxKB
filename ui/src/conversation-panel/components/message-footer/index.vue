@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 // import Feedback from './feedback/index.vue'
 import type { ChatContent } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
@@ -7,7 +7,15 @@ import { datetimeFormat } from '@/utils/time'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
 import { useExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 
+import { MESSAGE_LIST_KEY } from '../message-list/index'
+import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
+
 const props = defineProps<{ message: ChatMessage }>()
+
+// 复用对话的分享选择入口，回答生成中禁用。
+const conversationList = inject(CONVERSATION_LIST_KEY, null)
+const messageList = inject(MESSAGE_LIST_KEY, null)
+const canShare = computed(() => Boolean(messageList?.messages.value.length && !messageList.streamLoading.value))
 
 const detail = useExecutionDetailStore()
 
@@ -68,8 +76,17 @@ const openExecutionDetail = () => {
           <MkIcon name="icon_copy_outlined" />
         </el-button>
       </MkTooltip>
+      <!-- 进入分享模式 -->
+      <span>
+        <MkTooltip content="分享">
+          <el-button text :disabled="!canShare" @click="conversationList?.switchShared(true)">
+            <MkIcon name="icon_share_outlined" />
+          </el-button>
+        </MkTooltip>
+      </span>
+
       <!-- <Feedback :message="message" /> -->
-      <span v-if="meta.createTime" class="text-N600">{{ datetimeFormat(meta.createTime) }}</span>
+      <span v-if="meta.createTime" class="text-N600 ml-2">{{ datetimeFormat(meta.createTime) }}</span>
     </div>
   </div>
 </template>
