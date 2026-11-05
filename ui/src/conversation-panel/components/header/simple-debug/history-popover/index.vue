@@ -107,7 +107,7 @@ function handleClearConversations() {
                 <MkDropdownMenu>
                   <RenameConversation :conversation="conversation" />
                   <!-- 删除历史对话 -->
-                  <MkDropdownItem divided @click="handleDeleteConversation(conversation)">
+                  <MkDropdownItem @click="handleDeleteConversation(conversation)">
                     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                     <span>删除</span>
                   </MkDropdownItem>

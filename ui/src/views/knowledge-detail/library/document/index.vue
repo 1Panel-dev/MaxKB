@@ -17,7 +17,7 @@ import { numberFormat } from '@/utils/number'
 import { toOrderBy, isWorkFlow } from '@/utils/common'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
-import { isWorkspaceResource, isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
 import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
 import ButtonExecutionRecord from './components/ButtonExecutionRecord.vue'
@@ -51,9 +51,18 @@ import { perm } from '@/permission'
  * 知识库「文档」权限判断
  */
 type KnowledgeDocPermissionMethod =
-  | 'docCreate' | 'docEdit' | 'docDelete' | 'docSync'
-  | 'docExport' | 'docDownload' | 'docVector' | 'docToken'
-  | 'docGenerate' | 'docMigrate' | 'docTag' | 'docReplace'
+  | 'docCreate'
+  | 'docEdit'
+  | 'docDelete'
+  | 'docSync'
+  | 'docExport'
+  | 'docDownload'
+  | 'docVector'
+  | 'docToken'
+  | 'docGenerate'
+  | 'docMigrate'
+  | 'docTag'
+  | 'docReplace'
 
 function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -492,7 +501,12 @@ onBeforeUnmount(() => {
       <template #default="{ row }: { row: DocumentItem }">
         <div class="flex-align-center" @click.stop>
           <!-- 启用或禁用文档 -->
-          <el-switch :model-value="row.is_active" size="small" :disabled="operationLoading || !knowledgeDocPermission('docEdit')" :before-change="() => handleChangeActive(row)" />
+          <el-switch
+            :model-value="row.is_active"
+            size="small"
+            :disabled="operationLoading || !knowledgeDocPermission('docEdit')"
+            :before-change="() => handleChangeActive(row)"
+          />
 
           <el-divider direction="vertical" class="ml-3! mr-2!" />
 
@@ -572,11 +586,23 @@ onBeforeUnmount(() => {
                 v-if="knowledgeDocPermission('docMigrate')"
               />
               <!-- 导出文档 -->
-              <ExportDocumentAction v-if="knowledgeDocPermission('docExport')" label="导出" :api="resourceApi.document" v-model:loading="operationLoading" :document="row" />
+              <ExportDocumentAction
+                v-if="knowledgeDocPermission('docExport')"
+                label="导出"
+                :api="resourceApi.document"
+                v-model:loading="operationLoading"
+                :document="row"
+              />
 
               <template v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.BASE || isWorkFlow(knowledgeType)">
                 <!-- 下载原文档 -->
-                <DownloadDocumentAction v-if="knowledgeDocPermission('docDownload')" :api="resourceApi.document" :knowledge-id="knowledgeId" v-model:loading="operationLoading" :document="row" />
+                <DownloadDocumentAction
+                  v-if="knowledgeDocPermission('docDownload')"
+                  :api="resourceApi.document"
+                  :knowledge-id="knowledgeId"
+                  v-model:loading="operationLoading"
+                  :document="row"
+                />
                 <!-- 替换原文档 -->
                 <ReplaceDocumentAction
                   :api="resourceApi.document"
@@ -589,7 +615,6 @@ onBeforeUnmount(() => {
               </template>
               <!-- 删除文档 -->
               <DeleteDocumentAction
-                divided
                 icon="icon_delete-trash_outlined"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -697,7 +722,6 @@ onBeforeUnmount(() => {
               :document-ids="selectedDocumentIds"
               :task-type="DOCUMENT_TASK_TYPE.EMBEDDING"
               label="取消向量化"
-              divided
               @refresh="refreshAfterOperation"
             />
             <!-- 批量取消生成问题 -->

@@ -28,7 +28,7 @@ function handleExportTool() {
 
 <template>
   <!-- 导出工具 -->
-  <MkDropdownItem divided @click="handleExportTool">
+  <MkDropdownItem @click="handleExportTool">
     <template #icon><MkIcon name="icon_export_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>

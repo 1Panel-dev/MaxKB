@@ -139,7 +139,7 @@ function deleteNode() {
 
           <el-switch v-model="nodeEnabled" size="small" />
         </div>
-        <MkDropdownItem divided @click="deleteNode">
+        <MkDropdownItem @click="deleteNode">
           <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
           删除
         </MkDropdownItem>

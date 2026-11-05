@@ -24,7 +24,7 @@ function handleDeleteModel() {
 
 <template>
   <!-- 删除模型 -->
-  <MkDropdownItem divided @click="handleDeleteModel">
+  <MkDropdownItem @click="handleDeleteModel">
     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>

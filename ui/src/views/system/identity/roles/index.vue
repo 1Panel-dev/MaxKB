@@ -138,7 +138,7 @@ onMounted(() => loadRoles())
                     重命名
                   </MkDropdownItem>
                   <!-- 删除 -->
-                  <MkDropdownItem v-if="perm.system.role.delete()" divided @click="handleDeleteRole(role)">
+                  <MkDropdownItem v-if="perm.system.role.delete()" @click="handleDeleteRole(role)">
                     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                     删除
                   </MkDropdownItem>

@@ -31,7 +31,7 @@ function handleDeleteApplication() {
 </script>
 
 <template>
-  <MkDropdownItem divided @click="handleDeleteApplication">
+  <MkDropdownItem @click="handleDeleteApplication">
     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>

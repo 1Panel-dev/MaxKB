@@ -262,7 +262,7 @@ onMounted(() => loadChatUsers())
                   <!-- 配额设置 -->
                   <ButtonQuotaSettings v-if="perm.system.chatUser.quotaSetting()" :user-ids="row.id" dropdown @refresh="loadChatUsers()" />
                   <!-- 删除 -->
-                  <MkDropdownItem v-if="perm.system.chatUser.delete()" divided @click="deleteUser(row)">
+                  <MkDropdownItem v-if="perm.system.chatUser.delete()" @click="deleteUser(row)">
                     <template #icon>
                       <MkIcon name="icon_delete-trash_outlined" />
                     </template>

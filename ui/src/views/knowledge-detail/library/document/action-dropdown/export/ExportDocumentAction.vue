@@ -27,7 +27,7 @@ function handleExportDocument(method: (typeof exportOptions)[number]['method']) 
 </script>
 
 <template>
-  <MkDropdownItem divided @click.prevent.stop class="p-0!">
+  <MkDropdownItem @click.prevent.stop class="p-0!">
     <MkDropdown class="w-full" trigger="hover" placement="left-start">
       <!-- 展开文档导出菜单 -->
       <div class="flex-between w-full gap-2 p-2">

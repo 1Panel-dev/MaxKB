@@ -61,7 +61,7 @@ function handleSubmit(payload: WorkflowVersionPayload, versionId: string) {
 
 <template>
   <!-- 打开工具发布历史 -->
-  <MkDropdownItem divided @click="handleOpen">
+  <MkDropdownItem @click="handleOpen">
     <template #icon><MkIcon name="icon_history_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>
