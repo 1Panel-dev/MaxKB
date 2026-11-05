@@ -9,7 +9,7 @@ from rest_framework import serializers
 
 class ProvideResponse(ResultSerializer):
     def get_data(self):
-        return ProvideSerializer()
+        return ProvideSerializer(many=True)
 
 
 class ProvideSerializer(serializers.Serializer):

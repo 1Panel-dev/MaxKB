@@ -13,7 +13,7 @@ import requests
 from django.core.cache import cache
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework.parsers import MultiPartParser
@@ -46,7 +46,7 @@ from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.exception.app_exception import AppApiException
 from common.log.log import _get_ip_address, log, record_log
-from common.result import result
+from common.result import DefaultResultSerializer, result
 from common.utils.rsa_util import decrypt
 from knowledge.models import FileSourceType
 from maxkb.const import CONFIG
@@ -469,7 +469,13 @@ class ChatUserProfileView(APIView):
         description=_("Get current user information"),
         operation_id=_("V3 Get current user information"),  # type: ignore
         tags=[_("V3 Chat User")],  # type: ignore
-        responses=UserProfileAPI.get_response(),
+        responses={
+            200: UserProfileAPI.get_response(),
+            401: OpenApiResponse(
+                response=DefaultResultSerializer,
+                description=_("Authentication required"),
+            ),
+        },
     )
     def get(self, request: Request):
         return result.success(ChatUserProfileSerializer().profile(request.user.profile))

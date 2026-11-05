@@ -282,14 +282,20 @@ class ModelSerializer(serializers.Serializer):
                         500, _("base model【{model_name}】already exists").format(model_name=self.data.get("name"))
                     )
 
+            provider = model.provider
+            if provider not in ModelProvideConstants:
+                raise BadRequest400(400, _("provider is invalid"))
+            provider_handler = ModelProvideConstants[provider]
+            model_type = self.data.get("model_type") or model.model_type
+            model_type_list = [item.get("value") for item in provider_handler.get_model_type_list()]
+            if model_type not in model_type_list:
+                raise BadRequest400(400, _("model_type is invalid"))
+
             ModelSerializer.model_to_dict(model)
 
-            provider = model.provider
-            model_type = self.data.get("model_type") or model.model_type
             model_name = self.data.get("model_name") or model.model_name
             credential = self.data.get("credential")
-            provider_handler = ModelProvideConstants[provider]
-            model_credential = ModelProvideConstants[provider].get_model_credential(model_type, model_name)
+            model_credential = provider_handler.get_model_credential(model_type, model_name)
             source_model_credential = json.loads(rsa_long_decrypt(model.credential))
             source_encryption_model_credential = model_credential.encryption_dict(source_model_credential)
             if credential is None:
@@ -318,6 +324,10 @@ class ModelSerializer(serializers.Serializer):
                 provider_handler = ModelProvideConstants[provider]
             except KeyError as error:
                 raise BadRequest400(400, _("provider is invalid")) from error
+            model_type = self.data.get("model_type")
+            model_type_list = [item.get("value") for item in provider_handler.get_model_type_list()]
+            if model_type not in model_type_list:
+                raise BadRequest400(400, _("model_type is invalid"))
             model_params_form = self.data.get("model_params_form")
             if not isinstance(model_params_form, list):
                 raise BadRequest400(400, _("model_params_form must be a list"))

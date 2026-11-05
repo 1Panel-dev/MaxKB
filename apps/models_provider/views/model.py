@@ -19,7 +19,16 @@ from common.utils.common import query_params_to_single_dict
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
-from models_provider.api.model import DefaultModelResponse, GetModelApi, ModelCreateAPI, ModelEditApi, ModelListResponse
+from models_provider.api.model import (
+    DefaultModelResponse,
+    GetModelApi,
+    ModelCreateAPI,
+    ModelEditApi,
+    ModelGroupedListResponse,
+    ModelListResponse,
+    ModelMetaResponse,
+    ModelSummaryListResponse,
+)
 from models_provider.api.chat_completion import ChatCompletionAPI
 from models_provider.api.prompt_generate import PromptGenerateAPI
 from models_provider.api.provide import ProvideApi
@@ -283,7 +292,7 @@ class ModelSetting(APIView):
             description=_("Query model meta information, this interface does not carry authentication information"),
             operation_id=_("Query model meta information, this interface does not carry authentication information"),  # type: ignore
             parameters=GetModelApi.get_parameters(),
-            responses=GetModelApi.get_response(),
+            responses=ModelMetaResponse,
             tags=[_("Model")],  # type: ignore
         )
         @has_permissions(
@@ -340,7 +349,7 @@ class WorkspaceSharedModelSetting(APIView):
         description=_("Get Share model by workspace id"),
         operation_id=_("Get Share model by workspace id"),  # type: ignore
         parameters=ModelListResponse.get_parameters(),
-        responses=DefaultModelResponse.get_response(),
+        responses=ModelSummaryListResponse,
         tags=[_("Shared Model")],  # type: ignore
     )
     @has_permissions(
@@ -366,7 +375,7 @@ class ModelList(APIView):
         description=_("Query all model list"),
         operation_id=_("Query all model list"),  # type: ignore
         parameters=ModelListResponse.get_parameters(),
-        responses=ModelListResponse.get_response(),
+        responses=ModelGroupedListResponse.get_response(),
         tags=[_("Model")],  # type: ignore
     )
     @has_permissions(

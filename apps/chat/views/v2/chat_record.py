@@ -8,7 +8,7 @@
 """
 
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -29,6 +29,7 @@ from chat.serializers.chat_record import (
 )
 from common import result
 from common.auth import ChatTokenAuth
+from common.result import DefaultResultSerializer
 
 
 class VoteView(APIView):
@@ -65,7 +66,13 @@ class HistoricalConversationView(APIView):
         summary=_("Get historical conversation"),
         operation_id=_("Get historical conversation"),  # type: ignore
         parameters=HistoricalConversationAPI.get_parameters(),
-        responses=HistoricalConversationAPI.get_response(),
+        responses={
+            200: HistoricalConversationAPI.get_response(),
+            401: OpenApiResponse(
+                response=DefaultResultSerializer,
+                description=_("Authentication required"),
+            ),
+        },
         tags=[_("Chat")],  # type: ignore
     )
     def get(self, request: Request):
@@ -153,7 +160,13 @@ class HistoricalConversationView(APIView):
             summary=_("Get historical conversation by page"),
             operation_id=_("Get historical conversation by page"),  # type: ignore
             parameters=PageHistoricalConversationAPI.get_parameters(),
-            responses=PageHistoricalConversationAPI.get_response(),
+            responses={
+                200: PageHistoricalConversationAPI.get_response(),
+                401: OpenApiResponse(
+                    response=DefaultResultSerializer,
+                    description=_("Authentication required"),
+                ),
+            },
             tags=[_("Chat")],  # type: ignore
         )
         def get(self, request: Request, current_page: int, page_size: int):
