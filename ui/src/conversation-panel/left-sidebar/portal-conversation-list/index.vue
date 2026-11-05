@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { relativeTimeFormat } from '@/utils/time'
 import type { Conversation } from '../../core/types'
 import { useConversationListStore } from '../conversation-list/index'
@@ -12,7 +13,7 @@ defineOptions({ name: 'PortalConversationList' })
 
 const portalList = usePortalConversationListStore()
 const { applicationGroups, currentApplicationId, isApplicationListActive, toggleGroup } = portalList
-const { conversations, currentChatId, selectConversation, deleteChat, toggleLeftSide } = useConversationListStore()
+const { conversations, currentChatId, selectConversation, deleteChat, newConversation, switchShared, toggleLeftSide } = useConversationListStore()
 
 const historyApplicationId = ref('')
 const historyVisible = ref(false)
@@ -50,6 +51,30 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
   if (isCurrentApplication(group)) return deleteChat(conversation.id).then(() => portalList.loadApplicationGroups())
   else portalList.deleteGroupConversation(group.id, conversation.id)
 }
+// 清空所有智能体的历史，删除成功后同步当前会话；失败时保留尚未删除的记录。
+const clearing = ref(false)
+const handleClearConversations = () => {
+  if (clearing.value) return
+  clearing.value = true
+  MsgConfirm('确认清空全部历史对话？', '将清空所有智能体的历史对话，清空后无法恢复。', { confirmButtonText: '清空' })
+    .then(() => {
+      historyVisible.value = false
+      return portalList
+        .clearConversations((applicationId, chatId) => {
+          if (applicationId !== currentApplicationId.value) return
+          conversations.value = conversations.value.filter((conversation) => conversation.id !== chatId)
+          if (currentChatId.value === chatId) {
+            switchShared(false)
+            newConversation()
+          }
+        })
+        .then(() => MsgSuccess('清空成功'))
+    })
+    .catch(() => {})
+    .finally(() => {
+      clearing.value = false
+    })
+}
 </script>
 
 <template>
@@ -83,14 +108,16 @@ const handleDeleteConversation = (group: PortalApplicationGroup, conversation: C
     <div class="flex-between pl-2 mt-4">
       <h6 class="text-N600 font-medium">历史对话</h6>
 
-      <!-- // TODO: 全部清空对话 -->
-      <el-button text>
-        <MkIcon name="icon_delete-trash_outlined" />
-      </el-button>
+      <MkTooltip content="清空">
+        <!-- 清空所有智能体的历史对话 -->
+        <el-button text :loading="clearing" :disabled="!historyApplicationGroups.length" @click="handleClearConversations">
+          <MkIcon name="icon_delete-trash_outlined" />
+        </el-button>
+      </MkTooltip>
     </div>
 
     <!-- 历史列表独立滚动，门户入口和新建入口保持固定。 -->
-    <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
+    <el-scrollbar :inert="clearing" class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
       <div v-if="historyApplicationGroups.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
       <div v-else class="space-y-1">
         <template v-for="group in historyApplicationGroups" :key="group.id">

@@ -9,7 +9,7 @@ import GroupToolItem from './items/group-tool/index.vue'
 import GroupItem from './items/group/index.vue'
 import FormItem from './items/form.vue'
 import FailureItem from './items/failure.vue'
-import QuestionItem from './items/question.vue'
+import QuestionItem from './items/question/index.vue'
 
 defineOptions({ name: 'ConversationContent' })
 
