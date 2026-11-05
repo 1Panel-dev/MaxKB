@@ -7,6 +7,9 @@
 @desc:
 """
 
+import time
+from copy import deepcopy
+
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext
@@ -15,12 +18,14 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType, new_instance
 from application.workflow.i_node import INode, Signal
+from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.content import Position
 from application.workflow.status import Status
+from application.workflow.tool_record import save_workflow_tool_record
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import ChatException, AppApiException
 from common.field.common import ObjectField
-from tools.models import Tool, ToolType, ToolWorkflowVersion
+from tools.models import Tool, ToolTaskTypeChoices, ToolType, ToolWorkflowVersion
 from knowledge.services.retrieval_access import inherited_retrieval_context
 
 
@@ -119,8 +124,22 @@ class ToolWorkflowLibNode(INode):
         }
 
         node_id = self.get_node_id()
+        start_time = time.time()
+        aggregation = AggregationManager()
+        workflow_type = self.get_workflow_type()
+        if workflow_type == WorkflowType.KNOWLEDGE:
+            source_type = ToolTaskTypeChoices.KNOWLEDGE
+            source_id = workflow_params.get("knowledge_id")
+        elif workflow_type == WorkflowType.TOOL:
+            source_type = ToolTaskTypeChoices.TOOL
+            source_id = workflow_params.get("tool_id")
+        else:
+            source_type = ToolTaskTypeChoices.APPLICATION
+            source_id = workflow_params.get("application_id")
 
         def on_next(wf_manage, content):
+            # 记录使用子工作流内的位置，避免父工作流转发时改写聚合内容。
+            aggregation.aggregate(deepcopy(content))
             # 把子工作流的输出位置嵌套到当前节点下，再转发给父工作流
             content.position = Position(node_id, None, content.position)
             self.write(content)
@@ -137,6 +156,24 @@ class ToolWorkflowLibNode(INode):
             self.data["details"] = wf_manage.get_details()
             self.data["message_tokens"] = _sum_tokens(wf_manage.context, "message_tokens")
             self.data["answer_tokens"] = _sum_tokens(wf_manage.context, "answer_tokens")
+
+            try:
+                save_workflow_tool_record(
+                    tool_record_id,
+                    tool_lib.id,
+                    tool_lib.workspace_id,
+                    source_type,
+                    source_id,
+                    wf_manage,
+                    aggregation,
+                    parameters,
+                    start_time,
+                    error,
+                )
+            except Exception as record_error:
+                # 回调在子工作流线程执行，保存失败也必须结束父节点，避免对话一直等待。
+                self.complete(Status.FAIL, error=error or record_error)
+                return
 
             # 子工作流被取消：如实以 CANCELLED 结束本节点
             if wf_manage.signal == Signal.CANCELLED or self.workflow_manage.signal == Signal.CANCELLED:

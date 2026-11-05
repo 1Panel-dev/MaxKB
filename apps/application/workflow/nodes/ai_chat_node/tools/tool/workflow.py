@@ -16,9 +16,8 @@ from langchain_core.tools import StructuredTool
 from pydantic import Field
 
 from application.workflow.message.aggregator import AggregationManager
-from application.workflow.status import Status
-from knowledge.models.knowledge_action import State
-from tools.models import Tool, ToolRecord, ToolType, ToolWorkflowVersion
+from application.workflow.tool_record import save_workflow_tool_record
+from tools.models import Tool, ToolType, ToolWorkflowVersion
 
 from ..base import build_schema, get_type
 
@@ -40,45 +39,6 @@ def get_workflow_args(tool, qv):
             )
 
     return build_schema({})
-
-
-def _save_workflow_tool_record(
-    tool_record_id, tool_id, workspace_id, source_type, source_id, wf_manage, aggregation, parameters, start_time, error
-):
-    """
-    工具工作流执行结束后落库执行记录（替代旧引擎 ToolWorkflowPostHandler.handler）。
-    实实行（非调试）直接插入 ToolRecord，字段与工具记录查询端点保持一致。
-    """
-    workflow = wf_manage.workflow
-    base_node = workflow.get_node("tool-base-node")
-    input_field_list = base_node.properties.get("user_input_field_list", []) if base_node else []
-    output_field_list = base_node.properties.get("user_output_field_list", []) if base_node else []
-    input_data = {f.get("field"): parameters.get(f.get("field")) for f in input_field_list}
-    # 新引擎工具输出统一收口于全局 output 上下文（tool-start-node 初始化、变量赋值节点写入）
-    output = wf_manage.context.get("output", {})
-    details = wf_manage.get_details()
-    if error:
-        state = State.FAILURE
-    else:
-        has_fail = any((d or {}).get("status") == Status.FAIL.value for d in (details or []))
-        state = State.FAILURE if has_fail else State.SUCCESS
-    ToolRecord(
-        id=tool_record_id,
-        tool_id=tool_id,
-        workspace_id=workspace_id,
-        source_type=source_type,
-        source_id=source_id,
-        state=state,
-        run_time=time.time() - start_time,
-        meta={
-            "input_field_list": input_field_list,
-            "output_field_list": output_field_list,
-            "input": input_data,
-            "output": output,
-            "details": details,
-            "answer_text_list": aggregation.get_contents(),
-        },
-    ).save()
 
 
 def get_workflow_func(source_type, source_id, tool, qv, workspace_id, cancel_event, workflow_params=None):
@@ -121,7 +81,7 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id, cancel_eve
                 # 工具工作流输出统一写入 context['output']
                 result_holder["output"] = dict(wf_manage.context.get("output", {}) or {})
                 # 执行结束落库工具执行记录
-                _save_workflow_tool_record(
+                save_workflow_tool_record(
                     tool_record_id,
                     tool_id,
                     workspace_id,
