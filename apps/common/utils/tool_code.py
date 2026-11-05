@@ -175,34 +175,37 @@ sys.stdout.flush()
                 if node.name.startswith("_"):
                     other_code.append(ast.unparse(node))
                     continue
-                # 修改函数参数以包含 params 中的默认值
-                arg_names = [arg.arg for arg in node.args.args]
-                # 为参数添加默认值,确保参数顺序正确
-                defaults = []
-                num_defaults = 0
-                # 从后往前检查哪些参数有默认值
-                for i, arg_name in enumerate(arg_names):
-                    if arg_name in params:
-                        num_defaults = len(arg_names) - i
-                        break
-                # 为有默认值的参数创建默认值列表
-                if num_defaults > 0:
-                    for i in range(len(arg_names) - num_defaults, len(arg_names)):
-                        arg_name = arg_names[i]
-                        if arg_name in params:
-                            default_value = params[arg_name]
-                            if isinstance(default_value, str):
-                                defaults.append(ast.Constant(value=default_value))
-                            elif isinstance(default_value, (int, float, bool)):
-                                defaults.append(ast.Constant(value=default_value))
-                            elif default_value is None:
-                                defaults.append(ast.Constant(value=None))
-                            else:
-                                defaults.append(ast.Constant(value=str(default_value)))
-                        else:
-                            # 如果某个参数没有默认值,需要添加 None 占位
-                            defaults.append(ast.Constant(value=None))
-                    node.args.defaults = defaults
+                # Initialization values stay in the server-side body, never in the model's signature.
+                positional = node.args.posonlyargs + node.args.args
+                defaults = dict(zip(
+                    [arg.arg for arg in positional[len(positional) - len(node.args.defaults):]],
+                    node.args.defaults,
+                ))
+                bound_args = [arg for arg in positional + node.args.kwonlyargs if arg.arg in params]
+                node.args.posonlyargs = [arg for arg in node.args.posonlyargs if arg.arg not in params]
+                node.args.args = [arg for arg in node.args.args if arg.arg not in params]
+                node.args.defaults = [defaults[arg.arg] for arg in node.args.posonlyargs + node.args.args
+                                      if arg.arg in defaults]
+                keyword_args = [(arg, default) for arg, default in zip(node.args.kwonlyargs, node.args.kw_defaults)
+                                if arg.arg not in params]
+                node.args.kwonlyargs = [arg for arg, _ in keyword_args]
+                node.args.kw_defaults = [default for _, default in keyword_args]
+                assignments = [ast.Assign(
+                    targets=[ast.Name(id=arg.arg, ctx=ast.Store())],
+                    value=ast.parse(repr(params[arg.arg]), mode="eval").body,
+                ) for arg in bound_args]
+                if node.args.kwarg:
+                    for key in params:
+                        assignments.append(ast.Expr(value=ast.Call(
+                            func=ast.Attribute(value=ast.Name(id=node.args.kwarg.arg, ctx=ast.Load()),
+                                               attr="pop", ctx=ast.Load()),
+                            args=[ast.Constant(value=key), ast.Constant(value=None)], keywords=[],
+                        )))
+                # Keep the docstring as the first statement for FastMCP's documentation extraction.
+                offset = int(bool(node.body and isinstance(node.body[0], ast.Expr)
+                                  and isinstance(node.body[0].value, ast.Constant)
+                                  and isinstance(node.body[0].value.value, str)))
+                node.body[offset:offset] = assignments
                 # 将不支持 JSON Schema 的参数类型注解替换为 Any，
                 # 避免 FastMCP/Pydantic 生成 schema 时崩溃（如 requests.Response）
                 _safe_annotation_names = {
@@ -327,7 +330,7 @@ exec({dedent(code)!a})
 
     def get_tool_mcp_config(self, tool, params):
         _code = self.generate_mcp_server_code(tool.code, params, tool.name, tool.desc, str(tool.id))
-        maxkb_logger.debug(f"Python code of mcp tool: {_code}")
+        maxkb_logger.debug("Generating MCP configuration for tool %s", tool.id)
         compressed_and_base64_encoded_code_str = base64.b64encode(gzip.compress(_code.encode())).decode()
         tool_config = {
             "command": sys.executable,
