@@ -36,7 +36,7 @@
     "dingtalk-jsapi": "^3.2.9",
     "dompurify": "^3.4.14",
     "echarts": "^6.1.0",
-    "element-plus": "^2.14.2",
+    "element-plus": "^2.14.7",
     "highlight.js": "^11.12.0",
     "jsencrypt": "^3.5.4",
     "katex": "^0.16.47",
