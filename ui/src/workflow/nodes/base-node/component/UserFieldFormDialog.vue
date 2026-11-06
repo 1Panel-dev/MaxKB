@@ -158,6 +158,8 @@ const open = (row: any, index: any) => {
     currentItem.value = cloneDeep(row)
     currentIndex.value = index
   } else {
+    isEdit.value = false
+    currentIndex.value = null
     currentItem.value = null
   }
 }
