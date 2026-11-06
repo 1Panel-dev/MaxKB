@@ -40,6 +40,7 @@ from common.utils.common import (
     restricted_loads,
 )
 from common.utils.logger import maxkb_logger
+from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
 from django.core import validators
@@ -200,6 +201,17 @@ def get_bound_application_ids(instance: Dict) -> List[str]:
     return list(application_ids)
 
 
+def get_bound_knowledge_ids(instance: Dict) -> List[str]:
+    knowledge_ids = {str(value) for value in instance.get("knowledge_id_list") or []}
+
+    def collect(node_data):
+        if (node_data.get("search_scope_type") or "custom") == "custom":
+            knowledge_ids.update(str(value) for value in node_data.get("knowledge_id_list") or [])
+
+    _walk_workflow_nodes(instance.get("work_flow"), collect)
+    return list(knowledge_ids)
+
+
 def get_authorized_tool_ids(user_id: str, workspace_id: str, tool_ids: List[str]) -> List[str]:
     """
     返回 tool_ids 中当前用户被授权绑定/使用的工具id。
@@ -300,7 +312,7 @@ def get_authorized_application_ids(user_id: str, workspace_id: str, application_
 
 def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: Dict):
     """
-    校验应用/工作流中绑定的工具和子应用,当前用户是否都有权限使用,防止低权限成员
+    校验应用/工作流中绑定的工具、知识库和子应用,当前用户是否都有权限使用,防止低权限成员
     绑定自己被禁止访问的资源,并通过应用/工作流执行绕过单独授权控制。
     """
     tool_ids = get_bound_tool_ids(instance)
@@ -312,6 +324,11 @@ def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: D
                 _("No permission to use tool(s): {tool_ids}"), tool_ids=", ".join(unauthorized_tool_ids)
             )
             raise AppApiException(403, str(message))
+
+    knowledge_ids = get_bound_knowledge_ids(instance)
+    authorized_knowledge_ids = set(filter_authorized_ids("knowledge", knowledge_ids, workspace_id, user_id=user_id))
+    if any(knowledge_id not in authorized_knowledge_ids for knowledge_id in knowledge_ids):
+        raise AppApiException(403, _("No permission to access"))
 
     validate_bound_application_permissions(user_id, workspace_id, instance)
 
@@ -333,11 +350,13 @@ def validate_bound_application_permissions(user_id: str, workspace_id: str, inst
 
 def validate_application_resource_permissions(user_id, application):
     """校验实际保存或执行的应用配置;发布后的聊天使用应用所属用户的资源授权。"""
-    validate_bound_tool_permissions(user_id, application.workspace_id, {
+    instance = {
         key: getattr(application, key) for key in (
             "work_flow", "tool_ids", "skill_tool_ids", "mcp_tool_ids", "application_ids"
         )
-    })
+    }
+    instance["knowledge_id_list"] = getattr(application, "knowledge_ids", [])
+    validate_bound_tool_permissions(user_id, application.workspace_id, instance)
 
 
 def validate_import_resource_permissions(user_id, workspace_id, resources, created_tool_ids):
@@ -346,6 +365,7 @@ def validate_import_resource_permissions(user_id, workspace_id, resources, creat
         validate_bound_tool_permissions(user_id, workspace_id, {
             "tool_ids": [tool_id for tool_id in get_bound_tool_ids(resource) if tool_id not in created_tool_ids],
             "application_ids": get_bound_application_ids(resource),
+            "knowledge_id_list": get_bound_knowledge_ids(resource),
         })
 
 
