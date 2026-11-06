@@ -66,10 +66,6 @@ const system = {
  */
   mcpConfig: () => canSys(P.RESOURCE_KNOWLEDGE_MCP_CONFIG),
 /**
- * 系统「知识库」导出权限
- */
-  exportSkills: () => canSys(P.RESOURCE_KNOWLEDGE_EXPORT_SKILLS),
-/**
  * 系统「知识库」「定时同步」只读权限
  */
   scheduledSyncRead: () => canSys(P.RESOURCE_KNOWLEDGE_SCHEDULED_SYNC_READ),
