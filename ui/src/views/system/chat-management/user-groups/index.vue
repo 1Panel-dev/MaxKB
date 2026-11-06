@@ -50,9 +50,7 @@ function deleteGroup(group: ListItem) {
       groupsLoading.value = true
       return ChatGroupsApi.deleteChatUserGroup(group.id).then(() => {
         MsgSuccess('删除成功')
-        if (currentGroup.value?.id === group.id) {
-          return loadChatUserGroups()
-        }
+        return loadChatUserGroups()
       })
     })
     .catch(() => {})
