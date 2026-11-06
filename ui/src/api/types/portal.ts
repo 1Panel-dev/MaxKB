@@ -16,6 +16,7 @@ export interface PortalSetting {
   logo: string | null
   enable_public_access: boolean
   enable_api: boolean
+  enable_agent_mcp_service: boolean
   enable_knowledge_base_api: boolean
   enable_auth: boolean
   auth_config: PortalAuthConfig
