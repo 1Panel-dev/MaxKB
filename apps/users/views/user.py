@@ -207,7 +207,7 @@ class WorkspaceUserMemberView(APIView):
     @has_permissions(
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         RoleConstants.ADMIN,
-        RoleConstants.EXTENDS_ADMIN.get_workspace_role(),
+        RoleConstants.EXTENDS_ADMIN,
         RoleConstants.EXTENDS_WORKSPACE_MANAGE.get_workspace_role(),
         RoleConstants.USER.get_workspace_role(),
         RoleConstants.EXTENDS_USER.get_workspace_role(),
