@@ -23,6 +23,13 @@ import { getResourceScope, isSystemResource } from '@/utils/resource-context'
 import { useApplicationDetailContext } from '../context'
 import { createSettings, createSettingsPayload, type ApplicationSettings, type SelectedKnowledge, type LongTermSettingData } from './settings'
 import ButtonKnowledgeSetting from './components/ButtonKnowledgeSetting.vue'
+import perm from '@/permission/index.ts'
+
+type ApplicationSettingPermissionMethod = 'publish'
+function applicationSettingPermission(method: ApplicationSettingPermissionMethod): boolean {
+  if (isSystem.value) return Boolean(perm.application.system[method]())
+  return Boolean(perm.application.workspace[method](applicationId.value))
+}
 
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
@@ -245,7 +252,7 @@ onMounted(() => {
           保存
         </el-button>
         <!-- 保存并发布智能体 -->
-        <el-button type="primary" :disabled="saving" @click="publish">发布</el-button>
+        <el-button v-if="applicationSettingPermission('publish')" type="primary" :disabled="saving" @click="publish">发布</el-button>
       </div>
     </div>
   </Teleport>

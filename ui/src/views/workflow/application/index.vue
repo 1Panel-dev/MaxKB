@@ -25,6 +25,13 @@ import { showWorkflowValidateError } from '../components/validate-error'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import { getResourceScope, isSystemResource } from '@/utils/resource-context.ts'
 import { goBack } from './navigation'
+import perm from '@/permission/index.ts'
+
+type ApplicationWorkflowPermissionMethod = 'publish'
+function applicationWorkflowPermission(method: ApplicationWorkflowPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.application.system[method]())
+  return Boolean(perm.application.workspace[method](applicationId))
+}
 
 defineOptions({ name: 'ApplicationWorkflowView' })
 const requestApi = isSystemResource() ? SystemResourceApplicationApi : WorkspaceApplicationApi
@@ -372,7 +379,7 @@ onBeforeUnmount(() => stopAutoSave())
       </MkTooltip>
 
       <!-- 发布 -->
-      <el-button type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
+      <el-button v-if="applicationWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
       <!-- 更多操作 -->
       <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
         <el-button text class="h-7! w-7! px-0!">
