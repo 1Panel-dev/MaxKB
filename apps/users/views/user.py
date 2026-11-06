@@ -206,12 +206,12 @@ class WorkspaceUserMemberView(APIView):
         responses=WorkspaceUserAPI.get_response(),
     )
     @has_permissions(
-        RoleConstants.WORKSPACE_MANAGE,
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         RoleConstants.ADMIN,
-        RoleConstants.EXTENDS_ADMIN,
-        RoleConstants.EXTENDS_WORKSPACE_MANAGE,
-        RoleConstants.USER,
-        RoleConstants.EXTENDS_USER,
+        RoleConstants.EXTENDS_ADMIN.get_workspace_role(),
+        RoleConstants.EXTENDS_WORKSPACE_MANAGE.get_workspace_role(),
+        RoleConstants.USER.get_workspace_role(),
+        RoleConstants.EXTENDS_USER.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id):
         nick_name = request.query_params.get("nick_name", None)
