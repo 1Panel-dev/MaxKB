@@ -10,7 +10,16 @@ import ModelApi from '@/api/admin/workspace/model'
 import SystemModelApi from '@/api/admin/system/resource-management/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import { isWorkspaceResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
 defineOptions({ name: 'SelectModel', inheritAttrs: false })
+
+// 创建模型权限：随当前资源范围选择对应模型的创建权限
+const canCreateModel = computed(() => {
+  if (isWorkspaceResource()) return perm.model.workspace.create()
+  if (isSystemSharedResource()) return perm.model.share.create()
+  return false
+})
 
 interface ModelOptionGroup {
   icon: string
@@ -160,7 +169,7 @@ function openModelParams() {
         </div>
       </template>
 
-      <template v-if="canAdd && requestApi" #footer>
+      <template v-if="canAdd && requestApi && canCreateModel" #footer>
         <slot name="footer">
           <ButtonAddModel :api="requestApi" :current-provider="allModelProvider" :providers="providerOptions" @refresh="emit('refresh')">
             <template #default="{ open }">
