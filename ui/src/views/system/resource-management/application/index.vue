@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
 import SystemCommonApi from '@/api/admin/system/common'
 import SystemWorkspaceApi from '@/api/admin/system/workspace'
 import SystemResourceTriggerApi from '@/api/admin/system/resource-management/resource-trigger'
@@ -12,6 +13,7 @@ import { datetimeFormat } from '@/utils/time'
 import { isWorkFlow, toOrderBy } from '@/utils/common'
 import {
   AuthorizeApplicationAction,
+  RelatedResourcesApplicationAction,
   ExportApplicationAction,
   PortalApplicationAction,
   DeleteApplicationAction,
@@ -187,6 +189,13 @@ onMounted(() => {
                 <TriggerApplicationAction v-if="perm.application.system.triggerRead()" label="触发器" :api="SystemResourceTriggerApi" :application="row" />
                 <!-- MCP 服务配置 -->
                 <McpConfigApplicationAction v-if="perm.application.system.mcpConfig()" label="MCP 服务配置" :application="row" />
+                <!-- 查看关联资源 -->
+                <RelatedResourcesApplicationAction
+                  v-if="perm.application.system.relateMap()"
+                  label="查看关联资源"
+                  :api="SystemRelatedResourcesApi"
+                  :application="row"
+                />
                 <!-- 门户上下架 -->
                 <PortalApplicationAction
                   v-model:loading="operationLoading"
