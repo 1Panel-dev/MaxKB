@@ -12,6 +12,7 @@ import ToolTaskExecution from './task-execution/ToolTaskExecution.vue'
 import ApplicationTaskExecution from './task-execution/ApplicationTaskExecution.vue'
 import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import ApplicationApi from '@/api/admin/workspace/application/application'
+import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
@@ -24,10 +25,11 @@ const props = withDefaults(
   defineProps<{
     resource?: ResourceTriggerResource
     resourceApi?: typeof ResourceTriggerApi
+    applicationApi?: typeof ApplicationApi | typeof SystemResourceApplicationApi
     toolApi?: typeof ToolApi | typeof SystemToolApi
     toolWorkflowApi?: typeof WorkflowApi
   }>(),
-  { resourceApi: () => ResourceTriggerApi, toolApi: () => ToolApi, toolWorkflowApi: () => WorkflowApi },
+  { resourceApi: () => ResourceTriggerApi, applicationApi: () => ApplicationApi, toolApi: () => ToolApi, toolWorkflowApi: () => WorkflowApi },
 )
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 /* 抽屉生命周期与详情 */
@@ -133,7 +135,7 @@ function open(triggerId?: string) {
               resources.value[key] = tool
             })
           if (!resources.value[key])
-            return ApplicationApi.getApplicationDetail(task.source_id).then((application) => {
+            return props.applicationApi.getApplicationDetail(task.source_id).then((application) => {
               resources.value[key] = application
             })
           return Promise.resolve()

@@ -3,20 +3,25 @@ import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
 
-import { nextTick, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
-import type { ResourceTrigger, ResourceTriggerResource, TriggerSetting } from '@/api/types'
-import { TRIGGER_TYPE, SCHEDULE_TYPE } from '@/api/enums'
+import type { ToolItem, ResourceTrigger, ResourceTriggerResource, TriggerSetting } from '@/api/types'
+import { RESOURCE_TYPE, TRIGGER_TYPE, SCHEDULE_TYPE } from '@/api/enums'
 import { MsgSuccess } from '@/utils/message'
-import TriggerFormDrawer from '../trigger-form/TriggerFormDrawer.vue'
+import TriggerFormDrawer from '@/views/trigger/trigger-form/TriggerFormDrawer.vue'
 
 const props = defineProps<{
   toolApi?: typeof ToolApi | typeof SystemToolApi
   toolWorkflowApi?: typeof ToolWorkflowApi
   api: typeof ResourceTriggerApi
-  resource: ResourceTriggerResource
+  tool: ToolItem
 }>()
 const emit = defineEmits<{ closed: [] }>()
+const resource = computed<ResourceTriggerResource>(() => ({
+  source_type: RESOURCE_TYPE.TOOL,
+  source_id: props.tool.id,
+  workspace_id: props.tool.workspace_id,
+}))
 
 /* 当前资源的触发器列表 */
 const visible = ref(false)
@@ -25,7 +30,7 @@ const triggersData = ref<ResourceTrigger[]>([])
 function loadTriggers() {
   loading.value = true
   return props.api
-    .getResourceTriggerList(props.resource)
+    .getResourceTriggerList(resource.value)
     .then((result) => {
       triggersData.value = result
     })
@@ -74,7 +79,7 @@ function handleRemoveTrigger(trigger: ResourceTrigger) {
   if (loading.value) return
   loading.value = true
   return props.api
-    .deleteResourceTrigger(props.resource, trigger.id)
+    .deleteResourceTrigger(resource.value, trigger.id)
     .then(() => {
       MsgSuccess('移除成功')
       return loadTriggers()
@@ -140,5 +145,3 @@ defineExpose({ open })
     @closed="handleFormClosed"
   />
 </template>
-
-<style scoped lang="scss"></style>
