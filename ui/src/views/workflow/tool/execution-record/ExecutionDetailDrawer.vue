@@ -67,6 +67,7 @@ watch(
             <p class="mb-1 text-N600">触发来源</p>
             <div class="flex-align-center gap-2">
               <KnowledgeIcon v-if="record.source_type === TOOL_RECORD_SOURCE.KNOWLEDGE" :type="KNOWLEDGE_TYPE.WORKFLOW" :size="20" />
+              <ToolIcon v-else-if="record.source_type === TOOL_RECORD_SOURCE.TOOL" :icon="record.source_icon ?? undefined" :size="20" />
               <TriggerIcon v-else-if="record.source_type === TOOL_RECORD_SOURCE.TRIGGER" :type="record.trigger_type ?? undefined" :size="20" />
               <ApplicationIcon v-else :icon="record.source_icon ?? undefined" :size="20" />
               <span class="min-w-0 flex-1 truncate" :title="record.source_name ?? undefined">{{ record.source_name || '-' }}</span>
@@ -100,6 +101,16 @@ watch(
 
       <div v-if="detail" class="space-y-2">
         <ExecutionDetailContent v-if="nodeDetails.length" :detail="nodeDetails" :workflow-mode="WorkflowMode.Tool" />
+        <template v-else>
+          <div class="mk-gray-card-sm">
+            <h6 class="mb-2">输入</h6>
+            <div class="whitespace-pre-wrap break-all">{{ detail.meta?.input ?? '-' }}</div>
+          </div>
+          <div class="mk-gray-card-sm">
+            <h6 class="mb-2">输出</h6>
+            <div class="whitespace-pre-wrap break-all">{{ detail.meta?.output ?? '-' }}</div>
+          </div>
+        </template>
       </div>
     </div>
     <template #footer>

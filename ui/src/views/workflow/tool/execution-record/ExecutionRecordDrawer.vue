@@ -22,11 +22,13 @@ const orderBy = ref<string>()
 const sourceLabels = {
   [TOOL_RECORD_SOURCE.APPLICATION]: '智能体',
   [TOOL_RECORD_SOURCE.KNOWLEDGE]: '知识库',
+  [TOOL_RECORD_SOURCE.TOOL]: '工具',
   [TOOL_RECORD_SOURCE.TRIGGER]: '触发器',
 }
 const sourceTypeOptions = [
   { label: sourceLabels[TOOL_RECORD_SOURCE.APPLICATION], value: TOOL_RECORD_SOURCE.APPLICATION },
   { label: sourceLabels[TOOL_RECORD_SOURCE.KNOWLEDGE], value: TOOL_RECORD_SOURCE.KNOWLEDGE },
+  { label: sourceLabels[TOOL_RECORD_SOURCE.TOOL], value: TOOL_RECORD_SOURCE.TOOL },
   { label: sourceLabels[TOOL_RECORD_SOURCE.TRIGGER], value: TOOL_RECORD_SOURCE.TRIGGER },
 ]
 const stateOptions = [
@@ -145,6 +147,7 @@ defineExpose({ open })
           <div class="flex-align-center gap-2">
             <ApplicationIcon v-if="row.source_type === TOOL_RECORD_SOURCE.APPLICATION" :icon="row.source_icon" :size="20" />
             <KnowledgeIcon v-else-if="row.source_type === TOOL_RECORD_SOURCE.KNOWLEDGE" :type="KNOWLEDGE_TYPE.WORKFLOW" :size="20" />
+            <ToolIcon v-else-if="row.source_type === TOOL_RECORD_SOURCE.TOOL" :icon="row.source_icon ?? undefined" :size="20" />
             <TriggerIcon v-else-if="row.source_type === TOOL_RECORD_SOURCE.TRIGGER" :type="row.trigger_type ?? undefined" :size="20" />
             <span class="min-w-0 flex-1 truncate" :title="row.source_name || '-'">{{ row.source_name || '-' }}</span>
           </div>

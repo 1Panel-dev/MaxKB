@@ -1532,6 +1532,7 @@ class ToolSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             application_subquery = Application.objects.filter(id=OuterRef("source_id")).values("name")[:1]
             knowledge_subquery = Knowledge.objects.filter(id=OuterRef("source_id")).values("name")[:1]
+            tool_subquery = Tool.objects.filter(id=OuterRef("source_id")).values("name")[:1]
             trigger_subquery = Trigger.objects.filter(id=OuterRef("source_id")).values("name")[:1]
             trigger_type_subquery = Trigger.objects.filter(id=OuterRef("source_id")).values("trigger_type")[:1]
 
@@ -1542,6 +1543,7 @@ class ToolSerializer(serializers.Serializer):
                     source_name=Case(
                         When(source_type="APPLICATION", then=Subquery(application_subquery)),
                         When(source_type="KNOWLEDGE", then=Subquery(knowledge_subquery)),
+                        When(source_type="TOOL", then=Subquery(tool_subquery)),
                         When(source_type="TRIGGER", then=Subquery(trigger_subquery)),
                         default=Value(""),
                         output_field=CharField(),
