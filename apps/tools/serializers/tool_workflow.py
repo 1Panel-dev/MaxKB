@@ -440,14 +440,15 @@ class ToolWorkflowSerializer(serializers.Serializer):
             ]
             return list(knowledge_application_mapping_list) + edit_knowledge_list
 
-        def edit(self, instance: Dict):
+        def edit(self, instance: Dict, *, check_bound_resource_permissions=True):
             self.is_valid(raise_exception=True)
             tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
             workflow_id = tool.workspace_id
             if instance.get("work_flow"):
                 # 校验工作流中引用的工具(mcp-node 的 mcp_tool_id 等)当前用户是否有权使用,
                 # 防止低权限用户绑定他人工具并通过工作流执行绕过工具的单独授权控制
-                validate_bound_tool_permissions(self.data.get("user_id"), workflow_id, instance)
+                if check_bound_resource_permissions:
+                    validate_bound_tool_permissions(self.data.get("user_id"), workflow_id, instance)
                 dependency = is_valid_tool_workflow_circular_dependency(
                     workflow=instance.get("work_flow"), _id=str(tool.id)
                 )
