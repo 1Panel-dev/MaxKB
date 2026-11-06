@@ -437,6 +437,7 @@ class AIChatNode(INode):
                         question.content,
                         reasoning_content_id,
                         text_content_id,
+                        is_result=is_result,
                     )
                 )
             else:
@@ -467,7 +468,7 @@ class AIChatNode(INode):
         return HumanMessage(content=[*videos, *images, {"type": "text", "text": question_str}])
 
     async def _stream_response(
-        self, response, chat_model, message_list, question, reasoning_content_id, text_content_id
+        self, response, chat_model, message_list, question, reasoning_content_id, text_content_id, is_result=None
     ):
 
         reasoning_setting = {"reasoning_end": False, "is_reasoning": False}
@@ -503,11 +504,12 @@ class AIChatNode(INode):
                                 reasoning_content_id, "", Status.SUCCESS, node_info, Position(self.get_node_id())
                             )
                         )
-                    self.write(
-                        TextContent(
-                            text_content_id, content_chunk, Status.RUNNING, node_info, Position(self.get_node_id())
+                    if is_result:
+                        self.write(
+                            TextContent(
+                                text_content_id, content_chunk, Status.RUNNING, node_info, Position(self.get_node_id())
+                            )
                         )
-                    )
                 if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
                     reasoning_setting["is_reasoning"] = True
                     self.write(
