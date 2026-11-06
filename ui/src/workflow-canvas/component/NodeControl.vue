@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, reactive, ref, watch } from 'vue'
 import type LogicFlow from '@logicflow/core'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { SelectionSelect } from '@logicflow/extension'
@@ -73,10 +73,10 @@ function fitView() {
   props.logicFlow.fitView(40, 40)
 }
 
-// 批量展开收起不替换节点数据，保留表单内容。
+// 与节点视图共用 Vue 响应式代理，批量切换时同步内容显示并保留表单数据。
 function setNodesExpanded(expanded: boolean) {
   props.logicFlow.graphModel.nodes.forEach((node) => {
-    node.properties.showNode = expanded
+    reactive(node).properties.showNode = expanded
   })
 }
 

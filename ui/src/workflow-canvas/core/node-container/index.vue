@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reaction, type BaseNodeModel, type Model } from '@logicflow/core'
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, escape, escapeRegExp } from 'lodash'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
 import { copyText } from '@/utils/clipboard'
 import { WorkflowMode, WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
@@ -218,23 +218,18 @@ const clearSelectOn = () => {
 // 高亮选中关键字
 
 const highlightedStepName = (contentText: string) => {
-  let res = contentText
-  if (keyWord.value === '') {
-    return res
-  } else {
-    const wordsArray = contentText.split('')
-    for (let i = 0; i < wordsArray.length; i++) {
-      const word = wordsArray[i]
-      if (word && keyWord.value.includes(word)) {
-        wordsArray[i] = currentKeyWord.value
-          ? `<span style='background: #FF8800;'>${word}</span>`
-          : `<span style='background: #FFC60A;'>${word}</span>`
-      }
-    }
-    res = wordsArray.join('')
-    return res
-  }
+  if (!keyWord.value) return escape(contentText)
+  const keywordPattern = new RegExp(`(${escapeRegExp(keyWord.value)})`, 'gi')
+  return contentText
+    .split(keywordPattern)
+    .map((part, index) => {
+      const text = escape(part)
+      if (index % 2 === 0) return text
+      return currentKeyWord.value ? `<span style='background: var(--mk-warning);'>${text}</span>` : `<span style='background: #FFC60A'>${text}</span>`
+    })
+    .join('')
 }
+
 onMounted(() => {
   model.openNodeMenu = (anchor: Model.AnchorConfig) => {
     showAnchor.value && anchorData.value?.id === anchor.id ? closeNodeMenu() : openNodeMenu(anchor)
