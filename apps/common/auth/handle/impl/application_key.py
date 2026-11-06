@@ -21,6 +21,7 @@ from common.exception.app_exception import AppAuthenticationFailed
 class ApplicationKey(AuthBaseHandle):
     def handle(self, request, token: str, get_token_details):
         application_api_key = QuerySet(ApplicationApiKey).filter(secret_key=token).first()
+        QuerySet()
         if application_api_key is None:
             raise AppAuthenticationFailed(500, _("Secret key is invalid"))
         if not application_api_key.is_active:
@@ -31,10 +32,13 @@ class ApplicationKey(AuthBaseHandle):
             QuerySet(ApplicationAccessToken).filter(application_id=application_api_key.application_id).first()
         )
         if application_access_token is not None:
+            if not application_access_token.enable_api_key:
+                raise AppAuthenticationFailed(1002, _("Authentication information is incorrect"))
             if application_access_token.authentication:
                 if application_access_token.authentication_value.get("type", "password") != "password":
                     raise AppAuthenticationFailed(1002, _("Authentication information is incorrect"))
-
+        else:
+            raise AppAuthenticationFailed(1002, _("Authentication information is incorrect"))
         k = f"{Group.CHAT_USER}:r:{application_access_token.application_id}"
         return Principal(
             str(application_api_key.id),
