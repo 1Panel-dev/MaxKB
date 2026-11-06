@@ -80,9 +80,9 @@ const getCaptcha = (username: string, accessToken: string) => {
   return get<ChatCaptchaResponse>('/v3/captcha', { username, accessToken })
 }
 
-/** 退出当前对话用户登录状态。 */
-const postLogout = () => {
-  return post<undefined, boolean>('/v3/auth/logout')
+/** 退出当前对话用户登录状态；传入 accessToken 时后端按对应应用的路径清除文件凭证 cookie。 */
+const postLogout = (accessToken?: string) => {
+  return post<undefined, boolean>('/v3/auth/logout', undefined, accessToken ? { accessToken } : undefined)
 }
 
 export default {

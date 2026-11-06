@@ -9,7 +9,8 @@ const getChatUserProfile = () => {
 }
 
 /** 修改当前用户密码，提交 RSA 加密后的表单。 */
-const postResetPassword = (data: { encryptedData: string }) => post<{ encryptedData: string }, boolean>('/v3/chat_user/current/reset_password', data)
+const postResetPassword = (data: { encryptedData: string }, accessToken?: string) =>
+  post<{ encryptedData: string }, boolean>('/v3/chat_user/current/reset_password', data, accessToken ? { accessToken } : undefined)
 
 /** 获取当前用户 API Key；首次读取由服务端创建。 */
 const getApiKey = () => get<ChatUserApiKey>('/v3/api_key')
