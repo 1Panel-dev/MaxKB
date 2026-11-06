@@ -579,7 +579,7 @@ System／飞书扩展及文件 ID 导入、策略协议需对应部署支持，�
 批量删除提交 `{ id_list, resource_type }`，图片传 `image`，普通文档默认传 `document`；
 服务端按知识库和资源类型校验整批 ID。
 批量向量化提交 `{ id_list, state_list, resource_type }`；图片同样传 `image`，普通文档默认传 `document`。
-Workspace 与 System 资源管理的 `knowledge/image.ts` 提供图片专属接口，通过上下文 `resourceApi.image` 读取。
+Workspace、System 资源管理与 System 共享的 `knowledge/image.ts` 提供图片专属接口，通过上下文 `resourceApi.image` 读取。
 `postUploadImagePreview` 通过 POST `image/preview` 按策略生成图片预览，
 JSON 提交 `{ file_id_list, doc_strategy }`，复用上传成功的文件 ID，不重复上传，返回 ImageDocumentPreview[]；
 图片预览结果仅包含 name、source_file_id、resource_type（image）、content 和 doc_strategy，
@@ -589,8 +589,9 @@ JSON 提交 `{ file_id_list, doc_strategy }`，复用上传成功的文件 ID，
 `putBatchCreateImageDocuments` 通过 PUT `image/batch_create` 提交 ImageDocumentImportPayload，返回 DocumentItem[]。
 未生成预览时，提交 `{ file_id_list, doc_strategy }`，ID 使用上一步上传成功的图片文件 ID，并传当前处理策略；
 已预览时提交 `{ file_id_list }`，使用生成结果的 `source_file_id`，服务端保留已有预览的策略和识别结果。
-图片支持 JPG、JPEG、PNG、WEBP、BMP；共享范围尚未装配图片上传和导入接口，不回退到 Workspace。
-System 资源管理接口前缀为 `/system/resource/knowledge/<knowledgeId>/document/image`；
+图片支持 JPG、JPEG、PNG、WEBP、BMP；Workspace 共享保持只读，不装配图片导入接口。
+System 资源管理和 System 共享接口前缀分别为 `/system/resource/knowledge/<knowledgeId>/document/image`
+和 `/system/shared/knowledge/<knowledgeId>/document/image`；
 生成预览 POST `preview`，批量添加 PUT `batch_create`。
 is_active 为 false 时保留，“全部”省略；tags 传叶子 ID 数组或 NO_TAG，按 tags[] 序列化。
 状态使用 DOCUMENT_TASK_STATE 与 DOCUMENT_TASK_TYPE，不用通用 STATE_TYPES；非任务状态省略 task_type。

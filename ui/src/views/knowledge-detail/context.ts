@@ -9,6 +9,7 @@ import SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/k
 import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import ImageApi from '@/api/admin/workspace/knowledge/image'
 import SystemResourceImageApi from '@/api/admin/system/resource-management/knowledge/image'
+import SystemSharedImageApi from '@/api/admin/system/shared-resources/knowledge/image'
 import DocumentApi from '@/api/admin/workspace/knowledge/document'
 import SharedDocumentApi from '@/api/admin/workspace/shared/knowledge/document'
 import SystemResourceDocumentApi from '@/api/admin/system/resource-management/knowledge/document'
@@ -61,7 +62,7 @@ interface KnowledgeResourceApi {
   readonly chatUser: OptionalApiMethods<
     typeof ChatUserApi | typeof SharedChatUserApi | typeof SystemResourceChatUserApi | typeof SystemSharedChatUserApi
   >
-  readonly image?: OptionalApiMethods<typeof ImageApi | typeof SystemResourceImageApi>
+  readonly image?: OptionalApiMethods<typeof ImageApi | typeof SystemResourceImageApi | typeof SystemSharedImageApi>
   readonly workflow?: typeof WorkflowApi
   readonly document: OptionalApiMethods<
     typeof DocumentApi | typeof SharedDocumentApi | typeof SystemResourceDocumentApi | typeof SystemSharedDocumentApi
@@ -143,6 +144,7 @@ const resourceConfigs = {
       externalRetrieval: SystemSharedExternalRetrievalApi,
       document: SystemSharedDocumentApi,
       paragraph: SystemSharedParagraphApi,
+      image: SystemSharedImageApi,
       tags: SystemSharedTagsApi,
       termbase: SystemSharedTermbaseApi,
       problem: SystemSharedProblemApi,
