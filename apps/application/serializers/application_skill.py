@@ -19,7 +19,7 @@ from common.exception.app_exception import AppApiException
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
 
-SKILL_SCRIPT_PATH = os.path.join(PROJECT_DIR, "apps", "application", "template", "skill", "skill_script.py")
+SKILL_SCRIPT_PATH = os.path.join(PROJECT_DIR, "apps", "application", "template", "skill", "skill_script")
 
 
 class InvalidSkillBaseUrl(AppApiException):
