@@ -823,7 +823,7 @@
 /* progress */
 .el-progress {
   .el-progress-bar__inner {
-    background: linear-gradient(90deg, rgb(var(--mk-primary-rgb) / 20%) 0%, var(--el-color-primary) 100%);
+    background: linear-gradient(90deg, rgb(51 112 255 / 20%) 0%, #3370ff 100%);
   }
   &.is-warning {
     .el-progress-bar__inner {

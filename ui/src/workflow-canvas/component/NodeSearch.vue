@@ -24,7 +24,20 @@ const matchedNodes = computed(() => {
 function focusCurrentNode() {
   const node = matchedNodes.value[currentIndex.value]
   props.logicFlow.clearSelectElements()
+  const keyword = searchKeyword.value.trim()
+  props.logicFlow.graphModel.nodes.forEach((nodeModel) => {
+    nodeModel.clearSelectOn?.()
+    if (
+      keyword &&
+      String(nodeModel.properties.stepName ?? '')
+        .toLocaleLowerCase()
+        .includes(keyword.toLocaleLowerCase())
+    ) {
+      nodeModel.selectOn?.(keyword)
+    }
+  })
   if (!node) return
+  props.logicFlow.getNodeModelById(node.id)?.focusOn?.()
   props.logicFlow.selectElementById(node.id)
   props.logicFlow.focusOn(node.id)
 }
@@ -44,7 +57,7 @@ function closeSearch() {
   searchVisible.value = false
   searchKeyword.value = ''
   currentIndex.value = 0
-  props.logicFlow.clearSelectElements()
+  focusCurrentNode()
 }
 
 function handleShortcut(event: KeyboardEvent) {
@@ -61,7 +74,10 @@ watch(searchKeyword, () => {
 })
 
 onMounted(() => window.addEventListener('keydown', handleShortcut))
-onBeforeUnmount(() => window.removeEventListener('keydown', handleShortcut))
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleShortcut)
+  props.logicFlow.graphModel.nodes.forEach((node) => node.clearSelectOn?.())
+})
 </script>
 
 <template>
