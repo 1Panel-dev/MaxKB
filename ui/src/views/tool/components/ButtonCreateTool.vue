@@ -12,6 +12,7 @@ import DataSourceFormDrawer from '../tool-form/DataSourceFormDrawer.vue'
 import McpFormDrawer from '../tool-form/McpFormDrawer.vue'
 import SkillToolFormDrawer from '../tool-form/SkillToolFormDrawer.vue'
 import WorkflowFormDialog from '../tool-form/WorkflowFormDialog.vue'
+import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'ButtonCreateTool' })
 
@@ -168,6 +169,7 @@ function handleRefresh() {
           multiple
           :on-change="handleImportCreate"
           :show-file-list="false"
+          v-if="perm.tool.workspace.import()"
         >
           <MkDropdownItem class="w-full py-2!">
             <template #icon>
