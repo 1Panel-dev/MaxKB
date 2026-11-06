@@ -20,24 +20,19 @@ from maxkb.conf import PROJECT_DIR
 openai_llm_model_credential = AnthropicLLMModelCredential()
 openai_image_model_credential = AnthropicImageModelCredential()
 
+# Claude model ids: https://platform.claude.com/docs/en/about-claude/models/overview
 model_info_list = [
-    ModelInfo('claude-3-opus-20240229', '', ModelTypeConst.LLM,
+    ModelInfo('claude-opus-4-6', '', ModelTypeConst.LLM,
               openai_llm_model_credential, AnthropicChatModel
               ),
-    ModelInfo('claude-3-sonnet-20240229', '', ModelTypeConst.LLM, openai_llm_model_credential,
+    ModelInfo('claude-sonnet-4-6', '', ModelTypeConst.LLM, openai_llm_model_credential,
               AnthropicChatModel),
-    ModelInfo('claude-3-haiku-20240307', '', ModelTypeConst.LLM, openai_llm_model_credential,
-              AnthropicChatModel),
-    ModelInfo('claude-3-5-sonnet-20240620', '', ModelTypeConst.LLM, openai_llm_model_credential,
-              AnthropicChatModel),
-    ModelInfo('claude-3-5-haiku-20241022', '', ModelTypeConst.LLM, openai_llm_model_credential,
-              AnthropicChatModel),
-    ModelInfo('claude-3-5-sonnet-20241022', '', ModelTypeConst.LLM, openai_llm_model_credential,
+    ModelInfo('claude-haiku-4-5-20251001', '', ModelTypeConst.LLM, openai_llm_model_credential,
               AnthropicChatModel),
 ]
 
 image_model_info = [
-    ModelInfo('claude-3-5-sonnet-20241022', '', ModelTypeConst.IMAGE, openai_image_model_credential,
+    ModelInfo('claude-sonnet-4-6', '', ModelTypeConst.IMAGE, openai_image_model_credential,
               AnthropicImage),
 ]
 
