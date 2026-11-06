@@ -11,7 +11,16 @@ from common.auth.constants.role_constants import RoleConstants
 from common.log.log import log
 from common.result import result
 from models_provider.api.model import DefaultModelResponse
-from system_manage.api.chat_user import BatchAddGroupApi, ChatUserAPI, ChatUserPageApi, EditUserApi
+from system_manage.api.chat_user import (
+    BatchAddGroupApi,
+    ChatUserAPI,
+    ChatUserDetailResponse,
+    ChatUserGroupPageUserListResponse,
+    ChatUserPageApi,
+    ChatUserPageUserListResponse,
+    ChatUsersListResponse,
+    EditUserApi,
+)
 from system_manage.api.user_group import (
     AddMemberApi,
     CreateUserGroupApi,
@@ -27,7 +36,7 @@ from system_manage.serializers.chat_user import (
     UserGroupListPageSerializer,
     UserGroupRemoveMemberSerializer,
 )
-from users.api.user import ChangeUserPasswordApi, DeleteUserApi, UserPageApi, UserProfileAPI
+from users.api.user import ChangeUserPasswordApi, DeleteUserApi, UserProfileAPI
 
 
 def get_user_operation_object(user_id):
@@ -120,7 +129,7 @@ class SystemChatUserView(APIView):
             operation_id=_("Get chat user information"),  # type: ignore
             tags=[_("System/Chat user")],  # type: ignore
             request=DeleteUserApi.get_parameters(),
-            responses=UserProfileAPI.get_response(),
+            responses=ChatUserDetailResponse,
         )
         @has_permissions(PermissionConstants.CHAT_USER_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request, user_id):
@@ -155,7 +164,7 @@ class SystemChatUserView(APIView):
             operation_id=_("Get user list by group"),  # type: ignore
             tags=[_("System/Chat user")],  # type: ignore
             request=AddMemberApi.get_parameters(),
-            responses=UserProfileAPI.get_response(),
+            responses=ChatUsersListResponse,
         )
         @has_permissions(PermissionConstants.CHAT_USER_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request, user_group_id):
@@ -239,7 +248,7 @@ class SystemChatUserView(APIView):
             operation_id=_("Get user paginated list"),  # type: ignore
             tags=[_("System/Chat user")],  # type: ignore
             parameters=ChatUserPageApi.get_parameters(),
-            responses=UserPageApi.get_response(),
+            responses=ChatUserPageUserListResponse,
         )
         @has_permissions(PermissionConstants.CHAT_USER_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request, current_page, page_size):
@@ -386,7 +395,7 @@ class SystemChatUserGroupView(APIView):
             operation_id=_("Get user list by group"),  # type: ignore
             tags=[_("System/User Group")],  # type: ignore
             parameters=UserGroupListApi.get_parameters(),
-            responses=UserGroupListApi.get_response(),
+            responses=ChatUserGroupPageUserListResponse,
         )
         @has_permissions(PermissionConstants.USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request, user_group_id: str, current_page: int, page_size: int):

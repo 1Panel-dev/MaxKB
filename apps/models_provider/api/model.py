@@ -22,7 +22,7 @@ class ModelDetailSerializer(serializers.Serializer):
     status = serializers.CharField(required=True, label=_("status"))
     meta = serializers.DictField(required=False, allow_null=True, label=_("model meta"))
     credential = serializers.DictField(required=False, label=_("certification information"))
-    workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+    workspace_id = serializers.CharField(required=False, label=_("workspace id"))
     nick_name = serializers.CharField(required=False, allow_blank=True, label=_("nick name"))
     username = serializers.CharField(required=False, allow_blank=True, label=_("username"))
 

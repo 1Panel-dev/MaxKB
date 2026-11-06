@@ -27,6 +27,8 @@ from system_manage.api.user_resource_permission import (
     ResourceUserPermissionAPI,
     ResourceUserPermissionPageAPI,
     ResourceUserPermissionEditAPI,
+    ResourceUserGroupPermissionAPI,
+    ResourceUserGroupPermissionPageAPI,
     UserResourcePermissionPageAPI,
 )
 from system_manage.serializers.user_group_resource_permission import (
@@ -150,7 +152,7 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
         summary=_("Get user group authorization status of resource"),
         operation_id=_("Get user group authorization status of resource"),  # type: ignore
         parameters=ResourceUserPermissionAPI.get_parameters(),
-        responses=ResourceUserPermissionAPI.get_response(),
+        responses=ResourceUserGroupPermissionAPI.get_response(),
         tags=[_("Resources authorization")],  # type: ignore
     )
     @has_permissions(
@@ -237,7 +239,7 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
             summary=_("Get user group authorization status of resource by page"),
             operation_id=_("Get user group authorization status of resource by page"),  # type: ignore
             parameters=ResourceUserPermissionPageAPI.get_parameters(),
-            responses=ResourceUserPermissionPageAPI.get_response(),
+            responses=ResourceUserGroupPermissionPageAPI.get_response(),
             tags=[_("Resources authorization")],  # type: ignore
         )
         @has_permissions(

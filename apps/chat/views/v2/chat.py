@@ -46,7 +46,7 @@ from common.auth.constants.chat_permission_constants import ChatPermissionConsta
 from common.constants.cache_version import Cache_Version
 from common.exception.app_exception import AppAuthenticationFailed, AppApiException
 from common.log.log import _get_ip_address, log
-from common.result import DefaultResultSerializer, result
+from common.result import DefaultResultSerializer, ResultStringSerializer, result
 from common.utils.rsa_util import decrypt
 from knowledge.models import FileSourceType
 from maxkb.const import CONFIG
@@ -188,7 +188,16 @@ class AuthProfile(APIView):
         summary=_("Get application authentication information"),
         operation_id=_("Get application authentication information"),  # type: ignore
         parameters=ChatAuthenticationProfileAPIV2.get_parameters(),
-        responses=None,
+        responses={
+            200: OpenApiResponse(
+                response=DefaultResultSerializer,
+                description=_("Success"),
+            ),
+            400: OpenApiResponse(
+                response=ResultStringSerializer,
+                description=_("access_token is required"),
+            ),
+        },
         tags=[_("Chat")],  # type: ignore
     )
     def get(self, request: Request):

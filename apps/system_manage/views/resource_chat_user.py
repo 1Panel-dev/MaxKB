@@ -8,11 +8,12 @@
 """
 
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common import result
+from common.result import ResultStringSerializer
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.compare_constants import CompareConstants
@@ -75,7 +76,13 @@ class ResourceChatUser(APIView):
         summary=_("Get Resource chat user List"),
         operation_id=_("Get Resource chat user List"),  # type: ignore
         parameters=WorkspaceResourceChatUserListAPI.get_parameters(),
-        responses=WorkspaceResourceChatUserListAPI.get_response(),
+        responses={
+            200: WorkspaceResourceChatUserListAPI.get_response(),
+            403: OpenApiResponse(
+                response=ResultStringSerializer,
+                description=_("No permission to access"),
+            ),
+        },
         tags=[_("Chat user")],  # type: ignore
     )
     @has_permissions(
@@ -144,7 +151,13 @@ class ResourceChatUser(APIView):
             summary=_("Get Resource chat user page List"),
             operation_id=_("Get Resource chat user page List"),  # type: ignore
             parameters=ResourceChatUserPageAPI.get_parameters(),
-            responses=ResourceChatUserPageAPI.get_response(),
+            responses={
+                200: ResourceChatUserPageAPI.get_response(),
+                403: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("No permission to access"),
+                ),
+            },
             tags=[_("Chat user")],  # type: ignore
         )
         @has_permissions(

@@ -121,6 +121,7 @@ def check_verify_code_attempts(email: str, type_code: str, submitted_code: str) 
 class UserProfileResponse(serializers.ModelSerializer):
     is_edit_password = serializers.BooleanField(required=True, label=_("Is Edit Password"))
     permissions = serializers.DictField(child=serializers.CharField(), required=True, label=_("permissions"))
+    role = serializers.ListField(child=serializers.CharField(), required=True, label=_("Role"))
 
     class Meta:
         model = User

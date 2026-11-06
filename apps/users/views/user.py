@@ -36,18 +36,17 @@ from users.api.user import (
     ChangeUserPasswordApi,
     UserPageApi,
     UserListApi,
+    UserManageDetailResponse,
     UserPasswordResponse,
     WorkspaceUserAPI,
     ResetPasswordAPI,
     SendEmailAPI,
-    CheckCodeAPI,
     SwitchUserLanguageAPI,
 )
 from users.models import User
 from users.serializers.user import (
     UserProfileSerializer,
     UserManageSerializer,
-    CheckCodeSerializer,
     SendEmailSerializer,
     RePasswordSerializer,
     SwitchLanguageSerializer,
@@ -287,7 +286,7 @@ class UserManage(APIView):
             operation_id=_("Get user information"),  # type: ignore
             tags=[_("User Management")],  # type: ignore
             request=DeleteUserApi.get_parameters(),
-            responses=UserProfileAPI.get_response(),
+            responses=UserManageDetailResponse,
         )
         @has_permissions(PermissionConstants.USER_READ, RoleConstants.ADMIN)
         def get(self, request: Request, user_id):

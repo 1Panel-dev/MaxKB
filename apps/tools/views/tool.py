@@ -1,4 +1,5 @@
 from common import result
+from common.result import ResultStringSerializer
 from common.auth import TokenAuth
 from common.auth.authentication import check_batch_permissions, has_permissions
 from common.auth.constants.compare_constants import CompareConstants
@@ -8,7 +9,7 @@ from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -28,6 +29,7 @@ from tools.api.tool import (
     ToolReadAPI,
     ToolMoveAPI,
     ToolTreeReadAPI,
+    ToolListResponse,
 )
 from tools.models import Tool, ToolScope
 from tools.permissions import get_tool_read_permission
@@ -88,7 +90,13 @@ class ToolView(APIView):
         summary=_("Get tool by folder"),
         operation_id=_("Get tool by folder"),  # type: ignore
         parameters=ToolTreeReadAPI.get_parameters(),
-        responses=ToolTreeReadAPI.get_response(),
+        responses={
+            200: ToolTreeReadAPI.get_response(),
+            400: OpenApiResponse(
+                response=ResultStringSerializer,
+                description=_("Invalid or missing parameter"),
+            ),
+        },
         tags=[_("Tool")],  # type: ignore
     )
     @has_permissions(
@@ -356,7 +364,13 @@ class ToolView(APIView):
             summary=_("Get tool list by pagination"),
             operation_id=_("Get tool list by pagination"),  # type: ignore
             parameters=ToolPageAPI.get_parameters(),
-            responses=ToolPageAPI.get_response(),
+            responses={
+                200: ToolPageAPI.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("Invalid or missing parameter"),
+                ),
+            },
             tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
@@ -391,7 +405,7 @@ class ToolView(APIView):
             summary=_("Get tool list"),
             operation_id=_("Get tool list"),  # type: ignore
             parameters=ToolReadAPI.get_parameters(),
-            responses=ToolReadAPI.get_response(),
+            responses=ToolListResponse,
             tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
