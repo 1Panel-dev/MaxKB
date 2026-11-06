@@ -11,6 +11,7 @@ import { Compare, hasPermission, Role, RoleConstants } from '@/permission/core'
 import { getWorkspaceId } from '@/utils/resource-context'
 import { useStore } from '@/stores'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
+import perm from '@/permission/index.ts'
 
 const router = useRouter()
 const props = withDefaults(defineProps<{ mode?: LayoutMode; preview?: boolean }>(), { mode: 'workspace', preview: false })
@@ -86,7 +87,7 @@ function toUrl(url?: string) {
     <div class="flex-align-center gap-5">
       <span class="-mr-1">
         <!-- 访问智能体门户 -->
-        <el-button text @click="toUrl(portalAccessUrl)">
+        <el-button v-if="perm.system.other.portal()" text @click="toUrl(portalAccessUrl)">
           <MkIcon name="icon_chat_outlined" />
           <span>门户</span>
         </el-button>
