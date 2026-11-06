@@ -11,7 +11,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
-from common.result import ResultSerializer
+from common.result import ResultPageSerializer, ResultSerializer
 from users.serializers.user import CreateUserSerializer
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -101,14 +101,79 @@ class ChatUserListResponse(serializers.Serializer):
     id = serializers.CharField(required=True, label=_("ID"))
     username = serializers.CharField(required=True, label=_("Username"))
     nick_name = serializers.CharField(required=True, label=_("Nickname"))
-    email = serializers.EmailField(required=False, allow_blank=True, label=_("Email"))
-    phone = serializers.CharField(required=False, allow_blank=True, label=_("Phone"))
+    email = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Email"))
+    phone = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Phone"))
     is_active = serializers.BooleanField(required=False, default=True, label=_("Is Active"))
+    create_time = serializers.DateTimeField(required=False, label=_("Create Time"))
+    update_time = serializers.DateTimeField(required=False, label=_("Update Time"))
+    source = serializers.CharField(required=False, allow_blank=True, label=_("Source"))
 
 
 class ChatUsersListResponse(ResultSerializer):
     def get_data(self):
         return ChatUserListResponse(many=True)
+
+
+class ChatUserDetailSerializer(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_("ID"))
+    username = serializers.CharField(required=True, label=_("Username"))
+    nick_name = serializers.CharField(required=True, label=_("Nickname"))
+    email = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Email"))
+    phone = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Phone"))
+    is_active = serializers.BooleanField(required=False, default=True, label=_("Is Active"))
+    create_time = serializers.DateTimeField(required=False, label=_("Create Time"))
+    update_time = serializers.DateTimeField(required=False, label=_("Update Time"))
+    source = serializers.CharField(required=False, allow_blank=True, label=_("Source"))
+    user_group_ids = serializers.ListField(
+        required=False, child=serializers.CharField(required=False), label=_("User Group IDs")
+    )
+
+
+class ChatUserDetailResponse(ResultSerializer):
+    def get_data(self):
+        return ChatUserDetailSerializer()
+
+
+class ChatUserPageUserListSerializer(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_("ID"))
+    username = serializers.CharField(required=True, label=_("Username"))
+    nick_name = serializers.CharField(required=True, label=_("Nickname"))
+    email = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Email"))
+    phone = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Phone"))
+    is_active = serializers.BooleanField(required=False, default=True, label=_("Is Active"))
+    create_time = serializers.DateTimeField(required=False, label=_("Create Time"))
+    update_time = serializers.DateTimeField(required=False, label=_("Update Time"))
+    source = serializers.CharField(required=False, allow_blank=True, label=_("Source"))
+    user_group_ids = serializers.ListField(
+        required=False, child=serializers.CharField(required=False), label=_("User Group IDs")
+    )
+    user_group_names = serializers.ListField(
+        required=False, child=serializers.CharField(required=False), label=_("User Group Names")
+    )
+    token_quota = serializers.DictField(required=False, allow_null=True, label=_("Token Quota"))
+
+
+class ChatUserPageUserListResponse(ResultPageSerializer):
+    def get_data(self):
+        return ChatUserPageUserListSerializer(many=True)
+
+
+class ChatUserGroupPageUserListSerializer(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_("ID"))
+    username = serializers.CharField(required=True, label=_("Username"))
+    nick_name = serializers.CharField(required=True, label=_("Nickname"))
+    email = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Email"))
+    phone = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Phone"))
+    is_active = serializers.BooleanField(required=False, default=True, label=_("Is Active"))
+    create_time = serializers.DateTimeField(required=False, label=_("Create Time"))
+    update_time = serializers.DateTimeField(required=False, label=_("Update Time"))
+    source = serializers.CharField(required=False, allow_blank=True, label=_("Source"))
+    user_group_relation_id = serializers.CharField(required=False, label=_("User Group Relation ID"))
+
+
+class ChatUserGroupPageUserListResponse(ResultPageSerializer):
+    def get_data(self):
+        return ChatUserGroupPageUserListSerializer(many=True)
 
 
 class ChatUserPageApi(APIMixin):

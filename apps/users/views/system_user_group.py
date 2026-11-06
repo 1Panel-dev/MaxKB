@@ -17,6 +17,7 @@ from users.api.user_group import (
     CreateUserGroupApi,
     DeleteUserGroupApi,
     RemoveMemberApi,
+    SystemUserGroupUserListPageResponse,
     UserGroupListApi,
     UserGroupListPageApi,
 )
@@ -180,7 +181,7 @@ class SystemUserGroupView(APIView):
             operation_id=_("Get user list by group"),  # type: ignore
             tags=[_("IAM/System User Group")],  # type: ignore
             parameters=UserGroupListPageApi.get_parameters(),
-            responses=UserGroupListPageApi.get_response(),
+            responses=SystemUserGroupUserListPageResponse,
         )
         @has_permissions(
             PermissionConstants.SYSTEM_USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE

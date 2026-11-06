@@ -29,7 +29,7 @@ from chat.serializers.chat_record import (
 )
 from common import result
 from common.auth import ChatTokenAuth
-from common.result import DefaultResultSerializer
+from common.result import ResultStringSerializer
 
 
 class VoteView(APIView):
@@ -69,7 +69,7 @@ class HistoricalConversationView(APIView):
         responses={
             200: HistoricalConversationAPI.get_response(),
             401: OpenApiResponse(
-                response=DefaultResultSerializer,
+                response=ResultStringSerializer,
                 description=_("Authentication required"),
             ),
         },
@@ -163,7 +163,7 @@ class HistoricalConversationView(APIView):
             responses={
                 200: PageHistoricalConversationAPI.get_response(),
                 401: OpenApiResponse(
-                    response=DefaultResultSerializer,
+                    response=ResultStringSerializer,
                     description=_("Authentication required"),
                 ),
             },

@@ -90,7 +90,8 @@ class WorkspaceUserAPI(APIMixin):
 
 class WorkspaceUser(serializers.Serializer):
     id = serializers.CharField(required=True, label=_("id"))
-    username = serializers.CharField(required=True, label=_("Username"))
+    nick_name = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_("Nick name"))
+    roles = serializers.ListField(child=serializers.CharField(required=False), required=False, label=_("roles"))
 
 
 class WorkspaceUserListResponse(ResultSerializer):
@@ -161,9 +162,30 @@ class ChangeUserPasswordApi(APIMixin):
         return UserManageSerializer.RePasswordInstance
 
 
+class UserMinimalSerializer(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_("ID"))
+    username = serializers.CharField(required=True, label=_("Username"))
+    nick_name = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Nickname"))
+
+
 class UserListResponse(ResultSerializer):
     def get_data(self):
-        return UserInstanceSerializer(many=True)
+        return UserMinimalSerializer(many=True)
+
+
+class UserManageDetailSerializer(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_("ID"))
+    username = serializers.CharField(required=True, label=_("Username"))
+    email = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Email"))
+    phone = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Phone"))
+    nick_name = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Nickname"))
+    is_active = serializers.BooleanField(required=False, label=_("Is Active"))
+    role_setting = serializers.DictField(required=False, label=_("Role Setting"))
+
+
+class UserManageDetailResponse(ResultSerializer):
+    def get_data(self):
+        return UserManageDetailSerializer()
 
 
 class UserPageResponse(ResultPageSerializer):

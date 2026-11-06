@@ -2,9 +2,10 @@
 
 
 from common import result
+from common.result import ResultStringSerializer
 from common.auth import TokenAuth
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from models_provider.api.provide import ProvideApi
 from models_provider.constants.model_provider_constants import ModelProvideConstants
 from models_provider.serializers.model_serializer import get_default_model_params_setting
@@ -70,7 +71,13 @@ class Provide(APIView):
             description=_("Get a list of model types"),
             operation_id=_("Get a list of model types"),  # type: ignore
             parameters=ProvideApi.ModelTypeList.get_query_params_api(),
-            responses=ProvideApi.ModelTypeList.get_response(),
+            responses={
+                200: ProvideApi.ModelTypeList.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("provider is required"),
+                ),
+            },
             tags=[_("Model")],  # type: ignore
         )
         def get(self, request: Request):
@@ -86,7 +93,13 @@ class Provide(APIView):
             description=_("Example of obtaining model list"),
             operation_id=_("Example of obtaining model list"),  # type: ignore
             parameters=ProvideApi.ModelList.get_query_params_api(),
-            responses=ProvideApi.ModelList.get_response(),
+            responses={
+                200: ProvideApi.ModelList.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("provider is required"),
+                ),
+            },
             tags=[_("Model")],  # type: ignore
         )
         @staticmethod
@@ -181,7 +194,13 @@ class Provide(APIView):
             description=_("Get model default parameters"),
             operation_id=_("Get model default parameters"),  # type: ignore
             parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
-            responses=ProvideApi.ModelParamsForm.get_response(),
+            responses={
+                200: ProvideApi.ModelParamsForm.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("provider is required"),
+                ),
+            },
             tags=[_("Model")],  # type: ignore
         )
         def get(self, request: Request):
@@ -202,7 +221,13 @@ class Provide(APIView):
             description=_("Get the model creation form"),
             operation_id=_("Get the model creation form"),  # type: ignore
             parameters=ProvideApi.ModelParamsForm.get_query_params_api(),
-            responses=ProvideApi.ModelParamsForm.get_response(),
+            responses={
+                200: ProvideApi.ModelParamsForm.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("provider is required"),
+                ),
+            },
             tags=[_("Model")],  # type: ignore
         )
         def get(self, request: Request):

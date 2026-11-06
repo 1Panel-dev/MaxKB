@@ -25,6 +25,16 @@ class DefaultResultSerializer(serializers.Serializer):
     data = serializers.BooleanField(required=False, default=True)
 
 
+class ResultStringSerializer(serializers.Serializer):
+    code = serializers.IntegerField(required=True, help_text=_("response code"), label=_("response code"))
+    message = serializers.CharField(
+        required=False, default="success", help_text=_("error prompt"), label=_("error prompt")
+    )
+    data = serializers.CharField(
+        required=False, allow_null=True, help_text=_("response data"), label=_("response data")
+    )
+
+
 class ResultSerializer(serializers.Serializer):
     """
     响应结果

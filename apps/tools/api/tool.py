@@ -20,6 +20,21 @@ class ToolModelResponseSerializer(ToolModelSerializer):
     init_params = serializers.DictField(required=False, allow_null=True, label="初始化参数")
 
 
+class ToolListDataSerializer(serializers.Serializer):
+    tools = ToolModelResponseSerializer(many=True, label="工具列表")
+    shared_tools = ToolModelResponseSerializer(many=True, label="共享工具列表")
+
+
+class ToolListResponse(ResultSerializer):
+    def get_data(self):
+        return ToolListDataSerializer()
+
+
+class ToolModelListResponse(ResultSerializer):
+    def get_data(self):
+        return ToolModelResponseSerializer(many=True)
+
+
 class ToolCreateResponse(ResultSerializer):
     def get_data(self):
         return ToolModelResponseSerializer()
@@ -76,6 +91,10 @@ class ToolEditAPI(ToolReadAPI):
     @staticmethod
     def get_request():
         return ToolEditRequest
+
+    @staticmethod
+    def get_response():
+        return ToolCreateResponse
 
 
 class ToolDeleteAPI(ToolReadAPI):

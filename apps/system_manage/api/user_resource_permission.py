@@ -282,3 +282,32 @@ class ResourceUserPermissionEditAPI(APIMixin):
     @staticmethod
     def get_response():
         return APIResourceUserPermissionResponse()
+
+
+class ResourceUserGroupPermissionItemResponse(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_("用户组id"))
+    name = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_("用户组名称"))
+    count = serializers.IntegerField(required=True, label=_("用户数"))
+    permission = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_("permission"))
+
+
+class APIResourceUserGroupPermissionResponse(ResultSerializer):
+    def get_data(self):
+        return ResourceUserGroupPermissionItemResponse(many=True)
+
+
+class APIResourceUserGroupPermissionPageResponse(ResultPageSerializer):
+    def get_data(self):
+        return ResourceUserGroupPermissionItemResponse(many=True)
+
+
+class ResourceUserGroupPermissionAPI(ResourceUserPermissionAPI):
+    @staticmethod
+    def get_response():
+        return APIResourceUserGroupPermissionResponse
+
+
+class ResourceUserGroupPermissionPageAPI(ResourceUserPermissionPageAPI):
+    @staticmethod
+    def get_response():
+        return APIResourceUserGroupPermissionPageResponse

@@ -46,7 +46,7 @@ from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.exception.app_exception import AppApiException
 from common.log.log import _get_ip_address, log, record_log
-from common.result import DefaultResultSerializer, result
+from common.result import DefaultResultSerializer, ResultStringSerializer, result
 from common.utils.rsa_util import decrypt
 from knowledge.models import FileSourceType
 from maxkb.const import CONFIG
@@ -194,7 +194,16 @@ class ChatAuthProfile(APIView):
         summary=_("Get application authentication information"),
         operation_id=_("V3 Get application authentication information"),  # type: ignore
         parameters=ChatAuthenticationProfileAPI.get_parameters(),
-        responses=None,
+        responses={
+            200: OpenApiResponse(
+                response=DefaultResultSerializer,
+                description=_("Success"),
+            ),
+            400: OpenApiResponse(
+                response=ResultStringSerializer,
+                description=_("access_token is required"),
+            ),
+        },
         tags=[_("V3 Chat")],  # type: ignore
     )
     def get(self, request: Request):
@@ -472,7 +481,7 @@ class ChatUserProfileView(APIView):
         responses={
             200: UserProfileAPI.get_response(),
             401: OpenApiResponse(
-                response=DefaultResultSerializer,
+                response=ResultStringSerializer,
                 description=_("Authentication required"),
             ),
         },

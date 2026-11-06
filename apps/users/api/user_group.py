@@ -4,7 +4,7 @@ from drf_spectacular.utils import OpenApiParameter
 from rest_framework import serializers
 
 from common.mixins.api_mixin import APIMixin
-from common.result import ResultSerializer, DefaultResultSerializer
+from common.result import DefaultResultSerializer, ResultPageSerializer, ResultSerializer
 from users.serializers.user_group import SystemUserGroupModelSerializer, SystemUserGroupCreateSerializer
 
 
@@ -69,6 +69,20 @@ class UserGroupListApi(APIMixin):
                 location=OpenApiParameter.PATH,  # type: ignore
             )
         ]
+
+
+class SystemUserGroupUserListSerializer(serializers.Serializer):
+    id = serializers.CharField(required=True, label=_("ID"))
+    username = serializers.CharField(required=True, label=_("Username"))
+    nick_name = serializers.CharField(required=True, label=_("Nickname"))
+    system_user_group_relation_id = serializers.CharField(required=False, label=_("Relation ID"))
+    source = serializers.CharField(required=False, allow_blank=True, label=_("Source"))
+    roles = serializers.ListField(required=False, child=serializers.CharField(required=False), label=_("Roles"))
+
+
+class SystemUserGroupUserListPageResponse(ResultPageSerializer):
+    def get_data(self):
+        return SystemUserGroupUserListSerializer(many=True)
 
 
 class UserGroupListPageResponse(ResultSerializer):

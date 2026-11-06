@@ -1,12 +1,12 @@
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.role_constants import RoleConstants
-from common.result import result
+from common.result import result, ResultStringSerializer
 from system_manage.api.resource_chat_user_group import ResourceChatUserGroupListAPI, ResourceChatUserGroupEditAPI
 from system_manage.serializers.resource_chat_user_group import (
     ResourceChatUserGroupQuerySerializer,
@@ -24,7 +24,13 @@ class ResourceChatUserGroup(APIView):
         summary=_("Get Resource chat user group List"),
         operation_id=_("Get Resource chat user group List"),  # type: ignore
         parameters=ResourceChatUserGroupListAPI.get_parameters(),
-        responses=None,
+        responses={
+            200: ResourceChatUserGroupListAPI.get_response(),
+            403: OpenApiResponse(
+                response=ResultStringSerializer,
+                description=_("No permission to access"),
+            ),
+        },
         tags=[_("Chat user")],  # type: ignore
     )
     @has_permissions(
@@ -95,7 +101,13 @@ class ResourceChatUserGroup(APIView):
             summary=_("Get Resource chat user page group List"),
             operation_id=_("Get Resource chat user group page List"),  # type: ignore
             parameters=ResourceChatUserGroupListAPI.get_parameters(),
-            responses=None,
+            responses={
+                200: ResourceChatUserGroupListAPI.get_response(),
+                403: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("No permission to access"),
+                ),
+            },
             tags=[_("Chat user")],  # type: ignore
         )
         @has_permissions(

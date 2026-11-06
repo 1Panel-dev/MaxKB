@@ -7,11 +7,12 @@
 @desc:
 """
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common import result
+from common.result import ResultStringSerializer
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.permission_constants import PermissionConstants
@@ -44,7 +45,13 @@ class HomePageAPI(APIView):
             summary=_("Chat record aggregation"),
             operation_id="homepage_chat_count_aggregation",
             parameters=TokensAggregationAPI.get_parameters(),
-            responses=TokensAggregationAPI.get_response(),
+            responses={
+                200: TokensAggregationAPI.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("Invalid or missing time range parameters"),
+                ),
+            },
             tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
@@ -73,7 +80,13 @@ class HomePageAPI(APIView):
             summary=_("Tokens data aggregation"),
             operation_id="homepage_tokens_aggregation",
             parameters=TokensAggregationAPI.get_parameters(),
-            responses=TokensAggregationAPI.get_response(),
+            responses={
+                200: TokensAggregationAPI.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("Invalid or missing time range parameters"),
+                ),
+            },
             tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
@@ -102,7 +115,13 @@ class HomePageAPI(APIView):
             summary=_("Top applications by token consumption export"),
             operation_id="homepage_application_tokens_ranking_export",
             parameters=RankingBaseExportAPI.get_parameters(),
-            responses=RankingBaseExportAPI.get_response(),
+            responses={
+                200: RankingBaseExportAPI.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("Invalid or missing time range parameters"),
+                ),
+            },
             tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
@@ -160,7 +179,13 @@ class HomePageAPI(APIView):
             summary=_("Top applications by question count export"),
             operation_id="homepage_application_question_ranking_export",
             parameters=RankingBaseExportAPI.get_parameters(),
-            responses=RankingBaseExportAPI.get_response(),
+            responses={
+                200: RankingBaseExportAPI.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("Invalid or missing time range parameters"),
+                ),
+            },
             tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
@@ -218,7 +243,13 @@ class HomePageAPI(APIView):
             summary=_("Top users by token consumption export"),
             operation_id="homepage_user_tokens_ranking_export",
             parameters=RankingBaseExportAPI.get_parameters(),
-            responses=RankingBaseExportAPI.get_response(),
+            responses={
+                200: RankingBaseExportAPI.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("Invalid or missing time range parameters"),
+                ),
+            },
             tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
@@ -276,7 +307,13 @@ class HomePageAPI(APIView):
             summary=_("Dialogue-related statistical trends"),
             operation_id="Dialogue-related statistical trends",  # type: ignore
             parameters=ApplicationMonitoringAPI.get_parameters(),
-            responses=ApplicationMonitoringAPI.get_response(),
+            responses={
+                200: ApplicationMonitoringAPI.get_response(),
+                400: OpenApiResponse(
+                    response=ResultStringSerializer,
+                    description=_("Invalid or missing time range parameters"),
+                ),
+            },
             tags=[_("Home page")],  # type: ignore
         )
         @has_permissions(
