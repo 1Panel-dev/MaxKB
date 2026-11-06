@@ -30,6 +30,8 @@ import SharedProblemApi from '@/api/admin/workspace/shared/knowledge/problem'
 import SystemResourceProblemApi from '@/api/admin/system/resource-management/knowledge/problem'
 import SystemSharedProblemApi from '@/api/admin/system/shared-resources/knowledge/problem'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import SystemResourceWorkflowApi from '@/api/admin/system/resource-management/knowledge/workflow'
+import SystemSharedWorkflowApi from '@/api/admin/system/shared-resources/knowledge/workflow'
 import ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-sync'
 import SharedScheduledSyncApi from '@/api/admin/workspace/shared/knowledge/scheduled-sync'
 import SystemResourceScheduledSyncApi from '@/api/admin/system/resource-management/knowledge/scheduled-sync'
@@ -129,6 +131,7 @@ const resourceConfigs = {
       tags: SystemResourceTagsApi,
       termbase: SystemResourceTermbaseApi,
       problem: SystemResourceProblemApi,
+      workflow: SystemResourceWorkflowApi,
     },
     listRouteName: 'system-resource-knowledge',
   },
@@ -143,6 +146,7 @@ const resourceConfigs = {
       tags: SystemSharedTagsApi,
       termbase: SystemSharedTermbaseApi,
       problem: SystemSharedProblemApi,
+      workflow: SystemSharedWorkflowApi,
     },
     listRouteName: 'system-shared-knowledge',
   },
