@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { compileFunction } from 'node:vm'
 import ts from 'typescript'
+import { compileScript, parse } from '@vue/compiler-sfc'
 import * as Vue from 'vue'
 
 function loadModule(path, resolveDependency) {
@@ -23,7 +24,7 @@ function createContext(scope) {
   const requests = []
   const request = (method) => async (url, payload) => {
     requests.push({ method, url, payload })
-    return []
+    return url.endsWith('/upload_document') ? { id: 'action-a' } : []
   }
   const resourceContext = {
     getResourceScope: () => route.meta.resourceScope,
@@ -81,4 +82,59 @@ test('详情资源范围切换后，表单请求使用新范围而不保留工�
   delete route.params.workspaceId
   await resourceApi.workflow.getKnowledgeWorkflowFormList('knowledge-a', 'tool', 'tool-a', { id: 'source' })
   assert.equal(requests[0].url, '/system/resource/knowledge/knowledge-a/datasource/tool/tool-a/form_list')
+})
+
+test('系统共享知识库点击导入后打开表单，并通过共享接口提交本地文档', async () => {
+  const { context, requests } = createContext('system-shared')
+  const workflow = { nodes: [{ id: 'source', type: 'data-source-local-node' }], edges: [] }
+  const opened = []
+  const emitted = []
+  const refs = {
+    workflowDrawerRef: Vue.ref({ open: (graph) => opened.push(graph) }),
+    actionRef: Vue.ref({
+      validate: async () => true,
+      getData: () => ({ node_id: 'source', file_list: [{ file_id: 'file-a', status: 'success' }, { status: 'uploading' }] }),
+    }),
+  }
+  function loadComponent(name) {
+    const path = `views/knowledge-detail/library/document/import-document/${name}.vue`
+    const { descriptor } = parse(readFileSync(new URL(`../src/${path}`, import.meta.url), 'utf8'))
+    const script = compileScript(descriptor, { id: 'shared-workflow-import' })
+    const { outputText } = ts.transpileModule(script.content, {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+    })
+    const exports = {}
+    compileFunction(outputText, ['require', 'exports'])((id) => {
+      if (id === 'vue') return { ...Vue, provide() {}, useTemplateRef: (key) => refs[key] ?? Vue.ref() }
+      if (id === '@/constants/knowledge') return { KNOWLEDGE_TYPE_KEY: { WORKFLOW: 'workflow' } }
+      if (id === '@/workflow-canvas/types') return { WorkflowNodeType: { DataSourceLocalNode: 'data-source-local-node' } }
+      if (id === '@/utils/message') return { MsgWarning() {} }
+      if (id.startsWith('@/api/') || id.endsWith('.vue')) return {}
+      assert.fail(`Unexpected dependency: ${id}`)
+    }, exports)
+    return exports.default
+  }
+  const button = loadComponent('ButtonImportDocument').setup(
+    { workflowApi: context.resourceApi.workflow, knowledgeType: 'workflow', knowledgeId: 'knowledge-a', workflow },
+    { expose() {}, emit() {} },
+  )
+  await button.handleOpenImport()
+  assert.equal(button.workflowDrawerMounted.value, true)
+  assert.deepEqual(opened, [workflow])
+  const drawer = loadComponent('WorkflowImportDocumentDrawer').setup(
+    { api: context.resourceApi.workflow, knowledgeId: 'knowledge-a' },
+    { expose() {}, emit: (...args) => emitted.push(args) },
+  )
+  drawer.open(opened[0])
+  await drawer.handleSubmit()
+  assert.deepEqual(requests, [
+    {
+      method: 'POST',
+      url: '/system/shared/knowledge/knowledge-a/upload_document',
+      payload: { data_source: { node_id: 'source', file_list: [{ file_id: 'file-a', status: 'success' }] }, knowledge_base: {} },
+    },
+  ])
+  assert.equal(drawer.actionId.value, 'action-a')
+  assert.equal(drawer.active.value, 'result')
+  assert.deepEqual(emitted, [['refresh']])
 })
