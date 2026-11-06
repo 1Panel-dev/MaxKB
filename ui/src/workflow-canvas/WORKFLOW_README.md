@@ -324,6 +324,7 @@ LLM 节点的工具声明由 `llm-node/component/ToolsSetting.vue` 维护，导�
 AI 对话节点的 `component/resource-setting` 仅渲染技能卡片内的 MCP、工具、Skills 和智能体分组，
 各分组直接在入口使用 `MkCollapse`，普通列表区直接维护，仅选择弹窗独立封装。
 工具和 Skills 的添加入口复用 `SelectToolDialog`，智能体入口使用 `SelectApplicationDialog`；
+工具选择从 `resourceWorkspaceId` 注入读取详情所属空间，通过 `workspaceId` 传给弹窗，简易智能体与 AI 对话节点共用此流程。
 System 共享资源不展示智能体分组，也不挂载智能体选择弹窗。
 Skills 仅查询 SKILL 类型，选择器排除当前路由对应的智能体或工具。确认后同时更新执行用的
 ID 数组及 `tool_list`、`skill_tool_list`、`application_list` 回显快照；移除时同步清理快照，

@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { compileFunction } from 'node:vm'
 import { compileScript, parse } from '@vue/compiler-sfc'
+import { renderToString } from '@vue/server-renderer'
+import { setImmediate } from 'node:timers/promises'
 import lodash from 'lodash'
 import ts from 'typescript'
 import * as Vue from 'vue'
@@ -146,4 +148,172 @@ test('工具菜单在资源详情加载后自动查询，并保留数据源与�
     ])
     scope.stop()
   }
+})
+
+function loadComponent(path, dependencies, inlineTemplate = false) {
+  const { descriptor } = parse(readFileSync(new URL(`../src/${path}`, import.meta.url), 'utf8'))
+  const script = compileScript(descriptor, { id: 'tool-workspace-dialog', inlineTemplate })
+  const { outputText } = ts.transpileModule(script.content, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  })
+  const exports = {}
+  compileFunction(outputText, ['require', 'exports'])((id) => {
+    assert.ok(Object.hasOwn(dependencies, id), `Unexpected dependency: ${id}`)
+    return dependencies[id]
+  }, exports)
+  return exports.default
+}
+
+function createToolDialog(t, resourceScope, workspaceId, toolTypes = ['CUSTOM', 'WORKFLOW', 'INTERNAL']) {
+  const tools = [
+    { id: 'tool-a', name: 'Tool A', workspace_id: 'workspace-a', is_active: true, tool_type: 'CUSTOM' },
+    { id: 'skill-a', name: 'Skill A', workspace_id: 'workspace-a', is_active: true, tool_type: 'SKILL' },
+    { id: 'tool-b', name: 'Tool B', workspace_id: 'workspace-b', is_active: true, tool_type: 'CUSTOM' },
+    { id: 'skill-b', name: 'Skill B', workspace_id: 'workspace-b', is_active: true, tool_type: 'SKILL' },
+    { id: 'disabled', name: 'Disabled', workspace_id: 'workspace-a', is_active: false, tool_type: 'CUSTOM' },
+    { id: 'self', name: 'Self', workspace_id: 'workspace-a', is_active: true, tool_type: 'WORKFLOW' },
+  ]
+  const calls = []
+  const emitted = []
+  const api = (scope) => ({
+    getAllTool: async (query) => {
+      calls.push({ scope, query })
+      return tools.filter(
+        (tool) => (!query.workspace_id || tool.workspace_id === query.workspace_id) && (!query.name || tool.name.includes(query.name)),
+      )
+    },
+  })
+  const dependencies = {
+    vue: { ...Vue, useTemplateRef: () => Vue.ref() },
+    lodash,
+    '@/components/global/mk-tooltip/constants': { TOOLTIP_SHOW_DELAY: 300 },
+    '@/utils/resource-context': {
+      isSystemResource: () => resourceScope === 'system-resource',
+      isSystemSharedResource: () => resourceScope === 'system-shared',
+      isWorkspaceResource: () => resourceScope === 'workspace',
+    },
+    '@/api/admin/workspace/tool/tool': api('workspace'),
+    '@/api/admin/system/resource-management/tool/tool': api('system-resource'),
+    '@/api/admin/system/shared-resources/tool/tool': api('system-shared'),
+    '@/api/enums': { RESOURCE_TYPE: { TOOL: 'TOOL' }, TOOL_TYPE: { CUSTOM: 'CUSTOM', WORKFLOW: 'WORKFLOW', INTERNAL: 'INTERNAL' } },
+    '@/constants/folder': { FOLDER_ENTRIES: { TOOL: { all: { id: 'all', name: '全部' } } } },
+    '@/components/business/folder-tree/index.vue': {},
+    '@/components/mk-card-checkbox/index.vue': {},
+  }
+  const component = loadComponent('components/business/select-tool-dialog/index.vue', dependencies)
+  const props = Vue.reactive({ workspaceId, toolTypes, excludedIds: ['self'], title: '工具' })
+  const scope = Vue.effectScope()
+  const dialog = scope.run(() => component.setup(props, { expose() {}, emit: (...args) => emitted.push(args) }))
+  t.after(() => scope.stop())
+  return { dialog, props, calls, emitted }
+}
+
+test('公共工具和 Skills 弹窗按所属空间查询，搜索与刷新保留空间筛选', async (t) => {
+  for (const toolTypes of [['CUSTOM', 'WORKFLOW', 'INTERNAL'], ['SKILL']]) {
+    const { dialog, calls } = createToolDialog(t, 'system-resource', 'workspace-a', toolTypes)
+    dialog.open([])
+    await setImmediate()
+    assert.deepEqual(calls[0], { scope: 'system-resource', query: { tool_type_list: toolTypes, workspace_id: 'workspace-a' } })
+    assert.deepEqual(
+      dialog.toolOptions.value.map(({ id }) => id),
+      [toolTypes[0] === 'SKILL' ? 'skill-a' : 'tool-a'],
+    )
+    dialog.searchKeyword.value = ' A '
+    await dialog.refreshTool()
+    dialog.refreshResources()
+    await setImmediate()
+    assert.equal(calls.length, 3)
+    for (const { query } of calls.slice(1)) {
+      assert.deepEqual(query, { tool_type_list: toolTypes, workspace_id: 'workspace-a', name: 'A' })
+    }
+    assert.equal(dialog.loading.value, false)
+  }
+})
+
+test('公共弹窗等待资源所属空间，打开期间详情加载后自动刷新', async (t) => {
+  const { dialog, props, calls } = createToolDialog(t, 'system-resource', undefined)
+  dialog.open([{ id: 'saved-tool' }])
+  await setImmediate()
+  assert.equal(calls.length, 0)
+  assert.deepEqual(dialog.toolOptions.value, [])
+  props.workspaceId = 'workspace-a'
+  await setImmediate()
+  assert.equal(calls.length, 1)
+  assert.equal(calls[0].query.workspace_id, 'workspace-a')
+  assert.deepEqual(dialog.selectedTool.value, [{ id: 'saved-tool' }])
+  dialog.visible.value = false
+  props.workspaceId = 'workspace-b'
+  await setImmediate()
+  assert.equal(calls.length, 1)
+  dialog.open([])
+  await setImmediate()
+  assert.equal(calls[1].query.workspace_id, 'workspace-b')
+  assert.deepEqual(
+    dialog.toolOptions.value.map(({ id }) => id),
+    ['tool-b'],
+  )
+})
+
+test('公共弹窗保持工作空间目录查询及系统共享查询原有范围', async (t) => {
+  for (const scope of ['workspace', 'system-shared']) {
+    const { dialog, calls } = createToolDialog(t, scope, undefined)
+    dialog.open([])
+    await setImmediate()
+    assert.deepEqual(calls, [
+      { scope, query: { tool_type_list: ['CUSTOM', 'WORKFLOW', 'INTERNAL'], ...(scope === 'workspace' ? { folder_id: 'all' } : {}) } },
+    ])
+  }
+})
+
+test('工具选择不删除已有快照，取消不提交，确认返回独立副本', async (t) => {
+  const { dialog, emitted } = createToolDialog(t, 'system-resource', 'workspace-a')
+  const selected = [{ id: 'legacy-tool', name: '旧配置' }]
+  dialog.open(selected)
+  await setImmediate()
+  dialog.toggleTool(dialog.toolOptions.value[0])
+  dialog.visible.value = false
+  dialog.resetData()
+  assert.deepEqual(emitted, [])
+  assert.deepEqual(selected, [{ id: 'legacy-tool', name: '旧配置' }])
+  dialog.open(selected)
+  await setImmediate()
+  dialog.toggleTool(dialog.toolOptions.value[0])
+  dialog.submit()
+  assert.deepEqual(
+    emitted[0][1].map(({ id }) => id),
+    ['legacy-tool', 'tool-a'],
+  )
+  dialog.resetData()
+  assert.equal(emitted[0][1].length, 2)
+})
+
+test('简易智能体与 AI 对话共用的资源设置将注入空间传给公共工具弹窗', async () => {
+  const captured = []
+  const SlotContainer = {
+    setup:
+      (_, { slots }) =>
+      () =>
+        slots.default?.(),
+  }
+  const dependencies = {
+    vue: { ...Vue, resolveComponent: () => SlotContainer },
+    'vue-router': { useRoute: () => ({ params: { toolId: 'current-tool' } }) },
+    lodash,
+    '@/utils/resource-context': { isSystemSharedResource: () => false },
+    '@/api/enums': { TOOL_TYPE: { SKILL: 'SKILL' } },
+    '@/components/business/select-tool-dialog/index.vue': {
+      props: ['workspaceId', 'excludedIds'],
+      setup: (props) => {
+        captured.push({ workspaceId: props.workspaceId, excludedIds: props.excludedIds })
+        return () => null
+      },
+    },
+    '@/components/business/select-application-dialog/index.vue': { render: () => null },
+    './McpSettingDialog.vue': { render: () => null },
+  }
+  const component = loadComponent('workflow-canvas/nodes/ai-chat-node/component/resource-setting/index.vue', dependencies, true)
+  const app = Vue.createSSRApp(component, { setting: { tool_ids: [], skill_tool_ids: [], mcp_tool_ids: [], application_ids: [] } })
+  app.provide('resourceWorkspaceId', Vue.ref('owner-workspace'))
+  await renderToString(app)
+  assert.deepEqual(captured, [{ workspaceId: 'owner-workspace', excludedIds: ['current-tool'] }])
 })

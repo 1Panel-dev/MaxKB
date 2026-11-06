@@ -835,6 +835,8 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 System 共享资源不提供智能体选择，由调用入口限制，弹窗不增加该来源判断。
 工具在工作空间通过 `getAllTool` 查询，不显示共享目录、不调用 Workspace Shared API；在 System 资源管理、System 共享资源
 通过对应完整 API 的 `getAllTool` 查询，不增加 Workspace 共享页面来源分支。
+System 资源管理中的工具选择必须传入资源详情所属空间 `workspaceId`，查询携带 `workspace_id`；
+未加载所属空间时不查询，弹窗打开期间所属空间变化会重新查询。Workspace 与 System 共享不使用此参数。
 仅普通工作空间显示或查询文件夹；仅展示启用资源。`toolTypes` 默认包含自定义、工作流和内置工具，
 Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两者支持 `excludedIds`，
 供调用方排除当前智能体或工具，避免直接自引用。弹窗不使用滚动分页。

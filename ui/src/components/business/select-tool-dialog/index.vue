@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 import ToolApi from '@/api/admin/workspace/tool/tool'
@@ -14,7 +14,7 @@ import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 
 defineOptions({ name: 'SelectToolDialog' })
 
-const props = withDefaults(defineProps<{ excludedIds?: string[]; title?: string; toolTypes?: ToolType[] }>(), {
+const props = withDefaults(defineProps<{ excludedIds?: string[]; title?: string; toolTypes?: ToolType[]; workspaceId?: string | null }>(), {
   excludedIds: () => [],
   title: '工具',
   toolTypes: () => [TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW, TOOL_TYPE.INTERNAL],
@@ -43,12 +43,14 @@ function toggleTool(tool: ToolItem) {
 
 // 每次查询一次加载全部结果。
 function refreshTool() {
-  loading.value = true
   toolOptions.value = []
+  if (isSystemResource() && !props.workspaceId) return Promise.resolve()
+  loading.value = true
   appliedSearchKeyword.value = searchKeyword.value.trim()
   const requestApi = isSystemResource() ? SystemToolApi : isSystemSharedResource() ? SystemSharedToolApi : ToolApi
   const query = {
     tool_type_list: props.toolTypes,
+    ...(isSystemResource() ? { workspace_id: props.workspaceId } : {}),
     ...(isWorkspaceScope.value ? { folder_id: currentFolder.value.id } : {}),
     ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
   }
@@ -86,6 +88,13 @@ function open(tool: (Partial<ToolItem> & { id: string })[]) {
   visible.value = true
   void refreshTool()
 }
+
+watch(
+  () => props.workspaceId,
+  () => {
+    if (visible.value && isSystemResource()) void refreshTool()
+  },
+)
 
 function submit() {
   emit('submit', cloneDeep(selectedTool.value))

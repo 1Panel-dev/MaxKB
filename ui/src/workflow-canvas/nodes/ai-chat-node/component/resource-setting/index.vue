@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, inject, nextTick, ref, useTemplateRef, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import { isSystemSharedResource } from '@/utils/resource-context'
@@ -36,6 +36,7 @@ const mcpDialogRef = useTemplateRef<InstanceType<typeof McpSettingDialog>>('mcpD
 const canSelectApplications = computed(() => props.showApplications && !isSystemSharedResource())
 
 const route = useRoute()
+const resourceWorkspaceId = inject<Ref<string | null | undefined>>('resourceWorkspaceId', ref())
 const toolDialogRef = useTemplateRef<InstanceType<typeof SelectToolDialog>>('toolDialogRef')
 const selectingSkills = ref(false)
 const applicationDialogRef = useTemplateRef<InstanceType<typeof SelectApplicationDialog>>('applicationDialogRef')
@@ -232,6 +233,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
 
   <SelectToolDialog
     ref="toolDialogRef"
+    :workspace-id="resourceWorkspaceId"
     :title="selectingSkills ? 'Skills' : '工具'"
     :tool-types="selectingSkills ? [TOOL_TYPE.SKILL] : undefined"
     :excluded-ids="excludedToolIds"
