@@ -32,8 +32,8 @@ const previewHeaderStyle = computed<CSSProperties>(() => ({
 
 <template>
   <div class="mk-gray-card-lg flex h-full items-end gap-2 overflow-hidden">
-    <div class="flex-column h-full min-w-0 flex-1 overflow-hidden border border-N300 bg-white shadow-lg rounded-xl">
-      <header class="flex-between h-header shrink-0 gap-4 border-b border-N300 p-4" :style="previewHeaderStyle">
+    <div class="flex-column h-full min-w-0 flex-1 overflow-hidden border bg-white shadow-lg rounded-xl">
+      <header class="flex-between h-header shrink-0 gap-4 border-b p-4" :style="previewHeaderStyle">
         <div class="flex-align-center min-w-0 flex-1 gap-2">
           <MkIcon name="icon_sidebar_outlined" :size="18" class="mr-2 shrink-0" />
           <ApplicationIcon :icon="previewImages.icon" :size="24" class="shrink-0" />
@@ -68,7 +68,7 @@ const previewHeaderStyle = computed<CSSProperties>(() => ({
           <div class="h-8.5 w-2/3 rounded-xl bg-N100"></div>
         </div>
         <div class="mt-auto space-y-2">
-          <div class="mk-input-box flex h-23 items-end justify-end border border-N350/60 shadow-lg">
+          <div class="mk-input-box flex h-23 items-end justify-end border shadow-lg">
             <!-- 预览发送按钮 -->
             <el-button circle disabled type="primary">
               <MkIcon name="icon_arrow-up_outlined" :size="18" />

@@ -88,11 +88,11 @@
   &.drawer,
   &.push.open {
     &.left {
-      border-right: 1px solid var(--mk-N350);
+      border-right: 1px solid var(--mk-N300);
     }
 
     &.right {
-      border-left: 1px solid var(--mk-N350);
+      border-left: 1px solid var(--mk-N300);
     }
   }
 }
@@ -112,7 +112,7 @@
 
 /* 对话输入区：边框颜色随内部焦点平滑切换。 */
 .mk-conversation-message-input {
-  border: 1px solid rgb(var(--mk-N350-rgb) / 60%);
+  border: 1px solid var(--mk-N300);
   transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
 
   &:focus-within {

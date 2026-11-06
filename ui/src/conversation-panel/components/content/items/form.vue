@@ -4,7 +4,7 @@ import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import type { Dict } from '@/api/types'
 import { useSendMessageOptional } from '@/conversation-panel/components/message-list/index'
-import { useViewType, VIEW_TYPE, type ViewType } from "@/conversation-panel/view/index"
+import { useViewType, VIEW_TYPE, type ViewType } from '@/conversation-panel/view/index'
 defineOptions({ name: 'ConversationFormContent' })
 const viewType = useViewType()
 // 发送能力由消息列表或外部宿主 provide;拿不到 → 只读降级
@@ -57,17 +57,14 @@ const submit = async () => {
   }
 }
 const READONLY_VIEWS: readonly ViewType[] = [VIEW_TYPE.LOG, VIEW_TYPE.SHARE]
-
 </script>
 
 <template>
-  <div class="mk-gray-card-lg space-y-4 border border-N300">
+  <div class="mk-gray-card-lg space-y-4 border">
     <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="leadingText || ''"></MdPreview>
-    <MkDynamicsForm ref="dynamicsFormRef" :view="is_submit || READONLY_VIEWS.includes(viewType)"
-      :render-data="form_field_list" v-model="form_data" />
+    <MkDynamicsForm ref="dynamicsFormRef" :view="is_submit || READONLY_VIEWS.includes(viewType)" :render-data="form_field_list" v-model="form_data" />
     <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="trailingText || ''"></MdPreview>
-    <el-button :type="is_submit ? 'info' : 'primary'"
-      :disabled="is_submit || READONLY_VIEWS.includes(viewType) || !sendMessage" @click="submit">
+    <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit || READONLY_VIEWS.includes(viewType) || !sendMessage" @click="submit">
       {{ is_submit ? '已提交' : '提交' }}
     </el-button>
   </div>

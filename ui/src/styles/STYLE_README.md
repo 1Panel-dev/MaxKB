@@ -324,6 +324,14 @@ Tailwind 类。
 不要直接写这些变量，也不要绕过项目变量写入 Element Plus 的 `--el-*` 主题变量。Element Plus
 色阶继续由 `element-plus.scss` 基于 `--mk-primary` 映射生成。
 
+Chat 的主题能力由独立的 `src/stores/chat/theme.ts` 提供，通过 Chat 的 `useStore().theme`
+访问。`setTheme(themeColor)` 接收六位十六进制颜色，空值或非法值回退到默认色；
+`resetTheme()` 恢复默认主题。仅显式调用时更新当前文档根节点的项目颜色变量，不持久化，
+不加载 Admin 外观配置。Chat Auth Store 的 `fetchAuthProfile()` 在获取或复用认证前置配置后，
+显式应用顶层 `custom_theme.theme_color`，登录页和正式对话共用当前认证场景的主题。
+对话装配不从智能体 profile 设置主题，门户内切换智能体沿用门户认证配置中的主题。
+Admin 不调用该 Store。
+
 普通 CSS 使用 `color: var(--mk-primary)`。
 
 ### Tailwind

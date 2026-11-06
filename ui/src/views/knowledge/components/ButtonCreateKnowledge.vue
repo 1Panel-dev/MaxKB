@@ -139,7 +139,7 @@ function handleImportCreate(file: UploadFile) {
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.BASE" /></template>
           <div class="min-w-0">
             <p>通用知识库</p>
-            <p class="text-sm text-N500 whitespace-normal">通过上传文件或手动录入构建知识库</p>
+            <p class="text-sm text-N600 whitespace-normal">通过上传文件或手动录入构建知识库</p>
           </div>
         </MkDropdownItem>
         <!-- 创建 Web 知识库 -->
@@ -147,7 +147,7 @@ function handleImportCreate(file: UploadFile) {
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.WEB" /></template>
           <div class="min-w-0">
             <p>Web 知识库</p>
-            <p class="text-sm text-N500 whitespace-normal">通过网站链接构建知识库</p>
+            <p class="text-sm text-N600 whitespace-normal">通过网站链接构建知识库</p>
           </div>
         </MkDropdownItem>
         <!-- 创建飞书知识库 -->
@@ -155,7 +155,7 @@ function handleImportCreate(file: UploadFile) {
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.LARK" /></template>
           <div class="min-w-0">
             <p>飞书知识库</p>
-            <p class="text-sm text-N500 whitespace-normal">通过飞书文档构建知识库</p>
+            <p class="text-sm text-N600 whitespace-normal">通过飞书文档构建知识库</p>
           </div>
         </MkDropdownItem>
         <!-- 创建工作流知识库 -->
@@ -163,7 +163,7 @@ function handleImportCreate(file: UploadFile) {
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.WORKFLOW" /></template>
           <div class="min-w-0">
             <p>工作流知识库</p>
-            <p class="text-sm text-N500 whitespace-normal">通过自定义工作流方式构建知识库</p>
+            <p class="text-sm text-N600 whitespace-normal">通过自定义工作流方式构建知识库</p>
           </div>
         </MkDropdownItem>
         <!-- 导入创建 -->

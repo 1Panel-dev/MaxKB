@@ -21,7 +21,7 @@ const showContent = computed(() => isSuccess.value || props.showContentOnError)
 </script>
 
 <template>
-  <el-card shadow="hover" class="border-N300! cursor-pointer" @click="show = !show">
+  <el-card shadow="hover" class="cursor-pointer" @click="show = !show">
     <MkCollapse v-model:expanded="show" trigger="indicator">
       <template #label>
         <slot name="header" />

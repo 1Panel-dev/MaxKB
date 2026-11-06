@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useStore } from '@/stores/chat'
 import { MsgConfirm } from '@/utils/message'
 import RenameConversation from '../../components/rename/index.vue'
 import { relativeTimeFormat } from '@/utils/time'
@@ -14,6 +15,8 @@ import { useViewType, VIEW_TYPE } from '../../view/index'
 defineOptions({ name: 'ConversationList' })
 
 const viewType = useViewType()
+const { auth } = useStore()
+const authProfile = computed(() => (viewType === VIEW_TYPE.CHAT ? auth.authProfile : null))
 const msgs = useMessageListStore()
 // 会话菜单分享不针对某一轮，进入后不预先勾选
 const shareLink = useShareLinkStoreOptional()
@@ -53,7 +56,7 @@ function handleClearConversations() {
 <template>
   <div class="flex-column h-full overflow-hidden p-4">
     <!-- 应用信息与收起侧栏 -->
-    <div class="mb-4 flex-between shrink-0 gap-2">
+    <div class="mb-4 flex-between shrink-0 gap-2" :style="{ color: authProfile?.custom_theme?.header_font_color || undefined }">
       <div class="min-w-0 flex-align-center gap-2">
         <ApplicationIcon :icon="appInfo?.icon" :size="24" class="shrink-0" />
         <h4 class="truncate" :title="appInfo?.name || 'AI 助手'">{{ appInfo?.name || 'AI 助手' }}</h4>
@@ -61,7 +64,7 @@ function handleClearConversations() {
       <!-- 收起左侧 -->
       <MkTooltip content="收起侧边栏">
         <el-button text @click="toggleLeftSide()" class="-mr-1">
-          <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
+          <MkIcon name="icon_sidebar_outlined" :size="18" :color="authProfile?.custom_theme?.header_font_color || 'var(--mk-N900)'" />
         </el-button>
       </MkTooltip>
     </div>

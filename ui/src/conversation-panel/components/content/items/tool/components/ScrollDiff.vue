@@ -29,7 +29,7 @@ watch(
 </script>
 
 <template>
-  <div ref="diffScrollRef" class="max-h-[400px] overflow-y-auto rounded-md border border-N300">
+  <div ref="diffScrollRef" class="max-h-[400px] overflow-y-auto rounded-md border">
     <FileDiff :file="file" />
   </div>
 </template>

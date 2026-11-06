@@ -45,7 +45,7 @@ provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
 provide(EXECUTION_DETAIL_KEY, bundle.detail)
-provide(VIEW_KEY,VIEW_TYPE.DEBUG)
+provide(VIEW_KEY, VIEW_TYPE.DEBUG)
 const debug = createDebugHeaderStore()
 provide(DEBUG_HEADER_KEY, debug)
 // open/close 暴露给工作流页通过 ref 调用
@@ -79,7 +79,7 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
     <transition name="debug-panel">
       <div
         v-if="debug.visible.value"
-        class="workflow-debug-panel overflow-hidden border border-N300 bg-white shadow-lg rounded-xl"
+        class="workflow-debug-panel overflow-hidden border bg-white shadow-lg rounded-xl"
         :class="{ expanded: debug.expanded.value }"
       >
         <ConversationLayout

@@ -108,7 +108,7 @@ function handleRefresh() {
           </template>
           <div class="min-w-0">
             <p>简易智能体</p>
-            <p class="text-sm text-N500 whitespace-normal">通过表单设置方式，快速搭建基础功能的智能体</p>
+            <p class="text-sm text-N600 whitespace-normal">通过表单设置方式，快速搭建基础功能的智能体</p>
           </div>
         </MkDropdownItem>
         <MkDropdownItem class="py-2! items-start!" @click="handleOpenAdvancedApplicationCreate">
@@ -119,7 +119,7 @@ function handleRefresh() {
           </template>
           <div class="min-w-0">
             <p class="leading-5">高级智能体</p>
-            <p class="text-sm text-N500 whitespace-normal">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
+            <p class="text-sm text-N600 whitespace-normal">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
           </div>
         </MkDropdownItem>
 

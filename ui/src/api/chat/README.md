@@ -19,8 +19,10 @@ Chat 业务接口统一调用后端 v3 路由（`/chat/api/v3/...`）；文件�
 可选进度回调及取消，统一返回 `{ request, abort }`。`request` 解包得到文件地址；
 取消仍拒绝 Promise，但不弹出通用错误提示。loading 由调用方管理。
 
-`auth.ts` 维护门户与单应用的认证：`getApplicationAuthProfile(accessToken)` 请求 `/profile`，
-`getPortalAuthProfile()` 请求 `/portal/profile`，两者返回结构相同的 `AuthProfile`，差异字段在 `meta`。
+`auth.ts` 维护门户与单应用的认证：`getApplicationAuthProfile(accessToken)` 请求 `/v3/profile`，
+`getPortalAuthProfile()` 请求 `/v3/portal/profile`，两者返回结构相同的 `AuthProfile`，差异字段在 `meta`。
+主题配置位于响应顶层 `custom_theme`，不在 `meta` 内；Chat Auth Store 获取或复用该配置后，
+显式应用 `custom_theme.theme_color`，登录页与正式对话共用此主题。
 `postAnonymousAuth(accessToken?)` 与 `postLogin(loginRequest, accessToken?)` 传入 accessToken 时为应用认证，
 否则为门户认证。`getCaptcha(username, accessToken)` 获取应用登录验证码，后端以 `accessToken`
 查询参数接收应用令牌，暂不支持门户。`chat-user.ts` 的 `getChatUserProfile()` 获取当前对话用户。

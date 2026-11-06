@@ -31,7 +31,7 @@
   --el-color-success-dark-2: color-mix(in srgb, var(--mk-success) 85%, black);
   --el-color-warning: var(--mk-warning);
   --el-color-warning-dark-2: color-mix(in srgb, var(--mk-warning) 85%, black);
-  --el-border-color: var(--mk-N350);
+  --el-border-color: var(--mk-N300);
   --el-border-radius-base: 6px;
   --el-border-radius-round: 16px;
   --el-border-radius-small: 4px;
@@ -1147,7 +1147,7 @@
   --el-table-header-bg-color: var(--mk-N100);
   --el-table-text-color: var(--el-text-color-primary);
   --el-table-row-hover-bg-color: color-mix(in srgb, var(--el-color-primary) 4%, white);
-  --el-table-border-color: var(--mk-N300);
+  --el-table-border-color: var(--el-border-color);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 
   thead th {
@@ -1268,7 +1268,7 @@
   }
   &--plain {
     &.el-tag--info {
-      --el-tag-border-color: rgb(var(--mk-N900-rgb) / 15%) !important;
+      --el-tag-border-color: var(--el-border-color) !important;
       --el-tag-text-color: var(--mk-N600);
       font-weight: 500 !important;
     }

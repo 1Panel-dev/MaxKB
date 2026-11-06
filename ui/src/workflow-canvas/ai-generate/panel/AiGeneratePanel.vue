@@ -208,7 +208,7 @@ defineExpose({ open, close })
         </div>
       </el-scrollbar>
 
-      <div class="mk-input-box m-4 mt-0 border border-N350/60 shadow-lg transition-colors focus-within:border-primary/60">
+      <div class="mk-input-box m-4 mt-0 border shadow-lg transition-colors focus-within:border-primary/60">
         <el-input
           v-model="requirement"
           type="textarea"
