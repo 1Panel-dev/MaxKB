@@ -264,6 +264,7 @@ function handleBatchDelete() {
                     v-if="perm.application.workspace.triggerRead(application.id)"
                     label="触发器"
                     :api="ResourceTriggerApi"
+                    :application-api="ApplicationApi"
                     :application="application"
                   />
                   <!-- MCP 服务配置 -->
