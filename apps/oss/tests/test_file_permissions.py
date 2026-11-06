@@ -1,4 +1,4 @@
-"""File reads retain workspace authorization outside system download endpoints."""
+"""Knowledge files support system admins and existing workspace authorization."""
 
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -7,7 +7,7 @@ from django.test import SimpleTestCase
 
 from common.auth.constants.permission_constants import PermissionConstants
 from common.exception.app_exception import AppUnauthorizedFailed
-from knowledge.models import Document, File, FileSourceType, Knowledge
+from knowledge.models import Document, File, FileSourceType, Knowledge, Paragraph
 from oss.serializers.file import FileSerializer, _auth_system, _check_workspace_resource_permission
 from system_manage.models import WorkspaceUserResourcePermission
 from users.models import User
@@ -29,11 +29,31 @@ class FilePermissionTests(SimpleTestCase):
         query.side_effect = lambda model: {
             User: self.user_query,
             Document: self.document_query,
+            Paragraph: self.document_query,
             Knowledge: self.knowledge_query,
             WorkspaceUserResourcePermission: self.grants,
         }[model]
         self.enterContext(patch("oss.serializers.file.get_auth", return_value=self.auth))
         self.file = File(source_type=FileSourceType.DOCUMENT, source_id="document")
+
+    def test_system_admin_can_read_knowledge_files_without_workspace_membership(self):
+        self.auth.roles = {"ADMIN"}
+        for source_type in (FileSourceType.KNOWLEDGE, FileSourceType.DOCUMENT, FileSourceType.PARAGRAPH):
+            with self.subTest(source_type=source_type):
+                _auth_system(File(source_type=source_type, source_id="source"), "user")
+        self.grants.filter.assert_not_called()
+
+    def test_system_admin_cannot_read_files_from_missing_knowledge(self):
+        self.auth.roles = {"ADMIN"}
+        self.knowledge_query.filter.return_value.first.return_value = None
+        with self.assertRaises(AppUnauthorizedFailed):
+            _auth_system(self.file, "user")
+
+    def test_deleted_user_cannot_use_system_admin_authorization(self):
+        self.auth.roles = {"ADMIN"}
+        self.user_query.filter.return_value.first.return_value = None
+        with self.assertRaises(AppUnauthorizedFailed):
+            _auth_system(self.file, "user")
 
     def test_unassigned_custom_role_is_denied_without_a_type_error(self):
         self.auth.roles = {"EXTENDS_ADMIN"}

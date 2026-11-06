@@ -10,6 +10,7 @@ from common.auth.common import parse_token, SystemToken, ChatToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.constants.operate_constants import Operate
 from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.auth.handle.impl.user_token import get_auth
 from common.auth.handle.impl.chat_user_token import get_auth as get_chat_auth
 from common.auth.struct.permission import Permission
@@ -352,6 +353,9 @@ def _auth_system(file, user_id):
         knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first() if knowledge_id else None
         if knowledge is None:
             _deny()
+        # 系统管理员通过资源管理查看知识库文件，不依赖工作空间成员或资源授权。
+        if str(RoleConstants.ADMIN) in user_auth.roles:
+            return
         _check_workspace_resource_permission(
             user_auth,
             user_id,
