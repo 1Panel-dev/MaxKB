@@ -38,9 +38,11 @@ class FilePermissionTests(SimpleTestCase):
 
     def test_system_admin_can_read_knowledge_files_without_workspace_membership(self):
         self.auth.roles = {"ADMIN"}
-        for source_type in (FileSourceType.KNOWLEDGE, FileSourceType.DOCUMENT, FileSourceType.PARAGRAPH):
-            with self.subTest(source_type=source_type):
-                _auth_system(File(source_type=source_type, source_id="source"), "user")
+        for workspace_id in ("ws", "None"):
+            self.knowledge_query.filter.return_value.first.return_value.workspace_id = workspace_id
+            for source_type in (FileSourceType.KNOWLEDGE, FileSourceType.DOCUMENT, FileSourceType.PARAGRAPH):
+                with self.subTest(workspace_id=workspace_id, source_type=source_type):
+                    _auth_system(File(source_type=source_type, source_id="source"), "user")
         self.grants.filter.assert_not_called()
 
     def test_system_admin_cannot_read_files_from_missing_knowledge(self):
