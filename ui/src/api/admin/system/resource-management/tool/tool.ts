@@ -1,3 +1,4 @@
+import { uniqBy } from 'lodash'
 import { del, downloadRequest, getExportFile, get, post, postStream, put } from '../../../core/request'
 import type { ParamsPage, ResponsePage } from '../../../core/types'
 import type { Dict, ToolDebugPayload, ToolGenerateCodePayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
@@ -8,9 +9,11 @@ const prefix = '/system/resource/tool'
 /** 获取 System 资源管理不分页的工具列表。 */
 const getAllTool = (query?: Dict<unknown>) => get<ToolItem[]>(prefix, query)
 
-/** 获取当前系统范围可用的工具选项。 */
+/** 获取当前系统范围可用的工具选项，合并时按工具 ID 去重。 */
 const getToolListWithShared = (query?: Dict<unknown>) =>
-  get<{ tools: ToolItem[]; shared_tools: ToolItem[] }>(`${prefix}/tool_list`, query).then(({ tools, shared_tools }) => [...tools, ...shared_tools])
+  get<{ tools: ToolItem[]; shared_tools: ToolItem[] }>(`${prefix}/tool_list`, query).then(({ tools, shared_tools }) =>
+    uniqBy([...tools, ...shared_tools], 'id'),
+  )
 
 /** 获取工具分页列表。 */
 const getToolPage = (page: ParamsPage, query?: Dict<unknown>) => {

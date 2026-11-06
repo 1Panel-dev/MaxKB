@@ -255,6 +255,7 @@ System 不传 Workspace 文件夹条件；System 共享不提供智能体选择�
 
 System 资源管理的 `getAllTool(query)` 与 `getToolListWithShared(query)` 支持资源所属
 `workspace_id`：普通工具限定该空间，后者额外返回该空间已获授权的共享工具。
+`getToolListWithShared` 合并后按工具 ID 去重并保留首次出现的配置，避免重复列表 key 导致搜索结果残留；不同 ID 的同名工具分别保留。
 两者支持 `tool_type` 或 `tool_type_list`（请求数组键为 `tool_type_list[]`），保留名称筛选；
 不传工作空间的管理查询仍可跨空间读取，不能用于资源内的工具选择。
 

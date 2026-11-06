@@ -164,6 +164,96 @@ function loadComponent(path, dependencies, inlineTemplate = false) {
   return exports.default
 }
 
+function createSystemToolApi(response) {
+  const filename = new URL('../src/api/admin/system/resource-management/tool/tool.ts', import.meta.url)
+  const { outputText } = ts.transpileModule(readFileSync(filename, 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  })
+  const calls = []
+  const dependencies = {
+    lodash,
+    '../../../core/request': {
+      get: async (path, query) => {
+        calls.push({ path, query })
+        return response
+      },
+    },
+    '@/api/constants': { ADMIN_API_BASE_PATH: '/admin/api' },
+  }
+  const exports = {}
+  compileFunction(outputText, ['require', 'exports'])((id) => {
+    assert.ok(Object.hasOwn(dependencies, id), `Unexpected dependency: ${id}`)
+    return dependencies[id]
+  }, exports)
+  return { api: exports.default, calls }
+}
+
+test('系统工具选项按 ID 合并，保留同名的不同工具、顺序和完整配置', async () => {
+  const tool = { id: 'weather', name: 'get_weather_info', input_field_list: [{ field: 'city' }] }
+  const sameNameTool = { id: 'shared-weather', name: tool.name }
+  const response = { tools: [tool, { ...tool }], shared_tools: [{ ...tool }, sameNameTool, { ...sameNameTool }] }
+  const snapshot = lodash.cloneDeep(response)
+  const { api, calls } = createSystemToolApi(response)
+  const query = { workspace_id: 'owner-workspace', tool_type_list: ['CUSTOM', 'WORKFLOW'] }
+  const options = await api.getToolListWithShared(query)
+  assert.deepEqual(options, [tool, sameNameTool])
+  assert.equal(options[0], tool)
+  assert.deepEqual(response, snapshot)
+  assert.deepEqual(calls, [{ path: '/system/resource/tool/tool_list', query }])
+  for (const emptySide of [
+    { tools: [], shared_tools: [sameNameTool] },
+    { tools: [tool], shared_tools: [] },
+    { tools: [], shared_tools: [] },
+  ]) {
+    const { api } = createSystemToolApi(emptySide)
+    assert.deepEqual(await api.getToolListWithShared(), [...emptySide.tools, ...emptySide.shared_tools])
+  }
+})
+
+test('工具菜单连续搜索和清空不重复结果，仍按名称筛选并保留正确节点', async (t) => {
+  const tools = [
+    { id: 'weather-a', name: 'get_weather_info', tool_type: 'CUSTOM', is_active: true },
+    { id: 'push-a', name: 'push_tools_to_messages', tool_type: 'CUSTOM', is_active: true },
+    { id: 'image-a', name: '工具图片增强（glm5.3-flash）', tool_type: 'CUSTOM', is_active: true },
+    { id: 'weather-b', name: 'get_weather_info', tool_type: 'WORKFLOW', is_active: true },
+    { id: 'push-b', name: 'push_tools_to_messages', tool_type: 'CUSTOM', is_active: true },
+    { id: 'weather-c', name: 'get_weather_info', tool_type: 'CUSTOM', is_active: true },
+  ]
+  const { api } = createSystemToolApi({ tools, shared_tools: lodash.cloneDeep(tools) })
+  const component = loadComponent('workflow-canvas/node-menu/ResourceNodeMenu.vue', {
+    vue: { ...Vue, inject: (key) => (key === 'resourceScope' ? 'system-resource' : Vue.ref('owner-workspace')), onMounted() {} },
+    'vue-router': { useRoute: () => ({ params: {} }) },
+    lodash,
+    '@/components/global/mk-tooltip/constants': { TOOLTIP_SHOW_DELAY: 300 },
+    '@/api/admin/workspace/shared/tool': {},
+    '@/api/admin/workspace/tool/tool': {},
+    '@/api/enums': { RESOURCE_TYPE: { TOOL: 'TOOL' }, TOOL_TYPE: { CUSTOM: 'CUSTOM', WORKFLOW: 'WORKFLOW', DATA_SOURCE: 'DATA_SOURCE' } },
+    '@/constants': { FOLDER_ENTRY_ID: { ALL: 'all', SHARED: 'shared' } },
+    '@/utils/common': { isWorkFlow: () => true },
+    '@/components/business/folder-tree/index.vue': {},
+    '@/workflow-canvas/config/node-data': { applicationNode: {}, toolLibNode: {}, toolWorkflowLibNode: {} },
+    '@/workflow-canvas/store': { useWorkflowStore: () => ({ force: api }) },
+    '@/workflow-canvas/types': { WorkflowKind: { DataSource: 'data-source' } },
+  })
+  const scope = Vue.effectScope()
+  const menu = scope.run(() => component.setup({ source: 'TOOL' }, { expose() {}, emit() {} }))
+  t.after(() => scope.stop())
+  await menu.loadResources()
+  for (const keyword of ['', 'g', 'ge', 'get', 'get_wea', '', 'push', 'missing', '', '  GET_WEA  ', '图片']) {
+    menu.searchKeyword.value = keyword
+    const expected = tools.filter((tool) => tool.name.toLocaleLowerCase().includes(keyword.trim().toLocaleLowerCase()))
+    assert.deepEqual(
+      menu.filteredResourceItems.value.map(({ id }) => id),
+      expected.map(({ id }) => id),
+      `搜索词：${keyword}`,
+    )
+    assert.deepEqual(
+      menu.filteredResourceItems.value.map(({ node }) => node.properties.node_data.tool_lib_id),
+      expected.map(({ id }) => id),
+    )
+  }
+})
+
 function createToolDialog(t, resourceScope, workspaceId, toolTypes = ['CUSTOM', 'WORKFLOW', 'INTERNAL']) {
   const tools = [
     { id: 'tool-a', name: 'Tool A', workspace_id: 'workspace-a', is_active: true, tool_type: 'CUSTOM' },
