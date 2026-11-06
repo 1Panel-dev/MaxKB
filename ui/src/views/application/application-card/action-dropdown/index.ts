@@ -3,7 +3,7 @@ export { default as ExportApplicationAction } from './ExportApplicationAction.vu
 export { default as PortalApplicationAction } from './PortalApplicationAction.vue'
 export { default as MoveApplicationAction } from './MoveApplicationAction.vue'
 export { default as SettingApplicationAction } from './SettingApplicationAction.vue'
-export { default as TriggerApplicationAction } from './TriggerApplicationAction.vue'
+export { default as TriggerApplicationAction } from './trigger-action/TriggerApplicationAction.vue'
 export { default as McpConfigApplicationAction } from './McpConfigApplicationAction.vue'
 export { default as AuthorizeApplicationAction } from './AuthorizeApplicationAction.vue'
 export { default as RelatedResourcesApplicationAction } from './RelatedResourcesApplicationAction.vue'

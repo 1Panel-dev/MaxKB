@@ -186,7 +186,13 @@ onMounted(() => {
                 <!-- 资源授权 -->
                 <AuthorizeApplicationAction v-if="perm.application.system.auth()" label="资源授权" :application="row" />
                 <!-- 智能体触发器 -->
-                <TriggerApplicationAction v-if="perm.application.system.triggerRead()" label="触发器" :api="SystemResourceTriggerApi" :application="row" />
+                <TriggerApplicationAction
+                  v-if="perm.application.system.triggerRead()"
+                  label="触发器"
+                  :api="SystemResourceTriggerApi"
+                  :application-api="SystemResourceApplicationApi"
+                  :application="row"
+                />
                 <!-- MCP 服务配置 -->
                 <McpConfigApplicationAction v-if="perm.application.system.mcpConfig()" label="MCP 服务配置" :application="row" />
                 <!-- 查看关联资源 -->

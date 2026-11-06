@@ -439,6 +439,9 @@ View 负责路由、资源与模式、图加载、保存／发布／调试编排
 
 ### 触发器
 
+- 智能体、工具的资源触发器 Action 与列表弹窗分别放在各自的 `action-dropdown/trigger-action/`，
+  创建／编辑表单继续共用 `trigger/trigger-form/TriggerFormDrawer.vue`。
+
 - 触发器执行记录的执行时间列使用服务端排序，独立 `orderBy` 经 `toOrderBy` 添加 `ett.` 前缀，
   通过查询参数 `order` 传入。切换排序回第一页；搜索、分页和详情跨页保留排序，重新打开抽屉恢复默认排序。
 - 触发器列表的下次执行时间、创建时间使用 `order_by` 表头排序，切换时清空选择并回到第一页；搜索、筛选和分页保留排序。
