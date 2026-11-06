@@ -132,11 +132,14 @@ class ResourceChatUserGroupSerializer(serializers.Serializer):
                     old_resource_chat_user_group_authorize.user_group_id
                 ):
                     old_resource_chat_user_group_authorize.is_auth = resource_chat_user_group_authorize.is_auth
+                    old_resource_chat_user_group_authorize.workspace_id = workspace_id
                     update_list.append(old_resource_chat_user_group_authorize)
                     is_exist = True
                     break
             if not is_exist:
                 create_list.append(resource_chat_user_group_authorize)
         QuerySet(ResourceChatUserGroupAuthorize).bulk_create(create_list) if len(create_list) > 0 else None
-        QuerySet(ResourceChatUserGroupAuthorize).bulk_update(update_list, ["is_auth"]) if len(update_list) > 0 else None
+        QuerySet(ResourceChatUserGroupAuthorize).bulk_update(update_list, ["is_auth", "workspace_id"]) if len(
+            update_list
+        ) > 0 else None
         return True
