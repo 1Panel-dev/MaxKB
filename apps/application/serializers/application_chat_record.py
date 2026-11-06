@@ -303,7 +303,9 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     knowledge_id = serializers.UUIDField(required=True, label=_("Knowledge base id"))
     document_id = serializers.UUIDField(required=True, label=_("Document id"))
-    chat_ids = serializers.ListSerializer(child=serializers.UUIDField(), required=True, label=_("Conversation ID"))
+    chat_ids = serializers.ListSerializer(
+        child=serializers.UUIDField(), required=True, allow_empty=False, label=_("Conversation ID")
+    )
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -315,9 +317,10 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
             raise AppApiException(500, _("Application id does not exist"))
         if not Document.objects.filter(id=self.data["document_id"], knowledge_id=self.data["knowledge_id"]).exists():
             raise AppApiException(500, gettext("The document id is incorrect"))
-        if not ChatRecord.objects.filter(
+        authorized_chat_ids = ChatRecord.objects.filter(
                 chat_id__in=self.data["chat_ids"], chat__application_id=self.data["application_id"]
-        ).exists():
+        ).values_list("chat_id", flat=True)
+        if set(self.data["chat_ids"]) != {str(chat_id) for chat_id in authorized_chat_ids}:
             raise AppApiException(500, gettext("The chat id is incorrect"))
 
     @staticmethod
@@ -328,8 +331,6 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
     @post(post_function=post_embedding_paragraph)
     @transaction.atomic
     def post_improve(self, instance: Dict, request=None, scope="WORKSPACE", with_valid=True):
-        if with_valid:
-            ApplicationChatRecordAddKnowledgeSerializer(data=instance).is_valid(raise_exception=True)
         self.is_valid(raise_exception=True)
         if scope == "WORKSPACE":
             is_permission = get_is_permissions(
@@ -351,13 +352,15 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
         if not is_permission:
             raise AppUnauthorizedFailed(403, gettext("No permission to access"))
 
-        chat_ids = instance["chat_ids"]
-        document_id = instance["document_id"]
-        knowledge_id = instance["knowledge_id"]
+        chat_ids = self.data["chat_ids"]
+        document_id = self.data["document_id"]
+        knowledge_id = self.data["knowledge_id"]
 
         # 获取所有聊天记录
-        chat_record_list = list(ChatRecord.objects.filter(chat_id__in=chat_ids))
-        if len(chat_record_list) < len(chat_ids):
+        chat_record_list = list(ChatRecord.objects.filter(
+            chat_id__in=chat_ids, chat__application_id=self.data["application_id"]
+        ))
+        if {str(record.chat_id) for record in chat_record_list} != set(chat_ids):
             raise AppApiException(500, gettext("Conversation records that do not exist"))
 
         # 批量创建段落和问题映射
