@@ -898,7 +898,8 @@ class DocumentSerializers(serializers.Serializer):
             response.write(zip_buffer.getvalue())
             return response
 
-        def download_source_file(self, mk_file_auth=None):
+        def download_source_file(self, mk_file_auth=None, *, with_file_auth=True):
+            """Only a caller with its own download authorization may disable file auth."""
             self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
             source_file_id = (
@@ -909,7 +910,9 @@ class DocumentSerializers(serializers.Serializer):
             file = file or files.first()
             if not file:
                 raise AppApiException(500, _("File not exist. Only manually uploaded documents are supported"))
-            return FileSerializer.Operate(data={"id": file.id}).get(mk_file_auth=mk_file_auth, with_valid=True)
+            return FileSerializer.Operate(data={"id": file.id}).get(
+                mk_file_auth=mk_file_auth, with_valid=True, with_file_auth=with_file_auth
+            )
 
         def one(self, with_valid=False):
             self.is_valid(raise_exception=True)

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from django.db.models import QuerySet
 
+from common.auth.constants.permission_constants import PermissionConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from knowledge.models import Knowledge
 from portal.models import get_portal_setting
@@ -104,7 +105,7 @@ def filter_admin_knowledge(knowledge, user_id):
                 workspace_id=item.workspace_id,
                 target_id=str(item.id),
                 auth_target_type="KNOWLEDGE",
-                read_permission="KNOWLEDGE:READ",
+                read_permission=PermissionConstants.KNOWLEDGE_READ.value,
             )
             allowed.append(str(item.id))
         except AppUnauthorizedFailed:

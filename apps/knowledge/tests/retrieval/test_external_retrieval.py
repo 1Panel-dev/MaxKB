@@ -11,6 +11,7 @@ from django.test import RequestFactory, SimpleTestCase
 from django.urls import resolve
 from rest_framework.exceptions import ValidationError
 
+from common.auth.constants.permission_constants import PermissionConstants
 from chat.mcp import knowledge as knowledge_mcp
 from chat.views.v3 import knowledge as views
 from knowledge.models import DocumentResourceType, Knowledge, KnowledgeType, SourceType
@@ -300,7 +301,7 @@ class RetrievalAccessTests(SimpleTestCase):
 
         queryset.return_value.filter.return_value.first.return_value = SimpleNamespace(id=UID)
         self.assertEqual(access.filter_admin_knowledge([knowledge()], UID), [KID])
-        self.assertEqual(check.call_args.kwargs["read_permission"], "KNOWLEDGE:READ")
+        self.assertEqual(check.call_args.kwargs["read_permission"], PermissionConstants.KNOWLEDGE_READ.value)
         check.side_effect = AppUnauthorizedFailed(403, "denied")
         self.assertEqual(access.filter_admin_knowledge([knowledge()], UID), [])
 

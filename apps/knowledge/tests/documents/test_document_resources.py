@@ -1,6 +1,7 @@
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 
+from common.auth.constants.permission_constants import PermissionConstants
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase
@@ -205,7 +206,7 @@ class KnowledgeUploadSizeLimitTests(SimpleTestCase):
             workspace_id="workspace",
             target_id=knowledge_query.filter.return_value.first.return_value.id,
             auth_target_type="KNOWLEDGE",
-            read_permission="KNOWLEDGE:READ",
+            read_permission=PermissionConstants.KNOWLEDGE_READ.value,
         )
 
         paragraph_query.filter.return_value.values_list.return_value.first.return_value = None

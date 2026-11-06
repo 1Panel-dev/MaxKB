@@ -43,7 +43,9 @@ class DocumentSourceFileTests(SimpleTestCase):
         self.document_files.filter.assert_called_once_with(id=SOURCE_FILE_ID)
         self.document_files.first.assert_not_called()
         self.download.assert_called_once_with(data={"id": SOURCE_FILE_ID})
-        self.download.return_value.get.assert_called_once_with(mk_file_auth=self.auth, with_valid=True)
+        self.download.return_value.get.assert_called_once_with(
+            mk_file_auth=self.auth, with_valid=True, with_file_auth=True
+        )
 
     def test_legacy_documents_without_a_reference_still_download_their_associated_file(self):
         self.documents.filter.return_value.values_list.return_value.first.return_value = None

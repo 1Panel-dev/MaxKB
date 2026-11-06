@@ -9,8 +9,10 @@ from application.models import Application, ApplicationAccessToken, ChatShareLin
 from common.auth.common import parse_token, SystemToken, ChatToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.constants.operate_constants import Operate
+from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.handle.impl.user_token import get_auth
 from common.auth.handle.impl.chat_user_token import get_auth as get_chat_auth
+from common.auth.struct.permission import Permission
 from common.constants.authentication_type import AuthenticationType
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed, NotFound404
@@ -20,6 +22,7 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from homepage.serializers.homepage import (
     has_extends_workspace_manage_permission,
+    has_user_permission,
     hasPermission,
     is_extends_workspace_manage,
     is_workspace_manage,
@@ -203,7 +206,7 @@ def parse_file_token(mk_file_auth):
     else:
         try:
             return parse_token(token=mk_file_auth)
-        except Exception as e:
+        except Exception:
             _deny()
 
 
@@ -330,7 +333,7 @@ def _auth_system(file, user_id):
             workspace_id=application.workspace_id,
             target_id=application.id,
             auth_target_type="APPLICATION",
-            read_permission="APPLICATION:READ",
+            read_permission=PermissionConstants.APPLICATION_READ.value,
         )
     elif file.source_type == FileSourceType.APPLICATION:
         application = QuerySet(Application).filter(id=file.source_id).first()
@@ -342,7 +345,7 @@ def _auth_system(file, user_id):
             workspace_id=application.workspace_id,
             target_id=application.id,
             auth_target_type="APPLICATION",
-            read_permission="APPLICATION:READ",
+            read_permission=PermissionConstants.APPLICATION_READ.value,
         )
     elif file.source_type in (FileSourceType.DOCUMENT, FileSourceType.PARAGRAPH, FileSourceType.KNOWLEDGE):
         knowledge_id = _knowledge_id_for_file_source(file.source_type, file.source_id)
@@ -355,14 +358,14 @@ def _auth_system(file, user_id):
             workspace_id=knowledge.workspace_id,
             target_id=knowledge.id,
             auth_target_type="KNOWLEDGE",
-            read_permission="KNOWLEDGE:READ",
+            read_permission=PermissionConstants.KNOWLEDGE_READ.value,
         )
     else:
         _deny()
 
 
 def _check_workspace_resource_permission(
-    user_auth, user_id, *, workspace_id, target_id, auth_target_type, read_permission
+    user_auth, user_id, *, workspace_id, target_id, auth_target_type, read_permission: Permission
 ):
     if is_workspace_manage(user_auth, workspace_id):
         return
@@ -371,7 +374,11 @@ def _check_workspace_resource_permission(
     ):
         return
 
-    permission_list = ["VIEW", "MANAGE", "ROLE"] if hasPermission(user_auth, read_permission) else ["VIEW", "MANAGE"]
+    permission_list = (
+        ["VIEW", "MANAGE", "ROLE"]
+        if has_user_permission(user_auth, read_permission, workspace_id)
+        else ["VIEW", "MANAGE"]
+    )
     if (
         not QuerySet(WorkspaceUserResourcePermission)
         .filter(
@@ -447,14 +454,16 @@ class FileSerializer(serializers.Serializer):
             help_text=_('HTTP Range header for partial content requests, e.g., "bytes=0-1023"'),
         )
 
-        def get(self, mk_file_auth=None, with_valid=True):
+        def get(self, mk_file_auth=None, with_valid=True, *, with_file_auth=True):
+            """File auth is required unless the caller already authorized this download."""
             if with_valid:
                 self.is_valid(raise_exception=True)
             file_id = self.data.get("id")
             file = QuerySet(File).filter(id=file_id).first()
             if file is None:
                 raise NotFound404(404, _("File not found"))
-            auth(file, mk_file_auth)
+            if with_file_auth:
+                auth(file, mk_file_auth)
             file_type = file.file_name.split(".")[-1].lower()
             content_type = mime_types.get(file_type, "application/octet-stream")
             encoded_filename = urllib.parse.quote(file.file_name)
