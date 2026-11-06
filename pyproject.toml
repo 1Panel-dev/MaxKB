@@ -32,7 +32,7 @@ dependencies = [
     "langchain-huggingface==1.2.2",
     "langchain-ollama==1.1.0",
     "langchain-aws==1.6.0",
-    "langgraph==1.2.6",
+    "langgraph==1.2.14",
     "deepagents==0.6.11",
     "torch==2.13.0",
     "numpy==1.26.4",
