@@ -24,7 +24,7 @@ import UserAuthorizationList from './components/UserAuthorizationList.vue'
 import UserGroupAuthorizationList from './components/user-group/UserGroupAuthorizationList.vue'
 import { RESOURCE_AUTHORIZATION_LABELS } from './constants'
 
-const { auth } = useStore()
+const { auth, user } = useStore()
 const route = useRoute()
 
 const resourceType = ref<ResourceAuthorizationType>((route.meta.resource as ResourceAuthorizationType) ?? RESOURCE_TYPE.APPLICATION)
@@ -40,7 +40,7 @@ const resourceTypeOptions: OptionItem<ResourceAuthorizationType>[] = [
 
 /* 选择工作空间列表 */
 const loadingView = ref(false)
-const selectedWorkspaceId = ref('default')
+const selectedWorkspaceId = ref(user.userInfo?.workspace_list?.[0]?.id ?? 'default')
 const workspaceOptions = ref<WorkspaceItem[]>([])
 
 function handleWorkspaceSelect(workspace: WorkspaceItem) {
