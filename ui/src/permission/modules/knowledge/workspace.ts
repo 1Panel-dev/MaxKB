@@ -83,10 +83,6 @@ const workspace = {
  */
   mcpConfig: (id: string) => canWorkspaceKnowledge(P.KNOWLEDGE_MCP_CONFIG, id),
 /**
- * 工作空间「知识库」导出权限
- */
-  exportSkills: (id: string) => canWorkspaceKnowledge(P.KNOWLEDGE_EXPORT_SKILLS, id),
-/**
  * 工作空间「知识库」「定时同步」只读权限
  */
   scheduledSyncRead: (id: string) => canWorkspaceKnowledge(P.KNOWLEDGE_SCHEDULED_SYNC_READ, id),
