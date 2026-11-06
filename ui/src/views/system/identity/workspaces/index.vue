@@ -49,12 +49,15 @@ function handleWorkspaceDelete(workspace: WorkspaceItem) {
     .then(() =>
       MsgConfirm(`确认删除${workspace.name}？`, '删除后，该空间下的成员都会被移除，请谨慎操作。').then(() => {
         workspaceLoading.value = true
-        return WorkspaceApi.deleteWorkspace(workspace.id as string).then(() => {
-          MsgSuccess('删除成功')
-          if (currentWorkspace.value?.id === workspace.id) {
-            return loadWorkspaceOptions()
-          }
-        })
+        return WorkspaceApi.deleteWorkspace(workspace.id as string)
+          .then(() => {
+            MsgSuccess('删除成功')
+            // 删除未选中的空间也要刷新列表，并保留当前选中项。
+            return loadWorkspaceOptions(currentWorkspace.value?.id)
+          })
+          .finally(() => {
+            workspaceLoading.value = false
+          })
       }),
     )
 
