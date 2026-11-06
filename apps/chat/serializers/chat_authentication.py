@@ -31,14 +31,14 @@ class AnonymousAuthenticationSerializer(serializers.Serializer):
     def auth(self, request):
         self.is_valid(raise_exception=True)
         token = request.META.get("HTTP_AUTHORIZATION")
-        token_details = {}
+        token_details = None
         try:
             # 校验token
             if token is not None:
-                token_details = signing.loads(token[7:])
+                token_details = parse_token(token[7:])
         except Exception:
             pass
-        chat_user_id = token_details.get("id") or str(uuid.uuid7())
+        chat_user_id = token_details.id if token_details else str(uuid.uuid7())
         _type = AuthenticationType.CHAT_USER
 
         access_token = self.data.get("access_token")

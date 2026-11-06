@@ -139,7 +139,7 @@ export const useChatAuthStore = defineStore('chat-auth', {
 
     /** 退出当前场景的登录状态。 */
     logout() {
-      return ChatAuthApi.postLogout().then(() => this.clearToken())
+      return ChatAuthApi.postLogout(this.accessToken).then(() => this.clearToken())
     },
 
     /** 保存指定场景的 token；是当前场景时同步到 Store。 */
@@ -158,7 +158,10 @@ export const useChatAuthStore = defineStore('chat-auth', {
       useChatUserStore().clearCurrentUser()
     },
 
-    /** 清除当前场景的 token，如退出登录。 */
+    /**
+     * 清除当前场景本地保存的 token，如退出登录。
+     * 文件凭证 cookie（mk_file_auth）为 HttpOnly，前端无法清除，由退出登录、修改密码接口的响应删除。
+     */
     clearToken() {
       localStorage.removeItem(getTokenStorageKey(this.scope))
       this.token = ''

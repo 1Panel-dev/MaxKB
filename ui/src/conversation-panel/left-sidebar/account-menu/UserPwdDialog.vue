@@ -58,7 +58,7 @@ async function submitPassword() {
       return
     }
 
-    return ChatUserApi.postResetPassword({ encryptedData })
+    return ChatUserApi.postResetPassword({ encryptedData }, auth.accessToken)
       .then(() => {
         MsgSuccess('密码修改成功')
 

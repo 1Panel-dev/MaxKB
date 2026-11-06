@@ -186,18 +186,14 @@ class TextToVideoNode(INode):
     def _upload_application_file(self, file, workflow_params):
         application_id = workflow_params.get("application_id")
         chat_id = workflow_params.get("chat_id")
-        debug = workflow_params.get("debug", False)
-        meta = {
-            "debug": debug,
-            "chat_id": chat_id,
-            "application_id": application_id,
-        }
+        chat_user_id = workflow_params.get("chat_user_id")
+        meta = {"chat_id": chat_id, "application_id": application_id, "user_id": chat_user_id}
         file_url = FileSerializer(
             data={
                 "file": file,
                 "meta": meta,
-                "source_id": application_id,
-                "source_type": FileSourceType.APPLICATION.value,
+                "source_id": chat_id,
+                "source_type": FileSourceType.CHAT.value,
             }
         ).upload()
         return file_url

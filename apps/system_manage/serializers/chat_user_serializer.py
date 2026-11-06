@@ -31,7 +31,10 @@ class ChatUserAccessTokenSerializer(serializers.Serializer):
             raise AppApiException(1005, _("Invalid access token"))
 
         application_id = application_access_token.application_id
-        # 检查用户是否有权限访问该应用
+        # 如果不需要认证就直接
+        if not application_access_token.authentication:
+            return
+            # 检查用户是否有权限访问该应用
         is_authorized = ResourceChatUserAuthorize.objects.filter(
             resource_id=application_id, resource_type=ResourceType.APPLICATION.value, is_auth=True, user_id=user.id
         ).exists()

@@ -221,12 +221,13 @@ class ImageGenerateNode(INode):
     def _upload_application_file(self, file, workflow_params):
         application_id = workflow_params.get("application_id")
         chat_id = workflow_params.get("chat_id")
+        chat_user_id = workflow_params.get("chat_user_id")
         return FileSerializer(
             data={
                 "file": file,
-                "meta": {"debug": False, "chat_id": chat_id, "application_id": application_id},
-                "source_id": application_id,
-                "source_type": FileSourceType.APPLICATION.value,
+                "meta": {"chat_id": chat_id, "application_id": application_id, "user_id": chat_user_id},
+                "source_id": chat_id,
+                "source_type": FileSourceType.CHAT.value,
             }
         ).upload()
 

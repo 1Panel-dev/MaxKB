@@ -465,7 +465,7 @@ class ResetCurrentUserPasswordView(APIView):
             version, get_key = Cache_Version.CHAT_USER_TOKEN.value
             auth = request.META.get("HTTP_AUTHORIZATION")
             cache.delete(get_key(token=auth), version=version)
-            return result.success(True)
+            return clear_file_auth_cookie(result.success(True), request.query_params.get("accessToken"))
         return result.error(_("Failed to change password"))
 
 
@@ -488,6 +488,20 @@ class ChatUserProfileView(APIView):
     )
     def get(self, request: Request):
         return result.success(ChatUserProfileSerializer().profile(request.user.profile))
+
+
+FILE_AUTH_COOKIE = "mk_file_auth"
+
+
+def get_chat_user_cookie_path(access_token):
+    """对话用户登录时写入文件凭证 cookie 的路径；退出登录时按同一路径删除。"""
+    return f"/chat/{access_token + '/' if access_token else ''}"
+
+
+def clear_file_auth_cookie(response: HttpResponse, access_token):
+    """删除对话用户登录写入的文件凭证 cookie；该 cookie 为 HttpOnly，前端无法自行清除。"""
+    response.delete_cookie(FILE_AUTH_COOKIE, path=get_chat_user_cookie_path(access_token), samesite="Lax")
+    return response
 
 
 class BaseAuthView(APIView):
@@ -531,7 +545,7 @@ class BaseAuthView(APIView):
     def generate(self, request, token: str, response: HttpResponse, path: str = "/chat"):
         secure = request.is_secure()
         response.set_cookie(
-            "mk_file_auth",
+            FILE_AUTH_COOKIE,
             value=token,
             max_age=7 * 24 * 3600,
             path=path,
@@ -559,7 +573,7 @@ class LocalLoginView(BaseAuthView):
         user.source = "LOCAL"
         token = self.create_token_and_cache(user, access_token, Operate.LOCAL)
         response = result.success({"token": token})
-        return self.generate(request, token, response, path=f"/chat/{access_token + '/' if access_token else ''}")
+        return self.generate(request, token, response, path=get_chat_user_cookie_path(access_token))
 
 
 class Logout(APIView):
@@ -578,4 +592,4 @@ class Logout(APIView):
         version, get_key = Cache_Version.CHAT_USER_TOKEN.value
         auth = request.META.get("HTTP_AUTHORIZATION")
         cache.delete(get_key(token=auth[7:]), version=version)
-        return result.success(True)
+        return clear_file_auth_cookie(result.success(True), request.query_params.get("accessToken"))
