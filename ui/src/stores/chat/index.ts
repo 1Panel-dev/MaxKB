@@ -3,6 +3,7 @@
 import { createPinia } from 'pinia'
 import { useChatAuthStore } from './auth'
 import { useChatUserStore } from './user'
+import { useChatThemeStore } from './theme'
 
 export const pinia = createPinia()
 
@@ -12,6 +13,9 @@ const stores = {
   },
   get user() {
     return useChatUserStore(pinia)
+  },
+  get theme() {
+    return useChatThemeStore(pinia)
   },
 }
 

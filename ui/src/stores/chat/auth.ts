@@ -9,6 +9,7 @@ import { defineStore } from 'pinia'
 import ChatAuthApi from '@/api/chat/auth'
 import type { ApplicationAuthProfileMeta, AuthProfile, ChatLoginRequest } from '@/api/types'
 import { useChatUserStore } from './user'
+import { useChatThemeStore } from './theme'
 
 /** 门户的认证场景；accessToken 为 16 位十六进制字符串，不会与之重名。 */
 export const PORTAL_AUTH_SCOPE = 'portal'
@@ -81,11 +82,19 @@ export const useChatAuthStore = defineStore('chat-auth', {
       return token === this.expiredToken ? '' : token
     },
 
-    /** 获取指定场景的认证前置配置；与当前场景相同时复用。 */
+    /** 获取并应用指定场景的认证前置主题；与当前场景相同时复用配置。 */
     fetchAuthProfile(scope: string): Promise<AuthProfile<unknown>> {
-      if (scope === this.scope && this.authProfile) return Promise.resolve(this.authProfile)
+      const profileRequest =
+        scope === this.scope && this.authProfile
+          ? Promise.resolve(this.authProfile)
+          : isPortalScope(scope)
+            ? ChatAuthApi.getPortalAuthProfile()
+            : ChatAuthApi.getApplicationAuthProfile(scope)
 
-      return isPortalScope(scope) ? ChatAuthApi.getPortalAuthProfile() : ChatAuthApi.getApplicationAuthProfile(scope)
+      return profileRequest.then((authProfile) => {
+        useChatThemeStore().setTheme(authProfile.custom_theme?.theme_color)
+        return authProfile
+      })
     },
 
     /** 切换当前场景，由守卫在放行前调用。 */
