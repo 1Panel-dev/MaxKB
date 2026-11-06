@@ -1688,6 +1688,16 @@ class PermissionConstants(Enum):
         ),
     )
 
+    APPLICATION_CLEAR_POLICY = (
+        Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.CLEAR_POLICY, bit_index=42),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
+        ),
+    )
+
     APPLICATION_RESOURCE_AUTHORIZATION = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.AUTH, bit_index=10),
         PermissionMeta(

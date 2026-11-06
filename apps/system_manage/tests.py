@@ -5,6 +5,7 @@ from django.test import SimpleTestCase, TestCase
 
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.struct.aggregate_permission import AggregatePermission
+from common.auth.struct.permission import Permission
 from common.exception.app_exception import AppUnauthorizedFailed
 from system_manage.models import ChatUser, UserGroup, UserGroupRelation
 from system_manage.serializers.chat_user import ChatUserSerializer
@@ -13,12 +14,44 @@ from system_manage.views.resource_chat_user import ResourceChatUser, get_chat_us
 
 
 class ChatUserPermissionTests(SimpleTestCase):
+    workspace_id = "workspace-1"
+    resource_id = "resource-1"
+
     @staticmethod
     def build_permissions(items, request, kwargs, compare):
         for item in items:
             if callable(item) and not isinstance(item, AggregatePermission):
                 item(request, kwargs)
         return SimpleNamespace(hasPermission=lambda *args, **kwargs: True)
+
+    @classmethod
+    def build_extended_user_request(cls, permission_constant):
+        source = permission_constant.value
+        permission = Permission(
+            group=source.group,
+            sub_group=source.sub_group,
+            operate=source.operate,
+            bit_index=source.bit_index,
+            workspace_id=cls.workspace_id,
+            resource_id=cls.resource_id,
+        )
+        return SimpleNamespace(
+            query_params={},
+            data=[],
+            auth=SimpleNamespace(
+                roles={f"EXTENDS_USER:w:{cls.workspace_id}"},
+                permissions={permission.get_resource_permission_key(cls.resource_id): permission.bit()},
+            ),
+        )
+
+    @classmethod
+    def endpoint_kwargs(cls):
+        return {
+            "workspace_id": cls.workspace_id,
+            "resource_type": "APPLICATION",
+            "resource_id": cls.resource_id,
+            "user_group_id": "group-1",
+        }
 
     def test_supported_resources_keep_existing_permissions(self):
         self.assertEqual(
@@ -60,6 +93,52 @@ class ChatUserPermissionTests(SimpleTestCase):
                 resource_chat_user_group.ResourceChatUserGroup.get(
                     resource_chat_user_group.ResourceChatUserGroup(), SimpleNamespace(), **kwargs
                 )
+
+    def test_extended_user_can_read_chat_users_and_groups(self):
+        request = self.build_extended_user_request(PermissionConstants.APPLICATION_CHAT_USER_READ)
+        kwargs = self.endpoint_kwargs()
+        group_kwargs = {key: value for key, value in kwargs.items() if key != "user_group_id"}
+
+        with (
+            patch("system_manage.views.resource_chat_user.ResourceChatUserQuerySerializer") as user_query,
+            patch("system_manage.views.resource_chat_user_group.ResourceChatUserGroupQuerySerializer") as group_query,
+        ):
+            user_query.return_value.list.return_value = []
+            user_query.return_value.page.return_value = []
+            group_query.return_value.list.return_value = []
+            group_query.return_value.page.return_value = []
+
+            ResourceChatUser.get(ResourceChatUser(), request, **kwargs)
+            ResourceChatUser.Page.get(ResourceChatUser.Page(), request, **kwargs, current_page=1, page_size=20)
+            resource_chat_user_group.ResourceChatUserGroup.get(
+                resource_chat_user_group.ResourceChatUserGroup(), request, **group_kwargs
+            )
+            resource_chat_user_group.ResourceChatUserGroup.Page.get(
+                resource_chat_user_group.ResourceChatUserGroup.Page(),
+                request,
+                **group_kwargs,
+                current_page=1,
+                page_size=20,
+            )
+
+    def test_extended_user_can_edit_chat_users_and_groups(self):
+        request = self.build_extended_user_request(PermissionConstants.APPLICATION_CHAT_USER_EDIT)
+        kwargs = self.endpoint_kwargs()
+        group_kwargs = {key: value for key, value in kwargs.items() if key != "user_group_id"}
+
+        with (
+            patch("system_manage.views.resource_chat_user.ResourceChatUserSerializer") as user_edit,
+            patch("system_manage.views.resource_chat_user_group.ResourceChatUserGroupSerializer") as group_edit,
+        ):
+            user_edit.return_value.edit.return_value = []
+            group_edit.return_value.edit.return_value = []
+            ResourceChatUser.put(ResourceChatUser(), request, **kwargs)
+            resource_chat_user_group.ResourceChatUserGroup.put(
+                resource_chat_user_group.ResourceChatUserGroup(), request, **group_kwargs
+            )
+
+        user_edit.return_value.edit.assert_called_once_with([])
+        group_edit.return_value.edit.assert_called_once_with([])
 
 
 class ChatUserEditTests(TestCase):
