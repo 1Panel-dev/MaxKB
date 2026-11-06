@@ -44,6 +44,9 @@ class PortalSerializer(serializers.Serializer):
         required=False, label=_("enable public access"), help_text=_("enable public access")
     )
     enable_api = serializers.BooleanField(required=False, label=_("enable api"), help_text=_("enable api"))
+    enable_agent_mcp_service = serializers.BooleanField(
+        required=False, label=_("enable agent mcp service"), help_text=_("enable agent mcp service")
+    )
     enable_knowledge_base_api = serializers.BooleanField(
         required=False, label=_("enable knowledge base api"), help_text=_("enable knowledge base api")
     )

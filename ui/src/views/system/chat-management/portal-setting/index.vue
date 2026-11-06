@@ -12,7 +12,7 @@ import ButtonPortalAuthSetting from './components/ButtonPortalAuthSetting.vue'
 import ButtonPortalCorsSetting from './components/ButtonPortalCorsSetting.vue'
 import { useStore } from '@/stores'
 
-type AccessField = 'enable_public_access' | 'enable_api' | 'enable_knowledge_base_api' | 'enable_auth' | 'enable_cors'
+type AccessField = 'enable_public_access' | 'enable_api' | 'enable_agent_mcp_service' | 'enable_knowledge_base_api' | 'enable_auth' | 'enable_cors'
 
 const portalSetting = reactive<PortalSetting>({
   id: '',
@@ -21,6 +21,7 @@ const portalSetting = reactive<PortalSetting>({
   logo: '',
   enable_public_access: true,
   enable_api: true,
+  enable_agent_mcp_service: true,
   enable_knowledge_base_api: true,
   enable_auth: false,
   auth_config: {
@@ -173,9 +174,9 @@ const canEditPortal = computed(() => perm.system.portal.edit())
               </span>
               <el-switch
                 :disabled="!canEditPortal || saving"
-                :model-value="portalSetting.enable_knowledge_base_api"
+                :model-value="portalSetting.enable_agent_mcp_service"
                 size="small"
-                @change="handleAccessChange('enable_knowledge_base_api', $event)"
+                @change="handleAccessChange('enable_agent_mcp_service', $event)"
               />
             </div>
 
