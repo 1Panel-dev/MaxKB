@@ -91,7 +91,6 @@ class WorkspaceKnowledgePermissionTests(SimpleTestCase):
             self.assertEqual(len(children[group]["permission"]), count)
         ids = {p["id"] for p in children["KNOWLEDGE"]["permission"]}
         self.assertIn(str(P.KNOWLEDGE_MCP_CONFIG.value), ids)
-        self.assertIn(str(P.KNOWLEDGE_EXPORT_SKILLS.value), ids)
 
     @patch("knowledge.views.document.DocumentSerializers.Query")
     def test_image_and_document_lists_require_their_own_read_permission(self, serializer):

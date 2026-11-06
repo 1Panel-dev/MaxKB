@@ -700,21 +700,6 @@ class PermissionConstants(Enum):
         ),
     )
 
-    KNOWLEDGE_EXPORT_SKILLS = (
-        Permission(
-            group=Group.KNOWLEDGE,
-            sub_group=Group.KNOWLEDGE,
-            operate=Operate.EXPORT_SKILLS,
-            bit_index=13,
-        ),
-        PermissionMeta(
-            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
-            category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
-            resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-        ),
-    )
-
     KNOWLEDGE_IMAGE_READ = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.IMAGE, operate=Operate.READ, bit_index=14),
         PermissionMeta(
@@ -2527,21 +2512,6 @@ class PermissionConstants(Enum):
             sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
             operate=Operate.MCP_CONFIG,
             bit_index=63,
-        ),
-        PermissionMeta(
-            role_list=[RoleConstants.ADMIN],
-            category=Category.SHARED,
-            is_ee=is_ee,
-            scope=[PermissionScopeConstants.SYSTEM],
-        ),
-    )
-
-    SHARED_KNOWLEDGE_EXPORT_SKILLS = (
-        Permission(
-            group=Group.SYSTEM_SHARED_KNOWLEDGE,
-            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
-            operate=Operate.EXPORT_SKILLS,
-            bit_index=64,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4407,21 +4377,6 @@ class PermissionConstants(Enum):
             sub_group=Group.SYSTEM_RES_KNOWLEDGE,
             operate=Operate.MCP_CONFIG,
             bit_index=44,
-        ),
-        PermissionMeta(
-            role_list=[RoleConstants.ADMIN],
-            category=Category.RESOURCE,
-            is_ee=is_ee,
-            scope=[PermissionScopeConstants.SYSTEM],
-        ),
-    )
-
-    RESOURCE_KNOWLEDGE_EXPORT_SKILLS = (
-        Permission(
-            group=Group.SYSTEM_RES_KNOWLEDGE,
-            sub_group=Group.SYSTEM_RES_KNOWLEDGE,
-            operate=Operate.EXPORT_SKILLS,
-            bit_index=45,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
