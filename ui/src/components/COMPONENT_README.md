@@ -821,7 +821,8 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 切换选择，始终过滤掉 `embedding_model_id` 为空的知识库；选中后仅展示相同 Embedding 模型的选项，清空后恢复可选范围；悬停展示知识库详情。
 按工作空间、System 资源管理、System 共享资源选择完整 Knowledge API 的 `getAllKnowledge`，
 一次加载当前查询的全部知识库，不使用滚动分页，不增加 Workspace 共享页面来源分支。
-仅普通工作空间显示只读 `FolderTree`，不显示共享目录、不调用 Workspace Shared API；其他范围不显示或查询文件夹。
+仅普通工作空间显示只读 `FolderTree`，包含共享目录；选中共享目录时调用 Workspace Shared API 的
+`getAllKnowledge`，不传文件夹参数；其他范围不显示或查询文件夹。
 支持名称搜索和跨目录保留选择，调用方维护最终关联 ID 与快照。
 
 ### SelectApplicationDialog、SelectToolDialog
