@@ -83,9 +83,28 @@ def get_paragraph_element_txt(paragraph_element, doc: Document, images_list, get
     return ""
 
 
+# Wrappers whose runs are shown as part of the paragraph: tracked insertions, moved-to text, simple fields,
+# smart tags and custom XML. An inline content control (w:sdt) shows the runs of its w:sdtContent.
+inline_wrapper_tags = {ns.qn('w:ins'), ns.qn('w:moveTo'), ns.qn('w:fldSimple'), ns.qn('w:smartTag'),
+                       ns.qn('w:customXml')}
+
+
+def get_inline_elements(parent):
+    for element in parent:
+        if element.tag in inline_wrapper_tags:
+            yield from get_inline_elements(element)
+        elif element.tag == ns.qn('w:sdt'):
+            content = element.find(ns.qn('w:sdtContent'))
+            if content is not None:
+                yield from get_inline_elements(content)
+        else:
+            yield element
+
+
 def get_paragraph_txt(paragraph: Paragraph, doc: Document, images_list, get_image_id):
     try:
-        return "".join([get_paragraph_element_txt(e, doc, images_list, get_image_id) for e in paragraph._element])
+        return "".join([get_paragraph_element_txt(e, doc, images_list, get_image_id) for e in
+                        get_inline_elements(paragraph._element)])
     except Exception as e:
         return ""
 
@@ -175,9 +194,21 @@ class DocSplitHandle(BaseSplitHandle):
                 [get_cell_text(cell, doc, images_list, get_image_id) for cell in row.cells]) + ' |\n'
         return md_table
 
+    @staticmethod
+    def iter_block_elements(parent):
+        # A block-level content control (w:sdt), such as a cover page or a form field, holds its
+        # paragraphs and tables in w:sdtContent
+        for element in parent:
+            if element.tag == ns.qn('w:sdt'):
+                content = element.find(ns.qn('w:sdtContent'))
+                if content is not None:
+                    yield from DocSplitHandle.iter_block_elements(content)
+            else:
+                yield element
+
     def to_md(self, doc, images_list, get_image_id):
         elements = []
-        for element in doc.element.body:
+        for element in self.iter_block_elements(doc.element.body):
             tag = str(element.tag)
             if tag.endswith('tbl'):
                 # 处理表格
