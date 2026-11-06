@@ -1466,7 +1466,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         return True
 
     @transaction.atomic
-    def edit(self, instance: Dict, with_valid=True):
+    def edit(self, instance: Dict, with_valid=True, *, check_bound_resource_permissions=True):
         if with_valid:
             self.is_valid()
             ApplicationEditSerializer(data=instance).is_valid(raise_exception=True)
@@ -1478,7 +1478,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if "work_flow_template" in instance:
             return self.update_template_workflow(instance, application)
 
-        validate_bound_tool_permissions(self.data.get("user_id"), self.data.get("workspace_id"), instance)
+        if check_bound_resource_permissions:
+            validate_bound_tool_permissions(self.data.get("user_id"), self.data.get("workspace_id"), instance)
 
         if instance.get("model_id") is None or len(instance.get("model_id")) == 0:
             application.model_id = None
