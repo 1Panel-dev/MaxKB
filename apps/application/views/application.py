@@ -624,7 +624,7 @@ class ApplicationAPI(APIView):
             tags=[_("Application")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.APPLICATION_READ.get_workspace_permission(),
+            PermissionConstants.APPLICATION_CLEAR_POLICY.get_workspace_permission(),
             RoleConstants.USER.get_workspace_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )

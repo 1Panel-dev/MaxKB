@@ -40,6 +40,32 @@ def get_chat_user_permission_constant(resource_type, operate):
     return PermissionConstants[f"{normalized}_CHAT_USER_{operate}"]
 
 
+def get_chat_user_role_permissions(operate):
+    def get_permission(request, kwargs):
+        constant = get_chat_user_permission_constant(kwargs.get("resource_type"), operate).value
+        return Permission(
+            group=constant.group,
+            sub_group=constant.sub_group,
+            operate=constant.operate,
+            bit_index=constant.bit_index,
+            workspace_id=kwargs.get("workspace_id"),
+            resource_id=kwargs.get("resource_id"),
+        )
+
+    return [
+        ViewPermission(
+            [RoleConstants.USER.get_workspace_role()],
+            [get_permission],
+            compare=CompareConstants.AND,
+        ),
+        ViewPermission(
+            [RoleConstants.EXTENDS_USER.get_workspace_role()],
+            [get_permission],
+            compare=CompareConstants.AND,
+        ),
+    ]
+
+
 class ResourceChatUser(APIView):
     authentication_classes = [TokenAuth]
 
@@ -59,20 +85,7 @@ class ResourceChatUser(APIView):
         lambda r, kwargs: get_chat_user_permission_constant(
             kwargs.get("resource_type"), "READ"
         ).get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [
-                lambda r, kwargs: Permission(
-                    group=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.group,
-                    sub_group=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.sub_group,
-                    operate=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.operate,
-                    bit_index=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.bit_index,
-                    workspace_id=kwargs.get("workspace_id"),
-                    resource_id=kwargs.get("resource_id"),
-                )
-            ],
-            compare=CompareConstants.AND,
-        ),
+        *get_chat_user_role_permissions("READ"),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id: str, resource_type: str, resource_id: str, user_group_id: str):
@@ -107,20 +120,7 @@ class ResourceChatUser(APIView):
         lambda r, kwargs: get_chat_user_permission_constant(
             kwargs.get("resource_type"), "EDIT"
         ).get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [
-                lambda r, kwargs: Permission(
-                    group=get_chat_user_permission_constant(kwargs.get("resource_type"), "EDIT").value.group,
-                    sub_group=get_chat_user_permission_constant(kwargs.get("resource_type"), "EDIT").value.sub_group,
-                    operate=get_chat_user_permission_constant(kwargs.get("resource_type"), "EDIT").value.operate,
-                    bit_index=get_chat_user_permission_constant(kwargs.get("resource_type"), "EDIT").value.bit_index,
-                    workspace_id=kwargs.get("workspace_id"),
-                    resource_id=kwargs.get("resource_id"),
-                )
-            ],
-            compare=CompareConstants.AND,
-        ),
+        *get_chat_user_role_permissions("EDIT"),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def put(self, request: Request, workspace_id: str, resource_type, resource_id: str, user_group_id: str):
@@ -154,24 +154,7 @@ class ResourceChatUser(APIView):
             lambda r, kwargs: get_chat_user_permission_constant(
                 kwargs.get("resource_type"), "READ"
             ).get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [
-                    lambda r, kwargs: Permission(
-                        group=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.group,
-                        sub_group=get_chat_user_permission_constant(
-                            kwargs.get("resource_type"), "READ"
-                        ).value.sub_group,
-                        operate=get_chat_user_permission_constant(kwargs.get("resource_type"), "READ").value.operate,
-                        bit_index=get_chat_user_permission_constant(
-                            kwargs.get("resource_type"), "READ"
-                        ).value.bit_index,
-                        workspace_id=kwargs.get("workspace_id"),
-                        resource_id=kwargs.get("resource_id"),
-                    )
-                ],
-                compare=CompareConstants.AND,
-            ),
+            *get_chat_user_role_permissions("READ"),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(

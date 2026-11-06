@@ -28,7 +28,7 @@ const workspace = {
 /**
  * 工作空间「智能体」批量清除策略权限
  */
-  batchCleanStrategy: () => can(P.APPLICATION_CHAT_LOG_CLEAR_POLICY),
+  batchCleanStrategy: () => can(P.APPLICATION_CLEAR_POLICY),
 
   // —— 资源级（按应用 id）——
 /**
