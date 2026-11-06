@@ -26,6 +26,7 @@ from knowledge.serializers.common import BatchSerializer
 from maxkb.conf import PROJECT_DIR
 from tools.models import Tool, ToolWorkflow
 from trigger.models import TriggerTypeChoices, Trigger, TriggerTaskTypeChoices, TriggerTask, TaskRecord
+from trigger.utils import get_source_query_set
 
 
 class BatchActiveSerializer(serializers.Serializer):
@@ -251,7 +252,8 @@ class TriggerValidationMixin:
 
 class TriggerTaskCreateRequest(serializers.Serializer):
     source_type = serializers.ChoiceField(required=True, choices=TriggerTaskTypeChoices)
-    source_id = serializers.CharField(required=True, label=_('source_id'))
+    source_id = serializers.CharField(required=True, label=_('source_id'),
+                                      help_text=_('Workspace resource or authorized shared tool ID'))
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
     meta = serializers.DictField(default=dict, required=False)
     parameter = serializers.DictField(default=dict, required=False)
@@ -273,7 +275,8 @@ class TriggerTaskCreateRequest(serializers.Serializer):
 
 class TriggerTaskEditRequest(serializers.Serializer):
     source_type = serializers.ChoiceField(required=False, choices=TriggerTaskTypeChoices)
-    source_id = serializers.CharField(required=False, label=_('source_id'))
+    source_id = serializers.CharField(required=False, label=_('source_id'),
+                                      help_text=_('Workspace resource or authorized shared tool ID'))
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
     meta = serializers.DictField(default=dict, required=False)
     parameter = serializers.DictField(default=dict, required=False)
@@ -375,7 +378,7 @@ class TriggerSerializer(serializers.Serializer):
         trigger_tasks = valid_data.get('trigger_task')
         if trigger_tasks:
 
-            is_active_map = self.batch_get_source_active_status(trigger_tasks)
+            is_active_map = self.batch_get_source_active_status(trigger_tasks, self.data.get('workspace_id'))
 
             trigger_task_models = [
                 TriggerTask(
@@ -399,7 +402,7 @@ class TriggerSerializer(serializers.Serializer):
         return TriggerResponse(trigger_model).data
 
     @staticmethod
-    def batch_get_source_active_status(trigger_tasks: list) -> Dict[tuple, bool]:
+    def batch_get_source_active_status(trigger_tasks: list, workspace_id: str) -> Dict[tuple, bool]:
         """
         批量查询所有 source 的 is_active 状态
         返回: {(source_type, source_id): is_active}
@@ -423,8 +426,11 @@ class TriggerSerializer(serializers.Serializer):
 
         is_active_map = {}
         for source_type, source_ids in source_ids_by_type.items():
-            source_model, field = config[source_type]
-            source_query_set = QuerySet(source_model).filter(id__in=source_ids).values('id', field)
+            field = config[source_type][1]
+            source_query_set = list(get_source_query_set(source_type, workspace_id)
+                                    .filter(id__in=source_ids).values('id', field))
+            if {str(source['id']) for source in source_query_set} != set(map(str, source_ids)):
+                raise AppApiException(403, _('No permission to access'))
 
             for source in source_query_set:
                 is_active_map[(source_type, str(source['id']))] = source[field]
@@ -546,7 +552,7 @@ class TriggerOperateSerializer(serializers.Serializer):
             if not trigger_tasks:
                 raise serializers.ValidationError(_('Trigger must have at least one task'))
 
-            is_active_map = TriggerSerializer.batch_get_source_active_status(trigger_tasks)
+            is_active_map = TriggerSerializer.batch_get_source_active_status(trigger_tasks, workspace_id)
 
             trigger_task_model_list = [TriggerTask(
                 id=task_data.get('id') or uuid.uuid7(),
