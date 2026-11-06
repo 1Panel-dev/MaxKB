@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Ref } from 'vue'
 import { inject, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { FormInstance } from 'element-plus'
@@ -12,7 +13,8 @@ defineOptions({ name: 'AiChatNodeMcpSettingDialog' })
 
 const emit = defineEmits<{ submit: [setting: McpSetting]; loaded: [tools: ToolItem[]] }>()
 const resourceScope = inject<string>('resourceScope', 'workspace')
-const store = useWorkflowStore(resourceScope)
+const resourceWorkspaceId = inject<Ref<string | null | undefined>>('resourceWorkspaceId', ref())
+const store = useWorkflowStore(resourceScope, () => resourceWorkspaceId.value)
 
 const MCP_SERVER_EXAMPLE = `{
   "math": {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
@@ -45,6 +45,10 @@ const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflo
 
 /* 智能体工作流加载与保存 */
 const applicationDetail = ref<ApplicationDetail>()
+provide(
+  'resourceWorkspaceId',
+  computed(() => applicationDetail.value?.workspace_id),
+)
 const loading = ref(false)
 const savedWorkflow = ref<LogicFlow.GraphData>()
 const saveTime = ref<Date | string>()

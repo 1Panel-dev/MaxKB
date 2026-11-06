@@ -61,7 +61,7 @@ const apiMap = Object.fromEntries(
 const cacheMap = new Map<string, Map<string, unknown>>()
 const pendingMap = new Map<string, Map<string, Promise<unknown>>>()
 
-export function useWorkflowStore(resourceScope: string): WorkflowStore {
+export function useWorkflowStore(resourceScope: string, getResourceWorkspaceId?: () => string | null | undefined): WorkflowStore {
   const api: ApiModule | undefined = apiMap[resourceScope]
   if (!api) {
     throw new Error(`[useWorkflowStore] unknown resourceScope: "${resourceScope}"`)
@@ -125,7 +125,10 @@ export function useWorkflowStore(resourceScope: string): WorkflowStore {
       },
       getToolListWithShared(query?: Dict<unknown>): Promise<ToolItem[]> {
         if (!requestApi.getToolListWithShared) return Promise.resolve([])
-        return withCache(`tool-list:${JSON.stringify(query ?? {})}`, () => requestApi.getToolListWithShared!(query), force)
+        const workspaceId = getResourceWorkspaceId?.()
+        if (resourceScope === 'system-resource' && getResourceWorkspaceId && !workspaceId) return Promise.resolve([])
+        const toolQuery = resourceScope === 'system-resource' && workspaceId ? { ...query, workspace_id: workspaceId } : query
+        return withCache(`tool-list:${JSON.stringify(toolQuery ?? {})}`, () => requestApi.getToolListWithShared!(toolQuery), force)
       },
       getToolById(toolId: string): Promise<ToolItem> {
         if (!requestApi.getToolById) return Promise.resolve({} as ToolItem)

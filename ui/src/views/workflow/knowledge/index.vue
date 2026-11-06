@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action, UploadFile, UploadInstance } from 'element-plus'
@@ -92,6 +92,10 @@ function handleSaveDefaultModelSetting(settings: DefaultModelSettingPayload) {
 
 /* 知识库工作流加载与保存 */
 const knowledgeDetail = ref<KnowledgeDetail>()
+provide(
+  'resourceWorkspaceId',
+  computed(() => knowledgeDetail.value?.workspace_id),
+)
 const loading = ref(false)
 const savedWorkflow = ref<LogicFlow.GraphData>()
 const saveTime = ref<Date | string>()

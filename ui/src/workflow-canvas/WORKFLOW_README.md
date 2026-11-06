@@ -137,8 +137,12 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 ### 资源查询（`store/`）
 
-`useWorkflowStore(resourceScope)` 是画布资源接口适配器，不是 Pinia Store。它自动收集 `store/api/*/index.ts`，
+`useWorkflowStore(resourceScope, getResourceWorkspaceId?)` 是画布资源接口适配器，不是 Pinia Store。它自动收集 `store/api/*/index.ts`，
 查询方法按范围、方法与查询参数缓存结果并复用在途请求；`store.force.xxx()` 跳过已完成缓存，仍复用同键在途请求。
+三类工作流及简易智能体设置通过 `resourceWorkspaceId` 注入资源详情所属工作空间的响应式值。
+工具菜单和 MCP 选择将读取函数传入 Store；System 资源管理工具查询携带该 `workspace_id`，
+详情未加载时不查询，缓存与在途请求按工作空间隔离；Workspace 和 System 共享沿用原查询参数。
+工具菜单在详情所属工作空间变化后重新查询。
 `postPromptGenerate` 与 `postChatCompletion` 是流式方法，始终直接转发到对应范围的 Model API，不缓存或去重；
 通过普通 Store 或 `force` 调用都会发起新请求，返回独立的 Response 流。
 模型选项统一调用 `store.getModelListWithShared(query)`，由对应范围 API 查询；Workspace 和

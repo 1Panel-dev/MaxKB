@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { Ref } from 'vue'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
-import { computed, inject, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import SharedToolApi from '@/api/admin/workspace/shared/tool'
 import ToolApi from '@/api/admin/workspace/tool/tool'
@@ -19,7 +20,8 @@ defineOptions({ name: 'ResourceNodeMenu' })
 
 const route = useRoute()
 const resourceScope = inject<string>('resourceScope', 'workspace')
-const store = useWorkflowStore(resourceScope)
+const resourceWorkspaceId = inject<Ref<string | null | undefined>>('resourceWorkspaceId', ref())
+const store = useWorkflowStore(resourceScope, () => resourceWorkspaceId.value)
 const isSystemScope = resourceScope === 'system-resource' || resourceScope === 'system-shared'
 const props = defineProps<{
   source: NodeMenuResourceSource
@@ -133,6 +135,10 @@ function loadResources(folder?: FolderItem) {
 function handleNodeDragStart(event: PointerEvent, node: NodeMenuItem) {
   if (event.button === 0) emit('dragstart', node, event)
 }
+
+watch(resourceWorkspaceId, () => {
+  if (resourceScope === 'system-resource' && isToolMenu.value) void loadResources()
+})
 
 onMounted(() => {
   void loadResources()

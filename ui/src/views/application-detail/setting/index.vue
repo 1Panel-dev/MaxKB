@@ -31,6 +31,10 @@ const isSystem = computed(() => isSystemResource())
 const modelApi = computed(() => (isSystem.value ? SystemModelApi : ModelApi))
 const toolApi = computed(() => (isSystem.value ? SystemToolApi : ToolApi))
 provide('resourceScope', getResourceScope())
+provide(
+  'resourceWorkspaceId',
+  computed(() => application.value?.workspace_id),
+)
 provide('getModelParamsForm', (modelId: string) => modelApi.value.getModelParamsForm(modelId))
 
 /* 详情回填到设置表单，编辑数据与接口详情保持隔离。 */

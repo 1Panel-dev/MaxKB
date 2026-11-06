@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Ref } from 'vue'
 import { TOOL_TYPE } from '@/api/enums'
 import { computed, inject, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { set } from 'lodash'
@@ -37,7 +38,8 @@ const mcpResource = MCP_RESOURCE[workflowMode] ?? MCP_RESOURCE[WorkflowMode.Appl
 const mcpResourceType = mcpResource.type
 const mcpResourceId = mcpResource.id() || ''
 
-const store = useWorkflowStore(resourceScope)
+const resourceWorkspaceId = inject<Ref<string | null | undefined>>('resourceWorkspaceId', ref())
+const store = useWorkflowStore(resourceScope, () => resourceWorkspaceId.value)
 
 interface SchemaProperty {
   description?: string
