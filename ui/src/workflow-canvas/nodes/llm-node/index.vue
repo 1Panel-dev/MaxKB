@@ -49,7 +49,7 @@ const defaultForm: LlmNodeForm = {
   enable_context: false,
   context_variable: [],
   tools: { location: 'customize', reference: [], tools: [] },
-  is_result: false,
+  is_result: true,
 }
 const savedForm = model.properties.node_data as Partial<LlmNodeForm> | undefined
 model.properties.node_data = {
