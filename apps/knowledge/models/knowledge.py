@@ -507,6 +507,10 @@ class PublicFileAccess(AppModelMixin):
         db_index=True,
         verbose_name="资源ID"
     )
+    share_link = models.ForeignKey(
+        'application.ChatShareLink', on_delete=models.CASCADE, null=True, blank=True,
+        verbose_name="分享链接"
+    )
 
     class Meta:
         db_table = 'public_file_access'

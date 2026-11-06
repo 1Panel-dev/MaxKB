@@ -3,7 +3,7 @@ import re
 import urllib
 
 import uuid_utils.compat as uuid
-from application.models import Application, ApplicationAccessToken, ChatShareLink
+from application.models import Application, ApplicationAccessToken, ChatShareLink, ShareLinkType
 from common.auth.common import FileToken
 from common.auth.handle.impl.user_token import get_auth
 from common.constants.authentication_type import AuthenticationType
@@ -93,8 +93,11 @@ def auth(file, mk_file_auth):
     # 公共/临时文件无需鉴权
     if file.source_type in _PUBLIC_SOURCE_TYPES:
         return
-    # PublicFileAccess 中记录的文件允许公开访问
-    if QuerySet(PublicFileAccess).filter(source_type='FILE', source_id=str(file.id)).exists():
+    # 文件公开授权仅在对应的公开分享及聊天仍有效时生效；旧的无关联授权不再放行。
+    if QuerySet(PublicFileAccess).filter(
+            source_type='FILE', source_id=str(file.id),
+            share_link__share_type=ShareLinkType.PUBLIC, share_link__chat__is_deleted=False,
+    ).exists():
         return
     if file.source_type == FileSourceType.APPLICATION:
         application = QuerySet(Application).filter(id=file.source_id).first()
@@ -128,7 +131,9 @@ def _auth_chat(file, token, user_type):
         if file.meta.get('user_id') == user_id:
             return
         # 非本人:存在分享链接才允许
-        if not QuerySet(ChatShareLink).filter(chat_id=file.source_id).exists():
+        if not QuerySet(ChatShareLink).filter(
+                chat_id=file.source_id, share_type=ShareLinkType.PUBLIC, chat__is_deleted=False,
+        ).exists():
             _deny()
         # 匿名用户还需满足应用的登录要求
         if user_type == AuthenticationType.CHAT_ANONYMOUS_USER:
