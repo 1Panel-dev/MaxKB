@@ -12,10 +12,10 @@ import { useStore } from '@/stores'
 import perm from '@/permission/index.ts'
 import { LOGIN_METHOD } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
-const { auth } = useStore()
+const { auth, user } = useStore()
 
 /* 选择工作空间列表 */
-const selectedWorkspaceId = ref('default')
+const selectedWorkspaceId = ref(user.userInfo?.workspace_list?.[0]?.id ?? 'default')
 const workspaceOptions = ref<WorkspaceItem[]>([])
 const loadingView = ref(false)
 
