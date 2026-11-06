@@ -3915,7 +3915,7 @@ msgstr "文件處理策略"
 #: apps/common/auth/constants/group_constants.py:40
 #: apps/common/auth/constants/group_constants.py:130
 msgid "External service"
-msgstr "外部服務"
+msgstr "外部檢索服務"
 
 #: apps/common/auth/constants/group_constants.py:41
 #: apps/common/auth/constants/group_constants.py:131
@@ -5933,7 +5933,7 @@ msgstr "知識庫封存檔中繼資料無效。"
 
 #: apps/knowledge/services/knowledge_archive.py:311
 msgid "Invalid external service settings."
-msgstr "外部服務設定無效。"
+msgstr "外部檢索服務設定無效。"
 
 #: apps/knowledge/services/knowledge_archive.py:318
 msgid "Unsupported knowledge archive version."
