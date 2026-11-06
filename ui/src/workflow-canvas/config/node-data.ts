@@ -438,7 +438,7 @@ export const loopNode = {
             },
             fields: [],
             showNode: true,
-            stepName: '开始',
+            stepName: '循环开始',
             globalFields: [],
           },
         },
