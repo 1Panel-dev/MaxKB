@@ -34,6 +34,7 @@ import ButtonCreateTool from './components/ButtonCreateTool.vue'
 import ButtonToolStore from './components/ButtonToolStore.vue'
 import EditToolForm from '@/views/tool/tool-form/EditToolForm.vue'
 import perm from '@/permission/index.ts'
+import { getWorkspaceId } from '@/utils/resource-context.ts'
 
 /* 当前文件夹 */
 
@@ -222,7 +223,7 @@ onMounted(() => {
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip content="创建文件夹" placement="top">
+        <MkTooltip v-if="perm.tool.workspace.folderCreate(getWorkspaceId() || '')" content="创建文件夹" placement="top">
           <el-button @click="handleCreateFolder" text type="primary" class="-mr-1">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>

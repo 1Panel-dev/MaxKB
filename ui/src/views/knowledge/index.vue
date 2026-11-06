@@ -286,6 +286,7 @@ function handleBatchDelete() {
                     label="分词索引"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
+                    v-if="perm.knowledge.workspace.docToken(knowledge.id)"
                   />
                   <!-- MCP 服务配置 -->
                   <McpConfigKnowledgeAction
