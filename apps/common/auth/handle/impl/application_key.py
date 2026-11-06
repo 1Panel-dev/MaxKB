@@ -21,7 +21,6 @@ from common.exception.app_exception import AppAuthenticationFailed
 class ApplicationKey(AuthBaseHandle):
     def handle(self, request, token: str, get_token_details):
         application_api_key = QuerySet(ApplicationApiKey).filter(secret_key=token).first()
-        QuerySet()
         if application_api_key is None:
             raise AppAuthenticationFailed(500, _("Secret key is invalid"))
         if not application_api_key.is_active:
