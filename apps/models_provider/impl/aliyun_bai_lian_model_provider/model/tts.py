@@ -5,6 +5,7 @@ import dashscope
 from django.utils.translation import gettext as _
 
 from common.utils.common import _remove_empty_lines
+from common.utils.provider_request import provider_request
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tts import BaseTextToSpeech
 from oss.url_fetch import fetch_public_bytes
@@ -64,8 +65,6 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             audio_url = response.output.audio.url
             audio = fetch_public_bytes(audio_url)
         elif 'MiniMax' in self.model:
-            import requests
-
             api_url = f"{self.base_url}/services/aigc/multimodal-generation/generation"
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
@@ -78,12 +77,12 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                     **self.params
                 }
             }
-            response = requests.post(api_url, headers=headers, json=payload)
+            response = provider_request("POST", api_url, headers=headers, json=payload)
             audio_hex = response.json().get("output", {}).get("data", {}).get("audio")
             if audio_hex:
                 audio = bytes.fromhex(audio_hex)
             else:
-                raise Exception(f"Failed to get audio data from response: {str(response.text)}")
+                raise Exception("Failed to get audio data from response")
         else:
             from dashscope.audio.tts_v2 import SpeechSynthesizer
             synthesizer = SpeechSynthesizer(model=self.model, **self.params)
