@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import RoleApi from '@/api/admin/system/role'
 import type { RoleItem, RolePermission, RolePermissionModule, RolePermissionModuleGroup } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
+import perm from '@/permission';
 
 interface PermissionTableRow {
   id: string
@@ -185,7 +186,7 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
     </MkTable>
 
     <footer v-if="!disabled" class="sticky -mb-6 -ml-6 -mr-6 bottom-0 z-10 mt-auto flex shrink-0 justify-end border-t bg-white px-6 py-4">
-      <el-button type="primary" :loading="loading" @click="handleSave">保存</el-button>
+      <el-button v-if="perm.system.role.edit()" type="primary" :loading="loading" @click="handleSave">保存</el-button>
     </footer>
   </div>
 </template>
