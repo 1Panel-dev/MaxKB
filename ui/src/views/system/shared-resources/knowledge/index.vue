@@ -144,6 +144,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                     label="MCP 服务配置"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
+                    v-if="perm.knowledge.share.mcpConfig()"
                   />
 
                   <!-- 授权工作空间 -->
