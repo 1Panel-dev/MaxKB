@@ -230,6 +230,7 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 不自动请求生成预览；成功通知列表刷新，失败保留文件和策略供重试。
 图片上传入口接收 `resourceApi.image`；Workspace、System 资源管理和 System 共享提供生成预览及批量添加，
 Workspace 共享保持只读。
+替换图片原文件使用知识库图片扩展名过滤与校验；普通文档替换保持原有类型范围，服务端验证图片真实内容。
 类型统一读取路由 `type`，使用 `KNOWLEDGE_TYPE_KEY`，不逐层传递类型 Prop。
 挂载时查询并启动 6 秒轮询，请求结束后安排下一次；静默刷新保留筛选、页码和当前页选择，
 操作中推迟轮询，卸载后停止。创建者选项打开或远程搜索时加载，不在页面进入时预查。

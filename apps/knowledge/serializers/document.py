@@ -2274,12 +2274,19 @@ class DocumentSerializers(serializers.Serializer):
             if knowledge is None:
                 raise AppApiException(500, _("Knowledge id does not exist"))
             validate_knowledge_file_size(knowledge, [self.data.get("file")])
-            if (
-                not QuerySet(Document)
+            document = (
+                QuerySet(Document)
                 .filter(id=self.data.get("document_id"), knowledge_id=self.data.get("knowledge_id"))
-                .exists()
-            ):
+                .first()
+            )
+            if document is None:
                 raise AppApiException(500, _("Document id does not exist"))
+
+            if document.resource_type == DocumentResourceType.IMAGE:
+                from knowledge.services.image_documents import ImageDocumentService
+
+                file = self.data.get("file")
+                file.name = ImageDocumentService._validate_image(file, knowledge)
 
         @transaction.atomic
         def replace(self):

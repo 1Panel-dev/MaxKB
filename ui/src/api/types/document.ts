@@ -41,6 +41,7 @@ export interface DocumentItem {
   knowledge_id: string
   name: string
   type: KnowledgeType
+  resource_type?: DocumentResourceType
   is_active: boolean
   status: string
   status_meta?: DocumentStatusMeta | null
