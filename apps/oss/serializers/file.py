@@ -91,6 +91,50 @@ def _deny():
     raise AppUnauthorizedFailed(403, gettext('No permission to access'))
 
 
+def auth_delete(file, user):
+    if user is None:
+        _deny()
+    user_auth = get_auth(user)
+    if RoleConstants.ADMIN.value.__str__() in user_auth.role_list:
+        return
+    if file.source_type in (
+        FileSourceType.TEMPORARY_120_MINUTE, FileSourceType.TEMPORARY_30_MINUTE, FileSourceType.TEMPORARY_1_DAY,
+    ):
+        if str(file.meta.get('user_id')) != str(user.id):
+            _deny()
+        return
+    if file.source_type == FileSourceType.TOOL:
+        resource = QuerySet(Tool).filter(id=file.source_id).first()
+        permission, resource_type = PermissionConstants.TOOL_EDIT, 'tool'
+    elif file.source_type in (FileSourceType.APPLICATION, FileSourceType.CHAT):
+        resource = (QuerySet(Application).filter(id=file.source_id).first()
+                    if file.source_type == FileSourceType.APPLICATION
+                    else QuerySet(Application).filter(chat__id=file.source_id).first())
+        permission, resource_type = PermissionConstants.APPLICATION_EDIT, 'application'
+    elif file.source_type in (FileSourceType.KNOWLEDGE, FileSourceType.DOCUMENT):
+        knowledge_id = file.source_id
+        if file.source_type == FileSourceType.DOCUMENT:
+            knowledge_id = QuerySet(Document).filter(id=file.source_id).values_list('knowledge_id', flat=True).first()
+        resource = QuerySet(Knowledge).filter(id=knowledge_id).first() if knowledge_id else None
+        permission, resource_type = PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE, 'knowledge'
+    else:
+        _deny()
+    if resource is None:
+        _deny()
+    if not get_is_permissions(
+        SimpleNamespace(user=user, auth=user_auth), workspace_id=resource.workspace_id,
+        **{f'{resource_type}_id': str(resource.id)},
+    )(
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        getattr(permission, f'get_workspace_{resource_type}_permission')(),
+        permission.get_workspace_permission_workspace_manage_role(),
+        ViewPermission([RoleConstants.USER.get_workspace_role()],
+                       [getattr(PermissionConstants[resource_type.upper()],
+                                f'get_workspace_{resource_type}_permission')()], CompareConstants.AND),
+    ):
+        _deny()
+
+
 def auth(file, mk_file_auth):
     # A SKILL package is source code, not a public tool icon or generated output.
     skill = QuerySet(Tool).filter(tool_type=ToolType.SKILL, code=str(file.id)).first()
@@ -382,12 +426,12 @@ class FileSerializer(serializers.Serializer):
                 response['Content-Disposition'] = f'inline; filename={encoded_filename}'
                 return response
 
-        def delete(self, mk_file_auth=None):
+        def delete(self, user):
             self.is_valid(raise_exception=True)
             file_id = self.data.get('id')
             file = QuerySet(File).filter(id=file_id).first()
             if file is not None:
-                auth(file, mk_file_auth)
+                auth_delete(file, user)
                 file.delete()
             return True
 
