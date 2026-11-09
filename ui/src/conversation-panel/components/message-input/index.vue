@@ -12,8 +12,11 @@ import { useVoiceRecorder } from './voice-recorder/index'
 const {
   question,
   fileList,
+  uploadEnabled,
+  canUpload,
   maxFiles,
   maxSizeMB,
+  allowedExtensions,
   acceptList,
   streamLoading,
   disabled,
@@ -32,7 +35,7 @@ const {
 // 所有附件入口共用禁用条件，上传和发送仍由输入 Store 处理。
 const { fileInputRef, handleFileSelect, handlePaste, handleDragover, handleDrop, handleKeydown } = useInputEvents({
   text: question,
-  canUpload: () => !disabled.value && !streamLoading.value && fileList.value.length < maxFiles,
+  canUpload: () => canUpload.value,
   addFiles,
   submit: () => {
     if (canSend.value) send()
@@ -98,20 +101,19 @@ const { recording, seconds: recordSeconds, waveLevels, start: startRecording, st
     <!-- 操作栏 -->
     <div class="mt-3 flex items-center">
       <UserForm class="mr-3" />
-      <input ref="fileInputRef" type="file" multiple :accept="acceptList" class="hidden" @change="handleFileSelect" />
-      <MkTooltip placement="top">
+      <input v-if="uploadEnabled" ref="fileInputRef" type="file" multiple :accept="acceptList" class="hidden" @change="handleFileSelect" />
+      <MkTooltip v-if="uploadEnabled" placement="top">
         <template #content>
           <div class="break-all whitespace-pre-wrap">
             可拖拽到输入框内上传文件
             <br />
             上传文件：最多{{ maxFiles }}个，每个文件限制{{ maxSizeMB }}MB
             <br />
-            <!-- // TODO: 类型格式处理 -->
-            文件类型：{{ acceptList }}
+            文件类型：{{ allowedExtensions.join('、') }}
           </div>
         </template>
         <!-- 上传文件 -->
-        <el-button text :disabled="disabled || streamLoading || fileList.length >= maxFiles" @click="fileInputRef?.click()">
+        <el-button text :disabled="!canUpload" @click="fileInputRef?.click()">
           <MkIcon name="icon_attachment_outlined" :size="18" class="text-N900!" />
         </el-button>
       </MkTooltip>

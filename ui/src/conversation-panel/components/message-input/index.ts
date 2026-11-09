@@ -2,9 +2,11 @@ import { ref, computed, reactive, watch, inject, type Ref, type InjectionKey } f
 import type { LocationQuery } from 'vue-router'
 import { pick } from 'lodash'
 import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants/file-type'
-import { isImage, isDocument, isAudio, isVideo } from '@/utils/icon'
-import { MsgError } from '@/utils/message'
+import { isImage, isDocument, isAudio, isVideo, getFileExtension } from '@/utils/icon'
+import { MsgError, MsgWarning } from '@/utils/message'
 import type { Dict } from '@/api/types'
+import { defaultFileUploadSetting } from '@/workflow-canvas/nodes/base-node/constant'
+import type { BaseNodeForm, FileUploadSettingData } from '@/workflow-canvas/nodes/base-node/types'
 import type { ChatMessage, Conversation, ConversationAppInfo, SendMessageOptions } from '../../core/types'
 import { createUserFormStore } from './user-form/index'
 
@@ -77,10 +79,39 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   const question = ref('')
   const fileList = ref<FileItem[]>([])
   const sending = ref(false)
-  const maxFiles = 10
-  const maxSizeMB = 50
 
-  const acceptList = [...IMAGE_EXTENSIONS, ...DOCUMENT_EXTENSIONS, ...VIDEO_EXTENSIONS, ...AUDIO_EXTENSIONS].map((e) => `.${e}`).join(',')
+  // 文件上传配置：优先读取开始节点，缺失时回退到智能体字段，再补齐默认值。
+  const baseNodeData = computed(() => {
+    const baseNode = appInfo.value?.work_flow?.nodes?.find((node) => node.id === 'base-node')
+    return (baseNode?.properties?.node_data ?? {}) as Partial<Pick<BaseNodeForm, 'file_upload_enable' | 'file_upload_setting'>>
+  })
+  const uploadSetting = computed<FileUploadSettingData>(() => ({
+    ...defaultFileUploadSetting,
+    ...(baseNodeData.value.file_upload_setting ?? (appInfo.value?.file_upload_setting as Partial<FileUploadSettingData> | undefined)),
+  }))
+  const fileUploadEnabled = computed(() => Boolean(baseNodeData.value.file_upload_enable ?? appInfo.value?.file_upload_enable))
+  /** 本地上传：控制上传按钮、拖拽与粘贴入口。 */
+  const uploadEnabled = computed(() => fileUploadEnabled.value && uploadSetting.value.local_upload)
+  // TODO: URL 上传入口未实现，页面接入时使用 urlUploadEnabled 控制显示，并复用数量、大小、类型限制。
+  const urlUploadEnabled = computed(() => fileUploadEnabled.value && uploadSetting.value.url_upload)
+  const maxFiles = computed(() => uploadSetting.value.maxFiles)
+  const maxSizeMB = computed(() => uploadSetting.value.fileLimit)
+  /** 允许上传的大写扩展名：按勾选的文件类型拼接，其他文件使用自定义扩展名。 */
+  const allowedExtensions = computed(() => {
+    const { image, document, audio, video, other, otherExtensions } = uploadSetting.value
+    const extensions = [
+      ...(image ? IMAGE_EXTENSIONS : []),
+      ...(document ? DOCUMENT_EXTENSIONS : []),
+      ...(audio ? AUDIO_EXTENSIONS : []),
+      ...(video ? VIDEO_EXTENSIONS : []),
+      ...(other ? (otherExtensions ?? []).map((extension) => extension.toUpperCase()) : []),
+    ]
+    return [...new Set(extensions)]
+  })
+  const acceptList = computed(() => allowedExtensions.value.map((extension) => `.${extension}`).join(','))
+  const canUpload = computed(
+    () => uploadEnabled.value && !disabled.value && !streamLoading.value && !sending.value && fileList.value.length < maxFiles.value,
+  )
 
   // 语音输入：智能体开启语音转文字且当前模式提供接口时可用
   const transcribing = ref(false)
@@ -106,10 +137,19 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   const imageFiles = computed(() => fileList.value.filter((attachment) => isImage(attachment.name)))
 
   // 附件上传与本地预览
-  const validateFile = (file: File) => fileList.value.length < maxFiles && file.size > 0 && file.size <= maxSizeMB * 1024 * 1024
+  /** 校验单个文件，返回不通过的提示；拖拽、粘贴不受 accept 限制，需校验扩展名。 */
+  const getFileError = (file: File) => {
+    if (fileList.value.length >= maxFiles.value) return `单次最多上传 ${maxFiles.value} 个文件`
+    if (!allowedExtensions.value.includes(getFileExtension(file.name))) return '不支持上传该类型的文件'
+    if (file.size <= 0) return '不能上传空文件'
+    if (file.size > maxSizeMB.value * 1024 * 1024) return `每个文件不能超过 ${maxSizeMB.value}MB`
+  }
 
-  const addFile = (file: File) => {
-    if (disabled.value || streamLoading.value || sending.value || !validateFile(file)) return
+  /** 添加并上传文件，校验不通过时返回提示。 */
+  const addFile = (file: File): string | undefined => {
+    if (!uploadEnabled.value || disabled.value || streamLoading.value || sending.value) return
+    const error = getFileError(file)
+    if (error) return error
     const attachment: FileItem = reactive({
       uid: Date.now() + Math.random(),
       name: file.name,
@@ -159,7 +199,13 @@ export function createMessageInputStore(deps: MessageInputDeps) {
 
   const addFiles = (files: FileList | File[] | null | undefined) => {
     if (!files || disabled.value) return
-    Array.from(files).forEach(addFile)
+    // 批量添加时相同提示只显示一次
+    const errors = new Set<string>()
+    Array.from(files).forEach((file) => {
+      const error = addFile(file)
+      if (error) errors.add(error)
+    })
+    errors.forEach((error) => MsgWarning(error))
   }
 
   const removeFile = (index: number) => {
@@ -287,8 +333,12 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     userForm,
     question,
     fileList,
+    uploadEnabled,
+    urlUploadEnabled,
+    canUpload,
     maxFiles,
     maxSizeMB,
+    allowedExtensions,
     acceptList,
     streamLoading,
     disabled,
