@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Fragment, isVNode, ref } from 'vue'
+import { Fragment, isVNode, nextTick, ref } from 'vue'
 import type { DropdownInstance } from 'element-plus'
 import type { Options } from '@popperjs/core'
 import { hasRenderableSlotContent } from '@/utils/vnode'
@@ -18,8 +18,11 @@ const dropdownRef = ref<DropdownInstance>()
 // 保留模式也延迟到首次展开，避免列表初始化时挂载每一行的菜单及业务浮层。
 const hasOpened = ref(false)
 
-function handleVisibleChange(visible: boolean) {
-  if (visible) hasOpened.value = true
+async function handleVisibleChange(visible: boolean) {
+  if (!visible || hasOpened.value) return
+  // 首次入场钩子执行后再切换 persistent，避免菜单停在透明的初始状态。
+  await nextTick()
+  hasOpened.value = true
 }
 
 const slots = defineSlots<{

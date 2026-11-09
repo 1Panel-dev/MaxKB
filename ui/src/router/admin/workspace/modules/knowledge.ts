@@ -45,7 +45,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 path: 'image',
                 name: 'workspace-knowledge-image-list',
                 component: () => import('@/views/knowledge-detail/library/image/index.vue'),
-                meta: { permission: ({ params }) => perm.knowledge.workspace.image.read(String(params.knowledgeId)), next: 'workspace-knowledge-tag', title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE },
+                meta: { permission: ({ params }) => perm.knowledge.workspace.image.read(String(params.knowledgeId)), next: 'workspace-knowledge-tag', title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE || params.type === KNOWLEDGE_TYPE_KEY.WORKFLOW },
               },
               {
                 path: 'tag',
