@@ -3920,7 +3920,7 @@ msgstr "外部檢索服務"
 #: apps/common/auth/constants/group_constants.py:41
 #: apps/common/auth/constants/group_constants.py:131
 msgid "Knowledge settings"
-msgstr "設定"
+msgstr "基础設定"
 
 #: apps/common/auth/constants/group_constants.py:42
 #: apps/common/auth/constants/group_constants.py:113
