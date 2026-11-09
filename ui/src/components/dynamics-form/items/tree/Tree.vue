@@ -169,6 +169,11 @@ function renderTemplate(template: string, data: any) {
 }
 
 const loadNode: LoadFunction = (node, resolve)=> {
+  // fetch_list_function 是工具代码中的函数名, 只允许标识符, 防止拼接出其他接口路径
+  if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(attrs.fetch_list_function)) {
+    resolve([])
+    return
+  }
   request_call(request, {
     url: renderTemplate(
       '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' +

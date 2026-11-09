@@ -108,7 +108,7 @@ class BaseRerankerNode(IRerankerNode):
         result = reset_result_list(result, documents)
         r = filter_result(result, max_paragraph_char_number, top_n, similarity)
         return NodeResult({'result_list': r, 'result': ''.join([item.get('page_content') for item in r]),
-                           'is_hit_handling_method_list': [r for row in r if
+                           'is_hit_handling_method_list': [row for row in r if
                                                            row.get('metadata').get('is_hit_handling_method')]}, {})
 
     def get_details(self, index: int, **kwargs):

@@ -22,10 +22,13 @@
               :item="nodeModel?.properties.node_data"
               style="--el-avatar-border-radius: 6px"
             />
-            <h4
-              class="ellipsis-1 break-all"
-              v-html="highlightedStepName(nodeModel.properties.stepName)"
-            ></h4>
+            <h4 class="ellipsis-1 break-all">
+              <span
+                v-for="(character, index) in Array.from(String(nodeModel.properties.stepName || ''))"
+                :key="index"
+                :style="keyWord.includes(character) ? { background: currentKeyWord ? '#FF8800' : '#FFC60A' } : {}"
+              >{{ character }}</span>
+            </h4>
           </div>
 
           <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
@@ -547,25 +550,6 @@ const clearSelectOn = () => {
   currentKeyWord.value = false
 }
 
-// 高亮选中关键字
-
-const highlightedStepName = (contentText: string) => {
-  let res = contentText
-  if (keyWord.value === '') {
-    return res
-  } else {
-    const wordsArray = contentText.split('')
-    for (let i = 0; i < wordsArray.length; i++) {
-      if (keyWord.value.includes(wordsArray[i])) {
-        wordsArray[i] = currentKeyWord.value
-          ? `<span style='background: #FF8800;'>${wordsArray[i]}</span>`
-          : `<span style='background: #FFC60A;'>${wordsArray[i]}</span>`
-      }
-    }
-    res = wordsArray.join('')
-    return res
-  }
-}
 onMounted(() => {
   set(props.nodeModel, 'openNodeMenu', (anchorData: any) => {
     showAnchor.value ? closeNodeMenu() : openNodeMenu(anchorData)

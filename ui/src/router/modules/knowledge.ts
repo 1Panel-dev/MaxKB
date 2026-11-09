@@ -160,6 +160,24 @@ const ModelRouter = {
           },
           () => {
             const to: any = get_next_route()
+            if (to.params.folderId == 'shared') {
+              return RoleConst.ADMIN
+            } else if (to.params.folderId == 'resource-management') {
+            } else {
+              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole()
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.params.folderId == 'shared') {
+              return PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_CREATE
+            } else if (to.params.folderId == 'resource-management') {
+            } else {
+              return PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermissionWorkspaceManageRole()
+            }
+          },
+          () => {
+            const to: any = get_next_route()
             if (to.params.folderId == 'resource-management') {
               return PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_CREATE
             }
@@ -215,6 +233,24 @@ const ModelRouter = {
               return PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getKnowledgeWorkspaceResourcePermission(
                 to ? to.query.id : '',
               )
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.params.folderId == 'shared') {
+              return RoleConst.ADMIN
+            } else if (to.params.folderId == 'resource-management') {
+            } else {
+              return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole()
+            }
+          },
+          () => {
+            const to: any = get_next_route()
+            if (to.params.folderId == 'shared') {
+              return PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_CREATE
+            } else if (to.params.folderId == 'resource-management') {
+            } else {
+              return PermissionConst.KNOWLEDGE_DOCUMENT_CREATE.getWorkspacePermissionWorkspaceManageRole()
             }
           },
           () => {

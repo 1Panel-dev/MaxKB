@@ -304,6 +304,15 @@ class WorkflowManage:
     def get_body(self):
         return self.params
 
+    def get_resource_user_id(self):
+        parent = getattr(self, 'parentWorkflowManage', None)
+        if parent is not None:
+            return parent.get_resource_user_id()
+        chat_info = getattr(self.work_flow_post_handler, 'chat_info', None)
+        if chat_info is not None:
+            return chat_info.application.user_id
+        return self.params.get('user_id')
+
     def is_run(self, timeout=0.5):
         future_list_len = len(self.future_list)
         try:
@@ -354,6 +363,7 @@ class WorkflowManage:
         self.future_list.append(future)
 
     def run_chain_manage(self, current_node, node_result_future, language='zh'):
+        connection.close()
         translation.activate(language)
         if current_node is None:
             start_node = self.get_start_node()

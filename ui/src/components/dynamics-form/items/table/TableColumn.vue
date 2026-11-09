@@ -1,9 +1,14 @@
 <template>
-  <component :is="column.property" v-bind="attrs" :column="column" :row="row"></component>
+  <ProgressTableItem
+    v-if="column.property === 'ProgressTableItem'"
+    v-bind="attrs"
+    :column="column"
+    :row="row"
+  />
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import _ from 'lodash'
+import { computed } from 'vue'
+import ProgressTableItem from './ProgressTableItem.vue'
 const props = defineProps<{
   /**
    *表单渲染Item column
@@ -16,7 +21,11 @@ const props = defineProps<{
 }>()
 
 const attrs = computed(() => {
-  return props.column.attrs ? props.column.attrs : {}
+  const allowed = new Set([
+    'color', 'stroke-width', 'text-inside', 'status', 'width', 'show-text', 'stroke-linecap',
+    'type', 'indeterminate', 'duration', 'striped', 'striped-flow',
+  ])
+  return Object.fromEntries(Object.entries(props.column.attrs || {}).filter(([key]) => allowed.has(key)))
 })
 </script>
 <style lang="scss" scoped></style>

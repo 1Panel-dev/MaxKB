@@ -30,6 +30,7 @@ class ChatEmbedAPI(APIMixin):
                 name="protocol",
                 description=_("protocol"),
                 type=OpenApiTypes.STR,
+                enum=['http', 'https'],
                 location='query',
                 required=False,
             ),

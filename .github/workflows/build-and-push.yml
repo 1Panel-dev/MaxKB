@@ -48,19 +48,29 @@ jobs:
           ref: ${{ github.ref_name }}
       - name: Prepare
         id: prepare
+        env:
+          DOCKER_PLATFORMS: ${{ github.event.inputs.architecture }}
+          TAG_NAME: ${{ github.event.inputs.dockerImageTag }}
+          TAG_NAME_WITH_LATEST: ${{ github.event.inputs.dockerImageTagWithLatest }}
+          REGISTRY_HOST: ${{ secrets.FIT2CLOUD_REGISTRY_HOST }}
         run: |
-          DOCKER_IMAGE=${{ secrets.FIT2CLOUD_REGISTRY_HOST }}/maxkb/maxkb
-          DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
-          TAG_NAME=${{ github.event.inputs.dockerImageTag }}
-          TAG_NAME_WITH_LATEST=${{ github.event.inputs.dockerImageTagWithLatest }}
+          if [[ ! "$TAG_NAME" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.-]{0,127}$ ]]; then
+            echo "Invalid Docker image tag" >&2
+            exit 1
+          fi
+          case "$DOCKER_PLATFORMS" in
+            linux/amd64|linux/arm64|linux/amd64,linux/arm64) ;;
+            *) echo "Invalid architecture" >&2; exit 1 ;;
+          esac
+          DOCKER_IMAGE="${REGISTRY_HOST}/maxkb/maxkb"
           if [[ ${TAG_NAME_WITH_LATEST} == 'true' ]]; then            
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:${TAG_NAME%%.*} --tag ${DOCKER_IMAGE}:latest"
           else
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           fi
           echo "buildx_args=--platform ${DOCKER_PLATFORMS} --memory-swap -1 \
-            --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=`git rev-parse --short HEAD` --no-cache \
-            ${DOCKER_IMAGE_TAGS} ." >> $GITHUB_OUTPUT
+            --build-arg DOCKER_IMAGE_TAG=${TAG_NAME} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=`git rev-parse --short HEAD` --no-cache \
+            ${DOCKER_IMAGE_TAGS} ." >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
         with:
@@ -86,9 +96,12 @@ jobs:
           cp -r ./web-build-output/ui ./
           rm -rf ./web-build-output
       - name: Docker Buildx (build-and-push)
+        env:
+          BUILDX_ARGS: ${{ steps.prepare.outputs.buildx_args }}
         run: |
+          read -r -a buildx_args <<< "$BUILDX_ARGS"
           sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free -m
-          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile
+          docker buildx build --output "type=image,push=true" "${buildx_args[@]}" -f installer/Dockerfile
 
   build-and-push-to-dockerhub:
     if: ${{ contains(github.event.inputs.registry, 'dockerhub') }}
@@ -104,19 +117,29 @@ jobs:
           ref: ${{ github.ref_name }}
       - name: Prepare
         id: prepare
+        env:
+          DOCKER_PLATFORMS: ${{ github.event.inputs.architecture }}
+          TAG_NAME: ${{ github.event.inputs.dockerImageTag }}
+          TAG_NAME_WITH_LATEST: ${{ github.event.inputs.dockerImageTagWithLatest }}
+          REGISTRY_HOST: ${{ secrets.FIT2CLOUD_REGISTRY_HOST }}
         run: |
+          if [[ ! "$TAG_NAME" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.-]{0,127}$ ]]; then
+            echo "Invalid Docker image tag" >&2
+            exit 1
+          fi
+          case "$DOCKER_PLATFORMS" in
+            linux/amd64|linux/arm64|linux/amd64,linux/arm64) ;;
+            *) echo "Invalid architecture" >&2; exit 1 ;;
+          esac
           DOCKER_IMAGE=1panel/maxkb
-          DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
-          TAG_NAME=${{ github.event.inputs.dockerImageTag }}          
-          TAG_NAME_WITH_LATEST=${{ github.event.inputs.dockerImageTagWithLatest }}
           if [[ ${TAG_NAME_WITH_LATEST} == 'true' ]]; then            
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME} --tag ${DOCKER_IMAGE}:${TAG_NAME%%.*} --tag ${DOCKER_IMAGE}:latest"
           else
             DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           fi
           echo "buildx_args=--platform ${DOCKER_PLATFORMS} --memory-swap -1 \
-            --build-arg DOCKER_IMAGE_TAG=${{ github.event.inputs.dockerImageTag }} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=`git rev-parse --short HEAD` --no-cache \
-            ${DOCKER_IMAGE_TAGS} ." >> $GITHUB_OUTPUT
+            --build-arg DOCKER_IMAGE_TAG=${TAG_NAME} --build-arg BUILD_AT=$(TZ=Asia/Shanghai date +'%Y-%m-%dT%H:%M') --build-arg GITHUB_COMMIT=`git rev-parse --short HEAD` --no-cache \
+            ${DOCKER_IMAGE_TAGS} ." >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
         with:
@@ -141,6 +164,9 @@ jobs:
           cp -r ./web-build-output/ui ./
           rm -rf ./web-build-output
       - name: Docker Buildx (build-and-push)
+        env:
+          BUILDX_ARGS: ${{ steps.prepare.outputs.buildx_args }}
         run: |
+          read -r -a buildx_args <<< "$BUILDX_ARGS"
           sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches && free -m
-          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }} -f installer/Dockerfile
+          docker buildx build --output "type=image,push=true" "${buildx_args[@]}" -f installer/Dockerfile

@@ -19,6 +19,7 @@ from tools.models import Tool
 from trigger.models import TriggerTypeChoices, Trigger, TriggerTaskTypeChoices, TriggerTask
 from trigger.serializers.trigger import TriggerModelSerializer, TriggerSerializer, ApplicationTriggerTaskSerializer, \
     ToolTriggerTaskSerializer, TriggerTaskModelSerializer
+from trigger.utils import get_source_query_set
 
 
 class TaskSourceTriggerTaskEditRequest(serializers.Serializer):
@@ -42,12 +43,13 @@ class TaskSourceTriggerSerializer(serializers.Serializer):
     def insert(self, instance, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-        if not len(instance.get("trigger_task")) == 1:
+        if not len(instance.get("trigger_task") or []) == 1:
             raise AppApiException(500, _('Trigger task number must be one'))
         source_id = instance.get('source_id')
         source_type = instance.get('source_type')
         source_trigger_task = instance.get('trigger_task')[0]
-        if not (instance.get('source_id') == source_id and source_trigger_task.get('source_type') == source_type):
+        if not (source_trigger_task.get('source_id') == source_id and
+                source_trigger_task.get('source_type') == source_type):
             raise AppApiException(500, _('Incorrect trigger task'))
 
         return TriggerSerializer(data={
@@ -68,8 +70,15 @@ class TaskSourceTriggerOperateSerializer(serializers.Serializer):
         query_set = QuerySet(Trigger).filter(id=self.data.get('trigger_id'))
         if workspace_id:
             query_set = query_set.filter(workspace_id=workspace_id)
-        if not query_set.exists():
+        trigger = query_set.first()
+        if trigger is None:
             raise AppApiException(500, _('Trigger id does not exist'))
+        source_type = self.data.get('source_type')
+        source_id = self.data.get('source_id')
+        if not get_source_query_set(source_type, trigger.workspace_id).filter(id=source_id).exists():
+            raise AppApiException(403, _('No permission to access'))
+        if not TriggerTask.objects.filter(trigger=trigger, source_type=source_type, source_id=source_id).exists():
+            raise AppApiException(403, _('No permission to access'))
 
     def one(self, with_valid=True):
         if with_valid:

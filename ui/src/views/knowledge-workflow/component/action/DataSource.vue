@@ -154,7 +154,11 @@ const filterSuccessFiles = (data: any): any => {
   }
 }
 const get_data = () => {
-  return filterSuccessFiles(form_data.value)
+  const node = source_node_list.value?.find((n: any) => n.id === base_form_data.value.node_id)
+  // 仅本地上传文件需要按上传状态过滤，工具数据源的文件列表原样提交。
+  return node?.type === WorkflowType.DataSourceLocalNode
+    ? filterSuccessFiles(form_data.value)
+    : form_data.value
 }
 watch(
   source_node_list,

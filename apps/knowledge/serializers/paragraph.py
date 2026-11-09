@@ -7,7 +7,7 @@ from celery_once import AlreadyQueued
 from common.chunk import text_to_chunk
 from common.db.search import page_search
 from common.event.listener_manage import ListenerManagement
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from common.utils.common import post
 from django.db import transaction
 from django.db.models import Count, F, QuerySet
@@ -88,7 +88,8 @@ class EditParagraphSerializers(serializers.Serializer):
 
 class ParagraphBatchGenerateRelatedSerializer(serializers.Serializer):
     paragraph_id_list = serializers.ListField(
-        required=True, label=_("paragraph id list"), child=serializers.UUIDField(required=True, label=_("paragraph id"))
+        required=True, label=_("paragraph id list"), child=serializers.UUIDField(required=True, label=_("paragraph id")),
+        help_text=_("All paragraphs must belong to the document and knowledge base in the request path."),
     )
     model_id = serializers.UUIDField(required=True, label=_("model id"))
     prompt = serializers.CharField(
@@ -586,21 +587,34 @@ class ParagraphSerializers(serializers.Serializer):
         def batch_generate_related(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            paragraph_id_list = instance.get("paragraph_id_list")
+            batch = BatchSerializer(data={"id_list": instance.get("paragraph_id_list")})
+            batch.is_valid(raise_exception=True)
+            paragraph_id_list = list(dict.fromkeys(str(item) for item in batch.validated_data["id_list"]))
+            knowledge_id = self.data.get("knowledge_id")
+            document_id = self.data.get("document_id")
+            document_queryset = QuerySet(Document).filter(id=document_id, knowledge_id=knowledge_id)
+            if not document_queryset.exists():
+                raise AppUnauthorizedFailed(403, _("The document id is incorrect"))
+            paragraph_queryset = QuerySet(Paragraph).filter(
+                id__in=paragraph_id_list, document_id=document_id, knowledge_id=knowledge_id
+            )
+            if paragraph_queryset.count() != len(paragraph_id_list):
+                raise AppUnauthorizedFailed(403, _("Paragraph id does not exist"))
+            if not paragraph_id_list:
+                return
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
             model_params_setting = instance.get("model_params_setting")
-            document_id = self.data.get("document_id")
             ListenerManagement.update_status(
-                QuerySet(Document).filter(id=document_id), TaskType.GENERATE_PROBLEM, State.PENDING
+                document_queryset, TaskType.GENERATE_PROBLEM, State.PENDING
             )
             ListenerManagement.update_status(
-                QuerySet(Paragraph).filter(id__in=paragraph_id_list), TaskType.GENERATE_PROBLEM, State.PENDING
+                paragraph_queryset, TaskType.GENERATE_PROBLEM, State.PENDING
             )
             ListenerManagement.get_aggregation_document_status(document_id)()
             try:
                 generate_related_by_paragraph_id_list.delay(
-                    document_id, paragraph_id_list, model_id, model_params_setting, prompt
+                    document_id, paragraph_id_list, model_id, model_params_setting, prompt, knowledge_id=knowledge_id
                 )
             except AlreadyQueued as e:
                 raise AppApiException(500, _("The task is being executed, please do not send it again."))

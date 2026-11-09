@@ -178,7 +178,9 @@ class ToolView(APIView):
         )
         def put(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(
-                ToolSerializer.Operate(data={"id": tool_id, "workspace_id": workspace_id}).edit(request.data)
+                ToolSerializer.Operate(data={
+                    "id": tool_id, "workspace_id": workspace_id, "user_id": request.user.id,
+                }).edit(request.data)
             )
 
         @extend_schema(
@@ -462,7 +464,9 @@ class ToolView(APIView):
             get_operation_object=lambda r, k: get_tool_operation_object(k.get("tool_id")),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str):
-            return ToolSerializer.Operate(data={"id": tool_id, "workspace_id": workspace_id}).export()
+            return ToolSerializer.Operate(data={
+                "id": tool_id, "workspace_id": workspace_id, "user_id": request.user.id,
+            }).export()
 
     class Pylint(APIView):
         authentication_classes = [TokenAuth]

@@ -7,12 +7,14 @@
 """
 import re
 
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import Chat, ChatShareLink, ShareLinkType, ChatRecord
 from common.exception.app_exception import AppApiException
 from common.utils.chat_link_code import UUIDEncoder
+from common.utils.public_file_access import public_share_file_source_id
 from knowledge.models import PublicFileAccess
 import uuid_utils.compat as uuid
 
@@ -60,33 +62,40 @@ class ChatRecordShareLinkRequestSerializer(serializers.Serializer):
 def extract_oss_file_urls(answer_text_list):
     """从 answer_text_list 中提取所有 ./oss/file/ 开头的链接"""
     file_urls = []
-    for answer_group in answer_text_list:
+    for answer_group in answer_text_list or []:
         if not isinstance(answer_group, list):
             answer_group = [answer_group]
         for item in answer_group:
+            if not isinstance(item, dict) or not isinstance(item.get('content'), str):
+                continue
             content = item.get('content', '')
             urls = re.findall(r'\./oss/file/[\w-]+', content)
             file_urls.extend(urls)
     return file_urls
 
 
-def save_public_file_access(chat_record_list):
-    """提取聊天记录中的所有文件ID并入库 PublicFileAccess"""
-    file_ids = set()
+def save_public_file_access(chat_record_list, share_link):
+    """使用现有 source_id 保存文件与分享的关联，不信任旧的无关联授权。"""
+    source_ids = set()
+    record_ids = {str(record_id) for record_id in share_link.chat_record_ids}
     for chat_record in chat_record_list:
+        if str(chat_record.chat_id) != str(share_link.chat_id) or str(chat_record.id) not in record_ids:
+            continue
         urls = extract_oss_file_urls(chat_record.answer_text_list)
         for url in urls:
             file_id = url.replace('./oss/file/', '')
-            if file_id:
-                file_ids.add(file_id)
+            try:
+                source_ids.add(public_share_file_source_id(file_id, share_link.id))
+            except ValueError:
+                continue
 
-    if not file_ids:
+    if not source_ids:
         return
 
     existing = set(
         PublicFileAccess.objects.filter(
             source_type='FILE',
-            source_id__in=list(file_ids)
+            source_id__in=source_ids,
         ).values_list('source_id', flat=True)
     )
 
@@ -94,9 +103,9 @@ def save_public_file_access(chat_record_list):
         PublicFileAccess(
             id=uuid.uuid7(),
             source_type='FILE',
-            source_id=file_id
+            source_id=source_id,
         )
-        for file_id in file_ids if file_id not in existing
+        for source_id in source_ids if source_id not in existing
     ]
 
     if new_records:
@@ -120,6 +129,7 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
         if not chat_query_set.exists():
             raise AppApiException(500, _('Chat id does not exist'))
 
+    @transaction.atomic
     def generate_link(self, instance, with_valid=True):
         if with_valid:
             request_serializer = ChatRecordShareLinkRequestSerializer(data=instance)
@@ -152,10 +162,10 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
             chat_record_ids=sorted_ids
         ).first()
 
+        chat_record_list = ChatRecord.objects.filter(id__in=sorted_ids, chat_id=chat_id)
         if existing:
+            save_public_file_access(chat_record_list, existing)
             return {'link': UUIDEncoder.encode(existing.id)}
-        chat_record_list = ChatRecord.objects.filter(id__in=sorted_ids)
-        save_public_file_access(chat_record_list)
         chat_share_link_model = ChatShareLink(
             id=uuid.uuid7(),
             chat_id=chat_id,
@@ -165,6 +175,7 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
             chat_record_ids=sorted_ids
         )
         chat_share_link_model.save()
+        save_public_file_access(chat_record_list, chat_share_link_model)
 
         link = UUIDEncoder.encode(chat_share_link_model.id)
 
@@ -180,7 +191,7 @@ class ChatShareLinkDetailSerializer(serializers.Serializer):
         link = self.data.get('link')
         share_link_id = UUIDEncoder.decode_to_str(link)
 
-        share_link_query_set = ChatShareLink.objects.filter(id=share_link_id).first()
+        share_link_query_set = ChatShareLink.objects.filter(id=share_link_id, share_type=ShareLinkType.PUBLIC).first()
         if not share_link_query_set:
             raise AppApiException(500, _('Share link does not exist'))
         if share_link_query_set.chat.is_deleted:
@@ -193,6 +204,8 @@ class ChatShareLinkDetailSerializer(serializers.Serializer):
 
         chat_record_model_list = ChatRecord.objects.filter(id__in=share_link_model.chat_record_ids,
                                                            chat_id=share_link_model.chat_id).order_by('create_time')
+        # Rebuild grants for existing links on access, without a database backfill.
+        save_public_file_access(chat_record_model_list, share_link_model)
 
         abstract = Chat.objects.filter(
             id=share_link_model.chat_id

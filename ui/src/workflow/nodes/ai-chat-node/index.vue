@@ -38,7 +38,10 @@
                 style="width: 85px"
                 @change="chat_data.model_id_reference = []"
               >
-                <el-option :label="$t('dynamicsForm.ModelConstructor.defaultModel')" value="default" />
+                <el-option
+                  :label="$t('dynamicsForm.ModelConstructor.defaultModel')"
+                  value="default"
+                />
                 <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
                 <el-option :label="$t('common.custom')" value="custom" />
               </el-select>
@@ -101,7 +104,11 @@
                 type="primary"
                 link
                 @click="openGeneratePromptDialog(chat_data.model_id)"
-                :disabled="chat_data.model_id_type === 'reference' || !chat_data.model_id"
+                :disabled="
+                  chat_data.model_id_type === 'reference' ||
+                  (!chat_data.model_id && chat_data.model_id_type === 'custom')||
+                  (chat_data.model_id_type==='default'&& !defaultModelId)
+                "
               >
                 <AppIcon iconName="app-generate-star"></AppIcon>
               </el-button>
@@ -638,7 +645,9 @@ import { fileTooltip } from '@/workflow/common/data.ts'
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
-
+const defaultModelId = computed(() => {
+  return getResourceDetail?.()?.value?.default_model_setting?.['LLM']?.model_id || ''
+})
 const {
   params: { id },
 } = route as any
@@ -784,8 +793,11 @@ const openAIParamSettingDialog = (modelId: string) => {
 
 const GeneratePromptDialogRef = ref<InstanceType<typeof GeneratePromptDialog>>()
 const openGeneratePromptDialog = (modelId: string) => {
-  if (modelId) {
+  if (modelId && chat_data.value.model_id_type === 'custom') {
     GeneratePromptDialogRef.value?.open(modelId, id)
+  }
+  if (chat_data.value.model_id_type === 'default'&&defaultModelId.value) {
+    GeneratePromptDialogRef.value?.open(defaultModelId.value, id)
   }
 }
 const replace = (v: any) => {

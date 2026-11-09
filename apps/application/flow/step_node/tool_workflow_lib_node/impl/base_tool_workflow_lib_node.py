@@ -143,6 +143,8 @@ def valid_function(tool_lib, workspace_id, user_id=None):
         raise Exception(_("Tool does not exist"))
     if not tool_lib.is_active:
         raise Exception(_("Tool is not active"))
+    if tool_lib.workspace_id == "None":
+        return
     validate_authorized_tool_ids([str(tool_lib.id)], workspace_id, user_id)
 
 
@@ -223,12 +225,12 @@ class BaseToolWorkflowLibNodeNode(IToolWorkflowLibNode):
             work_flow_manage = ToolWorkflowManage(
                 Workflow.new_instance(tool_workflow_version.work_flow, WorkflowMode.TOOL),
                 {
+                    **parameters,
                     'chat_record_id': tool_record_id,
                     'tool_id': tool_lib_id,
                     'stream': True,
                     'workspace_id': workspace_id,
-                    'user_id': runtime_user_id,
-                    **parameters,
+                    'user_id': runtime_user_id or tool_lib.user_id,
                     'default_model_setting': tool_workflow_version.default_model_setting},
                 ToolWorkflowPostHandler(took_execute, tool_lib_id),
                 base_to_response=LoopToResponse(),

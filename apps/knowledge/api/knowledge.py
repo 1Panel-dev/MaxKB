@@ -1,5 +1,6 @@
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
+from rest_framework import serializers
 
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
@@ -37,6 +38,10 @@ class KnowledgeReadAPI(APIMixin):
     @staticmethod
     def get_response():
         return KnowledgeCreateResponse
+
+
+class KnowledgeTagsRequest(serializers.Serializer):
+    knowledge_ids = serializers.ListField(child=serializers.UUIDField(), required=True)
 
 
 class KnowledgeBaseCreateAPI(APIMixin):

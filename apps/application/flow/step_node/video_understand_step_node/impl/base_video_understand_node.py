@@ -4,6 +4,7 @@ import time
 from functools import reduce
 from typing import List, Dict
 
+from django.db import connection
 from django.db.models import QuerySet
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
 
@@ -178,6 +179,7 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
         self.context['message_list'] = message_list
         self.generate_context_video(video)
         self.context['dialogue_type'] = dialogue_type
+        connection.close()
         if stream:
             r = video_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': video_model, 'message_list': message_list,

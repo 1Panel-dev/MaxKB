@@ -18,8 +18,10 @@ class ChatHeadersMiddleware(MiddlewareMixin):
 
         if request.path.startswith(CONFIG.get_chat_path()) and not request.path.startswith(
                 CONFIG.get_chat_path() + '/api'):
-            access_token = request.path.replace(CONFIG.get_chat_path() + '/', '')
-            if access_token.__contains__('/') or access_token == 'undefined':
+            # 路由会把 URL 规范成带结尾斜杠的形式，去掉末尾 '/' 后再校验，
+            # 否则刷新页面时 access_token 会带 '/'，标题替换会被跳过、退回默认 MaxKB
+            access_token = request.path.replace(CONFIG.get_chat_path() + '/', '').rstrip('/')
+            if access_token == '' or access_token == 'undefined' or '/' in access_token:
                 return response
             application_access_token = get_application_access_token(access_token, True)
             if application_access_token is not None:

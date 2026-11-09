@@ -23,6 +23,8 @@ from common.field.common import UploadedImageField
 from common.result import result
 from common.utils.common import bytes_to_uploaded_file, common_convert_value, get_file_content
 from common.utils.logger import maxkb_logger
+from common.utils.file_reference import get_owned_upload
+from common.utils.workflow_reference import get_exportable_tools, validate_resource_references
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
@@ -43,7 +45,7 @@ from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from tools.models import Tool, ToolFolder, ToolRecord, ToolScope, ToolType
+from tools.models import Tool, ToolFolder, ToolRecord, ToolScope, ToolType, protect_skill_file
 from tools.models.tool_workflow import ToolWorkflow
 from tools.serializers.init_field import InitField, InitFieldListField, sanitize_init_field_list, validate_init_field_list
 from trigger.models import Trigger, TriggerTask
@@ -452,6 +454,8 @@ class ToolSerializer(serializers.Serializer):
                 # 校验代码是否包括禁止的关键字
                 if instance.get("tool_type") == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get("code", ""))
+            if instance.get('tool_type') == ToolType.WORKFLOW:
+                validate_resource_references(instance, self.data['workspace_id'], self.data['user_id'])
 
             # 处理 work_flow_template
             if instance.get("work_flow_template") is not None:
@@ -513,7 +517,7 @@ class ToolSerializer(serializers.Serializer):
             # 如果是SKILL类型的工具，修改file表中对应的记录
             if instance.get("tool_type") == ToolType.SKILL:
                 file_id = instance.get("code")
-                old_file = QuerySet(File).filter(id=file_id).first()
+                old_file = get_owned_upload(file_id, self.data.get("user_id"))
                 if old_file:
                     # 创建新的文件副本,不复制实际文件内容
                     new_file_id = uuid.uuid7()
@@ -524,7 +528,7 @@ class ToolSerializer(serializers.Serializer):
                         sha256_hash=old_file.sha256_hash,
                         source_type=FileSourceType.TOOL,
                         source_id=tool_id,
-                        meta=old_file.meta,
+                        meta={**old_file.meta, "skill_file": True},
                     )
                     new_file.save(old_file.get_bytes())
                     # 更新工具的code为新的文件id
@@ -601,6 +605,7 @@ class ToolSerializer(serializers.Serializer):
                 )
 
     class Operate(serializers.Serializer):
+        user_id = serializers.UUIDField(required=False, label=_("User ID"))
         id = serializers.UUIDField(required=True, label=_("tool id"))
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
 
@@ -662,6 +667,8 @@ class ToolSerializer(serializers.Serializer):
             tool = QuerySet(Tool).filter(
                 id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
             ).first()
+            if tool.tool_type == ToolType.SKILL and "code" in edit_dict and tool.code != edit_dict["code"]:
+                get_owned_upload(edit_dict["code"], self.data.get("user_id"))
             if "init_params" in edit_dict:
                 if edit_dict["init_field_list"] is not None:
                     rm_key = []
@@ -678,6 +685,8 @@ class ToolSerializer(serializers.Serializer):
                 edit_dict["init_params"] = rsa_long_encrypt(json.dumps(edit_dict["init_params"]))
 
             edit_dict["update_time"] = timezone.now()
+            if "code" in edit_dict and tool.code != edit_dict["code"]:
+                protect_skill_file(tool)
             QuerySet(Tool).filter(
                 id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
             ).update(**edit_dict)
@@ -687,12 +696,15 @@ class ToolSerializer(serializers.Serializer):
                 )
 
             # 如果是SKILL类型的工具，修改file表中对应的记录
-            if instance.get("tool_type") == ToolType.SKILL:
+            if tool.tool_type == ToolType.SKILL and "code" in edit_dict:
                 old_file_id = tool.code
-                file_id = instance.get("code")
+                file_id = edit_dict["code"]
                 if old_file_id != file_id:
-                    QuerySet(File).filter(id=old_file_id).delete()
+                    QuerySet(File).filter(id=old_file_id, source_type=FileSourceType.TOOL, source_id=tool.id).delete()
                     QuerySet(File).filter(id=file_id).update(source_id=tool.id, source_type=FileSourceType.TOOL)
+                    skill_file = QuerySet(File).filter(id=file_id).first()
+                    if skill_file:
+                        QuerySet(File).filter(id=file_id).update(meta={**skill_file.meta, "skill_file": True})
 
             return self.one()
 
@@ -782,7 +794,8 @@ class ToolSerializer(serializers.Serializer):
             ]
             tool_list = []
             if len(tool_id_list) > 0:
-                tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
+                tool_list = get_exportable_tools(tool_id_list, self.data.get('workspace_id'),
+                                                 self.data.get('user_id'))
                 work_flow_tools = [tool for tool in tool_list if tool.tool_type == ToolType.WORKFLOW]
                 if len(work_flow_tools) > 0:
                     work_flow_tool_dict = {
@@ -935,7 +948,7 @@ class ToolSerializer(serializers.Serializer):
                     file_name=f"{tool.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool.get("id"),
-                    meta={},
+                    meta={"skill_file": True},
                 )
                 skill_file.save(base64.b64decode(code))
                 tool["code"] = skill_file_id
@@ -985,6 +998,12 @@ class ToolSerializer(serializers.Serializer):
                 tool.get("work_flow"),
                 update_tool_map,
             )
+            created_ids = {str(imported_tool['id']) for imported_tool in tool_list}
+            validate_resource_references({'work_flow': work_flow}, workspace_id, user_id, created_ids)
+            for imported_tool in tool_list:
+                if imported_tool.get('tool_type') == ToolType.WORKFLOW:
+                    child_flow = self.to_tool_workflow(imported_tool.get('work_flow'), update_tool_map)
+                    validate_resource_references({'work_flow': child_flow}, workspace_id, user_id, created_ids)
             defaults = {"tool_id": tool.get("id"), "workspace_id": workspace_id, "work_flow": work_flow}
             if tool.get("default_model_setting") is not None:
                 defaults["default_model_setting"] = tool.get("default_model_setting")
@@ -1078,7 +1097,7 @@ class ToolSerializer(serializers.Serializer):
                     file_name=f"{tool.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool_id,
-                    meta={},
+                    meta={"skill_file": True},
                 )
                 skill_file.save(base64.b64decode(code))
                 code = skill_file_id
@@ -1308,7 +1327,7 @@ class ToolSerializer(serializers.Serializer):
                     file_name=f"{tool_data.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool_id,
-                    meta={},
+                    meta={"skill_file": True},
                 )
                 skill_file.save(base64.b64decode(tool_data.get("code")))
                 tool_data["code"] = skill_file_id
@@ -1386,7 +1405,7 @@ class ToolSerializer(serializers.Serializer):
                     file_name=f"{tool_data.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool.id,
-                    meta={},
+                    meta={"skill_file": True},
                 )
                 skill_file.save(base64.b64decode(tool_data.get("code")))
                 tool_data["code"] = skill_file_id
@@ -1526,7 +1545,8 @@ class ToolSerializer(serializers.Serializer):
             if not file.name.endswith(".zip"):
                 raise AppApiException(1001, _("Unsupported file format"))
             file_id = uuid.uuid7()
-            file = File(id=file_id, file_name=self.data.get("file").name, meta={})
+            file = File(id=file_id, file_name=self.data.get("file").name,
+                        meta={"user_id": str(self.data.get("user_id")), "skill_file": True})
             file.save(self.data.get("file").read())
             return file_id
 

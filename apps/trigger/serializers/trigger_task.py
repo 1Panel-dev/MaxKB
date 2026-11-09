@@ -9,7 +9,7 @@
 import os
 
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -21,6 +21,7 @@ from knowledge.models.knowledge_action import State
 from maxkb.conf import PROJECT_DIR
 from tools.models import ToolRecord
 from trigger.models import TriggerTask, TaskRecord, Trigger
+from trigger.utils import get_source_query_set
 
 
 class ChatRecordSerializerModel(serializers.ModelSerializer):
@@ -82,11 +83,17 @@ class TriggerTaskRecordOperateSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
         task_record = QuerySet(TaskRecord).filter(trigger_id=self.data.get("trigger_id"),
                                                   trigger_task_id=self.data.get("trigger_task_id"),
-                                                  id=self.data.get('trigger_task_record_id')).first()
+                                                  id=self.data.get('trigger_task_record_id'))
+        task_record = task_record.select_related('trigger').first()
         if not task_record:
             raise AppApiException(500, _('Trigger task record id does not exist'))
+        source = get_source_query_set(task_record.source_type, task_record.trigger.workspace_id).filter(
+            id=task_record.source_id).first()
+        if source is None:
+            raise AppApiException(403, _('No permission to access'))
         if task_record.source_type == 'APPLICATION':
-            chat_record = QuerySet(ChatRecord).filter(id=task_record.task_record_id).first()
+            chat_record = QuerySet(ChatRecord).filter(id=task_record.task_record_id,
+                                                     chat__application_id=source.id).first()
             if chat_record:
                 return ChatRecordSerializerModel(chat_record).data
             return {
@@ -94,7 +101,8 @@ class TriggerTaskRecordOperateSerializer(serializers.Serializer):
                 'meta': task_record.meta
             }
         if task_record.source_type == 'TOOL':
-            tool_record = QuerySet(ToolRecord).filter(id=task_record.task_record_id).first()
+            tool_record = QuerySet(ToolRecord).filter(id=task_record.task_record_id, tool_id=source.id,
+                                                     workspace_id=source.workspace_id).first()
             if tool_record:
                 return {
                     'id': tool_record.id,
@@ -140,6 +148,7 @@ class TriggerTaskRecordQuerySerializer(serializers.Serializer):
             raise AppApiException(500, _('Trigger id does not exist'))
 
     def get_query_set(self):
+        workspace_id = QuerySet(Trigger).get(id=self.data.get('trigger_id')).workspace_id
         trigger_query_set = QuerySet(
             model=get_dynamics_model({
                 'ett.create_time': models.DateTimeField(),
@@ -147,10 +156,17 @@ class TriggerTaskRecordQuerySerializer(serializers.Serializer):
                 'sdc.name': models.CharField(),
                 'ett.workspace_id': models.CharField(),
                 'ett.trigger_id': models.UUIDField(),
+                'ett.source_id': models.UUIDField(),
                 'sdc.source_type': models.CharField()
             }))
         trigger_query_set = trigger_query_set.filter(
             **{'ett.trigger_id': self.data.get("trigger_id")})
+        trigger_query_set = trigger_query_set.filter(
+            Q(**{'sdc.source_type': 'APPLICATION', 'ett.source_id__in':
+                get_source_query_set('APPLICATION', workspace_id).values('id')}) |
+            Q(**{'sdc.source_type': 'TOOL', 'ett.source_id__in':
+                get_source_query_set('TOOL', workspace_id).values('id')})
+        )
         if self.data.get("order"):
             trigger_query_set = trigger_query_set.order_by(self.data.get("order"))
         else:

@@ -454,7 +454,7 @@ function shareChatHandle() {
   }
   chatAPI.postShareChat(id || props.appId, chartOpenId.value, obj, shareLoading).then((res) => {
     if (res.data?.link) {
-      copyClick(window.location.origin + '/chat/share/' + res.data.link)
+      copyClick(`${window.location.origin}${window.MaxKB.prefix}/share/${res.data.link}`)
     }
   })
 }

@@ -136,13 +136,15 @@ export const get: (
   params?: unknown,
   loading?: NProgress | Ref<boolean>,
   timeout?: number,
+  paramsSerializer?:unknown,
 ) => Promise<Result<any>> = (
   url: string,
   params: unknown,
   loading?: NProgress | Ref<boolean>,
   timeout?: number,
+  paramsSerializer?: unknown,
 ) => {
-  return promise(request({ url: url, method: 'get', params, timeout: timeout }), loading)
+  return promise(request(paramsSerializer?{ url: url, method: 'get', params, timeout: timeout ,paramsSerializer:paramsSerializer}:{url: url, method: 'get', params, timeout: timeout }), loading)
 }
 
 /**

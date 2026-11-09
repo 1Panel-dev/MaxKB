@@ -4,20 +4,20 @@ interface ViewCardItem {
   /**
    * 类型
    */
-  type: 'eval' | 'default'
+  type: 'default'
   /**
    * 标题
    */
   title: string
   /**
-   * 值 根据类型不一样 取值也不一样 default= row[value_field] eval `${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`
+   * 行数据字段，以纯文本展示 row[value_field]
    */
   value_field: string
 }
 
 interface TableColumn {
   /**
-   * 字段|组件名称|可计算的模板字符串
+   * 行数据字段或允许的组件名称
    */
   property: string
   /**
@@ -29,11 +29,16 @@ interface TableColumn {
    */
   value_field?: string
 
+  width?: string | number
+  minWidth?: string | number
+  align?: 'left' | 'center' | 'right'
+  sortable?: boolean
+
   attrs?: Attrs
   /**
    * 类型
    */
-  type: 'eval' | 'component' | 'default'
+  type: 'component' | 'default'
 
   props_info?: PropsInfo
 }

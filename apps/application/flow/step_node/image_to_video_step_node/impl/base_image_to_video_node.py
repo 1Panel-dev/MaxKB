@@ -3,7 +3,7 @@ import base64
 from functools import reduce
 from typing import List
 
-import requests
+from django.db import connection
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
@@ -13,6 +13,7 @@ from application.flow.step_node.image_to_video_step_node.i_image_to_video_node i
 from common.utils.common import bytes_to_uploaded_file
 from knowledge.models import FileSourceType, File
 from oss.serializers.file import FileSerializer, mime_types
+from oss.url_fetch import fetch_public_bytes
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
@@ -62,18 +63,19 @@ class BaseImageToVideoNode(IImageToVideoNode):
         # 判断是不是 url
         first_frame_url = self.get_file_base64(first_frame_url)
         last_frame_url = self.get_file_base64(last_frame_url)
+        connection.close()
         video_urls = ttv_model.generate_video(question, negative_prompt, first_frame_url, last_frame_url)
         # 保存图片
         if video_urls is None or video_urls == '':
             return NodeResult({'answer': gettext('Failed to generate video')}, {})
         file_name = 'generated_video.mp4'
         if isinstance(video_urls, str) and video_urls.startswith('http'):
-            video_urls = requests.get(video_urls).content
+            video_urls = fetch_public_bytes(video_urls)
         file = bytes_to_uploaded_file(video_urls, file_name)
         file_url = self.upload_file(file)
         video_label = f'<video src="{file_url}" controls style="max-width: 100%; width: 100%; height: auto; max-height: 60vh;"></video>'
         video_list = [{'file_id': file_url.split('/')[-1], 'file_name': file_name, 'url': file_url}]
-        return NodeResult({'answer': video_label, 'chat_model': ttv_model, 'message_list': message_list,
+        return NodeResult({'answer': video_label, 'message_list': message_list,
                            'video': video_list,
                            'history_message': history_message, 'question': question}, {})
 

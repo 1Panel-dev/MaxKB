@@ -16,6 +16,7 @@ import re
 import shutil
 import threading
 import zipfile
+from copy import deepcopy
 from functools import reduce
 from typing import Iterator
 
@@ -345,6 +346,60 @@ def generate_tool_message_complete(icon, name, input_content, output_content):
     return f"<tool_calls_render>{json.dumps(content, ensure_ascii=False)}</tool_calls_render>"
 
 
+def _parse_tool_result(content):
+    """Return the tool id, record data and display data without changing the message."""
+    if isinstance(content, list):
+        parts = [_parse_tool_result(part) for part in content]
+        if len(parts) == 1:
+            return parts[0]
+        tool_id = next((part[0] for part in parts if part[0]), None)
+        return tool_id, [part[1] for part in parts], [part[2] for part in parts]
+
+    if isinstance(content, str):
+        try:
+            content = json.loads(content)
+        except (TypeError, ValueError):
+            return None, content, content
+    else:
+        content = deepcopy(content)
+
+    if not isinstance(content, dict):
+        return None, content, content
+
+    tool_id = content.pop("tool_id", None)
+    text = content.get("text")
+    if isinstance(text, str) and content.get("type") in (None, "text"):
+        try:
+            output = json.loads(text)
+        except (TypeError, ValueError):
+            output = text
+        if isinstance(output, dict):
+            tool_id = output.pop("tool_id", None) or tool_id
+        return tool_id, content, output
+    return tool_id, content, content
+
+
+def _tool_result_for_display(content, media=False):
+    """Keep media metadata in text cards; retain binary payloads only in the original/record."""
+    if isinstance(content, list):
+        return [_tool_result_for_display(part, media) for part in content]
+    if isinstance(content, dict):
+        media = media or content.get("type") in (
+            "image", "image_url", "audio", "input_audio", "video", "file", "resource", "base64"
+        )
+        return {
+            key: (
+                "[base64 omitted]"
+                if media and key in {"data", "base64", "blob"} and isinstance(value, str)
+                else _tool_result_for_display(value, media)
+            )
+            for key, value in content.items()
+        }
+    if isinstance(content, str) and content.startswith("data:") and ";base64," in content:
+        return content.split(";base64,", 1)[0] + ";base64,[omitted]"
+    return content
+
+
 # 全局单例事件循环
 _global_loop = None
 _loop_thread = None
@@ -482,6 +537,10 @@ async def _yield_mcp_response(
         _tool_fragments = {}
 
         def _merge_arguments(entry, part_args):
+            # A header-only tool delta may omit arguments or send null. It adds
+            # no JSON fragment; serializing None would prepend "null" to the args.
+            if part_args is None:
+                return
             if not isinstance(part_args, str):
                 try:
                     part_args = json.dumps(part_args, ensure_ascii=False)
@@ -536,7 +595,11 @@ async def _yield_mcp_response(
             _merge_arguments(entry, part_args)
 
         async for chunk in response:
-            # print(chunk)
+            # DeepAgents' internal summary call streams from the same model node.
+            # Filter its source metadata before collecting tool fragments or yielding
+            # content/reasoning; matching answer text or node names is not reliable.
+            if chunk[1].get("lc_source") == "summarization":
+                continue
             if isinstance(chunk[0], AIMessageChunk):
                 # ----------------------------------------------------------------
                 # 1. 从 tool_call_chunks 中聚合工具调用片段
@@ -605,8 +668,12 @@ async def _yield_mcp_response(
                             maxkb_logger.debug(f"Skipping fragment {idx}: missing id. Fragment: {entry}")
                             continue
                         if not entry.get("arguments"):
-                            maxkb_logger.debug(f"Skipping fragment {idx}: missing arguments. Fragment: {entry}")
-                            continue
+                            # LangChain treats an empty argument stream as {}. An
+                            # empty ID alias must not overwrite the indexed result.
+                            if entry["id"] in tool_calls_info:
+                                entry["completed"] = True
+                                continue
+                            entry["arguments"] = "{}"
 
                         if not entry.get("completed") and entry.get("id") and entry.get("arguments"):
                             try:
@@ -679,32 +746,23 @@ async def _yield_mcp_response(
                 tool_id = chunk[0].tool_call_id
                 normalized_tool_id = _extract_tool_id(tool_id)
                 tool_info = tool_calls_info.get(tool_id) or tool_calls_info.get(normalized_tool_id)
+                display_message = chunk[0]
 
                 if tool_info:
-                    try:
-                        if isinstance(chunk[0].content, str):
-                            tool_result = json.loads(chunk[0].content)
-                        elif isinstance(chunk[0].content, dict):
-                            tool_result = chunk[0].content
-                        elif isinstance(chunk[0].content, list):
-                            tool_result = chunk[0].content[0] if len(chunk[0].content) > 0 else {}
-                        else:
-                            tool_result = {}
-                        text = tool_result.get("text") if "text" in tool_result else None
-                        text_result = json.loads(text) if text else tool_result
-                        if text:
-                            tool_lib_id = text_result.pop("tool_id") if "tool_id" in text_result else None
-                        else:
-                            tool_lib_id = tool_result.pop("tool_id") if "tool_id" in tool_result else None
-                        if tool_lib_id:
-                            await save_tool_record(tool_lib_id, tool_info, tool_result, source_id, source_type)
-                        tool_result = json.dumps(text_result, ensure_ascii=False)
-                    except Exception as e:
-                        tool_result = chunk[0].content
+                    tool_lib_id, record_result, tool_result = _parse_tool_result(chunk[0].content)
+                    if tool_lib_id:
+                        try:
+                            await save_tool_record(tool_lib_id, tool_info, record_result, source_id, source_type)
+                        except Exception:
+                            maxkb_logger.warning("Failed to save tool record for %s", tool_lib_id, exc_info=True)
                     content = generate_tool_message_complete(
-                        tool_info.get("icon", ""), tool_info["name"], tool_info["input"], tool_result
+                        tool_info.get("icon", ""),
+                        tool_info["name"],
+                        tool_info["input"],
+                        _tool_result_for_display(tool_result),
                     )
-                    chunk[0].content = content
+                    # LangGraph streams the same ToolMessage used by subsequent model calls.
+                    display_message = chunk[0].model_copy(deep=True, update={"content": content})
                 else:
                     maxkb_logger.warning(
                         f"Tool ID {tool_id} not found in tool_calls_info. "
@@ -713,7 +771,7 @@ async def _yield_mcp_response(
                         f"Tool fragments at this point: {_tool_fragments}"
                     )
 
-                yield chunk[0]
+                yield display_message
 
     except ExceptionGroup as eg:
 
@@ -1103,12 +1161,12 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id, user_id=No
         work_flow_manage = ToolWorkflowManage(
             Workflow.new_instance(qv.work_flow, WorkflowMode.TOOL),
             {
+                **kwargs,
                 "chat_record_id": tool_record_id,
                 "tool_id": tool_id,
                 "stream": True,
                 "workspace_id": workspace_id,
-                "user_id": user_id,
-                **kwargs,
+                "user_id": user_id or tool.user_id,
                 "default_model_setting": qv.default_model_setting,
             },
             ToolWorkflowPostHandler(took_execute, tool_id),

@@ -8,11 +8,10 @@
 """
 from .base_tool_task import ToolTask as BaseToolTask
 from .workflow_tool_task import ToolTask as WorkflowToolTask
-from django.db.models import QuerySet
 
 from common.utils.logger import maxkb_logger
-from tools.models import Tool
 from trigger.handler.base_task import BaseTriggerTask
+from trigger.utils import get_task_source
 
 TOOL_TASKS = [BaseToolTask(), WorkflowToolTask()]
 
@@ -29,8 +28,8 @@ class ToolTask(BaseTriggerTask):
 
     def execute(self, trigger_task, **kwargs):
         tool_id = trigger_task.get('source_id')
-        tool = QuerySet(Tool).filter(id=tool_id, is_active=True).first()
-        if not tool:
+        tool = get_task_source(trigger_task)
+        if not tool or not tool.is_active:
             maxkb_logger.info(f"Tool with id {tool_id} not found or inactive.")
             return
         execute(tool, trigger_task, **kwargs)

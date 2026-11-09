@@ -16,7 +16,6 @@ from urllib.parse import urljoin
 
 import uuid_utils.compat as uuid
 from charset_normalizer import detect
-from django.utils.translation import gettext_lazy as _
 from knowledge.models import File
 
 from common.handle.base_split_handle import BaseSplitHandle
@@ -28,6 +27,7 @@ from common.handle.impl.text.text_split_handle import TextSplitHandle
 from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.utils.common import parse_md_file_link, parse_md_image
+from common.utils.logger import maxkb_logger
 
 
 class FileBufferHandle:
@@ -56,7 +56,7 @@ def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int, s
     for split_handle in split_handles:
         if split_handle.support(file, get_buffer):
             return split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, save_inner_image)
-    raise Exception(_("Unsupported file format"))
+    return None
 
 
 def is_valid_uuid(uuid_str: str):
@@ -166,12 +166,14 @@ class ZipSplitHandle(BaseSplitHandle):
                         # 处理一下文件名
                         f.name = get_file_name(f.name)
                         value = file_to_paragraph(f, pattern_list, with_filter, limit, save_image)
+                        if value is None:
+                            continue
                         if isinstance(value, list):
                             result = [*result, *value]
                         else:
                             result.append(value)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        maxkb_logger.warning(f"Zip member: {f.name}, split error: {e}", exc_info=True)
             image_list = get_image_list(result, files)
             result = filter_image_file(result, image_list)
             image_mode_list = []

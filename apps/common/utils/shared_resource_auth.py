@@ -43,11 +43,14 @@ def filter_authorized_ids(resource_type: str, ids: List[str], workspace_id: str,
     @param resource_type: 资源类型 ('model', 'tool', 'knowledge')
     @param ids: 待过滤的ID列表
     @param workspace_id: 工作空间ID
-    @param user_id: 当前工作空间用户ID（仅 tool 类型会按用户级授权进一步过滤）
+    @param user_id: 资源执行用户ID（knowledge 类型必须提供，不能用聊天访客身份替代）
     @return: 授权通过的ID列表
     """
 
     if not ids:
+        return []
+    ids = [str(resource_id) for resource_id in ids]
+    if resource_type == "knowledge" and not user_id:
         return []
 
     auth_func = DatabaseModelManage.get_model(f"get_authorized_{resource_type}")
@@ -64,6 +67,15 @@ def filter_authorized_ids(resource_type: str, ids: List[str], workspace_id: str,
     cross_workspace_ids = [i for i in ids if i not in set(map(str, same_workspace_ids))]
 
     authorized_ids = set(map(str, same_workspace_ids))
+    if resource_type == "knowledge" and not is_workspace_manage(user_id, workspace_id):
+        permissions = QuerySet(WorkspaceUserResourcePermission).filter(
+            workspace_id=workspace_id, user_id=user_id,
+            auth_target_type=AuthTargetType.KNOWLEDGE.value, target__in=authorized_ids,
+        )
+        authorized_ids = {
+            str(permission.target) for permission in permissions
+            if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
+        }
 
     if cross_workspace_ids and auth_func is not None:
         cross_queryset = QuerySet(model_class).filter(id__in=cross_workspace_ids)

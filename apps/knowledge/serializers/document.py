@@ -14,7 +14,7 @@ from celery_once import AlreadyQueued
 from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.event.common import work_thread_pool
 from common.event.listener_manage import ListenerManagement
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from common.field.common import UploadedFileField
 from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
 from common.handle.impl.qa.md_parse_qa_handle import MarkdownParseQAHandle
@@ -33,6 +33,7 @@ from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.handle.impl.text.zip_split_handle import ZipSplitHandle
 from common.utils.common import bulk_create_in_batches, get_file_content, parse_file_link, parse_image, post
+from common.utils.file_reference import get_knowledge_source_file
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import flat_map, get_split_model
@@ -233,7 +234,10 @@ class DocumentBatchRefreshSerializer(serializers.Serializer):
 
 
 class DocumentBatchGenerateRelatedSerializer(serializers.Serializer):
-    document_id_list = serializers.ListField(required=True, label=_("document id list"))
+    document_id_list = serializers.ListField(
+        required=True, child=serializers.UUIDField(), label=_("document id list"),
+        help_text=_("All documents must belong to the knowledge base in the request path."),
+    )
     model_id = serializers.UUIDField(required=True, label=_("model id"))
     prompt = serializers.CharField(required=True, label=_("prompt"))
     state_list = serializers.ListField(required=True, label=_("state list"))
@@ -1320,10 +1324,10 @@ class DocumentSerializers(serializers.Serializer):
                 raise AppApiException(500, _("Knowledge id does not exist"))
 
         @staticmethod
-        def link_file(source_file_id, document_id):
+        def link_file(source_file_id, document_id, knowledge_id, user_id):
             if source_file_id is None:
                 return
-            source_file = QuerySet(File).filter(id=source_file_id).first()
+            source_file = get_knowledge_source_file(source_file_id, knowledge_id, user_id)
             if source_file:
                 # 获取原始文件内容
                 file_content = source_file.get_bytes()
@@ -1371,7 +1375,8 @@ class DocumentSerializers(serializers.Serializer):
                 )
                 # 保存文档和文件的关系
                 document_instance = document_paragraph_dict_model.get("document")
-                self.link_file(document.get("source_file_id"), document_instance.id)
+                self.link_file(document.get("source_file_id"), document_instance.id,
+                               knowledge_id, self.data.get("user_id"))
                 document_model_list.append(document_instance)
                 for paragraph in document_paragraph_dict_model.get("paragraph_model_list"):
                     paragraph_model_list.append(paragraph)
@@ -1662,13 +1667,21 @@ class DocumentSerializers(serializers.Serializer):
         def batch_generate_related(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("document_id_list")
+            batch = BatchSerializer(data={"id_list": instance.get("document_id_list")})
+            batch.is_valid(raise_exception=True)
+            document_id_list = list(dict.fromkeys(str(item) for item in batch.validated_data["id_list"]))
+            knowledge_id = self.data.get("knowledge_id")
+            document_queryset = QuerySet(Document).filter(knowledge_id=knowledge_id, id__in=document_id_list)
+            if document_queryset.count() != len(document_id_list):
+                raise AppUnauthorizedFailed(403, _("document id not exist"))
+            if not document_id_list:
+                return
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
             model_params_setting = instance.get("model_params_setting")
             state_list = instance.get("state_list")
             ListenerManagement.update_status(
-                QuerySet(Document).filter(id__in=document_id_list), TaskType.GENERATE_PROBLEM, State.PENDING
+                document_queryset, TaskType.GENERATE_PROBLEM, State.PENDING
             )
             ListenerManagement.update_status(
                 QuerySet(Paragraph)
@@ -1676,18 +1689,18 @@ class DocumentSerializers(serializers.Serializer):
                     reversed_status=Reverse("status"),
                     task_type_status=Substr("reversed_status", TaskType.GENERATE_PROBLEM.value, 1),
                 )
-                .filter(task_type_status__in=state_list, document_id__in=document_id_list)
+                .filter(task_type_status__in=state_list, document_id__in=document_id_list, knowledge_id=knowledge_id)
                 .values("id"),
                 TaskType.GENERATE_PROBLEM,
                 State.PENDING,
             )
             ListenerManagement.get_aggregation_document_status_by_query_set(
-                QuerySet(Document).filter(id__in=document_id_list)
+                document_queryset
             )()
             try:
                 for document_id in document_id_list:
                     generate_related_by_document_id.delay(
-                        document_id, model_id, model_params_setting, prompt, state_list
+                        document_id, model_id, model_params_setting, prompt, state_list, knowledge_id=knowledge_id
                     )
             except AlreadyQueued as e:
                 pass
