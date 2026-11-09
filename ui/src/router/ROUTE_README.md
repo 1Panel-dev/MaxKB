@@ -260,7 +260,7 @@ Workspace 共享覆盖 resourceScope，保留 Workspace scope 及知识库 activ
 
 | 菜单       | 路径与条件                                                                                                            |
 | ---------- | --------------------------------------------------------------------------------------------------------------------- |
-| 资料库     | 空 path 分组；document、image、tag；仅 BASE 显示图片                                                                  |
+| 资料库     | 空 path 分组；document、image、tag；BASE 显示图片，Workspace 自有知识库的 WORKFLOW 类型也显示图片                                                                  |
 | 工作流     | workflow-entry；WORKFLOW 类型 beforeEnter 重定向对应全屏画布，其他类型显示转换页                                      |
 | 检索优化   | retrieval/hit-test、retrieval/question、retrieval/dictionary                                                          |
 | 授权与集成 | integration/chat-user、integration/external-retrieval                                                                 |
