@@ -59,7 +59,7 @@ function open() {
   knowledgeLoading.value = true
   const requestKnowledgeApi = isSystemResource() ? SystemResourceKnowledgeApi : WorkspaceKnowledgeApi
   return requestKnowledgeApi
-    .getAllKnowledge()
+    .getAllKnowledge(isSystemResource() ? { application_id: props.applicationId } : undefined)
     .then((knowledge) => {
       knowledgeOptions.value = knowledge
     })

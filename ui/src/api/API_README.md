@@ -602,7 +602,7 @@ putDocument 统一更新名称、启停及设置，不按字段重复封装；�
 生成用 document_id_list，标签用 document_ids／tag_ids，迁移及批量导出直接传 ID 数组。
 
 文档／图片和分段迁移查询目标时，`getAllKnowledge` 携带源 `knowledge_id`。
-System 资源管理据此返回源知识库同工作空间内所有文件夹的知识库；`knowledge_id` 和 `folder_id` 均未传入时
+System 资源管理据此返回源知识库同工作空间内所有文件夹的知识库；`application_id`、`knowledge_id` 和 `folder_id` 均未传入时
 返回全部工作空间知识库。其他范围沿用自身工作空间／共享范围，文档迁移排除源知识库，分段迁移仅排除当前文档。
 
 | 操作         | 协议差异                                                                                                    |
@@ -747,6 +747,8 @@ Workspace 清除策略通过 PUT `batch_clean_time` 提交当前智能体的单�
 添加知识库通过 POST `/<applicationId>/add_knowledge` 提交 `ChatLogAddKnowledgePayload`
 （`knowledge_id`、`document_id`、`chat_ids`），将所选对话的问答写入目标文档。
 知识库及目标文档选项通过当前范围 Knowledge／Document API 查询，文档使用 `getAllDocuments(knowledgeId)`。
+System 资源管理的修正内容及添加知识库弹窗查询 `getAllKnowledge` 时传入当前 `application_id`，
+后端按智能体所属工作空间返回全部文件夹中的知识库；无效智能体返回错误，不回退全系统列表。
 聊天记录与标注接口保留在同一 API 文件；日志详情使用现有 `LogConversation`，其聊天记录查询仍使用 Workspace API。
 
 简易智能体详情的 `model`、`stt_model`、`tts_model`、`long_term_model` 为模型 ID 响应别名，
