@@ -85,6 +85,7 @@ function handleRefresh() {
     placement="bottom-end"
     persistent
     :class="{ 'w-full': $slots.trigger }"
+    :popper-options="fitTriggerWidth ? { modifiers: [{ name: 'computeStyles', options: { roundOffsets: false } }] } : undefined"
     :popper-style="dropdownStyle"
     :popper-class="popperClass"
     @visible-change="handleVisibleChange"

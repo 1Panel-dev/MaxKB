@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { CSSProperties } from 'vue'
 import type { ApplicationDisplaySetting } from '@/api/types'
+import defaultFloatIconUrl from '/MaxKB.gif?url'
 
 defineOptions({ name: 'DisplaySettingPreview' })
 
@@ -79,6 +80,6 @@ const previewHeaderStyle = computed<CSSProperties>(() => ({
       </div>
     </div>
     <!-- 浮窗图标 -->
-    <img :src="previewImages.float_icon || '/MaxKB.gif'" alt="" class="size-8 shrink-0 object-contain" />
+    <img :src="previewImages.float_icon || defaultFloatIconUrl" alt="" class="size-8 shrink-0 object-contain" />
   </div>
 </template>
