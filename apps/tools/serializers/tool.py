@@ -23,6 +23,7 @@ from common.field.common import UploadedImageField
 from common.result import result
 from common.utils.common import bytes_to_uploaded_file, common_convert_value, get_file_content
 from common.utils.logger import maxkb_logger
+from common.utils.file_reference import get_owned_upload
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
@@ -513,7 +514,7 @@ class ToolSerializer(serializers.Serializer):
             # 如果是SKILL类型的工具，修改file表中对应的记录
             if instance.get("tool_type") == ToolType.SKILL:
                 file_id = instance.get("code")
-                old_file = QuerySet(File).filter(id=file_id).first()
+                old_file = get_owned_upload(file_id, self.data.get("user_id"))
                 if old_file:
                     # 创建新的文件副本,不复制实际文件内容
                     new_file_id = uuid.uuid7()
@@ -601,6 +602,7 @@ class ToolSerializer(serializers.Serializer):
                 )
 
     class Operate(serializers.Serializer):
+        user_id = serializers.UUIDField(required=False, label=_("User ID"))
         id = serializers.UUIDField(required=True, label=_("tool id"))
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
 
@@ -662,6 +664,8 @@ class ToolSerializer(serializers.Serializer):
             tool = QuerySet(Tool).filter(
                 id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
             ).first()
+            if tool.tool_type == ToolType.SKILL and "code" in edit_dict and tool.code != edit_dict["code"]:
+                get_owned_upload(edit_dict["code"], self.data.get("user_id"))
             if "init_params" in edit_dict:
                 if edit_dict["init_field_list"] is not None:
                     rm_key = []
@@ -689,11 +693,11 @@ class ToolSerializer(serializers.Serializer):
                 )
 
             # 如果是SKILL类型的工具，修改file表中对应的记录
-            if instance.get("tool_type") == ToolType.SKILL:
+            if tool.tool_type == ToolType.SKILL and "code" in edit_dict:
                 old_file_id = tool.code
-                file_id = instance.get("code")
+                file_id = edit_dict["code"]
                 if old_file_id != file_id:
-                    QuerySet(File).filter(id=old_file_id).delete()
+                    QuerySet(File).filter(id=old_file_id, source_type=FileSourceType.TOOL, source_id=tool.id).delete()
                     QuerySet(File).filter(id=file_id).update(source_id=tool.id, source_type=FileSourceType.TOOL)
                     skill_file = QuerySet(File).filter(id=file_id).first()
                     if skill_file:

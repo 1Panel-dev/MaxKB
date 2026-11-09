@@ -826,12 +826,6 @@ class KnowledgeSerializer(serializers.Serializer):
                 if source_file_path in namelist_set:
                     source_file_bytes = zf.read(source_file_path)
                     break
-            else:
-                old_file = QuerySet(File).filter(id=source_file_id).first()
-                if old_file:
-                    source_file_bytes = old_file.get_bytes()
-                    if source_file_meta is None:
-                        source_file_meta = {"file_name": old_file.file_name}
             if source_file_bytes is None:
                 return None
 

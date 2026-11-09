@@ -178,7 +178,9 @@ class ToolView(APIView):
         )
         def put(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(
-                ToolSerializer.Operate(data={"id": tool_id, "workspace_id": workspace_id}).edit(request.data)
+                ToolSerializer.Operate(data={
+                    "id": tool_id, "workspace_id": workspace_id, "user_id": request.user.id,
+                }).edit(request.data)
             )
 
         @extend_schema(
