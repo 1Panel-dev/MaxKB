@@ -14,7 +14,7 @@ import type { ApplicationAccessToken } from '@/api/types'
 defineOptions({ name: 'AccessRestrictionDrawer' })
 
 const props = defineProps<{ initialConfig?: ApplicationAccessToken }>()
-const emit = defineEmits<{ closed: [] }>()
+const emit = defineEmits<{ closed: []; updated: [config: ApplicationAccessToken] }>()
 const { auth } = useStore()
 const { applicationId, resourceApi } = useApplicationDetailContext()
 const visible = ref(true)
@@ -107,7 +107,8 @@ function handleSave() {
     loading.value = true
     return resourceApi.application
       .putAccessToken(applicationId.value, payload)
-      .then(() => {
+      .then((config: ApplicationAccessToken) => {
+        emit('updated', config)
         MsgSuccess('保存成功')
         visible.value = false
       })
