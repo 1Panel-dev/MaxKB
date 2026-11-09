@@ -10,13 +10,15 @@ import AccountMenu from '../account-menu/index.vue'
 
 import { useMessageListStore } from '../../components/message-list/index'
 import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
-import { useViewType, VIEW_TYPE } from '../../view/index'
+import { useViewType, VIEW_TYPE ,type ViewType} from '../../view/index'
 
 defineOptions({ name: 'ConversationList' })
 
 const viewType = useViewType()
 const { auth } = useStore()
 const authProfile = computed(() => (viewType === VIEW_TYPE.CHAT ? auth.authProfile : null))
+
+const SHOW_PROFILE: readonly ViewType[] = [VIEW_TYPE.CHAT, VIEW_TYPE.PORTAL]
 const msgs = useMessageListStore()
 // 会话菜单分享不针对某一轮，进入后不预先勾选
 const shareLink = useShareLinkStoreOptional()
@@ -138,7 +140,7 @@ function handleClearConversations() {
       </div>
     </el-scrollbar>
     <!-- 账户入口固定在侧栏底部，不随历史列表滚动。 -->
-    <div class="mt-3 shrink-0">
+    <div class="mt-3 shrink-0" v-if="SHOW_PROFILE.includes(viewType)">
       <AccountMenu />
     </div>
   </div>
