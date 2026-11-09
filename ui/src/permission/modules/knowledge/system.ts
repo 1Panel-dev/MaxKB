@@ -42,6 +42,10 @@ const system = {
  */
   generate: () => canSys(P.RESOURCE_KNOWLEDGE_GENERATE),
 /**
+ * 系统「知识库」分词索引权限
+ */
+  token: () => canSys(P.RESOURCE_KNOWLEDGE_TOKEN),
+/**
  * 系统「知识库」导出权限
  */
   export: () => canSys(P.RESOURCE_KNOWLEDGE_EXPORT),

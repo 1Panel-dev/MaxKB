@@ -164,6 +164,18 @@ class WorkspaceKnowledgePermissionTests(SimpleTestCase):
         response = KnowledgeMcpConfigView().get(self.request(P.KNOWLEDGE_MCP_CONFIG), **self.kwargs())
         self.assertEqual(json.loads(response.content)["data"], {"mcp_config": {"test": True}})
 
+    @patch("common.log.log.Log")
+    @patch("knowledge.views.knowledge.KnowledgeSerializer.Operate")
+    def test_tokenize_uses_knowledge_token_permission_instead_of_document_token(self, serializer, log):
+        serializer.return_value.tokenize.return_value = {}
+        KnowledgeView.Tokenize().put(self.request(P.KNOWLEDGE_TOKEN), **self.kwargs())
+        serializer.assert_called_once()
+        for permission in (P.KNOWLEDGE_DOCUMENT_TOKEN, P.KNOWLEDGE_IMAGE_TOKEN, P.KNOWLEDGE_EDIT):
+            serializer.reset_mock()
+            with self.assertRaises(AppUnauthorizedFailed):
+                KnowledgeView.Tokenize().put(self.request(permission), **self.kwargs())
+            serializer.assert_not_called()
+
     @patch("knowledge.views.knowledge.KnowledgeSerializer.Operate")
     def test_detail_redaction_and_settings_section_permissions(self, serializer):
         serializer.return_value.one.side_effect = lambda: {
