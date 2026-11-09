@@ -27,7 +27,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'image',
             name: 'system-shared-knowledge-image-list',
             component: () => import('@/views/knowledge-detail/library/image/index.vue'),
-            meta: { permission: () => perm.knowledge.share.image.read(), next: 'system-shared-knowledge-tag', title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE },
+            meta: { permission: () => perm.knowledge.share.image.read(), next: 'system-shared-knowledge-tag', title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE || params.type === KNOWLEDGE_TYPE_KEY.WORKFLOW },
           },
           {
             path: 'tag',
