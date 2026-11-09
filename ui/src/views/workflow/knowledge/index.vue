@@ -41,6 +41,16 @@ import ButtonPublishHistory from './components/ButtonPublishHistory.vue'
 import WorkflowImportDocumentDrawer from '@/views/knowledge-detail/library/document/import-document/WorkflowImportDocumentDrawer.vue'
 import { goBack } from './navigation'
 import ButtonAiGenerate from './components/ButtonAiGenerate.vue'
+import perm from '@/permission/index.ts'
+
+type KnowledgeWorkflowPermissionMethod = 'workflowEdit' | 'publish' | 'workflowExport'
+
+function knowledgeWorkflowPermission(method: KnowledgeWorkflowPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 工作空间侧共享知识库只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId))
+}
 
 defineOptions({ name: 'KnowledgeWorkflowView' })
 
@@ -471,13 +481,13 @@ onBeforeUnmount(stopAutoSave)
       />
 
       <!-- 保存 -->
-      <MkTooltip content="保存" placement="bottom">
+      <MkTooltip v-if="knowledgeWorkflowPermission('workflowEdit')" content="保存" placement="bottom">
         <el-button plain :disabled="loading" @click="handleSave" class="w-8! min-w-8!">
           <MkIcon name="icon_save_outlined" />
         </el-button>
       </MkTooltip>
       <!-- 发布 -->
-      <el-button type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
+      <el-button v-if="knowledgeWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
       <!-- 更多操作 -->
       <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
         <el-button text class="h-7! w-7! px-0!">
@@ -507,7 +517,7 @@ onBeforeUnmount(stopAutoSave)
               </MkDropdownItem>
             </el-upload>
             <!-- 导出工作流 -->
-            <MkDropdownItem @click="handleExportWorkflow">
+            <MkDropdownItem v-if="knowledgeWorkflowPermission('workflowExport')" @click="handleExportWorkflow">
               <template #icon><MkIcon name="icon_export_outlined" /></template>
               <span>导出工作流</span>
             </MkDropdownItem>
@@ -528,7 +538,7 @@ onBeforeUnmount(stopAutoSave)
             />
 
             <!-- 自动保存 -->
-            <MkDropdownItem @click.stop>
+            <MkDropdownItem v-if="knowledgeWorkflowPermission('workflowEdit')" @click.stop>
               <template #icon><MkIcon name="icon_save_outlined" /></template>
               <span>自动保存</span>
               <el-switch v-model="autoSaveEnabled" class="ml-auto" size="small" @click.stop @change="handleAutoSaveChange" />
