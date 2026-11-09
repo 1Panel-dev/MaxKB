@@ -3,7 +3,7 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { loopModeOf } from './tools/canvas'
 import { inheritMessages, useAgentConfig } from './common'
 import { createAgent } from './create-agent'
-import { AgentSuccessResult, ErrorResult } from './tools/result'
+import { ErrorResult } from './tools/result'
 import { renderNodeFunction } from './tools/node'
 import {
   addEdgeTool,
@@ -22,7 +22,7 @@ import type { AgentBindings, AgentTool, RunnableAgent } from './type'
 
 /**
  * 应用工作流（Application）的父 agent：把每个节点当作一个函数（说明、形参、返回字段），
- * 先委派规划器据需求组合出蓝图，再亲手建图（含循环体，经 lf_id 跨画布），字段配置委派给各节点配置 agent，最后校验。
+ * 先委派规划器据需求写出文字方案并经用户确认，再亲手建图（含循环体，经 lf_id 跨画布），字段配置委派给各节点配置 agent，最后校验。
  */
 
 function nodeLine(type: string, label: string): string {
@@ -54,11 +54,12 @@ const GUIDE = `你是 MaxKB「智能体工作流」的搭建助手，在 LogicFl
 - 画布用 lf_id 标识：主画布 "main"（或省略）；循环体 = 该循环节点 id。每个循环体固定有 loop-start-node（输出 index、item）。
 
 【从零搭建】
-1. 先调 plan：规划器据需求组合节点函数，产出蓝图 { blueprint, notes }。之后照蓝图建。
+1. 先调 plan：规划器据需求组合节点函数，写出文字方案 { plan }（用户已在「规划流程」中看到全文）。拿到方案后先不要建图：不复述全文，用两三句概括主链路与关键假设，请用户确认或提出修改，然后直接结束本轮回复（不调用任何工具）。
+   用户确认后再照方案从第 2 步开始建；用户提出修改时，小改直接说明调整点后再次请用户确认，大改重新调 plan，同样确认后再建。
 2. 用 add_node(type, source_anchor_id) 建节点并接上游：第一个节点接 "start-node"；普通链式连接传上游节点 id；判断器 / 意图识别要先 configure_node 配好分支（requirement 写清分几路、各路条件或分类），再 get_node_anchors 取各分支出口接下游；多分支汇合用 add_edge 补入边。
 3. 循环：主画布 add_node 建 loop-node 并 configure_node 配循环方式；再带 lf_id=该循环节点 id 往循环体建（首节点 source_anchor_id="loop-start-node"），循环体内节点用 lf_id=该循环 id 配置；无限循环必须放 loop-break-node。
 4. 节点建好接好后 configure_node(nodeId, args, requirement, returns?) 配置，相当于调用这个函数：
-   - args 传实参：形参名 → 上游引用 [节点ID, 字段]（多引用形参传列表），按蓝图的数据流给，框架会校验并绑定；
+   - args 传实参：形参名 → 上游引用 [节点ID, 字段]（多引用形参传列表），按方案中各节点的输入来源给，框架会校验并绑定；
    - requirement 写配置要求（提示词只写要求、模型 / 知识库只写意图），节点配置 agent 会生成内容并查出真实资源；
    - 节点有 [字段名] 动态返回时，returns 列出要求产出的字段名（如参数提取的 city、date），下游按这些字段引用。
    同一轮可并发配置多个节点；但实参要引用上游的动态返回字段时，先配上游，按其交付的 outputs 再配下游。
@@ -73,49 +74,28 @@ function buildPrompt(bindings: AgentBindings): string {
   return `${GUIDE}\n\n======== 可用节点 ========\n${renderCatalog(bindings)}`
 }
 
-const PLAN_GUIDE = `你是 MaxKB「智能体工作流」的规划器。下方【可用节点】把每个节点写成一个函数（说明、形参、返回字段）。根据用户需求，像写程序一样组合这些函数，产出一份执行蓝图供搭建 agent 照着建。你只规划、不改画布。
+const PLAN_GUIDE = `你是 MaxKB「智能体工作流」的规划器。下方【可用节点】把每个节点写成一个函数（说明、形参、返回字段）。根据用户需求，像写程序一样组合这些函数，写出一份文字方案：先给用户确认，再供搭建 agent 照着建。你只规划、不改画布。
 
 思路：
 - 先拆解需求：最终要给用户什么输出；为得到它需要哪些中间数据；每份数据由哪个节点函数的返回值提供。
 - 按数据依赖排顺序：每个节点的形参都要有上游返回值（或开始节点的 question、全局变量）来提供，类型要对得上（如循环的 array 需要上游返回 array）。
 - 需要按条件 / 分类走不同处理时用分支（condition-node / intent-node），需要逐项处理一组数据时用循环（loop-node）。
 - 只放需求实际需要的节点；末端必须是能输出给用户的节点，最终回答 is_result=true、中间步骤 false。
-- 需要外部工具时先 get_tools 看有哪些可用工具。需求含糊时按最常见理解规划，并在 notes 写明假设。
+- 需要外部工具时先 get_tools 看有哪些可用工具。需求含糊时按最常见理解规划，并写明假设。
 
-blueprint 元素 { type, intent, args?, returns?, children?, branches? }：
-- intent：一句话写清它在链路里做什么与配置要求（AI 对话的角色 / 目标 / 输出、检索什么、判断条件、表单收集哪些字段）；
-- args：每个形参由谁提供，写成 形参名 → "上游节点.返回字段"（如 question → "开始.question"、materials → ["知识库检索.data", "开始.question"]）；
-- returns：有 [字段名] 动态返回的节点，列出要产出的字段名与类型（如参数提取 { city: string, date: string }）；
-- loop-node 用 children 装循环体；condition-node / intent-node 用 branches（[{cond, children}]，最后一个为 else / 其他）。
-想清楚后调 submit_plan 交出，交出即结束。`
+方案格式（Markdown，面向用户可读，同时足够搭建 agent 照着建）：
+- 按执行顺序逐个列节点：节点名称（类型）——做什么与配置要求（AI 对话的角色 / 目标 / 输出、检索什么、判断条件、表单收集哪些字段）；输入：形参 ← 上游节点.返回字段（如 问题 ← 开始.question）；有 [字段名] 动态返回时写出要产出的字段与类型。
+- 分支节点（判断器 / 意图识别）逐路写：条件或分类 → 该路的后续节点，最后一路为 else / 其他；循环节点写清循环方式与循环体内的节点。
+- 最后写「关键假设」：需要用户事先准备或之后补充的内容（如知识库、工具），以及对含糊需求的理解。
+写完方案直接结束，不调用任何工具。`
 
-const PLAN_TASK = '结合用户这次的需求，组合可用节点函数设计出蓝图，调用 submit_plan 交出。'
+const PLAN_TASK = '结合用户这次的需求，组合可用节点函数，按方案格式写出文字方案。'
 
-function submitPlanTool(): AgentTool {
-  return {
-    name: 'submit_plan',
-    description: '交出规划：blueprint 节点树，notes 设计思路与关键假设。交出即结束。',
-    parameters: {
-      type: 'object',
-      properties: {
-        blueprint: { type: 'array', items: { type: 'object' } },
-        notes: { type: 'string' },
-      },
-      required: ['blueprint'],
-    },
-    apply: (args) =>
-      new AgentSuccessResult({
-        blueprint: Array.isArray(args.blueprint) ? args.blueprint : [],
-        notes: typeof args.notes === 'string' ? args.notes : '',
-      }),
-  }
-}
-
-/** 规划委派：起规划器子 agent（继承父对话），产出蓝图后上抛给父 agent */
+/** 规划委派：起规划器子 agent（继承父对话），产出文字方案后上抛给父 agent */
 function planTool(bindings: AgentBindings): AgentTool {
   return {
     name: 'plan',
-    description: '（从零搭建的第一步）委派规划器据需求组合节点函数并产出蓝图，返回 { blueprint, notes }。',
+    description: '（从零搭建的第一步，或用户要求大改方案时）委派规划器据需求组合节点函数，写出文字方案，返回 { plan }。',
     parameters: { type: 'object', properties: {} },
     apply: () => {
       const plannerBindings: AgentBindings = {
@@ -128,17 +108,16 @@ function planTool(bindings: AgentBindings): AgentTool {
         useAgentConfig(
           {
             prompt: `${PLAN_GUIDE}\n\n======== 可用节点 ========\n${renderCatalog(bindings)}`,
-            tools: [getToolsTool(bindings), submitPlanTool()],
+            tools: [getToolsTool(bindings)],
           },
           plannerBindings,
         ),
       )
+      // 规划器不调用工具即结束，data 为最后一段正文
       const promise = planner.run(PLAN_TASK).then((result) => {
-        const plan = result.data as { blueprint?: unknown[] } | undefined
-        if (result.status !== 'done' || !plan || typeof plan !== 'object' || !plan.blueprint?.length) {
-          return new ErrorResult(typeof result.data === 'string' && result.data ? result.data : '规划未产出蓝图')
-        }
-        return plan
+        const plan = typeof result.data === 'string' ? result.data.trim() : ''
+        if (result.status !== 'done' || !plan) return new ErrorResult(plan || '规划未产出方案')
+        return { plan }
       })
       return { promise, cancel: planner.stop }
     },
