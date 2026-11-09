@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
+import { ArrowLeft } from '@element-plus/icons-vue'
 import { getDingTalkClientAuthCode } from '@/views/login/dingtalk-client-login'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 import { v7 as uuidv7 } from 'uuid'
@@ -18,7 +19,7 @@ const route = useRoute()
 const router = useRouter()
 const { auth } = useStore()
 const isClientLoggingIn = ref(false)
-
+console.log(auth)
 const loginTitle = computed(() => {
   if (auth.isPortal) return '门户登录'
   return (auth.authProfile?.meta as ApplicationAuthProfileMeta | undefined)?.application_name || '登录'
@@ -132,15 +133,36 @@ onBeforeMount(async () => {
     isClientLoggingIn.value = false
   }
 })
+
+const enableAuth=computed(()=>{
+  return auth.authProfile?.enable_auth
+})
+ 
+const goBack = () => {
+  if (enableAuth.value) {
+    return
+  }
+  router.replace(getRedirectRoute())
+}
 </script>
 
 <template>
   <div class="chat-login flex-center flex-col">
+
     <div class="mb-6 flex-align-center gap-4 max-w-full">
       <ApplicationIcon :icon="auth.authProfile?.logo" :size="32" class="shrink-0" />
       <h2 class="max-w-full truncate" :title="loginTitle">{{ loginTitle }}</h2>
     </div>
     <el-card class="chat-login__card w-100">
+      <!-- 返回上一页 -->
+      <span
+        v-if="!enableAuth"
+        class="mb-4 inline-flex items-center gap-1 cursor-pointer text-sm text-N900 hover:text-primary"
+        @click="goBack"
+      >
+        <MkIcon :icon="ArrowLeft" :size="14" />
+        返回
+      </span>
       <LoginModePanel v-if="!isClientLoggingIn" :login-config="loginConfig" :login-service="loginService" />
     </el-card>
   </div>
