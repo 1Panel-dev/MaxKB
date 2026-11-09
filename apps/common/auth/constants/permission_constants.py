@@ -1718,7 +1718,7 @@ class PermissionConstants(Enum):
         PermissionMeta(
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
-            scope=[PermissionScopeConstants.WORKSPACE],
+            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
         ),
     )
 
