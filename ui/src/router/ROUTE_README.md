@@ -138,6 +138,9 @@ Chat 导航守卫（`chat/index.ts`）：
 
 当前场景只在放行前切换，请求层直接读取 `auth.token`，导航未完成时不会带上目标场景的 token。
 
+Chat Router 不根据 `route.meta.title` 更新浏览器标题：单应用对话页的标题和图标由后端
+`ChatHeadersMiddleware` 替换为应用名称与应用图标，前端不得覆盖。
+
 接口返回 401（`/auth/` 认证接口除外）时，请求层调用 `reauthenticate()`：将当前场景的 token 标记为失效（Store 中清除，本地存储保留），并以
 `force: true` 重新导航到当前地址，由守卫重新匿名认证或跳转登录页。同一时间只处理一次。
 

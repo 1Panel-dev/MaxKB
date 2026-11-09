@@ -85,10 +85,6 @@ chatRouter.beforeEach(async (to) => {
   return getLoginRoute(scope, to)
 })
 
-chatRouter.afterEach((to) => {
-  document.title = to.meta.title ? `${to.meta.title} - MaxKB` : 'MaxKB'
-})
-
 let isReauthenticating = false
 
 /**
