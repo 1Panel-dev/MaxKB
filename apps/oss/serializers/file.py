@@ -1,12 +1,15 @@
 # coding=utf-8
 import re
 import urllib
+from types import SimpleNamespace
 
 import uuid_utils.compat as uuid
 from application.models import Application, ApplicationAccessToken, ChatShareLink, ShareLinkType
 from common.auth.common import FileToken
+from common.auth.authentication import get_is_permissions
 from common.auth.handle.impl.user_token import get_auth
 from common.constants.authentication_type import AuthenticationType
+from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed, NotFound404
 from django.db.models import QuerySet
@@ -26,6 +29,7 @@ from rest_framework import serializers
 from system_manage.models import WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping, ResourceType
 from tools.serializers.tool import UploadedFileField
+from tools.models import Tool, ToolType
 from users.models import User
 
 mime_types = {
@@ -88,6 +92,33 @@ def _deny():
 
 
 def auth(file, mk_file_auth):
+    # A SKILL package is source code, not a public tool icon or generated output.
+    skill = QuerySet(Tool).filter(tool_type=ToolType.SKILL, code=str(file.id)).first()
+    if skill is not None or file.meta.get('skill_file'):
+        if mk_file_auth is None:
+            _deny()
+        token = FileToken.new_instance(mk_file_auth)
+        if token.type != AuthenticationType.SYSTEM_USER.value:
+            _deny()
+        user = QuerySet(User).filter(id=token.user_id).first()
+        if user is None:
+            _deny()
+        if skill is None:
+            if str(file.meta.get('user_id')) != str(user.id):
+                _deny()
+        elif not get_is_permissions(
+            SimpleNamespace(user=user, auth=get_auth(user)),
+            workspace_id=skill.workspace_id, tool_id=str(skill.id),
+        )(
+            RoleConstants.ADMIN,
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.TOOL.get_workspace_tool_permission()], CompareConstants.AND),
+        ):
+            _deny()
+        return
     if CONFIG.get("FILE_AUTH", "1") != "1":
         return
     # 公共/临时文件无需鉴权

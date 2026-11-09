@@ -1087,7 +1087,7 @@ class ApplicationSerializer(serializers.Serializer):
                 file_name=f"{tool.get('name')}.zip",
                 source_type=FileSourceType.TOOL,
                 source_id=tool.get("id"),
-                meta={},
+                meta={"skill_file": True},
             )
             skill_file.save(base64.b64decode(code))
             tool["code"] = skill_file_id
