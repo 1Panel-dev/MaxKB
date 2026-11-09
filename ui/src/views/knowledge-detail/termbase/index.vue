@@ -2,20 +2,20 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
+import MkEditName from '@/components/mk-edit-name/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { TermbaseItem } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess } from '@/utils/message'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import ButtonCreateTermbase from './components/ButtonCreateTermbase.vue'
-import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 /**
  * 知识库「词库」权限判断
  */
-type KnowledgeTermbasePermissionMethod =
-    'termbaseCreate' | 'termbaseEdit' | 'termbaseDelete' | 'termbaseExport'
+type KnowledgeTermbasePermissionMethod = 'termbaseCreate' | 'termbaseEdit' | 'termbaseDelete' | 'termbaseExport'
 
 function knowledgeTermbasePermission(method: KnowledgeTermbasePermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -79,6 +79,16 @@ function handleTermbasesCreated() {
   paginationConfig.value.currentPage = 1
   clearSelection()
   return loadTermbases()
+}
+
+/* 词语原位编辑：保存接口不返回词条，刷新当前页同步更新时间。 */
+function saveTermbaseContent(termbaseId: string, content: string): Promise<string> {
+  return (
+    resourceApi.termbase
+      .putTermbase?.(knowledgeId.value, termbaseId, { content })
+      .then(() => loadTermbases())
+      .then(() => content) ?? Promise.resolve(termbases.value.find(({ id }) => id === termbaseId)?.content ?? '')
+  )
 }
 
 /* 快捷创建与弹窗创建复用同一批量创建接口。 */
@@ -200,7 +210,18 @@ onMounted(() => {
       />
     </template>
     <el-table-column type="selection" width="40" />
-    <el-table-column prop="content" label="词语" show-overflow-tooltip />
+    <el-table-column prop="content" label="词语" show-overflow-tooltip>
+      <template #default="{ row }: { row: TermbaseItem }">
+        <!-- 编辑分词 -->
+        <MkEditName
+          :key="row.id"
+          v-model="row.content"
+          :maxlength="256"
+          :save="(content) => saveTermbaseContent(row.id, content)"
+          :disabled="isWorkspaceSharedResource() || !knowledgeTermbasePermission('termbaseEdit')"
+        />
+      </template>
+    </el-table-column>
     <el-table-column prop="create_time" label="创建时间" width="180">
       <template #default="{ row }: { row: TermbaseItem }">
         {{ datetimeFormat(row.create_time) }}
@@ -223,9 +244,23 @@ onMounted(() => {
     </el-table-column>
     <template #footer-batch-actions>
       <!-- 批量导出词语 -->
-      <el-button v-if="knowledgeTermbasePermission('termbaseExport')" type="primary" plain :disabled="operationLoading" @click="handleExportTermbases">导出</el-button>
+      <el-button
+        v-if="knowledgeTermbasePermission('termbaseExport')"
+        type="primary"
+        plain
+        :disabled="operationLoading"
+        @click="handleExportTermbases"
+      >
+        导出
+      </el-button>
       <!-- 批量删除词语 -->
-      <el-button v-if="!isWorkspaceSharedResource() && knowledgeTermbasePermission('termbaseDelete')" type="danger" plain :loading="operationLoading" @click="handleBatchDeleteTermbases">
+      <el-button
+        v-if="!isWorkspaceSharedResource() && knowledgeTermbasePermission('termbaseDelete')"
+        type="danger"
+        plain
+        :loading="operationLoading"
+        @click="handleBatchDeleteTermbases"
+      >
         删除
       </el-button>
     </template>
