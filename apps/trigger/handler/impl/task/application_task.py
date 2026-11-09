@@ -1,19 +1,22 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： application_task.py
-    @date：2026/1/14 19:14
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： application_task.py
+@date：2026/1/14 19:14
+@desc:
 """
+
 import json
 import time
+from collections import deque
 import traceback
 
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 
 from application.models import ChatUserType, Chat, ChatRecord, ChatSourceChoices, Application
+from application.workflow.status import Status
 from chat.serializers.chat import ChatSerializers
 from common.utils.logger import maxkb_logger
 from knowledge.models.knowledge_action import State
@@ -32,7 +35,7 @@ def get_reference(fields, obj):
 
 
 def conversion_custom_value(value, _type):
-    if ['array', 'dict', 'float', 'int', 'boolean', 'any'].__contains__(_type):
+    if ["array", "dict", "float", "int", "boolean", "any"].__contains__(_type):
         try:
             return json.loads(value)
         except Exception as e:
@@ -41,43 +44,43 @@ def conversion_custom_value(value, _type):
 
 
 def valid_value_type(value, _type):
-    if _type == 'array':
+    if _type == "array":
         return isinstance(value, list)
-    if _type == 'dict':
+    if _type == "dict":
         return isinstance(value, dict)
-    if _type == 'float':
+    if _type == "float":
         return isinstance(value, float)
-    if _type == 'int':
+    if _type == "int":
         return isinstance(value, int)
-    if _type == 'boolean':
+    if _type == "boolean":
         return isinstance(value, bool)
     return isinstance(value, str)
 
 
 def get_field_value(value, kwargs, _type, required, default_value, field):
-    source = value.get('source')
-    if source == 'custom':
-        _value = value.get('value')
+    source = value.get("source")
+    if source == "custom":
+        _value = value.get("value")
         if _value:
             _value = conversion_custom_value(_value, _type)
         else:
-            if default_value or (_type == 'boolean' and default_value == False):
+            if default_value or (_type == "boolean" and default_value == False):
                 return default_value
             if required:
-                raise Exception(f'{field} is required')
+                raise Exception(f"{field} is required")
             else:
                 return None
     else:
-        _value = get_reference(value.get('value'), kwargs)
+        _value = get_reference(value.get("value"), kwargs)
     valid = valid_value_type(_value, _type)
     if not valid:
-        raise Exception(f'{field} type error')
+        raise Exception(f"{field} type error")
     return _value
 
 
 def get_application_execute_parameters(parameter_setting, application_parameters_setting, kwargs):
-    many_field = ['api_input_field_list', 'user_input_field_list']
-    parameters = {'form_data': {}}
+    many_field = ["api_input_field_list", "user_input_field_list"]
+    parameters = {"form_data": {}}
     for key, value in application_parameters_setting.items():
         setting = parameter_setting.get(key)
         if setting:
@@ -85,25 +88,27 @@ def get_application_execute_parameters(parameter_setting, application_parameters
                 for ck, cv in value.items():
                     _setting = setting.get(ck)
                     if _setting:
-                        _value = get_field_value(_setting, kwargs, cv.get('type'), cv.get('required'),
-                                                 cv.get('default_value'), ck)
-                        parameters['form_data'][ck] = _value
+                        _value = get_field_value(
+                            _setting, kwargs, cv.get("type"), cv.get("required"), cv.get("default_value"), ck
+                        )
+                        parameters["form_data"][ck] = _value
                     else:
-                        if cv.get('default_value'):
-                            parameters['form_data'][ck] = cv.get('default_value')
+                        if cv.get("default_value"):
+                            parameters["form_data"][ck] = cv.get("default_value")
                         else:
-                            if cv.get('required'):
-                                raise Exception(f'{ck} is required')
+                            if cv.get("required"):
+                                raise Exception(f"{ck} is required")
             else:
-                value = get_field_value(setting, kwargs, value.get('type'), value.get('required'),
-                                        value.get('default_value'), key)
-                parameters['message' if key == 'question' else key] = value
+                value = get_field_value(
+                    setting, kwargs, value.get("type"), value.get("required"), value.get("default_value"), key
+                )
+                parameters["message" if key == "question" else key] = value
         else:
-            if value.get('default_value'):
-                parameters['message' if key == 'question' else key] = value.get('default_value')
+            if value.get("default_value"):
+                parameters["message" if key == "question" else key] = value.get("default_value")
             else:
-                if value.get('required'):
-                    raise Exception(f'{"message" if key == "question" else key} is required')
+                if value.get("required"):
+                    raise Exception(f"{'message' if key == 'question' else key} is required")
 
     return parameters
 
@@ -111,142 +116,190 @@ def get_application_execute_parameters(parameter_setting, application_parameters
 def get_loop_workflow_node(node_list):
     result = []
     for item in node_list:
-        if item.get('type') == 'loop-node':
-            for loop_item in item.get('loop_node_data') or []:
+        if item.get("type") == "loop-node":
+            for loop_item in item.get("loop_node_data") or []:
                 for inner_item in loop_item.values():
                     result.append(inner_item)
     return result
 
 
 def get_workflow_state(details):
-    node_list = details.values()
+    # 新引擎 details 为节点详情列表(status 为 Status 枚举值);兼容旧引擎的 dict 结构(status=500)
+    if isinstance(details, dict):
+        node_list = list(details.values())
+    else:
+        node_list = [d for d in (details or []) if isinstance(d, dict)]
     all_node = [*node_list, *get_loop_workflow_node(node_list)]
-    err = any([True for value in all_node if value.get('status') == 500 and not value.get('enableException')])
+    err = any(
+        value.get("status") in (Status.FAIL.value, 500) and not value.get("enableException") for value in all_node
+    )
     if err:
         return State.FAILURE
     return State.SUCCESS
 
 
+FILE_LIST_FIELDS = ["image_list", "document_list", "audio_list", "video_list", "other_list"]
+
+
+def build_chat_message(parameters):
+    """对齐 ChatMessageSerializers:question 与文件列表收进 message 字典,其余参数保持顶层。"""
+    message = {"content": parameters.pop("message", None) or ""}
+    for field in FILE_LIST_FIELDS:
+        message[field] = parameters.pop(field, None) or []
+    parameters["message"] = message
+    return message
+
+
 def get_user_field_component_input_type(input_type):
     if input_type == "MultiRow":
-        return 'array'
+        return "array"
     if input_type == "SwitchInput":
-        return 'boolean'
-    return 'string'
+        return "boolean"
+    return "string"
 
 
 def get_application_parameters_setting(application):
-    application_parameter_setting = {'question': {
-        'required': True,
-        'type': 'string'
-    }}
-    if application.type == 'SIMPLE':
+    application_parameter_setting = {"question": {"required": True, "type": "string"}}
+    if application.type == "SIMPLE":
         return application_parameter_setting
     else:
-        base_node_list = [n for n in application.work_flow.get('nodes') if n.get('type') == "base-node"]
+        base_node_list = [n for n in application.work_flow.get("nodes") if n.get("type") == "base-node"]
         if len(base_node_list) == 0:
-            raise Exception('Incorrect application workflow information')
+            raise Exception("Incorrect application workflow information")
         base_node = base_node_list[0]
-        api_input_field_list = base_node.get('properties').get('api_input_field_list') or []
-        api_input_field_list = {user_field.get('variable'): {
-            'required': user_field.get('is_required'),
-            'default_value': user_field.get('default_value'),
-            'type': 'string'
-        } for user_field in api_input_field_list}
-        user_input_field_list = base_node.get('properties').get('user_input_field_list') or []
-        user_input_field_list = {user_field.get('field'): {
-            'required': user_field.get('required'),
-            'default_value': user_field.get('default_value'),
-            'type': get_user_field_component_input_type(user_field.get('input_type'))
-        } for user_field in user_input_field_list}
-        application_parameter_setting['api_input_field_list'] = api_input_field_list
-        application_parameter_setting['user_input_field_list'] = user_input_field_list
-        node_data = base_node.get('properties').get('node_data') or {}
-        file_upload_enable = node_data.get('file_upload_enable')
+        api_input_field_list = base_node.get("properties").get("api_input_field_list") or []
+        api_input_field_list = {
+            user_field.get("variable"): {
+                "required": user_field.get("is_required"),
+                "default_value": user_field.get("default_value"),
+                "type": "string",
+            }
+            for user_field in api_input_field_list
+        }
+        user_input_field_list = base_node.get("properties").get("user_input_field_list") or []
+        user_input_field_list = {
+            user_field.get("field"): {
+                "required": user_field.get("required"),
+                "default_value": user_field.get("default_value"),
+                "type": get_user_field_component_input_type(user_field.get("input_type")),
+            }
+            for user_field in user_input_field_list
+        }
+        application_parameter_setting["api_input_field_list"] = api_input_field_list
+        application_parameter_setting["user_input_field_list"] = user_input_field_list
+        node_data = base_node.get("properties").get("node_data") or {}
+        file_upload_enable = node_data.get("file_upload_enable")
         if file_upload_enable:
-            file_upload_setting = node_data.get('file_upload_setting') or {}
-            for field in ['audio', 'document', 'image', 'other', 'video']:
+            file_upload_setting = node_data.get("file_upload_setting") or {}
+            for field in ["audio", "document", "image", "other", "video"]:
                 v = file_upload_setting.get(field)
                 if v:
-                    application_parameter_setting[field + '_list'] = {'required': False, 'default_value': [],
-                                                                      'type': 'array'}
+                    application_parameter_setting[field + "_list"] = {
+                        "required": False,
+                        "default_value": [],
+                        "type": "array",
+                    }
         return application_parameter_setting
 
 
 class ApplicationTask(BaseTriggerTask):
     def support(self, trigger_task, **kwargs):
-        return trigger_task.get('source_type') == 'APPLICATION'
+        return trigger_task.get("source_type") == "APPLICATION"
 
     def execute(self, trigger_task, **kwargs):
-        parameter_setting = trigger_task.get('parameter')
+        parameter_setting = trigger_task.get("parameter")
         task_record_id = uuid.uuid7()
         start_time = time.time()
         try:
-            application = QuerySet(Application).filter(id=trigger_task.get('source_id')).only('type',
-                                                                                              'work_flow').first()
+            application = (
+                QuerySet(Application).filter(id=trigger_task.get("source_id")).only("type", "work_flow").first()
+            )
             if application is None:
-                QuerySet(TriggerTask).filter(id=trigger_task.get('id')).delete()
+                QuerySet(TriggerTask).filter(id=trigger_task.get("id")).delete()
                 return
-            application_id = trigger_task.get('source_id')
+            application_id = trigger_task.get("source_id")
             chat_id = uuid.uuid7()
             chat_user_id = str(uuid.uuid7())
             chat_record_id = str(uuid.uuid7())
-            TaskRecord(id=task_record_id, trigger_id=trigger_task.get('trigger'),
-                       trigger_task_id=trigger_task.get('id'),
-                       source_type="APPLICATION",
-                       source_id=application_id,
-                       task_record_id=chat_record_id,
-                       meta={'chat_id': chat_id},
-                       state=State.STARTED).save()
+            TaskRecord(
+                id=task_record_id,
+                trigger_id=trigger_task.get("trigger"),
+                trigger_task_id=trigger_task.get("id"),
+                source_type="APPLICATION",
+                source_id=application_id,
+                task_record_id=chat_record_id,
+                meta={"chat_id": chat_id},
+                state=State.STARTED,
+            ).save()
             application_parameters_setting = get_application_parameters_setting(application)
             parameters = get_application_execute_parameters(parameter_setting, application_parameters_setting, kwargs)
-            parameters['re_chat'] = False
-            parameters['stream'] = True
-            parameters['chat_record_id'] = chat_record_id
-            message = parameters.get('message')
-            ip_address = '-'
-            if kwargs.get('body') is not None:
-                ip_address = kwargs.get('body').get('ip_address')
-            Chat.objects.get_or_create(id=chat_id, defaults={
-                'application_id': application_id,
-                'abstract': message,
-                'chat_user_id': chat_user_id,
-                'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
-                'asker': {'username': "游客"},
-                'ip_address': ip_address,
-                'source': {
-                    'type': ChatSourceChoices.TRIGGER.value
+            parameters["re_chat"] = False
+            parameters["stream"] = True
+            parameters["chat_record_id"] = chat_record_id
+            message = build_chat_message(parameters)
+            ip_address = "-"
+            if kwargs.get("body") is not None:
+                ip_address = kwargs.get("body").get("ip_address")
+            Chat.objects.get_or_create(
+                id=chat_id,
+                defaults={
+                    "application_id": application_id,
+                    "abstract": str(message.get("content") or "")[0:1024],
+                    "chat_user_id": chat_user_id,
+                    "chat_user_type": ChatUserType.ANONYMOUS_USER.value,
+                    "asker": {"username": "游客"},
+                    "ip_address": ip_address,
+                    "source": {"type": ChatSourceChoices.TRIGGER.value},
                 },
-            })
+            )
 
-            list(ChatSerializers(data={
-                "chat_id": chat_id,
-                "chat_user_id": chat_user_id,
-                'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
-                'application_id': application_id,
-                'ip_address': ip_address,
-                'source': {
-                    'type': ChatSourceChoices.TRIGGER.value
-                },
-                'debug': False
-            }).chat(instance=parameters))
+            chat_serializer = ChatSerializers(
+                data={
+                    "chat_id": chat_id,
+                    "chat_user_id": chat_user_id,
+                    "chat_user_type": ChatUserType.ANONYMOUS_USER.value,
+                    "application_id": application_id,
+                    "ip_address": ip_address,
+                    "source": {"type": ChatSourceChoices.TRIGGER.value},
+                    "debug": False,
+                }
+            )
+            chat_serializer.is_valid(raise_exception=True)
+            # 传入 chat_record_id 时 chat 不会创建占位记录(视为续跑),这里先建好,结束后由 chat 回填
+            ChatRecord(id=chat_record_id, **chat_serializer.get_defaults_record(message)).save(force_insert=True)
+            response = chat_serializer.chat(instance=parameters)
+            try:
+                # 只需把流消费完以等待执行结束,不保留帧;maxlen=0 的 deque 逐个丢弃,避免 list 堆积整段输出
+                deque(response, maxlen=0)
+            finally:
+                response.close()
             chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
             if chat_record:
                 state = get_workflow_state(chat_record.details)
-                QuerySet(TaskRecord).filter(id=task_record_id).update(state=state, run_time=chat_record.run_time,
-                                                                      meta={'parameter_setting': parameter_setting,
-                                                                            'input': parameters, 'output': None})
+                QuerySet(TaskRecord).filter(id=task_record_id).update(
+                    state=state,
+                    run_time=chat_record.run_time,
+                    meta={"parameter_setting": parameter_setting, "input": parameters, "output": None},
+                )
             else:
-                QuerySet(TaskRecord).filter(id=task_record_id).update(state=State.FAILURE,
-                                                                      run_time=time.time() - start_time,
-                                                                      meta={'parameter_setting': parameter_setting,
-                                                                            'input': parameters, 'output': None,
-                                                                            'err_message': 'Error: An unknown error occurred during the execution of the conversation'})
+                QuerySet(TaskRecord).filter(id=task_record_id).update(
+                    state=State.FAILURE,
+                    run_time=time.time() - start_time,
+                    meta={
+                        "parameter_setting": parameter_setting,
+                        "input": parameters,
+                        "output": None,
+                        "err_message": "Error: An unknown error occurred during the execution of the conversation",
+                    },
+                )
         except Exception as e:
             maxkb_logger.error(f"Application execution error: {traceback.format_exc()}")
             QuerySet(TaskRecord).filter(id=task_record_id).update(
                 state=State.FAILURE,
                 run_time=time.time() - start_time,
-                meta={'input': {'parameter_setting': parameter_setting, **kwargs}, 'output': None,
-                      'err_message': 'Error: ' + str(e)}
+                meta={
+                    "input": {"parameter_setting": parameter_setting, **kwargs},
+                    "output": None,
+                    "err_message": "Error: " + str(e),
+                },
             )
