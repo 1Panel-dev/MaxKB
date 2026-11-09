@@ -12,6 +12,7 @@ from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed, NotFound404
+from common.utils.public_file_access import has_active_public_file_share
 from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.utils.translation import gettext
@@ -22,7 +23,7 @@ from homepage.serializers.homepage import (
     is_extends_workspace_manage,
     is_workspace_manage,
 )
-from knowledge.models import Document, File, FileSourceType, Knowledge, PublicFileAccess
+from knowledge.models import Document, File, FileSourceType, Knowledge
 from maxkb.const import CONFIG
 from oss.url_fetch import FETCH_URL_CODE
 from rest_framework import serializers
@@ -169,10 +170,7 @@ def auth(file, mk_file_auth):
     if file.source_type in _PUBLIC_SOURCE_TYPES:
         return
     # 文件公开授权仅在对应的公开分享及聊天仍有效时生效；旧的无关联授权不再放行。
-    if QuerySet(PublicFileAccess).filter(
-            source_type='FILE', source_id=str(file.id),
-            share_link__share_type=ShareLinkType.PUBLIC, share_link__chat__is_deleted=False,
-    ).exists():
+    if has_active_public_file_share(file.id):
         return
     if file.source_type == FileSourceType.APPLICATION:
         application = QuerySet(Application).filter(id=file.source_id).first()
