@@ -19,10 +19,20 @@ function formatJson(value: unknown) {
     <template #header>
       <BaseHeader :data="data" show-tokens />
     </template>
+    <!-- 系统提示词 -->
+    <div class="mk-gray-card-sm">
+      <h6 class="mb-2">系统提示词</h6>
+      <div>{{ data.system || '-' }}</div>
+    </div>
+    <!-- 系统提示词 -->
+    <div class="mk-gray-card-sm">
+      <h6 class="mb-2">用户提示词</h6>
+      <div>{{ data.prompt || '-' }}</div>
+    </div>
 
     <!-- 消息列表 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">消息列表</h6>
+      <h6 class="mb-2">上下文</h6>
       <div class="space-y-2">
         <template v-if="data.message_list?.length > 0">
           <p v-for="(message, messageIndex) in data.message_list" :key="messageIndex" class="whitespace-pre-wrap">
@@ -33,13 +43,11 @@ function formatJson(value: unknown) {
         <template v-else>-</template>
       </div>
     </div>
-
-    <!-- 思考过程 -->
+    <!-- 结束原因 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">思考过程</h6>
-      <div class="whitespace-pre-wrap">{{ data.reasoning_content || '-' }}</div>
+      <h6 class="mb-2">结束原因</h6>
+      <div>{{ data.finish_reason || '-' }}</div>
     </div>
-
     <!-- 回答内容 -->
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">回答内容</h6>
@@ -63,10 +71,6 @@ function formatJson(value: unknown) {
       </div>
     </div>
 
-    <!-- 结束原因 -->
-    <div class="mk-gray-card-sm">
-      <h6 class="mb-2">结束原因</h6>
-      <div>{{ data.finish_reason || '-' }}</div>
-    </div>
+
   </DetailContainer>
 </template>

@@ -390,6 +390,8 @@ class LLMNode(INode):
                 "message_tokens": self.data.get("message_tokens"),
                 "answer_tokens": self.data.get("answer_tokens"),
                 "messages": aggregation.get_contents(),
+                "system": self.get_parameters().get("system"),
+                "prompt": self.get_parameters().get("prompt"),
             }
         )
         return details
