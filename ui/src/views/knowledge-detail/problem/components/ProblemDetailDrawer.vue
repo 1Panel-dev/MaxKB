@@ -10,6 +10,20 @@ import { getFileIconUrl } from '@/utils/icon'
 import { getFileUrl } from '@/utils/common'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
+import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
+
+/**
+ * 知识库「问题」权限判断
+ */
+type KnowledgeProblemPermissionMethod = 'problemRelate'
+
+function knowledgeProblemPermission(method: KnowledgeProblemPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share[method]())
+  if (isWorkspaceSharedResource()) return false // 共享知识库在工作空间侧只读
+  return Boolean(perm.knowledge.workspace[method](knowledgeId.value))
+}
 
 defineOptions({ name: 'ProblemDetailDrawer' })
 const problem = defineModel<ProblemItem>({ required: true })
@@ -161,7 +175,7 @@ defineExpose({ refresh: handleLoadParagraphs })
     </div>
     <template #footer>
       <!-- 关联当前问题的分段 -->
-      <el-button plain :disabled="loading" @click="emit('associate')">关联分段</el-button>
+      <el-button plain :disabled="loading" v-if="knowledgeProblemPermission('problemRelate')"  @click="emit('associate')">关联分段</el-button>
       <!-- 查看上一个问题 -->
       <el-button plain :disabled="loading || !hasPrevious" @click="emit('previous')">上一个</el-button>
       <!-- 查看下一个问题 -->
