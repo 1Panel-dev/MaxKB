@@ -7,6 +7,14 @@ import type { ApplicationDetail, ResourceTrigger, ResourceTriggerResource, Trigg
 import { RESOURCE_TYPE, TRIGGER_TYPE, SCHEDULE_TYPE } from '@/api/enums'
 import { MsgSuccess } from '@/utils/message'
 import TriggerFormDrawer from '@/views/trigger/trigger-form/TriggerFormDrawer.vue'
+import perm from '@/permission'
+import { isSystemResource } from '@/utils/resource-context'
+
+type ApplicationTriggerPermissionMethod = 'triggerCreate' | 'triggerEdit' | 'triggerDelete'
+function applicationTriggerPermission(method: ApplicationTriggerPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.application.system[method]())
+  return Boolean(perm.application.workspace[method](props.application.id))
+}
 
 const props = defineProps<{
   api: typeof ResourceTriggerApi
@@ -96,7 +104,7 @@ defineExpose({ open })
         <h4>触发器</h4>
         <div class="flex-align-center">
           <!-- 添加触发器 -->
-          <el-button text :disabled="loading" @click="handleOpenForm()" class="text-N900!">
+          <el-button v-if="applicationTriggerPermission('triggerCreate')" text :disabled="loading" @click="handleOpenForm()" class="text-N900!">
             <MkIcon name="icon_add_outlined" />
             <span>添加</span>
           </el-button>
@@ -119,11 +127,11 @@ defineExpose({ open })
               <div class="flex-align-center shrink-0">
                 <!-- 编辑触发器 -->
 
-                <el-button text :disabled="loading" @click="handleOpenForm(trigger.id)"><MkIcon name="icon_edit_outlined" /></el-button>
+                <el-button v-if="applicationTriggerPermission('triggerEdit')" text :disabled="loading" @click="handleOpenForm(trigger.id)"><MkIcon name="icon_edit_outlined" /></el-button>
 
                 <!-- 移除当前资源的触发器 -->
 
-                <el-button text :disabled="loading" @click="handleRemoveTrigger(trigger)"><MkIcon name="icon_close_outlined" /></el-button>
+                <el-button v-if="applicationTriggerPermission('triggerDelete')" text :disabled="loading" @click="handleRemoveTrigger(trigger)"><MkIcon name="icon_close_outlined" /></el-button>
               </div>
             </div>
           </el-card>
