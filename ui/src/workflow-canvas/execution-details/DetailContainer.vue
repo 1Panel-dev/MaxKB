@@ -27,7 +27,7 @@ const showContent = computed(() => isSuccess.value || props.showContentOnError)
         <slot name="header" />
       </template>
       <!-- 内容区独立交互，避免链接、表单和嵌套详情点击时收起外层卡片。 -->
-      <div v-if="show" class="mt-4 cursor-auto space-y-2" @click.stop>
+      <div v-if="show" class="mt-4 cursor-auto space-y-2 wrap-anywhere" @click.stop>
         <slot v-if="showContent" />
         <div v-else class="mk-gray-card-sm">
           <h6 class="mb-2">错误日志</h6>
