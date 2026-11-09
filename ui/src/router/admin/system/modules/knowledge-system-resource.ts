@@ -6,7 +6,7 @@ function firstAccessibleDetail(params: RouteParamsGeneric) {
   const system = perm.knowledge.system
   const candidates = [
     ['document-list', system.docRead()],
-    ['image-list', params.type === KNOWLEDGE_TYPE_KEY.BASE && system.image.read()],
+    ['image-list', (params.type === KNOWLEDGE_TYPE_KEY.BASE || params.type === KNOWLEDGE_TYPE_KEY.WORKFLOW) && system.image.read()],
     ['hit-test', system.hitTest()],
     ['problem', system.problemRead()],
     ['tag', system.tagRead()],
@@ -47,7 +47,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'image',
             name: 'system-resource-knowledge-image-list',
             component: () => import('@/views/knowledge-detail/library/image/index.vue'),
-            meta: { permission: () => perm.knowledge.system.image.read(), next: 'system-resource-knowledge-tag', title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE },
+            meta: { permission: () => perm.knowledge.system.image.read(), next: 'system-resource-knowledge-tag', title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE || params.type === KNOWLEDGE_TYPE_KEY.WORKFLOW },
           },
           {
             path: 'tag',

@@ -26,7 +26,7 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'image',
             name: 'workspace-shared-knowledge-image-list',
             component: () => import('@/views/knowledge-detail/library/image/index.vue'),
-            meta: { title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE },
+            meta: { title: '图片', order: 20, detailMenuVisible: (params) => params.type === KNOWLEDGE_TYPE_KEY.BASE || params.type === KNOWLEDGE_TYPE_KEY.WORKFLOW },
           },
           {
             path: 'tag',
