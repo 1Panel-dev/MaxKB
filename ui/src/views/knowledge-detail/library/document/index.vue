@@ -348,7 +348,7 @@ onBeforeUnmount(() => {
         <template v-if="!isWorkspaceSharedResource()">
           <!-- 导入 Web、飞书或工作流文档 -->
           <ButtonImportDocument
-            v-if="!showQuickCreate"
+            v-if="!showQuickCreate && knowledgeDocPermission('docCreate')"
             :api="resourceApi.document"
             :knowledge-id="knowledgeId"
             :knowledge-type="knowledgeType"
