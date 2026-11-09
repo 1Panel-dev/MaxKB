@@ -59,6 +59,10 @@ const share = {
  */
   publish: () => canSys(P.SHARED_KNOWLEDGE_WORKFLOW_PUBLISH),
 /**
+ * 系统「共享知识库」MCP配置详情权限
+ */
+  mcpConfig: () => canSys(P.SHARED_KNOWLEDGE_MCP_CONFIG),
+/**
  * 系统「共享知识库」查看关联资源权限
  */
   relateMap: () => canSys(P.SHARED_KNOWLEDGE_RELATE_RESOURCE_VIEW),
