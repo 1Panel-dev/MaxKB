@@ -798,6 +798,7 @@ class AIChatNode(INode):
                 "answer_tokens": self.data.get("answer_tokens"),
                 "history_message": self.get_context("history_message"),
                 "messages": messages,
+                "system": self.data.get("system"),
             }
         )
         return details
