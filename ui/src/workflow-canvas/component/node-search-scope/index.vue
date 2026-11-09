@@ -78,12 +78,12 @@ onBeforeUnmount(() => anchorGuard.reset())
             :validate-event="false"
             :teleported="false"
             size="small"
-            class="w-18!"
+            class="w-22!"
             @wheel="handleNodeWheel"
             @update:model-value="changeScopeType"
             @visible-change="anchorGuard.setOverlayVisible('scope-type', $event)"
           >
-            <el-option label="引用" value="referencing" />
+            <el-option label="引用变量" value="referencing" />
             <el-option label="自定义" value="custom" />
           </el-select>
         </div>
