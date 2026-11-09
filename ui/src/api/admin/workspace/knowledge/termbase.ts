@@ -15,6 +15,10 @@ const getTermbasePage = (knowledgeId: string, page: ParamsPage, query?: { conten
 /** 删除单个知识库自定义分词条目。 */
 const deleteTermbase = (knowledgeId: string, termbaseId: string) => del<undefined, boolean>(`${getPrefix(knowledgeId)}/${termbaseId}`)
 
+/** 修改单个知识库自定义分词条目。 */
+const putTermbase = (knowledgeId: string, termbaseId: string, payload: TermbaseUpdatePayload) =>
+  put<TermbaseUpdatePayload, void>(`${getPrefix(knowledgeId)}/${termbaseId}`, payload)
+
 /** 批量删除知识库自定义分词条目。 */
 const putBatchDeleteTermbases = (knowledgeId: string, termbaseIds: string[]) =>
   put<string[], boolean>(`${getPrefix(knowledgeId)}/batch_delete`, termbaseIds)
@@ -27,6 +31,7 @@ export default {
   postTermbases,
   getTermbasePage,
   deleteTermbase,
+  putTermbase,
   putBatchDeleteTermbases,
   postExportTermbases,
 }
