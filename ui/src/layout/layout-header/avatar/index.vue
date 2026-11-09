@@ -89,7 +89,7 @@
         </div>
         <el-dropdown-item
           style="padding: 0"
-          @click.stop
+          @click.stop.prevent
           v-if="
             hasPermission(
               new ComplexPermission(
