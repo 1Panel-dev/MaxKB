@@ -272,7 +272,7 @@ onMounted(() => loadSystemUsers())
                   </el-button>
                 </MkTooltip>
                 <!-- 修改用户密码 -->
-                <ButtonChangeUserPassword :user="row" @refresh="loadSystemUsers(false)" />
+                <ButtonChangeUserPassword v-if="perm.system.user.edit()" :user="row" @refresh="loadSystemUsers(false)" />
                 <!-- 删除 -->
                 <MkTooltip content="删除" placement="top" v-if="perm.system.user.delete()">
                   <el-button type="primary" text @click.stop="deleteUser(row)">
