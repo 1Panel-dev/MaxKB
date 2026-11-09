@@ -126,7 +126,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                     v-if="perm.knowledge.share.generate()"
                   />
                   <!-- 设置 -->
-                  <MkDropdownItem v-if="perm.knowledge.share.edit()" @click.stop="handleOpenKnowledgeSetting(knowledge)">
+                  <MkDropdownItem v-if="perm.knowledge.share.settingRead()" @click.stop="handleOpenKnowledgeSetting(knowledge)">
                     <template #icon><MkIcon name="icon_setting" /></template>
                     设置
                   </MkDropdownItem>
