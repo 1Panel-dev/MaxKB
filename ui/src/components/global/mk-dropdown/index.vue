@@ -63,6 +63,7 @@ defineExpose({ handleOpen, handleClose })
     v-if="!hideWhenEmpty || hasDropdownContent(slots.dropdown?.())"
     class="mk-dropdown"
     ref="dropdownRef"
+    :popper-options="popperOptions"
     :persistent="persistent && hasOpened"
     v-bind="$attrs"
     @visible-change="handleVisibleChange"
