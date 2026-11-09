@@ -31,7 +31,12 @@ const rules: FormRules<EmailSettingPayload> = {
 function loadEmailSetting() {
   loading.value = true
   return EmailSettingApi.getEmailSetting()
-    .then((setting) => Object.assign(emailSetting, defaultEmailSetting, setting))
+    .then((setting) => {
+      // 兼容接口返回数字端口，统一使用字符串进行回显、校验和提交。
+      Object.assign(emailSetting, defaultEmailSetting, setting, {
+        email_port: String(setting.email_port ?? ''),
+      })
+    })
     .finally(() => {
       loading.value = false
     })
