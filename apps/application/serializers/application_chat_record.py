@@ -393,15 +393,17 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
         paragraph_ids = []
         problem_paragraph_mappings = []
         for chat_record in chat_record_list:
+            answer_text = "".join([r.get("content") for r in chat_record.messages if r.get("type") == "TEXT"])
+            problem_text = chat_record.question.get("content")
             paragraph = Paragraph(
                 id=uuid.uuid7(),
                 document_id=document_id,
-                content=chat_record.answer_text,
+                content=answer_text,
                 knowledge_id=knowledge_id,
-                title=chat_record.problem_text,
-                chunks=text_to_chunk(chat_record.answer_text),
+                title=problem_text,
+                chunks=text_to_chunk(answer_text),
             )
-            problem, _ = Problem.objects.get_or_create(content=chat_record.problem_text, knowledge_id=knowledge_id)
+            problem, _ = Problem.objects.get_or_create(content=problem_text, knowledge_id=knowledge_id)
             problem_paragraph_mapping = ProblemParagraphMapping(
                 id=uuid.uuid7(),
                 knowledge_id=knowledge_id,
