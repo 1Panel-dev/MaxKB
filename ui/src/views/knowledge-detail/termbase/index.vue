@@ -182,7 +182,12 @@ onMounted(() => {
 <template>
   <Teleport v-if="headerTarget" :to="headerTarget">
     <div class="flex-between gap-4">
-      <h4>{{ title }}</h4>
+      <div class="flex-align-center gap-2">
+        <h4>{{ title }}</h4>
+        <MkTooltip placement="right" content="避免专业术语被拆分，提升全文检索的精准度与召回率">
+          <MkIcon name="icon_info_outlined" class="text-N600!" />
+        </MkTooltip>
+      </div>
       <div class="flex-align-center gap-3">
         <MkSearchInput v-model="searchText" class="w-60!" @change="handleSearchChange" />
         <ButtonCreateTermbase v-if="!isWorkspaceSharedResource()" :knowledge-id="knowledgeId" @refresh="handleTermbasesCreated" />
