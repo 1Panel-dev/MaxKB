@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
-import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import { STATE_TYPES } from '@/api/enums'
-import type { Dict, KnowledgeExecutionRecord } from '@/api/types'
+import type { KnowledgeWorkflowApi, Dict, KnowledgeExecutionRecord } from '@/api/types'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
 import { datetimeFormat } from '@/utils/time'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm } from '@/utils/message'
 import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 
-const props = defineProps<{ api: typeof WorkflowApi; knowledgeId: string }>()
+const props = defineProps<{ api: KnowledgeWorkflowApi; knowledgeId: string }>()
 const emit = defineEmits<{ closed: [] }>()
 
 /* 知识库执行记录查询 */

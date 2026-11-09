@@ -10,11 +10,17 @@ export type DynamicFormValue = any
 
 export type DynamicFormValidatorCallback = (error?: string | Error) => void
 
+export type DynamicFormTreeLoader = (functionName: string, currentNode?: Dict<DynamicFormValue>) => Promise<Dict<DynamicFormValue>[]>
+
 export interface DynamicFormResponse<T> {
   data: T
 }
 
-export type DynamicFormSource = string | FormField[] | Promise<FormField[] | DynamicFormResponse<FormField[]>> | (() => Promise<FormField[] | DynamicFormResponse<FormField[]>>)
+export type DynamicFormSource =
+  | string
+  | FormField[]
+  | Promise<FormField[] | DynamicFormResponse<FormField[]>>
+  | (() => Promise<FormField[] | DynamicFormResponse<FormField[]>>)
 
 export type VisibilityCompareOperator = 'eq' | 'not_eq' | 'contain' | 'not_contain' | 'is_true' | 'is_not_true' | 'gt' | 'ge' | 'lt' | 'le'
 

@@ -1,10 +1,15 @@
 /** Workspace 知识库列表和知识库卡片共用的业务类型。 */
 
 import type LogicFlow from '@logicflow/core'
+import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import { KNOWLEDGE_HIT_UNIT_TYPE, KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
 import type { DefaultModelSettingPayload } from './model'
 import type { DocumentResourceType, DocumentTaskState } from './document'
 import type { ParagraphItem } from './paragraph'
+
+/** 工作流页面的范围接口；只读共享范围不提供目录查询能力。 */
+export type KnowledgeWorkflowApi = Omit<typeof WorkflowApi, 'getKnowledgeDatasourceDocuments'> &
+  Partial<Pick<typeof WorkflowApi, 'getKnowledgeDatasourceDocuments'>>
 
 /** 生成关联问题共用的模型与提示词配置。 */
 export interface RelatedQuestionsConfig {

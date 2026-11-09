@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
+import type { KnowledgeWorkflowApi, WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
 
 defineOptions({ name: 'ButtonKnowledgePublishHistory' })
 
-const props = defineProps<{ label: string; api: typeof WorkflowApi; knowledgeId: string; selectedId?: string; disabled?: boolean }>()
+const props = defineProps<{ label: string; api: KnowledgeWorkflowApi; knowledgeId: string; selectedId?: string; disabled?: boolean }>()
 const visible = defineModel<boolean>('visible', { default: false })
 const emit = defineEmits<{
   open: []

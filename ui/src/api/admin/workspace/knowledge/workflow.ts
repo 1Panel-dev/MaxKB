@@ -41,6 +41,12 @@ const getKnowledgeWorkflowFormList = (knowledgeId: string, type: 'local' | 'tool
   return post<{ node: Dict<unknown> }, Dict<unknown>[]>(`${getPrefix()}/${knowledgeId}/datasource/${type}/${id}/form_list`, { node })
 }
 
+/** 获取数据源工具的根目录或当前目录文件列表。 */
+const getKnowledgeDatasourceDocuments = (knowledgeId: string, toolId: string, functionName: string, currentNode?: Dict<unknown>) =>
+  post<{ current_node?: Dict<unknown> }, Dict<unknown>[]>(`${getPrefix()}/${knowledgeId}/datasource/tool/${toolId}/${functionName}`, {
+    current_node: currentNode,
+  })
+
 /** 提交知识库工作流调试任务。 */
 const postKnowledgeWorkflowDebug = (knowledgeId: string, payload: KnowledgeWorkflowDebugPayload) => {
   return post<KnowledgeWorkflowDebugPayload, KnowledgeWorkflowAction>(`${getPrefix()}/${knowledgeId}/debug`, payload)
@@ -90,6 +96,7 @@ export default {
   putKnowledgeWorkflow,
   putKnowledgeWorkflowPublish,
   getKnowledgeWorkflowFormList,
+  getKnowledgeDatasourceDocuments,
   postKnowledgeWorkflowDebug,
   postKnowledgeWorkflowImport,
   getKnowledgeWorkflowAction,

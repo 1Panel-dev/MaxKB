@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import type { KnowledgeWorkflowAction } from '@/api/types'
+import type { KnowledgeWorkflowApi, KnowledgeWorkflowAction } from '@/api/types'
 import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'DebugResult' })
 
-const props = defineProps<{ api?: typeof WorkflowApi; knowledgeId: string; actionId: string }>()
+const props = defineProps<{ api?: KnowledgeWorkflowApi; knowledgeId: string; actionId: string }>()
 
 const TERMINAL_STATES = ['SUCCESS', 'FAILURE', 'REVOKE', 'REVOKED']
 const POLL_INTERVAL = 2000

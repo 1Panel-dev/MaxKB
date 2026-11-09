@@ -345,6 +345,11 @@ postTransformWorkflow POST `/<id>/transform_workflow`，提交 `{ work_flow }`�
 
 导入／导出工作流专用 `.kbwf`，接口为 workflow/import（FormData file）与 workflow/export，
 不能使用包含文档的知识库包接口。正式文档执行用 upload_document，调试用 debug，复用 KnowledgeWorkflowDebugPayload。
+知识库工作流的 Workspace、System 资源管理与 System 共享 API 提供
+`getKnowledgeDatasourceDocuments(knowledgeId, toolId, functionName, currentNode?)`，
+通过各自知识库前缀的 `/<knowledgeId>/datasource/tool/<toolId>/<functionName>` 查询工具文件列表，
+根目录省略 `current_node`，子目录提交原始节点对象。
+
 四个范围各自维护 `knowledge/workflow.ts`，协议保持一致，前缀分别为 `/workspace/<workspaceId>/knowledge`、
 `/system/shared/workspace/<workspaceId>/knowledge`、`/system/resource/knowledge`、`/system/shared/knowledge`。
 工作流页面按路由 `resourceScope` 选择接口，通过 Props 传给调试、历史和执行记录组件。

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch } from 'vue'
-import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
-import type { Dict } from '@/api/types'
+import { MkDynamicsForm, type DynamicFormTreeLoader, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
+import type { KnowledgeWorkflowApi, Dict } from '@/api/types'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import { getWorkspaceId } from '@/utils/resource-context'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
@@ -20,7 +20,7 @@ interface WorkflowNode {
 }
 
 const props = defineProps<{
-  api?: typeof WorkflowApi
+  api?: KnowledgeWorkflowApi
   workflow: { nodes?: WorkflowNode[] } | null
   knowledgeId: string
 }>()
@@ -51,14 +51,20 @@ const sourceContext = ref<{ current_tool_id?: string }>({
 })
 // 动态目录字段沿用 get_extra 注入协议，读取当前工具上下文。
 provide('get_extra', () => sourceContext.value)
+// 根目录与子目录请求跟随调试／导入入口传入的资源范围。
+provide<DynamicFormTreeLoader>('loadTreeData', (functionName, currentNode) => {
+  const toolId = sourceContext.value.current_tool_id
+  if (!toolId) return Promise.resolve([])
+  const loadDocuments = (props.api ?? WorkflowApi).getKnowledgeDatasourceDocuments
+  if (!loadDocuments) return Promise.reject(new Error('当前知识库不支持数据源文件查询'))
+  return loadDocuments(props.knowledgeId, toolId, functionName, currentNode)
+})
 
 function handleSourceChange(nodeId: string) {
   baseFormData.value.node_id = nodeId
   const node = sourceNodeList.value.find((sourceNode) => sourceNode.id === nodeId)
   if (!node) return
-  if (node.properties.node_data?.tool_lib_id) {
-    sourceContext.value.current_tool_id = node.properties.node_data.tool_lib_id
-  }
+  sourceContext.value.current_tool_id = node.properties.node_data?.tool_lib_id
   const localSource = isLocalSource(node)
   const sourceType = localSource ? 'local' : 'tool'
   const sourceId = localSource ? node.type : (node.properties.node_data?.tool_lib_id ?? node.type)

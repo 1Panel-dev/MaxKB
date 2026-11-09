@@ -5,7 +5,7 @@ import { formItemContextKey, type TableInstance, type TreeNode } from 'element-p
 import type { Dict } from '@/api/types'
 import { post } from '@/api/admin/core/request'
 import { getFileIconUrl } from '@/utils/icon'
-import type { DynamicFormValue, FormField } from '../../type'
+import type { DynamicFormTreeLoader, DynamicFormValue, FormField } from '../../type'
 
 defineOptions({ name: 'DynamicFormTree', inheritAttrs: false })
 
@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue; formFiel
 const emit = defineEmits<{ 'update:modelValue': [value: DynamicFormValue[]]; change: [value: DynamicFormValue[]] }>()
 const attrs = useAttrs()
 const getExtra = inject<() => Dict<DynamicFormValue>>('get_extra')
+const loadTreeData = inject<DynamicFormTreeLoader>('loadTreeData')
 const elFormItem = inject(formItemContextKey, undefined)
 
 // 字段映射与表格数据，保留完整节点对象作为选中值。
@@ -86,7 +87,12 @@ const requestUrl = computed(() =>
 
 function loadDocuments(currentNode?: Dict<DynamicFormValue>) {
   pendingLoads.value += 1
-  return post<{ current_node?: Dict<DynamicFormValue> }, Dict<DynamicFormValue>[]>(requestUrl.value, { current_node: currentNode })
+  return Promise.resolve()
+    .then(() =>
+      loadTreeData
+        ? loadTreeData(String(props.formField.attrs?.fetch_list_function ?? attrs.fetch_list_function), currentNode)
+        : post<{ current_node?: Dict<DynamicFormValue> }, Dict<DynamicFormValue>[]>(requestUrl.value, { current_node: currentNode }),
+    )
     .then(normalizeDocuments)
     .finally(() => {
       pendingLoads.value -= 1

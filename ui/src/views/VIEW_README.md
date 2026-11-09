@@ -268,6 +268,7 @@ Workspace 共享保持只读。
 不依赖详情页上下文，以支持详情文档页与全屏工作流页复用。
 详情上下文为 Workspace、System 资源管理和 System 共享分别装配对应的 Workflow API；
 Workspace 共享保持只读，不装配导入 API。System 请求不依赖路由中的 workspaceId。
+数据源的目录选择通过 `loadTreeData` 注入当前 Workflow API，根目录与展开子目录请求保持同一资源范围。
 本地文件校验上传成功及 `file_id`，远程工具数据源保留其文件／目录协议。
 导入成功清空搜索、筛选并回第一页，失败保留文件、选择与策略。
 

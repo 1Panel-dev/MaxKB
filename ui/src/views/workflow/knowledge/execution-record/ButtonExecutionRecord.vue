@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { KnowledgeWorkflowApi } from '@/api/types'
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import ExecutionRecordDrawer from './ExecutionRecordDrawer.vue'
 
 defineOptions({ name: 'ButtonKnowledgeExecutionRecord', inheritAttrs: false })
 
-defineProps<{ label: string; api: typeof WorkflowApi; knowledgeId: string }>()
+defineProps<{ label: string; api: KnowledgeWorkflowApi; knowledgeId: string }>()
 
 /* 执行记录抽屉按需挂载，关闭动画结束后卸载。 */
 const drawerMounted = ref(false)

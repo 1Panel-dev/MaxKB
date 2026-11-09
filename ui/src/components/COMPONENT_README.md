@@ -637,6 +637,8 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 保留 `text_field`、`value_field`、`childrenField` 映射，选中值仍为原始节点对象数组；
 已导入节点自动选中且不可取消，`disabled` 节点不可选择。懒加载先查询根目录，展开时通过
 原有工具数据源接口提交 `current_node` 查询子节点；非懒加载使用 `option_list`。
+知识库调试／导入通过 `provide('loadTreeData', loader)` 注入 `DynamicFormTreeLoader`，
+根目录与子目录共用当前范围 API；未注入时保留原工作空间请求协议。
 
 动态表单 `UploadInput` 按附件原顺序使用 Flex 换行展示，不按类型分组。
 文件及音视频使用图标和文件名紧凑卡片，文件链接在新标签页打开或下载。

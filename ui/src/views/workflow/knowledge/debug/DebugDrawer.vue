@@ -3,10 +3,9 @@ import { computed, provide, ref, useTemplateRef, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { AxiosProgressEvent } from 'axios'
 import type LogicFlow from '@logicflow/core'
-import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
-import type { Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
+import type { KnowledgeWorkflowApi, Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import type { FormField } from '@/components/mk-dynamics-form'
@@ -16,7 +15,7 @@ import Result from './action/Result.vue'
 
 defineOptions({ name: 'KnowledgeWorkflowDebugDrawer' })
 
-const props = defineProps<{ api: typeof WorkflowApi; knowledgeId: string }>()
+const props = defineProps<{ api: KnowledgeWorkflowApi; knowledgeId: string }>()
 const router = useRouter()
 const route = useRoute()
 

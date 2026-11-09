@@ -2,10 +2,9 @@
 import { computed, provide, ref, useTemplateRef, type Component } from 'vue'
 import type { AxiosProgressEvent } from 'axios'
 import type LogicFlow from '@logicflow/core'
-import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
-import type { Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
+import type { KnowledgeWorkflowApi, Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import DataSource from '@/views/workflow/knowledge/debug/action/DataSource.vue'
@@ -14,7 +13,7 @@ import Result from '@/views/workflow/knowledge/debug/action/Result.vue'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowImportDocumentDrawer' })
-const props = defineProps<{ api: typeof WorkflowApi; knowledgeId: string }>()
+const props = defineProps<{ api: KnowledgeWorkflowApi; knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
 /* 复用工作流 Action，上传适配保留进度、取消和上传中保护。 */

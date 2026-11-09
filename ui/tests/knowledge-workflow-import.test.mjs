@@ -5,6 +5,7 @@ import { compileFunction } from 'node:vm'
 import ts from 'typescript'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import * as Vue from 'vue'
+import lodash from 'lodash'
 
 function loadModule(path, resolveDependency) {
   const { outputText } = ts.transpileModule(readFileSync(new URL(`../src/${path}.ts`, import.meta.url), 'utf8'), {
@@ -137,4 +138,109 @@ test('系统共享知识库点击导入后打开表单，并通过共享接口�
   assert.equal(drawer.actionId.value, 'action-a')
   assert.equal(drawer.active.value, 'result')
   assert.deepEqual(emitted, [['refresh']])
+})
+
+function createDatasourceTree(scope, overrideLoader) {
+  const { context, route, requests } = createContext(scope)
+  const provided = new Map()
+  function setup(path, props) {
+    const { descriptor } = parse(readFileSync(new URL(`../src/${path}.vue`, import.meta.url), 'utf8'))
+    const script = compileScript(descriptor, { id: 'datasource-tree' })
+    const { outputText } = ts.transpileModule(script.content, {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+    })
+    const exports = {}
+    compileFunction(outputText, ['require', 'exports'])((id) => {
+      if (id === 'vue')
+        return {
+          ...Vue,
+          provide: (key, value) => provided.set(key, value),
+          inject: (key) => provided.get(key),
+          watch() {},
+          useModel: () => Vue.ref(false),
+          useAttrs: () => ({}),
+          useTemplateRef: () => Vue.ref(),
+        }
+      if (id === 'lodash') return lodash
+      if (id === 'element-plus') return { formItemContextKey: Symbol() }
+      if (id === '@/api/admin/core/request')
+        return {
+          post: async (url, payload) => {
+            requests.push({ method: 'POST', url, payload })
+            return []
+          },
+        }
+      if (id === '@/utils/resource-context') return { getWorkspaceId: () => route.params.workspaceId }
+      if (id === '@/api/admin/workspace/knowledge/workflow') return { default: context.resourceApi.workflow }
+      if (id === '@/workflow-canvas/types')
+        return {
+          WorkflowKind: { DataSource: 'data-source' },
+          WorkflowNodeType: { DataSourceLocalNode: 'data-source-local-node', DataSourceWebNode: 'data-source-web-node' },
+        }
+      if (id === '@/components/mk-dynamics-form' || id === '@/utils/icon' || id === '@/workflow-canvas/icons/utils') return {}
+      assert.fail(`Unexpected dependency: ${id}`)
+    }, exports)
+    return exports.default.setup(props, { expose() {}, emit() {} })
+  }
+  const workflow = { nodes: [{ id: 'source', type: 'tool-lib-node', properties: { kind: 'data-source', node_data: { tool_lib_id: 'tool-a' } } }] }
+  const datasource = setup('views/workflow/knowledge/debug/action/DataSource', {
+    api: context.resourceApi.workflow,
+    knowledgeId: 'knowledge-a',
+    workflow,
+  })
+  if (overrideLoader) provided.set('loadTreeData', overrideLoader)
+  if (overrideLoader === null) provided.delete('loadTreeData')
+  const tree = setup('components/mk-dynamics-form/items/tree/Tree', {
+    modelValue: [],
+    formField: { attrs: { lazy: true, fetch_list_function: 'get_file_list' } },
+    otherParams: { current_knowledge_id: 'knowledge-a', current_workspace_id: route.params.workspaceId },
+  })
+  return { datasource, tree, requests, route, provided }
+}
+
+for (const [scope, prefix] of [
+  ['workspace', '/workspace/workspace-a/knowledge'],
+  ['system-resource', '/system/resource/knowledge'],
+  ['system-shared', '/system/shared/knowledge'],
+]) {
+  test(`${scope} 数据源表单及目录树根、子节点使用相同接口范围`, async () => {
+    const { datasource, tree, requests } = createDatasourceTree(scope)
+    await datasource.handleSourceChange('source')
+    await tree.loadDocuments()
+    const folder = { token: 'folder-a', type: 'folder', name: 'Documents' }
+    await tree.loadDocuments(folder)
+    assert.equal(requests[0].url, `${prefix}/knowledge-a/datasource/tool/tool-a/form_list`)
+    assert.deepEqual(requests.slice(1), [
+      { method: 'POST', url: `${prefix}/knowledge-a/datasource/tool/tool-a/get_file_list`, payload: { current_node: undefined } },
+      { method: 'POST', url: `${prefix}/knowledge-a/datasource/tool/tool-a/get_file_list`, payload: { current_node: folder } },
+    ])
+    assert.equal(tree.pendingLoads.value, 0)
+  })
+}
+
+test('共享数据源加载失败释放 loading，保留错误且不回退工作空间接口', async () => {
+  const { datasource, tree, requests } = createDatasourceTree('system-shared', async () => {
+    throw new Error('Denied')
+  })
+  await datasource.handleSourceChange('source')
+  await assert.rejects(tree.loadDocuments(), /Denied/)
+  assert.equal(tree.pendingLoads.value, 0)
+  assert.equal(requests.length, 1)
+})
+
+test('切换到本地数据源后清除上一个工具上下文', async () => {
+  const { datasource, provided, requests } = createDatasourceTree('system-shared')
+  await datasource.handleSourceChange('source')
+  datasource.sourceNodeList.value.push({ id: 'local', type: 'data-source-local-node', properties: {} })
+  await datasource.handleSourceChange('local')
+  const count = requests.length
+  assert.deepEqual(await provided.get('loadTreeData')('get_file_list'), [])
+  assert.equal(requests.length, count)
+})
+
+test('未注入查询方法的目录树保持原工作空间请求协议', async () => {
+  const { datasource, tree, requests } = createDatasourceTree('workspace', null)
+  await datasource.handleSourceChange('source')
+  await tree.loadDocuments()
+  assert.equal(requests[1].url, '/workspace/workspace-a/knowledge/knowledge-a/datasource/tool/tool-a/get_file_list')
 })

@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { computed, ref, watch } from 'vue'
-import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import type { KnowledgeWorkflowAction, KnowledgeExecutionRecord } from '@/api/types'
+import type { KnowledgeWorkflowApi, KnowledgeWorkflowAction, KnowledgeExecutionRecord } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
 import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 const props = defineProps<{
-  api: typeof WorkflowApi
+  api: KnowledgeWorkflowApi
   knowledgeId: string
   record: KnowledgeExecutionRecord
   previousDisabled: boolean

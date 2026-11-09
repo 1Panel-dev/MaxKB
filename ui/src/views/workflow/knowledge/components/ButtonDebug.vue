@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { KnowledgeWorkflowApi } from '@/api/types'
 import { useTemplateRef } from 'vue'
 import type LogicFlow from '@logicflow/core'
-import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import DebugDrawer from '../debug/DebugDrawer.vue'
 import { showWorkflowValidateError } from '../../components/validate-error'
 
@@ -9,7 +9,7 @@ defineOptions({ name: 'ButtonKnowledgeDebug' })
 
 const props = defineProps<{
   label: string
-  api: typeof WorkflowApi
+  api: KnowledgeWorkflowApi
   knowledgeId: string
   disabled?: boolean
   hasUnsavedChanges: () => boolean
