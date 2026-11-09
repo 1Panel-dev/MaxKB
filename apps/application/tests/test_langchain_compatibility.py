@@ -16,6 +16,8 @@ from botocore.config import Config
 from botocore.exceptions import ClientError
 from django.test import SimpleTestCase
 from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.outputs import ChatGeneration, ChatResult
+from langchain_openai import ChatOpenAI
 from openai import RateLimitError
 
 from application.workflow.backend import sandbox_shell
@@ -61,6 +63,52 @@ def llm_node():
 
 
 class LangChainMessageCompatibilityTests(SimpleTestCase):
+    def test_empty_stream_falls_back_to_invoke(self):
+        model = openai_model(streaming=True)
+        expected = AIMessage(content="fallback")
+
+        def empty_stream(*args, **kwargs):
+            return
+            yield
+
+        with (
+            patch.object(ChatOpenAI, "_stream", new=empty_stream),
+            patch.object(
+                ChatOpenAI,
+                "_generate",
+                return_value=ChatResult(generations=[ChatGeneration(message=expected)]),
+            ) as generate,
+        ):
+            chunks = list(model.stream([HumanMessage(content="hello")]))
+
+        self.assertEqual("".join(chunk.content for chunk in chunks), "fallback")
+        generate.assert_called_once()
+
+    def test_empty_async_stream_falls_back_to_ainvoke(self):
+        model = openai_model(streaming=True)
+        expected = AIMessage(content="fallback")
+
+        async def empty_stream(*args, **kwargs):
+            return
+            yield
+
+        with (
+            patch.object(ChatOpenAI, "_astream", new=empty_stream),
+            patch.object(
+                ChatOpenAI,
+                "_agenerate",
+                new=AsyncMock(return_value=ChatResult(generations=[ChatGeneration(message=expected)])),
+            ) as agenerate,
+        ):
+            chunks = asyncio.run(self._collect_async_stream(model))
+
+        self.assertEqual("".join(chunk.content for chunk in chunks), "fallback")
+        agenerate.assert_awaited_once()
+
+    @staticmethod
+    async def _collect_async_stream(model):
+        return [chunk async for chunk in model.astream([HumanMessage(content="hello")])]
+
     async def test_complete_messages_preserve_text_tools_metadata_and_input(self):
         contents = [
             "你好",
