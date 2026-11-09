@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, ref, useTemplateRef } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, ref, useTemplateRef ,provide} from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type LogicFlow from '@logicflow/core'
@@ -18,7 +18,8 @@ import { clearDebugLog } from '../common'
 import { createAgent } from '../create-agent'
 import type { AgentEvent, AgentHandle } from '../type'
 import { createActivity } from './activity'
-
+import { VIEW_KEY,VIEW_TYPE } from '@/conversation-panel/view'
+provide(VIEW_KEY,VIEW_TYPE.DEBUG)
 defineOptions({ name: 'WorkflowAiGeneratePanel' })
 const props = withDefaults(
   defineProps<{
@@ -90,8 +91,13 @@ function scrollToBottom() {
   nextTick(() => scrollbarRef.value?.setScrollTop(Number.MAX_SAFE_INTEGER))
 }
 
+/** 会改动画布的顶层工具；本轮未调用时视为仅规划 / 答复（如等待用户确认方案），不提示生成完成 */
+const CANVAS_MUTATING_TOOLS = new Set(['add_node', 'add_edge', 'delete_node', 'delete_edge', 'configure_node', 'layout'])
+let canvasChanged = false
+
 /** 顶层 agent 的总结已作为正文流入活动，失败作为 FAILURE 项展示 */
 function onEvent(event: AgentEvent) {
+  if (event.type === 'tool_start' && !event.position.length && CANVAS_MUTATING_TOOLS.has(event.name)) canvasChanged = true
   activity.pushEvent(event)
   scrollToBottom()
 }
@@ -117,9 +123,11 @@ async function run(text: string) {
     )
   }
   status.value = 'running'
+  canvasChanged = false
   const result = await agent.run(text)
   if (result.status === 'done') {
     status.value = 'done'
+    if (!canvasChanged) return
     await layoutCanvas(lf)
     lf.fitView()
     MsgSuccess('工作流已生成，请检查后保存')

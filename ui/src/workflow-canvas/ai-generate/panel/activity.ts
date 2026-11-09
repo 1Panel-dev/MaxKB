@@ -31,7 +31,6 @@ const TOOL_LABELS: Record<string, string> = {
   configure_node: '配置节点',
   validate: '校验工作流',
   layout: '整理布局',
-  submit_plan: '提交规划',
   get_field_options: '查看可引用变量',
   get_models: '查询模型',
   get_knowledge_list: '查询知识库',
