@@ -149,6 +149,8 @@ class PortalSerializer(serializers.Serializer):
         file_fields = ["logo", "id", "create_time", "update_time"]
         for field, value in instance.items():
             if hasattr(portal, field) and field not in file_fields:
+                if field == "auth_config" and isinstance(value, dict):
+                    value = {**(portal.auth_config or {}), **value}
                 setattr(portal, field, value)
         for field_name in ["logo"]:
             if field_name in instance:
