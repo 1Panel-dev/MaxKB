@@ -333,6 +333,8 @@ def _knowledge_content_read_permissions(file):
         )
     if resource_type == DocumentResourceType.DOCUMENT:
         return (PermissionConstants.KNOWLEDGE_DOCUMENT_READ.value,)
+    if resource_type == DocumentResourceType.IMAGE:
+        return (PermissionConstants.KNOWLEDGE_IMAGE_READ.value,)
     return ()
 
 
