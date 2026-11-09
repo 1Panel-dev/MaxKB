@@ -62,6 +62,10 @@ const workspace = {
  */
   generate: (id: string) => canWorkspaceKnowledge(P.KNOWLEDGE_GENERATE, id),
 /**
+ * 工作空间「知识库」分词索引权限
+ */
+  token: (id: string) => canWorkspaceKnowledge(P.KNOWLEDGE_TOKEN, id),
+/**
  * 工作空间「知识库」导出权限
  */
   export: (id: string) => canWorkspaceKnowledge(P.KNOWLEDGE_EXPORT, id),

@@ -644,6 +644,16 @@ class PermissionConstants(Enum):
         ),
     )
 
+    KNOWLEDGE_TOKEN = (
+        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.TOKEN, bit_index=73),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
+            resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
+        ),
+    )
+
     KNOWLEDGE_BATCH_DELETE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.BATCH_DELETE, bit_index=8),
         PermissionMeta(
@@ -2512,6 +2522,21 @@ class PermissionConstants(Enum):
             sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
             operate=Operate.MCP_CONFIG,
             bit_index=63,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.SHARED,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    SHARED_KNOWLEDGE_TOKEN = (
+        Permission(
+            group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            sub_group=Group.SYSTEM_SHARED_KNOWLEDGE,
+            operate=Operate.TOKEN,
+            bit_index=65,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
@@ -4615,6 +4640,22 @@ class PermissionConstants(Enum):
             sub_group=Group.SYSTEM_KNOWLEDGE_SETTING,
             operate=Operate.EDIT,
             bit_index=64,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    # 资源管理 - 知识库分词索引
+    RESOURCE_KNOWLEDGE_TOKEN = (
+        Permission(
+            group=Group.SYSTEM_RES_KNOWLEDGE,
+            sub_group=Group.SYSTEM_RES_KNOWLEDGE,
+            operate=Operate.TOKEN,
+            bit_index=65,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],

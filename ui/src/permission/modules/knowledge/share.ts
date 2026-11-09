@@ -47,6 +47,10 @@ const share = {
  */
   generate: () => canSys(P.SHARED_KNOWLEDGE_GENERATE),
 /**
+ * 系统「共享知识库」分词索引权限
+ */
+  token: () => canSys(P.SHARED_KNOWLEDGE_TOKEN),
+/**
  * 系统「共享知识库」导出权限
  */
   export: () => canSys(P.SHARED_KNOWLEDGE_EXPORT),

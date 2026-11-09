@@ -136,6 +136,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                     label="分词索引"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
+                    v-if="perm.knowledge.share.token()"
                   />
                   <!-- MCP 服务配置 -->
                   <McpConfigKnowledgeAction

@@ -565,8 +565,8 @@ class KnowledgeView(APIView):
             tags=[_("Knowledge Base")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TOKEN.get_workspace_knowledge_permission(),
-            PermissionConstants.KNOWLEDGE_DOCUMENT_TOKEN.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.KNOWLEDGE_TOKEN.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_TOKEN.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
