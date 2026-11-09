@@ -60,6 +60,14 @@ export type LongTermSettingData = Pick<
 
 export type SelectedKnowledge = Partial<KnowledgeItem> & { id: string }
 
+/** 后端空对象表示未配置 MCP，非空对象转为编辑器使用的 JSON 文本。 */
+function normalizeMcpServers(value: unknown): string {
+  if (value == null) return ''
+  if (typeof value === 'string') return value
+  if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) return ''
+  return JSON.stringify(value, null, 2) ?? ''
+}
+
 export function createSettings(detail?: ApplicationDetail): ApplicationSettings {
   const defaults: ApplicationSettings = {
     name: '',
@@ -120,7 +128,7 @@ export function createSettings(detail?: ApplicationDetail): ApplicationSettings 
     desc: detail.desc ?? '',
     problem_optimization_prompt: detail.problem_optimization_prompt || DEFAULT_PROBLEM_OPTIMIZATION_PROMPT,
     mcp_source: detail.mcp_source === 'custom' ? 'custom' : 'referencing',
-    mcp_servers: detail.mcp_servers ?? '',
+    mcp_servers: normalizeMcpServers(detail.mcp_servers),
     mcp_output_enable: detail.mcp_output_enable ?? false,
     model_id: detail.model ?? detail.model_id ?? '',
     stt_model_id: detail.stt_model ?? detail.stt_model_id ?? '',
