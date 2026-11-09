@@ -706,7 +706,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).first()
                     if knowledge_workflow:
                         from application.flow.tools import get_tool_id_list
-                        from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
+                        from tools.models import ToolType, ToolWorkflow
 
                         from knowledge.serializers.knowledge_workflow import (
                             KBWFInstance,
@@ -717,7 +717,10 @@ class KnowledgeSerializer(serializers.Serializer):
                         tool_id_list = get_tool_id_list(knowledge_workflow.work_flow, True)
                         tool_list = []
                         if len(tool_id_list) > 0:
-                            tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
+                            from common.utils.workflow_reference import get_exportable_tools
+
+                            tool_list = get_exportable_tools(tool_id_list, self.data.get('workspace_id'),
+                                                             self.data.get('user_id'))
                         tw_dict = {
                             tw.tool_id: tw
                             for tw in QuerySet(ToolWorkflow).filter(

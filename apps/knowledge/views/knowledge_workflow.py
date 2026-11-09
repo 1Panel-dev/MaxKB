@@ -41,7 +41,8 @@ class KnowledgeDatasourceFormListView(APIView):
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str, type: str, id: str):
         r = KnowledgeWorkflowSerializer.Datasource(
-            data={"type": type, "id": id, "params": request.data, "function_name": "get_form_list"}
+            data={"type": type, "id": id, "params": request.data, "function_name": "get_form_list",
+                  "workspace_id": workspace_id, "knowledge_id": knowledge_id, "user_id": request.user.id}
         ).action()
 
         return result.success(r)
@@ -63,7 +64,8 @@ class KnowledgeDatasourceView(APIView):
     def post(self, request: Request, workspace_id: str, knowledge_id: str, type: str, id: str, function_name: str):
         return result.success(
             KnowledgeWorkflowSerializer.Datasource(
-                data={"type": type, "id": id, "params": request.data, "function_name": function_name}
+                data={"type": type, "id": id, "params": request.data, "function_name": function_name,
+                      "workspace_id": workspace_id, "knowledge_id": knowledge_id, "user_id": request.user.id}
             ).action()
         )
 

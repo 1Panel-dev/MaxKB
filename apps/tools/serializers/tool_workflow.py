@@ -27,7 +27,6 @@ from application.models import ChatRecord
 from application.serializers.application import (
     McpServersSerializer,
     get_mcp_tools,
-    validate_bound_tool_permissions,
     validate_workflow_default_models,
 )
 from application.serializers.common import ToolExecute
@@ -37,6 +36,7 @@ from common.field.common import UploadedFileField
 from common.result import result
 from common.utils.common import bytes_to_uploaded_file, generate_uuid, restricted_loads
 from common.utils.logger import maxkb_logger
+from common.utils.workflow_reference import validate_resource_references
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
 from django.db import transaction
@@ -295,7 +295,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
             if instance.get("work_flow"):
                 # 校验工作流中引用的工具(mcp-node 的 mcp_tool_id 等)当前用户是否有权使用,
                 # 防止低权限用户绑定他人工具并通过工作流执行绕过工具的单独授权控制
-                validate_bound_tool_permissions(self.data.get("user_id"), workflow_id, instance)
+                validate_resource_references(instance, workflow_id, self.data.get("user_id"))
                 dependency = is_valid_tool_workflow_circular_dependency(
                     workflow=instance.get("work_flow"), _id=str(tool.id)
                 )

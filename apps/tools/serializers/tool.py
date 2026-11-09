@@ -24,6 +24,7 @@ from common.result import result
 from common.utils.common import bytes_to_uploaded_file, common_convert_value, get_file_content
 from common.utils.logger import maxkb_logger
 from common.utils.file_reference import get_owned_upload
+from common.utils.workflow_reference import get_exportable_tools, validate_resource_references
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
@@ -453,6 +454,8 @@ class ToolSerializer(serializers.Serializer):
                 # 校验代码是否包括禁止的关键字
                 if instance.get("tool_type") == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get("code", ""))
+            if instance.get('tool_type') == ToolType.WORKFLOW:
+                validate_resource_references(instance, self.data['workspace_id'], self.data['user_id'])
 
             # 处理 work_flow_template
             if instance.get("work_flow_template") is not None:
@@ -791,7 +794,8 @@ class ToolSerializer(serializers.Serializer):
             ]
             tool_list = []
             if len(tool_id_list) > 0:
-                tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
+                tool_list = get_exportable_tools(tool_id_list, self.data.get('workspace_id'),
+                                                 self.data.get('user_id'))
                 work_flow_tools = [tool for tool in tool_list if tool.tool_type == ToolType.WORKFLOW]
                 if len(work_flow_tools) > 0:
                     work_flow_tool_dict = {
@@ -994,6 +998,12 @@ class ToolSerializer(serializers.Serializer):
                 tool.get("work_flow"),
                 update_tool_map,
             )
+            created_ids = {str(imported_tool['id']) for imported_tool in tool_list}
+            validate_resource_references({'work_flow': work_flow}, workspace_id, user_id, created_ids)
+            for imported_tool in tool_list:
+                if imported_tool.get('tool_type') == ToolType.WORKFLOW:
+                    child_flow = self.to_tool_workflow(imported_tool.get('work_flow'), update_tool_map)
+                    validate_resource_references({'work_flow': child_flow}, workspace_id, user_id, created_ids)
             defaults = {"tool_id": tool.get("id"), "workspace_id": workspace_id, "work_flow": work_flow}
             if tool.get("default_model_setting") is not None:
                 defaults["default_model_setting"] = tool.get("default_model_setting")
