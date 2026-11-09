@@ -195,7 +195,7 @@ onMounted(() => {
       <div class="flex-align-center">
         <MkSearchInput v-model="searchText" class="mr-3 w-60!" @change="handleSearchChange" />
         <!-- 导入标签，成功后刷新列表 -->
-        <ButtonImportTags :api="resourceApi.tags" :knowledge-id="knowledgeId" :disabled="loading || operationLoading" @refresh="loadTags" />
+        <ButtonImportTags v-if="knowledgeTagPermission('tagCreate')" :api="resourceApi.tags" :knowledge-id="knowledgeId" :disabled="loading || operationLoading" @refresh="loadTags" />
         <!-- 创建标签 -->
         <el-button v-if="knowledgeTagPermission('tagCreate')" type="primary" :disabled="loading || operationLoading" @click="handleOpenCreateTag">
           <MkIcon name="icon_add_outlined" />
