@@ -487,11 +487,12 @@ class DocumentSerializers(serializers.Serializer):
             target_knowledge = QuerySet(Knowledge).filter(id=target_knowledge_id).first()
             document_id_list = self.data.get("document_id_list")
             document_list = QuerySet(Document).filter(knowledge_id=knowledge_id, id__in=document_id_list)
-            if (
-                document_list.filter(resource_type=DocumentResourceType.IMAGE).exists()
-                and target_knowledge.type != KnowledgeType.BASE
-            ):
-                raise AppApiException(500, _("Image documents can only be migrated to a general knowledge base"))
+            if document_list.filter(
+                resource_type=DocumentResourceType.IMAGE
+            ).exists() and target_knowledge.type not in (KnowledgeType.BASE, KnowledgeType.WORKFLOW):
+                raise AppApiException(
+                    500, _("Image documents can only be migrated to a general or workflow knowledge base")
+                )
             paragraph_list = QuerySet(Paragraph).filter(knowledge_id=knowledge_id, document_id__in=document_id_list)
             detach_shared_paragraph_images(list(paragraph_list), target_knowledge_id)
 

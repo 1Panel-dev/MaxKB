@@ -148,7 +148,8 @@ tests, workflow retrieval and REST/MCP retrieval rechecks deletion state before 
 
 ## 图片文档接口
 
-通用知识库支持将图片预览导入为独立图片文档。工作空间接口的知识库路径前缀为
+通用知识库和工作流知识库支持将图片预览导入为独立图片文档，图片也可在这两类知识库之间迁移。
+手动导入的图片保持 `Document.type=BASE`，不参与工作流来源快照清理。工作空间接口的知识库路径前缀为
 `/workspace/<workspace_id>/knowledge/<knowledge_id>`，位于 Admin API 路径下
 （默认 `/admin/api`）。
 

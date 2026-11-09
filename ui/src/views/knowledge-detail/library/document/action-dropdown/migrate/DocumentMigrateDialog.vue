@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { KnowledgeItem } from '@/api/types'
+import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
+import type { DocumentResourceType, KnowledgeItem } from '@/api/types'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DocumentMigrateDialog' })
-const props = defineProps<{ api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']; knowledgeId: string }>()
+const props = defineProps<{
+  api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
+  knowledgeId: string
+  resourceType?: DocumentResourceType
+}>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 const { resourceApi } = useKnowledgeDetailContext()
 const visible = ref(false)
@@ -30,7 +35,11 @@ function open(documentIds: string[]) {
   resourceApi.knowledge
     .getAllKnowledge({ knowledge_id: props.knowledgeId })
     .then((knowledge) => {
-      knowledgeOptions.value = knowledge.filter(({ id }) => id !== props.knowledgeId)
+      knowledgeOptions.value = knowledge.filter(
+        ({ id, type }) =>
+          id !== props.knowledgeId &&
+          (props.resourceType !== DOCUMENT_RESOURCE_TYPE.IMAGE || type === KNOWLEDGE_TYPE.BASE || type === KNOWLEDGE_TYPE.WORKFLOW),
+      )
     })
     .catch(() => {
       // 请求层统一提示错误，保留当前输入。

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import type { DocumentResourceType } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import DocumentMigrateDialog from './DocumentMigrateDialog.vue'
 
@@ -8,6 +9,7 @@ const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
   documentIds: string[]
+  resourceType?: DocumentResourceType
   label: string
   icon?: string
   disabled?: boolean
@@ -39,6 +41,7 @@ function handleDialogClosed() {
     v-model:loading="loading"
     :api="api"
     :knowledge-id="knowledgeId"
+    :resource-type="resourceType"
     @refresh="emit('refresh')"
     @closed="handleDialogClosed"
   />

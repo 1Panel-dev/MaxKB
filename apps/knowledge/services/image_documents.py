@@ -1,4 +1,4 @@
-"""Standalone image resources for general knowledge bases."""
+"""Standalone image resources for general and workflow knowledge bases."""
 
 from functools import partial
 from pathlib import Path
@@ -66,8 +66,8 @@ class ImageDocumentService:
         knowledge = QuerySet(Knowledge).filter(id=self.knowledge_id, workspace_id=self.workspace_id).first()
         if knowledge is None:
             raise AppApiException(500, _("Knowledge id does not exist"))
-        if knowledge.type != KnowledgeType.BASE:
-            raise AppApiException(500, _("Image files are only supported by general knowledge bases"))
+        if knowledge.type not in (KnowledgeType.BASE, KnowledgeType.WORKFLOW):
+            raise AppApiException(500, _("Image files are only supported by general and workflow knowledge bases"))
         return knowledge
 
     @staticmethod

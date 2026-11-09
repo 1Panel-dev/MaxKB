@@ -517,6 +517,7 @@ onBeforeUnmount(() => {
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
                 :document-ids="[row.id]"
+                :resource-type="DOCUMENT_RESOURCE_TYPE.IMAGE"
                 :disabled="operationLoading"
                 @refresh="refreshAfterOperation"
               />
@@ -611,6 +612,7 @@ onBeforeUnmount(() => {
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               :document-ids="selectedDocumentIds"
+              :resource-type="DOCUMENT_RESOURCE_TYPE.IMAGE"
               :disabled="operationLoading"
               @refresh="refreshAfterOperation"
             />
