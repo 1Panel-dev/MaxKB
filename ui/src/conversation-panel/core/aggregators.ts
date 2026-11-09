@@ -102,7 +102,15 @@ const GROUP = (prev: Partial<ChatContent> = {}, chunk: Partial<ChatContent>) => 
     extra: chunk.extra ?? prev.extra,
   }
 }
-
+const HTML = (prev: Partial<ChatContent> = {}, chunk: Partial<ChatContent>) => {
+  return {
+    type: 'HTML',
+    id: chunk.id ?? prev.id,
+    content: (prev.content || '') + (chunk.content || ''),
+    workflowRunId: chunk.workflowRunId ?? prev.workflowRunId,
+    extra: chunk.extra ?? prev.extra,
+  }
+}
 export const aggregators = {
   TEXT,
   REASONING,
@@ -111,4 +119,5 @@ export const aggregators = {
   FORM,
   PROGRESS,
   GROUP,
+  HTML
 } as Record<string, ContentAggregator>
