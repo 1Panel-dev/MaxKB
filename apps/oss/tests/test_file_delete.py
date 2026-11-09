@@ -54,5 +54,5 @@ class FileDeleteTests(SimpleTestCase):
                 FileSerializer.Operate(data={"id": self.file_id}).delete(
                     mk_file_auth="file-token", user_id=self.user_id
                 )
-        authorize.assert_called_once_with(self.file, "file-token")
+        authorize.assert_called_once_with(self.file, "file-token", allow_content_read=False)
         self.file.delete.assert_not_called()

@@ -207,6 +207,7 @@ class KnowledgeUploadSizeLimitTests(SimpleTestCase):
             target_id=knowledge_query.filter.return_value.first.return_value.id,
             auth_target_type="KNOWLEDGE",
             read_permission=PermissionConstants.KNOWLEDGE_READ.value,
+            additional_read_permissions=(),
         )
 
         paragraph_query.filter.return_value.values_list.return_value.first.return_value = None

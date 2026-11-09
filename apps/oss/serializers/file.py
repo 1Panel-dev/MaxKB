@@ -28,7 +28,15 @@ from homepage.serializers.homepage import (
     is_extends_workspace_manage,
     is_workspace_manage,
 )
-from knowledge.models import Document, File, FileSourceType, Knowledge, Paragraph, PublicFileAccess
+from knowledge.models import (
+    Document,
+    DocumentResourceType,
+    File,
+    FileSourceType,
+    Knowledge,
+    Paragraph,
+    PublicFileAccess,
+)
 from knowledge.services import validate_knowledge_file_size
 from maxkb.const import CONFIG
 from rest_framework import serializers
@@ -211,7 +219,7 @@ def parse_file_token(mk_file_auth):
             _deny()
 
 
-def auth(file, mk_file_auth):
+def auth(file, mk_file_auth, *, allow_content_read=True):
     if CONFIG.get("FILE_AUTH", "1") != "1":
         return
     # 公共/临时文件无需鉴权
@@ -232,7 +240,7 @@ def auth(file, mk_file_auth):
     if user_type == AuthenticationType.CHAT_USER:
         _auth_chat(file, token)
     elif user_type == AuthenticationType.SYSTEM_USER:
-        _auth_system(file, token.id)
+        _auth_system(file, token.id, allow_content_read=allow_content_read)
     else:
         # 默认拒绝,避免枚举扩展后静默放行
         _deny()
@@ -314,7 +322,21 @@ def _check_knowledge_mapped_to_application(knowledge_id):
         _deny()
 
 
-def _auth_system(file, user_id):
+def _knowledge_content_read_permissions(file):
+    # 导入预览文件先归属于知识库，保存后按文档或分段归属判断。
+    resource_type = DocumentResourceType.DOCUMENT if file.source_type == FileSourceType.KNOWLEDGE else None
+    if file.source_type == FileSourceType.DOCUMENT:
+        resource_type = QuerySet(Document).filter(id=file.source_id).values_list("resource_type", flat=True).first()
+    elif file.source_type == FileSourceType.PARAGRAPH:
+        resource_type = (
+            QuerySet(Paragraph).filter(id=file.source_id).values_list("document__resource_type", flat=True).first()
+        )
+    if resource_type == DocumentResourceType.DOCUMENT:
+        return (PermissionConstants.KNOWLEDGE_DOCUMENT_READ.value,)
+    return ()
+
+
+def _auth_system(file, user_id, *, allow_content_read=True):
     user = QuerySet(User).filter(id=user_id).first()
     if not user:
         _deny()
@@ -363,24 +385,33 @@ def _auth_system(file, user_id):
             target_id=knowledge.id,
             auth_target_type="KNOWLEDGE",
             read_permission=PermissionConstants.KNOWLEDGE_READ.value,
+            additional_read_permissions=_knowledge_content_read_permissions(file) if allow_content_read else (),
         )
     else:
         _deny()
 
 
 def _check_workspace_resource_permission(
-    user_auth, user_id, *, workspace_id, target_id, auth_target_type, read_permission: Permission
+    user_auth,
+    user_id,
+    *,
+    workspace_id,
+    target_id,
+    auth_target_type,
+    read_permission: Permission,
+    additional_read_permissions=(),
 ):
     if is_workspace_manage(user_auth, workspace_id):
         return
-    if is_extends_workspace_manage(user_auth, workspace_id) and has_extends_workspace_manage_permission(
-        user_auth, read_permission, workspace_id
+    read_permissions = (read_permission, *additional_read_permissions)
+    if is_extends_workspace_manage(user_auth, workspace_id) and any(
+        has_extends_workspace_manage_permission(user_auth, permission, workspace_id) for permission in read_permissions
     ):
         return
 
     permission_list = (
         ["VIEW", "MANAGE", "ROLE"]
-        if has_user_permission(user_auth, read_permission, workspace_id)
+        if any(has_user_permission(user_auth, permission, workspace_id) for permission in read_permissions)
         else ["VIEW", "MANAGE"]
     )
     if (
@@ -521,7 +552,7 @@ class FileSerializer(serializers.Serializer):
                     if user_id is None or str((file.meta or {}).get("user_id")) != str(user_id):
                         _deny()
                 else:
-                    auth(file, mk_file_auth)
+                    auth(file, mk_file_auth, allow_content_read=False)
                 file.delete()
             return True
 
