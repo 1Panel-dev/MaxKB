@@ -17,12 +17,9 @@ from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.compare_constants import CompareConstants
-from common.auth.constants.group_constants import Group
-from common.auth.constants.operate_constants import Operate
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
 from common.auth.struct.aggregate_permission import ViewPermission
-from common.auth.struct.permission import Permission
 from common.log.log import log
 from system_manage.api.user_resource_permission import (
     UserResourcePermissionAPI,
@@ -58,11 +55,18 @@ class WorkSpaceUserResourcePermissionView(APIView):
         tags=[_("Resources authorization")],  # type: ignore
     )
     @has_permissions(
-        lambda r, kwargs: PermissionConstants[
-            kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"
-        ]._build_workspace_permission(),
         RoleConstants.ADMIN,
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        ViewPermission(
+            [RoleConstants.EXTENDS_ADMIN],
+            [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"]],
+            compare=CompareConstants.AND,
+        ),
+        ViewPermission(
+            [RoleConstants.EXTENDS_WORKSPACE_MANAGE.get_workspace_role()],
+            [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"]],
+            compare=CompareConstants.AND,
+        ),
     )
     def get(self, request: Request, workspace_id: str, user_id: str, resource: str):
         return result.success(
@@ -89,11 +93,18 @@ class WorkSpaceUserResourcePermissionView(APIView):
         get_operation_object=lambda r, k: get_user_operation_object(k.get("user_id")),
     )
     @has_permissions(
-        lambda r, kwargs: PermissionConstants[
-            kwargs.get("resource") + "_RESOURCE_PERMISSION_EDIT"
-        ]._build_workspace_permission(),
         RoleConstants.ADMIN,
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        ViewPermission(
+            [RoleConstants.EXTENDS_ADMIN],
+            [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_EDIT"]],
+            compare=CompareConstants.AND,
+        ),
+        ViewPermission(
+            [RoleConstants.EXTENDS_WORKSPACE_MANAGE.get_workspace_role()],
+            [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_EDIT"]],
+            compare=CompareConstants.AND,
+        ),
     )
     def put(self, request: Request, workspace_id: str, user_id: str, resource: str):
         return result.success(
@@ -116,11 +127,18 @@ class WorkSpaceUserResourcePermissionView(APIView):
             tags=[_("Resources authorization")],  # type: ignore
         )
         @has_permissions(
-            lambda r, kwargs: PermissionConstants[
-                kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"
-            ]._build_workspace_permission(),
             RoleConstants.ADMIN,
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission(
+                [RoleConstants.EXTENDS_ADMIN],
+                [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"]],
+                compare=CompareConstants.AND,
+            ),
+            ViewPermission(
+                [RoleConstants.EXTENDS_WORKSPACE_MANAGE.get_workspace_role()],
+                [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"]],
+                compare=CompareConstants.AND,
+            ),
         )
         def get(
             self, request: Request, workspace_id: str, user_id: str, resource: str, current_page: str, page_size: str
@@ -153,6 +171,16 @@ class WorkspaceResourceUserPermissionView(APIView):
         tags=[_("Resources authorization")],  # type: ignore
     )
     @has_permissions(
+        RoleConstants.ADMIN,
+        ViewPermission(
+            [RoleConstants.EXTENDS_ADMIN],
+            [
+                lambda r, kwargs: PermissionConstants[
+                    "RESOURCE_" + kwargs.get("resource").replace("_FOLDER", "") + "_AUTH"
+                ]
+            ],
+            compare=CompareConstants.AND,
+        ),
         lambda r, kwargs: PermissionConstants[
             kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
         ].get_workspace_permission_workspace_manage_role(),
@@ -204,6 +232,16 @@ class WorkspaceResourceUserPermissionView(APIView):
         get_operation_object=lambda r, k: get_user_operation_object(k.get("user_id")),
     )
     @has_permissions(
+        RoleConstants.ADMIN,
+        ViewPermission(
+            [RoleConstants.EXTENDS_ADMIN],
+            [
+                lambda r, kwargs: PermissionConstants[
+                    "RESOURCE_" + kwargs.get("resource").replace("_FOLDER", "") + "_AUTH"
+                ]
+            ],
+            compare=CompareConstants.AND,
+        ),
         lambda r, kwargs: PermissionConstants[
             kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
         ].get_workspace_permission_workspace_manage_role(),
@@ -245,6 +283,16 @@ class WorkspaceResourceUserPermissionView(APIView):
             tags=[_("Resources authorization")],  # type: ignore
         )
         @has_permissions(
+            RoleConstants.ADMIN,
+            ViewPermission(
+                [RoleConstants.EXTENDS_ADMIN],
+                [
+                    lambda r, kwargs: PermissionConstants[
+                        "RESOURCE_" + kwargs.get("resource").replace("_FOLDER", "") + "_AUTH"
+                    ]
+                ],
+                compare=CompareConstants.AND,
+            ),
             lambda r, kwargs: PermissionConstants[
                 kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
             ].get_workspace_permission_workspace_manage_role(),

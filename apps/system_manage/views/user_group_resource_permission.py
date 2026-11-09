@@ -57,9 +57,18 @@ class WorkSpaceUserGroupResourcePermissionView(APIView):
         tags=[_("Resources authorization")],  # type: ignore
     )
     @has_permissions(
-        lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"],
         RoleConstants.ADMIN,
-        RoleConstants.WORKSPACE_MANAGE,
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        ViewPermission(
+            [RoleConstants.EXTENDS_ADMIN],
+            [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"]],
+            compare=CompareConstants.AND,
+        ),
+        ViewPermission(
+            [RoleConstants.EXTENDS_WORKSPACE_MANAGE.get_workspace_role()],
+            [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"]],
+            compare=CompareConstants.AND,
+        ),
     )
     def get(self, request: Request, workspace_id: str, user_group_id: str, resource: str):
         return result.success(
@@ -86,11 +95,18 @@ class WorkSpaceUserGroupResourcePermissionView(APIView):
         get_operation_object=lambda r, k: get_user_operation_object(k.get("user_group_id")),
     )
     @has_permissions(
-        lambda r, kwargs: PermissionConstants[
-            kwargs.get("resource") + "_RESOURCE_PERMISSION_EDIT"
-        ]._build_workspace_permission(),
         RoleConstants.ADMIN,
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        ViewPermission(
+            [RoleConstants.EXTENDS_ADMIN],
+            [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_EDIT"]],
+            compare=CompareConstants.AND,
+        ),
+        ViewPermission(
+            [RoleConstants.EXTENDS_WORKSPACE_MANAGE.get_workspace_role()],
+            [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_EDIT"]],
+            compare=CompareConstants.AND,
+        ),
     )
     def put(self, request: Request, workspace_id: str, user_group_id: str, resource: str):
         return result.success(
@@ -113,11 +129,18 @@ class WorkSpaceUserGroupResourcePermissionView(APIView):
             tags=[_("Resources authorization")],  # type: ignore
         )
         @has_permissions(
-            lambda r, kwargs: PermissionConstants[
-                kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"
-            ]._build_workspace_permission(),
             RoleConstants.ADMIN,
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission(
+                [RoleConstants.EXTENDS_ADMIN],
+                [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"]],
+                compare=CompareConstants.AND,
+            ),
+            ViewPermission(
+                [RoleConstants.EXTENDS_WORKSPACE_MANAGE.get_workspace_role()],
+                [lambda r, kwargs: PermissionConstants[kwargs.get("resource") + "_RESOURCE_PERMISSION_READ"]],
+                compare=CompareConstants.AND,
+            ),
         )
         def get(
             self,
@@ -156,6 +179,16 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
         tags=[_("Resources authorization")],  # type: ignore
     )
     @has_permissions(
+        RoleConstants.ADMIN,
+        ViewPermission(
+            [RoleConstants.EXTENDS_ADMIN],
+            [
+                lambda r, kwargs: PermissionConstants[
+                    "RESOURCE_" + kwargs.get("resource").replace("_FOLDER", "") + "_AUTH"
+                ]
+            ],
+            compare=CompareConstants.AND,
+        ),
         lambda r, kwargs: PermissionConstants[
             kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
         ].get_workspace_permission_workspace_manage_role(),
@@ -202,6 +235,16 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
         get_operation_object=lambda r, k: get_user_operation_object(k.get("user_id")),
     )
     @has_permissions(
+        RoleConstants.ADMIN,
+        ViewPermission(
+            [RoleConstants.EXTENDS_ADMIN],
+            [
+                lambda r, kwargs: PermissionConstants[
+                    "RESOURCE_" + kwargs.get("resource").replace("_FOLDER", "") + "_AUTH"
+                ]
+            ],
+            compare=CompareConstants.AND,
+        ),
         lambda r, kwargs: PermissionConstants[
             kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
         ].get_workspace_permission_workspace_manage_role(),
@@ -243,6 +286,16 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
             tags=[_("Resources authorization")],  # type: ignore
         )
         @has_permissions(
+            RoleConstants.ADMIN,
+            ViewPermission(
+                [RoleConstants.EXTENDS_ADMIN],
+                [
+                    lambda r, kwargs: PermissionConstants[
+                        "RESOURCE_" + kwargs.get("resource").replace("_FOLDER", "") + "_AUTH"
+                    ]
+                ],
+                compare=CompareConstants.AND,
+            ),
             lambda r, kwargs: PermissionConstants[
                 kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
             ].get_workspace_permission_workspace_manage_role(),
