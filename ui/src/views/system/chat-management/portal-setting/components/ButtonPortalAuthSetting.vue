@@ -2,7 +2,8 @@
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
-import type { PortalAuthConfig, PortalSetting, PortalSettingPayload } from '@/api/types'
+import { LOGIN_METHOD_LABELS } from '@/constants'
+import type { LoginMethod, PortalAuthConfig, PortalSetting, PortalSettingPayload } from '@/api/types'
 
 const props = defineProps<{ disabled: boolean; setting: PortalSetting; saving: boolean; save: (payload: PortalSettingPayload) => Promise<void> }>()
 
@@ -115,7 +116,7 @@ defineExpose({ open })
       <el-form-item label="登录方式" prop="login_value">
         <el-checkbox-group v-model="authForm.login_value" @change="handleLoginMethodsChange" class="flex-wrap">
           <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption.value" :value="loginMethodOption.value" class="w-32">
-            {{ loginMethodOption.label }}
+            {{ LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] || loginMethodOption.label }}
           </el-checkbox>
         </el-checkbox-group>
       </el-form-item>
@@ -125,7 +126,7 @@ defineExpose({ open })
             v-for="loginMethodOption in defaultLoginMethodOptions"
             :key="loginMethodOption.value"
             :value="loginMethodOption.value"
-            :label="loginMethodOption.label"
+            :label="LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] || loginMethodOption.label"
           />
         </el-select>
       </el-form-item>

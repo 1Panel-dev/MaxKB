@@ -4,9 +4,10 @@ import { pick } from 'lodash'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import type { ListItem, LoginAuthSettingPayload, SystemUserGroup } from '@/api/types'
+import type { ListItem, LoginAuthSettingPayload, LoginMethod, SystemUserGroup } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 import { useStore } from '@/stores'
 import perm from '@/permission'
@@ -171,7 +172,7 @@ onActivated(() => {
     <el-form-item label="登录方式" prop="login_methods">
       <el-checkbox-group v-model="form.login_methods" @change="handleLoginMethodsChange" class="flex-wrap">
         <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption.value" :value="loginMethodOption.value" class="w-40">
-          {{ loginMethodOption.label }}
+          {{ LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] || loginMethodOption.label }}
         </el-checkbox>
       </el-checkbox-group>
     </el-form-item>
@@ -182,7 +183,7 @@ onActivated(() => {
           v-for="loginMethodOption in defaultLoginMethodOptions"
           :key="loginMethodOption.value"
           :value="loginMethodOption.value"
-          :label="loginMethodOption.label"
+          :label="LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] || loginMethodOption.label"
         />
       </el-select>
     </el-form-item>
