@@ -104,6 +104,10 @@ function handleResetAccessToken() {
   )
 }
 
+function handleAccessRestrictionUpdated(config: ApplicationAccessToken) {
+  accessTokenConfig.value = config
+}
+
 function handleChangeApiKeyAccess() {
   if (apiKeySaving.value) return false
   apiKeySaving.value = true
@@ -171,7 +175,11 @@ onMounted(() => {
             <!-- 嵌入第三方 -->
             <ButtonEmbedThirdParty v-if="applicationOverviewPermission('overviewEmbed')" :share-url="accessUrl" :access-token="accessToken" />
             <!-- 访问限制 -->
-            <ButtonAccessRestriction v-if="applicationOverviewPermission('overviewAccess')" :access-token-config="accessTokenConfig" />
+            <ButtonAccessRestriction
+              v-if="applicationOverviewPermission('overviewAccess')"
+              :access-token-config="accessTokenConfig"
+              @updated="handleAccessRestrictionUpdated"
+            />
             <!-- 显示设置 -->
             <ButtonDisplaySetting v-if="applicationOverviewPermission('overviewDisplay')" />
           </div>

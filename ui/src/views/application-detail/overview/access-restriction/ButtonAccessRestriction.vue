@@ -9,6 +9,8 @@ defineOptions({ name: 'ButtonAccessRestriction' })
 
 const drawerVisible = ref(false)
 
+const emit = defineEmits<{ updated: [config: ApplicationAccessToken] }>()
+
 function handleOpenAccessRestriction() {
   drawerVisible.value = true
 }
@@ -20,5 +22,10 @@ function handleOpenAccessRestriction() {
     <MkIcon name="icon-lock" />
     <span>访问限制</span>
   </el-button>
-  <AccessRestrictionDrawer v-if="drawerVisible" :initial-config="accessTokenConfig" @closed="drawerVisible = false" />
+  <AccessRestrictionDrawer
+    v-if="drawerVisible"
+    :initial-config="accessTokenConfig"
+    @closed="drawerVisible = false"
+    @updated="(config) => emit('updated', config)"
+  />
 </template>
