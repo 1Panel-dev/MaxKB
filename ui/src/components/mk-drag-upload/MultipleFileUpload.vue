@@ -46,6 +46,7 @@ const uploadRef = useTemplateRef<UploadInstance>('uploadRef')
 const folderInputRef = useTemplateRef<HTMLInputElement>('folderInputRef')
 
 const uploadRequests = new Map<number, () => void>()
+const removingFiles = new Set<DragUploadFile>()
 
 /* 图片缩略图只保留当前文件的本地 URL，移除或卸载时释放。 */
 const imagePreviewUrls = ref(new Map<File, string>())
@@ -173,12 +174,19 @@ function clearFiles() {
   uploadRef.value?.clearFiles()
 }
 
-function handleRemove(file: DragUploadFile) {
+async function handleRemove(file: DragUploadFile) {
+  if (props.disabled || removingFiles.has(file)) return
   cancelUpload(file)
   if (file.status === 'success' && file.file_id) {
-    void FileApi.deleteFile(file.file_id).catch(() => {
-      // 请求层统一提示删除失败，临时文件仍按有效期清理。
-    })
+    removingFiles.add(file)
+    try {
+      await FileApi.deleteFile(file.file_id)
+    } catch {
+      // 请求层统一提示失败，保留文件供用户重试。
+      return
+    } finally {
+      removingFiles.delete(file)
+    }
   }
   // 同步清理 ElUpload 的内部列表，避免后续 change 回写已移除的重复文件。
   if (file.uid !== undefined) {

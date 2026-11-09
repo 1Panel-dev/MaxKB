@@ -507,12 +507,21 @@ class FileSerializer(serializers.Serializer):
                 response["Content-Disposition"] = f"inline; filename={encoded_filename}"
                 return response
 
-        def delete(self, mk_file_auth=None):
+        def delete(self, mk_file_auth=None, user_id=None):
             self.is_valid(raise_exception=True)
             file_id = self.data.get("id")
             file = QuerySet(File).filter(id=file_id).first()
             if file is not None:
-                auth(file, mk_file_auth)
+                if file.source_type in (
+                    FileSourceType.TEMPORARY_120_MINUTE,
+                    FileSourceType.TEMPORARY_30_MINUTE,
+                    FileSourceType.TEMPORARY_1_DAY,
+                ):
+                    # 上传取消使用已认证用户，公开预览权限不等于删除权限。
+                    if user_id is None or str((file.meta or {}).get("user_id")) != str(user_id):
+                        _deny()
+                else:
+                    auth(file, mk_file_auth)
                 file.delete()
             return True
 

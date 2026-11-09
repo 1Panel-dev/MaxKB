@@ -7,7 +7,7 @@ from rest_framework.views import APIView, Request
 
 from application.models import Application
 from common.auth import TokenAuth, AllTokenAuth
-from common.auth.authentication import has_permissions, get_is_permissions
+from common.auth.authentication import get_is_permissions
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
@@ -89,14 +89,6 @@ class FileView(APIView):
             tags=[_("File")],  # type: ignore
         )
         @log(menu="file", operate="Delete file")
-        @has_permissions(
-            RoleConstants.ADMIN,
-            RoleConstants.WORKSPACE_MANAGE,
-            RoleConstants.USER,
-            RoleConstants.EXTENDS_WORKSPACE_MANAGE,
-            RoleConstants.EXTENDS_USER,
-            RoleConstants.EXTENDS_ADMIN,
-        )
         def delete(self, request: Request, file_id: str):
             return result.success(
                 FileSerializer.Operate(
@@ -104,7 +96,7 @@ class FileView(APIView):
                         "id": file_id,
                         "http_range": request.headers.get("Range", ""),
                     }
-                ).delete(mk_file_auth=request.COOKIES.get("mk_file_auth"))
+                ).delete(mk_file_auth=request.COOKIES.get("mk_file_auth"), user_id=str(request.user.id))
             )
 
 

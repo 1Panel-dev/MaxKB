@@ -573,6 +573,7 @@ Logo 数据统一从 Theme Store 获取。
   change 后等待调用方回写和校验，再上传 ready 文件；响应成功才标记 success 并提取 file_id，100% 仅表示传输完成。
 - 未注入请求时只选择文件，重试发出 retry(file)。删除／清空／卸载取消上传；移除有 file_id 的成功文件会调用
   Admin FileApi.deleteFile 删除服务端文件，remove 事件通知业务清理。
+  已上传文件仅在服务端删除成功后从列表移除；失败保留文件，重复点击不重复提交。
 - 暴露 clearFiles()、handleRemove(file)、响应式 uploadingCount；公开选择状态 ready／uploading／success／fail。
   页面提供具体上传请求与业务校验，不通过展示插槽控制数量限制。
 
