@@ -5,6 +5,7 @@ from typing import Dict, Optional, Any, Iterator, cast, Union, Sequence, Callabl
 
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.messages import (
+    AIMessage,
     BaseMessage,
     get_buffer_string,
     BaseMessageChunk,
@@ -130,16 +131,24 @@ class BaseChatOpenAI(ChatOpenAI):
         )
 
     def _stream(self, *args: Any, **kwargs: Any) -> Iterator[ChatGenerationChunk]:
+        chunk = None
         for chunk in super()._stream(*args, **kwargs):
             if chunk.message.usage_metadata is not None:
                 self.usage_metadata = chunk.message.usage_metadata
             yield chunk
+        if chunk is None:
+            message = cast(AIMessage, self.invoke(*args, **{**kwargs, "stream": False}))
+            yield ChatGenerationChunk(message=AIMessageChunk(**message.model_dump(exclude={"type"})))
 
     async def _astream(self, *args: Any, **kwargs: Any) -> AsyncIterator[ChatGenerationChunk]:
+        chunk = None
         async for chunk in super()._astream(*args, **kwargs):
             if chunk.message.usage_metadata is not None:
                 self.usage_metadata = chunk.message.usage_metadata
             yield chunk
+        if chunk is None:
+            message = cast(AIMessage, await self.ainvoke(*args, **{**kwargs, "stream": False}))
+            yield ChatGenerationChunk(message=AIMessageChunk(**message.model_dump(exclude={"type"})))
 
     def _convert_chunk_to_generation_chunk(
         self,
