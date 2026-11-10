@@ -121,7 +121,7 @@ onMounted(() => {
                   :model="model"
                 />
                 <!-- 授权工作空间 -->
-                <AuthorizedWorkspaceAction label="授权工作空间" :resource="model" :resource-type="RESOURCE_TYPE.MODEL" />
+                <AuthorizedWorkspaceAction v-if="perm.model.share.authToWorkspace()" label="授权工作空间" :resource="model" :resource-type="RESOURCE_TYPE.MODEL" />
 
                 <!-- 查看关联资源 -->
                 <RelatedResourcesModelAction v-if="perm.model.share.relateMap()" label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
