@@ -264,7 +264,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout ref="layoutRef" title="" :loading="loading" collapsible class="[&_aside+button]:top-4!">
+  <MkViewLayout ref="layoutRef" title="" :loading="loading" collapsible resizable class="[&_aside~button]:top-4!">
     <template #top>
       <div class="flex-between gap-4" :inert="loading">
         <div class="flex-align-center min-w-0 gap-2">
