@@ -346,7 +346,7 @@ class DebugHistoricalConversation(APIView):
                     "chat_user_id": str(request.user.id),
                 }
             )
-            return result.success(serializer.page(current_page, page_size))
+            return result.success(serializer.debug_page(current_page, page_size))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

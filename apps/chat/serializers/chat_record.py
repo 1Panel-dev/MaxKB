@@ -214,6 +214,15 @@ class HistoricalConversationRecordSerializer(serializers.Serializer):
         queryset = self.get_queryset()
         return [ChatRecordSerializerModel(r).data for r in queryset]
 
+    def debug_page(self, current_page, page_size):
+        self.is_valid(raise_exception=True)
+        application_access_token = (
+            QuerySet(ApplicationAccessToken).filter(application_id=self.data.get("application_id")).first()
+        )
+        return ApplicationChatRecordQuerySerializers(
+            data={"application_id": self.data.get("application_id"), "chat_id": self.data.get("chat_id")}
+        ).page(current_page, page_size, show_source=True, show_exec=True)
+
     def page(self, current_page, page_size):
         self.is_valid(raise_exception=True)
         application_access_token = (
