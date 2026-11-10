@@ -47,7 +47,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
     <template #prepend>
       <!-- 开场白在空会话或历史全部加载后显示，固定在会话最前 -->
       <div v-if="!isShared && prologue && (!messages.length || !hasMore)">
-        <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
+        <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0 mb-3" />
         <PrologueContent :prologue="prologue" :app-info="appInfo" class="mb-3" />
       </div>
     </template>
@@ -55,7 +55,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
       <ShareMessageRow :active="isShared" :record-id="shareLink?.messageRecordIds.value[i]">
         <!-- 用户提问靠右：头像独占一行在上，提问容器在下方靠右收缩 -->
         <div v-if="msg.role === 'USER'">
-          <div v-if="showUserAvatar" class="text-right">
+          <div v-if="showUserAvatar" class="text-right mb-2">
             <el-avatar v-if="userAvatar" class="bg-transparent!" shape="square" :size="24">
               <img :src="userAvatar" alt="" />
             </el-avatar>
@@ -66,12 +66,13 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
           <ContentList :content-list="msg.content" />
         </div>
         <template v-else>
-          <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
+          <!-- 智能体头像 -->
+          <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0 mb-3" />
           <ContentList :content-list="msg.content" />
           <!-- 助手消息结束后显示底部信息栏(知识来源/执行详情/tokens/耗时) -->
           <MessageFooter
             class="mt-3"
-            v-if="(!isShared && msg.role === 'ASSISTANT' && (msg.write_ed || msg.record))&&!streamLoading"
+            v-if="!isShared && msg.role === 'ASSISTANT' && (msg.write_ed || msg.record) && !streamLoading"
             :message="msg"
             @resize="scrollRef?.followBottom()"
           />

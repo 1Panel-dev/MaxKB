@@ -76,7 +76,6 @@
 /* Markdown 预览 */
 .mk-markdown-editor {
   .md-editor-preview {
-    font-size: inherit;
     margin: 0;
     padding: 0;
     word-break: break-word;
@@ -98,7 +97,7 @@
     p {
       padding: 0 !important;
       margin: 0 !important;
-      line-height: var(--mk-line-height-base) !important;
+      line-height: 24px;
     }
 
     sup[data-title] {

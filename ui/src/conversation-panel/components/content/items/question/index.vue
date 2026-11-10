@@ -132,7 +132,7 @@ function getAttachmentDescription(file: QuestionAttachment) {
       </template>
     </div>
     <QuestionEditor v-if="editing" :content="content.content ?? ''" :disabled="!canEdit" @cancel="editing = false" @send="sendEditedQuestion" />
-    <div v-else-if="content.content" class="mk-gray-card-lg ml-auto w-fit max-w-full py-3! whitespace-pre-wrap wrap-anywhere">
+    <div v-else-if="content.content" class="mk-gray-card-lg text-[16px] ml-auto w-fit max-w-full py-3! whitespace-pre-wrap wrap-anywhere">
       {{ content.content }}
     </div>
     <div

@@ -24,7 +24,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
     <template v-for="(msg, i) in messages" :key="msg.id || i">
       <!-- 用户提问靠右：头像独占一行在上，提问容器在下方靠右收缩 -->
       <div v-if="msg.role === 'USER'">
-        <div v-if="showUserAvatar" class="text-right">
+        <div v-if="showUserAvatar" class="text-right mb-3">
           <el-avatar v-if="userAvatar" class="bg-transparent!" shape="square" :size="24">
             <img :src="userAvatar" alt="" />
           </el-avatar>
@@ -35,7 +35,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
         <ContentList :content-list="msg.content" />
       </div>
       <div v-else>
-        <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0" />
+        <ApplicationIcon v-if="showAvatar" :icon="avatar" :size="24" class="shrink-0 mb-1" />
         <ContentList :content-list="msg.content" />
         <!-- 助手消息底部信息栏(知识来源/执行详情/tokens/耗时) -->
         <LogMessageFooter

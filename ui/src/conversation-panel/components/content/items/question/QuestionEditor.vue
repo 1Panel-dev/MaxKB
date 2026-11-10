@@ -28,9 +28,9 @@ function sendQuestion() {
       resize="none"
       class="question-editor-input"
     />
-    <div class="flex justify-end gap-3">
+    <div class="flex justify-end">
       <!-- 取消编辑 -->
-      <el-button class="min-w-20" @click="emit('cancel')">取消</el-button>
+      <el-button plain class="min-w-20" @click="emit('cancel')">取消</el-button>
       <!-- 发送编辑后的提问 -->
       <el-button type="primary" class="min-w-20" :disabled="disabled || !questionDraft.trim()" @click="sendQuestion">发送</el-button>
     </div>
