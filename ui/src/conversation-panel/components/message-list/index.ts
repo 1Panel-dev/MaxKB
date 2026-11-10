@@ -169,7 +169,9 @@ export function createMessageListStore(deps: MessageListDeps) {
     }
     const target = opts.newQuestion
       ? messages.value[messages.value.length - 1]
-      : messages.value.find((message) => message.id === `${opts.chatRecordId}_ASSISTANT`) || messages.value[messages.value.length - 1]
+      : messages.value.find(
+          (message) => (!!opts.chatRecordId && message.recordId === opts.chatRecordId) || message.id === `${opts.chatRecordId}_ASSISTANT`,
+        ) || messages.value[messages.value.length - 1]
     if (!target) return
 
     const payload: Dict<unknown> = { message: opts.message, stream: true, re_chat: opts.reChat ?? false }
@@ -178,10 +180,17 @@ export function createMessageListStore(deps: MessageListDeps) {
     if (opts.chatRecordId) payload.chat_record_id = opts.chatRecordId
     if (opts.chunkId) payload.chunk_id = opts.chunkId
 
+    let replacementStarted = false
     runStream(
       () => chatMessage(cid, payload),
       (chunk) => {
         if (chunk?.chat_record_id && !target.recordId) target.recordId = chunk.chat_record_id
+        if (opts.reChat && !replacementStarted) {
+          target.content = []
+          target.record = undefined
+          target.write_ed = false
+          replacementStarted = true
+        }
         appendChunk(target, chunk)
         opts.onNext?.(chunk)
       },
@@ -191,6 +200,15 @@ export function createMessageListStore(deps: MessageListDeps) {
         opts.onComplete?.(e)
       },
     )
+  }
+
+  // 原回答保留到重新生成收到首个分片，避免请求失败时丢失已展示内容。
+  const regenerate = (message: ChatMessage) => {
+    if (streamLoading.value || loading.value || !message.recordId) return
+    const index = messages.value.indexOf(message)
+    const question = messages.value[index - 1]
+    if (index < 1 || question?.role !== 'USER' || !question.content[0]) return
+    sendMessage({ message: question.content[0], newQuestion: false, reChat: true, chatRecordId: message.recordId })
   }
 
   // 优雅停止:仅通知后端取消,本地流继续读到 [DONE] 自行结束
@@ -245,6 +263,7 @@ export function createMessageListStore(deps: MessageListDeps) {
     load,
     loadMore,
     sendMessage,
+    regenerate,
     uploadFile,
     onStreamProgress,
     stop,
