@@ -351,32 +351,42 @@ class ChatSerializers(serializers.Serializer):
                     chat_record_id_str,
                     FailureContent(str(uuid_utils.uuid7()), str(error), Status.SUCCESS, None, None).to_dict(),
                 )
-            messages = aggregation.get_contents()
-            old_details = None
-            chat_record = None
-            if chat_record_id is not None:
-                chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
-                if chat_record:
-                    old_details = chat_record.details
-                    if position and chat_record.messages:
-                        messages = list({m.get("id"): m for m in [*chat_record.messages, *messages]}.values())
-            details = wf_manage.get_details(position=position, old_details=old_details)
-            run_time = time.time() - wf_manage.start_time
-            self.update_chat_record(chat_user_id, chat_record_id_str, wf_manage.context, messages, details, run_time)
-            self.update_chat_variable(chat_id, chat_variable, wf_manage.context.get("chat"))
-            ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
-            # 表单续跑时 message_dict.content 为空;保留原记录里的用户问题,避免 WORKFLOW 历史丢问题
-            question = chat_record.question if (chat_record and chat_record.question) else message_dict
-            ChatHistory(chat_id).append(
-                ChatRecord(
-                    id=chat_record_id_str,
-                    chat_id=chat_id,
-                    question=question,
-                    messages=messages,
-                    details=details,
-                    create_time=timezone.now(),
+            try:
+                messages = aggregation.get_contents()
+                old_details = None
+                chat_record = None
+                if chat_record_id is not None:
+                    chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
+                    if chat_record:
+                        old_details = chat_record.details
+                        if position and chat_record.messages:
+                            messages = list({m.get("id"): m for m in [*chat_record.messages, *messages]}.values())
+                details = wf_manage.get_details(position=position, old_details=old_details)
+                run_time = time.time() - wf_manage.start_time
+                self.update_chat_record(
+                    chat_user_id, chat_record_id_str, wf_manage.context, messages, details, run_time
                 )
-            )
+                self.update_chat_variable(chat_id, chat_variable, wf_manage.context.get("chat"))
+                ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
+                # 表单续跑时 message_dict.content 为空;保留原记录里的用户问题,避免 WORKFLOW 历史丢问题
+                question = chat_record.question if (chat_record and chat_record.question) else message_dict
+                ChatHistory(chat_id).append(
+                    ChatRecord(
+                        id=chat_record_id_str,
+                        chat_id=chat_id,
+                        question=question,
+                        messages=messages,
+                        details=details,
+                        create_time=timezone.now(),
+                    )
+                )
+            except Exception as e:
+                if not error:
+                    result_queue.put(("error", e))
+                    message_queue.produce(
+                        chat_record_id_str,
+                        FailureContent(str(uuid_utils.uuid7()), str(e), Status.SUCCESS, None, None).to_dict(),
+                    )
             result_queue.put(("done", None))
             message_queue.produce_done(chat_record_id_str)
 
@@ -454,6 +464,7 @@ class ChatSerializers(serializers.Serializer):
         self.is_valid_chat()
         application = self.get_application()
         self.is_valid_intraday_access_num()
+        ChatUserTokenQuota.check_available(self.data.get("chat_user_id"))
         return self.chat_work_flow(application, instance, base_to_response)
 
 
