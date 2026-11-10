@@ -975,7 +975,9 @@ Workspace API 内部使用 `getWorkspaceId()`，System 共享 API 不接收工�
 正式对话的 `message-list` 根据会话 Store 的 `isShared` 展示分享选择态，同轮提问与回答同步选择，
 内容只读且选中时显示背景；无记录 ID 的问答不可选。列表底部提供当前已加载轮次的全选、已选数量、
 取消及创建链接，创建时按消息顺序提交记录 ID；成功退出分享，失败保留选择。分享期间主面板隐藏输入框，
-消息列表卸载时退出分享态。分享入口仅在 `SHAREABLE_VIEWS`（Chat、Portal）显示，调试、日志等视图不提供分享服务。
+消息列表卸载时退出分享态。分享入口按 `view/index.ts` 的 `useShowShare()` 显示：Chat、Portal 视图按智能体的
+`show_share` provide `SHOW_SHARE_KEY`（门户还要求已选定智能体），调试、日志等视图不提供，即不显示。
+门户侧栏与历史对话抽屉的分享入口跨多个智能体，暂不受 `show_share` 控制。
 分享选择放在 `message-list/share/`：`index.ts` 的 `createShareLinkStore({ messages, share, setShared })` 维护
 每条消息的记录 ID、已选记录、数量与全选状态、单条切换、全选、进入（`enterShare`）、提交（`copyShareLink`）
 及退出（`exitShare`）；提交成功后退出，失败保留选择。分享模式开关仍由会话 Store 的 `isShared` 维护，

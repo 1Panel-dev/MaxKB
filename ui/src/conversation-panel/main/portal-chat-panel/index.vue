@@ -27,7 +27,7 @@ const disclaimerText = computed(() =>
   <!-- 门户对话主面板:header + message-list + message-input -->
   <main class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 收起侧栏时标题栏的新建对话与侧栏一致：没有当前智能体时选择智能体 -->
-    <PortalHeader :new-conversation="portalList.newConversation" shareable @share="shareLink?.enterShare()" />
+    <PortalHeader :new-conversation="portalList.newConversation" @share="shareLink?.enterShare()" />
     <MessageList :key="list.currentChatId.value" v-if="portalList.currentApplicationId.value" :app-name="list.appInfo.value?.name || 'AI 助手'" />
     <!-- 未确定智能体时不显示欢迎语：分组加载完成且没有可用智能体时显示空状态 -->
     <div v-else class="flex-center min-h-0 flex-1">

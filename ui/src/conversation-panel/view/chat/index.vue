@@ -13,7 +13,7 @@ import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
 import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
 import { SHARE_LINK_KEY } from '../../components/message-list/share/index'
 import { createChatConversation, createChatUserProfileGetter } from './index'
-import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, createDeviceType } from '../index.ts'
+import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, SHOW_SHARE_KEY, createDeviceType } from '../index.ts'
 
 const bundle = createChatConversation()
 
@@ -38,6 +38,11 @@ provide(MESSAGE_INPUT_KEY, bundle.input)
 provide(EXECUTION_DETAIL_KEY, bundle.detail)
 provide(SHARE_LINK_KEY, bundle.share)
 provide(VIEW_KEY, VIEW_TYPE.CHAT)
+// 智能体开启「允许分享对话记录」时显示标题栏、会话菜单、提问与回答上的分享入口
+provide(
+  SHOW_SHARE_KEY,
+  computed(() => Boolean(bundle.list.appInfo.value?.show_share)),
+)
 // HTML 内容 iframe 内 chatUserProfile() 取当前对话用户
 provide(CHAT_USER_PROFILE_KEY, createChatUserProfileGetter())
 
@@ -83,7 +88,7 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
     @mask-click="closeDrawers"
   >
     <template #left><ConversationList /></template>
-    <template #main><ChatPanel shareable /></template>
+    <template #main><ChatPanel /></template>
     <template #right><ExecutionDetail /></template>
   </ConversationLayout>
 </template>

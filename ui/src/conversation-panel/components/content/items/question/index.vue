@@ -13,13 +13,13 @@ import { copyText } from '@/utils/clipboard'
 
 import { MESSAGE_LIST_KEY } from '../../../message-list/index'
 import { CONVERSATION_LIST_KEY } from '../../../../left-sidebar/conversation-list/index'
-import { useViewType } from '../../../../view/index'
-import { SHAREABLE_VIEWS, useShareLinkStoreOptional, useShareRecordId } from '../../../message-list/share/index'
+import { useShowShare } from '../../../../view/index'
+import { useShareLinkStoreOptional, useShareRecordId } from '../../../message-list/share/index'
 
 defineOptions({ name: 'ConversationQuestionContent' })
 
-// 仅提供分享服务的视图（对话、门户）显示分享入口；进入分享时预先勾选所属轮次。
-const showShare = SHAREABLE_VIEWS.includes(useViewType())
+// 智能体允许分享时显示分享入口；进入分享时预先勾选所属轮次。
+const showShare = useShowShare()
 const shareLink = useShareLinkStoreOptional()
 const shareRecordId = useShareRecordId()
 

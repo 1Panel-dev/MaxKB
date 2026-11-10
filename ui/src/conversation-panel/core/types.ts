@@ -1,4 +1,3 @@
-import type { CHAT_TYPE } from './enums'
 import type { ChatFeedback, ChatApplicationProfile, ChatContent, ChatLogRecord, ChatUserProfile, Dict } from '@/api/types'
 
 /**
@@ -52,8 +51,6 @@ interface StreamContentBatch {
 
 /** SSE 支持批量内容分片，也支持直接发送单个内容项。 */
 export type StreamChunk = StreamContentBatch | ChatContent
-
-export type ChatType = (typeof CHAT_TYPE)[keyof typeof CHAT_TYPE]
 
 // 通用「发起/续跑一次对话」的参数。message-input、表单节点等任何能发起对话的地方共用。
 export interface SendMessageOptions {
