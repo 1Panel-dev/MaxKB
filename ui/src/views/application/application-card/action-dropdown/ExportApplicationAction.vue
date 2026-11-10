@@ -18,8 +18,10 @@ const isSystem = computed(() => !('putMoveApplication' in props.api))
 const canExportApplication = computed(() =>
   isSystem.value ? perm.application.system.export() : perm.application.workspace.export(props.application.id),
 )
-const canExportSkills = computed(() =>
-  isSystem.value ? perm.application.system.exportSkills() : perm.application.workspace.exportSkills(props.application.id),
+const canExportSkills = computed(
+  () =>
+    props.application.is_publish &&
+    (isSystem.value ? perm.application.system.exportSkills() : perm.application.workspace.exportSkills(props.application.id)),
 )
 
 // 二级菜单留在所属一级浮层内，避免焦点移入时关闭一级菜单，并避开滚动容器裁剪。
@@ -86,7 +88,7 @@ function handleExportApplication() {
 </script>
 
 <template>
-  <MkDropdownItem @click.prevent.stop class="p-0!">
+  <MkDropdownItem v-if="canExportApplication || canExportSkills" @click.prevent.stop class="p-0!">
     <MkDropdown class="w-full" trigger="hover" placement="right-start" :append-to="exportMenuContainer">
       <!-- 展开智能体导出菜单 -->
       <div ref="exportTriggerRef" class="flex-between w-full gap-2 p-2">
