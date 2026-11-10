@@ -146,18 +146,22 @@ class PortalSerializer(serializers.Serializer):
         portal = Portal.objects.first()
         if portal is None:
             raise AppApiException(500, _("Portal configuration does not exist"))
-        file_fields = ["logo", "id", "create_time", "update_time"]
+        license_valid = self._is_license_valid()
+        file_fields = {"logo", "id", "create_time", "update_time"}
         for field, value in instance.items():
-            if hasattr(portal, field) and field not in file_fields:
-                if field == "auth_config" and isinstance(value, dict):
-                    value = {**(portal.auth_config or {}), **value}
-                setattr(portal, field, value)
+            if not hasattr(portal, field) or field in file_fields:
+                continue
+            # auth_config 仅在授权有效时允许保存
+            if field == "auth_config":
+                if not license_valid or not isinstance(value, dict):
+                    continue
+                value = {**(portal.auth_config or {}), **value}
+            setattr(portal, field, value)
         # Logo 为授权功能，授权无效时忽略 Logo 上传/修改
-        for field_name in ["logo"]:
-            if field_name in instance and self._is_license_valid():
-                self._handle_file_field(portal, field_name, instance.get(field_name))
+        if "logo" in instance and license_valid:
+            self._handle_file_field(portal, "logo", instance.get("logo"))
         portal.save()
-        return PortalSerializer.Model(portal).data
+        return self.one()
 
 
 class PortalLoginSerializer(serializers.Serializer):
