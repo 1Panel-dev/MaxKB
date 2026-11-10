@@ -107,8 +107,8 @@ const router = useRouter()
 const editToolFormRef = useTemplateRef<InstanceType<typeof EditToolForm>>('editToolFormRef')
 
 function handleOpenEditTool(tool: ToolItem) {
-  if (!perm.tool.workspace.edit(tool.id)) return
-  return editToolFormRef.value?.open(tool)
+  if (!perm.tool.workspace.read()) return
+return editToolFormRef.value?.open(tool)
 }
 
 function handleOpenTool(tool: ToolItem, event: MouseEvent) {

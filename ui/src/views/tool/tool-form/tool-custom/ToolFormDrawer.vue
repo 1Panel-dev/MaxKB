@@ -20,7 +20,10 @@ defineOptions({ name: 'ToolFormDrawer' })
 
 const { auth } = useStore()
 
-const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; title: string; folderId: string }>()
+const props = withDefaults(
+  defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; title: string; folderId: string; canEdit?: boolean }>(),
+  { canEdit: true },
+)
 
 const emit = defineEmits<{ closed: []; refresh: []; update: [tool: ToolItem] }>()
 
@@ -228,8 +231,8 @@ defineExpose({ open })
 
     <template #footer>
       <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">取消</el-button>
-      <el-button plain :disabled="loading || formLoading" @click="handleOpenDebug">调试</el-button>
-      <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
+      <el-button v-if="canEdit" plain :disabled="loading || formLoading" @click="handleOpenDebug">调试</el-button>
+      <el-button v-if="canEdit" type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
         {{ editId ? '保存' : '创建' }}
       </el-button>
     </template>
