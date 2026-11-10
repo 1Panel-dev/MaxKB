@@ -50,7 +50,6 @@ class PortalSerializer(serializers.Serializer):
     enable_knowledge_base_api = serializers.BooleanField(
         required=False, label=_("enable knowledge base api"), help_text=_("enable knowledge base api")
     )
-    enable_auth = serializers.BooleanField(required=False, label=_("enable auth"), help_text=_("enable auth"))
     auth_config = serializers.JSONField(required=False, label=_("auth config"), help_text=_("auth config"))
     enable_cors = serializers.BooleanField(required=False, label=_("enable cors"), help_text=_("enable cors"))
     cross_domain_list = serializers.ListSerializer(
@@ -62,7 +61,7 @@ class PortalSerializer(serializers.Serializer):
     class Model(serializers.ModelSerializer):
         class Meta:
             model = Portal
-            fields = "__all__"
+            exclude = ("enable_auth",)
 
     @staticmethod
     def _is_license_valid():
@@ -111,11 +110,12 @@ class PortalSerializer(serializers.Serializer):
         if portal is None:
             raise AppApiException(500, _("Portal configuration does not exist"))
         data = PortalSerializer.Model(portal).data
-        # 授权无效时不展示 auth_config，避免暴露认证配置
+        # 授权无效时不展示 auth_config 与 logo，避免暴露认证配置与品牌信息
         if self._is_license_valid():
             data["auth_config"] = self._enrich_auth_config(data["auth_config"])
         else:
             data["auth_config"] = {}
+            data["logo"] = ""
         return data
 
     def _upload_file(self, file_obj):
@@ -152,8 +152,9 @@ class PortalSerializer(serializers.Serializer):
                 if field == "auth_config" and isinstance(value, dict):
                     value = {**(portal.auth_config or {}), **value}
                 setattr(portal, field, value)
+        # Logo 为授权功能，授权无效时忽略 Logo 上传/修改
         for field_name in ["logo"]:
-            if field_name in instance:
+            if field_name in instance and self._is_license_valid():
                 self._handle_file_field(portal, field_name, instance.get(field_name))
         portal.save()
         return PortalSerializer.Model(portal).data
@@ -166,13 +167,13 @@ class PortalLoginSerializer(serializers.Serializer):
         if portal is None:
             raise AppApiException(500, _("Portal configuration does not exist"))
         auth_config = portal.auth_config or {}
+        license_valid = PortalSerializer._is_license_valid()
         return {
             "name": portal.name,
             "description": portal.description or "",
-            "logo": portal.logo or "",
-            "enable_auth": portal.enable_auth,
-            "authentication_type": auth_config.get("type", "LOCAL") if portal.enable_auth else "",
-            "login_value": auth_config.get("login_value", []) if portal.enable_auth else [],
-            "max_attempts": auth_config.get("max_attempts", 1) if portal.enable_auth else 1,
+            "logo": (portal.logo or "") if license_valid else "",
+            "authentication_type": auth_config.get("type", "LOCAL"),
+            "login_value": auth_config.get("login_value", []),
+            "max_attempts": auth_config.get("max_attempts", 1),
             "rsa_key": get_key_pair_by_sql().get("key", ""),
         }

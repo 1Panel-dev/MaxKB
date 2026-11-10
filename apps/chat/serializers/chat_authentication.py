@@ -8,7 +8,6 @@
 """
 
 import uuid_utils.compat as uuid
-from django.core import signing
 from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
@@ -116,6 +115,7 @@ class PortalAuthProfileSerializer(serializers.Serializer):
                     "max_attempts": 1,
                     "enable_auth": False,
                     "login_value": ["LOCAL"],
+                    "default_value": "LOCAL",
                     "rsa_key": get_key_pair_by_sql().get("key"),
                     "meta": {},
                     "logo": "./favicon.ico",
@@ -128,8 +128,9 @@ class PortalAuthProfileSerializer(serializers.Serializer):
         return {
             **{
                 "max_attempts": auth_config.get("max_attempts", 1),
-                "enable_auth": portal.enable_auth,
+                "enable_auth": False,
                 "login_value": auth_config.get("login_value", []),
+                "default_value": auth_config.get("type", "LOCAL"),
                 "rsa_key": get_key_pair_by_sql().get("key"),
                 "meta": {},
                 "logo": portal.logo or "./favicon.ico",

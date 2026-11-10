@@ -34,7 +34,6 @@ class PortalAPI(APIMixin):
                         "tab_logo": {"type": "string", "format": "binary", "description": "浏览器Tab Logo"},
                         "enable_public_access": {"type": "boolean", "description": "是否开启公开访问"},
                         "enable_api": {"type": "boolean", "description": "是否开启API服务"},
-                        "enable_auth": {"type": "boolean", "description": "是否开启身份认证"},
                         "auth_config": {"type": "object", "description": "身份认证配置"},
                         "enable_cors": {"type": "boolean", "description": "是否开启跨域设置"},
                         "cross_domain_list": {

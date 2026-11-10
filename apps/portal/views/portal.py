@@ -22,7 +22,6 @@ from common.log.log import log
 from portal.api.portal import PortalAPI
 from portal.serializers.portal import (
     PortalSerializer,
-    PortalLoginSerializer,
 )
 
 
@@ -55,15 +54,3 @@ class PortalView(APIView):
     @has_permissions(PermissionConstants.PORTAL_EDIT, RoleConstants.ADMIN)
     def put(self, request: Request):
         return result.success(PortalSerializer(data=request.data).edit(request.data))
-
-
-class PortalInfoView(APIView):
-    @extend_schema(
-        methods=["GET"],
-        description=_("Get portal login info"),
-        summary=_("Get portal login info"),
-        operation_id=_("Get portal login info"),  # type: ignore
-        tags=[_("Portal")],  # type: ignore
-    )
-    def get(self, request: Request):
-        return result.success(PortalLoginSerializer.get_login_profile())
