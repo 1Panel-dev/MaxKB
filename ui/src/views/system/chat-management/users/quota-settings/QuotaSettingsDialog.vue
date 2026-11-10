@@ -48,7 +48,8 @@ function buildPayload(): ChatUserQuotaPayload {
     quota_type: QUOTA_TYPE.PERIODIC,
     period_type: quotaSettingsForm.periodType,
     period_value: quotaSettingsForm.periodValue,
-    token_limit: quotaSettingsForm.tokenLimit,
+    // 前端单位是 K，传给后端时为原始 token 数
+    token_limit: quotaSettingsForm.tokenLimit * 1000,
   }
 }
 
@@ -85,7 +86,7 @@ async function loadQuota(userId: string) {
       quotaType: quota.quota_type,
       periodType: quota.period_type ?? PERIOD_TYPE.MONTH,
       periodValue: quota.period_value ?? 1,
-      tokenLimit: quota.token_limit ?? 10_000_000,
+      tokenLimit: quota.token_limit == null ? 10_000_000 : Math.round(quota.token_limit / 1000),
     })
   } catch {
     // 请求层已提示错误；保留默认表单，用户可自行设置后再保存
