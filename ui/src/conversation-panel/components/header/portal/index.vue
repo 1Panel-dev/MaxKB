@@ -2,12 +2,11 @@
 import { computed } from 'vue'
 import { useConversationListStore } from '../../../left-sidebar/conversation-list/index'
 import { useMessageListStore } from '../../message-list/index'
+import { useShowShare } from '../../../view/index'
 
 const props = defineProps<{
   /** 新建对话；不传时在当前应用中新建（门户在没有当前智能体时改为选择智能体） */
   newConversation?: () => void
-  /** 显示分享入口；仅对话端传入 */
-  shareable?: boolean
 }>()
 
 const emit = defineEmits<{ share: [] }>()
@@ -16,6 +15,7 @@ const list = useConversationListStore()
 const msgs = useMessageListStore()
 // 回答生成中或没有消息时不可分享
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
+const showShare = useShowShare()
 
 const handleNewConversation = () => (props.newConversation ? props.newConversation() : list.newConversation())
 </script>
@@ -48,7 +48,7 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
       </el-button>
     </MkTooltip>
     <!-- 进入分享模式，勾选要分享的对话 -->
-    <MkTooltip v-if="shareable" content="分享">
+    <MkTooltip v-if="showShare" content="分享">
       <el-button text :disabled="!canShare" @click="emit('share')">
         <MkIcon name="icon_share_outlined" :size="18" class="text-N900!" />
       </el-button>

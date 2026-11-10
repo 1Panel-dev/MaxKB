@@ -6,13 +6,6 @@ import MessageInput from '../../components/message-input/index.vue'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { useMessageInputStore } from '../../components/message-input/index'
 
-defineProps<{
-  /** 标题栏显示分享入口；仅对话端传入 */
-  shareable?: boolean
-}>()
-
-const emit = defineEmits<{ share: [] }>()
-
 const list = useConversationListStore()
 const input = useMessageInputStore()
 // 拖拽到面板任意处 → 交给 message-input 接收文件
@@ -25,7 +18,7 @@ const disclaimerText = computed(() => (list.appInfo.value?.disclaimer ? list.app
   <main class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 头部可被替换(如 debug 用 debug header);默认普通 chat header -->
     <slot name="header">
-      <ChatHeader :shareable="shareable" @share="emit('share')" />
+      <ChatHeader />
     </slot>
     <!-- 聊天背景铺满标题栏以下的消息区与输入区，与显示设置预览一致 -->
     <div

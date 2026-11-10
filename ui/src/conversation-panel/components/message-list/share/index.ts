@@ -1,9 +1,5 @@
 import { computed, inject, ref, type InjectionKey, type Ref } from 'vue'
 import type { ChatMessage } from '../../../core/types'
-import { VIEW_TYPE, type ViewType } from '../../../view/index'
-
-/** 提供分享服务的视图；其他视图不显示进入分享选择的入口。 */
-export const SHAREABLE_VIEWS: readonly ViewType[] = [VIEW_TYPE.CHAT, VIEW_TYPE.PORTAL]
 
 export interface ShareLinkDeps {
   /** 当前会话消息：只读，由消息列表 Store 维护 */

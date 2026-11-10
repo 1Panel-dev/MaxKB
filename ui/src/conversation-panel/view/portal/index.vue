@@ -17,7 +17,7 @@ import { PORTAL_CONVERSATION_LIST_KEY } from '../../left-sidebar/portal-conversa
 import { SHARE_LINK_KEY } from '../../components/message-list/share/index'
 import { createPortalConversation } from './index'
 import { createChatUserProfileGetter } from '../chat/index'
-import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, createDeviceType } from '../index.ts'
+import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, SHOW_SHARE_KEY, createDeviceType } from '../index.ts'
 
 const applicationSelectorRef = ref<InstanceType<typeof SelectApplicationDrawer>>()
 const bundle = createPortalConversation({ openApplicationSelector: () => applicationSelectorRef.value?.open() })
@@ -44,6 +44,11 @@ provide(EXECUTION_DETAIL_KEY, bundle.detail)
 provide(SHARE_LINK_KEY, bundle.share)
 provide(PORTAL_CONVERSATION_LIST_KEY, bundle.portalList)
 provide(VIEW_KEY, VIEW_TYPE.PORTAL)
+// 当前智能体开启「允许分享对话记录」时显示标题栏、提问与回答上的分享入口
+provide(
+  SHOW_SHARE_KEY,
+  computed(() => Boolean(bundle.portalList.currentApplicationId.value && bundle.list.appInfo.value?.show_share)),
+)
 // HTML 内容 iframe 内 chatUserProfile() 取当前对话用户
 provide(CHAT_USER_PROFILE_KEY, createChatUserProfileGetter())
 // 响应式:窄屏 drawer,宽屏 push

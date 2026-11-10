@@ -49,3 +49,10 @@ export const CHAT_USER_PROFILE_KEY: InjectionKey<GetChatUserProfile> = Symbol('c
 export function useChatUserProfileGetter(): GetChatUserProfile {
   return inject(CHAT_USER_PROFILE_KEY, () => Promise.resolve(null))
 }
+
+/** 是否显示进入分享选择的入口；Chat、Portal 视图按智能体的 show_share 提供，调试、日志等视图不提供即不显示。 */
+export const SHOW_SHARE_KEY: InjectionKey<Readonly<Ref<boolean>>> = Symbol('conversation-show-share')
+
+export function useShowShare(): Readonly<Ref<boolean>> {
+  return inject(SHOW_SHARE_KEY, () => computed(() => false), true)
+}

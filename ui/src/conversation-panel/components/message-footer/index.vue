@@ -10,8 +10,8 @@ import type { ChatMessage, ChatRecordMeta } from '../../core/types'
 import { useExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 
 import { MESSAGE_LIST_KEY } from '../message-list/index'
-import { SHAREABLE_VIEWS, useShareLinkStoreOptional } from '../message-list/share/index'
-import { useViewType } from '../../view/index'
+import { useShareLinkStoreOptional } from '../message-list/share/index'
+import { useShowShare } from '../../view/index'
 
 const props = defineProps<{ message: ChatMessage }>()
 const emit = defineEmits<{ resize: [] }>()
@@ -25,8 +25,8 @@ onMounted(() => {
 })
 onBeforeUnmount(() => footerObserver?.disconnect())
 
-// 仅提供分享服务的视图（对话、门户）显示分享入口；进入分享时预先勾选当前回答所属轮次。
-const showShare = SHAREABLE_VIEWS.includes(useViewType())
+// 智能体允许分享时显示分享入口；进入分享时预先勾选当前回答所属轮次。
+const showShare = useShowShare()
 const shareLink = useShareLinkStoreOptional()
 // 回答生成中禁用分享。
 const messageList = inject(MESSAGE_LIST_KEY, null)

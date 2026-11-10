@@ -10,7 +10,7 @@ import AccountMenu from '../account-menu/index.vue'
 
 import { useMessageListStore } from '../../components/message-list/index'
 import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
-import { useViewType, VIEW_TYPE, type ViewType } from '../../view/index'
+import { useShowShare, useViewType, VIEW_TYPE, type ViewType } from '../../view/index'
 
 defineOptions({ name: 'ConversationList' })
 
@@ -22,6 +22,7 @@ const SHOW_PROFILE: readonly ViewType[] = [VIEW_TYPE.CHAT, VIEW_TYPE.PORTAL]
 const msgs = useMessageListStore()
 // 会话菜单分享默认全选，内容分享由内容入口指定记录。
 const shareLink = useShareLinkStoreOptional()
+const showShare = useShowShare()
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
 
 const { appInfo, conversations, currentChatId, selectConversation, newConversation, deleteChat, toggleLeftSide, hasMore, loadMore } =
@@ -123,7 +124,7 @@ function handleClearConversations() {
                   <MkDropdownMenu>
                     <!-- 激活所选对话并全选分享 -->
                     <MkDropdownItem
-                      v-if="viewType === VIEW_TYPE.CHAT"
+                      v-if="showShare"
                       :disabled="msgs.loading.value || (currentChatId === conversation.id && !canShare)"
                       @click="handleShareConversation(conversation)"
                     >
