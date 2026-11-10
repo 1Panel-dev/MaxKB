@@ -37,7 +37,7 @@ class PortalView(APIView):
         responses=PortalAPI.Get.get_response(),
         tags=[_("Portal")],  # type: ignore
     )
-    @has_permissions(PermissionConstants.PORTAL_EDIT, RoleConstants.ADMIN)
+    @has_permissions(PermissionConstants.PORTAL_READ, RoleConstants.ADMIN)
     def get(self, request: Request):
         return result.success(PortalSerializer().one())
 
