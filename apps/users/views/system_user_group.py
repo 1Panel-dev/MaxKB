@@ -58,7 +58,10 @@ class SystemUserGroupView(APIView):
         tags=["IAM/System User Group"],
     )
     @has_permissions(
-        PermissionConstants.SYSTEM_USER_GROUP_CREATE, PermissionConstants.SYSTEM_USER_GROUP_EDIT, RoleConstants.ADMIN
+        PermissionConstants.SYSTEM_USER_GROUP_CREATE,
+        PermissionConstants.SYSTEM_USER_GROUP_EDIT,
+        RoleConstants.ADMIN,
+        RoleConstants.WORKSPACE_MANAGE,
     )
     @log(
         menu="IAM/System User Group",
@@ -100,7 +103,9 @@ class SystemUserGroupView(APIView):
             responses=DefaultModelResponse.get_response(),
             tags=["IAM/System User Group"],
         )
-        @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_DELETE, RoleConstants.ADMIN)
+        @has_permissions(
+            PermissionConstants.SYSTEM_USER_GROUP_DELETE, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE
+        )
         @log(
             menu="IAM/System User Group",
             operate="Delete System User Group",
@@ -126,7 +131,9 @@ class SystemUserGroupView(APIView):
             responses=DefaultModelResponse.get_response(),
             tags=["IAM/System User Group"],
         )
-        @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_ADD_MEMBER, RoleConstants.ADMIN)
+        @has_permissions(
+            PermissionConstants.SYSTEM_USER_GROUP_ADD_MEMBER, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE
+        )
         @log(
             menu="IAM/System User Group",
             operate="Add members to System User Group",
@@ -155,7 +162,9 @@ class SystemUserGroupView(APIView):
             responses=DefaultModelResponse.get_response(),
             tags=["IAM/System User Group"],
         )
-        @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_REMOVE_MEMBER, RoleConstants.ADMIN)
+        @has_permissions(
+            PermissionConstants.SYSTEM_USER_GROUP_REMOVE_MEMBER, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE
+        )
         @log(
             menu="IAM/System User Group",
             operate="Remove members from System User Group",
