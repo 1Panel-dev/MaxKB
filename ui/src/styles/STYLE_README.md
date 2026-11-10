@@ -39,7 +39,8 @@ Element Plus 覆盖、主题变量和应用样式。Chat 入口还显式引入 E
 也不额外设置 `min-height: 0`、`height: 100%` 或 `max-height: 100%`，消息列表负责内部滚动。
 
 消息列表与底部输入区可共用 `mk-conversation-content`，在对话模块公共样式中统一设置
-宽度 100%、最大宽度 800px 和水平居中。
+`border-box`、宽度 100% 和水平居中。调用方配合 `p-4`，最大外宽为
+`800px + var(--spacing) * 8`，使正文最大宽度保持 800px，窄容器下连同左右内边距一起收缩。
 
 用户提问容器使用 `mk-conversation-question-content`，在对话模块公共样式中控制靠右、
 随内容收缩及最大 85% 宽度。文字气泡使用 `mk-gray-card-lg`，换行规则在模板中组合工具类。

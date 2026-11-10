@@ -57,6 +57,41 @@ function collectAnswerText(contents: ChatContent[]): string {
 }
 const answerText = computed(() => collectAnswerText(props.message.content))
 
+// 重新生成沿用当前记录及原问题，由列表 Store 管理流式替换。
+const canRegenerate = computed(() => Boolean(messageList && props.message.recordId && !messageList.streamLoading.value && !messageList.loading.value))
+function regenerateAnswer() {
+  if (!canRegenerate.value) return
+  stopReading()
+  messageList?.regenerate(props.message)
+}
+
+// 浏览器朗读仅使用回答正文；切换回答或卸载时释放本组件发起的语音。
+const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
+const speaking = ref(false)
+let utterance: SpeechSynthesisUtterance | undefined
+function stopReading() {
+  if (utterance) {
+    utterance.onend = null
+    utterance.onerror = null
+    window.speechSynthesis.cancel()
+    utterance = undefined
+  }
+  speaking.value = false
+}
+function toggleReading() {
+  if (speaking.value) return stopReading()
+  if (!speechSupported || !answerText.value) return
+  window.speechSynthesis.cancel()
+  utterance = new SpeechSynthesisUtterance(answerText.value)
+  utterance.onend = utterance.onerror = () => {
+    speaking.value = false
+    utterance = undefined
+  }
+  speaking.value = true
+  window.speechSynthesis.speak(utterance)
+}
+onBeforeUnmount(stopReading)
+
 const openExecutionDetail = () => {
   detail.showExecutionDetail(meta.value.executionDetails || [])
 }
@@ -125,6 +160,24 @@ function openFeedback(status: '0' | '1') {
           <MkIcon name="icon_copy_outlined" />
         </el-button>
       </MkTooltip>
+      <!-- 重新生成当前回答 -->
+      <span>
+        <MkTooltip content="重新生成">
+          <el-button text :disabled="!canRegenerate" @click="regenerateAnswer">
+            <MkIcon name="icon_refresh_outlined" />
+          </el-button>
+        </MkTooltip>
+      </span>
+
+      <!-- 朗读回答正文，再次点击停止 -->
+      <span>
+        <MkTooltip :content="speaking ? '停止朗读' : '朗读内容'">
+          <el-button text :disabled="!speechSupported || !answerText" @click="toggleReading">
+            <MkIcon :name="speaking ? 'icon_pause-round_outlined' : 'icon_speaker_outlined'" />
+          </el-button>
+        </MkTooltip>
+      </span>
+      <ButtonFeedback v-if="canFeedback" :current-status="currentStatus" :submitting="submitting" @select="openFeedback" />
       <!-- 进入分享模式 -->
       <span v-if="showShare">
         <MkTooltip content="分享">
@@ -133,7 +186,6 @@ function openFeedback(status: '0' | '1') {
           </el-button>
         </MkTooltip>
       </span>
-      <ButtonFeedback v-if="canFeedback" :current-status="currentStatus" :submitting="submitting" @select="openFeedback" />
       <span v-if="meta.createTime" class="text-N600 ml-1">{{ datetimeFormat(meta.createTime) }}</span>
     </div>
     <el-collapse-transition>

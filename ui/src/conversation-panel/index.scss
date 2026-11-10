@@ -15,8 +15,9 @@
 
 /* 对话正文：消息列表与底部输入区共用宽度和居中布局。 */
 .mk-conversation-content {
+  box-sizing: border-box;
   margin-inline: auto;
-  max-width: 800px;
+  max-width: calc(800px + var(--spacing) * 8);
   width: 100%;
 }
 

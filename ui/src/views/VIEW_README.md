@@ -520,6 +520,13 @@ System 资源管理的修正内容与添加知识库选项仅包含当前智能�
   门户复用 Chat 分享 Store，抽屉点击分享后关闭并进入消息选择模式。
   Chat／Portal 视图将左栏布局模式绑定到会话列表 Store；开启分享时，抽屉模式自动收起左栏。
 
+### 对话消息操作
+
+消息 Footer 在复制后提供重新生成和朗读内容入口。列表 Store 的 `regenerate(message)` 沿用
+原问题与记录 ID，生成中及历史加载中禁用；收到首个分片后替换原回答，请求失败前保留原内容。
+朗读使用浏览器语音合成，仅收集回答正文，不包含思考与工具参数；再次点击停止，卸载时清理语音。
+不支持语音合成的浏览器禁用朗读按钮。
+
 ### 对话消息反馈
 
 `conversation-panel/components/message-footer/feedback/` 内的 `ButtonFeedback.vue` 和 `FeedbackCard.vue`
