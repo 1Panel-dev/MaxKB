@@ -39,7 +39,7 @@ function handleApply(tool = props.tool) {
 </script>
 
 <template>
-  <MkResourceCard :title="tool.name">
+  <MkResourceCard :title="tool.name" class="cursor-pointer" @click="openDetailDrawer">
     <template #icon>
       <ToolIcon :icon="tool.icon" :size="24" :type="tool.tool_type" />
     </template>
