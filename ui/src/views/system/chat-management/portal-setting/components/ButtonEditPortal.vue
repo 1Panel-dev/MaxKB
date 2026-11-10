@@ -4,7 +4,13 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { PortalSetting } from '@/api/types'
 import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 
-const props = defineProps<{ disabled: boolean; setting: PortalSetting; saving: boolean; save: (payload: FormData) => Promise<void> }>()
+const props = defineProps<{
+  disabled: boolean
+  logoDisabled?: boolean
+  setting: PortalSetting
+  saving: boolean
+  save: (payload: FormData) => Promise<void>
+}>()
 
 /* 门户名称与 Logo */
 const editVisible = ref(false)
@@ -35,7 +41,7 @@ function handleSavePortalInfo() {
     if (!valid || props.disabled || props.saving) return
     const payload = new FormData()
     payload.append('name', portalForm.name.trim())
-    if (logoChanged.value) payload.append('logo', logoFile.value || '')
+    if (logoChanged.value && !props.logoDisabled) payload.append('logo', logoFile.value || '')
     return props.save(payload).then(() => {
       editVisible.value = false
     })
@@ -68,7 +74,7 @@ function handleClosePortalEdit() {
     >
       <el-form-item label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
-          <MkEditAvatar v-model="portalForm.logo" @change="handleLogoChange" :size="32">
+          <MkEditAvatar v-model="portalForm.logo" @change="handleLogoChange" :size="32" :disabled="logoDisabled">
             <template #default="{ icon }">
               <PortalIcon :icon="icon" />
             </template>

@@ -8,6 +8,7 @@ export interface AuthProfile<Meta = Record<string, never>> {
   max_attempts: number
   enable_auth: boolean
   login_value: LoginMethod[]
+  default_value?: LoginMethod
   rsa_key: string
   logo: string
   custom_theme?: { theme_color?: string; header_font_color?: string } | null

@@ -6,5 +6,4 @@ app_name = "portal"
 
 urlpatterns = [
     path("portal", views.PortalView.as_view()),
-    path("portal/info", views.PortalInfoView.as_view()),
 ]

@@ -105,6 +105,8 @@ onMounted(() => loadPortalSetting())
 
 // 权限 控制
 const canEditPortal = computed(() => perm.system.portal.edit())
+// Logo 为授权功能，授权无效（含社区版）时仅可查看，禁止上传或更换 Logo
+const canEditLogo = computed(() => perm.system.portal.edit() && (auth.isPE || auth.isEE))
 </script>
 
 <template>
@@ -118,7 +120,13 @@ const canEditPortal = computed(() => perm.system.portal.edit())
               <h4 class="truncate" :title="previewName">{{ previewName }}</h4>
             </div>
             <!-- 编辑门户名称与 Logo -->
-            <ButtonEditPortal :setting="portalSetting" :saving="saving" :disabled="!canEditPortal" :save="savePortalSetting" />
+            <ButtonEditPortal
+              :setting="portalSetting"
+              :saving="saving"
+              :disabled="!canEditPortal"
+              :logo-disabled="!canEditLogo"
+              :save="savePortalSetting"
+            />
           </div>
         </el-card>
         <el-card shadow="never">
@@ -197,12 +205,11 @@ const canEditPortal = computed(() => perm.system.portal.edit())
               />
             </div>
 
-            <div class="flex-between gap-2">
+            <div class="flex-between gap-2" v-if="auth.isPE || auth.isEE">
               <span>登录设置</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置登录设置 -->
                 <ButtonPortalAuthSetting
-                  v-if="auth.isPE || auth.isEE"
                   ref="authSettingButtonRef"
                   :setting="portalSetting"
                   :saving="saving"

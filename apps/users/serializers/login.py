@@ -308,8 +308,6 @@ class CaptchaSerializer(serializers.Serializer):
     @staticmethod
     def portal_generate(username: str, type: str = "portal"):
         portal = Portal.objects.first()
-        if portal is None or not portal.enable_auth:
-            return {"captcha": ""}
         auth_config = portal.auth_config or {}
         max_attempts = auth_config.get("max_attempts", 1)
         key = f"{type}_{username}"

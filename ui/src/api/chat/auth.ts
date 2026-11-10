@@ -76,7 +76,7 @@ const getDingTalkOauthCallback = (code: string, accessToken?: string) => {
  * 获取应用登录验证码；无需验证码时返回空字符串。
  * 后端以 `accessToken` 查询参数接收应用令牌，且仅支持应用场景。
  */
-const getCaptcha = (username: string, accessToken: string) => {
+const getCaptcha = (username: string, accessToken?: string) => {
   return get<ChatCaptchaResponse>('/v3/captcha', { username, accessToken })
 }
 

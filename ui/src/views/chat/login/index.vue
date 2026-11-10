@@ -2,7 +2,7 @@
 import { computed, onBeforeMount, ref } from 'vue'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { getDingTalkClientAuthCode } from '@/views/login/dingtalk-client-login'
-import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
+import { type RouteLocationRaw, useRoute, useRouter } from 'vue-router'
 import { v7 as uuidv7 } from 'uuid'
 import ChatAuthApi from '@/api/chat/auth'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
@@ -25,11 +25,15 @@ const loginTitle = computed(() => {
   return (auth.authProfile?.meta as ApplicationAuthProfileMeta | undefined)?.application_name || '登录'
 })
 
-// 认证前置配置只有可用登录方式，默认登录方式依次取本地、LDAP、第一个可用方式
+// 认证前置配置只有可用登录方式，默认登录方式优先取后端配置，再依次回退本地、LDAP、第一个可用方式
 const loginConfig = computed<LoginConfig>(() => {
   const loginMethods = auth.authProfile?.login_value?.length ? auth.authProfile.login_value : [LOGIN_METHOD.LOCAL]
+  const configuredDefault = auth.authProfile?.default_value
   const defaultLoginMethod =
-    [LOGIN_METHOD.LOCAL, LOGIN_METHOD.LDAP].find((method) => loginMethods.includes(method)) ?? loginMethods[0] ?? LOGIN_METHOD.LOCAL
+    (configuredDefault && loginMethods.includes(configuredDefault) ? configuredDefault : undefined) ??
+    [LOGIN_METHOD.LOCAL, LOGIN_METHOD.LDAP].find((method) => loginMethods.includes(method)) ??
+    loginMethods[0] ??
+    LOGIN_METHOD.LOCAL
   return { default_value: defaultLoginMethod, login_methods: loginMethods, max_attempts: auth.authProfile?.max_attempts ?? 1 }
 })
 
@@ -75,7 +79,7 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
     if (!config.authEndpoint || !config.clientId) return ''
     const redirectUrl = `${config.redirectUrl}${queryString ? `?${queryString}` : ''}`
     const state = accessToken ? `${uuidv7()}_${accessToken}` : uuidv7()
-    let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${state}`
+    let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${config.redirectUrl}&state=${state}`
     if (config.scope) url += `&scope=${config.scope}`
     return url
   })
@@ -102,11 +106,10 @@ const loginService: LoginService = {
   },
   login: (loginRequest) => auth.login(loginRequest),
   ldapLogin: (loginForm) => auth.ldapLogin(loginForm),
-  // 验证码：后端按失败次数决定是否需要，无需时返回空字符串；目前仅应用场景支持
+  // 验证码：后端按失败次数决定是否需要，无需时返回空字符串
   getCaptcha: (username) => {
-    const { accessToken } = auth
-    if (!accessToken || !username.trim()) return Promise.resolve('')
-    return ChatAuthApi.getCaptcha(username, accessToken).then(({ captcha }) => captcha)
+    if (!username.trim()) return Promise.resolve('')
+    return ChatAuthApi.getCaptcha(username, auth.accessToken).then(({ captcha }) => captcha)
   },
   getExternalLoginUrl,
   getQrCodeSources: () => ChatAuthApi.getQrCodeSources(),
