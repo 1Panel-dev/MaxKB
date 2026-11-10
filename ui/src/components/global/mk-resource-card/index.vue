@@ -94,9 +94,9 @@ function handleSelectedChange(selected: boolean | string | number) {
           <div class="text-sm text-N600" v-if="slots.subtitle || create_time || nick_name">
             <slot name="subtitle">
               <div class="flex gap-1">
-                <span>{{ props.nick_name }}</span>
-                <span>创建于</span>
-                <span>{{ dateFormat(props.create_time) }}</span>
+                <span class="min-w-0 truncate" :title="props.nick_name">{{ props.nick_name }}</span>
+                <span class="shrink-0">创建于</span>
+                <span class="shrink-0">{{ dateFormat(props.create_time) }}</span>
               </div>
             </slot>
           </div>
