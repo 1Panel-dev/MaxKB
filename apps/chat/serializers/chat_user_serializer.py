@@ -42,7 +42,7 @@ class ChatUserAccessTokenV3Serializer(serializers.Serializer):
                 auth_setting.get("lock_time", 10),
             )
         portal = Portal.objects.first()
-        if portal is None or not portal.enable_auth:
+        if portal is None:
             return ("portal", 1, 5, 10)
         auth_config = portal.auth_config or {}
         return (
