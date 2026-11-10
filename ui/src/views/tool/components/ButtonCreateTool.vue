@@ -13,6 +13,19 @@ import McpFormDrawer from '../tool-form/McpFormDrawer.vue'
 import SkillToolFormDrawer from '../tool-form/SkillToolFormDrawer.vue'
 import WorkflowFormDialog from '../tool-form/WorkflowFormDialog.vue'
 import perm from '@/permission/index.ts'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+
+/**
+ * 工具「导入」权限判断
+ */
+type ToolImportPermissionMethod = 'import'
+
+function toolImportPermission(method: ToolImportPermissionMethod): boolean {
+  if (isSystemResource()) return Boolean(perm.tool.system[method]())
+  if (isSystemSharedResource()) return Boolean(perm.tool.share[method]())
+  if (isWorkspaceSharedResource()) return Boolean(perm.tool.workspaceShared[method]())
+  return Boolean(perm.tool.workspace[method]())
+}
 
 defineOptions({ name: 'ButtonCreateTool' })
 
@@ -170,7 +183,7 @@ function handleRefresh() {
           multiple
           :on-change="handleImportCreate"
           :show-file-list="false"
-          v-if="perm.tool.workspace.import()"
+          v-if="toolImportPermission('import')"
         >
           <MkDropdownItem class="w-full py-2!">
             <template #icon>
