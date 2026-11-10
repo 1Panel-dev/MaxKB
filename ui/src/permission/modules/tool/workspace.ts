@@ -26,6 +26,10 @@ const workspace = {
    * 工作空间「工具」导入权限
    */
   import: () => can(P.TOOL_IMPORT),
+    /**
+   * 工作空间「工具」文件夹创建权限
+   */
+  folderCreateWorkspace: () => can(P.TOOL_FOLDER_CREATE),
   debug: () => false,
   authToWorkspace: () => false,
 
