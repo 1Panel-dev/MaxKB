@@ -685,6 +685,7 @@ def build_workflow(application):
     knowledge_setting = application.knowledge_setting or {}
     no_references_setting = knowledge_setting.get("no_references_setting") or {}
     model_setting = application.model_setting or {}
+    dialogue_number = application.dialogue_number
     # 发布版本使用发布时的知识库快照；调试使用 Application 本体，从资源映射读取
     if isinstance(application, ApplicationVersion):
         knowledge_ids = application.knowledge_ids
@@ -726,6 +727,7 @@ def build_workflow(application):
     data["nodes"][5]["properties"]["node_data"]["mcp_servers"] = application.mcp_servers
     data["nodes"][5]["properties"]["node_data"]["application_ids"] = application.application_ids
     data["nodes"][5]["properties"]["node_data"]["tool_ids"] = application.tool_ids
+    data["nodes"][5]["properties"]["node_data"]["dialogue_number"] = application.dialogue_number
     ## 未查询到知识库ai 回复
     data["nodes"][10]["properties"]["node_data"]["model_id"] = model_id
     data["nodes"][10]["properties"]["node_data"]["model_params_setting"] = model_params_setting
@@ -736,6 +738,7 @@ def build_workflow(application):
     data["nodes"][10]["properties"]["node_data"]["mcp_servers"] = application.mcp_servers
     data["nodes"][10]["properties"]["node_data"]["application_ids"] = application.application_ids
     data["nodes"][10]["properties"]["node_data"]["tool_ids"] = application.tool_ids
+    data["nodes"][10]["properties"]["node_data"]["dialogue_number"] = application.dialogue_number
     ## 未查询到知识库指定回复
     if no_references_setting.get("status") == "designated_answer":
         data["nodes"][6]["properties"]["node_data"]["content"] = no_references_setting.get("value")
