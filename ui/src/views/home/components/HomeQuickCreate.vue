@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ModelProviderItem } from '@/api/types'
 import ModelProviderApi from '@/api/admin/model-provider'
@@ -8,8 +8,14 @@ import ButtonCreateApplication from '@/views/application/components/ButtonCreate
 import ButtonCreateKnowledge from '@/views/knowledge/components/ButtonCreateKnowledge.vue'
 import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
 import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
+import perm from '@/permission'
 const props = defineProps<{ workspaceId: string }>()
 const router = useRouter()
+
+/* 任一资源可创建时展示快捷创建区域。 */
+const showQuickCreate = computed(
+  () => perm.application.workspace.create() || perm.knowledge.workspace.create() || perm.tool.workspace.create() || perm.model.workspace.create(),
+)
 
 /* 智能体快捷导入完成后进入列表页面。其他创建会随组件进入对应的详情页面 */
 function handleCreateApplication() {
@@ -41,10 +47,18 @@ onMounted(() =>
 )
 </script>
 <template>
-  <section>
+  <section v-if="showQuickCreate">
+    <h4 class="mb-4 mt-4">快捷创建</h4>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <!-- 创建智能体 -->
-      <ButtonCreateApplication trigger="hover" fit-trigger-width folder-id="default" popperClass="rounded-xl!" @refresh="handleCreateApplication">
+      <ButtonCreateApplication
+        v-if="perm.application.workspace.create()"
+        trigger="hover"
+        fit-trigger-width
+        folder-id="default"
+        popperClass="rounded-xl!"
+        @refresh="handleCreateApplication"
+      >
         <template #trigger>
           <el-card shadow="hover">
             <div class="flex-between gap-3">
@@ -59,7 +73,14 @@ onMounted(() =>
         </template>
       </ButtonCreateApplication>
       <!-- 创建知识库 -->
-      <ButtonCreateKnowledge trigger="hover" fit-trigger-width popper-class="rounded-xl!" folder-id="default" @refresh="handleCreateKnowledge">
+      <ButtonCreateKnowledge
+        v-if="perm.knowledge.workspace.create()"
+        trigger="hover"
+        fit-trigger-width
+        popper-class="rounded-xl!"
+        folder-id="default"
+        @refresh="handleCreateKnowledge"
+      >
         <template #trigger>
           <el-card shadow="hover">
             <div class="flex-between gap-3">
@@ -74,7 +95,14 @@ onMounted(() =>
         </template>
       </ButtonCreateKnowledge>
       <!-- 创建工具 -->
-      <ButtonCreateTool trigger="hover" fit-trigger-width popper-class="rounded-xl!" folder-id="default" @refresh="handleCreateTool">
+      <ButtonCreateTool
+        v-if="perm.tool.workspace.create()"
+        trigger="hover"
+        fit-trigger-width
+        popper-class="rounded-xl!"
+        folder-id="default"
+        @refresh="handleCreateTool"
+      >
         <template #trigger>
           <el-card shadow="hover">
             <div class="flex-between gap-3">
@@ -89,7 +117,13 @@ onMounted(() =>
         </template>
       </ButtonCreateTool>
       <!-- 添加模型 -->
-      <ButtonAddModel :current-provider="defaultProvider" :providers="providers" :api="ModelApi" @refresh="handleCreateModel">
+      <ButtonAddModel
+        v-if="perm.model.workspace.create()"
+        :current-provider="defaultProvider"
+        :providers="providers"
+        :api="ModelApi"
+        @refresh="handleCreateModel"
+      >
         <template #default="{ open }">
           <!-- 打开模型创建入口 -->
           <el-card shadow="hover" class="cursor-pointer" @click="open">
