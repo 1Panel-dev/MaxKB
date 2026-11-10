@@ -218,6 +218,8 @@ MCP 配置和导出 Skills 使用独立权限位，命名均以 `KNOWLEDGE_` 为
 - 文档和图片共用的单项操作从数据库确定实际资源类型；混合批次须同时满足两种类型的权限。
   列表以 `resource_type` 区分文档和图片。图片批量操作缺少该参数时根据所选 ID 推断类型，
   要求单一类型的业务操作仍拒绝混合提交。
+- 下载原文档接口使用当前 Bearer 身份校验文档或图片的下载权限，不再依赖 `mk_file_auth` Cookie。
+  下载前仍校验工作空间、知识库、文档和原文件的归属；直接访问 OSS 文件接口沿用文件鉴权。
 - `sync_setting` GET／PUT 和 `sync_log` 使用定时同步查看／编辑权限；
   `external_service` GET／PUT 使用外部服务查看／编辑权限。
 - 知识库详情 GET 的 `section=setting/document_strategy` 分别要求设置／文档处理策略查看权限。

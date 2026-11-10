@@ -919,9 +919,10 @@ class DocumentView(APIView):
             )
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            # The authenticated request already grants download access; retain serializer ownership checks.
             return DocumentSerializers.Operate(
                 data={"workspace_id": workspace_id, "document_id": document_id, "knowledge_id": knowledge_id}
-            ).download_source_file(mk_file_auth=request.COOKIES.get("mk_file_auth"))
+            ).download_source_file(with_file_auth=False)
 
     class ReplaceSourceFile(APIView):
         authentication_classes = [TokenAuth]
