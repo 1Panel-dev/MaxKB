@@ -28,11 +28,17 @@ const tokenPercentage = computed(() => {
 const userPwdDialogRef = useTemplateRef<InstanceType<typeof UserPwdDialog>>('userPwdDialogRef')
 const apiKeyDialogRef = useTemplateRef<InstanceType<typeof ApiKeyDialog>>('apiKeyDialogRef')
 
-// 退出对话账号后重新导航，由守卫处理后续认证。
+// 退出对话账号后回到当前场景首页，不停留在上一用户的对话；由守卫决定匿名认证或跳转登录页。
 const handleLogout = () => {
   return auth
     .logout()
-    .then(() => router.replace({ path: router.currentRoute.value.fullPath, force: true }))
+    .then(() =>
+      router.replace(
+        route.meta.portal
+          ? { name: 'portal-application-list', force: true }
+          : { name: 'chat-home', params: { accessToken: route.params.accessToken }, force: true },
+      ),
+    )
     .catch(() => {})
 }
 
