@@ -18,10 +18,11 @@
           v-model="form.user"
           multiple
           filterable
+          remote
           :reserve-keyword="false"
           :placeholder="$t('common.selectPlaceholder')"
           :loading="optionLoading"
-          :filter-method="filterUser"
+          :remote-method="filterUser"
         >
           <el-option
             v-for="item in chatUserList"
@@ -49,8 +50,6 @@ import { ref, reactive, onBeforeMount } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
-import SystemGroupApi from '@/api/system/user-group'
-import userManageApi from '@/api/system/chat-user'
 import type { ChatUserItem } from '@/api/type/systemChatUser'
 import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 
@@ -68,31 +67,23 @@ const form = ref<{ user: string[] }>({
 
 const optionLoading = ref(false)
 const chatUserList = ref<ChatUserItem[]>([])
-const originalChatUserList = ref<ChatUserItem[]>([])
-async function getChatUserList() {
+
+async function fetchUserOptions(query?: string) {
   try {
-    const res = await loadPermissionApi('chatUser').getChatUserList(optionLoading)
-    originalChatUserList.value = res.data
-    chatUserList.value = [...res.data]
+    const res = await loadPermissionApi('chatUser').getChatUserList(
+      query ? { nick_name: query } : {},
+      optionLoading,
+    )
+    chatUserList.value = (res.data || []) as ChatUserItem[]
   } catch (e) {
     console.error(e)
   }
 }
 
-const filterUser = (query: string) => {
-  if (!query) {
-    chatUserList.value = originalChatUserList.value
-    return
-  }
-
-  const q = query.toLowerCase()
-  chatUserList.value = originalChatUserList.value.filter(
-    (item) => item.nick_name?.toLowerCase().includes(q) || item.username?.toLowerCase().includes(q),
-  )
-}
+const filterUser = (query: string) => fetchUserOptions(query)
 
 onBeforeMount(() => {
-  getChatUserList()
+  fetchUserOptions()
 })
 
 const groupId = ref('')
@@ -101,6 +92,7 @@ function open(id: string) {
   form.value = { ...defaultForm }
   groupId.value = id
   dialogVisible.value = true
+  fetchUserOptions()
 }
 
 const formRef = ref<FormInstance>()
