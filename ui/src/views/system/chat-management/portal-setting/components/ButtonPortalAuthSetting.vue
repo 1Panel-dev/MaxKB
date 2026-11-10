@@ -139,7 +139,7 @@ defineExpose({ open })
           </div>
           <div class="flex-align-center gap-2">
             <span class="shrink-0">登录失败</span>
-            <el-input-number v-model="authForm.failed_attempts" class="w-32!" :min="1" :max="100" :precision="0" :value-on-clear="5" />
+            <el-input-number v-model="authForm.failed_attempts" class="w-32!" :min="-1" :max="100" :precision="0" :value-on-clear="5" />
             <span class="shrink-0">次，锁定账号</span>
             <el-input-number v-model="authForm.lock_time" class="w-32!" :min="1" :max="1440" :precision="0" :value-on-clear="10" />
             <span class="shrink-0">分钟</span>
