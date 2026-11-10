@@ -9,7 +9,7 @@ import { datetimeFormat } from '@/utils/time'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
 import { useExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 
-import { MESSAGE_LIST_KEY, useMessageListStore } from '../message-list/index'
+import { MESSAGE_LIST_KEY } from '../message-list/index'
 import { useShareLinkStoreOptional } from '../message-list/share/index'
 import { useShowShare } from '../../view/index'
 
@@ -173,7 +173,8 @@ function openFeedback(status: '0' | '1') {
       <span>
         <MkTooltip :content="speaking ? '停止朗读' : '朗读内容'">
           <el-button text :disabled="!speechSupported || !answerText" @click="toggleReading">
-            <MkIcon :name="speaking ? 'icon_pause-round_outlined' : 'icon_speaker_outlined'" />
+            <VoiceWaveIcon v-if="speaking" :size="16" class="text-primary" />
+            <MkIcon v-else name="icon_speaker_outlined" />
           </el-button>
         </MkTooltip>
       </span>

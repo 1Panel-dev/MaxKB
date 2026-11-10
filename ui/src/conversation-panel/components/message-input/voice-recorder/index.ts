@@ -7,7 +7,7 @@ import { MsgError } from '@/utils/message'
 /** 单次录音最长秒数，到时自动结束并转写。 */
 export const VOICE_RECORD_MAX_SECONDS = 60
 /** 录音波形柱数量。 */
-const WAVE_BAR_COUNT = 60
+const WAVE_BAR_COUNT = 80
 
 // 关闭 recorder-core 的控制台日志
 Recorder.CLog = () => {}
@@ -50,8 +50,22 @@ export function useVoiceRecorder(onRecorded: (audio: Blob) => void) {
       type: 'mp3',
       bitRate: 128,
       sampleRate: 16000,
-      onProcess: (_buffers: unknown, powerLevel: number) => {
-        waveLevels.value = [...waveLevels.value.slice(1), powerLevel]
+      onProcess: (buffers: Int16Array[]) => {
+        // 分段计算最新音频的能量，整排随当前声音刷新，静音时收回点状基线。
+        const samples = buffers[buffers.length - 1]
+        waveLevels.value = Array.from({ length: WAVE_BAR_COUNT }, (_, index) => {
+          if (!samples?.length) return 0
+          const start = Math.floor((index * samples.length) / WAVE_BAR_COUNT)
+          const end = Math.floor(((index + 1) * samples.length) / WAVE_BAR_COUNT)
+          if (end === start) return 0
+          let energy = 0
+          for (let offset = start; offset < end; offset++) {
+            const amplitude = samples[offset]! / 32768
+            energy += amplitude * amplitude
+          }
+          const volume = Math.sqrt(energy / (end - start))
+          return Math.min(100, Math.max(0, volume - 0.005) * 500)
+        })
       },
     })
     recorder = instance

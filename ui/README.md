@@ -34,7 +34,7 @@ Admin 默认访问地址为 `http://localhost:3000/admin/`。在另一个终端�
 | `VITE_API_TARGET` | 未设置       | 未设置      | 覆盖开发代理的后端地址     |
 
 当前未设置 `VITE_API_TARGET` 时，使用 `vite.config.ts` 中的 `defaultBackendTarget`，
-值为 `http://47.120.55.164:38080`。连接本地后端时，在 `env/.env.local` 中配置：
+值为 `https://mkv3-ee.fit2cloud.cn/`。连接本地后端时，在 `env/.env.local` 中配置：
 
 ```dotenv
 VITE_API_TARGET=http://127.0.0.1:8080

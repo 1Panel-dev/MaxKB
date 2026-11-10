@@ -59,6 +59,7 @@ declare module 'vue' {
     TableFilterSingle: typeof import('./components/global/mk-table/mk-table-filter/TableFilterSingle.vue')['default']
     ToolIcon: typeof import('./components/global/mk-icon/ToolIcon.vue')['default']
     TriggerIcon: typeof import('./components/global/mk-icon/TriggerIcon.vue')['default']
+    VoiceWaveIcon: typeof import('./components/global/mk-icon/VoiceWaveIcon.vue')['default']
   }
 }
 
@@ -111,4 +112,5 @@ declare global {
   const TableFilterSingle: typeof import('./components/global/mk-table/mk-table-filter/TableFilterSingle.vue')['default']
   const ToolIcon: typeof import('./components/global/mk-icon/ToolIcon.vue')['default']
   const TriggerIcon: typeof import('./components/global/mk-icon/TriggerIcon.vue')['default']
+  const VoiceWaveIcon: typeof import('./components/global/mk-icon/VoiceWaveIcon.vue')['default']
 }
