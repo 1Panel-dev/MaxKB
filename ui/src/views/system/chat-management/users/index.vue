@@ -256,7 +256,7 @@ onMounted(() => loadChatUsers())
                   </el-button>
                 </MkTooltip>
                 <!-- 修改用户密码 -->
-                <ButtonChangeUserPassword :user="row" @refresh="loadChatUsers(false)" />
+                <ButtonChangeUserPassword v-if="perm.system.chatUser.edit()" :user="row" @refresh="loadChatUsers(false)" />
                 <!-- 更多 -->
                 <MkTableMoreDropdown>
                   <!-- 配额设置 -->
