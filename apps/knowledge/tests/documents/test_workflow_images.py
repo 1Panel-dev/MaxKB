@@ -1,13 +1,18 @@
 """Workflow libraries reuse standalone image management without joining source snapshots."""
 
+import json
 from io import BytesIO
+from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import uuid4
 
+from common.auth.struct.auth import Auth
 from common.exception.app_exception import AppApiException
 from django.test import SimpleTestCase, TestCase
+from django.urls import resolve
 from django.utils import timezone
 from PIL import Image
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from knowledge.models import (
     AssetProcessStatus,
@@ -66,6 +71,54 @@ class WorkflowImageManagementTests(TestCase):
         # Storage I/O is mocked; database ownership and image validation remain real.
         File.objects.bulk_create([file])
         return file
+
+    def request_images(self, action, payload):
+        path = f"/workspace/{self.knowledge.workspace_id}/knowledge/{self.knowledge.id}/document/image/{action}"
+        factory = APIRequestFactory()
+        request = (factory.post if action == "preview" else factory.put)(path, payload, format="json")
+        force_authenticate(
+            request,
+            user=SimpleNamespace(id=str(uuid4()), type="TEST"),
+            token=Auth(roles={f"WORKSPACE_MANAGE:w:{self.knowledge.workspace_id}"}, permissions={}),
+        )
+        match = resolve(path, urlconf="knowledge.urls")
+        response = match.func(request, **match.kwargs)
+        self.assertEqual(response.status_code, 200)
+        result = json.loads(response.content)
+        self.assertEqual(result["code"], 200, result)
+        return result["data"]
+
+    def test_workflow_image_import_api_accepts_direct_upload_with_visual_strategy(self):
+        for enabled in (False, True):
+            with self.subTest(visual_enabled=enabled):
+                file = self.create_file()
+                strategy = {"visual": {"enabled": enabled, "strategy": "model", "model_id": str(uuid4())}}
+                with (
+                    patch("knowledge.serializers.document.embedding_by_document.delay") as embed,
+                    self.captureOnCommitCallbacks(execute=True),
+                ):
+                    result = self.request_images(
+                        "batch_create", {"file_id_list": [str(file.id)], "doc_strategy": strategy}
+                    )
+                self.assertEqual(len(result), 1)
+                self.assertEqual(result[0]["resource_type"], DocumentResourceType.IMAGE)
+                document = Document.objects.get(id=result[0]["id"])
+                self.assertEqual(document.knowledge_id, self.knowledge.id)
+                self.assertEqual(document.doc_strategy["visual"]["enabled"], enabled)
+                file.refresh_from_db()
+                self.assertEqual((file.source_type, file.source_id), (FileSourceType.DOCUMENT, str(document.id)))
+                embed.assert_called_once()
+                self.assertEqual(embed.call_args.args[0], str(document.id))
+
+    def test_workflow_image_preview_can_be_imported_through_api(self):
+        file = self.create_file()
+        previews = self.request_images("preview", {"file_id_list": [str(file.id)]})
+        self.assertEqual(previews[0]["resource_type"], DocumentResourceType.IMAGE)
+        result = self.request_images("batch_create", {"file_id_list": [previews[0]["source_file_id"]]})
+        document = Document.objects.get(id=result[0]["id"])
+        self.assertEqual(document.knowledge_id, self.knowledge.id)
+        self.assertEqual(document.resource_type, DocumentResourceType.IMAGE)
+        self.assertEqual(Paragraph.objects.get(document=document).content, "photo")
 
     def test_preview_edit_and_import_preserve_content_and_source(self):
         file = self.create_file()
