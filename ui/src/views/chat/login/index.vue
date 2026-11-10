@@ -134,10 +134,10 @@ onBeforeMount(async () => {
   }
 })
 
-const enableAuth=computed(()=>{
+const enableAuth = computed(() => {
   return auth.authProfile?.enable_auth
 })
- 
+
 const goBack = () => {
   if (enableAuth.value) {
     return
@@ -148,21 +148,16 @@ const goBack = () => {
 
 <template>
   <div class="chat-login flex-center flex-col">
-
     <div class="mb-6 flex-align-center gap-4 max-w-full">
       <ApplicationIcon :icon="auth.authProfile?.logo" :size="32" class="shrink-0" />
       <h2 class="max-w-full truncate" :title="loginTitle">{{ loginTitle }}</h2>
     </div>
     <el-card class="chat-login__card w-100">
       <!-- 返回上一页 -->
-      <span
-        v-if="!enableAuth"
-        class="mb-4 inline-flex items-center gap-1 cursor-pointer text-sm text-N900 hover:text-primary"
-        @click="goBack"
-      >
-        <MkIcon :icon="ArrowLeft" :size="14" />
-        返回
-      </span>
+      <el-button text v-if="!enableAuth" @click="goBack" class="-ml-1 mb-4 text-N900!">
+        <MkIcon :icon="ArrowLeft" />
+        <span>返回</span>
+      </el-button>
       <LoginModePanel v-if="!isClientLoggingIn" :login-config="loginConfig" :login-service="loginService" />
     </el-card>
   </div>

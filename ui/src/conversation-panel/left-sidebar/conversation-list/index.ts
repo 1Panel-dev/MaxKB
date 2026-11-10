@@ -60,8 +60,8 @@ export function createConversationListStore(deps: ConversationListDeps) {
   const composerResetSignal = ref(0)
 
   // View 在两个 Store 创建后绑定加载方法，避免与 message-list 循环初始化。
-  let loadMessages: () => void = () => {}
-  const bindLoader = (loader: () => void) => (loadMessages = loader)
+  let loadMessages: () => void | Promise<void> = () => {}
+  const bindLoader = (loader: () => void | Promise<void>) => (loadMessages = loader)
 
   const resetComposer = () => {
     composerResetSignal.value++
@@ -78,7 +78,7 @@ export function createConversationListStore(deps: ConversationListDeps) {
   const selectConversation = (id: string) => {
     resetComposer()
     currentChatId.value = id
-    loadMessages()
+    return loadMessages()
   }
 
   const newConversation = () => {

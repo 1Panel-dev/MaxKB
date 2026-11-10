@@ -51,8 +51,8 @@ export function createShareLinkStore(deps: ShareLinkDeps) {
     selectedRecordIds.value = checked ? [...availableRecordIds.value] : []
   }
 
-  // 进入分享选择：以传入记录为初始勾选，仅保留当前可分享记录，空值与重复项忽略
-  const enterShare = (recordIds: (string | undefined)[] = []) => {
+  // 会话分享默认全选；内容入口传入记录时仅勾选对应问答，空值与重复项忽略
+  const enterShare = (recordIds: (string | undefined)[] = availableRecordIds.value) => {
     selectedRecordIds.value = availableRecordIds.value.filter((recordId) => recordIds.includes(recordId))
     deps.setShared(true)
   }

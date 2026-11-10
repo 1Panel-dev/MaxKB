@@ -22,8 +22,8 @@ function navigateToWorkspaceMenu(workspaceMenuItem: LayoutMenuItem) {
     <template v-for="workspaceMenuItem in workspaceMenuItems" :key="workspaceMenuItem.name">
       <div
         v-if="workspaceMenuItem.permission ? workspaceMenuItem.permission(route) : true"
-        class="flex-col-center w-full cursor-pointer rounded-md py-2 text-xs font-semibold text-N600 hover:bg-N900/10"
-        :class="isWorkspaceMenuActive(workspaceMenuItem) && 'bg-white text-N900'"
+        class="flex-col-center w-full cursor-pointer rounded-md py-2 text-xs font-semibold text-N600"
+        :class="isWorkspaceMenuActive(workspaceMenuItem) ? 'bg-white text-N900' : 'hover:bg-N900/10'"
         @click="navigateToWorkspaceMenu(workspaceMenuItem)"
       >
         <MkIcon

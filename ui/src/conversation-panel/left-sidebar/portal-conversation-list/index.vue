@@ -8,9 +8,12 @@ import HistoryConversationDrawer from './HistoryConversationDrawer.vue'
 import AccountMenu from '../account-menu/index.vue'
 import { usePortalConversationListStore, type PortalApplicationGroup } from './index'
 import RenameConversation from '../../components/rename/index.vue'
+import { useMessageListStore } from '../../components/message-list/index'
 
 defineOptions({ name: 'PortalConversationList' })
 
+const msgs = useMessageListStore()
+const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
 const portalList = usePortalConversationListStore()
 const { applicationGroups, currentApplicationId, isApplicationListActive, toggleGroup } = portalList
 const { conversations, currentChatId, selectConversation, deleteChat, newConversation, switchShared, toggleLeftSide } = useConversationListStore()
@@ -193,6 +196,14 @@ const handleClearConversations = () => {
                     <el-button text><MkIcon name="icon_more_outlined" /></el-button>
                     <template #dropdown>
                       <MkDropdownMenu>
+                        <!-- 激活所选对话并全选分享 -->
+                        <MkDropdownItem
+                          :disabled="msgs.loading.value || (isActiveConversation(group, conversation) && !canShare)"
+                          @click="portalList.shareConversation(group.id, conversation.id)"
+                        >
+                          <template #icon><MkIcon name="icon_share_outlined" /></template>
+                          <span>分享</span>
+                        </MkDropdownItem>
                         <RenameConversation :conversation="conversation" :application-id="group.id" @renamed="conversation.abstract = $event" />
                         <!-- 删除历史对话 -->
                         <MkDropdownItem divided @click="handleDeleteConversation(group, conversation)">

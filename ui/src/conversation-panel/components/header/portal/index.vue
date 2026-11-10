@@ -15,7 +15,7 @@ const emit = defineEmits<{ share: [] }>()
 const list = useConversationListStore()
 const msgs = useMessageListStore()
 // 回答生成中或没有消息时不可分享
-const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
+const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
 
 const handleNewConversation = () => (props.newConversation ? props.newConversation() : list.newConversation())
 </script>
