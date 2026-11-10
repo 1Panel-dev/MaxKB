@@ -88,7 +88,7 @@ class ChatAuthProfileSerializer(serializers.Serializer):
             "custom_theme": application_setting.custom_theme
             if application_setting
             else {"theme_color": "", "header_font_color": ""},
-            "logo": application_setting.avatar if application_setting else "./favicon.ico",
+            "logo": application_access_token.application.icon,
             "meta": {
                 "application_name": application_access_token.application.name,
                 "application_id": str(application_access_token.application_id),
