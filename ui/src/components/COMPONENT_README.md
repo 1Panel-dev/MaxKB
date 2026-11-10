@@ -218,6 +218,11 @@ Symbol ID 变化时同步引用。
 `--el-loading-spinner-size`。数字按 px 处理，字符串需携带 CSS 单位，例如
 `<LoadingIcon :size="24" />` 或 `<LoadingIcon size="2rem" />`。
 
+`VoiceWaveIcon` 位于 `global/mk-icon/VoiceWaveIcon.vue`，模板中自动注册，使用纯 CSS 持续循环播放
+五根音柱的缩放动画，不依赖录音或播放状态。`size` 默认 `24`，数字按 px 处理，字符串需携带
+CSS 单位；`color` 默认继承文字颜色，也可通过 `text-primary` 设置主题色，例如
+`<VoiceWaveIcon :size="24" class="text-primary" />`。系统启用减少动态效果时显示静态音柱。
+
 ### MkInfiniteScroll
 
 分页列表的滚动触底加载组件，使用 `IntersectionObserver` 监听组件所在滚动区域的底部，不依赖
@@ -975,6 +980,19 @@ Workspace API 内部使用 `getWorkspaceId()`，System 共享 API 不接收工�
 聊天列表订阅流式进度后调用 `followBottom()`；只读日志无需订阅。
 `message-list` 和 `log-message-list` 使用该容器，保留各自的消息正文与底部信息；聊天列表
 自行展示流式圆点，开场白放入 `prepend` 插槽，日志空状态放入 `empty` 插槽。日志列表不注入发送能力。
+消息 Store 的 `loadMore()` 在新增历史记录时返回 `true`，空页、失败或未执行时返回 `false`，
+直接传给滚动容器。新会话及重置时 `hasMore` 为 `false`；已有会话主动加载首页，成功后再更新
+`hasMore`。首页失败后通过重新加载首页重试，不从下一页继续。
+Chat、Portal 和 Display 面板直接放置消息列表，并以当前会话 ID 为 `key`，不再包裹额外滚动层。
+
+### Question（对话模块）
+
+`conversation-panel/components/content/items/question/index.vue` 负责提问展示、附件和操作入口。
+同目录 `QuestionEditor.vue` 接收 `content`、`disabled`，维护本次编辑草稿，通过 `cancel` 和
+`send(question)` 通知入口组件；进入时挂载并聚焦，退出时卸载。入口组件负责发送能力与附件传递。
+
+### 分享选择（对话模块）
+
 正式对话的 `message-list` 根据会话 Store 的 `isShared` 展示分享选择态，同轮提问与回答同步选择，
 内容只读且选中时显示背景；无记录 ID 的问答不可选。列表底部提供当前已加载轮次的全选、已选数量、
 取消及创建链接，创建时按消息顺序提交记录 ID；成功退出分享，失败保留选择。分享期间主面板隐藏输入框，
@@ -990,17 +1008,6 @@ Store 经 `setShared` 开关。所有分享入口调用 `enterShare(recordIds?)`
 Chat、Portal 视图创建并 provide `SHARE_LINK_KEY`，组件通过 `useShareLinkStoreOptional()` 获取，未提供时不进入选择态。
 `ShareMessageRow` 通过插槽承载消息，`ShareFooter` 展示全选、数量、取消与创建链接并在卸载时退出分享态；
 两者只绑定 Store 状态与方法，不维护逻辑。`message-list/index.vue` 只组合组件并传入 Store 提供的记录 ID。
-
-消息 Store 的 `loadMore()` 在新增历史记录时返回 `true`，空页、失败或未执行时返回 `false`，
-直接传给滚动容器。新会话及重置时 `hasMore` 为 `false`；已有会话主动加载首页，成功后再更新
-`hasMore`。首页失败后通过重新加载首页重试，不从下一页继续。
-Chat、Portal 和 Display 面板直接放置消息列表，并以当前会话 ID 为 `key`，不再包裹额外滚动层。
-
-### Question（对话模块）
-
-`conversation-panel/components/content/items/question/index.vue` 负责提问展示、附件和操作入口。
-同目录 `QuestionEditor.vue` 接收 `content`、`disabled`，维护本次编辑草稿，通过 `cancel` 和
-`send(question)` 通知入口组件；进入时挂载并聚焦，退出时卸载。入口组件负责发送能力与附件传递。
 
 ### SharePanel（对话模块）
 
