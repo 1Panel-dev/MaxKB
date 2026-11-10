@@ -218,7 +218,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout class="workspace-tool-view" collapsible>
+  <MkViewLayout class="workspace-tool-view" collapsible resizable>
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>

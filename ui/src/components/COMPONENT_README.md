@@ -190,6 +190,9 @@ Drawer 没有 `MkDialog` 的外壳挂载控制；需要按需挂载时，由业�
 满高页面布局，`loading` 覆盖整个根节点。`title` 默认读取路由标题，传空字符串隐藏；
 提供 `aside` 插槽时才渲染侧栏，`collapsible` 开启内部折叠，`top` 放左右区域上方的内容。
 
+- `resizable` 默认 `false`，显式开启后可拖动侧栏右边界；`minLeftWidth` 默认使用主题展开宽度（240px），
+  `maxLeftWidth` 默认 400px，单位为 px。折叠后展开保留本次宽度，关闭开关恢复主题宽度；不持久化。
+  工作空间智能体、知识库、工具和模型资源列表显式开启，其他调用方按需配置。
 - `aside` 插槽提供 `title`、`Header`；默认插槽提供 `title`、`Header`、`Footer`。
 - 未显式渲染 `Header` 时自动显示标题；`Header`、`Footer` 固定，正文由内置 `el-scrollbar` 滚动。
   不重复包裹整个主内容区，局部树、Tabs 等可独立滚动。

@@ -22,7 +22,10 @@ interface ScrollData {
   scrollTop: number
 }
 
-const props = withDefaults(defineProps<{ collapsible?: boolean; loading?: boolean; title?: string }>(), { collapsible: false, loading: false })
+const props = withDefaults(
+  defineProps<{ collapsible?: boolean; resizable?: boolean; minLeftWidth?: number; maxLeftWidth?: number; loading?: boolean; title?: string }>(),
+  { collapsible: false, resizable: false, loading: false },
+)
 
 const emit = defineEmits<{ scroll: [data: ScrollData] }>()
 
@@ -128,7 +131,14 @@ defineExpose({ getScrollContainer, setScrollTop })
     </div>
 
     <div class="flex min-h-0 flex-1">
-      <LayoutAside v-if="$slots.aside" :collapsible="props.collapsible" :title="title">
+      <LayoutAside
+        v-if="$slots.aside"
+        :collapsible="props.collapsible"
+        :resizable="props.resizable"
+        :min-left-width="props.minLeftWidth"
+        :max-left-width="props.maxLeftWidth"
+        :title="title"
+      >
         <template #default="{ Header, title: asideTitle }">
           <slot name="aside" :Header="Header" :title="asideTitle" />
         </template>

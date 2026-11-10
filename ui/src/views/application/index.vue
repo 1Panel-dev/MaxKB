@@ -197,7 +197,7 @@ function handleBatchDelete() {
 </script>
 
 <template>
-  <MkViewLayout class="workspace-application-view" collapsible>
+  <MkViewLayout class="workspace-application-view" collapsible resizable>
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>

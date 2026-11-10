@@ -90,7 +90,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout class="workspace-model-view" collapsible>
+  <MkViewLayout class="workspace-model-view" collapsible resizable>
     <template #aside>
       <ModelProvider :model-value="currentProvider" :providers="modelProviders" @update:model-value="handleProviderSelect" />
     </template>
