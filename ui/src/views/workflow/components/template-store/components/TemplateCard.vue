@@ -30,7 +30,7 @@ function handleUseTemplate() {
 </script>
 
 <template>
-  <MkResourceCard :title="template.name">
+  <MkResourceCard :title="template.name" class="cursor-pointer" @click="handleOpenDetail">
     <template #icon>
       <el-avatar class="bg-transparent!" shape="square" :size="24">
         <img :src="resetUrl(template.icon, true)" alt="" />
@@ -48,8 +48,8 @@ function handleUseTemplate() {
         <div class="flex min-w-0 flex-1" @click.stop>
           <!-- 查看模板详情 -->
           <el-button class="flex-1!" plain @click="handleOpenDetail">详情</el-button>
-          <!-- 使用模板 -->
-          <el-button class="flex-1!" type="primary" :disabled="disabled" @click="handleUseTemplate">使用</el-button>
+          <!-- 应用模板 -->
+          <el-button class="flex-1!" type="primary" :disabled="disabled" @click="handleUseTemplate">应用</el-button>
         </div>
       </component>
     </template>
