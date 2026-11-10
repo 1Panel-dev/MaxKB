@@ -9,6 +9,7 @@ import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
 import enterpriseWechatLogo from '@/assets/logo/logo_enterprise-wechat.svg'
 import larkLogo from '@/assets/logo/logo_lark.svg'
 import EditSCANDrawer from '../EditSCANDrawer.vue'
+import perm from '@/permission'
 
 interface QrLoginPlatformView extends QrLoginPlatformPayload {
   isValid: boolean
@@ -88,12 +89,12 @@ onMounted(loadQrPlatforms)
 
           <div class="flex-align-center gap-4">
             <!-- 配置扫码登录平台 -->
-            <el-button plain @click.stop="handleEditPlatform(platform)">{{ platform.isValid ? '配置' : '未配置' }}</el-button>
+            <el-button :disabled="!perm.system.loginAuth.edit()" plain @click.stop="handleEditPlatform(platform)">{{ platform.isValid ? '配置' : '未配置' }}</el-button>
             <template v-if="platform.isValid">
               <el-divider direction="vertical" />
               <!-- 启停扫码登录，阻止点击打开配置 -->
               <span class="inline-flex" @click.stop>
-                <el-switch v-model="platform.isActive" @change="handlePlatformStatusChange(platform)" />
+                <el-switch :disabled="!perm.system.loginAuth.edit()" v-model="platform.isActive" @change="handlePlatformStatusChange(platform)" />
               </span>
             </template>
           </div>
