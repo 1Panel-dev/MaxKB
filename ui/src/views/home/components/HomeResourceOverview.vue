@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import type HomepageApi from '@/api/admin/workspace/homepage'
 import type { HomeApplicationAggregation, HomeKnowledgeAggregation, HomeToolAggregation, HomeModelAggregation } from '@/api/types'
 import { toThousands } from '@/utils/number'
+import perm from '@/permission'
 interface HomeResourceCard {
   label: string
   route: string
   icon: string
   color: string
+  disabled?: boolean
   total?: number
   details: [string, number | undefined][]
 }
@@ -16,6 +18,8 @@ interface HomeResourceCard {
 /* 资源概况与列表导航 */
 const props = defineProps<{ workspaceId: string; api: typeof HomepageApi }>()
 const router = useRouter()
+const route = useRoute()
+const isSystemScope = computed(() => route.meta.scope === 'system')
 const loading = ref(false)
 const application = ref<HomeApplicationAggregation>()
 const knowledge = ref<HomeKnowledgeAggregation>()
@@ -24,6 +28,7 @@ const model = ref<HomeModelAggregation>()
 const resourceGroups = computed<HomeResourceCard[]>(() => [
   {
     label: '智能体',
+    disabled: isSystemScope.value || !perm.application.workspace.isShare(),
     route: 'workspace-application-list',
     icon: 'icon_robot_filled',
     color: '#3370FF',
@@ -35,6 +40,7 @@ const resourceGroups = computed<HomeResourceCard[]>(() => [
   },
   {
     label: '知识库',
+    disabled: isSystemScope.value || !perm.knowledge.workspace.isShare(),
     route: 'workspace-knowledge-list',
     icon: 'icon_book_filled',
     color: '#7F3BF5',
@@ -46,6 +52,7 @@ const resourceGroups = computed<HomeResourceCard[]>(() => [
   },
   {
     label: '工具',
+    disabled: isSystemScope.value || !perm.tool.workspace.isShare(),
     route: 'workspace-tools',
     icon: 'icon_busy_filled',
     color: '#2CA91F',
@@ -58,6 +65,7 @@ const resourceGroups = computed<HomeResourceCard[]>(() => [
   },
   {
     label: '模型',
+    disabled: isSystemScope.value || !perm.model.workspace.isShare(),
     route: 'workspace-model',
     icon: 'icon_dataset_filled',
     color: '#FF8800',
@@ -109,8 +117,9 @@ function loadResources() {
     loading.value = false
   })
 }
-function handleNavigate(name: string) {
-  router.push({ name, params: { workspaceId: props.workspaceId } })
+function handleNavigate(card: HomeResourceCard) {
+  if (card.disabled) return
+  router.push({ name: card.route, params: { workspaceId: props.workspaceId } })
 }
 onMounted(loadResources)
 defineExpose({ refresh: loadResources })
@@ -119,11 +128,12 @@ defineExpose({ refresh: loadResources })
   <section>
     <div v-loading="loading" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <template v-for="card in resourceGroups" :key="card.route">
+        <!-- 进入未禁用资源的列表 -->
         <el-card
-          shadow="hover"
-          class="cursor-pointer hover:border-current!"
+          :shadow="card.disabled ? 'never' : 'hover'"
+          :class="{ 'cursor-pointer hover:border-current!': !card.disabled }"
           :style="{ color: card.color, backgroundImage: `linear-gradient(to bottom, ${card.color}0A 0%, #FFFFFF 40%, #FFFFFF 100%)` }"
-          @click="handleNavigate(card.route)"
+          @click="handleNavigate(card)"
         >
           <div class="flex-between text-N900">
             <div>

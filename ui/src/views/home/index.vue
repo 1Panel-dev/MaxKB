@@ -36,7 +36,6 @@ onMounted(() => {
 <template>
   <MkViewLayout title="">
     <!-- 快捷创建 -->
-    <h4 class="mb-4 mt-4">快捷创建</h4>
     <HomeQuickCreate :workspace-id="workspaceId" />
     <!-- 资源 -->
     <h4 class="mb-4 mt-4">资源</h4>
