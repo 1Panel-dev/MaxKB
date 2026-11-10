@@ -17,16 +17,22 @@ const userOptions = ref<ChatUserBase[]>([])
 const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
 const formRules: FormRules = { userIds: [{ required: true, message: '请选择对话用户', trigger: 'change' }] }
 
-function open() {
-  visible.value = true
+function loadUserOptions(keyword = '') {
   optionsLoading.value = true
-  return ChatUserApi.getChatUser()
+  return ChatUserApi.getChatUser(keyword ? { nick_name: keyword } : undefined)
     .then((users) => {
-      userOptions.value = users
+      const selectedUserIds = new Set(memberForm.userIds)
+      const selectedUserOptions = userOptions.value.filter(({ id }) => selectedUserIds.has(id))
+      userOptions.value = [...new Map([...selectedUserOptions, ...users].map((user) => [user.id, user])).values()]
     })
     .finally(() => {
       optionsLoading.value = false
     })
+}
+
+function open() {
+  visible.value = true
+  return loadUserOptions()
 }
 
 function submit() {
@@ -64,7 +70,17 @@ defineExpose({ open })
   <MkDialog v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="对话用户" prop="userIds">
-        <el-select v-model="memberForm.userIds" class="w-full" filterable multiple :loading="optionsLoading" placeholder="请选择用户名或姓名">
+        <el-select
+          v-model="memberForm.userIds"
+          class="w-full"
+          filterable
+          multiple
+          :loading="optionsLoading"
+          remote
+          :remote-method="loadUserOptions"
+          :reserve-keyword="false"
+          placeholder="请选择用户名或姓名"
+        >
           <el-option v-for="user in userOptions" :key="user.id" :label="user.nick_name" :value="user.id" />
         </el-select>
       </el-form-item>
