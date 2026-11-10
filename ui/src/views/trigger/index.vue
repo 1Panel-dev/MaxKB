@@ -230,7 +230,7 @@ onMounted(() => loadTriggers())
 
               <div class="flex">
                 <!-- 编辑当前触发器 -->
-                <MkTooltip content="编辑" placement="top" v-if="perm.trigger.edit()">
+                <MkTooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenTriggerDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
@@ -265,5 +265,5 @@ onMounted(() => loadTriggers())
     </template>
   </MkViewLayout>
   <TriggerTaskRecordDrawer ref="recordDrawerRef" />
-  <TriggerFormDrawer ref="triggerDrawerRef" @refresh="loadTriggers" />
+  <TriggerFormDrawer :can-edit="perm.trigger.edit()" ref="triggerDrawerRef" @refresh="loadTriggers" />
 </template>

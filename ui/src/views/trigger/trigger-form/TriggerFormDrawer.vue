@@ -28,8 +28,9 @@ const props = withDefaults(
     applicationApi?: typeof ApplicationApi | typeof SystemResourceApplicationApi
     toolApi?: typeof ToolApi | typeof SystemToolApi
     toolWorkflowApi?: typeof WorkflowApi
+    canEdit?: boolean
   }>(),
-  { resourceApi: () => ResourceTriggerApi, applicationApi: () => ApplicationApi, toolApi: () => ToolApi, toolWorkflowApi: () => WorkflowApi },
+  { resourceApi: () => ResourceTriggerApi, applicationApi: () => ApplicationApi, toolApi: () => ToolApi, toolWorkflowApi: () => WorkflowApi, canEdit: true },
 )
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 /* 抽屉生命周期与详情 */
@@ -432,7 +433,7 @@ defineExpose({ open })
       <!-- 取消触发器编辑 -->
       <el-button plain :disabled="saving" @click="visible = false">取消</el-button>
       <!-- 保存触发器配置 -->
-      <el-button type="primary" :loading="saving" :disabled="loading || detailFailed" @click="handleSave">
+      <el-button v-if="canEdit" type="primary" :loading="saving" :disabled="loading || detailFailed" @click="handleSave">
         {{ editingId ? '保存' : '创建' }}
       </el-button>
     </template>

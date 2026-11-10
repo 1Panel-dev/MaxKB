@@ -129,7 +129,7 @@ defineExpose({ open })
               <div class="flex-align-center shrink-0">
                 <!-- 编辑触发器 -->
 
-                <el-button v-if="toolTriggerPermission('triggerEdit')" text :disabled="loading" @click="handleOpenForm(trigger.id)"><MkIcon name="icon_edit_outlined" /></el-button>
+                <el-button text :disabled="loading" @click="handleOpenForm(trigger.id)"><MkIcon name="icon_edit_outlined" /></el-button>
 
                 <!-- 移除当前资源的触发器 -->
 
@@ -151,5 +151,6 @@ defineExpose({ open })
     :resource-api="api"
     @refresh="loadTriggers"
     @closed="handleFormClosed"
+    :can-edit="toolTriggerPermission('triggerEdit')"
   />
 </template>
