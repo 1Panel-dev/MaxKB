@@ -6,12 +6,22 @@
 
 ```bash
 uv run python apps/manage.py test application.tests.test_workflow_excel_split \
-  application.tests.test_workflow_document_source
+  application.tests.test_workflow_document_source application.tests.test_workflow_document_images \
+  knowledge.tests.imports.test_zip_document_import --keepdb --noinput
 ```
 
 Excel 的智能、自定义和 QA 分段均按 sheet 输出独立文档。测试使用内存中的 XLSX、XLS
 文件经过真实提取、分段节点，覆盖 sheet 命名、原文件及来源元数据、分段长度、QA 问题
-和非 Excel 文档兼容性。文件查询使用替身，不验证数据库入库或前端显示。
+和非 Excel 文档兼容性。ZIP 导入保留内部文件边界，Excel 按 sheet 输出文档，来源仍指向
+原 ZIP；覆盖混合文件、子目录、同名 sheet、图片引用改写和文本汇总输出兼容性。
+`WorkflowExcelSplitTests` 的文件查询和图片保存使用替身；`WorkflowExcelDatabaseTests` 使用
+真实测试数据库执行提取、分段、文档写入，覆盖三种策略下各 sheet 的段落隔离及独立的源文件
+归属记录，仅替换对象存储读取。图片归属由 `test_workflow_document_images` 的数据库测试覆盖。
+自动化测试不验证前端显示、真实对象存储或模型向量化。
+
+2026-11-10 针对缺陷 1078294 的定向验证：上述 29 项测试全部通过。另通过本地页面上传
+缺陷原始 ZIP，智能分段后 4 个 sheet 分别生成独立文档，分段数为 1、3、1、1；包内的
+`knowledge.json` 继续作为普通文件导入。5 个文档的真实向量化均成功，临时验证知识库已清理。
 
 ## 工作流 Web 图片导入
 

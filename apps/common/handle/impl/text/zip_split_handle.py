@@ -134,7 +134,7 @@ def get_file_name(file_name):
         file_name_code = file_name.encode("cp437")
         charset = detect(file_name_code)["encoding"]
         return file_name_code.decode(charset)
-    except Exception as e:
+    except Exception:
         return file_name
 
 
@@ -193,14 +193,14 @@ class ZipSplitHandle(BaseSplitHandle):
         return False
 
     def get_content(self, file, save_image):
-        """
-        从 zip 中提取并返回拼接的 md 文本，同时收集并保存内嵌图片（通过 save_image 回调）。
-        使用 posixpath 来正确处理 zip 内部的路径拼接与规范化。
-        """
+        return "\n\n".join(document["content"] for document in self.get_documents(file, save_image))
+
+    def get_documents(self, file, save_image, content_handles=None):
+        """保留 ZIP 内的文件名和内容边界，同时解析并保存引用的图片。"""
         buffer = file.read() if hasattr(file, "read") else None
         bytes_io = io.BytesIO(buffer) if buffer is not None else io.BytesIO(file)
         image_list = []
-        content_parts = []
+        content_handles = split_handles if content_handles is None else content_handles
 
         with zipfile.ZipFile(bytes_io, "r") as zip_ref:
             files = zip_ref.namelist()
@@ -216,7 +216,7 @@ class ZipSplitHandle(BaseSplitHandle):
                     # 为 split_handle 提供可重复读取的 file-like 对象
                     zf.name = real_name
                     get_buffer = FileBufferHandle().get_buffer
-                    for split_handle in split_handles:
+                    for split_handle in content_handles:
                         if split_handle.support(zf, get_buffer):
                             row = get_buffer(zf)
                             md_text = split_handle.get_content(io.BytesIO(row), save_image)
@@ -226,7 +226,7 @@ class ZipSplitHandle(BaseSplitHandle):
                 _image_list, content = get_image_list_by_content(
                     file_content.get("name"), file_content.get("content"), files
                 )
-                content_parts.append(content)
+                file_content["content"] = content
                 for image in _image_list:
                     image_list.append(image)
 
@@ -243,4 +243,4 @@ class ZipSplitHandle(BaseSplitHandle):
                         image_mode_list.append(i)
                 save_image(image_mode_list)
 
-        return "\n\n".join(content_parts)
+        return file_content_list

@@ -15,6 +15,7 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
+from common.handle.impl.text.zip_split_handle import ZipSplitHandle
 from knowledge.models import File, FileSourceType
 from knowledge.serializers.document import FileBufferHandle, parse_table_handle_list, split_handles
 
@@ -97,15 +98,24 @@ class DocumentExtractNode(INode):
             for split_handle in parse_table_handle_list + split_handles:
                 if split_handle.support(buffer, get_buffer):
                     buffer.seek(0)
-                    file_content = split_handle.get_content(buffer, save_image)
+                    if isinstance(split_handle, ZipSplitHandle):
+                        extracted_documents = split_handle.get_documents(
+                            buffer, save_image, parse_table_handle_list + split_handles
+                        )
+                    else:
+                        extracted_documents = [
+                            {"name": doc["name"], "content": split_handle.get_content(buffer, save_image)}
+                        ]
+                    file_content = "\n\n".join(item["content"] for item in extracted_documents)
                     content.append("### " + doc["name"] + "\n" + file_content)
-                    document_list.append(
+                    document_list.extend(
                         {
                             "id": str(file.id),
-                            "name": doc["name"],
-                            "content": file_content,
+                            "name": item["name"],
+                            "content": item["content"],
                             "meta": {**(doc.get("meta") or {}), "source_file_id": str(file.id)},
                         }
+                        for item in extracted_documents
                     )
                     break
 
