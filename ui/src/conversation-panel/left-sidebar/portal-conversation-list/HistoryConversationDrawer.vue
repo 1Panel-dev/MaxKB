@@ -8,7 +8,6 @@ import { usePortalConversationListStore } from './index'
 import RenameConversation from '../../components/rename/index.vue'
 
 import { useMessageListStore } from '../../components/message-list/index'
-import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
 
 defineOptions({ name: 'HistoryConversationDrawer' })
 const props = defineProps<{ applicationId: string }>()
@@ -16,14 +15,11 @@ const visible = defineModel<boolean>({ required: true })
 const portalList = usePortalConversationListStore()
 const conversationList = useConversationListStore()
 const msgs = useMessageListStore()
-const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
-const shareLink = useShareLinkStoreOptional()
+const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
 
-// 开启当前对话的分享选择（不预先勾选），并关闭历史抽屉。
-const handleShareConversation = () => {
-  if (!canShare.value) return
-  shareLink?.enterShare()
-  visible.value = false
+// 激活所选会话并全选分享，成功后关闭历史抽屉。
+const handleShareConversation = async (conversation: PortalConversationSummary) => {
+  if (await portalList.shareConversation(selectedApplicationId.value, conversation.id)) visible.value = false
 }
 const selectedApplicationId = ref(props.applicationId)
 const keyword = ref('')
@@ -102,8 +98,11 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
               <el-button text><MkIcon name="icon_more_outlined" /></el-button>
               <template #dropdown>
                 <MkDropdownMenu>
-                  <!-- 分享当前激活对话 -->
-                  <MkDropdownItem v-if="isActiveConversation(conversation)" :disabled="!canShare" @click="handleShareConversation">
+                  <!-- 激活所选对话并全选分享 -->
+                  <MkDropdownItem
+                    :disabled="msgs.loading.value || (isActiveConversation(conversation) && !canShare)"
+                    @click="handleShareConversation(conversation)"
+                  >
                     <template #icon><MkIcon name="icon_share_outlined" /></template>
                     <span>分享</span>
                   </MkDropdownItem>

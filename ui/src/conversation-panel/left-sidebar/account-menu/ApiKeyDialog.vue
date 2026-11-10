@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 import ChatUserApi from '@/api/chat/chat-user'
 import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'ConversationApiKeyDialog' })
 
-const router = useRouter()
 const dialogVisible = ref(false)
 const apiKey = ref('')
 const loading = ref(false)
 const mcpServiceType = ref<'agent' | 'knowledge'>('agent')
-const apiUrl = computed(() => new URL(router.resolve({ name: 'portal-home' }).href, window.location.origin).href)
-const maskedApiKey = computed(() => (apiKey.value ? `******${apiKey.value.slice(-4)}` : ''))
+const mcpConfig = ref('')
 
 // 每次打开重新读取；重置直接替换当前用户的唯一密钥。
 function loadApiKey(regenerate = false) {
@@ -46,10 +43,10 @@ defineExpose({ open })
     <template #subtitle>每个用户仅一个 API Key，绑定当前对话用户、与其同权。重置后旧 Key 立即失效</template>
 
     <div class="mb-2">我的 API Key</div>
-    <el-input :model-value="maskedApiKey" readonly class="mb-4">
+    <el-input :model-value="`******${apiKey.slice(-4)}`" readonly class="mb-4">
       <template #suffix>
         <!-- 复制 API URL -->
-        <el-button text @click="copyText(maskedApiKey)">
+        <el-button text @click="copyText(apiKey)">
           <MkIcon name="icon_copy_outlined" />
         </el-button>
         <MkTooltip content="重新生成" placement="top">
@@ -69,9 +66,9 @@ defineExpose({ open })
     </el-radio-group>
 
     <div class="group relative">
-      <el-input :model-value="maskedApiKey" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
+      <el-input :model-value="mcpConfig" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
       <!-- 复制 MCP 配置 -->
-      <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle @click="copyText(maskedApiKey)">
+      <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle @click="copyText(mcpConfig)">
         <MkIcon name="icon_copy_outlined" />
       </el-button>
     </div>

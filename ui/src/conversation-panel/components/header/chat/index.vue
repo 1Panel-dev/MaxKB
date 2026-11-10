@@ -13,7 +13,7 @@ const props = defineProps<{
 const list = useConversationListStore()
 
 const msgs = useMessageListStore()
-// 标题栏分享不针对某一轮，进入后不预先勾选
+// 标题栏分享默认全选当前可分享记录
 const shareLink = useShareLinkStoreOptional()
 // 回答生成中或没有消息时不可分享
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)

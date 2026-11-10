@@ -27,6 +27,8 @@ export interface PortalConversationListDeps {
   openApplication: (applicationId: string) => void
   /** 打开其他智能体的会话。 */
   openConversation: (applicationId: string, chatId: string) => void
+  /** 激活所选会话，加载后全选分享；成功进入返回 true。 */
+  shareConversation: (applicationId: string, chatId: string) => Promise<boolean>
   /** 打开全部智能体页。 */
   openApplicationList: () => void
   /** 打开选择智能体抽屉。 */
@@ -155,6 +157,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
     isApplicationListActive: deps.isApplicationListActive,
     openApplication: deps.openApplication,
     openConversation: deps.openConversation,
+    shareConversation: deps.shareConversation,
     openApplicationList: deps.openApplicationList,
     newConversation,
   }

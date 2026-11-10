@@ -1,4 +1,4 @@
-import { computed, watch } from 'vue'
+import { computed, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ConversationApi from '@/api/chat/conversation'
 import PortalApi from '@/api/chat/portal'
@@ -62,6 +62,36 @@ export function createPortalConversation(options: PortalConversationOptions): Po
     currentApplicationId,
     isApplicationListActive,
     openApplication,
+    // 跨智能体通过导航激活，等待路由驱动的消息加载结束后再全选分享。
+    shareConversation: async (applicationId, chatId) => {
+      if (bundle.msgs.loading.value) return false
+      if (applicationId !== currentApplicationId.value) {
+        const failure = await router.push({ name: 'portal-application-chat', params: { applicationId, chatId }, query: route.query })
+        if (failure) return false
+        await nextTick()
+        if (bundle.msgs.loading.value) {
+          await new Promise<void>((resolve) => {
+            const stop = watch(bundle.msgs.loading, (loading) => {
+              if (!loading) {
+                stop()
+                resolve()
+              }
+            })
+          })
+        }
+      } else if (bundle.list.currentChatId.value !== chatId) {
+        await bundle.list.selectConversation(chatId)
+      }
+      if (
+        currentApplicationId.value !== applicationId ||
+        bundle.list.currentChatId.value !== chatId ||
+        !bundle.msgs.messages.value.length ||
+        bundle.msgs.streamLoading.value
+      )
+        return false
+      bundle.share.enterShare()
+      return true
+    },
     openConversation: (applicationId, chatId) =>
       void router.push({ name: 'portal-application-chat', params: { applicationId, chatId }, query: route.query }),
     openApplicationList: () => void router.push({ name: 'portal-application-list', query: route.query }),

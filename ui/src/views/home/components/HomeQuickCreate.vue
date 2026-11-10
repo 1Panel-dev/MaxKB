@@ -53,7 +53,7 @@ onMounted(() =>
                 <h6>创建智能体</h6>
                 <p class="text-sm text-N600">手动搭建、AI 生成或导入创建</p>
               </div>
-              <MkIcon name="icon_down_outlined" />
+              <MkIcon name="icon_down_outlined" class="text-N600!" />
             </div>
           </el-card>
         </template>
