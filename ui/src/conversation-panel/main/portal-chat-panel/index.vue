@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
 import PortalHeader from '../../components/header/portal/index.vue'
 import MessageList from '../../components/message-list/index.vue'
@@ -16,6 +17,11 @@ const portalList = usePortalConversationListStore()
 
 // 拖拽到面板任意处 → 交给 message-input 接收文件
 const handleDrop = (e: DragEvent) => input.addFiles(e.dataTransfer?.files)
+
+// 当前智能体开启免责声明时在输入框下方居中显示，与显示设置预览一致
+const disclaimerText = computed(() =>
+  portalList.currentApplicationId.value && list.appInfo.value?.disclaimer ? list.appInfo.value.disclaimer_value : '',
+)
 </script>
 <template>
   <!-- 门户对话主面板:header + message-list + message-input -->
@@ -27,6 +33,9 @@ const handleDrop = (e: DragEvent) => input.addFiles(e.dataTransfer?.files)
     <div v-else class="flex-center min-h-0 flex-1">
       <MkEmpty v-if="portalList.isApplicationGroupsLoaded.value" description="暂无可用智能体" />
     </div>
-    <footer v-if="!list.isShared.value" class="mk-conversation-content flex-center shrink-0 p-4"><MessageInput /></footer>
+    <footer v-if="!list.isShared.value" class="mk-conversation-content flex-col-center shrink-0 gap-2 p-4">
+      <MessageInput />
+      <p v-if="disclaimerText" class="wrap-anywhere text-center text-sm text-N500 -mb-1">{{ disclaimerText }}</p>
+    </footer>
   </main>
 </template>
