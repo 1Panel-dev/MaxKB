@@ -99,7 +99,7 @@ class SystemChatUserView(APIView):
             RoleConstants.WORKSPACE_MANAGE,
         )
         def get(self, request: Request):
-            return result.success(ChatUserSerializer.list())
+            return result.success(ChatUserSerializer.list(request.query_params.get("nick_name", None)))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

@@ -17,8 +17,8 @@ import type {
 const prefix = '/system/chat_user'
 
 /** 获取对话用户。 */
-const getChatUser = () => {
-  return get<ChatUserBase[]>(`${prefix}/list`)
+const getChatUser = (query?: Dict<unknown>) => {
+  return get<ChatUserBase[]>(`${prefix}/list`, query)
 }
 
 /** 获取对话用户分页列表。 */
