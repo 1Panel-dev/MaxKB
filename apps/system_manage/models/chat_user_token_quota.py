@@ -12,6 +12,7 @@ from common.exception.app_exception import AppApiException
 from common.mixins.app_model_mixin import AppModelMixin
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class QuotaType(models.TextChoices):
@@ -68,26 +69,35 @@ class ChatUserTokenQuota(AppModelMixin):
 
     @classmethod
     def consume(cls, user_id, amount):
+        """记录本次实际 Token 消耗：累计 used_tokens/total_tokens。
+        即使超出上限也不抛异常，配额拦截交给对话前的 check_available，保证对话记录能正常落库。
+        """
         if amount <= 0:
             return
         quota = cls.objects.filter(user_id=user_id).first()
         if quota is None:
             # 所有消费用户都创建统计行，匿名用户也累计使用量
-            quota, _ = cls.objects.get_or_create(
+            quota, _created = cls.objects.get_or_create(
                 user_id=user_id,
                 defaults={"quota_type": QuotaType.UNLIMITED},
             )
-        if quota.quota_type == QuotaType.UNLIMITED:
-            # 不限额：只累计使用量，不校验上限
-            quota.used_tokens += amount
-            quota.total_tokens += amount
-            quota.save(update_fields=["used_tokens", "total_tokens"])
-            return
         quota.check_and_reset()
-        if quota.used_tokens + amount > quota.token_limit:
-            raise AppApiException(
-                500, _("The token quota for the current period has been exhausted. Please contact the administrator.")
-            )
+        # 记录实际使用量：即使超出上限也如实累计，拦截交给下次对话前的 check_available
         quota.used_tokens += amount
         quota.total_tokens += amount
         quota.save(update_fields=["used_tokens", "total_tokens"])
+
+    @classmethod
+    def check_available(cls, user_id):
+        """对话前预校验：当前周期配额已用满或超限则抛 AppApiException，不写库。"""
+        quota = cls.objects.filter(user_id=user_id).first()
+        if quota is None:
+            return
+        if quota.quota_type == QuotaType.UNLIMITED:
+            return
+        quota.check_and_reset()
+        if quota.token_limit is not None and quota.used_tokens >= quota.token_limit:
+            raise AppApiException(
+                500,
+                _("The token quota for the current period has been exhausted. Please contact the administrator."),
+            )
