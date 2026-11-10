@@ -71,7 +71,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
           <!-- 助手消息结束后显示底部信息栏(知识来源/执行详情/tokens/耗时) -->
           <MessageFooter
             class="mt-3"
-            v-if="!isShared && msg.role === 'ASSISTANT' && (msg.write_ed || msg.record)"
+            v-if="(!isShared && msg.role === 'ASSISTANT' && (msg.write_ed || msg.record))&&!streamLoading"
             :message="msg"
             @resize="scrollRef?.followBottom()"
           />

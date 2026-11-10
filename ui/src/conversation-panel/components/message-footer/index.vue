@@ -9,7 +9,7 @@ import { datetimeFormat } from '@/utils/time'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
 import { useExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
 
-import { MESSAGE_LIST_KEY } from '../message-list/index'
+import { MESSAGE_LIST_KEY, useMessageListStore } from '../message-list/index'
 import { useShareLinkStoreOptional } from '../message-list/share/index'
 import { useShowShare } from '../../view/index'
 
@@ -24,14 +24,14 @@ onMounted(() => {
   if (footerRef.value) footerObserver.observe(footerRef.value)
 })
 onBeforeUnmount(() => footerObserver?.disconnect())
-
 // 智能体允许分享时显示分享入口；进入分享时预先勾选当前回答所属轮次。
 const showShare = useShowShare()
 const shareLink = useShareLinkStoreOptional()
+
 // 回答生成中禁用分享。
 const messageList = inject(MESSAGE_LIST_KEY, null)
 const canShare = computed(() => Boolean(messageList?.messages.value.length && !messageList.streamLoading.value))
-
+const show_exec=computed(()=>messageList?.appInfo.value?.show_exec)
 const detail = useExecutionDetailStore()
 
 const EMPTY: ChatRecordMeta = {
@@ -143,7 +143,7 @@ function openFeedback(status: '0' | '1') {
       </el-button>
 
       <!-- 执行详情:对话结束时已拉取并缓存,点击直接在右侧展示 -->
-      <el-button text @click="openExecutionDetail" class="-ml-1">
+      <el-button v-if="show_exec" text @click="openExecutionDetail" class="-ml-1">
         <MkIcon name="icon_logs_outlined" />
         <span>执行详情</span>
       </el-button>
