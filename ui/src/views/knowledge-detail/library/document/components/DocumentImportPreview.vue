@@ -3,7 +3,7 @@ import { computed, nextTick, ref } from 'vue'
 import type { DocumentImportParagraph, DocumentSplitResult } from '@/api/types'
 import { getFileIconUrl } from '@/utils/icon'
 import { getFileUrl } from '@/utils/common'
-import { MsgWarning } from '@/utils/message'
+import { MsgConfirm, MsgWarning } from '@/utils/message'
 import EditParagraphDialog from '../upload-document/EditParagraphDialog.vue'
 
 defineOptions({ name: 'DocumentImportPreview' })
@@ -54,7 +54,14 @@ function validate() {
 defineExpose({ validate })
 
 function handleDeleteParagraph(index: number) {
-  selectedDocument.value?.content.splice(index, 1)
+  const document = selectedDocument.value
+  if (!document) return
+  const resourceName = document.source_file_id && document.resource_type === 'image' ? '图片' : '文档'
+  return MsgConfirm(`是否删除${resourceName}：${document.name}？`)
+    .then(() => {
+      document.content.splice(index, 1)
+    })
+    .catch(() => {})
 }
 </script>
 
