@@ -155,13 +155,15 @@ const goBack = () => {
       <ApplicationIcon :icon="auth.authProfile?.logo" :size="32" class="shrink-0" />
       <h2 class="max-w-full truncate" :title="loginTitle">{{ loginTitle }}</h2>
     </div>
-    <el-card class="chat-login__card w-100">
+    <el-card class="chat-login__card w-100" body-class="flex-column h-full">
       <!-- 返回上一页 -->
-      <el-button text v-if="!enableAuth" @click="goBack" class="-ml-1 mb-4 text-N900!">
+      <el-button text v-if="!enableAuth" @click="goBack" class="-ml-1 mb-4 shrink-0 self-start text-N900!">
         <MkIcon :icon="ArrowLeft" />
         <span>返回</span>
       </el-button>
-      <LoginModePanel v-if="!isClientLoggingIn" :login-config="loginConfig" :login-service="loginService" />
+      <div v-if="!isClientLoggingIn" class="min-h-0 flex-1">
+        <LoginModePanel :login-config="loginConfig" :login-service="loginService" />
+      </div>
     </el-card>
   </div>
 </template>
