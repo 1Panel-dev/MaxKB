@@ -297,6 +297,7 @@ class AliyunBaiLianModelProvider(IModelProvider):
 
     def get_dynamic_model_info_list(self, api_key, api_base, credential=None):
         """DashScope 专有实现：按 capabilities/inference_metadata 精确映射模型类型。"""
+        api_key = api_key or self._credential_api_key(credential)
         # 模型列表始终走官方 DashScope 接口；compatible-mode 地址归一化回原生 /api/v1。
         items = []
         for base in dict.fromkeys([self._query_base_for(api_base), "https://dashscope.aliyuncs.com/api/v1"]):
@@ -353,46 +354,75 @@ class AliyunBaiLianModelProvider(IModelProvider):
         """调用阿里云百炼（DashScope）官方 /models 列表接口实时获取可用模型。
 
         兼容两种返回结构：
-        - DashScope：{"output": {"models": [...]}}
+        - DashScope：{"output": {"total": N, "models": [...]}}
         - 网关/OpenAI 风格：{"data": [...]}（如 ai.fit2cloud.cn 网关）
         传入 api_base 时会作为 SDK 的 base_address，否则使用 SDK 默认的
         https://dashscope.aliyuncs.com/api/v1。
+
+        首屏返回 total 后并发拉取剩余页，避免 4 次串行请求造成 2s+ 延迟；
+        网关类接口不返回 total 时退化为串行直到短页或没有新增。
         """
         import dashscope
+        from concurrent.futures import ThreadPoolExecutor
 
-        models = []
-        seen = set()
-        page_no = 1
         page_size = 100
-        while True:
-            kwargs = {"page": page_no, "page_size": page_size, "api_key": api_key}
-            if api_base:
-                kwargs["base_address"] = api_base
-            response = dashscope.Models.list(**kwargs)
+
+        def page_models(response):
             if getattr(response, "status_code", None) != 200:
-                if models:
-                    return models
                 return []
             output = response.output or {}
             if isinstance(output, dict):
-                page_models = output.get("models") or output.get("data") or []
-            elif isinstance(output, list):
-                page_models = output
-            else:
-                page_models = []
-            if not page_models:
-                break
-            new_count = 0
-            for item in page_models:
+                return output.get("models") or output.get("data") or []
+            return output or []
+
+        def total_of(response):
+            output = response.output or {}
+            total = output.get("total") if isinstance(output, dict) else None
+            return int(total) if isinstance(total, int) or (isinstance(total, str) and total.isdigit()) else None
+
+        def fetch(page_no):
+            kwargs = {"page": page_no, "page_size": page_size, "api_key": api_key}
+            if api_base:
+                kwargs["base_address"] = api_base
+            return dashscope.Models.list(**kwargs)
+
+        responses = {}
+        first = fetch(1)
+        if getattr(first, "status_code", None) != 200:
+            return []
+        responses[1] = page_models(first)
+
+        total = total_of(first)
+        if total is not None:
+            total_pages = max(1, (total + page_size - 1) // page_size)
+            if total_pages > 1:
+                with ThreadPoolExecutor(max_workers=min(total_pages, 8)) as executor:
+                    future_map = {executor.submit(fetch, page_no): page_no for page_no in range(2, total_pages + 1)}
+                    for future in future_map:
+                        try:
+                            page_no = future_map[future]
+                            responses[page_no] = page_models(future.result())
+                        except Exception:
+                            responses[page_no] = []
+        else:
+            page_no = 2
+            while True:
+                response = fetch(page_no)
+                items = page_models(response)
+                responses[page_no] = items
+                if not items or len(items) < page_size:
+                    break
+                page_no += 1
+
+        models = []
+        seen = set()
+        for page_no in sorted(responses):
+            for item in responses[page_no]:
                 model_id = item.get("model") or item.get("id") or item.get("model_id") or item.get("name")
                 if not model_id or model_id in seen:
                     continue
                 seen.add(model_id)
                 models.append(item)
-                new_count += 1
-            if len(page_models) < page_size or new_count == 0:
-                break
-            page_no += 1
         return models
 
     @staticmethod

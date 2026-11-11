@@ -4,7 +4,6 @@
 import os
 from common.utils.common import get_file_content
 from models_provider.base_model_provider import (
-    _model_type_name,
     IModelProvider,
     ModelProvideInfo,
     ModelInfo,
@@ -239,28 +238,11 @@ class BedrockModelProvider(IModelProvider):
             summaries = client.list_foundation_models().get("modelSummaries") or []
         except Exception:
             return None
-        builtin_manage = self.get_model_info_manage()
-        impl_map = {}
-        for info in builtin_manage.model_list:
-            impl_map.setdefault(info.model_type, (info.model_credential, info.model_class))
-        builtin_by_name = {info.name: info for info in builtin_manage.model_list}
-        info_list = []
-        for item in summaries:
-            model_id = item.get("modelId") or item.get("modelArn")
-            if not model_id:
-                continue
-            builtin = builtin_by_name.get(model_id)
-            if builtin is not None:
-                info_list.append(
-                    ModelInfo(model_id, builtin.desc, builtin.model_type, builtin.model_credential, builtin.model_class)
-                )
-                continue
-            model_type = self.classify_dynamic_model(model_id)
-            impl = impl_map.get(_model_type_name(model_type))
-            if impl is None:
-                continue
-            info_list.append(ModelInfo(model_id, _(""), model_type, impl[0], impl[1]))
-        return info_list or None
+        return self._build_dynamic_model_info_list(
+            summaries,
+            lambda item, model_id: self.classify_dynamic_model(model_id),
+            id_extractor=lambda item: item.get("modelId") or item.get("modelArn"),
+        )
 
     def __init__(self):
         self._model_info_manage = _initialize_model_info()

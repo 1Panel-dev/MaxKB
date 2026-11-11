@@ -1,7 +1,7 @@
 # coding=utf-8
 import base64
 from concurrent.futures import ThreadPoolExecutor
-from typing import Dict, Optional, Any, Iterator, cast, Union, Sequence, Callable, Mapping, AsyncIterator
+from typing import Dict, Optional, Any, Iterator, cast, Union, Sequence, Callable, Mapping, AsyncIterator, ClassVar
 
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.messages import (
@@ -94,6 +94,9 @@ def _convert_delta_to_message_chunk(
 class BaseChatOpenAI(ChatOpenAI):
     usage_metadata: dict = {}
     custom_get_token_ids = custom_get_token_ids
+    # 连通性校验使用短超时，避免不可达地址导致创建/编辑模型接口长时间挂起。
+    # 仅作用于 is_valid_credential 期间构造的临时校验实例，不影响真实推理。
+    credential_validation_timeout: ClassVar[float] = 5.0
 
     def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
         return self.usage_metadata

@@ -119,17 +119,12 @@ class ChatUserSerializer(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)
-            self._check_unique_username_and_email()
+            self._check_unique_username()
 
-        def _check_unique_username_and_email(self):
+        def _check_unique_username(self):
             username = self.data.get("username")
-            nick_name = self.data.get("nick_name")
-            user = ChatUser.objects.filter(Q(username=username) | Q(nick_name=nick_name)).first()
-            if user:
-                if user.username == username:
-                    raise ExceptionCodeConstants.USERNAME_IS_EXIST.value.to_app_api_exception()
-                if user.nick_name == nick_name:
-                    raise ExceptionCodeConstants.NICKNAME_IS_EXIST.value.to_app_api_exception()
+            if username and ChatUser.objects.filter(username=username).exists():
+                raise ExceptionCodeConstants.USERNAME_IS_EXIST.value.to_app_api_exception()
 
     class Query(serializers.Serializer):
         username = serializers.CharField(required=False, label=_("Username"), allow_null=True, allow_blank=True)
@@ -320,14 +315,8 @@ class ChatUserSerializer(serializers.Serializer):
             child=serializers.CharField(required=True), required=False, label=_("User Group IDs")
         )
 
-        def is_valid(self, *, user_id=None, raise_exception=False):
+        def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            self._check_unique_nick_name(user_id)
-
-        def _check_unique_nick_name(self, user_id):
-            nick_name = self.data.get("nick_name")
-            if nick_name and ChatUser.objects.filter(nick_name=nick_name).exclude(id=user_id).exists():
-                raise AppApiException(1008, _("Nickname is already in use"))
 
     class RePasswordInstance(serializers.Serializer):
         password = serializers.CharField(
@@ -387,9 +376,7 @@ class ChatUserSerializer(serializers.Serializer):
         def edit(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-                ChatUserSerializer.UserEditInstance(data=instance).is_valid(
-                    user_id=self.data.get("id"), raise_exception=True
-                )
+                ChatUserSerializer.UserEditInstance(data=instance).is_valid(raise_exception=True)
             user = ChatUser.objects.filter(id=self.data.get("id")).first()
             self._update_user_fields(user, instance)
             user.save()
