@@ -507,6 +507,8 @@ Chat 协议及认证接口见 [chat/README.md](chat/README.md)。
 
 历史消息和流式聚合复用 `@/api/types` 的 `ChatContent`，定义在 `types/chat-log.ts`；
 `ChatLogRecord.question` 与 `messages` 使用该内容项类型，扩展字段保留为 `unknown`。
+`paragraph_list` 为 `ChatParagraphSource[]`，后端仅在开启「显示知识来源」或调试、日志时返回；
+其 `meta` 在历史快照中可能是 JSON 字符串，使用方需兼容字符串与对象。
 Chat、Workspace 调试和 System 调试的记录分页及详情均声明 `ChatLogRecord` 返回类型，
 消息列表依赖从 `ConversationApiAdapter` 选取对应接口约定。
 `conversation-panel/core/stream.ts` 的 `ConversationStream<Chunk>` 通过回调推断分片类型，

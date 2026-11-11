@@ -7,7 +7,7 @@ import type { ChatContent, ChatFeedback } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
 import { datetimeFormat } from '@/utils/time'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
-import { useExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
+import { useRightSidebarStore } from '../../right-sidebar/index'
 
 import { MESSAGE_LIST_KEY } from '../message-list/index'
 import { useShareLinkStoreOptional } from '../message-list/share/index'
@@ -32,13 +32,13 @@ const shareLink = useShareLinkStoreOptional()
 const messageList = inject(MESSAGE_LIST_KEY, null)
 const canShare = computed(() => Boolean(messageList?.messages.value.length && !messageList.streamLoading.value))
 const show_exec=computed(()=>messageList?.appInfo.value?.show_exec)
-const detail = useExecutionDetailStore()
+const rightSidebar = useRightSidebarStore()
 
 const EMPTY: ChatRecordMeta = {
   messageTokens: 0,
   answerTokens: 0,
   runTime: 0,
-  knowledgeCount: 0,
+  paragraphList: [],
   executionDetails: [],
 }
 const meta = computed<ChatRecordMeta>(() => props.message.record || EMPTY)
@@ -93,7 +93,7 @@ function toggleReading() {
 onBeforeUnmount(stopReading)
 
 const openExecutionDetail = () => {
-  detail.showExecutionDetail(meta.value.executionDetails || [])
+  rightSidebar.showExecutionDetail(meta.value.executionDetails || [])
 }
 // 消息反馈：Footer 协调按钮、草稿面板与提交状态。
 const canFeedback = computed(() => Boolean(messageList?.feedback && props.message.recordId && props.message.record))
@@ -137,9 +137,10 @@ function openFeedback(status: '0' | '1') {
   <div ref="footerRef" class="mk-conversation-message-footer space-y-2">
     <!-- 助手消息底部信息栏:知识来源 / 执行详情 / Tokens · 耗时  -->
     <div class="flex-align-center gap-1">
-      <el-button v-if="meta.knowledgeCount" text class="-ml-1">
+      <!-- 知识来源:在右侧展示回答引用的分段 -->
+      <el-button v-if="meta.paragraphList.length" text class="-ml-1" @click="rightSidebar.showKnowledgeSource(meta.paragraphList)">
         <MkIcon name="icon_reference_outlined" />
-        <span>知识来源 ({{ meta.knowledgeCount }})</span>
+        <span>知识来源 ({{ meta.paragraphList.length }})</span>
       </el-button>
 
       <!-- 执行详情:对话结束时已拉取并缓存,点击直接在右侧展示 -->

@@ -11,7 +11,7 @@ import type { ConversationApiAdapter } from '../../core/types'
 import { createConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { createMessageListStore } from '../../components/message-list/index'
 import { createMessageInputStore } from '../../components/message-input/index'
-import { createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
+import { createRightSidebarStore } from '../../right-sidebar/index'
 import type { ConversationBundle } from '../types'
 import { useAdminAppInfo } from './app-info'
 
@@ -73,6 +73,6 @@ export function createDebugConversation(application: Readonly<Ref<ApplicationDet
     appInfo,
     apiInputEditable: true,
   })
-  const detail = createExecutionDetailStore()
-  return { appInfo, list, msgs, input, detail }
+  const rightSidebar = createRightSidebarStore()
+  return { appInfo, list, msgs, input, rightSidebar }
 }

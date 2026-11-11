@@ -6,12 +6,12 @@ import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import ConversationLayout from '../../core/layout/index.vue'
 import ChatPanel from '../../main/chat-panel/index.vue'
-import ExecutionDetail from '../../right-sidebar/execution-detail/index.vue'
+import RightSidebar from '../../right-sidebar/index.vue'
 import SimpleDebugHeader from '../../components/header/simple-debug/index.vue'
 import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
 import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
-import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
+import { RIGHT_SIDEBAR_KEY } from '../../right-sidebar/index'
 import { createDebugConversation } from '../debug/index'
 import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
 
@@ -49,7 +49,7 @@ provide('upload', (file: File, onProgress?: (percent: number, event: AxiosProgre
 provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
-provide(EXECUTION_DETAIL_KEY, bundle.detail)
+provide(RIGHT_SIDEBAR_KEY, bundle.rightSidebar)
 provide(VIEW_KEY,VIEW_TYPE.SIMPLE_DEBUG)
 // 左栏放设置表单而非会话列表，开合复用会话列表 store 的 leftSideOpen；历史对话由标题栏浮层切换。
 // 响应式按面板自身宽度判断（嵌在 Admin 页面内，窗口宽度不代表可用宽度）：窄时 drawer，宽时 push。
@@ -71,14 +71,14 @@ watch(
   narrow,
   (isNarrow) => {
     bundle.list.leftSideOpen.value = !isNarrow
-    if (isNarrow) bundle.detail.closeRightSide()
+    if (isNarrow) bundle.rightSidebar.closeRightSide()
   },
   { immediate: true },
 )
 
 // 挤压态放不下两侧时互相让位：后展开的一侧收起对侧；面板变窄时保留设置、收起执行详情。
 watch(
-  () => bundle.detail.rightSideOpen.value,
+  () => bundle.rightSidebar.rightSideOpen.value,
   (open) => {
     if (open && !narrow.value && !canPushBoth.value) bundle.list.leftSideOpen.value = false
   },
@@ -86,11 +86,11 @@ watch(
 watch(
   () => bundle.list.leftSideOpen.value,
   (open) => {
-    if (open && !narrow.value && !canPushBoth.value) bundle.detail.closeRightSide()
+    if (open && !narrow.value && !canPushBoth.value) bundle.rightSidebar.closeRightSide()
   },
 )
 watch(canPushBoth, (fits) => {
-  if (!fits && !narrow.value && bundle.list.leftSideOpen.value) bundle.detail.closeRightSide()
+  if (!fits && !narrow.value && bundle.list.leftSideOpen.value) bundle.rightSidebar.closeRightSide()
 })
 
 const resizeObserver = new ResizeObserver(([entry]) => {
@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
 // 遮罩只在抽屉态出现，点击收起设置和执行详情。
 const closeDrawers = () => {
   bundle.list.leftSideOpen.value = false
-  bundle.detail.closeRightSide()
+  bundle.rightSidebar.closeRightSide()
 }
 
 // 页面保存、发布校验失败时展开设置，显示错误字段。
@@ -122,7 +122,7 @@ defineExpose({ openSetting: () => (bundle.list.leftSideOpen.value = true) })
   <div ref="panelRef" class="mk-simple-debug h-full">
     <ConversationLayout
       :left-open="bundle.list.leftSideOpen.value"
-      :right-open="bundle.detail.rightSideOpen.value"
+      :right-open="bundle.rightSidebar.rightSideOpen.value"
       :left-mode="sideMode"
       :right-mode="sideMode"
       :left-width="SETTING_WIDTH"
@@ -138,7 +138,7 @@ defineExpose({ openSetting: () => (bundle.list.leftSideOpen.value = true) })
           </template>
         </ChatPanel>
       </template>
-      <template #right><ExecutionDetail /></template>
+      <template #right><RightSidebar /></template>
     </ConversationLayout>
   </div>
 </template>

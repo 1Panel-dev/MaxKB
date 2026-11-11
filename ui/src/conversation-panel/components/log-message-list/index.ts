@@ -17,7 +17,7 @@ const buildRecordMeta = (raw: ChatLogRecord): ChatRecordMeta => ({
   messageTokens: raw.message_tokens || 0,
   answerTokens: raw.answer_tokens || 0,
   runTime: raw.run_time || 0,
-  knowledgeCount: (raw.paragraph_list || []).length,
+  paragraphList: raw.paragraph_list || [],
   executionDetails: raw.execution_details || [],
   feedback: { vote_status: raw.vote_status ?? '-1', vote_reason: raw.vote_reason, vote_other_content: raw.vote_other_content },
 })

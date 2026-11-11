@@ -11,7 +11,7 @@ import type { ConversationApiAdapter, ConversationAppInfo } from '../../core/typ
 import { createConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { createMessageListStore } from '../../components/message-list/index'
 import { createMessageInputStore } from '../../components/message-input/index'
-import { createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
+import { createRightSidebarStore } from '../../right-sidebar/index'
 import { createShareLinkStore, type ShareLinkStore } from '../../components/message-list/share/index'
 import type { ConversationBundle } from '../types'
 import type { GetChatUserProfile } from '../index'
@@ -126,7 +126,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     // 门户首页、全部智能体页尚未确定智能体时禁止发送
     disabled: computed(() => !getApplicationId()),
   })
-  const detail = createExecutionDetailStore()
+  const rightSidebar = createRightSidebarStore()
   // 生成分享链接后复制分享页地址(与 v2 一致为 {chat 部署路径}/share/{link})
   const share = createShareLinkStore({
     messages: msgs.messages,
@@ -176,5 +176,5 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
   // 地址中带会话 ID 时打开该会话
   if (getRouteChatId()) list.selectConversation(getRouteChatId())
 
-  return { appInfo, list, msgs, input, detail, share }
+  return { appInfo, list, msgs, input, rightSidebar, share }
 }

@@ -8,11 +8,11 @@ import PortalConversationList from '../../left-sidebar/portal-conversation-list/
 import SelectApplicationDrawer from '../../left-sidebar/portal-conversation-list/SelectApplicationDrawer.vue'
 import PortalChatPanel from '../../main/portal-chat-panel/index.vue'
 import PortalApplicationPanel from '../../main/portal-application-panel/index.vue'
-import ExecutionDetail from '../../right-sidebar/execution-detail/index.vue'
+import RightSidebar from '../../right-sidebar/index.vue'
 import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
 import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
-import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
+import { RIGHT_SIDEBAR_KEY } from '../../right-sidebar/index'
 import { PORTAL_CONVERSATION_LIST_KEY } from '../../left-sidebar/portal-conversation-list/index'
 import { SHARE_LINK_KEY } from '../../components/message-list/share/index'
 import { createPortalConversation } from './index'
@@ -40,7 +40,7 @@ provide('upload', (file: File, onProgress?: (percent: number, event: AxiosProgre
 provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
-provide(EXECUTION_DETAIL_KEY, bundle.detail)
+provide(RIGHT_SIDEBAR_KEY, bundle.rightSidebar)
 provide(SHARE_LINK_KEY, bundle.share)
 provide(PORTAL_CONVERSATION_LIST_KEY, bundle.portalList)
 provide(VIEW_KEY, VIEW_TYPE.PORTAL)
@@ -63,7 +63,7 @@ provide(DEVICE_KEY, createDeviceType(leftMode))
 
 const closeDrawers = () => {
   if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
-  if (rightMode.value === 'drawer') bundle.detail.rightSideOpen.value = false
+  if (rightMode.value === 'drawer') bundle.rightSidebar.rightSideOpen.value = false
 }
 
 onMounted(() => {
@@ -88,7 +88,7 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
   <!-- portal 视图:在 chat 视图基础上把左侧换成按智能体分组的门户历史对话 -->
   <ConversationLayout
     :left-open="bundle.list.leftSideOpen.value"
-    :right-open="bundle.detail.rightSideOpen.value"
+    :right-open="bundle.rightSidebar.rightSideOpen.value"
     :left-mode="leftMode"
     :right-mode="rightMode"
     @mask-click="closeDrawers"
@@ -100,7 +100,7 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
       <PortalApplicationPanel v-if="bundle.portalList.isApplicationListActive.value" />
       <PortalChatPanel v-else />
     </template>
-    <template #right><ExecutionDetail /></template>
+    <template #right><RightSidebar /></template>
   </ConversationLayout>
   <!-- 没有当前智能体时新建对话，选择智能体 -->
   <SelectApplicationDrawer ref="applicationSelectorRef" />
