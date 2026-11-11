@@ -41,6 +41,12 @@ const applicationRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/chat/login/index.vue'),
     meta: { title: '登录' },
   },
+   {
+    path: '/:accessToken',
+    redirect: (to) => {
+      return `/${to.params.accessToken}/`
+    },
+  },
   {
     path: '/:accessToken/',
     name: 'chat-home',
