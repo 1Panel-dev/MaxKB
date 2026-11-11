@@ -185,7 +185,8 @@ export function createActivity() {
       }
       last.text += event.delta
       emit(scopeKey, { type, id: last.id, content: event.delta, ...(type === 'REASONING' ? { status: 'RUNNING' } : {}) })
-      lastActivity.value = tail(last.text)
+      // lastActivity.value = tail(last.text)
+      lastActivity.value = event.type === 'reasoning' ? tail(last.text) : ''
     } else if (event.type === 'tool_start') {
       settle(scopeKey)
       const delegate = DELEGATE_TOOLS.has(event.name)
@@ -206,9 +207,7 @@ export function createActivity() {
       const name = toolTitle(toolCall)
       emit(
         toolCall.scopeKey,
-        toolCall.delegate
-          ? { type: 'GROUP', id: toolCall.contentId, name }
-          : { type: 'TOOL', id: toolCall.contentId, name, arguments: event.delta },
+        toolCall.delegate ? { type: 'GROUP', id: toolCall.contentId, name } : { type: 'TOOL', id: toolCall.contentId, name, arguments: event.delta },
       )
     } else if (event.type === 'tool_end') {
       const toolCall = toolCallById.get(event.id)
