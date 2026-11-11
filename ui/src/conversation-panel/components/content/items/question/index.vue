@@ -69,7 +69,7 @@ const attachments = computed(() =>
       status: 'success' as const,
       key: `${field}-${file.file_id ?? index}`,
       field,
-      src: file.url ? resetUrl(file.url) : '',
+      src: file.url ? file.url : '',
     })),
   ),
 )
