@@ -6,13 +6,13 @@ import type { Dict, DocumentItem, KnowledgeTagUpdatePayload } from '@/api/types'
 import { getFileIconUrl } from '@/utils/icon'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 /**
  * 知识库「文档」权限判断
  */
-type KnowledgeDocPermissionMethod = | 'docRead' | 'docEdit'
+type KnowledgeDocPermissionMethod = 'docRead' | 'docEdit'
 
 function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -156,7 +156,7 @@ defineExpose({ open })
       </el-tabs>
       <div class="flex-between gap-3">
         <!-- 批量关联或取消关联文档 -->
-        <el-button plain :disabled="!selectedDocuments.length || loading && !knowledgeDocPermission('docEdit')" @click="handleBatchLinkDocuments">
+        <el-button plain :disabled="!selectedDocuments.length || (loading && !knowledgeDocPermission('docEdit'))" @click="handleBatchLinkDocuments">
           <MkIcon :name="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'" />
           <span>{{ activeTab === 'linked' ? '取消关联' : '关联' }}</span>
         </el-button>

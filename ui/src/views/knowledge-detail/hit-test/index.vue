@@ -10,7 +10,6 @@ import type { KnowledgeHitTestPayload, KnowledgeHitTestResult, ParagraphItem } f
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
 import emptyHitTestImage from '@/assets/empty/hit-test.png'
-import fileImageIcon from '@/assets/file-type/file-image-icon.svg'
 import HitTestInput from './components/HitTestInput.vue'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
@@ -228,7 +227,11 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
 
                 <template #footer>
                   <div class="flex-align-center min-w-0 gap-2 text-sm text-N600">
-                    <img :src="paragraph.isImgaeDoc ? fileImageIcon : getFileIconUrl(paragraph.document_name)" alt="" class="size-4 shrink-0" />
+                    <img
+                      :src="getFileIconUrl(paragraph.document_name, paragraph.knowledge_type, paragraph.isImgaeDoc)"
+                      alt=""
+                      class="size-4 shrink-0"
+                    />
                     <span class="truncate" :title="paragraph.document_name">{{ paragraph.document_name }}</span>
                   </div>
                 </template>

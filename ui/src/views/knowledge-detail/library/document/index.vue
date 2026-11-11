@@ -402,8 +402,7 @@ onBeforeUnmount(() => {
           :disabled="isWorkspaceSharedResource() || !knowledgeDocPermission('docEdit')"
         >
           <template #prefix>
-            <img v-if="knowledgeType === KNOWLEDGE_TYPE_KEY.WEB" src="@/assets/file-type/web-link-icon.svg" alt="" class="size-5" />
-            <img v-else :src="getFileIconUrl(row.name)" alt="" class="size-5" />
+            <img :src="getFileIconUrl(row.name, row.type)" alt="" class="size-5" />
           </template>
         </MkEditName>
       </template>

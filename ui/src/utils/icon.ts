@@ -1,5 +1,9 @@
 /** 提供跨页面复用的文件后缀识别、类型校验和图标匹配函数。 */
 
+import type { KnowledgeType } from '@/api/types'
+import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
+import fileImageIcon from '@/assets/file-type/file-image-icon.svg'
+import webLinkIcon from '@/assets/file-type/web-link-icon.svg'
 import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants/file-type'
 
 /** 获取文件名中不含点号的大写后缀；无有效后缀时返回空字符串。 */
@@ -31,8 +35,11 @@ export function isVideo(fileName: string): boolean {
   return VIDEO_EXTENSIONS.includes(getFileExtension(fileName))
 }
 
-/** 返回文档或音视频图标 URL；图片由调用方预览，其他类型回退到 unknown 图标。 */
-export function getFileIconUrl(fileName: string): string {
+/** 返回文件图标 URL；图片标记优先于 Web 知识库类型，未传时按后缀匹配。 */
+export function getFileIconUrl(fileName: string, knowledgeType?: KnowledgeType | null, isImageType?: boolean): string {
+  if (isImageType) return fileImageIcon
+  if (knowledgeType != null && KNOWLEDGE_TYPE_MAP[knowledgeType] === KNOWLEDGE_TYPE_KEY.WEB) return webLinkIcon
+
   const extension = getFileExtension(fileName)
   let iconName = 'unknown'
 

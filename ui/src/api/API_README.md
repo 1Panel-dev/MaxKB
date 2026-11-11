@@ -280,7 +280,7 @@ Workspace、System 资源管理和 System 共享资源均在各自 `knowledge/kn
 `postKnowledgeHitTest(knowledgeId, payload)`，向知识库的 `/hit_test` 提交 POST，直接返回命中分段数组。
 请求使用 `KnowledgeHitTestPayload`，包含 `query_text`、`image_list`、`top_number`、`similarity` 和
 `search_mode`；检索模式复用 `KNOWLEDGE_SEARCH_MODE`。文本和图片至少提供一项，图片仅支持向量或混合检索。
-结果使用 `KnowledgeHitTestResult`，保留分段、得分及图片命中信息。Workspace 共享暂无对应接口，不回退其他范围。
+结果使用 `KnowledgeHitTestResult`，保留分段、得分及图片命中信息；可选 `knowledge_type` 使用 `KnowledgeType` 数字枚举，用于来源图标匹配。Workspace 共享暂无对应接口，不回退其他范围。
 向量标签依据 `hit_unit_type`（`KNOWLEDGE_HIT_UNIT_TYPE`）：`image` 显示“图片向量”，`text` 显示“文本向量”，图片描述命中也属于文本向量。
 `document_resource_type` 表示来源文档类型，`document_image_id` 用于展示图片文档原图，不用于判断命中向量类型。
 `query_unit_type` 表示产生该命中的查询输入类型，与 `hit_unit_type` 分别描述查询端和命中端。
@@ -509,6 +509,7 @@ Chat 协议及认证接口见 [chat/README.md](chat/README.md)。
 `ChatLogRecord.question` 与 `messages` 使用该内容项类型，扩展字段保留为 `unknown`。
 `paragraph_list` 为 `ChatParagraphSource[]`，后端仅在开启「显示知识来源」或调试、日志时返回；
 其 `meta` 在历史快照中可能是 JSON 字符串，使用方需兼容字符串与对象。
+分段的 `knowledge_type` 使用可选的 `KnowledgeType` 数字枚举，展示类型映射前先判断字段是否存在。
 Chat、Workspace 调试和 System 调试的记录分页及详情均声明 `ChatLogRecord` 返回类型，
 消息列表依赖从 `ConversationApiAdapter` 选取对应接口约定。
 `conversation-panel/core/stream.ts` 的 `ConversationStream<Chunk>` 通过回调推断分片类型，

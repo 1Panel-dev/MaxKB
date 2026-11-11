@@ -108,6 +108,8 @@ warning 类型；输入和普通警告弹窗继续直接使用 `ElMessageBox`。
 
 `icon.ts` 的 `getFileExtension()` 返回不含点号的大写后缀，无有效后缀时返回空字符串。
 `isImage()`、`isDocument()`、`isAudio()`、`isVideo()` 统一复用 `constants/file-type.ts` 的四组常量。
-`getFileIconUrl()` 为文档返回对应后缀图标，为音视频分别返回 `file-audio-icon.svg`、
+`getFileIconUrl(fileName, knowledgeType?, isImageType?)` 支持可选的知识库类型和图片标记。
+`isImageType` 为 `true` 时优先返回 `file-image-icon.svg`，其次 Web 知识库返回 `web-link-icon.svg`；
+未命中时按文件后缀匹配：为文档返回对应后缀图标，为音视频分别返回 `file-audio-icon.svg`、
 `file-video-icon.svg`，其他类型回退到 `unknown-icon.svg`；图片预览由调用方单独处理。
 DOC、ZIP 保留历史图标兼容，但不加入消息附件的文档类型白名单。

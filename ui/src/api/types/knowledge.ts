@@ -197,6 +197,7 @@ export interface KnowledgeHitTestAsset {
 
 /** 召回测试返回的分段与命中得分。 */
 export interface KnowledgeHitTestResult extends ParagraphItem {
+  knowledge_type?: KnowledgeType | null
   document_image_id?: string | null
   document_resource_type?: DocumentResourceType | null
   knowledge_id: string

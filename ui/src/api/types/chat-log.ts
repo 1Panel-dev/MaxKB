@@ -1,7 +1,7 @@
 import type { CHAT_LOG_SOURCE } from '@/api/enums'
 import type { Dict } from './common'
 import type { DocumentResourceType } from './document'
-import type { KnowledgeHitTestAsset } from './knowledge'
+import type { KnowledgeHitTestAsset, KnowledgeType } from './knowledge'
 
 export type ChatLogSource = (typeof CHAT_LOG_SOURCE)[keyof typeof CHAT_LOG_SOURCE]
 
@@ -77,7 +77,7 @@ export interface ChatParagraphSource {
   hit_asset?: KnowledgeHitTestAsset | null
   knowledge_id?: string
   knowledge_name?: string
-  knowledge_type?: string
+  knowledge_type?: KnowledgeType
   /** 历史快照中可能为 JSON 字符串 */
   meta?: ChatParagraphSourceMeta | string | null
 }
