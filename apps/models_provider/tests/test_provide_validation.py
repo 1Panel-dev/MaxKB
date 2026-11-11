@@ -97,3 +97,58 @@ class ProvideParameterValidationTests(SimpleTestCase):
             api_base=None,
             credential=None,
         )
+
+    def test_model_list_post_requires_provider_credential_fields(self):
+        provider = MagicMock()
+        provider.get_model_type_list.return_value = [{"value": "EMBEDDING"}]
+        provider.get_model_credential.return_value.to_form_list.return_value = [
+            {"field": "api_base", "label": "API URL", "required": True},
+            {"field": "api_key", "label": "API Key", "required": True},
+        ]
+        request = SimpleNamespace(
+            data={
+                "provider": "test_provider",
+                "model_type": "EMBEDDING",
+                "credential": {"api_base": " ", "api_key": ""},
+            }
+        )
+
+        with patch("models_provider.views.provide.ModelProvideConstants", {"test_provider": provider}):
+            with self.assertRaises(BadRequest400) as context:
+                Provide.ModelList().post(request)
+
+        self.assertIn("API URL", str(context.exception.message))
+        self.assertIn("API Key", str(context.exception.message))
+        provider.get_model_list.assert_not_called()
+
+    def test_model_list_post_queries_with_provider_credential_fields(self):
+        provider = MagicMock()
+        provider.get_model_type_list.return_value = [{"value": "EMBEDDING"}]
+        provider.get_model_credential.return_value.to_form_list.return_value = [
+            {"field": "api_base", "label": "API URL", "required": True},
+            {"field": "api_key", "label": "API Key", "required": True},
+        ]
+        provider.get_model_list.return_value = [{"name": "text-embedding-3-small"}]
+        request = SimpleNamespace(
+            data={
+                "provider": "test_provider",
+                "model_type": "EMBEDDING",
+                "credential": {"api_base": "https://api.example.com/v1", "api_key": "secret"},
+            }
+        )
+
+        with (
+            patch("models_provider.views.provide.ModelProvideConstants", {"test_provider": provider}),
+            patch("models_provider.views.provide.cache_base_model_list") as cache_model_list,
+        ):
+            response = Provide.ModelList().post(request)
+
+        self.assertEqual(200, response.status_code)
+        provider.get_model_list.assert_called_once_with(
+            "EMBEDDING",
+            api_key=None,
+            api_base=None,
+            credential={"api_base": "https://api.example.com/v1", "api_key": "secret"},
+            allow_builtin_fallback=False,
+        )
+        cache_model_list.assert_called_once()
