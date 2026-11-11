@@ -61,7 +61,7 @@ class SystemUserGroupView(APIView):
         PermissionConstants.SYSTEM_USER_GROUP_CREATE,
         PermissionConstants.SYSTEM_USER_GROUP_EDIT,
         RoleConstants.ADMIN,
-        RoleConstants.WORKSPACE_MANAGE,
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     @log(
         menu="IAM/System User Group",
@@ -87,7 +87,11 @@ class SystemUserGroupView(APIView):
         responses=UserGroupListApi.get_response(),
         tags=["IAM/System User Group"],
     )
-    @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
+    @has_permissions(
+        PermissionConstants.SYSTEM_USER_GROUP_READ,
+        RoleConstants.ADMIN,
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+    )
     def get(self, request: Request, workspace_id: str):
         return result.success(SystemUserGroupCreateSerializer.Query(data={"workspace_id": workspace_id}).list())
 
@@ -104,7 +108,9 @@ class SystemUserGroupView(APIView):
             tags=["IAM/System User Group"],
         )
         @has_permissions(
-            PermissionConstants.SYSTEM_USER_GROUP_DELETE, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE
+            PermissionConstants.SYSTEM_USER_GROUP_DELETE,
+            RoleConstants.ADMIN,
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
             menu="IAM/System User Group",
@@ -132,7 +138,9 @@ class SystemUserGroupView(APIView):
             tags=["IAM/System User Group"],
         )
         @has_permissions(
-            PermissionConstants.SYSTEM_USER_GROUP_ADD_MEMBER, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE
+            PermissionConstants.SYSTEM_USER_GROUP_ADD_MEMBER,
+            RoleConstants.ADMIN,
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
             menu="IAM/System User Group",
@@ -163,7 +171,9 @@ class SystemUserGroupView(APIView):
             tags=["IAM/System User Group"],
         )
         @has_permissions(
-            PermissionConstants.SYSTEM_USER_GROUP_REMOVE_MEMBER, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE
+            PermissionConstants.SYSTEM_USER_GROUP_REMOVE_MEMBER,
+            RoleConstants.ADMIN,
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
             menu="IAM/System User Group",
@@ -193,7 +203,9 @@ class SystemUserGroupView(APIView):
             responses=SystemUserGroupUserListPageResponse,
         )
         @has_permissions(
-            PermissionConstants.SYSTEM_USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE
+            PermissionConstants.SYSTEM_USER_GROUP_READ,
+            RoleConstants.ADMIN,
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, user_group_id: str, current_page: int, page_size: int):
             d = UserGroupListPageSerializer.Query(
