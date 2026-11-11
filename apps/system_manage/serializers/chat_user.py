@@ -442,7 +442,7 @@ class ChatUserSerializer(serializers.Serializer):
     def list(cls, nick_name=None):
         query_set = ChatUser.objects.all().order_by("-create_time")
         if nick_name:
-            query_set = query_set.filter(nick_name__contains=nick_name)
+            query_set = query_set.filter(Q(nick_name__contains=nick_name) | Q(username__contains=nick_name))
         users = query_set[:200]
         return ChatUserInstanceSerializer(users, many=True).data
 
