@@ -23,6 +23,9 @@ export function configureMarkdownEditor() {
   if (configured) return
 
   config({
+    markdownItConfig(md) {
+      md.set({ html: true })
+    },
     editorConfig: {
       languageUserDefined: {
         'zh-Hant': ZH_TW,

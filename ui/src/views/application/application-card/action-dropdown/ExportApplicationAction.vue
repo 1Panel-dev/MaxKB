@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, useTemplateRef } from 'vue'
-import { ElMessageBox } from 'element-plus'
+import { computed, inject, useTemplateRef } from 'vue'
+import { DROPDOWN_INJECTION_KEY, ElMessageBox } from 'element-plus'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { ApplicationDetail, ExportError } from '@/api/types'
@@ -12,6 +12,9 @@ defineOptions({ name: 'ExportApplicationAction' })
 const props = defineProps<{ api: typeof ApplicationApi | typeof SystemResourceApplicationApi; application: ApplicationDetail; label: string }>()
 
 const loading = defineModel<boolean>('loading', { default: false })
+
+// 选中二级导出项后同步收起一级菜单，保留 Action 内的请求和弹窗状态。
+const parentDropdown = inject(DROPDOWN_INJECTION_KEY, undefined)
 
 /** 依据 api 是否含工作空间独有方法区分工作空间/系统资源管理场景，用于选择对应权限。 */
 const isSystem = computed(() => !('putMoveApplication' in props.api))
@@ -89,7 +92,7 @@ function handleExportApplication() {
 
 <template>
   <MkDropdownItem v-if="canExportApplication || canExportSkills" @click.prevent.stop class="p-0!">
-    <MkDropdown class="w-full" trigger="hover" placement="right-start" :append-to="exportMenuContainer">
+    <MkDropdown @command="parentDropdown?.handleClose()" class="w-full" trigger="hover" placement="right-start" :append-to="exportMenuContainer">
       <!-- 展开智能体导出菜单 -->
       <div ref="exportTriggerRef" class="flex-between w-full gap-2 p-2">
         <div class="flex-align-center gap-2">

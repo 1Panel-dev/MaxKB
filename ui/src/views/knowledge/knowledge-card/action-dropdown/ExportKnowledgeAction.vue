@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, inject, ref, useTemplateRef } from 'vue'
+import { DROPDOWN_INJECTION_KEY } from 'element-plus'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
@@ -13,6 +14,9 @@ const props = defineProps<{
   label: string
 }>()
 const loading = defineModel<boolean>('loading', { default: false })
+
+// 选中二级导出项后同步收起一级菜单，保留 Action 内的请求和弹窗状态。
+const parentDropdown = inject(DROPDOWN_INJECTION_KEY, undefined)
 
 // 二级菜单留在所属一级浮层内，避免焦点移入时关闭一级菜单，并避开滚动容器裁剪。
 const exportTriggerRef = useTemplateRef<HTMLDivElement>('exportTriggerRef')
@@ -64,7 +68,7 @@ function handleExportDialogClosed() {
 
 <template>
   <MkDropdownItem @click.prevent.stop class="p-0!">
-    <MkDropdown class="w-full" trigger="hover" placement="right-start" :append-to="exportMenuContainer">
+    <MkDropdown @command="parentDropdown?.handleClose()" class="w-full" trigger="hover" placement="right-start" :append-to="exportMenuContainer">
       <!-- 展开知识库导出菜单 -->
       <div ref="exportTriggerRef" class="flex-between w-full gap-2 p-2">
         <div class="flex-align-center gap-2">

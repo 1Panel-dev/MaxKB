@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { inject } from 'vue'
+import { DROPDOWN_INJECTION_KEY } from 'element-plus'
 import { useRoute } from 'vue-router'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentItem } from '@/api/types'
@@ -8,6 +10,9 @@ defineOptions({ name: 'ExportDocumentAction' })
 const props = defineProps<{ api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']; document: DocumentItem; label: string }>()
 const route = useRoute()
 const loading = defineModel<boolean>('loading', { default: false })
+
+// 选中二级导出项后同步收起一级菜单，保留 Action 内的请求和弹窗状态。
+const parentDropdown = inject(DROPDOWN_INJECTION_KEY, undefined)
 
 /* 文档导出菜单 */
 const exportOptions = [
@@ -28,7 +33,7 @@ function handleExportDocument(method: (typeof exportOptions)[number]['method']) 
 
 <template>
   <MkDropdownItem @click.prevent.stop class="p-0!">
-    <MkDropdown class="w-full" trigger="hover" placement="left-start">
+    <MkDropdown @command="parentDropdown?.handleClose()" class="w-full" trigger="hover" placement="left-start">
       <!-- 展开文档导出菜单 -->
       <div class="flex-between w-full gap-2 p-2">
         <div class="flex-align-center gap-2">

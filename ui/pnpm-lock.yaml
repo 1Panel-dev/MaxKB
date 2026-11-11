@@ -84,8 +84,8 @@ importers:
         specifier: ^4.18.1
         version: 4.18.1
       md-editor-v3:
-        specifier: ^6.5.6
-        version: 6.5.6(vue@3.5.43(typescript@6.0.3))
+        specifier: ^7.1.0
+        version: 7.1.0(vue@3.5.43(typescript@6.0.3))
       mermaid:
         specifier: ^11.17.2
         version: 11.17.2
@@ -1260,8 +1260,8 @@ packages:
   '@vavt/copy2clipboard@1.0.3':
     resolution: {integrity: sha512-HtG48r2FBYp9eRvGB3QGmtRBH1zzRRAVvFbGgFstOwz4/DDaNiX0uZc3YVKPydqgOav26pibr9MtoCaWxn7aeA==}
 
-  '@vavt/markdown-theme@5.0.2':
-    resolution: {integrity: sha512-cGYEV2VIUmhT9p8Wua9yXh7sKN1f3cbztTFHlkYyH9SzbpiKUnQrcbDts/0fP6cmvZPOe9SWWsDujmyuHepJdQ==}
+  '@vavt/markdown-theme@6.0.1':
+    resolution: {integrity: sha512-S6HClmYtnrBuAm+6aeAKRtMwy6cTv+7QlGQYlpNHwumoFr3x86X6uGtJbvrv3ReoKx40vCOJR7h+1OiflKJOWA==}
 
   '@vavt/util@2.1.2':
     resolution: {integrity: sha512-L3UbSJthJwr3wq0x93O5TrCepimrmVZaIl2ciZbeL18G5++gBhJXNhcH7RcVk/6rr3SavWOvwhig0mqRLoR7dw==}
@@ -2356,8 +2356,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  md-editor-v3@6.5.6:
-    resolution: {integrity: sha512-bD+xKTpaC9mGDE7W+9x25Y5mEsv21Y735J2Q0dxV+lWQTXH21/sKNdwaUYQ5dhXU2fl+oqrOJsEjSd58FLyNSA==}
+  md-editor-v3@7.1.0:
+    resolution: {integrity: sha512-+byIdwES9aGEeDDxcxx7LiVX8g31VgwJqETtfFvGjsGuwEAuMeuPZ6vV8/vltNa+SCBrigbwQxLb1R47mxaWfg==}
     peerDependencies:
       vue: ^3.5.3
 
@@ -4244,7 +4244,7 @@ snapshots:
 
   '@vavt/copy2clipboard@1.0.3': {}
 
-  '@vavt/markdown-theme@5.0.2': {}
+  '@vavt/markdown-theme@6.0.1': {}
 
   '@vavt/util@2.1.2': {}
 
@@ -5357,7 +5357,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  md-editor-v3@6.5.6(vue@3.5.43(typescript@6.0.3)):
+  md-editor-v3@7.1.0(vue@3.5.43(typescript@6.0.3)):
     dependencies:
       '@codemirror/autocomplete': 6.20.3
       '@codemirror/commands': 6.11.1
@@ -5371,9 +5371,10 @@ snapshots:
       '@lucide/vue': 1.47.0(vue@3.5.43(typescript@6.0.3))
       '@types/markdown-it': 14.2.0
       '@vavt/copy2clipboard': 1.0.3
-      '@vavt/markdown-theme': 5.0.2
+      '@vavt/markdown-theme': 6.0.1
       '@vavt/util': 2.1.2
       codemirror: 6.0.2
+      json5: 2.2.3
       markdown-it: 14.3.2
       markdown-it-image-figures: 2.1.1(markdown-it@14.3.2)
       markdown-it-sub: 2.0.0
