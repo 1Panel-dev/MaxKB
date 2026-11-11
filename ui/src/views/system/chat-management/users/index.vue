@@ -54,7 +54,7 @@ const chatUserQuery = computed<Dict<unknown>>(() => ({
 }))
 
 function formatQuotaUsage(tokenQuota?: ChatUser['token_quota']) {
-  if (!tokenQuota) return '-'
+  if (!tokenQuota) return '0 / 不限'
   const used = formatTokenNumber(tokenQuota.used_tokens)
   if (tokenQuota.quota_type === QUOTA_TYPE.UNLIMITED) return `${used} / 不限`
   return `${used} / ${formatTokenNumber(tokenQuota.token_limit)}`
