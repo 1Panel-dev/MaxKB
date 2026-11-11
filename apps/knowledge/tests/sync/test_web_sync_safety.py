@@ -364,6 +364,47 @@ class WebSyncSafetyTests(TestCase):
         self.assertEqual((result["synced_count"], result["deleted_count"]), (1, 1))
         self.document_delay.assert_called_once()
 
+    def test_complete_sync_rebuilds_old_empty_markdown_documents(self):
+        markdown_url = ROOT_URL + "/page.md"
+        empty_document = Document.objects.create(
+            knowledge=self.knowledge,
+            name="Open Markdown",
+            char_length=0,
+            type=KnowledgeType.WEB,
+            meta={"source_url": markdown_url, "selector": "body"},
+        )
+        old_time = self.document.create_time
+        responses = {
+            ROOT_URL: (f'<body><h1>Updated HTML</h1><a href="{markdown_url}">Open Markdown</a></body>', "text/html"),
+            markdown_url: ("# Markdown title\n\nUpdated Markdown content", "text/markdown; charset=utf-8"),
+        }
+
+        def fetch(url, _headers):
+            content, content_type = responses[url]
+            return SimpleNamespace(
+                status_code=200,
+                content=content.encode(),
+                encoding="utf-8",
+                apparent_encoding="utf-8",
+                content_type=content_type,
+            )
+
+        with patch.object(Fork, "requests_get", side_effect=fetch), self.captureOnCommitCallbacks(execute=True):
+            result = sync_replace_web_knowledge.run(
+                str(self.knowledge.id), None, ROOT_URL, "body", sync_type="complete", record_log=True
+            )
+
+        self.assertEqual(result["status"], "success")
+        self.assertEqual((result["synced_count"], result["deleted_count"]), (2, 2))
+        self.assertFalse(Document.objects.filter(pk__in=[self.document.pk, empty_document.pk]).exists())
+        documents = Document.objects.filter(knowledge=self.knowledge)
+        self.assertEqual(documents.count(), 2)
+        self.assertTrue(all(document.create_time > old_time and document.char_length > 0 for document in documents))
+        markdown_document = documents.get(meta__source_url=markdown_url)
+        self.assertIn("Updated Markdown content", Paragraph.objects.get(document=markdown_document).content)
+        self.assertEqual(KnowledgeSyncLog.objects.get(knowledge=self.knowledge).status, KnowledgeSyncStatus.SUCCESS)
+        self.assertEqual(self.document_delay.call_count, 2)
+
     def test_complete_publication_failure_rolls_back_cleanup_and_new_documents(self):
         with (
             patch("knowledge.task.sync.delete_document_data", side_effect=self.fail_after_cleanup),

@@ -16,11 +16,19 @@ requests.packages.urllib3.disable_warnings()
 
 
 class SandboxFetchResponse:
-    def __init__(self, status_code: int, content: bytes, encoding: str | None, apparent_encoding: str | None):
+    def __init__(
+        self,
+        status_code: int,
+        content: bytes,
+        encoding: str | None,
+        apparent_encoding: str | None,
+        content_type: str = "",
+    ):
         self.status_code = status_code
         self.content = content
         self.encoding = encoding
         self.apparent_encoding = apparent_encoding
+        self.content_type = content_type
 
 
 class ChildLink:
@@ -184,16 +192,19 @@ class Fork:
 
     @staticmethod
     def get_beautiful_soup(response):
+        return BeautifulSoup(Fork.get_response_text(response), "html.parser")
+
+    @staticmethod
+    def get_response_text(response):
         encoding_list = Fork.get_encoding_list(response)
         for encoding in encoding_list:
             try:
-                return BeautifulSoup(response.content.decode(encoding), "html.parser")
+                return response.content.decode(encoding)
             except (LookupError, UnicodeDecodeError):
                 continue
 
         fallback_encoding = encoding_list[0] if len(encoding_list) > 0 else "utf-8"
-        html_content = response.content.decode(fallback_encoding, errors="replace")
-        return BeautifulSoup(html_content, "html.parser")
+        return response.content.decode(fallback_encoding, errors="replace")
 
     @staticmethod
     def get_encoding_list(response):
@@ -214,14 +225,8 @@ class Fork:
         charset_list = []
         content_head = content[:8192]
         charset_list.extend(re.findall(rb"<meta[^>]+charset=['\"]?\s*([a-zA-Z0-9._-]+)", content_head, re.I))
-        charset_list.extend(
-            re.findall(rb"<meta[^>]+content=['\"][^'\"]*charset=([a-zA-Z0-9._-]+)", content_head, re.I)
-        )
-        return [
-            charset.decode("ascii", errors="ignore")
-            for charset in charset_list
-            if len(charset) > 0
-        ]
+        charset_list.extend(re.findall(rb"<meta[^>]+content=['\"][^'\"]*charset=([a-zA-Z0-9._-]+)", content_head, re.I))
+        return [charset.decode("ascii", errors="ignore") for charset in charset_list if len(charset) > 0]
 
     @staticmethod
     def normalize_charset(charset):
@@ -247,6 +252,7 @@ def fetch_url(url, headers):
         "content": base64.b64encode(response.content).decode("ascii"),
         "encoding": response.encoding,
         "apparent_encoding": response.apparent_encoding,
+        "content_type": response.headers.get("Content-Type", ""),
     }
 """,
             {"url": base_fork_url, "headers": headers},
@@ -257,6 +263,7 @@ def fetch_url(url, headers):
             base64.b64decode(response.get("content")),
             response.get("encoding"),
             response.get("apparent_encoding"),
+            response.get("content_type", ""),
         )
 
     @staticmethod
@@ -274,6 +281,12 @@ def fetch_url(url, headers):
             if response.status_code != 200:
                 maxkb_logger.error(f"url: {self.base_fork_url} code:{response.status_code}")
                 return Fork.Response.error(f"url: {self.base_fork_url} code:{response.status_code}")
+            content_type = getattr(response, "content_type", "").split(";", 1)[0].strip().lower()
+            if content_type in {"text/markdown", "text/x-markdown"} or (
+                content_type == "text/plain" and self.urlparse.path.lower().endswith((".md", ".markdown"))
+            ):
+                # Markdown has no HTML body; preserve its syntax instead of selecting/converting it.
+                return Fork.Response.success(self.get_response_text(response), [])
             bf = self.get_beautiful_soup(response)
         except Exception as e:
             maxkb_logger.error(f"{str(e)}:{traceback.format_exc()}")
