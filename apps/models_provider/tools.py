@@ -171,7 +171,13 @@ def _resolve_base_model_credential_parts(api_key, api_base, credential):
     # url/key 的取值口径在「写缓存」和「读缓存」必须完全一致
     credential = credential or {}
     url = api_base or credential.get("api_base") or credential.get("base_url") or ""
-    key = api_key or credential.get("api_key") or ""
+    key = api_key or ""
+    if not key:
+        for name in ("api_key", "dashscope_api_key", "apikey", "access_key", "access_key_id", "token"):
+            value = credential.get(name)
+            if value:
+                key = value
+                break
     return url, key
 
 

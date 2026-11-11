@@ -13,7 +13,6 @@ import requests
 
 from common.utils.common import get_file_content
 from models_provider.base_model_provider import (
-    _model_type_name,
     IModelProvider,
     ModelProvideInfo,
     ModelInfo,
@@ -145,6 +144,7 @@ model_info_manage = (
 class GeminiModelProvider(IModelProvider):
     def get_dynamic_model_info_list(self, api_key, api_base, credential=None):
         """Gemini 原生 /v1beta/models 返回 supportedGenerationMethods，可精确判型；失败时回退框架默认。"""
+        api_key = api_key or self._credential_api_key(credential)
         base = (api_base or self.get_dynamic_default_api_base() or "").strip().rstrip("/")
         if not base:
             return None
@@ -159,45 +159,30 @@ class GeminiModelProvider(IModelProvider):
             items = response.json().get("models") or []
             if not items:
                 return None
-            builtin_manage = self.get_model_info_manage()
-            builtin_by_name = {}
-            impl_map = {}
-            for info in builtin_manage.model_list:
-                builtin_by_name.setdefault(info.name, info)
-                impl_map.setdefault(info.model_type, (info.model_credential, info.model_class))
-            info_list = []
-            for item in items:
-                name = str(item.get("name") or "").removeprefix("models/")
-                if not name:
-                    continue
-                builtin = builtin_by_name.get(name)
-                if builtin is not None:
-                    info_list.append(
-                        ModelInfo(name, builtin.desc, builtin.model_type, builtin.model_credential, builtin.model_class)
-                    )
-                    continue
-                methods = {str(m).lower() for m in (item.get("supportedGenerationMethods") or [])}
-                if not methods:
-                    # 官方接口未给出可用能力时跳过，避免误判成 LLM。
-                    continue
-                if "embedcontent" in methods:
-                    model_type = ModelTypeConst.EMBEDDING
-                elif any(m in methods for m in ("generatecontent", "counttokens", "generateanswer")):
-                    model_type = ModelTypeConst.LLM
-                elif "generatevideos" in methods:
-                    model_type = ModelTypeConst.TTV
-                else:
-                    model_type = self.classify_dynamic_model(name)
-                impl = impl_map.get(_model_type_name(model_type))
-                if impl is None:
-                    continue
-                info_list.append(ModelInfo(name, _(""), model_type, impl[0], impl[1]))
-            return info_list or None
         except Exception:
             return None
+        return self._build_dynamic_model_info_list(
+            items,
+            self._classify_gemini_item,
+            id_extractor=lambda item: str(item.get("name") or "").removeprefix("models/"),
+        )
+
+    def _classify_gemini_item(self, item, model_id):
+        """按官方 supportedGenerationMethods 判型；无能力字段时跳过，避免误判成 LLM。"""
+        methods = {str(m).lower() for m in (item.get("supportedGenerationMethods") or [])}
+        if not methods:
+            return None
+        if "embedcontent" in methods:
+            return ModelTypeConst.EMBEDDING
+        if any(m in methods for m in ("generatecontent", "counttokens", "generateanswer")):
+            return ModelTypeConst.LLM
+        if "generatevideos" in methods:
+            return ModelTypeConst.TTV
+        return self.classify_dynamic_model(model_id)
 
     def fetch_dynamic_model_ids(self, api_key, api_base, credential=None):
         """Gemini OpenAI 兼容端点：GET {base}/v1beta/openai/models，Bearer 鉴权。"""
+        api_key = api_key or self._credential_api_key(credential)
         api_base = (api_base or self.get_dynamic_default_api_base() or "").strip().rstrip("/")
         if not api_base:
             return []

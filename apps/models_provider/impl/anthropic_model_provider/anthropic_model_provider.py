@@ -57,6 +57,7 @@ class AnthropicModelProvider(IModelProvider):
 
     def fetch_dynamic_model_items(self, api_key, api_base, credential=None):
         """Anthropic 专有协议：GET {base}/v1/models，鉴权用 x-api-key 头。"""
+        api_key = api_key or self._credential_api_key(credential)
         api_base = (api_base or self.get_dynamic_default_api_base() or "").strip().rstrip("/")
         if not api_base:
             return []

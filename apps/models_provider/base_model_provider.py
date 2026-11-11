@@ -10,7 +10,7 @@ from enum import Enum
 from functools import reduce
 from typing import Dict, Iterator, List, Type
 
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, BadRequest400, NotFound404
 from common.utils.common import encryption
 from django.utils.translation import gettext_lazy as _
 from pydantic import BaseModel
@@ -26,6 +26,15 @@ class DownModelChunkStatus(Enum):
 class ValidCode(Enum):
     valid_error = 500
     model_not_fount = 404
+
+
+# 凭据/连通性校验阶段抛出的 AppApiException，按业务码(ValidCode)路由到一致的
+# HTTP 异常，使业务码与状态码对齐；未命中任一 ValidCode 的异常统一按客户端
+# 参数错误(BadRequest400)处理。
+_VALID_CODE_HTTP_EXCEPTION = {
+    ValidCode.valid_error.value: BadRequest400,
+    ValidCode.model_not_fount.value: NotFound404,
+}
 
 
 class DownModelChunk:
@@ -104,13 +113,15 @@ class IModelProvider(ABC):
     def get_model_type_list(self):
         return self.get_model_info_manage().get_model_type_list()
 
-    def get_model_list(self, model_type, api_key=None, api_base=None, credential=None):
+    def get_model_list(self, model_type, api_key=None, api_base=None, credential=None, allow_builtin_fallback=True):
         if model_type is None:
             raise AppApiException(500, _("Model type cannot be empty"))
         if api_key or credential:
             manage = self._get_dynamic_manage_cached(api_key, api_base, credential)
             if manage is not None:
                 return manage.get_model_list_by_model_type(model_type)
+            if not allow_builtin_fallback:
+                return []
         return self.get_model_info_manage().get_model_list_by_model_type(model_type)
 
     # ---------- 动态模型列表框架 ----------
@@ -123,6 +134,18 @@ class IModelProvider(ABC):
         items = self.fetch_dynamic_model_items(api_key, api_base, credential)
         if not items:
             return None
+        return self._build_dynamic_model_info_list(items, self._classify_dynamic_item_or_id)
+
+    def _classify_dynamic_item_or_id(self, item, model_id):
+        """默认判型：优先用 /models 结构化元数据，否则按模型 id 关键词。"""
+        return self.classify_dynamic_item(item) if isinstance(item, dict) else self.classify_dynamic_model(model_id)
+
+    def _build_dynamic_model_info_list(self, items, classify, id_extractor=None):
+        """共享的动态条目 -> ModelInfo 构建：内置名沿用原实现，其余按 classify 判型找实现。
+
+        classify(item, model_id) 返回 ModelTypeConst，返回 None 表示跳过该条；
+        id_extractor(item) 返回最终模型 id，缺省取 dict 的 id 字段或 item 本身。
+        """
         builtin_manage = self.get_model_info_manage()
         builtin_by_name = {}
         impl_map = {}
@@ -131,7 +154,7 @@ class IModelProvider(ABC):
             impl_map.setdefault(info.model_type, (info.model_credential, info.model_class))
         info_list = []
         for item in items:
-            model_id = item.get("id") if isinstance(item, dict) else item
+            model_id = id_extractor(item) if id_extractor else (item.get("id") if isinstance(item, dict) else item)
             if not model_id:
                 continue
             # 内置列表中已有的模型：类型与实现直接沿用原有逻辑，不依赖关键词猜型。
@@ -141,10 +164,9 @@ class IModelProvider(ABC):
                     ModelInfo(model_id, builtin.desc, builtin.model_type, builtin.model_credential, builtin.model_class)
                 )
                 continue
-            if isinstance(item, dict):
-                model_type = self.classify_dynamic_item(item)
-            else:
-                model_type = self.classify_dynamic_model(model_id)
+            model_type = classify(item, model_id)
+            if model_type is None:
+                continue
             impl = impl_map.get(_model_type_name(model_type))
             if impl is None:
                 # 视觉输入的对话模型（IMAGE 类型）在无视觉实现时按 LLM 兜底；其余未支持类型直接丢弃。
@@ -174,6 +196,7 @@ class IModelProvider(ABC):
 
     def fetch_dynamic_model_items(self, api_key, api_base, credential=None):
         """OpenAI 兼容协议实时获取模型条目（保留官方元数据，供判型使用）。"""
+        api_key = api_key or self._credential_api_key(credential)
         api_base = (
             (api_base or self._credential_api_base(credential) or self.get_dynamic_default_api_base() or "")
             .strip()
@@ -253,6 +276,17 @@ class IModelProvider(ABC):
         return None
 
     @staticmethod
+    def _credential_api_key(credential):
+        """从完整凭证里找 API Key 字段（各供应商字段名不同：api_key/dashscope_api_key 等）。"""
+        if not isinstance(credential, dict):
+            return None
+        for key in ("api_key", "dashscope_api_key", "apikey", "access_key", "access_key_id", "token"):
+            value = str(credential.get(key) or "").strip()
+            if value:
+                return value
+        return None
+
+    @staticmethod
     def _credential_cache_fingerprint(credential):
         """完整凭证的缓存指纹：仅取字符串值参与排序，避免大对象。"""
         if not isinstance(credential, dict):
@@ -316,9 +350,23 @@ class IModelProvider(ABC):
         raise_exception=False,
     ):
         model_info = self.get_model_info_manage().get_model_info(model_type, model_name)
-        return model_info.model_credential.is_valid(
-            model_type, model_name, model_credential, model_params, self, raise_exception=raise_exception
-        )
+        validate_params = dict(model_params)
+        # 兼容 OpenAI 协议的模型在连通性校验时注入短超时并关闭重试，
+        # 防止不可达地址触发 OpenAI 客户端默认 600s read 超时导致接口长期挂起。
+        validation_timeout = getattr(model_info.model_class, "credential_validation_timeout", None)
+        if validation_timeout is not None:
+            validate_params["request_timeout"] = validation_timeout
+            validate_params["max_retries"] = 0
+        try:
+            return model_info.model_credential.is_valid(
+                model_type, model_name, model_credential, validate_params, self, raise_exception=raise_exception
+            )
+        except AppApiException as e:
+            if not raise_exception:
+                raise
+            # 拿到模型侧返回的 ValidCode 就按它路由；否则统一按 400 处理。
+            http_exception = _VALID_CODE_HTTP_EXCEPTION.get(e.code, BadRequest400)
+            raise http_exception(http_exception.status_code, e.message) from e
 
     def get_model(self, model_type, model_name, model_credential: Dict[str, object], **model_kwargs) -> BaseModel:
         model_info = self.get_model_info_manage().get_model_info(model_type, model_name)

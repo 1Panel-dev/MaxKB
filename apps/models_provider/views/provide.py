@@ -103,63 +103,84 @@ class Provide(APIView):
             tags=[_("Model")],  # type: ignore
         )
         @staticmethod
-        def _get_model_list(provider, model_type, api_key, api_base, credential, search):
+        def _filter_model_list(model_list, search):
+            if not search:
+                return model_list
+            search = str(search).strip().lower()
+            return [
+                model
+                for model in model_list
+                if search in str(model.get("name", "")).lower() or search in str(model.get("desc", "")).lower()
+            ]
+
+        @staticmethod
+        def _get_model_list(provider, model_type, api_key, api_base, credential, allow_builtin_fallback=True):
             provider_handler = _get_provider(provider)
             if not model_type:
                 raise BadRequest400(400, _("model_type is required"))
             model_type_list = [item.get("value") for item in provider_handler.get_model_type_list()]
             if model_type not in model_type_list:
                 raise BadRequest400(400, _("model_type is invalid"))
-            model_list = provider_handler.get_model_list(
+            if allow_builtin_fallback:
+                return provider_handler.get_model_list(
+                    model_type, api_key=api_key, api_base=api_base, credential=credential
+                )
+            return provider_handler.get_model_list(
                 model_type,
                 api_key=api_key,
                 api_base=api_base,
                 credential=credential,
+                allow_builtin_fallback=False,
             )
-            if search:
-                search = str(search).strip().lower()
-                model_list = [
-                    model
-                    for model in model_list
-                    if search in str(model.get("name", "")).lower() or search in str(model.get("desc", "")).lower()
-                ]
-            return model_list
 
         def get(self, request: Request):
             """内置列表查询；带凭证的查询必须走 POST，避免 api_key 出现在 URL/访问日志中。"""
             return result.success(
-                self._get_model_list(
-                    request.query_params.get("provider"),
-                    request.query_params.get("model_type"),
-                    None,
-                    None,
-                    None,
+                self._filter_model_list(
+                    self._get_model_list(
+                        request.query_params.get("provider"),
+                        request.query_params.get("model_type"),
+                        None,
+                        None,
+                        None,
+                    ),
                     request.query_params.get("search"),
                 )
             )
 
         def post(self, request: Request):
-            """携带凭证的查询走 POST，避免 api_key 出现在 URL/访问日志中；成功后按 url+key 写入缓存。"""
+            """携带凭证的查询走 POST，避免 api_key 出现在 URL/访问日志中。
+
+            取数顺序：实时动态列表 → 缓存 → 内置兜底；实时成功才按 url+key 更新缓存。
+            """
             data = request.data or {}
-            model_list = self._get_model_list(
-                data.get("provider"),
-                data.get("model_type"),
-                data.get("api_key"),
-                data.get("api_base"),
-                data.get("credential"),
-                data.get("search"),
+            provider = data.get("provider")
+            model_type = data.get("model_type")
+            api_key = data.get("api_key")
+            api_base = data.get("api_base")
+            credential = data.get("credential")
+            search = data.get("search")
+
+            if not (api_key or credential):
+                # 未提供凭证：直接返回内置列表，无缓存语义。
+                model_list = self._get_model_list(provider, model_type, api_key, api_base, credential)
+                return result.success(self._filter_model_list(model_list, search))
+
+            # 1) 实时动态列表（不带内置兜底）
+            live_list = self._get_model_list(
+                provider, model_type, api_key, api_base, credential, allow_builtin_fallback=False
             )
-            if model_list and not data.get("search"):
-                # search 结果是过滤子集，不写入缓存，避免覆盖全量列表
-                cache_base_model_list(
-                    data.get("provider"),
-                    data.get("model_type"),
-                    data.get("api_key"),
-                    data.get("api_base"),
-                    data.get("credential"),
-                    model_list,
-                )
-            return result.success(model_list)
+            if live_list:
+                cache_base_model_list(provider, model_type, api_key, api_base, credential, live_list)
+                return result.success(self._filter_model_list(live_list, search))
+
+            # 2) 实时无数据 → 读缓存
+            if cached_list := get_cached_base_model_list(provider, model_type, None, credential):
+                return result.success(self._filter_model_list(cached_list, search))
+
+            # 3) 缓存也没有 → 内置兜底
+            fallback_list = self._get_model_list(provider, model_type, api_key, api_base, credential)
+            return result.success(self._filter_model_list(fallback_list, search))
 
     class ModelListCache(APIView):
         authentication_classes = [TokenAuth]
