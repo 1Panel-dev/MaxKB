@@ -94,7 +94,7 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
           @change="handleSettingChange('enabled', $event)"
         />
       </section>
-      <section>
+      <section v-if="setting.enabled">
         <div class="mb-2">
           <span>对话用户授权</span>
           <span class="text-N600"> (开启后，仅允许授权的对话用户通过 APIKey 检索当前知识库)</span>
