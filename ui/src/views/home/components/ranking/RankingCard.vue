@@ -8,7 +8,6 @@ const props = defineProps<{
   records?: HomeRankingRecord[]
   loading: boolean
   total?: number
-  detailDisabled?: boolean
 }>()
 defineEmits<{ detail: [] }>()
 defineSlots<{ description(props: { record: HomeRankingRecord; index: number }): unknown }>()
@@ -28,7 +27,7 @@ function getRecordPercentage(record: HomeRankingRecord) {
     <div class="mb-6 flex-between">
       <h4>{{ title }}</h4>
       <!-- 查看排行榜详情 -->
-      <el-button text :disabled="loading || detailDisabled" class="-mr-1" @click="$emit('detail')">
+      <el-button text :disabled="loading" class="-mr-1" @click="$emit('detail')">
         <span>详情</span>
         <MkIcon name="icon_right_outlined" />
       </el-button>

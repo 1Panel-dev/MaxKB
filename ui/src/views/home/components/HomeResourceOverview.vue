@@ -15,27 +15,11 @@ interface HomeResourceCard {
   details: [string, number | undefined][]
 }
 
-const ZERO_APPLICATION: HomeApplicationAggregation = { total: 0, publish_count: 0, un_publish_count: 0 }
-const ZERO_KNOWLEDGE: HomeKnowledgeAggregation = { total: 0, document_count: 0, failure_count: 0 }
-const ZERO_TOOL: HomeToolAggregation = {
-  total: 0,
-  custom_count: 0,
-  workflow_count: 0,
-  skill_count: 0,
-  mcp_count: 0,
-  data_source_count: 0,
-}
-const ZERO_MODEL: HomeModelAggregation = { total: 0, llm_count: 0, embedding_count: 0 }
-
 /* 资源概况与列表导航 */
 const props = defineProps<{ workspaceId: string; api: typeof HomepageApi }>()
 const router = useRouter()
 const route = useRoute()
 const isSystemScope = computed(() => route.meta.scope === 'system')
-const canReadApplication = computed(() => !isSystemScope.value || perm.application.system.read())
-const canReadKnowledge = computed(() => !isSystemScope.value || perm.knowledge.system.read())
-const canReadTool = computed(() => !isSystemScope.value || perm.tool.system.read())
-const canReadModel = computed(() => !isSystemScope.value || perm.model.system.read())
 const loading = ref(false)
 const application = ref<HomeApplicationAggregation>()
 const knowledge = ref<HomeKnowledgeAggregation>()
@@ -97,54 +81,38 @@ function loadResources() {
   if (loading.value) return
   loading.value = true
   return Promise.allSettled([
-    canReadApplication.value
-      ? props.api
-          .getApplicationAggregation(props.workspaceId)
-          .then((value) => {
-            application.value = value
-          })
-          .catch(() => {
-            application.value = undefined
-          })
-      : Promise.resolve().then(() => {
-          application.value = { ...ZERO_APPLICATION }
-        }),
-    canReadKnowledge.value
-      ? props.api
-          .getKnowledgeAggregation(props.workspaceId)
-          .then((value) => {
-            knowledge.value = value
-          })
-          .catch(() => {
-            knowledge.value = undefined
-          })
-      : Promise.resolve().then(() => {
-          knowledge.value = { ...ZERO_KNOWLEDGE }
-        }),
-    canReadTool.value
-      ? props.api
-          .getToolAggregation(props.workspaceId)
-          .then((value) => {
-            tool.value = value
-          })
-          .catch(() => {
-            tool.value = undefined
-          })
-      : Promise.resolve().then(() => {
-          tool.value = { ...ZERO_TOOL }
-        }),
-    canReadModel.value
-      ? props.api
-          .getModelAggregation(props.workspaceId)
-          .then((value) => {
-            model.value = value
-          })
-          .catch(() => {
-            model.value = undefined
-          })
-      : Promise.resolve().then(() => {
-          model.value = { ...ZERO_MODEL }
-        }),
+    props.api
+      .getApplicationAggregation(props.workspaceId)
+      .then((value) => {
+        application.value = value
+      })
+      .catch(() => {
+        application.value = undefined
+      }),
+    props.api
+      .getKnowledgeAggregation(props.workspaceId)
+      .then((value) => {
+        knowledge.value = value
+      })
+      .catch(() => {
+        knowledge.value = undefined
+      }),
+    props.api
+      .getToolAggregation(props.workspaceId)
+      .then((value) => {
+        tool.value = value
+      })
+      .catch(() => {
+        tool.value = undefined
+      }),
+    props.api
+      .getModelAggregation(props.workspaceId)
+      .then((value) => {
+        model.value = value
+      })
+      .catch(() => {
+        model.value = undefined
+      }),
   ]).finally(() => {
     loading.value = false
   })

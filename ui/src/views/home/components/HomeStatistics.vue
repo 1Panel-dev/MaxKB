@@ -13,10 +13,8 @@ const props = defineProps<{
   workspaceId: string
   applicationId: string
   api: typeof HomepageApi | typeof SystemHomepageApi | typeof OverviewApi
-  canReadApplication?: boolean
 }>()
 defineSlots<{ application(props: { loading: boolean }): unknown }>()
-const canReadApplicationStatistics = computed(() => props.canReadApplication ?? true)
 
 /* 日期、智能体筛选与使用统计 */
 const range = ref({ start_time: beforeDay(7), end_time: beforeDay(0) })
@@ -53,11 +51,6 @@ const metrics = computed(() =>
   })),
 )
 function loadMonitoring() {
-  if (!canReadApplicationStatistics.value) {
-    monitoring.value = []
-    loading.value = false
-    return Promise.resolve()
-  }
   loading.value = true
   return props.api
     .getMonitoring(props.workspaceId, range.value, props.applicationId === 'all' ? '' : props.applicationId)
