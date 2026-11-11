@@ -34,7 +34,9 @@ function applyBaseModelOptions(provider: string, modelType: string, credentialSn
     JSON.stringify(modelForm.credential) === credentialSnapshot
   ) {
     baseModelOptions.value = options
+    return true
   }
+  return false
 }
 const baseModelLoading = ref(false)
 const credentialFields = ref<FormField[]>([])
@@ -93,8 +95,16 @@ function open(provider: ModelProviderItem, model: ModelItem) {
     })
 }
 
-function fetchBaseModelOptions() {
+async function fetchBaseModelOptions() {
   if (!modelForm.provider || !modelForm.model_type) return
+  const requiredFields = credentialFields.value.filter((field) => field.required !== false).map((field) => field.field)
+  if (requiredFields.length) {
+    const valid = await dynamicsFormRef.value?.ruleFormRef?.validateField(requiredFields).then(
+      () => true,
+      () => false,
+    )
+    if (!valid) return
+  }
   baseModelLoading.value = true
   const requestProvider = modelForm.provider
   const requestModelType = modelForm.model_type
@@ -107,10 +117,12 @@ function fetchBaseModelOptions() {
   ProviderApi.getBaseModelList(requestProvider, requestModelType, undefined, modelForm.credential as Record<string, unknown>)
     .then((options) => {
       if (options?.length) {
-        applyBaseModelOptions(requestProvider, requestModelType, requestCredentialSnapshot, options)
-      } else {
-        return loadBuiltin()
+        if (applyBaseModelOptions(requestProvider, requestModelType, requestCredentialSnapshot, options)) {
+          MsgSuccess('获取成功')
+        }
+        return
       }
+      return loadBuiltin()
     })
     .catch(() => loadBuiltin())
     .finally(() => {

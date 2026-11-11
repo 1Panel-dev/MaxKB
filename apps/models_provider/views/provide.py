@@ -30,6 +30,38 @@ def _get_provider(provider):
     return ModelProvideConstants[provider]
 
 
+def _is_empty_credential_value(value):
+    return value is None or (isinstance(value, str) and not value.strip())
+
+
+def _validate_model_type(provider_handler, model_type):
+    if not model_type:
+        raise BadRequest400(400, _("model_type is required"))
+    model_type_list = [item.get("value") for item in provider_handler.get_model_type_list()]
+    if model_type not in model_type_list:
+        raise BadRequest400(400, _("model_type is invalid"))
+
+
+def _validate_required_credential(provider_handler, model_type, credential):
+    """按供应商自己的凭证表单校验模型列表查询所需的必填参数。"""
+    model_credential = provider_handler.get_model_credential(model_type, "")
+    if model_credential is None:
+        return
+    missing_fields = []
+    for field in model_credential.to_form_list():
+        if not field.get("required") or not _is_empty_credential_value(credential.get(field.get("field"))):
+            continue
+        label = field.get("label")
+        if isinstance(label, dict):
+            label = label.get("label")
+        missing_fields.append(str(label or field.get("field")))
+    if missing_fields:
+        raise BadRequest400(
+            400,
+            _("The following fields are required: {keys}").format(keys=", ".join(missing_fields)),
+        )
+
+
 class Provide(APIView):
     authentication_classes = [TokenAuth]
 
@@ -116,11 +148,7 @@ class Provide(APIView):
         @staticmethod
         def _get_model_list(provider, model_type, api_key, api_base, credential, allow_builtin_fallback=True):
             provider_handler = _get_provider(provider)
-            if not model_type:
-                raise BadRequest400(400, _("model_type is required"))
-            model_type_list = [item.get("value") for item in provider_handler.get_model_type_list()]
-            if model_type not in model_type_list:
-                raise BadRequest400(400, _("model_type is invalid"))
+            _validate_model_type(provider_handler, model_type)
             if allow_builtin_fallback:
                 return provider_handler.get_model_list(
                     model_type, api_key=api_key, api_base=api_base, credential=credential
@@ -160,6 +188,15 @@ class Provide(APIView):
             api_base = data.get("api_base")
             credential = data.get("credential")
             search = data.get("search")
+
+            provider_handler = _get_provider(provider)
+            credential = dict(credential) if isinstance(credential, dict) else {}
+            if api_key and not credential.get("api_key"):
+                credential["api_key"] = api_key
+            if api_base and not credential.get("api_base"):
+                credential["api_base"] = api_base
+            _validate_model_type(provider_handler, model_type)
+            _validate_required_credential(provider_handler, model_type, credential)
 
             if not (api_key or credential):
                 # 未提供凭证：直接返回内置列表，无缓存语义。
