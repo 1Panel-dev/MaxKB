@@ -35,7 +35,7 @@ class ChatHeadersMiddleware(MiddlewareMixin):
                 response.content = (
                     response.content.decode("utf-8")
                     .replace(
-                        '<link rel="icon" href="./favicon.ico" />', f'<link rel="icon" href="{application_icon}" />'
+                        '<link rel="icon" href="/chat/favicon.ico" />', f'<link rel="icon" href="{application_icon}" />'
                     )
                     .replace("<title>MaxKB</title>", f"<title>{application_name}</title>")
                     .encode("utf-8")
