@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getFileIconUrl } from '@/utils/icon'
+import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import { useRightSidebarStore } from '../index'
 import DocumentPreview from './document-preview/index.vue'
 
@@ -39,23 +40,29 @@ const { previewDocument, sourceParagraphs, count, openDocument } = knowledgeSour
                 </div>
               </template>
 
-              <MdPreview :model-value="paragraph.content" no-img-zoom-in />
-
               <!-- 放大预览召回图片 -->
               <el-image
                 v-if="paragraph.imageUrl"
                 :src="paragraph.imageUrl"
                 :alt="paragraph.title"
-                fit="cover"
-                class="mt-2 w-full rounded-lg"
+                fit="contain"
+                class="mb-2"
                 :preview-src-list="[paragraph.imageUrl]"
                 preview-teleported
               />
 
+              <MdPreview :model-value="paragraph.content" no-img-zoom-in />
+
               <!-- 打开来源文档：PDF 在知识来源内预览，其他文件下载，网页来源打开原网址 -->
               <el-card v-if="paragraph.documentName" shadow="never" class="small mt-2 cursor-pointer" @click="openDocument(paragraph)">
                 <div class="flex-align-center gap-2">
-                  <img :src="getFileIconUrl(paragraph.documentName)" alt="" width="24" />
+                  <img
+                    :src="
+                      getFileIconUrl(paragraph.documentName, paragraph.knowledgeType, paragraph.documentResourceType === DOCUMENT_RESOURCE_TYPE.IMAGE)
+                    "
+                    alt=""
+                    class="size-6 shrink-0"
+                  />
                   <span class="min-w-0 truncate" :title="paragraph.documentName">{{ paragraph.documentName }}</span>
                 </div>
               </el-card>

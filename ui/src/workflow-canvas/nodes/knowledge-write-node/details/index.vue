@@ -4,6 +4,7 @@ import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { getFileIconUrl } from '@/utils/icon'
+import { KNOWLEDGE_TYPE } from '@/api/enums'
 
 defineOptions({ name: 'KnowledgeWriteNodeDetail' })
 
@@ -52,8 +53,7 @@ watch(writeContent, () => {
             @click="selectedDocumentIndex = index"
           >
             <div class="flex-align-center gap-2">
-              <img v-if="file.meta?.source_type === 'web'" src="@/assets/file-type/web-link-icon.svg" alt="" width="24" />
-              <img v-else :src="getFileIconUrl(file.name || '')" alt="" width="24" />
+              <img :src="getFileIconUrl(file.name || '', file.meta?.source_type === 'web' ? KNOWLEDGE_TYPE.WEB : undefined)" alt="" width="24" />
               <span class="min-w-0 truncate" :title="file.name">{{ file.name || '-' }}</span>
             </div>
           </el-card>

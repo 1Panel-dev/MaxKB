@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import type { ChatParagraphSource, ChatParagraphSourceMeta } from '@/api/types'
+import type { ChatParagraphSource, ChatParagraphSourceMeta, DocumentResourceType, KnowledgeType } from '@/api/types'
 import { downloadByURL, getFileUrl } from '@/utils/common'
 import { MsgInfo } from '@/utils/message'
 import { isPdfDocument, type PreviewDocument } from './document-preview/index'
@@ -28,12 +28,13 @@ export interface KnowledgeSourceParagraph {
   vectorLabel: string
   imageUrl: string
   documentName: string
+  documentResourceType?: DocumentResourceType | null
   documentAction: SourceDocumentAction
   /** 来源文档地址，UNAVAILABLE 时为空字符串 */
   documentUrl: string
   allowDownload: boolean
   knowledgeName: string
-  knowledgeType?: string
+  knowledgeType?: KnowledgeType
 }
 
 // 历史快照中 meta 可能是 JSON 字符串，解析失败按无元数据处理
@@ -79,6 +80,7 @@ function toSourceParagraph(paragraph: ChatParagraphSource, index: number): Knowl
     vectorLabel: paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE || paragraph.hit_asset ? '图片向量' : '文本向量',
     imageUrl: getImageUrl(paragraph),
     documentName,
+    documentResourceType: paragraph.document_resource_type,
     documentAction: documentTarget.action,
     documentUrl: documentTarget.url,
     allowDownload: meta.allow_download !== false,

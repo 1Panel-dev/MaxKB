@@ -5,12 +5,10 @@ import MkEditName from '@/components/mk-edit-name/index.vue'
 import { MsgSuccess } from '@/utils/message'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
-import fileImageIcon from '@/assets/file-type/file-image-icon.svg'
 import { getFileIconUrl } from '@/utils/icon'
 import { getFileUrl } from '@/utils/common'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
-import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 /**
@@ -158,14 +156,13 @@ defineExpose({ refresh: handleLoadParagraphs })
             <div class="flex-align-center gap-2 text-sm text-N600">
               <span class="shrink-0">{{ paragraph.content.length }} 字符</span>
               <el-divider direction="vertical" />
-              <img v-if="paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE" :src="fileImageIcon" class="size-4 shrink-0" />
               <img
-                v-else-if="paragraph.knowledge_type != null && KNOWLEDGE_TYPE_MAP[paragraph.knowledge_type] === KNOWLEDGE_TYPE_KEY.WEB"
-                src="@/assets/file-type/web-link-icon.svg"
+                :src="
+                  getFileIconUrl(paragraph.document_name, paragraph.knowledge_type, paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE)
+                "
                 alt=""
                 class="size-4 shrink-0"
               />
-              <img v-else :src="getFileIconUrl(paragraph.document_name)" class="size-4 shrink-0" alt="" />
               <span class="truncate" :title="paragraph.document_name">{{ paragraph.document_name }}</span>
             </div>
           </el-card>
@@ -175,7 +172,7 @@ defineExpose({ refresh: handleLoadParagraphs })
     </div>
     <template #footer>
       <!-- 关联当前问题的分段 -->
-      <el-button plain :disabled="loading" v-if="knowledgeProblemPermission('problemRelate')"  @click="emit('associate')">关联分段</el-button>
+      <el-button plain :disabled="loading" v-if="knowledgeProblemPermission('problemRelate')" @click="emit('associate')">关联分段</el-button>
       <!-- 查看上一个问题 -->
       <el-button plain :disabled="loading || !hasPrevious" @click="emit('previous')">上一个</el-button>
       <!-- 查看下一个问题 -->

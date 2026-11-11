@@ -60,7 +60,7 @@ defineProps<{
             >
               <el-card shadow="never" class="small cursor-pointer">
                 <div class="flex-align-center gap-2">
-                  <img :src="getFileIconUrl(paragraph.metadata.document_name.trim())" alt="" width="24" />
+                  <img :src="getFileIconUrl(paragraph.metadata.document_name.trim(), paragraph.metadata.knowledge_type)" alt="" width="24" />
                   <span class="min-w-0 truncate" :title="paragraph.metadata.document_name.trim()">{{ paragraph.metadata.document_name.trim() }}</span>
                 </div>
               </el-card>
@@ -114,7 +114,7 @@ defineProps<{
             >
               <el-card shadow="never" class="small cursor-pointer">
                 <div class="flex-align-center gap-2">
-                  <img :src="getFileIconUrl(paragraph.metadata.document_name.trim())" alt="" width="24" />
+                  <img :src="getFileIconUrl(paragraph.metadata.document_name.trim(), paragraph.metadata.knowledge_type)" alt="" width="24" />
                   <span class="min-w-0 truncate" :title="paragraph.metadata.document_name.trim()">{{ paragraph.metadata.document_name.trim() }}</span>
                 </div>
               </el-card>

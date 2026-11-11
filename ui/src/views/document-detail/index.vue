@@ -6,7 +6,6 @@ import { provideDocumentDetailContext } from './context'
 import type { ParamsPage } from '@/api/admin/core/types'
 import type { DocumentItem, ParagraphItem, ParagraphQuery } from '@/api/types'
 import { getFileIconUrl } from '@/utils/icon'
-import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { useParagraphSort } from './action-dropdown/move/useParagraphSort'
 import CreateParagraphDialog from './paragraph-dialog/CreateParagraphDialog.vue'
@@ -271,8 +270,7 @@ onMounted(() => {
           <!-- 返回文档列表 -->
           <el-button text @click="handleBack"><MkIcon name="icon_arrow-left_outlined" :size="20" /></el-button>
           <template v-if="documentDetail">
-            <img v-if="route.params.type === KNOWLEDGE_TYPE_KEY.WEB" src="@/assets/file-type/web-link-icon.svg" alt="" class="size-6 shrink-0" />
-            <img v-else :src="getFileIconUrl(documentDetail.name)" alt="" class="size-6 shrink-0" />
+            <img :src="getFileIconUrl(documentDetail.name, documentDetail.type)" alt="" class="size-6 shrink-0" />
           </template>
           <h4 class="truncate" :title="documentDetail?.name">{{ documentDetail?.name ?? '-' }}</h4>
         </div>

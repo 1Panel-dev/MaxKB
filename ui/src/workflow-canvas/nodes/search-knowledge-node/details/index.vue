@@ -6,7 +6,7 @@ import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_HIT_UNIT_TYPE } from '@/api/enums'
-import type { DocumentResourceType, KnowledgeHitTestAsset } from '@/api/types'
+import type { DocumentResourceType, KnowledgeHitTestAsset, KnowledgeType } from '@/api/types'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 
 defineOptions({ name: 'SearchKnowledgeNodeDetail' })
@@ -22,7 +22,7 @@ interface SearchParagraph {
   document_image_id?: string | null
   hit_asset?: KnowledgeHitTestAsset | null
   knowledge_name?: string
-  knowledge_type?: string
+  knowledge_type?: KnowledgeType
   meta?: {
     source_file_id?: string
     source_url?: string
@@ -131,7 +131,17 @@ function getParagraphImageUrl(paragraph: SearchParagraph) {
             >
               <el-card shadow="never" class="small cursor-pointer">
                 <div class="flex-align-center gap-2">
-                  <img :src="getFileIconUrl(paragraph.document_name.trim())" alt="" width="24" />
+                  <img
+                    :src="
+                      getFileIconUrl(
+                        paragraph.document_name.trim(),
+                        paragraph.knowledge_type,
+                        paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE,
+                      )
+                    "
+                    alt=""
+                    class="size-6 shrink-0"
+                  />
                   <span class="min-w-0 truncate" :title="paragraph.document_name.trim()">{{ paragraph.document_name.trim() }}</span>
                 </div>
               </el-card>

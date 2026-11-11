@@ -5,7 +5,6 @@ import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ParamsPage } from '@/api/admin/core/types'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import type { DocumentItem, DocumentResourceType, ParagraphItem, ProblemParagraphReference } from '@/api/types'
-import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess } from '@/utils/message'
@@ -203,13 +202,7 @@ defineExpose({ open })
                   :alt="row.name"
                   fit="cover"
                 />
-                <img
-                  v-else-if="KNOWLEDGE_TYPE_MAP[row.type] === KNOWLEDGE_TYPE_KEY.WEB"
-                  src="@/assets/file-type/web-link-icon.svg"
-                  alt=""
-                  class="size-4"
-                />
-                <img v-else :src="getFileIconUrl(row.name)" class="size-4 shrink-0" alt="" />
+                <img v-else :src="getFileIconUrl(row.name, row.type)" class="size-4 shrink-0" alt="" />
                 <span class="min-w-0 flex-1 truncate" :title="row.name">{{ row.name }}</span>
                 <!-- 关联数字 -->
                 <span v-if="getSelectedCount(row.id)" class="mk-badge">
