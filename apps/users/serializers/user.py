@@ -757,7 +757,9 @@ class UserManageSerializer(serializers.Serializer):
                 workspace_id=workspace_id, role__type="USER"
             ).select_related("role", "user")
             if nick_name:
-                user_role_relations = user_role_relations.filter(user__nick_name__contains=nick_name)
+                user_role_relations = user_role_relations.filter(
+                    Q(user__nick_name__contains=nick_name) | Q(user__username__contains=nick_name)
+                )
             user_dict = {}
             for relation in user_role_relations:
                 user_id = relation.user.id
@@ -774,7 +776,7 @@ class UserManageSerializer(serializers.Serializer):
             return list(user_dict.values())[:200]
         user_list = User.objects.exclude(role=RoleConstants.ADMIN.name)
         if nick_name:
-            user_list = user_list.filter(nick_name__contains=nick_name)
+            user_list = user_list.filter(Q(nick_name__contains=nick_name) | Q(username__contains=nick_name))
         return [
             {"id": user.id, "nick_name": user.nick_name, "roles": [RoleConstants.USER.name]} for user in user_list[:200]
         ]
