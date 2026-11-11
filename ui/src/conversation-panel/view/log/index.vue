@@ -4,9 +4,9 @@ import ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import type { ApplicationDetail, ChatLogRecord } from '@/api/types'
 import ConversationLayout from '../../core/layout/index.vue'
 import LogMessageList from '../../components/log-message-list/index.vue'
-import ExecutionDetail from '../../right-sidebar/execution-detail/index.vue'
+import RightSidebar from '../../right-sidebar/index.vue'
 import { LOG_MESSAGE_LIST_KEY, createLogMessageListStore } from '../../components/log-message-list/index'
-import { EXECUTION_DETAIL_KEY, createExecutionDetailStore } from '../../right-sidebar/execution-detail/index'
+import { RIGHT_SIDEBAR_KEY, createRightSidebarStore } from '../../right-sidebar/index'
 import { toLogAppInfo } from './app-info'
 import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
 
@@ -45,10 +45,10 @@ const msgs = createLogMessageListStore({
   getChatId: () => props.chatId,
   appInfo,
 })
-const detail = createExecutionDetailStore()
+const rightSidebar = createRightSidebarStore()
 
 provide(LOG_MESSAGE_LIST_KEY, msgs)
-provide(EXECUTION_DETAIL_KEY, detail)
+provide(RIGHT_SIDEBAR_KEY, rightSidebar)
 provide(VIEW_KEY, VIEW_TYPE.LOG)
 // 日志无左栏，按 PC 端渲染
 provide(DEVICE_KEY, createDeviceType('push'))
@@ -56,7 +56,7 @@ provide(DEVICE_KEY, createDeviceType('push'))
 watch(
   () => props.chatId,
   () => {
-    detail.closeRightSide()
+    rightSidebar.closeRightSide()
     msgs.load()
   },
   { immediate: true },
@@ -66,17 +66,17 @@ watch(
 <template>
   <ConversationLayout
     :left-open="false"
-    :right-open="detail.rightSideOpen.value"
+    :right-open="rightSidebar.rightSideOpen.value"
     right-mode="drawer"
     :right-drawer-target="props.rightDrawerTarget"
-    @mask-click="detail.closeRightSide()"
+    @mask-click="rightSidebar.closeRightSide()"
   >
     <template #main>
       <main class="mk-conversation-main">
         <LogMessageList :key="props.chatId" :api="props.chatLogApi" :application-id="props.applicationId || ''" :chat-id="props.chatId" />
       </main>
     </template>
-    <template #right><ExecutionDetail /></template>
+    <template #right><RightSidebar /></template>
   </ConversationLayout>
 </template>
 

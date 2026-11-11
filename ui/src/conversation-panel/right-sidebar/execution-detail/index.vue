@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import { useExecutionDetailStore } from './index'
+import { useRightSidebarStore } from '../index'
 
 withDefaults(defineProps<{ workflowMode?: WorkflowMode }>(), {
   workflowMode: WorkflowMode.Application,
 })
 
-const { detail, closeRightSide } = useExecutionDetailStore()
+const { executionDetail, closeRightSide } = useRightSidebarStore()
+const { executionDetails: detail } = executionDetail
 </script>
 
 <template>

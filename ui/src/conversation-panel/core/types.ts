@@ -1,4 +1,4 @@
-import type { ChatFeedback, ChatApplicationProfile, ChatContent, ChatLogRecord, ChatUserProfile, Dict } from '@/api/types'
+import type { ChatFeedback, ChatApplicationProfile, ChatContent, ChatLogRecord, ChatParagraphSource, ChatUserProfile, Dict } from '@/api/types'
 
 /**
  * 当前对话的智能体信息，由 view 加载并注入各组件 store，chat 与 debug 结构一致。
@@ -21,14 +21,14 @@ export interface Conversation {
   update_time?: string
 }
 
-// 助手消息底部展示数据(对话结束后 / 历史加载时填充):知识来源数、tokens、耗时、执行详情
+// 助手消息底部展示数据(对话结束后 / 历史加载时填充):知识来源分段、tokens、耗时、执行详情
 export interface ChatRecordMeta {
   feedback?: ChatFeedback
   createTime?: string
   messageTokens: number
   answerTokens: number
   runTime: number
-  knowledgeCount: number
+  paragraphList: ChatParagraphSource[]
   executionDetails: NonNullable<ChatLogRecord['execution_details']>
 }
 
@@ -82,4 +82,4 @@ export interface ConversationApiAdapter {
 }
 
 // 说明:各组件 store 的类型不在此集中声明,而是各组件 index.ts 用 ReturnType 自导出
-// (ConversationListStore / MessageListStore / MessageInputStore / ExecutionDetailStore)。
+// (ConversationListStore / MessageListStore / MessageInputStore / RightSidebarStore)。

@@ -6,11 +6,11 @@ import { FILE_SOURCE_TYPE } from '@/api/enums'
 import ConversationLayout from '../../core/layout/index.vue'
 import ConversationList from '../../left-sidebar/conversation-list/index.vue'
 import ChatPanel from '../../main/chat-panel/index.vue'
-import ExecutionDetail from '../../right-sidebar/execution-detail/index.vue'
+import RightSidebar from '../../right-sidebar/index.vue'
 import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
 import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
-import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
+import { RIGHT_SIDEBAR_KEY } from '../../right-sidebar/index'
 import { SHARE_LINK_KEY } from '../../components/message-list/share/index'
 import { createChatConversation, createChatUserProfileGetter } from './index'
 import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, SHOW_SHARE_KEY, createDeviceType } from '../index.ts'
@@ -35,7 +35,7 @@ provide('upload', (file: File, onProgress?: (percent: number, event: AxiosProgre
 provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
-provide(EXECUTION_DETAIL_KEY, bundle.detail)
+provide(RIGHT_SIDEBAR_KEY, bundle.rightSidebar)
 provide(SHARE_LINK_KEY, bundle.share)
 provide(VIEW_KEY, VIEW_TYPE.CHAT)
 // 智能体开启「允许分享对话记录」时显示标题栏、会话菜单、提问与回答上的分享入口
@@ -58,7 +58,7 @@ provide(DEVICE_KEY, createDeviceType(leftMode))
 
 const closeDrawers = () => {
   if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
-  if (rightMode.value === 'drawer') bundle.detail.rightSideOpen.value = false
+  if (rightMode.value === 'drawer') bundle.rightSidebar.rightSideOpen.value = false
 }
 
 onMounted(() => {
@@ -82,14 +82,14 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
   <!-- chat 视图自组装:provide 各组件 store + 布局壳 + 左/主/右三区。窄屏抽屉、宽屏挤压 -->
   <ConversationLayout
     :left-open="bundle.list.leftSideOpen.value"
-    :right-open="bundle.detail.rightSideOpen.value"
+    :right-open="bundle.rightSidebar.rightSideOpen.value"
     :left-mode="leftMode"
     :right-mode="rightMode"
     @mask-click="closeDrawers"
   >
     <template #left><ConversationList /></template>
     <template #main><ChatPanel /></template>
-    <template #right><ExecutionDetail /></template>
+    <template #right><RightSidebar /></template>
   </ConversationLayout>
 </template>
 

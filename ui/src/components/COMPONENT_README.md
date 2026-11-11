@@ -996,6 +996,24 @@ Chat、Portal 和 Display 面板直接放置消息列表，并以当前会话 ID
 同目录 `QuestionEditor.vue` 接收 `content`、`disabled`，维护本次编辑草稿，通过 `cancel` 和
 `send(question)` 通知入口组件；进入时挂载并聚焦，退出时卸载。入口组件负责发送能力与附件传递。
 
+### RightSidebar（对话模块）
+
+`conversation-panel/right-sidebar/index.vue` 放在视图布局的 `#right` 插槽，按当前面板展示执行详情或知识来源，
+两者共用右侧位置，后打开的替换当前面板；挤压与抽屉由 `ConversationLayout` 按视图模式处理，面板自身不使用抽屉。
+每类面板各自有 `index.ts` 与 `index.vue`：`index.ts` 维护本面板数据，`index.vue` 只负责展示。
+`right-sidebar/index.ts` 的 `createRightSidebarStore()` 维护当前面板与右侧开合，并组合
+`execution-detail` 与 `knowledge-source` 的面板 store；由各视图创建并 provide `RIGHT_SIDEBAR_KEY`，
+组件通过 `useRightSidebarStore()` 获取，面板经其 `executionDetail`、`knowledgeSource` 读取数据。消息底部的执行详情入口调用 `showExecutionDetail`，
+知识来源入口在记录含分段（`ChatRecordMeta.paragraphList`）时显示并调用 `showKnowledgeSource`。
+`knowledge-source/` 面板与执行详情结构一致：标题栏显示分段数量与关闭，内容区展示分段卡片；
+其 `index.ts` 的 `createKnowledgeSourceStore()` 保存分段及正在预览的文档，按相似度从高到低整理分段，兼容字符串 `meta`，
+提供召回图片与来源文档的打开方式：知识库文件中的 PDF 在知识来源内预览，其他文件以下载方式获取，
+网页来源仅接受 http(s) 地址并在新窗口打开，无可用地址时按下载权限提示；来源文件不交给浏览器原生打开或预览。
+文档预览是知识来源的下一级，位于 `knowledge-source/document-preview/`，覆盖在分段列表之上显示，
+列表仅隐藏不卸载以便返回时保留滚动位置，打开新的知识来源时回到列表。预览以 pdf.js 把 PDF 逐页绘制为 canvas，不创建文本层与注释层，关闭 XFA，
+避免原生预览执行文件内脚本；pdf.js 在首次预览时按需加载，支持返回知识来源、全屏及按宽度重绘；
+预览区预留滚动条位置，重绘在后台完成后整体替换并保持滚动比例，不清空已显示页面。
+
 ### 分享选择（对话模块）
 
 正式对话的 `message-list` 根据会话 Store 的 `isShared` 展示分享选择态，同轮提问与回答同步选择，

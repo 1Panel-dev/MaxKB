@@ -7,12 +7,12 @@ import { FILE_SOURCE_TYPE } from '@/api/enums'
 import ConversationLayout from '../../core/layout/index.vue'
 import ConversationList from '../../left-sidebar/conversation-list/index.vue'
 import ChatPanel from '../../main/chat-panel/index.vue'
-import ExecutionDetail from '../../right-sidebar/execution-detail/index.vue'
+import RightSidebar from '../../right-sidebar/index.vue'
 import DebugHeader from '../../components/header/debug/index.vue'
 import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
 import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
-import { EXECUTION_DETAIL_KEY } from '../../right-sidebar/execution-detail/index'
+import { RIGHT_SIDEBAR_KEY } from '../../right-sidebar/index'
 import { createDebugHeaderStore, DEBUG_HEADER_KEY } from '../../components/header/debug/index'
 import { createDebugConversation } from './index'
 import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
@@ -44,7 +44,7 @@ provide('upload', (file: File, onProgress?: (percent: number, event: AxiosProgre
 provide(CONVERSATION_LIST_KEY, bundle.list)
 provide(MESSAGE_LIST_KEY, bundle.msgs)
 provide(MESSAGE_INPUT_KEY, bundle.input)
-provide(EXECUTION_DETAIL_KEY, bundle.detail)
+provide(RIGHT_SIDEBAR_KEY, bundle.rightSidebar)
 provide(VIEW_KEY, VIEW_TYPE.DEBUG)
 const debug = createDebugHeaderStore()
 provide(DEBUG_HEADER_KEY, debug)
@@ -60,7 +60,7 @@ provide(DEVICE_KEY, createDeviceType(leftMode))
 // 抽屉态:遮罩点击 / 切换会话 → 收起
 const closeDrawers = () => {
   if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
-  if (rightMode.value === 'drawer') bundle.detail.rightSideOpen.value = false
+  if (rightMode.value === 'drawer') bundle.rightSidebar.rightSideOpen.value = false
 }
 onMounted(() => {
   bundle.list.leftSideOpen.value = false // 菜单默认收起
@@ -84,7 +84,7 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
       >
         <ConversationLayout
           :left-open="bundle.list.leftSideOpen.value"
-          :right-open="bundle.detail.rightSideOpen.value"
+          :right-open="bundle.rightSidebar.rightSideOpen.value"
           :left-mode="leftMode"
           :right-mode="rightMode"
           @mask-click="closeDrawers"
@@ -95,7 +95,7 @@ watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSig
               <template #header><DebugHeader /></template>
             </ChatPanel>
           </template>
-          <template #right><ExecutionDetail /></template>
+          <template #right><RightSidebar /></template>
         </ConversationLayout>
       </div>
     </transition>
