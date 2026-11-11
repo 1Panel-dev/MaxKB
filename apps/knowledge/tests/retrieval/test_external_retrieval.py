@@ -215,6 +215,7 @@ class RetrievalAccessTests(SimpleTestCase):
                 access.RetrievalIdentity(UID),
                 access.RetrievalIdentity(api_key_id=KEY),
                 access.RetrievalIdentity(admin_user_id=UID),
+                access.identity_from_server(UID, "ANONYMOUS_USER"),
                 access.RetrievalIdentity(UID, KEY),
             ):
                 with self.subTest(enabled=enabled, authentication=authentication, identity=identity):
@@ -278,6 +279,46 @@ class RetrievalAccessTests(SimpleTestCase):
         queryset.return_value.filter.return_value = [knowledge(authentication=False)]
         self.assertEqual(access.filter_workflow_knowledge([KID], {}), [KID])
 
+    @patch.object(access, "authorized_ids", return_value=set())
+    @patch.object(access, "QuerySet")
+    def test_authenticated_anonymous_session_keeps_application_knowledge_access(self, queryset, authorized):
+        identity = access.identity_from_server(UID, "ANONYMOUS_USER")
+        for enabled in (False, True):
+            for authentication in (False, True):
+                with self.subTest(enabled=enabled, authentication=authentication):
+                    queryset.return_value.filter.return_value = [
+                        knowledge(enabled=enabled, authentication=authentication)
+                    ]
+                    self.assertEqual(
+                        access.filter_workflow_knowledge([KID, "missing-knowledge"], {"retrieval_identity": identity}),
+                        [KID],
+                    )
+        authorized.assert_not_called()
+
+    @patch.object(access, "authorized_ids", return_value=set())
+    @patch.object(access, "QuerySet")
+    def test_untrusted_anonymous_fields_do_not_bypass_knowledge_authorization(self, queryset, authorized):
+        queryset.return_value.filter.return_value = [knowledge(authentication=True)]
+        for identity in (
+            None,
+            {"is_anonymous": True},
+            access.identity_from_server(None, "ANONYMOUS_USER"),
+            access.identity_from_server(UID, "CHAT_USER"),
+            access.identity_from_server(UID, "APPLICATION_API_KEY"),
+        ):
+            with self.subTest(identity=identity):
+                self.assertEqual(
+                    access.filter_workflow_knowledge(
+                        [KID],
+                        {
+                            "retrieval_identity": identity,
+                            "chat_user_type": "ANONYMOUS_USER",
+                            "form_data": {"asker": {"id": UID, "is_anonymous": True}},
+                        },
+                    ),
+                    [],
+                )
+
     def test_child_tools_cannot_override_trusted_identity(self):
         parent = {
             "retrieval_identity": access.identity_from_server(UID, "CHAT_USER"),
@@ -292,6 +333,13 @@ class RetrievalAccessTests(SimpleTestCase):
         self.assertEqual(child["retrieval_identity"].user_id, UID)
         self.assertFalse(child["debug"])
         self.assertIsNone(access.identity_from_server(UID, "APPLICATION_API_KEY", True).admin_user_id)
+
+    @patch.object(access, "QuerySet")
+    def test_anonymous_identity_is_inherited_by_nested_tools(self, queryset):
+        queryset.return_value.filter.return_value = [knowledge(authentication=True)]
+        parent = {"retrieval_identity": access.identity_from_server(UID, "ANONYMOUS_USER")}
+        child = {"retrieval_identity": {}, **access.inherited_retrieval_context(parent)}
+        self.assertEqual(access.filter_workflow_knowledge([KID], child), [KID])
 
     @patch("oss.serializers.file._check_workspace_resource_permission")
     @patch("common.auth.handle.impl.user_token.get_auth")

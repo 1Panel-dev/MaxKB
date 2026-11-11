@@ -22,6 +22,7 @@ class RetrievalIdentity:
     user_id: str | None = None
     api_key_id: str | None = None
     admin_user_id: str | None = None
+    is_anonymous: bool = False
 
 
 def key_identity(key):
@@ -76,6 +77,7 @@ def identity_from_server(user_id, user_type, debug=False):
     return RetrievalIdentity(
         user_id=str(user_id) if user_id and user_type == "CHAT_USER" else None,
         admin_user_id=str(user_id) if user_id and debug and user_type in {"SYSTEM_USER", "ADMIN"} else None,
+        is_anonymous=bool(user_id and user_type == "ANONYMOUS_USER"),
     )
 
 
@@ -125,7 +127,8 @@ def filter_workflow_knowledge(knowledge_ids, parameters):
         setting = item.external_service
         if "authentication" not in setting:
             legacy.append(str(item.id))
-        elif setting["authentication"]:
+        # Anonymous sessions have already passed application access checks and have no chat-user grants.
+        elif setting["authentication"] and not identity.is_anonymous:
             restricted.append(str(item.id))
         else:
             allowed.add(str(item.id))
