@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import SystemHomepageApi from '@/api/admin/system/homepage'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
@@ -9,10 +9,12 @@ import { useStore } from '@/stores'
 import HomeResourceOverview from '@/views/home/components/HomeResourceOverview.vue'
 import HomeStatistics from '@/views/home/components/HomeStatistics.vue'
 import HomeRankings from '@/views/home/components/ranking/HomeRankings.vue'
+import { perm } from '@/permission'
 
 defineOptions({ name: 'SystemHomeView' })
 
 const { auth } = useStore()
+const canReadApplicationResources = computed(() => perm.application.system.read())
 
 /* 工作空间筛选 */
 const ALL_WORKSPACES = '' // 全部空间标识（空串），传给后端视为 None（所有工作空间）
@@ -40,6 +42,10 @@ const applications = ref<ApplicationDetail[]>([])
 const applicationsLoading = ref(false)
 const selectedApplication = ref<ApplicationDetail>()
 async function fetchApplications(query: string) {
+  if (!canReadApplicationResources.value) {
+    applications.value = []
+    return
+  }
   applicationsLoading.value = true
   const workspaceFilter = selectedWorkspaceId.value ? { workspace_ids: JSON.stringify([selectedWorkspaceId.value]) } : {}
   try {
@@ -52,11 +58,13 @@ async function fetchApplications(query: string) {
 /* 远程搜索防抖，避免输入时每次按键都发请求 */
 let searchTimer: ReturnType<typeof setTimeout> | undefined
 function loadApplications(query = '') {
+  if (!canReadApplicationResources.value) return
   clearTimeout(searchTimer)
   searchTimer = setTimeout(() => fetchApplications(query), 300)
 }
 /* 打开下拉时才按需加载智能体列表，避免进入页面就全量拉取 */
 function handleApplicationVisibleChange(visible: boolean) {
+  if (!canReadApplicationResources.value) return
   if (visible && !applicationsLoading.value && !applications.value.length) {
     loadApplications('')
   }
@@ -86,6 +94,7 @@ onMounted(() => {
       :workspace-id="selectedWorkspaceId"
       :application-id="applicationId"
       :api="SystemHomepageApi"
+      :can-read-application="canReadApplicationResources"
     >
       <template #application="{ loading }">
         <el-select
@@ -96,7 +105,7 @@ onMounted(() => {
           class="w-55!"
           :remote-method="loadApplications"
           :loading="applicationsLoading"
-          :disabled="loading"
+          :disabled="loading || !canReadApplicationResources"
           @change="handleApplicationChange"
           @visible-change="handleApplicationVisibleChange"
         >
@@ -125,6 +134,12 @@ onMounted(() => {
       </template>
     </HomeStatistics>
     <!-- 排行榜 TOP5 -->
-    <HomeRankings :key="selectedWorkspaceId" class="mt-4" :workspace-id="selectedWorkspaceId" :api="SystemHomepageApi" />
+    <HomeRankings
+      :key="selectedWorkspaceId"
+      class="mt-4"
+      :workspace-id="selectedWorkspaceId"
+      :api="SystemHomepageApi"
+      :can-read-application="canReadApplicationResources"
+    />
   </MkViewLayout>
 </template>
