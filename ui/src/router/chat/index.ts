@@ -6,7 +6,7 @@ import { chatRoutes } from './routes'
 
 const CHAT_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/chat/'
 
-const chatRouter = createRouter({ history: createWebHistory(CHAT_BASE_PATH), routes: chatRoutes })
+const chatRouter = createRouter({ history: createWebHistory(CHAT_BASE_PATH), strict: true, routes: chatRoutes })
 
 const LOGIN_ROUTE_NAMES = new Set(['portal-login', 'chat-login'])
 
