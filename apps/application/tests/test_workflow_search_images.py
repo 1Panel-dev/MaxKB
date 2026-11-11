@@ -32,8 +32,13 @@ class SearchKnowledgeImageTests(SimpleTestCase):
             "documents": ["selected-document"],
         }[fields[0]]
         self.node = search_module.SearchKnowledgeNode(
-            SimpleNamespace(id="search"), self.workflow, lambda _: self.params
+            SimpleNamespace(id="search", properties={"stepName": "Knowledge search"}),
+            self.workflow,
+            lambda _: self.params,
         )
+        self.context = {}
+        self.workflow.write_context.side_effect = lambda node_id, key, value, append: self.context.update({key: value})
+        self.workflow.get_context.side_effect = lambda node_id, key: self.context.get(key)
         self.authorized = self.enterContext(
             patch.object(search_module, "filter_authorized_ids", return_value=self.params["knowledge_id_list"])
         )
@@ -77,6 +82,25 @@ class SearchKnowledgeImageTests(SimpleTestCase):
         )
         self.vector.hit_test.assert_not_called()
         self.load_images.assert_not_called()
+
+        self.assertEqual(self.node.get_details()["query_image_list"], [])
+
+    def test_image_only_query_is_recorded_in_details_even_without_matches(self):
+        self.params["image_list"] = ["start-node", "image"]
+        self.images[0].update({"name": "query.png", "url": "/oss/file/query", "size": 42})
+        self.workflow.get_reference_field.side_effect = lambda node_id, fields: {
+            "question": "",
+            "image": self.images,
+        }[fields[0]]
+
+        self.node.execute()
+
+        details = json.loads(json.dumps(self.node.get_details()))
+        self.assertEqual(details["question"], "")
+        self.assertEqual(details["query_image_list"], self.images)
+        self.assertEqual(details["paragraph_list"], [])
+        self.assertEqual(details["image_list"], [])
+        self.assertEqual(self.vector.hit_test.call_args.args[0], "")
 
     def test_empty_image_reference_value_keeps_text_retrieval(self):
         self.params["image_list"] = ["start-node", "image"]
@@ -210,6 +234,8 @@ class SearchKnowledgeImageTests(SimpleTestCase):
         )
         image_content = "![](./oss/file/original-image-file)\n\ngoogle"
         self.assertEqual(context["data"], f"#### google\n{image_content}")
+        self.assertEqual(self.node.get_details()["query_image_list"], self.images)
+        self.assertEqual(self.node.get_details()["paragraph_list"][0]["document_image_id"], "original-image-file")
         self.assertEqual(context["directly_return"], image_content)
         self.assertEqual(context["paragraph_list"][0]["content"], "google")
         self.assertEqual(context["paragraph_list"][0]["meta"], {"allow_download": False})

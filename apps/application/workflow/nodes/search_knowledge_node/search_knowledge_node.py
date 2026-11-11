@@ -260,6 +260,7 @@ class SearchKnowledgeNode(INode):
             exclude_paragraph_id_list = list(set(paragraph_id_list))
 
         self.write_context("question", question)
+        self.write_context("query_image_list", image_items)
         self.write_context("show_knowledge", show_knowledge)
 
         document_id_list = None
@@ -387,6 +388,7 @@ class SearchKnowledgeNode(INode):
         details.update(
             {
                 "question": self.get_context("question"),
+                "query_image_list": self.get_context("query_image_list"),
                 "paragraph_list": self.get_context("paragraph_list"),
                 "image_list": self.get_context("image_list"),
                 "data": self.get_context("data"),

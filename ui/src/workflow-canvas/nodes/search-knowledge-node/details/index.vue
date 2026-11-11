@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import { getFileUrl } from '@/utils/common'
@@ -30,6 +31,21 @@ interface SearchParagraph {
   title?: string
 }
 
+interface QueryImage {
+  file_id?: string
+  name?: string
+  url?: string
+  size?: number
+}
+
+const queryImages = computed(() =>
+  ((props.data.query_image_list as QueryImage[] | undefined) || []).map((image) => ({
+    ...image,
+    name: image.name || '',
+    url: image.file_id ? getFileUrl(image.file_id) : image.url || '',
+  })),
+)
+
 const sortedParagraphs = computed<SearchParagraph[]>(() =>
   [...((props.data?.paragraph_list as SearchParagraph[] | undefined) || [])].sort((a, b) => (b.similarity || 0) - (a.similarity || 0)),
 )
@@ -50,7 +66,23 @@ function getParagraphImageUrl(paragraph: SearchParagraph) {
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">检索内容</h6>
-      <div>{{ data.question || '-' }}</div>
+      <div class="space-y-2">
+        <div v-if="data.question">{{ data.question }}</div>
+        <div v-if="queryImages.length" class="flex flex-wrap gap-2">
+          <template v-for="(image, index) in queryImages" :key="index">
+            <!-- 放大预览检索图片 -->
+            <ImageUploadCard
+              :file="{ ...image, status: 'success' }"
+              :src="image.url"
+              :size="58"
+              :show-remove="false"
+              :preview-src-list="queryImages.map((image) => image.url)"
+              :initial-index="index"
+            />
+          </template>
+        </div>
+        <div v-if="!data.question && !queryImages.length">-</div>
+      </div>
     </div>
 
     <div class="mk-gray-card-sm">

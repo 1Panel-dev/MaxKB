@@ -469,6 +469,8 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 
 知识库检索详情按相似度降序展示 `paragraph_list`；多路召回分别展示 `document_list` 和
 `result_list`，段落直接在节点详情中渲染并复用 `MdPreview`，不依赖 `ParagraphCard`。
+知识库检索的输入图片通过 `query_image_list` 展示，复用 `ImageUploadCard` 支持预览；
+它与召回图片输出 `image_list` 分开保存，即使没有命中结果也保留查询图片。
 知识库检索详情使用 `document_image_id` 展示图片文档原图，其他文档可展示 `hit_asset.file_id`
 对应的命中图片；正文已有同图引用时不重复添加，缩略图支持放大预览。检索输出 `data` 与
 `directly_return` 包含相同图片的 Markdown 引用，可直接用于指定回复。
