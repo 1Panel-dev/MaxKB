@@ -9,7 +9,9 @@ import AccountMenu from '../account-menu/index.vue'
 import { usePortalConversationListStore, type PortalApplicationGroup } from './index'
 import RenameConversation from '../../components/rename/index.vue'
 import { useMessageListStore } from '../../components/message-list/index'
-
+import auth from '@/api/chat/auth.ts'
+import { useStore } from '@/stores/chat/index.ts'
+const { auth: authStore  }=useStore()
 defineOptions({ name: 'PortalConversationList' })
 
 const msgs = useMessageListStore()
@@ -78,6 +80,13 @@ const handleClearConversations = () => {
       clearing.value = false
     })
 }
+const name=computed(()=>{
+  const meta:any=authStore.authProfile?.meta
+  return meta.portal_name ||'智能体门户'
+})
+const logo=computed(()=>{
+    return authStore.authProfile?.logo
+})
 </script>
 
 <template>
@@ -85,8 +94,8 @@ const handleClearConversations = () => {
     <!-- 门户名称与收起侧栏 -->
     <div class="mb-4 flex-between shrink-0 gap-2">
       <div class="min-w-0 flex-align-center gap-2">
-        <PortalIcon />
-        <h4 class="truncate">智能体门户</h4>
+        <PortalIcon :icon="logo"/>
+        <h4 class="truncate">{{name}}</h4>
       </div>
       <!-- 收起左侧 -->
       <MkTooltip content="收起侧边栏">
