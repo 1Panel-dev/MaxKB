@@ -72,23 +72,21 @@ const goLogin = () => {
               <div class="truncate text-N600" :title="account?.username">{{ account?.username || '-' }}</div>
             </div>
           </div>
-          <template v-if="account?.token_quota">
-            <div class="mb-1 flex-align-center">
-              <span class="mr-3">Tokens</span>
-              <span class="text-primary">{{ formatTokenNumber(account?.token_quota?.used_tokens) }}</span>
-              <span class="text-N500">
-                /{{ account?.token_quota?.quota_type === QUOTA_TYPE.UNLIMITED ? '不限' : formatTokenNumber(account?.token_quota?.token_limit) }}
-              </span>
-            </div>
+          <div class="mb-1 flex-align-center">
+            <span class="mr-3">Tokens</span>
+            <span class="text-primary">{{ formatTokenNumber(account?.token_quota?.used_tokens ?? 0) }}</span>
+            <span class="text-N500">
+              /{{ !account?.token_quota || account?.token_quota?.quota_type === QUOTA_TYPE.UNLIMITED ? '不限' : formatTokenNumber(account?.token_quota?.token_limit) }}
+            </span>
+          </div>
 
-            <el-progress
-              v-if="account?.token_quota?.quota_type !== QUOTA_TYPE.UNLIMITED"
-              :percentage="tokenPercentage"
-              :status="tokenPercentage > 80 ? 'warning' : undefined"
-              :show-text="false"
-              :stroke-width="6"
-            />
-          </template>
+          <el-progress
+            v-if="account?.token_quota && account?.token_quota?.quota_type !== QUOTA_TYPE.UNLIMITED"
+            :percentage="tokenPercentage"
+            :status="tokenPercentage > 80 ? 'warning' : undefined"
+            :show-text="false"
+            :stroke-width="6"
+          />
         </div>
         <el-divider />
         <MkDropdownMenu>
