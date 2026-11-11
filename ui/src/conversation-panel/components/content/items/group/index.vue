@@ -78,7 +78,7 @@ const currentActivity = computed(() => {
     <template #label>
       <span v-if="content.status === 'RUNNING'" class="mk-conversation-loading" />
       <span class="min-w-0 max-w-[300px] truncate" :title="content.name">{{ content.name }}</span>
-      <span v-if="!isExpanded && currentActivity" class="min-w-0 truncate" :title="currentActivity">{{ currentActivity }}</span>
+      <!-- <span v-if="!isExpanded && currentActivity" class="min-w-0 truncate" :title="currentActivity">{{ currentActivity }}</span> -->
       <el-tag v-if="isFailed" size="small" :type="statusType">{{ statusText }}</el-tag>
     </template>
 
