@@ -37,8 +37,8 @@ export interface PortalConversationListDeps {
 
 // 门户可访问的智能体数量有限，一次加载全部
 const APPLICATION_PAGE_SIZE = 100
-// 每个智能体分组最多展示最近 5 条会话
-const GROUP_CONVERSATION_LIMIT = 5
+// 总数不超过 20 条时展示全部会话，分组查询需覆盖完整展示范围。
+const GROUP_CONVERSATION_LIMIT = 20
 
 /**
  * 管理门户侧栏的智能体分组与全部智能体列表。当前智能体的会话由会话列表 Store 维护，
@@ -51,6 +51,14 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
   const applicationGroups = ref<PortalApplicationGroup[]>([])
   const isApplicationGroupsLoaded = ref(false)
 
+  // 总数不超过 20 条时，补齐分组接口可能只返回的最近 5 条会话。
+  const completeGroupConversations = async () => {
+    if (applicationGroups.value.reduce((total, group) => total + group.count, 0) > GROUP_CONVERSATION_LIMIT) return
+    await Promise.all(
+      applicationGroups.value.filter((group) => group.conversations.length < group.count).map((group) => loadGroupConversations(group)),
+    )
+  }
+
   const loadApplicationGroups = () =>
     pageApplicationConversations(1, APPLICATION_PAGE_SIZE).then((response) => {
       applicationGroups.value = (response.records ?? []).map((application) => ({
@@ -58,6 +66,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
         expanded: application.conversations.length > 0 || application.id === currentApplicationId.value,
       }))
       isApplicationGroupsLoaded.value = true
+      return completeGroupConversations()
     })
 
   // 展开其他智能体时查询其最近会话；当前智能体以会话列表 Store 为准，无需查询
@@ -84,6 +93,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
     if (group) {
       group.conversations = group.conversations.filter((conversation) => conversation.id !== chatId)
       group.count = Math.max(0, group.count - 1)
+      await completeGroupConversations()
     }
   }
 

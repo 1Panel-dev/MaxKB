@@ -21,8 +21,10 @@ defineOptions({ name: 'MkSearchList' })
  */
 const componentProps = withDefaults(
   defineProps<{
-    /** 列表全量数据，搜索在前端完成 */
+    /** 列表数据，默认在前端搜索；remote 模式直接展示接口结果 */
     data?: T[]
+    /** 输入防抖后通知调用方异步搜索，不进行前端过滤 */
+    remote?: boolean
     /** 初始选中项的唯一值 */
     defaultActive?: string | number
     /** 列表为空或无搜索结果时的提示 */
@@ -33,7 +35,7 @@ const componentProps = withDefaults(
   { defaultActive: '', emptyText: '暂无数据', props: () => ({}) },
 )
 
-const emit = defineEmits<{ click: [row: T, index: number] }>()
+const emit = defineEmits<{ click: [row: T, index: number]; search: [keyword: string] }>()
 
 defineSlots<{
   action(props: { row: T; index: number }): unknown
@@ -51,6 +53,7 @@ const valueField = computed(() => componentProps.props.value ?? ('id' as keyof T
 const searchKeyword = defineModel<string>({ default: '' })
 const filteredData = computed(() => {
   if (!componentProps.data) return []
+  if (componentProps.remote) return componentProps.data
 
   const normalizedKeyword = searchKeyword.value.trim().toLocaleLowerCase()
   if (!normalizedKeyword) return componentProps.data
@@ -60,6 +63,14 @@ const filteredData = computed(() => {
       .toLocaleLowerCase()
       .includes(normalizedKeyword)
   })
+})
+
+// 远程搜索在停止输入 300ms 后触发，继续输入或卸载时取消待执行查询。
+watch(searchKeyword, (keyword, _previousKeyword, onCleanup) => {
+  if (!componentProps.remote) return
+
+  const searchTimer = setTimeout(() => emit('search', keyword.trim()), 300)
+  onCleanup(() => clearTimeout(searchTimer))
 })
 
 // 全量数据先过滤，再每次渲染 50 条，滚动到底部时继续追加。
@@ -94,6 +105,7 @@ function selectRow(row: T, index: number) {
 
 <template>
   <div class="flex-column min-h-0 flex-1">
+    <!-- 搜索列表，远程模式输入后防抖查询 -->
     <MkSearchInput v-model="searchKeyword" class="shrink-0 px-4" />
 
     <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1 px-4 py-2" @end-reached="loadMore">

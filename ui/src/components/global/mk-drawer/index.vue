@@ -11,6 +11,7 @@ defineSlots<{ default(): unknown; footer(): unknown; header(): unknown }>()
 <template>
   <el-drawer
     v-model="visible"
+    class="max-md:w-full! max-md:h-full!"
     :append-to-body="true"
     size="700"
     :close-on-click-modal="false"

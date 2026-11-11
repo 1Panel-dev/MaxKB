@@ -61,6 +61,7 @@ function loadWorkspaceOptions() {
 const targetType = ref<'user-group' | 'user'>('user-group')
 const userGroups = ref<SystemUserGroup[]>([])
 const workspaceMembers = ref<CommonUserOption[]>([])
+const loadingUsers = ref(false)
 const selectedUserGroupId = ref('')
 const selectedUserId = ref('')
 
@@ -75,6 +76,20 @@ function loadAuthorizationTargets() {
     selectedUserId.value = users[0]?.id ?? ''
     return loadResourcePermissions()
   })
+}
+
+// 用户搜索只更新候选列表，保留当前授权对象和权限编辑状态。
+function handleUserSearch(keyword: string) {
+  if (loadingUsers.value) return
+
+  loadingUsers.value = true
+  CommonSystemApi.getWorkspaceMembers(selectedWorkspaceId.value, keyword ? { nick_name: keyword } : undefined)
+    .then((users) => {
+      workspaceMembers.value = users
+    })
+    .finally(() => {
+      loadingUsers.value = false
+    })
 }
 
 function handleTargetTypeChange() {
@@ -204,7 +219,16 @@ const canEditResourcePermission = computed(() => resourceEditPermissions[resourc
         :user-groups="userGroups"
         @select="handleUserGroupSelect"
       />
-      <UserAuthorizationList v-else :active-id="selectedUserId" :users="workspaceMembers" @select="handleUserSelect" />
+      <UserAuthorizationList
+        v-else
+        :key="selectedWorkspaceId"
+        v-loading="loadingUsers"
+        :inert="loadingUsers"
+        :active-id="selectedUserId"
+        :users="workspaceMembers"
+        @select="handleUserSelect"
+        @search="handleUserSearch"
+      />
     </template>
 
     <template #default="{ Header }">

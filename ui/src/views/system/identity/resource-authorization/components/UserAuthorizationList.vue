@@ -6,7 +6,7 @@ import MkSearchList from '@/components/mk-search-list/index.vue'
 defineOptions({ name: 'UserAuthorizationList' })
 
 defineProps<{ activeId: string; users: CommonUserOption[] }>()
-const emit = defineEmits<{ select: [user: CommonUserOption] }>()
+const emit = defineEmits<{ select: [user: CommonUserOption]; search: [keyword: string] }>()
 
 const { auth } = useStore()
 
@@ -20,11 +20,20 @@ function handleUserSelect(user: CommonUserOption) {
 </script>
 
 <template>
-  <MkSearchList :data="users" :default-active="activeId" :props="{ label: 'nick_name', value: 'id' }" @click="handleUserSelect">
+  <MkSearchList
+    :data="users"
+    remote
+    @search="emit('search', $event)"
+    :default-active="activeId"
+    :props="{ label: 'nick_name', value: 'id' }"
+    @click="handleUserSelect"
+  >
     <template #default="{ row }">
       <div class="flex-align-center min-w-0 flex-1 gap-2">
         <span class="min-w-0 truncate" :title="row.nick_name">{{ row.nick_name }}</span>
-        <span v-if="(auth.isEE || auth.isPE) && row.roles?.length" class="min-w-0 truncate text-N600" :title="getUserRoleText(row)"> ({{ getUserRoleText(row) }}) </span>
+        <span v-if="(auth.isEE || auth.isPE) && row.roles?.length" class="min-w-0 truncate text-N600" :title="getUserRoleText(row)">
+          ({{ getUserRoleText(row) }})
+        </span>
       </div>
     </template>
   </MkSearchList>
