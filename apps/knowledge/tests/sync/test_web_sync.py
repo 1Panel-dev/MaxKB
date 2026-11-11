@@ -303,6 +303,49 @@ class IncrementalSyncTests(SimpleTestCase):
         paragraph.save.assert_not_called()
         self.assertEqual(result.unchanged_ids, [str(paragraph.id)])
 
+    @patch("knowledge.services.incremental_sync.Paragraph.objects")
+    @patch("knowledge.services.incremental_sync.Document.objects")
+    def test_lark_sync_keeps_enhanced_content_and_counts_until_source_changes(self, documents, paragraphs):
+        strategy = normalize_document_strategy(None)
+        document = Document(type=KnowledgeType.LARK, doc_strategy=strategy, **strategy_hashes(strategy))
+        document.save = MagicMock()
+        source = {"title": "Cat", "content": "![image](./oss/file/original)"}
+        remote = prepare_remote_paragraphs([source])[0]
+        enhanced = "![A black cat looking up](./oss/file/original)"
+        paragraph = Paragraph(
+            title=source["title"],
+            content=enhanced,
+            source_key=remote["source_key"],
+            source_hash=remote["source_hash"],
+            source_snapshot=source,
+            origin=ContentOrigin.SYNCED,
+            hit_num=7,
+        )
+        paragraph.save = MagicMock()
+        documents.select_for_update.return_value.get.return_value = document
+        paragraphs.select_for_update.return_value.filter.return_value.order_by.return_value = [paragraph]
+        service = IncrementalDocumentSync(document, source_authoritative=True)
+        with patch.object(service, "_reorder"), patch.object(service, "_sync_title_questions"):
+            result = IncrementalDocumentSync.merge.__wrapped__(service, [source])
+
+            self.assertEqual(result.unchanged_ids, [str(paragraph.id)])
+            self.assertEqual(result.reembed_ids, [])
+            self.assertEqual(paragraph.content, enhanced)
+            self.assertEqual(paragraph.source_snapshot, source)
+            self.assertEqual(paragraph.source_hash, remote["source_hash"])
+            self.assertEqual(document.source_hash, document_source_hash([remote]))
+            self.assertEqual(document.char_length, len(enhanced))
+
+            changed = {**source, "content": source["content"] + "\nNew source text"}
+            result = IncrementalDocumentSync.merge.__wrapped__(service, [changed])
+
+        self.assertEqual(result.updated_ids, [str(paragraph.id)])
+        self.assertEqual(result.conflict_ids, [])
+        self.assertEqual(paragraph.content, changed["content"])
+        self.assertEqual(paragraph.local_state, LocalState.CLEAN)
+        self.assertEqual(paragraph.hit_num, 7)
+        self.assertEqual(document.char_length, len(changed["content"]))
+
     def test_replace_content_overwrites_local_edit_with_unchanged_source_hash(self):
         service = IncrementalDocumentSync(Document(), source_authoritative=True, replace_content=True)
         remote = prepare_remote_paragraphs([{"title": "Title", "content": "base"}])[0]

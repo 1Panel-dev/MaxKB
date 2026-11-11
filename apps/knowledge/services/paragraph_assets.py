@@ -460,7 +460,7 @@ def _write_asset_description(asset: ParagraphAsset) -> None:
     elif (
         asset.document.resource_type == DocumentResourceType.DOCUMENT
         and asset.process_status == AssetProcessStatus.SUCCESS
-        and asset.document.type == KnowledgeType.BASE
+        and asset.document.type in (KnowledgeType.BASE, KnowledgeType.LARK)
         and asset.description.strip()
         and paragraph.local_state != LocalState.DELETED
     ):

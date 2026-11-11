@@ -35,7 +35,7 @@ the request does not call the vision model or tool.
 
 The existing embedding job is published with `transaction.on_commit`. In the worker,
 `process_pending_visual_assets` enhances pending images using the document strategy and knowledge
-workspace before reading the paragraph text for indexing. For ordinary documents in general knowledge
+workspace before reading the paragraph text for indexing. For ordinary documents in general and Lark knowledge
 bases, successful inline image recognition also writes the description into the Markdown alt text:
 `![description](./oss/file/<file_id>)`.
 The image URL and surrounding text are preserved; description line breaks become spaces and
@@ -44,6 +44,10 @@ are updated together without changing source fingerprints. Failed or skipped rec
 the original Markdown intact. Standalone images update their paragraph text and chunks. `embed_paragraph_assets`
 indexes the image descriptions. Completed assets are reused when embeddings are rebuilt.
 A failed image retains its existing description or caption and does not stop the remaining images.
+Lark synchronization retains enhanced Markdown and its character count when the source is unchanged;
+changed source paragraphs keep their IDs and are enhanced again after synchronization. Source snapshots
+and hashes continue to describe the original remote content. Existing Lark documents whose assets were
+already recognized need a replacement sync to write descriptions into their Markdown.
 
 Before paragraph text is embedded, inline image Markdown is replaced with its description;
 image URLs, file IDs and filename-only alt text are excluded. Image-containing text is split
@@ -79,7 +83,7 @@ No external model call holds a preview row lock.
 Saving edited paragraph content synchronizes inline image references into `content_schema`
 and `ParagraphAsset` before returning the paragraph. Standalone image documents retain their
 original image asset and its recognition results. New or replaced images use the document's
-visual strategy; inline recognition in general knowledge base documents updates their descriptions
+visual strategy; inline recognition in general and Lark knowledge base documents updates their descriptions
 while preserving surrounding edited text.
 For standalone image documents, recognition updates structured metadata without replacing edited paragraph text.
 Removing an inline image also removes its asset record and image embeddings in the same transaction.

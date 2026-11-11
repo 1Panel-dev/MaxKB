@@ -394,7 +394,11 @@ class IncrementalDocumentSync:
                     result.updated_ids.append(value)
         self.document.doc_strategy = self.strategy
         self.document.source_hash = document_source_hash(remote_list)
-        self.document.char_length = sum(len(item["content"]) for item in remote_list)
+        self.document.char_length = (
+            sum(len(paragraph.content) for paragraph in ordered_synced)
+            if self.source_authoritative
+            else sum(len(item["content"]) for item in remote_list)
+        )
         self.document.sync_version += 1
         self.document.last_sync_time = timezone.now()
         for key, value in hashes.items():

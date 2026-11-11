@@ -48,8 +48,14 @@ class InlineVisualDescriptionTests(SimpleTestCase):
         self.documents = self.enterContext(patch("knowledge.services.paragraph_assets.Document.objects.filter"))
 
     def test_model_and_tool_results_replace_only_the_image_alt_text(self):
-        for strategy in ("model", "tool"):
-            with self.subTest(strategy=strategy):
+        for knowledge_type, strategy in (
+            (KnowledgeType.BASE, "model"),
+            (KnowledgeType.BASE, "tool"),
+            (KnowledgeType.LARK, "model"),
+            (KnowledgeType.LARK, "tool"),
+        ):
+            with self.subTest(knowledge_type=knowledge_type, strategy=strategy):
+                self.document.type = knowledge_type
                 self.paragraph.content = self.original
                 self.paragraph.content_schema = paragraph_content_schema(self.original)
                 process_visual_assets(
@@ -124,7 +130,7 @@ class InlineVisualDescriptionTests(SimpleTestCase):
         self.documents.assert_not_called()
 
     def test_external_knowledge_sources_keep_their_original_markdown(self):
-        for knowledge_type in (KnowledgeType.WEB, KnowledgeType.LARK, KnowledgeType.WORKFLOW):
+        for knowledge_type in (KnowledgeType.WEB, KnowledgeType.WORKFLOW):
             with self.subTest(knowledge_type=knowledge_type):
                 self.document.type = knowledge_type
 
