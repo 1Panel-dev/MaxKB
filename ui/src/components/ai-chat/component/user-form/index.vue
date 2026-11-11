@@ -53,6 +53,7 @@
 import { ref, watch, computed, onMounted } from 'vue'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import type { FormField } from '@/components/dynamics-form/type'
+import { safeChatFormFields } from '@/components/dynamics-form/safe-fields'
 import { useRoute } from 'vue-router'
 import { MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
@@ -190,6 +191,7 @@ function handleInputFieldList() {
                 }
               })
           : []
+      inputFieldList.value = safeChatFormFields(inputFieldList.value)
       if (props.excludeFields?.length) {
         inputFieldList.value = inputFieldList.value.filter(
           (f: any) => !props.excludeFields!.includes(f.field),
@@ -277,6 +279,7 @@ function handleInputFieldList() {
               })
           : []
 
+      apiInputFieldList.value = safeChatFormFields(apiInputFieldList.value)
       //
       inputFieldConfig.value = v.properties.user_input_config?.title
         ? v.properties.user_input_config

@@ -7,6 +7,7 @@ import requests
 from django.utils.translation import gettext as _
 
 from common.utils.logger import maxkb_logger
+from common.utils.provider_request import provider_request
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tti import BaseTextToImage
 
@@ -61,7 +62,7 @@ class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
             }
-            response = requests.post(self.base_url, headers=headers, json=payload, timeout=300)
+            response = provider_request("POST", self.base_url, headers=headers, json=payload, timeout=(5, 300))
             response.raise_for_status()
             result = response.json()
             data = result.get("data") or []
@@ -71,7 +72,7 @@ class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
                 if url:
                     file_urls.append(url)
             if not file_urls:
-                maxkb_logger.error(f"Tencent Text to Image API returned no urls: {result}")
+                maxkb_logger.error("Tencent Text to Image API returned no urls")
                 raise RuntimeError("Tencent Text to Image API returned no image urls")
             return file_urls
         except requests.RequestException as err:

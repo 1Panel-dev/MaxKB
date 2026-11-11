@@ -1,7 +1,7 @@
 import json
 from typing import Sequence, Optional, Dict, Any
 
-import requests
+from common.utils.provider_request import provider_request
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
 
@@ -59,10 +59,10 @@ class QfBgeReranker(MaxKBBaseModel, BaseDocumentCompressor):
             "top_n": top_n
         }
 
-        response = requests.post(f"{self.api_url}/rerank", json=payload, headers=headers)
+        response = provider_request("POST", f"{self.api_url}/rerank", json=payload, headers=headers)
 
         if response.status_code != 200:
-            raise RuntimeError(f"千帆 API 请求失败：{response.text}")
+            raise RuntimeError(f"千帆 API 请求失败：HTTP {response.status_code}")
 
         res = response.json()
 

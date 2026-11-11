@@ -34,6 +34,8 @@ from common.result import result
 from common.utils.common import bytes_to_uploaded_file
 from common.utils.common import restricted_loads
 from common.utils.logger import maxkb_logger
+from common.utils.file_reference import bind_knowledge_uploads
+from common.utils.workflow_reference import get_exportable_tools, validate_resource_references
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
@@ -184,6 +186,8 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
+        validate_resource_references({'work_flow': knowledge_workflow.work_flow},
+                                     self.data.get('workspace_id'), str(user.id))
         knowledge_action_id = uuid.uuid7()
         meta = {"user_id": str(user.id), "user_name": user.username}
         KnowledgeAction(
@@ -202,12 +206,12 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         work_flow_manage = KnowledgeWorkflowManage(
             Workflow.new_instance(knowledge_workflow.work_flow, WorkflowMode.KNOWLEDGE),
             {
+                **instance,
                 "knowledge_id": self.data.get("knowledge_id"),
                 "knowledge_action_id": knowledge_action_id,
                 "stream": True,
                 "workspace_id": self.data.get("workspace_id"),
                 "user_id": str(user.id),
-                **instance,
                 "default_model_setting": knowledge_workflow.default_model_setting,
             },
             KnowledgeWorkflowPostHandler(None, knowledge_action_id),
@@ -234,12 +238,17 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
         if not knowledge_workflow.is_publish:
             raise AppApiException(500, _("The knowledge base workflow has not been published"))
+        data_source = instance.get("data_source") or {}
+        file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
         knowledge_workflow_version = (
             QuerySet(KnowledgeWorkflowVersion)
             .filter(knowledge_id=self.data.get("knowledge_id"))
             .order_by("-create_time")[0:1]
             .first()
         )
+        validate_resource_references({'work_flow': knowledge_workflow_version.work_flow},
+                                     self.data.get('workspace_id'), str(user.id))
+        bind_knowledge_uploads(file_ids, self.data.get("knowledge_id"), user.id)
         knowledge_action_id = uuid.uuid7()
         meta = {"user_id": str(user.id), "user_name": user.username}
         KnowledgeAction(
@@ -258,12 +267,12 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         work_flow_manage = KnowledgeWorkflowManage(
             Workflow.new_instance(knowledge_workflow_version.work_flow, WorkflowMode.KNOWLEDGE),
             {
+                **instance,
                 "knowledge_id": self.data.get("knowledge_id"),
                 "knowledge_action_id": knowledge_action_id,
                 "stream": True,
                 "workspace_id": self.data.get("workspace_id"),
                 "user_id": str(user.id),
-                **instance,
                 "default_model_setting": knowledge_workflow_version.default_model_setting,
             },
             KnowledgeWorkflowPostHandler(None, knowledge_action_id),
@@ -276,18 +285,6 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             ),
         )
         work_flow_manage.run()
-        # 需要把文件改成永久文件
-        data_source = instance.get("data_source") or {}
-        file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
-        knowledge_id = str(self.data.get("knowledge_id"))
-        file_list = list(QuerySet(File).filter(id__in=file_ids))
-        for file in file_list:
-            meta = dict(file.meta or {})
-            meta.update(debug=False, knowledge_id=knowledge_id)
-            file.source_type = FileSourceType.KNOWLEDGE.value
-            file.source_id = knowledge_id
-            file.meta = meta
-        QuerySet(File).bulk_update(file_list, ["source_type", "source_id", "meta"])
         return {
             "id": knowledge_action_id,
             "knowledge_id": self.data.get("knowledge_id"),
@@ -348,6 +345,9 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
 
 class KnowledgeWorkflowSerializer(serializers.Serializer):
     class Datasource(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True)
+        knowledge_id = serializers.UUIDField(required=True)
+        workspace_id = serializers.CharField(required=False)
         type = serializers.CharField(required=True, label=_("type"))
         id = serializers.CharField(required=True, label=_("type"))
         params = serializers.DictField(required=True, label="")
@@ -365,15 +365,30 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
 
         def action(self):
             self.is_valid(raise_exception=True)
+            knowledge_query = QuerySet(Knowledge).filter(id=self.data['knowledge_id'])
+            if self.data.get('workspace_id'):
+                knowledge_query = knowledge_query.filter(workspace_id=self.data['workspace_id'])
+            knowledge = knowledge_query.first()
+            if knowledge is None:
+                raise AppApiException(500, _("Knowledge id does not exist"))
             if self.data.get("type") == "local":
+                if (self.data['id'] not in ('data-source-local-node', 'data-source-web-node')
+                        or self.data['function_name'] != 'get_form_list'):
+                    raise AppApiException(403, _("No permission to access"))
                 node = get_node(self.data.get("id"), WorkflowMode.KNOWLEDGE)
-                return node.__getattribute__(node, self.data.get("function_name"))(**self.data.get("params"))
+                return node.get_form_list(**self.data['params'])
             elif self.data.get("type") == "tool":
-                tool = QuerySet(Tool).filter(id=self.data.get("id")).first()
-                init_params = json.loads(rsa_long_decrypt(tool.init_params))
+                tool = QuerySet(Tool).filter(id=self.data.get("id"), tool_type=ToolType.DATA_SOURCE,
+                                             is_active=True).first()
+                if tool is None:
+                    raise AppApiException(500, _("Tool id does not exist"))
+                validate_resource_references({'tool_ids': [str(tool.id)]}, knowledge.workspace_id,
+                                             self.data['user_id'])
+                init_params = json.loads(rsa_long_decrypt(tool.init_params)) if tool.init_params else {}
                 return tool_executor.exec_code(
                     tool.code, {**init_params, **self.data.get("params")}, self.data.get("function_name")
                 )
+            raise AppApiException(403, _("No permission to access"))
 
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("user id"))
@@ -385,6 +400,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
         @transaction.atomic
         def save_workflow(self, instance: Dict):
             self.is_valid(raise_exception=True)
+            validate_resource_references(instance, self.data['workspace_id'], self.data['user_id'])
 
             folder_id = instance.get("folder_id", self.data.get("workspace_id"))
 
@@ -474,7 +490,13 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 knowledge_workflow,
                 update_tool_map,
             )
-            tool_model_list = [self.to_tool(tool, workspace_id, user_id) for tool in tool_list]
+            created_ids = {str(tool['id']) for tool in tool_list} if is_import_tool else set()
+            validate_resource_references({'work_flow': work_flow}, workspace_id, user_id, created_ids)
+            for imported_tool in tool_list:
+                if imported_tool.get('tool_type') == ToolType.WORKFLOW and is_import_tool:
+                    child_flow = self.reset_workflow(imported_tool.get('work_flow'), update_tool_map)
+                    validate_resource_references({'work_flow': child_flow}, workspace_id, user_id, created_ids)
+            tool_model_list = [self.to_tool(tool, workspace_id, user_id) for tool in tool_list] if is_import_tool else []
             defaults = {"work_flow": work_flow}
             if knowledge_workflow.get("default_model_setting") is not None:
                 defaults["default_model_setting"] = knowledge_workflow.get("default_model_setting")
@@ -537,7 +559,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                     file_name=f"{tool.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool.get("id"),
-                    meta={},
+                    meta={"skill_file": True},
                 )
                 skill_file.save(base64.b64decode(code))
                 tool["code"] = skill_file_id
@@ -573,7 +595,8 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 tool_id_list = get_tool_id_list(knowledge_workflow.work_flow, True)
                 tool_list = []
                 if len(tool_id_list) > 0:
-                    tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
+                    tool_list = get_exportable_tools(tool_id_list, self.data.get('workspace_id'),
+                                                     self.data.get('user_id'))
                 tw_dict = {
                     tw.tool_id: tw
                     for tw in QuerySet(ToolWorkflow).filter(
@@ -628,6 +651,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 .first()
             )
             validate_workflow_default_models(knowledge_workflow.work_flow, knowledge_workflow.default_model_setting)
+            validate_resource_references({'work_flow': knowledge_workflow.work_flow}, workspace_id, user_id)
             work_flow_version = KnowledgeWorkflowVersion(
                 work_flow=knowledge_workflow.work_flow,
                 default_model_setting=knowledge_workflow.default_model_setting,
@@ -646,6 +670,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
         def edit(self, instance: Dict):
             self.is_valid(raise_exception=True)
             if instance.get("work_flow"):
+                validate_resource_references(instance, self.data['workspace_id'], self.data['user_id'])
                 defaults = {"work_flow": instance.get("work_flow")}
                 if instance.get("default_model_setting") is not None:
                     defaults["default_model_setting"] = instance.get("default_model_setting")

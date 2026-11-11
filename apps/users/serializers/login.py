@@ -164,6 +164,7 @@ class LoginSerializer(serializers.Serializer):
         # 清除失败计数并生成令牌
         cache.delete(system_get_key(f"system_{username}"), version=system_version)
         cache.delete(system_get_key(f"system_{username}_lock"), version=system_version)
+        cache.delete(system_get_key(f"system_{username}_lock_count"), version=system_version)
         token = signing.dumps(
             {
                 "username": user.username,
@@ -207,9 +208,7 @@ class LoginSerializer(serializers.Serializer):
         captcha_cache = cache.get(captcha_key, version=Cache_Version.CAPTCHA.get_version())
 
         if captcha_cache is None or captcha.lower() != captcha_cache:
-            # 校验失败同样按一次登录失败处理：统一走 _handle_failed_login，
-            # 既递增失败计数/锁定计数，也会在达到阈值时触发账户锁定
-            LoginSerializer._handle_failed_login(username, failed_attempts, lock_time)
+            # Only password failures after the CAPTCHA gate may count toward an account lock.
             raise AppApiException(1005, _("Captcha code error or expiration"))
 
         # 校验通过即销毁，保证验证码一次性使用

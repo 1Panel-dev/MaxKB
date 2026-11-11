@@ -2,7 +2,6 @@
 from functools import reduce
 from typing import List
 
-import requests
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
 from application.flow.common import WorkflowMode
@@ -11,6 +10,7 @@ from application.flow.step_node.text_to_video_step_node.i_text_to_video_node imp
 from common.utils.common import bytes_to_uploaded_file
 from knowledge.models import FileSourceType
 from oss.serializers.file import FileSerializer
+from oss.url_fetch import fetch_public_bytes
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from django.utils.translation import gettext_lazy as _, gettext
 
@@ -61,7 +61,7 @@ class BaseTextToVideoNode(ITextToVideoNode):
             return NodeResult({'answer': gettext('Failed to generate video')}, {})
         file_name = 'generated_video.mp4'
         if isinstance(video_urls, str) and video_urls.startswith('http'):
-            video_urls = requests.get(video_urls).content
+            video_urls = fetch_public_bytes(video_urls)
         file = bytes_to_uploaded_file(video_urls, file_name)
         file_url = self.upload_file(file)
         video_label = f'<video src="{file_url}" controls style="max-width: 100%; width: 100%; height: auto;"></video>'

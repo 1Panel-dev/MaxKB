@@ -1,5 +1,7 @@
 import uuid_utils.compat as uuid
 from django.db import models
+from django.db.models.signals import pre_delete, pre_save
+from django.dispatch import receiver
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
@@ -84,3 +86,33 @@ class ToolRecord(AppModelMixin):
 
     class Meta:
         db_table = "tool_record"
+
+
+def protect_skill_file(tool, using=None):
+    """Keep legacy packages private before their Tool reference is removed or replaced."""
+    if tool.tool_type != ToolType.SKILL:
+        return
+    from knowledge.models import File
+
+    try:
+        file_id = uuid.UUID(str(tool.code))
+    except (ValueError, TypeError, AttributeError):
+        return
+    files = File.objects.using(using or tool._state.db).filter(id=file_id)
+    file = files.first()
+    if file is not None and not file.meta.get('skill_file'):
+        files.update(meta={**file.meta, 'skill_file': True})
+
+
+@receiver(pre_delete, sender=Tool)
+def protect_deleted_skill_file(sender, instance, using, **kwargs):
+    protect_skill_file(instance, using)
+
+
+@receiver(pre_save, sender=Tool)
+def protect_replaced_skill_file(sender, instance, using, raw=False, update_fields=None, **kwargs):
+    if raw or (update_fields is not None and not {'code', 'tool_type'}.intersection(update_fields)):
+        return
+    previous = Tool.objects.using(using).filter(id=instance.id).only('code', 'tool_type').first()
+    if previous is not None and (previous.code != instance.code or previous.tool_type != instance.tool_type):
+        protect_skill_file(previous, using)

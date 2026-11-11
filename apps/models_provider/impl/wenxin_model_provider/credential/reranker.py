@@ -43,15 +43,15 @@ class QfRerankerCredential(BaseForm, BaseModelCredential):
             test_text = str(_('Hello'))
             model.compress_documents([Document(page_content=test_text)], test_text)
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error('Model verification failed: %s', type(e).__name__)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(
                     ValidCode.valid_error.value,
                     _('Verification failed, please check whether the parameters are correct: {error}').format(
-                        error=str(e))
-                )
+                        error=type(e).__name__)
+                ) from None
             return False
 
         return True

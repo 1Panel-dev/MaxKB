@@ -233,23 +233,15 @@ class Fork:
     @staticmethod
     def _sandbox_requests_get(base_fork_url: str, headers: dict):
         from common.utils.tool_code import ToolExecutor
+        from maxkb.const import CONFIG
+        from oss.url_fetch import FETCH_URL_CODE
 
         response = ToolExecutor().exec_code(
-            """
-def fetch_url(url, headers):
-    import base64
-    import requests
-
-    requests.packages.urllib3.disable_warnings()
-    response = requests.get(url, verify=False, headers=headers)
-    return {
-        "status_code": response.status_code,
-        "content": base64.b64encode(response.content).decode("ascii"),
-        "encoding": response.encoding,
-        "apparent_encoding": response.apparent_encoding,
-    }
-""",
-            {"url": base_fork_url, "headers": headers},
+            FETCH_URL_CODE,
+            {"url": base_fork_url, "headers": headers, "file_limit": 10 * 1024 * 1024,
+             "binary": True, "detect_encoding": True,
+             # Private wikis require an operator-configured CIDR list (comma-separated in ENV mode).
+             "allowed_networks": CONFIG.get("WEB_SOURCE_ALLOWED_NETWORKS", [])},
             function_name="fetch_url",
         )
         return SandboxFetchResponse(

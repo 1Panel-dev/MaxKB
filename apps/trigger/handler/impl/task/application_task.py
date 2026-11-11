@@ -13,12 +13,13 @@ import traceback
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 
-from application.models import ChatUserType, Chat, ChatRecord, ChatSourceChoices, Application
+from application.models import ChatUserType, Chat, ChatRecord, ChatSourceChoices
 from chat.serializers.chat import ChatSerializers
 from common.utils.logger import maxkb_logger
 from knowledge.models.knowledge_action import State
 from trigger.handler.base_task import BaseTriggerTask
-from trigger.models import TaskRecord, TriggerTask
+from trigger.models import TaskRecord
+from trigger.utils import get_task_source
 
 
 def get_reference(fields, obj):
@@ -182,10 +183,8 @@ class ApplicationTask(BaseTriggerTask):
         task_record_id = uuid.uuid7()
         start_time = time.time()
         try:
-            application = QuerySet(Application).filter(id=trigger_task.get('source_id')).only('type',
-                                                                                              'work_flow').first()
+            application = get_task_source(trigger_task)
             if application is None:
-                QuerySet(TriggerTask).filter(id=trigger_task.get('id')).delete()
                 return
             application_id = trigger_task.get('source_id')
             chat_id = uuid.uuid7()

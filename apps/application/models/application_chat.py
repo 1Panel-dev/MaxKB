@@ -9,6 +9,8 @@
 import uuid_utils.compat as uuid
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.utils.translation import gettext as _
 from langchain_core.messages import HumanMessage, AIMessage
 
@@ -161,6 +163,13 @@ class ChatShareLink(AppModelMixin):
 
     class Meta:
         db_table = "application_chat_share_link"
+
+
+@receiver(pre_delete, sender=ChatShareLink)
+def delete_chat_share_file_access(sender, instance, using, **kwargs):
+    from common.utils.public_file_access import delete_public_share_file_access
+
+    delete_public_share_file_access(instance, using)
 
 
 class ApplicationLongTermMemory(AppModelMixin):

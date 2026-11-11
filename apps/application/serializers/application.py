@@ -40,6 +40,7 @@ from common.utils.common import (
     restricted_loads,
 )
 from common.utils.logger import maxkb_logger
+from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
 from django.core import validators
@@ -200,6 +201,17 @@ def get_bound_application_ids(instance: Dict) -> List[str]:
     return list(application_ids)
 
 
+def get_bound_knowledge_ids(instance: Dict) -> List[str]:
+    knowledge_ids = {str(value) for value in instance.get("knowledge_id_list") or []}
+
+    def collect(node_data):
+        if (node_data.get("search_scope_type") or "custom") == "custom":
+            knowledge_ids.update(str(value) for value in node_data.get("knowledge_id_list") or [])
+
+    _walk_workflow_nodes(instance.get("work_flow"), collect)
+    return list(knowledge_ids)
+
+
 def get_authorized_tool_ids(user_id: str, workspace_id: str, tool_ids: List[str]) -> List[str]:
     """
     返回 tool_ids 中当前用户被授权绑定/使用的工具id。
@@ -300,7 +312,7 @@ def get_authorized_application_ids(user_id: str, workspace_id: str, application_
 
 def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: Dict):
     """
-    校验应用/工作流中绑定的工具和子应用,当前用户是否都有权限使用,防止低权限成员
+    校验应用/工作流中绑定的工具、知识库和子应用,当前用户是否都有权限使用,防止低权限成员
     绑定自己被禁止访问的资源,并通过应用/工作流执行绕过单独授权控制。
     """
     tool_ids = get_bound_tool_ids(instance)
@@ -312,6 +324,11 @@ def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: D
                 _("No permission to use tool(s): {tool_ids}"), tool_ids=", ".join(unauthorized_tool_ids)
             )
             raise AppApiException(403, str(message))
+
+    knowledge_ids = get_bound_knowledge_ids(instance)
+    authorized_knowledge_ids = set(filter_authorized_ids("knowledge", knowledge_ids, workspace_id, user_id=user_id))
+    if any(knowledge_id not in authorized_knowledge_ids for knowledge_id in knowledge_ids):
+        raise AppApiException(403, _("No permission to access"))
 
     validate_bound_application_permissions(user_id, workspace_id, instance)
 
@@ -333,11 +350,23 @@ def validate_bound_application_permissions(user_id: str, workspace_id: str, inst
 
 def validate_application_resource_permissions(user_id, application):
     """校验实际保存或执行的应用配置;发布后的聊天使用应用所属用户的资源授权。"""
-    validate_bound_tool_permissions(user_id, application.workspace_id, {
+    instance = {
         key: getattr(application, key) for key in (
             "work_flow", "tool_ids", "skill_tool_ids", "mcp_tool_ids", "application_ids"
         )
-    })
+    }
+    instance["knowledge_id_list"] = getattr(application, "knowledge_ids", [])
+    validate_bound_tool_permissions(user_id, application.workspace_id, instance)
+
+
+def validate_import_resource_permissions(user_id, workspace_id, resources, created_tool_ids):
+    """Only tools actually created by this import may bypass existing-resource authorization."""
+    for resource in resources:
+        validate_bound_tool_permissions(user_id, workspace_id, {
+            "tool_ids": [tool_id for tool_id in get_bound_tool_ids(resource) if tool_id not in created_tool_ids],
+            "application_ids": get_bound_application_ids(resource),
+            "knowledge_id_list": get_bound_knowledge_ids(resource),
+        })
 
 
 def get_base_node_work_flow(work_flow):
@@ -990,10 +1019,19 @@ class ApplicationSerializer(serializers.Serializer):
             raise AppApiException(1001, _("Unsupported file format"))
         application = mk_instance.application
         validate_bound_application_permissions(user_id, workspace_id, application)
-        tool_list = mk_instance.get_tool_list()
+        tool_list = mk_instance.get_tool_list() if is_import_tool else []
         # 已存在且有权限的工具复用, 无权限或不存在则生成新id新建
         update_tool_map, tool_list = resolve_import_tools(tool_list, user_id, workspace_id)
         application_model = self.to_application(application, workspace_id, user_id, update_tool_map, folder_id)
+        for tool in tool_list:
+            if tool.get("tool_type") == ToolType.WORKFLOW:
+                tool["work_flow"] = self.reset_workflow(tool.get("work_flow"), update_tool_map)
+        resources = [{key: getattr(application_model, key) for key in (
+            "work_flow", "tool_ids", "skill_tool_ids", "mcp_tool_ids", "application_ids"
+        )}, *tool_list]
+        validate_import_resource_permissions(
+            user_id, workspace_id, resources, {str(tool["id"]) for tool in tool_list}
+        )
         tool_model_list = [self.to_tool(f, workspace_id, user_id) for f in tool_list]
         application_model.save()
         # 插入授权数据
@@ -1015,7 +1053,7 @@ class ApplicationSerializer(serializers.Serializer):
                     [
                         ToolWorkflow(
                             workspace_id=workspace_id,
-                            work_flow=self.reset_workflow(tool.get("work_flow"), update_tool_map),
+                            work_flow=tool.get("work_flow"),
                             tool_id=tool.get("id"),
                         )
                         for tool in tool_list
@@ -1049,7 +1087,7 @@ class ApplicationSerializer(serializers.Serializer):
                 file_name=f"{tool.get('name')}.zip",
                 source_type=FileSourceType.TOOL,
                 source_id=tool.get("id"),
-                meta={},
+                meta={"skill_file": True},
             )
             skill_file.save(base64.b64decode(code))
             tool["code"] = skill_file_id
@@ -1070,21 +1108,19 @@ class ApplicationSerializer(serializers.Serializer):
 
     @staticmethod
     def reset_workflow(work_flow, update_tool_map):
+        if not work_flow:
+            return work_flow
         for node in work_flow.get("nodes", []):
             hand_node(node, update_tool_map)
             if node.get("type") == "loop-node":
-                for n in node.get("properties", {}).get("node_data", {}).get("loop_body", {}).get("nodes", []):
-                    hand_node(n, update_tool_map)
+                ApplicationSerializer.reset_workflow(
+                    node.get("properties", {}).get("node_data", {}).get("loop_body"), update_tool_map
+                )
         return work_flow
 
     @staticmethod
     def to_application(application, workspace_id, user_id, update_tool_map, folder_id):
-        work_flow = application.get("work_flow")
-        for node in work_flow.get("nodes", []):
-            hand_node(node, update_tool_map)
-            if node.get("type") == "loop-node":
-                for n in node.get("properties", {}).get("node_data", {}).get("loop_body", {}).get("nodes", []):
-                    hand_node(n, update_tool_map)
+        work_flow = ApplicationSerializer.reset_workflow(application.get("work_flow"), update_tool_map)
         return Application(
             id=uuid.uuid7(),
             user_id=user_id,

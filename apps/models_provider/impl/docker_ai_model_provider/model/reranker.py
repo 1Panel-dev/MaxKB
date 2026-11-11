@@ -8,7 +8,7 @@
 """
 import json
 from typing import Sequence, Optional, Any, Dict
-import requests
+from common.utils.provider_request import provider_request
 
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
@@ -48,10 +48,10 @@ class DockerAIReranker(MaxKBBaseModel, BaseDocumentCompressor):
             "top_n": self.top_n,
         }
 
-        response = requests.post(f"{self.api_base}/rerank", data=json.dumps(payload), headers=headers)
+        response = provider_request("POST", f"{self.api_base}/rerank", data=json.dumps(payload), headers=headers)
 
         if response.status_code != 200:
-            raise RuntimeError(f"Docker AI API 请求失败: {response.text}")
+            raise RuntimeError(f"Docker AI API 请求失败: HTTP {response.status_code}")
 
         res = response.json()
 

@@ -32,8 +32,10 @@ from application.models import Application, ApplicationTypeChoices, \
     ChatUserType, ApplicationChatUserStats, ApplicationAccessToken, ChatRecord, Chat, ApplicationVersion
 from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.common import ChatInfo
+from common.auth.authentication import get_is_permissions
+from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed, ChatException
+from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed, AppUnauthorizedFailed, ChatException
 from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.openai_to_response import OpenaiToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
@@ -135,15 +137,38 @@ def get_post_handler(chat_info: ChatInfo):
 class DebugChatSerializers(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
 
-    def chat(self, instance: dict, base_to_response: BaseToResponse = SystemToResponse()):
+    def chat(self, instance: dict, base_to_response: BaseToResponse = SystemToResponse(), *, request,
+             scope="WORKSPACE"):
         self.is_valid(raise_exception=True)
         chat_id = self.data.get('chat_id')
         chat_info: ChatInfo = ChatInfo.get_cache(chat_id)
+        if (chat_info is None or not chat_info.debug
+                or chat_info.chat_user_type != ChatUserType.PLATFORM_USER.value
+                or str(chat_info.chat_user_id) != str(request.user.id)):
+            raise ChatException(500, _("Conversation does not exist"))
         application = QuerySet(Application).filter(id=chat_info.application_id).first()
+        if application is None:
+            raise ChatException(500, _("Application does not exist"))
+        is_permission = get_is_permissions(
+            request=request, workspace_id=application.workspace_id, application_id=str(application.id)
+        )
+        if scope == "SYSTEM":
+            authorized = is_permission(PermissionConstants.RESOURCE_APPLICATION_EDIT, RoleConstants.ADMIN)
+        else:
+            authorized = is_permission(
+                PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                ViewPermission([RoleConstants.USER.get_workspace_role()],
+                               [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                               CompareConstants.AND),
+                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            )
+        if not authorized:
+            raise AppUnauthorizedFailed(403, _("No permission to access"))
         chat_info.application = application
         return ChatSerializers(data={
-            'chat_id': chat_id, "chat_user_id": chat_info.chat_user_id,
-            "chat_user_type": chat_info.chat_user_type,
+            'chat_id': chat_id, "chat_user_id": str(request.user.id),
+            "chat_user_type": ChatUserType.PLATFORM_USER.value,
             "application_id": chat_info.application.id, "debug": True
         }).chat(instance, base_to_response)
 

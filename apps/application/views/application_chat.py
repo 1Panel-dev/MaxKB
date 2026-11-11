@@ -151,7 +151,7 @@ class ChatView(APIView):
         tags=[_('Application')]  # type: ignore
     )
     def post(self, request: Request, chat_id: str):
-        return DebugChatSerializers(data={'chat_id': chat_id}).chat(request.data)
+        return DebugChatSerializers(data={'chat_id': chat_id}).chat(request.data, request=request)
 
 class PromptGenerateView(APIView):
     authentication_classes = [TokenAuth]

@@ -1161,12 +1161,12 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id, user_id=No
         work_flow_manage = ToolWorkflowManage(
             Workflow.new_instance(qv.work_flow, WorkflowMode.TOOL),
             {
+                **kwargs,
                 "chat_record_id": tool_record_id,
                 "tool_id": tool_id,
                 "stream": True,
                 "workspace_id": workspace_id,
-                "user_id": user_id,
-                **kwargs,
+                "user_id": user_id or tool.user_id,
                 "default_model_setting": qv.default_model_setting,
             },
             ToolWorkflowPostHandler(took_execute, tool_id),

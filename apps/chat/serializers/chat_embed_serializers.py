@@ -7,8 +7,11 @@
     @desc:
 """
 import os
+from urllib.parse import urlencode, urlsplit
 import uuid_utils.compat as uuid
 
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.template import Template, Context
@@ -23,8 +26,18 @@ from maxkb.const import CONFIG
 
 class ChatEmbedSerializer(serializers.Serializer):
     host = serializers.CharField(required=True, label=_("Host"))
-    protocol = serializers.CharField(required=True, label=_("protocol"))
+    protocol = serializers.ChoiceField(choices=('http', 'https'), required=True, label=_("protocol"))
     token = serializers.CharField(required=True, label=_("token"))
+
+    def validate_host(self, value):
+        try:
+            URLValidator(schemes=['http', 'https'])(f'http://{value}')
+            parsed = urlsplit(f'http://{value}')
+            if parsed.netloc != value or parsed.username is not None or parsed.password is not None:
+                raise ValueError()
+        except (ValidationError, ValueError):
+            raise serializers.ValidationError(_("Invalid host"))
+        return value
 
     def get_embed(self, with_valid=True, params=None):
         if params is None:
@@ -89,7 +102,7 @@ class ChatEmbedSerializer(serializers.Serializer):
 
     @staticmethod
     def get_query_api_input(application, params):
-        query = ''
+        query = []
         if application.work_flow is not None:
             work_flow = application.work_flow
             if work_flow is not None:
@@ -101,7 +114,7 @@ class ChatEmbedSerializer(serializers.Serializer):
                         if input_field_list is not None:
                             for field in input_field_list:
                                 if field['assignment_method'] == 'api_input' and field['variable'] in params:
-                                    query += f"&{field['variable']}={params[field['variable']]}"
+                                    query.append((field['variable'], params[field['variable']]))
         if 'asker' in params:
-            query += f"&asker={params.get('asker')}"
-        return query
+            query.append(('asker', params.get('asker')))
+        return '&' + urlencode(query) if query else ''

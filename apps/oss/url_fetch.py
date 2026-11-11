@@ -4,7 +4,7 @@
 # the resolver is temporarily wrapped for this download. Keep the source here
 # so execution does not depend on inspect.getsource in packaged releases.
 FETCH_URL_CODE = r'''
-def fetch_url(url, file_limit, binary=False):
+def fetch_url(url, file_limit, binary=False, headers=None, allowed_networks=None, detect_encoding=False):
     import base64
     import ipaddress
     import socket
@@ -26,6 +26,13 @@ def fetch_url(url, file_limit, binary=False):
     if parsed.port == 0:
         raise ValueError("Invalid URL port")
 
+    if isinstance(allowed_networks, str):
+        allowed_networks = [value.strip() for value in allowed_networks.split(",") if value.strip()]
+    allowed_networks = [ipaddress.ip_network(value) for value in (allowed_networks or [])]
+    private_networks = [ipaddress.ip_network(value) for value in
+                        ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "fc00::/7")]
+    blocked_ipv6_networks = [ipaddress.ip_network(value) for value in
+                            ("fd00:ec2::/32", "64:ff9b::/96", "64:ff9b:1::/48")]
     resolve = socket.getaddrinfo
 
     def resolve_public(*args, **kwargs):
@@ -36,10 +43,13 @@ def fetch_url(url, file_limit, binary=False):
             if family not in (socket.AF_INET, socket.AF_INET6):
                 raise ValueError("Unsupported address family")
             ip = ipaddress.ip_address(address[0])
-            if not ip.is_global or ip.is_multicast or ip.is_reserved or (
-                ip.version == 6 and (ip.is_site_local or ip.ipv4_mapped or ip.sixtofour or ip.teredo)
+            private_allowed = (any(ip in network for network in private_networks)
+                               and any(ip in network for network in allowed_networks))
+            if (not ip.is_global and not private_allowed) or ip.is_multicast or ip.is_reserved or (
+                ip.version == 6 and (ip.is_site_local or ip.ipv4_mapped or ip.sixtofour or ip.teredo
+                                    or any(ip in network for network in blocked_ipv6_networks))
             ):
-                raise ValueError("Access to non-public IP addresses is blocked")
+                raise ValueError("Access to non-public or disallowed IP addresses is blocked")
         return addresses
 
     # Validate the addresses requests/urllib3 will actually connect to, not a
@@ -51,7 +61,7 @@ def fetch_url(url, file_limit, binary=False):
             session.trust_env = False
             # requests otherwise buffers redirect bodies even when redirects are disabled.
             session.resolve_redirects = lambda *args, **kwargs: iter(())
-            with session.get(url, stream=True, timeout=(5, 10), allow_redirects=False) as response:
+            with session.get(url, headers=headers, stream=True, timeout=(5, 10), allow_redirects=False) as response:
                 length = response.headers.get("Content-Length")
                 if length is not None:
                     if not length.isascii() or not length.isdecimal():
@@ -69,8 +79,8 @@ def fetch_url(url, file_limit, binary=False):
                         raise ValueError("File size exceeds limit")
                     body.extend(chunk)
                 content_type = response.headers.get("Content-Type", "")
+                response._content = bytes(body)
                 if not binary and ("text" in content_type.lower() or "json" in content_type.lower()):
-                    response._content = bytes(body)
                     content = response.text
                 else:
                     content = base64.b64encode(body).decode("ascii")
@@ -79,7 +89,25 @@ def fetch_url(url, file_limit, binary=False):
                     "Content-Type": content_type,
                     "Content-Length": len(body),
                     "content": content,
+                    "encoding": response.encoding,
+                    "apparent_encoding": response.apparent_encoding if detect_encoding else None,
                 }
     finally:
         socket.getaddrinfo = resolve
 '''
+
+
+def fetch_public_bytes(url, file_limit=50 * 1024 * 1024):
+    """Download provider media using the isolated, bounded public-address fetcher."""
+    import base64
+
+    from common.utils.tool_code import ToolExecutor
+
+    response = ToolExecutor().exec_code(
+        FETCH_URL_CODE,
+        {"url": url, "file_limit": file_limit, "binary": True},
+        function_name="fetch_url",
+    )
+    if not 200 <= response["status_code"] < 300:
+        raise ValueError(f"Failed to download media: HTTP {response['status_code']}")
+    return base64.b64decode(response["content"], validate=True)

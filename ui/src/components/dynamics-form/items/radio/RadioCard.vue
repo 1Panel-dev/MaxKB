@@ -13,8 +13,8 @@
               modelValue == item[valueField] ? 'active' : '',
             ]"
             @click="inputDisabled ? () => {} : selected(item[valueField])"
-            :innerHTML="item[textField] ? item[textField] : '\u200D'"
           >
+            {{ item[textField] ? item[textField] : '\u200D' }}
           </el-card>
         </el-col>
       </template>

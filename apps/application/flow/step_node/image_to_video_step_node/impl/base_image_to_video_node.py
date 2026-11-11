@@ -3,7 +3,6 @@ import base64
 from functools import reduce
 from typing import List
 
-import requests
 from django.db import connection
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _, gettext
@@ -14,6 +13,7 @@ from application.flow.step_node.image_to_video_step_node.i_image_to_video_node i
 from common.utils.common import bytes_to_uploaded_file
 from knowledge.models import FileSourceType, File
 from oss.serializers.file import FileSerializer, mime_types
+from oss.url_fetch import fetch_public_bytes
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
@@ -70,7 +70,7 @@ class BaseImageToVideoNode(IImageToVideoNode):
             return NodeResult({'answer': gettext('Failed to generate video')}, {})
         file_name = 'generated_video.mp4'
         if isinstance(video_urls, str) and video_urls.startswith('http'):
-            video_urls = requests.get(video_urls).content
+            video_urls = fetch_public_bytes(video_urls)
         file = bytes_to_uploaded_file(video_urls, file_name)
         file_url = self.upload_file(file)
         video_label = f'<video src="{file_url}" controls style="max-width: 100%; width: 100%; height: auto; max-height: 60vh;"></video>'

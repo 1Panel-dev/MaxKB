@@ -12,6 +12,7 @@ from typing import Any, Dict, List
 import uuid_utils.compat as uuid
 from common.chunk import text_to_chunk
 from common.utils.common import bulk_create_in_batches, filter_special_character
+from common.utils.file_reference import get_knowledge_source_file
 from django.db.models import QuerySet
 from django.db.models.aggregates import Max
 from django.utils.translation import gettext_lazy as _
@@ -70,10 +71,10 @@ def convert_uuid_to_str(obj):
         return obj
 
 
-def link_file(source_file_id, document_id):
+def link_file(source_file_id, document_id, knowledge_id, user_id):
     if source_file_id is None:
         return
-    source_file = QuerySet(File).filter(id=source_file_id).first()
+    source_file = get_knowledge_source_file(source_file_id, knowledge_id, user_id)
     if source_file:
         file_content = source_file.get_bytes()
 
@@ -249,7 +250,7 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
                 document
             )
             document_instance = document_paragraph_dict_model.get('document')
-            link_file(document.get("source_file_id"), document_instance.id)
+            link_file(document.get("source_file_id"), document_instance.id, knowledge_id, user_id)
             document_model_list.append(document_instance)
             # 收集标签
             single_document_tag_list = document.get("tags", [])

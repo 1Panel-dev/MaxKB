@@ -46,13 +46,13 @@ class DockerAIRerankerCredential(BaseForm, BaseModelCredential):
             model: DockerAIReranker = provider.get_model(model_type, model_name, model_credential)
             model.compress_documents([Document(page_content=_('Hello'))], _('Hello'))
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error('Model verification failed: %s', type(e).__name__)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
                                       _('Verification failed, please check whether the parameters are correct: {error}').format(
-                                          error=str(e)))
+                                          error=type(e).__name__)) from None
             else:
                 return False
         return True

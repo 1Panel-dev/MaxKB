@@ -10,8 +10,8 @@ const prefix = '/workspace/chat_user'
 /**
  * 用户列表
  */
-const getChatUserList: (loading?: Ref<boolean>) => Promise<Result<ChatUserItem[]>> = (loading) => {
-  return get(`${prefix}/list`, undefined, loading)
+const getChatUserList: (params?: any, loading?: Ref<boolean>) => Promise<Result<ChatUserItem[]>> = (params, loading) => {
+  return get(`${prefix}/list`, params, loading)
 }
 
 /**

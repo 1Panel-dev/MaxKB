@@ -94,7 +94,7 @@ class FileView(APIView):
                         "id": file_id,
                         "http_range": request.headers.get("Range", ""),
                     }
-                ).delete(mk_file_auth=request.COOKIES.get("mk_file_auth"))
+                ).delete(user=request.user)
             )
 
 

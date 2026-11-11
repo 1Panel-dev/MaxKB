@@ -125,7 +125,7 @@ class AliyunBaiLianTTSModelCredential(BaseForm, BaseModelCredential):
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error('Model verification failed: %s', type(e).__name__)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
@@ -133,8 +133,8 @@ class AliyunBaiLianTTSModelCredential(BaseForm, BaseModelCredential):
                     ValidCode.valid_error.value,
                     gettext(
                         'Verification failed, please check whether the parameters are correct: {error}'
-                    ).format(error=str(e))
-                )
+                    ).format(error=type(e).__name__)
+                ) from None
             return False
 
         return True

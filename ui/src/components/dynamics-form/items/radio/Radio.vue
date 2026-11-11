@@ -1,7 +1,7 @@
 <template>
   <el-radio-group v-bind="$attrs">
     <el-radio v-for="(item, index) in option_list" :key="index" :label="item[valueField]">
-      <div v-html="label(item)"></div>
+      <div>{{ label(item) }}</div>
     </el-radio>
   </el-radio-group>
 </template>

@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 import requests
 
 from common.utils.logger import maxkb_logger
+from common.utils.provider_request import provider_request
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.base_ttv import BaseGenerationVideo
 
@@ -116,13 +117,13 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         video_id = self._find_video_id(body)
         if video_id:
             return self._poll_private_task(video_id)
-        raise RuntimeError(f"私有部署返回内容既非视频二进制也无可识别的视频地址/任务 id: {body}")
+        raise RuntimeError("私有部署返回内容既非视频二进制也无可识别的视频地址/任务 id")
 
     def _post_private(self, url, headers, files):
         """私有部署 POST 提交，带重试；能解析为 JSON 则返回 JSON，否则返回视频二进制。"""
         for attempt in range(self.max_retries):
             try:
-                response = requests.post(url, headers=headers, files=files, timeout=600)
+                response = provider_request("POST", url, headers=headers, files=files, timeout=(5, 600))
                 response.raise_for_status()
                 return self._parse_private_body(response)
             except (requests.exceptions.ProxyError, requests.exceptions.ConnectionError,
@@ -131,7 +132,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 time.sleep(self.retry_delay)
             except requests.exceptions.HTTPError as e:
                 raise RuntimeError(
-                    f"私有部署 HTTP 请求失败: {e.response.text if hasattr(e, 'response') else str(e)}")
+                    f"私有部署 HTTP 请求失败: {e}") from None
         raise RuntimeError("多次重试后仍无法连接到私有部署服务")
 
     @staticmethod
@@ -149,7 +150,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         max_attempts = 60
         for attempt in range(max_attempts):
             try:
-                response = requests.get(query_url, headers=headers, timeout=60)
+                response = provider_request("GET", query_url, headers=headers)
                 response.raise_for_status()
                 body = self._parse_private_body(response)
             except (requests.exceptions.ProxyError, requests.exceptions.ConnectionError,
@@ -159,7 +160,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 continue
             except requests.exceptions.HTTPError as e:
                 raise RuntimeError(
-                    f"私有部署查询任务失败: {e.response.text if hasattr(e, 'response') else str(e)}")
+                    f"私有部署查询任务失败: {e}") from None
             if isinstance(body, (bytes, bytearray)):
                 maxkb_logger.info("私有部署查询直接返回视频二进制")
                 return body
@@ -170,9 +171,9 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 if video_url:
                     maxkb_logger.info(f"私有部署任务成功，视频 URL: {video_url}")
                     return video_url
-                raise RuntimeError(f"私有部署任务成功但未找到视频地址: {body}")
+                raise RuntimeError("私有部署任务成功但未找到视频地址")
             if status in self.v2_fail_status:
-                raise RuntimeError(f"视频生成失败，状态: {status}, 返回: {body}")
+                raise RuntimeError("视频生成失败")
             time.sleep(self.retry_delay)
         raise RuntimeError(f"任务超时：经过 {max_attempts} 次轮询后仍未完成")
 
@@ -239,9 +240,9 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         for attempt in range(self.max_retries):
             try:
                 if method.upper() == "POST":
-                    response = requests.post(url, headers=headers, **kwargs)
+                    response = provider_request("POST", url, headers=headers, **kwargs)
                 elif method.upper() == "GET":
-                    response = requests.get(url, headers=headers, **kwargs)
+                    response = provider_request("GET", url, headers=headers, **kwargs)
                 else:
                     raise ValueError(f"Unsupported HTTP method: {method}")
 
@@ -256,7 +257,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 time.sleep(self.retry_delay)
             except requests.exceptions.HTTPError as e:
                 maxkb_logger.error(f"HTTP 错误: {e}")
-                raise RuntimeError(f"HTTP 请求失败: {e.response.text if hasattr(e, 'response') else str(e)}")
+                raise RuntimeError(f"HTTP 请求失败: {e}") from None
 
         raise RuntimeError("多次重试后仍无法连接到 MiniMax API，请检查代理或网络配置")
 
@@ -318,7 +319,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
         task_id = response_data.get("task_id")
         if not task_id:
-            raise RuntimeError(f"提交任务失败，未获取到 task_id: {response_data}")
+            raise RuntimeError("提交任务失败，未获取到 task_id")
 
         maxkb_logger.info(f"任务已提交，task_id: {task_id}")
         return self._poll_task_status_v2(task_id)
@@ -339,12 +340,11 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 content = task.get("content") or {}
                 video_url = content.get("url")
                 if not video_url:
-                    raise RuntimeError(f"任务成功但未获取到视频 URL: {response_data}")
+                    raise RuntimeError("任务成功但未获取到视频 URL")
                 maxkb_logger.info(f"任务处理成功，视频 URL: {video_url}")
                 return video_url
             elif status in self.v2_fail_status:
-                error_msg = self._extract_error(task, response_data)
-                raise RuntimeError(f"视频生成失败: {error_msg}")
+                raise RuntimeError("视频生成失败")
             else:
                 # queued / running 等状态，继续轮询
                 time.sleep(self.retry_delay)
@@ -393,7 +393,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
         task_id = response_data.get("task_id")
         if not task_id:
-            raise RuntimeError(f"提交任务失败，未获取到 task_id: {response_data}")
+            raise RuntimeError("提交任务失败，未获取到 task_id")
 
         maxkb_logger.info(f"任务已提交，task_id: {task_id}")
 
@@ -418,13 +418,12 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
             if status in self.v2_success_status:
                 file_id = response_data.get("file_id")
                 if not file_id:
-                    raise RuntimeError(f"任务成功但未获取到 file_id: {response_data}")
+                    raise RuntimeError("任务成功但未获取到 file_id")
                 maxkb_logger.info(f"任务处理成功，file_id: {file_id}")
                 return file_id
             elif status in self.v2_fail_status:
-                error_msg = response_data.get("error_message", "未知错误")
-                maxkb_logger.error(f"视频生成失败: {error_msg}")
-                raise RuntimeError(f"视频生成失败: {error_msg}")
+                maxkb_logger.error("视频生成失败")
+                raise RuntimeError("视频生成失败")
             else:
                 # 任务仍在处理中，等待后继续轮询
                 time.sleep(self.retry_delay)
@@ -442,6 +441,6 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         download_url = file_info.get("download_url")
 
         if not download_url:
-            raise RuntimeError(f"获取下载链接失败: {response_data}")
+            raise RuntimeError("获取下载链接失败")
 
         return download_url
