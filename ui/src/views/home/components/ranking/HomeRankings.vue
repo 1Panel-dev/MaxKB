@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { HomeRankingKind, HomeRankingRecord } from '@/api/types'
 import type HomepageApi from '@/api/admin/workspace/homepage'
 import RankingDrawer from './RankingDrawer.vue'
@@ -9,7 +9,8 @@ import type { MkDateRangeValue } from '@/components/mk-date-range/types'
 import { beforeDay } from '@/utils/time'
 import { numberFormat, formatTokenNumber } from '@/utils/number'
 
-const props = defineProps<{ workspaceId: string; api: typeof HomepageApi }>()
+const props = defineProps<{ workspaceId: string; api: typeof HomepageApi; canReadApplication?: boolean }>()
+const canReadApplicationStatistics = computed(() => props.canReadApplication ?? true)
 
 /* 排行类型与展示计算 */
 
@@ -24,11 +25,18 @@ function getRankingAverage(kind: HomeRankingKind, record: HomeRankingRecord) {
 /* 排行榜查询与详情入口 */
 const range = ref({ start_time: beforeDay(7), end_time: beforeDay(0) })
 const loading = ref(false)
-const tokenTotal = ref<number>()
-const chatTotal = ref<number>()
+const tokenTotal = ref<number | undefined>(0)
+const chatTotal = ref<number | undefined>(0)
 const rankings = ref<Record<HomeRankingKind, HomeRankingRecord[] | undefined>>({ tokens: undefined, questions: undefined, userTokens: undefined })
 const selectedKind = ref<HomeRankingKind>()
 function loadRankings() {
+  if (!canReadApplicationStatistics.value) {
+    tokenTotal.value = 0
+    chatTotal.value = 0
+    rankings.value = { tokens: [], questions: [], userTokens: [] }
+    loading.value = false
+    return Promise.resolve()
+  }
   loading.value = true
   const query = { ...range.value }
   return Promise.allSettled([
@@ -81,6 +89,7 @@ function handleRangeChange({ startTime, endTime }: MkDateRangeValue) {
   loadRankings()
 }
 function handleOpenRanking(kind: HomeRankingKind) {
+  if (!canReadApplicationStatistics.value) return
   selectedKind.value = kind
 }
 function handleRankingDrawerClosed() {
@@ -99,6 +108,7 @@ onMounted(loadRankings)
         title="Tokens 消耗 · Top 智能体"
         :records="rankings.tokens"
         :loading="loading"
+        :detail-disabled="!canReadApplicationStatistics"
         kind="tokens"
         :total="tokenTotal"
         @detail="handleOpenRanking('tokens')"
@@ -113,6 +123,7 @@ onMounted(loadRankings)
         title="对话次数 · Top 智能体"
         :records="rankings.questions"
         :loading="loading"
+        :detail-disabled="!canReadApplicationStatistics"
         kind="questions"
         :total="chatTotal"
         @detail="handleOpenRanking('questions')"
@@ -127,6 +138,7 @@ onMounted(loadRankings)
         title="Tokens 消耗 · Top 用户"
         :records="rankings.userTokens"
         :loading="loading"
+        :detail-disabled="!canReadApplicationStatistics"
         kind="userTokens"
         :total="tokenTotal"
         @detail="handleOpenRanking('userTokens')"
