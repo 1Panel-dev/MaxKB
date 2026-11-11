@@ -163,6 +163,8 @@ Dialog 和 Drawer 的 `show-close` 不根据 loading 或提交状态动态判断
 
 布尔 `v-model` 控制显示，默认宽度 `700`、挂载到 body、显示关闭按钮、关闭后销毁内容，
 禁止点击遮罩和 Escape 关闭；原生属性、事件通过 `$attrs` 覆盖或透传。
+小于 `md` 断点（48rem，默认 768px）时，抽屉宽高均为 `100%`，优先于调用方传入的 `size`；
+横向和纵向抽屉均全屏展示，桌面端仍使用默认或传入的尺寸。
 提供默认、`header`、`footer` 插槽，内容使用 `el-scrollbar` 和 `p-6`，可用 `contentClass` 调整。
 全高内容可传 `content-class="h-full p-0"` 并复用 `MkViewLayout`。
 Drawer 没有 `MkDialog` 的外壳挂载控制；需要按需挂载时，由业务在 `closed` 后卸载。
@@ -636,6 +638,7 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 手动导入 `mk-search-list/index.vue`，放在有明确高度的纵向 Flex 容器中。
 `v-model` 为搜索词；`data` 传全量数组，默认按 `name` 忽略大小写与首尾空格过滤，以 `id` 识别行。
 `props.label` / `props.value` 可映射字段，唯一值不能重复。`defaultActive` 设置选中值，后续变更也会同步。
+设置 `remote` 后不做前端过滤，输入（含清空）停止 300ms 后触发 `search(keyword)`（去除首尾空格），由调用方请求并更新 `data`、管理 loading。
 每批渲染 50 条，搜索或数据变化重置滚动位置；这是前端分批渲染，不替代接口分页。
 
 默认插槽提供 `{ row, index, active }`。`action`、`action-dropdown` 的

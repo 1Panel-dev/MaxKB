@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useStore } from '@/stores/chat'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { relativeTimeFormat } from '@/utils/time'
 import type { Conversation } from '../../core/types'
@@ -9,10 +10,17 @@ import AccountMenu from '../account-menu/index.vue'
 import { usePortalConversationListStore, type PortalApplicationGroup } from './index'
 import RenameConversation from '../../components/rename/index.vue'
 import { useMessageListStore } from '../../components/message-list/index'
-import auth from '@/api/chat/auth.ts'
-import { useStore } from '@/stores/chat/index.ts'
-const { auth: authStore  }=useStore()
+
 defineOptions({ name: 'PortalConversationList' })
+
+// 门户名称和 Logo 使用认证配置，配置未加载时保留默认展示。
+const { auth: authStore } = useStore()
+const portalName = computed(() => {
+  const meta = authStore.authProfile?.meta
+  const name = meta && typeof meta === 'object' && 'portal_name' in meta ? meta.portal_name : undefined
+  return typeof name === 'string' && name ? name : '智能体门户'
+})
+const portalLogo = computed(() => authStore.authProfile?.logo)
 
 const msgs = useMessageListStore()
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
@@ -27,17 +35,22 @@ const handleOpenHistory = (group: PortalApplicationGroup) => {
   historyVisible.value = true
 }
 
-// 每个智能体最多展示最近 5 条会话
+// 总数超过 20 条时，每个智能体最多展示最近 5 条会话
 const RECENT_CONVERSATION_LIMIT = 5
 
 const isCurrentApplication = (group: PortalApplicationGroup) => group.id === currentApplicationId.value
 
-// 当前智能体以会话列表 Store 为准，其他智能体使用分组接口返回的会话
-const groupConversations = (group: PortalApplicationGroup) =>
-  (isCurrentApplication(group) ? conversations.value : group.conversations).slice(0, RECENT_CONVERSATION_LIMIT)
-
 const groupConversationCount = (group: PortalApplicationGroup) =>
   Math.max(group.count, isCurrentApplication(group) ? conversations.value.length : group.conversations.length)
+
+// 所有智能体的对话总数超过 20 条时，才显示分组的查看更多入口。
+const totalConversationCount = computed(() => applicationGroups.value.reduce((total, group) => total + groupConversationCount(group), 0))
+
+// 当前智能体以会话列表 Store 为准；无需查看更多时展示全部已加载会话。
+const groupConversations = (group: PortalApplicationGroup) => {
+  const applicationConversations = isCurrentApplication(group) ? conversations.value : group.conversations
+  return totalConversationCount.value > 20 ? applicationConversations.slice(0, RECENT_CONVERSATION_LIMIT) : applicationConversations
+}
 
 // 仅展示有历史记录的智能体，随当前会话的新建、删除同步更新。
 const historyApplicationGroups = computed(() => applicationGroups.value.filter((group) => groupConversations(group).length > 0))
@@ -80,13 +93,6 @@ const handleClearConversations = () => {
       clearing.value = false
     })
 }
-const name=computed(()=>{
-  const meta:any=authStore.authProfile?.meta
-  return meta.portal_name ||'智能体门户'
-})
-const logo=computed(()=>{
-    return authStore.authProfile?.logo
-})
 </script>
 
 <template>
@@ -94,8 +100,8 @@ const logo=computed(()=>{
     <!-- 门户名称与收起侧栏 -->
     <div class="mb-4 flex-between shrink-0 gap-2">
       <div class="min-w-0 flex-align-center gap-2">
-        <PortalIcon :icon="logo"/>
-        <h4 class="truncate">{{name}}</h4>
+        <PortalIcon :icon="portalLogo" />
+        <h4 class="truncate">{{ portalName }}</h4>
       </div>
       <!-- 收起左侧 -->
       <MkTooltip content="收起侧边栏">
@@ -224,8 +230,12 @@ const logo=computed(()=>{
                   </MkDropdown>
                 </template>
               </MkListItem>
-              <!-- 超过5条 查看更多 -->
-              <MkListItem class="pl-8!" v-if="groupConversationCount(group) > RECENT_CONVERSATION_LIMIT" @click="handleOpenHistory(group)">
+              <!-- 总数超过 20 条且当前智能体超过 5 条时查看更多 -->
+              <MkListItem
+                class="pl-8!"
+                v-if="totalConversationCount > 20 && groupConversationCount(group) > RECENT_CONVERSATION_LIMIT"
+                @click="handleOpenHistory(group)"
+              >
                 <template #default>
                   <span>查看更多</span>
                   <span>
