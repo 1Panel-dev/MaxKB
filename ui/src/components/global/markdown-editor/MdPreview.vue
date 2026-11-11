@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { MdPreview as MdPreviewV3 } from 'md-editor-v3'
 import { useStore } from '@/stores'
+import { sanitizeMarkdown } from './sanitize'
 
 defineOptions({ name: 'MdPreview', inheritAttrs: false })
 
@@ -14,7 +15,7 @@ const language = computed(() => {
 </script>
 
 <template>
-  <MdPreviewV3 class="mk-markdown-editor" :language="language" :code-foldable="false" v-bind="$attrs" />
+  <MdPreviewV3 class="mk-markdown-editor" :language="language" :code-foldable="false" v-bind="$attrs" :sanitize="sanitizeMarkdown" />
 </template>
 
 <style scoped lang="scss"></style>

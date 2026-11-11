@@ -113,6 +113,11 @@ Admin、Chat 共用的 `App.vue` 通过 Config Provider 的 `table.tooltipOption
   `:validate-event="false"` 可关闭；这一能力不适用于普通 `MdEditor` 或 `MdPreview`。
 - `MdPreview` 默认关闭代码折叠，用 `model-value` 传入只读内容。
 
+Markdown 启用原始 HTML 解析，并通过 XSS 插件及编辑器、预览固定绑定的 DOMPurify 清洗最终
+HTML；调用方不能通过 `sanitize` 属性替换清洗规则。保留上标引用、视频、SVG 与 MathML，
+移除脚本、事件属性、普通 iframe 及表单容器；媒体地址仅允许 HTTP(S)、相对地址与 Blob URL，
+禁止自动播放，`preload` 限制为 `none` 或 `metadata`。独立 HTML 内容项的沙箱不受此配置影响。
+
 Admin、Chat 入口调用 `configureMarkdownEditor()` 配置本地高亮、KaTeX、Mermaid、ECharts、
 图片裁剪、全屏和 Prettier，避免运行时加载 CDN；图标随依赖打包，不维护旧图标脚本。
 共享样式在 `md-editor.scss`，由 `config.ts` 引入；编辑器覆盖限定在 `mk-markdown-editor`，

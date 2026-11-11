@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { MdEditor as MdEditorV3 } from 'md-editor-v3'
 import { useStore } from '@/stores'
+import { sanitizeMarkdown } from './sanitize'
 
 defineOptions({ name: 'MdEditor', inheritAttrs: false })
 
@@ -18,7 +19,7 @@ const language = computed(() => {
 </script>
 
 <template>
-  <MdEditorV3 class="mk-markdown-editor" :language="language" no-prettier v-bind="$attrs">
+  <MdEditorV3 class="mk-markdown-editor" :language="language" no-prettier v-bind="$attrs" :sanitize="sanitizeMarkdown">
     <template #defFooters>
       <slot name="defFooters" />
     </template>
