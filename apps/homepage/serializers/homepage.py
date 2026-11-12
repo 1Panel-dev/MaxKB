@@ -245,7 +245,7 @@ class HomePageSerializer(serializers.Serializer):
             ).exclude(chat_user_id="")
 
             if name:
-                base_queryset = base_queryset.filter(asker__username__contains=name)
+                base_queryset = base_queryset.filter(asker__username__icontains=name)
 
             # ---- 权限过滤 ----
             base_queryset = self._apply_permission_filter(base_queryset, auth, workspace_id, user_id)
@@ -329,7 +329,7 @@ class HomePageSerializer(serializers.Serializer):
                 ]
                 worksheet.append(row)
             response = HttpResponse(content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
+            response["Content-Disposition"] = 'attachment; filename="data.xlsx"'
             workbook.save(response)
             return response
 
@@ -400,9 +400,10 @@ class HomePageSerializer(serializers.Serializer):
             queryset = QuerySet(Application)
             is_resource_filter = True
             if name:
-                queryset = queryset.filter(name__contains=name)
+                queryset = queryset.filter(name__icontains=name)
             if is_workspace_manage(auth, workspace_id):
                 queryset = queryset.filter(workspace_id=workspace_id)
+                is_resource_filter = False
             elif is_extends_workspace_manage(auth, workspace_id):
                 if has_extends_workspace_manage_permission(
                     auth, PermissionConstants.APPLICATION_READ.value, workspace_id
@@ -500,7 +501,7 @@ class HomePageSerializer(serializers.Serializer):
                 ]
                 worksheet.append(row)
             response = HttpResponse(content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
+            response["Content-Disposition"] = 'attachment; filename="data.xlsx"'
             workbook.save(response)
             return response
 
@@ -532,7 +533,7 @@ class HomePageSerializer(serializers.Serializer):
             is_resource_filter = True
             queryset = QuerySet(Application)
             if name:
-                queryset = queryset.filter(name__contains=name)
+                queryset = queryset.filter(name__icontains=name)
             if is_workspace_manage(auth, workspace_id):
                 queryset = queryset.filter(workspace_id=workspace_id)
                 is_resource_filter = False
@@ -630,7 +631,7 @@ class HomePageSerializer(serializers.Serializer):
                 ]
                 worksheet.append(row)
             response = HttpResponse(content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
+            response["Content-Disposition"] = 'attachment; filename="data.xlsx"'
             workbook.save(response)
             return response
 
