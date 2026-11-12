@@ -70,7 +70,16 @@ class QianfanLLMModelCredential(BaseForm, BaseModelCredential):
             model.invoke([HumanMessage(content="1")])
         except Exception as e:
             maxkb_logger.error(f"Exception: {e}", exc_info=True)
-            raise e
+            if isinstance(e, AppApiException):
+                raise e
+            if raise_exception:
+                raise AppApiException(
+                    ValidCode.valid_error.value,
+                    gettext("Verification failed, please check whether the parameters are correct: {error}").format(
+                        error=str(e)
+                    ),
+                )
+            return False
         return True
 
     def encryption_dict(self, model_info: Dict[str, object]):
