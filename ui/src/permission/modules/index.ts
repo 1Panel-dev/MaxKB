@@ -11,6 +11,7 @@ import tool from './tool'
 import model from './model'
 import system from './system'
 import trigger from './trigger'
+import homepage from './homepage'
 
 export default {
   /**
@@ -36,4 +37,9 @@ export default {
   /**
    * 「系统全局」按钮权限
    * */
-  system }
+  system,
+  /**
+   * 工作空间「概览」按钮权限
+   */
+  homepage,
+}
