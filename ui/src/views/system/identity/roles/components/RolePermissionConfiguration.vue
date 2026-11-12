@@ -21,7 +21,8 @@ const props = defineProps<{ currentRole: RoleItem }>()
 const loading = ref(false)
 const permissionData = ref<PermissionTableRow[]>([])
 const showCategory = ref(true)
-const disabled = computed(() => props.currentRole.internal)
+// 内置角色或当前用户无角色编辑权限时，权限矩阵只读。
+const disabled = computed(() => props.currentRole.internal || !perm.system.role.edit())
 const permissionTableKey = computed(() => `${props.currentRole.id}:${disabled.value ? 'readonly' : 'editable'}`)
 
 function loadPermissions() {
