@@ -161,6 +161,30 @@ class ImageDocumentImportTests(SimpleTestCase):
             self.service.import_previews(self.ids)
         self.documents.assert_not_called()
 
+    def test_import_accepts_more_than_fifty_images_up_to_the_configured_limit(self):
+        self.knowledge.file_count_limit = 51
+        self.files = [
+            MagicMock(id=uuid4(), file_name=f"image-{index}.png", meta={"user_id": self.user_id}) for index in range(51)
+        ]
+        for file in self.files:
+            file.get_bytes.return_value = self.content
+        self.query.return_value.filter.return_value.select_for_update.return_value.__iter__.return_value = self.files
+        ids = [str(file.id) for file in self.files]
+        request = ImagePreviewBatchCreateRequest(data={"file_id_list": ids})
+        self.assertTrue(request.is_valid(), request.errors)
+        result = self.service.import_previews(request.validated_data["file_id_list"])
+        self.assertEqual(len(result), 51)
+        self.assertEqual([call.kwargs["meta"]["source_file_id"] for call in self.documents.call_args_list], ids)
+
+    def test_default_and_larger_configured_limits_reject_excess_before_file_lookup(self):
+        for limit in (Knowledge().file_count_limit, 60):
+            with self.subTest(limit=limit):
+                self.knowledge.file_count_limit = limit
+                with self.assertRaises(AppApiException):
+                    self.service.import_previews([str(uuid4()) for _ in range(limit + 1)])
+        self.query.assert_not_called()
+        self.documents.assert_not_called()
+
     def test_batch_create_route_imports_uploaded_files_with_strategy_and_returns_document_list(self):
         path = f"/workspace/default/knowledge/{self.service.knowledge_id}/document/image/batch_create"
         strategy = {"visual": {"enabled": False}, "index": {"title_as_question": True}}
@@ -192,14 +216,13 @@ class ImageDocumentImportTests(SimpleTestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("doc_strategy", serializer.errors)
 
-    def test_schema_rejects_missing_empty_invalid_or_excessive_file_id_list(self):
+    def test_schema_rejects_missing_empty_or_invalid_file_id_list(self):
         for payload in (
             {},
             {"preview_ids": self.ids},
             {"file_ids": self.ids},
             {"file_id_list": []},
             {"file_id_list": ["invalid"]},
-            {"file_id_list": [str(uuid4()) for _ in range(51)]},
         ):
             with self.subTest(payload=payload):
                 serializer = ImagePreviewBatchCreateRequest(data=payload)

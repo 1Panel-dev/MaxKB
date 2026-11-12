@@ -202,7 +202,7 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 文本和图片至少提供一项，空白文本不可提交；仅 BASE 通用知识库支持图片查询，其他类型隐藏图片上传入口并禁止选择、拖拽和粘贴图片。
 图片上传不受检索模式限制，已有图片不限制检索模式切换。
 图片通过 Admin File API 上传为 120 分钟临时文件，仅提交上传成功的文件引用；数量和单文件大小读取知识库
-`file_count_limit`、`file_size_limit` 配置，与图片上传抽屉一致，数量最多 50 张，缺省为 50 张、每张 100MB。
+`file_count_limit`、`file_size_limit` 配置；召回测试输入另设最多 50 张限制，缺省为 50 张、每张 100MB。
 支持 JPG、JPEG、PNG、WEBP、BMP，文件选择、格式校验和提示使用一致的类型配置。
 召回测试与对话输入共用 `conversation-panel/core/input-events.ts` 的选择文件、拖拽、粘贴和提交快捷键。
 `HitTestInput` 管理文本、图片上传与提交校验，在输入框下方提供整行测试按钮。父页面传入测试请求的加载状态；
@@ -221,6 +221,8 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 `library/document/index.vue` 管理查询、分页、选择、启停及刷新；Action 管理各自请求和浮层。
 `library/image/index.vue` 使用独立列表入口，复用 `document/` 的状态、展示组件及 Action，
 查询与操作沿用 Document API；图片列表的查询参数差异见 [API 文档](../api/API_README.md#文档与分段)。
+文本、表格、QA 与图片上传抽屉的数量提示和控件限制均使用知识库 `file_count_limit`，未配置时默认 50，
+不再额外限制为 50；图片预览与导入接口也按知识库配置校验数量。
 点击图片行通过 `resourceApi.paragraph.getParagraphPage` 查询首个分段，使用 `ParagraphDialog` 展示详情；弹窗按需挂载，关闭动画结束后卸载。
 图片上传独立放在 `image/upload-image/`，`ButtonUploadImage` 管理入口与按需挂载，
 `UploadImageDrawer` 分为上传图片、图片处理两步，复用 `MkDragUpload` 的多文件图片模式暂存文件；

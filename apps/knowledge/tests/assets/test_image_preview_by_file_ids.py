@@ -122,10 +122,26 @@ class ImagePreviewByFileIdsTests(SimpleTestCase):
         self.query.return_value.filter.return_value.update.assert_not_called()
 
     def test_knowledge_count_limit_is_enforced_before_file_lookup(self):
-        self.knowledge.file_count_limit = 1
-        with self.assertRaises(AppApiException):
-            self.service.create_previews_by_file_ids(self.ids)
+        for limit in (1, Knowledge().file_count_limit, 60):
+            with self.subTest(limit=limit):
+                self.knowledge.file_count_limit = limit
+                with self.assertRaises(AppApiException):
+                    self.service.create_previews_by_file_ids([str(uuid4()) for _ in range(limit + 1)])
         self.query.assert_not_called()
+
+    def test_preview_accepts_more_than_fifty_images_up_to_the_configured_limit(self):
+        self.knowledge.file_count_limit = 51
+        self.files = [
+            MagicMock(id=uuid4(), file_name=f"image-{index}.png", meta={"user_id": self.user_id}) for index in range(51)
+        ]
+        for file in self.files:
+            file.get_bytes.return_value = self.content
+        self.query.return_value.filter.return_value.select_for_update.return_value.__iter__.return_value = self.files
+        ids = [str(file.id) for file in self.files]
+        request = ImagePreviewUploadRequest(data={"file_id_list": ids})
+        self.assertTrue(request.is_valid(), request.errors)
+        previews = self.service.create_previews_by_file_ids(request.validated_data["file_id_list"])
+        self.assertEqual([preview["source_file_id"] for preview in previews], ids)
 
     def test_wrong_workspace_fails_before_file_lookup(self):
         self.service.get_knowledge = ImageDocumentService.get_knowledge.__get__(self.service)
@@ -134,9 +150,9 @@ class ImagePreviewByFileIdsTests(SimpleTestCase):
             self.service.create_previews_by_file_ids(self.ids)
         self.query.return_value.filter.assert_called_once_with(id=self.service.knowledge_id, workspace_id="default")
 
-    def test_schema_rejects_empty_invalid_duplicate_and_excessive_ids(self):
+    def test_schema_rejects_empty_invalid_and_duplicate_ids(self):
         self.assertIs(ImagePreviewAPI.get_request(), ImagePreviewUploadRequest)
-        for ids in ([], ["invalid"], [self.ids[0]] * 2, [str(uuid4()) for _ in range(51)]):
+        for ids in ([], ["invalid"], [self.ids[0]] * 2):
             with self.subTest(ids=ids):
                 serializer = ImagePreviewUploadRequest(data={"file_id_list": ids})
                 self.assertFalse(serializer.is_valid())

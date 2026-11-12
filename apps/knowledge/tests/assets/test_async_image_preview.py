@@ -10,6 +10,7 @@ from django.test import SimpleTestCase
 from PIL import Image
 
 from common.event.listener_manage import ListenerManagement
+from common.exception.app_exception import AppApiException
 from knowledge.models import (
     AssetProcessStatus,
     DocumentResourceType,
@@ -130,6 +131,20 @@ class AsyncImagePreviewTests(SimpleTestCase):
 
         self.assertEqual(previews[0]["process_status"], AssetProcessStatus.SKIPPED)
         on_commit.assert_not_called()
+
+    def test_upload_uses_configured_count_above_fifty_and_rejects_excess_before_saving(self):
+        self.knowledge.file_count_limit = 51
+        with patch("knowledge.services.image_documents.File", return_value=self.file):
+            previews = self.service.create_previews([self.upload() for _ in range(51)])
+        self.assertEqual(len(previews), 51)
+        self.assertEqual(self.file.save.call_count, 51)
+        self.file.save.reset_mock()
+        for limit in (1, 50, 51):
+            with self.subTest(limit=limit), patch("knowledge.services.image_documents.File", return_value=self.file):
+                self.knowledge.file_count_limit = limit
+                with self.assertRaises(AppApiException):
+                    self.service.create_previews([self.upload() for _ in range(limit + 1)])
+        self.file.save.assert_not_called()
 
     def test_worker_saves_result_and_existing_get_endpoint_returns_completed_preview(self):
         self.service.process_preview(self.file.id)

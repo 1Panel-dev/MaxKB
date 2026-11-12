@@ -166,7 +166,7 @@ tests, workflow retrieval and REST/MCP retrieval rechecks deletion state before 
 | PUT | `/document/image/batch_create` | 批量导入图片文档 |
 
 预览使用 JSON：`{"file_id_list": ["<uploaded-file-uuid>"], "doc_strategy": {...}}`，
-文件 ID 必填、不可重复且最多 50 个，同时受知识库文件数量限制。仅接受当前用户的临时文件
+文件 ID 必填、不可重复，预览与导入的数量上限均使用知识库的 `file_count_limit` 配置（默认 50），可配置超过 50。仅接受当前用户的临时文件
 或当前知识库的文件；校验实际图片格式和大小后复用原文件，不重复存储。`doc_strategy` 可选。批量导入提交
 `{"file_id_list": [...], "doc_strategy": {...}}`，其中 `doc_strategy` 可选。
 `file_id_list` 支持当前用户上传的临时图片 ID 和当前知识库已生成预览的图片文件 ID，可不经过预览直接导入。

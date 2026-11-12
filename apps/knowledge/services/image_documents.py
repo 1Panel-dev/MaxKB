@@ -250,7 +250,7 @@ class ImageDocumentService:
         file_list = list(files)
         if not file_list:
             raise AppApiException(500, _("Please upload at least one image"))
-        count_limit = min(50, knowledge.file_count_limit)
+        count_limit = knowledge.file_count_limit
         if len(file_list) > count_limit:
             raise AppApiException(
                 500,
@@ -315,7 +315,7 @@ class ImageDocumentService:
     ) -> List[Dict]:
         knowledge = self.get_knowledge()
         ordered_ids = [str(file_id) for file_id in file_ids]
-        if not ordered_ids or len(ordered_ids) > min(50, knowledge.file_count_limit):
+        if not ordered_ids or len(ordered_ids) > knowledge.file_count_limit:
             raise AppApiException(500, _("Invalid number of image files"))
         files = self._get_uploaded_image_files(ordered_ids)
         source_files = [files[file_id] for file_id in ordered_ids]
@@ -381,7 +381,7 @@ class ImageDocumentService:
         ordered_ids = list(dict.fromkeys(str(file_id) for file_id in file_ids))
         if not ordered_ids:
             raise AppApiException(500, _("Please select at least one image preview"))
-        if len(ordered_ids) > min(50, knowledge.file_count_limit):
+        if len(ordered_ids) > knowledge.file_count_limit:
             raise AppApiException(500, _("Invalid number of image files"))
         files_by_id = self._get_uploaded_image_files(ordered_ids)
         normalized_strategy = normalize_document_strategy(strategy)

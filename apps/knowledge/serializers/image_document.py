@@ -11,7 +11,6 @@ from knowledge.services.image_documents import ImageDocumentService
 
 
 class ImagePreviewUploadRequest(DocumentInstanceFileIdsSerializer):
-    file_id_list = serializers.ListField(child=serializers.UUIDField(), allow_empty=False, max_length=50)
     doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
 
@@ -36,9 +35,7 @@ class ImagePreviewUpdateRequest(serializers.Serializer):
 
 
 class ImagePreviewBatchCreateRequest(serializers.Serializer):
-    file_id_list = serializers.ListField(
-        child=serializers.UUIDField(), allow_empty=False, max_length=50, label=_("image file ids")
-    )
+    file_id_list = serializers.ListField(child=serializers.UUIDField(), allow_empty=False, label=_("image file ids"))
     doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
 
