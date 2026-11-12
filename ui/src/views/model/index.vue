@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import type { Dict, ModelItem, ModelProviderItem, OptionItem } from '@/api/types'
 import { MODEL_TYPE_LABELS } from '@/constants'
 import CommonApi from '@/api/admin/workspace/common'
@@ -11,13 +11,8 @@ import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import ModelCard from './model-card/ModelCard.vue'
 import ButtonAddModel from './create-model/ButtonAddModel.vue'
 import ModelProvider from './components/ModelProvider.vue'
-import {
-  AuthorizeModelAction,
-  DeleteModelAction,
-  EditModelAction,
-  ParamSettingAction,
-  RelatedResourcesModelAction,
-} from './model-card/action-dropdown'
+import EditModelDrawer from './model-card/action-dropdown/edit-model-action/EditModelDrawer.vue'
+import { AuthorizeModelAction, DeleteModelAction, ParamSettingAction, RelatedResourcesModelAction } from './model-card/action-dropdown'
 import perm from '@/permission/index.ts'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
@@ -84,6 +79,17 @@ function handleProviderSelect(provider: ModelProviderItem) {
   loadModels()
 }
 
+/* 卡片与菜单共用编辑抽屉，沿用模型编辑权限。 */
+const editDrawerMounted = ref(false)
+const editModelDrawerRef = useTemplateRef<InstanceType<typeof EditModelDrawer>>('editModelDrawerRef')
+
+async function handleOpenEditModel(model: ModelItem) {
+  if (isShared.value || !perm.model.workspace.modify(model.id) || editDrawerMounted.value) return
+  editDrawerMounted.value = true
+  await nextTick()
+  editModelDrawerRef.value?.open(getModelProvider(model), model)
+}
+
 onMounted(() => {
   Promise.all([loadModelProviders(), loadModels()])
 })
@@ -100,7 +106,13 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <ButtonAddModel v-if="!isShared && perm.model.workspace.create()" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" :api="ModelApi" />
+          <ButtonAddModel
+            v-if="!isShared && perm.model.workspace.create()"
+            :current-provider="currentProvider"
+            :providers="modelProviders"
+            @refresh="loadModels"
+            :api="ModelApi"
+          />
         </div>
       </component>
       <div v-loading="loading">
@@ -113,16 +125,27 @@ onMounted(() => {
               :refresh="loadModels"
               :shared="isShared"
               :disabled="isShared"
+              @click="handleOpenEditModel(model)"
             >
               <template #action-dropdown>
                 <!-- 编辑 -->
-                <EditModelAction v-if="perm.model.workspace.modify(model.id)" label="编辑" :api="ModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
+                <MkAction v-if="perm.model.workspace.modify(model.id)" label="编辑" icon="icon_edit_outlined" @click="handleOpenEditModel(model)" />
                 <!-- 模型参数设置 -->
-                <ParamSettingAction v-if="model.model_type !== 'RERANKER' && perm.model.workspace.paramSetting(model.id)" label="模型参数设置" :api="ModelApi" :model="model" />
+                <ParamSettingAction
+                  v-if="model.model_type !== 'RERANKER' && perm.model.workspace.paramSetting(model.id)"
+                  label="模型参数设置"
+                  :api="ModelApi"
+                  :model="model"
+                />
                 <!-- 资源授权 -->
                 <AuthorizeModelAction v-if="perm.model.workspace.auth(model.id)" label="资源授权" :model="model" />
                 <!-- 查看关联资源 -->
-                <RelatedResourcesModelAction v-if="perm.model.workspace.relateMap(model.id)" label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
+                <RelatedResourcesModelAction
+                  v-if="perm.model.workspace.relateMap(model.id)"
+                  label="查看关联资源"
+                  :api="RelatedResourcesApi"
+                  :model="model"
+                />
                 <!-- 删除 -->
                 <DeleteModelAction v-if="perm.model.workspace.delete(model.id)" label="删除" :api="ModelApi" :model="model" @refresh="loadModels" />
               </template>
@@ -133,6 +156,7 @@ onMounted(() => {
       </div>
     </template>
   </MkViewLayout>
+  <EditModelDrawer v-if="editDrawerMounted" ref="editModelDrawerRef" :api="ModelApi" @closed="editDrawerMounted = false" @refresh="loadModels" />
 </template>
 
 <style scoped lang="scss"></style>
