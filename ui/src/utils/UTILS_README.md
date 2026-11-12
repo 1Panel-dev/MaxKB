@@ -87,6 +87,8 @@ MkTable、MkFormList 的排序优先使用其公开属性；普通列表再直�
 资源范围定义见 [ROUTE_README.md](../router/ROUTE_README.md#资源范围判断)。
 `resource-context.ts` 提供 getWorkspaceId、getResourceScope 和四种 isXxxResource 判断。
 非组件代码通过 getWorkspaceId 获取工作空间；页面／组件通过现有判断读取当前资源范围。
+Routing 守卫评估目标路由权限时使用 `withRouteWorkspace(route, fn)` 将该路由的 workspaceId 作为
+判定上下文，此时 router.currentRoute 尚未更新为待跳转路由，不能直接读取。
 isWorkspaceResource 仅匹配 workspace，不包含 workspace-shared；未配置范围时不推测来源。
 
 ## VNode 插槽内容判断
