@@ -40,7 +40,7 @@ from knowledge.models import (
 from knowledge.services import validate_knowledge_file_size
 from maxkb.const import CONFIG
 from rest_framework import serializers
-from system_manage.models import ChatUserApiKey, WorkspaceUserResourcePermission
+from system_manage.models import ChatUserApiKey, WorkspaceUserGroupResourcePermission, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping, ResourceType
 from tools.serializers.tool import UploadedFileField
 from users.models import User
@@ -417,7 +417,7 @@ def _check_workspace_resource_permission(
         else ["VIEW", "MANAGE"]
     )
     if (
-        not QuerySet(WorkspaceUserResourcePermission)
+        QuerySet(WorkspaceUserResourcePermission)
         .filter(
             target=target_id,
             workspace_id=workspace_id,
@@ -427,7 +427,20 @@ def _check_workspace_resource_permission(
         )
         .exists()
     ):
-        _deny()
+        return
+    if (
+        QuerySet(WorkspaceUserGroupResourcePermission)
+        .filter(
+            target=target_id,
+            workspace_id=workspace_id,
+            user_group__user_relations__user_id=user_id,
+            auth_target_type=auth_target_type,
+            permission_list__overlap=permission_list,
+        )
+        .exists()
+    ):
+        return
+    _deny()
 
 
 class FileSerializer(serializers.Serializer):
