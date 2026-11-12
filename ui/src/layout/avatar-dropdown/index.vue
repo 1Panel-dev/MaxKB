@@ -3,6 +3,7 @@ import { ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import LoginApi from '@/api/admin/auth/login'
 import { LOGIN_METHOD } from '@/api/enums'
+import { LOCALE_OPTIONS, type Locale } from '@/locales/config'
 import { useStore } from '@/stores'
 import ChangePasswordDialog from './ChangePasswordDialog.vue'
 import AboutDialog from './AboutDialog.vue'
@@ -11,16 +12,9 @@ import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'AvatarDropdown' })
 
-type Language = 'en' | 'zh-CN' | 'zh-TW'
-
-const currentLanguage = ref<Language>('zh-CN')
+const currentLanguage = ref<Locale>('zh-CN')
 const router = useRouter()
 const { auth, user, theme } = useStore()
-const languages: Array<{ label: string; value: Language }> = [
-  { label: 'English', value: 'en' },
-  { label: '简体中文', value: 'zh-CN' },
-  { label: '繁體中文', value: 'zh-TW' },
-]
 
 // 修改当前账号密码。
 const changePasswordDialogRef = ref<InstanceType<typeof ChangePasswordDialog>>()
@@ -104,7 +98,7 @@ function toUrl(url?: string) {
               <template #dropdown>
                 <MkDropdownMenu class="w-52">
                   <MkDropdownItem
-                    v-for="language in languages"
+                    v-for="language in LOCALE_OPTIONS"
                     :key="language.value"
                     selectable
                     :selected="currentLanguage === language.value"

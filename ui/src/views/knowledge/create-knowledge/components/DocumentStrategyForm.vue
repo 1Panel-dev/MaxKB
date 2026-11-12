@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 import { computed, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
@@ -29,10 +30,6 @@ const visualModelId = computed({
   },
 })
 
-const splitPatternOptions = ['#', '##', '###', '####', '#####', '######'].map((heading) => ({
-  label: heading,
-  value: `(?m)^${heading} .*`,
-}))
 const splitPatterns = ref<string[]>([])
 const splitOptions = [
   { value: 'smart', title: '智能分段（推荐）', desc: '不了解如何设置分段规则时推荐使用智能分段' },
@@ -163,7 +160,7 @@ defineExpose({ validate, getStrategy, setStrategy })
                   </span>
                 </template>
                 <el-select v-model="splitPatterns" multiple filterable allow-create default-first-option placeholder="请选择分段标识" class="w-full">
-                  <el-option v-for="pattern in splitPatternOptions" :key="pattern.value" :label="pattern.label" :value="pattern.value" />
+                  <el-option v-for="pattern in DOCUMENT_SPLIT_PATTERN_OPTIONS" :key="pattern.value" :label="pattern.label" :value="pattern.value" />
                 </el-select>
               </el-form-item>
               <el-form-item label="分段长度">
@@ -173,7 +170,7 @@ defineExpose({ validate, getStrategy, setStrategy })
                 <template #label>
                   <span class="flex-align-center gap-1">
                     子块长度
-                    <MkTooltip content="子块长度仅用户向量检索，命中后将回溯显示其所在分段" placement="right">
+                    <MkTooltip content="子块长度仅用于向量检索，命中后将回溯显示其所在分段" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
                     </MkTooltip>
                   </span>

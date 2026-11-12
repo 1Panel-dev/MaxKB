@@ -18,6 +18,7 @@ Pinia 3、Element Plus、Tailwind CSS 4 和 Sass；工作流画布基于 LogicFl
 | [VIEW_README.md](src/views/VIEW_README.md)                   | 页面职责、功能本地组织与业务约束     |
 | [WORKFLOW_README.md](src/workflow-canvas/WORKFLOW_README.md) | 画布内核、节点、资源查询与接入接口   |
 | [CONSTANT_README.md](src/constants/CONSTANT_README.md)       | 共享展示常量                         |
+| [LOCALE_README.md](src/locales/LOCALE_README.md)             | 国际化分类、语言状态与使用约定       |
 | [UTILS_README.md](src/utils/UTILS_README.md)                 | 共享工具函数与组合式函数             |
 
 新增专题规则文档时补充此索引；仅在目录、公开接口或使用规则变化时同步对应章节。
@@ -43,7 +44,7 @@ Pinia 3、Element Plus、Tailwind CSS 4 和 Sass；工作流画布基于 LogicFl
 | `src/constants/`、`src/utils/`          | 跨功能常量与工具                                         |
 | `src/assets/`、`public/`                | 源码导入资源／需要保留原文件名和 URL 的静态文件          |
 
-国际化尚未集成，未创建 `src/locales/`。文件放入现有功能边界，不创建平行的顶层结构。
+国际化基础及分类规则见 [LOCALE_README.md](src/locales/LOCALE_README.md)。文件放入现有功能边界，不创建平行的顶层结构。
 各入口复用自己的 Pinia：Admin 使用 `@/stores/admin`，Chat 使用 `@/stores/chat` 的 `useStore()`；
 Store 内部协调状态时可直接引用同入口的具体 Store，避免聚合入口循环依赖。
 `src/stores/index.ts` 当前是 Admin 兼容入口，不能用它获取 Chat Store。

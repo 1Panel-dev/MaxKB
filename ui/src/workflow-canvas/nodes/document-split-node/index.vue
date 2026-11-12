@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 import type { FormInstance } from 'element-plus'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { createAnchorGuard } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import { DOCUMENT_SPLIT_STRATEGY_LABELS, splitPatternOptions } from './constant'
+import { DOCUMENT_SPLIT_STRATEGY_LABELS } from './constant'
 
 defineOptions({ name: 'WorkflowDocumentSplitNode' })
 
@@ -188,7 +189,12 @@ onBeforeUnmount(() => anchorGuard.reset())
             placeholder="请选择分段标识"
             @visible-change="anchorGuard.setOverlayVisible('patterns', $event)"
           >
-            <el-option v-for="pattern in splitPatternOptions" :key="pattern.value" :label="pattern.label" :value="pattern.value"></el-option>
+            <el-option
+              v-for="pattern in DOCUMENT_SPLIT_PATTERN_OPTIONS"
+              :key="pattern.value"
+              :label="pattern.label"
+              :value="pattern.value"
+            ></el-option>
           </el-select>
           <NodeCascader v-else :node-model="model" class="w-full!" placeholder="请选择引用变量" v-model="formData.patterns_reference" />
         </el-form-item>

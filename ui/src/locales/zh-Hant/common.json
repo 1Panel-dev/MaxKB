@@ -1,0 +1,5 @@
+{
+  "actions": { "goHome": "返回首頁" },
+  "fields": { "language": { "label": "介面語言" } },
+  "errors": { "notFound": { "description": "頁面不存在或已被刪除" } }
+}

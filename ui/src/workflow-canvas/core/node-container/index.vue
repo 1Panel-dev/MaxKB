@@ -263,7 +263,7 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-  <div class="workflow-node-container relative overflow-visible" @mousedown="handleNodeMousedown">
+  <div class="workflow-node-container relative overflow-visible" @mousedown="handleNodeMousedown" @wheel="handleNodeWheel">
     <div ref="stepContainerRef" class="step-container p-4" :class="{ isSelected: nodeSelected, error: node_status !== 200 }">
       <div>
         <div class="flex-between">
