@@ -316,9 +316,11 @@ class ModelSerializer(serializers.Serializer):
         credential = serializers.DictField(required=True, label=_("certification information"))
         workspace_id = serializers.CharField(required=False, label=_("workspace id"), max_length=128)
 
-        def is_valid(self, *, raise_exception=False):
+        def is_valid(self, *, raise_exception=False, workspace_id=None):
             if not super().is_valid(raise_exception=raise_exception):
                 return False
+            if workspace_id is None:
+                workspace_id = self.data.get("workspace_id", "None")
             provider = self.data.get("provider")
             try:
                 provider_handler = ModelProvideConstants[provider]
@@ -342,11 +344,7 @@ class ModelSerializer(serializers.Serializer):
                         400,
                         _("The field and default_value fields are required for the {index}th item").format(index=index),
                     )
-            if (
-                QuerySet(Model)
-                .filter(name=self.data.get("name"), workspace_id=self.data.get("workspace_id", "None"))
-                .exists()
-            ):
+            if QuerySet(Model).filter(name=self.data.get("name"), workspace_id=workspace_id).exists():
                 raise AppApiException(
                     500, _("base model【{model_name}】already exists").format(model_name=self.data.get("name"))
                 )
@@ -364,7 +362,7 @@ class ModelSerializer(serializers.Serializer):
             status = Status.SUCCESS
             if with_valid:
                 try:
-                    self.is_valid(raise_exception=True)
+                    self.is_valid(raise_exception=True, workspace_id=workspace_id)
                 except AppApiException as e:
                     if e.code == ValidCode.model_not_fount:
                         status = Status.DOWNLOAD
