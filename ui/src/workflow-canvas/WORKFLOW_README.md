@@ -50,6 +50,8 @@ src/workflow-canvas/
 `visible-change` 状态，并在节点组件卸载时调用 `reset()`；不要通过 Teleport 到 `body` 或增加
 `z-index` 绕过画布的缩放和 SVG 绘制顺序。
 
+节点容器统一通过 `handleNodeWheel()` 隔离滚轮冒泡，保留下拉浮层等内部区域的原生滚动，避免画布处理滚轮并取消默认滚动。
+
 `component/NodeCascader.vue` 提供上游变量选择，已在内部统一管理下拉层的锚点保护，使用方无需重复接入。
 组件在选值回写及 Vue 更新完成后触发表单校验，清空统一回写空数组；`validateEvent` 默认为
 `true`，设为 `false` 可关闭自动校验。
