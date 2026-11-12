@@ -239,7 +239,11 @@ class ChatUserMCPToolHandler:
         return application_ids
 
     def get_applications(self):
-        return QuerySet(Application).filter(id__in=self.get_application_ids(), is_publish=True).order_by("name")
+        return (
+            QuerySet(Application)
+            .filter(id__in=self.get_application_ids(), is_portal=True, is_publish=True)
+            .order_by("name")
+        )
 
     def is_accessible_application(self, application_id):
         try:
