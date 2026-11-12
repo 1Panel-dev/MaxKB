@@ -11,12 +11,14 @@ import datetime
 import hashlib
 import io
 import json
+import math
 import mimetypes
 import pickle
 import re
 import secrets
 import shutil
 import uuid
+from decimal import Decimal, ROUND_HALF_UP
 from functools import lru_cache, reduce
 from typing import Dict, List
 
@@ -32,6 +34,43 @@ from pydub import AudioSegment
 
 from ..database_model_manage.database_model_manage import DatabaseModelManage
 from ..exception.app_exception import AppApiException
+
+
+_NUMBER_UNITS = ["", "K", "M", "B", "T"]
+
+
+def _to_fixed(value, digits):
+    if value is None:
+        value = 0
+    dec = Decimal(str(value)).quantize(Decimal("1").scaleb(-digits), rounding=ROUND_HALF_UP)
+    return f"{dec:.{digits}f}"
+
+
+def _to_thousands(text):
+    return re.sub(r"\B(?=(\d{3})+(?!\d))", ",", text)
+
+
+def number_format(value):
+    """Replicate the frontend numberFormat util (thousands separators / 'k' abbreviation)."""
+    if value is None:
+        value = 0
+    if value < 1000:
+        return _to_thousands(str(value))
+    return f"{_to_thousands(_to_fixed(value / 1000, 1))}k"
+
+
+def format_token_number(value):
+    """Replicate the frontend formatTokenNumber util (K/M/B/T abbreviation)."""
+    if value is None or not isinstance(value, (int, float)) or not math.isfinite(value):
+        return "-"
+    normalized = float(value)
+    unit_index = 0
+    while abs(normalized) >= 1000 and unit_index < len(_NUMBER_UNITS) - 1:
+        normalized /= 1000
+        unit_index += 1
+    if unit_index == 0:
+        return str(math.floor(normalized + 0.5))
+    return f"{_to_fixed(normalized, 1)}{_NUMBER_UNITS[unit_index]}"
 
 
 def _legacy_md5_hash(row_password):
