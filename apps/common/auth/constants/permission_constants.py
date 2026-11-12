@@ -1029,7 +1029,7 @@ class PermissionConstants(Enum):
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
-            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE],
+            scope=[PermissionScopeConstants.WORKSPACE, PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
     )
 
