@@ -465,7 +465,9 @@ class UserManageSerializer(serializers.Serializer):
                     user_id = str(relation.user_id)
                     role_id = relation.role_id
                     workspace_id = relation.workspace_id
-                    if not is_admin and relation.role.type == RoleConstants.ADMIN.name:
+                    # 非内置系统管理员只能看到除内置系统管理员之外的角色
+                    is_builtin_admin_role = relation.role.internal and relation.role.type == RoleConstants.ADMIN.name
+                    if not is_admin and is_builtin_admin_role:
                         continue
                     user_role_mapping[user_id].add(relation.role.role_name)
                     if relation.role.type == RoleConstants.ADMIN.name:
@@ -504,7 +506,9 @@ class UserManageSerializer(serializers.Serializer):
             if role_model and user_role_relation_model:
                 # 获取当前用户的所有角色 判断是不是内置的系统管理员
                 is_admin = user_role_relation_model.objects.filter(
-                    user_id=user_id, role__type=RoleConstants.ADMIN.name
+                    user_id=user_id,
+                    role__type=RoleConstants.ADMIN.name,
+                    role__internal=True,
                 ).exists()
                 user_ids = [user["id"] for user in result["records"]]
                 user_role_mapping, user_role_setting_mapping, user_role_workspace_mapping = _get_user_roles(
@@ -513,10 +517,10 @@ class UserManageSerializer(serializers.Serializer):
 
                 # 将角色信息添加回用户数据中
                 for user in result["records"]:
-                    user_id = str(user["id"])
-                    user["role_name"] = user_role_mapping.get(user_id, [])
-                    user["role_setting"] = user_role_setting_mapping.get(user_id, [])
-                    user["role_workspace"] = user_role_workspace_mapping.get(user_id, [])
+                    record_user_id = str(user["id"])
+                    user["role_name"] = user_role_mapping.get(record_user_id, [])
+                    user["role_setting"] = user_role_setting_mapping.get(record_user_id, [])
+                    user["role_workspace"] = user_role_workspace_mapping.get(record_user_id, [])
 
             # 用户设置用户组
             return result
