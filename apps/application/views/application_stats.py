@@ -284,8 +284,8 @@ class ApplicationStats(APIView):
             tags=[_("Application")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission(),
-            PermissionConstants.APPLICATION_EXPORT.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.APPLICATION_OVERVIEW_EXPORT.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_OVERVIEW_EXPORT.get_workspace_permission_workspace_manage_role(),
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.APPLICATION.get_workspace_application_permission()],
@@ -318,8 +318,8 @@ class ApplicationStats(APIView):
             tags=[_("Application")],  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission(),
-            PermissionConstants.APPLICATION_EXPORT.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.APPLICATION_OVERVIEW_EXPORT.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_OVERVIEW_EXPORT.get_workspace_permission_workspace_manage_role(),
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.APPLICATION.get_workspace_application_permission()],
