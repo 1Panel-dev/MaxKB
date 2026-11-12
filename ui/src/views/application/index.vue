@@ -28,7 +28,6 @@ import ButtonCreateApplication from './components/ButtonCreateApplication.vue'
 import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
 import ButtonBatchCleanStrategy from './components/ButtonBatchCleanStrategy.vue'
 import perm from '@/permission/index.ts'
-import { getWorkspaceId } from '@/utils/resource-context.ts'
 
 const route = useRoute()
 const router = useRouter()
@@ -201,7 +200,7 @@ function handleBatchDelete() {
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip v-if="perm.application.workspace.folderCreate(getWorkspaceId() || '')" content="创建文件夹" placement="top">
+        <MkTooltip v-if="perm.application.workspace.folderCreateWorkspace()" content="创建文件夹" placement="top">
           <el-button @click="handleCreateFolder" text type="primary" class="-mr-1">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>

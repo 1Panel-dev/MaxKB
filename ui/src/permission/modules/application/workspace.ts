@@ -83,6 +83,10 @@ const workspace = {
 /**
  * 工作空间「智能体」「文件夹」创建权限
  */
+  folderCreateWorkspace: () => can(P.APPLICATION_FOLDER_CREATE),
+/**
+ * 工作空间「智能体」「文件夹」创建权限
+ */
   folderCreate: (id: string) => canRes(P.APPLICATION_FOLDER_CREATE, id),
 /**
  * 工作空间「智能体」「文件夹」只读权限
