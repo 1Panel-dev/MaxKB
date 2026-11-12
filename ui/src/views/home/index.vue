@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import HomepageApi from '@/api/admin/workspace/homepage'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail } from '@/api/types'
+import perm from '@/permission'
 import HomeQuickCreate from './components/HomeQuickCreate.vue'
 import HomeResourceOverview from './components/HomeResourceOverview.vue'
 import HomeStatistics from './components/HomeStatistics.vue'
@@ -13,24 +14,26 @@ const workspaceId = computed(() => String(route.params.workspaceId))
 
 /* 监控智能体筛选 */
 const applicationId = ref('all')
-const applications = ref<ApplicationDetail[]>([])
+const applicationsList = ref<ApplicationDetail[]>([])
 const applicationsLoading = ref(false)
 const selectedApplication = ref<ApplicationDetail>()
 function loadApplications(query = '') {
+  if (!perm.application.workspace.isShare()) return
   applicationsLoading.value = true
   return ApplicationApi.getApplicationPage({ currentPage: 1, pageSize: 200 }, { name: query })
     .then((result) => {
-      applications.value = result.records
+      applicationsList.value = result.records
     })
     .finally(() => {
       applicationsLoading.value = false
     })
 }
-function handleApplicationChange(value: string) {
-  selectedApplication.value = applications.value.find((application) => application.id === value)
+function handleApplicationChange(value: string | undefined) {
+  applicationId.value = value || 'all'
+  selectedApplication.value = applicationsList.value.find((application) => application.id === applicationId.value)
 }
 onMounted(() => {
-  void loadApplications()
+  // void loadApplications()
 })
 </script>
 <template>
@@ -43,8 +46,10 @@ onMounted(() => {
     <!-- 监控 -->
     <HomeStatistics class="mt-4" :workspace-id="workspaceId" :application-id="applicationId" :api="HomepageApi">
       <template #application="{ loading }">
+        <!-- 筛选智能体，清除后恢复全部智能体 -->
         <el-select
           v-model="applicationId"
+          clearable
           filterable
           remote
           fit-input-width
@@ -60,7 +65,7 @@ onMounted(() => {
               <span>全部智能体</span>
             </div>
           </el-option>
-          <template v-for="application in applications" :key="application.id">
+          <template v-for="application in applicationsList" :key="application.id">
             <el-option :label="application.name" :value="application.id">
               <div class="flex-align-center gap-2">
                 <ApplicationIcon :icon="application.icon" :size="20" class="shrink-0" />
