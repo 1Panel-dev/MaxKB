@@ -495,7 +495,7 @@ FILE_AUTH_COOKIE = "mk_file_auth"
 
 def get_chat_user_cookie_path(access_token):
     """对话用户登录时写入文件凭证 cookie 的路径；退出登录时按同一路径删除。"""
-    return f"/chat/{access_token + '/' if access_token else ''}"
+    return f"/chat/{access_token or 'portal'}"
 
 
 def clear_file_auth_cookie(response: HttpResponse, access_token):
