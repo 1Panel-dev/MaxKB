@@ -20,16 +20,19 @@ function load(path, resolveDependency) {
 function createUpload(scope) {
   const requests = []
   const emitted = []
+  const warnings = []
   const strategy = { image_understand: { enable: false } }
   const refs = {
     processingRef: Vue.ref({ validate: async () => true, getStrategy: () => strategy }),
     previewRef: Vue.ref({ validate: () => true }),
   }
   function dependency(id) {
-    if (id === 'vue') return { ...Vue, provide() {}, useTemplateRef: (key) => refs[key] ?? Vue.ref() }
+    if (id === 'vue') return { ...Vue, provide() {}, useTemplateRef: (key) => refs[key] ?? Vue.ref(), useModel: () => drawer.previewDocuments }
     if (id === 'vue-router') return { useRoute: () => ({ meta: { resourceScope: scope }, params: { knowledgeId: 'knowledge-a' } }) }
     if (id === '@/utils/resource-context') return { getResourceScope: () => scope }
-    if (id === '@/utils/message') return { MsgSuccess() {}, MsgWarning() {} }
+    if (id === '@/utils/message') return { MsgSuccess() {}, MsgWarning: (message) => warnings.push(message), MsgConfirm: () => Promise.resolve() }
+    if (id === '@/utils/common') return { getFileUrl: () => '' }
+    if (id === '@/utils/icon') return { getFileIconUrl: () => '' }
     if (id === '@/api/admin/core/request')
       return Object.fromEntries(
         ['post', 'put'].map((method) => [
@@ -54,7 +57,12 @@ function createUpload(scope) {
   )
   drawer.selectedFiles.value = [{ status: 'success', file_id: 'image-a' }]
   drawer.open()
-  return { drawer, requests, emitted, strategy, api: context.resourceApi.image }
+  const createPreview = () =>
+    load('views/knowledge-detail/library/document/components/DocumentImportPreview.vue', dependency).default.setup(
+      { knowledgeId: 'knowledge-a' },
+      { expose() {} },
+    )
+  return { drawer, requests, emitted, warnings, strategy, createPreview, api: context.resourceApi.image }
 }
 
 for (const [scope, prefix] of [
@@ -106,4 +114,35 @@ test('图片预览导入携带编辑后的标题、正文和关联问题', async
 
 test('工作空间共享知识库不提供图片写入 API', () => {
   assert.equal(createUpload('workspace-shared').api, undefined)
+})
+
+test('删除图片预览的唯一分段后禁止导入，重新生成后恢复', async () => {
+  const { drawer, requests, emitted, warnings, createPreview } = createUpload('system-shared')
+  await drawer.handleGeneratePreview()
+  const preview = createPreview()
+  await preview.handleDeleteParagraph(0)
+  await drawer.handleSubmit()
+  assert.equal(requests.length, 1)
+  assert.equal(drawer.canImport.value, false)
+  assert.deepEqual(emitted, [])
+  assert.equal(drawer.visible.value, true)
+  assert.ok(warnings.at(-1).includes('分段'))
+
+  drawer.handlePrevious()
+  await drawer.handleGeneratePreview()
+  assert.equal(drawer.canImport.value, true)
+  await drawer.handleSubmit()
+  assert.equal(requests.at(-1).method, 'put')
+  assert.deepEqual(emitted, [['refresh']])
+})
+
+test('批量预览中任一图片分段被删除时不提交整批导入', async () => {
+  const { drawer, requests, createPreview } = createUpload('system-resource')
+  await drawer.handleGeneratePreview()
+  drawer.previewDocuments.value.push({ source_file_id: 'image-b', resource_type: 'image', name: 'second.png', content: [{ content: '第二张图片' }] })
+  await createPreview().handleDeleteParagraph(0)
+  await drawer.handleSubmit()
+  assert.equal(requests.length, 1)
+  assert.equal(drawer.canImport.value, false)
+  assert.equal(drawer.previewDocuments.value[1].content.length, 1)
 })

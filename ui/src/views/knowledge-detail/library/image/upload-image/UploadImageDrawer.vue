@@ -29,6 +29,9 @@ const activeStep = ref(0)
 const processingMounted = ref(false)
 const previewVisible = ref(false)
 const previewDocuments = ref<(ImageDocumentPreview & DocumentSplitResult)[]>([])
+const canImport = computed(
+  () => !previewVisible.value || (previewDocuments.value.length > 0 && previewDocuments.value.every((preview) => preview.content.length > 0)),
+)
 const selectedFiles = ref<DragUploadFile[]>([])
 const successfulFiles = computed(() => selectedFiles.value.filter((file) => file.status === 'success'))
 const countLimit = computed(() => props.fileCountLimit ?? 50)
@@ -93,6 +96,10 @@ function handleGeneratePreview() {
 /* 图片导入：预览后提交文件 ID 与分段草稿，未预览直接提交上传成功的图片 ID。 */
 async function handleSubmit() {
   if (!validateFiles() || (previewVisible.value && !previewRef.value?.validate())) return
+  if (!canImport.value) {
+    MsgWarning('图片预览没有分段，请返回重新生成预览')
+    return
+  }
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
   if (!previewVisible.value && fileIds.length !== successfulFiles.value.length) {
     MsgWarning('没有上传成功的文件，请重新上传')
@@ -178,7 +185,7 @@ defineExpose({ open })
       <!-- 按图片处理策略生成预览 -->
       <el-button v-if="activeStep === 1 && !previewVisible" plain :loading="loading" @click="handleGeneratePreview">生成预览</el-button>
       <!-- 导入处理后的图片 -->
-      <el-button v-if="activeStep === 1" type="primary" :loading="loading" @click="handleSubmit">开始导入</el-button>
+      <el-button v-if="activeStep === 1" type="primary" :loading="loading" :disabled="!canImport" @click="handleSubmit">开始导入</el-button>
     </template>
   </MkDrawer>
 </template>

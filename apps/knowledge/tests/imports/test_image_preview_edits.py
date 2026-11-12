@@ -125,3 +125,12 @@ class ImagePreviewEditImportTests(TestCase):
         with self.assertRaises(AppApiException):
             self.import_file(content=[{"content": "正文", "problem_list": [{"content": "问题"}]}])
         self.assertFalse(Document.objects.filter(knowledge=self.knowledge).exists())
+
+    def test_deleted_preview_paragraph_is_rejected_without_creating_image_document(self):
+        with self.assertRaises(ValidationError):
+            self.import_file(content=[])
+        self.assertFalse(Document.objects.filter(knowledge=self.knowledge).exists())
+        self.assertFalse(Paragraph.objects.filter(knowledge=self.knowledge).exists())
+        self.file.refresh_from_db()
+        self.assertEqual(self.file.source_type, FileSourceType.TEMPORARY_120_MINUTE)
+        self.refresh.assert_not_called()
