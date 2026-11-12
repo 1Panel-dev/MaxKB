@@ -6,6 +6,7 @@ import SystemApplicationApi from '@/api/admin/system/resource-management/applica
 import type { ApplicationDetail, WorkspaceItem } from '@/api/types'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import { useStore } from '@/stores'
+import perm from '@/permission'
 import HomeResourceOverview from '@/views/home/components/HomeResourceOverview.vue'
 import HomeStatistics from '@/views/home/components/HomeStatistics.vue'
 import HomeRankings from '@/views/home/components/ranking/HomeRankings.vue'
@@ -30,39 +31,31 @@ function handleWorkspaceChange(workspaceId: string) {
   if (workspaceId === selectedWorkspaceId.value) return
   selectedWorkspaceId.value = workspaceId
   applicationId.value = 'all'
-  applications.value = []
+  applicationsList.value = []
   selectedApplication.value = undefined
 }
 
 /* 监控智能体筛选 */
 const applicationId = ref('all')
-const applications = ref<ApplicationDetail[]>([])
+const applicationsList = ref<ApplicationDetail[]>([])
 const applicationsLoading = ref(false)
 const selectedApplication = ref<ApplicationDetail>()
-async function fetchApplications(query: string) {
+function loadApplications(query = '') {
+  if (!perm.application.system.read) return
   applicationsLoading.value = true
   const workspaceFilter = selectedWorkspaceId.value ? { workspace_ids: JSON.stringify([selectedWorkspaceId.value]) } : {}
-  try {
-    const result = await SystemApplicationApi.getApplicationPage({ currentPage: 1, pageSize: 200 }, { name: query, ...workspaceFilter })
-    applications.value = result.records
-  } finally {
-    applicationsLoading.value = false
-  }
+  return SystemApplicationApi.getApplicationPage({ currentPage: 1, pageSize: 200 }, { name: query, ...workspaceFilter })
+    .then((result) => {
+      applicationsList.value = result.records
+    })
+    .finally(() => {
+      applicationsLoading.value = false
+    })
 }
-/* 远程搜索防抖，避免输入时每次按键都发请求 */
-let searchTimer: ReturnType<typeof setTimeout> | undefined
-function loadApplications(query = '') {
-  clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => fetchApplications(query), 300)
-}
-/* 打开下拉时才按需加载智能体列表，避免进入页面就全量拉取 */
-function handleApplicationVisibleChange(visible: boolean) {
-  if (visible && !applicationsLoading.value && !applications.value.length) {
-    loadApplications('')
-  }
-}
-function handleApplicationChange(value: string) {
-  selectedApplication.value = applications.value.find((application) => application.id === value)
+
+function handleApplicationChange(value: string | undefined) {
+  applicationId.value = value || 'all'
+  selectedApplication.value = applicationsList.value.find((application) => application.id === applicationId.value)
 }
 
 onMounted(() => {
@@ -88,8 +81,10 @@ onMounted(() => {
       :api="SystemHomepageApi"
     >
       <template #application="{ loading }">
+        <!-- 筛选智能体，清除后恢复全部智能体 -->
         <el-select
           v-model="applicationId"
+          clearable
           filterable
           remote
           fit-input-width
@@ -98,7 +93,6 @@ onMounted(() => {
           :loading="applicationsLoading"
           :disabled="loading"
           @change="handleApplicationChange"
-          @visible-change="handleApplicationVisibleChange"
         >
           <el-option label="全部智能体" value="all">
             <div class="flex-align-center gap-2">
@@ -106,7 +100,7 @@ onMounted(() => {
               <span>全部智能体</span>
             </div>
           </el-option>
-          <template v-for="application in applications" :key="application.id">
+          <template v-for="application in applicationsList" :key="application.id">
             <el-option :label="application.name" :value="application.id">
               <div class="flex-align-center gap-2">
                 <ApplicationIcon :icon="application.icon" :size="20" class="shrink-0" />
