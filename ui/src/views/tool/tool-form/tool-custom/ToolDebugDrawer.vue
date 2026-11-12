@@ -157,7 +157,7 @@ defineExpose({ open })
         :closable="false"
         :title="debugSucceeded ? '运行成功' : '运行失败'"
         :type="debugSucceeded ? 'success' : 'error'"
-        class="mb-4"
+        class="mb-4!"
         show-icon
       />
       <p class="mb-2">输出</p>
