@@ -465,9 +465,8 @@ class UserManageSerializer(serializers.Serializer):
                     user_id = str(relation.user_id)
                     role_id = relation.role_id
                     workspace_id = relation.workspace_id
-                    # 非内置系统管理员只能看到除内置系统管理员之外的角色
-                    is_builtin_admin_role = relation.role.internal and relation.role.type == RoleConstants.ADMIN.name
-                    if not is_admin and is_builtin_admin_role:
+                    # 非内置系统管理员只能看到系统角色类型（ADMIN）之外的角色
+                    if not is_admin and relation.role.type == RoleConstants.ADMIN.name:
                         continue
                     user_role_mapping[user_id].add(relation.role.role_name)
                     if relation.role.type == RoleConstants.ADMIN.name:
@@ -827,7 +826,7 @@ def update_user_role(instance, user, user_id=None):
             return
 
         is_admin = workspace_user_role_mapping_model.objects.filter(
-            user_id=user_id, role_id=RoleConstants.ADMIN.name
+            user_id=user_id, role_id=RoleConstants.ADMIN.name, role__internal=True
         ).exists()
 
         if str(user.id) == "f0dd8f71-e4ee-11ee-8c84-a8a1595801ab":
@@ -858,6 +857,7 @@ def update_user_role(instance, user, user_id=None):
         if is_admin:
             workspace_user_role_mapping_model.objects.filter(user_id=user.id).delete()
         else:
+            # 非内置系统管理员看不到系统角色类型（ADMIN）的角色，保存时保留这些关系，避免被覆盖
             workspace_user_role_mapping_model.objects.filter(user_id=user.id).exclude(
                 role__type=RoleConstants.ADMIN.name
             ).delete()
