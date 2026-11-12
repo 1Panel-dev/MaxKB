@@ -9,6 +9,7 @@
 
 import datetime
 import os
+from decimal import Decimal, ROUND_HALF_UP
 from typing import List, Dict
 
 import openpyxl
@@ -37,7 +38,7 @@ from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
 from common.auth.struct.permission import Permission, Role
 from common.db.search import native_search, get_dynamics_model, page_search
-from common.utils.common import get_file_content
+from common.utils.common import format_token_number, get_file_content, number_format
 from knowledge.models import Knowledge
 from maxkb.conf import PROJECT_DIR
 from models_provider.base_model_provider import ModelTypeConst
@@ -48,6 +49,22 @@ from tools.models import Tool, ToolType
 _PERM_WITH_ROLE = ["VIEW", "MANAGE", "ROLE"]
 _PERM_DEFAULT = ["VIEW", "MANAGE"]
 TOKEN_EXPR = F("chatrecord__message_tokens") + F("chatrecord__answer_tokens")
+
+
+def _round_ratio(value, divisor):
+    if divisor <= 0:
+        return 0
+    dec = (Decimal(value) / Decimal(divisor)).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+    result = float(dec)
+    return int(result) if result.is_integer() else result
+
+
+def _proportion_percentage(value, total):
+    if not total:
+        return 0
+    dec = (Decimal(value) / Decimal(total) * 100).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+    result = min(100.0, max(0.0, float(dec)))
+    return int(result) if result.is_integer() else result
 
 
 def hasPermission(auth, permission):
@@ -305,10 +322,10 @@ class HomePageSerializer(serializers.Serializer):
                 row = [
                     index,
                     username,
-                    total_tokens,
-                    total_tokens / token_count if token_count else 0,
-                    chat_record_count,
-                    total_tokens / chat_record_count if chat_record_count else 0,
+                    format_token_number(total_tokens),
+                    _proportion_percentage(total_tokens, token_count),
+                    number_format(chat_record_count),
+                    format_token_number(_round_ratio(total_tokens, chat_record_count)),
                 ]
                 worksheet.append(row)
             response = HttpResponse(content_type="application/vnd.ms-excel")
@@ -476,10 +493,10 @@ class HomePageSerializer(serializers.Serializer):
                 row = [
                     index,
                     item.name,
-                    item.chat_record_count_total,
-                    item.chat_record_count_total / chat_record_number if chat_record_number != 0 else 0,
-                    item.chat_user_count,
-                    item.chat_user_count / item.chat_record_count_total if item.chat_record_count_total != 0 else 0,
+                    number_format(item.chat_record_count_total),
+                    _proportion_percentage(item.chat_record_count_total, chat_record_number),
+                    number_format(item.chat_user_count),
+                    number_format(_round_ratio(item.chat_record_count_total, item.chat_user_count)),
                 ]
                 worksheet.append(row)
             response = HttpResponse(content_type="application/vnd.ms-excel")
@@ -605,11 +622,11 @@ class HomePageSerializer(serializers.Serializer):
                 row = [
                     index,
                     item.name,
-                    total_tokens,
-                    total_tokens / tokens_total if tokens_total else 0,
-                    item.chat_user_count,
-                    chat_record_count_total,
-                    total_tokens / chat_record_count_total if chat_record_count_total else 0,
+                    format_token_number(total_tokens),
+                    _proportion_percentage(total_tokens, tokens_total),
+                    number_format(chat_record_count_total),
+                    number_format(item.chat_user_count),
+                    format_token_number(_round_ratio(total_tokens, chat_record_count_total)),
                 ]
                 worksheet.append(row)
             response = HttpResponse(content_type="application/vnd.ms-excel")
