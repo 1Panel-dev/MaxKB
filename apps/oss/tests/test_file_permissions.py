@@ -9,7 +9,7 @@ from common.auth.constants.permission_constants import PermissionConstants
 from common.exception.app_exception import AppUnauthorizedFailed
 from knowledge.models import Document, File, FileSourceType, Knowledge, Paragraph
 from oss.serializers.file import FileSerializer, _auth_system, _check_workspace_resource_permission
-from system_manage.models import WorkspaceUserResourcePermission
+from system_manage.models import WorkspaceUserGroupResourcePermission, WorkspaceUserResourcePermission
 from users.models import User
 
 
@@ -19,6 +19,9 @@ class FilePermissionTests(SimpleTestCase):
         self.grants = MagicMock()
         self.grants.filter.return_value = self.grants
         self.grants.exists.return_value = False
+        self.group_grants = MagicMock()
+        self.group_grants.filter.return_value = self.group_grants
+        self.group_grants.exists.return_value = False
         self.user_query = MagicMock()
         self.user_query.filter.return_value.first.return_value = SimpleNamespace(id="user")
         self.document_query = MagicMock()
@@ -32,6 +35,7 @@ class FilePermissionTests(SimpleTestCase):
             Paragraph: self.document_query,
             Knowledge: self.knowledge_query,
             WorkspaceUserResourcePermission: self.grants,
+            WorkspaceUserGroupResourcePermission: self.group_grants,
         }[model]
         self.enterContext(patch("oss.serializers.file.get_auth", return_value=self.auth))
         self.file = File(source_type=FileSourceType.DOCUMENT, source_id="document")
@@ -69,6 +73,17 @@ class FilePermissionTests(SimpleTestCase):
             target="knowledge",
             workspace_id="ws",
             user_id="user",
+            auth_target_type="KNOWLEDGE",
+            permission_list__overlap=["VIEW", "MANAGE"],
+        )
+
+    def test_user_group_view_and_manage_grants_allow_source_file_reads(self):
+        self.group_grants.exists.return_value = True
+        _auth_system(self.file, "user")
+        self.group_grants.filter.assert_called_once_with(
+            target="knowledge",
+            workspace_id="ws",
+            user_group__user_relations__user_id="user",
             auth_target_type="KNOWLEDGE",
             permission_list__overlap=["VIEW", "MANAGE"],
         )
