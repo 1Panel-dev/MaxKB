@@ -188,7 +188,6 @@ def create_agent(
 
     async def _run():
         checkpointer = MemorySaver()
-        await init_skills(skill_tool_ids, temp_dir)
         client = MultiServerMCPClient(json.loads(mcp_servers))
         tools = await client.get_tools()
         for tool in tools:
@@ -236,6 +235,8 @@ def create_agent(
 
     error = None
     try:
+        # 技能初始化含同步 ORM / 文件 IO,在当前工作线程执行,不进入事件循环
+        init_skills(skill_tool_ids, temp_dir)
         async_runner.run_async(_run)
     except Exception as e:
         error = _classify_error(e)

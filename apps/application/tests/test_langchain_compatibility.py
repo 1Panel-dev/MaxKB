@@ -404,7 +404,7 @@ class LangChainHTTPCompatibilityTests(SimpleTestCase):
 
         with (
             TemporaryDirectory(prefix="maxkb-agent-compat-") as directory,
-            patch.object(agent_module, "init_skills", new=AsyncMock()),
+            patch.object(agent_module, "init_skills", new=MagicMock()),
             patch.object(
                 agent_module,
                 "MultiServerMCPClient",
@@ -442,7 +442,7 @@ class LangChainHTTPCompatibilityTests(SimpleTestCase):
 
         with (
             TemporaryDirectory(prefix="maxkb-agent-limit-") as directory,
-            patch.object(agent_module, "init_skills", new=AsyncMock()),
+            patch.object(agent_module, "init_skills", new=MagicMock()),
             patch.object(agent_module.CONFIG, "get", return_value="1"),
             patch.object(
                 agent_module,

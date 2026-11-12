@@ -12,7 +12,6 @@ import json
 import os
 import zipfile
 
-from asgiref.sync import sync_to_async
 from django.db.models import QuerySet
 
 from common.utils.rsa_util import rsa_long_decrypt
@@ -20,11 +19,15 @@ from knowledge.models import File
 from tools.models import Tool
 
 
-async def init_skills(skill_tool_ids, temp_dir):
+def init_skills(skill_tool_ids, temp_dir):
+    """
+    同步函数：包含 ORM 查询、RSA 密钥读取(缓存未命中时查库)、文件读取与解压，
+    必须在工作线程中调用，不能在事件循环线程内执行(否则触发 SynchronousOnlyOperation 并阻塞循环)。
+    """
     if not skill_tool_ids:
         return
     skills_dir = os.path.join(temp_dir, "skills")
-    tools = await sync_to_async(lambda: list(QuerySet(Tool).filter(id__in=skill_tool_ids, is_active=True)))()
+    tools = list(QuerySet(Tool).filter(id__in=skill_tool_ids, is_active=True))
     if not tools:
         return
 
@@ -35,10 +38,10 @@ async def init_skills(skill_tool_ids, temp_dir):
         else:
             params = init_params_default_value
 
-        file = await sync_to_async(lambda t=tool: QuerySet(File).filter(id=t.code).first())()
+        file = QuerySet(File).filter(id=tool.code).first()
         if not file:
             continue
-        file_bytes = await sync_to_async(file.get_bytes)()
+        file_bytes = file.get_bytes()
 
         with zipfile.ZipFile(io.BytesIO(file_bytes), "r") as zip_ref:
             members = [m for m in zip_ref.namelist() if not m.startswith("__MACOSX/") and "__MACOSX" not in m]
