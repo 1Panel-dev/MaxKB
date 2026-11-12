@@ -626,11 +626,14 @@ class UserManageSerializer(serializers.Serializer):
                 raise AppApiException(1004, _("User does not exist"))
 
         @transaction.atomic
-        def delete(self, with_valid=True):
+        def delete(self, current_user_id, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-                self._check_not_admin()
             user_id = self.data.get("id")
+            if str(user_id) == str(current_user_id):
+                raise AppApiException(1004, _("Cannot delete current user"))
+            if with_valid:
+                self._check_not_admin()
             # TODO  需要删除授权关系
             User.objects.filter(id=user_id).delete()
             return True
@@ -788,11 +791,14 @@ class UserManageSerializer(serializers.Serializer):
     class BatchDelete(serializers.Serializer):
         ids = serializers.ListField(required=True, label=_("User IDs"))
 
-        def batch_delete(self, with_valid=True):
+        def batch_delete(self, current_user_id, with_valid=True):
             user_ids = self.data.get("ids")
             if not user_ids:
                 raise AppApiException(1004, _("User IDs cannot be empty"))
-            User.objects.filter(id__in=user_ids).exclude(id="f0dd8f71-e4ee-11ee-8c84-a8a1595801ab").delete()
+            # 批量删除时排除当前用户和系统内置用户
+            User.objects.filter(id__in=user_ids).exclude(
+                id__in=["f0dd8f71-e4ee-11ee-8c84-a8a1595801ab", str(current_user_id)]
+            ).delete()
             return True
 
     def get_all_user_list(self, nick_name=None):

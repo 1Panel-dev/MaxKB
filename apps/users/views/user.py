@@ -277,7 +277,11 @@ class UserManage(APIView):
             get_operation_object=lambda r, k: get_user_operation_object(k.get("user_id")),
         )
         def delete(self, request: Request, user_id):
-            return result.success(UserManageSerializer.Operate(data={"id": user_id}).delete(with_valid=True))
+            return result.success(
+                UserManageSerializer.Operate(data={"id": user_id}).delete(
+                    current_user_id=str(request.user.id), with_valid=True
+                )
+            )
 
         @extend_schema(
             methods=["GET"],
@@ -334,7 +338,11 @@ class UserManage(APIView):
             get_operation_object=lambda r, k: get_user_operation_object(r.data.get("ids", [])),
         )
         def post(self, request: Request):
-            return result.success(UserManageSerializer.BatchDelete({"ids": request.data}).batch_delete(with_valid=True))
+            return result.success(
+                UserManageSerializer.BatchDelete({"ids": request.data}).batch_delete(
+                    current_user_id=str(request.user.id), with_valid=True
+                )
+            )
 
     class RePassword(APIView):
         authentication_classes = [TokenAuth]
