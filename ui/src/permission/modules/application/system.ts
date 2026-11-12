@@ -91,6 +91,10 @@ const system = {
  */
   overviewRead: () => canSys(P.RESOURCE_APPLICATION_OVERVIEW_READ),
 /**
+ * 系统「智能体」「概览」导出权限
+ */
+  overviewExport: () => canSys(P.RESOURCE_APPLICATION_OVERVIEW_EXPORT),
+/**
  * 系统「智能体」「概览」嵌入第三方权限
  */
   overviewEmbed: () => canSys(P.RESOURCE_APPLICATION_OVERVIEW_EMBED),

@@ -126,6 +126,10 @@ const workspace = {
  */
   overviewRead: (id: string) => canRes(P.APPLICATION_OVERVIEW_READ, id),
 /**
+ * 工作空间「智能体」「概览」导出权限
+ */
+  overviewExport: (id: string) => canRes(P.APPLICATION_OVERVIEW_EXPORT, id),
+/**
  * 工作空间「智能体」「概览」嵌入第三方权限
  */
   overviewEmbed: (id: string) => canRes(P.APPLICATION_OVERVIEW_EMBED, id),

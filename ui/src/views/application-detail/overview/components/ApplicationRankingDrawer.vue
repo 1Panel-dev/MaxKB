@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { ApplicationRankingKind, HomeDateRange, HomeRankingRecord } from '@/api/types'
+import perm from '@/permission'
+import { isSystemResource } from '@/utils/resource-context'
 import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
 import { formatTokenNumber, numberFormat } from '@/utils/number'
@@ -10,6 +12,12 @@ defineOptions({ name: 'ApplicationRankingDrawer' })
 const props = defineProps<{ applicationId: string; initialKind: ApplicationRankingKind; initialRange: HomeDateRange }>()
 const emit = defineEmits<{ closed: [] }>()
 const { resourceApi } = useApplicationDetailContext()
+
+/* 概览排行榜导出需要独立的概览导出权限。 */
+const canExport = computed(() => {
+  if (isSystemResource()) return Boolean(perm.application.system.overviewExport())
+  return Boolean(perm.application.workspace.overviewExport(props.applicationId))
+})
 
 const visible = ref(true)
 const activeKind = ref(props.initialKind)
@@ -104,7 +112,7 @@ onMounted(loadRanking)
         <MkSearchInput v-model="searchName" class="w-55!" @change="handleSearch" />
       </div>
       <!-- 导出当前筛选下的完整用户排行 -->
-      <el-button plain :loading="exporting" :disabled="loading" @click="handleExport">
+      <el-button v-if="canExport" plain :loading="exporting" :disabled="loading" @click="handleExport">
         <MkIcon name="icon_export_outlined" />
         <span>导出</span>
       </el-button>

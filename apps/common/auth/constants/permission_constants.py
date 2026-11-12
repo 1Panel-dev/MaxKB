@@ -1882,6 +1882,16 @@ class PermissionConstants(Enum):
         ),
     )
 
+    APPLICATION_OVERVIEW_EXPORT = (
+        Permission(group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.EXPORT, bit_index=43),
+        PermissionMeta(
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
+        ),
+    )
+
     APPLICATION_OVERVIEW_BACKEND_API_ACCESS = (
         Permission(
             group=Group.APPLICATION,
@@ -3717,6 +3727,21 @@ class PermissionConstants(Enum):
             sub_group=Group.SYSTEM_OVERVIEW,
             operate=Operate.PUBLIC_ACCESS,
             bit_index=19,
+        ),
+        PermissionMeta(
+            role_list=[RoleConstants.ADMIN],
+            category=Category.RESOURCE,
+            is_ee=is_ee,
+            scope=[PermissionScopeConstants.SYSTEM],
+        ),
+    )
+
+    RESOURCE_APPLICATION_OVERVIEW_EXPORT = (
+        Permission(
+            group=Group.SYSTEM_RES_APPLICATION,
+            sub_group=Group.SYSTEM_OVERVIEW,
+            operate=Operate.EXPORT,
+            bit_index=32,
         ),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
