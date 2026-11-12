@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import type { Dict, ModelItem, ModelProviderItem, OptionItem } from '@/api/types'
 import { MODEL_TYPE_LABELS } from '@/constants'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
@@ -10,7 +10,8 @@ import ProviderApi from '@/api/admin/model-provider'
 import ModelCard from '@/views/model/model-card/ModelCard.vue'
 import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
 import ModelProvider from '@/views/model/components/ModelProvider.vue'
-import { DeleteModelAction, EditModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
+import { DeleteModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
+import EditModelDrawer from '@/views/model/model-card/action-dropdown/edit-model-action/EditModelDrawer.vue'
 import perm from '@/permission'
 import { RESOURCE_TYPE } from '@/api/enums'
 
@@ -73,6 +74,17 @@ function handleProviderSelect(provider: ModelProviderItem) {
   loadModels()
 }
 
+/* 卡片与菜单共用编辑抽屉，沿用共享模型编辑权限。 */
+const editDrawerMounted = ref(false)
+const editModelDrawerRef = useTemplateRef<InstanceType<typeof EditModelDrawer>>('editModelDrawerRef')
+
+async function handleOpenEditModel(model: ModelItem) {
+  if (!perm.model.share.modify() || editDrawerMounted.value) return
+  editDrawerMounted.value = true
+  await nextTick()
+  editModelDrawerRef.value?.open(getModelProvider(model), model)
+}
+
 onMounted(() => {
   Promise.all([loadModelProviders(), loadModels()])
 })
@@ -102,17 +114,17 @@ onMounted(() => {
       <div v-loading="loading">
         <div v-if="ModelItems.length" class="mk-resource-card-grid">
           <template v-for="model in ModelItems" :key="model.id">
-            <ModelCard :api="SystemSharedModelApi" :model="model" :provider="getModelProvider(model)" :refresh="loadModels" :shared="true">
+            <ModelCard
+              :api="SystemSharedModelApi"
+              :model="model"
+              :provider="getModelProvider(model)"
+              :refresh="loadModels"
+              :shared="true"
+              @click="handleOpenEditModel(model)"
+            >
               <template #action-dropdown>
                 <!-- 编辑 -->
-                <EditModelAction
-                  v-if="perm.model.share.modify()"
-                  label="编辑"
-                  :api="SystemSharedModelApi"
-                  :model="model"
-                  :provider="getModelProvider(model)"
-                  @refresh="loadModels"
-                />
+                <MkAction v-if="perm.model.share.modify()" label="编辑" icon="icon_edit_outlined" @click="handleOpenEditModel(model)" />
                 <!-- 模型参数设置 -->
                 <ParamSettingAction
                   v-if="model.model_type !== 'RERANKER' && perm.model.share.paramSetting()"
@@ -121,7 +133,12 @@ onMounted(() => {
                   :model="model"
                 />
                 <!-- 授权工作空间 -->
-                <AuthorizedWorkspaceAction v-if="perm.model.share.authToWorkspace()" label="授权工作空间" :resource="model" :resource-type="RESOURCE_TYPE.MODEL" />
+                <AuthorizedWorkspaceAction
+                  v-if="perm.model.share.authToWorkspace()"
+                  label="授权工作空间"
+                  :resource="model"
+                  :resource-type="RESOURCE_TYPE.MODEL"
+                />
 
                 <!-- 查看关联资源 -->
                 <RelatedResourcesModelAction v-if="perm.model.share.relateMap()" label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
@@ -136,4 +153,11 @@ onMounted(() => {
       </div>
     </template>
   </MkViewLayout>
+  <EditModelDrawer
+    v-if="editDrawerMounted"
+    ref="editModelDrawerRef"
+    :api="SystemSharedModelApi"
+    @closed="editDrawerMounted = false"
+    @refresh="loadModels"
+  />
 </template>

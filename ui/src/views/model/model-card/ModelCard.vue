@@ -19,6 +19,8 @@ const props = defineProps<{
   shared: boolean
 }>()
 
+const emit = defineEmits<{ click: [event: MouseEvent] }>()
+
 defineSlots<{ 'action-dropdown'?: () => unknown }>()
 
 const errMessage = computed(() => {
@@ -30,10 +32,22 @@ const errMessage = computed(() => {
   }
   return ''
 })
+
+function handleClick(event: MouseEvent) {
+  if (props.disabled) return
+  emit('click', event)
+}
 </script>
 
 <template>
-  <MkResourceCard class="relative overflow-hidden" :title="model.name" :nick_name="model.nick_name || '-'" :create_time="model.create_time">
+  <MkResourceCard
+    class="relative overflow-hidden"
+    :disabled="disabled"
+    :title="model.name"
+    :nick_name="model.nick_name || '-'"
+    :create_time="model.create_time"
+    @click="handleClick"
+  >
     <template #icon>
       <span class="block h-6 w-6" :innerHTML="provider.icon" />
     </template>
