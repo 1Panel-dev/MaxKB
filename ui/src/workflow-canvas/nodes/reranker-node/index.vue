@@ -112,7 +112,7 @@ onMounted(() => {
           <MkFormList v-model="formData.reranker_reference_list" :default-item="[]" :first-row-has-label="false" :show-add-button="false">
             <template #default="{ index }">
               <el-form-item
-                class="mb-2! min-w-0 flex-1"
+                class="mb-2! min-w-0 flex-1 small"
                 :prop="`reranker_reference_list.${index}`"
                 :rules="{ type: 'array', required: true, message: '请选择重排内容', trigger: 'change' }"
               >

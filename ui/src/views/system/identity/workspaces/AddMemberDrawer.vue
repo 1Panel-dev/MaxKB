@@ -97,7 +97,7 @@ defineExpose({ open })
       <MkFormList v-model="memberForm.members" add-text="添加成员" :default-item="{ role_ids: [], user_ids: [] }">
         <template #default="{ index, item: memberSetting }">
           <el-form-item
-            class="flex-1"
+            class="flex-1 small"
             :label="index === 0 ? '成员' : ''"
             :prop="`members.${index}.user_ids`"
             :rules="{ required: true, type: 'array', min: 1, message: '请选择成员', trigger: 'change' }"
@@ -126,7 +126,7 @@ defineExpose({ open })
           </el-form-item>
 
           <el-form-item
-            class="flex-1"
+            class="flex-1 small"
             :label="index === 0 ? '角色' : ''"
             :prop="`members.${index}.role_ids`"
             :rules="{ required: true, type: 'array', min: 1, message: '请选择角色', trigger: 'change' }"

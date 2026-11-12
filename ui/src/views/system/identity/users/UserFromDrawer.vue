@@ -246,7 +246,7 @@ defineExpose({ open })
         <MkFormList v-model="userForm.role_setting" add-text="添加角色" :default-item="{ role_id: '', workspace_ids: [] }">
           <template #default="{ index, item: roleAssignment }">
             <el-form-item
-              class="flex-1"
+              class="flex-1 small"
               :label="index === 0 ? '角色' : ''"
               :prop="`role_setting.${index}.role_id`"
               :rules="{ required: true, message: '请选择角色', trigger: 'change' }"
@@ -273,7 +273,7 @@ defineExpose({ open })
             <!-- 企业版用户的非系统管理员角色需要指定工作空间。 -->
             <el-form-item
               v-if="auth.isEE"
-              class="flex-1"
+              class="flex-1 small"
               :label="index === 0 ? '工作空间' : ''"
               :prop="`role_setting.${index}.workspace_ids`"
               :rules="

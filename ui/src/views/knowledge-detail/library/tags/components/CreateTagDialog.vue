@@ -74,7 +74,7 @@ defineExpose({ open })
       <MkFormList v-model="tagForm.tags" :default-item="defaultTag" @update:model-value="handleRowsChange">
         <template #default="{ index, item: tag }">
           <el-form-item
-            class="min-w-0 flex-1"
+            class="min-w-0 flex-1 small"
             :label="index === 0 ? '标签' : ''"
             :prop="`tags.${index}.key`"
             :rules="{ required: true, whitespace: true, message: '请输入标签', trigger: 'blur' }"
@@ -82,7 +82,7 @@ defineExpose({ open })
             <el-input v-model="tag.key" :disabled="!!fixedTagKey" :maxlength="64" placeholder="请输入标签" />
           </el-form-item>
           <el-form-item
-            class="min-w-0 flex-1"
+            class="min-w-0 flex-1 small"
             :label="index === 0 ? '标签值' : ''"
             :prop="`tags.${index}.value`"
             :rules="{ required: true, whitespace: true, message: '请输入标签值', trigger: 'blur' }"
