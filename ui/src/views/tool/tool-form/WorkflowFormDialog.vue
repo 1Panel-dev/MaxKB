@@ -148,7 +148,7 @@ defineExpose({ open })
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="名称" prop="name">
+      <el-form-item class="mk-form-item-with-avatar" label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
           <!-- 设置工具头像 -->
           <MkEditAvatar v-model="workflowForm.icon" @change="handleIconChange">

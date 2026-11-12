@@ -612,6 +612,9 @@
 /* form */
 .el-form-item {
   margin-bottom: calc(var(--spacing) * 4);
+  &.mk-form-item-with-avatar > .el-form-item__content > .el-form-item__error {
+    padding-left: calc(32px + var(--spacing) * 3);
+  }
   &.small {
     margin-bottom: calc(var(--spacing) * 2);
   }
@@ -1146,7 +1149,8 @@
 .el-table {
   --el-table-header-bg-color: var(--mk-N100);
   --el-table-text-color: var(--el-text-color-primary);
-  --el-table-row-hover-bg-color: color-mix(in srgb, var(--el-color-primary) 4%, white);
+  --el-table-row-hover-bg-color: var(--mk-N200);
+  // --el-table-row-hover-bg-color: var(--el-color-primary-light-9);
   --el-table-border-color: var(--el-border-color);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 
@@ -1164,6 +1168,10 @@
   .cell {
     line-height: var(--mk-line-height-base);
     padding: calc(var(--spacing) * 3);
+  }
+  // 多选列勾选后，整行（含固定列）保持选中底色。
+  .el-table__row:has(> .el-table-column--selection .el-checkbox.is-checked) > .el-table__cell {
+    background-color: var(--el-color-primary-light-9);
   }
   &.small {
     .cell {

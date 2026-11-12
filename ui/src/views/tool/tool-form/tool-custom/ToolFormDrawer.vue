@@ -21,7 +21,12 @@ defineOptions({ name: 'ToolFormDrawer' })
 const { auth } = useStore()
 
 const props = withDefaults(
-  defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; title: string; folderId: string; canEdit?: boolean }>(),
+  defineProps<{
+    api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi
+    title: string
+    folderId: string
+    canEdit?: boolean
+  }>(),
   { canEdit: true },
 )
 
@@ -186,7 +191,7 @@ defineExpose({ open })
       @submit.prevent
     >
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
-      <el-form-item label="名称" prop="name">
+      <el-form-item class="mk-form-item-with-avatar" label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
           <MkEditAvatar v-model="toolForm.icon" @change="handleIconChange">
             <template #default="{ icon }">

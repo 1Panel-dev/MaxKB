@@ -107,5 +107,15 @@ export function createPortalConversation(options: PortalConversationOptions): Po
     bundle.list.conversations.value = [...(findGroup(applicationId)?.conversations ?? [])]
   })
 
+  // 当前智能体从无历史变为有会话时自动展开，后续消息不覆盖用户手动收起的状态。
+  watch(
+    () => [currentApplicationId.value, bundle.list.conversations.value.length] as const,
+    ([applicationId, count], [previousApplicationId, previousCount]) => {
+      if (applicationId !== previousApplicationId || previousCount !== 0 || count === 0) return
+      const group = portalList.applicationGroups.value.find((applicationGroup) => applicationGroup.id === applicationId)
+      if (group) group.expanded = true
+    },
+  )
+
   return { ...bundle, portalList }
 }

@@ -64,6 +64,11 @@ Element Plus 覆盖、主题变量和应用样式。Chat 入口还显式引入 E
 模板无需重复添加 `transition-colors` 或 `focus-within:border-primary`。
 生成输入区使用 `mk-input-box`，不叠加对话专属类。
 
+## 带头像的名称表单
+
+32px 头像与名称输入框以 `gap-3` 横向排列时，在所属 `el-form-item` 上添加
+`mk-form-item-with-avatar`，由 `element-plus.scss` 统一让校验提示与输入框左边缘对齐。
+
 ## 连体表单控件
 
 `app.scss` 中的 `mk-input-group` 用于默认尺寸的两段式控件组合，统一横向布局、外边框、

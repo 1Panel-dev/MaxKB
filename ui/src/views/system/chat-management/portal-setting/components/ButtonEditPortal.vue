@@ -72,7 +72,7 @@ function handleClosePortalEdit() {
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="名称" prop="name">
+      <el-form-item class="mk-form-item-with-avatar" label="名称" prop="name">
         <div class="flex-align-center w-full gap-3">
           <MkEditAvatar v-model="portalForm.logo" @change="handleLogoChange" :size="32" :disabled="logoDisabled">
             <template #default="{ icon }">
