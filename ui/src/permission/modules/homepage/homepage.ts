@@ -11,5 +11,5 @@ export default {
   /**
    * 工作空间「概览」导出权限
    */
-  edit: () => can(P.HOMEPAGE_EXPORT)
+  export: () => can(P.HOMEPAGE_EXPORT)
 }

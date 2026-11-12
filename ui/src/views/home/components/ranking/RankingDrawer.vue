@@ -5,6 +5,17 @@ import type HomepageApi from '@/api/admin/workspace/homepage'
 import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
 import { numberFormat, formatTokenNumber } from '@/utils/number'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import perm from '@/permission'
+
+const route = useRoute()
+const isSystemHome = computed(() => route.meta.scope === 'system')
+
+/* 排行榜导出权限：系统概览走系统首页权限，工作空间概览走概览权限 */
+const canExport = computed(() =>
+  isSystemHome.value ? Boolean(perm.system.homepage.export()) : Boolean(perm.homepage.homepage.export()),
+)
 
 const props = defineProps<{ api: typeof HomepageApi; workspaceId: string; initialKind: HomeRankingKind; initialRange: HomeDateRange }>()
 
@@ -92,7 +103,7 @@ onMounted(() => loadRanking())
         <MkSearchInput v-model="searchName" class="w-55!" @change="handleSearch" />
       </div>
       <!-- 导出当前筛选下的完整排行榜 -->
-      <el-button plain :loading="exporting" :disabled="loading" @click="handleExport">
+      <el-button v-if="canExport" plain :loading="exporting" :disabled="loading" @click="handleExport">
         <MkIcon name="icon_export_outlined" />
         <span>导出</span>
       </el-button>
