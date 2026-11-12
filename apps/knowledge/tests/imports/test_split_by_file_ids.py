@@ -55,6 +55,19 @@ class SplitByFileIdsTests(SimpleTestCase):
         self.assertEqual([len(p["content"]) for p in documents[0]["content"]], [60, 20])
         self.assertTrue(documents[0]["doc_strategy"]["index"]["title_as_question"])
 
+    def test_markdown_smart_preview_preserves_heading_hierarchy_with_repeated_names(self):
+        self.sources[0].file_name = "guide.md"
+        self.sources[0].get_bytes.return_value = (
+            "# 目录\n## 章节\n目录条目\n## 附录\n附录正文\n# 章节\n## 正文\n章节正文"
+        ).encode()
+        self.payload["doc_strategy"] = {"split": {"mode": "smart", "limit": 4096}}
+        documents = self.splitter.parse_by_file_ids(self.payload)
+        self.assertEqual(documents[0]["source_file_id"], self.sources[0].id)
+        self.assertEqual(
+            [(row["title"].strip(), row["content"].strip()) for row in documents[0]["content"]],
+            [("目录  章节", "目录条目"), ("目录  附录", "附录正文"), ("章节  正文", "章节正文")],
+        )
+
     def test_invalid_ids_fail_before_storage_access(self):
         for ids in ([], ["invalid"], [str(self.sources[0].id)] * 2):
             with self.subTest(ids=ids), self.assertRaises(ValidationError):

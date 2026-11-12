@@ -29,6 +29,11 @@ and restart the web and task services to reload translations.
 
 ## Document processing
 
+Markdown smart splitting uses heading match positions to keep section boundaries and title
+hierarchies intact. A heading repeated in a table of contents, body text, or fenced code block
+does not move the actual section boundary. Existing documents need to be split again or reimported
+to correct previously saved paragraphs.
+
 Document imports save paragraphs, original inline images, and `ParagraphAsset` records
 in the import transaction. With visual enhancement enabled, image assets remain `pending`;
 the request does not call the vision model or tool.
