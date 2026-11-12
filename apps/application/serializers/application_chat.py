@@ -61,7 +61,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
     min_trample = serializers.IntegerField(required=False, min_value=0,
                                            label=_("Minimum number of clicks"))
     comparer = serializers.CharField(required=False, label=_("Comparator"), validators=[
-        validators.RegexValidator(regex=re.compile("^and|or$"),
+        validators.RegexValidator(regex=re.compile("^(and|or)$"),
                                   message=_("Only supports and|or"), code=500)
     ])
 

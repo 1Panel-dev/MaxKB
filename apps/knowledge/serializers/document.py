@@ -163,7 +163,7 @@ class DocumentEditInstanceSerializer(serializers.Serializer):
         required=False,
         validators=[
             validators.RegexValidator(
-                regex=re.compile("^optimization|directly_return$"),
+                regex=re.compile("^(optimization|directly_return)$"),
                 message=_("The type only supports optimization|directly_return"),
                 code=500,
             )
@@ -266,7 +266,7 @@ class DocumentSerializers(serializers.Serializer):
             required=True,
             validators=[
                 validators.RegexValidator(
-                    regex=re.compile("^csv|excel$"), message=_("The template type only supports excel|csv"), code=500
+                    regex=re.compile("^(csv|excel)$"), message=_("The template type only supports excel|csv"), code=500
                 )
             ],
             label=_("type"),

@@ -46,7 +46,7 @@ class BatchActiveSerializer(serializers.Serializer):
 
 class InputField(serializers.Serializer):
     source = serializers.CharField(required=True, label=_("source"), validators=[
-        validators.RegexValidator(regex=re.compile("^custom|reference$"),
+        validators.RegexValidator(regex=re.compile("^(custom|reference)$"),
                                   message=_("The field only supports custom|reference"), code=500)
     ])
     value = ObjectField(required=True, label=_("Variable Value"), model_type_list=[str, list])

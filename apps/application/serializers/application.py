@@ -478,7 +478,7 @@ class KnowledgeSettingSerializer(serializers.Serializer):
         required=True,
         validators=[
             validators.RegexValidator(
-                regex=re.compile("^embedding|keywords|blend$"),
+                regex=re.compile("^(embedding|keywords|blend)$"),
                 message=_("The type only supports embedding|keywords|blend"),
                 code=500,
             )
@@ -641,7 +641,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
             label=_("Application Type"),
             validators=[
                 validators.RegexValidator(
-                    regex=re.compile("^SIMPLE|WORK_FLOW$"),
+                    regex=re.compile("^(SIMPLE|WORK_FLOW)$"),
                     message=_("Application type only supports SIMPLE|WORK_FLOW"),
                     code=500,
                 )
