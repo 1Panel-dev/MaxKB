@@ -12,6 +12,7 @@ import { systemRoutes } from './system'
 import { workspaceRoutes } from './workspace'
 import { workflowRoutes } from './workflow'
 import { getChildRouteList } from './utils'
+import { withRouteWorkspace } from '@/utils/resource-context'
 const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'
 
 NProgress.configure({ minimum: 0.3, showSpinner: false, speed: 500, trickleSpeed: 200 })
@@ -62,17 +63,17 @@ router.beforeEach(async (to, from) => {
     }
   }
 
-const workspaceList = user.userInfo?.workspace_list ?? []
-if (to.name === 'workspace-home' && workspaceList.length === 0) {
-  const hasSystemAccess = getChildRouteList('system').some((item) => (item.permission ? item.permission() : true))
-  if (hasSystemAccess) {
-    return { name: 'system-home', replace: true }
+  const workspaceList = user.userInfo?.workspace_list ?? []
+  if (to.name === 'workspace-home' && workspaceList.length === 0) {
+    const hasSystemAccess = getChildRouteList('system').some((item) => (item.permission ? item.permission() : true))
+    if (hasSystemAccess) {
+      return { name: 'system-home', replace: true }
+    }
+    // 没有任何工作空间、也没有系统权限：不做额外处理，保持原有行为
   }
-  // 没有任何工作空间、也没有系统权限：不做额外处理，保持原有行为
-}
 
   // 当前路由有权限，放行
-  if (!to.meta?.permission || (to.meta.permission as (route: RouteLocationNormalizedLoaded) => boolean)(to)) {
+  if (!to.meta?.permission || withRouteWorkspace(to, () => (to.meta.permission as (route: RouteLocationNormalizedLoaded) => boolean)(to))) {
     return true
   }
 
@@ -98,7 +99,7 @@ if (to.name === 'workspace-home' && workspaceList.length === 0) {
       const nextPermission = nextRoute.meta?.permission as (
         route?: RouteLocationNormalized | RouteLocationResolvedGeneric | RouteLocationNormalizedLoaded,
       ) => boolean
-      if (!nextPermission || nextPermission(nextRoute)) {
+      if (!nextPermission || withRouteWorkspace(nextRoute, () => nextPermission(nextRoute))) {
         return { name: nextName, params: to.params, query: to.query, hash: to.hash, replace: true }
       }
     }
