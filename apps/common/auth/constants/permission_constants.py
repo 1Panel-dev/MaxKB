@@ -2008,7 +2008,7 @@ class PermissionConstants(Enum):
             category=Category.SYSTEM_SETTING,
             scope=[PermissionScopeConstants.SYSTEM],
             role_category_map={
-                RoleConstants.ADMIN.name: Category.SYSTEM_SETTING,
+                RoleConstants.ADMIN.name: Category.OTHER,
                 RoleConstants.USER.name: Category.OTHER,
                 RoleConstants.WORKSPACE_MANAGE.name: Category.OTHER,
             },
@@ -2019,7 +2019,7 @@ class PermissionConstants(Enum):
         Permission(group=Group.OTHER, sub_group=Group.OTHER, operate=Operate.LICENSE, bit_index=1),
         PermissionMeta(
             role_list=[RoleConstants.ADMIN],
-            category=Category.SYSTEM_SETTING,
+            category=Category.OTHER,
             scope=[PermissionScopeConstants.SYSTEM],
         ),
     )
@@ -2031,7 +2031,7 @@ class PermissionConstants(Enum):
             category=Category.SYSTEM_SETTING,
             scope=[PermissionScopeConstants.SYSTEM],
             role_category_map={
-                RoleConstants.ADMIN.name: Category.SYSTEM_SETTING,
+                RoleConstants.ADMIN.name: Category.OTHER,
                 RoleConstants.USER.name: Category.OTHER,
                 RoleConstants.WORKSPACE_MANAGE.name: Category.OTHER,
             },
@@ -2045,7 +2045,7 @@ class PermissionConstants(Enum):
             category=Category.SYSTEM_SETTING,
             scope=[PermissionScopeConstants.SYSTEM],
             role_category_map={
-                RoleConstants.ADMIN.name: Category.SYSTEM_SETTING,
+                RoleConstants.ADMIN.name: Category.OTHER,
                 RoleConstants.USER.name: Category.OTHER,
                 RoleConstants.WORKSPACE_MANAGE.name: Category.OTHER,
             },
@@ -2059,7 +2059,7 @@ class PermissionConstants(Enum):
             category=Category.SYSTEM_SETTING,
             scope=[PermissionScopeConstants.SYSTEM],
             role_category_map={
-                RoleConstants.ADMIN.name: Category.SYSTEM_SETTING,
+                RoleConstants.ADMIN.name: Category.OTHER,
                 RoleConstants.USER.name: Category.OTHER,
                 RoleConstants.WORKSPACE_MANAGE.name: Category.OTHER,
             },
@@ -2073,7 +2073,7 @@ class PermissionConstants(Enum):
             category=Category.SYSTEM_SETTING,
             scope=[PermissionScopeConstants.SYSTEM],
             role_category_map={
-                RoleConstants.ADMIN.name: Category.SYSTEM_SETTING,
+                RoleConstants.ADMIN.name: Category.OTHER,
                 RoleConstants.USER.name: Category.OTHER,
                 RoleConstants.WORKSPACE_MANAGE.name: Category.OTHER,
             },
