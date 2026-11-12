@@ -21,12 +21,12 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
 </script>
 
 <template>
-  <header class="flex-align-center p-4">
+  <header class="flex-align-center gap-1 p-4">
     <!-- 左侧收起时才在顶部显示:展开左侧 + 新建对话(展开时它们在侧栏内) -->
     <template v-if="!list.leftSideOpen.value">
       <!-- 展开左侧 -->
       <MkTooltip content="展开侧边栏">
-        <el-button text @click="list.toggleLeftSide()" class="-ml-1 mr-1">
+        <el-button text @click="list.toggleLeftSide()" class="-ml-1 mr-2">
           <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
         </el-button>
       </MkTooltip>
@@ -42,7 +42,7 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
       </el-tag>
     </div>
     <!-- 新建对话 -->
-    <MkTooltip content="新建对话">
+    <MkTooltip content="新建对话" v-if="!list.leftSideOpen.value">
       <el-button text @click="handleNewConversation">
         <MkIcon name="icon_new-chat_outlined" :size="18" class="text-N900!" />
       </el-button>
@@ -50,7 +50,13 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
     <!-- 进入分享模式，勾选要分享的对话 -->
     <MkTooltip v-if="showShare" content="分享">
       <el-button text :disabled="!canShare" @click="emit('share')">
-        <MkIcon name="icon_share_outlined" :size="18" class="text-N900!" />
+        <MkIcon name="icon_share_outlined" :size="18" :class="canShare ? 'text-N900!' : 'text-N400!'" />
+      </el-button>
+    </MkTooltip>
+    <!-- 导出-->
+    <MkTooltip content="导出">
+      <el-button text>
+        <MkIcon name="icon_export_outlined" :size="18" class="text-N900!" />
       </el-button>
     </MkTooltip>
     <slot />

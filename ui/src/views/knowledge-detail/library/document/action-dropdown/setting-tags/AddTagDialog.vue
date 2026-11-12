@@ -106,7 +106,7 @@ defineExpose({ open })
       <MkFormList v-model="tagForm.tags" :default-item="{ key: '', tagId: '' }" @update:model-value="handleRowsChange">
         <template #default="{ index, item: tag }">
           <el-form-item
-            class="min-w-0 flex-1"
+            class="min-w-0 flex-1 small"
             :label="index === 0 ? '标签' : ''"
             :prop="`tags.${index}.key`"
             :rules="{ required: true, message: '请选择标签', trigger: 'change' }"
@@ -123,7 +123,7 @@ defineExpose({ open })
             </el-select>
           </el-form-item>
           <el-form-item
-            class="min-w-0 flex-1"
+            class="min-w-0 flex-1 small"
             :label="index === 0 ? '标签值' : ''"
             :prop="`tags.${index}.tagId`"
             :rules="{ required: true, message: '请选择标签值', trigger: 'change' }"
