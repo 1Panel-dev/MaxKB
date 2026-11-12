@@ -172,6 +172,10 @@ tests, workflow retrieval and REST/MCP retrieval rechecks deletion state before 
 `file_id_list` 支持当前用户上传的临时图片 ID 和当前知识库已生成预览的图片文件 ID，可不经过预览直接导入。
 直接导入校验整批图片的权限、格式、大小和数量后创建图片文档，视觉增强由导入后的向量化任务执行；
 已有预览保留其处理策略、识别结果和编辑，不被请求中的 `doc_strategy` 覆盖。
+预览后导入可附带 `preview_list: [{source_file_id, content: [{title, content, problem_list}]}]`，
+文件 ID 必须与 `file_id_list` 一一对应，每张图片包含一个分段。标题、正文和关联问题随导入事务保存，
+问题仅在当前知识库内复用，图片资产和识别结果继续保留；已编辑正文不会被后续图片识别覆盖。
+省略 `preview_list` 时继续按服务端预览或上传文件直接导入。
 生成预览保留上传文件的临时 `source_type` 和 `source_id`，不提前绑定知识库；图片识别结果及
 本次预览的知识库上下文暂存在 `meta.image_preview`。查询、编辑、删除和识别任务校验上传用户
 及预览上下文；正式导入成功后才将文件绑定到新文档。未保存的预览仍按原临时文件期限清理。

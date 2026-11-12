@@ -23,8 +23,11 @@ from knowledge.models import (
     FileSourceType,
     Knowledge,
     KnowledgeType,
+    LocalState,
     Paragraph,
     ParagraphAsset,
+    Problem,
+    ProblemParagraphMapping,
     SyncState,
 )
 from knowledge.services import validate_knowledge_file_size
@@ -376,13 +379,22 @@ class ImageDocumentService:
         return True
 
     @transaction.atomic
-    def import_previews(self, file_ids: Iterable, strategy: Dict | None = None) -> List[str]:
+    def import_previews(
+        self, file_ids: Iterable, strategy: Dict | None = None, *, preview_list: List[Dict] | None = None
+    ) -> List[str]:
         knowledge = self.get_knowledge()
         ordered_ids = list(dict.fromkeys(str(file_id) for file_id in file_ids))
         if not ordered_ids:
             raise AppApiException(500, _("Please select at least one image preview"))
         if len(ordered_ids) > knowledge.file_count_limit:
             raise AppApiException(500, _("Invalid number of image files"))
+        drafts = {str(preview["source_file_id"]): preview["content"] for preview in preview_list or []}
+        if preview_list is not None and (
+            len(drafts) != len(preview_list)
+            or set(drafts) != set(ordered_ids)
+            or any(len(content) != 1 for content in drafts.values())
+        ):
+            raise AppApiException(500, _("Image preview drafts must match the imported files"))
         files_by_id = self._get_uploaded_image_files(ordered_ids)
         normalized_strategy = normalize_document_strategy(strategy)
         file_names = {}
@@ -408,7 +420,12 @@ class ImageDocumentService:
                 preview = _preview_meta(file)
             strategy = normalize_document_strategy(preview.get("doc_strategy"))
             hashes = strategy_hashes(strategy)
-            content = _display_text(file.file_name, preview)
+            generated_content = _display_text(file.file_name, preview)
+            generated_title = Path(file.file_name).stem
+            draft = drafts[file_id][0] if file_id in drafts else {}
+            content = (draft["content"] or "") if "content" in draft else generated_content
+            title = (draft["title"] or "") if "title" in draft else generated_title
+            text_edited = content != generated_content or title != generated_title
             document = Document(
                 id=uuid.uuid7(),
                 knowledge_id=knowledge.id,
@@ -418,7 +435,7 @@ class ImageDocumentService:
                 type=KnowledgeType.BASE,
                 resource_type=DocumentResourceType.IMAGE,
                 doc_strategy=strategy,
-                source_hash=document_source_hash([{"title": Path(file.file_name).stem, "content": content}]),
+                source_hash=document_source_hash([{"title": title, "content": content}]),
                 meta={
                     "source_file_id": str(file.id),
                     "allow_download": True,
@@ -431,7 +448,7 @@ class ImageDocumentService:
                 id=uuid.uuid7(),
                 document_id=document.id,
                 knowledge_id=knowledge.id,
-                title=Path(file.file_name).stem,
+                title=title,
                 content=content,
                 chunks=text_to_chunk(content, strategy["split"]["child_length"]),
                 content_schema=[
@@ -444,9 +461,18 @@ class ImageDocumentService:
                     }
                 ],
                 origin=ContentOrigin.MANUAL,
+                local_state=LocalState.MODIFIED if text_edited else LocalState.CLEAN,
                 position=1,
             )
             paragraph.save()
+            for problem_content in dict.fromkeys(problem["content"] for problem in draft.get("problem_list", [])):
+                problem, _created = Problem.objects.get_or_create(knowledge_id=knowledge.id, content=problem_content)
+                ProblemParagraphMapping.objects.get_or_create(
+                    knowledge_id=knowledge.id,
+                    document_id=document.id,
+                    paragraph_id=paragraph.id,
+                    problem_id=problem.id,
+                )
             ParagraphAsset.objects.create(
                 id=uuid.uuid7(),
                 knowledge_id=knowledge.id,

@@ -110,6 +110,7 @@ export interface LarkDocumentImportPayload extends Pick<LarkDocumentNode, 'name'
 export interface ImageDocumentImportPayload {
   file_id_list: string[]
   doc_strategy?: DocumentStrategy
+  preview_list?: Pick<ImageDocumentPreview, 'source_file_id' | 'content'>[]
 }
 
 /** 独立图片上传后的处理预览。 */

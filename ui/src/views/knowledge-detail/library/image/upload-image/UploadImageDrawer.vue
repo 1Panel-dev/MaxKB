@@ -90,7 +90,7 @@ function handleGeneratePreview() {
     })
 }
 
-/* 图片导入：预览后提交生成结果的文件 ID，未预览直接提交上传成功的图片 ID。 */
+/* 图片导入：预览后提交文件 ID 与分段草稿，未预览直接提交上传成功的图片 ID。 */
 async function handleSubmit() {
   if (!validateFiles() || (previewVisible.value && !previewRef.value?.validate())) return
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
@@ -108,7 +108,11 @@ async function handleSubmit() {
     const payload: ImageDocumentImportPayload = {
       file_id_list: previewVisible.value ? previewDocuments.value.map((preview) => preview.source_file_id) : fileIds,
     }
-    if (!previewVisible.value) payload.doc_strategy = processingRef.value?.getStrategy()
+    if (previewVisible.value) {
+      payload.preview_list = previewDocuments.value.map(({ source_file_id, content }) => ({ source_file_id, content }))
+    } else {
+      payload.doc_strategy = processingRef.value?.getStrategy()
+    }
     const importRequest = props.api?.putBatchCreateImageDocuments(props.knowledgeId, payload)
     if (!importRequest) return
     await importRequest

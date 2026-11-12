@@ -207,7 +207,7 @@ class ImageDocumentImportTests(SimpleTestCase):
 
     def test_schema_requires_file_id_list_and_validates_optional_strategy(self):
         self.assertIs(ImageBatchCreateAPI.get_request(), ImagePreviewBatchCreateRequest)
-        self.assertEqual(set(ImagePreviewBatchCreateRequest().fields), {"file_id_list", "doc_strategy"})
+        self.assertEqual(set(ImagePreviewBatchCreateRequest().fields), {"file_id_list", "doc_strategy", "preview_list"})
         serializer = ImagePreviewBatchCreateRequest(data={"file_id_list": self.ids})
         self.assertTrue(serializer.is_valid(), serializer.errors)
         serializer = ImagePreviewBatchCreateRequest(

@@ -596,7 +596,9 @@ JSON 提交 `{ file_id_list, doc_strategy }`，复用上传成功的文件 ID，
 关闭视觉增强或识别失败时，正文使用不含扩展名的文件名，预览生成无需客户端轮询。
 `putBatchCreateImageDocuments` 通过 PUT `image/batch_create` 提交 ImageDocumentImportPayload，返回 DocumentItem[]。
 未生成预览时，提交 `{ file_id_list, doc_strategy }`，ID 使用上一步上传成功的图片文件 ID，并传当前处理策略；
-已预览时提交 `{ file_id_list }`，使用生成结果的 `source_file_id`，服务端保留已有预览的策略和识别结果。
+已预览时提交 `{ file_id_list, preview_list }`，其中 `preview_list` 为 `{ source_file_id, content }[]`，
+每张图片携带一个分段的标题、正文和 `problem_list`；服务端保留已有预览的策略、图片资产和识别结果，并保存编辑后的分段及问题关联。
+`preview_list` 与文件 ID 必须一一对应；省略该字段仍兼容按文件 ID 导入。
 图片支持 JPG、JPEG、PNG、WEBP、BMP；Workspace 共享保持只读，不装配图片导入接口。
 System 资源管理和 System 共享接口前缀分别为 `/system/resource/knowledge/<knowledgeId>/document/image`
 和 `/system/shared/knowledge/<knowledgeId>/document/image`；

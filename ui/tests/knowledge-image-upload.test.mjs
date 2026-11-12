@@ -36,7 +36,7 @@ function createUpload(scope) {
           method,
           async (url, payload) => {
             requests.push({ method, url, payload })
-            return [{ source_file_id: 'image-a', content: [] }]
+            return [{ source_file_id: 'image-a', resource_type: 'image', name: 'image.png', content: [{ title: 'image', content: '识别内容' }] }]
           },
         ]),
       )
@@ -68,7 +68,11 @@ for (const [scope, prefix] of [
     await drawer.handleSubmit()
     assert.deepEqual(requests, [
       { method: 'post', url: `${prefix}/knowledge-a/document/image/preview`, payload: { file_id_list: ['image-a'], doc_strategy: strategy } },
-      { method: 'put', url: `${prefix}/knowledge-a/document/image/batch_create`, payload: { file_id_list: ['image-a'] } },
+      {
+        method: 'put',
+        url: `${prefix}/knowledge-a/document/image/batch_create`,
+        payload: { file_id_list: ['image-a'], preview_list: [{ source_file_id: 'image-a', content: [{ title: 'image', content: '识别内容' }] }] },
+      },
     ])
     assert.deepEqual(emitted, [['refresh']])
     assert.equal(drawer.visible.value, false)
@@ -86,6 +90,18 @@ test('系统共享图片不生成预览时直接携带策略导入', async () =>
       payload: { file_id_list: ['image-a'], doc_strategy: strategy },
     },
   ])
+})
+
+test('图片预览导入携带编辑后的标题、正文和关联问题', async () => {
+  const { drawer, requests } = createUpload('system-shared')
+  await drawer.handleGeneratePreview()
+  const paragraph = { title: '编辑标题', content: '编辑正文', problem_list: [{ content: '图片里有什么？' }] }
+  drawer.previewDocuments.value[0].content = [paragraph]
+  await drawer.handleSubmit()
+  assert.deepEqual(requests.at(-1).payload, {
+    file_id_list: ['image-a'],
+    preview_list: [{ source_file_id: 'image-a', content: [paragraph] }],
+  })
 })
 
 test('工作空间共享知识库不提供图片写入 API', () => {
