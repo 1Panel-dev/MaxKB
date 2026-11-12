@@ -7,6 +7,7 @@ import type { KnowledgeItem } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import { formatKnowledgeMcpConfig } from '@/views/knowledge/external-retrieval-config'
 
 defineOptions({ name: 'McpConfigKnowledgeAction' })
 
@@ -28,7 +29,7 @@ function handleOpenMcpConfig() {
   return props.api
     .getKnowledgeMcpConfig(props.knowledge.id)
     .then((mcpConfig) => {
-      config.value = mcpConfig
+      config.value = formatKnowledgeMcpConfig(JSON.parse(mcpConfig), window.location.origin)
       visible.value = true
     })
     .finally(() => {

@@ -790,7 +790,8 @@ GET `/status` 返回按平台标识索引的 `[是否已配置, 是否启用]`�
 工作空间 ID 在调用时由 API 内读取，四套均使用 Admin 请求封装，不返回占位 null 或回退其他范围。
 
 查询返回 `enabled`、`authentication`、`api_url`、`api_example`、`mcp_url`、`mcp_config`；
-`api_example` 为后台生成的完整 API 调用示例文本（string），前端仅展示和复制，不拼接请求内容。
+`api_example` 为后台生成的完整 API 调用示例文本（string），前端展示和复制时仅将端点替换为浏览器访问入口，
+保留路径、请求参数和请求体。MCP 配置端点采用相同规则，避免反向代理内部 HTTP 地址进入复制结果。
 保存只更新 payload 传入的 `enabled` 或 `authentication`，保留未提交字段，并返回包含最新 `api_example` 的完整配置。
 响应与提交类型共用 `types/knowledge-external-retrieval.ts`，通过 `@/api/types` 导入；请求层统一解包 `data`。
 页面通过 Knowledge Detail Context 的 `resourceApi.externalRetrieval` 按四范围选择完整 API，

@@ -7,6 +7,7 @@ import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { formatKnowledgeApiExample, formatKnowledgeMcpConfig } from '@/views/knowledge/external-retrieval-config'
 /**
  * 知识库「外部检索服务」权限判断
  */
@@ -60,7 +61,8 @@ async function handleSettingChange(field: keyof KnowledgeExternalRetrievalPayloa
   }
 }
 
-const mcpConfig = computed(() => (setting.value ? JSON.stringify(setting.value.mcp_config, null, 2) : ''))
+const mcpConfig = computed(() => (setting.value ? formatKnowledgeMcpConfig(setting.value.mcp_config, window.location.origin) : ''))
+const apiExample = computed(() => (setting.value ? formatKnowledgeApiExample(setting.value, window.location.origin) : ''))
 
 watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval, { immediate: true })
 </script>
@@ -109,14 +111,9 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
       <section>
         <div class="mb-2">API 调用示例</div>
         <div class="group relative">
-          <el-input :model-value="setting?.api_example ?? ''" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
+          <el-input :model-value="apiExample" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
           <!-- 复制 API 调用示例 -->
-          <el-button
-            class="group-hover-visible absolute right-3 top-3 z-10 shadow-md"
-            circle
-            :disabled="!setting?.api_example"
-            @click="copyText(setting?.api_example)"
-          >
+          <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle :disabled="!apiExample" @click="copyText(apiExample)">
             <MkIcon name="icon_copy_outlined" />
           </el-button>
         </div>
