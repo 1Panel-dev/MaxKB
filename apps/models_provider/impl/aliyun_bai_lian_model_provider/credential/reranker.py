@@ -76,9 +76,7 @@ class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
             if raise_exception:
                 raise AppApiException(
                     ValidCode.valid_error.value,
-                    _("Verification failed, please check whether the parameters are correct: {error}").format(
-                        error=str(e)
-                    ),
+                    str(e),
                 )
             return False
 
