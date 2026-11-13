@@ -113,7 +113,7 @@ def get_model_by_id(_id, workspace_id):
     # 归还链接到连接池
     connection.close()
     if model is None:
-        raise Exception(_("Model does not exist"))
+        raise RuntimeError(_("Model does not exist"))
     return model
 
 
