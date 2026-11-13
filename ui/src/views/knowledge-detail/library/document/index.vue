@@ -385,7 +385,7 @@ onBeforeUnmount(() => {
   >
     <template v-if="showQuickCreate && !isWorkspaceSharedResource()" #body-prepend>
       <!-- 快速创建空白文档 -->
-      <MkQuickCreate ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
+      <MkQuickCreate v-if="knowledgeDocPermission('docCreate')" ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
     </template>
 
     <el-table-column type="selection" width="40" reserve-selection v-if="!isWorkspaceSharedResource()" />
