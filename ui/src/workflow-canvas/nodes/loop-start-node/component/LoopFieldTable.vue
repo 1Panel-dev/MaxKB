@@ -34,7 +34,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { cloneDeep, set } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
 import LoopFieldDialog from './LoopFieldDialog.vue'
@@ -81,12 +81,24 @@ function sync() {
   ;(props.nodeModel as { clearNextNodeField?: (containSelf: boolean) => void }).clearNextNodeField?.(true)
 }
 
-onMounted(() => {
+/* 内置参数（index/item）由循环引擎提供，作为只读输出参数展示，不进入用户可配置的循环变量列表 */
+function readFields(): LoopInputField[] {
   const properties = props.nodeModel.properties as { loop_input_field_list?: LoopInputField[] }
-  // 内置参数（index/item）由循环引擎提供，作为只读输出参数展示，不进入用户可配置的循环变量列表
-  loopInputFieldList.value = (Array.isArray(properties.loop_input_field_list) ? cloneDeep(properties.loop_input_field_list) : []).filter(
+  return (Array.isArray(properties.loop_input_field_list) ? cloneDeep(properties.loop_input_field_list) : []).filter(
     (item) => !isLoopBuiltinField(item.field),
   )
+}
+
+onMounted(() => {
+  loopInputFieldList.value = readFields()
   sync()
 })
+// 节点属性被外部改写（如 AI 生成写入循环变量）时同步表格，避免后续编辑覆盖掉外部写入
+watch(
+  () => (props.nodeModel.properties as { loop_input_field_list?: LoopInputField[] }).loop_input_field_list,
+  () => {
+    loopInputFieldList.value = readFields()
+  },
+  { deep: true },
+)
 </script>

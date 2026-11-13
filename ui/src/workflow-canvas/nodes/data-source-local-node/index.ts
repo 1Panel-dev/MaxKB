@@ -1,4 +1,5 @@
 import DataSourceLocalNode from './index.vue'
+import agent from './agent'
 import DataSourceLocalNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
@@ -14,4 +15,5 @@ export default {
   model: WorkflowNodeModel,
   view: DataSourceLocalNodeView,
   details: DataSourceLocalNodeDetail,
+  agent,
 }

@@ -3,12 +3,45 @@ import { argReference, finishWithValidate, useNodeAgent } from '@/workflow-canva
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
-/** document-extract-node（文档内容提取）的 AI 生成配置：只有入参文档（documents），无其他可配置项 */
+/** document-extract-node（文档内容提取）的 AI 生成配置：只有入参文件列表（documents），无其他可配置项；返回拼接文本与逐篇文档列表 */
+
+/**
+ * 入参 documents / 返回 document_list 的结构，逐字段对应后端 DocumentExtractNode 读写的数据。
+ * x-single：items 只描述引用值的元素结构，这里只接一个引用。
+ */
+const FILE_SCHEMA = {
+  type: 'object',
+  properties: {
+    file_id: { type: 'string', description: '文件 id，按它读取文件内容' },
+    name: { type: 'string', description: '文件名，按扩展名选择解析方式' },
+    meta: { type: 'object', description: '来源信息，原样带到输出的 meta' },
+  },
+  required: ['file_id', 'name'],
+}
+
+const DOCUMENT_SCHEMA = {
+  type: 'object',
+  properties: {
+    id: { type: 'string', description: '源文件 id' },
+    name: { type: 'string', description: '文档名；ZIP 会展开为包内每个文件各一项' },
+    content: { type: 'string', description: '该文档全文' },
+    meta: { type: 'object', description: '输入文件的 meta，并补 source_file_id' },
+  },
+  required: ['id', 'name', 'content'],
+}
 
 const params: JsonObjectSchema = {
   type: 'object',
   properties: {
-    documents: { type: 'array', description: '要提取内容的文档，常来自开始节点用户上传的 document', 'x-bind': 'document_list' },
+    documents: {
+      type: 'array',
+      items: FILE_SCHEMA,
+      'x-single': true,
+      description:
+        '要提取内容的文件列表：应用工作流常来自开始节点用户上传的 document，知识库工作流来自本地文件数据源的 file_list；' +
+        '不要接已含文本的 document_list（如 Web 站点数据源的输出，没有 file_id）',
+      'x-bind': 'document_list',
+    },
   },
   required: ['documents'],
 }
@@ -18,8 +51,15 @@ const config: JsonObjectSchema = { type: 'object', properties: {} }
 const returns: JsonObjectSchema = {
   type: 'object',
   properties: {
-    content: { type: 'string', description: '提取出的文档文本，适合放进提示词' },
-    document_list: { type: 'array', description: '文档列表' },
+    content: {
+      type: 'string',
+      description: '全部文件的文本拼成的一个字符串：每个文件为 "### 文件名\\n正文"，文件之间用分隔线隔开；适合放进提示词',
+    },
+    document_list: {
+      type: 'array',
+      items: DOCUMENT_SCHEMA,
+      description: '逐篇的文档列表，可直接作为文档分段的入参',
+    },
   },
   additionalProperties: false,
 }
@@ -52,7 +92,7 @@ function useAgent(context: NodeAgentContext) {
 }
 
 export default {
-  description: '提取用户上传文档的文本内容，供下游 AI 对话基于文档回答（如总结、问答）',
+  description: '提取用户上传文档的文本内容，供下游 AI 对话基于文档回答（如总结、问答）；知识库工作流中接在本地文件数据源之后，document_list 供文档分段',
   params,
   config,
   returns,

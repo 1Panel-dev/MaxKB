@@ -14,7 +14,9 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
-from application.workflow.loop_workflow_manage import LoopWorkFlowManage
+
+# 可赋值的变量分组:全局变量 / 会话变量 / 循环变量 / 输出变量
+ASSIGNABLE_GROUPS = ("global", "chat", "loop", "output")
 
 
 class VariableAssignNodeParamsSerializer(serializers.Serializer):
@@ -37,41 +39,15 @@ class VariableAssignNode(INode):
             if not variable.get("fields"):
                 continue
 
-            field0 = variable["fields"][0]
-            if field0 == "global":
-                result = self.handle(variable, self.global_evaluation)
-                result_list.append(result)
-            elif field0 == "chat":
-                result = self.handle(variable, self.chat_evaluation)
-                result_list.append(result)
-            elif field0 == "loop":
-                result = self.handle(variable, self.loop_evaluation)
-                result_list.append(result)
-            elif field0 == "output":
-                result = self.handle(variable, self.output_evaluation)
-                result_list.append(result)
+            if variable["fields"][0] in ASSIGNABLE_GROUPS:
+                result_list.append(self.handle(variable, self.evaluation))
 
         self.write_context("variable_list", node_params.get("variable_list", []))
         self.write_context("result_list", result_list)
 
-    def _target_manage(self):
-        return (
-            self.workflow_manage.parent_workflow_manage
-            if isinstance(self.workflow_manage, LoopWorkFlowManage)
-            else self.workflow_manage
-        )
-
-    def global_evaluation(self, variable, value):
-        self._target_manage().write_context("global", variable["fields"][1], value)
-
-    def loop_evaluation(self, variable, value):
-        self.workflow_manage.write_context("loop", variable["fields"][1], value)
-
-    def chat_evaluation(self, variable, value):
-        self._target_manage().write_context("chat", variable["fields"][1], value)
-
-    def output_evaluation(self, variable, value):
-        self._target_manage().write_context("output", variable["fields"][1], value)
+    def evaluation(self, variable, value):
+        # 写到哪一层由 workflow_manage 决定:循环体内的 global/chat/output 会逐级交给根工作流,loop 写到所属循环
+        self.workflow_manage.write_context(variable["fields"][0], variable["fields"][1], value)
 
     def handle(self, variable, evaluation: Callable):
         result = {

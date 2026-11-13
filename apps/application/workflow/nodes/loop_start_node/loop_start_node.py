@@ -23,9 +23,6 @@ class LoopStartNode(INode):
     type = "loop-start-node"
 
     def execute(self):
-        loop = self.workflow_manage.context.get("loop")
-        if loop is None:
-            self.write_context("loop", {})
         parameters = self.workflow_manage.get_parameters()
         if parameters is not None:
             index = parameters.get("index", 0)

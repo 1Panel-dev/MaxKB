@@ -157,6 +157,8 @@ export interface AgentHandle {
   run: (requirement: string) => Promise<AgentResult>
   /** 中断在途请求并级联停止委派中的子 agent */
   stop: () => void
+  /** 本 agent 的消息历史（活引用）；停止后重建 agent 时可传给 bindings.messages 续聊 */
+  messages: AgentMessage[]
 }
 
 // ============================================================
@@ -170,6 +172,7 @@ export type JsonSchema = Record<string, unknown>
  * 对象形 JSON Schema：节点的 params / config / returns 统一使用。
  * 框架扩展字段（渲染给模型时去掉）：
  * - params 属性上的 x-bind：实参由框架直接写入 node_data 的该字段；未声明则交由节点配置 agent 使用；
+ * - params 数组属性上的 x-single：items 只描述引用值的元素结构，仍只接一个引用（默认带 items 的数组形参可接多个引用）；
  * - returns.additionalProperties 上的 x-from：动态返回字段来自哪一项配置。
  */
 export interface JsonObjectSchema {
@@ -199,6 +202,10 @@ export interface NodeAgentContext {
   requirement: string
   /** 父 agent 要求产出的动态返回字段名 */
   expectedReturns: string[]
+  /** 已绑定引用的值结构：键为 "节点ID.字段"，取上游 returns 中逐字段声明的结构 */
+  argStructures: Record<string, string>
+  /** 直连下游节点需要的结构化入参（每行一个），本节点输出交给它们时须符合 */
+  downstream: string[]
 }
 
 /**

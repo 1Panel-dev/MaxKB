@@ -12,11 +12,11 @@ import { inputShortcut } from '@/conversation-panel/core/shortcuts'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import { useApplicationAgent } from '../application'
+import { useAgent } from '../impl'
 import { layoutCanvas } from '../tools/canvas'
-import { clearDebugLog } from '../common'
+import { clearDebugLog, resumeMessages } from '../common'
 import { createAgent } from '../create-agent'
-import type { AgentEvent, AgentHandle } from '../type'
+import type { AgentEvent, AgentHandle, AgentMessage } from '../type'
 import { createActivity } from './activity'
 import { VIEW_KEY,VIEW_TYPE } from '@/conversation-panel/view'
 provide(VIEW_KEY,VIEW_TYPE.DEBUG)
@@ -62,6 +62,10 @@ function sendSuggestedRequirement(question: string) {
 }
 
 let agent: AgentHandle | null = null
+/** 停止后保留的历史，重建 agent 时续上（已 abort 的 agent 不可复用） */
+let carriedMessages: AgentMessage[] | undefined
+/** 本次会话的首条需求：停止后重建 agent 时仍作为整体目标背景，不被续聊文字覆盖 */
+let sessionGoal: string | undefined
 
 function loadModels() {
   Promise.all([store.getModelListWithShared({ model_type: 'LLM' }), store.getProviderList()])
@@ -102,29 +106,45 @@ function onEvent(event: AgentEvent) {
   scrollToBottom()
 }
 
+/** 画布所属资源 id：按模式取路由上的应用 / 工具 / 知识库 id */
+function resourceIdOf(): string | undefined {
+  const key = props.workflowMode.startsWith('knowledge')
+    ? 'knowledgeId'
+    : props.workflowMode.startsWith('tool')
+      ? 'toolId'
+      : 'applicationId'
+  return typeof route.params[key] === 'string' ? (route.params[key] as string) : undefined
+}
+
 /** 首轮装配父 agent，后续续聊复用同一实例以保留上下文 */
 async function run(text: string) {
   const lf = props.getLogicFlow()
   if (!lf) return
   if (!agent) {
+    sessionGoal ??= text
     agent = createAgent(
-      useApplicationAgent({
+      useAgent(props.workflowMode, {
         rootLf: lf,
         modelId: modelId.value,
         modelParams: cloneDeep(modelParams.value),
         call: { onNext: onEvent },
         workflowMode: props.workflowMode,
         resourceScope,
-        resourceId: typeof route.params.applicationId === 'string' ? route.params.applicationId : undefined,
+        resourceId: resourceIdOf(),
         position: [],
         maxIterations: 200,
-        context: text,
+        context: sessionGoal,
+        messages: carriedMessages,
       }),
     )
+    carriedMessages = undefined
   }
   status.value = 'running'
   canvasChanged = false
-  const result = await agent.run(text)
+  const current = agent
+  const result = await current.run(text)
+  // 运行期间已新建会话：结果作废，不回写状态
+  if (agent !== current) return
   if (result.status === 'done') {
     status.value = 'done'
     if (!canvasChanged) return
@@ -136,6 +156,9 @@ async function run(text: string) {
     status.value = 'error'
   } else {
     status.value = 'stopped'
+    // 已 abort 的 agent 不能复用：保留可续聊的历史，丢弃实例，下次发送时重建续聊
+    carriedMessages = resumeMessages(current.messages)
+    agent = null
   }
 }
 
@@ -160,6 +183,8 @@ function stop() {
 function reset() {
   agent?.stop()
   agent = null
+  carriedMessages = undefined
+  sessionGoal = undefined
   activity.reset()
   status.value = 'idle'
 }

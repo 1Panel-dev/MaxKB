@@ -22,6 +22,19 @@ export const FIXED_NODE_TYPES: string[] = [
   WorkflowNodeType.LoopBodyNode,
 ]
 
+/** 各模式额外固定节点：应用外的基本信息 / 开始节点也不同，均不可由 AI 新增或删除 */
+const MODE_FIXED_NODE_TYPES: Partial<Record<WorkflowMode, string[]>> = {
+  [WorkflowMode.Knowledge]: [WorkflowNodeType.KnowledgeBase],
+  [WorkflowMode.KnowledgeLoop]: [WorkflowNodeType.KnowledgeBase],
+  [WorkflowMode.Tool]: [WorkflowNodeType.ToolBaseNode, WorkflowNodeType.ToolStartNode],
+  [WorkflowMode.ToolLoop]: [WorkflowNodeType.ToolBaseNode, WorkflowNodeType.ToolStartNode],
+}
+
+/** 当前画布模式的固定节点集合 */
+export function fixedNodeTypesOf(mode: WorkflowMode): string[] {
+  return [...FIXED_NODE_TYPES, ...(MODE_FIXED_NODE_TYPES[mode] ?? [])]
+}
+
 type LoopBodyModel = BaseNodeModel & { getLoopLogicFlow?: () => LogicFlow | null; loopLayout?: () => unknown }
 type BranchNodeData = { branch?: Array<{ id: string; type?: string; content?: string; isOther?: boolean }> }
 type DagreExtension = { dagre?: { layout?: () => Promise<unknown> | unknown } }
@@ -182,17 +195,17 @@ export function addEdge(lf: LogicFlow, sourceNodeId: string, sourceAnchorId: str
   return null
 }
 
-/** 新节点放在上游右侧，按上游已有出边数纵向错开，避免重叠；最终由自动布局整理 */
+/** 新节点放在上游右侧，按上游已有出边数纵向错开，避免重叠；无上游（入口节点）放在左侧起始位；最终由自动布局整理 */
 export function addNode(
   lf: LogicFlow,
   template: ShapeItem,
   sourceNodeId: string,
   propertiesOverride: Record<string, unknown> = {},
 ): WorkflowNodeModel {
-  const source = getNode(lf, sourceNodeId)
+  const source = sourceNodeId ? getNode(lf, sourceNodeId) : undefined
   const outgoingCount = source ? lf.graphModel.getNodeOutgoingEdge(sourceNodeId).length : 0
-  const x = (source?.x ?? 400) + (source?.width ?? 320) / 2 + 400
-  const y = (source?.y ?? 400) + outgoingCount * 420
+  const x = source ? (source.x ?? 400) + (source.width ?? 320) / 2 + 400 : 240
+  const y = source ? (source.y ?? 400) + outgoingCount * 420 : 240
   const node = lf.graphModel.addNode({
     type: String(template.type),
     properties: { ...cloneDeep(template.properties ?? {}), ...propertiesOverride },
@@ -265,10 +278,13 @@ export function validateReference(lf: LogicFlow, nodeId: string, reference: unkn
   return null
 }
 
-/** 提示词变量：{{节点名称.字段}}，全局变量为 {{global.字段}} */
+/** 变量分组（非节点）：提示词里直接用分组名，如 {{global.字段}}、{{loop.字段}} */
+export const VARIABLE_GROUPS = ['global', 'chat', 'loop', 'output']
+
+/** 提示词变量：{{节点名称.字段}}，全局 / 会话 / 循环变量为 {{分组.字段}} */
 export function promptVariablesOf(lf: LogicFlow, nodeId: string): string[] {
   return getFieldOptions(lf, nodeId).flatMap((group) =>
-    group.fields.map((field) => (group.nodeId === 'global' ? `{{global.${field.value}}}` : `{{${group.name}.${field.value}}}`)),
+    group.fields.map((field) => (VARIABLE_GROUPS.includes(group.nodeId) ? `{{${group.nodeId}.${field.value}}}` : `{{${group.name}.${field.value}}}`)),
   )
 }
 

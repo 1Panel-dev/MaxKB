@@ -117,7 +117,7 @@ export function createAgent(agent: RunnableAgent): AgentHandle {
     }
   }
 
-  return { run, stop }
+  return { run, stop, messages }
 }
 
 /** 跑一轮补全：把流式条目翻成事件下发，并返回本轮完整结果。 */

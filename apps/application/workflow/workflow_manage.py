@@ -224,8 +224,23 @@ class WorkflowManage:
         @param prompt: 提示词
         @return: 处理后的提示词
         """
-        input_template = self.workflow.reset_prompt(prompt)
-        return render_prompt(input_template, self.context)
+        input_template = self.reset_prompt(prompt)
+        return render_prompt(input_template, self.get_merged_context())
+
+    def reset_prompt(self, prompt):
+        """
+        把提示词里的变量引用替换成对 context 的取值表达式
+        @param prompt: 提示词
+        @return: 替换后的模板
+        """
+        return self.workflow.reset_prompt(prompt)
+
+    def get_merged_context(self):
+        """
+        获取当前工作流可见的全部上下文;子工作流(循环体)会把祖先工作流的上下文合并进来
+        @return: 上下文
+        """
+        return self.context
 
     def get_reference_field(self, node_id, fields):
         """

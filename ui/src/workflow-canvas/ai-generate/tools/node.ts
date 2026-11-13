@@ -7,6 +7,7 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { useAgentConfig } from '../common'
 import type { AgentTool, JsonObjectSchema, JsonSchema, NodeAgentContext, NodeAgentModule, NodeReference, RunnableAgent } from '../type'
 import {
+  VARIABLE_GROUPS,
   getDefaultModelConfig,
   getFieldOptions,
   getNode,
@@ -55,9 +56,9 @@ export function argReference(context: NodeAgentContext, name: string): NodeRefer
   return argReferences(context, name)[0]
 }
 
-/** 引用在提示词里的写法：{{节点名称.字段}}，全局变量为 {{global.字段}} */
+/** 引用在提示词里的写法：{{节点名称.字段}}，全局 / 会话 / 循环变量为 {{分组.字段}} */
 export function promptVariableOf(context: NodeAgentContext, [refNodeId, field]: NodeReference): string {
-  if (refNodeId === 'global') return `{{global.${field}}}`
+  if (VARIABLE_GROUPS.includes(refNodeId)) return `{{${refNodeId}.${field}}}`
   const group = getFieldOptions(context.lf, context.nodeId).find((item) => item.nodeId === refNodeId)
   return `{{${group?.name ?? refNodeId}.${field}}}`
 }
@@ -65,7 +66,10 @@ export function promptVariableOf(context: NodeAgentContext, [refNodeId, field]: 
 /** 已绑定实参的说明，写进节点配置 agent 的 prompt */
 function describeArgs(context: NodeAgentContext): string {
   const lines = Object.keys(context.args).map((name) => {
-    const references = argReferences(context, name).map((reference) => `${JSON.stringify(reference)}（提示词写作 ${promptVariableOf(context, reference)}）`)
+    const references = argReferences(context, name).map((reference) => {
+      const structure = context.argStructures[reference.join('.')]
+      return `${JSON.stringify(reference)}（提示词写作 ${promptVariableOf(context, reference)}${structure ? `；值结构：${structure}` : ''}）`
+    })
     return `- ${name} = ${references.join('、')}`
   })
   return lines.length ? `已绑定入参（由父 agent 连线决定，需要引用上游数据时使用这些，不要另选）：\n${lines.join('\n')}` : '本节点没有绑定入参。'
@@ -90,11 +94,6 @@ export function formatValidationError(error: unknown): string {
     if (messages.length) return prefix + messages.join('；')
   }
   return prefix + (typeof error === 'string' ? error : JSON.stringify(errMessage ?? error))
-}
-
-export function summarizeNodeData(value: unknown): unknown {
-  const text = JSON.stringify(value ?? {})
-  return text.length > 600 ? `${text.slice(0, 600)}…` : value
 }
 
 /**
@@ -299,9 +298,15 @@ const NODE_GUIDE = `你是 MaxKB 工作流某个节点的配置专家，只配�
 export function useNodeAgent(context: NodeAgentContext, config: { prompt: string; tools: AgentTool[] }): RunnableAgent {
   const node = getNode(context.lf, context.nodeId)
   const expected = context.expectedReturns.length ? `\n要求产出的返回字段（字段名必须一致）：${context.expectedReturns.join('、')}` : ''
+  const downstream = context.downstream.length
+    ? `\n下游要求（本节点直连的下游节点需要的入参结构；本节点的输出交给它时，返回值必须严格符合该结构，顶层是数组就返回列表，不要返回单个对象或以名称为键的字典）：\n${context.downstream.join('\n')}`
+    : ''
+  // 带上节点现有配置：续聊修改时在现状上改，而不是不知情地整体重写
+  const currentText = JSON.stringify(node?.properties.node_data ?? {})
+  const current = currentText.length > 2 ? `\n当前配置（node_data；修改已有节点时在此基础上只改要求涉及的部分，其余保持）：\n${currentText.length > 8000 ? `${currentText.slice(0, 8000)}…` : currentText}` : ''
   return useAgentConfig(
     {
-      prompt: `${NODE_GUIDE}\n\n${config.prompt}\n\n本节点：id=${context.nodeId}，名称=${node ? nodeNameOf(node) : context.nodeId}\n${describeArgs(context)}${expected}`,
+      prompt: `${NODE_GUIDE}\n\n${config.prompt}\n\n本节点：id=${context.nodeId}，名称=${node ? nodeNameOf(node) : context.nodeId}\n${describeArgs(context)}${expected}${downstream}${current}`,
       tools: [getFieldOptionsTool(context), ...config.tools],
     },
     context.bindings,
@@ -361,11 +366,25 @@ export function createLoopConditionAgent(type: WorkflowNodeType.LoopBreakNode | 
 // 节点函数签名
 // ============================================================
 
-/** JSON Schema 渲染成 TS 风格的类型 */
-function schemaType(schema: JsonSchema | undefined): string {
+/** 带逐字段结构的 schema：有 properties 的对象，或元素为这种对象的数组 */
+export function isStructuredSchema(schema: JsonSchema | undefined): schema is JsonSchema {
+  if (!schema) return false
+  const target = schema.type === 'array' ? (schema.items as JsonSchema | undefined) : schema
+  return target?.type === 'object' && !!target.properties && typeof target.properties === 'object'
+}
+
+/** JSON Schema 渲染成 TS 风格的类型；带 properties 的对象逐字段展开（含必填与说明），供描述嵌套结构 */
+export function schemaType(schema: JsonSchema | undefined): string {
   if (!schema) return 'any'
   if (Array.isArray(schema.enum)) return schema.enum.map((value) => JSON.stringify(value)).join(' | ')
-  if (schema.type === 'array') return `${schemaType(schema.items as JsonSchema | undefined)}[]`
+  if (schema.type === 'array') {
+    const item = schemaType(schema.items as JsonSchema | undefined)
+    return item.startsWith('{') ? `Array<${item}>` : `${item}[]`
+  }
+  if (schema.type === 'object' && schema.properties && typeof schema.properties === 'object') {
+    const fields = objectFields(schema as unknown as JsonObjectSchema, '字段名')
+    return fields.length ? `{ ${fields.join('; ')} }` : 'object'
+  }
   return typeof schema.type === 'string' ? schema.type : 'any'
 }
 
@@ -397,7 +416,17 @@ function configSummary(schema: JsonObjectSchema): string {
  * // 名称：说明
  * // 配置：配置项
  * type(形参): { 返回字段 }
+ * 未注册节点配置 agent 的菜单节点用 renderPlainNodeFunction：说明取菜单文案，返回取模板的 config.fields。
  */
+export function renderPlainNodeFunction(type: string, label: string, text: string, outputs: Array<{ value: string; label: string }>): string {
+  const returns = outputs.map((output) => `${output.value}: any /* ${output.label} */`)
+  return [
+    `// ${label}：${text || label}`,
+    '// 配置：暂不支持 AI 配置（可新增并连线，不能 configure_node，需用户手动配置）',
+    `${type}(): ${returns.length ? `{ ${returns.join('; ')} }` : 'void'}`,
+  ].join('\n')
+}
+
 export function renderNodeFunction(type: string, label: string, module: NodeAgentModule): string {
   const params = objectFields(module.params, '参数名')
   const returns = objectFields(module.returns, '字段名')
