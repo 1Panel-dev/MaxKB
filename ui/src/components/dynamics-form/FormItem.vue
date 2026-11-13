@@ -143,6 +143,12 @@ const to_rule = (rule: any) => {
   if (typeof rule.validator === 'string' || rule.validator === 'component') {
     return { ...rule, validator: component_validator }
   }
+  if (
+    rule.required &&
+    ['TextInput', 'TextareaInput', 'PasswordInput'].includes(props.formfield.input_type)
+  ) {
+    return { ...rule, type: 'string', whitespace: true }
+  }
   return rule
 }
 
@@ -152,11 +158,11 @@ const to_rule = (rule: any) => {
 const rules = computed(() => {
   return props_info.value.rules
     ? props_info.value.rules.map(to_rule)
-    : {
+    : to_rule({
         message: errMsg.value,
         trigger: props.formfield.input_type === 'Slider' ? 'blur' : ['blur', 'change'],
         required: props.formfield.required === false ? false : true,
-      }
+      })
 })
 
 /**

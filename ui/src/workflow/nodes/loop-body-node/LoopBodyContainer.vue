@@ -2,7 +2,7 @@
   <div @mousedown="mousedown" class="workflow-node-container p-16" style="overflow: visible">
     <div
       class="step-container white-bg border-r-8 p-16"
-      :class="{ isSelected: props.nodeModel.isSelected, error: node_status !== 200 }"
+      :class="{ error: node_status !== 200 }"
       style="overflow: visible;"
     >
       <div>
@@ -227,14 +227,11 @@ defineExpose({ close, zoom })
 <style lang="scss" scoped>
 .workflow-node-container {
   .step-container {
-    border: 2px solid #ffffff !important;
+    border: 2px solid var(--workflow-node-border-color) !important;
     box-sizing: border-box;
     box-shadow: 0px 2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.12);
     &:hover {
       box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
-    }
-    &.isSelected {
-      border: 2px solid var(--el-color-primary) !important;
     }
     &.error {
       border: 1px solid #f54a45 !important;

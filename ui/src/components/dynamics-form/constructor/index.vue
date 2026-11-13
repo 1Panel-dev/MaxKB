@@ -213,8 +213,8 @@ const form_data = ref<any>({
 const visibility_rules = ref<any>(null)
 const visibilityRef = ref()
 const rules = {
-  label: [{ required: true, message: t('dynamicsForm.paramForm.name.requiredMessage') }],
-  field: [{ required: true, message: t('dynamicsForm.paramForm.field.requiredMessage') }],
+  label: [{ required: true, whitespace: true, message: t('dynamicsForm.paramForm.name.requiredMessage') }],
+  field: [{ required: true, whitespace: true, message: t('dynamicsForm.paramForm.field.requiredMessage') }],
   required: [{ required: true, message: t('dynamicsForm.paramForm.required.requiredMessage') }],
   input_type: [{ required: true, message: t('dynamicsForm.paramForm.input_type.requiredMessage') }],
 }

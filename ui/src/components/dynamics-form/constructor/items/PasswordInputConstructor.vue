@@ -55,7 +55,7 @@
     prop="default_value"
     :label="$t('dynamicsForm.default.label')"
     :rules="
-      formValue.required ? [{ required: true, message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}` }, ...rules] : rules
+      formValue.required ? [{ required: true, whitespace: true, message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}` }, ...rules] : rules
     "
   >
     <div class="defaultValueCheckbox">
@@ -117,6 +117,7 @@ const getData = () => {
         ? [
           {
             required: true,
+            whitespace: true,
             message: `${formValue.value.label} ${t('dynamicsForm.default.requiredMessage')}`
           },
           {

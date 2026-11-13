@@ -1,11 +1,11 @@
-import {fileURLToPath, URL} from 'node:url'
-import type {ProxyOptions} from 'vite'
-import {defineConfig, loadEnv} from 'vite'
+import { fileURLToPath, URL } from 'node:url'
+import type { ProxyOptions } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import DefineOptions from 'unplugin-vue-define-options/vite'
 import path from 'path'
-import {createHtmlPlugin} from 'vite-plugin-html'
+import { createHtmlPlugin } from 'vite-plugin-html'
 import fs from 'fs'
 // import vueDevTools from 'vite-plugin-vue-devtools'
 const envDir = './env'
@@ -36,15 +36,15 @@ export default defineConfig((conf: any) => {
   const ENV = loadEnv(mode, envDir)
   const proxyConf: Record<string, string | ProxyOptions> = {}
   proxyConf['/admin/api'] = {
-    target: 'http://127.0.0.1:8080',
+    target: 'https://mk-ee.fit2cloud.cn',
     changeOrigin: true,
   }
   proxyConf['/chat/api'] = {
-    target: 'http://127.0.0.1:8080',
+    target: 'https://mk-ee.fit2cloud.cn',
     changeOrigin: true,
   }
   proxyConf['/doc'] = {
-    target: 'http://127.0.0.1:8080',
+    target: 'https://mk-ee.fit2cloud.cn',
     changeOrigin: true,
     rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
@@ -89,7 +89,7 @@ export default defineConfig((conf: any) => {
       vue(),
       vueJsx(),
       DefineOptions(),
-      createHtmlPlugin({template: ENV.VITE_ENTRY}),
+      createHtmlPlugin({ template: ENV.VITE_ENTRY }),
       renameHtmlPlugin(`dist${ENV.VITE_BASE_PATH}`, ENV.VITE_ENTRY),
     ],
     server: {

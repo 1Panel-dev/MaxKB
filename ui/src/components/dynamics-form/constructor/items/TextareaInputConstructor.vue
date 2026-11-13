@@ -58,6 +58,7 @@
         ? [
             {
               required: true,
+              whitespace: true,
               message: `${$t('dynamicsForm.default.label')}${$t('dynamicsForm.default.requiredMessage')}`,
             },
             ...rules,
@@ -122,6 +123,7 @@ const getData = () => {
         ? [
             {
               required: true,
+              whitespace: true,
               message: `${formValue.value.label} ${t('dynamicsForm.default.requiredMessage')}`,
             },
             {

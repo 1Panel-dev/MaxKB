@@ -81,12 +81,12 @@
   &:focus-visible {
     outline: none !important;
   }
-  &.is-link:focus {
-    background: none;
+  &.is-link {
     border: none;
-  }
-  &.is-link:not(.is-disabled):hover {
-    color: var(--el-color-primary);
+    &:focus {
+      background: none;
+      border: none;
+    }
   }
 }
 .el-button--text {
