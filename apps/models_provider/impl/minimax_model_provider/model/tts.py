@@ -68,10 +68,10 @@ class MiniMaxTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         result = response.json()
         if result.get('base_resp', {}).get('status_code', 0) != 0:
             error_msg = result.get('base_resp', {}).get('status_msg', 'Unknown error')
-            raise Exception(f'MiniMax TTS API error: {error_msg}')
+            raise RuntimeError(f'MiniMax TTS API error: {error_msg}')
 
         audio_hex = result.get('data', {}).get('audio', '')
         if not audio_hex:
-            raise Exception('MiniMax TTS API returned empty audio data')
+            raise RuntimeError('MiniMax TTS API returned empty audio data')
 
         return bytes.fromhex(audio_hex)
