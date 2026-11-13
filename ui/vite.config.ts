@@ -36,15 +36,15 @@ export default defineConfig((conf: any) => {
   const ENV = loadEnv(mode, envDir)
   const proxyConf: Record<string, string | ProxyOptions> = {}
   proxyConf['/admin/api'] = {
-    target: 'https://mk-ee.fit2cloud.cn',
+    target: 'http://127.0.0.1:8080',
     changeOrigin: true,
   }
   proxyConf['/chat/api'] = {
-    target: 'https://mk-ee.fit2cloud.cn',
+    target: 'http://127.0.0.1:8080',
     changeOrigin: true,
   }
   proxyConf['/doc'] = {
-    target: 'https://mk-ee.fit2cloud.cn',
+    target: 'http://127.0.0.1:8080',
     changeOrigin: true,
     rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
   }
