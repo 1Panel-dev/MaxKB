@@ -476,14 +476,14 @@ def common_convert_value(_type, value):
         v = json.loads(value)
         if isinstance(v, dict):
             return v
-        raise Exception(_("type error"))
+        raise RuntimeError(_("type error"))
     if _type == "array":
         if isinstance(value, list):
             return value
         v = json.loads(value)
         if isinstance(v, list):
             return v
-        raise Exception(_("type error"))
+        raise RuntimeError(_("type error"))
     return value
 
 
