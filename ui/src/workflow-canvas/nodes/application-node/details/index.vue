@@ -2,6 +2,7 @@
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import { getFileIconUrl } from '@/utils/icon'
+import { downloadByURL } from '@/utils/common'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 
 defineOptions({ name: 'ApplicationNodeDetail' })
@@ -34,15 +35,13 @@ defineProps<{
           <p class="mb-1 text-N600">文档：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(f, i) in data.document_list" :key="i">
-              <!-- 在新标签页打开或下载附件 -->
-              <a :href="f.url || undefined" target="_blank" rel="noopener noreferrer" :download="f.name" class="block min-w-0">
-                <el-card shadow="never" class="small cursor-pointer">
-                  <div class="flex-align-center gap-2">
-                    <img :src="getFileIconUrl(f?.name)" alt="" width="24" />
-                    <span class="min-w-0 truncate" :title="f?.name">{{ f?.name }}</span>
-                  </div>
-                </el-card>
-              </a>
+              <!-- 下载文档附件 -->
+              <el-card shadow="never" class="small cursor-pointer" @click="f.url && downloadByURL(f.url, f.name)">
+                <div class="flex-align-center gap-2">
+                  <img :src="getFileIconUrl(f?.name)" alt="" width="24" />
+                  <span class="min-w-0 truncate" :title="f?.name">{{ f?.name }}</span>
+                </div>
+              </el-card>
             </template>
           </div>
         </div>
@@ -100,15 +99,13 @@ defineProps<{
           <p class="mb-1 text-N600">其他：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(f, i) in data.other_list" :key="i">
-              <!-- 在新标签页打开或下载附件 -->
-              <a :href="f.url || undefined" target="_blank" rel="noopener noreferrer" :download="f.name" class="block min-w-0">
-                <el-card shadow="never" class="small cursor-pointer">
-                  <div class="flex-align-center gap-2">
-                    <img :src="getFileIconUrl(f?.name)" alt="" width="24" />
-                    <span class="min-w-0 truncate" :title="f?.name">{{ f?.name }}</span>
-                  </div>
-                </el-card>
-              </a>
+              <!-- 下载其他附件 -->
+              <el-card shadow="never" class="small cursor-pointer" @click="f.url && downloadByURL(f.url, f.name)">
+                <div class="flex-align-center gap-2">
+                  <img :src="getFileIconUrl(f?.name)" alt="" width="24" />
+                  <span class="min-w-0 truncate" :title="f?.name">{{ f?.name }}</span>
+                </div>
+              </el-card>
             </template>
           </div>
         </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
-import { getFileUrl } from '@/utils/common'
+import { downloadByURL, getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
@@ -11,6 +11,12 @@ defineOptions({ name: 'RerankerNodeDetail' })
 defineProps<{
   data: ExecutionNodeDetail
 }>()
+
+// 来源文件按原文件名下载，网页来源打开原网址。
+function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
+  if (fileId) downloadByURL(getFileUrl(fileId), name.trim())
+  else if (sourceUrl && /^https?:\/\//i.test(sourceUrl.trim())) window.open(sourceUrl.trim(), '_blank', 'noopener,noreferrer')
+}
 </script>
 
 <template>
@@ -50,21 +56,17 @@ defineProps<{
             <MdPreview :model-value="paragraph.page_content || paragraph.metadata?.content || ''" no-img-zoom-in />
 
             <!-- 打开来源文档 -->
-            <a
+            <el-card
               v-if="paragraph.metadata?.document_name?.trim()"
-              :href="getFileUrl(paragraph.metadata.source_file_id) || paragraph.metadata.source_url || undefined"
-              target="_blank"
-              rel="noopener noreferrer"
-              :download="paragraph.metadata.document_name.trim()"
-              class="mt-2 block min-w-0"
+              shadow="never"
+              class="small cursor-pointer mt-2 min-w-0"
+              @click="openSourceDocument(paragraph.metadata.document_name, paragraph.metadata?.source_file_id, paragraph.metadata?.source_url)"
             >
-              <el-card shadow="never" class="small cursor-pointer">
-                <div class="flex-align-center gap-2">
-                  <img :src="getFileIconUrl(paragraph.metadata.document_name.trim(), paragraph.metadata.knowledge_type)" alt="" width="24" />
-                  <span class="min-w-0 truncate" :title="paragraph.metadata.document_name.trim()">{{ paragraph.metadata.document_name.trim() }}</span>
-                </div>
-              </el-card>
-            </a>
+              <div class="flex-align-center gap-2">
+                <img :src="getFileIconUrl(paragraph.metadata.document_name.trim(), paragraph.metadata.knowledge_type)" alt="" width="24" />
+                <span class="min-w-0 truncate" :title="paragraph.metadata.document_name.trim()">{{ paragraph.metadata.document_name.trim() }}</span>
+              </div>
+            </el-card>
 
             <template #footer>
               <div class="flex-align-center w-full gap-2 border-t pt-2">
@@ -104,21 +106,17 @@ defineProps<{
             <MdPreview :model-value="paragraph.page_content || paragraph.metadata?.content || ''" no-img-zoom-in />
 
             <!-- 打开来源文档 -->
-            <a
+            <el-card
               v-if="paragraph.metadata?.document_name?.trim()"
-              :href="getFileUrl(paragraph.metadata.source_file_id) || paragraph.metadata.source_url || undefined"
-              target="_blank"
-              rel="noopener noreferrer"
-              :download="paragraph.metadata.document_name.trim()"
-              class="mt-2 block min-w-0"
+              shadow="never"
+              class="small cursor-pointer mt-2 min-w-0"
+              @click="openSourceDocument(paragraph.metadata.document_name, paragraph.metadata?.source_file_id, paragraph.metadata?.source_url)"
             >
-              <el-card shadow="never" class="small cursor-pointer">
-                <div class="flex-align-center gap-2">
-                  <img :src="getFileIconUrl(paragraph.metadata.document_name.trim(), paragraph.metadata.knowledge_type)" alt="" width="24" />
-                  <span class="min-w-0 truncate" :title="paragraph.metadata.document_name.trim()">{{ paragraph.metadata.document_name.trim() }}</span>
-                </div>
-              </el-card>
-            </a>
+              <div class="flex-align-center gap-2">
+                <img :src="getFileIconUrl(paragraph.metadata.document_name.trim(), paragraph.metadata.knowledge_type)" alt="" width="24" />
+                <span class="min-w-0 truncate" :title="paragraph.metadata.document_name.trim()">{{ paragraph.metadata.document_name.trim() }}</span>
+              </div>
+            </el-card>
 
             <template #footer>
               <div class="flex-align-center w-full gap-2 border-t pt-2">
