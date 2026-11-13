@@ -135,6 +135,9 @@ const open = (row: any, index?: any) => {
     form.value = cloneDeep(row)
     isEdit.value = true
     currentIndex.value = index
+  } else {
+    isEdit.value = false
+    currentIndex.value = null
   }
 
   dialogVisible.value = true
