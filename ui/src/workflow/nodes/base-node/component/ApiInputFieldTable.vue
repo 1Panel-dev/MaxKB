@@ -77,9 +77,7 @@ const ApiFieldFormDialogRef = ref()
 const inputFieldList = ref<any[]>([])
 
 function openAddDialog(data?: any, index?: any) {
-  if (typeof index !== 'undefined') {
-    currentIndex.value = index
-  }
+  currentIndex.value = typeof index !== 'undefined' ? index : null
   ApiFieldFormDialogRef.value.open(data)
 }
 
