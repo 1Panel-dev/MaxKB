@@ -229,7 +229,8 @@ export function createMessageInputStore(deps: MessageInputDeps) {
 
     const isFirstMessage = messages.value.length === 0
     const abstract = questionText.substring(0, 256)
-    if (isFirstMessage && !conversations.value.some((conversation) => conversation.id === chatId)) {
+    const conversation = conversations.value.find((item) => item.id === chatId)
+    if (isFirstMessage && !conversation) {
       // 本地新会话尚未由历史接口返回，使用首次发送时间展示相对时间。
       const createTime = new Date().toISOString()
       conversations.value.unshift({
@@ -238,6 +239,14 @@ export function createMessageInputStore(deps: MessageInputDeps) {
         create_time: createTime,
         update_time: createTime,
       })
+    } else if (conversation) {
+      // 在已有会话中继续提问：移到历史列表顶部并刷新更新时间，与后端按 update_time 倒序展示一致。
+      conversation.update_time = new Date().toISOString()
+      const index = conversations.value.indexOf(conversation)
+      if (index > 0) {
+        conversations.value.splice(index, 1)
+        conversations.value.unshift(conversation)
+      }
     }
 
     sendMessage({

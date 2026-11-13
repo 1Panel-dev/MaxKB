@@ -303,6 +303,8 @@ class ChatSerializers(serializers.Serializer):
         chat_variable = dict(chat.meta) if isinstance(chat.meta, dict) else {}
         if chat_record_id is None:
             ChatRecord(id=chat_record_id_str, **self.get_defaults_record(message_dict)).save(force_insert=True)
+            # 新提问刷新会话更新时间，历史列表按 update_time 倒序展示
+            QuerySet(Chat).filter(id=chat_id).update(update_time=timezone.now())
 
         parameters = {
             "retrieval_identity": identity_from_server(chat_user_id, chat_user_type, debug),
