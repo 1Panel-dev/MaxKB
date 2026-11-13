@@ -43,7 +43,7 @@ from knowledge.models import Knowledge
 from maxkb.conf import PROJECT_DIR
 from models_provider.base_model_provider import ModelTypeConst
 from models_provider.models import Model
-from system_manage.models import WorkspaceUserResourcePermission
+from system_manage.models import WorkspaceUserGroupResourcePermission, WorkspaceUserResourcePermission
 from tools.models import Tool, ToolType
 
 _PERM_WITH_ROLE = ["VIEW", "MANAGE", "ROLE"]
@@ -115,6 +115,35 @@ def is_extends_workspace_manage(auth, workspace_id):
     return str(Role(RoleConstants.EXTENDS_WORKSPACE_MANAGE.value.name, workspace_id)) in auth.roles
 
 
+def get_user_resource_permission_target_query(workspace_id, user_id, auth_target_type, permission_list):
+    """Return accessible resource target ids, covering both direct and group grants."""
+    direct_targets = (
+        QuerySet(WorkspaceUserResourcePermission)
+        .filter(
+            workspace_id=workspace_id,
+            user_id=user_id,
+            auth_target_type=auth_target_type,
+            permission_list__overlap=permission_list,
+        )
+        .exclude(target="default")
+        .annotate(target_uuid=Cast("target", output_field=UUIDField()))
+        .values_list("target_uuid", flat=True)
+    )
+    group_targets = (
+        QuerySet(WorkspaceUserGroupResourcePermission)
+        .filter(
+            workspace_id=workspace_id,
+            auth_target_type=auth_target_type,
+            permission_list__overlap=permission_list,
+            user_group__user_relations__user_id=user_id,
+        )
+        .exclude(target="default")
+        .annotate(target_uuid=Cast("target", output_field=UUIDField()))
+        .values_list("target_uuid", flat=True)
+    )
+    return direct_targets.union(group_targets)
+
+
 def get_start_time(date_time):
     d = datetime.datetime.strptime(date_time, "%Y-%m-%d").date()
     naive = datetime.datetime.combine(d, datetime.time.min)
@@ -161,16 +190,8 @@ class HomePageSerializer(serializers.Serializer):
                     if hasPermission(auth, PermissionConstants.APPLICATION_READ.value)
                     else ["VIEW", "MANAGE"]
                 )
-                permission_subquery = (
-                    WorkspaceUserResourcePermission.objects.filter(
-                        workspace_id=workspace_id,
-                        user_id=user_id,
-                        auth_target_type="APPLICATION",
-                        permission_list__overlap=permission_list,
-                    )
-                    .exclude(target="default")
-                    .annotate(target_uuid=Cast("target", output_field=UUIDField()))
-                    .values("target_uuid")
+                permission_subquery = get_user_resource_permission_target_query(
+                    workspace_id, user_id, "APPLICATION", permission_list
                 )
                 query = query.filter(chat__application_id__in=permission_subquery)
 
@@ -207,16 +228,8 @@ class HomePageSerializer(serializers.Serializer):
                     if hasPermission(auth, PermissionConstants.APPLICATION_READ.value)
                     else ["VIEW", "MANAGE"]
                 )
-                permission_subquery = (
-                    WorkspaceUserResourcePermission.objects.filter(
-                        workspace_id=workspace_id,
-                        user_id=user_id,
-                        auth_target_type="APPLICATION",
-                        permission_list__overlap=permission_list,
-                    )
-                    .exclude(target="default")
-                    .annotate(target_uuid=Cast("target", output_field=UUIDField()))
-                    .values("target_uuid")
+                permission_subquery = get_user_resource_permission_target_query(
+                    workspace_id, user_id, "APPLICATION", permission_list
                 )
                 query = query.filter(chat__application_id__in=permission_subquery)
 
@@ -349,17 +362,8 @@ class HomePageSerializer(serializers.Serializer):
                 _PERM_WITH_ROLE if hasPermission(auth, PermissionConstants.APPLICATION_READ.value) else _PERM_DEFAULT
             )
 
-            allowed_app_ids = (
-                QuerySet(WorkspaceUserResourcePermission)
-                .filter(
-                    workspace_id=workspace_id,
-                    user_id=user_id,
-                    auth_target_type="APPLICATION",
-                    permission_list__overlap=permission_list,
-                )
-                .exclude(target="default")
-                .annotate(target_uuid=Cast("target", output_field=UUIDField()))
-                .values_list("target_uuid", flat=True)
+            allowed_app_ids = get_user_resource_permission_target_query(
+                workspace_id, user_id, "APPLICATION", permission_list
             )
 
             return queryset.filter(application_id__in=allowed_app_ids)
@@ -421,16 +425,9 @@ class HomePageSerializer(serializers.Serializer):
                 )
 
                 queryset = queryset.filter(
-                    id__in=QuerySet(WorkspaceUserResourcePermission)
-                    .filter(
-                        workspace_id=workspace_id,
-                        user_id=user_id,
-                        auth_target_type="APPLICATION",
-                        permission_list__overlap=permission_list,
+                    id__in=get_user_resource_permission_target_query(
+                        workspace_id, user_id, "APPLICATION", permission_list
                     )
-                    .exclude(target="default")
-                    .annotate(target_uuid=Cast("target", output_field=UUIDField()))
-                    .values_list("target_uuid", flat=True)
                 )
 
             record_time_filter = (
@@ -555,16 +552,9 @@ class HomePageSerializer(serializers.Serializer):
                 )
 
                 queryset = queryset.filter(
-                    id__in=QuerySet(WorkspaceUserResourcePermission)
-                    .filter(
-                        workspace_id=workspace_id,
-                        user_id=user_id,
-                        auth_target_type="APPLICATION",
-                        permission_list__overlap=permission_list,
+                    id__in=get_user_resource_permission_target_query(
+                        workspace_id, user_id, "APPLICATION", permission_list
                     )
-                    .exclude(target="default")
-                    .annotate(target_uuid=Cast("target", output_field=UUIDField()))
-                    .values_list("target_uuid", flat=True)
                 )
 
             return queryset.annotate(
@@ -768,16 +758,7 @@ class HomePageSerializer(serializers.Serializer):
                 else ["VIEW", "MANAGE"]
             )
             return QuerySet(Application).filter(
-                id__in=QuerySet(WorkspaceUserResourcePermission)
-                .filter(
-                    workspace_id=workspace_id,
-                    user_id=user_id,
-                    auth_target_type="APPLICATION",
-                    permission_list__overlap=permission_list,
-                )
-                .exclude(target="default")
-                .annotate(target_uuid=Cast("target", output_field=UUIDField()))
-                .values_list("target_uuid", flat=True)
+                id__in=get_user_resource_permission_target_query(workspace_id, user_id, "APPLICATION", permission_list)
             )
 
         def aggregation(self, auth, with_valid=True):
@@ -817,16 +798,7 @@ class HomePageSerializer(serializers.Serializer):
                 else ["VIEW", "MANAGE"]
             )
             return QuerySet(Knowledge).filter(
-                id__in=QuerySet(WorkspaceUserResourcePermission)
-                .filter(
-                    workspace_id=workspace_id,
-                    user_id=user_id,
-                    auth_target_type="KNOWLEDGE",
-                    permission_list__overlap=permission_list,
-                )
-                .exclude(target="default")
-                .annotate(target_uuid=Cast("target", output_field=UUIDField()))
-                .values_list("target_uuid", flat=True)
+                id__in=get_user_resource_permission_target_query(workspace_id, user_id, "KNOWLEDGE", permission_list)
             )
 
         def aggregation(self, auth, with_valid=True):
@@ -873,16 +845,7 @@ class HomePageSerializer(serializers.Serializer):
                 else ["VIEW", "MANAGE"]
             )
             return QuerySet(Tool).filter(
-                id__in=QuerySet(WorkspaceUserResourcePermission)
-                .filter(
-                    workspace_id=workspace_id,
-                    user_id=user_id,
-                    auth_target_type="TOOL",
-                    permission_list__overlap=permission_list,
-                )
-                .exclude(target="default")
-                .annotate(target_uuid=Cast("target", output_field=UUIDField()))
-                .values_list("target_uuid", flat=True)
+                id__in=get_user_resource_permission_target_query(workspace_id, user_id, "TOOL", permission_list)
             )
 
         def aggregation(self, auth, with_valid=True):
@@ -926,16 +889,7 @@ class HomePageSerializer(serializers.Serializer):
                 else ["VIEW", "MANAGE"]
             )
             return QuerySet(Model).filter(
-                id__in=QuerySet(WorkspaceUserResourcePermission)
-                .filter(
-                    workspace_id=workspace_id,
-                    user_id=user_id,
-                    auth_target_type="MODEL",
-                    permission_list__overlap=permission_list,
-                )
-                .exclude(target="default")
-                .annotate(target_uuid=Cast("target", output_field=UUIDField()))
-                .values_list("target_uuid", flat=True)
+                id__in=get_user_resource_permission_target_query(workspace_id, user_id, "MODEL", permission_list)
             )
 
         def aggregation(self, auth, with_valid=True):
