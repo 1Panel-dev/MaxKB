@@ -1,11 +1,18 @@
 /** 工作空间触发器操作权限。 */
 import { can } from '../policy'
-import { PermissionConstants as P } from '../core'
+import { hasPermission, PermissionConstants as P } from '../core'
+import { AggregatePermission, Role, RoleConstants } from '../core/common'
+import { getWorkspaceId } from '@/utils/resource-context'
 export default {
     /**
    * 工作空间「触发器」只读权限
    */
-  read: () => can(P.TRIGGER_READ),
+  read: () => {
+    const workspaceId=getWorkspaceId() || ''
+    return hasPermission(AggregatePermission.builder()
+    .addRole(new Role(RoleConstants.WORKSPACE_MANAGE.name, workspaceId))
+    .addPermission(P.TRIGGER_READ.getWorkspacePermission()({'workspaceId':workspaceId})).build())
+  },
   /**
    * 工作空间「触发器」创建权限
    */
