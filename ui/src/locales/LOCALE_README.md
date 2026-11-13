@@ -6,7 +6,7 @@
 ## 分类
 
 按“业务域 → 对象或场景 → 文案用途”组织；文件按业务域划分，不对应组件目录。
-当前只建立实际使用的 common.json，不预建空业务包。
+当前仅建立实际使用的 auth.json；common 等业务包在有文案接入时创建，不保留空包。
 
 | 业务域      | 内容                                             |
 | ----------- | ------------------------------------------------ |
@@ -25,7 +25,6 @@
 业务域内按实际对象拆分，如 knowledge.document；末级按用途使用：
 `title`、`description`、`actions`、`fields`、`validation`、`messages`、`dialogs`、
 `states`、`options`、`empty`。fields 内使用字段名下的 label、placeholder、description。
-common.errors 用于通用错误场景，例如 common.errors.notFound.description。
 
 归属以业务含义判断：知识库检索模式归 knowledge，知识库检索节点归 workflow。
 系统资源管理复用原业务域，不复制到 system。多处使用不等于通用；相同中文但业务语义
@@ -45,15 +44,20 @@ common.errors 用于通用错误场景，例如 common.errors.notFound.descripti
 
 Admin 和 Chat 分别调用 createAppI18n，连接自己的 User Store；该模块不导入任何 Store。
 Store 是语言状态来源，通过 setLanguage 更新，不能直接修改 Vue I18n 的 locale。
-App.vue 通过当前 locale 配置 Element Plus，初始化同时维护 html.lang。
+App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、zh-tw 日期语言包；
+英文使用内置 en。日期组件按当前 Element Plus 语言读取日期文案，不修改时区及原始值。
+初始化同时维护 html.lang。Markdown 编辑器与预览读取当前应用的 locale，繁体映射为 zh-TW，
+语言包在入口通过 configureMarkdownEditor 注册，不跟随语言切换重复初始化或重建编辑器。
 
 两个入口继续共用 MaxKB-locale。初始化按本地缓存、浏览器语言、默认中文选择；
 英语变体归一为 en-US；zh-Hant、zh-TW、zh-HK、zh-MO 归一为 zh-Hant，
 显式 zh-Hans 优先使用简体，其余语言回退 zh-CN。Element Plus 的繁体映射为 zh-tw。Admin 加载账号后继续采用账号语言。
 跨标签页缓存变化同步到当前 Store。请求头复用原请求层的 user.language。
-当前语言选择只保存本地，不写回账号；账号偏好优先级在账号设置模块中处理。
+登录前的语言选择只保存本地；头部菜单调用当前账号语言接口，成功后同步 Store、
+用户档案和本地偏好，不刷新页面。Admin 后续加载账号时继续采用已保存的账号语言。
 
 ## 分批迁移
 
-404 页面为当前样例，提供简体、英文及繁体切换。其余界面、路由标题、编辑器及日期格式专项
+Admin 登录与找回密码页面支持三语切换，错误页暂不接入翻译。复用的账号与扫码组件同时影响 Chat 登录和
+外观预览；平台配置的品牌文案保持原值，第三方扫码界面由 SDK 提供。Element Plus 日期组件及 Markdown 编辑器、预览已接入三语。其余界面、路由标题及业务日期格式
 按模块接入，允许过渡期保留原中文。每批完成后等待用户检查，未经确认不扩展下一批。

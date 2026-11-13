@@ -552,3 +552,10 @@ Chat／Portal 视图将左栏布局模式绑定到会话列表 Store；开启分
 日志消息继续使用独立日志 Footer，`log-message-footer/feedback/` 根据记录的反馈状态只读展示
 对应的彩色禁用按钮，并在操作栏下方通过本地 `FeedbackCard.vue` 展示已保存原因与补充内容。
 原因、输入框和操作按钮全部禁用；未评价时不展示反馈区域，不发起提交或撤销请求。
+
+## 登录界面语言
+
+Admin 登录及找回密码使用 auth 语言包，LoginLayout 提供本地语言切换；外观预览隐藏
+语言操作入口，品牌名称与平台自定义标语不翻译。账号与扫码组件通过当前入口的 useI18n
+读取语言，可同时复用于 Chat；切换语言不重建表单，校验仅刷新已显示的错误。
+语言分类与状态约定见 [LOCALE_README.md](../locales/LOCALE_README.md)。

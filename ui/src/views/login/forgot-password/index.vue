@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import JSEncrypt from 'jsencrypt'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -20,6 +21,7 @@ const RESEND_WAIT_SECONDS = 60
 defineOptions({ name: 'ForgotPasswordView' })
 
 const router = useRouter()
+const { t, locale } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 
 const forgotPasswordFormRef = ref<FormInstance>()
@@ -33,26 +35,40 @@ const isSendCodeDisabled = computed(() => !forgotPasswordForm.email.trim() || is
 
 const validateConfirmPassword = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
   if (!value) {
-    callback(new Error('请输入确认密码'))
+    callback(new Error(t('auth.forgotPassword.validation.confirmPasswordRequired')))
   } else if (value !== forgotPasswordForm.password) {
-    callback(new Error('两次输入的密码不一致'))
+    callback(new Error(t('auth.forgotPassword.validation.passwordMismatch')))
   } else {
     callback()
   }
 }
 
-const forgotPasswordRules = reactive<FormRules<ForgotPasswordForm>>({
+const forgotPasswordRules = computed<FormRules<ForgotPasswordForm>>(() => ({
   confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
   email: [
-    { whitespace: true, required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' },
+    { whitespace: true, required: true, message: t('auth.forgotPassword.validation.emailRequired'), trigger: 'blur' },
+    { type: 'email', message: t('auth.forgotPassword.validation.emailInvalid'), trigger: 'blur' },
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 30, message: '密码长度应为 6-30 位', trigger: 'blur' },
+    { required: true, message: t('auth.credentials.validation.passwordRequired'), trigger: 'blur' },
+    { min: 6, max: 30, message: t('auth.forgotPassword.validation.passwordLength'), trigger: 'blur' },
   ],
-  verificationCode: [{ whitespace: true, required: true, message: '请输入验证码', trigger: 'blur' }],
-})
+  verificationCode: [{ whitespace: true, required: true, message: t('auth.forgotPassword.validation.codeRequired'), trigger: 'blur' }],
+}))
+
+// 切换语言时保留输入，仅更新已经显示的错误。
+watch(
+  locale,
+  () => {
+    const form = forgotPasswordFormRef.value
+    form?.fields
+      .filter((field) => field.validateState === 'error')
+      .forEach((field) => {
+        if (field.prop) void form.validateField(field.prop).catch(() => undefined)
+      })
+  },
+  { flush: 'post' },
+)
 
 const startCountdown = () => {
   countdown.value = RESEND_WAIT_SECONDS
@@ -73,7 +89,7 @@ const handleSendCode = async () => {
     isSendingCode.value = true
     try {
       await ForgotPasswordApi.postSendVerificationCode(forgotPasswordForm.email)
-      MsgSuccess('验证码已发送，请查收邮件')
+      MsgSuccess(t('auth.forgotPassword.messages.codeSent'))
       startCountdown()
     } finally {
       isSendingCode.value = false
@@ -104,7 +120,7 @@ const handleResetPassword = async () => {
       }
 
       await ForgotPasswordApi.postResetPassword({ code, email, password: encryptedData, re_password: encryptedRePassword, encrypted: true })
-      MsgSuccess('密码修改成功，请使用新密码登录')
+      MsgSuccess(t('auth.forgotPassword.messages.passwordReset'))
       router.push({ name: 'login' })
     } finally {
       isSubmitting.value = false
@@ -119,30 +135,33 @@ onMounted(() => {
 
 <template>
   <LoginLayout>
+    <!-- 返回登录页面 -->
     <el-button class="-mx-1" text @click="router.push({ name: 'login' })">
       <MkIcon name="icon_left_outlined" />
-      <span>返回登录</span>
+      <span>{{ t('auth.forgotPassword.actions.backToLogin') }}</span>
     </el-button>
 
-    <h2 class="mt-4">修改密码</h2>
+    <h2 class="mt-4">{{ t('auth.forgotPassword.title') }}</h2>
 
     <el-form
       ref="forgotPasswordFormRef"
       :model="forgotPasswordForm"
       :rules="forgotPasswordRules"
+      :validate-on-rule-change="false"
       class="mt-4"
       @submit.prevent="handleResetPassword"
       size="large"
     >
       <el-form-item prop="email">
-        <el-input v-model="forgotPasswordForm.email" autocomplete="email" placeholder="请输入邮箱" />
+        <el-input v-model="forgotPasswordForm.email" autocomplete="email" :placeholder="t('auth.forgotPassword.fields.email.placeholder')" />
       </el-form-item>
 
       <el-form-item prop="verificationCode">
         <div class="flex w-full gap-3">
-          <el-input v-model="forgotPasswordForm.verificationCode" placeholder="请输入验证码" />
-          <el-button plain class="w-35 shrink-0" :disabled="isSendCodeDisabled" :loading="isSendingCode" @click="handleSendCode">
-            {{ countdown > 0 ? `重新发送 (${countdown}s)` : '获取验证码' }}
+          <el-input v-model="forgotPasswordForm.verificationCode" :placeholder="t('auth.forgotPassword.fields.verificationCode.placeholder')" />
+          <!-- 发送邮箱验证码 -->
+          <el-button plain class="min-w-35 shrink-0" :disabled="isSendCodeDisabled" :loading="isSendingCode" @click="handleSendCode">
+            {{ countdown > 0 ? t('auth.forgotPassword.actions.resendCode', { seconds: countdown }) : t('auth.forgotPassword.actions.sendCode') }}
           </el-button>
         </div>
       </el-form-item>
@@ -152,7 +171,7 @@ onMounted(() => {
           v-model="forgotPasswordForm.password"
           autocomplete="new-password"
           maxlength="30"
-          placeholder="请输入6-30位密码"
+          :placeholder="t('auth.forgotPassword.fields.password.placeholder')"
           show-password
           type="password"
         />
@@ -163,13 +182,14 @@ onMounted(() => {
           v-model="forgotPasswordForm.confirmPassword"
           autocomplete="new-password"
           maxlength="30"
-          placeholder="请输入确认密码"
+          :placeholder="t('auth.forgotPassword.fields.confirmPassword.placeholder')"
           show-password
           type="password"
         />
       </el-form-item>
 
-      <el-button native-type="submit" type="primary" class="w-full" :loading="isSubmitting">修改密码</el-button>
+      <!-- 提交密码重置 -->
+      <el-button native-type="submit" type="primary" class="w-full" :loading="isSubmitting">{{ t('auth.forgotPassword.actions.submit') }}</el-button>
     </el-form>
   </LoginLayout>
 </template>

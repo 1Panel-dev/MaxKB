@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
 import { ArrowLeft } from '@element-plus/icons-vue'
+import { useI18n } from 'vue-i18n'
 import { getDingTalkClientAuthCode } from '@/views/login/dingtalk-client-login'
 import { type RouteLocationRaw, useRoute, useRouter } from 'vue-router'
 import { v7 as uuidv7 } from 'uuid'
@@ -16,6 +17,7 @@ defineOptions({ name: 'ChatLogin' })
 
 // 门户登录与单应用登录共用本页，场景由守卫切换到 Store 的当前认证场景
 const route = useRoute()
+const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const { auth } = useStore()
 const isClientLoggingIn = ref(false)
@@ -126,7 +128,10 @@ const loginService: LoginService = {
 onBeforeMount(async () => {
   isClientLoggingIn.value = true
   try {
-    const code = await getDingTalkClientAuthCode(route.query)
+    const code = await getDingTalkClientAuthCode(route.query, {
+      missingCode: t('auth.dingtalkClient.messages.missingCode'),
+      authorizationFailed: t('auth.dingtalkClient.messages.authorizationFailed'),
+    })
     if (!code) return
     await auth.loginWithDingTalkClient(code)
     await loginService.onLoginSuccess()

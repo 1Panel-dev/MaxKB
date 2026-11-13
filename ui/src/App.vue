@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import 'dayjs/locale/zh-cn'
+import 'dayjs/locale/zh-tw'
 import { useI18n } from 'vue-i18n'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import en from 'element-plus/es/locale/lang/en'

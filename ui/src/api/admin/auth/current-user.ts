@@ -25,4 +25,9 @@ const postCurrentUserPassword = (password: PasswordRequest) => {
   return post<PasswordRequest, boolean>('/user/current/reset_password', password)
 }
 
-export default { postCurrentUserPassword, getCurrentUserInfo, getCurrentUserRoleList, getCurrentUserWorkspaceList }
+/** 保存当前账号的语言偏好。 */
+const postCurrentUserLanguage = (language: string) => {
+  return post<{ language: string }, void>('/user/language', { language })
+}
+
+export default { postCurrentUserLanguage, postCurrentUserPassword, getCurrentUserInfo, getCurrentUserRoleList, getCurrentUserWorkspaceList }

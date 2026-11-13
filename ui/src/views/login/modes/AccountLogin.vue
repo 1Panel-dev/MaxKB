@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import JSEncrypt from 'jsencrypt'
 import { useRoute } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import { LOGIN_METHOD_LABELS } from '@/constants'
+import { useI18n } from 'vue-i18n'
+import { LOGIN_METHOD_LABEL_KEYS } from '../constants'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { LoginConfig, LoginMethod } from '@/api/types'
 import type { AccountLoginForm, LoginService } from '../types'
@@ -13,6 +14,7 @@ defineOptions({ name: 'AccountLogin' })
 const props = withDefaults(defineProps<{ loginConfig?: LoginConfig; loginService: LoginService; preview?: boolean }>(), { preview: false })
 
 const route = useRoute()
+const { t, locale } = useI18n({ useScope: 'global' })
 const isSubmitting = ref(false)
 const identifyCode = ref('')
 const loginMethod = ref<LoginMethod>(props.loginConfig?.default_value ?? LOGIN_METHOD.LOCAL)
@@ -32,11 +34,25 @@ const accountLoginMethods = computed(() => {
 const accountLoginFormRef = ref<FormInstance>()
 const accountLoginForm = reactive<AccountLoginForm>({ captcha: '', password: '', username: '' })
 
-const accountLoginRules = reactive<FormRules<AccountLoginForm>>({
-  captcha: [{ required: false, message: '请输入验证码', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  username: [{ whitespace: true, required: true, message: '请输入用户名', trigger: 'blur' }],
-})
+const accountLoginRules = computed<FormRules<AccountLoginForm>>(() => ({
+  captcha: [{ required: false, message: t('auth.credentials.validation.captchaRequired'), trigger: 'blur' }],
+  password: [{ required: true, message: t('auth.credentials.validation.passwordRequired'), trigger: 'blur' }],
+  username: [{ whitespace: true, required: true, message: t('auth.credentials.validation.usernameRequired'), trigger: 'blur' }],
+}))
+
+// 切换语言时只刷新已经显示的校验错误，不触发其他字段校验。
+watch(
+  locale,
+  () => {
+    const form = accountLoginFormRef.value
+    form?.fields
+      .filter((field) => field.validateState === 'error')
+      .forEach((field) => {
+        if (field.prop) void form.validateField(field.prop).catch(() => undefined)
+      })
+  },
+  { flush: 'post' },
+)
 
 const handleLogin = async () => {
   if (props.preview) return
@@ -114,13 +130,14 @@ onMounted(() => {
   <div class="account-login flex-column h-full" :class="{ 'is-preview': preview }">
     <div class="min-h-0 flex-1">
       <h2 class="mb-4">
-        {{ loginMethod === LOGIN_METHOD.LDAP ? 'LDAP 登录' : LOGIN_METHOD_LABELS[loginMethod] }}
+        {{ t(LOGIN_METHOD_LABEL_KEYS[loginMethod]) }}
       </h2>
 
       <el-form
         ref="accountLoginFormRef"
         :model="accountLoginForm"
         :rules="accountLoginRules"
+        :validate-on-rule-change="false"
         :autocomplete="preview ? 'off' : undefined"
         class="login-form"
         size="large"
@@ -132,7 +149,7 @@ onMounted(() => {
             :autocomplete="preview ? 'off' : 'username'"
             :disabled="preview"
             :readonly="preview"
-            placeholder="请输入用户名"
+            :placeholder="t('auth.credentials.fields.username.placeholder')"
             @blur="refreshCaptcha"
           />
         </el-form-item>
@@ -142,28 +159,40 @@ onMounted(() => {
             :autocomplete="preview ? 'new-password' : 'current-password'"
             :disabled="preview"
             :readonly="preview"
-            placeholder="请输入密码"
+            :placeholder="t('auth.credentials.fields.password.placeholder')"
             show-password
             type="password"
           />
         </el-form-item>
         <div v-if="loginMethod !== LOGIN_METHOD.LDAP && identifyCode" class="flex gap-2">
           <el-form-item prop="captcha" class="flex-1">
-            <el-input v-model="accountLoginForm.captcha" autocomplete="off" :disabled="preview" placeholder="请输入验证码" :readonly="preview" />
+            <el-input
+              v-model="accountLoginForm.captcha"
+              autocomplete="off"
+              :disabled="preview"
+              :placeholder="t('auth.credentials.fields.captcha.placeholder')"
+              :readonly="preview"
+            />
           </el-form-item>
-          <img :src="identifyCode" alt="验证码" class="w-35 h-10 cursor-pointer border" @click="refreshCaptcha" />
+          <img
+            :src="identifyCode"
+            :alt="t('auth.credentials.fields.captcha.label')"
+            class="w-35 h-10 cursor-pointer border"
+            @click="refreshCaptcha"
+          />
         </div>
         <el-form-item>
-          <el-button :loading="isSubmitting" native-type="submit" type="primary" class="w-full">登录</el-button>
+          <!-- 提交账号登录 -->
+          <el-button :loading="isSubmitting" native-type="submit" type="primary" class="w-full">{{ t('auth.login.actions.submit') }}</el-button>
         </el-form-item>
       </el-form>
       <!-- 忘记密码 -->
       <el-button v-if="loginService.forgotPassword" size="default" class="mt-3" link type="primary" @click="loginService.forgotPassword()">
-        忘记密码？
+        {{ t('auth.login.actions.forgotPassword') }}
       </el-button>
     </div>
     <div v-if="accountLoginMethods.length" class="third-login flex-col-center gap-4">
-      <el-divider>其他登录方式</el-divider>
+      <el-divider>{{ t('auth.login.description') }}</el-divider>
       <div class="flex gap-4">
         <template v-for="method in accountLoginMethods" :key="method">
           <el-button circle size="large" class="text-xs! font-medium!" @click="selectLoginMethod(method)" v-if="loginMethod !== method">

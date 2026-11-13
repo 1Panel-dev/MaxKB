@@ -33,6 +33,7 @@
     "axios": "^1.19.0",
     "codemirror": "^6.0.2",
     "cropperjs": "^1.6.3",
+    "dayjs": "^1.11.23",
     "dingtalk-jsapi": "^3.2.9",
     "dompurify": "^3.4.14",
     "echarts": "^6.1.0",

@@ -1,5 +1,0 @@
-{
-  "actions": { "goHome": "Back to home" },
-  "fields": { "language": { "label": "Interface language" } },
-  "errors": { "notFound": { "description": "This page does not exist or has been deleted." } }
-}

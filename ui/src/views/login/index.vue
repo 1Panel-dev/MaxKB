@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { getDingTalkClientAuthCode } from './dingtalk-client-login'
 import BaseInfoApi from '@/api/admin/auth/base-info.ts'
 import { useStore } from '@/stores'
@@ -11,6 +12,7 @@ import LoginModePanel from './components/LoginModePanel.vue'
 import { useAdminLoginService } from './admin-login-service'
 
 const route = useRoute()
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 const loginService = useAdminLoginService()
 
@@ -27,7 +29,10 @@ onBeforeMount(async () => {
       if (Object.keys(config).length > 0) loginConfig.value = config
     }
 
-    const code = await getDingTalkClientAuthCode(route.query)
+    const code = await getDingTalkClientAuthCode(route.query, {
+      missingCode: t('auth.dingtalkClient.messages.missingCode'),
+      authorizationFailed: t('auth.dingtalkClient.messages.authorizationFailed'),
+    })
     if (!code) return
     await auth.loginWithDingTalkClient(code)
     await loginService.onLoginSuccess()

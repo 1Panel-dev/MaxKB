@@ -163,6 +163,11 @@ FormData；保存返回完整配置，页面以该返回值作为唯一数据来
 中选择。认证配置仅提交 `login_value`、`type`、`max_attempts`、`failed_attempts`、`lock_time`，
 不透传查询响应中的选项；跨域地址提交 `cross_domain_list` 数组，不另建 `cors_config`。
 
+### 当前账号语言
+
+`admin/auth/current-user.ts` 的 postCurrentUserLanguage 向 `/user/language` POST `{ language }`。
+头部菜单在成功后更新当前入口的语言状态与用户档案，不整页刷新；失败保留原语言。
+
 ### 当前账号密码
 
 `admin/auth/current-user.ts` 的 postCurrentUserPassword 向 `/user/current/reset_password`

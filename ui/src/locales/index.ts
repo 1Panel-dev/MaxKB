@@ -2,14 +2,14 @@
 import { watch } from 'vue'
 import { createI18n } from 'vue-i18n'
 import { DEFAULT_LOCALE, LANGUAGE_STORAGE_KEY, normalizeLocale, type Locale } from './config'
-import zhCommon from './zh-CN/common.json'
-import enCommon from './en-US/common.json'
-import hantCommon from './zh-Hant/common.json'
+import zhAuth from './zh-CN/auth.json'
+import enAuth from './en-US/auth.json'
+import hantAuth from './zh-Hant/auth.json'
 
-type MessageSchema = { common: typeof zhCommon }
+type MessageSchema = { auth: typeof zhAuth }
 declare module 'vue-i18n' {
   export interface DefineLocaleMessage {
-    common: MessageSchema['common']
+    auth: MessageSchema['auth']
   }
 }
 
@@ -26,9 +26,9 @@ export function createAppI18n(user: LanguageState) {
     locale: normalizeLocale(user.language),
     fallbackLocale: DEFAULT_LOCALE,
     messages: {
-      'zh-CN': { common: zhCommon },
-      'en-US': { common: enCommon },
-      'zh-Hant': { common: hantCommon },
+      'zh-CN': { auth: zhAuth },
+      'en-US': { auth: enAuth },
+      'zh-Hant': { auth: hantAuth },
     },
   })
 
