@@ -65,14 +65,14 @@ def get_field_value(value, kwargs, _type, required, default_value, field):
             if default_value or (_type == 'boolean' and default_value == False):
                 return default_value
             if required:
-                raise Exception(f'{field} is required')
+                raise RuntimeError(f'{field} is required')
             else:
                 return None
     else:
         _value = get_reference(value.get('value'), kwargs)
     valid = valid_value_type(_value, _type)
     if not valid:
-        raise Exception(f'{field} type error')
+        raise RuntimeError(f'{field} type error')
     return _value
 
 
@@ -94,7 +94,7 @@ def get_application_execute_parameters(parameter_setting, application_parameters
                             parameters['form_data'][ck] = cv.get('default_value')
                         else:
                             if cv.get('required'):
-                                raise Exception(f'{ck} is required')
+                                raise RuntimeError(f'{ck} is required')
             else:
                 value = get_field_value(setting, kwargs, value.get('type'), value.get('required'),
                                         value.get('default_value'), key)
@@ -104,7 +104,7 @@ def get_application_execute_parameters(parameter_setting, application_parameters
                 parameters['message' if key == 'question' else key] = value.get('default_value')
             else:
                 if value.get('required'):
-                    raise Exception(f'{"message" if key == "question" else key} is required')
+                    raise RuntimeError(f'{"message" if key == "question" else key} is required')
 
     return parameters
 
@@ -146,7 +146,7 @@ def get_application_parameters_setting(application):
     else:
         base_node_list = [n for n in application.work_flow.get('nodes') if n.get('type') == "base-node"]
         if len(base_node_list) == 0:
-            raise Exception('Incorrect application workflow information')
+            raise RuntimeError('Incorrect application workflow information')
         base_node = base_node_list[0]
         api_input_field_list = base_node.get('properties').get('api_input_field_list') or []
         api_input_field_list = {user_field.get('variable'): {
