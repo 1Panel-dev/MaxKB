@@ -214,8 +214,8 @@ class DocumentSplitNode(INode):
             file_mem = bytes_to_uploaded_file(content.encode("utf-8"), doc["name"])
             get_buffer = FileBufferHandle().get_buffer
             result = default_split_handle.handle(file_mem, patterns, with_filter, limit, get_buffer, self._save_image)
-            if sheet_name is not None:
-                result["name"] = sheet_name
+            # UploadedFile sanitizes paths; document titles may legitimately contain '/'.
+            result["name"] = sheet_name if sheet_name is not None else doc["name"]
             results.append(result)
         return results
 
