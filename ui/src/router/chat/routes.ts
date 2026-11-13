@@ -41,7 +41,7 @@ const applicationRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/chat/login/index.vue'),
     meta: { title: '登录' },
   },
-   {
+  {
     path: '/:accessToken',
     redirect: (to) => {
       return `/${to.params.accessToken}/`
@@ -66,9 +66,10 @@ export const chatRoutes: RouteRecordRaw[] = [
   ...portalRoutes,
   ...applicationRoutes,
   {
-    path: '/:pathMatch(.*)*',
-    name: 'chat-not-found',
-    component: () => import('@/views/chat/error/index.vue'),
+    path: '/404',
+    name: '404',
+    component: () => import('@/views/chat/error/404.vue'),
     meta: { title: '页面不存在' },
   },
+  { path: '/:pathMatch(.*)*', redirect: { name: '404' } },
 ]

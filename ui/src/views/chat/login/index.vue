@@ -10,6 +10,7 @@ import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { ApplicationAuthProfileMeta, LoginConfig, LoginMethod, PortalAuthProfileMeta } from '@/api/types'
 import { useStore } from '@/stores/chat'
+import NoService from '@/views/chat/error/NoService.vue'
 import LoginModePanel from '@/views/login/components/LoginModePanel.vue'
 import type { LoginService } from '@/views/login/types'
 
@@ -20,6 +21,7 @@ const route = useRoute()
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const { auth } = useStore()
+const unavailable = computed(() => auth.unavailablePath === route.fullPath)
 const isClientLoggingIn = ref(false)
 console.log(auth)
 const loginTitle = computed(() => {
@@ -128,6 +130,7 @@ const loginService: LoginService = {
 }
 // 客户端授权期间暂停普通登录，失败后恢复原登录方式。
 onBeforeMount(async () => {
+  if (unavailable.value) return
   isClientLoggingIn.value = true
   try {
     const code = await getDingTalkClientAuthCode(route.query, {
@@ -157,7 +160,8 @@ const goBack = () => {
 </script>
 
 <template>
-  <div class="chat-login flex-center flex-col">
+  <NoService v-if="unavailable" />
+  <div v-else class="chat-login flex-center flex-col">
     <div class="mb-6 flex-align-center gap-4 max-w-full">
       <ApplicationIcon :icon="auth.authProfile?.logo" :size="32" class="shrink-0" />
       <h2 class="max-w-full truncate" :title="loginTitle">{{ loginTitle }}</h2>

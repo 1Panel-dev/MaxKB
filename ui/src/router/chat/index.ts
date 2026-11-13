@@ -28,11 +28,6 @@ function getLoginRoute(scope: string, to: RouteLocationNormalized) {
   return scope === PORTAL_AUTH_SCOPE ? { name: 'portal-login', query } : { name: 'chat-login', params: { accessToken: scope }, query }
 }
 
-/** 渲染 404 页面并保留原地址，刷新时可重新尝试。 */
-function getNotFoundRoute(to: RouteLocationNormalized) {
-  return { name: 'chat-not-found', params: { pathMatch: to.path.substring(1).split('/') }, query: to.query, hash: to.hash }
-}
-
 chatRouter.beforeEach(async (to) => {
   if (isUnknownPortalPath(to)) return { name: 'portal-home', replace: true }
 
@@ -52,12 +47,13 @@ chatRouter.beforeEach(async (to) => {
       : { name: 'chat-home', params: { accessToken: scope }, query, replace: true }
   }
 
-  // accessToken 无效、应用已停用或门户未开放时，认证前置配置与匿名认证会失败，统一进入 404 页面
+  // accessToken 无效、应用已停用或门户未开放时，认证前置配置与匿名认证会失败，在原地址展示服务不可用页面
   let authProfile: AuthProfile<unknown>
   try {
     authProfile = await auth.fetchAuthProfile(scope)
   } catch {
-    return getNotFoundRoute(to)
+    auth.unavailablePath = to.fullPath
+    return true
   }
 
   // 登录页始终放行：开启认证时必须登录，未开启认证时匿名用户也可主动登录
@@ -76,7 +72,8 @@ chatRouter.beforeEach(async (to) => {
     try {
       await auth.postAnonymousAuth(scope)
     } catch {
-      return getNotFoundRoute(to)
+      auth.unavailablePath = to.fullPath
+      return true
     }
     auth.activate(scope, authProfile)
     return true

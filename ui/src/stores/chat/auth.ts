@@ -57,11 +57,13 @@ interface ChatAuthState {
   token: string
   /** 本次页面中已失效（401）的 token；仍保留在本地存储中，供重新认证时携带。 */
   expiredToken: string
+  /** 初始化失败的对话地址；只在该地址展示服务不可用，避免影响其他应用或分享页。 */
+  unavailablePath: string
   authProfile: AuthProfile<unknown> | null
 }
 
 export const useChatAuthStore = defineStore('chat-auth', {
-  state: (): ChatAuthState => ({ scope: '', token: '', expiredToken: '', authProfile: null }),
+  state: (): ChatAuthState => ({ scope: '', token: '', expiredToken: '', unavailablePath: '', authProfile: null }),
 
   getters: {
     isAuthenticated: (state) => Boolean(state.token),
@@ -100,6 +102,7 @@ export const useChatAuthStore = defineStore('chat-auth', {
     /** 切换当前场景，由守卫在放行前调用。 */
     activate(scope: string, authProfile: AuthProfile<unknown>) {
       if (scope !== this.scope) useChatUserStore().clearCurrentUser()
+      this.unavailablePath = ''
       this.scope = scope
       this.authProfile = authProfile
       this.token = this.getStoredToken(scope)
