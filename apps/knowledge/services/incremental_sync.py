@@ -12,6 +12,7 @@ from django.utils import timezone
 from knowledge.models import (
     ContentOrigin,
     Document,
+    KnowledgeType,
     LocalState,
     Paragraph,
     Problem,
@@ -20,6 +21,7 @@ from knowledge.models import (
 )
 from knowledge.services.document_cleanup import delete_synced_paragraph_data
 from knowledge.services.paragraph_files import preserve_incoming_image_files
+from knowledge.services.paragraph_assets import content_with_visual_descriptions
 from knowledge.services.document_strategy import (
     document_source_hash,
     normalize_document_strategy,
@@ -180,7 +182,13 @@ class IncrementalDocumentSync:
         base = paragraph.source_snapshot or {"title": paragraph.title, "content": paragraph.content}
         local = {"title": paragraph.title or "", "content": paragraph.content or ""}
         incoming = self._snapshot(remote)
-        local_changed = paragraph.local_state == LocalState.MODIFIED or local != base
+        comparable_base = base
+        if self.document.type == KnowledgeType.WEB:
+            comparable_base = {
+                **base,
+                "content": content_with_visual_descriptions(base.get("content") or "", paragraph.content_schema or []),
+            }
+        local_changed = paragraph.local_state == LocalState.MODIFIED or (local != base and local != comparable_base)
         remote_changed = incoming != base
 
         paragraph.source_key = remote["source_key"]
@@ -199,8 +207,10 @@ class IncrementalDocumentSync:
             paragraph.is_active = True
             result.conflict_ids.append(str(paragraph.id))
         elif not local_changed:
-            changed = local != incoming or paragraph.sync_state != SyncState.ACTIVE or not paragraph.is_active
-            paragraph.title, paragraph.content = incoming["title"], incoming["content"]
+            changed = remote_changed or paragraph.sync_state != SyncState.ACTIVE or not paragraph.is_active
+            # Keep generated descriptions when the source itself has not changed.
+            if remote_changed:
+                paragraph.title, paragraph.content = incoming["title"], incoming["content"]
             paragraph.chunks = text_to_chunk(paragraph.content, self.strategy["split"]["child_length"])
             paragraph.local_state = LocalState.CLEAN
             paragraph.sync_state = SyncState.ACTIVE
@@ -396,7 +406,7 @@ class IncrementalDocumentSync:
         self.document.source_hash = document_source_hash(remote_list)
         self.document.char_length = (
             sum(len(paragraph.content) for paragraph in ordered_synced)
-            if self.source_authoritative
+            if self.source_authoritative or self.document.type == KnowledgeType.WEB
             else sum(len(item["content"]) for item in remote_list)
         )
         self.document.sync_version += 1

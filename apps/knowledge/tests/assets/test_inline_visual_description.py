@@ -8,6 +8,7 @@ from django.test import SimpleTestCase
 from knowledge.models import AssetProcessStatus, Document, KnowledgeType, LocalState, Paragraph, ParagraphAsset
 from knowledge.services.paragraph_assets import (
     _write_asset_description,
+    content_with_visual_descriptions,
     paragraph_content_schema,
     process_visual_assets,
 )
@@ -53,6 +54,8 @@ class InlineVisualDescriptionTests(SimpleTestCase):
             (KnowledgeType.BASE, "tool"),
             (KnowledgeType.LARK, "model"),
             (KnowledgeType.LARK, "tool"),
+            (KnowledgeType.WEB, "model"),
+            (KnowledgeType.WEB, "tool"),
         ):
             with self.subTest(knowledge_type=knowledge_type, strategy=strategy):
                 self.document.type = knowledge_type
@@ -129,16 +132,34 @@ class InlineVisualDescriptionTests(SimpleTestCase):
         self.assertEqual(self.paragraph.content, self.original)
         self.documents.assert_not_called()
 
-    def test_external_knowledge_sources_keep_their_original_markdown(self):
-        for knowledge_type in (KnowledgeType.WEB, KnowledgeType.WORKFLOW):
-            with self.subTest(knowledge_type=knowledge_type):
-                self.document.type = knowledge_type
+    def test_workflow_knowledge_sources_keep_their_original_markdown(self):
+        self.document.type = KnowledgeType.WORKFLOW
 
-                _write_asset_description(self.asset)
+        _write_asset_description(self.asset)
 
-                self.assertEqual(self.paragraph.content, self.original)
-                self.assertEqual(self.paragraph.content_schema[1]["description"], self.asset.description)
-                self.documents.assert_not_called()
+        self.assertEqual(self.paragraph.content, self.original)
+        self.assertEqual(self.paragraph.content_schema[1]["description"], self.asset.description)
+        self.documents.assert_not_called()
+
+    def test_sync_comparison_applies_recognized_images_by_position(self):
+        source = f"![first]({self.url})\n![second]({self.url})\n![third]({self.url})"
+        schema = paragraph_content_schema(source)
+        images = [block for block in schema if block["type"] == "image"]
+        images[0]["description"] = "第一张图"
+        images[2]["description"] = "第三张 [图]\\说明\n第二行"
+
+        content = content_with_visual_descriptions(source, schema)
+
+        self.assertEqual(
+            content,
+            f"![第一张图]({self.url})\n![second]({self.url})\n![第三张 \\[图\\]\\\\说明 第二行]({self.url})",
+        )
+
+    def test_sync_comparison_does_not_apply_a_different_images_description(self):
+        schema = paragraph_content_schema(f"![new](./oss/file/{uuid4()})")
+        schema[0]["description"] = "其他图片的描述"
+
+        self.assertEqual(content_with_visual_descriptions(self.original, schema), self.original)
 
     def test_repeating_the_same_result_does_not_change_the_character_count_again(self):
         _write_asset_description(self.asset)

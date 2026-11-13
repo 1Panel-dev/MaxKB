@@ -157,6 +157,17 @@ tests, workflow retrieval and REST/MCP retrieval rechecks deletion state before 
 
 ## 图片文档接口
 
+普通 Web 文档启用视觉增强后，成功识别的图片描述会写入正文中对应图片的 Markdown 说明，
+同步更新文本分块和字数。图片链接、来源快照及来源哈希保持原值，识别失败不替换原说明。
+增量同步会区分自动生成的图片说明和人工修改：来源未变时保留识别结果，来源更新时正常刷新，
+真实人工编辑与来源同时变化时仍保留本地内容并标记冲突。回归命令：
+
+```bash
+uv run python apps/manage.py test knowledge.tests.assets.test_inline_visual_description \
+  knowledge.tests.sync.test_web_visual_sync knowledge.tests.sync.test_web_sync \
+  knowledge.tests.sync.test_web_sync_safety
+```
+
 通用知识库和工作流知识库支持将图片预览导入为独立图片文档，图片也可在这两类知识库之间迁移。
 手动导入的图片保持 `Document.type=BASE`，不参与工作流来源快照清理。工作空间接口的知识库路径前缀为
 `/workspace/<workspace_id>/knowledge/<knowledge_id>`，位于 Admin API 路径下

@@ -93,6 +93,22 @@ def paragraph_content_schema(content: str) -> List[Dict]:
     return blocks or [{"type": "text", "content": content or ""}]
 
 
+def _description_caption(description: str) -> str:
+    return re.sub(r"([\\\[\]])", r"\\\1", " ".join(description.strip().splitlines()))
+
+
+def content_with_visual_descriptions(content: str, schema: List[Dict]) -> str:
+    """Apply recorded recognition results to a source snapshot for sync comparison."""
+    images = [block for block in schema if block.get("type") == "image"]
+    matches = list(IMAGE_PATTERN.finditer(content))
+    for match, image in reversed(list(zip(matches, images))):
+        description = image.get("description") or ""
+        if match.group("file_id") == image.get("file_id") and description.strip():
+            start, end = match.span("caption")
+            content = content[:start] + _description_caption(description) + content[end:]
+    return content
+
+
 @transaction.atomic
 def sync_paragraph_assets(paragraphs: Iterable[Paragraph], visual_strategy_hash: str = "") -> List[ParagraphAsset]:
     paragraphs = list(paragraphs)
@@ -460,7 +476,7 @@ def _write_asset_description(asset: ParagraphAsset) -> None:
     elif (
         asset.document.resource_type == DocumentResourceType.DOCUMENT
         and asset.process_status == AssetProcessStatus.SUCCESS
-        and asset.document.type in (KnowledgeType.BASE, KnowledgeType.LARK)
+        and asset.document.type in (KnowledgeType.BASE, KnowledgeType.LARK, KnowledgeType.WEB)
         and asset.description.strip()
         and paragraph.local_state != LocalState.DELETED
     ):
@@ -469,8 +485,7 @@ def _write_asset_description(asset: ParagraphAsset) -> None:
         matches = list(IMAGE_PATTERN.finditer(paragraph.content))
         if index < len(matches) and matches[index].group("file_id") == str(asset.file_id):
             match = matches[index]
-            description = " ".join(asset.description.strip().splitlines())
-            description = re.sub(r"([\\\[\]])", r"\\\1", description)
+            description = _description_caption(asset.description)
             start, end = match.span("caption")
             content = paragraph.content[:start] + description + paragraph.content[end:]
             images[index]["raw"] = (
