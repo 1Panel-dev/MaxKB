@@ -29,7 +29,7 @@ def execute(trigger_task, **kwargs):
         if simple_task_handler.support(trigger_task, **kwargs):
             Thread(target=simple_task_handler.execute, args=(trigger_task,), kwargs=kwargs).start()
             return
-    raise Exception("不支持的处理器类型")
+    raise RuntimeError("不支持的处理器类型")
 
 
 def deploy(trigger, **kwargs):
@@ -42,7 +42,7 @@ def deploy(trigger, **kwargs):
     for simple_trigger_handler in simple_trigger_handlers:
         if simple_trigger_handler.support(trigger, **kwargs):
             return simple_trigger_handler.deploy(trigger, **kwargs)
-    raise Exception("不支持的触发器类型")
+    raise RuntimeError("不支持的触发器类型")
 
 
 def undeploy(trigger, **kwargs):
@@ -54,4 +54,4 @@ def undeploy(trigger, **kwargs):
     """
     for simple_trigger_handler in simple_trigger_handlers:
         return simple_trigger_handler.undeploy(trigger, **kwargs)
-    raise Exception("不支持的触发器类型")
+    raise RuntimeError("不支持的触发器类型")
