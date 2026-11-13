@@ -67,7 +67,7 @@ class AliyunBaiLianEmbeddingCredential(BaseForm, BaseModelCredential):
             if raise_exception:
                 raise AppApiException(
                     ValidCode.valid_error.value,
-                    f"Verification failed, please check whether the parameters are correct: {e}",
+                    str(e),
                 )
             return False
 
