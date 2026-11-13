@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import type { ChatContent } from '@/api/types'
 import ContentList from '@/conversation-panel/components/content-list/index.vue'
+import { useBottomFollow } from '@/conversation-panel/core/bottom-follow'
 
 /**
  * 通用分组：content.name 为标题，content.status 可选（不传不显示状态），
  * content.children 为任意内容项（可再嵌套 GROUP），交由 ContentList 渲染。
- * 执行中或无状态时默认展开，结束后默认收起，手动切换后以手动为准；收起时展示最新一条子项在做什么。
+ * 默认收起（执行中也是），手动切换后以手动为准。
  */
 defineOptions({ name: 'ConversationGroupContent' })
 
@@ -31,11 +32,10 @@ const statusType = computed(() => {
 
 const isFailed = computed(() => props.content.status === 'FAIL' || props.content.status === 'FAILURE')
 
-const manualExpanded = ref<boolean>()
-const isExpanded = computed({
-  get: () => manualExpanded.value ?? (!props.content.status || props.content.status === 'RUNNING'),
-  set: (value: boolean) => (manualExpanded.value = value),
-})
+const isExpanded = ref(false)
+
+// 分组内容限高滚动，高度与新建文件的差异区一致；子项流式更新时跟随到底部
+useBottomFollow(useTemplateRef<HTMLElement>('groupScrollRef'))
 
 function tail(text: string) {
   const trimmed = text.trim()
@@ -82,7 +82,7 @@ const currentActivity = computed(() => {
       <el-tag v-if="isFailed" size="small" :type="statusType">{{ statusText }}</el-tag>
     </template>
 
-    <div v-if="isExpanded && childContents.length" class="mt-1 border-l-2 border-N900/15 pl-3">
+    <div v-if="isExpanded && childContents.length" ref="groupScrollRef" class="mt-1 max-h-[400px] overflow-y-auto border-l-2 border-N900/15 pl-3">
       <ContentList :content-list="childContents" />
     </div>
   </MkCollapse>

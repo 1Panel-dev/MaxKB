@@ -1,21 +1,15 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, useTemplateRef } from 'vue'
+import { useBottomFollow } from '@/conversation-panel/core/bottom-follow'
 
 defineOptions({ name: 'ConversationReasoningContent' })
 
-const props = defineProps<{ content: { content?: string | null; status?: string } }>()
-const isExpanded = ref(true)
-let prevStatus = props.content.status
+defineProps<{ content: { content?: string | null; status?: string } }>()
+// 默认收起，思考中也只显示状态文案，手动展开后查看内容
+const isExpanded = ref(false)
 
-watch(
-  () => props.content.status,
-  (status) => {
-    if (prevStatus === 'RUNNING' && status !== 'RUNNING') {
-      isExpanded.value = false
-    }
-    prevStatus = status
-  },
-)
+// 思考内容限高滚动，高度与新建文件的差异区一致；流式输出时跟随到底部
+useBottomFollow(useTemplateRef<HTMLElement>('reasoningScrollRef'))
 </script>
 
 <template>
@@ -35,7 +29,7 @@ watch(
         {{ content.status === 'RUNNING' ? '思考中' : '思考完成' }}
       </span>
     </template>
-    <div class="text-N500! whitespace-pre-wrap break-words">
+    <div ref="reasoningScrollRef" class="max-h-[400px] overflow-y-auto text-N500! whitespace-pre-wrap break-words">
       {{ content.content }}
     </div>
   </MkCollapse>

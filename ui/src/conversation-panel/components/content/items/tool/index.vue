@@ -19,7 +19,7 @@ const props = defineProps<{ content: ChatContent }>()
 
 // 工具执行状态与展开状态。
 const loading = computed(() => props.content.status === 'RUNNING')
-const isExpanded = ref(props.content.status === 'RUNNING')
+const isExpanded = ref(false)
 
 // 工具执行完成自动收起
 watch(loading, (current, previous) => {
