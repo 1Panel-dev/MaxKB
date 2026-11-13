@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, provide, ref } from 'vue'
+import { EXPORT_MESSAGE_ELEMENT_KEY } from '../../components/header/header-actions/export/context.ts'
 import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
 import PortalHeader from '../../components/header/portal/index.vue'
 import MessageList from '../../components/message-list/index.vue'
@@ -11,6 +12,8 @@ import { usePortalConversationListStore } from '../../left-sidebar/portal-conver
 defineOptions({ name: 'PortalChatPanel' })
 
 const shareLink = useShareLinkStoreOptional()
+const mainRef = ref<HTMLElement>()
+provide(EXPORT_MESSAGE_ELEMENT_KEY, () => mainRef.value?.querySelector<HTMLElement>('.mk-conversation-content') ?? null)
 const list = useConversationListStore()
 const input = useMessageInputStore()
 const portalList = usePortalConversationListStore()
@@ -25,7 +28,7 @@ const disclaimerText = computed(() =>
 </script>
 <template>
   <!-- 门户对话主面板:header + message-list + message-input -->
-  <main class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
+  <main ref="mainRef" class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 收起侧栏时标题栏的新建对话与侧栏一致：没有当前智能体时选择智能体 -->
     <PortalHeader :new-conversation="portalList.newConversation" @share="shareLink?.enterShare()" />
     <MessageList :key="list.currentChatId.value" v-if="portalList.currentApplicationId.value" :app-name="list.appInfo.value?.name || 'AI 助手'" />

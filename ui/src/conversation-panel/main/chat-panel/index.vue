@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, provide, ref } from 'vue'
+import { EXPORT_MESSAGE_ELEMENT_KEY } from '../../components/header/header-actions/export/context.ts'
 import ChatHeader from '../../components/header/chat/index.vue'
 import MessageList from '../../components/message-list/index.vue'
 import MessageInput from '../../components/message-input/index.vue'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { useMessageInputStore } from '../../components/message-input/index'
 
+const mainRef = ref<HTMLElement>()
+provide(EXPORT_MESSAGE_ELEMENT_KEY, () => mainRef.value?.querySelector<HTMLElement>('.mk-conversation-content') ?? null)
 const list = useConversationListStore()
 const input = useMessageInputStore()
 // 拖拽到面板任意处 → 交给 message-input 接收文件
@@ -15,7 +18,7 @@ const disclaimerText = computed(() => (list.appInfo.value?.disclaimer ? list.app
 </script>
 <template>
   <!-- 带输入框的主面板:header + message-list + message-input -->
-  <main class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
+  <main ref="mainRef" class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 头部可被替换(如 debug 用 debug header);默认普通 chat header -->
     <slot name="header">
       <ChatHeader />

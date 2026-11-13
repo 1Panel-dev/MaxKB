@@ -131,7 +131,13 @@ onBeforeUnmount(() => {
           :show-file-list="false"
           :on-change="selectImage"
         >
-          <el-image v-if="previewIcon" :src="previewIcon" fit="cover" class="size-20" />
+          <div v-if="previewIcon" class="group relative size-20 cursor-pointer overflow-hidden rounded-md">
+            <el-image :src="previewIcon" fit="cover" class="h-full w-full" />
+            <!-- 悬停提示点击重新上传头像 -->
+            <div class="group-hover-visible pointer-events-none absolute inset-0 flex-center bg-N900/30">
+              <MkIcon name="icon_edit_outlined" class="text-white!" :size="16" />
+            </div>
+          </div>
           <div v-else class="flex-center h-20 w-20 rounded-md border border-dashed bg-N200 hover:border-primary">
             <MkIcon name="icon_add_outlined" :size="24" />
           </div>

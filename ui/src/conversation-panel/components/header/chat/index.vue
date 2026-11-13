@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import HeaderActions from '../header-actions/index.vue'
+import ExportAction from '../header-actions/export/ExportAction.vue'
 import { useConversationListStore } from '../../../left-sidebar/conversation-list/index'
 import { useMessageListStore } from '../../message-list/index'
 import { useShareLinkStoreOptional } from '../../message-list/share/index'
-import { useShowShare } from '../../../view/index'
+import { DEVICE_TYPE, useDeviceType, useShowShare } from '../../../view/index'
 
 const props = defineProps<{
   /** 新建对话；不传时在当前应用中新建（门户在没有当前智能体时改为选择智能体） */
@@ -17,6 +19,7 @@ const shareLink = useShareLinkStoreOptional()
 // 回答生成中或没有消息时不可分享
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value)
 const showShare = useShowShare()
+const deviceType = useDeviceType()
 const handleNewConversation = () => (props.newConversation ? props.newConversation() : list.newConversation())
 </script>
 
@@ -37,26 +40,21 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
     </div>
     <template v-if="!list.isShared.value">
       <!-- 新建对话 -->
-      <MkTooltip content="新建对话" v-if="!list.leftSideOpen.value">
-        <el-button text @click="handleNewConversation">
-          <MkIcon name="icon_new-chat_outlined" :size="18" class="text-N900!" />
-        </el-button>
-      </MkTooltip>
-      <!-- 进入分享模式，勾选要分享的对话 -->
-      <MkTooltip v-if="showShare" content="分享">
-        <el-button text :disabled="!canShare" @click="shareLink?.enterShare()">
-          <MkIcon name="icon_share_outlined" :size="18" :class="canShare ? 'text-N900!' : 'text-N400!'" />
-        </el-button>
-      </MkTooltip>
-      <!-- 导出-->
-      <MkTooltip content="导出">
-        <el-button text>
-          <MkIcon name="icon_export_outlined" :size="18" class="text-N900!" />
-        </el-button>
-      </MkTooltip>
-      <slot />
+      <MkAction
+        v-if="!list.leftSideOpen.value"
+        display="button"
+        label="新建对话"
+        icon="icon_new-chat_outlined"
+        class="text-N900!"
+        @click="handleNewConversation"
+      />
+      <HeaderActions :collapse="deviceType === DEVICE_TYPE.MOBILE">
+        <!-- 进入分享模式，勾选要分享的对话 -->
+        <MkAction v-if="showShare" label="分享" icon="icon_share_outlined" :disabled="!canShare" @click="shareLink?.enterShare()" />
+        <!-- 导出对话 -->
+        <ExportAction />
+        <slot />
+      </HeaderActions>
     </template>
   </header>
 </template>
-
-<style scoped lang="scss"></style>
