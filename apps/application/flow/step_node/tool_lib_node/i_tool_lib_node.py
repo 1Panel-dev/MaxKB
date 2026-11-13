@@ -36,7 +36,7 @@ class FunctionLibNodeParamsSerializer(serializers.Serializer):
         # 归还链接到连接池
         connection.close()
         if f_lib is None:
-            raise Exception(_('The function has been deleted'))
+            raise RuntimeError(_('The function has been deleted'))
 
 
 class IToolLibNode(INode):
