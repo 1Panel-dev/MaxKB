@@ -7,6 +7,7 @@
 @Date    ：5/13/24 7:47 AM
 """
 
+import copy
 import os
 
 from common.utils.common import get_file_content
@@ -145,6 +146,15 @@ model_info_manage = (
 class VolcanicEngineModelProvider(IModelProvider):
     def get_model_info_manage(self):
         return model_info_manage
+
+    def get_model_credential(self, model_type, model_name):
+        model_credential = super().get_model_credential(model_type, model_name)
+        # 火山引擎 Ark 统一走 v3 地址；LLM 复用 OpenAI 凭证类，需为实例单独设置，
+        # 避免覆写共享凭证类的 default_value 影响到其它 provider。
+        if model_type == "LLM" and hasattr(model_credential, "api_base"):
+            model_credential.api_base = copy.copy(model_credential.api_base)
+            model_credential.api_base.default_value = "https://ark.cn-beijing.volces.com/api/v3"
+        return model_credential
 
     def get_model_provide_info(self):
         return ModelProvideInfo(

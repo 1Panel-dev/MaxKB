@@ -39,7 +39,7 @@ class AnthropicImageModelParams(BaseForm):
 
 
 class AnthropicImageModelCredential(BaseForm, BaseModelCredential):
-    api_base = forms.TextInputField(_("API URL"), required=True)
+    api_base = forms.TextInputField(_("API URL"), required=True, default_value="https://api.anthropic.com/v1")
     api_key = forms.PasswordInputField(_("API Key"), required=True)
 
     def is_valid(

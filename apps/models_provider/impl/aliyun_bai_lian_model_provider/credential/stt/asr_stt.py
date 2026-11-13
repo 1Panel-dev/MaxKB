@@ -10,7 +10,7 @@ from common.utils.logger import maxkb_logger
 
 
 class AliyunBaiLianAsrSTTModelCredential(BaseForm, BaseModelCredential):
-    api_url = forms.TextInputField(_("API URL"), required=True)
+    api_url = forms.TextInputField(_("API URL"), required=True, default_value="https://dashscope.aliyuncs.com/api/v1")
     api_key = forms.PasswordInputField(_("API Key"), required=True)
 
     def is_valid(
