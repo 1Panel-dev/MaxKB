@@ -14,7 +14,7 @@ MaxKB (Max Knowledge Brain) is an open-source platform for building enterprise A
 
 **Frontend:** Vue 3.5, TypeScript, Vite 8, Element Plus, Pinia, Vue Router
 
-**Infrastructure:** PostgreSQL 17.10 + pgvector, Redis 7
+**Infrastructure:** PostgreSQL 17.12 + pgvector, Redis 7
 
 ## Project Structure
 
