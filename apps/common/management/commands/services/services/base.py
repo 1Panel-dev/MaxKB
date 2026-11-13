@@ -101,7 +101,7 @@ class BaseService(object):
         if not self._process:
             try:
                 self._process = psutil.Process(self.pid)
-            except:
+            except Exception:
                 pass
         return self._process
 
@@ -139,7 +139,7 @@ class BaseService(object):
             return
         try:
             self.process.wait(1)
-        except:
+        except Exception:
             pass
 
         for i in range(self.STOP_TIMEOUT):
@@ -163,7 +163,7 @@ class BaseService(object):
         if self.process:
             try:
                 self.process.wait(1)  # 不wait，子进程可能无法回收
-            except:
+            except Exception:
                 pass
 
         if self.is_running:
