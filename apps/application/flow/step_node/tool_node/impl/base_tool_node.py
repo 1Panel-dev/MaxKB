@@ -54,7 +54,7 @@ def valid_reference_value(_type, value, name):
         ).format(name=name, _type=_type, value=value))
         return value
     if not isinstance(value, instance_type):
-        raise Exception(_(
+        raise RuntimeError(_(
             'Field: {name} Type: {_type} Value: {value} Type error'
         ).format(name=name, _type=_type, value=value))
     return value
@@ -71,7 +71,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
             if not is_required:
                 return None
             else:
-                raise Exception(_(
+                raise RuntimeError(_(
                     'Field: {name} Type: {_type} is required'
                 ).format(name=name, _type=_type))
         value = valid_reference_value(_type, value, name)
@@ -84,7 +84,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
         value = node.workflow_manage.generate_prompt(value)
         return common_convert_value(_type, value)
     except Exception as e:
-        raise Exception(
+        raise RuntimeError(
             _('Field: {name} Type: {_type} Value: {value} Type error').format(name=name, _type=_type,
                                                                               value=value))
 
