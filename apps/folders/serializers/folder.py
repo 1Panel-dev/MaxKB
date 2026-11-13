@@ -19,7 +19,7 @@ from folders.models.folder import FolderCreateRequest
 from knowledge.models import KnowledgeFolder, Knowledge
 from knowledge.serializers.knowledge import KnowledgeSerializer
 from knowledge.serializers.knowledge_folder import KnowledgeFolderTreeSerializer
-from system_manage.models import WorkspaceUserResourcePermission
+from system_manage.models import WorkspaceUserGroupResourcePermission, WorkspaceUserResourcePermission
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import ToolFolder, Tool
 from tools.serializers.tool import ToolSerializer
@@ -453,14 +453,23 @@ class FolderTreeSerializer(serializers.Serializer):
             if having_read_permission_by_role:
                 permission_condition = ["VIEW", "ROLE"]
 
-            base_q &= Q(
-                id__in=WorkspaceUserResourcePermission.objects.filter(
-                    user_id=current_user.id,
-                    auth_target_type=self.data.get("source"),
-                    workspace_id=self.data.get("workspace_id"),
-                    permission_list__overlap=permission_condition,
-                ).values_list("target", flat=True)
-            ) | Q(id=self.data.get("workspace_id"))
+            user_authorized_folder_ids = WorkspaceUserResourcePermission.objects.filter(
+                user_id=current_user.id,
+                auth_target_type=self.data.get("source"),
+                workspace_id=self.data.get("workspace_id"),
+                permission_list__overlap=permission_condition,
+            ).values_list("target", flat=True)
+            group_authorized_folder_ids = WorkspaceUserGroupResourcePermission.objects.filter(
+                user_group__user_relations__user_id=current_user.id,
+                auth_target_type=self.data.get("source"),
+                workspace_id=self.data.get("workspace_id"),
+                permission_list__overlap=permission_condition,
+            ).values_list("target", flat=True)
+            base_q &= (
+                Q(id__in=user_authorized_folder_ids)
+                | Q(id__in=group_authorized_folder_ids)
+                | Q(id=self.data.get("workspace_id"))
+            )
 
         nodes = Folder.objects.filter(base_q).get_cached_trees()
 
