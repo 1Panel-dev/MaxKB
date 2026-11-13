@@ -147,17 +147,17 @@ sys.stdout.flush()
             with execution_timer(_id):
                 subprocess_result = self._exec(f.name, _id)
         if subprocess_result.returncode != 0:
-            raise Exception(subprocess_result.stderr or subprocess_result.stdout or "Unknown exception occurred")
+            raise RuntimeError(subprocess_result.stderr or subprocess_result.stdout or "Unknown exception occurred")
         lines = subprocess_result.stdout.splitlines()
         if len(lines) < 2 or lines[-1] != f"{_id}__END__":
-            raise Exception("Execution interrupted or tampered")
+            raise RuntimeError("Execution interrupted or tampered")
         last_line = lines[-2]
         if not last_line.startswith(_id):
-            raise Exception("No result found.")
+            raise RuntimeError("No result found.")
         result = json.loads(last_line[len(_id) :])
         if result.get("code") == 200:
             return result.get("data")
-        raise Exception(result.get("msg") + (f"\n{subprocess_result.stderr}" if subprocess_result.stderr else ""))
+        raise RuntimeError(result.get("msg") + (f"\n{subprocess_result.stderr}" if subprocess_result.stderr else ""))
 
     def _generate_mcp_server_code(self, _code, params, name=None, description=None, tool_id=None):
         # 解析代码,提取导入语句和函数定义
@@ -417,7 +417,7 @@ exec({dedent(code)!a})
             )
             return subprocess_result
         except subprocess.TimeoutExpired:
-            raise Exception(_("Process execution timed out after {} seconds.").format(_process_limit_timeout_seconds))
+            raise RuntimeError(_("Process execution timed out after {} seconds.").format(_process_limit_timeout_seconds))
 
     def validate_mcp_transport(self, code_str):
         validate_mcp_servers(json.loads(code_str))
