@@ -125,9 +125,9 @@ class ProblemParagraphManage:
 def get_embedding_model_by_knowledge_id_list(knowledge_id_list: List):
     knowledge_list = QuerySet(Knowledge).filter(id__in=knowledge_id_list)
     if len(set([knowledge.embedding_model_id for knowledge in knowledge_list])) > 1:
-        raise Exception(_('The knowledge base is inconsistent with the vector model'))
+        raise RuntimeError(_('The knowledge base is inconsistent with the vector model'))
     if len(knowledge_list) == 0:
-        raise Exception(_('Knowledge base setting error, please reset the knowledge base'))
+        raise RuntimeError(_('Knowledge base setting error, please reset the knowledge base'))
 
     default_params = get_model_default_params(knowledge_list[0].embedding_model)
 
@@ -161,9 +161,9 @@ def get_embedding_model_id_by_knowledge_id(knowledge_id):
 def get_embedding_model_id_by_knowledge_id_list(knowledge_id_list: List):
     knowledge_list = QuerySet(Knowledge).filter(id__in=knowledge_id_list)
     if len(set([knowledge.embedding_model_id for knowledge in knowledge_list])) > 1:
-        raise Exception(_('The knowledge base is inconsistent with the vector model'))
+        raise RuntimeError(_('The knowledge base is inconsistent with the vector model'))
     if len(knowledge_list) == 0:
-        raise Exception(_('Knowledge base setting error, please reset the knowledge base'))
+        raise RuntimeError(_('Knowledge base setting error, please reset the knowledge base'))
     return str(knowledge_list[0].embedding_model_id)
 
 
