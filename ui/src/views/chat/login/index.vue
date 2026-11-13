@@ -8,7 +8,7 @@ import { v7 as uuidv7 } from 'uuid'
 import ChatAuthApi from '@/api/chat/auth'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { LOGIN_METHOD } from '@/api/enums'
-import type { ApplicationAuthProfileMeta, LoginConfig, LoginMethod } from '@/api/types'
+import type { ApplicationAuthProfileMeta, LoginConfig, LoginMethod, PortalAuthProfileMeta } from '@/api/types'
 import { useStore } from '@/stores/chat'
 import LoginModePanel from '@/views/login/components/LoginModePanel.vue'
 import type { LoginService } from '@/views/login/types'
@@ -23,7 +23,9 @@ const { auth } = useStore()
 const isClientLoggingIn = ref(false)
 console.log(auth)
 const loginTitle = computed(() => {
-  if (auth.isPortal) return '门户登录'
+  if (auth.isPortal) {
+    return (auth.authProfile?.meta as PortalAuthProfileMeta | undefined)?.portal_name || '门户登录'
+  }
   return (auth.authProfile?.meta as ApplicationAuthProfileMeta | undefined)?.application_name || '登录'
 })
 

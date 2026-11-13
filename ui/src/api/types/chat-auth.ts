@@ -20,11 +20,15 @@ export interface ApplicationAuthProfileMeta {
   application_name: string
 }
 
+export interface PortalAuthProfileMeta {
+  portal_name: string
+}
+
 /** 单应用对话的认证前置配置。 */
 export type ApplicationAuthProfile = AuthProfile<ApplicationAuthProfileMeta>
 
 /** 门户的认证前置配置。 */
-export type PortalAuthProfile = AuthProfile
+export type PortalAuthProfile = AuthProfile<PortalAuthProfileMeta>
 
 export interface ChatLoginRequest {
   username: string
