@@ -79,7 +79,7 @@ def valid_reference_value(_type, value, name):
         ).format(name=name, _type=_type, value=value))
         return value
     if not isinstance(value, instance_type):
-        raise Exception(_(
+        raise RuntimeError(_(
             'Field: {name} Type: {_type} Value: {value} Type error'
         ).format(name=name, _type=_type, value=value))
     return value
@@ -96,7 +96,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
             if not is_required:
                 return None
             else:
-                raise Exception(_(
+                raise RuntimeError(_(
                     'Field: {name} Type: {_type} is required'
                 ).format(name=name, _type=_type))
         value = valid_reference_value(_type, value, name)
@@ -109,21 +109,21 @@ def convert_value(name: str, value, _type, is_required, source, node):
         value = node.workflow_manage.generate_prompt(value)
         return common_convert_value(_type, value)
     except Exception as e:
-        raise Exception(
+        raise RuntimeError(
             _('Field: {name} Type: {_type} Value: {value} Type error').format(name=name, _type=_type,
                                                                               value=value))
 
 
 def valid_function(tool_lib, workspace_id, user_id=None):
     if tool_lib is None:
-        raise Exception(_('Tool does not exist'))
+        raise RuntimeError(_('Tool does not exist'))
     get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
     if tool_lib and tool_lib.workspace_id != workspace_id and get_authorized_tool is not None:
         tool_lib = get_authorized_tool(QuerySet(Tool).filter(id=tool_lib.id), workspace_id).first()
     if tool_lib is None:
-        raise Exception(_("Tool does not exist"))
+        raise RuntimeError(_("Tool does not exist"))
     if not tool_lib.is_active:
-        raise Exception(_("Tool is not active"))
+        raise RuntimeError(_("Tool is not active"))
     if tool_lib.workspace_id == "None":
         return
     validate_authorized_tool_ids([str(tool_lib.id)], workspace_id, user_id)
