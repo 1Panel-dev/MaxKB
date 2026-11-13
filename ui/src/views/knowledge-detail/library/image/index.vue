@@ -440,7 +440,7 @@ onBeforeUnmount(() => {
           <el-switch
             :model-value="row.is_active"
             size="small"
-            :disabled="operationLoading && !canImage('edit')"
+            :disabled="operationLoading || !canImage('edit')"
             :before-change="() => handleChangeActive(row)"
           />
 
