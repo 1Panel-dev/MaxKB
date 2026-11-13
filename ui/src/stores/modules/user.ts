@@ -128,8 +128,6 @@ const useUserStore = defineStore('user', {
         this.workspace_list = workspace_list
         useLocalStorage<string>(localeConfigKey, 'en-US').value =
           ok?.data?.language || this.getLanguage()
-        const theme = useThemeStore()
-        theme.setTheme()
         return this.asyncGetProfile()
       })
     },

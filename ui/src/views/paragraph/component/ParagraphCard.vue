@@ -77,6 +77,7 @@
                 <el-dropdown
                   class="w-full"
                   trigger="hover"
+                  :teleported="false"
                   :show-arrow="false"
                   placement="right-start"
                   popper-class="move-position-popper"

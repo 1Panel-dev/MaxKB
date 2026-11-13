@@ -11,6 +11,10 @@
   margin: 0;
   padding: 0;
 }
+/* 全局焦点轮廓 */
+*:focus-visible {
+  outline: none !important;
+}
 
 html {
   height: 100%;

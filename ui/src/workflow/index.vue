@@ -236,4 +236,12 @@ defineExpose({
 .lf-drag-able {
   cursor: pointer;
 }
+
+.lf-node {
+  --workflow-node-border-color: #ffffff;
+
+  &.lf-node-selected {
+    --workflow-node-border-color: var(--el-color-primary);
+  }
+}
 </style>
