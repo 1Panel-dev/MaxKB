@@ -47,7 +47,11 @@ class Config(dict):
         "REDIS_MAX_CONNECTIONS": 100,
         # 外置语言包路径
         "EXTERNAL_LOCALE_PATH": "/opt/maxkb/local/locales",
-        "FILE_AUTH": "1"
+        "FILE_AUTH": "1",
+        # 混合检索融合权重：向量分权重 α（关键词分权重 = 1 - α），默认 0.5 ≈ 现状 1:1（排名等价）
+        "SEARCH_VECTOR_WEIGHT": 0.5,
+        # 关键词检索软 AND 门槛：命中词数比例下限（默认 0.3），空结果时按 0.1 降档重试
+        "SEARCH_KEYWORD_MIN_MATCH": 0.3
     }
 
     def get_debug(self) -> bool:
