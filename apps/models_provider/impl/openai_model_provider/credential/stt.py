@@ -19,7 +19,7 @@ class OpenAISTTModelParams(BaseForm):
 
 
 class OpenAISTTModelCredential(BaseForm, BaseModelCredential):
-    api_base = forms.TextInputField("API URL", required=True)
+    api_base = forms.TextInputField("API URL", required=True, default_value="https://api.openai.com/v1")
     api_key = forms.PasswordInputField("API Key", required=True)
 
     def is_valid(

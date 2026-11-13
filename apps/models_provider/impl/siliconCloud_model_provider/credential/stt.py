@@ -11,7 +11,7 @@ from common.utils.logger import maxkb_logger
 
 
 class SiliconCloudSTTModelCredential(BaseForm, BaseModelCredential):
-    api_base = forms.TextInputField("API URL", required=True)
+    api_base = forms.TextInputField("API URL", required=True, default_value="https://api.siliconflow.cn/v1")
     api_key = forms.PasswordInputField("API Key", required=True)
 
     def is_valid(

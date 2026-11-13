@@ -32,7 +32,12 @@ class AliyunBaiLianDefaultSTTModelCredential(BaseForm, BaseModelCredential):
             {"label": _("Real-time speech recognition - Fun-ASR/Paraformer"), "value": "other"},
         ],
     )
-    api_url = forms.TextInputField(_("API URL"), required=True, relation_show_field_dict={"type": ["qwen", "omni"]})
+    api_url = forms.TextInputField(
+        _("API URL"),
+        required=True,
+        default_value="https://dashscope.aliyuncs.com/api/v1",
+        relation_show_field_dict={"type": ["qwen", "omni"]},
+    )
     api_key = forms.PasswordInputField(_("API Key"), required=True)
 
     def is_valid(

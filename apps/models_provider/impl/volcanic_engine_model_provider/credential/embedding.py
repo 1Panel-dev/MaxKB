@@ -59,5 +59,5 @@ class VolcanicEmbeddingCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
-    api_base = forms.TextInputField("API URL", required=True)
+    api_base = forms.TextInputField("API URL", required=True, default_value="https://ark.cn-beijing.volces.com/api/v3")
     api_key = forms.PasswordInputField("API Key", required=True)

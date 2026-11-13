@@ -63,7 +63,7 @@ By default, images are produced in standard quality, but with DALL·E 3 you can 
 
 
 class OpenAITextToImageModelCredential(BaseForm, BaseModelCredential):
-    api_base = forms.TextInputField("API URL", required=True)
+    api_base = forms.TextInputField("API URL", required=True, default_value="https://api.openai.com/v1")
     api_key = forms.PasswordInputField("API Key", required=True)
 
     def is_valid(
