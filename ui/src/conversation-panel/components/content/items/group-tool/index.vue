@@ -39,7 +39,7 @@ function resolveToolRenderer(toolName: unknown): Component | undefined {
   return toolRenderers[String(toolName || '').toLowerCase()]
 }
 
-// 组内专用渲染器的展开状态：执行中默认展开，结束后默认收起，手动切换后以手动为准
+// 组内专用渲染器的展开状态：默认收起（执行中也是），手动切换后以手动为准
 const manualToolExpanded = ref<Dict<boolean>>({})
 
 function toolKey(toolItem: ChatContent, index: number) {
@@ -47,14 +47,14 @@ function toolKey(toolItem: ChatContent, index: number) {
 }
 
 function isToolExpanded(toolItem: ChatContent, index: number) {
-  return manualToolExpanded.value[toolKey(toolItem, index)] ?? toolItem.status === 'RUNNING'
+  return manualToolExpanded.value[toolKey(toolItem, index)] ?? false
 }
 
 function toggleTool(toolItem: ChatContent, index: number) {
   manualToolExpanded.value[toolKey(toolItem, index)] = !isToolExpanded(toolItem, index)
 }
 
-// 汇总执行状态；分组和工具的手动展开状态优先于默认状态。
+// 汇总执行状态；分组默认收起，手动切换后以手动为准。
 const groupStatus = computed(() => {
   const childStatuses = toolItems.value.map((toolItem) => toolItem.status)
   if (childStatuses.includes('RUNNING')) return 'running'
@@ -62,11 +62,7 @@ const groupStatus = computed(() => {
   return childStatuses.length ? 'success' : ''
 })
 
-const manualExpanded = ref<boolean>()
-const isExpanded = computed({
-  get: () => manualExpanded.value ?? groupStatus.value === 'running',
-  set: (value: boolean) => (manualExpanded.value = value),
-})
+const isExpanded = ref(false)
 </script>
 
 <template>
