@@ -13,6 +13,7 @@ from common.constants.permission_constants import CompareConstants, PermissionCo
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed, NotFound404
 from common.utils.public_file_access import has_active_public_file_share
+from django.db import DatabaseError
 from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.utils.translation import gettext
@@ -378,7 +379,13 @@ class FileSerializer(serializers.Serializer):
             content_type = mime_types.get(file_type, 'application/octet-stream')
             encoded_filename = urllib.parse.quote(file.file_name)
             # 获取文件内容
-            file_bytes = file.get_bytes()
+            try:
+                file_bytes = file.get_bytes()
+            except DatabaseError as e:
+                # 文件记录存在但大对象已丢失(PostgreSQL 42704 undefined_object)
+                if getattr(e.__cause__, 'sqlstate', None) == '42704':
+                    raise NotFound404(404, _('File not found'))
+                raise
             file_size = len(file_bytes)
 
             response = None
