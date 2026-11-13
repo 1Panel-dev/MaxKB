@@ -82,13 +82,13 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             if audio_hex:
                 audio = bytes.fromhex(audio_hex)
             else:
-                raise Exception("Failed to get audio data from response")
+                raise RuntimeError("Failed to get audio data from response")
         else:
             from dashscope.audio.tts_v2 import SpeechSynthesizer
             synthesizer = SpeechSynthesizer(model=self.model, **self.params)
             audio = synthesizer.call(text)
         if audio is None:
-            raise Exception('Failed to generate audio')
+            raise RuntimeError('Failed to generate audio')
         if type(audio) == str:
-            raise Exception(audio)
+            raise RuntimeError(audio)
         return audio
