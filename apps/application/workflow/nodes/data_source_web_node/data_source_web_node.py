@@ -14,7 +14,7 @@ from rest_framework import serializers
 
 from application.workflow.common import CancelledException, WorkflowType
 from application.workflow.i_node import INode
-from common.utils.fork import ChildLink, Fork, ForkManage
+from common.utils.fork import ChildLink, Fork, ForkManage, remove_fragment
 from common.utils.logger import maxkb_logger
 from knowledge.web_assets import internalize_web_images
 
@@ -50,9 +50,17 @@ class DataSourceWebNode(INode):
             },
         ]
 
-    def _get_collect_handler(self, document_list, source_meta=None, selector="body", knowledge_id=None):
+    def _get_collect_handler(self, document_list, source_meta=None, selector="body", knowledge_id=None, root_url=None):
         def handler(child_link: ChildLink, response: Fork.Response):
+            self._check_cancelled()
             if response.status != 200:
+                if (
+                    response.status == 404
+                    and root_url is not None
+                    and remove_fragment(child_link.url).rstrip("/") != remove_fragment(root_url).rstrip("/")
+                ):
+                    maxkb_logger.warning(f"Skip missing Web child page: {child_link.url}")
+                    return
                 raise ValueError(response.message or f"Failed to fetch Web source: {child_link.url}")
             document_name = (
                 child_link.tag.text
@@ -73,8 +81,6 @@ class DataSourceWebNode(INode):
                     },
                 }
             )
-            # 已取消则抛出 CancelledException,由引擎结束流程
-            self._check_cancelled()
 
         return handler
 
@@ -89,12 +95,16 @@ class DataSourceWebNode(INode):
 
         document_list = []
         source_meta = workflow_params.get("workflow_source") or {}
+        sync_document = workflow_params.get("workflow_sync_document")
         collect_handler = self._get_collect_handler(
-            document_list, source_meta, selector, knowledge_id=workflow_params.get("knowledge_id")
+            document_list,
+            source_meta,
+            selector,
+            knowledge_id=workflow_params.get("knowledge_id"),
+            root_url=None if sync_document else source_url,
         )
 
         try:
-            sync_document = workflow_params.get("workflow_sync_document")
             if sync_document:
                 response = Fork(source_url, selector.split(" ")).fork()
                 collect_handler(ChildLink(source_url, None), response)

@@ -7,6 +7,17 @@ from common.utils.fork import Fork
 
 
 class ForkContentTypeTests(SimpleTestCase):
+    def test_http_failures_preserve_status_for_crawl_policy(self):
+        for status in (404, 403, 429, 503):
+            with (
+                self.subTest(status=status),
+                patch.object(Fork, "requests_get", return_value=SimpleNamespace(status_code=status)),
+            ):
+                result = Fork("https://example.com/missing", ["body"]).fork()
+                self.assertEqual(result.status, status)
+                self.assertEqual(result.child_link_list, [])
+                self.assertEqual(result.content, "")
+
     def response(self, content, content_type, encoding="utf-8"):
         return SimpleNamespace(
             status_code=200,

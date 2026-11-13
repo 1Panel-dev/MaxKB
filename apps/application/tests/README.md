@@ -25,6 +25,10 @@ Excel 的智能、自定义和 QA 分段均按 sheet 输出独立文档。测试
 
 ## 工作流 Web 图片导入
 
+Web 全站抓取跳过返回 HTTP 404 的子页面，继续导入其余成功页面。入口页或单文档同步返回
+404，以及鉴权、限流、服务错误仍终止执行，避免将不完整抓取结果作为完整快照发布。
+`application.tests.test_workflow_web_crawl` 覆盖该行为及取消处理。
+
 工作流 Web 图片导入的 HTTP 回归使用 Postman CLI 1.70 或更高版本：
 
 ```bash

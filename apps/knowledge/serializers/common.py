@@ -56,7 +56,7 @@ class MetaSerializer(serializers.Serializer):
             super().is_valid(raise_exception=True)
             source_url = self.data.get("source_url")
             response = Fork(source_url, []).fork()
-            if response.status == 500:
+            if response.status != 200:
                 raise AppApiException(500, _("URL error, cannot parse [{source_url}]").format(source_url=source_url))
 
     class BaseMeta(serializers.Serializer):

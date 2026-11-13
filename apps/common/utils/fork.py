@@ -90,8 +90,8 @@ class Fork:
             return Fork.Response(html_content, child_link_list, 200, "")
 
         @staticmethod
-        def error(message: str):
-            return Fork.Response("", [], 500, message)
+        def error(message: str, status=500):
+            return Fork.Response("", [], status, message)
 
     def __init__(self, base_fork_url: str, selector_list: List[str]):
         base_fork_url = remove_fragment(base_fork_url)
@@ -280,7 +280,9 @@ def fetch_url(url, headers):
             response = self.requests_get(self.base_fork_url, headers)
             if response.status_code != 200:
                 maxkb_logger.error(f"url: {self.base_fork_url} code:{response.status_code}")
-                return Fork.Response.error(f"url: {self.base_fork_url} code:{response.status_code}")
+                return Fork.Response.error(
+                    f"url: {self.base_fork_url} code:{response.status_code}", response.status_code
+                )
             content_type = getattr(response, "content_type", "").split(";", 1)[0].strip().lower()
             if content_type in {"text/markdown", "text/x-markdown"} or (
                 content_type == "text/plain" and self.urlparse.path.lower().endswith((".md", ".markdown"))
