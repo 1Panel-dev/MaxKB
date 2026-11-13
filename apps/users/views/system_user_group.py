@@ -206,6 +206,10 @@ class SystemUserGroupView(APIView):
             PermissionConstants.SYSTEM_USER_GROUP_READ,
             RoleConstants.ADMIN,
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.EXTENDS_ADMIN,
+            RoleConstants.EXTENDS_WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
+            RoleConstants.EXTENDS_USER.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, user_group_id: str, current_page: int, page_size: int):
             d = UserGroupListPageSerializer.Query(
