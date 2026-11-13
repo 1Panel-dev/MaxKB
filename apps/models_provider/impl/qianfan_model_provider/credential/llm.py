@@ -75,7 +75,7 @@ class QianfanLLMModelCredential(BaseForm, BaseModelCredential):
             if raise_exception:
                 raise AppApiException(
                     ValidCode.valid_error.value,
-                    str(e),
+                    str(e)
                 )
             return False
         return True
