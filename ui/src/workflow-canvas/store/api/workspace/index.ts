@@ -31,6 +31,7 @@ const getLatestKnowledgeAction = async (knowledgeId: string) => {
 export default {
   getLatestKnowledgeAction,
   getAllApplication: ApplicationApi.getAllApplication,
+  getApplicationDetail: ApplicationApi.getApplicationDetail,
   postPromptGenerate: modelAPI.postPromptGenerate,
   postChatCompletion: modelAPI.postChatCompletion,
   getModelListWithShared: modelAPI.getModelListWithShared,

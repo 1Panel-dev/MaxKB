@@ -86,7 +86,9 @@ function useAgent(context: NodeAgentContext) {
 }
 
 export default {
-  description: '调用工具库中的自定义工具，相当于调用一个外部函数（新增时需 tool_id，用 get_tools 查询）；入参为工具中 source=reference 的参数',
+  description:
+    '调用工具库中的自定义工具，相当于调用一个外部函数（新增时需 tool_id，用 get_tools 查询；get_tools 同时列出工作流工具，也用这一种节点类型新增，签名在 add_node 的返回结果里）；' +
+    '入参为工具中 source=reference 的参数',
   params,
   config,
   returns,

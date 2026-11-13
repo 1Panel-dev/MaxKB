@@ -95,6 +95,7 @@ function useAgent(context: NodeAgentContext) {
       '- inputs（输入参数）：调用方传入的数据。type 按数据形态选：文本 string，数字 int / float，开关 boolean，列表 array，对象 dict。',
       '- desc 是写给调用方的：智能体调用工具时，模型只能看到每个输入参数的 desc 并据此生成参数值，要写清含义、格式与示例，不超过 128 字；被工作流节点调用时写清需要什么结构的数据。',
       '- outputs（输出参数）：工具的返回字段，只需参数名与显示名称；它的值由流程里的变量赋值节点写入。',
+      '- 输入参数和输出参数都可以没有：要求里没提到的一侧不要自行添加；要清空某一侧时传空数组。',
       '- inputs / outputs 各自整体替换：修改其中一项时要带上该侧要保留的其余参数；只改一侧时另一侧省略。',
       `当前签名：${JSON.stringify(signatureOf(context))}`,
     ].join('\n'),

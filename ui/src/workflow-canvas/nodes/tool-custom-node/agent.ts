@@ -28,7 +28,12 @@ const config: JsonObjectSchema = {
           name: { type: 'string', description: '参数名，与函数形参一致' },
           type: { type: 'string', enum: FIELD_TYPES },
           source: { type: 'string', enum: ['reference', 'custom'], description: 'reference 由同名入参引用上游，custom 为常量' },
-          is_required: { type: 'boolean', description: '是否必填，默认 true' },
+          is_required: {
+            type: 'boolean',
+            description:
+              '默认 true。仅对 source=reference 有效：运行时引用取到的值为空（null / 空字符串 / 空数组）会直接中断节点并报错「字段为必填」。' +
+              '引用的上游字段在正常情况下可能为空（如可选的提取结果、模型可能不输出、循环变量起始为空、分支未覆盖的字段等）时必须设为 false，让空值在代码里按业务逻辑处理，而不是让节点中断；只有确定上游一定有值时才设 true',
+          },
           desc: { type: 'string', description: '参数说明' },
           value: { description: 'source=custom 时的常量值' },
         },
@@ -55,6 +60,7 @@ function useAgent(context: NodeAgentContext) {
       'tool-custom-node（自定义工具）配置要点：',
       '- code：按需求写一段可直接运行的 Python，只定义一个函数，形参与 inputs 的 name 一一对应，return 结果；只用标准库。',
       '- inputs：source=reference 的参数由同名入参绑定，无需给 value；source=custom 的参数给常量 value。',
+      '- is_required 只对 source=reference 的参数有效：引用的上游值运行时为空会直接报错中断节点，不是「代码里判断一下」就能接住的。引用的字段本身可能为空（可选的提取结果、模型可能不输出、循环变量初始为空等）就必须设 is_required=false，代码里按空值正常处理；只有确定上游一定有值才设 true。',
       '- 示例：def main(text: str, limit: int):\\n    return text[:limit]',
       '- 解析模型输出的 JSON 时先去掉 ```json 代码块标记并做容错（解析失败时返回原数据或空结果），不要让代码直接抛错。',
       '- 返回值结构以「下游要求」为准：有下游要求时按它逐字段构造返回值；顶层是数组就 return 一个 list，哪怕只有一条也不能返回单个 dict，也不能返回 {名称: 内容} 这样的字典。',

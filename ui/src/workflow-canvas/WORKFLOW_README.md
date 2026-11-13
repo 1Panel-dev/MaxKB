@@ -513,8 +513,9 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 | `validate`        | 并行调用节点校验，返回 Promise                  |
 | `onmousedown`     | 启动节点拖拽或执行节点回调                      |
 
-`getGraphData()` 在实例未初始化时返回 `undefined`；`validate()` 此时返回已完成的空数组 Promise，
-有实例时汇总节点各自的校验，不额外执行顶层图结构校验。
+`getGraphData()` 在实例未初始化时返回 `undefined`；`validate()` 此时返回已完成的 Promise，
+有实例时调用 `core/validate.ts` 的 `validateWorkflow()` 汇总节点各自的校验，不额外执行顶层图结构校验；
+AI 生成的 validate 工具复用同一入口（`collectWorkflowValidationErrors()` 取全部失败原因）。
 
 当前 `renderGraphData()` 不主动销毁上一实例；普通数据加载使用 `render()`，不要将前者当作
 已封装完整清理的重置方法。画布卸载时销毁当前实例并清理 Teleport。
@@ -565,8 +566,15 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 | panel/          | 将用户需求、文本、思考、工具及委派事件转换为对话内容展示 |
 
 可新增的节点以节点菜单（`node-menu/menu.ts` 的 `getMenuNodes`）为准：节点目录与 add_node 都按画布模式取菜单节点，
-另含工具库节点（tool-lib-node）；菜单新增节点后 AI 侧自动可用。数据源节点（`kind` 为 DataSource）是知识库工作流入口，
+另含工具（tool-lib-node）与智能体（application-node，仅应用工作流）两个资源类节点，对应菜单里的资源页签；
+菜单新增节点后 AI 侧自动可用。数据源节点（`kind` 为 DataSource）是知识库工作流入口，
 新增时不接上游，其余节点必须建即接。停止后续聊会重建父 agent，并沿用裁剪后的历史与首条需求。
+
+资源类节点（tool-lib-node、application-node）的签名取决于新增时绑定的资源，不是静态的：get_tools / get_applications
+列出可选资源（自定义工具带 inputs；工作流工具与智能体的签名取决于它们自己声明的参数，成本较高不在列表里带），
+add_node 时按 tool_id / application_id 查出真实详情、连同输入输出字段一起写入新节点的 node_data，返回结果里的
+`inputs`／`outputs` 就是这份真实签名，不需要再查一次。tool-lib-node 同时覆盖自定义工具与工作流工具（AI 侧只传
+这一种 type，按工具类型选择实际的内部节点），application-node 的入参只能引用上游数据，不支持常量。
 
 节点配置 agent 位于节点目录的 agent.ts，通过 index.ts 默认导出的 agent 字段注册；
 未注册的节点仍进入 AI 可选目录（说明取菜单文案，输出取模板 config.fields），可新增和连线，但不能 AI 配置。NodeAgentModule 使用 JSON Schema 定义 params、config、returns：

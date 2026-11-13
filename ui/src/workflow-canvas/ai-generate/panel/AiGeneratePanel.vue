@@ -8,6 +8,7 @@ import type { DefaultModelSettingPayload, ModelItem, ModelProviderItem } from '@
 import SelectModel from '@/components/business/select-model/index.vue'
 import ContentList from '@/conversation-panel/components/content-list/index.vue'
 import QuickQuestion from '@/conversation-panel/components/markdown-renderer/QuickQuestion.vue'
+import { Scroll } from '@/conversation-panel/core/scroll'
 import { inputShortcut } from '@/conversation-panel/core/shortcuts'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { useWorkflowStore } from '@/workflow-canvas/store'
@@ -91,8 +92,36 @@ function close() {
   visible.value = false
 }
 
-function scrollToBottom() {
-  nextTick(() => scrollbarRef.value?.setScrollTop(Number.MAX_SAFE_INTEGER))
+/* 底部跟随与对话面板共用 Scroll：用户上滑查看时停止跟随，回到底部附近恢复。 */
+let bottomScroll: Scroll | undefined
+let bottomScrollElement: HTMLElement | undefined
+let followPending = false
+
+/** 抽屉内容可能重新挂载，滚动容器变化时重建跟随实例 */
+function getBottomScroll() {
+  const wrap = scrollbarRef.value?.wrapRef
+  if (!wrap) return undefined
+  if (wrap !== bottomScrollElement) {
+    bottomScroll?.destroy()
+    bottomScroll = new Scroll(wrap)
+    bottomScrollElement = wrap
+  }
+  return bottomScroll
+}
+
+/** 流式增量：仅在用户停留在底部附近时跟随；同一轮渲染内的多次增量只滚动一次 */
+function followBottom() {
+  if (followPending) return
+  followPending = true
+  nextTick(() => {
+    followPending = false
+    getBottomScroll()?.scrollBottom()
+  })
+}
+
+/** 用户发送需求：回到最新内容并恢复跟随 */
+function forceBottom() {
+  nextTick(() => getBottomScroll()?.forceBottom())
 }
 
 /** 会改动画布的顶层工具；本轮未调用时视为仅规划 / 答复（如等待用户确认方案），不提示生成完成 */
@@ -103,7 +132,7 @@ let canvasChanged = false
 function onEvent(event: AgentEvent) {
   if (event.type === 'tool_start' && !event.position.length && CANVAS_MUTATING_TOOLS.has(event.name)) canvasChanged = true
   activity.pushEvent(event)
-  scrollToBottom()
+  followBottom()
 }
 
 /** 画布所属资源 id：按模式取路由上的应用 / 工具 / 知识库 id */
@@ -171,7 +200,7 @@ function submit() {
     activity.reset()
   }
   activity.pushQuestion(text)
-  scrollToBottom()
+  forceBottom()
   run(text)
 }
 
@@ -193,7 +222,10 @@ function handleKeydown(event: KeyboardEvent) {
   inputShortcut(event, requirement, submit)
 }
 
-onBeforeUnmount(() => agent?.stop())
+onBeforeUnmount(() => {
+  agent?.stop()
+  bottomScroll?.destroy()
+})
 
 defineExpose({ open, close })
 </script>

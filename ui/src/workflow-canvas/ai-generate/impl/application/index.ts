@@ -8,6 +8,7 @@ import {
   getCanvasDetailTool,
   getNodeDetailTool,
   getNodeAnchorsTool,
+  getApplicationsTool,
   getToolsTool,
   layoutTool,
   validateTool,
@@ -28,11 +29,12 @@ const GUIDE = `你是 MaxKB「智能体工作流」的搭建助手，在 LogicFl
 - 画布用 lf_id 标识：主画布 "main"（或省略）；循环体 = 该循环节点 id。每个循环体固定有 loop-start-node（输出 index、item）。
 - 循环变量：要跨轮次累积 / 传递数据，或循环结束后还要用循环内算出的值时，configure_node 循环节点时在 requirement 写明要声明哪些循环变量、returns 列出变量名。循环体内用 ["loop", 变量名] 引用；循环变量初始为空，修改它只能在循环体内加变量赋值节点（variable-assign-node，target=["loop", 变量名]），其他节点的输出不会自动写入，所以每个要更新的循环变量都要在产出数据的节点之后接一个变量赋值节点；循环结束后下游用 [循环节点ID, 变量名] 引用最终值。
 - 目录里标注「暂不支持 AI 配置」的节点可以新增和连线，但不能 configure_node：有可配置的节点能满足需求时优先用后者；确实要用时建好接好，并在最后总结里提示用户手动配置。
+- 智能体节点（application-node）相当于把当前对话的一部分交给另一个已发布的智能体处理：add_node 时传 application_id（get_applications 查询），configure_node 时绑定用户问题与它需要的每个参数（只能引用上游数据，不支持常量）。
 
 【从零搭建】
 1. 先调 plan：规划器据需求组合节点函数，写出文字方案 { plan }（用户已在「规划流程」中看到全文）。拿到方案后先不要建图：不复述全文，用两三句概括主链路与关键假设，请用户确认或提出修改，然后直接结束本轮回复（不调用任何工具）。
    用户确认后再照方案从第 2 步开始建；用户提出修改时，小改直接说明调整点后再次请用户确认，大改重新调 plan，同样确认后再建。
-2. 用 add_node(type, source_anchor_id) 建节点并接上游：第一个节点接 "start-node"；普通链式连接传上游节点 id；判断器 / 意图识别要先 configure_node 配好分支（requirement 写清分几路、各路条件或分类），再 get_node_anchors 取各分支出口接下游；多分支汇合用 add_edge 补入边。
+2. 用 add_node(type, source_anchor_id) 建节点并接上游：第一个节点接 "start-node"；普通链式连接传上游节点 id；新增工具节点（tool-lib-node）同时传 tool_id（get_tools 查询），新增智能体节点（application-node）同时传 application_id（get_applications 查询）；判断器 / 意图识别要先 configure_node 配好分支（requirement 写清分几路、各路条件或分类），再 get_node_anchors 取各分支出口接下游；多分支汇合用 add_edge 补入边。
 3. 循环：主画布 add_node 建 loop-node 并 configure_node 配循环方式；再带 lf_id=该循环节点 id 往循环体建（首节点 source_anchor_id="loop-start-node"），循环体内节点用 lf_id=该循环 id 配置；无限循环必须放 loop-break-node。
 4. 节点建好接好后 configure_node(nodeId, args, requirement, returns?) 配置，相当于调用这个函数：
    - args 传实参：形参名 → 上游引用 [节点ID, 字段]（多引用形参传列表），按方案中各节点的输入来源给，框架会校验并绑定；
@@ -54,7 +56,7 @@ const PLAN_GUIDE = `你是 MaxKB「智能体工作流」的规划器。下方【
 - 按数据依赖排顺序：每个节点的形参都要有上游返回值（或开始节点的 question、全局变量）来提供，类型要对得上（如循环的 array 需要上游返回 array）。
 - 需要按条件 / 分类走不同处理时用分支（condition-node / intent-node），需要逐项处理一组数据时用循环（loop-node）。
 - 只放需求实际需要的节点；末端必须是能输出给用户的节点，最终回答 is_result=true、中间步骤 false。
-- 需要外部工具时先 get_tools 看有哪些可用工具。需求含糊时按最常见理解规划，并写明假设。
+- 需要外部工具时先 get_tools 看有哪些可用工具；需要把一部分任务交给另一个智能体处理时先 get_applications 看有哪些已发布的智能体可用。需求含糊时按最常见理解规划，并写明假设。
 
 方案格式（Markdown，面向用户可读，同时足够搭建 agent 照着建）：
 - 按执行顺序逐个列节点：节点名称（类型）——做什么与配置要求（AI 对话的角色 / 目标 / 输出、检索什么、判断条件、表单收集哪些字段）；输入：形参 ← 上游节点.返回字段（如 问题 ← 开始.question）；有 [字段名] 动态返回时写出要产出的字段与类型。
@@ -70,11 +72,12 @@ export function useApplicationAgent(bindings: AgentBindings): RunnableAgent {
     {
       prompt: buildParentPrompt(GUIDE, bindings),
       tools: [
-        createPlanTool(bindings, { guide: `${PLAN_GUIDE}\n\n======== 可用节点 ========\n${renderCatalog(bindings)}`, task: PLAN_TASK, tools: [getToolsTool(bindings)] }),
+        createPlanTool(bindings, { guide: `${PLAN_GUIDE}\n\n======== 可用节点 ========\n${renderCatalog(bindings)}`, task: PLAN_TASK, tools: [getToolsTool(bindings), getApplicationsTool(bindings)] }),
         getCanvasDetailTool(bindings),
         getNodeDetailTool(bindings),
         getNodeAnchorsTool(bindings),
         getToolsTool(bindings),
+        getApplicationsTool(bindings),
         addNodeTool(bindings),
         addEdgeTool(bindings),
         deleteNodeTool(bindings),

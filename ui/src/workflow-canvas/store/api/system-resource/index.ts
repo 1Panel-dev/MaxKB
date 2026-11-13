@@ -24,6 +24,7 @@ const getLatestKnowledgeAction = async (knowledgeId: string) => {
 export default {
   getLatestKnowledgeAction,
   getAllApplication: ApplicationApi.getAllApplication,
+  getApplicationDetail: ApplicationApi.getApplicationDetail,
   postPromptGenerate: ModelApi.postPromptGenerate,
   postChatCompletion: ModelApi.postChatCompletion,
   getMcpTools,
