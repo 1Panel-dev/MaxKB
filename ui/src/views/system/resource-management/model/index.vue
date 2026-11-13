@@ -160,7 +160,14 @@ onMounted(() => {
         <el-table-column prop="model_name" label="基础模型" min-width="180" show-overflow-tooltip />
         <el-table-column v-if="auth.isEE" prop="workspace_name" min-width="160" show-overflow-tooltip>
           <template #header>
-            <MkTableFilter mode="multiple" v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="multiple"
+              v-model="selectedWorkspaceIds"
+              label="工作空间"
+              filterable
+              :options="workspaceOptions"
+              @change="handleFilterChange"
+            />
           </template>
         </el-table-column>
         <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />

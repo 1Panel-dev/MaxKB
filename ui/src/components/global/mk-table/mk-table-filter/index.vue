@@ -18,8 +18,9 @@ const props = withDefaults(
     resetValue?: T
     cascaderProps?: CascaderProps
     width?: string | number
+    filterable?: boolean
   }>(),
-  { mode: 'multiple', options: () => [] },
+  { mode: 'multiple', options: () => [], filterable: false },
 )
 defineSlots<{ default(props: { value: T }): unknown }>()
 const emit = defineEmits<{ change: [value: T]; open: [] }>()
@@ -67,6 +68,7 @@ const filterProps = computed(() => {
     modelValue: selectedValue.value as TableFilterOption['value'][],
     options: props.options as TableFilterOption[],
     width: props.width,
+    filterable: props.filterable,
   }
 })
 
