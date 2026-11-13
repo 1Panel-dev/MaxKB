@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
+import { downloadByURL } from '@/utils/common'
 import { useRightSidebarStore } from '../../index'
 import { createFullscreenToggle, createPdfRenderer } from './index'
 
@@ -9,10 +10,15 @@ const { knowledgeSource, closeRightSide } = useRightSidebarStore()
 const { previewDocument, closePreview } = knowledgeSource
 const { loading, error, render, destroy } = createPdfRenderer()
 const fullscreen = createFullscreenToggle()
-const { isFullscreen } = fullscreen
 
 const viewerRef = useTemplateRef<HTMLElement>('viewerRef')
 const pagesRef = useTemplateRef<HTMLElement>('pagesRef')
+
+// 下载当前预览的 PDF 原文件
+const downloadDocument = () => {
+  const document = previewDocument.value
+  if (document?.url) downloadByURL(document.url, document.name)
+}
 
 // 挂载及切换文档时重新绘制，卸载时释放 pdf.js 资源
 onMounted(() => {
@@ -42,13 +48,20 @@ onBeforeUnmount(() => {
         </el-button>
         <h4 class="min-w-0 truncate" :title="previewDocument?.name">{{ previewDocument?.name }}</h4>
       </div>
-      <div class="flex-align-center shrink-0">
-        <!-- 全屏预览 -->
-        <MkTooltip :content="isFullscreen ? '退出全屏' : '全屏'">
-          <el-button text @click="fullscreen.toggle()">
-            <MkIcon :name="isFullscreen ? 'icon_collapse_outlined' : 'icon_expand_outlined'" size="18" />
+      <div class="flex-align-center gap-2 shrink-0">
+        <!-- 下载 -->
+        <MkTooltip content="下载">
+          <el-button text :disabled="!previewDocument?.url" @click="downloadDocument">
+            <MkIcon name="icon_download_outlined" size="18" />
           </el-button>
         </MkTooltip>
+        <!-- 全屏预览 -->
+        <MkTooltip content="全屏">
+          <el-button text @click="fullscreen.toggle()" class="ml-0!">
+            <MkIcon name="icon_window-new_outlined" size="18" />
+          </el-button>
+        </MkTooltip>
+        <el-divider direction="vertical" class="mx-1!" />
         <!-- 关闭文档预览 -->
         <el-button text @click="closeRightSide()">
           <MkIcon name="icon_close_outlined" size="18" />

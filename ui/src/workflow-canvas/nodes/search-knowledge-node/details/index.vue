@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
-import { getFileUrl } from '@/utils/common'
+import { downloadByURL, getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_HIT_UNIT_TYPE } from '@/api/enums'
 import type { DocumentResourceType, KnowledgeHitTestAsset, KnowledgeType } from '@/api/types'
@@ -55,6 +55,12 @@ function getParagraphImageUrl(paragraph: SearchParagraph) {
     (paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE ? paragraph.document_image_id : undefined) || paragraph.hit_asset?.file_id
   if (!fileId || paragraph.content?.includes(`/oss/file/${fileId}`)) return ''
   return getFileUrl(fileId)
+}
+
+// 来源文件按原文件名下载，网页来源打开原网址。
+function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
+  if (fileId) downloadByURL(getFileUrl(fileId), name.trim())
+  else if (sourceUrl && /^https?:\/\//i.test(sourceUrl.trim())) window.open(sourceUrl.trim(), '_blank', 'noopener,noreferrer')
 }
 </script>
 
@@ -120,32 +126,27 @@ function getParagraphImageUrl(paragraph: SearchParagraph) {
             <MdPreview :model-value="paragraph.content" no-img-zoom-in />
 
             <!-- 打开来源文档 -->
-
-            <a
+            <el-card
               v-if="paragraph.document_name?.trim()"
-              :href="paragraph.meta?.source_file_id || paragraph.meta?.source_url || undefined"
-              target="_blank"
-              rel="noopener noreferrer"
-              :download="paragraph.document_name.trim()"
-              class="mt-2 block min-w-0"
+              shadow="never"
+              class="small cursor-pointer mt-2 min-w-0"
+              @click="openSourceDocument(paragraph.document_name, paragraph.meta?.source_file_id, paragraph.meta?.source_url)"
             >
-              <el-card shadow="never" class="small cursor-pointer">
-                <div class="flex-align-center gap-2">
-                  <img
-                    :src="
-                      getFileIconUrl(
-                        paragraph.document_name.trim(),
-                        paragraph.knowledge_type,
-                        paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE,
-                      )
-                    "
-                    alt=""
-                    class="size-6 shrink-0"
-                  />
-                  <span class="min-w-0 truncate" :title="paragraph.document_name.trim()">{{ paragraph.document_name.trim() }}</span>
-                </div>
-              </el-card>
-            </a>
+              <div class="flex-align-center gap-2">
+                <img
+                  :src="
+                    getFileIconUrl(
+                      paragraph.document_name.trim(),
+                      paragraph.knowledge_type,
+                      paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE,
+                    )
+                  "
+                  alt=""
+                  class="size-6 shrink-0"
+                />
+                <span class="min-w-0 truncate" :title="paragraph.document_name.trim()">{{ paragraph.document_name.trim() }}</span>
+              </div>
+            </el-card>
 
             <template #footer>
               <div class="flex-align-center w-full gap-2 border-t pt-2">

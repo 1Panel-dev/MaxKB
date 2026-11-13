@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
+import { useFormItem } from 'element-plus'
 import type { UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
 import SingleFileUpload from './SingleFileUpload.vue'
 import MultipleFileUpload from './MultipleFileUpload.vue'
@@ -32,6 +33,9 @@ defineSlots<{
 }>()
 
 const fileList = defineModel<DragUploadFile[]>({ required: true })
+/* 拖拽区边框跟随所属表单项的校验状态。 */
+const { formItem } = useFormItem()
+const isError = computed(() => formItem?.validateState === 'error')
 const uploadingCount = computed(() => fileList.value.filter((file) => file.status === 'uploading').length)
 const uploadRef = useTemplateRef<InstanceType<typeof SingleFileUpload> | InstanceType<typeof MultipleFileUpload>>('uploadRef')
 
@@ -66,6 +70,8 @@ defineExpose({ clearFiles, handleRemove, uploadingCount })
 <template>
   <component
     :is="multiple ? MultipleFileUpload : SingleFileUpload"
+    class="mk-drag-upload"
+    :class="{ 'is-error': isError }"
     v-bind="multiple ? { mode } : {}"
     ref="uploadRef"
     v-model="fileList"
@@ -85,3 +91,9 @@ defineExpose({ clearFiles, handleRemove, uploadingCount })
     <template v-if="$slots.download" #download="{ file }"><slot name="download" :file="file" /></template>
   </component>
 </template>
+
+<style scoped lang="scss">
+.mk-drag-upload.is-error :deep(.el-upload-dragger) {
+  border-color: var(--el-color-danger);
+}
+</style>

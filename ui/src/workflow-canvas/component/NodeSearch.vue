@@ -81,8 +81,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- 打开节点搜索 -->
-  <el-button text :class="{ 'bg-primary/10! text-primary!': searchVisible }" @click="openSearch">
+  <!-- 切换节点搜索 -->
+  <el-button text :class="{ 'bg-primary/10! text-primary!': searchVisible }" @click="searchVisible ? closeSearch() : openSearch()">
     <MkIcon name="icon_search-outlined" size="18" />
   </el-button>
   <el-card v-if="searchVisible" shadow="always" class="workflow-search-container" style="--el-card-padding: 8px 12px">
