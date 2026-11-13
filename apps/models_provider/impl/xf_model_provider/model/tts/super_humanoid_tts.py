@@ -110,18 +110,18 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                     return await self.handle_message(ws)
             except websockets.exceptions.InvalidStatus as e:
                 if e.response.status_code == 401:
-                    raise Exception(
+                    raise RuntimeError(
                         _("Authentication failed (HTTP 401). Please check: "
                           "1) API URL is correct for TTS service; "
                           "2) APP ID, API Key, and API Secret are correct; "
                           "3) Your iFlytek account has TTS service enabled.")
                     )
                 else:
-                    raise Exception(f"WebSocket connection failed: HTTP {e.response.status_code}")
+                    raise RuntimeError(f"WebSocket connection failed: HTTP {e.response.status_code}")
             except Exception as e:
                 if "Authentication failed" in str(e):
                     raise
-                raise Exception(f"iFlytek TTS service error: {str(e)}")
+                raise RuntimeError(f"iFlytek TTS service error: {str(e)}")
 
         return asyncio.run(handle())
 
@@ -138,7 +138,7 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
                 if code != 0:
                     errMsg = message["header"].get("message", "Unknown error")
-                    raise Exception(f"sid: {sid} call error: {errMsg} code is: {code}")
+                    raise RuntimeError(f"sid: {sid} call error: {errMsg} code is: {code}")
 
                 if "payload" in message and "audio" in message["payload"]:
                     audio = base64.b64decode(message["payload"]["audio"]["audio"])
@@ -147,7 +147,7 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                     if message["payload"]["audio"].get("status") == 2:
                         break
             else:
-                raise Exception(
+                raise RuntimeError(
                     f"Unexpected response from iFlytek API. Response: {json.dumps(message, ensure_ascii=False)}"
                 )
 
