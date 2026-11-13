@@ -3,92 +3,46 @@
 @project: MaxKB
 @Author：虎
 @file： embedding.py
-@date：2024/10/17 15:29
-@desc:
+@date：2026/11/13
+@desc: Xunfei Spark 向量模型 OpenAI 兼容接口模型
 """
 
-import queue
-import threading
-import time
-from typing import Dict, Optional
+from typing import Dict, List
 
-import base64
-import json
-import numpy as np
-from numpy import ndarray
+import openai
 
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
-from models_provider.langchain_compat.sparkllm import SparkLLMTextEmbeddings
-
-_task_queue = queue.Queue()
 
 
-def _worker():
-    while True:
-        message, future = _task_queue.get()
-
-        for i in range(3):
-            try:
-                data = json.loads(message)
-                code = data["header"]["code"]
-
-                if code != 0:
-                    raise Exception(f"Request error: {code}, {data}")
-
-                text_base = data["payload"]["feature"]["text"]
-                text_data = base64.b64decode(text_base)
-
-                dt = np.dtype(np.float32)
-                dt = dt.newbyteorder("<")
-
-                text = np.frombuffer(text_data, dtype=dt)
-
-                if len(text) > 2560:
-                    array = text[:2560]
-                else:
-                    array = text
-
-                future["result"] = array
-                future["event"].set()
-                break
-
-            except Exception as e:
-                if i == 2:
-                    future["error"] = e
-                    future["event"].set()
-                else:
-                    time.sleep(0.5)
-
-        time.sleep(0.5)  # QPS=2
-
-
-threading.Thread(target=_worker, daemon=True).start()
-
-
-class XFEmbedding(MaxKBBaseEmbeddingModel, SparkLLMTextEmbeddings):
+class XunFeiOpenAIEmbeddingModel(MaxKBBaseEmbeddingModel):
     def supports_image_embedding(self) -> bool:
+        return False
+
+    model_name: str
+    optional_params: dict
+
+    def __init__(self, api_key, base_url, model_name: str, optional_params: dict):
+        self.client = openai.OpenAI(api_key=api_key, base_url=base_url).embeddings
+        self.model_name = model_name
+        self.optional_params = optional_params
+
+    def is_cache_model(self):
         return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        return XFEmbedding(
-            base_url=model_credential.get("base_url"),
-            spark_app_id=model_credential.get("spark_app_id"),
-            spark_api_key=model_credential.get("spark_api_key"),
-            spark_api_secret=model_credential.get("spark_api_secret"),
+        optional_params = MaxKBBaseEmbeddingModel.filter_optional_params(model_kwargs)
+        return XunFeiOpenAIEmbeddingModel(
+            api_key=model_credential.get("api_key"),
+            base_url=model_credential.get("api_base"),
+            model_name=model_credential.get("model_id") or model_name,
+            optional_params=optional_params,
         )
 
-    @staticmethod
-    def _parser_message(
-        message: str,
-    ) -> Optional[ndarray]:
-        future = {"event": threading.Event(), "result": None, "error": None}
+    def embed_query(self, text: str):
+        res = self.embed_documents([text])
+        return res[0]
 
-        _task_queue.put((message, future))
-
-        future["event"].wait()
-
-        if future["error"]:
-            raise future["error"]
-
-        return future["result"]
+    def embed_documents(self, texts: List[str], chunk_size: int | None = None) -> List[List[float]]:
+        res = self.client.create(input=texts, model=self.model_name, encoding_format="float")
+        return [e.embedding for e in res.data]

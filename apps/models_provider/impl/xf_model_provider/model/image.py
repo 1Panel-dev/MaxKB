@@ -1,100 +1,45 @@
 # coding=utf-8
-import base64
-import os
-from typing import Dict, Any, List, Optional, Iterator
+"""
+@project: MaxKB
+@Author：虎
+@file： image.py
+@date：2026/11/13
+@desc: 讯飞星火视觉模型 OpenAI 兼容接入（基于 Chat Completions 多模态协议）
+"""
 
-# from docutils.utils import SystemMessage
-from models_provider.langchain_compat.sparkllm import ChatSparkLLM, _convert_delta_to_message_chunk
-from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.messages import BaseMessage, ChatMessage, HumanMessage, AIMessage, AIMessageChunk
-from langchain_core.outputs import ChatGenerationChunk
+from typing import Any, Dict
 
+from langchain_core.language_models import LanguageModelInput
 from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
-class ImageMessage(HumanMessage):
-    content: str
-
-
-def convert_message_to_dict(message: BaseMessage) -> dict:
-    message_dict: Dict[str, Any]
-    if isinstance(message, ChatMessage):
-        message_dict = {"role": "user", "content": message.content}
-    elif isinstance(message, ImageMessage):
-        message_dict = {"role": "user", "content": message.content, "content_type": "image"}
-    elif isinstance(message, HumanMessage):
-        message_dict = {"role": "user", "content": message.content}
-    elif isinstance(message, AIMessage):
-        message_dict = {"role": "assistant", "content": message.content}
-        if "function_call" in message.additional_kwargs:
-            message_dict["function_call"] = message.additional_kwargs["function_call"]
-            # If function call only, content is None not empty string
-            if message_dict["content"] == "":
-                message_dict["content"] = None
-        if "tool_calls" in message.additional_kwargs:
-            message_dict["tool_calls"] = message.additional_kwargs["tool_calls"]
-            # If tool calls only, content is None not empty string
-            if message_dict["content"] == "":
-                message_dict["content"] = None
-    # elif isinstance(message, SystemMessage):
-    #     message_dict = {"role": "system", "content": message.content}
-    else:
-        raise ValueError(f"Got unknown type {message}")
-
-    return message_dict
-
-
-class XFSparkImage(MaxKBBaseModel, ChatSparkLLM):
-    spark_app_id: str
-    spark_api_key: str
-    spark_api_secret: str
-    spark_api_url: str
+class XunFeiOpenAIImage(MaxKBBaseModel, BaseChatOpenAI):
+    @staticmethod
+    def is_cache_model():
+        return False
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
-        return XFSparkImage(
-            spark_app_id=model_credential.get("spark_app_id"),
-            spark_api_key=model_credential.get("spark_api_key"),
-            spark_api_secret=model_credential.get("spark_api_secret"),
-            spark_api_url=model_credential.get("spark_api_url"),
+        return XunFeiOpenAIImage(
+            model=model_name,
+            openai_api_base=model_credential.get("api_base") or "https://maas-api.cn-huabei-1.xf-yun.com/v2",
+            openai_api_key=model_credential.get("api_key"),
+            streaming=True,
+            stream_usage=True,
             **optional_params,
         )
 
-    @staticmethod
-    def generate_message(prompt: str, image) -> list[BaseMessage]:
-        if image is None:
-            cwd = os.path.dirname(os.path.abspath(__file__))
-            with open(f"{cwd}/img_1.png", "rb") as f:
-                base64_image = base64.b64encode(f.read()).decode("utf-8")
-                return [ImageMessage(f"data:image/jpeg;base64,{base64_image}"), HumanMessage(prompt)]
-        return [HumanMessage(prompt)]
-
-    def _stream(
+    def _get_request_payload(
         self,
-        messages: List[BaseMessage],
-        stop: Optional[List[str]] = None,
-        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        input_: LanguageModelInput,
+        *,
+        stop: list[str] | None = None,
         **kwargs: Any,
-    ) -> Iterator[ChatGenerationChunk]:
-        default_chunk_class = AIMessageChunk
-
-        self.client.arun(
-            [convert_message_to_dict(m) for m in messages],
-            self.spark_user_id,
-            self.model_kwargs,
-            streaming=True,
-        )
-        for content in self.client.subscribe(timeout=self.request_timeout):
-            if "data" not in content:
-                continue
-            delta = content["data"]
-            chunk = _convert_delta_to_message_chunk(delta, default_chunk_class)
-            cg_chunk = ChatGenerationChunk(message=chunk)
-            if run_manager:
-                run_manager.on_llm_new_token(str(chunk.content), chunk=cg_chunk)
-            yield cg_chunk
-
-    @staticmethod
-    def is_cache_model():
-        return False
+    ) -> dict:
+        payload = super()._get_request_payload(input_, stop=stop, **kwargs)
+        # 星火 OpenAI 兼容接口使用 max_tokens 字段，而不是 OpenAI 新版的 max_completion_tokens。
+        if "max_completion_tokens" in payload and "max_tokens" not in payload:
+            payload["max_tokens"] = payload.pop("max_completion_tokens")
+        return payload
