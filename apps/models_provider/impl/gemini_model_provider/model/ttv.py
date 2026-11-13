@@ -93,10 +93,10 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
             # 8. 异常与结果检查
             if operation.error:
-                raise Exception(f"Video generation failed from Google Side: {operation.error}")
+                raise RuntimeError(f"Video generation failed from Google Side: {operation.error}")
 
             if not operation.result or not operation.result.generated_videos:
-                raise Exception("Google API returned empty result.")
+                raise RuntimeError("Google API returned empty result.")
 
             generated_video_obj = operation.result.generated_videos[0]
             video_file_ref = generated_video_obj.video
