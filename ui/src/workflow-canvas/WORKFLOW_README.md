@@ -547,7 +547,7 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 
 ## AI 生成（`ai-generate/`）
 
-当前用于应用工作流及循环体，根据用户需求规划、创建节点、连线与配置字段。
+当前用于应用、知识库、工具三类工作流及其循环体，根据用户需求规划、创建节点、连线与配置字段。
 页面通过 WorkflowCanvas.getLogicFlow() 提供画布，生成结果只改图，不自动保存。
 模型选择支持参数设置，不提供添加模型入口；优先沿用默认 LLM 的参数，切换模型加载对应默认参数。
 首轮生成时固定模型及参数，父 agent 和委派的子 agent 共用，并通过 `model_params_setting` 传入补全请求；新建会话后可重新配置。
@@ -555,24 +555,37 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 | 位置            | 职责                                                     |
 | --------------- | -------------------------------------------------------- |
 | create-agent.ts | 流式补全、工具执行、错误回喂及级联取消                   |
-| application.ts  | 应用工作流父 agent 与规划器                              |
+| common.ts       | agent 装配、流式补全、委派与续聊的历史裁剪、调试日志     |
+| impl/           | 按画布模式分发的父 agent 与规划器，shared.ts 为共用装配  |
 | tools/canvas.ts | 唯一直接读写 LogicFlow 的适配层                          |
 | tools/result.ts | 工具结果及 agent 终态                                    |
 | tools/node.ts   | 节点 agent 共用能力与配置校验                            |
 | panel/          | 将用户需求、文本、思考、工具及委派事件转换为对话内容展示 |
 
+可新增的节点以节点菜单（`node-menu/menu.ts` 的 `getMenuNodes`）为准：节点目录与 add_node 都按画布模式取菜单节点，
+另含工具库节点（tool-lib-node）；菜单新增节点后 AI 侧自动可用。数据源节点（`kind` 为 DataSource）是知识库工作流入口，
+新增时不接上游，其余节点必须建即接。停止后续聊会重建父 agent，并沿用裁剪后的历史与首条需求。
+
 节点配置 agent 位于节点目录的 agent.ts，通过 index.ts 默认导出的 agent 字段注册；
-未注册的节点不进入 AI 可选目录。NodeAgentModule 使用 JSON Schema 定义 params、config、returns：
+未注册的节点仍进入 AI 可选目录（说明取菜单文案，输出取模板 config.fields），可新增和连线，但不能 AI 配置。NodeAgentModule 使用 JSON Schema 定义 params、config、returns：
 params 描述运行时上游引用，config 描述建图时配置，returns 描述固定和动态输出。
 x-bind 指定引用写入的 node_data 字段，x-from 描述动态输出来源，函数签名展示不暴露 x- 扩展。
-params 实参使用 `[节点ID, 字段]`；带 items 且无 x-bind 的数组形参可接多个引用。
+params 实参使用 `[节点ID, 字段]`；带 items 的数组形参可接多个引用，加 x-single 时 items 只描述引用值的元素结构、仍只接一个引用。
+带 properties 的对象 schema 在函数签名中逐字段展开，用于描述文档列表等嵌套结构。
+配置节点时，框架把已绑定引用的上游结构（argStructures）和直连下游节点的结构化形参（downstream）注入节点 agent，
+使产出按下游需要的结构构造（如自定义代码直连知识库写入时返回文档列表）；因此需要先连好链路再配置。
+节点 agent 的提示词带上节点现有 node_data，续聊修改在现状上改。画布信息分两层：get_canvas_detail 只给骨架（节点、连线、数据引用），get_node_detail 按节点 id 列表取完整配置。排查问题先诊断后修改，
+知识库工作流另有 get_last_run 读最近一次执行详情（store 的 getLatestKnowledgeAction，值标注真实类型），定位到原因后只改出问题的节点。
+工具工作流的函数签名由基本信息节点（tool-base-node）的 agent 声明：写入输入 / 输出参数并同步开始节点的全局变量，固定节点可配置但不可增删；返回值只取变量赋值写入 `output` 的值，
+validate 额外检查未写入的输出参数和对未声明参数的引用。指引按调用方（智能体 / 工作流节点 / 知识库工作流）设计签名，知识库文档结构取自 knowledge-write-node 的形参声明。
 固定输出放在 returns.properties，动态输出由 additionalProperties 描述，无动态输出时设为 false。
 父 agent 负责连线与实参有效性，节点 agent 负责配置；写入后调用节点 validate，并核对要求的返回字段，
 通过后交付 config.fields。分支变更保留分支 ID 协议，删除分支同时清理出口连线。
 
 画布使用 lf_id 标识，主画布为 main，循环体为循环节点 ID；循环体通过 getLoopLogicFlow 获取。
 属性经 reactive(model) 写回，使节点表单同步；引用字段与 NodeCascader 一致，提示词变量使用
-`{{节点名称.字段}}` 与 `{{global.字段}}`。
+`{{节点名称.字段}}`，全局／会话／循环变量使用 `{{global.字段}}`、`{{chat.字段}}`、`{{loop.字段}}`。
+循环变量由循环节点 agent 的 variables 声明，写入循环体 loop-start-node 的 loop_input_field_list，并同步为循环节点的输出字段。
 
 SuccessResult／ErrorResult 回喂模型并继续循环，AgentSuccessResult／AgentErrorResult 结束所在 agent；
 同轮终态失败优先。普通值按成功结果处理，异常按可续修错误处理；停止父 agent 时级联取消委派任务。

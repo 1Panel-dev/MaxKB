@@ -14,11 +14,24 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType, new_instance
 from application.workflow.i_node import INode, Signal
+from application.workflow.loop_workflow_manage import LoopWorkFlowManage, get_loop_variable_fields
 from application.workflow.message.struct.content import Position
 from application.workflow.status import Status
 from common.exception.app_exception import AppApiException
 
 MAX_LOOP_COUNT = 500
+# 本节点自身写入上下文的 key;循环变量也存放在本节点的上下文里,不能与它们重名
+LOOP_RESERVED_FIELDS = ("index", "item", "last_context", "error_message", "exception_message")
+
+
+def _get_loop_variable_fields(loop_body):
+    """
+    获取循环体声明的循环变量名(声明在循环体的 loop-start-node 上)
+    """
+    for node in (loop_body or {}).get("nodes") or []:
+        if node.get("id") == "loop-start-node":
+            return get_loop_variable_fields(node.get("properties"))
+    return []
 
 
 class LoopNodeSerializer(serializers.Serializer):
@@ -40,6 +53,10 @@ class LoopNodeSerializer(serializers.Serializer):
             if number is None:
                 message = _("{field}, this field is required.", field="number")
                 raise AppApiException(500, message)
+        # 循环变量存放在循环节点的上下文里,不能和循环节点自身的字段重名
+        for field in _get_loop_variable_fields(self.data.get("loop_body")):
+            if field in LOOP_RESERVED_FIELDS:
+                raise AppApiException(500, _("Loop variable name is reserved: {field}").format(field=field))
 
 
 def _generate_loop_number(number, start_index=0):
@@ -91,6 +108,12 @@ class LoopNode(INode):
             array = self.workflow_manage.get_reference_field(array[0], array[1:])
 
         self.data["params"] = {"loop_type": loop_type, "array": array, "number": number}
+
+        # 循环变量存放在本节点的上下文里;全新执行(非断点续跑)时清空,保证初始为空
+        if position.get("id") != self.node.id:
+            node_context = self.workflow_manage.context.setdefault(self.node.id, {})
+            for field in _get_loop_variable_fields(loop_body):
+                node_context.pop(field, None)
 
         # 根据 start_index 构建迭代器
         if loop_type == "ARRAY":
@@ -163,7 +186,6 @@ class LoopNode(INode):
             self._run_next()
 
         from application.workflow.workflow_manage import CallBack
-        from application.workflow.loop_workflow_manage import LoopWorkFlowManage
         from application.workflow.nodes import get_node_class
 
         call_back = CallBack(on_next, on_complete)
@@ -210,6 +232,7 @@ class LoopNode(INode):
             call_back=call_back,
             get_start_node=get_start_node_fn,
             parent_workflow_manage=self.workflow_manage,
+            loop_node_id=self.node.id,
             get_context=get_context,
         )
         if loop_manage:
@@ -243,7 +266,7 @@ class LoopNode(INode):
                 if position.get("children").get("id") == value.get("node_id"):
                     position_index = index
 
-        for index, _loop_details in enumerate(self.data.get("loop_details_list")):
+        for index, _loop_details in enumerate(self.data.get("loop_details_list") or []):
             if position and index == 0:
                 for inner_index, item in enumerate(_loop_details):
                     if position is not None and inner_index == 0 and index == 0:

@@ -22,6 +22,9 @@ export interface ContentItem {
 const TOOL_LABELS: Record<string, string> = {
   plan: '规划流程',
   get_canvas_detail: '查看画布',
+  get_node_detail: '查看节点配置',
+  get_last_run: '查看最近一次执行',
+  list_datasource: '查询数据源',
   get_node_anchors: '查看节点出口',
   get_tools: '查询工具',
   add_node: '添加节点',

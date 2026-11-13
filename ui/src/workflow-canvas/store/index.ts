@@ -4,6 +4,7 @@ import type {
   Dict,
   DynamicFormField,
   KnowledgeTagGroup,
+  KnowledgeWorkflowAction,
   ModelItem,
   ModelProviderItem,
   PromptGeneratePayload,
@@ -28,6 +29,7 @@ type ApiModule = {
   getToolListWithShared?: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById?: (toolId: string) => Promise<ToolItem>
   getKnowledgeTags?: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
+  getLatestKnowledgeAction?: (knowledgeId: string) => Promise<KnowledgeWorkflowAction | null>
   postPromptGenerate: (modelId: string, payload: PromptGeneratePayload) => Promise<Response>
   postChatCompletion?: (modelId: string, payload: ChatCompletionPayload, signal?: AbortSignal) => Promise<Response>
 }
@@ -43,6 +45,8 @@ export type WorkflowStoreApi = {
   getToolListWithShared: (query?: Dict<unknown>) => Promise<ToolItem[]>
   getToolById: (toolId: string) => Promise<ToolItem>
   getKnowledgeTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
+  /** 知识库工作流最近一次执行（调试或导入）的详情，不缓存；当前范围不支持或没有记录时为 null */
+  getLatestKnowledgeAction: (knowledgeId: string) => Promise<KnowledgeWorkflowAction | null>
   postPromptGenerate: (modelId: string, payload: PromptGeneratePayload) => Promise<Response>
   postChatCompletion: (modelId: string, payload: ChatCompletionPayload, signal?: AbortSignal) => Promise<Response>
 }
@@ -133,6 +137,9 @@ export function useWorkflowStore(resourceScope: string, getResourceWorkspaceId?:
       getToolById(toolId: string): Promise<ToolItem> {
         if (!requestApi.getToolById) return Promise.resolve({} as ToolItem)
         return withCache(`tool:${toolId}`, () => requestApi.getToolById!(toolId), force)
+      },
+      getLatestKnowledgeAction(knowledgeId: string): Promise<KnowledgeWorkflowAction | null> {
+        return requestApi.getLatestKnowledgeAction ? requestApi.getLatestKnowledgeAction(knowledgeId) : Promise.resolve(null)
       },
       getKnowledgeTags(knowledgeIds: string[]): Promise<KnowledgeTagGroup[]> {
         if (!requestApi.getKnowledgeTags) return Promise.resolve([])

@@ -56,6 +56,26 @@ export function inheritMessages(bindings: AgentBindings): AgentMessage[] {
   return trimmed
 }
 
+/** 停止后模型未回复时补的占位回复，避免续聊出现连续两条 user 消息 */
+const STOPPED_PLACEHOLDER = '（上一轮已被用户停止，未完成）'
+
+/**
+ * 从已停止 agent 的历史裁出续聊用的初始历史：去掉 system（重建时由 useAgentConfig 重新生成），
+ * 已完整回填的工具轮次原样保留，只裁掉末尾未回填完的那一轮；末尾是 user 时补一条占位回复。
+ */
+export function resumeMessages(source: AgentMessage[]): AgentMessage[] {
+  const messages = source.filter((message) => message.role !== 'system')
+  let toolStart = messages.length
+  while (toolStart > 0 && messages[toolStart - 1]?.role === 'tool') toolStart--
+  const caller = messages[toolStart - 1]
+  if (caller?.role === 'assistant' && caller.tool_calls && messages.length - toolStart < caller.tool_calls.length) {
+    messages.length = toolStart - 1
+    if (caller.content) messages.push({ role: 'assistant', content: caller.content })
+  }
+  if (messages.at(-1)?.role === 'user') messages.push({ role: 'assistant', content: STOPPED_PLACEHOLDER })
+  return messages
+}
+
 export function toToolSchemas(tools: AgentTool[]): NonNullable<ChatCompletionPayload['tools']> {
   return tools.map((tool) => ({
     type: 'function',

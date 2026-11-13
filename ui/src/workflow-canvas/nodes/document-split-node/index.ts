@@ -1,4 +1,5 @@
 import DocumentSplitNode from './index.vue'
+import agent from './agent'
 import DocumentSplitNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
@@ -21,4 +22,5 @@ export default {
   model: DocumentSplitNodeModel,
   view: DocumentSplitNodeView,
   details: DocumentSplitNodeDetail,
+  agent,
 }

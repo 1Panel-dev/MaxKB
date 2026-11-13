@@ -4,6 +4,7 @@ import type { McpTool } from '@/workflow-canvas/store'
 import ModelApi from '@/api/admin/system/shared-resources/model'
 import ToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import ProviderApi from '@/api/admin/model-provider'
+import KnowledgeWorkflowApi from '@/api/admin/system/shared-resources/knowledge/workflow'
 
 /** 查询当前系统范围的 MCP 服务工具定义。 */
 const getMcpTools = (resourceType: string, resourceId: string, mcpServers: string) =>
@@ -12,7 +13,15 @@ const getMcpTools = (resourceType: string, resourceId: string, mcpServers: strin
 /** 查询当前系统范围内所选知识库的文档标签。 */
 const getAllTags = (knowledgeIds: string[]) => get<KnowledgeTagGroup[]>('/system/shared/knowledge/tags', { 'knowledge_ids[]': knowledgeIds })
 
+/** 知识库工作流最近一次执行（调试或导入）的详情，供 AI 生成排查运行报错。 */
+const getLatestKnowledgeAction = async (knowledgeId: string) => {
+  const page = await KnowledgeWorkflowApi.getKnowledgeExecutionRecordPage(knowledgeId, { currentPage: 1, pageSize: 1 })
+  const record = page.records[0]
+  return record ? KnowledgeWorkflowApi.getKnowledgeWorkflowAction(knowledgeId, record.id) : null
+}
+
 export default {
+  getLatestKnowledgeAction,
   postPromptGenerate: ModelApi.postPromptGenerate,
   postChatCompletion: ModelApi.postChatCompletion,
   getMcpTools,

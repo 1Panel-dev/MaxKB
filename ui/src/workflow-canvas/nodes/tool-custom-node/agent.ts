@@ -56,6 +56,15 @@ function useAgent(context: NodeAgentContext) {
       '- code：按需求写一段可直接运行的 Python，只定义一个函数，形参与 inputs 的 name 一一对应，return 结果；只用标准库。',
       '- inputs：source=reference 的参数由同名入参绑定，无需给 value；source=custom 的参数给常量 value。',
       '- 示例：def main(text: str, limit: int):\\n    return text[:limit]',
+      '- 解析模型输出的 JSON 时先去掉 ```json 代码块标记并做容错（解析失败时返回原数据或空结果），不要让代码直接抛错。',
+      '- 返回值结构以「下游要求」为准：有下游要求时按它逐字段构造返回值；顶层是数组就 return 一个 list，哪怕只有一条也不能返回单个 dict，也不能返回 {名称: 内容} 这样的字典。',
+      '- 结果要给知识库写入（如补标签 tags、关联问题 problem_list、元数据 meta）时：遍历上游文档分段的 paragraph_list（list），逐篇复制后补字段，原字段一律保留，最后 return 整个 list；'
+        + 'AI 输出是 {文档名: [...]} 这样的字典时，只用它按 name 查找，不要把它当返回值；'
+        + 'tags 为 [{"key": str, "value": str}]（key ≤64 字、value ≤128 字，均不能为空），problem_list 写在每个分段上，为 list[str]。',
+      '- 知识库写入的示例：\\ndef main(documents: list, ai_output: str):\\n    import json, re\\n    text = re.sub(r"^```(json)?|```$", "", (ai_output or "").strip(), flags=re.M).strip()\\n'
+        + '    try:\\n        tags_by_name = json.loads(text)\\n    except Exception:\\n        tags_by_name = {}\\n    if not isinstance(tags_by_name, dict):\\n        tags_by_name = {}\\n'
+        + '    result = []\\n    for document in documents or []:\\n        tags = [t for t in tags_by_name.get(document.get("name"), []) if isinstance(t, dict) and t.get("key") and t.get("value")]\\n'
+        + '        result.append({**document, "tags": (document.get("tags") or []) + tags})\\n    return result',
     ].join('\n'),
     tools: [
       {

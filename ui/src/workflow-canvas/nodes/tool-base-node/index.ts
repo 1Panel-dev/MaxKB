@@ -1,4 +1,5 @@
 import ToolBaseNode from './index.vue'
+import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
@@ -15,4 +16,4 @@ class ToolBaseNodeModel extends WorkflowNodeModel {
   }
 }
 
-export default { type: WorkflowNodeType.ToolBaseNode, model: ToolBaseNodeModel, view: ToolBaseNodeView }
+export default { type: WorkflowNodeType.ToolBaseNode, model: ToolBaseNodeModel, view: ToolBaseNodeView, agent }
