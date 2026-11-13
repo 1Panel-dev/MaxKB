@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { MdPreview as MdPreviewV3 } from 'md-editor-v3'
-import { useStore } from '@/stores'
+import { useI18n } from 'vue-i18n'
+import { MARKDOWN_LOCALES, normalizeLocale } from '@/locales/config'
 import { sanitizeMarkdown } from './sanitize'
 
 defineOptions({ name: 'MdPreview', inheritAttrs: false })
 
-const { user } = useStore()
-const language = computed(() => {
-  const currentLanguage = user.language.toLowerCase()
-  if (['zh-tw', 'zh-hant', 'zh-hk', 'zh-mo'].includes(currentLanguage)) return 'zh-TW'
-  return currentLanguage.startsWith('zh') ? 'zh-CN' : 'en-US'
-})
+const { locale } = useI18n({ useScope: 'global' })
+const language = computed(() => MARKDOWN_LOCALES[normalizeLocale(locale.value)])
 </script>
 
 <template>

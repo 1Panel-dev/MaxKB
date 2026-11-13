@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
+import CurrentUserApi from '@/api/admin/auth/current-user'
 import LoginApi from '@/api/admin/auth/login'
 import { LOGIN_METHOD } from '@/api/enums'
 import { LOCALE_OPTIONS, type Locale } from '@/locales/config'
@@ -12,9 +13,23 @@ import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'AvatarDropdown' })
 
-const currentLanguage = ref<Locale>('zh-CN')
+const isChangingLanguage = ref(false)
 const router = useRouter()
 const { auth, user, theme } = useStore()
+
+// 保存账号偏好后同步界面，不刷新页面，避免丢失未保存内容。
+function handleChangeLanguage(language: Locale) {
+  if (isChangingLanguage.value || language === user.language) return
+  isChangingLanguage.value = true
+  return CurrentUserApi.postCurrentUserLanguage(language)
+    .then(() => {
+      user.setLanguage(language)
+      if (user.userInfo) user.userInfo.language = language
+    })
+    .finally(() => {
+      isChangingLanguage.value = false
+    })
+}
 
 // 修改当前账号密码。
 const changePasswordDialogRef = ref<InstanceType<typeof ChangePasswordDialog>>()
@@ -84,7 +99,7 @@ function toUrl(url?: string) {
             <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
             <span>API Key</span>
           </MkDropdownItem>
-          <!-- // TODO 语言 -->
+          <!-- 切换账号界面语言 -->
           <MkDropdownItem @click.stop class="p-0!" v-if="perm.system.other.SWITCH_LANGUAGE()">
             <MkDropdown class="w-full" trigger="hover" placement="left-start">
               <div class="flex-between w-full gap-2 p-2">
@@ -101,8 +116,9 @@ function toUrl(url?: string) {
                     v-for="language in LOCALE_OPTIONS"
                     :key="language.value"
                     selectable
-                    :selected="currentLanguage === language.value"
-                    @click="currentLanguage = language.value"
+                    :selected="user.language === language.value"
+                    :disabled="isChangingLanguage"
+                    @click="handleChangeLanguage(language.value)"
                   >
                     {{ language.label }}
                   </MkDropdownItem>

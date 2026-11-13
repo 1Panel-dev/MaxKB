@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { CaretBottom } from '@element-plus/icons-vue'
+import { LOCALE_OPTIONS } from '@/locales/config'
 import type { ThemeInfo } from '@/api/admin/auth/types'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import { DEFAULT_THEME_COLOR, DEFAULT_THEME_SETTING, getThemeImg } from '@/constants'
@@ -12,7 +14,8 @@ const props = withDefaults(defineProps<{ preview?: boolean; themeInfo?: ThemeInf
 
 defineSlots<{ default: () => unknown }>()
 
-const { theme } = useStore()
+const { theme, user } = useStore()
+const currentLanguageLabel = computed(() => LOCALE_OPTIONS.find((option) => option.value === user.language)?.label)
 
 const layoutThemeInfo = computed(() => props.themeInfo ?? theme.themeInfo)
 const customLoginImage = computed(() => layoutThemeInfo.value?.loginImage?.trim() ?? '')
@@ -32,6 +35,23 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(layoutTh
         <el-divider v-if="layoutThemeInfo?.slogan" direction="vertical" />
         <span class="text-lg">{{ layoutThemeInfo?.slogan ?? DEFAULT_THEME_SETTING.slogan }}</span>
       </div>
+      <!-- 切换登录界面语言 -->
+      <MkDropdown v-if="!preview" trigger="click" placement="bottom-end">
+        <el-button text class="flex-align-center gap-1">
+          <MkIcon name="icon_internet_outlined" class="shrink-0" :size="16" />
+          <span>{{ currentLanguageLabel }}</span>
+          <MkIcon :icon="CaretBottom" :size="14" />
+        </el-button>
+        <template #dropdown>
+          <MkDropdownMenu class="w-52">
+            <template v-for="option in LOCALE_OPTIONS" :key="option.value">
+              <MkDropdownItem selectable :selected="user.language === option.value" @click="user.setLanguage(option.value)">
+                {{ option.label }}
+              </MkDropdownItem>
+            </template>
+          </MkDropdownMenu>
+        </template>
+      </MkDropdown>
     </header>
 
     <el-row class="login-main" align="middle">

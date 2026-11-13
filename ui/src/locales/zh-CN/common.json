@@ -1,5 +1,0 @@
-{
-  "actions": { "goHome": "返回首页" },
-  "fields": { "language": { "label": "界面语言" } },
-  "errors": { "notFound": { "description": "页面不存在或已被删除" } }
-}

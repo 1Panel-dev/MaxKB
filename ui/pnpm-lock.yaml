@@ -59,6 +59,9 @@ importers:
       cropperjs:
         specifier: ^1.6.3
         version: 1.6.3
+      dayjs:
+        specifier: ^1.11.23
+        version: 1.11.23
       dingtalk-jsapi:
         specifier: ^3.2.9
         version: 3.2.9

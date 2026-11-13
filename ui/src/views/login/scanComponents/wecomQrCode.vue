@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { QrCodeConfig } from '@/api/types'
 import type { LoginService } from '../types'
 
 defineOptions({ name: 'WecomQrCode' })
 
+const { locale } = useI18n({ useScope: 'global' })
 const props = defineProps<{ config: QrCodeConfig; loginService: LoginService }>()
 
 const iframeUrl = computed(() => {
@@ -12,7 +14,7 @@ const iframeUrl = computed(() => {
   const params = new URLSearchParams({
     agentid: props.config.agent_id ?? '',
     appid: props.config.corp_id ?? '',
-    lang: localStorage.getItem('MaxKB-locale') === 'en-US' ? 'en' : 'zh',
+    lang: locale.value === 'en-US' ? 'en' : 'zh',
     login_type: 'CorpApp',
     panel_size: 'small',
     redirect_uri: props.config.callback_url,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { QrCodeConfig } from '@/api/types'
 import type { LoginService } from '../types'
 import { MsgError } from '@/utils/message'
@@ -7,6 +8,7 @@ import { loadLoginScript } from '@/utils/script-loader'
 
 defineOptions({ name: 'LarkQrCode' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ config: QrCodeConfig; loginService: LoginService }>()
 let messageHandler: ((event: MessageEvent) => void) | undefined
 
@@ -14,7 +16,7 @@ const initialize = async () => {
   if (!props.config.app_key) return
   await loadLoginScript('https://lf-package-cn.feishucdn.com/obj/feishu-static/lark/passport/qrcode/LarkSSOSDKWebQRCode-1.0.3.js', 'lark-login-sdk')
   await nextTick()
-  if (!window.QRLogin) throw new Error('飞书扫码 SDK 加载失败')
+  if (!window.QRLogin) throw new Error(t('auth.qrCode.messages.sdkLoadFailed', { provider: t('auth.login.options.lark') }))
 
   const authorizeUrl = new URL('https://passport.feishu.cn/suite/passport/oauth/authorize')
   authorizeUrl.search = new URLSearchParams({
@@ -23,7 +25,13 @@ const initialize = async () => {
     response_type: 'code',
     state: 'fit2cloud-lark-qr',
   }).toString()
-  const qrLogin = window.QRLogin({ goto: authorizeUrl.toString(), height: '266', id: 'lark-qr-code', style: 'width:280px;height:280px;margin:0 auto;', width: '266' })
+  const qrLogin = window.QRLogin({
+    goto: authorizeUrl.toString(),
+    height: '266',
+    id: 'lark-qr-code',
+    style: 'width:280px;height:280px;margin:0 auto;',
+    width: '266',
+  })
 
   if (messageHandler) window.removeEventListener('message', messageHandler)
   messageHandler = (event) => {
@@ -48,7 +56,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="mt-6 flex-center">
     <img src="@/assets/logo/logo_lark.svg" alt="" width="24px" class="mr-2" />
-    <h2>飞书扫码登录</h2>
+    <h2>{{ t('auth.qrCode.title', { provider: t('auth.login.options.lark') }) }}</h2>
   </div>
   <div id="lark-qr-code" />
 </template>

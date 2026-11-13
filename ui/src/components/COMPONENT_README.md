@@ -105,7 +105,9 @@ Admin、Chat 共用的 `App.vue` 通过 Config Provider 的 `table.tooltipOption
 
 ### MdEditor、MdEditorMagnify、MdPreview
 
-位于 `global/markdown-editor/`，底层 Props、事件通过 `$attrs` 透传，语言来自 User Store。
+位于 `global/markdown-editor/`，底层 Props、事件通过 `$attrs` 透传；默认语言读取当前应用的 Vue I18n 全局实例，
+不直接依赖 Admin 或 Chat Store。语言切换只更新 language 属性，不重建编辑器或改写正文；
+通过既有 language 属性仍可显式覆盖。繁体 zh-Hant 映射到已注册的 zh-TW 语言包。
 
 - `MdEditor` 默认关闭 Prettier，提供 `defFooters` 插槽。
 - `MdEditorMagnify` 接收字符串 `v-model` 和 `title`，弹窗确认后回写并触发 `submitDialog`；
