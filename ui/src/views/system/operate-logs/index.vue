@@ -191,6 +191,7 @@ onMounted(() => {
               mode="multiple"
               v-model="selectedWorkspaceIds"
               label="工作空间"
+              filterable
               :options="workspaceOptions"
               @change="handleWorkspaceChange"
             />
