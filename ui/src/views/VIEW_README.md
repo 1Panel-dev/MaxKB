@@ -63,7 +63,8 @@
 | `login/`、`login/forgot-password/`                                                    | Admin 登录与找回密码                         |
 | `chat/`、`portal/`                                                                    | 单应用与门户对话                             |
 | `chat/share/`                                                                         | 公开分享链接的只读问答展示与失败重试         |
-| `chat/login/`、`chat/error/`、`error/`                                                | Chat 登录、Chat／Admin 错误页                |
+| `chat/login/`、`chat/error/`                                                          | Chat 登录、独立 404 与服务不可用展示                            |
+| `error/404.vue`、`error/NoPermission.vue`、`error/NoService.vue`                      | Admin 页面不存在、无访问权限与服务不可用展示 |
 | `details-demo/`                                                                       | 临时执行详情预览                             |
 
 ## 资源列表与详情

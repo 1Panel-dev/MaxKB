@@ -77,8 +77,11 @@ Login、Workflow 路由没有挂载 `AppLayout`，因此不会出现在左侧导
 
 登录页面地址为 `/login`；忘记密码使用独立页面 `/forgot-password`，两者均复用登录布局且不挂载 `AppLayout`。
 
-Admin 使用末尾 catch-all 路由 `not-found` 渲染 `views/error/index.vue`。直接访问不存在的
-页面或 Admin API 返回需要全局处理的 404 时，统一进入该页面。
+Admin 的 `/404`（路由名 `404`）渲染 `views/error/404.vue`。未知地址由末尾 catch-all
+重定向到该页；Admin API 返回需要全局处理的 404 时也进入该页。
+`/no-permission`（`no-permission`）仅供 Admin 权限守卫在没有可访问后续页面时使用，渲染
+`views/error/NoPermission.vue`。`/no-service`（`no-service`）渲染 `views/error/NoService.vue`，
+作为备用入口，不统一拦截接口 500。两者仍需 Admin 登录。
 
 ## Admin 导航拦截器
 
@@ -87,7 +90,7 @@ Admin Router 在 `admin/index.ts` 中统一处理导航初始化：
 1. 路由 path 变化时调用 `NProgress.start()`；同一路径只更新 query 或 hash 时不启动顶部进度条。
    导航完成或发生路由错误时调用 `NProgress.done()`；统一关闭 Spinner，视觉样式由
    `styles/nprogress.scss` 维护。
-2. `login`、`forgot-password`、`not-found` 为公开路由，不校验登录状态。
+2. `login`、`forgot-password`、`404` 为公开路由，不校验登录状态。
 3. URL 查询参数包含 `token` 时，先写入 Admin 认证 Store，用于外部认证回跳，然后使用替换
    导航清理地址栏中的 token。
 4. 访问非公开路由且没有 token 时跳转到 `login`，并通过 `redirect` 查询参数保留原地址，同时透传钉钉客户端入口参数 `client`、`corpId`。
@@ -115,16 +118,18 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 `chat-home-detail`（`/:accessToken/c/:chatId`）和 `chat-login`（`/:accessToken/login`）。
 静态段 `/portal` 优先于动态参数匹配；后端生成的 accessToken 为 16 位十六进制字符串，不会等于 `portal`。
 
-根路径 `/` 重定向到 `portal-home`；匹配不到的地址由末尾 catch-all 路由 `chat-not-found` 渲染
-`views/chat/error/index.vue`，保留原地址。Router base 优先读取 `window.MaxKB.prefix`（后端按 `CHAT_PATH`
-替换），再回退到 `VITE_BASE_PATH`。
+根路径 `/` 重定向到 `portal-home`；匹配不到的地址由末尾 catch-all 重定向到 `/404`（路由名 `404`），
+渲染 Chat 自己的 `views/chat/error/404.vue`。门户、单应用和登录页在认证初始化失败时，直接在原地址展示
+`views/chat/error/NoService.vue`（500 图片与“暂时无法访问服务”），刷新后重新尝试初始化。
+Chat 不注册 `/no-service` 和无权限页路由。
+Router base 优先读取 `window.MaxKB.prefix`（后端按 `CHAT_PATH` 替换），再回退到 `VITE_BASE_PATH`。
 
 认证场景（scope）由路由决定：门户路由为 `PORTAL_AUTH_SCOPE`，单应用路由为其 accessToken。
 Chat 导航守卫（`chat/index.ts`）：
 
 1. `/portal` 下未定义的子路径会被单应用路由匹配为 `accessToken = 'portal'`，重定向到 `portal-home`。
 2. 获取目标场景的认证前置配置（`AuthProfile`），与当前场景相同时复用。accessToken 无效、应用已停用或门户
-   未开放导致获取失败时，进入 `chat-not-found` 并保留原地址；匿名认证失败时同样处理。
+   未开放导致获取失败时，记录失败地址并放行，由页面在原地址展示服务不可用；匿名认证失败时同样处理。
 3. 判断时只读取目标场景在本地存储中的 token，不切换 Store 的当前场景。
 4. 登录页始终放行：`enable_auth` 为 true 时必须登录；为 false 时匿名用户也可从账户菜单主动登录，
    登录成功后回到 `redirect` 记录的原地址。

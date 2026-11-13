@@ -127,7 +127,7 @@ request.interceptors.response.use(
       console.error(error)
     }
     if (status === 404 && !requestUrl.includes('/application/authentication')) {
-      void router.replace({ name: 'not-found', params: { pathMatch: ['404'] } })
+      void router.replace({ name: '404' })
     }
     if (status === 401 && !requestUrl.includes('application/profile')) {
       const { auth } = useStore()

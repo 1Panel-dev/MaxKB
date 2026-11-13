@@ -27,13 +27,17 @@ const router = createRouter({
     ...workflowRoutes,
     workspaceRoutes,
     systemRoutes,
-    { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/error/index.vue'), meta: { title: '页面不存在' } },
+    // 承接权限守卫在没有可访问后续页面时的兜底跳转
+    { path: '/no-permission', name: 'no-permission', component: () => import('@/views/error/NoPermission.vue'), meta: { title: '无访问权限' } },
+    { path: '/no-service', name: 'no-service', component: () => import('@/views/error/NoService.vue'), meta: { title: '服务不可用' } },
+    { path: '/404', name: '404', component: () => import('@/views/error/404.vue'), meta: { title: '页面不存在' } },
+    { path: '/:pathMatch(.*)*', redirect: { name: '404' } },
   ],
 })
 
 router.beforeEach(async (to, from) => {
   if (to.path !== from.path) NProgress.start()
-  const notAuthRouteNameList = ['login', 'forgot-password', 'not-found', 'details-demo']
+  const notAuthRouteNameList = ['login', 'forgot-password', '404', 'details-demo']
   const { auth, user } = useStore()
 
   if (!notAuthRouteNameList.includes(to.name ? to.name.toString() : '')) {
