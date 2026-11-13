@@ -343,7 +343,8 @@ class IncrementalDocumentSync:
         unmatched = [paragraph for paragraph in existing if paragraph.origin == ContentOrigin.SYNCED]
         ordered_synced, result = [], MergeResult()
         matches = [None] * len(remote_list)
-        if self.source_authoritative:
+        is_web = self.document.type == KnowledgeType.WEB
+        if self.source_authoritative or is_web:
             # Reserve every unchanged chunk before matching changed chunks by title. Otherwise
             # an inserted chunk under a repeated heading could consume an unchanged old chunk.
             for index, remote in enumerate(remote_list):
@@ -358,6 +359,23 @@ class IncrementalDocumentSync:
                 if paragraph is not None:
                     matches[index] = paragraph
                     unmatched.remove(paragraph)
+        if is_web:
+            # Web keys contain heading text. A rename can still be identified by a
+            # unique unchanged source body, even when local/visual edits changed it.
+            source_bodies = defaultdict(list)
+            remote_bodies = defaultdict(list)
+            for paragraph in unmatched:
+                content = (paragraph.source_snapshot or {}).get("content", paragraph.content)
+                if content:
+                    source_bodies[content].append(paragraph)
+            for index, remote in enumerate(remote_list):
+                if matches[index] is None and remote["content"]:
+                    remote_bodies[remote["content"]].append(index)
+            for content, indexes in remote_bodies.items():
+                candidates = source_bodies.get(content, [])
+                if len(indexes) == 1 and len(candidates) == 1:
+                    matches[indexes[0]] = candidates[0]
+                    unmatched.remove(candidates[0])
         for index, remote in enumerate(remote_list):
             if matches[index] is None:
                 paragraph = self._match(remote, unmatched)
@@ -370,12 +388,18 @@ class IncrementalDocumentSync:
                 [paragraph.id for paragraph in unmatched], self.document.knowledge_id, remote_list
             )
             self._handle_remote_deletes(unmatched, result)
+        if self.source_authoritative or is_web:
             # Release changing keys together before a heading reorder swaps unique source keys.
             rekey_ids = [
                 paragraph.id
                 for remote, paragraph in zip(remote_list, matches)
                 if paragraph is not None and paragraph.source_key != remote["source_key"]
             ]
+            if is_web:
+                # Missing Web chunks are retained, so release keys now used by a
+                # different chunk after duplicate headings shift their occurrence.
+                incoming_keys = {remote["source_key"] for remote in remote_list}
+                rekey_ids.extend(p.id for p in unmatched if p.source_key in incoming_keys)
             if rekey_ids:
                 Paragraph.objects.filter(document=self.document, id__in=rekey_ids).update(source_key="")
         for remote, paragraph in zip(remote_list, matches):

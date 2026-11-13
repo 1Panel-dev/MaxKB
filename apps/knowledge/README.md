@@ -140,6 +140,11 @@ retain their records and source metadata with `local_state=deleted` and `is_acti
 incremental synchronization can recognize local deletions and source conflicts. Both paths remove
 the deleted paragraphs' embeddings.
 
+Web heading renames reuse the existing paragraph ID and manually linked questions when the source
+body uniquely identifies an unmatched paragraph. Matching reserves unchanged paragraphs first and
+compares stored source bodies, preserving local edits and visual descriptions for conflict handling.
+Ambiguous repeated bodies retain the existing three-way synchronization policy.
+
 Paragraph lists, pagination totals and document `paragraph_count` exclude `local_state=deleted`.
 Document character-length recalculation also excludes these rows. Disabled paragraphs that have
 not been deleted remain visible and counted; synchronization continues to read retained deleted rows.
@@ -164,6 +169,7 @@ tests, workflow retrieval and REST/MCP retrieval rechecks deletion state before 
 
 ```bash
 uv run python apps/manage.py test knowledge.tests.assets.test_inline_visual_description \
+  knowledge.tests.sync.test_web_heading_identity \
   knowledge.tests.sync.test_web_visual_sync knowledge.tests.sync.test_web_sync \
   knowledge.tests.sync.test_web_sync_safety
 ```
