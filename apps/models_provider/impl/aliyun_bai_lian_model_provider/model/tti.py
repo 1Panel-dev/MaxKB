@@ -98,7 +98,7 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
             else:
                 maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                    (rsp.status_code, rsp.code, rsp.message))
-                raise Exception('sync_call Failed, status_code: %s, code: %s, message: %s' %
+                raise RuntimeError('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                 (rsp.status_code, rsp.code, rsp.message))
             return file_urls
         elif self.model_name.startswith("wan") or self.model_name.startswith("qwen-image-plus"):
@@ -114,7 +114,7 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
             else:
                 maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                    (rsp.status_code, rsp.code, rsp.message))
-                raise Exception('sync_call Failed, status_code: %s, code: %s, message: %s' %
+                raise RuntimeError('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                 (rsp.status_code, rsp.code, rsp.message))
             return file_urls
         elif self.model_name.startswith("qwen"):
@@ -151,6 +151,6 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
             else:
                 maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                    (rsp.status_code, rsp.code, rsp.message))
-                raise Exception('sync_call Failed, status_code: %s, code: %s, message: %s' %
+                raise RuntimeError('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                 (rsp.status_code, rsp.code, rsp.message))
             return file_urls
