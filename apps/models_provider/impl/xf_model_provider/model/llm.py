@@ -1,27 +1,20 @@
 # coding=utf-8
 """
-@project: maxkb
+@project: MaxKB
 @Author：虎
-@file： __init__.py.py
-@date：2024/04/19 15:55
-@desc:
+@file： llm.py
+@date：2026/11/13
+@desc: Xunfei Spark OpenAI 兼容模型（X2.x 模型走 OpenAI Chat 协议）
 """
 
-from typing import List, Optional, Any, Iterator, Dict
+from typing import Any, Dict
 
-from models_provider.langchain_compat.sparkllm import (
-    ChatSparkLLM,
-    _convert_delta_to_message_chunk,
-    convert_message_to_dict,
-)
-from langchain_core.callbacks import CallbackManagerForLLMRun
-from langchain_core.messages import BaseMessage, AIMessageChunk
-from langchain_core.outputs import ChatGenerationChunk
-
+from langchain_core.language_models import LanguageModelInput
 from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
-class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
+class XunFeiOpenAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
     @staticmethod
     def is_cache_model():
         return False
@@ -29,54 +22,22 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
-        return XFChatSparkLLM(
-            spark_app_id=model_credential.get("spark_app_id"),
-            spark_api_key=model_credential.get("spark_api_key"),
-            spark_api_secret=model_credential.get("spark_api_secret"),
-            spark_api_url=model_credential.get("spark_api_url"),
-            spark_llm_domain=model_name,
-            streaming=model_kwargs.get("streaming", False),
+        return XunFeiOpenAIChatModel(
+            model=model_name,
+            openai_api_base=model_credential.get("api_base") or "https://maas-api.cn-huabei-1.xf-yun.com/v2",
+            openai_api_key=model_credential.get("api_key"),
             **optional_params,
         )
 
-    usage_metadata: dict = {}
-
-    def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
-        return self.usage_metadata
-
-    def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        return self.usage_metadata.get("prompt_tokens", 0)
-
-    def get_num_tokens(self, text: str) -> int:
-        return self.usage_metadata.get("completion_tokens", 0)
-
-    def _stream(
+    def _get_request_payload(
         self,
-        messages: List[BaseMessage],
-        stop: Optional[List[str]] = None,
-        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        input_: LanguageModelInput,
+        *,
+        stop: list[str] | None = None,
         **kwargs: Any,
-    ) -> Iterator[ChatGenerationChunk]:
-        default_chunk_class = AIMessageChunk
-
-        self.client.arun(
-            [convert_message_to_dict(m) for m in messages],
-            self.spark_user_id,
-            self.model_kwargs,
-            True,
-        )
-        for content in self.client.subscribe(timeout=self.request_timeout):
-            if "data" in content:
-                delta = content["data"]
-                chunk = _convert_delta_to_message_chunk(delta, default_chunk_class)
-                cg_chunk = ChatGenerationChunk(message=chunk)
-            elif "usage" in content:
-                generation_info = content["usage"]
-                self.usage_metadata = generation_info
-                continue
-            else:
-                continue
-            if cg_chunk is not None:
-                if run_manager:
-                    run_manager.on_llm_new_token(str(cg_chunk.message.content), chunk=cg_chunk)
-            yield cg_chunk
+    ) -> dict:
+        payload = super()._get_request_payload(input_, stop=stop, **kwargs)
+        # 星火 OpenAI 兼容接口使用 max_tokens 字段，而不是 OpenAI 新版的 max_completion_tokens。
+        if "max_completion_tokens" in payload and "max_tokens" not in payload:
+            payload["max_tokens"] = payload.pop("max_completion_tokens")
+        return payload

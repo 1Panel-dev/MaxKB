@@ -3,13 +3,13 @@
 @project: MaxKB
 @Author：虎
 @file： embedding.py
-@date：2024/10/17 15:40
-@desc:
+@date：2026/11/13
+@desc: Xunfei Spark 向量模型 OpenAI 兼容接口凭证
 """
 
 from typing import Dict
 
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _, gettext
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -18,7 +18,7 @@ from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
 
-class XFEmbeddingCredential(BaseForm, BaseModelCredential):
+class XunFeiOpenAIEmbeddingCredential(BaseForm, BaseModelCredential):
     def is_valid(
         self,
         model_type: str,
@@ -26,14 +26,20 @@ class XFEmbeddingCredential(BaseForm, BaseModelCredential):
         model_credential: Dict[str, object],
         model_params,
         provider,
-        raise_exception=False,
+        raise_exception=True,
     ):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get("value") == model_type, model_type_list))):
             raise AppApiException(
                 ValidCode.valid_error.value, _("{model_type} Model type is not supported").format(model_type=model_type)
             )
-        self.valid_form(model_credential)
+
+        for key in ["api_base", "api_key", "model_id"]:
+            if key not in model_credential:
+                if raise_exception:
+                    raise AppApiException(ValidCode.valid_error.value, gettext("{key}  is required").format(key=key))
+                else:
+                    return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
             model.embed_query(_("Hello"))
@@ -51,9 +57,10 @@ class XFEmbeddingCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, "spark_api_secret": super().encryption(model.get("spark_api_secret", ""))}
+        return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
-    base_url = forms.TextInputField("API URL", required=True, default_value="https://emb-cn-huabei-1.xf-yun.com/")
-    spark_app_id = forms.TextInputField("APP ID", required=True)
-    spark_api_key = forms.PasswordInputField("API Key", required=True)
-    spark_api_secret = forms.PasswordInputField("API Secret", required=True)
+    api_base = forms.TextInputField(
+        "API URL", required=True, default_value="https://maas-api.cn-huabei-1.xf-yun.com/v2"
+    )
+    api_key = forms.PasswordInputField("API Key", required=True)
+    model_id = forms.TextInputField("Model ID", required=True)

@@ -1,26 +1,56 @@
 # coding=utf-8
-import base64
-import os
+"""
+@project: MaxKB
+@Author：虎
+@file： image.py
+@date：2026/11/13
+@desc: 讯飞星火视觉模型 OpenAI 兼容接口凭证
+"""
+
 from typing import Dict
 
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.messages import HumanMessage
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
-from models_provider.base_model_provider import BaseModelCredential, ValidCode
-from models_provider.impl.xf_model_provider.model.image import ImageMessage
+from common.forms import BaseForm, TooltipLabel
 from common.utils.logger import maxkb_logger
+from models_provider.base_model_provider import BaseModelCredential, ValidCode
+
+
+class XunFeiImageModelParams(BaseForm):
+    temperature = forms.SliderField(
+        TooltipLabel(
+            _("Temperature"),
+            _("Higher values make the output more random, while lower values make it more focused and deterministic"),
+        ),
+        required=True,
+        default_value=0.5,
+        _min=0.1,
+        _max=1.0,
+        _step=0.01,
+        precision=2,
+    )
+
+    max_tokens = forms.SliderField(
+        TooltipLabel(
+            _("Output the maximum Tokens"), _("Specify the maximum number of tokens that the model can generate")
+        ),
+        required=True,
+        default_value=4096,
+        _min=1,
+        _max=100000,
+        _step=1,
+        precision=0,
+    )
 
 
 class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
-    spark_api_url = forms.TextInputField(
-        "API URL", required=True, default_value="wss://spark-api.cn-huabei-1.xf-yun.com/v2.1/image"
+    api_base = forms.TextInputField(
+        "API URL", required=True, default_value="https://maas-api.cn-huabei-1.xf-yun.com/v2"
     )
-    spark_app_id = forms.TextInputField("APP ID", required=True)
-    spark_api_key = forms.PasswordInputField("API Key", required=True)
-    spark_api_secret = forms.PasswordInputField("API Secret", required=True)
+    api_key = forms.PasswordInputField("API Key", required=True)
 
     def is_valid(
         self,
@@ -34,24 +64,21 @@ class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
         model_type_list = provider.get_model_type_list()
         if not any(list(filter(lambda mt: mt.get("value") == model_type, model_type_list))):
             raise AppApiException(
-                ValidCode.valid_error.value, _("{model_type} Model type is not supported").format(model_type=model_type)
+                ValidCode.valid_error.value,
+                gettext("{model_type} Model type is not supported").format(model_type=model_type),
             )
 
-        for key in ["spark_api_url", "spark_app_id", "spark_api_key", "spark_api_secret"]:
+        for key in ["api_base", "api_key"]:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, _("{key}  is required").format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, gettext("{key}  is required").format(key=key))
                 else:
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            cwd = os.path.dirname(os.path.abspath(__file__))
-            with open(f"{cwd}/img_1.png", "rb") as f:
-                message_list = [
-                    ImageMessage(str(base64.b64encode(f.read()), "utf-8")),
-                    HumanMessage(_("Please outline this picture")),
-                ]
-                model.stream(message_list)
+            res = model.stream([HumanMessage(content=[{"type": "text", "text": gettext("Hello")}])])
+            for chunk in res:
+                maxkb_logger.info(chunk)
         except Exception as e:
             maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if isinstance(e, AppApiException):
@@ -66,7 +93,7 @@ class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, "spark_api_secret": super().encryption(model.get("spark_api_secret", ""))}
+        return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
     def get_model_params_setting_form(self, model_name):
-        pass
+        return XunFeiImageModelParams()

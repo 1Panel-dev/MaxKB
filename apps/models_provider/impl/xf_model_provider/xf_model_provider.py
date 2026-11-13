@@ -18,9 +18,9 @@ from models_provider.base_model_provider import (
     IModelProvider,
     ModelInfoManage,
 )
-from models_provider.impl.xf_model_provider.credential.embedding import XFEmbeddingCredential
 from models_provider.impl.xf_model_provider.credential.image import XunFeiImageModelCredential
-from models_provider.impl.xf_model_provider.credential.llm import XunFeiLLMModelCredential
+from models_provider.impl.xf_model_provider.credential.embedding import XunFeiOpenAIEmbeddingCredential
+from models_provider.impl.xf_model_provider.credential.llm import XunFeiOpenAILLMModelCredential
 from models_provider.impl.xf_model_provider.credential.stt import XunFeiSTTModelCredential
 from models_provider.impl.xf_model_provider.credential.tts import XunFeiTTSModelCredential
 from models_provider.impl.xf_model_provider.credential.tts.super_humanoid_tts import (
@@ -28,8 +28,9 @@ from models_provider.impl.xf_model_provider.credential.tts.super_humanoid_tts im
 )
 from models_provider.impl.xf_model_provider.credential.tts.default_tts import XunFeiDefaultTTSModelCredential
 from models_provider.impl.xf_model_provider.credential.zh_en_stt import ZhEnXunFeiSTTModelCredential
-from models_provider.impl.xf_model_provider.model.embedding import XFEmbedding
-from models_provider.impl.xf_model_provider.model.llm import XFChatSparkLLM
+from models_provider.impl.xf_model_provider.model.embedding import XunFeiOpenAIEmbeddingModel
+from models_provider.impl.xf_model_provider.model.image import XunFeiOpenAIImage
+from models_provider.impl.xf_model_provider.model.llm import XunFeiOpenAIChatModel
 from models_provider.impl.xf_model_provider.model.stt import XFSparkSpeechToText
 from models_provider.impl.xf_model_provider.model.tts import XFSparkTextToSpeech
 from models_provider.impl.xf_model_provider.model.tts.super_humanoid_tts import XFSparkSuperHumanoidTextToSpeech
@@ -41,7 +42,7 @@ from models_provider.impl.xf_model_provider.model.zh_en_stt import XFZhEnSparkSp
 
 ssl._create_default_https_context = ssl.create_default_context
 
-xunfei_model_credential = XunFeiLLMModelCredential()
+xunfei_openai_model_credential = XunFeiOpenAILLMModelCredential()
 stt_model_credential = XunFeiSTTModelCredential()
 zh_en_stt_credential = ZhEnXunFeiSTTModelCredential()
 image_model_credential = XunFeiImageModelCredential()
@@ -49,18 +50,17 @@ image_model_credential = XunFeiImageModelCredential()
 tts_model_credential = XunFeiTTSModelCredential()
 super_humanoid_tts_credential = XunFeiSuperHumanoidTTSModelCredential()
 default_tts_credential = XunFeiDefaultTTSModelCredential()
-embedding_model_credential = XFEmbeddingCredential()
+embedding_model_credential = XunFeiOpenAIEmbeddingCredential()
 
 model_info_list = [
-    ModelInfo("generalv3.5", "", ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM),
-    ModelInfo("generalv3", "", ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM),
-    ModelInfo("generalv2", "", ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM),
+    ModelInfo("spark-x2.6", "", ModelTypeConst.LLM, xunfei_openai_model_credential, XunFeiOpenAIChatModel),
     ModelInfo(
         "iat", _("Chinese and English recognition"), ModelTypeConst.STT, stt_model_credential, XFSparkSpeechToText
     ),
     ModelInfo(
         "slm", _("Chinese and English recognition"), ModelTypeConst.STT, zh_en_stt_credential, XFZhEnSparkSpeechToText
     ),
+    ModelInfo("spark-x2.6", _("Vision Model"), ModelTypeConst.IMAGE, image_model_credential, XunFeiOpenAIImage),
     # 具体 TTS 模型
     ModelInfo("tts", _("Online TTS"), ModelTypeConst.TTS, tts_model_credential, XFSparkTextToSpeech),
     ModelInfo(
@@ -70,26 +70,29 @@ model_info_list = [
         super_humanoid_tts_credential,
         XFSparkSuperHumanoidTextToSpeech,
     ),
-    ModelInfo("embedding", "", ModelTypeConst.EMBEDDING, embedding_model_credential, XFEmbedding),
+    ModelInfo("embedding", "", ModelTypeConst.EMBEDDING, embedding_model_credential, XunFeiOpenAIEmbeddingModel),
 ]
 
 model_info_manage = (
     ModelInfoManage.builder()
     .append_model_info_list(model_info_list)
     .append_default_model_info(
-        ModelInfo("generalv3.5", "", ModelTypeConst.LLM, xunfei_model_credential, XFChatSparkLLM)
+        ModelInfo("spark-x2.6", "", ModelTypeConst.LLM, xunfei_openai_model_credential, XunFeiOpenAIChatModel)
     )
     .append_default_model_info(
         ModelInfo(
             "iat", _("Chinese and English recognition"), ModelTypeConst.STT, stt_model_credential, XFSparkSpeechToText
         ),
     )
+    .append_default_model_info(
+        ModelInfo("spark-x2.6", _("Vision Model"), ModelTypeConst.IMAGE, image_model_credential, XunFeiOpenAIImage)
+    )
     # default TTS 工厂入口
     .append_default_model_info(
         ModelInfo("default", _("default"), ModelTypeConst.TTS, default_tts_credential, XFSparkDefaultTextToSpeech)
     )
     .append_default_model_info(
-        ModelInfo("embedding", "", ModelTypeConst.EMBEDDING, embedding_model_credential, XFEmbedding)
+        ModelInfo("embedding", "", ModelTypeConst.EMBEDDING, embedding_model_credential, XunFeiOpenAIEmbeddingModel)
     )
     .build()
 )

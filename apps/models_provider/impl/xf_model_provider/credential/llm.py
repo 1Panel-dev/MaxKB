@@ -3,8 +3,8 @@
 @project: MaxKB
 @Author：虎
 @file： llm.py
-@date：2024/7/12 10:29
-@desc:
+@date：2026/11/13
+@desc: Xunfei Spark OpenAI 兼容接口凭证（X2.x 模型走 OpenAI Chat 协议）
 """
 
 from typing import Dict
@@ -19,7 +19,7 @@ from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
 
-class XunFeiLLMModelGeneralParams(BaseForm):
+class XunFeiOpenAILLMModelParams(BaseForm):
     temperature = forms.SliderField(
         TooltipLabel(
             _("Temperature"),
@@ -46,34 +46,7 @@ class XunFeiLLMModelGeneralParams(BaseForm):
     )
 
 
-class XunFeiLLMModelProParams(BaseForm):
-    temperature = forms.SliderField(
-        TooltipLabel(
-            _("Temperature"),
-            _("Higher values make the output more random, while lower values make it more focused and deterministic"),
-        ),
-        required=True,
-        default_value=0.5,
-        _min=0.1,
-        _max=1.0,
-        _step=0.01,
-        precision=2,
-    )
-
-    max_tokens = forms.SliderField(
-        TooltipLabel(
-            _("Output the maximum Tokens"), _("Specify the maximum number of tokens that the model can generate")
-        ),
-        required=True,
-        default_value=4096,
-        _min=1,
-        _max=100000,
-        _step=1,
-        precision=0,
-    )
-
-
-class XunFeiLLMModelCredential(BaseForm, BaseModelCredential):
+class XunFeiOpenAILLMModelCredential(BaseForm, BaseModelCredential):
     def is_valid(
         self,
         model_type: str,
@@ -90,7 +63,7 @@ class XunFeiLLMModelCredential(BaseForm, BaseModelCredential):
                 gettext("{model_type} Model type is not supported").format(model_type=model_type),
             )
 
-        for key in ["spark_api_url", "spark_app_id", "spark_api_key", "spark_api_secret"]:
+        for key in ["api_base", "api_key"]:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, gettext("{key}  is required").format(key=key))
@@ -113,14 +86,12 @@ class XunFeiLLMModelCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, "spark_api_secret": super().encryption(model.get("spark_api_secret", ""))}
+        return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
-    spark_api_url = forms.TextInputField("API URL", required=True, default_value="wss://spark-api.xf-yun.com/v3.5/chat")
-    spark_app_id = forms.TextInputField("APP ID", required=True)
-    spark_api_key = forms.PasswordInputField("API Key", required=True)
-    spark_api_secret = forms.PasswordInputField("API Secret", required=True)
+    api_base = forms.TextInputField(
+        "API URL", required=True, default_value="https://maas-api.cn-huabei-1.xf-yun.com/v2"
+    )
+    api_key = forms.PasswordInputField("API Key", required=True)
 
     def get_model_params_setting_form(self, model_name):
-        if model_name == "general" or model_name == "pro-128k":
-            return XunFeiLLMModelGeneralParams()
-        return XunFeiLLMModelProParams()
+        return XunFeiOpenAILLMModelParams()
