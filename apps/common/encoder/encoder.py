@@ -30,7 +30,7 @@ class SystemEncoder(json.JSONEncoder):
         r = obj
         try:
             r = strip_nul(obj)
-        except:
+        except Exception:
             pass
         json_str = super().encode(strip_nul(r))
         return json_str
