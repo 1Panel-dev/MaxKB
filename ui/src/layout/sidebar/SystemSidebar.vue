@@ -28,7 +28,6 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
         :collapse-transition="false"
         :default-active="systemActiveMenuPath"
         router
-        :persistent="false"
       >
         <template v-for="item in systemMenuItems" :key="item.name">
           <template v-if="item.permission ? item.permission() : true">
@@ -129,13 +128,18 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
 
     &__title {
       border-radius: var(--el-border-radius-base);
-      color: var(--el-text-color-primary);
       height: auto;
       line-height: 18px;
       padding: 11px calc(var(--spacing) * 2) !important;
 
       &:hover {
         background-color: var(--mk-N900-transparent-10);
+      }
+    }
+    &.is-active {
+      .el-sub-menu__title {
+        color: var(--el-color-primary);
+        font-weight: 500;
       }
     }
 

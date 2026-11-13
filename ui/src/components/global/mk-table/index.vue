@@ -117,7 +117,7 @@ const slots = defineSlots<{
   'footer-batch-actions'?: () => VNode[]
 }>()
 
-/** 表头排序统一交给调用方；在 Element Plus 排序前转换，避免重排当前页。 */
+/** 统一列配置：右侧固定操作列禁用调宽，表头排序交给调用方。 */
 function normalizeColumn(column: VNode): VNode {
   if (column.type === Fragment && Array.isArray(column.children)) {
     return h(
@@ -129,7 +129,10 @@ function normalizeColumn(column: VNode): VNode {
   if (column.type !== ElTableColumn) return column
 
   const sortable = column.props?.sortable
-  const normalizedColumn = cloneVNode(column, sortable === true || sortable === '' ? { sortable: 'custom' } : undefined)
+  const normalizedColumn = cloneVNode(column, {
+    ...(sortable === true || sortable === '' ? { sortable: 'custom' } : {}),
+    ...(column.props?.fixed === 'right' ? { resizable: false } : {}),
+  })
   const columnSlots = column.children
   if (columnSlots && !Array.isArray(columnSlots) && typeof columnSlots === 'object' && typeof columnSlots.default === 'function') {
     const defaultSlot = columnSlots.default
@@ -270,6 +273,7 @@ defineExpose({ clearSelection, tableRef })
       :row-key="props.rowKey"
       v-bind="$attrs"
       :border="props.resizable"
+      :allow-drag-last-column="false"
       @select="handleSelect"
       @selection-change="handleSelectionChange"
       @pointerdown.capture="handlePointerDown"

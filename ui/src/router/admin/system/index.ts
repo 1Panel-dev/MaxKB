@@ -30,6 +30,7 @@ export const systemRoutes: RouteRecordRaw = {
       meta: {
         title: '身份与权限',
         icon: 'icon_account_outlined',
+        activeIcon: 'icon_account_filled',
         order: 10,
         permission: () => {
           return (
@@ -148,6 +149,8 @@ export const systemRoutes: RouteRecordRaw = {
       meta: {
         title: '资源管理',
         icon: 'icon_project-settings-outlined',
+        activeIcon: 'icon_project-settings-filled',
+
         order: 20,
         resourceScope: 'system-resource',
         permission: () => {
@@ -190,6 +193,7 @@ export const systemRoutes: RouteRecordRaw = {
       meta: {
         title: '共享资源',
         icon: 'icon_folder-share_outlined',
+        activeIcon: 'icon_folder-share_filled',
         order: 30,
         resourceScope: 'system-shared',
         permission: () => {
@@ -228,6 +232,7 @@ export const systemRoutes: RouteRecordRaw = {
       meta: {
         title: '对话端管理',
         icon: 'icon_contacts_outlined',
+        activeIcon: 'icon_contacts_filled',
         order: 40,
         permission: () => {
           return perm.system.chatUser.read() || perm.system.chatUserGroup.read() || perm.system.chatAuth.read() || perm.system.portal.read()
@@ -268,6 +273,7 @@ export const systemRoutes: RouteRecordRaw = {
       meta: {
         title: '系统设置',
         icon: 'icon_setting',
+        activeIcon: 'icon_setting_filled',
         order: 50,
         permission: () => {
           return perm.system.loginAuth.read() || perm.system.appearance.read() || perm.system.email.read()
