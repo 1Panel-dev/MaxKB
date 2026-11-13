@@ -70,9 +70,7 @@ class VLLMModelCredential(BaseForm, BaseModelCredential):
             maxkb_logger.error(f"Exception: {e}", exc_info=True)
             raise AppApiException(
                 ValidCode.valid_error.value,
-                gettext("Verification failed, please check whether the parameters are correct: {error}").format(
-                    error=str(e)
-                ),
+                str(e),
             )
         return True
 

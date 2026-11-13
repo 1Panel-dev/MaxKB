@@ -84,6 +84,10 @@ def classify_dynamic_model_id(model_id: str):
         return ModelTypeConst.EMBEDDING
     if "rerank" in model_id:
         return ModelTypeConst.RERANKER
+    if "bge" in model_id:
+        # 智源 BGE 系列（bge-small/bge-m3/bge-large 等）为向量模型，
+        # 放在 rerank 判断之后，避免 bge-reranker-* 被误判为向量模型。
+        return ModelTypeConst.EMBEDDING
     if any(k in model_id for k in ("whisper", "asr", "transcribe", "paraformer")):
         return ModelTypeConst.STT
     if any(k in model_id for k in ("tts", "speech", "voice", "cosyvoice", "sambert")):
