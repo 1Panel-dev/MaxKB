@@ -7,6 +7,7 @@ import AppEdge from '@/workflow-canvas/core/edge/index'
 import LoopEdge from '@/workflow-canvas/core/edge/loop-edge'
 import { initDefaultShortcut } from '@/workflow-canvas/core/shortcut'
 import { disconnectAll, getTeleport } from '@/workflow-canvas/core/teleport'
+import { validateWorkflow } from '@/workflow-canvas/core/validate'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import Dagre from '@/workflow-canvas/plugins/dagre'
 import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
@@ -125,8 +126,8 @@ function render(data: LogicFlow.GraphConfigData) {
 }
 
 function validate() {
-  if (!lf.value) return Promise.resolve([])
-  return Promise.all(lf.value.graphModel.nodes.map((node) => (node as unknown as WorkflowNodeModel).validate?.()))
+  if (!lf.value) return Promise.resolve()
+  return validateWorkflow(lf.value)
 }
 
 function onmousedown(shapeItem: ShapeItem, event?: PointerEvent) {

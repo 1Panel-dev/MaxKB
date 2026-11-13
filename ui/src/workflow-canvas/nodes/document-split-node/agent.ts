@@ -1,7 +1,7 @@
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { argReference, createUpdateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
-import { splitPatternOptions } from './constant'
+import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 
 /** document-split-node（文档分段）的 AI 生成配置：入参文档列表，配置分段策略及其参数（均按自定义常量写入），返回带分段的文档列表 */
 
@@ -69,7 +69,7 @@ const config: JsonObjectSchema = {
     patterns: {
       type: 'array',
       items: { type: 'string' },
-      description: `分段标识，仅 custom 策略：按先后顺序递归分割，可选 ${splitPatternOptions.map((pattern) => pattern.label).join('、')}，也可传自定义正则`,
+      description: `分段标识，仅 custom 策略：按先后顺序递归分割，可选 ${DOCUMENT_SPLIT_PATTERN_OPTIONS.map((pattern) => pattern.label).join('、')}，也可传自定义正则`,
     },
     limit: { type: 'integer', description: `分段长度，仅 custom 策略，${LENGTH_MIN}–${LENGTH_MAX}，默认 4096` },
     with_filter: { type: 'boolean', description: '自动清洗，仅 custom 策略：去掉重复多余的符号、空格、空行、制表符' },
@@ -121,7 +121,7 @@ function useAgent(context: NodeAgentContext) {
           const limit = lengthOf(args.limit, 'limit')
           if (typeof limit === 'string') return limit
           const patterns = Array.isArray(args.patterns)
-            ? args.patterns.map((pattern) => splitPatternOptions.find((option) => option.label === pattern)?.value ?? String(pattern)).filter(Boolean)
+            ? args.patterns.map((pattern) => DOCUMENT_SPLIT_PATTERN_OPTIONS.find((option) => option.label === pattern)?.value ?? String(pattern)).filter(Boolean)
             : undefined
           const booleanFields = ['with_filter', 'paragraph_title_relate_problem', 'document_name_relate_problem'].filter(
             (field) => typeof args[field] === 'boolean',

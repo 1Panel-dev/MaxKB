@@ -21,6 +21,7 @@ export interface McpTool {
 // 底层 api/*/index.ts 提供的原始接口实现,不含缓存层能力。
 type ApiModule = {
   getAllApplication?: (query?: Dict<unknown>) => Promise<ApplicationDetail[]>
+  getApplicationDetail?: (applicationId: string) => Promise<ApplicationDetail>
   getAllTags?: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
   getModelListWithShared: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
@@ -37,6 +38,8 @@ type ApiModule = {
 // 查询默认走缓存，通过 store.force.xxx() 强制刷新；生成请求始终直接转发。
 export type WorkflowStoreApi = {
   getAllApplication: (query?: Dict<unknown>) => Promise<ApplicationDetail[]>
+  /** 应用详情；当前范围不支持时返回空对象 */
+  getApplicationDetail: (applicationId: string) => Promise<ApplicationDetail>
   getAllTags: (knowledgeIds: string[]) => Promise<KnowledgeTagGroup[]>
   getModelListWithShared: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
@@ -105,6 +108,10 @@ export function useWorkflowStore(resourceScope: string, getResourceWorkspaceId?:
       getAllApplication(query?: Dict<unknown>): Promise<ApplicationDetail[]> {
         if (!requestApi.getAllApplication) return Promise.resolve([])
         return withCache(`application-list:${JSON.stringify(query ?? {})}`, () => requestApi.getAllApplication!(query), force)
+      },
+      getApplicationDetail(applicationId: string): Promise<ApplicationDetail> {
+        if (!requestApi.getApplicationDetail) return Promise.resolve({} as ApplicationDetail)
+        return withCache(`application:${applicationId}`, () => requestApi.getApplicationDetail!(applicationId), force)
       },
       getAllTags(knowledgeIds: string[]): Promise<KnowledgeTagGroup[]> {
         if (!requestApi.getAllTags) return Promise.resolve([])

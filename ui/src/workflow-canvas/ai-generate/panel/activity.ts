@@ -90,11 +90,6 @@ function spawnKeyOf(toolCall: ToolCall): string | undefined {
   return undefined
 }
 
-function tail(text: string) {
-  const trimmed = text.trim()
-  return trimmed.length > 40 ? `…${trimmed.slice(-40)}` : trimmed
-}
-
 function parentKeyOf(scopeKey: string) {
   const index = scopeKey.lastIndexOf('/')
   return index >= 0 ? scopeKey.slice(0, index) : ''
@@ -107,7 +102,7 @@ export function createActivity() {
   const groupIdByScope = new Map<string, string>()
   const toolCallById = new Map<string, ToolCall>()
   /** 各作用域最后一条正文 / 思考：同类增量续写到同一项 */
-  const lastStreamByScope = new Map<string, { type: 'TEXT' | 'REASONING'; id: string; text: string }>()
+  const lastStreamByScope = new Map<string, { type: 'TEXT' | 'REASONING'; id: string }>()
 
   function reset() {
     activityItems.value = []
@@ -183,13 +178,12 @@ export function createActivity() {
       let last = lastStreamByScope.get(scopeKey)
       if (last?.type !== type) {
         settle(scopeKey)
-        last = { type, id: uuidv7(), text: '' }
+        last = { type, id: uuidv7() }
         lastStreamByScope.set(scopeKey, last)
       }
-      last.text += event.delta
       emit(scopeKey, { type, id: last.id, content: event.delta, ...(type === 'REASONING' ? { status: 'RUNNING' } : {}) })
-      // lastActivity.value = tail(last.text)
-      lastActivity.value = event.type === 'reasoning' ? tail(last.text) : ''
+      // mk-dotting 只接受静态文案（见 STYLE_README.md），不能随逐字增量改变，否则文案本身也会跟着抖动
+      lastActivity.value = event.type === 'reasoning' ? '思考中' : '生成中'
     } else if (event.type === 'tool_start') {
       settle(scopeKey)
       const delegate = DELEGATE_TOOLS.has(event.name)

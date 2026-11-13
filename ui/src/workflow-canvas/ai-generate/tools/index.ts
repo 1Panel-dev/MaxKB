@@ -1,10 +1,10 @@
 import { cloneDeep } from 'lodash'
 import { TOOL_TYPE } from '@/api/enums'
-import type { ToolItem } from '@/api/types'
+import type { ToolItem, ToolType } from '@/api/types'
 import type LogicFlow from '@logicflow/core'
 import type { BaseNodeModel } from '@logicflow/core'
-import { WorkFlowInstance, KnowledgeWorkFlowInstance, ToolWorkFlowInstance } from '@/workflow-canvas/core/validate'
-import { toolLibNode } from '@/workflow-canvas/config/node-data'
+import { collectWorkflowValidationErrors } from '@/workflow-canvas/core/validate'
+import { applicationNode, toolLibNode, toolWorkflowLibNode } from '@/workflow-canvas/config/node-data'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowKind, WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
 import {
@@ -300,14 +300,70 @@ export function getNodeAnchorsTool(bindings: AgentBindings): AgentTool {
   }
 }
 
-/** 工具节点的模板：按工具详情补齐参数与名称，与资源菜单拖入的节点一致；数据源工具额外写入 kind / condition */
+/** 自定义工具（tool-lib-node）的入参摘要：node_data.input_field_list 以 name 为键 */
+function toolInputsOf(fields: Array<{ name: string; type?: string; source?: string; is_required?: boolean; desc?: string }> | undefined) {
+  return (fields ?? []).map((field) => ({ name: field.name, type: field.type, source: field.source, is_required: field.is_required, desc: field.desc }))
+}
+
+/** 工作流工具（tool-workflow-lib-node）的入参摘要：node_data.input_field_list 以 field 为键，与 tool-base-node 的字段协议一致 */
+function workflowToolInputsOf(fields: Array<{ field: string; label?: string; type?: string; source?: string; is_required?: boolean; desc?: string }> | undefined) {
+  return (fields ?? []).map((field) => ({ name: field.field, label: field.label, type: field.type, source: field.source, is_required: field.is_required, desc: field.desc }))
+}
+
+/** source=custom 的常量初始值：与节点表单 getCustomValue 一致，避免类型不匹配 */
+function workflowToolCustomValueOf(type: string | undefined): unknown {
+  if (type === 'array') return []
+  if (type === 'dict') return {}
+  if (type === 'int' || type === 'float') return undefined
+  return ''
+}
+
+/** 工作流工具自己工作流里基本信息节点声明的输入 / 输出参数（即 tool-base-node 的 user_input_field_list / user_output_field_list） */
+function workflowToolBaseProperties(tool: ToolItem) {
+  const baseNode = tool.work_flow?.nodes?.find((node) => node.type === WorkflowNodeType.ToolBaseNode)
+  return (baseNode?.properties ?? {}) as {
+    user_input_field_list?: Array<{ field: string; label?: string; type?: string; desc?: string; is_required?: boolean }>
+    user_output_field_list?: Array<{ field: string; label?: string }>
+  }
+}
+
+/**
+ * 工具节点的模板：按工具详情补齐参数与名称，与资源菜单拖入的节点一致；数据源工具额外写入 kind / condition。
+ * 覆盖自定义工具与工作流工具（按 tool_type 选 tool-lib-node / tool-workflow-lib-node），AI 侧统一传 tool_id，不用区分。
+ * 工作流工具的签名在它自己工作流的基本信息节点里，这里一并取出补进 node_data 与 config.fields，
+ * 使 add_node 的返回结果立即带有真实的入参与输出字段，不必另外一次查询。
+ */
 async function toolNodeTemplate(bindings: AgentBindings, toolId: string): Promise<ShapeItem | { error: string }> {
   const tool = await useWorkflowStore(bindings.resourceScope)
     .force.getToolById(toolId)
     .catch(() => null)
   if (!tool?.id) return { error: `工具不存在: ${toolId}` }
-  const inputFields = (tool.input_field_list ?? []).map((field) => ({ ...field, value: field.source === 'reference' ? [] : '' }))
+  if (!tool.is_active) return { error: `工具已停用: ${tool.name}` }
   const dataSource = tool.tool_type === TOOL_TYPE.DATA_SOURCE ? { kind: WorkflowKind.DataSource, condition: 'OR' } : {}
+  if (tool.tool_type === TOOL_TYPE.WORKFLOW) {
+    const baseProperties = workflowToolBaseProperties(tool)
+    if (!tool.work_flow?.nodes?.length) return { error: `工作流工具尚未发布，需发布后才能使用: ${tool.name}` }
+    const inputFields = (baseProperties.user_input_field_list ?? []).map((field) => ({
+      field: field.field,
+      label: field.label || field.field,
+      type: field.type ?? 'string',
+      desc: field.desc ?? '',
+      is_required: field.is_required ?? true,
+      source: 'custom' as const,
+      value: workflowToolCustomValueOf(field.type),
+    }))
+    const outputFields = (baseProperties.user_output_field_list ?? []).map((field) => ({ value: field.field, label: field.label || field.field }))
+    return {
+      ...cloneDeep(toolWorkflowLibNode),
+      properties: {
+        ...cloneDeep(toolWorkflowLibNode.properties),
+        stepName: tool.name,
+        config: { ...cloneDeep(toolWorkflowLibNode.properties.config), fields: outputFields },
+        node_data: { input_field_list: inputFields, tool_lib_id: tool.id },
+      },
+    }
+  }
+  const inputFields = (tool.input_field_list ?? []).map((field) => ({ ...field, value: field.source === 'reference' ? [] : '' }))
   return {
     ...cloneDeep(toolLibNode),
     properties: {
@@ -319,31 +375,83 @@ async function toolNodeTemplate(bindings: AgentBindings, toolId: string): Promis
   }
 }
 
-/** 工具列表 → 精简结构，供 get_tools / list_datasource 复用 */
+/** 工具列表 → 精简结构，供 list_datasource 复用（数据源始终是自定义实现，带 inputs） */
 function summarizeTools(tools: ToolItem[]) {
-  return tools.map((tool) => ({
-    id: tool.id,
-    name: tool.name,
-    desc: tool.desc,
-    inputs: (tool.input_field_list ?? []).map((field) => ({
-      name: field.name,
-      type: field.type,
-      source: field.source,
-      is_required: field.is_required,
-      desc: field.desc,
-    })),
-  }))
+  return tools.map((tool) => ({ id: tool.id, name: tool.name, desc: tool.desc, inputs: toolInputsOf(tool.input_field_list) }))
 }
 
-/** 列出可在应用工作流中使用的自定义工具（父 agent 选型用） */
+/** 与节点菜单「工具」页签一致：自定义工具 + 工作流工具（父 agent 选型用） */
 export function getToolsTool(bindings: AgentBindings): AgentTool {
+  const toolTypes: ToolType[] = [TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW]
   return {
     name: 'get_tools',
-    description: '列出可用的自定义工具 [{id,name,desc,inputs:[{name,type,source,is_required,desc}]}]，add_node 新增 tool-lib-node 时传其 tool_id。',
+    description:
+      '列出可用工具 [{id,name,desc,type}]，范围与节点菜单的「工具」页签一致：自定义工具（type=custom，带 inputs）与工作流工具（type=workflow，签名未知，' +
+      '因为取决于它自己工作流声明的输入 / 输出参数，add_node 新增后即可在返回结果里看到）。add_node 新增 tool-lib-node 时传其 tool_id，两种工具都用这一种节点类型。',
     parameters: { type: 'object', properties: {} },
     apply: async () => {
-      const tools = await useWorkflowStore(bindings.resourceScope).getToolListWithShared({ tool_type: TOOL_TYPE.CUSTOM })
-      return summarizeTools(tools.filter((tool) => tool.is_active && tool.tool_type === TOOL_TYPE.CUSTOM))
+      const tools = await useWorkflowStore(bindings.resourceScope).getToolListWithShared({ tool_type_list: toolTypes })
+      const currentToolId = bindings.workflowMode === WorkflowMode.Tool || bindings.workflowMode === WorkflowMode.ToolLoop ? bindings.resourceId : undefined
+      return tools
+        .filter((tool) => tool.is_active && tool.id !== currentToolId && toolTypes.includes(tool.tool_type))
+        .map((tool) => ({
+          id: tool.id,
+          name: tool.name,
+          desc: tool.desc,
+          type: tool.tool_type === TOOL_TYPE.WORKFLOW ? 'workflow' : 'custom',
+          ...(tool.tool_type === TOOL_TYPE.WORKFLOW ? {} : { inputs: toolInputsOf(tool.input_field_list) }),
+        }))
+    },
+  }
+}
+
+/** 列出可在应用工作流中添加的已发布智能体（父 agent 选型用），与节点菜单「智能体」页签一致 */
+export function getApplicationsTool(bindings: AgentBindings): AgentTool {
+  return {
+    name: 'get_applications',
+    description:
+      '列出可添加为智能体节点的已发布智能体 [{id,name,desc}]。add_node 新增 application-node 时传其 application_id，' +
+      '它的入参（工作流智能体的开始节点字段）在新增后的返回结果里可见，需要逐个用引用绑定（不支持常量）。',
+    parameters: { type: 'object', properties: {} },
+    apply: async () => {
+      const applications = await useWorkflowStore(bindings.resourceScope).getAllApplication({ publish_status: 'published' })
+      const currentApplicationId = bindings.workflowMode === WorkflowMode.Application || bindings.workflowMode === WorkflowMode.ApplicationLoop ? bindings.resourceId : undefined
+      return applications.filter((application) => application.id !== currentApplicationId).map((application) => ({ id: application.id, name: application.name, desc: application.desc }))
+    },
+  }
+}
+
+/**
+ * 智能体节点的模板：按应用详情补齐名称与入参，与资源菜单拖入的节点一致。
+ * 工作流类型的应用，入参取自它开始节点声明的 api_input_field_list（API 入参）与 user_input_field_list（表单入参）；
+ * 简易应用没有这些入参，只有用户问题（由节点自带的 question_reference_address 绑定，不需要额外参数）。
+ */
+async function applicationNodeTemplate(bindings: AgentBindings, applicationId: string): Promise<ShapeItem | { error: string }> {
+  const application = await useWorkflowStore(bindings.resourceScope)
+    .force.getApplicationDetail(applicationId)
+    .catch(() => null)
+  if (!application?.id) return { error: `智能体不存在: ${applicationId}` }
+  const startNode = application.work_flow?.nodes?.[0]
+  const startProperties = (startNode?.properties ?? {}) as {
+    api_input_field_list?: Array<{ variable: unknown; label?: unknown; is_required: boolean }>
+    user_input_field_list?: Array<{ field: string; label: unknown; required: boolean }>
+  }
+  const apiInputFieldList = (startProperties.api_input_field_list ?? []).map((field) => ({ ...field, value: [] }))
+  const userInputFieldList = (startProperties.user_input_field_list ?? []).map((field) => ({ ...field, value: [] }))
+  return {
+    ...cloneDeep(applicationNode),
+    properties: {
+      ...cloneDeep(applicationNode.properties),
+      stepName: application.name,
+      node_data: {
+        application_id: application.id,
+        name: application.name,
+        icon: application.icon,
+        question_reference_address: [WorkflowNodeType.Start, 'question'],
+        is_result: false,
+        api_input_field_list: apiInputFieldList,
+        user_input_field_list: userInputFieldList,
+      },
     },
   }
 }
@@ -362,15 +470,38 @@ export function listDataSourceTool(bindings: AgentBindings): AgentTool {
   }
 }
 
+/** 资源类节点（工具 / 智能体）新增后，从已 bake 好的 node_data 里取入参摘要，随 add_node 的结果一并交付，不必再查一次 */
+function resourceNodeInputsOf(node: ReturnType<typeof addNode>): { inputs?: unknown[] } {
+  const nodeData = node.properties.node_data as Record<string, unknown> | undefined
+  if (!nodeData) return {}
+  if (String(node.type) === WorkflowNodeType.ToolLib) return { inputs: toolInputsOf(nodeData.input_field_list as never) }
+  if (String(node.type) === WorkflowNodeType.ToolWorkflowLib) return { inputs: workflowToolInputsOf(nodeData.input_field_list as never) }
+  if (String(node.type) === WorkflowNodeType.Application) {
+    const apiInputs = ((nodeData.api_input_field_list ?? []) as Array<{ variable: unknown; label?: unknown; is_required: boolean }>).map((field) => ({
+      name: field.variable,
+      label: field.label,
+      is_required: field.is_required,
+    }))
+    const userInputs = ((nodeData.user_input_field_list ?? []) as Array<{ field: string; label: unknown; required: boolean }>).map((field) => ({
+      name: field.field,
+      label: field.label,
+      is_required: field.required,
+    }))
+    return { inputs: [...apiInputs, ...userInputs] }
+  }
+  return {}
+}
+
 export function addNodeTool(bindings: AgentBindings): AgentTool {
   return {
     name: 'add_node',
     description:
       '新增节点并从上游出口接一条入边（建即接，杜绝孤立节点）；可新增的节点与当前画布的节点菜单一致。' +
       'source_anchor_id：普通连接传上游节点 id；接判断器/意图识别某分支时传 get_node_anchors 返回的出口 id；循环体首个节点接 "loop-start-node"。' +
-      'tool-lib-node 需同时传 tool_id（get_tools 或 list_datasource 查询）。' +
+      'tool-lib-node 需同时传 tool_id（get_tools / list_datasource 查询）：自定义工具与工作流工具都传这一种 type，框架按工具类型选择实际节点。' +
+      'application-node 需同时传 application_id（get_applications 查询）。' +
       '数据源节点（本地文件 / Web 站点 / 数据源工具）是流程入口，不接上游，必须省略 source_anchor_id。' +
-      '返回 { nodeId, name, outputs }；带 note 表示该节点暂不支持 AI 配置。',
+      '返回 { nodeId, name, outputs }，资源类节点（工具 / 智能体）额外带 inputs；带 note 表示该节点暂不支持 AI 配置。',
     parameters: {
       type: 'object',
       properties: {
@@ -378,6 +509,7 @@ export function addNodeTool(bindings: AgentBindings): AgentTool {
         source_anchor_id: { type: 'string', description: '上游节点 id 或出口 id；仅数据源节点省略' },
         name: { type: 'string', description: '节点名称（可选，体现用途，如 "产品知识检索"）' },
         tool_id: { type: 'string', description: 'type=tool-lib-node 时必填' },
+        application_id: { type: 'string', description: 'type=application-node 时必填' },
         lf_id: LF_ID_SCHEMA,
       },
       required: ['type'],
@@ -391,6 +523,9 @@ export function addNodeTool(bindings: AgentBindings): AgentTool {
       if (type === WorkflowNodeType.ToolLib) {
         if (!args.tool_id) return { error: 'tool-lib-node 需要 tool_id，先 get_tools / list_datasource 查询' }
         template = await toolNodeTemplate(bindings, String(args.tool_id))
+      } else if (type === WorkflowNodeType.Application) {
+        if (!args.application_id) return { error: 'application-node 需要 application_id，先 get_applications 查询' }
+        template = await applicationNodeTemplate(bindings, String(args.application_id))
       } else {
         template = findNodeTemplate(canvas.mode, type)
       }
@@ -405,7 +540,8 @@ export function addNodeTool(bindings: AgentBindings): AgentTool {
         name: nodeNameOf(node),
         lf_id: canvas.lfId,
         outputs: nodeOutputFields(node),
-        ...(nodeAgentFor(type) ? {} : { note: '该节点暂不支持 AI 配置：不要对它 configure_node，完成后提示用户手动配置' }),
+        ...resourceNodeInputsOf(node),
+        ...(nodeAgentFor(String(node.type)) ? {} : { note: '该节点暂不支持 AI 配置：不要对它 configure_node，完成后提示用户手动配置' }),
       })
       // 数据源节点是流程入口，没有入口锚点：不接上游；其余节点必须建即接
       const sourceAnchor = typeof args.source_anchor_id === 'string' ? args.source_anchor_id.trim() : ''
@@ -659,59 +795,17 @@ export function configureNodeTool(bindings: AgentBindings): AgentTool {
 // 校验
 // ============================================================
 
-function graphOf(lf: LogicFlow) {
-  const graph = lf.getGraphData() as LogicFlow.GraphData
-  return {
-    nodes: graph.nodes.filter((node) => node.type !== WorkflowNodeType.LoopBodyNode),
-    edges: graph.edges.filter((edge) => edge.type !== 'loop-edge'),
-  } as unknown as ConstructorParameters<typeof WorkFlowInstance>[0]
-}
-
-/**
- * 按画布模式选择图结构校验器：工具 / 知识库主画布有各自的开始节点与流程规则。
- * 循环体与 loop-body-node 视图的校验一致：知识库循环用 KnowledgeWorkFlowInstance，其余（含工具循环）用 WorkFlowInstance，
- * 工具循环体的开始节点是 loop-start-node，不能用按 tool-start-node 找开始节点的 ToolWorkFlowInstance。
- */
-function instanceOf(mode: WorkflowMode, graph: ReturnType<typeof graphOf>): WorkFlowInstance {
-  if (mode === WorkflowMode.Tool) return new ToolWorkFlowInstance(graph, mode)
-  if (mode === WorkflowMode.Knowledge || mode === WorkflowMode.KnowledgeLoop) return new KnowledgeWorkFlowInstance(graph, mode)
-  return new WorkFlowInstance(graph, mode)
-}
-
 export function validateTool(bindings: AgentBindings): AgentTool {
   return {
     name: 'validate',
     description:
-      '校验整张工作流：连线完整性（未接入流程的节点、未连接的分支、不能作为结束的节点）、循环体结构与各节点表单必填项；' +
+      '校验整张工作流，与画布调试 / 发布前的校验是同一个函数：各节点表单必填项与引用有效性、分支是否都已连接、循环体内的节点与循环图结构；' +
       '工具工作流还检查输出参数是否都有变量赋值写入、是否引用了未声明的输入 / 输出参数。返回 { qualified, problems }。',
     parameters: { type: 'object', properties: {} },
     apply: async () => {
-      const problems: string[] = []
+      // 先展开循环体，保证循环体节点已挂载并注册了 validate
       const canvases = await listCanvases(bindings.rootLf, bindings.workflowMode)
-      for (const canvas of canvases) {
-        const where = canvas.lfId === MAIN_LF_ID ? '主画布' : `循环体(${canvas.lfId})`
-        try {
-          const instance = instanceOf(canvas.mode, graphOf(canvas.lf))
-          if (canvas.lfId === MAIN_LF_ID) instance.is_valid()
-          else {
-            instance.is_loop_valid()
-            const loopNode = canvases.flatMap((item) => item.lf.graphModel.nodes).find((node) => node.id === canvas.lfId)
-            if ((loopNode?.properties.node_data as { loop_type?: string } | undefined)?.loop_type === 'LOOP' && !instance.exist_break_node()) {
-              problems.push(`${where}：无限循环的循环体需要包含 Break 节点`)
-            }
-          }
-        } catch (error) {
-          problems.push(`${where}：${typeof error === 'string' ? error : formatValidationError(error)}`)
-        }
-        const results = await Promise.allSettled(
-          canvas.lf.graphModel.nodes
-            .filter((node) => String(node.type) !== WorkflowNodeType.LoopBodyNode)
-            .map((node) => (node as unknown as { validate?: () => Promise<unknown> }).validate?.()),
-        )
-        results.forEach((result) => {
-          if (result.status === 'rejected') problems.push(`${where}：${formatValidationError(result.reason)}`)
-        })
-      }
+      const problems = (await collectWorkflowValidationErrors(bindings.rootLf)).map((error) => formatValidationError(error))
       if (isToolMode(bindings.workflowMode)) {
         problems.push(...brokenToolParamReferences(bindings.rootLf, canvases))
         unwrittenToolOutputs(bindings.rootLf, canvases).forEach((field) =>

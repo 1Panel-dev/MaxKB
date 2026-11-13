@@ -1,5 +1,5 @@
 import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
-import { WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
+import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
 import { loopModeOf } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { inheritMessages, useAgentConfig } from '@/workflow-canvas/ai-generate/common'
 import { createAgent } from '@/workflow-canvas/ai-generate/create-agent'
@@ -25,7 +25,8 @@ export function nodeLine(node: CatalogNode): string {
 
 /**
  * 可用节点函数目录：与节点菜单（node-menu）一致，按画布模式列出全部菜单节点，循环体专属节点单列；
- * 末尾追加「工具」（tool-lib-node）函数，对应菜单的工具 / 数据源页签。
+ * 末尾追加「工具」（tool-lib-node，涵盖自定义工具与工作流工具）和「智能体」（application-node，仅应用工作流）函数，
+ * 对应菜单里的资源页签（工具 / 数据源 / 智能体），这些节点不在 menu.ts 的静态列表里。
  */
 export function renderCatalog(bindings: AgentBindings): string {
   const mainGroups = getMenuNodes(bindings.workflowMode)
@@ -36,6 +37,9 @@ export function renderCatalog(bindings: AgentBindings): string {
   const sections = mainGroups.filter((group) => group.list.length).map((group) => `【${group.label}】\n${group.list.map(nodeLine).join('\n\n')}`)
   const toolLib = nodeAgentFor(WorkflowNodeType.ToolLib)
   if (toolLib) sections.push(`【工具】\n${renderNodeFunction(WorkflowNodeType.ToolLib, '工具', toolLib)}`)
+  const isApplicationMode = bindings.workflowMode === WorkflowMode.Application || bindings.workflowMode === WorkflowMode.ApplicationLoop
+  const application = isApplicationMode ? nodeAgentFor(WorkflowNodeType.Application) : undefined
+  if (application) sections.push(`【智能体】\n${renderNodeFunction(WorkflowNodeType.Application, '智能体节点', application)}`)
   if (loopOnly.length) sections.push(`【仅循环体内可用（lf_id=所在循环节点 id）】\n${loopOnly.map(nodeLine).join('\n\n')}`)
   return sections.join('\n\n')
 }

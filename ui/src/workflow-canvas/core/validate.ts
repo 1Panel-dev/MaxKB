@@ -396,3 +396,18 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
     }
   }
 }
+
+/**
+ * 画布校验的唯一入口，调试、发布与 AI 生成共用：并行调用各节点注册的 validate()，返回全部失败原因（空数组即通过）。
+ * 节点表单必填与引用有效性由各节点负责，循环体内的节点与循环图结构由循环体节点（loop-body-node）的 validate 负责。
+ */
+export async function collectWorkflowValidationErrors(lf: LogicFlow): Promise<unknown[]> {
+  const results = await Promise.allSettled(lf.graphModel.nodes.map((node) => (node as unknown as { validate?: () => Promise<unknown> }).validate?.()))
+  return results.flatMap((result) => (result.status === 'rejected' ? [result.reason] : []))
+}
+
+/** 画布校验：通过时完成，否则以第一个失败原因拒绝 */
+export async function validateWorkflow(lf: LogicFlow): Promise<void> {
+  const errors = await collectWorkflowValidationErrors(lf)
+  if (errors.length) throw errors[0]
+}
