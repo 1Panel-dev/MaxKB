@@ -147,6 +147,43 @@ class VolcanicEngineModelProvider(IModelProvider):
     def get_model_info_manage(self):
         return model_info_manage
 
+    def classify_dynamic_item(self, item):
+        """火山引擎 Ark 的 /models 把各模态放在 modalities 嵌套字段里，并带权威的
+        domain 字段（VLM/ImageGeneration/VideoGeneration/Embedding 等）。这里按官方
+        domain 精确判型，避免视频、向量、3D、路由模型被误判成视觉模型；无 domain
+        或不认识的 domain 时归一化嵌套 modalities 后走基类兜底。"""
+        if not isinstance(item, dict):
+            return super().classify_dynamic_item(item)
+        if not (item.get("input_modalities") or item.get("output_modalities")):
+            modalities = item.get("modalities") or {}
+            if isinstance(modalities, dict) and (
+                modalities.get("input_modalities") or modalities.get("output_modalities")
+            ):
+                item = {
+                    **item,
+                    "input_modalities": modalities.get("input_modalities") or [],
+                    "output_modalities": modalities.get("output_modalities") or [],
+                }
+        domain = str(item.get("domain") or "").lower()
+        if domain == "imagegeneration":
+            return ModelTypeConst.TTI
+        if domain == "embedding":
+            return ModelTypeConst.EMBEDDING
+        if domain == "videogeneration":
+            model_id = str(item.get("id") or "").lower()
+            if "i2v" in model_id and "t2v" not in model_id:
+                return ModelTypeConst.ITV
+            return ModelTypeConst.TTV
+        if domain == "3dgeneration":
+            # MaxKB 暂不支持 3D 生成，跳过，避免被当成视觉模型。
+            return None
+        if domain in ("vlm", "llm", "router"):
+            input_modalities = {str(m).lower() for m in (item.get("input_modalities") or [])}
+            if domain == "router" or "image" not in input_modalities:
+                return ModelTypeConst.LLM
+            return ModelTypeConst.IMAGE
+        return super().classify_dynamic_item(item)
+
     def get_model_credential(self, model_type, model_name):
         model_credential = super().get_model_credential(model_type, model_name)
         # 火山引擎 Ark 统一走 v3 地址；LLM 复用 OpenAI 凭证类，需为实例单独设置，
