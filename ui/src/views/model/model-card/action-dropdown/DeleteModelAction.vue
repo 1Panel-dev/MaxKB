@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import type ModelApi from '@/api/admin/workspace/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type { ModelItem } from '@/api/types'
@@ -7,22 +6,19 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DeleteModelAction' })
 
-const { t } = useI18n({ useScope: 'global' })
-
 const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi; label: string; model: ModelItem }>()
 
 const emit = defineEmits<{ refresh: [] }>()
 
 function handleDeleteModel() {
   return MsgConfirm(
-    t('model.delete.confirm', { name: props.model.name }),
-    props.model.resource_count ? t('model.delete.referenced', { count: props.model.resource_count }) : '',
-    { cancelButtonText: t('common.actions.cancel'), confirmButtonText: t('common.actions.delete') },
+    `是否删除模型：${props.model.name}？`,
+    props.model.resource_count ? `此模型关联 ${props.model.resource_count} 个资源，删除后无法使用，请谨慎操作。` : '',
   )
     .then(() => {
       return props.api.deleteModel(props.model.id).then(() => {
         emit('refresh')
-        MsgSuccess(t('common.messages.deleted'))
+        MsgSuccess('删除成功')
       })
     })
     .catch(() => {})

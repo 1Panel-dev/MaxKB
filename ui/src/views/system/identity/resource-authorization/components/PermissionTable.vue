@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import ProviderApi from '@/api/admin/model-provider.ts'
 import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
@@ -15,8 +14,6 @@ import type {
 import { getPermissionOptions } from '../constants'
 import BatchSetPermissionDialog from '../dialog/BatchSetPermissionDialog.vue'
 
-const { t } = useI18n({ useScope: 'global' })
-
 defineOptions({ name: 'ResourcePermissionTable' })
 
 const props = defineProps<{ data: ResourcePermissionItem[]; resourceType: ResourceAuthorizationType; disabled: boolean }>()
@@ -24,7 +21,7 @@ const emit = defineEmits<{ submit: [permissions: ResourcePermissionPayload[]] }>
 
 const permissionSearchFields = computed<OptionItem<string>[]>(() => [
   { label: '名称', value: 'name' },
-  { label: '权限', multiple: true, options: getPermissionOptions().map((option) => ({ ...option, label: t(option.label) })), value: 'permission' },
+  { label: '权限', multiple: true, options: getPermissionOptions(), value: 'permission' },
 ])
 
 /* 搜索与展开 */
@@ -205,7 +202,7 @@ watch(
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <el-radio-group :model-value="row.permission" :disabled="disabled" @change="handlePermissionChange($event as ResourcePermission, row)">
             <template v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value">
-              <el-radio :value="permissionOption.value">{{ t(permissionOption.label) }}</el-radio>
+              <el-radio :value="permissionOption.value">{{ permissionOption.label }}</el-radio>
             </template>
           </el-radio-group>
         </template>

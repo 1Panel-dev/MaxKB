@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { computed, h, type FunctionalComponent } from 'vue'
 import { dateFormat } from '@/utils/time'
 import { hasRenderableSlotContent } from '@/utils/vnode'
@@ -28,8 +27,6 @@ import MkResourceCardActionDropdown from './MkResourceCardActionDropdown.vue'
  *   </component>
  * </template>
  */
-const { t } = useI18n({ useScope: 'global' })
-
 defineOptions({ name: 'MkResourceCard' })
 
 const props = withDefaults(
@@ -98,7 +95,7 @@ function handleSelectedChange(selected: boolean | string | number) {
             <slot name="subtitle">
               <div class="flex gap-1">
                 <span class="min-w-0 truncate" :title="props.nick_name">{{ props.nick_name }}</span>
-                <span class="shrink-0">{{ t('components.resourceCard.createdAt') }}</span>
+                <span class="shrink-0">创建于</span>
                 <span class="shrink-0">{{ dateFormat(props.create_time) }}</span>
               </div>
             </slot>

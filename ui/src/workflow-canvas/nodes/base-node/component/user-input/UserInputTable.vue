@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import { dynamicFormTypeOptions, type FormField } from '@/components/mk-dynamics-form'
@@ -8,8 +7,6 @@ import type { ApiInputField, UserInputSetting } from '../../types'
 import UserInputFieldDialog from './UserInputFieldDialog.vue'
 import UserInputSettingDialog from './UserInputSettingDialog.vue'
 import { exposedInputTypes } from './constant'
-
-const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ apiFields: ApiInputField[]; nodeId: string }>()
 const inputFields = defineModel<FormField[]>({ required: true })
@@ -57,11 +54,6 @@ function removeExposedField(field: string) {
   nextSetting.exposed_fields = nextSetting.exposed_fields.filter((exposedField) => exposedField !== field)
   setting.value = nextSetting
 }
-
-function getTypeLabel(inputType: string) {
-  const label = dynamicFormTypeOptions.find((option) => option.value === inputType)?.label
-  return label ? t(label) : inputType
-}
 </script>
 
 <template>
@@ -92,9 +84,11 @@ function getTypeLabel(inputType: string) {
         </template>
       </el-table-column>
       <el-table-column label="组件类型" width="110">
-        <template #default="{ row }">
-          <el-tag size="small" type="info">{{ getTypeLabel(row.input_type) }}</el-tag>
-        </template>
+        <template #default="{ row }"
+          ><el-tag size="small" type="info">{{
+            dynamicFormTypeOptions.find(({ value }) => value === row.input_type)?.label ?? row.input_type
+          }}</el-tag></template
+        >
       </el-table-column>
       <el-table-column label="默认值">
         <template #default="{ row }">

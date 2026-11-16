@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-import { computed, onMounted, ref, nextTick } from 'vue'
+import { onMounted, ref, nextTick } from 'vue'
 import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form/constant'
 import VisibilityConstructor from './visibility/index.vue'
 import BasicInfoConstructor from './BasicInfoConstructor.vue'
@@ -12,8 +11,6 @@ import type {
   VisibilityFieldOption,
   VisibilityRules,
 } from '../type'
-
-const { t } = useI18n({ useScope: 'global' })
 
 interface VisibilityConstructorExpose {
   getData: () => VisibilityRules | null
@@ -39,11 +36,8 @@ const props = withDefaults(
   }>(),
   {
     enableVisibility: false,
+    fieldTypeOptions: () => dynamicFormTypeOptions.map((item) => ({ label: item.label, value: `${item.value}Constructor` })),
   },
-)
-
-const fieldTypeOptions = computed(() =>
-  props.fieldTypeOptions ?? dynamicFormTypeOptions.map(({ label, value }) => ({ label: t(label), value: `${value}Constructor` })),
 )
 
 const activeTab = ref('basic')
@@ -95,8 +89,8 @@ defineExpose({ getData, validate, render })
 <template>
   <div v-if="enableVisibility" class="flex-column max-h-[inherit] min-h-0">
     <el-tabs v-model="activeTab" class="shrink-0">
-      <el-tab-pane :label="t('common.titles.basicInfo')" name="basic" />
-      <el-tab-pane :label="t('dynamicForm.visibility.title')" name="visibility" />
+      <el-tab-pane label="基本信息" name="basic" />
+      <el-tab-pane label="显隐设置" name="visibility" />
     </el-tabs>
 
     <!-- 导航固定，内容独立滚动；两个表单保持挂载，供统一回填、取值和校验。 -->

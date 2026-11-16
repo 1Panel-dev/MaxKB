@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { computed, inject, provide, useAttrs } from 'vue'
 import { useFormDisabled, type UploadRawFile } from 'element-plus'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
 import type { FormField } from '../../type'
-
-const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'DynamicFormLocalFileUpload', inheritAttrs: false })
 
@@ -49,8 +46,8 @@ const fileCountLimit = computed(() => Number(props.formField.attrs?.file_count_l
     <el-alert type="primary" :closable="false" show-icon class="mb-4!">
       <template #icon><MkIcon name="icon_info_filled" /></template>
       <ol class="list-inside list-decimal space-y-1">
-        <li>{{ t('dynamicForm.upload.segmentHint') }}</li>
-        <li>{{ t('dynamicForm.upload.limitsHint', { count: fileCountLimit, size: fileSizeLimit }) }}</li>
+        <li>文件上传前，建议规范文件的分段标识</li>
+        <li>每次最多上传 {{ fileCountLimit }} 个文件，每个文件不超过 {{ fileSizeLimit }} MB</li>
       </ol>
     </el-alert>
     <MkDragUpload
@@ -60,7 +57,7 @@ const fileCountLimit = computed(() => Number(props.formField.attrs?.file_count_l
       :accept="accept"
       :limit="fileCountLimit"
       :size-limit="fileSizeLimit"
-      :tip-text="formats ? t('dynamicForm.upload.supportedFormats', { formats }) : ''"
+      :tip-text="formats ? `支持格式：${formats}` : ''"
     />
   </div>
 </template>

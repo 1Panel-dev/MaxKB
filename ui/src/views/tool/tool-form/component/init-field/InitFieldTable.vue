@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { ref, useTemplateRef } from 'vue'
 import type { DynamicFormField } from '@/api/types'
 import { dynamicFormTypeOptions, type FormField } from '@/components/mk-dynamics-form'
 import InitFieldDialog from './InitFieldDialog.vue'
 
 defineOptions({ name: 'InitFieldTable' })
-
-const { t } = useI18n({ useScope: 'global' })
 
 const initFields = defineModel<DynamicFormField[]>({ required: true })
 const currentIndex = ref<number>()
@@ -35,8 +32,7 @@ function handleDeleteInitField(index: number) {
 }
 
 function getTypeLabel(inputType: string) {
-  const label = dynamicFormTypeOptions.find((option) => option.value === inputType)?.label
-  return label ? t(label) : inputType
+  return dynamicFormTypeOptions.find((option) => option.value === inputType)?.label ?? inputType
 }
 </script>
 

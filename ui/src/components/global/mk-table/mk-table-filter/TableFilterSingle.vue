@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import type { TableFilterOption } from './types'
-
-const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'TableFilterSingle' })
 
@@ -25,7 +22,7 @@ function handleVisibleChange(visible: boolean) {
     <slot />
     <template #dropdown>
       <MkDropdownMenu :style="{ width: typeof width === 'number' ? `${width}px` : width }">
-        <MkDropdownItem selectable :selected="!active" @click="emit('select', null)">{{ t('components.table.all') }}</MkDropdownItem>
+        <MkDropdownItem selectable :selected="!active" @click="emit('select', null)">全部</MkDropdownItem>
         <template v-for="option in options" :key="`${typeof option.value}:${option.value}`">
           <MkDropdownItem
             selectable

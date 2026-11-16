@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
 import type { ResourcePermission } from '@/api/types'
 import { getPermissionOptions } from '../constants'
-
-const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'BatchSetPermissionDialog' })
 
@@ -42,9 +39,9 @@ defineExpose({ open, close })
   <MkDialog v-model="visible" title="配置权限" @closed="resetData">
     <el-radio-group v-model="permission" class="mk-radio-group-vertical" :disabled="disabled">
       <el-radio v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value" :value="permissionOption.value">
-        <p>{{ t(permissionOption.label) }}</p>
+        <p>{{ permissionOption.label }}</p>
         <p v-if="permissionOption.description" class="text-N500 mt-1">
-          {{ t(permissionOption.description) }}
+          {{ permissionOption.description }}
         </p>
       </el-radio>
     </el-radio-group>

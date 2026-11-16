@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
 import type { VisibilityFieldOption } from '../../type'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
-
-const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ modelValue: string[]; leftOptions?: VisibilityFieldOption[] }>()
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -30,20 +27,20 @@ const selectedNodeField = computed(() => {
 
 const validate = () => {
   if (!data.value || data.value.length === 0) {
-    return Promise.reject(t('dynamicForm.visibility.referenceRequired'))
+    return Promise.reject('请选择引用变量')
   }
   if (data.value.length < 2) {
-    return Promise.reject(t('dynamicForm.visibility.invalidReference'))
+    return Promise.reject('引用变量格式错误')
   }
   const [scopeValue, fieldValue] = data.value
   const scope = options.value.find((item) => item.value === scopeValue)
   if (!scope) {
     data.value = []
-    return Promise.reject(t('dynamicForm.visibility.referenceNotFound'))
+    return Promise.reject('未找到引用变量')
   }
   if (!scope.children?.some((child) => child.value === fieldValue)) {
     data.value = []
-    return Promise.reject(t('dynamicForm.visibility.referenceNotFound'))
+    return Promise.reject('未找到引用变量')
   }
   return Promise.resolve('')
 }

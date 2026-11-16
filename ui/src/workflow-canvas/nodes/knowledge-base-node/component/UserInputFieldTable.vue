@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import { MsgError } from '@/utils/message'
@@ -7,8 +6,6 @@ import { dynamicFormTypeOptions, type FormField } from '@/components/mk-dynamics
 import type { KnowledgeFieldConfig } from '../types'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import TitleSettingDialog from './TitleSettingDialog.vue'
-
-const { t } = useI18n({ useScope: 'global' })
 
 const fields = defineModel<FormField[]>({ required: true })
 const config = defineModel<KnowledgeFieldConfig>('config', { required: true })
@@ -60,11 +57,6 @@ function saveTitle(data: KnowledgeFieldConfig) {
   config.value = cloneDeep(data)
   titleDialogRef.value?.close()
 }
-
-function getTypeLabel(inputType: string) {
-  const label = dynamicFormTypeOptions.find((option) => option.value === inputType)?.label
-  return label ? t(label) : inputType
-}
 </script>
 
 <template>
@@ -90,9 +82,11 @@ function getTypeLabel(inputType: string) {
         </template>
       </el-table-column>
       <el-table-column prop="input_type" label="组件类型" width="95">
-        <template #default="{ row }">
-          <el-tag type="info" size="small">{{ getTypeLabel(row.input_type) }}</el-tag>
-        </template>
+        <template #default="{ row }"
+          ><el-tag type="info" size="small">{{
+            dynamicFormTypeOptions.find(({ value }) => value === row.input_type)?.label ?? row.input_type
+          }}</el-tag></template
+        >
       </el-table-column>
       <el-table-column label="默认值" min-width="80">
         <template #default="{ row }">
