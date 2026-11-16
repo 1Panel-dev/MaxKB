@@ -94,7 +94,7 @@ function getProvider(model: ModelItem): ModelProviderItem {
 function handleDeleteModel(model: ModelItem) {
   return MsgConfirm(
     t('model.delete.confirm', { name: model.name }),
-    model.resource_count ? t('system.resourceManagement.delete.modelReferenced', { count: model.resource_count }) : '',
+    model.resource_count ? t('model.delete.referenced', { count: model.resource_count }) : '',
     { cancelButtonText: t('common.actions.cancel'), confirmButtonText: t('common.actions.delete') },
   )
     .then(() => {
