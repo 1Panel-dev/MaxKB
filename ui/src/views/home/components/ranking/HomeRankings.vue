@@ -94,7 +94,7 @@ onMounted(loadRankings)
       <h4>排行榜 TOP5</h4>
       <MkDateRange @change="handleRangeChange" />
     </div>
-    <div v-loading="loading" class="grid grid-cols-1 gap-4 xl:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
       <RankingCard
         title="Tokens 消耗 · Top 智能体"
         :records="rankings.tokens"

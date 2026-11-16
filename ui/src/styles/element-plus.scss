@@ -979,6 +979,12 @@
   }
 }
 
+/* skeleton */
+.el-skeleton {
+  --el-skeleton-color: rgba(239, 240, 241, 0.6);
+  --el-skeleton-to-color: rgba(239, 240, 241, 1);
+}
+
 /* slider */
 .el-slider {
   --el-slider-button-wrapper-size: 16px;

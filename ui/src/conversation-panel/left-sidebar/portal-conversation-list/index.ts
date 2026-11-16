@@ -49,6 +49,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
 
   // 历史对话分组
   const applicationGroups = ref<PortalApplicationGroup[]>([])
+  const initialLoading = ref(true)
   const isApplicationGroupsLoaded = ref(false)
 
   // 总数不超过 20 条时，补齐分组接口可能只返回的最近 5 条会话。
@@ -60,14 +61,18 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
   }
 
   const loadApplicationGroups = () =>
-    pageApplicationConversations(1, APPLICATION_PAGE_SIZE).then((response) => {
-      applicationGroups.value = (response.records ?? []).map((application) => ({
-        ...application,
-        expanded: application.conversations.length > 0 || application.id === currentApplicationId.value,
-      }))
-      isApplicationGroupsLoaded.value = true
-      return completeGroupConversations()
-    })
+    pageApplicationConversations(1, APPLICATION_PAGE_SIZE)
+      .then((response) => {
+        applicationGroups.value = (response.records ?? []).map((application) => ({
+          ...application,
+          expanded: application.conversations.length > 0 || application.id === currentApplicationId.value,
+        }))
+        isApplicationGroupsLoaded.value = true
+        return completeGroupConversations()
+      })
+      .finally(() => {
+        initialLoading.value = false
+      })
 
   // 展开其他智能体时查询其最近会话；当前智能体以会话列表 Store 为准，无需查询
   const loadGroupConversations = (group: PortalApplicationGroup) =>
@@ -153,6 +158,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
 
   return {
     applicationGroups,
+    initialLoading,
     isApplicationGroupsLoaded,
     loadApplicationGroups,
     toggleGroup,

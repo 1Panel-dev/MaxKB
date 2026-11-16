@@ -35,9 +35,10 @@ onMounted(() => {
       <MkSearchInput v-model="applicationKeyword" class="w-full! md:w-50!" placeholder="搜索" @change="loadApplications" />
     </header>
 
-    <el-scrollbar v-loading="isApplicationsLoading" class="min-h-0 flex-1 p-4 pt-0!">
+    <el-scrollbar class="min-h-0 flex-1 p-4 pt-0!">
+      <el-skeleton v-if="isApplicationsLoading" animated />
       <MkEmpty
-        v-if="!isApplicationsLoading && applications.length === 0"
+        v-else-if="applications.length === 0"
         :type="applicationKeyword ? 'search' : 'default'"
         :description="applicationKeyword ? '没有匹配的智能体' : '暂无可用智能体'"
         class="mt-20"

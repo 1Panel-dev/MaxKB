@@ -25,10 +25,17 @@ const selectedApplicationId = ref(props.applicationId)
 const keyword = ref('')
 const conversations = ref<PortalConversationSummary[]>([])
 const scrollRef = ref<{ reset: () => Promise<void> }>()
+const initialLoading = ref(true)
+let requestVersion = 0
 
 // 搜索与切换智能体从第一页重新加载，分页由共享滚动组件维护。
-const loadConversations = ({ currentPage, pageSize }: { currentPage: number; pageSize: number }) =>
-  ConversationApi.getPortalConversationPage(selectedApplicationId.value, currentPage, pageSize, keyword.value.trim())
+const loadConversations = ({ currentPage, pageSize }: { currentPage: number; pageSize: number }) => {
+  const currentRequestVersion = ++requestVersion
+  initialLoading.value = currentPage === 1
+  return ConversationApi.getPortalConversationPage(selectedApplicationId.value, currentPage, pageSize, keyword.value.trim()).finally(() => {
+    if (currentRequestVersion === requestVersion) initialLoading.value = false
+  })
+}
 const handleSearch = () => scrollRef.value?.reset()
 const handleApplicationChange = () => {
   keyword.value = ''
@@ -76,7 +83,9 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
       <!-- 按历史对话摘要搜索 -->
       <MkSearchInput v-model="keyword" class="min-w-0 flex-1" placeholder="搜索" @change="handleSearch" />
     </div>
-    <MkInfiniteScroll ref="scrollRef" v-model="conversations" :load="loadConversations">
+    <el-skeleton v-if="initialLoading" animated />
+    <!-- 保持滚动组件挂载，由它发起首屏和重置请求。 -->
+    <MkInfiniteScroll v-show="!initialLoading" ref="scrollRef" v-model="conversations" :load="loadConversations">
       <div class="space-y-1">
         <!-- 打开历史对话 -->
         <MkListItem

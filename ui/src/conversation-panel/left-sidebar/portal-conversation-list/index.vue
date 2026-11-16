@@ -25,7 +25,7 @@ const portalLogo = computed(() => authStore.authProfile?.logo)
 const msgs = useMessageListStore()
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
 const portalList = usePortalConversationListStore()
-const { applicationGroups, currentApplicationId, isApplicationListActive, toggleGroup } = portalList
+const { applicationGroups, initialLoading, currentApplicationId, isApplicationListActive, toggleGroup } = portalList
 const { conversations, currentChatId, selectConversation, deleteChat, newConversation, switchShared, toggleLeftSide } = useConversationListStore()
 
 const historyApplicationId = ref('')
@@ -135,8 +135,9 @@ const handleClearConversations = () => {
     </div>
 
     <!-- 历史列表独立滚动，门户入口和新建入口保持固定。 -->
-    <el-scrollbar :inert="clearing" class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
-      <div v-if="historyApplicationGroups.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
+    <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
+      <el-skeleton v-if="initialLoading" animated />
+      <div v-else-if="historyApplicationGroups.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
       <div v-else class="space-y-1">
         <template v-for="group in historyApplicationGroups" :key="group.id">
           <MkCollapse
