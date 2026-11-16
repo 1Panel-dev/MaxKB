@@ -219,7 +219,7 @@ onMounted(() => loadChatUserGroups())
             </div>
           </div>
           <!-- 保存对话用户授权 -->
-          <el-button v-if="applicationchatUserPermission('chatUserEdit')" type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
+          <el-button v-if="!currentGroup.is_auth && applicationchatUserPermission('chatUserEdit')" type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
         </div>
 
         <MkTable
