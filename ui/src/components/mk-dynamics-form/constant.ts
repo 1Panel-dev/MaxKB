@@ -1,54 +1,22 @@
-export const dynamicFormTypeOptions = [
-  { label: '文本框', value: 'TextInput' },
-  { label: '多行文本框', value: 'TextareaInput' },
-  { label: 'JSON 文本框', value: 'JsonInput' },
-  { label: '密码框', value: 'PasswordInput' },
-  { label: '单选框', value: 'SingleSelect' },
-  { label: '多选框', value: 'MultiSelect' },
-  { label: '选项卡', value: 'RadioCard' },
-  { label: '单行选项卡', value: 'RadioRow' },
-  { label: '单行多选卡', value: 'MultiRow' },
-  { label: '滑块', value: 'Slider' },
-  { label: '开关', value: 'SwitchInput' },
-  { label: '日期', value: 'DatePicker' },
-  { label: '文件上传', value: 'UploadInput' },
-  { label: '模型', value: 'Model' },
-  { label: '知识库', value: 'Knowledge' },
-  { label: '树形选择器', value: 'TreeSelect' },
+/** 动态表单控件类型的有序定义；展示时翻译 labelKey，不写入字段配置。 */
+export const DYNAMIC_FORM_TYPES = [
+  { value: 'TextInput', labelKey: 'dynamicForm.types.textInput' },
+  { value: 'TextareaInput', labelKey: 'dynamicForm.types.textareaInput' },
+  { value: 'JsonInput', labelKey: 'dynamicForm.types.jsonInput' },
+  { value: 'PasswordInput', labelKey: 'dynamicForm.types.passwordInput' },
+  { value: 'SingleSelect', labelKey: 'dynamicForm.types.singleSelect' },
+  { value: 'MultiSelect', labelKey: 'dynamicForm.types.multiSelect' },
+  { value: 'RadioCard', labelKey: 'dynamicForm.types.radioCard' },
+  { value: 'RadioRow', labelKey: 'dynamicForm.types.radioRow' },
+  { value: 'MultiRow', labelKey: 'dynamicForm.types.multiRow' },
+  { value: 'Slider', labelKey: 'dynamicForm.types.slider' },
+  { value: 'SwitchInput', labelKey: 'dynamicForm.types.switchInput' },
+  { value: 'DatePicker', labelKey: 'dynamicForm.types.datePicker' },
+  { value: 'UploadInput', labelKey: 'dynamicForm.types.uploadInput' },
+  { value: 'Model', labelKey: 'dynamicForm.types.model' },
+  { value: 'Knowledge', labelKey: 'dynamicForm.types.knowledge' },
+  { value: 'TreeSelect', labelKey: 'dynamicForm.types.treeSelect' },
 ] as const
 
-export type DynamicFormInputType = (typeof dynamicFormTypeOptions)[number]['value']
-export type DynamicFormTypeOption = (typeof dynamicFormTypeOptions)[number]
-
-// 引用变量为选择类字段提供选项时的格式说明。
-export const referenceOptionsHelp = `变量的值必须符合:
-[
-  {
-    "label": "xx",
-    "value": "xx",
-    "default": false
-  }
-]
-label: 标签 必填
-value: 值 必填
-default: 是否为默认值`
-
-/** 控件类型的展示翻译 key；不写入字段配置。 */
-export const DYNAMIC_FORM_TYPE_MESSAGE_KEYS: Record<string, string> = {
-  TextInput: 'dynamicForm.types.textInput',
-  TextareaInput: 'dynamicForm.types.textareaInput',
-  JsonInput: 'dynamicForm.types.jsonInput',
-  PasswordInput: 'dynamicForm.types.passwordInput',
-  SingleSelect: 'dynamicForm.types.singleSelect',
-  MultiSelect: 'dynamicForm.types.multiSelect',
-  RadioCard: 'dynamicForm.types.radioCard',
-  RadioRow: 'dynamicForm.types.radioRow',
-  MultiRow: 'dynamicForm.types.multiRow',
-  Slider: 'dynamicForm.types.slider',
-  SwitchInput: 'dynamicForm.types.switchInput',
-  DatePicker: 'dynamicForm.types.datePicker',
-  UploadInput: 'dynamicForm.types.uploadInput',
-  Model: 'dynamicForm.types.model',
-  Knowledge: 'dynamicForm.types.knowledge',
-  TreeSelect: 'dynamicForm.types.treeSelect',
-}
+export type DynamicFormInputType = (typeof DYNAMIC_FORM_TYPES)[number]['value']
+export type DynamicFormTypeOption = (typeof DYNAMIC_FORM_TYPES)[number]

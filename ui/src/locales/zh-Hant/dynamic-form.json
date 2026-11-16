@@ -51,7 +51,6 @@
       "requiredMessage": "請輸入預設值",
       "selectRequiredMessage": "請選擇預設值",
       "lengthMessage": "長度應為 {min} 到 {max} 個字元",
-      "propertyRequiredMessage": "此屬性為必填",
       "datePlaceholder": "選擇日期"
     },
     "optionLabel": {
@@ -114,6 +113,8 @@
       "placeholder": "請選擇變量"
     },
     "comparisonValue": {
+      "placeholder": "請輸入比較值",
+      "selectPlaceholder": "請選擇比較值",
       "requiredMessage": "請輸入比較值"
     },
     "fileTypes": {

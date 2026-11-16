@@ -51,7 +51,6 @@
       "requiredMessage": "请输入默认值",
       "selectRequiredMessage": "请选择默认值",
       "lengthMessage": "长度在 {min} 到 {max} 个字符",
-      "propertyRequiredMessage": "为必填属性",
       "datePlaceholder": "选择日期"
     },
     "optionLabel": {
@@ -114,6 +113,8 @@
       "placeholder": "请选择变量"
     },
     "comparisonValue": {
+      "placeholder": "请输入比较值",
+      "selectPlaceholder": "请选择比较值",
       "requiredMessage": "请输入比较值"
     },
     "fileTypes": {

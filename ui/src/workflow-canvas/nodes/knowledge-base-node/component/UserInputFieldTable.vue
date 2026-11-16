@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeFieldConfig } from '../types'
 import type { FormField } from '@/components/mk-dynamics-form'
-import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
+import { DYNAMIC_FORM_TYPES } from '@/components/mk-dynamics-form'
 import TitleSettingDialog from './TitleSettingDialog.vue'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const fields = defineModel<FormField[]>({ required: true })
 const config = defineModel<KnowledgeFieldConfig>('config', { required: true })
 const fieldDialogRef = useTemplateRef<InstanceType<typeof UserFieldFormDialog>>('fieldDialogRef')
 const titleDialogRef = useTemplateRef<InstanceType<typeof TitleSettingDialog>>('titleDialogRef')
+
+function getTypeLabel(inputType: string) {
+  const definition = DYNAMIC_FORM_TYPES.find(({ value }) => value === inputType)
+  return definition ? t(definition.labelKey) : inputType
+}
 
 // 表格只维护列表和重名检查，节点入口统一同步变量。
 function handleOpenField(field?: FormField, index?: number) {
@@ -83,11 +91,9 @@ function saveTitle(data: KnowledgeFieldConfig) {
         </template>
       </el-table-column>
       <el-table-column prop="input_type" label="组件类型" width="95">
-        <template #default="{ row }"
-          ><el-tag type="info" size="small">{{
-            dynamicFormTypeOptions.find(({ value }) => value === row.input_type)?.label ?? row.input_type
-          }}</el-tag></template
-        >
+        <template #default="{ row }">
+          <el-tag type="info" size="small">{{ getTypeLabel(row.input_type) }}</el-tag>
+        </template>
       </el-table-column>
       <el-table-column label="默认值" min-width="80">
         <template #default="{ row }">

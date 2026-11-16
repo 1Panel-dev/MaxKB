@@ -60,7 +60,7 @@ function handleFieldChange() {
       v-if="['SingleSelect', 'RadioCard', 'RadioRow'].includes(condition._fieldType || '')"
       v-model="condition.value"
       clearable
-      :placeholder="t('dynamicForm.fields.optionValue.placeholder')"
+      :placeholder="t('dynamicForm.fields.comparisonValue.selectPlaceholder')"
       @change="condition._valueError = ''"
     >
       <el-option v-for="option in condition._options || []" :key="option.value" :label="`${option.label} (${option.value})`" :value="option.value" />
@@ -71,7 +71,7 @@ function handleFieldChange() {
       v-model="condition.value"
       clearable
       multiple
-      :placeholder="t('dynamicForm.fields.optionValue.placeholder')"
+      :placeholder="t('dynamicForm.fields.comparisonValue.selectPlaceholder')"
       @change="condition._valueError = ''"
     >
       <el-option v-for="option in condition._options || []" :key="option.value" :label="`${option.label} (${option.value})`" :value="option.value" />
@@ -84,10 +84,15 @@ function handleFieldChange() {
       :multiple="condition._treeMultiple"
       :render-after-expand="false"
       clearable
-      :placeholder="t('dynamicForm.fields.optionValue.placeholder')"
+      :placeholder="t('dynamicForm.fields.comparisonValue.selectPlaceholder')"
       @change="condition._valueError = ''"
     />
 
-    <el-input v-else v-model="condition.value" :placeholder="t('dynamicForm.fields.optionValue.placeholder')" @input="condition._valueError = ''" />
+    <el-input
+      v-else
+      v-model="condition.value"
+      :placeholder="t('dynamicForm.fields.comparisonValue.placeholder')"
+      @input="condition._valueError = ''"
+    />
   </el-form-item>
 </template>

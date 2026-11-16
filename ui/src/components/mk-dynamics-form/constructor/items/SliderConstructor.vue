@@ -113,7 +113,7 @@ onBeforeMount(() => {
     :label="t('dynamicForm.fields.defaultValue.label')"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.fields.defaultValue.propertyRequiredMessage') }] : []"
+    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.fields.defaultValue.requiredMessage') }] : []"
   >
     <MkSlider
       v-model="formValue.default_value"

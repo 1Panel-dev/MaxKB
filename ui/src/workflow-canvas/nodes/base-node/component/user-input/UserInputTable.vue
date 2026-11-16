@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApiInputField, UserInputSetting } from '../../types'
 import type { FormField } from '@/components/mk-dynamics-form'
-import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
+import { DYNAMIC_FORM_TYPES } from '@/components/mk-dynamics-form'
 import UserInputFieldDialog from './UserInputFieldDialog.vue'
 import UserInputSettingDialog from './UserInputSettingDialog.vue'
 import { exposedInputTypes } from './constant'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ apiFields: ApiInputField[]; nodeId: string }>()
 const inputFields = defineModel<FormField[]>({ required: true })
@@ -23,6 +26,11 @@ function formatDefaultValue(field: FormField) {
 
 function openFieldDialog(field?: FormField, index?: number) {
   fieldDialogRef.value?.open(field, index)
+}
+
+function getTypeLabel(inputType: string) {
+  const definition = DYNAMIC_FORM_TYPES.find(({ value }) => value === inputType)
+  return definition ? t(definition.labelKey) : inputType
 }
 
 // 用户输入与接口传参共用参数命名空间。
@@ -78,23 +86,21 @@ function removeExposedField(field: string) {
       </el-table-column>
       <el-table-column label="显示名称">
         <template #default="{ row }">
-          <span class="block truncate" :title="row.label.label" v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
-            row.label.label
-          }}</span>
+          <span class="block truncate" :title="row.label.label" v-if="row.label && row.label.input_type === 'TooltipLabel'">
+            {{ row.label.label }}
+          </span>
           <span class="block truncate" :title="row.label" v-else>{{ row.label }}</span>
         </template>
       </el-table-column>
       <el-table-column label="组件类型" width="110">
-        <template #default="{ row }"
-          ><el-tag size="small" type="info">{{
-            dynamicFormTypeOptions.find(({ value }) => value === row.input_type)?.label ?? row.input_type
-          }}</el-tag></template
-        >
+        <template #default="{ row }">
+          <el-tag size="small" type="info">{{ getTypeLabel(row.input_type) }}</el-tag>
+        </template>
       </el-table-column>
       <el-table-column label="默认值">
         <template #default="{ row }">
-          <span :title="formatDefaultValue(row)" class="block truncate">{{ formatDefaultValue(row) }}</span></template
-        >
+          <span :title="formatDefaultValue(row)" class="block truncate">{{ formatDefaultValue(row) }}</span>
+        </template>
       </el-table-column>
       <el-table-column label="必填" width="55">
         <template #default="{ row }"><el-switch :model-value="Boolean(row.required)" disabled size="small" /></template>

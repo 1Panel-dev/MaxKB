@@ -109,6 +109,7 @@ MkResourceCard、MkComplexSearch、MkEmpty 的默认创建信息、占位和空�
 通用输入校验复用 common.validation，占位与校验分别定义 key。模型类型复用 model.fields.type；
 模型参数表的参数、显示名称、组件类型和默认值复用 dynamicForm.fields。控件类型使用 types，
 条件比较方式使用 operators，上传与树形配置的专属文案分别使用 upload、tree；仍遵守四层上限。
-控件类型协议值与比较符枚举不翻译，展示时映射翻译 key。
+控件类型定义统一来自 DYNAMIC_FORM_TYPES，由调用方翻译 labelKey；下拉选项响应式生成，
+表格按 value 查找显示文案。控件类型协议值与比较符枚举不翻译，不把当前语言保存到配置。
 用户输入、接口字段说明、选项标签及已有序列化规则原样保留；配置器 getData() 继续输出原协议，
 不将当前语言写入配置。其他共享组件的内部文案和 Demo 按其各自批次处理。

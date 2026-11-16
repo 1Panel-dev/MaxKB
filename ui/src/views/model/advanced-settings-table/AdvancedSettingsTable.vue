@@ -3,7 +3,7 @@ import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { DynamicFormField } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
-import { DYNAMIC_FORM_TYPE_MESSAGE_KEYS, dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
+import { DYNAMIC_FORM_TYPES } from '@/components/mk-dynamics-form'
 import ModelParamDialog from './ModelParamDialog.vue'
 import { MsgError } from '@/utils/message'
 
@@ -22,8 +22,8 @@ function handleOpenParamDialog(field?: DynamicFormField, index?: number) {
 }
 
 function getTypeLabel(inputType: string) {
-  const key = DYNAMIC_FORM_TYPE_MESSAGE_KEYS[inputType]
-  return key ? t(key) : (dynamicFormTypeOptions.find((option) => option.value === inputType)?.label ?? inputType)
+  const definition = DYNAMIC_FORM_TYPES.find(({ value }) => value === inputType)
+  return definition ? t(definition.labelKey) : inputType
 }
 
 function handleSubmitParam(field: FormField) {
