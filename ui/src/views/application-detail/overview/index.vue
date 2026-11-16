@@ -164,7 +164,7 @@ onMounted(() => {
                     <MkIcon name="icon_copy_outlined" />
                   </el-button>
                   <!-- 重置访问链接 -->
-                  <el-button text :loading="loading" @click="handleResetAccessToken">
+                  <el-button v-if="applicationOverviewPermission('overviewPublic')" text :loading="loading" @click="handleResetAccessToken">
                     <MkIcon name="icon_refresh_outlined" />
                   </el-button>
                 </div>
