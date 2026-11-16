@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
 import { computed, onMounted, watch } from 'vue'
+
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -28,11 +31,15 @@ const getData = () => {
     props_info: {
       rules: formValue.value.required
         ? [
-            { whitespace: true, required: true, message: `请输入 ${formValue.value.label}` },
+            { whitespace: true, required: true, message: t('common.form.inputFieldSpaced', { fieldName: formValue.value.label }) },
             {
               min: formValue.value.minlength,
               max: formValue.value.maxlength,
-              message: `${formValue.value.label}长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`,
+              message: t('dynamicForm.validation.fieldLengthRange', {
+                fieldName: formValue.value.label,
+                min: formValue.value.minlength,
+                max: formValue.value.maxlength,
+              }),
               trigger: 'blur',
             },
           ]
@@ -40,7 +47,11 @@ const getData = () => {
             {
               min: formValue.value.minlength,
               max: formValue.value.maxlength,
-              message: `${formValue.value.label}长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`,
+              message: t('dynamicForm.validation.fieldLengthRange', {
+                fieldName: formValue.value.label,
+                min: formValue.value.minlength,
+                max: formValue.value.maxlength,
+              }),
               trigger: 'blur',
             },
           ],
@@ -58,7 +69,7 @@ const rules = computed(() => [
   {
     min: formValue.value.minlength,
     max: formValue.value.maxlength,
-    message: `长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`,
+    message: t('dynamicForm.validation.lengthRange', { min: formValue.value.minlength, max: formValue.value.maxlength }),
     trigger: 'blur',
   },
 ])
@@ -75,13 +86,21 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="mk-required mb-2">文本长度</div>
+  <div class="mk-required mb-2">{{ t('dynamicForm.text.length') }}</div>
   <div class="flex w-full items-start gap-2">
-    <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '请输入最小长度', trigger: 'change' }]" prop="minlength">
+    <el-form-item
+      class="min-w-0 flex-1"
+      :rules="[{ required: true, message: t('dynamicForm.text.minLengthRequired'), trigger: 'change' }]"
+      prop="minlength"
+    >
       <el-input-number v-model="formValue.minlength" :min="1" :step="1" controls-position="right" align="left" step-strictly />
     </el-form-item>
     <span class="flex-center shrink-0 h-8">-</span>
-    <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '请输入最大长度', trigger: 'change' }]" prop="maxlength">
+    <el-form-item
+      class="min-w-0 flex-1"
+      :rules="[{ required: true, message: t('dynamicForm.text.maxLengthRequired'), trigger: 'change' }]"
+      prop="maxlength"
+    >
       <el-input-number
         v-model="formValue.maxlength"
         :min="formValue.minlength > formValue.maxlength ? formValue.minlength : 1"
@@ -97,19 +116,23 @@ onMounted(() => {
     class="mk-hide-asterisk"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ whitespace: true, required: true, message: '请输入默认值' }, ...rules] : rules"
+    :rules="
+      formValue.required
+        ? [{ whitespace: true, required: true, message: t('common.form.inputField', { fieldName: t('dynamicForm.fields.defaultValue') }) }, ...rules]
+        : rules
+    "
   >
     <template #label>
       <div class="flex-between">
-        <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
-        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+        <span :class="formValue.required ? 'mk-required' : ''">{{ t('dynamicForm.fields.defaultValue') }}</span>
+        <el-checkbox v-model="formValue.show_default_value" :label="t('dynamicForm.defaultValue.show')" />
       </div>
     </template>
     <el-input
       v-model="formValue.default_value"
       :maxlength="formValue.maxlength"
       :minlength="formValue.minlength"
-      placeholder="请输入默认值"
+      :placeholder="t('common.form.inputField', { fieldName: t('dynamicForm.fields.defaultValue') })"
       show-word-limit
       :rows="3"
       type="textarea"

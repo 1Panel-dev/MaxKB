@@ -1,14 +1,17 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n({ useScope: 'global' })
+
 defineOptions({ name: 'MkSearchInput', inheritAttrs: false })
 
-const props = withDefaults(defineProps<{ placeholder?: string }>(), { placeholder: '搜索' })
+const props = defineProps<{ placeholder?: string }>()
 const searchKeyword = defineModel<string | number>({ default: '' })
 
 defineSlots<{ append?(): unknown; prefix?(): unknown; prepend?(): unknown; suffix?(): unknown }>()
 </script>
 
 <template>
-  <el-input v-model="searchKeyword" :placeholder="props.placeholder" clearable v-bind="$attrs">
+  <el-input v-model="searchKeyword" :placeholder="props.placeholder ?? t('common.actions.search')" clearable v-bind="$attrs">
     <template #prefix>
       <slot name="prefix">
         <MkIcon name="icon_search-outlined" />

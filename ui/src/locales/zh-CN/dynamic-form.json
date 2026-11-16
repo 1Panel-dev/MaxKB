@@ -1,0 +1,166 @@
+{
+  "validation": {
+    "duplicateParameter": "参数“{parameter}”已存在",
+    "duplicateDisplayName": "显示名称“{displayName}”已存在",
+    "componentTypeRequired": "请选择组件类型",
+    "fieldLengthRange": "{fieldName}长度在 {min} 到 {max} 个字符",
+    "lengthRange": "长度在 {min} 到 {max} 个字符",
+    "requiredProperty": "为必填属性"
+  },
+  "addTitle": "添加参数",
+  "editTitle": "编辑参数",
+  "fields": {
+    "parameter": "参数",
+    "displayName": "显示名称",
+    "componentType": "组件类型",
+    "defaultValue": "默认值",
+    "required": "必填",
+    "dataType": "数据类型",
+    "isRequired": "是否必填",
+    "tooltip": "参数提示说明"
+  },
+  "model": {
+    "placeholder": "请选择模型",
+    "type": "模型类型",
+    "typeRequired": "请选择模型类型",
+    "options": "可选模型",
+    "default": "默认模型"
+  },
+  "types": {
+    "text": "文本框",
+    "textarea": "多行文本框",
+    "json": "JSON 文本框",
+    "password": "密码框",
+    "singleSelect": "单选框",
+    "multiSelect": "多选框",
+    "radioCard": "选项卡",
+    "radioRow": "单行选项卡",
+    "multiRow": "单行多选卡",
+    "slider": "滑块",
+    "switch": "开关",
+    "date": "日期",
+    "upload": "文件上传",
+    "treeSelect": "树形选择器",
+    "knowledge": "知识库",
+    "model": "模型"
+  },
+  "options": {
+    "referenceSchema": "变量的值必须符合:\n[\n  {'{'}\n    \"label\": \"xx\",\n    \"value\": \"xx\",\n    \"default\": false\n  {'}'}\n]\nlabel: 标签 必填\nvalue: 值 必填\ndefault: 是否为默认值",
+    "value": "选项值",
+    "label": "标签",
+    "labelRequired": "请输入标签",
+    "valueRequired": "请输入选项值"
+  },
+  "visibility": {
+    "title": "显隐设置",
+    "referenceRequired": "请选择引用变量",
+    "invalidReference": "引用变量格式错误",
+    "referenceNotFound": "未找到引用变量",
+    "comparisonPlaceholder": "请输入比较值",
+    "showWhen": "显示条件",
+    "hideWhen": "隐藏条件",
+    "conditionPrefix": "符合以下",
+    "conditionSuffix": "条件",
+    "all": "所有",
+    "any": "任意",
+    "operators": {
+      "is_null": "为空",
+      "is_not_null": "不为空",
+      "contain": "包含",
+      "not_contain": "不包含",
+      "eq": "等于",
+      "not_eq": "不等于",
+      "ge": "大于等于",
+      "gt": "大于",
+      "le": "小于等于",
+      "lt": "小于",
+      "len_eq": "长度等于",
+      "len_ge": "长度大于等于",
+      "len_gt": "长度大于",
+      "len_le": "长度小于等于",
+      "len_lt": "长度小于",
+      "is_true": "为真",
+      "is_not_true": "不为真",
+      "start_with": "startWith",
+      "end_with": "endWith",
+      "regex": "正则匹配",
+      "wildcard": "通配符匹配"
+    }
+  },
+  "date": {
+    "year": "年",
+    "month": "月",
+    "datetime": "日期时间",
+    "type": "时间类型",
+    "typeRequired": "请选择时间类型",
+    "format": "格式",
+    "formatRequired": "请选择格式",
+    "unselected": "未选中项",
+    "selectDate": "选择日期"
+  },
+  "defaultValue": {
+    "reference": "引用变量",
+    "referenceInputRequired": "请输入引用变量",
+    "assignmentMethod": "赋值方式",
+    "jsonReferenceHint": "变量的值必须符合: JSON 格式",
+    "variableRequired": "请选择变量",
+    "show": "显示默认值",
+    "selectRequired": "请选择默认值"
+  },
+  "knowledge": {
+    "optionsRequired": "请选择可选知识库",
+    "options": "可选知识库",
+    "default": "默认知识库",
+    "placeholder": "请选择知识库"
+  },
+  "text": {
+    "length": "文本长度",
+    "minLengthRequired": "请输入最小长度",
+    "maxLengthRequired": "请输入最大长度"
+  },
+  "slider": {
+    "zeroStep": "步长不能为 0",
+    "stepRequired": "请输入步长值",
+    "showInput": "是否带输入框",
+    "range": "取值范围",
+    "minRequired": "最小值必填",
+    "maxRequired": "最大值必填",
+    "step": "步长值"
+  },
+  "tree": {
+    "completeOptionRequired": "请至少填写一条完整数据",
+    "parentNotFound": "未找到父节点",
+    "labelAndValueRequired": "标签和选项值不能为空",
+    "deleteConfirm": "确定删除「{label}」吗？",
+    "deleteFailed": "删除失败",
+    "optionsRequired": "请添加选项",
+    "options": "选项",
+    "multiple": "允许多选",
+    "addRoot": "添加一级选项",
+    "addChild": "添加子选项",
+    "labelPlaceholder": "请输入选项标签",
+    "allDocuments": "全部文档"
+  },
+  "upload": {
+    "maxCount": "单次上传最多文件数",
+    "maxSize": "每个文件最大(MB)",
+    "fileTypes": "文件类型",
+    "fileTypesRequired": "文件类型必填",
+    "segmentHint": "文件上传前，建议规范文件的分段标识",
+    "limitsHint": "每次最多上传 {count} 个文件，每个文件不超过 {size} MB",
+    "supportedFormats": "支持格式：{formats}",
+    "duplicateFileName": "文件名重复",
+    "sizeExceeded": "文件大小不能超过 {size}MB",
+    "countExceeded": "最多只能上传 {count} 个文件"
+  },
+  "providers": {
+    "qianfan": "千帆大模型",
+    "zhipu": "智谱 AI",
+    "xfyun": "讯飞星火",
+    "volcengine": "火山引擎",
+    "hunyuan": "腾讯混元",
+    "tencent": "腾讯云",
+    "local": "本地模型",
+    "aliyun": "阿里云百炼"
+  }
+}

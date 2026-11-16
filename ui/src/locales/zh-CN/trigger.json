@@ -1,0 +1,103 @@
+{
+  "execution": {
+    "triggerTask": "触发任务",
+    "input": "触发器入参",
+    "error": "错误信息"
+  },
+  "fields": {
+    "resourceType": "资源类型",
+    "task": "任务",
+    "nextExecutionTime": "下次执行时间"
+  },
+  "types": {
+    "scheduled": {
+      "description": "到设定时间后执行任务"
+    },
+    "event": {
+      "label": "事件触发",
+      "description": "当某个事件发生时执行任务"
+    }
+  },
+  "delete": {
+    "confirm": "确定删除触发器“{name}”吗？",
+    "description": "删除后将停止触发任务，并删除相关执行记录。",
+    "batchConfirm": "是否删除选中的 {count} 个触发器？"
+  },
+  "messages": {
+    "batchEnabled": "批量启用成功",
+    "batchDisabled": "批量禁用成功",
+    "batchDeleted": "批量删除成功"
+  },
+  "form": {
+    "nameRequired": "请输入触发器名称",
+    "tasksRequired": "请至少选择一个执行任务",
+    "tokenRequired": "请生成 Bearer Token",
+    "requestParameterNameRequired": "请填写请求参数名称",
+    "duplicateRequestParameterName": "请求参数名称不能重复",
+    "editTitle": "编辑触发器",
+    "createTitle": "创建触发器",
+    "name": "触发器名称",
+    "eventUrl": "事件 URL",
+    "taskExecution": "任务执行"
+  },
+  "requestParameters": {
+    "nameRequired": "请输入参数名",
+    "duplicateName": "参数名称不能重复",
+    "typeRequired": "请选择参数类型",
+    "addTitle": "添加请求参数",
+    "editTitle": "编辑请求参数",
+    "name": "参数名",
+    "typePlaceholder": "请选择数据类型",
+    "title": "请求参数"
+  },
+  "taskExecution": {
+    "addResource": "添加{resourceType}",
+    "fileTypes": {
+      "audio": "音频",
+      "video": "视频",
+      "other": "其他文件"
+    },
+    "invalidReference": "请选择有效的事件请求参数，或切换为自定义",
+    "reference": "引用"
+  },
+  "schedule": {
+    "daily": "每日/{times}",
+    "weekly": "每周{days}/{times}",
+    "monthly": "每月{days}日/{times}",
+    "interval": "每隔{interval}{unit}",
+    "weekdays": {
+      "sunday": "日",
+      "monday": "一",
+      "tuesday": "二",
+      "wednesday": "三",
+      "thursday": "四",
+      "friday": "五",
+      "saturday": "六"
+    },
+    "cron": "Cron 表达式",
+    "switchToCron": "切换为 Cron 表达式",
+    "switchToPeriod": "切换为周期设置",
+    "cronPlaceholder": "请输入Cron表达式（如：0 0 1 * *）",
+    "scheduledTrigger": "定时触发",
+    "periodRequired": "请选择触发周期",
+    "invalidCron": "请输入有效的Cron 表达式",
+    "period": "触发周期",
+    "options": {
+      "daily": "每日",
+      "weekly": "每周",
+      "monthly": "每月",
+      "interval": "按间隔",
+      "weekdays": {
+        "monday": "周一",
+        "tuesday": "周二",
+        "wednesday": "周三",
+        "thursday": "周四",
+        "friday": "周五",
+        "saturday": "周六",
+        "sunday": "周日"
+      },
+      "dayOfMonth": "{day} 日"
+    }
+  },
+  "title": "触发器"
+}

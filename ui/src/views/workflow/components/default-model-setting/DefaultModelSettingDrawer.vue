@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, provide, ref, watch } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
 import type LogicFlow from '@logicflow/core'
@@ -14,11 +15,13 @@ import { MODEL_TYPE_LABELS } from '@/constants/model'
 
 defineOptions({ name: 'DefaultModelSettingDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const defaultModelTypes = ['LLM', 'TTS', 'STT', 'IMAGE', 'TTI', 'TTV', 'ITV', 'RERANKER'] as const
-const defaultModelTypeLabels: Record<string, string> = {
-  ...MODEL_TYPE_LABELS,
-  LLM: 'AI 模型',
-}
+const defaultModelTypeLabels = computed<Record<string, string>>(() => ({
+  ...Object.fromEntries(Object.entries(MODEL_TYPE_LABELS).map(([type, label]) => [type, t(label)])),
+  LLM: t('workflow.model.label'),
+}))
 
 const props = defineProps<{
   modelValue?: DefaultModelSettingPayload

@@ -1,0 +1,158 @@
+{
+  "apiKey": {
+    "secretNotice": "Store this key securely and do not disclose it.",
+    "acknowledge": "Got it",
+    "expirationRequired": "Please select an expiration time",
+    "futureExpirationRequired": "Please select an expiration time later than now",
+    "editTitle": "Edit API Key",
+    "expiration": "Expiration time",
+    "cors": "Cross-origin settings",
+    "corsPlaceholder": "Enter allowed origins. When enabled, leaving this blank allows all origins.\nEnter one origin per line, for example:\nhttp://127.0.0.1:5678\nhttps://dataease.io",
+    "neverExpires": "Never expires",
+    "validSevenDays": "Valid for 7 days",
+    "validThirtyDays": "Valid for 30 days",
+    "validNinetyDays": "Valid for 90 days",
+    "validHalfYear": "Valid for 180 days",
+    "expiresInMinutes": "Expires in {minutes} minutes",
+    "expiresInHours": "Expires in {hours} hours",
+    "expiresInDays": "Expires in {days} days",
+    "deleteConfirm": "Delete this API Key?",
+    "deleteWarning": "Services using this API Key will lose access after deletion. Proceed with caution!",
+    "corsEnabled": "Enabled",
+    "corsDisabled": "Not enabled"
+  },
+  "folder": {
+    "nameRequired": "Please enter a folder name",
+    "sort": {
+      "createdAscending": "Creation time: oldest first",
+      "createdDescending": "Creation time: newest first",
+      "nameAscending": "Name: ascending",
+      "nameDescending": "Name: descending",
+      "dragOrder": "Drag to reorder"
+    },
+    "createChild": "Create subfolder",
+    "editTitle": "Edit folder",
+    "deleteConfirm": "Delete folder: {name}?",
+    "deleteWarning": "Resources in this folder will be deleted. Proceed with caution.",
+    "allResources": "All {resourceName}",
+    "sharedResources": "Shared {resourceName}"
+  },
+  "generateContent": {
+    "failed": "Generation failed",
+    "regenerate": "Regenerate"
+  },
+  "generateQuestions": {
+    "promptDescription": "The {'{'}data{'}'} placeholder in the prompt is replaced with the paragraph content and sent to the AI model.\nThe AI model generates related questions from the paragraph. Put each generated question in <question></question> tags so the system can link it automatically.\nResults depend on the selected model and prompt. Adjust them as needed for the best results.",
+    "prompt": "Prompt",
+    "promptRequired": "Please enter a prompt"
+  },
+  "relatedResources": {
+    "dependencies": "Dependencies",
+    "dependents": "Dependents",
+    "title": "Related resources"
+  },
+  "resourceAuthorization": {
+    "effectiveResources": "Applicable resources",
+    "currentResourceOnly": "Current resource only",
+    "includeChildFolders": "Include all subfolders",
+    "memberCount": "Members",
+    "permissions": {
+      "none": {
+        "label": "No access"
+      },
+      "view": {
+        "label": "View",
+        "description": "Can only view and use this resource"
+      },
+      "manage": {
+        "label": "Manage",
+        "description": "Can edit and delete this resource"
+      },
+      "role": {
+        "label": "By user role",
+        "description": "Grant access to this resource based on the permissions in the user's roles"
+      }
+    }
+  },
+  "resourceSelection": {
+    "refresh": "Refresh",
+    "selectedCount": "Selected {count}",
+    "embeddingModelMismatch": "Selected knowledge bases must use the same embedding model"
+  },
+  "modelSelect": {
+    "placeholder": "Please select a model",
+    "unavailable": "Unavailable"
+  },
+  "codeEditor": {
+    "invalidJson": "Please enter valid JSON"
+  },
+  "collapse": {
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
+  "empty": {
+    "noResults": "No related content found",
+    "noMatches": "No matching results"
+  },
+  "infiniteScroll": {
+    "noMore": "No more results"
+  },
+  "mediaPreview": {
+    "audioError": "Unable to play. Check the audio format or file URL.",
+    "videoError": "Unable to play. Check the video format or file URL."
+  },
+  "resourceCard": {
+    "createdAt": "Created on"
+  },
+  "table": {
+    "quickCreate": "Quick create",
+    "resetFilter": "Reset",
+    "all": "All"
+  },
+  "dateRange": {
+    "lastSevenDays": "Last 7 days",
+    "lastThirtyDays": "Last 30 days",
+    "lastNinetyDays": "Last 90 days",
+    "lastHalfYear": "Last 6 months",
+    "startDate": "Start date",
+    "endDate": "End date"
+  },
+  "upload": {
+    "reupload": "Upload again",
+    "deleteFile": "Delete file",
+    "deleteImage": "Delete image",
+    "multipleDragHint": "Drag files here or",
+    "selectFile": "Select file",
+    "sizeExceeded": "File too large",
+    "unsupportedFormat": "Unsupported file format",
+    "emptyFile": "File cannot be empty",
+    "networkFailed": "Network error",
+    "maxFiles": "Upload up to {count} files at a time",
+    "selectFolder": "Select folder",
+    "completed": "Completed {count}/{total}",
+    "uploading": "Uploading",
+    "failedCount": "{count} failed",
+    "retry": "Retry",
+    "allSucceeded": "All succeeded",
+    "singleDragHint": "Drag a file here or",
+    "replaceFile": "Replace file",
+    "selectFileToUpload": "Select a file to upload",
+    "uploadInProgress": "Files are uploading. Please wait.",
+    "noUploadedFiles": "No files were uploaded successfully. Please upload again."
+  },
+  "avatar": {
+    "unsupportedFormat": "Only JPG, PNG, and GIF images are supported",
+    "sizeExceeded": "File size cannot exceed 10MB",
+    "title": "Logo settings",
+    "defaultLogo": "Default logo",
+    "customUpload": "Upload custom logo",
+    "uploadHint": "Supports JPG, PNG, and GIF, up to 10MB"
+  },
+  "tagsEdit": {
+    "duplicateSuffix": "File extension already exists",
+    "addSuffix": "Add file extension"
+  },
+  "batchSelection": {
+    "selectedCount": "Selected {count}/{total}"
+  }
+}

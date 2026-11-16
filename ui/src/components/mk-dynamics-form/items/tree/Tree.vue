@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, inject, nextTick, ref, toRaw, useAttrs, useTemplateRef, watch } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
 import { formItemContextKey, type TableInstance, type TreeNode } from 'element-plus'
@@ -6,6 +7,8 @@ import type { Dict } from '@/api/types'
 import { post } from '@/api/admin/core/request'
 import { getFileIconUrl } from '@/utils/icon'
 import type { DynamicFormTreeLoader, DynamicFormValue, FormField } from '../../type'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'DynamicFormTree', inheritAttrs: false })
 
@@ -150,7 +153,7 @@ watch(() => props.modelValue, restoreSelection, { deep: true })
   >
     <!-- 选择文档或文件夹，全选由表格维护 -->
     <el-table-column type="selection" width="40" reserve-selection :selectable="(row: DocumentRow) => !row.disabled && !row.is_exist" />
-    <el-table-column class-name="expand-name-column" label="全部文档" :prop="textField">
+    <el-table-column class-name="expand-name-column" :label="t('dynamicForm.tree.allDocuments')" :prop="textField">
       <template #default="{ row }: { row: DocumentRow }">
         <div class="flex-align-center min-w-0 flex-1 gap-2">
           <img v-if="row.icon" :src="row.icon" alt="" class="w-4.5 shrink-0" />

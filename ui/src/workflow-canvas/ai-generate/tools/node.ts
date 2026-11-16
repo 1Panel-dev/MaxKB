@@ -250,11 +250,16 @@ export const CONDITION_SCHEMA = {
     compare: {
       type: 'string',
       enum: compareList.map((item) => item.value),
-      description: compareList.map((item) => `${item.value}=${item.label}`).join('，'),
+      description: '',
     },
     value: { type: 'string', description: '比较值；为空/不为空/为真/不为真无需比较值' },
   },
   required: ['field', 'compare'],
+}
+
+/** 发起 AI 生成前，用当前界面的翻译更新运算符说明。 TODO 这个地方因为是ts 里边的 无法引用locale 暂时放在这里 xinxinwu */
+export function updateConditionSchema(t: (label: string) => string) {
+  CONDITION_SCHEMA.properties.compare.description = compareList.map((item) => `${item.value}=${t(item.label)}`).join('，')
 }
 
 export interface ConditionItem {
@@ -303,7 +308,10 @@ export function useNodeAgent(context: NodeAgentContext, config: { prompt: string
     : ''
   // 带上节点现有配置：续聊修改时在现状上改，而不是不知情地整体重写
   const currentText = JSON.stringify(node?.properties.node_data ?? {})
-  const current = currentText.length > 2 ? `\n当前配置（node_data；修改已有节点时在此基础上只改要求涉及的部分，其余保持）：\n${currentText.length > 8000 ? `${currentText.slice(0, 8000)}…` : currentText}` : ''
+  const current =
+    currentText.length > 2
+      ? `\n当前配置（node_data；修改已有节点时在此基础上只改要求涉及的部分，其余保持）：\n${currentText.length > 8000 ? `${currentText.slice(0, 8000)}…` : currentText}`
+      : ''
   return useAgentConfig(
     {
       prompt: `${NODE_GUIDE}\n\n${config.prompt}\n\n本节点：id=${context.nodeId}，名称=${node ? nodeNameOf(node) : context.nodeId}\n${describeArgs(context)}${expected}${downstream}${current}`,

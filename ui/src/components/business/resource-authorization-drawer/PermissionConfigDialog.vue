@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
 import type { ResourcePermission } from '@/api/types'
 
 import type { ResourcePermissionOption } from './types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   options: ResourcePermissionOption[]
@@ -43,26 +46,30 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="scopeOnly ? '生效资源' : '配置权限'" @closed="resetData">
+  <MkDialog
+    v-model="visible"
+    :title="scopeOnly ? t('components.resourceAuthorization.effectiveResources') : t('system.identity.resourceAuthorization.configure')"
+    @closed="resetData"
+  >
     <el-radio-group v-if="!scopeOnly" v-model="permission" class="mk-radio-group-vertical" :disabled="loading">
       <el-radio v-for="option in options" :key="option.value" :value="option.value">
-        <p>{{ option.label }}</p>
-        <p v-if="option.description" class="mt-1 text-N500">{{ option.description }}</p>
+        <p>{{ t(option.label) }}</p>
+        <p v-if="option.description" class="mt-1 text-N500">{{ t(option.description) }}</p>
       </el-radio>
     </el-radio-group>
     <div v-if="isFolder">
       <div v-if="!scopeOnly">
         <el-divider class="my-4!" />
-        <h6 class="mb-2">生效资源</h6>
+        <h6 class="mb-2">{{ t('components.resourceAuthorization.effectiveResources') }}</h6>
       </div>
       <el-radio-group v-model="includeChildren" class="mk-radio-group-vertical" :disabled="loading">
-        <el-radio :value="false">仅当前资源</el-radio>
-        <el-radio :value="true" :disabled="!canIncludeChildren">包含所有子文件夹</el-radio>
+        <el-radio :value="false">{{ t('components.resourceAuthorization.currentResourceOnly') }}</el-radio>
+        <el-radio :value="true" :disabled="!canIncludeChildren">{{ t('components.resourceAuthorization.includeChildFolders') }}</el-radio>
       </el-radio-group>
     </div>
     <template #footer>
-      <el-button plain :disabled="loading" @click="close">取消</el-button>
-      <el-button type="primary" :loading="loading" :disabled="!permission" @click="handleSubmit">确认</el-button>
+      <el-button plain :disabled="loading" @click="close">{{ t('common.actions.cancel') }}</el-button>
+      <el-button type="primary" :loading="loading" :disabled="!permission" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

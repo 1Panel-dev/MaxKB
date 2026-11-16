@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
 import type { OptionItem } from '@/api/types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'MkComplexSearch' })
 
@@ -69,7 +72,7 @@ function handleChange() {
       clearable
       :loading="remoteLoading"
       :multiple="activeField.multiple"
-      placeholder="请选择"
+      :placeholder="t('common.form.selectPlaceholder')"
       filterable
       collapse-tags
       collapse-tags-tooltip
@@ -95,7 +98,7 @@ function handleChange() {
       v-model="searchValue"
       class="mk-input-group__content w-50!"
       clearable
-      placeholder="请输入"
+      :placeholder="t('common.form.inputPlaceholder')"
       @change="handleChange"
     />
   </div>

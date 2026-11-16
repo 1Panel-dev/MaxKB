@@ -140,7 +140,7 @@ onMounted(() => loadRanking())
         </template>
       </el-table-column>
 
-      <el-table-column label="对话轮次" min-width="100">
+      <el-table-column label="对话次数" min-width="100">
         <template #default="{ row }">{{ numberFormat(row.chat_record_count) }}</template>
       </el-table-column>
       <el-table-column v-if="activeKind === 'tokens' || activeKind === 'questions'" label="活跃用户" min-width="100">

@@ -1,0 +1,141 @@
+{
+  "members": {
+    "userRequired": "Please select a user",
+    "addTitle": "Add member",
+    "usernameOrName": "Username/Name",
+    "userPlaceholder": "Please select a username or name",
+    "label": "Members",
+    "placeholder": "Please select members"
+  },
+  "groups": {
+    "nameRequired": "Please enter a user group name",
+    "renameTitle": "Rename user group",
+    "createTitle": "Create user group",
+    "name": "User group name",
+    "deleteConfirm": "Delete user group: {name}?",
+    "deleteDescription": "Members will be removed from this group and resource permissions inherited from it will be revoked. Proceed with caution!",
+    "removeUserConfirm": "Remove user: {name}?",
+    "batchRemoveConfirm": "Remove the {count} selected users?",
+    "removeDescription": "Resource permissions inherited from this group will be revoked when members are removed. Proceed with caution.",
+    "label": "User group",
+    "placeholder": "Please select a user group"
+  },
+  "messages": {
+    "batchRemoved": "Members removed successfully"
+  },
+  "users": {
+    "fields": {
+      "name": "Name",
+      "username": "Username",
+      "source": "User source",
+      "email": "Email",
+      "phone": "Phone number"
+    },
+    "sources": {
+      "system": "System user",
+      "localFile": "Local file"
+    },
+    "editTitle": "Edit user",
+    "createTitle": "Create user",
+    "validation": {
+      "usernameRequired": "Please enter a username",
+      "nameRequired": "Please enter a name",
+      "emailRequired": "Please enter an email address",
+      "emailInvalid": "Please enter a valid email address",
+      "phoneInvalid": "Please enter a valid phone number"
+    },
+    "phonePlaceholder": "Please enter a phone number",
+    "defaultPassword": "Default password",
+    "roleSettings": "Role settings",
+    "addRole": "Add role",
+    "batchRole": {
+      "title": "Set roles"
+    },
+    "import": {
+      "title": "Import users",
+      "sourceRequired": "Please select a user source",
+      "fileFormatInvalid": "Only xlsx files are supported",
+      "conflicts": {
+        "username": "Username already exists",
+        "email": "Email already exists",
+        "name": "Name already exists",
+        "other": "{fieldType} conflict"
+      },
+      "newUsersOnly": "Import new users only",
+      "supportedFormats": "Supported format: xlsx",
+      "results": {
+        "success": "Successfully imported {count} users",
+        "skipped": "Successfully imported {count} users; skipped {skippedCount} users",
+        "conflicts": "Successfully imported {count} users; {conflictDetails}",
+        "skippedWithConflicts": "Successfully imported {count} users; skipped {skippedCount} users; {conflictDetails}"
+      }
+    },
+    "deleteConfirm": "Delete user “{name}”?",
+    "deleteDescription": "Deleting this user will not delete their resources (agents, knowledge bases, or models). Proceed with caution.",
+    "batchDeleteConfirm": "Delete the {count} selected users?",
+    "password": {
+      "title": "Change user password",
+      "confirmRequired": "Please confirm the password",
+      "mismatch": "Passwords do not match",
+      "required": "Please enter a new password",
+      "succeeded": "Password changed successfully",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "confirmPlaceholder": "Please enter the new password again"
+    }
+  },
+  "roles": {
+    "label": "Role",
+    "removeMemberConfirm": "Remove member “{name}”?",
+    "batchRemoveConfirm": "Delete the {count} selected members?",
+    "permission": {
+      "module": "Module name",
+      "target": "Target",
+      "title": "Permission configuration"
+    },
+    "nameRequired": "Please enter a role name",
+    "inheritedRoleRequired": "Please select an inherited role",
+    "renameTitle": "Rename role",
+    "createTitle": "Create role",
+    "name": "Role name",
+    "inheritedRole": "Inherited role",
+    "placeholder": "Please select a role",
+    "deleteConfirm": "Delete role: {name}?",
+    "deleteDescription": "All members will be removed from this role after deletion. Proceed with caution.",
+    "systemBadge": "S",
+    "types": {
+      "admin": "System administrator",
+      "workspaceManager": "Workspace administrator",
+      "user": "Standard user"
+    }
+  },
+  "resourceAuthorization": {
+    "permission": "Permission",
+    "configure": "Configure permissions",
+    "operationPermission": "Operation permissions",
+    "resourceTypes": {
+      "application": "Agent",
+      "knowledge": "Knowledge base",
+      "model": "Model",
+      "tool": "Tool"
+    },
+    "byGroup": "By user group",
+    "byUser": "By user",
+    "title": "Resource permissions"
+  },
+  "workspaces": {
+    "label": "Workspace",
+    "placeholder": "Please select a workspace",
+    "defaultName": "Default workspace",
+    "nameRequired": "Please enter a workspace name",
+    "renameTitle": "Rename workspace",
+    "createTitle": "Create workspace",
+    "name": "Workspace name",
+    "deleteConfirm": "Delete {name}?",
+    "deleteDescription": "All members will be removed from this workspace after deletion. Proceed with caution.",
+    "removeMemberConfirm": "Remove member: {name}?",
+    "batchRemoveConfirm": "Remove the members corresponding to the selected records?",
+    "batchRemoveDescription": "Affects {userCount} users across {recordCount} records.",
+    "partialRemoveResult": "Removed {successCount} members; failed to remove {failedCount}"
+  }
+}

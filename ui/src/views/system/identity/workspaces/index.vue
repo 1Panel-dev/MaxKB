@@ -142,7 +142,7 @@ function handleRemoveMember(member: WorkspaceMemberItem) {
   const workspaceId = currentWorkspace.value?.id
   if (!workspaceId) return
 
-  MsgConfirm(`是否移除成员：${member.nick_name}？`)
+  MsgConfirm(`是否移除成员：${member.nick_name}？`, '', { confirmButtonText: '移除' })
     .then(() => {
       workspaceMembersLoading.value = true
       return WorkspaceApi.postRemoveWorkspaceMember(workspaceId, member.user_relation_id).then(() => {
@@ -166,7 +166,7 @@ function handleBatchDelete() {
   const selectedMembers = [...batchSelectedMembers.value]
   const userCount = new Set(selectedMembers.map(({ user_id }) => user_id)).size
   const userRelationIds = [...new Set(selectedMembers.map(({ user_relation_id }) => user_relation_id))]
-  MsgConfirm('是否移除选中记录对应的成员？', `涉及 ${userCount} 位用户，共 ${selectedMembers.length} 条记录。`)
+  MsgConfirm('是否移除选中记录对应的成员？', `涉及 ${userCount} 位用户，共 ${selectedMembers.length} 条记录。`, { confirmButtonText: '移除' })
     .then(() => {
       workspaceMembersLoading.value = true
       return WorkspaceApi.postBatchRemoveWorkspaceMembers(workspaceId, userRelationIds).then(({ success_count, failed_count }) => {

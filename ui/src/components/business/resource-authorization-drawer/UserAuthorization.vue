@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { RESOURCE_PERMISSION } from '@/api/enums'
 import { RESOURCE_PERMISSION_OPTIONS } from '@/constants/resource-authorization'
@@ -8,6 +9,8 @@ import { useStore } from '@/stores'
 import type ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
 import type SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
 import type { ResourcePermissionOption } from './types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   api: typeof ResourceAuthorizationApi | typeof SystemResourceAuthorizationApi
@@ -24,12 +27,17 @@ const canSelectNotAuth = computed(() => props.permissionOptions.some(({ value })
 
 /* 查询与当前页选择 */
 const { auth } = useStore()
-const searchPermissionOptions = computed(() => RESOURCE_PERMISSION_OPTIONS.filter(({ value }) => !auth.isCE || value !== RESOURCE_PERMISSION.ROLE))
+const searchPermissionOptions = computed(() =>
+  RESOURCE_PERMISSION_OPTIONS.filter(({ value }) => !auth.isCE || value !== RESOURCE_PERMISSION.ROLE).map((option) => ({
+    ...option,
+    label: t(option.label),
+  })),
+)
 const searchFields = computed(() => [
-  { label: '姓名', value: 'nick_name' },
-  { label: '用户名', value: 'username' },
-  { label: '权限', value: 'permission', multiple: true, options: searchPermissionOptions.value },
-  ...(auth.isEE || auth.isPE ? [{ label: '角色', value: 'role' }] : []),
+  { label: t('system.identity.users.fields.name'), value: 'nick_name' },
+  { label: t('system.identity.users.fields.username'), value: 'username' },
+  { label: t('system.identity.resourceAuthorization.permission'), value: 'permission', multiple: true, options: searchPermissionOptions.value },
+  ...(auth.isEE || auth.isPE ? [{ label: t('system.identity.roles.label'), value: 'role' }] : []),
 ])
 const loading = ref(false)
 const permissionUsers = ref<ResourceUserPermission[]>([])
@@ -101,7 +109,9 @@ onMounted(() => loadPermissions())
   <div>
     <div class="flex-between mb-4 gap-4">
       <!-- 批量配置权限 -->
-      <el-button type="primary" :disabled="!selectedUsers.length || loading || submitting" @click="handleOpenBatchConfig">配置权限</el-button>
+      <el-button type="primary" :disabled="!selectedUsers.length || loading || submitting" @click="handleOpenBatchConfig">
+        {{ t('system.identity.resourceAuthorization.configure') }}
+      </el-button>
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />
     </div>
     <MkTable
@@ -115,18 +125,18 @@ onMounted(() => loadPermissions())
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="40" />
-      <el-table-column prop="nick_name" label="姓名" min-width="120" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" min-width="120" show-overflow-tooltip />
-      <el-table-column v-if="auth.isEE || auth.isPE" label="角色" width="160">
+      <el-table-column prop="nick_name" :label="t('system.identity.users.fields.name')" min-width="120" show-overflow-tooltip />
+      <el-table-column prop="username" :label="t('system.identity.users.fields.username')" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="auth.isEE || auth.isPE" :label="t('system.identity.roles.label')" width="160">
         <template #default="{ row }">
           <MkTagGroup v-if="row.role_name?.length" :tags="row.role_name" />
           <span v-else>-</span>
         </template>
       </el-table-column>
-      <el-table-column label="权限" min-width="340">
+      <el-table-column :label="t('system.identity.resourceAuthorization.permission')" min-width="340">
         <template #default="{ row }">
           <el-radio-group :model-value="row.permission" :disabled="submitting" @change="handlePermissionChange($event, row)">
-            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ option.label }}</el-radio>
+            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ t(option.label) }}</el-radio>
           </el-radio-group>
         </template>
       </el-table-column>

@@ -1,0 +1,9 @@
+{
+  "authorization": {
+    "title": "Authorize workspaces",
+    "description": "Authorized workspaces can use this resource",
+    "whitelist": "Allowlist",
+    "blacklist": "Blocklist",
+    "selectWorkspace": "Select workspace"
+  }
+}

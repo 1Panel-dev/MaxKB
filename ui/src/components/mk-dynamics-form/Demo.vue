@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, computed, provide } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { Dict } from '@/api/types'
@@ -13,6 +14,8 @@ import {
 import ModelApi from '@/api/admin/workspace/model'
 
 defineOptions({ name: 'MkDynamicsFormDemo' })
+
+const { t } = useI18n({ useScope: 'global' })
 provide('getSelectModelList', ModelApi.getModelListWithShared)
 provide('getModelParamsForm', ModelApi.getModelParamsForm)
 const constructorRef = ref<InstanceType<typeof MkDynamicsFormConstructor>>()
@@ -52,7 +55,7 @@ const getFieldLabel = (row: FormField) => {
 
 const getTypeLabel = (inputType: string) => {
   const item = dynamicFormTypeOptions.find((i) => i.value === inputType)
-  return item ? item.label : inputType
+  return item ? t(item.label) : inputType
 }
 
 const openAddDialog = () => {

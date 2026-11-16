@@ -48,7 +48,7 @@ function handleMemberAdded() {
 
 // 移除成员
 function handleRemoveMember(member: RoleMember) {
-  MsgConfirm(`确定移除成员“${member.nick_name || member.username}”吗？`)
+  MsgConfirm(`确定移除成员“${member.nick_name || member.username}”吗？`, '', { confirmButtonText: '移除' })
     .then(() => {
       loading.value = true
       return RoleApi.deleteRoleMember(props.currentRole.id, member.user_relation_id).then(() => {
@@ -96,7 +96,10 @@ watch(
     <div class="flex-between mb-4">
       <div>
         <!-- 添加成员 -->
-        <el-button type="primary" v-if="perm.system.role.addMember()" @click="handleOpenAddMemberDrawer"> <MkIcon name="icon_add_outlined" />添加成员 </el-button>
+        <el-button type="primary" v-if="perm.system.role.addMember()" @click="handleOpenAddMemberDrawer">
+          <MkIcon name="icon_add_outlined" />
+          添加成员
+        </el-button>
       </div>
 
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />

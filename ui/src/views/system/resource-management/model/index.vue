@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref } from 'vue'
 import SystemModelApi from '@/api/admin/system/resource-management/model'
 import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
@@ -14,6 +15,8 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { EditModelAction, AuthorizeModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
 import perm from '@/permission'
 
+const { t } = useI18n({ useScope: 'global' })
+
 const { auth } = useStore()
 
 /* 模型分页与筛选 */
@@ -28,10 +31,15 @@ const selectedModelType = ref('')
 const selectedProvider = ref('')
 const selectedWorkspaceIds = ref<string[]>([])
 const searchFields = computed(() => [
-  { label: '模型名称', value: 'name' },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('model.form.name.label'), value: 'name' },
+  {
+    label: t('common.fields.creator'),
+    value: 'create_user',
+    options: creatorOptions.value,
+    remoteMethod: loadCreatorOptions,
+  },
 ])
-const modelTypeOptions = Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => ({ value, label }))
+const modelTypeOptions = computed(() => Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => ({ value, label: t(label) })))
 
 function loadCreatorOptions(keyword: string) {
   return SystemCommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
@@ -85,13 +93,14 @@ function getProvider(model: ModelItem): ModelProviderItem {
 /* 删除成功后保留筛选，末页删空时退回上一页。 */
 function handleDeleteModel(model: ModelItem) {
   return MsgConfirm(
-    `确认删除模型：${model.name}？`,
-    model.resource_count ? `该模型已被 ${model.resource_count} 个资源引用，删除后相关资源将无法正常运行，请谨慎操作。` : '',
+    t('model.delete.confirm', { name: model.name }),
+    model.resource_count ? t('system.resourceManagement.delete.modelReferenced', { count: model.resource_count }) : '',
+    { cancelButtonText: t('common.actions.cancel'), confirmButtonText: t('common.actions.delete') },
   )
     .then(() => {
       loading.value = true
       return SystemModelApi.deleteModel(model.id).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleted'))
         if (modelsData.value.length === 1 && pagination.value.currentPage > 1) pagination.value.currentPage -= 1
         return loadModels()
       })
@@ -116,7 +125,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout>
+  <MkViewLayout :title="t('model.title')">
     <template #default="{ Header, title }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -132,7 +141,7 @@ onMounted(() => {
         @sort-change="handleSortChange"
         resizable
       >
-        <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
+        <el-table-column prop="name" :label="t('common.fields.name')" min-width="220" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <span v-if="getProvider(row).icon" class="h-5 w-5 shrink-0" v-html="getProvider(row).icon" />
@@ -140,9 +149,15 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="provider" label="供应商" min-width="160" show-overflow-tooltip>
+        <el-table-column prop="provider" :label="t('system.resourceManagement.fields.provider')" min-width="160" show-overflow-tooltip>
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedProvider" label="供应商" :options="providerOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedProvider"
+              :label="t('system.resourceManagement.fields.provider')"
+              :options="providerOptions"
+              @change="handleFilterChange"
+            />
           </template>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
@@ -151,39 +166,45 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="model_type" label="模型类型" width="140">
+        <el-table-column prop="model_type" :label="t('model.form.type.label')" width="140">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedModelType" label="模型类型" :options="modelTypeOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedModelType"
+              :label="t('model.form.type.label')"
+              :options="modelTypeOptions"
+              @change="handleFilterChange"
+            />
           </template>
-          <template #default="{ row }">{{ MODEL_TYPE_LABELS[row.model_type] ?? row.model_type }}</template>
+          <template #default="{ row }">{{ MODEL_TYPE_LABELS[row.model_type] ? t(MODEL_TYPE_LABELS[row.model_type]!) : row.model_type }}</template>
         </el-table-column>
-        <el-table-column prop="model_name" label="基础模型" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="model_name" :label="t('model.form.baseModel.label')" min-width="180" show-overflow-tooltip />
         <el-table-column v-if="auth.isEE" prop="workspace_name" min-width="160" show-overflow-tooltip>
           <template #header>
             <MkTableFilter
               mode="multiple"
               v-model="selectedWorkspaceIds"
-              label="工作空间"
+              :label="t('system.resourceManagement.fields.workspace')"
               filterable
               :options="workspaceOptions"
               @change="handleFilterChange"
             />
           </template>
         </el-table-column>
-        <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="update_time" label="更新时间" width="180" sortable>
+        <el-table-column prop="nick_name" :label="t('common.fields.creator')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="update_time" :label="t('common.fields.updateTime')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
         </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
+        <el-table-column prop="create_time" :label="t('common.fields.createTime')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column :label="t('common.fields.actions')" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 编辑模型 -->
               <EditModelAction
                 display="button"
-                label="编辑"
+                :label="t('common.actions.edit')"
                 :api="SystemModelApi"
                 :model="row"
                 :provider="getProvider(row)"
@@ -193,27 +214,27 @@ onMounted(() => {
               />
 
               <!-- 资源授权 -->
-              <AuthorizeModelAction v-if="perm.model.system.auth()" display="button" label="资源授权" :model="row" />
+              <AuthorizeModelAction v-if="perm.model.system.auth()" display="button" :label="t('common.actions.authorize')" :model="row" />
               <!-- 更多模型操作 -->
               <MkTableMoreDropdown>
                 <!-- 模型参数设置 -->
                 <ParamSettingAction
                   v-if="['TTS', 'LLM', 'IMAGE', 'TTI', 'STT', 'EMBEDDING'].includes(row.model_type) && perm.model.system.paramSetting()"
-                  label="模型参数设置"
+                  :label="t('model.actions.parameterSettings')"
                   :api="SystemModelApi"
                   :model="row"
                 />
                 <!-- 查看关联资源 -->
                 <RelatedResourcesModelAction
                   v-if="perm.model.system.relateMap()"
-                  label="查看关联资源"
+                  :label="t('common.actions.relatedResources')"
                   :api="SystemRelatedResourcesApi"
                   :model="row"
                 />
                 <!-- 删除模型 -->
                 <MkDropdownItem v-if="perm.model.system.delete()" :disabled="loading" @click="handleDeleteModel(row)">
                   <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                  删除
+                  {{ t('common.actions.delete') }}
                 </MkDropdownItem>
               </MkTableMoreDropdown>
             </div>

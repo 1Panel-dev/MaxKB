@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import { dynamicFormTypeOptions, type FormField, type VisibilityFieldOption } from '@/components/mk-dynamics-form'
@@ -7,13 +8,16 @@ import FormFieldDialog from './FormFieldDialog.vue'
 
 defineOptions({ name: 'WorkflowFormFieldTable' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<{ upstreamFieldOptions: VisibilityFieldOption[]; nodeId: string; nodeName: string }>()
 const formFields = defineModel<FormField[]>({ required: true })
 const formFieldDialogRef = useTemplateRef<InstanceType<typeof FormFieldDialog>>('formFieldDialogRef')
 
 // 字段展示兼容复合标签与多选默认值。
 function getTypeLabel(inputType: string) {
-  return dynamicFormTypeOptions.find((option) => option.value === inputType)?.label ?? inputType
+  const label = dynamicFormTypeOptions.find((option) => option.value === inputType)?.label
+  return label ? t(label) : inputType
 }
 
 function getDefaultValue(field: FormField): string {
