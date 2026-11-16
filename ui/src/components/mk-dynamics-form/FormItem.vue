@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { computed, onBeforeUnmount, onMounted, ref, type Component, type Ref } from 'vue'
 import type { FormItemRule } from 'element-plus'
 import { get } from 'lodash'
@@ -8,8 +7,6 @@ import bus from '@/utils/bus'
 import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import FormItemLabel from './FormItemLabel.vue'
 import type { DynamicFormTriggerMap, DynamicFormTriggerSetting, DynamicFormValue, FormField, FormFieldLabel, SerializedFormRule } from './type'
-
-const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'MkDynamicsFormItem' })
 
@@ -99,7 +96,7 @@ const errorMessage = computed(() => {
     return fieldProps.value.err_msg
   }
   const label = isString(props.formField.label) ? props.formField.label : props.formField.label?.label
-  return t('common.form.inputFieldSpaced', { fieldName: label || props.formField.field })
+  return `请输入 ${label || props.formField.field}`
 })
 
 function deserializeRule(rule: SerializedFormRule): FormItemRule {

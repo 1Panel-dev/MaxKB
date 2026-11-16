@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-import { computed, ref, useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import { dynamicFormTypeOptions, MkDynamicsFormConstructor, type DynamicFormConstructorOption, type FormField } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'InitFieldDialog' })
-
-const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ submit: [field: FormField] }>()
 
@@ -21,12 +18,10 @@ const initFieldInputTypes = [
   'SwitchInput',
   'JsonInput',
 ] as const
-const initFieldTypeOptions = computed<DynamicFormConstructorOption[]>(() =>
-  initFieldInputTypes.map((inputType) => {
-    const label = dynamicFormTypeOptions.find((option) => option.value === inputType)?.label
-    return { label: label ? t(label) : inputType, value: `${inputType}Constructor` }
-  }),
-)
+const initFieldTypeOptions: DynamicFormConstructorOption[] = initFieldInputTypes.map((inputType) => ({
+  label: dynamicFormTypeOptions.find((option) => option.value === inputType)?.label ?? inputType,
+  value: `${inputType}Constructor`,
+}))
 
 const visible = ref(false)
 const editing = ref(false)

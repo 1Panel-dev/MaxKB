@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
 import type { CheckboxValueType } from 'element-plus'
 import type { TableFilterOption } from './types'
-
-const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'TableFilterMultiple' })
 const props = withDefaults(
@@ -72,7 +69,7 @@ function handleConfirm() {
           class="mr-0!"
           @change="handleSelectAllChange"
         >
-          {{ t('components.table.all') }}
+          全部
         </el-checkbox>
         <el-checkbox-group v-model="pendingValues" class="mk-checkbox-group-vertical gap-2">
           <el-checkbox
@@ -84,15 +81,15 @@ function handleConfirm() {
             <span class="block min-w-0 truncate" :title="option.label">{{ option.label }}</span>
           </el-checkbox>
         </el-checkbox-group>
-        <MkEmpty v-if="filterable && !filteredOptions.length" type="search" :description="t('components.empty.noMatches')" :image-size="64" />
+        <MkEmpty v-if="filterable && !filteredOptions.length" type="search" description="暂无匹配结果" :image-size="64" />
       </div>
     </el-scrollbar>
 
     <div class="p-3 text-right">
       <!-- 清除多选筛选 -->
-      <el-button plain class="min-w-12! w-12!" size="small" @click="handleReset">{{ t('components.table.resetFilter') }}</el-button>
+      <el-button plain class="min-w-12! w-12!" size="small" @click="handleReset">重置</el-button>
       <!-- 确认多选筛选 -->
-      <el-button class="min-w-12! w-12!" size="small" type="primary" @click="handleConfirm">{{ t('common.actions.confirmButton') }}</el-button>
+      <el-button class="min-w-12! w-12!" size="small" type="primary" @click="handleConfirm">确定</el-button>
     </div>
   </el-popover>
 </template>

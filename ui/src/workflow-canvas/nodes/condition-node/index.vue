@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { cloneDeep } from 'lodash'
 import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef, type Directive } from 'vue'
 import type { FormInstance } from 'element-plus'
@@ -11,8 +10,6 @@ import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils
 import { compareList } from '@/workflow-canvas/config/constants'
 import { randomId } from '@/utils/common'
 import { useSortable } from '@/utils/use-sortable'
-
-const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'WorkflowConditionNode' })
 const getModel = inject('getModel') as () => BaseNodeModel
@@ -209,7 +206,7 @@ onBeforeUnmount(() => {
                       @visible-change="anchorGuard.setOverlayVisible(`${branch.id}:${conditionIndex}:compare`, $event)"
                       @wheel="handleNodeWheel"
                     >
-                      <el-option v-for="comparison in compareList" :key="comparison.value" :label="t(comparison.label)" :value="comparison.value" />
+                      <el-option v-for="comparison in compareList" :key="comparison.value" :label="comparison.label" :value="comparison.value" />
                     </el-select>
                   </el-form-item>
                   <div class="min-w-0 flex-1">

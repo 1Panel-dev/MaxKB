@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { computed, reactive, ref, watch } from 'vue'
 import type { BaseModelOption, Dict, DynamicFormField, ModelPayload, ModelProviderItem, ModelTypeOption } from '@/api/types'
 import type ModelApi from '@/api/admin/workspace/model'
@@ -14,8 +13,6 @@ import ModelAdvancedSettings from '@/views/model/advanced-settings-table/Advance
 import { loadCachedBaseModelOptions, loadCachedOrBuiltinBaseModelOptions } from '@/views/model/base-model-options'
 
 defineOptions({ name: 'CreateModelDrawer' })
-
-const { t } = useI18n({ useScope: 'global' })
 
 const { auth } = useStore()
 
@@ -117,13 +114,13 @@ async function fetchBaseModelOptions() {
   const loadBuiltin = () =>
     ProviderApi.getBaseModelList(requestProvider, requestModelType).then((options) => {
       applyBaseModelOptions(requestProvider, requestModelType, credentialSnapshot, options)
-      MsgWarning(t('model.messages.usingBuiltinModels'))
+      MsgWarning('未获取到官方模型列表，已展示内置常用模型')
     })
   ProviderApi.getBaseModelList(requestProvider, requestModelType, undefined, modelForm.credential as Record<string, unknown>)
     .then((options) => {
       if (options?.length) {
         if (applyBaseModelOptions(requestProvider, requestModelType, credentialSnapshot, options)) {
-          MsgSuccess(t('model.messages.fetched'))
+          MsgSuccess('获取成功')
         }
         return
       }
@@ -219,7 +216,7 @@ function handleSubmit() {
     return request
       .then(() => {
         return auth.loadAuthBaseProfile().then(() => {
-          MsgSuccess(t('common.messages.created'))
+          MsgSuccess('创建成功')
           visible.value = false
           emit('refresh')
         })
@@ -264,13 +261,13 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" content-class="h-full p-0!" direction="btt" :title="t('model.actions.addModel')" @closed="resetData">
+  <MkDrawer v-model="visible" content-class="h-full p-0!" direction="btt" title="添加模型" @closed="resetData">
     <template #header>
       <div class="flex w-full">
-        <h4>{{ t('model.actions.addModel') }}</h4>
+        <h4>添加模型</h4>
         <el-steps :active="1" finish-status="success" class="absolute-center w-75!">
-          <el-step :title="t('model.form.selectProvider')" />
-          <el-step :title="t('model.actions.addModel')" />
+          <el-step title="选择供应商" />
+          <el-step title="添加模型" />
         </el-steps>
       </div>
     </template>
@@ -280,8 +277,8 @@ defineExpose({ open })
         <component :is="Header">
           <!-- 选择模型类型 -->
           <el-select v-model="modelType" class="w-full" @change="loadModelProviders">
-            <el-option :label="t('model.list.allModels')" value="all" />
-            <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="t(label)" :value="value" />
+            <el-option label="全部模型" value="all" />
+            <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
           </el-select>
         </component>
 
@@ -311,13 +308,13 @@ defineExpose({ open })
               <el-form-item
                 class="mk-hide-asterisk"
                 prop="name"
-                :rules="{ whitespace: true, required: true, message: t('model.form.name.required'), trigger: 'blur' }"
+                :rules="{ whitespace: true, required: true, message: '请输入模型名称', trigger: 'blur' }"
               >
                 <template #label>
                   <span class="inline-flex items-center gap-2">
-                    <span class="mk-required">{{ t('model.form.name.label') }}</span>
+                    <span class="mk-required">模型名称</span>
 
-                    <MkTooltip :content="t('model.form.name.description')" placement="right">
+                    <MkTooltip content="MaxKB 中自定义的模型名称" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
                     </MkTooltip>
                   </span>
@@ -325,57 +322,49 @@ defineExpose({ open })
                 <el-input
                   v-model="modelForm.name"
                   maxlength="64"
-                  :placeholder="t('model.form.name.placeholder')"
+                  placeholder="请给基础模型设置一个名称"
                   @blur="modelForm.name = modelForm.name.trim()"
                 />
               </el-form-item>
 
-              <el-form-item
-                class="mk-hide-asterisk"
-                prop="model_type"
-                :rules="{ required: true, message: t('model.form.type.placeholder'), trigger: 'change' }"
-              >
+              <el-form-item class="mk-hide-asterisk" prop="model_type" :rules="{ required: true, message: '请选择模型类型', trigger: 'change' }">
                 <template #label>
                   <span class="inline-flex items-center gap-2">
-                    <span class="mk-required">{{ t('model.form.type.label') }}</span>
+                    <span class="mk-required">模型类型</span>
                     <MkTooltip placement="right">
                       <template #content>
-                        <p>{{ t('model.types.llm.description') }}</p>
-                        <p>{{ t('model.types.embedding.description') }}</p>
-                        <p>{{ t('model.types.speechToText.description') }}</p>
-                        <p>{{ t('model.types.textToSpeech.description') }}</p>
-                        <p>{{ t('model.types.reranker.description') }}</p>
-                        <p>{{ t('model.types.vision.description') }}</p>
-                        <p>{{ t('model.types.imageGeneration.description') }}</p>
-                        <p>{{ t('model.types.textToVideo.description') }}</p>
-                        <p>{{ t('model.types.imageToVideo.description') }}</p>
+                        <p>大语言模型：在智能体中与AI对话的推理模型。</p>
+                        <p>向量模型：在知识库中对文档内容进行向量化的模型。</p>
+                        <p>语音识别：在智能体中开启语音识别后用于语音转文字的模型。</p>
+                        <p>语音合成：在智能体中开启语音播放后用于文字转语音的模型。</p>
+                        <p>重排模型：在高级智能体中使用多路召回时，对候选分段进行重新排序的模型。</p>
+                        <p>视觉模型：在高级智能体中用于图片理解的视觉模型。</p>
+                        <p>图片生成：在高级智能体中用于图片生成的视觉模型。</p>
+                        <p>文生视频：在高级智能体中用于文生视频的模型。</p>
+                        <p>图生视频：在高级智能体中用于图生视频的模型。</p>
                       </template>
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
                     </MkTooltip>
                   </span>
                 </template>
-                <el-select
-                  v-model="modelForm.model_type"
-                  class="w-full"
-                  :placeholder="t('model.form.type.placeholder')"
-                  @change="handleModelTypeChange"
-                >
+                <el-select v-model="modelForm.model_type" class="w-full" placeholder="请选择模型类型" @change="handleModelTypeChange">
                   <el-option v-for="option in modelTypeOptions" :key="option.value" :label="option.key" :value="option.value" />
                 </el-select>
               </el-form-item>
             </template>
 
             <template #after>
+
               <el-form-item
                 class="mk-hide-asterisk"
                 prop="model_name"
-                :rules="{ required: true, message: t('model.form.baseModel.required'), trigger: 'change' }"
+                :rules="{ required: true, message: '请选择基础模型，自定义输入基础模型后回车即可', trigger: 'change' }"
               >
                 <template #label>
                   <span class="inline-flex w-full items-center gap-2">
                     <span class="inline-flex items-center gap-2">
-                      <span class="mk-required">{{ t('model.form.baseModel.label') }}</span>
-                      <span class="text-warning">{{ t('model.form.baseModel.description') }}</span>
+                      <span class="mk-required">基础模型</span>
+                      <span class="text-warning">列表中未列出的模型，直接输入模型名称，回车即可添加</span>
                     </span>
                     <el-button
                       class="ml-auto"
@@ -386,7 +375,7 @@ defineExpose({ open })
                       @click="fetchBaseModelOptions()"
                     >
                       <MkIcon name="icon_refresh_outlined" class="mr-1"></MkIcon>
-                      {{ t('model.actions.fetchModels') }}
+                      获取模型
                     </el-button>
                   </span>
                 </template>
@@ -397,7 +386,7 @@ defineExpose({ open })
                   default-first-option
                   filterable
                   :loading="baseModelLoading"
-                  :placeholder="t('model.form.baseModel.placeholder')"
+                  placeholder="请先点击「获取模型」加载列表，或直接输入模型名称后回车"
                   @change="handleBaseModelChange"
                 >
                   <el-option v-for="option in baseModelOptions" :key="option.name" :label="option.name" :value="option.name">
@@ -423,15 +412,15 @@ defineExpose({ open })
             trigger-class="mb-3 w-fit"
           >
             <template #label>
-              <h6>{{ t('common.titles.advancedSettings') }}</h6>
+              <h6>高级设置</h6>
             </template>
             <ModelAdvancedSettings v-model="modelParamsForm" />
           </MkCollapse>
         </div>
         <component :is="Footer">
-          <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-          <el-button plain :disabled="loading" @click="handleBack">{{ t('common.actions.previousStep') }}</el-button>
-          <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.save') }}</el-button>
+          <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+          <el-button plain :disabled="loading" @click="handleBack">上一步</el-button>
+          <el-button type="primary" :loading="loading" @click="handleSubmit">保存</el-button>
         </component>
       </template>
     </MkViewLayout>

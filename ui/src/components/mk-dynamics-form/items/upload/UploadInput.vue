@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
 import { computed, inject, ref, useAttrs } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
@@ -11,8 +10,6 @@ import { useFormDisabled } from 'element-plus'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
 import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
-
-const { t } = useI18n({ useScope: 'global' })
 const inputDisabled = useFormDisabled()
 const attrs = useAttrs() as DynamicFormValue
 const upload = inject('upload') as DynamicFormValue
@@ -56,18 +53,18 @@ const loading = ref<boolean>(false)
 const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) => {
   fileList.splice(fileList.indexOf(file), 1)
   if (fileArray.value.find((f: DynamicFormValue) => f.name === file.name)) {
-    MsgWarning(t('dynamicForm.upload.duplicateFileName'))
+    MsgWarning('文件名重复')
 
     return
   }
   const maxFileSize = (props.formField as DynamicFormValue).max_file_size
   if (file.size / 1024 / 1024 > maxFileSize) {
-    MsgWarning(t('dynamicForm.upload.sizeExceeded', { size: maxFileSize }))
+    MsgWarning('文件大小不能超过 ' + maxFileSize + 'MB')
     return
   }
 
   if (fileList.length > attrs.limit) {
-    MsgWarning(t('dynamicForm.upload.countExceeded', { count: attrs.limit }))
+    MsgWarning('最多只能上传 ' + attrs.limit + ' 个文件')
     return
   }
   upload(file.raw, loading).then((ok: DynamicFormValue) => {
@@ -94,7 +91,7 @@ const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) 
   >
     <el-button plain>
       <MkIcon name="icon_upload_outlined" />
-      <span>{{ t('common.actions.uploadFile') }}</span>
+      <span>上传文件</span>
     </el-button>
   </el-upload>
   <div v-if="attachments.length" class="mt-2 flex flex-wrap w-full gap-2">

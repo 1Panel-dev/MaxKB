@@ -1,22 +1,19 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { computed, onBeforeMount } from 'vue'
 import { dateFormat, datetimeFormat } from '@/utils/time'
 import type { DynamicFormConstructorOption, DynamicFormValue } from '../../type'
-
-const { t } = useI18n({ useScope: 'global' })
 
 type DatePickerType = 'year' | 'month' | 'date' | 'datetime'
 type DateFormatOption = Pick<DynamicFormConstructorOption, 'value'>
 
 const defaultDatePickerType: DatePickerType = 'datetime'
 
-const dateTypeOptions = computed<DynamicFormConstructorOption[]>(() => [
-  { label: t('dynamicForm.date.year'), value: 'year' },
-  { label: t('dynamicForm.date.month'), value: 'month' },
-  { label: t('dynamicForm.types.date'), value: 'date' },
-  { label: t('dynamicForm.date.datetime'), value: 'datetime' },
-])
+const dateTypeOptions: DynamicFormConstructorOption[] = [
+  { label: '年', value: 'year' },
+  { label: '月', value: 'month' },
+  { label: '日期', value: 'date' },
+  { label: '日期时间', value: 'datetime' },
+]
 const dateFormatOptions: Record<DatePickerType, DateFormatOption[]> = {
   year: [{ value: 'YYYY' }],
   month: [{ value: 'YYYY-MM' }],
@@ -88,18 +85,13 @@ onBeforeMount(() => {
 
 <template>
   <div class="flex gap-4">
-    <el-form-item class="min-w-0 flex-1" :label="t('dynamicForm.date.type')" required>
-      <el-select v-model="formValue.type" :placeholder="t('dynamicForm.date.typeRequired')" @change="handleDateTypeChange">
-        <el-option
-          v-for="inputTypeOption in dateTypeOptions"
-          :key="inputTypeOption.value"
-          :label="inputTypeOption.label"
-          :value="inputTypeOption.value"
-        />
+    <el-form-item class="min-w-0 flex-1" label="时间类型" required>
+      <el-select v-model="formValue.type" placeholder="请选择时间类型" @change="handleDateTypeChange">
+        <el-option v-for="inputTypeOption in dateTypeOptions" :key="inputTypeOption.value" :label="inputTypeOption.label" :value="inputTypeOption.value" />
       </el-select>
     </el-form-item>
-    <el-form-item class="min-w-0 flex-1" :label="t('dynamicForm.date.format')" required>
-      <el-select v-model="formValue.format" filterable default-first-option allow-create :placeholder="t('dynamicForm.date.formatRequired')">
+    <el-form-item class="min-w-0 flex-1" label="格式" required>
+      <el-select v-model="formValue.format" filterable default-first-option allow-create placeholder="请选择格式">
         <el-option
           v-for="inputTypeOption in dateFormatOptions[formValue.type as DatePickerType]"
           :key="inputTypeOption.value"
@@ -109,26 +101,14 @@ onBeforeMount(() => {
       </el-select>
     </el-form-item>
   </div>
-  <el-form-item
-    class="mk-hide-asterisk"
-    :required="formValue.required"
-    prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: t('common.form.inputField', { fieldName: t('dynamicForm.fields.defaultValue') }) }] : []"
-  >
+  <el-form-item class="mk-hide-asterisk" :required="formValue.required" prop="default_value" :rules="formValue.required ? [{ required: true, message: '请输入默认值' }] : []">
     <template #label>
       <div class="flex-between">
-        <span :class="formValue.required ? 'mk-required' : ''">{{ t('dynamicForm.fields.defaultValue') }}</span>
-        <el-checkbox v-model="defaultValueUnselected" :label="t('dynamicForm.date.unselected')" />
+        <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
+        <el-checkbox v-model="defaultValueUnselected" label="未选中项" />
       </div>
     </template>
-    <el-date-picker
-      v-model="formValue.default_value"
-      :type="formValue.type"
-      :placeholder="t('dynamicForm.date.selectDate')"
-      :format="formValue.format"
-      :value-format="formValue.format"
-      class="w-full!"
-    />
+    <el-date-picker v-model="formValue.default_value" :type="formValue.type" placeholder="选择日期" :format="formValue.format" :value-format="formValue.format" class="w-full!" />
   </el-form-item>
 </template>
 <style lang="scss" scoped></style>

@@ -697,8 +697,7 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 局部变量使用 camelCase，模板属性使用 kebab-case。`input_type`、`default_value`、
 `visibility_rules` 等服务端字段协议保持 snake_case，不在组件边界内改名。
 
-公开入口包括 `dynamicFormTypeOptions`，其中 `label` 保存 `dynamicForm.types.*` 翻译键，由使用处通过 `t()` 获取显示文案；
-`FormItem.vue`、`FormItemLabel.vue`、`items/` 和配置器子目录均为内部实现。
+公开入口包括 `dynamicFormTypeOptions`；`FormItem.vue`、`FormItemLabel.vue`、`items/` 和配置器子目录均为内部实现。
 
 `MkDynamicsForm` 的主要 Props 为 `modelValue`、`renderData`、`otherParams`、`view`、
 `defaultItemWidth` 和 `parentField`，公开 `validate()`、`render()`、`initDefaultData()` 与

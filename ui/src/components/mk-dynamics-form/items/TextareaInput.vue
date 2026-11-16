@@ -1,9 +1,5 @@
-<script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-
-const { t } = useI18n({ useScope: 'global' })
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <el-input v-bind="$attrs" type="textarea" :placeholder="t('common.form.inputPlaceholder')"></el-input>
+  <el-input v-bind="$attrs" type="textarea" placeholder="请输入"></el-input>
 </template>

@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import { MkDynamicsFormConstructor, type FormField } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'ModelParamDialog' })
-
-const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ submit: [field: FormField] }>()
 
@@ -45,13 +42,13 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="editing ? t('dynamicForm.editTitle') : t('dynamicForm.addTitle')" @closed="resetData">
+  <MkDialog v-model="visible" :title="editing ? '编辑参数' : '添加参数'" @closed="resetData">
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" />
 
     <template #footer>
-      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
       <el-button type="primary" @click="handleSubmit">
-        {{ editing ? t('common.actions.save') : t('common.actions.add') }}
+        {{ editing ? '保存' : '添加' }}
       </el-button>
     </template>
   </MkDialog>

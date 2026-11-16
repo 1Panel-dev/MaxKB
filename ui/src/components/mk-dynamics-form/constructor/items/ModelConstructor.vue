@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import type { ModelItem } from '@/api/types'
 import type { DynamicFormValue } from '../../type'
 import { computed, inject, provide, ref } from 'vue'
@@ -7,9 +6,6 @@ import { cloneDeep } from 'lodash'
 import SelectModel from '@/components/business/select-model/index.vue'
 import { providerList as providerOptions } from '../../items/model/provider-data'
 import { MODEL_TYPE_LABELS } from '@/constants/model'
-
-const { t } = useI18n({ useScope: 'global' })
-
 const getSelectModelList = inject<(params: { model_type: string }) => Promise<ModelItem[]>>('getSelectModelList')
 const getModelParamsForm = inject<(modelId: string) => Promise<DynamicFormValue>>('getModelParamsForm')
 
@@ -191,39 +187,36 @@ defineExpose({ getData, render })
 </script>
 
 <template>
-  <el-form-item :label="t('dynamicForm.model.type')" prop="model_type" :rules="[{ required: true, message: t('dynamicForm.model.typeRequired') }]">
-    <el-select v-model="formValue.model_type" :placeholder="t('dynamicForm.model.typeRequired')" @change="handleModelTypeChange">
-      <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="t(label)" :value="value" />
+  <el-form-item label="模型类型" prop="model_type" :rules="[{ required: true, message: '请选择模型类型' }]">
+    <el-select v-model="formValue.model_type" placeholder="请选择模型类型" @change="handleModelTypeChange">
+      <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
     </el-select>
   </el-form-item>
 
-  <el-form-item
-    :label="t('dynamicForm.model.options')"
-    prop="provider_list"
-    :rules="[{ required: true, message: t('dynamicForm.model.placeholder'), type: 'array' }]"
-  >
+  <el-form-item label="可选模型" prop="provider_list" :rules="[{ required: true, message: '请选择模型', type: 'array' }]">
     <SelectModel
       teleported
       multiple
       v-model="selectedIds"
-      :placeholder="t('dynamicForm.model.placeholder')"
+      placeholder="请选择模型"
       :options="rawModelOptions"
       :provider-options="providerOptions"
       :model-type="formValue.model_type"
-    ></SelectModel>
+    >
+    </SelectModel>
   </el-form-item>
   <el-form-item
-    :label="t('dynamicForm.model.default')"
+    label="默认模型"
     prop="default_value.model_id"
     :required="formValue.required"
-    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.model.placeholder') }] : []"
+    :rules="formValue.required ? [{ required: true, message: '请选择模型' }] : []"
     v-if="formValue.provider_list && formValue.provider_list.length > 0"
   >
     <SelectModel
       v-model="defaultModelId"
       v-model:model-params="defaultModelParams"
       can-edit-params
-      :placeholder="t('dynamicForm.model.placeholder')"
+      placeholder="请选择模型"
       :options="selectedModelsOptions"
       :provider-options="providerOptions"
       teleported

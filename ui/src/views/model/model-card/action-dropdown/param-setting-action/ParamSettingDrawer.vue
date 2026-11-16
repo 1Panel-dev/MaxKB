@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
 import type ModelApi from '@/api/admin/workspace/model'
 import type SystemResourceModelApi from '@/api/admin/system/resource-management/model'
@@ -9,8 +8,6 @@ import { MsgSuccess } from '@/utils/message'
 import AdvancedSettingsTable from '@/views/model/advanced-settings-table/AdvancedSettingsTable.vue'
 
 defineOptions({ name: 'ParamSettingDrawer' })
-
-const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi | typeof SystemResourceModelApi }>()
 
@@ -53,7 +50,7 @@ function handleSubmit() {
   props.api
     .putModelParamsForm(currentModel.value.id, modelParamsForm.value)
     .then(() => {
-      MsgSuccess(t('common.messages.saved'))
+      MsgSuccess('保存成功')
       visible.value = false
     })
     .finally(() => {
@@ -65,14 +62,14 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" direction="btt" :title="t('model.actions.parameterSettings')" @closed="handleClosed">
+  <MkDrawer v-model="visible" direction="btt" title="模型参数设置" @closed="handleClosed">
     <div v-loading="loading" class="mx-auto w-full max-w-200">
       <AdvancedSettingsTable v-model="modelParamsForm" />
     </div>
 
     <template #footer>
-      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.save') }}</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">保存</el-button>
     </template>
   </MkDrawer>
 </template>

@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import { computed } from 'vue'
 import noDataImage from '@/assets/empty/no-data.svg'
 import noSearchResultsImage from '@/assets/empty/no-search-results.svg'
-
-const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'MkEmpty', inheritAttrs: false })
 
@@ -14,10 +11,10 @@ defineSlots<{ default(): unknown; description(): unknown; image(): unknown }>()
 
 const emptyState = computed(() => {
   if (props.type === 'search') {
-    return { description: t('components.empty.noResults'), image: noSearchResultsImage }
+    return { description: '没有找到相关内容', image: noSearchResultsImage }
   }
 
-  return { description: t('common.empty.noData'), image: noDataImage }
+  return { description: '暂无数据', image: noDataImage }
 })
 </script>
 
