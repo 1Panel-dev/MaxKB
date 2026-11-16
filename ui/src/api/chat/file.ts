@@ -1,6 +1,6 @@
 import type { AxiosProgressEvent } from 'axios'
-import { postUpload } from './core/request'
-import type { FileSourceType } from '@/api/types'
+import { postUpload, get } from './core/request'
+import type { FileSourceType, UrlFileContent } from '@/api/types'
 
 /** 上传资源文件，支持可选的进度回调与取消操作。 */
 const postUploadFile = (
@@ -16,4 +16,7 @@ const postUploadFile = (
   return postUpload<string>('/oss/file', formData, onProgress)
 }
 
-export default { postUploadFile }
+/** 获取 URL 文件内容、类型和大小。 */
+const getUrlFile = (applicationId: string, url: string) => get<UrlFileContent>(`/oss/get_url/${applicationId}`, { url })
+
+export default { getUrlFile, postUploadFile }

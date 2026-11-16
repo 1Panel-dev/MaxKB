@@ -4,7 +4,8 @@ import { pick } from 'lodash'
 import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants/file-type'
 import { isImage, isDocument, isAudio, isVideo, getFileExtension } from '@/utils/icon'
 import { MsgError, MsgWarning } from '@/utils/message'
-import type { Dict } from '@/api/types'
+import { URL_FILE_MIME_TYPES, createUrlFile } from './url-upload/index'
+import type { UrlFileContent, Dict } from '@/api/types'
 import { defaultFileUploadSetting } from '@/workflow-canvas/nodes/base-node/constant'
 import type { BaseNodeForm, FileUploadSettingData } from '@/workflow-canvas/nodes/base-node/types'
 import type { ChatMessage, Conversation, ConversationAppInfo, SendMessageOptions } from '../../core/types'
@@ -41,6 +42,7 @@ export interface QuestionOptions {
 
 // 仅注入消息输入所需的会话、上传和发送能力。
 export interface MessageInputDeps {
+  getUrlFile: (url: string) => Promise<UrlFileContent>
   // 来自 conversation-list
   conversations: Ref<Conversation[]>
   getChatId: () => string
@@ -80,6 +82,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   const question = ref('')
   const fileList = ref<FileItem[]>([])
   const sending = ref(false)
+  const urlUploading = ref(false)
 
   // 文件上传配置：优先读取开始节点，缺失时回退到智能体字段，再补齐默认值。
   const baseNodeData = computed(() => {
@@ -115,6 +118,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       !disabled.value &&
       !streamLoading.value &&
       !sending.value &&
+      !urlUploading.value &&
       fileList.value.length < maxFiles.value,
   )
 
@@ -136,6 +140,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       !streamLoading.value &&
       !sending.value &&
       !transcribing.value &&
+      !urlUploading.value &&
       attachmentsReady.value,
   )
 
@@ -143,7 +148,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     fileList.value.filter((attachment) => attachment.attachmentType === 'image_list' || (!attachment.attachmentType && isImage(attachment.name))),
   )
 
-  // URL 附件直接传递地址，分类由用户选择，不下载远程文件。
+  // URL 上传：服务端读取远程文件，校验后按类型保留地址或转为本地上传。
   const urlUploadTypes = computed(() =>
     [
       { enabled: uploadSetting.value.document, value: 'document_list' as const, label: '文档' },
@@ -153,27 +158,99 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       { enabled: uploadSetting.value.other, value: 'other_list' as const, label: '其他' },
     ].filter((type) => type.enabled),
   )
-  const addUrls = (addresses: string[], attachmentType: MessageAttachmentKey): boolean => {
-    if (!urlUploadEnabled.value || !canUpload.value || !urlUploadTypes.value.some((type) => type.value === attachmentType)) return false
+  const addUrls = async (addresses: string[], attachmentType: MessageAttachmentKey): Promise<boolean> => {
+    if (
+      !addresses.length ||
+      urlUploading.value ||
+      !urlUploadEnabled.value ||
+      !canUpload.value ||
+      !urlUploadTypes.value.some((type) => type.value === attachmentType)
+    )
+      return false
     if (fileList.value.length + addresses.length > maxFiles.value) {
       MsgWarning(`单次最多上传 ${maxFiles.value} 个文件`)
       return false
     }
-    try {
-      addresses.forEach((address) => {
-        const url = new URL(address)
-        if (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid URL')
-      })
-    } catch {
-      MsgWarning('请输入有效的 HTTP 或 HTTPS URL 地址')
-      return false
-    }
-    addresses.forEach((address) => {
-      const url = new URL(address)
-      const name = url.pathname.split('/').filter(Boolean).pop() || url.hostname
-      fileList.value.push({ uid: Date.now() + Math.random(), name, size: 0, url: address, attachmentType, status: 'success', progress: 100 })
+    const validAddresses = addresses.filter((address) => {
+      try {
+        return ['http:', 'https:'].includes(new URL(address).protocol)
+      } catch {
+        return false
+      }
     })
-    return true
+    if (validAddresses.length !== addresses.length) MsgWarning('请输入有效的 HTTP 或 HTTPS URL 地址')
+    if (!validAddresses.length) return false
+    const extensions =
+      attachmentType === 'image_list'
+        ? IMAGE_EXTENSIONS
+        : attachmentType === 'document_list'
+          ? DOCUMENT_EXTENSIONS
+          : attachmentType === 'audio_list'
+            ? AUDIO_EXTENSIONS
+            : attachmentType === 'video_list'
+              ? VIDEO_EXTENSIONS
+              : (uploadSetting.value.otherExtensions ?? [])
+    const expectedMimes = extensions.flatMap((extension) => URL_FILE_MIME_TYPES[extension.toLowerCase()] ?? [])
+    // 先占用附件名额，避免并发上传超限，也阻止校验完成前发送。
+    const attachments = validAddresses.map((address) =>
+      reactive<FileItem>({
+        uid: Date.now() + Math.random(),
+        name: new URL(address).pathname.split('/').filter(Boolean).pop() || `file_${Date.now()}`,
+        size: 0,
+        url: address,
+        attachmentType,
+        status: 'uploading',
+        progress: 0,
+      }),
+    )
+    fileList.value.push(...attachments)
+    urlUploading.value = true
+    try {
+      const results = await Promise.all(
+        attachments.map(async (attachment) => {
+          try {
+            const response = await deps.getUrlFile(attachment.url!)
+            if (!fileList.value.includes(attachment)) return false
+            if (response.status_code !== 200) throw new Error('URL 地址无效')
+            const mime = (response['Content-Type'] || '').split(';')[0]!.trim().toLowerCase()
+            if (expectedMimes.length && !expectedMimes.includes(mime)) throw new Error('文件类型与所选类型不匹配')
+            const size = Number(response['Content-Length']) || 0
+            if (size > maxSizeMB.value * 1024 * 1024) throw new Error(`每个文件不能超过 ${maxSizeMB.value}MB`)
+            if (!attachment.name.includes('.')) {
+              const extension =
+                extensions.find((extension) => URL_FILE_MIME_TYPES[extension.toLowerCase()] === mime) ??
+                Object.keys(URL_FILE_MIME_TYPES).find((extension) => URL_FILE_MIME_TYPES[extension] === mime)
+              if (extension) attachment.name += `.${extension.toLowerCase()}`
+            }
+            attachment.size = size
+            if (attachmentType === 'document_list' || attachmentType === 'audio_list' || attachmentType === 'other_list') {
+              const file = createUrlFile(response.content, attachment.name, mime)
+              if (file.size > maxSizeMB.value * 1024 * 1024) throw new Error(`每个文件不能超过 ${maxSizeMB.value}MB`)
+              if (!file.size) throw new Error('不能上传空文件')
+              attachment.raw = file
+              attachment.size = file.size
+              attachment.url = undefined
+              attachment.status = 'ready'
+              await uploadAttachment(attachment)
+              return fileList.value.some((file) => file.uid === attachment.uid && file.status === 'success')
+            }
+            attachment.status = 'success'
+            attachment.progress = 100
+            return true
+          } catch (error) {
+            const index = fileList.value.indexOf(attachment)
+            if (index >= 0) {
+              removeFile(index)
+              MsgWarning(`${attachment.url || attachment.name}：${error instanceof Error ? error.message : '读取 URL 文件失败'}`)
+            }
+            return false
+          }
+        }),
+      )
+      return results.some(Boolean)
+    } finally {
+      urlUploading.value = false
+    }
   }
 
   // 附件上传与本地预览
@@ -211,7 +288,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     attachment.status = 'uploading'
     attachment.progress = 0
     attachment.errMsg = ''
-    void Promise.resolve()
+    return Promise.resolve()
       .then(() => {
         if (!fileList.value.includes(attachment)) return
         if (!attachment.raw) return
@@ -387,6 +464,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     uploadEnabled,
     urlUploadEnabled,
     urlUploadTypes,
+    urlUploading,
     addUrls,
     canUpload,
     maxFiles,
