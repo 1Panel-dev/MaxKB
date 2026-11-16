@@ -897,6 +897,9 @@ def set_user_groups(user_id, instance):
             for group_id in user_group_ids
         )
 
+    version = Cache_Version.PERMISSION_LIST.get_version()
+    cache.delete(Cache_Version.PERMISSION_LIST.get_key(user_id=user_id), version=version)
+
     return None
 
 
