@@ -79,7 +79,8 @@
     "title": "Model parameters"
   },
   "delete": {
-    "confirm": "Delete model “{name}”?"
+    "confirm": "Delete model “{name}”?",
+    "referenced": "This model is associated with {count} resources, which cannot be used after it is deleted. Proceed with caution."
   },
   "messages": {
     "fetched": "Fetched successfully",

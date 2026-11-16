@@ -8,7 +8,6 @@
     "workspace": "工作空間"
   },
   "delete": {
-    "modelReferenced": "該模型已被 {count} 個資源引用，刪除後相關資源將無法正常運作，請謹慎操作。",
     "toolReferenced": "該工具已被 {count} 個資源引用，刪除後相關資源將無法正常運作，請謹慎操作。"
   }
 }

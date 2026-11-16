@@ -14,10 +14,11 @@ const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi; 
 const emit = defineEmits<{ refresh: [] }>()
 
 function handleDeleteModel() {
-  return MsgConfirm(t('model.delete.confirm', { name: props.model.name }), undefined, {
-    cancelButtonText: t('common.actions.cancel'),
-    confirmButtonText: t('common.actions.delete'),
-  })
+  return MsgConfirm(
+    t('model.delete.confirm', { name: props.model.name }),
+    props.model.resource_count ? t('model.delete.referenced', { count: props.model.resource_count }) : '',
+    { cancelButtonText: t('common.actions.cancel'), confirmButtonText: t('common.actions.delete') },
+  )
     .then(() => {
       return props.api.deleteModel(props.model.id).then(() => {
         emit('refresh')

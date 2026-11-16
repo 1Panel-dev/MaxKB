@@ -79,7 +79,8 @@
     "title": "模型参数"
   },
   "delete": {
-    "confirm": "确认删除模型：{name}？"
+    "confirm": "是否删除模型：{name}？",
+    "referenced": "此模型关联 {count} 个资源，删除后无法使用，请谨慎操作。"
   },
   "messages": {
     "fetched": "获取成功",

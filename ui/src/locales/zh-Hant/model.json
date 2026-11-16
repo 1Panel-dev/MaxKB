@@ -79,7 +79,8 @@
     "title": "模型參數"
   },
   "delete": {
-    "confirm": "確認刪除模型：{name}？"
+    "confirm": "是否刪除模型：{name}？",
+    "referenced": "此模型關聯 {count} 個資源，刪除後無法使用，請謹慎操作。"
   },
   "messages": {
     "fetched": "取得成功",

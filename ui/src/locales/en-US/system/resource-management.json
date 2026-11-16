@@ -8,7 +8,6 @@
     "workspace": "Workspace"
   },
   "delete": {
-    "modelReferenced": "This model is referenced by {count} resources. Deleting it will prevent those resources from working properly. Proceed with caution.",
     "toolReferenced": "This tool is referenced by {count} resources. Deleting it will prevent those resources from working properly. Proceed with caution."
   }
 }
