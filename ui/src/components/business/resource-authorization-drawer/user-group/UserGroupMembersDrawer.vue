@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import { LOGIN_METHOD } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
 import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'UserGroupMembersDrawer' })
 
@@ -17,17 +20,19 @@ const userGroupMembers = ref<SystemUserGroupMember[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields = computed<OptionItem<string>[]>(() => [
-  { label: '姓名', value: 'nick_name' },
-  { label: '用户名', value: 'username' },
-  ...(auth.isEE || auth.isPE ? [{ label: '角色', value: 'role' }] : []),
+  { label: t('system.identity.users.fields.name'), value: 'nick_name' },
+  { label: t('system.identity.users.fields.username'), value: 'username' },
+  ...(auth.isEE || auth.isPE ? [{ label: t('system.identity.roles.label'), value: 'role' }] : []),
 ])
 
 /* 表头筛选 */
 const selectedMemberSource = ref<string | null>(null)
-const memberSourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
-  label: value === LOGIN_METHOD.LOCAL ? '系统用户' : label,
-  value,
-}))
+const memberSourceOptions = computed<OptionItem<string>[]>(() =>
+  Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
+    label: value === LOGIN_METHOD.LOCAL ? t('system.identity.users.sources.system') : label,
+    value,
+  })),
+)
 const memberListQuery = computed<Dict<unknown>>(() => ({
   ...memberSearchQuery.value,
   ...(selectedMemberSource.value !== null ? { source: selectedMemberSource.value } : {}),
@@ -102,23 +107,23 @@ defineExpose({ open })
       @current-change="loadUserGroupMembers"
       @size-change="loadUserGroupMembers"
     >
-      <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" show-overflow-tooltip />
-      <el-table-column prop="source" label="用户来源">
+      <el-table-column prop="nick_name" :label="t('system.identity.users.fields.name')" show-overflow-tooltip />
+      <el-table-column prop="username" :label="t('system.identity.users.fields.username')" show-overflow-tooltip />
+      <el-table-column prop="source" :label="t('system.identity.users.fields.source')">
         <template #header>
           <MkTableFilter
             mode="single"
             v-model="selectedMemberSource"
-            label="用户来源"
+            :label="t('system.identity.users.fields.source')"
             :options="memberSourceOptions"
             @change="handleMemberFilterChange"
           />
         </template>
         <template #default="{ row }">
-          {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
+          {{ row.source === LOGIN_METHOD.LOCAL ? t('system.identity.users.sources.system') : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
         </template>
       </el-table-column>
-      <el-table-column v-if="auth.isEE || auth.isPE" label="角色">
+      <el-table-column v-if="auth.isEE || auth.isPE" :label="t('system.identity.roles.label')">
         <template #default="{ row }">
           <MkTagGroup v-if="row.roles?.length" :tags="row.roles" />
           <span v-else>-</span>

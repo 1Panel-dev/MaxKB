@@ -1,11 +1,12 @@
+/** 模型类型的翻译键，使用处通过 t() 获取显示文案。 */
 export const MODEL_TYPE_LABELS: Record<string, string> = {
-  LLM: '大语言模型',
-  EMBEDDING: '向量模型',
-  RERANKER: '重排模型',
-  STT: '语音识别',
-  TTS: '语音合成',
-  IMAGE: '视觉模型',
-  TTI: '图片生成',
-  ITV: '图生视频',
-  TTV: '文生视频',
+  LLM: 'model.types.llm.label',
+  EMBEDDING: 'model.types.embedding.label',
+  RERANKER: 'model.types.reranker.label',
+  STT: 'model.types.speechToText.label',
+  TTS: 'model.types.textToSpeech.label',
+  IMAGE: 'model.types.vision.label',
+  TTI: 'model.types.imageGeneration.label',
+  ITV: 'model.types.imageToVideo.label',
+  TTV: 'model.types.textToVideo.label',
 }

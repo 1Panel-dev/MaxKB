@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
 import { RESOURCE_TYPE } from '@/api/enums'
 import type { SharedResourceType, SharedWorkspaceAuthorization, WorkspaceItem } from '@/api/types'
 import AuthorizationApi from '@/api/admin/system/shared-resources/authorization'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import { MsgSuccess } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const WHITE_LIST = 'WHITE_LIST'
 const BLACK_LIST = 'BLACK_LIST'
@@ -54,7 +57,7 @@ function handleConfirm() {
     workspace_id_list: [...checkedWorkspaceIds.value],
   })
     .then(() => {
-      MsgSuccess('操作成功')
+      MsgSuccess(t('common.messages.succeeded'))
       visible.value = false
     })
     .finally(() => {
@@ -81,15 +84,15 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="授权工作空间" width="840" content-class="h-120" @closed="handleClosed">
-    <template #subtitle>被授权的工作空间，可使用当前资源</template>
+  <MkDialog v-model="visible" :title="t('system.sharedResources.authorization.title')" width="840" content-class="h-120" @closed="handleClosed">
+    <template #subtitle>{{ t('system.sharedResources.authorization.description') }}</template>
     <div v-loading="loading" class="flex-column h-full">
-      <p class="shrink-0">类型</p>
+      <p class="shrink-0">{{ t('common.fields.type') }}</p>
       <el-radio-group v-model="authenticationType" class="shrink-0">
-        <el-radio :value="WHITE_LIST">白名单</el-radio>
-        <el-radio :value="BLACK_LIST">黑名单</el-radio>
+        <el-radio :value="WHITE_LIST">{{ t('system.sharedResources.authorization.whitelist') }}</el-radio>
+        <el-radio :value="BLACK_LIST">{{ t('system.sharedResources.authorization.blacklist') }}</el-radio>
       </el-radio-group>
-      <p class="mt-2 mb-2 shrink-0">选择工作空间</p>
+      <p class="mt-2 mb-2 shrink-0">{{ t('system.sharedResources.authorization.selectWorkspace') }}</p>
       <div class="grid min-h-0 flex-1 grid-cols-2 overflow-hidden rounded-md border">
         <!-- 左边 -->
         <section class="flex-column min-h-0 border-r">
@@ -101,7 +104,7 @@ defineExpose({ open })
             <!-- 全选工作空间 -->
             <div class="p-2 pb-0">
               <el-checkbox v-if="!search" v-model="checkAll" :indeterminate="isIndeterminate" class="w-full shrink-0 rounded-md p-2 hover:bg-N900/10">
-                全选
+                {{ t('common.actions.selectAll') }}
               </el-checkbox>
             </div>
             <el-scrollbar class="min-h-0 flex-1 p-2 pt-0">
@@ -125,9 +128,9 @@ defineExpose({ open })
         <!-- 右边 -->
         <section class="flex-column min-h-0">
           <div class="flex-between shrink-0 p-4 pb-3 mt-1">
-            <span>已选：{{ checkedWorkspaceIds.length }} 个</span>
+            <span>{{ t('common.selection.selectedCount', { count: checkedWorkspaceIds.length }) }}</span>
             <!-- 清空已选工作空间 -->
-            <el-button link type="primary" @click="checkedWorkspaceIds = []">清空</el-button>
+            <el-button link type="primary" @click="checkedWorkspaceIds = []">{{ t('common.actions.clear') }}</el-button>
           </div>
           <el-scrollbar class="min-h-0 flex-1" wrap-class="p-2 pt-0">
             <template v-for="workspace in selectedWorkspaces" :key="workspace.id">
@@ -143,9 +146,9 @@ defineExpose({ open })
     </div>
     <template #footer>
       <!-- 取消工作空间授权 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存工作空间授权 -->
-      <el-button type="primary" :loading="loading" @click="handleConfirm">保存</el-button>
+      <el-button type="primary" :loading="loading" @click="handleConfirm">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

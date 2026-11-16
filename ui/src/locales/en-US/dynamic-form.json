@@ -1,0 +1,166 @@
+{
+  "validation": {
+    "duplicateParameter": "Parameter “{parameter}” already exists",
+    "duplicateDisplayName": "Display name “{displayName}” already exists",
+    "componentTypeRequired": "Please select a component type",
+    "fieldLengthRange": "{fieldName} must be {min}–{max} characters long",
+    "lengthRange": "Length must be {min}–{max} characters",
+    "requiredProperty": "is required"
+  },
+  "addTitle": "Add parameter",
+  "editTitle": "Edit parameter",
+  "fields": {
+    "parameter": "Parameter",
+    "displayName": "Display name",
+    "componentType": "Component type",
+    "defaultValue": "Default value",
+    "required": "Required",
+    "dataType": "Data type",
+    "isRequired": "Required",
+    "tooltip": "Parameter help text"
+  },
+  "model": {
+    "placeholder": "Please select a model",
+    "type": "Model type",
+    "typeRequired": "Please select a model type",
+    "options": "Available models",
+    "default": "Default model"
+  },
+  "types": {
+    "text": "Text input",
+    "textarea": "Multiline text input",
+    "json": "JSON input",
+    "password": "Password input",
+    "singleSelect": "Single select",
+    "multiSelect": "Multi-select",
+    "radioCard": "Radio cards",
+    "radioRow": "Inline radio cards",
+    "multiRow": "Inline multi-select cards",
+    "slider": "Slider",
+    "switch": "Switch",
+    "date": "Date",
+    "upload": "File upload",
+    "treeSelect": "Tree select",
+    "knowledge": "Knowledge base",
+    "model": "Model"
+  },
+  "options": {
+    "referenceSchema": "The variable value must match:\n[\n  {'{'}\n    \"label\": \"xx\",\n    \"value\": \"xx\",\n    \"default\": false\n  {'}'}\n]\nlabel: label (required)\nvalue: value (required)\ndefault: whether this is the default value",
+    "value": "Option value",
+    "label": "Label",
+    "labelRequired": "Please enter a label",
+    "valueRequired": "Please enter an option value"
+  },
+  "visibility": {
+    "title": "Visibility settings",
+    "referenceRequired": "Please select a variable reference",
+    "invalidReference": "Invalid variable reference format",
+    "referenceNotFound": "Variable reference not found",
+    "comparisonPlaceholder": "Please enter a comparison value",
+    "showWhen": "Show when",
+    "hideWhen": "Hide when",
+    "conditionPrefix": "Match",
+    "conditionSuffix": "of the following conditions",
+    "all": "all",
+    "any": "any",
+    "operators": {
+      "is_null": "Is empty",
+      "is_not_null": "Is not empty",
+      "contain": "Contains",
+      "not_contain": "Does not contain",
+      "eq": "Equals",
+      "not_eq": "Does not equal",
+      "ge": "Greater than or equal to",
+      "gt": "Greater than",
+      "le": "Less than or equal to",
+      "lt": "Less than",
+      "len_eq": "Length equals",
+      "len_ge": "Length greater than or equal to",
+      "len_gt": "Length greater than",
+      "len_le": "Length less than or equal to",
+      "len_lt": "Length less than",
+      "is_true": "Is true",
+      "is_not_true": "Is not true",
+      "start_with": "Starts with",
+      "end_with": "Ends with",
+      "regex": "Matches regular expression",
+      "wildcard": "Matches wildcard"
+    }
+  },
+  "date": {
+    "year": "Year",
+    "month": "Month",
+    "datetime": "Date and time",
+    "type": "Time type",
+    "typeRequired": "Please select a time type",
+    "format": "Format",
+    "formatRequired": "Please select a format",
+    "unselected": "Unselected option",
+    "selectDate": "Select date"
+  },
+  "defaultValue": {
+    "reference": "Variable reference",
+    "referenceInputRequired": "Please enter a variable reference",
+    "assignmentMethod": "Assignment method",
+    "jsonReferenceHint": "The variable value must be valid JSON",
+    "variableRequired": "Please select a variable",
+    "show": "Show default value",
+    "selectRequired": "Please select a default value"
+  },
+  "knowledge": {
+    "optionsRequired": "Please select available knowledge bases",
+    "options": "Available knowledge bases",
+    "default": "Default knowledge base",
+    "placeholder": "Please select a knowledge base"
+  },
+  "text": {
+    "length": "Text length",
+    "minLengthRequired": "Please enter the minimum length",
+    "maxLengthRequired": "Please enter the maximum length"
+  },
+  "slider": {
+    "zeroStep": "Step cannot be 0",
+    "stepRequired": "Please enter a step value",
+    "showInput": "Show input",
+    "range": "Value range",
+    "minRequired": "Minimum value is required",
+    "maxRequired": "Maximum value is required",
+    "step": "Step"
+  },
+  "tree": {
+    "completeOptionRequired": "Please enter at least one complete option",
+    "parentNotFound": "Parent node not found",
+    "labelAndValueRequired": "Label and option value cannot be empty",
+    "deleteConfirm": "Delete “{label}”?",
+    "deleteFailed": "Deletion failed",
+    "optionsRequired": "Please add options",
+    "options": "Options",
+    "multiple": "Allow multiple selections",
+    "addRoot": "Add top-level option",
+    "addChild": "Add child option",
+    "labelPlaceholder": "Please enter an option label",
+    "allDocuments": "All documents"
+  },
+  "upload": {
+    "maxCount": "Maximum files per upload",
+    "maxSize": "Maximum size per file (MB)",
+    "fileTypes": "File types",
+    "fileTypesRequired": "File type is required",
+    "segmentHint": "We recommend standardizing chunk delimiters before uploading files",
+    "limitsHint": "Upload up to {count} files at a time, each no larger than {size} MB",
+    "supportedFormats": "Supported formats: {formats}",
+    "duplicateFileName": "Duplicate file name",
+    "sizeExceeded": "File size cannot exceed {size}MB",
+    "countExceeded": "You can upload up to {count} files"
+  },
+  "providers": {
+    "qianfan": "Baidu Qianfan",
+    "zhipu": "Zhipu AI",
+    "xfyun": "iFlytek Spark",
+    "volcengine": "Volcengine",
+    "hunyuan": "Tencent Hunyuan",
+    "tencent": "Tencent Cloud",
+    "local": "Local model",
+    "aliyun": "Alibaba Cloud Model Studio"
+  }
+}

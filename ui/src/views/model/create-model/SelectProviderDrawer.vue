@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
 import type { ModelProviderItem } from '@/api/types'
 import ProviderApi from '@/api/admin/model-provider'
 import { MODEL_TYPE_LABELS } from '@/constants'
 
 defineOptions({ name: 'SelectProviderDrawer' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ select: [provider: ModelProviderItem, modelType: string] }>()
 
@@ -60,23 +63,23 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" direction="btt" title="添加模型" @closed="resetData">
+  <MkDrawer v-model="visible" direction="btt" :title="t('model.actions.addModel')" @closed="resetData">
     <template #header>
       <div class="flex w-full">
-        <h4>添加模型</h4>
+        <h4>{{ t('model.actions.addModel') }}</h4>
         <el-steps :active="0" class="absolute-center w-75!">
-          <el-step title="选择供应商" />
-          <el-step title="添加模型" />
+          <el-step :title="t('model.form.selectProvider')" />
+          <el-step :title="t('model.actions.addModel')" />
         </el-steps>
       </div>
     </template>
 
     <div class="max-w-200 mx-auto">
       <div class="mb-5 flex-between">
-        <h4>选择供应商</h4>
+        <h4>{{ t('model.form.selectProvider') }}</h4>
         <el-select v-model="modelType" class="w-45!" @change="handleModelTypeChange">
-          <el-option label="全部模型" value="all" />
-          <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
+          <el-option :label="t('model.list.allModels')" value="all" />
+          <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="t(label)" :value="value" />
         </el-select>
       </div>
       <div v-loading="loading">

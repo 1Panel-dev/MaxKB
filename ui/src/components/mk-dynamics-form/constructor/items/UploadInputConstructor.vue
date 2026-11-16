@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
 import { computed, onMounted } from 'vue'
 import MkTagsEdit from '@/components/mk-tags-edit/index.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 
 const emit = defineEmits(['update:modelValue'])
@@ -43,20 +46,30 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form-item label="单次上传最多文件数" required prop="limit">
+  <el-form-item :label="t('dynamicForm.upload.maxCount')" required prop="limit">
     <el-input-number
       style="width: 100%"
       v-model="formValue.limit"
-      :rules="[{ required: true, message: '请输入', trigger: 'change' }]"
+      :rules="[{ required: true, message: t('common.form.inputPlaceholder'), trigger: 'change' }]"
       :min="0"
       controls-position="right"
       align="left"
     />
   </el-form-item>
-  <el-form-item label="每个文件最大(MB)" required prop="max_file_size" :rules="[{ required: true, message: '请输入', trigger: 'change' }]">
+  <el-form-item
+    :label="t('dynamicForm.upload.maxSize')"
+    required
+    prop="max_file_size"
+    :rules="[{ required: true, message: t('common.form.inputPlaceholder'), trigger: 'change' }]"
+  >
     <el-input-number style="width: 100%" v-model="formValue.max_file_size" :min="0" controls-position="right" align="left" />
   </el-form-item>
-  <el-form-item label="文件类型" required prop="accept" :rules="[{ required: true, message: '文件类型必填', trigger: 'change' }]">
+  <el-form-item
+    :label="t('dynamicForm.upload.fileTypes')"
+    required
+    prop="accept"
+    :rules="[{ required: true, message: t('dynamicForm.upload.fileTypesRequired'), trigger: 'change' }]"
+  >
     <MkTagsEdit v-model="formValue.accept" />
   </el-form-item>
 </template>

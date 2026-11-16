@@ -1,15 +1,18 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref, inject } from 'vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import JsonInput from '@/components/mk-dynamics-form/items/JsonInput.vue'
 import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
+
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 const getModel = inject<() => DynamicFormValue>('getModel')
 
 const assignmentMethodOptions = computed(() => {
-  const options = [{ label: '自定义', value: 'custom' }]
+  const options = [{ label: t('common.options.custom'), value: 'custom' }]
   if (getModel) {
-    options.push({ label: '引用变量', value: 'ref_variables' })
+    options.push({ label: t('dynamicForm.defaultValue.reference'), value: 'ref_variables' })
   }
   return options
 })
@@ -65,7 +68,7 @@ const referenceVariableRule = {
   required: true,
   validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
     if (!(Array.isArray(value) && value.length > 1)) {
-      callback('请输入引用变量')
+      callback(t('dynamicForm.defaultValue.referenceInputRequired'))
     }
 
     return true
@@ -88,14 +91,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form-item v-if="getModel" label="赋值方式">
+  <el-form-item v-if="getModel" :label="t('dynamicForm.defaultValue.assignmentMethod')">
     <el-radio-group v-model="formValue.default_value_assignment_method">
       <el-radio :value="item.value" v-for="(item, index) in assignmentMethodOptions" :key="index">
         <span class="flex-align-center gap-1">
           {{ item.label }}
 
           <MkTooltip placement="right" v-if="item.value === 'ref_variables'">
-            <template #content> 变量的值必须符合: JSON 格式 </template>
+            <template #content>{{ t('dynamicForm.defaultValue.jsonReferenceHint') }}</template>
             <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
           </MkTooltip>
         </span>
@@ -108,7 +111,12 @@ onMounted(() => {
     prop="default_value"
     :rules="[referenceVariableRule]"
   >
-    <NodeCascader ref="nodeCascaderRef" :nodeModel="model" placeholder="请选择变量" v-model="formValue.option_list" />
+    <NodeCascader
+      ref="nodeCascaderRef"
+      :nodeModel="model"
+      :placeholder="t('dynamicForm.defaultValue.variableRequired')"
+      v-model="formValue.option_list"
+    />
   </el-form-item>
 
   <el-form-item
@@ -120,11 +128,11 @@ onMounted(() => {
   >
     <template #label>
       <div class="flex-between">
-        <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
-        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+        <span :class="formValue.required ? 'mk-required' : ''">{{ t('dynamicForm.fields.defaultValue') }}</span>
+        <el-checkbox v-model="formValue.show_default_value" :label="t('dynamicForm.defaultValue.show')" />
       </div>
     </template>
-    <JsonInput ref="jsonInputRef" v-model="formValue.default_value"> </JsonInput>
+    <JsonInput ref="jsonInputRef" v-model="formValue.default_value"></JsonInput>
   </el-form-item>
 </template>
 

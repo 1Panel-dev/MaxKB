@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
 import { computed, onMounted, reactive } from 'vue'
 
 import { MsgConfirm, MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -109,7 +112,7 @@ function submitAdd() {
     .filter((item) => item.label && item.value)
 
   if (!validList.length) {
-    MsgWarning('请至少填写一条完整数据')
+    MsgWarning(t('dynamicForm.tree.completeOptionRequired'))
     return
   }
 
@@ -120,7 +123,7 @@ function submitAdd() {
   } else {
     const parent = addDialog.parentNode
     if (!parent) {
-      MsgError('未找到父节点')
+      MsgError(t('dynamicForm.tree.parentNotFound'))
       return
     }
 
@@ -130,7 +133,7 @@ function submitAdd() {
     parent.children.push(...newNodes)
   }
 
-  MsgSuccess('保存成功')
+  MsgSuccess(t('common.messages.saved'))
   closeAddDialog()
 }
 
@@ -158,32 +161,36 @@ function submitEdit() {
   const value = editDialog.form.value.trim()
 
   if (!label || !value) {
-    MsgWarning('标签和选项值不能为空')
+    MsgWarning(t('dynamicForm.tree.labelAndValueRequired'))
     return
   }
 
   if (!editDialog.targetNode) {
-    MsgError('未找到父节点')
+    MsgError(t('dynamicForm.tree.parentNotFound'))
     return
   }
 
   editDialog.targetNode.label = label
   editDialog.targetNode.value = value
 
-  MsgSuccess('保存成功')
+  MsgSuccess(t('common.messages.saved'))
   closeEditDialog()
 }
 
 /* -------------------- 删除 -------------------- */
 
 function handleDelete(node: TreeNode) {
-  MsgConfirm('提示', `确定删除「${node.label}」吗？`, { type: 'warning' })
+  MsgConfirm(t('common.titles.notice'), t('dynamicForm.tree.deleteConfirm', { label: node.label }), {
+    type: 'warning',
+    cancelButtonText: t('common.actions.cancel'),
+    confirmButtonText: t('common.actions.delete'),
+  })
     .then(() => {
       const removed = removeNodeById(formValue.value.treeData, node.id)
       if (removed) {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleted'))
       } else {
-        MsgError('删除失败')
+        MsgError(t('dynamicForm.tree.deleteFailed'))
       }
     })
     .catch(() => {})
@@ -213,12 +220,16 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
 </script>
 
 <template>
-  <el-form-item prop="treeData" class="mk-hide-asterisk" :rules="[{ required: true, message: '请添加选项', blur: 'change', type: 'array', min: 1 }]">
+  <el-form-item
+    prop="treeData"
+    class="mk-hide-asterisk"
+    :rules="[{ required: true, message: t('dynamicForm.tree.optionsRequired'), blur: 'change', type: 'array', min: 1 }]"
+  >
     <template #label>
       <div class="flex-between">
-        <span class="mk-required">选项</span>
+        <span class="mk-required">{{ t('dynamicForm.tree.options') }}</span>
         <div class="flex gap-3">
-          <el-checkbox v-model="formValue.multiple" label="允许多选" />
+          <el-checkbox v-model="formValue.multiple" :label="t('dynamicForm.tree.multiple')" />
           <el-button link type="primary" @click="openAddRootDialog">
             <MkIcon name="icon_add_outlined"></MkIcon>
           </el-button>
@@ -252,12 +263,12 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
     class="mk-hide-asterisk"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: '请输入默认值' }] : []"
+    :rules="formValue.required ? [{ required: true, message: t('common.form.inputField', { fieldName: t('dynamicForm.fields.defaultValue') }) }] : []"
   >
     <template #label>
       <div class="flex-between">
-        <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
-        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+        <span :class="formValue.required ? 'mk-required' : ''">{{ t('dynamicForm.fields.defaultValue') }}</span>
+        <el-checkbox v-model="formValue.show_default_value" :label="t('dynamicForm.defaultValue.show')" />
       </div>
     </template>
     <el-tree-select
@@ -269,22 +280,26 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
     />
   </el-form-item>
   <!-- 添加弹窗 -->
-  <MkDialog v-model="addDialog.visible" :title="addDialog.mode === 'root' ? '添加一级选项' : '添加子选项'" @closed="handleAddClosed">
+  <MkDialog
+    v-model="addDialog.visible"
+    :title="addDialog.mode === 'root' ? t('dynamicForm.tree.addRoot') : t('dynamicForm.tree.addChild')"
+    @closed="handleAddClosed"
+  >
     <el-form :model="addDialog" label-position="top" require-asterisk-position="right" @submit.prevent>
       <MkFormList v-model="addDialog.formList" :default-item="createEmptyRow" item-key="key">
         <template #default="{ index, item: option }">
-          <el-form-item :label="index === 0 ? '标签' : ''" :required="index === 0" class="min-w-0 flex-1 small">
-            <el-input v-model.trim="option.label" placeholder="请输入选项标签" maxlength="50" />
+          <el-form-item :label="index === 0 ? t('dynamicForm.options.label') : ''" :required="index === 0" class="min-w-0 flex-1 small">
+            <el-input v-model.trim="option.label" :placeholder="t('dynamicForm.tree.labelPlaceholder')" maxlength="50" />
           </el-form-item>
-          <el-form-item :label="index === 0 ? '选项值' : ''" :required="index === 0" class="min-w-0 flex-1 small">
-            <el-input v-model.trim="option.value" placeholder="请输入选项值" maxlength="100" />
+          <el-form-item :label="index === 0 ? t('dynamicForm.options.value') : ''" :required="index === 0" class="min-w-0 flex-1 small">
+            <el-input v-model.trim="option.value" :placeholder="t('dynamicForm.options.valueRequired')" maxlength="100" />
           </el-form-item>
         </template>
       </MkFormList>
     </el-form>
     <template #footer>
-      <el-button plain @click="closeAddDialog">取消</el-button>
-      <el-button type="primary" @click="submitAdd">添加</el-button>
+      <el-button plain @click="closeAddDialog">{{ t('common.actions.cancel') }}</el-button>
+      <el-button type="primary" @click="submitAdd">{{ t('common.actions.add') }}</el-button>
     </template>
   </MkDialog>
 
@@ -294,22 +309,22 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
     :close-on-click-modal="true"
     :close-on-press-escape="true"
     v-model="editDialog.visible"
-    title="编辑"
+    :title="t('common.actions.edit')"
     @closed="handleEditClosed"
   >
     <el-form :model="editDialog.form" label-position="top" require-asterisk-position="right" @submit.prevent>
       <div class="flex gap-2">
-        <el-form-item label="标签" required class="min-w-0 flex-1 small">
-          <el-input v-model.trim="editDialog.form.label" placeholder="请输入选项标签" maxlength="50" />
+        <el-form-item :label="t('dynamicForm.options.label')" required class="min-w-0 flex-1 small">
+          <el-input v-model.trim="editDialog.form.label" :placeholder="t('dynamicForm.tree.labelPlaceholder')" maxlength="50" />
         </el-form-item>
-        <el-form-item label="选项值" required class="min-w-0 flex-1 small">
-          <el-input v-model.trim="editDialog.form.value" placeholder="请输入选项值" maxlength="100" />
+        <el-form-item :label="t('dynamicForm.options.value')" required class="min-w-0 flex-1 small">
+          <el-input v-model.trim="editDialog.form.value" :placeholder="t('dynamicForm.options.valueRequired')" maxlength="100" />
         </el-form-item>
       </div>
     </el-form>
     <template #footer>
-      <el-button plain @click="closeEditDialog">取消</el-button>
-      <el-button type="primary" @click="submitEdit">保存</el-button>
+      <el-button plain @click="closeEditDialog">{{ t('common.actions.cancel') }}</el-button>
+      <el-button type="primary" @click="submitEdit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

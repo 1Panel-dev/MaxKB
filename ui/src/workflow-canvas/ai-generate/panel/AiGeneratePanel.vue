@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, ref, useTemplateRef ,provide} from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { cloneDeep } from 'lodash'
 import type LogicFlow from '@logicflow/core'
 import type { ScrollbarInstance } from 'element-plus'
@@ -15,6 +16,7 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import { useAgent } from '../impl'
 import { layoutCanvas } from '../tools/canvas'
+import { updateConditionSchema } from '../tools/node'
 import { clearDebugLog, resumeMessages } from '../common'
 import { createAgent } from '../create-agent'
 import type { AgentEvent, AgentHandle, AgentMessage } from '../type'
@@ -34,6 +36,7 @@ const emit = defineEmits<{ (event: 'done'): void }>()
 
 const resourceScope = inject('resourceScope', 'workspace')
 const route = useRoute()
+const { t } = useI18n({ useScope: 'global' })
 const store = useWorkflowStore(resourceScope)
 
 type GenerateStatus = 'idle' | 'running' | 'done' | 'error' | 'stopped'
@@ -149,6 +152,7 @@ function resourceIdOf(): string | undefined {
 async function run(text: string) {
   const lf = props.getLogicFlow()
   if (!lf) return
+  updateConditionSchema(t)
   if (!agent) {
     sessionGoal ??= text
     agent = createAgent(

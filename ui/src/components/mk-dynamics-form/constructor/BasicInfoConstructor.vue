@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref, computed, nextTick } from 'vue'
 import type { Component } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { DynamicFormConstructorExpose, DynamicFormConstructorOption, DynamicFormConstructorState, FormField, FormFieldLabel } from '../type'
+
+const { t } = useI18n({ useScope: 'global' })
 
 interface ConstructorModule {
   default: Component
@@ -27,11 +30,11 @@ const currentConstructor = computed(() => constructorComponents[props.modelValue
 const ruleFormRef = ref<FormInstance>()
 const componentFormRef = ref<DynamicFormConstructorExpose>()
 
-const rules: FormRules<DynamicFormConstructorState> = {
-  label: [{ whitespace: true, required: true, message: '请输入显示名称' }],
-  field: [{ whitespace: true, required: true, message: '请输入参数' }],
-  input_type: [{ required: true, message: '请选择组件类型' }],
-}
+const rules = computed<FormRules<DynamicFormConstructorState>>(() => ({
+  label: [{ whitespace: true, required: true, message: t('common.form.inputField', { fieldName: t('dynamicForm.fields.displayName') }) }],
+  field: [{ whitespace: true, required: true, message: t('common.form.inputField', { fieldName: t('dynamicForm.fields.parameter') }) }],
+  input_type: [{ required: true, message: t('dynamicForm.validation.componentTypeRequired') }],
+}))
 
 const validate = () => (ruleFormRef.value ? ruleFormRef.value.validate() : Promise.resolve())
 
@@ -81,20 +84,35 @@ defineExpose({ validate, getData, render })
 </script>
 <template>
   <el-form @submit.prevent ref="ruleFormRef" label-position="top" require-asterisk-position="right" :model="form">
-    <el-form-item label="参数" prop="field" :rules="rules.field">
-      <el-input v-model="form.field" :maxlength="64" placeholder="请输入参数" show-word-limit />
+    <el-form-item :label="t('dynamicForm.fields.parameter')" prop="field" :rules="rules.field">
+      <el-input
+        v-model="form.field"
+        :maxlength="64"
+        :placeholder="t('common.form.inputField', { fieldName: t('dynamicForm.fields.parameter') })"
+        show-word-limit
+      />
     </el-form-item>
-    <el-form-item label="显示名称" prop="label" :rules="rules.label">
-      <el-input v-model="form.label" :maxlength="64" show-word-limit placeholder="请输入显示名称" />
+    <el-form-item :label="t('dynamicForm.fields.displayName')" prop="label" :rules="rules.label">
+      <el-input
+        v-model="form.label"
+        :maxlength="64"
+        show-word-limit
+        :placeholder="t('common.form.inputField', { fieldName: t('dynamicForm.fields.displayName') })"
+      />
     </el-form-item>
-    <el-form-item label="参数提示说明">
-      <el-input v-model="form.tooltip" :maxlength="128" show-word-limit placeholder="请输入参数提示说明" />
+    <el-form-item :label="t('dynamicForm.fields.tooltip')">
+      <el-input
+        v-model="form.tooltip"
+        :maxlength="128"
+        show-word-limit
+        :placeholder="t('common.form.inputField', { fieldName: t('dynamicForm.fields.tooltip') })"
+      />
     </el-form-item>
-    <el-form-item label="是否必填" prop="required" @click.prevent>
+    <el-form-item :label="t('dynamicForm.fields.isRequired')" prop="required" @click.prevent>
       <el-switch v-model="form.required" :active-value="true" :inactive-value="false" />
     </el-form-item>
-    <el-form-item label="组件类型" prop="input_type" :rules="rules.input_type">
-      <el-select v-model="form.input_type" placeholder="请选择组件类型">
+    <el-form-item :label="t('dynamicForm.fields.componentType')" prop="input_type" :rules="rules.input_type">
+      <el-select v-model="form.input_type" :placeholder="t('dynamicForm.validation.componentTypeRequired')">
         <el-option v-for="item in inputTypeList" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
     </el-form-item>

@@ -1,0 +1,179 @@
+{
+  "authentication": {
+    "scan": {
+      "settingsTitle": "{provider}设置",
+      "title": "扫码登录"
+    },
+    "fields": {
+      "callbackUrl": "回调地址",
+      "password": "密码",
+      "authorizationUrl": "授权端地址",
+      "tokenUrl": "Token 端地址",
+      "userInfoUrl": "用户信息端地址",
+      "scope": "连接范围",
+      "clientId": "客户端 ID",
+      "clientSecret": "客户端密钥",
+      "fieldMapping": "字段映射"
+    },
+    "cas": {
+      "idpUriRequired": "请输入 ldpUri",
+      "validationUrlRequired": "请输入验证地址",
+      "validationUrl": "验证地址",
+      "enable": "启用 CAS 认证"
+    },
+    "callbackUrlRequired": "请输入回调地址",
+    "ldap": {
+      "validation": {
+        "serverRequired": "请输入服务器地址",
+        "bindDnRequired": "请输入Bind DN",
+        "userDirectoryRequired": "请输入用户目录（OU）",
+        "userFilterRequired": "请输入用户过滤器"
+      },
+      "address": {
+        "label": "LDAP 地址",
+        "placeholder": "请输入LDAP 地址"
+      },
+      "bindDn": {
+        "label": "绑定 DN",
+        "placeholder": "请输入绑定 DN"
+      },
+      "userOu": {
+        "label": "用户 OU",
+        "placeholder": "请输入用户 OU"
+      },
+      "userFilter": "用户过滤器",
+      "attributeMapping": {
+        "label": "LDAP 属性映射",
+        "placeholder": "请输入 LDAP 属性映射"
+      },
+      "enable": "启用 LDAP 认证"
+    },
+    "passwordRequired": "请输入密码",
+    "fieldMappingRequired": "请输入字段映射",
+    "validation": {
+      "authorizationUrlRequired": "请输入授权端地址",
+      "tokenUrlRequired": "请输入 Token 端地址",
+      "userInfoUrlRequired": "请输入用户信息端地址",
+      "scopeRequired": "请输入连接范围",
+      "clientIdRequired": "请输入客户端 ID",
+      "clientSecretRequired": "请输入客户端密钥"
+    },
+    "oauth2": {
+      "enable": "启用 OAuth2 认证"
+    },
+    "oidc": {
+      "scopeRequired": "请输入 Scope",
+      "enable": "启用 OIDC 认证"
+    },
+    "login": {
+      "title": "登录设置",
+      "loginMethodsRequired": "请选择登录方式",
+      "defaultLoginRequired": "请选择默认登录方式",
+      "roleRequired": "请选择角色",
+      "workspaceRequired": "请选择工作空间",
+      "loginMethods": "登录方式",
+      "defaultLogin": "默认登录方式",
+      "captchaSettings": "账号登录验证码设置",
+      "showCaptchaAfterFailures": "登录失败 {count} 次显示验证码",
+      "captchaDisabledHint": "(值为-1时，不显示验证码)",
+      "lockAfterFailures": "登录失败 {count} 次，锁定账号 {minutes} 分钟",
+      "thirdPartyRoleAssignment": "第三方用户默认角色分配",
+      "role": "角色",
+      "workspace": "工作空间",
+      "userGroup": "用户组",
+      "userGroupPlaceholder": "请选择用户组"
+    },
+    "saml2": {
+      "idpMetadataUrlRequired": "请输入 Idp MetaData Url",
+      "privateKeyRequired": "请输入 SP Private Key",
+      "certificateRequired": "请输入 SP Certificate",
+      "entityIdRequired": "请输入 SP Entity Id",
+      "acsRequired": "请输入 SP Ace",
+      "signRequests": "开启请求签名",
+      "signAssertions": "开启断言签名",
+      "entityIdPlaceholder": "请输入 SP Entity ID",
+      "acsPlaceholder": "请输入 SP ACS",
+      "enable": "启用 SAML2 认证"
+    }
+  },
+  "email": {
+    "validation": {
+      "hostRequired": "请输入 SMTP Host",
+      "portRequired": "请输入 SMTP Port",
+      "accountRequired": "请输入 SMTP 账户",
+      "senderRequired": "请输入发件人邮箱"
+    },
+    "fields": {
+      "account": "SMTP 账户",
+      "sender": "发件人邮箱"
+    },
+    "passwordPlaceholder": "请输入发件人密码",
+    "ssl": {
+      "label": "启用 SSL",
+      "description": "（如果 SMTP 端口是 465，通常需要启用 SSL）"
+    },
+    "tls": {
+      "label": "启用 TLS",
+      "description": "（如果 SMTP 端口是 587，通常需要启用 TL）"
+    }
+  },
+  "theme": {
+    "images": {
+      "icon": {
+        "label": "网站 Logo",
+        "description": "顶部网站显示 Logo，建议尺寸 48*48，支持 JPG、PNG、GIF，大小不超过 10MB"
+      },
+      "loginLogo": {
+        "label": "登录 Logo",
+        "description": "登录页面左侧 Logo，建议尺寸 126*32，支持 JPG、PNG、GIF，大小不超过 10 MB"
+      },
+      "loginImage": {
+        "label": "登录背景图",
+        "description": "左侧背景图，矢量图建议尺寸 1728*1117，位图建议尺寸 3456*2234；支持 JPG、PNG、GIF，大小不超过 10 MB"
+      }
+    },
+    "validation": {
+      "sloganRequired": "请输入网站欢迎语",
+      "titleRequired": "请输入网站名称",
+      "imageFormatInvalid": "仅支持 JPG、PNG 或 GIF 格式的图片",
+      "imageSizeExceeded": "图片大小不能超过 10 MB"
+    },
+    "customColor": "自定义颜色",
+    "loginSettings": "平台登录设置",
+    "platformSettings": "平台设置",
+    "fields": {
+      "title": "网站名称",
+      "slogan": "欢迎语"
+    },
+    "links": {
+      "userManual": {
+        "label": "用户手册",
+        "placeholder": "请输入用户手册地址"
+      },
+      "forum": {
+        "label": "论坛求助",
+        "placeholder": "请输入论坛求助地址"
+      },
+      "project": {
+        "label": "项目地址",
+        "placeholder": "请输入项目地址"
+      }
+    },
+    "preview": {
+      "loginDescription": "预览页默认为 MaxKB 登录界面，支持自定义设置",
+      "platformDescription": "预览页默认为 MaxKB 平台界面，支持自定义设置",
+      "changePassword": "修改密码",
+      "about": "关于",
+      "sampleName": "飞小致",
+      "systemAdministrator": "系统管理员",
+      "logout": "退出登录"
+    },
+    "colors": {
+      "default": "默认",
+      "orange": "活力橙",
+      "green": "松石绿",
+      "purple": "神秘紫",
+      "red": "胭脂红"
+    }
+  }
+}

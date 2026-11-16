@@ -1,0 +1,141 @@
+{
+  "members": {
+    "userRequired": "请选择用户",
+    "addTitle": "添加成员",
+    "usernameOrName": "用户名/姓名",
+    "userPlaceholder": "请选择用户名或姓名",
+    "label": "成员",
+    "placeholder": "请选择成员"
+  },
+  "groups": {
+    "nameRequired": "请输入用户组名称",
+    "renameTitle": "重命名用户组",
+    "createTitle": "创建用户组",
+    "name": "用户组名称",
+    "deleteConfirm": "是否删除用户组：{name}？",
+    "deleteDescription": "删除后，成员将被移除该用户组，通过该用户组继承的资源权限将被回收，请谨慎操作！",
+    "removeUserConfirm": "是否移除用户：{name}？",
+    "batchRemoveConfirm": "是否移除选中的 {count} 个用户？",
+    "removeDescription": "成员移除后，通过该用户组继承的资源权限将被回收，请谨慎操作。",
+    "label": "用户组",
+    "placeholder": "请选择用户组"
+  },
+  "messages": {
+    "batchRemoved": "批量移除成功"
+  },
+  "users": {
+    "fields": {
+      "name": "姓名",
+      "username": "用户名",
+      "source": "用户来源",
+      "email": "邮箱",
+      "phone": "手机号"
+    },
+    "sources": {
+      "system": "系统用户",
+      "localFile": "本地文件"
+    },
+    "editTitle": "编辑用户",
+    "createTitle": "创建用户",
+    "validation": {
+      "usernameRequired": "请输入用户名",
+      "nameRequired": "请输入姓名",
+      "emailRequired": "请输入邮箱",
+      "emailInvalid": "请输入正确的邮箱",
+      "phoneInvalid": "请输入正确的手机号"
+    },
+    "phonePlaceholder": "请输入手机号",
+    "defaultPassword": "默认密码",
+    "roleSettings": "角色设置",
+    "addRole": "添加角色",
+    "batchRole": {
+      "title": "设置角色"
+    },
+    "import": {
+      "title": "导入用户",
+      "sourceRequired": "请选择用户来源",
+      "fileFormatInvalid": "仅支持上传 xlsx 格式的文件",
+      "conflicts": {
+        "username": "用户名已存在",
+        "email": "邮箱已存在",
+        "name": "姓名已存在",
+        "other": "{fieldType} 冲突"
+      },
+      "newUsersOnly": "仅导入新增用户",
+      "supportedFormats": "支持格式：xlsx",
+      "results": {
+        "success": "成功导入 {count} 个用户",
+        "skipped": "成功导入 {count} 个用户，跳过 {skippedCount} 个用户",
+        "conflicts": "成功导入 {count} 个用户，{conflictDetails}",
+        "skippedWithConflicts": "成功导入 {count} 个用户，跳过 {skippedCount} 个用户，{conflictDetails}"
+      }
+    },
+    "deleteConfirm": "确定删除用户“{name}”吗？",
+    "deleteDescription": "删除用户，该用户创建的资源（智能体、知识库、模型）不会删除，请谨慎操作。",
+    "batchDeleteConfirm": "是否删除选中的 {count} 个用户？",
+    "password": {
+      "title": "修改用户密码",
+      "confirmRequired": "请输入确认密码",
+      "mismatch": "输入的密码不一致",
+      "required": "请输入新密码",
+      "succeeded": "密码修改成功",
+      "newPassword": "新密码",
+      "confirmPassword": "确认密码",
+      "confirmPlaceholder": "请再次输入新密码"
+    }
+  },
+  "roles": {
+    "label": "角色",
+    "removeMemberConfirm": "确定移除成员“{name}”吗？",
+    "batchRemoveConfirm": "是否删除选中的 {count} 个成员？",
+    "permission": {
+      "module": "模块名称",
+      "target": "操作对象",
+      "title": "权限配置"
+    },
+    "nameRequired": "请输入角色名称",
+    "inheritedRoleRequired": "请选择继承角色",
+    "renameTitle": "重命名角色",
+    "createTitle": "创建角色",
+    "name": "角色名称",
+    "inheritedRole": "继承角色",
+    "placeholder": "请选择角色",
+    "deleteConfirm": "是否刪除角色：{name}？",
+    "deleteDescription": "删除后，该角色下的成员都会被移除，请谨慎操作。",
+    "systemBadge": "系",
+    "types": {
+      "admin": "系统管理员",
+      "workspaceManager": "工作空间管理员",
+      "user": "普通用户"
+    }
+  },
+  "resourceAuthorization": {
+    "permission": "权限",
+    "configure": "配置权限",
+    "operationPermission": "操作权限",
+    "resourceTypes": {
+      "application": "智能体",
+      "knowledge": "知识库",
+      "model": "模型",
+      "tool": "工具"
+    },
+    "byGroup": "按用户组",
+    "byUser": "按用户",
+    "title": "资源权限配置"
+  },
+  "workspaces": {
+    "label": "工作空间",
+    "placeholder": "请选择工作空间",
+    "defaultName": "默认工作空间",
+    "nameRequired": "请输入工作空间名称",
+    "renameTitle": "重命名工作空间",
+    "createTitle": "创建工作空间",
+    "name": "工作空间名称",
+    "deleteConfirm": "确认删除{name}？",
+    "deleteDescription": "删除后，该空间下的成员都会被移除，请谨慎操作。",
+    "removeMemberConfirm": "是否移除成员：{name}？",
+    "batchRemoveConfirm": "是否移除选中记录对应的成员？",
+    "batchRemoveDescription": "涉及 {userCount} 位用户，共 {recordCount} 条记录。",
+    "partialRemoveResult": "移除成功 {successCount} 个成员，失败 {failedCount} 个"
+  }
+}

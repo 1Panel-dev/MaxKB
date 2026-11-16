@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { TableFilterCustomValue } from './types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'TableFilterCustom' })
 const props = defineProps<{
@@ -45,9 +48,9 @@ function handleConfirm() {
 
     <div class="p-3 text-right">
       <!-- 清除多选筛选 -->
-      <el-button plain class="min-w-12! w-12!" size="small" @click="handleReset">重置</el-button>
+      <el-button plain class="min-w-12! w-12!" size="small" @click="handleReset">{{ t('components.table.resetFilter') }}</el-button>
       <!-- 确认多选筛选 -->
-      <el-button class="min-w-12! w-12!" size="small" type="primary" @click="handleConfirm">确定</el-button>
+      <el-button class="min-w-12! w-12!" size="small" type="primary" @click="handleConfirm">{{ t('common.actions.confirmButton') }}</el-button>
     </div>
   </el-popover>
 </template>

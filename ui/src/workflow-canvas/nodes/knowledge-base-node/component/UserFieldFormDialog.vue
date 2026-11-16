@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import { MkDynamicsFormConstructor, dynamicFormTypeOptions, type FormField } from '@/components/mk-dynamics-form'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ submit: [data: FormField, index?: number] }>()
 const constructorRef = useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('constructorRef')
@@ -9,9 +12,11 @@ const dialogVisible = ref(false)
 const editingIndex = ref<number>()
 const currentField = ref<Partial<FormField>>(createField())
 const allowedInputTypes = ['TextInput', 'PasswordInput', 'SingleSelect', 'MultiSelect', 'RadioCard', 'DatePicker', 'SwitchInput']
-const fieldTypeOptions = dynamicFormTypeOptions
-  .filter(({ value }) => allowedInputTypes.includes(value))
-  .map(({ label, value }) => ({ label, value: `${value}Constructor` }))
+const fieldTypeOptions = computed(() =>
+  dynamicFormTypeOptions
+    .filter(({ value }) => allowedInputTypes.includes(value))
+    .map(({ label, value }) => ({ label: t(label), value: `${value}Constructor` })),
+)
 
 function createField(): Partial<FormField> {
   return { input_type: 'TextInput', required: false, attrs: { maxlength: 200, minlength: 0 }, show_default_value: true }

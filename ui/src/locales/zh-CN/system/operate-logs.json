@@ -1,0 +1,16 @@
+{
+  "fields": {
+    "menu": "操作菜单",
+    "detail": "操作详情",
+    "user": "操作用户",
+    "workspace": "工作空间",
+    "operateTime": "操作时间"
+  },
+  "detail": {
+    "title": "API 详情"
+  },
+  "cleanStrategy": {
+    "title": "清除策略",
+    "description": "删除 {days} 天之前的对话记录"
+  }
+}

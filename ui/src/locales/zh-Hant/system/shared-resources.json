@@ -1,0 +1,9 @@
+{
+  "authorization": {
+    "title": "授權工作空間",
+    "description": "已授權的工作空間可使用目前資源",
+    "whitelist": "白名單",
+    "blacklist": "黑名單",
+    "selectWorkspace": "選擇工作空間"
+  }
+}

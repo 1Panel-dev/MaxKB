@@ -1,0 +1,14 @@
+{
+  "actions": {
+    "manage": "管理"
+  },
+  "fields": {
+    "publishTime": "发布时间",
+    "provider": "供应商",
+    "workspace": "工作空间"
+  },
+  "delete": {
+    "modelReferenced": "该模型已被 {count} 个资源引用，删除后相关资源将无法正常运行，请谨慎操作。",
+    "toolReferenced": "该工具已被 {count} 个资源引用，删除后相关资源将无法正常运行，请谨慎操作。"
+  }
+}

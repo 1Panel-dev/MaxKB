@@ -1,0 +1,117 @@
+{
+  "list": {
+    "allTools": "全部工具"
+  },
+  "types": {
+    "dataSource": "数据源",
+    "custom": "工具",
+    "workflow": "工作流"
+  },
+  "actions": {
+    "executionRecords": "查看执行记录",
+    "updateVersion": "更新版本",
+    "saveAndEnable": "保存并启用"
+  },
+  "form": {
+    "resourceCreationUnsupported": "资源管理不支持创建工具",
+    "unsavedChanges": "当前的更改尚未保存，确认退出吗？",
+    "customNoticeTitle": "提示？"
+  },
+  "custom": {
+    "editTitle": "编辑工具",
+    "copyTitle": "复制工具",
+    "nameRequired": "请输入工具名称",
+    "contentRequired": "请输入工具内容",
+    "createTitle": "创建工具"
+  },
+  "dataSource": {
+    "createTitle": "创建数据源",
+    "editTitle": "编辑数据源",
+    "copyTitle": "复制数据源",
+    "nameRequired": "请输入数据源名称",
+    "contentRequired": "请输入数据源内容"
+  },
+  "mcp": {
+    "createTitle": "创建 MCP",
+    "editTitle": "编辑 MCP",
+    "copyTitle": "复制 MCP",
+    "service": "MCP 服务",
+    "transportDescription": "（仅支持 SSE、Streamable HTTP 调用方式）",
+    "nameRequired": "请输入 MCP 名称",
+    "configRequired": "请输入 MCP Server Config",
+    "configInvalid": "请输入正确的 MCP Server Config",
+    "configTitle": "MCP 服务配置"
+  },
+  "skill": {
+    "createTitle": "创建 Skill",
+    "editTitle": "编辑 Skill",
+    "copyTitle": "复制 Skill",
+    "nameRequired": "请输入 Skill 名称",
+    "file": "Skill 文件",
+    "fileRequired": "请上传 Skill ZIP 文件",
+    "fileEmpty": "不能上传空文件",
+    "fileSizeExceeded": "文件大小不能超过 {maxSize} MB",
+    "fileDescription": "支持格式：ZIP，大小不超过 {maxSize} MB"
+  },
+  "workflow": {
+    "createTitle": "创建工作流",
+    "editTitle": "编辑工作流",
+    "copyTitle": "复制工作流",
+    "nameRequired": "请输入工作流名称",
+    "publishBeforeEnable": "无法启用，请先发布工作流"
+  },
+  "parameters": {
+    "initTitle": "启动参数",
+    "inputTitle": "输入参数",
+    "outputTitle": "输出参数",
+    "visibleDuringUse": "使用工具时显示",
+    "fields": {
+      "name": "参数名称",
+      "description": "参数提示说明"
+    },
+    "nameRequired": "请输入参数名称",
+    "sourceOptions": {
+      "reference": "引用参数"
+    },
+    "outputResult": "结果 {result}"
+  },
+  "codeGeneration": {
+    "contentTitle": "工具内容（Python）",
+    "hiddenDuringUse": "使用工具时不显示",
+    "title": "生成 Python 代码",
+    "placeholder": "请描述这个工具的功能",
+    "empty": "Python 代码显示在这里"
+  },
+  "debug": {
+    "toolRunFailed": "工具运行失败",
+    "result": "运行结果"
+  },
+  "store": {
+    "title": "工具商店",
+    "addTitle": "添加工具",
+    "searchResultCount": "找到 {count} 个相关工具",
+    "categories": {
+      "databaseSearch": "数据库查询",
+      "webSearch": "联网搜索"
+    }
+  },
+  "copy": {
+    "defaultName": "{name}  副本"
+  },
+  "delete": {
+    "confirm": "确认删除工具：{name}？",
+    "batchConfirm": "是否批量删除 {count} 个工具？"
+  },
+  "update": {
+    "confirm": "确认更新工具：{name}？",
+    "description": "更新工具可能会影响正在使用的资源，请谨慎操作。"
+  },
+  "disable": {
+    "confirm": "是否禁用工具：{name}？",
+    "description": "禁用后，引用了该工具的资源执行会报错 ，请谨慎操作。"
+  },
+  "messages": {
+    "workspaceMissing": "工具缺少所属工作空间信息",
+    "replaced": "替换成功"
+  }
+}

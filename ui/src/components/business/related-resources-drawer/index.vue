@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { computed, onBeforeUnmount, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import type RelatedResourcesApi from '@/api/admin/workspace/related-resources'
@@ -10,6 +11,8 @@ import { isSystemSharedResource } from '@/utils/resource-context'
 import type { Dict, ModelProviderItem, OptionItem, RelatedResource, ResourceType } from '@/api/types'
 import ResourceIcon from './ResourceIcon.vue'
 import type { RelatedResourceTarget } from './types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'RelatedResourcesDrawer' })
 const props = defineProps<{
@@ -24,20 +27,20 @@ const visible = ref(false)
 const resourceType = ref<ResourceType>(RESOURCE_TYPE.APPLICATION)
 const targetResource = ref<RelatedResourceTarget>()
 const resourceLabels = {
-  [RESOURCE_TYPE.APPLICATION]: '智能体',
-  [RESOURCE_TYPE.KNOWLEDGE]: '知识库',
-  [RESOURCE_TYPE.TOOL]: '工具',
-  [RESOURCE_TYPE.MODEL]: '模型',
+  [RESOURCE_TYPE.APPLICATION]: 'system.identity.resourceAuthorization.resourceTypes.application',
+  [RESOURCE_TYPE.KNOWLEDGE]: 'system.identity.resourceAuthorization.resourceTypes.knowledge',
+  [RESOURCE_TYPE.TOOL]: 'system.identity.resourceAuthorization.resourceTypes.tool',
+  [RESOURCE_TYPE.MODEL]: 'system.identity.resourceAuthorization.resourceTypes.model',
 }
-const resourceTypeOptions = Object.entries(resourceLabels).map(([value, label]) => ({ value, label }))
-const searchFields = [
-  { label: '名称', value: 'resource_name' },
-  { label: '创建者', value: 'user_name' },
-]
-const relationTabs = [
-  { value: 'dependency', label: '依赖' },
-  { value: 'dependent', label: '被依赖' },
-]
+const resourceTypeOptions = computed(() => Object.entries(resourceLabels).map(([value, label]) => ({ value, label: t(label) })))
+const searchFields = computed(() => [
+  { label: t('common.fields.name'), value: 'resource_name' },
+  { label: t('common.fields.creator'), value: 'user_name' },
+])
+const relationTabs = computed(() => [
+  { value: 'dependency', label: t('components.relatedResources.dependencies') },
+  { value: 'dependent', label: t('components.relatedResources.dependents') },
+])
 const relationDirection = ref<'dependency' | 'dependent'>('dependency')
 
 /* 分页查询：两个关系方向共用表格，仅转换关系字段。 */
@@ -141,10 +144,10 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="查看关联资源" size="60%" @closed="handleClosed">
+  <MkDrawer v-model="visible" :title="t('common.actions.relatedResources')" size="60%" @closed="handleClosed">
     <template v-if="targetResource">
       <div class="flex-align-center mb-4">
-        <span class="mr-4 mk-N600!">{{ resourceLabels[resourceType] }}</span>
+        <span class="mr-4 mk-N600!">{{ t(resourceLabels[resourceType]) }}</span>
 
         <ResourceIcon
           :resource-type="resourceType"
@@ -156,7 +159,7 @@ defineExpose({ open, close })
         <span class="ml-2">{{ targetResource.name }}</span>
       </div>
 
-      <h4 class="mk-title-decoration mb-4">关联资源</h4>
+      <h4 class="mk-title-decoration mb-4">{{ t('components.relatedResources.title') }}</h4>
 
       <div class="flex-between gap-3">
         <el-radio-group v-model="relationDirection" @change="changeDirection">
@@ -174,7 +177,7 @@ defineExpose({ open, close })
         @current-change="loadResources"
         @size-change="loadResources"
       >
-        <el-table-column prop="name" label="名称" min-width="160" show-overflow-tooltip>
+        <el-table-column prop="name" :label="t('common.fields.name')" min-width="160" show-overflow-tooltip>
           <template #default="{ row }">
             <!-- // TODO: 资源跳转 -->
             <div class="flex-align-center gap-2">
@@ -183,26 +186,38 @@ defineExpose({ open, close })
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="desc" label="描述" min-width="160" show-overflow-tooltip />
-        <el-table-column label="类型" min-width="100">
+        <el-table-column prop="desc" :label="t('common.fields.description')" min-width="160" show-overflow-tooltip />
+        <el-table-column :label="t('common.fields.type')" min-width="100">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedResourceType" label="类型" :options="resourceTypeOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedResourceType"
+              :label="t('common.fields.type')"
+              :options="resourceTypeOptions"
+              @change="handleFilterChange"
+            />
           </template>
-          <template #default="{ row }">{{ resourceLabels[row.resourceType as ResourceType] }}</template>
+          <template #default="{ row }">{{ t(resourceLabels[row.resourceType as ResourceType]) }}</template>
         </el-table-column>
-        <el-table-column v-if="showWorkspace" prop="workspace_name" label="工作空间" min-width="140" show-overflow-tooltip>
+        <el-table-column
+          v-if="showWorkspace"
+          prop="workspace_name"
+          :label="t('system.identity.workspaces.label')"
+          min-width="140"
+          show-overflow-tooltip
+        >
           <template #header>
             <!-- 筛选关联资源所属工作空间 -->
             <MkTableFilter
               mode="multiple"
               v-model="selectedWorkspaceIds"
-              label="工作空间"
+              :label="t('system.identity.workspaces.label')"
               :options="workspaceOptions"
               @change="handleFilterChange"
             />
           </template>
         </el-table-column>
-        <el-table-column prop="username" label="创建者" min-width="100" show-overflow-tooltip />
+        <el-table-column prop="username" :label="t('common.fields.creator')" min-width="100" show-overflow-tooltip />
       </MkTable>
     </template>
   </MkDrawer>
