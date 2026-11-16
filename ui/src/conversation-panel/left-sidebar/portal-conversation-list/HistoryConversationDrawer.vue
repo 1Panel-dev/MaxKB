@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import ConversationApi from '@/api/chat/conversation'
 import type { PortalConversationSummary } from '@/api/types'
-import { relativeTimeFormat } from '@/utils/time'
+import ConversationApi from '@/api/chat/conversation'
+import { useMessageListStore } from '../../components/message-list/index'
+import RenameConversation from '../../components/rename/index.vue'
 import { useConversationListStore } from '../conversation-list/index'
 import { usePortalConversationListStore } from './index'
-import RenameConversation from '../../components/rename/index.vue'
-
-import { useMessageListStore } from '../../components/message-list/index'
+import { relativeTimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'HistoryConversationDrawer' })
 const props = defineProps<{ applicationId: string }>()

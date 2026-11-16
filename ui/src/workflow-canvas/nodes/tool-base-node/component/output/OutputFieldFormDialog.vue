@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import type { ToolOutputField } from '../../types'
+import type { FormInstance, FormRules } from 'element-plus'
 
 const emit = defineEmits<{ submit: [data: ToolOutputField, index?: number] }>()
 const formRef = useTemplateRef<FormInstance>('formRef')

@@ -1,7 +1,7 @@
 /** 智能体工作流的返回导航，按详情路由配置选择可访问的子页面。 */
 import type { RouteParamsGeneric } from 'vue-router'
-import router from '@/router/admin'
 import { APPLICATION_TYPE } from '@/api/enums'
+import router from '@/router/admin'
 import { getWorkspaceId, isSystemResource } from '@/utils/resource-context'
 
 /** 按详情菜单顺序返回首个可访问的子路由，无可用详情时返回对应范围的列表。 */

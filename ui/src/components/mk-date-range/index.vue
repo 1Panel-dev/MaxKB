@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { MkDateRangeValue } from './types'
 import type { OptionItem } from '@/api/types'
 import { beforeDay } from '@/utils/time'
-import type { MkDateRangeValue } from './types'
 
 defineOptions({ name: 'MkDateRange' })
 

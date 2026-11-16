@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import JSEncrypt from 'jsencrypt'
+import { useI18n } from 'vue-i18n'
 import type { FormInstance, FormRules } from 'element-plus'
 import ForgotPasswordApi from '@/api/admin/auth/forgot-password'
+import LoginLayout from '../components/LoginLayout.vue'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import LoginLayout from '../components/LoginLayout.vue'
 
 interface ForgotPasswordForm {
   confirmPassword: string

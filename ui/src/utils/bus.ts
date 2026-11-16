@@ -1,4 +1,5 @@
-import mitt, { type Emitter } from 'mitt'
+import mitt from 'mitt'
+import type { Emitter } from 'mitt'
 
 /**
  * 全局事件总线。

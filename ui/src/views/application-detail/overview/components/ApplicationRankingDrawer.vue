@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import type { ApplicationRankingKind, HomeDateRange, HomeRankingRecord } from '@/api/types'
-import perm from '@/permission'
-import { isSystemResource } from '@/utils/resource-context'
-import MkDateRange from '@/components/mk-date-range/index.vue'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
-import { formatTokenNumber, numberFormat } from '@/utils/number'
+import MkDateRange from '@/components/mk-date-range/index.vue'
 import { useApplicationDetailContext } from '../../context'
+import { formatTokenNumber, numberFormat } from '@/utils/number'
+import { isSystemResource } from '@/utils/resource-context'
+import perm from '@/permission'
 
 defineOptions({ name: 'ApplicationRankingDrawer' })
 const props = defineProps<{ applicationId: string; initialKind: ApplicationRankingKind; initialRange: HomeDateRange }>()

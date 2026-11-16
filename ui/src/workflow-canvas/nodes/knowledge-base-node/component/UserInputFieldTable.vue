@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { MsgError } from '@/utils/message'
-import { dynamicFormTypeOptions, type FormField } from '@/components/mk-dynamics-form'
 import type { KnowledgeFieldConfig } from '../types'
-import UserFieldFormDialog from './UserFieldFormDialog.vue'
+import type { FormField } from '@/components/mk-dynamics-form'
+import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
 import TitleSettingDialog from './TitleSettingDialog.vue'
+import UserFieldFormDialog from './UserFieldFormDialog.vue'
+import { MsgError } from '@/utils/message'
 
 const fields = defineModel<FormField[]>({ required: true })
 const config = defineModel<KnowledgeFieldConfig>('config', { required: true })

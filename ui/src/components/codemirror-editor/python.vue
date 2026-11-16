@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { EditorState } from '@codemirror/state'
-import { linter, type Diagnostic } from '@codemirror/lint'
 import { python } from '@codemirror/lang-python'
+import { linter } from '@codemirror/lint'
 import { Codemirror } from 'vue-codemirror'
-import ToolApi from '@/api/admin/workspace/tool/tool'
+import type { ToolPylintIssue } from '@/api/types'
+import type { Diagnostic } from '@codemirror/lint'
+import type { EditorState } from '@codemirror/state'
 import SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
-import type { ToolPylintIssue } from '@/api/types'
+import ToolApi from '@/api/admin/workspace/tool/tool'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'PythonCodeEditor', inheritAttrs: false })

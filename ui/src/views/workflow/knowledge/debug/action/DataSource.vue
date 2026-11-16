@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch } from 'vue'
-import { MkDynamicsForm, type DynamicFormTreeLoader, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
-import type { KnowledgeWorkflowApi, Dict } from '@/api/types'
+import type { Dict, KnowledgeWorkflowApi } from '@/api/types'
+import type { DynamicFormTreeLoader, DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import { getWorkspaceId } from '@/utils/resource-context'
+import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 defineOptions({ name: 'DataSource' })
 

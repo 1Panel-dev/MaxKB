@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { DocumentItem, DocumentResourceType } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import type { DocumentItem, DocumentResourceType } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DeleteDocumentAction' })

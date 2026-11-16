@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, inject, provide, useAttrs } from 'vue'
-import { useFormDisabled, type UploadRawFile } from 'element-plus'
-import MkDragUpload from '@/components/mk-drag-upload/index.vue'
-import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
+import { useFormDisabled } from 'element-plus'
 import type { FormField } from '../../type'
+import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
+import type { UploadRawFile } from 'element-plus'
+import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 
 defineOptions({ name: 'DynamicFormLocalFileUpload', inheritAttrs: false })
 

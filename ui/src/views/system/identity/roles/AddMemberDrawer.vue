@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
+import type { CreateRoleMemberItem, RoleItem, SystemUserOption, WorkspaceItem } from '@/api/types'
 import type { FormInstance } from 'element-plus'
+import { ROLE_TYPE } from '@/api/enums'
 import CommonSystemApi from '@/api/admin/system/common'
 import RoleApi from '@/api/admin/system/role'
 import WorkspaceApi from '@/api/admin/system/workspace'
-import { ROLE_TYPE } from '@/api/enums'
-import type { CreateRoleMemberItem, RoleItem, SystemUserOption, WorkspaceItem } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 

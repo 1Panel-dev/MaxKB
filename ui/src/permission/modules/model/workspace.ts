@@ -1,7 +1,7 @@
 /** 工作空间「模型」按钮权限。（模型无独立文件夹资源权限，文件夹操作复用模型级权限）*/
 
-import { can, canRes } from '../../policy'
 import { PermissionConstants as P } from '../../core'
+import { can, canRes } from '../../policy'
 
 const workspace = {
   // —— 工作空间级 ——

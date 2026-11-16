@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
+import type { VariableField } from './component/variable-field/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
-
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import VariableFieldTable from './component/variable-field/VariableFieldTable.vue'
-import type { VariableField } from './component/variable-field/types'
 
 defineOptions({ name: 'WorkflowVariableSplittingNode' })
 const getModel = inject('getModel') as () => BaseNodeModel

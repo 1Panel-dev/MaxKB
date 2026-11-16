@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups'
-import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
 import type { ChatUserBase, ListItem } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
+import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups'
 import { MsgSuccess } from '@/utils/message'
 
 const props = defineProps<{ currentGroup?: ListItem }>()

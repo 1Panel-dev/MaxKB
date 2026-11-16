@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watch } from 'vue'
-import RoleApi from '@/api/admin/system/role'
-import { ROLE_TYPE } from '@/api/enums'
 import type { Dict, OptionItem, RoleItem, RoleMember } from '@/api/types'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { ROLE_TYPE } from '@/api/enums'
+import RoleApi from '@/api/admin/system/role'
 import AddMemberDrawer from '../AddMemberDrawer.vue'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
 const props = defineProps<{ currentRole: RoleItem }>()

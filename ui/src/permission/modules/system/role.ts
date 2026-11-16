@@ -1,7 +1,7 @@
 /** 系统「角色管理」按钮权限。$perm.role.* */
 
+import { Compare, PermissionConstants as P, RoleConstants, hasEdition, hasPermission } from '../../core'
 import { canSys } from '../../policy'
-import { PermissionConstants as P, hasPermission, RoleConstants, Compare,hasEdition} from '../../core'
 import { Edition } from '@/permission/core/common'
 
 export default {

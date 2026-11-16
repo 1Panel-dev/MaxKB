@@ -1,7 +1,7 @@
-import { get } from '../core/request'
-import { getWorkspaceId } from '@/utils/resource-context'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type { Dict, RelatedResource, ResourceType } from '@/api/types'
+import { get } from '../core/request'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 /** 获取引用当前资源的资源。 */
 const getUsedByResources = (resource: ResourceType, resourceId: string, page: ParamsPage, query?: Dict<unknown>) => {

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, useTemplateRef } from 'vue'
-import type { FormItemInstance } from 'element-plus'
+import type { NodeModelData, NodeModelFields, NodeModelSource } from './types'
 import type { DefaultModelType, ModelItem, ModelProviderItem } from '@/api/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormItemInstance } from 'element-plus'
 import SelectModel from '@/components/business/select-model/index.vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
-import type { NodeModelData, NodeModelFields, NodeModelSource } from './types'
 
 defineOptions({ name: 'NodeModelSelect' })
 

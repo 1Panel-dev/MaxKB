@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import { computed } from 'vue'
+import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
+import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import ContentList from '../content-list/index.vue'
 import LogMessageFooter from '../log-message-footer/index.vue'
-import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import { useLogMessageListStore } from './index'
 
 defineProps<{

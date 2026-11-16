@@ -1,11 +1,11 @@
 /** Workspace 智能体列表及其卡片共用的业务类型。 */
 
-import type LogicFlow from '@logicflow/core'
-import { APPLICATION_ACCESS_PLATFORM, APPLICATION_TYPE } from '@/api/enums'
-import type { DefaultModelSettingPayload } from './model'
-import type { WorkflowStoreTemplate } from './workflow-template'
 import type { Dict } from './common'
 import type { KnowledgeItem } from './knowledge'
+import type { DefaultModelSettingPayload } from './model'
+import type { WorkflowStoreTemplate } from './workflow-template'
+import type LogicFlow from '@logicflow/core'
+import { APPLICATION_ACCESS_PLATFORM, APPLICATION_TYPE } from '@/api/enums'
 
 export type ApplicationType = (typeof APPLICATION_TYPE)[keyof typeof APPLICATION_TYPE]
 

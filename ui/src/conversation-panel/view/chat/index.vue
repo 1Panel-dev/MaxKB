@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue'
+import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
 import type { AxiosProgressEvent } from 'axios'
-import FileApi from '@/api/chat/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
+import FileApi from '@/api/chat/file'
+import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
+import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
+import { SHARE_LINK_KEY } from '../../components/message-list/share/index'
 import ConversationLayout from '../../core/layout/index.vue'
+import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
 import ConversationList from '../../left-sidebar/conversation-list/index.vue'
 import ChatPanel from '../../main/chat-panel/index.vue'
-import RightSidebar from '../../right-sidebar/index.vue'
-import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
-import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
-import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
 import { RIGHT_SIDEBAR_KEY } from '../../right-sidebar/index'
-import { SHARE_LINK_KEY } from '../../components/message-list/share/index'
+import RightSidebar from '../../right-sidebar/index.vue'
+import { CHAT_USER_PROFILE_KEY, DEVICE_KEY, SHOW_SHARE_KEY, VIEW_KEY, VIEW_TYPE, createDeviceType } from '../index.ts'
 import { createChatConversation, createChatUserProfileGetter } from './index'
-import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, CHAT_USER_PROFILE_KEY, SHOW_SHARE_KEY, createDeviceType } from '../index.ts'
 
 const bundle = createChatConversation()
 

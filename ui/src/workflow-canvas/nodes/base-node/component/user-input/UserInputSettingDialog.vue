@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormField } from '@/components/mk-dynamics-form'
 import type { UserInputSetting } from '../../types'
+import type { FormField } from '@/components/mk-dynamics-form'
 import { exposedInputTypes } from './constant'
 
 const props = defineProps<{ fields: FormField[] }>()

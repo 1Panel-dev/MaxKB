@@ -1,12 +1,12 @@
 /** 发布渠道的展示信息、配置字段与平台后台指引。 */
 import { APPLICATION_ACCESS_PLATFORM } from '@/api/enums'
 import type { ApplicationAccessPlatform } from '@/api/types'
+import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
 import wecomBotLogo from '@/assets/logo/logo_enterprise-wechat-bot.svg'
 import wecomLogo from '@/assets/logo/logo_enterprise-wechat.svg'
-import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
-import wechatLogo from '@/assets/logo/logo_wechat.svg'
 import larkLogo from '@/assets/logo/logo_lark.svg'
 import slackLogo from '@/assets/logo/logo_slack.svg'
+import wechatLogo from '@/assets/logo/logo_wechat.svg'
 
 interface AccessField {
   key: string

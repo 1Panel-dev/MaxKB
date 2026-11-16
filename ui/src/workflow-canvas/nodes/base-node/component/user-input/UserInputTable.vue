@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { dynamicFormTypeOptions, type FormField } from '@/components/mk-dynamics-form'
-import { MsgError } from '@/utils/message'
 import type { ApiInputField, UserInputSetting } from '../../types'
+import type { FormField } from '@/components/mk-dynamics-form'
+import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
 import UserInputFieldDialog from './UserInputFieldDialog.vue'
 import UserInputSettingDialog from './UserInputSettingDialog.vue'
 import { exposedInputTypes } from './constant'
+import { MsgError } from '@/utils/message'
 
 const props = defineProps<{ apiFields: ApiInputField[]; nodeId: string }>()
 const inputFields = defineModel<FormField[]>({ required: true })

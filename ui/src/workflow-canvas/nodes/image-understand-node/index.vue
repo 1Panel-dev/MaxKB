@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-
-import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
-import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
-import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
-import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
-import { fileTooltip } from '@/workflow-canvas/config/constants'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { ReasoningSettingData } from '@/workflow-canvas/types'
+import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
+import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
+import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
+import { fileTooltip } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
-import { WorkflowMode, type ReasoningSettingData } from '@/workflow-canvas/types'
+import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowImageUnderstandNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel

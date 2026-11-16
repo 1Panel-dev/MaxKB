@@ -1,11 +1,10 @@
 /** 管理 Admin 用户相关的共享状态。 */
 
 import { defineStore } from 'pinia'
-import CurrentUserApi from '@/api/admin/auth/current-user'
 import type { CurrentUserInfo } from '@/api/admin/auth/types'
 import { ROLE_TYPE } from '@/api/enums'
-
-import { getDefaultLanguage, LANGUAGE_STORAGE_KEY, normalizeLocale } from '@/locales/config'
+import CurrentUserApi from '@/api/admin/auth/current-user'
+import { LANGUAGE_STORAGE_KEY, getDefaultLanguage, normalizeLocale } from '@/locales/config'
 
 interface UserState {
   language: string

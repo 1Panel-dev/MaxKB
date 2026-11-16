@@ -1,5 +1,5 @@
-import { get, put } from '../../core/request'
 import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetting } from '@/api/types'
+import { get, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}`

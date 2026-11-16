@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
 import type { ApiInputField } from '../../types'
+import type { FormInstance } from 'element-plus'
 
 const emit = defineEmits<{ submit: [data: ApiInputField, index?: number] }>()
 const dialogVisible = ref(false)

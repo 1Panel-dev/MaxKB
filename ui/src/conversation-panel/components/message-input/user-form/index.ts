@@ -1,9 +1,10 @@
-import { computed, ref, watch, type Ref } from 'vue'
-import type { LocationQuery } from 'vue-router'
+import { computed, ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
-import type { Dict } from '@/api/types'
 import type { ConversationAppInfo } from '../../../core/types'
+import type { Dict } from '@/api/types'
+import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
+import type { Ref } from 'vue'
+import type { LocationQuery } from 'vue-router'
 
 /** 开始节点中旧版简写字段（input / select / date）的配置结构。 */
 interface LegacyInputField {

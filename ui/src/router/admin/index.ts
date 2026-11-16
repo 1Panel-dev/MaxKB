@@ -1,17 +1,12 @@
+import { createRouter, createWebHistory } from 'vue-router'
 import NProgress from 'nprogress'
-import {
-  createRouter,
-  createWebHistory,
-  type RouteLocationNormalizedLoaded,
-  type RouteLocationNormalized,
-  type RouteLocationResolvedGeneric,
-} from 'vue-router'
-import { useStore } from '@/stores'
+import type { RouteLocationNormalized, RouteLocationNormalizedLoaded, RouteLocationResolvedGeneric } from 'vue-router'
 import { loginRoutes } from './login'
 import { systemRoutes } from './system'
-import { workspaceRoutes } from './workspace'
-import { workflowRoutes } from './workflow'
 import { getChildRouteList } from './utils'
+import { workflowRoutes } from './workflow'
+import { workspaceRoutes } from './workspace'
+import { useStore } from '@/stores'
 import { withRouteWorkspace } from '@/utils/resource-context'
 const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'
 

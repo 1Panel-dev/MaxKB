@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import { perm } from '@/permission'
-import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
-import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import CommonApi from '@/api/admin/workspace/common'
-import CommonSystemApi from '@/api/admin/system/common'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge.ts'
 import type { Dict, FolderItem, KnowledgeItem, OptionItem } from '@/api/types'
 import { KNOWLEDGE_TYPE, RESOURCE_TYPE } from '@/api/enums'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
+import CommonSystemApi from '@/api/admin/system/common'
+import CommonApi from '@/api/admin/workspace/common'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
+import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge.ts'
+import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import FolderTree from '@/components/business/folder-tree/index.vue'
-import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
 import ButtonCreateKnowledge from './components/ButtonCreateKnowledge.vue'
 import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
+import KnowledgeCard from './knowledge-card/KnowledgeCard.vue'
 import {
   AuthorizeKnowledgeAction,
   DeleteKnowledgeAction,
@@ -27,8 +25,10 @@ import {
   RelatedResourcesKnowledgeAction,
   SyncKnowledgeAction,
 } from './knowledge-card/action-dropdown'
-import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
+import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { perm } from '@/permission'
 
 /* 知识库详情入口 */
 const route = useRoute()

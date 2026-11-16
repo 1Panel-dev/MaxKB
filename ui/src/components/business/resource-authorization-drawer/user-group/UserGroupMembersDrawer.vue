@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import UserGroupsApi from '@/api/admin/system/user-groups'
+import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
+import UserGroupsApi from '@/api/admin/system/user-groups'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
-import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 
 defineOptions({ name: 'UserGroupMembersDrawer' })
 

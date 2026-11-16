@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { BaseEdgeModel } from '@logicflow/core'
 import { inject } from 'vue'
+import type { BaseEdgeModel } from '@logicflow/core'
 
 defineOptions({ name: 'ButtonDeleteEdge' })
 

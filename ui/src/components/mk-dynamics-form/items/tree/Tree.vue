@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, ref, toRaw, useAttrs, useTemplateRef, watch } from 'vue'
+import { formItemContextKey } from 'element-plus'
 import { cloneDeep, isEqual } from 'lodash'
-import { formItemContextKey, type TableInstance, type TreeNode } from 'element-plus'
+import type { DynamicFormTreeLoader, DynamicFormValue, FormField } from '../../type'
 import type { Dict } from '@/api/types'
+import type { TableInstance, TreeNode } from 'element-plus'
 import { post } from '@/api/admin/core/request'
 import { getFileIconUrl } from '@/utils/icon'
-import type { DynamicFormTreeLoader, DynamicFormValue, FormField } from '../../type'
 
 defineOptions({ name: 'DynamicFormTree', inheritAttrs: false })
 

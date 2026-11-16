@@ -1,8 +1,8 @@
 /** 对话端智能体信息类型。 */
 
-import type LogicFlow from '@logicflow/core'
 import type { ApplicationType } from './application'
 import type { Dict } from './common'
+import type LogicFlow from '@logicflow/core'
 
 /**
  * 对话端可见的智能体信息。门户智能体列表只返回基础字段；

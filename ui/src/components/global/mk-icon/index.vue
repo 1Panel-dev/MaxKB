@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, type Component, useId } from 'vue'
+import { computed, useId } from 'vue'
+import type { Component } from 'vue'
 import '@/assets/iconfont.js'
 
 defineOptions({ name: 'MkIcon' })

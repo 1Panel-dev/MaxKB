@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import type { DynamicFormField } from '@/api/types'
-import { dynamicFormTypeOptions, type FormField } from '@/components/mk-dynamics-form'
+import type { FormField } from '@/components/mk-dynamics-form'
+import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
 import InitFieldDialog from './InitFieldDialog.vue'
 
 defineOptions({ name: 'InitFieldTable' })

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import UserGroupsApi from '@/api/admin/system/user-groups'
-import CommonSystemApi from '@/api/admin/system/common'
 import type { CommonUserOption } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import CommonSystemApi from '@/api/admin/system/common'
+import UserGroupsApi from '@/api/admin/system/user-groups'
 import { MsgSuccess } from '@/utils/message'
 
 const props = defineProps<{ workspaceId: string; currentGroup?: { id: string; name: string } }>()

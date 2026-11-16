@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ParagraphDetail } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
 import { getFileUrl } from '@/utils/common'
+import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'ParagraphPreview' })
 defineProps<{ paragraph?: ParagraphDetail }>()

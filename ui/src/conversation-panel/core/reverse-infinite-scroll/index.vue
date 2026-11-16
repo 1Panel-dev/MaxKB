@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useReverseInfiniteScroll, type ReverseInfiniteScrollProps } from './index'
+import type { ReverseInfiniteScrollProps } from './index'
+import { useReverseInfiniteScroll } from './index'
 
 defineOptions({ name: 'ReverseInfiniteScroll' })
 const props = defineProps<ReverseInfiniteScrollProps>()

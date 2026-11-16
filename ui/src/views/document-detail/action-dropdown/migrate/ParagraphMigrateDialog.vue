@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { DocumentItem, KnowledgeItem } from '@/api/types'
 import type { DocumentParagraphApi } from '@/views/document-detail/context'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type { FormInstance, FormRules } from 'element-plus'
 import SystemKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import { useDocumentDetailContext } from '@/views/document-detail/context'
-import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
-import type { DocumentItem, KnowledgeItem } from '@/api/types'
-import { MsgSuccess } from '@/utils/message'
 import { getFileIconUrl } from '@/utils/icon'
+import { MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'ParagraphMigrateDialog' })
 const props = defineProps<{

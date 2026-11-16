@@ -1,43 +1,43 @@
 <script setup lang="ts">
-import { perm } from '@/permission'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import type { CascaderOption, TableColumnCtx } from 'element-plus'
-import MkEditName from '@/components/mk-edit-name/index.vue'
-import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import CommonApi from '@/api/admin/workspace/common'
-import CommonSystemApi from '@/api/admin/system/common'
-import { DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_TYPE } from '@/api/enums'
-import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
-import { DOCUMENT_STATUS_FILTER_OPTIONS } from '../document/status'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem, ParagraphItem } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
-import { numberFormat } from '@/utils/number'
-import { getFileUrl } from '@/utils/common'
-import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
-import ButtonUploadImage from './upload-image/ButtonUploadImage.vue'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import type { CascaderOption, TableColumnCtx } from 'element-plus'
+import { DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_TYPE } from '@/api/enums'
+import CommonSystemApi from '@/api/admin/system/common'
+import CommonApi from '@/api/admin/workspace/common'
+import MkEditName from '@/components/mk-edit-name/index.vue'
 import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
-import DocumentStatus from '../document/components/DocumentStatus.vue'
-import DocumentTags from '../document/components/DocumentTags.vue'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import {
-  BatchEmbeddingAction,
   BatchCancelTaskAction,
+  BatchDocumentTagsAction,
+  BatchEmbeddingAction,
+  BatchGenerateQuestionsAction,
+  BatchSettingDocumentAction,
+  BatchTokenizeAction,
   DeleteDocumentAction,
   DocumentTagsAction,
-  BatchDocumentTagsAction,
+  DownloadDocumentAction,
   EmbeddingDocumentAction,
   GenerateQuestionsAction,
-  BatchGenerateQuestionsAction,
-  DownloadDocumentAction,
-  ReplaceDocumentAction,
   MigrateDocumentAction,
+  ReplaceDocumentAction,
   SettingDocumentAction,
-  BatchSettingDocumentAction,
   TokenizeDocumentAction,
-  BatchTokenizeAction,
 } from '../document/action-dropdown'
+import DocumentStatus from '../document/components/DocumentStatus.vue'
+import DocumentTags from '../document/components/DocumentTags.vue'
+import { DOCUMENT_STATUS_FILTER_OPTIONS } from '../document/status'
+import ButtonUploadImage from './upload-image/ButtonUploadImage.vue'
+import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
+import { getFileUrl } from '@/utils/common'
+import { MsgSuccess } from '@/utils/message'
+import { numberFormat } from '@/utils/number'
+import { isSystemResource, isSystemSharedResource, isWorkspaceResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { datetimeFormat } from '@/utils/time'
+import { perm } from '@/permission'
 
 defineOptions({ name: 'ImageListView' })
 defineProps<ResourceDetailPageProps>()

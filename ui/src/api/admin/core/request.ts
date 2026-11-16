@@ -1,12 +1,13 @@
 /** 提供 Admin API 的 Axios 实例与常用 HTTP 请求封装。 */
 
-import axios, { AxiosHeaders, type AxiosRequestConfig, type AxiosResponse, type AxiosProgressEvent, type InternalAxiosRequestConfig } from 'axios'
-import router from '@/router/admin'
-import { useStore } from '@/stores'
+import axios, { AxiosHeaders } from 'axios'
 import type { ApiResponse } from './types'
 import type { Dict } from '@/api/types'
-import { MsgError } from '@/utils/message'
+import type { AxiosProgressEvent, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
+import router from '@/router/admin'
+import { useStore } from '@/stores'
+import { MsgError } from '@/utils/message'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1000 // 30 minutes
 

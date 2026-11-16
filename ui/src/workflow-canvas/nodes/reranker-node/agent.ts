@@ -1,7 +1,14 @@
-import { getNode, getDefaultModelConfig, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { argReference, finishWithValidate, getModelsTool, MODEL_FIELD_SCHEMA, modelSlot, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
-import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
+import { getDefaultModelConfig, getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
+import {
+  MODEL_FIELD_SCHEMA,
+  argReference,
+  finishWithValidate,
+  getModelsTool,
+  modelSlot,
+  useNodeAgent,
+} from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 
 /** reranker-node（多路召回）的 AI 生成配置；node_data 协议以节点视图 index.vue 的 defaultForm 为准 */
 

@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { computed, provide, ref, useTemplateRef } from 'vue'
-import FileApi from '@/api/admin/file'
-import { FILE_SOURCE_TYPE } from '@/api/enums'
-import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
-import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type { DocumentUploadMode } from './constants'
 import type { DocumentSplitResult } from '@/api/types'
-import DocumentImportPreview from '../components/DocumentImportPreview.vue'
-import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
+import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
+import FileApi from '@/api/admin/file'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
+import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
+import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
+import DocumentImportPreview from '../components/DocumentImportPreview.vue'
+import { DOCUMENT_UPLOAD_OPTIONS } from './constants'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
-import { DOCUMENT_UPLOAD_OPTIONS, type DocumentUploadMode } from './constants'
 
 defineOptions({ name: 'UploadDocumentDrawer' })
 const props = defineProps<{

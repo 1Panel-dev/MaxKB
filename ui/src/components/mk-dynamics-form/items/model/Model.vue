@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
-import { MODEL_STATUS } from '@/api/enums'
-import type { Dict, ModelConfig, ModelItem } from '@/api/types'
 import type { FormField } from '../../type'
-import { providerList } from './provider-data'
+import type { Dict, ModelConfig, ModelItem } from '@/api/types'
+import { MODEL_STATUS } from '@/api/enums'
 import SelectModel from '@/components/business/select-model/index.vue'
+import { providerList } from './provider-data'
 
 defineOptions({ name: 'DynamicFormModel', inheritAttrs: false })
 

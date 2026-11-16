@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { CSSProperties } from 'vue'
-import type { ApplicationDisplaySetting } from '@/api/types'
 import defaultFloatIconUrl from '/MaxKB.gif?url'
+import type { ApplicationDisplaySetting } from '@/api/types'
+import type { CSSProperties } from 'vue'
 
 defineOptions({ name: 'DisplaySettingPreview' })
 

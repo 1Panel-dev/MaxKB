@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { LOGIN_METHOD } from '@/api/enums'
+import type { LoginService } from '../types'
 import type { LoginConfig, QrCodeProvider } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
+import { qrCodeLoginMethods } from '../constants'
 import AccountLogin from '../modes/AccountLogin.vue'
 import QrCodeLogin from '../modes/QrCodeLogin.vue'
-import { qrCodeLoginMethods } from '../constants'
-import type { LoginService } from '../types'
 
 defineOptions({ name: 'LoginModePanel' })
 

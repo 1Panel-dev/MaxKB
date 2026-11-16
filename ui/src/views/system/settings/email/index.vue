@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import type { EmailSettingPayload } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
 import EmailSettingApi from '@/api/admin/system/settings/email-setting'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'

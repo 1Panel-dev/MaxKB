@@ -1,5 +1,5 @@
-import { post, put } from '@/api/admin/core/request'
 import type { DocumentFileImportPayload, DocumentItem, DocumentStrategy, ImageDocumentImportPayload, ImageDocumentPreview } from '@/api/types'
+import { post, put } from '@/api/admin/core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/document/image`

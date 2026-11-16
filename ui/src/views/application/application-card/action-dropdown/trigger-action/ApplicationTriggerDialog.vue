@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
-import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
-import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import type ApplicationApi from '@/api/admin/workspace/application/application'
+import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import type { ApplicationDetail, ResourceTrigger, ResourceTriggerResource, TriggerSetting } from '@/api/types'
-import { RESOURCE_TYPE, TRIGGER_TYPE, SCHEDULE_TYPE } from '@/api/enums'
-import { MsgSuccess } from '@/utils/message'
+import { RESOURCE_TYPE, SCHEDULE_TYPE, TRIGGER_TYPE } from '@/api/enums'
 import TriggerFormDrawer from '@/views/trigger/trigger-form/TriggerFormDrawer.vue'
-import perm from '@/permission'
+import { MsgSuccess } from '@/utils/message'
 import { isSystemResource } from '@/utils/resource-context'
+import perm from '@/permission'
 
 type ApplicationTriggerPermissionMethod = 'triggerCreate' | 'triggerEdit' | 'triggerDelete'
 function applicationTriggerPermission(method: ApplicationTriggerPermissionMethod): boolean {
@@ -131,7 +131,9 @@ defineExpose({ open })
 
                 <!-- 移除当前资源的触发器 -->
 
-                <el-button v-if="applicationTriggerPermission('triggerDelete')" text :disabled="loading" @click="handleRemoveTrigger(trigger)"><MkIcon name="icon_close_outlined" /></el-button>
+                <el-button v-if="applicationTriggerPermission('triggerDelete')" text :disabled="loading" @click="handleRemoveTrigger(trigger)">
+                  <MkIcon name="icon_close_outlined" />
+                </el-button>
               </div>
             </div>
           </el-card>

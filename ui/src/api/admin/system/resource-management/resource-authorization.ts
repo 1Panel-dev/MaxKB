@@ -1,4 +1,3 @@
-import { get, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   Dict,
@@ -8,6 +7,7 @@ import type {
   ResourceUserPermission,
   ResourceUserPermissionPayload,
 } from '@/api/types'
+import { get, put } from '../../core/request'
 
 const getPrefix = (workspaceId: string) => `/system/workspace/${workspaceId}/resource_management`
 

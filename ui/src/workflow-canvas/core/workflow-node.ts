@@ -1,20 +1,14 @@
-import { createApp, reactive, shallowReactive, type Component } from 'vue'
+import { createApp, reactive, shallowReactive } from 'vue'
+import { Component as LogicFlowComponent, HtmlNode, HtmlNodeModel, createRef, h as createLogicFlowElement } from '@logicflow/core'
 import { cloneDeep } from 'lodash'
 import type { DefaultModelType, ModelConfig } from '@/api/types'
-import {
-  Component as LogicFlowComponent,
-  createRef,
-  h as createLogicFlowElement,
-  HtmlNode,
-  HtmlNodeModel,
-  type GraphModel,
-  type IHtmlNodeProperties,
-  type Model,
-} from '@logicflow/core'
+import type { WorkflowNodeField } from '@/workflow-canvas/types'
+import type { GraphModel, IHtmlNodeProperties, Model } from '@logicflow/core'
+import type { Component } from 'vue'
 import { nodeDict } from '@/workflow-canvas/config/node-mapping'
-import { WorkflowKind, WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
-import { connect, disconnect } from './teleport'
+import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 import NodeAnchor from './node-container/NodeAnchor.vue'
+import { connect, disconnect } from './teleport'
 
 type NodeViewProps = ConstructorParameters<typeof HtmlNode>[0]
 type NodeFieldGroup = Record<string, WorkflowNodeField[]>

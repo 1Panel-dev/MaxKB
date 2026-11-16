@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-
+import type { LayoutMode } from './types'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
+import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import AvatarDropdown from './avatar-dropdown/index.vue'
 import HeaderWorkspaceDropdown from './header-workspace-dropdown/index.vue'
 import { isSystem, isWorkspace } from './utils'
-import LogoFull from '@/components/mk-logo/LogoFull.vue'
-import type { LayoutMode } from './types'
-import { Compare, hasPermission, Role, RoleConstants } from '@/permission/core'
-import { getWorkspaceId } from '@/utils/resource-context'
+import { Compare, Role, RoleConstants, hasPermission } from '@/permission/core'
 import { useStore } from '@/stores'
-import { CHAT_API_BASE_PATH } from '@/api/constants'
+import { getWorkspaceId } from '@/utils/resource-context'
 import perm from '@/permission/index.ts'
 
 const router = useRouter()

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, ref, onBeforeUnmount, provide } from 'vue'
+import { computed, onBeforeUnmount, provide, ref } from 'vue'
+import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
+import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 import ContentList from '../content-list/index.vue'
 import MessageFooter from '../message-footer/index.vue'
-import PrologueContent from '../prologue-content/index.vue'
 import { formatPrologue } from '../prologue-content/index'
-import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
-import { useMessageListStore, SEND_MESSAGE_KEY } from './index'
-import ShareMessageRow from './share/ShareMessageRow.vue'
+import PrologueContent from '../prologue-content/index.vue'
+import { SEND_MESSAGE_KEY, useMessageListStore } from './index'
 import ShareFooter from './share/ShareFooter.vue'
+import ShareMessageRow from './share/ShareMessageRow.vue'
 import { useShareLinkStoreOptional } from './share/index'
-import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 defineProps<{ appName?: string }>()
 
 const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamProgress, sendMessage } = useMessageListStore()

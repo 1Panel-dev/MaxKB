@@ -1,7 +1,7 @@
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, readNodeData, validateReference, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { argReference, finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 /**
  * application-node（智能体节点）的 AI 生成配置：把用户问题与智能体需要的参数都绑定成引用。

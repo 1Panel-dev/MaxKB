@@ -1,5 +1,5 @@
-import { del, get, getExportFile, post, put } from '../../core/request'
 import type { Dict, KnowledgeTagGroup, KnowledgeTagPayload, KnowledgeTagUpdatePayload } from '@/api/types'
+import { del, get, getExportFile, post, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}`

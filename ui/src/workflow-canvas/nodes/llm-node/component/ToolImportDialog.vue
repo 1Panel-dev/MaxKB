@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { normalizeTool, type LlmTool } from '../types'
+import type { LlmTool } from '../types'
+import { normalizeTool } from '../types'
 
 defineOptions({ name: 'WorkflowLlmToolImportDialog' })
 

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { SCHEDULE_OPTION } from '@/constants/schedule'
+import type { LongTermSetting } from '../types'
+import type { ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
 import type { CascaderOption, FormInstance } from 'element-plus'
 import SelectModel from '@/components/business/select-model/index.vue'
-import type { ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
-import type { LongTermSetting } from '../types'
+import { SCHEDULE_OPTION } from '@/constants/schedule'
 
 defineOptions({ name: 'BaseNodeLongTermSetting' })
 

@@ -1,26 +1,26 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
-import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
-import SystemCommonApi from '@/api/admin/system/common'
-import SystemWorkspaceApi from '@/api/admin/system/workspace'
-import SystemResourceTriggerApi from '@/api/admin/system/resource-management/resource-trigger'
 import type { ApplicationDetail, Dict, OptionItem } from '@/api/types'
 import { APPLICATION_TYPE } from '@/api/enums'
+import SystemCommonApi from '@/api/admin/system/common'
+import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
+import SystemResourceTriggerApi from '@/api/admin/system/resource-management/resource-trigger'
+import SystemWorkspaceApi from '@/api/admin/system/workspace'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
-import { useStore } from '@/stores'
-import { datetimeFormat } from '@/utils/time'
-import { isWorkFlow, toOrderBy } from '@/utils/common'
 import {
   AuthorizeApplicationAction,
-  RelatedResourcesApplicationAction,
-  ExportApplicationAction,
-  PortalApplicationAction,
   DeleteApplicationAction,
-  TriggerApplicationAction,
+  ExportApplicationAction,
   McpConfigApplicationAction,
+  PortalApplicationAction,
+  RelatedResourcesApplicationAction,
+  TriggerApplicationAction,
 } from '@/views/application/application-card/action-dropdown'
+import { useStore } from '@/stores'
+import { isWorkFlow, toOrderBy } from '@/utils/common'
+import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission'
 
 const { auth } = useStore()

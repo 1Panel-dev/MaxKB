@@ -1,9 +1,10 @@
 /** 为每个应用入口创建独立的国际化实例，并连接该入口的语言状态。 */
 import { watch } from 'vue'
 import { createI18n } from 'vue-i18n'
-import { DEFAULT_LOCALE, LANGUAGE_STORAGE_KEY, normalizeLocale, type Locale } from './config'
-import zhAuth from './zh-CN/auth.json'
+import type { Locale } from './config'
+import { DEFAULT_LOCALE, LANGUAGE_STORAGE_KEY, normalizeLocale } from './config'
 import enAuth from './en-US/auth.json'
+import zhAuth from './zh-CN/auth.json'
 import hantAuth from './zh-Hant/auth.json'
 
 type MessageSchema = { auth: typeof zhAuth }

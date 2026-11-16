@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { reactive, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance, FormRules, UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
-import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type { DynamicFormField, ToolItem, ToolPayload } from '@/api/types'
+import type { FormInstance, FormRules, UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
 import { FILE_SOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import FileApi from '@/api/admin/file'
-import type { DynamicFormField, ToolItem, ToolPayload } from '@/api/types'
-import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
+import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
+import InitFieldTable from './component/init-field/InitFieldTable.vue'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
-
-import InitFieldTable from './component/init-field/InitFieldTable.vue'
 
 defineOptions({ name: 'SkillToolFormDrawer' })
 

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import TriggerTaskRecordDrawer from './execution-record/TriggerTaskRecordDrawer.vue'
-import TriggerApi from '@/api/admin/workspace/trigger/trigger'
-import CommonApi from '@/api/admin/workspace/common'
-import { TRIGGER_TYPE } from '@/api/enums'
+import { computed, onMounted, ref } from 'vue'
 import type { Dict, OptionItem, Trigger, TriggerType } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
+import { TRIGGER_TYPE } from '@/api/enums'
+import CommonApi from '@/api/admin/workspace/common'
+import TriggerApi from '@/api/admin/workspace/trigger/trigger'
+import TriggerTaskPopover from './components/TriggerTaskPopover.vue'
+import TriggerTaskRecordDrawer from './execution-record/TriggerTaskRecordDrawer.vue'
+import TriggerFormDrawer from './trigger-form/TriggerFormDrawer.vue'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import TriggerFormDrawer from './trigger-form/TriggerFormDrawer.vue'
-import TriggerTaskPopover from './components/TriggerTaskPopover.vue'
+import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission/index.ts'
 
 /* 触发器筛选与分页查询 */

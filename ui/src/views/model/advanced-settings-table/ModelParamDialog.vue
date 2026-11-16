@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { MkDynamicsFormConstructor, type FormField } from '@/components/mk-dynamics-form'
+import type { FormField } from '@/components/mk-dynamics-form'
+import { MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'ModelParamDialog' })
 

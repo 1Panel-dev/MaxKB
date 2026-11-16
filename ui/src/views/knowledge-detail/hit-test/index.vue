@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { perm } from '@/permission'
-import { isSystemResource, isWorkspaceResource } from '@/utils/resource-context'
 import { computed, nextTick, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance } from 'element-plus'
-import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_HIT_UNIT_TYPE, KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
-import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 import type { KnowledgeHitTestPayload, KnowledgeHitTestResult, ParagraphItem } from '@/api/types'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import type { FormInstance } from 'element-plus'
+import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_HIT_UNIT_TYPE, KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 import emptyHitTestImage from '@/assets/empty/hit-test.png'
+import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import HitTestInput from './components/HitTestInput.vue'
+import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
+import { isSystemResource, isWorkspaceResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
 
 defineOptions({ name: 'HitTestView' })
 defineProps<ResourceDetailPageProps>()

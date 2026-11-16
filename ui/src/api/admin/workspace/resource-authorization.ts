@@ -1,13 +1,13 @@
-import { get, put } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type {
   Dict,
+  ResourceAuthorizationTargetType,
   ResourceUserGroupPermission,
   ResourceUserGroupPermissionPayload,
-  ResourceAuthorizationTargetType,
   ResourceUserPermission,
   ResourceUserPermissionPayload,
 } from '@/api/types'
+import { get, put } from '../core/request'
 
 const getPrefix = (workspaceId: string) => `/workspace/${workspaceId}`
 /** 获取指定资源或文件夹的用户权限分页列表。 */

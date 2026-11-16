@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import { useFormItem } from 'element-plus'
-import type { CascaderInstance } from 'element-plus'
-
-import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'
+import type { BaseNodeModel } from '@logicflow/core'
+import type { CascaderInstance } from 'element-plus'
+import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import { iconComponent } from '../icons/utils'
-import type { BaseNodeModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowNodeCascader', inheritAttrs: false })
 

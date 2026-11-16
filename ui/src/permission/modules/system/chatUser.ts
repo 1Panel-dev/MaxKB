@@ -1,7 +1,7 @@
 /** 系统「对话用户」按钮权限。$perm.chatUser.* */
 
+import { Compare, PermissionConstants as P, RoleConstants, hasPermission } from '../../core'
 import { canSys } from '../../policy'
-import { PermissionConstants as P, hasPermission, RoleConstants, Compare} from '../../core'
 
 export default {
   /**

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import ParametersFieldDialog from './ParametersFieldDialog.vue'
 import type { ParameterField } from './types'
+import ParametersFieldDialog from './ParametersFieldDialog.vue'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowParameterExtractionFieldTable' })

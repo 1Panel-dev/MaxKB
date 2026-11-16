@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { LlmTool, LlmToolsSetting } from '../types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { createAnchorGuard } from '@/workflow-canvas/core/utils'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import { downloadByURL } from '@/utils/common'
 import ToolFunctionDrawer from './ToolFunctionDrawer.vue'
 import ToolImportDialog from './ToolImportDialog.vue'
-import type { LlmTool, LlmToolsSetting } from '../types'
+import { downloadByURL } from '@/utils/common'
 
 defineOptions({ name: 'WorkflowLlmToolsSetting' })
 

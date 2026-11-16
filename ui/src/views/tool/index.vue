@@ -1,38 +1,38 @@
 <script setup lang="ts">
-import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
-import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
-import { onMounted, computed, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import CommonApi from '@/api/admin/workspace/common'
-import CommonSystemApi from '@/api/admin/system/common'
-import WorkflowApi from '@/api/admin/workspace/tool/workflow'
-import ToolApi from '@/api/admin/workspace/tool/tool'
-import SharedToolApi from '@/api/admin/workspace/shared/tool'
-import StoreApi from '@/api/admin/store.ts'
 import type { Dict, FolderItem, OptionItem, ToolItem, ToolStoreResponse, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
-import { TOOL_TYPE_OPTIONS, FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
-import FolderTree from '@/components/business/folder-tree/index.vue'
+import StoreApi from '@/api/admin/store.ts'
+import CommonSystemApi from '@/api/admin/system/common'
+import CommonApi from '@/api/admin/workspace/common'
+import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
+import SharedToolApi from '@/api/admin/workspace/shared/tool'
+import ToolApi from '@/api/admin/workspace/tool/tool'
+import WorkflowApi from '@/api/admin/workspace/tool/workflow'
+import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import FolderTree from '@/components/business/folder-tree/index.vue'
+import EditToolForm from '@/views/tool/tool-form/EditToolForm.vue'
+import ButtonCreateTool from './components/ButtonCreateTool.vue'
+import ButtonToolStore from './components/ButtonToolStore.vue'
 import ToolCard from './tool-card/ToolCard.vue'
 import ToolStatusSwitch from './tool-card/ToolStatusSwitch.vue'
 import {
   AuthorizeToolAction,
-  RelatedResourcesToolAction,
   CopyToolAction,
   DeleteToolAction,
-  ExportToolAction,
   ExecutionRecordToolAction,
+  ExportToolAction,
   InitParamAction,
   McpConfigAction,
   MoveToolAction,
+  RelatedResourcesToolAction,
   ToolWorkflowAction,
   TriggerToolAction,
 } from './tool-card/action-dropdown'
-import ButtonCreateTool from './components/ButtonCreateTool.vue'
-import ButtonToolStore from './components/ButtonToolStore.vue'
-import EditToolForm from '@/views/tool/tool-form/EditToolForm.vue'
+import { FOLDER_ENTRIES, FOLDER_ENTRY_ID, TOOL_TYPE_OPTIONS } from '@/constants'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
 /* 当前文件夹 */

@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, provide, ref, useTemplateRef } from 'vue'
-import FileApi from '@/api/admin/file'
-import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { DocumentSplitResult, ImageDocumentImportPayload, ImageDocumentPreview } from '@/api/types'
-import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_TYPE_LABEL } from '@/constants/knowledge'
-import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
-import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import ImageProcessingForm from './ImageProcessingForm.vue'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
+import FileApi from '@/api/admin/file'
+import MkDragUpload from '@/components/mk-drag-upload/index.vue'
+import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import DocumentImportPreview from '../../document/components/DocumentImportPreview.vue'
+import ImageProcessingForm from './ImageProcessingForm.vue'
+import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_TYPE_LABEL } from '@/constants/knowledge'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'UploadImageDrawer' })

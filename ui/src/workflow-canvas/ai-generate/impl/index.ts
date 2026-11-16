@@ -1,8 +1,8 @@
-import { WorkflowMode } from '@/workflow-canvas/types'
+import type { AgentBindings, RunnableAgent } from '@/workflow-canvas/ai-generate/type'
 import { useApplicationAgent } from '@/workflow-canvas/ai-generate/impl/application'
 import { useKnowledgeAgent } from '@/workflow-canvas/ai-generate/impl/knowledge'
 import { useToolAgent } from '@/workflow-canvas/ai-generate/impl/tool'
-import type { AgentBindings, RunnableAgent } from '@/workflow-canvas/ai-generate/type'
+import { WorkflowMode } from '@/workflow-canvas/types'
 
 /** 主画布模式 → 父 agent 工厂；循环体随主画布归一到对应模式 */
 const agentByMode: Partial<Record<WorkflowMode, (bindings: AgentBindings) => RunnableAgent>> = {

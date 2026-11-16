@@ -2,13 +2,13 @@
 import { computed } from 'vue'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/zh-tw'
-import { useI18n } from 'vue-i18n'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
-import en from 'element-plus/es/locale/lang/en'
-import zhTw from 'element-plus/es/locale/lang/zh-tw'
-import { normalizeLocale } from '@/locales/config'
 import { RouterView } from 'vue-router'
+import en from 'element-plus/es/locale/lang/en'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import zhTw from 'element-plus/es/locale/lang/zh-tw'
+import { useI18n } from 'vue-i18n'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
+import { normalizeLocale } from '@/locales/config'
 
 const { locale } = useI18n({ useScope: 'global' })
 const elementLocales = { 'zh-CN': zhCn, 'en-US': en, 'zh-Hant': zhTw }

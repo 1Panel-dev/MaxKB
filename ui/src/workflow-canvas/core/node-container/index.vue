@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { reaction, type BaseNodeModel, type Model } from '@logicflow/core'
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { reaction } from '@logicflow/core'
 import { cloneDeep, escape, escapeRegExp } from 'lodash'
-import { iconComponent } from '@/workflow-canvas/icons/utils'
-import { copyText } from '@/utils/clipboard'
-import { WorkflowMode, WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
-import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
 import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
+import type { WorkflowNodeField } from '@/workflow-canvas/types'
+import type { BaseNodeModel, Model } from '@logicflow/core'
+import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
+import { iconComponent } from '@/workflow-canvas/icons/utils'
+import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
+import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import NodeConditionDropdown from './NodeConditionDropdown.vue'
 import NodeOperateDropdown from './NodeOperateDropdown.vue'
-import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
+import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'NodeContainer' })
 

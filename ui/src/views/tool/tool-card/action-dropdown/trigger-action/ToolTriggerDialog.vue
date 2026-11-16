@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import type ToolApi from '@/api/admin/workspace/tool/tool'
-import type SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
-import type ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
-
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import type SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
+import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
-import type { ToolItem, ResourceTrigger, ResourceTriggerResource, TriggerSetting } from '@/api/types'
-import { RESOURCE_TYPE, TRIGGER_TYPE, SCHEDULE_TYPE } from '@/api/enums'
-import { MsgSuccess } from '@/utils/message'
+import type { ResourceTrigger, ResourceTriggerResource, ToolItem, TriggerSetting } from '@/api/types'
+import { RESOURCE_TYPE, SCHEDULE_TYPE, TRIGGER_TYPE } from '@/api/enums'
 import TriggerFormDrawer from '@/views/trigger/trigger-form/TriggerFormDrawer.vue'
-import perm from '@/permission'
+import { MsgSuccess } from '@/utils/message'
 import { isSystemResource } from '@/utils/resource-context'
+import perm from '@/permission'
 
 type ToolTriggerPermissionMethod = 'triggerCreate' | 'triggerEdit' | 'triggerDelete'
 function toolTriggerPermission(method: ToolTriggerPermissionMethod): boolean {

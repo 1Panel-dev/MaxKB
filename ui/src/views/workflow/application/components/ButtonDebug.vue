@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
-import DebugPanel from '@/conversation-panel/view/debug/index.vue'
 import type { ApplicationDetail } from '@/api/types'
+import DebugPanel from '@/conversation-panel/view/debug/index.vue'
 import { showWorkflowValidateError } from '../../components/validate-error'
 
 defineOptions({ name: 'ButtonDebug' })

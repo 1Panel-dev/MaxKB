@@ -1,12 +1,19 @@
 import { pick } from 'lodash'
-import { TOOL_TYPE } from '@/api/enums'
-import type { ToolItem } from '@/api/types'
-import { useWorkflowStore } from '@/workflow-canvas/store'
-import { getNode, readNodeData, validatePromptVariables, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { argReference, finishWithValidate, getModelsTool, MODEL_FIELD_SCHEMA, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
-import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import type { AiChatNodeForm, ToolResourceOption } from './types'
+import type { ToolItem } from '@/api/types'
+import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
+import { TOOL_TYPE } from '@/api/enums'
+import { getNode, readNodeData, validatePromptVariables, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
+import {
+  MODEL_FIELD_SCHEMA,
+  argReference,
+  finishWithValidate,
+  getModelsTool,
+  resolveModelFields,
+  useNodeAgent,
+} from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
+import { useWorkflowStore } from '@/workflow-canvas/store'
 
 /**
  * ai-chat-node（AI 对话）的 AI 生成配置；node_data 协议以节点视图 index.vue 的 defaultForm 为准。

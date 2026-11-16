@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { MkDynamicsForm } from '@/components/mk-dynamics-form'
-import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import type { Dict } from '@/api/types'
+import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
+import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'MarkdownFormRender' })
 

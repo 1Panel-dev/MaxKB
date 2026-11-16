@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
 import { computed, inject, ref, useAttrs } from 'vue'
-import type { FormField } from '@/components/mk-dynamics-form/type'
-import { MsgWarning } from '@/utils/message'
-import { getFileUrl } from '@/utils/common'
-import { getFileIconUrl, isImage, isAudio, isVideo } from '@/utils/icon'
 import { useFormDisabled } from 'element-plus'
-
-import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import type { DynamicFormValue } from '../../type'
+import type { FormField } from '@/components/mk-dynamics-form/type'
 import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
 import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import { getFileUrl } from '@/utils/common'
+import { getFileIconUrl, isAudio, isImage, isVideo } from '@/utils/icon'
+import { MsgWarning } from '@/utils/message'
 const inputDisabled = useFormDisabled()
 const attrs = useAttrs() as DynamicFormValue
 const upload = inject('upload') as DynamicFormValue

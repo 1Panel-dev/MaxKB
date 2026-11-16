@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import UserGroupsApi from '@/api/admin/system/user-groups'
 import type { ListItem } from '@/api/types'
 import type { CascaderNode, CascaderOption, CascaderProps } from 'element-plus'
+import UserGroupsApi from '@/api/admin/system/user-groups'
 
 defineOptions({ name: 'UserGroupSetting' })
 

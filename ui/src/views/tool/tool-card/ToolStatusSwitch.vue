@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
-import { TOOL_TYPE } from '@/api/enums'
+import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem } from '@/api/types'
-import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
+import { TOOL_TYPE } from '@/api/enums'
 import InitParamDrawer from './InitParamDrawer.vue'
+import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ToolStatusSwitch', inheritAttrs: false })
 

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
+import JsonInput from '@/components/codemirror-editor/Json.vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
-import type { WorkflowNodeField } from '@/workflow-canvas/types'
-import JsonInput from '@/components/codemirror-editor/Json.vue'
 import { randomId } from '@/utils/common'
 
 defineOptions({ name: 'WorkflowVariableAssignNode' })

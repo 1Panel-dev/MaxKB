@@ -6,10 +6,10 @@
  */
 
 import { defineStore } from 'pinia'
-import ChatAuthApi from '@/api/chat/auth'
 import type { ApplicationAuthProfileMeta, AuthProfile, ChatLoginRequest } from '@/api/types'
-import { useChatUserStore } from './user'
+import ChatAuthApi from '@/api/chat/auth'
 import { useChatThemeStore } from './theme'
+import { useChatUserStore } from './user'
 
 /** 门户的认证场景；accessToken 为 16 位十六进制字符串，不会与之重名。 */
 export const PORTAL_AUTH_SCOPE = 'portal'

@@ -1,8 +1,8 @@
 /** 提供 Admin 登录前所需的平台公开信息接口。 */
 
-import { get } from '../core/request'
-import type { LoginConfig } from '@/api/types'
 import type { BaseProfile, ThemeInfo } from './types'
+import type { LoginConfig } from '@/api/types'
+import { get } from '../core/request'
 
 /** 获取平台版本、许可信息及登录加密公钥。 */
 const getBaseProfile = () => {

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import type { LayoutMode } from './types'
 import SystemSidebar from './sidebar/SystemSidebar.vue'
 import WorkspaceSidebar from './sidebar/WorkspaceSidebar.vue'
 import { isSystem, isWorkspace } from './utils'
-import type { LayoutMode } from './types'
 import { useIsSmallScreen } from '@/utils/use-responsive'
 
 const props = defineProps<{ mode: LayoutMode }>()

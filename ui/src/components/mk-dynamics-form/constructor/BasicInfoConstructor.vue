@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
-import type { Component } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import { computed, nextTick, ref } from 'vue'
 import type { DynamicFormConstructorExpose, DynamicFormConstructorOption, DynamicFormConstructorState, FormField, FormFieldLabel } from '../type'
+import type { FormInstance, FormRules } from 'element-plus'
+import type { Component } from 'vue'
 
 interface ConstructorModule {
   default: Component

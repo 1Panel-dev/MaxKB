@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { KnowledgeWorkflowApi } from '@/api/types'
 import { useTemplateRef } from 'vue'
+import type { KnowledgeWorkflowApi } from '@/api/types'
 import type LogicFlow from '@logicflow/core'
-import DebugDrawer from '../debug/DebugDrawer.vue'
 import { showWorkflowValidateError } from '../../components/validate-error'
+import DebugDrawer from '../debug/DebugDrawer.vue'
 
 defineOptions({ name: 'ButtonKnowledgeDebug' })
 

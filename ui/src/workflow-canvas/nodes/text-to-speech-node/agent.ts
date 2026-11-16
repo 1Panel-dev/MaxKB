@@ -1,7 +1,14 @@
-import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { finishWithValidate, getModelsTool, MODEL_FIELD_SCHEMA, modelSlot, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
-import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
+import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
+import {
+  MODEL_FIELD_SCHEMA,
+  finishWithValidate,
+  getModelsTool,
+  modelSlot,
+  resolveModelFields,
+  useNodeAgent,
+} from '@/workflow-canvas/ai-generate/tools/node'
+import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 
 /** text-to-speech-node（文本转语音）的 AI 生成配置；node_data 协议以节点视图 index.vue 的 defaultForm 为准 */
 

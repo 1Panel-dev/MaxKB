@@ -1,20 +1,24 @@
 import { cloneDeep } from 'lodash'
-import { TOOL_TYPE } from '@/api/enums'
+import type { AgentBindings, AgentTool, JsonSchema, NodeAgentModule, NodeReference } from '../type'
+import type { CanvasRef } from './canvas'
 import type { ToolItem, ToolType } from '@/api/types'
+import type { ShapeItem } from '@/workflow-canvas/types'
 import type LogicFlow from '@logicflow/core'
 import type { BaseNodeModel } from '@logicflow/core'
-import { collectWorkflowValidationErrors } from '@/workflow-canvas/core/validate'
+import { TOOL_TYPE } from '@/api/enums'
 import { applicationNode, toolLibNode, toolWorkflowLibNode } from '@/workflow-canvas/config/node-data'
+import { collectWorkflowValidationErrors } from '@/workflow-canvas/core/validate'
 import { useWorkflowStore } from '@/workflow-canvas/store'
-import { WorkflowKind, WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
+import { WorkflowKind, WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
+import { createAgent } from '../create-agent'
 import {
-  fixedNodeTypesOf,
   MAIN_LF_ID,
   VARIABLE_GROUPS,
   addEdge,
   addNode,
   findNodeCanvas,
   findNodeTemplate,
+  fixedNodeTypesOf,
   getNode,
   getOutgoingAnchors,
   layoutCanvas,
@@ -26,12 +30,9 @@ import {
   resolveSourceAnchor,
   validateReference,
   writeNodeProperties,
-  type CanvasRef,
 } from './canvas'
-import { createAgent } from '../create-agent'
 import { formatValidationError, isReference, isStructuredSchema, schemaType } from './node'
 import { ErrorResult } from './result'
-import type { AgentBindings, AgentTool, JsonSchema, NodeAgentModule, NodeReference } from '../type'
 
 
 /** 节点配置 agent 取自各节点 index.ts 默认导出的 agent 字段；未提供的节点可新增、连线，但不能 AI 配置 */

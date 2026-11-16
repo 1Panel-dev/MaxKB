@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
-import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import type { ParamsPage } from '@/api/admin/core/types'
+import type { Dict, KnowledgeItem, OptionItem } from '@/api/types'
+import { KNOWLEDGE_TYPE, RESOURCE_TYPE } from '@/api/enums'
+import SystemCommonApi from '@/api/admin/system/common'
 import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import SystemSharedRelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
-import SystemCommonApi from '@/api/admin/system/common'
-import type { Dict, KnowledgeItem, OptionItem } from '@/api/types'
-import { RESOURCE_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
-import KnowledgeCard from '@/views/knowledge/knowledge-card/KnowledgeCard.vue'
 import ButtonCreateKnowledge from '@/views/knowledge/components/ButtonCreateKnowledge.vue'
 import ButtonTemplateStore from '@/views/knowledge/components/ButtonTemplateStore.vue'
+import KnowledgeCard from '@/views/knowledge/knowledge-card/KnowledgeCard.vue'
 import {
   DeleteKnowledgeAction,
   EmbeddingKnowledgeAction,
@@ -22,6 +20,8 @@ import {
   RelatedResourcesKnowledgeAction,
   SyncKnowledgeAction,
 } from '@/views/knowledge/knowledge-card/action-dropdown'
+import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import perm from '@/permission/index.ts'
 
 /* 共享知识库详情入口 */

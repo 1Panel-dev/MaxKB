@@ -1,5 +1,5 @@
-import { get } from '../../../core/request'
 import type { KnowledgeExternalRetrievalSetting } from '@/api/types'
+import { get } from '../../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/system/shared/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}`

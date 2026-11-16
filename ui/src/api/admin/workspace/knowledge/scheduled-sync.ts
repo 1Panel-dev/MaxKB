@@ -1,6 +1,6 @@
-import { get, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { KnowledgeSyncLog, KnowledgeSyncSetting } from '@/api/types'
+import { get, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}`

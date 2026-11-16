@@ -1,4 +1,5 @@
-import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
+import type { ShapeItem } from '@/workflow-canvas/types'
+import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import * as NodeData from '../config/node-data'
 
 export interface WorkflowMenuNode extends ShapeItem {

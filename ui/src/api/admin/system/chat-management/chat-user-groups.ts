@@ -1,6 +1,6 @@
-import { del, get, post } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { ChatUserGroupMember, ChatUserGroupPayload, ListItem, Dict } from '@/api/types'
+import type { ChatUserGroupMember, ChatUserGroupPayload, Dict, ListItem } from '@/api/types'
+import { del, get, post } from '../../core/request'
 
 const prefix = '/system/group'
 

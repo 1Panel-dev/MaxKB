@@ -1,6 +1,6 @@
-import type { AxiosProgressEvent } from 'axios'
-import { postUpload, del, get } from './core/request'
 import type { FileSourceType, UrlFileContent } from '@/api/types'
+import type { AxiosProgressEvent } from 'axios'
+import { del, get, postUpload } from './core/request'
 
 /** 上传资源文件，支持可选的进度回调与取消操作。 */
 const postUploadFile = (

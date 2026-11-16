@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type ApplicationApiKeyApi from '@/api/admin/workspace/application/api-key'
 import type SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
+import type ApplicationApiKeyApi from '@/api/admin/workspace/application/api-key'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 import ApiKeyList from '@/components/business/api-key-list/index.vue'
 import { copyText } from '@/utils/clipboard'

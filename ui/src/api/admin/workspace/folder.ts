@@ -1,5 +1,5 @@
+import type { Dict, FolderItem, FolderPayload, FolderSource } from '@/api/types'
 import { del, get, post, put } from '../core/request'
-import type { Dict, FolderSource, FolderItem, FolderPayload } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (source: FolderSource) => {

@@ -1,6 +1,6 @@
-import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type { CreateWorkspaceMemberPayload, Dict, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
+import { del, get, post } from '../core/request'
 
 const prefix = '/system/workspace'
 

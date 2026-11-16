@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, Fragment, h, isVNode, ref, type FunctionalComponent, type VNode, type VNodeChild, useSlots } from 'vue'
+import { Fragment, computed, h, isVNode, ref, useSlots } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElScrollbar } from 'element-plus'
+import type { FunctionalComponent, VNode, VNodeChild } from 'vue'
 import LayoutAside from './LayoutAside.vue'
 import LayoutBatchFooter from './LayoutBatchFooter.vue'
 

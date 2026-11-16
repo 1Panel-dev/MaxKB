@@ -1,5 +1,5 @@
-import { get, put } from '../core/request'
 import type { LicenseProfile } from '@/api/types'
+import { get, put } from '../core/request'
 
 /** 获取当前平台的授权信息。 */
 const getLicense = () => get<LicenseProfile>('/license/profile')

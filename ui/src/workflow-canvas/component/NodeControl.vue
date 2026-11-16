@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref, watch } from 'vue'
+import type Dagre from '@/workflow-canvas/plugins/dagre'
 import type LogicFlow from '@logicflow/core'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { SelectionSelect } from '@logicflow/extension'
-import type Dagre from '@/workflow-canvas/plugins/dagre'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { MsgError } from '@/utils/message'
 

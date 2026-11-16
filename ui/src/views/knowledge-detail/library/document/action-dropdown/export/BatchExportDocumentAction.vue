@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { inject } from 'vue'
-import { DROPDOWN_INJECTION_KEY } from 'element-plus'
 import { useRoute } from 'vue-router'
+import { DROPDOWN_INJECTION_KEY } from 'element-plus'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 
 defineOptions({ name: 'BatchExportDocumentAction' })

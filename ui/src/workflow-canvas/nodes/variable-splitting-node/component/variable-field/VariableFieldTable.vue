@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-
-import VariableFieldDialog from './VariableFieldDialog.vue'
 import type { VariableField } from './types'
+import VariableFieldDialog from './VariableFieldDialog.vue'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowVariableSplittingFieldTable' })

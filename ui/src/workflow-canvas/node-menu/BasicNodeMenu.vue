@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, ref } from 'vue'
-import { getMenuNodes, type WorkflowMenuNode } from '@/workflow-canvas/node-menu/menu'
-import { iconComponent } from '@/workflow-canvas/icons/utils'
+import type { WorkflowMenuNode } from '@/workflow-canvas/node-menu/menu'
 import type { WorkflowMode } from '@/workflow-canvas/types'
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
+import { iconComponent } from '@/workflow-canvas/icons/utils'
+import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
 
 defineOptions({ name: 'BasicNodeMenu' })
 

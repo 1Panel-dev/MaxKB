@@ -1,8 +1,9 @@
-import { createRouter, createWebHistory, type RouteLocationNormalized } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
+import type { AuthProfile } from '@/api/types'
+import type { RouteLocationNormalized } from 'vue-router'
+import { chatRoutes } from './routes'
 import { useStore } from '@/stores/chat'
 import { PORTAL_AUTH_SCOPE, isAnonymousToken } from '@/stores/chat/auth'
-import type { AuthProfile } from '@/api/types'
-import { chatRoutes } from './routes'
 
 const CHAT_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/chat/'
 

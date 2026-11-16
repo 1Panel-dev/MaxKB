@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
-import { init, use, type EChartsCoreOption, type EChartsType } from 'echarts/core'
+import { init, use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
+import type { EChartsCoreOption, EChartsType } from 'echarts/core'
 
 use([CanvasRenderer])
 defineOptions({ name: 'MkEchart' })

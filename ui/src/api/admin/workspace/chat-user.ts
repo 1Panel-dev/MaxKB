@@ -1,13 +1,13 @@
-import { get, put } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type {
   ChatUserAuthorization,
   ChatUserAuthorizationGroup,
+  ChatUserAuthorizationPayload,
   ChatUserAuthorizationResource,
   ChatUserGroupAuthorizationPayload,
-  ChatUserAuthorizationPayload,
   Dict,
 } from '@/api/types'
+import { get, put } from '../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (resource: ChatUserAuthorizationResource) => `/workspace/${getWorkspaceId()}/${resource.resource_type}/${resource.resource_id}`

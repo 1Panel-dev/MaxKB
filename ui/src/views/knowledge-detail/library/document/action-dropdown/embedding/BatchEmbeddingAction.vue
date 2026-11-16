@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { DocumentResourceType, DocumentTaskState } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import type { DocumentResourceType, DocumentTaskState } from '@/api/types'
 import DocumentEmbeddingDialog from './DocumentEmbeddingDialog.vue'
 
 defineOptions({ name: 'BatchEmbeddingAction' })

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-
-import type ModelApi from '@/api/admin/workspace/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
-import { MODEL_TYPE_LABELS } from '@/constants'
 import ModelDownloadStatus from './ModelDownloadStatus.vue'
+import { MODEL_TYPE_LABELS } from '@/constants'
 
 defineOptions({ name: 'ModelCard' })
 

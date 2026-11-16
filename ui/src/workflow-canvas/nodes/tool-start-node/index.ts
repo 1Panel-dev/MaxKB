@@ -1,9 +1,10 @@
-import ToolStartNode from './index.vue'
-import ToolStartNodeDetail from './details/index.vue'
-import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
-import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
 import type { ToolOutputField } from '../tool-base-node/types'
+import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import type { Model } from '@logicflow/core'
+import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
+import ToolStartNodeDetail from './details/index.vue'
+import ToolStartNode from './index.vue'
 
 class ToolStartNodeView extends WorkflowNodeView {
   constructor(props: ConstructorParameters<typeof WorkflowNodeView>[0]) {

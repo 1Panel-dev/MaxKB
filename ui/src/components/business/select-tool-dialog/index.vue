@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep } from 'lodash'
-import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
-import ToolApi from '@/api/admin/workspace/tool/tool'
-import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
-import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { FolderItem, ToolItem, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
-import { FOLDER_ENTRIES } from '@/constants/folder'
+import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
+import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import ToolApi from '@/api/admin/workspace/tool/tool'
 import FolderTree from '@/components/business/folder-tree/index.vue'
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
+import { FOLDER_ENTRIES } from '@/constants/folder'
+import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'SelectToolDialog' })
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
+import type { ChatUser, UpdatePasswordForm } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
 import { useStore } from '@/stores'
-import type { ChatUser, UpdatePasswordForm } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'UserPwdDialog' })

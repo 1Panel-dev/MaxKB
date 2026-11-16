@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { MsgSuccess } from '@/utils/message'
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentItem } from '@/api/types'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DownloadDocumentAction' })
 const props = defineProps<{

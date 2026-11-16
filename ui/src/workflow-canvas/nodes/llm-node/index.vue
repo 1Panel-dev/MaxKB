@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onMounted, ref, useTemplateRef } from 'vue'
-
-import type { FormInstance } from 'element-plus'
+import type { LlmTool, LlmToolsSetting } from './types'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
 import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
+import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import ToolsSetting from './component/ToolsSetting.vue'
-import { normalizeTool, type LlmTool, type LlmToolsSetting } from './types'
+import { normalizeTool } from './types'
 
 defineOptions({ name: 'WorkflowLlmNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel

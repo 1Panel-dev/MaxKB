@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { FOLDER_ENTRY_ID } from '@/constants'
 import type { KnowledgeDetail } from '@/api/types'
 import ResourceDetailLayout from '@/layout/ResourceDetailLayout.vue'
 import { provideKnowledgeDetailContext } from './context'
-import { isWorkspaceResource, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { FOLDER_ENTRY_ID } from '@/constants'
+import { isSystemResource, isSystemSharedResource, isWorkspaceResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'KnowledgeDetailView' })
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
+import { computed } from 'vue'
 import type { ThemeInfo } from '@/api/admin/auth/types'
+import type { Component } from 'vue'
 import AppLayout from '@/layout/AppLayout.vue'
 
 defineOptions({ name: 'ThemePlatformPreview' })

@@ -1,7 +1,7 @@
 /** 提供 Admin 忘记密码页面发送验证码与重置密码的接口。 */
 
-import { post } from '../core/request'
 import type { ResetPasswordRequest, SendEmailRequest } from '@/api/types/login'
+import { post } from '../core/request'
 
 /** 向指定邮箱发送用于重置密码的验证码。 */
 const postSendVerificationCode = (email: string) => {

@@ -1,4 +1,3 @@
-import { del, get, getExportFile, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type {
   ApplicationAccessToken,
@@ -10,6 +9,7 @@ import type {
   ApplicationFormPayload,
   Dict,
 } from '@/api/types'
+import { del, get, getExportFile, put } from '@/api/admin/core/request'
 
 const prefix = '/system/resource/application'
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentItem } from '@/api/types'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import AddTagDialog from '../action-dropdown/setting-tags/AddTagDialog.vue'
 
 defineOptions({ name: 'DocumentTags' })

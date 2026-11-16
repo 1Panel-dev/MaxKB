@@ -2,8 +2,8 @@
 
 import { createPinia } from 'pinia'
 import { useChatAuthStore } from './auth'
-import { useChatUserStore } from './user'
 import { useChatThemeStore } from './theme'
+import { useChatUserStore } from './user'
 
 export const pinia = createPinia()
 

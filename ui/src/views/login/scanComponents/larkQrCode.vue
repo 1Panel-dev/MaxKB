@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { QrCodeConfig } from '@/api/types'
 import type { LoginService } from '../types'
+import type { QrCodeConfig } from '@/api/types'
 import { MsgError } from '@/utils/message'
 import { loadLoginScript } from '@/utils/script-loader'
 

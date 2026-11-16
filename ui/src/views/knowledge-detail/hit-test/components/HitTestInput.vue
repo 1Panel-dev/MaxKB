@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref } from 'vue'
-import FileApi from '@/api/admin/file'
-import { FILE_SOURCE_TYPE } from '@/api/enums'
 import type { KnowledgeHitTestImage, KnowledgeHitTestPayload } from '@/api/types'
-import { KNOWLEDGE_IMAGE_EXTENSIONS, KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_TYPE_LABEL } from '@/constants/knowledge'
-import { MsgWarning } from '@/utils/message'
-import { useInputEvents } from '@/conversation-panel/core/input-events'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
+import FileApi from '@/api/admin/file'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
-import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { useInputEvents } from '@/conversation-panel/core/input-events'
+import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_EXTENSIONS, KNOWLEDGE_IMAGE_TYPE_LABEL } from '@/constants/knowledge'
+import { MsgWarning } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 /**

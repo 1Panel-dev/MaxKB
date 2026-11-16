@@ -1,8 +1,8 @@
 import { cloneDeep } from 'lodash'
+import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { argReference, finishWithValidate, getKnowledgeListTool, loadKnowledge, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { compareOptions } from './constant'
 

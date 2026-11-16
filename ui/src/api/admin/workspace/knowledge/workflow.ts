@@ -1,6 +1,4 @@
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type LogicFlow from '@logicflow/core'
-import { get, post, put, getExportFile } from '../../core/request'
 import type {
   DefaultModelSettingPayload,
   Dict,
@@ -12,6 +10,8 @@ import type {
   WorkflowVersion,
   WorkflowVersionPayload,
 } from '@/api/types'
+import type LogicFlow from '@logicflow/core'
+import { get, getExportFile, post, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 type KnowledgeWorkflowPayload =

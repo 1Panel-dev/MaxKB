@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-sync'
-import type SharedScheduledSyncApi from '@/api/admin/workspace/shared/knowledge/scheduled-sync'
 import type SystemResourceScheduledSyncApi from '@/api/admin/system/resource-management/knowledge/scheduled-sync'
 import type SystemSharedScheduledSyncApi from '@/api/admin/system/shared-resources/knowledge/scheduled-sync'
-import { KNOWLEDGE_SYNC_STATUS } from '@/api/enums'
+import type ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-sync'
+import type SharedScheduledSyncApi from '@/api/admin/workspace/shared/knowledge/scheduled-sync'
 import type { KnowledgeSyncLog, KnowledgeSyncStatus } from '@/api/types'
 import type { StatusLabelOptions } from '@/components/global/mk-status-label/types'
+import { KNOWLEDGE_SYNC_STATUS } from '@/api/enums'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import { datetimeFormat } from '@/utils/time'
 

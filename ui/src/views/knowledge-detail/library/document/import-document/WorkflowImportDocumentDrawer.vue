@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { computed, provide, ref, useTemplateRef, type Component } from 'vue'
-import type { AxiosProgressEvent } from 'axios'
-import type LogicFlow from '@logicflow/core'
-import FileApi from '@/api/admin/file'
-import { FILE_SOURCE_TYPE } from '@/api/enums'
-import type { KnowledgeWorkflowApi, Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
+import { computed, provide, ref, useTemplateRef } from 'vue'
+import type { Dict, KnowledgeWorkflowApi, KnowledgeWorkflowDebugPayload } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
+import type LogicFlow from '@logicflow/core'
+import type { AxiosProgressEvent } from 'axios'
+import type { Component } from 'vue'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
+import FileApi from '@/api/admin/file'
 import DataSource from '@/views/workflow/knowledge/debug/action/DataSource.vue'
 import KnowledgeBase from '@/views/workflow/knowledge/debug/action/KnowledgeBase.vue'
 import Result from '@/views/workflow/knowledge/debug/action/Result.vue'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowImportDocumentDrawer' })

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import UploadDocumentDrawer from './UploadDocumentDrawer.vue'
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentUploadMode } from './constants'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import UploadDocumentDrawer from './UploadDocumentDrawer.vue'
 
 defineOptions({ name: 'ButtonUploadDocument' })
 defineProps<{

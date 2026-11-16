@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-import type { FormInstance } from 'element-plus'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance } from 'element-plus'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
 import { fileTooltip } from '@/workflow-canvas/config/constants'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 

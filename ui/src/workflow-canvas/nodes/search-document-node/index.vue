@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
-import { useWorkflowStore } from '@/workflow-canvas/store'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
-import type { KnowledgeItem, KnowledgeTagGroup } from '@/api/types'
-import NodeSearchScope from '@/workflow-canvas/component/node-search-scope/index.vue'
-import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
-
-import { compareOptions, defaultSearchCondition } from './constant'
 import type { SearchDocumentForm } from './types'
+import type { KnowledgeItem, KnowledgeTagGroup } from '@/api/types'
+import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance } from 'element-plus'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import NodeSearchScope from '@/workflow-canvas/component/node-search-scope/index.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
+import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
+import { useWorkflowStore } from '@/workflow-canvas/store'
+import { compareOptions, defaultSearchCondition } from './constant'
 
 defineOptions({ name: 'WorkflowSearchDocumentNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel

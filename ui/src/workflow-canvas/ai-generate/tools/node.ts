@@ -1,11 +1,11 @@
 import { nextTick } from 'vue'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type { AgentTool, JsonObjectSchema, JsonSchema, NodeAgentContext, NodeAgentModule, NodeReference, RunnableAgent } from '../type'
 import type { KnowledgeItem } from '@/api/types'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import { compareList } from '@/workflow-canvas/config/constants'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { useAgentConfig } from '../common'
-import type { AgentTool, JsonObjectSchema, JsonSchema, NodeAgentContext, NodeAgentModule, NodeReference, RunnableAgent } from '../type'
 import {
   VARIABLE_GROUPS,
   getDefaultModelConfig,

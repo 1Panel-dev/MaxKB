@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, type ComponentPublicInstance } from 'vue'
+import { ref, useTemplateRef } from 'vue'
+import { cloneDeep } from 'lodash'
+import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
+import type { ToolInputField } from '@/workflow-canvas/nodes/tool-base-node/types'
 import type LogicFlow from '@logicflow/core'
 import type { FormInstance, FormItemRule } from 'element-plus'
-import { cloneDeep } from 'lodash'
-import type { ToolInputField } from '@/workflow-canvas/nodes/tool-base-node/types'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
-import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
-import ResultDrawer from './ResultDrawer.vue'
+import type { ComponentPublicInstance } from 'vue'
 import JsonInput from '@/components/codemirror-editor/Json.vue'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
+import ResultDrawer from './ResultDrawer.vue'
 
 defineOptions({ name: 'ToolWorkflowDebugDrawer' })
 const props = defineProps<{ toolId: string; api?: typeof WorkflowApi }>()

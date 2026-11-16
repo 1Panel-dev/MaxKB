@@ -6,8 +6,8 @@ import ModelProviderApi from '@/api/admin/model-provider'
 import ModelApi from '@/api/admin/workspace/model'
 import ButtonCreateApplication from '@/views/application/components/ButtonCreateApplication.vue'
 import ButtonCreateKnowledge from '@/views/knowledge/components/ButtonCreateKnowledge.vue'
-import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
 import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
+import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
 import perm from '@/permission'
 const props = defineProps<{ workspaceId: string }>()
 const router = useRouter()

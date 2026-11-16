@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
+import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { compareList } from '@/workflow-canvas/config/constants'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 
 defineOptions({ name: 'WorkflowLoopBreakNode' })

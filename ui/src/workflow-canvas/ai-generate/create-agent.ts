@@ -1,5 +1,4 @@
-import { chatCompletion, clipForLog, logDebug, toToolSchemas } from './common'
-import { AgentErrorResult, AgentSuccessResult, ErrorResult, isFailureResult, toToolResult, type ToolResult } from './tools/result'
+import type { ToolResult } from './tools/result'
 import type {
   AgentHandle,
   AgentMessage,
@@ -13,6 +12,8 @@ import type {
   StreamItem,
   ToolCall,
 } from './type'
+import { chatCompletion, clipForLog, logDebug, toToolSchemas } from './common'
+import { AgentErrorResult, AgentSuccessResult, ErrorResult, isFailureResult, toToolResult } from './tools/result'
 
 /** 工具结果回喂模型的截断上限，避免上下文膨胀 */
 const TOOL_RESULT_LIMIT = 8000

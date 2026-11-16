@@ -1,20 +1,19 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch } from 'vue'
-import QuestionEditor from './QuestionEditor.vue'
-import { useMessageInputStoreOptional } from '../../../message-input/index'
 import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
 import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
 import FileUploadCard from '@/components/mk-drag-upload/FileUploadCard.vue'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
-import { getFileExtension, resetUrl } from '@/utils/icon'
-import { formatFileSize } from '@/utils/number'
-import { downloadByURL } from '@/utils/common'
-import { copyText } from '@/utils/clipboard'
-
-import { MESSAGE_LIST_KEY } from '../../../message-list/index'
 import { CONVERSATION_LIST_KEY } from '../../../../left-sidebar/conversation-list/index'
 import { useShowShare } from '../../../../view/index'
+import { useMessageInputStoreOptional } from '../../../message-input/index'
+import { MESSAGE_LIST_KEY } from '../../../message-list/index'
 import { useShareLinkStoreOptional, useShareRecordId } from '../../../message-list/share/index'
+import QuestionEditor from './QuestionEditor.vue'
+import { copyText } from '@/utils/clipboard'
+import { downloadByURL } from '@/utils/common'
+import { getFileExtension, resetUrl } from '@/utils/icon'
+import { formatFileSize } from '@/utils/number'
 
 defineOptions({ name: 'ConversationQuestionContent' })
 

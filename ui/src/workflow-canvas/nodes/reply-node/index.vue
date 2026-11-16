@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
-
+import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
-import type { BaseNodeModel } from '@logicflow/core'
 import { REPLY_CONTENT_TYPE_LABELS } from './constant'
 
 defineOptions({ name: 'WorkflowReplyNode' })

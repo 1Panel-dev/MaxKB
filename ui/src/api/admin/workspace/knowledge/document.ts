@@ -1,24 +1,24 @@
-import { del, downloadRequest, get, getExportFile, post, postExportExcel, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import type {
   Dict,
-  DocumentGeneratePayload,
   DocumentFileImportPayload,
+  DocumentGeneratePayload,
   DocumentImportPayload,
-  DocumentSplitResult,
-  DocumentStrategy,
   DocumentItem,
   DocumentQuickCreatePayload,
   DocumentResourceType,
   DocumentSettingPayload,
+  DocumentSplitResult,
+  DocumentStrategy,
   DocumentTaskState,
   DocumentTaskType,
   DocumentUpdatePayload,
-  WebDocumentImportPayload,
-  LarkDocumentList,
   LarkDocumentImportPayload,
+  LarkDocumentList,
+  WebDocumentImportPayload,
 } from '@/api/types'
+import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
+import { del, downloadRequest, get, getExportFile, post, postExportExcel, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/document`

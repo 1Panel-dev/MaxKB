@@ -1,7 +1,8 @@
 /** 基于 VueDraggablePlus 提供列表排序、动态容器绑定和可选的独立数据写回。 */
 import { computed, onBeforeUnmount, onMounted, onUpdated, toValue, watch, type MaybeRefOrGetter, type Ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import { useDraggable, type UseDraggableOptions } from 'vue-draggable-plus'
+import { useDraggable } from 'vue-draggable-plus'
+import type { UseDraggableOptions } from 'vue-draggable-plus'
 
 export interface SortableChange<T> {
   oldIndex: number

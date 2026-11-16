@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { MsgError } from '@/utils/message'
-import type { ToolOutputField, ToolFieldConfig } from '../../types'
+import type { ToolFieldConfig, ToolOutputField } from '../../types'
 import OutputFieldFormDialog from './OutputFieldFormDialog.vue'
 import TitleSettingDialog from './TitleSettingDialog.vue'
+import { MsgError } from '@/utils/message'
 
 const fields = defineModel<ToolOutputField[]>({ required: true })
 const config = defineModel<ToolFieldConfig>('config', { required: true })

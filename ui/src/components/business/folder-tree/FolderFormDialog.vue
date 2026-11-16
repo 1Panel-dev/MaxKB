@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref, useTemplateRef } from 'vue'
+import type { FolderItem, FolderSource } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import FolderApi from '@/api/admin/workspace/folder'
-import type { FolderItem, FolderSource } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { ApplicationDetail } from '@/api/types'
-import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
-import perm from '@/permission'
+import type ApplicationApi from '@/api/admin/workspace/application/application'
+import type { ApplicationDetail } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
+import perm from '@/permission'
 
 defineOptions({ name: 'PortalApplicationAction' })
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 

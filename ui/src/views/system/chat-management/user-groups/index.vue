@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
-import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups.ts'
+import type { ChatUserGroupMember, Dict, ListItem, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
-import type { ListItem, ChatUserGroupMember, LoginMethod, OptionItem, Dict } from '@/api/types'
-import { LOGIN_METHOD_LABELS } from '@/constants'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups.ts'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
+import { LOGIN_METHOD_LABELS } from '@/constants'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
 /* 添加用户组表单dialog */

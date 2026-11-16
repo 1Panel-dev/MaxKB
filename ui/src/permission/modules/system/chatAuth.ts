@@ -1,7 +1,7 @@
 /** 系统「对话用户认证」按钮权限。$perm.chatAuth.* */
 
+import { PermissionConstants as P, hasEdition } from '../../core'
 import { canSys } from '../../policy'
-import { PermissionConstants as P,hasEdition} from '../../core'
 import { Edition } from '@/permission/core/common'
 
 export default {

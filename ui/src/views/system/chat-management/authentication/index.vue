@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, type Component } from 'vue'
+import { computed, ref } from 'vue'
+import type { Component } from 'vue'
 import { LOGIN_METHOD } from '@/api/enums'
-import LDAP from './components/LDAP.vue'
 import CAS from './components/CAS.vue'
+import LDAP from './components/LDAP.vue'
+import OAuth2 from './components/OAuth2.vue'
 import OIDC from './components/OIDC.vue'
 import SCAN from './components/SCANLogin.vue'
-import OAuth2 from './components/OAuth2.vue'
 
 interface AuthenticationTab {
   component: Component

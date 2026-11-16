@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { use, type ComposeOption } from 'echarts/core'
-import { LineChart, type LineSeriesOption } from 'echarts/charts'
+import { LineChart } from 'echarts/charts'
+import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components'
+import { use } from 'echarts/core'
 import { LegacyGridContainLabel } from 'echarts/features'
-import {
-  GridComponent,
-  LegendComponent,
-  TooltipComponent,
-  type GridComponentOption,
-  type LegendComponentOption,
-  type TooltipComponentOption,
-} from 'echarts/components'
-import { numberFormat } from '@/utils/number'
-import MkEchart from './index.vue'
 import type { MkLineChartOption } from './types'
+import type { LineSeriesOption } from 'echarts/charts'
+import type { GridComponentOption, LegendComponentOption, TooltipComponentOption } from 'echarts/components'
+import type { ComposeOption } from 'echarts/core'
+import MkEchart from './index.vue'
+import { numberFormat } from '@/utils/number'
 
 use([LineChart, GridComponent, LegendComponent, TooltipComponent, LegacyGridContainLabel])
 defineOptions({ name: 'MkLineChart' })

@@ -1,4 +1,4 @@
-import type { ChatFeedback, ChatApplicationProfile, ChatContent, ChatLogRecord, ChatParagraphSource, ChatUserProfile, Dict } from '@/api/types'
+import type { ChatApplicationProfile, ChatContent, ChatFeedback, ChatLogRecord, ChatParagraphSource, ChatUserProfile, Dict } from '@/api/types'
 
 /**
  * 当前对话的智能体信息，由 view 加载并注入各组件 store，chat 与 debug 结构一致。

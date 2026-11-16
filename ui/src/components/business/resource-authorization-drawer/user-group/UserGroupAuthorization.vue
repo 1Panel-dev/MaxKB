@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
-import type ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
+import type { ResourcePermissionOption } from '../types'
 import type SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
-import { RESOURCE_PERMISSION } from '@/api/enums'
+import type ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
 import type { Dict, ResourceAuthorizationTargetType, ResourcePermission, ResourceUserGroupPermission } from '@/api/types'
+import { RESOURCE_PERMISSION } from '@/api/enums'
 import MkTable from '@/components/global/mk-table/index.vue'
 import UserGroupMembersDrawer from './UserGroupMembersDrawer.vue'
-
-import type { ResourcePermissionOption } from '../types'
 
 const props = defineProps<{
   api: typeof ResourceAuthorizationApi | typeof SystemResourceAuthorizationApi

@@ -1,12 +1,13 @@
 /** 提供 Chat API 的 Axios 实例与常用 HTTP 请求封装。 */
 
-import axios, { AxiosHeaders, type AxiosResponse, type AxiosProgressEvent, type InternalAxiosRequestConfig } from 'axios'
-import { reauthenticate } from '@/router/chat'
-import { useStore } from '@/stores/chat'
+import axios, { AxiosHeaders } from 'axios'
 import type { ApiResponse } from './types'
 import type { Dict } from '@/api/types'
-import { MsgError } from '@/utils/message'
+import type { AxiosProgressEvent, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
+import { reauthenticate } from '@/router/chat'
+import { useStore } from '@/stores/chat'
+import { MsgError } from '@/utils/message'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes
 

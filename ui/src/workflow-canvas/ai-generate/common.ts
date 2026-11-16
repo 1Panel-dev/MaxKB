@@ -1,6 +1,6 @@
+import type { AgentBindings, AgentConfig, AgentMessage, AgentTool, Call, RunnableAgent, SseEvent, StreamItem, ToolCall } from './type'
 import type { ChatCompletionPayload } from '@/api/types'
 import { useWorkflowStore } from '@/workflow-canvas/store'
-import type { AgentBindings, AgentConfig, AgentMessage, AgentTool, Call, RunnableAgent, SseEvent, StreamItem, ToolCall } from './type'
 
 /**
  * 跨模块共用的基础设施：agent 装配（useAgentConfig）、工具 schema、SSE 流式补全、

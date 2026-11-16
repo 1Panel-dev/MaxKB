@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { perm } from '@/permission'
 import { computed, ref, watch } from 'vue'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetting } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { formatKnowledgeApiExample, formatKnowledgeMcpConfig } from '@/views/knowledge/external-retrieval-config'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
-import { formatKnowledgeApiExample, formatKnowledgeMcpConfig } from '@/views/knowledge/external-retrieval-config'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
 /**
  * 知识库「外部检索服务」权限判断
  */

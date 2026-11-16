@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import { MdPreview as MdPreviewV3 } from 'md-editor-v3'
 import { useI18n } from 'vue-i18n'
-import { MARKDOWN_LOCALES, normalizeLocale } from '@/locales/config'
 import { sanitizeMarkdown } from './sanitize'
+import { MARKDOWN_LOCALES, normalizeLocale } from '@/locales/config'
 
 defineOptions({ name: 'MdPreview', inheritAttrs: false })
 

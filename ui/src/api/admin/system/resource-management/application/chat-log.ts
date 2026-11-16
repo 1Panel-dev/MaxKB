@@ -1,6 +1,6 @@
-import { del, get, post, postExportExcel, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import type { ChatLog, ChatLogAddKnowledgePayload, ChatLogRecord, ApplicationDetail, Dict } from '@/api/types'
+import type { ApplicationDetail, ChatLog, ChatLogAddKnowledgePayload, ChatLogRecord, Dict } from '@/api/types'
+import { del, get, post, postExportExcel, put } from '@/api/admin/core/request'
 
 const getPrefix = () => `/system/resource/application`
 

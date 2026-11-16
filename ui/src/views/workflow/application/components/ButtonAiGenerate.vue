@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
-import type LogicFlow from '@logicflow/core'
 import type { DefaultModelSettingPayload } from '@/api/types'
+import type LogicFlow from '@logicflow/core'
 import AiGeneratePanel from '@/workflow-canvas/ai-generate/panel/AiGeneratePanel.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
 

@@ -1,12 +1,13 @@
-import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
-import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
-import { loopModeOf } from '@/workflow-canvas/ai-generate/tools/canvas'
+import type { AgentBindings, AgentTool } from '@/workflow-canvas/ai-generate/type'
+import type { ShapeItem } from '@/workflow-canvas/types'
 import { inheritMessages, useAgentConfig } from '@/workflow-canvas/ai-generate/common'
 import { createAgent } from '@/workflow-canvas/ai-generate/create-agent'
+import { nodeAgentFor } from '@/workflow-canvas/ai-generate/tools'
+import { loopModeOf } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { renderNodeFunction, renderPlainNodeFunction, schemaType } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import { nodeAgentFor } from '@/workflow-canvas/ai-generate/tools'
-import type { AgentBindings, AgentTool } from '@/workflow-canvas/ai-generate/type'
+import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
+import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 
 /**
  * 各画布模式父 agent 共享的机械装配：可用节点目录渲染、规划器委派、提示词拼装。

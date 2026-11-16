@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import { computed, ref } from 'vue'
-import MarkDialog from './MarkDialog.vue'
-import ImproveDialog from './ImproveDialog.vue'
+import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import { useLogMessageListStore } from '../../log-message-list'
+import ImproveDialog from './ImproveDialog.vue'
+import MarkDialog from './MarkDialog.vue'
 
 defineOptions({ name: 'ButtonImprove' })
 const props = defineProps<{

@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
 import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import type { Dict, ModelItem, ModelProviderItem, OptionItem } from '@/api/types'
-import { MODEL_TYPE_LABELS } from '@/constants'
+import { RESOURCE_TYPE } from '@/api/enums'
+import ProviderApi from '@/api/admin/model-provider'
+import CommonSystemApi from '@/api/admin/system/common'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import RelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
-import CommonSystemApi from '@/api/admin/system/common'
-import ProviderApi from '@/api/admin/model-provider'
-import ModelCard from '@/views/model/model-card/ModelCard.vue'
-import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
 import ModelProvider from '@/views/model/components/ModelProvider.vue'
+import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
+import ModelCard from '@/views/model/model-card/ModelCard.vue'
 import { DeleteModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
 import EditModelDrawer from '@/views/model/model-card/action-dropdown/edit-model-action/EditModelDrawer.vue'
+import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
+import { MODEL_TYPE_LABELS } from '@/constants'
 import perm from '@/permission'
-import { RESOURCE_TYPE } from '@/api/enums'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 

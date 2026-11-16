@@ -1,10 +1,10 @@
 /** 提供跨页面复用的文件后缀识别、类型校验和图标匹配函数。 */
 
 import type { KnowledgeType } from '@/api/types'
-import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import fileImageIcon from '@/assets/file-type/file-image-icon.svg'
 import webLinkIcon from '@/assets/file-type/web-link-icon.svg'
-import { IMAGE_EXTENSIONS, DOCUMENT_EXTENSIONS, VIDEO_EXTENSIONS, AUDIO_EXTENSIONS } from '@/constants/file-type'
+import { AUDIO_EXTENSIONS, DOCUMENT_EXTENSIONS, IMAGE_EXTENSIONS, VIDEO_EXTENSIONS } from '@/constants/file-type'
+import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 
 /** 获取文件名中不含点号的大写后缀；无有效后缀时返回空字符串。 */
 export function getFileExtension(fileName: string): string {

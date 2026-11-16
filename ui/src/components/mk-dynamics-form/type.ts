@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'vue'
 import type { Dict } from '@/api/types'
+import type { CSSProperties } from 'vue'
 
 /**
  * 动态表单协议允许字段组件携带不同结构的值。

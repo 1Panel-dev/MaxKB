@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type ModelApi from '@/api/admin/workspace/model'
 import type SystemResourceModelApi from '@/api/admin/system/resource-management/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type { ModelItem } from '@/api/types'
 import ParamSettingDrawer from './ParamSettingDrawer.vue'
 

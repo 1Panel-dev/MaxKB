@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
-import { downloadByURL } from '@/utils/common'
 import { useRightSidebarStore } from '../../index'
 import { createFullscreenToggle, createPdfRenderer } from './index'
+import { downloadByURL } from '@/utils/common'
 
 defineOptions({ name: 'DocumentPreview' })
 

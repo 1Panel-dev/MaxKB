@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
-import { RESOURCE_TYPE } from '@/api/enums'
 import type { ToolItem, TriggerBodyField, TriggerTaskPayload, TriggerType } from '@/api/types'
+import { RESOURCE_TYPE } from '@/api/enums'
 import TaskParameterForm from './components/TaskParameterForm.vue'
 
 const props = defineProps<{ tool?: Partial<ToolItem>; triggerType: TriggerType; body: TriggerBodyField[]; disabled?: boolean }>()

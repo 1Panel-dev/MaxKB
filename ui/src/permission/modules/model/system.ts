@@ -1,7 +1,7 @@
 /** 系统「模型资源管理」按钮权限（系统 > 资源管理 > 模型）。全局判定，无 id。 */
 
+import { PermissionConstants as P, hasEdition } from '../../core'
 import { canSys } from '../../policy'
-import { PermissionConstants as P,hasEdition} from '../../core'
 import { Edition } from '@/permission/core/common'
 
 const system = {

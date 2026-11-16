@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { ApplicationAccessTokenPayload, ApplicationAuthenticationConfig, LoginMethod, OptionItem } from '@/api/types'
+import type { ApplicationAccessToken } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
-import ChatUserAuthApi from '@/api/admin/system/chat-management/chat-user-auth'
 import { LOGIN_METHOD } from '@/api/enums'
-import type { ApplicationAuthenticationConfig, ApplicationAccessTokenPayload, LoginMethod, OptionItem } from '@/api/types'
+import ChatUserAuthApi from '@/api/admin/system/chat-management/chat-user-auth'
+import { useApplicationDetailContext } from '../../context'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { useStore } from '@/stores/admin'
 import { MsgSuccess } from '@/utils/message'
-import { useApplicationDetailContext } from '../../context'
-import type { ApplicationAccessToken } from '@/api/types'
 
 defineOptions({ name: 'AccessRestrictionDrawer' })
 

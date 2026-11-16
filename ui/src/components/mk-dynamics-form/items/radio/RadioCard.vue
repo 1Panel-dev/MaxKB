@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
 import { computed, inject } from 'vue'
+import { formItemContextKey, useFormDisabled } from 'element-plus'
+import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
-import { useFormDisabled, formItemContextKey } from 'element-plus'
 
 const inputDisabled = useFormDisabled()
 

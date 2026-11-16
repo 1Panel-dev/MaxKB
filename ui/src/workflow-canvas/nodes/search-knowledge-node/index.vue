@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { KnowledgeItem } from '@/api/types'
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import NodeSearchScope from '@/workflow-canvas/component/node-search-scope/index.vue'
+import type { SearchKnowledgeNodeForm } from './types'
+import type { KnowledgeItem } from '@/api/types'
 import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance } from 'element-plus'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import NodeSearchScope from '@/workflow-canvas/component/node-search-scope/index.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import SearchSetting from './component/SearchSetting.vue'
 import { defaultSearchSetting } from './constant.ts'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
-import type { SearchKnowledgeNodeForm } from './types'
 
 defineOptions({ name: 'WorkflowSearchKnowledgeNode' })
 

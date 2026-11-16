@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, ref, useTemplateRef, type Ref } from 'vue'
+import { computed, inject, nextTick, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
-import { isSystemSharedResource } from '@/utils/resource-context'
-import { TOOL_TYPE } from '@/api/enums'
+import type { ApplicationResourceOption, ResourceSetting, ToolResourceOption } from '../../types'
 import type { ApplicationDetail, ToolItem } from '@/api/types'
+import type { Ref } from 'vue'
+import { TOOL_TYPE } from '@/api/enums'
 import SelectApplicationDialog from '@/components/business/select-application-dialog/index.vue'
 import SelectToolDialog from '@/components/business/select-tool-dialog/index.vue'
-import type { ApplicationResourceOption, ResourceSetting, ToolResourceOption } from '../../types'
 import McpSettingDialog from './McpSettingDialog.vue'
+import { isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'AiChatNodeResourceSetting' })
 

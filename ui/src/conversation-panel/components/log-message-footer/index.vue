@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
-import ButtonImprove from './improve/ButtonImprove.vue'
-import LogMessageFeedback from './feedback/index.vue'
-import FeedbackCard from './feedback/FeedbackCard.vue'
 import { computed } from 'vue'
+import type { ChatMessage, ChatRecordMeta } from '../../core/types'
+import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import type { ChatContent } from '@/api/types'
+import { useRightSidebarStore } from '../../right-sidebar/index'
+import FeedbackCard from './feedback/FeedbackCard.vue'
+import LogMessageFeedback from './feedback/index.vue'
+import ButtonImprove from './improve/ButtonImprove.vue'
 import { copyText } from '@/utils/clipboard'
 import { datetimeFormat } from '@/utils/time'
-import type { ChatMessage, ChatRecordMeta } from '../../core/types'
-import { useRightSidebarStore } from '../../right-sidebar/index'
 
 const props = defineProps<{
   api: Pick<typeof ChatLogApi, 'putChatRecordLog' | 'getMarkChatRecord' | 'deleteMarkChatRecord'>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
-import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import type { ApplicationDetail, ToolItem, TriggerBodyField, TriggerTaskPayload, TriggerTaskSource, TriggerType } from '@/api/types'
-import TaskParameterForm from './components/TaskParameterForm.vue'
+import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import SelectApplicationDialog from '@/components/business/select-application-dialog/index.vue'
 import SelectToolDialog from '@/components/business/select-tool-dialog/index.vue'
+import TaskParameterForm from './components/TaskParameterForm.vue'
 
 const props = defineProps<{
   initialResources: Record<string, Partial<ApplicationDetail & ToolItem>>

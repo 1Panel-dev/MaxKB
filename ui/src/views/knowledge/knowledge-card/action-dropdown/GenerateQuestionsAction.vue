@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { DocumentTaskState, KnowledgeItem, RelatedQuestionsConfig } from '@/api/types'
 import GenerateQuestionsDialog from '@/components/business/generate-questions/index.vue'
 import { MsgSuccess } from '@/utils/message'
-import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
-import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 
 defineOptions({ name: 'GenerateQuestionsAction' })
 const props = defineProps<{

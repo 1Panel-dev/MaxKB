@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue'
+import type { ChatUserSyncConflict, ListItem, LoginMethod, SystemUserGroup } from '@/api/types'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
-import type { ChatUserSyncConflict, ListItem, LoginMethod, SystemUserGroup } from '@/api/types'
-import { LOGIN_METHOD_LABELS } from '@/constants'
-import { MsgSuccess, MsgWarning } from '@/utils/message'
 import CurrentUserApi from '@/api/admin/auth/current-user'
-import UserManageApi from '@/api/admin/system/user-manage'
 import UserGroupApi from '@/api/admin/system/user-groups'
-import { useStore } from '@/stores'
+import UserManageApi from '@/api/admin/system/user-manage'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
+import { LOGIN_METHOD_LABELS } from '@/constants'
+import { useStore } from '@/stores'
+import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ImportUsersDialog' })
 

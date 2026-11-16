@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
-import ChatUserAuthScanApi from '@/api/admin/system/chat-management/chat-user-auth-scan'
 import type { QrLoginPlatformPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
-import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
 import { LOGIN_METHOD } from '@/api/enums'
+import ChatUserAuthScanApi from '@/api/admin/system/chat-management/chat-user-auth-scan'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
+import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
 import { copyText } from '@/utils/clipboard'
-import { MsgSuccess, MsgError } from '@/utils/message'
+import { MsgError, MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
 const emit = defineEmits<{ refresh: [] }>()

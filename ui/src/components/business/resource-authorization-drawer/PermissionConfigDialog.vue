@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { ResourcePermission } from '@/api/types'
-
 import type { ResourcePermissionOption } from './types'
+import type { ResourcePermission } from '@/api/types'
 
 const props = defineProps<{
   options: ResourcePermissionOption[]

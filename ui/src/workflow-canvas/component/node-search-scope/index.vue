@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { KnowledgeItem } from '@/api/types'
 import { nextTick, onBeforeUnmount, useTemplateRef } from 'vue'
+import type { NodeSearchScopeData } from './types'
+import type { KnowledgeItem } from '@/api/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormItemInstance } from 'element-plus'
 import SelectKnowledgeDialog from '@/components/business/select-knowledge-dialog/index.vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
-import type { NodeSearchScopeData } from './types'
 
 defineOptions({ name: 'NodeSearchScope' })
 

@@ -1,5 +1,5 @@
-import { CHAT_LOG_SOURCE } from '@/api/enums'
 import type { ChatLogSource } from '@/api/types'
+import { CHAT_LOG_SOURCE } from '@/api/enums'
 
 export const CHAT_LOG_SOURCE_LABELS: Record<ChatLogSource, string> = {
   [CHAT_LOG_SOURCE.ONLINE]: '线上使用',

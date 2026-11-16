@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import type { CheckboxValueType } from 'element-plus'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import { LOGIN_METHOD, RESOURCE_TYPE } from '@/api/enums'
 import type { ChatUserAuthorization, ChatUserAuthorizationGroup, ChatUserAuthorizationResource, Dict, LoginMethod, OptionItem } from '@/api/types'
-import { LOGIN_METHOD_LABELS } from '@/constants'
-import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import type { CheckboxValueType } from 'element-plus'
+import { LOGIN_METHOD, RESOURCE_TYPE } from '@/api/enums'
+import MkSearchList from '@/components/mk-search-list/index.vue'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 /**

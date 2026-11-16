@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useApplicationDetailContext } from '../context'
 import type { ChatLog } from '@/api/types'
 import LogConversation from '@/conversation-panel/view/log/index.vue'
+import { useApplicationDetailContext } from '../context'
 
 const props = defineProps<{
   chatLog: ChatLog

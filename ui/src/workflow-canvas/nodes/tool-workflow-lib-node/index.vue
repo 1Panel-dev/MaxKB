@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { ToolFieldConfig, ToolInputField, ToolOutputField } from '../tool-base-node/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
 import JsonInput from '@/components/codemirror-editor/Json.vue'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
-import type { ToolFieldConfig, ToolInputField, ToolOutputField } from '../tool-base-node/types'
 
 defineOptions({ name: 'WorkflowToolWorkflowLibNode' })
 

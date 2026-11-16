@@ -1,14 +1,15 @@
 /** Admin 端（调试、对话日志）的智能体信息：由 Admin 智能体详情与显示设置转为对话端 profile 结构。 */
 
-import { computed, ref, watch, type ComputedRef, type Ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
-import WorkspaceApplicationApi from '@/api/admin/workspace/application/application'
-import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import type { ConversationAppInfo } from '../../core/types'
 import type { ApplicationDetail, ApplicationDisplaySetting, Dict } from '@/api/types'
+import type { ComputedRef, Ref } from 'vue'
+import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import WorkspaceApplicationApi from '@/api/admin/workspace/application/application'
 import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
 import { useStore } from '@/stores'
 import { isSystemResource } from '@/utils/resource-context'
-import type { ConversationAppInfo } from '../../core/types'
 
 const BASE_NODE_ID = 'base-node'
 

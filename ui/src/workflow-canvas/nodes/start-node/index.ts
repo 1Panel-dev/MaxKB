@@ -1,7 +1,7 @@
-import StartNode from './index.vue'
-import StartNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
+import StartNodeDetail from './details/index.vue'
+import StartNode from './index.vue'
 
 class StartNodeView extends WorkflowNodeView {
   constructor(props: ConstructorParameters<typeof WorkflowNodeView>[0]) {

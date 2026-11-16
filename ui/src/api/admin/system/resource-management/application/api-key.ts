@@ -1,6 +1,6 @@
-import { del, get, post, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type { ApiKeyPayload, ApiKeyRecord, Dict } from '@/api/types'
+import { del, get, post, put } from '@/api/admin/core/request'
 
 const getPrefix = (applicationId: string) => `/system/resource/application/${applicationId}/application_key`
 

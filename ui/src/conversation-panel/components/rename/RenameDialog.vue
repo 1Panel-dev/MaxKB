@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { inject, reactive, ref } from 'vue'
+import type { Conversation } from '../../core/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ConversationApi from '@/api/chat/conversation'
-import { PORTAL_CONVERSATION_LIST_KEY } from '../../left-sidebar/portal-conversation-list/index'
-import type { Conversation } from '../../core/types'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
+import { PORTAL_CONVERSATION_LIST_KEY } from '../../left-sidebar/portal-conversation-list/index'
 
 defineOptions({ name: 'RenameDialog' })
 

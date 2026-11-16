@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type ToolApi from '@/api/admin/workspace/tool/tool'
-import type SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
-import type ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
-
 import { nextTick, ref, useTemplateRef } from 'vue'
+import type SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
+import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type ToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import type { ToolItem } from '@/api/types'
 import ToolTriggerDialog from './ToolTriggerDialog.vue'

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue'
-import type { UploadFile } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import type { ApplicationDisplaySetting } from '@/api/types'
-import { MsgError, MsgSuccess } from '@/utils/message'
+import type { UploadFile } from 'element-plus'
 import { useApplicationDetailContext } from '../../context'
 import DisplaySettingPreview from './components/DisplaySettingPreview.vue'
 import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
+import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'XpackDisplaySettingDialog' })
 

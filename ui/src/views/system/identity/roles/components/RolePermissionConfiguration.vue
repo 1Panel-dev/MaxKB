@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import RoleApi from '@/api/admin/system/role'
 import type { RoleItem, RolePermission, RolePermissionModule, RolePermissionModuleGroup } from '@/api/types'
+import RoleApi from '@/api/admin/system/role'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission';
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
 import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'EditPublishVersionDialog' })

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useApplicationDetailContext } from '../context'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-
+import type { AccessPlatformDefinition } from './platforms'
 import type { ApplicationAccessStatus } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { MsgSuccess } from '@/utils/message'
+import { useApplicationDetailContext } from '../context'
 import AccessSettingDrawer from './AccessSettingDrawer.vue'
-import { accessPlatforms, type AccessPlatformDefinition } from './platforms'
+import { accessPlatforms } from './platforms'
+import { MsgSuccess } from '@/utils/message'
 import { isSystemResource } from '@/utils/resource-context.ts'
 import perm from '@/permission/index.ts'
 

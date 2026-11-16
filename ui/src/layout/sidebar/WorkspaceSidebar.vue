@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getChildRouteList } from '@/router/admin/utils'
 import type { LayoutMenuItem } from '../types'
+import { getChildRouteList } from '@/router/admin/utils'
 
 const route = useRoute()
 const router = useRouter()

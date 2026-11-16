@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { computed } from 'vue'
-import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import type { DocumentItem } from '@/api/types'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import { isDocumentTaskRunning } from '../../status'
 
 defineOptions({ name: 'TokenizeDocumentAction' })

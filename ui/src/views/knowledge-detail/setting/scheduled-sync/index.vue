@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { perm } from '@/permission'
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
-import { KNOWLEDGE_SYNC_TYPE, SCHEDULE_TYPE } from '@/api/enums'
-import type { KnowledgeSyncSetting, KnowledgeSyncScheduleType } from '@/api/types'
-import { SCHEDULE_OPTION } from '@/constants/schedule'
-import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
+import type { KnowledgeSyncScheduleType, KnowledgeSyncSetting } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { MsgSuccess } from '@/utils/message'
-import { getResourceScope, isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import type { FormInstance, FormRules } from 'element-plus'
+import { KNOWLEDGE_SYNC_TYPE, SCHEDULE_TYPE } from '@/api/enums'
 import { useKnowledgeDetailContext } from '../../context'
 import SyncLogTable from './components/SyncLogTable.vue'
+import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
+import { SCHEDULE_OPTION } from '@/constants/schedule'
+import { MsgSuccess } from '@/utils/message'
+import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
 /**
  * 知识库「定时同步」权限判断
  */

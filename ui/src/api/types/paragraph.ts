@@ -1,5 +1,5 @@
-import type { KnowledgeType, RelatedQuestionsConfig } from './knowledge'
 import type { DocumentResourceType } from './document'
+import type { KnowledgeType, RelatedQuestionsConfig } from './knowledge'
 
 /** 文档分段的查询响应与新增载荷。 */
 export interface ParagraphItem {

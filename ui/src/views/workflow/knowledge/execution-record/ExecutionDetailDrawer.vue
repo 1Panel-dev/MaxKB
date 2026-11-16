@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { computed, ref, watch } from 'vue'
-import type { KnowledgeWorkflowApi, KnowledgeWorkflowAction, KnowledgeExecutionRecord } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
-import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
+import type { KnowledgeExecutionRecord, KnowledgeWorkflowAction, KnowledgeWorkflowApi } from '@/api/types'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
+import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
+import { datetimeFormat } from '@/utils/time'
 
 const props = defineProps<{
   api: KnowledgeWorkflowApi

@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import type { TableColumnCtx } from 'element-plus'
-import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import type { TableColumnCtx } from 'element-plus'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import AssociatedDocumentDrawer from './AssociatedDocumentDrawer.vue'
+import ButtonImportTags from './components/ButtonImportTags.vue'
 import CreateTagDialog from './components/CreateTagDialog.vue'
 import EditTagDialog from './components/EditTagDialog.vue'
-import ButtonImportTags from './components/ButtonImportTags.vue'
-import AssociatedDocumentDrawer from './AssociatedDocumentDrawer.vue'
-import { isWorkspaceSharedResource,isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 defineOptions({ name: 'TagManagementView' })

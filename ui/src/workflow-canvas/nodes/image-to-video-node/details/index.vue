@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 
 defineOptions({ name: 'ImageToVideoNodeDetail' })
 

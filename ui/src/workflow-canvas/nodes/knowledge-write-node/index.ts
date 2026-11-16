@@ -1,8 +1,8 @@
-import KnowledgeWriteNode from './index.vue'
-import agent from './agent'
-import KnowledgeWriteNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import agent from './agent'
+import KnowledgeWriteNodeDetail from './details/index.vue'
+import KnowledgeWriteNode from './index.vue'
 
 class KnowledgeWriteNodeView extends WorkflowNodeView {
   constructor(props: ConstructorParameters<typeof WorkflowNodeView>[0]) {

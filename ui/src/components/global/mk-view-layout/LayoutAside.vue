@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, Fragment, h, isVNode, onBeforeUnmount, ref, watch, type FunctionalComponent, type VNode, useSlots } from 'vue'
+import { Fragment, computed, h, isVNode, onBeforeUnmount, ref, useSlots, watch } from 'vue'
+import type { FunctionalComponent, VNode } from 'vue'
 
 defineOptions({ name: 'LayoutAside' })
 

@@ -1,8 +1,8 @@
 /** 提供门户的智能体与历史对话接口。 */
 
-import { get } from './core/request'
 import type { ResponsePage } from './core/types'
 import type { ChatApplicationProfile, PortalApplicationConversations } from '@/api/types'
+import { get } from './core/request'
 
 /** 分页获取门户可访问的智能体，支持按名称搜索。 */
 const getPortalApplicationPage = (page: number, size: number, name?: string) => {

@@ -1,26 +1,26 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue'
 import { cloneDeep, groupBy } from 'lodash'
-import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
-import { MsgSuccess } from '@/utils/message'
-import ToolApi from '@/api/admin/workspace/tool/tool'
-import SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
-import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
-import ModelApi from '@/api/admin/workspace/model'
-import SystemResourceModelApi from '@/api/admin/system/resource-management/model'
-import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
-import ModelProviderApi from '@/api/admin/model-provider'
-import GenerateContent from '@/components/business/generate-content/index.vue'
-import { MODEL_STATUS } from '@/api/enums'
 import type {
   DynamicFormField,
   ModelItem,
   ModelProviderItem,
-  ToolGenerateMessage,
   ToolGenerateCodePayload,
+  ToolGenerateMessage,
   ToolInputField,
   ToolItem,
 } from '@/api/types'
+import { MODEL_STATUS } from '@/api/enums'
+import ModelProviderApi from '@/api/admin/model-provider'
+import SystemResourceModelApi from '@/api/admin/system/resource-management/model'
+import SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import ModelApi from '@/api/admin/workspace/model'
+import ToolApi from '@/api/admin/workspace/tool/tool'
+import GenerateContent from '@/components/business/generate-content/index.vue'
+import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
+import { MsgSuccess } from '@/utils/message'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'ToolCodeGenerate' })

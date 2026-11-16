@@ -1,9 +1,10 @@
-import { ref, inject, type InjectionKey, type Ref } from 'vue'
+import { inject, ref } from 'vue'
 import { nanoid } from 'nanoid'
+import type { ChatMessage, ChatRecordMeta, ConversationApiAdapter, ConversationAppInfo, SendMessageOptions, StreamChunk } from '../../core/types'
 import type { ChatFeedback, ChatLogRecord, Dict } from '@/api/types'
+import type { InjectionKey, Ref } from 'vue'
 import { aggregators } from '../../core/aggregators'
 import { ConversationStream } from '../../core/stream'
-import type { ChatMessage, ChatRecordMeta, ConversationApiAdapter, ConversationAppInfo, SendMessageOptions, StreamChunk } from '../../core/types'
 
 export interface MessageListDeps extends Pick<
   ConversationApiAdapter,

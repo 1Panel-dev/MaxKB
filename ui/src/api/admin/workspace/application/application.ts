@@ -1,4 +1,3 @@
-import { del, get, getExportFile, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   ApplicationAccessToken,
@@ -11,6 +10,7 @@ import type {
   ApplicationFormPayload,
   Dict,
 } from '@/api/types'
+import { del, get, getExportFile, post, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {

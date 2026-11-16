@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import UrlUpload from './url-upload/index.vue'
-import { isAudio, isVideo } from '@/utils/icon'
-import { useInputEvents } from '../../core/input-events'
-import { useMessageInputStore } from './index'
-import FileCard from './file-card/index.vue'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import { useInputEvents } from '../../core/input-events'
+import FileCard from './file-card/index.vue'
+import { useMessageInputStore } from './index'
+import UrlUpload from './url-upload/index.vue'
 import UserForm from './user-form/index.vue'
-import VoiceRecorder from './voice-recorder/index.vue'
 import { useVoiceRecorder } from './voice-recorder/index'
+import VoiceRecorder from './voice-recorder/index.vue'
+import { isAudio, isVideo } from '@/utils/icon'
 
 const {
   question,

@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { perm } from '@/permission'
 import { APPLICATION_TYPE } from '@/api/enums'
+import { perm } from '@/permission'
 
 export const applicationRoutes: RouteRecordRaw[] = [
   {

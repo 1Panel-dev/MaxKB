@@ -1,7 +1,7 @@
-import { get, post, put, del, postStream } from './core/request'
 import type { ResponsePage } from './core/types'
-import { CHAT_API_BASE_PATH as chatApiBase } from '@/api/constants'
 import type { ChatFeedback, ChatLogRecord, ChatShareDetail, PortalConversationSummary } from '@/api/types'
+import { del, get, post, postStream, put } from './core/request'
+import { CHAT_API_BASE_PATH as chatApiBase } from '@/api/constants'
 
 /** v3 对话接口均按智能体划分资源路径。 */
 const getApplicationPath = (applicationId: string) => `/v3/application/${applicationId}`

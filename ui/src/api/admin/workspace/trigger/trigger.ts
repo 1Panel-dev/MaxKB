@@ -1,6 +1,6 @@
-import { get, post, put, del } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { Dict, Trigger, TriggerDetail, TriggerPayload, TriggerTaskRecord, TriggerTaskRecordDetail } from '@/api/types'
+import { del, get, post, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => `/workspace/${getWorkspaceId()}/trigger`

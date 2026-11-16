@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
+import type { LoginMethod, PortalAuthConfig, PortalSetting, PortalSettingPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
-import type { LoginMethod, PortalAuthConfig, PortalSetting, PortalSettingPayload } from '@/api/types'
 
 const props = defineProps<{ disabled: boolean; setting: PortalSetting; saving: boolean; save: (payload: PortalSettingPayload) => Promise<void> }>()
 

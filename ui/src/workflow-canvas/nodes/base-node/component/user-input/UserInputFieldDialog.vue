@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { MkDynamicsFormConstructor, type FormField, type VisibilityFieldOption } from '@/components/mk-dynamics-form'
+import type { FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
+import { MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
 import { MsgError } from '@/utils/message'
 
 const props = defineProps<{ formFields: FormField[]; nodeId: string }>()

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
-import type { UploadFile, UploadFiles, UploadInstance, UploadRawFile, UploadUserFile } from 'element-plus'
 import type { DragUploadFile, DragUploadHandler, DragUploadMode } from './types'
+import type { UploadFile, UploadFiles, UploadInstance, UploadRawFile, UploadUserFile } from 'element-plus'
 import FileApi from '@/api/admin/file'
 import uploadImage from '@/assets/mk_icon_upload.svg'
-import { MsgWarning } from '@/utils/message'
 import FileUploadCard from './FileUploadCard.vue'
 import ImageUploadCard from './ImageUploadCard.vue'
+import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'MultipleFileUpload' })
 

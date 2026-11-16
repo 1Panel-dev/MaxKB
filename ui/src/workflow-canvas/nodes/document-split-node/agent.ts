@@ -1,6 +1,6 @@
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { argReference, createUpdateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 
 /** document-split-node（文档分段）的 AI 生成配置：入参文档列表，配置分段策略及其参数（均按自定义常量写入），返回带分段的文档列表 */

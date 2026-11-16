@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Ref } from 'vue'
 import { inject, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
-import { TOOL_TYPE } from '@/api/enums'
+import type { McpSetting, McpSource } from '../../types'
 import type { ToolItem } from '@/api/types'
+import type { FormInstance } from 'element-plus'
+import type { Ref } from 'vue'
+import { TOOL_TYPE } from '@/api/enums'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { MsgError } from '@/utils/message'
-import type { McpSetting, McpSource } from '../../types'
 
 defineOptions({ name: 'AiChatNodeMcpSettingDialog' })
 

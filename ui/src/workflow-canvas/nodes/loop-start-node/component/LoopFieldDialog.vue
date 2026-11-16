@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormRules, FormInstance } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus'
 import { isLoopBuiltinField } from '../constant'
 
 defineOptions({ name: 'LoopFieldDialog' })

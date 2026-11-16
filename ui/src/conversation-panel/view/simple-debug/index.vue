@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, provide, ref, toRef, useTemplateRef, watch } from 'vue'
-import type { AxiosProgressEvent } from 'axios'
 import type { ApplicationDetail } from '@/api/types'
-import FileApi from '@/api/admin/file'
+import type { AxiosProgressEvent } from 'axios'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
-import ConversationLayout from '../../core/layout/index.vue'
-import ChatPanel from '../../main/chat-panel/index.vue'
-import RightSidebar from '../../right-sidebar/index.vue'
+import FileApi from '@/api/admin/file'
 import SimpleDebugHeader from '../../components/header/simple-debug/index.vue'
-import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
-import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
 import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
+import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
+import ConversationLayout from '../../core/layout/index.vue'
+import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
+import ChatPanel from '../../main/chat-panel/index.vue'
 import { RIGHT_SIDEBAR_KEY } from '../../right-sidebar/index'
+import RightSidebar from '../../right-sidebar/index.vue'
 import { createDebugConversation } from '../debug/index'
-import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
+import { DEVICE_KEY, VIEW_KEY, VIEW_TYPE, createDeviceType } from '../index.ts'
 
 defineOptions({ name: 'SimpleDebugConversation' })
 

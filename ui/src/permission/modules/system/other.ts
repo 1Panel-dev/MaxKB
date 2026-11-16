@@ -1,7 +1,7 @@
 /** 系统「其他/关于」类按钮权限 → $perm.other.* */
 
+import { Compare, PermissionConstants as P, RoleConstants, hasEdition, hasPermission } from '../../core'
 import { canSys } from '../../policy'
-import { PermissionConstants as P, hasPermission, RoleConstants, Compare, hasEdition} from '../../core'
 import { Edition } from '@/permission/core/common'
 
 export default {

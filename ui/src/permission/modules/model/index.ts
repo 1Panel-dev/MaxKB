@@ -1,8 +1,8 @@
 /** 「模型」各场景按钮权限：$perm.model.workspace.* / .system.* / .share.* */
 
-import workspace from './workspace'
-import system from './system'
 import share from './share'
+import system from './system'
+import workspace from './workspace'
 
 export default {
   workspace,

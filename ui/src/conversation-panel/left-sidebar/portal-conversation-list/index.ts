@@ -1,6 +1,7 @@
-import { inject, ref, type InjectionKey, type Ref } from 'vue'
-import type { ChatApplicationProfile, PortalApplicationConversations } from '@/api/types'
+import { inject, ref } from 'vue'
 import type { Conversation } from '../../core/types'
+import type { ChatApplicationProfile, PortalApplicationConversations } from '@/api/types'
+import type { InjectionKey, Ref } from 'vue'
 
 /** 门户侧栏中按智能体分组的历史对话。 */
 export interface PortalApplicationGroup {

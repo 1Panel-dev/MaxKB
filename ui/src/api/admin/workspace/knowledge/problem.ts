@@ -1,6 +1,6 @@
-import { del, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { Dict, ProblemItem, ProblemBatchAssociationPayload, ProblemParagraph } from '@/api/types'
+import type { Dict, ProblemBatchAssociationPayload, ProblemItem, ProblemParagraph } from '@/api/types'
+import { del, get, post, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/problem`

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
+import type { DynamicFormValue } from '../../type'
 const props = defineProps<{
   /**
    *表单渲染Item column

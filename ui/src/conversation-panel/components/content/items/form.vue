@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { MkDynamicsForm } from '@/components/mk-dynamics-form'
-import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import type { Dict } from '@/api/types'
+import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
+import type { ViewType } from '@/conversation-panel/view/index'
+import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { useSendMessageOptional } from '@/conversation-panel/components/message-list/index'
-import { useViewType, VIEW_TYPE, type ViewType } from '@/conversation-panel/view/index'
+import { VIEW_TYPE, useViewType } from '@/conversation-panel/view/index'
 defineOptions({ name: 'ConversationFormContent' })
 const viewType = useViewType()
 // 发送能力由消息列表或外部宿主 provide;拿不到 → 只读降级

@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { RelatedResourceTarget } from './types'
 import type RelatedResourcesApi from '@/api/admin/workspace/related-resources'
+import type { Dict, ModelProviderItem, OptionItem, RelatedResource, ResourceType } from '@/api/types'
+import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import ModelProviderApi from '@/api/admin/model-provider'
 import WorkspaceApi from '@/api/admin/system/workspace'
-import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
+import ResourceIcon from './ResourceIcon.vue'
 import { useStore } from '@/stores'
 import { isSystemSharedResource } from '@/utils/resource-context'
-import type { Dict, ModelProviderItem, OptionItem, RelatedResource, ResourceType } from '@/api/types'
-import ResourceIcon from './ResourceIcon.vue'
-import type { RelatedResourceTarget } from './types'
 
 defineOptions({ name: 'RelatedResourcesDrawer' })
 const props = defineProps<{

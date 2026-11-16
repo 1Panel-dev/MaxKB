@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef, type CSSProperties } from 'vue'
-import type { UploadFile, UploadInstance } from 'element-plus'
-import ToolApi from '@/api/admin/workspace/tool/tool'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
-import { TOOL_TYPE } from '@/api/enums'
 import type { ToolType } from '@/api/types'
-import { useStore } from '@/stores'
-import { MsgSuccess } from '@/utils/message'
-import ToolFormDrawer from '../tool-form/tool-custom/ToolFormDrawer.vue'
+import type { UploadFile, UploadInstance } from 'element-plus'
+import type { CSSProperties } from 'vue'
+import { TOOL_TYPE } from '@/api/enums'
+import ToolApi from '@/api/admin/workspace/tool/tool'
 import DataSourceFormDrawer from '../tool-form/DataSourceFormDrawer.vue'
 import McpFormDrawer from '../tool-form/McpFormDrawer.vue'
 import SkillToolFormDrawer from '../tool-form/SkillToolFormDrawer.vue'
 import WorkflowFormDialog from '../tool-form/WorkflowFormDialog.vue'
-import perm from '@/permission/index.ts'
+import ToolFormDrawer from '../tool-form/tool-custom/ToolFormDrawer.vue'
+import { useStore } from '@/stores'
+import { MsgSuccess } from '@/utils/message'
 import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import perm from '@/permission/index.ts'
 
 /**
  * 工具「导入」权限判断

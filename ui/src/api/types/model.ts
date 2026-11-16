@@ -1,8 +1,8 @@
 /** Workspace 模型与工具页面共用的业务类型。 */
 
-import { MODEL_STATUS } from '@/api/enums'
 import type { Dict } from './common'
 import type { DynamicFormField } from './common'
+import { MODEL_STATUS } from '@/api/enums'
 
 export type ModelStatus = (typeof MODEL_STATUS)[keyof typeof MODEL_STATUS]
 

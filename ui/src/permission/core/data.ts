@@ -6,7 +6,7 @@
  * 与后端逐条对齐。请勿手工增删单条；后端调整权限枚举后重新同步整表。
  */
 
-import { Permission, Group, Operate } from './common'
+import { Group, Operate, Permission } from './common'
 
 const p = (group: Group, subGroup: Group, operate: Operate, bitIndex: number) => new Permission(group, subGroup, operate, bitIndex)
 

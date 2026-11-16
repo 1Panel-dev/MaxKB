@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref } from 'vue'
+import type { BatchSetUserWorkspaceRolesRequest, ListItem, SystemUserRoleAssignment } from '@/api/types'
 import type { FormInstance } from 'element-plus'
+import { ROLE_TYPE } from '@/api/enums'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
-import { ROLE_TYPE } from '@/api/enums'
-import type { ListItem, BatchSetUserWorkspaceRolesRequest, SystemUserRoleAssignment } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 

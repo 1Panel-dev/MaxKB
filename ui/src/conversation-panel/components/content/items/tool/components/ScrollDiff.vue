@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import type { PatchFileInfo } from '../patch/patchTypes'
 import { Scroll } from '@/conversation-panel/core/scroll'
 import FileDiff from '../patch/FileDiff.vue'
-import type { PatchFileInfo } from '../patch/patchTypes'
 
 defineOptions({ name: 'ConversationScrollDiff' })
 

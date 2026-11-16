@@ -1,6 +1,6 @@
-import { get, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type { KnowledgeSyncLog, KnowledgeSyncSetting } from '@/api/types'
+import { get, put } from '@/api/admin/core/request'
 const getPrefix = (knowledgeId: string) => `/system/resource/knowledge/${knowledgeId}`
 /** 获取知识库定时同步设置。 */
 const getKnowledgeSyncSetting = (knowledgeId: string) => get<KnowledgeSyncSetting>(`${getPrefix(knowledgeId)}/sync_setting`)

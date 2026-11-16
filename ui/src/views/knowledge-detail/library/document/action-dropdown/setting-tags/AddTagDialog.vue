@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref } from 'vue'
-import type { FormInstance } from 'element-plus'
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagGroup } from '@/api/types'
-import { MsgError, MsgSuccess } from '@/utils/message'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type { FormInstance } from 'element-plus'
 import CreateTagDialog from '@/views/knowledge-detail/library/tags/components/CreateTagDialog.vue'
+import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'AddTagDialog' })
 const props = defineProps<{

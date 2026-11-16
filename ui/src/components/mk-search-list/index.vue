@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T extends object">
-import type { ScrollbarDirection, ScrollbarInstance } from 'element-plus'
 import { computed, nextTick, ref, watch } from 'vue'
+import type { ScrollbarDirection, ScrollbarInstance } from 'element-plus'
 
 defineOptions({ name: 'MkSearchList' })
 

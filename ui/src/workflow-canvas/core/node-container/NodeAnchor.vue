@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Model } from '@logicflow/core'
 import type { WorkflowNodeModel } from '../workflow-node'
+import type { Model } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowNodeAnchor' })
 

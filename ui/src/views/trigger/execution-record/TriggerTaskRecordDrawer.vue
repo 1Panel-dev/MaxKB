@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import TriggerApi from '@/api/admin/workspace/trigger/trigger'
-import { RESOURCE_TYPE, STATE_TYPES } from '@/api/enums'
 import type { Dict, TriggerTaskRecord } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
-import { toOrderBy } from '@/utils/common'
+import { RESOURCE_TYPE, STATE_TYPES } from '@/api/enums'
+import TriggerApi from '@/api/admin/workspace/trigger/trigger'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
 import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
+import { toOrderBy } from '@/utils/common'
+import { datetimeFormat } from '@/utils/time'
 
 /* 当前触发器记录查询 */
 const visible = ref(false)

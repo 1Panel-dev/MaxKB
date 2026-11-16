@@ -1,6 +1,6 @@
-import { perm } from '@/permission'
-import type { RouteRecordRaw, RouteParamsGeneric } from 'vue-router'
+import type { RouteParamsGeneric, RouteRecordRaw } from 'vue-router'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
+import { perm } from '@/permission'
 
 function firstAccessibleDetail(params: RouteParamsGeneric) {
   const system = perm.knowledge.system

@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
-import SystemKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
-import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type { FolderItem, KnowledgeItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
+import SystemKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
 import FolderTree from '@/components/business/folder-tree/index.vue'
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 import KnowledgeCard from '@/views/knowledge/knowledge-card/KnowledgeCard.vue'
+import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
+import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'SelectKnowledgeDialog' })
 

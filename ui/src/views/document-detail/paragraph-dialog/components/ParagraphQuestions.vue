@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue'
+import type { ParagraphQuestionDraft } from '../types'
+import type { ParagraphProblem } from '@/api/types'
 import type { SelectInstance } from 'element-plus'
 import { useDocumentDetailContext } from '@/views/document-detail/context'
-import type { ParagraphProblem } from '@/api/types'
-import type { ParagraphQuestionDraft } from '../types'
 import { MsgWarning } from '@/utils/message'
-import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 /**

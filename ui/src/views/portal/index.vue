@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import NoService from '@/views/chat/error/NoService.vue'
 import PortalConversation from '@/conversation-panel/view/portal/index.vue'
+import NoService from '@/views/chat/error/NoService.vue'
 import { useStore } from '@/stores/chat'
 
 defineOptions({ name: 'PortalApplicationChat' })

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 
 defineOptions({ name: 'ToolWorkflowLibNodeDetail' })
 

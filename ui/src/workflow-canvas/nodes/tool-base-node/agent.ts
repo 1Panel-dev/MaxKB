@@ -1,10 +1,10 @@
 import { cloneDeep } from 'lodash'
+import type { ToolInputField, ToolOutputField } from './types'
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import { AgentSuccessResult, ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
-import type { ToolInputField, ToolOutputField } from './types'
 
 /**
  * tool-base-node（工具基本信息）的 AI 生成配置：声明工具工作流的函数签名。

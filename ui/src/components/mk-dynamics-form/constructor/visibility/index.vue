@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { randomId } from '@/utils/common'
 import type { VisibilityConditionState, VisibilityFieldOption, VisibilityRules } from '../../type'
-import { inferFieldType, getAllowedOps, getFieldConfig } from './utils'
 import { compareList } from '@/workflow-canvas/config/constants'
 import ConditionRow from './ConditionRow.vue'
+import { getAllowedOps, getFieldConfig, inferFieldType } from './utils'
+import { randomId } from '@/utils/common'
 
 defineOptions({ name: 'MkDynamicsFormVisibilityConstructor' })
 

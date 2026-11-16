@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import type { ChatContent } from '@/api/types'
-import ScrollDiff from './components/ScrollDiff.vue'
-import { parsePatch } from './patch/parsePatch'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import type { PatchFileStatus } from './patch/patchTypes'
-import { extractPartialJsonField } from './extract-partial-json'
+import type { ChatContent } from '@/api/types'
 import { Scroll } from '@/conversation-panel/core/scroll'
+import ScrollDiff from './components/ScrollDiff.vue'
+import { extractPartialJsonField } from './extract-partial-json'
+import { parsePatch } from './patch/parsePatch'
 
 defineOptions({ name: 'ConversationPatchContent' })
 

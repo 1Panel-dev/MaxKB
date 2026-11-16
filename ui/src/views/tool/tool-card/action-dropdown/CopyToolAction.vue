@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
-import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vue'
 import DataSourceFormDrawer from '@/views/tool/tool-form/DataSourceFormDrawer.vue'
 import McpFormDrawer from '@/views/tool/tool-form/McpFormDrawer.vue'
 import SkillToolFormDrawer from '@/views/tool/tool-form/SkillToolFormDrawer.vue'
 import WorkflowFormDialog from '@/views/tool/tool-form/WorkflowFormDialog.vue'
+import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vue'
 
 defineOptions({ name: 'CopyToolAction' })
 

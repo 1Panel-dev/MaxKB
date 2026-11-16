@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
-import type { TableColumnCtx } from 'element-plus'
 import type { Dict, OptionItem, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
+import type { TableColumnCtx } from 'element-plus'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import MkSearchList from '@/components/mk-search-list/index.vue'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import AddMemberDrawer from './AddMemberDrawer.vue'
 import CreateOrUpdateWorkspaceDialog from './dialog/CreateOrUpdateWorkspaceDialog.vue'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
 /* 添加工作空间表单dialog */

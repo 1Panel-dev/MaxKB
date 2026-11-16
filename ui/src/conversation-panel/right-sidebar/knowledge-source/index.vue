@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { getFileIconUrl } from '@/utils/icon'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import { useRightSidebarStore } from '../index'
 import DocumentPreview from './document-preview/index.vue'
+import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'KnowledgeSource' })
 

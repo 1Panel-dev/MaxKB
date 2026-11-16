@@ -1,10 +1,9 @@
 /** 管理当前对话用户档案与语言。 */
 
 import { defineStore } from 'pinia'
-import ChatUserApi from '@/api/chat/chat-user'
 import type { ChatUserProfile } from '@/api/types'
-
-import { getDefaultLanguage, LANGUAGE_STORAGE_KEY, normalizeLocale } from '@/locales/config'
+import ChatUserApi from '@/api/chat/chat-user'
+import { LANGUAGE_STORAGE_KEY, getDefaultLanguage, normalizeLocale } from '@/locales/config'
 
 interface ChatUserState {
   language: string

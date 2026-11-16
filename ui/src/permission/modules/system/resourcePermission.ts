@@ -1,6 +1,6 @@
 /** 系统「授权管理」（资源权限）按钮权限 → $perm.resourcePermission.* */
 
-import { PermissionConstants as P, hasPermission, RoleConstants, Compare} from '../../core'
+import { Compare, PermissionConstants as P, RoleConstants, hasPermission } from '../../core'
 
 export default {
   applicationRead: () => hasPermission([RoleConstants.ADMIN,RoleConstants.WORKSPACE_MANAGE,P.APPLICATION_READ],Compare.OR),

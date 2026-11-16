@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
-import { formatTokenNumber } from '@/utils/number'
-import { iconComponent } from '@/workflow-canvas/icons/utils'
+import { computed } from 'vue'
 import type { ExecutionNodeDetail } from './types'
+import type { Component } from 'vue'
+import { iconComponent } from '@/workflow-canvas/icons/utils'
+import { formatTokenNumber } from '@/utils/number'
 
 defineOptions({ name: 'BaseHeader' })
 

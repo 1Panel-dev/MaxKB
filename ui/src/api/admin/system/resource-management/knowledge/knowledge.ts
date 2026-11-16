@@ -1,15 +1,15 @@
-import { del, get, getExportFile, post, put } from '@/api/admin/core/request'
-import type LogicFlow from '@logicflow/core'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type {
-  KnowledgeHitTestPayload,
-  KnowledgeHitTestResult,
   Dict,
   KnowledgeDetail,
-  KnowledgeItem,
   KnowledgeGeneratePayload,
+  KnowledgeHitTestPayload,
+  KnowledgeHitTestResult,
+  KnowledgeItem,
   KnowledgeSyncType,
 } from '@/api/types'
+import type LogicFlow from '@logicflow/core'
+import { del, get, getExportFile, post, put } from '@/api/admin/core/request'
 
 const prefix = '/system/resource/knowledge'
 

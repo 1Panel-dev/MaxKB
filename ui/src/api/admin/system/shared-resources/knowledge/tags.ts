@@ -1,5 +1,5 @@
-import { del, get, getExportFile, post, put } from '@/api/admin/core/request'
 import type { Dict, KnowledgeTagGroup, KnowledgeTagPayload, KnowledgeTagUpdatePayload } from '@/api/types'
+import { del, get, getExportFile, post, put } from '@/api/admin/core/request'
 
 const getPrefix = (knowledgeId: string) => `/system/shared/knowledge/${knowledgeId}`
 

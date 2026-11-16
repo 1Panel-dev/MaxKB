@@ -1,9 +1,11 @@
 import { computed, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import type { PortalConversationListStore } from '../../left-sidebar/portal-conversation-list/index'
+import type { ChatConversationBundle, ChatConversationRouting } from '../chat/index'
 import ConversationApi from '@/api/chat/conversation'
 import PortalApi from '@/api/chat/portal'
-import { createPortalConversationListStore, type PortalConversationListStore } from '../../left-sidebar/portal-conversation-list/index'
-import { createChatConversation, type ChatConversationBundle, type ChatConversationRouting } from '../chat/index'
+import { createPortalConversationListStore } from '../../left-sidebar/portal-conversation-list/index'
+import { createChatConversation } from '../chat/index'
 
 export interface PortalConversationBundle extends ChatConversationBundle {
   portalList: PortalConversationListStore

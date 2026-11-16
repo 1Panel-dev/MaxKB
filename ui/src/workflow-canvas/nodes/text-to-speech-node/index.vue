@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-
-import type { FormInstance } from 'element-plus'
-import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
+import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance } from 'element-plus'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
-import type { ModelItem, ModelProviderItem } from '@/api/types'
 
 defineOptions({ name: 'WorkflowTextToSpeechNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel

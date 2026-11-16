@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
 import type { DocumentImportParagraph, DocumentSplitResult } from '@/api/types'
-import { getFileIconUrl } from '@/utils/icon'
-import { getFileUrl } from '@/utils/common'
-import { MsgConfirm, MsgWarning } from '@/utils/message'
 import EditParagraphDialog from '../upload-document/EditParagraphDialog.vue'
+import { getFileUrl } from '@/utils/common'
+import { getFileIconUrl } from '@/utils/icon'
+import { MsgConfirm, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'DocumentImportPreview' })
 defineProps<{ knowledgeId: string }>()

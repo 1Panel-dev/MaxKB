@@ -2,14 +2,14 @@
 import { nextTick, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
-import type { KnowledgeWorkflowTemplate, WorkflowStoreTemplate } from '@/api/types'
-import { knowledgeTemplate } from '../template.ts'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import type { KnowledgeWorkflowTemplate, WorkflowStoreTemplate } from '@/api/types'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import { knowledgeTemplate } from '../template.ts'
+import KnowledgeBaseForm from './components/KnowledgeBaseForm.vue'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import KnowledgeBaseForm from './components/KnowledgeBaseForm.vue'
 
 defineOptions({ name: 'CreateWorkflowKnowledgeDialog' })
 const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>()

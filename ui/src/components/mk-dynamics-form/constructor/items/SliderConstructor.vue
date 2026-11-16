@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
 import { computed, onBeforeMount, watch } from 'vue'
+import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({

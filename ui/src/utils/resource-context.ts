@@ -1,7 +1,7 @@
 /** 提供当前路由资源范围和工作空间上下文的读取函数。 */
 
-import router from '@/router/admin'
 import type { RouteLocationNormalized, RouteLocationNormalizedLoaded, RouteLocationResolvedGeneric } from 'vue-router'
+import router from '@/router/admin'
 
 type WorkspaceRouteLike = RouteLocationNormalized | RouteLocationNormalizedLoaded | RouteLocationResolvedGeneric
 

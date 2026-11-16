@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useDocumentDetailContext } from '@/views/document-detail/context'
-import type { ParagraphUpdatePayload } from '@/api/types'
 import type { ParagraphQuestionDraft } from './types'
+import type { ParagraphUpdatePayload } from '@/api/types'
+import { useDocumentDetailContext } from '@/views/document-detail/context'
 import ParagraphForm from './components/ParagraphForm.vue'
 import ParagraphQuestions from './components/ParagraphQuestions.vue'
 import { MsgSuccess } from '@/utils/message'

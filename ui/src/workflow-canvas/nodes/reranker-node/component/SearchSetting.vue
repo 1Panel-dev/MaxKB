@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
 import type { RerankerSetting } from '../types'
+import type { FormInstance } from 'element-plus'
 
 defineOptions({ name: 'RerankerSearchSetting' })
 const setting = defineModel<RerankerSetting>({ required: true })

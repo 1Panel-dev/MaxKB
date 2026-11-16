@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import type { Dict, ModelItem, ModelProviderItem, OptionItem } from '@/api/types'
+import SystemModelProviderApi from '@/api/admin/model-provider'
+import SystemCommonApi from '@/api/admin/system/common'
 import SystemModelApi from '@/api/admin/system/resource-management/model'
 import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
-import SystemCommonApi from '@/api/admin/system/common'
 import SystemWorkspaceApi from '@/api/admin/system/workspace'
-import SystemModelProviderApi from '@/api/admin/model-provider'
-import type { Dict, ModelItem, ModelProviderItem, OptionItem } from '@/api/types'
+import { AuthorizeModelAction, EditModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
 import { MODEL_TYPE_LABELS } from '@/constants'
 import { useStore } from '@/stores'
-import { datetimeFormat } from '@/utils/time'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import { EditModelAction, AuthorizeModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
+import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission'
 
 const { auth } = useStore()

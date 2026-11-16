@@ -3,8 +3,8 @@ import { nextTick, ref, useTemplateRef } from 'vue'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
-import { FOLDER_ENTRY_ID } from '@/constants'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
+import { FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'MoveKnowledgeAction' })

@@ -1,5 +1,5 @@
-import { get, post } from '../../core/request'
 import type { SharedResourceType, SharedWorkspaceAuthorization } from '@/api/types'
+import { get, post } from '../../core/request'
 
 const prefix = '/system/shared'
 

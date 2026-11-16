@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import JSEncrypt from 'jsencrypt'
-import CommonSystemApi from '@/api/admin/system/common'
-import CurrentUserApi from '@/api/admin/auth/current-user'
-import UserManageApi from '@/api/admin/system/user-manage'
+import type { ListItem, SystemUser, SystemUserPayload, SystemUserRoleAssignment } from '@/api/types/index.ts'
+import type { FormInstance, FormRules } from 'element-plus'
 import { ROLE_TYPE } from '@/api/enums'
+import CurrentUserApi from '@/api/admin/auth/current-user'
+import CommonSystemApi from '@/api/admin/system/common'
+import UserManageApi from '@/api/admin/system/user-manage'
+import UserGroupSetting from './components/UserGroupSetting.vue'
 import { useStore } from '@/stores'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import UserGroupSetting from './components/UserGroupSetting.vue'
-import type { ListItem, SystemUser, SystemUserPayload, SystemUserRoleAssignment } from '@/api/types/index.ts'
-import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'UserFromDrawer' })
 

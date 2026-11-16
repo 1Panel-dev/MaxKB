@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import type { ApiKeyRecord } from '@/api/types'
-import type ApplicationApiKeyApi from '@/api/admin/workspace/application/api-key'
-import type SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
 import type SystemApiKeyApi from '@/api/admin/system/api-key'
+import type SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
+import type ApplicationApiKeyApi from '@/api/admin/workspace/application/api-key'
+import type { ApiKeyRecord } from '@/api/types'
 import ButtonCreateApiKey from './create-api-key/index.vue'
 import ButtonEditApiKey from './edit-api-key/index.vue'
 import { getApiKeyExpiration } from './expiration'
 import { copyText } from '@/utils/clipboard'
-import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'ApiKeyList' })
 

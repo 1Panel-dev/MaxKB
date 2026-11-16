@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ChatContent } from '@/api/types'
-import ContentList from '../content-list/index.vue'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
+import ContentList from '../content-list/index.vue'
 import { useShareMessageListStore } from './index'
 import { copyText } from '@/utils/clipboard'
 

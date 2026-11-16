@@ -1,12 +1,12 @@
 <script setup lang="ts" generic="T extends TableFilterValue = string[]">
 import { computed } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
+import type { TableFilterCustomValue, TableFilterOption, TableFilterValue } from './types'
 import type { CascaderOption, CascaderProps, CascaderValue } from 'element-plus'
-import TableFilterSingle from './TableFilterSingle.vue'
-import TableFilterMultiple from './TableFilterMultiple.vue'
 import TableFilterCascader from './TableFilterCascader.vue'
 import TableFilterCustom from './TableFilterCustom.vue'
-import type { TableFilterCustomValue, TableFilterOption, TableFilterValue } from './types'
+import TableFilterMultiple from './TableFilterMultiple.vue'
+import TableFilterSingle from './TableFilterSingle.vue'
 
 defineOptions({ name: 'MkTableFilter' })
 

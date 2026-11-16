@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { provide } from 'vue'
-import ShareMessageList from '../../components/share-message-list/index.vue'
 import { SHARE_MESSAGE_LIST_KEY } from '../../components/share-message-list/index'
+import ShareMessageList from '../../components/share-message-list/index.vue'
 import { useSharePanelStore } from './index'
 
 defineOptions({ name: 'SharePanel' })

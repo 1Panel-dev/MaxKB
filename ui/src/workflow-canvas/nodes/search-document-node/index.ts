@@ -1,8 +1,8 @@
-import SearchDocumentNode from './index.vue'
-import SearchDocumentNodeDetail from './details/index.vue'
-import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import agent from './agent'
+import SearchDocumentNodeDetail from './details/index.vue'
+import SearchDocumentNode from './index.vue'
 
 class SearchDocumentNodeView extends WorkflowNodeView {
   constructor(props: ConstructorParameters<typeof WorkflowNodeView>[0]) {

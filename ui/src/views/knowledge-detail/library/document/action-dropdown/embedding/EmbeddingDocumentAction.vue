@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { DOCUMENT_TASK_TYPE } from '@/api/enums'
 import type { DocumentItem, DocumentTaskState } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import { MsgSuccess } from '@/utils/message'
-import DocumentEmbeddingDialog from './DocumentEmbeddingDialog.vue'
+import { DOCUMENT_TASK_TYPE } from '@/api/enums'
 import { isDocumentTaskRunning } from '../../status'
+import DocumentEmbeddingDialog from './DocumentEmbeddingDialog.vue'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'EmbeddingDocumentAction' })
 const props = defineProps<{

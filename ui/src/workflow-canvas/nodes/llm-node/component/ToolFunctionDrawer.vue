@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { LlmTool, LlmToolFunction, LlmToolParameter } from '../types'
 import type { FormInstance, FormItemRule } from 'element-plus'
-import { MsgError } from '@/utils/message'
+import { normalizeTool, toolParameterTypes } from '../types'
 import ToolParameterDialog from './ToolParameterDialog.vue'
-import { normalizeTool, toolParameterTypes, type LlmTool, type LlmToolFunction, type LlmToolParameter } from '../types'
+import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowLlmToolFunctionDrawer' })
 

@@ -1,7 +1,7 @@
-import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
 import type { OptionItem, ResourceAuthorizationType, ResourcePermission } from '@/api/types'
-import { useStore } from '@/stores'
+import { RESOURCE_PERMISSION, RESOURCE_TYPE } from '@/api/enums'
 import { RESOURCE_PERMISSION_OPTIONS } from '@/constants/resource-authorization'
+import { useStore } from '@/stores'
 const { auth } = useStore()
 
 export const RESOURCE_AUTHORIZATION_LABELS: Record<ResourceAuthorizationType, string> = {

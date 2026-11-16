@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { ParagraphUpdatePayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { Footers, ToolbarNames } from 'md-editor-v3'
-import FileApi from '@/api/admin/file'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
-import type { ParagraphUpdatePayload } from '@/api/types'
+import FileApi from '@/api/admin/file'
 
 defineOptions({ name: 'ParagraphForm' })
 const props = defineProps<{ knowledgeId: string }>()

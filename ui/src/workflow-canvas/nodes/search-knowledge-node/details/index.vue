@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
-import { downloadByURL, getFileUrl } from '@/utils/common'
-import { getFileIconUrl } from '@/utils/icon'
-import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_HIT_UNIT_TYPE } from '@/api/enums'
 import type { DocumentResourceType, KnowledgeHitTestAsset, KnowledgeType } from '@/api/types'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_HIT_UNIT_TYPE } from '@/api/enums'
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import { downloadByURL, getFileUrl } from '@/utils/common'
+import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'SearchKnowledgeNodeDetail' })
 

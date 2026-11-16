@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import type { CreateWorkspaceMemberPayload, ListItem, SystemUserOption, WorkspaceItem } from '@/api/types'
 import type { FormInstance } from 'element-plus'
+import { ROLE_TYPE } from '@/api/enums'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import CommonSystemApi from '@/api/admin/system/common'
 import WorkspaceApi from '@/api/admin/system/workspace'
-import { ROLE_TYPE } from '@/api/enums'
-import type { CreateWorkspaceMemberPayload, ListItem, SystemUserOption, WorkspaceItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'AddWorkspaceMemberDrawer' })

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
-import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
-import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 
 defineOptions({ name: 'KeywordIndexKnowledgeAction' })
 

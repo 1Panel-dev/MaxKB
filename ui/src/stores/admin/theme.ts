@@ -1,8 +1,8 @@
 /** 管理公开外观信息并将主题色应用到运行时样式变量。 */
 
 import { defineStore } from 'pinia'
-import BaseInfoApi from '@/api/admin/auth/base-info'
 import type { ThemeInfo } from '@/api/admin/auth/types'
+import BaseInfoApi from '@/api/admin/auth/base-info'
 import { DEFAULT_THEME_COLOR } from '@/constants'
 
 function normalizeThemeColor(themeColor?: string) {

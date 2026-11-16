@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import type { Ref } from 'vue'
-import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, inject, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import type { NodeMenuItem, NodeMenuResourceSource } from './types'
+import type { ApplicationDetail, ApplicationType, FolderItem, ToolItem, ToolType } from '@/api/types'
+import type { Ref } from 'vue'
+import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import SharedToolApi from '@/api/admin/workspace/shared/tool'
 import ToolApi from '@/api/admin/workspace/tool/tool'
-import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
-import type { ApplicationDetail, ApplicationType, FolderItem, ToolItem, ToolType } from '@/api/types'
-import type { NodeMenuItem, NodeMenuResourceSource } from './types'
-import { FOLDER_ENTRY_ID } from '@/constants'
-import { isWorkFlow } from '@/utils/common'
 import FolderTree from '@/components/business/folder-tree/index.vue'
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { applicationNode, toolLibNode, toolWorkflowLibNode } from '@/workflow-canvas/config/node-data'
-import { useRoute } from 'vue-router'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowKind } from '@/workflow-canvas/types'
+import { FOLDER_ENTRY_ID } from '@/constants'
+import { isWorkFlow } from '@/utils/common'
 
 defineOptions({ name: 'ResourceNodeMenu' })
 

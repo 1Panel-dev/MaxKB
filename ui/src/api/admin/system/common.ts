@@ -1,5 +1,5 @@
-import { get } from '../core/request'
 import type { CommonUserOption, Dict, SystemUserOption } from '@/api/types'
+import { get } from '../core/request'
 
 /** 获取默认密码。 */
 const getDefaultPassword = () => {

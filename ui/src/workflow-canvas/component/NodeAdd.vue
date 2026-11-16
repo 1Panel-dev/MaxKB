@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ClickOutside as vClickOutside } from 'element-plus'
-import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
 import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
 import type { WorkflowMode } from '@/workflow-canvas/types'
+import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
 
 defineOptions({ name: 'WorkflowNodeAdd' })
 

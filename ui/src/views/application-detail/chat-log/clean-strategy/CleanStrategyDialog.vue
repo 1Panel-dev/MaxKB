@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { ApplicationChatLogApi } from '../../context'
-import { MsgSuccess } from '@/utils/message'
 import { useApplicationDetailContext } from '../../context'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ChatLogCleanStrategyDialog' })
 const props = defineProps<{ api: ApplicationChatLogApi; applicationId: string }>()

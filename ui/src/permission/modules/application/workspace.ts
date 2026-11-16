@@ -1,7 +1,7 @@
 /** 工作空间「应用」按钮权限（工作空间内的应用列表 / 详情页）。 */
 
-import { can, canRes } from '../../policy'
 import { PermissionConstants as P } from '../../core'
+import { can, canRes } from '../../policy'
 
 const workspace = {
   // —— 工作空间级（无资源 id）——

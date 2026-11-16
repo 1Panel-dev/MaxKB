@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { MkDynamicsFormConstructor, dynamicFormTypeOptions, type FormField } from '@/components/mk-dynamics-form'
+import type { FormField } from '@/components/mk-dynamics-form'
+import { MkDynamicsFormConstructor, dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
 
 const emit = defineEmits<{ submit: [data: FormField, index?: number] }>()
 const constructorRef = useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('constructorRef')

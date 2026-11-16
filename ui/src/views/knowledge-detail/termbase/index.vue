@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
-import MkEditName from '@/components/mk-edit-name/index.vue'
-import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { TermbaseItem } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
-import { MsgSuccess } from '@/utils/message'
+import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import MkEditName from '@/components/mk-edit-name/index.vue'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import ButtonCreateTermbase from './components/ButtonCreateTermbase.vue'
-import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { datetimeFormat } from '@/utils/time'
 import { perm } from '@/permission'
 
 /**

@@ -1,5 +1,5 @@
-import type { KNOWLEDGE_SYNC_STATUS, SCHEDULE_TYPE } from '@/api/enums'
 import type { KnowledgeSyncType } from './knowledge'
+import type { KNOWLEDGE_SYNC_STATUS, SCHEDULE_TYPE } from '@/api/enums'
 
 export type KnowledgeSyncScheduleType = (typeof SCHEDULE_TYPE)[keyof typeof SCHEDULE_TYPE]
 export type KnowledgeSyncStatus = (typeof KNOWLEDGE_SYNC_STATUS)[keyof typeof KNOWLEDGE_SYNC_STATUS]

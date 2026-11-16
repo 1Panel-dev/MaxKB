@@ -1,7 +1,7 @@
 /** 系统「用户管理」按钮权限。$perm.user.* */
 
-import { canSys } from '../../policy'
 import { PermissionConstants as P } from '../../core'
+import { canSys } from '../../policy'
 
 export default {
   /**

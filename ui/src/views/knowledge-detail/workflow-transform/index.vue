@@ -3,11 +3,11 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import workflowDemo from '@/assets/workflow/workflow-demo.png'
+import { knowledgeTemplate } from '@/views/knowledge/template'
+import { useKnowledgeDetailContext } from '../context'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { isWorkspaceSharedResource } from '@/utils/resource-context'
-import { knowledgeTemplate } from '@/views/knowledge/template'
-import workflowDemo from '@/assets/workflow/workflow-demo.png'
-import { useKnowledgeDetailContext } from '../context'
 
 defineOptions({ name: 'KnowledgeWorkflowTransformView' })
 defineProps<ResourceDetailPageProps>()

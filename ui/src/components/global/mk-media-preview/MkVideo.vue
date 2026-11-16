@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { MediaPreviewProps } from './types'
 import MkMediaPreview from './index.vue'
 import { MsgWarning } from '@/utils/message'
-import type { MediaPreviewProps } from './types'
 
 defineOptions({ name: 'MkVideo' })
 const props = defineProps<MediaPreviewProps>()

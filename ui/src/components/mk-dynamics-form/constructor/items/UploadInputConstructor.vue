@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
 import { computed, onMounted } from 'vue'
+import type { DynamicFormValue } from '../../type'
 import MkTagsEdit from '@/components/mk-tags-edit/index.vue'
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 

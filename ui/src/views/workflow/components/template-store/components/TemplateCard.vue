@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type { WorkflowStoreTemplate } from '@/api/types'
-import { numberFormat } from '@/utils/number'
-import { resetUrl } from '@/utils/icon'
 import TemplateStoreDetailDrawer from '../TemplateStoreDetailDrawer.vue'
+import { resetUrl } from '@/utils/icon'
+import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'TemplateCard' })
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Fragment, isVNode, nextTick, ref } from 'vue'
-import type { DropdownInstance } from 'element-plus'
 import type { Options } from '@popperjs/core'
-import { hasRenderableSlotContent } from '@/utils/vnode'
+import type { DropdownInstance } from 'element-plus'
 import MkDropdownMenu from './MkDropdownMenu.vue'
+import { hasRenderableSlotContent } from '@/utils/vnode'
 
 defineOptions({ name: 'MkDropdown', inheritAttrs: false })
 

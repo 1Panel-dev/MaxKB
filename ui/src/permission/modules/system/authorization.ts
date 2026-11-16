@@ -1,6 +1,6 @@
 /** 系统「资源授权」按钮权限（按资源类型分组）。$perm.authorization.application.read() ... */
 
-import { PermissionConstants as P, hasPermission, RoleConstants, Compare } from '../../core'
+import { Compare, PermissionConstants as P, RoleConstants, hasPermission } from '../../core'
 
 export default {
   /**

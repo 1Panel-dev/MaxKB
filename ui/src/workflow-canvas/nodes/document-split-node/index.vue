@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
-import type { FormInstance } from 'element-plus'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import { createAnchorGuard } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance } from 'element-plus'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
+import { createAnchorGuard } from '@/workflow-canvas/core/utils'
 import { DOCUMENT_SPLIT_STRATEGY_LABELS } from './constant'
+import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 
 defineOptions({ name: 'WorkflowDocumentSplitNode' })
 

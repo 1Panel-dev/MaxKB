@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { MkDynamicsForm } from '@/components/mk-dynamics-form'
-import type { FormField } from '@/components/mk-dynamics-form'
 import type { Dict } from '@/api/types'
-import { MsgWarning } from '@/utils/message'
+import type { FormField } from '@/components/mk-dynamics-form'
+import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { useMessageInputStore } from '../index'
+import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ConversationUserForm' })
 

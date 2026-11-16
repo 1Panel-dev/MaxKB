@@ -1,5 +1,5 @@
-import { get, post, put } from '../../core/request'
 import type { QrLoginPlatform, QrLoginPlatformPayload } from '@/api/types'
+import { get, post, put } from '../../core/request'
 
 const prefix = '/chat_user/auth/platform/source'
 

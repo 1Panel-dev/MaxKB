@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import type { DocumentItem } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
-import type { DocumentItem } from '@/api/types'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { isWorkFlow } from '@/utils/common'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'SyncDocumentAction' })
 const props = defineProps<{

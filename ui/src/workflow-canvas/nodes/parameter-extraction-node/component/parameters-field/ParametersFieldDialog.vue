@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance, FormRules } from 'element-plus'
 import type { ParameterField } from './types'
+import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'ParameterExtractionFieldDialog' })
 

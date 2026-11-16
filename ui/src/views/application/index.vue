@@ -1,32 +1,32 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import CommonApi from '@/api/admin/workspace/common'
-import ApplicationApi from '@/api/admin/workspace/application/application'
-import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
-import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import type { ApplicationDetail, Dict, FolderItem, OptionItem } from '@/api/types'
 import { APPLICATION_TYPE, RESOURCE_TYPE } from '@/api/enums'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
-import FolderTree from '@/components/business/folder-tree/index.vue'
+import ApplicationApi from '@/api/admin/workspace/application/application'
+import CommonApi from '@/api/admin/workspace/common'
+import RelatedResourcesApi from '@/api/admin/workspace/related-resources'
+import ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import FolderTree from '@/components/business/folder-tree/index.vue'
 import ApplicationCard from './application-card/ApplicationCard.vue'
 import {
   AuthorizeApplicationAction,
   CopyApplicationAction,
-  RelatedResourcesApplicationAction,
   DeleteApplicationAction,
   ExportApplicationAction,
-  PortalApplicationAction,
   McpConfigApplicationAction,
   MoveApplicationAction,
+  PortalApplicationAction,
+  RelatedResourcesApplicationAction,
   SettingApplicationAction,
   TriggerApplicationAction,
 } from './application-card/action-dropdown'
+import ButtonBatchCleanStrategy from './components/ButtonBatchCleanStrategy.vue'
 import ButtonCreateApplication from './components/ButtonCreateApplication.vue'
 import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
-import ButtonBatchCleanStrategy from './components/ButtonBatchCleanStrategy.vue'
+import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
 const route = useRoute()

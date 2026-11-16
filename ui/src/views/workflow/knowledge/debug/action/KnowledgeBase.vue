@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
 import type { Dict } from '@/api/types'
+import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
+import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'KnowledgeBase' })

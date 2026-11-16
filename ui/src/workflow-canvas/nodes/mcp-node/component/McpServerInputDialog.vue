@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, reactive } from 'vue'
+import { reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance } from 'element-plus'
 
 defineOptions({ name: 'McpServerInputDialog' })

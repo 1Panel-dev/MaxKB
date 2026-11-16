@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
 import { computed, onMounted, reactive } from 'vue'
-
+import type { DynamicFormValue } from '../../type'
 import { MsgConfirm, MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 const emit = defineEmits(['update:modelValue'])

@@ -2,10 +2,10 @@
 import { computed, ref } from 'vue'
 import { escape } from 'lodash'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
-import { copyText } from '@/utils/clipboard'
-import fullscreenImage from '@/assets/application/embed-fullscreen.png'
 import floatingImage from '@/assets/application/embed-floating.png'
+import fullscreenImage from '@/assets/application/embed-fullscreen.png'
 import mobileImage from '@/assets/application/embed-mobile.png'
+import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'EmbedThirdPartyDialog' })
 

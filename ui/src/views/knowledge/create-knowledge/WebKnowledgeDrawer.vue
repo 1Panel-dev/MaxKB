@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, reactive } from 'vue'
-import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
+import { reactive, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import type { FormInstance, FormRules } from 'element-plus'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
-import { useStore } from '@/stores'
-import { MsgSuccess } from '@/utils/message'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import DocumentStrategyForm from './components/DocumentStrategyForm.vue'
 import KnowledgeBaseForm from './components/KnowledgeBaseForm.vue'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
+import { useStore } from '@/stores'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CreateWebKnowledgeDrawer' })
 const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>()

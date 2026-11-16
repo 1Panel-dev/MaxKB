@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
-import type { FormInstance } from 'element-plus'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
+import type { FormInstance } from 'element-plus'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { fileTooltip } from '@/workflow-canvas/config/constants'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowDocumentExtractNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel

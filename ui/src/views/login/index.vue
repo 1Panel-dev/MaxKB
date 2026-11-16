@@ -2,14 +2,14 @@
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { getDingTalkClientAuthCode } from './dingtalk-client-login'
-import BaseInfoApi from '@/api/admin/auth/base-info.ts'
-import { useStore } from '@/stores'
-import { LOGIN_METHOD } from '@/api/enums'
 import type { LoginConfig } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
+import BaseInfoApi from '@/api/admin/auth/base-info.ts'
+import { useAdminLoginService } from './admin-login-service'
 import LoginLayout from './components/LoginLayout.vue'
 import LoginModePanel from './components/LoginModePanel.vue'
-import { useAdminLoginService } from './admin-login-service'
+import { getDingTalkClientAuthCode } from './dingtalk-client-login'
+import { useStore } from '@/stores'
 
 const route = useRoute()
 const { t } = useI18n({ useScope: 'global' })

@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
-import SystemSharedRelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
-import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
-import CommonSystemApi from '@/api/admin/system/common'
-import SystemSharedToolWorkflowApi from '@/api/admin/system/shared-resources/tool/tool-workflow'
 import type { ParamsPage } from '@/api/admin/core/types'
 import type { Dict, OptionItem, ToolItem, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
-import { TOOL_TYPE_OPTIONS } from '@/constants'
+import CommonSystemApi from '@/api/admin/system/common'
+import SystemSharedRelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
+import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import SystemSharedToolWorkflowApi from '@/api/admin/system/shared-resources/tool/tool-workflow'
+import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
+import ButtonToolStore from '@/views/tool/components/ButtonToolStore.vue'
 import ToolCard from '@/views/tool/tool-card/ToolCard.vue'
 import ToolStatusSwitch from '@/views/tool/tool-card/ToolStatusSwitch.vue'
-import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
 import {
-  RelatedResourcesToolAction,
+  CopyToolAction,
   DeleteToolAction,
-  ExportToolAction,
   ExecutionRecordToolAction,
+  ExportToolAction,
   InitParamAction,
   McpConfigAction,
-  CopyToolAction,
+  RelatedResourcesToolAction,
 } from '@/views/tool/tool-card/action-dropdown'
-import ButtonToolStore from '@/views/tool/components/ButtonToolStore.vue'
 import EditToolForm from '@/views/tool/tool-form/EditToolForm.vue'
+import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
+import { TOOL_TYPE_OPTIONS } from '@/constants'
 import perm from '@/permission'
 
 const router = useRouter()

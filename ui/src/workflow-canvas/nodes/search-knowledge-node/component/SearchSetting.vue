@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { KnowledgeSearchSetting } from '../types'
 import type { FormInstance } from 'element-plus'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 import { defaultSearchSetting } from '../constant'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
-import type { KnowledgeSearchSetting } from '../types'
 
 defineOptions({ name: 'SearchKnowledgeSetting' })
 

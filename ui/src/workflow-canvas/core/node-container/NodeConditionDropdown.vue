@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { BaseNodeModel } from '@logicflow/core'
 import { computed, watch } from 'vue'
-
+import type { BaseNodeModel } from '@logicflow/core'
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'NodeConditionDropdown' })

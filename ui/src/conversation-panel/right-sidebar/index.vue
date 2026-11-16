@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ExecutionDetail from './execution-detail/index.vue'
-import KnowledgeSource from './knowledge-source/index.vue'
 import { RIGHT_SIDEBAR_PANEL, useRightSidebarStore } from './index'
+import KnowledgeSource from './knowledge-source/index.vue'
 
 defineOptions({ name: 'RightSidebar' })
 

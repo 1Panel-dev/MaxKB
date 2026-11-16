@@ -1,11 +1,10 @@
-import { del, get, post, put } from '../../core/request'
-import type { ParamsPage, ResponsePage, PasswordRequest } from '../../core/types'
+import type { ParamsPage, PasswordRequest, ResponsePage } from '../../core/types'
 import type {
+  BatchSetChatUserGroupsRequest,
   BatchSetChatUserQuotaRequest,
   BatchSetChatUserQuotaResult,
-  BatchSetChatUserGroupsRequest,
-  ChatUserBase,
   ChatUser,
+  ChatUserBase,
   ChatUserPayload,
   ChatUserQuota,
   ChatUserQuotaPayload,
@@ -13,6 +12,7 @@ import type {
   ChatUserUpdateRequest,
   Dict,
 } from '@/api/types'
+import { del, get, post, put } from '../../core/request'
 
 const prefix = '/system/chat_user'
 
