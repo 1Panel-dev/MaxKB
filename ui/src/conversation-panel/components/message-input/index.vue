@@ -36,7 +36,7 @@ const {
 // 所有附件入口共用禁用条件，上传和发送仍由输入 Store 处理。
 const { fileInputRef, handlePaste, handleDragover, handleDrop, handleKeydown } = useInputEvents({
   text: question,
-  canUpload: () => canUpload.value && !urlUploadEnabled.value,
+  canUpload: () => canUpload.value && uploadEnabled.value,
   addFiles,
   submit: () => {
     if (canSend.value) send()

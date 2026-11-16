@@ -119,6 +119,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     streamLoading: msgs.streamLoading,
     sendMessage: msgs.sendMessage,
     uploadFile: msgs.uploadFile,
+    getUrlFile: (url) => FileApi.getUrlFile(getApplicationId(), url),
     stop: msgs.stop,
     speechToText: (data) => ConversationApi.postSpeechToText(getApplicationId(), data),
     appInfo,

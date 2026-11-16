@@ -847,3 +847,10 @@ PUT `/v3/application/<applicationId>/chat/<chatId>/chat_record/<recordId>/vote`�
 `1`（不满意）字符串，`vote_reason` 为单选原因，`vote_other_content` 为补充说明。
 满意原因支持 `accurate`、`complete`、`other`，不满意支持 `inaccurate`、`incomplete`、`other`。
 已评价记录须先撤销才能再次评价；历史记录通过同名字段回显。
+
+## URL 附件读取
+
+Admin 与 Chat 的 `file.ts` 提供 `getUrlFile(applicationId, url)`，请求 `/oss/get_url/{applicationId}`，
+返回共享类型 `UrlFileContent`：响应状态、Content-Type、Content-Length 和 content。
+后端对 text／json 类型返回文本原文，其他内容返回 Base64。对话装配层注入各入口的文件 API，
+输入组件负责类型、大小校验及需要落库的文件转上传，不跨入口复用请求客户端。

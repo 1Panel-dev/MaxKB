@@ -22,9 +22,7 @@ import { useAdminAppInfo } from './app-info'
 export function createDebugConversation(application: Readonly<Ref<ApplicationDetail | null | undefined>>): ConversationBundle {
   const route = useRoute()
   const ConversationApi = isSystemResource() ? SystemResourceConversationApi : WorkspaceConversationApi
-  const appId = computed(
-    () => (route.params.id as string) || (route.params.applicationId as string) || '',
-  )
+  const appId = computed(() => (route.params.id as string) || (route.params.applicationId as string) || '')
   const api: ConversationApiAdapter = {
     pageConversations: (p, s) => ConversationApi.getConversationPage(p, s, appId.value),
     pageRecords: (cid, p, s) => ConversationApi.getConversationRecordPage(cid, p, s, appId.value),
@@ -68,6 +66,7 @@ export function createDebugConversation(application: Readonly<Ref<ApplicationDet
     streamLoading: msgs.streamLoading,
     sendMessage: msgs.sendMessage,
     uploadFile: msgs.uploadFile,
+    getUrlFile: (url) => FileApi.getUrlFile(appId.value, url),
     stop: msgs.stop,
     speechToText: (data) => ConversationApi.postSpeechToText(appId.value, data),
     appInfo,
