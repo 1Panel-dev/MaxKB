@@ -1,0 +1,11 @@
+{
+  "actions": {
+    "edit": "編輯",
+    "delete": "刪除"
+  },
+  "fields": {
+    "creator": {
+      "label": "建立者"
+    }
+  }
+}

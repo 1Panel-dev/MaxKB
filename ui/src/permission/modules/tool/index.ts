@@ -1,8 +1,8 @@
 /** 「工具」各场景按钮权限：$perm.tool.workspace.* / .system.* / .share.* */
 
-import share from './share'
-import system from './system'
 import workspace from './workspace'
+import system from './system'
+import share from './share'
 import workspaceShared from './workspace-shared'
 
 export default {

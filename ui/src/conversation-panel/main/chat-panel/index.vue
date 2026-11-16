@@ -18,16 +18,19 @@ const disclaimerText = computed(() => (list.appInfo.value?.disclaimer ? list.app
 </script>
 <template>
   <!-- 带输入框的主面板:header + message-list + message-input -->
-  <main ref="mainRef" class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
+  <main
+    ref="mainRef"
+    class="mk-conversation-main bg-cover! bg-center!"
+    :style="{ backgroundImage: list.appInfo.value?.chat_background ? `url(${JSON.stringify(list.appInfo.value.chat_background)})` : undefined }"
+    @drop.prevent="handleDrop"
+    @dragover.prevent
+  >
     <!-- 头部可被替换(如 debug 用 debug header);默认普通 chat header -->
     <slot name="header">
       <ChatHeader />
     </slot>
-    <!-- 聊天背景铺满标题栏以下的消息区与输入区，与显示设置预览一致 -->
-    <div
-      class="flex-column min-h-0 flex-1 bg-cover bg-center"
-      :style="{ backgroundImage: list.appInfo.value?.chat_background ? `url(${JSON.stringify(list.appInfo.value.chat_background)})` : undefined }"
-    >
+    <!-- 消息区与输入区共用主面板背景 -->
+    <div class="flex-column min-h-0 flex-1">
       <MessageList :key="list.currentChatId.value" :app-name="list.appInfo.value?.name || 'AI 助手'"></MessageList>
 
       <footer v-if="!list.isShared.value" class="mk-conversation-content flex-col-center shrink-0 gap-2 p-4">

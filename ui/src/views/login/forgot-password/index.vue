@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import JSEncrypt from 'jsencrypt'
 import { useI18n } from 'vue-i18n'
@@ -21,7 +21,7 @@ const RESEND_WAIT_SECONDS = 60
 defineOptions({ name: 'ForgotPasswordView' })
 
 const router = useRouter()
-const { t, locale } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 
 const forgotPasswordFormRef = ref<FormInstance>()
@@ -35,9 +35,9 @@ const isSendCodeDisabled = computed(() => !forgotPasswordForm.email.trim() || is
 
 const validateConfirmPassword = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
   if (!value) {
-    callback(new Error(t('auth.forgotPassword.validation.confirmPasswordRequired')))
+    callback(new Error(t('auth.fields.confirmPassword.requiredMessage')))
   } else if (value !== forgotPasswordForm.password) {
-    callback(new Error(t('auth.forgotPassword.validation.passwordMismatch')))
+    callback(new Error(t('auth.fields.confirmPassword.mismatchMessage')))
   } else {
     callback()
   }
@@ -46,29 +46,15 @@ const validateConfirmPassword = (_rule: unknown, value: string, callback: (error
 const forgotPasswordRules = computed<FormRules<ForgotPasswordForm>>(() => ({
   confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
   email: [
-    { whitespace: true, required: true, message: t('auth.forgotPassword.validation.emailRequired'), trigger: 'blur' },
-    { type: 'email', message: t('auth.forgotPassword.validation.emailInvalid'), trigger: 'blur' },
+    { whitespace: true, required: true, message: t('auth.fields.email.requiredMessage'), trigger: 'blur' },
+    { type: 'email', message: t('auth.fields.email.invalidMessage'), trigger: 'blur' },
   ],
   password: [
-    { required: true, message: t('auth.credentials.validation.passwordRequired'), trigger: 'blur' },
-    { min: 6, max: 30, message: t('auth.forgotPassword.validation.passwordLength'), trigger: 'blur' },
+    { required: true, message: t('auth.fields.password.requiredMessage'), trigger: 'blur' },
+    { min: 6, max: 30, message: t('auth.forgotPassword.password.lengthMessage'), trigger: 'blur' },
   ],
-  verificationCode: [{ whitespace: true, required: true, message: t('auth.forgotPassword.validation.codeRequired'), trigger: 'blur' }],
+  verificationCode: [{ whitespace: true, required: true, message: t('auth.fields.verificationCode.requiredMessage'), trigger: 'blur' }],
 }))
-
-// 切换语言时保留输入，仅更新已经显示的错误。
-watch(
-  locale,
-  () => {
-    const form = forgotPasswordFormRef.value
-    form?.fields
-      .filter((field) => field.validateState === 'error')
-      .forEach((field) => {
-        if (field.prop) void form.validateField(field.prop).catch(() => undefined)
-      })
-  },
-  { flush: 'post' },
-)
 
 const startCountdown = () => {
   countdown.value = RESEND_WAIT_SECONDS
@@ -153,12 +139,12 @@ onMounted(() => {
       size="large"
     >
       <el-form-item prop="email">
-        <el-input v-model="forgotPasswordForm.email" autocomplete="email" :placeholder="t('auth.forgotPassword.fields.email.placeholder')" />
+        <el-input v-model="forgotPasswordForm.email" autocomplete="email" :placeholder="t('auth.fields.email.placeholder')" />
       </el-form-item>
 
       <el-form-item prop="verificationCode">
         <div class="flex w-full gap-3">
-          <el-input v-model="forgotPasswordForm.verificationCode" :placeholder="t('auth.forgotPassword.fields.verificationCode.placeholder')" />
+          <el-input v-model="forgotPasswordForm.verificationCode" :placeholder="t('auth.fields.verificationCode.placeholder')" />
           <!-- 发送邮箱验证码 -->
           <el-button plain class="min-w-35 shrink-0" :disabled="isSendCodeDisabled" :loading="isSendingCode" @click="handleSendCode">
             {{ countdown > 0 ? t('auth.forgotPassword.actions.resendCode', { seconds: countdown }) : t('auth.forgotPassword.actions.sendCode') }}
@@ -171,7 +157,7 @@ onMounted(() => {
           v-model="forgotPasswordForm.password"
           autocomplete="new-password"
           maxlength="30"
-          :placeholder="t('auth.forgotPassword.fields.password.placeholder')"
+          :placeholder="t('auth.forgotPassword.password.placeholder')"
           show-password
           type="password"
         />
@@ -182,7 +168,7 @@ onMounted(() => {
           v-model="forgotPasswordForm.confirmPassword"
           autocomplete="new-password"
           maxlength="30"
-          :placeholder="t('auth.forgotPassword.fields.confirmPassword.placeholder')"
+          :placeholder="t('auth.fields.confirmPassword.placeholder')"
           show-password
           type="password"
         />

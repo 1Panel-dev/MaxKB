@@ -1,11 +1,12 @@
 import { createApp } from 'vue'
 import ElementPlus from 'element-plus'
-import { configureMarkdownEditor } from '@/components/global/markdown-editor/config'
+
 import App from './App.vue'
-import { createAppI18n } from '@/locales'
-import permission from '@/permission/install'
+import { configureMarkdownEditor } from '@/components/global/markdown-editor/config'
 import router from '@/router/admin'
 import { pinia, useStore } from '@/stores/admin'
+import { createAppI18n } from '@/locales'
+import permission from '@/permission/install'
 import '@/styles/tailwind.css'
 import '@/styles/index.scss'
 

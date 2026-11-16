@@ -9,9 +9,9 @@
  * 复杂/特殊按钮可绕过这里，直接用 core 的 hasPermission + 常量自行组合。
  */
 
-import type { Permission } from './core/common'
-import { Compare, RoleConstants, buildBasePermission, buildBaseResourcePermission, hasPermission } from './core'
 import { getWorkspaceId } from '@/utils/resource-context'
+import { hasPermission, buildBasePermission, buildBaseResourcePermission, RoleConstants, Compare } from './core'
+import type { Permission } from './core/common'
 
 
 /** 工作空间级：命中权限位 / 系统管理员 / 该空间管理员 即可。workspaceId 内部取当前路由。 */

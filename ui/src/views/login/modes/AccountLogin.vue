@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import JSEncrypt from 'jsencrypt'
 import { useI18n } from 'vue-i18n'
@@ -14,7 +14,7 @@ defineOptions({ name: 'AccountLogin' })
 const props = withDefaults(defineProps<{ loginConfig?: LoginConfig; loginService: LoginService; preview?: boolean }>(), { preview: false })
 
 const route = useRoute()
-const { t, locale } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ useScope: 'global' })
 const isSubmitting = ref(false)
 const identifyCode = ref('')
 const loginMethod = ref<LoginMethod>(props.loginConfig?.default_value ?? LOGIN_METHOD.LOCAL)
@@ -35,24 +35,10 @@ const accountLoginFormRef = ref<FormInstance>()
 const accountLoginForm = reactive<AccountLoginForm>({ captcha: '', password: '', username: '' })
 
 const accountLoginRules = computed<FormRules<AccountLoginForm>>(() => ({
-  captcha: [{ required: false, message: t('auth.credentials.validation.captchaRequired'), trigger: 'blur' }],
-  password: [{ required: true, message: t('auth.credentials.validation.passwordRequired'), trigger: 'blur' }],
-  username: [{ whitespace: true, required: true, message: t('auth.credentials.validation.usernameRequired'), trigger: 'blur' }],
+  captcha: [{ required: false, message: t('auth.fields.verificationCode.requiredMessage'), trigger: 'blur' }],
+  password: [{ required: true, message: t('auth.fields.password.requiredMessage'), trigger: 'blur' }],
+  username: [{ whitespace: true, required: true, message: t('auth.fields.username.requiredMessage'), trigger: 'blur' }],
 }))
-
-// 切换语言时只刷新已经显示的校验错误，不触发其他字段校验。
-watch(
-  locale,
-  () => {
-    const form = accountLoginFormRef.value
-    form?.fields
-      .filter((field) => field.validateState === 'error')
-      .forEach((field) => {
-        if (field.prop) void form.validateField(field.prop).catch(() => undefined)
-      })
-  },
-  { flush: 'post' },
-)
 
 const handleLogin = async () => {
   if (props.preview) return
@@ -149,7 +135,7 @@ onMounted(() => {
             :autocomplete="preview ? 'off' : 'username'"
             :disabled="preview"
             :readonly="preview"
-            :placeholder="t('auth.credentials.fields.username.placeholder')"
+            :placeholder="t('auth.fields.username.placeholder')"
             @blur="refreshCaptcha"
           />
         </el-form-item>
@@ -159,7 +145,7 @@ onMounted(() => {
             :autocomplete="preview ? 'new-password' : 'current-password'"
             :disabled="preview"
             :readonly="preview"
-            :placeholder="t('auth.credentials.fields.password.placeholder')"
+            :placeholder="t('auth.fields.password.placeholder')"
             show-password
             type="password"
           />
@@ -170,16 +156,11 @@ onMounted(() => {
               v-model="accountLoginForm.captcha"
               autocomplete="off"
               :disabled="preview"
-              :placeholder="t('auth.credentials.fields.captcha.placeholder')"
+              :placeholder="t('auth.fields.verificationCode.placeholder')"
               :readonly="preview"
             />
           </el-form-item>
-          <img
-            :src="identifyCode"
-            :alt="t('auth.credentials.fields.captcha.label')"
-            class="w-35 h-10 cursor-pointer border"
-            @click="refreshCaptcha"
-          />
+          <img :src="identifyCode" :alt="t('auth.fields.captcha.label')" class="w-35 h-10 cursor-pointer border" @click="refreshCaptcha" />
         </div>
         <el-form-item>
           <!-- 提交账号登录 -->
