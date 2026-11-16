@@ -1,0 +1,217 @@
+{
+  "types": {
+    "textInput": "Text input",
+    "textareaInput": "Multiline text input",
+    "jsonInput": "JSON input",
+    "passwordInput": "Password input",
+    "singleSelect": "Single select",
+    "multiSelect": "Multi select",
+    "radioCard": "Radio cards",
+    "radioRow": "Inline radio cards",
+    "multiRow": "Inline multi-select cards",
+    "slider": "Slider",
+    "switchInput": "Switch",
+    "datePicker": "Date",
+    "uploadInput": "File upload",
+    "model": "Model",
+    "knowledge": "Knowledge base",
+    "treeSelect": "Tree select"
+  },
+  "tabs": {
+    "basic": "Basic information",
+    "visibility": "Visibility settings"
+  },
+  "fields": {
+    "field": {
+      "label": "Parameter",
+      "placeholder": "Enter a parameter",
+      "requiredMessage": "Enter a parameter"
+    },
+    "label": {
+      "label": "Display name",
+      "placeholder": "Enter a display name",
+      "requiredMessage": "Enter a display name"
+    },
+    "tooltip": {
+      "label": "Parameter description",
+      "placeholder": "Enter a parameter description"
+    },
+    "required": {
+      "label": "Required",
+      "columnLabel": "Required"
+    },
+    "inputType": {
+      "label": "Component type",
+      "placeholder": "Select a component type",
+      "requiredMessage": "Select a component type"
+    },
+    "defaultValue": {
+      "label": "Default value",
+      "placeholder": "Enter a default value",
+      "requiredMessage": "Enter a default value",
+      "selectRequiredMessage": "Select a default value",
+      "lengthMessage": "Length must be between {min} and {max} characters",
+      "propertyRequiredMessage": "This property is required",
+      "datePlaceholder": "Select a date"
+    },
+    "optionLabel": {
+      "label": "Label",
+      "placeholder": "Enter a label",
+      "requiredMessage": "Enter a label",
+      "treePlaceholder": "Enter an option label"
+    },
+    "optionValue": {
+      "label": "Option value",
+      "placeholder": "Enter an option value",
+      "requiredMessage": "Enter an option value"
+    },
+    "minLength": {
+      "requiredMessage": "Enter the minimum length"
+    },
+    "maxLength": {
+      "requiredMessage": "Enter the maximum length"
+    },
+    "min": {
+      "requiredMessage": "Minimum value is required"
+    },
+    "max": {
+      "requiredMessage": "Maximum value is required"
+    },
+    "step": {
+      "label": "Step",
+      "requiredMessage": "Enter a step value",
+      "invalidMessage": "Step cannot be zero"
+    },
+    "dateType": {
+      "label": "Date type",
+      "placeholder": "Select a date type"
+    },
+    "format": {
+      "label": "Format",
+      "placeholder": "Select a format"
+    },
+    "reference": {
+      "requiredMessage": "Enter a variable reference",
+      "selectRequiredMessage": "Select a variable reference",
+      "invalidMessage": "Invalid variable reference format",
+      "notFoundMessage": "Variable reference not found"
+    },
+    "model": {
+      "requiredMessage": "Select a model",
+      "placeholder": "Select a model"
+    },
+    "knowledge": {
+      "requiredMessage": "Select a knowledge base",
+      "placeholder": "Select a knowledge base"
+    },
+    "availableKnowledge": {
+      "requiredMessage": "Select available knowledge bases",
+      "label": "Available knowledge bases",
+      "placeholder": "Select available knowledge bases"
+    },
+    "variable": {
+      "requiredMessage": "Select a variable",
+      "placeholder": "Select a variable"
+    },
+    "comparisonValue": {
+      "requiredMessage": "Enter a comparison value"
+    },
+    "fileTypes": {
+      "requiredMessage": "File types are required",
+      "label": "File types"
+    },
+    "options": {
+      "requiredMessage": "Add an option",
+      "label": "Options"
+    },
+    "defaultKnowledge": {
+      "label": "Default knowledge base"
+    },
+    "availableModels": {
+      "label": "Available models"
+    },
+    "defaultModel": {
+      "label": "Default model"
+    },
+    "fileCount": {
+      "label": "Maximum files per upload"
+    },
+    "fileSize": {
+      "label": "Maximum size per file (MB)"
+    },
+    "assignment": {
+      "label": "Assignment method"
+    },
+    "showInput": {
+      "label": "Show input"
+    }
+  },
+  "options": {
+    "custom": "Custom",
+    "reference": "Variable reference",
+    "showDefault": "Show default value",
+    "unselected": "Unselected",
+    "multiple": "Allow multiple selections",
+    "year": "Year",
+    "month": "Month",
+    "date": "Date",
+    "datetime": "Date and time",
+    "all": "all",
+    "any": "any"
+  },
+  "labels": {
+    "textLength": "Text length",
+    "range": "Value range",
+    "allDocuments": "All documents"
+  },
+  "messages": {
+    "completeOption": "Enter at least one complete entry",
+    "parentNotFound": "Parent node not found",
+    "emptyOption": "Label and option value cannot be empty"
+  },
+  "tree": {
+    "addRoot": "Add root option",
+    "addChild": "Add child option",
+    "deleteConfirm": "Delete “{label}”?"
+  },
+  "visibility": {
+    "show": "Show conditions",
+    "hide": "Hide conditions",
+    "match": "Match {condition} conditions"
+  },
+  "help": {
+    "jsonFormat": "The variable value must be valid JSON",
+    "referenceOptions": "The variable value must match:\n[\n  {'{'}\n    \"label\": \"xx\",\n    \"value\": \"xx\",\n    \"default\": false\n  {'}'}\n]\nlabel: required label\nvalue: required value\ndefault: whether this is the default option"
+  },
+  "upload": {
+    "segmentation": "Standardize paragraph delimiters before uploading files.",
+    "duplicateName": "Duplicate file name",
+    "limits": "Upload up to {count} files at a time, each no larger than {size} MB",
+    "formats": "Supported formats: {formats}",
+    "sizeLimit": "File size cannot exceed {size}MB",
+    "countLimit": "You can upload at most {count} files"
+  },
+  "operators": {
+    "is_null": "Is empty",
+    "is_not_null": "Is not empty",
+    "contain": "Contains",
+    "not_contain": "Does not contain",
+    "eq": "Equals",
+    "not_eq": "Does not equal",
+    "ge": "Greater than or equal to",
+    "gt": "Greater than",
+    "le": "Less than or equal to",
+    "lt": "Less than",
+    "len_eq": "Length equals",
+    "len_ge": "Length greater than or equal to",
+    "len_gt": "Length greater than",
+    "len_le": "Length less than or equal to",
+    "len_lt": "Length less than",
+    "is_true": "Is true",
+    "is_not_true": "Is not true",
+    "start_with": "Starts with",
+    "end_with": "Ends with",
+    "regex": "Matches regular expression",
+    "wildcard": "Matches wildcard"
+  }
+}

@@ -98,7 +98,7 @@ Admin Router 在 `admin/index.ts` 中统一处理导航初始化：
    企业版同时加载服务端外观主题，其他版本恢复默认主题，使刷新页面也能恢复版本、用户和
    外观状态。
 6. 登录态档案加载失败时清除登录状态并返回登录页。
-7. 导航完成后根据 `route.meta.title` 更新浏览器标题。
+7. 导航完成后结束顶部进度条；当前未按路由动态更新浏览器标签标题。
 
 ### Chat
 
@@ -161,7 +161,7 @@ Chat Router 不根据 `route.meta.title` 更新浏览器标题：单应用对话
 | `activeMenu`         | `string`                                                                    | 进入子页面时需要保持激活的侧栏菜单标识（Workspace 为名称，System 为路径） |
 | `resourceDetailRoot` | `boolean`                                                                   | 标记资源详情根，详情容器和独立文档分段页配置，用于目录与工作空间切换      |
 | `detailActiveMenu`   | `string`                                                                    | 更深层详情页面需要保持激活的二级菜单路由名称                              |
-| `title`              | `string`                                                                    | 页面标题，同时作为导航名称                                                |
+| `title`              | `string`                                                                    | 页面标题，同时作为导航名称；已迁移模块使用业务翻译 key，其余保留原文案    |
 | `icon`               | `string`                                                                    | iconfont Symbol ID，子目录通常可以不配置                                  |
 | `order`              | `number`                                                                    | 同级导航排序，数字越小越靠前                                              |
 | `hidden`             | `boolean`                                                                   | 设置为 `true` 时不显示在导航中                                            |
@@ -176,7 +176,13 @@ Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权�
 
 ## 导航生成
 
-`admin/utils.ts` 中的 `getChildRouteList(scope)` 会：
+模型相关路由的 `meta.title` 使用 `model.title`，不在路由模块初始化时调用翻译。
+Workspace、System 侧栏在 computed 中生成菜单，并传入当前应用的标题翻译函数；仅翻译存在的 key，
+尚未迁移的中文标题原样展示。导航工具不依赖入口国际化单例，权限判断可省略翻译函数。
+页面通过显式传入已翻译的 title 展示模型标题；共用资源授权页按当前路由解析标题，其他业务文案保持原值。
+菜单 label 仅用于展示，不用作路由标识、排序或权限判断。
+
+`admin/utils.ts` 中的 `getChildRouteList(scope, translateTitle?)` 会：
 
 1. 根据 `scope` 找到 Workspace 或 System 根路由。
 2. 读取根路由的 `children`。
@@ -268,7 +274,7 @@ Workspace 共享覆盖 resourceScope，保留 Workspace scope 及知识库 activ
 
 | 菜单       | 路径与条件                                                                                                            |
 | ---------- | --------------------------------------------------------------------------------------------------------------------- |
-| 资料库     | 空 path 分组；document、image、tag；四种资源范围均在 BASE／WORKFLOW 类型显示图片                                                                  |
+| 资料库     | 空 path 分组；document、image、tag；四种资源范围均在 BASE／WORKFLOW 类型显示图片                                      |
 | 工作流     | workflow-entry；WORKFLOW 类型 beforeEnter 重定向对应全屏画布，其他类型显示转换页                                      |
 | 检索优化   | retrieval/hit-test、retrieval/question、retrieval/dictionary                                                          |
 | 授权与集成 | integration/chat-user、integration/external-retrieval                                                                 |

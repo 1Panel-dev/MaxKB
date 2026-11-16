@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 const emit = defineEmits(['update:modelValue'])
@@ -27,7 +29,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form-item label="默认值" :required="formValue.required" prop="default_value" :rules="formValue.required ? [{ required: true, message: '请选择默认值' }] : []" @click.prevent>
+  <el-form-item
+    :label="t('dynamicForm.fields.defaultValue.label')"
+    :required="formValue.required"
+    prop="default_value"
+    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.fields.defaultValue.selectRequiredMessage') }] : []"
+    @click.prevent
+  >
     <el-switch v-model="formValue.default_value" />
   </el-form-item>
 </template>

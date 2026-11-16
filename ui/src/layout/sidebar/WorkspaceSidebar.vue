@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { LayoutMenuItem } from '../types'
 import { getChildRouteList } from '@/router/admin/utils'
 
+const { t, te } = useI18n({ useScope: 'global' })
+
 const route = useRoute()
 const router = useRouter()
-const workspaceMenuItems = getChildRouteList('workspace')
+const workspaceMenuItems = computed(() => getChildRouteList('workspace', (title) => (te(title) ? t(title) : title)))
 const workspaceActiveMenuName = computed(() => route.meta.activeMenu ?? String(route.name ?? ''))
 
 const isWorkspaceMenuActive = (workspaceMenuItem: LayoutMenuItem) => workspaceMenuItem.name === workspaceActiveMenuName.value

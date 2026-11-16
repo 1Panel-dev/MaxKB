@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type {
   DynamicFormConstructorExpose,
   DynamicFormConstructorOption,
@@ -8,9 +9,10 @@ import type {
   VisibilityFieldOption,
   VisibilityRules,
 } from '../type'
-import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form/constant'
+import { DYNAMIC_FORM_TYPE_MESSAGE_KEYS, dynamicFormTypeOptions } from '@/components/mk-dynamics-form/constant'
 import BasicInfoConstructor from './BasicInfoConstructor.vue'
 import VisibilityConstructor from './visibility/index.vue'
+const { t } = useI18n({ useScope: 'global' })
 
 interface VisibilityConstructorExpose {
   getData: () => VisibilityRules | null
@@ -36,8 +38,16 @@ const props = withDefaults(
   }>(),
   {
     enableVisibility: false,
-    fieldTypeOptions: () => dynamicFormTypeOptions.map((item) => ({ label: item.label, value: `${item.value}Constructor` })),
   },
+)
+
+const inputTypeOptions = computed(
+  () =>
+    props.fieldTypeOptions ??
+    dynamicFormTypeOptions.map((option) => ({
+      label: t(DYNAMIC_FORM_TYPE_MESSAGE_KEYS[option.value]!),
+      value: `${option.value}Constructor`,
+    })),
 )
 
 const activeTab = ref('basic')
@@ -89,16 +99,16 @@ defineExpose({ getData, validate, render })
 <template>
   <div v-if="enableVisibility" class="flex-column max-h-[inherit] min-h-0">
     <el-tabs v-model="activeTab" class="shrink-0">
-      <el-tab-pane label="基本信息" name="basic" />
-      <el-tab-pane label="显隐设置" name="visibility" />
+      <el-tab-pane :label="t('dynamicForm.tabs.basic')" name="basic" />
+      <el-tab-pane :label="t('dynamicForm.tabs.visibility')" name="visibility" />
     </el-tabs>
 
     <!-- 导航固定，内容独立滚动；两个表单保持挂载，供统一回填、取值和校验。 -->
     <el-scrollbar class="mk-scrollbar-right mt-4 flex-column h-auto! min-h-0 flex-auto" wrap-class="h-auto! min-h-0 flex-auto">
-      <BasicInfoConstructor v-show="activeTab === 'basic'" ref="basicRef" v-model="formData" :input-type-list="fieldTypeOptions" v-bind="$attrs" />
+      <BasicInfoConstructor v-show="activeTab === 'basic'" ref="basicRef" v-model="formData" :input-type-list="inputTypeOptions" v-bind="$attrs" />
       <VisibilityConstructor v-show="activeTab === 'visibility'" ref="visibilityRef" :initial-value="visibilityRules" :left-options="leftOptions" />
     </el-scrollbar>
   </div>
 
-  <BasicInfoConstructor v-else ref="basicRef" v-model="formData" :input-type-list="fieldTypeOptions" v-bind="$attrs" />
+  <BasicInfoConstructor v-else ref="basicRef" v-model="formData" :input-type-list="inputTypeOptions" v-bind="$attrs" />
 </template>

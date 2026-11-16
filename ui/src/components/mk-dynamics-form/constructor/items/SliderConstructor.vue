@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<{ modelValue: DynamicFormValue }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -50,11 +53,11 @@ const stepRules = [
     required: true,
     validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
       if (value === 0) {
-        callback(new Error('步长不能为 0'))
+        callback(new Error(t('dynamicForm.fields.step.invalidMessage')))
         return false
       }
       if (!value) {
-        callback(new Error('请输入步长值'))
+        callback(new Error(t('dynamicForm.fields.step.requiredMessage')))
         return false
       }
 
@@ -74,17 +77,25 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <el-form-item label="是否带输入框" required prop="showInput" @click.prevent>
+  <el-form-item :label="t('dynamicForm.fields.showInput.label')" required prop="showInput" @click.prevent>
     <el-switch v-model="formValue.showInput" />
   </el-form-item>
   <!-- 取值范围 -->
-  <div class="mk-required mb-2">取值范围</div>
+  <div class="mk-required mb-2">{{ t('dynamicForm.labels.range') }}</div>
   <div class="flex w-full items-start gap-2">
-    <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '最小值必填', trigger: 'change' }]" prop="min">
-      <el-input-number v-model="formValue.min"  controls-position="right" align="left" />
+    <el-form-item
+      class="min-w-0 flex-1"
+      :rules="[{ required: true, message: t('dynamicForm.fields.min.requiredMessage'), trigger: 'change' }]"
+      prop="min"
+    >
+      <el-input-number v-model="formValue.min" controls-position="right" align="left" />
     </el-form-item>
     <span class="flex-center shrink-0 h-8">-</span>
-    <el-form-item class="min-w-0 flex-1" :rules="[{ required: true, message: '最大值必填', trigger: 'change' }]" prop="max">
+    <el-form-item
+      class="min-w-0 flex-1"
+      :rules="[{ required: true, message: t('dynamicForm.fields.max.requiredMessage'), trigger: 'change' }]"
+      prop="max"
+    >
       <el-input-number
         v-model="formValue.max"
         :min="formValue.min > formValue.max ? formValue.min : undefined"
@@ -94,15 +105,15 @@ onBeforeMount(() => {
     </el-form-item>
   </div>
 
-  <el-form-item label="步长值" required prop="step" :rules="stepRules">
+  <el-form-item :label="t('dynamicForm.fields.step.label')" required prop="step" :rules="stepRules">
     <el-input-number v-model="formValue.step" :min="0" controls-position="right" align="left" />
   </el-form-item>
 
   <el-form-item
-    label="默认值"
+    :label="t('dynamicForm.fields.defaultValue.label')"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: '为必填属性' }] : []"
+    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.fields.defaultValue.propertyRequiredMessage') }] : []"
   >
     <MkSlider
       v-model="formValue.default_value"

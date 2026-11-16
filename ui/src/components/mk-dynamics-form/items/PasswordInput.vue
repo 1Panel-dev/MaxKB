@@ -1,5 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n({ useScope: 'global' })
+</script>
 
 <template>
-  <el-input v-bind="$attrs" :show-password="true" autocomplete="off" placeholder="请输入"></el-input>
+  <el-input v-bind="$attrs" :show-password="true" autocomplete="off" :placeholder="t('common.placeholders.input')"></el-input>
 </template>

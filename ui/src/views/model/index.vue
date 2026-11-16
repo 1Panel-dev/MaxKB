@@ -13,7 +13,7 @@ import ButtonAddModel from './create-model/ButtonAddModel.vue'
 import ModelCard from './model-card/ModelCard.vue'
 import { AuthorizeModelAction, DeleteModelAction, ParamSettingAction, RelatedResourcesModelAction } from './model-card/action-dropdown'
 import EditModelDrawer from './model-card/action-dropdown/edit-model-action/EditModelDrawer.vue'
-import { MODEL_TYPE_MESSAGE_KEYS } from './model-type-labels'
+import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
 import perm from '@/permission/index.ts'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -29,9 +29,9 @@ const creatorOptions = ref<OptionItem<string>[]>([])
 
 const currentProviderName = computed(() =>
   currentProvider.value.provider === 'all'
-    ? t('model.providers.all')
+    ? t('model.categories.all')
     : currentProvider.value.provider === 'shared'
-      ? t('model.providers.shared')
+      ? t('model.categories.shared')
       : currentProvider.value.name,
 )
 
@@ -49,7 +49,7 @@ const searchFields = computed(() => [
     value: 'model_type',
     options: Object.entries(MODEL_TYPE_MESSAGE_KEYS).map(([value, key]) => ({ label: t(key), value })),
   },
-  { label: t('common.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 
 function loadCreatorOptions(keyword: string) {

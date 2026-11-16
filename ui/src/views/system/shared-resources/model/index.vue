@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, ModelItem, ModelProviderItem, OptionItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import ProviderApi from '@/api/admin/model-provider'
@@ -12,8 +13,10 @@ import ModelCard from '@/views/model/model-card/ModelCard.vue'
 import { DeleteModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
 import EditModelDrawer from '@/views/model/model-card/action-dropdown/edit-model-action/EditModelDrawer.vue'
 import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
-import { MODEL_TYPE_LABELS } from '@/constants'
+import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
 import perm from '@/permission'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 
@@ -23,6 +26,13 @@ const modelProviders = ref<ModelProviderItem[]>([])
 const ModelItems = ref<ModelItem[]>([])
 const modelQuery = ref<Dict<unknown>>()
 const creatorOptions = ref<OptionItem<string>[]>([])
+const currentProviderName = computed(() =>
+  currentProvider.value.provider === 'all'
+    ? t('model.categories.all')
+    : currentProvider.value.provider === 'shared'
+      ? t('model.categories.shared')
+      : currentProvider.value.name,
+)
 
 function getModelProvider(model: ModelItem): ModelProviderItem {
   return modelProviders.value.find(({ provider }) => provider === model.provider) ?? { icon: '', name: model.provider, provider: model.provider }
@@ -30,9 +40,13 @@ function getModelProvider(model: ModelItem): ModelProviderItem {
 
 /* 搜索 */
 const searchFields = computed(() => [
-  { label: '模型名称', value: 'name' },
-  { label: '模型类型', value: 'model_type', options: Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => ({ label, value })) },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('model.fields.name.label'), value: 'name' },
+  {
+    label: t('model.fields.type.label'),
+    value: 'model_type',
+    options: Object.entries(MODEL_TYPE_MESSAGE_KEYS).map(([value, key]) => ({ label: t(key), value })),
+  },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -91,14 +105,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout class="shared-model-view" collapsible>
+  <MkViewLayout :title="t('model.title')" class="shared-model-view" collapsible>
     <template #aside>
       <ModelProvider :model-value="currentProvider" :providers="modelProviders" @update:model-value="handleProviderSelect" />
     </template>
 
     <template #default="{ Header }">
       <component :is="Header">
-        <h4>{{ currentProvider.name }}</h4>
+        <h4>{{ currentProviderName }}</h4>
         <div class="flex-align-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 添加模型 -->
@@ -124,27 +138,43 @@ onMounted(() => {
             >
               <template #action-dropdown>
                 <!-- 编辑 -->
-                <MkAction v-if="perm.model.share.modify()" label="编辑" icon="icon_edit_outlined" @click="handleOpenEditModel(model)" />
+                <MkAction
+                  v-if="perm.model.share.modify()"
+                  :label="t('common.actions.edit')"
+                  icon="icon_edit_outlined"
+                  @click="handleOpenEditModel(model)"
+                />
                 <!-- 模型参数设置 -->
                 <ParamSettingAction
                   v-if="model.model_type !== 'RERANKER' && perm.model.share.paramSetting()"
-                  label="模型参数设置"
+                  :label="t('model.actions.parameters')"
                   :api="SystemSharedModelApi"
                   :model="model"
                 />
                 <!-- 授权工作空间 -->
                 <AuthorizedWorkspaceAction
                   v-if="perm.model.share.authToWorkspace()"
-                  label="授权工作空间"
+                  :label="t('resource.workspaceAuthorization.title')"
                   :resource="model"
                   :resource-type="RESOURCE_TYPE.MODEL"
                 />
 
                 <!-- 查看关联资源 -->
-                <RelatedResourcesModelAction v-if="perm.model.share.relateMap()" label="查看关联资源" :api="RelatedResourcesApi" :model="model" />
+                <RelatedResourcesModelAction
+                  v-if="perm.model.share.relateMap()"
+                  :label="t('resource.relations.title')"
+                  :api="RelatedResourcesApi"
+                  :model="model"
+                />
 
                 <!-- 删除 -->
-                <DeleteModelAction v-if="perm.model.share.delete()" label="删除" :api="SystemSharedModelApi" :model="model" @refresh="loadModels" />
+                <DeleteModelAction
+                  v-if="perm.model.share.delete()"
+                  :label="t('common.actions.delete')"
+                  :api="SystemSharedModelApi"
+                  :model="model"
+                  @refresh="loadModels"
+                />
               </template>
             </ModelCard>
           </template>

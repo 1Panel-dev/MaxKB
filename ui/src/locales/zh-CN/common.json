@@ -1,7 +1,43 @@
 {
+  "labels": {
+    "name": "名称",
+    "creator": "创建者",
+    "operation": "操作",
+    "createdOn": "创建于",
+    "createdAt": "创建时间",
+    "updatedAt": "更新时间"
+  },
   "actions": {
     "edit": "编辑",
-    "delete": "删除"
+    "delete": "删除",
+    "cancel": "取消",
+    "save": "保存",
+    "add": "添加",
+    "previous": "上一步",
+    "uploadFiles": "上传文件"
   },
-  "creator": "创建者"
+  "dialogs": {
+    "notice": "提示"
+  },
+  "messages": {
+    "saveSuccess": "保存成功",
+    "deleteSuccess": "删除成功",
+    "deleteFailed": "删除失败",
+    "createSuccess": "创建成功",
+    "fetchSuccess": "获取成功",
+    "updateSuccess": "修改成功"
+  },
+  "placeholders": {
+    "input": "请输入",
+    "select": "请选择"
+  },
+  "validation": {
+    "inputRequired": "请输入",
+    "inputFieldRequired": "请输入 {label}",
+    "selectRequired": "请选择"
+  },
+  "empty": {
+    "default": "暂无数据",
+    "search": "没有找到相关内容"
+  }
 }

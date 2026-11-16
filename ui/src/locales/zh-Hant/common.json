@@ -1,7 +1,43 @@
 {
+  "labels": {
+    "name": "名稱",
+    "creator": "建立者",
+    "operation": "操作",
+    "createdOn": "建立於",
+    "createdAt": "建立時間",
+    "updatedAt": "更新時間"
+  },
   "actions": {
     "edit": "編輯",
-    "delete": "刪除"
+    "delete": "刪除",
+    "cancel": "取消",
+    "save": "儲存",
+    "add": "新增",
+    "previous": "上一步",
+    "uploadFiles": "上傳檔案"
   },
-  "creator": "建立者"
+  "dialogs": {
+    "notice": "提示"
+  },
+  "messages": {
+    "saveSuccess": "儲存成功",
+    "deleteSuccess": "刪除成功",
+    "deleteFailed": "刪除失敗",
+    "createSuccess": "建立成功",
+    "fetchSuccess": "取得成功",
+    "updateSuccess": "修改成功"
+  },
+  "placeholders": {
+    "input": "請輸入",
+    "select": "請選擇"
+  },
+  "validation": {
+    "inputRequired": "請輸入",
+    "inputFieldRequired": "請輸入 {label}",
+    "selectRequired": "請選擇"
+  },
+  "empty": {
+    "default": "暫無資料",
+    "search": "沒有找到相關內容"
+  }
 }

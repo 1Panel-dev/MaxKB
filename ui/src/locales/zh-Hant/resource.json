@@ -4,5 +4,8 @@
   },
   "relations": {
     "title": "查看關聯資源"
+  },
+  "workspaceAuthorization": {
+    "title": "授權工作空間"
   }
 }

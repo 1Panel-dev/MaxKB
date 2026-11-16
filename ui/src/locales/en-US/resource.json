@@ -4,5 +4,8 @@
   },
   "relations": {
     "title": "View related resources"
+  },
+  "workspaceAuthorization": {
+    "title": "Authorize workspaces"
   }
 }

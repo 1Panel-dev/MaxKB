@@ -1,37 +1,77 @@
 {
   "title": "Models",
-  "providers": {
+  "categories": {
     "all": "All models",
     "shared": "Shared models",
     "public": "Public models",
     "private": "Private models"
   },
+  "provider": {
+    "label": "Provider",
+    "placeholder": "Select a provider"
+  },
   "fields": {
     "name": {
-      "label": "Model name"
+      "label": "Model name",
+      "placeholder": "Give the base model a name",
+      "requiredMessage": "Enter a model name",
+      "description": "Custom model name in MaxKB"
     },
     "type": {
-      "label": "Model type"
+      "label": "Model type",
+      "placeholder": "Select a model type",
+      "requiredMessage": "Select a model type"
     },
     "baseModel": {
-      "label": "Base model"
+      "label": "Base model",
+      "placeholder": "Click “Fetch models” to load the list, or enter a model name and press Enter",
+      "requiredMessage": "Select a base model, or enter a custom base model and press Enter",
+      "description": "For a model not listed, enter its name and press Enter to add it"
     }
   },
   "types": {
-    "llm": "Large language model",
-    "embedding": "Embedding model",
-    "reranker": "Reranking model",
-    "stt": "Speech recognition",
-    "tts": "Speech synthesis",
-    "image": "Vision model",
-    "tti": "Image generation",
-    "itv": "Image to video",
-    "ttv": "Text to video"
+    "llm": {
+      "label": "Large language model",
+      "description": "Large language model: a reasoning model for AI conversations in agents."
+    },
+    "embedding": {
+      "label": "Embedding model",
+      "description": "Embedding model: converts document content into vectors in knowledge bases."
+    },
+    "reranker": {
+      "label": "Reranking model",
+      "description": "Reranking model: reorders candidate paragraphs retrieved through multiple paths in advanced agents."
+    },
+    "stt": {
+      "label": "Speech recognition",
+      "description": "Speech recognition: converts speech to text when speech recognition is enabled in an agent."
+    },
+    "tts": {
+      "label": "Speech synthesis",
+      "description": "Speech synthesis: converts text to speech when voice playback is enabled in an agent."
+    },
+    "image": {
+      "label": "Vision model",
+      "description": "Vision model: interprets images in advanced agents."
+    },
+    "tti": {
+      "label": "Image generation",
+      "description": "Image generation: a vision model for generating images in advanced agents."
+    },
+    "itv": {
+      "label": "Image to video",
+      "description": "Image to video: generates videos from images in advanced agents."
+    },
+    "ttv": {
+      "label": "Text to video",
+      "description": "Text to video: generates videos from text in advanced agents."
+    }
   },
   "actions": {
     "add": "Add model",
     "parameters": "Model parameters",
-    "cancelDownload": "Cancel download"
+    "cancelDownload": "Cancel download",
+    "fetchModels": "Fetch models"
   },
   "states": {
     "shared": "Shared",
@@ -40,10 +80,24 @@
   "messages": {
     "missingOllama": "Model {name} does not exist in Ollama",
     "downloadFailed": "Base model: {name} download failed",
-    "deleted": "Deleted successfully"
+    "baseModelsFallback": "Could not fetch the official model list. Built-in common models are shown."
   },
   "delete": {
     "title": "Delete model: {name}?",
     "description": "This model is linked to {count} resource. Deleting it will make it unavailable. Proceed with caution. | This model is linked to {count} resources. Deleting it will make it unavailable. Proceed with caution."
+  },
+  "parameters": {
+    "title": "Model parameters",
+    "add": "Add parameter",
+    "edit": "Edit parameter",
+    "duplicateField": "Parameter “{name}” already exists",
+    "duplicateLabel": "Display name “{name}” already exists"
+  },
+  "create": {
+    "selectProvider": "Select provider",
+    "advancedSettings": "Advanced settings"
+  },
+  "edit": {
+    "title": "Edit {provider}"
   }
 }

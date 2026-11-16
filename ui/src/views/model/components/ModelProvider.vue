@@ -39,7 +39,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
           :size="18"
           class="mr-2"
         />
-        <span>{{ t('model.providers.shared') }}</span>
+        <span>{{ t('model.categories.shared') }}</span>
       </MkListItem>
 
       <el-divider class="my-1!" />
@@ -47,7 +47,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
 
     <MkListItem :active="modelValue.provider === ALL_MODEL_PROVIDER.provider" @click="handleProviderSelect(ALL_MODEL_PROVIDER)">
       <MkIcon :name="modelValue.provider === ALL_MODEL_PROVIDER.provider ? 'icon_card_filled' : 'icon_card_outlined'" :size="18" class="mr-2" />
-      <span>{{ t('model.providers.all') }}</span>
+      <span>{{ t('model.categories.all') }}</span>
     </MkListItem>
   </div>
 
@@ -56,7 +56,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
       <MkCollapse v-if="publicProviders.length" :default-expanded="false" triggerClass="hover:bg-N900/10 rounded-md py-[9px] px-2 mb-1">
         <template #label>
           <MkIcon name="icon_file-folder_colorful" :size="18" />
-          <span>{{ t('model.providers.public') }}</span>
+          <span>{{ t('model.categories.public') }}</span>
         </template>
         <div class="space-y-1">
           <MkListItem
@@ -76,7 +76,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
       <MkCollapse v-if="privateProviders.length" :default-expanded="false" triggerClass="hover:bg-N900/10 rounded-md py-[9px] px-2 mb-1">
         <template #label>
           <MkIcon name="icon_file-folder_colorful" :size="18" />
-          <span>{{ t('model.providers.private') }}</span>
+          <span>{{ t('model.categories.private') }}</span>
         </template>
         <div class="space-y-1">
           <MkListItem

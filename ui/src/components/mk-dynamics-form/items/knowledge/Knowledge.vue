@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { FormField } from '../../type'
 import type { KnowledgeItem } from '@/api/types'
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'DynamicFormKnowledge', inheritAttrs: false })
 
@@ -27,7 +29,7 @@ const selectedKnowledgeIds = computed({
 
 <template>
   <div class="w-full">
-    <el-select v-model="selectedKnowledgeIds" multiple v-bind="$attrs" class="w-full" placeholder="请选择知识库">
+    <el-select v-model="selectedKnowledgeIds" multiple v-bind="$attrs" class="w-full" :placeholder="t('dynamicForm.fields.knowledge.placeholder')">
       <el-option v-for="knowledge in availableKnowledge" :key="knowledge.id" :label="knowledge.name" :value="knowledge.id">
         <div class="flex-align-center min-w-0 gap-2">
           <KnowledgeIcon :type="knowledge.type" :size="20" class="shrink-0" />

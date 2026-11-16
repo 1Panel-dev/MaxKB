@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { get } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormTriggerMap, DynamicFormTriggerSetting, DynamicFormValue, FormField, FormFieldLabel, SerializedFormRule } from './type'
 import type { Dict } from '@/api/types'
 import type { FormItemRule } from 'element-plus'
@@ -10,6 +11,7 @@ import FormItemLabel from './FormItemLabel.vue'
 import bus from '@/utils/bus'
 
 defineOptions({ name: 'MkDynamicsFormItem' })
+const { t } = useI18n({ useScope: 'global' })
 
 interface DynamicFieldComponent {
   validate?: () => Promise<unknown>
@@ -97,7 +99,7 @@ const errorMessage = computed(() => {
     return fieldProps.value.err_msg
   }
   const label = isString(props.formField.label) ? props.formField.label : props.formField.label?.label
-  return `请输入 ${label || props.formField.field}`
+  return t('common.validation.inputFieldRequired', { label: label || props.formField.field })
 })
 
 function deserializeRule(rule: SerializedFormRule): FormItemRule {

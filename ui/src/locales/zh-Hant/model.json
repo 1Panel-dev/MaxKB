@@ -1,37 +1,77 @@
 {
   "title": "模型",
-  "providers": {
+  "categories": {
     "all": "全部模型",
     "shared": "共用模型",
     "public": "公有模型",
     "private": "私有模型"
   },
+  "provider": {
+    "label": "供應商",
+    "placeholder": "選擇供應商"
+  },
   "fields": {
     "name": {
-      "label": "模型名稱"
+      "label": "模型名稱",
+      "placeholder": "請為基礎模型設定名稱",
+      "requiredMessage": "請輸入模型名稱",
+      "description": "MaxKB 中自訂的模型名稱"
     },
     "type": {
-      "label": "模型類型"
+      "label": "模型類型",
+      "placeholder": "請選擇模型類型",
+      "requiredMessage": "請選擇模型類型"
     },
     "baseModel": {
-      "label": "基礎模型"
+      "label": "基礎模型",
+      "placeholder": "請先點擊「取得模型」載入清單，或直接輸入模型名稱後按 Enter",
+      "requiredMessage": "請選擇基礎模型，或輸入自訂基礎模型後按 Enter",
+      "description": "清單中未列出的模型，直接輸入模型名稱後按 Enter 即可新增"
     }
   },
   "types": {
-    "llm": "大型語言模型",
-    "embedding": "向量模型",
-    "reranker": "重排模型",
-    "stt": "語音辨識",
-    "tts": "語音合成",
-    "image": "視覺模型",
-    "tti": "圖片生成",
-    "itv": "圖生影片",
-    "ttv": "文生影片"
+    "llm": {
+      "label": "大型語言模型",
+      "description": "大型語言模型：在智慧體中與 AI 對話的推理模型。"
+    },
+    "embedding": {
+      "label": "向量模型",
+      "description": "向量模型：在知識庫中將文件內容轉為向量的模型。"
+    },
+    "reranker": {
+      "label": "重排模型",
+      "description": "重排模型：在進階智慧體使用多路檢索時，重新排序候選分段的模型。"
+    },
+    "stt": {
+      "label": "語音辨識",
+      "description": "語音識別：在智慧體中啟用語音識別後，將語音轉為文字的模型。"
+    },
+    "tts": {
+      "label": "語音合成",
+      "description": "語音合成：在智慧體中啟用語音播放後，將文字轉為語音的模型。"
+    },
+    "image": {
+      "label": "視覺模型",
+      "description": "視覺模型：在進階智慧體中用於圖片理解的視覺模型。"
+    },
+    "tti": {
+      "label": "圖片生成",
+      "description": "圖片生成：在進階智慧體中用於產生圖片的視覺模型。"
+    },
+    "itv": {
+      "label": "圖生影片",
+      "description": "圖生影片：在進階智慧體中由圖片產生影片的模型。"
+    },
+    "ttv": {
+      "label": "文生影片",
+      "description": "文生影片：在進階智慧體中由文字產生影片的模型。"
+    }
   },
   "actions": {
     "add": "新增模型",
     "parameters": "模型參數設定",
-    "cancelDownload": "取消下載"
+    "cancelDownload": "取消下載",
+    "fetchModels": "取得模型"
   },
   "states": {
     "shared": "共用",
@@ -40,10 +80,24 @@
   "messages": {
     "missingOllama": "{name} 模型在 Ollama 不存在",
     "downloadFailed": "基礎模型: {name} 下載失敗",
-    "deleted": "刪除成功"
+    "baseModelsFallback": "未取得官方模型清單，已顯示內建常用模型"
   },
   "delete": {
     "title": "是否刪除模型：{name}？",
     "description": "此模型關聯 {count} 個資源，刪除後無法使用，請謹慎操作。"
+  },
+  "parameters": {
+    "title": "模型參數",
+    "add": "新增參數",
+    "edit": "編輯參數",
+    "duplicateField": "參數「{name}」已存在",
+    "duplicateLabel": "顯示名稱「{name}」已存在"
+  },
+  "create": {
+    "selectProvider": "選擇供應商",
+    "advancedSettings": "進階設定"
+  },
+  "edit": {
+    "title": "編輯 {provider}"
   }
 }

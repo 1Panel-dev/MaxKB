@@ -1,7 +1,43 @@
 {
+  "labels": {
+    "name": "Name",
+    "creator": "Created by",
+    "operation": "Actions",
+    "createdOn": "created on",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at"
+  },
   "actions": {
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "add": "Add",
+    "previous": "Previous",
+    "uploadFiles": "Upload files"
   },
-  "creator": "Created by"
+  "dialogs": {
+    "notice": "Notice"
+  },
+  "messages": {
+    "saveSuccess": "Saved successfully",
+    "deleteSuccess": "Deleted successfully",
+    "deleteFailed": "Deletion failed",
+    "createSuccess": "Created successfully",
+    "fetchSuccess": "Fetched successfully",
+    "updateSuccess": "Updated successfully"
+  },
+  "placeholders": {
+    "input": "Please enter",
+    "select": "Please select"
+  },
+  "validation": {
+    "inputRequired": "This field is required",
+    "inputFieldRequired": "Enter {label}",
+    "selectRequired": "This field is required"
+  },
+  "empty": {
+    "default": "No data",
+    "search": "No results found"
+  }
 }

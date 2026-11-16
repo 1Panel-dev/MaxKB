@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type {
   CommonUserOption,
   OptionItem,
@@ -25,7 +26,12 @@ import { MsgSuccess } from '@/utils/message'
 import { perm } from '@/permission'
 
 const { auth, user } = useStore()
+const { t, te } = useI18n({ useScope: 'global' })
 const route = useRoute()
+const pageTitle = computed(() => {
+  const title = route.meta.title ?? ''
+  return te(title) ? t(title) : title
+})
 
 const resourceType = ref<ResourceAuthorizationType>((route.meta.resource as ResourceAuthorizationType) ?? RESOURCE_TYPE.APPLICATION)
 const resourceTypeOptions: OptionItem<ResourceAuthorizationType>[] = [
@@ -200,7 +206,7 @@ const canEditResourcePermission = computed(() => resourceEditPermissions[resourc
 </script>
 
 <template>
-  <MkViewLayout class="system-resource-authorization" :loading="loadingView">
+  <MkViewLayout :title="pageTitle" class="system-resource-authorization" :loading="loadingView">
     <template #top v-if="auth.isEE">
       <WorkspaceDropdown v-model="selectedWorkspaceId" :options="workspaceOptions" @select="handleWorkspaceSelect" />
     </template>

@@ -1,0 +1,217 @@
+{
+  "types": {
+    "textInput": "文字方塊",
+    "textareaInput": "多行文字方塊",
+    "jsonInput": "JSON 文字方塊",
+    "passwordInput": "密碼方塊",
+    "singleSelect": "單選下拉選單",
+    "multiSelect": "多選下拉選單",
+    "radioCard": "選項卡",
+    "radioRow": "單行選項卡",
+    "multiRow": "單行多選卡",
+    "slider": "滑桿",
+    "switchInput": "開關",
+    "datePicker": "日期",
+    "uploadInput": "檔案上傳",
+    "model": "模型",
+    "knowledge": "知識庫",
+    "treeSelect": "樹狀選擇器"
+  },
+  "tabs": {
+    "basic": "基本資訊",
+    "visibility": "顯隱設定"
+  },
+  "fields": {
+    "field": {
+      "label": "參數",
+      "placeholder": "請輸入參數",
+      "requiredMessage": "請輸入參數"
+    },
+    "label": {
+      "label": "顯示名稱",
+      "placeholder": "請輸入顯示名稱",
+      "requiredMessage": "請輸入顯示名稱"
+    },
+    "tooltip": {
+      "label": "參數提示說明",
+      "placeholder": "請輸入參數提示說明"
+    },
+    "required": {
+      "label": "是否必填",
+      "columnLabel": "必填"
+    },
+    "inputType": {
+      "label": "元件類型",
+      "placeholder": "請選擇元件類型",
+      "requiredMessage": "請選擇元件類型"
+    },
+    "defaultValue": {
+      "label": "預設值",
+      "placeholder": "請輸入預設值",
+      "requiredMessage": "請輸入預設值",
+      "selectRequiredMessage": "請選擇預設值",
+      "lengthMessage": "長度應為 {min} 到 {max} 個字元",
+      "propertyRequiredMessage": "此屬性為必填",
+      "datePlaceholder": "選擇日期"
+    },
+    "optionLabel": {
+      "label": "標籤",
+      "placeholder": "請輸入標籤",
+      "requiredMessage": "請輸入標籤",
+      "treePlaceholder": "請輸入選項標籤"
+    },
+    "optionValue": {
+      "label": "選項值",
+      "placeholder": "請輸入選項值",
+      "requiredMessage": "請輸入選項值"
+    },
+    "minLength": {
+      "requiredMessage": "請輸入最小長度"
+    },
+    "maxLength": {
+      "requiredMessage": "請輸入最大長度"
+    },
+    "min": {
+      "requiredMessage": "最小值必填"
+    },
+    "max": {
+      "requiredMessage": "最大值必填"
+    },
+    "step": {
+      "label": "步長值",
+      "requiredMessage": "請輸入步長值",
+      "invalidMessage": "步長不能為 0"
+    },
+    "dateType": {
+      "label": "時間類型",
+      "placeholder": "請選擇時間類型"
+    },
+    "format": {
+      "label": "格式",
+      "placeholder": "請選擇格式"
+    },
+    "reference": {
+      "requiredMessage": "請輸入參照變量",
+      "selectRequiredMessage": "請選擇參照變量",
+      "invalidMessage": "參照變量格式錯誤",
+      "notFoundMessage": "找不到參照變量"
+    },
+    "model": {
+      "requiredMessage": "請選擇模型",
+      "placeholder": "請選擇模型"
+    },
+    "knowledge": {
+      "requiredMessage": "請選擇知識庫",
+      "placeholder": "請選擇知識庫"
+    },
+    "availableKnowledge": {
+      "requiredMessage": "請選擇可選知識庫",
+      "label": "可選知識庫",
+      "placeholder": "請選擇可選知識庫"
+    },
+    "variable": {
+      "requiredMessage": "請選擇變量",
+      "placeholder": "請選擇變量"
+    },
+    "comparisonValue": {
+      "requiredMessage": "請輸入比較值"
+    },
+    "fileTypes": {
+      "requiredMessage": "檔案類型必填",
+      "label": "檔案類型"
+    },
+    "options": {
+      "requiredMessage": "請新增選項",
+      "label": "選項"
+    },
+    "defaultKnowledge": {
+      "label": "預設知識庫"
+    },
+    "availableModels": {
+      "label": "可選模型"
+    },
+    "defaultModel": {
+      "label": "預設模型"
+    },
+    "fileCount": {
+      "label": "單次上傳檔案數上限"
+    },
+    "fileSize": {
+      "label": "每個檔案上限 (MB)"
+    },
+    "assignment": {
+      "label": "賦值方式"
+    },
+    "showInput": {
+      "label": "是否顯示輸入框"
+    }
+  },
+  "options": {
+    "custom": "自訂",
+    "reference": "參照變量",
+    "showDefault": "顯示預設值",
+    "unselected": "未選取項目",
+    "multiple": "允許多選",
+    "year": "年",
+    "month": "月",
+    "date": "日期",
+    "datetime": "日期時間",
+    "all": "所有",
+    "any": "任意"
+  },
+  "labels": {
+    "textLength": "文字長度",
+    "range": "取值範圍",
+    "allDocuments": "全部文件"
+  },
+  "messages": {
+    "completeOption": "請至少填寫一筆完整資料",
+    "parentNotFound": "找不到父節點",
+    "emptyOption": "標籤與選項值不能為空"
+  },
+  "tree": {
+    "addRoot": "新增第一層選項",
+    "addChild": "新增子選項",
+    "deleteConfirm": "確定刪除「{label}」嗎？"
+  },
+  "visibility": {
+    "show": "顯示條件",
+    "hide": "隱藏條件",
+    "match": "符合以下{condition}條件"
+  },
+  "help": {
+    "jsonFormat": "變量值必須符合 JSON 格式",
+    "referenceOptions": "變量值必須符合：\n[\n  {'{'}\n    \"label\": \"xx\",\n    \"value\": \"xx\",\n    \"default\": false\n  {'}'}\n]\nlabel: 標籤，必填\nvalue: 值，必填\ndefault: 是否為預設值"
+  },
+  "upload": {
+    "segmentation": "上傳檔案前，建議統一檔案的分段標記",
+    "duplicateName": "檔案名稱重複",
+    "limits": "每次最多上傳 {count} 個檔案，每個檔案不超過 {size} MB",
+    "formats": "支援格式：{formats}",
+    "sizeLimit": "檔案大小不能超過 {size}MB",
+    "countLimit": "最多只能上傳 {count} 個檔案"
+  },
+  "operators": {
+    "is_null": "為空",
+    "is_not_null": "不為空",
+    "contain": "包含",
+    "not_contain": "不包含",
+    "eq": "等於",
+    "not_eq": "不等於",
+    "ge": "大於或等於",
+    "gt": "大於",
+    "le": "小於或等於",
+    "lt": "小於",
+    "len_eq": "長度等於",
+    "len_ge": "長度大於或等於",
+    "len_gt": "長度大於",
+    "len_le": "長度小於或等於",
+    "len_lt": "長度小於",
+    "is_true": "為真",
+    "is_not_true": "不為真",
+    "start_with": "startWith",
+    "end_with": "endWith",
+    "regex": "正規表示式比對",
+    "wildcard": "萬用字元比對"
+  }
+}

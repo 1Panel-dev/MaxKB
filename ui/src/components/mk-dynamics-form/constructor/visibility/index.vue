@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { I18nT, useI18n } from 'vue-i18n'
 import type { VisibilityConditionState, VisibilityFieldOption, VisibilityRules } from '../../type'
 import { compareList } from '@/workflow-canvas/config/constants'
 import ConditionRow from './ConditionRow.vue'
 import { getAllowedOps, getFieldConfig, inferFieldType } from './utils'
 import { randomId } from '@/utils/common'
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'MkDynamicsFormVisibilityConstructor' })
 
@@ -38,16 +40,16 @@ function validate(): Promise<void> {
     const hasAny = cond.field[0] || cond.field[1] || cond.compare
     if (!hasAny) continue
     if (!cond.field[0] || !cond.field[1]) {
-      cond._fieldError = '请选择变量'
+      cond._fieldError = t('dynamicForm.fields.variable.requiredMessage')
       hasError = true
     }
     if (!cond.compare) {
-      cond._compareError = '请选择'
+      cond._compareError = t('common.validation.selectRequired')
       hasError = true
     }
     const isEmpty = Array.isArray(cond.value) ? cond.value.length === 0 : !cond.value && cond.value !== 0
     if (!['is_true', 'is_not_true'].includes(cond.compare) && isEmpty) {
-      cond._valueError = '请输入比较值'
+      cond._valueError = t('dynamicForm.fields.comparisonValue.requiredMessage')
       hasError = true
     }
   }
@@ -113,18 +115,18 @@ defineExpose({ getData, render, validate })
 <template>
   <div class="w-full">
     <el-radio-group v-model="formData.action">
-      <el-radio value="show">显示条件</el-radio>
-      <el-radio value="hide">隐藏条件</el-radio>
+      <el-radio value="show">{{ t('dynamicForm.visibility.show') }}</el-radio>
+      <el-radio value="hide">{{ t('dynamicForm.visibility.hide') }}</el-radio>
     </el-radio-group>
 
-    <div class="flex align-center gap-2 my-2">
-      <span>符合以下</span>
-      <el-select v-model="formData.condition" size="small" class="w-20!">
-        <el-option label="所有" value="and" />
-        <el-option label="任意" value="or" />
-      </el-select>
-      <span>条件</span>
-    </div>
+    <I18nT keypath="dynamicForm.visibility.match" tag="div" class="flex align-center gap-2 my-2" scope="global">
+      <template #condition>
+        <el-select v-model="formData.condition" size="small" class="w-20!">
+          <el-option :label="t('dynamicForm.options.all')" value="and" />
+          <el-option :label="t('dynamicForm.options.any')" value="or" />
+        </el-select>
+      </template>
+    </I18nT>
 
     <MkFormList v-model="conditionRows" :default-item="defaultCondition" :firstRowHasLabel="false">
       <template #default="{ item: condition }">
