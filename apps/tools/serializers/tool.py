@@ -12,6 +12,7 @@ import tempfile
 import zipfile
 from functools import reduce
 from typing import Dict
+from urllib.parse import quote
 
 import requests
 import uuid_utils.compat as uuid
@@ -1625,7 +1626,7 @@ class ToolSerializer(serializers.Serializer):
                 raise AppApiException(500, _("Skill file does not exist"))
 
             response = HttpResponse(content_type="application/zip", content=skill_file.get_bytes())
-            response["Content-Disposition"] = f'attachment; filename="{skill_file.file_name}"'
+            response["Content-Disposition"] = f"attachment; filename*=UTF-8''{quote(skill_file.file_name, safe='')}"
             return response
 
     class GenerateCodeSerializer(serializers.Serializer):
