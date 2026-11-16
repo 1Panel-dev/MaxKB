@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Phone } from '@element-plus/icons-vue'
+import UrlUpload from './url-upload/index.vue'
 import { isAudio, isVideo } from '@/utils/icon'
 import { useInputEvents } from '../../core/input-events'
 import { useMessageInputStore } from './index'
@@ -13,6 +13,7 @@ const {
   question,
   fileList,
   uploadEnabled,
+  urlUploadEnabled,
   canUpload,
   maxFiles,
   maxSizeMB,
@@ -33,14 +34,21 @@ const {
 } = useMessageInputStore()
 
 // 所有附件入口共用禁用条件，上传和发送仍由输入 Store 处理。
-const { fileInputRef, handleFileSelect, handlePaste, handleDragover, handleDrop, handleKeydown } = useInputEvents({
+const { fileInputRef, handlePaste, handleDragover, handleDrop, handleKeydown } = useInputEvents({
   text: question,
-  canUpload: () => canUpload.value,
+  canUpload: () => canUpload.value && !urlUploadEnabled.value,
   addFiles,
   submit: () => {
     if (canSend.value) send()
   },
 })
+
+// 本地选择仅通过明确的上传按钮进入。
+function handleLocalSelect(event: Event) {
+  const input = event.target as HTMLInputElement
+  if (uploadEnabled.value && canUpload.value) addFiles(input.files)
+  input.value = ''
+}
 
 // 语音输入：点击麦克风开始录音，点击停止后转写到输入框
 const { recording, seconds: recordSeconds, waveLevels, start: startRecording, stop: stopRecording } = useVoiceRecorder(transcribe)
@@ -100,9 +108,12 @@ const { recording, seconds: recordSeconds, waveLevels, start: startRecording, st
 
     <!-- 操作栏 -->
     <div class="mt-3 flex items-center">
+      <!-- 用户输入参数表单 -->
       <UserForm class="mr-3" />
-      <input v-if="uploadEnabled" ref="fileInputRef" type="file" multiple :accept="acceptList" class="hidden" @change="handleFileSelect" />
-      <MkTooltip v-if="uploadEnabled" placement="top">
+      <!-- 本地文件选择：供直接上传按钮和 URL 浮层的本地上传入口共用 -->
+      <input v-if="uploadEnabled" ref="fileInputRef" type="file" multiple :accept="acceptList" class="hidden" @change="handleLocalSelect" />
+      <!-- 仅本地上传模式：展示拖拽提示，点击附件按钮直接选择文件 -->
+      <MkTooltip v-if="uploadEnabled && !urlUploadEnabled" placement="top">
         <template #content>
           <div class="break-all whitespace-pre-wrap">
             可拖拽到输入框内上传文件
@@ -112,11 +123,12 @@ const { recording, seconds: recordSeconds, waveLevels, start: startRecording, st
             文件类型：{{ allowedExtensions.join('、') }}
           </div>
         </template>
-        <!-- 上传文件 -->
         <el-button text :disabled="!canUpload" @click="fileInputRef?.click()">
           <MkIcon name="icon_attachment_outlined" :size="18" class="text-N900!" />
         </el-button>
       </MkTooltip>
+      <!-- URL 上传模式：附件按钮打开浮层，本地上传事件触发文件选择 -->
+      <UrlUpload v-if="urlUploadEnabled" @local-upload="fileInputRef?.click()" />
       <!-- 语音输入：点击开始录音 -->
       <el-button
         v-if="speechEnabled"
@@ -126,7 +138,6 @@ const { recording, seconds: recordSeconds, waveLevels, start: startRecording, st
         :disabled="disabled || streamLoading || transcribing"
         @click="startRecording"
       >
-        <!-- todo 这块icon记得换 先用饿了么的了 -->
         <MkIcon v-if="!transcribing" name="icon_mic_outlined" :size="18" class="text-N900!" />
       </el-button>
       <el-divider direction="vertical" class="ml-3! mr-4!" />

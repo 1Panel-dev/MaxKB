@@ -14,7 +14,8 @@ export interface FileItem {
   uid: number
   name: string
   size: number
-  raw: File
+  raw?: File
+  attachmentType?: MessageAttachmentKey
   url?: string
   file_id?: string
   previewUrl?: string
@@ -92,7 +93,6 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   const fileUploadEnabled = computed(() => Boolean(baseNodeData.value.file_upload_enable ?? appInfo.value?.file_upload_enable))
   /** 本地上传：控制上传按钮、拖拽与粘贴入口。 */
   const uploadEnabled = computed(() => fileUploadEnabled.value && uploadSetting.value.local_upload)
-  // TODO: URL 上传入口未实现，页面接入时使用 urlUploadEnabled 控制显示，并复用数量、大小、类型限制。
   const urlUploadEnabled = computed(() => fileUploadEnabled.value && uploadSetting.value.url_upload)
   const maxFiles = computed(() => uploadSetting.value.maxFiles)
   const maxSizeMB = computed(() => uploadSetting.value.fileLimit)
@@ -110,7 +110,12 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   })
   const acceptList = computed(() => allowedExtensions.value.map((extension) => `.${extension}`).join(','))
   const canUpload = computed(
-    () => uploadEnabled.value && !disabled.value && !streamLoading.value && !sending.value && fileList.value.length < maxFiles.value,
+    () =>
+      (uploadEnabled.value || urlUploadEnabled.value) &&
+      !disabled.value &&
+      !streamLoading.value &&
+      !sending.value &&
+      fileList.value.length < maxFiles.value,
   )
 
   // 语音输入：智能体开启语音转文字且当前模式提供接口时可用
@@ -134,7 +139,42 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       attachmentsReady.value,
   )
 
-  const imageFiles = computed(() => fileList.value.filter((attachment) => isImage(attachment.name)))
+  const imageFiles = computed(() =>
+    fileList.value.filter((attachment) => attachment.attachmentType === 'image_list' || (!attachment.attachmentType && isImage(attachment.name))),
+  )
+
+  // URL 附件直接传递地址，分类由用户选择，不下载远程文件。
+  const urlUploadTypes = computed(() =>
+    [
+      { enabled: uploadSetting.value.document, value: 'document_list' as const, label: '文档' },
+      { enabled: uploadSetting.value.image, value: 'image_list' as const, label: '图片' },
+      { enabled: uploadSetting.value.audio, value: 'audio_list' as const, label: '音频' },
+      { enabled: uploadSetting.value.video, value: 'video_list' as const, label: '视频' },
+      { enabled: uploadSetting.value.other, value: 'other_list' as const, label: '其他' },
+    ].filter((type) => type.enabled),
+  )
+  const addUrls = (addresses: string[], attachmentType: MessageAttachmentKey): boolean => {
+    if (!urlUploadEnabled.value || !canUpload.value || !urlUploadTypes.value.some((type) => type.value === attachmentType)) return false
+    if (fileList.value.length + addresses.length > maxFiles.value) {
+      MsgWarning(`单次最多上传 ${maxFiles.value} 个文件`)
+      return false
+    }
+    try {
+      addresses.forEach((address) => {
+        const url = new URL(address)
+        if (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid URL')
+      })
+    } catch {
+      MsgWarning('请输入有效的 HTTP 或 HTTPS URL 地址')
+      return false
+    }
+    addresses.forEach((address) => {
+      const url = new URL(address)
+      const name = url.pathname.split('/').filter(Boolean).pop() || url.hostname
+      fileList.value.push({ uid: Date.now() + Math.random(), name, size: 0, url: address, attachmentType, status: 'success', progress: 100 })
+    })
+    return true
+  }
 
   // 附件上传与本地预览
   /** 校验单个文件，返回不通过的提示；拖拽、粘贴不受 accept 限制，需校验扩展名。 */
@@ -174,6 +214,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     void Promise.resolve()
       .then(() => {
         if (!fileList.value.includes(attachment)) return
+        if (!attachment.raw) return
         return uploadFile(attachment.raw, getChatId(), (percent) => {
           if (!fileList.value.includes(attachment)) return
           // 文件传输结束后仍等待服务端处理，成功响应前最多显示 95%。
@@ -277,7 +318,8 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       const message: QuestionMessage = { type: 'QUESTION', content: question.value.trim() }
       for (const attachment of fileList.value) {
         let attachmentKey: MessageAttachmentKey = 'other_list'
-        if (isImage(attachment.name)) attachmentKey = 'image_list'
+        if (attachment.attachmentType) attachmentKey = attachment.attachmentType
+        else if (isImage(attachment.name)) attachmentKey = 'image_list'
         else if (isDocument(attachment.name)) attachmentKey = 'document_list'
         else if (isAudio(attachment.name)) attachmentKey = 'audio_list'
         else if (isVideo(attachment.name)) attachmentKey = 'video_list'
@@ -344,6 +386,8 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     fileList,
     uploadEnabled,
     urlUploadEnabled,
+    urlUploadTypes,
+    addUrls,
     canUpload,
     maxFiles,
     maxSizeMB,
