@@ -63,8 +63,6 @@ ESLint 检查的依据。需要检查代码时，可运行 `npx eslint <待检�
 导入顺序由项目 ESLint 规则检查，使用 `npx eslint <文件或目录> --fix` 自动整理；
 分组与顺序见 [AGENTS.md](AGENTS.md#import-顺序)。
 
-路由菜单、知识库角色权限与问题分段关联回归测试使用 Node 内置测试运行器：`node --test tests/*.test.mjs`。
-
 默认构建分别输出 `dist/admin/index.html` 和 `dist/chat/index.html`，HTML 由构建插件统一重命名。
 静态资源使用相对路径（`base: './'`）；部署时仍需为 History 路由配置对应入口回退，
 并由部署服务转发 API 和文件请求。Vite 的开发代理不会随静态构建产物部署。

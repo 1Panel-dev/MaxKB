@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemModelApi from '@/api/admin/system/resource-management/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type ModelApi from '@/api/admin/workspace/model'
 import type { ModelProviderItem } from '@/api/types'
 import CreateModelDrawer from './CreateModelDrawer.vue'
 import SelectProviderDrawer from './SelectProviderDrawer.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ButtonAddModel' })
 
@@ -43,7 +46,7 @@ function handleBackToProviderSelect() {
   <slot :open="handleOpenCreateModel">
     <el-button type="primary" class="ml-3" @click="handleOpenCreateModel">
       <MkIcon name="icon_add_outlined" />
-      <span>添加模型</span>
+      <span>{{ t('model.actions.add') }}</span>
     </el-button>
   </slot>
   <SelectProviderDrawer ref="selectProviderDrawerRef" @select="handleCreateProviderSelect" />

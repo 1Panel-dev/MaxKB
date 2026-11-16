@@ -1,0 +1,49 @@
+{
+  "title": "模型",
+  "providers": {
+    "all": "全部模型",
+    "shared": "共享模型",
+    "public": "公有模型",
+    "private": "私有模型"
+  },
+  "fields": {
+    "name": {
+      "label": "模型名称"
+    },
+    "type": {
+      "label": "模型类型"
+    },
+    "baseModel": {
+      "label": "基础模型"
+    }
+  },
+  "types": {
+    "llm": "大语言模型",
+    "embedding": "向量模型",
+    "reranker": "重排模型",
+    "stt": "语音识别",
+    "tts": "语音合成",
+    "image": "视觉模型",
+    "tti": "图片生成",
+    "itv": "图生视频",
+    "ttv": "文生视频"
+  },
+  "actions": {
+    "add": "添加模型",
+    "parameters": "模型参数设置",
+    "cancelDownload": "取消下载"
+  },
+  "states": {
+    "shared": "共享",
+    "downloading": "下载中"
+  },
+  "messages": {
+    "missingOllama": "{name} 模型在 Ollama 不存在",
+    "downloadFailed": "基础模型: {name} 下载失败",
+    "deleted": "删除成功"
+  },
+  "delete": {
+    "title": "是否删除模型：{name}？",
+    "description": "此模型关联 {count} 个资源，删除后无法使用，请谨慎操作。"
+  }
+}
