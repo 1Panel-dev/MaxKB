@@ -9,6 +9,7 @@ from models_provider.base_model_provider import (
     ModelInfo,
     ModelTypeConst,
     ModelInfoManage,
+    classify_dynamic_model_id,
 )
 from models_provider.impl.tencent_model_provider.credential.embedding import TencentEmbeddingCredential
 from models_provider.impl.tencent_model_provider.credential.image import TencentVisionModelCredential
@@ -231,6 +232,20 @@ class TencentModelProvider(IModelProvider):
 
     def get_model_info_manage(self):
         return self._model_info_manage
+
+    @staticmethod
+    def classify_dynamic_model(model_id):
+        """TokenHub 的 /models 不带模态元数据，按官方命名规则补齐判型。
+
+        YT-Video 系列为图生视频/首尾帧（ITV）；含 vision 的多数为视觉多模态
+        理解模型（IMAGE），但带 video/t2v/i2v 的仍按视频处理，避免误判。
+        """
+        model_id = str(model_id).lower()
+        if "yt-video" in model_id:
+            return ModelTypeConst.ITV
+        if "vision" in model_id and not any(k in model_id for k in ("video", "t2v", "i2v")):
+            return ModelTypeConst.IMAGE
+        return classify_dynamic_model_id(model_id)
 
     def get_model(self, model_type, model_name, model_credential, **model_kwargs):
         # STT 模型：模型名不以 asr- 开头的一律走 Tencent Tokenhub WAND 识别
