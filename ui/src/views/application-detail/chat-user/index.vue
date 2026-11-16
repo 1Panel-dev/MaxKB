@@ -213,9 +213,9 @@ onMounted(() => loadChatUserGroups())
             <!-- 搜索对话用户 -->
             <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
             <!-- 设置用户组自动授权 -->
-            <div v-if="applicationchatUserPermission('chatUserEdit')" class="flex-align-center shrink-0 gap-2">
+            <div class="flex-align-center shrink-0 gap-2">
               <span>自动授权</span>
-              <el-switch :model-value="currentGroup.is_auth" size="small" @change="handleAutoAuthorizationChange" />
+              <el-switch :disabled="!applicationchatUserPermission('chatUserEdit')" :model-value="currentGroup.is_auth" size="small" @change="handleAutoAuthorizationChange" />
             </div>
           </div>
           <!-- 保存对话用户授权 -->
