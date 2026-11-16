@@ -13,7 +13,10 @@ const router = useRouter()
 const systemMenuItems = getChildRouteList('system')
 const systemActiveMenuPath = computed(() => route.meta.activeMenu ?? route.path)
 
-const isSystemMenuActive = (systemMenuItem: LayoutMenuItem) => route.matched.some((matchedRoute) => matchedRoute.name === systemMenuItem.name)
+const isSystemMenuActive = (systemMenuItem: LayoutMenuItem): boolean =>
+  route.matched.some((matchedRoute) => matchedRoute.name === systemMenuItem.name) ||
+  Boolean(systemMenuItem.route && router.resolve(systemMenuItem.route).path === systemActiveMenuPath.value) ||
+  Boolean(systemMenuItem.children?.some(isSystemMenuActive))
 
 const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
   isSystemMenuActive(systemMenuItem) ? (systemMenuItem.activeIcon ?? systemMenuItem.icon) : systemMenuItem.icon

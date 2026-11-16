@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ModelProviderItem } from '@/api/types'
 import { isWorkspaceResource } from '@/utils/resource-context'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ModelProvider' })
 
@@ -36,7 +39,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
           :size="18"
           class="mr-2"
         />
-        <span>共享模型</span>
+        <span>{{ t('model.providers.shared') }}</span>
       </MkListItem>
 
       <el-divider class="my-1!" />
@@ -44,7 +47,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
 
     <MkListItem :active="modelValue.provider === ALL_MODEL_PROVIDER.provider" @click="handleProviderSelect(ALL_MODEL_PROVIDER)">
       <MkIcon :name="modelValue.provider === ALL_MODEL_PROVIDER.provider ? 'icon_card_filled' : 'icon_card_outlined'" :size="18" class="mr-2" />
-      <span>全部模型</span>
+      <span>{{ t('model.providers.all') }}</span>
     </MkListItem>
   </div>
 
@@ -53,7 +56,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
       <MkCollapse v-if="publicProviders.length" :default-expanded="false" triggerClass="hover:bg-N900/10 rounded-md py-[9px] px-2 mb-1">
         <template #label>
           <MkIcon name="icon_file-folder_colorful" :size="18" />
-          <span>公有模型</span>
+          <span>{{ t('model.providers.public') }}</span>
         </template>
         <div class="space-y-1">
           <MkListItem
@@ -73,7 +76,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
       <MkCollapse v-if="privateProviders.length" :default-expanded="false" triggerClass="hover:bg-N900/10 rounded-md py-[9px] px-2 mb-1">
         <template #label>
           <MkIcon name="icon_file-folder_colorful" :size="18" />
-          <span>私有模型</span>
+          <span>{{ t('model.providers.private') }}</span>
         </template>
         <div class="space-y-1">
           <MkListItem

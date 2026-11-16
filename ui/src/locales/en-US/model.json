@@ -1,0 +1,49 @@
+{
+  "title": "Models",
+  "providers": {
+    "all": "All models",
+    "shared": "Shared models",
+    "public": "Public models",
+    "private": "Private models"
+  },
+  "fields": {
+    "name": {
+      "label": "Model name"
+    },
+    "type": {
+      "label": "Model type"
+    },
+    "baseModel": {
+      "label": "Base model"
+    }
+  },
+  "types": {
+    "llm": "Large language model",
+    "embedding": "Embedding model",
+    "reranker": "Reranking model",
+    "stt": "Speech recognition",
+    "tts": "Speech synthesis",
+    "image": "Vision model",
+    "tti": "Image generation",
+    "itv": "Image to video",
+    "ttv": "Text to video"
+  },
+  "actions": {
+    "add": "Add model",
+    "parameters": "Model parameters",
+    "cancelDownload": "Cancel download"
+  },
+  "states": {
+    "shared": "Shared",
+    "downloading": "Downloading"
+  },
+  "messages": {
+    "missingOllama": "Model {name} does not exist in Ollama",
+    "downloadFailed": "Base model: {name} download failed",
+    "deleted": "Deleted successfully"
+  },
+  "delete": {
+    "title": "Delete model: {name}?",
+    "description": "This model is linked to {count} resource. Deleting it will make it unavailable. Proceed with caution. | This model is linked to {count} resources. Deleting it will make it unavailable. Proceed with caution."
+  }
+}

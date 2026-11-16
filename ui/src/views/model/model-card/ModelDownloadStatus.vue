@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import type ModelApi from '@/api/admin/workspace/model'
 import type { ModelItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ModelDownloadStatus' })
 
@@ -49,8 +52,8 @@ onBeforeUnmount(() => stopDownloadPolling())
 <template>
   <div class="model-download-status bg-white/94">
     <LoadingIcon class="h-7 w-7" />
-    <span class="mk-dotting my-2 ml-2 text-N600">下载中</span>
-    <el-button text type="primary" :loading="cancelLoading" @click.stop="handleCancelDownload"> 取消下载 </el-button>
+    <span class="mk-dotting my-2 ml-2 text-N600">{{ t('model.states.downloading') }}</span>
+    <el-button text type="primary" :loading="cancelLoading" @click.stop="handleCancelDownload">{{ t('model.actions.cancelDownload') }}</el-button>
   </div>
 </template>
 

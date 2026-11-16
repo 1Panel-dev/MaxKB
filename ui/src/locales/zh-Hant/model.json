@@ -1,0 +1,49 @@
+{
+  "title": "模型",
+  "providers": {
+    "all": "全部模型",
+    "shared": "共用模型",
+    "public": "公有模型",
+    "private": "私有模型"
+  },
+  "fields": {
+    "name": {
+      "label": "模型名稱"
+    },
+    "type": {
+      "label": "模型類型"
+    },
+    "baseModel": {
+      "label": "基礎模型"
+    }
+  },
+  "types": {
+    "llm": "大型語言模型",
+    "embedding": "向量模型",
+    "reranker": "重排模型",
+    "stt": "語音辨識",
+    "tts": "語音合成",
+    "image": "視覺模型",
+    "tti": "圖片生成",
+    "itv": "圖生影片",
+    "ttv": "文生影片"
+  },
+  "actions": {
+    "add": "新增模型",
+    "parameters": "模型參數設定",
+    "cancelDownload": "取消下載"
+  },
+  "states": {
+    "shared": "共用",
+    "downloading": "下載中"
+  },
+  "messages": {
+    "missingOllama": "{name} 模型在 Ollama 不存在",
+    "downloadFailed": "基礎模型: {name} 下載失敗",
+    "deleted": "刪除成功"
+  },
+  "delete": {
+    "title": "是否刪除模型：{name}？",
+    "description": "此模型關聯 {count} 個資源，刪除後無法使用，請謹慎操作。"
+  }
+}

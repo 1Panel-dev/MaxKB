@@ -3,21 +3,21 @@
  * 该对象会在 modules/index.ts 里被展开到顶层：$perm.user.* / $perm.role.* / ...
  */
 
-import appearance from './appearance'
+import user from './user'
+import workspace from './workspace'
+import role from './role'
+import userGroup from './userGroup'
 import authorization from './authorization'
-import chatAuth from './chatAuth'
 import chatUser from './chatUser'
 import chatUserGroup from './chatUserGroup'
-import email from './email'
-import homepage from './homepage'
-import loginAuth from './loginAuth'
-import operationLog from './operationLog'
-import other from './other'
+import chatAuth from './chatAuth'
 import portal from './portal'
-import role from './role'
-import user from './user'
-import userGroup from './userGroup'
-import workspace from './workspace'
+import loginAuth from './loginAuth'
+import appearance from './appearance'
+import email from './email'
+import operationLog from './operationLog'
+import homepage from './homepage'
+import other from './other'
 export default {
   /**
    * 系统「用户管理」按钮权限

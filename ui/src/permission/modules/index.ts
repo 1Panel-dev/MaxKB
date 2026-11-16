@@ -6,12 +6,12 @@
  */
 
 import application from './application'
-import homepage from './homepage'
 import knowledge from './knowledge'
+import tool from './tool'
 import model from './model'
 import system from './system'
-import tool from './tool'
 import trigger from './trigger'
+import homepage from './homepage'
 
 export default {
   /**
