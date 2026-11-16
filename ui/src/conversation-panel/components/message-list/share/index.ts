@@ -1,6 +1,7 @@
 import { computed, inject, ref } from 'vue'
 import type { ChatMessage } from '../../../core/types'
 import type { InjectionKey, Ref } from 'vue'
+import { getMessageRecordIds } from '../index'
 
 export interface ShareLinkDeps {
   /** 当前会话消息：只读，由消息列表 Store 维护 */
@@ -21,11 +22,8 @@ export function createShareLinkStore(deps: ShareLinkDeps) {
   // 已选 chat_record id；提问与回答共用记录 ID，按整轮选择
   const selectedRecordIds = ref<string[]>([])
 
-  // 每条消息对应的记录 ID：提问取下一条回答的记录 ID，无记录 ID 的问答不可选
-  const messageRecordIds = computed(() =>
-    messages.value.map((message, index) => (message.role === 'ASSISTANT' ? message.recordId : messages.value[index + 1]?.recordId)),
-  )
-  const availableRecordIds = computed(() => [...new Set(messageRecordIds.value.filter((id): id is string => Boolean(id)))])
+  // 无记录 ID 的问答不可选
+  const availableRecordIds = computed(() => [...new Set(getMessageRecordIds(messages.value).filter((id): id is string => Boolean(id)))])
 
   // 全选与数量仅统计当前列表中的可分享记录
   const selectedIds = computed(() => availableRecordIds.value.filter((recordId) => selectedRecordIds.value.includes(recordId)))
@@ -76,7 +74,6 @@ export function createShareLinkStore(deps: ShareLinkDeps) {
 
   return {
     sharing,
-    messageRecordIds,
     selectedCount,
     totalCount,
     allSelected,
@@ -94,14 +91,6 @@ export function createShareLinkStore(deps: ShareLinkDeps) {
 export type ShareLinkStore = ReturnType<typeof createShareLinkStore>
 
 export const SHARE_LINK_KEY: InjectionKey<ShareLinkStore> = Symbol('share-link')
-
-/** 消息所属问答轮次的记录 ID，由 ShareMessageRow 提供给消息内容，供内容项的分享入口预先勾选。 */
-export const SHARE_RECORD_ID_KEY: InjectionKey<Readonly<Ref<string | undefined>>> = Symbol('share-record-id')
-
-/** 未提供时为 undefined，分享入口不预先勾选。 */
-export function useShareRecordId(): Readonly<Ref<string | undefined>> {
-  return inject(SHARE_RECORD_ID_KEY, ref(undefined))
-}
 
 /** 未提供时返回 null，分享组件不可选择与提交。 */
 export function useShareLinkStoreOptional(): ShareLinkStore | null {

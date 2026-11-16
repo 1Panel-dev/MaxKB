@@ -19,6 +19,7 @@ from chat.api.chat_api import (
     PageHistoricalConversationRecordAPI,
     HistoricalConversationRecordAPI,
     HistoricalConversationOperateAPI,
+    TruncateConversationRecordAPI,
 )
 from chat.api.vote_api import VoteAPI
 from chat.serializers.chat_record import (
@@ -243,4 +244,29 @@ class ChatRecordView(APIView):
                     "chat_user_id": request.user.id,
                 }
             ).one(False)
+        )
+
+
+class ChatRecordTruncateView(APIView):
+    authentication_classes = [ChatTokenAuth]
+
+    @extend_schema(
+        methods=["POST"],
+        description=_("Delete the conversation record and all subsequent records"),
+        summary=_("Truncate conversation records"),
+        operation_id=_("V3 Truncate conversation records"),  # type: ignore
+        parameters=TruncateConversationRecordAPI.get_parameters(),
+        responses=TruncateConversationRecordAPI.get_response(),
+        tags=[_("V3 Chat")],  # type: ignore
+    )
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def post(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
+        return result.success(
+            HistoricalConversationRecordSerializer(
+                data={
+                    "chat_id": chat_id,
+                    "application_id": application_id,
+                    "chat_user_id": request.user.id,
+                }
+            ).truncate(chat_record_id)
         )

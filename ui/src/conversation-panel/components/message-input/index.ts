@@ -39,6 +39,8 @@ type QuestionMessage = {
 export interface QuestionOptions {
   attachments?: QuestionAttachments
   formData?: Dict<unknown>
+  /** 发送前先截断会话：删除该记录及其之后的对话，如编辑提问；截断失败时不发送。 */
+  truncateFromRecordId?: string
 }
 
 // 仅注入消息输入所需的会话、上传和发送能力。
@@ -51,6 +53,8 @@ export interface MessageInputDeps {
   composerResetSignal: Ref<number>
   // 来自 message-list
   messages: Ref<ChatMessage[]>
+  /** 截断会话并同步移除对应消息；不提供时不支持发送前截断，提问追加在末尾。 */
+  truncateMessages?: (chatRecordId: string) => Promise<void>
   /** 对话加载(回答生成中):只读,由 message-list 维护 */
   streamLoading: Readonly<Ref<boolean>>
   sendMessage: (opts: SendMessageOptions) => void
@@ -442,10 +446,22 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   /** 由开场白、回答中的快捷问题或 HTML 渲染发起提问；不读取也不清空输入框与暂存附件。 */
   const sendQuestion = (content: string, options: QuestionOptions = {}) => {
     if (disabled.value || streamLoading.value || sending.value || !content.trim()) return
+    // 校验与截断期间占用发送状态，避免连续触发时重复提交
+    sending.value = true
     userForm
       .validate()
-      .then(() => submitQuestion({ ...options.attachments, type: 'QUESTION', content: content.trim() }, options.formData))
+      .then(async () => {
+        if (options.truncateFromRecordId) {
+          // 截断期间新建或切换了会话时放弃发送，避免提问发到其他会话
+          const resetSignal = composerResetSignal.value
+          await deps.truncateMessages?.(options.truncateFromRecordId)
+          if (resetSignal !== composerResetSignal.value) return
+        }
+        submitQuestion({ ...options.attachments, type: 'QUESTION', content: content.trim() }, options.formData)
+      })
+      // 校验失败由表单提示，截断失败由请求层提示，均不发送
       .catch(() => {})
+      .finally(() => (sending.value = false))
   }
 
   // 新建/切换会话时清空暂存文件与输入
@@ -473,6 +489,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     allowedExtensions,
     acceptList,
     streamLoading,
+    sending,
     disabled,
     placeholder,
     canSend,

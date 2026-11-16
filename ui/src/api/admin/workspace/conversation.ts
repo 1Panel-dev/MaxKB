@@ -44,6 +44,10 @@ const getConversationRecordPage = (chatId: string, page: number, size: number, a
   return get<{ records: ChatLogRecord[] }>(`/workspace/${wsId}/historical_conversation_record/${chatId}/${page}/${size}`)
 }
 
+/** 截断调试会话：删除该记录及其之后的全部记录。 */
+const truncateConversation = (chatId: string, chatRecordId: string, applicationId?: string) =>
+  post(`/workspace/${getWorkspaceId()}/application/${applicationId}/historical_conversation_record/${chatId}/${chatRecordId}/truncate`, {})
+
 /** 删除会话。 */
 const deleteConversation = (chatId: string, applicationId?: string) => {
   const wsId = getWorkspaceId()
@@ -74,6 +78,7 @@ export default {
   getConversationPage,
   getConversationRecordDetail,
   getConversationRecordPage,
+  truncateConversation,
   deleteConversation,
   putConversation,
   postSpeechToText,

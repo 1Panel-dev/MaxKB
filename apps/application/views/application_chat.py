@@ -20,7 +20,12 @@ from application.api.application_chat import (
 )
 from application.models import ChatUserType, Application, ChatSourceChoices
 from application.serializers.application_chat import ApplicationChatQuerySerializers
-from chat.api.chat_api import ChatAPI, PageHistoricalConversationAPI, HistoricalConversationRecordAPI
+from chat.api.chat_api import (
+    ChatAPI,
+    PageHistoricalConversationAPI,
+    HistoricalConversationRecordAPI,
+    TruncateConversationRecordAPI,
+)
 from chat.api.chat_authentication_api import ChatOpenAPI
 from chat.serializers.chat import DebugChatSerializers, OpenChatSerializers, ResumeSerializers
 from common.auth import TokenAuth
@@ -347,6 +352,41 @@ class DebugHistoricalConversation(APIView):
                 }
             )
             return result.success(serializer.debug_page(current_page, page_size))
+
+    class RecordTruncateView(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["POST"],
+            description=_("Delete the conversation record and all subsequent records"),
+            summary=_("Truncate conversation records"),
+            operation_id=_("Truncate conversation records"),  # type: ignore
+            parameters=TruncateConversationRecordAPI.get_parameters(),
+            responses=TruncateConversationRecordAPI.get_response(),
+            tags=[_("Chat")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+            PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                compare=CompareConstants.AND,
+            ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str):
+            from chat.serializers.chat_record import HistoricalConversationRecordSerializer
+
+            return result.success(
+                HistoricalConversationRecordSerializer(
+                    data={
+                        "application_id": application_id,
+                        "chat_id": chat_id,
+                        "chat_user_id": str(request.user.id),
+                    }
+                ).truncate(chat_record_id)
+            )
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

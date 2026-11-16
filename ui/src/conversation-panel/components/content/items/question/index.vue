@@ -7,12 +7,12 @@ import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import { CONVERSATION_LIST_KEY } from '../../../../left-sidebar/conversation-list/index'
 import { useShowShare } from '../../../../view/index'
 import { useMessageInputStoreOptional } from '../../../message-input/index'
-import { MESSAGE_LIST_KEY } from '../../../message-list/index'
-import { useShareLinkStoreOptional, useShareRecordId } from '../../../message-list/share/index'
+import { MESSAGE_LIST_KEY, useMessageRecordId } from '../../../message-list/index'
+import { useShareLinkStoreOptional } from '../../../message-list/share/index'
 import QuestionEditor from './QuestionEditor.vue'
 import { copyText } from '@/utils/clipboard'
 import { downloadByURL } from '@/utils/common'
-import { getFileExtension, resetUrl } from '@/utils/icon'
+import { getFileExtension } from '@/utils/icon'
 import { formatFileSize } from '@/utils/number'
 
 defineOptions({ name: 'ConversationQuestionContent' })
@@ -20,7 +20,7 @@ defineOptions({ name: 'ConversationQuestionContent' })
 // 智能体允许分享时显示分享入口；进入分享时预先勾选所属轮次。
 const showShare = useShowShare()
 const shareLink = useShareLinkStoreOptional()
-const shareRecordId = useShareRecordId()
+const messageRecordId = useMessageRecordId()
 
 // 复用对话的分享选择入口，回答生成中禁用。
 const conversationList = inject(CONVERSATION_LIST_KEY, null)
@@ -39,20 +39,23 @@ type QuestionContent = { content?: string } & Partial<Record<AttachmentField, Qu
 
 const props = defineProps<{ content: QuestionContent }>()
 
-// 编辑保留原提问及附件，发送沿用输入框的新问题流程。
+// 编辑保留原提问的附件：先截断所属轮次及之后的对话，再按新提问发送；所属轮次没有记录 ID 时追加在末尾。
 const messageInput = useMessageInputStoreOptional()
 const editing = ref(false)
 const canEdit = computed(() =>
   Boolean(messageInput && !messageInput.disabled.value && !messageInput.streamLoading.value && !conversationList?.isShared.value),
 )
 
+// 校验与截断请求期间禁用发送，编辑框保持打开，失败后可继续修改
+const submitting = computed(() => Boolean(messageInput?.sending.value))
+
 function startEditing() {
   if (canEdit.value) editing.value = true
 }
 
 function sendEditedQuestion(question: string) {
-  if (!canEdit.value || !question.trim()) return
-  messageInput?.sendQuestion(question, { attachments: props.content })
+  if (!canEdit.value || submitting.value || !question.trim()) return
+  messageInput?.sendQuestion(question, { attachments: props.content, truncateFromRecordId: messageRecordId.value })
 }
 
 watch(canEdit, (available) => {
@@ -130,7 +133,13 @@ function getAttachmentDescription(file: QuestionAttachment) {
         </div>
       </template>
     </div>
-    <QuestionEditor v-if="editing" :content="content.content ?? ''" :disabled="!canEdit" @cancel="editing = false" @send="sendEditedQuestion" />
+    <QuestionEditor
+      v-if="editing"
+      :content="content.content ?? ''"
+      :disabled="!canEdit || submitting"
+      @cancel="editing = false"
+      @send="sendEditedQuestion"
+    />
     <div v-else-if="content.content" class="mk-gray-card-lg text-[16px] ml-auto w-fit max-w-full py-3! whitespace-pre-wrap wrap-anywhere">
       {{ content.content }}
     </div>
@@ -150,7 +159,7 @@ function getAttachmentDescription(file: QuestionAttachment) {
       </el-button>
       <!-- 进入分享模式 -->
       <MkTooltip v-if="showShare" content="分享">
-        <el-button text :disabled="!canShare" @click="shareLink?.enterShare([shareRecordId])">
+        <el-button text :disabled="!canShare" @click="shareLink?.enterShare([messageRecordId])">
           <MkIcon name="icon_share_outlined" />
         </el-button>
       </MkTooltip>

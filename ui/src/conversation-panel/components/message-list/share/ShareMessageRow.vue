@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { provide, toRef } from 'vue'
-import { SHARE_RECORD_ID_KEY, useShareLinkStoreOptional } from './index'
+import { MESSAGE_RECORD_ID_KEY } from '../index'
+import { useShareLinkStoreOptional } from './index'
 
 defineOptions({ name: 'ShareMessageRow' })
 
@@ -9,8 +10,8 @@ const props = defineProps<{
   recordId?: string
 }>()
 const shareLink = useShareLinkStoreOptional()
-// 消息内容内的分享入口据此预先勾选所属轮次
-provide(SHARE_RECORD_ID_KEY, toRef(props, 'recordId'))
+// 消息内容据此定位所属轮次：编辑提问时截断该轮及之后的对话，分享入口预先勾选该轮
+provide(MESSAGE_RECORD_ID_KEY, toRef(props, 'recordId'))
 </script>
 
 <template>

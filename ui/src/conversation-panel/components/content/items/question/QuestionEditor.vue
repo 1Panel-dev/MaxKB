@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import type { InputInstance } from 'element-plus'
+import { useInputEvents } from '../../../../core/input-events'
 
 defineOptions({ name: 'ConversationQuestionEditor' })
 
@@ -15,6 +16,9 @@ onMounted(() => editorRef.value?.focus())
 function sendQuestion() {
   if (!props.disabled && questionDraft.value.trim()) emit('send', questionDraft.value)
 }
+
+// 回车发送、组合键换行，与消息输入框一致；编辑框不接收附件。
+const { handleKeydown } = useInputEvents({ text: questionDraft, canUpload: () => false, addFiles: () => {}, submit: sendQuestion })
 </script>
 
 <template>
@@ -27,10 +31,11 @@ function sendQuestion() {
       :autosize="{ minRows: 1, maxRows: 8 }"
       resize="none"
       class="question-editor-input"
+      @keydown.enter="handleKeydown"
     />
     <div class="flex justify-end">
-      <!-- 取消编辑 -->
-      <el-button plain class="min-w-20" @click="emit('cancel')">取消</el-button>
+      <!-- 取消编辑；提交请求期间禁用，避免编辑框关闭后提问仍被发送 -->
+      <el-button plain class="min-w-20" :disabled="disabled" @click="emit('cancel')">取消</el-button>
       <!-- 发送编辑后的提问 -->
       <el-button type="primary" class="min-w-20" :disabled="disabled || !questionDraft.trim()" @click="sendQuestion">发送</el-button>
     </div>

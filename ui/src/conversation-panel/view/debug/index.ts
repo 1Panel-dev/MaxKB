@@ -29,6 +29,7 @@ export function createDebugConversation(application: Readonly<Ref<ApplicationDet
     pageRecords: (cid, p, s) => ConversationApi.getConversationRecordPage(cid, p, s, appId.value),
     recordDetail: (cid, rid) => ConversationApi.getConversationRecordDetail(cid, rid, appId.value),
     remove: (id) => ConversationApi.deleteConversation(id, appId.value),
+    truncate: (cid, rid) => ConversationApi.truncateConversation(cid, rid, appId.value),
     rename: (id, data) => ConversationApi.putConversation(id, data, appId.value),
     chatMessage: (cid, data) => ConversationApi.postConversationMessage(cid, data, appId.value),
     resumeMessage: (cid, rid) => ConversationApi.postResumeConversationMessage(cid, rid, appId.value),
@@ -53,6 +54,7 @@ export function createDebugConversation(application: Readonly<Ref<ApplicationDet
     chatMessage: api.chatMessage,
     resumeMessage: api.resumeMessage,
     cancel: api.cancel,
+    truncate: api.truncate,
     uploadFile: api.uploadFile,
     getChatId: () => list.currentChatId.value, // 只读 getter,无副作用
     appInfo,
@@ -64,6 +66,7 @@ export function createDebugConversation(application: Readonly<Ref<ApplicationDet
     renameChat: list.renameChat,
     composerResetSignal: list.composerResetSignal,
     messages: msgs.messages,
+    truncateMessages: msgs.truncateFrom,
     streamLoading: msgs.streamLoading,
     sendMessage: msgs.sendMessage,
     uploadFile: msgs.uploadFile,
