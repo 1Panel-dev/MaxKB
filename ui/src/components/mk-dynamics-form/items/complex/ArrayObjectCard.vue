@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
 import type { DynamicFormResponse, FormField } from '../../type'
 import DynamicsForm from '../../index.vue'
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<{
   modelValue?: DynamicFormValue[]
   formValue?: DynamicFormValue
@@ -42,7 +45,7 @@ const fieldProps = computed(() => {
   return props.formField.props_info ? props.formField.props_info : {}
 })
 const addMessage = computed(() => {
-  return fieldProps.value.add_msg ? fieldProps.value.add_msg : '添加'
+  return fieldProps.value.add_msg ? fieldProps.value.add_msg : t('common.actions.add')
 })
 /**
  * 添加一个card
@@ -94,7 +97,7 @@ defineExpose({ validate, field: props.field })
         v-bind="attr"
         :parent-field="formField.field + '.' + index"
       ></DynamicsForm>
-      <MkTooltip content="删除" placement="top">
+      <MkTooltip :content="t('common.actions.delete')" placement="top">
         <el-button text @click.stop="deleteKnowledge(item)" class="delete-button">
           <MkIcon name="icon_delete-trash_outlined"></MkIcon>
         </el-button>

@@ -1,0 +1,217 @@
+{
+  "types": {
+    "textInput": "文本框",
+    "textareaInput": "多行文本框",
+    "jsonInput": "JSON 文本框",
+    "passwordInput": "密码框",
+    "singleSelect": "单选框",
+    "multiSelect": "多选框",
+    "radioCard": "选项卡",
+    "radioRow": "单行选项卡",
+    "multiRow": "单行多选卡",
+    "slider": "滑块",
+    "switchInput": "开关",
+    "datePicker": "日期",
+    "uploadInput": "文件上传",
+    "model": "模型",
+    "knowledge": "知识库",
+    "treeSelect": "树形选择器"
+  },
+  "tabs": {
+    "basic": "基本信息",
+    "visibility": "显隐设置"
+  },
+  "fields": {
+    "field": {
+      "label": "参数",
+      "placeholder": "请输入参数",
+      "requiredMessage": "请输入参数"
+    },
+    "label": {
+      "label": "显示名称",
+      "placeholder": "请输入显示名称",
+      "requiredMessage": "请输入显示名称"
+    },
+    "tooltip": {
+      "label": "参数提示说明",
+      "placeholder": "请输入参数提示说明"
+    },
+    "required": {
+      "label": "是否必填",
+      "columnLabel": "必填"
+    },
+    "inputType": {
+      "label": "组件类型",
+      "placeholder": "请选择组件类型",
+      "requiredMessage": "请选择组件类型"
+    },
+    "defaultValue": {
+      "label": "默认值",
+      "placeholder": "请输入默认值",
+      "requiredMessage": "请输入默认值",
+      "selectRequiredMessage": "请选择默认值",
+      "lengthMessage": "长度在 {min} 到 {max} 个字符",
+      "propertyRequiredMessage": "为必填属性",
+      "datePlaceholder": "选择日期"
+    },
+    "optionLabel": {
+      "label": "标签",
+      "placeholder": "请输入标签",
+      "requiredMessage": "请输入标签",
+      "treePlaceholder": "请输入选项标签"
+    },
+    "optionValue": {
+      "label": "选项值",
+      "placeholder": "请输入选项值",
+      "requiredMessage": "请输入选项值"
+    },
+    "minLength": {
+      "requiredMessage": "请输入最小长度"
+    },
+    "maxLength": {
+      "requiredMessage": "请输入最大长度"
+    },
+    "min": {
+      "requiredMessage": "最小值必填"
+    },
+    "max": {
+      "requiredMessage": "最大值必填"
+    },
+    "step": {
+      "label": "步长值",
+      "requiredMessage": "请输入步长值",
+      "invalidMessage": "步长不能为 0"
+    },
+    "dateType": {
+      "label": "时间类型",
+      "placeholder": "请选择时间类型"
+    },
+    "format": {
+      "label": "格式",
+      "placeholder": "请选择格式"
+    },
+    "reference": {
+      "requiredMessage": "请输入引用变量",
+      "selectRequiredMessage": "请选择引用变量",
+      "invalidMessage": "引用变量格式错误",
+      "notFoundMessage": "未找到引用变量"
+    },
+    "model": {
+      "requiredMessage": "请选择模型",
+      "placeholder": "请选择模型"
+    },
+    "knowledge": {
+      "requiredMessage": "请选择知识库",
+      "placeholder": "请选择知识库"
+    },
+    "availableKnowledge": {
+      "requiredMessage": "请选择可选知识库",
+      "label": "可选知识库",
+      "placeholder": "请选择可选知识库"
+    },
+    "variable": {
+      "requiredMessage": "请选择变量",
+      "placeholder": "请选择变量"
+    },
+    "comparisonValue": {
+      "requiredMessage": "请输入比较值"
+    },
+    "fileTypes": {
+      "requiredMessage": "文件类型必填",
+      "label": "文件类型"
+    },
+    "options": {
+      "requiredMessage": "请添加选项",
+      "label": "选项"
+    },
+    "defaultKnowledge": {
+      "label": "默认知识库"
+    },
+    "availableModels": {
+      "label": "可选模型"
+    },
+    "defaultModel": {
+      "label": "默认模型"
+    },
+    "fileCount": {
+      "label": "单次上传最多文件数"
+    },
+    "fileSize": {
+      "label": "每个文件最大(MB)"
+    },
+    "assignment": {
+      "label": "赋值方式"
+    },
+    "showInput": {
+      "label": "是否带输入框"
+    }
+  },
+  "options": {
+    "custom": "自定义",
+    "reference": "引用变量",
+    "showDefault": "显示默认值",
+    "unselected": "未选中项",
+    "multiple": "允许多选",
+    "year": "年",
+    "month": "月",
+    "date": "日期",
+    "datetime": "日期时间",
+    "all": "所有",
+    "any": "任意"
+  },
+  "labels": {
+    "textLength": "文本长度",
+    "range": "取值范围",
+    "allDocuments": "全部文档"
+  },
+  "messages": {
+    "completeOption": "请至少填写一条完整数据",
+    "parentNotFound": "未找到父节点",
+    "emptyOption": "标签和选项值不能为空"
+  },
+  "tree": {
+    "addRoot": "添加一级选项",
+    "addChild": "添加子选项",
+    "deleteConfirm": "确定删除「{label}」吗？"
+  },
+  "visibility": {
+    "show": "显示条件",
+    "hide": "隐藏条件",
+    "match": "符合以下{condition}条件"
+  },
+  "help": {
+    "jsonFormat": "变量的值必须符合: JSON 格式",
+    "referenceOptions": "变量的值必须符合:\n[\n  {'{'}\n    \"label\": \"xx\",\n    \"value\": \"xx\",\n    \"default\": false\n  {'}'}\n]\nlabel: 标签 必填\nvalue: 值 必填\ndefault: 是否为默认值"
+  },
+  "upload": {
+    "segmentation": "文件上传前，建议规范文件的分段标识",
+    "duplicateName": "文件名重复",
+    "limits": "每次最多上传 {count} 个文件，每个文件不超过 {size} MB",
+    "formats": "支持格式：{formats}",
+    "sizeLimit": "文件大小不能超过 {size}MB",
+    "countLimit": "最多只能上传 {count} 个文件"
+  },
+  "operators": {
+    "is_null": "为空",
+    "is_not_null": "不为空",
+    "contain": "包含",
+    "not_contain": "不包含",
+    "eq": "等于",
+    "not_eq": "不等于",
+    "ge": "大于等于",
+    "gt": "大于",
+    "le": "小于等于",
+    "lt": "小于",
+    "len_eq": "长度等于",
+    "len_ge": "长度大于等于",
+    "len_gt": "长度大于",
+    "len_le": "长度小于等于",
+    "len_lt": "长度小于",
+    "is_true": "为真",
+    "is_not_true": "不为真",
+    "start_with": "startWith",
+    "end_with": "endWith",
+    "regex": "正则匹配",
+    "wildcard": "通配符匹配"
+  }
+}

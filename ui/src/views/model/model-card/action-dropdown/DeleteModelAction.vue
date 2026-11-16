@@ -21,7 +21,7 @@ function handleDeleteModel() {
     .then(() => {
       return props.api.deleteModel(props.model.id).then(() => {
         emit('refresh')
-        MsgSuccess(t('model.messages.deleted'))
+        MsgSuccess(t('common.messages.deleteSuccess'))
       })
     })
     .catch(() => {})

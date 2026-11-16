@@ -5,8 +5,8 @@ import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model
 import type ModelApi from '@/api/admin/workspace/model'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
-import { MODEL_TYPE_MESSAGE_KEYS } from '../model-type-labels'
 import ModelDownloadStatus from './ModelDownloadStatus.vue'
+import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
 
 const { t } = useI18n({ useScope: 'global' })
 

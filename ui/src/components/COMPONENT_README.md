@@ -144,7 +144,9 @@ Admin、Chat 入口调用 `configureMarkdownEditor()` 配置本地高亮、KaTeX
 ### MkEmpty
 
 基于 `el-empty`。`type="default"` 显示“暂无数据”，搜索无匹配使用 `type="search"`。
-`description`、`image`、`image-size` 可覆盖默认值，其他属性及默认、`image`、`description` 插槽透传。
+缺省文案读取当前应用的 common.empty，随语言响应式更新。
+`description`、`image`、`image-size` 可覆盖默认值，其他属性及默认、`image`、`description` 插槽透传；
+调用方提供的文案与插槽原样保留。
 
 ### MkDialog
 
@@ -174,6 +176,7 @@ Drawer 没有 `MkDialog` 的外壳挂载控制；需要按需挂载时，由业�
 ### MkComplexSearch
 
 `fields` 使用 `OptionItem<string>`，附加 `multiple`、`remoteMethod`。
+默认输入、选择占位提示复用 common.placeholders，语言切换不清空搜索字段或条件，调用方的字段和选项标签原样展示。
 有 `options` 时渲染选择器，否则渲染文本输入；`remoteMethod(query)` 由调用方更新选项，组件管理加载状态。
 `change` 返回 `{ [field]: value }`，多选返回数组；清空返回 `undefined`，切换字段仅在原条件非空时通知清空。
 组合外观复用 [连体表单控件样式](../styles/STYLE_README.md#连体表单控件)，字段和条件控件的默认宽度
@@ -432,6 +435,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 ### MkResourceCard
 
+默认创建信息中的“创建于”复用 common.labels.createdOn；标题、创建者与 subtitle 插槽内容保持调用方原值。
 等高资源卡片，`title` 必填，`nick_name`、`create_time` 提供创建信息；
 `icon`、`title`（透出 `{ title }`）、`subtitle`、`tag` 插槽可覆盖头部，默认插槽放详情。
 `footer` 提供常驻内容及 `Action`、`ActionDropdown`：前者是悬浮/焦点操作容器，后者包裹 More 菜单，
@@ -697,7 +701,7 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 局部变量使用 camelCase，模板属性使用 kebab-case。`input_type`、`default_value`、
 `visibility_rules` 等服务端字段协议保持 snake_case，不在组件边界内改名。
 
-公开入口包括 `dynamicFormTypeOptions`；`FormItem.vue`、`FormItemLabel.vue`、`items/` 和配置器子目录均为内部实现。
+公开入口包括 `dynamicFormTypeOptions` 和控件类型翻译 key 映射 `DYNAMIC_FORM_TYPE_MESSAGE_KEYS`；`FormItem.vue`、`FormItemLabel.vue`、`items/` 和配置器子目录均为内部实现。
 
 `MkDynamicsForm` 的主要 Props 为 `modelValue`、`renderData`、`otherParams`、`view`、
 `defaultItemWidth` 和 `parentField`，公开 `validate()`、`render()`、`initDefaultData()` 与
@@ -709,6 +713,13 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 `el-scrollbar` 及其内部滚动容器使用可收缩的 Flex 布局，并覆盖默认的百分比高度；达到最大高度后
 仅内容区滚动，Tabs 保持固定。普通 `MkDialog` 已提供内容最大高度，调用方不设置固定高度。
 两个表单通过 `v-show` 切换并保持挂载，确保未选中的页签也能回填、取值和校验。
+
+配置器与运行时控件的固定文案归 `dynamicForm` 命名空间，默认控件类型选项随当前语言更新；
+调用方传入的 `fieldTypeOptions` 保留原标签。用户配置的标签、说明、选项及默认值不自动翻译。
+切换语言不重新初始化表单、不主动校验；外层表单使用 `validate-on-rule-change=false`。
+`getData()` 保留原字段协议和序列化校验消息，不因当前语言改写已保存配置；显式 `err_msg` 和
+传入的校验规则优先。通用缺省提示在展示或校验时翻译。引用的选择弹窗、JSON 编辑器和文件上传
+组件内部文案由各自组件管理。
 
 字段配置中的动态校验器和表格行表达式属于受信任的服务端协议，只允许加载可信配置；普通业务
 输入不得作为脚本传入。

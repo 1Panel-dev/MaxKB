@@ -32,3 +32,23 @@ export const referenceOptionsHelp = `变量的值必须符合:
 label: 标签 必填
 value: 值 必填
 default: 是否为默认值`
+
+/** 控件类型的展示翻译 key；不写入字段配置。 */
+export const DYNAMIC_FORM_TYPE_MESSAGE_KEYS: Record<string, string> = {
+  TextInput: 'dynamicForm.types.textInput',
+  TextareaInput: 'dynamicForm.types.textareaInput',
+  JsonInput: 'dynamicForm.types.jsonInput',
+  PasswordInput: 'dynamicForm.types.passwordInput',
+  SingleSelect: 'dynamicForm.types.singleSelect',
+  MultiSelect: 'dynamicForm.types.multiSelect',
+  RadioCard: 'dynamicForm.types.radioCard',
+  RadioRow: 'dynamicForm.types.radioRow',
+  MultiRow: 'dynamicForm.types.multiRow',
+  Slider: 'dynamicForm.types.slider',
+  SwitchInput: 'dynamicForm.types.switchInput',
+  DatePicker: 'dynamicForm.types.datePicker',
+  UploadInput: 'dynamicForm.types.uploadInput',
+  Model: 'dynamicForm.types.model',
+  Knowledge: 'dynamicForm.types.knowledge',
+  TreeSelect: 'dynamicForm.types.treeSelect',
+}

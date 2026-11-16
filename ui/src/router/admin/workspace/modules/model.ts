@@ -6,9 +6,11 @@ export const modelRoutes: RouteRecordRaw[] = [
     path: 'model',
     name: 'workspace-model',
     component: () => import('@/views/model/index.vue'),
-    meta: { title: '模型',
+    meta: {
+      title: 'model.title',
       icon: 'icon_dataset_outlined',
-      activeIcon: 'icon_dataset_filled', order: 50,
+      activeIcon: 'icon_dataset_filled',
+      order: 50,
       permission: () => perm.model.workspace.isShare(),
       next: 'workspace-trigger',
     },

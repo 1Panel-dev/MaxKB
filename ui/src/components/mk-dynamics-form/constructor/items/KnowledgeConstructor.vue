@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { FormField } from '../../type'
 import type { KnowledgeItem } from '@/api/types'
 import type { FormItemInstance } from 'element-plus'
 import SelectKnowledgeDialog from '@/components/business/select-knowledge-dialog/index.vue'
 import Knowledge from '../../items/knowledge/Knowledge.vue'
+const { t } = useI18n({ useScope: 'global' })
 
 type KnowledgeOption = Pick<KnowledgeItem, 'id'> & Partial<Pick<KnowledgeItem, 'name' | 'type' | 'embedding_model_id'>>
 interface KnowledgeConstructorValue {
@@ -79,12 +81,16 @@ function removeKnowledge(knowledgeId: string) {
 </script>
 
 <template>
-  <el-form-item ref="knowledgeFormItemRef" prop="knowledge_list" :rules="[{ required: true, message: '请选择可选知识库', type: 'array', min: 1 }]">
+  <el-form-item
+    ref="knowledgeFormItemRef"
+    prop="knowledge_list"
+    :rules="[{ required: true, message: t('dynamicForm.fields.availableKnowledge.requiredMessage'), type: 'array', min: 1 }]"
+  >
     <MkCollapse class="w-full" trigger-class="pb-2">
       <template #label>
         <div class="flex-between w-full">
           <div class="flex-align-center">
-            <span class="mk-required">可选知识库</span>
+            <span class="mk-required">{{ t('dynamicForm.fields.availableKnowledge.label') }}</span>
             <span v-if="availableKnowledge.length">({{ availableKnowledge.length }})</span>
           </div>
 
@@ -106,15 +112,15 @@ function removeKnowledge(knowledgeId: string) {
           </el-card>
         </template>
       </div>
-      <el-text v-else type="info">请选择可选知识库</el-text>
+      <el-text v-else type="info">{{ t('dynamicForm.fields.availableKnowledge.placeholder') }}</el-text>
     </MkCollapse>
   </el-form-item>
   <el-form-item
     v-if="availableKnowledge.length"
-    label="默认知识库"
+    :label="t('dynamicForm.fields.defaultKnowledge.label')"
     prop="default_value"
     :required="formValue.required"
-    :rules="formValue.required ? [{ message: '请选择知识库', type: 'array', min: 1 }] : []"
+    :rules="formValue.required ? [{ message: t('dynamicForm.fields.knowledge.requiredMessage'), type: 'array', min: 1 }] : []"
   >
     <Knowledge v-model="formValue.default_value" :form-field="formField" />
   </el-form-item>

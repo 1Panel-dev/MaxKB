@@ -1,5 +1,5 @@
 export { default as MkDynamicsForm } from './index.vue'
 export { default as MkDynamicsFormConstructor } from './constructor/index.vue'
-export { dynamicFormTypeOptions } from './constant'
+export { DYNAMIC_FORM_TYPE_MESSAGE_KEYS, dynamicFormTypeOptions } from './constant'
 export type { DynamicFormInputType, DynamicFormTypeOption } from './constant'
 export type * from './type'

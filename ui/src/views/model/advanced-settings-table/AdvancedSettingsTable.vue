@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormField } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
-import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
+import { DYNAMIC_FORM_TYPE_MESSAGE_KEYS, dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
 import ModelParamDialog from './ModelParamDialog.vue'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ModelAdvancedSettings' })
 
@@ -19,7 +22,8 @@ function handleOpenParamDialog(field?: DynamicFormField, index?: number) {
 }
 
 function getTypeLabel(inputType: string) {
-  return dynamicFormTypeOptions.find((option) => option.value === inputType)?.label ?? inputType
+  const key = DYNAMIC_FORM_TYPE_MESSAGE_KEYS[inputType]
+  return key ? t(key) : (dynamicFormTypeOptions.find((option) => option.value === inputType)?.label ?? inputType)
 }
 
 function handleSubmitParam(field: FormField) {
@@ -27,7 +31,7 @@ function handleSubmitParam(field: FormField) {
   const modelParam: DynamicFormField = { ...field, label }
   const duplicateField = modelParams.value.some((param, index) => param.field === modelParam.field && index !== currentIndex.value)
   if (duplicateField) {
-    MsgError(`参数“${modelParam.field}”已存在`)
+    MsgError(t('model.parameters.duplicateField', { name: modelParam.field }))
     return
   }
 
@@ -36,7 +40,7 @@ function handleSubmitParam(field: FormField) {
     (param, index) => (typeof param.label === 'string' ? param.label : param.label.label) === modelParamLabel && index !== currentIndex.value,
   )
   if (duplicateLabel) {
-    MsgError(`显示名称“${modelParamLabel}”已存在`)
+    MsgError(t('model.parameters.duplicateLabel', { name: modelParamLabel }))
     return
   }
 
@@ -55,8 +59,8 @@ function handleDeleteParam(index: number) {
 
 <template>
   <div class="flex-between mb-2">
-    <span>模型参数</span>
-    <MkTooltip content="添加参数" placement="top">
+    <span>{{ t('model.parameters.title') }}</span>
+    <MkTooltip :content="t('model.parameters.add')" placement="top">
       <el-button text type="primary" @click.stop="handleOpenParamDialog()">
         <MkIcon name="icon_add_outlined" />
       </el-button>
@@ -64,25 +68,25 @@ function handleDeleteParam(index: number) {
   </div>
 
   <MkTable :data="modelParams" size="small">
-    <el-table-column label="参数" prop="field" min-width="130" show-overflow-tooltip />
-    <el-table-column label="显示名称" min-width="130" show-overflow-tooltip>
+    <el-table-column :label="t('dynamicForm.fields.field.label')" prop="field" min-width="130" show-overflow-tooltip />
+    <el-table-column :label="t('dynamicForm.fields.label.label')" min-width="130" show-overflow-tooltip>
       <template #default="{ row }">
         <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{ row.label.label }}</span>
         <span v-else>{{ row.label }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="组件类型" min-width="100">
+    <el-table-column :label="t('dynamicForm.fields.inputType.label')" min-width="100">
       <template #default="{ row }">
         <el-tag size="small" type="info">{{ getTypeLabel(row.input_type) }}</el-tag>
       </template>
     </el-table-column>
-    <el-table-column label="默认值" prop="default_value" show-overflow-tooltip> </el-table-column>
-    <el-table-column label="必填" width="70">
+    <el-table-column :label="t('dynamicForm.fields.defaultValue.label')" min-width="90" prop="default_value" show-overflow-tooltip></el-table-column>
+    <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" min-width="70">
       <template #default="{ row }">
         <el-switch :model-value="row.required ?? false" disabled size="small" />
       </template>
     </el-table-column>
-    <el-table-column label="操作" width="100">
+    <el-table-column :label="t('common.labels.operation')" width="100">
       <template #default="{ row, $index }">
         <el-button text type="primary" @click="handleOpenParamDialog(row, $index)">
           <MkIcon name="icon_edit_outlined" />

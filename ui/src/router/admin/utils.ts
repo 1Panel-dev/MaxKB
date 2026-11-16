@@ -13,40 +13,52 @@ interface MenuRouteRecord {
 const scopedRoutes: RouteRecordRaw[] = [workspaceRoutes, systemRoutes]
 
 /** 将路由记录递归转换为 Layout 菜单。 */
-function createMenuItems(routes: readonly MenuRouteRecord[], detailParams?: RouteParamsGeneric): LayoutMenuItem[] {
-  return routes
-    .filter((route) => route.name && route.meta?.title && route.meta.hidden !== true)
-    .filter((route) => !detailParams || ((route.meta?.detailMenuVisible?.(detailParams) ?? true) && (!route.meta?.permission || (route.meta.permission as (route: { params: RouteParamsGeneric }) => boolean)({ params: detailParams }))))
-    .sort((a, b) => (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER))
-    .map((route) => {
-      const children = route.children ? createMenuItems(route.children, detailParams) : []
+function createMenuItems(
+  routes: readonly MenuRouteRecord[],
+  detailParams?: RouteParamsGeneric,
+  translateTitle?: (title: string) => string,
+): LayoutMenuItem[] {
+  return (
+    routes
+      .filter((route) => route.name && route.meta?.title && route.meta.hidden !== true)
+      .filter(
+        (route) =>
+          !detailParams ||
+          ((route.meta?.detailMenuVisible?.(detailParams) ?? true) &&
+            (!route.meta?.permission || (route.meta.permission as (route: { params: RouteParamsGeneric }) => boolean)({ params: detailParams }))),
+      )
+      .sort((a, b) => (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER))
+      .map((route) => {
+        const children = route.children ? createMenuItems(route.children, detailParams, translateTitle) : []
 
-      return {
-        name: String(route.name),
-        label: route.meta!.title!,
-        activeIcon: route.meta?.activeIcon,
-        icon: route.meta?.icon,
-        route: { name: route.name! },
-        permission: detailParams && route.meta?.permission
-          ? () => (route.meta!.permission as (route: { params: RouteParamsGeneric }) => boolean)({ params: detailParams })
-          : route.meta?.permission as LayoutMenuItem['permission'],
-        children: route.children?.length ? children : undefined,
-      }
-    })
-    // 一级业务入口的列表和详情子路由通常全部隐藏；仅详情目录需要移除空分组。
-    .filter((menuItem) => !detailParams || !menuItem.children || menuItem.children.length > 0)
+        return {
+          name: String(route.name),
+          label: translateTitle ? translateTitle(route.meta!.title!) : route.meta!.title!,
+          activeIcon: route.meta?.activeIcon,
+          icon: route.meta?.icon,
+          route: { name: route.name! },
+          permission:
+            detailParams && route.meta?.permission
+              ? () => (route.meta!.permission as (route: { params: RouteParamsGeneric }) => boolean)({ params: detailParams })
+              : (route.meta?.permission as LayoutMenuItem['permission']),
+          children: route.children?.length ? children : undefined,
+        }
+      })
+      // 一级业务入口的列表和详情子路由通常全部隐藏；仅详情目录需要移除空分组。
+      .filter((menuItem) => !detailParams || !menuItem.children || menuItem.children.length > 0)
+  )
 }
 
 /** 根据 Workspace 或 System 路由树生成一级侧栏目录。 */
-export function getChildRouteList(scope: RouteScope): LayoutMenuItem[] {
+export function getChildRouteList(scope: RouteScope, translateTitle?: (title: string) => string): LayoutMenuItem[] {
   const rootRoute = scopedRoutes.find((route) => route.meta?.scope === scope)
 
-  return createMenuItems(rootRoute?.children ?? [])
+  return createMenuItems(rootRoute?.children ?? [], undefined, translateTitle)
 }
 
 /** 根据当前匹配路由生成所属详情父路由的二级侧栏目录。 */
-export function getMatchedChildRouteList(route: RouteLocationNormalizedLoaded): LayoutMenuItem[] {
+export function getMatchedChildRouteList(route: RouteLocationNormalizedLoaded, translateTitle?: (title: string) => string): LayoutMenuItem[] {
   const detailRoot = route.matched.find((matchedRoute) => matchedRoute.meta.resourceDetailRoot === true)
 
-  return createMenuItems(detailRoot?.children ?? [], route.params)
+  return createMenuItems(detailRoot?.children ?? [], route.params, translateTitle)
 }

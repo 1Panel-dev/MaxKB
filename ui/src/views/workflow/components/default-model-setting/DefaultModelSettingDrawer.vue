@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemModelApi from '@/api/admin/system/resource-management/model'
 import type SharedModelApi from '@/api/admin/system/shared-resources/model'
 import type ModelApi from '@/api/admin/workspace/model'
@@ -9,16 +10,18 @@ import type LogicFlow from '@logicflow/core'
 import ModelProviderApi from '@/api/admin/model-provider'
 import SelectModel from '@/components/business/select-model/index.vue'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
-import { MODEL_TYPE_LABELS } from '@/constants/model'
+import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DefaultModelSettingDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const defaultModelTypes = ['LLM', 'TTS', 'STT', 'IMAGE', 'TTI', 'TTV', 'ITV', 'RERANKER'] as const
-const defaultModelTypeLabels: Record<string, string> = {
-  ...MODEL_TYPE_LABELS,
+const defaultModelTypeLabels = computed<Record<string, string>>(() => ({
+  ...Object.fromEntries(Object.entries(MODEL_TYPE_MESSAGE_KEYS).map(([value, key]) => [value, t(key)])),
   LLM: 'AI 模型',
-}
+}))
 
 const props = defineProps<{
   modelValue?: DefaultModelSettingPayload

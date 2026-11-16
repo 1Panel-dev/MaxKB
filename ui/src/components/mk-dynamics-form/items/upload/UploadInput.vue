@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, ref, useAttrs } from 'vue'
 import { useFormDisabled } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
@@ -9,6 +10,8 @@ import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl, isAudio, isImage, isVideo } from '@/utils/icon'
 import { MsgWarning } from '@/utils/message'
+const { t } = useI18n({ useScope: 'global' })
+
 const inputDisabled = useFormDisabled()
 const attrs = useAttrs() as DynamicFormValue
 const upload = inject('upload') as DynamicFormValue
@@ -52,18 +55,18 @@ const loading = ref<boolean>(false)
 const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) => {
   fileList.splice(fileList.indexOf(file), 1)
   if (fileArray.value.find((f: DynamicFormValue) => f.name === file.name)) {
-    MsgWarning('文件名重复')
+    MsgWarning(t('dynamicForm.upload.duplicateName'))
 
     return
   }
   const maxFileSize = (props.formField as DynamicFormValue).max_file_size
   if (file.size / 1024 / 1024 > maxFileSize) {
-    MsgWarning('文件大小不能超过 ' + maxFileSize + 'MB')
+    MsgWarning(t('dynamicForm.upload.sizeLimit', { size: maxFileSize }))
     return
   }
 
   if (fileList.length > attrs.limit) {
-    MsgWarning('最多只能上传 ' + attrs.limit + ' 个文件')
+    MsgWarning(t('dynamicForm.upload.countLimit', { count: attrs.limit }))
     return
   }
   upload(file.raw, loading).then((ok: DynamicFormValue) => {
@@ -90,7 +93,7 @@ const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) 
   >
     <el-button plain>
       <MkIcon name="icon_upload_outlined" />
-      <span>上传文件</span>
+      <span>{{ t('common.actions.uploadFiles') }}</span>
     </el-button>
   </el-upload>
   <div v-if="attachments.length" class="mt-2 flex flex-wrap w-full gap-2">

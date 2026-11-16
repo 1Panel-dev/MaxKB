@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed, inject, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormConstructorOption, DynamicFormValidatorCallback, DynamicFormValue, FormField } from '../../type'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import { referenceOptionsHelp } from '../../constant'
 import MultiRow from '../../items/MultiRow.vue'
+const { t } = useI18n({ useScope: 'global' })
+
 const getModel = inject<() => DynamicFormValue>('getModel')
 
 const assignmentMethodOptions = computed(() => {
-  const options = [{ label: '自定义', value: 'custom' }]
+  const options = [{ label: t('dynamicForm.options.custom'), value: 'custom' }]
   if (getModel) {
-    options.push({ label: '引用变量', value: 'ref_variables' })
+    options.push({ label: t('dynamicForm.options.reference'), value: 'ref_variables' })
   }
   return options
 })
@@ -36,7 +38,7 @@ const referenceVariableRule = {
   required: true,
   validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
     if (!(Array.isArray(value) && value.length > 1)) {
-      callback('请输入引用变量')
+      callback(t('dynamicForm.fields.reference.requiredMessage'))
     }
 
     return true
@@ -101,7 +103,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form-item v-if="getModel" label="赋值方式">
+  <el-form-item v-if="getModel" :label="t('dynamicForm.fields.assignment.label')">
     <el-radio-group @change="resetOptions" v-model="formValue.assignment_method">
       <el-radio :value="item.value" v-for="(item, index) in assignmentMethodOptions" :key="index">
         <span class="flex-align-center gap-1">
@@ -109,7 +111,7 @@ onMounted(() => {
 
           <MkTooltip placement="right" v-if="item.value === 'ref_variables'">
             <template #content>
-              <div class="whitespace-pre-wrap">{{ referenceOptionsHelp }}</div>
+              <div class="whitespace-pre-wrap">{{ t('dynamicForm.help.referenceOptions') }}</div>
             </template>
             <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
           </MkTooltip>
@@ -118,12 +120,17 @@ onMounted(() => {
     </el-radio-group>
   </el-form-item>
   <el-form-item v-if="formValue.assignment_method === 'ref_variables'" :required="true" prop="option_list" :rules="[referenceVariableRule]">
-    <NodeCascader ref="nodeCascaderRef" :nodeModel="model" placeholder="请选择变量" v-model="formValue.option_list" />
+    <NodeCascader
+      ref="nodeCascaderRef"
+      :nodeModel="model"
+      :placeholder="t('dynamicForm.fields.variable.placeholder')"
+      v-model="formValue.option_list"
+    />
   </el-form-item>
 
   <div v-if="formValue.assignment_method === 'custom'" class="mb-4">
     <div class="flex-between mb-2">
-      <span>选项值</span>
+      <span>{{ t('dynamicForm.fields.optionValue.label') }}</span>
       <el-button text type="primary" @click.stop="addOption()">
         <MkIcon name="icon_add_outlined"></MkIcon>
       </el-button>
@@ -133,20 +140,34 @@ onMounted(() => {
       <MkFormList v-model="formValue.option_list" :default-item="{ label: '', value: '' }" :show-add-button="false" @remove="handleOptionRemove">
         <template #default="{ index, item: option }">
           <el-form-item
-            :label="index === 0 ? '标签' : ''"
+            :label="index === 0 ? t('dynamicForm.fields.optionLabel.label') : ''"
             :prop="`option_list.${index}.label`"
-            :rules="[{ whitespace: true, required: formValue.required, message: '请输入标签', trigger: ['blur', 'change'] }]"
+            :rules="[
+              {
+                whitespace: true,
+                required: formValue.required,
+                message: t('dynamicForm.fields.optionLabel.requiredMessage'),
+                trigger: ['blur', 'change'],
+              },
+            ]"
             class="flex-1 small"
           >
-            <el-input v-model="option.label" placeholder="请输入标签" />
+            <el-input v-model="option.label" :placeholder="t('dynamicForm.fields.optionLabel.placeholder')" />
           </el-form-item>
           <el-form-item
-            :label="index === 0 ? '选项值' : ''"
+            :label="index === 0 ? t('dynamicForm.fields.optionValue.label') : ''"
             :prop="`option_list.${index}.value`"
-            :rules="[{ whitespace: true, required: formValue.required, message: '请输入选项值', trigger: ['blur', 'change'] }]"
+            :rules="[
+              {
+                whitespace: true,
+                required: formValue.required,
+                message: t('dynamicForm.fields.optionValue.requiredMessage'),
+                trigger: ['blur', 'change'],
+              },
+            ]"
             class="flex-1 small"
           >
-            <el-input v-model="option.value" placeholder="请输入选项值" />
+            <el-input v-model="option.value" :placeholder="t('dynamicForm.fields.optionValue.placeholder')" />
           </el-form-item>
         </template>
       </MkFormList>
@@ -157,12 +178,12 @@ onMounted(() => {
     v-if="formValue.assignment_method === 'custom'"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: '请输入默认值' }] : []"
+    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.fields.defaultValue.requiredMessage') }] : []"
   >
     <template #label>
       <div class="flex-between">
-        <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
-        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+        <span :class="formValue.required ? 'mk-required' : ''">{{ t('dynamicForm.fields.defaultValue.label') }}</span>
+        <el-checkbox v-model="formValue.show_default_value" :label="t('dynamicForm.options.showDefault')" />
       </div>
     </template>
     <MultiRow v-if="completeOptions.length" v-model="formValue.default_value" :form-field="formField" :other-params="{}" field="default_value" />

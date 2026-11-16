@@ -20,6 +20,10 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 供前端判断及知识库详情路由 `type` 参数使用，地址不传数字；`KNOWLEDGE_TYPE_LABELS` 按这些字符串提供展示文案。提交接口时仍使用数字枚举值。
 字符串标识统一由 `KNOWLEDGE_TYPE_KEY` 维护，映射、文案和业务判断均引用该常量，避免重复写裸字符串。
 
+`model.ts` 的 `MODEL_TYPE_MESSAGE_KEYS` 是模型类型的共用翻译 key 映射，供模型业务、系统模型页、
+工作流默认模型设置和动态表单模型控件使用。调用方通过当前应用的 `t` 翻译，依赖语言的
+选项在 computed 中生成；不在常量内绑定入口国际化实例，不改变类型协议值。
+
 `resource-authorization.ts` 的 `RESOURCE_PERMISSION_OPTIONS` 统一维护权限标签和说明；
 资源授权页面与资源用户授权抽屉按版本和根目录约束筛选选项。
 
